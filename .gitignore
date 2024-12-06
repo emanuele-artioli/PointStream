@@ -162,5 +162,8 @@ cython_debug/
 # PointStream
 backup/
 legacy/
-frames/
+frames*/
 scenes/
+input/
+.vscode/
+*.pt
