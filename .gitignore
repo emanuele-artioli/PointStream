@@ -161,4 +161,6 @@ cython_debug/
 
 # PointStream
 backup/
-video/
+legacy/
+frames/
+scenes/
