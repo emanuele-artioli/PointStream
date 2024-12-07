@@ -1,6 +1,8 @@
 import os
+import numpy as np
 import subprocess
 import cv2
+import csv
 # import torch
 from ultralytics import YOLO
 
@@ -77,7 +79,6 @@ if not os.listdir(frames_folder):
         '-threads', '0',
         '-i', scene_path,
         '-vf', f'scale=-1:{height}',
-        '-c:v', 'libx264', 
         os.path.join(frames_folder, '%05d.png')
     ])
 
@@ -88,39 +89,74 @@ pose_model = YOLO('yolo11n-pose.pt')
 # Perform instance segmentation and pose estimation on the frames if not already done
 frames_segmented_folder = f'/app/frames_segmented/{video_name}/{scene_name}/{height}p'
 frames_pose_folder = f'/app/frames_pose/{video_name}/{scene_name}/{height}p'
+frames_pose_csv = f'/{frames_pose_folder}/poses.csv'
 os.makedirs(frames_segmented_folder, exist_ok=True)
 os.makedirs(frames_pose_folder, exist_ok=True)
-if not os.listdir(frames_segmented_folder):
-    for frame_file in sorted(os.listdir(frames_folder)):
-        frame_name, _ = os.path.splitext(frame_file)
-        frame_path = os.path.join(frames_folder, frame_file)
-        if not frame_file.endswith(".png"):
-            continue
 
-        # Read the frame
-        frame = cv2.imread(frame_path)
+# Open CSV file for writing pose data
+with open(frames_pose_csv, mode='w', newline='') as csv_file:
+    csv_writer = csv.writer(csv_file)
+    csv_writer.writerow(['frame', 'object_id', 'keypoint_id', 'x', 'y', 'confidence'])
 
-        # Perform instance segmentation
-        results_seg = segmentation_model.track(frame, persist=True)
+    if not os.listdir(frames_segmented_folder):
+        for frame_file in sorted(os.listdir(frames_folder)):
+            frame_name, _ = os.path.splitext(frame_file)
+            frame_path = os.path.join(frames_folder, frame_file)
+            if not frame_file.endswith(".png"):
+                continue
 
-        # Save segmentation result
-        segmented_frame = results_seg[0].plot()  # Visualization
-        cv2.imwrite(os.path.join(frames_segmented_folder, frame_file), segmented_frame)
+            # Read the frame
+            frame = cv2.imread(frame_path)
 
-        # Process each detected object
-        segmented_objects_folder = os.path.join(frames_segmented_folder, frame_name)
-        os.makedirs(segmented_objects_folder, exist_ok=True)
-        for i, mask in enumerate(results_seg[0].masks):
-            # Extract the object using the mask
-            object_img = cv2.bitwise_and(frame, frame, mask=mask.data[0].numpy())
+            # Perform instance segmentation
+            results_seg = segmentation_model.track(frame, persist=True)
 
-            # Save the object image
-            object_output_path = os.path.join(segmented_objects_folder, f'object_{i}.png')
-            cv2.imwrite(object_output_path, object_img)
+            # Save segmentation result
+            segmented_frame = results_seg[0].plot()  # Visualization
+            cv2.imwrite(os.path.join(frames_segmented_folder, frame_file), segmented_frame)
 
-        # Perform pose estimation
-        results_pose = pose_model(frame)
-        pose_frame = results_pose[0].plot()  # Visualization
+            # Process each detected object
+            segmented_objects_folder = os.path.join(frames_segmented_folder, frame_name)
+            os.makedirs(segmented_objects_folder, exist_ok=True)
+            for i, mask in enumerate(results_seg[0].masks):
+                # Ensure the mask is in the correct format
+                mask = mask.data[0].numpy().astype(np.uint8)
 
-        # Save pose estimation result
-        cv2.imwrite(os.path.join(frames_pose_folder, frame_file), pose_frame)
+                # Calculate the aspect ratio of the frame
+                frame_aspect_ratio = frame.shape[1] / frame.shape[0]
+
+                # Calculate the target height for the mask to match the aspect ratio
+                target_height = int(mask.shape[1] / frame_aspect_ratio)
+
+                # Pad or crop the mask to match the target height
+                if target_height > mask.shape[0]:
+                    # Pad the mask vertically
+                    pad_height = (target_height - mask.shape[0]) // 2
+                    mask_padded = np.pad(mask, ((pad_height, target_height - mask.shape[0] - pad_height), (0, 0)), mode='constant', constant_values=0)
+                else:
+                    # Crop the mask vertically
+                    crop_height = (mask.shape[0] - target_height) // 2
+                    mask_padded = mask[crop_height:crop_height + target_height, :]
+
+                # Resize the mask to match the dimensions of the frame
+                mask_resized = cv2.resize(mask_padded, (frame.shape[1], frame.shape[0]))
+
+                # Extract the object using the resized mask
+                object_img = cv2.bitwise_and(frame, frame, mask=mask_resized)
+
+                # Save the object image
+                object_output_path = os.path.join(segmented_objects_folder, f'{i}.png')
+                cv2.imwrite(object_output_path, object_img)
+
+            # Perform pose estimation
+                results_pose = pose_model.track(frame, persist=True)
+                pose_frame = results_pose[0].plot()  # Visualization
+
+                # Save pose estimation result
+                cv2.imwrite(os.path.join(frames_pose_folder, frame_file), pose_frame)
+
+                # Extract and save pose keypoints to CSV
+                for j, keypoints in enumerate(results_pose[0].keypoints):
+                    for k, keypoint in enumerate(keypoints):
+                        x, y, confidence = keypoint
+                        csv_writer.writerow([frame_file, j, k, x, y, confidence])
