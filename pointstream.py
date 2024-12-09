@@ -156,7 +156,7 @@ with open(frames_pose_csv, mode='w', newline='') as csv_file:
                 cv2.imwrite(os.path.join(frames_pose_folder, frame_file), pose_frame)
 
                 # Extract and save pose keypoints to CSV
-                for j, keypoints in enumerate(results_pose[0].keypoints):
+                for j, keypoints in enumerate(results_pose[0].numpy().keypoints.data):
                     for k, keypoint in enumerate(keypoints):
                         x, y, confidence = keypoint
                         csv_writer.writerow([frame_file, j, k, x, y, confidence])
