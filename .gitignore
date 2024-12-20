@@ -167,3 +167,4 @@ scenes/
 input/
 .vscode/
 *.pt
+.DS_Store
