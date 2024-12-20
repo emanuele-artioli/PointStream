@@ -15,7 +15,13 @@ COPY requirements.txt .
 RUN python -m pip install -r requirements.txt
 
 WORKDIR /app
-COPY . .
+
+# Add the pretrained models
+ADD https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s-seg.pt /app/yolo11s-seg.pt
+ADD https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n-pose.pt /app/yolo11n-pose.pt
+ADD https://github.com/ultralytics/assets/releases/download/v8.3.0/sam2.1_t.pt /app/sam2.1_t.pt
+
+COPY . /app
 
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 # For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers

@@ -4,7 +4,7 @@ import subprocess
 import cv2
 import csv
 # import torch
-from ultralytics import YOLO
+from ultralytics import YOLO, SAM
 import easyocr
 
 video_name = os.environ["VIDEO_NAME"]
@@ -133,8 +133,21 @@ if not os.listdir(frames_pose_folder):
 frames_segmented_folder = f'/app/frames_segmented/{video_name}/{scene_name}/{height}p'
 os.makedirs(frames_segmented_folder, exist_ok=True)
 if not os.listdir(frames_segmented_folder):
-    # Load YOLO model
-    segmentation_model = YOLO('yolo11n-seg.pt')
+    # Load segmentation model
+    segmentation_model = SAM('sam2.1_t.pt')
+
+    # Read bounding boxes from the CSV file
+    bboxes = {}
+    with open(frames_pose_csv, mode='r') as csv_file:
+        csv_reader = csv.reader(csv_file)
+        header = next(csv_reader)  # Skip the header
+        for row in csv_reader:
+            frame, object_id, object_type, bbox_x1, bbox_y1, bbox_x2, bbox_y2, keypoint_id, x, y = row
+            if frame not in bboxes:
+                bboxes[frame] = {}
+            if object_id not in bboxes[frame]:
+                bboxes[frame][object_id] = (float(bbox_x1), float(bbox_y1), float(bbox_x2), float(bbox_y2))
+
     for frame_file in sorted(os.listdir(frames_folder)):
         frame_name, _ = os.path.splitext(frame_file)
         frame_path = os.path.join(frames_folder, frame_file)
@@ -145,7 +158,7 @@ if not os.listdir(frames_segmented_folder):
         frame = cv2.imread(frame_path)
 
         # Perform instance segmentation
-        results_seg = segmentation_model.track(frame, persist=True)
+        results_seg = segmentation_model.predict(frame, bboxes=list(bboxes[frame_file].values()))
 
         # Save segmentation result
         segmented_frame = results_seg[0].plot()  # Visualization
