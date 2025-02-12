@@ -4,74 +4,68 @@ import csv
 import argparse
 from ultralytics import YOLO
 
-def perform_pose_estimation(frames_folder, frames_pose_folder, frames_pose_csv, height, width):
-    # Load YOLO model for pose estimation
+# can be sped up with multiprocessing
+# tells when no objects are detected, which can be used to avoid sending the image to client
+def perform_pose_estimation(segmented_objects_folder, pose_csv):
     model = YOLO('yolo11n-pose.pt')
 
-    # Open CSV file for writing pose data
-    with open(frames_pose_csv, mode='w', newline='') as csv_file:
+    with open(pose_csv, mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
-        # Updated header to include bounding box coordinates and keypoints
         header = ['frame', 'object_id', 'object_type', 'bbox_x1', 'bbox_y1', 'bbox_x2', 'bbox_y2']
-        for i in range(17):  # Assuming 17 keypoints
+        for i in range(17):
             header.extend([f'keypoint_{i}_x', f'keypoint_{i}_y'])
         csv_writer.writerow(header)
 
-        for frame_file in sorted(os.listdir(frames_folder)):
-            frame_name, _ = os.path.splitext(frame_file)
-            frame_path = os.path.join(frames_folder, frame_file)
-            if not frame_file.endswith(".png"):
+        # For each object subfolder, parse images and run YOLO pose
+        for obj_folder in sorted(os.listdir(segmented_objects_folder)):
+            full_obj_path = os.path.join(segmented_objects_folder, obj_folder)
+            if not os.path.isdir(full_obj_path):
                 continue
 
-            # Read the frame
-            frame = cv2.imread(frame_path)
+            # Use folder name (e.g., "object_4" or "object_sam_0_1") as object_id
+            object_id = obj_folder
 
-            # Perform pose estimation
-            results_pose = model.track(
-                frame, 
-                persist=True,
-                imgsz=(height//2, width//2), 
-                half=True,
-                max_det=30,
-                classes=[0],
-                save=False
-            )[0].numpy()
+            for frame_file in sorted(os.listdir(full_obj_path)):
+                if not frame_file.lower().endswith(('.png', '.jpg', '.jpeg')):
+                    continue
 
-            # Extract and save pose keypoints and bounding boxes to CSV
-            for i, id_obj in enumerate(results_pose.boxes.id):
-                # Get bounding box coordinates
-                x1, y1, x2, y2 = results_pose.boxes.xyxy[i]
-                # Get object type
-                object_type = results_pose.boxes.cls[i]
+                frame_path = os.path.join(full_obj_path, frame_file)
+                frame = cv2.imread(frame_path)
+                if frame is None:
+                    continue
 
-                # Prepare row data
-                row = [frame_file, int(id_obj), object_type, x1, y1, x2, y2]
-                for keypoint in results_pose.keypoints.xy[i]:
-                    row.extend(keypoint)
+                results = model.predict(
+                    frame,
+                    imgsz=640,
+                    classes=[0],
+                    max_det=2, 
+                    retina_masks=True,
+                )[0]
 
-                csv_writer.writerow(row)
+                for i, box in enumerate(results.boxes):
+                    x1, y1, x2, y2 = box.xyxy[0]
+                    object_type = box.cls[0]
+                    row = [frame_file, object_id, object_type, x1.item(), y1.item(), x2.item(), y2.item()]
+                    # Append keypoints
+                    if results.keypoints is not None:
+                        for kp in results.keypoints.xy[i]:
+                            row.extend(kp.tolist())
+                    csv_writer.writerow(row)
 
-                # Plot the whole frame with keypoints and edges
-                pose_frame = results_pose.plot(line_width=1, boxes=False, masks=False)
+                # # Optionally save pose visualization
+                # pose_frame = results.plot(line_width=1, boxes=False, masks=False)
+                # frame_output_folder = os.path.join(os.path.dirname(pose_csv), obj_folder, 'pose_vis')
+                # os.makedirs(frame_output_folder, exist_ok=True)
+                # cv2.imwrite(os.path.join(frame_output_folder, frame_file), pose_frame)
 
-                # Create a folder for each frame
-                frame_output_folder = os.path.join(frames_pose_folder, frame_name)
-                os.makedirs(frame_output_folder, exist_ok=True)
-
-                # Crop the player image from the whole pose frame
-                player_img = pose_frame[int(y1):int(y2), int(x1):int(x2)].copy()
-
-                # Save the player image with keypoints and edges
-                player_output_path = os.path.join(frame_output_folder, f'{int(id_obj)}.png')
-                cv2.imwrite(player_output_path, player_img)
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Perform pose estimation on video frames.')
-    parser.add_argument('--frames_folder', type=str, required=True, help='Path to the folder containing video frames.')
-    parser.add_argument('--frames_pose_folder', type=str, required=True, help='Path to the folder to save pose estimation results.')
-    parser.add_argument('--frames_pose_csv', type=str, required=True, help='Path to the CSV file to save pose estimation data.')
-    parser.add_argument('--target_height', type=int, required=True, help='Target processing height for the video frames.')
-    parser.add_argument('--target_width', type=int, required=True, help='Target processing width for the video frames.')
+def main():
+    parser = argparse.ArgumentParser(description='Perform pose estimation on segmented object frames.')
+    parser.add_argument('--segmented_objects_folder', type=str, required=True, help='Folder containing subfolders of object frames.')
+    parser.add_argument('--pose_csv', type=str, required=True, help='Path to the CSV file to save pose estimation data.')
     args = parser.parse_args()
 
-    perform_pose_estimation(args.frames_folder, args.frames_pose_folder, args.frames_pose_csv, args.target_height, args.target_width)
+    os.makedirs(os.path.dirname(args.pose_csv), exist_ok=True)
+    perform_pose_estimation(args.segmented_objects_folder, args.pose_csv)
+
+if __name__ == "__main__":
+    main()
