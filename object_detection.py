@@ -5,7 +5,7 @@ import csv
 from ultralytics import YOLO
 import numpy as np
 
-def perform_object_detection(input_file, segmented_folder, N_saved=2):
+def perform_object_detection(input_file, detected_folder, background_folder, N_saved=2):
     model = YOLO('yolo11n.pt')
     results = model.track(
         input_file, 
@@ -18,7 +18,7 @@ def perform_object_detection(input_file, segmented_folder, N_saved=2):
     )
     
     # Create CSV file and write header
-    csv_file = os.path.join(segmented_folder, 'box_coordinates.csv')
+    csv_file = os.path.join(detected_folder, 'box_coordinates.csv')
     with open(csv_file, mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(['frame_id', 'object_id', 'x1', 'y1', 'x2', 'y2'])
@@ -44,7 +44,7 @@ def perform_object_detection(input_file, segmented_folder, N_saved=2):
                 with open(csv_file, mode='a', newline='') as file:
                     writer = csv.writer(file)
                     writer.writerow([frame_id, obj_id, x1, y1, x2, y2])
-                obj_folder = os.path.join(segmented_folder, f"person_{obj_id}")
+                obj_folder = os.path.join(detected_folder, f"person_{obj_id}")
                 os.makedirs(obj_folder, exist_ok=True)
                 object_img = frame[y1:y2, x1:x2]
                 cv2.imwrite(os.path.join(obj_folder, f"{frame_id:04d}.png"), object_img)
@@ -58,7 +58,7 @@ def perform_object_detection(input_file, segmented_folder, N_saved=2):
                 with open(csv_file, mode='a', newline='') as file:
                     writer = csv.writer(file)
                     writer.writerow([frame_id, obj_id, x1, y1, x2, y2])
-                obj_folder = os.path.join(segmented_folder, f"person_{obj_id}")
+                obj_folder = os.path.join(detected_folder, f"person_{obj_id}")
                 os.makedirs(obj_folder, exist_ok=True)
                 object_img = frame[y1:y2, x1:x2]
                 cv2.imwrite(os.path.join(obj_folder, f"{frame_id:04d}.png"), object_img)
@@ -68,20 +68,51 @@ def perform_object_detection(input_file, segmented_folder, N_saved=2):
         
         # Apply the mask to the frame to remove the bounding box areas
         background = cv2.bitwise_and(frame, frame, mask=mask)
-        cv2.imwrite(os.path.join(segmented_folder, f"background_{frame_id:04d}.png"), background)
+        
+        cv2.imwrite(os.path.join(background_folder, f"{frame_id:04d}.png"), background)
         
         # Update the last known bounding boxes
         last_known_boxes.update(current_boxes)
         
         frame_id += 1
 
+def stitch_background_images(background_folder):
+    background_images = []
+    for filename in sorted(os.listdir(background_folder)):
+        if filename.endswith(".png"):
+            img_path = os.path.join(background_folder, filename)
+            img = cv2.imread(img_path)
+            if img is not None:
+                background_images.append(img)
+    
+    if not background_images:
+        print("No background images found.")
+        return None
+    
+    # Initialize the stitched image with the first background image
+    stitched_image = background_images[0].copy()
+    
+    for img in background_images[1:]:
+        # Overlay the images
+        mask = (stitched_image == 0)
+        stitched_image[mask] = img[mask]
+    
+    return stitched_image
+
 def main():
     parser = argparse.ArgumentParser(description='Perform instance segmentation on video.')
     parser.add_argument('--input_file', type=str, required=True, help='Path to the input video file.')
     parser.add_argument('--detected_folder', type=str, required=True, help='Folder to save detected images and CSV file.')
     args = parser.parse_args()
+
+    background_folder = os.path.join(args.detected_folder, "background")
+    os.makedirs(background_folder, exist_ok=True)
     
-    perform_object_detection(args.input_file, args.detected_folder)
+    perform_object_detection(args.input_file, args.detected_folder, background_folder)
+
+    stitched_image = stitch_background_images(background_folder)
+    if stitched_image is not None:
+        cv2.imwrite(os.path.join(args.detected_folder, 'full_background.png'), stitched_image)
 
 if __name__ == "__main__":
     main()
