@@ -25,33 +25,33 @@ if not os.listdir(detected_folder):
     elapsed_time = time.time() - start_time
     print(f"Elapsed time for object detection: {elapsed_time}")
 
-# # Perform instance segmentation on the frames if not already done
-# segmented_folder = '/app/segmented_objects'
-# os.makedirs(segmented_folder, exist_ok=True)
-# if not os.listdir(segmented_folder):
-#     # Calculate the elapsed time of this task
-#     start_time = time.time()
-#     model = os.environ.get("SEGMENTATION_MODEL", "yolo")  # Default to 'yolo' if not specified
-#     subprocess.call([
-#         'python', 'instance_segmentation.py',
-#         '--input_file', video_file,
-#         '--segmented_folder', segmented_folder,
-#         '--model', model
-#     ])
-#     elapsed_time = time.time() - start_time
-#     print(f"Elapsed time for instance segmentation: {elapsed_time}")
+# Perform instance segmentation on the frames if not already done
+segmented_folder = '/app/segmented_objects'
+os.makedirs(segmented_folder, exist_ok=True)
+if not os.listdir(segmented_folder):
+    # Calculate the elapsed time of this task
+    start_time = time.time()
+    model = os.environ.get("SEGMENTATION_MODEL", "yolo")  # Default to 'yolo' if not specified
+    subprocess.call([
+        'python', 'instance_segmentation.py',
+        '--detected_folder', detected_folder,
+        '--segmented_folder', segmented_folder,
+        '--model', model
+    ])
+    elapsed_time = time.time() - start_time
+    print(f"Elapsed time for instance segmentation: {elapsed_time}")
 
-# # Perform pose estimation on the segmented objects if not already done
-# pose_csv = "/app/poses.csv"
-# if not os.path.isfile(pose_csv):
-#     start_time = time.time()
-#     subprocess.call([
-#         'python', 'pose_estimation.py',
-#         '--segmented_objects_folder', segmented_folder,
-#         '--pose_csv', pose_csv
-#     ])
-#     elapsed_time = time.time() - start_time
-#     print(f"Elapsed time for pose estimation: {elapsed_time}")
+# Perform pose estimation on the segmented objects if not already done
+pose_csv = "/app/poses.csv"
+if not os.path.isfile(pose_csv):
+    start_time = time.time()
+    subprocess.call([
+        'python', 'pose_estimation.py',
+        '--segmented_folder', segmented_folder,
+        '--pose_csv', pose_csv
+    ])
+    elapsed_time = time.time() - start_time
+    print(f"Elapsed time for pose estimation: {elapsed_time}")
 
 # # Perform jersey number recognition on segmented objects if not already done
 # jersey_csv = "/app/jersey_numbers.csv"

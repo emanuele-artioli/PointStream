@@ -17,11 +17,11 @@ RUN python -m pip install -r requirements.txt
 WORKDIR /app
 
 # Add the pretrained models
-ADD https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n.pt /app/yolo11n.pt
-ADD https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n-seg.pt /app/yolo11n-seg.pt
-ADD https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n-pose.pt /app/yolo11n-pose.pt
-ADD https://github.com/ultralytics/assets/releases/download/v8.3.0/sam2.1_b.pt /app/sam2.1_b.pt
-ADD english_g2.pth /app/english_g2.pth
+# ADD https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n.pt /app/yolo11n.pt
+# ADD https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n-seg.pt /app/yolo11n-seg.pt
+# ADD https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n-pose.pt /app/yolo11n-pose.pt
+# ADD https://github.com/ultralytics/assets/releases/download/v8.3.0/sam2.1_b.pt /app/sam2.1_b.pt
+# ADD english_g2.pth /app/english_g2.pth
 
 COPY . /app
 

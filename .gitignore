@@ -167,7 +167,9 @@ scenes/
 input/
 .vscode/
 *.pt
-.DS_Store
 detected_objects/
 craft_mlt_25k.pth
 english_g2.pth
+segmented_objects/
+poses.csv
+.DS_Store
