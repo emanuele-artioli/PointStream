@@ -58,7 +58,7 @@ from ultralytics import YOLO
 #                 # cv2.imwrite(os.path.join(frame_output_folder, frame_file), pose_frame)
 
 def perform_pose_estimation(segmented_folder, pose_csv):
-    model = YOLO('yolo11n-pose.pt')
+    model = YOLO('yolo11m-pose.pt')
 
     # Create CSV file and write header
     with open(pose_csv, mode='w', newline='') as csv_file:
@@ -77,7 +77,7 @@ def perform_pose_estimation(segmented_folder, pose_csv):
             results = model.predict(
                 detected_person, 
                 conf=0.15, 
-                imgsz=640, 
+                imgsz=320, 
                 classes=[0], 
                 max_det=1, 
                 retina_masks=True, 

@@ -35,8 +35,11 @@ def perform_instance_segmentation(video_file, segmented_folder, background_folde
 
     for frame_id, result in enumerate(results):
         background = result.orig_img
-        boxes = result.boxes
-        masks = result.masks.data
+        try:
+            boxes = result.boxes
+            masks = result.masks.data
+        except AttributeError:
+            continue
         box_coordinates = {}
 
         for box, mask in zip(boxes, masks):
