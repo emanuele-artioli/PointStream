@@ -173,3 +173,5 @@ english_g2.pth
 segmented_objects/
 poses.csv
 .DS_Store
+cropped_video.mp4
+detected_objects.zip

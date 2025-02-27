@@ -1,126 +1,154 @@
 import os
-import numpy as np
 import cv2
 import argparse
 from ultralytics import YOLO
-import shutil
 
-def calculate_average_movement(box_coordinates, frame_interval=30):
-    movements = {}
-    for obj_id, coords in box_coordinates.items():
-        total_movement = 0
-        count = 0
-        for i in range(frame_interval, len(coords), frame_interval):
-            x1_prev, y1_prev, x2_prev, y2_prev = coords[i-frame_interval]
-            x1_curr, y1_curr, x2_curr, y2_curr = coords[i]
-            movement = np.sqrt((x1_curr - x1_prev)**2 + (y1_curr - y1_prev)**2 + (x2_curr - x2_prev)**2 + (y2_curr - y2_prev)**2)
-            total_movement += movement
-            count += 1
-        average_movement = total_movement / count if count > 0 else 0
-        movements[obj_id] = average_movement
-    return movements
+def extract_detections(result):
+    """Extracts object info (ID, class, confidence, bbox, mask) from a YOLO result."""
+    detections = {}
+    boxes = getattr(result, 'boxes', [])
+    masks = getattr(result, 'masks', None)
+    for i, box in enumerate(boxes):
+        detections[box.id] = {
+            'cls_id': int(box.cls[0]),
+            'conf': float(box.conf),
+            'bbox': tuple(map(int, box.xyxy[0])),
+            'mask': masks.data[i].cpu().numpy() if masks and i < len(masks.data) else None
+        }
+    return detections
 
-def perform_instance_segmentation(video_file, segmented_folder, background_folder, model, N_saved=2):
-    results = model.track(
-        video_file, 
-        conf=0.4, 
-        iou=0.5,
-        imgsz=960,
-        classes=[0], # 0: person, 32: sports ball, 38: tennis racket
-        stream=True,
-        persist=True,
-        retina_masks=True,
-        # tracker='/app/custom_botsort.yaml',
-    )
+def compute_overlap_area(a, b):
+    """Computes the overlapping area between two bounding boxes."""
+    ax1, ay1, ax2, ay2 = a
+    bx1, by1, bx2, by2 = b
+    ix1, iy1 = max(ax1, bx1), max(ay1, by1)
+    ix2, iy2 = min(ax2, bx2), min(ay2, by2)
+    return max(0, ix2 - ix1) * max(0, iy2 - iy1)
 
-    for frame_id, result in enumerate(results):
-        background = result.orig_img
-        try:
-            boxes = result.boxes
-            masks = result.masks.data
-        except AttributeError:
-            continue
-        box_coordinates = {}
+def find_overlapping_player(racket, players):
+    """Finds the person that overlaps the most with a racket."""
+    max_overlap = 0
+    max_player = None
+    for player_id, player in players.items():
+        overlap = compute_overlap_area(racket['bbox'], player['bbox'])
+        if overlap > max_overlap:
+            max_overlap = overlap
+            max_player = player_id
+    return max_player, max_overlap
 
-        for box, mask in zip(boxes, masks):
-            x1, y1, x2, y2 = map(int, box.xyxy[0])
-            obj_id = int(box.id)
+def find_objects_to_save(people, rackets=None, balls=None):
+    """Determines which objects to save based on the number of rackets detected."""
+    objects_to_save = {}
 
-            # Extract bounding box coordinates
-            if obj_id not in box_coordinates:
-                box_coordinates[obj_id] = []
-            box_coordinates[obj_id].append((x1, y1, x2, y2))
+    # If at least two rackets are detected, save the person that overlaps the most with each racket
+    if rackets:
+        if len(rackets) >= 2:
+            for racket in rackets:
+                player_id, _ = find_overlapping_player(racket, people)
+                objects_to_save[player_id] = people[player_id]
+                objects_to_save[racket['obj_id']] = racket
+    # If less than two rackets are detected, save every person and every racket
+        else:
+            objects_to_save.update(people)
+            objects_to_save.update(rackets)
+    else:
+        objects_to_save.update(people)
 
-            # Save bounding box coordinates in a single csv file
-            coordinates_file = os.path.join(segmented_folder, 'coordinates.csv')
-            with open(coordinates_file, 'a') as f:
-                f.write(f"{frame_id},{obj_id},{x1},{y1},{x2},{y2}\n")
+    # Add every ball to the list of objects to save
+    if balls:
+        objects_to_save.update(balls)
 
-            # Segment object from background
-            mask_arr = mask.cpu().numpy().astype(np.uint8)
-            output_folder = os.path.join(segmented_folder, f"object_{obj_id}")
-            os.makedirs(output_folder, exist_ok=True)
-            object_img = cv2.bitwise_and(background, background, mask=mask_arr)
-            background = cv2.bitwise_and(background, background, mask=1-mask_arr)
+    return objects_to_save      
+            
+def segment_object(frame_img, obj, frame_id):
+    '''Segment an object from the background based on its mask shape.'''
+    x1, y1, x2, y2 = obj['bbox']
+    if obj['mask'] is not None:
+        # TODO: Turn the mask from black into neon pink
+        seg = cv2.bitwise_and(frame_img, frame_img, obj['mask'].astype('uint8'))
+        return seg[y1:y2, x1:x2]
 
-            # Crop image based on bounding box and save
-            cropped_img = object_img[y1:y2, x1:x2]
-            cv2.imwrite(os.path.join(output_folder, f"{frame_id:04d}.png"), cropped_img)
-
-        # Save background image
-        cv2.imwrite(os.path.join(background_folder, f"{frame_id:04d}.png"), background)
-
-    # # Filter box coordinates to keep only the top movers
-    # movements = calculate_average_movement(box_coordinates)
-    # sorted_movements = sorted(movements.items(), key=lambda item: item[1], reverse=True)
-    # top_movers = [obj_id for obj_id, _ in sorted_movements[:N_saved]]
-
-    # # Delete objects that are not top movers
-    # for obj_id in box_coordinates:
-    #     if obj_id not in top_movers:
-    #         shutil.rmtree(os.path.join(segmented_folder, f"object_{obj_id}")) 
+def save_object(object_id, object, obj_img, segmented_folder, frame_id):
+    '''Save a segmented object to its subfolder.'''
+    obj_folder = os.path.join(segmented_folder, f'{object["cls_id"]}_{int(object_id)}')
+    os.makedirs(obj_folder, exist_ok=True)
+    cv2.imwrite(os.path.join(obj_folder, f'{frame_id}.png'), obj_img)
 
 def stitch_background_images(background_folder, stride=50):
-    background_images = []
-    for i, filename in enumerate(sorted(os.listdir(background_folder))):
-        if filename.endswith(".png") and i % stride == 0:
-            img_path = os.path.join(background_folder, filename)
-            img = cv2.imread(img_path)
+    """Combines periodic background frames into a single stitched image."""
+    all_images = []
+    for i, name in enumerate(sorted(os.listdir(background_folder))):
+        if name.endswith(".png") and i % stride == 0:
+            img = cv2.imread(os.path.join(background_folder, name))
             if img is not None:
-                background_images.append(img)
-    
-    if not background_images:
+                all_images.append(img)
+    if not all_images:
         print("No background images found.")
         return None
-    
-    # Initialize the stitched image with the first background image
-    stitched_image = background_images[0].copy()
-    
-    for img in background_images[1:]:
-        # Overlay the images
-        mask = (stitched_image == 0)
-        stitched_image[mask] = img[mask]
-    
-    return stitched_image
+    stitched = all_images[0].copy()
+    for img in all_images[1:]:
+        mask = (stitched == 0)
+        stitched[mask] = img[mask]
+    return stitched
 
 def main():
-    parser = argparse.ArgumentParser(description='Perform instance segmentation on video.')
+    parser = argparse.ArgumentParser(description='Perform instance segmentation on a video.')
     parser.add_argument('--video_file', type=str, required=True, help='Path to the input video file.')
     parser.add_argument('--segmented_folder', type=str, required=True, help='Folder to save segmented objects.')
     args = parser.parse_args()
 
-    os.makedirs(args.segmented_folder, exist_ok=True)
+    model = YOLO('yolo11l-seg.pt')
     background_folder = os.path.join(args.segmented_folder, 'background')
+    segmented_folder = os.path.join(args.segmented_folder, 'objects')
+    os.makedirs(segmented_folder, exist_ok=True)
     os.makedirs(background_folder, exist_ok=True)
-    
-    perform_instance_segmentation(args.video_file, args.segmented_folder, background_folder, model=YOLO('yolo11n-seg.pt'))
 
-    stitched_image = stitch_background_images(background_folder)
-    if stitched_image is not None:
-        cv2.imwrite(os.path.join(args.segmented_folder, 'full_background.png'), stitched_image)
+    inf_results = model.track(
+        source=args.video_file,
+        conf=0.5,
+        iou=0.4,
+        imgsz=1920,
+        stream=True,
+        persist=True,
+        classes=[0, 32, 38]  # person, ball, racket
+    )
 
-    # Remove the background folder
-    # shutil.rmtree(background_folder)
+    for frame_id, result in enumerate(inf_results):
+        frame_img = result.orig_img
+        frame_data = extract_detections(result)
+
+        rackets = {}
+        people = {}
+        balls = {}
+
+        # For each object detected, classify it as a racket, person, or ball
+        for obj_id, obj in frame_data.items():
+            if obj['cls_id'] == 0:
+                obj['cls_id'] = 'person'
+                people[obj_id] = obj 
+            elif obj['cls_id'] == 32:
+                obj['cls_id'] = 'ball'
+                balls[obj_id] = obj
+            elif obj['cls_id'] == 38:
+                obj['cls_id'] = 'racket'
+                rackets[obj_id] = obj
+
+        # Save objects based on the number of rackets detected
+        objects_to_save = find_objects_to_save(people, rackets, balls)
+        for obj_id, obj in objects_to_save.items():
+            obj_img = segment_object(frame_img, obj, frame_id)
+            save_object(obj_id, obj, obj_img, segmented_folder, frame_id)
+
+        # Remove objects from background
+        for obj in objects_to_save.values():
+            x1, y1, x2, y2 = obj['bbox']
+            frame_img[y1:y2, x1:x2] = 0
+
+        cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
+
+    stitched = stitch_background_images(background_folder)
+    if stitched is not None:
+        cv2.imwrite(os.path.join(args.segmented_folder, 'full_background.png'), stitched)
 
 if __name__ == "__main__":
     main()
