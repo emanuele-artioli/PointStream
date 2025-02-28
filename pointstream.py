@@ -5,17 +5,17 @@ import subprocess
 def main():
     video_file = os.environ["VIDEO_FILE"]
 
-    # Crop video to isolate playing field
-    cropped_video_file = '/app/cropped_video.mp4'
-    if not os.path.isfile(cropped_video_file):
-        subprocess.call([
-            'python', 'crop_video.py',
-            '--video_file', video_file,
-            '--output_file', cropped_video_file,
-            '--top_crop', '100',
-            '--side_crop', '50',
-            '--triangle_offset', '50'
-        ])
+    # # Crop video to isolate playing field
+    # cropped_video_file = '/app/cropped_video.mp4'
+    # if not os.path.isfile(cropped_video_file):
+    #     subprocess.call([
+    #         'python', 'crop_video.py',
+    #         '--video_file', video_file,
+    #         '--output_file', cropped_video_file,
+    #         '--top_crop', '100',
+    #         '--side_crop', '50',
+    #         '--triangle_offset', '50'
+    #     ])
 
     # # Perform object detection on the frames if not already done
     # detected_folder = '/app/detected_objects'

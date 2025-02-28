@@ -1,3 +1,4 @@
+import numpy as np
 import os
 import cv2
 import argparse
@@ -9,11 +10,11 @@ def extract_detections(result):
     boxes = getattr(result, 'boxes', [])
     masks = getattr(result, 'masks', None)
     for i, box in enumerate(boxes):
-        detections[box.id] = {
+        detections[int(box.id)] = {
             'cls_id': int(box.cls[0]),
             'conf': float(box.conf),
             'bbox': tuple(map(int, box.xyxy[0])),
-            'mask': masks.data[i].cpu().numpy() if masks and i < len(masks.data) else None
+            'mask': masks.data[i].cpu().numpy().astype(np.uint8) if masks and i < len(masks.data) else None
         }
     return detections
 
@@ -64,8 +65,10 @@ def segment_object(frame_img, obj, frame_id):
     '''Segment an object from the background based on its mask shape.'''
     x1, y1, x2, y2 = obj['bbox']
     if obj['mask'] is not None:
+        # Convert to 3-channel by stacking
+        rgb_mask = cv2.cvtColor(obj['mask'], cv2.COLOR_GRAY2RGB)
         # TODO: Turn the mask from black into neon pink
-        seg = cv2.bitwise_and(frame_img, frame_img, obj['mask'].astype('uint8'))
+        seg = frame_img * rgb_mask
         return seg[y1:y2, x1:x2]
 
 def save_object(object_id, object, obj_img, segmented_folder, frame_id):
@@ -106,8 +109,9 @@ def main():
     inf_results = model.track(
         source=args.video_file,
         conf=0.5,
-        iou=0.4,
+        iou=0.2,
         imgsz=1920,
+        retina_masks=True,
         stream=True,
         persist=True,
         classes=[0, 32, 38]  # person, ball, racket
