@@ -2,6 +2,7 @@ import numpy as np
 import os
 import cv2
 import argparse
+import csv
 from ultralytics import YOLO
 
 def extract_detections(result):
@@ -44,10 +45,10 @@ def find_objects_to_save(people, rackets=None, balls=None):
     # If at least two rackets are detected, save the person that overlaps the most with each racket
     if rackets:
         if len(rackets) >= 2:
-            for racket in rackets:
+            for racket_id, racket in rackets.items():
                 player_id, _ = find_overlapping_player(racket, people)
                 objects_to_save[player_id] = people[player_id]
-                objects_to_save[racket['obj_id']] = racket
+                objects_to_save[racket_id] = racket
     # If less than two rackets are detected, save every person and every racket
         else:
             objects_to_save.update(people)
@@ -71,11 +72,15 @@ def segment_object(frame_img, obj, frame_id):
         seg = frame_img * rgb_mask
         return seg[y1:y2, x1:x2]
 
-def save_object(object_id, object, obj_img, segmented_folder, frame_id):
-    '''Save a segmented object to its subfolder.'''
+def save_object(object_id, object, obj_img, segmented_folder, frame_id, csv_writer):
+    '''Save a segmented object to its subfolder and log its bounding box coordinates.'''
     obj_folder = os.path.join(segmented_folder, f'{object["cls_id"]}_{int(object_id)}')
     os.makedirs(obj_folder, exist_ok=True)
     cv2.imwrite(os.path.join(obj_folder, f'{frame_id}.png'), obj_img)
+    
+    # Save bounding box coordinates to CSV
+    x1, y1, x2, y2 = object['bbox']
+    csv_writer.writerow([frame_id, object_id, object['cls_id'], x1, y1, x2, y2])
 
 def stitch_background_images(background_folder, stride=50):
     """Combines periodic background frames into a single stitched image."""
@@ -106,53 +111,59 @@ def main():
     os.makedirs(segmented_folder, exist_ok=True)
     os.makedirs(background_folder, exist_ok=True)
 
-    inf_results = model.track(
-        source=args.video_file,
-        conf=0.5,
-        iou=0.2,
-        imgsz=1920,
-        retina_masks=True,
-        stream=True,
-        persist=True,
-        classes=[0, 32, 38]  # person, ball, racket
-    )
+    # Open CSV file for writing bounding box coordinates
+    csv_file_path = os.path.join(args.segmented_folder, 'bounding_boxes.csv')
+    with open(csv_file_path, mode='w', newline='') as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow(['frame_id', 'object_id', 'class_id', 'x1', 'y1', 'x2', 'y2'])
 
-    for frame_id, result in enumerate(inf_results):
-        frame_img = result.orig_img
-        frame_data = extract_detections(result)
+        inf_results = model.track(
+            source=args.video_file,
+            conf=0.5,
+            iou=0.2,
+            imgsz=1920,
+            retina_masks=True,
+            stream=True,
+            persist=True,
+            classes=[0, 32, 38]  # person, ball, racket
+        )
 
-        rackets = {}
-        people = {}
-        balls = {}
+        for frame_id, result in enumerate(inf_results):
+            frame_img = result.orig_img
+            frame_data = extract_detections(result)
 
-        # For each object detected, classify it as a racket, person, or ball
-        for obj_id, obj in frame_data.items():
-            if obj['cls_id'] == 0:
-                obj['cls_id'] = 'person'
-                people[obj_id] = obj 
-            elif obj['cls_id'] == 32:
-                obj['cls_id'] = 'ball'
-                balls[obj_id] = obj
-            elif obj['cls_id'] == 38:
-                obj['cls_id'] = 'racket'
-                rackets[obj_id] = obj
+            rackets = {}
+            people = {}
+            balls = {}
 
-        # Save objects based on the number of rackets detected
-        objects_to_save = find_objects_to_save(people, rackets, balls)
-        for obj_id, obj in objects_to_save.items():
-            obj_img = segment_object(frame_img, obj, frame_id)
-            save_object(obj_id, obj, obj_img, segmented_folder, frame_id)
+            # For each object detected, classify it as a racket, person, or ball
+            for obj_id, obj in frame_data.items():
+                if obj['cls_id'] == 0:
+                    obj['cls_id'] = 'person'
+                    people[obj_id] = obj 
+                elif obj['cls_id'] == 32:
+                    obj['cls_id'] = 'ball'
+                    balls[obj_id] = obj
+                elif obj['cls_id'] == 38:
+                    obj['cls_id'] = 'racket'
+                    rackets[obj_id] = obj
 
-        # Remove objects from background
-        for obj in objects_to_save.values():
-            x1, y1, x2, y2 = obj['bbox']
-            frame_img[y1:y2, x1:x2] = 0
+            # Save objects based on the number of rackets detected
+            objects_to_save = find_objects_to_save(people, rackets, balls)
+            for obj_id, obj in objects_to_save.items():
+                obj_img = segment_object(frame_img, obj, frame_id)
+                save_object(obj_id, obj, obj_img, segmented_folder, frame_id, csv_writer)
 
-        cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
+            # Remove objects from background
+            for obj in objects_to_save.values():
+                x1, y1, x2, y2 = obj['bbox']
+                frame_img[y1:y2, x1:x2] = 0
 
-    stitched = stitch_background_images(background_folder)
-    if stitched is not None:
-        cv2.imwrite(os.path.join(args.segmented_folder, 'full_background.png'), stitched)
+            cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
+
+        stitched = stitch_background_images(background_folder)
+        if stitched is not None:
+            cv2.imwrite(os.path.join(args.segmented_folder, 'full_background.png'), stitched)
 
 if __name__ == "__main__":
     main()
