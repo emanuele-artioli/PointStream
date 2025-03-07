@@ -4,7 +4,7 @@ import subprocess
 
 def main():
     # get current working directory
-    cwd = os.getcwd()
+    working_dir = os.environ.get("WORKING_DIR", "/app")
     video_file = os.environ["VIDEO_FILE"]
     device = os.environ.get("DEVICE", "cpu")
 
@@ -35,13 +35,13 @@ def main():
     #     print(f"Elapsed time for object detection: {elapsed_time}")
 
     # Perform instance segmentation on the frames if not already done
-    segmented_folder = f'{cwd}/segmented_objects'
+    segmented_folder = f'{working_dir}/segmented_objects'
     os.makedirs(segmented_folder, exist_ok=True)
     if not os.listdir(segmented_folder):
         # Calculate the elapsed time of this task
         start_time = time.time()
         subprocess.call([
-            'python', f'{cwd}/instance_segmentation.py',
+            'python', f'{working_dir}/instance_segmentation.py',
             '--video_file', video_file,
             '--segmented_folder', segmented_folder,
             '--device', device
