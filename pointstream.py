@@ -6,6 +6,7 @@ def main():
     # get current working directory
     cwd = os.getcwd()
     video_file = os.environ["VIDEO_FILE"]
+    device = os.environ.get("DEVICE", "cpu")
 
     # # Crop video to isolate playing field
     # cropped_video_file = '/app/cropped_video.mp4'
@@ -42,7 +43,8 @@ def main():
         subprocess.call([
             'python', f'{cwd}/instance_segmentation.py',
             '--video_file', video_file,
-            '--segmented_folder', segmented_folder
+            '--segmented_folder', segmented_folder,
+            '--device', device
         ])
         elapsed_time = time.time() - start_time
         print(f"Elapsed time for instance segmentation: {elapsed_time}")

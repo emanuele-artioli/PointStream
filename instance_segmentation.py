@@ -106,6 +106,7 @@ def main():
     parser = argparse.ArgumentParser(description='Perform instance segmentation on a video.')
     parser.add_argument('--video_file', type=str, required=True, help='Path to the input video file.')
     parser.add_argument('--segmented_folder', type=str, required=True, help='Folder to save segmented objects.')
+    parser.add_argument('--device', type=str, default='cpu', help='Device to run the model')
     args = parser.parse_args()
 
     model = YOLO('yolo11l-seg.pt')
@@ -122,6 +123,7 @@ def main():
 
         inf_results = model.track(
             source=args.video_file,
+            device=args.device,
             conf=0.5,
             iou=0.2,
             imgsz=1920,
