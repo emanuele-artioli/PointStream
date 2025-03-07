@@ -41,6 +41,8 @@ def find_overlapping_player(racket, players):
 def find_objects_to_save(people, rackets=None, balls=None):
     """Determines which objects to save based on the number of rackets detected."""
     objects_to_save = {}
+    # only save the background if two rackets are detected
+    full_set = False
 
     # If at least two rackets are detected, save the person that overlaps the most with each racket
     if rackets:
@@ -49,6 +51,7 @@ def find_objects_to_save(people, rackets=None, balls=None):
                 player_id, _ = find_overlapping_player(racket, people)
                 objects_to_save[player_id] = people[player_id]
                 objects_to_save[racket_id] = racket
+                full_set = True
     # If less than two rackets are detected, save every person and every racket
         else:
             objects_to_save.update(people)
@@ -60,7 +63,7 @@ def find_objects_to_save(people, rackets=None, balls=None):
     if balls:
         objects_to_save.update(balls)
 
-    return objects_to_save      
+    return objects_to_save, full_set   
             
 def segment_object(frame_img, obj, frame_id):
     '''Segment an object from the background based on its mask shape.'''
@@ -82,7 +85,7 @@ def save_object(object_id, object, obj_img, segmented_folder, frame_id, csv_writ
     x1, y1, x2, y2 = object['bbox']
     csv_writer.writerow([frame_id, object_id, object['cls_id'], x1, y1, x2, y2])
 
-def stitch_background_images(background_folder, stride=50):
+def stitch_background_images(background_folder, stride=5):
     """Combines periodic background frames into a single stitched image."""
     all_images = []
     for i, name in enumerate(sorted(os.listdir(background_folder))):
@@ -149,21 +152,31 @@ def main():
                     rackets[obj_id] = obj
 
             # Save objects based on the number of rackets detected
-            objects_to_save = find_objects_to_save(people, rackets, balls)
+            objects_to_save, save_background = find_objects_to_save(people, rackets, balls)
             for obj_id, obj in objects_to_save.items():
                 obj_img = segment_object(frame_img, obj, frame_id)
                 save_object(obj_id, obj, obj_img, segmented_folder, frame_id, csv_writer)
 
-            # Remove objects from background
-            for obj in objects_to_save.values():
-                x1, y1, x2, y2 = obj['bbox']
-                frame_img[y1:y2, x1:x2] = 0
+            if save_background:
+                # Remove objects from background
+                for obj in objects_to_save.values():
+                    x1, y1, x2, y2 = obj['bbox']
+                    frame_img[y1:y2, x1:x2] = 0
 
-            cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
+                # Save background image
+                cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
 
-        stitched = stitch_background_images(background_folder)
+        stitched = stitch_background_images(background_folder, stride=5)
         if stitched is not None:
             cv2.imwrite(os.path.join(args.segmented_folder, 'full_background.png'), stitched)
+
+        # Delete person folders that have too few frames (should be left with just players)
+        min_frames = frame_id - 10
+        for obj_folder in os.listdir(segmented_folder):
+            if obj_folder.startswith('person'):
+                num_frames = len(os.listdir(os.path.join(segmented_folder, obj_folder)))
+                if num_frames < min_frames:
+                    os.rmdir(os.path.join(segmented_folder, obj_folder))
 
 if __name__ == "__main__":
     main()
