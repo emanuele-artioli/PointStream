@@ -125,10 +125,10 @@ def main():
         inf_results = model.track(
             source=args.video_file,
             device=args.device,
-            conf=0.5,
+            conf=0.25,
             iou=0.2,
             imgsz=1920,
-            retina_masks=True,
+            retina_masks=False,
             stream=True,
             persist=True,
             classes=[0, 32, 38]  # person, ball, racket
