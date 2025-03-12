@@ -40,6 +40,9 @@ def postprocess_scene(experiment_folder):
     shutil.rmtree(os.path.join(experiment_folder, 'background'))
 
     # Delete person folders that are missing too many frames (should be left with just players)
+    # Get maximum number of frames from the frame id in the last row of the CSV file
+    with open(os.path.join(experiment_folder, 'bounding_boxes.csv')) as f:
+        frame_id = int(f.readlines()[-1].split(',')[0])
     min_frames = frame_id * 0.9
     for obj_folder in os.listdir(experiment_folder):
         if obj_folder.startswith('person'):
@@ -51,9 +54,10 @@ def postprocess_scene(experiment_folder):
         
         # TODO: Delete ball folders whose bounding boxes have not moved enough
 
-    # Zip the experiment folder
+    # Zip the experiment folder, then delete the folder
     shutil.make_archive(experiment_folder, 'zip', experiment_folder)
     print(f"Experiment folder zipped to {experiment_folder}.zip")
+    shutil.rmtree(experiment_folder)
 
 def main():
     # get current working directory
