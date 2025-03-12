@@ -1,4 +1,10 @@
 # To ensure app dependencies are ported from your virtual environment/host machine into your container, run 'pip freeze > requirements.txt' in the terminal to overwrite this file
-torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+torch
+torchvision
+torchaudio
+--index-url https://download.pytorch.org/whl/cu118
+
+lap
 ultralytics
 opencv-python
+--index-url https://pypi.org/simple

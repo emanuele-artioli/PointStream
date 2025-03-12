@@ -74,7 +74,7 @@ def main():
         all_videos = [video_file]
     with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
         for vid in all_videos:
-            experiment_folder = f'{working_dir}/segmented_objects_{os.path.basename(vid)}'
+            experiment_folder = f'{working_dir}/{os.path.basename(vid).split(".")[0]}'
             os.makedirs(experiment_folder, exist_ok=True)
             seg_future = executor.submit(segment_scene, vid, working_dir, device, experiment_folder)
             seg_future.add_done_callback(

@@ -111,7 +111,7 @@ def main():
             iou = 0.2,
             imgsz = 1920,
             # use half precision if on cuda
-            half = args.device.contains('cuda'),
+            half = 'cuda' in args.device,
             retina_masks = True,
             stream = True,
             persist = True,
@@ -164,8 +164,8 @@ def main():
                     x1, y1, x2, y2 = obj['bbox']
                     frame_img[y1:y2, x1:x2] = 0
 
-                # Save background image
-                cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
+            # Save background image
+            cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
 
 if __name__ == "__main__":
     main()
