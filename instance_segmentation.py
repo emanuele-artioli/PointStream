@@ -76,63 +76,51 @@ def segment_object(frame_img, obj, frame_id):
         seg = frame_img * rgb_mask
         return seg[y1:y2, x1:x2]
 
-def save_object(object_id, object, obj_img, segmented_folder, frame_id, csv_writer):
-    '''Save a segmented object to its subfolder and log its bounding box coordinates.'''
-    obj_folder = os.path.join(segmented_folder, f'{object["cls_id"]}_{object_id}')
+def save_object(object_id, object, obj_img, experiment_folder, frame_id, csv_writer):
+    '''Save an object to its subfolder and log its bounding box coordinates.'''
+    obj_folder = os.path.join(experiment_folder, f'{object["cls_id"]}_{object_id}')
     os.makedirs(obj_folder, exist_ok=True)
     cv2.imwrite(os.path.join(obj_folder, f'{frame_id}.png'), obj_img)
     
     # Save bounding box coordinates to CSV
     x1, y1, x2, y2 = object['bbox']
     csv_writer.writerow([frame_id, object_id, object['cls_id'], x1, y1, x2, y2])
-
-def stitch_background_images(background_folder, stride=5):
-    """Combines periodic background frames into a single stitched image."""
-    all_images = []
-    for i, name in enumerate(sorted(os.listdir(background_folder))):
-        if name.endswith(".png") and i % stride == 0:
-            img = cv2.imread(os.path.join(background_folder, name))
-            if img is not None:
-                all_images.append(img)
-    if not all_images:
-        print("No background images found.")
-        return None
-    stitched = all_images[0].copy()
-    for img in all_images[1:]:
-        mask = (stitched == 0)
-        stitched[mask] = img[mask]
-    return stitched
-
+     
 def main():
     parser = argparse.ArgumentParser(description='Perform instance segmentation on a video.')
     parser.add_argument('--video_file', type=str, required=True, help='Path to the input video file.')
-    parser.add_argument('--segmented_folder', type=str, required=True, help='Folder to save segmented objects.')
+    parser.add_argument('--experiment_folder', type=str, required=True, help='Folder to save objects.')
     parser.add_argument('--device', type=str, default='cpu', help='Device to run the model')
     args = parser.parse_args()
 
     model = YOLO('yolo11l-seg.pt')
-    background_folder = os.path.join(args.segmented_folder, 'background')
-    segmented_folder = os.path.join(args.segmented_folder, 'objects')
-    os.makedirs(segmented_folder, exist_ok=True)
+    background_folder = os.path.join(args.experiment_folder, 'background')
+    experiment_folder = os.path.join(args.experiment_folder, 'objects')
+    os.makedirs(experiment_folder, exist_ok=True)
     os.makedirs(background_folder, exist_ok=True)
 
     # Open CSV file for writing bounding box coordinates
-    csv_file_path = os.path.join(args.segmented_folder, 'bounding_boxes.csv')
+    csv_file_path = os.path.join(args.experiment_folder, 'bounding_boxes.csv')
     with open(csv_file_path, mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
         csv_writer.writerow(['frame_id', 'object_id', 'class_id', 'x1', 'y1', 'x2', 'y2'])
 
         inf_results = model.track(
-            source=args.video_file,
-            device=args.device,
-            conf=0.25,
-            iou=0.2,
-            imgsz=1920,
-            retina_masks=False,
-            stream=True,
-            persist=True,
-            classes=[0, 32, 38]  # person, ball, racket
+            source = args.video_file,
+            device = args.device,
+            conf = 0.25,
+            iou = 0.2,
+            imgsz = 1920,
+            # use half precision if on cuda
+            half = args.device.contains('cuda'),
+            retina_masks = True,
+            stream = True,
+            persist = True,
+            classes = [0, 32, 38]  # person, ball, racket
         )
+
+        # Initialize pairings dictionary to keep track of which rackets are paired with which players across frames
+        pairings = {}
 
         for frame_id, result in enumerate(inf_results):
             frame_img = result.orig_img
@@ -146,12 +134,19 @@ def main():
             for obj_id, obj in frame_data.items():
                 if obj['cls_id'] == 0:
                     obj['cls_id'] = 'person'
-                    people[obj_id] = obj 
+                    # only add the most confident people detections
+                    if len(people) < 15:
+                        people[obj_id] = obj 
                 elif obj['cls_id'] == 32:
                     obj['cls_id'] = 'ball'
                     balls[obj_id] = obj
                 elif obj['cls_id'] == 38:
                     obj['cls_id'] = 'racket'
+                    # If the racket overlaps a player that has already been paired with a previous racket, this is the same racket
+                    if pairings:
+                        player_id, overlap = find_overlapping_player(obj, people)
+                        if overlap > 0 and player_id in pairings.values():
+                            obj_id = next(k for k, v in pairings.items() if v == player_id)
                     rackets[obj_id] = obj
 
             # Save objects based on the number of rackets detected
@@ -162,7 +157,7 @@ def main():
                 if pairings and obj['cls_id'] == 'racket':
                     player_id = pairings[obj_id]
                     obj_id = f'{obj_id}_{player_id}'
-                save_object(obj_id, obj, obj_img, segmented_folder, frame_id, csv_writer)
+                save_object(obj_id, obj, obj_img, experiment_folder, frame_id, csv_writer)
 
             if pairings:
                 # Remove objects from background
@@ -172,18 +167,6 @@ def main():
 
                 # Save background image
                 cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
-
-        stitched = stitch_background_images(background_folder, stride=5)
-        if stitched is not None:
-            cv2.imwrite(os.path.join(args.segmented_folder, 'full_background.png'), stitched)
-
-        # Delete person folders that are missing too few frames (should be left with just players)
-        min_frames = frame_id * 0.9
-        for obj_folder in os.listdir(segmented_folder):
-            if obj_folder.startswith('person'):
-                num_frames = len(os.listdir(os.path.join(segmented_folder, obj_folder)))
-                if num_frames < min_frames:
-                    shutil.rmtree(os.path.join(segmented_folder, obj_folder))
 
 if __name__ == "__main__":
     main()

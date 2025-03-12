@@ -1,116 +1,81 @@
 import os
 import time
 import subprocess
+import cv2
+import shutil
+import concurrent.futures
+
+def stitch_background_images(background_folder, stride=5):
+    """Combines periodic background frames into a single stitched image."""
+    all_images = []
+    for i, name in enumerate(sorted(os.listdir(background_folder))):
+        if name.endswith(".png") and i % stride == 0:
+            img = cv2.imread(os.path.join(background_folder, name))
+            if img is not None:
+                all_images.append(img)
+    if not all_images:
+        print("No background images found.")
+        return None
+    stitched = all_images[0].copy()
+    for img in all_images[1:]:
+        mask = (stitched == 0)
+        stitched[mask] = img[mask]
+    return stitched
+
+def segment_scene(video_file, working_dir, device, experiment_folder):
+    start_time = time.time()
+    subprocess.call([
+        'python', f'{working_dir}/instance_segmentation.py',
+        '--video_file', video_file,
+        '--experiment_folder', experiment_folder,
+        '--device', device
+    ])
+    print(f"Elapsed time for instance segmentation: {time.time() - start_time}")
+
+def postprocess_scene(experiment_folder):
+    stitched = stitch_background_images(os.path.join(experiment_folder, 'background'), stride=5)
+    if stitched is not None:
+        cv2.imwrite(os.path.join(experiment_folder, 'full_background.png'), stitched)
+
+    shutil.rmtree(os.path.join(experiment_folder, 'background'))
+
+    # Delete person folders that are missing too many frames (should be left with just players)
+    min_frames = frame_id * 0.9
+    for obj_folder in os.listdir(experiment_folder):
+        if obj_folder.startswith('person'):
+            num_frames = len(os.listdir(os.path.join(experiment_folder, obj_folder)))
+            if num_frames < min_frames:
+                shutil.rmtree(os.path.join(experiment_folder, obj_folder))
+                # Move to next folder
+                continue
+        
+        # TODO: Delete ball folders whose bounding boxes have not moved enough
+
+    # Zip the experiment folder
+    shutil.make_archive(experiment_folder, 'zip', experiment_folder)
+    print(f"Experiment folder zipped to {experiment_folder}.zip")
 
 def main():
     # get current working directory
-    working_dir = os.environ.get("WORKING_DIR", "/app")
-    video_file = os.environ["VIDEO_FILE"]
+    working_dir = os.environ.get("WORKING_DIR", "/PointStream")
+    video_folder = os.environ.get("VIDEO_FOLDER", "/PointStream/scenes")
+    video_file = os.environ.get("VIDEO_FILE")
     device = os.environ.get("DEVICE", "cpu")
 
-    # # Crop video to isolate playing field
-    # cropped_video_file = '/app/cropped_video.mp4'
-    # if not os.path.isfile(cropped_video_file):
-    #     subprocess.call([
-    #         'python', 'crop_video.py',
-    #         '--video_file', video_file,
-    #         '--output_file', cropped_video_file,
-    #         '--top_crop', '100',
-    #         '--side_crop', '50',
-    #         '--triangle_offset', '50'
-    #     ])
-
-    # # Perform object detection on the frames if not already done
-    # detected_folder = '/app/detected_objects'
-    # os.makedirs(detected_folder, exist_ok=True)
-    # if not os.listdir(detected_folder):
-    #     # Calculate the elapsed time of this task
-    #     start_time = time.time()
-    #     subprocess.call([
-    #         'python', 'object_detection.py',
-    #         '--video_file', video_file,
-    #         '--detected_folder', detected_folder,
-    #     ])
-    #     elapsed_time = time.time() - start_time
-    #     print(f"Elapsed time for object detection: {elapsed_time}")
-
-    # Perform instance segmentation on the frames if not already done
-    segmented_folder = f'{working_dir}/segmented_objects'
-    os.makedirs(segmented_folder, exist_ok=True)
-    if not os.listdir(segmented_folder):
-        # Calculate the elapsed time of this task
-        start_time = time.time()
-        subprocess.call([
-            'python', f'{working_dir}/instance_segmentation.py',
-            '--video_file', video_file,
-            '--segmented_folder', segmented_folder,
-            '--device', device
-        ])
-        elapsed_time = time.time() - start_time
-        print(f"Elapsed time for instance segmentation: {elapsed_time}")
+     # If no video_file is provided, use every video in the folder
+    if not video_file:
+        all_videos = [os.path.join(video_folder, v)
+                      for v in os.listdir(video_folder) if v.endswith(('.mp4','.mov','.avi'))]
+    else:
+        all_videos = [video_file]
+    with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
+        for vid in all_videos:
+            experiment_folder = f'{working_dir}/segmented_objects_{os.path.basename(vid)}'
+            os.makedirs(experiment_folder, exist_ok=True)
+            seg_future = executor.submit(segment_scene, vid, working_dir, device, experiment_folder)
+            seg_future.add_done_callback(
+                lambda f, folder=experiment_folder: executor.submit(postprocess_scene, folder)
+            )
 
 if __name__ == "__main__":
     main()
-
-# video_file = os.environ["VIDEO_FILE"]
-# # extract video file resolution
-# width, height = subprocess.check_output([
-#     'ffprobe', '-v', 'error', 
-#     '-select_streams', 'v:0', 
-#     '-show_entries', 'stream=width,height', 
-#     '-of', 'csv=s=x:p=0', 
-#     video_file]).decode('utf-8').strip().split('x')
-
-# # Perform object detection on the frames if not already done
-# detected_folder = '/app/detected_objects'
-# os.makedirs(detected_folder, exist_ok=True)
-# if not os.listdir(detected_folder):
-#     # Calculate the elapsed time of this task
-#     start_time = time.time()
-#     subprocess.call([
-#         'python', 'object_detection.py',
-#         '--input_file', video_file,
-#         '--detected_folder', detected_folder,
-#     ])
-#     elapsed_time = time.time() - start_time
-#     print(f"Elapsed time for object detection: {elapsed_time}")
-
-# # Perform instance segmentation on the frames if not already done
-# segmented_folder = '/app/segmented_objects'
-# os.makedirs(segmented_folder, exist_ok=True)
-# if not os.listdir(segmented_folder):
-#     # Calculate the elapsed time of this task
-#     start_time = time.time()
-#     subprocess.call([
-#         'python', 'instance_segmentation.py',
-#         '--video_file', video_file,
-#         '--segmented_folder', segmented_folder
-#     ])
-#     elapsed_time = time.time() - start_time
-#     print(f"Elapsed time for instance segmentation: {elapsed_time}")
-
-# # Perform pose estimation on the segmented objects if not already done
-# pose_csv = "/app/poses.csv"
-# if not os.path.isfile(pose_csv):
-#     start_time = time.time()
-#     subprocess.call([
-#         'python', 'pose_estimation.py',
-#         '--segmented_folder', segmented_folder,
-#         '--pose_csv', pose_csv
-#     ])
-#     elapsed_time = time.time() - start_time
-#     print(f"Elapsed time for pose estimation: {elapsed_time}")
-
-# # Perform jersey number recognition on segmented objects if not already done
-# jersey_csv = "/app/jersey_numbers.csv"
-# if not os.path.isfile(jersey_csv):
-#     start_time = time.time()
-#     method = os.environ.get("JERSEY_RECOGNITION_METHOD", "easyocr")  # Default to 'easyocr' if not specified
-#     subprocess.call([
-#         'python', 'jersey_recognition.py',
-#         '--segmented_objects_folder', segmented_folder,
-#         '--jersey_csv', jersey_csv,
-#         '--method', method
-#     ])
-#     elapsed_time = time.time() - start_time
-#     print(f"Elapsed time for jersey recognition: {elapsed_time}")
