@@ -26,7 +26,7 @@ def segment_scene(video_file, working_dir, device, experiment_folder):
     start_time = time.time()
     subprocess.call([
         'python', f'{working_dir}/instance_segmentation.py',
-        '--video_file', video_file,
+        '--video_file', f'{working_dir}/scenes/{video_file}',
         '--experiment_folder', experiment_folder,
         '--device', device
     ])

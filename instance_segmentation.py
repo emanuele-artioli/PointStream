@@ -109,7 +109,7 @@ def main():
             device = args.device,
             conf = 0.25,
             iou = 0.2,
-            imgsz = 1920,
+            imgsz = 3840,
             # use half precision if on cuda
             half = 'cuda' in args.device,
             retina_masks = True,
