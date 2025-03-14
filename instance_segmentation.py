@@ -20,8 +20,8 @@ def extract_detections(result, players_ids):
             'mask': masks.data[i].cpu().numpy().astype(np.uint8) if masks and i < len(masks.data) else None
         }
         if obj['cls_id'] == 0:
-            # if 2 players are already detected, don't save anyone with a different ID
-            if len(players_ids) >= 2 and obj['id'] not in players_ids:
+            # if 2 players id are already known, and the current person id is not one of them, skip
+            if len(players_ids) >= 2 and i not in players_ids:
                 continue
             people[i] = obj
         elif obj['cls_id'] == 32:
@@ -111,14 +111,16 @@ def main():
         # Keep track of players' IDs and balls positions across frames
         players_ids = set()
         previous_balls_boxes = {}
+        frame_id = 0
 
         for frame_id, result in enumerate(inf_results):
+            frame_id += 1
             frame_img = result.orig_img
             people, rackets, balls = extract_detections(result, players_ids)
 
             if rackets:
                 # for each racket find the player they overlap with the most,
-                for racket in rackets.values():
+                for racket_id, racket in rackets.items():
                     player_id = find_overlapping_player(racket, people)
                     if player_id is not None:
                         players_ids.add(player_id)
@@ -128,16 +130,17 @@ def main():
 
             if balls:
                 # for each ball, check if it has moved enough from the previous frame
-                for ball_id, ball in balls.items():
+                for ball_id, ball in balls.copy().items():
                     if ball_id in previous_balls_boxes.keys():
                         previous_box = previous_balls_boxes[ball_id]
                         current_box = ball['bbox']
-                        # If the ball has moved enough, segment and save it
-                        if compute_overlap_area(previous_box, current_box) < 0.9:
+                        # If the ball has not moved enough, pop it from the list of balls
+                        if compute_overlap_area(previous_box, current_box) > 0.9:
+                            balls.pop(ball_id)
+                        # Otherwise, segment and save it
+                        else:
                             ball_img = segment_object(frame_img, ball, frame_id)
                             save_object(ball_id, ball, ball_img, experiment_folder, frame_id, csv_writer, frame_img)
-                            # Otherwise, pop it from the list of balls
-                            balls.pop(ball_id)
                     # Save the current ball's bbox for the next frame
                     previous_balls_boxes[ball_id] = ball['bbox']
 
@@ -159,6 +162,27 @@ def main():
 
             # Save background image
             cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
+
+        # Get max frame number from csv and delete people folders that are missing too many frames
+        min_frames = frame_id * 0.9
+        for obj_folder in os.listdir(experiment_folder):
+            if obj_folder.startswith('0_') or obj_folder.startswith('person'):
+                num_frames = len(os.listdir(os.path.join(experiment_folder, obj_folder)))
+                if num_frames < min_frames:
+                    shutil.rmtree(os.path.join(experiment_folder, obj_folder))
+
+        # Rename object folders with their class names
+        for obj_folder in os.listdir(experiment_folder):
+            if obj_folder.startswith('0_'):
+                os.rename(os.path.join(experiment_folder, obj_folder), os.path.join(experiment_folder, 'person_' + obj_folder[2:]))
+            elif obj_folder.startswith('32_'):
+                os.rename(os.path.join(experiment_folder, obj_folder), os.path.join(experiment_folder, 'ball_' + obj_folder[3:]))
+            elif obj_folder.startswith('38_'):
+                os.rename(os.path.join(experiment_folder, obj_folder), os.path.join(experiment_folder, 'racket_' + obj_folder[3:]))
+        
+        # Zip the experiment folder, then delete it
+        shutil.make_archive(experiment_folder, 'zip', experiment_folder)
+        shutil.rmtree(experiment_folder)
 
 if __name__ == "__main__":
     main()
