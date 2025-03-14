@@ -23,40 +23,33 @@ def stitch_background_images(background_folder, stride=5):
     return stitched
 
 def segment_scene(video_file, working_dir, device, experiment_folder):
-    start_time = time.time()
     subprocess.call([
         'python', f'{working_dir}/instance_segmentation.py',
         '--video_file', video_file,
         '--experiment_folder', experiment_folder,
         '--device', device
     ])
-    print(f"Elapsed time for instance segmentation: {time.time() - start_time}")
 
 def postprocess_scene(experiment_folder):
-    stitched = stitch_background_images(os.path.join(experiment_folder, 'background'), stride=5)
-    if stitched is not None:
-        cv2.imwrite(os.path.join(experiment_folder, 'full_background.png'), stitched)
-
-    shutil.rmtree(os.path.join(experiment_folder, 'background'))
-
-    # Delete person folders that are missing too many frames (should be left with just players)
+    '''Delete people folders that are missing too many frames (i.e., everyone besides players), rename the ones that are not, based on their class, then zip the experiment.'''
     # Get maximum number of frames from the frame id in the last row of the CSV file
     with open(os.path.join(experiment_folder, 'bounding_boxes.csv')) as f:
         frame_id = int(f.readlines()[-1].split(',')[0])
     min_frames = frame_id * 0.9
     for obj_folder in os.listdir(experiment_folder):
-        if obj_folder.startswith('person'):
+        if obj_folder.startswith('0_'):
             num_frames = len(os.listdir(os.path.join(experiment_folder, obj_folder)))
             if num_frames < min_frames:
                 shutil.rmtree(os.path.join(experiment_folder, obj_folder))
-                # Move to next folder
-                continue
-        
-        # TODO: Delete ball folders whose bounding boxes have not moved enough
-
-    # Zip the experiment folder, then delete the folder
+            else:
+                os.rename(os.path.join(experiment_folder, obj_folder), os.path.join(experiment_folder, 'person_' + obj_folder[2:]))
+        elif obj_folder.startswith('32_'):
+            os.rename(os.path.join(experiment_folder, obj_folder), os.path.join(experiment_folder, 'ball_' + obj_folder[3:]))
+        elif obj_folder.startswith('38_'):
+            os.rename(os.path.join(experiment_folder, obj_folder), os.path.join(experiment_folder, 'racket_' + obj_folder[3:]))
+    
+    # Zip the experiment folder
     shutil.make_archive(experiment_folder, 'zip', experiment_folder)
-    print(f"Experiment folder zipped to {experiment_folder}.zip")
     shutil.rmtree(experiment_folder)
 
 def main():
@@ -74,22 +67,18 @@ def main():
         all_videos = [v for v in os.listdir(video_folder) if v.endswith(('.mp4','.mov','.avi'))]
     else:
         all_videos = [video_file]
+
     # Whether to process each video in parallel or sequentially
-    if parallel:
-        with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
-            for vid in all_videos:
-                experiment_folder = f'{working_dir}/experiments/{os.path.basename(vid).split(".")[0]}'
-                os.makedirs(experiment_folder, exist_ok=True)
-                video_file = os.path.join(video_folder, vid)
+    for vid in all_videos:
+        experiment_folder = f'{working_dir}/experiments/{os.path.basename(vid).split(".")[0]}'
+        os.makedirs(experiment_folder, exist_ok=True)
+        video_file = os.path.join(video_folder, vid)
+        if parallel:
+            with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
                 seg_future = executor.submit(segment_scene, video_file, working_dir, device, experiment_folder)
-                seg_future.add_done_callback(
-                    lambda f, folder=experiment_folder: executor.submit(postprocess_scene, folder)
-                )
-    else:
-        for vid in all_videos:
-            experiment_folder = f'{working_dir}/experiments/{os.path.basename(vid).split(".")[0]}'
-            os.makedirs(experiment_folder, exist_ok=True)
-            video_file = os.path.join(video_folder, vid)
+                seg_future.result()  # Wait for segmentation to finish
+            postprocess_scene(experiment_folder)
+        else:
             segment_scene(video_file, working_dir, device, experiment_folder)
             postprocess_scene(experiment_folder)
 

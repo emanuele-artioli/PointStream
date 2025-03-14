@@ -3,6 +3,7 @@ import os
 import cv2
 import argparse
 import csv
+import shutil
 from ultralytics import YOLO
 
 def extract_detections(result, players_ids):
@@ -162,27 +163,6 @@ def main():
 
             # Save background image
             cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
-
-        # Get max frame number from csv and delete people folders that are missing too many frames
-        min_frames = frame_id * 0.9
-        for obj_folder in os.listdir(experiment_folder):
-            if obj_folder.startswith('0_') or obj_folder.startswith('person'):
-                num_frames = len(os.listdir(os.path.join(experiment_folder, obj_folder)))
-                if num_frames < min_frames:
-                    shutil.rmtree(os.path.join(experiment_folder, obj_folder))
-
-        # Rename object folders with their class names
-        for obj_folder in os.listdir(experiment_folder):
-            if obj_folder.startswith('0_'):
-                os.rename(os.path.join(experiment_folder, obj_folder), os.path.join(experiment_folder, 'person_' + obj_folder[2:]))
-            elif obj_folder.startswith('32_'):
-                os.rename(os.path.join(experiment_folder, obj_folder), os.path.join(experiment_folder, 'ball_' + obj_folder[3:]))
-            elif obj_folder.startswith('38_'):
-                os.rename(os.path.join(experiment_folder, obj_folder), os.path.join(experiment_folder, 'racket_' + obj_folder[3:]))
-        
-        # Zip the experiment folder, then delete it
-        shutil.make_archive(experiment_folder, 'zip', experiment_folder)
-        shutil.rmtree(experiment_folder)
 
 if __name__ == "__main__":
     main()
