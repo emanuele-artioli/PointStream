@@ -7,16 +7,17 @@ from ultralytics import YOLO
 
 def extract_detections(result):
     """Extracts object info (ID, class, confidence, bbox, mask) from a YOLO result."""
-    detections = {}
     boxes = getattr(result, 'boxes', [])
     masks = getattr(result, 'masks', None)
-    for i, box in enumerate(boxes):
-        detections[int(box.id)] = {
+    detections = {
+        int(box.id): {
             'cls_id': int(box.cls[0]),
             'conf': float(box.conf),
             'bbox': tuple(map(int, box.xyxy[0])),
             'mask': masks.data[i].cpu().numpy().astype(np.uint8) if masks and i < len(masks.data) else None
         }
+        for i, box in enumerate(boxes)
+    }
     return detections
 
 def compute_overlap_area(a, b):
@@ -27,32 +28,34 @@ def compute_overlap_area(a, b):
     ix2, iy2 = min(ax2, bx2), min(ay2, by2)
     return max(0, ix2 - ix1) * max(0, iy2 - iy1)
 
-def find_overlapping_player(racket, players):
+def find_overlapping_player(racket, people):
     """Finds the person that overlaps the most with a racket."""
     max_overlap = 0
-    max_player = None
-    for player_id, player in players.items():
-        overlap = compute_overlap_area(racket['bbox'], player['bbox'])
+    max_person = None
+    for person_id, person in people.items():
+        overlap = compute_overlap_area(racket['bbox'], person['bbox'])
         if overlap > max_overlap:
             max_overlap = overlap
-            max_player = player_id
-    return max_player, max_overlap
+            max_person = person_id
+    return max_person
 
 def find_objects_to_save(people, rackets=None, balls=None):
     """Determines which objects to save based on the number of rackets detected."""
     objects_to_save = {}
-    # only save the background if two rackets are detected
     pairings = {}
 
-    # If at least two rackets are detected, save the person that overlaps the most with each racket
     if rackets:
-        if len(rackets) >= 2:
-            for racket_id, racket in rackets.items():
-                player_id, _ = find_overlapping_player(racket, people)
+        for racket_id, racket in rackets.items():
+                player_id = find_overlapping_player(racket, people)
+                if player_id is not None:
+                    pairings[racket_id] = player_id
+        # If there are at least two pairings, save only the players and rackets that are paired
+        if len(pairings) >= 2:
+            for racket_id, player_id in pairings.items():
                 objects_to_save[player_id] = people[player_id]
-                objects_to_save[racket_id] = racket
-                pairings[racket_id] = player_id
-    # If less than two rackets are detected, save every person and every racket
+                objects_to_save[racket_id] = rackets[racket_id]
+
+        # Else, save every person and every racket
         else:
             objects_to_save.update(people)
             objects_to_save.update(rackets)
@@ -75,7 +78,7 @@ def segment_object(frame_img, obj, frame_id):
         seg = frame_img * rgb_mask
         return seg[y1:y2, x1:x2]
 
-def save_object(object_id, object, obj_img, experiment_folder, frame_id, csv_writer):
+def save_object(object_id, object, obj_img, experiment_folder, frame_id, csv_writer, frame_img=None):
     '''Save an object to its subfolder and log its bounding box coordinates.'''
     obj_folder = os.path.join(experiment_folder, f'{object["cls_id"]}_{object_id}')
     os.makedirs(obj_folder, exist_ok=True)
@@ -84,7 +87,39 @@ def save_object(object_id, object, obj_img, experiment_folder, frame_id, csv_wri
     # Save bounding box coordinates to CSV
     x1, y1, x2, y2 = object['bbox']
     csv_writer.writerow([frame_id, object_id, object['cls_id'], x1, y1, x2, y2])
-     
+
+    # Optionally save another copy of the object without segmentation
+    if frame_img is not None:
+        unsegmented_folder = os.path.join(obj_folder, 'unsegmented')
+        os.makedirs(unsegmented_folder, exist_ok=True)
+        cv2.imwrite(os.path.join(unsegmented_folder, f'{frame_id}.png'), frame_img[y1:y2, x1:x2])
+
+def classify_objects(frame_data, pairings=None):
+    '''For each object detected, classify it as a racket, person, or ball.'''
+    # TODO: this can be done with a dict of {cls_id: cls_name} instead of hardcoding, then the selection logic moved to another function.
+    # TODO: also, the classification can be put in the same function as the extraction.
+    people = {}
+    rackets = {}
+    balls = {}
+    for obj_id, obj in frame_data.items():
+        if obj['cls_id'] == 0:
+            obj['cls_id'] = 'person'
+            # Only add the most confident people detections
+            if len(people) < 10:
+                people[obj_id] = obj
+        elif obj['cls_id'] == 32:
+            obj['cls_id'] = 'ball'
+            balls[obj_id] = obj
+        elif obj['cls_id'] == 38:
+            obj['cls_id'] = 'racket'
+            # If the racket overlaps a player that has already been paired with a previous racket, give it the same racket id as the previous racket
+            if pairings:
+                player_id = find_overlapping_player(obj, people)
+                if player_id in pairings.values():
+                    obj_id = next(k for k, v in pairings.items() if v == player_id)
+            rackets[obj_id] = obj
+    return people, rackets, balls
+
 def main():
     parser = argparse.ArgumentParser(description='Perform instance segmentation on a video.')
     parser.add_argument('--video_file', type=str, required=True, help='Path to the input video file.')
@@ -106,12 +141,12 @@ def main():
 
         inf_results = model.track(
             source = args.video_file,
-            device = args.device,
             conf = 0.25,
             iou = 0.2,
             imgsz = 3840,
-            # use half precision if on cuda
-            half = 'cuda' in args.device,
+            half = 'cuda' in args.device, # use half precision if on cuda
+            device = args.device,
+            batch = 1,
             retina_masks = True,
             stream = True,
             persist = True,
@@ -125,38 +160,19 @@ def main():
             frame_img = result.orig_img
             frame_data = extract_detections(result)
 
-            rackets = {}
-            people = {}
-            balls = {}
-
-            # For each object detected, classify it as a racket, person, or ball
-            for obj_id, obj in frame_data.items():
-                if obj['cls_id'] == 0:
-                    obj['cls_id'] = 'person'
-                    # only add the most confident people detections
-                    if len(people) < 15:
-                        people[obj_id] = obj 
-                elif obj['cls_id'] == 32:
-                    obj['cls_id'] = 'ball'
-                    balls[obj_id] = obj
-                elif obj['cls_id'] == 38:
-                    obj['cls_id'] = 'racket'
-                    # If the racket overlaps a player that has already been paired with a previous racket, this is the same racket
-                    if pairings:
-                        player_id, overlap = find_overlapping_player(obj, people)
-                        if overlap > 0 and player_id in pairings.values():
-                            obj_id = next(k for k, v in pairings.items() if v == player_id)
-                    rackets[obj_id] = obj
+            people, rackets, balls = classify_objects(frame_data, pairings)
 
             # Save objects based on the number of rackets detected
-            objects_to_save, pairings = find_objects_to_save(people, rackets, balls)
+            objects_to_save, new_pairings = find_objects_to_save(people, rackets, balls)
+            
+            pairings.update(new_pairings)
             for obj_id, obj in objects_to_save.items():
-                obj_img = segment_object(frame_img, obj, frame_id)
+                obj_img = segment_object(frame_img, obj, frame_id)                
                 # if saving a racket, add the player ID it is paired with to its file name
                 if pairings and obj['cls_id'] == 'racket':
                     player_id = pairings[obj_id]
                     obj_id = f'{obj_id}_{player_id}'
-                save_object(obj_id, obj, obj_img, experiment_folder, frame_id, csv_writer)
+                save_object(obj_id, obj, obj_img, experiment_folder, frame_id, csv_writer, frame_img) # Remove frame_img to avoid saving unsegmented images
 
             if pairings:
                 # Remove objects from background
@@ -164,8 +180,8 @@ def main():
                     x1, y1, x2, y2 = obj['bbox']
                     frame_img[y1:y2, x1:x2] = 0
 
-            # Save background image
-            cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
+                # Save background image
+                cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
 
 if __name__ == "__main__":
     main()

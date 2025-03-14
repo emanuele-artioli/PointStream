@@ -26,7 +26,7 @@ def segment_scene(video_file, working_dir, device, experiment_folder):
     start_time = time.time()
     subprocess.call([
         'python', f'{working_dir}/instance_segmentation.py',
-        '--video_file', f'{working_dir}/scenes/{video_file}',
+        '--video_file', video_file,
         '--experiment_folder', experiment_folder,
         '--device', device
     ])
@@ -62,24 +62,37 @@ def postprocess_scene(experiment_folder):
 def main():
     # get current working directory
     working_dir = os.environ.get("WORKING_DIR", "/PointStream")
-    video_folder = os.environ.get("VIDEO_FOLDER", "/PointStream/scenes")
+    video_folder = os.environ.get("VIDEO_FOLDER", "/scenes")
     video_file = os.environ.get("VIDEO_FILE")
     device = os.environ.get("DEVICE", "cpu")
+    parallel = int(os.environ.get("PARALLEL", 0))
+
+    video_folder = os.path.join(working_dir, video_folder)
 
      # If no video_file is provided, use every video in the folder
     if not video_file:
-        all_videos = [os.path.join(video_folder, v)
-                      for v in os.listdir(video_folder) if v.endswith(('.mp4','.mov','.avi'))]
+        all_videos = [v for v in os.listdir(video_folder) if v.endswith(('.mp4','.mov','.avi'))]
     else:
         all_videos = [video_file]
-    with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
+    # Whether to process each video in parallel or sequentially
+    if parallel:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
+            for vid in all_videos:
+                experiment_folder = f'{working_dir}/experiments/{os.path.basename(vid).split(".")[0]}'
+                os.makedirs(experiment_folder, exist_ok=True)
+                video_file = os.path.join(video_folder, vid)
+                seg_future = executor.submit(segment_scene, video_file, working_dir, device, experiment_folder)
+                seg_future.add_done_callback(
+                    lambda f, folder=experiment_folder: executor.submit(postprocess_scene, folder)
+                )
+    else:
         for vid in all_videos:
-            experiment_folder = f'{working_dir}/{os.path.basename(vid).split(".")[0]}'
+            experiment_folder = f'{working_dir}/experiments/{os.path.basename(vid).split(".")[0]}'
             os.makedirs(experiment_folder, exist_ok=True)
-            seg_future = executor.submit(segment_scene, vid, working_dir, device, experiment_folder)
-            seg_future.add_done_callback(
-                lambda f, folder=experiment_folder: executor.submit(postprocess_scene, folder)
-            )
+            video_file = os.path.join(video_folder, vid)
+            segment_scene(video_file, working_dir, device, experiment_folder)
+            postprocess_scene(experiment_folder)
+
 
 if __name__ == "__main__":
     main()
