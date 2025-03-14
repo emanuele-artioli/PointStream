@@ -5,20 +5,30 @@ import argparse
 import csv
 from ultralytics import YOLO
 
-def extract_detections(result):
-    """Extracts object info (ID, class, confidence, bbox, mask) from a YOLO result."""
+def extract_detections(result, players_ids):
+    """Extracts object info (ID, class, confidence, bbox, mask) from a YOLO result into class dictionary."""
     boxes = getattr(result, 'boxes', [])
     masks = getattr(result, 'masks', None)
-    detections = {
-        int(box.id): {
+    people = {}
+    rackets = {}
+    balls = {}
+    for i, box in enumerate(boxes):
+        obj = {
             'cls_id': int(box.cls[0]),
             'conf': float(box.conf),
             'bbox': tuple(map(int, box.xyxy[0])),
             'mask': masks.data[i].cpu().numpy().astype(np.uint8) if masks and i < len(masks.data) else None
         }
-        for i, box in enumerate(boxes)
-    }
-    return detections
+        if obj['cls_id'] == 0:
+            # if 2 players are already detected, don't save anyone with a different ID
+            if len(players_ids) >= 2 and obj['id'] not in players_ids:
+                continue
+            people[i] = obj
+        elif obj['cls_id'] == 32:
+            balls[i] = obj
+        elif obj['cls_id'] == 38:
+            rackets[i] = obj
+    return people, rackets, balls
 
 def compute_overlap_area(a, b):
     """Computes the overlapping area between two bounding boxes."""
@@ -38,36 +48,7 @@ def find_overlapping_player(racket, people):
             max_overlap = overlap
             max_person = person_id
     return max_person
-
-def find_objects_to_save(people, rackets=None, balls=None):
-    """Determines which objects to save based on the number of rackets detected."""
-    objects_to_save = {}
-    pairings = {}
-
-    if rackets:
-        for racket_id, racket in rackets.items():
-                player_id = find_overlapping_player(racket, people)
-                if player_id is not None:
-                    pairings[racket_id] = player_id
-        # If there are at least two pairings, save only the players and rackets that are paired
-        if len(pairings) >= 2:
-            for racket_id, player_id in pairings.items():
-                objects_to_save[player_id] = people[player_id]
-                objects_to_save[racket_id] = rackets[racket_id]
-
-        # Else, save every person and every racket
-        else:
-            objects_to_save.update(people)
-            objects_to_save.update(rackets)
-    else:
-        objects_to_save.update(people)
-
-    # Add every ball to the list of objects to save
-    if balls:
-        objects_to_save.update(balls)
-
-    return objects_to_save, pairings   
-            
+      
 def segment_object(frame_img, obj, frame_id):
     '''Segment an object from the background based on its mask shape.'''
     x1, y1, x2, y2 = obj['bbox']
@@ -93,32 +74,6 @@ def save_object(object_id, object, obj_img, experiment_folder, frame_id, csv_wri
         unsegmented_folder = os.path.join(obj_folder, 'unsegmented')
         os.makedirs(unsegmented_folder, exist_ok=True)
         cv2.imwrite(os.path.join(unsegmented_folder, f'{frame_id}.png'), frame_img[y1:y2, x1:x2])
-
-def classify_objects(frame_data, pairings=None):
-    '''For each object detected, classify it as a racket, person, or ball.'''
-    # TODO: this can be done with a dict of {cls_id: cls_name} instead of hardcoding, then the selection logic moved to another function.
-    # TODO: also, the classification can be put in the same function as the extraction.
-    people = {}
-    rackets = {}
-    balls = {}
-    for obj_id, obj in frame_data.items():
-        if obj['cls_id'] == 0:
-            obj['cls_id'] = 'person'
-            # Only add the most confident people detections
-            if len(people) < 10:
-                people[obj_id] = obj
-        elif obj['cls_id'] == 32:
-            obj['cls_id'] = 'ball'
-            balls[obj_id] = obj
-        elif obj['cls_id'] == 38:
-            obj['cls_id'] = 'racket'
-            # If the racket overlaps a player that has already been paired with a previous racket, give it the same racket id as the previous racket
-            if pairings:
-                player_id = find_overlapping_player(obj, people)
-                if player_id in pairings.values():
-                    obj_id = next(k for k, v in pairings.items() if v == player_id)
-            rackets[obj_id] = obj
-    return people, rackets, balls
 
 def main():
     parser = argparse.ArgumentParser(description='Perform instance segmentation on a video.')
@@ -153,35 +108,57 @@ def main():
             classes = [0, 32, 38]  # person, ball, racket
         )
 
-        # Initialize pairings dictionary to keep track of which rackets are paired with which players across frames
-        pairings = {}
+        # Keep track of players' IDs and balls positions across frames
+        players_ids = set()
+        previous_balls_boxes = {}
 
         for frame_id, result in enumerate(inf_results):
             frame_img = result.orig_img
-            frame_data = extract_detections(result)
+            people, rackets, balls = extract_detections(result, players_ids)
 
-            people, rackets, balls = classify_objects(frame_data, pairings)
+            if rackets:
+                # for each racket find the player they overlap with the most,
+                for racket in rackets.values():
+                    player_id = find_overlapping_player(racket, people)
+                    if player_id is not None:
+                        players_ids.add(player_id)
+                    # Segment and save the racket
+                    racket_img = segment_object(frame_img, racket, frame_id)
+                    save_object(racket_id, racket, racket_img, experiment_folder, frame_id, csv_writer, frame_img)
 
-            # Save objects based on the number of rackets detected
-            objects_to_save, new_pairings = find_objects_to_save(people, rackets, balls)
-            
-            pairings.update(new_pairings)
-            for obj_id, obj in objects_to_save.items():
-                obj_img = segment_object(frame_img, obj, frame_id)                
-                # if saving a racket, add the player ID it is paired with to its file name
-                if pairings and obj['cls_id'] == 'racket':
-                    player_id = pairings[obj_id]
-                    obj_id = f'{obj_id}_{player_id}'
-                save_object(obj_id, obj, obj_img, experiment_folder, frame_id, csv_writer, frame_img) # Remove frame_img to avoid saving unsegmented images
+            if balls:
+                # for each ball, check if it has moved enough from the previous frame
+                for ball_id, ball in balls.items():
+                    if ball_id in previous_balls_boxes.keys():
+                        previous_box = previous_balls_boxes[ball_id]
+                        current_box = ball['bbox']
+                        # If the ball has moved enough, segment and save it
+                        if compute_overlap_area(previous_box, current_box) < 0.9:
+                            ball_img = segment_object(frame_img, ball, frame_id)
+                            save_object(ball_id, ball, ball_img, experiment_folder, frame_id, csv_writer, frame_img)
+                            # Otherwise, pop it from the list of balls
+                            balls.pop(ball_id)
+                    # Save the current ball's bbox for the next frame
+                    previous_balls_boxes[ball_id] = ball['bbox']
 
-            if pairings:
-                # Remove objects from background
-                for obj in objects_to_save.values():
-                    x1, y1, x2, y2 = obj['bbox']
-                    frame_img[y1:y2, x1:x2] = 0
+            # Segment and save every person (once 2 players are detected, only they will be present in people)
+            for person_id, person in people.items():
+                player_img = segment_object(frame_img, person, frame_id)
+                save_object(person_id, person, player_img, experiment_folder, frame_id, csv_writer, frame_img)
 
-                # Save background image
-                cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
+            # Remove every person, racket, and ball from the background
+            for obj in people.values():
+                x1, y1, x2, y2 = obj['bbox']
+                frame_img[y1:y2, x1:x2] = 0
+            for obj in rackets.values():
+                x1, y1, x2, y2 = obj['bbox']
+                frame_img[y1:y2, x1:x2] = 0
+            for obj in balls.values():
+                x1, y1, x2, y2 = obj['bbox']
+                frame_img[y1:y2, x1:x2] = 0
+
+            # Save background image
+            cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
 
 if __name__ == "__main__":
     main()
