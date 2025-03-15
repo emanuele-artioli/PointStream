@@ -47,6 +47,13 @@ def postprocess_scene(experiment_folder):
             os.rename(os.path.join(experiment_folder, obj_folder), os.path.join(experiment_folder, 'ball_' + obj_folder[3:]))
         elif obj_folder.startswith('38_'):
             os.rename(os.path.join(experiment_folder, obj_folder), os.path.join(experiment_folder, 'racket_' + obj_folder[3:]))
+
+    # Stitch background images
+    background_folder = os.path.join(experiment_folder, 'background')
+    stitched = stitch_background_images(background_folder)
+    if stitched is not None:
+        cv2.imwrite(os.path.join(experiment_folder, 'background.png'), stitched)
+    shutil.rmtree(background_folder)
     
     # Zip the experiment folder
     shutil.make_archive(experiment_folder, 'zip', experiment_folder)
