@@ -13,7 +13,8 @@ def extract_detections(result, players_ids):
     people = {}
     rackets = {}
     balls = {}
-    for i, box in enumerate(boxes):
+    for box in boxes:
+        i = box.id
         obj = {
             'cls_id': int(box.cls[0]),
             'conf': float(box.conf),
@@ -21,8 +22,8 @@ def extract_detections(result, players_ids):
             'mask': masks.data[i].cpu().numpy().astype(np.uint8) if masks and i < len(masks.data) else None
         }
         if obj['cls_id'] == 0:
-            # if 2 players id are already known, and the current person id is not one of them, skip
-            if len(players_ids) >= 2 and i not in players_ids:
+            # if enough players id are already known, and the current person id is not one of them, skip
+            if len(players_ids) >= 4 and i not in players_ids:
                 continue
             people[i] = obj
         elif obj['cls_id'] == 32:
@@ -97,7 +98,7 @@ def main():
 
         inf_results = model.track(
             source = args.video_file,
-            conf = 0.25,
+            conf = 0.5,
             iou = 0.2,
             imgsz = 3840,
             half = 'cuda' in args.device, # use half precision if on cuda
