@@ -23,7 +23,7 @@ def extract_detections(result, players_ids):
         }
         if obj['cls_id'] == 0:
             # if enough players id are already known, and the current person id is not one of them, skip
-            if len(players_ids) >= 4 and i not in players_ids:
+            if len(players_ids) >= 5 and i not in players_ids:
                 continue
             people[i] = obj
         elif obj['cls_id'] == 32:
@@ -87,27 +87,29 @@ def main():
     model = YOLO('yolo11l-seg.pt')
     background_folder = os.path.join(args.experiment_folder, 'background')
     experiment_folder = os.path.join(args.experiment_folder, 'objects')
+    csv_file_path = os.path.join(args.experiment_folder, 'bounding_boxes.csv')
     os.makedirs(experiment_folder, exist_ok=True)
     os.makedirs(background_folder, exist_ok=True)
 
     # Open CSV file for writing bounding box coordinates
-    csv_file_path = os.path.join(args.experiment_folder, 'bounding_boxes.csv')
     with open(csv_file_path, mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
         csv_writer.writerow(['frame_id', 'object_id', 'class_id', 'x1', 'y1', 'x2', 'y2'])
 
         inf_results = model.track(
             source = args.video_file,
-            conf = 0.5,
+            conf = 0.25,
             iou = 0.2,
             imgsz = 3840,
             half = 'cuda' in args.device, # use half precision if on cuda
             device = args.device,
             batch = 1,
+            max_det = 30,
+            classes = [0, 32, 38],  # person, ball, racket
             retina_masks = True,
             stream = True,
             persist = True,
-            classes = [0, 32, 38]  # person, ball, racket
+
         )
 
         # Keep track of players' IDs and balls positions across frames

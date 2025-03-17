@@ -5,11 +5,12 @@ import cv2
 import shutil
 import concurrent.futures
 
-def stitch_background_images(background_folder, stride=5):
+def stitch_background_images(background_folder, n_samples=10):
     """Combines periodic background frames into a single stitched image."""
     all_images = []
+    n_images = len(os.listdir(background_folder))
     for i, name in enumerate(sorted(os.listdir(background_folder))):
-        if name.endswith(".png") and i % stride == 0:
+        if name.endswith(".png") and i % (n_images // n_samples) == 0:
             img = cv2.imread(os.path.join(background_folder, name))
             if img is not None:
                 all_images.append(img)
@@ -60,6 +61,8 @@ def postprocess_scene(experiment_folder):
     shutil.rmtree(experiment_folder)
 
 def main():
+    # Start timing the script
+    start = time.time()
     # get current working directory
     working_dir = os.environ.get("WORKING_DIR", "/PointStream")
     video_folder = os.environ.get("VIDEO_FOLDER", "/scenes")
@@ -86,9 +89,15 @@ def main():
                 seg_future.result()  # Wait for segmentation to finish
             postprocess_scene(experiment_folder)
         else:
+            # Segment, postprocess and calculate the time required for each video
+            segment_start = time.time()
             segment_scene(video_file, working_dir, device, experiment_folder)
+            segment_end = time.time()
             postprocess_scene(experiment_folder)
-
+            postprocess_end = time.time()
+            print(f"Segmentation time: {segment_end - segment_start}")
+            print(f"Postprocessing time: {postprocess_end - segment_end}")
+    print(f"Total time: {time.time() - start}")
 
 if __name__ == "__main__":
     main()
