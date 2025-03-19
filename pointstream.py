@@ -5,7 +5,7 @@ import cv2
 import shutil
 import concurrent.futures
 
-def stitch_background_images(background_folder, n_samples=10):
+def stitch_background_images(background_folder, n_samples=50):
     """Combines periodic background frames into a single stitched image."""
     all_images = []
     n_images = len(os.listdir(background_folder))
@@ -23,31 +23,33 @@ def stitch_background_images(background_folder, n_samples=10):
         stitched[mask] = img[mask]
     return stitched
 
-def segment_scene(video_file, working_dir, device, experiment_folder):
+def segment_scene(video_file, working_dir, device, experiment_folder, model):
     subprocess.call([
         'python', f'{working_dir}/instance_segmentation.py',
         '--video_file', video_file,
         '--experiment_folder', experiment_folder,
-        '--device', device
+        '--device', device,
+        '--model', model,
     ])
 
 def postprocess_scene(experiment_folder):
     '''Delete people folders that are missing too many frames (i.e., everyone besides players), rename the ones that are not, based on their class, then zip the experiment.'''
+    objects_folder = os.path.join(experiment_folder, 'objects')
     # Get maximum number of frames from the frame id in the last row of the CSV file
     with open(os.path.join(experiment_folder, 'bounding_boxes.csv')) as f:
         frame_id = int(f.readlines()[-1].split(',')[0])
     min_frames = frame_id * 0.9
-    for obj_folder in os.listdir(experiment_folder):
-        if obj_folder.startswith('0_'):
-            num_frames = len(os.listdir(os.path.join(experiment_folder, obj_folder)))
+    for obj in os.listdir(objects_folder):
+        if obj.startswith('0_'):
+            num_frames = len(os.listdir(os.path.join(objects_folder, obj)))
             if num_frames < min_frames:
-                shutil.rmtree(os.path.join(experiment_folder, obj_folder))
+                shutil.rmtree(os.path.join(objects_folder, obj))
             else:
-                os.rename(os.path.join(experiment_folder, obj_folder), os.path.join(experiment_folder, 'person_' + obj_folder[2:]))
-        elif obj_folder.startswith('32_'):
-            os.rename(os.path.join(experiment_folder, obj_folder), os.path.join(experiment_folder, 'ball_' + obj_folder[3:]))
-        elif obj_folder.startswith('38_'):
-            os.rename(os.path.join(experiment_folder, obj_folder), os.path.join(experiment_folder, 'racket_' + obj_folder[3:]))
+                os.rename(os.path.join(objects_folder, obj), os.path.join(objects_folder, 'person_' + obj[2:]))
+        elif obj.startswith('32_'):
+            os.rename(os.path.join(objects_folder, obj), os.path.join(objects_folder, 'ball_' + obj[3:]))
+        elif obj.startswith('38_'):
+            os.rename(os.path.join(objects_folder, obj), os.path.join(objects_folder, 'racket_' + obj[3:]))
 
     # Stitch background images
     background_folder = os.path.join(experiment_folder, 'background')
@@ -69,6 +71,7 @@ def main():
     video_file = os.environ.get("VIDEO_FILE")
     device = os.environ.get("DEVICE", "cpu")
     parallel = int(os.environ.get("PARALLEL", 0))
+    model = os.environ.get("MODEL", None)
 
     video_folder = os.path.join(working_dir, video_folder)
 
@@ -85,13 +88,13 @@ def main():
         video_file = os.path.join(video_folder, vid)
         if parallel:
             with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
-                seg_future = executor.submit(segment_scene, video_file, working_dir, device, experiment_folder)
+                seg_future = executor.submit(segment_scene, video_file, working_dir, device, experiment_folder, model)
                 seg_future.result()  # Wait for segmentation to finish
             postprocess_scene(experiment_folder)
         else:
             # Segment, postprocess and calculate the time required for each video
             segment_start = time.time()
-            segment_scene(video_file, working_dir, device, experiment_folder)
+            segment_scene(video_file, working_dir, device, experiment_folder, model)
             segment_end = time.time()
             postprocess_scene(experiment_folder)
             postprocess_end = time.time()

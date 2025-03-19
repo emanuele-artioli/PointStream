@@ -13,8 +13,8 @@ def extract_detections(result, players_ids):
     people = {}
     rackets = {}
     balls = {}
-    for box in boxes:
-        i = box.id
+    for i, box in enumerate(boxes):
+        obj_id = int(box.id) if box.id is not None else 9999
         obj = {
             'cls_id': int(box.cls[0]),
             'conf': float(box.conf),
@@ -23,13 +23,13 @@ def extract_detections(result, players_ids):
         }
         if obj['cls_id'] == 0:
             # if enough players id are already known, and the current person id is not one of them, skip
-            if len(players_ids) >= 5 and i not in players_ids:
+            if len(players_ids) >= 2 and obj_id not in players_ids:
                 continue
-            people[i] = obj
+            people[obj_id] = obj
         elif obj['cls_id'] == 32:
-            balls[i] = obj
+            balls[obj_id] = obj
         elif obj['cls_id'] == 38:
-            rackets[i] = obj
+            rackets[obj_id] = obj
     return people, rackets, balls
 
 def compute_overlap_area(a, b):
@@ -82,9 +82,10 @@ def main():
     parser.add_argument('--video_file', type=str, required=True, help='Path to the input video file.')
     parser.add_argument('--experiment_folder', type=str, required=True, help='Folder to save objects.')
     parser.add_argument('--device', type=str, default='cpu', help='Device to run the model')
+    parser.add_argument('--model', type=str, default='models/yolo11l-seg.pt', help='Path to the model file.')
     args = parser.parse_args()
 
-    model = YOLO('yolo11l-seg.pt')
+    model = YOLO(args.model)
     background_folder = os.path.join(args.experiment_folder, 'background')
     experiment_folder = os.path.join(args.experiment_folder, 'objects')
     csv_file_path = os.path.join(args.experiment_folder, 'bounding_boxes.csv')
