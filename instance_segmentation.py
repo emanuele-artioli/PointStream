@@ -3,7 +3,6 @@ import os
 import cv2
 import argparse
 import csv
-import shutil
 from ultralytics import YOLO
 
 def extract_detections(result, players_ids):

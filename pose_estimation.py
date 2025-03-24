@@ -1,105 +1,94 @@
 import os
+import cv2
 import csv
 import argparse
 from ultralytics import YOLO
 
-# can be sped up with multiprocessing
-# tells when no objects are detected, which can be used to avoid sending the image to client
-# def perform_pose_estimation(segmented_objects_folder, pose_csv):
-#     model = YOLO('yolo11n-pose.pt')
+def extract_pose_detections(result):
+    """Extract keypoints and bounding boxes for each detected person."""
+    boxes = getattr(result, 'boxes', [])
+    keypoints_data = getattr(result, 'keypoints', None)
+    detections = []
+    for i, box in enumerate(boxes):
+        obj_id = int(box.id) if box.id is not None else 9999
+        bbox = tuple(map(int, box.xyxy[0]))
+        conf = float(box.conf)
+        keypoints = []
+        if keypoints_data is not None and i < len(keypoints_data.xy):
+            keypoints = keypoints_data.xy[i].cpu().numpy().tolist()
+        detections.append({
+            'id': obj_id,
+            'conf': conf,
+            'bbox': bbox,
+            'keypoints': keypoints
+        })
+    return detections
 
-#     with open(pose_csv, mode='w', newline='') as csv_file:
-#         csv_writer = csv.writer(csv_file)
-#         header = ['frame', 'object_id', 'object_type', 'bbox_x1', 'bbox_y1', 'bbox_x2', 'bbox_y2']
-#         for i in range(17):
-#             header.extend([f'keypoint_{i}_x', f'keypoint_{i}_y'])
-#         csv_writer.writerow(header)
+def remove_objects_from_frame(frame_img, detections):
+    """Remove detected people from the frame by setting their bounding boxes to black."""
+    for det in detections:
+        x1, y1, x2, y2 = det['bbox']
+        frame_img[y1:y2, x1:x2] = 0
 
-#         # For each object subfolder, parse images and run YOLO pose
-#         for obj_folder in sorted(os.listdir(segmented_objects_folder)):
-#             full_obj_path = os.path.join(segmented_objects_folder, obj_folder)
-#             if not os.path.isdir(full_obj_path):
-#                 continue
+def main():
+    parser = argparse.ArgumentParser(description='Perform pose estimation on a video.')
+    parser.add_argument('--video_file', type=str, required=True, help='Path to the input video file.')
+    parser.add_argument('--experiment_folder', type=str, required=True, help='Folder to save keypoints and background.')
+    parser.add_argument('--device', type=str, default='cpu', help='Device to run the model')
+    parser.add_argument('--model', type=str, default='models/yolo11m-pose.pt', help='Path to the pose model file.')
+    args = parser.parse_args()
 
-#             # Use folder name (e.g., "object_4" or "object_sam_0_1") as object_id
-#             object_id = obj_folder
+    model = YOLO(args.model)
+    background_folder = os.path.join(args.experiment_folder, 'background')
+    os.makedirs(background_folder, exist_ok=True)
 
-#             for frame_file in sorted(os.listdir(full_obj_path)):
-#                 if not frame_file.lower().endswith(('.png', '.jpg', '.jpeg')):
-#                     continue
-
-#                 frame_path = os.path.join(full_obj_path, frame_file)
-#                 frame = cv2.imread(frame_path)
-#                 if frame is None:
-#                     continue
-
-#                 results = model.predict(
-#                     frame,
-#                     imgsz=640,
-#                     classes=[0],
-#                     max_det=2, 
-#                     retina_masks=True,
-#                 )[0]
-
-#                 for i, box in enumerate(results.boxes):
-#                     x1, y1, x2, y2 = box.xyxy[0]
-#                     object_type = box.cls[0]
-#                     row = [frame_file, object_id, object_type, x1.item(), y1.item(), x2.item(), y2.item()]
-#                     # Append keypoints
-#                     if results.keypoints is not None:
-#                         for kp in results.keypoints.xy[i]:
-#                             row.extend(kp.tolist())
-#                     csv_writer.writerow(row)
-
-#                 # # Optionally save pose visualization
-#                 # pose_frame = results.plot(line_width=1, boxes=False, masks=False)
-#                 # frame_output_folder = os.path.join(os.path.dirname(pose_csv), obj_folder, 'pose_vis')
-#                 # os.makedirs(frame_output_folder, exist_ok=True)
-#                 # cv2.imwrite(os.path.join(frame_output_folder, frame_file), pose_frame)
-
-def perform_pose_estimation(segmented_folder, pose_csv):
-    model = YOLO('yolo11m-pose.pt')
-
-    # Create CSV file and write header
-    with open(pose_csv, mode='w', newline='') as csv_file:
+    # Create CSV file for writing keypoints
+    pose_csv_path = os.path.join(args.experiment_folder, 'keypoints.csv')
+    with open(pose_csv_path, mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
-        header = ['player', 'frame']
+        # Write CSV header: frame_id, object_id, confidence, plus pairs of x,y per keypoint
+        header = ['frame_id', 'object_id', 'confidence']
+        # Assume up to 17 keypoints as in COCO body
         for i in range(17):
             header.extend([f'keypoint_{i}_x', f'keypoint_{i}_y'])
         csv_writer.writerow(header)
 
-        for sub in os.listdir(segmented_folder):
-            # skip files, only process folders
-            detected_person = os.path.join(segmented_folder, sub)
-            if not os.path.isdir(detected_person):
-                continue
+        # Perform pose estimation in a streaming fashion
+        inf_results = model.track(
+            source=args.video_file,
+            conf=0.25,
+            iou=0.2,
+            imgsz=1280,
+            device=args.device,
+            classes=[0],  # person class
+            stream=True,
+            persist=True,
+            max_det=10
+        )
 
-            results = model.predict(
-                detected_person, 
-                conf=0.15, 
-                imgsz=320, 
-                classes=[0], 
-                max_det=1, 
-                retina_masks=True, 
-                stream=True
-            )
+        frame_id = 0
+        for frame_id, result in enumerate(inf_results):
+            frame_id += 1
+            frame_img = result.orig_img
+            detections = extract_pose_detections(result)
 
-            for frame_id, result in enumerate(results):
-                row = [sub, frame_id]
-                # Append keypoints
-                if result.keypoints is not None:
-                    for kp in result.keypoints.xy[0]:
-                        row.extend(kp.tolist())
+            # Write keypoints to CSV
+            for det in detections:
+                row = [
+                    frame_id,
+                    det['id'],
+                    f"{det['conf']:.2f}",
+                ]
+                # Add keypoints data (x,y)
+                for kp in det['keypoints']:
+                    row.extend([kp[0], kp[1]])
                 csv_writer.writerow(row)
 
-def main():
-    parser = argparse.ArgumentParser(description='Perform pose estimation on segmented object frames.')
-    parser.add_argument('--segmented_folder', type=str, required=True, help='Folder containing subfolders of object frames.')
-    parser.add_argument('--pose_csv', type=str, required=True, help='Path to the CSV file to save pose estimation data.')
-    args = parser.parse_args()
+            # Remove detected bounding boxes from the background
+            remove_objects_from_frame(frame_img, detections)
 
-    os.makedirs(os.path.dirname(args.pose_csv), exist_ok=True)
-    perform_pose_estimation(args.segmented_folder, args.pose_csv)
+            # Save background image
+            cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
 
 if __name__ == "__main__":
     main()
