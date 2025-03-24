@@ -4,6 +4,73 @@ import subprocess
 import cv2
 import shutil
 import concurrent.futures
+from ultralytics import YOLO
+import numpy as np
+import csv
+
+def extract_detections(result, players_ids):
+    """Extracts object info (ID, class, confidence, bbox, mask) from a YOLO result into class dictionary."""
+    boxes = getattr(result, 'boxes', [])
+    masks = getattr(result, 'masks', None)
+    people = {}
+    rackets = {}
+    balls = {}
+    for i, box in enumerate(boxes):
+        obj_id = int(box.id) if box.id is not None else 9999
+        obj = {
+            'cls_id': int(box.cls[0]),
+            'conf': float(box.conf),
+            'bbox': tuple(map(int, box.xyxy[0])),
+            'mask': masks.data[i].cpu().numpy().astype(np.uint8) if masks and i < len(masks.data) else None
+        }
+        if obj['cls_id'] == 0:
+            obj['cls_id'] = 'person'
+            # if enough players id are already known, and the current person id is not one of them, skip
+            if len(players_ids) >= 2 and obj_id not in players_ids:
+                continue
+            people[obj_id] = obj
+        elif obj['cls_id'] == 32:
+            obj['cls_id'] = 'ball'
+            balls[obj_id] = obj
+        elif obj['cls_id'] == 38:
+            obj['cls_id'] = 'racket'
+            rackets[obj_id] = obj
+    return people, rackets, balls
+
+def compute_overlap_area(a, b):
+    """Computes the overlapping area between two bounding boxes."""
+    ax1, ay1, ax2, ay2 = a
+    bx1, by1, bx2, by2 = b
+    ix1, iy1 = max(ax1, bx1), max(ay1, by1)
+    ix2, iy2 = min(ax2, bx2), min(ay2, by2)
+    return max(0, ix2 - ix1) * max(0, iy2 - iy1)
+
+def find_overlapping_player(racket, people):
+    """Finds the person that overlaps the most with a racket."""
+    max_overlap = 0
+    max_person = None
+    for person_id, person in people.items():
+        overlap = compute_overlap_area(racket['bbox'], person['bbox'])
+        if overlap > max_overlap:
+            max_overlap = overlap
+            max_person = person_id
+    return max_person
+      
+def fuse_bounding_boxes(box1, box2):
+    '''Fuse overlapping bounding boxes into a single one.'''
+    x1, y1, x2, y2 = box1
+    x3, y3, x4, y4 = box2
+    return (min(x1, x3), min(y1, y3), max(x2, x4), max(y2, y4))
+
+def save_object(object_id, object, obj_img, experiment_folder, frame_id, csv_writer):
+    '''Save an object to its subfolder and log its bounding box coordinates.'''
+    obj_folder = os.path.join(experiment_folder, f'{object["cls_id"]}_{object_id}')
+    os.makedirs(obj_folder, exist_ok=True)
+    cv2.imwrite(os.path.join(obj_folder, f'{frame_id}.png'), obj_img)
+    
+    # Save bounding box coordinates to CSV
+    x1, y1, x2, y2 = object['bbox']
+    csv_writer.writerow([frame_id, object_id, object['cls_id'], x1, y1, x2, y2])
 
 def stitch_background_images(background_folder, n_samples=50):
     """Combines periodic background frames into a single stitched image."""
@@ -23,15 +90,6 @@ def stitch_background_images(background_folder, n_samples=50):
         stitched[mask] = img[mask]
     return stitched
 
-def segment_scene(video_file, working_dir, device, experiment_folder, model):
-    subprocess.call([
-        'python', f'{working_dir}/instance_segmentation.py',
-        '--video_file', video_file,
-        '--experiment_folder', experiment_folder,
-        '--device', device,
-        '--model', model,
-    ])
-
 def postprocess_scene(experiment_folder):
     '''Delete people folders that are missing too many frames (i.e., everyone besides players), rename the ones that are not, based on their class, then zip the experiment.'''
     objects_folder = os.path.join(experiment_folder, 'objects')
@@ -40,16 +98,10 @@ def postprocess_scene(experiment_folder):
         frame_id = int(f.readlines()[-1].split(',')[0])
     min_frames = frame_id * 0.9
     for obj in os.listdir(objects_folder):
-        if obj.startswith('0_'):
+        if obj.startswith('person_'):
             num_frames = len(os.listdir(os.path.join(objects_folder, obj)))
             if num_frames < min_frames:
                 shutil.rmtree(os.path.join(objects_folder, obj))
-            else:
-                os.rename(os.path.join(objects_folder, obj), os.path.join(objects_folder, 'person_' + obj[2:]))
-        elif obj.startswith('32_'):
-            os.rename(os.path.join(objects_folder, obj), os.path.join(objects_folder, 'ball_' + obj[3:]))
-        elif obj.startswith('38_'):
-            os.rename(os.path.join(objects_folder, obj), os.path.join(objects_folder, 'racket_' + obj[3:]))
 
     # Stitch background images
     background_folder = os.path.join(experiment_folder, 'background')
@@ -65,42 +117,104 @@ def postprocess_scene(experiment_folder):
 def main():
     # Start timing the script
     start = time.time()
-    # get current working directory
+
+    # Get environment variables
+    device = os.environ.get("DEVICE", "cpu")
     working_dir = os.environ.get("WORKING_DIR", "/PointStream")
     video_folder = os.environ.get("VIDEO_FOLDER", "/scenes")
-    video_file = os.environ.get("VIDEO_FILE")
-    device = os.environ.get("DEVICE", "cpu")
-    parallel = int(os.environ.get("PARALLEL", 0))
-    model = os.environ.get("MODEL", None)
-
     video_folder = os.path.join(working_dir, video_folder)
-
-     # If no video_file is provided, use every video in the folder
+    # If no video_file is provided, use every video in the folder
+    video_file = os.environ.get("VIDEO_FILE")
     if not video_file:
         all_videos = [v for v in os.listdir(video_folder) if v.endswith(('.mp4','.mov','.avi'))]
     else:
         all_videos = [video_file]
+    # Load the object detection model
+    detection_model = os.environ.get("MODEL", None)
+    if 'yolo' in detection_model:
+        detection_model = YOLO(detection_model)
+    else:
+        raise ValueError('Model not supported.')
 
-    # Whether to process each video in parallel or sequentially
+    # Process each video
     for vid in all_videos:
         experiment_folder = f'{working_dir}/experiments/{os.path.basename(vid).split(".")[0]}'
-        os.makedirs(experiment_folder, exist_ok=True)
         video_file = os.path.join(video_folder, vid)
-        if parallel:
-            with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
-                seg_future = executor.submit(segment_scene, video_file, working_dir, device, experiment_folder, model)
-                seg_future.result()  # Wait for segmentation to finish
-            postprocess_scene(experiment_folder)
-        else:
-            # Segment, postprocess and calculate the time required for each video
-            segment_start = time.time()
-            segment_scene(video_file, working_dir, device, experiment_folder, model)
-            segment_end = time.time()
-            postprocess_scene(experiment_folder)
-            postprocess_end = time.time()
-            print(f"Segmentation time: {segment_end - segment_start}")
-            print(f"Postprocessing time: {postprocess_end - segment_end}")
-    print(f"Total time: {time.time() - start}")
+        background_folder = os.path.join(experiment_folder, 'background')
+        objects_folder = os.path.join(experiment_folder, 'objects')
+        csv_file_path = os.path.join(experiment_folder, 'bounding_boxes.csv')
+        os.makedirs(objects_folder, exist_ok=True)
+        os.makedirs(background_folder, exist_ok=True)
+
+        # Open CSV file for writing bounding box coordinates
+        with open(csv_file_path, mode='w', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow(['frame_id', 'object_id', 'class_id', 'x1', 'y1', 'x2', 'y2'])
+
+            # Keep track of players' IDs across frames
+            players_ids = set()
+
+            # First, a pass to detect objects of interest in the video
+            results = detection_model.track(
+                source = video_file,
+                conf = 0.25,
+                iou = 0.2,
+                imgsz = 640,
+                half = 'cuda' in device, # use half precision if on cuda
+                device = device,
+                batch = 20,
+                max_det = 30,
+                classes = [0, 32, 38], # person, ball, racket
+                retina_masks = True,
+                stream = True,
+                persist = True,
+            )
+
+            for frame_id, result in enumerate(results):
+                frame_img = result.orig_img
+                people, rackets, balls = extract_detections(result, players_ids)
+
+                if rackets:
+                    # for each racket find the player they overlap with the most,
+                    for racket_id, racket in rackets.items():
+                        player_id = find_overlapping_player(racket, people)
+                        if player_id is not None:
+                            players_ids.add(player_id)
+                            # If the racket overlaps with a player, fuse their bounding boxes
+                            people[player_id]['bbox'] = fuse_bounding_boxes(people[player_id]['bbox'], racket['bbox'])
+
+                if balls:
+                    # save each ball
+                    for ball_id, ball in balls.items():
+                        ball_img = frame_img[ball['bbox'][1]:ball['bbox'][3], ball['bbox'][0]:ball['bbox'][2]]
+                        save_object(ball_id, ball, ball_img, objects_folder, frame_id, csv_writer)
+
+                # Save every person (once 2 players are detected, only they will be present in people)
+                for person_id, person in people.items():
+                    person_img = frame_img[person['bbox'][1]:person['bbox'][3], person['bbox'][0]:person['bbox'][2]]
+                    save_object(person_id, person, person_img, objects_folder, frame_id, csv_writer)
+
+                # Remove every person, racket, and ball from the background
+                for obj in people.values():
+                    x1, y1, x2, y2 = obj['bbox']
+                    frame_img[y1:y2, x1:x2] = 0
+                for obj in rackets.values():
+                    x1, y1, x2, y2 = obj['bbox']
+                    frame_img[y1:y2, x1:x2] = 0
+                for obj in balls.values():
+                    x1, y1, x2, y2 = obj['bbox']
+                    frame_img[y1:y2, x1:x2] = 0
+
+                # Save the background
+                cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
+
+        # Postprocess the scene
+        postprocess_scene(experiment_folder)
+
+    # Print the total time taken
+    print(f'Total time taken: {time.time() - start} seconds')
 
 if __name__ == "__main__":
     main()
+
+# TODO: Right now I have only implemented the object detection part of the script. The next steps would be to implement the object segmentation and keypoints (or shape, that thing that Farzad did) estimation.

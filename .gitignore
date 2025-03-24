@@ -175,3 +175,4 @@ poses.csv
 .DS_Store
 cropped_video.mp4
 detected_objects.zip
+experiments/
