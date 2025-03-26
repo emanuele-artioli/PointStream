@@ -8,7 +8,7 @@ from ultralytics import YOLO, FastSAM
 import numpy as np
 import csv
 
-def extract_detections(result, players_ids=set()):
+def extract_detections(result, players_ids):
     """Extracts object info (ID, class, confidence, bbox, mask) from a YOLO result into class dictionary."""
     boxes = getattr(result, 'boxes', [])
     masks = getattr(result, 'masks', None)
@@ -96,47 +96,37 @@ def segment_with_SAM(img, model, prompt):
     mask = results[0].masks.data[0].cpu().numpy().astype(np.uint8) * 255
     return mask
 
-def segment_with_YOLO(img, model, conf=0.1, iou=0.01, device=None, classes=None):
+def segment_with_YOLO(img, model, conf=0.01, iou=0.01, imgsz=None, device=None, classes=None):
     '''Use YOLO to segment an object from the background.'''
     results = model.predict(
                 source = img,
                 conf = conf,
                 iou = iou,
-                imgsz = img.shape[0],
+                imgsz = imgsz,
                 half = 'cuda' in device, # use half precision if on cuda
                 device = device,
                 batch = 1,
-                max_det = 5,
+                max_det = 3,
                 classes = [0, 32, 38], # person, ball, racket
-                retina_masks = True,
+                retina_masks = True
             )
+    # If multiple objects are detected, find the first person and add their mask, then find the first racket and add its mask, then find the first ball and add its mask
     mask = np.zeros(img.shape[:2], dtype=np.uint8)
-    # First, extract people, rackets, and balls from the result
-    for frame_id, result in enumerate(results):
-        frame_img = result.orig_img
-        people, rackets, balls = extract_detections(result)
-    # If a racket is found, add its mask
-    if rackets:
-        racket_mask = list(rackets.values())[0]['mask'] * 255
-        mask = cv2.bitwise_or(mask, racket_mask)
-    # If a person is found, check which one is closest to the center of the frame and add its mask
-    if people:
-        frame_center = (frame_img.shape[1] / 2, frame_img.shape[0] / 2)
-        min_dist = float('inf')
-        closest_person = None
-        for person in people.values():
-            bbox = person['bbox']
-            person_center = ((bbox[2] + bbox[0]) / 2, (bbox[3] + bbox[1]) / 2)
-            dist = np.linalg.norm(np.array(frame_center) - np.array(person_center))
-            if dist < min_dist:
-                closest_person = person
-                min_dist = dist
-        person_mask = closest_person['mask'] * 255
-        mask = cv2.bitwise_or(mask, person_mask)
-    # If a ball is found, add its mask
-    if balls:
-        ball_mask = list(balls.values())[0]['mask'] * 255
-        mask = cv2.bitwise_or(mask, ball_mask)
+    for i, box in enumerate(results[0].boxes):
+        if box.cls[0] == 0:
+            person_mask = results[0].masks.data[i].cpu().numpy().astype(np.uint8) * 255
+            mask = cv2.bitwise_or(mask, person_mask)
+            break
+    for i, box in enumerate(results[0].boxes):
+        if box.cls[0] == 38:
+            racket_mask = results[0].masks.data[i].cpu().numpy().astype(np.uint8) * 170
+            mask = cv2.bitwise_or(mask, racket_mask)
+            break
+    for i, box in enumerate(results[0].boxes):
+        if box.cls[0] == 32:
+            ball_mask = results[0].masks.data[i].cpu().numpy().astype(np.uint8) * 85
+            mask = cv2.bitwise_or(mask, ball_mask)
+            break
     return mask
 
 def expand_bbox(bbox, scale, frame_shape):
@@ -296,7 +286,7 @@ def main():
                         img = cv2.imread(img_path)
                         if img is not None:
                             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                            mask = segment_with_YOLO(img, segmentation_model, device=device)
+                            mask = segment_with_YOLO(img, segmentation_model, imgsz=img.shape[:2], device=device)
                             cv2.imwrite(img_path.replace('.png', '_mask.png'), mask)
         print(f'Total time taken for segmentation: {time.time() - start} seconds')
         
@@ -306,7 +296,3 @@ if __name__ == "__main__":
 
 # TODO: Right now I have only implemented the object detection part of the script. 
 # The next steps would be to implement the object segmentation and keypoints (or shape, that thing that Farzad did) estimation.
-
-# TODO: one thing that can be done is to parse the video first, with a fast YOLO that identifies each object, with a long stride to be quick, and finds which ones are static over the video.
-# Then, we do a full pass, and the objects whose bounding boxes are in the same location as the objects that were recognized as static and therefore background, are not detected this time.
-# So we should be left with the ones that are part of the action.
