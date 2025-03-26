@@ -4,11 +4,11 @@ import subprocess
 import cv2
 import shutil
 import concurrent.futures
-from ultralytics import YOLO
+from ultralytics import YOLO, FastSAM
 import numpy as np
 import csv
 
-def extract_detections(result, players_ids):
+def extract_detections(result, players_ids=set()):
     """Extracts object info (ID, class, confidence, bbox, mask) from a YOLO result into class dictionary."""
     boxes = getattr(result, 'boxes', [])
     masks = getattr(result, 'masks', None)
@@ -90,29 +90,68 @@ def stitch_background_images(background_folder, n_samples=50):
         stitched[mask] = img[mask]
     return stitched
 
-def postprocess_scene(experiment_folder):
-    '''Delete people folders that are missing too many frames (i.e., everyone besides players), rename the ones that are not, based on their class, then zip the experiment.'''
-    objects_folder = os.path.join(experiment_folder, 'objects')
-    # Get maximum number of frames from the frame id in the last row of the CSV file
-    with open(os.path.join(experiment_folder, 'bounding_boxes.csv')) as f:
-        frame_id = int(f.readlines()[-1].split(',')[0])
-    min_frames = frame_id * 0.9
-    for obj in os.listdir(objects_folder):
-        if obj.startswith('person_'):
-            num_frames = len(os.listdir(os.path.join(objects_folder, obj)))
-            if num_frames < min_frames:
-                shutil.rmtree(os.path.join(objects_folder, obj))
+def segment_with_SAM(img, model, prompt):
+    '''Use SAM to segment an object from the background.'''
+    results = model(img, texts=prompt)
+    mask = results[0].masks.data[0].cpu().numpy().astype(np.uint8) * 255
+    return mask
 
-    # Stitch background images
-    background_folder = os.path.join(experiment_folder, 'background')
-    stitched = stitch_background_images(background_folder)
-    if stitched is not None:
-        cv2.imwrite(os.path.join(experiment_folder, 'background.png'), stitched)
-    shutil.rmtree(background_folder)
-    
-    # Zip the experiment folder
-    shutil.make_archive(experiment_folder, 'zip', experiment_folder)
-    shutil.rmtree(experiment_folder)
+def segment_with_YOLO(img, model, conf=0.1, iou=0.01, device=None, classes=None):
+    '''Use YOLO to segment an object from the background.'''
+    results = model.predict(
+                source = img,
+                conf = conf,
+                iou = iou,
+                imgsz = img.shape[0],
+                half = 'cuda' in device, # use half precision if on cuda
+                device = device,
+                batch = 1,
+                max_det = 5,
+                classes = [0, 32, 38], # person, ball, racket
+                retina_masks = True,
+            )
+    mask = np.zeros(img.shape[:2], dtype=np.uint8)
+    # First, extract people, rackets, and balls from the result
+    for frame_id, result in enumerate(results):
+        frame_img = result.orig_img
+        people, rackets, balls = extract_detections(result)
+    # If a racket is found, add its mask
+    if rackets:
+        racket_mask = list(rackets.values())[0]['mask'] * 255
+        mask = cv2.bitwise_or(mask, racket_mask)
+    # If a person is found, check which one is closest to the center of the frame and add its mask
+    if people:
+        frame_center = (frame_img.shape[1] / 2, frame_img.shape[0] / 2)
+        min_dist = float('inf')
+        closest_person = None
+        for person in people.values():
+            bbox = person['bbox']
+            person_center = ((bbox[2] + bbox[0]) / 2, (bbox[3] + bbox[1]) / 2)
+            dist = np.linalg.norm(np.array(frame_center) - np.array(person_center))
+            if dist < min_dist:
+                closest_person = person
+                min_dist = dist
+        person_mask = closest_person['mask'] * 255
+        mask = cv2.bitwise_or(mask, person_mask)
+    # If a ball is found, add its mask
+    if balls:
+        ball_mask = list(balls.values())[0]['mask'] * 255
+        mask = cv2.bitwise_or(mask, ball_mask)
+    return mask
+
+def expand_bbox(bbox, scale, frame_shape):
+    x1, y1, x2, y2 = bbox
+    w = x2 - x1
+    h = y2 - y1
+    cx = x1 + w / 2
+    cy = y1 + h / 2
+    new_w = w * (1 + scale)
+    new_h = h * (1 + scale)
+    new_x1 = max(int(cx - new_w / 2), 0)
+    new_y1 = max(int(cy - new_h / 2), 0)
+    new_x2 = min(int(cx + new_w / 2), frame_shape[1])
+    new_y2 = min(int(cy + new_h / 2), frame_shape[0])
+    return (new_x1, new_y1, new_x2, new_y2)
 
 def main():
     # Start timing the script
@@ -130,7 +169,7 @@ def main():
     else:
         all_videos = [video_file]
     # Load the object detection model
-    detection_model = os.environ.get("MODEL", None)
+    detection_model = os.environ.get("DET_MODEL", None)
     if 'yolo' in detection_model:
         detection_model = YOLO(detection_model)
     else:
@@ -158,11 +197,11 @@ def main():
             results = detection_model.track(
                 source = video_file,
                 conf = 0.25,
-                iou = 0.2,
+                iou = 0.1,
                 imgsz = 640,
                 half = 'cuda' in device, # use half precision if on cuda
                 device = device,
-                batch = 20,
+                batch = 10,
                 max_det = 30,
                 classes = [0, 32, 38], # person, ball, racket
                 retina_masks = True,
@@ -174,6 +213,7 @@ def main():
                 frame_img = result.orig_img
                 people, rackets, balls = extract_detections(result, players_ids)
 
+                players_with_rackets = set()
                 if rackets:
                     # for each racket find the player they overlap with the most,
                     for racket_id, racket in rackets.items():
@@ -182,6 +222,7 @@ def main():
                             players_ids.add(player_id)
                             # If the racket overlaps with a player, fuse their bounding boxes
                             people[player_id]['bbox'] = fuse_bounding_boxes(people[player_id]['bbox'], racket['bbox'])
+                            players_with_rackets.add(player_id)
 
                 if balls:
                     # save each ball
@@ -191,6 +232,9 @@ def main():
 
                 # Save every person (once 2 players are detected, only they will be present in people)
                 for person_id, person in people.items():
+                    # Expand bounding box for recognized players without a racket in this frame
+                    if person_id in players_ids and person_id not in players_with_rackets:
+                        person['bbox'] = expand_bbox(person['bbox'], 0.5, frame_img.shape[:2])
                     person_img = frame_img[person['bbox'][1]:person['bbox'][3], person['bbox'][0]:person['bbox'][2]]
                     save_object(person_id, person, person_img, objects_folder, frame_id, csv_writer)
 
@@ -208,13 +252,61 @@ def main():
                 # Save the background
                 cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
 
-        # Postprocess the scene
-        postprocess_scene(experiment_folder)
+        # Get maximum number of frames from the frame id in the last row of the CSV file
+        with open(os.path.join(experiment_folder, 'bounding_boxes.csv')) as f:
+            frame_id = int(f.readlines()[-1].split(',')[0])
+        min_frames = frame_id * 0.9
+        # Delete people folders that are missing too many frames (i.e., everyone besides players)
+        for obj in os.listdir(objects_folder):
+            if obj.startswith('person_'):
+                num_frames = len(os.listdir(os.path.join(objects_folder, obj)))
+                if num_frames < min_frames:
+                    shutil.rmtree(os.path.join(objects_folder, obj))
 
-    # Print the total time taken
-    print(f'Total time taken: {time.time() - start} seconds')
+        # Stitch background images
+        background_folder = os.path.join(experiment_folder, 'background')
+        stitched = stitch_background_images(background_folder)
+        if stitched is not None:
+            cv2.imwrite(os.path.join(experiment_folder, 'background.png'), stitched)
+        shutil.rmtree(background_folder)
+        
+        # Zip the experiment folder
+        # shutil.make_archive(experiment_folder, 'zip', experiment_folder)
+        # shutil.rmtree(experiment_folder)
+
+        # Print the total time taken
+        print(f'Total time taken for detection: {time.time() - start} seconds')
+
+        # Run a second pass of YOLO segmentation on the objects in the subfolders
+        start = time.time()
+
+        # Load the object detection model
+        segmentation_model = os.environ.get("SEG_MODEL", None)
+        if 'yolo' in segmentation_model:
+            segmentation_model = YOLO(segmentation_model)
+        else:
+            raise ValueError('Model not supported.')
+
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            for obj in os.listdir(objects_folder):
+                obj_folder = os.path.join(objects_folder, obj)
+                if os.path.isdir(obj_folder):
+                    for img in os.listdir(obj_folder):
+                        img_path = os.path.join(obj_folder, img)
+                        img = cv2.imread(img_path)
+                        if img is not None:
+                            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                            mask = segment_with_YOLO(img, segmentation_model, device=device)
+                            cv2.imwrite(img_path.replace('.png', '_mask.png'), mask)
+        print(f'Total time taken for segmentation: {time.time() - start} seconds')
+        
 
 if __name__ == "__main__":
     main()
 
-# TODO: Right now I have only implemented the object detection part of the script. The next steps would be to implement the object segmentation and keypoints (or shape, that thing that Farzad did) estimation.
+# TODO: Right now I have only implemented the object detection part of the script. 
+# The next steps would be to implement the object segmentation and keypoints (or shape, that thing that Farzad did) estimation.
+
+# TODO: one thing that can be done is to parse the video first, with a fast YOLO that identifies each object, with a long stride to be quick, and finds which ones are static over the video.
+# Then, we do a full pass, and the objects whose bounding boxes are in the same location as the objects that were recognized as static and therefore background, are not detected this time.
+# So we should be left with the ones that are part of the action.
