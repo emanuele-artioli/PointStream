@@ -6,7 +6,7 @@ import shutil
 import concurrent.futures
 from ultralytics import YOLO, FastSAM
 import numpy as np
-import csv
+import pandas as pd
 
 def extract_detections(result, players_ids):
     """Extracts object info (ID, class, confidence, bbox, mask) from a YOLO result into class dictionary."""
@@ -55,14 +55,14 @@ def find_overlapping_player(racket, people):
             max_overlap = overlap
             max_person = person_id
     return max_person
-      
+     
 def fuse_bounding_boxes(box1, box2):
     '''Fuse overlapping bounding boxes into a single one.'''
     x1, y1, x2, y2 = box1
     x3, y3, x4, y4 = box2
     return (min(x1, x3), min(y1, y3), max(x2, x4), max(y2, y4))
 
-def save_object(object_id, object, obj_img, experiment_folder, frame_id, csv_writer):
+def save_object(object_id, object, obj_img, experiment_folder, frame_id):
     '''Save an object to its subfolder and log its bounding box coordinates.'''
     obj_folder = os.path.join(experiment_folder, f'{object["cls_id"]}_{object_id}')
     os.makedirs(obj_folder, exist_ok=True)
@@ -70,7 +70,7 @@ def save_object(object_id, object, obj_img, experiment_folder, frame_id, csv_wri
     
     # Save bounding box coordinates to CSV
     x1, y1, x2, y2 = object['bbox']
-    csv_writer.writerow([frame_id, object_id, object['cls_id'], x1, y1, x2, y2])
+    return [frame_id, object_id, object['cls_id'], x1, y1, x2, y2]
 
 def stitch_background_images(background_folder, n_samples=50):
     """Combines periodic background frames into a single stitched image."""
@@ -90,10 +90,56 @@ def stitch_background_images(background_folder, n_samples=50):
         stitched[mask] = img[mask]
     return stitched
 
-def segment_with_SAM(img, model, prompt):
-    '''Use SAM to segment an object from the background.'''
-    results = model(img, texts=prompt)
-    mask = results[0].masks.data[0].cpu().numpy().astype(np.uint8) * 255
+def generate_mask(img, results):
+    mask = np.zeros(img.shape[:2], dtype=np.uint8)
+    person_mask, racket_mask, ball_mask = None, None, None
+
+    # Find the most central person
+    img_center = (img.shape[1] / 2, img.shape[0] / 2)
+    min_distance = float('inf')
+    central_person_idx = None
+
+    for i, box in enumerate(results[0].boxes):
+        cls = box.cls[0]
+        if cls == 0:  # Person
+            bbox = box.xyxy[0]
+            person_center = ((bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2)
+            distance = ((person_center[0] - img_center[0]) ** 2 + (person_center[1] - img_center[1]) ** 2) ** 0.5
+            if distance < min_distance:
+                min_distance = distance
+                central_person_idx = i
+
+    # Assign the mask for the most central person
+    if central_person_idx is not None:
+        person_mask = results[0].masks.data[central_person_idx].cpu().numpy().astype(np.uint8) * 255
+
+        # Find the racket that overlaps the most with the central person
+        max_overlap = 0
+        for i, box in enumerate(results[0].boxes):
+            cls = box.cls[0]
+            if cls == 38:  # Racket
+                racket_bbox = box.xyxy[0]
+                person_bbox = results[0].boxes[central_person_idx].xyxy[0]
+                overlap = compute_overlap_area(racket_bbox, person_bbox)
+                if overlap > max_overlap:
+                    max_overlap = overlap
+                    racket_mask = results[0].masks.data[i].cpu().numpy().astype(np.uint8) * 170
+
+    # Assign the mask for the first ball
+    for i, box in enumerate(results[0].boxes):
+        cls = box.cls[0]
+        if cls == 32 and ball_mask is None:  # Ball
+            ball_mask = results[0].masks.data[i].cpu().numpy().astype(np.uint8) * 85
+            break
+
+    # Combine masks
+    if person_mask is not None:
+        mask = cv2.bitwise_or(mask, person_mask)
+    if racket_mask is not None:
+        mask = cv2.bitwise_or(mask, racket_mask)
+    if ball_mask is not None:
+        mask = cv2.bitwise_or(mask, ball_mask)
+
     return mask
 
 def segment_with_YOLO(img, model, conf=0.01, iou=0.01, imgsz=None, device=None, classes=None):
@@ -106,27 +152,12 @@ def segment_with_YOLO(img, model, conf=0.01, iou=0.01, imgsz=None, device=None, 
                 half = 'cuda' in device, # use half precision if on cuda
                 device = device,
                 batch = 1,
-                max_det = 3,
+                max_det = 10,
                 classes = [0, 32, 38], # person, ball, racket
                 retina_masks = True
             )
     # If multiple objects are detected, find the first person and add their mask, then find the first racket and add its mask, then find the first ball and add its mask
-    mask = np.zeros(img.shape[:2], dtype=np.uint8)
-    for i, box in enumerate(results[0].boxes):
-        if box.cls[0] == 0:
-            person_mask = results[0].masks.data[i].cpu().numpy().astype(np.uint8) * 255
-            mask = cv2.bitwise_or(mask, person_mask)
-            break
-    for i, box in enumerate(results[0].boxes):
-        if box.cls[0] == 38:
-            racket_mask = results[0].masks.data[i].cpu().numpy().astype(np.uint8) * 170
-            mask = cv2.bitwise_or(mask, racket_mask)
-            break
-    for i, box in enumerate(results[0].boxes):
-        if box.cls[0] == 32:
-            ball_mask = results[0].masks.data[i].cpu().numpy().astype(np.uint8) * 85
-            mask = cv2.bitwise_or(mask, ball_mask)
-            break
+    mask = generate_mask(img, results)
     return mask
 
 def expand_bbox(bbox, scale, frame_shape):
@@ -147,11 +178,14 @@ def main():
     # Start timing the script
     start = time.time()
 
+    # Initialize a list to store timing data
+    timing_data = []
+
     # Get environment variables
     device = os.environ.get("DEVICE", "cpu")
     working_dir = os.environ.get("WORKING_DIR", "/PointStream")
     video_folder = os.environ.get("VIDEO_FOLDER", "/scenes")
-    video_folder = os.path.join(working_dir, video_folder)
+    timing_csv_path = os.path.join(working_dir, "experiments/timing_data.csv")
     # If no video_file is provided, use every video in the folder
     video_file = os.environ.get("VIDEO_FILE")
     if not video_file:
@@ -175,94 +209,80 @@ def main():
         os.makedirs(objects_folder, exist_ok=True)
         os.makedirs(background_folder, exist_ok=True)
 
-        # Open CSV file for writing bounding box coordinates
-        with open(csv_file_path, mode='w', newline='') as csv_file:
-            csv_writer = csv.writer(csv_file)
-            csv_writer.writerow(['frame_id', 'object_id', 'class_id', 'x1', 'y1', 'x2', 'y2'])
+        
+        # Keep track of players' IDs across frames
+        players_ids = set()
+        # Keep track of frame number (to know how many frames are in the video)
+        frame_id = 0
+        # Keep track of the rows to write to the CSV file
+        df_rows = []
 
-            # Keep track of players' IDs across frames
-            players_ids = set()
+        # First, a pass to detect objects of interest in the video
+        detection_start = time.time()
+        results = detection_model.track(
+            source = video_file,
+            conf = 0.25,
+            iou = 0.1,
+            imgsz = 640,
+            half = 'cuda' in device, # use half precision if on cuda
+            device = device,
+            batch = 10,
+            max_det = 30,
+            classes = [0, 32, 38], # person, ball, racket
+            retina_masks = True,
+            stream = True,
+            persist = True,
+        )
 
-            # First, a pass to detect objects of interest in the video
-            results = detection_model.track(
-                source = video_file,
-                conf = 0.25,
-                iou = 0.1,
-                imgsz = 640,
-                half = 'cuda' in device, # use half precision if on cuda
-                device = device,
-                batch = 10,
-                max_det = 30,
-                classes = [0, 32, 38], # person, ball, racket
-                retina_masks = True,
-                stream = True,
-                persist = True,
-            )
+        for frame_id, result in enumerate(results):
+            frame_img = result.orig_img
+            people, rackets, balls = extract_detections(result, players_ids)
 
-            for frame_id, result in enumerate(results):
-                frame_img = result.orig_img
-                people, rackets, balls = extract_detections(result, players_ids)
+            players_with_rackets = set()
+            # for each racket find the player they overlap with the most,
+            for racket_id, racket in rackets.items():
+                player_id = find_overlapping_player(racket, people)
+                if player_id is not None:
+                    players_ids.add(player_id)
+                    # If the racket overlaps with a player, fuse their bounding boxes
+                    people[player_id]['bbox'] = fuse_bounding_boxes(people[player_id]['bbox'], racket['bbox'])
+                    players_with_rackets.add(player_id)
 
-                players_with_rackets = set()
-                if rackets:
-                    # for each racket find the player they overlap with the most,
-                    for racket_id, racket in rackets.items():
-                        player_id = find_overlapping_player(racket, people)
-                        if player_id is not None:
-                            players_ids.add(player_id)
-                            # If the racket overlaps with a player, fuse their bounding boxes
-                            people[player_id]['bbox'] = fuse_bounding_boxes(people[player_id]['bbox'], racket['bbox'])
-                            players_with_rackets.add(player_id)
+            # save each ball
+            for ball_id, ball in balls.items():
+                ball_img = frame_img[ball['bbox'][1]:ball['bbox'][3], ball['bbox'][0]:ball['bbox'][2]]
+                df_rows.append(save_object(ball_id, ball, ball_img, objects_folder, frame_id))
 
-                if balls:
-                    # save each ball
-                    for ball_id, ball in balls.items():
-                        ball_img = frame_img[ball['bbox'][1]:ball['bbox'][3], ball['bbox'][0]:ball['bbox'][2]]
-                        save_object(ball_id, ball, ball_img, objects_folder, frame_id, csv_writer)
+            # Save every person (once 2 players are detected, only they will be present in people)
+            for person_id, person in people.items():
+                # Expand bounding box for recognized players without a racket in this frame
+                if person_id in players_ids and person_id not in players_with_rackets:
+                    person['bbox'] = expand_bbox(person['bbox'], 0.2, frame_img.shape[:2])
+                person_img = frame_img[person['bbox'][1]:person['bbox'][3], person['bbox'][0]:person['bbox'][2]]
+                df_rows.append(save_object(person_id, person, person_img, objects_folder, frame_id))
 
-                # Save every person (once 2 players are detected, only they will be present in people)
-                for person_id, person in people.items():
-                    # Expand bounding box for recognized players without a racket in this frame
-                    if person_id in players_ids and person_id not in players_with_rackets:
-                        person['bbox'] = expand_bbox(person['bbox'], 0.5, frame_img.shape[:2])
-                    person_img = frame_img[person['bbox'][1]:person['bbox'][3], person['bbox'][0]:person['bbox'][2]]
-                    save_object(person_id, person, person_img, objects_folder, frame_id, csv_writer)
+            # Remove every person, racket, and ball from the background
+            all_masks = np.zeros_like(frame_img, dtype=np.uint8)
+            for obj in [*people.values(), *rackets.values(), *balls.values()]:
+                x1, y1, x2, y2 = obj["bbox"]
+                all_masks[y1:y2, x1:x2] = 255
+            frame_img[all_masks > 0] = 0  # Apply mask at once
 
-                # Remove every person, racket, and ball from the background
-                for obj in people.values():
-                    x1, y1, x2, y2 = obj['bbox']
-                    frame_img[y1:y2, x1:x2] = 0
-                for obj in rackets.values():
-                    x1, y1, x2, y2 = obj['bbox']
-                    frame_img[y1:y2, x1:x2] = 0
-                for obj in balls.values():
-                    x1, y1, x2, y2 = obj['bbox']
-                    frame_img[y1:y2, x1:x2] = 0
+            # Save the background
+            cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
 
-                # Save the background
-                cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
-
-        # Get maximum number of frames from the frame id in the last row of the CSV file
-        with open(os.path.join(experiment_folder, 'bounding_boxes.csv')) as f:
-            frame_id = int(f.readlines()[-1].split(',')[0])
-        min_frames = frame_id * 0.9
-        # Delete people folders that are missing too many frames (i.e., everyone besides players)
-        for obj in os.listdir(objects_folder):
-            if obj.startswith('person_'):
-                num_frames = len(os.listdir(os.path.join(objects_folder, obj)))
-                if num_frames < min_frames:
-                    shutil.rmtree(os.path.join(objects_folder, obj))
+        detection_time = time.time() - detection_start
+        detection_fps = frame_id / detection_time if detection_time > 0 else 0
+        timing_data.append({"video": vid, "task": "detection", "time_taken": detection_time, "fps": detection_fps})
 
         # Stitch background images
-        background_folder = os.path.join(experiment_folder, 'background')
+        stitching_start = time.time()
         stitched = stitch_background_images(background_folder)
         if stitched is not None:
             cv2.imwrite(os.path.join(experiment_folder, 'background.png'), stitched)
         shutil.rmtree(background_folder)
-        
-        # Zip the experiment folder
-        # shutil.make_archive(experiment_folder, 'zip', experiment_folder)
-        # shutil.rmtree(experiment_folder)
+        stitching_time = time.time() - stitching_start
+        timing_data.append({"video": vid, "task": "background_stitching", "time_taken": stitching_time, "fps": None})
 
         # Print the total time taken
         print(f'Total time taken for detection: {time.time() - start} seconds')
@@ -277,19 +297,40 @@ def main():
         else:
             raise ValueError('Model not supported.')
 
+        min_frames = frame_id * 0.9
+        segmentation_start = time.time()
         with concurrent.futures.ProcessPoolExecutor() as executor:
             for obj in os.listdir(objects_folder):
                 obj_folder = os.path.join(objects_folder, obj)
                 if os.path.isdir(obj_folder):
-                    for img in os.listdir(obj_folder):
-                        img_path = os.path.join(obj_folder, img)
-                        img = cv2.imread(img_path)
-                        if img is not None:
-                            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                            mask = segment_with_YOLO(img, segmentation_model, imgsz=img.shape[:2], device=device)
-                            cv2.imwrite(img_path.replace('.png', '_mask.png'), mask)
+                    # Delete people folders that are missing too many frames (this should be every person besides players)
+                    if obj.startswith("person_") and len(os.listdir(obj_folder)) < min_frames:
+                        shutil.rmtree(obj_folder)
+                    else:
+                        # Segment the objects in the subfolders
+                        for img in os.listdir(obj_folder):
+                            img_path = os.path.join(obj_folder, img)
+                            img = cv2.imread(img_path)
+                            if img is not None:
+                                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                                mask = segment_with_YOLO(img, segmentation_model, imgsz=img.shape[:2], device=device)
+                                cv2.imwrite(img_path.replace('.png', '_mask.png'), mask)
+        segmentation_time = time.time() - segmentation_start
+        segmentation_fps = frame_id / segmentation_time if segmentation_time > 0 else 0
+        timing_data.append({"video": vid, "task": "segmentation", "time_taken": segmentation_time, "fps": segmentation_fps})
         print(f'Total time taken for segmentation: {time.time() - start} seconds')
-        
+
+        # Save all collected data to CSV at once
+        df = pd.DataFrame(df_rows, columns=["frame_id", "object_id", "class_id", "x1", "y1", "x2", "y2"])
+        df.to_csv(csv_file_path, index=False)
+
+        # Zip the experiment folder
+        shutil.make_archive(experiment_folder, 'zip', experiment_folder)
+        shutil.rmtree(experiment_folder)
+
+    # Save timing data to a CSV file using pandas
+    timing_df = pd.DataFrame(timing_data)
+    timing_df.to_csv(timing_csv_path, index=False)
 
 if __name__ == "__main__":
     main()
