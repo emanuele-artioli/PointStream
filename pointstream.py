@@ -8,10 +8,10 @@ from ultralytics import YOLO, FastSAM
 import numpy as np
 import pandas as pd
 
-def extract_detections(result, players_ids):
-    """Extracts object info (ID, class, confidence, bbox, mask) from a YOLO result into class dictionary."""
+def extract_estimations(result, players_ids):
+    """Extracts object info (ID, class, confidence, bbox, keypoints) from a YOLO result into class dictionary."""
     boxes = getattr(result, 'boxes', [])
-    masks = getattr(result, 'masks', None)
+    keypoints = getattr(result, 'keypoints', [])
     people = {}
     rackets = {}
     balls = {}
@@ -21,7 +21,7 @@ def extract_detections(result, players_ids):
             'cls_id': int(box.cls[0]),
             'conf': float(box.conf),
             'bbox': tuple(map(int, box.xyxy[0])),
-            'mask': masks.data[i].cpu().numpy().astype(np.uint8) if masks and i < len(masks.data) else None
+            'keypoints': keypoints.xy[i].cpu().numpy().astype(np.uint8) if keypoints and i < len(keypoints.data) else None
         }
         if obj['cls_id'] == 0:
             obj['cls_id'] = 'person'
@@ -68,9 +68,16 @@ def save_object(object_id, object, obj_img, experiment_folder, frame_id):
     os.makedirs(obj_folder, exist_ok=True)
     cv2.imwrite(os.path.join(obj_folder, f'{frame_id}.png'), obj_img)
     
-    # Save bounding box coordinates to CSV
+    # Save bounding box in a list
     x1, y1, x2, y2 = object['bbox']
-    return [frame_id, object_id, object['cls_id'], x1, y1, x2, y2]
+    obj_info = [frame_id, object_id, object['cls_id'], x1, y1, x2, y2] 
+    if object['keypoints'] is not None:
+        # Add the keypoints to the object info list
+        keypoints = object['keypoints']
+        keypoints = keypoints.reshape(-1, 2)
+        keypoints = keypoints
+        obj_info.extend(keypoints.flatten().tolist())
+    return obj_info
 
 def stitch_background_images(background_folder, n_samples=50):
     """Combines periodic background frames into a single stitched image."""
@@ -90,7 +97,21 @@ def stitch_background_images(background_folder, n_samples=50):
         stitched[mask] = img[mask]
     return stitched
 
-def generate_mask(img, results):
+def generate_mask(img, model, conf=0.01, iou=0.01, imgsz=None, device=None, classes=None):
+    '''Use YOLO to segment an object from the background.'''
+    results = model.predict(
+        source = img,
+        conf = conf,
+        iou = iou,
+        imgsz = imgsz,
+        half = 'cuda' in device, # use half precision if on cuda
+        device = device,
+        batch = 1,
+        max_det = 10,
+        classes = [0, 32, 38], # person, ball, racket
+        retina_masks = True
+    )
+    # If multiple objects are detected, find the first person and add their mask, then find the first racket and add its mask, then find the first ball and add its mask
     mask = np.zeros(img.shape[:2], dtype=np.uint8)
     person_mask, racket_mask, ball_mask = None, None, None
 
@@ -142,24 +163,6 @@ def generate_mask(img, results):
 
     return mask
 
-def segment_with_YOLO(img, model, conf=0.01, iou=0.01, imgsz=None, device=None, classes=None):
-    '''Use YOLO to segment an object from the background.'''
-    results = model.predict(
-                source = img,
-                conf = conf,
-                iou = iou,
-                imgsz = imgsz,
-                half = 'cuda' in device, # use half precision if on cuda
-                device = device,
-                batch = 1,
-                max_det = 10,
-                classes = [0, 32, 38], # person, ball, racket
-                retina_masks = True
-            )
-    # If multiple objects are detected, find the first person and add their mask, then find the first racket and add its mask, then find the first ball and add its mask
-    mask = generate_mask(img, results)
-    return mask
-
 def expand_bbox(bbox, scale, frame_shape):
     x1, y1, x2, y2 = bbox
     w = x2 - x1
@@ -182,7 +185,7 @@ def main():
     timing_data = []
 
     # Get environment variables
-    device = os.environ.get("DEVICE", "cpu")
+    device = os.environ.get("DEVICE", "cuda")
     working_dir = os.environ.get("WORKING_DIR", "/PointStream")
     video_folder = os.environ.get("VIDEO_FOLDER", "/scenes")
     timing_csv_path = os.path.join(working_dir, "experiments/timing_data.csv")
@@ -192,10 +195,10 @@ def main():
         all_videos = [v for v in os.listdir(video_folder) if v.endswith(('.mp4','.mov','.avi'))]
     else:
         all_videos = [video_file]
-    # Load the object detection model
-    detection_model = os.environ.get("DET_MODEL", None)
-    if 'yolo' in detection_model:
-        detection_model = YOLO(detection_model)
+    # Load the pose estimation model
+    estimation_model = os.environ.get("EST_MODEL", None)
+    if 'yolo' in estimation_model:
+        estimation_model = YOLO(estimation_model)
     else:
         raise ValueError('Model not supported.')
 
@@ -218,8 +221,8 @@ def main():
         df_rows = []
 
         # First, a pass to detect objects of interest in the video
-        detection_start = time.time()
-        results = detection_model.track(
+        estimation_start = time.time()
+        results = estimation_model.track(
             source = video_file,
             conf = 0.25,
             iou = 0.1,
@@ -236,7 +239,7 @@ def main():
 
         for frame_id, result in enumerate(results):
             frame_img = result.orig_img
-            people, rackets, balls = extract_detections(result, players_ids)
+            people, rackets, balls = extract_estimations(result, players_ids)
 
             players_with_rackets = set()
             # for each racket find the player they overlap with the most,
@@ -262,18 +265,18 @@ def main():
                 df_rows.append(save_object(person_id, person, person_img, objects_folder, frame_id))
 
             # Remove every person, racket, and ball from the background
-            all_masks = np.zeros_like(frame_img, dtype=np.uint8)
+            all_boxes = np.zeros_like(frame_img, dtype=np.uint8)
             for obj in [*people.values(), *rackets.values(), *balls.values()]:
                 x1, y1, x2, y2 = obj["bbox"]
-                all_masks[y1:y2, x1:x2] = 255
-            frame_img[all_masks > 0] = 0  # Apply mask at once
+                all_boxes[y1:y2, x1:x2] = 1
+            frame_img[all_boxes > 0] = 0  # Apply boxes at once
 
             # Save the background
             cv2.imwrite(os.path.join(background_folder, f'{frame_id}.png'), frame_img)
 
-        detection_time = time.time() - detection_start
-        detection_fps = frame_id / detection_time if detection_time > 0 else 0
-        timing_data.append({"video": vid, "task": "detection", "time_taken": detection_time, "fps": detection_fps})
+        estimation_time = time.time() - estimation_start
+        estimation_fps = frame_id / estimation_time if estimation_time > 0 else 0
+        timing_data.append({"video": vid, "task": "keypoint _extraction", "time_taken": estimation_time, "fps": estimation_fps})
 
         # Stitch background images
         stitching_start = time.time()
@@ -285,12 +288,12 @@ def main():
         timing_data.append({"video": vid, "task": "background_stitching", "time_taken": stitching_time, "fps": None})
 
         # Print the total time taken
-        print(f'Total time taken for detection: {time.time() - start} seconds')
+        print(f'Total time taken for keypoint extraction: {time.time() - start} seconds')
 
         # Run a second pass of YOLO segmentation on the objects in the subfolders
         start = time.time()
 
-        # Load the object detection model
+        # Load the segmentation model
         segmentation_model = os.environ.get("SEG_MODEL", None)
         if 'yolo' in segmentation_model:
             segmentation_model = YOLO(segmentation_model)
@@ -313,7 +316,7 @@ def main():
                             img = cv2.imread(img_path)
                             if img is not None:
                                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                                mask = segment_with_YOLO(img, segmentation_model, imgsz=img.shape[:2], device=device)
+                                mask = generate_mask(img, segmentation_model, imgsz=img.shape[:2], device=device)
                                 cv2.imwrite(img_path.replace('.png', '_mask.png'), mask)
         segmentation_time = time.time() - segmentation_start
         segmentation_fps = frame_id / segmentation_time if segmentation_time > 0 else 0
@@ -321,7 +324,14 @@ def main():
         print(f'Total time taken for segmentation: {time.time() - start} seconds')
 
         # Save all collected data to CSV at once
-        df = pd.DataFrame(df_rows, columns=["frame_id", "object_id", "class_id", "x1", "y1", "x2", "y2"])
+        df_columns = ['frame_id', 'object_id', 'class_id', 'x1', 'y1', 'x2', 'y2']
+        # Add keypoints columns if present
+        if df_rows and isinstance(df_rows[0], list) and len(df_rows[0]) > 7:
+            keypoints_count = (len(df_rows[0]) - 7) // 2
+            for i in range(keypoints_count):
+                df_columns.extend([f'keypoint_{i}_x', f'keypoint_{i}_y'])
+        # Create a DataFrame and save it to CSV
+        df = pd.DataFrame(df_rows, columns=df_columns)
         df.to_csv(csv_file_path, index=False)
 
         # Zip the experiment folder
@@ -334,6 +344,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# TODO: Right now I have only implemented the object detection part of the script. 
-# The next steps would be to implement the object segmentation and keypoints (or shape, that thing that Farzad did) estimation.
