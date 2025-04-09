@@ -35,6 +35,7 @@ def compute_lpips(source_video_path, generated_video_path):
         # Compute LPIPS distance
         distance = lpips_fn(t_s, t_g)
         scores.append(distance.item())
+        print(f"LPIPS score for frame: {distance.item()}")
 
     cap_source.release()
     cap_gen.release()
@@ -42,7 +43,7 @@ def compute_lpips(source_video_path, generated_video_path):
 
 if __name__ == "__main__":
     source_video_path = "scenes_encoded/djokovic_federer/source/024.mp4"
-    generated_video_path = "scenes_encoded/djokovic_federer/generated/skeleton_024.mp4"
+    generated_video_path = "scenes_encoded/djokovic_federer/generated/grid6_024.mp4"
 
     lpips_scores = compute_lpips(source_video_path, generated_video_path)
     print("LPIPS scores:", lpips_scores)
