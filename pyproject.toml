@@ -1,0 +1,27 @@
+# pyproject.toml
+#
+# This file contains the modern, standardized configuration for the project,
+# following PEP 621. It replaces most of the contents of setup.py.
+
+[build-system]
+requires = ["setuptools>=64.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pointstream"
+version = "0.1.0"
+authors = [
+    { name="Emanuele Artioli", email="emanuele.artioli@aau.at" },
+]
+description = "A generative AI and pose estimation framework for live video streaming."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/emanuele-artioli/PointStream" # Replace with your project URL
+

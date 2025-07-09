@@ -160,20 +160,3 @@ cython_debug/
 #.idea/
 
 # PointStream
-backup/
-legacy/
-frames*/
-scenes/
-input/
-.vscode/
-*.pt
-detected_objects/
-craft_mlt_25k.pth
-english_g2.pth
-segmented_objects/
-poses.csv
-.DS_Store
-cropped_video.mp4
-detected_objects.zip
-experiments/
-djokovic_federer/

@@ -1,0 +1,49 @@
+# PointStream Conda Environment - Using RAFT and Conda-based OpenCV
+#
+# This version uses the OpenCV package from conda-forge, which correctly
+# links against the full-featured ffmpeg also installed by conda. This
+# resolves video decoding issues with codecs like AV1.
+
+name: pointstream
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  # Core
+  - python=3.10
+  - pip
+
+  # --- Deep Learning Framework (PyTorch with CUDA) ---
+  - pytorch
+  - torchvision # Contains the pre-trained RAFT model
+  - torchaudio
+  - pytorch-cuda=12.1
+
+  # --- OpenCV from Conda ---
+  # This version is linked against the full ffmpeg from conda-forge
+  - opencv
+
+  # --- Data Science & Numerics ---
+  - numpy
+  - pandas
+  - scikit-learn
+  - scipy
+
+  # --- Utilities ---
+  - tqdm
+  - pyyaml
+  - diffusers
+
+  # --- Video I/O ---
+  - ffmpeg
+
+  # --- Visualization & Notebooks ---
+  - matplotlib
+  - seaborn
+  - jupyterlab
+
+  # --- Pip dependencies ---
+  - pip:
+    - lpips
