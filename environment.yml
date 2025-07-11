@@ -1,8 +1,10 @@
-# PointStream Conda Environment - Using RAFT and Conda-based OpenCV
+# PointStream Conda Environment
 #
-# This version uses the OpenCV package from conda-forge, which correctly
-# links against the full-featured ffmpeg also installed by conda. This
-# resolves video decoding issues with codecs like AV1.
+# To create the environment:
+# conda env create -f environment.yml
+#
+# To activate the environment:
+# conda activate pointstream
 
 name: pointstream
 channels:
@@ -22,13 +24,13 @@ dependencies:
   - pytorch-cuda=12.1
 
   # --- OpenCV from Conda ---
-  # This version is linked against the full ffmpeg from conda-forge
   - opencv
 
   # --- Data Science & Numerics ---
   - numpy
   - pandas
   - scikit-learn
+  - scikit-image # For Structural Similarity Index (SSIM)
   - scipy
 
   # --- Utilities ---
@@ -47,3 +49,4 @@ dependencies:
   # --- Pip dependencies ---
   - pip:
     - lpips
+    - ultralytics
