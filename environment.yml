@@ -1,52 +1,18 @@
-# PointStream Conda Environment
-#
-# To create the environment:
-# conda env create -f environment.yml
-#
-# To activate the environment:
-# conda activate pointstream
-
 name: pointstream
 channels:
-  - pytorch
-  - nvidia
   - conda-forge
   - defaults
 dependencies:
-  # Core
+  # Core Python version
   - python=3.10
-  - pip
 
-  # --- Deep Learning Framework (PyTorch with CUDA) ---
-  - pytorch
-  - torchvision # Contains the pre-trained RAFT model
-  - torchaudio
-  - pytorch-cuda=12.1
-
-  # --- OpenCV from Conda ---
-  - opencv
-
-  # --- Data Science & Numerics ---
+  # Conda packages for tools and core libraries
   - numpy
-  - pandas
-  - scikit-learn
-  - scikit-image # For Structural Similarity Index (SSIM)
-  - scipy
-
-  # --- Utilities ---
-  - tqdm
-  - pyyaml
-  - diffusers
-
-  # --- Video I/O ---
   - ffmpeg
-
-  # --- Visualization & Notebooks ---
-  - matplotlib
-  - seaborn
-  - jupyterlab
-
-  # --- Pip dependencies ---
+  - opencv
+  
+  # Pip packages for Python libraries
+  - pip
   - pip:
-    - lpips
+    - scikit-image
     - ultralytics
