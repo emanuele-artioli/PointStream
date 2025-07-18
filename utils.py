@@ -5,6 +5,122 @@ from typing import List, Tuple, Dict, Optional
 from skimage.metrics import structural_similarity as ssim
 import cv2
 
+# --- New imports for contextual understanding ---
+from PIL import Image
+import torch
+
+# --- Lazy-loaded model placeholders ---
+_vlm_processor = None
+_vlm_model = None
+_nlp = None
+
+import subprocess
+import os
+import numpy as np
+from typing import List, Tuple, Dict, Optional
+from skimage.metrics import structural_similarity as ssim
+import cv2
+
+# --- Imports for contextual understanding ---
+from PIL import Image
+import torch
+from nltk.corpus import wordnet # <-- New import for generalization
+
+# --- Lazy-loaded model placeholders ---
+_vlm_processor = None
+_vlm_model = None
+_nlp = None
+
+def _initialize_models():
+    """Initializes the VLM and NLP models on first use."""
+    global _vlm_processor, _vlm_model, _nlp
+    
+    if _vlm_processor is None:
+        print(" -> Initializing Vision-Language Model for the first time...")
+        from transformers import BlipProcessor, BlipForConditionalGeneration
+        _vlm_processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
+        _vlm_model = BlipForConditionalGeneration.from_pretrained(
+            "Salesforce/blip-image-captioning-base", use_safetensors=True
+        )
+        print(" -> VLM ready.")
+
+    if _nlp is None:
+        print(" -> Initializing NLP Model for the first time...")
+        import spacy
+        _nlp = spacy.load("en_core_web_sm")
+        print(" -> NLP ready.")
+
+def _get_general_category(noun_chunk: str) -> str:
+    """
+    Finds a general category (hypernym) for a noun using WordNet.
+    Example: 'mini cooper' -> 'car'
+    """
+    # Look up the noun in WordNet
+    synsets = wordnet.synsets(noun_chunk.replace(" ", "_"))
+    if not synsets:
+        return noun_chunk # Return original if not found
+
+    # Get the first and most common meaning
+    first_synset = synsets[0]
+    
+    # Get its hypernyms (more general categories)
+    hypernyms = first_synset.hypernyms()
+    if not hypernyms:
+        return noun_chunk # Return original if it has no broader category
+
+    # Return the name of the most direct hypernym
+    return hypernyms[0].lemmas()[0].name().replace("_", " ")
+
+def get_scene_context(frames: List[np.ndarray]) -> Tuple[str, List[str]]:
+    """
+    Analyzes a keyframe to generate a caption and extract generalized key nouns.
+    """
+    if not frames:
+        return "No frames provided", []
+
+    _initialize_models()
+
+    keyframe = frames[len(frames) // 2]
+    
+    # Generate caption with VLM
+    rgb_image = cv2.cvtColor(keyframe, cv2.COLOR_BGR2RGB)
+    pil_image = Image.fromarray(rgb_image)
+    inputs = _vlm_processor(images=pil_image, return_tensors="pt")
+    output_ids = _vlm_model.generate(**inputs, max_length=50)
+    caption = _vlm_processor.decode(output_ids[0], skip_special_tokens=True).strip()
+
+    # --- UPDATED LOGIC FOR NOUN GENERALIZATION ---
+    doc = _nlp(caption)
+    
+    # 1. Extract noun chunks (e.g., "a mini cooper", "the two horses")
+    # 2. Get the root noun text of the chunk (e.g., "mini cooper", "horses")
+    # 3. Generalize each noun using our WordNet helper
+    # 4. Use a set to store unique categories, then sort
+    
+    generalized_nouns = set()
+    for chunk in doc.noun_chunks:
+        # Use the root of the chunk for better lookup
+        noun_to_generalize = chunk.root.text
+        if chunk.root.text in chunk.text and len(chunk.text) > len(chunk.root.text):
+             # Handle cases like 'mini cooper' where root is 'cooper' but we want the whole chunk
+             noun_to_generalize = chunk.text
+        
+        # Exclude pronouns like 'it', 'he', 'they' which spaCy can tag as nouns
+        if chunk.root.pos_ == 'PRON':
+            continue
+
+        category = _get_general_category(noun_to_generalize)
+        generalized_nouns.add(category)
+        
+    # If no noun chunks found, fall back to single nouns
+    if not generalized_nouns:
+        for token in doc:
+            if token.pos_ == 'NOUN':
+                category = _get_gengeral_category(token.lemma_)
+                generalized_nouns.add(category)
+
+    return caption, sorted(list(generalized_nouns))
+
 def classify_scene_motion(frames: List[np.ndarray]) -> str:
     """
     Classifies a list of frames as 'static' or 'dynamic' based on optical flow.

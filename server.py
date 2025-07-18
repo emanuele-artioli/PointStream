@@ -6,8 +6,30 @@ from utils import (
     extract_frames,
     detect_scene_changes, 
     save_video_segment,
-    classify_scene_motion
+    classify_scene_motion,
+    get_scene_context
 )
+
+def process_segment(frames, video_path, start_frame, end_frame, fps):
+    """Helper function to process and save a single video segment."""
+    if not frames:
+        return
+
+    # 1. Classify scene motion
+    scene_type = classify_scene_motion(frames)
+    
+    # 2. Get scene context (NEW)
+    caption, object_classes = get_scene_context(frames)
+    print(f"  -> Context: '{caption}' >> Objects: {object_classes}")
+    
+    # 3. Create a descriptive filename
+    # Joins the first 2-3 most relevant nouns for a clean filename
+    context_str = "-".join(object_classes[:3]) if object_classes else "general"
+    output_filename = f"{start_frame}_{end_frame}_{scene_type}_{context_str}.mp4"
+    output_path = os.path.join("scenes", output_filename)
+    
+    # 4. Save the clip
+    save_video_segment(video_path, start_frame, end_frame, fps, output_path)
 
 if __name__ == "__main__":
     # --- Argument Parsing ---
@@ -25,7 +47,7 @@ if __name__ == "__main__":
     print(f"Starting scene detection for '{args.input_video}'...")
 
     video_path = args.input_video
-    threshold = 0.5
+    threshold = 0.2
 
     total_frames, fps = get_video_properties(video_path)
     if not total_frames or not fps:
@@ -33,7 +55,7 @@ if __name__ == "__main__":
     else:
         print(f"Video properties: {total_frames} frames, {fps:.2f} FPS.")
 
-        batch_size = 150
+        batch_size = 100
         frame_buffer = deque()
         last_cut_frame = 0
         processed_frames_count = 0
@@ -55,18 +77,14 @@ if __name__ == "__main__":
             global_cut_indices = sorted([idx + processed_frames_count for idx in scene_changes.keys()])
             
             for cut_frame in global_cut_indices:
-                # 3. A segment is found. Get its frames from the start of the buffer.
+                # A segment is found. Get its frames from the start of the buffer.
                 segment_len = cut_frame - last_cut_frame
                 if segment_len > 0 and len(frame_buffer) >= segment_len:
                     
                     segment_frames = [frame_buffer.popleft() for _ in range(segment_len)]
                     
-                    # 4. Classify the in-memory frames
-                    scene_type = classify_scene_motion(segment_frames)
-                    
-                    # 5. Save the clip
-                    output_path = f"scenes/{last_cut_frame}_{cut_frame}_{scene_type}.mp4"
-                    save_video_segment(video_path, last_cut_frame, cut_frame, fps, output_path)
+                    # Process and save the segment using the new helper function
+                    process_segment(segment_frames, video_path, last_cut_frame, cut_frame, fps)
                     
                     last_cut_frame = cut_frame
             
@@ -75,9 +93,8 @@ if __name__ == "__main__":
         # After the loop, process any remaining frames in the buffer as the final scene
         if frame_buffer:
             final_frame_count = last_cut_frame + len(frame_buffer)
-            scene_type = classify_scene_motion(list(frame_buffer))
-            output_path = f"scenes/{last_cut_frame}_{final_frame_count}_{scene_type}.mp4"
-            save_video_segment(video_path, last_cut_frame, final_frame_count, fps, output_path)
+            # Process and save the final segment
+            process_segment(list(frame_buffer), video_path, last_cut_frame, final_frame_count, fps)
             frame_buffer.clear()
 
         print(f"Processing complete. Clips saved in 'scenes'.")
