@@ -1,4 +1,3 @@
-name: pointstream
 # A couple useful conda commands:
 # # conda env create --file environment.yml
 # # conda env update --file environment.yml  --prune
@@ -6,30 +5,26 @@ name: pointstream
 # Commands to run right after creating the environment:
 # python -m spacy download en_core_web_sm
 # python -c "import nltk; nltk.download('wordnet'); nltk.download('omw-1.4')"
+name: pointstream
 channels:
   - pytorch
   - conda-forge
   - defaults
 dependencies:
-  # Core Python version
   - python=3.10
-
-  # Conda packages for tools and core libraries
-  - numpy
-  - ffmpeg
-  - opencv
-  - transformers
+  - pip
+  # Core ML/CV Libraries
   - pytorch
   - torchvision
   - torchaudio
-  - cuda-toolkit
-  - pillow
+  - opencv
   - scikit-image
+  - numpy<2
+  # VLM & NLP Libraries
+  - transformers
   - sentencepiece
+  - pillow
   - spacy
   - nltk
-  
-  # Pip packages for Python libraries
-  - pip
-  - pip:
-    - ultralytics
+  # New main dependency
+  - ultralytics

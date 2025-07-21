@@ -1,45 +1,98 @@
 import argparse
 import os
 from collections import deque
+import cv2
+import numpy as np
+from typing import List, Dict, Any
+import matplotlib.pyplot as plt
+
 from utils import (
     get_video_properties, 
     extract_frames,
-    detect_scene_changes, 
     save_video_segment,
     classify_scene_motion,
-    get_scene_context
+    detect_scene_changes, # Reintegrated
+    # --- New atomic functions ---
+    generate_caption,
+    extract_prompts_from_caption,
+    run_segmentation
 )
 
+def visualize_and_save_segmentation(
+    keyframe: np.ndarray, 
+    objects: List[Dict[str, Any]],
+    output_path: str
+):
+    """Draws segmentation masks on a frame and saves it."""
+    if not objects:
+        return
+    overlay = keyframe.copy()
+    h, w, _ = keyframe.shape
+    colors = [plt.cm.viridis(i) for i in np.linspace(0, 1, len(objects))]
+    for i, obj in enumerate(objects):
+        mask = cv2.resize(obj['mask'], (w, h), interpolation=cv2.INTER_NEAREST)
+        color_bgr = [c * 255 for c in colors[i][:3]][::-1]
+        overlay[mask > 0.5] = color_bgr
+        contours, _ = cv2.findContours(mask.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(keyframe, contours, -1, color_bgr, 2)
+        if contours:
+            M = cv2.moments(contours[0])
+            if M['m00'] > 0:
+                cx = int(M['m10'] / M['m00'])
+                cy = int(M['m01'] / M['m00'])
+                label = f"{obj['prompt']} ({obj['confidence']:.2f})"
+                cv2.putText(keyframe, label, (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+    final_image = cv2.addWeighted(keyframe, 0.6, overlay, 0.4, 0)
+    cv2.imwrite(output_path, final_image)
+    print(f"  -> Saved segmentation visualization to '{output_path}'")
+
+
 def process_segment(frames, video_path, start_frame, end_frame, fps):
-    """Helper function to process and save a single video segment."""
+    """
+    Orchestrates the analysis and processing of a single video segment.
+    """
     if not frames:
         return
 
-    # 1. Classify scene motion
+    print(f"\n--- Processing Segment: Frames {start_frame}-{end_frame} ---")
+    
+    # Step 0: Select a keyframe for analysis
+    keyframe = frames[len(frames) // 2]
+    
+    # Step 1: Generate a caption for the scene
+    caption = generate_caption(keyframe)
+    
+    # Step 2: Extract text prompts from the caption
+    prompts = extract_prompts_from_caption(caption)
+
+    # Step 3: Run language-guided segmentation
+    segmented_objects = run_segmentation(keyframe, prompts)
+
+    # Step 4: Classify overall scene motion
     scene_type = classify_scene_motion(frames)
     
-    # 2. Get scene context (NEW)
-    caption, object_classes = get_scene_context(frames)
-    print(f"  -> Context: '{caption}' >> Objects: {object_classes}")
+    # --- NEW: Create filename string from segmented objects ---
+    context_str = "no_objects"
+    if segmented_objects:
+        # Get unique prompts, sanitize for filename, and join with a hyphen
+        unique_prompts = sorted(list(set(obj['prompt'] for obj in segmented_objects)))
+        sanitized_prompts = [p.replace(" ", "_") for p in unique_prompts]
+        context_str = "-".join(sanitized_prompts)
     
-    # 3. Create a descriptive filename
-    # Joins the first 2-3 most relevant nouns for a clean filename
-    context_str = "-".join(object_classes[:3]) if object_classes else "general"
-    output_filename = f"{start_frame}_{end_frame}_{scene_type}_{context_str}.mp4"
-    output_path = os.path.join("scenes", output_filename)
-    
-    # 4. Save the clip
-    save_video_segment(video_path, start_frame, end_frame, fps, output_path)
+    # Step 5: Save the video clip and the visualization with the new name
+    output_basename = f"{start_frame}_{end_frame}_{scene_type}_{context_str}"
+    video_output_path = os.path.join("scenes", f"{output_basename}.mp4")
+    save_video_segment(video_path, start_frame, end_frame, fps, video_output_path)
+
+    if segmented_objects:
+        viz_output_path = os.path.join("scenes", f"{output_basename}_segmentation.jpg")
+        visualize_and_save_segmentation(keyframe, segmented_objects, viz_output_path)
+
 
 if __name__ == "__main__":
     # --- Argument Parsing ---
     argparser = argparse.ArgumentParser(description="PointStream Server - Scene-based Video Clipper")
-    argparser.add_argument(
-        "--input_video",
-        type=str,
-        required=True,
-        help="Path to the input video file."
-    )
+    argparser.add_argument("--input_video", type=str, required=True, help="Path to the input video file.")
     args = argparser.parse_args()
 
     # --- Execution & Logic ---
@@ -47,7 +100,7 @@ if __name__ == "__main__":
     print(f"Starting scene detection for '{args.input_video}'...")
 
     video_path = args.input_video
-    threshold = 0.2
+    threshold = 0.2 # Threshold for SSIM-based scene change detection
 
     total_frames, fps = get_video_properties(video_path)
     if not total_frames or not fps:
@@ -55,7 +108,7 @@ if __name__ == "__main__":
     else:
         print(f"Video properties: {total_frames} frames, {fps:.2f} FPS.")
 
-        batch_size = 100
+        batch_size = 200 # Process video in batches for memory efficiency
         frame_buffer = deque()
         last_cut_frame = 0
         processed_frames_count = 0
@@ -68,10 +121,11 @@ if __name__ == "__main__":
                 break
             
             frame_buffer.extend(batch_frames)
-            print(f"Processing frames {frame_range[0]} to {frame_range[0] + len(batch_frames) - 1}...")
+            print(f"\nReading frames {frame_range[0]} to {frame_range[0] + len(batch_frames) - 1} into buffer...")
 
             # 2. Run efficient scene detection on the new batch
-            scene_changes = detect_scene_changes(batch_frames, threshold=threshold, analysis_window=25)
+            # We use a copy of the batch frames for detection to not alter the buffer
+            scene_changes = detect_scene_changes(list(batch_frames), threshold=threshold, analysis_window=25)
             
             # Convert local batch indices to global frame indices
             global_cut_indices = sorted([idx + processed_frames_count for idx in scene_changes.keys()])
@@ -83,7 +137,7 @@ if __name__ == "__main__":
                     
                     segment_frames = [frame_buffer.popleft() for _ in range(segment_len)]
                     
-                    # Process and save the segment using the new helper function
+                    # Process and save the detected segment
                     process_segment(segment_frames, video_path, last_cut_frame, cut_frame, fps)
                     
                     last_cut_frame = cut_frame
@@ -97,4 +151,4 @@ if __name__ == "__main__":
             process_segment(list(frame_buffer), video_path, last_cut_frame, final_frame_count, fps)
             frame_buffer.clear()
 
-        print(f"Processing complete. Clips saved in 'scenes'.")
+        print(f"\nProcessing complete. Clips and visualizations saved in 'scenes' folder.")
