@@ -40,7 +40,41 @@ def classify_scene_motion(frames: List[np.ndarray]) -> str:
     print(f"  -> Analyzed motion for segment. Avg: {avg_motion:.2f}. Type: {scene_type.upper()}")
     return scene_type
 
-def save_video_segment(video_path: str, start_frame: int, end_frame: int, fps: float, output_path: str):
+def save_frames_as_video(output_path: str, frames: List[np.ndarray], fps: float):
+    """Saves a list of NumPy frames to a video file using an FFmpeg pipe."""
+    print(f"  -> Saving generated frames to '{output_path}' using FFmpeg...")
+    height, width, _ = frames[0].shape
+    
+    # Command to pipe frames to FFmpeg
+    # -i - : read from stdin
+    # -vcodec libx264: Use the highly compatible H.264 codec
+    # -pix_fmt yuv420p: Standard pixel format for web/mobile compatibility
+    command = [
+        'ffmpeg',
+        '-y',  # Overwrite output file if it exists
+        '-f', 'rawvideo',
+        '-vcodec', 'rawvideo',
+        '-s', f'{width}x{height}',  # Frame size
+        '-pix_fmt', 'bgr24',       # Input pixel format from OpenCV
+        '-r', str(fps),            # Frames per second
+        '-i', '-',                 # The input comes from stdin
+        '-an',                     # No audio
+        '-vcodec', 'libx264',
+        '-pix_fmt', 'yuv420p',
+        output_path
+    ]
+    
+    # Open a subprocess pipe
+    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    
+    # Write each frame to the pipe
+    for frame in frames:
+        process.stdin.write(frame.tobytes())
+        
+    process.stdin.close()
+    process.wait()
+
+def extract_video_segment(video_path: str, start_frame: int, end_frame: int, fps: float, output_path: str):
     """Saves a segment of the video from start_frame to end_frame."""
     start_time, end_time = start_frame / fps, end_frame / fps
     print(f"  -> Saving segment to '{output_path}'...")
@@ -86,7 +120,7 @@ def detect_scene_changes(frames: List[np.ndarray], threshold: float, analysis_wi
         return {}
 
     processed_frames = [
-        cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), (0, 0), fx=0.25, fy=0.25)
+        cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), (0, 0), fx=0.5, fy=0.5)
         for frame in frames
     ]
     scene_changes = {}
@@ -181,30 +215,33 @@ def extract_prompts_from_caption(caption: str) -> List[str]:
     print(f"  -> Using Text Prompts: {sorted_prompts}")
     return sorted_prompts
 
-def run_segmentation(keyframe: np.ndarray, prompts: List[str]) -> List[Dict[str, Any]]:
-    """Runs the YOLOE model on a frame with a given list of text prompts."""
-    if not prompts:
-        print("  -> No usable text prompts provided. Skipping segmentation.")
-        return []
+def track_objects_in_segment(frames: List[np.ndarray], prompts: List[str]) -> List[List[Dict[str, Any]]]:
+    """
+    Initializes a YOLOE model and tracks objects frame-by-frame through a segment.
+    """
+    print(f" -> Initializing YOLOE and tracking objects across {len(frames)} frames...")
 
-    # --- FIX: Instantiate a fresh model for each run to avoid state issues ---
-    print(" -> Initializing new YOLOE model instance for this segment...")
-    segmentation_model = YOLOE("/home/itec/emanuele/models/yoloe-11l-seg.pt")
-
-    # 1. Set the custom vocabulary on the new model instance
-    segmentation_model.set_classes(prompts, segmentation_model.get_text_pe(prompts))
-
-    # 2. Run inference to get segmentation results
-    results = segmentation_model.predict(keyframe, save=False, verbose=False)
+    # 1. Initialize the model and set classes once for the entire segment
+    model = YOLOE("/home/itec/emanuele/models/yoloe-11l-seg.pt")
+    model.set_classes(prompts, model.get_text_pe(prompts))
     
-    # 3. Process and return results in a clean format
-    segmented_objects = []
-    if results and results[0].masks is not None:
-        for i, mask_data in enumerate(results[0].masks.data):
-            class_id = int(results[0].boxes.cls[i])
-            segmented_objects.append({
-                "prompt": prompts[class_id],
-                "mask": mask_data.cpu().numpy(),
-                "confidence": float(results[0].boxes.conf[i])
-            })
-    return segmented_objects
+    all_frame_results = []
+    # 2. Loop through frames and call track with persist=True
+    for frame in frames:
+        results = model.track(source=frame, persist=True, verbose=False)
+        frame_results = results[0] # track returns a list with one result for the single frame
+        
+        current_frame_objects = []
+        if frame_results.masks is not None and frame_results.boxes.id is not None:
+            for i, mask_data in enumerate(frame_results.masks.data):
+                class_id = int(frame_results.boxes.cls[i])
+                track_id = int(frame_results.boxes.id[i])
+                current_frame_objects.append({
+                    "prompt": prompts[class_id],
+                    "mask": mask_data.cpu().numpy(),
+                    "confidence": float(frame_results.boxes.conf[i]),
+                    "track_id": track_id
+                })
+        all_frame_results.append(current_frame_objects)
+        
+    return all_frame_results
