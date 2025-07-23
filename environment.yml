@@ -1,11 +1,8 @@
-# To run once:
+# Useful conda commands:
 # conda deactivate
 # conda env remove --name pointstream
 # conda env create --file environment.yml
 # conda activate pointstream
-# python -m spacy download en_core_web_sm
-# python -c "import nltk; nltk.download('wordnet'); nltk.download('omw-1.4')"
-# To update the environment:
 # conda env update --file environment.yml  --prune
 name: pointstream
 channels:
@@ -15,19 +12,11 @@ channels:
 dependencies:
   - python=3.10
   - pip
-  # Core ML/CV Libraries
-  - pytorch
-  - torchvision
-  - torchaudio
   - opencv
   - scikit-image
   - numpy<2
-  # VLM & NLP Libraries
-  - transformers
-  - sentencepiece
   - pillow
-  - spacy
-  - nltk
+  - transformers
   - ultralytics
   - pip: 
     - scenedetect[opencv]

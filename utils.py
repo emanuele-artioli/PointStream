@@ -9,6 +9,7 @@ from typing import List, Tuple, Dict, Any
 import cv2
 from PIL import Image
 from ultralytics import YOLOE
+from transformers import BlipProcessor, BlipForConditionalGeneration
 from google import genai
 from google.genai import types
 
@@ -124,7 +125,6 @@ def _initialize_models():
     
     if _vlm_processor is None:
         print(" -> Initializing Vision-Language Model...")
-        from transformers import BlipProcessor, BlipForConditionalGeneration
         _vlm_processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
         _vlm_model = BlipForConditionalGeneration.from_pretrained(
             "Salesforce/blip-image-captioning-base", use_safetensors=True
@@ -137,28 +137,40 @@ def _initialize_models():
             raise ValueError("GEMINI_API_KEY environment variable not set. Please get a key from https://aistudio.google.com/")
         _gemini_client = genai.Client()
 
-def _query_llm(prompt_text: str) -> str:
-    """
-    Sends a prompt to the Gemini API using the new Client interface and returns the raw text response.
-    """
+GEMINI_SYSTEM_INSTRUCTION = """
+You are an expert scene analyst. Your task is to analyze a short scene description from a video.
+1. Identify all explicit and implicit physical objects.
+2. For each object, determine its role and mobility within the described scene.
+3. Categorize each object as either a 'Primary Subject' (animate or mobile objects central to the main action) or 'Static Background' (elements that are not part of the main action, including passive crowds or parked vehicles).
+4. Return the result as a single raw JSON object, and nothing else.
+
+Example:
+Scene description: "A chef is cooking in a restaurant kitchen with customers eating at tables."
+Response:
+{
+  "Primary Subject": ["chef", "pan"],
+  "Static Background": ["kitchen", "customers", "tables"]
+}
+"""
+
+def _query_llm(user_content: str) -> str:
+    """Sends a prompt to the Gemini API using a system instruction."""
     print("  -> Querying Gemini API to filter and infer objects...")
     try:
-        # Configure the request: disable "thinking" for speed and set response to JSON
         config = types.GenerateContentConfig(
             thinking_config=types.ThinkingConfig(thinking_budget=0),
             response_mime_type="application/json",
+            system_instruction=GEMINI_SYSTEM_INSTRUCTION, # Use the system instruction
         )
-        
-        # --- UPDATED API CALL ---
         response = _gemini_client.models.generate_content(
-            model="gemini-2.5-flash", # Using the new model name
-            contents=prompt_text,
+            model="gemini-2.5-flash",
+            contents=user_content,                        # Pass only the caption as contents
             config=config,
         )
         return response.text
     except Exception as e:
         print(f"  -> Error: Gemini API call failed. Reason: {e}")
-        return "{}" # Return empty JSON string on error
+        return "{}"
 
 # --------------------------------------------------------------------------
 # MODELS FUNCTIONS
@@ -174,26 +186,11 @@ def generate_caption(keyframe: np.ndarray) -> str:
     return caption
 
 def get_filtered_prompts(caption: str) -> List[str]:
-    _initialize_models() # Ensure Gemini client is ready
+    """Uses the Gemini LLM to generate a final, filtered list of prompts."""
+    _initialize_models()
     
-    prompt_template = f'''
-Analyze the scene description:
-"{caption}"
-
-Your task is to:
-1. Identify all explicit and implicit physical objects.
-2. Categorize each object as either a 'Primary Subject' (animate or mobile objects central to the main action) or 'Static Background' (elements that are not part of the main action).
-3. Return the result as a single raw JSON object, and nothing else.
-
-Example:
-Scene description: "A chef is cooking in a restaurant kitchen with customers eating at tables."
-Response:
-{{
-  "Primary Subject": ["chef", "pan"],
-  "Static Background": ["restaurant kitchen", "customers", "tables"]
-}}
-'''
-    llm_response_str = _query_llm(prompt_template)
+    # The prompt logic is now much simpler. We just call the LLM with the caption.
+    llm_response_str = _query_llm(caption)
     
     try:
         data = json.loads(llm_response_str)
