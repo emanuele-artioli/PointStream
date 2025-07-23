@@ -1,20 +1,16 @@
 # --------------------------------------------------------------------------
-# GENERAL DEPENDENCIES
+# DEPENDENCIES
 # --------------------------------------------------------------------------
 import subprocess
 import os
+import json
 import numpy as np
-from typing import List, Tuple, Dict, Any, Optional
-from skimage.metrics import structural_similarity as ssim
+from typing import List, Tuple, Dict, Any
 import cv2
-
-# --------------------------------------------------------------------------
-# MODEL DEPENDENCIES
-# --------------------------------------------------------------------------
 from PIL import Image
-import torch
-from nltk.corpus import wordnet
-from ultralytics import YOLOE # New main model import
+from ultralytics import YOLOE
+from google import genai
+from google.genai import types
 
 # --------------------------------------------------------------------------
 # GENERAL UTILITY FUNCTIONS
@@ -114,61 +110,17 @@ def extract_frames(video_path: str, frame_range: Tuple[int, int]) -> List[np.nda
     cap.release()
     return frames
 
-def detect_scene_changes(frames: List[np.ndarray], threshold: float, analysis_window: int) -> Dict[int, float]:
-    """Detects significant scene changes within a list of frames."""
-    if len(frames) < 2:
-        return {}
-
-    processed_frames = [
-        cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), (0, 0), fx=0.5, fy=0.5)
-        for frame in frames
-    ]
-    scene_changes = {}
-
-    def _find_best_cut_in_range(start: int, end: int) -> Optional[Tuple[int, float]]:
-        """Finds the single most significant cut in a small window."""
-        min_score, cut_location = 1.0, None
-        if start >= end: return None
-        for i in range(start + 1, min(end + 1, len(processed_frames))):
-            score, _ = ssim(processed_frames[i-1], processed_frames[i], full=True)
-            if score < min_score:
-                min_score, cut_location = score, i
-        if cut_location is not None and min_score < threshold:
-            return cut_location, min_score
-        return None
-
-    def _find_changes_recursive(start: int, end: int):
-        """Recursively searches for scene changes."""
-        if (end - start) <= analysis_window:
-            best_cut = _find_best_cut_in_range(start, end)
-            if best_cut:
-                cut_idx, cut_score = best_cut
-                if not any(abs(cut_idx - exist_cut) < analysis_window // 2 for exist_cut in scene_changes):
-                    scene_changes[cut_idx] = cut_score
-            return
-        
-        if end >= len(processed_frames): end = len(processed_frames) -1
-        boundary_score, _ = ssim(processed_frames[start], processed_frames[end], full=True)
-        if boundary_score < threshold:
-            mid = (start + end) // 2
-            _find_changes_recursive(start, mid)
-            _find_changes_recursive(mid + 1, end)
-
-    _find_changes_recursive(0, len(frames) - 1)
-    return scene_changes
-
 # --------------------------------------------------------------------------
 # MODELS INITIALIZATION
 # --------------------------------------------------------------------------
 
 _vlm_processor = None
 _vlm_model = None
-_nlp = None
-_segmentation_model = None # For YOLOE
+_gemini_client = None
 
 def _initialize_models():
     """Initializes the VLM and NLP models (which are safe to load once)."""
-    global _vlm_processor, _vlm_model, _nlp
+    global _vlm_processor, _vlm_model, _gemini_client
     
     if _vlm_processor is None:
         print(" -> Initializing Vision-Language Model...")
@@ -178,42 +130,79 @@ def _initialize_models():
             "Salesforce/blip-image-captioning-base", use_safetensors=True
         )
 
-    if _nlp is None:
-        print(" -> Initializing NLP Model...")
-        import spacy
-        _nlp = spacy.load("en_core_web_sm")
+    if _gemini_client is None:
+        print(" -> Initializing Gemini Client...")
+        # The client will automatically pick up the GEMINI_API_KEY environment variable.
+        if not os.getenv("GEMINI_API_KEY"):
+            raise ValueError("GEMINI_API_KEY environment variable not set. Please get a key from https://aistudio.google.com/")
+        _gemini_client = genai.Client()
+
+def _query_llm(prompt_text: str) -> str:
+    """
+    Sends a prompt to the Gemini API using the new Client interface and returns the raw text response.
+    """
+    print("  -> Querying Gemini API to filter and infer objects...")
+    try:
+        # Configure the request: disable "thinking" for speed and set response to JSON
+        config = types.GenerateContentConfig(
+            thinking_config=types.ThinkingConfig(thinking_budget=0),
+            response_mime_type="application/json",
+        )
+        
+        # --- UPDATED API CALL ---
+        response = _gemini_client.models.generate_content(
+            model="gemini-2.5-flash", # Using the new model name
+            contents=prompt_text,
+            config=config,
+        )
+        return response.text
+    except Exception as e:
+        print(f"  -> Error: Gemini API call failed. Reason: {e}")
+        return "{}" # Return empty JSON string on error
 
 # --------------------------------------------------------------------------
 # MODELS FUNCTIONS
 # --------------------------------------------------------------------------
 
 def generate_caption(keyframe: np.ndarray) -> str:
-    """Uses the VLM to generate a text caption for a single image frame."""
-    _initialize_models() # Ensure models are ready
+    _initialize_models() # This function now initializes all models
     pil_image = Image.fromarray(cv2.cvtColor(keyframe, cv2.COLOR_BGR2RGB))
-    
     inputs = _vlm_processor(images=pil_image, return_tensors="pt")
     output_ids = _vlm_model.generate(**inputs, max_length=50)
     caption = _vlm_processor.decode(output_ids[0], skip_special_tokens=True)
-    
     print(f"  -> Generated Caption: '{caption}'")
     return caption
 
-def extract_prompts_from_caption(caption: str) -> List[str]:
-    """Uses NLP to parse a caption and extract clean noun phrases for prompts."""
-    _initialize_models() # Ensure models are ready
-    doc = _nlp(caption)
-    prompts = set()
-    for chunk in doc.noun_chunks:
-        phrase_tokens = [
-            token.lemma_ for token in chunk if token.pos_ not in ['DET', 'PRON']
-        ]
-        if phrase_tokens:
-            prompts.add(" ".join(phrase_tokens))
+def get_filtered_prompts(caption: str) -> List[str]:
+    _initialize_models() # Ensure Gemini client is ready
     
-    sorted_prompts = sorted(list(prompts))
-    print(f"  -> Using Text Prompts: {sorted_prompts}")
-    return sorted_prompts
+    prompt_template = f'''
+Analyze the scene description:
+"{caption}"
+
+Your task is to:
+1. Identify all explicit and implicit physical objects.
+2. Categorize each object as either a 'Primary Subject' (animate or mobile objects central to the main action) or 'Static Background' (elements that are not part of the main action).
+3. Return the result as a single raw JSON object, and nothing else.
+
+Example:
+Scene description: "A chef is cooking in a restaurant kitchen with customers eating at tables."
+Response:
+{{
+  "Primary Subject": ["chef", "pan"],
+  "Static Background": ["restaurant kitchen", "customers", "tables"]
+}}
+'''
+    llm_response_str = _query_llm(prompt_template)
+    
+    try:
+        data = json.loads(llm_response_str)
+        prompts = data.get("Primary Subject", [])
+        print(f"  -> Using Filtered Prompts from Gemini: {prompts}")
+        return prompts
+    except (json.JSONDecodeError, TypeError):
+        print(f"  -> Error: Could not parse JSON response from Gemini. Response:\n{llm_response_str}")
+        return []
 
 def track_objects_in_segment(frames: List[np.ndarray], prompts: List[str]) -> List[List[Dict[str, Any]]]:
     """

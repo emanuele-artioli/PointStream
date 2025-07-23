@@ -1,10 +1,12 @@
-# A couple useful conda commands:
-# # conda env create --file environment.yml
-# # conda env update --file environment.yml  --prune
-# # conda env remove --name pointstream
-# Commands to run right after creating the environment:
+# To run once:
+# conda deactivate
+# conda env remove --name pointstream
+# conda env create --file environment.yml
+# conda activate pointstream
 # python -m spacy download en_core_web_sm
 # python -c "import nltk; nltk.download('wordnet'); nltk.download('omw-1.4')"
+# To update the environment:
+# conda env update --file environment.yml  --prune
 name: pointstream
 channels:
   - pytorch
@@ -26,5 +28,7 @@ dependencies:
   - pillow
   - spacy
   - nltk
-  # New main dependency
   - ultralytics
+  - pip: 
+    - scenedetect[opencv]
+    - google-genai
