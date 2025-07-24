@@ -95,7 +95,7 @@ def extract_frames(video_path: str, frame_range: Tuple[int, int]) -> List[np.nda
     if not cap.isOpened():
         raise ValueError(f"Cannot open video file: {video_path}")
     
-    frames = [] # <-- This line was the issue
+    frames = [] 
     cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
     
     current_frame_pos = start_frame
@@ -242,7 +242,7 @@ def _query_gemini_vision(contents: List, mode: str) -> str:
 
 def get_filtered_prompts(keyframe: np.ndarray) -> List[str]:
     """Uses Gemini to analyze a keyframe and return simplified prompts."""
-    _initialize_gemini_client()
+    _initialize_models() # Corrected from _initialize_gemini_client
     rgb_image = cv2.cvtColor(keyframe, cv2.COLOR_BGR2RGB)
     pil_image = Image.fromarray(rgb_image)
     image_byte_buffer = io.BytesIO()
@@ -268,6 +268,7 @@ def track_objects_in_segment(frames: List[np.ndarray], prompts: List[str]) -> Li
     Initializes a YOLOE model and tracks objects frame-by-frame through a segment.
     """
     print(f" -> Initializing YOLOE and tracking objects across {len(frames)} frames...")
+    _initialize_models()
 
     # 1. Initialize the model and set classes once for the entire segment
     model = YOLOE("/home/itec/emanuele/models/yoloe-11l-seg.pt")
@@ -360,4 +361,3 @@ def segment_with_boxes(frames: List[np.ndarray], box_prompts: List[Dict[str, Any
                 })
         all_frame_results.append(current_frame_objects)
     return all_frame_results
-

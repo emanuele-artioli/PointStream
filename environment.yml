@@ -12,6 +12,7 @@ dependencies:
   - pip
   - opencv
   - scikit-image
+  - matplotlib
   - numpy<2
   - pillow
   - pytorch
