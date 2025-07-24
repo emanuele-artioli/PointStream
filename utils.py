@@ -4,12 +4,13 @@
 import subprocess
 import os
 import json
+import io
 import numpy as np
+import matplotlib.pyplot as plt
 from typing import List, Tuple, Dict, Any
 import cv2
 from PIL import Image
-from ultralytics import YOLOE
-from transformers import BlipProcessor, BlipForConditionalGeneration
+from ultralytics import YOLOE, SAM
 from google import genai
 from google.genai import types
 
@@ -111,94 +112,155 @@ def extract_frames(video_path: str, frame_range: Tuple[int, int]) -> List[np.nda
     cap.release()
     return frames
 
-# --------------------------------------------------------------------------
-# MODELS INITIALIZATION
-# --------------------------------------------------------------------------
+def create_segmentation_video(frames: List[np.ndarray], all_frame_results: List[List[Dict[str, Any]]], output_path: str, fps: float):
+    """Creates a video with tracked segmentation masks drawn on every frame."""
+    if not any(all_frame_results):
+        return
 
-_vlm_processor = None
-_vlm_model = None
-_gemini_client = None
+    # Generate all visualized frames first
+    visualized_frames = []
+    track_colors = {}
+    color_palette = [plt.cm.viridis(i) for i in np.linspace(0, 1, 20)]
 
-def _initialize_models():
-    """Initializes the VLM and NLP models (which are safe to load once)."""
-    global _vlm_processor, _vlm_model, _gemini_client
+    for i, frame in enumerate(frames):
+        # Create a mutable copy for drawing on
+        draw_frame = frame.copy()
+        overlay = draw_frame.copy()
+        
+        segmented_objects = all_frame_results[i]
+        
+        for obj in segmented_objects:
+            track_id = obj['track_id']
+            if track_id not in track_colors:
+                track_colors[track_id] = color_palette[len(track_colors) % len(color_palette)]
+            
+            color_bgr = [c * 255 for c in track_colors[track_id][:3]][::-1]
+            h, w, _ = draw_frame.shape
+            mask = cv2.resize(obj['mask'].astype(np.uint8), (w, h), interpolation=cv2.INTER_NEAREST)
+            overlay[mask > 0.5] = color_bgr
+            contours, _ = cv2.findContours(mask.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cv2.drawContours(draw_frame, contours, -1, color_bgr, 2)
+            
+            label = f"ID {track_id}: {obj['prompt']}"
+            if contours:
+                M = cv2.moments(contours[0])
+                if M['m00'] > 0:
+                    cx = int(M['m10'] / M['m00'])
+                    cy = int(M['m01'] / M['m00'])
+                    cv2.putText(draw_frame, label, (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+        
+        final_image = cv2.addWeighted(draw_frame, 0.7, overlay, 0.3, 0)
+        visualized_frames.append(final_image)
     
-    if _vlm_processor is None:
-        print(" -> Initializing Vision-Language Model...")
-        _vlm_processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
-        _vlm_model = BlipForConditionalGeneration.from_pretrained(
-            "Salesforce/blip-image-captioning-base", use_safetensors=True
-        )
+    # Use the new, robust FFmpeg saver
+    save_frames_as_video(output_path, visualized_frames, fps)
+    print(f"  -> Saved tracking visualization to '{output_path}'")
 
-    if _gemini_client is None:
-        print(" -> Initializing Gemini Client...")
-        # The client will automatically pick up the GEMINI_API_KEY environment variable.
-        if not os.getenv("GEMINI_API_KEY"):
-            raise ValueError("GEMINI_API_KEY environment variable not set. Please get a key from https://aistudio.google.com/")
-        _gemini_client = genai.Client()
+# --------------------------------------------------------------------------
+# AI MODELS UTILITY FUNCTIONS
+# --------------------------------------------------------------------------
 
-GEMINI_SYSTEM_INSTRUCTION = """
-You are an expert scene analyst. Your task is to analyze a short scene description from a video.
-1. Identify all explicit and implicit physical objects.
-2. For each object, determine its role and mobility within the described scene.
-3. Categorize each object as either a 'Primary Subject' (animate or mobile objects central to the main action) or 'Static Background' (elements that are not part of the main action, including passive crowds or parked vehicles).
-4. Return the result as a single raw JSON object, and nothing else.
+_gemini_client = None
+_yoloe_model = None
+_sam_model = None
 
-Example:
-Scene description: "A chef is cooking in a restaurant kitchen with customers eating at tables."
+GEMINI_SYSTEM_INSTRUCTION_TEXT = """
+You are a highly efficient scene analysis engine. Your task is to analyze an image from a video and identify only the primary, dynamic subjects.
+
+Your response MUST follow these rules:
+1.  From the image, identify all animate or mobile objects that are central to the action.
+2.  IGNORE all static background elements like scenery, buildings, rooms, or passive crowds.
+3.  For each identified primary subject, map it to one of the following base categories ONLY: ["person", "animal", "vehicle", "object"].
+4.  Return a single JSON array containing the unique, simplified base categories. Do not include adjectives, numbers, or descriptions.
+
+Example Input: An image of two men playing tennis.
 Response:
-{
-  "Primary Subject": ["chef", "pan"],
-  "Static Background": ["kitchen", "customers", "tables"]
-}
+["person", "object"]
 """
 
-def _query_llm(user_content: str) -> str:
-    """Sends a prompt to the Gemini API using a system instruction."""
-    print("  -> Querying Gemini API to filter and infer objects...")
+GEMINI_SYSTEM_INSTRUCTION_POINT = """
+You are a motion detection expert analyzing two sequential frames from a video to identify and locate moving objects.
+
+Your response MUST follow these rules:
+1.  Compare the two images to identify primary subjects that have significantly changed position. IGNORE static background elements.
+2.  For each moving subject, determine its base category from this list ONLY: ["person", "animal", "vehicle", "object"].
+3.  For each moving subject, provide its NORMALIZED bounding box [x_min, y_min, x_max, y_max] in the *second* image. All coordinates must be floats between 0.0 and 1.0.
+4.  Return a single JSON array of objects. Each object must have a "category" and a "bbox_normalized" key.
+
+Example Input: Two images of a person walking a dog.
+Response:
+[
+  {"category": "person", "bbox_normalized": [0.6, 0.4, 0.75, 0.9]},
+  {"category": "animal", "bbox_normalized": [0.5, 0.7, 0.6, 0.85]}
+]
+"""
+
+def _initialize_models():
+    """Initializes all necessary AI models on first use."""
+    global _gemini_client, _sam_model, _yoloe_model
+    
+    # Initialize YOLOE (no change)
+    if _yoloe_model is None:
+        print(" -> Initializing YOLOE Model...")
+        if not os.path.exists("/home/itec/emanuele/models/yoloe-11l-seg.pt"):
+            raise FileNotFoundError("YOLOE model file not found at /home/itec/emanuele/models/yoloe-11l-seg.pt")
+        _yoloe_model = YOLOE("/home/itec/emanuele/models/yoloe-11l-seg.pt")
+
+    # Initialize Gemini (no change)
+    if _gemini_client is None:
+        print(" -> Initializing Gemini Client...")
+        if not os.getenv("GEMINI_API_KEY"):
+            raise ValueError("GEMINI_API_KEY environment variable not set.")
+        _gemini_client = genai.Client()
+
+    # Initialize SAM (new)
+    if _sam_model is None:
+        print(" -> Initializing Segment Anything Model (SAM)...")
+        # Model will auto-download on first use
+        _sam_model = SAM('/home/itec/emanuele/models/sam2.1_l.pt')
+
+def _query_gemini_vision(contents: List, mode: str) -> str:
+    """Sends a multimodal prompt to the Gemini API."""
+    print(f"  -> Querying Gemini API in '{mode}' mode...")
+    system_instruction = GEMINI_SYSTEM_INSTRUCTION_POINT if mode == 'point' else GEMINI_SYSTEM_INSTRUCTION_TEXT
     try:
         config = types.GenerateContentConfig(
             thinking_config=types.ThinkingConfig(thinking_budget=0),
             response_mime_type="application/json",
-            system_instruction=GEMINI_SYSTEM_INSTRUCTION, # Use the system instruction
+            system_instruction=system_instruction,
         )
+        
         response = _gemini_client.models.generate_content(
             model="gemini-2.5-flash",
-            contents=user_content,                        # Pass only the caption as contents
+            contents=contents,
             config=config,
         )
         return response.text
     except Exception as e:
         print(f"  -> Error: Gemini API call failed. Reason: {e}")
-        return "{}"
+        return "[]"
 
-# --------------------------------------------------------------------------
-# MODELS FUNCTIONS
-# --------------------------------------------------------------------------
-
-def generate_caption(keyframe: np.ndarray) -> str:
-    _initialize_models() # This function now initializes all models
-    pil_image = Image.fromarray(cv2.cvtColor(keyframe, cv2.COLOR_BGR2RGB))
-    inputs = _vlm_processor(images=pil_image, return_tensors="pt")
-    output_ids = _vlm_model.generate(**inputs, max_length=50)
-    caption = _vlm_processor.decode(output_ids[0], skip_special_tokens=True)
-    print(f"  -> Generated Caption: '{caption}'")
-    return caption
-
-def get_filtered_prompts(caption: str) -> List[str]:
-    """Uses the Gemini LLM to generate a final, filtered list of prompts."""
-    _initialize_models()
-    
-    # The prompt logic is now much simpler. We just call the LLM with the caption.
-    llm_response_str = _query_llm(caption)
-    
+def get_filtered_prompts(keyframe: np.ndarray) -> List[str]:
+    """Uses Gemini to analyze a keyframe and return simplified prompts."""
+    _initialize_gemini_client()
+    rgb_image = cv2.cvtColor(keyframe, cv2.COLOR_BGR2RGB)
+    pil_image = Image.fromarray(rgb_image)
+    image_byte_buffer = io.BytesIO()
+    pil_image.save(image_byte_buffer, format="JPEG")
+    contents = [types.Part.from_bytes(data=image_byte_buffer.getvalue(), mime_type='image/jpeg'), 
+                "Analyze this image based on the system instruction."]
+    llm_response_str = _query_gemini_vision(contents, mode='text')
     try:
-        data = json.loads(llm_response_str)
-        prompts = data.get("Primary Subject", [])
-        print(f"  -> Using Filtered Prompts from Gemini: {prompts}")
-        return prompts
+        prompts = json.loads(llm_response_str)
+        if isinstance(prompts, list):
+            clean_prompts = [str(p) for p in prompts]
+            print(f"  -> Using Filtered Prompts from Gemini: {clean_prompts}")
+            return clean_prompts
+        else:
+            print(f"  -> Error: Gemini response was not a JSON list. Response: {llm_response_str}")
+            return []
     except (json.JSONDecodeError, TypeError):
-        print(f"  -> Error: Could not parse JSON response from Gemini. Response:\n{llm_response_str}")
+        print(f"  -> Error: Could not parse JSON response. Response:\n{llm_response_str}")
         return []
 
 def track_objects_in_segment(frames: List[np.ndarray], prompts: List[str]) -> List[List[Dict[str, Any]]]:
@@ -231,3 +293,71 @@ def track_objects_in_segment(frames: List[np.ndarray], prompts: List[str]) -> Li
         all_frame_results.append(current_frame_objects)
         
     return all_frame_results
+
+def get_box_prompts_from_frames(frame_start: np.ndarray, frame_end: np.ndarray) -> List[Dict[str, Any]]:
+    """Uses Gemini to identify moving objects between two frames and return their center points."""
+    _initialize_models()
+
+    def to_part(frame):
+        """Converts a frame to a Gemini Part object."""
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        pil = Image.fromarray(rgb)
+        buffer = io.BytesIO()
+        pil.save(buffer, format="JPEG")
+        return types.Part.from_bytes(data=buffer.getvalue(), mime_type='image/jpeg')
+
+    # The prompt to the model is now simpler, without dimensions
+    contents = [
+        to_part(frame_start),
+        to_part(frame_end),
+        "Analyze these two frames to identify moving objects based on the system instruction."
+    ]
+
+    llm_response_str = _query_gemini_vision(contents, mode='point')
+
+    try:
+        boxes = json.loads(llm_response_str)
+        if isinstance(boxes, list):
+            print(f"  -> Got Box Prompts from Gemini: {boxes}")
+            return boxes
+        return []
+    except (json.JSONDecodeError, TypeError):
+        print(f"  -> Error: Could not parse JSON response for points. Response:\n{llm_response_str}")
+        return []
+
+def segment_with_boxes(frames: List[np.ndarray], box_prompts: List[Dict[str, Any]]) -> List[List[Dict[str, Any]]]:
+    """Segments objects in frames using a list of bounding box prompts with SAM."""
+    print(f" -> Segmenting {len(frames)} frames with SAM using {len(box_prompts)} box prompts...")
+    _initialize_models() # Ensures SAM is loaded
+    all_frame_results = []
+    
+    h, w, _ = frames[0].shape
+
+    for frame in frames:
+        current_frame_objects = []
+        for i, prompt in enumerate(box_prompts):
+            normalized_bbox = prompt.get("bbox_normalized")
+            category = prompt.get("category")
+            if not normalized_bbox or not category:
+                continue
+
+            # Convert normalized bbox to absolute pixel values [x1, y1, x2, y2]
+            x1 = int(normalized_bbox[0] * w)
+            y1 = int(normalized_bbox[1] * h)
+            x2 = int(normalized_bbox[2] * w)
+            y2 = int(normalized_bbox[3] * h)
+            
+            # --- UPDATED: Run inference with SAM using a bounding box ---
+            results = _sam_model(source=frame, bboxes=[x1, y1, x2, y2], verbose=False)
+            
+            if results and results[0].masks:
+                mask_data = results[0].masks.data[0]
+                current_frame_objects.append({
+                    "prompt": category,
+                    "mask": mask_data.cpu().numpy(),
+                    "confidence": None, 
+                    "track_id": i + 1 
+                })
+        all_frame_results.append(current_frame_objects)
+    return all_frame_results
+

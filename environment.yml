@@ -1,9 +1,7 @@
 # Useful conda commands:
-# conda deactivate
-# conda env remove --name pointstream
-# conda env create --file environment.yml
-# conda activate pointstream
+# conda deactivate && conda env remove --name pointstream -y && conda env create --file environment.yml && conda activate pointstream
 # conda env update --file environment.yml  --prune
+
 name: pointstream
 channels:
   - pytorch
@@ -16,7 +14,10 @@ dependencies:
   - scikit-image
   - numpy<2
   - pillow
-  - transformers
+  - pytorch
+  - torchvision
+  - torchaudio
+  # - transformers
   - ultralytics
   - pip: 
     - scenedetect[opencv]
