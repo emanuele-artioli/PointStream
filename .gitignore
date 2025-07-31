@@ -162,5 +162,7 @@ cython_debug/
 # PointStream
 *.pt
 *.ts
-output/
+output*/
 scenes*/
+data/
+distilled_model/

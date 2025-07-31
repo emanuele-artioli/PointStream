@@ -1,25 +1,43 @@
-# Useful conda commands:
-# conda deactivate && conda env remove --name pointstream -y && conda env create --file environment.yml && conda activate pointstream
-# conda env update --file environment.yml  --prune
+# After activation, run the following commands:
+# conda activate pointstream && mim install mmcv==2.1.0 mmdet==3.2.0 mmpose==1.3.2 mmpretrain
 
 name: pointstream
 channels:
+  - nvidia/label/cuda-12.1.1
   - pytorch
+  - nvidia
   - conda-forge
   - defaults
 dependencies:
+  # Core
   - python=3.10
   - pip
-  - opencv
-  - scikit-image
-  - matplotlib
-  - numpy<2
-  - pillow
+
+  # Pytorch and CUDA
   - pytorch
   - torchvision
   - torchaudio
-  # - transformers
+  - pytorch-cuda=12.1
+  - cuda
+
+  # Computer Vision & Image Processing
+  - opencv 
+  - scikit-image
+  - matplotlib
+  - pillow
+  - ffmpeg
+
+  # Key Libraries
   - ultralytics
-  - pip: 
+  - numpy<2
+  - openmim
+  - transformers
+
+  # Pip dependencies
+  - pip:
     - scenedetect[opencv]
     - google-genai
+    - autodistill
+    - autodistill-grounded-sam
+    - pytest
+    # - roboflow

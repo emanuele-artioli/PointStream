@@ -1,0 +1,7 @@
+# Pip requirements for the training script
+ultralytics
+numpy<2
+opencv-python-headless
+autodistill
+autodistill-grounded-sam
+roboflow
