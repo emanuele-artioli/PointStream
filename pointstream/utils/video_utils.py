@@ -29,13 +29,10 @@ def get_video_properties(video_path: str) -> Optional[Tuple[int, float, int, int
     cap.release()
     return frame_count, fps, width, height
 
-
 def read_frames_with_indices(video_path: str) -> Generator[Tuple[int, np.ndarray], None, None]:
     """
-    A generator function that reads frames from a video file one by one,
-    yielding both the frame index and the frame itself.
-
-    This is memory-efficient and highly reusable.
+    A generator that reads frames from a video file one by one, yielding
+    both the frame index and the frame itself. This is highly memory-efficient.
 
     Args:
         video_path: Path to the video file.

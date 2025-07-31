@@ -31,7 +31,7 @@ dependencies:
   - ultralytics
   - numpy<2
   - openmim
-  - transformers
+  - transformers=4.36.2
 
   # Pip dependencies
   - pip:
@@ -40,4 +40,3 @@ dependencies:
     - autodistill
     - autodistill-grounded-sam
     - pytest
-    # - roboflow

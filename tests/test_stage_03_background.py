@@ -10,13 +10,11 @@ def test_video_path() -> Path:
     """Provides the path to the test video."""
     path = Path(__file__).parent / "data" / "DAVIS_stitched.mp4"
     if not path.exists():
-        pytest.skip("Test video not found at tests/data/DAVIS_stitched.mp4")
+        pytest.skip(f"Test video not found at {path}")
     return path
 
 def test_run_background_pipeline_streaming(test_video_path):
-    """
-    Tests the main orchestrator function of the background modeling stage.
-    """
+    """Tests the main orchestrator function of the background modeling stage."""
     # Arrange: Chain all pipeline stages together
     video_stem = test_video_path.stem
     stage1_gen = stage_01_analyzer.run_analysis_pipeline(str(test_video_path))
@@ -29,18 +27,19 @@ def test_run_background_pipeline_streaming(test_video_path):
     # Assert
     assert len(results) > 0, "Background pipeline did not yield any scenes."
 
+    # Check that the frames key has been removed
+    first_scene = results[0]
+    assert "frames" not in first_scene, "The 'frames' key should be removed after Stage 3."
+
     # Find a processed STATIC or SIMPLE scene to check its contents
     processed_scene = next(
         (s for s in results if s["motion_type"] in ["STATIC", "SIMPLE"]), None
     )
 
     if processed_scene:
-        assert "background_image_path" in processed_scene, "Scene missing 'background_image_path' key."
-        assert processed_scene["background_image_path"] is not None, "Background image path should not be None for a processed scene."
-        
-        bg_path = Path(processed_scene["background_image_path"])
-        assert bg_path.exists(), f"Background image file was not created at {bg_path}"
-        
-        assert "camera_motion" in processed_scene, "Scene missing 'camera_motion' key."
-        assert isinstance(processed_scene["camera_motion"], list), "'camera_motion' should be a list."
-        assert len(processed_scene["camera_motion"]) > 0, "Camera motion list should not be empty."
+        assert "background_image_path" in processed_scene
+        assert processed_scene["background_image_path"] is not None
+        assert Path(processed_scene["background_image_path"]).exists()
+        assert "camera_motion" in processed_scene
+        assert isinstance(processed_scene["camera_motion"], list)
+        assert len(processed_scene["camera_motion"]) > 0

@@ -11,7 +11,7 @@ class MMPoseHandler:
 
     def __init__(self):
         """
-        Initializes the MMPose inferencers for different categories.
+        Initializes the MMPose inferencers.
         Models and weights are downloaded automatically on first use.
         """
         print(" -> Initializing MMPose inferencers...")
@@ -31,15 +31,12 @@ class MMPoseHandler:
             return []
 
         all_keypoints = []
-        # FIX: Call the inferencer explicitly for each frame in a loop. This is the
-        # most robust way to interact with the API and avoids internal bugs.
+        # Call the inferencer for each frame; this is the most robust method.
         for frame, bbox in zip(frames, bboxes):
-            # The input is the frame, and bboxes are passed as a keyword argument.
-            # Crucially, pass a standard Python list `[bbox]` to avoid the ValueError.
+            # Pass bbox as a standard Python list to avoid internal library errors.
             result_generator = inferencer(frame, bboxes=[bbox], return_datasamples=True)
             result = next(result_generator)
             
-            # Add a defensive check to ensure a pose was detected.
             if 'predictions' in result and result['predictions'] and result['predictions'][0].pred_instances:
                 keypoints = result['predictions'][0].pred_instances.keypoints[0]
                 all_keypoints.append(keypoints)

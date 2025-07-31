@@ -20,15 +20,13 @@ MOTION_CLASSIFIER_THRESHOLD = 0.5
 MOTION_DOWNSAMPLE_FACTOR = 0.25
 
 # --- Stage 2: Object Detection ---
-STUDENT_MODEL_PATH = "yolov8n.pt"
+STUDENT_MODEL_PATH = str(PACKAGE_ROOT / "models" / "weights" / "yolo_student.pt")
 DETECTION_CONFIDENCE_THRESHOLD = 0.5
 
 # --- Stage 4: Foreground Representation ---
 # Use the model's config name alias for simplicity and robustness.
+# This uses a high-performance ViT-based model for human pose.
 MMPOSE_MODEL_ALIAS = 'td-hm_ViTPose-huge_8xb64-210e_coco-256x192'
 
 # --- Device Configuration ---
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-
-# --- Logging ---
-LOG_LEVEL = "INFO"

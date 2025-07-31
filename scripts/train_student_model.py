@@ -1,8 +1,5 @@
 """
 Offline training script for creating a custom "student" object detection model.
-
-This version uses autodistill for auto-labeling (the "teacher") and the
-standard ultralytics library for training the YOLO model (the "student").
 """
 import argparse
 import os
@@ -11,46 +8,22 @@ import shutil
 from pathlib import Path
 from autodistill_grounded_sam import GroundedSAM
 from autodistill.detection import CaptionOntology
-from ultralytics import YOLO # Use ultralytics directly
-import torch
-import functools
+from ultralytics import YOLO
 
 def main():
-    """
-    Runs the full distillation pipeline.
-    """
+    """Runs the full distillation pipeline."""
     parser = argparse.ArgumentParser(description="Train a student model with autodistill.")
-    parser.add_argument(
-        "--data_path",
-        type=str,
-        required=True,
-        help="Path to the directory of unlabeled images."
-    )
-    parser.add_argument(
-        "--output_path",
-        type=str,
-        default="distilled_model",
-        help="Path to save the trained model and dataset."
-    )
-    parser.add_argument(
-        "--epochs",
-        type=int,
-        default=100,
-        help="Number of epochs to train the student model."
-    )
-    parser.add_argument(
-        "--max_images",
-        type=int,
-        default=None,
-        help="Cap the number of images to label for faster training runs."
-    )
+    parser.add_argument("--data_path", type=str, required=True, help="Path to the directory of unlabeled images.")
+    parser.add_argument("--output_path", type=str, default="distilled_model", help="Path to save the trained model and dataset.")
+    parser.add_argument("--epochs", type=int, default=100, help="Number of epochs to train the student model.")
+    parser.add_argument("--max_images", type=int, default=None, help="Cap the number of images to label for faster training runs.")
     args = parser.parse_args()
 
     print("--- Starting Autodistill Training Pipeline ---")
 
     # --- 1. Define the Ontology ---
     ontology = CaptionOntology({
-        "person": "person"
+        "person": "person",
         # Add other classes here, e.g., "animal": "animal"
     })
 
@@ -63,10 +36,7 @@ def main():
         if args.max_images:
             print(f" -> Selecting a random subset of {args.max_images} images...")
             all_images = [f for f in input_images_path.glob('*') if f.is_file()]
-            if len(all_images) > args.max_images:
-                selected_images = random.sample(all_images, args.max_images)
-            else:
-                selected_images = all_images
+            selected_images = random.sample(all_images, min(len(all_images), args.max_images))
             
             temp_subset_path.mkdir(parents=True, exist_ok=True)
             for img_path in selected_images:
@@ -87,11 +57,9 @@ def main():
         )
         print(f" -> Auto-labeling complete. Dataset saved to: {dataset_path}")
 
-        # --- 4. Train the Student Model using Ultralytics Directly ---
-        print(" -> Initializing student model (YOLOv12)...")
-        
-        # YOLO12 gets initialized with a pre-trained model
-        model = YOLO("yolo12n.pt")
+        # --- 4. Fine-Tune the Student Model using Ultralytics Directly ---
+        print(" -> Initializing student model (YOLO12)...")
+        model = YOLO("yolo12n.pt") # Start from the pre-trained YOLO12 model
 
         print(f" -> Starting training for {args.epochs} epochs...")
         data_yaml_path = dataset_path / "data.yaml"
@@ -102,7 +70,6 @@ def main():
             project=args.output_path
         )
         print(" -> Training complete!")
-        # Note: Ultralytics v12 might save to a different subfolder, e.g., 'train2'
         print(f" -> Trained model weights saved in: {args.output_path}/train/weights/best.pt")
 
     finally:

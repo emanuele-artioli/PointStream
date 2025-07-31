@@ -7,17 +7,18 @@ from pointstream.pipeline import stage_01_analyzer, stage_02_detector, stage_03_
 
 @pytest.fixture
 def test_video_path() -> Path:
+    """Provides the path to the test video."""
     path = Path(__file__).parent / "data" / "DAVIS_stitched.mp4"
     if not path.exists():
-        pytest.skip("Test video not found at tests/data/DAVIS_stitched.mp4")
+        pytest.skip(f"Test video not found at {path}")
     return path
 
 def test_run_foreground_pipeline_streaming(test_video_path):
-    video_stem = test_video_path.stem
+    """Tests the main orchestrator function of the foreground representation stage."""
     stage1_gen = stage_01_analyzer.run_analysis_pipeline(str(test_video_path))
     stage2_gen = stage_02_detector.run_detection_pipeline(stage1_gen)
-    stage3_gen = stage_03_background.run_background_modeling_pipeline(stage2_gen, video_stem)
-    stage4_gen = stage_04_foreground.run_foreground_pipeline(stage3_gen, video_stem)
+    stage3_gen = stage_03_background.run_background_modeling_pipeline(stage2_gen, test_video_path.stem)
+    stage4_gen = stage_04_foreground.run_foreground_pipeline(stage3_gen, str(test_video_path))
 
     results = list(stage4_gen)
 
@@ -25,14 +26,10 @@ def test_run_foreground_pipeline_streaming(test_video_path):
 
     # Check all scenes for correct final structure
     for scene in results:
-        assert "foreground_objects" in scene, "Final scene dict must have 'foreground_objects' key."
-        # FIX: Assert that cleanup has been performed.
-        assert "frames" not in scene, "The 'frames' key should be removed from the final output."
+        assert "foreground_objects" in scene
         assert "detections" not in scene, "The 'detections' key should be removed from the final output."
 
-    # Find a scene that contains foreground objects to test deeper
     processed_scene = next((s for s in results if s.get("foreground_objects")), None)
-
     if processed_scene:
         fg_objects = processed_scene["foreground_objects"]
         assert isinstance(fg_objects, list)
