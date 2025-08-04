@@ -129,8 +129,8 @@ def main():
     parser.add_argument(
         '--max_frames',
         type=int,
-        default=1000,
-        help="Maximum number of frames to extract from a single video.\nFrames will be spaced evenly. Default is 1000."
+        default=10000,
+        help="Maximum number of frames to extract from a single video.\nFrames will be spaced evenly. Default is 10000."
     )
 
     args = parser.parse_args()

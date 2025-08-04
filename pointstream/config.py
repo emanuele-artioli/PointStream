@@ -8,9 +8,13 @@ import torch
 PROJECT_ROOT = Path(__file__).parent.parent
 PACKAGE_ROOT = Path(__file__).parent
 
-OUTPUT_DIR = PROJECT_ROOT / "output_scenes"
+# FIX: Point to the new, centralized artifacts directory
+ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
+OUTPUT_DIR = ARTIFACTS_DIR / "pipeline_output" # For main pipeline results
+
 MODEL_DIR = PACKAGE_ROOT / "models" / "weights"
 
+# Ensure directories exist
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -20,13 +24,12 @@ MOTION_CLASSIFIER_THRESHOLD = 0.5
 MOTION_DOWNSAMPLE_FACTOR = 0.25
 
 # --- Stage 2: Object Detection ---
-STUDENT_MODEL_PATH = str(PACKAGE_ROOT / "models" / "weights" / "yolo_student.pt")
+STUDENT_MODEL_PATH = MODEL_DIR / "yolo12n.pt"
 DETECTION_CONFIDENCE_THRESHOLD = 0.5
 
 # --- Stage 4: Foreground Representation ---
-# Use the model's config name alias for simplicity and robustness.
-# This uses a high-performance ViT-based model for human pose.
-MMPOSE_MODEL_ALIAS = 'td-hm_ViTPose-huge_8xb64-210e_coco-256x192'
+MMPOSE_HUMAN_MODEL_ALIAS = 'human'
+MMPOSE_ANIMAL_MODEL_ALIAS = 'animal'
 
 # --- Device Configuration ---
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'

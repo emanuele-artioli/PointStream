@@ -9,12 +9,13 @@ from pathlib import Path
 from autodistill_grounded_sam import GroundedSAM
 from autodistill.detection import CaptionOntology
 from ultralytics import YOLO
+from pointstream.config import ARTIFACTS_DIR
 
 def main():
     """Runs the full distillation pipeline."""
     parser = argparse.ArgumentParser(description="Train a student model with autodistill.")
     parser.add_argument("--data_path", type=str, required=True, help="Path to the directory of unlabeled images.")
-    parser.add_argument("--output_path", type=str, default="distilled_model", help="Path to save the trained model and dataset.")
+    parser.add_argument("--output_path", type=str, default=str(ARTIFACTS_DIR / "training"), help="Path to save the trained model and dataset.")
     parser.add_argument("--epochs", type=int, default=100, help="Number of epochs to train the student model.")
     parser.add_argument("--max_images", type=int, default=None, help="Cap the number of images to label for faster training runs.")
     args = parser.parse_args()
@@ -24,7 +25,7 @@ def main():
     # --- 1. Define the Ontology ---
     ontology = CaptionOntology({
         "person": "person",
-        # Add other classes here, e.g., "animal": "animal"
+        "animal": "animal" # Add the animal class
     })
 
     # --- 2. Prepare Image Subset for Labeling ---

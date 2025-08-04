@@ -1,9 +1,10 @@
 """
-Generic video processing utilities using OpenCV.
+Generic video processing utilities using OpenCV and FFmpeg.
 """
-from typing import Generator, Tuple, Optional
+from typing import Generator, Tuple, Optional, List # <-- FIX: Added 'List' import
 import cv2
 import numpy as np
+import subprocess
 
 def get_video_properties(video_path: str) -> Optional[Tuple[int, float, int, int]]:
     """
@@ -53,3 +54,48 @@ def read_frames_with_indices(video_path: str) -> Generator[Tuple[int, np.ndarray
         frame_index += 1
     
     cap.release()
+
+def save_frames_as_video(output_path: str, frames: List[np.ndarray], fps: float):
+    """
+    Saves a list of NumPy frames to a video file using a direct FFmpeg pipe
+    for maximum compatibility and performance.
+
+    Args:
+        output_path: The path to save the output video file.
+        frames: A list of frames (as NumPy arrays in BGR format).
+        fps: The desired frames per second for the output video.
+    """
+    if not frames:
+        print("Warning: No frames provided to save_frames_as_video.")
+        return
+
+    height, width, _ = frames[0].shape
+    
+    command = [
+        'ffmpeg',
+        '-y',  # Overwrite output file if it exists
+        '-f', 'rawvideo',
+        '-vcodec', 'rawvideo',
+        '-s', f'{width}x{height}',  # Frame size
+        '-pix_fmt', 'bgr24',       # Input pixel format from OpenCV
+        '-r', str(fps),            # Frames per second
+        '-i', '-',                 # Input comes from stdin
+        '-an',                     # No audio
+        '-vcodec', 'libx264',      # Use H.264 codec
+        '-pix_fmt', 'yuv420p',     # Standard pixel format for compatibility
+        output_path
+    ]
+    
+    try:
+        process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        for frame in frames:
+            process.stdin.write(frame.tobytes())
+            
+        process.stdin.close()
+        process.wait()
+        if process.returncode != 0:
+            print(f"Error during FFmpeg execution: {process.stderr.read().decode()}")
+    except FileNotFoundError:
+        print("Error: ffmpeg command not found. Please ensure FFmpeg is installed and in your system's PATH.")
+    except Exception as e:
+        print(f"An unexpected error occurred while saving the video: {e}")

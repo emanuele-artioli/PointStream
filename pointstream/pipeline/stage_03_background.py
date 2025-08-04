@@ -76,7 +76,4 @@ def run_background_modeling_pipeline(scene_generator: Generator[Scene, None, Non
             
         scene['camera_motion'] = camera_motion
         
-        # This is the last stage to use the raw frames, so we remove them.
-        del scene['frames']
-        
         yield scene
