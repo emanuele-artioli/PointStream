@@ -1,14 +1,14 @@
 """
-Main entry point for the Pointstream processing pipeline.
+Main entry point for the Pointstream server processing pipeline.
 """
 import argparse
 import json
 from pathlib import Path
 import numpy as np
-# FIX: Use absolute imports from the package
 from pointstream import config
 from pointstream.pipeline import stage_01_analyzer, stage_02_detector, stage_03_background, stage_04_foreground
 from pointstream.utils.video_utils import get_video_properties
+
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -19,7 +19,20 @@ class NumpyEncoder(json.JSONEncoder):
 def main():
     parser = argparse.ArgumentParser(description="Pointstream: A Content-Aware Neural Video Codec")
     parser.add_argument("--input-video", type=str, required=True, help="Path to the input video file.")
+    # FIX: Add a new argument to select the content type
+    parser.add_argument(
+        "--content-type",
+        type=str,
+        default="general",
+        choices=config.MODEL_REGISTRY.keys(),
+        help="Select the model to use based on the video's content."
+    )
     args = parser.parse_args()
+    
+    # --- Select the Model Path ---
+    model_path = config.MODEL_REGISTRY[args.content_type]
+    print(f"Using '{args.content_type}' model: {model_path}")
+
     video_path = args.input_video
     video_stem = Path(video_path).stem
 
@@ -38,10 +51,11 @@ def main():
     }
 
     # --- Chain all pipeline stages together ---
-    stage1_gen = stage_01_analyzer.run_analysis_pipeline(video_path)
-    stage2_gen = stage_02_detector.run_detection_pipeline(stage1_gen)
-    stage3_gen = stage_03_background.run_background_modeling_pipeline(stage2_gen, video_stem)
-    stage4_gen = stage_04_foreground.run_foreground_pipeline(stage3_gen, video_path)
+    stage1_gen = stage_01_analyzer.run_analysis_pipeline(args.input_video)
+    # FIX: Pass the selected model_path to the detection stage
+    stage2_gen = stage_02_detector.run_detection_pipeline(stage1_gen, model_path)
+    stage3_gen = stage_03_background.run_background_modeling_pipeline(stage2_gen, Path(args.input_video).stem)
+    stage4_gen = stage_04_foreground.run_foreground_pipeline(stage3_gen, args.input_video)
 
     # --- Structure the Final Output ---
     final_output = {

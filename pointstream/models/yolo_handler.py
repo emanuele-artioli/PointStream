@@ -9,25 +9,16 @@ from .. import config
 class YOLOHandler:
     """A wrapper for the ultralytics YOLO model."""
 
-    def __init__(self, model_path: str = config.STUDENT_MODEL_PATH):
-        """Initializes the YOLO model."""
+    # FIX: The __init__ method now accepts a model_path
+    def __init__(self, model_path: str):
+        """Initializes the YOLO model from a given path."""
         print(f" -> Initializing YOLO model from: {model_path}")
         self.model = YOLO(model_path)
 
     def track_objects(self, frames: List[np.ndarray]) -> List[List[Dict[str, Any]]]:
-        """
-        Tracks objects through a list of frames for a single scene.
-
-        Args:
-            frames: A list of video frames.
-
-        Returns:
-            A list of lists, where each inner list contains detection
-            dictionaries for a single frame.
-        """
+        """Tracks objects through a list of frames for a single scene."""
         print(f"  -> Tracking objects across {len(frames)} frames...")
         
-        # Use stream=True for memory-efficient processing of frame lists
         results_generator = self.model.track(
             source=frames, 
             persist=True, 

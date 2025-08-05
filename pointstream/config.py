@@ -7,14 +7,10 @@ import torch
 # --- General Paths ---
 PROJECT_ROOT = Path(__file__).parent.parent
 PACKAGE_ROOT = Path(__file__).parent
-
-# FIX: Point to the new, centralized artifacts directory
 ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
-OUTPUT_DIR = ARTIFACTS_DIR / "pipeline_output" # For main pipeline results
-
+OUTPUT_DIR = ARTIFACTS_DIR / "pipeline_output"
 MODEL_DIR = PACKAGE_ROOT / "models" / "weights"
 
-# Ensure directories exist
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -24,8 +20,13 @@ MOTION_CLASSIFIER_THRESHOLD = 0.5
 MOTION_DOWNSAMPLE_FACTOR = 0.25
 
 # --- Stage 2: Object Detection ---
-STUDENT_MODEL_PATH = MODEL_DIR / "yolo12n.pt"
 DETECTION_CONFIDENCE_THRESHOLD = 0.5
+
+# FIX: Create a model registry to handle multiple student models
+MODEL_REGISTRY = {
+    "general": "yolo12n.pt", # The pre-trained general model
+    "sports": str(MODEL_DIR / "yolo_sports_student.pt") # Path to our future custom model
+}
 
 # --- Stage 4: Foreground Representation ---
 MMPOSE_HUMAN_MODEL_ALIAS = 'human'
