@@ -48,6 +48,8 @@ def _classify_camera_motion(scene_frames: List[np.ndarray]) -> str:
 
     avg_motion = np.mean(magnitudes)
     
+    print(f"     -> Motion analysis: avg_motion={avg_motion:.4f}, threshold={config.MOTION_CLASSIFIER_THRESHOLD}")
+    
     if avg_motion < config.MOTION_CLASSIFIER_THRESHOLD:
         return "STATIC"
     elif avg_motion < config.MOTION_CLASSIFIER_THRESHOLD * 5:

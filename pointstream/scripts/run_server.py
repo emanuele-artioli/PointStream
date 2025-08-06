@@ -3,7 +3,6 @@ Main entry point for the Pointstream server processing pipeline.
 """
 import argparse
 import json
-import time
 from pathlib import Path
 import numpy as np
 from pointstream import config
@@ -38,8 +37,6 @@ def main():
     video_stem = Path(video_path).stem
 
     print(f"Starting Pointstream pipeline for: {video_path}")
-    
-    start_time = time.time()
 
     # --- Get Video Metadata at the Start ---
     props = get_video_properties(video_path)
@@ -60,18 +57,26 @@ def main():
     stage3_gen = stage_03_background.run_background_modeling_pipeline(stage2_gen, Path(args.input_video).stem)
     stage4_gen = stage_04_foreground.run_foreground_pipeline(stage3_gen, args.input_video)
 
-    end_time = time.time()
-    processing_time = end_time - start_time
-
     # --- Structure the Final Output ---
+    scenes_list = list(stage4_gen)
+    
+    # DEBUG: Print scene structure
+    print(f"\n--> DEBUG: Total scenes processed: {len(scenes_list)}")
+    for i, scene in enumerate(scenes_list):
+        print(f"    Scene {i}: keys = {list(scene.keys())}")
+        if 'foreground_objects' in scene:
+            print(f"    Scene {i}: foreground_objects count = {len(scene['foreground_objects'])}")
+            for j, obj in enumerate(scene['foreground_objects']):
+                print(f"      Object {j}: track_id={obj.get('track_id')}, class={obj.get('class_name')}, keypoint_type={obj.get('keypoint_type')}")
+                if 'keypoints' in obj:
+                    print(f"      Object {j}: keypoints shape = {[kp.shape if hasattr(kp, 'shape') else type(kp) for kp in obj['keypoints']]}")
+    
     final_output = {
         "metadata": video_metadata,
-        "scenes": list(stage4_gen),
-        "processing_time": processing_time
+        "scenes": scenes_list
     }
 
     print(f"\n--> Pipeline finished processing all scenes.")
-    print(f"Processing time: {processing_time:.2f} seconds")
 
     output_path = config.OUTPUT_DIR / f"{video_stem}_final_results.json"
     with open(output_path, 'w') as f:

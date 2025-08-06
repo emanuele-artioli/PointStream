@@ -3,7 +3,7 @@
 
 name: pointstream
 channels:
-  - nvidia/label/cuda-12.1.1
+  - nvidia/label/cuda-12.4.0
   - pytorch
   - nvidia
   - conda-forge
@@ -13,11 +13,11 @@ dependencies:
   - python=3.10
   - pip
 
-  # Pytorch and CUDA
-  - pytorch
-  - torchvision
-  - torchaudio
-  - pytorch-cuda=12.1
+  # Pytorch and CUDA (Updated to CUDA 12.4 for compatibility)
+  - pytorch>=2.6.0
+  - torchvision>=0.21.0
+  - torchaudio>=2.6.0
+  - pytorch-cuda=12.4
   - cuda
 
   # Computer Vision & Image Processing
@@ -41,3 +41,14 @@ dependencies:
     - autodistill-grounded-sam
     - pytest
     - natsort
+
+We keep getting these /home/itec/emanuele/.conda/envs/pointstream/lib/python3.10/site-packages/transformers/utils/generic.py:441: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+
+And /home/itec/emanuele/.conda/envs/pointstream/lib/python3.10/site-packages/transformers/utils/generic.py:441: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+
+And: 08/06 15:46:36 - mmengine - WARNING - Failed to search registry with scope "mmpose" in the "function" registry tree. As a workaround, the current "function" registry in "mmengine" is used to build instance. This may cause unexpected failure when running the built modules. Please check whether "mmpose" is a correct scope, or whether the registry is initialized.
+/home/itec/emanuele/.conda/envs/pointstream/lib/python3.10/importlib/__init__.py:169: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  _bootstrap._exec(spec, module)
+Loads checkpoint by http backend from path: https://download.openmmlab.com/mmpose/v1/projects/rtmposev1/rtmdet_m_8xb32-100e_coco-obj365-person-235e8209.pth
+
+Shouldn't we take care of them?

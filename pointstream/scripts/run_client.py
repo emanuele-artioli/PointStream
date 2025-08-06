@@ -2,7 +2,6 @@
 A script to run the client-side video reconstruction.
 """
 import argparse
-import time
 from pathlib import Path
 from pointstream.client.reconstructor import Reconstructor
 
@@ -31,17 +30,11 @@ def main():
     if not output_dir:
         input_stem = json_path.stem.replace('_final_results', '')
         output_dir = Path(f"{input_stem}_reconstructed_scenes")
+    else:
+        output_dir = Path(output_dir)
 
-    print(f"Starting reconstruction from: {json_path}")
-    print(f"Output directory: {output_dir}")
-    
-    start_time = time.time()
     reconstructor = Reconstructor(data_path=str(json_path))
-    reconstructor.run(str(output_dir))
-    end_time = time.time()
-    
-    reconstruction_time = end_time - start_time
-    print(f"Reconstruction completed in {reconstruction_time:.2f} seconds")
+    reconstructor.run(output_dir)
 
 if __name__ == "__main__":
     main()

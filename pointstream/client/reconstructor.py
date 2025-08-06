@@ -49,7 +49,7 @@ class Reconstructor:
             appearance = cv2.imread(obj_data['appearance_path'], cv2.IMREAD_UNCHANGED)
             objects[track_id] = {
                 'appearance': appearance,
-                'keypoints': np.array(obj_data['keypoints']),
+                'keypoints': obj_data['keypoints'],  # Keep as list, don't convert to numpy array
             }
         
         num_frames = scene['end_frame'] - scene['start_frame'] + 1
@@ -62,8 +62,21 @@ class Reconstructor:
                 
                 appearance, keypoints = data['appearance'], data['keypoints'][i]
                 
-                min_x, min_y = np.min(keypoints, axis=0)
-                max_x, max_y = np.max(keypoints, axis=0)
+                # Convert keypoints list to numpy array
+                keypoints = np.array(keypoints)
+                
+                # Handle both 2D and 3D keypoint formats (x,y) or (x,y,confidence)
+                if len(keypoints) == 0:
+                    continue  # Skip if no keypoints
+                
+                if keypoints.shape[-1] == 3:
+                    # Extract only x, y coordinates, ignore confidence
+                    keypoints_2d = keypoints[:, :2]
+                else:
+                    keypoints_2d = keypoints
+                
+                min_x, min_y = np.min(keypoints_2d, axis=0)
+                max_x, max_y = np.max(keypoints_2d, axis=0)
                 
                 dst_pts = np.array([[min_x, min_y], [max_x, min_y], [max_x, max_y]], dtype=np.float32)
                 h, w, _ = appearance.shape
@@ -79,10 +92,11 @@ class Reconstructor:
             
             yield current_frame
 
-    def run(self, output_dir: Path):
+    def run(self, output_dir):
         """
         Runs the reconstruction for all scenes and saves each as a separate video file.
         """
+        output_dir = Path(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
         print(f"\n -> Starting reconstruction. Output will be saved in: {output_dir}")
 

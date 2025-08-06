@@ -48,6 +48,38 @@ coverage.xml
 *.cover
 *.py,cover
 .hypothesis/
+
+# Project-specific artifacts
+artifacts/
+!artifacts/.gitkeep
+!artifacts/pipeline_output/.gitkeep
+!artifacts/training/.gitkeep
+
+# Environment and IDE
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
 .pytest_cache/
 cover/
 

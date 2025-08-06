@@ -6,20 +6,68 @@ import numpy as np
 import cv2
 from pathlib import Path
 from .. import config
-from ..models.mmpose_handler import MMPoseHandler
+try:
+    from ..models.mmpose_handler import MMPoseHandler
+except ImportError:
+    print("[WARNING] MMPose not available, using mock implementation")
+    from ..models.mock_mmpose_handler import MockMMPoseHandler as MMPoseHandler
+
+# Import our new rigid keypoint extractor
+from ..models.rigid_keypoint_extractor import extract_rigid_object_keypoints
 
 Scene = Dict[str, Any]
 
-# ... (_extract_feature_keypoints is unchanged)
 def _extract_feature_keypoints(frames: List[np.ndarray], bboxes: List[List[int]]) -> List[np.ndarray]:
-    print("  -> NOTE: Using placeholder for rigid object keypoint extraction.")
-    return [np.array([[bbox[0], bbox[1]], [bbox[2], bbox[1]], [bbox[2], bbox[2]], [bbox[0], bbox[2]]]) for bbox in bboxes]
+    """
+    Extract meaningful keypoints from rigid objects using computer vision techniques.
+    
+    This replaces the simple bbox corner approach with proper edge detection,
+    corner detection, and feature extraction.
+    """
+    print("  -> Extracting RIGID OBJECT keypoints using CV methods (edge detection, corners, features)...")
+    
+    keypoints_list = []
+    
+    for frame, bbox in zip(frames, bboxes):
+        try:
+            # Convert bbox format from [x1, y1, x2, y2] to [x, y, w, h]
+            x1, y1, x2, y2 = bbox
+            bbox_xywh = [x1, y1, x2 - x1, y2 - y1]
+            
+            # Extract keypoints using our new method
+            keypoints = extract_rigid_object_keypoints(
+                image=frame,
+                bbox=bbox_xywh,
+                max_keypoints=15  # Reasonable number for rigid objects
+            )
+            
+            # Convert to numpy array format expected by the pipeline
+            if keypoints:
+                keypoints_array = np.array(keypoints, dtype=np.float32)
+            else:
+                # Fallback to bbox corners if extraction fails
+                keypoints_array = np.array([
+                    [x1, y1], [x2, y1], [x2, y2], [x1, y2]
+                ], dtype=np.float32)
+            
+            keypoints_list.append(keypoints_array)
+            
+        except Exception as e:
+            print(f"     -> Warning: Error extracting rigid keypoints: {e}")
+            # Fallback to bbox corners
+            x1, y1, x2, y2 = bbox
+            keypoints_array = np.array([
+                [x1, y1], [x2, y1], [x2, y2], [x1, y2]
+            ], dtype=np.float32)
+            keypoints_list.append(keypoints_array)
+    
+    return keypoints_list
 
 
 def run_foreground_pipeline(scene_generator: Generator[Scene, None, None], video_path: str) -> Generator[Scene, None, None]:
     """Orchestrates the foreground representation stage."""
     print("\n--- Starting Stage 4: Foreground Representation (Streaming) ---")
-    mmpose_handler = MMPoseHandler()
+    mmpose_handler = MMPoseHandler('human')  # Use default human model
     video_stem = Path(video_path).stem
 
     for scene in scene_generator:
@@ -65,7 +113,7 @@ def run_foreground_pipeline(scene_generator: Generator[Scene, None, None], video
                     keypoint_type = "mmpose_animal"
                 else:
                     keypoints = _extract_feature_keypoints(obj_frames, bboxes)
-                    keypoint_type = "features_bbox_corners"
+                    keypoint_type = "rigid_cv_features"
 
                 valid_frames_data = [(frame, bbox, kp) for frame, bbox, kp in zip(obj_frames, bboxes, keypoints) if kp.size > 0]
                 if not valid_frames_data:
