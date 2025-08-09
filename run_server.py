@@ -6,6 +6,12 @@ import json
 import time
 from pathlib import Path
 import numpy as np
+
+# Apply warning suppression early
+from pointstream.utils.warning_suppression import suppress_known_warnings, setup_clean_logging
+suppress_known_warnings()
+setup_clean_logging()
+
 from pointstream import config
 from pointstream.pipeline import stage_01_analyzer, stage_02_detector, stage_03_background, stage_04_foreground
 from pointstream.utils.video_utils import get_video_properties

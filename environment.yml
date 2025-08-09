@@ -31,7 +31,8 @@ dependencies:
   - ultralytics
   - numpy<2
   - openmim
-  - transformers=4.36.2
+  - transformers>=4.45.0  # Updated to resolve PyTree deprecation warnings
+  - setuptools>=60.2.0,<70  # Compatible version to reduce pkg_resources warnings
 
   # Pip dependencies
   - pip:

@@ -121,7 +121,7 @@ def main():
         logger.info("=" * 50)
         
         server_cmd = [
-            "python", "run_server.py",
+            "conda", "run", "-n", "pointstream", "python3", "run_server.py",
             "--input-video", str(input_video),
             "--content-type", args.content_type
         ]
@@ -153,7 +153,7 @@ def main():
         logger.info("=" * 50)
         
         client_cmd = [
-            "python", "run_client.py",
+            "conda", "run", "-n", "pointstream", "python3", "run_client.py",
             "--input-json", str(json_results_path),
             "--output-dir", str(reconstructed_dir)
         ]
@@ -183,7 +183,7 @@ def main():
         logger.info("=" * 50)
         
         eval_cmd = [
-            "python", "run_evaluation.py",
+            "conda", "run", "-n", "pointstream", "python3", "run_evaluation.py",
             "--original-video", str(input_video),
             "--json-results", str(json_results_path),
             "--reconstructed-dir", str(reconstructed_dir),

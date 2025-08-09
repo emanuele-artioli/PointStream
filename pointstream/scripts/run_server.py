@@ -8,6 +8,7 @@ import numpy as np
 from pointstream import config
 from pointstream.pipeline import stage_01_analyzer, stage_02_detector, stage_03_background, stage_04_foreground
 from pointstream.utils.video_utils import get_video_properties
+from pointstream.codecs import encode_complex_scene_av1
 
 
 class NumpyEncoder(json.JSONEncoder):
@@ -58,18 +59,32 @@ def main():
     stage4_gen = stage_04_foreground.run_foreground_pipeline(stage3_gen, args.input_video)
 
     # --- Structure the Final Output ---
-    scenes_list = list(stage4_gen)
+    scenes_list = []
     
-    # DEBUG: Print scene structure
-    print(f"\n--> DEBUG: Total scenes processed: {len(scenes_list)}")
-    for i, scene in enumerate(scenes_list):
-        print(f"    Scene {i}: keys = {list(scene.keys())}")
-        if 'foreground_objects' in scene:
-            print(f"    Scene {i}: foreground_objects count = {len(scene['foreground_objects'])}")
-            for j, obj in enumerate(scene['foreground_objects']):
-                print(f"      Object {j}: track_id={obj.get('track_id')}, class={obj.get('class_name')}, keypoint_type={obj.get('keypoint_type')}")
-                if 'keypoints' in obj:
-                    print(f"      Object {j}: keypoints shape = {[kp.shape if hasattr(kp, 'shape') else type(kp) for kp in obj['keypoints']]}")
+    for scene in stage4_gen:
+        # Handle complex scenes with AV1 encoding
+        if scene['motion_type'] == 'COMPLEX':
+            print(f"\n--> Encoding complex scene {scene['scene_index']} with AV1...")
+            
+            # Get original frames back for AV1 encoding
+            if 'frames' not in scene:
+                print(f"    -> Warning: No frames available for complex scene {scene['scene_index']}")
+                scene['av1_encoded_path'] = None
+                scene['av1_file_size'] = 0
+            else:
+                av1_output_path = config.OUTPUT_DIR / f"{video_stem}_scene_{scene['scene_index']}_complex.webm"
+                av1_path = encode_complex_scene_av1(
+                    scene['frames'], 
+                    str(av1_output_path), 
+                    fps=video_metadata['fps']
+                )
+                scene['av1_encoded_path'] = av1_path
+                scene['av1_file_size'] = Path(av1_path).stat().st_size if av1_path else 0
+                
+                # Remove frames to save memory after encoding
+                del scene['frames']
+        
+        scenes_list.append(scene)
     
     final_output = {
         "metadata": video_metadata,

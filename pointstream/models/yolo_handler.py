@@ -42,5 +42,10 @@ class YOLOHandler:
                     current_frame_detections.append(detection)
             
             all_frames_detections.append(current_frame_detections)
+        
+        # Clear CUDA cache after processing scene to prevent memory accumulation
+        import torch
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
             
         return all_frames_detections

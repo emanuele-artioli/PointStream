@@ -8,6 +8,7 @@ import argparse
 import os
 import random
 import shutil
+from datetime import datetime
 from pathlib import Path
 from autodistill_grounded_sam import GroundedSAM
 from autodistill.detection import CaptionOntology

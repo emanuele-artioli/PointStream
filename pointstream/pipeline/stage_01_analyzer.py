@@ -74,18 +74,40 @@ def run_analysis_pipeline(video_path: str) -> Generator[Scene, None, None]:
     print("--- Starting Stage 1: Scene Analysis (Streaming) ---")
     scene_generator = _detect_scenes_stream(video_path, config.SCENE_DETECTOR_THRESHOLD)
     
+    scene_counter = 0
     for i, (scene_frames, start_frame, end_frame) in enumerate(scene_generator):
         if not scene_frames:
             continue
-            
-        motion_type = _classify_camera_motion(scene_frames)
         
-        scene_info: Scene = {
-            "scene_index": i,
-            "start_frame": start_frame,
-            "end_frame": end_frame,
-            "motion_type": motion_type,
-            "frames": scene_frames
-        }
-        print(f"  -> Stage 1 yielding Scene {i} (Frames {start_frame}-{end_frame}): {motion_type}")
-        yield scene_info
+        # Chunk large scenes to prevent memory issues
+        if len(scene_frames) > config.MAX_SCENE_SIZE:
+            print(f"  -> Scene {i} has {len(scene_frames)} frames, chunking into smaller scenes...")
+            for chunk_start in range(0, len(scene_frames), config.MAX_SCENE_SIZE):
+                chunk_end = min(chunk_start + config.MAX_SCENE_SIZE, len(scene_frames))
+                chunk_frames = scene_frames[chunk_start:chunk_end]
+                
+                motion_type = _classify_camera_motion(chunk_frames)
+                
+                scene_info: Scene = {
+                    "scene_index": scene_counter,
+                    "start_frame": start_frame + chunk_start,
+                    "end_frame": start_frame + chunk_end - 1,
+                    "motion_type": motion_type,
+                    "frames": chunk_frames
+                }
+                print(f"  -> Stage 1 yielding Scene {scene_counter} (Frames {start_frame + chunk_start}-{start_frame + chunk_end - 1}): {motion_type} [CHUNKED]")
+                scene_counter += 1
+                yield scene_info
+        else:            
+            motion_type = _classify_camera_motion(scene_frames)
+            
+            scene_info: Scene = {
+                "scene_index": scene_counter,
+                "start_frame": start_frame,
+                "end_frame": end_frame,
+                "motion_type": motion_type,
+                "frames": scene_frames
+            }
+            print(f"  -> Stage 1 yielding Scene {scene_counter} (Frames {start_frame}-{end_frame}): {motion_type}")
+            scene_counter += 1
+            yield scene_info
