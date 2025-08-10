@@ -51,11 +51,11 @@ def main():
         "resolution": [width, height]
     }
 
-    # --- Chain all pipeline stages together ---
+    # --- Chain all pipeline stages together with content type ---
     stage1_gen = stage_01_analyzer.run_analysis_pipeline(args.input_video)
-    # FIX: Pass the selected model_path to the detection stage
-    stage2_gen = stage_02_detector.run_detection_pipeline(stage1_gen, model_path)
-    stage3_gen = stage_03_background.run_background_modeling_pipeline(stage2_gen, Path(args.input_video).stem)
+    # FIX: Pass the selected model_path and content_type to the detection stage
+    stage2_gen = stage_02_detector.run_detection_pipeline(stage1_gen, model_path, args.content_type)
+    stage3_gen = stage_03_background.run_background_modeling_pipeline(stage2_gen, Path(args.input_video).stem, args.content_type)
     stage4_gen = stage_04_foreground.run_foreground_pipeline(stage3_gen, args.input_video)
 
     # --- Structure the Final Output ---

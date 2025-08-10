@@ -71,3 +71,24 @@ MMPOSE_ANIMAL_MODEL_ALIAS = 'animal'
 # Allow forcing CPU usage with environment variable
 FORCE_CPU = os.getenv('POINTSTREAM_FORCE_CPU', 'false').lower() == 'true'
 DEVICE = 'cpu' if FORCE_CPU else ('cuda:0' if torch.cuda.is_available() else 'cpu')
+
+# --- Adaptive Inpainting & Tracking ---
+# ProPainter settings - chunk-level with frame fallback
+PROPAINTER_PATH = "/home/itec/emanuele/ProPainter"
+PROPAINTER_TIMEOUT = 30  # seconds per chunk
+ENABLE_PROPAINTER = True
+MIN_FRAMES_FOR_PROPAINTER = 3  # Minimum frames to use ProPainter
+PROPAINTER_COMPLEXITY_THRESHOLD = 0.4  # Use ProPainter if chunk complexity > this
+
+# Enhanced tracking settings - YOLO with adaptive thresholds
+ENABLE_DEEPSORT_FALLBACK = False  # Currently disabled, for future enhancement
+TRACKING_QUALITY_CHECK_FRAMES = 10  # Check quality every N frames
+
+# Adaptive threshold learning
+METRICS_CACHE_FILE = "pointstream_metrics_cache.json"
+MIN_SAMPLES_FOR_LEARNING = 5  # Minimum samples before learning thresholds
+ADAPTIVE_LEARNING_RATE = 0.1  # How quickly to adapt thresholds
+
+# Quality scoring weights for metrics
+MASK_SIZE_WEIGHT = 0.6
+MASK_COMPLEXITY_WEIGHT = 0.4

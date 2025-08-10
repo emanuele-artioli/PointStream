@@ -1,5 +1,5 @@
 """
-Stage 3: Background Modeling.
+Stage 3: Background Modeling with Enhanced Adaptive Inpainting.
 """
 from typing import Dict, Any, Generator, List, Tuple, Optional
 import numpy as np
@@ -7,8 +7,28 @@ import cv2
 from pathlib import Path
 from .. import config
 from ..models.segmentation_handler import get_segmentation_handler
+from ..models.propainter_manager import ProPainterManager
+from ..utils.enhanced_processing import EnhancedBackgroundInpainter
 
 Scene = Dict[str, Any] # Type alias for clarity
+
+# Initialize managers
+_propainter_manager = None
+_enhanced_inpainter = None
+
+def get_propainter_manager():
+    """Get or create ProPainter manager instance."""
+    global _propainter_manager
+    if _propainter_manager is None:
+        _propainter_manager = ProPainterManager()
+    return _propainter_manager
+
+def get_enhanced_inpainter():
+    """Get or create enhanced inpainter instance."""
+    global _enhanced_inpainter
+    if _enhanced_inpainter is None:
+        _enhanced_inpainter = EnhancedBackgroundInpainter()
+    return _enhanced_inpainter
 
 def _create_object_masks_from_detections(frame: np.ndarray, detections: List[Dict[str, Any]]) -> np.ndarray:
     """Create precise segmentation masks for all detected objects in a frame."""
@@ -16,7 +36,7 @@ def _create_object_masks_from_detections(frame: np.ndarray, detections: List[Dic
     return segmentation_handler.create_precise_masks(frame, detections)
 
 def _inpaint_background(frame: np.ndarray, mask: np.ndarray) -> np.ndarray:
-    """Inpaint masked regions using OpenCV's inpainting algorithm."""
+    """Inpaint masked regions using OpenCV's inpainting algorithm (fallback method)."""
     if np.sum(mask) == 0:  # No objects to inpaint
         return frame
     
@@ -24,24 +44,39 @@ def _inpaint_background(frame: np.ndarray, mask: np.ndarray) -> np.ndarray:
     inpainted = cv2.inpaint(frame, mask, inpaintRadius=3, flags=cv2.INPAINT_NS)
     return inpainted
 
+def _inpaint_frame_chunk_adaptive(frames: List[np.ndarray], 
+                                 frame_masks: List[np.ndarray],
+                                 content_type: str = "general") -> List[np.ndarray]:
+    """Inpaint frame chunk using adaptive ProPainter/OpenCV selection."""
+    propainter_manager = get_propainter_manager()
+    return propainter_manager.inpaint_scene_chunk(frames, frame_masks, content_type)
+
 def _create_static_background_with_inpainting(frames: List[np.ndarray], 
-                                            frame_detections: List[List[Dict[str, Any]]]) -> np.ndarray:
-    """Creates a clean background by taking the first frame and inpainting foreground objects."""
-    print("  -> Creating background from first frame with foreground inpainting...")
+                                            frame_detections: List[List[Dict[str, Any]]],
+                                            content_type: str = "general") -> np.ndarray:
+    """Creates a clean background using enhanced adaptive inpainting."""
+    print("  -> Creating enhanced background with multiple methods...")
     
-    # Use the first frame as base
-    base_frame = frames[0].copy()
+    # Use enhanced background inpainter for better results
+    enhanced_inpainter = get_enhanced_inpainter()
     
-    # Create mask for all detected objects in the first frame
-    if frame_detections and len(frame_detections) > 0:
-        object_mask = _create_object_masks_from_detections(base_frame, frame_detections[0])
-        
-        # Inpaint the masked regions
-        background = _inpaint_background(base_frame, object_mask)
-        print(f"     -> Inpainted {np.sum(object_mask > 0)} pixels")
-    else:
-        background = base_frame
-        print("     -> No objects detected, using first frame as-is")
+    # Flatten detections for enhanced processing
+    all_detections = []
+    for frame_idx, frame_dets in enumerate(frame_detections):
+        for det in frame_dets:
+            det_copy = det.copy()
+            det_copy['frame_id'] = frame_idx
+            all_detections.append(det_copy)
+    
+    # Create scene info
+    scene_info = {
+        'content_type': content_type,
+        'frame_count': len(frames),
+        'detection_count': len(all_detections)
+    }
+    
+    # Create enhanced background
+    background = enhanced_inpainter.create_enhanced_background(frames, all_detections, scene_info)
     
     return background
 
@@ -111,7 +146,8 @@ def _calculate_camera_motion(frames: List[np.ndarray]) -> Tuple[List[np.ndarray]
 
 def _create_panorama_background(frames: List[np.ndarray], 
                               motion_matrices: List[np.ndarray],
-                              frame_detections: List[List[Dict[str, Any]]]) -> np.ndarray:
+                              frame_detections: List[List[Dict[str, Any]]],
+                              content_type: str = "general") -> np.ndarray:
     """Creates a panoramic background by stitching frames with proper cumulative motion."""
     print("  -> Creating panoramic background by stitching frames...")
     
@@ -149,11 +185,13 @@ def _create_panorama_background(frames: List[np.ndarray],
         if matrix is None:
             continue
             
-        # Remove foreground objects from frame
+        # Remove foreground objects from frame using adaptive inpainting
         clean_frame = frame.copy()
         if i < len(frame_detections) and frame_detections[i]:
             object_mask = _create_object_masks_from_detections(clean_frame, frame_detections[i])
-            clean_frame = _inpaint_background(clean_frame, object_mask)
+            # Use adaptive inpainting for single frame
+            inpainted_frames = _inpaint_frame_chunk_adaptive([clean_frame], [object_mask], content_type)
+            clean_frame = inpainted_frames[0]
         
         # Calculate position for this frame
         dx, dy = matrix[0, 2], matrix[1, 2]
@@ -204,7 +242,9 @@ def _create_panorama_background(frames: List[np.ndarray],
     
     return panorama
 
-def run_background_modeling_pipeline(scene_generator: Generator[Scene, None, None], video_stem: str) -> Generator[Scene, None, None]:
+def run_background_modeling_pipeline(scene_generator: Generator[Scene, None, None], 
+                                    video_stem: str, 
+                                    content_type: str = "general") -> Generator[Scene, None, None]:
     """Orchestrates the background modeling stage in a streaming fashion."""
     print("\n--- Starting Stage 3: Background Modeling (Streaming) ---")
     
@@ -218,15 +258,15 @@ def run_background_modeling_pipeline(scene_generator: Generator[Scene, None, Non
         avg_motion_vector = np.array([0.0, 0.0])
 
         if scene['motion_type'] == 'STATIC':
-            # For static scenes: take first frame, remove foreground objects, inpaint
-            background_image = _create_static_background_with_inpainting(frames, detections)
+            # For static scenes: take first frame, remove foreground objects, inpaint with adaptive method
+            background_image = _create_static_background_with_inpainting(frames, detections, content_type)
             identity_matrix = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
             camera_motion = [identity_matrix] * len(frames)
         
         elif scene['motion_type'] == 'SIMPLE':
             # For simple motion: calculate motion and create panorama
             motion_matrices, avg_motion_vector = _calculate_camera_motion(frames)
-            background_image = _create_panorama_background(frames, motion_matrices, detections)
+            background_image = _create_panorama_background(frames, motion_matrices, detections, content_type)
             camera_motion = motion_matrices
         
         else: # COMPLEX scene
