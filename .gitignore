@@ -90,3 +90,4 @@ models/*.ckpt
 # Generated files
 generated/
 reconstructed/
+*.pt
