@@ -66,8 +66,12 @@ class ObjectSegmentationInpainter:
         self.model_name = model_name or config.get_str('segmentation', 'yolo_model', 'yolov8n-seg.pt')
         self.confidence_threshold = config.get_float('segmentation', 'confidence_threshold', 0.25)
         self.iou_threshold = config.get_float('segmentation', 'iou_threshold', 0.7)
-        self.max_objects = config.get_int('segmentation', 'max_objects_per_scene', 3)
+        self.max_objects = config.get_int('segmentation', 'max_objects_per_frame', 3)
         self.device = config.get_str('segmentation', 'device', 'auto')
+        
+        # YOLO class filtering (empty list = all classes)
+        classes_config = config.get_list('segmentation', 'classes', [])
+        self.classes = classes_config if classes_config else None
         
         # Get inpainting configuration
         self.inpaint_method = config.get_str('inpainting', 'method', 'telea')  # 'telea' or 'navier_stokes'
@@ -75,10 +79,13 @@ class ObjectSegmentationInpainter:
         self.dilate_mask = config.get_bool('inpainting', 'dilate_mask', True)
         self.dilate_kernel_size = config.get_int('inpainting', 'dilate_kernel_size', 3)
         
-        # Object tracking configuration
-        self.tracking_strategy = config.get_str('object_tracking', 'strategy', 'confidence')  # 'confidence', 'size', 'center'
+        # Custom selection strategy (applied after YOLO's built-in filtering)
+        self.selection_strategy = config.get_str('object_tracking', 'selection_strategy', 'confidence')
         self.min_object_area = config.get_int('object_tracking', 'min_object_area', 500)
-        self.exclude_classes = config.get_list('object_tracking', 'exclude_classes', [])
+        
+        # Output format configuration
+        self.object_format = config.get_str('object_output', 'object_image_format', 'png')
+        self.background_format = config.get_str('object_output', 'background_image_format', 'png')
         
         # Performance tracking
         self.processing_times = []
@@ -91,8 +98,10 @@ class ObjectSegmentationInpainter:
         logging.info(f"Object Segmentation Inpainter initialized")
         logging.info(f"YOLO model: {self.model_name}")
         logging.info(f"Device: {self.device}")
-        logging.info(f"Max objects per scene: {self.max_objects}")
-        logging.info(f"Confidence threshold: {self.confidence_threshold}")
+        logging.info(f"Max objects per frame (YOLO max_det): {self.max_objects}")
+        logging.info(f"Confidence threshold (YOLO): {self.confidence_threshold}")
+        logging.info(f"Classes filter (YOLO): {self.classes or 'All classes'}")
+        logging.info(f"Custom selection strategy: {self.selection_strategy}")
         logging.info(f"Inpainting method: {self.inpaint_method}")
         logging.info(f"Saving enabled: {self.enable_saving}")
 
@@ -112,18 +121,16 @@ class ObjectSegmentationInpainter:
             logging.error(f"Error loading YOLO model: {e}")
             raise
 
-    def _select_important_objects(self, results, strategy: str = None) -> List[Dict]:
+    def _extract_objects_from_track_results(self, results) -> List[Dict]:
         """
-        Select the most important objects from YOLO detection results.
+        Extract objects from YOLO track results.
         
         Args:
-            results: YOLO detection results
-            strategy: Selection strategy ('confidence', 'size', 'center')
+            results: YOLO track results (already filtered by YOLO's max_det and classes)
             
         Returns:
-            List of object dictionaries with detection info
+            List of object dictionaries with detection and tracking info
         """
-        strategy = strategy or self.tracking_strategy
         objects = []
         
         if len(results) == 0 or results[0].masks is None:
@@ -136,7 +143,7 @@ class ObjectSegmentationInpainter:
         if boxes is None or masks is None:
             return objects
         
-        # Extract object information
+        # Extract object information from tracked results
         for i in range(len(boxes)):
             box = boxes[i]
             mask = masks[i]
@@ -146,18 +153,15 @@ class ObjectSegmentationInpainter:
             confidence = float(box.conf.cpu().numpy())
             class_name = self.model.names[class_id]
             
-            # Skip if below confidence threshold
-            if confidence < self.confidence_threshold:
-                continue
+            # Get track ID if available (from YOLO tracking)
+            track_id = None
+            if hasattr(box, 'id') and box.id is not None:
+                track_id = int(box.id.cpu().numpy())
             
-            # Skip excluded classes
-            if class_name in self.exclude_classes:
-                continue
-            
-            # Get mask data (now at original image resolution)
+            # Get mask data (at original image resolution due to retina_masks=True)
             mask_data = mask.data[0].cpu().numpy().astype(np.uint8)
             
-            # Check minimum area
+            # Check minimum area (only additional filter we apply)
             mask_area = np.sum(mask_data)
             if mask_area < self.min_object_area:
                 continue
@@ -174,6 +178,7 @@ class ObjectSegmentationInpainter:
             size = (x2 - x1) * (y2 - y1)
             
             objects.append({
+                'track_id': track_id,
                 'class_id': class_id,
                 'class_name': class_name,
                 'confidence': confidence,
@@ -185,21 +190,48 @@ class ObjectSegmentationInpainter:
                 'index': i
             })
         
-        # Sort objects based on strategy
+        return objects
+
+    def _apply_selection_strategy(self, objects: List[Dict], strategy: str = None) -> List[Dict]:
+        """
+        Apply custom selection strategy to objects that have already been filtered by YOLO.
+        YOLO has already applied max_det (keeping top confidence detections) and class filtering.
+        
+        Args:
+            objects: List of objects already filtered by YOLO
+            strategy: Selection strategy ('confidence', 'size', 'center', 'area')
+            
+        Returns:
+            List of objects after applying the strategy
+        """
+        if not objects:
+            return objects
+        
+        strategy = strategy or self.selection_strategy
+        
+        # Apply custom sorting strategy
         if strategy == 'confidence':
+            # Sort by confidence (highest first) - this is redundant since YOLO already does this with max_det
             objects.sort(key=lambda x: x['confidence'], reverse=True)
         elif strategy == 'size':
+            # Sort by bounding box size (largest first)
             objects.sort(key=lambda x: x['size'], reverse=True)
         elif strategy == 'center':
-            # Sort by distance from image center
+            # Sort by distance from image center (closest first)
             if objects:
                 img_h, img_w = objects[0]['mask'].shape
                 img_center = (img_w / 2, img_h / 2)
                 objects.sort(key=lambda x: np.sqrt((x['center'][0] - img_center[0])**2 + 
                                                  (x['center'][1] - img_center[1])**2))
+        elif strategy == 'area':
+            # Sort by mask area (largest first)
+            objects.sort(key=lambda x: x['mask_area'], reverse=True)
         
-        # Return top N objects
-        return objects[:self.max_objects]
+        # Note: We don't limit the number here since YOLO's max_det already did that
+        # But we could add an additional limit if needed:
+        # return objects[:self.max_objects]
+        
+        return objects
 
     def _create_combined_mask(self, objects: List[Dict], image_shape: Tuple[int, int]) -> np.ndarray:
         """
@@ -292,9 +324,10 @@ class ObjectSegmentationInpainter:
     def _save_scene_data(self, scene_data: Dict[str, Any], scene_number: int) -> Dict[str, Any]:
         """
         Save processed scene data to files (if saving is enabled).
+        Now handles frame-by-frame processing data.
         
         Args:
-            scene_data: Processed scene data
+            scene_data: Processed scene data with frames_data
             scene_number: Scene number for file naming
             
         Returns:
@@ -304,52 +337,67 @@ class ObjectSegmentationInpainter:
             return scene_data
         
         saving_start = time.time()
-        saved_files = {}
+        saved_files = []
         
         try:
-            # Save background image
-            if 'inpainted_background' in scene_data:
-                bg_filename = f"scene_{scene_number:04d}_background.png"
-                bg_path = self.output_dir / "backgrounds" / bg_filename
-                cv2.imwrite(str(bg_path), scene_data['inpainted_background'])
-                saved_files['background_file'] = str(bg_path)
+            frames_data = scene_data.get('frames_data', [])
             
-            # Save combined mask
-            if 'combined_mask' in scene_data:
-                mask_filename = f"scene_{scene_number:04d}_mask.png"
-                mask_path = self.output_dir / "masks" / mask_filename
-                cv2.imwrite(str(mask_path), scene_data['combined_mask'] * 255)
-                saved_files['mask_file'] = str(mask_path)
-            
-            # Save individual object images
-            if 'object_images' in scene_data:
-                object_files = []
-                for i, obj_img in enumerate(scene_data['object_images']):
-                    obj_info = scene_data['objects'][i]
-                    class_name = obj_info['class_name']
-                    confidence = obj_info['confidence']
-                    
-                    obj_filename = f"scene_{scene_number:04d}_obj_{i+1}_{class_name}_{confidence:.2f}.png"
-                    obj_path = self.output_dir / "objects" / obj_filename
-                    cv2.imwrite(str(obj_path), obj_img)
-                    object_files.append(str(obj_path))
+            # Process each frame's data
+            for frame_data in frames_data:
+                frame_idx = frame_data['frame_index']
+                frame_saved_files = {}
                 
-                saved_files['object_files'] = object_files
+                # Save background image for this frame
+                if 'inpainted_background' in frame_data:
+                    bg_filename = f"scene_{scene_number:04d}_frame_{frame_idx:04d}_background.{self.background_format}"
+                    bg_path = self.output_dir / "backgrounds" / bg_filename
+                    cv2.imwrite(str(bg_path), frame_data['inpainted_background'])
+                    frame_saved_files['background_file'] = str(bg_path)
+                
+                # Save combined mask for this frame
+                if 'combined_mask' in frame_data:
+                    mask_filename = f"scene_{scene_number:04d}_frame_{frame_idx:04d}_mask.png"
+                    mask_path = self.output_dir / "masks" / mask_filename
+                    cv2.imwrite(str(mask_path), frame_data['combined_mask'] * 255)
+                    frame_saved_files['mask_file'] = str(mask_path)
+                
+                # Save individual object images for this frame
+                if 'object_images' in frame_data and frame_data['object_images']:
+                    object_files = []
+                    for i, obj_img in enumerate(frame_data['object_images']):
+                        obj_info = frame_data['objects'][i]
+                        class_name = obj_info['class_name']
+                        confidence = obj_info['confidence']
+                        track_id = obj_info.get('track_id', 'unknown')
+                        
+                        obj_filename = f"scene_{scene_number:04d}_frame_{frame_idx:04d}_track_{track_id}_{class_name}_{confidence:.2f}.{self.object_format}"
+                        obj_path = self.output_dir / "objects" / obj_filename
+                        cv2.imwrite(str(obj_path), obj_img)
+                        object_files.append(str(obj_path))
+                    
+                    frame_saved_files['object_files'] = object_files
+                
+                # Add frame metadata
+                frame_saved_files['frame_index'] = frame_idx
+                frame_saved_files['objects'] = frame_data.get('objects', [])
+                frame_saved_files['num_objects'] = frame_data.get('num_objects_detected', 0)
+                frame_saved_files['processing_time'] = frame_data.get('processing_time', 0)
+                
+                saved_files.append(frame_saved_files)
             
-            # Save metadata
+            # Save scene-level metadata
             metadata = {
                 'scene_number': scene_number,
-                'objects': scene_data.get('objects', []),
+                'total_frames_processed': scene_data.get('total_frames_processed', 0),
+                'total_objects_detected': scene_data.get('total_objects_detected', 0),
                 'processing_time': scene_data.get('processing_time', 0),
-                'num_objects': len(scene_data.get('objects', [])),
-                'original_frame_count': scene_data.get('original_frame_count', 0)
+                'frames_data': saved_files
             }
             
             metadata_filename = f"scene_{scene_number:04d}_metadata.json"
             metadata_path = self.output_dir / metadata_filename
             with open(metadata_path, 'w') as f:
                 json.dump(metadata, f, indent=2, default=str)
-            saved_files['metadata_file'] = str(metadata_path)
             
             saving_time = time.time() - saving_start
             self.saving_times.append(saving_time)
@@ -358,7 +406,7 @@ class ObjectSegmentationInpainter:
             scene_data['saved_files'] = saved_files
             scene_data['saving_time'] = saving_time
             
-            logging.info(f"Scene {scene_number} files saved in {saving_time:.3f}s")
+            logging.info(f"Scene {scene_number} files saved in {saving_time:.3f}s ({len(frames_data)} frames)")
             
         except Exception as e:
             logging.error(f"Error saving scene {scene_number} files: {e}")
@@ -403,62 +451,92 @@ class ObjectSegmentationInpainter:
             processing_start = time.time()
             
             try:
-                # Process the first frame of the scene for object detection
-                # In a more sophisticated version, you might process multiple frames
-                # or use temporal information for better tracking
-                representative_frame = scene_data['frames'][0]  # Use first frame as representative
+                # Process every frame of the scene using YOLO tracking
+                frames = scene_data['frames']
+                frame_processing_data = []
+                total_objects_in_scene = 0
                 
-                # Run YOLO segmentation with retina_masks=True to get masks at original resolution
-                results = self.model(representative_frame, 
-                                   conf=self.confidence_threshold,
-                                   iou=self.iou_threshold,
-                                   device=self.device,
-                                   retina_masks=True)
-                
-                # Select important objects
-                objects = self._select_important_objects(results)
-                
-                # Create combined mask
-                if objects:
-                    combined_mask = self._create_combined_mask(objects, representative_frame.shape[:2])
+                # Process each frame individually with tracking
+                for frame_idx, frame in enumerate(frames):
+                    frame_start_time = time.time()
                     
-                    # Inpaint background
-                    inpainted_background = self._inpaint_background(representative_frame, combined_mask)
+                    # Run YOLO tracking with built-in filtering first:
+                    # - conf: confidence threshold filter
+                    # - iou: non-maximum suppression threshold  
+                    # - max_det: maximum detections per frame (keeps top confidence objects)
+                    # - classes: class ID filter (None = all classes)
+                    # - retina_masks: get masks at original resolution
+                    results = self.model.track(frame, 
+                                             conf=self.confidence_threshold,
+                                             iou=self.iou_threshold,
+                                             device=self.device,
+                                             retina_masks=True,
+                                             max_det=self.max_objects,
+                                             classes=self.classes,
+                                             verbose=False,
+                                             persist=True)  # Persist tracks across frames
                     
-                    # Extract object images
-                    object_images = self._extract_object_images(representative_frame, objects)
-                else:
-                    # No objects detected
-                    combined_mask = np.zeros(representative_frame.shape[:2], dtype=np.uint8)
-                    inpainted_background = representative_frame.copy()
-                    object_images = []
+                    # Extract objects from YOLO's filtered and tracked results
+                    objects = self._extract_objects_from_track_results(results)
+                    
+                    # Apply our custom selection strategy to YOLO's filtered objects
+                    selected_objects = self._apply_selection_strategy(objects)
+                    
+                    total_objects_in_scene += len(selected_objects)
+                    
+                    # Create combined mask
+                    if selected_objects:
+                        combined_mask = self._create_combined_mask(selected_objects, frame.shape[:2])
+                        
+                        # Inpaint background
+                        inpainted_background = self._inpaint_background(frame, combined_mask)
+                        
+                        # Extract object images
+                        object_images = self._extract_object_images(frame, selected_objects)
+                    else:
+                        # No objects detected
+                        combined_mask = np.zeros(frame.shape[:2], dtype=np.uint8)
+                        inpainted_background = frame.copy()
+                        object_images = []
+                    
+                    frame_processing_time = time.time() - frame_start_time
+                    
+                    # Store frame processing data
+                    frame_data = {
+                        'frame_index': frame_idx,
+                        'frame': frame,
+                        'objects': [
+                            {
+                                'track_id': obj['track_id'],
+                                'class_id': obj['class_id'],
+                                'class_name': obj['class_name'],
+                                'confidence': obj['confidence'],
+                                'bbox': obj['bbox'].tolist(),
+                                'center': obj['center'],
+                                'size': obj['size'],
+                                'mask_area': obj['mask_area']
+                            } for obj in selected_objects
+                        ],
+                        'object_images': object_images,
+                        'combined_mask': combined_mask,
+                        'inpainted_background': inpainted_background,
+                        'processing_time': frame_processing_time,
+                        'num_objects_detected': len(selected_objects)
+                    }
+                    frame_processing_data.append(frame_data)
                 
                 processing_time = time.time() - processing_start
                 self.processing_times.append(processing_time)
                 self.processed_scenes += 1
                 
-                # Create processed scene data
+                # Create processed scene data with all frames
                 processed_data = {
                     'scene_number': scene_data.get('scene_number'),
                     'original_scene_data': scene_data,  # Keep original data
-                    'representative_frame': representative_frame,
-                    'objects': [
-                        {
-                            'class_id': obj['class_id'],
-                            'class_name': obj['class_name'],
-                            'confidence': obj['confidence'],
-                            'bbox': obj['bbox'].tolist(),
-                            'center': obj['center'],
-                            'size': obj['size'],
-                            'mask_area': obj['mask_area']
-                        } for obj in objects
-                    ],
-                    'object_images': object_images,
-                    'combined_mask': combined_mask,
-                    'inpainted_background': inpainted_background,
+                    'frames_data': frame_processing_data,  # All processed frames
                     'processing_time': processing_time,
-                    'num_objects_detected': len(objects),
-                    'original_frame_count': len(scene_data['frames']),
+                    'total_objects_detected': total_objects_in_scene,
+                    'total_frames_processed': len(frames),
                     'processing_timestamp': time.time()
                 }
                 
@@ -467,13 +545,19 @@ class ObjectSegmentationInpainter:
                 
                 # Log processing info
                 scene_num = scene_data.get('scene_number', '?')
-                logging.info(f"Scene {scene_num}: detected {len(objects)} objects, "
+                frames_processed = len(frame_processing_data)
+                
+                logging.info(f"Scene {scene_num}: processed {frames_processed} frames, "
+                           f"detected {total_objects_in_scene} total objects, "
                            f"processed in {processing_time:.3f}s")
                 
-                if objects:
-                    obj_names = [obj['class_name'] for obj in objects]
-                    obj_confs = [f"{obj['confidence']:.2f}" for obj in objects]
-                    logging.info(f"  Objects: {', '.join([f'{name}({conf})' for name, conf in zip(obj_names, obj_confs)])}")
+                # Log sample of objects found (from first frame with objects)
+                sample_frame_with_objects = next((fd for fd in frame_processing_data if fd['objects']), None)
+                if sample_frame_with_objects:
+                    obj_names = [obj['class_name'] for obj in sample_frame_with_objects['objects']]
+                    obj_confs = [f"{obj['confidence']:.2f}" for obj in sample_frame_with_objects['objects']]
+                    track_ids = [str(obj.get('track_id', 'N/A')) for obj in sample_frame_with_objects['objects']]
+                    logging.info(f"  Sample objects: {', '.join([f'{name}({conf},id:{tid})' for name, conf, tid in zip(obj_names, obj_confs, track_ids)])}")
                 
                 yield processed_data
                 
@@ -504,7 +588,9 @@ class ObjectSegmentationInpainter:
                 'model_name': self.model_name,
                 'device': self.device,
                 'confidence_threshold': self.confidence_threshold,
-                'max_objects': self.max_objects
+                'max_objects_per_frame': self.max_objects,
+                'classes_filter': self.classes,
+                'selection_strategy': self.selection_strategy
             }
         }
 

@@ -20,12 +20,17 @@ Video Scene Splitter → Object Segmentation Inpainter → Next Pipeline Stage
 
 The pipeline follows these steps:
 1. **Scene Detection**: Video is split into scenes with frame extraction
-2. **Object Detection**: YOLO processes representative frames to detect objects
-3. **Object Selection**: Selects top N objects based on configured strategy
-4. **Mask Creation**: Creates individual and combined masks for detected objects
-5. **Object Extraction**: Extracts object images with transparency
-6. **Background Inpainting**: Removes objects from background using inpainting
-7. **Data Yielding**: Yields processed data for downstream stages
+2. **YOLO Filtering**: YOLO processes frames with built-in filtering:
+   - Confidence threshold filtering
+   - Non-maximum suppression (IoU)
+   - Maximum detections per frame (top confidence)
+   - Class filtering (if specified)
+3. **Custom Selection**: Additional filtering using custom strategies
+4. **Object Tracking**: Track objects across frames using YOLO's built-in tracking
+5. **Mask Creation**: Creates individual and combined masks for detected objects
+6. **Object Extraction**: Extracts object images with transparency
+7. **Background Inpainting**: Removes objects from background using inpainting
+8. **Data Yielding**: Yields processed data for downstream stages
 
 ## Quick Start
 
@@ -56,17 +61,18 @@ All parameters are configured in `config.ini`. Key sections:
 
 ### [segmentation]
 ```ini
-yolo_model = yolov8n-seg.pt    # YOLO model size
-confidence_threshold = 0.25     # Detection confidence threshold
-max_objects_per_scene = 3      # Max objects to track per scene
-device = auto                  # Processing device (auto/cpu/cuda)
+yolo_model = yolov8n-seg.pt      # YOLO model size
+confidence_threshold = 0.25       # YOLO detection confidence threshold
+iou_threshold = 0.7              # YOLO non-maximum suppression threshold
+max_objects_per_frame = 3        # YOLO max detections per frame
+device = auto                    # Processing device (auto/cpu/cuda)
+classes = []                     # YOLO class IDs to include (empty = all classes)
 ```
 
 ### [object_tracking]
 ```ini
-strategy = confidence          # Selection strategy
-min_object_area = 500         # Minimum object size
-exclude_classes = []          # Classes to ignore
+selection_strategy = confidence   # Custom selection strategy after YOLO filtering
+min_object_area = 500            # Minimum object area in pixels
 ```
 
 ### [inpainting]
@@ -86,16 +92,29 @@ Available YOLO segmentation models (speed vs accuracy tradeoff):
 - **yolov8l-seg.pt**: Large (high accuracy)
 - **yolov8x-seg.pt**: Extra Large (highest accuracy, slowest)
 
-## Object Selection Strategies
+## Object Selection Workflow
 
-### Confidence (default)
-Selects objects with highest detection confidence scores.
+The pipeline uses a two-stage filtering process:
 
-### Size
+### Stage 1: YOLO's Built-in Filtering
+- **Confidence Threshold**: Filters detections below minimum confidence
+- **IoU Threshold**: Non-maximum suppression to remove overlapping detections
+- **Max Detections**: Keeps only the top N highest-confidence objects per frame
+- **Class Filtering**: Optionally filters by specific object classes (person, car, etc.)
+
+### Stage 2: Custom Selection Strategies
+
+#### Confidence (default)
+Selects objects with highest detection confidence scores (redundant after YOLO's max_det but available for consistency).
+
+#### Size
 Selects largest objects by bounding box area.
 
-### Center
+#### Center
 Selects objects closest to the image center.
+
+#### Area
+Selects objects with the largest mask area.
 
 ## Output Data Structure
 
