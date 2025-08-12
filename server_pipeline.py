@@ -165,19 +165,26 @@ def process_video_pipeline(input_video: str, output_dir: str = None,
                     print(f"  Optional object saving: {object_saving_time:.3f}s")
                 
                 print()
-                print("THROUGHPUT (Production metrics - what matters for real-time):")
-                production_fps = summary.get('production_frames_per_second', summary.get('frames_per_second_processing', 0))
-                production_rtf = summary.get('production_real_time_factor', summary.get('real_time_factor', 0))
+                print("THROUGHPUT (TRUE Production metrics - including object processing):")
+                
+                # Calculate true production metrics including object processing
+                video_duration = summary.get('total_frames', 0) / summary.get('video_fps', 24) if summary.get('video_fps', 0) > 0 else 0
+                true_production_fps = summary.get('total_frames', 0) / true_production_time if true_production_time > 0 else 0
+                true_production_rtf = video_duration / true_production_time if true_production_time > 0 else 0
+                
+                scene_fps = summary.get('production_frames_per_second', summary.get('frames_per_second_processing', 0))
                 obj_fps = obj_summary.get('processing_fps', 0)
                 
-                print(f"  Scene processing: {production_fps:.1f} frames/second")
+                print(f"  Scene processing: {scene_fps:.1f} frames/second")
                 print(f"  Object processing: {obj_fps:.1f} scenes/second") 
-                print(f"  PRODUCTION real-time factor: {production_rtf:.2f}x")
+                print(f"  TRUE PRODUCTION real-time factor: {true_production_rtf:.2f}x")
+                print(f"  TRUE PRODUCTION throughput: {true_production_fps:.1f} frames/second")
                 
-                if production_rtf >= 1.0:
+                if true_production_rtf >= 1.0:
                     print(f"  ✅ Pipeline is faster than real-time for PRODUCTION use!")
                 else:
                     print(f"  ⚠️  Pipeline is slower than real-time for production use")
+                    print(f"  📊 Need {1.0/true_production_rtf:.1f}x speedup to achieve real-time")
                     
                 if stats_time > 0 or (enable_saving and summary.get('total_encoding_time', 0) > 0):
                     print(f"  ℹ️  Optional operations (stats/encoding) add overhead - disable for production")
