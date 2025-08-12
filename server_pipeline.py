@@ -141,29 +141,46 @@ def process_video_pipeline(input_video: str, output_dir: str = None,
                 print(f"Pipeline duration: {pipeline_duration:.3f}s")
                 print()
                 print("PERFORMANCE BREAKDOWN:")
-                print(f"  Scene processing: {summary.get('total_processing_time', 0):.3f}s")
-                print(f"  Object processing: {obj_summary.get('total_processing_time', 0):.3f}s")
+                # Calculate TRUE production time including object processing
+                scene_production_time = summary.get('production_processing_time', summary.get('total_processing_time', 0))
+                object_processing_time = obj_summary.get('total_processing_time', 0)
+                true_production_time = scene_production_time + object_processing_time
+                
+                core_detection_time = summary.get('core_scene_detection_time', 0)
+                frame_extraction_time = summary.get('frame_extraction_time', 0)
+                stats_time = summary.get('stats_collection_time', 0)
+                
+                print(f"  TRUE PRODUCTION time (scene + object): {true_production_time:.3f}s")
+                print(f"    - Scene processing: {scene_production_time:.3f}s")
+                print(f"      - Core scene detection: {core_detection_time:.3f}s")
+                print(f"      - Frame extraction: {frame_extraction_time:.3f}s")
+                print(f"    - Object processing: {object_processing_time:.3f}s")
+                if stats_time > 0:
+                    print(f"  Optional stats collection: {stats_time:.3f}s")
                 
                 if enable_saving:
                     scene_encoding_time = summary.get('total_encoding_time', 0)
                     object_saving_time = obj_summary.get('total_saving_time', 0)
-                    print(f"  Scene encoding: {scene_encoding_time:.3f}s")
-                    print(f"  Object saving: {object_saving_time:.3f}s")
+                    print(f"  Optional scene encoding: {scene_encoding_time:.3f}s")
+                    print(f"  Optional object saving: {object_saving_time:.3f}s")
                 
                 print()
-                print("THROUGHPUT:")
-                scene_fps = summary.get('frames_per_second_processing', 0)
-                real_time_factor = summary.get('real_time_factor', 0)
+                print("THROUGHPUT (Production metrics - what matters for real-time):")
+                production_fps = summary.get('production_frames_per_second', summary.get('frames_per_second_processing', 0))
+                production_rtf = summary.get('production_real_time_factor', summary.get('real_time_factor', 0))
                 obj_fps = obj_summary.get('processing_fps', 0)
                 
-                print(f"  Scene processing: {scene_fps:.1f} frames/second")
+                print(f"  Scene processing: {production_fps:.1f} frames/second")
                 print(f"  Object processing: {obj_fps:.1f} scenes/second") 
-                print(f"  Real-time factor: {real_time_factor:.2f}x")
+                print(f"  PRODUCTION real-time factor: {production_rtf:.2f}x")
                 
-                if real_time_factor >= 1.0:
-                    print(f"  ✅ Pipeline is faster than real-time!")
+                if production_rtf >= 1.0:
+                    print(f"  ✅ Pipeline is faster than real-time for PRODUCTION use!")
                 else:
-                    print(f"  ⚠️  Pipeline is slower than real-time")
+                    print(f"  ⚠️  Pipeline is slower than real-time for production use")
+                    
+                if stats_time > 0 or (enable_saving and summary.get('total_encoding_time', 0) > 0):
+                    print(f"  ℹ️  Optional operations (stats/encoding) add overhead - disable for production")
                 
                 # Show file locations if saving
                 if enable_saving and output_path:
@@ -186,7 +203,7 @@ def process_video_pipeline(input_video: str, output_dir: str = None,
             else:
                 scene_count += 1
                 scene_num = processed_data.get('scene_number', scene_count)
-                num_objects = processed_data.get('num_objects_detected', 0)
+                num_objects = processed_data.get('total_objects_detected', 0)
                 total_objects += num_objects
                 
                 # Get timing information
@@ -199,13 +216,28 @@ def process_video_pipeline(input_video: str, output_dir: str = None,
                 
                 # Show detected objects
                 if num_objects > 0:
-                    objects = processed_data.get('objects', [])
-                    obj_info = []
-                    for obj in objects:
-                        name = obj['class_name']
-                        conf = obj['confidence']
-                        obj_info.append(f"{name}({conf:.2f})")
-                    print(f"           Objects: {', '.join(obj_info)}")
+                    # Extract objects from frame data (objects are in individual frames)
+                    frame_data_list = processed_data.get('frames_data', [])
+                    all_objects = []
+                    for frame_data in frame_data_list:
+                        frame_objects = frame_data.get('objects', [])
+                        all_objects.extend(frame_objects)
+                    
+                    # Show a sample of unique objects (by class name)
+                    if all_objects:
+                        # Get unique objects by class name and pick highest confidence
+                        unique_objects = {}
+                        for obj in all_objects:
+                            class_name = obj['class_name']
+                            if class_name not in unique_objects or obj['confidence'] > unique_objects[class_name]['confidence']:
+                                unique_objects[class_name] = obj
+                        
+                        obj_info = []
+                        for obj in unique_objects.values():
+                            name = obj['class_name']
+                            conf = obj['confidence']
+                            obj_info.append(f"{name}({conf:.2f})")
+                        print(f"           Objects: {', '.join(obj_info)}")
                 
                 # In a real application, you would use the processed data here:
                 # - processed_data['object_images']: Individual object images

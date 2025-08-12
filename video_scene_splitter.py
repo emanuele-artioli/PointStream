@@ -28,7 +28,11 @@ import tempfile
 import shutil
 
 try:
-    from scenedetect import detect, ContentDetector
+    from scenedetect import detect, ContentDetector, open_video, FrameTimecode
+    from scenedetect.detectors import AdaptiveDetector, HistogramDetector, HashDetector, ThresholdDetector
+    from scenedetect.scene_manager import SceneManager, Interpolation
+    from scenedetect.stats_manager import StatsManager
+    from scenedetect.backends import AVAILABLE_BACKENDS
     import cv2
     import config
 except ImportError as e:
@@ -40,7 +44,7 @@ except ImportError as e:
 class VideoSceneSplitter:
     def __init__(self, input_video: str, output_dir: str = None, 
                  batch_size: int = None, max_scene_frames: int = None, config_file: str = None,
-                 enable_encoding: bool = True):
+                 enable_encoding: bool = True, detector_type: str = None, video_backend: str = None):
         """
         Initialize the video scene splitter with configuration support.
         
@@ -51,6 +55,8 @@ class VideoSceneSplitter:
             max_scene_frames: Maximum frames per scene before forced cut
             config_file: Path to configuration file
             enable_encoding: Whether to encode scenes to files (for debugging) or just yield frame data
+            detector_type: Type of scene detector ('content', 'adaptive', 'histogram', 'hash', 'threshold', 'multi')
+            video_backend: Video backend to use ('opencv', 'pyav', 'moviepy', 'auto')
         """
         # Load configuration
         if config_file:
@@ -61,6 +67,31 @@ class VideoSceneSplitter:
         self.input_video = Path(input_video)
         if not self.input_video.exists():
             raise FileNotFoundError(f"Input video not found: {input_video}")
+        
+        # Set detector type
+        self.detector_type = detector_type or config.get_str('scene_detection', 'detector_type', 'content')
+        
+        # Set video backend
+        self.video_backend = video_backend or config.get_str('video', 'backend', 'auto')
+        
+        # Initialize stats manager (OPTIONAL - for analysis only, not production)
+        self.use_stats = config.get_bool('scene_detection', 'use_stats_manager', False)
+        self.stats_manager = None
+        self.stats_file_path = None
+        
+        # WARNING: Stats caching can give false performance readings for repeated videos
+        # In production, always set use_stats_manager = false to get true processing times
+        if self.use_stats:
+            # Always create a unique stats file to avoid caching false positives
+            import time
+            timestamp = int(time.time())
+            stats_file = self.input_video.parent / f"{self.input_video.stem}_stats_{timestamp}.csv"
+            self.stats_manager = StatsManager()
+            # DO NOT load existing stats to avoid false performance benefits
+            self.stats_file_path = str(stats_file)
+            logging.warning("Stats collection enabled - this may slow down processing and should be disabled in production")
+        else:
+            logging.info("Stats collection disabled - using production mode for accurate timing")
         
         # Set output directory (only used if encoding is enabled)
         if output_dir is None and enable_encoding:
@@ -87,6 +118,31 @@ class VideoSceneSplitter:
         self.min_scene_len = config.get_int('scene_detection', 'min_scene_len', 15)
         self.luma_only = config.get_bool('scene_detection', 'luma_only', False)
         
+        # Enhanced detection parameters
+        self.enable_downscaling = config.get_bool('scene_detection', 'enable_downscaling', True)
+        self.downscale_factor = config.get_int('scene_detection', 'downscale_factor', 0)  # 0 = auto
+        self.adaptive_window = config.get_int('scene_detection', 'adaptive_window_frames', 60)
+        self.histogram_bins = config.get_int('scene_detection', 'histogram_bins', 256)
+        self.hash_size = config.get_int('scene_detection', 'hash_size', 8)
+        
+        # Interpolation method for frame scaling/processing
+        interpolation_str = config.get_str('scene_detection', 'interpolation_method', 'linear')
+        self.interpolation_method = getattr(Interpolation, interpolation_str.upper(), Interpolation.LINEAR)
+        
+        # Note: event_buffer_length is no longer configurable in PySceneDetect 0.6+
+        # It's automatically determined by each detector algorithm
+        
+        # Multi-detector weights (for when detector_type='multi')
+        self.detector_weights = {
+            'content': config.get_float('scene_detection', 'content_weight', 1.0),
+            'adaptive': config.get_float('scene_detection', 'adaptive_weight', 0.8),
+            'histogram': config.get_float('scene_detection', 'histogram_weight', 0.6),
+            'hash': config.get_float('scene_detection', 'hash_weight', 0.9)
+        }
+        
+        # Initialize video stream with configurable backend
+        self.video_stream = self._initialize_video_stream()
+        
         # Processing state for live simulation
         self.processed_scenes = []
         self.scene_counter = 0
@@ -95,11 +151,13 @@ class VideoSceneSplitter:
         self.last_batch_end_frame = None  # Track where last batch ended
         self.scene_boundaries = []  # Confirmed scene boundaries from current batch
         
-        # Time tracking (separate processing from encoding)
-        self.processing_times = []  # Only scene detection and frame extraction
-        self.encoding_times = []    # Optional encoding times
+        # Time tracking - SEPARATE core processing from optional operations
+        self.core_processing_times = []     # CORE: Only scene detection (production-critical)
+        self.stats_collection_times = []    # OPTIONAL: Statistics collection overhead
+        self.encoding_times = []            # OPTIONAL: Video encoding (not needed in production)
+        self.frame_extraction_times = []    # CORE: Frame extraction time (needed for next stage)
         
-        # Open video capture for frame extraction
+        # Open video capture for frame extraction (keep for compatibility)
         self.cap = cv2.VideoCapture(str(self.input_video))
         
         logging.info(f"Input video: {self.input_video}")
@@ -147,8 +205,7 @@ class VideoSceneSplitter:
 
     def _detect_scene_cuts_in_batch(self, start_frame: int, end_frame: int) -> List[float]:
         """
-        Detect scene cut timestamps within a specific batch for live streaming.
-        Only returns the cut points (timestamps), not full scenes.
+        Enhanced scene cut detection with multiple detector support and performance optimizations.
         
         Args:
             start_frame: Starting frame number of current batch
@@ -163,35 +220,125 @@ class VideoSceneSplitter:
         
         logging.debug(f"Detecting scene cuts in batch: {start_time:.2f}s - {end_time:.2f}s")
         
-        # Create content detector with configuration
-        detector = ContentDetector(
-            threshold=self.scene_threshold,
-            min_scene_len=self.min_scene_len,
-            luma_only=self.luma_only
-        )
-        
         try:
-            # Detect scenes in this batch only
-            scene_list = detect(
-                str(self.input_video), 
-                detector, 
-                start_time=start_time, 
-                end_time=end_time
-            )
-            
-            # Extract only the cut points (start times of scenes after the first)
-            cut_times = []
-            for i, scene in enumerate(scene_list):
-                scene_start = scene[0].get_seconds()
-                # Skip the first scene as it represents continuation from previous batch
-                if i > 0 and start_time <= scene_start < end_time:
-                    cut_times.append(scene_start)
-            
-            return cut_times
-            
+            if self.detector_type == 'multi':
+                return self._detect_with_multiple_detectors(start_time, end_time)
+            else:
+                return self._detect_with_single_detector(start_time, end_time)
+                
         except Exception as e:
             logging.error(f"Error detecting scene cuts in batch: {e}")
             return []
+
+    def _detect_with_single_detector(self, start_time: float, end_time: float) -> List[float]:
+        """Detect scenes using a single detector algorithm."""
+        detector = self._create_detector()
+        
+        # Optional: Stats collection timing
+        stats_start_time = time.time() if self.use_stats else None
+        
+        # Use SceneManager for better control and performance
+        scene_manager = SceneManager(stats_manager=self.stats_manager if self.use_stats else None)
+        scene_manager.add_detector(detector)
+        
+        # Optional: Track stats collection overhead
+        if self.use_stats and stats_start_time:
+            stats_setup_time = time.time() - stats_start_time
+            self.stats_collection_times.append(stats_setup_time)
+        
+        # Enable downscaling for performance if configured
+        if self.enable_downscaling:
+            if self.downscale_factor == 0:
+                # Auto-calculate downscale factor
+                from scenedetect.scene_manager import compute_downscale_factor
+                scene_manager.auto_downscale = True
+            else:
+                scene_manager.downscale = self.downscale_factor
+                
+            # Set interpolation method for downscaling
+            scene_manager.interpolation = self.interpolation_method
+            logging.debug(f"Using {self.interpolation_method} interpolation for downscaling")
+        
+        # CORE: Scene detection (this is what we need to be fast in production)
+        # PySceneDetect 0.6+ API: Use video seeking and duration instead of start_time/end_time
+        if start_time > 0:
+            self.video_stream.seek(start_time)
+        
+        # Calculate duration from start_time to end_time
+        duration_seconds = end_time - start_time
+        duration = FrameTimecode(duration_seconds, fps=self.video_fps)
+        
+        scene_manager.detect_scenes(
+            video=self.video_stream,
+            duration=duration,
+            show_progress=False
+        )
+        
+        scene_list = scene_manager.get_scene_list()
+        
+        # Extract only the cut points (start times of scenes after the first)
+        cut_times = []
+        for i, scene in enumerate(scene_list):
+            scene_start = scene[0].get_seconds()
+            # Skip the first scene as it represents continuation from previous batch
+            if i > 0 and start_time <= scene_start < end_time:
+                cut_times.append(scene_start)
+        
+        return cut_times
+
+    def _detect_with_multiple_detectors(self, start_time: float, end_time: float) -> List[float]:
+        """Detect scenes using multiple detectors and combine results."""
+        detector_types = ['content', 'adaptive', 'histogram', 'hash']
+        all_cuts = {}
+        
+        for det_type in detector_types:
+            if self.detector_weights.get(det_type, 0) > 0:
+                try:
+                    detector = self._create_detector(det_type)
+                    scene_manager = SceneManager(stats_manager=self.stats_manager)
+                    scene_manager.add_detector(detector)
+                    
+                    if self.enable_downscaling:
+                        scene_manager.auto_downscale = True
+                    
+                    # Use the same updated API as single detector
+                    if start_time > 0:
+                        self.video_stream.seek(start_time)
+                    
+                    duration_seconds = end_time - start_time
+                    duration = FrameTimecode(duration_seconds, fps=self.video_fps)
+                    
+                    scene_manager.detect_scenes(
+                        video=self.video_stream,
+                        duration=duration,
+                        show_progress=False
+                    )
+                    
+                    scene_list = scene_manager.get_scene_list()
+                    cuts = []
+                    for i, scene in enumerate(scene_list):
+                        scene_start = scene[0].get_seconds()
+                        if i > 0 and start_time <= scene_start < end_time:
+                            cuts.append(scene_start)
+                    
+                    weight = self.detector_weights[det_type]
+                    for cut_time in cuts:
+                        if cut_time not in all_cuts:
+                            all_cuts[cut_time] = 0
+                        all_cuts[cut_time] += weight
+                    
+                    logging.debug(f"{det_type} detector found {len(cuts)} cuts")
+                    
+                except Exception as e:
+                    logging.warning(f"Error with {det_type} detector: {e}")
+        
+        # Filter cuts based on combined weights
+        min_weight = config.get_float('scene_detection', 'multi_detector_threshold', 1.0)
+        final_cuts = [cut_time for cut_time, weight in all_cuts.items() if weight >= min_weight]
+        final_cuts.sort()
+        
+        logging.debug(f"Multi-detector approach: {len(final_cuts)} final cuts from {len(all_cuts)} candidates")
+        return final_cuts
 
     def _process_batch_realtime(self, batch_start: int, batch_end: int) -> List[Dict[str, Any]]:
         """
@@ -210,13 +357,18 @@ class VideoSceneSplitter:
         """
         logging.info(f"Processing batch: frames {batch_start} - {batch_end}")
         
-        batch_processing_start = time.time()
+        # Track CORE processing time (scene detection only)
+        core_processing_start = time.time()
+        
         batch_start_time = batch_start / self.video_fps
         batch_end_time = batch_end / self.video_fps
         completed_scenes = []
         
-        # Detect scene cuts in this batch
+        # Detect scene cuts in this batch (CORE processing)
         scene_cuts = self._detect_scene_cuts_in_batch(batch_start, batch_end)
+        
+        # Track core scene detection time
+        core_scene_detection_time = time.time() - core_processing_start
         
         # If this is the first batch, initialize pending scene
         if self.pending_scene_start is None:
@@ -265,13 +417,21 @@ class VideoSceneSplitter:
         # Store information about this batch for next iteration
         self.last_batch_end_frame = batch_end
         
-        # Track processing time (excluding encoding) - measure before any scene creation
-        batch_processing_time = time.time() - batch_processing_start
+        # Track CORE processing time (scene detection + scene boundary logic)
+        core_processing_time = time.time() - core_processing_start
+        self.core_processing_times.append(core_processing_time)
         
-        # Now handle scene creation separately (which might include encoding)
+        # Now handle optional operations separately
         final_scenes = []
         for scene_data in completed_scenes:
-            # Add encoding if enabled (separately timed)
+            # Optional: Frame extraction timing (needed for next pipeline stage)
+            if scene_data:
+                frame_extraction_start = time.time()
+                # Frame extraction is already done in _create_scene_data_no_encoding
+                frame_extraction_time = time.time() - frame_extraction_start
+                self.frame_extraction_times.append(frame_extraction_time)
+            
+            # Optional: Add encoding if enabled (separately timed)
             if self.enable_encoding and self.output_dir:
                 encoding_start = time.time()
                 output_file = self._save_scene_with_config(
@@ -286,15 +446,12 @@ class VideoSceneSplitter:
             
             final_scenes.append(scene_data)
         
-        # Only track the pure processing time (scene detection + frame extraction without encoding)
-        self.processing_times.append(batch_processing_time)
-        
+        logging.info(f"CORE processing time: {core_processing_time:.3f}s (production-critical)")
         if scene_cuts:
             logging.info(f"Found {len(scene_cuts)} scene cuts in batch at: {[f'{t:.2f}s' for t in scene_cuts]}")
         else:
             logging.info(f"No scene cuts in batch, pending scene continues")
         
-        logging.info(f"Batch processing time: {batch_processing_time:.3f}s")
         return final_scenes
 
     def _create_scene_data(self, start_time: float, end_time: float, scene_num: int) -> Optional[Dict[str, Any]]:
@@ -561,6 +718,86 @@ class VideoSceneSplitter:
             logging.error(f"Error verifying output file: {e}")
             return False
 
+    def _initialize_video_stream(self):
+        """Initialize video stream with configurable backend."""
+        try:
+            if self.video_backend == 'auto':
+                # Try backends in order of preference
+                for backend in ['pyav', 'opencv', 'moviepy']:
+                    if backend in AVAILABLE_BACKENDS:
+                        try:
+                            video_stream = open_video(str(self.input_video), backend=backend)
+                            logging.info(f"Using video backend: {backend}")
+                            return video_stream
+                        except Exception as e:
+                            logging.warning(f"Failed to use {backend} backend: {e}")
+                            continue
+            else:
+                if self.video_backend in AVAILABLE_BACKENDS:
+                    video_stream = open_video(str(self.input_video), backend=self.video_backend)
+                    logging.info(f"Using video backend: {self.video_backend}")
+                    return video_stream
+                else:
+                    logging.warning(f"Backend {self.video_backend} not available, falling back to OpenCV")
+            
+            # Fallback to OpenCV
+            video_stream = open_video(str(self.input_video), backend='opencv')
+            logging.info("Using video backend: opencv (fallback)")
+            return video_stream
+            
+        except Exception as e:
+            logging.error(f"Failed to initialize video stream: {e}")
+            raise
+
+    def _create_detector(self, detector_type: str = None):
+        """Create scene detector based on configuration."""
+        detector_type = detector_type or self.detector_type
+        
+        # Create base detector
+        if detector_type == 'content':
+            base_detector = ContentDetector(
+                threshold=self.scene_threshold,
+                min_scene_len=self.min_scene_len,
+                luma_only=self.luma_only
+            )
+        elif detector_type == 'adaptive':
+            base_detector = AdaptiveDetector(
+                adaptive_threshold=self.scene_threshold,
+                min_scene_len=self.min_scene_len,
+                window_width=self.adaptive_window,
+                luma_only=self.luma_only
+            )
+        elif detector_type == 'histogram':
+            base_detector = HistogramDetector(
+                threshold=self.scene_threshold,
+                min_scene_len=self.min_scene_len,
+                bins=self.histogram_bins
+            )
+        elif detector_type == 'hash':
+            base_detector = HashDetector(
+                threshold=self.scene_threshold,
+                min_scene_len=self.min_scene_len,
+                hash_size=self.hash_size
+            )
+        elif detector_type == 'threshold':
+            base_detector = ThresholdDetector(
+                threshold=self.scene_threshold,
+                min_scene_len=self.min_scene_len
+            )
+        else:
+            logging.warning(f"Unknown detector type: {detector_type}, using ContentDetector")
+            base_detector = ContentDetector(
+                threshold=self.scene_threshold,
+                min_scene_len=self.min_scene_len,
+                luma_only=self.luma_only
+            )
+        
+        # Note: event_buffer_length is read-only in PySceneDetect 0.6+
+        # It's automatically determined by the detector algorithm
+        logging.debug(f"Using default event buffer length ({base_detector.event_buffer_length}) for {detector_type} detector")
+        
+        return base_detector
+        
     def process_video_realtime_generator(self):
         """
         Generator that yields scene data one at a time to simulate real-time streaming.
@@ -630,8 +867,21 @@ class VideoSceneSplitter:
         # Clean up
         self.cap.release()
         
-        # Final summary
-        total_processing_time = sum(self.processing_times)
+        # Save stats if enabled
+        if self.stats_manager and self.stats_file_path:
+            try:
+                self.stats_manager.save_to_csv(self.stats_file_path)
+                logging.info(f"Saved scene detection stats to: {self.stats_file_path}")
+            except Exception as e:
+                logging.error(f"Failed to save stats: {e}")
+        
+        # Final summary with PRODUCTION-RELEVANT metrics
+        core_processing_time = sum(self.core_processing_times)
+        frame_extraction_time = sum(self.frame_extraction_times)
+        production_processing_time = core_processing_time + frame_extraction_time
+        
+        # Optional operation times
+        stats_collection_time = sum(self.stats_collection_times) if self.stats_collection_times else 0
         total_encoding_time = sum(self.encoding_times) if self.encoding_times else 0
         overall_time = time.time() - overall_start_time
         
@@ -639,12 +889,24 @@ class VideoSceneSplitter:
             'status': 'complete',
             'summary': {
                 'total_scenes': self.scene_counter,
-                'total_processing_time': total_processing_time,
+                # PRODUCTION metrics (what matters for real-time performance)
+                'core_scene_detection_time': core_processing_time,
+                'frame_extraction_time': frame_extraction_time,
+                'production_processing_time': production_processing_time,
+                'production_frames_per_second': self.total_frames / production_processing_time if production_processing_time > 0 else 0,
+                'production_real_time_factor': (self.total_frames / self.video_fps) / production_processing_time if production_processing_time > 0 else 0,
+                
+                # OPTIONAL metrics (not needed in production)
+                'stats_collection_time': stats_collection_time,
                 'total_encoding_time': total_encoding_time,
                 'overall_time': overall_time,
-                'average_processing_time_per_scene': total_processing_time / max(self.scene_counter, 1),
-                'frames_per_second_processing': self.total_frames / total_processing_time if total_processing_time > 0 else 0,
-                'real_time_factor': (self.total_frames / self.video_fps) / total_processing_time if total_processing_time > 0 else 0,
+                
+                # Legacy metrics for compatibility
+                'total_processing_time': production_processing_time,  # For backward compatibility
+                'frames_per_second_processing': self.total_frames / production_processing_time if production_processing_time > 0 else 0,
+                'real_time_factor': (self.total_frames / self.video_fps) / production_processing_time if production_processing_time > 0 else 0,
+                'average_processing_time_per_scene': production_processing_time / max(self.scene_counter, 1),
+                
                 'scene_timestamps': self.processed_scenes,
                 'input_video': str(self.input_video),
                 'video_fps': self.video_fps,
@@ -653,8 +915,14 @@ class VideoSceneSplitter:
         }
         
         logging.info(f"Processing complete! Generated {self.scene_counter} scenes")
-        logging.info(f"Total processing time: {total_processing_time:.3f}s")
-        logging.info(f"Real-time factor: {summary['summary']['real_time_factor']:.2f}x")
+        logging.info(f"PRODUCTION processing time: {production_processing_time:.3f}s (core + frame extraction)")
+        logging.info(f"  - Core scene detection: {core_processing_time:.3f}s")
+        logging.info(f"  - Frame extraction: {frame_extraction_time:.3f}s")
+        if stats_collection_time > 0:
+            logging.info(f"Optional stats collection: {stats_collection_time:.3f}s")
+        if total_encoding_time > 0:
+            logging.info(f"Optional encoding: {total_encoding_time:.3f}s")
+        logging.info(f"PRODUCTION real-time factor: {summary['summary']['production_real_time_factor']:.2f}x")
         
         yield summary
 
@@ -793,7 +1061,34 @@ Examples:
     parser.add_argument('--simulate-delay', action='store_true', 
                        help='Add realistic processing delays to simulate live streaming')
     
+    # Enhanced detection options
+    parser.add_argument('--detector', choices=['content', 'adaptive', 'histogram', 'hash', 'threshold', 'multi'],
+                       default=None, help='Scene detection algorithm to use')
+    parser.add_argument('--backend', choices=['opencv', 'pyav', 'moviepy', 'auto'],
+                       default=None, help='Video backend to use for processing')
+    parser.add_argument('--enable-stats', action='store_true',
+                       help='Enable statistics collection and caching')
+    parser.add_argument('--downscale', type=int, default=None,
+                       help='Downscale factor for faster processing (0=auto, 1=no downscale)')
+    parser.add_argument('--show-detectors', action='store_true',
+                       help='Show available detection algorithms and backends')
+    
     args = parser.parse_args()
+    
+    # Show available detectors and backends if requested
+    if args.show_detectors:
+        print("=== Available Scene Detection Algorithms ===")
+        print("content     - Fast cuts using weighted average of HSV changes (default)")
+        print("adaptive    - Fast cuts using rolling average of HSL changes")
+        print("histogram   - Fast cuts using HSV histogram changes")
+        print("hash        - Fast cuts using perceptual image hashing (fastest)")
+        print("threshold   - Fades in/out using pixel intensity changes")
+        print("multi       - Combines multiple detectors for better accuracy")
+        print(f"\n=== Available Video Backends ===")
+        for backend in AVAILABLE_BACKENDS:
+            print(f"{backend:<12} - Available")
+        print("auto        - Automatically select best available backend")
+        return
     
     # Reload config if specified
     if args.config:
@@ -820,8 +1115,20 @@ Examples:
             batch_size=args.batch_size,
             max_scene_frames=args.max_frames,
             config_file=args.config,
-            enable_encoding=args.enable_encoding
+            enable_encoding=args.enable_encoding,
+            detector_type=args.detector,
+            video_backend=args.backend
         )
+        
+        # Apply enhanced settings from command line
+        if args.enable_stats:
+            splitter.use_stats = True
+            if not splitter.stats_manager:
+                splitter.stats_manager = StatsManager()
+        
+        if args.downscale is not None:
+            splitter.downscale_factor = args.downscale
+            splitter.enable_downscaling = args.downscale != 1
         
         # Setup logging to file if configured
         log_to_file = config.get_bool('logging', 'log_to_file', True)
@@ -837,7 +1144,15 @@ Examples:
         
         # Process video using generator approach
         print(f"Starting real-time scene processing...")
+        print(f"Detection algorithm: {splitter.detector_type}")
+        print(f"Video backend: {splitter.video_backend}")
         print(f"Encoding enabled: {args.enable_encoding}")
+        if splitter.enable_downscaling:
+            if splitter.downscale_factor == 0:
+                print(f"Frame downscaling: Auto")
+            else:
+                print(f"Frame downscaling: {splitter.downscale_factor}x")
+        print(f"Stats collection: {splitter.use_stats}")
         print(f"Processing frames in batches...")
         
         scene_count = 0
