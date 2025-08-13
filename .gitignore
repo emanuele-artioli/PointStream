@@ -51,14 +51,14 @@ ehthumbs.db
 Thumbs.db
 
 # Project specific
-test_output/
-output/
-results/
-checkpoints/
+*output*/
+*results*/
+*checkpoints*/
 *.pth
 *.ckpt
 *.safetensors
 motion_config.json
+config_*
 
 # Data
 data/

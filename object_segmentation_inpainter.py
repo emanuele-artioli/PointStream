@@ -27,13 +27,22 @@ import tempfile
 
 try:
     import torch
-    from ultralytics import YOLO
+    from ultralytics import YOLO, YOLOE
+    from stitching import Stitcher
     import config
 except ImportError as e:
     print(f"Error importing required libraries: {e}")
     print("Please ensure you have activated the pointstream environment and installed:")
     print("  pip install ultralytics torch opencv-python")
     sys.exit(1)
+
+try:
+    from diffusers import StableDiffusionInpaintPipeline
+    from PIL import Image
+    DIFFUSERS_AVAILABLE = True
+except ImportError:
+    DIFFUSERS_AVAILABLE = False
+    logging.warning("Diffusers not available. AI inpainting will not work.")
 
 
 class ObjectSegmentationInpainter:
@@ -79,11 +88,32 @@ class ObjectSegmentationInpainter:
         classes_config = config.get_list('segmentation', 'classes', [])
         self.classes = classes_config if classes_config else None
         
-        # Get inpainting configuration
-        self.inpaint_method = config.get_str('inpainting', 'method', 'telea')  # 'telea' or 'navier_stokes'
-        self.inpaint_radius = config.get_int('inpainting', 'radius', 3)
-        self.dilate_mask = config.get_bool('inpainting', 'dilate_mask', True)
-        self.dilate_kernel_size = config.get_int('inpainting', 'dilate_kernel_size', 3)
+        # Get background processing configuration
+        self.background_method = config.get_str('background_processing', 'background_method', 'opencv_inpaint')
+        
+        # OpenCV inpainting settings
+        self.opencv_inpaint_method = config.get_str('background_processing', 'opencv_inpaint_method', 'telea')
+        self.opencv_inpaint_radius = config.get_int('background_processing', 'opencv_inpaint_radius', 3)
+        
+        # AI inpainting settings
+        self.ai_inpaint_model = config.get_str('background_processing', 'ai_inpaint_model', 'stabilityai/stable-diffusion-2-inpainting')
+        self.ai_inpaint_prompt = config.get_str('background_processing', 'ai_inpaint_prompt', 'clean background, natural lighting, high quality')
+        self.ai_inpaint_guidance_scale = config.get_float('background_processing', 'ai_inpaint_guidance_scale', 7.5)
+        self.ai_inpaint_num_inference_steps = config.get_int('background_processing', 'ai_inpaint_num_inference_steps', 20)
+        
+        # Mask processing settings
+        self.dilate_mask = config.get_bool('background_processing', 'dilate_mask', True)
+        self.dilate_kernel_size = config.get_int('background_processing', 'dilate_kernel_size', 3)
+        
+        # Masking visualization settings
+        mask_color_str = config.get_str('background_processing', 'mask_color', '[255, 0, 0]')
+        self.mask_color = eval(mask_color_str) if mask_color_str.startswith('[') else [255, 0, 0]
+        self.mask_alpha = config.get_float('background_processing', 'mask_alpha', 0.5)
+        
+        # Initialize AI inpainting pipeline if needed
+        self.ai_inpaint_pipeline = None
+        if self.background_method == 'ai_inpaint':
+            self._initialize_ai_inpaint_pipeline()
         
         # Custom selection strategy (applied after YOLO's built-in filtering)
         self.selection_strategy = config.get_str('object_tracking', 'selection_strategy', 'confidence')
@@ -93,6 +123,15 @@ class ObjectSegmentationInpainter:
         # Output format configuration
         self.object_format = config.get_str('object_output', 'object_image_format', 'png')
         self.background_format = config.get_str('object_output', 'background_image_format', 'png')
+        
+        # Panorama stitching configuration
+        self.stitching_method = config.get_str('panorama', 'stitching_method', 'opencv')
+        self.stitcher_mode = config.get_str('panorama', 'stitcher_mode', 'panorama')
+        self.max_frames = config.get_int('panorama', 'max_frames', 20)
+        self.downsample_factor = config.get_float('panorama', 'downsample_factor', 0.5)
+        self.fallback_to_median = config.get_bool('panorama', 'fallback_to_median', True)
+        self.stitching_detector = config.get_str('panorama', 'stitching_detector', 'sift')
+        self.stitching_confidence_threshold = config.get_float('panorama', 'stitching_confidence_threshold', 0.2)
         
         # Performance tracking
         self.processing_times = []
@@ -113,15 +152,47 @@ class ObjectSegmentationInpainter:
         logging.info(f"YOLO image size: {self.yolo_image_size}")
         logging.info(f"YOLO half precision: {self.yolo_half_precision}")
         logging.info(f"YOLO streaming mode: {self.yolo_stream}")
-        logging.info(f"Inpainting method: {self.inpaint_method}")
+        logging.info(f"Background processing method: {self.background_method}")
+        if self.background_method == 'opencv_inpaint':
+            logging.info(f"OpenCV inpainting method: {self.opencv_inpaint_method}")
+        elif self.background_method == 'ai_inpaint':
+            logging.info(f"AI inpainting model: {self.ai_inpaint_model}")
+        logging.info(f"Panorama stitching method: {self.stitching_method}")
+        if self.stitching_method == 'stitching_lib':
+            logging.info(f"Stitching library detector: {self.stitching_detector}")
+            logging.info(f"Stitching library confidence threshold: {self.stitching_confidence_threshold}")
         logging.info(f"Saving enabled: {self.enable_saving}")
-        logging.info(f"Purpose: Create clean panoramas from inpainted backgrounds")
+        
+        purpose_desc = {
+            'none': 'original frames with objects',
+            'masking': 'frames with object masks overlaid',
+            'opencv_inpaint': 'OpenCV inpainted backgrounds',
+            'ai_inpaint': 'AI inpainted backgrounds'
+        }.get(self.background_method, 'processed frames')
+        logging.info(f"Purpose: Create panoramas from {purpose_desc}")
+    
+    def _initialize_ai_inpaint_pipeline(self):
+        """Initialize Stable Diffusion inpainting pipeline for AI-powered background inpainting."""
+        if not DIFFUSERS_AVAILABLE:
+            raise RuntimeError("Diffusers library not available. Please install with: pip install diffusers transformers accelerate")
+        
+        try:
+            logging.info(f"Initializing AI inpainting pipeline: {self.ai_inpaint_model}")
+            self.ai_inpaint_pipeline = StableDiffusionInpaintPipeline.from_pretrained(
+                self.ai_inpaint_model,
+                torch_dtype=torch.float16,
+            )
+            self.ai_inpaint_pipeline.to(self.device)
+            logging.info("AI inpainting pipeline initialized successfully")
+        except Exception as e:
+            logging.error(f"Failed to initialize AI inpainting pipeline: {e}")
+            raise
 
     def _initialize_model(self):
         """Initialize the YOLO segmentation model."""
         try:
             logging.info(f"Loading YOLO model: {self.model_name}")
-            self.model = YOLO(self.model_name)
+            self.model = YOLOE(self.model_name)
             
             # Set device
             if self.device == 'auto':
@@ -275,9 +346,63 @@ class ObjectSegmentationInpainter:
         
         return combined_mask
 
-    def _inpaint_background(self, image: np.ndarray, mask: np.ndarray) -> np.ndarray:
+    def _process_background(self, image: np.ndarray, mask: np.ndarray) -> np.ndarray:
         """
-        Inpaint the background to remove objects.
+        Process the background using the configured method.
+        
+        Args:
+            image: Original image
+            mask: Binary mask of objects to remove/process
+            
+        Returns:
+            Processed image
+        """
+        if self.background_method == 'none':
+            # No processing - return original image
+            return image
+        
+        elif self.background_method == 'masking':
+            # Overlay mask on objects for visualization
+            return self._apply_mask_overlay(image, mask)
+        
+        elif self.background_method == 'opencv_inpaint':
+            # Traditional OpenCV inpainting
+            return self._opencv_inpaint_background(image, mask)
+        
+        elif self.background_method == 'ai_inpaint':
+            # AI-powered Stable Diffusion inpainting
+            return self._ai_inpaint_background(image, mask)
+        
+        else:
+            logging.warning(f"Unknown background processing method: {self.background_method}, using no processing")
+            return image
+
+    def _apply_mask_overlay(self, image: np.ndarray, mask: np.ndarray) -> np.ndarray:
+        """
+        Apply a black mask overlay to completely block out objects for panorama stitching.
+        
+        Args:
+            image: Original image
+            mask: Binary mask of objects
+            
+        Returns:
+            Image with black mask overlay (opaque, no transparency)
+        """
+        # Convert mask to 8-bit if needed
+        if mask.dtype != np.uint8:
+            mask = (mask * 255).astype(np.uint8)
+        
+        # Create result image as copy of original
+        result = image.copy()
+        
+        # Set masked regions to black (completely opaque)
+        result[mask > 0] = [0, 0, 0]  # Black in BGR format
+        
+        return result
+
+    def _opencv_inpaint_background(self, image: np.ndarray, mask: np.ndarray) -> np.ndarray:
+        """
+        Inpaint the background using OpenCV to remove objects.
         
         Args:
             image: Original image
@@ -291,31 +416,113 @@ class ObjectSegmentationInpainter:
             mask = (mask * 255).astype(np.uint8)
         
         # Apply inpainting
-        if self.inpaint_method == 'telea':
-            inpainted = cv2.inpaint(image, mask, self.inpaint_radius, cv2.INPAINT_TELEA)
-        elif self.inpaint_method == 'navier_stokes':
-            inpainted = cv2.inpaint(image, mask, self.inpaint_radius, cv2.INPAINT_NS)
+        if self.opencv_inpaint_method == 'telea':
+            inpainted = cv2.inpaint(image, mask, self.opencv_inpaint_radius, cv2.INPAINT_TELEA)
+        elif self.opencv_inpaint_method == 'navier_stokes':
+            inpainted = cv2.inpaint(image, mask, self.opencv_inpaint_radius, cv2.INPAINT_NS)
         else:
-            logging.warning(f"Unknown inpainting method: {self.inpaint_method}, using Telea")
-            inpainted = cv2.inpaint(image, mask, self.inpaint_radius, cv2.INPAINT_TELEA)
+            logging.warning(f"Unknown OpenCV inpainting method: {self.opencv_inpaint_method}, using Telea")
+            inpainted = cv2.inpaint(image, mask, self.opencv_inpaint_radius, cv2.INPAINT_TELEA)
         
         return inpainted
 
-    def _create_scene_panorama(self, inpainted_frames: List[np.ndarray]) -> Optional[np.ndarray]:
+    def _ai_inpaint_background(self, image: np.ndarray, mask: np.ndarray) -> np.ndarray:
         """
-        Create a panorama from inpainted background frames using OpenCV Stitcher.
+        Inpaint the background using AI (Stable Diffusion) to remove objects.
         
         Args:
-            inpainted_frames: List of inpainted background images
+            image: Original image
+            mask: Binary mask of objects to remove
+            
+        Returns:
+            AI-inpainted image
+        """
+        if self.ai_inpaint_pipeline is None:
+            logging.warning("AI inpainting pipeline not initialized, falling back to OpenCV inpainting")
+            return self._opencv_inpaint_background(image, mask)
+        
+        try:
+            # Convert OpenCV image (BGR) to PIL (RGB)
+            image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            pil_image = Image.fromarray(image_rgb)
+            
+            # Convert mask to PIL
+            if mask.dtype != np.uint8:
+                mask = (mask * 255).astype(np.uint8)
+            pil_mask = Image.fromarray(mask)
+            
+            # Resize if too large (SD inpainting works best with smaller images)
+            max_size = 512
+            if max(pil_image.size) > max_size:
+                # Calculate new size maintaining aspect ratio
+                width, height = pil_image.size
+                if width > height:
+                    new_width, new_height = max_size, int(height * max_size / width)
+                else:
+                    new_width, new_height = int(width * max_size / height), max_size
+                
+                pil_image = pil_image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+                pil_mask = pil_mask.resize((new_width, new_height), Image.Resampling.NEAREST)
+                resize_back = True
+                original_size = (width, height)
+            else:
+                resize_back = False
+            
+            # Run AI inpainting
+            result = self.ai_inpaint_pipeline(
+                prompt=self.ai_inpaint_prompt,
+                image=pil_image,
+                mask_image=pil_mask,
+                guidance_scale=self.ai_inpaint_guidance_scale,
+                num_inference_steps=self.ai_inpaint_num_inference_steps,
+            ).images[0]
+            
+            # Resize back to original size if needed
+            if resize_back:
+                result = result.resize(original_size, Image.Resampling.LANCZOS)
+            
+            # Convert back to OpenCV format (RGB to BGR)
+            result_rgb = np.array(result)
+            result_bgr = cv2.cvtColor(result_rgb, cv2.COLOR_RGB2BGR)
+            
+            return result_bgr
+            
+        except Exception as e:
+            logging.error(f"AI inpainting failed: {e}, falling back to OpenCV inpainting")
+            return self._opencv_inpaint_background(image, mask)
+
+    def _create_scene_panorama(self, frames: List[np.ndarray]) -> Optional[np.ndarray]:
+        """
+        Create a panorama from processed frames using the configured stitching method.
+        
+        Args:
+            frames: List of processed images (inpainted backgrounds or original frames)
             
         Returns:
             Panorama image or None if creation fails
         """
-        if not inpainted_frames:
+        if not frames:
             return None
         
-        if len(inpainted_frames) == 1:
-            return inpainted_frames[0]
+        if len(frames) == 1:
+            return frames[0]
+        
+        # Choose stitching method based on configuration
+        if self.stitching_method == 'stitching_lib':
+            return self._create_panorama_stitching_lib(frames)
+        else:
+            return self._create_panorama_opencv(frames)
+    
+    def _create_panorama_opencv(self, frames: List[np.ndarray]) -> Optional[np.ndarray]:
+        """
+        Create a panorama using OpenCV Stitcher.
+        
+        Args:
+            frames: List of processed images
+            
+        Returns:
+            Panorama image or None if creation fails
+        """
         
         try:
             # Get panorama configuration
@@ -325,7 +532,7 @@ class ObjectSegmentationInpainter:
             fallback_to_median = config.get_bool('panorama', 'fallback_to_median', True)
             
             # Limit number of frames for performance (stitching can be slow with many frames)
-            frames_to_use = inpainted_frames[:max_frames_for_stitching]
+            frames_to_use = frames[:max_frames_for_stitching]
             
             # Downsample frames for faster stitching if they're large
             original_frames = frames_to_use.copy()
@@ -381,16 +588,65 @@ class ObjectSegmentationInpainter:
                 
                 if fallback_to_median:
                     logging.info("Falling back to median composite approach...")
-                    frame_stack = np.stack(inpainted_frames, axis=0)
+                    frame_stack = np.stack(frames_to_use, axis=0)
                     panorama = np.median(frame_stack, axis=0).astype(np.uint8)
                     return panorama
                 else:
-                    return inpainted_frames[0]  # Return first frame as fallback
+                    return frames_to_use[0]  # Return first frame as fallback
                     
         except Exception as e:
             logging.warning(f"Failed to create panorama: {e}")
-            if len(inpainted_frames) > 0:
-                return inpainted_frames[0]  # Fallback to first frame
+            if len(frames) > 0:
+                return frames[0]  # Fallback to first frame
+            return None
+
+    def _create_panorama_stitching_lib(self, frames: List[np.ndarray]) -> Optional[np.ndarray]:
+        """
+        Create a panorama using the stitching library.
+        
+        Args:
+            frames: List of processed images
+            
+        Returns:
+            Panorama image or None if creation fails
+        """
+        try:
+            # Get panorama configuration
+            max_frames_for_stitching = config.get_int('panorama', 'max_frames', 20)
+            fallback_to_median = config.get_bool('panorama', 'fallback_to_median', True)
+            
+            # Limit number of frames for performance
+            frames_to_use = frames[:max_frames_for_stitching]
+            
+            # Initialize stitching library with configured settings
+            settings = {
+                "detector": self.stitching_detector,
+                "confidence_threshold": self.stitching_confidence_threshold
+            }
+            stitcher = Stitcher(**settings)
+            
+            # Attempt to stitch the frames
+            logging.info(f"Attempting to stitch {len(frames_to_use)} frames using stitching library (detector: {self.stitching_detector})...")
+            panorama = stitcher.stitch(frames_to_use)
+            
+            if panorama is not None:
+                logging.info(f"Stitching library panorama successful! Result size: {panorama.shape[:2]}")
+                return panorama
+            else:
+                logging.warning("Stitching library panorama creation failed")
+                
+                if fallback_to_median:
+                    logging.info("Falling back to median composite approach...")
+                    frame_stack = np.stack(frames_to_use, axis=0)
+                    panorama = np.median(frame_stack, axis=0).astype(np.uint8)
+                    return panorama
+                else:
+                    return frames_to_use[0]  # Return first frame as fallback
+                    
+        except Exception as e:
+            logging.warning(f"Failed to create panorama with stitching library: {e}")
+            if len(frames) > 0:
+                return frames[0]  # Fallback to first frame
             return None
 
     def _extract_object_images(self, image: np.ndarray, objects: List[Dict]) -> List[np.ndarray]:
@@ -592,11 +848,11 @@ class ObjectSegmentationInpainter:
                 # Timing for different processing steps
                 total_yolo_time = 0
                 total_mask_time = 0
-                total_inpaint_time = 0
+                total_inpaint_time = 0  # Actually background processing time (keeping name for compatibility)
                 total_extract_time = 0
                 
-                # Store inpainted backgrounds for panorama creation
-                inpainted_backgrounds = []
+                # Store processed backgrounds for panorama creation
+                processed_backgrounds = []
                 
                 # Process every nth frame based on frame_skip setting
                 for frame_idx, frame in enumerate(frames):
@@ -649,17 +905,21 @@ class ObjectSegmentationInpainter:
                     mask_time = time.time() - mask_start
                     total_mask_time += mask_time
                     
-                    # STEP 3: Background Inpainting (ALWAYS - needed for panorama)
-                    inpaint_start = time.time()
+                    # STEP 3: Background Processing (unified system)
+                    process_start = time.time()
                     if selected_objects:
-                        inpainted_background = self._inpaint_background(frame, combined_mask)
+                        # Process background according to configured method
+                        processed_background = self._process_background(frame, combined_mask)
+                        frames_for_panorama = processed_background
                     else:
-                        inpainted_background = frame.copy()  # No objects to remove
-                    inpaint_time = time.time() - inpaint_start
-                    total_inpaint_time += inpaint_time
+                        # No objects detected - use original frame
+                        processed_background = frame.copy()
+                        frames_for_panorama = frame.copy()
+                    process_time = time.time() - process_start
+                    total_inpaint_time += process_time  # Keep variable name for compatibility
                     
                     # Store for panorama creation
-                    inpainted_backgrounds.append(inpainted_background)
+                    processed_backgrounds.append(frames_for_panorama)
                     
                     # STEP 4: Object Extraction (only if saving)
                     extract_start = time.time()
@@ -690,19 +950,20 @@ class ObjectSegmentationInpainter:
                         ],
                         'object_images': object_images,
                         'combined_mask': combined_mask,
-                        'inpainted_background': inpainted_background,
+                        'inpainted_background': processed_background,  # For compatibility (now processed background)
+                        'background_frame': frames_for_panorama,       # The actual frame used for panorama
                         'processing_time': frame_processing_time,
                         'yolo_time': yolo_time,
                         'mask_time': mask_time,
-                        'inpaint_time': inpaint_time,
+                        'inpaint_time': process_time,
                         'extract_time': extract_time,
                         'num_objects_detected': len(selected_objects)
                     }
                     frame_processing_data.append(frame_data)
                 
-                # STEP 5: Create Scene Panorama from Inpainted Backgrounds
+                # STEP 5: Create Scene Panorama from Processed Frames (inpainted or original)
                 panorama_start = time.time()
-                scene_panorama = self._create_scene_panorama(inpainted_backgrounds)
+                scene_panorama = self._create_scene_panorama(processed_backgrounds)
                 panorama_time = time.time() - panorama_start
                 
                 processing_time = time.time() - processing_start
@@ -714,7 +975,7 @@ class ObjectSegmentationInpainter:
                     'scene_number': scene_data.get('scene_number'),
                     'original_scene_data': scene_data,  # Keep original data
                     'frames_data': frame_processing_data,  # All processed frames
-                    'scene_panorama': scene_panorama,  # Clean background panorama
+                    'scene_panorama': scene_panorama,  # Panorama from processed frames (inpainted or original)
                     'processing_time': processing_time,
                     'detailed_timing': {
                         'total_yolo_time': total_yolo_time,
@@ -747,15 +1008,23 @@ class ObjectSegmentationInpainter:
                 logging.info(f"  Timing breakdown:")
                 logging.info(f"    YOLO detection: {total_yolo_time:.3f}s ({timing['avg_yolo_per_frame']:.3f}s/frame)")
                 logging.info(f"    Mask creation: {total_mask_time:.3f}s")
-                logging.info(f"    Inpainting: {total_inpaint_time:.3f}s ({timing['avg_inpaint_per_frame']:.3f}s/frame)")
+                
+                bg_method_desc = {
+                    'none': 'No processing',
+                    'masking': 'Mask overlay',
+                    'opencv_inpaint': 'OpenCV inpainting',
+                    'ai_inpaint': 'AI inpainting'
+                }.get(self.background_method, 'Background processing')
+                logging.info(f"    {bg_method_desc}: {total_inpaint_time:.3f}s ({timing['avg_inpaint_per_frame']:.3f}s/frame)")
+                
                 logging.info(f"    Object extraction: {total_extract_time:.3f}s")
                 logging.info(f"    Panorama creation: {panorama_time:.3f}s")
                 
                 # Show percentage breakdown
                 if processing_time > 0:
                     yolo_pct = (total_yolo_time / processing_time) * 100
-                    inpaint_pct = (total_inpaint_time / processing_time) * 100
-                    logging.info(f"  Performance bottlenecks: YOLO {yolo_pct:.1f}%, Inpainting {inpaint_pct:.1f}%")
+                    bg_processing_pct = (total_inpaint_time / processing_time) * 100
+                    logging.info(f"  Performance bottlenecks: YOLO {yolo_pct:.1f}%, {bg_method_desc} {bg_processing_pct:.1f}%")
                 
                 # Log sample of objects found (from first frame with objects)
                 sample_frame_with_objects = next((fd for fd in frame_processing_data if fd['objects']), None)
@@ -913,7 +1182,7 @@ Examples:
                 # processed_data contains:
                 # - 'objects': list of detected object info
                 # - 'object_images': list of extracted object images 
-                # - 'inpainted_background': background with objects removed
+                # - 'inpainted_background': background processed according to background_method
                 # - 'combined_mask': mask of all objects
         
         # Clean up
