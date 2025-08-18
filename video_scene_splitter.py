@@ -27,6 +27,10 @@ from typing import List, Tuple, Optional, Dict, Any
 import tempfile
 import shutil
 
+# Configure PySceneDetect logging BEFORE importing it to reduce verbosity
+pyscene_logger = logging.getLogger('pyscenedetect')
+pyscene_logger.setLevel(logging.WARNING)  # Only show warnings and errors
+
 try:
     from scenedetect import detect, ContentDetector, open_video, FrameTimecode
     from scenedetect.detectors import AdaptiveDetector, HistogramDetector, HashDetector, ThresholdDetector
@@ -35,6 +39,14 @@ try:
     from scenedetect.backends import AVAILABLE_BACKENDS
     import cv2
     import config
+    
+    # Configure PySceneDetect logging AFTER import
+    import logging
+    pyscene_logger = logging.getLogger('pyscenedetect')
+    pyscene_logger.setLevel(logging.ERROR)  # Only show errors
+    for handler in pyscene_logger.handlers:
+        handler.setLevel(logging.ERROR)
+    
 except ImportError as e:
     print(f"Error importing required libraries: {e}")
     print("Please ensure you have activated the pointstream environment and installed all dependencies.")
@@ -774,11 +786,28 @@ class VideoSceneSplitter:
                 bins=self.histogram_bins
             )
         elif detector_type == 'hash':
-            base_detector = HashDetector(
-                threshold=self.scene_threshold,
-                min_scene_len=self.min_scene_len,
-                hash_size=self.hash_size
-            )
+            try:
+                # Try new API without hash_size parameter
+                base_detector = HashDetector(
+                    threshold=self.scene_threshold,
+                    min_scene_len=self.min_scene_len
+                )
+            except TypeError:
+                # Fallback to older API if new one doesn't work
+                try:
+                    base_detector = HashDetector(
+                        threshold=self.scene_threshold,
+                        min_scene_len=self.min_scene_len,
+                        hash_size=self.hash_size
+                    )
+                except Exception as e:
+                    logging.warning(f"Error with hash detector: {e}")
+                    logging.info("Falling back to ContentDetector")
+                    base_detector = ContentDetector(
+                        threshold=self.scene_threshold,
+                        min_scene_len=self.min_scene_len,
+                        luma_only=self.luma_only
+                    )
         elif detector_type == 'threshold':
             base_detector = ThresholdDetector(
                 threshold=self.scene_threshold,

@@ -54,6 +54,8 @@ Thumbs.db
 *output*/
 *results*/
 *checkpoints*/
+*scenes*/
+*cache*/
 *.pth
 *.ckpt
 *.safetensors

@@ -55,6 +55,7 @@ dependencies:
     - accelerate
     - scipy
     - safetensors
+    - imagehash
 
     # Training dependencies (autodistill with required components)
     - autodistill

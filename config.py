@@ -7,6 +7,8 @@ This replaces the complex config manager with simple direct INI file reading.
 
 import configparser
 import json
+import os
+import re
 from pathlib import Path
 from typing import Any, List
 
@@ -28,9 +30,17 @@ def load_config(config_file: str = None):
     print(f"Loaded config from: {config_path}")
 
 def get_str(section: str, key: str, default: str = "") -> str:
-    """Get string value from config."""
+    """Get string value from config with environment variable substitution."""
     try:
-        return config.get(section, key)
+        value = config.get(section, key)
+        # Handle environment variable substitution ${VAR_NAME}
+        if value and '${' in value:
+            pattern = r'\$\{([^}]+)\}'
+            def replace_env_var(match):
+                env_var = match.group(1)
+                return os.environ.get(env_var, '')
+            value = re.sub(pattern, replace_env_var, value)
+        return value
     except (configparser.NoSectionError, configparser.NoOptionError):
         return default
 
