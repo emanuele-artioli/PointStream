@@ -114,6 +114,31 @@ class Segmenter:
             'frames_data': frames_data
         }
     
+    @log_step
+    @time_step(track_processing=True)
+    def segment_frames_only(self, frames: List[np.ndarray]) -> Dict[str, Any]:
+        """
+        Segment objects only in scene frames (no panorama processing).
+        
+        Args:
+            frames: List of scene frames
+            
+        Returns:
+            Dictionary containing only frames_data
+        """
+        if not frames:
+            return {'frames_data': []}
+        
+        logging.info(f"Segmenting {len(frames)} frames only")
+        
+        # Process frames (with tracking)
+        frames_data = []
+        for i, frame in enumerate(frames):
+            frame_data = self._segment_frame(frame, frame_index=i)
+            frames_data.append(frame_data)
+        
+        return {'frames_data': frames_data}
+    
     def _segment_panorama(self, panorama: np.ndarray) -> Dict[str, Any]:
         """
         Segment objects in panorama image without tracking.

@@ -20,16 +20,9 @@ import numpy as np
 import logging
 from typing import List, Dict, Any, Optional, Tuple
 
-# These modules are assumed to exist in the user's environment
-# from decorators import log_step, time_step
-# import config
-
-# Mock config for standalone execution if config module is not available
-class MockConfig:
-    def get_str(self, section, key, default): return default
-    def get_int(self, section, key, default): return default
-    def get_float(self, section, key, default): return default
-config = MockConfig()
+# Import decorators and config
+from decorators import log_step, time_step
+import config
 
 
 class Stitcher:
@@ -54,8 +47,8 @@ class Stitcher:
             self.detector = cv2.ORB_create(nfeatures=self.orb_nfeatures)
             self.bf_matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
-    # @log_step
-    # @time_step(track_processing=True)
+    @log_step
+    @time_step(track_processing=True)
     def stitch_scene(self, frames: List[np.ndarray], masks: Optional[List[np.ndarray]] = None) -> Dict[str, Any]:
         """Main stitching function implementing the top-down strategy."""
         if not frames or len(frames) == 0:

@@ -42,8 +42,9 @@ try:
     from stitcher import Stitcher
     from segmenter import Segmenter 
     from keypointer import Keypointer
-    from prompter import Prompter
-    from inpainter import Inpainter
+    # No longer needed: prompter and inpainter
+    # from prompter import Prompter
+    # from inpainter import Inpainter
     from video_scene_splitter import VideoSceneSplitter
     import config
 except ImportError as e:
@@ -71,8 +72,9 @@ class PointStreamProcessor:
         self.stitcher = None
         self.segmenter = None
         self.keypointer = None
-        self.prompter = None
-        self.inpainter = None
+        # No longer needed
+        # self.prompter = None
+        # self.inpainter = None
         
         self._initialize_components()
         
@@ -93,11 +95,12 @@ class PointStreamProcessor:
             logging.info("   🫴 Initializing Keypointer...")
             self.keypointer = Keypointer()
             
-            logging.info("   💭 Initializing Prompter...")
-            self.prompter = Prompter()
-            
-            logging.info("   🎨 Initializing Inpainter...")
-            self.inpainter = Inpainter()
+            # No longer needed
+            # logging.info("   💭 Initializing Prompter...")
+            # self.prompter = Prompter()
+            # 
+            # logging.info("   🎨 Initializing Inpainter...")
+            # self.inpainter = Inpainter()
             
             logging.info("✅ All components loaded successfully")
             
@@ -105,15 +108,59 @@ class PointStreamProcessor:
             logging.error(f"Failed to initialize components: {e}")
             raise
     
+    def _create_masked_frames(self, frames: List[np.ndarray], segmentation_result: Dict[str, Any]) -> List[np.ndarray]:
+        """
+        Create masked frames by overlaying object masks to hide objects during stitching.
+        
+        Args:
+            frames: Original frames
+            segmentation_result: Result from frame segmentation
+            
+        Returns:
+            List of masked frames where objects are hidden/inpainted
+        """
+        masked_frames = []
+        frames_data = segmentation_result.get('frames_data', [])
+        
+        for i, frame in enumerate(frames):
+            try:
+                # Find corresponding frame data
+                frame_data = None
+                for fd in frames_data:
+                    if fd.get('frame_index', -1) == i:
+                        frame_data = fd
+                        break
+                
+                if frame_data is None or not frame_data.get('objects'):
+                    # No objects found, use original frame
+                    masked_frames.append(frame.copy())
+                    continue
+                
+                # Create masked frame by overlaying each object mask individually
+                masked_frame = frame.copy()
+                for obj in frame_data.get('objects', []):
+                    if 'mask' in obj:
+                        obj_mask = obj['mask']
+                        # Simply set object areas to black (no inpainting)
+                        masked_frame[obj_mask > 0] = [0, 0, 0]  # Black overlay
+                
+                masked_frames.append(masked_frame)
+                
+            except Exception as e:
+                logging.warning(f"Failed to create masked frame {i}: {e}")
+                # Fallback to original frame
+                masked_frames.append(frame.copy())
+        
+        return masked_frames
+    
     @log_step
     @time_step(track_processing=True)
-    def process_scene(self, scene_data: Dict[str, Any], cached_prompt: Optional[str] = None) -> Dict[str, Any]:
+    def process_scene(self, scene_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Process a complete scene through the pipeline.
         
         Args:
             scene_data: Scene data from video splitter
-            cached_prompt: Pre-cached prompt if available
             
         Returns:
             Processed scene data or Complex scene indicator
@@ -131,10 +178,25 @@ class PointStreamProcessor:
         logging.info(f"🎬 Processing scene {scene_number} ({len(frames)} frames)")
         
         try:
-            # STEP 1: Stitching
-            logging.info(f"🧩 Scene {scene_number}: Step 1/5 - Stitching panorama...")
+            # STEP 1: Frame Segmentation (moved before stitching)
+            logging.info(f"🎯 Scene {scene_number}: Step 1/4 - Object segmentation on frames...")
             step_start = time.time()
-            stitching_result = self.stitcher.stitch_scene(frames)
+            frame_segmentation_result = self.segmenter.segment_frames_only(frames)
+            step_time = time.time() - step_start
+            objects_count = sum(len(frame_data.get('objects', [])) for frame_data in frame_segmentation_result.get('frames_data', []))
+            logging.info(f"   ✅ Frame segmentation completed in {step_time:.1f}s - Found {objects_count} objects")
+            
+            # STEP 2: Create masked frames (overlay masks to hide objects)
+            logging.info(f"🎭 Scene {scene_number}: Step 2/4 - Creating masked frames...")
+            step_start = time.time()
+            masked_frames = self._create_masked_frames(frames, frame_segmentation_result)
+            step_time = time.time() - step_start
+            logging.info(f"   ✅ Masked frames created in {step_time:.1f}s")
+            
+            # STEP 3: Stitching with masked frames
+            logging.info(f"🧩 Scene {scene_number}: Step 3/4 - Stitching panorama with masked frames...")
+            step_start = time.time()
+            stitching_result = self.stitcher.stitch_scene(masked_frames)
             step_time = time.time() - step_start
             logging.info(f"   ✅ Stitching completed in {step_time:.1f}s")
             
@@ -144,60 +206,30 @@ class PointStreamProcessor:
                     'scene_type': 'Complex',
                     'scene_number': scene_number,
                     'stitching_result': stitching_result,
-                    'frames': frames  # Return frames for AV1 encoding
+                    'frames': frames  # Return original frames for AV1 encoding
                 }
             
             panorama = stitching_result['panorama']
             homographies = stitching_result['homographies']
             
-            # STEP 2: Segmentation
-            logging.info(f"🎯 Scene {scene_number}: Step 2/5 - Object segmentation...")
+            # STEP 4: Process keypoints (using original segmentation data)
+            logging.info(f"🎯 Scene {scene_number}: Step 4/4 - Keypoint extraction...")
             step_start = time.time()
-            segmentation_result = self.segmenter.segment_scene(frames, panorama)
-            step_time = time.time() - step_start
-            objects_count = sum(len(frame_data.get('objects', [])) for frame_data in segmentation_result.get('frames_data', []))
-            logging.info(f"   ✅ Segmentation completed in {step_time:.1f}s - Found {objects_count} objects")
-            
-            # STEP 3: Process keypoints
-            logging.info(f"🎯 Scene {scene_number}: Step 3/5 - Keypoint extraction...")
-            step_start = time.time()
-            keypoint_result = self._process_keypoints(segmentation_result, frames)
+            keypoint_result = self._process_keypoints(frame_segmentation_result, frames)
             step_time = time.time() - step_start
             keypoints_count = len(keypoint_result.get('objects', []))
             logging.info(f"   ✅ Keypoints completed in {step_time:.1f}s - Processed {keypoints_count} objects")
             
-            # STEP 4: Prompt generation
-            logging.info(f"💭 Scene {scene_number}: Step 4/5 - Generating prompt...")
-            step_start = time.time()
-            if cached_prompt:
-                prompt_result = {'prompt': cached_prompt, 'method': 'cached'}
-                step_time = 0.0
-                logging.info(f"   ✅ Using cached prompt (0.0s)")
-            else:
-                prompt_result = self.prompter.generate_prompt(panorama)
-                step_time = time.time() - step_start
-                logging.info(f"   ✅ Prompt generated in {step_time:.1f}s")
-            
-            prompt = prompt_result.get('prompt', 'natural scene with ambient lighting')
-            
-            # STEP 5: Inpainting
-            logging.info(f"🎨 Scene {scene_number}: Step 5/5 - Inpainting background...")
-            step_start = time.time()
-            panorama_masks = segmentation_result['panorama_data']['masks']
-            inpainting_result = self.inpainter.inpaint_background(panorama, panorama_masks, prompt)
-            step_time = time.time() - step_start
-            method = inpainting_result.get('method', 'unknown')
-            logging.info(f"   ✅ Inpainting completed in {step_time:.1f}s using {method}")
+            # No longer need prompt generation or inpainting since objects are already removed
             
             # Combine all results
             processed_result = {
                 'scene_type': stitching_result['scene_type'],
                 'scene_number': scene_number,
                 'stitching_result': stitching_result,
-                'segmentation_result': segmentation_result,
+                'segmentation_result': frame_segmentation_result,  # Use frame segmentation instead
                 'keypoint_result': keypoint_result,
-                'prompt_result': prompt_result,
-                'inpainting_result': inpainting_result
+                'masked_frames': masked_frames  # Include masked frames in result
             }
             
             logging.info(f"🎉 Scene {scene_number} processed successfully")
@@ -452,32 +484,19 @@ class PointStreamPipeline:
         if config_file:
             config.load_config(config_file)
         
-        # Pipeline configuration
-        self.enable_caching = config.get_bool('pipeline', 'enable_caching', True)
-        self.cache_dir = Path(config.get_str('pipeline', 'cache_dir', './cache'))
-        
-        # Create cache directory
-        if self.enable_caching:
-            self.cache_dir.mkdir(exist_ok=True)
-            self.prompt_cache = self._load_prompt_cache()
-        else:
-            self.prompt_cache = {}
-        
         # Initialize the processor
         self.processor = PointStreamProcessor()
         
         # Statistics
         self.processed_scenes = 0
         self.complex_scenes = 0
-        self.cache_hits = 0
         self.processing_times = []
         
         logging.info("🚀 PointStream Pipeline initialized")
         logging.info("🔄 Running in SEQUENTIAL mode")
-        logging.info(f"💾 Caching enabled: {self.enable_caching}")
-        if self.enable_caching:
-            logging.info(f"📁 Cache directory: {self.cache_dir}")
-            logging.info(f"🗃️  Cached prompts: {len(self.prompt_cache)}")
+        logging.info("🎯 New workflow: Segmentation → Masking → Stitching → Keypoints")
+    
+    @log_step
     
     def _load_prompt_cache(self) -> Dict[str, str]:
         """Load existing prompt cache from disk."""
@@ -731,16 +750,9 @@ class PointStreamPipeline:
                 
                 logging.info(f"📺 Processing scene {scene_number} (#{self.processed_scenes + 1}) - Duration: {scene_duration:.2f}s")
                 
-                # Check for cached prompt
-                cached_prompt = self._get_cached_prompt(scene_data)
-                if cached_prompt:
-                    logging.info(f"💾 Using cached prompt for scene {scene_number}")
-                else:
-                    logging.info(f"🆕 Will generate new prompt for scene {scene_number}")
-                
-                # Process scene sequentially
+                # Process scene sequentially (no more prompt caching needed)
                 logging.info(f"🚀 Starting sequential processing for scene {scene_number}")
-                result = self.processor.process_scene(scene_data, cached_prompt)
+                result = self.processor.process_scene(scene_data)
                 
                 processing_time = time.time() - processing_start
                 self.processing_times.append(processing_time)
@@ -767,14 +779,6 @@ class PointStreamPipeline:
                     # Handle successfully processed scene
                     logging.info(f"✨ Scene {scene_number}: {result.get('scene_type', 'Unknown')} -> Processed successfully")
                     
-                    # Cache the prompt if it was generated
-                    prompt_result = result.get('prompt_result', {})
-                    if prompt_result.get('method') != 'cached':
-                        prompt = prompt_result.get('prompt')
-                        if prompt:
-                            self._cache_prompt(scene_data, prompt)
-                            logging.info(f"💾 Cached new prompt for scene {scene_number}")
-                    
                     # Save results if enabled
                     if enable_saving and output_dir:
                         logging.info(f"💾 Saving scene {scene_number} results...")
@@ -788,10 +792,6 @@ class PointStreamPipeline:
             
             # Final cleanup
             splitter.close()
-            
-            # Save final cache
-            if self.enable_caching:
-                self._save_prompt_cache()
             
             # Generate summary
             summary = self._generate_processing_summary()
@@ -929,12 +929,7 @@ class PointStreamPipeline:
                 panorama_path = output_path / "panoramas" / f"scene_{scene_number:04d}_panorama.jpg"
                 cv2.imwrite(str(panorama_path), panorama)
             
-            # Save inpainted background
-            inpainting_result = result.get('inpainting_result', {})
-            inpainted_bg = inpainting_result.get('inpainted_image')
-            if inpainted_bg is not None:
-                bg_path = output_path / "panoramas" / f"scene_{scene_number:04d}_inpainted.jpg"
-                cv2.imwrite(str(bg_path), inpainted_bg)
+            # No longer save inpainted background since we don't do inpainting
             
             # Save objects (images, masks, keypoints)
             self._save_scene_objects(result, output_path)
@@ -974,17 +969,7 @@ class PointStreamPipeline:
                     'objects_saved': len([obj for obj in keypoint_result.get('objects', []) if obj.get('cropped_image') is not None])
                 },
                 
-                'prompt': {
-                    'text': result.get('prompt_result', {}).get('prompt', ''),
-                    'method': result.get('prompt_result', {}).get('method', 'unknown'),
-                    'processing_time': result.get('prompt_result', {}).get('processing_time', 0)
-                },
-                
-                'inpainting': {
-                    'method': inpainting_result.get('method'),
-                    'success': inpainting_result.get('success', False),
-                    'processing_time': inpainting_result.get('processing_time', 0)
-                },
+                # No longer have prompt or inpainting results
                 
                 'performance': {
                     'detailed_timings': performance_summary,
@@ -1017,10 +1002,8 @@ class PointStreamPipeline:
             'simple_scenes': self.processed_scenes - self.complex_scenes,
             'total_processing_time': total_time,
             'average_processing_time': total_time / max(self.processed_scenes, 1),
-            'cache_hits': self.cache_hits,
-            'cache_hit_rate': self.cache_hits / max(self.processed_scenes, 1),
             'throughput': self.processed_scenes / total_time if total_time > 0 else 0,
-            'caching_enabled': self.enable_caching
+            'workflow': 'segmentation_first'
         }
 
 
@@ -1122,8 +1105,7 @@ Examples:
         print(f"Total processing time: {summary['total_processing_time']:.3f}s")
         print(f"Average time per scene: {summary['average_processing_time']:.3f}s")
         print(f"Throughput: {summary['throughput']:.2f} scenes/second")
-        print(f"Cache hits: {summary['cache_hits']} ({summary['cache_hit_rate']:.1%})")
-        print(f"Workers used: {summary['workers_used']}")
+        print(f"Workflow: {summary['workflow']}")
         
         if not args.no_saving:
             print(f"Results saved to: {args.output_dir}")
