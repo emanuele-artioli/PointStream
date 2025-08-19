@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """
-Stable Diffusion Inpainting Component
+Inpainting Component
 
-This component handles background inpainting using Stable Diffusion 2 inpainting model.
-It takes panorama images, object masks, and text prompts to create clean, inpainted backgrounds.
+This component handles background inpainting using multiple methods:
+- Stable Diffusion 2 inpainting model (AI-based, high quality)
+- OpenCV TELEA inpainting (traditional, fast)
+- OpenCV Navier-Stokes inpainting (traditional, alternative)
 
-The component optimizes for quality and performance while handling various input scenarios.
+The component can be configured to use either method as primary with automatic
+fallback to the other method if the primary fails. This allows for optimization
+between quality and performance while handling various input scenarios.
 """
 
 import cv2
@@ -27,10 +31,13 @@ except ImportError:
 
 
 class Inpainter:
-    """Stable Diffusion 2 inpainting component for background restoration."""
+    """Multi-method inpainting component for background restoration."""
     
     def __init__(self):
-        """Initialize the inpainter with Stable Diffusion configuration."""
+        """Initialize the inpainter with configuration."""
+        # Primary inpainting method
+        self.primary_method = config.get_str('inpainting', 'primary_method', 'stable_diffusion')
+        
         # Model configuration
         self.model_name = config.get_str('inpainting', 'model_name', 'stabilityai/stable-diffusion-2-inpainting')
         self.device = config.get_str('inpainting', 'device', 'auto')
@@ -50,6 +57,10 @@ class Inpainter:
         self.blur_mask_edges = config.get_bool('inpainting', 'blur_mask_edges', True)
         self.blur_kernel_size = config.get_int('inpainting', 'blur_kernel_size', 3)
         
+        # OpenCV inpainting parameters
+        self.opencv_method = config.get_str('inpainting', 'opencv_method', 'telea')
+        self.opencv_radius = config.get_int('inpainting', 'opencv_radius', 3)
+        
         # Fallback parameters
         self.fallback_method = config.get_str('inpainting', 'fallback_method', 'telea')
         self.fallback_radius = config.get_int('inpainting', 'fallback_radius', 3)
@@ -58,16 +69,22 @@ class Inpainter:
         if self.device == 'auto':
             self.device = 'cuda' if torch.cuda.is_available() and DIFFUSERS_AVAILABLE else 'cpu'
         
-        # Initialize pipeline
+        # Initialize pipeline only if using stable diffusion
         self.pipeline = None
-        self._initialize_pipeline()
+        if self.primary_method == 'stable_diffusion':
+            self._initialize_pipeline()
         
         logging.info("Inpainter initialized")
-        logging.info(f"Model: {self.model_name}")
-        logging.info(f"Device: {self.device}")
-        logging.info(f"Max image size: {self.max_image_size}")
-        logging.info(f"Guidance scale: {self.guidance_scale}")
-        logging.info(f"Inference steps: {self.num_inference_steps}")
+        logging.info(f"Primary method: {self.primary_method}")
+        if self.primary_method == 'stable_diffusion':
+            logging.info(f"Model: {self.model_name}")
+            logging.info(f"Device: {self.device}")
+            logging.info(f"Max image size: {self.max_image_size}")
+            logging.info(f"Guidance scale: {self.guidance_scale}")
+            logging.info(f"Inference steps: {self.num_inference_steps}")
+        else:
+            logging.info(f"OpenCV method: {self.opencv_method}")
+            logging.info(f"OpenCV radius: {self.opencv_radius}")
     
     def _initialize_pipeline(self):
         """Initialize the Stable Diffusion inpainting pipeline."""
@@ -166,11 +183,43 @@ class Inpainter:
                     'mask_pixels': 0
                 }
             
-            # Use AI inpainting if available, otherwise fallback
-            if self.pipeline is not None:
-                result = self._inpaint_with_stable_diffusion(panorama, combined_mask, prompt)
-            else:
-                result = self._inpaint_with_fallback(panorama, combined_mask)
+            # Use primary method first, then fallback if it fails
+            try:
+                if self.primary_method == 'opencv':
+                    result = self._inpaint_with_opencv(panorama, combined_mask)
+                elif self.primary_method == 'stable_diffusion' and self.pipeline is not None:
+                    result = self._inpaint_with_stable_diffusion(panorama, combined_mask, prompt)
+                else:
+                    # Fallback to OpenCV if stable diffusion is not available
+                    result = self._inpaint_with_opencv(panorama, combined_mask)
+                    
+            except Exception as primary_error:
+                logging.warning(f"Primary inpainting method ({self.primary_method}) failed: {primary_error}")
+                logging.info("Attempting fallback method")
+                
+                # Try the alternative method as fallback
+                try:
+                    if self.primary_method == 'opencv':
+                        # Primary was OpenCV, try stable diffusion as fallback
+                        if self.pipeline is not None:
+                            result = self._inpaint_with_stable_diffusion(panorama, combined_mask, prompt)
+                        else:
+                            # No stable diffusion available, use fallback OpenCV settings
+                            result = self._inpaint_with_fallback_opencv(panorama, combined_mask)
+                    else:
+                        # Primary was stable diffusion, use OpenCV as fallback
+                        result = self._inpaint_with_opencv(panorama, combined_mask)
+                        
+                except Exception as fallback_error:
+                    logging.error(f"Fallback inpainting method also failed: {fallback_error}")
+                    # Return original image as last resort
+                    result = {
+                        'inpainted_image': panorama.copy(),
+                        'method': 'error_both_failed',
+                        'success': False,
+                        'primary_error': str(primary_error),
+                        'fallback_error': str(fallback_error)
+                    }
             
             return result
             
@@ -405,9 +454,9 @@ class Inpainter:
             logging.error(f"Stable Diffusion inpainting failed: {e}")
             raise
     
-    def _inpaint_with_fallback(self, image: np.ndarray, mask: np.ndarray) -> Dict[str, Any]:
+    def _inpaint_with_opencv(self, image: np.ndarray, mask: np.ndarray) -> Dict[str, Any]:
         """
-        Perform inpainting using OpenCV fallback methods.
+        Perform inpainting using OpenCV methods.
         
         Args:
             image: Input image
@@ -420,24 +469,67 @@ class Inpainter:
             # Convert mask to 8-bit
             mask_8bit = (mask * 255).astype(np.uint8)
             
-            # Apply OpenCV inpainting
-            if self.fallback_method == 'telea':
-                inpainted = cv2.inpaint(image, mask_8bit, self.fallback_radius, cv2.INPAINT_TELEA)
-            elif self.fallback_method == 'navier_stokes':
-                inpainted = cv2.inpaint(image, mask_8bit, self.fallback_radius, cv2.INPAINT_NS)
+            # Apply OpenCV inpainting using primary method settings
+            if self.opencv_method == 'telea':
+                inpainted = cv2.inpaint(image, mask_8bit, self.opencv_radius, cv2.INPAINT_TELEA)
+                method_name = 'telea'
+            elif self.opencv_method == 'navier_stokes':
+                inpainted = cv2.inpaint(image, mask_8bit, self.opencv_radius, cv2.INPAINT_NS)
+                method_name = 'navier_stokes'
             else:
-                logging.warning(f"Unknown fallback method: {self.fallback_method}, using Telea")
-                inpainted = cv2.inpaint(image, mask_8bit, self.fallback_radius, cv2.INPAINT_TELEA)
+                logging.warning(f"Unknown OpenCV method: {self.opencv_method}, using Telea")
+                inpainted = cv2.inpaint(image, mask_8bit, self.opencv_radius, cv2.INPAINT_TELEA)
+                method_name = 'telea_fallback'
             
             return {
                 'inpainted_image': inpainted,
-                'method': f'opencv_{self.fallback_method}',
+                'method': f'opencv_{method_name}',
                 'success': True,
-                'mask_pixels': int(np.sum(mask > 0))
+                'mask_pixels': int(np.sum(mask > 0)),
+                'radius': self.opencv_radius
             }
             
         except Exception as e:
-            logging.error(f"Fallback inpainting failed: {e}")
+            logging.error(f"OpenCV inpainting failed: {e}")
+            raise
+    
+    def _inpaint_with_fallback_opencv(self, image: np.ndarray, mask: np.ndarray) -> Dict[str, Any]:
+        """
+        Perform inpainting using OpenCV fallback settings.
+        
+        Args:
+            image: Input image
+            mask: Binary mask
+            
+        Returns:
+            Inpainting result dictionary
+        """
+        try:
+            # Convert mask to 8-bit
+            mask_8bit = (mask * 255).astype(np.uint8)
+            
+            # Apply OpenCV inpainting using fallback settings
+            if self.fallback_method == 'telea':
+                inpainted = cv2.inpaint(image, mask_8bit, self.fallback_radius, cv2.INPAINT_TELEA)
+                method_name = 'telea'
+            elif self.fallback_method == 'navier_stokes':
+                inpainted = cv2.inpaint(image, mask_8bit, self.fallback_radius, cv2.INPAINT_NS)
+                method_name = 'navier_stokes'
+            else:
+                logging.warning(f"Unknown fallback method: {self.fallback_method}, using Telea")
+                inpainted = cv2.inpaint(image, mask_8bit, self.fallback_radius, cv2.INPAINT_TELEA)
+                method_name = 'telea_fallback'
+            
+            return {
+                'inpainted_image': inpainted,
+                'method': f'opencv_fallback_{method_name}',
+                'success': True,
+                'mask_pixels': int(np.sum(mask > 0)),
+                'radius': self.fallback_radius
+            }
+            
+        except Exception as e:
+            logging.error(f"Fallback OpenCV inpainting failed: {e}")
             raise
     
     def _get_mask_bounding_box(self, mask: np.ndarray) -> Optional[Dict[str, int]]:

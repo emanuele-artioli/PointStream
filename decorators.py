@@ -5,12 +5,88 @@ Decorators for logging and timing pipeline components.
 This module provides decorators for the PointStream pipeline components:
 - @log_step: Logs function execution with crucial information
 - @time_step: Measures execution time, distinguishing between processing and debugging
+- PerformanceProfiler: Detailed performance tracking and reporting
 """
 
 import logging
 import time
 import functools
-from typing import Callable, Any, Dict
+from typing import Callable, Any, Dict, List
+from collections import defaultdict, deque
+
+
+class PerformanceProfiler:
+    """Global performance profiler for detailed timing analysis."""
+    
+    def __init__(self):
+        self.timings = defaultdict(list)
+        self.current_scene_timings = {}
+        self.scene_count = 0
+        
+    def start_timer(self, operation: str):
+        """Start timing an operation."""
+        self.current_scene_timings[operation] = time.time()
+        
+    def end_timer(self, operation: str) -> float:
+        """End timing an operation and return duration."""
+        if operation in self.current_scene_timings:
+            duration = time.time() - self.current_scene_timings[operation]
+            self.timings[operation].append(duration)
+            del self.current_scene_timings[operation]
+            return duration
+        return 0.0
+        
+    def log_scene_summary(self, scene_number: int):
+        """Log a comprehensive performance summary for the completed scene."""
+        summary = self.get_overall_summary()
+        if not summary:
+            logging.info(f"🔄 Scene {scene_number}: No performance data available")
+            return
+        
+        total_time = sum(data['total_time'] for data in summary.values())
+        
+        logging.info(f"📊 Performance Summary for Scene {scene_number}")
+        logging.info(f"   Total Processing Time: {total_time:.2f}s")
+        
+        # Sort operations by total time (longest first)
+        sorted_ops = sorted(summary.items(), key=lambda x: x[1]['total_time'], reverse=True)
+        
+        for operation, data in sorted_ops:
+            percentage = (data['total_time'] / total_time * 100) if total_time > 0 else 0
+            logging.info(f"   {operation:20s}: {data['total_time']:6.2f}s ({percentage:5.1f}%) - {data['call_count']} calls")
+        
+        # Find bottlenecks
+        if sorted_ops:
+            slowest = sorted_ops[0]
+            if slowest[1]['total_time'] > total_time * 0.5:
+                logging.warning(f"⚠️ Performance bottleneck detected: {slowest[0]} takes {slowest[1]['total_time']:.1f}s ({slowest[1]['total_time']/total_time*100:.1f}% of total time)")
+        
+        # Clear data for next scene
+        self.clear()
+    
+    def clear(self):
+        """Clear all timing data."""
+        self.timings.clear()
+
+
+# Global profiler instance
+        
+    def get_overall_summary(self) -> Dict[str, Any]:
+        """Get overall performance summary."""
+        summary = {}
+        for operation, times in self.timings.items():
+            if times:
+                summary[operation] = {
+                    'avg_time': sum(times) / len(times),
+                    'total_time': sum(times),
+                    'min_time': min(times),
+                    'max_time': max(times),
+                    'call_count': len(times)
+                }
+        return summary
+
+# Global profiler instance
+profiler = PerformanceProfiler()
 
 
 def log_step(func: Callable) -> Callable:
@@ -79,6 +155,10 @@ def time_step(track_processing: bool = True, track_debugging: bool = False):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             func_name = func.__name__
+            operation_name = f"{func_name}_{'processing' if track_processing else 'debugging'}"
+            
+            # Start profiler timer
+            profiler.start_timer(operation_name)
             start_time = time.time()
             
             try:
@@ -86,25 +166,28 @@ def time_step(track_processing: bool = True, track_debugging: bool = False):
                 end_time = time.time()
                 execution_time = end_time - start_time
                 
-                # Log timing information
+                # End profiler timer
+                profiler.end_timer(operation_name)
+                
+                # Log detailed timing information
                 if track_processing:
-                    logging.info(f"{func_name} processing time: {execution_time:.3f}s")
+                    logging.info(f"🚀 {func_name} processing: {execution_time:.3f}s")
                 elif track_debugging:
-                    logging.debug(f"{func_name} debugging time: {execution_time:.3f}s")
+                    logging.debug(f"🔧 {func_name} debugging: {execution_time:.3f}s")
                 else:
-                    logging.info(f"{func_name} execution time: {execution_time:.3f}s")
+                    logging.info(f"⏱️  {func_name} execution: {execution_time:.3f}s")
                 
                 # Add timing information to result if it's a dictionary
                 if isinstance(result, dict):
                     timing_key = 'processing_time' if track_processing else 'debugging_time'
                     result[timing_key] = execution_time
+                    result['operation_name'] = operation_name
                 
                 return result
                 
             except Exception as e:
-                end_time = time.time()
-                execution_time = end_time - start_time
-                logging.error(f"{func_name} failed after {execution_time:.3f}s: {str(e)}")
+                # End timer even on error
+                profiler.end_timer(operation_name)
                 raise
         
         return wrapper

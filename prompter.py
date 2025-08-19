@@ -551,6 +551,50 @@ class Prompter:
         
         return results
     
+    def _clean_prompt(self, prompt: str) -> str:
+        """
+        Clean and post-process generated prompt text.
+        
+        Args:
+            prompt: Raw generated prompt
+            
+        Returns:
+            Cleaned prompt text
+        """
+        if not prompt:
+            return "natural outdoor scene with clear lighting"
+        
+        # Remove common unwanted phrases
+        unwanted_phrases = [
+            "in this image", "the image shows", "this photo", "the photo",
+            "i can see", "there are", "there is", "the scene contains"
+        ]
+        
+        cleaned = prompt.lower()
+        for phrase in unwanted_phrases:
+            cleaned = cleaned.replace(phrase, "")
+        
+        # Remove mentions of people/animals
+        people_terms = ["person", "people", "man", "woman", "child", "human", "figure"]
+        animal_terms = ["animal", "dog", "cat", "bird", "horse", "cow"]
+        
+        for term in people_terms + animal_terms:
+            cleaned = cleaned.replace(term, "")
+        
+        # Clean up extra spaces and punctuation
+        cleaned = " ".join(cleaned.split())
+        cleaned = cleaned.strip(" .,;:")
+        
+        # Ensure it starts with a capital letter
+        if cleaned:
+            cleaned = cleaned[0].upper() + cleaned[1:]
+        
+        # Fallback if too short after cleaning
+        if len(cleaned) < 10:
+            return "natural outdoor scene with ambient lighting"
+        
+        return cleaned
+    
     def validate_prompt(self, prompt: str) -> Dict[str, Any]:
         """
         Validate the quality of a generated prompt.
