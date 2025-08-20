@@ -474,7 +474,7 @@ class PointStreamPipeline:
                     # Apply background masking to cropped object
                     masked_object = self._apply_background_mask(cropped_image, obj)
                     
-                    # Save masked object image
+                    # Save masked object image with transparency as PNG
                     image_filename = f"{object_filename}.png"
                     image_path = objects_dir / image_filename
                     cv2.imwrite(str(image_path), masked_object)
@@ -537,16 +537,23 @@ class PointStreamPipeline:
             logging.info(f"Saved {len(saved_objects)} objects for scene {scene_number}")
 
     def _apply_background_mask(self, cropped_image: np.ndarray, obj: Dict[str, Any]) -> np.ndarray:
-        """Apply background masking to cropped object image."""
+        """Apply background masking to cropped object image with transparency."""
         try:
             # Get the segmentation mask for this object
             seg_mask = obj.get('segmentation_mask')
             crop_bbox = obj.get('crop_bbox', [])
             
             if seg_mask is None or len(crop_bbox) < 4:
-                # If no mask available, return original cropped image
+                # If no mask available, return original cropped image converted to RGBA
                 logging.debug(f"No mask or bbox for object {obj.get('class_name', 'unknown')}")
-                return cropped_image
+                if len(cropped_image.shape) == 3:
+                    # Convert BGR to RGBA with full opacity
+                    rgba_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGBA)
+                    return rgba_image
+                else:
+                    # Grayscale to RGBA
+                    rgba_image = cv2.cvtColor(cropped_image, cv2.COLOR_GRAY2RGBA)
+                    return rgba_image
             
             # Extract crop coordinates
             x1, y1, x2, y2 = map(int, crop_bbox[:4])
@@ -570,22 +577,28 @@ class PointStreamPipeline:
             # Convert mask to binary (0 or 1)
             binary_mask = (mask_crop > 0.5).astype(np.uint8)
             
-            # Create masked image - set background (where mask is 0) to black
-            masked_image = cropped_image.copy()
-            if len(masked_image.shape) == 3:
-                # Color image - use 3D indexing
-                for c in range(3):
-                    masked_image[:, :, c] = masked_image[:, :, c] * binary_mask
+            # Create RGBA image with transparency
+            if len(cropped_image.shape) == 3:
+                # Color image - convert BGR to RGBA
+                rgba_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGBA)
             else:
-                # Grayscale image
-                masked_image = masked_image * binary_mask
+                # Grayscale - convert to RGBA
+                rgba_image = cv2.cvtColor(cropped_image, cv2.COLOR_GRAY2RGBA)
             
-            return masked_image
+            # Set alpha channel based on mask: 255 for object pixels, 0 for background
+            rgba_image[:, :, 3] = binary_mask * 255
+            
+            return rgba_image
             
         except Exception as e:
             logging.warning(f"Failed to apply background mask for object {obj.get('class_name', 'unknown')}: {e}")
-            # Return original cropped image if masking fails
-            return cropped_image
+            # Return original cropped image converted to RGBA if masking fails
+            if len(cropped_image.shape) == 3:
+                rgba_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGBA)
+                return rgba_image
+            else:
+                rgba_image = cv2.cvtColor(cropped_image, cv2.COLOR_GRAY2RGBA)
+                return rgba_image
         
         # Save objects metadata file
         if saved_objects:
@@ -615,8 +628,9 @@ class PointStreamPipeline:
             # Define frame processing components and their typical frame processing
             component_mappings = {
                 'segment_frames_only_processing': 'Frame Segmentation',
-                'stitch_scene_processing': 'Stitching',
-                'extract_keypoints_processing': 'Keypoint Extraction'
+                'stitch_scene_processing': 'Stitching', 
+                'extract_keypoints_processing': 'Keypoint Extraction',
+                '_detect_scene_cuts_in_batch': 'Scene Detection'  # Add scene detection timing
             }
             
             # Calculate total frames processed (estimate from scene data)
@@ -825,23 +839,30 @@ class PointStreamPipeline:
             else:
                 output_path = f"scene_{scene_number:04d}_complex.mp4"
             
-            # Get video properties
+            # Get video properties and original fps
             height, width = frames[0].shape[:2]
-            fps = 24
+            # Get original video fps from scene_data, or extract from source video
+            fps = scene_data.get('fps')
+            if fps is None:
+                # Extract FPS from original video if not in scene_data
+                import cv2
+                cap = cv2.VideoCapture(str(self.input_video))
+                fps = cap.get(cv2.CAP_PROP_FPS) or 25.0  # Default to 25 if cannot get FPS
+                cap.release()
+                logging.info(f"Extracted FPS from source video: {fps}")
             
-            # Use FFmpeg directly with libsvtav1 encoder
+            # Simplified FFmpeg command for AV1 encoding - let FFmpeg handle everything else
             ffmpeg_cmd = [
                 'ffmpeg',
                 '-f', 'rawvideo',
-                '-vcodec', 'rawvideo',
+                '-vcodec', 'rawvideo', 
                 '-s', f'{width}x{height}',
                 '-pix_fmt', 'bgr24',
                 '-r', str(fps),
                 '-i', '-',  # Read from stdin
                 '-c:v', 'libsvtav1',
-                '-crf', '35',
+                '-crf', '30',  # Better quality
                 '-preset', '6',
-                '-pix_fmt', 'yuv420p',
                 '-y',  # Overwrite output
                 output_path
             ]

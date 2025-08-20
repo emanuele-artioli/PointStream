@@ -39,6 +39,7 @@ try:
     from scenedetect.backends import AVAILABLE_BACKENDS
     import cv2
     import config
+    from decorators import time_step  # Import decorators for timing
     
     # Configure PySceneDetect logging AFTER import
     import logging
@@ -84,7 +85,7 @@ class VideoSceneSplitter:
         self.detector_type = detector_type or config.get_str('scene_detection', 'detector_type', 'content')
         
         # Set video backend
-        self.video_backend = video_backend or config.get_str('video', 'backend', 'auto')
+        self.video_backend = video_backend or config.get_str('encoding', 'backend', 'auto')
         
         # Initialize stats manager (OPTIONAL - for analysis only, not production)
         self.use_stats = config.get_bool('scene_detection', 'use_stats_manager', False)
@@ -107,7 +108,7 @@ class VideoSceneSplitter:
         
         # Set output directory (only used if encoding is enabled)
         if output_dir is None and enable_encoding:
-            pattern = config.get_str('general', 'default_output_pattern', '{input_stem}_scenes')
+            pattern = config.get_str('scene_detection', 'default_output_pattern', '{input_stem}_scenes')
             self.output_dir = self.input_video.parent / pattern.format(input_stem=self.input_video.stem)
         elif output_dir:
             self.output_dir = Path(output_dir)
@@ -118,9 +119,9 @@ class VideoSceneSplitter:
             self.output_dir.mkdir(exist_ok=True)
         
         # Get batch processing configuration
-        self.batch_size = batch_size or config.get_int('batch_processing', 'batch_size', 100)
-        self.max_scene_frames = max_scene_frames or config.get_int('general', 'default_max_frames', 1000)
-        self.overlap_frames = config.get_int('batch_processing', 'overlap_frames', 10)
+        self.batch_size = batch_size or config.get_int('scene_detection', 'batch_size', 100)
+        self.max_scene_frames = max_scene_frames or config.get_int('scene_detection', 'default_max_frames', 1000)
+        self.overlap_frames = config.get_int('scene_detection', 'overlap_frames', 10)
         
         # Get video properties
         self.video_fps, self.total_frames = self._get_video_properties()
@@ -215,6 +216,7 @@ class VideoSceneSplitter:
         
         return frames
 
+    @time_step(track_processing=True)
     def _detect_scene_cuts_in_batch(self, start_frame: int, end_frame: int) -> List[float]:
         """
         Enhanced scene cut detection with multiple detector support and performance optimizations.
@@ -481,7 +483,7 @@ class VideoSceneSplitter:
         duration = end_time - start_time
         
         # Apply quality control filters
-        min_scene_duration = config.get_float('quality_control', 'min_scene_duration', 0.5)
+        min_scene_duration = config.get_float('scene_detection', 'min_scene_duration', 0.5)
         if duration < min_scene_duration:
             logging.warning(f"Scene {scene_num} too short ({duration:.2f}s), skipping")
             return None
@@ -527,7 +529,7 @@ class VideoSceneSplitter:
         duration = end_time - start_time
         
         # Apply quality control filters
-        min_scene_duration = config.get_float('quality_control', 'min_scene_duration', 0.5)
+        min_scene_duration = config.get_float('scene_detection', 'min_scene_duration', 0.5)
         if duration < min_scene_duration:
             logging.warning(f"Scene {scene_num} too short ({duration:.2f}s), skipping")
             return None
@@ -563,8 +565,8 @@ class VideoSceneSplitter:
         duration = end_time - start_time
         
         # Apply quality control filters
-        min_scene_duration = config.get_float('quality_control', 'min_scene_duration', 0.5)
-        max_scene_duration = config.get_float('quality_control', 'max_scene_duration', 300)
+        min_scene_duration = config.get_float('scene_detection', 'min_scene_duration', 0.5)
+        max_scene_duration = config.get_float('scene_detection', 'max_scene_duration', 300)
         
         if duration < min_scene_duration:
             logging.warning(f"Scene {scene_num} too short ({duration:.2f}s), skipping")
@@ -574,18 +576,18 @@ class VideoSceneSplitter:
             logging.warning(f"Scene {scene_num} too long ({duration:.2f}s), may need splitting")
         
         # Generate output filename using configuration
-        filename_pattern = config.get_str('output', 'scene_filename_pattern', 'scene_{number:04d}.{extension}')
+        filename_pattern = config.get_str('encoding', 'scene_filename_pattern', 'scene_{number:04d}.{extension}')
         container_format = config.get_str('encoding', 'container_format', 'mp4')
         
         filename = filename_pattern.format(number=scene_num, extension=container_format)
         output_file = self.output_dir / filename
         
         # Build FFmpeg command using configuration
-        ffmpeg_binary = config.get_str('ffmpeg', 'ffmpeg_binary', 'ffmpeg')
+        ffmpeg_binary = config.get_str('encoding', 'ffmpeg_binary', 'ffmpeg')
         cmd = [ffmpeg_binary]
         
         # Add extra input arguments
-        extra_input_args = config.get_list('ffmpeg', 'extra_input_args', [])
+        extra_input_args = config.get_list('encoding', 'extra_input_args', [])
         cmd.extend(extra_input_args)
         
         # Input and timing
@@ -628,7 +630,7 @@ class VideoSceneSplitter:
             cmd.extend(['-an'])
         
         # Threading
-        ffmpeg_threads = config.get_int('ffmpeg', 'ffmpeg_threads', 0)
+        ffmpeg_threads = config.get_int('encoding', 'ffmpeg_threads', 0)
         if ffmpeg_threads > 0:
             cmd.extend(['-threads', str(ffmpeg_threads)])
         
@@ -639,13 +641,13 @@ class VideoSceneSplitter:
         
         # Misc
         cmd.extend(['-avoid_negative_ts', 'make_zero'])
-        extra_output_args = config.get_list('ffmpeg', 'extra_output_args', [])
+        extra_output_args = config.get_list('encoding', 'extra_output_args', [])
         cmd.extend(extra_output_args)
         cmd.extend(['-y', str(output_file)])
         
         # Execute with retries
-        retry_count = config.get_int('ffmpeg', 'retry_failed', 1)
-        timeout = config.get_int('ffmpeg', 'ffmpeg_timeout', 300)
+        retry_count = config.get_int('encoding', 'retry_failed', 1)
+        timeout = config.get_int('encoding', 'ffmpeg_timeout', 300)
         
         for attempt in range(retry_count + 1):
             try:
@@ -659,7 +661,7 @@ class VideoSceneSplitter:
                 )
                 
                 # Verify output if configured
-                verify_output = config.get_bool('quality_control', 'verify_output_files', True)
+                verify_output = config.get_bool('scene_detection', 'verify_output_files', True)
                 if verify_output:
                     if not self._verify_output_file(str(output_file)):
                         if attempt < retry_count:
@@ -679,7 +681,7 @@ class VideoSceneSplitter:
                     logging.error(f"FFmpeg stderr: {e.stderr}")
                 
                 if attempt >= retry_count:
-                    continue_on_error = config.get_bool('ffmpeg', 'continue_on_error', False)
+                    continue_on_error = config.get_bool('encoding', 'continue_on_error', False)
                     if not continue_on_error:
                         raise
                     else:
@@ -702,8 +704,8 @@ class VideoSceneSplitter:
             
             # Check file size
             file_size_kb = file_path.stat().st_size / 1024
-            min_file_size_kb = config.get_float('quality_control', 'min_file_size_kb', 10)
-            max_file_size_mb = config.get_float('quality_control', 'max_file_size_mb', 1000)
+            min_file_size_kb = config.get_float('encoding', 'min_file_size_kb', 10)
+            max_file_size_mb = config.get_float('encoding', 'max_file_size_mb', 1000)
             
             if file_size_kb < min_file_size_kb:
                 logging.warning(f"File too small: {file_size_kb:.1f}KB")
@@ -715,7 +717,7 @@ class VideoSceneSplitter:
                 return False
             
             # Check video integrity if configured
-            check_integrity = config.get_bool('quality_control', 'check_video_integrity', True)
+            check_integrity = config.get_bool('scene_detection', 'check_video_integrity', True)
             if check_integrity:
                 result = subprocess.run(
                     ['ffmpeg', '-v', 'error', '-i', output_file, '-f', 'null', '-'],
@@ -864,7 +866,7 @@ class VideoSceneSplitter:
                     'error': str(e)
                 }
                 
-                if not config.get_bool('ffmpeg', 'continue_on_error', False):
+                if not config.get_bool('encoding', 'continue_on_error', False):
                     break
         
         # Handle any remaining pending scene
@@ -963,7 +965,7 @@ class VideoSceneSplitter:
 
     def create_metadata_file(self, results: Dict[str, Any]):
         """Create comprehensive metadata file for the processing session."""
-        export_metadata = config.get_bool('output', 'export_metadata', True)
+        export_metadata = config.get_bool('encoding', 'export_metadata', True)
         
         if not export_metadata:
             return
@@ -982,7 +984,7 @@ class VideoSceneSplitter:
             'results': results
         }
         
-        metadata_filename = config.get_str('output', 'metadata_filename', 'metadata.json')
+        metadata_filename = config.get_str('encoding', 'metadata_filename', 'metadata.json')
         metadata_file = self.output_dir / metadata_filename
         try:
             with open(metadata_file, 'w') as f:
@@ -993,7 +995,7 @@ class VideoSceneSplitter:
 
     def create_scene_list(self, results: Dict[str, Any]):
         """Create a detailed scene list file."""
-        scene_list_filename = config.get_str('output', 'scene_list_filename', 'scene_list.txt')
+        scene_list_filename = config.get_str('encoding', 'scene_list_filename', 'scene_list.txt')
         scene_list_file = self.output_dir / scene_list_filename
         
         try:
@@ -1080,9 +1082,9 @@ Examples:
     parser.add_argument('output_dir', nargs='?', default=None,
                        help='Output directory for scene videos (only used if --enable-encoding)')
     parser.add_argument('--batch-size', type=int, default=None,
-                       help=f'Number of frames per batch (default from config: {config.get_int("batch_processing", "batch_size", 100)})')
+                       help=f'Number of frames per batch (default from config: {config.get_int("scene_detection", "batch_size", 100)})')
     parser.add_argument('--max-frames', type=int, default=None,
-                       help=f'Maximum frames per scene (default from config: {config.get_int("general", "default_max_frames", 1000)})')
+                       help=f'Maximum frames per scene (default from config: {config.get_int("scene_detection", "default_max_frames", 1000)})')
     parser.add_argument('--config', help='Path to configuration file')
     parser.add_argument('--show-config', action='store_true', help='Show current configuration and exit')
     parser.add_argument('--enable-encoding', action='store_true', 

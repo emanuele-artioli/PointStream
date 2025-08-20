@@ -99,11 +99,11 @@ class Keypointer:
         if MMPOSE_AVAILABLE:
             try:
                 # Initialize human pose model
-                human_model_config = config.get_str('keypoints', 'human_model_config', 'human2d')
+                human_model_config = config.get_str('keypoints', 'human_model_config', 'human')
                 human_model_checkpoint = config.get_str('keypoints', 'human_model_checkpoint', '')
                 
                 # Initialize animal pose model
-                animal_model_config = config.get_str('keypoints', 'animal_model_config', 'animal2d')
+                animal_model_config = config.get_str('keypoints', 'animal_model_config', 'animal')
                 animal_model_checkpoint = config.get_str('keypoints', 'animal_model_checkpoint', '')
                 
                 # Initialize MMPose models
