@@ -40,6 +40,7 @@ class Segmenter:
         # Performance settings
         self.yolo_image_size = config.get_int('segmentation', 'yolo_image_size', 640)
         self.yolo_half_precision = config.get_bool('segmentation', 'yolo_half_precision', True)
+        self.agnostic_nms = config.get_bool('segmentation', 'agnostic_nms', True)
         
         # Class filtering
         classes_config = config.get_list('segmentation', 'classes', [])
@@ -61,58 +62,17 @@ class Segmenter:
         logging.info(f"Classes filter: {self.classes or 'All classes'}")
     
     def _initialize_models(self):
-        """Initialize YOLO models for tracking and non-tracking."""
+        """Initialize YOLO model for tracking frames only."""
         try:
             # Model with tracking for video frames
             logging.info("Loading YOLO model with tracking for frames...")
             self.model_with_tracking = YOLO(self.model_path)
             
-            # Model without tracking for panorama processing
-            logging.info("Loading YOLO model without tracking for panorama...")
-            self.model_without_tracking = YOLO(self.model_path)
-            
-            logging.info("YOLO models loaded successfully")
+            logging.info("YOLO model loaded successfully")
             
         except Exception as e:
             logging.error(f"Failed to initialize YOLO models: {e}")
             raise
-    
-    @log_step
-    @time_step(track_processing=True)
-    def segment_scene(self, frames: List[np.ndarray], panorama: np.ndarray) -> Dict[str, Any]:
-        """
-        Segment objects in scene frames and panorama.
-        
-        Args:
-            frames: List of scene frames
-            panorama: Scene panorama image
-            
-        Returns:
-            Dictionary containing:
-            - panorama_data: Segmentation data for panorama
-            - frames_data: List of segmentation data for each frame
-        """
-        if not frames:
-            return {
-                'panorama_data': {'objects': [], 'masks': [], 'bounding_boxes': []},
-                'frames_data': []
-            }
-        
-        logging.info(f"Segmenting {len(frames)} frames and panorama")
-        
-        # Process panorama (without tracking)
-        panorama_data = self._segment_panorama(panorama)
-        
-        # Process frames (with tracking)
-        frames_data = []
-        for i, frame in enumerate(frames):
-            frame_data = self._segment_frame(frame, frame_index=i)
-            frames_data.append(frame_data)
-        
-        return {
-            'panorama_data': panorama_data,
-            'frames_data': frames_data
-        }
     
     @log_step
     @time_step(track_processing=True)
@@ -138,41 +98,7 @@ class Segmenter:
             frames_data.append(frame_data)
         
         return {'frames_data': frames_data}
-    
-    def _segment_panorama(self, panorama: np.ndarray) -> Dict[str, Any]:
-        """
-        Segment objects in panorama image without tracking.
-        
-        Args:
-            panorama: Panorama image
-            
-        Returns:
-            Dictionary with panorama segmentation data
-        """
-        if panorama is None:
-            return {'objects': [], 'masks': [], 'bounding_boxes': []}
-        
-        try:
-            # Run YOLO detection without tracking
-            results = self.model_without_tracking.predict(
-                panorama,
-                conf=self.confidence_threshold,
-                iou=self.iou_threshold,
-                device=self.device,
-                retina_masks=True,
-                max_det=self.max_objects,
-                classes=self.classes,
-                imgsz=self.yolo_image_size,
-                half=self.yolo_half_precision,
-                verbose=False
-            )
-            
-            return self._extract_detection_data(results, frame_index=None, with_tracking=False)
-            
-        except Exception as e:
-            logging.error(f"Panorama segmentation failed: {e}")
-            return {'objects': [], 'masks': [], 'bounding_boxes': []}
-    
+
     def _segment_frame(self, frame: np.ndarray, frame_index: int) -> Dict[str, Any]:
         """
         Segment objects in a single frame with tracking.
@@ -196,6 +122,7 @@ class Segmenter:
                 classes=self.classes,
                 imgsz=self.yolo_image_size,
                 half=self.yolo_half_precision,
+                agnostic_nms=self.agnostic_nms,
                 verbose=False,
                 persist=True  # Persist tracks across frames
             )

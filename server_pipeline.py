@@ -43,6 +43,7 @@ try:
     from stitcher import Stitcher
     from segmenter import Segmenter 
     from keypointer import Keypointer
+    from saver import Saver
     # No longer needed: prompter and inpainter
     # from prompter import Prompter
     # from inpainter import Inpainter
@@ -73,6 +74,7 @@ class PointStreamProcessor:
         self.stitcher = None
         self.segmenter = None
         self.keypointer = None
+        self.saver = None
         # No longer needed
         # self.prompter = None
         # self.inpainter = None
@@ -96,6 +98,9 @@ class PointStreamProcessor:
             logging.info("   🫴 Initializing Keypointer...")
             self.keypointer = Keypointer()
             
+            logging.info("   💾 Initializing Saver...")
+            self.saver = Saver()
+            
             # No longer needed
             # logging.info("   💭 Initializing Prompter...")
             # self.prompter = Prompter()
@@ -111,15 +116,17 @@ class PointStreamProcessor:
     
     def _create_masked_frames(self, frames: List[np.ndarray], segmentation_result: Dict[str, Any]) -> List[np.ndarray]:
         """
-        Create masked frames by overlaying object masks to hide objects during stitching.
+        Create masked frames with configurable background handling.
+        Can use either background reconstruction or simple black masking.
         
         Args:
             frames: Original frames
             segmentation_result: Result from frame segmentation
             
         Returns:
-            List of masked frames where objects are hidden/inpainted
+            List of masked frames where objects are handled according to config
         """
+        use_reconstruction = config.get_bool('stitching', 'use_background_reconstruction', True)
         masked_frames = []
         frames_data = segmentation_result.get('frames_data', [])
         
@@ -137,13 +144,16 @@ class PointStreamProcessor:
                     masked_frames.append(frame.copy())
                     continue
                 
-                # Create masked frame by overlaying each object mask individually
-                masked_frame = frame.copy()
-                for obj in frame_data.get('objects', []):
-                    if 'mask' in obj:
-                        obj_mask = obj['mask']
-                        # Simply set object areas to black (no inpainting)
-                        masked_frame[obj_mask > 0] = [0, 0, 0]  # Black overlay
+                if use_reconstruction:
+                    # Create masked frame with background reconstruction
+                    masked_frame = self._reconstruct_background(frame, frame_data, frames, i)
+                else:
+                    # Use simple black masking (old method)
+                    masked_frame = frame.copy()
+                    for obj in frame_data.get('objects', []):
+                        if 'mask' in obj:
+                            obj_mask = obj['mask']
+                            masked_frame[obj_mask > 0] = [0, 0, 0]  # Black overlay
                 
                 masked_frames.append(masked_frame)
                 
@@ -153,6 +163,169 @@ class PointStreamProcessor:
                 masked_frames.append(frame.copy())
         
         return masked_frames
+    
+    def _reconstruct_background(self, current_frame: np.ndarray, frame_data: Dict[str, Any], 
+                               all_frames: List[np.ndarray], frame_idx: int) -> np.ndarray:
+        """
+        Reconstruct background behind objects using content from other frames.
+        
+        Args:
+            current_frame: Current frame to process
+            frame_data: Object detection data for current frame
+            all_frames: All frames in the scene
+            frame_idx: Index of current frame
+            
+        Returns:
+            Frame with objects replaced by reconstructed background
+        """
+        reconstructed_frame = current_frame.copy()
+        
+        # Get all object masks for this frame
+        combined_mask = np.zeros(current_frame.shape[:2], dtype=np.uint8)
+        for obj in frame_data.get('objects', []):
+            if 'mask' in obj:
+                obj_mask = obj['mask']
+                combined_mask = cv2.bitwise_or(combined_mask, obj_mask.astype(np.uint8))
+        
+        if np.sum(combined_mask) == 0:
+            return reconstructed_frame
+        
+        # Try to fill object areas using content from neighboring frames
+        object_areas = combined_mask > 0
+        
+        # Strategy 1: Use neighboring frames (temporal reconstruction)
+        neighbor_indices = []
+        for offset in [-2, -1, 1, 2]:  # Check 2 frames before and after
+            neighbor_idx = frame_idx + offset
+            if 0 <= neighbor_idx < len(all_frames):
+                neighbor_indices.append(neighbor_idx)
+        
+        if neighbor_indices:
+            # Create weighted average of neighboring frames for object areas
+            background_content = np.zeros_like(current_frame, dtype=np.float64)
+            total_weight = 0
+            
+            for neighbor_idx in neighbor_indices:
+                weight = 1.0 / (abs(neighbor_idx - frame_idx))  # Closer frames have higher weight
+                background_content += all_frames[neighbor_idx].astype(np.float64) * weight
+                total_weight += weight
+            
+            if total_weight > 0:
+                background_content = (background_content / total_weight).astype(np.uint8)
+                
+                # Use inpainting to blend the background content smoothly
+                kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+                dilated_mask = cv2.dilate(combined_mask, kernel, iterations=2)
+                
+                # Replace object areas with reconstructed background
+                reconstructed_frame[object_areas] = background_content[object_areas]
+                
+                # Apply Gaussian blur to the boundary for smooth blending
+                blurred_frame = cv2.GaussianBlur(reconstructed_frame, (5, 5), 0)
+                
+                # Create a soft transition mask
+                distance_transform = cv2.distanceTransform(255 - dilated_mask, cv2.DIST_L2, 5)
+                transition_mask = np.clip(distance_transform / 10.0, 0, 1)  # Soft falloff over 10 pixels
+                
+                # Blend original and reconstructed content based on distance from object
+                for c in range(3):  # For each color channel
+                    reconstructed_frame[:, :, c] = (
+                        blurred_frame[:, :, c] * (1 - transition_mask) + 
+                        current_frame[:, :, c] * transition_mask
+                    ).astype(np.uint8)
+        
+        else:
+            # Fallback: Use simple inpainting if no neighbor frames available
+            inpainted = cv2.inpaint(current_frame, combined_mask, inpaintRadius=3, flags=cv2.INPAINT_TELEA)
+            reconstructed_frame = inpainted
+        
+        return reconstructed_frame
+    
+    def _cleanup_panorama_black_areas(self, panorama: np.ndarray) -> np.ndarray:
+        """
+        Remove black areas in panorama using smart inpainting that excludes border areas.
+        This handles black holes created by object masking while preserving warping borders.
+        
+        Args:
+            panorama: Input panorama that may contain black areas
+            
+        Returns:
+            Cleaned panorama with interior black areas inpainted
+        """
+        if panorama is None:
+            return None
+            
+        try:
+            # Create mask for black/very dark areas
+            black_threshold = config.get_int('stitching', 'cleanup_black_threshold', 10)
+            gray = cv2.cvtColor(panorama, cv2.COLOR_BGR2GRAY)
+            black_mask = (gray < black_threshold).astype(np.uint8)
+            
+            # Remove small isolated black pixels (noise)
+            kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+            black_mask = cv2.morphologyEx(black_mask, cv2.MORPH_OPEN, kernel)
+            
+            # SMART FILTERING: Remove black areas that touch borders
+            # These are usually from warping and should not be inpainted
+            exclude_borders = config.get_bool('stitching', 'exclude_border_black_areas', True)
+            h, w = black_mask.shape
+            
+            if exclude_borders:
+                border_mask = np.zeros_like(black_mask)
+                
+                # Create border region (configurable width from each edge)
+                border_width = config.get_int('stitching', 'border_exclusion_width', 10)
+                border_mask[:border_width, :] = 1    # Top border
+                border_mask[-border_width:, :] = 1   # Bottom border 
+                border_mask[:, :border_width] = 1    # Left border
+                border_mask[:, -border_width:] = 1   # Right border
+                
+                # Find black areas that touch borders using connected components
+                num_labels, labels = cv2.connectedComponents(black_mask)
+                
+                # Create mask for interior black areas only
+                interior_black_mask = np.zeros_like(black_mask)
+                
+                for label in range(1, num_labels):  # Skip background (label 0)
+                    component_mask = (labels == label).astype(np.uint8)
+                    
+                    # Check if this component touches any border
+                    if np.any(component_mask & border_mask):
+                        # Component touches border - don't inpaint
+                        continue
+                    else:
+                        # Component is interior - add to inpainting mask
+                        interior_black_mask |= component_mask
+                
+                final_mask = interior_black_mask
+                excluded_pixels = np.sum(black_mask) - np.sum(interior_black_mask)
+            else:
+                # Use all black areas
+                final_mask = black_mask
+                excluded_pixels = 0
+            
+            # Only inpaint if we have significant interior black areas
+            black_area_ratio = np.sum(final_mask) / (h * w)
+            
+            if black_area_ratio > 0.001:  # More than 0.1% interior black areas
+                inpaint_radius = config.get_int('stitching', 'inpaint_radius', 7)
+                
+                if exclude_borders and excluded_pixels > 0:
+                    logging.info(f"Inpainting {black_area_ratio*100:.2f}% interior black areas in panorama")
+                    logging.info(f"Excluded {excluded_pixels} border pixels from inpainting")
+                else:
+                    logging.info(f"Inpainting {black_area_ratio*100:.2f}% black areas in panorama")
+                
+                # Use Telea inpainting algorithm for better results
+                inpainted = cv2.inpaint(panorama, final_mask, inpaintRadius=inpaint_radius, flags=cv2.INPAINT_TELEA)
+                return inpainted
+            else:
+                logging.info("No significant interior black areas found - panorama clean")
+                return panorama
+                
+        except Exception as e:
+            logging.warning(f"Failed to cleanup panorama black areas: {e}")
+            return panorama
     
     @log_step
     @time_step(track_processing=True)
@@ -211,6 +384,13 @@ class PointStreamProcessor:
                 }
             
             panorama = stitching_result['panorama']
+            
+            # Clean up any remaining black areas in the panorama
+            if panorama is not None and config.get_bool('stitching', 'enable_panorama_cleanup', True):
+                logging.info(f"🎨 Scene {scene_number}: Cleaning up panorama black areas...")
+                panorama = self._cleanup_panorama_black_areas(panorama)
+                stitching_result['panorama'] = panorama  # Update the cleaned panorama
+            
             homographies = stitching_result['homographies']
             
             # STEP 4: Process keypoints (using original segmentation data)
@@ -435,183 +615,24 @@ class PointStreamPipeline:
             }
 
     def _save_scene_objects(self, scene_data: Dict[str, Any], output_dir: Path):
-        """Save individual object images with background masking and enhanced metadata."""
+        """Save individual object images using the dedicated Saver component."""
         if not output_dir:
             return
             
         scene_number = scene_data.get('scene_number', 0)
-        objects = scene_data.get('keypoint_result', {}).get('objects', [])
-        homographies = scene_data.get('stitching_result', {}).get('homographies', [])
         
-        if not objects:
-            return
-            
-        # Create objects directory
-        objects_dir = output_dir / 'objects' / f'scene_{scene_number:04d}'
-        objects_dir.mkdir(parents=True, exist_ok=True)
+        # Use the Saver component to save objects
+        save_result = self.saver.save_scene_objects(scene_data, output_dir, scene_number)
         
-        saved_objects = []
-        class_counters = {}  # To handle multiple objects of same class
+        if save_result.get('saved_objects', 0) > 0:
+            logging.info(f"Saved {save_result['saved_objects']} objects for scene {scene_number}")
         
-        for obj in objects:
-            try:
-                # Use class name for object identification
-                class_name = obj.get('class_name', 'unknown')
-                object_id = obj.get('object_id', 'unknown')
-                cropped_image = obj.get('cropped_image')
-                
-                if cropped_image is not None:
-                    # Generate class-based filename
-                    if class_name not in class_counters:
-                        class_counters[class_name] = 0
-                    class_counters[class_name] += 1
-                    
-                    if class_counters[class_name] == 1:
-                        object_filename = class_name
-                    else:
-                        object_filename = f"{class_name}_{class_counters[class_name]}"
-                    
-                    # Apply background masking to cropped object
-                    masked_object = self._apply_background_mask(cropped_image, obj)
-                    
-                    # Save masked object image with transparency as PNG
-                    image_filename = f"{object_filename}.png"
-                    image_path = objects_dir / image_filename
-                    cv2.imwrite(str(image_path), masked_object)
-                    
-                    # Create comprehensive object metadata
-                    obj_metadata = {
-                        'object_id': object_id,
-                        'class_name': class_name,
-                        'filename': object_filename,
-                        'saved_image_path': str(image_path),
-                        'image_filename': image_filename,
-                        'frame_index': obj.get('frame_index'),
-                        'confidence': obj.get('confidence'),
-                        
-                        # Bounding box information
-                        'bbox': obj.get('bbox', []).tolist() if hasattr(obj.get('bbox', []), 'tolist') else obj.get('bbox', []),
-                        'crop_bbox': obj.get('crop_bbox', []).tolist() if hasattr(obj.get('crop_bbox', []), 'tolist') else obj.get('crop_bbox', []),
-                        
-                        # Keypoints information
-                        'keypoints': obj.get('keypoints', []).tolist() if hasattr(obj.get('keypoints', []), 'tolist') else obj.get('keypoints', []),
-                        'keypoint_scores': obj.get('keypoint_scores', []).tolist() if hasattr(obj.get('keypoint_scores', []), 'tolist') else obj.get('keypoint_scores', []),
-                        'keypoint_visibility': obj.get('keypoint_visibility', []).tolist() if hasattr(obj.get('keypoint_visibility', []), 'tolist') else obj.get('keypoint_visibility', []),
-                        'has_keypoints': len(obj.get('keypoints', [])) > 0,
-                        
-                        # Homography for this frame (if available)
-                        'homography': homographies[obj.get('frame_index', 0)].tolist() if obj.get('frame_index', 0) < len(homographies) and homographies[obj.get('frame_index', 0)] is not None else None,
-                        
-                        # Additional tracking information
-                        'track_id': obj.get('track_id'),
-                        'area': obj.get('area'),
-                        'processing_timestamp': obj.get('processing_timestamp')
-                    }
-                    
-                    # Save segmentation mask if available
-                    seg_mask = obj.get('segmentation_mask')
-                    if seg_mask is not None:
-                        mask_filename = f"{object_filename}_mask.png"
-                        mask_path = objects_dir / mask_filename
-                        cv2.imwrite(str(mask_path), seg_mask * 255)  # Convert to 0-255 range
-                        obj_metadata['saved_mask_path'] = str(mask_path)
-                        obj_metadata['mask_filename'] = mask_filename
-                    
-                    saved_objects.append(obj_metadata)
-                    
-            except Exception as e:
-                logging.warning(f"Failed to save object {obj.get('class_name', 'unknown')} (ID: {obj.get('object_id', 'unknown')}): {e}")
+        # Save metadata using the Saver component
+        metadata_result = self.saver.save_metadata(scene_data, output_dir, scene_number)
+        if metadata_result.get('metadata_saved'):
+            logging.info(f"Saved metadata for scene {scene_number}")
         
-        # Save objects metadata
-        if saved_objects:
-            metadata_path = objects_dir / 'objects_metadata.json'
-            with open(metadata_path, 'w') as f:
-                json.dump({
-                    'scene_number': scene_number,
-                    'total_objects': len(saved_objects),
-                    'objects': saved_objects,
-                    'homographies_count': len(homographies),
-                    'processing_timestamp': time.time()
-                }, f, indent=2)
-            
-            logging.info(f"Saved {len(saved_objects)} objects for scene {scene_number}")
-
-    def _apply_background_mask(self, cropped_image: np.ndarray, obj: Dict[str, Any]) -> np.ndarray:
-        """Apply background masking to cropped object image with transparency."""
-        try:
-            # Get the segmentation mask for this object
-            seg_mask = obj.get('segmentation_mask')
-            crop_bbox = obj.get('crop_bbox', [])
-            
-            if seg_mask is None or len(crop_bbox) < 4:
-                # If no mask available, return original cropped image converted to RGBA
-                logging.debug(f"No mask or bbox for object {obj.get('class_name', 'unknown')}")
-                if len(cropped_image.shape) == 3:
-                    # Convert BGR to RGBA with full opacity
-                    rgba_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGBA)
-                    return rgba_image
-                else:
-                    # Grayscale to RGBA
-                    rgba_image = cv2.cvtColor(cropped_image, cv2.COLOR_GRAY2RGBA)
-                    return rgba_image
-            
-            # Extract crop coordinates
-            x1, y1, x2, y2 = map(int, crop_bbox[:4])
-            
-            # Get the portion of the segmentation mask that corresponds to the crop
-            # The seg_mask should be in full frame coordinates, so we crop it to match our object crop
-            if len(seg_mask.shape) == 2:
-                # 2D mask - crop it to the bounding box region
-                mask_crop = seg_mask[y1:y2, x1:x2]
-            else:
-                # Handle potential 3D mask
-                mask_crop = seg_mask[y1:y2, x1:x2]
-                if len(mask_crop.shape) > 2:
-                    mask_crop = mask_crop[:, :, 0]  # Take first channel
-            
-            # Ensure mask dimensions match cropped image
-            crop_h, crop_w = cropped_image.shape[:2]
-            if mask_crop.shape != (crop_h, crop_w):
-                mask_crop = cv2.resize(mask_crop, (crop_w, crop_h))
-            
-            # Convert mask to binary (0 or 1)
-            binary_mask = (mask_crop > 0.5).astype(np.uint8)
-            
-            # Create RGBA image with transparency
-            if len(cropped_image.shape) == 3:
-                # Color image - convert BGR to RGBA
-                rgba_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGBA)
-            else:
-                # Grayscale - convert to RGBA
-                rgba_image = cv2.cvtColor(cropped_image, cv2.COLOR_GRAY2RGBA)
-            
-            # Set alpha channel based on mask: 255 for object pixels, 0 for background
-            rgba_image[:, :, 3] = binary_mask * 255
-            
-            return rgba_image
-            
-        except Exception as e:
-            logging.warning(f"Failed to apply background mask for object {obj.get('class_name', 'unknown')}: {e}")
-            # Return original cropped image converted to RGBA if masking fails
-            if len(cropped_image.shape) == 3:
-                rgba_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGBA)
-                return rgba_image
-            else:
-                rgba_image = cv2.cvtColor(cropped_image, cv2.COLOR_GRAY2RGBA)
-                return rgba_image
-        
-        # Save objects metadata file
-        if saved_objects:
-            metadata_path = objects_dir / 'objects_metadata.json'
-            with open(metadata_path, 'w') as f:
-                json.dump({
-                    'scene_number': scene_number,
-                    'total_objects': len(saved_objects),
-                    'objects': saved_objects,
-                    'saved_at': time.time()
-                }, f, indent=2)
-            
-            logging.info(f"Saved {len(saved_objects)} objects for scene {scene_number}")
+        return save_result
 
     def _log_component_fps_statistics(self):
         """Log average FPS statistics for each component across all processed scenes."""
@@ -813,16 +834,16 @@ class PointStreamPipeline:
         except Exception as e:
             logging.warning(f"Prompt caching failed: {e}")
     
-    def _encode_complex_scene(self, scene_data: Dict[str, Any], output_dir: str = None) -> Dict[str, Any]:
+    def _save_complex_scene(self, scene_data: Dict[str, Any], output_dir: str = None) -> Dict[str, Any]:
         """
-        Encode complex scene directly to AV1 video with libsvtav1.
+        Save complex scene using the dedicated Saver component.
         
         Args:
             scene_data: Scene data with frames
-            output_dir: Output directory for the encoded file
+            output_dir: Output directory for the saved files
             
         Returns:
-            Encoding result
+            Save result
         """
         scene_number = scene_data.get('scene_number', 0)
         frames = scene_data.get('frames', [])
@@ -830,7 +851,7 @@ class PointStreamPipeline:
         if not frames:
             return {'success': False, 'error': 'no_frames'}
         
-        logging.info(f"Encoding complex scene {scene_number} with {len(frames)} frames")
+        logging.info(f"Saving complex scene {scene_number} with {len(frames)} frames")
         
         try:
             # Create output path
@@ -840,8 +861,6 @@ class PointStreamPipeline:
                 output_path = f"scene_{scene_number:04d}_complex.mp4"
             
             # Get video properties and original fps
-            height, width = frames[0].shape[:2]
-            # Get original video fps from scene_data, or extract from source video
             fps = scene_data.get('fps')
             if fps is None:
                 # Extract FPS from original video if not in scene_data
@@ -851,83 +870,23 @@ class PointStreamPipeline:
                 cap.release()
                 logging.info(f"Extracted FPS from source video: {fps}")
             
-            # Simplified FFmpeg command for AV1 encoding - let FFmpeg handle everything else
-            ffmpeg_cmd = [
-                'ffmpeg',
-                '-f', 'rawvideo',
-                '-vcodec', 'rawvideo', 
-                '-s', f'{width}x{height}',
-                '-pix_fmt', 'bgr24',
-                '-r', str(fps),
-                '-i', '-',  # Read from stdin
-                '-c:v', 'libsvtav1',
-                '-crf', '30',  # Better quality
-                '-preset', '6',
-                '-y',  # Overwrite output
-                output_path
-            ]
+            # Use the Saver component to encode the video
+            encoding_result = self.saver.save_complex_scene_video(
+                frames=frames, 
+                output_path=output_path, 
+                fps=fps,
+                scene_number=scene_number
+            )
             
-            encoding_start = time.time()
-            
-            # Start FFmpeg process
-            import subprocess
-            process = subprocess.Popen(ffmpeg_cmd, stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-            
-            try:
-                # Write frames directly to FFmpeg stdin
-                for frame in frames:
-                    if process.poll() is not None:
-                        # Process has terminated
-                        break
-                    if process.stdin and not process.stdin.closed:
-                        try:
-                            process.stdin.write(frame.tobytes())
-                        except BrokenPipeError:
-                            logging.warning("FFmpeg process ended unexpectedly during frame writing")
-                            break
-                    else:
-                        logging.warning("FFmpeg stdin is closed, stopping frame writing")
-                        break
-                
-                # Close stdin and wait for completion
-                if process.stdin and not process.stdin.closed:
-                    try:
-                        process.stdin.close()
-                    except:
-                        pass  # Ignore errors when closing stdin
-                stdout, stderr = process.communicate()
-                
-            except Exception as e:
-                try:
-                    process.kill()
-                    process.wait()
-                except:
-                    pass
-                raise e
-            
-            encoding_time = time.time() - encoding_start
-            
-            if process.returncode == 0:
-                file_size = os.path.getsize(output_path)
-                logging.info(f"Complex scene {scene_number} encoded in {encoding_time:.3f}s, size: {file_size/1024/1024:.2f}MB")
-                
-                return {
-                    'success': True,
-                    'output_path': output_path,
-                    'encoding_time': encoding_time,
-                    'file_size': file_size,
-                    'method': 'libsvtav1_direct'
-                }
+            if encoding_result['success']:
+                logging.info(f"Complex scene {scene_number} saved successfully")
+                return encoding_result
             else:
-                error_msg = stderr.decode() if stderr else "Unknown FFmpeg error"
-                logging.error(f"FFmpeg encoding failed: {error_msg}")
-                return {
-                    'success': False,
-                    'error': error_msg
-                }
+                logging.error(f"Failed to save complex scene {scene_number}: {encoding_result.get('error', 'Unknown error')}")
+                return encoding_result
                 
         except Exception as e:
-            logging.error(f"Complex scene encoding failed: {e}")
+            logging.error(f"Complex scene saving failed: {e}")
             return {
                 'success': False,
                 'error': str(e)
@@ -997,7 +956,12 @@ class PointStreamPipeline:
                     # Handle complex scene
                     self.complex_scenes += 1
                     logging.info(f"🎬 Encoding complex scene {scene_number} to video...")
-                    encoding_result = self._encode_complex_scene(scene_data, str(output_path) if output_dir else None)
+                    encoding_result = self.processor.saver.save_complex_scene_video(
+                        frames=scene_data.get('frames', []),
+                        output_path=str(output_path / f"scene_{scene_number:04d}_complex.mp4"),
+                        fps=scene_data.get('fps', 25.0),
+                        scene_number=scene_number
+                    )
                     logging.info(f"✅ Scene {scene_number}: Complex -> AV1 encoded")
                     
                     if enable_saving and encoding_result.get('success'):
@@ -1058,7 +1022,7 @@ class PointStreamPipeline:
             # No longer save inpainted background since we don't do inpainting
             
             # Save objects (images, masks, keypoints)
-            self._save_scene_objects(result, output_path)
+            self._save_scene_objects_local(result, output_path)
             
             # Get detailed performance data
             performance_summary = profiler.get_overall_summary()
@@ -1118,6 +1082,23 @@ class PointStreamPipeline:
             import traceback
             logging.error(traceback.format_exc())
     
+    def _save_scene_objects_local(self, result: Dict[str, Any], output_path: Path):
+        """Save scene objects using the processor's saver component."""
+        scene_number = result.get('scene_number', 0)
+        
+        # Use the processor's saver
+        save_result = self.processor.saver.save_scene_objects(result, output_path, scene_number)
+        
+        if save_result.get('saved_objects', 0) > 0:
+            logging.info(f"Saved {save_result['saved_objects']} objects for scene {scene_number}")
+        
+        # Save metadata using the processor's saver
+        metadata_result = self.processor.saver.save_metadata(result, output_path, scene_number)
+        if metadata_result.get('metadata_saved'):
+            logging.info(f"Saved metadata for scene {scene_number}")
+        
+        return save_result
+
     def _generate_processing_summary(self) -> Dict[str, Any]:
         """Generate final processing summary."""
         total_time = sum(self.processing_times)
