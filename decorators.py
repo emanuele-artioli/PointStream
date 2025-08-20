@@ -20,6 +20,7 @@ class PerformanceProfiler:
     
     def __init__(self):
         self.timings = defaultdict(list)
+        self.global_timings = defaultdict(list)  # Keep global accumulation
         self.current_scene_timings = {}
         self.scene_count = 0
         
@@ -32,6 +33,7 @@ class PerformanceProfiler:
         if operation in self.current_scene_timings:
             duration = time.time() - self.current_scene_timings[operation]
             self.timings[operation].append(duration)
+            self.global_timings[operation].append(duration)  # Also store globally
             del self.current_scene_timings[operation]
             return duration
         return 0.0
@@ -74,7 +76,7 @@ class PerformanceProfiler:
     def get_overall_summary(self) -> Dict[str, Any]:
         """Get overall performance summary."""
         summary = {}
-        for operation, times in self.timings.items():
+        for operation, times in self.global_timings.items():  # Use global timings
             if times:
                 summary[operation] = {
                     'avg_time': sum(times) / len(times),

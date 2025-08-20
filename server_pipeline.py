@@ -630,7 +630,7 @@ class PointStreamPipeline:
                 'segment_frames_only_processing': 'Frame Segmentation',
                 'stitch_scene_processing': 'Stitching', 
                 'extract_keypoints_processing': 'Keypoint Extraction',
-                '_detect_scene_cuts_in_batch': 'Scene Detection'  # Add scene detection timing
+                '_detect_scene_cuts_in_batch_processing': 'Scene Detection'
             }
             
             # Calculate total frames processed (estimate from scene data)
@@ -876,19 +876,33 @@ class PointStreamPipeline:
             try:
                 # Write frames directly to FFmpeg stdin
                 for frame in frames:
+                    if process.poll() is not None:
+                        # Process has terminated
+                        break
                     if process.stdin and not process.stdin.closed:
-                        process.stdin.write(frame.tobytes())
+                        try:
+                            process.stdin.write(frame.tobytes())
+                        except BrokenPipeError:
+                            logging.warning("FFmpeg process ended unexpectedly during frame writing")
+                            break
                     else:
                         logging.warning("FFmpeg stdin is closed, stopping frame writing")
                         break
                 
                 # Close stdin and wait for completion
                 if process.stdin and not process.stdin.closed:
-                    process.stdin.close()
+                    try:
+                        process.stdin.close()
+                    except:
+                        pass  # Ignore errors when closing stdin
                 stdout, stderr = process.communicate()
                 
             except Exception as e:
-                process.kill()
+                try:
+                    process.kill()
+                    process.wait()
+                except:
+                    pass
                 raise e
             
             encoding_time = time.time() - encoding_start
@@ -1002,10 +1016,11 @@ class PointStreamPipeline:
                         self._save_scene_results(result, output_path, scene_number)
                         logging.info(f"✅ Scene {scene_number} results saved")
                 
-                # Progress summary
-                avg_time = sum(self.processing_times) / len(self.processing_times)
-                logging.info(f"📊 Progress: {self.processed_scenes} scenes completed | Avg: {avg_time:.1f}s/scene | Complex: {self.complex_scenes}")
-                logging.info("-" * 80)
+                # Progress summary (every 5 scenes)
+                if self.processed_scenes % 5 == 0:
+                    avg_time = sum(self.processing_times) / len(self.processing_times)
+                    logging.info(f"📊 Progress: {self.processed_scenes} scenes completed | Avg: {avg_time:.1f}s/scene | Complex: {self.complex_scenes}")
+                    logging.info("-" * 80)
             
             # Final cleanup
             splitter.close()
