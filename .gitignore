@@ -83,6 +83,7 @@ wandb/
 temp/
 tmp/
 *.tmp
+*test*/
 
 # Model weights
 weights/

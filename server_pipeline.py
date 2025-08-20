@@ -11,6 +11,7 @@ import sys
 import time
 import logging
 import argparse
+import subprocess
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 import tempfile
@@ -322,6 +323,25 @@ class PointStreamProcessor:
 
 
 class PointStreamPipeline:
+    """Main pipeline orchestrator with sequential processing and intelligent caching."""
+    
+    def __init__(self, config_file: str = None):
+        """Initialize the pipeline with configuration."""
+        # Load configuration
+        if config_file:
+            config.load_config(config_file)
+        
+        # Initialize the processor
+        self.processor = PointStreamProcessor()
+        
+        # Statistics
+        self.processed_scenes = 0
+        self.complex_scenes = 0
+        self.processing_times = []
+        
+        logging.info("🚀 PointStream Pipeline initialized")
+        logging.info("🔄 Running in SEQUENTIAL mode")
+        logging.info("🎯 New workflow: Segmentation → Masking → Stitching → Keypoints")
     
     def _process_keypoints(self, segmentation_result: Dict[str, Any], frames: List[np.ndarray]) -> Dict[str, Any]:
         """Process keypoints for all segmented objects and save object images."""
@@ -415,12 +435,13 @@ class PointStreamPipeline:
             }
 
     def _save_scene_objects(self, scene_data: Dict[str, Any], output_dir: Path):
-        """Save individual object images and their data."""
+        """Save individual object images with background masking and enhanced metadata."""
         if not output_dir:
             return
             
         scene_number = scene_data.get('scene_number', 0)
         objects = scene_data.get('keypoint_result', {}).get('objects', [])
+        homographies = scene_data.get('stitching_result', {}).get('homographies', [])
         
         if not objects:
             return
@@ -430,27 +451,67 @@ class PointStreamPipeline:
         objects_dir.mkdir(parents=True, exist_ok=True)
         
         saved_objects = []
+        class_counters = {}  # To handle multiple objects of same class
         
         for obj in objects:
             try:
+                # Use class name for object identification
+                class_name = obj.get('class_name', 'unknown')
                 object_id = obj.get('object_id', 'unknown')
                 cropped_image = obj.get('cropped_image')
                 
                 if cropped_image is not None:
-                    # Save cropped object image
-                    image_filename = f"{object_id}.png"
-                    image_path = objects_dir / image_filename
-                    cv2.imwrite(str(image_path), cropped_image)
+                    # Generate class-based filename
+                    if class_name not in class_counters:
+                        class_counters[class_name] = 0
+                    class_counters[class_name] += 1
                     
-                    # Create object metadata (without the image data)
-                    obj_metadata = {k: v for k, v in obj.items() if k != 'cropped_image' and k != 'segmentation_mask'}
-                    obj_metadata['saved_image_path'] = str(image_path)
-                    obj_metadata['image_filename'] = image_filename
+                    if class_counters[class_name] == 1:
+                        object_filename = class_name
+                    else:
+                        object_filename = f"{class_name}_{class_counters[class_name]}"
+                    
+                    # Apply background masking to cropped object
+                    masked_object = self._apply_background_mask(cropped_image, obj)
+                    
+                    # Save masked object image
+                    image_filename = f"{object_filename}.png"
+                    image_path = objects_dir / image_filename
+                    cv2.imwrite(str(image_path), masked_object)
+                    
+                    # Create comprehensive object metadata
+                    obj_metadata = {
+                        'object_id': object_id,
+                        'class_name': class_name,
+                        'filename': object_filename,
+                        'saved_image_path': str(image_path),
+                        'image_filename': image_filename,
+                        'frame_index': obj.get('frame_index'),
+                        'confidence': obj.get('confidence'),
+                        
+                        # Bounding box information
+                        'bbox': obj.get('bbox', []).tolist() if hasattr(obj.get('bbox', []), 'tolist') else obj.get('bbox', []),
+                        'crop_bbox': obj.get('crop_bbox', []).tolist() if hasattr(obj.get('crop_bbox', []), 'tolist') else obj.get('crop_bbox', []),
+                        
+                        # Keypoints information
+                        'keypoints': obj.get('keypoints', []).tolist() if hasattr(obj.get('keypoints', []), 'tolist') else obj.get('keypoints', []),
+                        'keypoint_scores': obj.get('keypoint_scores', []).tolist() if hasattr(obj.get('keypoint_scores', []), 'tolist') else obj.get('keypoint_scores', []),
+                        'keypoint_visibility': obj.get('keypoint_visibility', []).tolist() if hasattr(obj.get('keypoint_visibility', []), 'tolist') else obj.get('keypoint_visibility', []),
+                        'has_keypoints': len(obj.get('keypoints', [])) > 0,
+                        
+                        # Homography for this frame (if available)
+                        'homography': homographies[obj.get('frame_index', 0)].tolist() if obj.get('frame_index', 0) < len(homographies) and homographies[obj.get('frame_index', 0)] is not None else None,
+                        
+                        # Additional tracking information
+                        'track_id': obj.get('track_id'),
+                        'area': obj.get('area'),
+                        'processing_timestamp': obj.get('processing_timestamp')
+                    }
                     
                     # Save segmentation mask if available
                     seg_mask = obj.get('segmentation_mask')
                     if seg_mask is not None:
-                        mask_filename = f"{object_id}_mask.png"
+                        mask_filename = f"{object_filename}_mask.png"
                         mask_path = objects_dir / mask_filename
                         cv2.imwrite(str(mask_path), seg_mask * 255)  # Convert to 0-255 range
                         obj_metadata['saved_mask_path'] = str(mask_path)
@@ -459,7 +520,72 @@ class PointStreamPipeline:
                     saved_objects.append(obj_metadata)
                     
             except Exception as e:
-                logging.warning(f"Failed to save object {obj.get('object_id', 'unknown')}: {e}")
+                logging.warning(f"Failed to save object {obj.get('class_name', 'unknown')} (ID: {obj.get('object_id', 'unknown')}): {e}")
+        
+        # Save objects metadata
+        if saved_objects:
+            metadata_path = objects_dir / 'objects_metadata.json'
+            with open(metadata_path, 'w') as f:
+                json.dump({
+                    'scene_number': scene_number,
+                    'total_objects': len(saved_objects),
+                    'objects': saved_objects,
+                    'homographies_count': len(homographies),
+                    'processing_timestamp': time.time()
+                }, f, indent=2)
+            
+            logging.info(f"Saved {len(saved_objects)} objects for scene {scene_number}")
+
+    def _apply_background_mask(self, cropped_image: np.ndarray, obj: Dict[str, Any]) -> np.ndarray:
+        """Apply background masking to cropped object image."""
+        try:
+            # Get the segmentation mask for this object
+            seg_mask = obj.get('segmentation_mask')
+            crop_bbox = obj.get('crop_bbox', [])
+            
+            if seg_mask is None or len(crop_bbox) < 4:
+                # If no mask available, return original cropped image
+                logging.debug(f"No mask or bbox for object {obj.get('class_name', 'unknown')}")
+                return cropped_image
+            
+            # Extract crop coordinates
+            x1, y1, x2, y2 = map(int, crop_bbox[:4])
+            
+            # Get the portion of the segmentation mask that corresponds to the crop
+            # The seg_mask should be in full frame coordinates, so we crop it to match our object crop
+            if len(seg_mask.shape) == 2:
+                # 2D mask - crop it to the bounding box region
+                mask_crop = seg_mask[y1:y2, x1:x2]
+            else:
+                # Handle potential 3D mask
+                mask_crop = seg_mask[y1:y2, x1:x2]
+                if len(mask_crop.shape) > 2:
+                    mask_crop = mask_crop[:, :, 0]  # Take first channel
+            
+            # Ensure mask dimensions match cropped image
+            crop_h, crop_w = cropped_image.shape[:2]
+            if mask_crop.shape != (crop_h, crop_w):
+                mask_crop = cv2.resize(mask_crop, (crop_w, crop_h))
+            
+            # Convert mask to binary (0 or 1)
+            binary_mask = (mask_crop > 0.5).astype(np.uint8)
+            
+            # Create masked image - set background (where mask is 0) to black
+            masked_image = cropped_image.copy()
+            if len(masked_image.shape) == 3:
+                # Color image - use 3D indexing
+                for c in range(3):
+                    masked_image[:, :, c] = masked_image[:, :, c] * binary_mask
+            else:
+                # Grayscale image
+                masked_image = masked_image * binary_mask
+            
+            return masked_image
+            
+        except Exception as e:
+            logging.warning(f"Failed to apply background mask for object {obj.get('class_name', 'unknown')}: {e}")
+            # Return original cropped image if masking fails
+            return cropped_image
         
         # Save objects metadata file
         if saved_objects:
@@ -472,29 +598,80 @@ class PointStreamPipeline:
                     'saved_at': time.time()
                 }, f, indent=2)
             
-            logging.info(f"Saved {len(saved_objects)} objects for scene {scene_number} to {objects_dir}")
+            logging.info(f"Saved {len(saved_objects)} objects for scene {scene_number}")
 
-
-class PointStreamPipeline:
-    """Main pipeline orchestrator with sequential processing and intelligent caching."""
-    
-    def __init__(self, config_file: str = None):
-        """Initialize the pipeline with configuration."""
-        # Load configuration
-        if config_file:
-            config.load_config(config_file)
-        
-        # Initialize the processor
-        self.processor = PointStreamProcessor()
-        
-        # Statistics
-        self.processed_scenes = 0
-        self.complex_scenes = 0
-        self.processing_times = []
-        
-        logging.info("🚀 PointStream Pipeline initialized")
-        logging.info("🔄 Running in SEQUENTIAL mode")
-        logging.info("🎯 New workflow: Segmentation → Masking → Stitching → Keypoints")
+    def _log_component_fps_statistics(self):
+        """Log average FPS statistics for each component across all processed scenes."""
+        try:
+            from decorators import profiler
+            
+            # Get overall performance summary
+            performance_summary = profiler.get_overall_summary()
+            
+            if not performance_summary:
+                logging.info("📊 Component FPS Analysis: No performance data available")
+                return
+            
+            # Define frame processing components and their typical frame processing
+            component_mappings = {
+                'segment_frames_only_processing': 'Frame Segmentation',
+                'stitch_scene_processing': 'Stitching',
+                'extract_keypoints_processing': 'Keypoint Extraction'
+            }
+            
+            # Calculate total frames processed (estimate from scene data)
+            total_frames_processed = 0
+            scenes_with_frames = 0
+            
+            # Estimate frames per scene based on processing times and scene count
+            if self.processed_scenes > 0:
+                # Rough estimate: 24 fps video, average scene ~2-3 seconds = ~50-70 frames per scene
+                estimated_frames_per_scene = 60  # Conservative estimate
+                total_frames_processed = self.processed_scenes * estimated_frames_per_scene
+                scenes_with_frames = self.processed_scenes
+            
+            logging.info("📊 Component Performance Analysis (Average FPS):")
+            logging.info("=" * 60)
+            
+            for component_key, component_name in component_mappings.items():
+                if component_key in performance_summary:
+                    stats = performance_summary[component_key]
+                    avg_time = stats['avg_time']
+                    call_count = stats['call_count']
+                    
+                    if avg_time > 0 and call_count > 0:
+                        # Calculate FPS based on estimated frames per call
+                        if component_key == 'segment_frames_only_processing':
+                            # Segmentation processes all frames in a scene
+                            estimated_frames_per_call = estimated_frames_per_scene
+                        elif component_key == 'stitch_scene_processing':
+                            # Stitching processes all frames in a scene
+                            estimated_frames_per_call = estimated_frames_per_scene
+                        elif component_key == 'extract_keypoints_processing':
+                            # Keypoints process individual objects, but we can estimate frames
+                            estimated_frames_per_call = estimated_frames_per_scene
+                        else:
+                            estimated_frames_per_call = estimated_frames_per_scene
+                        
+                        fps = estimated_frames_per_call / avg_time
+                        
+                        logging.info(f"🎯 {component_name:20s}: {fps:6.1f} fps (avg {avg_time:5.1f}s per scene)")
+                    else:
+                        logging.info(f"🎯 {component_name:20s}: No data available")
+                else:
+                    logging.info(f"🎯 {component_name:20s}: Not measured")
+            
+            # Overall pipeline FPS
+            if self.processing_times and total_frames_processed > 0:
+                total_processing_time = sum(self.processing_times)
+                overall_fps = total_frames_processed / total_processing_time
+                logging.info("=" * 60)
+                logging.info(f"🚀 Overall Pipeline    : {overall_fps:6.1f} fps ({total_processing_time:.1f}s total)")
+                logging.info(f"📈 Estimated Frames   : {total_frames_processed} ({estimated_frames_per_scene} per scene avg)")
+                logging.info(f"🎬 Scenes Processed   : {self.processed_scenes} scenes")
+            
+        except Exception as e:
+            logging.warning(f"Failed to calculate component FPS statistics: {e}")
     
     @log_step
     
@@ -622,12 +799,13 @@ class PointStreamPipeline:
         except Exception as e:
             logging.warning(f"Prompt caching failed: {e}")
     
-    def _encode_complex_scene(self, scene_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _encode_complex_scene(self, scene_data: Dict[str, Any], output_dir: str = None) -> Dict[str, Any]:
         """
-        Encode complex scene to AV1 video.
+        Encode complex scene directly to AV1 video with libsvtav1.
         
         Args:
             scene_data: Scene data with frames
+            output_dir: Output directory for the encoded file
             
         Returns:
             Encoding result
@@ -641,42 +819,60 @@ class PointStreamPipeline:
         logging.info(f"Encoding complex scene {scene_number} with {len(frames)} frames")
         
         try:
-            # Create temporary video file
-            with tempfile.NamedTemporaryFile(suffix='.mp4', delete=False) as temp_file:
-                temp_path = temp_file.name
+            # Create output path
+            if output_dir:
+                output_path = os.path.join(output_dir, f"scene_{scene_number:04d}_complex.mp4")
+            else:
+                output_path = f"scene_{scene_number:04d}_complex.mp4"
             
-            # Get video properties (assuming 24 fps)
+            # Get video properties
             height, width = frames[0].shape[:2]
             fps = 24
             
-            # Create video writer
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-            out = cv2.VideoWriter(temp_path, fourcc, fps, (width, height))
-            
-            # Write frames
-            for frame in frames:
-                out.write(frame)
-            out.release()
-            
-            # Re-encode with AV1 using FFmpeg (SVT-AV1 encoder)
-            output_path = temp_path.replace('.mp4', '_av1.mp4')
+            # Use FFmpeg directly with libsvtav1 encoder
             ffmpeg_cmd = [
-                'ffmpeg', '-i', temp_path,
+                'ffmpeg',
+                '-f', 'rawvideo',
+                '-vcodec', 'rawvideo',
+                '-s', f'{width}x{height}',
+                '-pix_fmt', 'bgr24',
+                '-r', str(fps),
+                '-i', '-',  # Read from stdin
                 '-c:v', 'libsvtav1',
                 '-crf', '35',
-                '-preset', '6',  # Balanced speed/quality
+                '-preset', '6',
+                '-pix_fmt', 'yuv420p',
                 '-y',  # Overwrite output
                 output_path
             ]
             
             encoding_start = time.time()
-            result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True)
+            
+            # Start FFmpeg process
+            import subprocess
+            process = subprocess.Popen(ffmpeg_cmd, stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+            
+            try:
+                # Write frames directly to FFmpeg stdin
+                for frame in frames:
+                    if process.stdin and not process.stdin.closed:
+                        process.stdin.write(frame.tobytes())
+                    else:
+                        logging.warning("FFmpeg stdin is closed, stopping frame writing")
+                        break
+                
+                # Close stdin and wait for completion
+                if process.stdin and not process.stdin.closed:
+                    process.stdin.close()
+                stdout, stderr = process.communicate()
+                
+            except Exception as e:
+                process.kill()
+                raise e
+            
             encoding_time = time.time() - encoding_start
             
-            # Clean up temporary file
-            os.unlink(temp_path)
-            
-            if result.returncode == 0:
+            if process.returncode == 0:
                 file_size = os.path.getsize(output_path)
                 logging.info(f"Complex scene {scene_number} encoded in {encoding_time:.3f}s, size: {file_size/1024/1024:.2f}MB")
                 
@@ -685,13 +881,14 @@ class PointStreamPipeline:
                     'output_path': output_path,
                     'encoding_time': encoding_time,
                     'file_size': file_size,
-                    'method': 'av1'
+                    'method': 'libsvtav1_direct'
                 }
             else:
-                logging.error(f"FFmpeg encoding failed: {result.stderr}")
+                error_msg = stderr.decode() if stderr else "Unknown FFmpeg error"
+                logging.error(f"FFmpeg encoding failed: {error_msg}")
                 return {
                     'success': False,
-                    'error': result.stderr
+                    'error': error_msg
                 }
                 
         except Exception as e:
@@ -765,15 +962,14 @@ class PointStreamPipeline:
                     # Handle complex scene
                     self.complex_scenes += 1
                     logging.info(f"🎬 Encoding complex scene {scene_number} to video...")
-                    encoding_result = self._encode_complex_scene(scene_data)
+                    encoding_result = self._encode_complex_scene(scene_data, str(output_path) if output_dir else None)
                     logging.info(f"✅ Scene {scene_number}: Complex -> AV1 encoded")
                     
-                    if enable_saving and encoding_result.get('success') and output_dir:
-                        # Move encoded file to output directory
-                        src_path = encoding_result['output_path']
-                        dst_path = output_path / f"scene_{scene_number:04d}_complex.mp4"
-                        shutil.move(src_path, str(dst_path))
-                        logging.info(f"💾 Complex scene saved: {dst_path}")
+                    if enable_saving and encoding_result.get('success'):
+                        # File is already saved to the correct location
+                        logging.info(f"💾 Complex scene saved: {encoding_result['output_path']}")
+                    else:
+                        logging.warning(f"⚠️ Failed to encode complex scene {scene_number}: {encoding_result.get('error', 'Unknown error')}")
                 
                 else:
                     # Handle successfully processed scene
@@ -793,6 +989,9 @@ class PointStreamPipeline:
             # Final cleanup
             splitter.close()
             
+            # Calculate component FPS statistics
+            self._log_component_fps_statistics()
+            
             # Generate summary
             summary = self._generate_processing_summary()
             
@@ -802,115 +1001,6 @@ class PointStreamPipeline:
         except Exception as e:
             logging.error(f"Pipeline processing failed: {e}")
             raise
-    
-    def _encode_complex_scene(self, scene_data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Encode complex scene to video file.
-        
-        Args:
-            scene_data: Scene data with frames
-            
-        Returns:
-            Encoding result
-        """
-        scene_number = scene_data.get('scene_number', 0)
-        frames = scene_data.get('frames', [])
-        
-        if not frames:
-            return {'success': False, 'error': 'no_frames'}
-        
-        logging.info(f"Encoding complex scene {scene_number} with {len(frames)} frames")
-        
-        try:
-            # Create temporary video file
-            import tempfile
-            with tempfile.NamedTemporaryFile(suffix='.mp4', delete=False) as temp_file:
-                temp_path = temp_file.name
-            
-            # Get video properties
-            height, width = frames[0].shape[:2]
-            fps = 24
-            
-            # Create video writer
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-            writer = cv2.VideoWriter(temp_path, fourcc, fps, (width, height))
-            
-            # Write frames
-            for frame in frames:
-                writer.write(frame)
-            
-            writer.release()
-            
-            return {
-                'success': True,
-                'output_path': temp_path,
-                'frame_count': len(frames),
-                'fps': fps,
-                'resolution': (width, height)
-            }
-            
-        except Exception as e:
-            logging.error(f"Complex scene encoding failed: {e}")
-            return {'success': False, 'error': str(e)}
-    
-    def _save_scene_objects(self, result: Dict[str, Any], output_dir: Path):
-        """Save individual object images and their data."""
-        if not output_dir:
-            return
-            
-        scene_number = result.get('scene_number', 0)
-        objects = result.get('keypoint_result', {}).get('objects', [])
-        
-        if not objects:
-            return
-            
-        # Create objects directory
-        objects_dir = output_dir / 'objects' / f'scene_{scene_number:04d}'
-        objects_dir.mkdir(parents=True, exist_ok=True)
-        
-        saved_objects = []
-        
-        for obj in objects:
-            try:
-                object_id = obj.get('object_id', 'unknown')
-                cropped_image = obj.get('cropped_image')
-                
-                if cropped_image is not None:
-                    # Save cropped object image
-                    image_filename = f"{object_id}.png"
-                    image_path = objects_dir / image_filename
-                    cv2.imwrite(str(image_path), cropped_image)
-                    
-                    # Create object metadata (without the image data)
-                    obj_metadata = {k: v for k, v in obj.items() if k != 'cropped_image' and k != 'segmentation_mask'}
-                    obj_metadata['saved_image_path'] = str(image_path)
-                    obj_metadata['image_filename'] = image_filename
-                    
-                    # Save segmentation mask if available
-                    seg_mask = obj.get('segmentation_mask')
-                    if seg_mask is not None:
-                        mask_filename = f"{object_id}_mask.png"
-                        mask_path = objects_dir / mask_filename
-                        cv2.imwrite(str(mask_path), seg_mask * 255)  # Convert to 0-255 range
-                        obj_metadata['saved_mask_path'] = str(mask_path)
-                        obj_metadata['mask_filename'] = mask_filename
-                    
-                    saved_objects.append(obj_metadata)
-                    
-            except Exception as e:
-                logging.warning(f"Failed to save object {obj.get('object_id', 'unknown')}: {e}")
-        
-        # Save objects metadata
-        if saved_objects:
-            metadata_path = objects_dir / 'objects_metadata.json'
-            with open(metadata_path, 'w') as f:
-                json.dump({
-                    'scene_number': scene_number,
-                    'objects': saved_objects,
-                    'total_objects': len(saved_objects)
-                }, f, indent=2)
-            
-            logging.info(f"Saved {len(saved_objects)} objects for scene {scene_number} to {objects_dir}")
     
     def _save_scene_results(self, result: Dict[str, Any], output_path: Path, scene_number: int):
         """Save scene processing results to files."""
