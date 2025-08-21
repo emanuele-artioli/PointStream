@@ -1,82 +1,33 @@
 #!/usr/bin/env python3
 """
-Decorators for logging and timing pipeline components.
+Simplified decorators for logging and timing pipeline components.
 
-This module provides decorators for the PointStream pipeline components:
-- @log_step: Logs function execution with crucial information
-- @time_step: Measures execution time, distinguishing between processing and debugging
-- PerformanceProfiler: Detailed performance tracking and reporting
+This module provides unified decorators for the PointStream pipeline components:
+- @track_performance: Combined logging and timing decorator
+- PerformanceProfiler: Simplified performance tracking
 """
 
 import logging
 import time
 import functools
-from typing import Callable, Any, Dict, List
-from collections import defaultdict, deque
+from typing import Callable, Any, Dict
+from collections import defaultdict
 
 
 class PerformanceProfiler:
-    """Global performance profiler for detailed timing analysis."""
+    """Simplified performance profiler for timing analysis."""
     
     def __init__(self):
         self.timings = defaultdict(list)
-        self.global_timings = defaultdict(list)  # Keep global accumulation
-        self.current_scene_timings = {}
-        self.scene_count = 0
         
-    def start_timer(self, operation: str):
-        """Start timing an operation."""
-        self.current_scene_timings[operation] = time.time()
-        
-    def end_timer(self, operation: str) -> float:
-        """End timing an operation and return duration."""
-        if operation in self.current_scene_timings:
-            duration = time.time() - self.current_scene_timings[operation]
-            self.timings[operation].append(duration)
-            self.global_timings[operation].append(duration)  # Also store globally
-            del self.current_scene_timings[operation]
-            return duration
-        return 0.0
-        
-    def log_scene_summary(self, scene_number: int):
-        """Log a comprehensive performance summary for the completed scene."""
-        summary = self.get_overall_summary()
-        if not summary:
-            logging.info(f"🔄 Scene {scene_number}: No performance data available")
-            return
-        
-        total_time = sum(data['total_time'] for data in summary.values())
-        
-        logging.info(f"📊 Performance Summary for Scene {scene_number}")
-        logging.info(f"   Total Processing Time: {total_time:.2f}s")
-        
-        # Sort operations by total time (longest first)
-        sorted_ops = sorted(summary.items(), key=lambda x: x[1]['total_time'], reverse=True)
-        
-        for operation, data in sorted_ops:
-            percentage = (data['total_time'] / total_time * 100) if total_time > 0 else 0
-            logging.info(f"   {operation:20s}: {data['total_time']:6.2f}s ({percentage:5.1f}%) - {data['call_count']} calls")
-        
-        # Find bottlenecks
-        if sorted_ops:
-            slowest = sorted_ops[0]
-            if slowest[1]['total_time'] > total_time * 0.5:
-                logging.warning(f"⚠️ Performance bottleneck detected: {slowest[0]} takes {slowest[1]['total_time']:.1f}s ({slowest[1]['total_time']/total_time*100:.1f}% of total time)")
-        
-        # Clear data for next scene
-        self.clear()
-    
-    def clear(self):
-        """Clear all timing data."""
-        self.timings.clear()
-
-
-# Global profiler instance
+    def record_timing(self, operation: str, duration: float):
+        """Record timing for an operation."""
+        self.timings[operation].append(duration)
         
     def get_overall_summary(self) -> Dict[str, Any]:
         """Get overall performance summary."""
         summary = {}
-        for operation, times in self.global_timings.items():  # Use global timings
+        for operation, times in self.timings.items():
             if times:
                 summary[operation] = {
                     'avg_time': sum(times) / len(times),
@@ -86,140 +37,81 @@ class PerformanceProfiler:
                     'call_count': len(times)
                 }
         return summary
+    
+    def log_scene_summary(self, scene_number: int):
+        """Log a performance summary for the completed scene."""
+        summary = self.get_overall_summary()
+        if not summary:
+            logging.info(f"🔄 Scene {scene_number}: No performance data available")
+            return
+        
+        total_time = sum(data['total_time'] for data in summary.values())
+        logging.info(f"📊 Performance Summary for Scene {scene_number} - Total: {total_time:.2f}s")
+        
+        # Sort operations by total time (longest first)
+        sorted_ops = sorted(summary.items(), key=lambda x: x[1]['total_time'], reverse=True)
+        
+        for operation, data in sorted_ops[:3]:  # Show top 3 slowest operations
+            percentage = (data['total_time'] / total_time * 100) if total_time > 0 else 0
+            logging.info(f"   {operation:20s}: {data['avg_time']:6.2f}s avg ({percentage:5.1f}%) - {data['call_count']} calls")
+
 
 # Global profiler instance
 profiler = PerformanceProfiler()
 
 
-def log_step(func: Callable) -> Callable:
+def track_performance(func: Callable) -> Callable:
     """
-    Decorator to log the execution of pipeline steps.
+    Unified decorator for logging and timing pipeline steps.
     
-    Logs the function name, scene information, and any errors or warnings.
+    Combines the functionality of @log_step and @time_step into a single decorator.
     """
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         func_name = func.__name__
+        operation_name = f"{func_name}_processing"
         
-        # Try to extract scene information from arguments
+        # Extract scene information from arguments
         scene_info = ""
-        if args:
-            if hasattr(args[0], '__class__'):
-                # Method call - args[0] is self
-                if len(args) > 1 and isinstance(args[1], (list, tuple)):
-                    scene_info = f" (processing {len(args[1])} frames)"
-            elif isinstance(args[0], (list, tuple)):
-                # Function call with frames as first argument
-                scene_info = f" (processing {len(args[0])} frames)"
+        if args and len(args) > 1:
+            if hasattr(args[1], '__len__') and hasattr(args[1], '__getitem__'):
+                scene_info = f" ({len(args[1])} items)"
         
-        logging.info(f"Starting {func_name}{scene_info}")
+        logging.info(f"🚀 Starting {func_name}{scene_info}")
+        start_time = time.time()
         
         try:
             result = func(*args, **kwargs)
+            execution_time = time.time() - start_time
             
-            # Log additional information based on result
+            # Record timing
+            profiler.record_timing(operation_name, execution_time)
+            
+            # Log completion with timing
+            logging.info(f"✅ {func_name} completed in {execution_time:.2f}s")
+            
+            # Add timing to result if it's a dictionary
             if isinstance(result, dict):
-                if 'scene_type' in result:
-                    logging.info(f"{func_name} completed - Scene type: {result['scene_type']}")
-                elif 'keypoints' in result:
-                    logging.info(f"{func_name} completed - Found keypoints for {len(result.get('objects', []))} objects")
-                elif 'prompt' in result:
-                    logging.info(f"{func_name} completed - Generated prompt: '{result['prompt'][:100]}...'")
-                elif 'inpainted_background' in result:
-                    logging.info(f"{func_name} completed - Inpainted background generated")
-                else:
-                    logging.info(f"{func_name} completed successfully")
-            else:
-                logging.info(f"{func_name} completed successfully")
+                result['processing_time'] = execution_time
             
             return result
             
         except Exception as e:
-            logging.error(f"{func_name} failed: {str(e)}")
+            execution_time = time.time() - start_time
+            logging.error(f"❌ {func_name} failed after {execution_time:.2f}s: {str(e)}")
             raise
     
     return wrapper
 
 
+# Legacy decorators for backward compatibility
+def log_step(func: Callable) -> Callable:
+    """Legacy decorator - use @track_performance instead."""
+    return track_performance(func)
+
+
 def time_step(track_processing: bool = True, track_debugging: bool = False):
-    """
-    Decorator to measure execution time of pipeline steps.
-    
-    Args:
-        track_processing: Whether to track this as processing time (default: True)
-        track_debugging: Whether to track this as debugging time (default: False)
-    
-    The decorator distinguishes between:
-    - Processing time: Active model inference, image processing, etc.
-    - Debugging time: File saving, visualization, optional operations
-    """
+    """Legacy decorator - use @track_performance instead."""
     def decorator(func: Callable) -> Callable:
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            func_name = func.__name__
-            operation_name = f"{func_name}_{'processing' if track_processing else 'debugging'}"
-            
-            # Start profiler timer
-            profiler.start_timer(operation_name)
-            start_time = time.time()
-            
-            try:
-                result = func(*args, **kwargs)
-                end_time = time.time()
-                execution_time = end_time - start_time
-                
-                # End profiler timer
-                profiler.end_timer(operation_name)
-                
-                # Log detailed timing information
-                if track_processing:
-                    logging.info(f"🚀 {func_name} processing: {execution_time:.3f}s")
-                elif track_debugging:
-                    logging.debug(f"🔧 {func_name} debugging: {execution_time:.3f}s")
-                else:
-                    logging.info(f"⏱️  {func_name} execution: {execution_time:.3f}s")
-                
-                # Add timing information to result if it's a dictionary
-                if isinstance(result, dict):
-                    timing_key = 'processing_time' if track_processing else 'debugging_time'
-                    result[timing_key] = execution_time
-                    result['operation_name'] = operation_name
-                
-                return result
-                
-            except Exception as e:
-                # End timer even on error
-                profiler.end_timer(operation_name)
-                raise
-        
-        return wrapper
-    return decorator
-
-
-def gpu_context(gpu_id: int):
-    """
-    Decorator to set GPU context for model operations.
-    
-    Args:
-        gpu_id: GPU device ID to use
-    """
-    def decorator(func: Callable) -> Callable:
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            import os
-            original_gpu = os.environ.get('CUDA_VISIBLE_DEVICES')
-            
-            try:
-                # Set GPU context
-                os.environ['CUDA_VISIBLE_DEVICES'] = str(gpu_id)
-                result = func(*args, **kwargs)
-                return result
-            finally:
-                # Restore original GPU context
-                if original_gpu is not None:
-                    os.environ['CUDA_VISIBLE_DEVICES'] = original_gpu
-                else:
-                    os.environ.pop('CUDA_VISIBLE_DEVICES', None)
-        
-        return wrapper
+        return track_performance(func)
     return decorator

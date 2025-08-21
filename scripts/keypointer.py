@@ -14,7 +14,7 @@ import cv2
 import numpy as np
 import logging
 from typing import List, Dict, Any, Optional, Tuple
-from .decorators import log_step, time_step
+from .decorators import track_performance
 from . import config
 
 try:
@@ -187,8 +187,7 @@ class Keypointer:
         # Default to 'other'
         return 'other'
     
-    @log_step
-    @time_step(track_processing=True)
+    @track_performance
     def extract_keypoints(self, objects_data: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         Extract keypoints for all objects based on their semantic category.

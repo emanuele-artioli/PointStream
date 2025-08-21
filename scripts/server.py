@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-PointStream Server Pipeline - Sequential Processing
+PointStream Server Pipeline - Simplified Sequential Processing
 
-This module implements the main processing pipeline for the PointStream system.
-It processes scenes sequentially through all components for clear debugging and logging.
+This module implements a simplified processing pipeline for the PointStream system.
+Removes redundant classes and functions while maintaining all functionality.
 """
 
 import os
@@ -39,14 +39,11 @@ from PIL import Image
 
 # Import all PointStream components
 try:
-    from .decorators import log_step, time_step
+    from .decorators import track_performance
     from .stitcher import Stitcher
     from .segmenter import Segmenter 
     from .keypointer import Keypointer
     from .saver import Saver
-    # No longer needed: prompter and inpainter
-    # from prompter import Prompter
-    # from inpainter import Inpainter
     from .splitter import VideoSceneSplitter
     from . import config
 except ImportError as e:
@@ -63,28 +60,35 @@ except ImportError:
     IMAGEHASH_AVAILABLE = False
     logging.warning("imagehash not available, disabling frame similarity caching")
 
-class PointStreamProcessor:
-    """Sequential processor for scene processing."""
+
+class PointStreamPipeline:
+    """
+    Simplified PointStream pipeline that combines processing and orchestration.
     
-    def __init__(self):
-        """Initialize processor with all components."""
-        logging.info("🚀 Initializing PointStream processor...")
+    This class eliminates the redundant PointStreamProcessor wrapper and handles
+    all processing, statistics, and I/O in a single coherent class.
+    """
+    
+    def __init__(self, config_file: str = None):
+        """Initialize the pipeline with configuration."""
+        # Load configuration
+        if config_file:
+            config.load_config(config_file)
         
-        # Initialize all components
-        self.stitcher = None
-        self.segmenter = None
-        self.keypointer = None
-        self.saver = None
-        # No longer needed
-        # self.prompter = None
-        # self.inpainter = None
-        
+        # Initialize all processing components directly
+        logging.info("🚀 Initializing PointStream pipeline...")
         self._initialize_components()
         
-        logging.info("✅ PointStream processor initialized successfully")
+        # Statistics tracking
+        self.processed_scenes = 0
+        self.complex_scenes = 0
+        self.processing_times = []
+        
+        logging.info("✅ PointStream Pipeline initialized")
+        logging.info("🎯 Workflow: Segmentation → Masking → Stitching → Keypoints")
     
     def _initialize_components(self):
-        """Initialize all components."""
+        """Initialize all processing components."""
         try:
             logging.info("🔧 Loading components...")
             
@@ -101,13 +105,6 @@ class PointStreamProcessor:
             logging.info("   💾 Initializing Saver...")
             self.saver = Saver()
             
-            # No longer needed
-            # logging.info("   💭 Initializing Prompter...")
-            # self.prompter = Prompter()
-            # 
-            # logging.info("   🎨 Initializing Inpainter...")
-            # self.inpainter = Inpainter()
-            
             logging.info("✅ All components loaded successfully")
             
         except Exception as e:
@@ -118,13 +115,6 @@ class PointStreamProcessor:
         """
         Create masked frames with configurable background handling.
         Can use either background reconstruction or simple black masking.
-        
-        Args:
-            frames: Original frames
-            segmentation_result: Result from frame segmentation
-            
-        Returns:
-            List of masked frames where objects are handled according to config
         """
         use_reconstruction = config.get_bool('stitching', 'use_background_reconstruction', True)
         masked_frames = []
@@ -168,15 +158,6 @@ class PointStreamProcessor:
                                all_frames: List[np.ndarray], frame_idx: int) -> np.ndarray:
         """
         Reconstruct background behind objects using content from other frames.
-        
-        Args:
-            current_frame: Current frame to process
-            frame_data: Object detection data for current frame
-            all_frames: All frames in the scene
-            frame_idx: Index of current frame
-            
-        Returns:
-            Frame with objects replaced by reconstructed background
         """
         reconstructed_frame = current_frame.copy()
         
@@ -244,13 +225,6 @@ class PointStreamProcessor:
     def _cleanup_panorama_black_areas(self, panorama: np.ndarray) -> np.ndarray:
         """
         Remove black areas in panorama using smart inpainting that excludes border areas.
-        This handles black holes created by object masking while preserving warping borders.
-        
-        Args:
-            panorama: Input panorama that may contain black areas
-            
-        Returns:
-            Cleaned panorama with interior black areas inpainted
         """
         if panorama is None:
             return None
@@ -266,7 +240,6 @@ class PointStreamProcessor:
             black_mask = cv2.morphologyEx(black_mask, cv2.MORPH_OPEN, kernel)
             
             # SMART FILTERING: Remove black areas that touch borders
-            # These are usually from warping and should not be inpainted
             exclude_borders = config.get_bool('stitching', 'exclude_border_black_areas', True)
             h, w = black_mask.shape
             
@@ -327,8 +300,97 @@ class PointStreamProcessor:
             logging.warning(f"Failed to cleanup panorama black areas: {e}")
             return panorama
     
-    @log_step
-    @time_step(track_processing=True)
+    def _process_keypoints(self, segmentation_result: Dict[str, Any], frames: List[np.ndarray]) -> Dict[str, Any]:
+        """Process keypoints for all segmented objects and save object images."""
+        try:
+            # Extract objects from all frames and add cropped images
+            all_objects = []
+            for frame_data in segmentation_result['frames_data']:
+                objects = frame_data.get('objects', [])
+                frame_idx = frame_data.get('frame_index', 0)
+                
+                # Get the actual frame for cropping
+                if frame_idx < len(frames):
+                    frame = frames[frame_idx]
+                    
+                    for obj_idx, obj in enumerate(objects):
+                        obj['frame_index'] = frame_idx
+                        obj['object_id'] = f"frame_{frame_idx}_obj_{obj_idx}"
+                        
+                        # Crop object image using bounding box
+                        bbox = obj.get('bbox', [])
+                        if len(bbox) >= 4:
+                            x1, y1, x2, y2 = map(int, bbox[:4])
+                            # Ensure coordinates are within frame bounds
+                            h, w = frame.shape[:2]
+                            x1, y1 = max(0, x1), max(0, y1)
+                            x2, y2 = min(w, x2), min(h, y2)
+                            
+                            if x2 > x1 and y2 > y1:
+                                cropped_object = frame[y1:y2, x1:x2]
+                                obj['cropped_image'] = cropped_object
+                                obj['crop_bbox'] = [x1, y1, x2, y2]
+                                obj['crop_size'] = [x2-x1, y2-y1]
+                            else:
+                                obj['cropped_image'] = None
+                                obj['crop_bbox'] = bbox
+                                obj['crop_size'] = [0, 0]
+                        else:
+                            obj['cropped_image'] = None
+                            obj['crop_bbox'] = []
+                            obj['crop_size'] = [0, 0]
+                        
+                        all_objects.append(obj)
+            
+            # Process keypoints for all objects
+            if all_objects:
+                keypoint_result = self.keypointer.extract_keypoints(all_objects)
+                
+                # Enhance objects with additional metadata
+                enhanced_objects = []
+                for obj in keypoint_result.get('objects', []):
+                    # Add detailed metadata for saving
+                    enhanced_obj = {
+                        'object_id': obj.get('object_id', 'unknown'),
+                        'frame_index': obj.get('frame_index', 0),
+                        'class_name': obj.get('class_name', 'unknown'),
+                        'confidence': obj.get('confidence', 0.0),
+                        'bbox': obj.get('bbox', []),
+                        'crop_bbox': obj.get('crop_bbox', []),
+                        'crop_size': obj.get('crop_size', [0, 0]),
+                        'keypoints': obj.get('keypoints', []),
+                        'segmentation_mask': obj.get('segmentation_mask'),
+                        'cropped_image': obj.get('cropped_image'),
+                        'processed_at': time.time(),
+                        'has_keypoints': len(obj.get('keypoints', [])) > 0,
+                        'mask_area': obj.get('mask_area', 0)
+                    }
+                    enhanced_objects.append(enhanced_obj)
+                
+                return {
+                    'objects': enhanced_objects,
+                    'total_objects': len(enhanced_objects),
+                    'objects_with_keypoints': sum(1 for obj in enhanced_objects if obj['has_keypoints']),
+                    'processing_time': keypoint_result.get('processing_time', 0)
+                }
+            else:
+                return {
+                    'objects': [],
+                    'total_objects': 0,
+                    'objects_with_keypoints': 0,
+                    'processing_time': 0
+                }
+                
+        except Exception as e:
+            logging.error(f"Keypoint processing failed: {e}")
+            return {
+                'objects': [], 
+                'total_objects': 0,
+                'objects_with_keypoints': 0,
+                'error': str(e)
+            }
+    
+    @track_performance
     def process_scene(self, scene_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Process a complete scene through the pipeline.
@@ -401,16 +463,14 @@ class PointStreamProcessor:
             keypoints_count = len(keypoint_result.get('objects', []))
             logging.info(f"   ✅ Keypoints completed in {step_time:.1f}s - Processed {keypoints_count} objects")
             
-            # No longer need prompt generation or inpainting since objects are already removed
-            
             # Combine all results
             processed_result = {
                 'scene_type': stitching_result['scene_type'],
                 'scene_number': scene_number,
                 'stitching_result': stitching_result,
-                'segmentation_result': frame_segmentation_result,  # Use frame segmentation instead
+                'segmentation_result': frame_segmentation_result,
                 'keypoint_result': keypoint_result,
-                'masked_frames': masked_frames  # Include masked frames in result
+                'masked_frames': masked_frames
             }
             
             logging.info(f"🎉 Scene {scene_number} processed successfully")
@@ -425,201 +485,10 @@ class PointStreamProcessor:
                 'frames': frames
             }
     
-    def _process_keypoints(self, segmentation_result: Dict[str, Any], frames: List[np.ndarray]) -> Dict[str, Any]:
-        """Process keypoints for all segmented objects and save object images."""
-        try:
-            # Extract objects from all frames and add cropped images
-            all_objects = []
-            for frame_data in segmentation_result['frames_data']:
-                objects = frame_data.get('objects', [])
-                frame_idx = frame_data.get('frame_index', 0)
-                
-                # Get the actual frame for cropping
-                if frame_idx < len(frames):
-                    frame = frames[frame_idx]
-                    
-                    for obj_idx, obj in enumerate(objects):
-                        obj['frame_index'] = frame_idx
-                        obj['object_id'] = f"frame_{frame_idx}_obj_{obj_idx}"
-                        
-                        # Crop object image using bounding box
-                        bbox = obj.get('bbox', [])
-                        if len(bbox) >= 4:
-                            x1, y1, x2, y2 = map(int, bbox[:4])
-                            # Ensure coordinates are within frame bounds
-                            h, w = frame.shape[:2]
-                            x1, y1 = max(0, x1), max(0, y1)
-                            x2, y2 = min(w, x2), min(h, y2)
-                            
-                            if x2 > x1 and y2 > y1:
-                                cropped_object = frame[y1:y2, x1:x2]
-                                obj['cropped_image'] = cropped_object
-                                obj['crop_bbox'] = [x1, y1, x2, y2]
-                                obj['crop_size'] = [x2-x1, y2-y1]
-                            else:
-                                obj['cropped_image'] = None
-                                obj['crop_bbox'] = bbox
-                                obj['crop_size'] = [0, 0]
-                        else:
-                            obj['cropped_image'] = None
-                            obj['crop_bbox'] = []
-                            obj['crop_size'] = [0, 0]
-                        
-                        all_objects.append(obj)
-            
-            # Process keypoints for all objects
-            if all_objects:
-                keypoint_result = self.keypointer.extract_keypoints(all_objects)
-                
-                # Enhance objects with additional metadata
-                enhanced_objects = []
-                for obj in keypoint_result.get('objects', []):
-                    # Add detailed metadata for saving
-                    enhanced_obj = {
-                        'object_id': obj.get('object_id', 'unknown'),
-                        'frame_index': obj.get('frame_index', 0),
-                        'class_name': obj.get('class_name', 'unknown'),
-                        'confidence': obj.get('confidence', 0.0),
-                        'bbox': obj.get('bbox', []),
-                        'crop_bbox': obj.get('crop_bbox', []),
-                        'crop_size': obj.get('crop_size', [0, 0]),
-                        'keypoints': obj.get('keypoints', []),
-                        'segmentation_mask': obj.get('segmentation_mask'),
-                        'cropped_image': obj.get('cropped_image'),
-                        # Add timing and processing info
-                        'processed_at': time.time(),
-                        'processing_method': obj.get('processing_method', 'unknown')
-                    }
-                    enhanced_objects.append(enhanced_obj)
-                
-                keypoint_result['objects'] = enhanced_objects
-                return keypoint_result
-            else:
-                return {'objects': [], 'processing_time': 0.0, 'method': 'no_objects'}
-                
-        except Exception as e:
-            logging.error(f"Keypoint processing failed: {e}")
-            return {'objects': [], 'processing_time': 0.0, 'error': str(e)}
-
-
-class PointStreamPipeline:
-    """Main pipeline orchestrator with sequential processing and intelligent caching."""
-    
-    def __init__(self, config_file: str = None):
-        """Initialize the pipeline with configuration."""
-        # Load configuration
-        if config_file:
-            config.load_config(config_file)
-        
-        # Initialize the processor
-        self.processor = PointStreamProcessor()
-        
-        # Statistics
-        self.processed_scenes = 0
-        self.complex_scenes = 0
-        self.processing_times = []
-        
-        logging.info("🚀 PointStream Pipeline initialized")
-        logging.info("🔄 Running in SEQUENTIAL mode")
-        logging.info("🎯 New workflow: Segmentation → Masking → Stitching → Keypoints")
-    
-    def _process_keypoints(self, segmentation_result: Dict[str, Any], frames: List[np.ndarray]) -> Dict[str, Any]:
-        """Process keypoints for all segmented objects and save object images."""
-        try:
-            # Extract objects from all frames and add cropped images
-            all_objects = []
-            for frame_data in segmentation_result['frames_data']:
-                objects = frame_data.get('objects', [])
-                frame_idx = frame_data.get('frame_index', 0)
-                
-                # Get the actual frame for cropping
-                if frame_idx < len(frames):
-                    frame = frames[frame_idx]
-                    
-                    for obj_idx, obj in enumerate(objects):
-                        obj['frame_index'] = frame_idx
-                        obj['object_id'] = f"frame_{frame_idx}_obj_{obj_idx}"
-                        
-                        # Crop object image using bounding box
-                        bbox = obj.get('bbox', [])
-                        if len(bbox) >= 4:
-                            x1, y1, x2, y2 = map(int, bbox[:4])
-                            # Ensure coordinates are within frame bounds
-                            h, w = frame.shape[:2]
-                            x1, y1 = max(0, x1), max(0, y1)
-                            x2, y2 = min(w, x2), min(h, y2)
-                            
-                            if x2 > x1 and y2 > y1:
-                                cropped_object = frame[y1:y2, x1:x2]
-                                obj['cropped_image'] = cropped_object
-                                obj['crop_bbox'] = [x1, y1, x2, y2]
-                                obj['crop_size'] = [x2-x1, y2-y1]
-                            else:
-                                obj['cropped_image'] = None
-                                obj['crop_bbox'] = bbox
-                                obj['crop_size'] = [0, 0]
-                        else:
-                            obj['cropped_image'] = None
-                            obj['crop_bbox'] = []
-                            obj['crop_size'] = [0, 0]
-                        
-                        all_objects.append(obj)
-            
-            # Process keypoints for all objects
-            if all_objects:
-                keypoint_result = self.keypointer.extract_keypoints(all_objects)
-                
-                # Enhance objects with additional metadata
-                enhanced_objects = []
-                for obj in keypoint_result.get('objects', []):
-                    # Add detailed metadata for saving
-                    enhanced_obj = {
-                        'object_id': obj.get('object_id', 'unknown'),
-                        'frame_index': obj.get('frame_index', 0),
-                        'class_name': obj.get('class_name', 'unknown'),
-                        'confidence': obj.get('confidence', 0.0),
-                        'bbox': obj.get('bbox', []),
-                        'crop_bbox': obj.get('crop_bbox', []),
-                        'crop_size': obj.get('crop_size', [0, 0]),
-                        'keypoints': obj.get('keypoints', []),
-                        'segmentation_mask': obj.get('segmentation_mask'),
-                        'cropped_image': obj.get('cropped_image'),
-                        # Add timing and processing info
-                        'processed_at': time.time(),
-                        'has_keypoints': len(obj.get('keypoints', [])) > 0,
-                        'mask_area': obj.get('mask_area', 0)
-                    }
-                    enhanced_objects.append(enhanced_obj)
-                
-                return {
-                    'objects': enhanced_objects,
-                    'total_objects': len(enhanced_objects),
-                    'objects_with_keypoints': sum(1 for obj in enhanced_objects if obj['has_keypoints']),
-                    'processing_time': keypoint_result.get('processing_time', 0)
-                }
-            else:
-                return {
-                    'objects': [],
-                    'total_objects': 0,
-                    'objects_with_keypoints': 0,
-                    'processing_time': 0
-                }
-                
-        except Exception as e:
-            logging.error(f"Keypoint processing failed: {e}")
-            return {
-                'objects': [], 
-                'total_objects': 0,
-                'objects_with_keypoints': 0,
-                'error': str(e)
-            }
-
-    def _save_scene_objects(self, scene_data: Dict[str, Any], output_dir: Path):
+    def _save_scene_objects(self, scene_data: Dict[str, Any], output_dir: Path, scene_number: int):
         """Save individual object images using the dedicated Saver component."""
         if not output_dir:
             return
-            
-        scene_number = scene_data.get('scene_number', 0)
         
         # Use the Saver component to save objects
         save_result = self.saver.save_scene_objects(scene_data, output_dir, scene_number)
@@ -633,7 +502,7 @@ class PointStreamPipeline:
             logging.info(f"Saved metadata for scene {scene_number}")
         
         return save_result
-
+    
     def _log_component_fps_statistics(self):
         """Log average FPS statistics for each component across all processed scenes."""
         try:
@@ -708,192 +577,7 @@ class PointStreamPipeline:
         except Exception as e:
             logging.warning(f"Failed to calculate component FPS statistics: {e}")
     
-    @log_step
-    
-    def _load_prompt_cache(self) -> Dict[str, str]:
-        """Load existing prompt cache from disk."""
-        cache_file = self.cache_dir / "prompt_cache.json"
-        if cache_file.exists():
-            try:
-                with open(cache_file, 'r') as f:
-                    cache = json.load(f)
-                logging.info(f"Loaded {len(cache)} cached prompts")
-                return cache
-            except Exception as e:
-                logging.warning(f"Failed to load prompt cache: {e}")
-        return {}
-    
-    def _save_prompt_cache(self):
-        """Save prompt cache to disk."""
-        if not self.enable_caching:
-            return
-        
-        try:
-            cache_file = self.cache_dir / "prompt_cache.json"
-            with open(cache_file, 'w') as f:
-                json.dump(self.prompt_cache, f, indent=2)
-            logging.debug(f"Saved {len(self.prompt_cache)} cached prompts")
-        except Exception as e:
-            logging.warning(f"Failed to save prompt cache: {e}")
-    
-    def _calculate_perceptual_hash(self, frame: np.ndarray) -> str:
-        """
-        Calculate perceptual hash of frame for caching.
-        
-        Args:
-            frame: Input frame
-            
-        Returns:
-            Hash string for caching
-        """
-        try:
-            if IMAGEHASH_AVAILABLE:
-                # Convert to PIL and calculate perceptual hash
-                if len(frame.shape) == 3:
-                    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                else:
-                    frame_rgb = frame
-                
-                pil_image = Image.fromarray(frame_rgb)
-                phash = str(imagehash.phash(pil_image))
-                return phash
-            else:
-                # Fallback to MD5 hash of resized frame
-                small_frame = cv2.resize(frame, (64, 64))
-                frame_bytes = small_frame.tobytes()
-                md5_hash = hashlib.md5(frame_bytes).hexdigest()
-                return md5_hash
-                
-        except Exception as e:
-            logging.warning(f"Hash calculation failed: {e}")
-            # Fallback to timestamp-based hash
-            return str(int(time.time() * 1000))
-    
-    def _get_cached_prompt(self, scene_data: Dict[str, Any]) -> Optional[str]:
-        """
-        Check cache for existing prompt based on scene's first frame.
-        
-        Args:
-            scene_data: Scene data with frames
-            
-        Returns:
-            Cached prompt if found, None otherwise
-        """
-        if not self.enable_caching or not scene_data.get('frames'):
-            return None
-        
-        try:
-            first_frame = scene_data['frames'][0]
-            frame_hash = self._calculate_perceptual_hash(first_frame)
-            
-            # Check for exact match
-            if frame_hash in self.prompt_cache:
-                self.cache_hits += 1
-                logging.debug(f"Cache hit for scene {scene_data.get('scene_number', '?')}")
-                return self.prompt_cache[frame_hash]
-            
-            # Check for similar hashes (only with imagehash)
-            if IMAGEHASH_AVAILABLE:
-                current_hash = imagehash.hex_to_hash(frame_hash)
-                for cached_hash_str, prompt in self.prompt_cache.items():
-                    try:
-                        cached_hash = imagehash.hex_to_hash(cached_hash_str)
-                        if current_hash - cached_hash < 5:  # Hamming distance < 5
-                            self.cache_hits += 1
-                            logging.debug(f"Similar cache hit for scene {scene_data.get('scene_number', '?')}")
-                            return prompt
-                    except:
-                        continue
-            
-            return None
-            
-        except Exception as e:
-            logging.warning(f"Cache lookup failed: {e}")
-            return None
-    
-    def _cache_prompt(self, scene_data: Dict[str, Any], prompt: str):
-        """
-        Cache a prompt for future use.
-        
-        Args:
-            scene_data: Scene data with frames
-            prompt: Generated prompt to cache
-        """
-        if not self.enable_caching or not scene_data.get('frames'):
-            return
-        
-        try:
-            first_frame = scene_data['frames'][0]
-            frame_hash = self._calculate_perceptual_hash(first_frame)
-            self.prompt_cache[frame_hash] = prompt
-            
-            # Save cache periodically
-            if len(self.prompt_cache) % 10 == 0:
-                self._save_prompt_cache()
-                
-        except Exception as e:
-            logging.warning(f"Prompt caching failed: {e}")
-    
-    def _save_complex_scene(self, scene_data: Dict[str, Any], output_dir: str = None) -> Dict[str, Any]:
-        """
-        Save complex scene using the dedicated Saver component.
-        
-        Args:
-            scene_data: Scene data with frames
-            output_dir: Output directory for the saved files
-            
-        Returns:
-            Save result
-        """
-        scene_number = scene_data.get('scene_number', 0)
-        frames = scene_data.get('frames', [])
-        
-        if not frames:
-            return {'success': False, 'error': 'no_frames'}
-        
-        logging.info(f"Saving complex scene {scene_number} with {len(frames)} frames")
-        
-        try:
-            # Create output path
-            if output_dir:
-                output_path = os.path.join(output_dir, f"scene_{scene_number:04d}_complex.mp4")
-            else:
-                output_path = f"scene_{scene_number:04d}_complex.mp4"
-            
-            # Get video properties and original fps
-            fps = scene_data.get('fps')
-            if fps is None:
-                # Extract FPS from original video if not in scene_data
-                import cv2
-                cap = cv2.VideoCapture(str(self.input_video))
-                fps = cap.get(cv2.CAP_PROP_FPS) or 25.0  # Default to 25 if cannot get FPS
-                cap.release()
-                logging.info(f"Extracted FPS from source video: {fps}")
-            
-            # Use the Saver component to encode the video
-            encoding_result = self.saver.save_complex_scene_video(
-                frames=frames, 
-                output_path=output_path, 
-                fps=fps,
-                scene_number=scene_number
-            )
-            
-            if encoding_result['success']:
-                logging.info(f"Complex scene {scene_number} saved successfully")
-                return encoding_result
-            else:
-                logging.error(f"Failed to save complex scene {scene_number}: {encoding_result.get('error', 'Unknown error')}")
-                return encoding_result
-                
-        except Exception as e:
-            logging.error(f"Complex scene saving failed: {e}")
-            return {
-                'success': False,
-                'error': str(e)
-            }
-    
-    @log_step
-    @time_step(track_processing=True)
+    @track_performance
     def process_video(self, input_video: str, output_dir: str = None, 
                      enable_saving: bool = True) -> Dict[str, Any]:
         """
@@ -941,9 +625,9 @@ class PointStreamPipeline:
                 
                 logging.info(f"📺 Processing scene {scene_number} (#{self.processed_scenes + 1}) - Duration: {scene_duration:.2f}s")
                 
-                # Process scene sequentially (no more prompt caching needed)
+                # Process scene
                 logging.info(f"🚀 Starting sequential processing for scene {scene_number}")
-                result = self.processor.process_scene(scene_data)
+                result = self.process_scene(scene_data)
                 
                 processing_time = time.time() - processing_start
                 self.processing_times.append(processing_time)
@@ -956,7 +640,7 @@ class PointStreamPipeline:
                     # Handle complex scene
                     self.complex_scenes += 1
                     logging.info(f"🎬 Encoding complex scene {scene_number} to video...")
-                    encoding_result = self.processor.saver.save_complex_scene_video(
+                    encoding_result = self.saver.save_complex_scene_video(
                         frames=scene_data.get('frames', []),
                         output_path=str(output_path / f"scene_{scene_number:04d}_complex.mp4"),
                         fps=scene_data.get('fps', 25.0),
@@ -965,7 +649,6 @@ class PointStreamPipeline:
                     logging.info(f"✅ Scene {scene_number}: Complex -> AV1 encoded")
                     
                     if enable_saving and encoding_result.get('success'):
-                        # File is already saved to the correct location
                         logging.info(f"💾 Complex scene saved: {encoding_result['output_path']}")
                     else:
                         logging.warning(f"⚠️ Failed to encode complex scene {scene_number}: {encoding_result.get('error', 'Unknown error')}")
@@ -1019,10 +702,8 @@ class PointStreamPipeline:
                 panorama_path = output_path / "panoramas" / f"scene_{scene_number:04d}_panorama.jpg"
                 cv2.imwrite(str(panorama_path), panorama)
             
-            # No longer save inpainted background since we don't do inpainting
-            
-            # Save objects (images, masks, keypoints)
-            self._save_scene_objects_local(result, output_path)
+            # Save objects (images, masks, keypoints) - use single implementation
+            self._save_scene_objects(result, output_path, scene_number)
             
             # Get detailed performance data
             performance_summary = profiler.get_overall_summary()
@@ -1034,8 +715,6 @@ class PointStreamPipeline:
             metadata = {
                 'scene_number': scene_number,
                 'scene_type': result.get('scene_type'),
-                'worker_id': result.get('worker_id'),
-                'gpu_id': result.get('gpu_id'),
                 'processing_timestamp': time.time(),
                 
                 'stitching': {
@@ -1059,8 +738,6 @@ class PointStreamPipeline:
                     'objects_saved': len([obj for obj in keypoint_result.get('objects', []) if obj.get('cropped_image') is not None])
                 },
                 
-                # No longer have prompt or inpainting results
-                
                 'performance': {
                     'detailed_timings': performance_summary,
                     'total_scene_time': sum(timing['total_time'] for timing in performance_summary.values()),
@@ -1082,23 +759,6 @@ class PointStreamPipeline:
             import traceback
             logging.error(traceback.format_exc())
     
-    def _save_scene_objects_local(self, result: Dict[str, Any], output_path: Path):
-        """Save scene objects using the processor's saver component."""
-        scene_number = result.get('scene_number', 0)
-        
-        # Use the processor's saver
-        save_result = self.processor.saver.save_scene_objects(result, output_path, scene_number)
-        
-        if save_result.get('saved_objects', 0) > 0:
-            logging.info(f"Saved {save_result['saved_objects']} objects for scene {scene_number}")
-        
-        # Save metadata using the processor's saver
-        metadata_result = self.processor.saver.save_metadata(result, output_path, scene_number)
-        if metadata_result.get('metadata_saved'):
-            logging.info(f"Saved metadata for scene {scene_number}")
-        
-        return save_result
-
     def _generate_processing_summary(self) -> Dict[str, Any]:
         """Generate final processing summary."""
         total_time = sum(self.processing_times)
@@ -1153,21 +813,21 @@ def setup_logging(log_level: str = "INFO"):
 def main():
     """Main entry point for the PointStream pipeline."""
     parser = argparse.ArgumentParser(
-        description="PointStream Pipeline - Dual-GPU Modular Video Processing",
+        description="PointStream Pipeline - Simplified Sequential Video Processing",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-    # Process video with dual-GPU workers
-    python server_pipeline.py input.mp4
+    # Process video
+    python server_simplified.py input.mp4
     
     # Custom output directory
-    python server_pipeline.py input.mp4 --output-dir ./output
+    python server_simplified.py input.mp4 --output-dir ./output
     
     # Process without saving files
-    python server_pipeline.py input.mp4 --no-saving
+    python server_simplified.py input.mp4 --no-saving
     
     # Custom configuration
-    python server_pipeline.py input.mp4 --config config_custom.ini
+    python server_simplified.py input.mp4 --config config_custom.ini
         """
     )
     

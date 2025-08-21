@@ -14,7 +14,8 @@ import cv2
 import numpy as np
 import logging
 from typing import List, Dict, Any, Optional, Tuple
-from .decorators import log_step, time_step
+from .decorators import track_performance
+from .error_handling import safe_execute
 from . import config
 
 try:
@@ -74,8 +75,7 @@ class Segmenter:
             logging.error(f"Failed to initialize YOLO models: {e}")
             raise
     
-    @log_step
-    @time_step(track_processing=True)
+    @track_performance
     def segment_frames_only(self, frames: List[np.ndarray]) -> Dict[str, Any]:
         """
         Segment objects only in scene frames (no panorama processing).
@@ -99,6 +99,7 @@ class Segmenter:
         
         return {'frames_data': frames_data}
 
+    @safe_execute("Frame segmentation", {'frame_index': 0, 'objects': [], 'masks': [], 'bounding_boxes': []})
     def _segment_frame(self, frame: np.ndarray, frame_index: int) -> Dict[str, Any]:
         """
         Segment objects in a single frame with tracking.
@@ -110,33 +111,23 @@ class Segmenter:
         Returns:
             Dictionary with frame segmentation data
         """
-        try:
-            # Run YOLO tracking
-            results = self.model_with_tracking.track(
-                frame,
-                conf=self.confidence_threshold,
-                iou=self.iou_threshold,
-                device=self.device,
-                retina_masks=True,
-                max_det=self.max_objects,
-                classes=self.classes,
-                imgsz=self.yolo_image_size,
-                half=self.yolo_half_precision,
-                agnostic_nms=self.agnostic_nms,
-                verbose=False,
-                persist=True  # Persist tracks across frames
-            )
-            
-            return self._extract_detection_data(results, frame_index=frame_index, with_tracking=True)
-            
-        except Exception as e:
-            logging.error(f"Frame {frame_index} segmentation failed: {e}")
-            return {
-                'frame_index': frame_index,
-                'objects': [],
-                'masks': [],
-                'bounding_boxes': []
-            }
+        # Run YOLO tracking
+        results = self.model_with_tracking.track(
+            frame,
+            conf=self.confidence_threshold,
+            iou=self.iou_threshold,
+            device=self.device,
+            retina_masks=True,
+            max_det=self.max_objects,
+            classes=self.classes,
+            imgsz=self.yolo_image_size,
+            half=self.yolo_half_precision,
+            agnostic_nms=self.agnostic_nms,
+            verbose=False,
+            persist=True  # Persist tracks across frames
+        )
+        
+        return self._extract_detection_data(results, frame_index=frame_index, with_tracking=True)
     
     def _extract_detection_data(self, results, frame_index: Optional[int] = None, 
                                with_tracking: bool = False) -> Dict[str, Any]:

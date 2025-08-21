@@ -18,7 +18,7 @@ Note: client.py will be added later for client-side functionality.
 __version__ = "1.0.0"
 
 # Import main components for easy access
-from .server import PointStreamPipeline, PointStreamProcessor
+from .server import PointStreamPipeline
 from .splitter import VideoSceneSplitter
 from .segmenter import Segmenter
 from .stitcher import Stitcher
@@ -28,7 +28,6 @@ from . import config
 
 __all__ = [
     'PointStreamPipeline',
-    'PointStreamProcessor', 
     'VideoSceneSplitter',
     'Segmenter',
     'Stitcher', 

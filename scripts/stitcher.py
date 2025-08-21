@@ -21,7 +21,8 @@ import logging
 from typing import List, Dict, Any, Optional, Tuple
 
 # Import decorators and config
-from .decorators import log_step, time_step
+from .decorators import track_performance
+from .error_handling import safe_execute
 from . import config
 
 
@@ -47,8 +48,7 @@ class Stitcher:
             self.detector = cv2.ORB_create(nfeatures=self.orb_nfeatures)
             self.bf_matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
-    @log_step
-    @time_step(track_processing=True)
+    @track_performance
     def stitch_scene(self, frames: List[np.ndarray], masks: Optional[List[np.ndarray]] = None) -> Dict[str, Any]:
         """Main stitching function implementing the top-down strategy."""
         if not frames or len(frames) == 0:

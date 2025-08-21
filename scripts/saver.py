@@ -21,7 +21,8 @@ import os
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 from PIL import Image
-from .decorators import log_step, time_step
+from .decorators import track_performance
+from .error_handling import safe_execute, create_error_result, create_success_result
 from . import config
 
 
@@ -54,8 +55,8 @@ class Saver:
         logging.info(f"Image format: {self.image_format}")
         logging.info(f"Container: {self.container_format}")
         
-    @log_step
-    @time_step(track_processing=False)  # This is saving, not core processing
+    @safe_execute("Complex scene video encoding", {'success': False, 'error': 'encoding_failed'})
+    @track_performance
     def save_complex_scene_video(self, frames: List[np.ndarray], output_path: str, fps: float, scene_number: int) -> Dict[str, Any]:
         """
         Save complex scene as video with multiple codec support.
@@ -69,81 +70,76 @@ class Saver:
         Returns:
             Dictionary with save result
         """
+        if not frames:
+            return {'success': False, 'error': 'No frames provided'}
+            
+        height, width = frames[0].shape[:2]
+        
+        # Build FFmpeg command based on codec
+        ffmpeg_cmd = self._build_video_encode_command(width, height, fps, output_path)
+        
+        logging.info(f"Encoding scene {scene_number} video with {self.video_codec}")
+        logging.info(f"Resolution: {width}x{height}, FPS: {fps}, Frames: {len(frames)}")
+        
+        encoding_start = time.time()
+        
+        # Start FFmpeg process with proper buffering
+        process = subprocess.Popen(
+            ffmpeg_cmd, 
+            stdin=subprocess.PIPE, 
+            stderr=subprocess.PIPE, 
+            stdout=subprocess.DEVNULL,  # Don't capture stdout
+            bufsize=1024*1024  # 1MB buffer
+        )
+        
+        stderr_output = None
         try:
-            if not frames:
-                return {'success': False, 'error': 'No frames provided'}
-                
-            height, width = frames[0].shape[:2]
+            # Prepare all frame data in a buffer
+            frame_data = bytearray()
+            for frame in frames:
+                rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                frame_data.extend(rgb_frame.tobytes())
             
-            # Build FFmpeg command based on codec
-            ffmpeg_cmd = self._build_video_encode_command(width, height, fps, output_path)
-            
-            logging.info(f"Encoding scene {scene_number} video with {self.video_codec}")
-            logging.info(f"Resolution: {width}x{height}, FPS: {fps}, Frames: {len(frames)}")
-            
-            encoding_start = time.time()
-            
-            # Start FFmpeg process with proper buffering
-            process = subprocess.Popen(
-                ffmpeg_cmd, 
-                stdin=subprocess.PIPE, 
-                stderr=subprocess.PIPE, 
-                stdout=subprocess.DEVNULL,  # Don't capture stdout
-                bufsize=1024*1024  # 1MB buffer
-            )
-            
-            stderr_output = None
+            # Let communicate() handle sending data and closing stdin.
+            # This is the main fix.
             try:
-                # Prepare all frame data in a buffer
-                frame_data = bytearray()
-                for frame in frames:
-                    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    frame_data.extend(rgb_frame.tobytes())
-                
-                # Let communicate() handle sending data and closing stdin.
-                # This is the main fix.
-                try:
-                    _, stderr_output = process.communicate(input=frame_data, timeout=60)
-                except subprocess.TimeoutExpired:
-                    logging.error("FFmpeg process timed out after 60 seconds")
-                    process.kill()
-                    # After killing, communicate again to get any final output
-                    _, stderr_output = process.communicate()
-                    
-            except Exception as e:
-                logging.error(f"Error during FFmpeg communication: {e}")
-                # Ensure the process is terminated if something goes wrong
+                _, stderr_output = process.communicate(input=frame_data, timeout=60)
+            except subprocess.TimeoutExpired:
+                logging.error("FFmpeg process timed out after 60 seconds")
                 process.kill()
-                process.wait()
-                raise e
-            
-            encoding_time = time.time() - encoding_start
-            
-            if process.returncode == 0:
-                file_size = os.path.getsize(output_path)
-                logging.info(f"Scene {scene_number} video encoded in {encoding_time:.3f}s")
-                logging.info(f"Output: {output_path} ({file_size/1024/1024:.2f}MB)")
-                
-                return {
-                    'success': True,
-                    'output_path': output_path,
-                    'encoding_time': encoding_time,
-                    'file_size_mb': file_size/1024/1024,
-                    'codec': self.video_codec
-                }
-            else:
-                error_msg = stderr_output.decode('utf-8') if stderr_output else 'Unknown FFmpeg error'
-                logging.error(f"FFmpeg failed with return code {process.returncode}")
-                logging.error(f"FFmpeg stderr: {error_msg}")
-                return {
-                    'success': False,
-                    'error': f'FFmpeg failed: {error_msg}',
-                    'return_code': process.returncode
-                }
+                # After killing, communicate again to get any final output
+                _, stderr_output = process.communicate()
                 
         except Exception as e:
-            logging.error(f"Complex scene video save failed: {e}")
-            return {'success': False, 'error': str(e)}
+            logging.error(f"Error during FFmpeg communication: {e}")
+            # Ensure the process is terminated if something goes wrong
+            process.kill()
+            process.wait()
+            raise e
+        
+        encoding_time = time.time() - encoding_start
+        
+        if process.returncode == 0:
+            file_size = os.path.getsize(output_path)
+            logging.info(f"Scene {scene_number} video encoded in {encoding_time:.3f}s")
+            logging.info(f"Output: {output_path} ({file_size/1024/1024:.2f}MB)")
+            
+            return {
+                'success': True,
+                'output_path': output_path,
+                'encoding_time': encoding_time,
+                'file_size_mb': file_size/1024/1024,
+                'codec': self.video_codec
+            }
+        else:
+            error_msg = stderr_output.decode('utf-8') if stderr_output else 'Unknown FFmpeg error'
+            logging.error(f"FFmpeg failed with return code {process.returncode}")
+            logging.error(f"FFmpeg stderr: {error_msg}")
+            return {
+                'success': False,
+                'error': f'FFmpeg failed: {error_msg}',
+                    'return_code': process.returncode
+                }
     
     def _build_video_encode_command(self, width: int, height: int, fps: float, output_path: str) -> List[str]:
         """Build FFmpeg command for different codecs."""
@@ -206,8 +202,7 @@ class Saver:
         
         return cmd
     
-    @log_step
-    @time_step(track_processing=False)
+    @track_performance
     def save_scene_objects(self, scene_data: Dict[str, Any], output_dir: Path, scene_number: int) -> Dict[str, Any]:
         """
         Save individual object images with proper color correction and transparency.
@@ -365,8 +360,7 @@ class Saver:
             else:
                 return cv2.cvtColor(cropped_image, cv2.COLOR_GRAY2RGBA)
     
-    @log_step
-    @time_step(track_processing=False)
+    @track_performance
     def save_metadata(self, scene_data: Dict[str, Any], output_dir: Path, scene_number: int) -> Dict[str, Any]:
         """Save scene metadata as JSON."""
         if not self.save_metadata_enabled:
