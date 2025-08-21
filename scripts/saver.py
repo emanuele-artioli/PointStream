@@ -20,6 +20,7 @@ import time
 import os
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
+from PIL import Image
 from .decorators import log_step, time_step
 from . import config
 
@@ -82,46 +83,38 @@ class Saver:
             
             encoding_start = time.time()
             
-            # Start FFmpeg process
+            # Start FFmpeg process with proper buffering
             process = subprocess.Popen(
                 ffmpeg_cmd, 
                 stdin=subprocess.PIPE, 
                 stderr=subprocess.PIPE, 
-                stdout=subprocess.PIPE
+                stdout=subprocess.DEVNULL,  # Don't capture stdout
+                bufsize=1024*1024  # 1MB buffer
             )
             
+            stderr_output = None
             try:
-                # Write frames to FFmpeg stdin
-                for i, frame in enumerate(frames):
-                    if process.poll() is not None:
-                        break
-                        
-                    if process.stdin and not process.stdin.closed:
-                        try:
-                            # Convert BGR to RGB for proper color encoding
-                            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                            process.stdin.write(rgb_frame.tobytes())
-                        except BrokenPipeError:
-                            logging.warning(f"FFmpeg process ended at frame {i}")
-                            break
-                    else:
-                        break
+                # Prepare all frame data in a buffer
+                frame_data = bytearray()
+                for frame in frames:
+                    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    frame_data.extend(rgb_frame.tobytes())
                 
-                # Close stdin and wait for completion
-                if process.stdin and not process.stdin.closed:
-                    try:
-                        process.stdin.close()
-                    except:
-                        pass
-                        
-                stdout, stderr = process.communicate()
-                
-            except Exception as e:
+                # Let communicate() handle sending data and closing stdin.
+                # This is the main fix.
                 try:
+                    _, stderr_output = process.communicate(input=frame_data, timeout=60)
+                except subprocess.TimeoutExpired:
+                    logging.error("FFmpeg process timed out after 60 seconds")
                     process.kill()
-                    process.wait()
-                except:
-                    pass
+                    # After killing, communicate again to get any final output
+                    _, stderr_output = process.communicate()
+                    
+            except Exception as e:
+                logging.error(f"Error during FFmpeg communication: {e}")
+                # Ensure the process is terminated if something goes wrong
+                process.kill()
+                process.wait()
                 raise e
             
             encoding_time = time.time() - encoding_start
@@ -135,13 +128,18 @@ class Saver:
                     'success': True,
                     'output_path': output_path,
                     'encoding_time': encoding_time,
-                    'file_size': file_size,
+                    'file_size_mb': file_size/1024/1024,
                     'codec': self.video_codec
                 }
             else:
-                error_msg = stderr.decode() if stderr else "Unknown FFmpeg error"
-                logging.error(f"Video encoding failed: {error_msg}")
-                return {'success': False, 'error': error_msg}
+                error_msg = stderr_output.decode('utf-8') if stderr_output else 'Unknown FFmpeg error'
+                logging.error(f"FFmpeg failed with return code {process.returncode}")
+                logging.error(f"FFmpeg stderr: {error_msg}")
+                return {
+                    'success': False,
+                    'error': f'FFmpeg failed: {error_msg}',
+                    'return_code': process.returncode
+                }
                 
         except Exception as e:
             logging.error(f"Complex scene video save failed: {e}")
@@ -256,12 +254,30 @@ class Saver:
                     # Apply proper background masking with color correction
                     masked_object = self._create_transparent_object(cropped_image, obj)
                     
-                    # Save as PNG to support transparency
+                    # Save as PNG to support transparency using PIL for correct color handling
                     image_filename = f"{object_filename}.png"
                     image_path = objects_dir / image_filename
                     
-                    # Save with proper color space
-                    success = cv2.imwrite(str(image_path), masked_object)
+                    # Save with PIL to ensure correct RGB color space
+                    try:
+                        # Convert numpy array to PIL Image
+                        if masked_object.shape[2] == 4:  # RGBA
+                            pil_image = Image.fromarray(masked_object, 'RGBA')
+                        else:  # RGB
+                            pil_image = Image.fromarray(masked_object, 'RGB')
+                        
+                        # Save with PIL (handles RGB correctly)
+                        pil_image.save(str(image_path), 'PNG')
+                        success = True
+                    except Exception as e:
+                        logging.warning(f"PIL save failed, falling back to OpenCV: {e}")
+                        # Fallback to OpenCV (convert RGB back to BGR for cv2.imwrite)
+                        if masked_object.shape[2] == 4:  # RGBA
+                            bgra_object = cv2.cvtColor(masked_object, cv2.COLOR_RGBA2BGRA)
+                            success = cv2.imwrite(str(image_path), bgra_object)
+                        else:  # RGB
+                            bgr_object = cv2.cvtColor(masked_object, cv2.COLOR_RGB2BGR)
+                            success = cv2.imwrite(str(image_path), bgr_object)
                     
                     if success:
                         obj_metadata = {
