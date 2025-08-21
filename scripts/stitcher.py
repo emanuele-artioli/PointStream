@@ -21,8 +21,8 @@ import logging
 from typing import List, Dict, Any, Optional, Tuple
 
 # Import decorators and config
-from decorators import log_step, time_step
-import config
+from .decorators import log_step, time_step
+from . import config
 
 
 class Stitcher:

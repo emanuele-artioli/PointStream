@@ -20,8 +20,8 @@ import time
 import os
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
-from decorators import log_step, time_step
-import config
+from .decorators import log_step, time_step
+from . import config
 
 
 class Saver:
@@ -45,7 +45,7 @@ class Saver:
         
         # Output settings
         self.save_individual_objects = config.get_bool('saver', 'save_individual_objects', True)
-        self.save_metadata = config.get_bool('saver', 'save_metadata', True)
+        self.save_metadata_enabled = config.get_bool('saver', 'save_metadata', True)
         self.save_debug_data = config.get_bool('saver', 'save_debug_data', True)
         
         logging.info(f"Saver initialized")
@@ -298,9 +298,10 @@ class Saver:
             crop_bbox = obj.get('crop_bbox', [])
             
             if seg_mask is None or len(crop_bbox) < 4:
-                # No mask available - convert BGR to RGBA
+                # No mask available - convert BGR to RGB then to RGBA for correct colors
                 if len(cropped_image.shape) == 3:
-                    rgba_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGBA)
+                    rgb_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGB)
+                    rgba_image = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2RGBA)
                     return rgba_image
                 else:
                     rgba_image = cv2.cvtColor(cropped_image, cv2.COLOR_GRAY2RGBA)
@@ -327,8 +328,9 @@ class Saver:
             
             # Create RGBA image with proper color space
             if len(cropped_image.shape) == 3:
-                # BGR to RGBA conversion
-                rgba_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGBA)
+                # Convert BGR to RGB first, then to RGBA for correct colors
+                rgb_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGB)
+                rgba_image = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2RGBA)
             else:
                 # Grayscale to RGBA
                 rgba_image = cv2.cvtColor(cropped_image, cv2.COLOR_GRAY2RGBA)
@@ -340,9 +342,10 @@ class Saver:
             
         except Exception as e:
             logging.warning(f"Failed to create transparent object: {e}")
-            # Fallback to opaque image
+            # Fallback to opaque image with correct color conversion
             if len(cropped_image.shape) == 3:
-                return cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGBA)
+                rgb_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGB)
+                return cv2.cvtColor(rgb_image, cv2.COLOR_RGB2RGBA)
             else:
                 return cv2.cvtColor(cropped_image, cv2.COLOR_GRAY2RGBA)
     
@@ -350,7 +353,7 @@ class Saver:
     @time_step(track_processing=False)
     def save_metadata(self, scene_data: Dict[str, Any], output_dir: Path, scene_number: int) -> Dict[str, Any]:
         """Save scene metadata as JSON."""
-        if not self.save_metadata:
+        if not self.save_metadata_enabled:
             return {'metadata_saved': False}
             
         try:

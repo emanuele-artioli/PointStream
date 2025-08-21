@@ -20,7 +20,8 @@ def load_config(config_file: str = None):
     global config
     
     if config_file is None:
-        config_file = Path(__file__).parent / "config.ini"
+        # Look for config.ini in the parent directory (project root)
+        config_file = Path(__file__).parent.parent / "config.ini"
     
     config_path = Path(config_file)
     if not config_path.exists():

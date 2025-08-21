@@ -39,16 +39,16 @@ from PIL import Image
 
 # Import all PointStream components
 try:
-    from decorators import log_step, time_step
-    from stitcher import Stitcher
-    from segmenter import Segmenter 
-    from keypointer import Keypointer
-    from saver import Saver
+    from .decorators import log_step, time_step
+    from .stitcher import Stitcher
+    from .segmenter import Segmenter 
+    from .keypointer import Keypointer
+    from .saver import Saver
     # No longer needed: prompter and inpainter
     # from prompter import Prompter
     # from inpainter import Inpainter
-    from video_scene_splitter import VideoSceneSplitter
-    import config
+    from .splitter import VideoSceneSplitter
+    from . import config
 except ImportError as e:
     logging.error(f"Failed to import PointStream components: {e}")
     print("Error: Cannot import required PointStream components")
@@ -637,7 +637,7 @@ class PointStreamPipeline:
     def _log_component_fps_statistics(self):
         """Log average FPS statistics for each component across all processed scenes."""
         try:
-            from decorators import profiler
+            from .decorators import profiler
             
             # Get overall performance summary
             performance_summary = profiler.get_overall_summary()
@@ -1006,7 +1006,7 @@ class PointStreamPipeline:
         """Save scene processing results to files."""
         try:
             # Import profiler for timing data
-            from decorators import profiler
+            from .decorators import profiler
             
             # Create subdirectories
             (output_path / "panoramas").mkdir(exist_ok=True)
