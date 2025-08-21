@@ -111,6 +111,42 @@ class PointStreamPipeline:
             logging.error(f"Failed to initialize components: {e}")
             raise
     
+    def _create_masked_frame_for_objects(self, frame: np.ndarray, objects: List[Dict[str, Any]]) -> np.ndarray:
+        """
+        Create a frame where all object backgrounds are masked to black.
+        This ensures that when objects are cropped, they have black backgrounds instead of scene background.
+        
+        Args:
+            frame: Original frame
+            objects: List of objects with their masks
+            
+        Returns:
+            Frame with object backgrounds masked to black
+        """
+        masked_frame = frame.copy()
+        
+        for obj in objects:
+            if 'mask' in obj:
+                obj_mask = obj['mask']
+                
+                # Create inverted mask (background areas)
+                background_mask = (obj_mask == 0)
+                
+                # Get object bounding box to limit the masking area
+                bbox = obj.get('bbox', [])
+                if len(bbox) >= 4:
+                    x1, y1, x2, y2 = map(int, bbox[:4])
+                    # Ensure coordinates are within frame bounds
+                    h, w = frame.shape[:2]
+                    x1, y1 = max(0, x1), max(0, y1)
+                    x2, y2 = min(w, x2), min(h, y2)
+                    
+                    # Apply black masking only within the bounding box region
+                    bbox_background_mask = background_mask[y1:y2, x1:x2]
+                    masked_frame[y1:y2, x1:x2][bbox_background_mask] = [0, 0, 0]  # Black background
+        
+        return masked_frame
+    
     def _create_masked_frames(self, frames: List[np.ndarray], segmentation_result: Dict[str, Any]) -> List[np.ndarray]:
         """
         Create masked frames with configurable background handling.
@@ -313,21 +349,24 @@ class PointStreamPipeline:
                 if frame_idx < len(frames):
                     frame = frames[frame_idx]
                     
+                    # Create a masked version of the frame where all object backgrounds are black
+                    masked_frame = self._create_masked_frame_for_objects(frame, objects)
+                    
                     for obj_idx, obj in enumerate(objects):
                         obj['frame_index'] = frame_idx
                         obj['object_id'] = f"frame_{frame_idx}_obj_{obj_idx}"
                         
-                        # Crop object image using bounding box
+                        # Crop object image using bounding box from the masked frame
                         bbox = obj.get('bbox', [])
                         if len(bbox) >= 4:
                             x1, y1, x2, y2 = map(int, bbox[:4])
                             # Ensure coordinates are within frame bounds
-                            h, w = frame.shape[:2]
+                            h, w = masked_frame.shape[:2]
                             x1, y1 = max(0, x1), max(0, y1)
                             x2, y2 = min(w, x2), min(h, y2)
                             
                             if x2 > x1 and y2 > y1:
-                                cropped_object = frame[y1:y2, x1:x2]
+                                cropped_object = masked_frame[y1:y2, x1:x2]
                                 obj['cropped_image'] = cropped_object
                                 obj['crop_bbox'] = [x1, y1, x2, y2]
                                 obj['crop_size'] = [x2-x1, y2-y1]
