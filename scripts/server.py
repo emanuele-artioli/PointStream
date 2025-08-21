@@ -525,7 +525,7 @@ class PointStreamPipeline:
             }
     
     def _save_scene_objects(self, scene_data: Dict[str, Any], output_dir: Path, scene_number: int):
-        """Save individual object images using the dedicated Saver component."""
+        """Save individual object images and comprehensive metadata using the dedicated Saver component."""
         if not output_dir:
             return
         
@@ -535,10 +535,10 @@ class PointStreamPipeline:
         if save_result.get('saved_objects', 0) > 0:
             logging.info(f"Saved {save_result['saved_objects']} objects for scene {scene_number}")
         
-        # Save metadata using the Saver component
+        # Save comprehensive metadata using the Saver component
         metadata_result = self.saver.save_metadata(scene_data, output_dir, scene_number)
         if metadata_result.get('metadata_saved'):
-            logging.info(f"Saved metadata for scene {scene_number}")
+            logging.info(f"Saved comprehensive metadata for scene {scene_number}")
         
         return save_result
     
@@ -741,52 +741,8 @@ class PointStreamPipeline:
                 panorama_path = output_path / "panoramas" / f"scene_{scene_number:04d}_panorama.jpg"
                 cv2.imwrite(str(panorama_path), panorama)
             
-            # Save objects (images, masks, keypoints) - use single implementation
+            # Save objects (images, masks, keypoints) and comprehensive metadata
             self._save_scene_objects(result, output_path, scene_number)
-            
-            # Get detailed performance data
-            performance_summary = profiler.get_overall_summary()
-            
-            # Enhanced metadata with detailed object and performance information
-            keypoint_result = result.get('keypoint_result', {})
-            segmentation_result = result.get('segmentation_result', {})
-            
-            metadata = {
-                'scene_number': scene_number,
-                'scene_type': result.get('scene_type'),
-                'processing_timestamp': time.time(),
-                
-                'stitching': {
-                    'scene_type': stitching_result.get('scene_type'),
-                    'homographies_count': len(stitching_result.get('homographies', [])),
-                    'panorama_shape': list(panorama.shape) if panorama is not None else None,
-                    'processing_time': stitching_result.get('processing_time', 0)
-                },
-                
-                'segmentation': {
-                    'panorama_objects': len(segmentation_result.get('panorama_data', {}).get('objects', [])),
-                    'total_frame_objects': sum(len(fd.get('objects', [])) for fd in segmentation_result.get('frames_data', [])),
-                    'frames_processed': len(segmentation_result.get('frames_data', [])),
-                    'processing_time': segmentation_result.get('processing_time', 0)
-                },
-                
-                'keypoints': {
-                    'total_objects': keypoint_result.get('total_objects', 0),
-                    'objects_with_keypoints': keypoint_result.get('objects_with_keypoints', 0),
-                    'processing_time': keypoint_result.get('processing_time', 0),
-                    'objects_saved': len([obj for obj in keypoint_result.get('objects', []) if obj.get('cropped_image') is not None])
-                },
-                
-                'performance': {
-                    'detailed_timings': performance_summary,
-                    'total_scene_time': sum(timing['total_time'] for timing in performance_summary.values()),
-                    'slowest_operation': max(performance_summary.keys(), key=lambda k: performance_summary[k]['avg_time']) if performance_summary else None
-                }
-            }
-            
-            metadata_path = output_path / "results" / f"scene_{scene_number:04d}_metadata.json"
-            with open(metadata_path, 'w') as f:
-                json.dump(metadata, f, indent=2, default=str)
             
             # Log performance summary for this scene
             profiler.log_scene_summary(scene_number)

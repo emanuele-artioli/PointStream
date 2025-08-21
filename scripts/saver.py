@@ -362,18 +362,74 @@ class Saver:
     
     @track_performance
     def save_metadata(self, scene_data: Dict[str, Any], output_dir: Path, scene_number: int) -> Dict[str, Any]:
-        """Save scene metadata as JSON."""
+        """Save comprehensive scene metadata as JSON with performance statistics."""
         if not self.save_metadata_enabled:
             return {'metadata_saved': False}
             
         try:
             metadata_file = output_dir / f'scene_{scene_number:04d}_metadata.json'
             
-            # Create clean metadata (remove large binary data)
-            clean_metadata = self._clean_metadata_for_json(scene_data)
+            # Add comprehensive performance and summary information first
+            try:
+                from .decorators import profiler
+                performance_summary = profiler.get_overall_summary()
+                
+                # Extract results for summary statistics (before cleaning)
+                stitching_result = scene_data.get('stitching_result', {})
+                segmentation_result = scene_data.get('segmentation_result', {})
+                keypoint_result = scene_data.get('keypoint_result', {})
+                panorama = stitching_result.get('panorama')
+                
+                # Create enhanced metadata with summary statistics
+                enhanced_metadata = {
+                    'scene_number': scene_number,
+                    'scene_type': scene_data.get('scene_type'),
+                    'processing_timestamp': time.time(),
+                    
+                    # Summary statistics (calculated before cleaning)
+                    'stitching': {
+                        'scene_type': stitching_result.get('scene_type'),
+                        'homographies_count': len(stitching_result.get('homographies', [])),
+                        'panorama_shape': list(panorama.shape) if panorama is not None else None,
+                        'processing_time': stitching_result.get('processing_time', 0)
+                    },
+                    
+                    'segmentation': {
+                        'panorama_objects': len(segmentation_result.get('panorama_data', {}).get('objects', [])),
+                        'total_frame_objects': sum(len(fd.get('objects', [])) for fd in segmentation_result.get('frames_data', [])),
+                        'frames_processed': len(segmentation_result.get('frames_data', [])),
+                        'processing_time': segmentation_result.get('processing_time', 0)
+                    },
+                    
+                    'keypoints': {
+                        'total_objects': keypoint_result.get('total_objects', 0),
+                        'objects_with_keypoints': keypoint_result.get('objects_with_keypoints', 0),
+                        'processing_time': keypoint_result.get('processing_time', 0),
+                        'objects_saved': len([obj for obj in keypoint_result.get('objects', []) if obj.get('cropped_image') is not None])
+                    },
+                    
+                    'performance': {
+                        'detailed_timings': performance_summary,
+                        'total_scene_time': sum(timing['total_time'] for timing in performance_summary.values()) if performance_summary else 0,
+                        'slowest_operation': max(performance_summary.keys(), key=lambda k: performance_summary[k]['avg_time']) if performance_summary else None
+                    }
+                }
+                
+                # Now add the cleaned detailed data (excluding masked_frames and segmentation_result)
+                clean_metadata = self._clean_metadata_for_json(scene_data)
+                
+                # Merge the clean detailed data with our summary
+                for key, value in clean_metadata.items():
+                    if key not in enhanced_metadata:  # Don't overwrite our summary sections
+                        enhanced_metadata[key] = value
+                
+            except Exception as e:
+                # Fallback to basic metadata if performance data unavailable
+                logging.warning(f"Could not add performance data to metadata: {e}")
+                enhanced_metadata = self._clean_metadata_for_json(scene_data)
             
             with open(metadata_file, 'w') as f:
-                json.dump(clean_metadata, f, indent=2, default=str)
+                json.dump(enhanced_metadata, f, indent=2, default=str)
             
             return {'metadata_saved': True, 'metadata_path': str(metadata_file)}
             
@@ -382,16 +438,14 @@ class Saver:
             return {'metadata_saved': False, 'error': str(e)}
     
     def _clean_metadata_for_json(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Remove large binary data from metadata before JSON serialization."""
+        """Remove large binary data and unwanted sections from metadata before JSON serialization."""
         if isinstance(data, dict):
             cleaned = {}
             for key, value in data.items():
-                if key in ['frames', 'cropped_image', 'segmentation_mask', 'panorama']:
-                    # Skip large binary data
-                    if key == 'frames':
-                        cleaned[key] = f"<{len(value)} frames>" if isinstance(value, list) else "<frames>"
-                    else:
-                        cleaned[key] = "<binary_data>"
+                # Skip large binary data and unwanted data structures
+                if key in ['frames', 'cropped_image', 'segmentation_mask', 'panorama', 'masked_frames', 'segmentation_result']:
+                    # Skip these entirely - don't include them in the JSON
+                    continue
                 else:
                     cleaned[key] = self._clean_metadata_for_json(value)
             return cleaned
