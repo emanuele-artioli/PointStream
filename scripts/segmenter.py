@@ -20,7 +20,7 @@ from . import config
 
 try:
     import torch
-    from ultralytics import YOLO
+    from ultralytics import YOLO, YOLOE
 except ImportError as e:
     logging.error(f"Failed to import required libraries: {e}")
     raise
@@ -67,7 +67,14 @@ class Segmenter:
         try:
             # Model with tracking for video frames
             logging.info("Loading YOLO model with tracking for frames...")
-            self.model_with_tracking = YOLO(self.model_path)
+            
+            # Determine which YOLO class to use based on model path
+            if 'yoloe' in self.model_path.lower():
+                self.model_with_tracking = YOLOE(self.model_path)
+                logging.info(f"Using YOLOE class for model: {self.model_path}")
+            else:
+                self.model_with_tracking = YOLO(self.model_path)
+                logging.info(f"Using YOLO class for model: {self.model_path}")
             
             logging.info("YOLO model loaded successfully")
             

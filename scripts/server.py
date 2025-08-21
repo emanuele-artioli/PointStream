@@ -732,7 +732,6 @@ class PointStreamPipeline:
             
             # Create subdirectories
             (output_path / "panoramas").mkdir(exist_ok=True)
-            (output_path / "results").mkdir(exist_ok=True)
             
             # Save panorama
             stitching_result = result.get('stitching_result', {})
