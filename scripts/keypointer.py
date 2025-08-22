@@ -28,44 +28,12 @@ except ImportError:
 
 
 class Keypointer:
-    """Keypoint detection component with semantic object categorization."""
+    """Keypoint detection component for semantically categorized objects."""
     
     def __init__(self):
         """Initialize the keypointer with MMPose models and parameters."""
         # Device configuration
         self.device = 'cuda' if cv2.cuda.getCudaEnabledDeviceCount() > 0 else 'cpu'
-        
-        # Semantic categorization mappings
-        self.class_to_category = {
-            # Human category
-            'person': 'human',
-            'human': 'human',
-            'man': 'human',
-            'woman': 'human',
-            'child': 'human',
-            'baby': 'human',
-            
-            # Animal category
-            'dog': 'animal',
-            'cat': 'animal',
-            'horse': 'animal',
-            'sheep': 'animal',
-            'cow': 'animal',
-            'elephant': 'animal',
-            'bear': 'animal',
-            'zebra': 'animal',
-            'giraffe': 'animal',
-            'bird': 'animal',
-            'chicken': 'animal',
-            'duck': 'animal',
-            'goose': 'animal',
-            'turkey': 'animal',
-            'fish': 'animal',
-            'shark': 'animal',
-            'whale': 'animal',
-            
-            # Everything else is 'other'
-        }
         
         # Keypoint detection parameters
         self.human_confidence_threshold = config.get_float('keypoints', 'human_confidence_threshold', 0.3)
@@ -156,44 +124,14 @@ class Keypointer:
         else:
             logging.info("MMPose not available, using fallback methods only")
     
-    def semantic_categorizer(self, class_name: str) -> str:
-        """
-        Semantic tool to categorize object class names into keypoint categories.
-        
-        Args:
-            class_name: Object class name from detection
-            
-        Returns:
-            Category string: 'human', 'animal', or 'other'
-        """
-        class_name_lower = class_name.lower()
-        
-        # Check direct mappings
-        if class_name_lower in self.class_to_category:
-            return self.class_to_category[class_name_lower]
-        
-        # Check partial matches for animals
-        animal_keywords = ['dog', 'cat', 'bird', 'fish', 'animal']
-        for keyword in animal_keywords:
-            if keyword in class_name_lower:
-                return 'animal'
-        
-        # Check partial matches for humans
-        human_keywords = ['person', 'human', 'man', 'woman', 'people']
-        for keyword in human_keywords:
-            if keyword in class_name_lower:
-                return 'human'
-        
-        # Default to 'other'
-        return 'other'
-    
     @track_performance
     def extract_keypoints(self, objects_data: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         Extract keypoints for all objects based on their semantic category.
+        Objects should already have semantic categories assigned by the semantic classifier.
         
         Args:
-            objects_data: List of object dictionaries with cropped/masked images
+            objects_data: List of object dictionaries with semantic categories
             
         Returns:
             Dictionary containing keypoint data for each object
@@ -207,40 +145,36 @@ class Keypointer:
         
         for obj_data in objects_data:
             try:
-                # Get object information
-                class_name = obj_data.get('class_name', 'unknown')
+                # Get object information (semantic category should already be set)
+                class_name = obj_data.get('class_name', 'other')  # This should be 'human', 'animal', or 'other'
+                semantic_category = obj_data.get('semantic_category', class_name)
                 track_id = obj_data.get('track_id')
                 frame_index = obj_data.get('frame_index')
                 
-                # Categorize object semantically
-                category = self.semantic_categorizer(class_name)
-                
-                # Extract keypoints based on category
-                if category == 'human':
+                # Extract keypoints based on semantic category
+                if semantic_category == 'human':
                     keypoints = self._extract_human_keypoints(obj_data)
-                elif category == 'animal':
+                elif semantic_category == 'animal':
                     keypoints = self._extract_animal_keypoints(obj_data)
-                else:  # category == 'other'
+                else:  # semantic_category == 'other'
                     keypoints = self._extract_edge_keypoints(obj_data)
                 
                 # Create enhanced object data
                 enhanced_obj = obj_data.copy()
                 enhanced_obj.update({
-                    'semantic_category': category,
                     'keypoints': keypoints,
-                    'keypoint_method': self._get_method_name(category)
+                    'keypoint_method': self._get_method_name(semantic_category)
                 })
                 
                 processed_objects.append(enhanced_obj)
                 
-                logging.debug(f"Object {class_name} (track {track_id}): {category} -> {len(keypoints.get('points', []))} keypoints")
+                logging.debug(f"Object {semantic_category} (track {track_id}): {len(keypoints.get('points', []))} keypoints")
                 
             except Exception as e:
                 logging.error(f"Failed to extract keypoints for object {obj_data.get('class_name', 'unknown')}: {e}")
                 # Add object without keypoints
                 enhanced_obj = obj_data.copy()
                 enhanced_obj.update({
-                    'semantic_category': 'other',
                     'keypoints': {'points': [], 'method': 'error'},
                     'keypoint_method': 'error'
                 })

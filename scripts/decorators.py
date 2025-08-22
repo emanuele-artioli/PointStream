@@ -77,7 +77,13 @@ def track_performance(func: Callable) -> Callable:
             if hasattr(args[1], '__len__') and hasattr(args[1], '__getitem__'):
                 scene_info = f" ({len(args[1])} items)"
         
-        logging.info(f"🚀 Starting {func_name}{scene_info}")
+        # Only log start for major operations (filter out small, repetitive operations)
+        verbose_logging = kwargs.get('verbose_logging', False)
+        is_minor_operation = func_name in ['classify_class_name', 'filter_duplicates']
+        
+        if not is_minor_operation or verbose_logging:
+            logging.info(f"🚀 Starting {func_name}{scene_info}")
+            
         start_time = time.time()
         
         try:
@@ -87,8 +93,9 @@ def track_performance(func: Callable) -> Callable:
             # Record timing
             profiler.record_timing(operation_name, execution_time)
             
-            # Log completion with timing
-            logging.info(f"✅ {func_name} completed in {execution_time:.2f}s")
+            # Log completion with timing only for major operations
+            if not is_minor_operation or verbose_logging:
+                logging.info(f"✅ {func_name} completed in {execution_time:.2f}s")
             
             # Add timing to result if it's a dictionary
             if isinstance(result, dict):

@@ -1,18 +1,18 @@
 """
 PointStream Scripts Package
 
-This package contains all the core PointStream processing components with single-word names:
+This package contains all the core PointStream processing components:
 
-- server: Main processing pipeline (formerly server_pipeline.py)
-- splitter: Video scene detection and splitting (formerly video_scene_splitter.py)
+- server: Main processing pipeline 
+- splitter: Video scene detection and splitting
 - segmenter: Object detection and segmentation
+- duplicate_filter: Duplicate detection filtering 
+- semantic_classifier: Semantic classification of objects into human/animal/other
 - stitcher: Panorama stitching
 - keypointer: Keypoint detection
 - saver: File saving utilities
 - config: Configuration management
 - decorators: Performance and logging decorators
-
-Note: client.py will be added later for client-side functionality.
 """
 
 __version__ = "1.0.0"
@@ -21,6 +21,8 @@ __version__ = "1.0.0"
 from .server import PointStreamPipeline
 from .splitter import VideoSceneSplitter
 from .segmenter import Segmenter
+from .duplicate_filter import DuplicateFilter
+from .semantic_classifier import SemanticClassifier
 from .stitcher import Stitcher
 from .keypointer import Keypointer
 from .saver import Saver
@@ -30,6 +32,8 @@ __all__ = [
     'PointStreamPipeline',
     'VideoSceneSplitter',
     'Segmenter',
+    'DuplicateFilter',
+    'SemanticClassifier',
     'Stitcher', 
     'Keypointer',
     'Saver',

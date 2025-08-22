@@ -42,6 +42,8 @@ try:
     from .decorators import track_performance
     from .stitcher import Stitcher
     from .segmenter import Segmenter 
+    from .duplicate_filter import DuplicateFilter
+    from .semantic_classifier import SemanticClassifier
     from .keypointer import Keypointer
     from .saver import Saver
     from .splitter import VideoSceneSplitter
@@ -85,7 +87,7 @@ class PointStreamPipeline:
         self.processing_times = []
         
         logging.info("✅ PointStream Pipeline initialized")
-        logging.info("🎯 Workflow: Segmentation → Masking → Stitching → Keypoints")
+        logging.info("🎯 Workflow: Segmentation → Duplicate Filtering → Semantic Classification → Masking → Stitching → Keypoints")
     
     def _initialize_components(self):
         """Initialize all processing components."""
@@ -99,12 +101,18 @@ class PointStreamPipeline:
             logging.info("   🎯 Initializing Segmenter...")
             self.segmenter = Segmenter()
             
-            logging.info("   🫴 Initializing Keypointer...")
+            logging.info("   � Initializing Semantic Classifier...")
+            self.semantic_classifier = SemanticClassifier()
+            
+            logging.info("   �🫴 Initializing Keypointer...")
             self.keypointer = Keypointer()
             
             logging.info("   💾 Initializing Saver...")
             self.saver = Saver()
-            
+
+            logging.info("   🔍 Initializing Duplicate Filter...")
+            self.duplicate_filter = DuplicateFilter()
+
             logging.info("✅ All components loaded successfully")
             
         except Exception as e:
@@ -381,7 +389,16 @@ class PointStreamPipeline:
                         
                         all_objects.append(obj)
             
-            # Process keypoints for all objects
+            # Apply semantic classification to all objects
+            if all_objects:
+                logging.info(f"Applying semantic classification to {len(all_objects)} objects")
+                all_objects = self.semantic_classifier.classify_objects(all_objects)
+                
+                # Log classification statistics
+                stats = self.semantic_classifier.get_classification_statistics(all_objects)
+                logging.info(f"Classification stats: {stats}")
+            
+            # Process keypoints for all semantically classified objects
             if all_objects:
                 keypoint_result = self.keypointer.extract_keypoints(all_objects)
                 
@@ -392,7 +409,12 @@ class PointStreamPipeline:
                     enhanced_obj = {
                         'object_id': obj.get('object_id', 'unknown'),
                         'frame_index': obj.get('frame_index', 0),
-                        'class_name': obj.get('class_name', 'unknown'),
+                        'class_name': obj.get('class_name', 'other'),  # This is now the semantic category
+                        'original_class_name': obj.get('original_class_name', 'unknown'),
+                        'semantic_category': obj.get('semantic_category', 'other'),
+                        'semantic_confidence': obj.get('semantic_confidence', 0.0),
+                        'classification_method': obj.get('classification_method', 'unknown'),
+                        'track_id': obj.get('track_id'),
                         'confidence': obj.get('confidence', 0.0),
                         'bbox': obj.get('bbox', []),
                         'crop_bbox': obj.get('crop_bbox', []),
@@ -457,6 +479,13 @@ class PointStreamPipeline:
             logging.info(f"🎯 Scene {scene_number}: Step 1/4 - Object segmentation on frames...")
             step_start = time.time()
             frame_segmentation_result = self.segmenter.segment_frames_only(frames)
+            
+            # Apply duplicate filtering to remove redundant detections
+            if frame_segmentation_result.get('frames_data'):
+                logging.info("   🔍 Applying duplicate filtering to segmentation results")
+                filtered_frames_data = self.duplicate_filter.filter_by_frame(frame_segmentation_result['frames_data'])
+                frame_segmentation_result['frames_data'] = filtered_frames_data
+            
             step_time = time.time() - step_start
             objects_count = sum(len(frame_data.get('objects', [])) for frame_data in frame_segmentation_result.get('frames_data', []))
             logging.info(f"   ✅ Frame segmentation completed in {step_time:.1f}s - Found {objects_count} objects")

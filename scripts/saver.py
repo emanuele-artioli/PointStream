@@ -227,24 +227,23 @@ class Saver:
         objects_dir.mkdir(parents=True, exist_ok=True)
         
         saved_objects = []
-        class_counters = {}
         
         for obj in objects:
             try:
-                class_name = obj.get('class_name', 'unknown')
-                object_id = obj.get('object_id', 'unknown')
+                # Get object information (should use semantic categories now)
+                semantic_category = obj.get('semantic_category', 'other')
+                original_class_name = obj.get('original_class_name', obj.get('class_name', 'unknown'))
+                track_id = obj.get('track_id')
                 cropped_image = obj.get('cropped_image')
+                frame_index = obj.get('frame_index', 0)
                 
                 if cropped_image is not None:
-                    # Generate filename
-                    if class_name not in class_counters:
-                        class_counters[class_name] = 0
-                    class_counters[class_name] += 1
-                    
-                    if class_counters[class_name] == 1:
-                        object_filename = class_name
+                    # Generate filename using semantic category, track ID, and frame index
+                    if track_id is not None:
+                        object_filename = f"{semantic_category}_track_{track_id}_frame_{frame_index:04d}"
                     else:
-                        object_filename = f"{class_name}_{class_counters[class_name]}"
+                        # Fallback for objects without track ID
+                        object_filename = f"{semantic_category}_{original_class_name}_frame_{frame_index:04d}"
                     
                     # Apply proper background masking with color correction
                     masked_object = self._create_transparent_object(cropped_image, obj)
@@ -276,17 +275,20 @@ class Saver:
                     
                     if success:
                         obj_metadata = {
-                            'object_id': object_id,
-                            'class_name': class_name,
+                            'semantic_category': semantic_category,
+                            'original_class_name': original_class_name,
+                            'track_id': track_id,
                             'filename': object_filename,
                             'saved_image_path': str(image_path),
                             'has_transparency': True,
-                            'format': 'PNG'
+                            'format': 'PNG',
+                            'semantic_confidence': obj.get('semantic_confidence', 0.0),
+                            'classification_method': obj.get('classification_method', 'unknown')
                         }
                         saved_objects.append(obj_metadata)
                 
             except Exception as e:
-                logging.warning(f"Failed to save object {class_name}: {e}")
+                logging.warning(f"Failed to save object {semantic_category} (track {track_id}): {e}")
                 continue
         
         logging.info(f"Saved {len(saved_objects)} objects for scene {scene_number}")
