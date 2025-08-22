@@ -21,9 +21,9 @@ import os
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 from PIL import Image
-from .decorators import track_performance
-from .error_handling import safe_execute, create_error_result, create_success_result
-from . import config
+from ...utils.decorators import track_performance
+from ...utils.error_handling import safe_execute, create_error_result, create_success_result
+from ...utils import config
 
 
 class Saver:
@@ -373,7 +373,7 @@ class Saver:
             
             # Add comprehensive performance and summary information first
             try:
-                from .decorators import profiler
+                from ...utils.decorators import profiler
                 performance_summary = profiler.get_overall_summary()
                 
                 # Extract results for summary statistics (before cleaning)

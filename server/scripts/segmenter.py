@@ -14,9 +14,9 @@ import cv2
 import numpy as np
 import logging
 from typing import List, Dict, Any, Optional, Tuple
-from .decorators import track_performance
-from .error_handling import safe_execute
-from . import config
+from ...utils.decorators import track_performance
+from ...utils.error_handling import safe_execute
+from ...utils import config
 
 try:
     import torch

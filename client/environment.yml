@@ -1,0 +1,67 @@
+# PointStream Client Environment
+# Focused on generative models and video reconstruction
+# After activation, run: conda activate pointstream-client && pip install -r requirements.txt
+
+name: pointstream-client
+channels:
+  - nvidia/label/cuda-12.4.0
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  # Core
+  - python=3.10
+  - pip
+
+  # PyTorch and CUDA (Using 12.4 for better compatibility)
+  - pytorch>=2.6.0
+  - torchvision>=0.21.0
+  - torchaudio>=2.6.0
+  - pytorch-cuda=12.4
+  - cuda
+  - cudatoolkit
+
+  # Computer Vision & Image Processing
+  - opencv 
+  - scikit-image
+  - matplotlib
+  - pillow
+  - ffmpeg
+
+  # Machine Learning Libraries for Generative Models
+  - numpy<2
+  - scikit-learn
+  - transformers>=4.45.0
+
+  # Development & Analysis
+  - tqdm
+  - jupyter
+  - pytest
+
+  # Pip dependencies
+  - pip:
+    # Core dependencies
+    - scipy
+    - safetensors
+    - natsort
+    
+    # Generative Models
+    - diffusers
+    - accelerate
+    - wandb  # For experiment tracking
+    - tensorboard  # For monitoring training
+    
+    # cGAN and other generative model dependencies
+    - torchsummary
+    - torchmetrics
+    - lpips  # For perceptual loss
+    
+    # Video processing
+    - moviepy
+    - imageio
+    - imageio-ffmpeg
+    
+    # Additional training tools
+    - python-dotenv
+    - ipykernel  # Jupyter kernel support

@@ -26,7 +26,7 @@ from .semantic_classifier import SemanticClassifier
 from .stitcher import Stitcher
 from .keypointer import Keypointer
 from .saver import Saver
-from . import config
+from ...utils import config
 
 __all__ = [
     'PointStreamPipeline',
