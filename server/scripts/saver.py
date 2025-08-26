@@ -21,9 +21,9 @@ import os
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 from PIL import Image
-from ...utils.decorators import track_performance
-from ...utils.error_handling import safe_execute, create_error_result, create_success_result
-from ...utils import config
+from utils.decorators import track_performance
+from utils.error_handling import safe_execute, create_error_result, create_success_result
+from utils import config
 
 
 class Saver:
@@ -373,7 +373,7 @@ class Saver:
             
             # Add comprehensive performance and summary information first
             try:
-                from ...utils.decorators import profiler
+                from utils.decorators import profiler
                 performance_summary = profiler.get_overall_summary()
                 
                 # Extract results for summary statistics (before cleaning)
@@ -431,7 +431,7 @@ class Saver:
                 enhanced_metadata = self._clean_metadata_for_json(scene_data)
             
             with open(metadata_file, 'w') as f:
-                json.dump(enhanced_metadata, f, indent=2, default=str)
+                json.dump(enhanced_metadata, f, indent=2)
             
             return {'metadata_saved': True, 'metadata_path': str(metadata_file)}
             
@@ -453,5 +453,8 @@ class Saver:
             return cleaned
         elif isinstance(data, list):
             return [self._clean_metadata_for_json(item) for item in data]
+        elif isinstance(data, np.ndarray):
+            # Convert numpy arrays to lists for proper JSON serialization
+            return data.tolist()
         else:
             return data

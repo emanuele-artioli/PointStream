@@ -20,11 +20,11 @@ import json
 import os
 
 try:
-    from ...utils.decorators import track_performance
-    from ...utils import config
-    from ..models.human_cgan import HumanCGAN
-    from ..models.animal_cgan import AnimalCGAN
-    from ..models.other_cgan import OtherCGAN
+    from utils.decorators import track_performance
+    from utils import config
+    from client.models.human_cgan import HumanCGAN
+    from client.models.animal_cgan import AnimalCGAN
+    from client.models.other_cgan import OtherCGAN
     
     # Optional imports for advanced features
     try:

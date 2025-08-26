@@ -15,14 +15,33 @@ from pathlib import Path
 # Add the current directory to Python path so we can import from subdirectories
 sys.path.insert(0, str(Path(__file__).parent))
 
-# Import server and client main functions
-try:
-    from server.server import main as server_main, PointStreamPipeline
-    from client.client import main as client_main, PointStreamClient
-except ImportError as e:
-    print(f"Error: Cannot import required PointStream components: {e}")
-    print("Make sure all component files are properly organized")
-    sys.exit(1)
+# Global imports for components (will be set based on needs)
+server_main = None
+PointStreamPipeline = None
+client_main = None
+PointStreamClient = None
+
+
+def import_server_components():
+    """Import server components when needed."""
+    global server_main, PointStreamPipeline
+    try:
+        from server.server import main as server_main, PointStreamPipeline
+        return True
+    except ImportError as e:
+        print(f"Error: Cannot import server components: {e}")
+        return False
+
+
+def import_client_components():
+    """Import client components when needed."""
+    global client_main, PointStreamClient
+    try:
+        from client.client import main as client_main, PointStreamClient
+        return True
+    except ImportError as e:
+        print(f"Error: Cannot import client components: {e}")
+        return False
 
 
 def setup_logging(log_level: str = "INFO"):
@@ -258,6 +277,14 @@ Examples:
     
     try:
         if args.full_pipeline:
+            # Import both server and client components
+            if not import_server_components():
+                print("❌ Failed to import server components")
+                sys.exit(1)
+            if not import_client_components():
+                print("❌ Failed to import client components")
+                sys.exit(1)
+                
             # Run complete pipeline
             print("🚀 Starting FULL POINTSTREAM PIPELINE")
             print("This will run: Server Processing → Client Processing → Quality Assessment")
@@ -296,6 +323,11 @@ Examples:
                 print("⚠️ Quality assessment failed, but pipeline completed")
         
         elif args.server_only:
+            # Import server components only
+            if not import_server_components():
+                print("❌ Failed to import server components")
+                sys.exit(1)
+                
             # Server processing only
             print("🔥 Starting SERVER-ONLY processing")
             success = run_server_processing(
@@ -305,6 +337,11 @@ Examples:
             )
         
         elif args.client_only:
+            # Import client components only
+            if not import_client_components():
+                print("❌ Failed to import client components")
+                sys.exit(1)
+                
             # Client processing only
             print("🔧 Starting CLIENT-ONLY processing")
             success = run_client_processing(
@@ -315,6 +352,11 @@ Examples:
             )
         
         elif args.assess_quality:
+            # Import client components only (needed for quality assessment)
+            if not import_client_components():
+                print("❌ Failed to import client components")
+                sys.exit(1)
+                
             # Quality assessment only
             print("📊 Starting QUALITY ASSESSMENT")
             success = assess_reconstruction_quality(

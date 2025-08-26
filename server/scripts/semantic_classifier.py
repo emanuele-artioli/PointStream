@@ -12,8 +12,8 @@ them to reference embeddings for each category.
 import logging
 import numpy as np
 from typing import List, Dict, Any, Optional, Tuple
-from ...utils.decorators import track_performance
-from ...utils import config
+from utils.decorators import track_performance
+from utils import config
 
 try:
     from sentence_transformers import SentenceTransformer

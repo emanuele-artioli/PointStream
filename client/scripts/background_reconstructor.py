@@ -15,8 +15,8 @@ from typing import Dict, List, Any, Optional
 from pathlib import Path
 
 try:
-    from ...utils.decorators import track_performance
-    from ...utils import config
+    from utils.decorators import track_performance
+    from utils import config
 except ImportError as e:
     logging.error(f"Failed to import PointStream utilities: {e}")
     raise
@@ -34,13 +34,25 @@ class BackgroundReconstructor:
         """Initialize the background reconstructor."""
         self.blending_mode = config.get_str('reconstruction', 'background_blending', 'gaussian')
         self.blur_kernel = config.get_int('reconstruction', 'background_blur_kernel', 5)
-        self.interpolation = getattr(cv2, f"INTER_{config.get_str('reconstruction', 'background_interpolation', 'bilinear').upper()}")
+        
+        # Map interpolation methods correctly for OpenCV
+        interp_method = config.get_str('reconstruction', 'background_interpolation', 'bilinear')
+        interp_mapping = {
+            'bilinear': cv2.INTER_LINEAR,
+            'linear': cv2.INTER_LINEAR,
+            'cubic': cv2.INTER_CUBIC,
+            'nearest': cv2.INTER_NEAREST,
+            'area': cv2.INTER_AREA,
+            'lanczos4': cv2.INTER_LANCZOS4
+        }
+        self.interpolation = interp_mapping.get(interp_method.lower(), cv2.INTER_LINEAR)
+        
         self.enable_smoothing = config.get_bool('reconstruction', 'homography_smoothing', True)
         self.temporal_consistency = config.get_bool('reconstruction', 'temporal_consistency', True)
         
         logging.info("🖼️  Background Reconstructor initialized")
         logging.info(f"   Blending mode: {self.blending_mode}")
-        logging.info(f"   Interpolation: {config.get_str('reconstruction', 'background_interpolation', 'bilinear')}")
+        logging.info(f"   Interpolation: {interp_method}")
         logging.info(f"   Temporal consistency: {self.temporal_consistency}")
     
     @track_performance
@@ -133,10 +145,14 @@ class BackgroundReconstructor:
             if homography.shape != (3, 3):
                 raise ValueError(f"Invalid homography shape: {homography.shape}")
             
+            # Invert homography for reconstruction direction (panorama → frame)
+            # The server computes frame → panorama, but we need panorama → frame
+            homography_inv = np.linalg.inv(homography)
+            
             # Warp panorama to frame view
             background_frame = cv2.warpPerspective(
                 panorama, 
-                homography, 
+                homography_inv, 
                 frame_size,
                 flags=self.interpolation,
                 borderMode=cv2.BORDER_CONSTANT,

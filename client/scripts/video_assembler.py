@@ -11,14 +11,15 @@ import time
 import numpy as np
 import cv2
 import subprocess
+import shutil
 from typing import Dict, List, Any, Optional
 from pathlib import Path
 import tempfile
 import os
 
 try:
-    from ...utils.decorators import track_performance
-    from ...utils import config
+    from utils.decorators import track_performance
+    from utils import config
 except ImportError as e:
     logging.error(f"Failed to import PointStream utilities: {e}")
     raise
@@ -162,15 +163,15 @@ class VideoAssembler:
         for i, frame in enumerate(frames):
             frame_path = temp_dir / f"frame_{i:06d}.png"
             
-            # Ensure frame is in correct format
+            # Ensure frame is in correct BGR format for cv2.imwrite
             if len(frame.shape) == 3 and frame.shape[2] == 3:
-                # BGR to RGB for proper color
-                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                # Frame is already in BGR format - no conversion needed
+                frame_bgr = frame
             else:
-                frame_rgb = frame
+                frame_bgr = frame
             
-            # Save frame
-            success = cv2.imwrite(str(frame_path), frame_rgb)
+            # Save frame (cv2.imwrite expects BGR)
+            success = cv2.imwrite(str(frame_path), frame_bgr)
             if not success:
                 raise RuntimeError(f"Failed to save frame {i}")
             
@@ -346,8 +347,14 @@ class VideoAssembler:
                 final_path = output_dir / f"scene_{scene_number:04d}_reconstructed.{self.container_format}"
                 
                 if temp_path.exists():
-                    temp_path.rename(final_path)
-                    result['final_path'] = str(final_path)
+                    # Use shutil.copy2 + remove to handle cross-device links
+                    try:
+                        shutil.copy2(temp_path, final_path)
+                        temp_path.unlink()  # Remove original after successful copy
+                        result['final_path'] = str(final_path)
+                    except Exception as e:
+                        logging.error(f"Failed to move video file: {e}")
+                        result['final_path'] = str(temp_path)  # Keep temp path if move fails
             
             results.append(result)
         

@@ -12,6 +12,7 @@ import time
 import logging
 import argparse
 import subprocess
+import shutil
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 import json
@@ -34,14 +35,15 @@ from torch.utils.data import DataLoader, Dataset
 
 # Import PointStream utilities
 try:
-    from ..utils.decorators import track_performance
-    from ..utils import config
-    from .scripts.background_reconstructor import BackgroundReconstructor
-    from .scripts.object_generator import ObjectGenerator
-    from .scripts.frame_composer import FrameComposer
-    from .scripts.video_assembler import VideoAssembler
-    from .scripts.quality_assessor import QualityAssessor
-    from .scripts.model_trainer import ModelTrainer
+    from utils.decorators import track_performance
+    from utils import config
+    from client.scripts.background_reconstructor import BackgroundReconstructor
+    from client.scripts.object_generator import ObjectGenerator
+    from client.scripts.frame_composer import FrameComposer
+    from client.scripts.video_assembler import VideoAssembler
+    from client.scripts.quality_assessor import QualityAssessor
+    from client.scripts.model_trainer import ModelTrainer
+    from client.scripts.demuxer import MetadataDemuxer
 except ImportError as e:
     logging.error(f"Failed to import PointStream client components: {e}")
     print("Error: Cannot import required PointStream client components")
@@ -101,6 +103,9 @@ class PointStreamClient:
             
             logging.info("   🎓 Initializing Model Trainer...")
             self.model_trainer = ModelTrainer(device=self.device)
+            
+            logging.info("   📦 Initializing Metadata Demuxer...")
+            self.demuxer = MetadataDemuxer()
             
             logging.info("✅ All client components loaded successfully")
             
@@ -167,10 +172,12 @@ class PointStreamClient:
         animal_objects = []
         other_objects = []
         
-        # Scan all scene metadata files
-        for metadata_file in metadata_path.glob("scene_*_metadata.json"):
-            with open(metadata_file, 'r') as f:
-                scene_data = json.load(f)
+        # Scan for .pzm files first, fallback to .json
+        metadata_files = list(metadata_path.glob("scene_*_metadata.pzm"))
+        if not metadata_files:
+            metadata_files = list(metadata_path.glob("scene_*_metadata.json"))
+        for metadata_file in metadata_files:
+            scene_data = self._load_scene_metadata(metadata_file)
             
             # Extract objects by category
             for obj in scene_data.get('objects', []):
@@ -310,16 +317,17 @@ class PointStreamClient:
             # PHASE 2: Scene Reconstruction
             logging.info("🎬 Phase 2: Scene reconstruction...")
             
-            # Find all scene metadata files
-            scene_files = sorted(metadata_path.glob("scene_*_metadata.json"))
+            # Find all scene metadata files (.pzm preferred)
+            scene_files = sorted(metadata_path.glob("scene_*_metadata.pzm"))
+            if not scene_files:
+                scene_files = sorted(metadata_path.glob("scene_*_metadata.json"))
             logging.info(f"📚 Found {len(scene_files)} scenes to reconstruct")
             
             reconstruction_results = []
             
             for scene_file in scene_files:
                 # Load scene metadata
-                with open(scene_file, 'r') as f:
-                    scene_data = json.load(f)
+                scene_data = self._load_scene_metadata(scene_file)
                 
                 scene_number = scene_data.get('scene_number', 0)
                 processing_start = time.time()
@@ -342,10 +350,15 @@ class PointStreamClient:
                 if result.get('status') == 'success' and output_dir:
                     reconstructed_path = result.get('reconstructed_video_path')
                     if reconstructed_path:
-                        # Move to output directory
+                        # Move to output directory (handle cross-device link)
                         final_path = output_path / f"scene_{scene_number:04d}_reconstructed.mp4"
                         if Path(reconstructed_path).exists():
-                            Path(reconstructed_path).rename(final_path)
+                            try:
+                                Path(reconstructed_path).rename(final_path)
+                            except OSError:
+                                # Handle cross-device link error
+                                shutil.copy2(reconstructed_path, final_path)
+                                Path(reconstructed_path).unlink()
                             result['final_video_path'] = str(final_path)
                             logging.info(f"💾 Scene {scene_number} saved: {final_path}")
                 
@@ -381,6 +394,10 @@ class PointStreamClient:
         objects_dir = metadata_path / "objects" / f"scene_{scene_number:04d}"
         if objects_dir.exists():
             scene_data['objects_dir'] = str(objects_dir)
+        
+        # The demuxer already extracted homographies to the top level, so no need to do it here
+        if 'homographies' in scene_data:
+            logging.info(f"📊 Found {len(scene_data['homographies'])} homography matrices for scene {scene_number}")
         
         return scene_data
     
@@ -420,6 +437,25 @@ class PointStreamClient:
             original_video, 
             reconstructed_video
         )
+
+    def _load_scene_metadata(self, metadata_file: Path) -> Dict[str, Any]:
+        """
+        Load scene metadata from file, handling both compressed and uncompressed formats.
+        
+        Args:
+            metadata_file: Path to metadata file (.json, .pzm, or .json.gz)
+            
+        Returns:
+            Scene metadata dictionary
+        """
+        try:
+            # Use demuxer to handle all metadata file types
+            return self.demuxer.get_scene_metadata(metadata_file)
+        except Exception as e:
+            # Fallback to direct JSON loading for compatibility
+            logging.warning(f"Demuxer failed for {metadata_file.name}, trying direct JSON load: {e}")
+            with open(metadata_file, 'r') as f:
+                return json.load(f)
 
 
 def setup_logging(log_level: str = "INFO"):
@@ -543,6 +579,8 @@ Examples:
     except Exception as e:
         print(f"Client pipeline failed: {e}")
         sys.exit(1)
+
+
 
 
 if __name__ == "__main__":

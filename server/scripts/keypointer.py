@@ -14,8 +14,8 @@ import cv2
 import numpy as np
 import logging
 from typing import List, Dict, Any, Optional, Tuple
-from ...utils.decorators import track_performance
-from ...utils import config
+from utils.decorators import track_performance
+from utils import config
 
 try:
     # Try to import MMPose

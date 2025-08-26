@@ -14,8 +14,8 @@ from typing import Dict, List, Any, Optional, Tuple
 from pathlib import Path
 
 try:
-    from ...utils.decorators import track_performance
-    from ...utils import config
+    from utils.decorators import track_performance
+    from utils import config
 except ImportError as e:
     logging.error(f"Failed to import PointStream utilities: {e}")
     raise

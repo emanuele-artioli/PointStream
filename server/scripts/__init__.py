@@ -18,7 +18,7 @@ This package contains all the core PointStream processing components:
 __version__ = "1.0.0"
 
 # Import main components for easy access
-from .server import PointStreamPipeline
+# Note: PointStreamPipeline is in the parent server.py, not in scripts
 from .splitter import VideoSceneSplitter
 from .segmenter import Segmenter
 from .duplicate_filter import DuplicateFilter
@@ -26,10 +26,9 @@ from .semantic_classifier import SemanticClassifier
 from .stitcher import Stitcher
 from .keypointer import Keypointer
 from .saver import Saver
-from ...utils import config
+from utils import config
 
 __all__ = [
-    'PointStreamPipeline',
     'VideoSceneSplitter',
     'Segmenter',
     'DuplicateFilter',

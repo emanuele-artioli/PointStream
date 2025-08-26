@@ -38,8 +38,8 @@ try:
     from scenedetect.stats_manager import StatsManager
     from scenedetect.backends import AVAILABLE_BACKENDS
     import cv2
-    from ...utils import config
-    from ...utils.decorators import time_step  # Import decorators for timing
+    from utils import config
+    from utils.decorators import time_step  # Import decorators for timing
     
     # Configure PySceneDetect logging AFTER import
     import logging

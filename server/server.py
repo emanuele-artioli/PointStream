@@ -39,15 +39,16 @@ from PIL import Image
 
 # Import all PointStream components
 try:
-    from ..utils.decorators import track_performance
-    from .scripts.stitcher import Stitcher
-    from .scripts.segmenter import Segmenter 
-    from .scripts.duplicate_filter import DuplicateFilter
-    from .scripts.semantic_classifier import SemanticClassifier
-    from .scripts.keypointer import Keypointer
-    from .scripts.saver import Saver
-    from .scripts.splitter import VideoSceneSplitter
-    from ..utils import config
+    from utils.decorators import track_performance
+    from server.scripts.stitcher import Stitcher
+    from server.scripts.segmenter import Segmenter 
+    from server.scripts.duplicate_filter import DuplicateFilter
+    from server.scripts.semantic_classifier import SemanticClassifier
+    from server.scripts.keypointer import Keypointer
+    from server.scripts.saver import Saver
+    from server.scripts.splitter import VideoSceneSplitter
+    from server.scripts.muxer import MetadataMuxer
+    from utils import config
 except ImportError as e:
     logging.error(f"Failed to import PointStream components: {e}")
     print("Error: Cannot import required PointStream components")
@@ -110,7 +111,10 @@ class PointStreamPipeline:
             logging.info("   💾 Initializing Saver...")
             self.saver = Saver()
 
-            logging.info("   🔍 Initializing Duplicate Filter...")
+            logging.info("   � Initializing Metadata Muxer...")
+            self.muxer = MetadataMuxer()
+
+            logging.info("   �🔍 Initializing Duplicate Filter...")
             self.duplicate_filter = DuplicateFilter()
 
             logging.info("✅ All components loaded successfully")
@@ -568,13 +572,23 @@ class PointStreamPipeline:
         metadata_result = self.saver.save_metadata(scene_data, output_dir, scene_number)
         if metadata_result.get('metadata_saved'):
             logging.info(f"Saved comprehensive metadata for scene {scene_number}")
+            
+            # Compress metadata into .pzm format
+            json_file_path = output_dir / f"scene_{scene_number}_metadata.json"
+            if json_file_path.exists():
+                mux_result = self.muxer.compress_metadata_file(str(json_file_path))
+                pzm_file_path = Path(mux_result.get('output_path', json_file_path.with_suffix('.pzm')))
+                if pzm_file_path.exists():
+                    logging.info(f"Compressed metadata to .pzm format for scene {scene_number}: {pzm_file_path}")
+                else:
+                    logging.warning(f"Failed to compress metadata for scene {scene_number}: .pzm file not found at {pzm_file_path}")
         
         return save_result
     
     def _log_component_fps_statistics(self):
         """Log average FPS statistics for each component across all processed scenes."""
         try:
-            from ..utils.decorators import profiler
+            from utils.decorators import profiler
             
             # Get overall performance summary
             performance_summary = profiler.get_overall_summary()
@@ -757,7 +771,7 @@ class PointStreamPipeline:
         """Save scene processing results to files."""
         try:
             # Import profiler for timing data
-            from ..utils.decorators import profiler
+            from utils.decorators import profiler
             
             # Create subdirectories
             (output_path / "panoramas").mkdir(exist_ok=True)

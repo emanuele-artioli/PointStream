@@ -11,8 +11,8 @@ import cv2
 import numpy as np
 import logging
 from typing import List, Dict, Any, Tuple
-from ...utils.decorators import track_performance
-from ...utils import config
+from utils.decorators import track_performance
+from utils import config
 
 
 class DuplicateFilter:

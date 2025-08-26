@@ -15,8 +15,8 @@ from pathlib import Path
 import subprocess
 
 try:
-    from ...utils.decorators import track_performance
-    from ...utils import config
+    from utils.decorators import track_performance
+    from utils import config
     # Optional imports for quality metrics
     try:
         from skimage.metrics import structural_similarity as ssim
