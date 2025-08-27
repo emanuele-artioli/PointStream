@@ -433,11 +433,11 @@ class Saver:
             with open(metadata_file, 'w') as f:
                 json.dump(enhanced_metadata, f, indent=2)
             
-            return {'metadata_saved': True, 'metadata_path': str(metadata_file)}
+            return {'metadata_saved': True, 'metadata_path': str(metadata_file), 'metadata_object': enhanced_metadata}
             
         except Exception as e:
             logging.warning(f"Failed to save metadata for scene {scene_number}: {e}")
-            return {'metadata_saved': False, 'error': str(e)}
+            return {'metadata_saved': False, 'error': str(e), 'metadata_object': None}
     
     def _clean_metadata_for_json(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Remove large binary data and unwanted sections from metadata before JSON serialization."""

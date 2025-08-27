@@ -48,7 +48,7 @@ class MetadataMuxer:
     @track_performance
     def compress_metadata_file(self, input_path: Union[str, Path], output_path: Union[str, Path] = None) -> Dict[str, Any]:
         """
-        Compress a single metadata file.
+        Compress a single metadata file by loading it and passing it to compress_metadata_object.
         
         Args:
             input_path: Path to the input JSON metadata file
@@ -67,38 +67,61 @@ class MetadataMuxer:
                 output_path = input_path.with_suffix('.pzm')  # PointStream Zipped Metadata
             else:
                 output_path = input_path.with_suffix('.json.gz')
-        else:
-            output_path = Path(output_path)
         
         # Load original metadata
         with open(input_path, 'r') as f:
             original_metadata = json.load(f)
+
+        original_size = input_path.stat().st_size
+
+        # Delegate to the object compression method
+        return self.compress_metadata_object(original_metadata, output_path, original_size)
+
+    @track_performance
+    def compress_metadata_object(self, metadata_obj: Dict[str, Any], output_path: Union[str, Path], original_size: int = 0) -> Dict[str, Any]:
+        """
+        Compress a metadata dictionary from memory and save it.
+
+        Args:
+            metadata_obj: The metadata dictionary to compress
+            output_path: Path for the compressed output file
+            original_size: The original size in bytes (if known, for stats)
+
+        Returns:
+            Dictionary with compression results and statistics
+        """
+        output_path = Path(output_path)
         
         # Compress the metadata
-        compressed_metadata = self._compress_metadata(original_metadata)
+        compressed_metadata = self._compress_metadata(metadata_obj)
         
         # Save compressed metadata
-        original_size = input_path.stat().st_size
         if self.use_binary_format:
             compressed_size = self._save_binary_format(compressed_metadata, output_path)
         else:
+            # Adjust output path for json.gz if needed
+            if output_path.suffix != '.gz':
+                output_path = output_path.with_suffix('.json.gz')
             compressed_size = self._save_json_gz_format(compressed_metadata, output_path)
 
         # Explicitly log file creation and output path
         if Path(output_path).exists():
-            logging.info(f"✅ .pzm file created: {output_path} ({compressed_size} bytes)")
+            logging.info(f"✅ Muxed file created: {output_path} ({compressed_size} bytes)")
         else:
-            logging.error(f"❌ .pzm file NOT created: {output_path}")
+            logging.error(f"❌ Muxed file NOT created: {output_path}")
 
         # Calculate compression statistics
-        compression_ratio = original_size / compressed_size if compressed_size > 0 else 0
-        space_saved = original_size - compressed_size
-
-        logging.info(f"📦 Compressed {input_path.name}: {original_size:,} → {compressed_size:,} bytes "
-                    f"({compression_ratio:.1f}x compression, {space_saved:,} bytes saved)")
+        if original_size > 0:
+            compression_ratio = original_size / compressed_size if compressed_size > 0 else 0
+            space_saved = original_size - compressed_size
+            logging.info(f"📦 Compressed metadata: {original_size:,} → {compressed_size:,} bytes "
+                        f"({compression_ratio:.1f}x compression, {space_saved:,} bytes saved)")
+        else:
+            compression_ratio = 0
+            space_saved = 0
+            logging.info(f"📦 Compressed metadata to {compressed_size:,} bytes")
 
         return {
-            'input_path': str(input_path),
             'output_path': str(output_path),
             'original_size': original_size,
             'compressed_size': compressed_size,
