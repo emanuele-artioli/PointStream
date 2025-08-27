@@ -94,3 +94,4 @@ models/*.ckpt
 generated/
 reconstructed/
 *.pt
+scene_*_metadata.json
