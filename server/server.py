@@ -535,6 +535,9 @@ class PointStreamPipeline:
             keypoints_count = len(keypoint_result.get('objects', []))
             logging.info(f"   ✅ Keypoints completed in {step_time:.1f}s - Processed {keypoints_count} objects")
             
+            # Get resolution from frame
+            height, width, _ = frames[0].shape
+
             # Combine all results
             processed_result = {
                 'scene_type': stitching_result['scene_type'],
@@ -542,7 +545,15 @@ class PointStreamPipeline:
                 'stitching_result': stitching_result,
                 'segmentation_result': frame_segmentation_result,
                 'keypoint_result': keypoint_result,
-                'masked_frames': masked_frames
+                'masked_frames': masked_frames,
+                'video_properties': {
+                    'resolution': {'width': width, 'height': height},
+                    'fps': scene_data.get('fps'),
+                    'frame_count': len(frames),
+                    'start_time': scene_data.get('start_time'),
+                    'end_time': scene_data.get('end_time'),
+                    'duration': scene_data.get('duration'),
+                }
             }
             
             logging.info(f"🎉 Scene {scene_number} processed successfully")
