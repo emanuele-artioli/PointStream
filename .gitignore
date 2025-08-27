@@ -95,3 +95,4 @@ generated/
 reconstructed/
 *.pt
 scene_*_metadata.json
+scene_*_metadata.pzm
