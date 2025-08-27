@@ -44,85 +44,113 @@ except ImportError as e:
     raise
 
 
+def collate_fn(batch):
+    """Custom collate function to filter out None values."""
+    batch = list(filter(lambda x: x is not None, batch))
+    if not batch:
+        return (None, None, None)
+    return torch.utils.data.dataloader.default_collate(batch)
+
+
 class ObjectDataset(Dataset):
-    """Dataset for training object generation models."""
+    """Dataset for training object generation models based on a reference image."""
     
-    def __init__(self, objects_data: List[Dict[str, Any]], category: str, 
+    def __init__(self, objects_data: Dict[str, List[Dict[str, Any]]], category: str,
                  input_size: int = 256, augment: bool = True):
         """
         Initialize object dataset.
         
         Args:
-            objects_data: List of object data
+            objects_data: Dict mapping object_id to a list of its appearances.
             category: Object category (human, animal, other)
             input_size: Input image size
             augment: Whether to apply data augmentation
         """
-        self.objects_data = objects_data
         self.category = category
         self.input_size = input_size
         self.augment = augment
+        self.training_pairs = []
         
-        # Filter valid objects (those with images and keypoints)
-        self.valid_objects = []
-        for obj in objects_data:
-            if self._validate_object(obj):
-                self.valid_objects.append(obj)
+        # Create training pairs (reference_object, target_object)
+        for object_id, appearances in objects_data.items():
+            # Filter for valid objects first
+            valid_appearances = []
+            for obj in appearances:
+                if self._validate_object(obj):
+                    valid_appearances.append(obj)
+
+            # Need at least one reference and one target
+            if len(valid_appearances) < 2:
+                continue
+
+            ref_obj = valid_appearances[0]
+
+            # Use all subsequent valid appearances as targets
+            for i in range(1, len(valid_appearances)):
+                target_obj = valid_appearances[i]
+                self.training_pairs.append((ref_obj, target_obj))
         
-        logging.info(f"📚 {category.capitalize()} dataset: {len(self.valid_objects)}/{len(objects_data)} valid objects")
-    
+        logging.info(f"📚 {category.capitalize()} dataset: {len(self.training_pairs)} training pairs created from {len(objects_data)} unique objects.")
+
     def _validate_object(self, obj: Dict[str, Any]) -> bool:
-        """Validate that object has required data."""
-        # Must have cropped image
-        if 'cropped_image' not in obj or obj['cropped_image'] is None:
-            return False
-        
-        # Must have keypoints
+        """Validate that object has required data and the image exists."""
         if 'keypoints' not in obj or not obj['keypoints']:
             return False
+
+        image_path = obj.get('cropped_image')
+        if image_path is None:
+            return False
         
+        if isinstance(image_path, str) and not os.path.exists(image_path):
+            logging.warning(f"Image path not found, skipping: {image_path}")
+            return False
+
         return True
-    
+
     def __len__(self) -> int:
-        return len(self.valid_objects)
-    
+        return len(self.training_pairs)
+
+    def _load_image(self, image_data: Any) -> Optional[np.ndarray]:
+        """Load image from path or use if already a numpy array."""
+        if isinstance(image_data, str):
+            img = cv2.imread(image_data)
+            if img is None:
+                logging.error(f"Failed to read image: {image_data}")
+            return img
+        return image_data
+
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """
-        Get training item.
-        
-        Returns:
-            Tuple of (condition_input, target_image, keypoint_map)
+        Get training item. Assumes that data has been pre-validated in __init__.
         """
-        obj = self.valid_objects[idx]
+        ref_obj, target_obj = self.training_pairs[idx]
         
-        # Load object image
-        object_image = obj['cropped_image']
-        if isinstance(object_image, str):
-            object_image = cv2.imread(object_image)
+        # --- Process Reference Image ---
+        ref_image = self._load_image(ref_obj['cropped_image'])
+        ref_image = cv2.resize(ref_image, (self.input_size, self.input_size))
+        ref_tensor = torch.from_numpy(ref_image).float().permute(2, 0, 1) / 127.5 - 1.0
+
+        # --- Process Target Image ---
+        target_image = self._load_image(target_obj['cropped_image'])
+        target_image = cv2.resize(target_image, (self.input_size, self.input_size))
         
-        # Resize to target size
-        object_image = cv2.resize(object_image, (self.input_size, self.input_size))
-        
-        # Create keypoint/feature map
-        keypoints = obj['keypoints']
+        # --- Process Feature Map (from target keypoints) ---
+        keypoints = target_obj['keypoints']
         if self.category in ['human', 'animal']:
             feature_map = self._create_pose_map(keypoints)
         else:
             feature_map = self._create_feature_map(keypoints)
         
-        # Data augmentation
+        # --- Data Augmentation (on target and feature map) ---
         if self.augment:
-            object_image, feature_map = self._apply_augmentation(object_image, feature_map)
+            target_image, feature_map = self._apply_augmentation(target_image, feature_map)
         
-        # Convert to tensors and normalize
-        # Target image (ground truth)
-        target_tensor = torch.from_numpy(object_image).float().permute(2, 0, 1) / 127.5 - 1.0
-        
-        # Feature map
+        # --- Convert to Tensors and Normalize ---
+        target_tensor = torch.from_numpy(target_image).float().permute(2, 0, 1) / 127.5 - 1.0
         feature_tensor = torch.from_numpy(feature_map).float().permute(2, 0, 1) / 127.5 - 1.0
         
-        # Condition input (reference + features)
-        condition_tensor = torch.cat([target_tensor, feature_tensor], dim=0)
+        # --- Condition Input (reference image + target feature map) ---
+        condition_tensor = torch.cat([ref_tensor, feature_tensor], dim=0)
         
         return condition_tensor, target_tensor, feature_tensor
     
@@ -225,7 +253,7 @@ class ModelTrainer:
         logging.info(f"   Batch size: {self.batch_size}")
     
     @track_performance
-    def train_human_model(self, human_objects: List[Dict[str, Any]], 
+    def train_human_model(self, human_objects: Dict[str, List[Dict[str, Any]]],
                          config_override: Dict[str, Any] = None) -> Dict[str, Any]:
         """Train human generation model."""
         logging.info("👤 Training human generation model...")
@@ -235,6 +263,7 @@ class ModelTrainer:
                               input_size=config.get_int('models', 'human_input_size', 256))
         
         if len(dataset) == 0:
+            logging.warning("No valid human training pairs found.")
             return {'error': 'No valid human training data'}
         
         # Initialize model
@@ -263,7 +292,7 @@ class ModelTrainer:
         return result
     
     @track_performance
-    def train_animal_model(self, animal_objects: List[Dict[str, Any]], 
+    def train_animal_model(self, animal_objects: Dict[str, List[Dict[str, Any]]],
                           config_override: Dict[str, Any] = None) -> Dict[str, Any]:
         """Train animal generation model."""
         logging.info("🐾 Training animal generation model...")
@@ -273,6 +302,7 @@ class ModelTrainer:
                               input_size=config.get_int('models', 'animal_input_size', 256))
         
         if len(dataset) == 0:
+            logging.warning("No valid animal training pairs found.")
             return {'error': 'No valid animal training data'}
         
         # Initialize model
@@ -301,7 +331,7 @@ class ModelTrainer:
         return result
     
     @track_performance
-    def train_other_model(self, other_objects: List[Dict[str, Any]], 
+    def train_other_model(self, other_objects: Dict[str, List[Dict[str, Any]]],
                          config_override: Dict[str, Any] = None) -> Dict[str, Any]:
         """Train other objects generation model."""
         logging.info("📦 Training other objects generation model...")
@@ -311,6 +341,7 @@ class ModelTrainer:
                               input_size=config.get_int('models', 'other_input_size', 256))
         
         if len(dataset) == 0:
+            logging.warning("No valid other training pairs found.")
             return {'error': 'No valid other objects training data'}
         
         # Initialize model
@@ -349,7 +380,8 @@ class ModelTrainer:
             batch_size=self.batch_size, 
             shuffle=True, 
             num_workers=4,
-            drop_last=True
+            drop_last=True,
+            collate_fn=collate_fn
         )
         
         # Setup optimizers
@@ -384,7 +416,12 @@ class ModelTrainer:
             epoch_gen_loss = 0.0
             epoch_disc_loss = 0.0
             
-            for batch_idx, (condition_input, target_image, feature_map) in enumerate(dataloader):
+            for batch_idx, data in enumerate(dataloader):
+                if data[0] is None:
+                    logging.warning(f"Skipping empty batch at epoch {epoch+1}, batch {batch_idx}")
+                    continue
+                condition_input, target_image, feature_map = data
+
                 # Move to device
                 condition_input = condition_input.to(self.device)
                 target_image = target_image.to(self.device)

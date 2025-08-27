@@ -138,7 +138,7 @@ class PointStreamClient:
             logging.info("👤 Training human generation model...")
             human_result = self.model_trainer.train_human_model(
                 training_data['human_objects'], 
-                config=training_config
+                config_override=training_config
             )
             training_results['human'] = human_result
         
@@ -147,7 +147,7 @@ class PointStreamClient:
             logging.info("🐾 Training animal generation model...")
             animal_result = self.model_trainer.train_animal_model(
                 training_data['animal_objects'], 
-                config=training_config
+                config_override=training_config
             )
             training_results['animal'] = animal_result
         
@@ -156,44 +156,59 @@ class PointStreamClient:
             logging.info("📦 Training other objects generation model...")
             other_result = self.model_trainer.train_other_model(
                 training_data['other_objects'], 
-                config=training_config
+                config_override=training_config
             )
             training_results['other'] = other_result
         
         logging.info("✅ Model training completed")
         return training_results
     
-    def _load_training_data(self, metadata_dir: str) -> Dict[str, List[Dict[str, Any]]]:
-        """Load and organize training data by object type."""
+    def _load_training_data(self, metadata_dir: str) -> Dict[str, Dict[str, List[Dict[str, Any]]]]:
+        """Load and organize training data by object type, grouped by object ID."""
         metadata_path = Path(metadata_dir)
         
-        # Organize objects by semantic category
-        human_objects = []
-        animal_objects = []
-        other_objects = []
+        # Organize objects by semantic category and then by object ID
+        human_objects = {}
+        animal_objects = {}
+        other_objects = {}
         
         # Scan for .pzm files first, fallback to .json
         metadata_files = list(metadata_path.glob("scene_*_metadata.pzm"))
         if not metadata_files:
             metadata_files = list(metadata_path.glob("scene_*_metadata.json"))
+
         for metadata_file in metadata_files:
             scene_data = self._load_scene_metadata(metadata_file)
             
             # Extract objects by category
             for obj in scene_data.get('objects', []):
                 category = obj.get('semantic_category', 'other')
-                
+                object_id = obj.get('object_id')
+
+                if not object_id:
+                    continue # Skip objects without an ID
+
                 if category == 'human':
-                    human_objects.append(obj)
+                    human_objects.setdefault(object_id, []).append(obj)
                 elif category == 'animal':
-                    animal_objects.append(obj)
+                    animal_objects.setdefault(object_id, []).append(obj)
                 else:
-                    other_objects.append(obj)
+                    other_objects.setdefault(object_id, []).append(obj)
+
+        # Sort object appearances by frame number to ensure consistent ordering
+        for group in [human_objects, animal_objects, other_objects]:
+            for object_id in group:
+                # Assuming 'frame' key exists in object dict for sorting
+                group[object_id].sort(key=lambda o: o.get('frame', 0))
         
-        logging.info(f"📚 Training data loaded:")
-        logging.info(f"   👤 Human objects: {len(human_objects)}")
-        logging.info(f"   🐾 Animal objects: {len(animal_objects)}")
-        logging.info(f"   📦 Other objects: {len(other_objects)}")
+        total_human_instances = sum(len(v) for v in human_objects.values())
+        total_animal_instances = sum(len(v) for v in animal_objects.values())
+        total_other_instances = sum(len(v) for v in other_objects.values())
+
+        logging.info(f"📚 Training data loaded and grouped by object ID:")
+        logging.info(f"   👤 Human objects: {len(human_objects)} unique, {total_human_instances} instances")
+        logging.info(f"   🐾 Animal objects: {len(animal_objects)} unique, {total_animal_instances} instances")
+        logging.info(f"   📦 Other objects: {len(other_objects)} unique, {total_other_instances} instances")
         
         return {
             'human_objects': human_objects,
