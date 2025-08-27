@@ -297,10 +297,10 @@ class MetadataDemuxer:
         else:
             raise ValueError(f"Unsupported file type: {scene_file.suffix}")
         
-        # Ensure homographies are available at top level for client compatibility
-        if 'stitching_result' in metadata and 'homographies' in metadata['stitching_result']:
-            metadata['homographies'] = metadata['stitching_result']['homographies']
-            metadata['scene_type'] = metadata['stitching_result'].get('scene_type', 'Unknown')
+        # Unpack stitching_result into the top-level metadata for client compatibility
+        if 'stitching_result' in metadata:
+            stitching_data = metadata.pop('stitching_result')
+            metadata.update(stitching_data)
         
         return metadata
 

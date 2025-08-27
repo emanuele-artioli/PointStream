@@ -570,18 +570,21 @@ class PointStreamPipeline:
         
         # Save comprehensive metadata using the Saver component
         metadata_result = self.saver.save_metadata(scene_data, output_dir, scene_number)
-        if metadata_result.get('metadata_saved'):
-            logging.info(f"Saved comprehensive metadata for scene {scene_number}")
-            
-            # Compress metadata into .pzm format
-            json_file_path = output_dir / f"scene_{scene_number}_metadata.json"
+
+        # Mux the metadata object directly, bypassing the intermediate JSON file read
+        metadata_obj = metadata_result.get('metadata_object')
+        if metadata_obj:
+            pzm_file_path = output_dir / f"scene_{scene_number:04d}_metadata.pzm"
+            try:
+                self.muxer.compress_metadata_object(metadata_obj, pzm_file_path)
+            except Exception as e:
+                logging.error(f"Failed to mux metadata object for scene {scene_number}: {e}")
+        elif metadata_result.get('metadata_saved'):
+            # Fallback to file-based compression if object not returned but file was saved
+            logging.warning("Metadata object not found, falling back to file-based muxing.")
+            json_file_path = Path(metadata_result.get('metadata_path'))
             if json_file_path.exists():
-                mux_result = self.muxer.compress_metadata_file(str(json_file_path))
-                pzm_file_path = Path(mux_result.get('output_path', json_file_path.with_suffix('.pzm')))
-                if pzm_file_path.exists():
-                    logging.info(f"Compressed metadata to .pzm format for scene {scene_number}: {pzm_file_path}")
-                else:
-                    logging.warning(f"Failed to compress metadata for scene {scene_number}: .pzm file not found at {pzm_file_path}")
+                self.muxer.compress_metadata_file(str(json_file_path))
         
         return save_result
     
