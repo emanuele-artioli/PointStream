@@ -35,7 +35,7 @@ class Segmenter:
         self.model_path = config.get_str('segmentation', 'yolo_model', 'yolov8n-seg.pt')
         self.confidence_threshold = config.get_float('segmentation', 'confidence_threshold', 0.25)
         self.iou_threshold = config.get_float('segmentation', 'iou_threshold', 0.7)
-        self.max_objects = config.get_int('segmentation', 'max_objects_per_frame', 10)
+        self.max_objects = config.get_int('segmentation', 'max_objects_per_frame', 0)
         self.device = config.get_str('segmentation', 'device', 'auto')
         
         # Performance settings
@@ -47,6 +47,13 @@ class Segmenter:
         classes_config = config.get_list('segmentation', 'classes', [])
         self.classes = classes_config if classes_config else None
         
+        # New parameters
+        self.selection_strategy = config.get_str('segmentation', 'selection_strategy', 'confidence')
+        self.min_object_area = config.get_int('segmentation', 'min_object_area', 0)
+        self.frame_skip = config.get_int('segmentation', 'frame_skip', 1)
+        if self.frame_skip < 1:
+            self.frame_skip = 1
+
         # Set device
         if self.device == 'auto':
             self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -60,6 +67,9 @@ class Segmenter:
         logging.info(f"Confidence threshold: {self.confidence_threshold}")
         logging.info(f"IoU threshold: {self.iou_threshold}")
         logging.info(f"Max objects per frame: {self.max_objects}")
+        logging.info(f"Selection Strategy: {self.selection_strategy}")
+        logging.info(f"Min Object Area: {self.min_object_area}")
+        logging.info(f"Frame Skip: {self.frame_skip}")
         logging.info(f"Classes filter: {self.classes or 'All classes'}")
     
     def _initialize_models(self):
@@ -96,11 +106,13 @@ class Segmenter:
         if not frames:
             return {'frames_data': []}
         
-        logging.info(f"Segmenting {len(frames)} frames only")
+        frames_to_process = len(frames) // self.frame_skip
+        logging.info(f"Segmenting {frames_to_process} frames out of {len(frames)} (frame_skip={self.frame_skip})")
         
         # Process frames (with tracking)
         frames_data = []
-        for i, frame in enumerate(frames):
+        for i in range(0, len(frames), self.frame_skip):
+            frame = frames[i]
             frame_data = self._segment_frame(frame, frame_index=i)
             frames_data.append(frame_data)
         
@@ -118,14 +130,14 @@ class Segmenter:
         Returns:
             Dictionary with frame segmentation data
         """
-        # Run YOLO tracking
+        # Run YOLO tracking, let it return all detections
         results = self.model_with_tracking.track(
             frame,
             conf=self.confidence_threshold,
             iou=self.iou_threshold,
             device=self.device,
             retina_masks=True,
-            max_det=self.max_objects,
+            max_det=0,  # Get all possible detections
             classes=self.classes,
             imgsz=self.yolo_image_size,
             half=self.yolo_half_precision,
@@ -229,9 +241,30 @@ class Segmenter:
                 obj_data['track_id'] = track_id
             
             objects.append(obj_data)
-            masks.append(mask_data)
-            bounding_boxes.append([float(x1), float(y1), float(x2), float(y2)])
-        
+
+        # --- MANUAL FILTERING AND SELECTION LOGIC ---
+
+        # 1. Filter by minimum area
+        if self.min_object_area > 0:
+            objects = self.filter_objects_by_area(objects, self.min_object_area)
+
+        # 2. Apply selection strategy if max_objects is set
+        if self.max_objects > 0 and len(objects) > self.max_objects:
+            if self.selection_strategy == 'area':
+                # Sort by mask area (largest first)
+                objects.sort(key=lambda obj: obj.get('mask_area', 0), reverse=True)
+            else: # Default to 'confidence'
+                # Sort by confidence score (highest first)
+                objects.sort(key=lambda obj: obj.get('confidence', 0), reverse=True)
+
+            # Keep only the top N objects
+            objects = objects[:self.max_objects]
+
+        # Re-populate masks and bounding_boxes from the final list of objects
+        for obj in objects:
+            masks.append(obj['mask'])
+            bounding_boxes.append(obj['bbox'])
+
         # Create return data
         result_data = {
             'objects': objects,
