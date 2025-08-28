@@ -73,9 +73,11 @@ class ObjectGenerator:
         
         # Initialize Human model
         try:
+            # For humans: v_appearance (2048) + p_t (17*3=51) = 2099
+            human_vector_size = 2048 + config.get_int('models', 'human_keypoint_channels', 17) * 3
             self.models['human'] = HumanCGAN(
                 input_size=self.human_input_size,
-                keypoint_channels=config.get_int('models', 'human_keypoint_channels', 17)
+                vector_input_size=human_vector_size
             ).to(self.device)
             
             if Path(self.human_model_path).exists():
@@ -90,9 +92,11 @@ class ObjectGenerator:
         
         # Initialize Animal model
         try:
+            # For animals: v_appearance (2048) + p_t (e.g., 20*3=60)
+            animal_vector_size = 2048 + config.get_int('models', 'animal_keypoint_channels', 20) * 3
             self.models['animal'] = AnimalCGAN(
                 input_size=self.animal_input_size,
-                keypoint_channels=config.get_int('models', 'animal_keypoint_channels', 20)
+                vector_input_size=animal_vector_size
             ).to(self.device)
             
             if Path(self.animal_model_path).exists():
@@ -107,9 +111,11 @@ class ObjectGenerator:
         
         # Initialize Other objects model
         try:
+            # For other: v_appearance (2048) + p_t (bbox=4) = 2052
+            other_vector_size = 2048 + 4
             self.models['other'] = OtherCGAN(
                 input_size=self.other_input_size,
-                feature_channels=config.get_int('models', 'other_feature_channels', 50)
+                vector_input_size=other_vector_size
             ).to(self.device)
             
             if Path(self.other_model_path).exists():
@@ -187,231 +193,110 @@ class ObjectGenerator:
     def _generate_track_objects(self, track_objects: List[Dict[str, Any]], 
                               category: str) -> List[Dict[str, Any]]:
         """
-        Generate objects for a complete track.
+        Generate objects for a complete track using the new vector-based input.
         
         Args:
-            track_objects: List of objects in the track (sorted by frame)
-            category: Object category (human, animal, other)
+            track_objects: List of objects in the track (sorted by frame).
+            category: Object category (human, animal, other).
             
         Returns:
-            List of generated objects for each frame
+            List of generated objects for each frame.
         """
         model = self.models.get(category)
         if model is None:
             logging.warning(f"No model available for category: {category}")
             return self._generate_fallback_objects(track_objects)
         
-        generated_objects = []
-        
-        # Get reference image from first frame
-        reference_obj = track_objects[0]
-        reference_image = self._load_reference_image(reference_obj)
-        
-        if reference_image is None:
-            logging.warning(f"No reference image available for track")
+        # Get the static appearance vector from the first object in the track
+        # (it should be the same for all objects in the track).
+        v_appearance = track_objects[0].get('v_appearance')
+        if v_appearance is None:
+            logging.warning(f"No appearance vector found for track {track_objects[0].get('track_id')}")
             return self._generate_fallback_objects(track_objects)
-        
-        # Generate objects for each frame
+
+        v_appearance_tensor = torch.from_numpy(np.array(v_appearance)).float().to(self.device)
+
+        generated_objects = []
         for obj in track_objects:
             try:
-                generated_obj = self._generate_single_object(
-                    obj, reference_image, category, model
-                )
+                generated_obj = self._generate_single_object(obj, v_appearance_tensor, category, model)
                 generated_objects.append(generated_obj)
             except Exception as e:
                 logging.warning(f"Failed to generate object for frame {obj.get('frame_index', 0)}: {e}")
-                # Use fallback (copy reference)
-                fallback_obj = self._create_fallback_object(obj, reference_image)
+                fallback_obj = self._create_fallback_object(obj)
                 generated_objects.append(fallback_obj)
         
         return generated_objects
-    
-    def _generate_single_object(self, obj: Dict[str, Any], reference_image: np.ndarray,
+
+    def _generate_single_object(self, obj: Dict[str, Any], v_appearance_tensor: torch.Tensor,
                               category: str, model: nn.Module) -> Dict[str, Any]:
-        """Generate a single object using the appropriate model."""
+        """Generate a single object using the new vector-based model."""
         
-        # Prepare input based on category
-        if category == 'human':
-            model_input = self._prepare_human_input(obj, reference_image)
-        elif category == 'animal':
-            model_input = self._prepare_animal_input(obj, reference_image)
-        else:
-            model_input = self._prepare_other_input(obj, reference_image)
+        # The pose vector is stored in the 'keypoints' field for backward compatibility
+        p_pose_data = obj.get('keypoints', {}).get('points', [])
+        if not p_pose_data:
+             raise ValueError(f"No pose vector (p_t) found for object {obj.get('object_id')}")
+
+        # For humans/animals, p_t is a list of [x, y, conf]. Flatten it.
+        if category in ['human', 'animal']:
+            p_t = [coord for kp in p_pose_data for coord in kp]
+        else: # For 'other', it's already a flat list [x, y, w, h]
+            p_t = p_pose_data
+
+        p_t_tensor = torch.tensor(p_t, dtype=torch.float32).to(self.device)
         
-        if model_input is None:
-            raise ValueError("Failed to prepare model input")
-        
-        # Generate object
+        # Combine vectors and generate object
         model.eval()
         with torch.no_grad():
-            model_input_tensor = torch.from_numpy(model_input).float().to(self.device)
-            if len(model_input_tensor.shape) == 3:
-                model_input_tensor = model_input_tensor.unsqueeze(0)  # Add batch dimension
-            
-            generated_tensor = model(model_input_tensor)
+            # Add batch dimension
+            v_appearance_batch = v_appearance_tensor.unsqueeze(0)
+            p_t_batch = p_t_tensor.unsqueeze(0)
+
+            generated_tensor = model.generate(v_appearance_batch, p_t_batch)
             generated_image = generated_tensor.squeeze(0).cpu().numpy()
             
-            # Convert from [-1, 1] to [0, 255]
-            generated_image = ((generated_image + 1) * 127.5).astype(np.uint8)
-            
-            # Transpose from CHW to HWC if needed
+            # Convert from [-1, 1] to [0, 255] and from CHW to HWC
+            generated_image = ((generated_image + 1) * 127.5).clip(0, 255).astype(np.uint8)
             if generated_image.shape[0] == 3:
                 generated_image = np.transpose(generated_image, (1, 2, 0))
         
         # Create result object
-        generated_obj = {
+        return {
             'object_id': obj.get('object_id'),
             'frame_index': obj.get('frame_index'),
             'track_id': obj.get('track_id'),
             'category': category,
             'bbox': obj.get('bbox', []),
             'generated_image': generated_image,
-            'original_size': reference_image.shape[:2],
-            'generation_method': f'{category}_cgan',
+            'generation_method': f'{category}_cgan_vector',
             'confidence': obj.get('confidence', 0.0)
         }
-        
-        return generated_obj
-    
-    def _prepare_human_input(self, obj: Dict[str, Any], 
-                           reference_image: np.ndarray) -> Optional[np.ndarray]:
-        """Prepare input for human generation model."""
-        keypoints = obj.get('keypoints', [])
-        
-        if not keypoints:
-            return None
-        
-        # Create pose map from keypoints
-        pose_map = self._create_pose_map(keypoints, self.human_input_size)
-        
-        # Resize reference image
-        reference_resized = cv2.resize(reference_image, (self.human_input_size, self.human_input_size))
-        
-        # Combine pose map and reference image
-        # Normalize to [-1, 1]
-        reference_norm = (reference_resized.astype(np.float32) / 127.5) - 1.0
-        pose_norm = (pose_map.astype(np.float32) / 127.5) - 1.0
-        
-        # Concatenate along channel dimension and transpose to CHW
-        combined_input = np.concatenate([reference_norm, pose_norm], axis=2)
-        model_input = np.transpose(combined_input, (2, 0, 1))
-        
-        return model_input
-    
-    def _prepare_animal_input(self, obj: Dict[str, Any], 
-                            reference_image: np.ndarray) -> Optional[np.ndarray]:
-        """Prepare input for animal generation model."""
-        keypoints = obj.get('keypoints', [])
-        
-        if not keypoints:
-            return None
-        
-        # Create pose map from keypoints
-        pose_map = self._create_pose_map(keypoints, self.animal_input_size)
-        
-        # Resize reference image
-        reference_resized = cv2.resize(reference_image, (self.animal_input_size, self.animal_input_size))
-        
-        # Combine pose map and reference image
-        reference_norm = (reference_resized.astype(np.float32) / 127.5) - 1.0
-        pose_norm = (pose_map.astype(np.float32) / 127.5) - 1.0
-        
-        combined_input = np.concatenate([reference_norm, pose_norm], axis=2)
-        model_input = np.transpose(combined_input, (2, 0, 1))
-        
-        return model_input
-    
-    def _prepare_other_input(self, obj: Dict[str, Any], 
-                           reference_image: np.ndarray) -> Optional[np.ndarray]:
-        """Prepare input for other objects generation model."""
-        keypoints = obj.get('keypoints', [])
-        
-        if not keypoints:
-            return None
-        
-        # For other objects, keypoints are edge/corner features
-        feature_map = self._create_feature_map(keypoints, self.other_input_size)
-        
-        # Resize reference image
-        reference_resized = cv2.resize(reference_image, (self.other_input_size, self.other_input_size))
-        
-        # Combine feature map and reference image
-        reference_norm = (reference_resized.astype(np.float32) / 127.5) - 1.0
-        feature_norm = (feature_map.astype(np.float32) / 127.5) - 1.0
-        
-        combined_input = np.concatenate([reference_norm, feature_norm], axis=2)
-        model_input = np.transpose(combined_input, (2, 0, 1))
-        
-        return model_input
-    
-    def _create_pose_map(self, keypoints: List[List[float]], image_size: int) -> np.ndarray:
-        """Create pose map from keypoints."""
-        pose_map = np.zeros((image_size, image_size, 1), dtype=np.uint8)
-        
-        for kp in keypoints:
-            if len(kp) >= 2:
-                x, y = int(kp[0] * image_size), int(kp[1] * image_size)
-                if 0 <= x < image_size and 0 <= y < image_size:
-                    cv2.circle(pose_map, (x, y), 3, (255,), -1)
-        
-        return pose_map
-    
-    def _create_feature_map(self, keypoints: List[List[float]], image_size: int) -> np.ndarray:
-        """Create feature map from edge/corner keypoints."""
-        feature_map = np.zeros((image_size, image_size, 1), dtype=np.uint8)
-        
-        for kp in keypoints:
-            if len(kp) >= 2:
-                x, y = int(kp[0] * image_size), int(kp[1] * image_size)
-                if 0 <= x < image_size and 0 <= y < image_size:
-                    cv2.circle(feature_map, (x, y), 2, (255,), -1)
-        
-        return feature_map
-    
-    def _load_reference_image(self, obj: Dict[str, Any]) -> Optional[np.ndarray]:
-        """Load reference image for an object."""
-        # Try to load from cropped image first
-        if 'cropped_image' in obj and obj['cropped_image'] is not None:
-            return obj['cropped_image']
-        
-        # Try to load from object directory
-        objects_dir = obj.get('objects_dir')
-        if objects_dir:
-            object_id = obj.get('object_id', '')
-            image_path = Path(objects_dir) / f"{object_id}_frame_0000.png"
-            if image_path.exists():
-                return cv2.imread(str(image_path))
-        
-        return None
     
     def _generate_fallback_objects(self, track_objects: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Generate fallback objects when model is not available."""
+        """Generate fallback objects (e.g., black squares) when a model fails or is unavailable."""
         fallback_objects = []
-        
-        reference_obj = track_objects[0]
-        reference_image = self._load_reference_image(reference_obj)
-        
-        if reference_image is None:
-            # Create black placeholder
-            reference_image = np.zeros((256, 256, 3), dtype=np.uint8)
-        
         for obj in track_objects:
-            fallback_obj = self._create_fallback_object(obj, reference_image)
+            # Determine the input size for the category to generate a correctly sized placeholder
+            category = obj.get('semantic_category', 'other')
+            if category == 'human':
+                size = self.human_input_size
+            elif category == 'animal':
+                size = self.animal_input_size
+            else:
+                size = self.other_input_size
+
+            fallback_image = np.zeros((size, size, 3), dtype=np.uint8)
+
+            fallback_obj = {
+                'object_id': obj.get('object_id'),
+                'frame_index': obj.get('frame_index'),
+                'track_id': obj.get('track_id'),
+                'category': category,
+                'bbox': obj.get('bbox', []),
+                'generated_image': fallback_image,
+                'generation_method': 'fallback_placeholder',
+                'confidence': 0.0
+            }
             fallback_objects.append(fallback_obj)
         
         return fallback_objects
-    
-    def _create_fallback_object(self, obj: Dict[str, Any], 
-                              reference_image: np.ndarray) -> Dict[str, Any]:
-        """Create fallback object (copy of reference)."""
-        return {
-            'object_id': obj.get('object_id'),
-            'frame_index': obj.get('frame_index'),
-            'track_id': obj.get('track_id'),
-            'category': obj.get('semantic_category', 'other'),
-            'bbox': obj.get('bbox', []),
-            'generated_image': reference_image.copy(),
-            'original_size': reference_image.shape[:2],
-            'generation_method': 'fallback_copy',
-            'confidence': 0.0
-        }
