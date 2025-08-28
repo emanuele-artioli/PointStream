@@ -46,48 +46,68 @@ class FrameComposer:
         logging.info(f"   Edge feathering: {self.edge_feathering}px")
     
     @track_performance
-    def compose_frames(self, backgrounds: List[np.ndarray], 
-                      generated_objects: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def compose_frames(self, backgrounds: List[np.ndarray],
+                      generated_objects: List[Dict[str, Any]],
+                      output_resolution: Optional[Dict[str, int]] = None) -> Dict[str, Any]:
         """
         Compose final frames from backgrounds and objects.
-        
+
         Args:
             backgrounds: List of background frames
             generated_objects: List of generated objects with frame indices
-            
+            output_resolution: The desired output resolution {'width': w, 'height': h}
+
         Returns:
             Dictionary containing composed frames
         """
         start_time = time.time()
-        
+
         if not backgrounds:
             raise ValueError("No background frames provided")
-        
+
         logging.info(f"🎬 Composing {len(backgrounds)} frames with {len(generated_objects)} objects")
-        
+
         # Group objects by frame
         objects_by_frame = self._group_objects_by_frame(generated_objects)
-        
+
         # Compose each frame
         composed_frames = []
-        
+
         for frame_idx, background in enumerate(backgrounds):
             frame_objects = objects_by_frame.get(frame_idx, [])
-            
+
             composed_frame = self._compose_single_frame(
-                background, 
-                frame_objects, 
+                background,
+                frame_objects,
                 frame_idx
             )
-            
+
             composed_frames.append(composed_frame)
-        
+
         # Apply temporal smoothing if enabled
         if self.enable_temporal_smoothing and len(composed_frames) > 1:
             composed_frames = self._apply_temporal_smoothing(composed_frames)
-        
+
+        # Resize to final output resolution if specified
+        if output_resolution and 'width' in output_resolution and 'height' in output_resolution:
+            width = output_resolution['width']
+            height = output_resolution['height']
+
+            # Only log if resizing is actually happening for the first frame
+            if composed_frames and (composed_frames[0].shape[1] != width or composed_frames[0].shape[0] != height):
+                logging.info(f"Resizing {len(composed_frames)} composed frames to {width}x{height}")
+
+            resized_frames = []
+            for frame in composed_frames:
+                if frame.shape[1] != width or frame.shape[0] != height:
+                    resized_frame = cv2.resize(frame, (width, height), interpolation=cv2.INTER_LANCZOS4)
+                    resized_frames.append(resized_frame)
+                else:
+                    resized_frames.append(frame)
+            composed_frames = resized_frames
+
         processing_time = time.time() - start_time
-        
+
         result = {
             'composed_frames': composed_frames,
             'frame_count': len(composed_frames),
