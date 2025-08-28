@@ -68,6 +68,7 @@ datasets/
 *.mp4
 *.avi
 *.mov
+*.MOV
 *.mkv
 *.jpg
 *.jpeg

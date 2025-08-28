@@ -285,3 +285,7 @@ If you use PointStream in your research, please cite:
 ## Contributing
 
 [Contributing Guidelines Here]
+
+## TODO
+
+We need an optimizer script, that takes as input a folder of videos, and a number of tests per video, and runs the pipeline on each video, modifying the values of config at each test, to find the best parameter config that results in 30 fps of processing speed, at the highest quality. We should train a model for this: at each iteration, it will try a new parameter config, obtained by taking each config value in the file, and calculating a random value between its square and square root, then run the pipeline, check how long it takes, and what quality it results in. It then saves this parameter config, video name and scene processed, and the results it achieves in a file, and ...
