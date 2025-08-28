@@ -38,6 +38,8 @@ class Stitcher:
         self.ransac_reproj_threshold = config.get_float('stitching', 'ransac_reproj_threshold', 4.0)
         self.min_inlier_ratio = config.get_float('stitching', 'min_inlier_ratio', 0.5)
         self.static_homography_threshold = config.get_float('stitching', 'static_homography_threshold', 0.01)
+        self.enable_homography_smoothing = config.get_bool('stitching', 'enable_homography_smoothing', True)
+        self.smoothing_window_size = config.get_int('stitching', 'smoothing_window_size', 5)
 
         if self.feature_detector_name == 'sift':
             logging.info("Using SIFT detector (high accuracy, slower)")
@@ -75,6 +77,10 @@ class Stitcher:
 
             # STAGE 2: Fill in the homographies for frames that were skipped
             final_homographies = self._fill_skipped_homographies(frames, panorama, sparse_homographies)
+
+            # STAGE 3: Apply temporal smoothing if enabled
+            if self.enable_homography_smoothing:
+                final_homographies = self._smooth_homographies(final_homographies, self.smoothing_window_size)
             
             logging.info(f"Scene classified as Simple - Final panorama: {panorama.shape}")
             return {'scene_type': 'Simple', 'panorama': panorama, 'homographies': final_homographies}
@@ -270,6 +276,39 @@ class Stitcher:
         except Exception as e:
             logging.debug(f"Panorama expansion failed: {e}")
             return None
+
+    def _smooth_homographies(self, homographies: List[np.ndarray], window_size: int) -> List[np.ndarray]:
+        """
+        Applies a temporal smoothing filter to a sequence of homography matrices.
+
+        This uses a simple moving average over a sliding window to reduce jitter.
+        """
+        if not homographies or window_size <= 1:
+            return homographies
+
+        logging.info(f"Applying homography smoothing with window size {window_size}")
+
+        smoothed_homographies = []
+        num_homographies = len(homographies)
+
+        # Using a centered moving average
+        for i in range(num_homographies):
+            # Determine the window boundaries for the current homography
+            start = max(0, i - window_size // 2)
+            end = min(num_homographies, i + window_size // 2 + 1)
+
+            # Extract the window of homographies
+            window = homographies[start:end]
+
+            # Compute the element-wise average of the matrices in the window
+            if window:
+                avg_homography = np.mean(np.array(window), axis=0)
+                smoothed_homographies.append(avg_homography)
+            else:
+                # This case should not happen if homographies is not empty
+                smoothed_homographies.append(homographies[i])
+
+        return smoothed_homographies
 
     def _check_static_scene(self, frames: List[np.ndarray]) -> Dict[str, Any]:
         """Check if scene is static by analyzing homography between first and last frames."""
