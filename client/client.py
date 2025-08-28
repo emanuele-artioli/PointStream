@@ -245,22 +245,28 @@ class PointStreamClient:
             step_time = time.time() - step_start
             logging.info(f"   ✅ Object generation completed in {step_time:.1f}s")
             
+            # Get video properties from metadata
+            video_properties = scene_data.get('video_properties', {})
+            fps = video_properties.get('fps', 25.0)
+            resolution = video_properties.get('resolution')
+
             # STEP 3: Compose frames by overlaying objects on backgrounds
             logging.info(f"🎨 Scene {scene_number}: Step 3/4 - Frame composition...")
             step_start = time.time()
             frame_result = self.frame_composer.compose_frames(
-                background_result['backgrounds'], 
-                object_result['generated_objects']
+                background_result['backgrounds'],
+                object_result['generated_objects'],
+                output_resolution=resolution
             )
             step_time = time.time() - step_start
             logging.info(f"   ✅ Frame composition completed in {step_time:.1f}s")
-            
+
             # STEP 4: Assemble frames into video
             logging.info(f"🎬 Scene {scene_number}: Step 4/4 - Video assembly...")
             step_start = time.time()
             video_result = self.video_assembler.assemble_video(
                 frame_result['composed_frames'],
-                scene_data.get('fps', 25.0),
+                fps,
                 scene_number
             )
             step_time = time.time() - step_start
