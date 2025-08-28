@@ -62,160 +62,97 @@ class AttentionBlock(nn.Module):
 
 
 class OtherGenerator(nn.Module):
-    """Generator network for other objects."""
+    """Generator network for other objects from a concatenated appearance and pose vector."""
     
-    def __init__(self, input_channels: int = 4, output_channels: int = 3, ngf: int = 64):
+    def __init__(self, vector_input_size: int = 2052, output_channels: int = 3, ngf: int = 64, latent_dim: int = 512):
         """
         Initialize other objects generator.
         
         Args:
-            input_channels: Number of input channels (3 for RGB + 1 for features)
-            output_channels: Number of output channels (3 for RGB)
-            ngf: Number of generator filters
+            vector_input_size: Dimension of the concatenated input vector [v_appearance, p_t].
+            output_channels: Number of output channels (3 for RGB).
+            ngf: Number of generator filters.
+            latent_dim: Dimension of the latent space to project the input vector to.
         """
         super(OtherGenerator, self).__init__()
         
-        # Encoder
-        self.encoder1 = nn.Sequential(
-            nn.Conv2d(input_channels, ngf, 4, 2, 1),
+        self.mapping_network = nn.Sequential(
+            nn.Linear(vector_input_size, latent_dim),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(latent_dim, latent_dim),
+            nn.LeakyReLU(0.2, inplace=True),
+        )
+
+        self.initial_projection = nn.Sequential(
+            nn.Linear(latent_dim, ngf * 8 * 4 * 4),
             nn.LeakyReLU(0.2, inplace=True)
         )
-        
-        self.encoder2 = nn.Sequential(
-            nn.Conv2d(ngf, ngf * 2, 4, 2, 1),
-            nn.BatchNorm2d(ngf * 2),
-            nn.LeakyReLU(0.2, inplace=True)
-        )
-        
-        self.encoder3 = nn.Sequential(
-            nn.Conv2d(ngf * 2, ngf * 4, 4, 2, 1),
+        self.ngf = ngf
+
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(ngf * 8, ngf * 8, 4, 2, 1, bias=False), # -> 8x8
+            nn.BatchNorm2d(ngf * 8),
+            nn.ReLU(True),
+            AttentionBlock(ngf * 8), # Add attention for better structure
+            nn.ConvTranspose2d(ngf * 8, ngf * 4, 4, 2, 1, bias=False), # -> 16x16
             nn.BatchNorm2d(ngf * 4),
-            nn.LeakyReLU(0.2, inplace=True)
-        )
-        
-        self.encoder4 = nn.Sequential(
-            nn.Conv2d(ngf * 4, ngf * 8, 4, 2, 1),
-            nn.BatchNorm2d(ngf * 8),
-            nn.LeakyReLU(0.2, inplace=True)
-        )
-        
-        self.encoder5 = nn.Sequential(
-            nn.Conv2d(ngf * 8, ngf * 8, 4, 2, 1),
-            nn.BatchNorm2d(ngf * 8),
-            nn.LeakyReLU(0.2, inplace=True)
-        )
-        
-        # Bottleneck with residual blocks and attention
-        self.bottleneck = nn.Sequential(
-            OtherResidualBlock(ngf * 8),
-            AttentionBlock(ngf * 8),
-            OtherResidualBlock(ngf * 8),
-            OtherResidualBlock(ngf * 8)
-        )
-        
-        # Decoder
-        self.decoder5 = nn.Sequential(
-            nn.ConvTranspose2d(ngf * 8, ngf * 8, 4, 2, 1),
-            nn.BatchNorm2d(ngf * 8),
-            nn.Dropout(0.5),
-            nn.ReLU(inplace=True)
-        )
-        
-        self.decoder4 = nn.Sequential(
-            nn.ConvTranspose2d(ngf * 16, ngf * 4, 4, 2, 1),
-            nn.BatchNorm2d(ngf * 4),
-            nn.Dropout(0.5),
-            nn.ReLU(inplace=True)
-        )
-        
-        self.decoder3 = nn.Sequential(
-            nn.ConvTranspose2d(ngf * 8, ngf * 2, 4, 2, 1),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(ngf * 4, ngf * 2, 4, 2, 1, bias=False), # -> 32x32
             nn.BatchNorm2d(ngf * 2),
-            nn.Dropout(0.5),
-            nn.ReLU(inplace=True)
-        )
-        
-        self.decoder2 = nn.Sequential(
-            nn.ConvTranspose2d(ngf * 4, ngf, 4, 2, 1),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(ngf * 2, ngf, 4, 2, 1, bias=False),     # -> 64x64
             nn.BatchNorm2d(ngf),
-            nn.ReLU(inplace=True)
-        )
-        
-        self.decoder1 = nn.Sequential(
-            nn.ConvTranspose2d(ngf * 2, output_channels, 4, 2, 1),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(ngf, ngf, 4, 2, 1, bias=False),         # -> 128x128
+            nn.BatchNorm2d(ngf),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(ngf, output_channels, 4, 2, 1, bias=False), # -> 256x256
             nn.Tanh()
         )
         
-    def forward(self, x):
-        # Encoder with skip connections
-        e1 = self.encoder1(x)
-        e2 = self.encoder2(e1)
-        e3 = self.encoder3(e2)
-        e4 = self.encoder4(e3)
-        e5 = self.encoder5(e4)
-        
-        # Bottleneck
-        bottleneck = self.bottleneck(e5)
-        
-        # Decoder with skip connections
-        d5 = self.decoder5(bottleneck)
-        d5 = torch.cat([d5, e4], 1)
-        
-        d4 = self.decoder4(d5)
-        d4 = torch.cat([d4, e3], 1)
-        
-        d3 = self.decoder3(d4)
-        d3 = torch.cat([d3, e2], 1)
-        
-        d2 = self.decoder2(d3)
-        d2 = torch.cat([d2, e1], 1)
-        
-        output = self.decoder1(d2)
-        
+    def forward(self, vec):
+        latent_vec = self.mapping_network(vec)
+        initial_h = self.initial_projection(latent_vec)
+        initial_h = initial_h.view(-1, self.ngf * 8, 4, 4)
+        output = self.decoder(initial_h)
         return output
 
 
 class OtherDiscriminator(nn.Module):
-    """Discriminator network for other objects."""
+    """Discriminator network for other objects, conditioned on a pose vector."""
     
-    def __init__(self, input_channels: int = 6, ndf: int = 64):
+    def __init__(self, input_channels: int = 3, pose_vector_size: int = 4, ndf: int = 64):
         """
         Initialize other objects discriminator.
         
         Args:
-            input_channels: Number of input channels (real/fake + condition)
-            ndf: Number of discriminator filters
+            input_channels: Number of input channels (3 for real/fake image).
+            pose_vector_size: Dimension of the pose vector p_t (bbox).
+            ndf: Number of discriminator filters.
         """
         super(OtherDiscriminator, self).__init__()
         
-        # Multi-scale discriminator for better detail capture
-        self.main = nn.Sequential(
-            # Input: [B, 6, 256, 256]
-            nn.utils.spectral_norm(nn.Conv2d(input_channels, ndf, 4, 2, 1)),
+        self.pose_projection = nn.Sequential(
+            nn.Linear(pose_vector_size, 256),
             nn.LeakyReLU(0.2, inplace=True),
-            
-            # [B, 64, 128, 128]
+            nn.Linear(256, 256 * 256)
+        )
+
+        self.main = nn.Sequential(
+            nn.utils.spectral_norm(nn.Conv2d(input_channels + 1, ndf, 4, 2, 1)),
+            nn.LeakyReLU(0.2, inplace=True),
             nn.utils.spectral_norm(nn.Conv2d(ndf, ndf * 2, 4, 2, 1)),
             nn.LeakyReLU(0.2, inplace=True),
-            
-            # [B, 128, 64, 64]
             nn.utils.spectral_norm(nn.Conv2d(ndf * 2, ndf * 4, 4, 2, 1)),
             nn.LeakyReLU(0.2, inplace=True),
-            
-            # [B, 256, 32, 32]
             nn.utils.spectral_norm(nn.Conv2d(ndf * 4, ndf * 8, 4, 2, 1)),
             nn.LeakyReLU(0.2, inplace=True),
-            
-            # [B, 512, 16, 16]
             nn.utils.spectral_norm(nn.Conv2d(ndf * 8, ndf * 8, 4, 2, 1)),
             nn.LeakyReLU(0.2, inplace=True),
-            
-            # [B, 512, 8, 8]
             nn.Conv2d(ndf * 8, 1, 4, 1, 0),
-            # [B, 1, 5, 5]
         )
         
-        # Additional fine-detail discriminator
+        # Fine-detail discriminator remains unconditioned for simplicity
         self.fine_detail = nn.Sequential(
             nn.utils.spectral_norm(nn.Conv2d(input_channels, ndf // 2, 3, 1, 1)),
             nn.LeakyReLU(0.2, inplace=True),
@@ -226,14 +163,14 @@ class OtherDiscriminator(nn.Module):
             nn.Conv2d(ndf * 2, 1, 3, 1, 1),
         )
         
-    def forward(self, input_img, condition_img):
-        x = torch.cat([input_img, condition_img], 1)
+    def forward(self, input_img, pose_vector):
+        # Condition the main branch on the pose vector
+        pose_map = self.pose_projection(pose_vector).view(-1, 1, 256, 256)
+        x_main = torch.cat([input_img, pose_map], 1)
+        main_out = self.main(x_main)
         
-        # Main discriminator output
-        main_out = self.main(x)
-        
-        # Fine detail discriminator output
-        fine_out = self.fine_detail(x)
+        # The fine_detail branch works on the image only
+        fine_out = self.fine_detail(input_img)
         
         return main_out, fine_out
 
@@ -241,32 +178,30 @@ class OtherDiscriminator(nn.Module):
 class OtherCGAN(nn.Module):
     """Complete Other objects cGAN model."""
     
-    def __init__(self, input_size: int = 256, feature_channels: int = 50):
+    def __init__(self, input_size: int = 256, vector_input_size: int = 2052):
         """
         Initialize Other objects cGAN.
         
         Args:
-            input_size: Input image size
-            feature_channels: Number of feature channels (edges, corners, etc.)
+            input_size: Output image size.
+            vector_input_size: Dimension of the concatenated input vector [v_appearance, p_t].
         """
         super(OtherCGAN, self).__init__()
         
         self.input_size = input_size
-        self.feature_channels = feature_channels
+        self.vector_input_size = vector_input_size
         
-        # Generator takes 4 channels: 3 (RGB reference) + 1 (feature map)
-        self.generator = OtherGenerator(input_channels=4, output_channels=3)
+        self.generator = OtherGenerator(vector_input_size=vector_input_size, output_channels=3)
         
-        # Discriminator takes 6 channels: 3 (real/fake) + 3 (reference condition)
-        self.discriminator = OtherDiscriminator(input_channels=6)
+        other_pose_size = 4 # bbox
+        self.discriminator = OtherDiscriminator(input_channels=3, pose_vector_size=other_pose_size)
         
-        # Initialize weights
         self._initialize_weights()
     
     def _initialize_weights(self):
         """Initialize network weights."""
         for m in self.modules():
-            if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
+            if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d, nn.Linear)):
                 nn.init.normal_(m.weight.data, 0.0, 0.02)
                 if m.bias is not None:
                     nn.init.constant_(m.bias.data, 0)
@@ -274,33 +209,33 @@ class OtherCGAN(nn.Module):
                 nn.init.normal_(m.weight.data, 1.0, 0.02)
                 nn.init.constant_(m.bias.data, 0)
     
-    def forward(self, x):
+    def forward(self, vec: torch.Tensor) -> torch.Tensor:
         """Forward pass through generator only (for inference)."""
-        return self.generator(x)
+        return self.generator(vec)
     
-    def generate(self, reference_img: torch.Tensor, feature_map: torch.Tensor) -> torch.Tensor:
+    def generate(self, v_appearance: torch.Tensor, p_t: torch.Tensor) -> torch.Tensor:
         """
-        Generate object from reference and features.
+        Generate object from appearance and pose vectors.
         
         Args:
-            reference_img: Reference image [B, 3, H, W]
-            feature_map: Feature map [B, 1, H, W]
+            v_appearance: Appearance vector [B, 2048]
+            p_t: Pose vector (normalized bbox) [B, 4]
             
         Returns:
             Generated image [B, 3, H, W]
         """
-        input_tensor = torch.cat([reference_img, feature_map], dim=1)
-        return self.generator(input_tensor)
+        input_vec = torch.cat([v_appearance, p_t], dim=1)
+        return self.generator(input_vec)
     
-    def discriminate(self, img: torch.Tensor, condition: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def discriminate(self, img: torch.Tensor, pose_vector: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Discriminate real vs fake images with multi-scale output.
         
         Args:
             img: Image to discriminate [B, 3, H, W]
-            condition: Conditioning image [B, 3, H, W]
+            pose_vector: Pose vector p_t (bbox) [B, 4]
             
         Returns:
             Tuple of (main_output, fine_detail_output)
         """
-        return self.discriminator(img, condition)
+        return self.discriminator(img, pose_vector)

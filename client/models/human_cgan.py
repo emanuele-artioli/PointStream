@@ -31,196 +31,153 @@ class ResidualBlock(nn.Module):
 
 
 class HumanGenerator(nn.Module):
-    """Generator network for human figures."""
+    """Generator network for human figures from a concatenated appearance and pose vector."""
     
-    def __init__(self, input_channels: int = 4, output_channels: int = 3, ngf: int = 64):
+    def __init__(self, vector_input_size: int = 2099, output_channels: int = 3, ngf: int = 64, latent_dim: int = 512):
         """
         Initialize human generator.
         
         Args:
-            input_channels: Number of input channels (3 for RGB + 1 for pose)
-            output_channels: Number of output channels (3 for RGB)
-            ngf: Number of generator filters
+            vector_input_size: Dimension of the concatenated input vector [v_appearance, p_t].
+            output_channels: Number of output channels (3 for RGB).
+            ngf: Number of generator filters.
+            latent_dim: Dimension of the latent space to project the input vector to.
         """
         super(HumanGenerator, self).__init__()
         
-        # Encoder
-        self.encoder1 = nn.Sequential(
-            nn.Conv2d(input_channels, ngf, 4, 2, 1),
+        # Mapping network to project the input vector into a latent space
+        self.mapping_network = nn.Sequential(
+            nn.Linear(vector_input_size, latent_dim),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(latent_dim, latent_dim),
+            nn.LeakyReLU(0.2, inplace=True),
+        )
+
+        # Project the latent vector to the starting size of the decoder
+        # We'll start at 4x4 resolution
+        self.initial_projection = nn.Sequential(
+            nn.Linear(latent_dim, ngf * 8 * 4 * 4),
             nn.LeakyReLU(0.2, inplace=True)
         )
-        
-        self.encoder2 = nn.Sequential(
-            nn.Conv2d(ngf, ngf * 2, 4, 2, 1),
-            nn.BatchNorm2d(ngf * 2),
-            nn.LeakyReLU(0.2, inplace=True)
-        )
-        
-        self.encoder3 = nn.Sequential(
-            nn.Conv2d(ngf * 2, ngf * 4, 4, 2, 1),
+        self.ngf = ngf
+
+        # Decoder (upsampling from 4x4 to 256x256)
+        self.decoder = nn.Sequential(
+            # Start from 4x4
+            nn.ConvTranspose2d(ngf * 8, ngf * 8, 4, 2, 1, bias=False), # -> 8x8
+            nn.BatchNorm2d(ngf * 8),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(ngf * 8, ngf * 4, 4, 2, 1, bias=False), # -> 16x16
             nn.BatchNorm2d(ngf * 4),
-            nn.LeakyReLU(0.2, inplace=True)
-        )
-        
-        self.encoder4 = nn.Sequential(
-            nn.Conv2d(ngf * 4, ngf * 8, 4, 2, 1),
-            nn.BatchNorm2d(ngf * 8),
-            nn.LeakyReLU(0.2, inplace=True)
-        )
-        
-        self.encoder5 = nn.Sequential(
-            nn.Conv2d(ngf * 8, ngf * 8, 4, 2, 1),
-            nn.BatchNorm2d(ngf * 8),
-            nn.LeakyReLU(0.2, inplace=True)
-        )
-        
-        # Bottleneck with residual blocks
-        self.bottleneck = nn.Sequential(
-            ResidualBlock(ngf * 8),
-            ResidualBlock(ngf * 8),
-            ResidualBlock(ngf * 8)
-        )
-        
-        # Decoder
-        self.decoder5 = nn.Sequential(
-            nn.ConvTranspose2d(ngf * 8, ngf * 8, 4, 2, 1),
-            nn.BatchNorm2d(ngf * 8),
-            nn.Dropout(0.5),
-            nn.ReLU(inplace=True)
-        )
-        
-        self.decoder4 = nn.Sequential(
-            nn.ConvTranspose2d(ngf * 16, ngf * 4, 4, 2, 1),  # ngf * 16 due to skip connection
-            nn.BatchNorm2d(ngf * 4),
-            nn.Dropout(0.5),
-            nn.ReLU(inplace=True)
-        )
-        
-        self.decoder3 = nn.Sequential(
-            nn.ConvTranspose2d(ngf * 8, ngf * 2, 4, 2, 1),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(ngf * 4, ngf * 2, 4, 2, 1, bias=False), # -> 32x32
             nn.BatchNorm2d(ngf * 2),
-            nn.Dropout(0.5),
-            nn.ReLU(inplace=True)
-        )
-        
-        self.decoder2 = nn.Sequential(
-            nn.ConvTranspose2d(ngf * 4, ngf, 4, 2, 1),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(ngf * 2, ngf, 4, 2, 1, bias=False),     # -> 64x64
             nn.BatchNorm2d(ngf),
-            nn.ReLU(inplace=True)
-        )
-        
-        self.decoder1 = nn.Sequential(
-            nn.ConvTranspose2d(ngf * 2, output_channels, 4, 2, 1),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(ngf, ngf, 4, 2, 1, bias=False),         # -> 128x128
+            nn.BatchNorm2d(ngf),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(ngf, output_channels, 4, 2, 1, bias=False), # -> 256x256
             nn.Tanh()
         )
         
-    def forward(self, x):
-        # Encoder with skip connections
-        e1 = self.encoder1(x)    # [B, 64, 128, 128]
-        e2 = self.encoder2(e1)   # [B, 128, 64, 64]
-        e3 = self.encoder3(e2)   # [B, 256, 32, 32]
-        e4 = self.encoder4(e3)   # [B, 512, 16, 16]
-        e5 = self.encoder5(e4)   # [B, 512, 8, 8]
+    def forward(self, vec):
+        # Map the input vector to the latent space
+        latent_vec = self.mapping_network(vec)
         
-        # Bottleneck
-        bottleneck = self.bottleneck(e5)
+        # Project and reshape to start the convolutional decoder
+        initial_h = self.initial_projection(latent_vec)
+        initial_h = initial_h.view(-1, self.ngf * 8, 4, 4)
         
-        # Decoder with skip connections (U-Net style)
-        d5 = self.decoder5(bottleneck)
-        d5 = torch.cat([d5, e4], 1)  # Skip connection
-        
-        d4 = self.decoder4(d5)
-        d4 = torch.cat([d4, e3], 1)  # Skip connection
-        
-        d3 = self.decoder3(d4)
-        d3 = torch.cat([d3, e2], 1)  # Skip connection
-        
-        d2 = self.decoder2(d3)
-        d2 = torch.cat([d2, e1], 1)  # Skip connection
-        
-        output = self.decoder1(d2)
+        # Generate the image
+        output = self.decoder(initial_h)
         
         return output
 
 
 class HumanDiscriminator(nn.Module):
-    """Discriminator network for human figures."""
+    """Discriminator network for human figures, conditioned on a pose vector."""
     
-    def __init__(self, input_channels: int = 6, ndf: int = 64):  # 6 = 3 (real/fake) + 3 (condition)
+    def __init__(self, input_channels: int = 3, pose_vector_size: int = 51, ndf: int = 64):
         """
         Initialize human discriminator.
         
         Args:
-            input_channels: Number of input channels (real/fake + condition)
-            ndf: Number of discriminator filters
+            input_channels: Number of input channels (3 for real/fake image).
+            pose_vector_size: Dimension of the pose vector p_t.
+            ndf: Number of discriminator filters.
         """
         super(HumanDiscriminator, self).__init__()
         
+        self.pose_projection = nn.Sequential(
+            nn.Linear(pose_vector_size, 256),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(256, 256 * 256) # Project to image size
+        )
+
         self.main = nn.Sequential(
-            # Input: [B, 6, 256, 256]
-            nn.Conv2d(input_channels, ndf, 4, 2, 1),
+            # Input: [B, 4, 256, 256] (3 for image + 1 for pose map)
+            nn.Conv2d(input_channels + 1, ndf, 4, 2, 1),
             nn.LeakyReLU(0.2, inplace=True),
             
-            # [B, 64, 128, 128]
             nn.Conv2d(ndf, ndf * 2, 4, 2, 1),
             nn.BatchNorm2d(ndf * 2),
             nn.LeakyReLU(0.2, inplace=True),
             
-            # [B, 128, 64, 64]
             nn.Conv2d(ndf * 2, ndf * 4, 4, 2, 1),
             nn.BatchNorm2d(ndf * 4),
             nn.LeakyReLU(0.2, inplace=True),
             
-            # [B, 256, 32, 32]
             nn.Conv2d(ndf * 4, ndf * 8, 4, 2, 1),
             nn.BatchNorm2d(ndf * 8),
             nn.LeakyReLU(0.2, inplace=True),
             
-            # [B, 512, 16, 16]
             nn.Conv2d(ndf * 8, ndf * 8, 4, 2, 1),
             nn.BatchNorm2d(ndf * 8),
             nn.LeakyReLU(0.2, inplace=True),
             
-            # [B, 512, 8, 8]
             nn.Conv2d(ndf * 8, 1, 4, 1, 0),
-            # [B, 1, 5, 5] - PatchGAN output
         )
         
-    def forward(self, input_img, condition_img):
-        # Concatenate real/fake image with condition
-        x = torch.cat([input_img, condition_img], 1)
+    def forward(self, input_img, pose_vector):
+        # Project pose vector to a spatial map
+        pose_map = self.pose_projection(pose_vector).view(-1, 1, 256, 256)
+
+        # Concatenate image with the projected pose map
+        x = torch.cat([input_img, pose_map], 1)
         return self.main(x)
 
 
 class HumanCGAN(nn.Module):
     """Complete Human cGAN model."""
     
-    def __init__(self, input_size: int = 256, keypoint_channels: int = 17):
+    def __init__(self, input_size: int = 256, vector_input_size: int = 2099):
         """
         Initialize Human cGAN.
         
         Args:
-            input_size: Input image size
-            keypoint_channels: Number of keypoint channels
+            input_size: Output image size.
+            vector_input_size: Dimension of the concatenated input vector [v_appearance, p_t].
         """
         super(HumanCGAN, self).__init__()
         
         self.input_size = input_size
-        self.keypoint_channels = keypoint_channels
+        self.vector_input_size = vector_input_size
         
-        # Generator takes 4 channels: 3 (RGB reference) + 1 (pose map)
-        self.generator = HumanGenerator(input_channels=4, output_channels=3)
+        self.generator = HumanGenerator(vector_input_size=vector_input_size, output_channels=3)
         
-        # Discriminator takes 6 channels: 3 (real/fake) + 3 (reference condition)
-        self.discriminator = HumanDiscriminator(input_channels=6)
+        # Discriminator is now conditioned on the pose vector
+        human_pose_size = 17 * 3 # 17 keypoints, 3 values (x, y, conf)
+        self.discriminator = HumanDiscriminator(input_channels=3, pose_vector_size=human_pose_size)
         
-        # Initialize weights
         self._initialize_weights()
     
     def _initialize_weights(self):
         """Initialize network weights."""
         for m in self.modules():
-            if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
+            if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d, nn.Linear)):
                 nn.init.normal_(m.weight.data, 0.0, 0.02)
                 if m.bias is not None:
                     nn.init.constant_(m.bias.data, 0)
@@ -228,34 +185,34 @@ class HumanCGAN(nn.Module):
                 nn.init.normal_(m.weight.data, 1.0, 0.02)
                 nn.init.constant_(m.bias.data, 0)
     
-    def forward(self, x):
+    def forward(self, vec: torch.Tensor) -> torch.Tensor:
         """Forward pass through generator only (for inference)."""
-        return self.generator(x)
+        return self.generator(vec)
     
-    def generate(self, reference_img: torch.Tensor, pose_map: torch.Tensor) -> torch.Tensor:
+    def generate(self, v_appearance: torch.Tensor, p_t: torch.Tensor) -> torch.Tensor:
         """
-        Generate human figure from reference and pose.
+        Generate human figure from appearance and pose vectors.
         
         Args:
-            reference_img: Reference image [B, 3, H, W]
-            pose_map: Pose map [B, 1, H, W]
+            v_appearance: Appearance vector [B, 2048]
+            p_t: Pose vector [B, 51]
             
         Returns:
             Generated image [B, 3, H, W]
         """
-        # Concatenate reference and pose
-        input_tensor = torch.cat([reference_img, pose_map], dim=1)
-        return self.generator(input_tensor)
+        # Concatenate appearance and pose vectors
+        input_vec = torch.cat([v_appearance, p_t], dim=1)
+        return self.generator(input_vec)
     
-    def discriminate(self, img: torch.Tensor, condition: torch.Tensor) -> torch.Tensor:
+    def discriminate(self, img: torch.Tensor, pose_vector: torch.Tensor) -> torch.Tensor:
         """
         Discriminate real vs fake images.
         
         Args:
             img: Image to discriminate [B, 3, H, W]
-            condition: Conditioning image [B, 3, H, W]
+            pose_vector: Pose vector p_t [B, 51]
             
         Returns:
-            Discriminator output [B, 1, H_out, W_out]
+            Discriminator output
         """
-        return self.discriminator(img, condition)
+        return self.discriminator(img, pose_vector)

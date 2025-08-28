@@ -14,6 +14,8 @@ import cv2
 import numpy as np
 import logging
 from typing import List, Dict, Any, Optional, Tuple
+from collections import defaultdict
+
 from utils.decorators import track_performance
 from utils import config
 
@@ -26,6 +28,62 @@ except ImportError:
     MMPOSE_AVAILABLE = False
     logging.warning("MMPose not available, using fallback keypoint detection")
 
+try:
+    import torch
+    import torchvision.transforms as T
+    from torchvision.models import resnet50, ResNet50_Weights
+    TORCHVISION_AVAILABLE = True
+    logging.info("TorchVision available for appearance vector extraction.")
+except ImportError:
+    TORCHVISION_AVAILABLE = False
+    logging.warning("TorchVision not available, cannot generate appearance vectors.")
+
+
+class AppearanceFeatureExtractor:
+    """Extracts a deep feature vector from an image using a pre-trained ResNet-50 model."""
+    def __init__(self, device: str = 'cuda'):
+        self.device = device
+        if not TORCHVISION_AVAILABLE:
+            self.model = None
+            self.preprocess = None
+            return
+
+        weights = ResNet50_Weights.DEFAULT
+        self.model = resnet50(weights=weights)
+
+        # Remove the final classification layer (the "head")
+        self.model = torch.nn.Sequential(*(list(self.model.children())[:-1]))
+        self.model.to(self.device)
+        self.model.eval()
+
+        # Preprocessing steps for ResNet-50
+        self.preprocess = T.Compose([
+            T.ToPILImage(),
+            T.Resize(256),
+            T.CenterCrop(224),
+            T.ToTensor(),
+            T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ])
+
+    @torch.no_grad()
+    def extract_feature(self, image: np.ndarray) -> Optional[np.ndarray]:
+        """Extracts a 2048-dimensional feature vector from a single image."""
+        if self.model is None or image is None:
+            return None
+
+        try:
+            # Preprocess the image and add a batch dimension
+            input_tensor = self.preprocess(image).unsqueeze(0).to(self.device)
+
+            # Extract features
+            features = self.model(input_tensor)
+
+            # Flatten the features and move to CPU
+            return features.squeeze().cpu().numpy()
+        except Exception as e:
+            logging.error(f"Failed to extract appearance feature: {e}")
+            return None
+
 
 class Keypointer:
     """Keypoint detection component for semantically categorized objects."""
@@ -33,31 +91,25 @@ class Keypointer:
     def __init__(self):
         """Initialize the keypointer with MMPose models and parameters."""
         # Device configuration
-        self.device = 'cuda' if cv2.cuda.getCudaEnabledDeviceCount() > 0 else 'cpu'
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         
         # Keypoint detection parameters
         self.human_confidence_threshold = config.get_float('keypoints', 'human_confidence_threshold', 0.3)
         self.animal_confidence_threshold = config.get_float('keypoints', 'animal_confidence_threshold', 0.3)
         
-        # Canny edge detection parameters for 'other' objects
-        self.canny_low_threshold = config.get_int('keypoints', 'canny_low_threshold', 50)
-        self.canny_high_threshold = config.get_int('keypoints', 'canny_high_threshold', 150)
-        self.canny_kernel_size = config.get_int('keypoints', 'canny_kernel_size', 3)
-        
-        # Corner detection parameters for 'other' objects
-        self.corner_max_corners = config.get_int('keypoints', 'corner_max_corners', 25)
-        self.corner_quality_level = config.get_float('keypoints', 'corner_quality_level', 0.01)
-        self.corner_min_distance = config.get_int('keypoints', 'corner_min_distance', 10)
-        
         # Initialize models
         self._initialize_models()
-        
+
+        # Initialize the appearance feature extractor
+        if TORCHVISION_AVAILABLE:
+            self.feature_extractor = AppearanceFeatureExtractor(device=self.device)
+        else:
+            self.feature_extractor = None
+
         logging.info("Keypointer initialized")
         logging.info(f"MMPose available: {MMPOSE_AVAILABLE}")
-        logging.info(f"Human confidence threshold: {self.human_confidence_threshold}")
-        logging.info(f"Animal confidence threshold: {self.animal_confidence_threshold}")
-        logging.info(f"Canny thresholds: {self.canny_low_threshold}-{self.canny_high_threshold}")
-        logging.info(f"Corner detection: max {self.corner_max_corners} corners")
+        logging.info(f"TorchVision available: {TORCHVISION_AVAILABLE}")
+        logging.info(f"Using device: {self.device}")
     
     def _initialize_models(self):
         """Initialize MMPose models for human and animal pose estimation."""
@@ -125,62 +177,119 @@ class Keypointer:
             logging.info("MMPose not available, using fallback methods only")
     
     @track_performance
-    def extract_keypoints(self, objects_data: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def extract_keypoints(self, objects_data: List[Dict[str, Any]], frames: List[np.ndarray]) -> Dict[str, Any]:
         """
-        Extract keypoints for all objects based on their semantic category.
-        Objects should already have semantic categories assigned by the semantic classifier.
-        
+        Extracts appearance and pose vectors for all objects.
+
         Args:
-            objects_data: List of object dictionaries with semantic categories
-            
+            objects_data: List of object dictionaries with semantic categories.
+            frames: The list of all frames in the scene.
+
         Returns:
-            Dictionary containing keypoint data for each object
+            Dictionary containing the processed objects with their new vectors.
         """
         if not objects_data:
             return {'objects': []}
+
+        logging.info(f"Extracting appearance and pose vectors for {len(objects_data)} objects.")
         
-        logging.info(f"Extracting keypoints for {len(objects_data)} objects")
-        
+        # Group objects by their track ID
+        objects_by_track = defaultdict(list)
+        for obj in objects_data:
+            track_id = obj.get('track_id')
+            if track_id is not None:
+                objects_by_track[track_id].append(obj)
+
+        # Generate static appearance vector for each track
+        appearance_vectors = {}
+        if self.feature_extractor:
+            for track_id, track_objects in objects_by_track.items():
+                # Find the best object instance (highest confidence) to generate the vector from
+                best_obj = max(track_objects, key=lambda o: o.get('confidence', 0))
+
+                # Extract feature vector from the cropped image of the best object
+                cropped_image = best_obj.get('cropped_image')
+                if cropped_image is not None:
+                    v_appearance = self.feature_extractor.extract_feature(cropped_image)
+                    appearance_vectors[track_id] = v_appearance
+                    logging.debug(f"Generated appearance vector for track {track_id}")
+
+        # Process each object to add appearance and pose vectors
         processed_objects = []
-        
         for obj_data in objects_data:
-            try:
-                # Get object information (semantic category should already be set)
-                class_name = obj_data.get('class_name', 'other')  # This should be 'human', 'animal', or 'other'
-                semantic_category = obj_data.get('semantic_category', class_name)
-                track_id = obj_data.get('track_id')
-                frame_index = obj_data.get('frame_index')
-                
-                # Extract keypoints based on semantic category
-                if semantic_category == 'human':
-                    keypoints = self._extract_human_keypoints(obj_data)
-                elif semantic_category == 'animal':
-                    keypoints = self._extract_animal_keypoints(obj_data)
-                else:  # semantic_category == 'other'
-                    keypoints = self._extract_edge_keypoints(obj_data)
-                
-                # Create enhanced object data
-                enhanced_obj = obj_data.copy()
-                enhanced_obj.update({
-                    'keypoints': keypoints,
-                    'keypoint_method': self._get_method_name(semantic_category)
-                })
-                
-                processed_objects.append(enhanced_obj)
-                
-                logging.debug(f"Object {semantic_category} (track {track_id}): {len(keypoints.get('points', []))} keypoints")
-                
-            except Exception as e:
-                logging.error(f"Failed to extract keypoints for object {obj_data.get('class_name', 'unknown')}: {e}")
-                # Add object without keypoints
-                enhanced_obj = obj_data.copy()
-                enhanced_obj.update({
-                    'keypoints': {'points': [], 'method': 'error'},
-                    'keypoint_method': 'error'
-                })
-                processed_objects.append(enhanced_obj)
-        
+            track_id = obj_data.get('track_id')
+            semantic_category = obj_data.get('semantic_category', 'other')
+
+            # Add the static appearance vector for this track
+            if track_id in appearance_vectors:
+                obj_data['v_appearance'] = appearance_vectors[track_id]
+
+            # Generate the dynamic pose vector (p_t)
+            if semantic_category == 'human':
+                pose_vector = self._extract_human_keypoints(obj_data)
+                obj_data['p_pose'] = pose_vector
+                obj_data['pose_method'] = 'mmpose_human'
+            elif semantic_category == 'animal':
+                pose_vector = self._extract_animal_keypoints(obj_data)
+                obj_data['p_pose'] = pose_vector
+                obj_data['pose_method'] = 'mmpose_animal'
+            else: # 'other' category
+                pose_vector = self._extract_bbox_pose(obj_data, frames)
+                obj_data['p_pose'] = pose_vector
+                obj_data['pose_method'] = 'bbox_normalized'
+
+            # For backward compatibility, we can store the pose vector in 'keypoints'
+            obj_data['keypoints'] = pose_vector
+
+            processed_objects.append(obj_data)
+
         return {'objects': processed_objects}
+
+    def _extract_bbox_pose(self, obj_data: Dict[str, Any], frames: List[np.ndarray]) -> Dict[str, Any]:
+        """
+        Extracts a normalized bounding box vector as the pose.
+        p_t = [center_x, center_y, width, height]
+
+        Args:
+            obj_data: Object data dictionary.
+            frames: List of all frames in the scene to get frame dimensions.
+
+        Returns:
+            A dictionary containing the normalized bounding box vector.
+        """
+        bbox = obj_data.get('bbox')
+        frame_index = obj_data.get('frame_index')
+
+        if bbox is None or frame_index is None or frame_index >= len(frames):
+            return {'points': [], 'method': 'no_bbox'}
+
+        try:
+            # Get frame dimensions for normalization
+            frame_height, frame_width, _ = frames[frame_index].shape
+
+            # Bbox is [x1, y1, x2, y2]
+            x1, y1, x2, y2 = bbox
+
+            # Calculate normalized center_x, center_y, width, height
+            box_w = x2 - x1
+            box_h = y2 - y1
+            center_x = x1 + box_w / 2
+            center_y = y1 + box_h / 2
+
+            norm_center_x = center_x / frame_width
+            norm_center_y = center_y / frame_height
+            norm_w = box_w / frame_width
+            norm_h = box_h / frame_height
+
+            pose_vector = [norm_center_x, norm_center_y, norm_w, norm_h]
+
+            return {
+                'points': pose_vector,
+                'method': 'bbox_normalized'
+            }
+        except Exception as e:
+            logging.error(f"Bounding box pose extraction failed: {e}")
+            return {'points': [], 'method': 'error'}
     
     def _extract_human_keypoints(self, obj_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -193,29 +302,17 @@ class Keypointer:
             Dictionary with human keypoint data
         """
         if not MMPOSE_AVAILABLE or self.human_model is None:
-            # Fallback to edge detection
-            logging.debug("MMPose not available for human keypoints, using edge detection fallback")
-            return self._extract_edge_keypoints(obj_data)
+            # Fallback to bbox
+            logging.debug("MMPose not available for human keypoints, using bbox fallback")
+            return self._extract_bbox_pose(obj_data, []) # Pass empty frames list, will be handled
         
         try:
             # Get the cropped image
             if 'cropped_image' in obj_data:
                 image = obj_data['cropped_image']
-            elif 'masked_image' in obj_data:
-                # Convert RGBA to RGB if needed
-                masked_img = obj_data['masked_image']
-                if masked_img.shape[-1] == 4:
-                    image = masked_img[:, :, :3]
-                else:
-                    image = masked_img
             else:
                 logging.warning("No suitable image found for human keypoint detection")
                 return {'points': [], 'method': 'no_image', 'confidence_scores': []}
-            
-            # In a real implementation, you would run MMPose inference here:
-            # results = self.human_model(image)
-            # keypoints = results['predictions'][0]['keypoints']
-            # scores = results['predictions'][0]['keypoint_scores']
             
             # For simulation, generate fake human keypoints (17 COCO keypoints)
             h, w = image.shape[:2]
@@ -227,28 +324,19 @@ class Keypointer:
             
             for i, (x, y, conf) in enumerate(simulated_keypoints):
                 if conf >= self.human_confidence_threshold:
-                    valid_keypoints.append({
-                        'id': i,
-                        'name': self._get_human_keypoint_name(i),
-                        'x': float(x),
-                        'y': float(y),
-                        'confidence': float(conf),
-                        'visible': True
-                    })
+                    valid_keypoints.append([float(x), float(y), float(conf)])
                     confidence_scores.append(float(conf))
             
             return {
                 'points': valid_keypoints,
                 'method': 'mmpose_human',
                 'confidence_scores': confidence_scores,
-                'total_keypoints': len(simulated_keypoints),
-                'valid_keypoints': len(valid_keypoints)
             }
             
         except Exception as e:
             logging.error(f"Human keypoint extraction failed: {e}")
-            return self._extract_edge_keypoints(obj_data)
-    
+            return self._extract_bbox_pose(obj_data, [])
+
     def _extract_animal_keypoints(self, obj_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Extract animal pose keypoints using MMPose.
@@ -260,27 +348,17 @@ class Keypointer:
             Dictionary with animal keypoint data
         """
         if not MMPOSE_AVAILABLE or self.animal_model is None:
-            # Fallback to edge detection
-            logging.debug("MMPose not available for animal keypoints, using edge detection fallback")
-            return self._extract_edge_keypoints(obj_data)
+            # Fallback to bbox
+            logging.debug("MMPose not available for animal keypoints, using bbox fallback")
+            return self._extract_bbox_pose(obj_data, [])
         
         try:
             # Get the cropped image
             if 'cropped_image' in obj_data:
                 image = obj_data['cropped_image']
-            elif 'masked_image' in obj_data:
-                # Convert RGBA to RGB if needed
-                masked_img = obj_data['masked_image']
-                if masked_img.shape[-1] == 4:
-                    image = masked_img[:, :, :3]
-                else:
-                    image = masked_img
             else:
                 logging.warning("No suitable image found for animal keypoint detection")
                 return {'points': [], 'method': 'no_image', 'confidence_scores': []}
-            
-            # In a real implementation, you would run MMPose animal inference here:
-            # results = self.animal_model(image)
             
             # For simulation, generate fake animal keypoints
             h, w = image.shape[:2]
@@ -292,98 +370,19 @@ class Keypointer:
             
             for i, (x, y, conf) in enumerate(simulated_keypoints):
                 if conf >= self.animal_confidence_threshold:
-                    valid_keypoints.append({
-                        'id': i,
-                        'name': self._get_animal_keypoint_name(i),
-                        'x': float(x),
-                        'y': float(y),
-                        'confidence': float(conf),
-                        'visible': True
-                    })
+                    valid_keypoints.append([float(x), float(y), float(conf)])
                     confidence_scores.append(float(conf))
             
             return {
                 'points': valid_keypoints,
                 'method': 'mmpose_animal',
                 'confidence_scores': confidence_scores,
-                'total_keypoints': len(simulated_keypoints),
-                'valid_keypoints': len(valid_keypoints)
             }
             
         except Exception as e:
             logging.error(f"Animal keypoint extraction failed: {e}")
-            return self._extract_edge_keypoints(obj_data)
-    
-    def _extract_edge_keypoints(self, obj_data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Extract key features using Canny edge detection and corner detection.
-        
-        Args:
-            obj_data: Object data dictionary with cropped/masked image
-            
-        Returns:
-            Dictionary with edge-based keypoint data
-        """
-        try:
-            # Get the cropped image
-            if 'cropped_image' in obj_data:
-                image = obj_data['cropped_image']
-            elif 'masked_image' in obj_data:
-                # Convert RGBA to RGB if needed
-                masked_img = obj_data['masked_image']
-                if masked_img.shape[-1] == 4:
-                    image = masked_img[:, :, :3]
-                else:
-                    image = masked_img
-            else:
-                logging.warning("No suitable image found for edge keypoint detection")
-                return {'points': [], 'method': 'no_image'}
-            
-            # Convert to grayscale
-            if len(image.shape) == 3:
-                gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            else:
-                gray = image
-            
-            # Apply Gaussian blur to reduce noise
-            blurred = cv2.GaussianBlur(gray, (self.canny_kernel_size, self.canny_kernel_size), 0)
-            
-            # Canny edge detection
-            edges = cv2.Canny(blurred, self.canny_low_threshold, self.canny_high_threshold)
-            
-            # Find corners on the edge image
-            corners = cv2.goodFeaturesToTrack(
-                edges,
-                maxCorners=self.corner_max_corners,
-                qualityLevel=self.corner_quality_level,
-                minDistance=self.corner_min_distance
-            )
-            
-            keypoints = []
-            if corners is not None:
-                for i, corner in enumerate(corners):
-                    x, y = corner.ravel()
-                    keypoints.append({
-                        'id': i,
-                        'name': f'corner_{i}',
-                        'x': float(x),
-                        'y': float(y),
-                        'confidence': 1.0,  # Corners don't have confidence scores
-                        'visible': True,
-                        'type': 'corner'
-                    })
-            
-            return {
-                'points': keypoints,
-                'method': 'canny_corners',
-                'edge_pixels': int(np.sum(edges > 0)),
-                'total_corners': len(keypoints)
-            }
-            
-        except Exception as e:
-            logging.error(f"Edge keypoint extraction failed: {e}")
-            return {'points': [], 'method': 'error'}
-    
+            return self._extract_bbox_pose(obj_data, [])
+
     def _generate_simulated_human_keypoints(self, width: int, height: int) -> List[Tuple[float, float, float]]:
         """Generate simulated human keypoints for testing (17 COCO keypoints)."""
         # Generate random keypoints within the image bounds with varying confidence
@@ -411,34 +410,6 @@ class Keypointer:
             keypoints.append((x, y, confidence))
         
         return keypoints
-    
-    def _get_human_keypoint_name(self, index: int) -> str:
-        """Get human keypoint name by index (COCO format)."""
-        names = [
-            'nose', 'left_eye', 'right_eye', 'left_ear', 'right_ear',
-            'left_shoulder', 'right_shoulder', 'left_elbow', 'right_elbow',
-            'left_wrist', 'right_wrist', 'left_hip', 'right_hip',
-            'left_knee', 'right_knee', 'left_ankle', 'right_ankle'
-        ]
-        return names[index] if index < len(names) else f'keypoint_{index}'
-    
-    def _get_animal_keypoint_name(self, index: int) -> str:
-        """Get animal keypoint name by index."""
-        names = [
-            'nose', 'left_ear', 'right_ear', 'left_shoulder', 'right_shoulder',
-            'left_elbow', 'right_elbow', 'left_paw', 'right_paw',
-            'left_hip', 'right_hip', 'tail_base'
-        ]
-        return names[index] if index < len(names) else f'animal_keypoint_{index}'
-    
-    def _get_method_name(self, category: str) -> str:
-        """Get the method name used for keypoint extraction."""
-        if category == 'human':
-            return 'mmpose_human' if MMPOSE_AVAILABLE and self.human_model else 'canny_corners'
-        elif category == 'animal':
-            return 'mmpose_animal' if MMPOSE_AVAILABLE and self.animal_model else 'canny_corners'
-        else:
-            return 'canny_corners'
     
     def filter_keypoints_by_confidence(self, keypoints_data: Dict[str, Any], 
                                      min_confidence: float) -> Dict[str, Any]:

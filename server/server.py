@@ -404,7 +404,7 @@ class PointStreamPipeline:
             
             # Process keypoints for all semantically classified objects
             if all_objects:
-                keypoint_result = self.keypointer.extract_keypoints(all_objects)
+                keypoint_result = self.keypointer.extract_keypoints(all_objects, frames)
                 
                 # Enhance objects with additional metadata
                 enhanced_objects = []
