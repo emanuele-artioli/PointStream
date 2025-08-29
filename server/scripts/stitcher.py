@@ -108,7 +108,7 @@ class Stitcher:
                 H = homography_result['homography']
                 stitched_pano = self._expand_panorama_with_frame(frames[0], frames[-1], H, len(frames) - 1)
                 # Mark intermediate frames as skipped (None)
-                homographies = [np.eye(3, dtype=np.float32)] + [None] * (num_frames - 2) + [H]
+                homographies = [np.eye(3, dtype=np.float32)] + [None] * (num_frames - 2) + [np.linalg.inv(H)]
                 return stitched_pano, homographies
 
         # RECURSIVE STEP: If shortcut fails or segment is too small, split and recurse.
@@ -128,8 +128,8 @@ class Stitcher:
         merged_panorama = self._expand_panorama_with_frame(left_pano, right_pano, H_merge, 0)
 
         # Chain the homographies
-        updated_right_h = [H_merge @ h if h is not None else None for h in right_h]
-        final_homographies = left_h + updated_right_h
+        updated_right_h = [np.linalg.inv(H_merge @ h) if h is not None else None for h in right_h]
+        final_homographies = [np.linalg.inv(h) if h is not None else None for h in left_h] + updated_right_h
 
         return merged_panorama, final_homographies
 
@@ -141,7 +141,7 @@ class Stitcher:
                 # This frame was skipped, so calculate its homography against the final panorama
                 result = self._find_homography_between_frames(panorama, frames[i])
                 if result['success']:
-                    final_homographies[i] = result['homography']
+                    final_homographies[i] = np.linalg.inv(result['homography'])
                 else:
                     # If it fails, use an identity matrix as a fallback
                     final_homographies[i] = np.eye(3, dtype=np.float32)

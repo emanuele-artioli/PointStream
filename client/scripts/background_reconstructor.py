@@ -145,19 +145,54 @@ class BackgroundReconstructor:
             if homography.shape != (3, 3):
                 raise ValueError(f"Invalid homography shape: {homography.shape}")
             
-            # Invert homography for reconstruction direction (panorama → frame)
-            # The server computes frame → panorama, but we need panorama → frame
-            homography_inv = np.linalg.inv(homography)
-            
-            # Warp panorama to frame view
+            # The stored homography transforms from panorama → frame
+            # For reconstruction, we can use it directly
             background_frame = cv2.warpPerspective(
                 panorama, 
-                homography_inv, 
+                homography, 
                 frame_size,
                 flags=self.interpolation,
                 borderMode=cv2.BORDER_CONSTANT,
                 borderValue=(0, 0, 0)
             )
+            
+            # Flip horizontally to correct the direction
+            # background_frame = cv2.flip(background_frame, 1)
+            
+            # If the result is shifted, try to center it
+            # Check if there's a significant black border on one side
+            gray = cv2.cvtColor(background_frame, cv2.COLOR_BGR2GRAY)
+            h, w = gray.shape
+            
+            # Check for black borders
+            left_border = np.mean(gray[:, :10])  # Left 10 pixels
+            right_border = np.mean(gray[:, -10:])  # Right 10 pixels
+            top_border = np.mean(gray[:10, :])  # Top 10 pixels
+            bottom_border = np.mean(gray[-10:, :])  # Bottom 10 pixels
+            
+            # If there's a significant black border on the right, try to shift the content
+            if right_border < 10 and left_border > right_border * 2:
+                logging.debug(f"Detected right black border in frame {frame_index}, attempting to center content")
+                # Find the actual content bounds
+                non_black = np.where(gray > 10)
+                if len(non_black[0]) > 0 and len(non_black[1]) > 0:
+                    min_y, max_y = np.min(non_black[0]), np.max(non_black[0])
+                    min_x, max_x = np.min(non_black[1]), np.max(non_black[1])
+                    
+                    # Center the content in the frame
+                    content_h, content_w = max_y - min_y, max_x - min_x
+                    center_y, center_x = h // 2, w // 2
+                    target_min_y = center_y - content_h // 2
+                    target_min_x = center_x - content_w // 2
+                    
+                    # Create a new frame and place the content in the center
+                    centered_frame = np.zeros_like(background_frame)
+                    src_roi = background_frame[min_y:max_y, min_x:max_x]
+                    dest_roi = centered_frame[target_min_y:target_min_y+content_h, 
+                                            target_min_x:target_min_x+content_w]
+                    dest_roi[:] = src_roi
+                    
+                    return centered_frame
             
             return background_frame
             

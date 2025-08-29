@@ -416,6 +416,16 @@ class PointStreamClient:
         if objects_dir.exists():
             scene_data['objects_dir'] = str(objects_dir)
         
+        # Extract frame dimensions from video_properties for background reconstructor
+        video_properties = scene_data.get('video_properties', {})
+        resolution = video_properties.get('resolution', {})
+        if isinstance(resolution, dict):
+            scene_data['frame_width'] = resolution.get('width', 1920)
+            scene_data['frame_height'] = resolution.get('height', 1080)
+        elif isinstance(resolution, (list, tuple)) and len(resolution) >= 2:
+            scene_data['frame_width'] = resolution[0]
+            scene_data['frame_height'] = resolution[1]
+        
         # The demuxer already extracted homographies to the top level, so no need to do it here
         if 'homographies' in scene_data:
             logging.info(f"📊 Found {len(scene_data['homographies'])} homography matrices for scene {scene_number}")
