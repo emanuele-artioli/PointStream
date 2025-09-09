@@ -1,18 +1,6 @@
 #!/usr/bin/env python3
-"""
-Object Segmentation Component
-
-This component handles object detection and segmentation using YOLO models.
-It uses two separate models:
-- One with tracking for processing video frames
-- One without tracking for processing panorama images
-
-The component returns structured data with bounding boxes, masks, and metadata.
-"""
-
 import cv2
 import numpy as np
-import logging
 from typing import List, Dict, Any, Optional, Tuple
 from utils.decorators import track_performance
 from utils.error_handling import safe_execute
@@ -21,95 +9,46 @@ from utils import config
 try:
     import torch
     from ultralytics import YOLO, YOLOE
-except ImportError as e:
-    logging.error(f"Failed to import required libraries: {e}")
+except ImportError:
     raise
 
-
 class Segmenter:
-    """Object segmentation component using YOLO models."""
-    
     def __init__(self):
-        """Initialize the segmenter with YOLO models."""
-        # Load configuration
         self.model_path = config.get_str('segmentation', 'yolo_model', 'yolov8n-seg.pt')
         self.confidence_threshold = config.get_float('segmentation', 'confidence_threshold', 0.25)
         self.iou_threshold = config.get_float('segmentation', 'iou_threshold', 0.7)
         self.max_objects = config.get_int('segmentation', 'max_objects_per_frame', 0)
         self.device = config.get_str('segmentation', 'device', 'auto')
-        
-        # Performance settings
         self.yolo_image_size = config.get_int('segmentation', 'yolo_image_size', 640)
         self.yolo_half_precision = config.get_bool('segmentation', 'yolo_half_precision', True)
         self.agnostic_nms = config.get_bool('segmentation', 'agnostic_nms', True)
-        
-        # Class filtering
         classes_config = config.get_list('segmentation', 'classes', [])
         self.classes = classes_config if classes_config else None
-        
-        # New parameters
         self.selection_strategy = config.get_str('segmentation', 'selection_strategy', 'confidence')
         self.min_object_area = config.get_int('segmentation', 'min_object_area', 0)
         self.frame_skip = config.get_int('segmentation', 'frame_skip', 1)
         if self.frame_skip < 1:
             self.frame_skip = 1
 
-        # Set device
         if self.device == 'auto':
             self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         
-        # Initialize models
         self._initialize_models()
-        
-        logging.info("Segmenter initialized")
-        logging.info(f"Model: {self.model_path}")
-        logging.info(f"Device: {self.device}")
-        logging.info(f"Confidence threshold: {self.confidence_threshold}")
-        logging.info(f"IoU threshold: {self.iou_threshold}")
-        logging.info(f"Max objects per frame: {self.max_objects}")
-        logging.info(f"Selection Strategy: {self.selection_strategy}")
-        logging.info(f"Min Object Area: {self.min_object_area}")
-        logging.info(f"Frame Skip: {self.frame_skip}")
-        logging.info(f"Classes filter: {self.classes or 'All classes'}")
     
     def _initialize_models(self):
-        """Initialize YOLO model for tracking frames only."""
         try:
-            # Model with tracking for video frames
-            logging.info("Loading YOLO model with tracking for frames...")
-            
-            # Determine which YOLO class to use based on model path
             if 'yoloe' in self.model_path.lower():
                 self.model_with_tracking = YOLOE(self.model_path)
-                logging.info(f"Using YOLOE class for model: {self.model_path}")
             else:
                 self.model_with_tracking = YOLO(self.model_path)
-                logging.info(f"Using YOLO class for model: {self.model_path}")
-            
-            logging.info("YOLO model loaded successfully")
-            
         except Exception as e:
-            logging.error(f"Failed to initialize YOLO models: {e}")
             raise
     
     @track_performance
     def segment_frames_only(self, frames: List[np.ndarray]) -> Dict[str, Any]:
-        """
-        Segment objects only in scene frames (no panorama processing).
-        
-        Args:
-            frames: List of scene frames
-            
-        Returns:
-            Dictionary containing only frames_data
-        """
         if not frames:
             return {'frames_data': []}
         
-        frames_to_process = len(frames) // self.frame_skip
-        logging.info(f"Segmenting {frames_to_process} frames out of {len(frames)} (frame_skip={self.frame_skip})")
-        
-        # Process frames (with tracking)
         frames_data = []
         for i in range(0, len(frames), self.frame_skip):
             frame = frames[i]
@@ -120,102 +59,65 @@ class Segmenter:
 
     @safe_execute("Frame segmentation", {'frame_index': 0, 'objects': [], 'masks': [], 'bounding_boxes': []})
     def _segment_frame(self, frame: np.ndarray, frame_index: int) -> Dict[str, Any]:
-        """
-        Segment objects in a single frame with tracking.
-        
-        Args:
-            frame: Input frame
-            frame_index: Index of the frame in the sequence
-            
-        Returns:
-            Dictionary with frame segmentation data
-        """
-        # Run YOLO tracking, let it return all detections
         results = self.model_with_tracking.track(
             frame,
             conf=self.confidence_threshold,
             iou=self.iou_threshold,
             device=self.device,
             retina_masks=True,
-            max_det=0,  # Get all possible detections
+            max_det=0,
             classes=self.classes,
             imgsz=self.yolo_image_size,
             half=self.yolo_half_precision,
             agnostic_nms=self.agnostic_nms,
             verbose=False,
-            persist=True  # Persist tracks across frames
+            persist=True
         )
         
         return self._extract_detection_data(results, frame_index=frame_index, with_tracking=True)
     
     def _extract_detection_data(self, results, frame_index: Optional[int] = None, 
                                with_tracking: bool = False) -> Dict[str, Any]:
-        """
-        Extract structured data from YOLO detection results.
-        
-        Args:
-            results: YOLO detection results
-            frame_index: Frame index (for frame data)
-            with_tracking: Whether tracking data is available
-            
-        Returns:
-            Dictionary with structured detection data
-        """
         objects = []
         masks = []
         bounding_boxes = []
         
-        # Handle both generator and list results
         if hasattr(results, '__iter__') and not isinstance(results, (list, tuple)):
             results = list(results)
         
         if len(results) == 0 or results[0].masks is None:
-            base_data = {
-                'objects': objects,
-                'masks': masks,
-                'bounding_boxes': bounding_boxes
-            }
+            base_data = {'objects': [], 'masks': [], 'bounding_boxes': []}
             if frame_index is not None:
                 base_data['frame_index'] = frame_index
             return base_data
         
-        result = results[0]  # Single image result
+        result = results[0]
         boxes = result.boxes
         detection_masks = result.masks
         
         if boxes is None or detection_masks is None:
-            base_data = {
-                'objects': objects,
-                'masks': masks,
-                'bounding_boxes': bounding_boxes
-            }
+            base_data = {'objects': [], 'masks': [], 'bounding_boxes': []}
             if frame_index is not None:
                 base_data['frame_index'] = frame_index
             return base_data
         
-        # Extract object information
         for i in range(len(boxes)):
             box = boxes[i]
             mask = detection_masks[i]
             
-            # Basic detection data
             class_id = int(box.cls.cpu().numpy())
             confidence = float(box.conf.cpu().numpy())
             class_name = self.model_with_tracking.names[class_id]
             
-            # Bounding box
             bbox = box.xyxy[0].cpu().numpy()
             x1, y1, x2, y2 = bbox
             
-            # Mask data
             mask_data = mask.data[0].cpu().numpy().astype(np.uint8)
             
-            # Track ID (if available)
             track_id = None
             if with_tracking and hasattr(box, 'id') and box.id is not None:
                 track_id = int(box.id.cpu().numpy())
             
-            # Calculate additional properties
             center_x = (x1 + x2) / 2
             center_y = (y1 + y2) / 2
             width = x2 - x1
@@ -223,7 +125,6 @@ class Segmenter:
             area = width * height
             mask_area = np.sum(mask_data)
             
-            # Create object dictionary
             obj_data = {
                 'class_id': class_id,
                 'class_name': class_name,
@@ -242,30 +143,20 @@ class Segmenter:
             
             objects.append(obj_data)
 
-        # --- MANUAL FILTERING AND SELECTION LOGIC ---
-
-        # 1. Filter by minimum area
         if self.min_object_area > 0:
             objects = self.filter_objects_by_area(objects, self.min_object_area)
 
-        # 2. Apply selection strategy if max_objects is set
         if self.max_objects > 0 and len(objects) > self.max_objects:
             if self.selection_strategy == 'area':
-                # Sort by mask area (largest first)
                 objects.sort(key=lambda obj: obj.get('mask_area', 0), reverse=True)
-            else: # Default to 'confidence'
-                # Sort by confidence score (highest first)
+            else:
                 objects.sort(key=lambda obj: obj.get('confidence', 0), reverse=True)
-
-            # Keep only the top N objects
             objects = objects[:self.max_objects]
 
-        # Re-populate masks and bounding_boxes from the final list of objects
         for obj in objects:
             masks.append(obj['mask'])
             bounding_boxes.append(obj['bbox'])
 
-        # Create return data
         result_data = {
             'objects': objects,
             'masks': masks,
@@ -278,78 +169,42 @@ class Segmenter:
         return result_data
     
     def extract_object_crops(self, frame: np.ndarray, objects: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """
-        Extract cropped and masked object images from a frame.
-        
-        Args:
-            frame: Source frame
-            objects: List of object dictionaries with masks and bounding boxes
-            
-        Returns:
-            List of object dictionaries with added 'cropped_image' and 'masked_image' fields
-        """
         enhanced_objects = []
-        
         for obj in objects:
             try:
-                # Get bounding box
                 bbox = obj['bbox']
                 x1, y1, x2, y2 = [int(coord) for coord in bbox]
-                
-                # Ensure coordinates are within frame bounds
                 h, w = frame.shape[:2]
                 x1 = max(0, min(x1, w-1))
                 y1 = max(0, min(y1, h-1))
                 x2 = max(x1+1, min(x2, w))
                 y2 = max(y1+1, min(y2, h))
                 
-                # Extract mask
                 mask = obj['mask']
-                
-                # Crop frame and mask to bounding box
                 cropped_frame = frame[y1:y2, x1:x2]
                 cropped_mask = mask[y1:y2, x1:x2]
                 
-                # Create masked image (object with transparent background)
                 if len(cropped_frame.shape) == 3:
-                    # Color image - add alpha channel
                     masked_image = np.zeros((cropped_frame.shape[0], cropped_frame.shape[1], 4), dtype=np.uint8)
                     masked_image[:, :, :3] = cropped_frame
-                    masked_image[:, :, 3] = cropped_mask * 255  # Alpha channel
+                    masked_image[:, :, 3] = cropped_mask * 255
                 else:
-                    # Grayscale - add alpha channel
                     masked_image = np.zeros((cropped_frame.shape[0], cropped_frame.shape[1], 2), dtype=np.uint8)
                     masked_image[:, :, 0] = cropped_frame
                     masked_image[:, :, 1] = cropped_mask * 255
                 
-                # Add to enhanced object data
                 enhanced_obj = obj.copy()
                 enhanced_obj.update({
                     'cropped_image': cropped_frame,
                     'masked_image': masked_image,
                     'cropped_mask': cropped_mask
                 })
-                
                 enhanced_objects.append(enhanced_obj)
-                
-            except Exception as e:
-                logging.error(f"Failed to extract crop for object {obj.get('class_name', 'unknown')}: {e}")
-                # Add object without crops
+            except Exception:
                 enhanced_objects.append(obj.copy())
-        
         return enhanced_objects
     
     def create_combined_mask(self, objects: List[Dict[str, Any]], image_shape: Tuple[int, int]) -> np.ndarray:
-        """
-        Create a combined mask from multiple objects.
-        
-        Args:
-            objects: List of object dictionaries with masks
-            image_shape: Shape of the target image (height, width)
-            
-        Returns:
-            Combined binary mask
-        """
         if not objects:
             return np.zeros(image_shape[:2], dtype=np.uint8)
         
@@ -364,42 +219,12 @@ class Segmenter:
     
     def filter_objects_by_confidence(self, objects: List[Dict[str, Any]], 
                                    min_confidence: float) -> List[Dict[str, Any]]:
-        """
-        Filter objects by confidence threshold.
-        
-        Args:
-            objects: List of object dictionaries
-            min_confidence: Minimum confidence threshold
-            
-        Returns:
-            Filtered list of objects
-        """
         return [obj for obj in objects if obj.get('confidence', 0) >= min_confidence]
     
     def filter_objects_by_area(self, objects: List[Dict[str, Any]], 
                               min_area: int) -> List[Dict[str, Any]]:
-        """
-        Filter objects by minimum area.
-        
-        Args:
-            objects: List of object dictionaries
-            min_area: Minimum area in pixels
-            
-        Returns:
-            Filtered list of objects
-        """
         return [obj for obj in objects if obj.get('mask_area', 0) >= min_area]
     
     def filter_objects_by_class(self, objects: List[Dict[str, Any]], 
                                allowed_classes: List[str]) -> List[Dict[str, Any]]:
-        """
-        Filter objects by class names.
-        
-        Args:
-            objects: List of object dictionaries
-            allowed_classes: List of allowed class names
-            
-        Returns:
-            Filtered list of objects
-        """
         return [obj for obj in objects if obj.get('class_name') in allowed_classes]
