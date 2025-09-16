@@ -458,3 +458,39 @@ class Saver:
             return data.tolist()
         else:
             return data
+
+    @safe_execute("Panorama video encoding", {'success': False, 'error': 'encoding_failed'})
+    @track_performance
+    def save_panorama_video(self, frames: List[np.ndarray], output_path: str, fps: float, scene_number: int) -> Dict[str, Any]:
+        """
+        Save scene frames as a video for debugging purposes.
+        Takes the actual frames that were selected for a scene and encodes them
+        as a video using the same FFmpeg parameters as complex scenes.
+        
+        Args:
+            frames: List of scene frames in BGR format
+            output_path: Output video file path
+            fps: Video framerate
+            scene_number: Scene number for logging
+            
+        Returns:
+            Dictionary with save result
+        """
+        if not frames:
+            return {'success': False, 'error': 'No frames provided'}
+        
+        try:
+            logging.info(f"Creating scene video for scene {scene_number} with {len(frames)} frames")
+            
+            # Use the same encoding method as complex scenes
+            result = self.save_complex_scene_video(frames, output_path, fps, scene_number)
+            
+            if result['success']:
+                logging.info(f"Scene video saved: {output_path}")
+                result['frame_count'] = len(frames)
+            
+            return result
+            
+        except Exception as e:
+            logging.error(f"Failed to save scene video for scene {scene_number}: {e}")
+            return {'success': False, 'error': str(e)}

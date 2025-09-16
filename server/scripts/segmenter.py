@@ -137,7 +137,7 @@ class Segmenter:
             iou=self.iou_threshold,
             device=self.device,
             retina_masks=True,
-            max_det=0,  # Get all possible detections
+            # max_det=0 causes issues with YOLOE models - removed to allow unlimited detections
             classes=self.classes,
             imgsz=self.yolo_image_size,
             half=self.yolo_half_precision,

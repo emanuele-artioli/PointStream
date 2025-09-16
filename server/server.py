@@ -546,6 +546,7 @@ class PointStreamPipeline:
                 'segmentation_result': frame_segmentation_result,
                 'keypoint_result': keypoint_result,
                 'masked_frames': masked_frames,
+                'frames': frames,  # Include original frames for panorama video saving
                 'video_properties': {
                     'resolution': {'width': width, 'height': height},
                     'fps': scene_data.get('fps'),
@@ -793,9 +794,39 @@ class PointStreamPipeline:
             # Save panorama
             stitching_result = result.get('stitching_result', {})
             panorama = stitching_result.get('panorama')
+            homographies = stitching_result.get('homographies', [])
+            
             if panorama is not None:
+                # Save panorama image with configurable JPEG quality
+                panorama_quality = config.get_int('encoding', 'panorama_quality', 95)
                 panorama_path = output_path / "panoramas" / f"scene_{scene_number:04d}_panorama.jpg"
-                cv2.imwrite(str(panorama_path), panorama)
+                
+                # Use cv2.imwrite with JPEG quality parameter
+                cv2.imwrite(str(panorama_path), panorama, [cv2.IMWRITE_JPEG_QUALITY, panorama_quality])
+                logging.info(f"💾 Saved panorama image: {panorama_path} (quality: {panorama_quality})")
+                
+                # Save panorama as video for debugging if enabled
+                enable_panorama_video = config.get_bool('encoding', 'panorama_video_encoding', True)
+                if enable_panorama_video:
+                    panorama_video_path = output_path / "panoramas" / f"scene_{scene_number:04d}_panorama_background.mp4"
+                    
+                    # Get video fps from scene data or use default
+                    scene_fps = result.get('video_properties', {}).get('fps', 25.0)
+                    
+                    # Use the original frames from the scene
+                    scene_frames = result.get('frames', [])
+                    
+                    panorama_video_result = self.saver.save_panorama_video(
+                        scene_frames,  # Use actual scene frames
+                        str(panorama_video_path), 
+                        scene_fps, 
+                        scene_number
+                    )
+                    
+                    if panorama_video_result['success']:
+                        logging.info(f"💾 Saved panorama background video: {panorama_video_path}")
+                    else:
+                        logging.warning(f"Failed to save panorama video: {panorama_video_result.get('error', 'Unknown error')}")
             
             # Save objects (images, masks, keypoints) and comprehensive metadata
             self._save_scene_objects(result, output_path, scene_number)

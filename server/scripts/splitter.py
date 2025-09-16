@@ -566,14 +566,10 @@ class VideoSceneSplitter:
         
         # Apply quality control filters
         min_scene_duration = config.get_float('scene_detection', 'min_scene_duration', 0.5)
-        max_scene_duration = config.get_float('scene_detection', 'max_scene_duration', 300)
         
         if duration < min_scene_duration:
             logging.warning(f"Scene {scene_num} too short ({duration:.2f}s), skipping")
             return None
-        
-        if max_scene_duration > 0 and duration > max_scene_duration:
-            logging.warning(f"Scene {scene_num} too long ({duration:.2f}s), may need splitting")
         
         # Generate output filename using configuration
         filename_pattern = config.get_str('encoding', 'scene_filename_pattern', 'scene_{number:04d}.{extension}')
