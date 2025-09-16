@@ -54,9 +54,19 @@ class Stitcher:
     def stitch_scene(self, frames: List[np.ndarray], masks: Optional[List[np.ndarray]] = None) -> Dict[str, Any]:
         """Main stitching function implementing the top-down strategy."""
         if not frames or len(frames) == 0:
-            return {'scene_type': 'Complex', 'panorama': None, 'homographies': []}
+            return {
+                'scene_type': 'Complex', 
+                'panorama': None, 
+                'homographies': [],
+                'used_frame_indices': []
+            }
         if len(frames) == 1:
-            return {'scene_type': 'Static', 'panorama': frames[0], 'homographies': [np.eye(3)]}
+            return {
+                'scene_type': 'Static', 
+                'panorama': frames[0], 
+                'homographies': [np.eye(3)],
+                'used_frame_indices': [0]  # Single frame used
+            }
 
         # Store masks for use throughout stitching
         self.masks = masks or [None] * len(frames)
@@ -65,7 +75,12 @@ class Stitcher:
 
         if self._check_static_scene(frames)['is_static']:
             logging.info("Scene classified as Static")
-            return {'scene_type': 'Static', 'panorama': frames[0], 'homographies': [np.eye(3)] * len(frames)}
+            return {
+                'scene_type': 'Static', 
+                'panorama': frames[0], 
+                'homographies': [np.eye(3)] * len(frames),
+                'used_frame_indices': [0]  # Only first frame used for static scenes
+            }
 
         try:
             # STAGE 1: Recursively build panorama and get sparse homographies
@@ -73,21 +88,42 @@ class Stitcher:
 
             if panorama is None:
                 logging.warning("Top-down stitching failed, classifying scene as Complex.")
-                return {'scene_type': 'Complex', 'panorama': None, 'homographies': []}
+                return {
+                    'scene_type': 'Complex', 
+                    'panorama': None, 
+                    'homographies': [],
+                    'used_frame_indices': []
+                }
 
             # STAGE 2: Fill in the homographies for frames that were skipped
             final_homographies = self._fill_skipped_homographies(frames, panorama, sparse_homographies)
+
+            # Track which frames were actually used in the panorama creation
+            # These are frames where sparse_homographies[i] is not None
+            used_frame_indices = [i for i, h in enumerate(sparse_homographies) if h is not None]
 
             # STAGE 3: Apply temporal smoothing if enabled
             if self.enable_homography_smoothing:
                 final_homographies = self._smooth_homographies(final_homographies, self.smoothing_window_size)
             
             logging.info(f"Scene classified as Simple - Final panorama: {panorama.shape}")
-            return {'scene_type': 'Simple', 'panorama': panorama, 'homographies': final_homographies}
+            logging.info(f"Used {len(used_frame_indices)} of {len(frames)} frames for panorama: {used_frame_indices}")
+            
+            return {
+                'scene_type': 'Simple', 
+                'panorama': panorama, 
+                'homographies': final_homographies,
+                'used_frame_indices': used_frame_indices  # Add this information
+            }
 
         except Exception as e:
             logging.error(f"Stitching process failed with exception: {e}", exc_info=True)
-            return {'scene_type': 'Complex', 'panorama': None, 'homographies': []}
+            return {
+                'scene_type': 'Complex', 
+                'panorama': None, 
+                'homographies': [],
+                'used_frame_indices': []
+            }
 
     def _build_panorama_top_down(self, frames: List[np.ndarray]) -> Tuple[Optional[np.ndarray], Optional[List[np.ndarray]]]:
         """

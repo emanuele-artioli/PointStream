@@ -36,6 +36,7 @@ import torch
 import cv2
 import numpy as np
 from PIL import Image
+from diffusers import StableDiffusionInpaintPipeline
 
 # Import all PointStream components
 try:
@@ -117,6 +118,23 @@ class PointStreamPipeline:
             logging.info("   �🔍 Initializing Duplicate Filter...")
             self.duplicate_filter = DuplicateFilter()
 
+            # Initialize diffusion model for background reconstruction if enabled
+            if config.get_bool('stitching', 'use_background_reconstruction', False):
+                logging.info("   🎨 Initializing Diffusion Inpainting Model...")
+                try:
+                    device = "cuda" if torch.cuda.is_available() else "cpu"
+                    model_name = config.get_str('segmentation', 'diffusion_model', 'runwayml/stable-diffusion-inpainting')
+                    self.inpaint_pipeline = StableDiffusionInpaintPipeline.from_pretrained(
+                        model_name,
+                        torch_dtype=torch.float16 if device == "cuda" else torch.float32,
+                    ).to(device)
+                    logging.info(f"   ✅ Diffusion model '{model_name}' loaded on {device}")
+                except Exception as e:
+                    logging.warning(f"   ⚠️ Failed to load diffusion model: {e}")
+                    self.inpaint_pipeline = None
+            else:
+                self.inpaint_pipeline = None
+
             logging.info("✅ All components loaded successfully")
             
         except Exception as e:
@@ -159,10 +177,17 @@ class PointStreamPipeline:
         
         return masked_frame
     
-    def _create_masked_frames(self, frames: List[np.ndarray], segmentation_result: Dict[str, Any]) -> List[np.ndarray]:
+    def _create_masked_frames(self, frames: List[np.ndarray], segmentation_result: Dict[str, Any], 
+                            stitching_mode: bool = False) -> List[np.ndarray]:
         """
         Create masked frames with configurable background handling.
         Can use either background reconstruction or simple black masking.
+        
+        Args:
+            frames: Input frames
+            segmentation_result: Segmentation data with object masks
+            stitching_mode: If True, use simple/fast masking for stitching. 
+                          If False, use full reconstruction for final panorama.
         """
         use_reconstruction = config.get_bool('stitching', 'use_background_reconstruction', True)
         masked_frames = []
@@ -182,11 +207,12 @@ class PointStreamPipeline:
                     masked_frames.append(frame.copy())
                     continue
                 
-                if use_reconstruction:
+                if use_reconstruction and not stitching_mode:
                     # Create masked frame with background reconstruction
+                    # Note: This will be used for final panorama processing
                     masked_frame = self._reconstruct_background(frame, frame_data, frames, i)
                 else:
-                    # Use simple black masking (old method)
+                    # Use simple black masking (for stitching or when reconstruction disabled)
                     masked_frame = frame.copy()
                     for obj in frame_data.get('objects', []):
                         if 'mask' in obj:
@@ -205,7 +231,7 @@ class PointStreamPipeline:
     def _reconstruct_background(self, current_frame: np.ndarray, frame_data: Dict[str, Any], 
                                all_frames: List[np.ndarray], frame_idx: int) -> np.ndarray:
         """
-        Reconstruct background behind objects using content from other frames.
+        Reconstruct background behind objects using diffusion inpainting or temporal reconstruction.
         """
         reconstructed_frame = current_frame.copy()
         
@@ -219,7 +245,46 @@ class PointStreamPipeline:
         if np.sum(combined_mask) == 0:
             return reconstructed_frame
         
-        # Try to fill object areas using content from neighboring frames
+        # Use diffusion inpainting if available
+        if hasattr(self, 'inpaint_pipeline') and self.inpaint_pipeline is not None:
+            try:
+                # Convert frame and mask to PIL Images
+                frame_pil = Image.fromarray(cv2.cvtColor(current_frame, cv2.COLOR_BGR2RGB))
+                mask_pil = Image.fromarray(combined_mask * 255)  # Convert to 0-255 range
+                
+                # Get configuration parameters
+                prompt = config.get_str('segmentation', 'diffusion_prompt', 'clean indoor scene, natural lighting, photorealistic')
+                inference_steps = config.get_int('segmentation', 'diffusion_inference_steps', 20)
+                guidance_scale = config.get_float('segmentation', 'diffusion_guidance_scale', 7.5)
+                
+                # Resize for diffusion model (512x512 is standard)
+                original_size = frame_pil.size
+                frame_resized = frame_pil.resize((512, 512))
+                mask_resized = mask_pil.resize((512, 512))
+                
+                # Run diffusion inpainting
+                logging.info("Running diffusion inpainting for background reconstruction...")
+                result = self.inpaint_pipeline(
+                    prompt=prompt,
+                    image=frame_resized,
+                    mask_image=mask_resized,
+                    num_inference_steps=inference_steps,
+                    guidance_scale=guidance_scale
+                ).images[0]
+                
+                # Resize back to original size
+                result_resized = result.resize(original_size)
+                
+                # Convert back to BGR numpy array
+                reconstructed_frame = cv2.cvtColor(np.array(result_resized), cv2.COLOR_RGB2BGR)
+                
+                logging.info("✅ Diffusion background reconstruction completed")
+                return reconstructed_frame
+                
+            except Exception as e:
+                logging.warning(f"Diffusion inpainting failed: {e}, falling back to temporal reconstruction")
+        
+        # Fallback: Try to fill object areas using content from neighboring frames
         object_areas = combined_mask > 0
         
         # Strategy 1: Use neighboring frames (temporal reconstruction)
@@ -269,6 +334,130 @@ class PointStreamPipeline:
             reconstructed_frame = inpainted
         
         return reconstructed_frame
+    
+    def _reconstruct_panorama_background(self, panorama: np.ndarray, frames: List[np.ndarray], 
+                                       segmentation_result: Dict[str, Any], 
+                                       stitching_result: Dict[str, Any]) -> np.ndarray:
+        """
+        Apply background reconstruction to the final panorama using masks from frames 
+        that were actually used during stitching.
+        
+        Args:
+            panorama: The stitched panorama
+            frames: Original frames
+            segmentation_result: Segmentation data with object masks
+            stitching_result: Stitching result containing used_frame_indices
+            
+        Returns:
+            Panorama with background reconstruction applied
+        """
+        use_reconstruction = config.get_bool('stitching', 'use_background_reconstruction', True)
+        if not use_reconstruction:
+            return panorama
+            
+        # Get frames that were actually used for stitching
+        used_frame_indices = stitching_result.get('used_frame_indices', [])
+        if not used_frame_indices:
+            logging.warning("No used_frame_indices found in stitching result")
+            return panorama
+            
+        logging.info(f"Applying background reconstruction to panorama using {len(used_frame_indices)} frames: {used_frame_indices}")
+        
+        # Collect masks from only the used frames
+        frames_data = segmentation_result.get('frames_data', [])
+        combined_mask = np.zeros(panorama.shape[:2], dtype=np.uint8)
+        mask_found = False
+        
+        for frame_idx in used_frame_indices:
+            # Find frame data for this specific frame
+            frame_data = None
+            for fd in frames_data:
+                if fd.get('frame_index', -1) == frame_idx:
+                    frame_data = fd
+                    break
+                    
+            if frame_data and frame_data.get('objects'):
+                # Project masks from frame to panorama space using homography
+                homographies = stitching_result.get('homographies', [])
+                if frame_idx < len(homographies) and homographies[frame_idx] is not None:
+                    H = homographies[frame_idx]
+                    
+                    # Combine all object masks for this frame
+                    frame_mask = np.zeros(frames[frame_idx].shape[:2], dtype=np.uint8)
+                    for obj in frame_data.get('objects', []):
+                        if 'mask' in obj:
+                            obj_mask = obj['mask']
+                            frame_mask = cv2.bitwise_or(frame_mask, obj_mask.astype(np.uint8))
+                    
+                    if np.sum(frame_mask) > 0:
+                        # Transform mask to panorama space
+                        try:
+                            panorama_mask = cv2.warpPerspective(
+                                frame_mask, H, 
+                                (panorama.shape[1], panorama.shape[0])
+                            )
+                            combined_mask = cv2.bitwise_or(combined_mask, panorama_mask)
+                            mask_found = True
+                        except Exception as e:
+                            logging.warning(f"Failed to transform mask for frame {frame_idx}: {e}")
+        
+        if not mask_found or np.sum(combined_mask) == 0:
+            logging.info("No object masks found in used frames, returning original panorama")
+            return panorama
+            
+        # Apply diffusion inpainting to the panorama
+        if hasattr(self, 'inpaint_pipeline') and self.inpaint_pipeline is not None:
+            try:
+                # Convert panorama and mask to PIL Images
+                panorama_pil = Image.fromarray(cv2.cvtColor(panorama, cv2.COLOR_BGR2RGB))
+                mask_pil = Image.fromarray(combined_mask * 255)  # Convert to 0-255 range
+                
+                # Get configuration parameters
+                prompt = config.get_str('segmentation', 'diffusion_prompt', 'clean indoor scene, natural lighting, photorealistic')
+                inference_steps = config.get_int('segmentation', 'diffusion_inference_steps', 20)
+                guidance_scale = config.get_float('segmentation', 'diffusion_guidance_scale', 7.5)
+                
+                # Resize for diffusion model if needed (limit to reasonable size)
+                original_size = panorama_pil.size
+                max_size = 1024  # Maximum dimension for diffusion
+                
+                if max(original_size) > max_size:
+                    # Calculate new size maintaining aspect ratio
+                    ratio = max_size / max(original_size)
+                    new_size = (int(original_size[0] * ratio), int(original_size[1] * ratio))
+                    panorama_resized = panorama_pil.resize(new_size)
+                    mask_resized = mask_pil.resize(new_size)
+                else:
+                    panorama_resized = panorama_pil
+                    mask_resized = mask_pil
+                    new_size = original_size
+                
+                # Run diffusion inpainting
+                logging.info(f"Running diffusion inpainting on panorama ({new_size[0]}x{new_size[1]})...")
+                result = self.inpaint_pipeline(
+                    prompt=prompt,
+                    image=panorama_resized,
+                    mask_image=mask_resized,
+                    num_inference_steps=inference_steps,
+                    guidance_scale=guidance_scale
+                ).images[0]
+                
+                # Resize back to original size if needed
+                if new_size != original_size:
+                    result = result.resize(original_size)
+                
+                # Convert back to BGR numpy array
+                reconstructed_panorama = cv2.cvtColor(np.array(result), cv2.COLOR_RGB2BGR)
+                
+                logging.info("✅ Panorama background reconstruction completed")
+                return reconstructed_panorama
+                
+            except Exception as e:
+                logging.warning(f"Panorama diffusion inpainting failed: {e}, returning original panorama")
+                return panorama
+        else:
+            logging.info("Diffusion pipeline not available, returning original panorama")
+            return panorama
     
     def _cleanup_panorama_black_areas(self, panorama: np.ndarray) -> np.ndarray:
         """
@@ -494,10 +683,10 @@ class PointStreamPipeline:
             objects_count = sum(len(frame_data.get('objects', [])) for frame_data in frame_segmentation_result.get('frames_data', []))
             logging.info(f"   ✅ Frame segmentation completed in {step_time:.1f}s - Found {objects_count} objects")
             
-            # STEP 2: Create masked frames (overlay masks to hide objects)
-            logging.info(f"🎭 Scene {scene_number}: Step 2/4 - Creating masked frames...")
+            # STEP 2: Create masked frames for stitching (use simple/fast masking)
+            logging.info(f"🎭 Scene {scene_number}: Step 2/4 - Creating masked frames for stitching...")
             step_start = time.time()
-            masked_frames = self._create_masked_frames(frames, frame_segmentation_result)
+            masked_frames = self._create_masked_frames(frames, frame_segmentation_result, stitching_mode=True)
             step_time = time.time() - step_start
             logging.info(f"   ✅ Masked frames created in {step_time:.1f}s")
             
@@ -518,6 +707,15 @@ class PointStreamPipeline:
                 }
             
             panorama = stitching_result['panorama']
+            
+            # Apply smart background reconstruction to final panorama using only used frames
+            if panorama is not None and config.get_bool('stitching', 'use_background_reconstruction', True):
+                logging.info(f"🎨 Scene {scene_number}: Applying smart background reconstruction to panorama...")
+                step_start = time.time()
+                panorama = self._reconstruct_panorama_background(panorama, frames, frame_segmentation_result, stitching_result)
+                stitching_result['panorama'] = panorama  # Update with reconstructed panorama
+                step_time = time.time() - step_start
+                logging.info(f"   ✅ Background reconstruction completed in {step_time:.1f}s")
             
             # Clean up any remaining black areas in the panorama
             if panorama is not None and config.get_bool('stitching', 'enable_panorama_cleanup', True):
