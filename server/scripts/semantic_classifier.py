@@ -56,7 +56,12 @@ class SemanticClassifier:
             'fish', 'shark', 'whale', 'dolphin', 'salmon', 'goldfish',
             'rabbit', 'mouse', 'rat', 'hamster', 'guinea pig',
             'animal', 'mammal', 'creature', 'beast', 'wildlife',
-            'pet', 'livestock', 'fauna'
+            'pet', 'livestock', 'fauna', 'beaver', 'deer', 'fox',
+            'wolf', 'raccoon', 'squirrel', 'otter', 'badger', 'ferret',
+            'hedgehog', 'bat', 'moose', 'elk', 'bison', 'buffalo',
+            'kangaroo', 'koala', 'panda', 'monkey', 'ape', 'chimpanzee',
+            'gorilla', 'orangutan', 'lemur', 'sloth', 'anteater',
+            'armadillo', 'porcupine', 'skunk', 'chipmunk', 'marmot'
         ]
         
         # Cache for embeddings to avoid recomputation

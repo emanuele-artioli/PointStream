@@ -179,27 +179,59 @@ class PointStreamClient:
 
         for metadata_file in metadata_files:
             scene_data = self._load_scene_metadata(metadata_file)
+            scene_number = scene_data.get('scene_number', 1)
+            objects_dir = metadata_path / "objects" / f"scene_{scene_number:04d}"
             
-            # Extract objects by category
-            for obj in scene_data.get('objects', []):
+            # Extract objects by category - check multiple possible locations
+            objects = []
+            if 'objects' in scene_data:
+                objects = scene_data['objects']
+            elif 'keypoint_result' in scene_data and 'objects' in scene_data['keypoint_result']:
+                objects = scene_data['keypoint_result']['objects']
+            
+            for obj in objects:
                 category = obj.get('semantic_category', 'other')
-                object_id = obj.get('object_id')
+                track_id = obj.get('track_id')
+                frame_index = obj.get('frame_index', 0)
 
-                if not object_id:
-                    continue # Skip objects without an ID
+                if track_id is None:
+                    continue # Skip objects without a track ID
 
-                if category == 'human':
-                    human_objects.setdefault(object_id, []).append(obj)
-                elif category == 'animal':
-                    animal_objects.setdefault(object_id, []).append(obj)
-                else:
-                    other_objects.setdefault(object_id, []).append(obj)
+                # Create object ID based on track_id for grouping
+                object_id = f"track_{track_id}"
+                
+                # Enhance object data with file paths and computed data
+                enhanced_obj = obj.copy()
+                
+                # Find the corresponding image file
+                image_filename = f"{category}_track_{track_id}_frame_{frame_index:04d}.png"
+                image_path = objects_dir / image_filename
+                
+                if image_path.exists():
+                    enhanced_obj['cropped_image'] = str(image_path)
+                    
+                    # Generate appearance vector (simplified - could be enhanced with actual feature extraction)
+                    enhanced_obj['v_appearance'] = self._generate_appearance_vector(str(image_path))
+                    
+                    # Convert keypoints to the expected format for pose
+                    if 'keypoints' in obj and 'points' in obj['keypoints']:
+                        enhanced_obj['p_pose'] = {
+                            'points': obj['keypoints']['points'],
+                            'confidence_scores': obj['keypoints'].get('confidence_scores', [])
+                        }
+
+                    if category == 'human':
+                        human_objects.setdefault(object_id, []).append(enhanced_obj)
+                    elif category == 'animal':
+                        animal_objects.setdefault(object_id, []).append(enhanced_obj)
+                    else:
+                        other_objects.setdefault(object_id, []).append(enhanced_obj)
 
         # Sort object appearances by frame number to ensure consistent ordering
         for group in [human_objects, animal_objects, other_objects]:
             for object_id in group:
-                # Assuming 'frame' key exists in object dict for sorting
-                group[object_id].sort(key=lambda o: o.get('frame', 0))
+                # Sort by frame index
+                group[object_id].sort(key=lambda o: o.get('frame_index', 0))
         
         total_human_instances = sum(len(v) for v in human_objects.values())
         total_animal_instances = sum(len(v) for v in animal_objects.values())
@@ -215,6 +247,40 @@ class PointStreamClient:
             'animal_objects': animal_objects,
             'other_objects': other_objects
         }
+    
+    def _generate_appearance_vector(self, image_path: str) -> np.ndarray:
+        """
+        Generate a simple appearance vector from an image.
+        This is a placeholder - could be enhanced with proper feature extraction.
+        """
+        import cv2
+        import numpy as np
+        
+        try:
+            # Load image
+            img = cv2.imread(image_path)
+            if img is None:
+                return np.random.randn(2048).astype(np.float32)  # Fallback to random
+            
+            # Simple appearance features: resize, flatten, normalize
+            img_resized = cv2.resize(img, (64, 64))  
+            features = img_resized.flatten().astype(np.float32)
+            
+            # Pad or truncate to 2048 dimensions
+            if len(features) > 2048:
+                features = features[:2048]
+            elif len(features) < 2048:
+                padding = np.zeros(2048 - len(features), dtype=np.float32)
+                features = np.concatenate([features, padding])
+                
+            # Normalize
+            features = features / (np.linalg.norm(features) + 1e-8)
+            
+            return features
+            
+        except Exception as e:
+            logging.warning(f"Failed to generate appearance vector for {image_path}: {e}")
+            return np.random.randn(2048).astype(np.float32)  # Fallback to random
     
     @track_performance
     def reconstruct_scene(self, scene_data: Dict[str, Any]) -> Dict[str, Any]:

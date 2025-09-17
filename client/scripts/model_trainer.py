@@ -93,11 +93,12 @@ class ObjectDataset(Dataset):
         
         # Filter for valid objects that have all the necessary data
         self.valid_objects = []
-        for obj in objects_data:
-            if self._validate_object(obj):
-                self.valid_objects.append(obj)
+        for object_id, appearances in objects_data.items():
+            for obj in appearances:
+                if self._validate_object(obj):
+                    self.valid_objects.append(obj)
         
-        logging.info(f"📚 {category.capitalize()} dataset: {len(self.valid_objects)}/{len(objects_data)} valid objects")
+        logging.info(f"📚 {category.capitalize()} dataset: {len(self.valid_objects)}/{sum(len(appearances) for appearances in objects_data.values())} valid objects")
     
     def _validate_object(self, obj: Dict[str, Any]) -> bool:
         """Validate that an object has the required data for training."""
@@ -128,23 +129,41 @@ class ObjectDataset(Dataset):
         Returns:
             Tuple of (v_appearance, p_t, target_image)
         """
-        obj = self.valid_objects[idx]
+        # Get the training pair
+        ref_obj, target_obj = self.training_pairs[idx]
         
         # Load and process the target image (ground truth)
-        target_image = obj['cropped_image']
+        target_image = target_obj['cropped_image']
         if isinstance(target_image, str):
             target_image = cv2.imread(target_image)
         target_image = cv2.resize(target_image, (self.input_size, self.input_size))
         target_tensor = torch.from_numpy(target_image).float().permute(2, 0, 1) / 127.5 - 1.0
         
-        # Get the appearance vector
-        v_appearance = np.array(obj['v_appearance'])
+        # Get the appearance vector from reference object
+        v_appearance = np.array(ref_obj['v_appearance'])
         v_appearance_tensor = torch.from_numpy(v_appearance).float()
         
-        # Get the pose vector
-        p_pose_data = obj['p_pose'].get('points', [])
+        # Get the pose vector from target object (where we want to generate)
+        p_pose_data = target_obj['p_pose'].get('points', [])
         if self.category in ['human', 'animal']:
-            p_t = [coord for kp in p_pose_data for coord in kp]
+            # Only use x,y coordinates, skip confidence scores
+            p_t = [coord for kp in p_pose_data for coord in kp[:2]]
+            
+            # Pad or truncate to expected dimensions
+            if self.category == 'animal':
+                expected_dims = 60  # Expected by AnimalDiscriminator
+                if len(p_t) < expected_dims:
+                    # Pad with zeros
+                    p_t.extend([0.0] * (expected_dims - len(p_t)))
+                elif len(p_t) > expected_dims:
+                    # Truncate
+                    p_t = p_t[:expected_dims]
+            elif self.category == 'human':
+                expected_dims = 34  # Assuming 17 keypoints × 2 for human
+                if len(p_t) < expected_dims:
+                    p_t.extend([0.0] * (expected_dims - len(p_t)))
+                elif len(p_t) > expected_dims:
+                    p_t = p_t[:expected_dims]
         else:
             p_t = p_pose_data
         p_t_tensor = torch.tensor(p_t, dtype=torch.float32)
