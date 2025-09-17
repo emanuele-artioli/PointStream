@@ -372,15 +372,35 @@ class ModelTrainer:
                 
                 # Real images
                 real_pred = model.discriminate(target_image, p_t)
-                real_labels = torch.ones_like(real_pred).to(self.device)
-                real_loss = self.adversarial_loss(real_pred, real_labels)
+                # Handle both single tensor and tuple outputs
+                if isinstance(real_pred, tuple):
+                    # For "other" models that return (main_out, fine_out)
+                    real_main, real_fine = real_pred
+                    real_labels_main = torch.ones_like(real_main).to(self.device)
+                    real_labels_fine = torch.ones_like(real_fine).to(self.device)
+                    real_loss = (self.adversarial_loss(real_main, real_labels_main) + 
+                                self.adversarial_loss(real_fine, real_labels_fine)) / 2
+                else:
+                    # For single tensor output (animal, human models)
+                    real_labels = torch.ones_like(real_pred).to(self.device)
+                    real_loss = self.adversarial_loss(real_pred, real_labels)
                 
                 # Fake images
                 input_vec = torch.cat([v_appearance, p_t], dim=1)
                 fake_images = model.generator(input_vec)
                 fake_pred = model.discriminate(fake_images.detach(), p_t)
-                fake_labels = torch.zeros_like(fake_pred).to(self.device)
-                fake_loss = self.adversarial_loss(fake_pred, fake_labels)
+                # Handle both single tensor and tuple outputs
+                if isinstance(fake_pred, tuple):
+                    # For "other" models that return (main_out, fine_out)
+                    fake_main, fake_fine = fake_pred
+                    fake_labels_main = torch.zeros_like(fake_main).to(self.device)
+                    fake_labels_fine = torch.zeros_like(fake_fine).to(self.device)
+                    fake_loss = (self.adversarial_loss(fake_main, fake_labels_main) + 
+                                self.adversarial_loss(fake_fine, fake_labels_fine)) / 2
+                else:
+                    # For single tensor output (animal, human models)
+                    fake_labels = torch.zeros_like(fake_pred).to(self.device)
+                    fake_loss = self.adversarial_loss(fake_pred, fake_labels)
                 
                 disc_loss = (real_loss + fake_loss) / 2
                 disc_loss.backward()
@@ -391,7 +411,18 @@ class ModelTrainer:
                 
                 # Adversarial loss
                 fake_pred = model.discriminate(fake_images, p_t)
-                adv_loss = self.adversarial_loss(fake_pred, real_labels)
+                # Handle both single tensor and tuple outputs
+                if isinstance(fake_pred, tuple):
+                    # For "other" models that return (main_out, fine_out)
+                    fake_main, fake_fine = fake_pred
+                    fake_labels_main = torch.ones_like(fake_main).to(self.device)
+                    fake_labels_fine = torch.ones_like(fake_fine).to(self.device)
+                    adv_loss = (self.adversarial_loss(fake_main, fake_labels_main) + 
+                               self.adversarial_loss(fake_fine, fake_labels_fine)) / 2
+                else:
+                    # For single tensor output (animal, human models)
+                    fake_labels = torch.ones_like(fake_pred).to(self.device)
+                    adv_loss = self.adversarial_loss(fake_pred, fake_labels)
                 
                 # Reconstruction loss (L1)
                 recon_loss = self.reconstruction_loss(fake_images, target_image)
