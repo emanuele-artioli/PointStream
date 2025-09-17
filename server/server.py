@@ -335,128 +335,125 @@ class PointStreamPipeline:
         
         return reconstructed_frame
     
+    def _get_panorama_masks(self, panorama: np.ndarray) -> np.ndarray:
+        """
+        Run YOLO segmentation directly on the panorama to get properly aligned masks.
+        """
+        try:
+            if not hasattr(self, 'segmenter') or self.segmenter is None:
+                logging.warning("Segmenter not available for panorama masking")
+                return np.zeros((panorama.shape[0], panorama.shape[1]), dtype=np.uint8)
+            
+            # Run YOLO on panorama
+            logging.info("Running YOLO segmentation on panorama")
+            segmentation_result = self.segmenter.segment_frame(panorama, frame_index=0)
+            
+            # Create combined mask from all detected objects
+            combined_mask = np.zeros((panorama.shape[0], panorama.shape[1]), dtype=np.uint8)
+            
+            objects = segmentation_result.get('objects', [])
+            logging.info(f"Detected {len(objects)} objects in panorama")
+            
+            for obj in objects:
+                if 'mask' in obj:
+                    obj_mask = obj['mask']
+                    # Ensure binary mask
+                    obj_mask = np.where(obj_mask > 0, 255, 0).astype(np.uint8)
+                    combined_mask = cv2.bitwise_or(combined_mask, obj_mask)
+            
+            # Log mask coverage
+            mask_coverage = (np.sum(combined_mask > 0) / combined_mask.size) * 100
+            logging.info(f"Panorama mask covers {mask_coverage:.2f}% of image")
+            
+            return combined_mask
+            
+        except Exception as e:
+            logging.error(f"Failed to get panorama masks: {e}")
+            return np.zeros((panorama.shape[0], panorama.shape[1]), dtype=np.uint8)
+
+    def _apply_diffusion_inpainting(self, panorama: np.ndarray, mask: np.ndarray) -> np.ndarray:
+        """
+        Apply diffusion-based inpainting to remove objects from the panorama background.
+        """
+        try:
+            if not hasattr(self, 'diffusion_pipeline') or self.diffusion_pipeline is None:
+                logging.warning("Diffusion pipeline not available, falling back to OpenCV inpainting")
+                return self._apply_opencv_inpainting(panorama, mask)
+            
+            # Convert to PIL format for diffusion
+            panorama_pil = Image.fromarray(cv2.cvtColor(panorama, cv2.COLOR_BGR2RGB))
+            mask_pil = Image.fromarray(mask)
+            
+            # Get diffusion parameters from config
+            steps = config.get_int('segmentation', 'diffusion_inference_steps', 20)
+            guidance = config.get_float('segmentation', 'diffusion_guidance_scale', 7.5)
+            prompt = config.get_string('segmentation', 'diffusion_prompt', 
+                                     "natural outdoor background, trees, grass, landscape")
+            
+            logging.info(f"Applying diffusion inpainting with {steps} steps, guidance {guidance}")
+            
+            # Apply diffusion inpainting
+            result = self.diffusion_pipeline(
+                prompt=prompt,
+                image=panorama_pil,
+                mask_image=mask_pil,
+                num_inference_steps=steps,
+                guidance_scale=guidance
+            ).images[0]
+            
+            # Convert back to OpenCV format
+            result_cv = cv2.cvtColor(np.array(result), cv2.COLOR_RGB2BGR)
+            
+            logging.info("Diffusion inpainting completed successfully")
+            return result_cv
+            
+        except Exception as e:
+            logging.error(f"Diffusion inpainting failed: {e}")
+            return self._apply_opencv_inpainting(panorama, mask)
+
+    def _apply_opencv_inpainting(self, panorama: np.ndarray, mask: np.ndarray) -> np.ndarray:
+        """
+        Fallback OpenCV-based inpainting when diffusion is not available or fails.
+        """
+        try:
+            result = cv2.inpaint(panorama, mask, 3, cv2.INPAINT_TELEA)
+            logging.info("Applied OpenCV inpainting as fallback")
+            return result
+        except Exception as e:
+            logging.error(f"OpenCV inpainting failed: {e}")
+            return panorama
+
     def _reconstruct_panorama_background(self, panorama: np.ndarray, frames: List[np.ndarray], 
                                        segmentation_result: Dict[str, Any], 
                                        stitching_result: Dict[str, Any]) -> np.ndarray:
         """
-        Apply background reconstruction to the final panorama using masks from frames 
-        that were actually used during stitching.
-        
-        Args:
-            panorama: The stitched panorama
-            frames: Original frames
-            segmentation_result: Segmentation data with object masks
-            stitching_result: Stitching result containing used_frame_indices
-            
-        Returns:
-            Panorama with background reconstruction applied
+        Apply background reconstruction to the final panorama using direct panorama segmentation.
+        Conditionally applies diffusion inpainting based on use_background_reconstruction setting.
         """
-        use_reconstruction = config.get_bool('stitching', 'use_background_reconstruction', True)
-        if not use_reconstruction:
-            return panorama
+        try:
+            # Always get panorama masks for object removal (gives properly aligned masks)
+            combined_mask = self._get_panorama_masks(panorama)
             
-        # Get frames that were actually used for stitching
-        used_frame_indices = stitching_result.get('used_frame_indices', [])
-        if not used_frame_indices:
-            logging.warning("No used_frame_indices found in stitching result")
-            return panorama
-            
-        logging.info(f"Applying background reconstruction to panorama using {len(used_frame_indices)} frames: {used_frame_indices}")
-        
-        # Collect masks from only the used frames
-        frames_data = segmentation_result.get('frames_data', [])
-        combined_mask = np.zeros(panorama.shape[:2], dtype=np.uint8)
-        mask_found = False
-        
-        for frame_idx in used_frame_indices:
-            # Find frame data for this specific frame
-            frame_data = None
-            for fd in frames_data:
-                if fd.get('frame_index', -1) == frame_idx:
-                    frame_data = fd
-                    break
-                    
-            if frame_data and frame_data.get('objects'):
-                # Project masks from frame to panorama space using homography
-                homographies = stitching_result.get('homographies', [])
-                if frame_idx < len(homographies) and homographies[frame_idx] is not None:
-                    H = homographies[frame_idx]
-                    
-                    # Combine all object masks for this frame
-                    frame_mask = np.zeros(frames[frame_idx].shape[:2], dtype=np.uint8)
-                    for obj in frame_data.get('objects', []):
-                        if 'mask' in obj:
-                            obj_mask = obj['mask']
-                            frame_mask = cv2.bitwise_or(frame_mask, obj_mask.astype(np.uint8))
-                    
-                    if np.sum(frame_mask) > 0:
-                        # Transform mask to panorama space
-                        try:
-                            panorama_mask = cv2.warpPerspective(
-                                frame_mask, H, 
-                                (panorama.shape[1], panorama.shape[0])
-                            )
-                            combined_mask = cv2.bitwise_or(combined_mask, panorama_mask)
-                            mask_found = True
-                        except Exception as e:
-                            logging.warning(f"Failed to transform mask for frame {frame_idx}: {e}")
-        
-        if not mask_found or np.sum(combined_mask) == 0:
-            logging.info("No object masks found in used frames, returning original panorama")
-            return panorama
-            
-        # Apply diffusion inpainting to the panorama
-        if hasattr(self, 'inpaint_pipeline') and self.inpaint_pipeline is not None:
-            try:
-                # Convert panorama and mask to PIL Images
-                panorama_pil = Image.fromarray(cv2.cvtColor(panorama, cv2.COLOR_BGR2RGB))
-                mask_pil = Image.fromarray(combined_mask * 255)  # Convert to 0-255 range
-                
-                # Get configuration parameters
-                prompt = config.get_str('segmentation', 'diffusion_prompt', 'clean indoor scene, natural lighting, photorealistic')
-                inference_steps = config.get_int('segmentation', 'diffusion_inference_steps', 20)
-                guidance_scale = config.get_float('segmentation', 'diffusion_guidance_scale', 7.5)
-                
-                # Resize for diffusion model if needed (limit to reasonable size)
-                original_size = panorama_pil.size
-                max_size = 1024  # Maximum dimension for diffusion
-                
-                if max(original_size) > max_size:
-                    # Calculate new size maintaining aspect ratio
-                    ratio = max_size / max(original_size)
-                    new_size = (int(original_size[0] * ratio), int(original_size[1] * ratio))
-                    panorama_resized = panorama_pil.resize(new_size)
-                    mask_resized = mask_pil.resize(new_size)
-                else:
-                    panorama_resized = panorama_pil
-                    mask_resized = mask_pil
-                    new_size = original_size
-                
-                # Run diffusion inpainting
-                logging.info(f"Running diffusion inpainting on panorama ({new_size[0]}x{new_size[1]})...")
-                result = self.inpaint_pipeline(
-                    prompt=prompt,
-                    image=panorama_resized,
-                    mask_image=mask_resized,
-                    num_inference_steps=inference_steps,
-                    guidance_scale=guidance_scale
-                ).images[0]
-                
-                # Resize back to original size if needed
-                if new_size != original_size:
-                    result = result.resize(original_size)
-                
-                # Convert back to BGR numpy array
-                reconstructed_panorama = cv2.cvtColor(np.array(result), cv2.COLOR_RGB2BGR)
-                
-                logging.info("✅ Panorama background reconstruction completed")
-                return reconstructed_panorama
-                
-            except Exception as e:
-                logging.warning(f"Panorama diffusion inpainting failed: {e}, returning original panorama")
+            if np.sum(combined_mask > 0) == 0:
+                logging.info("No objects detected in panorama, returning original")
                 return panorama
-        else:
-            logging.info("Diffusion pipeline not available, returning original panorama")
+            
+            # Check if background reconstruction is enabled
+            use_reconstruction = config.get_bool('stitching', 'use_background_reconstruction', False)
+            
+            if use_reconstruction:
+                # Apply sophisticated diffusion inpainting
+                logging.info("Background reconstruction enabled - applying diffusion inpainting")
+                return self._apply_diffusion_inpainting(panorama, combined_mask)
+            else:
+                # Simple masking - just black out the objects
+                logging.info("Background reconstruction disabled - applying simple masking")
+                result = panorama.copy()
+                result[combined_mask > 0] = [0, 0, 0]  # Black out detected objects
+                return result
+            
+        except Exception as e:
+            logging.error(f"Panorama background reconstruction failed: {e}")
             return panorama
     
     def _cleanup_panorama_black_areas(self, panorama: np.ndarray) -> np.ndarray:

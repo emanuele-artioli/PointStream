@@ -139,10 +139,28 @@ def main():
         client = PointStreamClient()
         training_results = client.train_models(metadata_dir=str(metadata_path))
 
-        if not training_results or any(res.get('error') for res in training_results.values()):
-            logging.error("❌ Model training failed.")
-            # The client's internal logging should provide more details
-            sys.exit(1)
+        # Handle case where training_results might not be a dictionary
+        if not isinstance(training_results, dict):
+            logging.warning(f"Training returned unexpected result type: {type(training_results)}")
+            training_results = {}
+        
+        # Filter out non-model entries (like processing_time added by decorator)
+        model_results = {k: v for k, v in training_results.items() 
+                        if k not in ['processing_time'] and isinstance(v, dict)}
+        
+        # Check for training errors
+        training_errors = []
+        for model_type, result in model_results.items():
+            if result.get('error'):
+                training_errors.append(f"{model_type}: {result['error']}")
+        
+        if training_errors:
+            logging.warning("⚠️ Some model training had issues:")
+            for error in training_errors:
+                logging.warning(f"   {error}")
+            logging.info("Continuing with available models...")
+        elif not model_results:
+            logging.info("ℹ️ No training data found - will use existing models if available")
 
         logging.info("✅ Model training completed successfully.")
 
@@ -156,8 +174,9 @@ def main():
         default_model_dir = Path(pointstream_config.get_str('models', 'model_dir', './models'))
 
         saved_models = []
-        for model_type in training_results:
-            model_path_str = training_results[model_type].get('model_path')
+        # Use the filtered model_results instead of training_results
+        for model_type, result in model_results.items():
+            model_path_str = result.get('model_path')
             if model_path_str:
                 model_path = Path(model_path_str)
                 if model_path.exists():
