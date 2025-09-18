@@ -184,8 +184,16 @@ class ObjectGenerator:
         all_generated_objects = []
         
         for track_id, track_objects in object_tracks.items():
-            category = track_objects[0].get('semantic_category', 'other')
+            # Determine track category by consensus (majority vote)
+            categories = [obj.get('category', obj.get('semantic_category', 'other')) for obj in track_objects]
+            # Count categories and use the most common one
+            from collections import Counter
+            category_counts = Counter(categories)
+            category = category_counts.most_common(1)[0][0]  # Most frequent category
+            
             logging.info(f"   🎯 Track {track_id} ({category}): {len(track_objects)} frames")
+            if len(category_counts) > 1:
+                logging.info(f"      📊 Category distribution: {dict(category_counts)}")
             
             # Generate objects for this track
             track_generated = self._generate_track_objects(track_objects, category, scene_data)
@@ -293,18 +301,23 @@ class ObjectGenerator:
         
         return generated_objects
 
-    def _normalize_keypoints_to_standard_size(self, obj: Dict[str, Any], standard_size: int = 256) -> List[float]:
+    def _normalize_keypoints_to_standard_size(self, obj: Dict[str, Any], standard_size: int = 256, category: str = None) -> List[float]:
         """
         Normalize keypoints from original crop size to standard model input size.
+        Ensures fixed-size output based on object category.
         
         Args:
             obj: Object containing keypoints and crop_size
             standard_size: Target size for model input (e.g., 256)
+            category: Override category for normalization (uses track consensus)
             
         Returns:
-            Normalized keypoints scaled to standard_size
+            Normalized keypoints scaled to standard_size with fixed dimensions
         """
-        keypoints_data = obj.get('keypoints', {}).get('points', [])
+        keypoints_info = obj.get('keypoints', {})
+        keypoints_data = keypoints_info.get('points', [])
+        keypoints_method = keypoints_info.get('method', 'unknown')
+        
         if not keypoints_data:
             raise ValueError(f"No keypoints found for object {obj.get('object_id')}")
         
@@ -327,22 +340,74 @@ class ObjectGenerator:
         scale_x = standard_size / original_width
         scale_y = standard_size / original_height
         
-        # Normalize keypoints
-        normalized_keypoints = []
-        for kp in keypoints_data:
-            if len(kp) >= 3:  # [x, y, confidence]
-                x, y, conf = kp[0], kp[1], kp[2]
-                # Scale to standard size
-                norm_x = x * scale_x
-                norm_y = y * scale_y
-                normalized_keypoints.extend([norm_x, norm_y, conf])
-            elif len(kp) == 2:  # [x, y]
-                x, y = kp[0], kp[1]
-                norm_x = x * scale_x
-                norm_y = y * scale_y
-                normalized_keypoints.extend([norm_x, norm_y])
+        # Determine expected keypoint count based on provided category or object category
+        if category:
+            # Use provided category (track consensus)
+            use_category = category
+        else:
+            # Fall back to object's own category
+            use_category = obj.get('category', 'other')
+            
+        if use_category == 'human':
+            expected_keypoints = 17
+        elif use_category == 'animal':
+            expected_keypoints = 12
+        else:
+            # For other objects, default to a reasonable number for bbox-based data
+            expected_keypoints = 2  # Just use center points for bbox data
         
-        logging.debug(f"Normalized keypoints from {crop_size} to {standard_size}x{standard_size}")
+        # Initialize normalized keypoints with zeros (padding)
+        normalized_keypoints = [0.0] * (expected_keypoints * 3)
+        
+        # Handle different keypoint data formats
+        if keypoints_method == 'bbox_normalized':
+            # Keypoints are bbox coordinates: [x1, y1, x2, y2]
+            if len(keypoints_data) >= 4:
+                x1, y1, x2, y2 = keypoints_data[0], keypoints_data[1], keypoints_data[2], keypoints_data[3]
+                # Convert to center point and corner point (for "other" objects)
+                center_x = (x1 + x2) / 2.0
+                center_y = (y1 + y2) / 2.0
+                # Scale to standard size
+                norm_center_x = center_x * scale_x
+                norm_center_y = center_y * scale_y
+                norm_corner_x = x2 * scale_x
+                norm_corner_y = y2 * scale_y
+                
+                # First keypoint: center
+                normalized_keypoints[0] = norm_center_x
+                normalized_keypoints[1] = norm_center_y
+                normalized_keypoints[2] = 1.0  # Confidence
+                
+                # Second keypoint: corner (if we have space)
+                if expected_keypoints >= 2:
+                    normalized_keypoints[3] = norm_corner_x
+                    normalized_keypoints[4] = norm_corner_y
+                    normalized_keypoints[5] = 1.0  # Confidence
+        else:
+            # Traditional keypoint format: [[x, y, confidence], ...] or [[x, y], ...]
+            for i, kp in enumerate(keypoints_data):
+                if i >= expected_keypoints:
+                    break  # Don't exceed expected number
+                    
+                if isinstance(kp, (list, tuple)) and len(kp) >= 3:  # [x, y, confidence]
+                    x, y, conf = kp[0], kp[1], kp[2]
+                    # Scale to standard size
+                    norm_x = x * scale_x
+                    norm_y = y * scale_y
+                    base_idx = i * 3
+                    normalized_keypoints[base_idx] = norm_x
+                    normalized_keypoints[base_idx + 1] = norm_y
+                    normalized_keypoints[base_idx + 2] = conf
+                elif isinstance(kp, (list, tuple)) and len(kp) >= 2:  # [x, y]
+                    x, y = kp[0], kp[1]
+                    norm_x = x * scale_x
+                    norm_y = y * scale_y
+                    base_idx = i * 3
+                    normalized_keypoints[base_idx] = norm_x
+                    normalized_keypoints[base_idx + 1] = norm_y
+                    normalized_keypoints[base_idx + 2] = 1.0  # Default confidence
+        
+        logging.debug(f"Normalized {len(keypoints_data)} {keypoints_method} keypoints to fixed size {expected_keypoints} for {use_category}")
         return normalized_keypoints
 
     def _resize_generated_image(self, generated_image: np.ndarray, target_size: List[int]) -> np.ndarray:
@@ -382,7 +447,7 @@ class ObjectGenerator:
         # Normalize keypoints to standard size
         try:
             if category in ['human', 'animal']:
-                normalized_keypoints = self._normalize_keypoints_to_standard_size(obj, standard_size)
+                normalized_keypoints = self._normalize_keypoints_to_standard_size(obj, standard_size, category)
                 p_t = normalized_keypoints
             else:  # For 'other', use bbox normalized to standard size
                 bbox = obj.get('bbox', [0, 0, standard_size, standard_size])

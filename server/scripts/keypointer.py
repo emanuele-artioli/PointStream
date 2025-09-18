@@ -219,6 +219,10 @@ class Keypointer:
         for obj_data in objects_data:
             track_id = obj_data.get('track_id')
             semantic_category = obj_data.get('semantic_category', 'other')
+            
+            # Debug logging
+            if semantic_category != 'other':
+                logging.info(f"Processing object {obj_data.get('object_id', 'unknown')} with category: {semantic_category}")
 
             # Add the static appearance vector for this track
             if track_id in appearance_vectors:
@@ -228,18 +232,22 @@ class Keypointer:
             if semantic_category == 'human':
                 pose_vector = self._extract_human_keypoints(obj_data)
                 obj_data['p_pose'] = pose_vector
-                obj_data['pose_method'] = 'mmpose_human'
+                obj_data['pose_method'] = 'mmpose_human_fixed'
+                obj_data['keypoints'] = pose_vector  # Set keypoints for client compatibility
             elif semantic_category == 'animal':
                 pose_vector = self._extract_animal_keypoints(obj_data)
                 obj_data['p_pose'] = pose_vector
-                obj_data['pose_method'] = 'mmpose_animal'
+                obj_data['pose_method'] = 'mmpose_animal_fixed'
+                obj_data['keypoints'] = pose_vector  # Set keypoints for client compatibility
             else: # 'other' category
                 pose_vector = self._extract_bbox_pose(obj_data, frames)
                 obj_data['p_pose'] = pose_vector
                 obj_data['pose_method'] = 'bbox_normalized'
+                obj_data['keypoints'] = pose_vector  # Set keypoints for client compatibility
 
-            # For backward compatibility, we can store the pose vector in 'keypoints'
-            obj_data['keypoints'] = pose_vector
+            # Ensure the client can access the category information
+            obj_data['category'] = semantic_category
+            logging.debug(f"Set category for object {obj_data.get('object_id', 'unknown')}: {semantic_category}")
 
             processed_objects.append(obj_data)
 
@@ -294,12 +302,13 @@ class Keypointer:
     def _extract_human_keypoints(self, obj_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Extract human pose keypoints using MMPose.
+        Always returns exactly 17 keypoints for consistency.
         
         Args:
             obj_data: Object data dictionary with cropped/masked image
             
         Returns:
-            Dictionary with human keypoint data
+            Dictionary with human keypoint data (exactly 17 keypoints)
         """
         if not MMPOSE_AVAILABLE or self.human_model is None:
             # Fallback to bbox
@@ -318,18 +327,29 @@ class Keypointer:
             h, w = image.shape[:2]
             simulated_keypoints = self._generate_simulated_human_keypoints(w, h)
             
-            # Filter by confidence threshold
-            valid_keypoints = []
+            # Ensure exactly 17 keypoints (pad with zeros if needed)
+            fixed_keypoints = []
             confidence_scores = []
             
-            for i, (x, y, conf) in enumerate(simulated_keypoints):
-                if conf >= self.human_confidence_threshold:
-                    valid_keypoints.append([float(x), float(y), float(conf)])
-                    confidence_scores.append(float(conf))
+            for i in range(17):  # Always process exactly 17 keypoints
+                if i < len(simulated_keypoints):
+                    x, y, conf = simulated_keypoints[i]
+                    if conf >= self.human_confidence_threshold:
+                        # Use valid keypoint
+                        fixed_keypoints.append([float(x), float(y), float(conf)])
+                        confidence_scores.append(float(conf))
+                    else:
+                        # Use invalid keypoint with zero confidence
+                        fixed_keypoints.append([0.0, 0.0, 0.0])
+                        confidence_scores.append(0.0)
+                else:
+                    # Pad missing keypoints with zeros
+                    fixed_keypoints.append([0.0, 0.0, 0.0])
+                    confidence_scores.append(0.0)
             
             return {
-                'points': valid_keypoints,
-                'method': 'mmpose_human',
+                'points': fixed_keypoints,
+                'method': 'mmpose_human_fixed',
                 'confidence_scores': confidence_scores,
             }
             
@@ -340,12 +360,13 @@ class Keypointer:
     def _extract_animal_keypoints(self, obj_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Extract animal pose keypoints using MMPose.
+        Always returns exactly 12 keypoints for consistency.
         
         Args:
             obj_data: Object data dictionary with cropped/masked image
             
         Returns:
-            Dictionary with animal keypoint data
+            Dictionary with animal keypoint data (exactly 12 keypoints)
         """
         if not MMPOSE_AVAILABLE or self.animal_model is None:
             # Fallback to bbox
@@ -364,18 +385,29 @@ class Keypointer:
             h, w = image.shape[:2]
             simulated_keypoints = self._generate_simulated_animal_keypoints(w, h)
             
-            # Filter by confidence threshold
-            valid_keypoints = []
+            # Ensure exactly 12 keypoints (pad with zeros if needed)
+            fixed_keypoints = []
             confidence_scores = []
             
-            for i, (x, y, conf) in enumerate(simulated_keypoints):
-                if conf >= self.animal_confidence_threshold:
-                    valid_keypoints.append([float(x), float(y), float(conf)])
-                    confidence_scores.append(float(conf))
+            for i in range(12):  # Always process exactly 12 keypoints
+                if i < len(simulated_keypoints):
+                    x, y, conf = simulated_keypoints[i]
+                    if conf >= self.animal_confidence_threshold:
+                        # Use valid keypoint
+                        fixed_keypoints.append([float(x), float(y), float(conf)])
+                        confidence_scores.append(float(conf))
+                    else:
+                        # Use invalid keypoint with zero confidence
+                        fixed_keypoints.append([0.0, 0.0, 0.0])
+                        confidence_scores.append(0.0)
+                else:
+                    # Pad missing keypoints with zeros
+                    fixed_keypoints.append([0.0, 0.0, 0.0])
+                    confidence_scores.append(0.0)
             
             return {
-                'points': valid_keypoints,
-                'method': 'mmpose_animal',
+                'points': fixed_keypoints,
+                'method': 'mmpose_animal_fixed',
                 'confidence_scores': confidence_scores,
             }
             

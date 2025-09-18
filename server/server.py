@@ -702,6 +702,7 @@ class PointStreamPipeline:
                         'class_name': obj.get('class_name', 'other'),  # This is now the semantic category
                         'original_class_name': obj.get('original_class_name', 'unknown'),
                         'semantic_category': obj.get('semantic_category', 'other'),
+                        'category': obj.get('category', obj.get('semantic_category', 'other')),  # For client compatibility
                         'semantic_confidence': obj.get('semantic_confidence', 0.0),
                         'classification_method': obj.get('classification_method', 'unknown'),
                         'track_id': obj.get('track_id'),
