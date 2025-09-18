@@ -57,7 +57,7 @@ def main():
     parser.add_argument(
         '--models-dir',
         type=str,
-        default='./trained_models',
+        default='./models',
         help="Directory to save the final trained models."
     )
     parser.add_argument(

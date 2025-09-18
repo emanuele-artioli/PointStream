@@ -127,6 +127,21 @@ class PointStreamClient:
         """
         logging.info("🎓 Starting model training phase...")
         
+        # Check if models already exist
+        from pathlib import Path
+        models_path = Path("./models")
+        animal_model = models_path / "animal_cgan.pth"
+        human_model = models_path / "human_cgan.pth" 
+        other_model = models_path / "other_cgan.pth"
+        
+        models_exist = animal_model.exists() or human_model.exists() or other_model.exists()
+        
+        if models_exist:
+            logging.info("✅ Found existing trained models, skipping training phase")
+            return {'status': 'skipped', 'reason': 'models_exist'}
+        
+        logging.info("🎓 No existing models found, starting training...")
+        
         # Load training data from metadata
         training_data = self._load_training_data(metadata_dir)
         

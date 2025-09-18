@@ -65,6 +65,50 @@ def setup_logging(log_level: str = "INFO"):
     print("=" * 80)
 
 
+def run_model_training(training_videos_dir: str, log_level: str = "INFO") -> bool:
+    """Run model training on a collection of training videos."""
+    print("\n" + "="*60)
+    print("PHASE 2: MODEL TRAINING (TRAINING VIDEOS → TRAINED MODELS)")
+    print("="*60)
+    
+    try:
+        import subprocess
+        import sys
+        
+        # Run the training pipeline on the training videos directory
+        training_command = [
+            sys.executable, 'train_pipeline.py',
+            training_videos_dir,
+            '--models-dir', './models',
+            '--log-level', log_level
+        ]
+        
+        print(f"🎓 Training models on videos from: {training_videos_dir}")
+        print(f"📋 Command: {' '.join(training_command)}")
+        
+        result = subprocess.run(training_command, cwd=Path(__file__).parent, check=True)
+        
+        print("✅ Model training completed successfully")
+        return True
+        
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Model training failed with exit code {e.returncode}")
+        return False
+    except Exception as e:
+        print(f"❌ Model training failed: {e}")
+        return False
+
+
+def check_models_exist() -> bool:
+    """Check if trained models already exist."""
+    models_path = Path("./models")
+    animal_model = models_path / "animal_cgan.pth"
+    human_model = models_path / "human_cgan.pth" 
+    other_model = models_path / "other_cgan.pth"
+    
+    return animal_model.exists() or human_model.exists() or other_model.exists()
+
+
 def run_server_processing(input_video: str, metadata_dir: str, 
                          server_config: str = None) -> bool:
     """Run server-side processing."""
@@ -204,20 +248,26 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-    # Full pipeline: server + client + quality assessment
-    python main.py input.mp4 --full-pipeline
+    # Full pipeline with model training (if models don't exist)
+    python main.py input.mp4 --full-pipeline --training-videos ./training_dataset
+    
+    # Full pipeline using existing models only
+    python main.py input.mp4 --full-pipeline --no-training
+    
+    # Full pipeline forcing model retraining
+    python main.py input.mp4 --full-pipeline --training-videos ./training_dataset --force-retrain
     
     # Server processing only
     python main.py input.mp4 --server-only --metadata-dir ./metadata
     
-    # Client processing only (requires existing metadata)
+    # Client processing only (requires existing metadata and models)
     python main.py --client-only --metadata-dir ./metadata --output-dir ./reconstructed
     
     # Quality assessment only
     python main.py input.mp4 --assess-quality ./reconstructed
     
     # Custom configurations
-    python main.py input.mp4 --full-pipeline --server-config ./server/config.ini --client-config ./client/config.ini
+    python main.py input.mp4 --full-pipeline --training-videos ./training_dataset --server-config ./server/config.ini --client-config ./client/config.ini
         """
     )
     
@@ -247,8 +297,12 @@ Examples:
                        help='Path to client configuration file')
     
     # Training options
+    parser.add_argument('--training-videos', metavar='TRAINING_DIR',
+                       help='Directory containing training videos for model training (required if models do not exist)')
     parser.add_argument('--no-training', action='store_true',
-                       help='Skip model training in client (use existing models)')
+                       help='Skip model training entirely (use existing models only)')
+    parser.add_argument('--force-retrain', action='store_true',
+                       help='Force retraining of models even if they exist')
     
     # Logging
     parser.add_argument('--log-level', default='INFO',
@@ -287,7 +341,7 @@ Examples:
                 
             # Run complete pipeline
             print("🚀 Starting FULL POINTSTREAM PIPELINE")
-            print("This will run: Server Processing → Client Processing → Quality Assessment")
+            print("This will run: Server Processing → Model Training (if needed) → Client Processing → Quality Assessment")
             
             # Phase 1: Server Processing
             success = run_server_processing(
@@ -300,19 +354,49 @@ Examples:
                 print("❌ Server processing failed, stopping pipeline")
                 sys.exit(1)
             
-            # Phase 2: Client Processing
+            # Phase 2: Model Training (if needed)
+            models_exist = check_models_exist()
+            
+            if args.force_retrain or (not models_exist and not args.no_training):
+                if not args.training_videos:
+                    print("❌ Error: Models do not exist and no training videos directory specified.")
+                    print("   Please provide --training-videos <directory> or use --no-training to skip model training.")
+                    sys.exit(1)
+                
+                if not Path(args.training_videos).exists():
+                    print(f"❌ Error: Training videos directory not found: {args.training_videos}")
+                    sys.exit(1)
+                
+                success = run_model_training(args.training_videos, args.log_level)
+                
+                if not success:
+                    print("❌ Model training failed, stopping pipeline")
+                    sys.exit(1)
+            else:
+                if models_exist:
+                    print("\n" + "="*60)
+                    print("PHASE 2: MODEL TRAINING (SKIPPED - MODELS EXIST)")
+                    print("="*60)
+                    print("✅ Found existing trained models, skipping training phase")
+                else:
+                    print("\n" + "="*60)
+                    print("PHASE 2: MODEL TRAINING (SKIPPED - NO-TRAINING FLAG)")
+                    print("="*60)
+                    print("⏭️ Skipping model training due to --no-training flag")
+            
+            # Phase 3: Client Processing (reconstruction only, no training)
             success = run_client_processing(
                 args.metadata_dir, 
                 args.output_dir, 
                 args.client_config,
-                not args.no_training
+                train_models=False  # Never train during client phase in full pipeline
             )
             
             if not success:
                 print("❌ Client processing failed, stopping pipeline")
                 sys.exit(1)
             
-            # Phase 3: Quality Assessment
+            # Phase 4: Quality Assessment
             success = assess_reconstruction_quality(
                 args.input_video, 
                 args.output_dir, 
