@@ -16,6 +16,8 @@ import torch.nn as nn
 from typing import Dict, List, Any, Optional, Tuple
 from pathlib import Path
 import json
+import torchvision.transforms as transforms
+from torchvision.models import resnet50, ResNet50_Weights
 
 try:
     from utils.decorators import track_performance
@@ -62,6 +64,9 @@ class ObjectGenerator:
         # Initialize models
         self._initialize_models()
         
+        # Initialize appearance feature extractor
+        self._initialize_feature_extractor()
+        
         logging.info("🤖 Object Generator initialized")
         logging.info(f"   Model type: {self.model_type}")
         logging.info(f"   Device: {self.device}")
@@ -92,8 +97,9 @@ class ObjectGenerator:
         
         # Initialize Animal model
         try:
-            # For animals: v_appearance (2048) + p_t (e.g., 20*3=60)
-            animal_vector_size = 2048 + config.get_int('models', 'animal_keypoint_channels', 20) * 3
+            # For animals: v_appearance (2048) + p_t (12*3=36) = 2084
+            # Note: Using 12 keypoints to match actual data from keypoint extraction
+            animal_vector_size = 2048 + config.get_int('models', 'animal_keypoint_channels', 12) * 3
             self.models['animal'] = AnimalCGAN(
                 input_size=self.animal_input_size,
                 vector_input_size=animal_vector_size
@@ -128,6 +134,34 @@ class ObjectGenerator:
             logging.error(f"Failed to initialize other model: {e}")
             self.models['other'] = None
     
+    def _initialize_feature_extractor(self):
+        """Initialize pre-trained CNN for appearance feature extraction."""
+        try:
+            # Use ResNet-50 pre-trained on ImageNet for robust feature extraction
+            self.feature_extractor = resnet50(weights=ResNet50_Weights.IMAGENET1K_V2)
+            
+            # Remove the final classification layer to get features
+            self.feature_extractor = nn.Sequential(*list(self.feature_extractor.children())[:-1])
+            
+            # Set to evaluation mode
+            self.feature_extractor.eval()
+            self.feature_extractor.to(self.device)
+            
+            # Define image preprocessing pipeline
+            self.transform = transforms.Compose([
+                transforms.ToPILImage(),
+                transforms.Resize((224, 224)),  # ResNet input size
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # ImageNet normalization
+            ])
+            
+            logging.info("   ✅ Initialized ResNet-50 feature extractor for appearance vectors")
+            
+        except Exception as e:
+            logging.error(f"Failed to initialize feature extractor: {e}")
+            self.feature_extractor = None
+            self.transform = None
+    
     @track_performance
     def generate_objects(self, scene_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -154,7 +188,7 @@ class ObjectGenerator:
             logging.info(f"   🎯 Track {track_id} ({category}): {len(track_objects)} frames")
             
             # Generate objects for this track
-            track_generated = self._generate_track_objects(track_objects, category)
+            track_generated = self._generate_track_objects(track_objects, category, scene_data)
             all_generated_objects.extend(track_generated)
         
         processing_time = time.time() - start_time
@@ -195,17 +229,21 @@ class ObjectGenerator:
         return tracks
     
     def _generate_track_objects(self, track_objects: List[Dict[str, Any]], 
-                              category: str) -> List[Dict[str, Any]]:
+                              category: str, scene_data: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
         Generate objects for a complete track using the new vector-based input.
         
         Args:
             track_objects: List of objects in the track (sorted by frame).
             category: Object category (human, animal, other).
+            scene_data: Scene metadata including objects directory path.
             
         Returns:
             List of generated objects for each frame.
         """
+        # Store objects directory for appearance vector extraction
+        self._current_objects_dir = scene_data.get('objects_dir')
+        
         model = self.models.get(category)
         if model is None:
             logging.warning(f"No model available for category: {category}")
@@ -215,8 +253,31 @@ class ObjectGenerator:
         # (it should be the same for all objects in the track).
         v_appearance = track_objects[0].get('v_appearance')
         if v_appearance is None:
-            logging.warning(f"No appearance vector found for track {track_objects[0].get('track_id')}")
-            return self._generate_fallback_objects(track_objects)
+            # Try to extract appearance vector from the first image of the track
+            track_id = track_objects[0].get('track_id')
+            category = track_objects[0].get('semantic_category', 'other')
+            
+            # Get objects directory from scene data
+            objects_dir = self._current_objects_dir
+            
+            if objects_dir and track_id is not None:
+                # Construct path to first frame image
+                first_frame_image = Path(objects_dir) / f"{category}_track_{track_id}_frame_0000.png"
+                logging.info(f"Attempting to extract appearance vector from: {first_frame_image}")
+                
+                v_appearance = self._extract_appearance_vector_from_image(str(first_frame_image), track_objects)
+                
+                if v_appearance is not None:
+                    logging.info(f"✅ Successfully extracted appearance vector for track {track_id}")
+                    # Update all objects in the track with the extracted appearance vector
+                    for obj in track_objects:
+                        obj['v_appearance'] = v_appearance.tolist()
+                else:
+                    logging.warning(f"❌ Failed to extract appearance vector for track {track_id}")
+            
+            if v_appearance is None:
+                logging.warning(f"No appearance vector found for track {track_objects[0].get('track_id')} and could not extract from image")
+                return self._generate_fallback_objects(track_objects)
 
         v_appearance_tensor = torch.from_numpy(np.array(v_appearance)).float().to(self.device)
 
@@ -232,24 +293,126 @@ class ObjectGenerator:
         
         return generated_objects
 
+    def _normalize_keypoints_to_standard_size(self, obj: Dict[str, Any], standard_size: int = 256) -> List[float]:
+        """
+        Normalize keypoints from original crop size to standard model input size.
+        
+        Args:
+            obj: Object containing keypoints and crop_size
+            standard_size: Target size for model input (e.g., 256)
+            
+        Returns:
+            Normalized keypoints scaled to standard_size
+        """
+        keypoints_data = obj.get('keypoints', {}).get('points', [])
+        if not keypoints_data:
+            raise ValueError(f"No keypoints found for object {obj.get('object_id')}")
+        
+        # Get original crop size
+        crop_size = obj.get('crop_size', [standard_size, standard_size])
+        
+        # Handle different crop_size formats
+        if isinstance(crop_size, (int, float)):
+            # Square crop size
+            crop_size = [float(crop_size), float(crop_size)]
+        elif isinstance(crop_size, (list, tuple)) and len(crop_size) >= 2:
+            crop_size = [float(crop_size[0]), float(crop_size[1])]
+        else:
+            logging.warning(f"Invalid crop_size {crop_size}, using standard size")
+            crop_size = [float(standard_size), float(standard_size)]
+        
+        original_width, original_height = crop_size[0], crop_size[1]
+        
+        # Calculate scaling factors
+        scale_x = standard_size / original_width
+        scale_y = standard_size / original_height
+        
+        # Normalize keypoints
+        normalized_keypoints = []
+        for kp in keypoints_data:
+            if len(kp) >= 3:  # [x, y, confidence]
+                x, y, conf = kp[0], kp[1], kp[2]
+                # Scale to standard size
+                norm_x = x * scale_x
+                norm_y = y * scale_y
+                normalized_keypoints.extend([norm_x, norm_y, conf])
+            elif len(kp) == 2:  # [x, y]
+                x, y = kp[0], kp[1]
+                norm_x = x * scale_x
+                norm_y = y * scale_y
+                normalized_keypoints.extend([norm_x, norm_y])
+        
+        logging.debug(f"Normalized keypoints from {crop_size} to {standard_size}x{standard_size}")
+        return normalized_keypoints
+
+    def _resize_generated_image(self, generated_image: np.ndarray, target_size: List[int]) -> np.ndarray:
+        """
+        Resize generated image from standard size back to original crop size.
+        
+        Args:
+            generated_image: Generated image at standard size
+            target_size: Original crop size [width, height]
+            
+        Returns:
+            Resized image at target size
+        """
+        if not isinstance(target_size, (list, tuple)) or len(target_size) < 2:
+            return generated_image
+            
+        target_width, target_height = int(target_size[0]), int(target_size[1])
+        
+        # Resize using high-quality interpolation
+        resized_image = cv2.resize(generated_image, (target_width, target_height), interpolation=cv2.INTER_CUBIC)
+        
+        logging.debug(f"Resized generated image from {generated_image.shape[:2]} to {target_height}x{target_width}")
+        return resized_image
+
     def _generate_single_object(self, obj: Dict[str, Any], v_appearance_tensor: torch.Tensor,
                               category: str, model: nn.Module) -> Dict[str, Any]:
-        """Generate a single object using the new vector-based model."""
+        """Generate a single object using the new vector-based model with size standardization."""
         
-        # The pose vector is stored in the 'keypoints' field for backward compatibility
-        p_pose_data = obj.get('keypoints', {}).get('points', [])
-        if not p_pose_data:
-             raise ValueError(f"No pose vector (p_t) found for object {obj.get('object_id')}")
+        # Get standard model input size
+        if category == 'human':
+            standard_size = self.human_input_size
+        elif category == 'animal':
+            standard_size = self.animal_input_size
+        else:
+            standard_size = self.other_input_size
+        
+        # Normalize keypoints to standard size
+        try:
+            if category in ['human', 'animal']:
+                normalized_keypoints = self._normalize_keypoints_to_standard_size(obj, standard_size)
+                p_t = normalized_keypoints
+            else:  # For 'other', use bbox normalized to standard size
+                bbox = obj.get('bbox', [0, 0, standard_size, standard_size])
+                crop_size = obj.get('crop_size', [standard_size, standard_size])
+                
+                if len(bbox) >= 4 and len(crop_size) >= 2:
+                    # Normalize bbox to standard size
+                    scale_x = standard_size / crop_size[0]
+                    scale_y = standard_size / crop_size[1]
+                    norm_bbox = [bbox[0] * scale_x, bbox[1] * scale_y, 
+                               bbox[2] * scale_x, bbox[3] * scale_y]
+                    p_t = norm_bbox
+                else:
+                    p_t = [0, 0, standard_size, standard_size]
+                    
+        except Exception as e:
+            logging.warning(f"Keypoint normalization failed for object {obj.get('object_id')}: {e}")
+            # Fallback to original method
+            p_pose_data = obj.get('keypoints', {}).get('points', [])
+            if not p_pose_data:
+                raise ValueError(f"No pose vector (p_t) found for object {obj.get('object_id')}")
 
-        # For humans/animals, p_t is a list of [x, y, conf]. Flatten it.
-        if category in ['human', 'animal']:
-            p_t = [coord for kp in p_pose_data for coord in kp]
-        else: # For 'other', it's already a flat list [x, y, w, h]
-            p_t = p_pose_data
+            if category in ['human', 'animal']:
+                p_t = [coord for kp in p_pose_data for coord in kp]
+            else:
+                p_t = p_pose_data
 
         p_t_tensor = torch.tensor(p_t, dtype=torch.float32).to(self.device)
         
-        # Combine vectors and generate object
+        # Generate object at standard size
         model.eval()
         with torch.no_grad():
             # Add batch dimension
@@ -264,6 +427,12 @@ class ObjectGenerator:
             if generated_image.shape[0] == 3:
                 generated_image = np.transpose(generated_image, (1, 2, 0))
         
+        # Resize generated image back to original crop size
+        original_crop_size = obj.get('crop_size', [standard_size, standard_size])
+        if (original_crop_size[0] != standard_size or original_crop_size[1] != standard_size):
+            generated_image = self._resize_generated_image(generated_image, original_crop_size)
+            logging.debug(f"Resized object from {standard_size}x{standard_size} to {original_crop_size}")
+        
         # Create result object
         return {
             'object_id': obj.get('object_id'),
@@ -271,10 +440,42 @@ class ObjectGenerator:
             'track_id': obj.get('track_id'),
             'category': category,
             'bbox': obj.get('bbox', []),
+            'crop_size': original_crop_size,
             'generated_image': generated_image,
-            'generation_method': f'{category}_cgan_vector',
+            'generation_method': f'{category}_cgan_vector_standardized',
             'confidence': obj.get('confidence', 0.0)
         }
+    
+    def _create_fallback_object(self, obj: Dict[str, Any]) -> Dict[str, Any]:
+        """Create a fallback object when generation fails."""
+        category = obj.get('semantic_category', 'other')
+        
+        # Use original crop size if available, otherwise standard size
+        crop_size = obj.get('crop_size', [256, 256])
+        if isinstance(crop_size, (list, tuple)) and len(crop_size) >= 2:
+            width, height = int(crop_size[0]), int(crop_size[1])
+        else:
+            if category == 'human':
+                width = height = self.human_input_size
+            elif category == 'animal':
+                width = height = self.animal_input_size
+            else:
+                width = height = self.other_input_size
+
+        fallback_image = np.zeros((height, width, 3), dtype=np.uint8)
+
+        fallback_obj = {
+            'object_id': obj.get('object_id'),
+            'frame_index': obj.get('frame_index'),
+            'track_id': obj.get('track_id'),
+            'category': category,
+            'bbox': obj.get('bbox', []),
+            'crop_size': crop_size,
+            'generated_image': fallback_image,
+            'generation_method': 'fallback_error',
+            'confidence': 0.0
+        }
+        return fallback_obj
     
     def _generate_fallback_objects(self, track_objects: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Generate fallback objects (e.g., black squares) when a model fails or is unavailable."""
@@ -304,3 +505,157 @@ class ObjectGenerator:
             fallback_objects.append(fallback_obj)
         
         return fallback_objects
+
+    def _extract_appearance_vector_from_image(self, image_path: str, track_objects: List[Dict[str, Any]] = None) -> Optional[np.ndarray]:
+        """
+        Extract robust appearance vector from object image(s) using pre-trained CNN.
+        
+        Args:
+            image_path: Path to the first object image
+            track_objects: Optional list of all objects in track for multi-frame aggregation
+            
+        Returns:
+            2048-dimensional appearance vector, or None if extraction fails
+        """
+        try:
+            if self.feature_extractor is None:
+                logging.warning("Feature extractor not available, falling back to simple method")
+                return self._extract_simple_appearance_vector(image_path)
+            
+            # Strategy: Use multiple frames (if available) to create robust appearance representation
+            image_paths = [image_path]
+            
+            # If we have track objects, use multiple frames for better appearance representation
+            if track_objects and self._current_objects_dir:
+                track_id = track_objects[0].get('track_id')
+                category = track_objects[0].get('semantic_category', 'other')
+                
+                # Collect paths for first few frames to get diverse appearance samples
+                frame_indices = [0, len(track_objects)//4, len(track_objects)//2, 3*len(track_objects)//4, len(track_objects)-1]
+                frame_indices = list(set(frame_indices))  # Remove duplicates
+                frame_indices = [idx for idx in frame_indices if idx < len(track_objects)]
+                
+                image_paths = []
+                for frame_idx in frame_indices[:5]:  # Use up to 5 frames
+                    frame_image_path = Path(self._current_objects_dir) / f"{category}_track_{track_id}_frame_{frame_idx:04d}.png"
+                    if frame_image_path.exists():
+                        image_paths.append(str(frame_image_path))
+                
+                if image_paths:
+                    logging.info(f"Using {len(image_paths)} frames for robust appearance extraction")
+                else:
+                    image_paths = [image_path]  # Fallback to original
+            
+            # Extract features from all available images
+            all_features = []
+            
+            for img_path in image_paths:
+                if not Path(img_path).exists():
+                    continue
+                    
+                # Load and preprocess image
+                image = cv2.imread(img_path)
+                if image is None:
+                    continue
+                    
+                # Convert BGR to RGB
+                image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                
+                # Apply preprocessing
+                input_tensor = self.transform(image_rgb).unsqueeze(0).to(self.device)
+                
+                # Extract features using ResNet
+                with torch.no_grad():
+                    features = self.feature_extractor(input_tensor)
+                    # features shape: [1, 2048, 1, 1] -> flatten to [2048]
+                    features = features.squeeze().cpu().numpy()
+                    
+                all_features.append(features)
+            
+            if not all_features:
+                logging.warning(f"No valid images found for appearance extraction")
+                return None
+            
+            # Aggregate features from multiple frames
+            if len(all_features) == 1:
+                final_features = all_features[0]
+            else:
+                # Use mean aggregation for multi-frame features
+                final_features = np.mean(all_features, axis=0)
+                logging.info(f"Aggregated features from {len(all_features)} frames")
+            
+            # Ensure we have exactly 2048 dimensions
+            if final_features.shape[0] != 2048:
+                logging.warning(f"Unexpected feature dimension: {final_features.shape[0]}, expected 2048")
+                # Pad or truncate to 2048
+                if final_features.shape[0] > 2048:
+                    final_features = final_features[:2048]
+                else:
+                    padded = np.zeros(2048)
+                    padded[:final_features.shape[0]] = final_features
+                    final_features = padded
+            
+            # Normalize features
+            norm = np.linalg.norm(final_features)
+            if norm > 1e-8:
+                final_features = final_features / norm
+            
+            logging.debug(f"Extracted CNN appearance vector: shape {final_features.shape}, norm {np.linalg.norm(final_features):.4f}")
+            return final_features.astype(np.float32)
+            
+        except Exception as e:
+            logging.warning(f"CNN feature extraction failed for {image_path}: {e}")
+            # Fallback to simple method
+            return self._extract_simple_appearance_vector(image_path)
+    
+    def _extract_simple_appearance_vector(self, image_path: str) -> Optional[np.ndarray]:
+        """
+        Fallback method for appearance vector extraction using simple features.
+        
+        Args:
+            image_path: Path to the object image
+            
+        Returns:
+            2048-dimensional appearance vector, or None if extraction fails
+        """
+        try:
+            if not Path(image_path).exists():
+                logging.warning(f"Object image not found: {image_path}")
+                return None
+                
+            # Load and preprocess image
+            image = cv2.imread(image_path)
+            if image is None:
+                logging.warning(f"Failed to load image: {image_path}")
+                return None
+                
+            # Convert to RGB
+            image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            
+            # Resize to standard size and flatten for appearance features
+            image_resized = cv2.resize(image_rgb, (64, 64))  # 64*64*3 = 12288 values
+            
+            # Normalize to [0, 1]
+            image_normalized = image_resized.astype(np.float32) / 255.0
+            
+            # Flatten image
+            flattened = image_normalized.flatten()  # 12288 values
+            
+            # Pad or truncate to exactly 2048 dimensions
+            if len(flattened) > 2048:
+                appearance_vector = flattened[:2048]
+            else:
+                appearance_vector = np.zeros(2048, dtype=np.float32)
+                appearance_vector[:len(flattened)] = flattened
+            
+            # Normalize
+            norm = np.linalg.norm(appearance_vector)
+            if norm > 1e-8:
+                appearance_vector = appearance_vector / norm
+                
+            logging.debug(f"Extracted simple appearance vector from {image_path}: shape {appearance_vector.shape}")
+            return appearance_vector
+            
+        except Exception as e:
+            logging.warning(f"Failed to extract simple appearance vector from {image_path}: {e}")
+            return None

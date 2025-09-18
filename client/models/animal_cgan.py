@@ -3,7 +3,7 @@
 Animal cGAN Model
 
 Conditional GAN for generating animal figures from keypoints and reference images.
-Uses animal pose keypoint format (20 keypoints) for pose conditioning.
+Uses animal pose keypoint format (12 keypoints) for pose conditioning.
 """
 
 import torch
@@ -144,7 +144,8 @@ class AnimalCGAN(nn.Module):
         
         self.generator = AnimalGenerator(vector_input_size=vector_input_size, output_channels=3)
         
-        animal_pose_size = 20 * 3
+        # Calculate pose size from vector_input_size: total - appearance (2048)
+        animal_pose_size = vector_input_size - 2048
         self.discriminator = AnimalDiscriminator(input_channels=3, pose_vector_size=animal_pose_size)
         
         self._initialize_weights()
@@ -170,7 +171,7 @@ class AnimalCGAN(nn.Module):
         
         Args:
             v_appearance: Appearance vector [B, 2048]
-            p_t: Pose vector [B, 60]
+            p_t: Pose vector [B, 36] (12 keypoints × 3 coordinates)
             
         Returns:
             Generated image [B, 3, H, W]

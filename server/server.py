@@ -37,6 +37,8 @@ import cv2
 import numpy as np
 from PIL import Image
 from diffusers import StableDiffusionInpaintPipeline
+import torchvision.transforms as transforms
+from torchvision.models import resnet50, ResNet50_Weights
 
 # Import all PointStream components
 try:
@@ -134,12 +136,95 @@ class PointStreamPipeline:
                     self.inpaint_pipeline = None
             else:
                 self.inpaint_pipeline = None
+            
+            # Initialize appearance vector extractor
+            logging.info("   🧠 Initializing Appearance Vector Extractor...")
+            self._initialize_appearance_extractor()
 
             logging.info("✅ All components loaded successfully")
             
         except Exception as e:
             logging.error(f"Failed to initialize components: {e}")
             raise
+    
+    def _initialize_appearance_extractor(self):
+        """
+        Initialize the CNN-based appearance vector extractor for server-side processing.
+        Uses ResNet-50 pre-trained on ImageNet to extract rich 2048-dimensional features.
+        """
+        try:
+            # Import required libraries
+            import torchvision.models as models
+            import torchvision.transforms as transforms
+            
+            # Initialize ResNet-50 pre-trained feature extractor
+            self.appearance_extractor = models.resnet50(pretrained=True)
+            self.appearance_extractor = torch.nn.Sequential(*list(self.appearance_extractor.children())[:-1])
+            self.appearance_extractor.eval()
+            
+            # Standard preprocessing transforms
+            self.appearance_transform = transforms.Compose([
+                transforms.ToPILImage(),
+                transforms.Resize((256, 256)),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+            ])
+            
+            # Move to GPU if available
+            device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+            self.appearance_extractor = self.appearance_extractor.to(device)
+            self.device = device
+            
+            logging.info("✅ Initialized ResNet-50 appearance vector extractor")
+            
+        except Exception as e:
+            logging.error(f"Failed to initialize appearance extractor: {e}")
+            self.appearance_extractor = None
+            self.appearance_transform = None
+    
+    def _extract_appearance_vector(self, frame: np.ndarray, bbox: List[float]) -> Optional[np.ndarray]:
+        """
+        Extract CNN-based appearance vector from object crop.
+        
+        Args:
+            frame: Input frame
+            bbox: Bounding box [x1, y1, x2, y2]
+            
+        Returns:
+            2048-dimensional appearance vector or None if extraction fails
+        """
+        if self.appearance_extractor is None:
+            return None
+            
+        try:
+            # Crop object from frame
+            x1, y1, x2, y2 = map(int, bbox[:4])
+            h, w = frame.shape[:2]
+            x1, y1 = max(0, x1), max(0, y1)
+            x2, y2 = min(w, x2), min(h, y2)
+            
+            if x2 <= x1 or y2 <= y1:
+                return None
+                
+            crop = frame[y1:y2, x1:x2]
+            
+            # Convert BGR to RGB if needed
+            if len(crop.shape) == 3 and crop.shape[2] == 3:
+                crop = cv2.cvtColor(crop, cv2.COLOR_BGR2RGB)
+            
+            # Apply transforms
+            input_tensor = self.appearance_transform(crop).unsqueeze(0).to(self.device)
+            
+            # Extract features
+            with torch.no_grad():
+                features = self.appearance_extractor(input_tensor)
+                features = features.squeeze().cpu().numpy()
+                
+            return features
+            
+        except Exception as e:
+            logging.warning(f"Failed to extract appearance vector: {e}")
+            return None
     
     def _create_masked_frame_for_objects(self, frame: np.ndarray, objects: List[Dict[str, Any]]) -> np.ndarray:
         """
@@ -595,6 +680,21 @@ class PointStreamPipeline:
                 # Enhance objects with additional metadata
                 enhanced_objects = []
                 for obj in keypoint_result.get('objects', []):
+                    # Extract appearance vector from cropped image
+                    v_appearance = None
+                    cropped_image = obj.get('cropped_image')
+                    bbox = obj.get('bbox', [])
+                    frame_index = obj.get('frame_index', 0)
+                    
+                    if cropped_image is not None and len(bbox) >= 4 and frame_index < len(frames):
+                        # Extract appearance vector using server-side CNN
+                        v_appearance = self._extract_appearance_vector(frames[frame_index], bbox)
+                        if v_appearance is not None:
+                            logging.debug(f"✅ Extracted {len(v_appearance)}-dim appearance vector for object {obj.get('object_id', 'unknown')}")
+                    
+                    if v_appearance is None:
+                        logging.debug(f"⚠️ No appearance vector extracted for object {obj.get('object_id', 'unknown')}")
+                    
                     # Add detailed metadata for saving
                     enhanced_obj = {
                         'object_id': obj.get('object_id', 'unknown'),
@@ -612,6 +712,7 @@ class PointStreamPipeline:
                         'keypoints': obj.get('keypoints', []),
                         'segmentation_mask': obj.get('segmentation_mask'),
                         'cropped_image': obj.get('cropped_image'),
+                        'v_appearance': v_appearance.tolist() if v_appearance is not None else None,  # Add appearance vector
                         'processed_at': time.time(),
                         'has_keypoints': len(obj.get('keypoints', [])) > 0,
                         'mask_area': obj.get('mask_area', 0)
