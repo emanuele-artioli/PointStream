@@ -82,7 +82,7 @@ class ObjectGenerator:
             
             if Path(self.human_model_path).exists():
                 checkpoint = torch.load(self.human_model_path, map_location=self.device)
-                self.models['human'].load_state_dict(checkpoint['generator'])
+                self.models['human'].generator.load_state_dict(checkpoint['generator'])
                 logging.info(f"   ✅ Loaded human model: {self.human_model_path}")
             else:
                 logging.warning(f"   ⚠️ Human model not found: {self.human_model_path}")
@@ -101,7 +101,7 @@ class ObjectGenerator:
             
             if Path(self.animal_model_path).exists():
                 checkpoint = torch.load(self.animal_model_path, map_location=self.device)
-                self.models['animal'].load_state_dict(checkpoint['generator'])
+                self.models['animal'].generator.load_state_dict(checkpoint['generator'])
                 logging.info(f"   ✅ Loaded animal model: {self.animal_model_path}")
             else:
                 logging.warning(f"   ⚠️ Animal model not found: {self.animal_model_path}")
@@ -120,7 +120,7 @@ class ObjectGenerator:
             
             if Path(self.other_model_path).exists():
                 checkpoint = torch.load(self.other_model_path, map_location=self.device)
-                self.models['other'].load_state_dict(checkpoint['generator'])
+                self.models['other'].generator.load_state_dict(checkpoint['generator'])
                 logging.info(f"   ✅ Loaded other model: {self.other_model_path}")
             else:
                 logging.warning(f"   ⚠️ Other model not found: {self.other_model_path}")
@@ -173,8 +173,12 @@ class ObjectGenerator:
         """Group objects by track ID for consistent generation."""
         tracks = {}
         
-        # Load object data from scene metadata
+        # Load object data from scene metadata - check multiple possible locations
         objects = scene_data.get('objects', [])
+        if not objects and 'keypoint_result' in scene_data:
+            objects = scene_data['keypoint_result'].get('objects', [])
+        
+        logging.info(f"🔍 Found {len(objects)} objects in scene metadata")
         
         for obj in objects:
             track_id = obj.get('track_id', f"obj_{obj.get('object_id', 'unknown')}")

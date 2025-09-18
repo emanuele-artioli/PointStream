@@ -132,35 +132,75 @@ def main():
         # --- PHASE 2: MODEL TRAINING ---
         logging.info("--- PHASE 2: MODEL TRAINING (METADATA -> MODELS) ---")
 
-        # We need to setup the client's logging separately if we want to see its output
-        # This is a bit of a hack, but it re-initializes the logger for the client's format
-        setup_client_logging(args.log_level)
+        # Check if models already exist
+        models_path = Path("./models")
+        animal_model = models_path / "animal_cgan.pth"
+        human_model = models_path / "human_cgan.pth" 
+        other_model = models_path / "other_cgan.pth"
+        
+        models_exist = animal_model.exists() or human_model.exists() or other_model.exists()
+        
+        if models_exist:
+            logging.info("✅ Found existing trained models, skipping training phase")
+            training_results = {'status': 'skipped', 'reason': 'models_exist'}
+            model_results = {}  # Initialize empty dict when skipping training
+        else:
+            logging.info("🎓 No existing models found, starting training...")
+            # We need to setup the client's logging separately if we want to see its output
+            # This is a bit of a hack, but it re-initializes the logger for the client's format
+            setup_client_logging(args.log_level)
 
-        client = PointStreamClient()
-        training_results = client.train_models(metadata_dir=str(metadata_path))
+            client = PointStreamClient()
+            training_results = client.train_models(metadata_dir=str(metadata_path))
 
-        # Handle case where training_results might not be a dictionary
+            training_results = client.train_models(metadata_dir=str(metadata_path))
+
+            # Handle case where training_results might not be a dictionary
+            if not isinstance(training_results, dict):
+                logging.warning(f"Training returned unexpected result type: {type(training_results)}")
+                training_results = {}
+            
+            # Filter out non-model entries (like processing_time added by decorator)
+            model_results = {k: v for k, v in training_results.items() 
+                            if k not in ['processing_time'] and isinstance(v, dict)}
+            
+            # Check for training errors
+            training_errors = []
+            for model_type, result in model_results.items():
+                if result.get('error'):
+                    training_errors.append(f"{model_type}: {result['error']}")
+            
+            if training_errors:
+                logging.warning("⚠️ Some model training had issues:")
+                for error in training_errors:
+                    logging.warning(f"   {error}")
+                logging.info("Continuing with available models...")
+            elif not model_results:
+                logging.info("ℹ️ No training data found - will use existing models if available")
+
+        # Handle case where training_results might not be a dictionary (for both training and skipped cases)
         if not isinstance(training_results, dict):
             logging.warning(f"Training returned unexpected result type: {type(training_results)}")
             training_results = {}
         
-        # Filter out non-model entries (like processing_time added by decorator)
-        model_results = {k: v for k, v in training_results.items() 
-                        if k not in ['processing_time'] and isinstance(v, dict)}
-        
-        # Check for training errors
-        training_errors = []
-        for model_type, result in model_results.items():
-            if result.get('error'):
-                training_errors.append(f"{model_type}: {result['error']}")
-        
-        if training_errors:
-            logging.warning("⚠️ Some model training had issues:")
-            for error in training_errors:
-                logging.warning(f"   {error}")
-            logging.info("Continuing with available models...")
-        elif not model_results:
-            logging.info("ℹ️ No training data found - will use existing models if available")
+        # Filter out non-model entries for trained models only
+        if training_results.get('status') != 'skipped':
+            model_results = {k: v for k, v in training_results.items() 
+                            if k not in ['processing_time'] and isinstance(v, dict)}
+            
+            # Check for training errors
+            training_errors = []
+            for model_type, result in model_results.items():
+                if result.get('error'):
+                    training_errors.append(f"{model_type}: {result['error']}")
+            
+            if training_errors:
+                logging.warning("⚠️ Some model training had issues:")
+                for error in training_errors:
+                    logging.warning(f"   {error}")
+                logging.info("Continuing with available models...")
+            elif not model_results:
+                logging.info("ℹ️ No training data found - will use existing models if available")
 
         logging.info("✅ Model training completed successfully.")
 

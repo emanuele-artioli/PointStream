@@ -496,6 +496,12 @@ class PointStreamClient:
         if 'homographies' in scene_data:
             logging.info(f"📊 Found {len(scene_data['homographies'])} homography matrices for scene {scene_number}")
         
+        # Flatten objects from keypoint_result for easier access by object generator
+        if 'keypoint_result' in scene_data and 'objects' in scene_data['keypoint_result']:
+            if 'objects' not in scene_data:  # Don't overwrite if already exists
+                scene_data['objects'] = scene_data['keypoint_result']['objects']
+                logging.info(f"📦 Flattened {len(scene_data['objects'])} objects for processing")
+        
         return scene_data
     
     def _generate_reconstruction_summary(self, training_results: Dict[str, Any], 

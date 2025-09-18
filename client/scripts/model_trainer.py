@@ -159,7 +159,7 @@ class ObjectDataset(Dataset):
                     # Truncate
                     p_t = p_t[:expected_dims]
             elif self.category == 'human':
-                expected_dims = 34  # Assuming 17 keypoints × 2 for human
+                expected_dims = 51  # Expected by HumanDiscriminator
                 if len(p_t) < expected_dims:
                     p_t.extend([0.0] * (expected_dims - len(p_t)))
                 elif len(p_t) > expected_dims:

@@ -445,6 +445,7 @@ class Saver:
             cleaned = {}
             for key, value in data.items():
                 # Skip large binary data and unwanted data structures
+                # Note: v_appearance vectors are preserved as they're needed for reconstruction
                 if key in ['frames', 'cropped_image', 'segmentation_mask', 'panorama', 'masked_frames', 'segmentation_result']:
                     # Skip these entirely - don't include them in the JSON
                     continue
