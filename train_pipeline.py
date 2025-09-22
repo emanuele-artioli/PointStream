@@ -8,6 +8,11 @@ This script orchestrates the full training pipeline:
 3. Aggregates all the extracted data.
 4. Runs the client-side model training using the aggregated data.
 5. Saves the trained models to a specified directory.
+
+Features:
+- Caches processed video data to avoid reprocessing
+- Supports incremental dataset updates
+- Only processes new videos not in cache
 """
 
 import argparse
@@ -23,6 +28,7 @@ sys.path.insert(0, str(Path(__file__).parent.absolute()))
 
 try:
     from client.client import PointStreamClient, setup_logging as setup_client_logging
+    from utils.training_cache import TrainingDataCache
 except ImportError as e:
     print(f"Error: Failed to import client components: {e}")
     sys.exit(1)
@@ -72,10 +78,51 @@ def main():
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'],
         help='Logging level for the pipeline.'
     )
+    parser.add_argument(
+        '--cache-dir',
+        type=str,
+        default=None,
+        help="Directory to store training data cache. If not provided, uses default config location."
+    )
+    parser.add_argument(
+        '--skip-cache',
+        action='store_true',
+        help="Skip cache and reprocess all videos (useful for testing or cache invalidation)."
+    )
+    parser.add_argument(
+        '--cache-stats',
+        action='store_true',
+        help="Show cache statistics and exit."
+    )
+    parser.add_argument(
+        '--clear-cache',
+        action='store_true',
+        help="Clear the training cache and exit."
+    )
     args = parser.parse_args()
 
     setup_pipeline_logging(args.log_level)
     logging.info("🚀 Starting End-to-End Training Pipeline...")
+
+    # Initialize training cache
+    cache = TrainingDataCache(cache_dir=args.cache_dir)
+    
+    # Handle cache management commands
+    if args.cache_stats:
+        stats = cache.get_cache_stats()
+        logging.info("📊 Training Cache Statistics:")
+        logging.info(f"   Total videos: {stats['total_videos']}")
+        logging.info(f"   Total size: {stats['total_size_mb']:.1f} MB")
+        logging.info(f"   Total metadata files: {stats['total_metadata_files']}")
+        logging.info(f"   Cache directory: {stats['cache_directory']}")
+        logging.info(f"   Created: {stats['created']}")
+        logging.info(f"   Last updated: {stats['last_updated']}")
+        return
+    
+    if args.clear_cache:
+        cache.clear_cache()
+        logging.info("🗑️  Training cache cleared")
+        return
 
     # Determine metadata directory
     if args.metadata_dir:
@@ -109,23 +156,64 @@ def main():
 
         logging.info(f"Found {len(video_files)} video(s) to process.")
 
-        for i, video_file in enumerate(video_files):
-            logging.info(f"Processing video {i+1}/{len(video_files)}: {video_file.name}")
-            try:
-                server_command = [
-                    sys.executable, 'main.py',
-                    str(video_file),
-                    '--server-only',
-                    '--metadata-dir', str(metadata_path),
-                    '--log-level', args.log_level
-                ]
-                subprocess.run(server_command, check=True, capture_output=True, text=True)
-                logging.info(f"✅ Successfully processed {video_file.name}")
-            except subprocess.CalledProcessError as e:
-                logging.error(f"❌ Server processing failed for {video_file.name}.")
-                logging.error(f"Command: {' '.join(e.cmd)}")
-                logging.error(f"Stderr: {e.stderr}")
-                sys.exit(1)
+        # Check cache for existing videos
+        if args.skip_cache:
+            videos_to_process = video_files
+            logging.info("🔄 Skipping cache - will reprocess all videos")
+        else:
+            videos_to_process = cache.get_uncached_videos([str(f) for f in video_files])
+            videos_to_process = [Path(v) for v in videos_to_process]
+            
+            cached_count = len(video_files) - len(videos_to_process)
+            if cached_count > 0:
+                logging.info(f"📋 Found {cached_count} videos already cached")
+            if videos_to_process:
+                logging.info(f"🎬 Need to process {len(videos_to_process)} new videos")
+            else:
+                logging.info("✅ All videos already cached - no processing needed")
+
+        # Process uncached videos
+        for i, video_file in enumerate(videos_to_process):
+            logging.info(f"Processing video {i+1}/{len(videos_to_process)}: {video_file.name}")
+            
+            # Create temporary directory for this video's metadata
+            with tempfile.TemporaryDirectory(prefix=f"pointstream_{video_file.stem}_") as temp_video_dir:
+                try:
+                    server_command = [
+                        sys.executable, 'main.py',
+                        str(video_file),
+                        '--server-only',
+                        '--metadata-dir', temp_video_dir,
+                        '--log-level', args.log_level
+                    ]
+                    subprocess.run(server_command, check=True, capture_output=True, text=True)
+                    
+                    # Add processed video to cache
+                    processing_stats = {
+                        'processed_at': logging.Formatter().formatTime(logging.makeLogRecord({})),
+                        'processing_successful': True
+                    }
+                    cache.add_video_to_cache(str(video_file), temp_video_dir, processing_stats)
+                    
+                    logging.info(f"✅ Successfully processed and cached {video_file.name}")
+                    
+                except subprocess.CalledProcessError as e:
+                    logging.error(f"❌ Server processing failed for {video_file.name}.")
+                    logging.error(f"Command: {' '.join(e.cmd)}")
+                    logging.error(f"Stderr: {e.stderr}")
+                    sys.exit(1)
+
+        # Collect all training data from cache
+        logging.info("📦 Collecting training data from cache...")
+        training_metadata_dir, collection_stats = cache.collect_all_training_data()
+        
+        logging.info(f"📊 Training data collection stats:")
+        logging.info(f"   Videos: {collection_stats['total_videos']}")
+        logging.info(f"   Metadata files: {collection_stats['total_metadata_files']}")
+        
+        # Update metadata path to use collected data
+        metadata_path = Path(training_metadata_dir)
+        is_temp_metadata = True  # This is now a temporary collection
 
         logging.info("--- SERVER PROCESSING COMPLETE ---")
 
@@ -153,38 +241,12 @@ def main():
             client = PointStreamClient()
             training_results = client.train_models(metadata_dir=str(metadata_path))
 
-            training_results = client.train_models(metadata_dir=str(metadata_path))
-
             # Handle case where training_results might not be a dictionary
             if not isinstance(training_results, dict):
                 logging.warning(f"Training returned unexpected result type: {type(training_results)}")
                 training_results = {}
             
             # Filter out non-model entries (like processing_time added by decorator)
-            model_results = {k: v for k, v in training_results.items() 
-                            if k not in ['processing_time'] and isinstance(v, dict)}
-            
-            # Check for training errors
-            training_errors = []
-            for model_type, result in model_results.items():
-                if result.get('error'):
-                    training_errors.append(f"{model_type}: {result['error']}")
-            
-            if training_errors:
-                logging.warning("⚠️ Some model training had issues:")
-                for error in training_errors:
-                    logging.warning(f"   {error}")
-                logging.info("Continuing with available models...")
-            elif not model_results:
-                logging.info("ℹ️ No training data found - will use existing models if available")
-
-        # Handle case where training_results might not be a dictionary (for both training and skipped cases)
-        if not isinstance(training_results, dict):
-            logging.warning(f"Training returned unexpected result type: {type(training_results)}")
-            training_results = {}
-        
-        # Filter out non-model entries for trained models only
-        if training_results.get('status') != 'skipped':
             model_results = {k: v for k, v in training_results.items() 
                             if k not in ['processing_time'] and isinstance(v, dict)}
             
@@ -225,19 +287,27 @@ def main():
                     logging.info(f"Moved {model_path.name} to {dest_path}")
                     saved_models.append(dest_path)
 
-        if not saved_models:
-            logging.warning("Could not find any trained models to save.")
-        else:
-            logging.info(f"✅ All trained models saved to: {output_models_path.resolve()}")
+        logging.info("--- TRAINING COMPLETE ---")
 
-    finally:
-        # Clean up temporary directory if one was created
+        # --- CLEANUP ---
         if is_temp_metadata:
-            logging.info(f"Cleaning up temporary metadata directory: {metadata_path}")
-            temp_dir.cleanup()
+            logging.info(f"🗑️ Cleaning up temporary metadata collection directory: {metadata_path}")
+            import shutil
+            shutil.rmtree(metadata_path)
 
-    logging.info("✅ End-to-End Training Pipeline Finished.")
+        # Final cache statistics
+        logging.info("📊 Final cache statistics:")
+        stats = cache.get_cache_stats()
+        for key, value in stats.items():
+            logging.info(f"   {key.replace('_', ' ').title()}: {value}")
 
+        logging.info("🎉 Training pipeline completed successfully!")
+
+    except Exception as e:
+        logging.error(f"❌ Training pipeline failed: {e}")
+        import traceback
+        logging.error(traceback.format_exc())
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

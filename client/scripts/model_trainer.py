@@ -151,7 +151,7 @@ class ObjectDataset(Dataset):
             
             # Pad or truncate to expected dimensions
             if self.category == 'animal':
-                expected_dims = 60  # Expected by AnimalDiscriminator
+                expected_dims = 24  # 12 keypoints × 2 coordinates (x, y)
                 if len(p_t) < expected_dims:
                     # Pad with zeros
                     p_t.extend([0.0] * (expected_dims - len(p_t)))
@@ -159,13 +159,18 @@ class ObjectDataset(Dataset):
                     # Truncate
                     p_t = p_t[:expected_dims]
             elif self.category == 'human':
-                expected_dims = 51  # Expected by HumanDiscriminator
+                expected_dims = 34  # 17 keypoints × 2 coordinates (x, y)
                 if len(p_t) < expected_dims:
                     p_t.extend([0.0] * (expected_dims - len(p_t)))
                 elif len(p_t) > expected_dims:
                     p_t = p_t[:expected_dims]
-        else:
-            p_t = p_pose_data
+        else:  # 'other' category - extract just the 4 bbox coordinates
+            # p_pose_data is 4 points with [x, y, confidence] each
+            # Extract just the first 2 coordinates from the first 2 points: [x1, y1, x2, y2]
+            if len(p_pose_data) >= 2:
+                p_t = [p_pose_data[0][0], p_pose_data[0][1], p_pose_data[2][0], p_pose_data[2][1]]  # [x1, y1, x2, y2]
+            else:
+                p_t = [0.0, 0.0, 0.0, 0.0]  # Fallback bbox
         p_t_tensor = torch.tensor(p_t, dtype=torch.float32)
         
         return v_appearance_tensor, p_t_tensor, target_tensor
@@ -233,7 +238,7 @@ class ModelTrainer:
             return {'error': 'No valid human training data'}
         
         # Initialize model
-        human_vector_size = 2048 + config.get_int('models', 'human_keypoint_channels', 17) * 3
+        human_vector_size = 2048 + config.get_int('models', 'human_keypoint_channels', 17) * 2  # x,y only
         model = HumanCGAN(
             input_size=config.get_int('models', 'human_input_size', 256),
             vector_input_size=human_vector_size
@@ -273,7 +278,7 @@ class ModelTrainer:
             return {'error': 'No valid animal training data'}
         
         # Initialize model
-        animal_vector_size = 2048 + config.get_int('models', 'animal_keypoint_channels', 20) * 3
+        animal_vector_size = 2048 + config.get_int('models', 'animal_keypoint_channels', 12) * 2  # x,y only
         model = AnimalCGAN(
             input_size=config.get_int('models', 'animal_input_size', 256),
             vector_input_size=animal_vector_size

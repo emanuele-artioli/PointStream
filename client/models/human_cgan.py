@@ -100,7 +100,7 @@ class HumanGenerator(nn.Module):
 class HumanDiscriminator(nn.Module):
     """Discriminator network for human figures, conditioned on a pose vector."""
     
-    def __init__(self, input_channels: int = 3, pose_vector_size: int = 51, ndf: int = 64):
+    def __init__(self, input_channels: int = 3, pose_vector_size: int = 34, ndf: int = 64):
         """
         Initialize human discriminator.
         
@@ -169,7 +169,7 @@ class HumanCGAN(nn.Module):
         self.generator = HumanGenerator(vector_input_size=vector_input_size, output_channels=3)
         
         # Discriminator is now conditioned on the pose vector
-        human_pose_size = 17 * 3 # 17 keypoints, 3 values (x, y, conf)
+        human_pose_size = 17 * 2 # 17 keypoints, 2 values (x, y)
         self.discriminator = HumanDiscriminator(input_channels=3, pose_vector_size=human_pose_size)
         
         self._initialize_weights()

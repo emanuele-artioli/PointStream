@@ -89,13 +89,13 @@ class AnimalGenerator(nn.Module):
 class AnimalDiscriminator(nn.Module):
     """Discriminator network for animal figures, conditioned on a pose vector."""
     
-    def __init__(self, input_channels: int = 3, pose_vector_size: int = 60, ndf: int = 64):
+    def __init__(self, input_channels: int = 3, pose_vector_size: int = 24, ndf: int = 64):
         """
         Initialize animal discriminator.
         
         Args:
             input_channels: Number of input channels (3 for real/fake image).
-            pose_vector_size: Dimension of the pose vector p_t.
+            pose_vector_size: Dimension of the pose vector p_t (12 keypoints × 3 coordinates = 36).
             ndf: Number of discriminator filters.
         """
         super(AnimalDiscriminator, self).__init__()

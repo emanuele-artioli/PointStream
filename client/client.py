@@ -134,13 +134,27 @@ class PointStreamClient:
         human_model = models_path / "human_cgan.pth" 
         other_model = models_path / "other_cgan.pth"
         
-        models_exist = animal_model.exists() or human_model.exists() or other_model.exists()
+        # Check which models already exist
+        from pathlib import Path
+        models_path = Path("./models")
+        animal_model = models_path / "animal_cgan.pth"
+        human_model = models_path / "human_cgan.pth" 
+        other_model = models_path / "other_cgan.pth"
         
-        if models_exist:
-            logging.info("✅ Found existing trained models, skipping training phase")
-            return {'status': 'skipped', 'reason': 'models_exist'}
+        # Train only missing models
+        models_to_train = []
+        if not human_model.exists():
+            models_to_train.append('human')
+        if not animal_model.exists():
+            models_to_train.append('animal')
+        if not other_model.exists():
+            models_to_train.append('other')
         
-        logging.info("🎓 No existing models found, starting training...")
+        if not models_to_train:
+            logging.info("✅ All models already exist, skipping training phase")
+            return {'status': 'skipped', 'reason': 'all_models_exist'}
+        
+        logging.info(f"🎓 Training missing models: {', '.join(models_to_train)}")
         
         # Load training data from metadata
         training_data = self._load_training_data(metadata_dir)
@@ -148,32 +162,41 @@ class PointStreamClient:
         # Train models for each object type
         training_results = {}
         
-        # Train human model
-        if training_data.get('human_objects'):
+        # Train human model only if missing
+        if 'human' in models_to_train and training_data.get('human_objects'):
             logging.info("👤 Training human generation model...")
             human_result = self.model_trainer.train_human_model(
                 training_data['human_objects'], 
                 config_override=training_config
             )
             training_results['human'] = human_result
+        elif human_model.exists():
+            logging.info("👤 Human model already exists, skipping...")
+            training_results['human'] = {'status': 'skipped', 'reason': 'exists'}
         
-        # Train animal model
-        if training_data.get('animal_objects'):
+        # Train animal model only if missing
+        if 'animal' in models_to_train and training_data.get('animal_objects'):
             logging.info("🐾 Training animal generation model...")
             animal_result = self.model_trainer.train_animal_model(
                 training_data['animal_objects'], 
                 config_override=training_config
             )
             training_results['animal'] = animal_result
+        elif animal_model.exists():
+            logging.info("🐾 Animal model already exists, skipping...")
+            training_results['animal'] = {'status': 'skipped', 'reason': 'exists'}
         
-        # Train other objects model
-        if training_data.get('other_objects'):
+        # Train other objects model only if missing
+        if 'other' in models_to_train and training_data.get('other_objects'):
             logging.info("📦 Training other objects generation model...")
             other_result = self.model_trainer.train_other_model(
                 training_data['other_objects'], 
                 config_override=training_config
             )
             training_results['other'] = other_result
+        elif other_model.exists():
+            logging.info("📦 Other objects model already exists, skipping...")
+            training_results['other'] = {'status': 'skipped', 'reason': 'exists'}
         
         logging.info("✅ Model training completed")
         return training_results
