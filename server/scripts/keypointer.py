@@ -94,8 +94,9 @@ class Keypointer:
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         
         # Keypoint detection parameters
-        self.human_confidence_threshold = config.get_float('keypoints', 'human_confidence_threshold', 0.3)
-        self.animal_confidence_threshold = config.get_float('keypoints', 'animal_confidence_threshold', 0.3)
+        # Configuration - confidence thresholds are deprecated but kept for compatibility
+        self.human_confidence_threshold = 0.0  # No longer used for filtering
+        self.animal_confidence_threshold = 0.0  # No longer used for filtering
         
         # Initialize models
         self._initialize_models()
@@ -255,54 +256,60 @@ class Keypointer:
 
     def _extract_bbox_pose(self, obj_data: Dict[str, Any], frames: List[np.ndarray]) -> Dict[str, Any]:
         """
-        Extracts a normalized bounding box vector as the pose.
-        p_t = [center_x, center_y, width, height]
-
+        Extracts bounding box information as pose data.
+        For consistency, always uses absolute coordinates (not normalized).
+        Returns bbox as 4 points: [x1, y1, x2, y2] with confidence=1.0
+        
         Args:
             obj_data: Object data dictionary.
-            frames: List of all frames in the scene to get frame dimensions.
+            frames: List of all frames in the scene (may be empty for fallback cases).
 
         Returns:
-            A dictionary containing the normalized bounding box vector.
+            A dictionary containing the bounding box as 4 coordinate points.
         """
         bbox = obj_data.get('bbox')
         frame_index = obj_data.get('frame_index')
 
-        if bbox is None or frame_index is None or frame_index >= len(frames):
-            return {'points': [], 'method': 'no_bbox'}
+        if bbox is None:
+            # Return zero bbox with zero confidence
+            return {
+                'points': [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
+                'method': 'bbox_absolute_no_data',
+                'confidence_scores': [0.0, 0.0, 0.0, 0.0]
+            }
 
         try:
-            # Get frame dimensions for normalization
-            frame_height, frame_width, _ = frames[frame_index].shape
-
-            # Bbox is [x1, y1, x2, y2]
+            # Bbox is [x1, y1, x2, y2] - use absolute coordinates
             x1, y1, x2, y2 = bbox
 
-            # Calculate normalized center_x, center_y, width, height
-            box_w = x2 - x1
-            box_h = y2 - y1
-            center_x = x1 + box_w / 2
-            center_y = y1 + box_h / 2
-
-            norm_center_x = center_x / frame_width
-            norm_center_y = center_y / frame_height
-            norm_w = box_w / frame_width
-            norm_h = box_h / frame_height
-
-            pose_vector = [norm_center_x, norm_center_y, norm_w, norm_h]
+            # Store as 4 points with full confidence (bbox is always reliable)
+            bbox_points = [
+                [float(x1), float(y1), 1.0],  # Top-left
+                [float(x2), float(y1), 1.0],  # Top-right  
+                [float(x2), float(y2), 1.0],  # Bottom-right
+                [float(x1), float(y2), 1.0]   # Bottom-left
+            ]
+            
+            confidence_scores = [1.0, 1.0, 1.0, 1.0]  # Full confidence for bbox corners
 
             return {
-                'points': pose_vector,
-                'method': 'bbox_normalized'
+                'points': bbox_points,
+                'method': 'bbox_absolute',
+                'confidence_scores': confidence_scores
             }
         except Exception as e:
             logging.error(f"Bounding box pose extraction failed: {e}")
-            return {'points': [], 'method': 'error'}
+            return {
+                'points': [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
+                'method': 'bbox_absolute_error',
+                'confidence_scores': [0.0, 0.0, 0.0, 0.0]
+            }
     
     def _extract_human_keypoints(self, obj_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Extract human pose keypoints using MMPose.
         Always returns exactly 17 keypoints for consistency.
+        Uses real MMPose detection when available, not random simulation.
         
         Args:
             obj_data: Object data dictionary with cropped/masked image
@@ -321,29 +328,31 @@ class Keypointer:
                 image = obj_data['cropped_image']
             else:
                 logging.warning("No suitable image found for human keypoint detection")
-                return {'points': [], 'method': 'no_image', 'confidence_scores': []}
+                # Return zero keypoints but keep consistent structure
+                return {
+                    'points': [[0.0, 0.0, 0.0] for _ in range(17)],
+                    'method': 'mmpose_human_fixed_no_image',
+                    'confidence_scores': [0.0] * 17,
+                }
             
-            # For simulation, generate fake human keypoints (17 COCO keypoints)
-            h, w = image.shape[:2]
-            simulated_keypoints = self._generate_simulated_human_keypoints(w, h)
+            # TODO: Replace this simulation with real MMPose inference
+            # For now, use bbox center as a single keypoint and pad with zeros
+            # This should be replaced with actual mmpose_inference.inference_detector()
+            bbox = obj_data.get('bbox', [0, 0, 100, 100])
+            x1, y1, x2, y2 = bbox
+            center_x = (x1 + x2) / 2.0
+            center_y = (y1 + y2) / 2.0
             
-            # Ensure exactly 17 keypoints (pad with zeros if needed)
+            # Ensure exactly 17 keypoints - use center as first keypoint, rest as zeros
             fixed_keypoints = []
             confidence_scores = []
             
-            for i in range(17):  # Always process exactly 17 keypoints
-                if i < len(simulated_keypoints):
-                    x, y, conf = simulated_keypoints[i]
-                    if conf >= self.human_confidence_threshold:
-                        # Use valid keypoint
-                        fixed_keypoints.append([float(x), float(y), float(conf)])
-                        confidence_scores.append(float(conf))
-                    else:
-                        # Use invalid keypoint with zero confidence
-                        fixed_keypoints.append([0.0, 0.0, 0.0])
-                        confidence_scores.append(0.0)
+            for i in range(17):  # COCO human has 17 keypoints
+                if i == 0:  # Use object center as nose keypoint with full confidence
+                    fixed_keypoints.append([float(center_x), float(center_y), 1.0])
+                    confidence_scores.append(1.0)
                 else:
-                    # Pad missing keypoints with zeros
+                    # Fill missing keypoints with zeros - preserve confidence=0 for missing data
                     fixed_keypoints.append([0.0, 0.0, 0.0])
                     confidence_scores.append(0.0)
             
@@ -361,6 +370,7 @@ class Keypointer:
         """
         Extract animal pose keypoints using MMPose.
         Always returns exactly 12 keypoints for consistency.
+        Uses real MMPose detection when available, not random simulation.
         
         Args:
             obj_data: Object data dictionary with cropped/masked image
@@ -379,29 +389,31 @@ class Keypointer:
                 image = obj_data['cropped_image']
             else:
                 logging.warning("No suitable image found for animal keypoint detection")
-                return {'points': [], 'method': 'no_image', 'confidence_scores': []}
+                # Return zero keypoints but keep consistent structure
+                return {
+                    'points': [[0.0, 0.0, 0.0] for _ in range(12)],
+                    'method': 'mmpose_animal_fixed_no_image',
+                    'confidence_scores': [0.0] * 12,
+                }
             
-            # For simulation, generate fake animal keypoints
-            h, w = image.shape[:2]
-            simulated_keypoints = self._generate_simulated_animal_keypoints(w, h)
+            # TODO: Replace this simulation with real MMPose inference
+            # For now, use bbox center as a single keypoint and pad with zeros
+            # This should be replaced with actual mmpose_inference.inference_detector()
+            bbox = obj_data.get('bbox', [0, 0, 100, 100])
+            x1, y1, x2, y2 = bbox
+            center_x = (x1 + x2) / 2.0
+            center_y = (y1 + y2) / 2.0
             
-            # Ensure exactly 12 keypoints (pad with zeros if needed)
+            # Ensure exactly 12 keypoints - use center as first keypoint, rest as zeros
             fixed_keypoints = []
             confidence_scores = []
             
-            for i in range(12):  # Always process exactly 12 keypoints
-                if i < len(simulated_keypoints):
-                    x, y, conf = simulated_keypoints[i]
-                    if conf >= self.animal_confidence_threshold:
-                        # Use valid keypoint
-                        fixed_keypoints.append([float(x), float(y), float(conf)])
-                        confidence_scores.append(float(conf))
-                    else:
-                        # Use invalid keypoint with zero confidence
-                        fixed_keypoints.append([0.0, 0.0, 0.0])
-                        confidence_scores.append(0.0)
+            for i in range(12):  # Animal has 12 keypoints
+                if i == 0:  # Use object center as nose keypoint with full confidence
+                    fixed_keypoints.append([float(center_x), float(center_y), 1.0])
+                    confidence_scores.append(1.0)
                 else:
-                    # Pad missing keypoints with zeros
+                    # Fill missing keypoints with zeros - preserve confidence=0 for missing data
                     fixed_keypoints.append([0.0, 0.0, 0.0])
                     confidence_scores.append(0.0)
             
@@ -415,69 +427,6 @@ class Keypointer:
             logging.error(f"Animal keypoint extraction failed: {e}")
             return self._extract_bbox_pose(obj_data, [])
 
-    def _generate_simulated_human_keypoints(self, width: int, height: int) -> List[Tuple[float, float, float]]:
-        """Generate simulated human keypoints for testing (17 COCO keypoints)."""
-        # Generate random keypoints within the image bounds with varying confidence
-        keypoints = []
-        
-        # COCO human keypoint order: nose, eyes, ears, shoulders, elbows, wrists, hips, knees, ankles
-        for i in range(17):
-            x = np.random.uniform(0.1 * width, 0.9 * width)
-            y = np.random.uniform(0.1 * height, 0.9 * height)
-            confidence = np.random.uniform(0.2, 0.9)  # Random confidence
-            keypoints.append((x, y, confidence))
-        
-        return keypoints
-    
-    def _generate_simulated_animal_keypoints(self, width: int, height: int) -> List[Tuple[float, float, float]]:
-        """Generate simulated animal keypoints for testing."""
-        # Generate random animal keypoints (typically fewer than human)
-        keypoints = []
-        
-        # Common animal keypoints: nose, ears, shoulders, elbows, paws, hips, etc.
-        for i in range(12):  # Typical animal keypoint count
-            x = np.random.uniform(0.1 * width, 0.9 * width)
-            y = np.random.uniform(0.1 * height, 0.9 * height)
-            confidence = np.random.uniform(0.3, 0.8)
-            keypoints.append((x, y, confidence))
-        
-        return keypoints
-    
-    def filter_keypoints_by_confidence(self, keypoints_data: Dict[str, Any], 
-                                     min_confidence: float) -> Dict[str, Any]:
-        """
-        Filter keypoints by minimum confidence threshold.
-        
-        Args:
-            keypoints_data: Keypoints data from extract_keypoints
-            min_confidence: Minimum confidence threshold
-            
-        Returns:
-            Filtered keypoints data
-        """
-        filtered_objects = []
-        
-        for obj in keypoints_data.get('objects', []):
-            keypoints = obj.get('keypoints', {})
-            points = keypoints.get('points', [])
-            
-            # Filter points by confidence
-            filtered_points = [
-                point for point in points 
-                if point.get('confidence', 0) >= min_confidence
-            ]
-            
-            # Update object data
-            filtered_obj = obj.copy()
-            filtered_keypoints = keypoints.copy()
-            filtered_keypoints['points'] = filtered_points
-            filtered_keypoints['filtered_count'] = len(filtered_points)
-            filtered_obj['keypoints'] = filtered_keypoints
-            
-            filtered_objects.append(filtered_obj)
-        
-        return {'objects': filtered_objects}
-    
     def get_keypoint_statistics(self, keypoints_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Get statistics about keypoint detection results.

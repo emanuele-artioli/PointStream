@@ -360,9 +360,43 @@ class ObjectGenerator:
         normalized_keypoints = [0.0] * (expected_keypoints * 3)
         
         # Handle different keypoint data formats
-        if keypoints_method == 'bbox_normalized':
-            # Keypoints are bbox coordinates: [x1, y1, x2, y2]
-            if len(keypoints_data) >= 4:
+        if keypoints_method in ['bbox_normalized', 'bbox_absolute', 'bbox_absolute_no_data', 'bbox_absolute_error']:
+            # New consistent bbox format: 4 points with coordinates and confidence
+            # Each point is [x, y, confidence]
+            if len(keypoints_data) >= 4 and all(isinstance(pt, (list, tuple)) and len(pt) >= 2 for pt in keypoints_data):
+                # Extract bbox corners from 4 points format
+                points = keypoints_data[:4]  # Take first 4 points
+                
+                # Convert 4-point format back to bbox format for processing
+                x_coords = [pt[0] for pt in points]
+                y_coords = [pt[1] for pt in points]
+                x1, x2 = min(x_coords), max(x_coords)
+                y1, y2 = min(y_coords), max(y_coords)
+                
+                # Convert to center point and size (for "other" objects)
+                center_x = (x1 + x2) / 2.0
+                center_y = (y1 + y2) / 2.0
+                width = x2 - x1
+                height = y2 - y1
+                
+                # Scale to standard size
+                norm_center_x = center_x * scale_x
+                norm_center_y = center_y * scale_y
+                norm_width = width * scale_x
+                norm_height = height * scale_y
+                
+                # First keypoint: center
+                normalized_keypoints[0] = norm_center_x
+                normalized_keypoints[1] = norm_center_y
+                normalized_keypoints[2] = 1.0  # Confidence
+                
+                # Second keypoint: size representation (if we have space)
+                if expected_keypoints >= 2:
+                    normalized_keypoints[3] = norm_width
+                    normalized_keypoints[4] = norm_height
+                    normalized_keypoints[5] = 1.0  # Confidence
+            elif len(keypoints_data) >= 4 and all(isinstance(val, (int, float)) for val in keypoints_data):
+                # Legacy bbox format: [x1, y1, x2, y2] (flat values)
                 x1, y1, x2, y2 = keypoints_data[0], keypoints_data[1], keypoints_data[2], keypoints_data[3]
                 # Convert to center point and corner point (for "other" objects)
                 center_x = (x1 + x2) / 2.0
