@@ -117,6 +117,20 @@ class Segmenter:
             frames_data.append(frame_data)
         
         return {'frames_data': frames_data}
+    
+    @safe_execute("Frame segmentation", {'frame_index': 0, 'objects': [], 'masks': [], 'bounding_boxes': []})
+    def segment_frame(self, frame: np.ndarray, frame_index: int = 0) -> Dict[str, Any]:
+        """
+        Public method to segment a single frame.
+        
+        Args:
+            frame: Input frame
+            frame_index: Index of the frame (default: 0)
+            
+        Returns:
+            Dictionary with frame segmentation data
+        """
+        return self._segment_frame(frame, frame_index)
 
     @safe_execute("Frame segmentation", {'frame_index': 0, 'objects': [], 'masks': [], 'bounding_boxes': []})
     def _segment_frame(self, frame: np.ndarray, frame_index: int) -> Dict[str, Any]:
