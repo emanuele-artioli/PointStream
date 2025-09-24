@@ -31,19 +31,30 @@ class ResidualBlock(nn.Module):
 
 
 class HumanGenerator(nn.Module):
-    """Generator network for human figures from a concatenated appearance and pose vector."""
+    """Generator network for human figures from a concatenated appearance and pose vector with temporal context."""
     
-    def __init__(self, vector_input_size: int = 2099, output_channels: int = 3, ngf: int = 64, latent_dim: int = 512):
+    def __init__(self, vector_input_size: int = 2201, output_channels: int = 3, ngf: int = 64, 
+                 latent_dim: int = 512, temporal_frames: int = 0):
         """
         Initialize human generator.
         
         Args:
-            vector_input_size: Dimension of the concatenated input vector [v_appearance, p_t].
+            vector_input_size: Dimension of the concatenated input vector [v_appearance, p_t, temporal_context].
             output_channels: Number of output channels (3 for RGB).
             ngf: Number of generator filters.
             latent_dim: Dimension of the latent space to project the input vector to.
+            temporal_frames: Number of temporal frames included in input (0 = no temporal context).
         """
         super(HumanGenerator, self).__init__()
+        
+        # Store model metadata for compatibility checking
+        self.model_metadata = {
+            'vector_input_size': vector_input_size,
+            'temporal_frames': temporal_frames,
+            'keypoint_channels': 17,  # COCO human pose
+            'include_confidence': True,  # Will be set based on actual input
+            'model_version': '2.0'  # Version with temporal support
+        }
         
         # Mapping network to project the input vector into a latent space
         self.mapping_network = nn.Sequential(
@@ -83,6 +94,10 @@ class HumanGenerator(nn.Module):
             nn.Tanh()
         )
         
+    def get_model_metadata(self):
+        """Get model metadata for compatibility checking."""
+        return self.model_metadata.copy()
+        
     def forward(self, vec):
         # Map the input vector to the latent space
         latent_vec = self.mapping_network(vec)
@@ -98,18 +113,29 @@ class HumanGenerator(nn.Module):
 
 
 class HumanDiscriminator(nn.Module):
-    """Discriminator network for human figures, conditioned on a pose vector."""
+    """Discriminator network for human figures, conditioned on a pose vector with temporal context."""
     
-    def __init__(self, input_channels: int = 3, pose_vector_size: int = 34, ndf: int = 64):
+    def __init__(self, input_channels: int = 3, pose_vector_size: int = 34, ndf: int = 64, 
+                 temporal_frames: int = 0):
         """
         Initialize human discriminator.
         
         Args:
             input_channels: Number of input channels (3 for real/fake image).
-            pose_vector_size: Dimension of the pose vector p_t.
+            pose_vector_size: Dimension of the pose vector p_t (including temporal context).
             ndf: Number of discriminator filters.
+            temporal_frames: Number of temporal frames included in input.
         """
         super(HumanDiscriminator, self).__init__()
+        
+        # Store model metadata for compatibility checking
+        self.model_metadata = {
+            'pose_vector_size': pose_vector_size,
+            'temporal_frames': temporal_frames,
+            'keypoint_channels': 17,  # COCO human pose
+            'include_confidence': True,  # Will be set based on actual input
+            'model_version': '2.0'  # Version with temporal support
+        }
         
         self.pose_projection = nn.Sequential(
             nn.Linear(pose_vector_size, 256),
@@ -141,6 +167,10 @@ class HumanDiscriminator(nn.Module):
             nn.Conv2d(ndf * 8, 1, 4, 1, 0),
         )
         
+    def get_model_metadata(self):
+        """Get model metadata for compatibility checking."""
+        return self.model_metadata.copy()
+        
     def forward(self, input_img, pose_vector):
         # Project pose vector to a spatial map
         pose_map = self.pose_projection(pose_vector).view(-1, 1, 256, 256)
@@ -151,26 +181,47 @@ class HumanDiscriminator(nn.Module):
 
 
 class HumanCGAN(nn.Module):
-    """Complete Human cGAN model."""
+    """Complete Human cGAN model with temporal context support."""
     
-    def __init__(self, input_size: int = 256, vector_input_size: int = 2099):
+    def __init__(self, input_size: int = 256, vector_input_size: int = 2201, 
+                 temporal_frames: int = 0, include_confidence: bool = True):
         """
         Initialize Human cGAN.
         
         Args:
             input_size: Output image size.
-            vector_input_size: Dimension of the concatenated input vector [v_appearance, p_t].
+            vector_input_size: Dimension of the concatenated input vector [v_appearance, p_t, temporal_context].
+            temporal_frames: Number of temporal frames included in input.
+            include_confidence: Whether keypoint confidence is included in vectors.
         """
         super(HumanCGAN, self).__init__()
         
         self.input_size = input_size
         self.vector_input_size = vector_input_size
+        self.temporal_frames = temporal_frames
+        self.include_confidence = include_confidence
         
-        self.generator = HumanGenerator(vector_input_size=vector_input_size, output_channels=3)
+        self.generator = HumanGenerator(
+            vector_input_size=vector_input_size, 
+            output_channels=3,
+            temporal_frames=temporal_frames
+        )
         
-        # Discriminator is now conditioned on the pose vector
-        human_pose_size = 17 * 2 # 17 keypoints, 2 values (x, y)
-        self.discriminator = HumanDiscriminator(input_channels=3, pose_vector_size=human_pose_size)
+        # Calculate pose vector size based on configuration
+        keypoint_channels = 17  # COCO human pose
+        if include_confidence:
+            pose_channels_per_frame = keypoint_channels * 3  # x, y, confidence
+        else:
+            pose_channels_per_frame = keypoint_channels * 2  # x, y only
+            
+        # Include temporal frames in pose vector size
+        human_pose_size = pose_channels_per_frame * (1 + temporal_frames)
+        
+        self.discriminator = HumanDiscriminator(
+            input_channels=3, 
+            pose_vector_size=human_pose_size,
+            temporal_frames=temporal_frames
+        )
         
         self._initialize_weights()
     
@@ -184,6 +235,19 @@ class HumanCGAN(nn.Module):
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.normal_(m.weight.data, 1.0, 0.02)
                 nn.init.constant_(m.bias.data, 0)
+    
+    def get_model_metadata(self):
+        """Get comprehensive model metadata for compatibility checking."""
+        return {
+            'input_size': self.input_size,
+            'vector_input_size': self.vector_input_size,
+            'temporal_frames': self.temporal_frames,
+            'include_confidence': self.include_confidence,
+            'keypoint_channels': 17,  # COCO human pose
+            'model_version': '2.0',  # Version with temporal support
+            'generator_metadata': self.generator.get_model_metadata(),
+            'discriminator_metadata': self.discriminator.get_model_metadata()
+        }
     
     def forward(self, vec: torch.Tensor) -> torch.Tensor:
         """Forward pass through generator only (for inference)."""

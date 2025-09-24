@@ -48,8 +48,18 @@ def get_str(section: str, key: str, default: str = "") -> str:
 def get_int(section: str, key: str, default: int = 0) -> int:
     """Get integer value from config."""
     try:
+        # First try the standard method
         return config.getint(section, key)
-    except (configparser.NoSectionError, configparser.NoOptionError, ValueError):
+    except ValueError:
+        # If that fails, try manually parsing with comment handling
+        try:
+            raw_value = config.get(section, key)
+            # Remove inline comments
+            clean_value = raw_value.split('#')[0].strip()
+            return int(clean_value)
+        except (ValueError, configparser.NoSectionError, configparser.NoOptionError):
+            return default
+    except (configparser.NoSectionError, configparser.NoOptionError):
         return default
 
 def get_float(section: str, key: str, default: float = 0.0) -> float:

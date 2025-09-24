@@ -292,7 +292,6 @@ def main():
         # --- CLEANUP ---
         if is_temp_metadata:
             logging.info(f"🗑️ Cleaning up temporary metadata collection directory: {metadata_path}")
-            import shutil
             shutil.rmtree(metadata_path)
 
         # Final cache statistics

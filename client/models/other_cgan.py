@@ -62,19 +62,30 @@ class AttentionBlock(nn.Module):
 
 
 class OtherGenerator(nn.Module):
-    """Generator network for other objects from a concatenated appearance and pose vector."""
+    """Generator network for other objects from a concatenated appearance and pose vector with temporal context."""
     
-    def __init__(self, vector_input_size: int = 2052, output_channels: int = 3, ngf: int = 64, latent_dim: int = 512):
+    def __init__(self, vector_input_size: int = 2264, output_channels: int = 3, ngf: int = 64, 
+                 latent_dim: int = 512, temporal_frames: int = 0):
         """
         Initialize other objects generator.
         
         Args:
-            vector_input_size: Dimension of the concatenated input vector [v_appearance, p_t].
+            vector_input_size: Dimension of the concatenated input vector [v_appearance, p_t, temporal_context].
             output_channels: Number of output channels (3 for RGB).
             ngf: Number of generator filters.
             latent_dim: Dimension of the latent space to project the input vector to.
+            temporal_frames: Number of temporal frames included in input (0 = no temporal context).
         """
         super(OtherGenerator, self).__init__()
+        
+        # Store model metadata for compatibility checking
+        self.model_metadata = {
+            'vector_input_size': vector_input_size,
+            'temporal_frames': temporal_frames,
+            'keypoint_channels': 24,  # Enhanced other keypoints
+            'include_confidence': True,  # Will be set based on actual input
+            'model_version': '2.0'  # Version with temporal support and enhanced keypoints
+        }
         
         self.mapping_network = nn.Sequential(
             nn.Linear(vector_input_size, latent_dim),
@@ -110,6 +121,15 @@ class OtherGenerator(nn.Module):
             nn.Tanh()
         )
         
+    def get_model_metadata(self):
+        """Get generator metadata."""
+        return {
+            'type': 'OtherGenerator',
+            'vector_input_size': self.vector_input_size,
+            'image_size': self.image_size,
+            'ngf': self.ngf
+        }
+        
     def forward(self, vec):
         latent_vec = self.mapping_network(vec)
         initial_h = self.initial_projection(latent_vec)
@@ -121,13 +141,13 @@ class OtherGenerator(nn.Module):
 class OtherDiscriminator(nn.Module):
     """Discriminator network for other objects, conditioned on a pose vector."""
     
-    def __init__(self, input_channels: int = 3, pose_vector_size: int = 4, ndf: int = 64):
+    def __init__(self, input_channels: int = 3, pose_vector_size: int = 216, ndf: int = 64):
         """
         Initialize other objects discriminator.
         
         Args:
             input_channels: Number of input channels (3 for real/fake image).
-            pose_vector_size: Dimension of the pose vector p_t (bbox).
+            pose_vector_size: Dimension of the pose vector p_t (enhanced keypoints with temporal context).
             ndf: Number of discriminator filters.
         """
         super(OtherDiscriminator, self).__init__()
@@ -163,6 +183,15 @@ class OtherDiscriminator(nn.Module):
             nn.Conv2d(ndf * 2, 1, 3, 1, 1),
         )
         
+    def get_model_metadata(self):
+        """Get discriminator metadata."""
+        return {
+            'type': 'OtherDiscriminator',
+            'pose_vector_size': self.pose_vector_size,
+            'image_size': self.image_size,
+            'ndf': self.ndf
+        }
+        
     def forward(self, input_img, pose_vector):
         # Condition the main branch on the pose vector
         pose_map = self.pose_projection(pose_vector).view(-1, 1, 256, 256)
@@ -178,22 +207,30 @@ class OtherDiscriminator(nn.Module):
 class OtherCGAN(nn.Module):
     """Complete Other objects cGAN model."""
     
-    def __init__(self, input_size: int = 256, vector_input_size: int = 2052):
+    def __init__(self, input_size: int = 256, vector_input_size: int = 2264, 
+                 temporal_frames: int = 0, include_confidence: bool = True):
         """
         Initialize Other objects cGAN.
         
         Args:
             input_size: Output image size.
             vector_input_size: Dimension of the concatenated input vector [v_appearance, p_t].
+            temporal_frames: Number of temporal frames included in input (for metadata).
+            include_confidence: Whether confidence values are included in vectors (for metadata).
         """
         super(OtherCGAN, self).__init__()
         
         self.input_size = input_size
         self.vector_input_size = vector_input_size
+        self.temporal_frames = temporal_frames
+        self.include_confidence = include_confidence
         
-        self.generator = OtherGenerator(vector_input_size=vector_input_size, output_channels=3)
+        self.generator = OtherGenerator(vector_input_size=vector_input_size, 
+                                      output_channels=3, temporal_frames=temporal_frames)
         
-        other_pose_size = 4 # bbox
+        # Calculate pose vector size based on configuration
+        # For 'other' category: 24 keypoints * 3 coords * (1 + temporal_frames) = 24*3*3 = 216 with 2 temporal frames
+        other_pose_size = vector_input_size - 2048  # Subtract appearance vector size to get pose vector size
         self.discriminator = OtherDiscriminator(input_channels=3, pose_vector_size=other_pose_size)
         
         self._initialize_weights()
@@ -208,6 +245,19 @@ class OtherCGAN(nn.Module):
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.normal_(m.weight.data, 1.0, 0.02)
                 nn.init.constant_(m.bias.data, 0)
+    
+    def get_model_metadata(self):
+        """Get comprehensive model metadata for compatibility checking."""
+        return {
+            'input_size': self.input_size,
+            'vector_input_size': self.vector_input_size,
+            'temporal_frames': self.temporal_frames,
+            'include_confidence': self.include_confidence,
+            'keypoint_channels': 24,  # Enhanced other objects pose
+            'model_version': '2.0',  # Version with temporal support
+            'generator_metadata': self.generator.get_model_metadata(),
+            'discriminator_metadata': self.discriminator.get_model_metadata()
+        }
     
     def forward(self, vec: torch.Tensor) -> torch.Tensor:
         """Forward pass through generator only (for inference)."""

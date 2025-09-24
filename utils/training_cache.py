@@ -174,6 +174,12 @@ class TrainingDataCache:
                 # Copy any .json files
                 for json_file in metadata_path.glob("*.json"):
                     shutil.copy2(json_file, cache_metadata_dir)
+                
+                # Copy the objects directory (essential for training)
+                objects_dir = metadata_path / "objects"
+                if objects_dir.exists():
+                    cache_objects_dir = cache_metadata_dir / "objects"
+                    shutil.copytree(objects_dir, cache_objects_dir, dirs_exist_ok=True)
             
             # Create video cache entry
             video_info = {
@@ -263,14 +269,32 @@ class TrainingDataCache:
             if source_metadata_dir.exists():
                 # Copy metadata files
                 for metadata_file in source_metadata_dir.glob("*"):
-                    dest_file = temp_path / metadata_file.name
+                    if metadata_file.is_file():  # Only copy files, not directories
+                        dest_file = temp_path / metadata_file.name
+                        
+                        # Handle filename conflicts by prefixing with video hash
+                        if dest_file.exists():
+                            dest_file = temp_path / f"{video_hash[:8]}_{metadata_file.name}"
+                        
+                        shutil.copy2(metadata_file, dest_file)
+                        stats['total_metadata_files'] += 1
+                
+                # Copy objects directory if it exists
+                source_objects_dir = source_metadata_dir / "objects"
+                if source_objects_dir.exists():
+                    dest_objects_dir = temp_path / "objects"
+                    dest_objects_dir.mkdir(exist_ok=True)
                     
-                    # Handle filename conflicts by prefixing with video hash
-                    if dest_file.exists():
-                        dest_file = temp_path / f"{video_hash[:8]}_{metadata_file.name}"
-                    
-                    shutil.copy2(metadata_file, dest_file)
-                    stats['total_metadata_files'] += 1
+                    # Copy all scene directories from this video
+                    for scene_dir in source_objects_dir.iterdir():
+                        if scene_dir.is_dir():
+                            dest_scene_dir = dest_objects_dir / scene_dir.name
+                            
+                            # Handle scene directory conflicts by prefixing with video hash
+                            if dest_scene_dir.exists():
+                                dest_scene_dir = dest_objects_dir / f"{video_hash[:8]}_{scene_dir.name}"
+                            
+                            shutil.copytree(scene_dir, dest_scene_dir, dirs_exist_ok=True)
                 
                 stats['videos_processed'].append(video_info['video_name'])
                 stats['total_videos'] += 1

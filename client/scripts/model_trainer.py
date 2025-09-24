@@ -25,6 +25,7 @@ try:
     from client.models.human_cgan import HumanCGAN
     from client.models.animal_cgan import AnimalCGAN
     from client.models.other_cgan import OtherCGAN
+    from utils.vector_utils import build_pose_vector, validate_vector_dimensions, calculate_pose_vector_size
     
     # Optional imports for advanced features
     try:
@@ -145,32 +146,31 @@ class ObjectDataset(Dataset):
         
         # Get the pose vector from target object (where we want to generate)
         p_pose_data = target_obj['p_pose'].get('points', [])
-        if self.category in ['human', 'animal']:
-            # Only use x,y coordinates, skip confidence scores
-            p_t = [coord for kp in p_pose_data for coord in kp[:2]]
-            
-            # Pad or truncate to expected dimensions
-            if self.category == 'animal':
-                expected_dims = 24  # 12 keypoints × 2 coordinates (x, y)
-                if len(p_t) < expected_dims:
-                    # Pad with zeros
-                    p_t.extend([0.0] * (expected_dims - len(p_t)))
-                elif len(p_t) > expected_dims:
-                    # Truncate
-                    p_t = p_t[:expected_dims]
-            elif self.category == 'human':
-                expected_dims = 34  # 17 keypoints × 2 coordinates (x, y)
-                if len(p_t) < expected_dims:
-                    p_t.extend([0.0] * (expected_dims - len(p_t)))
-                elif len(p_t) > expected_dims:
-                    p_t = p_t[:expected_dims]
-        else:  # 'other' category - extract just the 4 bbox coordinates
-            # p_pose_data is 4 points with [x, y, confidence] each
-            # Extract just the first 2 coordinates from the first 2 points: [x1, y1, x2, y2]
-            if len(p_pose_data) >= 2:
-                p_t = [p_pose_data[0][0], p_pose_data[0][1], p_pose_data[2][0], p_pose_data[2][1]]  # [x1, y1, x2, y2]
-            else:
-                p_t = [0.0, 0.0, 0.0, 0.0]  # Fallback bbox
+        
+        # Get configuration
+        include_confidence = config.get_bool('keypoints', 'include_confidence_in_vectors', True)
+        temporal_frames = config.get_int('keypoints', 'temporal_frames', 0)
+        
+        # Build pose vector using centralized utility
+        p_t = build_pose_vector(
+            keypoints_data=p_pose_data,
+            category=self.category,
+            temporal_frames=temporal_frames,
+            include_confidence=include_confidence
+        )
+        
+        # Validate vector dimensions
+        is_valid, expected_size, actual_size, error_msg = validate_vector_dimensions(
+            p_t, self.category, temporal_frames, include_confidence
+        )
+        
+        if not is_valid:
+            logging.warning(f"Training vector validation failed: {error_msg}")
+            # Fix by padding or truncating
+            if actual_size < expected_size:
+                p_t.extend([0.0] * (expected_size - actual_size))
+            elif actual_size > expected_size:
+                p_t = p_t[:expected_size]
         p_t_tensor = torch.tensor(p_t, dtype=torch.float32)
         
         return v_appearance_tensor, p_t_tensor, target_tensor
@@ -237,23 +237,42 @@ class ModelTrainer:
             logging.warning("No valid human training pairs found.")
             return {'error': 'No valid human training data'}
         
-        # Initialize model
-        human_vector_size = 2048 + config.get_int('models', 'human_keypoint_channels', 17) * 2  # x,y only
+        # Get configuration parameters
+        keypoint_channels = config.get_int('keypoints', 'human_num_keypoints', 17)
+        include_confidence = config.get_bool('keypoints', 'include_confidence_in_vectors', True)
+        temporal_frames = config.get_int('keypoints', 'temporal_frames', 0)
+        
+        # Calculate vector size based on configuration
+        if include_confidence:
+            pose_size = keypoint_channels * 3  # x, y, confidence
+        else:
+            pose_size = keypoint_channels * 2  # x, y only
+        
+        # Include temporal context
+        pose_size *= (1 + temporal_frames)
+        
+        # Total vector size: appearance (2048) + pose
+        human_vector_size = 2048 + pose_size
+        
+        # Initialize model with all configuration parameters
         model = HumanCGAN(
             input_size=config.get_int('models', 'human_input_size', 256),
-            vector_input_size=human_vector_size
+            vector_input_size=human_vector_size,
+            temporal_frames=temporal_frames,
+            include_confidence=include_confidence
         ).to(self.device)
         
         # Train model
         result = self._train_model(model, dataset, 'human', config_override)
         
-        # Save trained model
+        # Save trained model with metadata
         model_path = Path(config.get_str('models', 'human_model_path', './models/human_cgan.pth'))
         model_path.parent.mkdir(exist_ok=True)
         
         torch.save({
             'generator': model.generator.state_dict(),
             'discriminator': model.discriminator.state_dict(),
+            'model_metadata': model.get_model_metadata(),  # Include model configuration
             'training_config': config_override or {},
             'dataset_size': len(dataset)
         }, model_path)
@@ -277,23 +296,42 @@ class ModelTrainer:
             logging.warning("No valid animal training pairs found.")
             return {'error': 'No valid animal training data'}
         
-        # Initialize model
-        animal_vector_size = 2048 + config.get_int('models', 'animal_keypoint_channels', 12) * 2  # x,y only
+        # Get configuration parameters
+        keypoint_channels = config.get_int('keypoints', 'animal_num_keypoints', 12)
+        include_confidence = config.get_bool('keypoints', 'include_confidence_in_vectors', True)
+        temporal_frames = config.get_int('keypoints', 'temporal_frames', 0)
+        
+        # Calculate vector size based on configuration
+        if include_confidence:
+            pose_size = keypoint_channels * 3  # x, y, confidence
+        else:
+            pose_size = keypoint_channels * 2  # x, y only
+        
+        # Include temporal context
+        pose_size *= (1 + temporal_frames)
+        
+        # Total vector size: appearance (2048) + pose
+        animal_vector_size = 2048 + pose_size
+        
+        # Initialize model with all configuration parameters
         model = AnimalCGAN(
             input_size=config.get_int('models', 'animal_input_size', 256),
-            vector_input_size=animal_vector_size
+            vector_input_size=animal_vector_size,
+            temporal_frames=temporal_frames,
+            include_confidence=include_confidence
         ).to(self.device)
         
         # Train model
         result = self._train_model(model, dataset, 'animal', config_override)
         
-        # Save trained model
+        # Save trained model with metadata
         model_path = Path(config.get_str('models', 'animal_model_path', './models/animal_cgan.pth'))
         model_path.parent.mkdir(exist_ok=True)
         
         torch.save({
             'generator': model.generator.state_dict(),
             'discriminator': model.discriminator.state_dict(),
+            'model_metadata': model.get_model_metadata(),  # Include model configuration
             'training_config': config_override or {},
             'dataset_size': len(dataset)
         }, model_path)
@@ -317,23 +355,42 @@ class ModelTrainer:
             logging.warning("No valid other training pairs found.")
             return {'error': 'No valid other objects training data'}
         
-        # Initialize model
-        other_vector_size = 2048 + 4
+        # Get configuration parameters
+        keypoint_channels = config.get_int('keypoints', 'other_num_keypoints', 24)  # Updated to 24
+        include_confidence = config.get_bool('keypoints', 'include_confidence_in_vectors', True)
+        temporal_frames = config.get_int('keypoints', 'temporal_frames', 0)
+        
+        # Calculate vector size based on configuration
+        if include_confidence:
+            pose_size = keypoint_channels * 3  # x, y, confidence
+        else:
+            pose_size = keypoint_channels * 2  # x, y only
+        
+        # Include temporal context
+        pose_size *= (1 + temporal_frames)
+        
+        # Total vector size: appearance (2048) + pose
+        other_vector_size = 2048 + pose_size
+        
+        # Initialize model with all configuration parameters
         model = OtherCGAN(
             input_size=config.get_int('models', 'other_input_size', 256),
-            vector_input_size=other_vector_size
+            vector_input_size=other_vector_size,
+            temporal_frames=temporal_frames,
+            include_confidence=include_confidence
         ).to(self.device)
         
         # Train model
         result = self._train_model(model, dataset, 'other', config_override)
         
-        # Save trained model
+        # Save trained model with metadata
         model_path = Path(config.get_str('models', 'other_model_path', './models/other_cgan.pth'))
         model_path.parent.mkdir(exist_ok=True)
         
         torch.save({
             'generator': model.generator.state_dict(),
             'discriminator': model.discriminator.state_dict(),
+            'model_metadata': model.get_model_metadata(),  # Include model configuration
             'training_config': config_override or {},
             'dataset_size': len(dataset)
         }, model_path)

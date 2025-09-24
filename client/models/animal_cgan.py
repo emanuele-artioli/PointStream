@@ -31,19 +31,30 @@ class AnimalResidualBlock(nn.Module):
 
 
 class AnimalGenerator(nn.Module):
-    """Generator network for animal figures from a concatenated appearance and pose vector."""
+    """Generator network for animal figures from a concatenated appearance and pose vector with temporal context."""
     
-    def __init__(self, vector_input_size: int = 2084, output_channels: int = 3, ngf: int = 64, latent_dim: int = 512):
+    def __init__(self, vector_input_size: int = 2156, output_channels: int = 3, ngf: int = 64, 
+                 latent_dim: int = 512, temporal_frames: int = 0):
         """
         Initialize animal generator.
         
         Args:
-            vector_input_size: Dimension of the concatenated input vector [v_appearance, p_t].
+            vector_input_size: Dimension of the concatenated input vector [v_appearance, p_t, temporal_context].
             output_channels: Number of output channels (3 for RGB).
             ngf: Number of generator filters.
             latent_dim: Dimension of the latent space to project the input vector to.
+            temporal_frames: Number of temporal frames included in input (0 = no temporal context).
         """
         super(AnimalGenerator, self).__init__()
+        
+        # Store model metadata for compatibility checking
+        self.model_metadata = {
+            'vector_input_size': vector_input_size,
+            'temporal_frames': temporal_frames,
+            'keypoint_channels': 12,  # Animal pose
+            'include_confidence': True,  # Will be set based on actual input
+            'model_version': '2.0'  # Version with temporal support
+        }
         
         self.mapping_network = nn.Sequential(
             nn.Linear(vector_input_size, latent_dim),
@@ -77,6 +88,15 @@ class AnimalGenerator(nn.Module):
             nn.ConvTranspose2d(ngf, output_channels, 4, 2, 1, bias=False), # -> 256x256
             nn.Tanh()
         )
+        
+    def get_model_metadata(self):
+        """Get generator metadata."""
+        return {
+            'type': 'AnimalGenerator',
+            'vector_input_size': self.vector_input_size,
+            'image_size': self.image_size,
+            'ngf': self.ngf
+        }
         
     def forward(self, vec):
         latent_vec = self.mapping_network(vec)
@@ -120,6 +140,15 @@ class AnimalDiscriminator(nn.Module):
             nn.Conv2d(ndf * 8, 1, 4, 1, 0),
         )
         
+    def get_model_metadata(self):
+        """Get discriminator metadata."""
+        return {
+            'type': 'AnimalDiscriminator',
+            'pose_vector_size': self.pose_vector_size,
+            'image_size': self.image_size,
+            'ndf': self.ndf
+        }
+        
     def forward(self, input_img, pose_vector):
         pose_map = self.pose_projection(pose_vector).view(-1, 1, 256, 256)
         x = torch.cat([input_img, pose_map], 1)
@@ -129,20 +158,26 @@ class AnimalDiscriminator(nn.Module):
 class AnimalCGAN(nn.Module):
     """Complete Animal cGAN model."""
     
-    def __init__(self, input_size: int = 256, vector_input_size: int = 2084):
+    def __init__(self, input_size: int = 256, vector_input_size: int = 2156, 
+                 temporal_frames: int = 0, include_confidence: bool = True):
         """
         Initialize Animal cGAN.
         
         Args:
             input_size: Output image size.
             vector_input_size: Dimension of the concatenated input vector [v_appearance, p_t].
+            temporal_frames: Number of temporal frames included in input (for metadata).
+            include_confidence: Whether confidence values are included in vectors (for metadata).
         """
         super(AnimalCGAN, self).__init__()
         
         self.input_size = input_size
         self.vector_input_size = vector_input_size
+        self.temporal_frames = temporal_frames
+        self.include_confidence = include_confidence
         
-        self.generator = AnimalGenerator(vector_input_size=vector_input_size, output_channels=3)
+        self.generator = AnimalGenerator(vector_input_size=vector_input_size, 
+                                       output_channels=3, temporal_frames=temporal_frames)
         
         # Calculate pose size from vector_input_size: total - appearance (2048)
         animal_pose_size = vector_input_size - 2048
@@ -160,6 +195,19 @@ class AnimalCGAN(nn.Module):
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.normal_(m.weight.data, 1.0, 0.02)
                 nn.init.constant_(m.bias.data, 0)
+    
+    def get_model_metadata(self):
+        """Get comprehensive model metadata for compatibility checking."""
+        return {
+            'input_size': self.input_size,
+            'vector_input_size': self.vector_input_size,
+            'temporal_frames': self.temporal_frames,
+            'include_confidence': self.include_confidence,
+            'keypoint_channels': 12,  # Animal pose
+            'model_version': '2.0',  # Version with temporal support
+            'generator_metadata': self.generator.get_model_metadata(),
+            'discriminator_metadata': self.discriminator.get_model_metadata()
+        }
     
     def forward(self, vec: torch.Tensor) -> torch.Tensor:
         """Forward pass through generator only (for inference)."""

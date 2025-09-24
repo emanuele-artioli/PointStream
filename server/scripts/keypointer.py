@@ -93,10 +93,11 @@ class Keypointer:
         # Device configuration
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         
-        # Keypoint detection parameters
-        # Configuration - confidence thresholds are deprecated but kept for compatibility
-        self.human_confidence_threshold = 0.0  # No longer used for filtering
-        self.animal_confidence_threshold = 0.0  # No longer used for filtering
+        # Configuration parameters
+        self.human_num_keypoints = config.get_int('keypoints', 'human_num_keypoints', 17)
+        self.animal_num_keypoints = config.get_int('keypoints', 'animal_num_keypoints', 12)  
+        self.other_num_keypoints = config.get_int('keypoints', 'other_num_keypoints', 4)
+        self.include_confidence_in_vectors = config.get_bool('keypoints', 'include_confidence_in_vectors', False)
         
         # Initialize models
         self._initialize_models()
@@ -235,16 +236,30 @@ class Keypointer:
                 obj_data['p_pose'] = pose_vector
                 obj_data['pose_method'] = 'mmpose_human_fixed'
                 obj_data['keypoints'] = pose_vector  # Set keypoints for client compatibility
+                
+                # Create model input vector (x,y coordinates only if configured)
+                if not self.include_confidence_in_vectors:
+                    obj_data['p_pose_model_input'] = self._keypoints_for_model_input(pose_vector)
+                    
             elif semantic_category == 'animal':
                 pose_vector = self._extract_animal_keypoints(obj_data)
                 obj_data['p_pose'] = pose_vector
                 obj_data['pose_method'] = 'mmpose_animal_fixed'
                 obj_data['keypoints'] = pose_vector  # Set keypoints for client compatibility
+                
+                # Create model input vector (x,y coordinates only if configured)
+                if not self.include_confidence_in_vectors:
+                    obj_data['p_pose_model_input'] = self._keypoints_for_model_input(pose_vector)
+                    
             else: # 'other' category
-                pose_vector = self._extract_bbox_pose(obj_data, frames)
+                pose_vector = self._extract_other_keypoints(obj_data, frames)
                 obj_data['p_pose'] = pose_vector
                 obj_data['pose_method'] = 'bbox_normalized'
                 obj_data['keypoints'] = pose_vector  # Set keypoints for client compatibility
+                
+                # Create model input vector (x,y coordinates only if configured)  
+                if not self.include_confidence_in_vectors:
+                    obj_data['p_pose_model_input'] = self._keypoints_for_model_input(pose_vector)
 
             # Ensure the client can access the category information
             obj_data['category'] = semantic_category
@@ -254,56 +269,319 @@ class Keypointer:
 
         return {'objects': processed_objects}
 
-    def _extract_bbox_pose(self, obj_data: Dict[str, Any], frames: List[np.ndarray]) -> Dict[str, Any]:
+    def _keypoints_for_model_input(self, pose_vector: Dict[str, Any]) -> List[float]:
         """
-        Extracts bounding box information as pose data.
-        For consistency, always uses absolute coordinates (not normalized).
-        Returns bbox as 4 points: [x1, y1, x2, y2] with confidence=1.0
+        Convert keypoint data to the format needed for model input.
+        
+        Args:
+            pose_vector: Keypoint data with 'points' field containing [x, y, confidence] triplets
+            
+        Returns:
+            Flattened list of x,y coordinates (no confidence) for model input
+        """
+        points = pose_vector.get('points', [])
+        model_input = []
+        
+        for point in points:
+            if len(point) >= 2:
+                # Extract only x,y coordinates (ignore confidence)
+                model_input.extend([float(point[0]), float(point[1])])
+            else:
+                # Fallback for malformed points
+                model_input.extend([0.0, 0.0])
+                
+        return model_input
+
+    def _extract_other_keypoints(self, obj_data: Dict[str, Any], frames: List[np.ndarray]) -> Dict[str, Any]:
+        """
+        Extracts keypoints for 'other' category objects using enhanced corner/edge detection.
+        Always returns exactly the configured number of keypoints for consistency.
         
         Args:
             obj_data: Object data dictionary.
             frames: List of all frames in the scene (may be empty for fallback cases).
 
         Returns:
-            A dictionary containing the bounding box as 4 coordinate points.
+            A dictionary containing keypoint data with the configured number of points.
         """
         bbox = obj_data.get('bbox')
         frame_index = obj_data.get('frame_index')
+        cropped_image = obj_data.get('cropped_image')
 
         if bbox is None:
-            # Return zero bbox with zero confidence
+            # Return zero keypoints with zero confidence
+            zero_points = [[0.0, 0.0, 0.0] for _ in range(self.other_num_keypoints)]
             return {
-                'points': [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
-                'method': 'bbox_absolute_no_data',
-                'confidence_scores': [0.0, 0.0, 0.0, 0.0]
+                'points': zero_points,
+                'method': 'other_keypoints_no_data',
+                'confidence_scores': [0.0] * self.other_num_keypoints
             }
 
         try:
             # Bbox is [x1, y1, x2, y2] - use absolute coordinates
             x1, y1, x2, y2 = bbox
-
-            # Store as 4 points with full confidence (bbox is always reliable)
-            bbox_points = [
-                [float(x1), float(y1), 1.0],  # Top-left
-                [float(x2), float(y1), 1.0],  # Top-right  
-                [float(x2), float(y2), 1.0],  # Bottom-right
-                [float(x1), float(y2), 1.0]   # Bottom-left
-            ]
             
-            confidence_scores = [1.0, 1.0, 1.0, 1.0]  # Full confidence for bbox corners
+            # Debug logging for configuration
+            logging.debug(f"Other keypoint extraction: num_keypoints={self.other_num_keypoints}")
+            
+            # Enhanced keypoint extraction for more than 4 points
+            if self.other_num_keypoints > 4:
+                # Try cropped image first, then try to get from original frame
+                image_for_detection = cropped_image
+                
+                if image_for_detection is None and frames is not None and len(frames) > 0 and frame_index is not None:
+                    # Try to crop from the original frame
+                    try:
+                        if 0 <= frame_index < len(frames):
+                            frame = frames[frame_index]
+                            h, w = frame.shape[:2]
+                            x1_crop, y1_crop = max(0, int(x1)), max(0, int(y1))
+                            x2_crop, y2_crop = min(w, int(x2)), min(h, int(y2))
+                            
+                            if x2_crop > x1_crop and y2_crop > y1_crop:
+                                image_for_detection = frame[y1_crop:y2_crop, x1_crop:x2_crop]
+                                logging.debug(f"Using frame-cropped image for enhanced other keypoint detection")
+                    except Exception as e:
+                        logging.debug(f"Failed to crop from frame: {e}")
+                
+                if image_for_detection is not None:
+                    try:
+                        logging.debug(f"Attempting enhanced other keypoint extraction with {self.other_num_keypoints} points")
+                        keypoints = self._extract_enhanced_other_keypoints(image_for_detection, bbox)
+                        confidence_scores = [kp[2] for kp in keypoints]
+                        
+                        logging.debug(f"Enhanced extraction succeeded with {len(keypoints)} keypoints")
+                        return {
+                            'points': keypoints,
+                            'method': 'other_keypoints_enhanced',
+                            'confidence_scores': confidence_scores
+                        }
+                    except Exception as e:
+                        logging.warning(f"Enhanced other keypoint extraction failed, falling back to bbox: {e}")
+                else:
+                    logging.debug(f"No image available for enhanced other keypoint detection, using fallback")
+            
+            # Fallback: Use bounding box-based keypoints
+            logging.debug(f"Using bbox fallback with {self.other_num_keypoints} keypoints")
+            
+            # For now, use bounding box corners as keypoints
+            if self.other_num_keypoints == 4:
+                # Standard 4-corner bbox
+                keypoints = [
+                    [float(x1), float(y1), 1.0],  # Top-left
+                    [float(x2), float(y1), 1.0],  # Top-right  
+                    [float(x2), float(y2), 1.0],  # Bottom-right
+                    [float(x1), float(y2), 1.0]   # Bottom-left
+                ]
+                confidence_scores = [1.0, 1.0, 1.0, 1.0]
+                
+            else:
+                # For more keypoints, add center and edge midpoints
+                logging.debug(f"Creating {self.other_num_keypoints} bbox keypoints with grid/edge method")
+                center_x = (x1 + x2) / 2.0
+                center_y = (y1 + y2) / 2.0
+                
+                # Start with 4 corners + center = 5 points
+                keypoints = [
+                    [float(x1), float(y1), 1.0],      # Top-left
+                    [float(x2), float(y1), 1.0],      # Top-right  
+                    [float(x2), float(y2), 1.0],      # Bottom-right
+                    [float(x1), float(y2), 1.0],      # Bottom-left
+                    [float(center_x), float(center_y), 1.0]  # Center
+                ]
+                confidence_scores = [1.0, 1.0, 1.0, 1.0, 1.0]
+                
+                # Add edge midpoints if more keypoints needed
+                if self.other_num_keypoints > 5:
+                    additional_points = [
+                        [float(center_x), float(y1), 1.0],     # Top-center
+                        [float(x2), float(center_y), 1.0],     # Right-center
+                        [float(center_x), float(y2), 1.0],     # Bottom-center
+                        [float(x1), float(center_y), 1.0],     # Left-center
+                    ]
+                    
+                    # Add as many additional points as needed
+                    needed = self.other_num_keypoints - 5
+                    keypoints.extend(additional_points[:needed])
+                    confidence_scores.extend([1.0] * min(needed, len(additional_points)))
+                
+                # Add grid points if still more keypoints needed
+                while len(keypoints) < self.other_num_keypoints:
+                    remaining = self.other_num_keypoints - len(keypoints)
+                    grid_size = int(np.sqrt(remaining)) + 1
+                    
+                    for i in range(grid_size):
+                        for j in range(grid_size):
+                            if len(keypoints) >= self.other_num_keypoints:
+                                break
+                            
+                            # Create grid points within the object bounds
+                            grid_x = x1 + ((x2 - x1) * (i + 1)) / (grid_size + 1)
+                            grid_y = y1 + ((y2 - y1) * (j + 1)) / (grid_size + 1)
+                            keypoints.append([float(grid_x), float(grid_y), 0.5])
+                            confidence_scores.append(0.5)
+                        
+                        if len(keypoints) >= self.other_num_keypoints:
+                            break
+                    break  # Exit while loop
+                    
+                # Trim if too many points
+                keypoints = keypoints[:self.other_num_keypoints]
+                confidence_scores = confidence_scores[:self.other_num_keypoints]
 
             return {
-                'points': bbox_points,
-                'method': 'bbox_absolute',
+                'points': keypoints,
+                'method': 'other_keypoints_bbox',
                 'confidence_scores': confidence_scores
             }
         except Exception as e:
-            logging.error(f"Bounding box pose extraction failed: {e}")
+            logging.error(f"Other keypoint extraction failed: {e}")
+            zero_points = [[0.0, 0.0, 0.0] for _ in range(self.other_num_keypoints)]
             return {
-                'points': [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
-                'method': 'bbox_absolute_error',
-                'confidence_scores': [0.0, 0.0, 0.0, 0.0]
+                'points': zero_points,
+                'method': 'other_keypoints_error',
+                'confidence_scores': [0.0] * self.other_num_keypoints
             }
+    
+    def _extract_enhanced_other_keypoints(self, image: np.ndarray, bbox: List[float]) -> List[List[float]]:
+        """
+        Extract enhanced keypoints for 'other' category objects using corner/edge detection.
+        
+        Args:
+            image: Cropped object image
+            bbox: Bounding box [x1, y1, x2, y2]
+            
+        Returns:
+            List of [x, y, confidence] keypoints
+        """
+        # Convert to grayscale if needed
+        if len(image.shape) == 3:
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = image.copy()
+        
+        h, w = gray.shape
+        keypoints = []
+        
+        # Method 1: Corner detection (Shi-Tomasi)
+        corners = cv2.goodFeaturesToTrack(
+            gray,
+            maxCorners=self.other_num_keypoints * 2,  # Get more candidates
+            qualityLevel=config.get_float('keypoints', 'corner_quality_level', 0.01),
+            minDistance=config.get_float('keypoints', 'corner_min_distance', 10),
+            useHarrisDetector=False
+        )
+        
+        corner_keypoints = []
+        if corners is not None:
+            for corner in corners:
+                x, y = corner[0]
+                # Convert to absolute coordinates
+                abs_x = bbox[0] + x
+                abs_y = bbox[1] + y
+                # Use corner response as confidence (higher quality = higher confidence)
+                confidence = min(1.0, config.get_float('keypoints', 'corner_quality_level', 0.01) * 50)
+                corner_keypoints.append([abs_x, abs_y, confidence])
+        
+        # Method 2: Canny edge detection + strategic points
+        canny_low = config.get_int('keypoints', 'canny_low_threshold', 50)
+        canny_high = config.get_int('keypoints', 'canny_high_threshold', 150)
+        canny_kernel = config.get_int('keypoints', 'canny_kernel_size', 3)
+        
+        edges = cv2.Canny(gray, canny_low, canny_high, apertureSize=canny_kernel)
+        
+        # Find contours from edges
+        contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        
+        edge_keypoints = []
+        if contours:
+            # Get the largest contour
+            largest_contour = max(contours, key=cv2.contourArea)
+            
+            # Extract keypoints from contour
+            epsilon = 0.02 * cv2.arcLength(largest_contour, True)
+            approx = cv2.approxPolyDP(largest_contour, epsilon, True)
+            
+            for point in approx:
+                x, y = point[0]
+                # Convert to absolute coordinates
+                abs_x = bbox[0] + x
+                abs_y = bbox[1] + y
+                confidence = 0.8  # Edge-based points have good confidence
+                edge_keypoints.append([abs_x, abs_y, confidence])
+        
+        # Combine corner and edge keypoints
+        all_keypoints = corner_keypoints + edge_keypoints
+        
+        # If we have too many keypoints, select the best ones
+        if len(all_keypoints) > self.other_num_keypoints:
+            # Sort by confidence and take the top ones
+            all_keypoints.sort(key=lambda kp: kp[2], reverse=True)
+            all_keypoints = all_keypoints[:self.other_num_keypoints]
+        
+        # If we have too few keypoints, add bounding box strategic points
+        while len(all_keypoints) < self.other_num_keypoints:
+            remaining = self.other_num_keypoints - len(all_keypoints)
+            
+            # Add bounding box corners and centers
+            strategic_points = [
+                [bbox[0], bbox[1], 0.9],  # Top-left
+                [bbox[2], bbox[1], 0.9],  # Top-right
+                [bbox[2], bbox[3], 0.9],  # Bottom-right
+                [bbox[0], bbox[3], 0.9],  # Bottom-left
+                [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2, 0.7],  # Center
+                [(bbox[0] + bbox[2]) / 2, bbox[1], 0.6],  # Top-center
+                [(bbox[0] + bbox[2]) / 2, bbox[3], 0.6],  # Bottom-center
+                [bbox[0], (bbox[1] + bbox[3]) / 2, 0.6],  # Left-center
+                [bbox[2], (bbox[1] + bbox[3]) / 2, 0.6],  # Right-center
+            ]
+            
+            # Add strategic points that aren't already close to existing ones
+            for strategic_point in strategic_points:
+                if len(all_keypoints) >= self.other_num_keypoints:
+                    break
+                
+                # Check if this point is too close to existing ones
+                too_close = False
+                for existing_point in all_keypoints:
+                    dist = np.sqrt((strategic_point[0] - existing_point[0])**2 + 
+                                 (strategic_point[1] - existing_point[1])**2)
+                    if dist < 10:  # Minimum distance threshold
+                        too_close = True
+                        break
+                
+                if not too_close:
+                    all_keypoints.append(strategic_point)
+            
+            # If still not enough, add grid points
+            if len(all_keypoints) < self.other_num_keypoints:
+                grid_remaining = self.other_num_keypoints - len(all_keypoints)
+                grid_size = int(np.sqrt(grid_remaining)) + 1
+                
+                for i in range(grid_size):
+                    for j in range(grid_size):
+                        if len(all_keypoints) >= self.other_num_keypoints:
+                            break
+                        
+                        # Create grid points within the object bounds
+                        grid_x = bbox[0] + (w * (i + 1)) / (grid_size + 1)
+                        grid_y = bbox[1] + (h * (j + 1)) / (grid_size + 1)
+                        all_keypoints.append([grid_x, grid_y, 0.4])
+                    
+                    if len(all_keypoints) >= self.other_num_keypoints:
+                        break
+            
+            break  # Avoid infinite loop
+        
+        # Ensure we have exactly the target number of keypoints
+        keypoints = all_keypoints[:self.other_num_keypoints]
+        
+        # Pad with zeros if still not enough (safety)
+        while len(keypoints) < self.other_num_keypoints:
+            keypoints.append([0.0, 0.0, 0.0])
+        
+        logging.debug(f"Enhanced other keypoints: {len(keypoints)} points extracted")
+        return keypoints
     
     def _extract_human_keypoints(self, obj_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -318,9 +596,9 @@ class Keypointer:
             Dictionary with human keypoint data (exactly 17 keypoints)
         """
         if not MMPOSE_AVAILABLE or self.human_model is None:
-            # Fallback to bbox
-            logging.debug("MMPose not available for human keypoints, using bbox fallback")
-            return self._extract_bbox_pose(obj_data, []) # Pass empty frames list, will be handled
+            # Fallback to other keypoints method
+            logging.debug("MMPose not available for human keypoints, using fallback")
+            return self._extract_other_keypoints(obj_data, []) # Pass empty frames list, will be handled
         
         try:
             # Get the cropped image
@@ -330,9 +608,9 @@ class Keypointer:
                 logging.warning("No suitable image found for human keypoint detection")
                 # Return zero keypoints but keep consistent structure
                 return {
-                    'points': [[0.0, 0.0, 0.0] for _ in range(17)],
+                    'points': [[0.0, 0.0, 0.0] for _ in range(self.human_num_keypoints)],
                     'method': 'mmpose_human_fixed_no_image',
-                    'confidence_scores': [0.0] * 17,
+                    'confidence_scores': [0.0] * self.human_num_keypoints,
                 }
             
             # TODO: Replace this simulation with real MMPose inference
@@ -347,7 +625,7 @@ class Keypointer:
             fixed_keypoints = []
             confidence_scores = []
             
-            for i in range(17):  # COCO human has 17 keypoints
+            for i in range(self.human_num_keypoints):  # Use configured number
                 if i == 0:  # Use object center as nose keypoint with full confidence
                     fixed_keypoints.append([float(center_x), float(center_y), 1.0])
                     confidence_scores.append(1.0)
@@ -364,7 +642,7 @@ class Keypointer:
             
         except Exception as e:
             logging.error(f"Human keypoint extraction failed: {e}")
-            return self._extract_bbox_pose(obj_data, [])
+            return self._extract_other_keypoints(obj_data, [])
 
     def _extract_animal_keypoints(self, obj_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -379,9 +657,9 @@ class Keypointer:
             Dictionary with animal keypoint data (exactly 12 keypoints)
         """
         if not MMPOSE_AVAILABLE or self.animal_model is None:
-            # Fallback to bbox
-            logging.debug("MMPose not available for animal keypoints, using bbox fallback")
-            return self._extract_bbox_pose(obj_data, [])
+            # Fallback to other keypoints method
+            logging.debug("MMPose not available for animal keypoints, using fallback")
+            return self._extract_other_keypoints(obj_data, [])
         
         try:
             # Get the cropped image
@@ -391,9 +669,9 @@ class Keypointer:
                 logging.warning("No suitable image found for animal keypoint detection")
                 # Return zero keypoints but keep consistent structure
                 return {
-                    'points': [[0.0, 0.0, 0.0] for _ in range(12)],
+                    'points': [[0.0, 0.0, 0.0] for _ in range(self.animal_num_keypoints)],
                     'method': 'mmpose_animal_fixed_no_image',
-                    'confidence_scores': [0.0] * 12,
+                    'confidence_scores': [0.0] * self.animal_num_keypoints,
                 }
             
             # TODO: Replace this simulation with real MMPose inference
@@ -408,7 +686,7 @@ class Keypointer:
             fixed_keypoints = []
             confidence_scores = []
             
-            for i in range(12):  # Animal has 12 keypoints
+            for i in range(self.animal_num_keypoints):  # Use configured number
                 if i == 0:  # Use object center as nose keypoint with full confidence
                     fixed_keypoints.append([float(center_x), float(center_y), 1.0])
                     confidence_scores.append(1.0)
@@ -425,7 +703,7 @@ class Keypointer:
             
         except Exception as e:
             logging.error(f"Animal keypoint extraction failed: {e}")
-            return self._extract_bbox_pose(obj_data, [])
+            return self._extract_other_keypoints(obj_data, [])
 
     def get_keypoint_statistics(self, keypoints_data: Dict[str, Any]) -> Dict[str, Any]:
         """

@@ -25,6 +25,7 @@ try:
     from client.models.human_cgan import HumanCGAN
     from client.models.animal_cgan import AnimalCGAN
     from client.models.other_cgan import OtherCGAN
+    from utils.vector_utils import build_pose_vector, validate_vector_dimensions, calculate_pose_vector_size
 except ImportError as e:
     logging.error(f"Failed to import PointStream utilities or models: {e}")
     raise
@@ -47,6 +48,7 @@ class ObjectGenerator:
         self.batch_size = config.get_int('models', 'batch_size', 8)
         
         # Model paths
+        self.models_dir = config.get_str('models', 'models_dir', './models')
         self.human_model_path = config.get_str('models', 'human_model_path', './models/human_cgan.pth')
         self.animal_model_path = config.get_str('models', 'animal_model_path', './models/animal_cgan.pth')
         self.other_model_path = config.get_str('models', 'other_model_path', './models/other_cgan.pth')
@@ -61,6 +63,9 @@ class ObjectGenerator:
         self.animal_threshold = config.get_float('models', 'animal_pose_confidence_threshold', 0.3)
         self.other_threshold = config.get_float('models', 'other_confidence_threshold', 0.3)
         
+        # Initialize models dictionary
+        self.models = {}
+        
         # Initialize models
         self._initialize_models()
         
@@ -73,37 +78,349 @@ class ObjectGenerator:
         logging.info(f"   Batch size: {self.batch_size}")
     
     def _initialize_models(self):
-        """Initialize generative models for each object category."""
-        self.models = {}
+        """Initialize all CGAN models."""
+        logging.info("🤖 Object Generator initialized")
+        logging.info(f"   Device: {self.device}")
+        logging.info(f"   Models directory: {self.models_dir}")
+        
+        # Initialize feature extractor for appearance vectors
+        self._initialize_feature_extractor()
         
         # Initialize Human model
+        self._initialize_human_model()
+        
+        # Initialize Animal model
+        self._initialize_animal_model()
+        
+        # Initialize Other model
+        self._initialize_other_model()
+        
+        if self.feature_extractor is not None:
+            logging.info(f"✅ Initialized {self.feature_extractor.__class__.__name__} feature extractor for appearance vectors")
+    
+    def _extract_temporal_context(self, current_obj: Dict[str, Any], all_objects: List[Dict[str, Any]], 
+                                 temporal_frames: int) -> List[float]:
+        """
+        Extract temporal context from previous frames for the same track.
+        
+        Args:
+            current_obj: Current object data
+            all_objects: All objects in the scene
+            temporal_frames: Number of previous frames to include
+            
+        Returns:
+            Flattened list of keypoints from previous frames
+        """
+        if temporal_frames == 0:
+            return []
+        
         try:
-            # For humans: v_appearance (2048) + p_t (17*3=51) = 2099
-            human_vector_size = 2048 + config.get_int('models', 'human_keypoint_channels', 17) * 3
+            track_id = current_obj.get('track_id')
+            current_frame = current_obj.get('frame_index', 0)
+            category = current_obj.get('semantic_category', 'other')
+            
+            if track_id is None:
+                # No tracking available, return zeros
+                return self._get_empty_temporal_context(category, temporal_frames)
+            
+            # Find previous frames for the same track
+            track_objects = [obj for obj in all_objects 
+                           if obj.get('track_id') == track_id and 
+                           obj.get('frame_index', 0) < current_frame]
+            
+            # Sort by frame index (most recent first)
+            track_objects.sort(key=lambda x: x.get('frame_index', 0), reverse=True)
+            
+            temporal_context = []
+            frames_collected = 0
+            
+            for prev_obj in track_objects:
+                if frames_collected >= temporal_frames:
+                    break
+                
+                # Extract keypoints from previous frame
+                prev_keypoints = self._extract_keypoints_for_temporal_context(prev_obj, category)
+                temporal_context.extend(prev_keypoints)
+                frames_collected += 1
+            
+            # Pad with zeros if we don't have enough previous frames
+            while frames_collected < temporal_frames:
+                empty_keypoints = self._get_empty_keypoints_for_category(category)
+                temporal_context.extend(empty_keypoints)
+                frames_collected += 1
+            
+            return temporal_context
+            
+        except Exception as e:
+            logging.warning(f"Error extracting temporal context: {e}")
+            return self._get_empty_temporal_context(category, temporal_frames)
+    
+    def _get_empty_temporal_context(self, category: str, temporal_frames: int) -> List[float]:
+        """Get empty temporal context filled with zeros."""
+        empty_keypoints = self._get_empty_keypoints_for_category(category)
+        return empty_keypoints * temporal_frames
+    
+    def _get_empty_keypoints_for_category(self, category: str) -> List[float]:
+        """Get empty keypoints for a specific category."""
+        include_confidence = config.get_bool('keypoints', 'include_confidence_in_vectors', True)
+        
+        if category == 'human':
+            keypoint_count = config.get_int('keypoints', 'human_num_keypoints', 17)
+        elif category == 'animal':
+            keypoint_count = config.get_int('keypoints', 'animal_num_keypoints', 12)
+        else:
+            keypoint_count = config.get_int('keypoints', 'other_num_keypoints', 24)
+        
+        if include_confidence:
+            return [0.0] * (keypoint_count * 3)  # x, y, confidence
+        else:
+            return [0.0] * (keypoint_count * 2)  # x, y only
+    
+    def _extract_keypoints_for_temporal_context(self, obj: Dict[str, Any], category: str) -> List[float]:
+        """Extract keypoints from an object for temporal context."""
+        # Use the same keypoint processing as the main pipeline
+        if category in ['human', 'animal']:
+            return self._normalize_keypoints_to_standard_size(obj, 256, category)
+        else:
+            # For 'other', extract enhanced keypoints or bbox
+            keypoints_data = obj.get('p_pose_data', [])
+            if keypoints_data and len(keypoints_data) > 4:
+                # Use enhanced keypoints if available
+                include_confidence = config.get_bool('keypoints', 'include_confidence_in_vectors', True)
+                keypoint_count = config.get_int('keypoints', 'other_num_keypoints', 24)
+                
+                flattened = []
+                for i, kp in enumerate(keypoints_data[:keypoint_count]):
+                    if include_confidence and len(kp) >= 3:
+                        flattened.extend([kp[0], kp[1], kp[2]])
+                    elif len(kp) >= 2:
+                        if include_confidence:
+                            flattened.extend([kp[0], kp[1], 1.0])  # Default confidence
+                        else:
+                            flattened.extend([kp[0], kp[1]])
+                
+                # Pad if needed
+                target_size = keypoint_count * (3 if include_confidence else 2)
+                while len(flattened) < target_size:
+                    flattened.append(0.0)
+                
+                return flattened[:target_size]
+            else:
+                # Fallback to bbox
+                return self._get_empty_keypoints_for_category(category)
+    
+    def _check_model_compatibility(self, model_path: str, expected_metadata: dict) -> tuple[bool, dict]:
+        """
+        Check if a saved model is compatible with current configuration.
+        
+        Args:
+            model_path: Path to the saved model
+            expected_metadata: Expected model metadata based on current config
+            
+        Returns:
+            Tuple of (is_compatible, saved_metadata)
+        """
+        if not Path(model_path).exists():
+            return False, {}
+        
+        try:
+            checkpoint = torch.load(model_path, map_location='cpu')
+            saved_metadata = checkpoint.get('model_metadata', {})
+            
+            # Check critical compatibility parameters
+            critical_params = ['vector_input_size', 'keypoint_channels', 'include_confidence', 'temporal_frames']
+            
+            for param in critical_params:
+                if param in saved_metadata and param in expected_metadata:
+                    if saved_metadata[param] != expected_metadata[param]:
+                        logging.warning(f"Model incompatibility in {param}: saved={saved_metadata[param]}, expected={expected_metadata[param]}")
+                        return False, saved_metadata
+            
+            return True, saved_metadata
+            
+        except Exception as e:
+            logging.error(f"Error checking model compatibility: {e}")
+            return False, {}
+    
+    def _initialize_human_model(self):
+        """Initialize human model with compatibility checking."""
+        try:
+            # Get configuration parameters
+            keypoint_channels = config.get_int('keypoints', 'human_num_keypoints', 17)
+            include_confidence = config.get_bool('keypoints', 'include_confidence_in_vectors', True)
+            temporal_frames = config.get_int('keypoints', 'temporal_frames', 0)
+            
+            # Calculate vector size based on configuration
+            if include_confidence:
+                pose_size = keypoint_channels * 3  # x, y, confidence
+            else:
+                pose_size = keypoint_channels * 2  # x, y only
+            
+            # Include temporal context
+            pose_size *= (1 + temporal_frames)
+            
+            # Total vector size: appearance (2048) + pose
+            human_vector_size = 2048 + pose_size
+            
+            # Expected metadata for compatibility checking
+            expected_metadata = {
+                'vector_input_size': human_vector_size,
+                'keypoint_channels': keypoint_channels,
+                'include_confidence': include_confidence,
+                'temporal_frames': temporal_frames,
+                'model_version': '2.0'
+            }
+            
+            # Check model compatibility
+            is_compatible, saved_metadata = self._check_model_compatibility(self.human_model_path, expected_metadata)
+            
+            if not is_compatible and Path(self.human_model_path).exists():
+                logging.warning(f"   ⚠️ Human model incompatible with current config, will need retraining")
+                # Move incompatible model to backup
+                backup_path = f"{self.human_model_path}.backup"
+                Path(self.human_model_path).rename(backup_path)
+                logging.info(f"   💾 Moved incompatible model to {backup_path}")
+            
+            # Initialize model with current configuration
             self.models['human'] = HumanCGAN(
                 input_size=self.human_input_size,
-                vector_input_size=human_vector_size
+                vector_input_size=human_vector_size,
+                temporal_frames=temporal_frames,
+                include_confidence=include_confidence
             ).to(self.device)
             
-            if Path(self.human_model_path).exists():
+            if Path(self.human_model_path).exists() and is_compatible:
                 checkpoint = torch.load(self.human_model_path, map_location=self.device)
                 self.models['human'].generator.load_state_dict(checkpoint['generator'])
-                logging.info(f"   ✅ Loaded human model: {self.human_model_path}")
+                logging.info(f"   ✅ Loaded compatible human model: {self.human_model_path}")
             else:
                 logging.warning(f"   ⚠️ Human model not found: {self.human_model_path}")
+                
         except Exception as e:
             logging.error(f"Failed to initialize human model: {e}")
             self.models['human'] = None
         
         # Initialize Animal model
+        self._initialize_animal_model()
+        
+        # Initialize Other model
+        self._initialize_other_model()
+
+    def _initialize_animal_model(self):
+        """Initialize animal model with compatibility checking."""
         try:
-            # For animals: v_appearance (2048) + p_t (12*3=36) = 2084
-            # Note: Using 12 keypoints to match actual data from keypoint extraction
-            animal_vector_size = 2048 + config.get_int('models', 'animal_keypoint_channels', 12) * 3
+            # Get configuration parameters
+            keypoint_channels = config.get_int('keypoints', 'animal_num_keypoints', 12)
+            include_confidence = config.get_bool('keypoints', 'include_confidence_in_vectors', True)
+            temporal_frames = config.get_int('keypoints', 'temporal_frames', 0)
+            
+            # Calculate vector size based on configuration
+            if include_confidence:
+                pose_size = keypoint_channels * 3  # x, y, confidence
+            else:
+                pose_size = keypoint_channels * 2  # x, y only
+            
+            # Include temporal context
+            pose_size *= (1 + temporal_frames)
+            
+            # Total vector size: appearance (2048) + pose
+            animal_vector_size = 2048 + pose_size
+            
+            # Expected metadata for compatibility checking
+            expected_metadata = {
+                'vector_input_size': animal_vector_size,
+                'keypoint_channels': keypoint_channels,
+                'include_confidence': include_confidence,
+                'temporal_frames': temporal_frames,
+                'model_version': '2.0'
+            }
+            
+            # Check model compatibility
+            is_compatible, saved_metadata = self._check_model_compatibility(self.animal_model_path, expected_metadata)
+            
+            if not is_compatible and Path(self.animal_model_path).exists():
+                logging.warning(f"   ⚠️ Animal model incompatible with current config, will need retraining")
+                # Move incompatible model to backup
+                backup_path = f"{self.animal_model_path}.backup"
+                Path(self.animal_model_path).rename(backup_path)
+                logging.info(f"   💾 Moved incompatible model to {backup_path}")
+            
+            # Initialize model with current configuration
             self.models['animal'] = AnimalCGAN(
                 input_size=self.animal_input_size,
-                vector_input_size=animal_vector_size
+                vector_input_size=animal_vector_size,
+                temporal_frames=temporal_frames,
+                include_confidence=include_confidence
             ).to(self.device)
+            
+            if Path(self.animal_model_path).exists() and is_compatible:
+                checkpoint = torch.load(self.animal_model_path, map_location=self.device)
+                self.models['animal'].generator.load_state_dict(checkpoint['generator'])
+                logging.info(f"   ✅ Loaded compatible animal model: {self.animal_model_path}")
+            else:
+                logging.warning(f"   ⚠️ Animal model not found: {self.animal_model_path}")
+                
+        except Exception as e:
+            logging.error(f"Failed to initialize animal model: {e}")
+            self.models['animal'] = None
+    
+    def _initialize_other_model(self):
+        """Initialize other model with compatibility checking."""
+        try:
+            # Get configuration parameters  
+            keypoint_channels = config.get_int('keypoints', 'other_num_keypoints', 24)  # Updated to 24
+            include_confidence = config.get_bool('keypoints', 'include_confidence_in_vectors', True)
+            temporal_frames = config.get_int('keypoints', 'temporal_frames', 0)
+            
+            # Calculate vector size based on configuration
+            if include_confidence:
+                pose_size = keypoint_channels * 3  # x, y, confidence
+            else:
+                pose_size = keypoint_channels * 2  # x, y only
+            
+            # Include temporal context
+            pose_size *= (1 + temporal_frames)
+            
+            # Total vector size: appearance (2048) + pose
+            other_vector_size = 2048 + pose_size
+            
+            # Expected metadata for compatibility checking
+            expected_metadata = {
+                'vector_input_size': other_vector_size,
+                'keypoint_channels': keypoint_channels,
+                'include_confidence': include_confidence,
+                'temporal_frames': temporal_frames,
+                'model_version': '2.0'
+            }
+            
+            # Check model compatibility
+            is_compatible, saved_metadata = self._check_model_compatibility(self.other_model_path, expected_metadata)
+            
+            if not is_compatible and Path(self.other_model_path).exists():
+                logging.warning(f"   ⚠️ Other model incompatible with current config, will need retraining")
+                # Move incompatible model to backup
+                backup_path = f"{self.other_model_path}.backup"
+                Path(self.other_model_path).rename(backup_path)
+                logging.info(f"   💾 Moved incompatible model to {backup_path}")
+            
+            # Initialize model with current configuration
+            self.models['other'] = OtherCGAN(
+                input_size=self.other_input_size,
+                vector_input_size=other_vector_size,
+                temporal_frames=temporal_frames,
+                include_confidence=include_confidence
+            ).to(self.device)
+            
+            if Path(self.other_model_path).exists() and is_compatible:
+                checkpoint = torch.load(self.other_model_path, map_location=self.device)
+                self.models['other'].generator.load_state_dict(checkpoint['generator'])
+                logging.info(f"   ✅ Loaded compatible other model: {self.other_model_path}")
+            else:
+                logging.warning(f"   ⚠️ Other model not found: {self.other_model_path}")
+                
+        except Exception as e:
+            logging.error(f"Failed to initialize other model: {e}")
+            self.models['other'] = None
             
             if Path(self.animal_model_path).exists():
                 checkpoint = torch.load(self.animal_model_path, map_location=self.device)
@@ -117,8 +434,10 @@ class ObjectGenerator:
         
         # Initialize Other objects model
         try:
-            # For other: v_appearance (2048) + p_t (bbox=4) = 2052
-            other_vector_size = 2048 + 4
+            # For other: v_appearance (2048) + p_t (configurable keypoints*2) 
+            # Default to 4 keypoints (bbox corners) for backward compatibility
+            other_keypoints = config.get_int('models', 'other_keypoint_channels', 4)
+            other_vector_size = 2048 + other_keypoints * 2
             self.models['other'] = OtherCGAN(
                 input_size=self.other_input_size,
                 vector_input_size=other_vector_size
@@ -292,7 +611,7 @@ class ObjectGenerator:
         generated_objects = []
         for obj in track_objects:
             try:
-                generated_obj = self._generate_single_object(obj, v_appearance_tensor, category, model)
+                generated_obj = self._generate_single_object(obj, v_appearance_tensor, category, model, scene_data)
                 generated_objects.append(generated_obj)
             except Exception as e:
                 logging.warning(f"Failed to generate object for frame {obj.get('frame_index', 0)}: {e}")
@@ -467,7 +786,7 @@ class ObjectGenerator:
         return resized_image
 
     def _generate_single_object(self, obj: Dict[str, Any], v_appearance_tensor: torch.Tensor,
-                              category: str, model: nn.Module) -> Dict[str, Any]:
+                              category: str, model: nn.Module, scene_data: Dict[str, Any]) -> Dict[str, Any]:
         """Generate a single object using the new vector-based model with size standardization."""
         
         # Get standard model input size
@@ -478,31 +797,93 @@ class ObjectGenerator:
         else:
             standard_size = self.other_input_size
         
-        # Normalize keypoints to standard size
+        # Extract pose vector for model input with temporal context
         try:
-            if category in ['human', 'animal']:
-                normalized_keypoints = self._normalize_keypoints_to_standard_size(obj, standard_size, category)
-                p_t = normalized_keypoints
-            else:  # For 'other', use bbox normalized to standard size
-                bbox = obj.get('bbox', [0, 0, standard_size, standard_size])
-                crop_size = obj.get('crop_size', [standard_size, standard_size])
+            # Get configuration
+            temporal_frames = config.get_int('keypoints', 'temporal_frames', 0)
+            include_confidence = config.get_bool('keypoints', 'include_confidence_in_vectors', True)
+            
+            # Get keypoints data from the object
+            if 'p_pose_model_input' in obj:
+                # Use pre-processed vector if available
+                p_t = obj['p_pose_model_input']
+                logging.debug(f"Using pre-processed model input vector of length {len(p_t)} for {category}")
+            else:
+                # Build vector using centralized utility
+                keypoints_data = []
                 
-                if len(bbox) >= 4 and len(crop_size) >= 2:
-                    # Normalize bbox to standard size
-                    scale_x = standard_size / crop_size[0]
-                    scale_y = standard_size / crop_size[1]
-                    norm_bbox = [bbox[0] * scale_x, bbox[1] * scale_y, 
-                               bbox[2] * scale_x, bbox[3] * scale_y]
-                    p_t = norm_bbox
+                # Try different keypoint data sources
+                if 'keypoints' in obj and isinstance(obj['keypoints'], dict) and 'points' in obj['keypoints']:
+                    keypoints_data = obj['keypoints']['points']
+                elif 'p_pose' in obj and isinstance(obj['p_pose'], dict) and 'points' in obj['p_pose']:
+                    keypoints_data = obj['p_pose']['points']
+                elif 'p_pose_data' in obj:
+                    keypoints_data = obj['p_pose_data']
                 else:
-                    p_t = [0, 0, standard_size, standard_size]
+                    logging.warning(f"No keypoint data found for object {obj.get('object_id', 'unknown')}")
+                    keypoints_data = []
+                
+                # Extract temporal context if enabled
+                temporal_context_data = None
+                if temporal_frames > 0:
+                    all_objects = scene_data.get('objects', [])
+                    temporal_context = self._extract_temporal_context(obj, all_objects, temporal_frames)
+                    if temporal_context:
+                        # Split temporal context into frames
+                        expected_size = calculate_pose_vector_size(category, 0, include_confidence)
+                        temporal_context_data = []
+                        for i in range(0, len(temporal_context), expected_size):
+                            frame_data = temporal_context[i:i + expected_size]
+                            if len(frame_data) == expected_size:
+                                temporal_context_data.append(frame_data)
+                
+                # Build pose vector using centralized utility
+                p_t = build_pose_vector(
+                    keypoints_data=keypoints_data,
+                    category=category,
+                    temporal_frames=temporal_frames,
+                    include_confidence=include_confidence,
+                    temporal_context_data=temporal_context_data
+                )
+                
+                logging.debug(f"Built pose vector of length {len(p_t)} for {category}")
+            
+            # Validate vector dimensions
+            is_valid, expected_size, actual_size, error_msg = validate_vector_dimensions(
+                p_t, category, temporal_frames, include_confidence
+            )
+            
+            if not is_valid:
+                logging.warning(f"Vector validation failed: {error_msg}")
+                # Try to fix by padding or truncating
+                if actual_size < expected_size:
+                    p_t.extend([0.0] * (expected_size - actual_size))
+                    logging.debug(f"Padded vector from {actual_size} to {expected_size}")
+                elif actual_size > expected_size:
+                    p_t = p_t[:expected_size]
+                    logging.debug(f"Truncated vector from {actual_size} to {expected_size}")
                     
         except Exception as e:
-            logging.warning(f"Keypoint normalization failed for object {obj.get('object_id')}: {e}")
-            # Fallback to original method
-            p_pose_data = obj.get('keypoints', {}).get('points', [])
-            if not p_pose_data:
-                raise ValueError(f"No pose vector (p_t) found for object {obj.get('object_id')}")
+            logging.warning(f"Vector processing failed for object {obj.get('object_id')}: {e}")
+            # Fallback to original method with error handling
+            try:
+                p_pose_data = obj.get('keypoints', {}).get('points', [])
+                if not p_pose_data:
+                    raise ValueError(f"No pose vector (p_t) found for object {obj.get('object_id')}")
+                
+                # Use simple flattening as last resort
+                if isinstance(p_pose_data[0], (list, tuple)):
+                    p_t = [coord for kp in p_pose_data for coord in kp]
+                else:
+                    p_t = p_pose_data
+                    
+                logging.debug(f"Used fallback vector processing, length: {len(p_t)}")
+            except Exception as fallback_error:
+                logging.error(f"Fallback vector processing also failed: {fallback_error}")
+                # Ultimate fallback - return zeros with correct dimensions
+                expected_size = calculate_pose_vector_size(category, temporal_frames, include_confidence)
+                p_t = [0.0] * expected_size
+                logging.warning(f"Using zero vector with size {expected_size} as last resort")
 
             if category in ['human', 'animal']:
                 p_t = [coord for kp in p_pose_data for coord in kp]
