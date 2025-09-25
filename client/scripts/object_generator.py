@@ -281,10 +281,13 @@ class ObjectGenerator:
                 Path(self.human_model_path).rename(backup_path)
                 logging.info(f"   💾 Moved incompatible model to {backup_path}")
             
-            # Initialize model with current configuration
+            # Use saved vector size if model is compatible, otherwise use calculated size
+            model_vector_size = saved_metadata.get('vector_input_size', human_vector_size) if is_compatible else human_vector_size
+            
+            # Initialize model with appropriate configuration
             self.models['human'] = HumanCGAN(
                 input_size=self.human_input_size,
-                vector_input_size=human_vector_size,
+                vector_input_size=model_vector_size,
                 temporal_frames=temporal_frames,
                 include_confidence=include_confidence
             ).to(self.device)
@@ -345,10 +348,13 @@ class ObjectGenerator:
                 Path(self.animal_model_path).rename(backup_path)
                 logging.info(f"   💾 Moved incompatible model to {backup_path}")
             
-            # Initialize model with current configuration
+            # Use saved vector size if model is compatible, otherwise use calculated size
+            model_vector_size = saved_metadata.get('vector_input_size', animal_vector_size) if is_compatible else animal_vector_size
+            
+            # Initialize model with appropriate configuration
             self.models['animal'] = AnimalCGAN(
                 input_size=self.animal_input_size,
-                vector_input_size=animal_vector_size,
+                vector_input_size=model_vector_size,
                 temporal_frames=temporal_frames,
                 include_confidence=include_confidence
             ).to(self.device)
@@ -403,10 +409,13 @@ class ObjectGenerator:
                 Path(self.other_model_path).rename(backup_path)
                 logging.info(f"   💾 Moved incompatible model to {backup_path}")
             
-            # Initialize model with current configuration
+            # Use saved vector size if model is compatible, otherwise use calculated size
+            model_vector_size = saved_metadata.get('vector_input_size', other_vector_size) if is_compatible else other_vector_size
+            
+            # Initialize model with appropriate configuration
             self.models['other'] = OtherCGAN(
                 input_size=self.other_input_size,
-                vector_input_size=other_vector_size,
+                vector_input_size=model_vector_size,
                 temporal_frames=temporal_frames,
                 include_confidence=include_confidence
             ).to(self.device)
@@ -418,37 +427,6 @@ class ObjectGenerator:
             else:
                 logging.warning(f"   ⚠️ Other model not found: {self.other_model_path}")
                 
-        except Exception as e:
-            logging.error(f"Failed to initialize other model: {e}")
-            self.models['other'] = None
-            
-            if Path(self.animal_model_path).exists():
-                checkpoint = torch.load(self.animal_model_path, map_location=self.device)
-                self.models['animal'].generator.load_state_dict(checkpoint['generator'])
-                logging.info(f"   ✅ Loaded animal model: {self.animal_model_path}")
-            else:
-                logging.warning(f"   ⚠️ Animal model not found: {self.animal_model_path}")
-        except Exception as e:
-            logging.error(f"Failed to initialize animal model: {e}")
-            self.models['animal'] = None
-        
-        # Initialize Other objects model
-        try:
-            # For other: v_appearance (2048) + p_t (configurable keypoints*2) 
-            # Default to 4 keypoints (bbox corners) for backward compatibility
-            other_keypoints = config.get_int('models', 'other_keypoint_channels', 4)
-            other_vector_size = 2048 + other_keypoints * 2
-            self.models['other'] = OtherCGAN(
-                input_size=self.other_input_size,
-                vector_input_size=other_vector_size
-            ).to(self.device)
-            
-            if Path(self.other_model_path).exists():
-                checkpoint = torch.load(self.other_model_path, map_location=self.device)
-                self.models['other'].generator.load_state_dict(checkpoint['generator'])
-                logging.info(f"   ✅ Loaded other model: {self.other_model_path}")
-            else:
-                logging.warning(f"   ⚠️ Other model not found: {self.other_model_path}")
         except Exception as e:
             logging.error(f"Failed to initialize other model: {e}")
             self.models['other'] = None

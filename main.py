@@ -100,13 +100,31 @@ def run_model_training(training_videos_dir: str, log_level: str = "INFO") -> boo
 
 
 def check_models_exist() -> bool:
-    """Check if trained models already exist."""
+    """Check if all trained models already exist."""
     models_path = Path("./models")
     animal_model = models_path / "animal_cgan.pth"
     human_model = models_path / "human_cgan.pth" 
     other_model = models_path / "other_cgan.pth"
     
-    return animal_model.exists() or human_model.exists() or other_model.exists()
+    return animal_model.exists() and human_model.exists() and other_model.exists()
+
+
+def get_missing_models() -> list:
+    """Get list of missing model names."""
+    models_path = Path("./models")
+    animal_model = models_path / "animal_cgan.pth"
+    human_model = models_path / "human_cgan.pth" 
+    other_model = models_path / "other_cgan.pth"
+    
+    missing = []
+    if not human_model.exists():
+        missing.append('human')
+    if not animal_model.exists():
+        missing.append('animal')
+    if not other_model.exists():
+        missing.append('other')
+    
+    return missing
 
 
 def run_server_processing(input_video: str, metadata_dir: str, 
@@ -356,16 +374,24 @@ Examples:
             
             # Phase 2: Model Training (if needed)
             models_exist = check_models_exist()
+            missing_models = get_missing_models()
             
-            if args.force_retrain or (not models_exist and not args.no_training):
+            if args.force_retrain or (missing_models and not args.no_training):
                 if not args.training_videos:
-                    print("❌ Error: Models do not exist and no training videos directory specified.")
+                    print("❌ Error: Missing models detected and no training videos directory specified.")
+                    print(f"   Missing models: {', '.join(missing_models)}")
                     print("   Please provide --training-videos <directory> or use --no-training to skip model training.")
                     sys.exit(1)
                 
                 if not Path(args.training_videos).exists():
                     print(f"❌ Error: Training videos directory not found: {args.training_videos}")
                     sys.exit(1)
+
+                print("\n" + "="*60)
+                print("PHASE 2: MODEL TRAINING (TRAINING MISSING MODELS)")
+                print("="*60)
+                print(f"🎓 Missing models detected: {', '.join(missing_models)}")
+                print("🎓 Training models on videos from:", args.training_videos)
                 
                 success = run_model_training(args.training_videos, args.log_level)
                 
@@ -375,14 +401,17 @@ Examples:
             else:
                 if models_exist:
                     print("\n" + "="*60)
-                    print("PHASE 2: MODEL TRAINING (SKIPPED - MODELS EXIST)")
+                    print("PHASE 2: MODEL TRAINING (SKIPPED - ALL MODELS EXIST)")
                     print("="*60)
-                    print("✅ Found existing trained models, skipping training phase")
+                    print("✅ Found all existing trained models, skipping training phase")
                 else:
                     print("\n" + "="*60)
                     print("PHASE 2: MODEL TRAINING (SKIPPED - NO-TRAINING FLAG)")
                     print("="*60)
                     print("⏭️ Skipping model training due to --no-training flag")
+                    if missing_models:
+                        print(f"⚠️  Warning: Missing models: {', '.join(missing_models)}")
+                        print("   Client processing may fail for missing model categories")
             
             # Phase 3: Client Processing (reconstruction only, no training)
             success = run_client_processing(

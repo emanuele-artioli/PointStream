@@ -47,6 +47,12 @@ class AnimalGenerator(nn.Module):
         """
         super(AnimalGenerator, self).__init__()
         
+        # Store vector input size as instance attribute
+        self.vector_input_size = vector_input_size
+        self.temporal_frames = temporal_frames
+        self.image_size = 256  # Output image size (256x256)
+        self.ngf = ngf
+        
         # Store model metadata for compatibility checking
         self.model_metadata = {
             'vector_input_size': vector_input_size,
@@ -67,7 +73,6 @@ class AnimalGenerator(nn.Module):
             nn.Linear(latent_dim, ngf * 8 * 4 * 4),
             nn.LeakyReLU(0.2, inplace=True)
         )
-        self.ngf = ngf
 
         self.decoder = nn.Sequential(
             nn.ConvTranspose2d(ngf * 8, ngf * 8, 4, 2, 1, bias=False), # -> 8x8
@@ -119,6 +124,11 @@ class AnimalDiscriminator(nn.Module):
             ndf: Number of discriminator filters.
         """
         super(AnimalDiscriminator, self).__init__()
+        
+        # Store attributes
+        self.pose_vector_size = pose_vector_size
+        self.image_size = 256
+        self.ndf = ndf
         
         self.pose_projection = nn.Sequential(
             nn.Linear(pose_vector_size, 256),

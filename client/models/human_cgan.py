@@ -47,6 +47,10 @@ class HumanGenerator(nn.Module):
         """
         super(HumanGenerator, self).__init__()
         
+        # Store vector input size as instance attribute
+        self.vector_input_size = vector_input_size
+        self.temporal_frames = temporal_frames
+        
         # Store model metadata for compatibility checking
         self.model_metadata = {
             'vector_input_size': vector_input_size,

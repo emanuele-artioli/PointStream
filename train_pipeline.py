@@ -226,14 +226,21 @@ def main():
         human_model = models_path / "human_cgan.pth" 
         other_model = models_path / "other_cgan.pth"
         
-        models_exist = animal_model.exists() or human_model.exists() or other_model.exists()
+        # Check which models are missing
+        missing_models = []
+        if not human_model.exists():
+            missing_models.append('human')
+        if not animal_model.exists():
+            missing_models.append('animal')
+        if not other_model.exists():
+            missing_models.append('other')
         
-        if models_exist:
-            logging.info("✅ Found existing trained models, skipping training phase")
-            training_results = {'status': 'skipped', 'reason': 'models_exist'}
+        if not missing_models:
+            logging.info("✅ All models already exist, skipping training phase")
+            training_results = {'status': 'skipped', 'reason': 'all_models_exist'}
             model_results = {}  # Initialize empty dict when skipping training
         else:
-            logging.info("🎓 No existing models found, starting training...")
+            logging.info(f"🎓 Missing models detected: {', '.join(missing_models)}, starting training...")
             # We need to setup the client's logging separately if we want to see its output
             # This is a bit of a hack, but it re-initializes the logger for the client's format
             setup_client_logging(args.log_level)
