@@ -24,6 +24,7 @@ from PIL import Image
 from utils.decorators import track_performance
 from utils.error_handling import safe_execute, create_error_result, create_success_result
 from utils import config
+from utils.pose_visualization import create_pose_image
 
 
 class Saver:
@@ -274,12 +275,38 @@ class Saver:
                             success = cv2.imwrite(str(image_path), bgr_object)
                     
                     if success:
+                        # Also save pose image for training
+                        pose_image_filename = f"{object_filename}_pose.png"
+                        pose_image_path = objects_dir / pose_image_filename
+                        
+                        try:
+                            # Get model input size based on category
+                            if semantic_category == 'human':
+                                pose_img_size = config.get_int('models', 'human_input_size', 256)
+                            elif semantic_category == 'animal':
+                                pose_img_size = config.get_int('models', 'animal_input_size', 256)
+                            else:
+                                pose_img_size = config.get_int('models', 'other_input_size', 256)
+                            
+                            # Generate pose skeleton image
+                            pose_img = create_pose_image(obj, pose_img_size)
+                            
+                            # Save pose image
+                            pose_saved = cv2.imwrite(str(pose_image_path), pose_img)
+                            if not pose_saved:
+                                logging.warning(f"Failed to save pose image: {pose_image_path}")
+                            
+                        except Exception as e:
+                            logging.warning(f"Error generating pose image for {object_filename}: {e}")
+                            pose_saved = False
+                        
                         obj_metadata = {
                             'semantic_category': semantic_category,
                             'original_class_name': original_class_name,
                             'track_id': track_id,
                             'filename': object_filename,
                             'saved_image_path': str(image_path),
+                            'pose_image_path': str(pose_image_path) if pose_saved else None,
                             'has_transparency': True,
                             'format': 'PNG',
                             'semantic_confidence': obj.get('semantic_confidence', 0.0),

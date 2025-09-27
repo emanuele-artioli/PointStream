@@ -243,32 +243,18 @@ class ObjectGenerator:
             return False, {}
     
     def _initialize_human_model(self):
-        """Initialize human model with compatibility checking."""
+        """Initialize human model with new pose image architecture."""
         try:
-            # Get configuration parameters
-            keypoint_channels = config.get_int('keypoints', 'human_num_keypoints', 17)
-            include_confidence = config.get_bool('keypoints', 'include_confidence_in_vectors', True)
-            temporal_frames = config.get_int('keypoints', 'temporal_frames', 0)
-            
-            # Calculate vector size based on configuration
-            if include_confidence:
-                pose_size = keypoint_channels * 3  # x, y, confidence
-            else:
-                pose_size = keypoint_channels * 2  # x, y only
-            
-            # Include temporal context
-            pose_size *= (1 + temporal_frames)
-            
-            # Total vector size: appearance (2048) + pose
-            human_vector_size = 2048 + pose_size
+            # New architecture: appearance vector (2048) + pose image (3 channels)
+            appearance_vector_size = 2048  # ResNet-50 features
+            pose_image_channels = 3  # RGB pose skeleton image
             
             # Expected metadata for compatibility checking
             expected_metadata = {
-                'vector_input_size': human_vector_size,
-                'keypoint_channels': keypoint_channels,
-                'include_confidence': include_confidence,
-                'temporal_frames': temporal_frames,
-                'model_version': '2.0'
+                'appearance_vector_size': appearance_vector_size,
+                'pose_image_channels': pose_image_channels,
+                'input_type': 'vector_plus_image',
+                'model_version': '3.0'
             }
             
             # Check model compatibility
@@ -281,15 +267,11 @@ class ObjectGenerator:
                 Path(self.human_model_path).rename(backup_path)
                 logging.info(f"   💾 Moved incompatible model to {backup_path}")
             
-            # Use saved vector size if model is compatible, otherwise use calculated size
-            model_vector_size = saved_metadata.get('vector_input_size', human_vector_size) if is_compatible else human_vector_size
-            
-            # Initialize model with appropriate configuration
+            # Initialize model with new architecture
             self.models['human'] = HumanCGAN(
                 input_size=self.human_input_size,
-                vector_input_size=model_vector_size,
-                temporal_frames=temporal_frames,
-                include_confidence=include_confidence
+                appearance_vector_size=appearance_vector_size,
+                pose_image_channels=pose_image_channels
             ).to(self.device)
             
             if Path(self.human_model_path).exists() and is_compatible:
@@ -302,12 +284,6 @@ class ObjectGenerator:
         except Exception as e:
             logging.error(f"Failed to initialize human model: {e}")
             self.models['human'] = None
-        
-        # Initialize Animal model
-        self._initialize_animal_model()
-        
-        # Initialize Other model
-        self._initialize_other_model()
 
     def _initialize_animal_model(self):
         """Initialize animal model with compatibility checking."""
@@ -765,7 +741,7 @@ class ObjectGenerator:
 
     def _generate_single_object(self, obj: Dict[str, Any], v_appearance_tensor: torch.Tensor,
                               category: str, model: nn.Module, scene_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate a single object using the new vector-based model with size standardization."""
+        """Generate a single object using pose images instead of pose vectors."""
         
         # Get standard model input size
         if category == 'human':
@@ -775,109 +751,30 @@ class ObjectGenerator:
         else:
             standard_size = self.other_input_size
         
-        # Extract pose vector for model input with temporal context
+        # Generate pose image from keypoint data
         try:
-            # Get configuration
-            temporal_frames = config.get_int('keypoints', 'temporal_frames', 0)
-            include_confidence = config.get_bool('keypoints', 'include_confidence_in_vectors', True)
+            from utils.pose_visualization import create_pose_image
+            pose_image = create_pose_image(obj, standard_size)
             
-            # Get keypoints data from the object
-            if 'p_pose_model_input' in obj:
-                # Use pre-processed vector if available
-                p_t = obj['p_pose_model_input']
-                logging.debug(f"Using pre-processed model input vector of length {len(p_t)} for {category}")
-            else:
-                # Build vector using centralized utility
-                keypoints_data = []
-                
-                # Try different keypoint data sources
-                if 'keypoints' in obj and isinstance(obj['keypoints'], dict) and 'points' in obj['keypoints']:
-                    keypoints_data = obj['keypoints']['points']
-                elif 'p_pose' in obj and isinstance(obj['p_pose'], dict) and 'points' in obj['p_pose']:
-                    keypoints_data = obj['p_pose']['points']
-                elif 'p_pose_data' in obj:
-                    keypoints_data = obj['p_pose_data']
-                else:
-                    logging.warning(f"No keypoint data found for object {obj.get('object_id', 'unknown')}")
-                    keypoints_data = []
-                
-                # Extract temporal context if enabled
-                temporal_context_data = None
-                if temporal_frames > 0:
-                    all_objects = scene_data.get('objects', [])
-                    temporal_context = self._extract_temporal_context(obj, all_objects, temporal_frames)
-                    if temporal_context:
-                        # Split temporal context into frames
-                        expected_size = calculate_pose_vector_size(category, 0, include_confidence)
-                        temporal_context_data = []
-                        for i in range(0, len(temporal_context), expected_size):
-                            frame_data = temporal_context[i:i + expected_size]
-                            if len(frame_data) == expected_size:
-                                temporal_context_data.append(frame_data)
-                
-                # Build pose vector using centralized utility
-                p_t = build_pose_vector(
-                    keypoints_data=keypoints_data,
-                    category=category,
-                    temporal_frames=temporal_frames,
-                    include_confidence=include_confidence,
-                    temporal_context_data=temporal_context_data
-                )
-                
-                logging.debug(f"Built pose vector of length {len(p_t)} for {category}")
+            # Convert pose image to tensor [0, 1] range
+            pose_tensor = torch.from_numpy(pose_image).float().permute(2, 0, 1) / 255.0
+            pose_tensor = pose_tensor.to(self.device).unsqueeze(0)  # Add batch dimension
             
-            # Validate vector dimensions
-            is_valid, expected_size, actual_size, error_msg = validate_vector_dimensions(
-                p_t, category, temporal_frames, include_confidence
-            )
-            
-            if not is_valid:
-                logging.warning(f"Vector validation failed: {error_msg}")
-                # Try to fix by padding or truncating
-                if actual_size < expected_size:
-                    p_t.extend([0.0] * (expected_size - actual_size))
-                    logging.debug(f"Padded vector from {actual_size} to {expected_size}")
-                elif actual_size > expected_size:
-                    p_t = p_t[:expected_size]
-                    logging.debug(f"Truncated vector from {actual_size} to {expected_size}")
-                    
         except Exception as e:
-            logging.warning(f"Vector processing failed for object {obj.get('object_id')}: {e}")
-            # Fallback to original method with error handling
-            try:
-                p_pose_data = obj.get('keypoints', {}).get('points', [])
-                if not p_pose_data:
-                    raise ValueError(f"No pose vector (p_t) found for object {obj.get('object_id')}")
-                
-                # Use simple flattening as last resort
-                if isinstance(p_pose_data[0], (list, tuple)):
-                    p_t = [coord for kp in p_pose_data for coord in kp]
-                else:
-                    p_t = p_pose_data
-                    
-                logging.debug(f"Used fallback vector processing, length: {len(p_t)}")
-            except Exception as fallback_error:
-                logging.error(f"Fallback vector processing also failed: {fallback_error}")
-                # Ultimate fallback - return zeros with correct dimensions
-                expected_size = calculate_pose_vector_size(category, temporal_frames, include_confidence)
-                p_t = [0.0] * expected_size
-                logging.warning(f"Using zero vector with size {expected_size} as last resort")
-
-            if category in ['human', 'animal']:
-                p_t = [coord for kp in p_pose_data for coord in kp]
-            else:
-                p_t = p_pose_data
-
-        p_t_tensor = torch.tensor(p_t, dtype=torch.float32).to(self.device)
+            logging.warning(f"Failed to generate pose image for object {obj.get('object_id')}: {e}")
+            # Create black pose image as fallback
+            pose_image = np.zeros((standard_size, standard_size, 3), dtype=np.uint8)
+            pose_tensor = torch.from_numpy(pose_image).float().permute(2, 0, 1) / 255.0
+            pose_tensor = pose_tensor.to(self.device).unsqueeze(0)
         
-        # Generate object at standard size
+        # Generate object using appearance vector + pose image
         model.eval()
         with torch.no_grad():
-            # Add batch dimension
+            # Add batch dimension to appearance vector
             v_appearance_batch = v_appearance_tensor.unsqueeze(0)
-            p_t_batch = p_t_tensor.unsqueeze(0)
-
-            generated_tensor = model.generate(v_appearance_batch, p_t_batch)
+            
+            # Generate using new API
+            generated_tensor = model.generate(v_appearance_batch, pose_tensor)
             generated_image = generated_tensor.squeeze(0).cpu().numpy()
             
             # Convert from [-1, 1] to [0, 255] and from CHW to HWC
@@ -900,7 +797,7 @@ class ObjectGenerator:
             'bbox': obj.get('bbox', []),
             'crop_size': original_crop_size,
             'generated_image': generated_image,
-            'generation_method': f'{category}_cgan_vector_standardized',
+            'generation_method': f'{category}_cgan_pose_image',
             'confidence': obj.get('confidence', 0.0)
         }
     

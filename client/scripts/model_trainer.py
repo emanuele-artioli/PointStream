@@ -128,7 +128,7 @@ class ObjectDataset(Dataset):
         Get a training item.
         
         Returns:
-            Tuple of (v_appearance, p_t, target_image)
+            Tuple of (v_appearance, pose_image, target_image)
         """
         # Get the training pair
         ref_obj, target_obj = self.training_pairs[idx]
@@ -144,36 +144,33 @@ class ObjectDataset(Dataset):
         v_appearance = np.array(ref_obj['v_appearance'])
         v_appearance_tensor = torch.from_numpy(v_appearance).float()
         
-        # Get the pose vector from target object (where we want to generate)
-        p_pose_data = target_obj['p_pose'].get('points', [])
+        # Load pose image for target object (instead of pose vector)
+        pose_image = None
         
-        # Get configuration
-        include_confidence = config.get_bool('keypoints', 'include_confidence_in_vectors', True)
-        temporal_frames = config.get_int('keypoints', 'temporal_frames', 0)
+        # Try to load pre-generated pose image first
+        if 'pose_image_path' in target_obj and target_obj['pose_image_path']:
+            pose_image_path = target_obj['pose_image_path']
+            if isinstance(pose_image_path, str) and Path(pose_image_path).exists():
+                pose_image = cv2.imread(pose_image_path)
         
-        # Build pose vector using centralized utility
-        p_t = build_pose_vector(
-            keypoints_data=p_pose_data,
-            category=self.category,
-            temporal_frames=temporal_frames,
-            include_confidence=include_confidence
-        )
+        # If no pose image found, generate it from keypoint data
+        if pose_image is None:
+            from utils.pose_visualization import create_pose_image
+            try:
+                pose_image = create_pose_image(target_obj, self.input_size)
+            except Exception as e:
+                logging.warning(f"Failed to generate pose image for {target_obj.get('object_id', 'unknown')}: {e}")
+                # Create black pose image as fallback
+                pose_image = np.zeros((self.input_size, self.input_size, 3), dtype=np.uint8)
         
-        # Validate vector dimensions
-        is_valid, expected_size, actual_size, error_msg = validate_vector_dimensions(
-            p_t, self.category, temporal_frames, include_confidence
-        )
+        # Ensure pose image is correct size
+        if pose_image.shape[:2] != (self.input_size, self.input_size):
+            pose_image = cv2.resize(pose_image, (self.input_size, self.input_size))
         
-        if not is_valid:
-            logging.warning(f"Training vector validation failed: {error_msg}")
-            # Fix by padding or truncating
-            if actual_size < expected_size:
-                p_t.extend([0.0] * (expected_size - actual_size))
-            elif actual_size > expected_size:
-                p_t = p_t[:expected_size]
-        p_t_tensor = torch.tensor(p_t, dtype=torch.float32)
+        # Convert pose image to tensor [0, 1] range (pose images are already [0, 255])
+        pose_tensor = torch.from_numpy(pose_image).float().permute(2, 0, 1) / 255.0
         
-        return v_appearance_tensor, p_t_tensor, target_tensor
+        return v_appearance_tensor, pose_tensor, target_tensor
 
 
 class ModelTrainer:
@@ -237,29 +234,15 @@ class ModelTrainer:
             logging.warning("No valid human training pairs found.")
             return {'error': 'No valid human training data'}
         
-        # Get configuration parameters
-        keypoint_channels = config.get_int('keypoints', 'human_num_keypoints', 17)
-        include_confidence = config.get_bool('keypoints', 'include_confidence_in_vectors', True)
-        temporal_frames = config.get_int('keypoints', 'temporal_frames', 0)
+        # Get configuration parameters - now using appearance vector + pose image
+        appearance_vector_size = 2048  # ResNet-50 features
+        pose_image_channels = 3  # RGB pose skeleton image
         
-        # Calculate vector size based on configuration
-        if include_confidence:
-            pose_size = keypoint_channels * 3  # x, y, confidence
-        else:
-            pose_size = keypoint_channels * 2  # x, y only
-        
-        # Include temporal context
-        pose_size *= (1 + temporal_frames)
-        
-        # Total vector size: appearance (2048) + pose
-        human_vector_size = 2048 + pose_size
-        
-        # Initialize model with all configuration parameters
+        # Initialize model with new architecture
         model = HumanCGAN(
             input_size=config.get_int('models', 'human_input_size', 256),
-            vector_input_size=human_vector_size,
-            temporal_frames=temporal_frames,
-            include_confidence=include_confidence
+            appearance_vector_size=appearance_vector_size,
+            pose_image_channels=pose_image_channels
         ).to(self.device)
         
         # Train model
@@ -423,17 +406,17 @@ class ModelTrainer:
             epoch_start = time.time()
             epoch_gen_loss, epoch_disc_loss = 0.0, 0.0
             
-            for batch_idx, (v_appearance, p_t, target_image) in enumerate(dataloader):
+            for batch_idx, (v_appearance, pose_img, target_image) in enumerate(dataloader):
                 v_appearance = v_appearance.to(self.device)
-                p_t = p_t.to(self.device)
+                pose_img = pose_img.to(self.device)  # Now using pose image instead of pose vector
                 target_image = target_image.to(self.device)
                 batch_size = target_image.size(0)
 
                 # --- Train Discriminator ---
                 discriminator_optimizer.zero_grad()
                 
-                # Real images
-                real_pred = model.discriminate(target_image, p_t)
+                # Real images - discriminate using real image + pose image
+                real_pred = model.discriminate(target_image, pose_img)
                 # Handle both single tensor and tuple outputs
                 if isinstance(real_pred, tuple):
                     # For "other" models that return (main_out, fine_out)
@@ -443,14 +426,13 @@ class ModelTrainer:
                     real_loss = (self.adversarial_loss(real_main, real_labels_main) + 
                                 self.adversarial_loss(real_fine, real_labels_fine)) / 2
                 else:
-                    # For single tensor output (animal, human models)
+                    # For single tensor output (human, animal models)
                     real_labels = torch.ones_like(real_pred).to(self.device)
                     real_loss = self.adversarial_loss(real_pred, real_labels)
                 
-                # Fake images
-                input_vec = torch.cat([v_appearance, p_t], dim=1)
-                fake_images = model.generator(input_vec)
-                fake_pred = model.discriminate(fake_images.detach(), p_t)
+                # Fake images - generate using appearance vector + pose image
+                fake_images = model.generate(v_appearance, pose_img)  # New API
+                fake_pred = model.discriminate(fake_images.detach(), pose_img)
                 # Handle both single tensor and tuple outputs
                 if isinstance(fake_pred, tuple):
                     # For "other" models that return (main_out, fine_out)
@@ -471,8 +453,8 @@ class ModelTrainer:
                 # --- Train Generator ---
                 generator_optimizer.zero_grad()
                 
-                # Adversarial loss
-                fake_pred = model.discriminate(fake_images, p_t)
+                # Adversarial loss - discriminate generated images
+                fake_pred = model.discriminate(fake_images, pose_img)
                 # Handle both single tensor and tuple outputs
                 if isinstance(fake_pred, tuple):
                     # For "other" models that return (main_out, fine_out)
