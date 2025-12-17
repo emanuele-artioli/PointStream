@@ -1,8 +1,17 @@
-# Python
+# Generic Python .gitignore
+
+# Byte-compiled / optimized / DLLs
 __pycache__/
 *.py[cod]
 *$py.class
+
+# C extensions and built libraries
 *.so
+*.dylib
+*.dll
+*.pyd
+
+# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -15,85 +24,100 @@ lib64/
 parts/
 sdist/
 var/
-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
+pip-wheel-metadata/
+share/python-wheels/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
 
 # Virtual environments
-.env
-.venv
-env/
 venv/
 ENV/
+env/
+.venv/
 env.bak/
 venv.bak/
+.venv/*
 
-# Jupyter
-.ipynb_checkpoints
-*.ipynb
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
 
-# IDE
+# Caches and type-checkers
+.cache/
+.mypy_cache/
+.pytype/
+.pyre/
+.pyright/
+__pypackages__/
+
+# Sphinx docs
+docs/_build/
+
+# Django / Flask / general runtime files
+db.sqlite3
+db.sqlite3-journal
+local_settings.py
+media/
+staticfiles/
+instance/
+.webassets-cache
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+profile_default/
+ipython_config.py
+
+# IDEs and editors
 .vscode/
 .idea/
+*.sublime-project
+*.sublime-workspace
+.history/
 *.swp
-*.swo
 *~
+*.tmp
 
-# OS
+# OS files
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# Project specific
-*output*/
-*results*/
-*checkpoints*/
-*scenes*/
-*cache*/
-*.pth
-*.ckpt
-*.safetensors
-motion_config.json
-config_*
-
-# Data
-data/
-datasets/
-*.mp4
-*.avi
-*.mov
-*.MOV
-*.mkv
-*.jpg
-*.jpeg
-*.png
-*.gif
-
-# Logs
-logs/
-wandb/
+# Logs and temp files
 *.log
-
-# Temporary files
-temp/
+logs/
 tmp/
 *.tmp
-*test*/
 
-# Model weights
-weights/
-models/*.pth
-models/*.ckpt
+# Secret and environment files
+.env
+.env.*
+secrets.*
+*.key
+*.pem
 
-# Generated files
-generated/
-reconstructed/
-*.pt
-scene_*_metadata.json
-scene_*_metadata.pzm
+# Misc build artifacts
+target/
+*.manifest
+*.spec
+
+# Misc
+.scrapy
+celerybeat-schedule
+celerybeat.pid
+*.sqlite3
+*.db
+
+# PointStream specific ignores
+experiments/
