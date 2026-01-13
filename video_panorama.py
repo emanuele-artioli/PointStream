@@ -154,7 +154,7 @@ class VideoPanorama:
 
         # Video Writer
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(output_video_path, fourcc, 30.0, (frame_w, frame_h))
+        out = cv2.VideoWriter(output_video_path, fourcc, 24.0, (frame_w, frame_h))
 
         for H_raw in homographies:
             # We used H_final = H_trans @ H_global to put frame ONTO panorama
@@ -183,10 +183,38 @@ if __name__ == "__main__":
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     experiment_dir = f"/home/itec/emanuele/pointstream/experiments/pano_{timestamp}"
     os.makedirs(experiment_dir, exist_ok=True)
+
+    # Start timing execution
+    import time
+    start_time = time.time()
     
     # 1. Create Panorama
-    input_video = "/home/itec/emanuele/Datasets/DAVIS/avc_encoded/bear.mp4"
+    input_video = "/home/itec/emanuele/Datasets/DAVIS/avc_encoded/paragliding.mp4"
     processor.create_panorama(input_video, f"{experiment_dir}/pano.png", f"{experiment_dir}/meta.json", skip_frames=2)
     
     # 2. Reconstruct Video
     processor.reconstruct_video(f"{experiment_dir}/pano.png", f"{experiment_dir}/meta.json", f"{experiment_dir}/reconstructed.mp4")
+
+    # End timing execution
+    end_time = time.time()
+    print(f"Execution speed: { (len(os.listdir(experiment_dir)) / (end_time - start_time)) :.2f} fps.")
+
+    # 3. evaluate reconstruction quality with SSIM
+    from skimage.metrics import structural_similarity as ssim
+    import cv2
+    cap_orig = cv2.VideoCapture(input_video)
+    cap_recon = cv2.VideoCapture(f"{experiment_dir}/reconstructed.mp4")
+    ssim_values = []
+    while True:
+        ret1, frame1 = cap_orig.read()
+        ret2, frame2 = cap_recon.read()
+        if not ret1 or not ret2:
+            break
+        frame1_gray = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+        frame2_gray = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
+        ssim_index = ssim(frame1_gray, frame2_gray)
+        ssim_values.append(ssim_index)
+    cap_orig.release()
+    cap_recon.release()
+    avg_ssim = sum(ssim_values) / len(ssim_values) if ssim_values else 0
+    print(f"Average SSIM between original and reconstructed video: {avg_ssim:.4f}")
