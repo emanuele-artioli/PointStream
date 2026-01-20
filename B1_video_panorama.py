@@ -2,6 +2,18 @@ import cv2
 import numpy as np
 import json
 import os
+import argparse
+
+# TODO: Can we speed up by not calculating homographies for every frame? Maybe every N frames and interpolate? Maybe calculate residuals and only recalc if above threshold?
+# TODO: Can we improve blending? Maybe use multi-band blending or seam finding?
+# TODO: Can we use GPU acceleration for feature detection/matching?
+# TODO: Can we use other feature detectors (SIFT, AKAZE) for better results?
+# TODO: Can we use optical flow to improve alignment between frames?
+# TODO: Can we handle dynamic scenes better? Maybe use RANSAC to filter out moving objects? Or use semantic segmentation to mask out foreground objects?
+# TODO: Can we implement exposure compensation to handle varying lighting conditions between frames?
+# TODO: Can we implement a GUI to visualize the panorama creation process step-by-step?
+# TODO: Can we add support for different video formats and codecs? FFmpeg instead of OpenCV?
+# TODO: We should compare quality of recontruction against av1 at the same size. There is probably a movement threshold above which av1 is better, we should determine it and suggest when to use which method.
 
 class VideoPanorama:
     def __init__(self):
@@ -176,12 +188,17 @@ class VideoPanorama:
 
 # --- USAGE ---
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Create and reconstruct video panoramas")
+    parser.add_argument("--video_path", type=str, default="/home/itec/emanuele/Datasets/djokovic_federer/015.mp4", help="Path to the input video")
+    args = parser.parse_args()
+
+    input_video = args.video_path
     processor = VideoPanorama()
 
     # 0. Create experiment folder as timestamped directory
     import datetime
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    experiment_dir = f"/home/itec/emanuele/pointstream/experiments/pano_{timestamp}"
+    experiment_dir = f"/home/itec/emanuele/pointstream/experiments/{timestamp}_pano"
     os.makedirs(experiment_dir, exist_ok=True)
 
     # Start timing execution
@@ -189,7 +206,6 @@ if __name__ == "__main__":
     start_time = time.time()
     
     # 1. Create Panorama
-    input_video = "/home/itec/emanuele/Datasets/DAVIS/avc_encoded/paragliding.mp4"
     processor.create_panorama(input_video, f"{experiment_dir}/pano.png", f"{experiment_dir}/meta.json", skip_frames=2)
     
     # 2. Reconstruct Video

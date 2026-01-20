@@ -8,6 +8,10 @@ import numpy as np
 import torch
 from ultralytics import YOLOE
 
+# TODO: Mutiple untracked object masks in the same frame overwrite each other during saving.
+# TODO: To improve ID consistency, check bounding boxes after processing all frames and re-assign IDs based on IoU with previous frames.
+# TODO: segment with SAM 3 instead?
+
 def main():
     parser = argparse.ArgumentParser(description="Segment video using YOLOE with text prompts")
     parser.add_argument("--video_path", type=str, default="/home/itec/emanuele/Datasets/djokovic_federer/015.mp4", help="Path to the input video")
