@@ -238,7 +238,10 @@ def main():
             if masked_crop is not None and masked_crop.size > 0:
                 # Resize and pad to 512x512
                 masked_crop_padded = resize_and_pad(masked_crop, target_size=512)
-                output_path = os.path.join(masked_crops_dir, f"frame{frame_idx:05d}_id{det_id}.png")
+                # Create subfolder for this ID
+                id_subfolder = os.path.join(masked_crops_dir, f"id{det_id}")
+                os.makedirs(id_subfolder, exist_ok=True)
+                output_path = os.path.join(id_subfolder, f"{frame_idx:05d}.png")
                 cv2.imwrite(output_path, masked_crop_padded)
     
     # Merge pose_df with tracking_df to get class_id information
@@ -266,8 +269,10 @@ def main():
         # Create skeleton image
         skeleton_img = create_skeleton_image(keypoints, bbox)
         
-        # Save skeleton
-        output_path = os.path.join(skeletons_dir, f"frame{frame_idx:05d}_id{det_id}.png")
+        # Create subfolder for this ID
+        id_subfolder = os.path.join(skeletons_dir, f"id{det_id}")
+        os.makedirs(id_subfolder, exist_ok=True)
+        output_path = os.path.join(id_subfolder, f"{frame_idx:05d}.png")
         cv2.imwrite(output_path, skeleton_img)
     
     print(f"\nMasked crops saved to: {masked_crops_dir}")
