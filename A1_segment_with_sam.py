@@ -9,6 +9,7 @@ import torch
 from ultralytics.models.sam import SAM3VideoPredictor, SAM3SemanticPredictor
 
 # TODO: To improve ID consistency, check bounding boxes after processing all frames and re-assign IDs based on IoU with previous frames.
+# TODO: need a better way than top 2 highest confidence to select players in frame 0, for example I could draw a map of likelihood based on position in the court (players are likely to start near their baselines), what else?
 # TODO: refine prompts for better segmentation, ablation test
 #TODO: right now we are just segmenting players, we need to segment rackets and ball too.
 # TODO: Ultralytics sam3 allows efficiency gains by reusing features, SAM3VideoPredictor already includes this, but could be useful across videos.
@@ -18,27 +19,44 @@ from ultralytics.models.sam import SAM3VideoPredictor, SAM3SemanticPredictor
 def resize_and_pad(img, target_size=512):
     """
     Resize and pad an image to target_size x target_size, maintaining aspect ratio.
+    Always resizes so the largest dimension becomes target_size (consistent person size for training).
+    
+    Returns:
+        padded: The resized and padded image
+        transform_info: Dict with original dimensions, scale, and padding offsets for reversing
     """
     h, w = img.shape[:2]
-    scale = min(target_size / w, target_size / h)
+    # Always resize so the largest dimension becomes target_size
+    scale = target_size / max(w, h)
     
-    if scale < 1.0:
-        new_w = int(w * scale)
-        new_h = int(h * scale)
-        img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
-    else:
-        new_w, new_h = w, h
+    new_w = int(w * scale)
+    new_h = int(h * scale)
     
-    if len(img.shape) == 3:
-        padded = np.zeros((target_size, target_size, img.shape[2]), dtype=img.dtype)
+    # Use INTER_AREA for shrinking, INTER_LINEAR for enlarging
+    interp = cv2.INTER_AREA if scale < 1.0 else cv2.INTER_LINEAR
+    img_resized = cv2.resize(img, (new_w, new_h), interpolation=interp)
+    
+    if len(img_resized.shape) == 3:
+        padded = np.zeros((target_size, target_size, img_resized.shape[2]), dtype=img_resized.dtype)
     else:
-        padded = np.zeros((target_size, target_size), dtype=img.dtype)
+        padded = np.zeros((target_size, target_size), dtype=img_resized.dtype)
     
     top = (target_size - new_h) // 2
     left = (target_size - new_w) // 2
-    padded[top:top+new_h, left:left+new_w] = img
+    padded[top:top+new_h, left:left+new_w] = img_resized
     
-    return padded
+    # Store transform info for reversing during inference
+    transform_info = {
+        "orig_h": h,
+        "orig_w": w,
+        "scale": scale,
+        "pad_top": top,
+        "pad_left": left,
+        "resized_h": new_h,
+        "resized_w": new_w
+    }
+    
+    return padded, transform_info
 
 
 def main():
@@ -141,16 +159,19 @@ def main():
             
             # Save masked crop if valid
             if masked_crop is not None and masked_crop.size > 0:
-                masked_crop_padded = resize_and_pad(masked_crop, target_size=512)
+                masked_crop_padded, transform_info = resize_and_pad(masked_crop, target_size=512)
                 id_subfolder = os.path.join(masked_crops_dir, f"id{det_id}")
                 os.makedirs(id_subfolder, exist_ok=True)
                 crop_path = os.path.join(id_subfolder, f"{frame_idx:05d}.png")
                 cv2.imwrite(crop_path, masked_crop_padded)
+            else:
+                transform_info = None
             
             frame_data["detections"].append({
                 "id": det_id,
                 "class_id": cls_id,
-                "bbox": bbox
+                "bbox": bbox,
+                "transform_info": transform_info
             })
         metadata.append(frame_data)
 
@@ -158,10 +179,19 @@ def main():
     import pandas as pd
     metadata_frame = pd.DataFrame(metadata)
     # Explode detections to have one row per detection
-    metadata_frame = metadata_frame.explode('detections')
+    metadata_frame = metadata_frame.explode('detections').reset_index(drop=True)
     # Expand detection dicts into separate columns
     detections_expanded = metadata_frame['detections'].apply(pd.Series)
-    metadata_frame = metadata_frame.drop('detections', axis=1).join(detections_expanded)
+    metadata_frame = pd.concat([metadata_frame.drop('detections', axis=1), detections_expanded], axis=1)
+    
+    # Expand transform_info dict into separate columns for easy access during inference
+    if 'transform_info' in metadata_frame.columns:
+        transform_expanded = metadata_frame['transform_info'].apply(
+            lambda x: pd.Series(x) if isinstance(x, dict) else pd.Series()
+        )
+        transform_expanded.columns = [f'transform_{col}' for col in transform_expanded.columns]
+        metadata_frame = pd.concat([metadata_frame.drop('transform_info', axis=1), transform_expanded], axis=1)
+    
     metadata_csv_path = os.path.join(output_dir, "tracking_metadata.csv")
     metadata_frame.to_csv(metadata_csv_path, index=False)
     print(f"Tracking metadata saved to: {metadata_csv_path}")
