@@ -85,7 +85,7 @@ def main():
     
     # Step 2: Initialize bbox-based video predictor
     print(f"\nStarting bbox-based tracking on video: {video_path}")
-    overrides = dict(conf=0.25, task="segment", mode="predict", imgsz=644, model=args.model_path, half=True, save=False, compile="default")
+    overrides = dict(conf=0.25, task="segment", mode="predict", imgsz=644, model=args.model_path, half=True, save=False, compile=None)
     predictor = SAM3VideoPredictor(overrides=overrides)
     results = predictor(source=video_path, bboxes=initial_bboxes, stream=True)
 
