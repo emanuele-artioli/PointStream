@@ -180,7 +180,7 @@ def create_skeleton_image(keypoints, bbox, img_size=(512, 512)):
 def main():
     parser = argparse.ArgumentParser(description="Create masked crops and skeleton images")
     parser.add_argument("--experiment_dir", type=str, default="/home/itec/emanuele/pointstream/experiments/20260123_122136_sam_seg", help="Path to the experiment folder")
-    parser.add_argument("--max_frames", type=int, default=10, help="Maximum number of frames to process (for debugging)")
+    parser.add_argument("--max_frames", type=int, default=None, help="Maximum number of frames to process (for debugging)")
     args = parser.parse_args()
 
     experiment_dir = args.experiment_dir
