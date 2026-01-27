@@ -1,7 +1,7 @@
 # python segment_with_sam.py /home/itec/emanuele/Datasets/djokovic_federer/015.mp4 --model_path /home/itec/emanuele/models/sam3.pt
 
 import argparse
-import json
+import datetime
 import os
 import cv2
 import numpy as np
@@ -10,9 +10,36 @@ from ultralytics.models.sam import SAM3VideoPredictor, SAM3SemanticPredictor
 
 # TODO: To improve ID consistency, check bounding boxes after processing all frames and re-assign IDs based on IoU with previous frames.
 # TODO: refine prompts for better segmentation, ablation test
-# TODO: Ultralytics sam3 allows exemplar-based segmentation, try that.
-# TODO: Ultralytics sam3 allows efficiency gains by reusing features, try that too.
+#TODO: right now we are just segmenting players, we need to segment rackets and ball too.
+# TODO: Ultralytics sam3 allows efficiency gains by reusing features, SAM3VideoPredictor already includes this, but could be useful across videos.
 # TODO: if it breaks in the middle, can I save the poses so far with try-finally? Can I resume from there?
+
+
+def resize_and_pad(img, target_size=512):
+    """
+    Resize and pad an image to target_size x target_size, maintaining aspect ratio.
+    """
+    h, w = img.shape[:2]
+    scale = min(target_size / w, target_size / h)
+    
+    if scale < 1.0:
+        new_w = int(w * scale)
+        new_h = int(h * scale)
+        img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
+    else:
+        new_w, new_h = w, h
+    
+    if len(img.shape) == 3:
+        padded = np.zeros((target_size, target_size, img.shape[2]), dtype=img.dtype)
+    else:
+        padded = np.zeros((target_size, target_size), dtype=img.dtype)
+    
+    top = (target_size - new_h) // 2
+    left = (target_size - new_w) // 2
+    padded[top:top+new_h, left:left+new_w] = img
+    
+    return padded
+
 
 def main():
     parser = argparse.ArgumentParser(description="Segment video using SAM with text prompts")
@@ -23,16 +50,13 @@ def main():
     video_path = args.video_path
 
     # 0. Create experiment folder as timestamped directory
-    import datetime
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     
     # Create output directories
     output_dir = f"/home/itec/emanuele/pointstream/experiments/{timestamp}_sam_seg"
     os.makedirs(output_dir, exist_ok=True)
-    masks_dir = os.path.join(output_dir, "masks")
-    os.makedirs(masks_dir, exist_ok=True)
-    frames_dir = os.path.join(output_dir, "frames")
-    os.makedirs(frames_dir, exist_ok=True)
+    masked_crops_dir = os.path.join(output_dir, "masked_crops")
+    os.makedirs(masked_crops_dir, exist_ok=True)
 
     # Step 1: Extract frame 0 and get initial bounding boxes
     print("Extracting frame 0 to get initial bounding boxes...")
@@ -48,7 +72,6 @@ def main():
     cv2.imwrite(frame0_path, frame0)
     
     # Initialize semantic predictor for frame 0 only
-    # Use larger image size for better initial detection accuracy
     overrides = dict(conf=0.25, task="segment", mode="predict", imgsz=1288, model=args.model_path, half=True, save=True, compile=None)
     semantic_predictor = SAM3SemanticPredictor(overrides=overrides)
     semantic_predictor.set_image(frame0_path)
@@ -85,7 +108,7 @@ def main():
     
     # Step 2: Initialize bbox-based video predictor
     print(f"\nStarting bbox-based tracking on video: {video_path}")
-    overrides = dict(conf=0.25, task="segment", mode="predict", imgsz=644, model=args.model_path, half=True, save=False, compile=None)
+    overrides = dict(conf=0.25, task="segment", mode="predict", imgsz=644, model=args.model_path, half=True, save=False, compile="default")
     predictor = SAM3VideoPredictor(overrides=overrides)
     results = predictor(source=video_path, bboxes=initial_bboxes, stream=True)
 
@@ -97,27 +120,37 @@ def main():
         frame_height, frame_width = frame.shape[:2]
         frame_data = {"frame_index": frame_idx, "detections": []}
 
-        # Save frame as PNG
-        frame_filename = os.path.join(frames_dir, f"{frame_idx:05d}.png")
-        cv2.imwrite(frame_filename, frame)
-
         # Process all detections (should be exactly 2 tracked objects)
         for idx, (det, mask) in enumerate(zip(result.boxes, result.masks)):
-            cls_id = int(det.cls[0].cpu().numpy())
+            # Both detections are tennis players, so class_id is always 0 TODO: this is limiting if we want to track more classes.
+            cls_id = 0
             # Assign stable IDs based on bbox order: first bbox = ID 0, second bbox = ID 1
             det_id = idx
             bbox = det.xyxy[0].cpu().numpy().tolist()  # [x1, y1, x2, y2]
-            mask = mask.data.cpu().numpy()[0]  # Binary mask
+            mask_data = mask.data.cpu().numpy()[0]  # Binary mask
             
-            # Save mask as PNG
-            mask_filename = os.path.join(masks_dir, f"{frame_idx:05d}_id{det_id}.png")
-            cv2.imwrite(mask_filename, (mask * 255).astype(np.uint8))
+            # Create masked crop directly
+            x1, y1, x2, y2 = map(int, bbox)
+            x1, y1 = max(0, x1), max(0, y1)
+            x2, y2 = min(frame_width, x2), min(frame_height, y2)
+            
+            # Apply mask to frame and crop
+            mask_3ch = cv2.cvtColor((mask_data * 255).astype(np.uint8), cv2.COLOR_GRAY2BGR)
+            masked_frame = cv2.bitwise_and(frame, mask_3ch)
+            masked_crop = masked_frame[y1:y2, x1:x2]
+            
+            # Save masked crop if valid
+            if masked_crop is not None and masked_crop.size > 0:
+                masked_crop_padded = resize_and_pad(masked_crop, target_size=512)
+                id_subfolder = os.path.join(masked_crops_dir, f"id{det_id}")
+                os.makedirs(id_subfolder, exist_ok=True)
+                crop_path = os.path.join(id_subfolder, f"{frame_idx:05d}.png")
+                cv2.imwrite(crop_path, masked_crop_padded)
             
             frame_data["detections"].append({
                 "id": det_id,
                 "class_id": cls_id,
-                "bbox": bbox,
-                "mask_path": mask_filename
+                "bbox": bbox
             })
         metadata.append(frame_data)
 
