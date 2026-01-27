@@ -1,4 +1,4 @@
-# python segment_with_yolo.py /home/itec/emanuele/Datasets/djokovic_federer/015.mp4 --model_path /home/itec/emanuele/models/yoloe-11l-seg.pt
+# python segment_with_sam.py /home/itec/emanuele/Datasets/djokovic_federer/015.mp4 --model_path /home/itec/emanuele/models/sam3.pt
 
 import argparse
 import json
@@ -6,17 +6,18 @@ import os
 import cv2
 import numpy as np
 import torch
-from ultralytics import YOLOE
+from ultralytics.models.sam import SAM3VideoSemanticPredictor
 
-# TODO: Mutiple untracked object masks in the same frame overwrite each other during saving.
 # TODO: To improve ID consistency, check bounding boxes after processing all frames and re-assign IDs based on IoU with previous frames.
-# TODO: segment with SAM 3 instead?
 # TODO: refine prompts for better segmentation, ablation test
+# TODO: Ultralytics sam3 allows exemplar-based segmentation, tried by passing first frame players. It stopped detecting rackets and ball though.
+# TODO: Ultralytics sam3 allows efficiency gains by reusing features, try that too.
+# TODO: if it breaks in the middle, can I save the poses so far with try-finally? Can I resume from there?
 
 def main():
-    parser = argparse.ArgumentParser(description="Segment video using YOLOE with text prompts")
+    parser = argparse.ArgumentParser(description="Segment video using SAM with text prompts")
     parser.add_argument("--video_path", type=str, default="/home/itec/emanuele/Datasets/djokovic_federer/015.mp4", help="Path to the input video")
-    parser.add_argument("--model_path", type=str, default="/home/itec/emanuele/models/yoloe-11l-seg.pt", help="Path or name of the YOLOE model")
+    parser.add_argument("--model_path", type=str, default="/home/itec/emanuele/models/sam3.pt", help="Path or name of the SAM model")
     args = parser.parse_args()
 
     video_path = args.video_path
@@ -26,30 +27,24 @@ def main():
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     
     # Create output directories
-    output_dir = f"/home/itec/emanuele/pointstream/experiments/{timestamp}_yolo_seg"
+    output_dir = f"/home/itec/emanuele/pointstream/experiments/{timestamp}_sam_seg"
     os.makedirs(output_dir, exist_ok=True)
     masks_dir = os.path.join(output_dir, "masks")
     os.makedirs(masks_dir, exist_ok=True)
     frames_dir = os.path.join(output_dir, "frames")
     os.makedirs(frames_dir, exist_ok=True)
 
-    # Initialize model
-    print(f"Loading model: {args.model_path}")
-    model = YOLOE(args.model_path)
+    # Initialize semantic video predictor
+    overrides = dict(conf=0.25, task="segment", mode="predict", imgsz=640, model=args.model_path, half=True, save=True)
+    predictor = SAM3VideoSemanticPredictor(overrides=overrides)
     
     # Set text prompt for "tennis players holding their rackets"
     # We use a singular prompt which the model generalizes to instances
     names = ["tennis player", "racket", "tennis ball"]
     print(f"Setting classes to: {names}")
-    model.set_classes(names, model.get_text_pe(names))
-
+    
     print(f"Starting tracking on video: {video_path}")
-    # Run tracking with persist=True to maintain IDs across frames
-    # user requested: assume cuda availability
-    # Optimized: half=True (FP16), retina_masks=True (original resolution masks)
-    results = model.track(
-        video_path, stream=True, persist=True, retina_masks=True, conf=0.1, iou=0.1, imgsz=3840, device='cuda', half=True, stream_buffer=True
-    )
+    results = predictor(source=video_path, text=names, stream=True)
 
     metadata = []
     
@@ -63,7 +58,24 @@ def main():
         frame_filename = os.path.join(frames_dir, f"frame{frame_idx:05d}.png")
         cv2.imwrite(frame_filename, frame)
 
-        for det, mask in zip(result.boxes, result.masks):
+        # Filter detections: keep only 2 most confident (first 2) class_id 0 detections
+        class_0_indices = []
+        for idx, det in enumerate(result.boxes):
+            cls_id = int(det.cls[0].cpu().numpy())
+            if cls_id == 0:
+                class_0_indices.append(idx)
+        
+        # Determine which indices to keep
+        indices_to_keep = set(range(len(result.boxes)))
+        if len(class_0_indices) > 2:
+            # Remove all but the first 2 class_id 0 detections
+            indices_to_remove = class_0_indices[2:]
+            indices_to_keep = indices_to_keep - set(indices_to_remove)
+        
+        # Process only filtered detections
+        for idx, (det, mask) in enumerate(zip(result.boxes, result.masks)):
+            if idx not in indices_to_keep:
+                continue
             cls_id = int(det.cls[0].cpu().numpy())
             det_id = int(det.id.cpu().numpy()) if det.id is not None else -1
             bbox = det.xyxy[0].cpu().numpy().tolist()  # [x1, y1, x2, y2]
