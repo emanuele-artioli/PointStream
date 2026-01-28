@@ -37,7 +37,7 @@ def process_video(video_path, output_base_dir, model_path, pose_model_path):
     
     Args:
         video_path: Path to the input video file
-        output_base_dir: Base directory for output (e.g., pointstream/experiments/dataset/djokovic_federer/video_name/)
+        output_base_dir: Base directory for output (e.g., pointstream/experiments/dataset/video_name/scene_name)
         model_path: Path to SAM model
         pose_model_path: Path to YOLO pose model
     
@@ -123,13 +123,13 @@ def main():
     parser.add_argument(
         "--dataset_dir", 
         type=str, 
-        default="/home/itec/emanuele/Datasets/djokovic_federer",
+        default="/home/itec/emanuele/Datasets/medvedev_struff",
         help="Directory containing video files to process"
     )
     parser.add_argument(
         "--dataset_name",
         type=str,
-        default="djokovic_federer",
+        default="medvedev_struff",
         help="Name of the dataset (used for output directory structure)"
     )
     parser.add_argument(
