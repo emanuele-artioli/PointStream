@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 PointStream Pipeline
-Runs A1 (SAM segmentation), A2 (pose extraction), and A3 (masked crops and skeletons) 
+Runs A1 (SAM segmentation) and A2 (pose extraction with skeleton generation) 
 on all videos in a dataset directory.
 """
 
@@ -89,17 +89,7 @@ def process_video(video_path, output_base_dir, model_path, pose_model_path):
     if not run_command(a2_cmd, f"A2: Pose Extraction for {video_name}"):
         return False
     
-    # Step 3: Run A3 - Create Masked Crops and Skeletons
-    a3_cmd = [
-        sys.executable,
-        "/home/itec/emanuele/pointstream/A3_create_masked_crops_and_skeletons.py",
-        "--experiment_dir", latest_experiment
-    ]
-    
-    if not run_command(a3_cmd, f"A3: Create Masked Crops and Skeletons for {video_name}"):
-        return False
-    
-    # Step 4: Organize outputs into the desired structure
+    # Step 3: Organize outputs into the desired structure
     # Move masked_crops and skeletons to video-specific directory
     crops_src = os.path.join(latest_experiment, "masked_crops")
     poses_src = os.path.join(latest_experiment, "skeletons")
