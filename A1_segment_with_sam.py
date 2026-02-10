@@ -6,6 +6,60 @@ import os
 import cv2
 import numpy as np
 import torch
+# Runtime compatibility shim: make CLIP's SimpleTokenizer callable as Ultralytics expects.
+# Some CLIP/OpenCLIP SimpleTokenizer implementations provide an `encode` method but are
+# not callable. Ultralytics' SAM3 implementation calls the tokenizer like a function
+# (tokenizer(text, context_length=...)), which raises a TypeError when the tokenizer
+# instance isn't callable. To handle both cases we add a small __call__ wrapper that
+# returns token ids as a torch.LongTensor with the requested context length.
+# Try CLIP's simple_tokenizer and other common tokenizer modules (open_clip/clip.tokenizer).
+try:
+    from clip import simple_tokenizer as _simple_tokenizer
+except Exception:
+    _simple_tokenizer = None
+
+try:
+    from clip import tokenizer as _clip_tokenizer
+except Exception:
+    _clip_tokenizer = None
+
+try:
+    from open_clip import tokenizer as _open_tokenizer
+except Exception:
+    _open_tokenizer = None
+
+
+def _make_callable_module(module):
+    if module is None:
+        return
+    if not hasattr(module, 'SimpleTokenizer'):
+        return
+
+    cls = module.SimpleTokenizer
+
+    if hasattr(cls, '__call__'):
+        return
+
+    def _simple_tokenizer_call(self, text, context_length=77):
+        """Return token ids tensor for given text. Supports single string or list of strings."""
+        texts = text if isinstance(text, (list, tuple)) else [text]
+        token_ids = [self.encode(t) if hasattr(self, 'encode') else [] for t in texts]
+        import torch
+        out = torch.zeros((len(token_ids), context_length), dtype=torch.long)
+        for i, tks in enumerate(token_ids):
+            tks = tks[:context_length]
+            out[i, :len(tks)] = torch.tensor(tks, dtype=torch.long)
+            if len(tks) < context_length:
+                out[i, len(tks)] = 0
+        return out
+
+    cls.__call__ = _simple_tokenizer_call
+
+
+_make_callable_module(_simple_tokenizer)
+_make_callable_module(_clip_tokenizer)
+_make_callable_module(_open_tokenizer)
+
 from ultralytics.models.sam import SAM3VideoPredictor, SAM3SemanticPredictor
 
 # TODO: To improve ID consistency, check bounding boxes after processing all frames and re-assign IDs based on IoU with previous frames.
@@ -97,20 +151,42 @@ def main():
     # Get detections for tennis players
     names = ["tennis player"]
     print(f"Running semantic segmentation on frame 0 with classes: {names}")
-    frame0_results = semantic_predictor(text=names)
-    
-    # Filter to get 2 most confident class_id 0 detections
+    # Attempt semantic segmentation, but fall back to YOLO object detection if tokenizer incompatibility arises.
     class_0_detections = []
-    for idx, det in enumerate(frame0_results[0].boxes):
-        cls_id = int(det.cls[0].cpu().numpy())
-        if cls_id == 0:
-            bbox = det.xyxy[0].cpu().numpy().tolist()  # [x1, y1, x2, y2]
-            conf = float(det.conf[0].cpu().numpy())
-            class_0_detections.append({"idx": idx, "bbox": bbox, "conf": conf})
+    try:
+        frame0_results = semantic_predictor(text=names)
+        for idx, det in enumerate(frame0_results[0].boxes):
+            # Use .item() to extract scalar safely (avoids future NumPy deprecation errors)
+            cls_id = int(det.cls[0].cpu().item())
+            if cls_id == 0:
+                bbox = det.xyxy[0].cpu().numpy().tolist()  # [x1, y1, x2, y2]
+                conf = float(det.conf[0].cpu().item())
+                class_0_detections.append({"idx": idx, "bbox": bbox, "conf": conf})
+    except TypeError as e:
+        # Known incompatibility: some tokenizer instances are not callable in this environment.
+        print(f"Semantic predictor failed with error: {e}. Falling back to object detection (YOLO) to find players.")
+        try:
+            from ultralytics import YOLO
+            yolo_model = YOLO('/home/itec/emanuele/yolov8n.pt')
+            yolo_res = yolo_model(frame0_path, imgsz=1288, conf=0.25)
+            if yolo_res and len(yolo_res) > 0:
+                res = yolo_res[0]
+                for idx, box in enumerate(res.boxes):
+                    cls_id = int(box.cls.cpu().item())
+                    if cls_id == 0:  # COCO person class
+                        bbox = box.xyxy.cpu().numpy().tolist()[0]
+                        conf = float(box.conf.cpu().item())
+                        class_0_detections.append({"idx": idx, "bbox": bbox, "conf": conf})
+        except Exception as e2:
+            raise RuntimeError(f"Fallback YOLO detection failed: {e2}")
     
     # Check if we have at least 2 detections
     if len(class_0_detections) < 2:
-        raise ValueError(f"Frame 0 has only {len(class_0_detections)} class_id 0 detection(s). Need at least 2 tennis players.")
+        print(f"Frame 0 has only {len(class_0_detections)} class_id 0 detection(s). Need at least 2 tennis players. Skipping this video.")
+        # Clean up temporary frame file and exit gracefully
+        if os.path.exists(frame0_path):
+            os.remove(frame0_path)
+        return
     
     # Sort by confidence and take top 2
     class_0_detections.sort(key=lambda x: x["conf"], reverse=True)
@@ -137,6 +213,12 @@ def main():
         frame = result.orig_img
         frame_height, frame_width = frame.shape[:2]
         frame_data = {"frame_index": frame_idx, "detections": []}
+
+        # Guard against frames with no detections or missing masks
+        if result.masks is None or len(result.boxes) == 0:
+            print(f"Frame {frame_idx} has no masks or boxes; skipping")
+            metadata.append(frame_data)
+            continue
 
         # Process all detections (should be exactly 2 tracked objects)
         for idx, (det, mask) in enumerate(zip(result.boxes, result.masks)):
