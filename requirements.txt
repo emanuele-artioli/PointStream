@@ -1,0 +1,8 @@
+# PointStream requirements
+# NOTE: Install PyTorch with CUDA first (see README.md or environment.yaml)
+
+ultralytics>=8.4
+pandas
+scikit-image
+open-clip-torch
+clip @ git+https://github.com/openai/CLIP.git
