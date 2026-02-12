@@ -179,9 +179,11 @@ def run_inference(ref_image_path, skeleton_pils, config_path,
     )
     reference_unet.load_state_dict(
         torch.load(config.reference_unet_path, map_location="cpu"),
+        strict=False,
     )
     pose_guider.load_state_dict(
         torch.load(config.pose_guider_path, map_location="cpu"),
+        strict=False,
     )
 
     pipe = Pose2VideoPipeline(
