@@ -105,8 +105,9 @@ python process_tennis_datasets.py --folder /path/to/dataset --skip-existing
 
 ```
 experiments/YYYYMMDD_HHMMSS_sam_seg/
-├── tracking_metadata.csv      # SAM3 bounding boxes per frame
+├── tracking_metadata.csv      # SAM3 bounding boxes per frame (includes `video_fps` for new experiments)
 ├── dwpose_keypoints.csv       # 134 DWPose keypoints per frame per player
+├── merged_metadata*.csv       # (new) merged tracking + pose metadata; filename includes `w{detect_w}_h{detect_h}_fps_{fps}` when available (detect size & fps not stored as columns)
 ├── masked_crops/
 │   ├── id0/                   # Player 1 crops (512×512, masked + padded)
 │   └── id1/                   # Player 2 crops

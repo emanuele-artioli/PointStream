@@ -60,16 +60,76 @@ from dwpose import draw_pose, keypoints_to_pose_dict
 
 def load_keypoints(experiment_dir):
     """
-    Load the DWPose keypoints CSV produced by the server.
+    Load the merged metadata CSV (preferred) or fallback to the original
+    `dwpose_keypoints.csv` produced by the server.
 
     Returns:
-        DataFrame with columns: frame_index, player_id, keypoints (json),
-        scores (json), detect_width, detect_height.
+        (df, fps)
+        - df: DataFrame containing `frame_index`, `player_id`, `keypoints`,
+              `scores`, `detect_width`, `detect_height` and (if available)
+              tracking columns merged in.
+        - fps: source video frames-per-second (float) or None if unknown.
     """
-    csv_path = Path(experiment_dir) / "dwpose_keypoints.csv"
-    if not csv_path.exists():
-        raise FileNotFoundError(f"Keypoints CSV not found: {csv_path}")
-    return pd.read_csv(csv_path)
+    exp_dir = Path(experiment_dir)
+
+    # 1) Prefer merged metadata if present
+    merged_files = sorted(exp_dir.glob("merged_metadata*.csv"))
+    if merged_files:
+        merged_path = merged_files[0]
+        df = pd.read_csv(merged_path)
+
+        # Parse detect size / fps from filename (we store constant values in filename)
+        fname = merged_path.stem
+        fps = None
+        detect_w = None
+        detect_h = None
+        # patterns: ..._w{W}_h{H}_fps_{FPS}
+        import re
+        m = re.search(r"w(\d+)_h(\d+)", fname)
+        if m:
+            detect_w = int(m.group(1))
+            detect_h = int(m.group(2))
+        m2 = re.search(r"fps_([0-9]+\.?[0-9]*)", fname)
+        if m2:
+            try:
+                fps = float(m2.group(1))
+            except Exception:
+                fps = None
+
+        # If merged file doesn't include detect_width/height columns (we removed them),
+        # add them to the returned DataFrame for client compatibility
+        if detect_w and "detect_width" not in df.columns:
+            df["detect_width"] = detect_w
+        if detect_h and "detect_height" not in df.columns:
+            df["detect_height"] = detect_h
+
+        return df, fps
+
+    # 2) Fallback: use dwpose_keypoints.csv + tracking_metadata.csv (if present)
+    dw_csv = exp_dir / "dwpose_keypoints.csv"
+    if not dw_csv.exists():
+        raise FileNotFoundError(f"Keypoints CSV not found: {dw_csv}")
+    pose_df = pd.read_csv(dw_csv)
+
+    tracking_csv = exp_dir / "tracking_metadata.csv"
+    fps = None
+    if tracking_csv.exists():
+        track_df = pd.read_csv(tracking_csv)
+        if "video_fps" in track_df.columns:
+            fps_vals = track_df["video_fps"].dropna().unique()
+            fps = float(fps_vals[0]) if len(fps_vals) > 0 else None
+        # merge tracking columns into pose dataframe if helpful (left join)
+        merged = pd.merge(
+            pose_df,
+            track_df,
+            left_on=["frame_index", "player_id"],
+            right_on=["frame_index", "id"],
+            how="left",
+            suffixes=("_pose", "_track"),
+        )
+        return merged, fps
+
+    return pose_df, fps
 
 
 def build_skeleton_image(kpts_json, scores_json, detect_w, detect_h,
@@ -119,7 +179,7 @@ def build_all_skeletons(df, player_id, output_h=512, output_w=512):
 
 def run_inference(ref_image_path, skeleton_pils, config_path,
                   width=512, height=784, length=None, steps=30, cfg=3.5,
-                  seed=42, save_dir=None, player_id=0):
+                  seed=42, fps=None, save_dir=None, player_id=0):
     """
     Run AnimateAnyone Pose2Video inference with a reference image and
     skeleton sequence (both as PIL).
@@ -230,8 +290,9 @@ def run_inference(ref_image_path, skeleton_pils, config_path,
 
     video_with_refs = torch.cat([ref_image_tensor, pose_tensor, video], dim=0)
     out_path = save_dir / f"player_{player_id}_{height}x{width}_{int(cfg)}.mp4"
-    save_videos_grid(video_with_refs, str(out_path), n_rows=3, fps=12)
-    print(f"  Saved: {out_path}")
+    out_fps = fps or 12
+    save_videos_grid(video_with_refs, str(out_path), n_rows=3, fps=out_fps)
+    print(f"  Saved: {out_path} (fps={out_fps})")
     return out_path
 
 
@@ -277,9 +338,11 @@ def main():
     print(f"#  Experiment: {exp_dir}")
     print(f"{'#'*80}\n")
 
-    # Load keypoints
-    kp_df = load_keypoints(exp_dir)
+    # Load keypoints (merged metadata preferred) — returns (df, fps)
+    kp_df, source_fps = load_keypoints(exp_dir)
     all_player_ids = sorted(kp_df["player_id"].unique())
+    if source_fps:
+        print(f"Detected source video FPS: {source_fps}")
 
     if args.player_ids is not None:
         player_ids = [pid for pid in args.player_ids if pid in all_player_ids]
@@ -332,6 +395,7 @@ def main():
             steps=args.steps,
             cfg=args.cfg,
             seed=args.seed,
+            fps=source_fps,
             save_dir=args.output_dir,
             player_id=pid,
         )

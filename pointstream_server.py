@@ -193,10 +193,24 @@ def run_sam_segmentation(video_path, model_path, experiment_dir=None):
     print(f"{'='*80}\n")
 
     cap = cv2.VideoCapture(str(video_path))
+    # Extract FPS (fall back to framecount/duration if unavailable)
+    video_fps = float(cap.get(cv2.CAP_PROP_FPS) or 0.0)
+    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
+    if video_fps == 0.0 and frame_count > 0:
+        # attempt to compute fps via duration when possible
+        video_duration = float(cap.get(cv2.CAP_PROP_POS_MSEC) / 1000.0 or 0.0)
+        if video_duration > 0:
+            video_fps = frame_count / video_duration
     ret, frame0 = cap.read()
     cap.release()
     if not ret:
         raise ValueError("Failed to read frame 0 from input video")
+
+    # store FPS for downstream tools
+    try:
+        video_fps = float(video_fps)
+    except Exception:
+        video_fps = 0.0
 
     frame0_path = output_dir / "frame0_temp.png"
     cv2.imwrite(str(frame0_path), frame0)
@@ -279,9 +293,12 @@ def run_sam_segmentation(video_path, model_path, experiment_dir=None):
         transform_expanded.columns = [f"transform_{col}" for col in transform_expanded.columns]
         metadata_frame = pd.concat([metadata_frame.drop("transform_info", axis=1), transform_expanded], axis=1)
 
+    # add video FPS to tracking metadata so downstream tools (client) can reuse it
+    metadata_frame["video_fps"] = video_fps
+
     metadata_csv_path = output_dir / "tracking_metadata.csv"
     metadata_frame.to_csv(metadata_csv_path, index=False)
-    print(f"Tracking metadata saved to: {metadata_csv_path}")
+    print(f"Tracking metadata saved to: {metadata_csv_path} (video_fps={video_fps})")
     return output_dir
 
 
@@ -366,9 +383,91 @@ def extract_dwpose_keypoints(experiment_dir, det_model=None, pose_model=None):
         return None
 
     out_csv = experiment_dir / "dwpose_keypoints.csv"
-    pd.DataFrame(pose_results).to_csv(out_csv, index=False)
+    pose_df = pd.DataFrame(pose_results)
+    pose_df.to_csv(out_csv, index=False)
     print(f"\n  Saved {len(pose_results)} keypoint rows to {out_csv}")
     print(f"  Reference images in {reference_dir}")
+
+    # --- Merge tracking metadata and pose results into a single metadata file ---
+    tracking_csv = experiment_dir / "tracking_metadata.csv"
+    if tracking_csv.exists():
+        track_df = pd.read_csv(tracking_csv)
+
+        # Round keypoints to nearest integer and round scores to 3 decimals
+        # for the merged file (keep original CSV unchanged)
+        def _round_kpts_json(jstr):
+            try:
+                arr = json.loads(jstr)
+                arr_rounded = [[int(round(x)), int(round(y))] for x, y in arr]
+                return json.dumps(arr_rounded)
+            except Exception:
+                return jstr
+
+        def _round_scores_json(jstr):
+            try:
+                arr = json.loads(jstr)
+                arr_rounded = [round(float(x), 3) for x in arr]
+                return json.dumps(arr_rounded)
+            except Exception:
+                return jstr
+
+        pose_df_merged = pose_df.copy()
+        pose_df_merged["keypoints"] = pose_df_merged["keypoints"].apply(_round_kpts_json)
+        # Round per-keypoint confidence scores to 3 decimal places for readability/storage
+        if "scores" in pose_df_merged.columns:
+            pose_df_merged["scores"] = pose_df_merged["scores"].apply(_round_scores_json)
+
+        # Merge pose + tracking metadata on frame_index & id/player_id
+        merged = pd.merge(
+            pose_df_merged,
+            track_df,
+            left_on=["frame_index", "player_id"],
+            right_on=["frame_index", "id"],
+            how="left",
+            suffixes=("_pose", "_track"),
+        )
+
+        # Detect constants (detect_width/height from pose_df and video_fps from tracking)
+        detect_w = None
+        detect_h = None
+        if "detect_width" in pose_df.columns:
+            detect_vals_w = pose_df["detect_width"].dropna().unique()
+            detect_w = int(detect_vals_w[0]) if len(detect_vals_w) > 0 else None
+        if "detect_height" in pose_df.columns:
+            detect_vals_h = pose_df["detect_height"].dropna().unique()
+            detect_h = int(detect_vals_h[0]) if len(detect_vals_h) > 0 else None
+
+        fps_val = None
+        if "video_fps" in track_df.columns:
+            fps_vals = track_df["video_fps"].dropna().unique()
+            fps_val = float(fps_vals[0]) if len(fps_vals) > 0 else None
+
+        # Cleanup merged dataframe for readability:
+        # - Remove duplicate join columns from tracking side (id)
+        # - Remove detect_width/detect_height/video_fps columns (constants represented in filename)
+        for col in ["id"]:
+            if col in merged.columns:
+                merged.drop(columns=[col], inplace=True)
+        for col in ["detect_width", "detect_height", "video_fps"]:
+            if col in merged.columns:
+                merged.drop(columns=[col], inplace=True)
+
+        # Keep 'scores' in merged because the client uses them to draw skeletons.
+
+        # Build descriptive filename including detect size + fps when available
+        name_parts = [f"merged_metadata"]
+        if detect_w and detect_h:
+            name_parts.append(f"w{detect_w}_h{detect_h}")
+        if fps_val:
+            name_parts.append(f"fps_{fps_val:.3f}")
+        merged_name = "_".join(name_parts) + ".csv"
+
+        merged_path = experiment_dir / merged_name
+        merged.to_csv(merged_path, index=False)
+        print(f"  Wrote merged metadata to: {merged_path}")
+    else:
+        print("  Warning: tracking_metadata.csv not found, skipping merge step")
+
     return out_csv
 
 
