@@ -3,7 +3,7 @@
 PointStream Server – SAM3 Segmentation + DWPose Keypoint Extraction.
 
 Processes a tennis video into compact pose data that the client can animate:
-  1. Segment players from each frame using SAM3 (delegates to A1_segment_with_sam.py).
+    1. Segment players from each frame using SAM3 (native server implementation).
   2. Extract whole-body DWPose keypoints (body + hands + face) from each crop.
   3. Save a keypoints CSV and a reference image per player.
 
@@ -20,9 +20,8 @@ Output structure:
 """
 
 import argparse
+import datetime
 import json
-import os
-import subprocess
 import sys
 from pathlib import Path
 
@@ -30,6 +29,25 @@ import cv2
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+
+# Runtime compatibility shim: make CLIP/OpenCLIP SimpleTokenizer callable
+# as expected by Ultralytics SAM3 semantic predictor.
+try:
+    from clip import simple_tokenizer as _simple_tokenizer
+except Exception:
+    _simple_tokenizer = None
+
+try:
+    from clip import tokenizer as _clip_tokenizer
+except Exception:
+    _clip_tokenizer = None
+
+try:
+    from open_clip import tokenizer as _open_tokenizer
+except Exception:
+    _open_tokenizer = None
+
+from ultralytics.models.sam import SAM3SemanticPredictor, SAM3VideoPredictor
 
 POINTSTREAM_DIR = Path(__file__).resolve().parent
 EXPERIMENTS_DIR = POINTSTREAM_DIR / "experiments"
@@ -40,40 +58,231 @@ if str(POINTSTREAM_DIR) not in sys.path:
 
 
 # ---------------------------------------------------------------------------
-# Step 1 – SAM3 segmentation (thin wrapper around the existing A1 script)
+# Step 1 – SAM3 segmentation (fully inlined, independent from A1 script)
 # ---------------------------------------------------------------------------
 
-def run_sam_segmentation(video_path, model_path):
-    """
-    Run A1_segment_with_sam.py and return the path of the created experiment directory.
-    """
-    a1_script = str(POINTSTREAM_DIR / "A1_segment_with_sam.py")
-    cmd = [sys.executable, a1_script,
-           "--video_path", str(video_path),
-           "--model_path", str(model_path)]
+
+def _make_callable_module(module):
+    if module is None or not hasattr(module, "SimpleTokenizer"):
+        return
+
+    cls = module.SimpleTokenizer
+    try:
+        tokenizer_instance = cls()
+    except Exception:
+        tokenizer_instance = None
+
+    if tokenizer_instance is not None and callable(tokenizer_instance):
+        return
+
+    def _simple_tokenizer_call(self, text, context_length=77):
+        texts = text if isinstance(text, (list, tuple)) else [text]
+        token_ids = [self.encode(t) if hasattr(self, "encode") else [] for t in texts]
+        import torch
+
+        out = torch.zeros((len(token_ids), context_length), dtype=torch.long)
+        for i, tks in enumerate(token_ids):
+            tks = tks[:context_length]
+            out[i, : len(tks)] = torch.tensor(tks, dtype=torch.long)
+            if len(tks) < context_length:
+                out[i, len(tks)] = 0
+        return out
+
+    cls.__call__ = _simple_tokenizer_call
+
+
+_make_callable_module(_simple_tokenizer)
+_make_callable_module(_clip_tokenizer)
+_make_callable_module(_open_tokenizer)
+
+
+def _resize_and_pad(img, target_size=512):
+    h, w = img.shape[:2]
+    scale = target_size / max(w, h)
+    new_w = int(w * scale)
+    new_h = int(h * scale)
+    interp = cv2.INTER_AREA if scale < 1.0 else cv2.INTER_LINEAR
+    img_resized = cv2.resize(img, (new_w, new_h), interpolation=interp)
+
+    if len(img_resized.shape) == 3:
+        padded = np.zeros((target_size, target_size, img_resized.shape[2]), dtype=img_resized.dtype)
+    else:
+        padded = np.zeros((target_size, target_size), dtype=img_resized.dtype)
+
+    top = (target_size - new_h) // 2
+    left = (target_size - new_w) // 2
+    padded[top : top + new_h, left : left + new_w] = img_resized
+
+    transform_info = {
+        "orig_h": h,
+        "orig_w": w,
+        "scale": scale,
+        "pad_top": top,
+        "pad_left": left,
+        "resized_h": new_h,
+        "resized_w": new_w,
+    }
+    return padded, transform_info
+
+
+def _get_initial_bboxes_from_frame0(frame0_path, model_path):
+    overrides = dict(
+        conf=0.25,
+        task="segment",
+        mode="predict",
+        imgsz=1288,
+        model=model_path,
+        half=True,
+        save=False,
+        compile=None,
+    )
+    semantic_predictor = SAM3SemanticPredictor(overrides=overrides)
+    semantic_predictor.set_image(frame0_path)
+
+    names = ["tennis player"]
+    print(f"Running SAM3 semantic segmentation on frame 0 with text prompts: {names}")
+    try:
+        frame0_results = semantic_predictor(text=names)
+    except Exception as exc:
+        raise RuntimeError(
+            "SAM3 semantic prediction failed. "
+            f"Error: {exc}. "
+            "Tokenizer shim has been applied but semantic prompting still failed. "
+            "Please verify clip/open-clip package compatibility in the pointstream environment."
+        ) from exc
+
+    class_0_detections = []
+    if frame0_results and len(frame0_results) > 0:
+        for det in frame0_results[0].boxes:
+            cls_id = int(det.cls[0].cpu().item())
+            if cls_id == 0:
+                bbox = det.xyxy[0].cpu().numpy().tolist()
+                conf = float(det.conf[0].cpu().item())
+                class_0_detections.append({"bbox": bbox, "conf": conf})
+
+    if len(class_0_detections) < 2:
+        raise RuntimeError(
+            "SAM3 semantic predictor found fewer than 2 tennis players on frame 0. "
+            f"Detections found: {len(class_0_detections)}"
+        )
+
+    class_0_detections.sort(key=lambda x: x["conf"], reverse=True)
+    return [det["bbox"] for det in class_0_detections[:2]]
+
+
+def run_sam_segmentation(video_path, model_path, experiment_dir=None):
+    video_path = Path(video_path)
+    if not video_path.exists():
+        raise FileNotFoundError(f"Video not found: {video_path}")
+
+    if experiment_dir:
+        output_dir = Path(experiment_dir)
+    else:
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_dir = EXPERIMENTS_DIR / f"{timestamp}_sam_seg"
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    masked_crops_dir = output_dir / "masked_crops"
+    masked_crops_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"\n{'='*80}")
-    print(f"Step 1: SAM3 segmentation")
+    print("Step 1: SAM3 segmentation")
     print(f"  Video : {video_path}")
     print(f"  Model : {model_path}")
+    print(f"  Output: {output_dir}")
     print(f"{'='*80}\n")
 
-    result = subprocess.run(cmd, text=True)
-    if result.returncode != 0:
-        raise RuntimeError("SAM3 segmentation failed (see output above)")
+    cap = cv2.VideoCapture(str(video_path))
+    ret, frame0 = cap.read()
+    cap.release()
+    if not ret:
+        raise ValueError("Failed to read frame 0 from input video")
 
-    # Find the latest experiment directory
-    experiment_dirs = sorted(
-        [d for d in EXPERIMENTS_DIR.iterdir()
-         if d.is_dir() and d.name.endswith("_sam_seg")],
-        key=lambda p: p.stat().st_mtime,
+    frame0_path = output_dir / "frame0_temp.png"
+    cv2.imwrite(str(frame0_path), frame0)
+
+    try:
+        initial_bboxes = _get_initial_bboxes_from_frame0(str(frame0_path), str(model_path))
+    finally:
+        if frame0_path.exists():
+            frame0_path.unlink()
+
+    print("Using top-2 frame-0 SAM3 detections for tracking:")
+    for i, bbox in enumerate(initial_bboxes):
+        print(f"  Player {i + 1}: {bbox}")
+
+    overrides = dict(
+        conf=0.25,
+        task="segment",
+        mode="predict",
+        imgsz=644,
+        model=str(model_path),
+        half=True,
+        save=False,
+        compile=None,
     )
-    if not experiment_dirs:
-        raise FileNotFoundError("No experiment directory found after SAM3 segmentation")
+    predictor = SAM3VideoPredictor(overrides=overrides)
+    results = predictor(source=str(video_path), bboxes=initial_bboxes, stream=True)
 
-    exp_dir = experiment_dirs[-1]
-    print(f"  Experiment directory: {exp_dir}")
-    return exp_dir
+    metadata = []
+    for frame_idx, result in enumerate(results):
+        frame = result.orig_img
+        frame_h, frame_w = frame.shape[:2]
+        frame_data = {"frame_index": frame_idx, "detections": []}
+
+        if result.masks is None or len(result.boxes) == 0:
+            metadata.append(frame_data)
+            continue
+
+        for idx, (det, mask) in enumerate(zip(result.boxes, result.masks)):
+            cls_id = 0
+            det_id = idx
+            bbox = det.xyxy[0].cpu().numpy().tolist()
+            mask_data = mask.data.cpu().numpy()[0]
+
+            x1, y1, x2, y2 = map(int, bbox)
+            x1, y1 = max(0, x1), max(0, y1)
+            x2, y2 = min(frame_w, x2), min(frame_h, y2)
+
+            mask_3ch = cv2.cvtColor((mask_data * 255).astype(np.uint8), cv2.COLOR_GRAY2BGR)
+            masked_frame = cv2.bitwise_and(frame, mask_3ch)
+            masked_crop = masked_frame[y1:y2, x1:x2]
+
+            if masked_crop is not None and masked_crop.size > 0:
+                masked_crop_padded, transform_info = _resize_and_pad(masked_crop, target_size=512)
+                id_subfolder = masked_crops_dir / f"id{det_id}"
+                id_subfolder.mkdir(parents=True, exist_ok=True)
+                crop_path = id_subfolder / f"{frame_idx:05d}.png"
+                cv2.imwrite(str(crop_path), masked_crop_padded)
+            else:
+                transform_info = None
+
+            frame_data["detections"].append(
+                {
+                    "id": det_id,
+                    "class_id": cls_id,
+                    "bbox": bbox,
+                    "transform_info": transform_info,
+                }
+            )
+        metadata.append(frame_data)
+
+    metadata_frame = pd.DataFrame(metadata)
+    metadata_frame = metadata_frame.explode("detections").reset_index(drop=True)
+    detections_expanded = metadata_frame["detections"].apply(pd.Series)
+    metadata_frame = pd.concat([metadata_frame.drop("detections", axis=1), detections_expanded], axis=1)
+
+    if "transform_info" in metadata_frame.columns:
+        transform_expanded = metadata_frame["transform_info"].apply(
+            lambda x: pd.Series(x) if isinstance(x, dict) else pd.Series()
+        )
+        transform_expanded.columns = [f"transform_{col}" for col in transform_expanded.columns]
+        metadata_frame = pd.concat([metadata_frame.drop("transform_info", axis=1), transform_expanded], axis=1)
+
+    metadata_csv_path = output_dir / "tracking_metadata.csv"
+    metadata_frame.to_csv(metadata_csv_path, index=False)
+    print(f"Tracking metadata saved to: {metadata_csv_path}")
+    return output_dir
 
 
 # ---------------------------------------------------------------------------
@@ -88,8 +297,8 @@ def extract_dwpose_keypoints(experiment_dir, det_model=None, pose_model=None):
 
     Args:
         experiment_dir: path containing masked_crops/ and tracking_metadata.csv.
-        det_model: path to YOLOX ONNX model (default: Moore-AnimateAnyone weights).
-        pose_model: path to DW-LL pose ONNX model (default: Moore-AnimateAnyone weights).
+        det_model: path to YOLOX ONNX model (default: /home/itec/emanuele/Models/DWPose/yolox_l.onnx).
+        pose_model: path to DW-LL pose ONNX model (default: /home/itec/emanuele/Models/DWPose/dw-ll_ucoco_384.onnx).
     """
     from dwpose import Wholebody, extract_best_person
 
@@ -175,14 +384,14 @@ def main():
     parser.add_argument("--video_path", type=str, default="",
                         help="Input tennis video (required unless --experiment_dir is given)")
     parser.add_argument("--sam_model", type=str,
-                        default="/home/itec/emanuele/models/sam3.pt",
+                        default="/home/itec/emanuele/Models/SAM/sam3.pt",
                         help="Path to SAM3 model")
     parser.add_argument("--dwpose_det_model", type=str, default=None,
                         help="Path to YOLOX ONNX detection model "
-                             "(default: Moore-AnimateAnyone/pretrained_weights/DWPose/yolox_l.onnx)")
+                            "(default: /home/itec/emanuele/Models/DWPose/yolox_l.onnx)")
     parser.add_argument("--dwpose_pose_model", type=str, default=None,
                         help="Path to DW-LL pose ONNX model "
-                             "(default: Moore-AnimateAnyone/pretrained_weights/DWPose/dw-ll_ucoco_384.onnx)")
+                            "(default: /home/itec/emanuele/Models/DWPose/dw-ll_ucoco_384.onnx)")
     parser.add_argument("--experiment_dir", type=str, default=None,
                         help="Skip SAM3 and run DWPose on an existing experiment directory")
     args = parser.parse_args()
