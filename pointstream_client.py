@@ -22,6 +22,7 @@ import argparse
 import json
 import os
 import sys
+import shutil
 from datetime import datetime
 from pathlib import Path
 
@@ -249,8 +250,8 @@ def main():
                              "(default: configs/prompts/run_finetuned.yaml)")
     parser.add_argument("--player_ids", type=int, nargs="*", default=None,
                         help="Which player IDs to animate (default: all)")
-    parser.add_argument("-W", type=int, default=512, help="Output width")
-    parser.add_argument("-H", type=int, default=784, help="Output height")
+    parser.add_argument("-W", type=int, default=512, help="Output width (per-frame)")
+    parser.add_argument("-H", type=int, default=512, help="Output height (per-frame) — default changed to 512 for square frames)")
     parser.add_argument("-L", type=int, default=24, help="Sequence length (frames)")
     parser.add_argument("--steps", type=int, default=30, help="Denoising steps")
     parser.add_argument("--cfg", type=float, default=3.5, help="Guidance scale")
@@ -317,7 +318,7 @@ def main():
             continue
 
         # Run inference
-        run_inference(
+        out_path = run_inference(
             ref_image_path=str(ref_path),
             skeleton_pils=skeletons,
             config_path=args.config,
@@ -330,6 +331,16 @@ def main():
             save_dir=args.output_dir,
             player_id=pid,
         )
+
+        # Copy generated video(s) back into the experiment folder for easy access
+        try:
+            exp_out_dir = exp_dir
+            exp_out_dir.mkdir(parents=True, exist_ok=True)
+            dst_name = exp_out_dir / f"output_player_{pid}.mp4"
+            shutil.copy2(str(out_path), str(dst_name))
+            print(f"  Copied generated video to: {dst_name}")
+        except Exception as e:
+            print(f"  Warning: failed to copy generated video into experiment dir: {e}")
 
     print(f"\n{'='*80}")
     print(f"Client finished.")
