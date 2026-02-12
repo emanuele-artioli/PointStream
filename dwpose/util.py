@@ -2,7 +2,7 @@
 # Drawing utilities – copied from Moore-AnimateAnyone with no functional changes.
 
 import math
-import colorsys
+import matplotlib
 
 import cv2
 import numpy as np
@@ -105,14 +105,7 @@ def draw_handpose(canvas, all_hand_peaks):
                     canvas,
                     (x1, y1),
                     (x2, y2),
-                    tuple(
-                        int(c * 255)
-                        for c in colorsys.hsv_to_rgb(
-                            ie / float(len(edges)),
-                            1.0,
-                            1.0,
-                        )
-                    ),
+                    matplotlib.colors.hsv_to_rgb([ie / float(len(edges)), 1.0, 1.0]) * 255,
                     thickness=2,
                 )
 
