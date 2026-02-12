@@ -68,23 +68,49 @@ class Wholebody:
 
 
 def _create_session(onnx_path, try_cuda=True):
-    """Create an ONNXRuntime InferenceSession, falling back to CPU if CUDA fails."""
+    """Create an ONNXRuntime InferenceSession.
+
+    Notes on provider assignment:
+    - ONNX Runtime may intentionally place some shape/control nodes on CPU even when
+      CUDA is enabled (this is expected and often faster).
+    - We explicitly register providers in priority order (CUDA -> CPU) so node placement
+      and fallback behavior are deterministic.
+    """
+    sess_options = ort.SessionOptions()
+    sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+
     if not try_cuda:
-        return ort.InferenceSession(path_or_bytes=onnx_path, providers=["CPUExecutionProvider"])
+        return ort.InferenceSession(
+            path_or_bytes=onnx_path,
+            sess_options=sess_options,
+            providers=["CPUExecutionProvider"],
+        )
 
     try:
-        return ort.InferenceSession(path_or_bytes=onnx_path, providers=["CUDAExecutionProvider"])
+        return ort.InferenceSession(
+            path_or_bytes=onnx_path,
+            sess_options=sess_options,
+            providers=["CUDAExecutionProvider", "CPUExecutionProvider"],
+        )
     except Exception:
         try:
             import torch  # noqa: F401
         except Exception:
             pass
         try:
-            return ort.InferenceSession(path_or_bytes=onnx_path, providers=["CUDAExecutionProvider"])
+            return ort.InferenceSession(
+                path_or_bytes=onnx_path,
+                sess_options=sess_options,
+                providers=["CUDAExecutionProvider", "CPUExecutionProvider"],
+            )
         except Exception as exc:
             import warnings
             warnings.warn(
                 f"CUDA EP failed for ONNXRuntime; falling back to CPU. Error: {exc}. "
                 "Install a matching onnxruntime-gpu wheel for GPU support."
             )
-            return ort.InferenceSession(path_or_bytes=onnx_path, providers=["CPUExecutionProvider"])
+            return ort.InferenceSession(
+                path_or_bytes=onnx_path,
+                sess_options=sess_options,
+                providers=["CPUExecutionProvider"],
+            )
