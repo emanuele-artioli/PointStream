@@ -118,7 +118,7 @@ def build_all_skeletons(df, player_id, output_h=512, output_w=512):
 # ---------------------------------------------------------------------------
 
 def run_inference(ref_image_path, skeleton_pils, config_path,
-                  width=512, height=784, length=24, steps=30, cfg=3.5,
+                  width=512, height=784, length=None, steps=30, cfg=3.5,
                   seed=42, save_dir=None, player_id=0):
     """
     Run AnimateAnyone Pose2Video inference with a reference image and
@@ -202,7 +202,9 @@ def run_inference(ref_image_path, skeleton_pils, config_path,
         transforms.ToTensor(),
     ])
 
-    L = min(length, len(skeleton_pils))
+    # Use full skeleton sequence if `length` is None, otherwise cap to available frames
+    L = len(skeleton_pils) if length is None else min(length, len(skeleton_pils))
+    print(f"    Using sequence length L={L} (requested: {length}, available: {len(skeleton_pils)})")
     pose_list = skeleton_pils[:L]
     pose_tensor_list = [pose_transform(p) for p in pose_list]
 
@@ -254,7 +256,7 @@ def main():
                         help="Which player IDs to animate (default: all)")
     parser.add_argument("-W", type=int, default=512, help="Output width (per-frame)")
     parser.add_argument("-H", type=int, default=512, help="Output height (per-frame) — default changed to 512 for square frames)")
-    parser.add_argument("-L", type=int, default=24, help="Sequence length (frames)")
+    parser.add_argument("-L", type=int, default=None, help="Sequence length (frames) — default: all available frames from the DWpose CSV")
     parser.add_argument("--steps", type=int, default=30, help="Denoising steps")
     parser.add_argument("--cfg", type=float, default=3.5, help="Guidance scale")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
