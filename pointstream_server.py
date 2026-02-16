@@ -23,6 +23,7 @@ import argparse
 import datetime
 import json
 import sys
+import time
 from pathlib import Path
 
 import cv2
@@ -499,18 +500,47 @@ def main():
     print(f"#  PointStream Server")
     print(f"{'#'*80}")
 
+    start_total = time.perf_counter()
+    timings = {}
+
     if args.experiment_dir:
         exp_dir = Path(args.experiment_dir)
     else:
         if not args.video_path:
             parser.error("--video_path is required unless --experiment_dir is given")
+        step_start = time.perf_counter()
         exp_dir = run_sam_segmentation(args.video_path, args.sam_model)
+        timings["sam_segmentation_sec"] = round(time.perf_counter() - step_start, 3)
 
+    step_start = time.perf_counter()
     out_csv = extract_dwpose_keypoints(
         exp_dir,
         det_model=args.dwpose_det_model,
         pose_model=args.dwpose_pose_model,
     )
+    timings["dwpose_extraction_sec"] = round(time.perf_counter() - step_start, 3)
+    timings["server_total_sec"] = round(time.perf_counter() - start_total, 3)
+
+    try:
+        eval_payload = {
+            "script": "pointstream_server.py",
+            "timestamp": datetime.datetime.now().isoformat(),
+            "experiment_dir": str(exp_dir),
+            "config": {
+                "video_path": args.video_path,
+                "sam_model": args.sam_model,
+                "dwpose_det_model": args.dwpose_det_model,
+                "dwpose_pose_model": args.dwpose_pose_model,
+                "experiment_dir": args.experiment_dir,
+            },
+            "timings": timings,
+        }
+        eval_path = exp_dir / "evaluation_server.json"
+        with eval_path.open("w", encoding="utf-8") as f:
+            json.dump(eval_payload, f, indent=2)
+        print(f"  Wrote evaluation metadata: {eval_path}")
+    except Exception as exc:
+        print(f"  Warning: failed to write evaluation_server.json: {exc}")
 
     print(f"\n{'='*80}")
     print(f"Server finished.")

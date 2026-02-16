@@ -101,6 +101,29 @@ python pointstream_server.py --experiment_dir experiments/20260209_100146_sam_se
 python process_tennis_datasets.py --folder /path/to/dataset --skip-existing
 ```
 
+### Evaluate experiments (config + timings + PSNR)
+
+```bash
+conda activate pointstream
+python evaluate_experiments.py \
+    --experiments_root /home/itec/emanuele/pointstream/experiments
+```
+
+Optional arguments:
+- `--output_csv /path/to/evaluation_summary.csv`
+- `--output_json /path/to/evaluation_summary.json`
+- `--max_frames N` (limit PSNR frames per player for faster evaluation)
+
+The evaluator collects, per experiment:
+- Config parameters from `evaluation_server.json` and `evaluation_client.json`
+- Sub-task timing (`sam_segmentation_sec`, `dwpose_extraction_sec`,
+    `skeleton_reconstruction_sec`, `inference_sec`, totals)
+- PSNR quality by player and weighted experiment mean (`output_player_*.mp4`
+    vs `masked_crops/id*/`)
+
+`evaluation_server.json` and `evaluation_client.json` are now written by
+`pointstream_server.py` and `pointstream_client.py` at the end of each run.
+
 ## Output Structure
 
 ```

@@ -23,6 +23,7 @@ import json
 import os
 import sys
 import shutil
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -338,6 +339,11 @@ def main():
     print(f"#  Experiment: {exp_dir}")
     print(f"{'#'*80}\n")
 
+    start_total = time.perf_counter()
+    eval_timings = {
+        "per_player": {},
+    }
+
     # Load keypoints (merged metadata preferred) — returns (df, fps)
     kp_df, source_fps = load_keypoints(exp_dir)
     all_player_ids = sorted(kp_df["player_id"].unique())
@@ -363,7 +369,10 @@ def main():
             continue
 
         # Build skeletons
+        step_start = time.perf_counter()
         skeletons = build_all_skeletons(kp_df, pid, args.H, args.W)
+        skeleton_time = round(time.perf_counter() - step_start, 3)
+        eval_timings["per_player"].setdefault(str(pid), {})["skeleton_reconstruction_sec"] = skeleton_time
         print(f"  Built {len(skeletons)} skeleton frames")
 
         if not skeletons:
@@ -382,9 +391,11 @@ def main():
             for i, skel in enumerate(skeletons):
                 skel.save(skel_debug_dir / f"{i:05d}.png")
             print(f"  All {len(skeletons)} skeletons saved (--skeletons_only mode)")
+            eval_timings["per_player"].setdefault(str(pid), {})["inference_sec"] = 0.0
             continue
 
         # Run inference
+        step_start = time.perf_counter()
         out_path = run_inference(
             ref_image_path=str(ref_path),
             skeleton_pils=skeletons,
@@ -399,6 +410,8 @@ def main():
             save_dir=args.output_dir,
             player_id=pid,
         )
+        inference_time = round(time.perf_counter() - step_start, 3)
+        eval_timings["per_player"].setdefault(str(pid), {})["inference_sec"] = inference_time
 
         # Copy generated video(s) back into the experiment folder for easy access
         try:
@@ -409,6 +422,43 @@ def main():
             print(f"  Copied generated video to: {dst_name}")
         except Exception as e:
             print(f"  Warning: failed to copy generated video into experiment dir: {e}")
+
+    eval_timings["client_total_sec"] = round(time.perf_counter() - start_total, 3)
+    eval_timings["skeleton_reconstruction_sec"] = round(
+        sum(v.get("skeleton_reconstruction_sec", 0.0) for v in eval_timings["per_player"].values()), 3
+    )
+    eval_timings["inference_sec"] = round(
+        sum(v.get("inference_sec", 0.0) for v in eval_timings["per_player"].values()), 3
+    )
+
+    try:
+        eval_payload = {
+            "script": "pointstream_client.py",
+            "timestamp": datetime.now().isoformat(),
+            "experiment_dir": str(exp_dir),
+            "config": {
+                "animate_anyone_dir": str(args.animate_anyone_dir),
+                "config": str(args.config),
+                "player_ids": [int(pid) for pid in player_ids],
+                "W": int(args.W),
+                "H": int(args.H),
+                "L": None if args.L is None else int(args.L),
+                "steps": int(args.steps),
+                "cfg": float(args.cfg),
+                "seed": int(args.seed),
+                "output_dir": args.output_dir,
+                "skeletons_only": bool(args.skeletons_only),
+                "source_fps": source_fps,
+            },
+            "timings": eval_timings,
+        }
+        eval_json = json.dumps(eval_payload, indent=2)
+        eval_path = exp_dir / "evaluation_client.json"
+        with eval_path.open("w", encoding="utf-8") as f:
+            f.write(eval_json)
+        print(f"Wrote evaluation metadata: {eval_path}")
+    except Exception as exc:
+        print(f"Warning: failed to write evaluation_client.json: {exc}")
 
     print(f"\n{'='*80}")
     print(f"Client finished.")
