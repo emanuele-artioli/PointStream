@@ -243,6 +243,29 @@ def _flatten_record(experiment_dir: Path, max_frames: Optional[int] = None) -> D
     fg_dir = experiment_dir / "foreground"
     server_eval = _safe_load_json((fg_dir / "evaluation_server.json") if fg_dir.exists() else (experiment_dir / "evaluation_server.json"))
     client_eval = _safe_load_json((fg_dir / "evaluation_client.json") if fg_dir.exists() else (experiment_dir / "evaluation_client.json"))
+
+    # background evaluation (prefer `background/` folder, fall back to root)
+    bg_dir = experiment_dir / "background"
+    bg_server_eval = _safe_load_json((bg_dir / "evaluation_background_server.json") if bg_dir.exists() else (experiment_dir / "evaluation_background_server.json"))
+    bg_client_eval = _safe_load_json((bg_dir / "evaluation_background_client.json") if bg_dir.exists() else (experiment_dir / "evaluation_background_client.json"))
+
+    # background intrinsics -> detect fallback video and size
+    intrinsics = _safe_load_json((bg_dir / "background_intrinsics.json") if bg_dir.exists() else (experiment_dir / "background_intrinsics.json"))
+    panorama_failed = False
+    fallback_video = None
+    fallback_size_bytes = None
+    if intrinsics:
+        panorama_failed = bool(intrinsics.get("panorama_failed", False))
+        fallback_video = intrinsics.get("fallback_video")
+        if fallback_video:
+            # look for fallback file inside background/ then root
+            fallback_path = (bg_dir / fallback_video) if bg_dir.exists() else (experiment_dir / fallback_video)
+            if fallback_path.exists():
+                try:
+                    fallback_size_bytes = int(fallback_path.stat().st_size)
+                except Exception:
+                    fallback_size_bytes = None
+
     inferred = _infer_constants_from_merged_filename(experiment_dir)
     psnr = _compute_psnr_for_experiment(experiment_dir, max_frames=max_frames)
 
@@ -256,18 +279,33 @@ def _flatten_record(experiment_dir: Path, max_frames: Optional[int] = None) -> D
         "detect_height": inferred["detect_height"],
         "source_fps": inferred["source_fps"],
         "merged_metadata": inferred["merged_metadata"],
+
+        # server / client timings
         "server_sam_segmentation_sec": server_timings.get("sam_segmentation_sec"),
         "server_dwpose_extraction_sec": server_timings.get("dwpose_extraction_sec"),
         "server_total_sec": server_timings.get("server_total_sec"),
         "client_skeleton_reconstruction_sec": client_timings.get("skeleton_reconstruction_sec"),
         "client_inference_sec": client_timings.get("inference_sec"),
         "client_total_sec": client_timings.get("client_total_sec"),
+
+        # background metrics
+        "background_exists": (experiment_dir / "background").exists(),
+        "background_server_total_sec": (bg_server_eval or {}).get("timings", {}).get("server_total_sec"),
+        "background_reconstruction_sec": (bg_client_eval or {}).get("timings", {}).get("reconstruction_sec"),
+        "background_panorama_failed": panorama_failed,
+        "background_fallback_video": fallback_video,
+        "background_fallback_size_bytes": fallback_size_bytes,
+
         "pipeline_total_sec": None,
         "psnr_mean": psnr["psnr_mean"],
         "psnr_std": psnr["psnr_std"],
         "psnr_num_frames": psnr["psnr_num_frames"],
+
         "server_config_json": json.dumps((server_eval or {}).get("config", {}), ensure_ascii=False),
         "client_config_json": json.dumps((client_eval or {}).get("config", {}), ensure_ascii=False),
+        "background_server_config_json": json.dumps((bg_server_eval or {}).get("config", {}), ensure_ascii=False),
+        "background_client_config_json": json.dumps((bg_client_eval or {}).get("config", {}), ensure_ascii=False),
+
         "per_player_timings_json": json.dumps(client_timings.get("per_player", {}), ensure_ascii=False),
         "psnr_by_player_json": json.dumps(psnr["psnr_by_player"], ensure_ascii=False),
     }
