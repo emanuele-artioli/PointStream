@@ -40,7 +40,13 @@ def _safe_load_json(path: Path) -> Optional[Dict[str, Any]]:
 
 
 def _infer_constants_from_merged_filename(experiment_dir: Path) -> Dict[str, Any]:
-    merged_files = sorted(experiment_dir.glob("merged_metadata*.csv"))
+    # prefer merged metadata inside `foreground/` if available
+    fg_dir = experiment_dir / "foreground"
+    merged_files = []
+    if fg_dir.exists():
+        merged_files = sorted(fg_dir.glob("merged_metadata*.csv"))
+    if not merged_files:
+        merged_files = sorted(experiment_dir.glob("merged_metadata*.csv"))
     if not merged_files:
         return {"detect_width": None, "detect_height": None, "source_fps": None, "merged_metadata": None}
 
@@ -86,7 +92,10 @@ def _extract_generated_panel(frame: np.ndarray) -> np.ndarray:
 
 def _compute_psnr_for_player(experiment_dir: Path, player_id: int, max_frames: Optional[int] = None) -> Dict[str, Any]:
     output_video = experiment_dir / f"output_player_{player_id}.mp4"
-    masked_dir = experiment_dir / "masked_crops" / f"id{player_id}"
+    # masked crops / generated outputs live under foreground/ in the new layout
+    fg_dir = experiment_dir / "foreground"
+    output_video = (fg_dir / f"output_player_{player_id}.mp4") if fg_dir.exists() else (experiment_dir / f"output_player_{player_id}.mp4")
+    masked_dir = (fg_dir / "masked_crops" / f"id{player_id}") if fg_dir.exists() else (experiment_dir / "masked_crops" / f"id{player_id}")
 
     if not output_video.exists() or not masked_dir.exists():
         return {
@@ -166,7 +175,9 @@ def _compute_psnr_for_player(experiment_dir: Path, player_id: int, max_frames: O
 
 
 def _compute_psnr_for_experiment(experiment_dir: Path, max_frames: Optional[int] = None) -> Dict[str, Any]:
-    outputs = sorted(experiment_dir.glob("output_player_*.mp4"))
+    # look for generated outputs in foreground/ first, then fallback to root
+    fg_dir = experiment_dir / "foreground"
+    outputs = sorted((fg_dir).glob("output_player_*.mp4")) if fg_dir.exists() else sorted(experiment_dir.glob("output_player_*.mp4"))
     player_ids = [pid for pid in (_extract_player_id_from_name(p) for p in outputs) if pid is not None]
 
     if not player_ids:
@@ -217,14 +228,21 @@ def _discover_experiments(root: Path) -> List[Path]:
     for child in sorted(root.iterdir()):
         if not child.is_dir():
             continue
+        # accept experiments that either use the new `foreground/` layout or the legacy root layout
+        fg_child = child / "foreground"
+        if (fg_child.exists() and ((fg_child / "dwpose_keypoints.csv").exists() or (fg_child / "tracking_metadata.csv").exists())):
+            experiments.append(child)
+            continue
         if (child / "dwpose_keypoints.csv").exists() or (child / "tracking_metadata.csv").exists():
             experiments.append(child)
     return experiments
 
 
 def _flatten_record(experiment_dir: Path, max_frames: Optional[int] = None) -> Dict[str, Any]:
-    server_eval = _safe_load_json(experiment_dir / "evaluation_server.json")
-    client_eval = _safe_load_json(experiment_dir / "evaluation_client.json")
+    # prefer evaluation JSONs inside foreground/ when present
+    fg_dir = experiment_dir / "foreground"
+    server_eval = _safe_load_json((fg_dir / "evaluation_server.json") if fg_dir.exists() else (experiment_dir / "evaluation_server.json"))
+    client_eval = _safe_load_json((fg_dir / "evaluation_client.json") if fg_dir.exists() else (experiment_dir / "evaluation_client.json"))
     inferred = _infer_constants_from_merged_filename(experiment_dir)
     psnr = _compute_psnr_for_experiment(experiment_dir, max_frames=max_frames)
 

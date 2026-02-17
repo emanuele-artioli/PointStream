@@ -206,6 +206,12 @@ def main() -> None:
     out_video = bg_dir / args.output_name
     bg_dir.mkdir(parents=True, exist_ok=True)
 
+    # backward-compatible: allow intrinsics/panorama to live at experiment root
+    if not intrinsics_path.exists() and (exp_dir / args.intrinsics_name).exists():
+        intrinsics_path = exp_dir / args.intrinsics_name
+    if not pano_path.exists() and (exp_dir / args.panorama_name).exists():
+        pano_path = exp_dir / args.panorama_name
+
     if not intrinsics_path.exists():
         raise FileNotFoundError(f"Intrinsics not found: {intrinsics_path}")
     # allow missing panorama when server recorded a fallback (panorama_failed)

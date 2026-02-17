@@ -74,7 +74,13 @@ def load_keypoints(experiment_dir):
     exp_dir = Path(experiment_dir)
 
     # 1) Prefer merged metadata if present
-    merged_files = sorted(exp_dir.glob("merged_metadata*.csv"))
+    # Prefer merged metadata inside `foreground/` if present, otherwise fall back to experiment root
+    fg_dir = exp_dir / "foreground"
+    merged_files = []
+    if fg_dir.exists():
+        merged_files = sorted((fg_dir).glob("merged_metadata*.csv"))
+    if not merged_files:
+        merged_files = sorted(exp_dir.glob("merged_metadata*.csv"))
     if merged_files:
         merged_path = merged_files[0]
         df = pd.read_csv(merged_path)
@@ -107,12 +113,13 @@ def load_keypoints(experiment_dir):
         return df, fps
 
     # 2) Fallback: use dwpose_keypoints.csv + tracking_metadata.csv (if present)
-    dw_csv = exp_dir / "dwpose_keypoints.csv"
+    # look for DWpose CSV inside foreground/ first, then experiment root
+    dw_csv = (exp_dir / "foreground" / "dwpose_keypoints.csv") if (exp_dir / "foreground").exists() else (exp_dir / "dwpose_keypoints.csv")
     if not dw_csv.exists():
         raise FileNotFoundError(f"Keypoints CSV not found: {dw_csv}")
     pose_df = pd.read_csv(dw_csv)
 
-    tracking_csv = exp_dir / "tracking_metadata.csv"
+    tracking_csv = (exp_dir / "foreground" / "tracking_metadata.csv") if (exp_dir / "foreground").exists() else (exp_dir / "tracking_metadata.csv")
     fps = None
     if tracking_csv.exists():
         track_df = pd.read_csv(tracking_csv)
@@ -344,6 +351,10 @@ def main():
         "per_player": {},
     }
 
+    # prefer foreground/ layout for outputs
+    fg_dir = exp_dir / "foreground"
+    fg_dir.mkdir(parents=True, exist_ok=True)
+
     # Load keypoints (merged metadata preferred) — returns (df, fps)
     kp_df, source_fps = load_keypoints(exp_dir)
     all_player_ids = sorted(kp_df["player_id"].unique())
@@ -379,8 +390,8 @@ def main():
             print("  No skeletons built – skipping")
             continue
 
-        # Optionally save skeleton images for debugging
-        skel_debug_dir = exp_dir / "debug_skeletons" / f"id{pid}"
+        # Optionally save skeleton images for debugging (store under foreground/)
+        skel_debug_dir = fg_dir / "debug_skeletons" / f"id{pid}"
         skel_debug_dir.mkdir(parents=True, exist_ok=True)
         for i, skel in enumerate(skeletons[:5]):
             skel.save(skel_debug_dir / f"{i:05d}.png")
@@ -415,7 +426,7 @@ def main():
 
         # Copy generated video(s) back into the experiment folder for easy access
         try:
-            exp_out_dir = exp_dir
+            exp_out_dir = fg_dir
             exp_out_dir.mkdir(parents=True, exist_ok=True)
             dst_name = exp_out_dir / f"output_player_{pid}.mp4"
             shutil.copy2(str(out_path), str(dst_name))
@@ -453,7 +464,10 @@ def main():
             "timings": eval_timings,
         }
         eval_json = json.dumps(eval_payload, indent=2)
-        eval_path = exp_dir / "evaluation_client.json"
+        # write evaluation JSON next to foreground outputs when present
+        eval_parent = (exp_dir / "foreground") if (exp_dir / "foreground").exists() else exp_dir
+        eval_parent.mkdir(parents=True, exist_ok=True)
+        eval_path = eval_parent / "evaluation_client.json"
         with eval_path.open("w", encoding="utf-8") as f:
             f.write(eval_json)
         print(f"Wrote evaluation metadata: {eval_path}")

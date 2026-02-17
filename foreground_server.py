@@ -183,7 +183,11 @@ def run_sam_segmentation(video_path, model_path, experiment_dir=None):
         output_dir = EXPERIMENTS_DIR / f"{timestamp}_sam_seg"
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    masked_crops_dir = output_dir / "masked_crops"
+    # store all foreground-related artifacts in a `foreground/` subfolder
+    fg_dir = output_dir / "foreground"
+    fg_dir.mkdir(parents=True, exist_ok=True)
+
+    masked_crops_dir = fg_dir / "masked_crops"
     masked_crops_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"\n{'='*80}")
@@ -297,9 +301,10 @@ def run_sam_segmentation(video_path, model_path, experiment_dir=None):
     # add video FPS to tracking metadata so downstream tools (client) can reuse it
     metadata_frame["video_fps"] = video_fps
 
-    metadata_csv_path = output_dir / "tracking_metadata.csv"
+    metadata_csv_path = fg_dir / "tracking_metadata.csv"
     metadata_frame.to_csv(metadata_csv_path, index=False)
     print(f"Tracking metadata saved to: {metadata_csv_path} (video_fps={video_fps})")
+    # return experiment root (output_dir) — foreground artifacts are under `foreground/`
     return output_dir
 
 
@@ -323,7 +328,14 @@ def extract_dwpose_keypoints(experiment_dir, det_model=None, pose_model=None):
     experiment_dir = Path(experiment_dir)
     csv_path = experiment_dir / "tracking_metadata.csv"
     masked_crops_dir = experiment_dir / "masked_crops"
-    reference_dir = experiment_dir / "reference"
+    # prefer foreground/ layout, otherwise fall back to root experiment dir
+    fg_dir = experiment_dir / "foreground"
+    if fg_dir.exists():
+        masked_crops_dir = fg_dir / "masked_crops"
+        reference_dir = fg_dir / "reference"
+    else:
+        masked_crops_dir = experiment_dir / "masked_crops"
+        reference_dir = experiment_dir / "reference"
     reference_dir.mkdir(parents=True, exist_ok=True)
 
     if not csv_path.exists():
@@ -383,8 +395,14 @@ def extract_dwpose_keypoints(experiment_dir, det_model=None, pose_model=None):
         print("  No keypoints extracted – check crops / DWPose models.")
         return None
 
-    out_csv = experiment_dir / "dwpose_keypoints.csv"
+    # write DWpose CSV into foreground/ when present, otherwise root
+    fg_dir = experiment_dir / "foreground"
+    if fg_dir.exists():
+        out_csv = fg_dir / "dwpose_keypoints.csv"
+    else:
+        out_csv = experiment_dir / "dwpose_keypoints.csv"
     pose_df = pd.DataFrame(pose_results)
+    out_csv.parent.mkdir(parents=True, exist_ok=True)
     pose_df.to_csv(out_csv, index=False)
     print(f"\n  Saved {len(pose_results)} keypoint rows to {out_csv}")
     print(f"  Reference images in {reference_dir}")
@@ -463,7 +481,10 @@ def extract_dwpose_keypoints(experiment_dir, det_model=None, pose_model=None):
             name_parts.append(f"fps_{fps_val:.3f}")
         merged_name = "_".join(name_parts) + ".csv"
 
-        merged_path = experiment_dir / merged_name
+        # save merged metadata inside foreground/ when available
+        merged_parent = (experiment_dir / "foreground") if (experiment_dir / "foreground").exists() else experiment_dir
+        merged_path = merged_parent / merged_name
+        merged_parent.mkdir(parents=True, exist_ok=True)
         merged.to_csv(merged_path, index=False)
         print(f"  Wrote merged metadata to: {merged_path}")
     else:
@@ -535,7 +556,10 @@ def main():
             },
             "timings": timings,
         }
-        eval_path = exp_dir / "evaluation_server.json"
+        # write evaluation metadata next to foreground artifacts when present
+        eval_parent = (exp_dir / "foreground") if (exp_dir / "foreground").exists() else exp_dir
+        eval_path = eval_parent / "evaluation_server.json"
+        eval_parent.mkdir(parents=True, exist_ok=True)
         with eval_path.open("w", encoding="utf-8") as f:
             json.dump(eval_payload, f, indent=2)
         print(f"  Wrote evaluation metadata: {eval_path}")
@@ -545,9 +569,10 @@ def main():
     print(f"\n{'='*80}")
     print(f"Server finished.")
     if out_csv:
+        ref_display = (exp_dir / 'foreground' / 'reference') if (exp_dir / 'foreground').exists() else (exp_dir / 'reference')
         print(f"  Experiment : {exp_dir}")
         print(f"  Keypoints  : {out_csv}")
-        print(f"  Reference  : {exp_dir / 'reference'}")
+        print(f"  Reference  : {ref_display}")
         print(f"\nNext step – run the client:")
         print(f"  conda activate animate-anyone")
         print(f"  cd /home/itec/emanuele/Moore-AnimateAnyone")

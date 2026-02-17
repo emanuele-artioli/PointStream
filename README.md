@@ -128,18 +128,26 @@ The evaluator collects, per experiment:
 
 ```
 experiments/YYYYMMDD_HHMMSS_sam_seg/
-├── tracking_metadata.csv      # SAM3 bounding boxes per frame (includes `video_fps` for new experiments)
-├── dwpose_keypoints.csv       # 134 DWPose keypoints per frame per player
-├── merged_metadata*.csv       # (new) merged tracking + pose metadata; filename includes `w{detect_w}_h{detect_h}_fps_{fps}` when available (detect size & fps not stored as columns)
-├── masked_crops/
-│   ├── id0/                   # Player 1 crops (512×512, masked + padded)
-│   └── id1/                   # Player 2 crops
-├── reference/
-│   ├── id0.png                # First frame of player 1 (for client)
-│   └── id1.png                # First frame of player 2
-└── debug_skeletons/           # (created by client for visualisation)
-    ├── id0/
-    └── id1/
+├── foreground/                 # foreground-related artifacts (server + client)
+│   ├── tracking_metadata.csv   # SAM3 bounding boxes per frame (includes `video_fps`)
+│   ├── dwpose_keypoints.csv    # 134 DWPose keypoints per frame per player
+│   ├── merged_metadata*.csv    # merged tracking + pose metadata (filename includes detect size + fps)
+│   ├── masked_crops/
+│   │   ├── id0/                # Player 1 crops (512×512, masked + padded)
+│   │   └── id1/                # Player 2 crops
+│   ├── reference/
+│   │   ├── id0.png             # First frame of player 1 (for client)
+│   │   └── id1.png             # First frame of player 2
+│   ├── debug_skeletons/       # (created by client for visualisation)
+│   │   ├── id0/
+│   │   └── id1/
+│   └── output_player_*.mp4    # AnimateAnyone outputs (copied from client)
+└── background/                 # background reconstruction artifacts
+    ├── background_panorama.png
+    ├── background_intrinsics.json
+    ├── background_reconstructed.mp4
+    ├── background_fallback_av1.mp4  # when panorama creation fails
+    └── evaluation_background_*.json
 ```
 
 ### Keypoints CSV format
