@@ -45,11 +45,46 @@ def reconstruct_background_video(
     output_video_path: Path,
     fps_override: float | None = None,
 ) -> Dict[str, Any]:
+    # load intrinsics first so we can detect 'panorama_failed' fallback
+    data = _load_intrinsics(intrinsics_path)
+    if data.get("panorama_failed", False):
+        # server already encoded a fallback AV1 video (or mp4v if ffmpeg missing)
+        fallback_name = data.get("fallback_video", "background_fallback_av1.mp4")
+        fallback_path = intrinsics_path.parent / fallback_name
+        if not fallback_path.exists():
+            raise FileNotFoundError(f"Fallback video not found: {fallback_path}")
+        # copy fallback into expected output path
+        output_video_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            shutil.copy2(str(fallback_path), str(output_video_path))
+        except Exception:
+            # last-resort: transcode fallback to desired filename using ffmpeg if available
+            ffmpeg = shutil.which("ffmpeg")
+            if ffmpeg:
+                cmd = [
+                    ffmpeg,
+                    "-y",
+                    "-i",
+                    str(fallback_path),
+                    "-c:v",
+                    "copy",
+                    str(output_video_path),
+                ]
+                subprocess.check_call(cmd)
+            else:
+                raise
+
+        return {
+            "frames_written": int(data.get("processed_frame_count", 0)),
+            "fps": float(data.get("source_fps") or 24.0),
+            "frame_size": [int(s) for s in data.get("frame_size", [0, 0])],
+            "panorama_failed": True,
+            "fallback_source": str(fallback_path),
+        }
+
     panorama = cv2.imread(str(panorama_path))
     if panorama is None:
         raise RuntimeError(f"Failed to read panorama image: {panorama_path}")
-
-    data = _load_intrinsics(intrinsics_path)
 
     frame_w, frame_h = data["frame_size"]
     tx, ty = data["translation"]
@@ -165,14 +200,21 @@ def main() -> None:
     args = parser.parse_args()
 
     exp_dir = Path(args.experiment_dir).resolve()
-    pano_path = exp_dir / args.panorama_name
-    intrinsics_path = exp_dir / args.intrinsics_name
-    out_video = exp_dir / args.output_name
+    bg_dir = exp_dir / "background"
+    pano_path = bg_dir / args.panorama_name
+    intrinsics_path = bg_dir / args.intrinsics_name
+    out_video = bg_dir / args.output_name
+    bg_dir.mkdir(parents=True, exist_ok=True)
 
-    if not pano_path.exists():
-        raise FileNotFoundError(f"Panorama not found: {pano_path}")
     if not intrinsics_path.exists():
         raise FileNotFoundError(f"Intrinsics not found: {intrinsics_path}")
+    # allow missing panorama when server recorded a fallback (panorama_failed)
+    try:
+        data_preview = _load_intrinsics(intrinsics_path)
+    except Exception:
+        data_preview = {}
+    if not data_preview.get("panorama_failed", False) and not pano_path.exists():
+        raise FileNotFoundError(f"Panorama not found: {pano_path}")
 
     print("\n" + "#" * 80)
     print("#  Background Client")
@@ -206,7 +248,7 @@ def main() -> None:
         },
         "output": recon,
     }
-    _write_json(exp_dir / "evaluation_background_client.json", eval_payload)
+    _write_json((exp_dir / "background") / "evaluation_background_client.json", eval_payload)
 
     print(f"Reconstructed video: {out_video}")
     print(f"Frames written     : {recon['frames_written']}")

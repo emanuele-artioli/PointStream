@@ -22,6 +22,9 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import cv2
 import numpy as np
+import subprocess
+import shutil
+import os
 
 
 def _read_video_frames(video_path: Path, skip_frames: int = 1) -> Tuple[List[np.ndarray], List[int], float, int]:
@@ -185,14 +188,144 @@ def main() -> None:
     panorama = _stitch_panorama(frames, global_h, h_translation, canvas_w, canvas_h)
     t_stitch = time.perf_counter() - t0
 
-    pano_path = exp_dir / args.panorama_name
-    intrinsics_path = exp_dir / args.intrinsics_name
+    # store background artifacts in `background/` subfolder
+    bg_dir = exp_dir / "background"
+    bg_dir.mkdir(parents=True, exist_ok=True)
+    pano_path = bg_dir / args.panorama_name
+    intrinsics_path = bg_dir / args.intrinsics_name
 
+    # Heuristics to detect a failed panorama (e.g. camera moving too fast / poor alignment)
+    frame_h, frame_w = frames[0].shape[:2]
+    pano_gray = cv2.cvtColor(panorama, cv2.COLOR_BGR2GRAY)
+    coverage = float(np.count_nonzero(pano_gray)) / float(max(1, canvas_w * canvas_h))
+
+    # identity-ratio: how many relative homographies are exactly identity (returned when matching failed)
+    identity_count = 0
+    for i in range(max(0, len(global_h) - 1)):
+        rel = np.linalg.inv(global_h[i]) @ global_h[i + 1]
+        if np.allclose(rel, np.eye(3), atol=1e-8):
+            identity_count += 1
+    identity_ratio = float(identity_count) / float(max(1, len(global_h) - 1)) if len(global_h) > 1 else 0.0
+
+    too_large_canvas = (canvas_w > frame_w * 6) or (canvas_h > frame_h * 6)
+    low_coverage = coverage < 0.02
+    bad_alignment = identity_ratio > 0.4
+
+    panorama_failed = too_large_canvas or low_coverage or bad_alignment
+
+    if panorama_failed:
+        print("Panorama creation flagged as FAILED — falling back to traditional frame encoding (AV1).")
+        fallback_name = "background_fallback_av1.mp4"
+        fallback_path = bg_dir / fallback_name
+
+        ffmpeg_exe = shutil.which("ffmpeg")
+        if ffmpeg_exe is not None:
+            cmd = [
+                ffmpeg_exe,
+                "-y",
+                "-f",
+                "rawvideo",
+                "-pix_fmt",
+                "bgr24",
+                "-s",
+                f"{frame_w}x{frame_h}",
+                "-r",
+                f"{float(source_fps) if source_fps else 24.0}",
+                "-i",
+                "-",
+                "-c:v",
+                "libsvtav1",
+                "-crf",
+                "30",
+                "-b:v",
+                "0",
+                "-threads",
+                "0",
+                "-row-mt",
+                "1",
+                str(fallback_path),
+            ]
+            proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+            try:
+                for frame in frames:
+                    proc.stdin.write(frame.tobytes())
+                proc.stdin.close()
+                returncode = proc.wait()
+                stderr = proc.stderr.read().decode("utf-8", errors="replace") if proc.stderr is not None else ""
+                if returncode != 0:
+                    raise RuntimeError(f"ffmpeg fallback encoding failed: {stderr}")
+            finally:
+                if proc.stdin and not proc.stdin.closed:
+                    proc.stdin.close()
+        else:
+            # fallback to OpenCV writer
+            writer = cv2.VideoWriter(
+                str(fallback_path),
+                cv2.VideoWriter_fourcc(*"mp4v"),
+                float(source_fps) if source_fps else 24.0,
+                (frame_w, frame_h),
+            )
+            if not writer.isOpened():
+                raise RuntimeError("Failed to open fallback video writer")
+            for frame in frames:
+                writer.write(frame)
+            writer.release()
+
+        intrinsics_payload: Dict[str, Any] = {
+            "script": "background_server.py",
+            "timestamp": datetime.now().isoformat(),
+            "video_path": str(video_path),
+            "source_video_name": video_path.name,
+            "source_fps": float(source_fps) if source_fps else None,
+            "source_frame_count": int(source_frame_count),
+            "processed_frame_count": int(len(frames)),
+            "processed_frame_indices": [int(i) for i in frame_indices],
+            "skip_frames": int(args.skip_frames),
+            "frame_size": [int(frame_w), int(frame_h)],
+            "canvas_size": None,
+            "translation": [0.0, 0.0],
+            "homographies": [],
+            "panorama_failed": True,
+            "fallback_video": fallback_name,
+        }
+        _write_json(intrinsics_path, intrinsics_payload)
+
+        total_sec = time.perf_counter() - t_total
+        eval_payload = {
+            "script": "background_server.py",
+            "timestamp": datetime.now().isoformat(),
+            "experiment_dir": str(exp_dir),
+            "config": {
+                "video_path": str(video_path),
+                "skip_frames": int(args.skip_frames),
+                "nfeatures": int(args.nfeatures),
+                "panorama_name": args.panorama_name,
+                "intrinsics_name": args.intrinsics_name,
+            },
+            "timings": {
+                "read_frames_sec": round(t_read, 3),
+                "alignment_sec": round(t_align, 3),
+                "stitch_sec": round(t_stitch, 3),
+                "server_total_sec": round(total_sec, 3),
+            },
+            "fallback": {
+                "panorama_failed": True,
+                "fallback_video": fallback_name,
+            },
+        }
+        _write_json(bg_dir / "evaluation_background_server.json", eval_payload)
+
+        print(f"Panorama failed — wrote fallback video: {fallback_path}")
+        print(f"Intrinsics saved : {intrinsics_path}")
+        print(f"Total time (sec) : {total_sec:.3f}")
+        print("#" * 80 + "\n")
+        return
+
+    # normal (successful) path
     ok = cv2.imwrite(str(pano_path), panorama)
     if not ok:
         raise RuntimeError(f"Failed to write panorama: {pano_path}")
 
-    frame_h, frame_w = frames[0].shape[:2]
     intrinsics_payload: Dict[str, Any] = {
         "script": "background_server.py",
         "timestamp": datetime.now().isoformat(),
@@ -229,7 +362,7 @@ def main() -> None:
             "server_total_sec": round(total_sec, 3),
         },
     }
-    _write_json(exp_dir / "evaluation_background_server.json", eval_payload)
+    _write_json(bg_dir / "evaluation_background_server.json", eval_payload)
 
     print(f"Panorama saved   : {pano_path}")
     print(f"Intrinsics saved : {intrinsics_path}")
