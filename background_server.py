@@ -52,6 +52,49 @@ def _read_video_frames(video_path: Path, skip_frames: int = 1) -> Tuple[List[np.
     return frames, frame_indices, fps, total_frames
 
 
+def _apply_foreground_mask(frame: np.ndarray, mask: np.ndarray) -> np.ndarray:
+    if mask.ndim == 3:
+        mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+    mask_bin = (mask > 0).astype(np.uint8)
+    if not np.any(mask_bin):
+        return frame
+
+    # Dilate slightly to remove player-edge bleeding from imperfect masks.
+    kernel = np.ones((5, 5), dtype=np.uint8)
+    mask_bin = cv2.dilate(mask_bin, kernel, iterations=1)
+
+    out = frame.copy()
+    out[mask_bin > 0] = 0
+    return out
+
+
+def _load_and_apply_masks(
+    frames: List[np.ndarray],
+    frame_indices: List[int],
+    masks_dir: Optional[Path],
+) -> Tuple[List[np.ndarray], int]:
+    if masks_dir is None or not masks_dir.exists():
+        return frames, 0
+
+    masked_frames: List[np.ndarray] = []
+    applied = 0
+    for frame, frame_idx in zip(frames, frame_indices):
+        mask_path = masks_dir / f"{int(frame_idx):05d}.png"
+        if not mask_path.exists():
+            masked_frames.append(frame)
+            continue
+
+        mask = cv2.imread(str(mask_path), cv2.IMREAD_GRAYSCALE)
+        if mask is None:
+            masked_frames.append(frame)
+            continue
+
+        masked_frames.append(_apply_foreground_mask(frame, mask))
+        applied += 1
+
+    return masked_frames, applied
+
+
 def _estimate_homography_orb(
     detector: cv2.ORB,
     matcher: cv2.BFMatcher,
@@ -178,6 +221,18 @@ def main() -> None:
         raise RuntimeError("No frames extracted from input video")
 
     print(f"Extracted {len(frames)} frames (skip_frames={args.skip_frames})")
+
+    # Suppress players from frames using full-resolution foreground masks when available.
+    fg_masks_dir = exp_dir / "foreground" / "segmentation_masks"
+    if not fg_masks_dir.exists():
+        legacy_masks_dir = exp_dir / "segmentation_masks"
+        fg_masks_dir = legacy_masks_dir if legacy_masks_dir.exists() else None
+
+    frames, masks_applied_count = _load_and_apply_masks(frames, frame_indices, fg_masks_dir)
+    if fg_masks_dir is not None:
+        print(f"Applied foreground masks to {masks_applied_count}/{len(frames)} frames from: {fg_masks_dir}")
+    else:
+        print("No foreground masks found; panorama will include players.")
 
     t0 = time.perf_counter()
     global_h = _compute_global_homographies(frames, nfeatures=args.nfeatures)
@@ -308,6 +363,11 @@ def main() -> None:
                 "stitch_sec": round(t_stitch, 3),
                 "server_total_sec": round(total_sec, 3),
             },
+            "masking": {
+                "masks_dir": str(fg_masks_dir) if fg_masks_dir is not None else None,
+                "masks_applied_count": int(masks_applied_count),
+                "processed_frame_count": int(len(frames)),
+            },
             "fallback": {
                 "panorama_failed": True,
                 "fallback_video": fallback_name,
@@ -360,6 +420,11 @@ def main() -> None:
             "alignment_sec": round(t_align, 3),
             "stitch_sec": round(t_stitch, 3),
             "server_total_sec": round(total_sec, 3),
+        },
+        "masking": {
+            "masks_dir": str(fg_masks_dir) if fg_masks_dir is not None else None,
+            "masks_applied_count": int(masks_applied_count),
+            "processed_frame_count": int(len(frames)),
         },
     }
     _write_json(bg_dir / "evaluation_background_server.json", eval_payload)

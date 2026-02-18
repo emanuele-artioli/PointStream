@@ -189,6 +189,8 @@ def run_sam_segmentation(video_path, model_path, experiment_dir=None):
 
     masked_crops_dir = fg_dir / "masked_crops"
     masked_crops_dir.mkdir(parents=True, exist_ok=True)
+    masks_dir = fg_dir / "segmentation_masks"
+    masks_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"\n{'='*80}")
     print("Step 1: SAM3 segmentation")
@@ -249,7 +251,12 @@ def run_sam_segmentation(video_path, model_path, experiment_dir=None):
         frame_h, frame_w = frame.shape[:2]
         frame_data = {"frame_index": frame_idx, "detections": []}
 
+        # Store a full-resolution foreground mask (union of all tracked players) for background suppression.
+        combined_mask = np.zeros((frame_h, frame_w), dtype=np.uint8)
+
         if result.masks is None or len(result.boxes) == 0:
+            mask_path = masks_dir / f"{frame_idx:05d}.png"
+            cv2.imwrite(str(mask_path), combined_mask)
             metadata.append(frame_data)
             continue
 
@@ -258,12 +265,14 @@ def run_sam_segmentation(video_path, model_path, experiment_dir=None):
             det_id = idx
             bbox = det.xyxy[0].cpu().numpy().tolist()
             mask_data = mask.data.cpu().numpy()[0]
+            mask_uint8 = (mask_data > 0.5).astype(np.uint8) * 255
+            combined_mask = np.maximum(combined_mask, mask_uint8)
 
             x1, y1, x2, y2 = map(int, bbox)
             x1, y1 = max(0, x1), max(0, y1)
             x2, y2 = min(frame_w, x2), min(frame_h, y2)
 
-            mask_3ch = cv2.cvtColor((mask_data * 255).astype(np.uint8), cv2.COLOR_GRAY2BGR)
+            mask_3ch = cv2.cvtColor(mask_uint8, cv2.COLOR_GRAY2BGR)
             masked_frame = cv2.bitwise_and(frame, mask_3ch)
             masked_crop = masked_frame[y1:y2, x1:x2]
 
@@ -284,6 +293,9 @@ def run_sam_segmentation(video_path, model_path, experiment_dir=None):
                     "transform_info": transform_info,
                 }
             )
+
+        mask_path = masks_dir / f"{frame_idx:05d}.png"
+        cv2.imwrite(str(mask_path), combined_mask)
         metadata.append(frame_data)
 
     metadata_frame = pd.DataFrame(metadata)
@@ -304,6 +316,7 @@ def run_sam_segmentation(video_path, model_path, experiment_dir=None):
     metadata_csv_path = fg_dir / "tracking_metadata.csv"
     metadata_frame.to_csv(metadata_csv_path, index=False)
     print(f"Tracking metadata saved to: {metadata_csv_path} (video_fps={video_fps})")
+    print(f"Full-resolution segmentation masks saved to: {masks_dir}")
     # return experiment root (output_dir) — foreground artifacts are under `foreground/`
     return output_dir
 
@@ -331,6 +344,7 @@ def extract_dwpose_keypoints(experiment_dir, det_model=None, pose_model=None):
     # prefer foreground/ layout, otherwise fall back to root experiment dir
     fg_dir = experiment_dir / "foreground"
     if fg_dir.exists():
+        csv_path = fg_dir / "tracking_metadata.csv"
         masked_crops_dir = fg_dir / "masked_crops"
         reference_dir = fg_dir / "reference"
     else:
@@ -408,7 +422,7 @@ def extract_dwpose_keypoints(experiment_dir, det_model=None, pose_model=None):
     print(f"  Reference images in {reference_dir}")
 
     # --- Merge tracking metadata and pose results into a single metadata file ---
-    tracking_csv = experiment_dir / "tracking_metadata.csv"
+    tracking_csv = csv_path
     if tracking_csv.exists():
         track_df = pd.read_csv(tracking_csv)
 

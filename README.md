@@ -132,6 +132,7 @@ experiments/YYYYMMDD_HHMMSS_sam_seg/
 │   ├── tracking_metadata.csv   # SAM3 bounding boxes per frame (includes `video_fps`)
 │   ├── dwpose_keypoints.csv    # 134 DWPose keypoints per frame per player
 │   ├── merged_metadata*.csv    # merged tracking + pose metadata (filename includes detect size + fps)
+│   ├── segmentation_masks/      # full-resolution per-frame binary masks (players)
 │   ├── masked_crops/
 │   │   ├── id0/                # Player 1 crops (512×512, masked + padded)
 │   │   └── id1/                # Player 2 crops
@@ -148,6 +149,9 @@ experiments/YYYYMMDD_HHMMSS_sam_seg/
     ├── background_reconstructed.mp4
     ├── background_fallback_av1.mp4  # when panorama creation fails
     └── evaluation_background_*.json
+
+`background_server.py` uses `foreground/segmentation_masks/*.png` (when present)
+to suppress players before panorama stitching.
 ```
 
 ### Keypoints CSV format
