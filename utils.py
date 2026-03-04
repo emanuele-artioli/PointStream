@@ -1,175 +1,165 @@
 """
-Utility functions for PointStream dataset preparation and inference.
+Utility functions for PointStream.
 """
-import cv2
+
+
 import numpy as np
 
 
-def resize_and_pad(img, target_size=512):
+def load_video_frames(video_path: str) -> list[np.ndarray]:
     """
-    Resize and pad an image to target_size x target_size, maintaining aspect ratio.
-    Always resizes so the largest dimension becomes target_size (consistent person size for training).
-    
+    Load video frames from a video file.
     Args:
-        img: Input image (H, W) or (H, W, C)
-        target_size: Target dimension for the square output
-        
+        video_path: Path to the video file
     Returns:
-        padded: The resized and padded image (target_size, target_size, ...)
-        transform_info: Dict with original dimensions, scale, and padding offsets for reversing
+        A list of video frames as numpy arrays
     """
-    h, w = img.shape[:2]
-    # Always resize so the largest dimension becomes target_size
-    scale = target_size / max(w, h)
     
-    new_w = int(w * scale)
-    new_h = int(h * scale)
+    import subprocess
     
-    # Use INTER_AREA for shrinking, INTER_LINEAR for enlarging
-    interp = cv2.INTER_AREA if scale < 1.0 else cv2.INTER_LINEAR
-    img_resized = cv2.resize(img, (new_w, new_h), interpolation=interp)
+    ffprobe_command = f"ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 {video_path}"
+    ffprobe_process = subprocess.Popen(ffprobe_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    ffprobe_output, ffprobe_error = ffprobe_process.communicate()
+    width, height = ffprobe_output.decode().strip().split("x")
+    ffmpeg_command = f"ffmpeg -i {video_path} -vf 'scale={width}:{height}' -f image2pipe -vcodec rawvideo -pix_fmt bgr24 -"
+    process = subprocess.Popen(ffmpeg_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     
-    if len(img_resized.shape) == 3:
-        padded = np.zeros((target_size, target_size, img_resized.shape[2]), dtype=img_resized.dtype)
-    else:
-        padded = np.zeros((target_size, target_size), dtype=img_resized.dtype)
+    frames = []
+    while True:
+        raw_frame = process.stdout.read(int(width) * int(height) * 3)  # width * height * channels
+        if not raw_frame:
+            break
+        frame = np.frombuffer(raw_frame, dtype=np.uint8).reshape((int(height), int(width), 3))
+        frames.append(frame)
     
-    top = (target_size - new_h) // 2
-    left = (target_size - new_w) // 2
-    padded[top:top+new_h, left:left+new_w] = img_resized
-    
-    # Store transform info for reversing during inference
-    transform_info = {
-        "orig_h": h,
-        "orig_w": w,
-        "scale": scale,
-        "pad_top": top,
-        "pad_left": left,
-        "resized_h": new_h,
-        "resized_w": new_w
-    }
-    
-    return padded, transform_info
+    return frames
 
 
-def reverse_resize_and_pad(img, transform_info):
+def export_reid_model_to_tensorrt(
+    model_path: str,
+    half: bool = True,
+    dynamic: bool = True,
+    batch: int = 32,
+    imgsz: int | tuple[int, int] = 640,
+    overwrite: bool = False,
+    ) -> str:
     """
-    Reverse the resize_and_pad transformation to restore original dimensions.
-    Use this during inference to get outputs at the original crop size.
-    
+    Export a YOLO classification model to TensorRT for BoT-SORT ReID.
+
+    The exported `.engine` file is placed in the same folder as `model_path`.
+
     Args:
-        img: The 512x512 (or target_size x target_size) image from the model
-        transform_info: Dict containing the transform parameters:
-            - orig_h, orig_w: Original dimensions before transform
-            - scale: Scale factor that was applied
-            - pad_top, pad_left: Padding offsets
-            - resized_h, resized_w: Dimensions after resize, before padding
-            
+        model_path: Path to the source YOLO classification model (`.pt` or `.engine`).
+        half: Export in FP16 mode.
+        dynamic: Enable dynamic TensorRT shapes.
+        batch: Max batch size for TensorRT optimization.
+        imgsz: Export input size. Use 640 (or larger) for BoT-SORT ReID compatibility.
+        overwrite: Replace an existing `.engine` file if present.
+
     Returns:
-        restored: Image at original dimensions (orig_h, orig_w, ...)
+        Absolute path to the TensorRT engine model.
     """
-    # Extract transform parameters
-    orig_h = int(transform_info["orig_h"])
-    orig_w = int(transform_info["orig_w"])
-    scale = float(transform_info["scale"])
-    pad_top = int(transform_info["pad_top"])
-    pad_left = int(transform_info["pad_left"])
-    resized_h = int(transform_info["resized_h"])
-    resized_w = int(transform_info["resized_w"])
     
-    # Step 1: Remove padding (crop the content region)
-    cropped = img[pad_top:pad_top+resized_h, pad_left:pad_left+resized_w]
-    
-    # Step 2: Resize back to original dimensions
-    # Use INTER_AREA for shrinking, INTER_LINEAR for enlarging
-    inv_scale = 1.0 / scale
-    interp = cv2.INTER_AREA if inv_scale < 1.0 else cv2.INTER_LINEAR
-    restored = cv2.resize(cropped, (orig_w, orig_h), interpolation=interp)
-    
-    return restored
+    import shutil
+    from pathlib import Path
+
+    from torch import nn
+    from ultralytics import YOLO
+
+    source_path = Path(model_path).expanduser().resolve()
+    if not source_path.exists():
+        raise FileNotFoundError(f"Model not found: {source_path}")
+
+    if source_path.suffix == ".engine":
+        return str(source_path)
+
+    target_path = source_path.with_suffix(".engine")
+    if target_path.exists() and not overwrite:
+        return str(target_path)
+    if target_path.exists() and overwrite:
+        target_path.unlink()
+
+    model = YOLO(str(source_path))
+
+    head = model.model.model[-1]
+    pool = nn.Sequential(nn.AdaptiveAvgPool2d((1, 1)), nn.Flatten(start_dim=1))
+    pool.f, pool.i = head.f, head.i
+    model.model.model[-1] = pool
+
+    exported = Path(model.export(format="engine", half=half, dynamic=dynamic, batch=batch, imgsz=imgsz))
+    exported_path = exported if exported.is_absolute() else Path.cwd() / exported
+    exported_path = exported_path.resolve()
+
+    if exported_path.suffix != ".engine":
+        candidates = sorted(exported_path.parent.glob("*.engine"), key=lambda p: p.stat().st_mtime, reverse=True)
+        if not candidates:
+            raise RuntimeError("TensorRT export completed but no .engine file was found.")
+        exported_path = candidates[0].resolve()
+
+    if exported_path != target_path:
+        shutil.move(str(exported_path), str(target_path))
+
+    return str(target_path)
 
 
-def paste_crop_to_frame(frame, crop, bbox):
-    """
-    Paste a crop back into a frame at the specified bounding box location.
+def detect_with_yolo(
+    frames: list[np.ndarray], 
+    exp_folder: str,
+    classes: list = ["person"],
+    imgsz: tuple = (360, 640), 
+    model: str = "/home/itec/emanuele/Models/YOLO/yolo26x.pt", 
+    tracker: str | None = "/home/itec/emanuele/Models/YOLO/trackers/botsort.yaml",
+    ) -> dict:
     
+    """
+    Detect objects in a video using a YOLO model and track them across frames. Yields detection results as dictionaries.
     Args:
-        frame: The original frame (H, W, C)
-        crop: The crop to paste (should be at original crop dimensions, 
-              i.e., after reverse_resize_and_pad)
-        bbox: [x1, y1, x2, y2] coordinates where the crop should be placed
-        
-    Returns:
-        frame: The frame with the crop pasted (modified in-place)
+        frames: List of video frames as numpy arrays
+        exp_folder: Path to the experiment folder where results will be saved
+        classes: List of COCO class names to detect (default is ["person"])
+        imgsz: Image size for detection (width, height)
+        model: Path to the YOLO model weights
+        tracker: Tracker configuration file for tracking
+    Yields a dictionary containing:
+        orig_img: The original image as a numpy array
+        orig_shape: The original image shape in (height, width) format
+        boxes: A Boxes object containing the detection bounding boxes
+        speed: A dictionary of preprocess, inference, and postprocess speeds in milliseconds per image
+        names: A dictionary mapping class indices to class names
     """
-    frame_h, frame_w = frame.shape[:2]
-    x1, y1, x2, y2 = map(int, bbox)
     
-    # Clamp to frame boundaries
-    x1_clamped = max(0, x1)
-    y1_clamped = max(0, y1)
-    x2_clamped = min(frame_w, x2)
-    y2_clamped = min(frame_h, y2)
+    import torch
+    from ultralytics import YOLO
+    coco_classes = {0: 'person', 1: 'bicycle', 2: 'car', 3: 'motorcycle', 4: 'airplane', 5: 'bus', 6: 'train', 7: 'truck', 8: 'boat', 9: 'traffic light', 10: 'fire hydrant', 11: 'stop sign', 12: 'parking meter', 13: 'bench', 14: 'bird', 15: 'cat', 16: 'dog', 17: 'horse', 18: 'sheep', 19: 'cow', 20: 'elephant', 21: 'bear', 22: 'zebra', 23: 'giraffe', 24: 'backpack', 25: 'umbrella', 26: 'handbag', 27: 'tie', 28: 'suitcase', 29: 'frisbee', 30: 'skis', 31: 'snowboard', 32: 'sports ball', 33: 'kite', 34: 'baseball bat', 35: 'baseball glove', 36: 'skateboard', 37: 'surfboard', 38: 'tennis racket', 39: 'bottle', 40: 'wine glass', 41: 'cup', 42: 'fork', 43: 'knife', 44: 'spoon', 45: 'bowl', 46: 'banana', 47: 'apple', 48: 'sandwich', 49: 'orange', 50: 'broccoli', 51: 'carrot', 52: 'hot dog', 53: 'pizza', 54: 'donut', 55: 'cake', 56: 'chair', 57: 'couch', 58: 'potted plant', 59: 'bed', 60: 'dining table', 61: 'toilet', 62: 'tv', 63: 'laptop', 64: 'mouse', 65: 'remote', 66: 'keyboard', 67: 'cell phone', 68: 'microwave', 69: 'oven', 70: 'toaster', 71: 'sink', 72: 'refrigerator', 73: 'book', 74: 'clock', 75: 'vase', 76: 'scissors', 77: 'teddy bear', 78: 'hair drier', 79: 'toothbrush'}
     
-    # Calculate the corresponding region in the crop
-    crop_x1 = x1_clamped - x1
-    crop_y1 = y1_clamped - y1
-    crop_x2 = crop_x1 + (x2_clamped - x1_clamped)
-    crop_y2 = crop_y1 + (y2_clamped - y1_clamped)
+    # Load the model
+    yolo_model = YOLO(model)
     
-    # Paste the crop
-    frame[y1_clamped:y2_clamped, x1_clamped:x2_clamped] = crop[crop_y1:crop_y2, crop_x1:crop_x2]
-    
-    return frame
+    results = yolo_model.track(
+        source=frames,
+        tracker=tracker,  # TODO: ablation test of running with and without tracking, tracker with different configurations, and tracker converted to TensorRT or not, and comparing speed and accuracy.
+        persist=True,
+        conf=0.25,
+        iou=0.45,
+        imgsz=imgsz,
+        half=True,
+        device="cuda:0" if torch.cuda.is_available() else "cpu",
+        batch=4,
+        max_det=10, 
+        classes=[k for k, v in coco_classes.items() if v in classes], 
+        retina_masks=True,
+        project=exp_folder,
+        stream=True,
+        verbose=False,
+        # compile=True,
+    )
 
-
-def transform_keypoints_to_original(keypoints, transform_info):
-    """
-    Transform keypoints from 512x512 space back to original crop space.
-    
-    Args:
-        keypoints: List of [x, y] keypoints in 512x512 space
-        transform_info: Dict with transform parameters
-        
-    Returns:
-        keypoints_original: Keypoints in original crop space
-    """
-    pad_top = int(transform_info["pad_top"])
-    pad_left = int(transform_info["pad_left"])
-    scale = float(transform_info["scale"])
-    
-    keypoints_original = []
-    for kpt in keypoints:
-        if kpt[0] == 0 and kpt[1] == 0:
-            # Invalid keypoint, keep as-is
-            keypoints_original.append([0, 0])
-        else:
-            # Remove padding offset, then scale back
-            x_orig = (kpt[0] - pad_left) / scale
-            y_orig = (kpt[1] - pad_top) / scale
-            keypoints_original.append([x_orig, y_orig])
-    
-    return keypoints_original
-
-
-def keypoints_to_frame_coords(keypoints_crop, bbox):
-    """
-    Transform keypoints from crop space to frame space.
-    
-    Args:
-        keypoints_crop: Keypoints in crop coordinates
-        bbox: [x1, y1, x2, y2] of the crop in frame space
-        
-    Returns:
-        keypoints_frame: Keypoints in frame coordinates
-    """
-    x1, y1, x2, y2 = bbox
-    
-    keypoints_frame = []
-    for kpt in keypoints_crop:
-        if kpt[0] == 0 and kpt[1] == 0:
-            keypoints_frame.append([0, 0])
-        else:
-            keypoints_frame.append([kpt[0] + x1, kpt[1] + y1])
-    
-    return keypoints_frame
+    for r in results:
+        yield {
+            "frame": r.orig_img,
+            "resolution": r.orig_shape,
+            "track_ids": r.boxes.id,
+            "class_ids": r.boxes.cls,
+            "bboxes": r.boxes.xyxy,
+            "speed": r.speed,
+        }
