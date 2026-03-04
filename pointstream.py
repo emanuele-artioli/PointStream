@@ -16,9 +16,7 @@ def main():
         frame = detection["frame"]
         background = frame.copy()
 
-        for det_idx, (class_name, track_id, bbox) in enumerate(
-            zip(detection["class_names"], detection["track_ids"], detection["bboxes"])
-        ):
+        for (class_name, track_id, bbox) in zip(detection["class_names"], detection["track_ids"], detection["bboxes"]):
             x1, y1, x2, y2 = [int(value.item()) for value in bbox]
             crop = frame[y1:y2, x1:x2]
             background[y1:y2, x1:x2] = 0
@@ -29,8 +27,11 @@ def main():
 
         cv2.imwrite(f"{exp_folder}/background/{frame_idx:06d}.png", background)
         
-        # TODO: sometimes, the same object is detected in multiple frames but with different track IDs. To rectify this, we could save a csv with track ID, frame number, class names, and bboxes of each detection in each frame.
-        # Then, we can load the csv into a dataframe, sort the objects by the number of frames they contain, and if an object with many frames is missing frames, we can check the dataframe to see if there are other track IDs that have detections in those frames with similar bboxes and class names, and if so, we can merge the small subfolder into the big one and update the csv. 
+        # TODO: sometimes, the same object is detected in multiple frames but with different track IDs. 
+        # To rectify this, we could save a csv with track ID, frame number, class names, and bboxes of each detection in each frame.
+        # Then, we can load the csv into a dataframe, sort the objects by the number of frames they contain, and if an object with many frames is missing frames, 
+        # we can check the dataframe to see if there are other track IDs that have detections in those frames with similar bboxes and class names, and if so, 
+        # we can merge the small subfolder into the big one and update the csv. 
 
 if __name__ == "__main__":
     main()
