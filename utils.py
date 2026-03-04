@@ -159,7 +159,7 @@ def detect_with_yolo(
             "frame": r.orig_img,
             "resolution": r.orig_shape,
             "track_ids": r.boxes.id,
-            "class_ids": r.boxes.cls,
+            "class_names": [coco_classes.get(int(cls)) for cls in r.boxes.cls],
             "bboxes": r.boxes.xyxy,
             "speed": r.speed,
         }
