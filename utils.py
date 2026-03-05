@@ -5,6 +5,7 @@ Utility functions for PointStream.
 
 import numpy as np
 import torch
+import cv2
 from ultralytics import YOLO
 import subprocess
 import shutil
@@ -187,3 +188,78 @@ def run_yolo(
             output["masks"] = r.masks.data if r.masks is not None else None
         yield output
         
+
+def stitch_panorama(
+    frames: list[np.ndarray],
+    ) -> np.ndarray:
+    """Stitch video frames into a panorama with a minimal ORB + homography pipeline."""
+
+    if not frames:
+        raise ValueError("frames must contain at least one frame")
+    if len(frames) == 1:
+        return frames[0].copy()
+
+    base_h, base_w = frames[0].shape[:2]
+    if any(frame.shape[:2] != (base_h, base_w) for frame in frames):
+        raise ValueError("all frames must have the same spatial resolution")
+
+    orb = cv2.ORB_create(nfeatures=1000)
+    matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+
+    def estimate_pairwise_homography(current_frame: np.ndarray, previous_frame: np.ndarray) -> np.ndarray:
+        current_gray = cv2.cvtColor(current_frame, cv2.COLOR_BGR2GRAY)
+        previous_gray = cv2.cvtColor(previous_frame, cv2.COLOR_BGR2GRAY)
+
+        current_kp, current_des = orb.detectAndCompute(current_gray, None)
+        previous_kp, previous_des = orb.detectAndCompute(previous_gray, None)
+
+        if current_des is None or previous_des is None:
+            return np.eye(3, dtype=np.float64)
+
+        matches = matcher.match(current_des, previous_des)
+        if len(matches) < 4:
+            return np.eye(3, dtype=np.float64)
+
+        matches = sorted(matches, key=lambda m: m.distance)
+        best_matches = matches[: min(200, len(matches))]
+
+        src_pts = np.float32([current_kp[m.queryIdx].pt for m in best_matches]).reshape(-1, 1, 2)
+        dst_pts = np.float32([previous_kp[m.trainIdx].pt for m in best_matches]).reshape(-1, 1, 2)
+
+        homography, _ = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
+        if homography is None or not np.all(np.isfinite(homography)):
+            return np.eye(3, dtype=np.float64)
+
+        return homography
+
+    global_h = [np.eye(3, dtype=np.float64)]
+    cumulative_h = np.eye(3, dtype=np.float64)
+
+    for frame_idx in range(1, len(frames)):
+        h_rel = estimate_pairwise_homography(frames[frame_idx], frames[frame_idx - 1])
+        cumulative_h = cumulative_h @ h_rel
+        global_h.append(cumulative_h.copy())
+
+    corners = np.float32([[0, 0], [0, base_h], [base_w, base_h], [base_w, 0]]).reshape(-1, 1, 2)
+    warped_corners = [cv2.perspectiveTransform(corners, homography) for homography in global_h]
+    all_corners = np.concatenate(warped_corners, axis=0)
+
+    xmin, ymin = all_corners.min(axis=0).ravel()
+    xmax, ymax = all_corners.max(axis=0).ravel()
+
+    tx = -float(xmin)
+    ty = -float(ymin)
+    translation = np.array([[1.0, 0.0, tx], [0.0, 1.0, ty], [0.0, 0.0, 1.0]], dtype=np.float64)
+
+    canvas_w = max(1, int(np.ceil(float(xmax - xmin))))
+    canvas_h = max(1, int(np.ceil(float(ymax - ymin))))
+    panorama = np.zeros((canvas_h, canvas_w, 3), dtype=np.uint8)
+
+    for frame, homography in zip(frames, global_h):
+        warped = cv2.warpPerspective(frame, translation @ homography, (canvas_w, canvas_h))
+        mask = np.any(warped != 0, axis=2)
+        panorama[mask] = warped[mask]
+
+    return panorama
+
+

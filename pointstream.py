@@ -3,7 +3,7 @@ import cv2
 import datetime
 from ultralytics import YOLO
 
-from utils import load_video_frames, run_yolo
+from utils import load_video_frames, run_yolo, stitch_panorama
 
 def main():
     video_path = "/home/itec/emanuele/Datasets/federer_djokovic/libsvtav1_crf35_pre5/scene_004.mp4"
@@ -80,6 +80,10 @@ def main():
             background[y1:y2, x1:x2] = background_crop
 
         cv2.imwrite(f"{exp_folder}/background/{frame_idx:06d}.png", background)
+        
+    # Stitch every 50th of the background frames into a panorama and save it
+    panorama = stitch_panorama([cv2.imread(f"{exp_folder}/background/{frame_idx:06d}.png") for frame_idx in range(0, len(frames), 50)])
+    cv2.imwrite(f"{exp_folder}/panorama.png", panorama)
 
 if __name__ == "__main__":
     main()
