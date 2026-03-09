@@ -78,6 +78,16 @@ python A2_extract_poses_from_crops.py --experiment_dir experiments/20260209_1001
 python B1_video_panorama.py --video_path video.mp4
 ```
 
+`utils.stitch_panorama()` uses a minimal ORB-based pairwise homography pipeline with identity fallback when feature matching is insufficient. All input frames should have the same resolution.
+
+It now returns `(panorama_image, panorama_data)` instead of only the panorama image. `panorama_data` contains frame size, canvas size, translation matrix, and homographies needed to reverse the process. Use `utils.animate_panorama(panorama_image, panorama_data)` to reconstruct the background-frame sequence from the stitched panorama.
+
+### Per-object segmentation from detections
+
+`pointstream.py` also supports detection-first object masking. It saves bbox crops in `bbox_crops/`, runs segmentation on each crop (including single-frame list inputs), saves masks in `segmentation_masks/`, saves masked crops in `segmented_crops/`, and writes the background frame only after masking all objects in that frame.
+
+After panorama creation, `pointstream.py` loops over each `person_*` track folder, runs `utils.save_dwpose(...)` on that person's `object/` frames to generate skeleton PNGs in `dwpose_frames/`, and then encodes one AV1 (`libsvtav1`) video per person into `dwpose_videos/` using `utils.encode_video_libsvtav1(..., crf=25)`.
+
 ### Other pipeline modes
 
 ```bash
@@ -100,6 +110,14 @@ experiments/
 └── 20260209_100146_sam_seg/
     ├── tracking_metadata.csv    # Bounding boxes and transform info per frame
     ├── pose_metadata.csv        # Keypoint coordinates per frame
+    ├── dwpose_frames/
+    │   ├── person_1/
+    │   │   ├── 000000.png
+    │   │   └── ...
+    │   └── person_2/
+    ├── dwpose_videos/
+    │   ├── person_1_dwpose.mp4  # DWPose skeleton video for one tracked person
+    │   └── person_2_dwpose.mp4
     ├── masked_crops/
     │   ├── id0/                 # Player 1 crops (512×512, masked + padded)
     │   └── id1/                 # Player 2 crops

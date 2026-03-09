@@ -1,9 +1,11 @@
 import os
 import cv2
+import json
 import datetime
+from pathlib import Path
 from ultralytics import YOLO
 
-from utils import load_video_frames, run_yolo, stitch_panorama
+from utils import load_video_frames, run_yolo, stitch_panorama, save_dwpose, encode_video_libsvtav1
 
 def main():
     video_path = "/home/itec/emanuele/Datasets/federer_djokovic/libsvtav1_crf35_pre5/scene_004.mp4"
@@ -81,9 +83,78 @@ def main():
 
         cv2.imwrite(f"{exp_folder}/background/{frame_idx:06d}.png", background)
         
-    # Stitch every 50th of the background frames into a panorama and save it
-    panorama = stitch_panorama([cv2.imread(f"{exp_folder}/background/{frame_idx:06d}.png") for frame_idx in range(0, len(frames), 50)])
+    # Stitch every 50th of the background frames into a panorama and save it.
+    sampled_frame_indices = list(range(0, len(frames), 50))
+    sampled_background_frames = []
+    for frame_idx in sampled_frame_indices:
+        frame = cv2.imread(f"{exp_folder}/background/{frame_idx:06d}.png")
+        if frame is not None:
+            sampled_background_frames.append(frame)
+
+    panorama, panorama_data = stitch_panorama(sampled_background_frames)
     cv2.imwrite(f"{exp_folder}/panorama.png", panorama)
+
+    # Save panorama metadata
+    panorama_metadata_path = Path(exp_folder) / "panorama_data.json"
+    panorama_metadata = {
+        "sample_stride": 50,
+        "sampled_frame_indices": sampled_frame_indices,
+        "num_frames": int(panorama_data["num_frames"]),
+        "frame_width": int(panorama_data["frame_width"]),
+        "frame_height": int(panorama_data["frame_height"]),
+        "canvas_width": int(panorama_data["canvas_width"]),
+        "canvas_height": int(panorama_data["canvas_height"]),
+        "translation": panorama_data["translation"].tolist(),
+        "global_homographies": [homography.tolist() for homography in panorama_data["global_homographies"]],
+        "composite_homographies": [homography.tolist() for homography in panorama_data["composite_homographies"]],
+    }
+    with panorama_metadata_path.open("w", encoding="utf-8") as panorama_metadata_file:
+        json.dump(panorama_metadata, panorama_metadata_file, indent=2)
+
+    capture = cv2.VideoCapture(video_path)
+    fps = float(capture.get(cv2.CAP_PROP_FPS) or 0.0)
+    capture.release()
+    if fps <= 0:
+        fps = 25.0
+
+    exp_path = Path(exp_folder)
+    dwpose_frames_root = exp_path / "dwpose_frames"
+    dwpose_videos_root = exp_path / "dwpose_videos"
+    dwpose_frames_root.mkdir(parents=True, exist_ok=True)
+    dwpose_videos_root.mkdir(parents=True, exist_ok=True)
+
+    def person_sort_key(path: Path):
+        suffix = path.name.rsplit("_", 1)[-1]
+        return (0, int(suffix)) if suffix.isdigit() else (1, path.name)
+
+    person_dirs = sorted(
+        [path for path in exp_path.iterdir() if path.is_dir() and path.name.startswith("person_")],
+        key=person_sort_key,
+    )
+
+    for person_dir in person_dirs:
+        source_frames_dir = person_dir / "object"
+        if not source_frames_dir.exists():
+            continue
+
+        person_name = person_dir.name
+        person_dwpose_frames_dir = dwpose_frames_root / person_name
+        save_dwpose(
+            frames_folder=str(source_frames_dir),
+            output_folder=str(person_dwpose_frames_dir),
+        )
+
+        if not any(person_dwpose_frames_dir.glob("*.png")):
+            continue
+
+        output_path = dwpose_videos_root / f"{person_name}_dwpose.mp4"
+        encode_video_libsvtav1(
+            output_path=str(output_path),
+            fps=fps,
+            crf=25,
+            frame_folder=str(person_dwpose_frames_dir),
+        )
+        print(f"Saved DWPose video for {person_name} at {output_path}")
 
 if __name__ == "__main__":
     main()

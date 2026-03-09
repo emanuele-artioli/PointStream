@@ -117,7 +117,7 @@ def export_reid_model_to_tensorrt(
 
     return str(target_path)
 
-
+# TODO: should move to open vocab, so it can detect tennis players directly.
 def run_yolo(
     frames: list[np.ndarray], 
     exp_folder: str,
@@ -191,17 +191,36 @@ def run_yolo(
 
 def stitch_panorama(
     frames: list[np.ndarray],
-    ) -> np.ndarray:
-    """Stitch video frames into a panorama with a minimal ORB + homography pipeline."""
+    ) -> tuple[np.ndarray, dict]:
+    """
+    Stitch video frames into a panorama and return metadata needed for reversal.
+
+    Returns:
+        A tuple of (panorama_image, panorama_data).
+        `panorama_data` contains frame size, canvas size, translation matrix,
+        and homographies needed by `animate_panorama`.
+    """
 
     if not frames:
         raise ValueError("frames must contain at least one frame")
-    if len(frames) == 1:
-        return frames[0].copy()
 
     base_h, base_w = frames[0].shape[:2]
     if any(frame.shape[:2] != (base_h, base_w) for frame in frames):
         raise ValueError("all frames must have the same spatial resolution")
+
+    if len(frames) == 1:
+        identity = np.eye(3, dtype=np.float64)
+        panorama_data = {
+            "num_frames": 1,
+            "frame_width": int(base_w),
+            "frame_height": int(base_h),
+            "canvas_width": int(base_w),
+            "canvas_height": int(base_h),
+            "translation": identity.copy(),
+            "global_homographies": [identity.copy()],
+            "composite_homographies": [identity.copy()],
+        }
+        return frames[0].copy(), panorama_data
 
     orb = cv2.ORB_create(nfeatures=1000)
     matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
@@ -254,12 +273,319 @@ def stitch_panorama(
     canvas_w = max(1, int(np.ceil(float(xmax - xmin))))
     canvas_h = max(1, int(np.ceil(float(ymax - ymin))))
     panorama = np.zeros((canvas_h, canvas_w, 3), dtype=np.uint8)
+    composite_homographies = []
 
     for frame, homography in zip(frames, global_h):
-        warped = cv2.warpPerspective(frame, translation @ homography, (canvas_w, canvas_h))
+        homography_to_panorama = translation @ homography
+        composite_homographies.append(homography_to_panorama.copy())
+        warped = cv2.warpPerspective(frame, homography_to_panorama, (canvas_w, canvas_h))
         mask = np.any(warped != 0, axis=2)
         panorama[mask] = warped[mask]
 
-    return panorama
+    panorama_data = {
+        "num_frames": int(len(frames)),
+        "frame_width": int(base_w),
+        "frame_height": int(base_h),
+        "canvas_width": int(canvas_w),
+        "canvas_height": int(canvas_h),
+        "translation": translation.copy(),
+        "global_homographies": [homography.copy() for homography in global_h],
+        "composite_homographies": composite_homographies,
+    }
+
+    return panorama, panorama_data
+
+
+def animate_panorama(
+    panorama: np.ndarray,
+    panorama_data: dict,
+    interpolation: int = cv2.INTER_LINEAR,
+    border_mode: int = cv2.BORDER_CONSTANT,
+    border_value: tuple[int, int, int] = (0, 0, 0),
+    ) -> list[np.ndarray]:
+    """
+    Reconstruct background frames from a panorama using stitch metadata.
+
+    Args:
+        panorama: Stitched panorama image.
+        panorama_data: Metadata produced by `stitch_panorama`.
+        interpolation: OpenCV interpolation flag for warping.
+        border_mode: OpenCV border mode for out-of-bounds pixels.
+        border_value: Constant border value when border_mode is BORDER_CONSTANT.
+
+    Returns:
+        Reconstructed background frames in original frame coordinates.
+    """
+
+    if panorama is None or not isinstance(panorama, np.ndarray):
+        raise ValueError("panorama must be a numpy array.")
+    if panorama.ndim != 3 or panorama.shape[2] != 3:
+        raise ValueError("panorama must be a BGR image with shape (H, W, 3).")
+    if not isinstance(panorama_data, dict):
+        raise ValueError("panorama_data must be a dictionary returned by stitch_panorama().")
+
+    frame_width = int(panorama_data.get("frame_width", 0))
+    frame_height = int(panorama_data.get("frame_height", 0))
+    if frame_width <= 0 or frame_height <= 0:
+        raise ValueError("panorama_data must contain positive frame_width and frame_height values.")
+
+    homographies_to_panorama = panorama_data.get("composite_homographies")
+    if homographies_to_panorama is None:
+        translation = panorama_data.get("translation")
+        global_homographies = panorama_data.get("global_homographies")
+        if translation is None or global_homographies is None:
+            raise ValueError(
+                "panorama_data must contain either composite_homographies or both translation and global_homographies."
+            )
+
+        translation_matrix = np.asarray(translation, dtype=np.float64)
+        if translation_matrix.shape != (3, 3):
+            raise ValueError("translation must have shape (3, 3).")
+
+        homographies_to_panorama = [
+            translation_matrix @ np.asarray(homography, dtype=np.float64)
+            for homography in global_homographies
+        ]
+
+    if len(homographies_to_panorama) == 0:
+        return []
+
+    reconstructed_frames = []
+    for homography_to_panorama in homographies_to_panorama:
+        matrix = np.asarray(homography_to_panorama, dtype=np.float64)
+        if matrix.shape != (3, 3):
+            raise ValueError("Each homography must have shape (3, 3).")
+
+        try:
+            inverse_homography = np.linalg.inv(matrix)
+        except np.linalg.LinAlgError:
+            inverse_homography = np.eye(3, dtype=np.float64)
+
+        frame = cv2.warpPerspective(
+            panorama,
+            inverse_homography,
+            (frame_width, frame_height),
+            flags=interpolation,
+            borderMode=border_mode,
+            borderValue=border_value,
+        )
+        reconstructed_frames.append(frame)
+
+    return reconstructed_frames
+
+
+def encode_video_libsvtav1(
+    output_path: str,
+    fps: float,
+    crf: int = 25,
+    frame_folder: str | None = None,
+    frames: list[np.ndarray] | None = None,
+    frame_pattern: str = "%06d.png",
+    ) -> str:
+    """
+    Encode frames to AV1 video with ffmpeg + libsvtav1.
+
+    Provide exactly one input source:
+      - frame_folder: directory containing numbered PNG files
+      - frames: list of BGR uint8 numpy arrays
+
+    Args:
+        output_path: Destination video path.
+        fps: Target frame rate.
+        crf: AV1 constant rate factor (lower is higher quality).
+        frame_folder: Folder with frame images for ffmpeg file input mode.
+        frames: In-memory frames for ffmpeg pipe input mode.
+        frame_pattern: Input filename pattern when using frame_folder.
+
+    Returns:
+        Absolute path of the encoded video.
+    """
+
+    using_folder = frame_folder is not None
+    using_frames = frames is not None
+    if using_folder == using_frames:
+        raise ValueError("Provide exactly one of frame_folder or frames.")
+
+    ffmpeg_exe = shutil.which("ffmpeg")
+    if ffmpeg_exe is None:
+        raise RuntimeError("ffmpeg executable was not found in PATH.")
+
+    safe_fps = float(fps) if fps and float(fps) > 0 else 25.0
+    target_path = Path(output_path).expanduser().resolve()
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if using_folder:
+        source_dir = Path(frame_folder).expanduser().resolve()
+        if not source_dir.exists():
+            raise FileNotFoundError(f"Frame folder not found: {source_dir}")
+
+        pattern_path = source_dir / frame_pattern
+        command = [
+            ffmpeg_exe,
+            "-y",
+            "-framerate",
+            str(safe_fps),
+            "-i",
+            str(pattern_path),
+            "-vf",
+            "pad=ceil(iw/2)*2:ceil(ih/2)*2",
+            "-c:v",
+            "libsvtav1",
+            "-pix_fmt",
+            "yuv420p",
+            "-crf",
+            str(int(crf)),
+            "-b:v",
+            "0",
+            str(target_path),
+        ]
+
+        process = subprocess.run(command, capture_output=True, text=True)
+        if process.returncode != 0:
+            stderr = process.stderr.strip()
+            raise RuntimeError(f"ffmpeg folder encoding failed: {stderr}")
+        return str(target_path)
+
+    if not frames:
+        raise ValueError("frames must contain at least one frame.")
+
+    first = frames[0]
+    if first is None or not isinstance(first, np.ndarray):
+        raise ValueError("frames must be a list of numpy arrays.")
+    if first.ndim != 3 or first.shape[2] != 3:
+        raise ValueError("frames must be BGR images with shape (H, W, 3).")
+
+    height, width = first.shape[:2]
+    target_width = width + (width % 2)
+    target_height = height + (height % 2)
+    command = [
+        ffmpeg_exe,
+        "-y",
+        "-f",
+        "rawvideo",
+        "-pix_fmt",
+        "bgr24",
+        "-s",
+        f"{target_width}x{target_height}",
+        "-r",
+        str(safe_fps),
+        "-i",
+        "-",
+        "-c:v",
+        "libsvtav1",
+        "-pix_fmt",
+        "yuv420p",
+        "-crf",
+        str(int(crf)),
+        "-b:v",
+        "0",
+        str(target_path),
+    ]
+
+    process = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+    try:
+        for frame in frames:
+            if frame is None or not isinstance(frame, np.ndarray):
+                continue
+            if frame.ndim != 3 or frame.shape[2] != 3:
+                continue
+            if frame.shape[:2] != (height, width):
+                frame = cv2.resize(frame, (width, height), interpolation=cv2.INTER_NEAREST)
+            if frame.dtype != np.uint8:
+                frame = frame.astype(np.uint8)
+            if target_width != width or target_height != height:
+                frame = cv2.copyMakeBorder(
+                    frame,
+                    0,
+                    target_height - height,
+                    0,
+                    target_width - width,
+                    cv2.BORDER_CONSTANT,
+                    value=(0, 0, 0),
+                )
+            process.stdin.write(frame.tobytes())
+
+        process.stdin.close()
+        return_code = process.wait()
+        stderr = process.stderr.read().decode("utf-8", errors="replace") if process.stderr is not None else ""
+        if return_code != 0:
+            raise RuntimeError(f"ffmpeg array encoding failed: {stderr.strip()}")
+    finally:
+        if process.stdin is not None and not process.stdin.closed:
+            process.stdin.close()
+
+    return str(target_path)
+
+
+def save_dwpose(
+    frames_folder: str,
+    output_folder: str,
+    det_model: str | None = None,
+    pose_model: str | None = None,
+    score_threshold: float = 0.3,
+    ) -> None:
+    """
+    Run DWPose on a single frame folder and save skeleton PNG frames.
+
+    Args:
+        frames_folder: Folder containing source frame PNGs.
+        output_folder: Destination folder for per-frame DWPose PNGs.
+        det_model: Optional path to DWPose detection ONNX model.
+        pose_model: Optional path to DWPose pose ONNX model.
+        score_threshold: Visibility threshold for pose conversion.
+    """
+    from dwpose import Wholebody, draw_pose, extract_best_person, keypoints_to_pose_dict
+
+    source_dir = Path(frames_folder).expanduser().resolve()
+    if not source_dir.exists():
+        raise FileNotFoundError(f"Frames folder not found: {source_dir}")
+
+    frame_paths = sorted(source_dir.glob("*.png"))
+    if not frame_paths:
+        return
+
+    destination_dir = Path(output_folder).expanduser().resolve()
+    if destination_dir == source_dir:
+        raise ValueError("output_folder must be different from frames_folder.")
+    destination_dir.mkdir(parents=True, exist_ok=True)
+    for existing_frame in destination_dir.glob("*.png"):
+        existing_frame.unlink()
+
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    wholebody = Wholebody(device=device, det_model_path=det_model, pose_model_path=pose_model)
+
+    output_size = None
+    written_frames = 0
+
+    for frame_path in frame_paths:
+        frame = cv2.imread(str(frame_path))
+        if frame is None:
+            continue
+
+        height, width = frame.shape[:2]
+        keypoints, scores = wholebody(frame)
+        best_keypoints, best_scores = extract_best_person(keypoints, scores)
+
+        if best_keypoints is None:
+            dwpose_frame = np.zeros((height, width, 3), dtype=np.uint8)
+        else:
+            pose = keypoints_to_pose_dict(
+                best_keypoints,
+                best_scores,
+                width,
+                height,
+                score_threshold=score_threshold,
+            )
+            dwpose_frame = draw_pose(pose, height, width)
+
+        if output_size is None:
+            output_size = (dwpose_frame.shape[1], dwpose_frame.shape[0])
+
+        if (dwpose_frame.shape[1], dwpose_frame.shape[0]) != output_size:
+            dwpose_frame = cv2.resize(dwpose_frame, output_size, interpolation=cv2.INTER_NEAREST)
+
+        frame_output_path = destination_dir / f"{written_frames:06d}.png"
+        cv2.imwrite(str(frame_output_path), dwpose_frame)
+        written_frames += 1
 
 
