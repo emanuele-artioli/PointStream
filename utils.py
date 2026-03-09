@@ -57,6 +57,68 @@ def load_video_frames(video_path: str) -> list[np.ndarray]:
     return frames
 
 
+def resize_and_pad_image(
+    image: np.ndarray,
+    image_size: int | tuple[int, int],
+    interpolation: int = cv2.INTER_LINEAR,
+    ) -> np.ndarray:
+    """
+    Resize an image while preserving aspect ratio, then pad with black bands.
+
+    Args:
+        image: Input image as a 2D mask or 3D image array.
+        image_size: Target output size as int (square) or (height, width).
+        interpolation: OpenCV interpolation mode used for resizing.
+
+    Returns:
+        Resized and padded image with the requested output size.
+    """
+
+    if image is None or not isinstance(image, np.ndarray):
+        raise ValueError("image must be a numpy array.")
+    if image.ndim not in (2, 3):
+        raise ValueError("image must have shape (H, W) or (H, W, C).")
+
+    if isinstance(image_size, int):
+        target_h = image_size
+        target_w = image_size
+    elif isinstance(image_size, tuple) and len(image_size) == 2:
+        target_h = int(image_size[0])
+        target_w = int(image_size[1])
+    else:
+        raise ValueError("image_size must be an int or a (height, width) tuple.")
+
+    if target_h <= 0 or target_w <= 0:
+        raise ValueError("image_size values must be positive.")
+
+    src_h, src_w = image.shape[:2]
+    if src_h == 0 or src_w == 0:
+        raise ValueError("image must have non-zero spatial dimensions.")
+
+    if src_w >= src_h:
+        scale = target_w / float(src_w)
+    else:
+        scale = target_h / float(src_h)
+
+    # Fallback for mismatched source/target aspect ratios where one dimension could overflow.
+    scale = min(scale, target_w / float(src_w), target_h / float(src_h))
+
+    resized_w = max(1, int(round(src_w * scale)))
+    resized_h = max(1, int(round(src_h * scale)))
+    resized = cv2.resize(image, (resized_w, resized_h), interpolation=interpolation)
+
+    if image.ndim == 2:
+        padded = np.zeros((target_h, target_w), dtype=image.dtype)
+    else:
+        padded = np.zeros((target_h, target_w, image.shape[2]), dtype=image.dtype)
+
+    pad_top = (target_h - resized_h) // 2
+    pad_left = (target_w - resized_w) // 2
+    padded[pad_top:pad_top + resized_h, pad_left:pad_left + resized_w] = resized
+
+    return padded
+
+
 def export_reid_model_to_tensorrt(
     model_path: str,
     half: bool = True,

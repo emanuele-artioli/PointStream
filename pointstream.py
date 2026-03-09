@@ -5,7 +5,14 @@ import datetime
 from pathlib import Path
 from ultralytics import YOLO
 
-from utils import load_video_frames, run_yolo, stitch_panorama, save_dwpose, encode_video_libsvtav1
+from utils import (
+    load_video_frames,
+    run_yolo,
+    stitch_panorama,
+    save_dwpose,
+    encode_video_libsvtav1,
+    resize_and_pad_image,
+)
 
 def main():
     video_path = "/home/itec/emanuele/Datasets/federer_djokovic/libsvtav1_crf35_pre5/scene_004.mp4"
@@ -15,6 +22,7 @@ def main():
     detection_model = YOLO("/home/itec/emanuele/Models/YOLO/yolo26x.pt")
     segmentation_model = YOLO("/home/itec/emanuele/Models/YOLO/yolo26x-seg.pt")
     tracker = "/home/itec/emanuele/Models/YOLO/trackers/botsort.yaml"
+    save_image_size = (640, 640)
     
     frames = load_video_frames(video_path)
     os.makedirs(exp_folder, exist_ok=True)
@@ -37,6 +45,10 @@ def main():
         for (class_name, track_id, bbox) in zip(detection["class_names"], detection["track_ids"], detection["bboxes"]):
             x1, y1, x2, y2 = [int(value.item()) for value in bbox]
             crop = frame[y1:y2, x1:x2]
+            if crop.size == 0:
+                continue
+
+            resized_crop = resize_and_pad_image(crop, save_image_size)
             track_id_value = int(track_id.item()) if hasattr(track_id, "item") else int(track_id)
             crop_folder = f"{exp_folder}/{class_name}_{track_id_value}"
             bbox_folder = f"{crop_folder}/bbox"
@@ -45,7 +57,7 @@ def main():
             os.makedirs(bbox_folder, exist_ok=True)
             os.makedirs(mask_folder, exist_ok=True)
             os.makedirs(object_folder, exist_ok=True)
-            cv2.imwrite(f"{bbox_folder}/{frame_idx:06d}.png", crop)
+            cv2.imwrite(f"{bbox_folder}/{frame_idx:06d}.png", resized_crop)
             
             # TODO: sometimes, the same object is detected in multiple frames but with different track IDs. 
             # To rectify this, we could save a csv with track ID, frame number, class names, and bboxes of each detection in each frame.
@@ -72,9 +84,10 @@ def main():
                 continue
             mask = (segmentation["masks"][0] > 0.5).detach().cpu().numpy().astype("uint8") * 255
             mask = cv2.resize(mask, (crop.shape[1], crop.shape[0]), interpolation=cv2.INTER_NEAREST)
-            cv2.imwrite(f"{mask_folder}/{frame_idx:06d}.png", mask)
+            resized_mask = resize_and_pad_image(mask, save_image_size, interpolation=cv2.INTER_NEAREST)
+            cv2.imwrite(f"{mask_folder}/{frame_idx:06d}.png", resized_mask)
 
-            masked_crop = cv2.bitwise_and(crop, crop, mask=mask)
+            masked_crop = cv2.bitwise_and(resized_crop, resized_crop, mask=resized_mask)
             cv2.imwrite(f"{object_folder}/{frame_idx:06d}.png", masked_crop)
 
             background_crop = background[y1:y2, x1:x2]
