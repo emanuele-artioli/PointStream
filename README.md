@@ -86,7 +86,12 @@ It now returns `(panorama_image, panorama_data)` instead of only the panorama im
 
 `pointstream.py` also supports detection-first object masking. It saves bbox crops in `bbox_crops/`, runs segmentation on each crop (including single-frame list inputs), saves masks in `segmentation_masks/`, saves masked crops in `segmented_crops/`, and writes the background frame only after masking all objects in that frame.
 
-After panorama creation, `pointstream.py` loops over each `person_*` track folder, runs `utils.save_dwpose(...)` on that person's `object/` frames to generate skeleton PNGs in `dwpose_frames/`, and then encodes one AV1 (`libsvtav1`) video per person into `dwpose_videos/` using `utils.encode_video_libsvtav1(..., crf=25)`.
+After panorama creation, `pointstream.py` loops over each `person_*` track folder and runs a three-step DWPose flow:
+1. `utils.extract_dwpose_keypoints(...)` returns one ndarray per frame with columns `[x, y]` (low-confidence keypoints are set to `-1`).
+2. `utils.save_dwpose_keypoints_csv(...)` saves those keypoints to `dwpose_keypoints/*.csv`, then `utils.load_dwpose_keypoints_csv(...)` reads them back.
+3. `utils.convert_dwpose_keypoints_to_skeleton_frames(..., frame_size=(H, W))` renders skeleton PNGs into `dwpose_frames/`.
+
+The pipeline then encodes one AV1 (`libsvtav1`) video per person into `dwpose_videos/` using `utils.encode_video_libsvtav1(..., crf=25)`.
 
 ### Other pipeline modes
 
@@ -115,6 +120,9 @@ experiments/
     │   │   ├── 000000.png
     │   │   └── ...
     │   └── person_2/
+    ├── dwpose_keypoints/
+    │   ├── person_1_keypoints.csv
+    │   └── person_2_keypoints.csv
     ├── dwpose_videos/
     │   ├── person_1_dwpose.mp4  # DWPose skeleton video for one tracked person
     │   └── person_2_dwpose.mp4

@@ -9,7 +9,10 @@ from utils import (
     load_video_frames,
     run_yolo,
     stitch_panorama,
-    save_dwpose,
+    extract_dwpose_keypoints,
+    save_dwpose_keypoints_csv,
+    load_dwpose_keypoints_csv,
+    convert_dwpose_keypoints_to_skeleton_frames,
     encode_video_libsvtav1,
     resize_and_pad_image,
 )
@@ -19,6 +22,7 @@ def main():
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     exp_folder = f"/home/itec/emanuele/pointstream/experiments/{timestamp}"
     classes_to_detect = ["person", "tennis racket"]
+    # TODO: ablation test: compare with YOLOE, in two modes: one with text prompts (eg. tennis player), one with image (first frame of identified classes).
     detection_model = YOLO("/home/itec/emanuele/Models/YOLO/yolo26x.pt")
     segmentation_model = YOLO("/home/itec/emanuele/Models/YOLO/yolo26x-seg.pt")
     tracker = "/home/itec/emanuele/Models/YOLO/trackers/botsort.yaml"
@@ -37,8 +41,7 @@ def main():
             model=detection_model, 
             tracker=tracker,
             task="detect",
-        )
-    ):
+        )):
         frame = detection["frame"]
         background = frame.copy()
 
@@ -124,15 +127,16 @@ def main():
     with panorama_metadata_path.open("w", encoding="utf-8") as panorama_metadata_file:
         json.dump(panorama_metadata, panorama_metadata_file, indent=2)
 
+    # Save DWPose videos for each detected person.
     capture = cv2.VideoCapture(video_path)
     fps = float(capture.get(cv2.CAP_PROP_FPS) or 0.0)
     capture.release()
-    if fps <= 0:
-        fps = 25.0
 
     exp_path = Path(exp_folder)
+    dwpose_keypoints_root = exp_path / "dwpose_keypoints"
     dwpose_frames_root = exp_path / "dwpose_frames"
     dwpose_videos_root = exp_path / "dwpose_videos"
+    dwpose_keypoints_root.mkdir(parents=True, exist_ok=True)
     dwpose_frames_root.mkdir(parents=True, exist_ok=True)
     dwpose_videos_root.mkdir(parents=True, exist_ok=True)
 
@@ -151,10 +155,28 @@ def main():
             continue
 
         person_name = person_dir.name
+        person_dwpose_keypoints_csv = dwpose_keypoints_root / f"{person_name}_keypoints.csv"
         person_dwpose_frames_dir = dwpose_frames_root / person_name
-        save_dwpose(
+
+        keypoint_frames = extract_dwpose_keypoints(
             frames_folder=str(source_frames_dir),
+        )
+        if not keypoint_frames:
+            continue
+
+        save_dwpose_keypoints_csv(
+            keypoint_frames=keypoint_frames,
+            output_csv_path=str(person_dwpose_keypoints_csv),
+        )
+        
+        loaded_keypoint_frames = load_dwpose_keypoints_csv(str(person_dwpose_keypoints_csv))
+        if not loaded_keypoint_frames:
+            continue
+
+        convert_dwpose_keypoints_to_skeleton_frames(
+            keypoint_frames=loaded_keypoint_frames,
             output_folder=str(person_dwpose_frames_dir),
+            frame_size=save_image_size,
         )
 
         if not any(person_dwpose_frames_dir.glob("*.png")):
@@ -167,7 +189,6 @@ def main():
             crf=25,
             frame_folder=str(person_dwpose_frames_dir),
         )
-        print(f"Saved DWPose video for {person_name} at {output_path}")
 
 if __name__ == "__main__":
     main()

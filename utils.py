@@ -3,6 +3,8 @@ Utility functions for PointStream.
 """
 
 
+import csv
+import json
 import numpy as np
 import torch
 import cv2
@@ -179,7 +181,7 @@ def export_reid_model_to_tensorrt(
 
     return str(target_path)
 
-# TODO: should move to open vocab, so it can detect tennis players directly.
+
 def run_yolo(
     frames: list[np.ndarray], 
     exp_folder: str,
@@ -579,24 +581,27 @@ def encode_video_libsvtav1(
     return str(target_path)
 
 
-def save_dwpose(
+def extract_dwpose_keypoints(
     frames_folder: str,
-    output_folder: str,
     det_model: str | None = None,
     pose_model: str | None = None,
     score_threshold: float = 0.3,
-    ) -> None:
+    ) -> list[np.ndarray]:
     """
-    Run DWPose on a single frame folder and save skeleton PNG frames.
+    Run DWPose on a frame folder and return per-frame best-person keypoints.
 
     Args:
         frames_folder: Folder containing source frame PNGs.
-        output_folder: Destination folder for per-frame DWPose PNGs.
         det_model: Optional path to DWPose detection ONNX model.
         pose_model: Optional path to DWPose pose ONNX model.
-        score_threshold: Visibility threshold for pose conversion.
+        score_threshold: Visibility threshold used to hide low-confidence keypoints.
+
+    Returns:
+        List of arrays with shape (N, 2), where columns are [x, y].
+        Keypoints with score below ``score_threshold`` are set to -1.
+        Empty arrays indicate no detected person for that frame.
     """
-    from dwpose import Wholebody, draw_pose, extract_best_person, keypoints_to_pose_dict
+    from dwpose import Wholebody, extract_best_person
 
     source_dir = Path(frames_folder).expanduser().resolve()
     if not source_dir.exists():
@@ -604,36 +609,152 @@ def save_dwpose(
 
     frame_paths = sorted(source_dir.glob("*.png"))
     if not frame_paths:
-        return
-
-    destination_dir = Path(output_folder).expanduser().resolve()
-    if destination_dir == source_dir:
-        raise ValueError("output_folder must be different from frames_folder.")
-    destination_dir.mkdir(parents=True, exist_ok=True)
-    for existing_frame in destination_dir.glob("*.png"):
-        existing_frame.unlink()
+        return []
 
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
     wholebody = Wholebody(device=device, det_model_path=det_model, pose_model_path=pose_model)
 
-    output_size = None
-    written_frames = 0
-
+    extracted_keypoints: list[np.ndarray] = []
     for frame_path in frame_paths:
         frame = cv2.imread(str(frame_path))
         if frame is None:
             continue
 
-        height, width = frame.shape[:2]
         keypoints, scores = wholebody(frame)
         best_keypoints, best_scores = extract_best_person(keypoints, scores)
 
-        if best_keypoints is None:
+        if best_keypoints is None or best_scores is None:
+            extracted_keypoints.append(np.zeros((0, 2), dtype=np.float32))
+            continue
+
+        keypoint_array = np.asarray(best_keypoints, dtype=np.float32).copy()
+        score_array = np.asarray(best_scores, dtype=np.float32)
+        keypoint_array[score_array < float(score_threshold)] = -1.0
+        extracted_keypoints.append(keypoint_array)
+
+    return extracted_keypoints
+
+
+def save_dwpose_keypoints_csv(
+    keypoint_frames: list[np.ndarray],
+    output_csv_path: str,
+    ) -> str:
+    """
+    Save DWPose keypoints to CSV.
+
+    Args:
+        keypoint_frames: Per-frame arrays with columns [x, y].
+        output_csv_path: Destination CSV file path.
+
+    Returns:
+        Absolute path to the saved CSV file.
+    """
+
+    target_path = Path(output_csv_path).expanduser().resolve()
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with target_path.open("w", newline="", encoding="utf-8") as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(["frame_index", "keypoints"])
+        for frame_index, frame_keypoints in enumerate(keypoint_frames):
+            serialized = json.dumps(np.asarray(frame_keypoints, dtype=np.float32).tolist(), separators=(",", ":"))
+            writer.writerow([int(frame_index), serialized])
+
+    return str(target_path)
+
+
+def load_dwpose_keypoints_csv(
+    csv_path: str,
+    ) -> list[np.ndarray]:
+    """
+    Load DWPose keypoints from CSV saved by ``save_dwpose_keypoints_csv``.
+
+    Args:
+        csv_path: Path to CSV file containing serialized keypoints.
+
+    Returns:
+        List of per-frame arrays with columns [x, y].
+    """
+
+    source_path = Path(csv_path).expanduser().resolve()
+    if not source_path.exists():
+        raise FileNotFoundError(f"CSV file not found: {source_path}")
+
+    loaded_keypoints: list[np.ndarray] = []
+    with source_path.open("r", newline="", encoding="utf-8") as csv_file:
+        reader = csv.DictReader(csv_file)
+        if reader.fieldnames is None or "keypoints" not in reader.fieldnames:
+            raise ValueError("CSV must contain a 'keypoints' column.")
+
+        for row in reader:
+            serialized = (row.get("keypoints") or "[]").strip()
+            values = json.loads(serialized)
+            frame_keypoints = np.asarray(values, dtype=np.float32)
+
+            if frame_keypoints.size == 0:
+                loaded_keypoints.append(np.zeros((0, 2), dtype=np.float32))
+                continue
+            if frame_keypoints.ndim != 2 or frame_keypoints.shape[1] < 2:
+                raise ValueError("Each keypoint row must have at least 2 values [x, y].")
+
+            loaded_keypoints.append(frame_keypoints[:, :2].copy())
+
+    return loaded_keypoints
+
+
+def convert_dwpose_keypoints_to_skeleton_frames(
+    keypoint_frames: list[np.ndarray],
+    output_folder: str,
+    frame_size: tuple[int, int],
+    score_threshold: float = 0.3,
+    ) -> None:
+    """
+    Convert extracted DWPose keypoints into skeleton PNG frames.
+
+    Args:
+        keypoint_frames: Output of ``extract_dwpose_keypoints`` with [x, y] values.
+        output_folder: Destination folder for per-frame DWPose PNGs.
+        frame_size: Output frame size as (height, width).
+        score_threshold: Visibility threshold for pose conversion.
+    """
+    from dwpose import draw_pose, keypoints_to_pose_dict
+
+    if not keypoint_frames:
+        return
+
+    if not isinstance(frame_size, tuple) or len(frame_size) != 2:
+        raise ValueError("frame_size must be a (height, width) tuple.")
+    height = int(frame_size[0])
+    width = int(frame_size[1])
+    if height <= 0 or width <= 0:
+        raise ValueError("frame_size values must be positive.")
+
+    destination_dir = Path(output_folder).expanduser().resolve()
+    destination_dir.mkdir(parents=True, exist_ok=True)
+    for existing_frame in destination_dir.glob("*.png"):
+        existing_frame.unlink()
+
+    output_size = None
+    written_frames = 0
+
+    for frame_keypoints in keypoint_frames:
+        keypoint_array = np.asarray(frame_keypoints, dtype=np.float32)
+
+        if keypoint_array.size == 0:
             dwpose_frame = np.zeros((height, width, 3), dtype=np.uint8)
         else:
+            if keypoint_array.ndim != 2 or keypoint_array.shape[1] < 2:
+                raise ValueError("Each keypoint frame must have shape (N, >=2) with [x, y].")
+
+            visibility_scores = np.where(
+                (keypoint_array[:, 0] >= 0.0) & (keypoint_array[:, 1] >= 0.0),
+                1.0,
+                0.0,
+            ).astype(np.float32)
+
             pose = keypoints_to_pose_dict(
-                best_keypoints,
-                best_scores,
+                keypoint_array[:, :2].copy(),
+                visibility_scores,
                 width,
                 height,
                 score_threshold=score_threshold,
@@ -649,5 +770,59 @@ def save_dwpose(
         frame_output_path = destination_dir / f"{written_frames:06d}.png"
         cv2.imwrite(str(frame_output_path), dwpose_frame)
         written_frames += 1
+
+
+def save_dwpose(
+    frames_folder: str,
+    output_folder: str,
+    det_model: str | None = None,
+    pose_model: str | None = None,
+    frame_size: tuple[int, int] | None = None,
+    score_threshold: float = 0.3,
+    ) -> None:
+    """
+    Convenience wrapper that extracts DWPose keypoints and writes skeleton frames.
+
+    Args:
+        frames_folder: Folder containing source frame PNGs.
+        output_folder: Destination folder for per-frame DWPose PNGs.
+        det_model: Optional path to DWPose detection ONNX model.
+        pose_model: Optional path to DWPose pose ONNX model.
+        frame_size: Optional output frame size as (height, width).
+        score_threshold: Visibility threshold for pose conversion.
+    """
+    source_dir = Path(frames_folder).expanduser().resolve()
+    destination_dir = Path(output_folder).expanduser().resolve()
+    if destination_dir == source_dir:
+        raise ValueError("output_folder must be different from frames_folder.")
+
+    keypoint_frames = extract_dwpose_keypoints(
+        frames_folder=frames_folder,
+        det_model=det_model,
+        pose_model=pose_model,
+        score_threshold=score_threshold,
+    )
+    if not keypoint_frames:
+        return
+
+    resolved_frame_size = frame_size
+    if resolved_frame_size is None:
+        source_frame_paths = sorted(source_dir.glob("*.png"))
+        source_frame = None
+        for frame_path in source_frame_paths:
+            source_frame = cv2.imread(str(frame_path))
+            if source_frame is not None:
+                break
+        if source_frame is None:
+            return
+        source_height, source_width = source_frame.shape[:2]
+        resolved_frame_size = (int(source_height), int(source_width))
+
+    convert_dwpose_keypoints_to_skeleton_frames(
+        keypoint_frames=keypoint_frames,
+        output_folder=output_folder,
+        frame_size=resolved_frame_size,
+        score_threshold=score_threshold,
+    )
 
 
