@@ -93,6 +93,12 @@ After panorama creation, `pointstream.py` loops over each `person_*` track folde
 
 The pipeline then encodes one AV1 (`libsvtav1`) video per person into `dwpose_videos/` using `utils.encode_video_libsvtav1(..., crf=25)`.
 
+`pointstream.py` now runs in two explicit stages:
+1. `run_server()` creates a new timestamped experiment folder and writes `metadata.json` with paths and parameters needed by the client (`panorama_image_path`, `panorama_data_path`, `fps`, `frame_size`, and per-person DWPose CSV/video paths).
+2. `run_client()` automatically selects the latest subfolder under `experiments/`, loads `metadata.json`, reconstructs background frames from `panorama.png` + panorama metadata via `utils.animate_panorama(...)`, encodes `background_from_panorama.mp4`, then generates DWPose skeleton frames/videos from the saved CSV files.
+
+Running `python pointstream.py` executes `run_server()` and then `run_client()` sequentially through `main()`.
+
 ### Other pipeline modes
 
 ```bash

@@ -187,6 +187,7 @@ def run_yolo(
     exp_folder: str,
     classes: list = ["person"],
     imgsz: tuple = (360, 640),
+    max_det: int = 50,
     model: str | YOLO = "/home/itec/emanuele/Models/YOLO/yolo26x.pt",
     tracker: str | None = "/home/itec/emanuele/Models/YOLO/trackers/botsort.yaml",
     task: str = "detect",
@@ -200,6 +201,7 @@ def run_yolo(
         exp_folder: Path to the experiment folder where results will be saved
         classes: List of COCO class names to include
         imgsz: Image size for model inference
+        max_det: Maximum detections per frame
         model: Path to YOLO model weights or preloaded model
         tracker: Tracker configuration path. If None, uses predict mode.
         task: Either "detect" (default) or "segment".
@@ -220,8 +222,8 @@ def run_yolo(
         imgsz=imgsz,
         half=True,
         device="cuda:0" if torch.cuda.is_available() else "cpu",
-        batch=4,
-        max_det=10,
+        batch=16,
+        max_det=max_det,
         classes=[k for k, v in COCO_CLASSES.items() if v in classes],
         retina_masks=True,
         project=exp_folder,

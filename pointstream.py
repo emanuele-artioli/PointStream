@@ -9,6 +9,7 @@ from utils import (
     load_video_frames,
     run_yolo,
     stitch_panorama,
+    animate_panorama,
     extract_dwpose_keypoints,
     save_dwpose_keypoints_csv,
     load_dwpose_keypoints_csv,
@@ -17,10 +18,13 @@ from utils import (
     resize_and_pad_image,
 )
 
-def main():
+EXPERIMENTS_ROOT = Path("/home/itec/emanuele/pointstream/experiments")
+
+def run_server():
     video_path = "/home/itec/emanuele/Datasets/federer_djokovic/libsvtav1_crf35_pre5/scene_004.mp4"
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    exp_folder = f"/home/itec/emanuele/pointstream/experiments/{timestamp}"
+    exp_path = EXPERIMENTS_ROOT / timestamp
+    exp_folder = str(exp_path)
     classes_to_detect = ["person", "tennis racket"]
     # TODO: ablation test: compare with YOLOE, in two modes: one with text prompts (eg. tennis player), one with image (first frame of identified classes).
     detection_model = YOLO("/home/itec/emanuele/Models/YOLO/yolo26x.pt")
@@ -77,6 +81,7 @@ def main():
                     exp_folder=exp_folder,
                     classes=[class_name],
                     imgsz=(640, 640),
+                    max_det=1,
                     model=segmentation_model,
                     tracker=None,
                     task="segment",
@@ -149,6 +154,8 @@ def main():
         key=person_sort_key,
     )
 
+    dwpose_jobs = []
+
     for person_dir in person_dirs:
         source_frames_dir = person_dir / "object"
         if not source_frames_dir.exists():
@@ -156,8 +163,6 @@ def main():
 
         person_name = person_dir.name
         person_dwpose_keypoints_csv = dwpose_keypoints_root / f"{person_name}_keypoints.csv"
-        person_dwpose_frames_dir = dwpose_frames_root / person_name
-
         keypoint_frames = extract_dwpose_keypoints(
             frames_folder=str(source_frames_dir),
         )
@@ -168,10 +173,96 @@ def main():
             keypoint_frames=keypoint_frames,
             output_csv_path=str(person_dwpose_keypoints_csv),
         )
-        
+
+        dwpose_jobs.append(
+            {
+                "person_name": person_name,
+                "keypoints_csv": str(person_dwpose_keypoints_csv),
+                "output_video": str(dwpose_videos_root / f"{person_name}_dwpose.mp4"),
+            }
+        )
+
+    metadata_path = exp_path / "metadata.json"
+    metadata = {
+        "experiment_path": str(exp_path),
+        "panorama_image_path": str(exp_path / "panorama.png"),
+        "panorama_data_path": str(panorama_metadata_path),
+        "fps": fps,
+        "frame_size": list(save_image_size),
+        "dwpose_keypoints_csv_files": [job["keypoints_csv"] for job in dwpose_jobs],
+        "dwpose_jobs": dwpose_jobs,
+    }
+    with metadata_path.open("w", encoding="utf-8") as metadata_file:
+        json.dump(metadata, metadata_file, indent=2)
+
+
+def run_client():
+    experiment_dirs = [path for path in EXPERIMENTS_ROOT.iterdir() if path.is_dir()]
+    if not experiment_dirs:
+        print("No experiment folders found under experiments/. Nothing to process on the client.")
+        return
+
+    latest_exp_path = max(experiment_dirs, key=lambda path: path.stat().st_mtime)
+    metadata_path = latest_exp_path / "metadata.json"
+    if not metadata_path.exists():
+        print(f"Missing metadata file: {metadata_path}")
+        return
+
+    with metadata_path.open("r", encoding="utf-8") as metadata_file:
+        metadata = json.load(metadata_file)
+
+    panorama_image_path = Path(metadata.get("panorama_image_path", latest_exp_path / "panorama.png"))
+    panorama_data_path = Path(metadata.get("panorama_data_path", latest_exp_path / "panorama_data.json"))
+    if not panorama_image_path.exists():
+        print(f"Missing panorama image file: {panorama_image_path}")
+        return
+    if not panorama_data_path.exists():
+        print(f"Missing panorama data file: {panorama_data_path}")
+        return
+
+    panorama = cv2.imread(str(panorama_image_path))
+    if panorama is None:
+        print(f"Failed to read panorama image: {panorama_image_path}")
+        return
+
+    with panorama_data_path.open("r", encoding="utf-8") as panorama_data_file:
+        panorama_data = json.load(panorama_data_file)
+
+    reconstructed_background_frames = animate_panorama(
+        panorama=panorama,
+        panorama_data=panorama_data,
+    )
+
+    fps = float(metadata.get("fps", 0.0))
+    sample_stride = int(panorama_data.get("sample_stride", 1) or 1)
+    background_fps = fps / sample_stride if sample_stride > 0 else fps
+    background_output_path = latest_exp_path / "background_from_panorama.mp4"
+    if reconstructed_background_frames:
+        encode_video_libsvtav1(
+            output_path=str(background_output_path),
+            fps=background_fps,
+            crf=25,
+            frames=reconstructed_background_frames,
+        )
+
+    frame_size_values = metadata.get("frame_size", [640, 640])
+    if len(frame_size_values) != 2:
+        frame_size_values = [640, 640]
+    save_image_size = (int(frame_size_values[0]), int(frame_size_values[1]))
+    client_jobs = metadata.get("dwpose_jobs", [])
+    dwpose_frames_root = latest_exp_path / "dwpose_frames"
+
+    for job in client_jobs:
+        person_dwpose_keypoints_csv = Path(job["keypoints_csv"])
+        person_name = str(job.get("person_name", person_dwpose_keypoints_csv.stem.replace("_keypoints", "")))
+        person_dwpose_frames_dir = dwpose_frames_root / person_name
+        output_path = Path(job["output_video"])
+
         loaded_keypoint_frames = load_dwpose_keypoints_csv(str(person_dwpose_keypoints_csv))
         if not loaded_keypoint_frames:
             continue
+
+        person_dwpose_frames_dir.mkdir(parents=True, exist_ok=True)
 
         convert_dwpose_keypoints_to_skeleton_frames(
             keypoint_frames=loaded_keypoint_frames,
@@ -182,13 +273,18 @@ def main():
         if not any(person_dwpose_frames_dir.glob("*.png")):
             continue
 
-        output_path = dwpose_videos_root / f"{person_name}_dwpose.mp4"
         encode_video_libsvtav1(
             output_path=str(output_path),
             fps=fps,
             crf=25,
             frame_folder=str(person_dwpose_frames_dir),
         )
+
+
+def main():
+    run_server()
+    run_client()
+
 
 if __name__ == "__main__":
     main()
