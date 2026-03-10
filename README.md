@@ -97,7 +97,33 @@ The pipeline then encodes one AV1 (`libsvtav1`) video per person into `dwpose_vi
 1. `run_server()` creates a new timestamped experiment folder and writes `metadata.json` with paths and parameters needed by the client (`panorama_image_path`, `panorama_data_path`, `fps`, `frame_size`, and per-person DWPose CSV/video paths).
 2. `run_client()` automatically selects the latest subfolder under `experiments/`, loads `metadata.json`, reconstructs background frames from `panorama.png` + panorama metadata via `utils.animate_panorama(...)`, encodes `background_from_panorama.mp4`, then generates DWPose skeleton frames/videos from the saved CSV files.
 
-Running `python pointstream.py` executes `run_server()` and then `run_client()` sequentially through `main()`.
+`run_client()` also attempts optional AnimateAnyone Pose2Video synthesis through `utils.run_animate_anyone_pose2video(...)` for each person track. It reads skeleton PNGs from `dwpose_frames/<person_name>/`, uses the first available `object/*.png` frame as reference image, and saves outputs under `animate_anyone_videos/`.
+
+By default it looks for the AnimateAnyone repository at `/home/itec/emanuele/Moore-AnimateAnyone` and config `configs/prompts/run_finetuned.yaml`. You can override these at runtime:
+
+```bash
+POINTSTREAM_ANIMATE_ANYONE_DIR=/path/to/Moore-AnimateAnyone \
+POINTSTREAM_ANIMATE_ANYONE_CONFIG=/path/to/run_finetuned.yaml \
+python pointstream.py
+```
+
+If the repository or config is missing, PointStream skips this step and continues the rest of the client pipeline.
+
+### Split server/client execution by environment
+
+Use separate entry scripts so each stage runs in its intended conda env:
+
+```bash
+# 1) Server stage (YOLO + DWPose extraction)
+conda activate pointstream
+python pointstream_server.py
+
+# 2) Client stage (AnimateAnyone inference)
+conda activate animate-anyone
+python pointstream_client.py
+```
+
+`pointstream.py` still exposes both `run_server()` and `run_client()` functions, but running them separately is recommended to avoid dependency conflicts between the two environments.
 
 ### Other pipeline modes
 

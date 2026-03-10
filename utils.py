@@ -5,14 +5,21 @@ Utility functions for PointStream.
 
 import csv
 import json
+import os
 import numpy as np
 import torch
 import cv2
-from ultralytics import YOLO
 import subprocess
 import shutil
+import sys
+from datetime import datetime
 from pathlib import Path
 from torch import nn
+# YOLO is required only by the server, so we import it lazily in the functions that need it to avoid forcing a hard dependency on the client environment.
+try:
+    from ultralytics import YOLO
+except ImportError:
+    YOLO = None
 
 
 COCO_CLASSES = {
@@ -30,6 +37,7 @@ COCO_CLASSES = {
     75: 'vase', 76: 'scissors', 77: 'teddy bear', 78: 'hair drier', 79: 'toothbrush'
 }
 
+DEFAULT_ANIMATE_ANYONE_DIR = Path("/home/itec/emanuele/Moore-AnimateAnyone")
 
 
 def load_video_frames(video_path: str) -> list[np.ndarray]:
@@ -159,6 +167,7 @@ def export_reid_model_to_tensorrt(
     if target_path.exists() and overwrite:
         target_path.unlink()
 
+    _require_ultralytics()
     model = YOLO(str(source_path))
 
     head = model.model.model[-1]
@@ -188,7 +197,7 @@ def run_yolo(
     classes: list = ["person"],
     imgsz: tuple = (360, 640),
     max_det: int = 50,
-    model: str | YOLO = "/home/itec/emanuele/Models/YOLO/yolo26x.pt",
+    model: str | object = "/home/itec/emanuele/Models/YOLO/yolo26x.pt",
     tracker: str | None = "/home/itec/emanuele/Models/YOLO/trackers/botsort.yaml",
     task: str = "detect",
     ) -> dict:
@@ -826,5 +835,220 @@ def save_dwpose(
         frame_size=resolved_frame_size,
         score_threshold=score_threshold,
     )
+
+
+def _setup_animate_anyone_import_path(animate_anyone_dir: str | Path) -> Path:
+    """Ensure the AnimateAnyone repository is importable by Python."""
+    repo_path = Path(animate_anyone_dir).expanduser().resolve()
+    if not repo_path.exists():
+        raise FileNotFoundError(f"AnimateAnyone repository not found: {repo_path}")
+    if str(repo_path) not in sys.path:
+        sys.path.insert(0, str(repo_path))
+    return repo_path
+
+
+def run_animate_anyone_pose2video(
+    ref_image_path: str,
+    skeleton_frames_dir: str,
+    config_path: str | None = None,
+    animate_anyone_dir: str | Path = DEFAULT_ANIMATE_ANYONE_DIR,
+    width: int = 512,
+    height: int = 512,
+    length: int | None = None,
+    steps: int = 30,
+    cfg: float = 3.5,
+    seed: int = 42,
+    fps: float | None = None,
+    save_dir: str | None = None,
+    output_filename: str | None = None,
+    include_input_grid: bool = True,
+) -> str:
+    """
+    Run AnimateAnyone Pose2Video inference using pre-rendered skeleton PNG frames.
+
+    Args:
+        ref_image_path: Path to the reference RGB image.
+        skeleton_frames_dir: Folder containing ordered skeleton PNG frames.
+        config_path: AnimateAnyone YAML config path. If relative, it is resolved from
+            the AnimateAnyone repository root. Defaults to
+            ``configs/prompts/run_finetuned.yaml``.
+        animate_anyone_dir: Path to the Moore-AnimateAnyone repository root.
+        width: Output frame width.
+        height: Output frame height.
+        length: Optional cap for sequence length. Uses all available skeleton frames
+            when ``None``.
+        steps: Diffusion denoising steps.
+        cfg: Classifier-free guidance scale.
+        seed: Random seed.
+        fps: Output frame rate. Defaults to 12 when omitted or non-positive.
+        save_dir: Output directory for the generated video.
+        output_filename: Optional output video filename.
+        include_input_grid: If True, output a 3-row grid with reference image,
+            skeleton input, and generated video.
+
+    Returns:
+        Absolute path to the generated MP4 file.
+    """
+    # Keep imports local so the rest of PointStream still runs in environments
+    # that do not include AnimateAnyone dependencies.
+    from PIL import Image
+    import torch
+    from diffusers import AutoencoderKL, DDIMScheduler
+    from einops import repeat
+    from omegaconf import OmegaConf
+    from torchvision import transforms
+    from transformers import CLIPVisionModelWithProjection
+
+    if not torch.cuda.is_available():
+        raise RuntimeError("AnimateAnyone Pose2Video requires CUDA, but no CUDA device was detected.")
+
+    aa_dir = _setup_animate_anyone_import_path(animate_anyone_dir)
+    default_config = aa_dir / "configs" / "prompts" / "run_finetuned.yaml"
+    chosen_config = default_config if config_path is None else Path(config_path).expanduser()
+    if not chosen_config.is_absolute():
+        chosen_config = aa_dir / chosen_config
+    chosen_config = chosen_config.resolve()
+    if not chosen_config.exists():
+        raise FileNotFoundError(f"AnimateAnyone config not found: {chosen_config}")
+
+    ref_path = Path(ref_image_path).expanduser().resolve()
+    if not ref_path.exists():
+        raise FileNotFoundError(f"Reference image not found: {ref_path}")
+
+    skeleton_dir = Path(skeleton_frames_dir).expanduser().resolve()
+    if not skeleton_dir.exists():
+        raise FileNotFoundError(f"Skeleton folder not found: {skeleton_dir}")
+
+    skeleton_paths = sorted(skeleton_dir.glob("*.png"))
+    if not skeleton_paths:
+        raise ValueError(f"No skeleton PNG frames found in: {skeleton_dir}")
+
+    previous_cwd = Path.cwd()
+    try:
+        os.chdir(aa_dir)
+
+        from src.models.pose_guider import PoseGuider
+        from src.models.unet_2d_condition import UNet2DConditionModel
+        from src.models.unet_3d import UNet3DConditionModel
+        from src.pipelines.pipeline_pose2vid_long import Pose2VideoPipeline
+        from src.utils.util import save_videos_grid
+
+        config = OmegaConf.load(str(chosen_config))
+        weight_dtype = torch.float16 if config.weight_dtype == "fp16" else torch.float32
+
+        vae = AutoencoderKL.from_pretrained(
+            config.pretrained_vae_path,
+        ).to("cuda", dtype=weight_dtype)
+
+        reference_unet = UNet2DConditionModel.from_pretrained(
+            config.pretrained_base_model_path,
+            subfolder="unet",
+        ).to(dtype=weight_dtype, device="cuda")
+
+        inference_config_path = Path(config.inference_config)
+        if not inference_config_path.is_absolute():
+            inference_config_path = (aa_dir / inference_config_path).resolve()
+        infer_config = OmegaConf.load(str(inference_config_path))
+        denoising_unet = UNet3DConditionModel.from_pretrained_2d(
+            config.pretrained_base_model_path,
+            config.motion_module_path,
+            subfolder="unet",
+            unet_additional_kwargs=infer_config.unet_additional_kwargs,
+        ).to(dtype=weight_dtype, device="cuda")
+
+        pose_guider = PoseGuider(320, block_out_channels=(16, 32, 96, 256)).to(
+            dtype=weight_dtype,
+            device="cuda",
+        )
+
+        image_encoder = CLIPVisionModelWithProjection.from_pretrained(
+            config.image_encoder_path,
+        ).to(dtype=weight_dtype, device="cuda")
+
+        scheduler_kwargs = OmegaConf.to_container(infer_config.noise_scheduler_kwargs, resolve=True)
+        scheduler = DDIMScheduler(**scheduler_kwargs)
+
+        denoising_unet.load_state_dict(
+            torch.load(config.denoising_unet_path, map_location="cpu"),
+            strict=False,
+        )
+        reference_unet.load_state_dict(
+            torch.load(config.reference_unet_path, map_location="cpu"),
+            strict=False,
+        )
+        pose_guider.load_state_dict(
+            torch.load(config.pose_guider_path, map_location="cpu"),
+            strict=False,
+        )
+
+        pipe = Pose2VideoPipeline(
+            vae=vae,
+            image_encoder=image_encoder,
+            reference_unet=reference_unet,
+            denoising_unet=denoising_unet,
+            pose_guider=pose_guider,
+            scheduler=scheduler,
+        ).to("cuda", dtype=weight_dtype)
+
+        generator = torch.manual_seed(int(seed))
+
+        pose_transform = transforms.Compose([
+            transforms.Resize((int(height), int(width))),
+            transforms.ToTensor(),
+        ])
+
+        with Image.open(ref_path) as ref_image_file:
+            ref_image_pil = ref_image_file.convert("RGB")
+
+        max_length = len(skeleton_paths) if length is None else min(int(length), len(skeleton_paths))
+        if max_length <= 0:
+            raise ValueError("length must be positive when provided.")
+
+        pose_list = []
+        for skeleton_path in skeleton_paths[:max_length]:
+            with Image.open(skeleton_path) as skeleton_file:
+                pose_list.append(skeleton_file.convert("RGB"))
+
+        ref_image_tensor = pose_transform(ref_image_pil).unsqueeze(1).unsqueeze(0)
+        ref_image_tensor = repeat(ref_image_tensor, "b c f h w -> b c (repeat f) h w", repeat=max_length)
+        pose_tensor = torch.stack([pose_transform(pose_image) for pose_image in pose_list], dim=0)
+        pose_tensor = pose_tensor.transpose(0, 1).unsqueeze(0)
+
+        generated_video = pipe(
+            ref_image_pil,
+            pose_list,
+            int(width),
+            int(height),
+            int(max_length),
+            int(steps),
+            float(cfg),
+            generator=generator,
+        ).videos
+
+        if save_dir is None:
+            date_fragment = datetime.now().strftime("%Y%m%d")
+            time_fragment = datetime.now().strftime("%H%M")
+            save_path = aa_dir / "output" / date_fragment / f"{time_fragment}--pointstream"
+        else:
+            save_path = Path(save_dir).expanduser()
+            if not save_path.is_absolute():
+                save_path = (Path(previous_cwd) / save_path).resolve()
+        save_path.mkdir(parents=True, exist_ok=True)
+
+        video_basename = output_filename or f"pose2video_{int(height)}x{int(width)}_cfg{float(cfg):.1f}.mp4"
+        output_path = (save_path / video_basename).resolve()
+        output_fps = float(fps) if fps and float(fps) > 0 else 12.0
+
+        if include_input_grid:
+            video_to_save = torch.cat([ref_image_tensor, pose_tensor, generated_video], dim=0)
+            n_rows = 3
+        else:
+            video_to_save = generated_video
+            n_rows = 1
+
+        save_videos_grid(video_to_save, str(output_path), n_rows=n_rows, fps=output_fps)
+        return str(output_path)
+    finally:
+        os.chdir(previous_cwd)
 
 

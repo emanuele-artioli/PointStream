@@ -3,7 +3,6 @@ import cv2
 import json
 import datetime
 from pathlib import Path
-from ultralytics import YOLO
 
 from utils import (
     load_video_frames,
@@ -15,12 +14,18 @@ from utils import (
     load_dwpose_keypoints_csv,
     convert_dwpose_keypoints_to_skeleton_frames,
     encode_video_libsvtav1,
+    run_animate_anyone_pose2video,
     resize_and_pad_image,
 )
 
 EXPERIMENTS_ROOT = Path("/home/itec/emanuele/pointstream/experiments")
+DEFAULT_ANIMATE_ANYONE_DIR = Path("/home/itec/emanuele/Moore-AnimateAnyone")
+DEFAULT_ANIMATE_ANYONE_CONFIG = DEFAULT_ANIMATE_ANYONE_DIR / "configs" / "prompts" / "run_finetuned.yaml"
+ANIMATE_ANYONE_OUTPUT_SIZE = (512, 512)  # (height, width)
 
 def run_server():
+    from ultralytics import YOLO
+
     video_path = "/home/itec/emanuele/Datasets/federer_djokovic/libsvtav1_crf35_pre5/scene_004.mp4"
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     exp_path = EXPERIMENTS_ROOT / timestamp
@@ -161,6 +166,11 @@ def run_server():
         if not source_frames_dir.exists():
             continue
 
+        reference_candidates = sorted(source_frames_dir.glob("*.png"))
+        if not reference_candidates:
+            continue
+        reference_image_path = reference_candidates[0]
+
         person_name = person_dir.name
         person_dwpose_keypoints_csv = dwpose_keypoints_root / f"{person_name}_keypoints.csv"
         keypoint_frames = extract_dwpose_keypoints(
@@ -177,8 +187,10 @@ def run_server():
         dwpose_jobs.append(
             {
                 "person_name": person_name,
+                "reference_image": str(reference_image_path),
                 "keypoints_csv": str(person_dwpose_keypoints_csv),
                 "output_video": str(dwpose_videos_root / f"{person_name}_dwpose.mp4"),
+                "animate_anyone_output_video": str(exp_path / "animate_anyone_videos" / f"{person_name}_animate_anyone.mp4"),
             }
         )
 
@@ -251,6 +263,28 @@ def run_client():
     save_image_size = (int(frame_size_values[0]), int(frame_size_values[1]))
     client_jobs = metadata.get("dwpose_jobs", [])
     dwpose_frames_root = latest_exp_path / "dwpose_frames"
+    animate_anyone_default_dir = Path(
+        os.environ.get("POINTSTREAM_ANIMATE_ANYONE_DIR", str(DEFAULT_ANIMATE_ANYONE_DIR))
+    ).expanduser()
+    animate_anyone_config_value = os.environ.get(
+        "POINTSTREAM_ANIMATE_ANYONE_CONFIG",
+        str(DEFAULT_ANIMATE_ANYONE_CONFIG),
+    )
+    animate_anyone_config = Path(animate_anyone_config_value).expanduser()
+    if not animate_anyone_config.is_absolute():
+        animate_anyone_config = animate_anyone_default_dir / animate_anyone_config
+    animate_anyone_output_root = latest_exp_path / "animate_anyone_videos"
+
+    animate_anyone_enabled = True
+    if not animate_anyone_default_dir.exists():
+        print(f"AnimateAnyone repo not found, skipping pose2video: {animate_anyone_default_dir}")
+        animate_anyone_enabled = False
+    elif not animate_anyone_config.exists():
+        print(f"AnimateAnyone config not found, skipping pose2video: {animate_anyone_config}")
+        animate_anyone_enabled = False
+
+    if animate_anyone_enabled:
+        animate_anyone_output_root.mkdir(parents=True, exist_ok=True)
 
     for job in client_jobs:
         person_dwpose_keypoints_csv = Path(job["keypoints_csv"])
@@ -279,6 +313,46 @@ def run_client():
             crf=25,
             frame_folder=str(person_dwpose_frames_dir),
         )
+
+        if not animate_anyone_enabled:
+            continue
+
+        reference_image_path = Path(job.get("reference_image", "")).expanduser()
+        if not reference_image_path.exists():
+            fallback_candidates = sorted((latest_exp_path / person_name / "object").glob("*.png"))
+            if fallback_candidates:
+                reference_image_path = fallback_candidates[0]
+            else:
+                print(f"Missing reference image for {person_name}, skipping AnimateAnyone inference.")
+                continue
+
+        animate_anyone_output_path = Path(
+            job.get(
+                "animate_anyone_output_video",
+                animate_anyone_output_root / f"{person_name}_animate_anyone.mp4",
+            )
+        ).expanduser()
+
+        try:
+            generated_video_path = run_animate_anyone_pose2video(
+                ref_image_path=str(reference_image_path),
+                skeleton_frames_dir=str(person_dwpose_frames_dir),
+                config_path=str(animate_anyone_config),
+                animate_anyone_dir=str(animate_anyone_default_dir),
+                width=int(ANIMATE_ANYONE_OUTPUT_SIZE[1]),
+                height=int(ANIMATE_ANYONE_OUTPUT_SIZE[0]),
+                length=None,
+                steps=30,
+                cfg=3.5,
+                seed=42,
+                fps=fps if fps > 0 else None,
+                save_dir=str(animate_anyone_output_path.parent),
+                output_filename=animate_anyone_output_path.name,
+                include_input_grid=True,
+            )
+            print(f"Saved AnimateAnyone video for {person_name}: {generated_video_path}")
+        except Exception as exc:
+            print(f"AnimateAnyone inference failed for {person_name}: {exc}")
 
 
 def main():
