@@ -88,7 +88,7 @@ It now returns `(panorama_image, panorama_data)` instead of only the panorama im
 
 After panorama creation, `pointstream.py` loops over each `person_*` track folder and runs a three-step DWPose flow:
 1. `utils.extract_dwpose_keypoints(...)` returns one ndarray per frame with columns `[x, y]` (low-confidence keypoints are set to `-1`).
-2. `utils.save_dwpose_keypoints_csv(...)` saves those keypoints to `dwpose_keypoints/*.csv`, then `utils.load_dwpose_keypoints_csv(...)` reads them back.
+2. `utils.save_dwpose_keypoints_csv(...)` saves keypoints together with source `frame_index` and per-frame person bbox `[x1,y1,x2,y2]` to `dwpose_keypoints/*.csv`, then `utils.load_dwpose_keypoints_csv(...)` reads them back.
 3. `utils.convert_dwpose_keypoints_to_skeleton_frames(..., frame_size=(H, W))` renders skeleton PNGs into `dwpose_frames/`.
 
 The pipeline then encodes one AV1 (`libsvtav1`) video per person into `dwpose_videos/` using `utils.encode_video_libsvtav1(..., crf=25)`.
@@ -97,7 +97,26 @@ The pipeline then encodes one AV1 (`libsvtav1`) video per person into `dwpose_vi
 1. `run_server()` creates a new timestamped experiment folder and writes `metadata.json` with paths and parameters needed by the client (`panorama_image_path`, `panorama_data_path`, `fps`, `frame_size`, and per-person DWPose CSV/video paths).
 2. `run_client()` automatically selects the latest subfolder under `experiments/`, loads `metadata.json`, reconstructs background frames from `panorama.png` + panorama metadata via `utils.animate_panorama(...)`, encodes `background_from_panorama.mp4`, then generates DWPose skeleton frames/videos from the saved CSV files.
 
-`run_client()` also attempts optional AnimateAnyone Pose2Video synthesis through `utils.run_animate_anyone_pose2video(...)` for each person track. It reads skeleton PNGs from `dwpose_frames/<person_name>/`, uses the first available `object/*.png` frame as reference image, and saves outputs under `animate_anyone_videos/`.
+Panorama stitching now uses sampled background frames by default for faster server processing (`POINTSTREAM_PANORAMA_SAMPLE_STRIDE=10`).
+
+Client reconstruction still restores the full timeline: `background_from_panorama.mp4` and `panorama_with_people.mp4` are generated with the same frame count and FPS as the original input video.
+
+To tune speed/quality tradeoff, set a different stitching stride (client still expands back to original frame count/FPS using metadata):
+
+```bash
+POINTSTREAM_PANORAMA_SAMPLE_STRIDE=50 python pointstream_server.py
+```
+
+`run_client()` also attempts optional AnimateAnyone Pose2Video synthesis through `utils.run_animate_anyone(...)` for each person track. It reads skeleton PNGs from `dwpose_frames/<person_name>/`, uses the first available `object/*.png` frame as reference image, and saves RGBA PNG outputs under `animate_anyone_frames/`.
+
+Each output frame is saved as `frame_000000.png`, `frame_000001.png`, ... with transparent alpha where the generated background is black.
+
+For each person, client-side compositing now uses the bbox coordinates stored in CSV:
+1. `utils.scale_frame_to_bbox(...)` first removes letterbox padding introduced by `resize_and_pad_image(...)` (using bbox aspect ratio), then rescales each generated frame to the per-frame bbox.
+2. `utils.overlay_object_on_background_video(...)` overlays those scaled frames onto the reconstructed panorama background sequence.
+3. The final merged panorama video is encoded to `panorama_with_people.mp4`.
+
+`utils.run_animate_anyone(...)` defaults to frame output (`save_video=False`). Set `save_video=True` to write MP4 output instead.
 
 By default it looks for the AnimateAnyone repository at `/home/itec/emanuele/Moore-AnimateAnyone` and config `configs/prompts/run_finetuned.yaml`. You can override these at runtime:
 

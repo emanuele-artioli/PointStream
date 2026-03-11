@@ -218,6 +218,41 @@ def run_yolo(
     Yields:
         A dictionary with frame metadata, classes, bboxes, track ids, and optionally masks when task="segment".
     """
+    
+    
+    def _patch_botsort_reid_singleton_embeddings() -> None:
+        """
+        Patch Ultralytics BoT-SORT ReID to normalize singleton embedding shapes.
+
+        With TensorRT ReID backends, Ultralytics can occasionally return per-detection
+        features with shape ``(1, D)`` (instead of ``(D,)``) when only one detection
+        is present. This later becomes a 3D array in embedding-distance matching and
+        crashes with ``ValueError: XB must be a 2-dimensional array``.
+        """
+
+        try:
+            from ultralytics.trackers.bot_sort import ReID
+        except Exception:
+            return
+
+        if getattr(ReID, "_pointstream_singleton_patch", False):
+            return
+
+        original_call = ReID.__call__
+
+        def _patched_call(self, img: np.ndarray, dets: np.ndarray) -> list[np.ndarray]:
+            raw_features = original_call(self, img, dets)
+            normalized_features: list[np.ndarray] = []
+            for feature in raw_features:
+                feature_array = np.asarray(feature, dtype=np.float32)
+                if feature_array.ndim > 1:
+                    feature_array = feature_array.reshape(-1)
+                normalized_features.append(feature_array)
+            return normalized_features
+
+        ReID.__call__ = _patched_call
+        ReID._pointstream_singleton_patch = True
+
 
     if task not in {"detect", "segment"}:
         raise ValueError(f"Invalid task '{task}'. Expected 'detect' or 'segment'.")
@@ -243,6 +278,8 @@ def run_yolo(
     if tracker is None:
         results = yolo_model.predict(**common_kwargs)
     else:
+        if "botsort" in str(tracker).lower():
+            _patch_botsort_reid_singleton_embeddings()
         results = yolo_model.track(
             tracker=tracker,  # TODO: ablation test of running with and without tracking, tracker with different configurations, and tracker converted to TensorRT or not, and comparing speed and accuracy.
             persist=True,
@@ -629,6 +666,7 @@ def extract_dwpose_keypoints(
     for frame_path in frame_paths:
         frame = cv2.imread(str(frame_path))
         if frame is None:
+            extracted_keypoints.append(np.zeros((0, 2), dtype=np.float32))
             continue
 
         keypoints, scores = wholebody(frame)
@@ -649,6 +687,8 @@ def extract_dwpose_keypoints(
 def save_dwpose_keypoints_csv(
     keypoint_frames: list[np.ndarray],
     output_csv_path: str,
+    frame_indices: list[int] | None = None,
+    bboxes: list[np.ndarray | list[float] | tuple[float, float, float, float] | None] | None = None,
     ) -> str:
     """
     Save DWPose keypoints to CSV.
@@ -656,6 +696,9 @@ def save_dwpose_keypoints_csv(
     Args:
         keypoint_frames: Per-frame arrays with columns [x, y].
         output_csv_path: Destination CSV file path.
+        frame_indices: Optional source frame indices aligned with ``keypoint_frames``.
+        bboxes: Optional per-frame ``[x1, y1, x2, y2]`` bounding boxes aligned with
+            ``keypoint_frames``.
 
     Returns:
         Absolute path to the saved CSV file.
@@ -664,27 +707,56 @@ def save_dwpose_keypoints_csv(
     target_path = Path(output_csv_path).expanduser().resolve()
     target_path.parent.mkdir(parents=True, exist_ok=True)
 
+    num_frames = len(keypoint_frames)
+    resolved_frame_indices = list(range(num_frames)) if frame_indices is None else [int(idx) for idx in frame_indices]
+    if len(resolved_frame_indices) != num_frames:
+        raise ValueError("frame_indices must have the same length as keypoint_frames.")
+
+    resolved_bboxes = [None] * num_frames if bboxes is None else list(bboxes)
+    if len(resolved_bboxes) != num_frames:
+        raise ValueError("bboxes must have the same length as keypoint_frames when provided.")
+
     with target_path.open("w", newline="", encoding="utf-8") as csv_file:
         writer = csv.writer(csv_file)
-        writer.writerow(["frame_index", "keypoints"])
-        for frame_index, frame_keypoints in enumerate(keypoint_frames):
-            serialized = json.dumps(np.asarray(frame_keypoints, dtype=np.float32).tolist(), separators=(",", ":"))
-            writer.writerow([int(frame_index), serialized])
+        writer.writerow(["frame_index", "keypoints", "bbox"])
+        for frame_index, frame_keypoints, frame_bbox in zip(
+            resolved_frame_indices,
+            keypoint_frames,
+            resolved_bboxes,
+        ):
+            serialized_keypoints = json.dumps(
+                np.asarray(frame_keypoints, dtype=np.float32).tolist(),
+                separators=(",", ":"),
+            )
+
+            if frame_bbox is None:
+                bbox_values: list[float] = []
+            else:
+                bbox_array = np.asarray(frame_bbox, dtype=np.float32).reshape(-1)
+                bbox_values = [float(value) for value in bbox_array[:4]] if bbox_array.size >= 4 else []
+
+            serialized_bbox = json.dumps(bbox_values, separators=(",", ":"))
+            writer.writerow([int(frame_index), serialized_keypoints, serialized_bbox])
 
     return str(target_path)
 
 
 def load_dwpose_keypoints_csv(
     csv_path: str,
-    ) -> list[np.ndarray]:
+    return_metadata: bool = False,
+    ) -> list[np.ndarray] | tuple[list[np.ndarray], list[np.ndarray], list[int]]:
     """
     Load DWPose keypoints from CSV saved by ``save_dwpose_keypoints_csv``.
 
     Args:
         csv_path: Path to CSV file containing serialized keypoints.
+        return_metadata: If True, also return per-frame bounding boxes and source
+            frame indices.
 
     Returns:
         List of per-frame arrays with columns [x, y].
+        When ``return_metadata=True``, returns a tuple:
+        ``(keypoints, bboxes, frame_indices)``.
     """
 
     source_path = Path(csv_path).expanduser().resolve()
@@ -692,25 +764,254 @@ def load_dwpose_keypoints_csv(
         raise FileNotFoundError(f"CSV file not found: {source_path}")
 
     loaded_keypoints: list[np.ndarray] = []
+    loaded_bboxes: list[np.ndarray] = []
+    loaded_frame_indices: list[int] = []
     with source_path.open("r", newline="", encoding="utf-8") as csv_file:
         reader = csv.DictReader(csv_file)
         if reader.fieldnames is None or "keypoints" not in reader.fieldnames:
             raise ValueError("CSV must contain a 'keypoints' column.")
 
-        for row in reader:
+        has_bbox_column = "bbox" in reader.fieldnames
+        has_frame_index_column = "frame_index" in reader.fieldnames
+
+        for row_number, row in enumerate(reader):
             serialized = (row.get("keypoints") or "[]").strip()
             values = json.loads(serialized)
             frame_keypoints = np.asarray(values, dtype=np.float32)
 
             if frame_keypoints.size == 0:
                 loaded_keypoints.append(np.zeros((0, 2), dtype=np.float32))
-                continue
-            if frame_keypoints.ndim != 2 or frame_keypoints.shape[1] < 2:
-                raise ValueError("Each keypoint row must have at least 2 values [x, y].")
+            else:
+                if frame_keypoints.ndim != 2 or frame_keypoints.shape[1] < 2:
+                    raise ValueError("Each keypoint row must have at least 2 values [x, y].")
+                loaded_keypoints.append(frame_keypoints[:, :2].copy())
 
-            loaded_keypoints.append(frame_keypoints[:, :2].copy())
+            if has_frame_index_column:
+                raw_frame_index = (row.get("frame_index") or "").strip()
+                if raw_frame_index:
+                    try:
+                        frame_index_value = int(float(raw_frame_index))
+                    except ValueError as exc:
+                        raise ValueError(f"Invalid frame_index value at row {row_number}: '{raw_frame_index}'") from exc
+                else:
+                    frame_index_value = int(row_number)
+            else:
+                frame_index_value = int(row_number)
+            loaded_frame_indices.append(frame_index_value)
+
+            bbox_values: list[float] = []
+            if has_bbox_column:
+                serialized_bbox = (row.get("bbox") or "[]").strip()
+                if serialized_bbox:
+                    bbox_parsed = json.loads(serialized_bbox)
+                    bbox_array = np.asarray(bbox_parsed, dtype=np.float32).reshape(-1)
+                    if bbox_array.size >= 4:
+                        bbox_values = [float(value) for value in bbox_array[:4]]
+
+            if bbox_values:
+                loaded_bboxes.append(np.asarray(bbox_values, dtype=np.float32))
+            else:
+                loaded_bboxes.append(np.asarray([-1.0, -1.0, -1.0, -1.0], dtype=np.float32))
+
+    if return_metadata:
+        return loaded_keypoints, loaded_bboxes, loaded_frame_indices
 
     return loaded_keypoints
+
+
+def scale_frame_to_bbox(
+    animate_anyone_frames: list[str | Path | np.ndarray | None],
+    bbox_coordinates: list[np.ndarray | list[float] | tuple[float, float, float, float] | None],
+    output_frame_size: tuple[int, int],
+    interpolation: int = cv2.INTER_LINEAR,
+    ) -> list[np.ndarray]:
+    """
+    Map AnimateAnyone frames back to bbox space by inverting resize+pad geometry.
+
+    Frames are generated from crops previously processed by ``resize_and_pad_image``,
+    which first rescales and then adds letterbox padding. This function estimates and
+    removes that padding from each generated frame using bbox aspect ratio, then
+    rescales the de-letterboxed content to the target bbox.
+
+    Args:
+        animate_anyone_frames: Per-frame AnimateAnyone inputs as PNG paths or arrays.
+        bbox_coordinates: Per-frame bboxes as ``[x1, y1, x2, y2]``.
+        output_frame_size: Canvas size as ``(height, width)``.
+        interpolation: OpenCV interpolation mode used during resizing.
+
+    Returns:
+        List of RGBA overlays with shape ``(H, W, 4)``.
+    """
+
+    if len(animate_anyone_frames) != len(bbox_coordinates):
+        raise ValueError("animate_anyone_frames and bbox_coordinates must have the same length.")
+
+    if not isinstance(output_frame_size, tuple) or len(output_frame_size) != 2:
+        raise ValueError("output_frame_size must be a (height, width) tuple.")
+
+    output_h = int(output_frame_size[0])
+    output_w = int(output_frame_size[1])
+    if output_h <= 0 or output_w <= 0:
+        raise ValueError("output_frame_size values must be positive.")
+
+    def _invert_resize_and_pad(frame_data: np.ndarray, target_w: int, target_h: int) -> np.ndarray:
+        """Undo resize_and_pad_image geometry using target bbox aspect ratio."""
+
+        frame_h, frame_w = frame_data.shape[:2]
+        if target_w <= 0 or target_h <= 0:
+            return frame_data
+
+        # resize_and_pad_image scales the longer bbox side to the full target side
+        # and pads the shorter side centrally. Here we crop that central content.
+        if target_w >= target_h:
+            content_w = frame_w
+            content_h = max(1, int(round(frame_h * (float(target_h) / float(target_w)))))
+            content_h = min(content_h, frame_h)
+            pad_top = max(0, (frame_h - content_h) // 2)
+            pad_bottom = max(0, frame_h - content_h - pad_top)
+            cropped = frame_data[pad_top:frame_h - pad_bottom, :]
+        else:
+            content_h = frame_h
+            content_w = max(1, int(round(frame_w * (float(target_w) / float(target_h)))))
+            content_w = min(content_w, frame_w)
+            pad_left = max(0, (frame_w - content_w) // 2)
+            pad_right = max(0, frame_w - content_w - pad_left)
+            cropped = frame_data[:, pad_left:frame_w - pad_right]
+
+        if cropped.size == 0:
+            return frame_data
+
+        return cv2.resize(cropped, (target_w, target_h), interpolation=interpolation)
+
+    scaled_frames: list[np.ndarray] = []
+
+    for frame_input, frame_bbox in zip(animate_anyone_frames, bbox_coordinates):
+        canvas = np.zeros((output_h, output_w, 4), dtype=np.uint8)
+
+        if frame_input is None or frame_bbox is None:
+            scaled_frames.append(canvas)
+            continue
+
+        if isinstance(frame_input, np.ndarray):
+            frame_data = frame_input.copy()
+        else:
+            frame_path = Path(frame_input).expanduser()
+            frame_data = cv2.imread(str(frame_path), cv2.IMREAD_UNCHANGED)
+
+        if frame_data is None:
+            scaled_frames.append(canvas)
+            continue
+
+        if frame_data.ndim == 2:
+            frame_data = cv2.cvtColor(frame_data, cv2.COLOR_GRAY2BGRA)
+        elif frame_data.ndim == 3 and frame_data.shape[2] == 3:
+            inferred_alpha = np.where(np.any(frame_data > 0, axis=2), 255, 0).astype(np.uint8)
+            frame_data = np.dstack([frame_data, inferred_alpha])
+        elif frame_data.ndim != 3 or frame_data.shape[2] < 4:
+            scaled_frames.append(canvas)
+            continue
+        elif frame_data.shape[2] > 4:
+            frame_data = frame_data[:, :, :4]
+
+        bbox_array = np.asarray(frame_bbox, dtype=np.float32).reshape(-1)
+        if bbox_array.size < 4:
+            scaled_frames.append(canvas)
+            continue
+
+        x1, y1, x2, y2 = [int(round(float(value))) for value in bbox_array[:4]]
+        target_w = x2 - x1
+        target_h = y2 - y1
+        if target_w <= 0 or target_h <= 0:
+            scaled_frames.append(canvas)
+            continue
+
+        resized = _invert_resize_and_pad(frame_data, target_w=target_w, target_h=target_h)
+
+        dst_x1 = max(0, x1)
+        dst_y1 = max(0, y1)
+        dst_x2 = min(output_w, x2)
+        dst_y2 = min(output_h, y2)
+        if dst_x1 >= dst_x2 or dst_y1 >= dst_y2:
+            scaled_frames.append(canvas)
+            continue
+
+        src_x1 = dst_x1 - x1
+        src_y1 = dst_y1 - y1
+        src_x2 = src_x1 + (dst_x2 - dst_x1)
+        src_y2 = src_y1 + (dst_y2 - dst_y1)
+
+        canvas[dst_y1:dst_y2, dst_x1:dst_x2] = resized[src_y1:src_y2, src_x1:src_x2]
+        scaled_frames.append(canvas)
+
+    return scaled_frames
+
+
+def overlay_object_on_background_video(
+    background_frames: list[np.ndarray],
+    object_frames: list[np.ndarray | None],
+    ) -> list[np.ndarray]:
+    """
+    Alpha-composite per-frame object overlays over background video frames.
+
+    Args:
+        background_frames: Base BGR video frames.
+        object_frames: Per-frame overlays. Supports BGRA with alpha or BGR masks.
+
+    Returns:
+        Blended BGR frames.
+    """
+
+    if len(background_frames) != len(object_frames):
+        raise ValueError("background_frames and object_frames must have the same length.")
+
+    composited_frames: list[np.ndarray] = []
+
+    for background_frame, object_frame in zip(background_frames, object_frames):
+        if background_frame is None or not isinstance(background_frame, np.ndarray):
+            raise ValueError("Each background frame must be a valid numpy array.")
+        if background_frame.ndim != 3 or background_frame.shape[2] != 3:
+            raise ValueError("background_frames must contain BGR images with shape (H, W, 3).")
+
+        blended_frame = background_frame.copy()
+
+        if object_frame is None:
+            composited_frames.append(blended_frame)
+            continue
+        if not isinstance(object_frame, np.ndarray):
+            composited_frames.append(blended_frame)
+            continue
+
+        overlay_frame = object_frame
+        if overlay_frame.shape[:2] != blended_frame.shape[:2]:
+            overlay_frame = cv2.resize(
+                overlay_frame,
+                (blended_frame.shape[1], blended_frame.shape[0]),
+                interpolation=cv2.INTER_LINEAR,
+            )
+
+        if overlay_frame.ndim == 2:
+            overlay_bgr = cv2.cvtColor(overlay_frame, cv2.COLOR_GRAY2BGR)
+            alpha = (overlay_frame > 0).astype(np.float32)[..., None]
+        elif overlay_frame.ndim == 3 and overlay_frame.shape[2] == 4:
+            overlay_bgr = overlay_frame[:, :, :3]
+            alpha = (overlay_frame[:, :, 3:4].astype(np.float32) / 255.0)
+        elif overlay_frame.ndim == 3 and overlay_frame.shape[2] >= 3:
+            overlay_bgr = overlay_frame[:, :, :3]
+            alpha = np.any(overlay_bgr > 0, axis=2).astype(np.float32)[..., None]
+        else:
+            composited_frames.append(blended_frame)
+            continue
+
+        if overlay_bgr.dtype != np.uint8:
+            overlay_bgr = np.clip(overlay_bgr, 0, 255).astype(np.uint8)
+
+        blended = (
+            overlay_bgr.astype(np.float32) * alpha
+            + blended_frame.astype(np.float32) * (1.0 - alpha)
+        )
+        composited_frames.append(np.clip(blended, 0, 255).astype(np.uint8))
+
+    return composited_frames
 
 
 def convert_dwpose_keypoints_to_skeleton_frames(
@@ -847,7 +1148,7 @@ def _setup_animate_anyone_import_path(animate_anyone_dir: str | Path) -> Path:
     return repo_path
 
 
-def run_animate_anyone_pose2video(
+def run_animate_anyone(
     ref_image_path: str,
     skeleton_frames_dir: str,
     config_path: str | None = None,
@@ -858,13 +1159,19 @@ def run_animate_anyone_pose2video(
     steps: int = 30,
     cfg: float = 3.5,
     seed: int = 42,
+    save_video: bool = False,
     fps: float | None = None,
     save_dir: str | None = None,
     output_filename: str | None = None,
     include_input_grid: bool = True,
-) -> str:
+    filename_prefix: str = "frame",
+    transparent_threshold: int = 8,
+    ) -> str:
     """
-    Run AnimateAnyone Pose2Video inference using pre-rendered skeleton PNG frames.
+    Run AnimateAnyone Pose2Video inference and save either frames (default) or video.
+
+    Default behavior writes RGBA PNG frames with transparent alpha where generated
+    background pixels are black. Set ``save_video=True`` to write an MP4 instead.
 
     Args:
         ref_image_path: Path to the reference RGB image.
@@ -880,14 +1187,19 @@ def run_animate_anyone_pose2video(
         steps: Diffusion denoising steps.
         cfg: Classifier-free guidance scale.
         seed: Random seed.
-        fps: Output frame rate. Defaults to 12 when omitted or non-positive.
-        save_dir: Output directory for the generated video.
-        output_filename: Optional output video filename.
-        include_input_grid: If True, output a 3-row grid with reference image,
-            skeleton input, and generated video.
+        save_video: If True, save MP4 output. If False (default), save PNG frames.
+        fps: Output frame rate for video mode. Defaults to 12 when omitted.
+        save_dir: Output directory for generated assets.
+        output_filename: Optional output video filename in video mode.
+        include_input_grid: In video mode, if True save 3-row grid with reference,
+            pose input, and generated result.
+        filename_prefix: In frame mode, prefix for each output frame name.
+        transparent_threshold: In frame mode, pixels with all RGB channels <= this
+            value are treated as background (alpha=0).
 
     Returns:
-        Absolute path to the generated MP4 file.
+        Absolute path to generated MP4 (video mode) or output frame directory
+        (frame mode).
     """
     # Keep imports local so the rest of PointStream still runs in environments
     # that do not include AnimateAnyone dependencies.
@@ -901,6 +1213,10 @@ def run_animate_anyone_pose2video(
 
     if not torch.cuda.is_available():
         raise RuntimeError("AnimateAnyone Pose2Video requires CUDA, but no CUDA device was detected.")
+
+    threshold = int(transparent_threshold)
+    if threshold < 0 or threshold > 255:
+        raise ValueError("transparent_threshold must be in [0, 255].")
 
     aa_dir = _setup_animate_anyone_import_path(animate_anyone_dir)
     default_config = aa_dir / "configs" / "prompts" / "run_finetuned.yaml"
@@ -931,7 +1247,6 @@ def run_animate_anyone_pose2video(
         from src.models.unet_2d_condition import UNet2DConditionModel
         from src.models.unet_3d import UNet3DConditionModel
         from src.pipelines.pipeline_pose2vid_long import Pose2VideoPipeline
-        from src.utils.util import save_videos_grid
 
         config = OmegaConf.load(str(chosen_config))
         weight_dtype = torch.float16 if config.weight_dtype == "fp16" else torch.float32
@@ -992,11 +1307,6 @@ def run_animate_anyone_pose2video(
 
         generator = torch.manual_seed(int(seed))
 
-        pose_transform = transforms.Compose([
-            transforms.Resize((int(height), int(width))),
-            transforms.ToTensor(),
-        ])
-
         with Image.open(ref_path) as ref_image_file:
             ref_image_pil = ref_image_file.convert("RGB")
 
@@ -1009,11 +1319,6 @@ def run_animate_anyone_pose2video(
             with Image.open(skeleton_path) as skeleton_file:
                 pose_list.append(skeleton_file.convert("RGB"))
 
-        ref_image_tensor = pose_transform(ref_image_pil).unsqueeze(1).unsqueeze(0)
-        ref_image_tensor = repeat(ref_image_tensor, "b c f h w -> b c (repeat f) h w", repeat=max_length)
-        pose_tensor = torch.stack([pose_transform(pose_image) for pose_image in pose_list], dim=0)
-        pose_tensor = pose_tensor.transpose(0, 1).unsqueeze(0)
-
         generated_video = pipe(
             ref_image_pil,
             pose_list,
@@ -1025,29 +1330,76 @@ def run_animate_anyone_pose2video(
             generator=generator,
         ).videos
 
+        if save_video:
+            from src.utils.util import save_videos_grid
+
+            pose_transform = transforms.Compose([
+                transforms.Resize((int(height), int(width))),
+                transforms.ToTensor(),
+            ])
+
+            ref_image_tensor = pose_transform(ref_image_pil).unsqueeze(1).unsqueeze(0)
+            ref_image_tensor = repeat(ref_image_tensor, "b c f h w -> b c (repeat f) h w", repeat=max_length)
+            pose_tensor = torch.stack([pose_transform(pose_image) for pose_image in pose_list], dim=0)
+            pose_tensor = pose_tensor.transpose(0, 1).unsqueeze(0)
+
+            if save_dir is None:
+                date_fragment = datetime.now().strftime("%Y%m%d")
+                time_fragment = datetime.now().strftime("%H%M")
+                save_path = aa_dir / "output" / date_fragment / f"{time_fragment}--pointstream"
+            else:
+                save_path = Path(save_dir).expanduser()
+                if not save_path.is_absolute():
+                    save_path = (Path(previous_cwd) / save_path).resolve()
+            save_path.mkdir(parents=True, exist_ok=True)
+
+            video_basename = output_filename or f"pose2video_{int(height)}x{int(width)}_cfg{float(cfg):.1f}.mp4"
+            output_path = (save_path / video_basename).resolve()
+            output_fps = float(fps) if fps and float(fps) > 0 else 12.0
+
+            if include_input_grid:
+                video_to_save = torch.cat([ref_image_tensor, pose_tensor, generated_video], dim=0)
+                n_rows = 3
+            else:
+                video_to_save = generated_video
+                n_rows = 1
+
+            save_videos_grid(video_to_save, str(output_path), n_rows=n_rows, fps=output_fps)
+            return str(output_path)
+
         if save_dir is None:
             date_fragment = datetime.now().strftime("%Y%m%d")
             time_fragment = datetime.now().strftime("%H%M")
-            save_path = aa_dir / "output" / date_fragment / f"{time_fragment}--pointstream"
+            save_path = aa_dir / "output" / date_fragment / f"{time_fragment}--pointstream-frames"
         else:
             save_path = Path(save_dir).expanduser()
             if not save_path.is_absolute():
                 save_path = (Path(previous_cwd) / save_path).resolve()
         save_path.mkdir(parents=True, exist_ok=True)
 
-        video_basename = output_filename or f"pose2video_{int(height)}x{int(width)}_cfg{float(cfg):.1f}.mp4"
-        output_path = (save_path / video_basename).resolve()
-        output_fps = float(fps) if fps and float(fps) > 0 else 12.0
+        for existing_png in save_path.glob("*.png"):
+            existing_png.unlink()
 
-        if include_input_grid:
-            video_to_save = torch.cat([ref_image_tensor, pose_tensor, generated_video], dim=0)
-            n_rows = 3
-        else:
-            video_to_save = generated_video
-            n_rows = 1
+        if generated_video.ndim != 5 or generated_video.shape[0] < 1:
+            raise RuntimeError("Unexpected output shape from Pose2Video pipeline.")
 
-        save_videos_grid(video_to_save, str(output_path), n_rows=n_rows, fps=output_fps)
-        return str(output_path)
+        video_tensor = generated_video[0].detach().float().cpu()  # (C, F, H, W)
+        if video_tensor.shape[0] != 3:
+            raise RuntimeError("Expected generated video tensor with 3 color channels.")
+
+        frame_tensor = video_tensor.permute(1, 2, 3, 0)  # (F, H, W, C)
+        if float(frame_tensor.min()) < 0.0:
+            frame_tensor = (frame_tensor + 1.0) / 2.0
+        frame_tensor = frame_tensor.clamp(0.0, 1.0)
+        frame_array = (frame_tensor.numpy() * 255.0).round().astype(np.uint8)
+
+        for frame_index, rgb_frame in enumerate(frame_array):
+            alpha = np.where(np.all(rgb_frame <= threshold, axis=2), 0, 255).astype(np.uint8)
+            rgba_frame = np.dstack([rgb_frame, alpha])
+            frame_path = save_path / f"{filename_prefix}_{frame_index:06d}.png"
+            Image.fromarray(rgba_frame, mode="RGBA").save(frame_path)
+
+        return str(save_path.resolve())
     finally:
         os.chdir(previous_cwd)
 
