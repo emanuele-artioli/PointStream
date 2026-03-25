@@ -36,7 +36,7 @@ class TestEncoderPipeline(unittest.TestCase):
                 self.assertIsNotNone(event.object_id)
                 self.assertGreaterEqual(event.frame_id, 0)
 
-    def test_gpu_tags_are_propagated_to_dag_nodes(self) -> None:
+    def test_execution_tags_are_propagated_to_dag_nodes(self) -> None:
         chunk = VideoChunk(
             chunk_id="enc002",
             source_uri="assets/test_chunks/enc002.mp4",
@@ -51,7 +51,7 @@ class TestEncoderPipeline(unittest.TestCase):
         context = pipeline._dag.run(initial_context={"chunk": chunk})
 
         self.assertEqual(context["chunk__tag"], "cpu")
-        self.assertEqual(context["panorama__tag"], "gpu")
+        self.assertEqual(context["panorama__tag"], "cpu")
         self.assertEqual(context["actors__tag"], "gpu")
         self.assertEqual(context["rigid_objects__tag"], "gpu")
         self.assertEqual(context["ball__tag"], "gpu")

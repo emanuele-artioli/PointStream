@@ -5,16 +5,16 @@ from typing import Any
 
 import torch
 
+from src.encoder.background_modeler import BackgroundModeler
 from src.encoder.dag import DAGNode, DAGOrchestrator
 from src.encoder.execution_pool import BaseExecutionPool
 from src.encoder.mock_extractors import (
     ActorExtractor,
-    BackgroundModeler,
     BallTracker,
     ObjectTracker,
 )
 from src.encoder.residual import ResidualCalculator
-from src.encoder.video_io import decode_video_to_tensor
+from src.encoder.video_io import decode_video_to_tensor, probe_video_metadata
 from src.shared.schemas import EncodedChunkPayload, VideoChunk
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import cpu_bound
@@ -48,10 +48,22 @@ class EncoderPipeline:
             return context["chunk"]
 
         self._dag.add_node(DAGNode(name="chunk", func=load_chunk))
+
+        def build_panorama_node(context, deps):
+            return self._background_modeler.process(
+                chunk=deps["chunk"],
+                decoded_video_tensor=context.get("decoded_video_tensor"),
+            )
+
+        setattr(
+            build_panorama_node,
+            "_execution_tag",
+            getattr(self._background_modeler.process, "_execution_tag", "cpu"),
+        )
         self._dag.add_node(
             DAGNode(
                 name="panorama",
-                func=self._make_chunk_node(self._background_modeler.process),
+                func=build_panorama_node,
                 dependencies=("chunk",),
             )
         )
@@ -101,24 +113,19 @@ class EncoderPipeline:
         chunk_id: str,
         start_frame_id: int = 0,
     ) -> tuple[EncodedChunkPayload, torch.Tensor]:
-        decoded_video = decode_video_to_tensor(video_path)
+        metadata = probe_video_metadata(video_path)
 
         chunk = VideoChunk(
             chunk_id=chunk_id,
             source_uri=str(video_path),
             start_frame_id=start_frame_id,
-            fps=decoded_video.fps,
-            num_frames=decoded_video.num_frames,
-            width=decoded_video.width,
-            height=decoded_video.height,
+            fps=metadata.fps,
+            num_frames=metadata.num_frames,
+            width=metadata.width,
+            height=metadata.height,
         )
 
-        context = self._dag.run(
-            initial_context={
-                "chunk": chunk,
-                "decoded_video_tensor": decoded_video.tensor,
-            }
-        )
+        context = self._dag.run(initial_context={"chunk": chunk})
         payload = EncodedChunkPayload(
             chunk=context["chunk"],
             panorama=context["panorama"],
@@ -127,6 +134,7 @@ class EncoderPipeline:
             ball=context["ball"],
             residual=context["residual"],
         )
+        decoded_video = decode_video_to_tensor(video_path)
         return payload, decoded_video.tensor
 
     def shutdown(self) -> None:

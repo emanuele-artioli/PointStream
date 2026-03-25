@@ -9,6 +9,7 @@ import numpy as np
 
 from src.decoder.mock_renderer import DecoderRenderer
 from src.encoder.orchestrator import EncoderPipeline
+from src.encoder.video_io import iter_video_frames_ffmpeg, probe_video_metadata
 from src.transport.disk import DiskTransport
 
 
@@ -20,6 +21,17 @@ class TestEndToEndMock(unittest.TestCase):
 
         video_path = assets_dir / "test_video.mp4"
         self._create_dummy_video(video_path, num_frames=30, width=96, height=64, fps=30.0)
+
+        metadata = probe_video_metadata(video_path)
+        streamed_frames = list(
+            iter_video_frames_ffmpeg(
+                video_path,
+                width=metadata.width,
+                height=metadata.height,
+            )
+        )
+        self.assertEqual(len(streamed_frames), 30)
+        self.assertEqual(streamed_frames[0].shape, (64, 96, 3))
 
         transport_root = project_root / ".pointstream"
         chunk_id = "e2e_mock_0001"

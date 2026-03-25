@@ -5,11 +5,9 @@ import torch
 from src.shared.schemas import (
     ActorPacket,
     BallPacket,
-    CameraPose,
     InterpolateCommandEvent,
     KeyframeEvent,
     ObjectClass,
-    PanoramaPacket,
     RigidObjectPacket,
     StaticCommandEvent,
     SemanticEvent,
@@ -17,31 +15,6 @@ from src.shared.schemas import (
     VideoChunk,
 )
 from src.shared.tags import gpu_bound
-
-
-class BackgroundModeler:
-    @gpu_bound
-    def process(self, chunk: VideoChunk) -> PanoramaPacket:
-        poses = [
-            CameraPose(
-                frame_id=chunk.start_frame_id + frame_idx,
-                tx=0.0,
-                ty=0.0,
-                tz=0.0,
-                qx=0.0,
-                qy=0.0,
-                qz=0.0,
-                qw=1.0,
-            )
-            for frame_idx in range(chunk.num_frames)
-        ]
-        return PanoramaPacket(
-            chunk_id=chunk.chunk_id,
-            panorama_uri=f"memory://panorama/{chunk.chunk_id}.png",
-            frame_width=chunk.width,
-            frame_height=chunk.height,
-            camera_poses=poses,
-        )
 
 
 class ActorExtractor:
