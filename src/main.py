@@ -2,13 +2,17 @@ from __future__ import annotations
 
 import json
 
+from src.encoder.execution_pool import BaseExecutionPool
 from src.decoder.mock_renderer import DecoderRenderer
 from src.encoder.orchestrator import EncoderPipeline
 from src.shared.schemas import VideoChunk
 from src.transport.disk import DiskTransport
 
 
-def run_mock_pipeline() -> dict[str, object]:
+def run_mock_pipeline(
+    transport_root: str = ".pointstream",
+    execution_pool: BaseExecutionPool | None = None,
+) -> dict[str, object]:
     chunk = VideoChunk(
         chunk_id="0001",
         source_uri="assets/test_chunks/tennis_chunk_0001.mp4",
@@ -19,10 +23,13 @@ def run_mock_pipeline() -> dict[str, object]:
         height=720,
     )
 
-    encoder = EncoderPipeline()
-    payload = encoder.encode_chunk(chunk)
+    encoder = EncoderPipeline(execution_pool=execution_pool)
+    try:
+        payload = encoder.encode_chunk(chunk)
+    finally:
+        encoder.shutdown()
 
-    transport = DiskTransport(root_dir=".pointstream")
+    transport = DiskTransport(root_dir=transport_root)
     transport.send(payload)
     received_payload = transport.receive(chunk.chunk_id)
 

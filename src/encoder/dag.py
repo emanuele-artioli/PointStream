@@ -4,6 +4,8 @@ from collections import deque
 from dataclasses import dataclass
 from typing import Any
 
+from src.encoder.execution_pool import BaseExecutionPool, InlineExecutionPool
+
 
 @dataclass(frozen=True)
 class DAGNode:
@@ -13,8 +15,9 @@ class DAGNode:
 
 
 class DAGOrchestrator:
-    def __init__(self) -> None:
+    def __init__(self, execution_pool: BaseExecutionPool | None = None) -> None:
         self._nodes: dict[str, DAGNode] = {}
+        self._execution_pool = execution_pool or InlineExecutionPool()
 
     def add_node(self, node: DAGNode) -> None:
         if node.name in self._nodes:
@@ -66,6 +69,14 @@ class DAGOrchestrator:
                 dependency: context[dependency] for dependency in node.dependencies
             }
             execution_tag = getattr(node.func, "_execution_tag", "cpu")
-            context[node.name] = node.func(context=context, deps=dependency_outputs)
+            context[node.name] = self._execution_pool.execute(
+                tag=execution_tag,
+                func=node.func,
+                context=context,
+                deps=dependency_outputs,
+            )
             context[f"{node.name}__tag"] = execution_tag
         return context
+
+    def shutdown(self) -> None:
+        self._execution_pool.shutdown()

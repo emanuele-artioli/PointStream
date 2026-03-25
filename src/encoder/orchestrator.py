@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from typing import Any
+
 from src.encoder.dag import DAGNode, DAGOrchestrator
+from src.encoder.execution_pool import BaseExecutionPool
 from src.encoder.mock_extractors import (
     ActorExtractor,
     BackgroundModeler,
@@ -14,14 +17,26 @@ from src.shared.tags import cpu_bound
 
 
 class EncoderPipeline:
-    def __init__(self) -> None:
-        self._dag = DAGOrchestrator()
+    def __init__(self, execution_pool: BaseExecutionPool | None = None) -> None:
+        self._dag = DAGOrchestrator(execution_pool=execution_pool)
         self._background_modeler = BackgroundModeler()
         self._actor_extractor = ActorExtractor()
         self._object_tracker = ObjectTracker()
         self._ball_tracker = BallTracker()
         self._residual_calculator = ResidualCalculator(SynthesisEngine())
         self._register_nodes()
+
+    @staticmethod
+    def _make_chunk_node(process_method: Any):
+        def node_func(context, deps):
+            return process_method(deps["chunk"])
+
+        setattr(
+            node_func,
+            "_execution_tag",
+            getattr(process_method, "_execution_tag", "cpu"),
+        )
+        return node_func
 
     def _register_nodes(self) -> None:
         @cpu_bound
@@ -32,35 +47,35 @@ class EncoderPipeline:
         self._dag.add_node(
             DAGNode(
                 name="panorama",
-                func=lambda context, deps: self._background_modeler.process(deps["chunk"]),
+                func=self._make_chunk_node(self._background_modeler.process),
                 dependencies=("chunk",),
             )
         )
         self._dag.add_node(
             DAGNode(
                 name="actors",
-                func=lambda context, deps: self._actor_extractor.process(deps["chunk"]),
+                func=self._make_chunk_node(self._actor_extractor.process),
                 dependencies=("chunk",),
             )
         )
         self._dag.add_node(
             DAGNode(
                 name="rigid_objects",
-                func=lambda context, deps: self._object_tracker.process(deps["chunk"]),
+                func=self._make_chunk_node(self._object_tracker.process),
                 dependencies=("chunk",),
             )
         )
         self._dag.add_node(
             DAGNode(
                 name="ball",
-                func=lambda context, deps: self._ball_tracker.process(deps["chunk"]),
+                func=self._make_chunk_node(self._ball_tracker.process),
                 dependencies=("chunk",),
             )
         )
         self._dag.add_node(
             DAGNode(
                 name="residual",
-                func=lambda context, deps: self._residual_calculator.process(deps["chunk"]),
+                func=self._make_chunk_node(self._residual_calculator.process),
                 dependencies=("chunk", "panorama", "actors", "rigid_objects", "ball"),
             )
         )
@@ -75,3 +90,6 @@ class EncoderPipeline:
             ball=context["ball"],
             residual=context["residual"],
         )
+
+    def shutdown(self) -> None:
+        self._dag.shutdown()

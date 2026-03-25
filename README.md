@@ -27,6 +27,7 @@ pointstream/
       tags.py
     encoder/
       dag.py
+      execution_pool.py
       mock_extractors.py
       orchestrator.py
       residual.py
@@ -34,6 +35,16 @@ pointstream/
       mock_renderer.py
     transport/
       disk.py
+  tests/
+    test_dag.py
+    test_decoder.py
+    test_download_weights.py
+    test_encoder_pipeline.py
+    test_execution_pool.py
+    test_integration_main.py
+    test_schemas.py
+    test_tags.py
+    test_transport.py
 ```
 
 ## Environment Setup (CUDA-aware)
@@ -69,6 +80,29 @@ The run writes a local payload bundle under:
 with:
 - `metadata.msgpack` for semantic metadata/events
 - `residual.mp4` placeholder bytes for residual stream handoff
+
+## Run Unit Tests
+
+```bash
+cd /home/itec/emanuele/pointstream
+python -m unittest discover -s tests -p "test_*.py"
+```
+
+## Continuous Integration
+
+- GitHub Actions workflow: .github/workflows/ci.yml
+- Triggers: pushes to main/master/march26version and all pull requests
+- Runtime: Ubuntu + Python 3.10 + CPU PyTorch
+- Test command: `python -m unittest discover -s tests -p "test_*.py"`
+
+## CPU/GPU Execution Pool Stub
+
+- `src/encoder/execution_pool.py` provides:
+  - `InlineExecutionPool`: synchronous local execution (default)
+  - `TaggedMultiprocessPool`: torch.multiprocessing-ready stub with CPU/GPU queue separation
+  - `make_shared_cpu_tensor(...)`: shared-memory tensor allocation helper for process handoff
+- `DAGOrchestrator` can now run through an injected execution pool while preserving per-node CPU/GPU tags.
+- `run_mock_pipeline(...)` supports execution-pool injection for integration testing of tagged dispatch.
 
 ## Notes
 
