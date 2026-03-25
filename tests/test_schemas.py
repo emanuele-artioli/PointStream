@@ -16,10 +16,12 @@ from src.shared.schemas import (
 class TestSchemas(unittest.TestCase):
     def test_keyframe_event_requires_object_id(self) -> None:
         with self.assertRaises(ValidationError):
-            KeyframeEvent(
-                frame_id=0,
-                object_class=ObjectClass.PERSON,
-                coordinates=[0.1, 0.2],
+            KeyframeEvent.model_validate(
+                {
+                    "frame_id": 0,
+                    "object_class": ObjectClass.PERSON,
+                    "coordinates": [0.1, 0.2],
+                }
             )
 
     def test_video_chunk_valid_contract(self) -> None:
@@ -49,12 +51,14 @@ class TestSchemas(unittest.TestCase):
 
     def test_interpolate_event_rejects_invalid_method(self) -> None:
         with self.assertRaises(ValidationError):
-            InterpolateCommandEvent(
-                frame_id=1,
-                object_id="person_0",
-                object_class=ObjectClass.PERSON,
-                target_frame_id=3,
-                method="cubic",
+            InterpolateCommandEvent.model_validate(
+                {
+                    "frame_id": 1,
+                    "object_id": "person_0",
+                    "object_class": ObjectClass.PERSON,
+                    "target_frame_id": 3,
+                    "method": "cubic",
+                }
             )
 
     def test_static_event_rejects_negative_hold_frame(self) -> None:

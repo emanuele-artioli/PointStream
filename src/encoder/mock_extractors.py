@@ -12,6 +12,7 @@ from src.shared.schemas import (
     PanoramaPacket,
     RigidObjectPacket,
     StaticCommandEvent,
+    SemanticEvent,
     TensorSpec,
     VideoChunk,
 )
@@ -53,7 +54,7 @@ class ActorExtractor:
         # Shape: [Batch, Frames, Keypoints, Coords]
         poses = torch.zeros(batch, chunk.num_frames, 17, 3, dtype=torch.float32)
 
-        events_a = [
+        events_a: list[SemanticEvent] = [
             KeyframeEvent(
                 frame_id=chunk.start_frame_id,
                 object_id="person_0",
@@ -68,7 +69,7 @@ class ActorExtractor:
                 method="linear",
             ),
         ]
-        events_b = [
+        events_b: list[SemanticEvent] = [
             KeyframeEvent(
                 frame_id=chunk.start_frame_id,
                 object_id="person_1",
@@ -125,7 +126,7 @@ class ObjectTracker:
         # Shape: [Batch, Frames, Points, Coords]
         tracks = torch.zeros(batch, chunk.num_frames, 32, 2, dtype=torch.float32)
 
-        racket_events = [
+        racket_events: list[SemanticEvent] = [
             KeyframeEvent(
                 frame_id=chunk.start_frame_id,
                 object_id="racket_0",
@@ -163,7 +164,7 @@ class BallTracker:
         # Shape: [Batch, Frames, Params]
         trajectory = torch.zeros(batch, chunk.num_frames, 4, dtype=torch.float32)
 
-        ball_events = [
+        ball_events: list[SemanticEvent] = [
             KeyframeEvent(
                 frame_id=chunk.start_frame_id,
                 object_id="ball_0",
