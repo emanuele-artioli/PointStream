@@ -120,6 +120,7 @@ celerybeat.pid
 *.db
 
 # PointStream specific ignores
-experiments/
+experiments/*
 .pointstream
 old/
+assets/*

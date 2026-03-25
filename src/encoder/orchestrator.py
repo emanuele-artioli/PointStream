@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
+
+import torch
 
 from src.encoder.dag import DAGNode, DAGOrchestrator
 from src.encoder.execution_pool import BaseExecutionPool
@@ -11,6 +14,7 @@ from src.encoder.mock_extractors import (
     ObjectTracker,
 )
 from src.encoder.residual import ResidualCalculator
+from src.encoder.video_io import decode_video_to_tensor
 from src.shared.schemas import EncodedChunkPayload, VideoChunk
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import cpu_bound
@@ -90,6 +94,40 @@ class EncoderPipeline:
             ball=context["ball"],
             residual=context["residual"],
         )
+
+    def encode_video_file(
+        self,
+        video_path: str | Path,
+        chunk_id: str,
+        start_frame_id: int = 0,
+    ) -> tuple[EncodedChunkPayload, torch.Tensor]:
+        decoded_video = decode_video_to_tensor(video_path)
+
+        chunk = VideoChunk(
+            chunk_id=chunk_id,
+            source_uri=str(video_path),
+            start_frame_id=start_frame_id,
+            fps=decoded_video.fps,
+            num_frames=decoded_video.num_frames,
+            width=decoded_video.width,
+            height=decoded_video.height,
+        )
+
+        context = self._dag.run(
+            initial_context={
+                "chunk": chunk,
+                "decoded_video_tensor": decoded_video.tensor,
+            }
+        )
+        payload = EncodedChunkPayload(
+            chunk=context["chunk"],
+            panorama=context["panorama"],
+            actors=context["actors"],
+            rigid_objects=context["rigid_objects"],
+            ball=context["ball"],
+            residual=context["residual"],
+        )
+        return payload, decoded_video.tensor
 
     def shutdown(self) -> None:
         self._dag.shutdown()

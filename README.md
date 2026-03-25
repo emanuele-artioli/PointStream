@@ -47,6 +47,7 @@ pointstream/
     test_dag.py
     test_decoder.py
     test_download_weights.py
+    test_end_to_end_mock.py
     test_encoder_pipeline.py
     test_execution_pool.py
     test_integration_main.py
@@ -110,6 +111,13 @@ with:
 ```bash
 cd /home/itec/emanuele/pointstream
 python -m unittest discover -s tests -p "test_*.py"
+```
+
+Run only the end-to-end mock path (generates `assets/test_video.mp4`):
+
+```bash
+cd /home/itec/emanuele/pointstream
+python -m unittest tests.test_end_to_end_mock
 ```
 
 Run with a local coverage gate (same threshold as CI):
