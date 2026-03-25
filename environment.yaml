@@ -3,13 +3,14 @@ channels:
   - pytorch
   - nvidia
   - conda-forge
-  - defaults
 dependencies:
   - python=3.10
-  - ffmpeg
-  - pytorch-cuda=12.8
-  - pytorch
-  - torchvision
   - pip
+  - pytorch=2.5.1
+  - torchvision=0.20.1
+  - torchaudio=2.5.1
+  - pytorch-cuda=12.4
+  - numpy=1.26
   - pip:
-    - -r requirements.txt
+      - pydantic==2.11.2
+      - msgpack==1.1.0

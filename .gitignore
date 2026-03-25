@@ -121,3 +121,5 @@ celerybeat.pid
 
 # PointStream specific ignores
 experiments/
+.pointstream
+old/

@@ -1,20 +1,5 @@
-# PointStream requirements
-# NOTE: Install PyTorch with CUDA first (see README.md or environment.yaml)
+pydantic==2.11.2
+msgpack==1.1.0
+numpy==1.26.4
 
-ultralytics>=8.4
-pandas
-scikit-image
-open-clip-torch
-clip @ git+https://github.com/openai/CLIP.git
-onnxruntime-gpu
-controlnet-aux
-matplotlib
-tqdm
-# numpy>=2.0 is required by OpenCV 4.13 (binary incompatibility with 1.x).
-# scipy>=1.13 is required for numpy 2.x compatibility.
-numpy>=2.0,<2.5
-scipy>=1.13
-
-# Optional: required only for TensorRT ReID export utility in utils.py
-onnxslim>=0.1.71
-tensorrt-cu12!=10.1.0,>7.0.0
+# Install CUDA-enabled PyTorch via environment.yaml for explicit CUDA pinning.
