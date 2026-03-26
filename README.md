@@ -7,6 +7,26 @@ This version is intentionally **mock-first**:
 - It does **not** load real AI models yet.
 - All extractors/renderers return deterministic dummy tensors with correct shape conventions.
 
+## System Prerequisites
+
+Pointstream expects system-level FFmpeg tools to be available before running tests or pipeline commands:
+- `ffmpeg`
+- `ffprobe`
+
+On Ubuntu/Debian:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y ffmpeg
+```
+
+If you want to force non-default executable paths (for example `/opt/local/bin`), set:
+
+```bash
+export FFMPEG_BIN=/opt/local/bin/ffmpeg
+export FFPROBE_BIN=/opt/local/bin/ffprobe
+```
+
 ## Project Layout
 
 ```text
@@ -62,6 +82,7 @@ pointstream/
 Use conda for explicit CUDA-compatible PyTorch.
 
 Video decode is strict FFmpeg (`ffmpeg` + `ffprobe`) and stream-oriented by default (frame generator over pipe).
+The project does not vendor FFmpeg via pip/conda packages.
 
 ```bash
 cd /home/itec/emanuele/pointstream

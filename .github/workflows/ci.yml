@@ -74,6 +74,11 @@ jobs:
           pip install -r requirements-dev.txt
           pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
 
+      - name: Install FFmpeg tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
       - name: Run tests with coverage gate
         run: |
           coverage run -m unittest discover -s tests -p "test_*.py"

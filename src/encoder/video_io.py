@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import json
+import os
 from pathlib import Path
+import shutil
 import subprocess
 from collections.abc import Iterator
 from typing import Any
@@ -58,8 +60,9 @@ def iter_video_frames_ffmpeg(
     if width is None or height is None:
         width, height, _fps, _num_frames = _probe_video_with_ffprobe(source)
 
+    ffmpeg_bin = _resolve_binary_path("FFMPEG_BIN", "ffmpeg")
     ffmpeg_cmd = [
-        "ffmpeg",
+        ffmpeg_bin,
         "-hide_banner",
         "-loglevel",
         "warning",
@@ -141,8 +144,9 @@ def decode_video_to_tensor(video_path: str | Path) -> DecodedVideo:
 
 
 def _probe_video_with_ffprobe(video_path: Path) -> tuple[int, int, float, int]:
+    ffprobe_bin = _resolve_binary_path("FFPROBE_BIN", "ffprobe")
     probe_cmd = [
-        "ffprobe",
+        ffprobe_bin,
         "-v",
         "error",
         "-select_streams",
@@ -223,3 +227,18 @@ def _read_exact(stream: Any, size: int) -> bytes:
             break
         buffer.extend(chunk)
     return bytes(buffer)
+
+
+def _resolve_binary_path(env_var: str, binary_name: str) -> str:
+    explicit = os.environ.get(env_var)
+    if explicit:
+        return explicit
+
+    resolved = shutil.which(binary_name)
+    if resolved:
+        return resolved
+
+    raise FileNotFoundError(
+        f"Required binary '{binary_name}' was not found in PATH. "
+        f"Install FFmpeg tools or set {env_var} to the executable path."
+    )

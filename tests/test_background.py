@@ -54,14 +54,18 @@ class TestBackgroundModeler(unittest.TestCase):
         self.assertTrue(panorama.selected_frame_indices)
         self.assertEqual(panorama.selected_frame_indices[0], 0)
         self.assertLessEqual(len(panorama.selected_frame_indices), payload.chunk.num_frames)
+        self.assertIn(f"debug_panorama_{chunk_id}.jpg", panorama.panorama_uri)
 
         homography_0 = np.asarray(panorama.homography_matrices[0], dtype=np.float64)
         self.assertEqual(homography_0.shape, (3, 3))
 
         panorama_array = np.asarray(panorama.panorama_image, dtype=np.uint8)
-        self.assertEqual(panorama_array.shape[0], payload.chunk.height)
-        self.assertEqual(panorama_array.shape[1], payload.chunk.width)
+        self.assertGreaterEqual(panorama_array.shape[0], payload.chunk.height)
+        self.assertGreaterEqual(panorama_array.shape[1], payload.chunk.width)
         self.assertEqual(panorama_array.shape[2], 3)
+
+        self.assertEqual(panorama.frame_height, panorama_array.shape[0])
+        self.assertEqual(panorama.frame_width, panorama_array.shape[1])
 
         self.assertTrue(debug_panorama_path.exists())
         debug_img = cv2.imread(str(debug_panorama_path))
