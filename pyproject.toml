@@ -42,3 +42,9 @@ warn_redundant_casts = true
 warn_return_any = false
 check_untyped_defs = false
 no_implicit_optional = true
+
+[tool.coverage.run]
+source = ["src", "tests", "scripts"]
+
+[tool.coverage.report]
+omit = ["config-*.py", "*/config-*.py"]
