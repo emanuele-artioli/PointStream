@@ -1,7 +1,20 @@
 from __future__ import annotations
 
+from pathlib import Path
+from typing import Any
+
+import numpy as np
 import torch
 
+from src.encoder.actor_components import (
+    PayloadEncoder,
+    PipelineBuilder,
+    StandardTennisHeuristic,
+    Yolo26Detector,
+    YoloPoseEstimator,
+    YoloSegmenter,
+)
+from src.encoder.video_io import iter_video_frames_ffmpeg, probe_video_metadata
 from src.shared.schemas import (
     ActorPacket,
     BallPacket,
@@ -9,7 +22,6 @@ from src.shared.schemas import (
     KeyframeEvent,
     ObjectClass,
     RigidObjectPacket,
-    StaticCommandEvent,
     SemanticEvent,
     TensorSpec,
     VideoChunk,
@@ -18,14 +30,65 @@ from src.shared.tags import gpu_bound
 
 
 class ActorExtractor:
+    def __init__(
+        self,
+        detector_model: Any | None = None,
+        segmenter_model: Any | None = None,
+        pose_model: Any | None = None,
+        render_debug_keyframes: bool = True,
+    ) -> None:
+        self._render_debug_keyframes = render_debug_keyframes
+        # Models are loaded once in component initialization and reused frame-by-frame.
+        self._pipeline = PipelineBuilder(
+            detector=Yolo26Detector(model_name="yolo26n.pt", model=detector_model),
+            heuristic=StandardTennisHeuristic(),
+            segmenter=YoloSegmenter(model_name="yolo26n-seg.pt", model=segmenter_model),
+            pose_estimator=YoloPoseEstimator(model_name="yolo26n-pose.pt", model=pose_model),
+            payload_encoder=PayloadEncoder(pose_delta_threshold=20.0),
+        )
+
+    @gpu_bound
+    def process(self, chunk: VideoChunk) -> list[ActorPacket]:
+        frames_bgr = self._load_frames(chunk)
+        frame_states, packets = self._pipeline.run(chunk=chunk, frames_bgr=frames_bgr)
+        if self._render_debug_keyframes:
+            self._pipeline.render_debug_keyframes(
+                chunk=chunk,
+                frames_bgr=frames_bgr,
+                frame_states=frame_states,
+                actor_packets=packets,
+                out_dir=Path(__file__).resolve().parents[2] / "assets" / "debug_actors",
+            )
+        return packets
+
+    def _load_frames(self, chunk: VideoChunk) -> list[np.ndarray]:
+        source = Path(chunk.source_uri)
+        if not source.exists() or not source.is_file():
+            raise FileNotFoundError(f"ActorExtractor source video not found: {source}")
+
+        metadata = probe_video_metadata(source)
+        frames: list[np.ndarray] = []
+        for frame in iter_video_frames_ffmpeg(
+            source,
+            width=metadata.width,
+            height=metadata.height,
+        ):
+            frames.append(frame)
+            if len(frames) >= chunk.num_frames:
+                break
+        if not frames:
+            raise ValueError(f"ActorExtractor decoded zero frames from source: {source}")
+
+        return frames
+
+
+class MockActorExtractor:
     @gpu_bound
     def process(self, chunk: VideoChunk) -> list[ActorPacket]:
         batch = 1
 
-        # Shape: [Batch, Objects, EmbedDim]
         appearance = torch.zeros(batch, 2, 256, dtype=torch.float32)
-        # Shape: [Batch, Frames, Keypoints, Coords]
-        poses = torch.zeros(batch, chunk.num_frames, 17, 3, dtype=torch.float32)
+        poses = torch.zeros(batch, chunk.num_frames, 18, 3, dtype=torch.float32)
 
         events_a: list[SemanticEvent] = [
             KeyframeEvent(
@@ -49,11 +112,12 @@ class ActorExtractor:
                 object_class=ObjectClass.PERSON,
                 coordinates=[0.05, 0.1, 0.85, 0.9],
             ),
-            StaticCommandEvent(
-                frame_id=chunk.start_frame_id + min(2, chunk.num_frames - 1),
+            InterpolateCommandEvent(
+                frame_id=chunk.start_frame_id + 1,
                 object_id="person_1",
                 object_class=ObjectClass.PERSON,
-                hold_until_frame_id=chunk.start_frame_id + min(8, chunk.num_frames - 1),
+                target_frame_id=chunk.start_frame_id + min(5, chunk.num_frames - 1),
+                method="linear",
             ),
         ]
 
@@ -67,7 +131,7 @@ class ActorExtractor:
                     dtype=str(appearance.dtype),
                 ),
                 pose_tensor_spec=TensorSpec(
-                    name="actor_pose",
+                    name="actor_pose_dw",
                     shape=list(poses.shape),
                     dtype=str(poses.dtype),
                 ),
@@ -82,7 +146,7 @@ class ActorExtractor:
                     dtype=str(appearance.dtype),
                 ),
                 pose_tensor_spec=TensorSpec(
-                    name="actor_pose",
+                    name="actor_pose_dw",
                     shape=list(poses.shape),
                     dtype=str(poses.dtype),
                 ),

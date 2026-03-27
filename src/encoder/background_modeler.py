@@ -21,7 +21,7 @@ class BackgroundModeler:
         decoded_video_tensor: torch.Tensor | None = None,
         translation_threshold_px: float = 30.0,
     ) -> PanoramaPacket:
-        frames, used_fallback = self._resolve_frames(chunk=chunk, decoded_video_tensor=decoded_video_tensor)
+        frames = self._resolve_frames(chunk=chunk, decoded_video_tensor=decoded_video_tensor)
         num_frames, _height, _width, _ = frames.shape
 
         homographies = self._estimate_homographies(frames)
@@ -42,7 +42,7 @@ class BackgroundModeler:
         source_height = int(frames.shape[1])
         source_width = int(frames.shape[2])
         is_expanded_canvas = panorama.shape[0] > source_height or panorama.shape[1] > source_width
-        if not used_fallback and is_expanded_canvas:
+        if is_expanded_canvas:
             cv2.imwrite(str(latest_debug_path), panorama)
 
         camera_poses = [
@@ -74,7 +74,7 @@ class BackgroundModeler:
         self,
         chunk: VideoChunk,
         decoded_video_tensor: torch.Tensor | None,
-    ) -> tuple[np.ndarray, bool]:
+    ) -> np.ndarray:
         if decoded_video_tensor is not None:
             # Shape: [Frames, Channels, Height, Width] -> [Frames, Height, Width, Channels]
             frames = (
@@ -85,23 +85,26 @@ class BackgroundModeler:
                 .cpu()
                 .numpy()
             )
-            return frames, False
+            return frames
 
         source_path = Path(chunk.source_uri)
-        if source_path.exists() and source_path.is_file():
-            metadata = probe_video_metadata(source_path)
-            streamed_frames = list(
-                iter_video_frames_ffmpeg(
-                    source_path,
-                    width=metadata.width,
-                    height=metadata.height,
-                )
-            )
-            if streamed_frames:
-                return np.stack(streamed_frames, axis=0), False
-            raise ValueError(f"FFmpeg yielded no decodable frames: {source_path}")
+        if not source_path.exists() or not source_path.is_file():
+            raise FileNotFoundError(f"BackgroundModeler source video not found: {source_path}")
 
-        return np.zeros((chunk.num_frames, chunk.height, chunk.width, 3), dtype=np.uint8), True
+        metadata = probe_video_metadata(source_path)
+        streamed_frames: list[np.ndarray] = []
+        for frame in iter_video_frames_ffmpeg(
+            source_path,
+            width=metadata.width,
+            height=metadata.height,
+        ):
+            streamed_frames.append(frame)
+            if len(streamed_frames) >= chunk.num_frames:
+                break
+        if streamed_frames:
+            return np.stack(streamed_frames, axis=0)
+
+        raise ValueError(f"FFmpeg yielded no decodable frames: {source_path}")
 
     def _estimate_homographies(self, frames: np.ndarray) -> list[np.ndarray]:
         num_frames = int(frames.shape[0])
@@ -187,7 +190,7 @@ class BackgroundModeler:
         selected_indices: list[int],
     ) -> np.ndarray:
         if frames.shape[0] == 0:
-            return np.zeros((1, 1, 3), dtype=np.uint8)
+            raise ValueError("BackgroundModeler received zero frames; cannot compute panorama")
 
         height, width = int(frames.shape[1]), int(frames.shape[2])
         if not selected_indices:

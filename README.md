@@ -189,7 +189,7 @@ docker run --rm pointstream:cpu
 Run tests inside the container:
 
 ```bash
-docker run --rm pointstream:cpu python -m unittest discover -s tests -p "test_*.py"
+docker run --rm pointstream:cpu python -m pytest
 ```
 
 ## Docker (GPU)
@@ -210,7 +210,16 @@ docker run --gpus all --rm pointstream:gpu
 - Jobs:
   - `lint`: `ruff check src tests scripts`
   - `typecheck`: `mypy --config-file pyproject.toml`
-  - `tests`: `coverage run -m unittest discover -s tests -p "test_*.py"` + `coverage report --fail-under=80`
+  - `tests`: `coverage run -m pytest` + `coverage report --fail-under=80`
+
+## Test Tiers
+
+- Default pytest run is fast by design and excludes integration/slow tests.
+- Fast run: `pytest`
+- Integration run (real YOLO weights): `pytest -m integration`
+- Full run: `pytest -m "integration or slow or not (integration or slow)"`
+- Integration tests load YOLO detect/seg/pose models once per session via `tests/conftest.py` fixtures.
+- Unit plumbing tests use `MockActorExtractor` so they do not run real model inference on dummy videos.
 
 ## Release Flow
 
@@ -245,3 +254,9 @@ docker run --gpus all --rm ghcr.io/<owner>/<repo>/pointstream-gpu:<tag>
 - `scripts/download_weights.py` validates expected weight files in `assets/weights/`.
 - For missing custom weights, the script raises a clear `FileNotFoundError` with next actions.
 - Real model integrations should replace only the mock class internals while preserving interfaces and schemas.
+- `ActorExtractor` now runs a component-based pipeline (`detector -> heuristic -> segmenter -> pose -> payload encoder`) implemented in `src/encoder/actor_components.py`.
+- Keyframe debug skeleton renders are written to `assets/debug_actors/` as an offline inspection artifact.
+- YOLO actor components load weights from local files first (`assets/weights/` or explicit path); implicit online weight download is disabled by default.
+- Set `POINTSTREAM_ALLOW_AUTO_MODEL_DOWNLOAD=1` only if you intentionally want Ultralytics to fetch missing weights.
+- Fail-fast policy: model initialization failures, missing source videos, and inference/runtime errors in detector/pose stages now raise explicit exceptions instead of silently injecting synthetic tracks/poses/black frames.
+- Graceful degradation policy: noisy-data handling remains in place for track recovery/interpolation, segmenter per-frame bypass, homography identity fallback, and FFmpeg metadata tolerance.

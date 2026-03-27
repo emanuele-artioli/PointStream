@@ -5,9 +5,11 @@ import unittest
 from pydantic import ValidationError
 
 from src.shared.schemas import (
+    FrameState,
     InterpolateCommandEvent,
     KeyframeEvent,
     ObjectClass,
+    SceneActor,
     StaticCommandEvent,
     VideoChunk,
 )
@@ -69,6 +71,29 @@ class TestSchemas(unittest.TestCase):
                 object_class=ObjectClass.PERSON,
                 hold_until_frame_id=-1,
             )
+
+    def test_scene_actor_bbox_requires_four_values(self) -> None:
+        with self.assertRaises(ValidationError):
+            SceneActor(
+                track_id="player_0",
+                class_name="player",
+                bbox=[10.0, 20.0, 30.0],
+            )
+
+    def test_frame_state_contract(self) -> None:
+        state = FrameState(
+            frame_id=2,
+            actors=[
+                SceneActor(
+                    track_id="player_0",
+                    class_name="player",
+                    bbox=[10.0, 20.0, 30.0, 40.0],
+                    pose_dw=[[1.0, 2.0, 0.9] for _ in range(18)],
+                )
+            ],
+        )
+        self.assertEqual(state.frame_id, 2)
+        self.assertEqual(len(state.actors), 1)
 
 
 if __name__ == "__main__":

@@ -31,6 +31,19 @@ class VideoChunk(BaseModel):
     height: int = Field(gt=0)
 
 
+class SceneActor(BaseModel):
+    track_id: str
+    class_name: str
+    bbox: list[float] = Field(min_length=4, max_length=4)
+    mask: list[list[int]] | None = None
+    pose_dw: list[list[float]] | None = None
+
+
+class FrameState(BaseModel):
+    frame_id: int = Field(ge=0)
+    actors: list[SceneActor] = Field(default_factory=list)
+
+
 class ObjectState(BaseModel):
     frame_id: int = Field(ge=0)
     object_id: str

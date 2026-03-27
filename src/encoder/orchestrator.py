@@ -21,10 +21,14 @@ from src.shared.tags import cpu_bound
 
 
 class EncoderPipeline:
-    def __init__(self, execution_pool: BaseExecutionPool | None = None) -> None:
+    def __init__(
+        self,
+        execution_pool: BaseExecutionPool | None = None,
+        actor_extractor: ActorExtractor | None = None,
+    ) -> None:
         self._dag = DAGOrchestrator(execution_pool=execution_pool)
         self._background_modeler = BackgroundModeler()
-        self._actor_extractor = ActorExtractor()
+        self._actor_extractor = actor_extractor or ActorExtractor()
         self._object_tracker = ObjectTracker()
         self._ball_tracker = BallTracker()
         self._residual_calculator = ResidualCalculator(SynthesisEngine())
@@ -112,15 +116,17 @@ class EncoderPipeline:
         video_path: str | Path,
         chunk_id: str,
         start_frame_id: int = 0,
+        max_frames: int | None = None,
     ) -> tuple[EncodedChunkPayload, torch.Tensor]:
         metadata = probe_video_metadata(video_path)
+        effective_num_frames = metadata.num_frames if max_frames is None else min(metadata.num_frames, max_frames)
 
         chunk = VideoChunk(
             chunk_id=chunk_id,
             source_uri=str(video_path),
             start_frame_id=start_frame_id,
             fps=metadata.fps,
-            num_frames=metadata.num_frames,
+            num_frames=effective_num_frames,
             width=metadata.width,
             height=metadata.height,
         )
@@ -135,7 +141,10 @@ class EncoderPipeline:
             residual=context["residual"],
         )
         decoded_video = decode_video_to_tensor(video_path)
-        return payload, decoded_video.tensor
+        decoded_tensor = decoded_video.tensor
+        if max_frames is not None:
+            decoded_tensor = decoded_tensor[:max_frames]
+        return payload, decoded_tensor
 
     def shutdown(self) -> None:
         self._dag.shutdown()
