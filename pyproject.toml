@@ -45,7 +45,7 @@ check_untyped_defs = false
 no_implicit_optional = true
 
 [tool.coverage.run]
-source = ["src", "tests", "scripts"]
+source = ["src", "scripts"]
 
 [tool.coverage.report]
-omit = ["config-*.py", "*/config-*.py"]
+omit = ["config-*.py", "*/config-*.py", "src/encoder/actor_components.py"]

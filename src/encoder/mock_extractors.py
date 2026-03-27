@@ -6,14 +6,6 @@ from typing import Any
 import numpy as np
 import torch
 
-from src.encoder.actor_components import (
-    PayloadEncoder,
-    PipelineBuilder,
-    StandardTennisHeuristic,
-    Yolo26Detector,
-    YoloPoseEstimator,
-    YoloSegmenter,
-)
 from src.encoder.video_io import iter_video_frames_ffmpeg, probe_video_metadata
 from src.shared.schemas import (
     ActorPacket,
@@ -37,6 +29,15 @@ class ActorExtractor:
         pose_model: Any | None = None,
         render_debug_keyframes: bool = True,
     ) -> None:
+        from src.encoder.actor_components import (
+            PayloadEncoder,
+            PipelineBuilder,
+            StandardTennisHeuristic,
+            Yolo26Detector,
+            YoloPoseEstimator,
+            YoloSegmenter,
+        )
+
         self._render_debug_keyframes = render_debug_keyframes
         # Models are loaded once in component initialization and reused frame-by-frame.
         self._pipeline = PipelineBuilder(

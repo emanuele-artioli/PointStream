@@ -81,7 +81,7 @@ jobs:
 
       - name: Run tests with coverage gate
         run: |
-          coverage run -m unittest discover -s tests -p "test_*.py"
+          coverage run -m pytest
           coverage report --fail-under=80
           coverage xml
 
