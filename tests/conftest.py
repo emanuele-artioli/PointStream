@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import cv2
 import pytest
-from ultralytics import YOLO
 
 from src.encoder.mock_extractors import ActorExtractor, MockActorExtractor
 from src.encoder.orchestrator import EncoderPipeline
@@ -26,17 +26,19 @@ def _required_weight_paths() -> dict[str, Path]:
 
 
 @pytest.fixture(scope="session")
-def yolo_model_bundle() -> dict[str, YOLO]:
+def yolo_model_bundle() -> dict[str, Any]:
+    ultralytics = pytest.importorskip("ultralytics")
+    yolo_ctor = ultralytics.YOLO
     paths = _required_weight_paths()
     return {
-        "detector": YOLO(str(paths["detector"])),
-        "segmenter": YOLO(str(paths["segmenter"])),
-        "pose": YOLO(str(paths["pose"])),
+        "detector": yolo_ctor(str(paths["detector"])),
+        "segmenter": yolo_ctor(str(paths["segmenter"])),
+        "pose": yolo_ctor(str(paths["pose"])),
     }
 
 
 @pytest.fixture()
-def real_actor_extractor(yolo_model_bundle: dict[str, YOLO]) -> ActorExtractor:
+def real_actor_extractor(yolo_model_bundle: dict[str, Any]) -> ActorExtractor:
     return ActorExtractor(
         detector_model=yolo_model_bundle["detector"],
         segmenter_model=yolo_model_bundle["segmenter"],
