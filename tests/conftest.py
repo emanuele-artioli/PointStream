@@ -3,12 +3,38 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-import cv2
 import pytest
 
 from src.encoder.mock_extractors import ActorExtractor, MockActorExtractor
 from src.encoder.orchestrator import EncoderPipeline
-from src.encoder.video_io import iter_video_frames_ffmpeg, probe_video_metadata
+from src.encoder.video_io import (
+    encode_video_frames_ffmpeg,
+    iter_video_frames_ffmpeg,
+    probe_video_metadata,
+)
+
+
+def _clean_generated_assets() -> None:
+    project_root = Path(__file__).resolve().parents[1]
+    assets_dir = project_root / "assets"
+
+    debug_actors_dir = assets_dir / "debug_actors"
+    if debug_actors_dir.exists():
+        for png_file in debug_actors_dir.glob("*.png"):
+            png_file.unlink(missing_ok=True)
+
+    for pano_file in assets_dir.glob("debug_panorama*.jpg"):
+        pano_file.unlink(missing_ok=True)
+
+    test_chunks_dir = assets_dir / "test_chunks"
+    if test_chunks_dir.exists():
+        for mp4_file in test_chunks_dir.glob("*.mp4"):
+            mp4_file.unlink(missing_ok=True)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def cleanup_generated_assets_before_tests() -> None:
+    _clean_generated_assets()
 
 
 def _required_weight_paths() -> dict[str, Path]:
@@ -76,27 +102,29 @@ def real_tennis_10f_video(tmp_path_factory: pytest.TempPathFactory) -> Path:
     out_dir = tmp_path_factory.mktemp("integration_videos")
     out_path = out_dir / "real_tennis_10f.mp4"
 
-    writer = cv2.VideoWriter(
-        str(out_path),
-        getattr(cv2, "VideoWriter_fourcc")(*"mp4v"),
-        metadata.fps,
-        (metadata.width, metadata.height),
-    )
-    if not writer.isOpened():
-        raise RuntimeError(f"Unable to create clipped integration video at: {out_path}")
-
+    frames: list[Any] = []
     frame_count = 0
     for frame in iter_video_frames_ffmpeg(
         source_path,
         width=metadata.width,
         height=metadata.height,
     ):
-        writer.write(frame)
+        frames.append(frame)
         frame_count += 1
         if frame_count >= 10:
             break
 
-    writer.release()
+    encode_video_frames_ffmpeg(
+        output_path=out_path,
+        frames_bgr=frames,
+        fps=metadata.fps,
+        width=metadata.width,
+        height=metadata.height,
+        codec="libx264",
+        pix_fmt="yuv420p",
+        crf=18,
+        preset="veryfast",
+    )
     if frame_count == 0:
         raise RuntimeError("real_tennis.mp4 produced zero decodable frames")
 

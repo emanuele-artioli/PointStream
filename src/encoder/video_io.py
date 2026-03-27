@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import subprocess
 from collections.abc import Iterator
+from collections.abc import Iterable
 from typing import Any
 
 import numpy as np
@@ -141,6 +142,94 @@ def decode_video_to_tensor(video_path: str | Path) -> DecodedVideo:
         width=metadata.width,
         height=metadata.height,
     )
+
+
+def encode_video_frames_ffmpeg(
+    output_path: str | Path,
+    frames_bgr: Iterable[np.ndarray],
+    fps: float,
+    width: int,
+    height: int,
+    codec: str = "libx264",
+    pix_fmt: str = "yuv420p",
+    crf: int | None = 23,
+    preset: str | None = "veryfast",
+    overwrite: bool = True,
+) -> Path:
+    destination = Path(output_path)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+
+    ffmpeg_bin = _resolve_binary_path("FFMPEG_BIN", "ffmpeg")
+    ffmpeg_cmd = [
+        ffmpeg_bin,
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-f",
+        "rawvideo",
+        "-pix_fmt",
+        "bgr24",
+        "-s:v",
+        f"{int(width)}x{int(height)}",
+        "-r",
+        f"{float(fps):.6f}",
+        "-i",
+        "-",
+        "-an",
+        "-c:v",
+        codec,
+    ]
+    if preset is not None:
+        ffmpeg_cmd.extend(["-preset", preset])
+    if crf is not None:
+        ffmpeg_cmd.extend(["-crf", str(int(crf))])
+    ffmpeg_cmd.extend(["-pix_fmt", pix_fmt])
+    ffmpeg_cmd.append("-y" if overwrite else "-n")
+    ffmpeg_cmd.append(str(destination))
+
+    process = subprocess.Popen(
+        ffmpeg_cmd,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        bufsize=10**7,
+    )
+
+    frame_count = 0
+    try:
+        if process.stdin is None:
+            raise RuntimeError("FFmpeg stdin pipe is not available")
+
+        for frame in frames_bgr:
+            if frame.shape != (height, width, 3):
+                raise ValueError(
+                    "Unexpected frame shape for FFmpeg encode: "
+                    f"expected {(height, width, 3)} got {frame.shape}"
+                )
+            if frame.dtype != np.uint8:
+                frame = np.asarray(frame, dtype=np.uint8)
+            process.stdin.write(frame.tobytes(order="C"))
+            frame_count += 1
+
+        process.stdin.close()
+        stderr_output = process.stderr.read() if process.stderr is not None else b""
+        return_code = process.wait()
+        if return_code != 0:
+            stderr_text = stderr_output.decode("utf-8", errors="replace").strip()
+            raise RuntimeError(
+                f"FFmpeg encode failed for '{destination}': {stderr_text or 'unknown error'}"
+            )
+        if frame_count == 0:
+            raise ValueError(f"FFmpeg encode received zero frames for output: {destination}")
+    finally:
+        if process.stdin is not None and not process.stdin.closed:
+            process.stdin.close()
+        if process.stdout is not None:
+            process.stdout.close()
+        if process.stderr is not None:
+            process.stderr.close()
+
+    return destination
 
 
 def _probe_video_with_ffprobe(video_path: Path) -> tuple[int, int, float, int]:

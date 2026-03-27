@@ -220,6 +220,7 @@ docker run --gpus all --rm pointstream:gpu
 - Full run: `pytest -m "integration or slow or not (integration or slow)"`
 - Integration tests load YOLO detect/seg/pose models once per session via `tests/conftest.py` fixtures.
 - Unit plumbing tests use `MockActorExtractor` so they do not run real model inference on dummy videos.
+- Test session startup removes generated artifacts from `assets/debug_actors/*.png`, `assets/debug_panorama*.jpg`, and `assets/test_chunks/*.mp4` to avoid stale-file confusion.
 
 ## Release Flow
 
@@ -254,6 +255,7 @@ docker run --gpus all --rm ghcr.io/<owner>/<repo>/pointstream-gpu:<tag>
 - `scripts/download_weights.py` validates expected weight files in `assets/weights/`.
 - For missing custom weights, the script raises a clear `FileNotFoundError` with next actions.
 - Real model integrations should replace only the mock class internals while preserving interfaces and schemas.
+- Generated MP4 artifacts are encoded through `src/encoder/video_io.py::encode_video_frames_ffmpeg(...)` with explicit codec/pixel-format settings for player compatibility.
 - `ActorExtractor` now runs a component-based pipeline (`detector -> heuristic -> segmenter -> pose -> payload encoder`) implemented in `src/encoder/actor_components.py`.
 - Keyframe debug skeleton renders are written to `assets/debug_actors/` as an offline inspection artifact.
 - YOLO actor components load weights from local files first (`assets/weights/` or explicit path); implicit online weight download is disabled by default.

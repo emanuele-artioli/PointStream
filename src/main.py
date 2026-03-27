@@ -10,7 +10,7 @@ from src.encoder.execution_pool import BaseExecutionPool
 from src.decoder.mock_renderer import DecoderRenderer
 from src.encoder.mock_extractors import ActorExtractor
 from src.encoder.orchestrator import EncoderPipeline
-from src.encoder.video_io import probe_video_metadata
+from src.encoder.video_io import encode_video_frames_ffmpeg, probe_video_metadata
 from src.shared.schemas import VideoChunk
 from src.transport.disk import DiskTransport
 
@@ -69,24 +69,26 @@ def _ensure_mock_source_video() -> str:
     if source_path.exists() and source_path.is_file():
         return str(source_path)
 
-    writer = cv2.VideoWriter(
-        str(source_path),
-        getattr(cv2, "VideoWriter_fourcc")(*"mp4v"),
-        30.0,
-        (1280, 720),
-    )
-    if not writer.isOpened():
-        raise RuntimeError(f"Unable to create mock source video at: {source_path}")
-
+    frames: list[np.ndarray] = []
     for frame_idx in range(60):
         frame = np.zeros((720, 1280, 3), dtype=np.uint8)
         x0 = 100 + (frame_idx * 8) % 900
         y0 = 200 + (frame_idx * 3) % 250
         cv2.rectangle(frame, (x0, y0), (x0 + 90, y0 + 180), (0, 220, 60), thickness=-1)
         cv2.rectangle(frame, (1280 - x0 - 120, 720 - y0 - 220), (1280 - x0 - 40, 720 - y0 - 40), (30, 200, 230), thickness=-1)
-        writer.write(frame)
+        frames.append(frame)
 
-    writer.release()
+    encode_video_frames_ffmpeg(
+        output_path=source_path,
+        frames_bgr=frames,
+        fps=30.0,
+        width=1280,
+        height=720,
+        codec="libx264",
+        pix_fmt="yuv420p",
+        crf=18,
+        preset="veryfast",
+    )
     return str(source_path)
 
 
