@@ -22,6 +22,7 @@ from src.shared.schemas import (
     TensorSpec,
     VideoChunk,
 )
+from src.shared.dwpose_draw import draw_dwpose_canvas
 
 
 _COCO_PERSON_CLASS_ID = 0
@@ -742,7 +743,12 @@ class PipelineBuilder:
                 continue
 
             try:
-                skeleton_canvas = self._draw_dwpose_canvas(frame, np.stack(people_dw, axis=0))
+                skeleton_canvas = draw_dwpose_canvas(
+                    height=int(frame.shape[0]),
+                    width=int(frame.shape[1]),
+                    people_dw=np.stack(people_dw, axis=0),
+                    confidence_threshold=0.2,
+                )
             except ModuleNotFoundError as exc:
                 _LOGGER.warning("Skipping debug skeleton rendering because dwpose is unavailable: %s", exc)
                 return
@@ -753,37 +759,4 @@ class PipelineBuilder:
             stem = f"{chunk.chunk_id}_frame_{global_frame_id:05d}"
             cv2.imwrite(str(out_path / f"{stem}_skeleton_black.png"), skeleton_canvas)
             cv2.imwrite(str(out_path / f"{stem}_skeleton_overlay.png"), overlay)
-
-    def _draw_dwpose_canvas(self, frame_bgr: np.ndarray, people_dw: np.ndarray) -> np.ndarray:
-        h, w = frame_bgr.shape[:2]
-
-        from dwpose import draw_poses
-
-        pose_results = self._dw18_to_pose_results(people_dw, confidence_threshold=0.2)
-        rendered = draw_poses(pose_results, h, w, draw_body=True, draw_hand=False, draw_face=False)
-        return rendered
-
-    def _dw18_to_pose_results(self, people_dw: np.ndarray, confidence_threshold: float) -> list[Any]:
-        from dwpose.types import BodyResult, Keypoint, PoseResult
-
-        poses: list[Any] = []
-        for person in people_dw:
-            body_kpts: list[Any] = [None] * 18
-            for op_idx, kpt in enumerate(person):
-                x, y, conf = float(kpt[0]), float(kpt[1]), float(kpt[2])
-                if conf < confidence_threshold:
-                    continue
-                # Use positional constructor to match DWPose Keypoint API expected by draw_poses.
-                body_kpts[op_idx] = Keypoint(x, y, conf, op_idx)
-
-            poses.append(
-                PoseResult(
-                    body=BodyResult(keypoints=body_kpts),
-                    left_hand=None,
-                    right_hand=None,
-                    face=None,
-                )
-            )
-
-        return poses
 

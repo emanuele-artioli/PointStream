@@ -9,6 +9,7 @@ description = "Mock-first scaffold for an object-centric semantic neural codec p
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+  "kornia==0.7.4",
   "msgpack==1.1.0",
   "numpy==1.26.4",
   "opencv-python-headless==4.10.0.84",

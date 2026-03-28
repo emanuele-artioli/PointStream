@@ -90,13 +90,21 @@ class MockActorExtractor:
 
         appearance = torch.zeros(batch, 2, 256, dtype=torch.float32)
         poses = torch.zeros(batch, chunk.num_frames, 18, 3, dtype=torch.float32)
+        pose_a = poses[0, 0].clone()
+        pose_b = poses[0, 0].clone()
+        pose_a[:, 0] = torch.linspace(100.0, 220.0, 18)
+        pose_a[:, 1] = torch.linspace(80.0, 260.0, 18)
+        pose_a[:, 2] = 0.9
+        pose_b[:, 0] = torch.linspace(420.0, 560.0, 18)
+        pose_b[:, 1] = torch.linspace(90.0, 280.0, 18)
+        pose_b[:, 2] = 0.9
 
         events_a: list[SemanticEvent] = [
             KeyframeEvent(
                 frame_id=chunk.start_frame_id,
                 object_id="person_0",
                 object_class=ObjectClass.PERSON,
-                coordinates=[0.1, 0.2, 0.9, 0.95],
+                coordinates=pose_a.reshape(-1).tolist(),
             ),
             InterpolateCommandEvent(
                 frame_id=chunk.start_frame_id + 1,
@@ -111,7 +119,7 @@ class MockActorExtractor:
                 frame_id=chunk.start_frame_id,
                 object_id="person_1",
                 object_class=ObjectClass.PERSON,
-                coordinates=[0.05, 0.1, 0.85, 0.9],
+                coordinates=pose_b.reshape(-1).tolist(),
             ),
             InterpolateCommandEvent(
                 frame_id=chunk.start_frame_id + 1,

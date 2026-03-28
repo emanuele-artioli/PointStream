@@ -15,7 +15,7 @@ from src.encoder.mock_extractors import (
 )
 from src.encoder.residual import ResidualCalculator
 from src.encoder.video_io import decode_video_to_tensor, probe_video_metadata
-from src.shared.schemas import EncodedChunkPayload, VideoChunk
+from src.shared.schemas import EncodedChunkPayload, ResidualPacket, VideoChunk
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import cpu_bound
 
@@ -92,10 +92,31 @@ class EncoderPipeline:
                 dependencies=("chunk",),
             )
         )
+        def build_residual_node(context, deps):
+            placeholder_residual = ResidualPacket(
+                chunk_id=deps["chunk"].chunk_id,
+                codec="hevc-placeholder",
+                residual_video_uri=f"memory://residual/{deps['chunk'].chunk_id}.mp4",
+            )
+            payload = EncodedChunkPayload(
+                chunk=deps["chunk"],
+                panorama=deps["panorama"],
+                actors=deps["actors"],
+                rigid_objects=deps["rigid_objects"],
+                ball=deps["ball"],
+                residual=placeholder_residual,
+            )
+            return self._residual_calculator.process(payload)
+
+        setattr(
+            build_residual_node,
+            "_execution_tag",
+            getattr(self._residual_calculator.process, "_execution_tag", "cpu"),
+        )
         self._dag.add_node(
             DAGNode(
                 name="residual",
-                func=self._make_chunk_node(self._residual_calculator.process),
+                func=build_residual_node,
                 dependencies=("chunk", "panorama", "actors", "rigid_objects", "ball"),
             )
         )
