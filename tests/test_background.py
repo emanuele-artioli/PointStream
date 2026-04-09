@@ -14,7 +14,11 @@ from src.transport.disk import DiskTransport
 pytestmark = [pytest.mark.integration, pytest.mark.slow]
 
 
-def test_real_video_background_stitching_and_transport(real_encoder_pipeline, real_tennis_10f_video: Path) -> None:
+def test_real_video_background_stitching_and_transport(
+    real_encoder_pipeline,
+    real_tennis_10f_video: Path,
+    test_run_artifacts_dir: Path,
+) -> None:
     project_root = Path(__file__).resolve().parents[1]
 
     transport_root = project_root / ".pointstream"
@@ -23,9 +27,8 @@ def test_real_video_background_stitching_and_transport(real_encoder_pipeline, re
     if chunk_dir.exists():
         shutil.rmtree(chunk_dir)
 
-    debug_panorama_path = project_root / "assets" / "debug_panorama.jpg"
-    if debug_panorama_path.exists():
-        debug_panorama_path.unlink()
+    debug_panorama_path = test_run_artifacts_dir / "debug_panorama.jpg"
+    debug_panorama_path.unlink(missing_ok=True)
 
     payload, _decoded_video_tensor = real_encoder_pipeline.encode_video_file(
         video_path=real_tennis_10f_video,
@@ -52,7 +55,7 @@ def test_real_video_background_stitching_and_transport(real_encoder_pipeline, re
     assert panorama.frame_height == panorama_array.shape[0]
     assert panorama.frame_width == panorama_array.shape[1]
 
-    chunk_debug_path = project_root / "assets" / f"debug_panorama_{chunk_id}.jpg"
+    chunk_debug_path = test_run_artifacts_dir / f"debug_panorama_{chunk_id}.jpg"
     assert chunk_debug_path.exists()
     debug_img = cv2.imread(str(chunk_debug_path))
     assert debug_img is not None

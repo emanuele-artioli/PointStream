@@ -9,13 +9,11 @@ from src.transport.disk import DiskTransport
 from tests.video_utils import create_dummy_video
 
 
-def test_end_to_end_mp4_encode_transport_decode(mock_encoder_pipeline) -> None:
+def test_end_to_end_mp4_encode_transport_decode(mock_encoder_pipeline, test_run_artifacts_dir: Path) -> None:
     project_root = Path(__file__).resolve().parents[1]
-    assets_dir = project_root / "assets"
-    assets_dir.mkdir(parents=True, exist_ok=True)
 
     video_path = create_dummy_video(
-        path=assets_dir / "test_video.mp4",
+        path=test_run_artifacts_dir / "test_video.mp4",
         num_frames=30,
         width=96,
         height=64,

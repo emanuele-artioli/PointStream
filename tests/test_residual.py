@@ -18,9 +18,9 @@ pytestmark = [pytest.mark.integration, pytest.mark.slow]
 def test_weighted_residual_debug_video_has_sparse_actor_regions(
     real_encoder_pipeline,
     real_tennis_10f_video: Path,
+    test_run_artifacts_dir: Path,
 ) -> None:
-    project_root = Path(__file__).resolve().parents[1]
-    debug_output = project_root / "assets" / "debug_residual.mp4"
+    debug_output = test_run_artifacts_dir / "debug_residual.mp4"
     debug_output.unlink(missing_ok=True)
 
     payload, _decoded, frame_states = real_encoder_pipeline.encode_video_file_with_states(
@@ -67,9 +67,9 @@ def test_weighted_residual_debug_video_has_sparse_actor_regions(
 def test_full_codec_loop_composites_signed_residual_into_final_reconstruction(
     real_encoder_pipeline,
     real_tennis_10f_video: Path,
+    test_run_artifacts_dir: Path,
 ) -> None:
-    project_root = Path(__file__).resolve().parents[1]
-    final_output = project_root / "assets" / "debug_final_reconstruction.mp4"
+    final_output = test_run_artifacts_dir / "debug_final_reconstruction.mp4"
     final_output.unlink(missing_ok=True)
 
     payload, _decoded, _frame_states = real_encoder_pipeline.encode_video_file_with_states(
@@ -83,7 +83,7 @@ def test_full_codec_loop_composites_signed_residual_into_final_reconstruction(
         transport.send(payload)
         recovered_payload = transport.receive("debug_final_reconstruction")
 
-        decoder = DecoderRenderer(output_root=project_root / "assets")
+        decoder = DecoderRenderer(output_root=test_run_artifacts_dir)
         decoded = decoder.process(recovered_payload, output_path=final_output)
 
     assert decoded.output_uri == str(final_output)

@@ -10,13 +10,12 @@ from src.shared.synthesis_engine import SynthesisEngine
 from tests.video_utils import create_dummy_video
 
 
-def test_decoder_output_matches_chunk_dimensions(mock_encoder_pipeline) -> None:
-    project_root = Path(__file__).resolve().parents[1]
-    reconstruction_path = project_root / "assets" / "mock_reconstruction.mp4"
+def test_decoder_output_matches_chunk_dimensions(mock_encoder_pipeline, test_run_artifacts_dir: Path) -> None:
+    reconstruction_path = test_run_artifacts_dir / "mock_reconstruction.mp4"
     reconstruction_path.unlink(missing_ok=True)
 
     video_path = create_dummy_video(
-        path=project_root / "assets" / "test_chunks" / "dec001.mp4",
+        path=test_run_artifacts_dir / "test_chunks" / "dec001.mp4",
         num_frames=6,
         width=640,
         height=360,
@@ -57,11 +56,12 @@ def test_decoder_output_matches_chunk_dimensions(mock_encoder_pipeline) -> None:
     assert rendered_meta.width == payload.chunk.width
     assert rendered_meta.height == payload.chunk.height
 
-    decoded = DecoderRenderer().process(payload)
+    decoded = DecoderRenderer(output_root=test_run_artifacts_dir).process(payload)
 
     assert decoded.chunk_id == "dec001"
     assert decoded.num_frames == 6
     assert decoded.width == 640
     assert decoded.height == 360
     assert decoded.output_uri.endswith("dec001.mp4")
+    assert Path(decoded.output_uri).parent == test_run_artifacts_dir
     assert reconstruction_path.exists()

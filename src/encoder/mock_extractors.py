@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import os
 from pathlib import Path
 from typing import Any
 
@@ -71,9 +72,15 @@ class ActorExtractor:
                 frames_bgr=frames_bgr,
                 frame_states=frame_states,
                 actor_packets=packets,
-                out_dir=Path(__file__).resolve().parents[2] / "assets" / "debug_actors",
+                out_dir=self._resolve_debug_keyframes_dir(),
             )
         return ActorExtractionResult(frame_states=frame_states, actor_packets=packets)
+
+    def _resolve_debug_keyframes_dir(self) -> Path:
+        override = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")
+        if override:
+            return Path(override) / "debug_actors"
+        return Path(__file__).resolve().parents[2] / "assets" / "debug_actors"
 
     def _load_frames(self, chunk: VideoChunk) -> list[np.ndarray]:
         source = Path(chunk.source_uri)

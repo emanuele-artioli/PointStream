@@ -149,7 +149,7 @@ cd /home/itec/emanuele/pointstream
 python -m unittest discover -s tests -p "test_*.py"
 ```
 
-Run only the end-to-end mock path (generates `assets/test_video.mp4`):
+Run only the end-to-end mock path (generates `assets/test_runs/<timestamp>/test_video.mp4`):
 
 ```bash
 cd /home/itec/emanuele/pointstream
@@ -232,7 +232,7 @@ docker run --gpus all --rm pointstream:gpu
 - Full run: `pytest -m "integration or slow or not (integration or slow)"`
 - Integration tests load YOLO detect/seg/pose models once per session via `tests/conftest.py` fixtures.
 - Unit plumbing tests use `MockActorExtractor` so they do not run real model inference on dummy videos.
-- Test session startup removes generated artifacts from `assets/debug_actors/*.png`, `assets/debug_panorama*.jpg`, and `assets/test_chunks/*.mp4` to avoid stale-file confusion.
+- Test session startup creates a run-scoped artifact folder at `assets/test_runs/<timestamp>/` and exports `POINTSTREAM_DEBUG_ARTIFACT_DIR` for all test-time debug writers.
 
 ## Release Flow
 
@@ -269,17 +269,17 @@ docker run --gpus all --rm ghcr.io/<owner>/<repo>/pointstream-gpu:<tag>
 - Real model integrations should replace only the mock class internals while preserving interfaces and schemas.
 - Generated MP4 artifacts are encoded through `src/encoder/video_io.py::encode_video_frames_ffmpeg(...)` with explicit codec/pixel-format settings for player compatibility.
 - `ActorExtractor` now runs a component-based pipeline (`detector -> heuristic -> segmenter -> pose -> payload encoder`) implemented in `src/encoder/actor_components.py`.
-- Keyframe debug skeleton renders are written to `assets/debug_actors/` as an offline inspection artifact.
+- Keyframe debug skeleton renders are written to `assets/test_runs/<timestamp>/debug_actors/` during tests; outside tests they default to `assets/debug_actors/`.
 - `SynthesisEngine` (`src/shared/synthesis_engine.py`) now performs deterministic decode synthesis from payload metadata with strict seeding (`torch.manual_seed`, CUDA seed sync, deterministic algorithms enabled).
 - Decoder-side panorama re-warping is GPU-native through `kornia.geometry.transform.warp_perspective` (inverse homography per frame), and mock actor compositing draws dense DWPose skeletons over reconstructed backgrounds.
-- `tests/test_decoder.py` writes `assets/mock_reconstruction.mp4` so reconstruction smoothness and interpolation quality can be visually inspected without loading any heavy GenAI model.
+- `tests/test_decoder.py` writes `assets/test_runs/<timestamp>/mock_reconstruction.mp4` so reconstruction smoothness and interpolation quality can be visually inspected without loading any heavy GenAI model.
 - `ResidualCalculator` (`src/encoder/residual_calculator.py`) computes weighted server residuals using a pluggable saliency strategy (`BaseImportanceMapper`).
 - Baseline saliency strategy is `BinaryActorImportanceMapper`, which converts player/racket segmentation masks from per-frame `FrameState` into continuous `[H, W]` importance tensors in `[0.0, 1.0]`.
 - Residual encoding uses signed offsets with a neutral center: `encoded = clamp(((original - predicted) * importance) + 128, 0, 255)`.
 - Transport now copies the encoded residual stream into `.pointstream/chunk_<id>/residual.mp4` and stores that chunk-local path in metadata.
 - Residual stream encoding uses FFmpeg H.265 (`libx265`, `-crf 28`) for the transport payload.
 - Client compositing decodes residual, shifts by `-128`, then applies `final = clamp(predicted + decoded_diff, 0, 255)` in `src/decoder/compositor.py`.
-- `tests/test_residual.py` writes `assets/debug_residual.mp4` and `assets/debug_final_reconstruction.mp4` from a 10-frame real clip for offline verification of signed residuals and end-to-end reconstruction fidelity.
+- `tests/test_residual.py` writes `assets/test_runs/<timestamp>/debug_residual.mp4` and `assets/test_runs/<timestamp>/debug_final_reconstruction.mp4` from a 10-frame real clip for offline verification of signed residuals and end-to-end reconstruction fidelity.
 - YOLO actor components load weights from local files first (`assets/weights/` or explicit path); implicit online weight download is disabled by default.
 - Set `POINTSTREAM_ALLOW_AUTO_MODEL_DOWNLOAD=1` only if you intentionally want Ultralytics to fetch missing weights.
 - Fail-fast policy: model initialization failures, missing source videos, and inference/runtime errors in detector/pose stages now raise explicit exceptions instead of silently injecting synthetic tracks/poses/black frames.

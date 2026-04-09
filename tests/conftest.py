@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -14,33 +16,30 @@ from src.encoder.video_io import (
 )
 
 
-def _clean_generated_assets() -> None:
+def _create_test_run_artifacts_dir() -> Path:
     project_root = Path(__file__).resolve().parents[1]
-    assets_dir = project_root / "assets"
+    run_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_dir = project_root / "assets" / "test_runs" / run_timestamp
+    run_dir.mkdir(parents=True, exist_ok=True)
+    return run_dir
 
-    debug_actors_dir = assets_dir / "debug_actors"
-    if debug_actors_dir.exists():
-        for png_file in debug_actors_dir.glob("*.png"):
-            png_file.unlink(missing_ok=True)
 
-    for pano_file in assets_dir.glob("debug_panorama*.jpg"):
-        pano_file.unlink(missing_ok=True)
-
-    residual_debug = assets_dir / "debug_residual.mp4"
-    residual_debug.unlink(missing_ok=True)
-
-    final_debug = assets_dir / "debug_final_reconstruction.mp4"
-    final_debug.unlink(missing_ok=True)
-
-    test_chunks_dir = assets_dir / "test_chunks"
-    if test_chunks_dir.exists():
-        for mp4_file in test_chunks_dir.glob("*.mp4"):
-            mp4_file.unlink(missing_ok=True)
+@pytest.fixture(scope="session")
+def test_run_artifacts_dir() -> Path:
+    return _create_test_run_artifacts_dir()
 
 
 @pytest.fixture(scope="session", autouse=True)
-def cleanup_generated_assets_before_tests() -> None:
-    _clean_generated_assets()
+def configure_test_debug_artifact_env(test_run_artifacts_dir: Path):
+    previous = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")
+    os.environ["POINTSTREAM_DEBUG_ARTIFACT_DIR"] = str(test_run_artifacts_dir)
+    try:
+        yield
+    finally:
+        if previous is None:
+            os.environ.pop("POINTSTREAM_DEBUG_ARTIFACT_DIR", None)
+        else:
+            os.environ["POINTSTREAM_DEBUG_ARTIFACT_DIR"] = previous
 
 
 def _required_weight_paths() -> dict[str, Path]:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+import os
 from pathlib import Path
 
 import numpy as np
@@ -172,6 +173,9 @@ class ResidualCalculator:
         )
 
     def _default_residual_path(self, chunk: VideoChunk) -> Path:
+        override = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")
+        if override:
+            return Path(override) / f"residual_{chunk.chunk_id}.mp4"
         project_root = Path(__file__).resolve().parents[2]
         return project_root / "assets" / "test_chunks" / f"residual_{chunk.chunk_id}.mp4"
 

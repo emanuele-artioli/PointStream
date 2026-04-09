@@ -5,10 +5,9 @@ from pathlib import Path
 from tests.video_utils import create_dummy_video
 
 
-def test_encode_chunk_contract_and_events(mock_encoder_pipeline) -> None:
-    project_root = Path(__file__).resolve().parents[1]
+def test_encode_chunk_contract_and_events(mock_encoder_pipeline, test_run_artifacts_dir: Path) -> None:
     video_path = create_dummy_video(
-        path=project_root / "assets" / "test_chunks" / "enc001.mp4",
+        path=test_run_artifacts_dir / "test_chunks" / "enc001.mp4",
         num_frames=12,
         width=960,
         height=540,
@@ -37,10 +36,9 @@ def test_encode_chunk_contract_and_events(mock_encoder_pipeline) -> None:
             assert event.frame_id >= 0
 
 
-def test_execution_tags_are_propagated_to_dag_nodes(mock_encoder_pipeline) -> None:
-    project_root = Path(__file__).resolve().parents[1]
+def test_execution_tags_are_propagated_to_dag_nodes(mock_encoder_pipeline, test_run_artifacts_dir: Path) -> None:
     video_path = create_dummy_video(
-        path=project_root / "assets" / "test_chunks" / "enc002.mp4",
+        path=test_run_artifacts_dir / "test_chunks" / "enc002.mp4",
         num_frames=4,
         width=320,
         height=180,

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import cv2
@@ -31,14 +32,14 @@ class BackgroundModeler:
         )
         panorama = self._median_panorama(frames=frames, homographies=homographies, selected_indices=selected_indices)
 
-        assets_dir = Path(__file__).resolve().parents[2] / "assets"
-        assets_dir.mkdir(parents=True, exist_ok=True)
-        chunk_debug_path = assets_dir / f"debug_panorama_{chunk.chunk_id}.jpg"
+        debug_root = self._resolve_debug_root()
+        debug_root.mkdir(parents=True, exist_ok=True)
+        chunk_debug_path = debug_root / f"debug_panorama_{chunk.chunk_id}.jpg"
         cv2.imwrite(str(chunk_debug_path), panorama)
 
         # Keep a canonical debug artifact only for non-fallback decoding paths
         # that produce an expanded stitched canvas.
-        latest_debug_path = assets_dir / "debug_panorama.jpg"
+        latest_debug_path = debug_root / "debug_panorama.jpg"
         source_height = int(frames.shape[1])
         source_width = int(frames.shape[2])
         is_expanded_canvas = panorama.shape[0] > source_height or panorama.shape[1] > source_width
@@ -69,6 +70,12 @@ class BackgroundModeler:
             homography_matrices=[homography.tolist() for homography in homographies],
             selected_frame_indices=selected_indices,
         )
+
+    def _resolve_debug_root(self) -> Path:
+        override = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")
+        if override:
+            return Path(override)
+        return Path(__file__).resolve().parents[2] / "assets"
 
     def _resolve_frames(
         self,
