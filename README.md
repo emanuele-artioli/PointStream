@@ -81,6 +81,8 @@ pointstream/
 
 Use conda for explicit CUDA-compatible PyTorch.
 
+The current server driver is NVIDIA 535.x (`nvidia-smi` reports CUDA 12.2), so Pointstream pins CUDA 12.1 PyTorch builds for compatibility.
+
 Video decode is strict FFmpeg (`ffmpeg` + `ffprobe`) and stream-oriented by default (frame generator over pipe).
 The project does not vendor FFmpeg via pip/conda packages.
 
@@ -88,6 +90,16 @@ The project does not vendor FFmpeg via pip/conda packages.
 cd /home/itec/emanuele/pointstream
 conda env create -f environment.yaml
 conda activate pointstream
+```
+
+If `pointstream` already exists and previously resolved to CPU-only Torch, repair it in-place with:
+
+```bash
+cd /home/itec/emanuele/pointstream
+conda activate pointstream
+python -m pip uninstall -y torch torchvision torchaudio
+python -m pip install --index-url https://download.pytorch.org/whl/cu121 torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1
+python -c "import torch; print(torch.__version__, torch.version.cuda, torch.cuda.is_available())"
 ```
 
 For development tooling only (lint/type/pre-commit):

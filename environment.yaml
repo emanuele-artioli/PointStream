@@ -2,14 +2,15 @@ name: pointstream
 channels:
   - pytorch
   - nvidia
+  - defaults
   - conda-forge
 dependencies:
   - python=3.10
   - pip
-  - pytorch=2.5.1
-  - torchvision=0.20.1
-  - torchaudio=2.5.1
-  - pytorch-cuda=12.4
+  - pytorch=2.5.1=py3.10_cuda12.1_cudnn9.1.0_0
+  - torchvision=0.20.1=py310_cu121
+  - torchaudio=2.5.1=py310_cu121
+  - pytorch-cuda=12.1
   - numpy=1.26
   - pip:
       - pydantic==2.11.2
