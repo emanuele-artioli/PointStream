@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -10,15 +11,23 @@ from src.encoder.video_io import iter_video_frames_ffmpeg, probe_video_metadata
 from src.shared.schemas import (
     ActorPacket,
     BallPacket,
+    FrameState,
     InterpolateCommandEvent,
     KeyframeEvent,
     ObjectClass,
     RigidObjectPacket,
+    SceneActor,
     SemanticEvent,
     TensorSpec,
     VideoChunk,
 )
 from src.shared.tags import gpu_bound
+
+
+@dataclass(frozen=True)
+class ActorExtractionResult:
+    frame_states: list[FrameState]
+    actor_packets: list[ActorPacket]
 
 
 class ActorExtractor:
@@ -50,6 +59,10 @@ class ActorExtractor:
 
     @gpu_bound
     def process(self, chunk: VideoChunk) -> list[ActorPacket]:
+        return self.process_with_states(chunk).actor_packets
+
+    @gpu_bound
+    def process_with_states(self, chunk: VideoChunk) -> ActorExtractionResult:
         frames_bgr = self._load_frames(chunk)
         frame_states, packets = self._pipeline.run(chunk=chunk, frames_bgr=frames_bgr)
         if self._render_debug_keyframes:
@@ -60,7 +73,7 @@ class ActorExtractor:
                 actor_packets=packets,
                 out_dir=Path(__file__).resolve().parents[2] / "assets" / "debug_actors",
             )
-        return packets
+        return ActorExtractionResult(frame_states=frame_states, actor_packets=packets)
 
     def _load_frames(self, chunk: VideoChunk) -> list[np.ndarray]:
         source = Path(chunk.source_uri)
@@ -86,6 +99,10 @@ class ActorExtractor:
 class MockActorExtractor:
     @gpu_bound
     def process(self, chunk: VideoChunk) -> list[ActorPacket]:
+        return self.process_with_states(chunk).actor_packets
+
+    @gpu_bound
+    def process_with_states(self, chunk: VideoChunk) -> ActorExtractionResult:
         batch = 1
 
         appearance = torch.zeros(batch, 2, 256, dtype=torch.float32)
@@ -130,7 +147,7 @@ class MockActorExtractor:
             ),
         ]
 
-        return [
+        packets = [
             ActorPacket(
                 chunk_id=chunk.chunk_id,
                 object_id="person_0",
@@ -162,6 +179,74 @@ class MockActorExtractor:
                 events=events_b,
             ),
         ]
+        frame_states = self._build_frame_states(chunk)
+        return ActorExtractionResult(frame_states=frame_states, actor_packets=packets)
+
+    def _build_frame_states(self, chunk: VideoChunk) -> list[FrameState]:
+        frame_states: list[FrameState] = []
+        width = int(chunk.width)
+        height = int(chunk.height)
+
+        for frame_idx in range(int(chunk.num_frames)):
+            shift = float((frame_idx * 7) % max(1, width // 3))
+
+            p0_bbox = [
+                40.0 + shift,
+                80.0,
+                min(width - 1.0, 120.0 + shift),
+                min(height - 1.0, 260.0),
+            ]
+            p1_bbox = [
+                max(0.0, width - 160.0 - shift),
+                90.0,
+                max(1.0, width - 80.0 - shift),
+                min(height - 1.0, 280.0),
+            ]
+            r0_bbox = [
+                min(width - 2.0, p0_bbox[2] - 12.0),
+                min(height - 2.0, p0_bbox[1] + 48.0),
+                min(width - 1.0, p0_bbox[2] + 20.0),
+                min(height - 1.0, p0_bbox[1] + 96.0),
+            ]
+            r1_bbox = [
+                max(0.0, p1_bbox[0] - 24.0),
+                min(height - 2.0, p1_bbox[1] + 56.0),
+                max(1.0, p1_bbox[0] + 8.0),
+                min(height - 1.0, p1_bbox[1] + 102.0),
+            ]
+
+            actors = [
+                SceneActor(
+                    track_id="person_0",
+                    class_name="player",
+                    bbox=p0_bbox,
+                    mask=self._solid_mask(mask_h=48, mask_w=28),
+                ),
+                SceneActor(
+                    track_id="person_1",
+                    class_name="player",
+                    bbox=p1_bbox,
+                    mask=self._solid_mask(mask_h=52, mask_w=28),
+                ),
+                SceneActor(
+                    track_id="racket_0",
+                    class_name="racket",
+                    bbox=r0_bbox,
+                    mask=self._solid_mask(mask_h=20, mask_w=10),
+                ),
+                SceneActor(
+                    track_id="racket_1",
+                    class_name="racket",
+                    bbox=r1_bbox,
+                    mask=self._solid_mask(mask_h=20, mask_w=10),
+                ),
+            ]
+            frame_states.append(FrameState(frame_id=frame_idx, actors=actors))
+
+        return frame_states
+
+    def _solid_mask(self, mask_h: int, mask_w: int) -> list[list[int]]:
+        return np.ones((mask_h, mask_w), dtype=np.uint8).tolist()
 
 
 class ObjectTracker:

@@ -9,22 +9,23 @@ from src.encoder.background_modeler import BackgroundModeler
 from src.encoder.dag import DAGNode, DAGOrchestrator
 from src.encoder.execution_pool import BaseExecutionPool
 from src.encoder.mock_extractors import (
+    ActorExtractionResult,
     ActorExtractor,
     BallTracker,
     ObjectTracker,
 )
-from src.encoder.residual import ResidualCalculator
+from src.encoder.residual_calculator import ResidualCalculator
 from src.encoder.video_io import decode_video_to_tensor, probe_video_metadata
-from src.shared.schemas import EncodedChunkPayload, ResidualPacket, VideoChunk
+from src.shared.schemas import EncodedChunkPayload, FrameState, ResidualPacket, VideoChunk
 from src.shared.synthesis_engine import SynthesisEngine
-from src.shared.tags import cpu_bound
+from src.shared.tags import cpu_bound, gpu_bound
 
 
 class EncoderPipeline:
     def __init__(
         self,
         execution_pool: BaseExecutionPool | None = None,
-        actor_extractor: ActorExtractor | None = None,
+        actor_extractor: Any | None = None,
     ) -> None:
         self._dag = DAGOrchestrator(execution_pool=execution_pool)
         self._background_modeler = BackgroundModeler()
@@ -71,11 +72,38 @@ class EncoderPipeline:
                 dependencies=("chunk",),
             )
         )
+        actor_bundle_func = self._make_chunk_node(self._process_actor_bundle)
+        self._dag.add_node(
+            DAGNode(
+                name="actor_bundle",
+                func=actor_bundle_func,
+                dependencies=("chunk",),
+            )
+        )
+
+        def select_actor_packets(context, deps):
+            return deps["actor_bundle"].actor_packets
+
+        setattr(select_actor_packets, "_execution_tag", getattr(actor_bundle_func, "_execution_tag", "gpu"))
+
         self._dag.add_node(
             DAGNode(
                 name="actors",
-                func=self._make_chunk_node(self._actor_extractor.process),
-                dependencies=("chunk",),
+                func=select_actor_packets,
+                dependencies=("actor_bundle",),
+            )
+        )
+
+        def select_frame_states(context, deps):
+            return deps["actor_bundle"].frame_states
+
+        setattr(select_frame_states, "_execution_tag", getattr(actor_bundle_func, "_execution_tag", "gpu"))
+
+        self._dag.add_node(
+            DAGNode(
+                name="frame_states",
+                func=select_frame_states,
+                dependencies=("actor_bundle",),
             )
         )
         self._dag.add_node(
@@ -106,7 +134,11 @@ class EncoderPipeline:
                 ball=deps["ball"],
                 residual=placeholder_residual,
             )
-            return self._residual_calculator.process(payload)
+            return self._residual_calculator.process(
+                chunk=deps["chunk"],
+                payload=payload,
+                frame_states=deps["frame_states"],
+            )
 
         setattr(
             build_residual_node,
@@ -117,9 +149,16 @@ class EncoderPipeline:
             DAGNode(
                 name="residual",
                 func=build_residual_node,
-                dependencies=("chunk", "panorama", "actors", "rigid_objects", "ball"),
+                dependencies=("chunk", "panorama", "actors", "rigid_objects", "ball", "frame_states"),
             )
         )
+
+    @gpu_bound
+    def _process_actor_bundle(self, chunk: VideoChunk) -> ActorExtractionResult:
+        if hasattr(self._actor_extractor, "process_with_states"):
+            return self._actor_extractor.process_with_states(chunk)
+        actor_packets = self._actor_extractor.process(chunk)
+        return ActorExtractionResult(frame_states=[], actor_packets=actor_packets)
 
     def encode_chunk(self, chunk: VideoChunk) -> EncodedChunkPayload:
         context = self._dag.run(initial_context={"chunk": chunk})
@@ -166,6 +205,41 @@ class EncoderPipeline:
         if max_frames is not None:
             decoded_tensor = decoded_tensor[:max_frames]
         return payload, decoded_tensor
+
+    def encode_video_file_with_states(
+        self,
+        video_path: str | Path,
+        chunk_id: str,
+        start_frame_id: int = 0,
+        max_frames: int | None = None,
+    ) -> tuple[EncodedChunkPayload, torch.Tensor, list[FrameState]]:
+        metadata = probe_video_metadata(video_path)
+        effective_num_frames = metadata.num_frames if max_frames is None else min(metadata.num_frames, max_frames)
+
+        chunk = VideoChunk(
+            chunk_id=chunk_id,
+            source_uri=str(video_path),
+            start_frame_id=start_frame_id,
+            fps=metadata.fps,
+            num_frames=effective_num_frames,
+            width=metadata.width,
+            height=metadata.height,
+        )
+
+        context = self._dag.run(initial_context={"chunk": chunk})
+        payload = EncodedChunkPayload(
+            chunk=context["chunk"],
+            panorama=context["panorama"],
+            actors=context["actors"],
+            rigid_objects=context["rigid_objects"],
+            ball=context["ball"],
+            residual=context["residual"],
+        )
+        decoded_video = decode_video_to_tensor(video_path)
+        decoded_tensor = decoded_video.tensor
+        if max_frames is not None:
+            decoded_tensor = decoded_tensor[:max_frames]
+        return payload, decoded_tensor, context["frame_states"]
 
     def shutdown(self) -> None:
         self._dag.shutdown()

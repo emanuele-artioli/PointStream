@@ -250,4 +250,4 @@ class SynthesisEngine:
             frame_tensor = torch.from_numpy(frame_np).permute(2, 0, 1).contiguous().to(torch.uint8)
             out_frames.append(frame_tensor)
 
-        return torch.stack(out_frames, dim=0)
+        return torch.stack(out_frames, dim=0).to(self.device)

@@ -26,6 +26,12 @@ def _clean_generated_assets() -> None:
     for pano_file in assets_dir.glob("debug_panorama*.jpg"):
         pano_file.unlink(missing_ok=True)
 
+    residual_debug = assets_dir / "debug_residual.mp4"
+    residual_debug.unlink(missing_ok=True)
+
+    final_debug = assets_dir / "debug_final_reconstruction.mp4"
+    final_debug.unlink(missing_ok=True)
+
     test_chunks_dir = assets_dir / "test_chunks"
     if test_chunks_dir.exists():
         for mp4_file in test_chunks_dir.glob("*.mp4"):

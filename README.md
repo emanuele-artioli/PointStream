@@ -58,7 +58,7 @@ pointstream/
       execution_pool.py
       mock_extractors.py
       orchestrator.py
-      residual.py
+      residual_calculator.py
     decoder/
       mock_renderer.py
     transport/
@@ -273,6 +273,8 @@ docker run --gpus all --rm ghcr.io/<owner>/<repo>/pointstream-gpu:<tag>
 - `SynthesisEngine` (`src/shared/synthesis_engine.py`) now performs deterministic decode synthesis from payload metadata with strict seeding (`torch.manual_seed`, CUDA seed sync, deterministic algorithms enabled).
 - Decoder-side panorama re-warping is GPU-native through `kornia.geometry.transform.warp_perspective` (inverse homography per frame), and mock actor compositing draws dense DWPose skeletons over reconstructed backgrounds.
 - `tests/test_decoder.py` writes `assets/mock_reconstruction.mp4` so reconstruction smoothness and interpolation quality can be visually inspected without loading any heavy GenAI model.
+- `ResidualCalculator` (`src/encoder/residual_calculator.py`) computes weighted server residuals using a pluggable saliency strategy (`BaseImportanceMapper`).
+- Baseline saliency strategy is `BinaryActorImportanceMapper`, which converts player/racket segmentation masks from per-frame `FrameState` into continuous `[H, W]` importance tensors in `[0.0, 1.0]`.
 - YOLO actor components load weights from local files first (`assets/weights/` or explicit path); implicit online weight download is disabled by default.
 - Set `POINTSTREAM_ALLOW_AUTO_MODEL_DOWNLOAD=1` only if you intentionally want Ultralytics to fetch missing weights.
 - Fail-fast policy: model initialization failures, missing source videos, and inference/runtime errors in detector/pose stages now raise explicit exceptions instead of silently injecting synthetic tracks/poses/black frames.
