@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import shutil
 
 import msgpack
 
@@ -25,11 +26,26 @@ class DiskTransport(BaseTransport):
         metadata_path = chunk_dir / "metadata.msgpack"
         residual_path = chunk_dir / "residual.mp4"
 
-        metadata_bytes = msgpack.packb(payload.model_dump(mode="json"), use_bin_type=True)
-        metadata_path.write_bytes(metadata_bytes)
+        source_residual = Path(payload.residual.residual_video_uri)
+        if not source_residual.exists() or not source_residual.is_file():
+            raise FileNotFoundError(
+                f"Residual stream not found for chunk '{payload.chunk.chunk_id}': {source_residual}"
+            )
+        if source_residual.resolve() != residual_path.resolve():
+            shutil.copy2(source_residual, residual_path)
 
-        # Placeholder stream bytes for mock-first transport contract.
-        residual_path.write_bytes(b"POINTSTREAM_MOCK_RESIDUAL")
+        payload_for_disk = payload.model_copy(
+            update={
+                "residual": payload.residual.model_copy(
+                    update={
+                        "residual_video_uri": str(residual_path),
+                    }
+                )
+            }
+        )
+
+        metadata_bytes = msgpack.packb(payload_for_disk.model_dump(mode="json"), use_bin_type=True)
+        metadata_path.write_bytes(metadata_bytes)
 
     @cpu_bound
     def receive(self, chunk_id: str) -> EncodedChunkPayload:

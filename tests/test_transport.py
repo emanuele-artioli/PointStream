@@ -35,7 +35,10 @@ def test_roundtrip_payload(mock_encoder_pipeline) -> None:
 
         chunk_dir = Path(tmp_dir) / "chunk_rt001"
         assert (chunk_dir / "metadata.msgpack").exists()
-        assert (chunk_dir / "residual.mp4").exists()
+        residual_path = chunk_dir / "residual.mp4"
+        assert residual_path.exists()
+        assert residual_path.stat().st_size > 0
+        assert recovered.residual.residual_video_uri == str(residual_path)
 
 
 def test_receive_missing_payload_raises() -> None:

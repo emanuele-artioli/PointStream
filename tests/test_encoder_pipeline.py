@@ -28,7 +28,7 @@ def test_encode_chunk_contract_and_events(mock_encoder_pipeline) -> None:
     assert len(payload.actors) == 2
     assert len(payload.rigid_objects) == 1
     assert payload.ball.object_id == "ball_0"
-    assert payload.residual.codec == "hevc-placeholder"
+    assert payload.residual.codec == "libx265"
 
     for actor in payload.actors:
         assert actor.events
