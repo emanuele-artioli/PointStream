@@ -140,7 +140,7 @@ The run writes a local payload bundle under:
 
 with:
 - `metadata.msgpack` for semantic metadata/events
-- `residual.mp4` placeholder bytes for residual stream handoff
+- `residual.mp4` encoded signed residual stream (H.265 / `libx265`)
 
 ## Run Unit Tests
 
@@ -280,6 +280,9 @@ docker run --gpus all --rm ghcr.io/<owner>/<repo>/pointstream-gpu:<tag>
 - Residual stream encoding uses FFmpeg H.265 (`libx265`, `-crf 28`) for the transport payload.
 - Client compositing decodes residual, shifts by `-128`, then applies `final = clamp(predicted + decoded_diff, 0, 255)` in `src/decoder/compositor.py`.
 - `tests/test_residual.py` writes `assets/test_runs/<timestamp>/debug_residual.mp4` and `assets/test_runs/<timestamp>/debug_final_reconstruction.mp4` from a 10-frame real clip for offline verification of signed residuals and end-to-end reconstruction fidelity.
+- `BallExtractor` (`src/encoder/ball_extractor.py`) computes per-frame parametric tennis-ball states (`x, y, vx, vy, visible`) by GPU-native panorama re-warp subtraction, actor-mask suppression, and largest-blob tracking.
+- `SynthesisEngine` (`src/shared/synthesis_engine.py`) now reconstructs ball motion from parametric payloads and draws a velocity-aware motion-blurred ball trail during deterministic client synthesis.
+- `tests/test_ball_tracking.py` validates both extractor-side ball trajectory recovery and full encode -> transport -> decode reconstruction with ball visibility in `debug_final_reconstruction_ball.mp4`.
 - YOLO actor components load weights from local files first (`assets/weights/` or explicit path); implicit online weight download is disabled by default.
 - Set `POINTSTREAM_ALLOW_AUTO_MODEL_DOWNLOAD=1` only if you intentionally want Ultralytics to fetch missing weights.
 - Fail-fast policy: model initialization failures, missing source videos, and inference/runtime errors in detector/pose stages now raise explicit exceptions instead of silently injecting synthetic tracks/poses/black frames.

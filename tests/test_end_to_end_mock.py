@@ -60,6 +60,7 @@ def test_end_to_end_mp4_encode_transport_decode(mock_encoder_pipeline, test_run_
     assert len(recovered_payload.actors) == 2
     assert len(recovered_payload.rigid_objects) == 1
     assert recovered_payload.ball.object_id == "ball_0"
+    assert len(recovered_payload.ball.states) == 30
 
     assert decoded_result.chunk_id == chunk_id
     assert decoded_result.num_frames == 30

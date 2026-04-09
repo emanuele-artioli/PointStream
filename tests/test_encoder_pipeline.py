@@ -27,6 +27,7 @@ def test_encode_chunk_contract_and_events(mock_encoder_pipeline, test_run_artifa
     assert len(payload.actors) == 2
     assert len(payload.rigid_objects) == 1
     assert payload.ball.object_id == "ball_0"
+    assert len(payload.ball.states) == 12
     assert payload.residual.codec == "libx265"
 
     for actor in payload.actors:

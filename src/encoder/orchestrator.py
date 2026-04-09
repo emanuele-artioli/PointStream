@@ -6,12 +6,12 @@ from typing import Any
 import torch
 
 from src.encoder.background_modeler import BackgroundModeler
+from src.encoder.ball_extractor import BallExtractor
 from src.encoder.dag import DAGNode, DAGOrchestrator
 from src.encoder.execution_pool import BaseExecutionPool
 from src.encoder.mock_extractors import (
     ActorExtractionResult,
     ActorExtractor,
-    BallTracker,
     ObjectTracker,
 )
 from src.encoder.residual_calculator import ResidualCalculator
@@ -26,12 +26,13 @@ class EncoderPipeline:
         self,
         execution_pool: BaseExecutionPool | None = None,
         actor_extractor: Any | None = None,
+        ball_extractor: Any | None = None,
     ) -> None:
         self._dag = DAGOrchestrator(execution_pool=execution_pool)
         self._background_modeler = BackgroundModeler()
         self._actor_extractor = actor_extractor or ActorExtractor()
         self._object_tracker = ObjectTracker()
-        self._ball_tracker = BallTracker()
+        self._ball_extractor = ball_extractor or BallExtractor()
         self._residual_calculator = ResidualCalculator(SynthesisEngine())
         self._register_nodes()
 
@@ -113,11 +114,23 @@ class EncoderPipeline:
                 dependencies=("chunk",),
             )
         )
+        def build_ball_node(context, deps):
+            return self._ball_extractor.process(
+                chunk=deps["chunk"],
+                panorama=deps["panorama"],
+                frame_states=deps["frame_states"],
+            )
+
+        setattr(
+            build_ball_node,
+            "_execution_tag",
+            getattr(self._ball_extractor.process, "_execution_tag", "gpu"),
+        )
         self._dag.add_node(
             DAGNode(
                 name="ball",
-                func=self._make_chunk_node(self._ball_tracker.process),
-                dependencies=("chunk",),
+                func=build_ball_node,
+                dependencies=("chunk", "panorama", "frame_states"),
             )
         )
         def build_residual_node(context, deps):

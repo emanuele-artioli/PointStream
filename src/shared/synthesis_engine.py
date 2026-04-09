@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import os
 
+import cv2
 import numpy as np
 import torch
 
@@ -17,6 +18,15 @@ class SynthesisResult:
 
     # Shape: [Frames, Channels, Height, Width] in BGR uint8.
     frames_bgr: torch.Tensor
+
+
+@dataclass(frozen=True)
+class _BallRenderState:
+    x: float
+    y: float
+    vx: float
+    vy: float
+    is_visible: bool
 
 
 class SynthesisEngine:
@@ -40,8 +50,13 @@ class SynthesisEngine:
         self._set_global_seed(self.seed)
 
         dense_pose_stream = self._unroll_sparse_actor_poses(payload)
+        dense_ball_states = self._unroll_ball_states(payload=payload)
         background_frames = self._reconstruct_background_frames(payload)
-        composited_frames = self._composite_mock_skeletons(background_frames, dense_pose_stream)
+        composited_frames = self._composite_mock_skeletons(
+            background_frames,
+            dense_pose_stream,
+            dense_ball_states,
+        )
         return SynthesisResult(frames_bgr=composited_frames)
 
     def _set_global_seed(self, seed: int) -> None:
@@ -220,6 +235,7 @@ class SynthesisEngine:
         self,
         background_frames: torch.Tensor,
         dense_pose_stream: dict[str, torch.Tensor],
+        dense_ball_states: list[_BallRenderState],
     ) -> torch.Tensor:
         frame_count = int(background_frames.shape[0])
         out_frames: list[torch.Tensor] = []
@@ -247,7 +263,143 @@ class SynthesisEngine:
                 except ModuleNotFoundError:
                     pass
 
+            if frame_idx < len(dense_ball_states):
+                self._draw_motion_blurred_ball(frame_np=frame_np, state=dense_ball_states[frame_idx])
+
             frame_tensor = torch.from_numpy(frame_np).permute(2, 0, 1).contiguous().to(torch.uint8)
             out_frames.append(frame_tensor)
 
         return torch.stack(out_frames, dim=0).to(self.device)
+
+    def _unroll_ball_states(self, payload: EncodedChunkPayload) -> list[_BallRenderState]:
+        frame_count = int(payload.chunk.num_frames)
+        start_frame_id = int(payload.chunk.start_frame_id)
+        dense_states: list[_BallRenderState] = [
+            _BallRenderState(x=0.0, y=0.0, vx=0.0, vy=0.0, is_visible=False)
+            for _ in range(frame_count)
+        ]
+
+        if payload.ball.states:
+            for state in payload.ball.states:
+                local_idx = int(state.frame_id) - start_frame_id
+                if local_idx < 0 or local_idx >= frame_count:
+                    continue
+                dense_states[local_idx] = _BallRenderState(
+                    x=float(state.ball_x),
+                    y=float(state.ball_y),
+                    vx=float(state.velocity_x),
+                    vy=float(state.velocity_y),
+                    is_visible=bool(state.is_visible),
+                )
+
+            for idx in range(1, frame_count):
+                current = dense_states[idx]
+                if current.is_visible:
+                    continue
+                previous = dense_states[idx - 1]
+                if previous.is_visible:
+                    dense_states[idx] = _BallRenderState(
+                        x=previous.x,
+                        y=previous.y,
+                        vx=0.0,
+                        vy=0.0,
+                        is_visible=False,
+                    )
+            return dense_states
+
+        keyframes: dict[int, _BallRenderState] = {}
+        for event in payload.ball.events:
+            if event.event_type != "keyframe":
+                continue
+            local_idx = int(event.frame_id) - start_frame_id
+            if local_idx < 0 or local_idx >= frame_count:
+                continue
+            coords = event.coordinates
+            if len(coords) < 2:
+                continue
+            keyframes[local_idx] = _BallRenderState(
+                x=float(coords[0]),
+                y=float(coords[1]),
+                vx=float(coords[2]) if len(coords) > 2 else 0.0,
+                vy=float(coords[3]) if len(coords) > 3 else 0.0,
+                is_visible=True,
+            )
+
+        if not keyframes:
+            return dense_states
+
+        sorted_indices = sorted(keyframes.keys())
+        for local_idx, state in keyframes.items():
+            dense_states[local_idx] = state
+
+        first_idx = sorted_indices[0]
+        for idx in range(0, first_idx):
+            dense_states[idx] = dense_states[first_idx]
+
+        for left, right in zip(sorted_indices[:-1], sorted_indices[1:]):
+            left_state = dense_states[left]
+            right_state = dense_states[right]
+            span = right - left
+            if span <= 1:
+                continue
+            for idx in range(left + 1, right):
+                alpha = float(idx - left) / float(span)
+                dense_states[idx] = _BallRenderState(
+                    x=left_state.x * (1.0 - alpha) + right_state.x * alpha,
+                    y=left_state.y * (1.0 - alpha) + right_state.y * alpha,
+                    vx=left_state.vx * (1.0 - alpha) + right_state.vx * alpha,
+                    vy=left_state.vy * (1.0 - alpha) + right_state.vy * alpha,
+                    is_visible=True,
+                )
+
+        last_idx = sorted_indices[-1]
+        for idx in range(last_idx + 1, frame_count):
+            dense_states[idx] = dense_states[last_idx]
+
+        return dense_states
+
+    def _draw_motion_blurred_ball(self, frame_np: np.ndarray, state: _BallRenderState) -> None:
+        if not state.is_visible:
+            return
+
+        frame_h, frame_w = frame_np.shape[:2]
+        uses_normalized_coordinates = 0.0 <= state.x <= 1.2 and 0.0 <= state.y <= 1.2
+
+        if uses_normalized_coordinates:
+            center_x = state.x * float(frame_w - 1)
+            center_y = state.y * float(frame_h - 1)
+            velocity_x = state.vx * float(frame_w - 1)
+            velocity_y = state.vy * float(frame_h - 1)
+        else:
+            center_x = state.x
+            center_y = state.y
+            velocity_x = state.vx
+            velocity_y = state.vy
+
+        speed = float(np.hypot(velocity_x, velocity_y))
+        trail_scale = max(1.0, min(4.0, speed / 3.5))
+
+        head_x = int(np.clip(round(center_x), 0, frame_w - 1))
+        head_y = int(np.clip(round(center_y), 0, frame_h - 1))
+        tail_x = int(np.clip(round(center_x - velocity_x * trail_scale), 0, frame_w - 1))
+        tail_y = int(np.clip(round(center_y - velocity_y * trail_scale), 0, frame_h - 1))
+
+        overlay = frame_np.copy()
+        cv2.line(
+            overlay,
+            (tail_x, tail_y),
+            (head_x, head_y),
+            color=(70, 220, 255),
+            thickness=2,
+            lineType=cv2.LINE_AA,
+        )
+        radius = max(2, min(5, int(round(2.0 + speed * 0.12))))
+        cv2.circle(
+            overlay,
+            (head_x, head_y),
+            radius=radius,
+            color=(90, 255, 255),
+            thickness=-1,
+            lineType=cv2.LINE_AA,
+        )
+        cv2.addWeighted(overlay, 0.78, frame_np, 0.22, 0.0, dst=frame_np)

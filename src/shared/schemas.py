@@ -39,9 +39,19 @@ class SceneActor(BaseModel):
     pose_dw: list[list[float]] | None = None
 
 
+class BallState(BaseModel):
+    frame_id: int = Field(ge=0)
+    ball_x: float
+    ball_y: float
+    velocity_x: float
+    velocity_y: float
+    is_visible: bool
+
+
 class FrameState(BaseModel):
     frame_id: int = Field(ge=0)
     actors: list[SceneActor] = Field(default_factory=list)
+    ball_state: BallState | None = None
 
 
 class ObjectState(BaseModel):
@@ -113,6 +123,7 @@ class BallPacket(BaseModel):
     object_id: str = "ball_0"
     trajectory_spec: TensorSpec
     events: list[SemanticEvent]
+    states: list[BallState] = Field(default_factory=list)
 
 
 class ResidualPacket(BaseModel):
