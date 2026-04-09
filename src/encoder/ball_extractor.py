@@ -13,6 +13,7 @@ from src.shared.schemas import (
     KeyframeEvent,
     ObjectClass,
     PanoramaPacket,
+    SemanticEvent,
     TensorSpec,
     VideoChunk,
 )
@@ -94,7 +95,7 @@ class BallExtractor:
                 frame_states[frame_idx] = frame_states[frame_idx].model_copy(update={"ball_state": state})
 
         trajectory = torch.zeros((1, frame_count, 4), dtype=torch.float32)
-        events = []
+        events: list[SemanticEvent] = []
         for idx, state in enumerate(ball_states):
             trajectory[0, idx] = torch.tensor(
                 [state.ball_x, state.ball_y, state.velocity_x, state.velocity_y],

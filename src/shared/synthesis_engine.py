@@ -280,16 +280,16 @@ class SynthesisEngine:
         ]
 
         if payload.ball.states:
-            for state in payload.ball.states:
-                local_idx = int(state.frame_id) - start_frame_id
+            for ball_state in payload.ball.states:
+                local_idx = int(ball_state.frame_id) - start_frame_id
                 if local_idx < 0 or local_idx >= frame_count:
                     continue
                 dense_states[local_idx] = _BallRenderState(
-                    x=float(state.ball_x),
-                    y=float(state.ball_y),
-                    vx=float(state.velocity_x),
-                    vy=float(state.velocity_y),
-                    is_visible=bool(state.is_visible),
+                    x=float(ball_state.ball_x),
+                    y=float(ball_state.ball_y),
+                    vx=float(ball_state.velocity_x),
+                    vy=float(ball_state.velocity_y),
+                    is_visible=bool(ball_state.is_visible),
                 )
 
             for idx in range(1, frame_count):
@@ -329,8 +329,8 @@ class SynthesisEngine:
             return dense_states
 
         sorted_indices = sorted(keyframes.keys())
-        for local_idx, state in keyframes.items():
-            dense_states[local_idx] = state
+        for local_idx, render_state in keyframes.items():
+            dense_states[local_idx] = render_state
 
         first_idx = sorted_indices[0]
         for idx in range(0, first_idx):
