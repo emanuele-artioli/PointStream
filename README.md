@@ -289,6 +289,13 @@ docker run --gpus all --rm ghcr.io/<owner>/<repo>/pointstream-gpu:<tag>
 - `DecoderRenderer` (`src/decoder/mock_renderer.py`) decodes actor reference JPEGs into an internal actor-state cache and passes them into `GenAICompositor`.
 - `GenAICompositor` (`src/decoder/genai_compositor.py`) is the V2 interface stub for Animate Anyone integration; current mock behavior draws a filled actor box and pastes the reference crop to prove server -> transport -> client conditioning works.
 - `tests/test_genai_baseline.py` validates extraction, transport serialization/deserialization, and reconstruction output with reference-conditioned mock compositing (`debug_final_reconstruction.mp4`).
+- Heavy GenAI inference is feature-gated by `POINTSTREAM_ENABLE_GENAI`:
+  - `0` or unset: `SynthesisEngine` exposes a lightweight `MockCompositor` (fast CI-safe default).
+  - `1`: `SynthesisEngine` exposes `DiffusersCompositor`.
+- GenAI backend strategy is selected with `POINTSTREAM_GENAI_BACKEND`:
+  - `controlnet` (default when enabled): `BaselineControlNetStrategy` (`StableDiffusionControlNetImg2ImgPipeline`, OpenPose control).
+  - `animate-anyone`: `AnimateAnyoneStrategy` (local repo wrapper, requires `POINTSTREAM_ANIMATE_ANYONE_REPO_DIR`).
+- `tests/test_genai_node.py` is fully skipped unless `POINTSTREAM_ENABLE_GENAI=1`; when enabled it runs a 2-frame compositor smoke test and writes `assets/debug_genai_composite.mp4`.
 - YOLO actor components load weights from local files first (`assets/weights/` or explicit path); implicit online weight download is disabled by default.
 - Set `POINTSTREAM_ALLOW_AUTO_MODEL_DOWNLOAD=1` only if you intentionally want Ultralytics to fetch missing weights.
 - Fail-fast policy: model initialization failures, missing source videos, and inference/runtime errors in detector/pose stages now raise explicit exceptions instead of silently injecting synthetic tracks/poses/black frames.

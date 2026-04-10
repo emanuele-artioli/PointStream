@@ -8,7 +8,6 @@ import numpy as np
 import torch
 
 from src.decoder.compositor import ResidualCompositor
-from src.decoder.genai_compositor import GenAICompositor
 from src.encoder.video_io import encode_video_frames_ffmpeg
 from src.shared.schemas import DecodedChunkResult, EncodedChunkPayload
 from src.shared.synthesis_engine import SynthesisEngine
@@ -31,7 +30,7 @@ class DecoderRenderer:
         self._output_root.mkdir(parents=True, exist_ok=True)
         self._synthesis_engine = SynthesisEngine(seed=deterministic_seed)
         self._compositor = ResidualCompositor(device=self._synthesis_engine.device)
-        self._genai_compositor = GenAICompositor()
+        self._genai_compositor = self._synthesis_engine.get_genai_compositor()
         self._actor_state: dict[int, _ClientActorState] = {}
 
     @gpu_bound

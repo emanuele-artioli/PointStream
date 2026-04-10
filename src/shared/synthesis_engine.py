@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 import torch
 
+from src.decoder.genai_compositor import DiffusersCompositor, MockCompositor
 from src.shared.dwpose_draw import draw_dwpose_canvas
 from src.shared.schemas import ActorPacket, EncodedChunkPayload
 from src.shared.tags import gpu_bound
@@ -40,6 +41,16 @@ class SynthesisEngine:
         else:
             self.device = torch.device(device)
         self._set_global_seed(self.seed)
+        self._genai_compositor = self._build_genai_compositor()
+
+    def _build_genai_compositor(self) -> MockCompositor | DiffusersCompositor:
+        enabled = os.environ.get("POINTSTREAM_ENABLE_GENAI", "0").strip() == "1"
+        if enabled:
+            return DiffusersCompositor(seed=self.seed, device=self.device)
+        return MockCompositor()
+
+    def get_genai_compositor(self) -> MockCompositor | DiffusersCompositor:
+        return self._genai_compositor
 
     def _configure_cuda_determinism_env(self) -> None:
         # CuBLAS requires this variable for reproducible GEMM-based kernels on CUDA >= 10.2.
