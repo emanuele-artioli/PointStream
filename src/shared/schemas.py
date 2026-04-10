@@ -39,6 +39,11 @@ class SceneActor(BaseModel):
     pose_dw: list[list[float]] | None = None
 
 
+class SceneActorReference(BaseModel):
+    track_id: int
+    reference_crop_jpeg: bytes
+
+
 class BallState(BaseModel):
     frame_id: int = Field(ge=0)
     ball_x: float
@@ -136,6 +141,7 @@ class EncodedChunkPayload(BaseModel):
     chunk: VideoChunk
     panorama: PanoramaPacket
     actors: list[ActorPacket]
+    actor_references: list[SceneActorReference] = Field(default_factory=list)
     rigid_objects: list[RigidObjectPacket]
     ball: BallPacket
     residual: ResidualPacket

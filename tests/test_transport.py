@@ -31,6 +31,7 @@ def test_roundtrip_payload(mock_encoder_pipeline, test_run_artifacts_dir: Path) 
 
         assert recovered.chunk.chunk_id == "rt001"
         assert len(recovered.actors) == 2
+        assert len(recovered.actor_references) == 2
 
         chunk_dir = Path(tmp_dir) / "chunk_rt001"
         assert (chunk_dir / "metadata.msgpack").exists()

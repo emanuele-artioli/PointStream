@@ -58,6 +58,7 @@ def test_end_to_end_mp4_encode_transport_decode(mock_encoder_pipeline, test_run_
     assert recovered_payload.chunk.width == 96
     assert recovered_payload.chunk.height == 64
     assert len(recovered_payload.actors) == 2
+    assert len(recovered_payload.actor_references) == 2
     assert len(recovered_payload.rigid_objects) == 1
     assert recovered_payload.ball.object_id == "ball_0"
     assert len(recovered_payload.ball.states) == 30

@@ -44,7 +44,7 @@ class DiskTransport(BaseTransport):
             }
         )
 
-        metadata_bytes = msgpack.packb(payload_for_disk.model_dump(mode="json"), use_bin_type=True)
+        metadata_bytes = msgpack.packb(payload_for_disk.model_dump(mode="python"), use_bin_type=True)
         metadata_path.write_bytes(metadata_bytes)
 
     @cpu_bound

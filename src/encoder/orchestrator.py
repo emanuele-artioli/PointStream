@@ -14,6 +14,7 @@ from src.encoder.mock_extractors import (
     ActorExtractor,
     ObjectTracker,
 )
+from src.encoder.reference_extractor import ReferenceExtractor
 from src.encoder.residual_calculator import ResidualCalculator
 from src.encoder.video_io import decode_video_to_tensor, probe_video_metadata
 from src.shared.schemas import EncodedChunkPayload, FrameState, ResidualPacket, VideoChunk
@@ -27,12 +28,14 @@ class EncoderPipeline:
         execution_pool: BaseExecutionPool | None = None,
         actor_extractor: Any | None = None,
         ball_extractor: Any | None = None,
+        reference_extractor: Any | None = None,
     ) -> None:
         self._dag = DAGOrchestrator(execution_pool=execution_pool)
         self._background_modeler = BackgroundModeler()
         self._actor_extractor = actor_extractor or ActorExtractor()
         self._object_tracker = ObjectTracker()
         self._ball_extractor = ball_extractor or BallExtractor()
+        self._reference_extractor = reference_extractor or ReferenceExtractor()
         self._residual_calculator = ResidualCalculator(SynthesisEngine())
         self._register_nodes()
 
@@ -107,6 +110,24 @@ class EncoderPipeline:
                 dependencies=("actor_bundle",),
             )
         )
+        def build_actor_references_node(context, deps):
+            return self._reference_extractor.process(
+                chunk=deps["chunk"],
+                frame_states=deps["frame_states"],
+            )
+
+        setattr(
+            build_actor_references_node,
+            "_execution_tag",
+            getattr(self._reference_extractor.process, "_execution_tag", "cpu"),
+        )
+        self._dag.add_node(
+            DAGNode(
+                name="actor_references",
+                func=build_actor_references_node,
+                dependencies=("chunk", "frame_states"),
+            )
+        )
         self._dag.add_node(
             DAGNode(
                 name="rigid_objects",
@@ -143,6 +164,7 @@ class EncoderPipeline:
                 chunk=deps["chunk"],
                 panorama=deps["panorama"],
                 actors=deps["actors"],
+                actor_references=deps["actor_references"],
                 rigid_objects=deps["rigid_objects"],
                 ball=deps["ball"],
                 residual=placeholder_residual,
@@ -162,7 +184,7 @@ class EncoderPipeline:
             DAGNode(
                 name="residual",
                 func=build_residual_node,
-                dependencies=("chunk", "panorama", "actors", "rigid_objects", "ball", "frame_states"),
+                dependencies=("chunk", "panorama", "actors", "actor_references", "rigid_objects", "ball", "frame_states"),
             )
         )
 
@@ -179,6 +201,7 @@ class EncoderPipeline:
             chunk=context["chunk"],
             panorama=context["panorama"],
             actors=context["actors"],
+            actor_references=context["actor_references"],
             rigid_objects=context["rigid_objects"],
             ball=context["ball"],
             residual=context["residual"],
@@ -209,6 +232,7 @@ class EncoderPipeline:
             chunk=context["chunk"],
             panorama=context["panorama"],
             actors=context["actors"],
+            actor_references=context["actor_references"],
             rigid_objects=context["rigid_objects"],
             ball=context["ball"],
             residual=context["residual"],
@@ -244,6 +268,7 @@ class EncoderPipeline:
             chunk=context["chunk"],
             panorama=context["panorama"],
             actors=context["actors"],
+            actor_references=context["actor_references"],
             rigid_objects=context["rigid_objects"],
             ball=context["ball"],
             residual=context["residual"],
