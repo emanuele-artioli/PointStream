@@ -135,5 +135,13 @@ def test_decoder_mock_genai_stage_uses_transmitted_reference_crops(
 
     assert len(frames_with) == len(frames_without) == int(payload.chunk.num_frames)
 
-    diff = np.mean(np.abs(frames_with[0].astype(np.float32) - frames_without[0].astype(np.float32)))
-    assert float(diff) > 1.0
+    changed_pixel_counts: list[int] = []
+    for frame_idx in range(min(3, len(frames_with))):
+        frame_diff = np.abs(
+            frames_with[frame_idx].astype(np.int16) - frames_without[frame_idx].astype(np.int16)
+        )
+        per_pixel_delta = np.sum(frame_diff, axis=2)
+        changed_pixel_counts.append(int(np.count_nonzero(per_pixel_delta > 25)))
+
+    # Use a sparse high-delta metric so codec noise does not make this flaky on CI.
+    assert max(changed_pixel_counts) >= 300
