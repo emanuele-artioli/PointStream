@@ -118,18 +118,28 @@ class SynthesisEngine:
             homographies = homographies[:frame_count]
 
         inverse_h = torch.linalg.inv(homographies)
-        batched_panorama = panorama_tensor.expand(frame_count, -1, -1, -1)
-
-        warped = kornia.geometry.transform.warp_perspective(
-            src=batched_panorama,
-            M=inverse_h,
-            dsize=(output_height, output_width),
-            mode="bilinear",
-            padding_mode="zeros",
-            align_corners=False,
+        batch_size = max(1, int(os.environ.get("POINTSTREAM_PANORAMA_WARP_BATCH_SIZE", "4")))
+        warped_uint8 = torch.empty(
+            (frame_count, 3, output_height, output_width),
+            dtype=torch.uint8,
+            device=self.device,
         )
 
-        return warped.clamp(0.0, 1.0).mul(255.0).to(torch.uint8).contiguous()
+        for start in range(0, frame_count, batch_size):
+            end = min(frame_count, start + batch_size)
+            current_batch = end - start
+            batched_panorama = panorama_tensor.expand(current_batch, -1, -1, -1)
+            warped_batch = kornia.geometry.transform.warp_perspective(
+                src=batched_panorama,
+                M=inverse_h[start:end],
+                dsize=(output_height, output_width),
+                mode="bilinear",
+                padding_mode="zeros",
+                align_corners=False,
+            )
+            warped_uint8[start:end] = warped_batch.clamp(0.0, 1.0).mul(255.0).to(torch.uint8)
+
+        return warped_uint8.contiguous()
 
     def _unroll_sparse_actor_poses(self, payload: EncodedChunkPayload) -> dict[str, torch.Tensor]:
         dense_stream: dict[str, torch.Tensor] = {}

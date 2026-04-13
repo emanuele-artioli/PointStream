@@ -3,7 +3,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 import os
 from pathlib import Path
-import sys
 from typing import Any
 
 import cv2
@@ -115,12 +114,8 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
     def __init__(
         self,
         repo_dir: str | None = None,
-        entry_module: str = "animate_anyone_inference",
-        entry_function: str = "generate_frame",
     ) -> None:
         self._repo_dir = repo_dir or os.environ.get("POINTSTREAM_ANIMATE_ANYONE_REPO_DIR")
-        self._entry_module = entry_module
-        self._entry_function = entry_function
         self._runtime_fn: Any | None = None
 
     def _ensure_runtime(self) -> Any:
@@ -138,16 +133,9 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
                 f"Animate Anyone repository path does not exist: {repo_path}"
             )
 
-        if str(repo_path) not in sys.path:
-            sys.path.insert(0, str(repo_path))
+        from src.decoder.animate_anyone_runtime import generate_frame
 
-        module = __import__(self._entry_module, fromlist=[self._entry_function])
-        runtime_fn = getattr(module, self._entry_function, None)
-        if runtime_fn is None or not callable(runtime_fn):
-            raise RuntimeError(
-                f"Animate Anyone entry function '{self._entry_function}' not found in module '{self._entry_module}'."
-            )
-
+        runtime_fn = generate_frame
         self._runtime_fn = runtime_fn
         return runtime_fn
 
@@ -162,12 +150,23 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
 
         reference_np = _to_numpy_bgr(reference_crop_tensor)
         pose_np = dense_dwpose_tensor.detach().cpu().numpy().astype(np.float32)
-        generated_bgr = runtime_fn(
-            reference_image_bgr=reference_np,
-            dense_pose_sequence=pose_np,
-            seed=int(seed),
-            device=str(device),
-        )
+
+        try:
+            generated_bgr = runtime_fn(
+                reference_image_bgr=reference_np,
+                dense_pose_sequence=pose_np,
+                seed=int(seed),
+                device=str(device),
+                repo_dir=self._repo_dir,
+            )
+        except TypeError:
+            # Keep tests/stubs simple when monkeypatching _ensure_runtime.
+            generated_bgr = runtime_fn(
+                reference_image_bgr=reference_np,
+                dense_pose_sequence=pose_np,
+                seed=int(seed),
+                device=str(device),
+            )
 
         generated_bgr = np.asarray(generated_bgr, dtype=np.uint8)
         if generated_bgr.ndim != 3 or generated_bgr.shape[2] != 3:
@@ -291,6 +290,8 @@ class DiffusersCompositor(MockCompositor):
         if backend_value is None:
             backend_value = "controlnet"
         self._backend = backend_value.strip().lower()
+        threshold = int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_TRANSPARENT_THRESHOLD", "8"))
+        self._animate_anyone_transparent_threshold = int(np.clip(threshold, 0, 255))
         self._strategy = self._build_strategy(self._backend)
 
     def _build_strategy(self, backend: str) -> BaseGenAIStrategy:
@@ -331,13 +332,68 @@ class DiffusersCompositor(MockCompositor):
 
         target_h = max(1, y2 - y1)
         target_w = max(1, x2 - x1)
-        actor_resized = cv2.resize(generated_np, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
-        mask = self._segment_foreground(actor_resized)
+
+        is_animate_anyone = isinstance(self._strategy, AnimateAnyoneStrategy)
+        if is_animate_anyone:
+            actor_resized = self._resize_actor_with_aspect_recovery(
+                actor_bgr=generated_np,
+                target_w=target_w,
+                target_h=target_h,
+            )
+            mask = self._segment_black_background(actor_resized)
+        else:
+            actor_resized = cv2.resize(generated_np, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
+            mask = self._segment_foreground(actor_resized)
 
         roi = frame_np[y1:y2, x1:x2]
         roi[mask] = actor_resized[mask]
         frame_np[y1:y2, x1:x2] = roi
         return torch.from_numpy(frame_np).permute(2, 0, 1).contiguous().to(torch.uint8)
+
+    def _resize_actor_with_aspect_recovery(self, actor_bgr: np.ndarray, target_w: int, target_h: int) -> np.ndarray:
+        frame_h, frame_w = actor_bgr.shape[:2]
+        if target_w <= 0 or target_h <= 0:
+            return actor_bgr
+
+        # Inverse of resize-and-pad used by legacy PointStream path.
+        if target_w >= target_h:
+            content_w = frame_w
+            content_h = max(1, int(round(frame_h * (float(target_h) / float(target_w)))))
+            content_h = min(content_h, frame_h)
+            pad_top = max(0, (frame_h - content_h) // 2)
+            pad_bottom = max(0, frame_h - content_h - pad_top)
+            cropped = actor_bgr[pad_top:frame_h - pad_bottom, :]
+        else:
+            content_h = frame_h
+            content_w = max(1, int(round(frame_w * (float(target_w) / float(target_h)))))
+            content_w = min(content_w, frame_w)
+            pad_left = max(0, (frame_w - content_w) // 2)
+            pad_right = max(0, frame_w - content_w - pad_left)
+            cropped = actor_bgr[:, pad_left:frame_w - pad_right]
+
+        if cropped.size == 0:
+            cropped = actor_bgr
+
+        return cv2.resize(cropped, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
+
+    def _segment_black_background(self, actor_bgr: np.ndarray) -> np.ndarray:
+        threshold = self._animate_anyone_transparent_threshold
+        mask = np.any(actor_bgr > threshold, axis=2)
+
+        mask_u8 = np.asarray(mask.astype(np.uint8) * 255, dtype=np.uint8)
+        opened = cv2.morphologyEx(mask_u8, cv2.MORPH_OPEN, np.ones((3, 3), dtype=np.uint8), iterations=1)
+        closed = cv2.morphologyEx(
+            np.asarray(opened, dtype=np.uint8),
+            cv2.MORPH_CLOSE,
+            np.ones((5, 5), dtype=np.uint8),
+            iterations=1,
+        )
+        binary = np.asarray(closed, dtype=np.uint8) > 0
+
+        min_pixels = max(10, actor_bgr.shape[0] * actor_bgr.shape[1] // 80)
+        if int(np.count_nonzero(binary)) < min_pixels:
+            return np.ones(actor_bgr.shape[:2], dtype=bool)
+        return binary
 
     def _segment_foreground(self, actor_bgr: np.ndarray) -> np.ndarray:
         hsv = cv2.cvtColor(actor_bgr, cv2.COLOR_BGR2HSV)

@@ -44,11 +44,14 @@ class BallExtractor:
         frame_states: list[FrameState],
     ) -> BallPacket:
         original_frames = self._decode_original_frames(chunk)
-        background_frames = self._warp_panorama_to_frames(panorama=panorama, chunk=chunk, frame_count=int(original_frames.shape[0]))
-
-        frame_count = min(int(chunk.num_frames), int(original_frames.shape[0]), int(background_frames.shape[0]))
+        frame_count = min(int(chunk.num_frames), int(original_frames.shape[0]))
         if frame_count <= 0:
             raise ValueError("BallExtractor received zero valid frames")
+
+        panorama_tensor, inverse_h, kornia_module = self._prepare_panorama_warp(
+            panorama=panorama,
+            frame_count=frame_count,
+        )
 
         ball_states: list[BallState] = []
         previous_visible = False
@@ -58,7 +61,16 @@ class BallExtractor:
         for frame_idx in range(frame_count):
             frame_state = self._resolve_frame_state(frame_states=frame_states, frame_idx=frame_idx)
 
-            raw_diff = torch.abs(original_frames[frame_idx] - background_frames[frame_idx])
+            original_frame = original_frames[frame_idx].to(self._device, dtype=torch.float32)
+            background_frame = self._warp_panorama_frame(
+                kornia_module=kornia_module,
+                panorama_tensor=panorama_tensor,
+                inverse_h=inverse_h[frame_idx],
+                frame_height=int(chunk.height),
+                frame_width=int(chunk.width),
+            )
+
+            raw_diff = torch.abs(original_frame - background_frame)
             actor_mask = self._build_actor_mask(frame_state=frame_state, frame_height=int(chunk.height), frame_width=int(chunk.width))
             masked_diff = raw_diff * (1.0 - actor_mask.unsqueeze(0))
 
@@ -135,9 +147,13 @@ class BallExtractor:
 
     def _decode_original_frames(self, chunk: VideoChunk) -> torch.Tensor:
         decoded = decode_video_to_tensor(chunk.source_uri)
-        return decoded.tensor[: int(chunk.num_frames)].to(self._device, dtype=torch.float32).mul(255.0)
+        return decoded.tensor[: int(chunk.num_frames)].mul(255.0).contiguous()
 
-    def _warp_panorama_to_frames(self, panorama: PanoramaPacket, chunk: VideoChunk, frame_count: int) -> torch.Tensor:
+    def _prepare_panorama_warp(
+        self,
+        panorama: PanoramaPacket,
+        frame_count: int,
+    ) -> tuple[torch.Tensor, torch.Tensor, object]:
         try:
             import kornia
         except ModuleNotFoundError as exc:
@@ -161,16 +177,26 @@ class BallExtractor:
             homographies = homographies[:frame_count]
 
         inverse_h = torch.linalg.inv(homographies)
-        batched_panorama = panorama_tensor.expand(frame_count, -1, -1, -1)
-        warped = kornia.geometry.transform.warp_perspective(
-            src=batched_panorama,
-            M=inverse_h,
-            dsize=(int(chunk.height), int(chunk.width)),
+        return panorama_tensor, inverse_h, kornia
+
+    def _warp_panorama_frame(
+        self,
+        *,
+        kornia_module: object,
+        panorama_tensor: torch.Tensor,
+        inverse_h: torch.Tensor,
+        frame_height: int,
+        frame_width: int,
+    ) -> torch.Tensor:
+        warped = kornia_module.geometry.transform.warp_perspective(
+            src=panorama_tensor,
+            M=inverse_h.unsqueeze(0),
+            dsize=(int(frame_height), int(frame_width)),
             mode="bilinear",
             padding_mode="zeros",
             align_corners=False,
         )
-        return warped.mul(255.0)
+        return warped[0].mul(255.0)
 
     def _build_actor_mask(self, frame_state: FrameState, frame_height: int, frame_width: int) -> torch.Tensor:
         mask = torch.zeros((frame_height, frame_width), dtype=torch.float32, device=self._device)

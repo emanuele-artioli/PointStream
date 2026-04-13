@@ -4,9 +4,9 @@ from pathlib import Path
 
 
 DEFAULT_REQUIRED_WEIGHTS = [
-    "mock_actor_encoder.pt",
-    "mock_pose_estimator.pt",
-    "mock_ball_tracker.pt",
+    "yolo26n.pt",
+    "yolo26n-seg.pt",
+    "yolo26n-pose.pt",
 ]
 
 

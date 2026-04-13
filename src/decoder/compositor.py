@@ -28,27 +28,20 @@ class ResidualCompositor:
         if not residual_path.exists() or not residual_path.is_file():
             return predicted_frames
 
-        decoded_frames: list[np.ndarray] = []
-        for frame in iter_video_frames_ffmpeg(residual_path, width=width, height=height):
-            decoded_frames.append(frame)
+        composited = predicted_frames.to(self._device, dtype=torch.uint8)
+        frame_limit = int(composited.shape[0])
 
-        if not decoded_frames:
-            return predicted_frames
+        for frame_idx, residual_frame in enumerate(iter_video_frames_ffmpeg(residual_path, width=width, height=height)):
+            if frame_idx >= frame_limit:
+                break
 
-        residual_tensor = (
-            torch.from_numpy(np.stack(decoded_frames, axis=0))
-            .permute(0, 3, 1, 2)
-            .contiguous()
-            .to(self._device, dtype=torch.float32)
-        )
-        predicted_tensor = predicted_frames.to(self._device, dtype=torch.float32)
+            residual_tensor = (
+                torch.from_numpy(np.asarray(residual_frame, dtype=np.uint8))
+                .permute(2, 0, 1)
+                .contiguous()
+                .to(self._device, dtype=torch.float32)
+            )
+            predicted_tensor = composited[frame_idx].to(torch.float32)
+            composited[frame_idx] = torch.clamp(predicted_tensor + (residual_tensor - 128.0), 0.0, 255.0).to(torch.uint8)
 
-        valid_frames = min(int(predicted_tensor.shape[0]), int(residual_tensor.shape[0]))
-        decoded_diff = residual_tensor[:valid_frames] - 128.0
-        final_tensor = torch.clamp(predicted_tensor[:valid_frames] + decoded_diff, 0.0, 255.0).to(torch.uint8)
-
-        if valid_frames == int(predicted_tensor.shape[0]):
-            return final_tensor
-
-        tail = predicted_tensor[valid_frames:].to(torch.uint8)
-        return torch.cat([final_tensor, tail], dim=0)
+        return composited

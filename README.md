@@ -118,6 +118,70 @@ cd /home/itec/emanuele/pointstream
 pip install -e .
 ```
 
+## Model Weights (Local Links)
+
+Canonical model root on this machine:
+- `/home/itec/emanuele/Models`
+
+PointStream expects YOLO actor weights under `assets/weights/`:
+- `yolo26n.pt`
+- `yolo26n-seg.pt`
+- `yolo26n-pose.pt`
+
+If `assets/weights` is missing, recreate links from your shared model store:
+
+```bash
+cd /home/itec/emanuele/pointstream
+mkdir -p assets/weights
+ln -sfn /home/itec/emanuele/Models/yolo26n.pt assets/weights/yolo26n.pt
+ln -sfn /home/itec/emanuele/Models/yolo26n-seg.pt assets/weights/yolo26n-seg.pt
+ln -sfn /home/itec/emanuele/Models/yolo26n-pose.pt assets/weights/yolo26n-pose.pt
+```
+
+AnimateAnyone backend model variants are resolved from the Moore repo:
+- `<repo>/Models/original`
+- `<repo>/Models/finetuned_tennis`
+
+Those two Moore paths are expected to be symlink views into the canonical model store:
+- `/home/itec/emanuele/Models/AnimateAnyone/profiles/original`
+- `/home/itec/emanuele/Models/AnimateAnyone/profiles/finetuned_tennis`
+
+Recommended canonical layout:
+
+```text
+/home/itec/emanuele/Models/
+  AnimateAnyone/
+    profiles/
+      original/
+        stable-diffusion-v1-5/
+        sd-vae-ft-mse/
+        image_encoder/
+        denoising_unet.pth
+        reference_unet.pth
+        pose_guider.pth
+        motion_module.pth
+      finetuned_tennis/
+        stable-diffusion-v1-5/
+        sd-vae-ft-mse/
+        image_encoder/
+        denoising_unet.pth
+        reference_unet.pth
+        pose_guider.pth
+        motion_module.pth
+  yolo26n.pt
+  yolo26n-seg.pt
+  yolo26n-pose.pt
+```
+
+Each variant folder must share the same structure:
+- `stable-diffusion-v1-5/`
+- `sd-vae-ft-mse/`
+- `image_encoder/`
+- `denoising_unet.pth`
+- `reference_unet.pth`
+- `pose_guider.pth`
+- `motion_module.pth`
+
 ## Run Mock Pipeline
 
 ```bash
@@ -294,7 +358,16 @@ docker run --gpus all --rm ghcr.io/<owner>/<repo>/pointstream-gpu:<tag>
   - `1`: `SynthesisEngine` exposes `DiffusersCompositor`.
 - GenAI backend strategy is selected with `POINTSTREAM_GENAI_BACKEND`:
   - `controlnet` (default when enabled): `BaselineControlNetStrategy` (`StableDiffusionControlNetImg2ImgPipeline`, OpenPose control).
-  - `animate-anyone`: `AnimateAnyoneStrategy` (local repo wrapper, requires `POINTSTREAM_ANIMATE_ANYONE_REPO_DIR`).
+  - `animate-anyone`: `AnimateAnyoneStrategy` (PointStream-owned runtime, requires `POINTSTREAM_ANIMATE_ANYONE_REPO_DIR`).
+- AnimateAnyone runtime entrypoint lives in `src/decoder/animate_anyone_runtime.py` (integration code is maintained in PointStream, not in the external Moore repo).
+- AnimateAnyone runtime model selection:
+  - `POINTSTREAM_ANIMATE_ANYONE_MODEL_VARIANT=finetuned_tennis` (default) or `original`.
+  - `POINTSTREAM_ANIMATE_ANYONE_MODEL_DIR=<absolute-or-repo-relative-path>` overrides variant selection.
+- AnimateAnyone output tuning:
+  - `POINTSTREAM_ANIMATE_ANYONE_WIDTH` / `POINTSTREAM_ANIMATE_ANYONE_HEIGHT` (defaults: 512x512)
+  - `POINTSTREAM_ANIMATE_ANYONE_STEPS` (default: 30)
+  - `POINTSTREAM_ANIMATE_ANYONE_CFG` (default: 3.5)
+  - `POINTSTREAM_ANIMATE_ANYONE_TRANSPARENT_THRESHOLD` (default: 8, black-background alpha extraction)
 - `tests/test_genai_node.py` is fully skipped unless `POINTSTREAM_ENABLE_GENAI=1`; when enabled it runs a 2-frame compositor smoke test and writes `assets/debug_genai_composite.mp4`.
 - YOLO actor components load weights from local files first (`assets/weights/` or explicit path); implicit online weight download is disabled by default.
 - Set `POINTSTREAM_ALLOW_AUTO_MODEL_DOWNLOAD=1` only if you intentionally want Ultralytics to fetch missing weights.

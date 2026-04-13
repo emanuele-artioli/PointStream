@@ -8,7 +8,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from src.encoder.video_io import decode_video_to_tensor, encode_video_frames_ffmpeg
+from src.encoder.video_io import encode_video_frames_ffmpeg, iter_video_frames_ffmpeg, probe_video_metadata
 from src.shared.schemas import EncodedChunkPayload, FrameState, ResidualPacket, SceneActor, VideoChunk
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import gpu_bound
@@ -119,44 +119,66 @@ class ResidualCalculator:
         frame_states: list[FrameState],
         debug_output_path: str | Path | None = None,
     ) -> ResidualPacket:
-        original_frames = self._load_original_frames(chunk).to(self._device, dtype=torch.float32)
-        predicted_frames = self._synthesis_engine.synthesize(payload).frames_bgr.to(self._device, dtype=torch.float32)
+        predicted_frames = self._synthesis_engine.synthesize(payload).frames_bgr
+
+        source_metadata = probe_video_metadata(chunk.source_uri)
+        available_source_frames = max(0, int(source_metadata.num_frames) - int(chunk.start_frame_id))
 
         valid_frames = min(
             int(chunk.num_frames),
-            int(original_frames.shape[0]),
             int(predicted_frames.shape[0]),
+            int(available_source_frames),
         )
         if valid_frames <= 0:
             raise ValueError("ResidualCalculator received zero valid frames")
 
-        encoded_frames: list[torch.Tensor] = []
-        for frame_idx in range(valid_frames):
-            frame_state = self._select_frame_state(frame_states=frame_states, frame_idx=frame_idx)
-            importance_map = self._importance_mapper.build_importance_map(
-                frame_state=frame_state,
-                frame_height=int(chunk.height),
-                frame_width=int(chunk.width),
-                device=self._device,
-            )
-
-            # Shape: [Channels, Height, Width]
-            raw_diff = original_frames[frame_idx] - predicted_frames[frame_idx]
-            masked_diff = raw_diff * importance_map.unsqueeze(0)
-            encoded_residual = torch.clamp(masked_diff + 128.0, 0.0, 255.0).to(torch.uint8)
-            encoded_frames.append(encoded_residual)
-
-        encoded_tensor = torch.stack(encoded_frames, dim=0)
         output_path = Path(debug_output_path) if debug_output_path is not None else self._default_residual_path(chunk)
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        frames_bgr = [
-            np.asarray(frame.permute(1, 2, 0).contiguous().cpu().numpy(), dtype=np.uint8)
-            for frame in encoded_tensor
-        ]
+        source_iter = iter_video_frames_ffmpeg(
+            chunk.source_uri,
+            width=int(chunk.width),
+            height=int(chunk.height),
+        )
+
+        for _ in range(int(chunk.start_frame_id)):
+            try:
+                next(source_iter)
+            except StopIteration:
+                raise ValueError("ResidualCalculator could not seek to chunk start frame in source video")
+
+        def _iter_encoded_frames() -> list[np.ndarray]:
+            for frame_idx in range(valid_frames):
+                try:
+                    original_np = next(source_iter)
+                except StopIteration:
+                    break
+
+                frame_state = self._select_frame_state(frame_states=frame_states, frame_idx=frame_idx)
+                importance_map = self._importance_mapper.build_importance_map(
+                    frame_state=frame_state,
+                    frame_height=int(chunk.height),
+                    frame_width=int(chunk.width),
+                    device=self._device,
+                )
+
+                original_tensor = (
+                    torch.from_numpy(np.asarray(original_np, dtype=np.uint8))
+                    .permute(2, 0, 1)
+                    .to(self._device, dtype=torch.float32)
+                )
+                predicted_tensor = predicted_frames[frame_idx].to(self._device, dtype=torch.float32)
+
+                # Shape: [Channels, Height, Width]
+                raw_diff = original_tensor - predicted_tensor
+                masked_diff = raw_diff * importance_map.unsqueeze(0)
+                encoded_residual = torch.clamp(masked_diff + 128.0, 0.0, 255.0).to(torch.uint8)
+
+                yield np.asarray(encoded_residual.permute(1, 2, 0).contiguous().cpu().numpy(), dtype=np.uint8)
+
         encode_video_frames_ffmpeg(
             output_path=output_path,
-            frames_bgr=frames_bgr,
+            frames_bgr=_iter_encoded_frames(),
             fps=float(chunk.fps),
             width=int(chunk.width),
             height=int(chunk.height),
@@ -180,10 +202,10 @@ class ResidualCalculator:
         return project_root / "assets" / "test_chunks" / f"residual_{chunk.chunk_id}.mp4"
 
     def _load_original_frames(self, chunk: VideoChunk) -> torch.Tensor:
-        decoded = decode_video_to_tensor(chunk.source_uri)
-        original = decoded.tensor[: int(chunk.num_frames)]
-        # Shape: [Frames, Channels, Height, Width] in BGR uint8.
-        return original.clamp(0.0, 1.0).mul(255.0).to(torch.uint8)
+        decoded = probe_video_metadata(chunk.source_uri)
+        if int(decoded.num_frames) <= 0:
+            raise ValueError(f"Source video has no frames: {chunk.source_uri}")
+        raise RuntimeError("_load_original_frames is no longer used; original frames are streamed in process()")
 
     def _select_frame_state(self, frame_states: list[FrameState], frame_idx: int) -> FrameState:
         if frame_idx < len(frame_states):

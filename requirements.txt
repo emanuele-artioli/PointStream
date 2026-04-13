@@ -6,6 +6,8 @@ kornia==0.7.4
 diffusers==0.30.3
 transformers==4.46.3
 accelerate==1.1.1
+omegaconf==2.3.0
+einops==0.8.1
 
 # Install CUDA-enabled PyTorch via environment.yaml for explicit CUDA pinning.
 # Install lint/type/pre-commit tooling via requirements-dev.txt.
