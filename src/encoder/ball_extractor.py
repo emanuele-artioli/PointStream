@@ -3,6 +3,7 @@ from __future__ import annotations
 import cv2
 import numpy as np
 import torch
+from typing import Any
 
 from src.encoder.video_io import decode_video_to_tensor
 from src.shared.schemas import (
@@ -153,7 +154,7 @@ class BallExtractor:
         self,
         panorama: PanoramaPacket,
         frame_count: int,
-    ) -> tuple[torch.Tensor, torch.Tensor, object]:
+    ) -> tuple[torch.Tensor, torch.Tensor, Any]:
         try:
             import kornia
         except ModuleNotFoundError as exc:
@@ -182,7 +183,7 @@ class BallExtractor:
     def _warp_panorama_frame(
         self,
         *,
-        kornia_module: object,
+        kornia_module: Any,
         panorama_tensor: torch.Tensor,
         inverse_h: torch.Tensor,
         frame_height: int,

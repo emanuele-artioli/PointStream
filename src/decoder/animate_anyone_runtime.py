@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 import threading
 from typing import Any
+from typing import cast
 
 import cv2
 import numpy as np
@@ -149,7 +150,10 @@ def _load_pipeline(repo_root: Path, model_root: Path, device: str) -> Any:
         pose_guider = PoseGuider(320, block_out_channels=(16, 32, 96, 256)).to(device=device, dtype=dtype)
         image_encoder = CLIPVisionModelWithProjection.from_pretrained(image_encoder_path).to(device=device, dtype=dtype)
 
-        sched_kwargs = OmegaConf.to_container(infer_config.noise_scheduler_kwargs)
+        sched_container = OmegaConf.to_container(infer_config.noise_scheduler_kwargs)
+        if not isinstance(sched_container, dict):
+            raise ValueError("AnimateAnyone inference config 'noise_scheduler_kwargs' must be a mapping")
+        sched_kwargs = cast(dict[str, Any], sched_container)
         scheduler = DDIMScheduler(**sched_kwargs)
 
         denoising_unet.load_state_dict(torch.load(denoising_unet_path, map_location="cpu"), strict=False)

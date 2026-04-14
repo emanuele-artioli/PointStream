@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Iterator
 import os
 from pathlib import Path
 
@@ -147,7 +148,7 @@ class ResidualCalculator:
             except StopIteration:
                 raise ValueError("ResidualCalculator could not seek to chunk start frame in source video")
 
-        def _iter_encoded_frames() -> list[np.ndarray]:
+        def _iter_encoded_frames() -> Iterator[np.ndarray]:
             for frame_idx in range(valid_frames):
                 try:
                     original_np = next(source_iter)
