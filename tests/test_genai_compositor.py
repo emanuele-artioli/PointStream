@@ -1,12 +1,28 @@
 from __future__ import annotations
 
+import sys
 from types import SimpleNamespace
+import types
 
 import numpy as np
 import pytest
 import torch
 
 import src.decoder.genai_compositor as gc
+
+
+def _install_fake_pillow(monkeypatch: pytest.MonkeyPatch) -> None:
+    def _fromarray(array: np.ndarray) -> np.ndarray:
+        return np.asarray(array, dtype=np.uint8)
+
+    image_module = types.ModuleType("PIL.Image")
+    setattr(image_module, "fromarray", _fromarray)
+
+    pil_module = types.ModuleType("PIL")
+    setattr(pil_module, "Image", image_module)
+
+    monkeypatch.setitem(sys.modules, "PIL", pil_module)
+    monkeypatch.setitem(sys.modules, "PIL.Image", image_module)
 
 
 def _make_pose_sequence(valid_confidence: float = 0.95) -> torch.Tensor:
@@ -93,7 +109,8 @@ def test_diffusers_compositor_invalid_backend_raises() -> None:
 
 
 def test_baseline_controlnet_strategy_generate_with_fake_pipe(monkeypatch) -> None:
-    pil = pytest.importorskip("PIL.Image")
+    _install_fake_pillow(monkeypatch)
+    pil_image = sys.modules["PIL.Image"]
 
     strategy = gc.BaselineControlNetStrategy()
 
@@ -101,7 +118,7 @@ def test_baseline_controlnet_strategy_generate_with_fake_pipe(monkeypatch) -> No
         def __call__(self, **kwargs):
             _ = kwargs
             fake_rgb = np.full((64, 48, 3), 140, dtype=np.uint8)
-            return SimpleNamespace(images=[pil.fromarray(fake_rgb)])
+            return SimpleNamespace(images=[pil_image.fromarray(fake_rgb)])
 
     monkeypatch.setattr(strategy, "_ensure_pipeline", lambda device: _FakePipe())
 

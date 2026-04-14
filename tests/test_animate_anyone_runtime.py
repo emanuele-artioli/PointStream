@@ -43,9 +43,8 @@ def test_normalize_pose_to_canvas_brings_large_coordinates_in_bounds() -> None:
     assert float(np.max(normalized[:, 1]) - np.min(normalized[:, 1])) > 120.0
 
 
-def test_prepare_pose_sequence_produces_visible_condition_from_global_coords() -> None:
-    pil = pytest.importorskip("PIL.Image")
-    _ = pil
+def test_prepare_pose_sequence_produces_visible_condition_from_global_coords(monkeypatch) -> None:
+    _install_fake_pillow(monkeypatch)
 
     pose_seq = np.zeros((2, 18, 3), dtype=np.float32)
     for idx in range(2):
