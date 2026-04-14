@@ -1,13 +1,29 @@
 from __future__ import annotations
 
 from pathlib import Path
+import sys
 from types import SimpleNamespace
+import types
 
 import numpy as np
 import pytest
 import torch
 
 from src.decoder import animate_anyone_runtime as runtime
+
+
+def _install_fake_pillow(monkeypatch: pytest.MonkeyPatch) -> None:
+    def _fromarray(array: np.ndarray) -> np.ndarray:
+        return np.asarray(array, dtype=np.uint8)
+
+    image_module = types.ModuleType("PIL.Image")
+    setattr(image_module, "fromarray", _fromarray)
+
+    pil_module = types.ModuleType("PIL")
+    setattr(pil_module, "Image", image_module)
+
+    monkeypatch.setitem(sys.modules, "PIL", pil_module)
+    monkeypatch.setitem(sys.modules, "PIL.Image", image_module)
 
 
 def test_normalize_pose_to_canvas_brings_large_coordinates_in_bounds() -> None:
@@ -116,6 +132,8 @@ def test_resolve_model_root_missing_entries_raises(tmp_path: Path) -> None:
 
 
 def test_generate_frame_smoke_with_stub_pipeline(monkeypatch, tmp_path: Path) -> None:
+    _install_fake_pillow(monkeypatch)
+
     repo_root = tmp_path / "repo"
     repo_root.mkdir(parents=True)
     model_root = tmp_path / "models"
@@ -156,6 +174,8 @@ def test_generate_frame_smoke_with_stub_pipeline(monkeypatch, tmp_path: Path) ->
 
 
 def test_generate_frame_fallback_pose_sequence(monkeypatch, tmp_path: Path) -> None:
+    _install_fake_pillow(monkeypatch)
+
     repo_root = tmp_path / "repo"
     repo_root.mkdir(parents=True)
     model_root = tmp_path / "models"

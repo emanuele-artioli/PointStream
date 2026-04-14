@@ -259,15 +259,15 @@ def _normalize_pose_to_canvas(
 
 
 def _prepare_pose_sequence(dense_pose_sequence: np.ndarray, width: int, height: int) -> list[Any]:
-    try:
-        from PIL import Image
-    except ModuleNotFoundError as exc:
-        raise RuntimeError("Pillow is required for AnimateAnyone backend") from exc
-
     if dense_pose_sequence.ndim == 2:
         dense_pose_sequence = dense_pose_sequence[np.newaxis, ...]
     if dense_pose_sequence.ndim != 3:
         raise ValueError(f"Expected dense pose sequence [T,18,3] or [18,3], got {dense_pose_sequence.shape}")
+
+    try:
+        from PIL import Image
+    except ModuleNotFoundError as exc:
+        raise RuntimeError("Pillow is required for AnimateAnyone backend") from exc
 
     pose_images: list[Any] = []
     for pose in dense_pose_sequence:
@@ -307,13 +307,13 @@ def generate_frame(
     repo_dir: str | None = None,
 ) -> np.ndarray:
     """Generate one actor frame via Moore-AnimateAnyone from PointStream-owned runtime glue."""
+    if reference_image_bgr.ndim != 3 or reference_image_bgr.shape[2] != 3:
+        raise ValueError(f"Expected reference_image_bgr [H,W,3], got {reference_image_bgr.shape}")
+
     try:
         from PIL import Image
     except ModuleNotFoundError as exc:
         raise RuntimeError("Pillow is required for AnimateAnyone backend") from exc
-
-    if reference_image_bgr.ndim != 3 or reference_image_bgr.shape[2] != 3:
-        raise ValueError(f"Expected reference_image_bgr [H,W,3], got {reference_image_bgr.shape}")
 
     runtime = _runtime_config()
     repo_root = _resolve_repo_root(repo_dir=repo_dir)
