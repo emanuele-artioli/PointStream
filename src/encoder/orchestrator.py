@@ -29,6 +29,7 @@ class EncoderPipeline:
         actor_extractor: Any | None = None,
         ball_extractor: Any | None = None,
         reference_extractor: Any | None = None,
+        residual_calculator: ResidualCalculator | None = None,
     ) -> None:
         self._dag = DAGOrchestrator(execution_pool=execution_pool)
         self._background_modeler = BackgroundModeler()
@@ -36,7 +37,7 @@ class EncoderPipeline:
         self._object_tracker = ObjectTracker()
         self._ball_extractor = ball_extractor or BallExtractor()
         self._reference_extractor = reference_extractor or ReferenceExtractor()
-        self._residual_calculator = ResidualCalculator(SynthesisEngine())
+        self._residual_calculator = residual_calculator or ResidualCalculator(SynthesisEngine())
         self._register_nodes()
 
     @staticmethod

@@ -419,6 +419,12 @@ class BaseSegmenter(ABC):
         raise NotImplementedError
 
 
+class NoOpSegmenter(BaseSegmenter):
+    def segment(self, frame_bgr: np.ndarray, actor: SceneActor) -> SceneActor:
+        _ = frame_bgr
+        return actor
+
+
 class YoloSegmenter(BaseSegmenter):
     def __init__(self, model_name: str = "yolo26n-seg.pt", model: Any | None = None) -> None:
         self.model_name = model_name

@@ -38,8 +38,16 @@ class ActorExtractor:
         segmenter_model: Any | None = None,
         pose_model: Any | None = None,
         render_debug_keyframes: bool = True,
+        pose_backend: str = "yolo",
+        segmenter_backend: str = "yolo",
+        pose_delta_threshold: float = 20.0,
+        dwpose_device: str = "cuda",
     ) -> None:
         from src.encoder.actor_components import (
+            BasePoseEstimator,
+            BaseSegmenter,
+            DwposeEstimator,
+            NoOpSegmenter,
             PayloadEncoder,
             PipelineBuilder,
             StandardTennisHeuristic,
@@ -49,13 +57,32 @@ class ActorExtractor:
         )
 
         self._render_debug_keyframes = render_debug_keyframes
+
+        pose_estimator: BasePoseEstimator
+        normalized_pose_backend = pose_backend.strip().lower()
+        if normalized_pose_backend in {"yolo", "yolo-pose", "yolo_pose"}:
+            pose_estimator = YoloPoseEstimator(model_name="yolo26n-pose.pt", model=pose_model)
+        elif normalized_pose_backend in {"dwpose", "dw-pose", "dw_pose"}:
+            pose_estimator = DwposeEstimator(torchscript_device=dwpose_device)
+        else:
+            raise ValueError(f"Unsupported pose backend: {pose_backend}")
+
+        segmenter: BaseSegmenter
+        normalized_segmenter_backend = segmenter_backend.strip().lower()
+        if normalized_segmenter_backend in {"yolo", "yolo-seg", "yolo_seg"}:
+            segmenter = YoloSegmenter(model_name="yolo26n-seg.pt", model=segmenter_model)
+        elif normalized_segmenter_backend in {"none", "off", "noop", "no-op"}:
+            segmenter = NoOpSegmenter()
+        else:
+            raise ValueError(f"Unsupported segmenter backend: {segmenter_backend}")
+
         # Models are loaded once in component initialization and reused frame-by-frame.
         self._pipeline = PipelineBuilder(
             detector=Yolo26Detector(model_name="yolo26n.pt", model=detector_model),
             heuristic=StandardTennisHeuristic(),
-            segmenter=YoloSegmenter(model_name="yolo26n-seg.pt", model=segmenter_model),
-            pose_estimator=YoloPoseEstimator(model_name="yolo26n-pose.pt", model=pose_model),
-            payload_encoder=PayloadEncoder(pose_delta_threshold=20.0),
+            segmenter=segmenter,
+            pose_estimator=pose_estimator,
+            payload_encoder=PayloadEncoder(pose_delta_threshold=float(pose_delta_threshold)),
         )
 
     @gpu_bound

@@ -96,6 +96,20 @@ class BinaryActorImportanceMapper(BaseImportanceMapper):
         return clipped_x1, clipped_y1, clipped_x2, clipped_y2
 
 
+class UniformImportanceMapper(BaseImportanceMapper):
+    """Ablation mapper that applies full residual weight everywhere."""
+
+    def build_importance_map(
+        self,
+        frame_state: FrameState,
+        frame_height: int,
+        frame_width: int,
+        device: torch.device,
+    ) -> torch.Tensor:
+        _ = frame_state
+        return torch.ones((frame_height, frame_width), dtype=torch.float32, device=device)
+
+
 class ResidualCalculator:
     """Server-side weighted residual calculator."""
 

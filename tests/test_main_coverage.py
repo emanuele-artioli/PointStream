@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import json
+import os
 import runpy
 import sys
 import types
 from pathlib import Path
 from types import SimpleNamespace
+
+import pytest
 
 import src.main as main_module
 from src.encoder import residual as residual_module
@@ -13,9 +17,19 @@ from src.encoder import residual as residual_module
 class _FakeEncoderPipeline:
     instances: list["_FakeEncoderPipeline"] = []
 
-    def __init__(self, execution_pool=None, actor_extractor=None) -> None:
+    def __init__(
+        self,
+        execution_pool=None,
+        actor_extractor=None,
+        ball_extractor=None,
+        reference_extractor=None,
+        residual_calculator=None,
+    ) -> None:
         self.execution_pool = execution_pool
         self.actor_extractor = actor_extractor
+        self.ball_extractor = ball_extractor
+        self.reference_extractor = reference_extractor
+        self.residual_calculator = residual_calculator
         self.shutdown_called = False
         self.encoded_chunk = None
         _FakeEncoderPipeline.instances.append(self)
@@ -54,7 +68,9 @@ class _FakeDiskTransport:
 class _FakeDecoderRenderer:
     instances: list["_FakeDecoderRenderer"] = []
 
-    def __init__(self) -> None:
+    def __init__(self, output_root=None, deterministic_seed=1337) -> None:
+        self.output_root = output_root
+        self.deterministic_seed = deterministic_seed
         _FakeDecoderRenderer.instances.append(self)
 
     def process(self, payload):
@@ -96,6 +112,7 @@ def test_run_mock_pipeline_builds_summary_with_provided_source(monkeypatch) -> N
     assert summary["ball_object_id"] == "ball_0"
     assert str(summary["residual_uri"]).endswith("chunk.mp4")
     assert str(summary["decoded_uri"]).endswith("0001_decoded.mp4")
+    assert summary["transport_backend"] == "disk"
 
     encoder = _FakeEncoderPipeline.instances[0]
     assert encoder.encoded_chunk is not None
@@ -171,3 +188,172 @@ def test_ensure_mock_source_video_returns_existing_asset(monkeypatch, tmp_path: 
 
     resolved = main_module._ensure_mock_source_video()
     assert resolved == str(test_video)
+
+
+def test_run_cli_accepts_input_and_writes_default_summary(monkeypatch, tmp_path: Path) -> None:
+    source_video = tmp_path / "input.mp4"
+    source_video.write_bytes(b"x")
+    output_dir = tmp_path / "artifacts"
+
+    captured: dict[str, object | None] = {
+        "transport_root": None,
+        "source_uri": None,
+        "num_frames": None,
+    }
+
+    def _fake_run_mock_pipeline(**kwargs):
+        captured["transport_root"] = kwargs.get("transport_root")
+        captured["source_uri"] = kwargs.get("source_uri")
+        captured["num_frames"] = kwargs.get("num_frames")
+        return {
+            "chunk_id": "0001",
+            "num_actor_packets": 1,
+            "num_rigid_object_packets": 1,
+            "ball_object_id": "ball_0",
+            "residual_uri": "memory://residual/chunk.mp4",
+            "decoded_uri": "memory://decoded/chunk.mp4",
+        }
+
+    monkeypatch.setattr(main_module, "run_mock_pipeline", _fake_run_mock_pipeline)
+
+    exit_code = main_module.run_cli(
+        [
+            "--input",
+            str(source_video),
+            "--output-dir",
+            str(output_dir),
+            "--num-frames",
+            "9",
+        ]
+    )
+    assert exit_code == 0
+
+    assert captured["transport_root"] == str(output_dir)
+    assert captured["source_uri"] == str(source_video.resolve())
+    assert captured["num_frames"] == 9
+
+    summary_file = output_dir / "run_summary.json"
+    assert summary_file.exists()
+    summary = json.loads(summary_file.read_text(encoding="utf-8"))
+    assert summary["chunk_id"] == "0001"
+
+
+def test_run_cli_supports_no_summary_file(monkeypatch, tmp_path: Path) -> None:
+    source_video = tmp_path / "input.mp4"
+    source_video.write_bytes(b"x")
+    output_dir = tmp_path / "artifacts"
+
+    monkeypatch.setattr(
+        main_module,
+        "run_mock_pipeline",
+        lambda **kwargs: {
+            "chunk_id": "0002",
+            "num_actor_packets": 0,
+            "num_rigid_object_packets": 0,
+            "ball_object_id": "ball_0",
+            "residual_uri": "memory://residual/chunk.mp4",
+            "decoded_uri": "memory://decoded/chunk.mp4",
+        },
+    )
+
+    exit_code = main_module.run_cli(
+        [
+            "--input",
+            str(source_video),
+            "--output-dir",
+            str(output_dir),
+            "--no-summary-file",
+        ]
+    )
+    assert exit_code == 0
+    assert not (output_dir / "run_summary.json").exists()
+
+
+def test_run_cli_rejects_invalid_num_frames(monkeypatch) -> None:
+    monkeypatch.setattr(
+        main_module,
+        "run_mock_pipeline",
+        lambda **kwargs: {},
+    )
+
+    with pytest.raises(ValueError, match="positive integer"):
+        main_module.run_cli(["--num-frames", "0"])
+
+
+def test_run_cli_rejects_missing_input_video(monkeypatch, tmp_path: Path) -> None:
+    missing_video = tmp_path / "missing.mp4"
+
+    monkeypatch.setattr(
+        main_module,
+        "run_mock_pipeline",
+        lambda **kwargs: {},
+    )
+
+    with pytest.raises(FileNotFoundError):
+        main_module.run_cli(["--input", str(missing_video)])
+
+
+def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path: Path) -> None:
+    source_video = tmp_path / "input.mp4"
+    source_video.write_bytes(b"x")
+    output_dir = tmp_path / "results"
+
+    captured: dict[str, object] = {}
+
+    def _fake_run_mock_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "chunk_id": "ablation_01",
+            "num_actor_packets": 0,
+            "num_rigid_object_packets": 0,
+            "ball_object_id": "ball_0",
+            "residual_uri": "memory://residual/chunk.mp4",
+            "decoded_uri": "memory://decoded/chunk.mp4",
+            "transport_backend": "disk",
+        }
+
+    monkeypatch.setattr(main_module, "run_mock_pipeline", _fake_run_mock_pipeline)
+    monkeypatch.delenv("POINTSTREAM_ENABLE_GENAI", raising=False)
+    monkeypatch.delenv("POINTSTREAM_GENAI_BACKEND", raising=False)
+
+    exit_code = main_module.run_cli(
+        [
+            "--input",
+            str(source_video),
+            "--output-dir",
+            str(output_dir),
+            "--chunk-id",
+            "ablation_01",
+            "--execution-pool",
+            "tagged",
+            "--cpu-workers",
+            "2",
+            "--gpu-workers",
+            "3",
+            "--actor-extractor",
+            "mock",
+            "--ball-extractor",
+            "mock",
+            "--reference-jpeg-quality",
+            "80",
+            "--importance-mapper",
+            "uniform",
+            "--seed",
+            "7",
+            "--disable-genai",
+            "--genai-backend",
+            "controlnet",
+            "--no-summary-file",
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured["transport_root"] == str(output_dir)
+    assert captured["chunk_id"] == "ablation_01"
+    assert captured["execution_pool"] is not None
+    assert captured["actor_extractor"] is not None
+    assert captured["ball_extractor"] is not None
+    assert captured["reference_extractor"] is not None
+    assert captured["residual_calculator"] is not None
+    assert os.environ.get("POINTSTREAM_ENABLE_GENAI") == "0"
+    assert os.environ.get("POINTSTREAM_GENAI_BACKEND") == "controlnet"

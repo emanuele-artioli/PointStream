@@ -206,6 +206,68 @@ with:
 - `metadata.msgpack` for semantic metadata/events
 - `residual.mp4` encoded signed residual stream (H.265 / `libx265`)
 
+Run with a custom input video and output folder:
+
+```bash
+cd /home/itec/emanuele/pointstream
+python -m src.main --input /path/to/input.mp4 --output-dir /path/to/output_dir
+```
+
+Useful CLI options:
+- `--num-frames N`: process only the first N frames
+- `--summary-json /path/to/summary.json`: write summary JSON to a custom path
+- `--no-summary-file`: print summary only (do not write `run_summary.json`)
+- `--chunk-id custom_id`: choose chunk folder name (`chunk_<id>`)
+- `--decoder-output-dir /path/to/decoded`: write decoded reconstructions to a custom directory
+
+Module swap arguments (for ablations and performance tuning):
+- `--execution-pool inline|tagged` with `--cpu-workers` and `--gpu-workers`
+- `--actor-extractor real|mock`
+- `--pose-estimator yolo|dwpose` (real actor extractor path)
+- `--segmenter yolo|none` (real actor extractor path)
+- `--payload-pose-delta-threshold <float>`
+- `--ball-extractor difference|mock`
+- `--ball-difference-threshold <float>` and `--ball-min-blob-area <int>`
+- `--reference-jpeg-quality <1..100>` and `--reference-padding-ratio <float>`
+- `--importance-mapper binary|uniform`
+
+GenAI backend switches:
+- `--enable-genai` or `--disable-genai`
+- `--genai-backend controlnet|animate-anyone`
+- `--animate-anyone-repo-dir /path/to/Moore-AnimateAnyone`
+- `--animate-anyone-model-variant original|finetuned_tennis`
+- `--animate-anyone-model-dir /path/to/model/profile`
+- `--animate-anyone-window <int>`
+- `--animate-anyone-transparent-threshold <int>`
+
+Ablation examples:
+
+```bash
+# Fast mock ablation: no heavy detection/ball extraction
+cd /home/itec/emanuele/pointstream
+python -m src.main \
+  --input /path/to/input.mp4 \
+  --output-dir /tmp/ps_ablation_mock \
+  --actor-extractor mock \
+  --ball-extractor mock \
+  --execution-pool inline \
+  --importance-mapper uniform
+```
+
+```bash
+# Real extraction with dwpose + no segmenter + tagged pool
+cd /home/itec/emanuele/pointstream
+python -m src.main \
+  --input /path/to/input.mp4 \
+  --output-dir /tmp/ps_ablation_dwpose \
+  --actor-extractor real \
+  --pose-estimator dwpose \
+  --segmenter none \
+  --execution-pool tagged \
+  --cpu-workers 2 \
+  --gpu-workers 1
+```
+
 ## Run Unit Tests
 
 ```bash
