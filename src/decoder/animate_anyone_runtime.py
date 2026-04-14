@@ -15,7 +15,7 @@ import torch
 @dataclass(frozen=True)
 class _RuntimeConfig:
     width: int = 512
-    height: int = 512
+    height: int = 784
     inference_steps: int = 30
     guidance_scale: float = 3.5
     model_variant: str = "finetuned_tennis"
@@ -214,6 +214,46 @@ def _render_pose_image_from_dwpose(pose: np.ndarray, width: int, height: int) ->
     return canvas
 
 
+def _normalize_pose_to_canvas(
+    pose: np.ndarray,
+    width: int,
+    height: int,
+    margin_ratio: float = 0.12,
+) -> np.ndarray:
+    if pose.shape != (18, 3):
+        return pose
+
+    normalized = pose.copy().astype(np.float32, copy=False)
+    valid = normalized[:, 2] >= 0.2
+    if int(np.count_nonzero(valid)) < 2:
+        return normalized
+
+    xs = normalized[valid, 0]
+    ys = normalized[valid, 1]
+
+    min_x = float(np.min(xs))
+    max_x = float(np.max(xs))
+    min_y = float(np.min(ys))
+    max_y = float(np.max(ys))
+
+    src_w = max(1.0, max_x - min_x)
+    src_h = max(1.0, max_y - min_y)
+    dst_w = max(1.0, float(width) * (1.0 - 2.0 * margin_ratio))
+    dst_h = max(1.0, float(height) * (1.0 - 2.0 * margin_ratio))
+    scale = min(dst_w / src_w, dst_h / src_h)
+
+    center_x = 0.5 * (min_x + max_x)
+    center_y = 0.5 * (min_y + max_y)
+    target_center_x = 0.5 * float(width)
+    target_center_y = 0.5 * float(height)
+
+    normalized[:, 0] = (normalized[:, 0] - center_x) * scale + target_center_x
+    normalized[:, 1] = (normalized[:, 1] - center_y) * scale + target_center_y
+    normalized[:, 0] = np.clip(normalized[:, 0], 0.0, float(width - 1))
+    normalized[:, 1] = np.clip(normalized[:, 1], 0.0, float(height - 1))
+    return normalized
+
+
 def _prepare_pose_sequence(dense_pose_sequence: np.ndarray, width: int, height: int) -> list[Any]:
     try:
         from PIL import Image
@@ -227,10 +267,32 @@ def _prepare_pose_sequence(dense_pose_sequence: np.ndarray, width: int, height: 
 
     pose_images: list[Any] = []
     for pose in dense_pose_sequence:
-        pose_canvas = _render_pose_image_from_dwpose(pose=pose, width=width, height=height)
+        normalized_pose = _normalize_pose_to_canvas(
+            pose=np.asarray(pose, dtype=np.float32),
+            width=width,
+            height=height,
+        )
+        pose_canvas = _render_pose_image_from_dwpose(pose=normalized_pose, width=width, height=height)
         pose_rgb = cv2.cvtColor(pose_canvas, cv2.COLOR_BGR2RGB)
         pose_images.append(Image.fromarray(pose_rgb))
     return pose_images
+
+
+def _letterbox_resize_rgb(image_rgb: np.ndarray, target_w: int, target_h: int) -> np.ndarray:
+    src_h, src_w = image_rgb.shape[:2]
+    if src_h <= 0 or src_w <= 0:
+        return np.zeros((target_h, target_w, 3), dtype=np.uint8)
+
+    scale = min(float(target_w) / float(src_w), float(target_h) / float(src_h))
+    resized_w = max(1, int(round(float(src_w) * scale)))
+    resized_h = max(1, int(round(float(src_h) * scale)))
+    resized = cv2.resize(image_rgb, (resized_w, resized_h), interpolation=cv2.INTER_LINEAR)
+
+    canvas = np.zeros((target_h, target_w, 3), dtype=np.uint8)
+    off_x = max(0, (target_w - resized_w) // 2)
+    off_y = max(0, (target_h - resized_h) // 2)
+    canvas[off_y : off_y + resized_h, off_x : off_x + resized_w] = resized
+    return canvas
 
 
 def generate_frame(
@@ -260,7 +322,8 @@ def generate_frame(
     height = int(runtime.height)
 
     reference_rgb = cv2.cvtColor(reference_image_bgr, cv2.COLOR_BGR2RGB)
-    reference_pil = Image.fromarray(reference_rgb).resize((width, height), resample=Image.BILINEAR)
+    reference_rgb = _letterbox_resize_rgb(reference_rgb, target_w=width, target_h=height)
+    reference_pil = Image.fromarray(reference_rgb)
 
     dense_pose_sequence = np.asarray(dense_pose_sequence, dtype=np.float32)
     pose_pil_sequence = _prepare_pose_sequence(

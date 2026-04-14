@@ -364,9 +364,10 @@ docker run --gpus all --rm ghcr.io/<owner>/<repo>/pointstream-gpu:<tag>
   - `POINTSTREAM_ANIMATE_ANYONE_MODEL_VARIANT=finetuned_tennis` (default) or `original`.
   - `POINTSTREAM_ANIMATE_ANYONE_MODEL_DIR=<absolute-or-repo-relative-path>` overrides variant selection.
 - AnimateAnyone output tuning:
-  - `POINTSTREAM_ANIMATE_ANYONE_WIDTH` / `POINTSTREAM_ANIMATE_ANYONE_HEIGHT` (defaults: 512x512)
+  - `POINTSTREAM_ANIMATE_ANYONE_WIDTH` / `POINTSTREAM_ANIMATE_ANYONE_HEIGHT` (defaults: 512x784)
   - `POINTSTREAM_ANIMATE_ANYONE_STEPS` (default: 30)
   - `POINTSTREAM_ANIMATE_ANYONE_CFG` (default: 3.5)
+  - `POINTSTREAM_ANIMATE_ANYONE_WINDOW` (default: 16, temporal pose window length for AnimateAnyone conditioning)
   - `POINTSTREAM_ANIMATE_ANYONE_TRANSPARENT_THRESHOLD` (default: 8, black-background alpha extraction)
 - `tests/test_genai_node.py` is fully skipped unless `POINTSTREAM_ENABLE_GENAI=1`; when enabled it runs a 2-frame compositor smoke test and writes `assets/debug_genai_composite.mp4`.
 - YOLO actor components load weights from local files first (`assets/weights/` or explicit path); implicit online weight download is disabled by default.

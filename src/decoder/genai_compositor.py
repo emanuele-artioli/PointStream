@@ -216,8 +216,8 @@ class MockCompositor:
     def _to_pose_numpy(self, pose_tensor: torch.Tensor) -> np.ndarray:
         pose_np = pose_tensor.detach().cpu().numpy()
         if pose_np.ndim == 3:
-            # Use first frame when a temporal tensor [Frames, 18, 3] is provided.
-            pose_np = pose_np[0]
+            # Use latest frame when a temporal tensor [Frames, 18, 3] is provided.
+            pose_np = pose_np[-1]
         if pose_np.shape != (18, 3):
             raise ValueError(f"Expected pose tensor shape (18, 3), got {tuple(pose_np.shape)}")
         return pose_np.astype(np.float32, copy=False)
@@ -301,6 +301,9 @@ class DiffusersCompositor(MockCompositor):
             return AnimateAnyoneStrategy()
         raise ValueError(f"Unsupported POINTSTREAM_GENAI_BACKEND value: {backend}")
 
+    def uses_temporal_pose_sequence(self) -> bool:
+        return isinstance(self._strategy, AnimateAnyoneStrategy)
+
     @gpu_bound
     def process(
         self,
@@ -333,13 +336,9 @@ class DiffusersCompositor(MockCompositor):
         target_h = max(1, y2 - y1)
         target_w = max(1, x2 - x1)
 
-        is_animate_anyone = isinstance(self._strategy, AnimateAnyoneStrategy)
+        is_animate_anyone = self.uses_temporal_pose_sequence()
         if is_animate_anyone:
-            actor_resized = self._resize_actor_with_aspect_recovery(
-                actor_bgr=generated_np,
-                target_w=target_w,
-                target_h=target_h,
-            )
+            actor_resized = cv2.resize(generated_np, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
             mask = self._segment_black_background(actor_resized)
         else:
             actor_resized = cv2.resize(generated_np, (target_w, target_h), interpolation=cv2.INTER_LINEAR)

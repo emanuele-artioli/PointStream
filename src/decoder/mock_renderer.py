@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import os
 from pathlib import Path
 
 import cv2
@@ -106,6 +107,12 @@ class DecoderRenderer:
         if not self._actor_state:
             return frame_tensor
 
+        use_temporal_window = bool(
+            hasattr(self._genai_compositor, "uses_temporal_pose_sequence")
+            and self._genai_compositor.uses_temporal_pose_sequence()
+        )
+        temporal_window = max(1, int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW", "16")))
+
         out_frames: list[torch.Tensor] = []
         frame_count = int(frame_tensor.shape[0])
         for frame_idx in range(frame_count):
@@ -113,9 +120,16 @@ class DecoderRenderer:
             for actor_state in self._actor_state.values():
                 if frame_idx >= int(actor_state.dense_pose_tensor.shape[0]):
                     continue
+
+                if use_temporal_window:
+                    start_idx = max(0, frame_idx - temporal_window + 1)
+                    pose_condition = actor_state.dense_pose_tensor[start_idx : frame_idx + 1]
+                else:
+                    pose_condition = actor_state.dense_pose_tensor[frame_idx]
+
                 composited = self._genai_compositor.process(
                     reference_crop_tensor=actor_state.reference_crop_tensor,
-                    dense_dwpose_tensor=actor_state.dense_pose_tensor[frame_idx],
+                    dense_dwpose_tensor=pose_condition,
                     warped_background_frame=composited,
                 ).to(frame_tensor.device)
             out_frames.append(composited)
