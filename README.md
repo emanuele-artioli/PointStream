@@ -227,13 +227,22 @@ cd /home/itec/emanuele/pointstream
 python -m unittest discover -s tests -p "test_background.py"
 ```
 
-Run with a local coverage gate (same threshold as CI):
+Run the coverage gate with a local safety buffer:
 
 ```bash
 cd /home/itec/emanuele/pointstream
-coverage run -m unittest discover -s tests -p "test_*.py"
-coverage report --fail-under=80
-coverage xml
+python scripts/check_coverage_gate.py
+```
+
+Default thresholds used by the script:
+- local development: 85%
+- CI: 80%
+
+Override explicitly when needed:
+
+```bash
+cd /home/itec/emanuele/pointstream
+POINTSTREAM_COVERAGE_THRESHOLD=87 python scripts/check_coverage_gate.py
 ```
 
 ## Lint and Type Check

@@ -23,7 +23,7 @@ def _resolve_threshold() -> int:
     # Keep CI at policy threshold while requiring a tighter local buffer.
     if os.environ.get("CI"):
         return 80
-    return 81
+    return 85
 
 
 def _run(cmd: list[str]) -> None:
