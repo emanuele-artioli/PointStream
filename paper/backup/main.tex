@@ -1,0 +1,235 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Template for USENIX papers.
+%
+% History:
+%
+% - TEMPLATE for Usenix papers, specifically to meet requirements of
+%   USENIX '05. originally a template for producing IEEE-format
+%   articles using LaTeX. written by Matthew Ward, CS Department,
+%   Worcester Polytechnic Institute. adapted by David Beazley for his
+%   excellent SWIG paper in Proceedings, Tcl 96. turned into a
+%   smartass generic template by De Clarke, with thanks to both the
+%   above pioneers. Use at your own risk. Complaints to /dev/null.
+%   Make it two column with no page numbering, default is 10 point.
+%
+% - Munged by Fred Douglis <douglis@research.att.com> 10/97 to
+%   separate the .sty file from the LaTeX source template, so that
+%   people can more easily include the .sty file into an existing
+%   document. Also changed to more closely follow the style guidelines
+%   as represented by the Word sample file.
+%
+% - Note that since 2010, USENIX does not require endnotes. If you
+%   want foot of page notes, don't include the endnotes package in the
+%   usepackage command, below.
+% - This version uses the latex2e styles, not the very ancient 2.09
+%   stuff.
+%
+% - Updated July 2018: Text block size changed from 6.5" to 7"
+%
+% - Updated Dec 2018 for ATC'19:
+%
+%   * Revised text to pass HotCRP's auto-formatting check, with
+%     hotcrp.settings.submission_form.body_font_size=10pt, and
+%     hotcrp.settings.submission_form.line_height=12pt
+%
+%   * Switched from \endnote-s to \footnote-s to match Usenix's policy.
+%
+%   * \section* => \begin{abstract} ... \end{abstract}
+%
+%   * Make template self-contained in terms of bibtex entires, to allow
+%     this file to be compiled. (And changing refs style to 'plain'.)
+%
+%   * Make template self-contained in terms of figures, to
+%     allow this file to be compiled. 
+%
+%   * Added packages for hyperref, embedding fonts, and improving
+%     appearance.
+%   
+%   * Removed outdated text.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[letterpaper,twocolumn,10pt]{article}
+\usepackage{usenix2019_v3}
+
+\usepackage{booktabs} 
+\usepackage{algorithm}
+\usepackage{cite}
+\usepackage{xurl}
+\usepackage{algorithm}  
+\usepackage{algpseudocode}
+\usepackage{algorithmicx}
+\usepackage{color, colortbl}
+\usepackage{adjustbox}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{mathrsfs}
+\usepackage{amsfonts}
+\usepackage{graphicx,rotating,booktabs}
+\usepackage{epstopdf}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{subfig}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{color}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{fancyvrb}
+\usepackage{tcolorbox}
+\usepackage{xspace}
+\usepackage{colortbl}
+\pretolerance=5000
+\usepackage{balance}
+\usepackage{caption}
+\usepackage{pict2e}
+\usepackage{stackengine}
+\usepackage{wrapfig}
+\usepackage{pdflscape}
+\usepackage{rotating}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+\usepackage{subfig}
+\usepackage{breakurl}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\usetikzlibrary{plotmarks}
+\usetikzlibrary{arrows.meta}
+\usepgfplotslibrary{patchplots}
+\usepackage[normalem]{ulem}
+\algdef{SE}[DOWHILE]{Do}{doUntile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
+\definecolor{LightCyan}{rgb}{0.88,1,1}
+\usepackage{filecontents}
+\usepackage{siunitx}
+
+
+\usepackage[noframe]{showframe}
+\usepackage{framed}
+\usepackage{lipsum}
+\renewenvironment{shaded}{%
+  \def\FrameCommand{\fboxsep=\FrameSep \colorbox{shadecolor}}%
+  \MakeFramed{\advance\hsize-\width \FrameRestore\FrameRestore}}%
+ {\endMakeFramed}
+\definecolor{shadecolor}{gray}{0.90}
+
+\usepackage{tcolorbox}% Rule colour
+\newtcbox{\mybox}{on line,
+  colframe=shadecolor,colback=shadecolor!10!white,
+  boxrule=0.5pt,arc=4pt,boxsep=0pt,left=6pt,right=6pt,top=6pt,bottom=6pt}
+
+\newcommand{\etal}{\emph{et al.\xspace}}
+\newcommand{\ie}{\emph{i.e.}, }
+\newcommand{\eg}{\emph{e.g.}, }
+\newcommand{\etc}{\emph{etc.\xspace}}
+\newcommand*\rot{\rotatebox{90}}
+\usepackage{pifont}% http://ctan.org/pkg/pifont
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+\newtheorem{principle}{Design Principle}
+\newcommand{\rev}[1]{{#1}}
+\pagestyle{empty}
+\begin{document}
+\setlength{\abovedisplayskip}{0pt}
+\setlength{\belowdisplayskip}{0pt}
+\setlength{\abovedisplayshortskip}{0pt}
+\setlength{\belowdisplayshortskip}{0pt}
+\date{}
+
+\title{\Large \bf PointStream}
+
+\maketitle
+
+\begin{abstract}
+Abstract.
+\end{abstract}
+
+\section{Introduction}
+Live video streaming has become an essential application in modern digital communication, enabling real-time content delivery across various domains, including entertainment, education, teleconferencing, and remote healthcare. 
+For instance, live large-scale events generate nearly ten times more viewer engagement than video-on-demand (VoD) content~\cite{rldish}.
+
+The Hypertext Transfer Protocol (HTTP) and HTTP Adaptive Streaming (HAS) serve as the foundation for delivering both live and VoD content over the Internet~\cite{8424813}. In HAS, videos are divided into segments and encoded into multiple representations based on a predefined bitrate ladder, where different representations vary in bitrate and resolution. The server provides these available representations through a manifest file, allowing the client to dynamically select the appropriate representation for the next segment using an adaptive bitrate (ABR) algorithm. ABR algorithms optimize various performance metrics~\cite{10229083}, including quality of experience (QoE), which reflects the user’s overall satisfaction with the streaming session~\cite{zuo2022abr}. By enabling clients to make independent and adaptive representation selections, HAS efficiently handles network heterogeneity and variations in connectivity between servers and clients~\cite{8424813}. Additionally, HAS enhances scalability and performance by utilizing content delivery networks (CDNs), which cache video content and distribute it from geographically dispersed edge servers, ensuring low-latency access for end users~\cite{content_delivery_2002}.
+
+With the widespread adoption of high-definition (HD) and ultra-high-definition (UHD), video streaming has significantly increased the demand for network bandwidth, necessitating the development of novel techniques to deliver stunning quality with the lowest possible amount of data. Novel video compression techniques, such as HEVC~\cite{h265_overview}, AV1~\cite{av1_overview}, and VVC~\cite{vvc_overview}, have made significant advancements in reducing bitrates while preserving visual fidelity. Despite a significant reduction in the transmitted data volume, network congestion remains a persistent issue and is one of the key factors contributing to poor quality delivery and stalls, ultimately degrading the QoE~\cite{}.
+
+Recent advancements in generative artificial intelligence (AI) have introduced new possibilities for optimizing video streaming by reconstructing visual content on the client side. By leveraging deep learning models, such as super-resolution networks and generative adversarial networks (GANs), it is possible to transmit lower-resolution video while reconstructing high-fidelity details using computational resources available on GPU-enabled devices. These AI-driven methods significantly reduce bandwidth consumption but introduce additional computational overhead at the client side. Balancing this trade-off between bandwidth savings and computational complexity is a key research challenge in AI-assisted video streaming.
+
+In this paper, we propose a novel approach to address bandwidth constraints by leveraging fidelity reconstruction of static scenes in live video streaming. Our method focuses on scenarios where the background remains largely unchanged while objects or people move within the scene. By transmitting only the essential motion information and reconstructing the static elements at the client side, we achieve substantial bandwidth reductions without compromising perceptual quality. This approach enables efficient video delivery while utilizing the capabilities of modern GPUs for real-time fidelity reconstruction. Through our proposed method, we aim to enhance the efficiency of live video streaming, reducing network strain while maintaining a high-quality viewing experience.
+
+The contributions of this work are three-fold:
+
+\begin{itemize}
+    \item One
+    \item Two, and
+    \item Three.
+\end{itemize}
+
+\newpage
+
+\section{Related Work}
+Live video streaming has traditionally relied on two main pillars. 
+First, HTTP Adaptive Streaming (HAS) protocols use pre‐encoded representations~\cite{AVC, HEVC, AV1, VVC} to cope with network instability by dividing videos into segments and using adaptive bitrate (ABR) algorithms for quality selection~\cite{Wiegand et al. 2003, Sullivan et al. 2012}. 
+Second, content delivery networks (CDNs) and modern adaptive systems~\cite{Pensieve} have optimized client–server interactions to maintain user Quality of Experience (QoE). 
+However, despite these advances, bandwidth shortages due to network congestion and the high data demands of high-definition content persist.
+
+\subsection{Video Compression and Redundancy Removal}
+Conventional video codecs exploit spatial and temporal redundancies via techniques such as motion compensation and transform coding to achieve compression. 
+While these methods have matured over decades, they often require transmitting a substantial amount of data—even for scenes with largely static backgrounds. 
+% we could talk more about how blocks of a static background with objects moving on them, need to be re-encoded every time an object occludes them, since the codec does not know what is background and what is object.
+Recently, neural video codecs~\cite{NeRV, HNeRV} have emerged as alternatives that learn compact representations of video content. 
+Although promising, such approaches tend to shift the computational burden to the client and are not yet optimized for the real‐time constraints of live streaming.
+
+\subsection{Neural Video Restoration and Fidelity Reconstruction}
+Parallel to advancements in compression, deep learning–based video restoration techniques have been explored to enhance perceptual quality from low-bitrate or compressed streams. 
+Methods for frame interpolation, super-resolution, and inpainting~\cite{ELVIS} use convolutional neural networks and generative adversarial networks to recover high-quality visual details. 
+Yet, these approaches generally target the entire frame without explicitly exploiting the fact that many live streams exhibit predominantly static backgrounds. 
+In contrast, our method specifically targets scenarios where background elements remain largely unchanged while objects or people move—allowing the client to reconstruct high-fidelity static content using generative models, thereby reducing client load and transmitted data volume.
+
+\subsection{Content-Aware Adaptation in Live Streaming}
+A growing body of work has recognized that not all video segments are equally sensitive to quality degradation. 
+For instance, SENSEI~\cite{Zhang et al., NSDI '21} demonstrates that user sensitivity to quality changes varies dynamically with content—for example, rebuffering during a crucial moment in a live event is more detrimental than during routine play. 
+% this is why we base our segments into scenes instead of seconds.
+Similarly, recent systems like GRACE~\cite{Cheng et al., NSDI '24} leverage neural codecs to improve resilience against packet loss by reconstructing missing content on the fly. 
+These studies underscore the potential of incorporating semantic or content-aware insights into streaming systems. 
+Our work builds on this idea by concentrating on fidelity reconstruction of static scenes; by transmitting only essential motion information, we can devote computational resources at the client side (on modern GPUs) to reconstruct the crucial elements of a video with high visual fidelity.
+
+\newpage
+
+\section{Method}
+
+\section{Experiments}
+\subsection{Experimental Settings}
+
+\noindent
+\textbf{Dataset.}
+
+\noindent
+\textbf{Training and testing settings.}
+
+\noindent
+\textbf{Evaluation metrics.}
+
+\noindent
+\textbf{Implementation details.}
+
+\subsection{Quantitative and Qualitative Comparisons}
+We conduct a comprehensive comparison between our PointStream and
+several state-of-the-art X methods, including X, Y, Z.
+
+\noindent
+
+\textbf{Quantitative comparison.} Table with results about PSNR etc.
+
+\noindent
+
+\textbf{Qualitative comparison.} Exemplar visual results for various methods are presented in Figure X. PointStream generates high-quality...
+
+\subsection{Ablation Study}
+
+Ablation study here.
+
+\section{Conclusion}
+
+\balance
+
+\bibliographystyle{acm}
+\bibliography{ref}
+
+\end{document}
