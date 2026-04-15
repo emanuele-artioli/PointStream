@@ -19,11 +19,11 @@ def _dtype_alias_map() -> dict[str, torch.dtype]:
     }
 
     if hasattr(torch, "float8_e4m3fn"):
-        aliases["float8_e4m3fn"] = torch.float8_e4m3fn  # type: ignore[attr-defined]
-        aliases["fp8_e4m3fn"] = torch.float8_e4m3fn  # type: ignore[attr-defined]
+        aliases["float8_e4m3fn"] = torch.float8_e4m3fn
+        aliases["fp8_e4m3fn"] = torch.float8_e4m3fn
     if hasattr(torch, "float8_e5m2"):
-        aliases["float8_e5m2"] = torch.float8_e5m2  # type: ignore[attr-defined]
-        aliases["fp8_e5m2"] = torch.float8_e5m2  # type: ignore[attr-defined]
+        aliases["float8_e5m2"] = torch.float8_e5m2
+        aliases["fp8_e5m2"] = torch.float8_e5m2
 
     return aliases
 

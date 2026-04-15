@@ -198,12 +198,6 @@ class BallExtractor:
             height=int(chunk.height),
         )
 
-        for _ in range(int(chunk.start_frame_id)):
-            try:
-                next(frame_iter)
-            except StopIteration:
-                return
-
         emitted = 0
         for frame in frame_iter:
             if emitted >= int(chunk.num_frames):

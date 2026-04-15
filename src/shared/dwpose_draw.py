@@ -57,7 +57,8 @@ def _normalize_people_to_unit_space(people_dw: np.ndarray, width: int, height: i
 
 
 def _draw_dwpose_fallback(people_dw: np.ndarray, height: int, width: int, confidence_threshold: float) -> np.ndarray:
-    canvas = np.zeros((height, width, 3), dtype=np.uint8)
+    # Keep a signed integer buffer while drawing to satisfy OpenCV type stubs.
+    canvas = np.zeros((height, width, 3), dtype=np.int32)
     people = _normalize_people_to_unit_space(people_dw=people_dw, width=width, height=height)
 
     limb_seq = [
@@ -124,7 +125,9 @@ def _draw_dwpose_fallback(people_dw: np.ndarray, height: int, width: int, confid
                 360,
                 1,
             )
-            cv2.fillConvexPoly(canvas, polygon, colors[limb_idx])
+            polygon_np = np.asarray(polygon, dtype=np.int32)
+            color = tuple(float(channel) for channel in colors[limb_idx])
+            cv2.fillConvexPoly(canvas, polygon_np, color)
 
     canvas = np.asarray(canvas.astype(np.float32) * 0.6, dtype=np.uint8)
 
