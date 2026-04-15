@@ -61,6 +61,54 @@ def test_ball_extractor_tracks_visible_motion(test_run_artifacts_dir: Path) -> N
         assert abs(state.ball_y - expected_y) <= 8.0
 
 
+def test_ball_extractor_tracks_visible_motion_with_downscaled_detection(test_run_artifacts_dir: Path) -> None:
+    pytest.importorskip("kornia")
+
+    num_frames = 12
+    width = 96
+    height = 64
+    fps = 30.0
+    video_path = test_run_artifacts_dir / "test_chunks" / "ball_extract_downscaled.mp4"
+    expected_positions = _create_moving_ball_video(
+        path=video_path,
+        num_frames=num_frames,
+        width=width,
+        height=height,
+        fps=fps,
+    )
+
+    chunk = VideoChunk(
+        chunk_id="ball_extract_downscaled_0001",
+        source_uri=str(video_path),
+        start_frame_id=0,
+        fps=fps,
+        num_frames=num_frames,
+        width=width,
+        height=height,
+    )
+    panorama = _build_static_panorama(chunk=chunk)
+    frame_states = [FrameState(frame_id=idx, actors=[]) for idx in range(num_frames)]
+
+    extractor = BallExtractor(
+        difference_threshold=10.0,
+        min_blob_area=4,
+        device="cpu",
+        detection_max_side=48,
+    )
+    packet = extractor.process(chunk=chunk, panorama=panorama, frame_states=frame_states)
+
+    assert len(packet.states) == num_frames
+    visible_states = [state for state in packet.states if state.is_visible]
+    assert len(visible_states) >= 8
+
+    for frame_idx, state in enumerate(packet.states):
+        if not state.is_visible:
+            continue
+        expected_x, expected_y = expected_positions[frame_idx]
+        assert abs(state.ball_x - expected_x) <= 10.0
+        assert abs(state.ball_y - expected_y) <= 10.0
+
+
 def test_end_to_end_reconstruction_contains_tracked_ball(test_run_artifacts_dir: Path) -> None:
     pytest.importorskip("kornia")
 

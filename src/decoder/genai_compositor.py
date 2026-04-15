@@ -9,7 +9,9 @@ import cv2
 import numpy as np
 import torch
 
+from src.shared.dwpose_draw import draw_dwpose_canvas
 from src.shared.tags import gpu_bound
+from src.shared.torch_dtype import is_cuda_device_usable, resolve_torch_dtype_for_device
 
 
 class BaseGenAIStrategy(ABC):
@@ -50,7 +52,11 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
                 "Install diffusers, transformers, and accelerate."
             ) from exc
 
-        dtype = torch.float16 if device.type == "cuda" else torch.float32
+        dtype = resolve_torch_dtype_for_device(
+            device,
+            default_cuda=torch.float16,
+            allowed_cuda={torch.float16, torch.bfloat16, torch.float32},
+        )
         controlnet = ControlNetModel.from_pretrained(self._controlnet_id, torch_dtype=dtype)
         pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
             self._model_id,
@@ -188,7 +194,9 @@ class MockCompositor:
         reference_crop_tensor: torch.Tensor,
         dense_dwpose_tensor: torch.Tensor,
         warped_background_frame: torch.Tensor,
+        actor_identity: str | None = None,
     ) -> torch.Tensor:
+        _ = actor_identity
         frame_np = self._to_frame_numpy(warped_background_frame)
         pose_np = self._to_pose_numpy(dense_dwpose_tensor)
         crop_np = self._to_crop_numpy(reference_crop_tensor)
@@ -286,12 +294,25 @@ class DiffusersCompositor(MockCompositor):
             self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         else:
             self._device = torch.device(device)
+        if self._device.type == "cuda" and not is_cuda_device_usable(self._device):
+            self._device = torch.device("cpu")
         backend_value = backend if backend is not None else os.environ.get("POINTSTREAM_GENAI_BACKEND")
         if backend_value is None:
             backend_value = "controlnet"
         self._backend = backend_value.strip().lower()
         threshold = int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_TRANSPARENT_THRESHOLD", "8"))
         self._animate_anyone_transparent_threshold = int(np.clip(threshold, 0, 255))
+        resize_mode = os.environ.get("POINTSTREAM_GENAI_RESIZE_MODE", "aspect-recovery").strip().lower()
+        if resize_mode not in {"plain", "aspect-recovery"}:
+            resize_mode = "aspect-recovery"
+        self._resize_mode = resize_mode
+
+        adaptive_raw = os.environ.get("POINTSTREAM_ANIMATE_ANYONE_ADAPTIVE_THRESHOLD", "1").strip().lower()
+        self._use_adaptive_black_threshold = adaptive_raw not in {"0", "false", "off", "no"}
+
+        alpha_smoothing_raw = float(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_ALPHA_SMOOTHING", "0.25"))
+        self._alpha_temporal_smoothing = float(np.clip(alpha_smoothing_raw, 0.0, 0.95))
+        self._alpha_history_by_actor: dict[str, np.ndarray] = {}
         self._strategy = self._build_strategy(self._backend)
 
     def _build_strategy(self, backend: str) -> BaseGenAIStrategy:
@@ -310,6 +331,7 @@ class DiffusersCompositor(MockCompositor):
         reference_crop_tensor: torch.Tensor,
         dense_dwpose_tensor: torch.Tensor,
         warped_background_frame: torch.Tensor,
+        actor_identity: str | None = None,
     ) -> torch.Tensor:
         # Deterministic generation is required so residual encoding remains stable.
         torch.manual_seed(self._seed)
@@ -337,16 +359,24 @@ class DiffusersCompositor(MockCompositor):
         target_w = max(1, x2 - x1)
 
         is_animate_anyone = self.uses_temporal_pose_sequence()
-        if is_animate_anyone:
-            actor_resized = cv2.resize(generated_np, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
-            mask = self._segment_black_background(actor_resized)
+        if is_animate_anyone and self._resize_mode == "aspect-recovery":
+            actor_resized = self._resize_actor_with_aspect_recovery(generated_np, target_w=target_w, target_h=target_h)
         else:
             actor_resized = cv2.resize(generated_np, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
-            mask = self._segment_foreground(actor_resized)
+
+        if is_animate_anyone:
+            alpha_mask = self._segment_black_background(actor_resized)
+        else:
+            alpha_mask = self._segment_foreground(actor_resized)
+        alpha_mask = self._apply_temporal_alpha_smoothing(alpha_mask=alpha_mask, actor_identity=actor_identity)
+
+        if alpha_mask is None or int(np.count_nonzero(alpha_mask > 0.01)) == 0:
+            return torch.from_numpy(frame_np).permute(2, 0, 1).contiguous().to(torch.uint8)
 
         roi = frame_np[y1:y2, x1:x2]
-        roi[mask] = actor_resized[mask]
-        frame_np[y1:y2, x1:x2] = roi
+        alpha_3 = np.asarray(alpha_mask[:, :, None], dtype=np.float32)
+        blended = actor_resized.astype(np.float32) * alpha_3 + roi.astype(np.float32) * (1.0 - alpha_3)
+        frame_np[y1:y2, x1:x2] = np.asarray(np.clip(blended, 0.0, 255.0), dtype=np.uint8)
         return torch.from_numpy(frame_np).permute(2, 0, 1).contiguous().to(torch.uint8)
 
     def _resize_actor_with_aspect_recovery(self, actor_bgr: np.ndarray, target_w: int, target_h: int) -> np.ndarray:
@@ -375,33 +405,36 @@ class DiffusersCompositor(MockCompositor):
 
         return cv2.resize(cropped, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
 
-    def _segment_black_background(self, actor_bgr: np.ndarray) -> np.ndarray:
+    def _segment_black_background(self, actor_bgr: np.ndarray) -> np.ndarray | None:
         threshold = self._animate_anyone_transparent_threshold
-        mask = np.any(actor_bgr > threshold, axis=2)
+        span_threshold = 6
+        if self._use_adaptive_black_threshold:
+            threshold, span_threshold = self._estimate_adaptive_black_thresholds(
+                actor_bgr=actor_bgr,
+                base_threshold=threshold,
+                base_span_threshold=span_threshold,
+            )
 
+        max_channel = np.max(actor_bgr, axis=2)
+        channel_span = np.max(actor_bgr, axis=2) - np.min(actor_bgr, axis=2)
+        mask = (max_channel > threshold) | (channel_span > span_threshold)
         mask_u8 = np.asarray(mask.astype(np.uint8) * 255, dtype=np.uint8)
-        opened = cv2.morphologyEx(mask_u8, cv2.MORPH_OPEN, np.ones((3, 3), dtype=np.uint8), iterations=1)
-        closed = cv2.morphologyEx(
-            np.asarray(opened, dtype=np.uint8),
-            cv2.MORPH_CLOSE,
-            np.ones((5, 5), dtype=np.uint8),
-            iterations=1,
-        )
-        binary = np.asarray(closed, dtype=np.uint8) > 0
 
         min_pixels = max(10, actor_bgr.shape[0] * actor_bgr.shape[1] // 80)
-        if int(np.count_nonzero(binary)) < min_pixels:
-            return np.ones(actor_bgr.shape[:2], dtype=bool)
-        return binary
+        return self._postprocess_binary_mask(mask_u8, min_pixels=min_pixels)
 
-    def _segment_foreground(self, actor_bgr: np.ndarray) -> np.ndarray:
+    def _segment_foreground(self, actor_bgr: np.ndarray) -> np.ndarray | None:
         hsv = cv2.cvtColor(actor_bgr, cv2.COLOR_BGR2HSV)
         # Remove near-black/near-gray generated background with a simple color-energy mask.
         sat = hsv[:, :, 1]
         val = hsv[:, :, 2]
-        mask = (val > 24) & (sat > 20)
+        mask = (val > 24) & ((sat > 16) | (val > 42))
 
         mask_u8 = np.asarray(mask.astype(np.uint8) * 255, dtype=np.uint8)
+        min_pixels = max(10, actor_bgr.shape[0] * actor_bgr.shape[1] // 50)
+        return self._postprocess_binary_mask(mask_u8, min_pixels=min_pixels)
+
+    def _postprocess_binary_mask(self, mask_u8: np.ndarray, min_pixels: int) -> np.ndarray | None:
         opened = cv2.morphologyEx(mask_u8, cv2.MORPH_OPEN, np.ones((3, 3), dtype=np.uint8), iterations=1)
         closed = cv2.morphologyEx(
             np.asarray(opened, dtype=np.uint8),
@@ -409,10 +442,100 @@ class DiffusersCompositor(MockCompositor):
             np.ones((5, 5), dtype=np.uint8),
             iterations=1,
         )
-        binary = np.asarray(closed, dtype=np.uint8) > 0
-        if int(np.count_nonzero(binary)) < max(10, actor_bgr.shape[0] * actor_bgr.shape[1] // 50):
-            return np.ones(actor_bgr.shape[:2], dtype=bool)
-        return binary
+        largest = self._keep_largest_component(np.asarray(closed, dtype=np.uint8))
+        filled = self._fill_mask_holes(largest)
+
+        if int(np.count_nonzero(filled)) < int(min_pixels):
+            return None
+        return self._to_soft_alpha(filled)
+
+    def _keep_largest_component(self, mask_u8: np.ndarray) -> np.ndarray:
+        binary = np.asarray(mask_u8 > 0, dtype=np.uint8)
+        if int(np.count_nonzero(binary)) == 0:
+            return np.zeros_like(mask_u8, dtype=np.uint8)
+
+        num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(binary, connectivity=8)
+        if num_labels <= 1:
+            return np.zeros_like(mask_u8, dtype=np.uint8)
+
+        areas = stats[1:, cv2.CC_STAT_AREA]
+        best_label = int(np.argmax(areas)) + 1
+        kept = np.asarray(labels == best_label, dtype=np.uint8) * 255
+        return kept
+
+    def _fill_mask_holes(self, mask_u8: np.ndarray) -> np.ndarray:
+        if int(np.count_nonzero(mask_u8)) == 0:
+            return np.zeros_like(mask_u8, dtype=np.uint8)
+
+        h, w = mask_u8.shape[:2]
+        flood = np.asarray(mask_u8, dtype=np.uint8).copy()
+        flood_mask = np.zeros((h + 2, w + 2), dtype=np.uint8)
+        cv2.floodFill(flood, flood_mask, (0, 0), (255,))
+        flood_inv = cv2.bitwise_not(flood)
+        return cv2.bitwise_or(np.asarray(mask_u8, dtype=np.uint8), flood_inv)
+
+    def _to_soft_alpha(self, mask_u8: np.ndarray) -> np.ndarray:
+        blurred = cv2.GaussianBlur(np.asarray(mask_u8, dtype=np.uint8), (5, 5), 0)
+        alpha = np.asarray(blurred, dtype=np.float32) / 255.0
+        alpha[alpha < 0.05] = 0.0
+        alpha[alpha > 0.98] = 1.0
+        return np.asarray(np.clip(alpha, 0.0, 1.0), dtype=np.float32)
+
+    def _estimate_adaptive_black_thresholds(
+        self,
+        actor_bgr: np.ndarray,
+        base_threshold: int,
+        base_span_threshold: int,
+    ) -> tuple[int, int]:
+        border_pixels = self._extract_border_pixels(actor_bgr)
+        if border_pixels.size == 0:
+            return int(base_threshold), int(base_span_threshold)
+
+        border_max = np.max(border_pixels, axis=1)
+        border_span = np.max(border_pixels, axis=1) - np.min(border_pixels, axis=1)
+
+        adaptive_threshold = int(np.clip(np.percentile(border_max, 95) + 3.0, 0.0, 255.0))
+        adaptive_span = int(np.clip(np.percentile(border_span, 95) + 2.0, 0.0, 255.0))
+
+        return max(int(base_threshold), adaptive_threshold), max(int(base_span_threshold), adaptive_span)
+
+    def _extract_border_pixels(self, actor_bgr: np.ndarray) -> np.ndarray:
+        h, w = actor_bgr.shape[:2]
+        if h <= 0 or w <= 0:
+            return np.empty((0, 3), dtype=np.uint8)
+
+        border = max(1, min(h, w) // 32)
+        top = actor_bgr[:border, :, :].reshape(-1, 3)
+        bottom = actor_bgr[h - border :, :, :].reshape(-1, 3)
+        left = actor_bgr[:, :border, :].reshape(-1, 3)
+        right = actor_bgr[:, w - border :, :].reshape(-1, 3)
+        return np.concatenate([top, bottom, left, right], axis=0)
+
+    def _apply_temporal_alpha_smoothing(
+        self,
+        alpha_mask: np.ndarray | None,
+        actor_identity: str | None,
+    ) -> np.ndarray | None:
+        key = actor_identity if actor_identity is not None else "__default_actor__"
+
+        if alpha_mask is None:
+            self._alpha_history_by_actor.pop(key, None)
+            return None
+
+        current = np.asarray(alpha_mask, dtype=np.float32)
+        smoothing = float(self._alpha_temporal_smoothing)
+        if smoothing <= 0.0:
+            self._alpha_history_by_actor[key] = current
+            return current
+
+        previous = self._alpha_history_by_actor.get(key)
+        if previous is None or previous.shape != current.shape:
+            self._alpha_history_by_actor[key] = current
+            return current
+
+        blended = np.asarray(previous * smoothing + current * (1.0 - smoothing), dtype=np.float32)
+        self._alpha_history_by_actor[key] = blended
+        return blended
 
 
 def _to_numpy_bgr(image_tensor: torch.Tensor) -> np.ndarray:
@@ -431,39 +554,12 @@ def _render_pose_condition(pose_tensor: torch.Tensor, output_height: int, output
     if pose_np.shape != (18, 3):
         raise ValueError(f"Expected pose tensor shape (18, 3), got {tuple(pose_np.shape)}")
 
-    canvas = np.zeros((output_height, output_width, 3), dtype=np.uint8)
-    valid = pose_np[:, 2] >= 0.2
-    points = pose_np[:, :2].astype(np.int32)
-
-    for idx in np.where(valid)[0]:
-        px = int(np.clip(points[idx, 0], 0, output_width - 1))
-        py = int(np.clip(points[idx, 1], 0, output_height - 1))
-        cv2.circle(canvas, (px, py), 3, (255, 255, 255), thickness=-1, lineType=cv2.LINE_AA)
-
-    limb_edges = [
-        (0, 1),
-        (1, 2),
-        (2, 3),
-        (1, 5),
-        (5, 6),
-        (6, 7),
-        (1, 8),
-        (8, 9),
-        (9, 10),
-        (1, 11),
-        (11, 12),
-        (12, 13),
-    ]
-    for a, b in limb_edges:
-        if not (valid[a] and valid[b]):
-            continue
-        ax = int(np.clip(points[a, 0], 0, output_width - 1))
-        ay = int(np.clip(points[a, 1], 0, output_height - 1))
-        bx = int(np.clip(points[b, 0], 0, output_width - 1))
-        by = int(np.clip(points[b, 1], 0, output_height - 1))
-        cv2.line(canvas, (ax, ay), (bx, by), (255, 255, 255), thickness=2, lineType=cv2.LINE_AA)
-
-    return canvas
+    return draw_dwpose_canvas(
+        height=int(output_height),
+        width=int(output_width),
+        people_dw=pose_np[np.newaxis, ...],
+        confidence_threshold=0.2,
+    )
 
 
 # Backward-compatible alias used by existing decode tests.

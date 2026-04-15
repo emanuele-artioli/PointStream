@@ -38,7 +38,7 @@ class DecoderRenderer:
     def process(self, payload: EncodedChunkPayload, output_path: str | Path | None = None) -> DecodedChunkResult:
         chunk = payload.chunk
         self._actor_state = self._build_actor_state(payload)
-        synthesis = self._synthesis_engine.synthesize(payload)
+        synthesis = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False)
 
         frame_tensor = self._compositor.composite(
             predicted_frames=synthesis.frames_bgr,
@@ -112,6 +112,7 @@ class DecoderRenderer:
             and self._genai_compositor.uses_temporal_pose_sequence()
         )
         temporal_window = max(1, int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW", "16")))
+        preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
 
         out_frames: list[torch.Tensor] = []
         frame_count = int(frame_tensor.shape[0])
@@ -122,8 +123,13 @@ class DecoderRenderer:
                     continue
 
                 if use_temporal_window:
-                    start_idx = max(0, frame_idx - temporal_window + 1)
-                    pose_condition = actor_state.dense_pose_tensor[start_idx : frame_idx + 1]
+                    if frame_idx < preroll_frames:
+                        continue
+                    pose_condition = self._build_temporal_pose_condition(
+                        dense_pose_tensor=actor_state.dense_pose_tensor,
+                        frame_idx=frame_idx,
+                        temporal_window=temporal_window,
+                    )
                 else:
                     pose_condition = actor_state.dense_pose_tensor[frame_idx]
 
@@ -131,7 +137,27 @@ class DecoderRenderer:
                     reference_crop_tensor=actor_state.reference_crop_tensor,
                     dense_dwpose_tensor=pose_condition,
                     warped_background_frame=composited,
+                    actor_identity=actor_state.object_id,
                 ).to(frame_tensor.device)
             out_frames.append(composited)
 
         return torch.stack(out_frames, dim=0)
+
+    def _build_temporal_pose_condition(
+        self,
+        dense_pose_tensor: torch.Tensor,
+        frame_idx: int,
+        temporal_window: int,
+    ) -> torch.Tensor:
+        start_idx = max(0, int(frame_idx) - int(temporal_window) + 1)
+        sequence = dense_pose_tensor[start_idx : int(frame_idx) + 1]
+        if int(sequence.shape[0]) >= int(temporal_window):
+            return sequence
+
+        if int(sequence.shape[0]) == 0:
+            first_pose = dense_pose_tensor[0].unsqueeze(0)
+            return first_pose.repeat(int(temporal_window), 1, 1)
+
+        pad_count = int(temporal_window) - int(sequence.shape[0])
+        first_pose = sequence[0].unsqueeze(0).repeat(pad_count, 1, 1)
+        return torch.cat([first_pose, sequence], dim=0)

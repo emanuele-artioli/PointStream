@@ -12,6 +12,9 @@ import cv2
 import numpy as np
 import torch
 
+from src.shared.dwpose_draw import draw_dwpose_canvas
+from src.shared.torch_dtype import is_cuda_device_usable, resolve_torch_dtype_for_device
+
 
 @dataclass(frozen=True)
 class _RuntimeConfig:
@@ -101,7 +104,11 @@ def _load_pipeline(repo_root: Path, model_root: Path, device: str) -> Any:
     global _PIPELINE, _PIPELINE_DEVICE, _PIPELINE_DTYPE, _PIPELINE_REPO_ROOT, _PIPELINE_MODEL_ROOT
 
     with _PIPELINE_LOCK:
-        dtype = torch.float16 if device.startswith("cuda") else torch.float32
+        dtype = resolve_torch_dtype_for_device(
+            torch.device(device),
+            default_cuda=torch.float16,
+            allowed_cuda={torch.float16, torch.bfloat16, torch.float32},
+        )
         if (
             _PIPELINE is not None
             and _PIPELINE_DEVICE == device
@@ -179,43 +186,15 @@ def _load_pipeline(repo_root: Path, model_root: Path, device: str) -> Any:
 
 
 def _render_pose_image_from_dwpose(pose: np.ndarray, width: int, height: int) -> np.ndarray:
-    canvas = np.zeros((height, width, 3), dtype=np.uint8)
     if pose.shape != (18, 3):
-        return canvas
+        return np.zeros((height, width, 3), dtype=np.uint8)
 
-    valid = pose[:, 2] >= 0.2
-    points = pose[:, :2].astype(np.float32)
-    points[:, 0] = np.clip(points[:, 0], 0.0, float(width - 1))
-    points[:, 1] = np.clip(points[:, 1], 0.0, float(height - 1))
-
-    edges = [
-        (0, 1),
-        (1, 2),
-        (2, 3),
-        (1, 5),
-        (5, 6),
-        (6, 7),
-        (1, 8),
-        (8, 9),
-        (9, 10),
-        (1, 11),
-        (11, 12),
-        (12, 13),
-    ]
-
-    for idx in np.where(valid)[0]:
-        x = int(round(points[idx, 0]))
-        y = int(round(points[idx, 1]))
-        cv2.circle(canvas, (x, y), 4, (255, 255, 255), thickness=-1, lineType=cv2.LINE_AA)
-
-    for a, b in edges:
-        if not (valid[a] and valid[b]):
-            continue
-        ax, ay = int(round(points[a, 0])), int(round(points[a, 1]))
-        bx, by = int(round(points[b, 0])), int(round(points[b, 1]))
-        cv2.line(canvas, (ax, ay), (bx, by), (255, 255, 255), thickness=3, lineType=cv2.LINE_AA)
-
-    return canvas
+    return draw_dwpose_canvas(
+        height=int(height),
+        width=int(width),
+        people_dw=np.asarray(pose, dtype=np.float32)[np.newaxis, ...],
+        confidence_threshold=0.2,
+    )
 
 
 def _normalize_pose_to_canvas(
@@ -319,7 +298,9 @@ def generate_frame(
     repo_root = _resolve_repo_root(repo_dir=repo_dir)
     model_root = _resolve_model_root(repo_root=repo_root, runtime=runtime)
 
-    resolved_device = "cuda" if str(device).startswith("cuda") and torch.cuda.is_available() else "cpu"
+    resolved_device = "cpu"
+    if str(device).startswith("cuda") and torch.cuda.is_available() and is_cuda_device_usable(torch.device("cuda")):
+        resolved_device = "cuda"
     pipe = _load_pipeline(repo_root=repo_root, model_root=model_root, device=resolved_device)
 
     width = int(runtime.width)

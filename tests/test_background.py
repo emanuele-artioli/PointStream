@@ -68,6 +68,8 @@ def test_real_video_background_stitching_and_transport(
 
     assert recovered.chunk.chunk_id == chunk_id
     assert len(recovered.panorama.homography_matrices) == recovered.chunk.num_frames
+    assert recovered.panorama.panorama_image is None
+    assert Path(recovered.panorama.panorama_uri).exists()
     assert (chunk_dir / "metadata.msgpack").exists()
     assert (chunk_dir / "residual.mp4").exists()
 

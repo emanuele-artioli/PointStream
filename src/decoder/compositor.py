@@ -6,6 +6,7 @@ import numpy as np
 import torch
 
 from src.encoder.video_io import iter_video_frames_ffmpeg
+from src.shared.torch_dtype import is_cuda_device_usable
 
 
 class ResidualCompositor:
@@ -16,6 +17,8 @@ class ResidualCompositor:
             self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         else:
             self._device = torch.device(device)
+        if self._device.type == "cuda" and not is_cuda_device_usable(self._device):
+            self._device = torch.device("cpu")
 
     def composite(
         self,

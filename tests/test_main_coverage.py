@@ -280,6 +280,28 @@ def test_run_cli_rejects_invalid_num_frames(monkeypatch) -> None:
         main_module.run_cli(["--num-frames", "0"])
 
 
+def test_run_cli_rejects_negative_genai_preroll(monkeypatch) -> None:
+    monkeypatch.setattr(
+        main_module,
+        "run_mock_pipeline",
+        lambda **kwargs: {},
+    )
+
+    with pytest.raises(ValueError, match="non-negative"):
+        main_module.run_cli(["--genai-preroll-frames", "-1"])
+
+
+def test_run_cli_rejects_invalid_alpha_smoothing(monkeypatch) -> None:
+    monkeypatch.setattr(
+        main_module,
+        "run_mock_pipeline",
+        lambda **kwargs: {},
+    )
+
+    with pytest.raises(ValueError, match=r"range \[0.0, 1.0\]"):
+        main_module.run_cli(["--animate-anyone-alpha-smoothing", "1.5"])
+
+
 def test_run_cli_rejects_missing_input_video(monkeypatch, tmp_path: Path) -> None:
     missing_video = tmp_path / "missing.mp4"
 
@@ -315,6 +337,12 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
     monkeypatch.setattr(main_module, "run_mock_pipeline", _fake_run_mock_pipeline)
     monkeypatch.delenv("POINTSTREAM_ENABLE_GENAI", raising=False)
     monkeypatch.delenv("POINTSTREAM_GENAI_BACKEND", raising=False)
+    monkeypatch.delenv("POINTSTREAM_GENAI_PREROLL_FRAMES", raising=False)
+    monkeypatch.delenv("POINTSTREAM_GPU_DTYPE", raising=False)
+    monkeypatch.delenv("POINTSTREAM_BALL_MAX_SIDE", raising=False)
+    monkeypatch.delenv("POINTSTREAM_GENAI_RESIZE_MODE", raising=False)
+    monkeypatch.delenv("POINTSTREAM_ANIMATE_ANYONE_ADAPTIVE_THRESHOLD", raising=False)
+    monkeypatch.delenv("POINTSTREAM_ANIMATE_ANYONE_ALPHA_SMOOTHING", raising=False)
 
     exit_code = main_module.run_cli(
         [
@@ -343,6 +371,17 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
             "--disable-genai",
             "--genai-backend",
             "controlnet",
+            "--genai-preroll-frames",
+            "2",
+            "--gpu-dtype",
+            "fp32",
+            "--ball-max-side",
+            "720",
+            "--genai-resize-mode",
+            "aspect-recovery",
+            "--animate-anyone-adaptive-threshold",
+            "--animate-anyone-alpha-smoothing",
+            "0.35",
             "--no-summary-file",
         ]
     )
@@ -357,3 +396,9 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
     assert captured["residual_calculator"] is not None
     assert os.environ.get("POINTSTREAM_ENABLE_GENAI") == "0"
     assert os.environ.get("POINTSTREAM_GENAI_BACKEND") == "controlnet"
+    assert os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES") == "2"
+    assert os.environ.get("POINTSTREAM_GPU_DTYPE") == "fp32"
+    assert os.environ.get("POINTSTREAM_BALL_MAX_SIDE") == "720"
+    assert os.environ.get("POINTSTREAM_GENAI_RESIZE_MODE") == "aspect-recovery"
+    assert os.environ.get("POINTSTREAM_ANIMATE_ANYONE_ADAPTIVE_THRESHOLD") == "1"
+    assert os.environ.get("POINTSTREAM_ANIMATE_ANYONE_ALPHA_SMOOTHING") == "0.35"

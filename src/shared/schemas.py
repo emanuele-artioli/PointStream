@@ -103,7 +103,7 @@ class PanoramaPacket(BaseModel):
     frame_width: int = Field(gt=0)
     frame_height: int = Field(gt=0)
     camera_poses: list[CameraPose]
-    panorama_image: list[list[list[int]]]
+    panorama_image: list[list[list[int]]] | None = None
     homography_matrices: list[list[list[float]]]
     selected_frame_indices: list[int] = Field(default_factory=list)
 

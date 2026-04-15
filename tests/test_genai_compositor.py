@@ -4,6 +4,7 @@ import sys
 from types import SimpleNamespace
 import types
 
+import cv2
 import numpy as np
 import pytest
 import torch
@@ -106,6 +107,58 @@ def test_diffusers_compositor_process_with_stub_strategy(monkeypatch) -> None:
 def test_diffusers_compositor_invalid_backend_raises() -> None:
     with pytest.raises(ValueError):
         gc.DiffusersCompositor(backend="unknown-backend")
+
+
+def test_diffusers_compositor_black_background_mask_skips_empty_foreground() -> None:
+    compositor = gc.DiffusersCompositor(backend="animate-anyone", seed=3, device="cpu")
+    actor = np.zeros((64, 48, 3), dtype=np.uint8)
+
+    alpha = compositor._segment_black_background(actor)
+    assert alpha is None
+
+
+def test_diffusers_compositor_black_background_mask_returns_soft_alpha() -> None:
+    compositor = gc.DiffusersCompositor(backend="animate-anyone", seed=3, device="cpu")
+    actor = np.zeros((80, 56, 3), dtype=np.uint8)
+    cv2.rectangle(actor, (15, 10), (42, 70), color=(35, 210, 160), thickness=-1)
+
+    alpha = compositor._segment_black_background(actor)
+    assert alpha is not None
+    assert alpha.dtype == np.float32
+    assert float(np.max(alpha)) > 0.9
+    assert int(np.count_nonzero(alpha > 0.01)) > 0
+
+
+def test_diffusers_compositor_alpha_smoothing_is_actor_scoped() -> None:
+    compositor = gc.DiffusersCompositor(backend="animate-anyone", seed=3, device="cpu")
+    compositor._alpha_temporal_smoothing = 0.5
+
+    base_mask = np.ones((8, 8), dtype=np.float32)
+    out_a0 = compositor._apply_temporal_alpha_smoothing(base_mask, actor_identity="actor_a")
+    out_a1 = compositor._apply_temporal_alpha_smoothing(np.zeros((8, 8), dtype=np.float32), actor_identity="actor_a")
+    out_b0 = compositor._apply_temporal_alpha_smoothing(base_mask, actor_identity="actor_b")
+
+    assert out_a0 is not None
+    assert out_a1 is not None
+    assert out_b0 is not None
+    assert float(np.mean(out_a1)) < 1.0
+    assert float(np.mean(out_a1)) > 0.0
+    assert float(np.mean(out_b0)) == pytest.approx(1.0)
+
+
+def test_diffusers_compositor_adaptive_black_threshold_never_lowers_base() -> None:
+    compositor = gc.DiffusersCompositor(backend="animate-anyone", seed=3, device="cpu")
+    actor = np.zeros((24, 20, 3), dtype=np.uint8)
+    actor[6:18, 7:13] = np.array([10, 180, 200], dtype=np.uint8)
+
+    threshold, span = compositor._estimate_adaptive_black_thresholds(
+        actor_bgr=actor,
+        base_threshold=8,
+        base_span_threshold=6,
+    )
+
+    assert threshold >= 8
+    assert span >= 6
 
 
 def test_baseline_controlnet_strategy_generate_with_fake_pipe(monkeypatch) -> None:

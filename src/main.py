@@ -29,6 +29,15 @@ from src.shared.synthesis_engine import SynthesisEngine
 from src.transport.disk import DiskTransport
 
 
+def _safe_file_size(path_like: str | Path | None) -> int | None:
+    if path_like is None:
+        return None
+    candidate = Path(str(path_like))
+    if not candidate.exists() or not candidate.is_file():
+        return None
+    return int(candidate.stat().st_size)
+
+
 class _MockBallExtractorAdapter:
     """Adapter so the lightweight BallTracker can plug into EncoderPipeline."""
 
@@ -96,6 +105,20 @@ def run_mock_pipeline(
         decoder = DecoderRenderer()
     decoded = decoder.process(received_payload)
 
+    chunk_dir = Path(transport_root) / f"chunk_{received_payload.chunk.chunk_id}"
+    metadata_size_bytes = _safe_file_size(chunk_dir / "metadata.msgpack")
+    residual_size_bytes = _safe_file_size(received_payload.residual.residual_video_uri)
+    panorama_packet = getattr(received_payload, "panorama", None)
+    panorama_uri = getattr(panorama_packet, "panorama_uri", None) if panorama_packet is not None else None
+    panorama_size_bytes = _safe_file_size(panorama_uri)
+    source_size_bytes = _safe_file_size(resolved_source_uri)
+
+    transported_components = [
+        size for size in (metadata_size_bytes, residual_size_bytes, panorama_size_bytes)
+        if size is not None
+    ]
+    transport_total_size_bytes = int(sum(transported_components))
+
     summary = {
         "chunk_id": received_payload.chunk.chunk_id,
         "num_actor_packets": len(received_payload.actors),
@@ -104,7 +127,16 @@ def run_mock_pipeline(
         "residual_uri": received_payload.residual.residual_video_uri,
         "decoded_uri": decoded.output_uri,
         "transport_backend": normalized_transport,
+        "source_size_bytes": source_size_bytes,
+        "metadata_size_bytes": metadata_size_bytes,
+        "residual_size_bytes": residual_size_bytes,
+        "panorama_size_bytes": panorama_size_bytes,
+        "transport_total_size_bytes": transport_total_size_bytes,
     }
+    if source_size_bytes is not None and source_size_bytes > 0:
+        ratio = float(transport_total_size_bytes) / float(source_size_bytes)
+        summary["transport_to_source_ratio"] = ratio
+        summary["transport_savings_percent"] = (1.0 - ratio) * 100.0
     return summary
 
 
@@ -147,18 +179,28 @@ def _build_actor_extractor(
     )
 
 
-def _build_ball_extractor(mode: str, difference_threshold: float, min_blob_area: int) -> Any | None:
+def _build_ball_extractor(
+    mode: str,
+    difference_threshold: float,
+    min_blob_area: int,
+    detection_max_side: int,
+) -> Any | None:
     normalized_mode = mode.strip().lower()
     if normalized_mode == "mock":
         return _MockBallExtractorAdapter()
 
-    uses_default = float(difference_threshold) == 18.0 and int(min_blob_area) == 6
+    uses_default = (
+        float(difference_threshold) == 18.0
+        and int(min_blob_area) == 6
+        and int(detection_max_side) <= 0
+    )
     if uses_default:
         return None
 
     return BallExtractor(
         difference_threshold=float(difference_threshold),
         min_blob_area=int(min_blob_area),
+        detection_max_side=int(detection_max_side),
     )
 
 
@@ -208,9 +250,25 @@ def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
         os.environ["POINTSTREAM_ANIMATE_ANYONE_MODEL_DIR"] = str(Path(args.animate_anyone_model_dir).expanduser())
     if args.animate_anyone_window is not None:
         os.environ["POINTSTREAM_ANIMATE_ANYONE_WINDOW"] = str(int(args.animate_anyone_window))
+    if args.genai_preroll_frames is not None:
+        os.environ["POINTSTREAM_GENAI_PREROLL_FRAMES"] = str(int(args.genai_preroll_frames))
     if args.animate_anyone_transparent_threshold is not None:
         os.environ["POINTSTREAM_ANIMATE_ANYONE_TRANSPARENT_THRESHOLD"] = str(
             int(args.animate_anyone_transparent_threshold)
+        )
+    if args.gpu_dtype is not None:
+        os.environ["POINTSTREAM_GPU_DTYPE"] = str(args.gpu_dtype)
+    if args.ball_max_side is not None:
+        os.environ["POINTSTREAM_BALL_MAX_SIDE"] = str(int(args.ball_max_side))
+    if args.genai_resize_mode is not None:
+        os.environ["POINTSTREAM_GENAI_RESIZE_MODE"] = str(args.genai_resize_mode)
+    if args.animate_anyone_adaptive_threshold is not None:
+        os.environ["POINTSTREAM_ANIMATE_ANYONE_ADAPTIVE_THRESHOLD"] = (
+            "1" if bool(args.animate_anyone_adaptive_threshold) else "0"
+        )
+    if args.animate_anyone_alpha_smoothing is not None:
+        os.environ["POINTSTREAM_ANIMATE_ANYONE_ALPHA_SMOOTHING"] = str(
+            float(args.animate_anyone_alpha_smoothing)
         )
 
 
@@ -328,6 +386,12 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         help="Minimum connected-component area for ball detection.",
     )
     parser.add_argument(
+        "--ball-max-side",
+        type=int,
+        default=0,
+        help="Optional max frame side for ball extraction (0 keeps native resolution).",
+    )
+    parser.add_argument(
         "--reference-jpeg-quality",
         type=int,
         default=75,
@@ -350,6 +414,12 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         type=int,
         default=1337,
         help="Deterministic seed used by synthesis and GenAI components.",
+    )
+    parser.add_argument(
+        "--gpu-dtype",
+        choices=("fp16", "fp32", "bf16", "fp8_e4m3fn", "fp8_e5m2"),
+        default=None,
+        help="Global GPU compute dtype preference (falls back automatically if unsupported).",
     )
 
     genai_group = parser.add_mutually_exclusive_group()
@@ -391,10 +461,42 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         help="Temporal conditioning window length for AnimateAnyone decode compositing.",
     )
     parser.add_argument(
+        "--genai-preroll-frames",
+        type=int,
+        default=None,
+        help="Frames to keep residual-only before temporal GenAI compositing starts.",
+    )
+    parser.add_argument(
         "--animate-anyone-transparent-threshold",
         type=int,
         default=None,
         help="Black-background alpha threshold for AnimateAnyone compositing.",
+    )
+    parser.add_argument(
+        "--genai-resize-mode",
+        choices=("plain", "aspect-recovery"),
+        default=None,
+        help="Resize mode for GenAI actor placement in the decode ROI.",
+    )
+    adaptive_group = parser.add_mutually_exclusive_group()
+    adaptive_group.add_argument(
+        "--animate-anyone-adaptive-threshold",
+        dest="animate_anyone_adaptive_threshold",
+        action="store_true",
+        help="Enable adaptive border-threshold masking for AnimateAnyone black backgrounds.",
+    )
+    adaptive_group.add_argument(
+        "--disable-animate-anyone-adaptive-threshold",
+        dest="animate_anyone_adaptive_threshold",
+        action="store_false",
+        help="Disable adaptive border-threshold masking for AnimateAnyone black backgrounds.",
+    )
+    parser.set_defaults(animate_anyone_adaptive_threshold=None)
+    parser.add_argument(
+        "--animate-anyone-alpha-smoothing",
+        type=float,
+        default=None,
+        help="Temporal smoothing factor for AnimateAnyone alpha masks in range [0, 1].",
     )
     return parser
 
@@ -411,10 +513,16 @@ def run_cli(argv: list[str] | None = None) -> int:
         raise ValueError("--gpu-workers must be a positive integer")
     if args.ball_min_blob_area <= 0:
         raise ValueError("--ball-min-blob-area must be a positive integer")
+    if args.ball_max_side < 0:
+        raise ValueError("--ball-max-side must be a non-negative integer")
     if args.reference_jpeg_quality <= 0 or args.reference_jpeg_quality > 100:
         raise ValueError("--reference-jpeg-quality must be in range 1..100")
     if args.reference_padding_ratio < 0.0 or args.reference_padding_ratio >= 1.0:
         raise ValueError("--reference-padding-ratio must be in range [0.0, 1.0)")
+    if args.genai_preroll_frames is not None and args.genai_preroll_frames < 0:
+        raise ValueError("--genai-preroll-frames must be a non-negative integer")
+    if args.animate_anyone_alpha_smoothing is not None and not (0.0 <= args.animate_anyone_alpha_smoothing <= 1.0):
+        raise ValueError("--animate-anyone-alpha-smoothing must be in range [0.0, 1.0]")
     if args.chunk_id.strip() == "":
         raise ValueError("--chunk-id must not be empty")
 
@@ -444,6 +552,7 @@ def run_cli(argv: list[str] | None = None) -> int:
         mode=str(args.ball_extractor),
         difference_threshold=float(args.ball_difference_threshold),
         min_blob_area=int(args.ball_min_blob_area),
+        detection_max_side=int(args.ball_max_side),
     )
     reference_extractor = _build_reference_extractor(
         jpeg_quality=int(args.reference_jpeg_quality),

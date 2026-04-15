@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import os
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -11,6 +12,7 @@ from src.decoder.genai_compositor import DiffusersCompositor, MockCompositor
 from src.shared.dwpose_draw import draw_dwpose_canvas
 from src.shared.schemas import ActorPacket, EncodedChunkPayload
 from src.shared.tags import gpu_bound
+from src.shared.torch_dtype import is_cuda_device_usable, resolve_torch_dtype_for_device
 
 
 @dataclass(frozen=True)
@@ -40,6 +42,12 @@ class SynthesisEngine:
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         else:
             self.device = torch.device(device)
+        if self.device.type == "cuda" and not is_cuda_device_usable(self.device):
+            self.device = torch.device("cpu")
+        self._compute_dtype = resolve_torch_dtype_for_device(
+            self.device,
+            default_cuda=torch.float16,
+        )
         self._set_global_seed(self.seed)
         self._genai_compositor = self._build_genai_compositor()
 
@@ -57,18 +65,44 @@ class SynthesisEngine:
         os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
 
     @gpu_bound
-    def synthesize(self, payload: EncodedChunkPayload) -> SynthesisResult:
+    def synthesize(self, payload: EncodedChunkPayload, include_guidance_overlays: bool = True) -> SynthesisResult:
         self._set_global_seed(self.seed)
+
+        background_frames = self._reconstruct_background_frames(payload)
+        if not include_guidance_overlays:
+            return SynthesisResult(frames_bgr=background_frames)
 
         dense_pose_stream = self._unroll_sparse_actor_poses(payload)
         dense_ball_states = self._unroll_ball_states(payload=payload)
-        background_frames = self._reconstruct_background_frames(payload)
         composited_frames = self._composite_mock_skeletons(
             background_frames,
             dense_pose_stream,
             dense_ball_states,
         )
         return SynthesisResult(frames_bgr=composited_frames)
+
+    def _resolve_panorama_image(self, payload: EncodedChunkPayload) -> np.ndarray:
+        panorama_pixels = payload.panorama.panorama_image
+        if panorama_pixels is not None:
+            panorama_np = np.asarray(panorama_pixels, dtype=np.uint8)
+            if panorama_np.ndim != 3 or panorama_np.shape[2] != 3:
+                raise ValueError(
+                    "Invalid panorama image shape in payload: "
+                    f"expected [H, W, 3], got {tuple(panorama_np.shape)}"
+                )
+            return panorama_np
+
+        panorama_path = Path(str(payload.panorama.panorama_uri))
+        if not panorama_path.exists() or not panorama_path.is_file():
+            raise FileNotFoundError(
+                f"Panorama image not found: {panorama_path}. "
+                "Payload must include panorama_image pixels or a valid panorama_uri file."
+            )
+
+        decoded_panorama = cv2.imread(str(panorama_path), cv2.IMREAD_COLOR)
+        if decoded_panorama is None or decoded_panorama.size == 0:
+            raise ValueError(f"Failed to decode panorama image from {panorama_path}")
+        return np.asarray(decoded_panorama, dtype=np.uint8)
 
     def _set_global_seed(self, seed: int) -> None:
         torch.manual_seed(seed)
@@ -81,65 +115,76 @@ class SynthesisEngine:
             torch.backends.cudnn.benchmark = False
             torch.backends.cudnn.deterministic = True
 
+    def _is_cuda_oom(self, error: RuntimeError) -> bool:
+        if self.device.type != "cuda":
+            return False
+        return "out of memory" in str(error).lower()
+
+    def _fallback_to_cpu(self) -> None:
+        self.device = torch.device("cpu")
+        self._compute_dtype = torch.float32
+        self._genai_compositor = self._build_genai_compositor()
+
     def _reconstruct_background_frames(self, payload: EncodedChunkPayload) -> torch.Tensor:
         try:
             import kornia
         except ModuleNotFoundError as exc:
             raise RuntimeError("kornia is required for GPU-native panorama re-warping") from exc
 
-        chunk = payload.chunk
-        frame_count = int(chunk.num_frames)
-        output_height = int(chunk.height)
-        output_width = int(chunk.width)
+        try:
+            chunk = payload.chunk
+            frame_count = int(chunk.num_frames)
+            output_height = int(chunk.height)
+            output_width = int(chunk.width)
 
-        panorama_np = np.asarray(payload.panorama.panorama_image, dtype=np.uint8)
-        if panorama_np.ndim != 3 or panorama_np.shape[2] != 3:
-            raise ValueError(
-                "Invalid panorama image shape in payload: "
-                f"expected [H, W, 3], got {tuple(panorama_np.shape)}"
+            panorama_np = self._resolve_panorama_image(payload)
+
+            panorama_tensor = (
+                torch.from_numpy(panorama_np)
+                .permute(2, 0, 1)
+                .unsqueeze(0)
+                .to(self.device, dtype=self._compute_dtype)
+                / 255.0
             )
 
-        panorama_tensor = (
-            torch.from_numpy(panorama_np)
-            .permute(2, 0, 1)
-            .unsqueeze(0)
-            .to(self.device, dtype=torch.float32)
-            / 255.0
-        )
+            homographies = torch.tensor(payload.panorama.homography_matrices, dtype=torch.float32, device=self.device)
+            if homographies.shape[0] == 0:
+                raise ValueError("Payload contains no homography matrices")
+            if homographies.shape[0] < frame_count:
+                pad = frame_count - int(homographies.shape[0])
+                identity = torch.eye(3, dtype=torch.float32, device=self.device).unsqueeze(0).repeat(pad, 1, 1)
+                homographies = torch.cat([homographies, identity], dim=0)
+            elif homographies.shape[0] > frame_count:
+                homographies = homographies[:frame_count]
 
-        homographies = torch.tensor(payload.panorama.homography_matrices, dtype=torch.float32, device=self.device)
-        if homographies.shape[0] == 0:
-            raise ValueError("Payload contains no homography matrices")
-        if homographies.shape[0] < frame_count:
-            pad = frame_count - int(homographies.shape[0])
-            identity = torch.eye(3, dtype=torch.float32, device=self.device).unsqueeze(0).repeat(pad, 1, 1)
-            homographies = torch.cat([homographies, identity], dim=0)
-        elif homographies.shape[0] > frame_count:
-            homographies = homographies[:frame_count]
-
-        inverse_h = torch.linalg.inv(homographies)
-        batch_size = max(1, int(os.environ.get("POINTSTREAM_PANORAMA_WARP_BATCH_SIZE", "4")))
-        warped_uint8 = torch.empty(
-            (frame_count, 3, output_height, output_width),
-            dtype=torch.uint8,
-            device=self.device,
-        )
-
-        for start in range(0, frame_count, batch_size):
-            end = min(frame_count, start + batch_size)
-            current_batch = end - start
-            batched_panorama = panorama_tensor.expand(current_batch, -1, -1, -1)
-            warped_batch = kornia.geometry.transform.warp_perspective(
-                src=batched_panorama,
-                M=inverse_h[start:end],
-                dsize=(output_height, output_width),
-                mode="bilinear",
-                padding_mode="zeros",
-                align_corners=False,
+            inverse_h = torch.linalg.inv(homographies).to(dtype=self._compute_dtype)
+            batch_size = max(1, int(os.environ.get("POINTSTREAM_PANORAMA_WARP_BATCH_SIZE", "4")))
+            warped_uint8 = torch.empty(
+                (frame_count, 3, output_height, output_width),
+                dtype=torch.uint8,
+                device=self.device,
             )
-            warped_uint8[start:end] = warped_batch.clamp(0.0, 1.0).mul(255.0).to(torch.uint8)
 
-        return warped_uint8.contiguous()
+            for start in range(0, frame_count, batch_size):
+                end = min(frame_count, start + batch_size)
+                current_batch = end - start
+                batched_panorama = panorama_tensor.expand(current_batch, -1, -1, -1)
+                warped_batch = kornia.geometry.transform.warp_perspective(
+                    src=batched_panorama,
+                    M=inverse_h[start:end],
+                    dsize=(output_height, output_width),
+                    mode="bilinear",
+                    padding_mode="zeros",
+                    align_corners=False,
+                )
+                warped_uint8[start:end] = warped_batch.clamp(0.0, 1.0).mul(255.0).to(torch.uint8)
+
+            return warped_uint8.contiguous()
+        except RuntimeError as exc:
+            if self._is_cuda_oom(exc):
+                self._fallback_to_cpu()
+                return self._reconstruct_background_frames(payload)
+            raise
 
     def _unroll_sparse_actor_poses(self, payload: EncodedChunkPayload) -> dict[str, torch.Tensor]:
         dense_stream: dict[str, torch.Tensor] = {}

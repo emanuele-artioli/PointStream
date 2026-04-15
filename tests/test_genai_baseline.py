@@ -104,57 +104,63 @@ def test_decoder_mock_genai_stage_uses_transmitted_reference_crops(
         transport.send(payload)
         recovered_payload = transport.receive("genai_ref_decode_0001")
 
-    renderer = DecoderRenderer(output_root=test_run_artifacts_dir)
-    with_refs_output = test_run_artifacts_dir / "debug_final_reconstruction.mp4"
-    without_refs_output = test_run_artifacts_dir / "debug_final_reconstruction_no_refs.mp4"
-    with_refs_output.unlink(missing_ok=True)
-    without_refs_output.unlink(missing_ok=True)
+        renderer = DecoderRenderer(output_root=test_run_artifacts_dir)
+        with_refs_output = test_run_artifacts_dir / "debug_final_reconstruction.mp4"
+        without_refs_output = test_run_artifacts_dir / "debug_final_reconstruction_no_refs.mp4"
+        with_refs_output.unlink(missing_ok=True)
+        without_refs_output.unlink(missing_ok=True)
 
-    decoded_with = renderer.process(recovered_payload, output_path=with_refs_output)
-    payload_without_refs = recovered_payload.model_copy(update={"actor_references": []})
-    decoded_without = renderer.process(payload_without_refs, output_path=without_refs_output)
+        decoded_with = renderer.process(recovered_payload, output_path=with_refs_output)
+        payload_without_refs = recovered_payload.model_copy(update={"actor_references": []})
+        decoded_without = renderer.process(payload_without_refs, output_path=without_refs_output)
 
-    assert decoded_with.output_uri == str(with_refs_output)
-    assert decoded_without.output_uri == str(without_refs_output)
-    assert with_refs_output.exists()
-    assert without_refs_output.exists()
+        assert decoded_with.output_uri == str(with_refs_output)
+        assert decoded_without.output_uri == str(without_refs_output)
+        assert with_refs_output.exists()
+        assert without_refs_output.exists()
 
-    frames_with = list(
-        iter_video_frames_ffmpeg(
-            with_refs_output,
-            width=payload.chunk.width,
-            height=payload.chunk.height,
+        frames_with = list(
+            iter_video_frames_ffmpeg(
+                with_refs_output,
+                width=payload.chunk.width,
+                height=payload.chunk.height,
+            )
         )
-    )
-    assert len(frames_with) == int(payload.chunk.num_frames)
+        assert len(frames_with) == int(payload.chunk.num_frames)
 
-    # Compare pre-encode tensors to avoid FFmpeg codec variability across CI runners.
-    renderer_compare = DecoderRenderer(output_root=test_run_artifacts_dir)
-    actor_state_with = renderer_compare._build_actor_state(recovered_payload)
-    actor_state_without = renderer_compare._build_actor_state(payload_without_refs)
+        # Compare pre-encode tensors to avoid FFmpeg codec variability across CI runners.
+        renderer_compare = DecoderRenderer(output_root=test_run_artifacts_dir)
+        actor_state_with = renderer_compare._build_actor_state(recovered_payload)
+        actor_state_without = renderer_compare._build_actor_state(payload_without_refs)
 
-    assert actor_state_with
-    assert not actor_state_without
+        assert actor_state_with
+        assert not actor_state_without
 
-    synthesis_with = renderer_compare._synthesis_engine.synthesize(recovered_payload)
-    base_with = renderer_compare._compositor.composite(
-        predicted_frames=synthesis_with.frames_bgr,
-        residual_video_uri=recovered_payload.residual.residual_video_uri,
-        width=int(recovered_payload.chunk.width),
-        height=int(recovered_payload.chunk.height),
-    )
-    renderer_compare._actor_state = actor_state_with
-    final_with = renderer_compare._render_genai_baseline(base_with)
+        synthesis_with = renderer_compare._synthesis_engine.synthesize(
+            recovered_payload,
+            include_guidance_overlays=False,
+        )
+        base_with = renderer_compare._compositor.composite(
+            predicted_frames=synthesis_with.frames_bgr,
+            residual_video_uri=recovered_payload.residual.residual_video_uri,
+            width=int(recovered_payload.chunk.width),
+            height=int(recovered_payload.chunk.height),
+        )
+        renderer_compare._actor_state = actor_state_with
+        final_with = renderer_compare._render_genai_baseline(base_with)
 
-    synthesis_without = renderer_compare._synthesis_engine.synthesize(payload_without_refs)
-    base_without = renderer_compare._compositor.composite(
-        predicted_frames=synthesis_without.frames_bgr,
-        residual_video_uri=payload_without_refs.residual.residual_video_uri,
-        width=int(payload_without_refs.chunk.width),
-        height=int(payload_without_refs.chunk.height),
-    )
-    renderer_compare._actor_state = actor_state_without
-    final_without = renderer_compare._render_genai_baseline(base_without)
+        synthesis_without = renderer_compare._synthesis_engine.synthesize(
+            payload_without_refs,
+            include_guidance_overlays=False,
+        )
+        base_without = renderer_compare._compositor.composite(
+            predicted_frames=synthesis_without.frames_bgr,
+            residual_video_uri=payload_without_refs.residual.residual_video_uri,
+            width=int(payload_without_refs.chunk.width),
+            height=int(payload_without_refs.chunk.height),
+        )
+        renderer_compare._actor_state = actor_state_without
+        final_without = renderer_compare._render_genai_baseline(base_without)
 
-    assert final_with.shape == final_without.shape
-    assert not torch.equal(final_with, final_without)
+        assert final_with.shape == final_without.shape
+        assert not torch.equal(final_with, final_without)

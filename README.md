@@ -204,7 +204,11 @@ The run writes a local payload bundle under:
 
 with:
 - `metadata.msgpack` for semantic metadata/events
+- `panorama.jpg` (or `.png`) encoded sidecar image for background re-warping
 - `residual.mp4` encoded signed residual stream (H.265 / `libx265`)
+
+`metadata.msgpack` intentionally stores `panorama_uri` and omits raw `panorama_image` pixels to keep metadata size bounded.
+`DiskTransport` always writes panorama as an encoded sidecar image (never raw pixel arrays in metadata), using a pluggable encoder strategy.
 
 Run with a custom input video and output folder:
 
@@ -220,6 +224,8 @@ Useful CLI options:
 - `--chunk-id custom_id`: choose chunk folder name (`chunk_<id>`)
 - `--decoder-output-dir /path/to/decoded`: write decoded reconstructions to a custom directory
 
+Run summaries also include artifact size telemetry (`source_size_bytes`, `metadata_size_bytes`, `residual_size_bytes`, `panorama_size_bytes`, `transport_total_size_bytes`, and ratio/savings fields when source size is available).
+
 Module swap arguments (for ablations and performance tuning):
 - `--execution-pool inline|tagged` with `--cpu-workers` and `--gpu-workers`
 - `--actor-extractor real|mock`
@@ -227,9 +233,10 @@ Module swap arguments (for ablations and performance tuning):
 - `--segmenter yolo|none` (real actor extractor path)
 - `--payload-pose-delta-threshold <float>`
 - `--ball-extractor difference|mock`
-- `--ball-difference-threshold <float>` and `--ball-min-blob-area <int>`
+- `--ball-difference-threshold <float>`, `--ball-min-blob-area <int>`, and `--ball-max-side <int>`
 - `--reference-jpeg-quality <1..100>` and `--reference-padding-ratio <float>`
 - `--importance-mapper binary|uniform`
+- `--gpu-dtype fp16|fp32|bf16|fp8_e4m3fn|fp8_e5m2`
 
 GenAI backend switches:
 - `--enable-genai` or `--disable-genai`
@@ -238,7 +245,23 @@ GenAI backend switches:
 - `--animate-anyone-model-variant original|finetuned_tennis`
 - `--animate-anyone-model-dir /path/to/model/profile`
 - `--animate-anyone-window <int>`
+- `--genai-preroll-frames <int>`
 - `--animate-anyone-transparent-threshold <int>`
+- `--genai-resize-mode plain|aspect-recovery`
+- `--animate-anyone-adaptive-threshold` or `--disable-animate-anyone-adaptive-threshold`
+- `--animate-anyone-alpha-smoothing <float>`
+
+Panorama sidecar encoder knobs (via environment variables):
+- `POINTSTREAM_PANORAMA_CODEC=jpeg|png` (default: `jpeg`)
+- `POINTSTREAM_PANORAMA_JPEG_QUALITY=1..100` (default: `90`)
+- `POINTSTREAM_PANORAMA_PNG_COMPRESSION=0..9` (default: `3`)
+
+Runtime performance and compositing knobs (via environment variables):
+- `POINTSTREAM_GPU_DTYPE=fp16|fp32|bf16|fp8_e4m3fn|fp8_e5m2`
+- `POINTSTREAM_BALL_MAX_SIDE=<int>` (0 keeps native decode size)
+- `POINTSTREAM_GENAI_RESIZE_MODE=plain|aspect-recovery`
+- `POINTSTREAM_ANIMATE_ANYONE_ADAPTIVE_THRESHOLD=0|1`
+- `POINTSTREAM_ANIMATE_ANYONE_ALPHA_SMOOTHING=<float in [0,1]>`
 
 Ablation examples:
 

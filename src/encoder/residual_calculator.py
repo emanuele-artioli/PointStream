@@ -13,6 +13,7 @@ from src.encoder.video_io import encode_video_frames_ffmpeg, iter_video_frames_f
 from src.shared.schemas import EncodedChunkPayload, FrameState, ResidualPacket, SceneActor, VideoChunk
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import gpu_bound
+from src.shared.torch_dtype import is_cuda_device_usable
 
 
 class BaseImportanceMapper(ABC):
@@ -121,9 +122,11 @@ class ResidualCalculator:
     ) -> None:
         self._synthesis_engine = synthesis_engine or SynthesisEngine()
         if device is None:
-            self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            self._device = torch.device(self._synthesis_engine.device)
         else:
             self._device = torch.device(device)
+        if self._device.type == "cuda" and not is_cuda_device_usable(self._device):
+            self._device = torch.device("cpu")
         self._importance_mapper = importance_mapper or BinaryActorImportanceMapper()
 
     @gpu_bound
@@ -134,7 +137,7 @@ class ResidualCalculator:
         frame_states: list[FrameState],
         debug_output_path: str | Path | None = None,
     ) -> ResidualPacket:
-        predicted_frames = self._synthesis_engine.synthesize(payload).frames_bgr
+        predicted_frames = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False).frames_bgr
 
         source_metadata = probe_video_metadata(chunk.source_uri)
         available_source_frames = max(0, int(source_metadata.num_frames) - int(chunk.start_frame_id))
