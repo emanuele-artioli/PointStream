@@ -16,13 +16,11 @@ from src.shared.schemas import (
     BallState,
     CameraPose,
     EncodedChunkPayload,
-    InterpolateCommandEvent,
     KeyframeEvent,
     ObjectClass,
     PanoramaPacket,
     ResidualPacket,
     SemanticEvent,
-    StaticCommandEvent,
     TensorSpec,
     VideoChunk,
 )
