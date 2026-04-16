@@ -27,8 +27,15 @@ def _install_fake_actor_components(monkeypatch: pytest.MonkeyPatch) -> None:
         pass
 
     class PayloadEncoder:
-        def __init__(self, pose_delta_threshold: float) -> None:
+        def __init__(
+            self,
+            pose_delta_threshold: float,
+            include_mask_metadata: bool = False,
+            metadata_mask_codec: str = "auto",
+        ) -> None:
             self.pose_delta_threshold = pose_delta_threshold
+            self.include_mask_metadata = include_mask_metadata
+            self.metadata_mask_codec = metadata_mask_codec
 
     class PipelineBuilder:
         def __init__(self, **kwargs) -> None:

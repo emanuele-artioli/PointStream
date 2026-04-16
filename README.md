@@ -250,6 +250,9 @@ GenAI backend switches:
 - `--genai-resize-mode plain|aspect-recovery`
 - `--animate-anyone-adaptive-threshold` or `--disable-animate-anyone-adaptive-threshold`
 - `--animate-anyone-alpha-smoothing <float>`
+- `--compositing-mask-mode alpha-heuristic|metadata-source-mask|postgen-seg-client`
+- `--postgen-segmenter-backend yolo|heuristic` (used by `postgen-seg-client`)
+- `--metadata-mask-codec auto|rle-v1|bitpack-z1|png|segmenter-native|yolo-native` (used by `metadata-source-mask`)
 
 Panorama sidecar encoder knobs (via environment variables):
 - `POINTSTREAM_PANORAMA_CODEC=jpeg|png` (default: `jpeg`)
@@ -262,6 +265,10 @@ Runtime performance and compositing knobs (via environment variables):
 - `POINTSTREAM_GENAI_RESIZE_MODE=plain|aspect-recovery`
 - `POINTSTREAM_ANIMATE_ANYONE_ADAPTIVE_THRESHOLD=0|1`
 - `POINTSTREAM_ANIMATE_ANYONE_ALPHA_SMOOTHING=<float in [0,1]>`
+- `POINTSTREAM_COMPOSITING_MASK_MODE=alpha-heuristic|metadata-source-mask|postgen-seg-client`
+- `POINTSTREAM_POSTGEN_SEGMENTER_BACKEND=yolo|heuristic`
+- `POINTSTREAM_POSTGEN_SEGMENTER_MODEL=<weights-path-or-name>`
+- `POINTSTREAM_METADATA_MASK_CODEC=auto|rle-v1|bitpack-z1|png|segmenter-native|yolo-native`
 
 Ablation examples:
 
@@ -290,6 +297,21 @@ python -m src.main \
   --cpu-workers 2 \
   --gpu-workers 1
 ```
+
+Benchmark metadata-mask codecs with the ablation runner:
+
+```bash
+cd /home/itec/emanuele/pointstream
+python scripts/benchmark_mask_codecs.py \
+  --input assets/real_tennis.mp4 \
+  --num-frames 24 \
+  --repeats 2
+```
+
+The benchmark writes per-run and aggregate reports under `.pointstream/bench_mask_codecs/<timestamp>/`:
+- `mask_codec_ablation_runs.csv`
+- `mask_codec_ablation_summary.csv`
+- `mask_codec_ablation_summary.json`
 
 ## Run Unit Tests
 
@@ -446,6 +468,11 @@ docker run --gpus all --rm ghcr.io/<owner>/<repo>/pointstream-gpu:<tag>
 - `DiskTransport` now writes metadata with python-mode pydantic dumps so binary JPEG payloads roundtrip losslessly through `.msgpack`.
 - `DecoderRenderer` (`src/decoder/mock_renderer.py`) decodes actor reference JPEGs into an internal actor-state cache and passes them into `GenAICompositor`.
 - `GenAICompositor` (`src/decoder/genai_compositor.py`) is the V2 interface stub for Animate Anyone integration; current mock behavior draws a filled actor box and pastes the reference crop to prove server -> transport -> client conditioning works.
+- `ActorPacket` now supports optional per-frame `mask_frames` metadata with codec-tagged payloads (`auto` defaults to compact `rle-v1`/`bitpack-z1` selection, optional PNG fallback, and `segmenter-native`/`yolo-native` contour transport when available) extracted on the encoder side when `--compositing-mask-mode metadata-source-mask` is selected.
+- `DiffusersCompositor` supports mask strategy ablations for player cutout quality vs. bandwidth/runtime trade-offs:
+  - `alpha-heuristic`: existing black-background alpha extraction from generated actor crops.
+  - `metadata-source-mask`: uses encoder-transmitted source-segmentation masks (lower client compute, higher metadata).
+  - `postgen-seg-client`: runs a second segmentation pass after generation on the client (higher compute, no extra metadata).
 - `tests/test_genai_baseline.py` validates extraction, transport serialization/deserialization, and reconstruction output with reference-conditioned mock compositing (`debug_final_reconstruction.mp4`).
 - Heavy GenAI inference is feature-gated by `POINTSTREAM_ENABLE_GENAI`:
   - `0` or unset: `SynthesisEngine` exposes a lightweight `MockCompositor` (fast CI-safe default).

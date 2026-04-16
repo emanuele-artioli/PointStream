@@ -343,6 +343,9 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
     monkeypatch.delenv("POINTSTREAM_GENAI_RESIZE_MODE", raising=False)
     monkeypatch.delenv("POINTSTREAM_ANIMATE_ANYONE_ADAPTIVE_THRESHOLD", raising=False)
     monkeypatch.delenv("POINTSTREAM_ANIMATE_ANYONE_ALPHA_SMOOTHING", raising=False)
+    monkeypatch.delenv("POINTSTREAM_COMPOSITING_MASK_MODE", raising=False)
+    monkeypatch.delenv("POINTSTREAM_POSTGEN_SEGMENTER_BACKEND", raising=False)
+    monkeypatch.delenv("POINTSTREAM_METADATA_MASK_CODEC", raising=False)
 
     exit_code = main_module.run_cli(
         [
@@ -382,6 +385,12 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
             "--animate-anyone-adaptive-threshold",
             "--animate-anyone-alpha-smoothing",
             "0.35",
+            "--compositing-mask-mode",
+            "postgen-seg-client",
+            "--postgen-segmenter-backend",
+            "heuristic",
+            "--metadata-mask-codec",
+            "rle-v1",
             "--no-summary-file",
         ]
     )
@@ -402,3 +411,40 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
     assert os.environ.get("POINTSTREAM_GENAI_RESIZE_MODE") == "aspect-recovery"
     assert os.environ.get("POINTSTREAM_ANIMATE_ANYONE_ADAPTIVE_THRESHOLD") == "1"
     assert os.environ.get("POINTSTREAM_ANIMATE_ANYONE_ALPHA_SMOOTHING") == "0.35"
+    assert os.environ.get("POINTSTREAM_COMPOSITING_MASK_MODE") == "postgen-seg-client"
+    assert os.environ.get("POINTSTREAM_POSTGEN_SEGMENTER_BACKEND") == "heuristic"
+    assert os.environ.get("POINTSTREAM_METADATA_MASK_CODEC") == "rle-v1"
+
+
+def test_build_actor_extractor_forces_real_pipeline_for_metadata_masks(monkeypatch) -> None:
+    captured: dict[str, object] = {}
+
+    class _FakeActorExtractor:
+        def __init__(self, **kwargs) -> None:
+            captured.update(kwargs)
+
+    monkeypatch.setattr(main_module, "ActorExtractor", _FakeActorExtractor)
+
+    default_extractor = main_module._build_actor_extractor(
+        mode="real",
+        pose_estimator="yolo",
+        segmenter="yolo",
+        disable_debug_keyframes=False,
+        pose_delta_threshold=20.0,
+        compositing_mask_mode="alpha-heuristic",
+        metadata_mask_codec="auto",
+    )
+    assert default_extractor is None
+
+    metadata_extractor = main_module._build_actor_extractor(
+        mode="real",
+        pose_estimator="yolo",
+        segmenter="yolo",
+        disable_debug_keyframes=False,
+        pose_delta_threshold=20.0,
+        compositing_mask_mode="metadata-source-mask",
+        metadata_mask_codec="rle-v1",
+    )
+    assert isinstance(metadata_extractor, _FakeActorExtractor)
+    assert captured["include_mask_metadata"] is True
+    assert captured["metadata_mask_codec"] == "rle-v1"

@@ -41,6 +41,8 @@ class ActorExtractor:
         pose_backend: str = "yolo",
         segmenter_backend: str = "yolo",
         pose_delta_threshold: float = 20.0,
+        include_mask_metadata: bool = False,
+        metadata_mask_codec: str = "auto",
         dwpose_device: str = "cuda",
     ) -> None:
         from src.encoder.actor_components import (
@@ -82,7 +84,11 @@ class ActorExtractor:
             heuristic=StandardTennisHeuristic(),
             segmenter=segmenter,
             pose_estimator=pose_estimator,
-            payload_encoder=PayloadEncoder(pose_delta_threshold=float(pose_delta_threshold)),
+            payload_encoder=PayloadEncoder(
+                pose_delta_threshold=float(pose_delta_threshold),
+                include_mask_metadata=bool(include_mask_metadata),
+                metadata_mask_codec=str(metadata_mask_codec),
+            ),
         )
 
     @gpu_bound

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import os
 from pathlib import Path
 
@@ -10,7 +10,8 @@ import torch
 
 from src.decoder.compositor import ResidualCompositor
 from src.encoder.video_io import encode_video_frames_ffmpeg
-from src.shared.schemas import DecodedChunkResult, EncodedChunkPayload
+from src.shared.mask_codec import decode_binary_mask
+from src.shared.schemas import ActorPacket, DecodedChunkResult, EncodedChunkPayload
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import gpu_bound
 from src.shared.track_id import scene_track_id_to_int
@@ -22,6 +23,7 @@ class _ClientActorState:
     object_id: str
     reference_crop_tensor: torch.Tensor
     dense_pose_tensor: torch.Tensor
+    metadata_masks_by_frame: dict[int, np.ndarray] = field(default_factory=dict)
 
 
 class DecoderRenderer:
@@ -33,10 +35,12 @@ class DecoderRenderer:
         self._compositor = ResidualCompositor(device=self._synthesis_engine.device)
         self._genai_compositor = self._synthesis_engine.get_genai_compositor()
         self._actor_state: dict[int, _ClientActorState] = {}
+        self._chunk_start_frame_id: int = 0
 
     @gpu_bound
     def process(self, payload: EncodedChunkPayload, output_path: str | Path | None = None) -> DecodedChunkResult:
         chunk = payload.chunk
+        self._chunk_start_frame_id = int(chunk.start_frame_id)
         self._actor_state = self._build_actor_state(payload)
         synthesis = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False)
 
@@ -84,13 +88,49 @@ class DecoderRenderer:
             dense_pose = dense_pose_stream.get(actor_packet.object_id)
             if reference_crop is None or dense_pose is None:
                 continue
+            metadata_masks = self._decode_actor_masks(actor_packet)
             actor_state[track_id] = _ClientActorState(
                 track_id=track_id,
                 object_id=actor_packet.object_id,
                 reference_crop_tensor=reference_crop,
                 dense_pose_tensor=dense_pose,
+                metadata_masks_by_frame=metadata_masks,
             )
         return actor_state
+
+    def _decode_actor_masks(self, actor_packet: ActorPacket) -> dict[int, np.ndarray]:
+        decoded: dict[int, np.ndarray] = {}
+        for frame_mask in actor_packet.mask_frames:
+            payload = frame_mask.mask_payload
+            codec = frame_mask.mask_codec
+            if payload is None and frame_mask.mask_png is not None:
+                payload = frame_mask.mask_png
+                codec = "png"
+            if payload is None:
+                continue
+
+            default_h = max(1, int(frame_mask.bbox[3]) - int(frame_mask.bbox[1]))
+            default_w = max(1, int(frame_mask.bbox[2]) - int(frame_mask.bbox[0]))
+            mask_h = int(frame_mask.mask_height) if frame_mask.mask_height is not None else default_h
+            mask_w = int(frame_mask.mask_width) if frame_mask.mask_width is not None else default_w
+
+            try:
+                mask_gray = decode_binary_mask(
+                    codec=str(codec),
+                    payload=payload,
+                    height=mask_h,
+                    width=mask_w,
+                )
+            except Exception:
+                if codec != "png":
+                    continue
+                encoded_np = np.frombuffer(payload, dtype=np.uint8)
+                mask_gray = cv2.imdecode(encoded_np, cv2.IMREAD_GRAYSCALE)
+                if mask_gray is None or mask_gray.size == 0:
+                    continue
+
+            decoded[int(frame_mask.frame_id)] = np.asarray(mask_gray, dtype=np.uint8)
+        return decoded
 
     def _decode_reference_crops(self, payload: EncodedChunkPayload) -> dict[int, torch.Tensor]:
         decoded: dict[int, torch.Tensor] = {}
@@ -118,6 +158,7 @@ class DecoderRenderer:
         frame_count = int(frame_tensor.shape[0])
         for frame_idx in range(frame_count):
             composited = frame_tensor[frame_idx]
+            global_frame_id = int(self._chunk_start_frame_id) + int(frame_idx)
             for actor_state in self._actor_state.values():
                 if frame_idx >= int(actor_state.dense_pose_tensor.shape[0]):
                     continue
@@ -133,12 +174,24 @@ class DecoderRenderer:
                 else:
                     pose_condition = actor_state.dense_pose_tensor[frame_idx]
 
-                composited = self._genai_compositor.process(
-                    reference_crop_tensor=actor_state.reference_crop_tensor,
-                    dense_dwpose_tensor=pose_condition,
-                    warped_background_frame=composited,
-                    actor_identity=actor_state.object_id,
-                ).to(frame_tensor.device)
+                metadata_mask = actor_state.metadata_masks_by_frame.get(global_frame_id)
+
+                try:
+                    composited = self._genai_compositor.process(
+                        reference_crop_tensor=actor_state.reference_crop_tensor,
+                        dense_dwpose_tensor=pose_condition,
+                        warped_background_frame=composited,
+                        actor_identity=actor_state.object_id,
+                        metadata_mask=metadata_mask,
+                    ).to(frame_tensor.device)
+                except TypeError:
+                    # Keep compatibility with existing test doubles that don't accept metadata_mask.
+                    composited = self._genai_compositor.process(
+                        reference_crop_tensor=actor_state.reference_crop_tensor,
+                        dense_dwpose_tensor=pose_condition,
+                        warped_background_frame=composited,
+                        actor_identity=actor_state.object_id,
+                    ).to(frame_tensor.device)
             out_frames.append(composited)
 
         return torch.stack(out_frames, dim=0)

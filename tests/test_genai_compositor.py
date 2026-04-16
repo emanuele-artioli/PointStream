@@ -104,6 +104,54 @@ def test_diffusers_compositor_process_with_stub_strategy(monkeypatch) -> None:
     assert int(torch.count_nonzero(out)) > 0
 
 
+def test_diffusers_compositor_metadata_mask_mode_limits_blending(monkeypatch) -> None:
+    monkeypatch.setenv("POINTSTREAM_COMPOSITING_MASK_MODE", "metadata-source-mask")
+    monkeypatch.setattr(gc.DiffusersCompositor, "_build_strategy", lambda self, backend: _DummyStrategy())
+
+    compositor = gc.DiffusersCompositor(backend="controlnet", seed=1234, device="cpu")
+    compositor._alpha_temporal_smoothing = 0.0
+
+    reference = torch.full((3, 64, 48), 180, dtype=torch.uint8)
+    pose = _make_pose_sequence(valid_confidence=0.9)
+    background = torch.zeros((3, 180, 320), dtype=torch.uint8)
+
+    metadata_mask = np.zeros((24, 16), dtype=np.uint8)
+    metadata_mask[6:18, 5:11] = 255
+
+    out_with_metadata = compositor.process(
+        reference_crop_tensor=reference,
+        dense_dwpose_tensor=pose,
+        warped_background_frame=background,
+        actor_identity="actor_with_metadata",
+        metadata_mask=metadata_mask,
+    )
+    out_without_metadata = compositor.process(
+        reference_crop_tensor=reference,
+        dense_dwpose_tensor=pose,
+        warped_background_frame=background,
+        actor_identity="actor_without_metadata",
+        metadata_mask=None,
+    )
+
+    assert int(torch.count_nonzero(out_with_metadata)) < int(torch.count_nonzero(out_without_metadata))
+
+
+def test_diffusers_compositor_postgen_seg_client_falls_back_to_heuristic(monkeypatch) -> None:
+    monkeypatch.setenv("POINTSTREAM_COMPOSITING_MASK_MODE", "postgen-seg-client")
+    monkeypatch.setenv("POINTSTREAM_POSTGEN_SEGMENTER_BACKEND", "yolo")
+    monkeypatch.setattr(gc.DiffusersCompositor, "_build_strategy", lambda self, backend: _DummyStrategy())
+
+    compositor = gc.DiffusersCompositor(backend="animate-anyone", seed=4, device="cpu")
+    monkeypatch.setattr(compositor, "_ensure_postgen_segmenter", lambda: None)
+
+    actor = np.zeros((96, 64, 3), dtype=np.uint8)
+    cv2.rectangle(actor, (18, 20), (45, 82), color=(40, 220, 160), thickness=-1)
+
+    alpha = compositor._segment_generated_actor(actor_resized=actor, is_animate_anyone=True)
+    assert alpha is not None
+    assert int(np.count_nonzero(alpha > 0.01)) > 0
+
+
 def test_diffusers_compositor_invalid_backend_raises() -> None:
     with pytest.raises(ValueError):
         gc.DiffusersCompositor(backend="unknown-backend")

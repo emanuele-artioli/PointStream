@@ -36,6 +36,7 @@ class SceneActor(BaseModel):
     class_name: str
     bbox: list[float] = Field(min_length=4, max_length=4)
     mask: list[list[int]] | None = None
+    mask_polygons: list[list[list[float]]] | None = None
     pose_dw: list[list[float]] | None = None
 
 
@@ -114,6 +115,18 @@ class ActorPacket(BaseModel):
     appearance_embedding_spec: TensorSpec
     pose_tensor_spec: TensorSpec
     events: list[SemanticEvent]
+    mask_frames: list["ActorMaskFrame"] = Field(default_factory=list)
+
+
+class ActorMaskFrame(BaseModel):
+    frame_id: int = Field(ge=0)
+    bbox: list[int] = Field(min_length=4, max_length=4)
+    mask_codec: Literal["rle-v1", "bitpack-z1", "png", "poly-v1"] = "rle-v1"
+    mask_payload: bytes | None = None
+    mask_height: int | None = Field(default=None, gt=0)
+    mask_width: int | None = Field(default=None, gt=0)
+    mask_png: bytes | None = None
+    source: Literal["source", "postgen-server"] = "source"
 
 
 class RigidObjectPacket(BaseModel):

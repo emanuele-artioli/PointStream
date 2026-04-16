@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+import logging
 import os
 from pathlib import Path
 from typing import Any
@@ -12,6 +13,36 @@ import torch
 from src.shared.dwpose_draw import draw_dwpose_canvas
 from src.shared.tags import gpu_bound
 from src.shared.torch_dtype import is_cuda_device_usable, resolve_torch_dtype_for_device
+
+
+_LOGGER = logging.getLogger(__name__)
+
+
+def _resolve_local_weight_path(model_name: str) -> Path | None:
+    candidate = Path(model_name)
+    if candidate.exists():
+        return candidate
+
+    project_root = Path(__file__).resolve().parents[2]
+    assets_candidate = project_root / "assets" / "weights" / model_name
+    if assets_candidate.exists():
+        return assets_candidate
+
+    return None
+
+
+def _require_local_or_optin_weight(model_name: str) -> str:
+    local_path = _resolve_local_weight_path(model_name)
+    if local_path is not None:
+        return str(local_path)
+
+    if os.environ.get("POINTSTREAM_ALLOW_AUTO_MODEL_DOWNLOAD", "0") == "1":
+        return model_name
+
+    raise FileNotFoundError(
+        f"Required model weights not found for '{model_name}'. "
+        "Place weights in assets/weights/ or set POINTSTREAM_ALLOW_AUTO_MODEL_DOWNLOAD=1."
+    )
 
 
 class BaseGenAIStrategy(ABC):
@@ -195,8 +226,10 @@ class MockCompositor:
         dense_dwpose_tensor: torch.Tensor,
         warped_background_frame: torch.Tensor,
         actor_identity: str | None = None,
+        metadata_mask: np.ndarray | None = None,
     ) -> torch.Tensor:
         _ = actor_identity
+        _ = metadata_mask
         frame_np = self._to_frame_numpy(warped_background_frame)
         pose_np = self._to_pose_numpy(dense_dwpose_tensor)
         crop_np = self._to_crop_numpy(reference_crop_tensor)
@@ -313,6 +346,26 @@ class DiffusersCompositor(MockCompositor):
         alpha_smoothing_raw = float(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_ALPHA_SMOOTHING", "0.25"))
         self._alpha_temporal_smoothing = float(np.clip(alpha_smoothing_raw, 0.0, 0.95))
         self._alpha_history_by_actor: dict[str, np.ndarray] = {}
+
+        raw_mask_mode = os.environ.get("POINTSTREAM_COMPOSITING_MASK_MODE", "alpha-heuristic").strip().lower()
+        mask_mode_aliases = {
+            "alpha": "alpha-heuristic",
+            "alpha-heuristic": "alpha-heuristic",
+            "heuristic": "alpha-heuristic",
+            "metadata-source-mask": "metadata-source-mask",
+            "metadata-mask": "metadata-source-mask",
+            "source-mask": "metadata-source-mask",
+            "postgen-seg-client": "postgen-seg-client",
+            "postgen": "postgen-seg-client",
+        }
+        self._compositing_mask_mode = mask_mode_aliases.get(raw_mask_mode, "alpha-heuristic")
+
+        backend_raw = os.environ.get("POINTSTREAM_POSTGEN_SEGMENTER_BACKEND", "yolo").strip().lower()
+        self._postgen_segmenter_backend = backend_raw if backend_raw in {"yolo", "heuristic"} else "yolo"
+        self._postgen_segmenter_model = os.environ.get("POINTSTREAM_POSTGEN_SEGMENTER_MODEL", "yolo26n-seg.pt")
+        self._postgen_segmenter: Any | None = None
+        self._postgen_segmenter_disabled = False
+
         self._strategy = self._build_strategy(self._backend)
 
     def _build_strategy(self, backend: str) -> BaseGenAIStrategy:
@@ -332,6 +385,7 @@ class DiffusersCompositor(MockCompositor):
         dense_dwpose_tensor: torch.Tensor,
         warped_background_frame: torch.Tensor,
         actor_identity: str | None = None,
+        metadata_mask: np.ndarray | None = None,
     ) -> torch.Tensor:
         # Deterministic generation is required so residual encoding remains stable.
         torch.manual_seed(self._seed)
@@ -364,10 +418,11 @@ class DiffusersCompositor(MockCompositor):
         else:
             actor_resized = cv2.resize(generated_np, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
 
-        if is_animate_anyone:
-            alpha_mask = self._segment_black_background(actor_resized)
-        else:
-            alpha_mask = self._segment_foreground(actor_resized)
+        alpha_mask = self._select_compositing_alpha(
+            actor_resized=actor_resized,
+            metadata_mask=metadata_mask,
+            is_animate_anyone=is_animate_anyone,
+        )
         alpha_mask = self._apply_temporal_alpha_smoothing(alpha_mask=alpha_mask, actor_identity=actor_identity)
 
         if alpha_mask is None or int(np.count_nonzero(alpha_mask > 0.01)) == 0:
@@ -404,6 +459,127 @@ class DiffusersCompositor(MockCompositor):
             cropped = actor_bgr
 
         return cv2.resize(cropped, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
+
+    def _select_compositing_alpha(
+        self,
+        actor_resized: np.ndarray,
+        metadata_mask: np.ndarray | None,
+        is_animate_anyone: bool,
+    ) -> np.ndarray | None:
+        mode = self._compositing_mask_mode
+
+        if mode == "metadata-source-mask":
+            alpha = self._alpha_from_metadata_mask(
+                metadata_mask=metadata_mask,
+                target_w=int(actor_resized.shape[1]),
+                target_h=int(actor_resized.shape[0]),
+            )
+            if alpha is not None:
+                return alpha
+
+        if mode == "postgen-seg-client":
+            alpha = self._segment_generated_actor(actor_resized=actor_resized, is_animate_anyone=is_animate_anyone)
+            if alpha is not None:
+                return alpha
+
+        if is_animate_anyone:
+            return self._segment_black_background(actor_resized)
+        return self._segment_foreground(actor_resized)
+
+    def _alpha_from_metadata_mask(
+        self,
+        metadata_mask: np.ndarray | None,
+        target_w: int,
+        target_h: int,
+    ) -> np.ndarray | None:
+        if metadata_mask is None:
+            return None
+
+        raw = np.asarray(metadata_mask)
+        if raw.ndim == 3:
+            raw = raw[:, :, 0]
+        if raw.ndim != 2 or raw.size == 0:
+            return None
+
+        if raw.shape[0] != target_h or raw.shape[1] != target_w:
+            raw = cv2.resize(raw, (target_w, target_h), interpolation=cv2.INTER_NEAREST)
+
+        if raw.dtype != np.uint8:
+            raw_float = np.asarray(raw, dtype=np.float32)
+            raw = np.asarray(raw_float > 0.5, dtype=np.uint8) * 255
+        else:
+            raw = np.asarray(raw > 127, dtype=np.uint8) * 255
+
+        min_pixels = max(8, target_h * target_w // 120)
+        return self._postprocess_binary_mask(np.asarray(raw, dtype=np.uint8), min_pixels=min_pixels)
+
+    def _segment_generated_actor(self, actor_resized: np.ndarray, is_animate_anyone: bool) -> np.ndarray | None:
+        if self._postgen_segmenter_backend == "yolo":
+            alpha = self._segment_generated_actor_with_yolo(actor_resized=actor_resized)
+            if alpha is not None:
+                return alpha
+
+        # Always keep a heuristic fallback so ablations remain robust when model runtime is unavailable.
+        if is_animate_anyone:
+            return self._segment_black_background(actor_resized)
+        return self._segment_foreground(actor_resized)
+
+    def _segment_generated_actor_with_yolo(self, actor_resized: np.ndarray) -> np.ndarray | None:
+        model = self._ensure_postgen_segmenter()
+        if model is None:
+            return None
+
+        try:
+            results = model.predict(source=actor_resized, classes=[0], verbose=False, conf=0.2)
+        except Exception as exc:
+            if not self._postgen_segmenter_disabled:
+                _LOGGER.warning("Disabling post-generation segmenter after inference failure: %s", exc)
+            self._postgen_segmenter_disabled = True
+            self._postgen_segmenter = None
+            return None
+
+        if not results:
+            return None
+
+        masks = getattr(results[0], "masks", None)
+        if masks is None or getattr(masks, "data", None) is None or len(masks.data) == 0:
+            return None
+
+        mask_np = masks.data[0]
+        if hasattr(mask_np, "cpu"):
+            mask_np = mask_np.cpu().numpy()
+
+        mask_u8 = np.asarray(np.asarray(mask_np, dtype=np.float32) > 0.5, dtype=np.uint8) * 255
+        target_h, target_w = actor_resized.shape[:2]
+        if mask_u8.shape[:2] != (target_h, target_w):
+            mask_u8 = np.asarray(
+                cv2.resize(mask_u8, (target_w, target_h), interpolation=cv2.INTER_NEAREST),
+                dtype=np.uint8,
+            )
+
+        min_pixels = max(8, target_h * target_w // 120)
+        return self._postprocess_binary_mask(np.asarray(mask_u8, dtype=np.uint8), min_pixels=min_pixels)
+
+    def _ensure_postgen_segmenter(self) -> Any | None:
+        if self._postgen_segmenter_disabled:
+            return None
+        if self._postgen_segmenter is not None:
+            return self._postgen_segmenter
+
+        try:
+            from ultralytics import YOLO
+
+            weight_ref = _require_local_or_optin_weight(self._postgen_segmenter_model)
+            self._postgen_segmenter = YOLO(weight_ref)
+            return self._postgen_segmenter
+        except Exception as exc:
+            _LOGGER.warning(
+                "Post-generation segmenter is unavailable; falling back to heuristic alpha extraction: %s",
+                exc,
+            )
+            self._postgen_segmenter_disabled = True
+            self._postgen_segmenter = None
+            return None
 
     def _segment_black_background(self, actor_bgr: np.ndarray) -> np.ndarray | None:
         threshold = self._animate_anyone_transparent_threshold

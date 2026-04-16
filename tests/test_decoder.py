@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import cv2
 import numpy as np
 import torch
 
 from src.decoder.mock_renderer import DecoderRenderer, _ClientActorState
 from src.encoder.video_io import encode_video_frames_ffmpeg, probe_video_metadata
+from src.shared.schemas import ActorMaskFrame
 from src.shared.synthesis_engine import SynthesisEngine
 from tests.video_utils import create_dummy_video
 
@@ -75,9 +77,17 @@ class _TemporalSpyCompositor:
     def uses_temporal_pose_sequence(self) -> bool:
         return True
 
-    def process(self, reference_crop_tensor, dense_dwpose_tensor, warped_background_frame, actor_identity=None):
+    def process(
+        self,
+        reference_crop_tensor,
+        dense_dwpose_tensor,
+        warped_background_frame,
+        actor_identity=None,
+        metadata_mask=None,
+    ):
         _ = reference_crop_tensor
         _ = actor_identity
+        _ = metadata_mask
         self.window_lengths.append(int(dense_dwpose_tensor.shape[0]))
         return warped_background_frame
 
@@ -110,3 +120,47 @@ def test_render_genai_baseline_uses_preroll_and_fixed_temporal_window(monkeypatc
 
     assert torch.equal(out, frame_tensor)
     assert spy.window_lengths == [4, 4]
+
+
+def test_decoder_actor_mask_decode_supports_legacy_png_payload(mock_encoder_pipeline, test_run_artifacts_dir: Path) -> None:
+    video_path = create_dummy_video(
+        path=test_run_artifacts_dir / "test_chunks" / "legacy_mask_decode.mp4",
+        num_frames=4,
+        width=160,
+        height=96,
+        fps=24.0,
+    )
+    payload, _decoded = mock_encoder_pipeline.encode_video_file(
+        video_path=video_path,
+        chunk_id="legacy_mask_decode",
+        start_frame_id=0,
+    )
+
+    assert payload.actors
+    actor_packet = payload.actors[0]
+
+    legacy_mask = np.zeros((24, 16), dtype=np.uint8)
+    legacy_mask[4:20, 3:13] = 255
+    ok, encoded = cv2.imencode(".png", legacy_mask)
+    assert ok
+
+    actor_packet.mask_frames = [
+        ActorMaskFrame(
+            frame_id=int(payload.chunk.start_frame_id),
+            bbox=[0, 0, 16, 24],
+            mask_codec="png",
+            mask_payload=None,
+            mask_height=None,
+            mask_width=None,
+            mask_png=encoded.tobytes(),
+            source="source",
+        )
+    ]
+
+    renderer = DecoderRenderer(output_root=test_run_artifacts_dir)
+    decoded_masks = renderer._decode_actor_masks(actor_packet)
+
+    assert int(payload.chunk.start_frame_id) in decoded_masks
+    decoded_mask = decoded_masks[int(payload.chunk.start_frame_id)]
+    assert decoded_mask.shape == (24, 16)
+    assert int(np.count_nonzero(decoded_mask)) > 0

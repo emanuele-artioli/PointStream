@@ -132,6 +132,9 @@ def run_mock_pipeline(
         "residual_size_bytes": residual_size_bytes,
         "panorama_size_bytes": panorama_size_bytes,
         "transport_total_size_bytes": transport_total_size_bytes,
+        "compositing_mask_mode": os.environ.get("POINTSTREAM_COMPOSITING_MASK_MODE", "alpha-heuristic"),
+        "postgen_segmenter_backend": os.environ.get("POINTSTREAM_POSTGEN_SEGMENTER_BACKEND", "yolo"),
+        "metadata_mask_codec": os.environ.get("POINTSTREAM_METADATA_MASK_CODEC", "auto"),
     }
     if source_size_bytes is not None and source_size_bytes > 0:
         ratio = float(transport_total_size_bytes) / float(source_size_bytes)
@@ -157,16 +160,22 @@ def _build_actor_extractor(
     segmenter: str,
     disable_debug_keyframes: bool,
     pose_delta_threshold: float,
+    compositing_mask_mode: str,
+    metadata_mask_codec: str,
 ) -> ActorExtractor | MockActorExtractor | None:
     normalized_mode = mode.strip().lower()
     if normalized_mode == "mock":
         return MockActorExtractor()
+
+    normalized_mask_mode = compositing_mask_mode.strip().lower()
+    include_mask_metadata = normalized_mask_mode == "metadata-source-mask"
 
     uses_default = (
         pose_estimator == "yolo"
         and segmenter == "yolo"
         and not disable_debug_keyframes
         and float(pose_delta_threshold) == 20.0
+        and not include_mask_metadata
     )
     if uses_default:
         return None
@@ -176,6 +185,8 @@ def _build_actor_extractor(
         pose_backend=pose_estimator,
         segmenter_backend=segmenter,
         pose_delta_threshold=float(pose_delta_threshold),
+        include_mask_metadata=include_mask_metadata,
+        metadata_mask_codec=str(metadata_mask_codec),
     )
 
 
@@ -270,6 +281,12 @@ def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
         os.environ["POINTSTREAM_ANIMATE_ANYONE_ALPHA_SMOOTHING"] = str(
             float(args.animate_anyone_alpha_smoothing)
         )
+    if args.compositing_mask_mode is not None:
+        os.environ["POINTSTREAM_COMPOSITING_MASK_MODE"] = str(args.compositing_mask_mode)
+    if args.postgen_segmenter_backend is not None:
+        os.environ["POINTSTREAM_POSTGEN_SEGMENTER_BACKEND"] = str(args.postgen_segmenter_backend)
+    if args.metadata_mask_codec is not None:
+        os.environ["POINTSTREAM_METADATA_MASK_CODEC"] = str(args.metadata_mask_codec)
 
 
 def _build_cli_parser() -> argparse.ArgumentParser:
@@ -498,6 +515,30 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         default=None,
         help="Temporal smoothing factor for AnimateAnyone alpha masks in range [0, 1].",
     )
+    parser.add_argument(
+        "--compositing-mask-mode",
+        choices=("alpha-heuristic", "metadata-source-mask", "postgen-seg-client"),
+        default="alpha-heuristic",
+        help=(
+            "Actor compositing alpha strategy: heuristic alpha extraction, source mask metadata, "
+            "or post-generation client segmentation."
+        ),
+    )
+    parser.add_argument(
+        "--postgen-segmenter-backend",
+        choices=("yolo", "heuristic"),
+        default=None,
+        help="Segmentation backend when --compositing-mask-mode=postgen-seg-client.",
+    )
+    parser.add_argument(
+        "--metadata-mask-codec",
+        choices=("auto", "rle-v1", "bitpack-z1", "png", "segmenter-native", "yolo-native"),
+        default=None,
+        help=(
+            "Compression codec for metadata-source-mask payloads. "
+            "Use segmenter-native/yolo-native to transport contour polygons when available."
+        ),
+    )
     return parser
 
 
@@ -547,6 +588,8 @@ def run_cli(argv: list[str] | None = None) -> int:
         segmenter=str(args.segmenter),
         disable_debug_keyframes=bool(args.disable_debug_keyframes),
         pose_delta_threshold=float(args.payload_pose_delta_threshold),
+        compositing_mask_mode=str(args.compositing_mask_mode),
+        metadata_mask_codec=str(args.metadata_mask_codec or "auto"),
     )
     ball_extractor = _build_ball_extractor(
         mode=str(args.ball_extractor),
