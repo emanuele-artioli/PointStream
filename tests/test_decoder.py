@@ -161,6 +161,8 @@ def test_decoder_actor_mask_decode_supports_legacy_png_payload(mock_encoder_pipe
     decoded_masks = renderer._decode_actor_masks(actor_packet)
 
     assert int(payload.chunk.start_frame_id) in decoded_masks
-    decoded_mask = decoded_masks[int(payload.chunk.start_frame_id)]
+    decoded_entry = decoded_masks[int(payload.chunk.start_frame_id)]
+    assert decoded_entry.bbox == (0, 0, 16, 24)
+    decoded_mask = decoded_entry.mask_gray
     assert decoded_mask.shape == (24, 16)
     assert int(np.count_nonzero(decoded_mask)) > 0

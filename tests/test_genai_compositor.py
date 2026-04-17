@@ -136,6 +136,82 @@ def test_diffusers_compositor_metadata_mask_mode_limits_blending(monkeypatch) ->
     assert int(torch.count_nonzero(out_with_metadata)) < int(torch.count_nonzero(out_without_metadata))
 
 
+def test_diffusers_compositor_metadata_mode_uses_metadata_bbox_for_placement(monkeypatch) -> None:
+    monkeypatch.setenv("POINTSTREAM_COMPOSITING_MASK_MODE", "metadata-source-mask")
+    monkeypatch.setattr(gc.DiffusersCompositor, "_build_strategy", lambda self, backend: _DummyStrategy())
+
+    compositor = gc.DiffusersCompositor(backend="controlnet", seed=1234, device="cpu")
+    compositor._alpha_temporal_smoothing = 0.0
+
+    reference = torch.full((3, 64, 48), 180, dtype=torch.uint8)
+    pose = _make_pose_sequence(valid_confidence=0.9)
+    background = torch.zeros((3, 180, 320), dtype=torch.uint8)
+
+    metadata_mask = np.full((24, 16), 255, dtype=np.uint8)
+    metadata_bbox = (10, 12, 34, 44)
+
+    def _should_not_use_pose_bbox(*_args, **_kwargs):
+        raise AssertionError("_estimate_bbox_from_pose should not be called in metadata-source-mask mode")
+
+    monkeypatch.setattr(compositor, "_estimate_bbox_from_pose", _should_not_use_pose_bbox)
+
+    out = compositor.process(
+        reference_crop_tensor=reference,
+        dense_dwpose_tensor=pose,
+        warped_background_frame=background,
+        actor_identity="actor_metadata_bbox",
+        metadata_mask=metadata_mask,
+        metadata_bbox=metadata_bbox,
+    )
+
+    out_np = out.permute(1, 2, 0).cpu().numpy()
+    nonzero = np.argwhere(np.any(out_np > 0, axis=2))
+    assert nonzero.size > 0
+
+    y_min = int(np.min(nonzero[:, 0]))
+    x_min = int(np.min(nonzero[:, 1]))
+    y_max = int(np.max(nonzero[:, 0])) + 1
+    x_max = int(np.max(nonzero[:, 1])) + 1
+
+    assert x_min >= metadata_bbox[0]
+    assert y_min >= metadata_bbox[1]
+    assert x_max <= metadata_bbox[2]
+    assert y_max <= metadata_bbox[3]
+
+
+def test_diffusers_compositor_metadata_mode_intersects_generated_alpha(monkeypatch) -> None:
+    monkeypatch.setenv("POINTSTREAM_COMPOSITING_MASK_MODE", "metadata-source-mask")
+    monkeypatch.setattr(gc.DiffusersCompositor, "_build_strategy", lambda self, backend: _DummyStrategy())
+
+    compositor = gc.DiffusersCompositor(backend="animate-anyone", seed=7, device="cpu")
+    compositor._alpha_temporal_smoothing = 0.0
+
+    reference = torch.full((3, 64, 48), 180, dtype=torch.uint8)
+    pose = _make_pose_sequence(valid_confidence=0.9)
+    background = torch.zeros((3, 180, 320), dtype=torch.uint8)
+
+    metadata_mask = np.full((24, 16), 255, dtype=np.uint8)
+    metadata_bbox = (40, 50, 64, 82)
+
+    monkeypatch.setattr(
+        compositor,
+        "_segment_generated_actor",
+        lambda actor_resized, is_animate_anyone: np.zeros(actor_resized.shape[:2], dtype=np.float32),
+    )
+
+    out = compositor.process(
+        reference_crop_tensor=reference,
+        dense_dwpose_tensor=pose,
+        warped_background_frame=background,
+        actor_identity="actor_metadata_alpha_intersection",
+        metadata_mask=metadata_mask,
+        metadata_bbox=metadata_bbox,
+    )
+
+    # Generated alpha is forced to zero; metadata mode must respect intersection and avoid blending.
+    assert int(torch.count_nonzero(out)) == 0
+
+
 def test_diffusers_compositor_postgen_seg_client_falls_back_to_heuristic(monkeypatch) -> None:
     monkeypatch.setenv("POINTSTREAM_COMPOSITING_MASK_MODE", "postgen-seg-client")
     monkeypatch.setenv("POINTSTREAM_POSTGEN_SEGMENTER_BACKEND", "yolo")

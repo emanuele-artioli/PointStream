@@ -227,9 +227,11 @@ class MockCompositor:
         warped_background_frame: torch.Tensor,
         actor_identity: str | None = None,
         metadata_mask: np.ndarray | None = None,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         _ = actor_identity
         _ = metadata_mask
+        _ = metadata_bbox
         frame_np = self._to_frame_numpy(warped_background_frame)
         pose_np = self._to_pose_numpy(dense_dwpose_tensor)
         crop_np = self._to_crop_numpy(reference_crop_tensor)
@@ -386,6 +388,7 @@ class DiffusersCompositor(MockCompositor):
         warped_background_frame: torch.Tensor,
         actor_identity: str | None = None,
         metadata_mask: np.ndarray | None = None,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         # Deterministic generation is required so residual encoding remains stable.
         torch.manual_seed(self._seed)
@@ -403,10 +406,11 @@ class DiffusersCompositor(MockCompositor):
         generated_np = self._to_crop_numpy(generated_actor)
         pose_np = self._to_pose_numpy(dense_dwpose_tensor)
 
-        x1, y1, x2, y2 = self._estimate_bbox_from_pose(
+        x1, y1, x2, y2 = self._resolve_target_bbox(
             pose_np=pose_np,
             frame_height=int(frame_np.shape[0]),
             frame_width=int(frame_np.shape[1]),
+            metadata_bbox=metadata_bbox,
         )
 
         target_h = max(1, y2 - y1)
@@ -433,6 +437,27 @@ class DiffusersCompositor(MockCompositor):
         blended = actor_resized.astype(np.float32) * alpha_3 + roi.astype(np.float32) * (1.0 - alpha_3)
         frame_np[y1:y2, x1:x2] = np.asarray(np.clip(blended, 0.0, 255.0), dtype=np.uint8)
         return torch.from_numpy(frame_np).permute(2, 0, 1).contiguous().to(torch.uint8)
+
+    def _resolve_target_bbox(
+        self,
+        pose_np: np.ndarray,
+        frame_height: int,
+        frame_width: int,
+        metadata_bbox: tuple[int, int, int, int] | None,
+    ) -> tuple[int, int, int, int]:
+        if self._compositing_mask_mode == "metadata-source-mask" and metadata_bbox is not None:
+            x1, y1, x2, y2 = metadata_bbox
+            clipped_x1 = max(0, min(frame_width - 1, int(x1)))
+            clipped_y1 = max(0, min(frame_height - 1, int(y1)))
+            clipped_x2 = max(clipped_x1 + 1, min(frame_width, int(x2)))
+            clipped_y2 = max(clipped_y1 + 1, min(frame_height, int(y2)))
+            return clipped_x1, clipped_y1, clipped_x2, clipped_y2
+
+        return self._estimate_bbox_from_pose(
+            pose_np=pose_np,
+            frame_height=frame_height,
+            frame_width=frame_width,
+        )
 
     def _resize_actor_with_aspect_recovery(self, actor_bgr: np.ndarray, target_w: int, target_h: int) -> np.ndarray:
         frame_h, frame_w = actor_bgr.shape[:2]
@@ -469,13 +494,38 @@ class DiffusersCompositor(MockCompositor):
         mode = self._compositing_mask_mode
 
         if mode == "metadata-source-mask":
-            alpha = self._alpha_from_metadata_mask(
+            metadata_alpha = self._alpha_from_metadata_mask(
                 metadata_mask=metadata_mask,
                 target_w=int(actor_resized.shape[1]),
                 target_h=int(actor_resized.shape[0]),
             )
-            if alpha is not None:
-                return alpha
+            if metadata_alpha is not None:
+                generated_alpha = self._segment_generated_actor(
+                    actor_resized=actor_resized,
+                    is_animate_anyone=is_animate_anyone,
+                )
+                if generated_alpha is None:
+                    return metadata_alpha
+
+                if generated_alpha.shape != metadata_alpha.shape:
+                    generated_alpha = np.asarray(
+                        cv2.resize(
+                            np.asarray(generated_alpha, dtype=np.float32),
+                            (int(metadata_alpha.shape[1]), int(metadata_alpha.shape[0])),
+                            interpolation=cv2.INTER_LINEAR,
+                        ),
+                        dtype=np.float32,
+                    )
+
+                return np.asarray(
+                    np.clip(
+                        np.asarray(metadata_alpha, dtype=np.float32)
+                        * np.asarray(generated_alpha, dtype=np.float32),
+                        0.0,
+                        1.0,
+                    ),
+                    dtype=np.float32,
+                )
 
         if mode == "postgen-seg-client":
             alpha = self._segment_generated_actor(actor_resized=actor_resized, is_animate_anyone=is_animate_anyone)

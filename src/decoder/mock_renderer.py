@@ -23,7 +23,13 @@ class _ClientActorState:
     object_id: str
     reference_crop_tensor: torch.Tensor
     dense_pose_tensor: torch.Tensor
-    metadata_masks_by_frame: dict[int, np.ndarray] = field(default_factory=dict)
+    metadata_masks_by_frame: dict[int, "_DecodedActorMaskFrame"] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class _DecodedActorMaskFrame:
+    bbox: tuple[int, int, int, int]
+    mask_gray: np.ndarray
 
 
 class DecoderRenderer:
@@ -98,8 +104,8 @@ class DecoderRenderer:
             )
         return actor_state
 
-    def _decode_actor_masks(self, actor_packet: ActorPacket) -> dict[int, np.ndarray]:
-        decoded: dict[int, np.ndarray] = {}
+    def _decode_actor_masks(self, actor_packet: ActorPacket) -> dict[int, _DecodedActorMaskFrame]:
+        decoded: dict[int, _DecodedActorMaskFrame] = {}
         for frame_mask in actor_packet.mask_frames:
             payload = frame_mask.mask_payload
             codec = frame_mask.mask_codec
@@ -129,7 +135,16 @@ class DecoderRenderer:
                 if mask_gray is None or mask_gray.size == 0:
                     continue
 
-            decoded[int(frame_mask.frame_id)] = np.asarray(mask_gray, dtype=np.uint8)
+            bbox = (
+                int(frame_mask.bbox[0]),
+                int(frame_mask.bbox[1]),
+                int(frame_mask.bbox[2]),
+                int(frame_mask.bbox[3]),
+            )
+            decoded[int(frame_mask.frame_id)] = _DecodedActorMaskFrame(
+                bbox=bbox,
+                mask_gray=np.asarray(mask_gray, dtype=np.uint8),
+            )
         return decoded
 
     def _decode_reference_crops(self, payload: EncodedChunkPayload) -> dict[int, torch.Tensor]:
@@ -174,7 +189,9 @@ class DecoderRenderer:
                 else:
                     pose_condition = actor_state.dense_pose_tensor[frame_idx]
 
-                metadata_mask = actor_state.metadata_masks_by_frame.get(global_frame_id)
+                metadata_entry = actor_state.metadata_masks_by_frame.get(global_frame_id)
+                metadata_mask = None if metadata_entry is None else metadata_entry.mask_gray
+                metadata_bbox = None if metadata_entry is None else metadata_entry.bbox
 
                 try:
                     composited = self._genai_compositor.process(
@@ -183,15 +200,26 @@ class DecoderRenderer:
                         warped_background_frame=composited,
                         actor_identity=actor_state.object_id,
                         metadata_mask=metadata_mask,
+                        metadata_bbox=metadata_bbox,
                     ).to(frame_tensor.device)
                 except TypeError:
-                    # Keep compatibility with existing test doubles that don't accept metadata_mask.
-                    composited = self._genai_compositor.process(
-                        reference_crop_tensor=actor_state.reference_crop_tensor,
-                        dense_dwpose_tensor=pose_condition,
-                        warped_background_frame=composited,
-                        actor_identity=actor_state.object_id,
-                    ).to(frame_tensor.device)
+                    try:
+                        # Keep compatibility with existing test doubles that don't accept metadata_bbox.
+                        composited = self._genai_compositor.process(
+                            reference_crop_tensor=actor_state.reference_crop_tensor,
+                            dense_dwpose_tensor=pose_condition,
+                            warped_background_frame=composited,
+                            actor_identity=actor_state.object_id,
+                            metadata_mask=metadata_mask,
+                        ).to(frame_tensor.device)
+                    except TypeError:
+                        # Keep compatibility with older test doubles that don't accept metadata args.
+                        composited = self._genai_compositor.process(
+                            reference_crop_tensor=actor_state.reference_crop_tensor,
+                            dense_dwpose_tensor=pose_condition,
+                            warped_background_frame=composited,
+                            actor_identity=actor_state.object_id,
+                        ).to(frame_tensor.device)
             out_frames.append(composited)
 
         return torch.stack(out_frames, dim=0)
