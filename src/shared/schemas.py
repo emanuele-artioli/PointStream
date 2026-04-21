@@ -42,7 +42,8 @@ class SceneActor(BaseModel):
 
 class SceneActorReference(BaseModel):
     track_id: int
-    reference_crop_jpeg: bytes
+    reference_crop_jpeg: bytes | None = None
+    reference_crop_uri: str | None = None
 
 
 class BallState(BaseModel):

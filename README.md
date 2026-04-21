@@ -128,6 +128,12 @@ PointStream expects YOLO actor weights under `assets/weights/`:
 - `yolo26n-seg.pt`
 - `yolo26n-pose.pt`
 
+Optional backend-ablation weights under `assets/weights/`:
+- `yoloe-26n-seg.pt` (YOLOE detector and segmenter)
+- `mobileclip2_b.ts` (required by YOLOE text prompts)
+- `sam3.pt` (used by `--segmenter sam3`)
+- `sam2_b.pt` (used by `--segmenter sam`)
+
 If `assets/weights` is missing, recreate links from your shared model store:
 
 ```bash
@@ -136,6 +142,9 @@ mkdir -p assets/weights
 ln -sfn /home/itec/emanuele/Models/yolo26n.pt assets/weights/yolo26n.pt
 ln -sfn /home/itec/emanuele/Models/yolo26n-seg.pt assets/weights/yolo26n-seg.pt
 ln -sfn /home/itec/emanuele/Models/yolo26n-pose.pt assets/weights/yolo26n-pose.pt
+ln -sfn /home/itec/emanuele/Models/YOLO/yoloe-26n-seg.pt assets/weights/yoloe-26n-seg.pt
+ln -sfn /home/itec/emanuele/Models/YOLO/mobileclip2_b.ts assets/weights/mobileclip2_b.ts
+ln -sfn /home/itec/emanuele/Models/SAM/sam3.pt assets/weights/sam3.pt
 ```
 
 AnimateAnyone backend model variants are resolved from the Moore repo:
@@ -196,10 +205,15 @@ cd /home/itec/emanuele/pointstream
 python scripts/run_mock_pipeline.py
 ```
 
-The run writes a local payload bundle under:
+The run always writes runtime artifacts under a timestamped directory:
 
 ```text
-.pointstream/chunk_<chunk_id>/
+outputs/<timestamp>/
+  chunk_0001/
+  decoded/
+  debug/
+  runtime_sources/   # only when --input is omitted
+  run_summary.json
 ```
 
 with:
@@ -210,27 +224,25 @@ with:
 `metadata.msgpack` intentionally stores `panorama_uri` and omits raw `panorama_image` pixels to keep metadata size bounded.
 `DiskTransport` always writes panorama as an encoded sidecar image (never raw pixel arrays in metadata), using a pluggable encoder strategy.
 
-Run with a custom input video and output folder:
+Run with a custom input video:
 
 ```bash
 cd /home/itec/emanuele/pointstream
-python -m src.main --input /path/to/input.mp4 --output-dir /path/to/output_dir
+python -m src.main --input /path/to/input.mp4
 ```
 
 Useful CLI options:
 - `--num-frames N`: process only the first N frames
-- `--summary-json /path/to/summary.json`: write summary JSON to a custom path
 - `--no-summary-file`: print summary only (do not write `run_summary.json`)
-- `--chunk-id custom_id`: choose chunk folder name (`chunk_<id>`)
-- `--decoder-output-dir /path/to/decoded`: write decoded reconstructions to a custom directory
 
 Run summaries also include artifact size telemetry (`source_size_bytes`, `metadata_size_bytes`, `residual_size_bytes`, `panorama_size_bytes`, `transport_total_size_bytes`, and ratio/savings fields when source size is available).
 
 Module swap arguments (for ablations and performance tuning):
 - `--execution-pool inline|tagged` with `--cpu-workers` and `--gpu-workers`
 - `--actor-extractor real|mock`
+- `--detector yolo26|yoloe` and `--detector-caption "tennis player"`
 - `--pose-estimator yolo|dwpose` (real actor extractor path)
-- `--segmenter yolo|none` (real actor extractor path)
+- `--segmenter yolo|yoloe|sam3|sam|none` and `--segmenter-caption "tennis player"` (real actor extractor path)
 - `--payload-pose-delta-threshold <float>`
 - `--ball-extractor difference|mock`
 - `--ball-difference-threshold <float>`, `--ball-min-blob-area <int>`, and `--ball-max-side <int>`
@@ -277,7 +289,6 @@ Ablation examples:
 cd /home/itec/emanuele/pointstream
 python -m src.main \
   --input /path/to/input.mp4 \
-  --output-dir /tmp/ps_ablation_mock \
   --actor-extractor mock \
   --ball-extractor mock \
   --execution-pool inline \
@@ -289,7 +300,6 @@ python -m src.main \
 cd /home/itec/emanuele/pointstream
 python -m src.main \
   --input /path/to/input.mp4 \
-  --output-dir /tmp/ps_ablation_dwpose \
   --actor-extractor real \
   --pose-estimator dwpose \
   --segmenter none \
@@ -308,7 +318,7 @@ python scripts/benchmark_mask_codecs.py \
   --repeats 2
 ```
 
-The benchmark writes per-run and aggregate reports under `.pointstream/bench_mask_codecs/<timestamp>/`:
+The benchmark writes per-run and aggregate reports under `outputs/bench_mask_codecs/<timestamp>/`:
 - `mask_codec_ablation_runs.csv`
 - `mask_codec_ablation_summary.csv`
 - `mask_codec_ablation_summary.json`
@@ -320,7 +330,7 @@ cd /home/itec/emanuele/pointstream
 python -m unittest discover -s tests -p "test_*.py"
 ```
 
-Run only the end-to-end mock path (generates `assets/test_runs/<timestamp>/test_video.mp4`):
+Run only the end-to-end mock path (generates `outputs/tests/<timestamp>/test_video.mp4`):
 
 ```bash
 cd /home/itec/emanuele/pointstream
@@ -412,7 +422,7 @@ docker run --gpus all --rm pointstream:gpu
 - Full run: `pytest -m "integration or slow or not (integration or slow)"`
 - Integration tests load YOLO detect/seg/pose models once per session via `tests/conftest.py` fixtures.
 - Unit plumbing tests use `MockActorExtractor` so they do not run real model inference on dummy videos.
-- Test session startup creates a run-scoped artifact folder at `assets/test_runs/<timestamp>/` and exports `POINTSTREAM_DEBUG_ARTIFACT_DIR` for all test-time debug writers.
+- Test session startup creates a run-scoped artifact folder at `outputs/tests/<timestamp>/` and exports `POINTSTREAM_DEBUG_ARTIFACT_DIR` for all test-time debug writers.
 
 ## Release Flow
 
@@ -449,17 +459,17 @@ docker run --gpus all --rm ghcr.io/<owner>/<repo>/pointstream-gpu:<tag>
 - Real model integrations should replace only the mock class internals while preserving interfaces and schemas.
 - Generated MP4 artifacts are encoded through `src/encoder/video_io.py::encode_video_frames_ffmpeg(...)` with explicit codec/pixel-format settings for player compatibility.
 - `ActorExtractor` now runs a component-based pipeline (`detector -> heuristic -> segmenter -> pose -> payload encoder`) implemented in `src/encoder/actor_components.py`.
-- Keyframe debug skeleton renders are written to `assets/test_runs/<timestamp>/debug_actors/` during tests; outside tests they default to `assets/debug_actors/`.
+- Keyframe debug skeleton renders are written to `outputs/tests/<timestamp>/debug_actors/` during tests; outside tests they default to `outputs/<timestamp>/debug/debug_actors/`.
 - `SynthesisEngine` (`src/shared/synthesis_engine.py`) now performs deterministic decode synthesis from payload metadata with strict seeding (`torch.manual_seed`, CUDA seed sync, deterministic algorithms enabled).
 - Decoder-side panorama re-warping is GPU-native through `kornia.geometry.transform.warp_perspective` (inverse homography per frame), and mock actor compositing draws dense DWPose skeletons over reconstructed backgrounds.
-- `tests/test_decoder.py` writes `assets/test_runs/<timestamp>/mock_reconstruction.mp4` so reconstruction smoothness and interpolation quality can be visually inspected without loading any heavy GenAI model.
+- `tests/test_decoder.py` writes `outputs/tests/<timestamp>/mock_reconstruction.mp4` so reconstruction smoothness and interpolation quality can be visually inspected without loading any heavy GenAI model.
 - `ResidualCalculator` (`src/encoder/residual_calculator.py`) computes weighted server residuals using a pluggable saliency strategy (`BaseImportanceMapper`).
 - Baseline saliency strategy is `BinaryActorImportanceMapper`, which converts player/racket segmentation masks from per-frame `FrameState` into continuous `[H, W]` importance tensors in `[0.0, 1.0]`.
 - Residual encoding uses signed offsets with a neutral center: `encoded = clamp(((original - predicted) * importance) + 128, 0, 255)`.
-- Transport now copies the encoded residual stream into `.pointstream/chunk_<id>/residual.mp4` and stores that chunk-local path in metadata.
+- Transport now copies the encoded residual stream into `outputs/<timestamp>/chunk_<id>/residual.mp4` and stores that chunk-local path in metadata.
 - Residual stream encoding uses FFmpeg H.265 (`libx265`, `-crf 28`) for the transport payload.
 - Client compositing decodes residual, shifts by `-128`, then applies `final = clamp(predicted + decoded_diff, 0, 255)` in `src/decoder/compositor.py`.
-- `tests/test_residual.py` writes `assets/test_runs/<timestamp>/debug_residual.mp4` and `assets/test_runs/<timestamp>/debug_final_reconstruction.mp4` from a 10-frame real clip for offline verification of signed residuals and end-to-end reconstruction fidelity.
+- `tests/test_residual.py` writes `outputs/tests/<timestamp>/debug_residual.mp4` and `outputs/tests/<timestamp>/debug_final_reconstruction.mp4` from a 10-frame real clip for offline verification of signed residuals and end-to-end reconstruction fidelity.
 - `BallExtractor` (`src/encoder/ball_extractor.py`) computes per-frame parametric tennis-ball states (`x, y, vx, vy, visible`) by GPU-native panorama re-warp subtraction, actor-mask suppression, and largest-blob tracking.
 - `SynthesisEngine` (`src/shared/synthesis_engine.py`) now reconstructs ball motion from parametric payloads and draws a velocity-aware motion-blurred ball trail during deterministic client synthesis.
 - `tests/test_ball_tracking.py` validates both extractor-side ball trajectory recovery and full encode -> transport -> decode reconstruction with ball visibility in `debug_final_reconstruction_ball.mp4`.

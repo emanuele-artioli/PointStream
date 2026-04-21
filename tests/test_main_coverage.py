@@ -130,7 +130,7 @@ def test_run_mock_pipeline_uses_generated_source_when_missing_uri(monkeypatch) -
         return SimpleNamespace(num_frames=9, fps=25.0, width=160, height=90)
 
     monkeypatch.setattr(main_module, "probe_video_metadata", _probe)
-    monkeypatch.setattr(main_module, "_ensure_mock_source_video", lambda: "/tmp/generated.mp4")
+    monkeypatch.setattr(main_module, "_ensure_mock_source_video", lambda runtime_output_root=None: "/tmp/generated.mp4")
 
     summary = main_module.run_mock_pipeline(
         transport_root="/tmp/pointstream_tests",
@@ -168,25 +168,13 @@ def test_residual_reexport_contract() -> None:
     assert residual_module.ResidualCalculator is not None
 
 
-def test_ensure_mock_source_video_returns_existing_asset(monkeypatch, tmp_path: Path) -> None:
-    test_video = tmp_path / "assets" / "test_chunks" / "tennis_chunk_0001.mp4"
+def test_ensure_mock_source_video_returns_existing_asset(tmp_path: Path) -> None:
+    run_root = tmp_path / "outputs" / "tests_run"
+    test_video = run_root / "runtime_sources" / "tennis_chunk_0001.mp4"
     test_video.parent.mkdir(parents=True, exist_ok=True)
     test_video.write_bytes(b"existing")
 
-    class _FakePath:
-        def __init__(self, path: Path):
-            self._path = path
-
-        def resolve(self):
-            return self
-
-        @property
-        def parents(self):
-            return [self._path.parent, self._path.parent.parent]
-
-    monkeypatch.setattr(main_module, "Path", lambda _p: _FakePath(tmp_path / "src" / "main.py"))
-
-    resolved = main_module._ensure_mock_source_video()
+    resolved = main_module._ensure_mock_source_video(runtime_output_root=run_root)
     assert resolved == str(test_video)
 
 
@@ -194,15 +182,20 @@ def test_run_cli_accepts_input_and_writes_default_summary(monkeypatch, tmp_path:
     source_video = tmp_path / "input.mp4"
     source_video.write_bytes(b"x")
     output_dir = tmp_path / "artifacts"
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     captured: dict[str, object | None] = {
         "transport_root": None,
+        "runtime_output_root": None,
+        "chunk_id": None,
         "source_uri": None,
         "num_frames": None,
     }
 
     def _fake_run_mock_pipeline(**kwargs):
         captured["transport_root"] = kwargs.get("transport_root")
+        captured["runtime_output_root"] = kwargs.get("runtime_output_root")
+        captured["chunk_id"] = kwargs.get("chunk_id")
         captured["source_uri"] = kwargs.get("source_uri")
         captured["num_frames"] = kwargs.get("num_frames")
         return {
@@ -215,20 +208,21 @@ def test_run_cli_accepts_input_and_writes_default_summary(monkeypatch, tmp_path:
         }
 
     monkeypatch.setattr(main_module, "run_mock_pipeline", _fake_run_mock_pipeline)
+    monkeypatch.setattr(main_module, "_create_timestamped_output_dir", lambda base_root=None: output_dir)
 
     exit_code = main_module.run_cli(
         [
             "--input",
             str(source_video),
-            "--output-dir",
-            str(output_dir),
             "--num-frames",
             "9",
         ]
     )
     assert exit_code == 0
 
-    assert captured["transport_root"] == str(output_dir)
+    assert Path(str(captured["transport_root"])) == output_dir
+    assert Path(str(captured["runtime_output_root"])) == output_dir
+    assert captured["chunk_id"] == "0001"
     assert captured["source_uri"] == str(source_video.resolve())
     assert captured["num_frames"] == 9
 
@@ -242,6 +236,7 @@ def test_run_cli_supports_no_summary_file(monkeypatch, tmp_path: Path) -> None:
     source_video = tmp_path / "input.mp4"
     source_video.write_bytes(b"x")
     output_dir = tmp_path / "artifacts"
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     monkeypatch.setattr(
         main_module,
@@ -255,13 +250,12 @@ def test_run_cli_supports_no_summary_file(monkeypatch, tmp_path: Path) -> None:
             "decoded_uri": "memory://decoded/chunk.mp4",
         },
     )
+    monkeypatch.setattr(main_module, "_create_timestamped_output_dir", lambda base_root=None: output_dir)
 
     exit_code = main_module.run_cli(
         [
             "--input",
             str(source_video),
-            "--output-dir",
-            str(output_dir),
             "--no-summary-file",
         ]
     )
@@ -319,6 +313,7 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
     source_video = tmp_path / "input.mp4"
     source_video.write_bytes(b"x")
     output_dir = tmp_path / "results"
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     captured: dict[str, object] = {}
 
@@ -335,6 +330,7 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
         }
 
     monkeypatch.setattr(main_module, "run_mock_pipeline", _fake_run_mock_pipeline)
+    monkeypatch.setattr(main_module, "_create_timestamped_output_dir", lambda base_root=None: output_dir)
     monkeypatch.delenv("POINTSTREAM_ENABLE_GENAI", raising=False)
     monkeypatch.delenv("POINTSTREAM_GENAI_BACKEND", raising=False)
     monkeypatch.delenv("POINTSTREAM_GENAI_PREROLL_FRAMES", raising=False)
@@ -351,10 +347,6 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
         [
             "--input",
             str(source_video),
-            "--output-dir",
-            str(output_dir),
-            "--chunk-id",
-            "ablation_01",
             "--execution-pool",
             "tagged",
             "--cpu-workers",
@@ -396,8 +388,9 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
     )
 
     assert exit_code == 0
-    assert captured["transport_root"] == str(output_dir)
-    assert captured["chunk_id"] == "ablation_01"
+    assert Path(str(captured["transport_root"])) == output_dir
+    assert Path(str(captured["runtime_output_root"])) == output_dir
+    assert captured["chunk_id"] == "0001"
     assert captured["execution_pool"] is not None
     assert captured["actor_extractor"] is not None
     assert captured["ball_extractor"] is not None
@@ -427,8 +420,11 @@ def test_build_actor_extractor_forces_real_pipeline_for_metadata_masks(monkeypat
 
     default_extractor = main_module._build_actor_extractor(
         mode="real",
+        detector="yolo26",
+        detector_caption="tennis player",
         pose_estimator="yolo",
         segmenter="yolo",
+        segmenter_caption="tennis player",
         disable_debug_keyframes=False,
         pose_delta_threshold=20.0,
         compositing_mask_mode="alpha-heuristic",
@@ -438,8 +434,11 @@ def test_build_actor_extractor_forces_real_pipeline_for_metadata_masks(monkeypat
 
     metadata_extractor = main_module._build_actor_extractor(
         mode="real",
+        detector="yolo26",
+        detector_caption="tennis player",
         pose_estimator="yolo",
         segmenter="yolo",
+        segmenter_caption="tennis player",
         disable_debug_keyframes=False,
         pose_delta_threshold=20.0,
         compositing_mask_mode="metadata-source-mask",
@@ -448,3 +447,6 @@ def test_build_actor_extractor_forces_real_pipeline_for_metadata_masks(monkeypat
     assert isinstance(metadata_extractor, _FakeActorExtractor)
     assert captured["include_mask_metadata"] is True
     assert captured["metadata_mask_codec"] == "rle-v1"
+    assert captured["detector_backend"] == "yolo26"
+    assert captured["detector_caption"] == "tennis player"
+    assert captured["segmenter_caption"] == "tennis player"

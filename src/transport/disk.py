@@ -8,7 +8,7 @@ import msgpack
 import numpy as np
 
 from src.shared.interfaces import BaseTransport
-from src.shared.schemas import EncodedChunkPayload
+from src.shared.schemas import EncodedChunkPayload, SceneActorReference
 from src.shared.tags import cpu_bound
 from src.transport.panorama_encoder import BasePanoramaEncoder, build_panorama_encoder
 
@@ -43,6 +43,8 @@ class DiskTransport(BaseTransport):
         if source_residual.resolve() != residual_path.resolve():
             shutil.copy2(source_residual, residual_path)
 
+        materialized_references = self._materialize_actor_references(payload=payload, chunk_dir=chunk_dir)
+
         payload_for_disk = payload.model_copy(
             update={
                 "panorama": payload.panorama.model_copy(
@@ -55,7 +57,8 @@ class DiskTransport(BaseTransport):
                     update={
                         "residual_video_uri": str(residual_path),
                     }
-                )
+                ),
+                "actor_references": materialized_references,
             }
         )
 
@@ -68,6 +71,41 @@ class DiskTransport(BaseTransport):
             image_bgr=panorama_np,
             output_stem=chunk_dir / "panorama",
         )
+
+    def _materialize_actor_references(self, payload: EncodedChunkPayload, chunk_dir: Path) -> list[SceneActorReference]:
+        references_dir = chunk_dir / "actor_references"
+        references_dir.mkdir(parents=True, exist_ok=True)
+
+        output_references: list[SceneActorReference] = []
+        for reference in payload.actor_references:
+            jpeg_bytes = self._resolve_reference_bytes(reference=reference)
+            if jpeg_bytes is None:
+                continue
+
+            reference_path = references_dir / f"track_{int(reference.track_id):04d}.jpg"
+            reference_path.write_bytes(jpeg_bytes)
+            output_references.append(
+                SceneActorReference(
+                    track_id=int(reference.track_id),
+                    reference_crop_jpeg=None,
+                    reference_crop_uri=str(reference_path),
+                )
+            )
+
+        return output_references
+
+    def _resolve_reference_bytes(self, reference: SceneActorReference) -> bytes | None:
+        if reference.reference_crop_jpeg:
+            return bytes(reference.reference_crop_jpeg)
+
+        uri = reference.reference_crop_uri
+        if uri is None:
+            return None
+
+        reference_path = Path(str(uri))
+        if not reference_path.exists() or not reference_path.is_file():
+            return None
+        return reference_path.read_bytes()
 
     def _resolve_panorama_image(self, payload: EncodedChunkPayload) -> np.ndarray:
         panorama_pixels = payload.panorama.panorama_image

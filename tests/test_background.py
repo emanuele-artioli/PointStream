@@ -19,9 +19,7 @@ def test_real_video_background_stitching_and_transport(
     real_tennis_10f_video: Path,
     test_run_artifacts_dir: Path,
 ) -> None:
-    project_root = Path(__file__).resolve().parents[1]
-
-    transport_root = project_root / ".pointstream"
+    transport_root = test_run_artifacts_dir / "transport"
     chunk_id = "background_real_0001"
     chunk_dir = transport_root / f"chunk_{chunk_id}"
     if chunk_dir.exists():

@@ -94,21 +94,21 @@ def _load_mask_codec_counts(output_dir: Path, chunk_id: str) -> tuple[int, dict[
 
 def _build_main_command(
     *,
-    output_dir: Path,
-    chunk_id: str,
-    summary_path: Path,
+    output_dir: Path | None = None,
+    chunk_id: str | None = None,
+    summary_path: Path | None = None,
     input_video: str | None,
     num_frames: int,
     requested_codec: str,
 ) -> list[str]:
+    _ = output_dir
+    _ = chunk_id
+    _ = summary_path
+
     cmd = [
         sys.executable,
         "-m",
         "src.main",
-        "--output-dir",
-        str(output_dir),
-        "--chunk-id",
-        chunk_id,
         "--num-frames",
         str(num_frames),
         "--disable-genai",
@@ -127,25 +127,41 @@ def _build_main_command(
         "mock",
         "--execution-pool",
         "inline",
-        "--summary-json",
-        str(summary_path),
     ]
     if input_video is not None:
         cmd.extend(["--input", input_video])
     return cmd
 
 
+def _extract_summary_from_stdout(stdout: str) -> dict[str, Any]:
+    decoder = json.JSONDecoder()
+    candidates: list[dict[str, Any]] = []
+    for index, char in enumerate(stdout):
+        if char != "{":
+            continue
+        try:
+            parsed, _consumed = decoder.raw_decode(stdout[index:])
+        except json.JSONDecodeError:
+            continue
+        if isinstance(parsed, dict) and "chunk_id" in parsed and "run_output_root" in parsed:
+            candidates.append(parsed)
+
+    if not candidates:
+        raise ValueError("Could not parse run summary JSON from src.main stdout")
+    return candidates[-1]
+
+
 def _run_single_ablation(
     *,
-    output_dir: Path,
-    chunk_id: str,
+    output_dir: Path | None = None,
+    chunk_id: str | None = None,
     input_video: str | None,
     num_frames: int,
     requested_codec: str,
     run_index: int,
 ) -> RunMetrics:
-    output_dir.mkdir(parents=True, exist_ok=True)
-    summary_path = output_dir / "run_summary.json"
+    summary_path = (output_dir / "run_summary.json") if output_dir is not None else None
+
     cmd = _build_main_command(
         output_dir=output_dir,
         chunk_id=chunk_id,
@@ -177,8 +193,24 @@ def _run_single_ablation(
         ]
         raise RuntimeError("\n".join(msg))
 
-    summary = _load_summary(summary_path)
-    mask_frame_count, actual_codec_counts = _load_mask_codec_counts(output_dir=output_dir, chunk_id=chunk_id)
+    if summary_path is not None:
+        try:
+            summary = _load_summary(summary_path)
+            run_output_root = output_dir
+            summary_chunk_id = chunk_id or "0001"
+        except FileNotFoundError:
+            summary = _extract_summary_from_stdout(completed.stdout)
+            run_output_root = Path(str(summary["run_output_root"]))
+            summary_chunk_id = str(summary["chunk_id"])
+    else:
+        summary = _extract_summary_from_stdout(completed.stdout)
+        run_output_root = Path(str(summary["run_output_root"]))
+        summary_chunk_id = str(summary["chunk_id"])
+
+    mask_frame_count, actual_codec_counts = _load_mask_codec_counts(
+        output_dir=run_output_root,
+        chunk_id=summary_chunk_id,
+    )
 
     return RunMetrics(
         requested_codec=requested_codec,
@@ -191,8 +223,8 @@ def _run_single_ablation(
         source_size_bytes=_coerce_int(summary.get("source_size_bytes")),
         mask_frame_count=mask_frame_count,
         actual_codec_counts=actual_codec_counts,
-        output_dir=str(output_dir),
-        chunk_id=chunk_id,
+        output_dir=str(run_output_root),
+        chunk_id=summary_chunk_id,
     )
 
 
@@ -401,7 +433,7 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--output-root",
-        default=".pointstream/bench_mask_codecs",
+        default="outputs/bench_mask_codecs",
         help="Root folder where benchmark artifacts and reports are written.",
     )
     return parser

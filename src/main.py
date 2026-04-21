@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime
 import json
 import os
 from pathlib import Path
@@ -29,6 +30,20 @@ from src.shared.synthesis_engine import SynthesisEngine
 from src.transport.disk import DiskTransport
 
 
+def _project_root() -> Path:
+    return Path(__file__).resolve().parents[1]
+
+
+def _create_timestamped_output_dir(base_root: str | Path | None = None) -> Path:
+    root = Path(base_root).expanduser() if base_root is not None else (_project_root() / "outputs")
+    root.mkdir(parents=True, exist_ok=True)
+
+    timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_%f")
+    run_dir = root / timestamp
+    run_dir.mkdir(parents=True, exist_ok=True)
+    return run_dir
+
+
 def _safe_file_size(path_like: str | Path | None) -> int | None:
     if path_like is None:
         return None
@@ -51,7 +66,7 @@ class _MockBallExtractorAdapter:
 
 
 def run_mock_pipeline(
-    transport_root: str = ".pointstream",
+    transport_root: str | Path | None = None,
     execution_pool: BaseExecutionPool | None = None,
     source_uri: str | None = None,
     num_frames: int | None = None,
@@ -62,8 +77,24 @@ def run_mock_pipeline(
     transport_backend: str = "disk",
     decoder_output_root: str | Path | None = None,
     chunk_id: str = "0001",
+    runtime_output_root: str | Path | None = None,
 ) -> dict[str, object]:
-    resolved_source_uri = source_uri or _ensure_mock_source_video()
+    resolved_transport_root = (
+        Path(transport_root).expanduser() if transport_root is not None else _create_timestamped_output_dir()
+    )
+    resolved_transport_root.mkdir(parents=True, exist_ok=True)
+
+    resolved_runtime_root = (
+        Path(runtime_output_root).expanduser()
+        if runtime_output_root is not None
+        else resolved_transport_root
+    )
+    resolved_runtime_root.mkdir(parents=True, exist_ok=True)
+
+    if source_uri is None:
+        resolved_source_uri = _ensure_mock_source_video(runtime_output_root=resolved_runtime_root)
+    else:
+        resolved_source_uri = str(Path(source_uri).expanduser().resolve())
     source_metadata = probe_video_metadata(resolved_source_uri)
     chunk_frames = source_metadata.num_frames if num_frames is None else min(source_metadata.num_frames, num_frames)
 
@@ -84,20 +115,34 @@ def run_mock_pipeline(
         reference_extractor=reference_extractor,
         residual_calculator=residual_calculator,
     )
+
+    previous_debug_artifact_dir = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")
+    previous_cwd = Path.cwd()
+    os.chdir(resolved_runtime_root)
+    os.environ["POINTSTREAM_DEBUG_ARTIFACT_DIR"] = str(resolved_runtime_root / "debug")
     try:
         payload = encoder.encode_chunk(chunk)
     finally:
         encoder.shutdown()
+        if previous_debug_artifact_dir is None:
+            os.environ.pop("POINTSTREAM_DEBUG_ARTIFACT_DIR", None)
+        else:
+            os.environ["POINTSTREAM_DEBUG_ARTIFACT_DIR"] = previous_debug_artifact_dir
+        os.chdir(previous_cwd)
 
     normalized_transport = transport_backend.strip().lower()
     if normalized_transport != "disk":
         raise ValueError(f"Unsupported transport backend: {transport_backend}")
 
-    transport = DiskTransport(root_dir=transport_root)
+    transport = DiskTransport(root_dir=resolved_transport_root)
     transport.send(payload)
     received_payload = transport.receive(chunk.chunk_id)
 
-    resolved_decoder_root = Path(decoder_output_root).expanduser() if decoder_output_root is not None else Path(transport_root).expanduser() / "decoded"
+    resolved_decoder_root = (
+        Path(decoder_output_root).expanduser()
+        if decoder_output_root is not None
+        else resolved_transport_root / "decoded"
+    )
     try:
         decoder = DecoderRenderer(output_root=resolved_decoder_root)
     except TypeError:
@@ -105,9 +150,19 @@ def run_mock_pipeline(
         decoder = DecoderRenderer()
     decoded = decoder.process(received_payload)
 
-    chunk_dir = Path(transport_root) / f"chunk_{received_payload.chunk.chunk_id}"
+    chunk_dir = resolved_transport_root / f"chunk_{received_payload.chunk.chunk_id}"
     metadata_size_bytes = _safe_file_size(chunk_dir / "metadata.msgpack")
     residual_size_bytes = _safe_file_size(received_payload.residual.residual_video_uri)
+    actor_references_dir = chunk_dir / "actor_references"
+    actor_reference_size_bytes = None
+    if actor_references_dir.exists() and actor_references_dir.is_dir():
+        actor_reference_size_bytes = int(
+            sum(
+                path.stat().st_size
+                for path in actor_references_dir.glob("*")
+                if path.is_file()
+            )
+        )
     panorama_packet = getattr(received_payload, "panorama", None)
     panorama_uri = getattr(panorama_packet, "panorama_uri", None) if panorama_packet is not None else None
     panorama_size_bytes = _safe_file_size(panorama_uri)
@@ -117,10 +172,13 @@ def run_mock_pipeline(
         size for size in (metadata_size_bytes, residual_size_bytes, panorama_size_bytes)
         if size is not None
     ]
+    if actor_reference_size_bytes is not None:
+        transported_components.append(actor_reference_size_bytes)
     transport_total_size_bytes = int(sum(transported_components))
 
     summary = {
         "chunk_id": received_payload.chunk.chunk_id,
+        "run_output_root": str(resolved_transport_root),
         "num_actor_packets": len(received_payload.actors),
         "num_rigid_object_packets": len(received_payload.rigid_objects),
         "ball_object_id": received_payload.ball.object_id,
@@ -129,12 +187,15 @@ def run_mock_pipeline(
         "transport_backend": normalized_transport,
         "source_size_bytes": source_size_bytes,
         "metadata_size_bytes": metadata_size_bytes,
+        "actor_reference_size_bytes": actor_reference_size_bytes,
         "residual_size_bytes": residual_size_bytes,
         "panorama_size_bytes": panorama_size_bytes,
         "transport_total_size_bytes": transport_total_size_bytes,
         "compositing_mask_mode": os.environ.get("POINTSTREAM_COMPOSITING_MASK_MODE", "alpha-heuristic"),
         "postgen_segmenter_backend": os.environ.get("POINTSTREAM_POSTGEN_SEGMENTER_BACKEND", "yolo"),
         "metadata_mask_codec": os.environ.get("POINTSTREAM_METADATA_MASK_CODEC", "auto"),
+        "genai_enabled": os.environ.get("POINTSTREAM_ENABLE_GENAI", "0") == "1",
+        "genai_backend": os.environ.get("POINTSTREAM_GENAI_BACKEND", "controlnet"),
     }
     if source_size_bytes is not None and source_size_bytes > 0:
         ratio = float(transport_total_size_bytes) / float(source_size_bytes)
@@ -156,8 +217,11 @@ def _build_execution_pool(mode: str, cpu_workers: int, gpu_workers: int) -> Base
 
 def _build_actor_extractor(
     mode: str,
+    detector: str,
+    detector_caption: str,
     pose_estimator: str,
     segmenter: str,
+    segmenter_caption: str,
     disable_debug_keyframes: bool,
     pose_delta_threshold: float,
     compositing_mask_mode: str,
@@ -171,8 +235,11 @@ def _build_actor_extractor(
     include_mask_metadata = normalized_mask_mode == "metadata-source-mask"
 
     uses_default = (
-        pose_estimator == "yolo"
+        detector == "yolo26"
+        and detector_caption.strip().lower() == "tennis player"
+        and pose_estimator == "yolo"
         and segmenter == "yolo"
+        and segmenter_caption.strip().lower() == "tennis player"
         and not disable_debug_keyframes
         and float(pose_delta_threshold) == 20.0
         and not include_mask_metadata
@@ -182,8 +249,11 @@ def _build_actor_extractor(
 
     return ActorExtractor(
         render_debug_keyframes=not disable_debug_keyframes,
+        detector_backend=detector,
+        detector_caption=detector_caption,
         pose_backend=pose_estimator,
         segmenter_backend=segmenter,
+        segmenter_caption=segmenter_caption,
         pose_delta_threshold=float(pose_delta_threshold),
         include_mask_metadata=include_mask_metadata,
         metadata_mask_codec=str(metadata_mask_codec),
@@ -291,7 +361,10 @@ def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
 
 def _build_cli_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Run PointStream on one input video chunk and write artifacts to an output folder.",
+        description=(
+            "Run PointStream on one input video chunk. Runtime artifacts are always written under "
+            "outputs/<timestamp>/ in the project root."
+        ),
     )
     parser.add_argument(
         "--input",
@@ -300,36 +373,15 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         help="Path to input video. If omitted, a synthetic mock source clip is generated.",
     )
     parser.add_argument(
-        "--output-dir",
-        dest="transport_root",
-        default=".pointstream",
-        help="Output root for chunk artifacts (metadata.msgpack, residual.mp4, decoded video).",
-    )
-    parser.add_argument(
-        "--decoder-output-dir",
-        default=None,
-        help="Optional output directory for decoded reconstruction video(s). Defaults to <output-dir>/decoded.",
-    )
-    parser.add_argument(
-        "--chunk-id",
-        default="0001",
-        help="Chunk identifier used in output folder names.",
-    )
-    parser.add_argument(
         "--num-frames",
         type=int,
         default=None,
         help="Optional maximum number of frames to process from the input video.",
     )
     parser.add_argument(
-        "--summary-json",
-        default=None,
-        help="Optional path for pipeline summary JSON. Defaults to <output-dir>/run_summary.json.",
-    )
-    parser.add_argument(
         "--no-summary-file",
         action="store_true",
-        help="Do not write a summary JSON file; print summary to stdout only.",
+        help="Do not write a summary JSON file in outputs/<timestamp>; print summary to stdout only.",
     )
     parser.add_argument(
         "--transport",
@@ -362,6 +414,18 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         help="Actor extraction module: real pipeline or lightweight mock module.",
     )
     parser.add_argument(
+        "--detector",
+        choices=("yolo26", "yoloe"),
+        default="yolo26",
+        help="Player detector backend for real actor extractor.",
+    )
+    parser.add_argument(
+        "--detector-caption",
+        type=str,
+        default="tennis player",
+        help="Caption prompt for open-vocabulary detector backends such as YOLOE.",
+    )
+    parser.add_argument(
         "--pose-estimator",
         choices=("yolo", "dwpose"),
         default="yolo",
@@ -369,9 +433,15 @@ def _build_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--segmenter",
-        choices=("yolo", "none"),
+        choices=("yolo", "yoloe", "sam3", "sam", "none"),
         default="yolo",
         help="Segmentation backend for real actor extractor.",
+    )
+    parser.add_argument(
+        "--segmenter-caption",
+        type=str,
+        default="tennis player",
+        help="Caption prompt for open-vocabulary segmenters such as YOLOE.",
     )
     parser.add_argument(
         "--payload-pose-delta-threshold",
@@ -564,8 +634,6 @@ def run_cli(argv: list[str] | None = None) -> int:
         raise ValueError("--genai-preroll-frames must be a non-negative integer")
     if args.animate_anyone_alpha_smoothing is not None and not (0.0 <= args.animate_anyone_alpha_smoothing <= 1.0):
         raise ValueError("--animate-anyone-alpha-smoothing must be in range [0.0, 1.0]")
-    if args.chunk_id.strip() == "":
-        raise ValueError("--chunk-id must not be empty")
 
     source_uri: str | None = args.source_uri
     if source_uri is not None:
@@ -576,7 +644,9 @@ def run_cli(argv: list[str] | None = None) -> int:
 
     _apply_runtime_env_overrides(args)
 
-    transport_root = str(Path(args.transport_root).expanduser())
+    run_output_root = _create_timestamped_output_dir(base_root=_project_root() / "outputs")
+    chunk_id = "0001"
+
     execution_pool = _build_execution_pool(
         mode=str(args.execution_pool),
         cpu_workers=int(args.cpu_workers),
@@ -584,8 +654,11 @@ def run_cli(argv: list[str] | None = None) -> int:
     )
     actor_extractor = _build_actor_extractor(
         mode=str(args.actor_extractor),
+        detector=str(args.detector),
+        detector_caption=str(args.detector_caption),
         pose_estimator=str(args.pose_estimator),
         segmenter=str(args.segmenter),
+        segmenter_caption=str(args.segmenter_caption),
         disable_debug_keyframes=bool(args.disable_debug_keyframes),
         pose_delta_threshold=float(args.payload_pose_delta_threshold),
         compositing_mask_mode=str(args.compositing_mask_mode),
@@ -607,7 +680,7 @@ def run_cli(argv: list[str] | None = None) -> int:
     )
 
     summary = run_mock_pipeline(
-        transport_root=transport_root,
+        transport_root=run_output_root,
         execution_pool=execution_pool,
         source_uri=source_uri,
         num_frames=args.num_frames,
@@ -616,29 +689,30 @@ def run_cli(argv: list[str] | None = None) -> int:
         reference_extractor=reference_extractor,
         residual_calculator=residual_calculator,
         transport_backend=str(args.transport),
-        decoder_output_root=args.decoder_output_dir,
-        chunk_id=str(args.chunk_id),
+        chunk_id=chunk_id,
+        runtime_output_root=run_output_root,
     )
 
     summary_json = json.dumps(summary, indent=2)
     print(summary_json)
 
     if not bool(args.no_summary_file):
-        if args.summary_json is not None:
-            summary_path = Path(args.summary_json).expanduser()
-        else:
-            summary_path = Path(transport_root) / "run_summary.json"
+        summary_path = run_output_root / "run_summary.json"
         summary_path.parent.mkdir(parents=True, exist_ok=True)
         summary_path.write_text(f"{summary_json}\n", encoding="utf-8")
 
     return 0
 
 
-def _ensure_mock_source_video() -> str:
-    project_root = Path(__file__).resolve().parents[1]
-    assets_dir = project_root / "assets" / "test_chunks"
-    assets_dir.mkdir(parents=True, exist_ok=True)
-    source_path = assets_dir / "tennis_chunk_0001.mp4"
+def _ensure_mock_source_video(runtime_output_root: str | Path | None = None) -> str:
+    run_root = (
+        Path(runtime_output_root).expanduser()
+        if runtime_output_root is not None
+        else _create_timestamped_output_dir(base_root=_project_root() / "outputs")
+    )
+    source_dir = run_root / "runtime_sources"
+    source_dir.mkdir(parents=True, exist_ok=True)
+    source_path = source_dir / "tennis_chunk_0001.mp4"
 
     if source_path.exists() and source_path.is_file():
         return str(source_path)

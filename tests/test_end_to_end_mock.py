@@ -10,8 +10,6 @@ from tests.video_utils import create_dummy_video
 
 
 def test_end_to_end_mp4_encode_transport_decode(mock_encoder_pipeline, test_run_artifacts_dir: Path) -> None:
-    project_root = Path(__file__).resolve().parents[1]
-
     video_path = create_dummy_video(
         path=test_run_artifacts_dir / "test_video.mp4",
         num_frames=30,
@@ -31,7 +29,7 @@ def test_end_to_end_mp4_encode_transport_decode(mock_encoder_pipeline, test_run_
     assert len(streamed_frames) == 30
     assert streamed_frames[0].shape == (64, 96, 3)
 
-    transport_root = project_root / ".pointstream"
+    transport_root = test_run_artifacts_dir / "transport"
     chunk_id = "e2e_mock_0001"
     chunk_dir = transport_root / f"chunk_{chunk_id}"
     if chunk_dir.exists():

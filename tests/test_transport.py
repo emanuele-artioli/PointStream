@@ -36,10 +36,18 @@ def test_roundtrip_payload(mock_encoder_pipeline, test_run_artifacts_dir: Path) 
 
         chunk_dir = Path(tmp_dir) / "chunk_rt001"
         assert (chunk_dir / "metadata.msgpack").exists()
+        actor_refs_dir = chunk_dir / "actor_references"
+        assert actor_refs_dir.exists()
+        assert len(list(actor_refs_dir.glob("*.jpg"))) == 2
         residual_path = chunk_dir / "residual.mp4"
         assert residual_path.exists()
         assert residual_path.stat().st_size > 0
         assert recovered.residual.residual_video_uri == str(residual_path)
+
+        for reference in recovered.actor_references:
+            assert reference.reference_crop_jpeg is None
+            assert reference.reference_crop_uri is not None
+            assert Path(str(reference.reference_crop_uri)).exists()
 
         panorama_path = Path(recovered.panorama.panorama_uri)
         assert panorama_path.exists()
@@ -48,6 +56,8 @@ def test_roundtrip_payload(mock_encoder_pipeline, test_run_artifacts_dir: Path) 
 
         metadata_raw = msgpack.unpackb((chunk_dir / "metadata.msgpack").read_bytes(), raw=False)
         assert metadata_raw["panorama"]["panorama_image"] is None
+        assert all(item.get("reference_crop_jpeg") is None for item in metadata_raw.get("actor_references", []))
+        assert all(item.get("reference_crop_uri") is not None for item in metadata_raw.get("actor_references", []))
 
 
 def test_receive_missing_payload_raises() -> None:

@@ -13,6 +13,9 @@ from src.shared.schemas import VideoChunk
 
 
 def _install_fake_actor_components(monkeypatch: pytest.MonkeyPatch) -> None:
+    class BaseDetector:
+        pass
+
     class BasePoseEstimator:
         pass
 
@@ -69,6 +72,12 @@ def _install_fake_actor_components(monkeypatch: pytest.MonkeyPatch) -> None:
             self.model_name = model_name
             self.model = model
 
+    class YoloEDetector:
+        def __init__(self, model_name: str, model=None, captions=None) -> None:
+            self.model_name = model_name
+            self.model = model
+            self.captions = captions
+
     class YoloPoseEstimator(BasePoseEstimator):
         def __init__(self, model_name: str, model=None) -> None:
             self.model_name = model_name
@@ -79,7 +88,19 @@ def _install_fake_actor_components(monkeypatch: pytest.MonkeyPatch) -> None:
             self.model_name = model_name
             self.model = model
 
+    class YoloeSegmenter(BaseSegmenter):
+        def __init__(self, model_name: str, model=None, captions=None) -> None:
+            self.model_name = model_name
+            self.model = model
+            self.captions = captions
+
+    class SamSegmenter(BaseSegmenter):
+        def __init__(self, model_name: str, model=None) -> None:
+            self.model_name = model_name
+            self.model = model
+
     module: Any = types.ModuleType("src.encoder.actor_components")
+    setattr(module, "BaseDetector", BaseDetector)
     setattr(module, "BasePoseEstimator", BasePoseEstimator)
     setattr(module, "BaseSegmenter", BaseSegmenter)
     setattr(module, "DwposeEstimator", DwposeEstimator)
@@ -88,8 +109,11 @@ def _install_fake_actor_components(monkeypatch: pytest.MonkeyPatch) -> None:
     setattr(module, "PipelineBuilder", PipelineBuilder)
     setattr(module, "StandardTennisHeuristic", StandardTennisHeuristic)
     setattr(module, "Yolo26Detector", Yolo26Detector)
+    setattr(module, "YoloEDetector", YoloEDetector)
     setattr(module, "YoloPoseEstimator", YoloPoseEstimator)
     setattr(module, "YoloSegmenter", YoloSegmenter)
+    setattr(module, "YoloeSegmenter", YoloeSegmenter)
+    setattr(module, "SamSegmenter", SamSegmenter)
     monkeypatch.setitem(sys.modules, "src.encoder.actor_components", module)
 
 
@@ -107,6 +131,9 @@ def _make_chunk(path: Path, *, frames: int = 5) -> VideoChunk:
 
 def test_actor_extractor_rejects_invalid_backends(monkeypatch: pytest.MonkeyPatch) -> None:
     _install_fake_actor_components(monkeypatch)
+
+    with pytest.raises(ValueError, match="Unsupported detector backend"):
+        me.ActorExtractor(detector_backend="unsupported", render_debug_keyframes=False)
 
     with pytest.raises(ValueError, match="Unsupported pose backend"):
         me.ActorExtractor(pose_backend="unsupported", render_debug_keyframes=False)

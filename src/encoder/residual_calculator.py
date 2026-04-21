@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
+from datetime import datetime
 import os
 from pathlib import Path
 
@@ -216,8 +217,10 @@ class ResidualCalculator:
         override = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")
         if override:
             return Path(override) / f"residual_{chunk.chunk_id}.mp4"
+
         project_root = Path(__file__).resolve().parents[2]
-        return project_root / "assets" / "test_chunks" / f"residual_{chunk.chunk_id}.mp4"
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_%f")
+        return project_root / "outputs" / timestamp / "debug" / f"residual_{chunk.chunk_id}.mp4"
 
     def _load_original_frames(self, chunk: VideoChunk) -> torch.Tensor:
         decoded = probe_video_metadata(chunk.source_uri)

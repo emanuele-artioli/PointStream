@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 import os
 from pathlib import Path
 from typing import Any
@@ -38,27 +39,51 @@ class ActorExtractor:
         segmenter_model: Any | None = None,
         pose_model: Any | None = None,
         render_debug_keyframes: bool = True,
+        detector_backend: str = "yolo26",
+        detector_caption: str = "tennis player",
         pose_backend: str = "yolo",
         segmenter_backend: str = "yolo",
+        segmenter_caption: str = "tennis player",
         pose_delta_threshold: float = 20.0,
         include_mask_metadata: bool = False,
         metadata_mask_codec: str = "auto",
         dwpose_device: str = "cuda",
     ) -> None:
         from src.encoder.actor_components import (
+            BaseDetector,
             BasePoseEstimator,
             BaseSegmenter,
             DwposeEstimator,
             NoOpSegmenter,
             PayloadEncoder,
             PipelineBuilder,
+            SamSegmenter,
             StandardTennisHeuristic,
+            YoloEDetector,
             Yolo26Detector,
             YoloPoseEstimator,
+            YoloeSegmenter,
             YoloSegmenter,
         )
 
         self._render_debug_keyframes = render_debug_keyframes
+
+        caption_list = [part.strip() for part in str(detector_caption).split(",") if part.strip()]
+        if not caption_list:
+            caption_list = ["tennis player"]
+
+        detector: BaseDetector
+        normalized_detector_backend = detector_backend.strip().lower()
+        if normalized_detector_backend in {"yolo", "yolo26", "yolo26n"}:
+            detector = Yolo26Detector(model_name="yolo26n.pt", model=detector_model)
+        elif normalized_detector_backend in {"yoloe", "yolo-e", "yolo_e"}:
+            detector = YoloEDetector(
+                model_name="yoloe-26n-seg.pt",
+                model=detector_model,
+                captions=caption_list,
+            )
+        else:
+            raise ValueError(f"Unsupported detector backend: {detector_backend}")
 
         pose_estimator: BasePoseEstimator
         normalized_pose_backend = pose_backend.strip().lower()
@@ -73,6 +98,19 @@ class ActorExtractor:
         normalized_segmenter_backend = segmenter_backend.strip().lower()
         if normalized_segmenter_backend in {"yolo", "yolo-seg", "yolo_seg"}:
             segmenter = YoloSegmenter(model_name="yolo26n-seg.pt", model=segmenter_model)
+        elif normalized_segmenter_backend in {"yoloe", "yolo-e", "yolo_e"}:
+            segmenter_caption_list = [part.strip() for part in str(segmenter_caption).split(",") if part.strip()]
+            if not segmenter_caption_list:
+                segmenter_caption_list = ["tennis player"]
+            segmenter = YoloeSegmenter(
+                model_name="yoloe-26n-seg.pt",
+                model=segmenter_model,
+                captions=segmenter_caption_list,
+            )
+        elif normalized_segmenter_backend in {"sam3", "sam-3"}:
+            segmenter = SamSegmenter(model_name="sam3.pt", model=segmenter_model)
+        elif normalized_segmenter_backend in {"sam", "sam2", "sam-2"}:
+            segmenter = SamSegmenter(model_name="sam2_b.pt", model=segmenter_model)
         elif normalized_segmenter_backend in {"none", "off", "noop", "no-op"}:
             segmenter = NoOpSegmenter()
         else:
@@ -80,7 +118,7 @@ class ActorExtractor:
 
         # Models are loaded once in component initialization and reused frame-by-frame.
         self._pipeline = PipelineBuilder(
-            detector=Yolo26Detector(model_name="yolo26n.pt", model=detector_model),
+            detector=detector,
             heuristic=StandardTennisHeuristic(),
             segmenter=segmenter,
             pose_estimator=pose_estimator,
@@ -113,7 +151,10 @@ class ActorExtractor:
         override = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")
         if override:
             return Path(override) / "debug_actors"
-        return Path(__file__).resolve().parents[2] / "assets" / "debug_actors"
+
+        project_root = Path(__file__).resolve().parents[2]
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_%f")
+        return project_root / "outputs" / timestamp / "debug" / "debug_actors"
 
     def _load_frames(self, chunk: VideoChunk) -> list[np.ndarray]:
         source = Path(chunk.source_uri)

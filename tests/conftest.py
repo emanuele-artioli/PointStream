@@ -19,7 +19,7 @@ from src.encoder.video_io import (
 def _create_test_run_artifacts_dir() -> Path:
     project_root = Path(__file__).resolve().parents[1]
     run_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    run_dir = project_root / "assets" / "test_runs" / run_timestamp
+    run_dir = project_root / "outputs" / "tests" / run_timestamp
     run_dir.mkdir(parents=True, exist_ok=True)
     return run_dir
 

@@ -74,10 +74,14 @@ def test_actor_reference_jpegs_roundtrip_over_disk_transport(
         transport.send(payload)
         recovered = transport.receive("genai_ref_transport_0001")
 
-    after = {ref.track_id: ref.reference_crop_jpeg for ref in recovered.actor_references}
-    assert sorted(after.keys()) == sorted(before.keys())
-    for track_id, jpeg_bytes in before.items():
-        assert after[track_id] == jpeg_bytes
+        after = {ref.track_id: ref.reference_crop_uri for ref in recovered.actor_references}
+        assert sorted(after.keys()) == sorted(before.keys())
+        for track_id, jpeg_bytes in before.items():
+            reference_uri = after[track_id]
+            assert reference_uri is not None
+            reference_path = Path(str(reference_uri))
+            assert reference_path.exists()
+            assert reference_path.read_bytes() == jpeg_bytes
 
 
 def test_decoder_mock_genai_stage_uses_transmitted_reference_crops(

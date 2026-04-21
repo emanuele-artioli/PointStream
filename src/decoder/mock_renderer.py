@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import datetime
 import os
 from pathlib import Path
 
@@ -35,7 +36,11 @@ class _DecodedActorMaskFrame:
 class DecoderRenderer:
     def __init__(self, output_root: str | Path | None = None, deterministic_seed: int = 1337) -> None:
         project_root = Path(__file__).resolve().parents[2]
-        self._output_root = Path(output_root) if output_root is not None else project_root / "assets" / "decoded"
+        if output_root is None:
+            timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_%f")
+            self._output_root = project_root / "outputs" / timestamp / "decoded"
+        else:
+            self._output_root = Path(output_root)
         self._output_root.mkdir(parents=True, exist_ok=True)
         self._synthesis_engine = SynthesisEngine(seed=deterministic_seed)
         self._compositor = ResidualCompositor(device=self._synthesis_engine.device)
@@ -150,7 +155,15 @@ class DecoderRenderer:
     def _decode_reference_crops(self, payload: EncodedChunkPayload) -> dict[int, torch.Tensor]:
         decoded: dict[int, torch.Tensor] = {}
         for reference in payload.actor_references:
-            encoded_np = np.frombuffer(reference.reference_crop_jpeg, dtype=np.uint8)
+            jpeg_bytes = reference.reference_crop_jpeg
+            if not jpeg_bytes and reference.reference_crop_uri is not None:
+                reference_path = Path(str(reference.reference_crop_uri))
+                if reference_path.exists() and reference_path.is_file():
+                    jpeg_bytes = reference_path.read_bytes()
+            if not jpeg_bytes:
+                continue
+
+            encoded_np = np.frombuffer(jpeg_bytes, dtype=np.uint8)
             crop_bgr = cv2.imdecode(encoded_np, cv2.IMREAD_COLOR)
             if crop_bgr is None or crop_bgr.size == 0:
                 continue

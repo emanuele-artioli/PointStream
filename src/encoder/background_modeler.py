@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 import os
 from pathlib import Path
 
@@ -75,7 +76,10 @@ class BackgroundModeler:
         override = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")
         if override:
             return Path(override)
-        return Path(__file__).resolve().parents[2] / "assets"
+
+        project_root = Path(__file__).resolve().parents[2]
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_%f")
+        return project_root / "outputs" / timestamp / "debug"
 
     def _resolve_frames(
         self,
