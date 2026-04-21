@@ -49,4 +49,9 @@ no_implicit_optional = true
 source = ["src", "scripts"]
 
 [tool.coverage.report]
-omit = ["config-*.py", "*/config-*.py", "src/encoder/actor_components.py"]
+omit = [
+  "config-*.py",
+  "*/config-*.py",
+  "src/encoder/actor_components.py",
+  "scripts/benchmark_player_backends.py",
+]

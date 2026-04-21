@@ -41,9 +41,11 @@ def test_reference_extractor_emits_jpeg_per_player_track(test_run_artifacts_dir:
     assert len(references) == 2
     for reference in references:
         assert isinstance(reference.track_id, int)
-        assert len(reference.reference_crop_jpeg) > 64
+        assert reference.reference_crop_jpeg is not None
+        jpeg_bytes = reference.reference_crop_jpeg
+        assert len(jpeg_bytes) > 64
 
-        decoded = cv2.imdecode(np.frombuffer(reference.reference_crop_jpeg, dtype=np.uint8), cv2.IMREAD_COLOR)
+        decoded = cv2.imdecode(np.frombuffer(jpeg_bytes, dtype=np.uint8), cv2.IMREAD_COLOR)
         assert decoded is not None
         assert int(decoded.size) > 0
 
@@ -67,7 +69,10 @@ def test_actor_reference_jpegs_roundtrip_over_disk_transport(
     )
     assert len(payload.actor_references) == 2
 
-    before = {ref.track_id: ref.reference_crop_jpeg for ref in payload.actor_references}
+    before: dict[int, bytes] = {}
+    for ref in payload.actor_references:
+        assert ref.reference_crop_jpeg is not None
+        before[ref.track_id] = ref.reference_crop_jpeg
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         transport = DiskTransport(root_dir=tmp_dir)

@@ -161,6 +161,8 @@ def _run_single_ablation(
     run_index: int,
 ) -> RunMetrics:
     summary_path = (output_dir / "run_summary.json") if output_dir is not None else None
+    run_output_root: Path
+    summary_chunk_id: str
 
     cmd = _build_main_command(
         output_dir=output_dir,
@@ -196,6 +198,8 @@ def _run_single_ablation(
     if summary_path is not None:
         try:
             summary = _load_summary(summary_path)
+            if output_dir is None:
+                raise RuntimeError("output_dir must be provided when summary_path is set")
             run_output_root = output_dir
             summary_chunk_id = chunk_id or "0001"
         except FileNotFoundError:
