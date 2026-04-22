@@ -6,10 +6,6 @@ channels:
   - defaults
 dependencies:
   - python=3.10
-  - ffmpeg
-  - pytorch-cuda=12.8
-  - pytorch
-  - torchvision
   - pip
   # 1. Conda handles the massive system-level GPU/ML binaries
   - pytorch=2.5.1=py3.10_cuda12.1_cudnn9.1.0_0

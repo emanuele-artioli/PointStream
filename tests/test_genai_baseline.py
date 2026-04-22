@@ -24,7 +24,6 @@ def test_reference_extractor_prefers_first_confident_observation(test_run_artifa
     frame1 = np.zeros((72, 96, 3), dtype=np.uint8)
     frame2 = np.zeros((72, 96, 3), dtype=np.uint8)
 
-    # BGR colors inside candidate crops: first frame is blue, later frame is green.
     frame0[10:38, 10:28] = np.array([255, 0, 0], dtype=np.uint8)
     frame1[8:48, 8:40] = np.array([0, 255, 0], dtype=np.uint8)
     frame2[12:42, 10:30] = np.array([0, 0, 255], dtype=np.uint8)
@@ -76,7 +75,6 @@ def test_reference_extractor_prefers_first_confident_observation(test_run_artifa
     )
     assert decoded is not None
     mean_bgr = np.mean(decoded, axis=(0, 1))
-    # The selected crop should come from frame0 (blue patch), not the larger green box in frame1.
     assert float(mean_bgr[0]) > float(mean_bgr[1])
 
 

@@ -120,8 +120,8 @@ celerybeat.pid
 *.db
 
 # PointStream specific ignores
-experiments/
-outputs/
-assets/
-environment.yaml
+experiments/*
+assets/*
+outputs/*
+old/*
 mobileclip_blt.ts

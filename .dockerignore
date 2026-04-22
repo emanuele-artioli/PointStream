@@ -1,0 +1,13 @@
+.git
+.github
+.pointstream
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.venv/
+old/
+assets/weights/

@@ -360,7 +360,7 @@ class DiffusersCompositor(MockCompositor):
             "postgen-seg-client": "postgen-seg-client",
             "postgen": "postgen-seg-client",
         }
-        self._compositing_mask_mode = mask_mode_aliases.get(raw_mask_mode, "alpha-heuristic")
+        self._compositing_mask_mode = mask_mode_aliases.get(raw_mask_mode, "postgen-seg-client")
 
         backend_raw = os.environ.get("POINTSTREAM_POSTGEN_SEGMENTER_BACKEND", "yolo").strip().lower()
         self._postgen_segmenter_backend = backend_raw if backend_raw in {"yolo", "heuristic"} else "yolo"

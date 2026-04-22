@@ -248,7 +248,6 @@ class ResidualCalculator:
 
         compositor = self._synthesis_engine.get_genai_compositor()
         if not isinstance(compositor, DiffusersCompositor):
-            # Handle long-lived pipeline instances where env flags changed after init.
             self._synthesis_engine = SynthesisEngine(
                 seed=int(getattr(self._synthesis_engine, "seed", 1337)),
                 device=self._device,
@@ -334,9 +333,7 @@ class ResidualCalculator:
             crop_bgr = cv2.imdecode(encoded_np, cv2.IMREAD_COLOR)
             if crop_bgr is None or crop_bgr.size == 0:
                 continue
-            decoded[int(reference.track_id)] = (
-                torch.from_numpy(crop_bgr).permute(2, 0, 1).contiguous().to(torch.uint8)
-            )
+            decoded[int(reference.track_id)] = torch.from_numpy(crop_bgr).permute(2, 0, 1).contiguous().to(torch.uint8)
         return decoded
 
     def _decode_actor_masks(self, actor_packet: ActorPacket) -> dict[int, _DecodedActorMaskFrame]:

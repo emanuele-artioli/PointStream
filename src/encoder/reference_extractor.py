@@ -44,8 +44,7 @@ class ReferenceExtractor:
                 if not self._is_confident_detection(actor=actor, bbox=bbox):
                     continue
 
-                # Keep the first confident observation for each track to preserve
-                # temporal identity consistency and avoid late-frame swaps.
+                # Keep first confident detection to preserve temporal identity.
                 if actor.track_id not in selected:
                     selected[actor.track_id] = (frame_idx, bbox)
 
@@ -91,13 +90,11 @@ class ReferenceExtractor:
         if area <= 4.0:
             return False
 
-        # Prefer detections backed by segmentation masks when available.
         if actor.mask is not None:
             mask = np.asarray(actor.mask, dtype=np.uint8)
             if mask.ndim == 2 and mask.size > 0 and int(np.count_nonzero(mask)) > 0:
                 return True
 
-        # Fall back to pose confidence if present.
         if actor.pose_dw is not None:
             pose = np.asarray(actor.pose_dw, dtype=np.float32)
             if pose.ndim == 2 and pose.shape[1] >= 3 and pose.shape[0] > 0:
@@ -106,7 +103,6 @@ class ReferenceExtractor:
                 if visible >= 4:
                     return True
 
-        # Last-resort fallback when no mask/pose metadata is available.
         return area >= 16.0
 
     def _clip_bbox(self, bbox: list[float], frame_width: int, frame_height: int) -> list[int]:

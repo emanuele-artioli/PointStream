@@ -58,6 +58,7 @@ class EncoderPipeline:
             return context["chunk"]
 
         self._dag.add_node(DAGNode(name="chunk", func=load_chunk))
+
         actor_bundle_func = self._make_chunk_node(self._process_actor_bundle)
         self._dag.add_node(
             DAGNode(

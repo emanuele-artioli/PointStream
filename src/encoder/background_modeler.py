@@ -319,7 +319,6 @@ class BackgroundModeler:
                 if polygon_mask is None:
                     # Do not exclude full bbox rectangles when segmentation is missing.
                     continue
-
                 roi = mask[y1:y2, x1:x2]
                 roi[polygon_mask > 0] = 255
                 mask[y1:y2, x1:x2] = roi
@@ -327,7 +326,6 @@ class BackgroundModeler:
 
             local = np.asarray(actor.mask, dtype=np.uint8)
             if local.ndim != 2 or local.size == 0:
-                mask[y1:y2, x1:x2] = 255
                 continue
 
             resized = cv2.resize(local, (x2 - x1, y2 - y1), interpolation=cv2.INTER_NEAREST)
@@ -338,8 +336,8 @@ class BackgroundModeler:
         return mask
 
     def _build_polygon_mask(self, actor: SceneActor, width: int, height: int) -> np.ndarray | None:
-        polygons = getattr(actor, "mask_polygons", None)
-        if polygons is None or not isinstance(polygons, list) or len(polygons) == 0:
+        polygons = actor.mask_polygons
+        if polygons is None or len(polygons) == 0:
             return None
 
         local_mask = np.zeros((height, width), dtype=np.uint8)

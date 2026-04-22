@@ -66,7 +66,6 @@ def test_background_modeler_excludes_actor_pixels_with_masked_nan_median() -> No
     )
 
     pano_np = np.asarray(panorama.panorama_image, dtype=np.uint8)
-    # Moving masks should allow reconstruction from other frames, not black holes.
     actor_union = pano_np[20:44, 8:84]
     mean_val = float(np.mean(actor_union))
     assert mean_val > 70.0
@@ -96,5 +95,4 @@ def test_background_modeler_does_not_mask_full_bbox_when_actor_mask_missing() ->
         frame_width=96,
     )
 
-    # Without segmentation data there should be no coarse rectangular exclusion.
     assert int(np.count_nonzero(exclusion)) == 0
