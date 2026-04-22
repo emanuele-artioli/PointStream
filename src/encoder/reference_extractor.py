@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 
 from src.encoder.video_io import iter_video_frames_ffmpeg, probe_video_metadata
-from src.shared.schemas import FrameState, SceneActorReference, VideoChunk
+from src.shared.schemas import FrameState, SceneActor, SceneActorReference, VideoChunk
 from src.shared.tags import cpu_bound
 from src.shared.track_id import scene_track_id_to_int
 
@@ -33,9 +33,7 @@ class ReferenceExtractor:
         if frame_limit <= 0:
             return []
 
-        selected: dict[str, tuple[int, list[int], float, float]] = {}
-        center_x = float(chunk.width) * 0.5
-        center_y = float(chunk.height) * 0.5
+        selected: dict[str, tuple[int, list[int]]] = {}
 
         for frame_idx in range(frame_limit):
             for actor in frame_states[frame_idx].actors:
@@ -43,25 +41,16 @@ class ReferenceExtractor:
                     continue
 
                 bbox = self._clip_bbox(actor.bbox, frame_width=int(chunk.width), frame_height=int(chunk.height))
-                area = float(max(0, bbox[2] - bbox[0]) * max(0, bbox[3] - bbox[1]))
-                if area <= 1.0:
+                if not self._is_confident_detection(actor=actor, bbox=bbox):
                     continue
 
-                actor_center_x = 0.5 * (bbox[0] + bbox[2])
-                actor_center_y = 0.5 * (bbox[1] + bbox[3])
-                center_distance = float(np.hypot(actor_center_x - center_x, actor_center_y - center_y))
-                previous = selected.get(actor.track_id)
-                if previous is None:
-                    selected[actor.track_id] = (frame_idx, bbox, area, center_distance)
-                    continue
-
-                _prev_idx, _prev_bbox, prev_area, prev_center_distance = previous
-                if area > prev_area or (abs(area - prev_area) < 1e-4 and center_distance < prev_center_distance):
-                    selected[actor.track_id] = (frame_idx, bbox, area, center_distance)
+                # Keep first confident detection to preserve temporal identity.
+                if actor.track_id not in selected:
+                    selected[actor.track_id] = (frame_idx, bbox)
 
         references: list[SceneActorReference] = []
         for track_id_str, candidate in selected.items():
-            frame_idx, bbox, _area, _distance = candidate
+            frame_idx, bbox = candidate
             if frame_idx < 0 or frame_idx >= frame_limit:
                 continue
 
@@ -93,6 +82,28 @@ class ReferenceExtractor:
 
         references.sort(key=lambda item: item.track_id)
         return references
+
+    def _is_confident_detection(self, actor: SceneActor, bbox: list[int]) -> bool:
+        width = max(0, int(bbox[2]) - int(bbox[0]))
+        height = max(0, int(bbox[3]) - int(bbox[1]))
+        area = float(width * height)
+        if area <= 4.0:
+            return False
+
+        if actor.mask is not None:
+            mask = np.asarray(actor.mask, dtype=np.uint8)
+            if mask.ndim == 2 and mask.size > 0 and int(np.count_nonzero(mask)) > 0:
+                return True
+
+        if actor.pose_dw is not None:
+            pose = np.asarray(actor.pose_dw, dtype=np.float32)
+            if pose.ndim == 2 and pose.shape[1] >= 3 and pose.shape[0] > 0:
+                conf = pose[:, 2]
+                visible = int(np.count_nonzero(conf >= 0.20))
+                if visible >= 4:
+                    return True
+
+        return area >= 16.0
 
     def _clip_bbox(self, bbox: list[float], frame_width: int, frame_height: int) -> list[int]:
         x1, y1, x2, y2 = bbox

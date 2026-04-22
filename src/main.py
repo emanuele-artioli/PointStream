@@ -191,7 +191,7 @@ def run_mock_pipeline(
         "residual_size_bytes": residual_size_bytes,
         "panorama_size_bytes": panorama_size_bytes,
         "transport_total_size_bytes": transport_total_size_bytes,
-        "compositing_mask_mode": os.environ.get("POINTSTREAM_COMPOSITING_MASK_MODE", "alpha-heuristic"),
+        "compositing_mask_mode": os.environ.get("POINTSTREAM_COMPOSITING_MASK_MODE", "postgen-seg-client"),
         "postgen_segmenter_backend": os.environ.get("POINTSTREAM_POSTGEN_SEGMENTER_BACKEND", "yolo"),
         "metadata_mask_codec": os.environ.get("POINTSTREAM_METADATA_MASK_CODEC", "auto"),
         "genai_enabled": os.environ.get("POINTSTREAM_ENABLE_GENAI", "0") == "1",
@@ -588,7 +588,7 @@ def _build_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--compositing-mask-mode",
         choices=("alpha-heuristic", "metadata-source-mask", "postgen-seg-client"),
-        default="alpha-heuristic",
+        default="postgen-seg-client",
         help=(
             "Actor compositing alpha strategy: heuristic alpha extraction, source mask metadata, "
             "or post-generation client segmentation."

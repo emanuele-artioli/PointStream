@@ -55,13 +55,19 @@ class DecoderRenderer:
         self._actor_state = self._build_actor_state(payload)
         synthesis = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False)
 
+        genai_enabled = os.environ.get("POINTSTREAM_ENABLE_GENAI", "0").strip() == "1"
+        predicted_frames = synthesis.frames_bgr
+        if genai_enabled:
+            predicted_frames = self._render_genai_baseline(predicted_frames)
+
         frame_tensor = self._compositor.composite(
-            predicted_frames=synthesis.frames_bgr,
+            predicted_frames=predicted_frames,
             residual_video_uri=payload.residual.residual_video_uri,
             width=int(chunk.width),
             height=int(chunk.height),
         )
-        frame_tensor = self._render_genai_baseline(frame_tensor)
+        if not genai_enabled:
+            frame_tensor = self._render_genai_baseline(frame_tensor)
         frames_bgr = [
             np.asarray(frame.permute(1, 2, 0).cpu().numpy(), dtype=np.uint8)
             for frame in frame_tensor

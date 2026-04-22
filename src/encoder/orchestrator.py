@@ -59,24 +59,6 @@ class EncoderPipeline:
 
         self._dag.add_node(DAGNode(name="chunk", func=load_chunk))
 
-        def build_panorama_node(context, deps):
-            return self._background_modeler.process(
-                chunk=deps["chunk"],
-                decoded_video_tensor=context.get("decoded_video_tensor"),
-            )
-
-        setattr(
-            build_panorama_node,
-            "_execution_tag",
-            getattr(self._background_modeler.process, "_execution_tag", "cpu"),
-        )
-        self._dag.add_node(
-            DAGNode(
-                name="panorama",
-                func=build_panorama_node,
-                dependencies=("chunk",),
-            )
-        )
         actor_bundle_func = self._make_chunk_node(self._process_actor_bundle)
         self._dag.add_node(
             DAGNode(
@@ -109,6 +91,26 @@ class EncoderPipeline:
                 name="frame_states",
                 func=select_frame_states,
                 dependencies=("actor_bundle",),
+            )
+        )
+
+        def build_panorama_node(context, deps):
+            return self._background_modeler.process(
+                chunk=deps["chunk"],
+                decoded_video_tensor=context.get("decoded_video_tensor"),
+                frame_states=deps["frame_states"],
+            )
+
+        setattr(
+            build_panorama_node,
+            "_execution_tag",
+            getattr(self._background_modeler.process, "_execution_tag", "cpu"),
+        )
+        self._dag.add_node(
+            DAGNode(
+                name="panorama",
+                func=build_panorama_node,
+                dependencies=("chunk", "frame_states"),
             )
         )
         def build_actor_references_node(context, deps):

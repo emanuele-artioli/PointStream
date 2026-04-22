@@ -3,13 +3,14 @@ from __future__ import annotations
 from datetime import datetime
 import os
 from pathlib import Path
+import warnings
 
 import cv2
 import numpy as np
 import torch
 
 from src.encoder.video_io import iter_video_frames_ffmpeg, probe_video_metadata
-from src.shared.schemas import CameraPose, PanoramaPacket, VideoChunk
+from src.shared.schemas import CameraPose, FrameState, PanoramaPacket, SceneActor, VideoChunk
 from src.shared.tags import cpu_bound
 
 
@@ -21,6 +22,7 @@ class BackgroundModeler:
         self,
         chunk: VideoChunk,
         decoded_video_tensor: torch.Tensor | None = None,
+        frame_states: list[FrameState] | None = None,
         translation_threshold_px: float = 30.0,
     ) -> PanoramaPacket:
         frames = self._resolve_frames(chunk=chunk, decoded_video_tensor=decoded_video_tensor)
@@ -31,7 +33,12 @@ class BackgroundModeler:
             homographies=homographies,
             translation_threshold_px=translation_threshold_px,
         )
-        panorama = self._median_panorama(frames=frames, homographies=homographies, selected_indices=selected_indices)
+        panorama = self._median_panorama(
+            frames=frames,
+            homographies=homographies,
+            selected_indices=selected_indices,
+            frame_states=frame_states,
+        )
 
         debug_root = self._resolve_debug_root()
         debug_root.mkdir(parents=True, exist_ok=True)
@@ -199,6 +206,7 @@ class BackgroundModeler:
         frames: np.ndarray,
         homographies: list[np.ndarray],
         selected_indices: list[int],
+        frame_states: list[FrameState] | None = None,
     ) -> np.ndarray:
         if frames.shape[0] == 0:
             raise ValueError("BackgroundModeler received zero frames; cannot compute panorama")
@@ -215,19 +223,145 @@ class BackgroundModeler:
         )
         canvas_width, canvas_height = canvas_size
 
-        warped_frames: list[np.ndarray] = []
+        warped_frames_masked: list[np.ndarray] = []
+        warped_frames_unmasked: list[np.ndarray] = []
+        source_valid = np.full((height, width), 255, dtype=np.uint8)
         for frame_idx in selected_indices:
             warped = cv2.warpPerspective(
-                frames[frame_idx],
+                np.asarray(frames[frame_idx], dtype=np.float32),
                 panorama_homographies[frame_idx],
                 (canvas_width, canvas_height),
                 flags=cv2.INTER_LINEAR,
                 borderMode=cv2.BORDER_CONSTANT,
             )
-            warped_frames.append(warped)
+            warped_valid = cv2.warpPerspective(
+                source_valid,
+                panorama_homographies[frame_idx],
+                (canvas_width, canvas_height),
+                flags=cv2.INTER_NEAREST,
+                borderMode=cv2.BORDER_CONSTANT,
+                borderValue=(0.0,),
+            )
 
-        stacked = np.stack(warped_frames, axis=0)
-        return np.median(stacked, axis=0).astype(np.uint8)
+            exclusion_mask_src = self._build_actor_exclusion_mask(
+                frame_idx=frame_idx,
+                frame_states=frame_states,
+                frame_height=height,
+                frame_width=width,
+            )
+            warped_exclusion = cv2.warpPerspective(
+                exclusion_mask_src,
+                panorama_homographies[frame_idx],
+                (canvas_width, canvas_height),
+                flags=cv2.INTER_NEAREST,
+                borderMode=cv2.BORDER_CONSTANT,
+                borderValue=(0.0,),
+            )
+
+            warped_unmasked = warped.copy()
+            warped_unmasked[warped_valid < 127] = np.nan
+            warped_frames_unmasked.append(warped_unmasked)
+
+            warped_masked = warped.copy()
+            combined_invalid = (warped_valid < 127) | (warped_exclusion > 0)
+            warped_masked[combined_invalid] = np.nan
+            warped_frames_masked.append(warped_masked)
+
+        masked_median = self._safe_nanmedian(np.stack(warped_frames_masked, axis=0))
+        unmasked_median = self._safe_nanmedian(np.stack(warped_frames_unmasked, axis=0))
+
+        filled = np.where(np.isnan(masked_median), unmasked_median, masked_median)
+        if bool(np.any(np.isnan(filled))):
+            filled = self._inpaint_nan_holes(filled)
+
+        filled = np.nan_to_num(filled, nan=0.0, posinf=255.0, neginf=0.0)
+        return np.asarray(np.clip(filled, 0.0, 255.0), dtype=np.uint8)
+
+    def _safe_nanmedian(self, stacked: np.ndarray) -> np.ndarray:
+        with np.errstate(all="ignore"):
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", category=RuntimeWarning)
+                return np.nanmedian(stacked, axis=0)
+
+    def _inpaint_nan_holes(self, image_with_nan: np.ndarray) -> np.ndarray:
+        holes = np.any(np.isnan(image_with_nan), axis=2)
+        if not bool(np.any(holes)):
+            return image_with_nan
+
+        base = np.nan_to_num(image_with_nan, nan=0.0, posinf=255.0, neginf=0.0)
+        base_u8 = np.asarray(np.clip(base, 0.0, 255.0), dtype=np.uint8)
+        hole_mask = np.asarray(holes, dtype=np.uint8) * 255
+        inpainted = cv2.inpaint(base_u8, hole_mask, inpaintRadius=3, flags=cv2.INPAINT_TELEA)
+        return np.asarray(inpainted, dtype=np.float32)
+
+    def _build_actor_exclusion_mask(
+        self,
+        frame_idx: int,
+        frame_states: list[FrameState] | None,
+        frame_height: int,
+        frame_width: int,
+    ) -> np.ndarray:
+        if frame_states is None or frame_idx < 0 or frame_idx >= len(frame_states):
+            return np.zeros((frame_height, frame_width), dtype=np.uint8)
+
+        mask = np.zeros((frame_height, frame_width), dtype=np.uint8)
+        state = frame_states[frame_idx]
+        for actor in state.actors:
+            if actor.class_name not in {"player", "racket"}:
+                continue
+
+            x1, y1, x2, y2 = self._clip_bbox(actor.bbox, frame_width=frame_width, frame_height=frame_height)
+            if x2 <= x1 or y2 <= y1:
+                continue
+
+            if actor.mask is None:
+                polygon_mask = self._build_polygon_mask(actor=actor, width=x2 - x1, height=y2 - y1)
+                if polygon_mask is None:
+                    # Do not exclude full bbox rectangles when segmentation is missing.
+                    continue
+                roi = mask[y1:y2, x1:x2]
+                roi[polygon_mask > 0] = 255
+                mask[y1:y2, x1:x2] = roi
+                continue
+
+            local = np.asarray(actor.mask, dtype=np.uint8)
+            if local.ndim != 2 or local.size == 0:
+                continue
+
+            resized = cv2.resize(local, (x2 - x1, y2 - y1), interpolation=cv2.INTER_NEAREST)
+            roi = mask[y1:y2, x1:x2]
+            roi[resized > 0] = 255
+            mask[y1:y2, x1:x2] = roi
+
+        return mask
+
+    def _build_polygon_mask(self, actor: SceneActor, width: int, height: int) -> np.ndarray | None:
+        polygons = actor.mask_polygons
+        if polygons is None or len(polygons) == 0:
+            return None
+
+        local_mask = np.zeros((height, width), dtype=np.uint8)
+        for polygon in polygons:
+            poly_np = np.asarray(polygon, dtype=np.float32)
+            if poly_np.ndim != 2 or poly_np.shape[1] != 2 or poly_np.shape[0] < 3:
+                continue
+
+            poly_i = np.round(poly_np).astype(np.int32)
+            poly_i[:, 0] = np.clip(poly_i[:, 0], 0, width - 1)
+            poly_i[:, 1] = np.clip(poly_i[:, 1], 0, height - 1)
+            cv2.fillPoly(local_mask, [poly_i.reshape(-1, 1, 2)], color=(255.0,))
+
+        if int(np.count_nonzero(local_mask)) == 0:
+            return None
+        return local_mask
+
+    def _clip_bbox(self, bbox: list[float], frame_width: int, frame_height: int) -> tuple[int, int, int, int]:
+        x1, y1, x2, y2 = bbox
+        clipped_x1 = max(0, min(frame_width - 1, int(np.floor(x1))))
+        clipped_y1 = max(0, min(frame_height - 1, int(np.floor(y1))))
+        clipped_x2 = max(clipped_x1 + 1, min(frame_width, int(np.ceil(x2))))
+        clipped_y2 = max(clipped_y1 + 1, min(frame_height, int(np.ceil(y2))))
+        return clipped_x1, clipped_y1, clipped_x2, clipped_y2
 
     def _build_panorama_canvas(
         self,

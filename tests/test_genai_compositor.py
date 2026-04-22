@@ -104,6 +104,16 @@ def test_diffusers_compositor_process_with_stub_strategy(monkeypatch) -> None:
     assert int(torch.count_nonzero(out)) > 0
 
 
+def test_diffusers_compositor_defaults_to_postgen_yolo_masking(monkeypatch) -> None:
+    monkeypatch.delenv("POINTSTREAM_COMPOSITING_MASK_MODE", raising=False)
+    monkeypatch.delenv("POINTSTREAM_POSTGEN_SEGMENTER_BACKEND", raising=False)
+    monkeypatch.setattr(gc.DiffusersCompositor, "_build_strategy", lambda self, backend: _DummyStrategy())
+
+    compositor = gc.DiffusersCompositor(backend="controlnet", seed=1234, device="cpu")
+    assert compositor._compositing_mask_mode == "postgen-seg-client"
+    assert compositor._postgen_segmenter_backend == "yolo"
+
+
 def test_diffusers_compositor_metadata_mask_mode_limits_blending(monkeypatch) -> None:
     monkeypatch.setenv("POINTSTREAM_COMPOSITING_MASK_MODE", "metadata-source-mask")
     monkeypatch.setattr(gc.DiffusersCompositor, "_build_strategy", lambda self, backend: _DummyStrategy())

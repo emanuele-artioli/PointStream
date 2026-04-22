@@ -2,19 +2,38 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
+from dataclasses import dataclass
 from datetime import datetime
 import os
 from pathlib import Path
 
+import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
 
+from src.decoder.genai_compositor import DiffusersCompositor
 from src.encoder.video_io import encode_video_frames_ffmpeg, iter_video_frames_ffmpeg, probe_video_metadata
-from src.shared.schemas import EncodedChunkPayload, FrameState, ResidualPacket, SceneActor, VideoChunk
+from src.shared.mask_codec import decode_binary_mask
+from src.shared.schemas import ActorPacket, EncodedChunkPayload, FrameState, ResidualPacket, SceneActor, VideoChunk
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import gpu_bound
+from src.shared.track_id import scene_track_id_to_int
 from src.shared.torch_dtype import is_cuda_device_usable
+
+
+@dataclass(frozen=True)
+class _DecodedActorMaskFrame:
+    bbox: tuple[int, int, int, int]
+    mask_gray: np.ndarray
+
+
+@dataclass(frozen=True)
+class _ServerActorState:
+    object_id: str
+    reference_crop_tensor: torch.Tensor
+    dense_pose_tensor: torch.Tensor
+    metadata_masks_by_frame: dict[int, _DecodedActorMaskFrame]
 
 
 class BaseImportanceMapper(ABC):
@@ -139,6 +158,8 @@ class ResidualCalculator:
         debug_output_path: str | Path | None = None,
     ) -> ResidualPacket:
         predicted_frames = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False).frames_bgr
+        if self._is_genai_enabled():
+            predicted_frames = self._render_server_genai_prediction(payload=payload, frame_tensor=predicted_frames)
 
         source_metadata = probe_video_metadata(chunk.source_uri)
         available_source_frames = max(0, int(source_metadata.num_frames) - int(chunk.start_frame_id))
@@ -212,6 +233,170 @@ class ResidualCalculator:
             codec="libx265",
             residual_video_uri=str(output_path),
         )
+
+    def _is_genai_enabled(self) -> bool:
+        return os.environ.get("POINTSTREAM_ENABLE_GENAI", "0").strip() == "1"
+
+    def _render_server_genai_prediction(
+        self,
+        payload: EncodedChunkPayload,
+        frame_tensor: torch.Tensor,
+    ) -> torch.Tensor:
+        actor_state = self._build_actor_state(payload)
+        if not actor_state:
+            return frame_tensor
+
+        compositor = self._synthesis_engine.get_genai_compositor()
+        if not isinstance(compositor, DiffusersCompositor):
+            self._synthesis_engine = SynthesisEngine(
+                seed=int(getattr(self._synthesis_engine, "seed", 1337)),
+                device=self._device,
+            )
+            compositor = self._synthesis_engine.get_genai_compositor()
+        if not isinstance(compositor, DiffusersCompositor):
+            raise RuntimeError("GenAI residual path requires DiffusersCompositor when POINTSTREAM_ENABLE_GENAI=1")
+
+        use_temporal_window = compositor.uses_temporal_pose_sequence()
+        temporal_window = max(1, int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW", "16")))
+        preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
+
+        out_frames: list[torch.Tensor] = []
+        frame_count = int(frame_tensor.shape[0])
+        chunk_start = int(payload.chunk.start_frame_id)
+        for frame_idx in range(frame_count):
+            composited = frame_tensor[frame_idx]
+            global_frame_id = chunk_start + frame_idx
+            for state in actor_state.values():
+                if frame_idx >= int(state.dense_pose_tensor.shape[0]):
+                    continue
+
+                if use_temporal_window:
+                    if frame_idx < preroll_frames:
+                        continue
+                    pose_condition = self._build_temporal_pose_condition(
+                        dense_pose_tensor=state.dense_pose_tensor,
+                        frame_idx=frame_idx,
+                        temporal_window=temporal_window,
+                    )
+                else:
+                    pose_condition = state.dense_pose_tensor[frame_idx]
+
+                metadata_entry = state.metadata_masks_by_frame.get(global_frame_id)
+                metadata_mask = None if metadata_entry is None else metadata_entry.mask_gray
+                metadata_bbox = None if metadata_entry is None else metadata_entry.bbox
+
+                composited = compositor.process(
+                    reference_crop_tensor=state.reference_crop_tensor,
+                    dense_dwpose_tensor=pose_condition,
+                    warped_background_frame=composited,
+                    actor_identity=state.object_id,
+                    metadata_mask=metadata_mask,
+                    metadata_bbox=metadata_bbox,
+                ).to(frame_tensor.device)
+
+            out_frames.append(composited)
+
+        return torch.stack(out_frames, dim=0)
+
+    def _build_actor_state(self, payload: EncodedChunkPayload) -> dict[int, _ServerActorState]:
+        decoded_references = self._decode_reference_crops(payload)
+        dense_pose_stream = self._synthesis_engine._unroll_sparse_actor_poses(payload)
+
+        actor_state: dict[int, _ServerActorState] = {}
+        for actor_packet in payload.actors:
+            track_id = scene_track_id_to_int(actor_packet.object_id)
+            reference_crop = decoded_references.get(track_id)
+            dense_pose = dense_pose_stream.get(actor_packet.object_id)
+            if reference_crop is None or dense_pose is None:
+                continue
+
+            actor_state[track_id] = _ServerActorState(
+                object_id=actor_packet.object_id,
+                reference_crop_tensor=reference_crop,
+                dense_pose_tensor=dense_pose,
+                metadata_masks_by_frame=self._decode_actor_masks(actor_packet),
+            )
+        return actor_state
+
+    def _decode_reference_crops(self, payload: EncodedChunkPayload) -> dict[int, torch.Tensor]:
+        decoded: dict[int, torch.Tensor] = {}
+        for reference in payload.actor_references:
+            jpeg_bytes = reference.reference_crop_jpeg
+            if not jpeg_bytes and reference.reference_crop_uri is not None:
+                reference_path = Path(str(reference.reference_crop_uri))
+                if reference_path.exists() and reference_path.is_file():
+                    jpeg_bytes = reference_path.read_bytes()
+            if not jpeg_bytes:
+                continue
+
+            encoded_np = np.frombuffer(jpeg_bytes, dtype=np.uint8)
+            crop_bgr = cv2.imdecode(encoded_np, cv2.IMREAD_COLOR)
+            if crop_bgr is None or crop_bgr.size == 0:
+                continue
+            decoded[int(reference.track_id)] = torch.from_numpy(crop_bgr).permute(2, 0, 1).contiguous().to(torch.uint8)
+        return decoded
+
+    def _decode_actor_masks(self, actor_packet: ActorPacket) -> dict[int, _DecodedActorMaskFrame]:
+        decoded: dict[int, _DecodedActorMaskFrame] = {}
+        for frame_mask in actor_packet.mask_frames:
+            payload = frame_mask.mask_payload
+            codec = frame_mask.mask_codec
+            if payload is None and frame_mask.mask_png is not None:
+                payload = frame_mask.mask_png
+                codec = "png"
+            if payload is None:
+                continue
+
+            default_h = max(1, int(frame_mask.bbox[3]) - int(frame_mask.bbox[1]))
+            default_w = max(1, int(frame_mask.bbox[2]) - int(frame_mask.bbox[0]))
+            mask_h = int(frame_mask.mask_height) if frame_mask.mask_height is not None else default_h
+            mask_w = int(frame_mask.mask_width) if frame_mask.mask_width is not None else default_w
+
+            try:
+                mask_gray = decode_binary_mask(
+                    codec=str(codec),
+                    payload=payload,
+                    height=mask_h,
+                    width=mask_w,
+                )
+            except Exception:
+                if codec != "png":
+                    continue
+                encoded_np = np.frombuffer(payload, dtype=np.uint8)
+                mask_gray = cv2.imdecode(encoded_np, cv2.IMREAD_GRAYSCALE)
+                if mask_gray is None or mask_gray.size == 0:
+                    continue
+
+            bbox = (
+                int(frame_mask.bbox[0]),
+                int(frame_mask.bbox[1]),
+                int(frame_mask.bbox[2]),
+                int(frame_mask.bbox[3]),
+            )
+            decoded[int(frame_mask.frame_id)] = _DecodedActorMaskFrame(
+                bbox=bbox,
+                mask_gray=np.asarray(mask_gray, dtype=np.uint8),
+            )
+        return decoded
+
+    def _build_temporal_pose_condition(
+        self,
+        dense_pose_tensor: torch.Tensor,
+        frame_idx: int,
+        temporal_window: int,
+    ) -> torch.Tensor:
+        start_idx = max(0, int(frame_idx) - int(temporal_window) + 1)
+        sequence = dense_pose_tensor[start_idx : int(frame_idx) + 1]
+        if int(sequence.shape[0]) >= int(temporal_window):
+            return sequence
+
+        if int(sequence.shape[0]) == 0:
+            first_pose = dense_pose_tensor[0].unsqueeze(0)
+            return first_pose.repeat(int(temporal_window), 1, 1)
+
+        pad_count = int(temporal_window) - int(sequence.shape[0])
+        first_pose = sequence[0].unsqueeze(0).repeat(pad_count, 1, 1)
+        return torch.cat([first_pose, sequence], dim=0)
 
     def _default_residual_path(self, chunk: VideoChunk) -> Path:
         override = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")

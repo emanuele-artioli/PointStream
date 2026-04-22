@@ -10,10 +10,72 @@ import torch
 from src.decoder.mock_renderer import DecoderRenderer
 from src.encoder.mock_extractors import MockActorExtractor
 from src.encoder.reference_extractor import ReferenceExtractor
-from src.encoder.video_io import iter_video_frames_ffmpeg, probe_video_metadata
-from src.shared.schemas import VideoChunk
+from src.encoder.video_io import encode_video_frames_ffmpeg, iter_video_frames_ffmpeg, probe_video_metadata
+from src.shared.schemas import FrameState, SceneActor, VideoChunk
 from src.transport.disk import DiskTransport
 from tests.video_utils import create_dummy_video
+
+
+def test_reference_extractor_prefers_first_confident_observation(test_run_artifacts_dir: Path) -> None:
+    video_path = test_run_artifacts_dir / "test_chunks" / "first_confident_reference.mp4"
+    video_path.parent.mkdir(parents=True, exist_ok=True)
+
+    frame0 = np.zeros((72, 96, 3), dtype=np.uint8)
+    frame1 = np.zeros((72, 96, 3), dtype=np.uint8)
+    frame2 = np.zeros((72, 96, 3), dtype=np.uint8)
+
+    frame0[10:38, 10:28] = np.array([255, 0, 0], dtype=np.uint8)
+    frame1[8:48, 8:40] = np.array([0, 255, 0], dtype=np.uint8)
+    frame2[12:42, 10:30] = np.array([0, 0, 255], dtype=np.uint8)
+
+    encode_video_frames_ffmpeg(
+        output_path=video_path,
+        frames_bgr=[frame0, frame1, frame2],
+        fps=24.0,
+        width=96,
+        height=72,
+        codec="libx264",
+        pix_fmt="yuv420p",
+        crf=18,
+        preset="veryfast",
+    )
+
+    chunk = VideoChunk(
+        chunk_id="first_confident_reference",
+        source_uri=str(video_path),
+        start_frame_id=0,
+        fps=24.0,
+        num_frames=3,
+        width=96,
+        height=72,
+    )
+    mask = np.ones((24, 16), dtype=np.uint8).tolist()
+    frame_states = [
+        FrameState(
+            frame_id=0,
+            actors=[SceneActor(track_id="player_1", class_name="player", bbox=[10, 10, 28, 38], mask=mask)],
+        ),
+        FrameState(
+            frame_id=1,
+            actors=[SceneActor(track_id="player_1", class_name="player", bbox=[8, 8, 40, 48], mask=mask)],
+        ),
+        FrameState(
+            frame_id=2,
+            actors=[SceneActor(track_id="player_1", class_name="player", bbox=[10, 12, 30, 42], mask=mask)],
+        ),
+    ]
+
+    references = ReferenceExtractor().process(chunk=chunk, frame_states=frame_states)
+    assert len(references) == 1
+    assert references[0].reference_crop_jpeg is not None
+
+    decoded = cv2.imdecode(
+        np.frombuffer(references[0].reference_crop_jpeg, dtype=np.uint8),
+        cv2.IMREAD_COLOR,
+    )
+    assert decoded is not None
+    mean_bgr = np.mean(decoded, axis=(0, 1))
+    assert float(mean_bgr[0]) > float(mean_bgr[1])
 
 
 def test_reference_extractor_emits_jpeg_per_player_track(test_run_artifacts_dir: Path) -> None:
