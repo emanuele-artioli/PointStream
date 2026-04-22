@@ -121,3 +121,7 @@ celerybeat.pid
 
 # PointStream specific ignores
 experiments/
+outputs/
+assets/
+environment.yaml
+mobileclip_blt.ts
