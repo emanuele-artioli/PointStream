@@ -1,186 +1,507 @@
-# PointStream
+# Pointstream (Scaffold v1)
 
-Tennis video-to-animation pipeline. Segments players from match footage, extracts pose skeletons, and prepares data for few-shot video-to-video synthesis training.
+This directory contains the **initial robust scaffold** for Pointstream, an object-centric semantic neural codec pipeline.
 
-## Pipeline Steps
+This version is intentionally **mock-first**:
+- It implements architecture, data contracts, orchestration, and transport.
+- It does **not** load real AI models yet.
+- All extractors/renderers return deterministic dummy tensors with correct shape conventions.
 
-| Step | Script | Description |
-|------|--------|-------------|
-| A1 | `A1_segment_with_sam.py` | Segment players using SAM3 (text or bbox prompt) |
-| A2 | `A2_extract_poses_from_crops.py` | Extract YOLO pose skeletons from crops |
-| A3–A6 | (via `pointstream.py`) | Dataset preparation, LMDB build, training, inference |
-| B1 | `B1_video_panorama.py` | Video panorama stitching and reconstruction |
+## System Prerequisites
 
-`process_tennis_datasets.py` orchestrates A1 + crop encoding + DWpose extraction across an entire dataset folder.
+Pointstream expects system-level FFmpeg tools to be available before running tests or pipeline commands:
+- `ffmpeg`
+- `ffprobe`
 
-## Installation
-
-### Prerequisites
-
-- NVIDIA GPU with CUDA support
-- [Conda](https://docs.conda.io/en/latest/miniconda.html) (Miniconda or Anaconda)
-- `ffmpeg` / `ffprobe` on PATH (installed via conda below)
-
-### Create the environment
+On Ubuntu/Debian:
 
 ```bash
+sudo apt-get update
+sudo apt-get install -y ffmpeg
+```
+
+If you want to force non-default executable paths (for example `/opt/local/bin`), set:
+
+```bash
+export FFMPEG_BIN=/opt/local/bin/ffmpeg
+export FFPROBE_BIN=/opt/local/bin/ffprobe
+```
+
+## Project Layout
+
+```text
+pointstream/
+  .github/workflows/
+    ci.yml
+    release.yml
+  .pre-commit-config.yaml
+  Dockerfile.cpu
+  Dockerfile.gpu
+  assets/
+    weights/
+  old/                      # Legacy implementation kept untouched
+  pyproject.toml
+  scripts/
+    download_weights.py
+    run_mock_pipeline.py
+  requirements-dev.txt
+  src/
+    __init__.py
+    main.py
+    shared/
+      interfaces.py
+      schemas.py
+      synthesis_engine.py
+      tags.py
+    encoder/
+      dag.py
+      execution_pool.py
+      mock_extractors.py
+      orchestrator.py
+      residual_calculator.py
+    decoder/
+      mock_renderer.py
+    transport/
+      disk.py
+  tests/
+    test_background.py
+    test_dag.py
+    test_decoder.py
+    test_download_weights.py
+    test_end_to_end_mock.py
+    test_encoder_pipeline.py
+    test_execution_pool.py
+    test_integration_main.py
+    test_schemas.py
+    test_tags.py
+    test_transport.py
+```
+
+## Environment Setup (CUDA-aware)
+
+Use conda for explicit CUDA-compatible PyTorch.
+
+The current server driver is NVIDIA 535.x (`nvidia-smi` reports CUDA 12.2), so Pointstream pins CUDA 12.1 PyTorch builds for compatibility.
+
+Video decode is strict FFmpeg (`ffmpeg` + `ffprobe`) and stream-oriented by default (frame generator over pipe).
+The project does not vendor FFmpeg via pip/conda packages.
+
+```bash
+cd /home/itec/emanuele/pointstream
 conda env create -f environment.yaml
 conda activate pointstream
 ```
 
-This installs Python 3.10, FFmpeg, PyTorch with CUDA, and all pip dependencies in one step.
-
-### Download models
-
-The pipeline requires pretrained model weights. Place them in a `models/` directory (or adjust the default paths in the scripts):
-
-| Model | Default path | Source |
-|-------|-------------|--------|
-| SAM3 | `../models/sam3.pt` | [Ultralytics SAM3](https://docs.ultralytics.com/models/sam/) |
-| YOLO Pose | `../models/yolo11l-pose.pt` | [Ultralytics YOLO Pose](https://docs.ultralytics.com/tasks/pose/) |
-| YOLOv8n (fallback) | `../yolov8n.pt` | [Ultralytics YOLOv8](https://docs.ultralytics.com/models/yolov8/) |
-
-### Export ReID model to TensorRT
-
-Use `utils.export_reid_model_to_tensorrt()` to export a YOLO classification model for BoT-SORT ReID. The function writes the `.engine` file in the same folder as the input model.
+If `pointstream` already exists and previously resolved to CPU-only Torch, repair it in-place with:
 
 ```bash
+cd /home/itec/emanuele/pointstream
 conda activate pointstream
-python -c "from utils import export_reid_model_to_tensorrt; print(export_reid_model_to_tensorrt('/home/itec/emanuele/Models/YOLO/yolo26n-cls.pt', half=True, dynamic=True, batch=32, imgsz=640, overwrite=True))"
+python -m pip uninstall -y torch torchvision torchaudio
+python -m pip install --index-url https://download.pytorch.org/whl/cu121 torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1
+python -c "import torch; print(torch.__version__, torch.version.cuda, torch.cuda.is_available())"
 ```
 
-The tracker config at `/home/itec/emanuele/Models/YOLO/trackers/botsort.yaml` should point `model:` to the exported engine path (for example `/home/itec/emanuele/Models/YOLO/yolo26n-cls.engine`).
-
-## Usage
-
-### Full extraction pipeline (A1 + A2)
+For development tooling only (lint/type/pre-commit):
 
 ```bash
-python pointstream.py --mode extract --dataset_dir /path/to/videos
+cd /home/itec/emanuele/pointstream
+pip install -r requirements-dev.txt
 ```
 
-### Process an entire tennis dataset
+## Python Packaging
+
+The project is configured with a `pyproject.toml` (setuptools backend) so it can be installed as a package.
 
 ```bash
-python process_tennis_datasets.py --folder /path/to/dataset --skip-existing
+cd /home/itec/emanuele/pointstream
+pip install -e .
 ```
 
-### Single-step examples
+## Model Weights (Local Links)
+
+Canonical model root on this machine:
+- `/home/itec/emanuele/Models`
+
+PointStream expects YOLO actor weights under `assets/weights/`:
+- `yolo26n.pt`
+- `yolo26n-seg.pt`
+- `yolo26n-pose.pt`
+
+Optional backend-ablation weights under `assets/weights/`:
+- `yoloe-26n-seg.pt` (YOLOE detector and segmenter)
+- `mobileclip2_b.ts` (required by YOLOE text prompts)
+- `sam3.pt` (used by `--segmenter sam3`)
+- `sam2_b.pt` (used by `--segmenter sam`)
+
+If `assets/weights` is missing, recreate links from your shared model store:
 
 ```bash
-# Segment a single video
-python A1_segment_with_sam.py --video_path video.mp4 --model_path /path/to/sam3.pt
-
-# Extract poses from an experiment's crops
-python A2_extract_poses_from_crops.py --experiment_dir experiments/20260209_100146_sam_seg
-
-# Create a video panorama
-python B1_video_panorama.py --video_path video.mp4
+cd /home/itec/emanuele/pointstream
+mkdir -p assets/weights
+ln -sfn /home/itec/emanuele/Models/yolo26n.pt assets/weights/yolo26n.pt
+ln -sfn /home/itec/emanuele/Models/yolo26n-seg.pt assets/weights/yolo26n-seg.pt
+ln -sfn /home/itec/emanuele/Models/yolo26n-pose.pt assets/weights/yolo26n-pose.pt
+ln -sfn /home/itec/emanuele/Models/YOLO/yoloe-26n-seg.pt assets/weights/yoloe-26n-seg.pt
+ln -sfn /home/itec/emanuele/Models/YOLO/mobileclip2_b.ts assets/weights/mobileclip2_b.ts
+ln -sfn /home/itec/emanuele/Models/SAM/sam3.pt assets/weights/sam3.pt
 ```
 
-`utils.stitch_panorama()` uses a minimal ORB-based pairwise homography pipeline with identity fallback when feature matching is insufficient. All input frames should have the same resolution.
+AnimateAnyone backend model variants are resolved from the Moore repo:
+- `<repo>/Models/original`
+- `<repo>/Models/finetuned_tennis`
 
-It now returns `(panorama_image, panorama_data)` instead of only the panorama image. `panorama_data` contains frame size, canvas size, translation matrix, and homographies needed to reverse the process. Use `utils.animate_panorama(panorama_image, panorama_data)` to reconstruct the background-frame sequence from the stitched panorama.
+Those two Moore paths are expected to be symlink views into the canonical model store:
+- `/home/itec/emanuele/Models/AnimateAnyone/profiles/original`
+- `/home/itec/emanuele/Models/AnimateAnyone/profiles/finetuned_tennis`
 
-### Per-object segmentation from detections
+Recommended canonical layout:
 
-`pointstream.py` also supports detection-first object masking. It saves bbox crops in `bbox_crops/`, runs segmentation on each crop (including single-frame list inputs), saves masks in `segmentation_masks/`, saves masked crops in `segmented_crops/`, and writes the background frame only after masking all objects in that frame.
+```text
+/home/itec/emanuele/Models/
+  AnimateAnyone/
+    profiles/
+      original/
+        stable-diffusion-v1-5/
+        sd-vae-ft-mse/
+        image_encoder/
+        denoising_unet.pth
+        reference_unet.pth
+        pose_guider.pth
+        motion_module.pth
+      finetuned_tennis/
+        stable-diffusion-v1-5/
+        sd-vae-ft-mse/
+        image_encoder/
+        denoising_unet.pth
+        reference_unet.pth
+        pose_guider.pth
+        motion_module.pth
+  yolo26n.pt
+  yolo26n-seg.pt
+  yolo26n-pose.pt
+```
 
-After panorama creation, `pointstream.py` loops over each `person_*` track folder and runs a three-step DWPose flow:
-1. `utils.extract_dwpose_keypoints(...)` returns one ndarray per frame with columns `[x, y]` (low-confidence keypoints are set to `-1`).
-2. `utils.save_dwpose_keypoints_csv(...)` saves keypoints together with source `frame_index` and per-frame person bbox `[x1,y1,x2,y2]` to `dwpose_keypoints/*.csv`, then `utils.load_dwpose_keypoints_csv(...)` reads them back.
-3. `utils.convert_dwpose_keypoints_to_skeleton_frames(..., frame_size=(H, W))` renders skeleton PNGs into `dwpose_frames/`.
+Each variant folder must share the same structure:
+- `stable-diffusion-v1-5/`
+- `sd-vae-ft-mse/`
+- `image_encoder/`
+- `denoising_unet.pth`
+- `reference_unet.pth`
+- `pose_guider.pth`
+- `motion_module.pth`
 
-The pipeline then encodes one AV1 (`libsvtav1`) video per person into `dwpose_videos/` using `utils.encode_video_libsvtav1(..., crf=25)`.
-
-`pointstream.py` now runs in two explicit stages:
-1. `run_server()` creates a new timestamped experiment folder and writes `metadata.json` with paths and parameters needed by the client (`panorama_image_path`, `panorama_data_path`, `fps`, `frame_size`, and per-person DWPose CSV/video paths).
-2. `run_client()` automatically selects the latest subfolder under `experiments/`, loads `metadata.json`, reconstructs background frames from `panorama.png` + panorama metadata via `utils.animate_panorama(...)`, encodes `background_from_panorama.mp4`, then generates DWPose skeleton frames/videos from the saved CSV files.
-
-Panorama stitching now uses sampled background frames by default for faster server processing (`POINTSTREAM_PANORAMA_SAMPLE_STRIDE=10`).
-
-Client reconstruction still restores the full timeline: `background_from_panorama.mp4` and `panorama_with_people.mp4` are generated with the same frame count and FPS as the original input video.
-
-To tune speed/quality tradeoff, set a different stitching stride (client still expands back to original frame count/FPS using metadata):
+## Run Mock Pipeline
 
 ```bash
-POINTSTREAM_PANORAMA_SAMPLE_STRIDE=50 python pointstream_server.py
+cd /home/itec/emanuele/pointstream
+python -m src.main
 ```
 
-`run_client()` also attempts optional AnimateAnyone Pose2Video synthesis through `utils.run_animate_anyone(...)` for each person track. It reads skeleton PNGs from `dwpose_frames/<person_name>/`, uses the first available `object/*.png` frame as reference image, and saves RGBA PNG outputs under `animate_anyone_frames/`.
-
-Each output frame is saved as `frame_000000.png`, `frame_000001.png`, ... with transparent alpha where the generated background is black.
-
-For each person, client-side compositing now uses the bbox coordinates stored in CSV:
-1. `utils.scale_frame_to_bbox(...)` first removes letterbox padding introduced by `resize_and_pad_image(...)` (using bbox aspect ratio), then rescales each generated frame to the per-frame bbox.
-2. `utils.overlay_object_on_background_video(...)` overlays those scaled frames onto the reconstructed panorama background sequence.
-3. The final merged panorama video is encoded to `panorama_with_people.mp4`.
-
-`utils.run_animate_anyone(...)` defaults to frame output (`save_video=False`). Set `save_video=True` to write MP4 output instead.
-
-By default it looks for the AnimateAnyone repository at `/home/itec/emanuele/Moore-AnimateAnyone` and config `configs/prompts/run_finetuned.yaml`. You can override these at runtime:
+or
 
 ```bash
-POINTSTREAM_ANIMATE_ANYONE_DIR=/path/to/Moore-AnimateAnyone \
-POINTSTREAM_ANIMATE_ANYONE_CONFIG=/path/to/run_finetuned.yaml \
-python pointstream.py
+cd /home/itec/emanuele/pointstream
+python scripts/run_mock_pipeline.py
 ```
 
-If the repository or config is missing, PointStream skips this step and continues the rest of the client pipeline.
+The run always writes runtime artifacts under a timestamped directory:
 
-### Split server/client execution by environment
+```text
+outputs/<timestamp>/
+  chunk_0001/
+  decoded/
+  debug/
+  runtime_sources/   # only when --input is omitted
+  run_summary.json
+```
 
-Use separate entry scripts so each stage runs in its intended conda env:
+with:
+- `metadata.msgpack` for semantic metadata/events
+- `panorama.jpg` (or `.png`) encoded sidecar image for background re-warping
+- `residual.mp4` encoded signed residual stream (H.265 / `libx265`)
+
+`metadata.msgpack` intentionally stores `panorama_uri` and omits raw `panorama_image` pixels to keep metadata size bounded.
+`DiskTransport` always writes panorama as an encoded sidecar image (never raw pixel arrays in metadata), using a pluggable encoder strategy.
+
+Run with a custom input video:
 
 ```bash
-# 1) Server stage (YOLO + DWPose extraction)
-conda activate pointstream
-python pointstream_server.py
-
-# 2) Client stage (AnimateAnyone inference)
-conda activate animate-anyone
-python pointstream_client.py
+cd /home/itec/emanuele/pointstream
+python -m src.main --input /path/to/input.mp4
 ```
 
-`pointstream.py` still exposes both `run_server()` and `run_client()` functions, but running them separately is recommended to avoid dependency conflicts between the two environments.
+Useful CLI options:
+- `--num-frames N`: process only the first N frames
+- `--no-summary-file`: print summary only (do not write `run_summary.json`)
 
-### Other pipeline modes
+Run summaries also include artifact size telemetry (`source_size_bytes`, `metadata_size_bytes`, `residual_size_bytes`, `panorama_size_bytes`, `transport_total_size_bytes`, and ratio/savings fields when source size is available).
+
+Module swap arguments (for ablations and performance tuning):
+- `--execution-pool inline|tagged` with `--cpu-workers` and `--gpu-workers`
+- `--actor-extractor real|mock`
+- `--detector yolo26|yoloe` and `--detector-caption "tennis player"`
+- `--pose-estimator yolo|dwpose` (real actor extractor path)
+- `--segmenter yolo|yoloe|sam3|sam|none` and `--segmenter-caption "tennis player"` (real actor extractor path)
+- `--payload-pose-delta-threshold <float>`
+- `--ball-extractor difference|mock`
+- `--ball-difference-threshold <float>`, `--ball-min-blob-area <int>`, and `--ball-max-side <int>`
+- `--reference-jpeg-quality <1..100>` and `--reference-padding-ratio <float>`
+- `--importance-mapper binary|uniform`
+- `--gpu-dtype fp16|fp32|bf16|fp8_e4m3fn|fp8_e5m2`
+
+GenAI backend switches:
+- `--enable-genai` or `--disable-genai`
+- `--genai-backend controlnet|animate-anyone`
+- `--animate-anyone-repo-dir /path/to/Moore-AnimateAnyone`
+- `--animate-anyone-model-variant original|finetuned_tennis`
+- `--animate-anyone-model-dir /path/to/model/profile`
+- `--animate-anyone-window <int>`
+- `--genai-preroll-frames <int>`
+- `--animate-anyone-transparent-threshold <int>`
+- `--genai-resize-mode plain|aspect-recovery`
+- `--animate-anyone-adaptive-threshold` or `--disable-animate-anyone-adaptive-threshold`
+- `--animate-anyone-alpha-smoothing <float>`
+- `--compositing-mask-mode alpha-heuristic|metadata-source-mask|postgen-seg-client`
+- `--postgen-segmenter-backend yolo|heuristic` (used by `postgen-seg-client`)
+- `--metadata-mask-codec auto|rle-v1|bitpack-z1|png|segmenter-native|yolo-native` (used by `metadata-source-mask`)
+
+Panorama sidecar encoder knobs (via environment variables):
+- `POINTSTREAM_PANORAMA_CODEC=jpeg|png` (default: `jpeg`)
+- `POINTSTREAM_PANORAMA_JPEG_QUALITY=1..100` (default: `90`)
+- `POINTSTREAM_PANORAMA_PNG_COMPRESSION=0..9` (default: `3`)
+
+Runtime performance and compositing knobs (via environment variables):
+- `POINTSTREAM_GPU_DTYPE=fp16|fp32|bf16|fp8_e4m3fn|fp8_e5m2`
+- `POINTSTREAM_BALL_MAX_SIDE=<int>` (0 keeps native decode size)
+- `POINTSTREAM_GENAI_RESIZE_MODE=plain|aspect-recovery`
+- `POINTSTREAM_ANIMATE_ANYONE_ADAPTIVE_THRESHOLD=0|1`
+- `POINTSTREAM_ANIMATE_ANYONE_ALPHA_SMOOTHING=<float in [0,1]>`
+- `POINTSTREAM_COMPOSITING_MASK_MODE=alpha-heuristic|metadata-source-mask|postgen-seg-client`
+- `POINTSTREAM_POSTGEN_SEGMENTER_BACKEND=yolo|heuristic`
+- `POINTSTREAM_POSTGEN_SEGMENTER_MODEL=<weights-path-or-name>`
+- `POINTSTREAM_METADATA_MASK_CODEC=auto|rle-v1|bitpack-z1|png|segmenter-native|yolo-native`
+
+Ablation examples:
 
 ```bash
-# Prepare dataset for training (A3 + A4)
-python pointstream.py --mode prepare
-
-# Train fs_vid2vid model (A5)
-python pointstream.py --mode train
-
-# Run inference (A6)
-python pointstream.py --mode inference --checkpoint /path/to/checkpoint.pt
+# Fast mock ablation: no heavy detection/ball extraction
+cd /home/itec/emanuele/pointstream
+python -m src.main \
+  --input /path/to/input.mp4 \
+  --actor-extractor mock \
+  --ball-extractor mock \
+  --execution-pool inline \
+  --importance-mapper uniform
 ```
 
-## Output Structure
-
-Each extraction run creates a timestamped experiment folder under `experiments/`:
-
+```bash
+# Real extraction with dwpose + no segmenter + tagged pool
+cd /home/itec/emanuele/pointstream
+python -m src.main \
+  --input /path/to/input.mp4 \
+  --actor-extractor real \
+  --pose-estimator dwpose \
+  --segmenter none \
+  --execution-pool tagged \
+  --cpu-workers 2 \
+  --gpu-workers 1
 ```
-experiments/
-└── 20260209_100146_sam_seg/
-    ├── tracking_metadata.csv    # Bounding boxes and transform info per frame
-    ├── pose_metadata.csv        # Keypoint coordinates per frame
-    ├── dwpose_frames/
-    │   ├── person_1/
-    │   │   ├── 000000.png
-    │   │   └── ...
-    │   └── person_2/
-    ├── dwpose_keypoints/
-    │   ├── person_1_keypoints.csv
-    │   └── person_2_keypoints.csv
-    ├── dwpose_videos/
-    │   ├── person_1_dwpose.mp4  # DWPose skeleton video for one tracked person
-    │   └── person_2_dwpose.mp4
-    ├── masked_crops/
-    │   ├── id0/                 # Player 1 crops (512×512, masked + padded)
-    │   └── id1/                 # Player 2 crops
-    └── skeletons/
-        ├── id0/                 # Player 1 skeleton images
-        └── id1/                 # Player 2 skeleton images
+
+Benchmark metadata-mask codecs with the ablation runner:
+
+```bash
+cd /home/itec/emanuele/pointstream
+python scripts/benchmark_mask_codecs.py \
+  --input assets/real_tennis.mp4 \
+  --num-frames 24 \
+  --repeats 2
 ```
+
+The benchmark writes per-run and aggregate reports under `outputs/bench_mask_codecs/<timestamp>/`:
+- `mask_codec_ablation_runs.csv`
+- `mask_codec_ablation_summary.csv`
+- `mask_codec_ablation_summary.json`
+
+## Run Unit Tests
+
+```bash
+cd /home/itec/emanuele/pointstream
+python -m unittest discover -s tests -p "test_*.py"
+```
+
+Run only the end-to-end mock path (generates `outputs/tests/<timestamp>/test_video.mp4`):
+
+```bash
+cd /home/itec/emanuele/pointstream
+python -m unittest discover -s tests -p "test_end_to_end_mock.py"
+```
+
+Run real background stitching test (requires `assets/real_tennis.mp4`):
+
+```bash
+cd /home/itec/emanuele/pointstream
+python -m unittest discover -s tests -p "test_background.py"
+```
+
+Run the coverage gate with a local safety buffer:
+
+```bash
+cd /home/itec/emanuele/pointstream
+python scripts/check_coverage_gate.py
+```
+
+Default thresholds used by the script:
+- local development: 85%
+- CI: 80%
+
+Override explicitly when needed:
+
+```bash
+cd /home/itec/emanuele/pointstream
+POINTSTREAM_COVERAGE_THRESHOLD=87 python scripts/check_coverage_gate.py
+```
+
+## Lint and Type Check
+
+```bash
+cd /home/itec/emanuele/pointstream
+ruff check src tests scripts
+mypy --config-file pyproject.toml
+```
+
+## Pre-commit Hooks
+
+```bash
+cd /home/itec/emanuele/pointstream
+pre-commit install
+pre-commit run --all-files
+```
+
+## Docker (CPU)
+
+Build and run the CPU-only container:
+
+```bash
+cd /home/itec/emanuele/pointstream
+docker build -f Dockerfile.cpu -t pointstream:cpu .
+docker run --rm pointstream:cpu
+```
+
+Run tests inside the container:
+
+```bash
+docker run --rm pointstream:cpu python -m pytest
+```
+
+## Docker (GPU)
+
+Build and run the CUDA-enabled container (requires NVIDIA Container Toolkit):
+
+```bash
+cd /home/itec/emanuele/pointstream
+docker build -f Dockerfile.gpu -t pointstream:gpu .
+docker run --gpus all --rm pointstream:gpu
+```
+
+## Continuous Integration
+
+- GitHub Actions workflow: .github/workflows/ci.yml
+- Triggers: pushes to main/master/march26version and all pull requests
+- Runtime: Ubuntu + Python 3.10 + CPU PyTorch
+- Jobs:
+  - `lint`: `ruff check src tests scripts`
+  - `typecheck`: `mypy --config-file pyproject.toml`
+  - `tests`: `coverage run -m pytest` + `coverage report --fail-under=80`
+
+## Test Tiers
+
+- Default pytest run is fast by design and excludes integration/slow tests.
+- Fast run: `pytest`
+- Integration run (real YOLO weights): `pytest -m integration`
+- Full run: `pytest -m "integration or slow or not (integration or slow)"`
+- Integration tests load YOLO detect/seg/pose models once per session via `tests/conftest.py` fixtures.
+- Unit plumbing tests use `MockActorExtractor` so they do not run real model inference on dummy videos.
+- Test session startup creates a run-scoped artifact folder at `outputs/tests/<timestamp>/` and exports `POINTSTREAM_DEBUG_ARTIFACT_DIR` for all test-time debug writers.
+
+## Release Flow
+
+- GitHub Actions workflow: `.github/workflows/release.yml`
+- Trigger: push a tag matching `v*` (for example `v0.1.0`)
+- Actions performed:
+  - build source and wheel distributions with `python -m build`
+  - upload `dist/*` artifacts
+  - create GitHub release with generated notes and attached artifacts
+  - build and push GPU Docker image to GHCR as:
+    - `ghcr.io/<owner>/<repo>/pointstream-gpu:<tag>`
+    - `ghcr.io/<owner>/<repo>/pointstream-gpu:latest`
+
+Pull and run the published GPU image:
+
+```bash
+docker pull ghcr.io/<owner>/<repo>/pointstream-gpu:<tag>
+docker run --gpus all --rm ghcr.io/<owner>/<repo>/pointstream-gpu:<tag>
+```
+
+## CPU/GPU Execution Pool Stub
+
+- `src/encoder/execution_pool.py` provides:
+  - `InlineExecutionPool`: synchronous local execution (default)
+  - `TaggedMultiprocessPool`: torch.multiprocessing-ready stub with CPU/GPU queue separation
+  - `make_shared_cpu_tensor(...)`: shared-memory tensor allocation helper for process handoff
+- `DAGOrchestrator` can now run through an injected execution pool while preserving per-node CPU/GPU tags.
+- `run_mock_pipeline(...)` supports execution-pool injection for integration testing of tagged dispatch.
+
+## Notes
+
+- `scripts/download_weights.py` validates expected weight files in `assets/weights/`.
+- For missing custom weights, the script raises a clear `FileNotFoundError` with next actions.
+- Real model integrations should replace only the mock class internals while preserving interfaces and schemas.
+- Generated MP4 artifacts are encoded through `src/encoder/video_io.py::encode_video_frames_ffmpeg(...)` with explicit codec/pixel-format settings for player compatibility.
+- `ActorExtractor` now runs a component-based pipeline (`detector -> heuristic -> segmenter -> pose -> payload encoder`) implemented in `src/encoder/actor_components.py`.
+- Keyframe debug skeleton renders are written to `outputs/tests/<timestamp>/debug_actors/` during tests; outside tests they default to `outputs/<timestamp>/debug/debug_actors/`.
+- `SynthesisEngine` (`src/shared/synthesis_engine.py`) now performs deterministic decode synthesis from payload metadata with strict seeding (`torch.manual_seed`, CUDA seed sync, deterministic algorithms enabled).
+- Decoder-side panorama re-warping is GPU-native through `kornia.geometry.transform.warp_perspective` (inverse homography per frame), and mock actor compositing draws dense DWPose skeletons over reconstructed backgrounds.
+- `tests/test_decoder.py` writes `outputs/tests/<timestamp>/mock_reconstruction.mp4` so reconstruction smoothness and interpolation quality can be visually inspected without loading any heavy GenAI model.
+- `ResidualCalculator` (`src/encoder/residual_calculator.py`) computes weighted server residuals using a pluggable saliency strategy (`BaseImportanceMapper`).
+- Baseline saliency strategy is `BinaryActorImportanceMapper`, which converts player/racket segmentation masks from per-frame `FrameState` into continuous `[H, W]` importance tensors in `[0.0, 1.0]`.
+- Residual encoding uses signed offsets with a neutral center: `encoded = clamp(((original - predicted) * importance) + 128, 0, 255)`.
+- Transport now copies the encoded residual stream into `outputs/<timestamp>/chunk_<id>/residual.mp4` and stores that chunk-local path in metadata.
+- Residual stream encoding uses FFmpeg H.265 (`libx265`, `-crf 28`) for the transport payload.
+- Client compositing decodes residual, shifts by `-128`, then applies `final = clamp(predicted + decoded_diff, 0, 255)` in `src/decoder/compositor.py`.
+- `tests/test_residual.py` writes `outputs/tests/<timestamp>/debug_residual.mp4` and `outputs/tests/<timestamp>/debug_final_reconstruction.mp4` from a 10-frame real clip for offline verification of signed residuals and end-to-end reconstruction fidelity.
+- `BallExtractor` (`src/encoder/ball_extractor.py`) computes per-frame parametric tennis-ball states (`x, y, vx, vy, visible`) by GPU-native panorama re-warp subtraction, actor-mask suppression, and largest-blob tracking.
+- `SynthesisEngine` (`src/shared/synthesis_engine.py`) now reconstructs ball motion from parametric payloads and draws a velocity-aware motion-blurred ball trail during deterministic client synthesis.
+- `tests/test_ball_tracking.py` validates both extractor-side ball trajectory recovery and full encode -> transport -> decode reconstruction with ball visibility in `debug_final_reconstruction_ball.mp4`.
+- V2 baseline conditioning metadata now includes chunk-level `actor_references` (compressed per-track JPEG crops) in `EncodedChunkPayload`.
+- `ReferenceExtractor` (`src/encoder/reference_extractor.py`) selects a best per-player frame (largest bbox, center-aware tie-break), applies 10% crop padding, and encodes references as JPEG bytes (`cv2.imencode`, quality 75).
+- `DiskTransport` now writes metadata with python-mode pydantic dumps so binary JPEG payloads roundtrip losslessly through `.msgpack`.
+- `DecoderRenderer` (`src/decoder/mock_renderer.py`) decodes actor reference JPEGs into an internal actor-state cache and passes them into `GenAICompositor`.
+- `GenAICompositor` (`src/decoder/genai_compositor.py`) is the V2 interface stub for Animate Anyone integration; current mock behavior draws a filled actor box and pastes the reference crop to prove server -> transport -> client conditioning works.
+- `ActorPacket` now supports optional per-frame `mask_frames` metadata with codec-tagged payloads (`auto` defaults to compact `rle-v1`/`bitpack-z1` selection, optional PNG fallback, and `segmenter-native`/`yolo-native` contour transport when available) extracted on the encoder side when `--compositing-mask-mode metadata-source-mask` is selected.
+- `DiffusersCompositor` supports mask strategy ablations for player cutout quality vs. bandwidth/runtime trade-offs:
+  - `alpha-heuristic`: existing black-background alpha extraction from generated actor crops.
+  - `metadata-source-mask`: uses encoder-transmitted source-segmentation masks (lower client compute, higher metadata).
+  - `postgen-seg-client`: runs a second segmentation pass after generation on the client (higher compute, no extra metadata).
+- `tests/test_genai_baseline.py` validates extraction, transport serialization/deserialization, and reconstruction output with reference-conditioned mock compositing (`debug_final_reconstruction.mp4`).
+- Heavy GenAI inference is feature-gated by `POINTSTREAM_ENABLE_GENAI`:
+  - `0` or unset: `SynthesisEngine` exposes a lightweight `MockCompositor` (fast CI-safe default).
+  - `1`: `SynthesisEngine` exposes `DiffusersCompositor`.
+- GenAI backend strategy is selected with `POINTSTREAM_GENAI_BACKEND`:
+  - `controlnet` (default when enabled): `BaselineControlNetStrategy` (`StableDiffusionControlNetImg2ImgPipeline`, OpenPose control).
+  - `animate-anyone`: `AnimateAnyoneStrategy` (PointStream-owned runtime, requires `POINTSTREAM_ANIMATE_ANYONE_REPO_DIR`).
+- AnimateAnyone runtime entrypoint lives in `src/decoder/animate_anyone_runtime.py` (integration code is maintained in PointStream, not in the external Moore repo).
+- AnimateAnyone runtime model selection:
+  - `POINTSTREAM_ANIMATE_ANYONE_MODEL_VARIANT=finetuned_tennis` (default) or `original`.
+  - `POINTSTREAM_ANIMATE_ANYONE_MODEL_DIR=<absolute-or-repo-relative-path>` overrides variant selection.
+- AnimateAnyone output tuning:
+  - `POINTSTREAM_ANIMATE_ANYONE_WIDTH` / `POINTSTREAM_ANIMATE_ANYONE_HEIGHT` (defaults: 512x784)
+  - `POINTSTREAM_ANIMATE_ANYONE_STEPS` (default: 30)
+  - `POINTSTREAM_ANIMATE_ANYONE_CFG` (default: 3.5)
+  - `POINTSTREAM_ANIMATE_ANYONE_WINDOW` (default: 16, temporal pose window length for AnimateAnyone conditioning)
+  - `POINTSTREAM_ANIMATE_ANYONE_TRANSPARENT_THRESHOLD` (default: 8, black-background alpha extraction)
+- `tests/test_genai_node.py` is fully skipped unless `POINTSTREAM_ENABLE_GENAI=1`; when enabled it runs a 2-frame compositor smoke test and writes `assets/debug_genai_composite.mp4`.
+- YOLO actor components load weights from local files first (`assets/weights/` or explicit path); implicit online weight download is disabled by default.
+- Set `POINTSTREAM_ALLOW_AUTO_MODEL_DOWNLOAD=1` only if you intentionally want Ultralytics to fetch missing weights.
+- Fail-fast policy: model initialization failures, missing source videos, and inference/runtime errors in detector/pose stages now raise explicit exceptions instead of silently injecting synthetic tracks/poses/black frames.
+- Graceful degradation policy: noisy-data handling remains in place for track recovery/interpolation, segmenter per-frame bypass, homography identity fallback, and FFmpeg metadata tolerance.

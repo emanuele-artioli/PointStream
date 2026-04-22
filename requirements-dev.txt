@@ -1,0 +1,8 @@
+-r requirements.txt
+
+coverage==7.8.0
+mypy==1.15.0
+opencv-python-headless==4.10.0.84
+pytest==9.0.2
+pre-commit==4.1.0
+ruff==0.11.2
