@@ -121,8 +121,7 @@ celerybeat.pid
 
 # PointStream specific ignores
 experiments/*
-.pointstream
-old/
 assets/*
-output*/
+outputs/*
+old/*
 mobileclip_blt.ts
