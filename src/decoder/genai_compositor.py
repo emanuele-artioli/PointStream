@@ -349,7 +349,7 @@ class DiffusersCompositor(MockCompositor):
         self._alpha_temporal_smoothing = float(np.clip(alpha_smoothing_raw, 0.0, 0.95))
         self._alpha_history_by_actor: dict[str, np.ndarray] = {}
 
-        raw_mask_mode = os.environ.get("POINTSTREAM_COMPOSITING_MASK_MODE", "alpha-heuristic").strip().lower()
+        raw_mask_mode = os.environ.get("POINTSTREAM_COMPOSITING_MASK_MODE", "postgen-seg-client").strip().lower()
         mask_mode_aliases = {
             "alpha": "alpha-heuristic",
             "alpha-heuristic": "alpha-heuristic",
