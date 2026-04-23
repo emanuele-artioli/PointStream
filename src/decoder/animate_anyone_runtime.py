@@ -43,12 +43,10 @@ def _runtime_config() -> _RuntimeConfig:
     )
 
 
-def _resolve_repo_root(repo_dir: str | None) -> Path:
+def _resolve_repo_root(repo_dir: str | None) -> Path | None:
     configured = repo_dir or os.environ.get("POINTSTREAM_ANIMATE_ANYONE_REPO_DIR")
     if configured is None:
-        raise FileNotFoundError(
-            "Animate Anyone backend selected, but POINTSTREAM_ANIMATE_ANYONE_REPO_DIR is not set."
-        )
+        return None
 
     repo_root = Path(configured).expanduser().resolve()
     if not repo_root.exists() or not repo_root.is_dir():
@@ -59,12 +57,15 @@ def _resolve_repo_root(repo_dir: str | None) -> Path:
     return repo_root
 
 
-def _resolve_model_root(repo_root: Path, runtime: _RuntimeConfig) -> Path:
+def _resolve_model_root(repo_root: Path | None, runtime: _RuntimeConfig) -> Path:
     explicit_model_dir = os.environ.get("POINTSTREAM_ANIMATE_ANYONE_MODEL_DIR")
     if explicit_model_dir:
         model_root = Path(explicit_model_dir).expanduser()
         if not model_root.is_absolute():
-            model_root = (repo_root / model_root).resolve()
+            if repo_root is not None:
+                model_root = (repo_root / model_root).resolve()
+            else:
+                model_root = model_root.resolve()
         else:
             model_root = model_root.resolve()
     else:
@@ -78,7 +79,25 @@ def _resolve_model_root(repo_root: Path, runtime: _RuntimeConfig) -> Path:
             "finetuned": "finetuned_tennis",
         }
         model_folder = alias_map.get(variant, runtime.model_variant)
-        model_root = (repo_root / "Models" / model_folder).resolve()
+
+        if repo_root is not None:
+            model_root = (repo_root / "Models" / model_folder).resolve()
+        else:
+            project_assets_root = (
+                Path(__file__).resolve().parents[2] / "assets" / "animate-anyone" / "profiles" / model_folder
+            )
+            canonical_roots = [
+                project_assets_root,
+                Path.home() / "Models" / "AnimateAnyone" / "profiles" / model_folder,
+            ]
+            existing = [root.resolve() for root in canonical_roots if root.exists()]
+            if not existing:
+                raise FileNotFoundError(
+                    "AnimateAnyone model directory was not found. Set POINTSTREAM_ANIMATE_ANYONE_MODEL_DIR, "
+                    "or place models under assets/animate-anyone/profiles/<variant> "
+                    "(or ~/Models/AnimateAnyone/profiles/<variant>)."
+                )
+            model_root = existing[0]
 
     required_entries = [
         "stable-diffusion-v1-5",
@@ -100,7 +119,7 @@ def _resolve_model_root(repo_root: Path, runtime: _RuntimeConfig) -> Path:
     return model_root
 
 
-def _load_pipeline(repo_root: Path, model_root: Path, device: str) -> Any:
+def _load_pipeline(repo_root: Path | None, model_root: Path, device: str) -> Any:
     global _PIPELINE, _PIPELINE_DEVICE, _PIPELINE_DTYPE, _PIPELINE_REPO_ROOT, _PIPELINE_MODEL_ROOT
 
     with _PIPELINE_LOCK:
@@ -123,17 +142,25 @@ def _load_pipeline(repo_root: Path, model_root: Path, device: str) -> Any:
             from omegaconf import OmegaConf
             from transformers import CLIPVisionModelWithProjection
 
-            from src.models.pose_guider import PoseGuider
-            from src.models.unet_2d_condition import UNet2DConditionModel
-            from src.models.unet_3d import UNet3DConditionModel
-            from src.pipelines.pipeline_pose2vid_long import Pose2VideoPipeline
+            from animate_anyone.models.pose_guider import PoseGuider
+            from animate_anyone.models.unet_2d_condition import UNet2DConditionModel
+            from animate_anyone.models.unet_3d import UNet3DConditionModel
+            from animate_anyone.pipelines.pipeline_pose2vid_long import Pose2VideoPipeline
+
+            import animate_anyone as animate_anyone_pkg
         except ModuleNotFoundError as exc:
             raise RuntimeError(
                 "AnimateAnyone backend dependencies are missing. "
                 "Install the Moore-AnimateAnyone runtime dependencies in the active environment."
             ) from exc
 
-        infer_config = OmegaConf.load(str(repo_root / "configs" / "inference" / "inference_v2.yaml"))
+        package_root = Path(animate_anyone_pkg.__file__).resolve().parent
+        config_path = package_root / "configs" / "inference" / "inference_v2.yaml"
+        if not config_path.exists() and repo_root is not None:
+            config_path = repo_root / "configs" / "inference" / "inference_v2.yaml"
+        if not config_path.exists():
+            raise FileNotFoundError(f"AnimateAnyone inference config not found: {config_path}")
+        infer_config = OmegaConf.load(str(config_path))
 
         pretrained_vae_path = str(model_root / "sd-vae-ft-mse")
         pretrained_base_model_path = str(model_root / "stable-diffusion-v1-5")

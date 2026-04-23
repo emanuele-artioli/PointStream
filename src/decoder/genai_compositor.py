@@ -159,17 +159,6 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
         if self._runtime_fn is not None:
             return self._runtime_fn
 
-        if self._repo_dir is None:
-            raise FileNotFoundError(
-                "Animate Anyone backend selected, but POINTSTREAM_ANIMATE_ANYONE_REPO_DIR is not set."
-            )
-
-        repo_path = Path(self._repo_dir)
-        if not repo_path.exists() or not repo_path.is_dir():
-            raise FileNotFoundError(
-                f"Animate Anyone repository path does not exist: {repo_path}"
-            )
-
         from src.decoder.animate_anyone_runtime import generate_frame
 
         runtime_fn = generate_frame

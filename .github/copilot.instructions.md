@@ -9,6 +9,7 @@
 * **Dependency Management:** pyproject.toml is the ONE AND ONLY source of truth for standard Python packages. If you need a new pip package, add it there. Use environment.yaml STRICTLY as a GPU environment bootstrapper for heavy CUDA drivers/PyTorch binaries. Never use raw requirements.txt.  
 * **Execution Environment:** Check for the existence of the pointstream conda environment and run all scripts within it.  
 * **Default Test File:** Unless specified otherwise, always use the following file for testing and runs: /home/itec/emanuele/pointstream/assets/real\_tennis.mp4  
+* **Real Experiment Input Requirement:** Any real experiment (non-synthetic evaluation intended to validate end-to-end behavior) MUST pass `--input /home/itec/emanuele/pointstream/assets/real_tennis.mp4` explicitly. Do not rely on the mock-source fallback.  
 * **Testing & Review Workflow:** Use test-driven generation. Immediately test generated code and continue bugfixing until successful. When a task is complete, review it:  
   * **Analysis Focus:** Analyze code quality, structure, performance bottlenecks, potential bugs, security issues, and user experience/accessibility.  
   * **Important Guidelines:** Structure feedback with clear headings. Ask clarifying questions about design decisions. Focus on *what* should be changed and *why*.  

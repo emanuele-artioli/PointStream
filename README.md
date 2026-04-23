@@ -68,9 +68,40 @@ Optional backend-ablation weights:
 
 ### **Animate-Anyone Weights**
 
-The animate-anyone package is installed via standard pip dependencies, but requires specific model weight profiles to function properly.
+PointStream runs Animate-Anyone from the installed package and these local configuration assets.
 
-* **TODO:** Document the exact expected directory structure and paths for the Animate-Anyone original and finetuned\_tennis profile weights once finalized.
+Expected structure:
+
+```text
+assets/animate-anyone/
+  configs/prompts/
+    pointstream_original.yaml
+    pointstream_finetuned_tennis.yaml
+  profiles/
+    original/            # canonical model store
+    finetuned_tennis/    # canonical model store
+```
+
+Each profile must contain the AnimateAnyone layout:
+
+```text
+stable-diffusion-v1-5/
+sd-vae-ft-mse/
+image_encoder/
+denoising_unet.pth
+reference_unet.pth
+pose_guider.pth
+motion_module.pth
+```
+
+When `--animate-anyone-model-dir` is not provided, PointStream defaults to:
+
+1. `assets/animate-anyone/profiles/<variant>`
+2. `~/Models/AnimateAnyone/profiles/<variant>`
+
+You can still override explicitly with:
+
+* `--animate-anyone-model-dir /absolute/path/to/profile`
 
 ## **Run the Pipeline**
 
