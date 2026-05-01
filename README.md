@@ -136,6 +136,8 @@ GenAI backend switches:
 * \--animate-anyone-model-dir /path/to/model/profile  
 * \--compositing-mask-mode alpha-heuristic|metadata-source-mask|postgen-seg-client
 
+Selecting \--genai-backend animate-anyone also enables the GenAI decode path unless you explicitly pass \--disable-genai.
+
 ### **Baseline & Component Ablation Strategy**
 
 Pointstream evaluates the effectiveness of its specialized semantic extractors iteratively using a **Whole-Frame Residual Baseline**.  

@@ -199,6 +199,10 @@ class BackgroundModeler:
                 selected.append(frame_idx)
                 last_selected_h = current_h
 
+        last_frame_idx = len(homographies) - 1
+        if last_frame_idx not in selected:
+            selected.append(last_frame_idx)
+
         return selected
 
     def _median_panorama(
@@ -258,12 +262,13 @@ class BackgroundModeler:
                 borderValue=(0.0,),
             )
 
+            boundary_invalid = warped_valid < 127
             warped_unmasked = warped.copy()
-            warped_unmasked[warped_valid < 127] = np.nan
+            warped_unmasked[boundary_invalid] = np.nan
             warped_frames_unmasked.append(warped_unmasked)
 
             warped_masked = warped.copy()
-            combined_invalid = (warped_valid < 127) | (warped_exclusion > 0)
+            combined_invalid = boundary_invalid | (warped_exclusion > 0)
             warped_masked[combined_invalid] = np.nan
             warped_frames_masked.append(warped_masked)
 
@@ -317,7 +322,15 @@ class BackgroundModeler:
             if actor.mask is None:
                 polygon_mask = self._build_polygon_mask(actor=actor, width=x2 - x1, height=y2 - y1)
                 if polygon_mask is None:
-                    # Do not exclude full bbox rectangles when segmentation is missing.
+                    pose_mask = self._build_pose_exclusion_mask(
+                        actor=actor,
+                        frame_height=frame_height,
+                        frame_width=frame_width,
+                    )
+                    if pose_mask is None:
+                        # Do not exclude full bbox rectangles when segmentation is missing.
+                        continue
+                    mask = cv2.bitwise_or(mask, pose_mask)
                     continue
                 roi = mask[y1:y2, x1:x2]
                 roi[polygon_mask > 0] = 255
@@ -334,6 +347,36 @@ class BackgroundModeler:
             mask[y1:y2, x1:x2] = roi
 
         return mask
+
+    def _build_pose_exclusion_mask(
+        self,
+        actor: SceneActor,
+        frame_height: int,
+        frame_width: int,
+    ) -> np.ndarray | None:
+        pose_dw = actor.pose_dw
+        if pose_dw is None:
+            return None
+
+        pose_np = np.asarray(pose_dw, dtype=np.float32)
+        if pose_np.ndim != 2 or pose_np.shape[1] != 3 or pose_np.shape[0] == 0:
+            return None
+
+        confident = pose_np[pose_np[:, 2] > 0.2, :2]
+        if confident.shape[0] < 3:
+            return None
+
+        points = np.round(confident).astype(np.int32)
+        points[:, 0] = np.clip(points[:, 0], 0, frame_width - 1)
+        points[:, 1] = np.clip(points[:, 1], 0, frame_height - 1)
+        hull = cv2.convexHull(points.reshape(-1, 1, 2))
+
+        pose_mask = np.zeros((frame_height, frame_width), dtype=np.uint8)
+        cv2.fillConvexPoly(pose_mask, hull, color=255)
+        dilate_radius = max(3, int(round(min(frame_height, frame_width) * 0.015)))
+        kernel = np.ones((dilate_radius, dilate_radius), dtype=np.uint8)
+        pose_mask = cv2.dilate(pose_mask, kernel, iterations=1)
+        return pose_mask
 
     def _build_polygon_mask(self, actor: SceneActor, width: int, height: int) -> np.ndarray | None:
         polygons = actor.mask_polygons

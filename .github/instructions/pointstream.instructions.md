@@ -1,4 +1,11 @@
-## **description: 'Master Agent System Instructions for Pointstream: Object-Centric Semantic Neural Codec' applyTo: '\*\*/\*.py, \*\*/environment.yaml, \*\*/pyproject.toml, \*\*/README.md'**
+---
+# description: Describe when these instructions should be loaded by the agent based on task context
+description: 'Master Agent System Instructions for Pointstream: Object-Centric Semantic Neural Codec' 
+# applyTo: 'Describe when these instructions should be loaded by the agent based on task context' # when provided, instructions will automatically be added to the request context when the pattern matches an attached file
+applyTo: '\*\*/\*.py, \*\*/environment.yaml, \*\*/pyproject.toml, \*\*/README.md'
+---
+
+<!-- Tip: Use /create-instructions in chat to generate content with agent assistance -->
 
 # **Pointstream System Development**
 

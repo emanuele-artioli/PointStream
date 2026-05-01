@@ -316,10 +316,28 @@ def _build_residual_calculator(seed: int, importance_mapper: str) -> ResidualCal
 
 
 def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
-    if bool(args.enable_genai):
-        os.environ["POINTSTREAM_ENABLE_GENAI"] = "1"
+    enable_genai = bool(args.enable_genai)
+    if bool(args.genai_backend) and str(args.genai_backend).strip().lower() == "animate-anyone":
+        enable_genai = True
+    if any(
+        value is not None
+        for value in (
+            args.animate_anyone_repo_dir,
+            args.animate_anyone_model_variant,
+            args.animate_anyone_model_dir,
+            args.animate_anyone_window,
+            args.genai_preroll_frames,
+            args.animate_anyone_transparent_threshold,
+            args.genai_resize_mode,
+            args.animate_anyone_adaptive_threshold,
+            args.animate_anyone_alpha_smoothing,
+        )
+    ):
+        enable_genai = True
     if bool(args.disable_genai):
-        os.environ["POINTSTREAM_ENABLE_GENAI"] = "0"
+        enable_genai = False
+
+    os.environ["POINTSTREAM_ENABLE_GENAI"] = "1" if enable_genai else "0"
 
     if args.genai_backend is not None:
         os.environ["POINTSTREAM_GENAI_BACKEND"] = str(args.genai_backend)

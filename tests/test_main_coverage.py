@@ -409,6 +409,47 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
     assert os.environ.get("POINTSTREAM_METADATA_MASK_CODEC") == "rle-v1"
 
 
+def test_run_cli_enables_genai_for_animate_anyone_backend(monkeypatch, tmp_path: Path) -> None:
+    source_video = tmp_path / "input.mp4"
+    source_video.write_bytes(b"x")
+    output_dir = tmp_path / "results"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    captured: dict[str, object] = {}
+
+    def _fake_run_mock_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "chunk_id": "ablation_02",
+            "num_actor_packets": 0,
+            "num_rigid_object_packets": 0,
+            "ball_object_id": "ball_0",
+            "residual_uri": "memory://residual/chunk.mp4",
+            "decoded_uri": "memory://decoded/chunk.mp4",
+            "transport_backend": "disk",
+        }
+
+    monkeypatch.setattr(main_module, "run_mock_pipeline", _fake_run_mock_pipeline)
+    monkeypatch.setattr(main_module, "_create_timestamped_output_dir", lambda base_root=None: output_dir)
+    monkeypatch.delenv("POINTSTREAM_ENABLE_GENAI", raising=False)
+    monkeypatch.delenv("POINTSTREAM_GENAI_BACKEND", raising=False)
+
+    exit_code = main_module.run_cli(
+        [
+            "--input",
+            str(source_video),
+            "--genai-backend",
+            "animate-anyone",
+            "--no-summary-file",
+        ]
+    )
+
+    assert exit_code == 0
+    assert Path(str(captured["transport_root"])) == output_dir
+    assert os.environ.get("POINTSTREAM_ENABLE_GENAI") == "1"
+    assert os.environ.get("POINTSTREAM_GENAI_BACKEND") == "animate-anyone"
+
+
 def test_build_actor_extractor_forces_real_pipeline_for_metadata_masks(monkeypatch) -> None:
     captured: dict[str, object] = {}
 

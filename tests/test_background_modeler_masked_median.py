@@ -96,3 +96,49 @@ def test_background_modeler_does_not_mask_full_bbox_when_actor_mask_missing() ->
     )
 
     assert int(np.count_nonzero(exclusion)) == 0
+
+
+def test_background_modeler_uses_pose_fallback_when_mask_missing() -> None:
+    modeler = BackgroundModeler()
+    frame_states = [
+        FrameState(
+            frame_id=0,
+            actors=[
+                SceneActor(
+                    track_id="player_0",
+                    class_name="player",
+                    bbox=[20, 12, 60, 40],
+                    mask=None,
+                    pose_dw=[
+                        [26.0, 16.0, 0.95],
+                        [34.0, 18.0, 0.95],
+                        [42.0, 20.0, 0.95],
+                        [28.0, 26.0, 0.95],
+                        [38.0, 30.0, 0.95],
+                        [48.0, 34.0, 0.95],
+                    ],
+                )
+            ],
+        )
+    ]
+
+    exclusion = modeler._build_actor_exclusion_mask(
+        frame_idx=0,
+        frame_states=frame_states,
+        frame_height=64,
+        frame_width=96,
+    )
+
+    assert int(np.count_nonzero(exclusion)) > 0
+
+
+def test_background_modeler_always_includes_last_keyframe() -> None:
+    modeler = BackgroundModeler()
+    homographies = [np.eye(3, dtype=np.float64) for _ in range(4)]
+
+    selected = modeler._select_keyframes(
+        homographies=homographies,
+        translation_threshold_px=1_000.0,
+    )
+
+    assert selected == [0, 3]
