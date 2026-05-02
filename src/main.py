@@ -375,6 +375,14 @@ def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
         os.environ["POINTSTREAM_ANIMATE_ANYONE_MODEL_DIR"] = str(Path(args.animate_anyone_model_dir).expanduser())
     if args.animate_anyone_window is not None:
         os.environ["POINTSTREAM_ANIMATE_ANYONE_WINDOW"] = str(int(args.animate_anyone_window))
+    if args.animate_anyone_steps is not None:
+        os.environ["POINTSTREAM_ANIMATE_ANYONE_STEPS"] = str(int(args.animate_anyone_steps))
+    if args.animate_anyone_cfg is not None:
+        os.environ["POINTSTREAM_ANIMATE_ANYONE_CFG"] = str(float(args.animate_anyone_cfg))
+    if args.animate_anyone_width is not None:
+        os.environ["POINTSTREAM_ANIMATE_ANYONE_WIDTH"] = str(int(args.animate_anyone_width))
+    if args.animate_anyone_height is not None:
+        os.environ["POINTSTREAM_ANIMATE_ANYONE_HEIGHT"] = str(int(args.animate_anyone_height))
     if args.genai_preroll_frames is not None:
         os.environ["POINTSTREAM_GENAI_PREROLL_FRAMES"] = str(int(args.genai_preroll_frames))
     if args.animate_anyone_transparent_threshold is not None:
@@ -385,6 +393,12 @@ def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
         os.environ["POINTSTREAM_GPU_DTYPE"] = str(args.gpu_dtype)
     if args.ball_max_side is not None:
         os.environ["POINTSTREAM_BALL_MAX_SIDE"] = str(int(args.ball_max_side))
+    if args.ball_det_conf is not None:
+        os.environ["POINTSTREAM_BALL_DET_CONF"] = str(float(args.ball_det_conf))
+    if args.ball_det_model is not None:
+        os.environ["POINTSTREAM_BALL_DET_MODEL"] = str(args.ball_det_model)
+    if args.ball_class_id is not None:
+        os.environ["POINTSTREAM_BALL_CLASS_ID"] = str(int(args.ball_class_id))
     if args.genai_resize_mode is not None:
         os.environ["POINTSTREAM_GENAI_RESIZE_MODE"] = str(args.genai_resize_mode)
     if args.animate_anyone_adaptive_threshold is not None:
@@ -401,6 +415,14 @@ def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
         os.environ["POINTSTREAM_POSTGEN_SEGMENTER_BACKEND"] = str(args.postgen_segmenter_backend)
     if args.metadata_mask_codec is not None:
         os.environ["POINTSTREAM_METADATA_MASK_CODEC"] = str(args.metadata_mask_codec)
+    if args.panorama_warp_batch_size is not None:
+        os.environ["POINTSTREAM_PANORAMA_WARP_BATCH_SIZE"] = str(int(args.panorama_warp_batch_size))
+    if args.panorama_codec is not None:
+        os.environ["POINTSTREAM_PANORAMA_CODEC"] = str(args.panorama_codec)
+    if args.allow_auto_model_download:
+        os.environ["POINTSTREAM_ALLOW_AUTO_MODEL_DOWNLOAD"] = "1"
+    if args.postgen_segmenter_model is not None:
+        os.environ["POINTSTREAM_POSTGEN_SEGMENTER_MODEL"] = str(args.postgen_segmenter_model)
     os.environ["POINTSTREAM_ENABLE_SHIFTED_BALL"] = "1" if bool(args.enable_shifted_ball) else "0"
 
 
@@ -529,6 +551,24 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         help="Optional max frame side for ball extraction (0 keeps native resolution).",
     )
     parser.add_argument(
+        "--ball-det-conf",
+        type=float,
+        default=None,
+        help="Detection confidence threshold for segmentation-based ball detector.",
+    )
+    parser.add_argument(
+        "--ball-det-model",
+        type=str,
+        default=None,
+        help="Model filename or path for segmentation-based ball detector.",
+    )
+    parser.add_argument(
+        "--ball-class-id",
+        type=int,
+        default=None,
+        help="Class id to use for segmentation-based ball detector.",
+    )
+    parser.add_argument(
         "--reference-jpeg-quality",
         type=int,
         default=75,
@@ -557,6 +597,29 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         choices=("fp16", "fp32", "bf16", "fp8_e4m3fn", "fp8_e5m2"),
         default=None,
         help="Global GPU compute dtype preference (falls back automatically if unsupported).",
+    )
+    parser.add_argument(
+        "--panorama-warp-batch-size",
+        type=int,
+        default=None,
+        help="Batch size used by panorama warp operations (performance tuning).",
+    )
+    parser.add_argument(
+        "--panorama-codec",
+        choices=("jpeg", "png"),
+        default=None,
+        help="Codec used for panorama transport (jpeg or png).",
+    )
+    parser.add_argument(
+        "--allow-auto-model-download",
+        action="store_true",
+        help="Allow automatic model downloads when enabled (used by some backends).",
+    )
+    parser.add_argument(
+        "--postgen-segmenter-model",
+        type=str,
+        default=None,
+        help="Explicit model file for postgen segmenter backend.",
     )
 
     genai_group = parser.add_mutually_exclusive_group()
@@ -590,6 +653,30 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         "--animate-anyone-model-dir",
         default=None,
         help="Explicit AnimateAnyone model directory path.",
+    )
+    parser.add_argument(
+        "--animate-anyone-steps",
+        type=int,
+        default=None,
+        help="Number of diffusion inference steps for AnimateAnyone.",
+    )
+    parser.add_argument(
+        "--animate-anyone-cfg",
+        type=float,
+        default=None,
+        help="Guidance (CFG) scale for AnimateAnyone diffusion.",
+    )
+    parser.add_argument(
+        "--animate-anyone-width",
+        type=int,
+        default=None,
+        help="Width used by AnimateAnyone model (pixels).",
+    )
+    parser.add_argument(
+        "--animate-anyone-height",
+        type=int,
+        default=None,
+        help="Height used by AnimateAnyone model (pixels).",
     )
     parser.add_argument(
         "--animate-anyone-window",
