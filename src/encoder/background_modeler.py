@@ -39,20 +39,23 @@ class BackgroundModeler:
             selected_indices=selected_indices,
             frame_states=frame_states,
         )
+        if self._debug_artifacts_enabled():
+            debug_root = self._resolve_debug_root()
+            debug_root.mkdir(parents=True, exist_ok=True)
+            chunk_debug_path = debug_root / f"debug_panorama_{chunk.chunk_id}.jpg"
+            cv2.imwrite(str(chunk_debug_path), panorama)
 
-        debug_root = self._resolve_debug_root()
-        debug_root.mkdir(parents=True, exist_ok=True)
-        chunk_debug_path = debug_root / f"debug_panorama_{chunk.chunk_id}.jpg"
-        cv2.imwrite(str(chunk_debug_path), panorama)
-
-        # Keep a canonical debug artifact only for non-fallback decoding paths
-        # that produce an expanded stitched canvas.
-        latest_debug_path = debug_root / "debug_panorama.jpg"
-        source_height = int(frames.shape[1])
-        source_width = int(frames.shape[2])
-        is_expanded_canvas = panorama.shape[0] > source_height or panorama.shape[1] > source_width
-        if is_expanded_canvas:
-            cv2.imwrite(str(latest_debug_path), panorama)
+            # Keep a canonical debug artifact only for non-fallback decoding paths
+            # that produce an expanded stitched canvas.
+            latest_debug_path = debug_root / "debug_panorama.jpg"
+            source_height = int(frames.shape[1])
+            source_width = int(frames.shape[2])
+            is_expanded_canvas = panorama.shape[0] > source_height or panorama.shape[1] > source_width
+            if is_expanded_canvas:
+                cv2.imwrite(str(latest_debug_path), panorama)
+            panorama_uri = str(chunk_debug_path)
+        else:
+            panorama_uri = f"memory://panorama/{chunk.chunk_id}.jpg"
 
         camera_poses = [
             CameraPose(
@@ -70,7 +73,7 @@ class BackgroundModeler:
 
         return PanoramaPacket(
             chunk_id=chunk.chunk_id,
-            panorama_uri=str(chunk_debug_path),
+            panorama_uri=panorama_uri,
             frame_width=int(panorama.shape[1]),
             frame_height=int(panorama.shape[0]),
             camera_poses=camera_poses,
@@ -78,6 +81,10 @@ class BackgroundModeler:
             homography_matrices=[homography.tolist() for homography in homographies],
             selected_frame_indices=selected_indices,
         )
+
+    def _debug_artifacts_enabled(self) -> bool:
+        raw = os.environ.get("POINTSTREAM_DISABLE_DEBUG_ARTIFACTS", "0").strip().lower()
+        return raw not in {"1", "true", "yes", "on"}
 
     def _resolve_debug_root(self) -> Path:
         override = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")

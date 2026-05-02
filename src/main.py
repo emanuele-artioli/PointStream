@@ -419,10 +419,15 @@ def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
         os.environ["POINTSTREAM_PANORAMA_WARP_BATCH_SIZE"] = str(int(args.panorama_warp_batch_size))
     if args.panorama_codec is not None:
         os.environ["POINTSTREAM_PANORAMA_CODEC"] = str(args.panorama_codec)
+    if args.panorama_jpeg_quality is not None:
+        os.environ["POINTSTREAM_PANORAMA_JPEG_QUALITY"] = str(int(args.panorama_jpeg_quality))
+    if args.panorama_png_compression is not None:
+        os.environ["POINTSTREAM_PANORAMA_PNG_COMPRESSION"] = str(int(args.panorama_png_compression))
     if args.allow_auto_model_download:
         os.environ["POINTSTREAM_ALLOW_AUTO_MODEL_DOWNLOAD"] = "1"
     if args.postgen_segmenter_model is not None:
         os.environ["POINTSTREAM_POSTGEN_SEGMENTER_MODEL"] = str(args.postgen_segmenter_model)
+    os.environ["POINTSTREAM_DISABLE_DEBUG_ARTIFACTS"] = "1" if bool(args.disable_debug_artifacts) else "0"
     os.environ["POINTSTREAM_ENABLE_SHIFTED_BALL"] = "1" if bool(args.enable_shifted_ball) else "0"
 
 
@@ -522,6 +527,11 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         help="Disable actor keyframe skeleton debug image generation.",
     )
     parser.add_argument(
+        "--disable-debug-artifacts",
+        action="store_true",
+        help="Disable optional debug artifacts such as panorama debug images and actor keyframe renders.",
+    )
+    parser.add_argument(
         "--enable-shifted-ball",
         action="store_true",
         help="Stream actor frame states so ball extraction can start one frame earlier.",
@@ -609,6 +619,18 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         choices=("jpeg", "png"),
         default=None,
         help="Codec used for panorama transport (jpeg or png).",
+    )
+    parser.add_argument(
+        "--panorama-jpeg-quality",
+        type=int,
+        default=None,
+        help="JPEG quality used when --panorama-codec=jpeg.",
+    )
+    parser.add_argument(
+        "--panorama-png-compression",
+        type=int,
+        default=None,
+        help="PNG compression level used when --panorama-codec=png.",
     )
     parser.add_argument(
         "--allow-auto-model-download",
@@ -778,6 +800,10 @@ def run_cli(argv: list[str] | None = None) -> int:
         if not source_path.exists() or not source_path.is_file():
             raise FileNotFoundError(f"Input video does not exist: {source_path}")
         source_uri = str(source_path)
+
+    if bool(args.disable_debug_artifacts):
+        # Keep actor debug keyframes aligned with global debug-artifact disable switch.
+        args.disable_debug_keyframes = True
 
     _apply_runtime_env_overrides(args)
 
