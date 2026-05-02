@@ -11,6 +11,7 @@ import cv2
 import numpy as np
 
 from src.encoder.ball_extractor import BallExtractor
+from src.encoder.segmentation_ball_extractor import SegmentationBallExtractor
 from src.encoder.execution_pool import BaseExecutionPool
 from src.encoder.execution_pool import TaggedMultiprocessPool
 from src.encoder.execution_pool import WorkerConfig
@@ -269,6 +270,31 @@ def _build_ball_extractor(
     normalized_mode = mode.strip().lower()
     if normalized_mode == "mock":
         return _MockBallExtractorAdapter()
+    # Segmentation-only mode
+    if normalized_mode in {"segmentation", "detector"}:
+        conf = float(os.environ.get("POINTSTREAM_BALL_DET_CONF", "0.25"))
+        model_name = os.environ.get("POINTSTREAM_BALL_DET_MODEL", "yolo26n.pt")
+        return SegmentationBallExtractor(model_name=model_name, confidence=conf)
+
+    # Cascade mode: try segmentation detector first, then fallback to residual-based
+    if normalized_mode in {"cascade", "hybrid"}:
+        conf = float(os.environ.get("POINTSTREAM_BALL_DET_CONF", "0.25"))
+        model_name = os.environ.get("POINTSTREAM_BALL_DET_MODEL", "yolo26n.pt")
+        seg = SegmentationBallExtractor(model_name=model_name, confidence=conf)
+        resid = BallExtractor(
+            difference_threshold=float(difference_threshold),
+            min_blob_area=int(min_blob_area),
+            detection_max_side=int(detection_max_side),
+        )
+
+        class _Cascade:
+            def process(self, chunk, panorama, frame_states):
+                try:
+                    return seg.process(chunk=chunk, panorama=panorama, frame_states=frame_states)
+                except Exception:
+                    return resid.process(chunk=chunk, panorama=panorama, frame_states=frame_states)
+
+        return _Cascade()
 
     uses_default = (
         float(difference_threshold) == 18.0
@@ -474,9 +500,9 @@ def _build_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--ball-extractor",
-        choices=("difference", "mock"),
+        choices=("difference", "mock", "segmentation", "cascade"),
         default="difference",
-        help="Ball extraction module: background-difference extractor or lightweight mock tracker.",
+        help="Ball extraction module: 'difference' (residual), 'segmentation' (detector), 'cascade' (detector then residual), or 'mock'.",
     )
     parser.add_argument(
         "--ball-difference-threshold",

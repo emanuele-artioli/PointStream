@@ -115,6 +115,21 @@ class BallExtractor:
 
             grayscale = masked_diff.mean(dim=0)
             binary = (grayscale > self._difference_threshold).to(torch.uint8)
+            # Apply an ROI constraint if possible: only consider pixels inside the
+            # inter-player region. This reduces false positives from corners.
+            roi = self._compute_roi_from_frame_state(
+                frame_state=frame_state,
+                frame_height=detection_height,
+                frame_width=detection_width,
+                scale_x=scale_x,
+                scale_y=scale_y,
+            )
+            if roi is not None:
+                x1_r, y1_r, x2_r, y2_r = roi
+                # zero outside ROI
+                mask_outside = torch.ones_like(binary, dtype=torch.uint8)
+                mask_outside[y1_r:y2_r, x1_r:x2_r] = 0
+                binary = (binary * (1 - mask_outside)).to(torch.uint8)
             ball_x, ball_y, is_visible = self._largest_blob_center(binary)
 
             if is_visible:
@@ -433,6 +448,60 @@ class BallExtractor:
 
         center_x, center_y = centroids[best_label]
         return float(center_x), float(center_y), True
+
+    def _compute_roi_from_frame_state(
+        self,
+        frame_state: FrameState,
+        frame_height: int,
+        frame_width: int,
+        scale_x: float,
+        scale_y: float,
+        pad_ratio: float = 0.10,
+    ) -> tuple[int, int, int, int] | None:
+        """
+        Compute a conservative ROI between the two player bounding boxes.
+        Returns coordinates clipped to detection frame: (x1, y1, x2, y2)
+        or None if ROI cannot be computed.
+        """
+        players = [a for a in frame_state.actors if a.class_name == "player"]
+        if len(players) < 2:
+            return None
+
+        # Choose two primary players sorted by vertical center (top, bottom)
+        centers = [(p, (p.bbox[1] + p.bbox[3]) * 0.5) for p in players]
+        centers.sort(key=lambda t: t[1])
+        top_player = centers[0][0]
+        bottom_player = centers[-1][0]
+
+        # Map bbox to detection scale
+        def _scale(bbox: list[float]):
+            x1 = int(max(0, min(frame_width - 1, int(np.floor(bbox[0] * scale_x)))))
+            y1 = int(max(0, min(frame_height - 1, int(np.floor(bbox[1] * scale_y)))))
+            x2 = int(max(0, min(frame_width, int(np.ceil(bbox[2] * scale_x)))))
+            y2 = int(max(0, min(frame_height, int(np.ceil(bbox[3] * scale_y)))))
+            return x1, y1, x2, y2
+
+        t_x1, t_y1, t_x2, t_y2 = _scale(top_player.bbox)
+        b_x1, b_y1, b_x2, b_y2 = _scale(bottom_player.bbox)
+
+        x1 = min(t_x1, b_x1)
+        y1 = min(t_y1, b_y1)
+        x2 = max(t_x2, b_x2)
+        y2 = max(t_y2, b_y2)
+
+        # Expand a bit
+        w = max(1, x2 - x1)
+        h = max(1, y2 - y1)
+        pad_x = int(round(w * pad_ratio))
+        pad_y = int(round(h * pad_ratio))
+        x1 = max(0, x1 - pad_x)
+        y1 = max(0, y1 - pad_y)
+        x2 = min(frame_width, x2 + pad_x)
+        y2 = min(frame_height, y2 + pad_y)
+
+        if x2 <= x1 or y2 <= y1:
+            return None
+        return x1, y1, x2, y2
 
     def _resolve_frame_state(self, frame_states: list[FrameState], frame_idx: int) -> FrameState:
         if frame_idx < len(frame_states):
