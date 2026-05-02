@@ -161,6 +161,7 @@ Recent attempts explore the possibilities of integrating generative models into 
 
 While previous work advances compression efficiency, semantic analysis, and generative reconstruction in isolation, these developments largely evolve along parallel tracks. Traditional codecs focus on low-level signal optimization, semantic systems stop at detection without optimized encoding, and generative models remain underutilized within streaming pipelines. The intersection of these trajectories reveals a clear opportunity: a unified framework that combines semantic understanding, compact representation, and generative reconstruction to enable efficient, high-quality video streaming. PointStream emerges in this space, introducing a fully object-based encoding approach that leverages scene semantics to minimize redundancy and uses generative models to reconstruct video content intelligently on the client side.
 
+
 \section{Problem Description and Motivation}
 To evaluate whether our approach brings meaningful improvements, we first establish a baseline by measuring the performance of current state-of-the-art codecs under constrained bandwidth conditions, using a tennis match segment at 4K resolution, a framerate of \SI{50}{\fps}, and \SI{8}{\second} of duration as our test case.
 As our reference codec, we select HEVC due to its widespread adoption and high compression efficiency. 
@@ -195,6 +196,177 @@ While these assumptions simplify the evaluation, they are reasonable within the 
 
 Although not intended as a rigorous or statistically comprehensive evaluation, this stepwise transformation, from full-frame encoding, to object-background separation, to structured motion-based representation, highlights the potential of a content-aware, human-centric approach. 
 These insights directly inform the design of our proposed system, \emph{PointStream}, which generalizes this paradigm into a scalable and modular semantic live streaming pipeline.
+
+
+\section{System Design}
+PointStream is built around a layered representation of a video chunk rather than a monolithic encoded frame sequence. The central design decision is to separate what must be remembered from what can be recomputed. Static structure is summarized as a background panorama, foreground motion is expressed as sparse semantic events, and any remaining pixel detail is preserved in a residual stream. This makes the system hybrid in a deeper sense than a simple codec switch: semantics carry the scene structure, while conventional coding remains the safety net that preserves fidelity where the semantic layer is incomplete.
+
+The payload contract in \texttt{src/shared/schemas.py} makes this separation explicit. A \texttt{VideoChunk} defines the time span and geometry of the source. A \texttt{PanoramaPacket} stores the camera-grounded background, including selected frame indices, camera poses, and homography matrices. \texttt{ActorPacket} objects carry sparse keyframe events, optional mask frames, and appearance descriptors for humans. \texttt{RigidObjectPacket} and \texttt{BallPacket} provide a path for non-human motion, which is important because the design is not tied to a single object class. Finally, a \texttt{ResidualPacket} preserves the conventional video stream for information not explained by the semantic representation. In aggregate, these packets form a compositional scene description rather than a collection of unrelated side channels.
+
+\subsection{Semantic encoding pipeline}
+
+To build this layered representation, PointStream employs a staged encoder pipeline that progressively annotates the scene with increasing semantic richness. The pipeline performs the following sequence of operations on each frame:
+
+\subsubsection{Object Detection}
+The first stage identifies and tracks foreground objects. Two detector backends are available, reflecting a tradeoff between fixed and open-vocabulary detection:
+\begin{itemize}[topsep=0pt,itemsep=0pt,leftmargin=*]
+    \item \textbf{YOLOv8 Nano (YOLO26)} uses a traditional fixed-class detector trained on COCO, identifying persons and tennis rackets. This backend is computationally efficient and requires no external configuration beyond the base model.
+    \item \textbf{YOLOE (Open-vocabulary variant)} extends YOLOv8 with a text encoder (MobileCLIP) to enable open-vocabulary detection based on caption prompts. This allows detection customization per deployment, \eg ``tennis player'' or ``badminton player'', without retraining. The text encoder weights are cached locally to ensure deterministic inference.
+\end{itemize}
+Both detectors include frame-level tracking to maintain consistent identity across time. When tracking loss occurs (e.g., during occlusion), a recovery heuristic searches the region around the last known position to re-establish the track. The pipeline enforces a minimum of two players and two rackets per frame; if the detector misses objects, they are reconstructed by temporal interpolation or simple positional priors to ensure consistent semantic structure.
+
+\subsubsection{Pose Estimation}
+Once objects are identified, human actors are further annotated with skeletal motion via pose estimation. Two pose backends are available:
+\begin{itemize}[topsep=0pt,itemsep=0pt,leftmargin=*]
+    \item \textbf{YOLO Pose (YOLOv8 Pose)} uses the built-in pose head of YOLOv8, producing COCO-17 keypoint coordinates (17 joints with confidence values). The output is converted to DWPose/OpenPose-18 format by synthesizing the neck joint from shoulder positions when both are above a confidence threshold (0.2).
+    \item \textbf{DWPose (TorchScript)} runs a standalone OpenPose-compatible detector optimized for sports contexts. This backend processes each actor crop and directly outputs the 18-joint representation. It is typically more robust to occlusion and unusual poses than YOLO Pose but at higher computational cost.
+\end{itemize}
+Both backends extract the actor crop with 10\% padding around the bounding box to provide context, then apply the pose model to infer keypoint locations. Pose keypoints are stored as $(x, y, \text{confidence})$ triplets and serve as the primary semantic representation of motion in the ActorPacket. Keyframes are emitted when the Euclidean distance of flattened pose coordinates exceeds a configurable threshold (default 20.0 pixels), implementing an adaptive motion-driven rate control that sends fewer keyframes during slow play and more during rapid movement.
+
+\subsubsection{Instance Segmentation}
+To provide spatial guidance and optional mask-based compositing, the pipeline optionally performs instance segmentation. Three backends are available, representing different quality-speed tradeoffs:
+\begin{itemize}[topsep=0pt,itemsep=0pt,leftmargin=*]
+    \item \textbf{No-op segmentation} skips masking entirely. This is the lowest-bandwidth option and is useful when mask-guided compositing is disabled or when segmentation latency is prohibitive.
+    \item \textbf{YOLO Segmentation (YOLOv8-Seg)} applies the segmentation head of YOLOv8 to each actor crop, producing a binary mask. The implementation extracts polygon coordinates when available for more compact representation. This is fast and well-integrated with the detection backend.
+    \item \textbf{YOLOE Segmentation} provides open-vocabulary segmentation using the same caption-based prompting as open-vocabulary detection, enabling customized mask targets per deployment.
+    \item \textbf{SAM (Segment Anything Model)} uses the Segment Anything Model (SAM3 or SAM) with bounding-box prompts, providing higher-quality segmentation at increased computational cost. SAM operates on the full frame rather than crops, accepting the actor bounding box as a prompt and producing high-fidelity instance masks.
+\end{itemize}
+Masks are stored in the ActorPacket using a configurable codec (RLE, bitpacking, PNG, or polygon) to balance bandwidth and reconstruction fidelity.
+
+\subsubsection{Background Modeling}
+Parallel to foreground annotation, the background is modeled as a reusable geometric structure via the BackgroundModeler. This component:
+\begin{itemize}[topsep=0pt,itemsep=0pt,leftmargin=*]
+    \item Estimates optical flow using the KLT (Kanade-Lucas-Tomasi) algorithm to track frame-to-frame motion.
+    \item Selects keyframes based on cumulative translation thresholds (default 30 pixels) to identify frames where substantial new background content enters the view.
+    \item Constructs a panorama by stitching selected keyframes via median fusion and homography warping, creating a larger canvas that encompasses most scene content.
+    \item Computes per-frame homography matrices that describe how to warp the panorama into the current camera viewpoint, effectively converting camera motion from the pixel domain to the geometric transform domain.
+\end{itemize}
+The PanoramaPacket stores the stitched panorama image (in PNG or JPEG format), the homography matrices for all frames, and metadata about which frames were used for stitching. On the client, these homographies are applied via perspective warping to reconstruct the background for each frame, achieving high-quality geometry with minimal transmitted pixels.
+
+\subsubsection{Ball and Rigid Object Tracking}
+For scenes where non-human motion is salient (e.g., ball tracking in tennis), the pipeline includes specialized detectors:
+\begin{itemize}[topsep=0pt,itemsep=0pt,leftmargin=*]
+    \item \textbf{Ball Extraction} uses background subtraction and blob detection, computing per-frame differences between the original and warped background, then identifying connected components above a minimum area threshold (default 6 pixels). The detector adapts to motion by interpolating trajectory continuity across frames.
+    \item \textbf{Rigid Object Detection} provides a slot for additional tracked objects using trajectory-based representation, stored in RigidObjectPacket with similar keyframe-based event encoding as human actors.
+\end{itemize}
+Both are optional and can be disabled for faster encoding when the application does not require sub-object tracking.
+
+\subsubsection{Reference Extraction and Residual Encoding}
+Finally, the encoder materializes compact visual references and residual fallback:
+\begin{itemize}[topsep=0pt,itemsep=0pt,leftmargin=*]
+    \item \textbf{Actor References} extracts a single JPEG crop per tracked actor from the first confident detection. Crops include configurable padding (default 10\%) and JPEG quality (default 75) to balance appearance fidelity and bandwidth. These references are transmitted in the SceneActorReference structure and provide visual identity cues for appearance synthesis on the client.
+    \item \textbf{Residual Stream} encodes pixel differences between the full frame and the composite of warped background plus actor masks, weighted by an importance map. Two importance strategies are available: binary (1.0 where actors present, 0.0 elsewhere) or uniform. The residual is encoded with FFmpeg and transmitted as a fallback video stream.
+\end{itemize}
+
+\subsection{Background as geometric state}
+The most distinctive part of the design is the treatment of the background as a reusable geometric state. Instead of retransmitting full frames whenever the camera moves, PointStream represents the background as a panorama that can be reprojected into the current view with homography matrices. In other words, camera motion is moved from the pixel domain into the transform domain. This is a strong compression lever because many broadcast scenes contain a mostly stable canvas with a changing viewpoint, but relatively little new background information from frame to frame.
+
+This design also explains why the background packet stores both a panorama image and a homography sequence. The panorama provides the visual substrate, while the per-frame transforms encode the motion needed to recover the live viewpoint. The client therefore does not merely decode a background image; it reconstructs the current camera view by warping a stable reference layer. The result is a background that remains high-quality even when foreground content is highly dynamic.
+
+\subsection{Sparse foreground semantics}
+Foreground objects are represented sparsely and semantically rather than as dense video. Human actors are encoded through pose-oriented events that are only emitted when the pose changes enough to justify a new keyframe. This is a deliberate rate-control strategy: the number of transmitted events depends on motion complexity, not on the frame rate of the source. Optional mask frames and appearance references extend the representation when the client needs stronger spatial guidance, but they do not change the core abstraction. The pose delta threshold is the primary tuning knob for bandwidth: higher thresholds reduce event density but may miss rapid movements, while lower thresholds preserve finer motion at increased bitrate.
+
+The same pattern extends to rigid objects and balls. These packets are included because real scenes are not only about people, and a robust semantic codec should be able to carry non-human motion without redesigning the transport layer. This is also where the current implementation shows its longer-term potential: the system already has separate slots for human pose, object trajectories, and residual pixels, so additional object classes can be added without changing the fundamental architecture.
+
+\subsection{Reconstruction as synthesis plus compositing}
+On the client, PointStream reconstructs frames by combining three sources of information: warped background geometry, sparse object semantics, and a residual stream. The important design point is that reconstruction is not a single generator call. It is a staged process that first densifies sparse motion, then recovers object appearance, and finally composites the result back into the transmitted background. This makes the system easier to adapt because the appearance model, the compositor, and the geometric background model are all independently replaceable.
+
+Generative AI is therefore best understood as an optional reconstruction strategy inside a larger scene model, not as the core abstraction of the codec. When a heavy generative backend is available, the client can synthesize richer foreground appearance. When it is not, the rest of the pipeline still works because the structural contract is already there. That separation is what gives the design practical value: the system can exploit modern generative models without becoming dependent on them.
+
+\section{Implementation}
+The current codebase realizes this design in \texttt{src/main.py} as a single-chunk pipeline with a small CLI front end. The top-level runner parses the experiment configuration, applies environment overrides, resolves the source video, and then executes one encode transport decode cycle. If no input is supplied, the code generates a synthetic tennis-like clip so the entire stack remains runnable without external assets. That fallback is not just a convenience feature; it makes the system testable and reproducible in the absence of a full dataset.
+
+\subsection{Encoder Pipeline Assembly}
+The encoder itself is implemented by \texttt{EncoderPipeline} in \texttt{src/encoder/orchestrator.py}. Internally, it is organized as a DAG using \texttt{DAGOrchestrator}, which is the right abstraction for this kind of system because the semantic payload has real dependencies: actor extraction must precede pose export, the panorama depends on frame states, actor references depend on those same states, and the residual is built last from the assembled semantic payload. The graph contains explicit nodes for the chunk, actor bundle, actors, frame states, panorama, actor references, rigid objects, ball, and residual. That structure makes the execution order clear and also leaves room for parallel scheduling when a tagged execution pool is enabled.
+
+\subsubsection{Actor Extraction}
+The \texttt{ActorExtractor} class in \texttt{src/encoder/actor\_components.py} implements the full pipeline described in Section~\ref{sec:encoding}. It accepts configurable parameters for each stage:
+\begin{itemize}[topsep=0pt,itemsep=0pt,leftmargin=*]
+    \item \textbf{Detector backend:} \texttt{--detector} with options \texttt{yolo26} or \texttt{yoloe}. YOLO26 uses YOLOv8 Nano; YOLOE uses MobileCLIP-augmented open-vocabulary detection.
+    \item \textbf{Detector caption:} \texttt{--detector-caption} for YOLOE customization (default: ``tennis player'').
+    \item \textbf{Pose estimator:} \texttt{--pose-estimator} with options \texttt{yolo} or \texttt{dwpose}. Both produce 18-joint DWPose format.
+    \item \textbf{Segmenter backend:} \texttt{--segmenter} with options \texttt{yolo}, \texttt{yoloe}, \texttt{sam3}, \texttt{sam}, or \texttt{none}. Each produces a binary mask in configurable codec.
+    \item \textbf{Segmenter caption:} \texttt{--segmenter-caption} for open-vocabulary segmenters.
+    \item \textbf{Pose delta threshold:} \texttt{--payload-pose-delta-threshold} (default 20.0 pixels) controls keyframe emission rate.
+    \item \textbf{Debug keyframes:} \texttt{--disable-debug-keyframes} to skip skeletal visualization.
+    \item \textbf{Mask metadata inclusion:} Controlled by \texttt{--compositing-mask-mode} (default \texttt{postgen-seg-client}).
+    \item \textbf{Mask codec:} \texttt{--metadata-mask-codec} with options \texttt{auto}, \texttt{rle-v1}, \texttt{bitpack-z1}, \texttt{png}, \texttt{segmenter-native}, or \texttt{yolo-native}.
+\end{itemize}
+Internally, \texttt{ActorExtractor} runs detector, pose estimator, and segmenter in sequence on each frame, then applies a \texttt{PayloadEncoder} to convert frame states into sparse ActorPackets by tracking pose deltas and emitting keyframe events. Actors are associated with the detector output through spatial overlap, and rackets are linked to players via bounding-box proximity.
+
+\subsubsection{Background Modeling}
+The \texttt{BackgroundModeler} in \texttt{src/encoder/background\_modeler.py} constructs the panorama and homography matrices. It accepts raw frame states and optionally a pre-decoded video tensor for faster processing. Internally, it uses KLT-based optical flow tracking to identify keyframe candidates, selects frames based on cumulative translation (default 30 pixels), and stitches them into a panorama using median fusion and perspective warping. The output PanoramaPacket includes the stitched image in configurable format (PNG, JPEG), per-frame homography matrices, and metadata about selected frame indices.
+
+\subsubsection{Ball and Rigid Object Detection}
+The \texttt{BallExtractor} in \texttt{src/encoder/ball\_extractor.py} uses background subtraction with parameters:
+\begin{itemize}[topsep=0pt,itemsep=0pt,leftmargin=*]
+    \item \textbf{Difference threshold:} \texttt{--ball-difference-threshold} (default 18.0) for frame differencing.
+    \item \textbf{Minimum blob area:} \texttt{--ball-min-blob-area} (default 6 pixels).
+    \item \textbf{Detection frame size:} \texttt{--ball-max-side} (default 0, no downsampling) for optional resolution reduction.
+\end{itemize}
+The \texttt{ObjectTracker} in \texttt{src/encoder/mock\_extractors.py} provides a placeholder for rigid object trajectories. Both produce event-based packets with trajectory specifications.
+
+\subsubsection{Reference Extraction}
+The \texttt{ReferenceExtractor} in \texttt{src/encoder/reference\_extractor.py} extracts cropped JPEG images of each actor for use in appearance synthesis. Parameters:
+\begin{itemize}[topsep=0pt,itemsep=0pt,leftmargin=*]
+    \item \textbf{JPEG quality:} \texttt{--reference-jpeg-quality} (default 75).
+    \item \textbf{Padding ratio:} \texttt{--reference-padding-ratio} (default 0.10 or 10\%).
+\end{itemize}
+
+\subsubsection{Residual Encoding}
+The \texttt{ResidualCalculator} in \texttt{src/encoder/residual\_calculator.py} computes and encodes a residual stream. The importance map can be selected via \texttt{--importance-mapper} with options \texttt{binary} (1.0 where actors present, 0.0 elsewhere) or \texttt{uniform}. The residual is encoded using FFmpeg with the H.265/HEVC codec at a fixed quality level.
+
+\subsection{Execution Pool and Parallelization}
+By default (\texttt{--execution-pool inline}), the DAG runs synchronously. The alternative \texttt{--execution-pool tagged} activates \texttt{TaggedMultiprocessPool}, which distributes work across CPU and GPU processes based on function tags. The pool is configured with \texttt{--cpu-workers} and \texttt{--gpu-workers} (both default 1), allowing independent tuning of CPU-bound work (detection, pose estimation, background modeling) and GPU-bound work (residual synthesis). This architecture enables efficient utilization of multi-GPU systems or CPU farms.
+
+\subsection{Serialization and Transport}
+Once encoded, the payload is written through \texttt{DiskTransport} in \texttt{src/transport/disk.py}. The transport layer materializes the semantic packet into a chunk directory containing:
+\begin{itemize}[topsep=0pt,itemsep=0pt,leftmargin=*]
+    \item \texttt{metadata.msgpack}: Serialized EncodedChunkPayload with path references to external artifacts.
+    \item \texttt{residual.mp4}: Encoded residual stream video.
+    \item \texttt{panorama.png} (or \texttt{.jpg}): Stitched background image in selected format.
+    \item \texttt{actor\_references/track\_*.jpg}: JPEG crops of each actor.
+\end{itemize}
+The transport layer also includes a \texttt{panorama\_encoder} selector (CLI option passed at transport creation) to choose panorama compression, supporting PNG and JPEG. This separation of artifacts into sidecar files makes the payload inspectable and testable without special infrastructure.
+
+\subsection{Synthesis Engine and Client Reconstruction}
+The \texttt{SynthesisEngine} in \texttt{src/shared/synthesis\_engine.py} is a shared utility used by both encoder (for residual computation) and decoder. It implements:
+\begin{itemize}[topsep=0pt,itemsep=0pt,leftmargin=*]
+    \item \textbf{Panorama warping:} Uses Kornia's perspective warp with batch processing to apply homography matrices to the panorama, reconstructing the background for each frame at the correct camera viewpoint.
+    \item \textbf{Pose densification:} Unrolls sparse KeyframeEvent and InterpolateCommandEvent sequences into dense $(T, 18, 3)$ pose tensors via linear interpolation between keyframes.
+    \item \textbf{Pose visualization:} Renders DWPose keypoints and skeletons onto a canvas for visualization or mask-based compositing.
+\end{itemize}
+The engine accepts configuration via environment variables: \texttt{POINTSTREAM\_GPU\_DTYPE} (default fp16 on CUDA) for compute precision, and \texttt{POINTSTREAM\_PANORAMA\_WARP\_BATCH\_SIZE} (default 4) for memory efficiency.
+
+The \texttt{DecoderRenderer} in \texttt{src/decoder/mock\_renderer.py} orchestrates client-side reconstruction. It:
+\begin{enumerate*}[label=\textit{(\roman*)}]
+    \item Decodes reference crops from JPEG or in-memory bytes.
+    \item Unrolls sparse actor poses into dense trajectories.
+    \item Calls the synthesis engine to reconstruct background via warping and synthesize predicted foreground frames.
+    \item Optionally applies GenAI appearance synthesis.
+    \item Composites with residual stream via the ResidualCompositor.
+\end{enumerate*}
+
+\subsection{Generative AI Backends}
+The GenAI path is controlled by environment variables. The system implements two main strategies via \texttt{src/decoder/genai\_compositor.py}:
+\begin{itemize}[topsep=0pt,itemsep=0pt,leftmargin=*]
+    \item \textbf{ControlNet baseline:} \texttt{--genai-backend controlnet} (default when enabled) uses Stable Diffusion v1.5 with OpenPose ControlNet. Accepts \texttt{--animate-anyone-window} (temporal context window, default 8 frames) and mask compositing modes.
+    \item \textbf{AnimateAnyone:} \texttt{--genai-backend animate-anyone} uses the Moore-AnimateAnyone architecture for appearance-driven motion synthesis. Requires \texttt{--animate-anyone-repo-dir} pointing to the AnimateAnyone repository and \texttt{--animate-anyone-model-variant} (e.g., ``original'', ``finetuned\_tennis''). Additional options include \texttt{--animate-anyone-window} (temporal window), \texttt{--genai-preroll-frames} (frames to delay GenAI until residual stabilizes), \texttt{--animate-anyone-transparent-threshold} (alpha threshold for black-background masking), \texttt{--animate-anyone-adaptive-threshold} (enable adaptive border masking), and \texttt{--animate-anyone-alpha-smoothing} (temporal smoothing factor for alpha masks).
+\end{itemize}
+A lightweight \texttt{MockCompositor} is available for testing and always produces the synthesis output without generative synthesis. The compositing mode (\texttt{--compositing-mask-mode}) can be \texttt{alpha-heuristic} (rough alpha extraction), \texttt{metadata-source-mask} (use transmitted masks), or \texttt{postgen-seg-client} (segment generated frames on client using \texttt{--postgen-segmenter-backend}: \texttt{yolo} or \texttt{heuristic}).
+
+\subsection{Runtime Configuration and Observability}
+The CLI in \texttt{src/main.py} exposes all tunable parameters through argument parsing with validation. Running with \texttt{--help} shows all options. Key command groups:
+\begin{itemize}[topsep=0pt,itemsep=0pt,leftmargin=*]
+    \item \textbf{Video input:} \texttt{--input} (path or auto-generated), \texttt{--num-frames} (frame limit).
+    \item \textbf{Execution:} \texttt{--execution-pool}, \texttt{--cpu-workers}, \texttt{--gpu-workers}.
+    \item \textbf{Encoder components:} All actor extractor, ball extractor, reference, and residual options listed above.
+    \item \textbf{GenAI:} \texttt{--enable-genai}, \texttt{--disable-genai}, \texttt{--genai-backend}, \texttt{--animate-anyone-*} family.
+    \item \textbf{Debugging:} \texttt{--no-summary-file} (suppress output), \texttt{--disable-debug-keyframes}.
+\end{itemize}
+Runtime output is captured in a JSON summary that logs payload sizes and compression ratios, making ablation studies straightforward: changing a single option (e.g., segmenter backend or GenAI strategy) and re-running automatically reports the bandwidth and quality impact.
+
+For development, the code emits debug artifacts (skeleton visualizations, flow maps, mask renderings) into a debug directory when \texttt{POINTSTREAM\_DEBUG\_ARTIFACT\_DIR} is set. The pipeline also restores working directory and environment variables after each run, ensuring that nested or repeated invocations remain isolated and repeatable.
 
 %\section{Acknowledgments}
 %The financial support of the Austrian Federal Ministry for Digital and Economic Affairs, the National Foundation for Research, Technology and Development, and the Christian Doppler Research Association, is gratefully acknowledged. Christian Doppler Laboratory ATHENA: https://athena.itec.aau.at/
