@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
+import threading
 from typing import Any
 
 import torch
@@ -20,6 +22,60 @@ from src.encoder.video_io import decode_video_to_tensor, probe_video_metadata
 from src.shared.schemas import EncodedChunkPayload, FrameState, ResidualPacket, VideoChunk
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import cpu_bound, gpu_bound
+
+
+class _StreamingActorBundle:
+    def __init__(self) -> None:
+        self._cond = threading.Condition()
+        self._frame_states: list[FrameState] = []
+        self._result: ActorExtractionResult | None = None
+        self._error: Exception | None = None
+        self._done = False
+
+    @property
+    def frame_states(self) -> list[FrameState]:
+        return self.finalize().frame_states
+
+    @property
+    def actor_packets(self) -> list[Any]:
+        return self.finalize().actor_packets
+
+    def append_state(self, state: FrameState) -> None:
+        with self._cond:
+            self._frame_states.append(state)
+            self._cond.notify_all()
+
+    def complete(self, result: ActorExtractionResult) -> None:
+        with self._cond:
+            self._result = result
+            self._done = True
+            self._cond.notify_all()
+
+    def fail(self, exc: Exception) -> None:
+        with self._cond:
+            self._error = exc
+            self._done = True
+            self._cond.notify_all()
+
+    def wait_for_frame_state(self, frame_idx: int) -> FrameState | None:
+        with self._cond:
+            while len(self._frame_states) <= frame_idx and not self._done and self._error is None:
+                self._cond.wait()
+            if self._error is not None:
+                raise self._error
+            if len(self._frame_states) > frame_idx:
+                return self._frame_states[frame_idx]
+            return None
+
+    def finalize(self) -> ActorExtractionResult:
+        with self._cond:
+            while not self._done and self._error is None:
+                self._cond.wait()
+            if self._error is not None:
+                raise self._error
+            if self._result is None:
+                return ActorExtractionResult(frame_states=list(self._frame_states), actor_packets=[])
+            return self._result
 
 
 class EncoderPipeline:
@@ -77,7 +133,7 @@ class EncoderPipeline:
             DAGNode(
                 name="actors",
                 func=select_actor_packets,
-                dependencies=("actor_bundle",),
+                dependencies=("actor_bundle", "ball"),
             )
         )
 
@@ -90,7 +146,7 @@ class EncoderPipeline:
             DAGNode(
                 name="frame_states",
                 func=select_frame_states,
-                dependencies=("actor_bundle",),
+                dependencies=("actor_bundle", "ball"),
             )
         )
 
@@ -98,7 +154,7 @@ class EncoderPipeline:
             return self._background_modeler.process(
                 chunk=deps["chunk"],
                 decoded_video_tensor=context.get("decoded_video_tensor"),
-                frame_states=deps["frame_states"],
+                frame_states=None,
             )
 
         setattr(
@@ -110,7 +166,7 @@ class EncoderPipeline:
             DAGNode(
                 name="panorama",
                 func=build_panorama_node,
-                dependencies=("chunk", "frame_states"),
+                dependencies=("chunk",),
             )
         )
         def build_actor_references_node(context, deps):
@@ -139,10 +195,17 @@ class EncoderPipeline:
             )
         )
         def build_ball_node(context, deps):
+            actor_bundle = deps["actor_bundle"]
+            if hasattr(self._ball_extractor, "process_shifted") and hasattr(actor_bundle, "wait_for_frame_state"):
+                return self._ball_extractor.process_shifted(
+                    chunk=deps["chunk"],
+                    panorama=deps["panorama"],
+                    actor_bundle=actor_bundle,
+                )
             return self._ball_extractor.process(
                 chunk=deps["chunk"],
                 panorama=deps["panorama"],
-                frame_states=deps["frame_states"],
+                frame_states=actor_bundle.frame_states,
             )
 
         setattr(
@@ -154,7 +217,7 @@ class EncoderPipeline:
             DAGNode(
                 name="ball",
                 func=build_ball_node,
-                dependencies=("chunk", "panorama", "frame_states"),
+                dependencies=("chunk", "panorama", "actor_bundle"),
             )
         )
         def build_residual_node(context, deps):
@@ -192,7 +255,28 @@ class EncoderPipeline:
         )
 
     @gpu_bound
-    def _process_actor_bundle(self, chunk: VideoChunk) -> ActorExtractionResult:
+    def _process_actor_bundle(self, chunk: VideoChunk) -> Any:
+        shifted_enabled = os.environ.get("POINTSTREAM_ENABLE_SHIFTED_BALL", "0").strip() == "1"
+        supports_streaming = hasattr(self._actor_extractor, "process_with_states_streaming")
+        supports_shifted_ball = hasattr(self._ball_extractor, "process_shifted")
+
+        if shifted_enabled and supports_streaming and supports_shifted_ball:
+            bundle = _StreamingActorBundle()
+
+            def _run_stream() -> None:
+                try:
+                    result = self._actor_extractor.process_with_states_streaming(
+                        chunk,
+                        on_frame_state=bundle.append_state,
+                    )
+                    bundle.complete(result)
+                except Exception as exc:  # pragma: no cover - guarded runtime path
+                    bundle.fail(exc)
+
+            thread = threading.Thread(target=_run_stream, name="pointstream-actor-stream", daemon=True)
+            thread.start()
+            return bundle
+
         if hasattr(self._actor_extractor, "process_with_states"):
             return self._actor_extractor.process_with_states(chunk)
         actor_packets = self._actor_extractor.process(chunk)

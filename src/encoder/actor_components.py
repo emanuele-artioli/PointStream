@@ -151,6 +151,10 @@ class BaseDetector(ABC):
     def track(self, frames_bgr: list[np.ndarray]) -> list[FrameState]:
         raise NotImplementedError
 
+    def iter_track(self, frames_bgr: list[np.ndarray]):
+        for state in self.track(frames_bgr):
+            yield state
+
 
 class Yolo26Detector(BaseDetector):
     def __init__(self, model_name: str = "yolo26n.pt", model: Any | None = None) -> None:
@@ -166,11 +170,10 @@ class Yolo26Detector(BaseDetector):
         except Exception as exc:
             raise RuntimeError(f"Failed to initialize detector model '{self.model_name}'") from exc
 
-    def track(self, frames_bgr: list[np.ndarray]) -> list[FrameState]:
+    def iter_track(self, frames_bgr: list[np.ndarray]):
         if not frames_bgr:
-            return []
+            return
 
-        states: list[FrameState] = []
         previous_state: FrameState | None = None
 
         for frame_idx, frame in enumerate(frames_bgr):
@@ -181,10 +184,11 @@ class Yolo26Detector(BaseDetector):
                 state=state,
                 previous_state=previous_state,
             )
-            states.append(repaired)
             previous_state = repaired
+            yield repaired
 
-        return states
+    def track(self, frames_bgr: list[np.ndarray]) -> list[FrameState]:
+        return list(self.iter_track(frames_bgr))
 
     def _detect_frame(self, frame_bgr: np.ndarray, frame_idx: int) -> list[SceneActor]:
         detections: list[SceneActor] = []
@@ -1349,11 +1353,8 @@ class PipelineBuilder:
         self.pose_estimator = pose_estimator
         self.payload_encoder = payload_encoder
 
-    def run(self, chunk: VideoChunk, frames_bgr: list[np.ndarray]) -> tuple[list[FrameState], list[ActorPacket]]:
-        frame_states = self.detector.track(frames_bgr)
-
-        filtered_states: list[FrameState] = []
-        for state in frame_states:
+    def iter_filtered_states(self, chunk: VideoChunk, frames_bgr: list[np.ndarray]):
+        for state in self.detector.iter_track(frames_bgr):
             if state.frame_id >= len(frames_bgr):
                 continue
 
@@ -1367,7 +1368,10 @@ class PipelineBuilder:
                 with_pose = self.pose_estimator.estimate(frame, segmented)
                 updated_actors.append(with_pose)
 
-            filtered_states.append(FrameState(frame_id=state.frame_id, actors=updated_actors))
+            yield FrameState(frame_id=state.frame_id, actors=updated_actors)
+
+    def run(self, chunk: VideoChunk, frames_bgr: list[np.ndarray]) -> tuple[list[FrameState], list[ActorPacket]]:
+        filtered_states = list(self.iter_filtered_states(chunk=chunk, frames_bgr=frames_bgr))
 
         packets = self.payload_encoder.encode(chunk=chunk, frame_states=filtered_states)
         return filtered_states, packets

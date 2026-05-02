@@ -401,6 +401,7 @@ def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
         os.environ["POINTSTREAM_POSTGEN_SEGMENTER_BACKEND"] = str(args.postgen_segmenter_backend)
     if args.metadata_mask_codec is not None:
         os.environ["POINTSTREAM_METADATA_MASK_CODEC"] = str(args.metadata_mask_codec)
+    os.environ["POINTSTREAM_ENABLE_SHIFTED_BALL"] = "1" if bool(args.enable_shifted_ball) else "0"
 
 
 def _build_cli_parser() -> argparse.ArgumentParser:
@@ -497,6 +498,11 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         "--disable-debug-keyframes",
         action="store_true",
         help="Disable actor keyframe skeleton debug image generation.",
+    )
+    parser.add_argument(
+        "--enable-shifted-ball",
+        action="store_true",
+        help="Stream actor frame states so ball extraction can start one frame earlier.",
     )
     parser.add_argument(
         "--ball-extractor",

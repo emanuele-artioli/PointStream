@@ -147,6 +147,30 @@ class ActorExtractor:
             )
         return ActorExtractionResult(frame_states=frame_states, actor_packets=packets)
 
+    @gpu_bound
+    def process_with_states_streaming(
+        self,
+        chunk: VideoChunk,
+        on_frame_state: Any | None = None,
+    ) -> ActorExtractionResult:
+        frames_bgr = self._load_frames(chunk)
+        filtered_states: list[FrameState] = []
+        for state in self._pipeline.iter_filtered_states(chunk=chunk, frames_bgr=frames_bgr):
+            filtered_states.append(state)
+            if on_frame_state is not None:
+                on_frame_state(state)
+
+        packets = self._pipeline.payload_encoder.encode(chunk=chunk, frame_states=filtered_states)
+        if self._render_debug_keyframes:
+            self._pipeline.render_debug_keyframes(
+                chunk=chunk,
+                frames_bgr=frames_bgr,
+                frame_states=filtered_states,
+                actor_packets=packets,
+                out_dir=self._resolve_debug_keyframes_dir(),
+            )
+        return ActorExtractionResult(frame_states=filtered_states, actor_packets=packets)
+
     def _resolve_debug_keyframes_dir(self) -> Path:
         override = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")
         if override:

@@ -20,7 +20,7 @@ from src.shared.torch_dtype import is_cuda_device_usable, resolve_torch_dtype_fo
 class _RuntimeConfig:
     width: int = 512
     height: int = 784
-    inference_steps: int = 30
+    inference_steps: int = 3
     guidance_scale: float = 3.5
     model_variant: str = "finetuned_tennis"
 
@@ -37,7 +37,7 @@ def _runtime_config() -> _RuntimeConfig:
     return _RuntimeConfig(
         width=int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WIDTH", "512")),
         height=int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_HEIGHT", "512")),
-        inference_steps=int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_STEPS", "30")),
+        inference_steps=int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_STEPS", "3")),
         guidance_scale=float(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_CFG", "3.5")),
         model_variant=os.environ.get("POINTSTREAM_ANIMATE_ANYONE_MODEL_VARIANT", "finetuned_tennis"),
     )

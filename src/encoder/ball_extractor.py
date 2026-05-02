@@ -206,6 +206,159 @@ class BallExtractor:
             states=ball_states,
         )
 
+    @gpu_bound
+    def process_shifted(
+        self,
+        chunk: VideoChunk,
+        panorama: PanoramaPacket,
+        actor_bundle: Any,
+    ) -> BallPacket:
+        frame_count = int(chunk.num_frames)
+        if frame_count <= 0:
+            raise ValueError("BallExtractor received zero configured frames")
+
+        detection_height, detection_width, scale_x, scale_y = self._resolve_detection_geometry(
+            frame_width=int(chunk.width),
+            frame_height=int(chunk.height),
+        )
+
+        panorama_tensor, inverse_h, kornia_module = self._prepare_panorama_warp(
+            panorama=panorama,
+            frame_count=frame_count,
+        )
+
+        ball_states: list[BallState] = []
+        previous_visible = False
+        previous_x = 0.0
+        previous_y = 0.0
+
+        frame_iterator = self._iter_source_frames(chunk)
+        for frame_idx, original_frame_np in enumerate(frame_iterator):
+            if frame_idx >= frame_count:
+                break
+
+            # Shifted dependency: frame t consumes actor state from t-1.
+            if frame_idx <= 0:
+                frame_state = FrameState(frame_id=frame_idx, actors=[])
+            else:
+                previous_state = actor_bundle.wait_for_frame_state(frame_idx - 1)
+                frame_state = previous_state if previous_state is not None else FrameState(frame_id=frame_idx, actors=[])
+
+            original_frame = self._prepare_detection_frame(
+                frame_np=original_frame_np,
+                detection_height=detection_height,
+                detection_width=detection_width,
+            )
+            background_frame = self._warp_panorama_frame(
+                kornia_module=kornia_module,
+                panorama_tensor=panorama_tensor,
+                inverse_h=inverse_h[frame_idx],
+                frame_height=detection_height,
+                frame_width=detection_width,
+                output_buffer=self._ensure_background_buffer(
+                    frame_height=detection_height,
+                    frame_width=detection_width,
+                ),
+            )
+
+            raw_diff = torch.abs(original_frame - background_frame)
+            actor_mask = self._build_actor_mask(
+                frame_state=frame_state,
+                frame_height=detection_height,
+                frame_width=detection_width,
+                scale_x=scale_x,
+                scale_y=scale_y,
+            )
+            masked_diff = raw_diff * (1.0 - actor_mask.unsqueeze(0))
+
+            grayscale = masked_diff.mean(dim=0)
+            binary = (grayscale > self._difference_threshold).to(torch.uint8)
+            roi = self._compute_roi_from_frame_state(
+                frame_state=frame_state,
+                frame_height=detection_height,
+                frame_width=detection_width,
+                scale_x=scale_x,
+                scale_y=scale_y,
+            )
+            if roi is not None:
+                x1_r, y1_r, x2_r, y2_r = roi
+                mask_outside = torch.ones_like(binary, dtype=torch.uint8)
+                mask_outside[y1_r:y2_r, x1_r:x2_r] = 0
+                binary = (binary * (1 - mask_outside)).to(torch.uint8)
+            ball_x, ball_y, is_visible = self._largest_blob_center(binary)
+
+            if is_visible:
+                ball_x = float(ball_x) / float(scale_x)
+                ball_y = float(ball_y) / float(scale_y)
+
+            if is_visible:
+                if previous_visible:
+                    velocity_x = ball_x - previous_x
+                    velocity_y = ball_y - previous_y
+                else:
+                    velocity_x = 0.0
+                    velocity_y = 0.0
+                previous_x = ball_x
+                previous_y = ball_y
+            else:
+                ball_x = previous_x
+                ball_y = previous_y
+                velocity_x = 0.0
+                velocity_y = 0.0
+
+            previous_visible = is_visible
+            state = BallState(
+                frame_id=chunk.start_frame_id + frame_idx,
+                ball_x=float(ball_x),
+                ball_y=float(ball_y),
+                velocity_x=float(velocity_x),
+                velocity_y=float(velocity_y),
+                is_visible=bool(is_visible),
+            )
+            ball_states.append(state)
+
+        if not ball_states:
+            raise ValueError("BallExtractor decoded zero source frames")
+
+        trajectory = torch.zeros((1, len(ball_states), 4), dtype=torch.float32)
+        events: list[SemanticEvent] = []
+        for idx, state in enumerate(ball_states):
+            trajectory[0, idx] = torch.tensor(
+                [state.ball_x, state.ball_y, state.velocity_x, state.velocity_y],
+                dtype=torch.float32,
+            )
+            if state.is_visible:
+                events.append(
+                    KeyframeEvent(
+                        frame_id=state.frame_id,
+                        object_id="ball_0",
+                        object_class=ObjectClass.BALL,
+                        coordinates=[state.ball_x, state.ball_y, state.velocity_x, state.velocity_y],
+                    )
+                )
+            else:
+                events.append(
+                    InterpolateCommandEvent(
+                        frame_id=state.frame_id,
+                        object_id="ball_0",
+                        object_class=ObjectClass.BALL,
+                        target_frame_id=state.frame_id,
+                        method="linear",
+                    )
+                )
+
+        return BallPacket(
+            chunk_id=chunk.chunk_id,
+            object_id="ball_0",
+            trajectory_spec=TensorSpec(
+                name="ball_trajectory",
+                shape=list(trajectory.shape),
+                dtype=str(trajectory.dtype),
+            ),
+            events=events,
+            states=ball_states,
+        )
+
     def _iter_source_frames(self, chunk: VideoChunk) -> Iterator[np.ndarray]:
         frame_iter = iter_video_frames_ffmpeg(
             chunk.source_uri,
