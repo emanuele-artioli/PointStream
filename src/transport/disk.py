@@ -8,7 +8,7 @@ import msgpack
 import numpy as np
 
 from src.shared.interfaces import BaseTransport
-from src.shared.schemas import EncodedChunkPayload, SceneActorReference
+from src.shared.schemas import EncodedChunkPayload, ResidualMode, SceneActorReference
 from src.shared.tags import cpu_bound
 from src.transport.panorama_encoder import BasePanoramaEncoder, build_panorama_encoder
 
@@ -35,13 +35,21 @@ class DiskTransport(BaseTransport):
         residual_path = chunk_dir / "residual.mp4"
         panorama_path = self._materialize_panorama(payload=payload, chunk_dir=chunk_dir)
 
-        source_residual = Path(payload.residual.residual_video_uri)
-        if not source_residual.exists() or not source_residual.is_file():
-            raise FileNotFoundError(
-                f"Residual stream not found for chunk '{payload.chunk.chunk_id}': {source_residual}"
-            )
-        if source_residual.resolve() != residual_path.resolve():
-            shutil.copy2(source_residual, residual_path)
+        source_residual_uri = str(payload.residual.residual_video_uri or "").strip()
+        residual_mode = payload.residual.mode
+        if isinstance(residual_mode, str):
+            residual_mode = ResidualMode(residual_mode)
+
+        materialized_residual_uri = ""
+        if residual_mode != ResidualMode.NONE and source_residual_uri:
+            source_residual = Path(source_residual_uri)
+            if not source_residual.exists() or not source_residual.is_file():
+                raise FileNotFoundError(
+                    f"Residual stream not found for chunk '{payload.chunk.chunk_id}': {source_residual}"
+                )
+            if source_residual.resolve() != residual_path.resolve():
+                shutil.copy2(source_residual, residual_path)
+            materialized_residual_uri = str(residual_path)
 
         materialized_references = self._materialize_actor_references(payload=payload, chunk_dir=chunk_dir)
 
@@ -55,7 +63,7 @@ class DiskTransport(BaseTransport):
                 ),
                 "residual": payload.residual.model_copy(
                     update={
-                        "residual_video_uri": str(residual_path),
+                        "residual_video_uri": materialized_residual_uri,
                     }
                 ),
                 "actor_references": materialized_references,

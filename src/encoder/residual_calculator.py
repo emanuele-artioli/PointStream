@@ -15,7 +15,7 @@ import torch.nn.functional as F
 from src.decoder.genai_compositor import DiffusersCompositor
 from src.encoder.video_io import encode_video_frames_ffmpeg, iter_video_frames_ffmpeg, probe_video_metadata
 from src.shared.mask_codec import decode_binary_mask
-from src.shared.schemas import ActorPacket, EncodedChunkPayload, FrameState, ResidualPacket, SceneActor, VideoChunk
+from src.shared.schemas import ActorPacket, EncodedChunkPayload, FrameState, ResidualPacket, ResidualMode, SceneActor, VideoChunk
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import gpu_bound
 from src.shared.track_id import scene_track_id_to_int
@@ -132,13 +132,14 @@ class UniformImportanceMapper(BaseImportanceMapper):
 
 
 class ResidualCalculator:
-    """Server-side weighted residual calculator."""
+    """Server-side weighted residual calculator with support for multiple residual modes."""
 
     def __init__(
         self,
         synthesis_engine: SynthesisEngine | None = None,
         importance_mapper: BaseImportanceMapper | None = None,
         device: str | torch.device | None = None,
+        residual_mode: ResidualMode = ResidualMode.FULL_VIDEO,
     ) -> None:
         self._synthesis_engine = synthesis_engine or SynthesisEngine()
         if device is None:
@@ -148,6 +149,7 @@ class ResidualCalculator:
         if self._device.type == "cuda" and not is_cuda_device_usable(self._device):
             self._device = torch.device("cpu")
         self._importance_mapper = importance_mapper or BinaryActorImportanceMapper()
+        self._residual_mode = residual_mode
 
     @gpu_bound
     def process(
@@ -157,6 +159,35 @@ class ResidualCalculator:
         frame_states: list[FrameState],
         debug_output_path: str | Path | None = None,
     ) -> ResidualPacket:
+        """
+        Process residuals based on the configured mode.
+        
+        - NONE: Return placeholder without computing residuals (server skips GenAI)
+        - PLAYERS_ONLY: Masked residuals for players only (server generates players with same seed)
+        - FULL_VIDEO: Whole-video residuals after full client-side reconstruction (server runs full pipeline)
+        """
+        if self._residual_mode == ResidualMode.NONE:
+            return ResidualPacket(
+                chunk_id=chunk.chunk_id,
+                codec="none",
+                residual_video_uri="",
+                mode=ResidualMode.NONE,
+            )
+        elif self._residual_mode == ResidualMode.PLAYERS_ONLY:
+            return self._process_players_only(chunk, payload, frame_states, debug_output_path)
+        elif self._residual_mode == ResidualMode.FULL_VIDEO:
+            return self._process_full_video(chunk, payload, frame_states, debug_output_path)
+        else:
+            raise ValueError(f"Unknown residual mode: {self._residual_mode}")
+
+    def _process_players_only(
+        self,
+        chunk: VideoChunk,
+        payload: EncodedChunkPayload,
+        frame_states: list[FrameState],
+        debug_output_path: str | Path | None,
+    ) -> ResidualPacket:
+        """Calculate residuals for players only (masked prediction residuals)."""
         predicted_frames = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False).frames_bgr
         if self._is_genai_enabled():
             predicted_frames = self._render_server_genai_prediction(payload=payload, frame_tensor=predicted_frames)
@@ -232,6 +263,90 @@ class ResidualCalculator:
             chunk_id=chunk.chunk_id,
             codec="libx265",
             residual_video_uri=str(output_path),
+            mode=ResidualMode.PLAYERS_ONLY,
+        )
+
+    def _process_full_video(
+        self,
+        chunk: VideoChunk,
+        payload: EncodedChunkPayload,
+        frame_states: list[FrameState],
+        debug_output_path: str | Path | None,
+    ) -> ResidualPacket:
+        """Calculate residuals for the entire video after full reconstruction pipeline."""
+        # Run full client-side reconstruction: panorama warp + GenAI + overlay
+        predicted_frames = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False).frames_bgr
+
+        # Apply GenAI on the server side (always for FULL_VIDEO mode)
+        genai_enabled = self._is_genai_enabled()
+        if genai_enabled:
+            predicted_frames = self._render_server_genai_prediction(payload=payload, frame_tensor=predicted_frames)
+
+        source_metadata = probe_video_metadata(chunk.source_uri)
+        available_source_frames = max(0, int(source_metadata.num_frames) - int(chunk.start_frame_id))
+
+        valid_frames = min(
+            int(chunk.num_frames),
+            int(predicted_frames.shape[0]),
+            int(available_source_frames),
+        )
+        if valid_frames <= 0:
+            raise ValueError("ResidualCalculator received zero valid frames")
+
+        output_path = Path(debug_output_path) if debug_output_path is not None else self._default_residual_path(chunk)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        source_iter = iter_video_frames_ffmpeg(
+            chunk.source_uri,
+            width=int(chunk.width),
+            height=int(chunk.height),
+        )
+
+        for _ in range(int(chunk.start_frame_id)):
+            try:
+                next(source_iter)
+            except StopIteration:
+                raise ValueError("ResidualCalculator could not seek to chunk start frame in source video")
+
+        def _iter_encoded_frames() -> Iterator[np.ndarray]:
+            for frame_idx in range(valid_frames):
+                try:
+                    original_np = next(source_iter)
+                except StopIteration:
+                    break
+
+                # For FULL_VIDEO mode, use uniform importance to capture all residuals
+                original_tensor = (
+                    torch.from_numpy(np.asarray(original_np, dtype=np.uint8))
+                    .permute(2, 0, 1)
+                    .to(self._device, dtype=torch.float32)
+                )
+                predicted_tensor = predicted_frames[frame_idx].to(self._device, dtype=torch.float32)
+
+                # Shape: [Channels, Height, Width]
+                # For FULL_VIDEO, we include all differences; no masking applied
+                raw_diff = original_tensor - predicted_tensor
+                encoded_residual = torch.clamp(raw_diff + 128.0, 0.0, 255.0).to(torch.uint8)
+
+                yield np.asarray(encoded_residual.permute(1, 2, 0).contiguous().cpu().numpy(), dtype=np.uint8)
+
+        encode_video_frames_ffmpeg(
+            output_path=output_path,
+            frames_bgr=_iter_encoded_frames(),
+            fps=float(chunk.fps),
+            width=int(chunk.width),
+            height=int(chunk.height),
+            codec="libx265",
+            pix_fmt="yuv420p",
+            crf=28,
+            preset="medium",
+        )
+
+        return ResidualPacket(
+            chunk_id=chunk.chunk_id,
+            codec="libx265",
+            residual_video_uri=str(output_path),
+            mode=ResidualMode.FULL_VIDEO,
         )
 
     def _is_genai_enabled(self) -> bool:
@@ -373,10 +488,7 @@ class ResidualCalculator:
                 int(frame_mask.bbox[2]),
                 int(frame_mask.bbox[3]),
             )
-            decoded[int(frame_mask.frame_id)] = _DecodedActorMaskFrame(
-                bbox=bbox,
-                mask_gray=np.asarray(mask_gray, dtype=np.uint8),
-            )
+            decoded[int(frame_mask.frame_id)] = _DecodedActorMaskFrame(bbox=bbox, mask_gray=mask_gray)
         return decoded
 
     def _build_temporal_pose_condition(
@@ -385,24 +497,23 @@ class ResidualCalculator:
         frame_idx: int,
         temporal_window: int,
     ) -> torch.Tensor:
-        start_idx = max(0, int(frame_idx) - int(temporal_window) + 1)
-        sequence = dense_pose_tensor[start_idx : int(frame_idx) + 1]
-        if int(sequence.shape[0]) >= int(temporal_window):
-            return sequence
+        """Build temporal pose window for temporal GenAI compositors."""
+        window_half = temporal_window // 2
+        start_idx = max(0, frame_idx - window_half)
+        end_idx = min(int(dense_pose_tensor.shape[0]), frame_idx + window_half + 1)
 
-        if int(sequence.shape[0]) == 0:
-            first_pose = dense_pose_tensor[0].unsqueeze(0)
-            return first_pose.repeat(int(temporal_window), 1, 1)
+        poses: list[torch.Tensor] = []
+        for idx in range(start_idx, end_idx):
+            if idx < int(dense_pose_tensor.shape[0]):
+                poses.append(dense_pose_tensor[idx])
 
-        pad_count = int(temporal_window) - int(sequence.shape[0])
-        first_pose = sequence[0].unsqueeze(0).repeat(pad_count, 1, 1)
-        return torch.cat([first_pose, sequence], dim=0)
+        if not poses:
+            return dense_pose_tensor[frame_idx]
+
+        # Keep temporal conditioning as [Frames, 18, 3]; concatenation would flatten to [Frames*18, 3].
+        return torch.stack(poses, dim=0)
 
     def _default_residual_path(self, chunk: VideoChunk) -> Path:
-        override = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")
-        if override:
-            return Path(override) / f"residual_{chunk.chunk_id}.mp4"
-
         project_root = Path(__file__).resolve().parents[2]
         timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_%f")
         return project_root / "outputs" / timestamp / "debug" / f"residual_{chunk.chunk_id}.mp4"

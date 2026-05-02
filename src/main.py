@@ -27,6 +27,7 @@ from src.encoder.residual_calculator import ResidualCalculator
 from src.encoder.residual_calculator import UniformImportanceMapper
 from src.encoder.video_io import encode_video_frames_ffmpeg, probe_video_metadata
 from src.shared.schemas import VideoChunk
+from src.shared.schemas import ResidualMode
 from src.shared.synthesis_engine import SynthesisEngine
 from src.transport.disk import DiskTransport
 
@@ -184,6 +185,7 @@ def run_mock_pipeline(
         "num_rigid_object_packets": len(received_payload.rigid_objects),
         "ball_object_id": received_payload.ball.object_id,
         "residual_uri": received_payload.residual.residual_video_uri,
+            "residual_mode": received_payload.residual.mode,
         "decoded_uri": decoded.output_uri,
         "transport_backend": normalized_transport,
         "source_size_bytes": source_size_bytes,
@@ -330,7 +332,23 @@ def _build_importance_mapper(name: str) -> BaseImportanceMapper:
 
 
 def _build_residual_calculator(seed: int, importance_mapper: str) -> ResidualCalculator | None:
-    uses_default = int(seed) == 1337 and importance_mapper.strip().lower() == "binary"
+    return _build_residual_calculator_with_mode(
+        seed=seed,
+        importance_mapper=importance_mapper,
+        residual_mode=ResidualMode.FULL_VIDEO,
+    )
+
+
+def _build_residual_calculator_with_mode(
+    seed: int,
+    importance_mapper: str,
+    residual_mode: ResidualMode = ResidualMode.FULL_VIDEO,
+) -> ResidualCalculator | None:
+    uses_default = (
+        int(seed) == 1337
+        and importance_mapper.strip().lower() == "binary"
+        and residual_mode == ResidualMode.FULL_VIDEO
+    )
     if uses_default:
         return None
 
@@ -338,11 +356,14 @@ def _build_residual_calculator(seed: int, importance_mapper: str) -> ResidualCal
     return ResidualCalculator(
         synthesis_engine=SynthesisEngine(seed=int(seed)),
         importance_mapper=mapper,
+        residual_mode=residual_mode,
     )
 
 
 def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
     enable_genai = bool(args.enable_genai)
+    residual_mode = getattr(args, "residual_mode", "full_video").strip().lower()
+
     if bool(args.genai_backend) and str(args.genai_backend).strip().lower() == "animate-anyone":
         enable_genai = True
     if any(
@@ -362,6 +383,14 @@ def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
         enable_genai = True
     if bool(args.disable_genai):
         enable_genai = False
+
+    # Residual mode has final precedence over all other toggles.
+    # - none: server skips GenAI
+    # - players_only/full_video: server computes GenAI predictions for deterministic residuals
+    if residual_mode == "none":
+        enable_genai = False
+    elif residual_mode in {"players_only", "full_video"}:
+        enable_genai = True
 
     os.environ["POINTSTREAM_ENABLE_GENAI"] = "1" if enable_genai else "0"
 
@@ -595,6 +624,17 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         choices=("binary", "uniform"),
         default="binary",
         help="Residual weighting strategy.",
+    )
+    parser.add_argument(
+        "--residual-mode",
+        choices=("none", "players_only", "full_video"),
+        default="full_video",
+        help=(
+            "Residual calculation mode: "
+            "'none' (no residuals, server skips GenAI), "
+            "'players_only' (residuals for players only), "
+            "'full_video' (whole-video residuals after full reconstruction, default)."
+        ),
     )
     parser.add_argument(
         "--seed",
@@ -837,9 +877,16 @@ def run_cli(argv: list[str] | None = None) -> int:
         jpeg_quality=int(args.reference_jpeg_quality),
         padding_ratio=float(args.reference_padding_ratio),
     )
-    residual_calculator = _build_residual_calculator(
+    residual_mode_str = str(args.residual_mode).strip().lower()
+    try:
+        residual_mode = ResidualMode(residual_mode_str)
+    except ValueError:
+        residual_mode = ResidualMode.FULL_VIDEO
+
+    residual_calculator = _build_residual_calculator_with_mode(
         seed=int(args.seed),
         importance_mapper=str(args.importance_mapper),
+        residual_mode=residual_mode,
     )
 
     summary = run_mock_pipeline(

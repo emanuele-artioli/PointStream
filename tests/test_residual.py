@@ -10,6 +10,7 @@ from src.decoder.mock_renderer import DecoderRenderer
 from src.encoder.residual_calculator import BinaryActorImportanceMapper, ResidualCalculator
 from src.encoder.video_io import iter_video_frames_ffmpeg, probe_video_metadata
 from src.transport.disk import DiskTransport
+from src.shared.schemas import ResidualMode
 
 
 pytestmark = [pytest.mark.integration, pytest.mark.slow]
@@ -29,7 +30,10 @@ def test_weighted_residual_debug_video_has_sparse_actor_regions(
         max_frames=10,
     )
 
-    calculator = ResidualCalculator(importance_mapper=BinaryActorImportanceMapper())
+    calculator = ResidualCalculator(
+        importance_mapper=BinaryActorImportanceMapper(),
+        residual_mode=ResidualMode.PLAYERS_ONLY,
+    )
     residual_packet = calculator.process(
         chunk=payload.chunk,
         payload=payload,

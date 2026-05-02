@@ -19,6 +19,14 @@ class ObjectClass(str, Enum):
     RACKET = "racket"
     BALL = "ball"
     BACKGROUND = "background"
+class ResidualMode(str, Enum):
+    """Strategy for residual calculation and server-side computation."""
+    
+    NONE = "none"  # No residuals; server skips GenAI
+    PLAYERS_ONLY = "players_only"  # Player-only residuals from masked prediction
+    FULL_VIDEO = "full_video"  # Whole-video residuals after full reconstruction
+
+
 
 
 class VideoChunk(BaseModel):
@@ -149,6 +157,7 @@ class ResidualPacket(BaseModel):
     chunk_id: str
     codec: str = "hevc-placeholder"
     residual_video_uri: str
+    mode: ResidualMode = ResidualMode.FULL_VIDEO
 
 
 class EncodedChunkPayload(BaseModel):
