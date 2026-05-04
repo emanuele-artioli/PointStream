@@ -3,13 +3,20 @@ from __future__ import annotations
 import argparse
 from datetime import datetime
 import json
+import logging
 import os
 from pathlib import Path
+import sys
 from time import perf_counter
 from typing import Any
 
 import cv2
 import numpy as np
+
+try:
+    import yaml
+except ImportError:  # pragma: no cover - exercised when optional dependency is missing.
+    yaml = None
 
 from src.encoder.ball_extractor import BallExtractor
 from src.encoder.segmentation_ball_extractor import SegmentationBallExtractor
@@ -394,31 +401,11 @@ def _build_residual_calculator_with_mode(
 def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
     if args.ffmpeg_codec is not None:
         os.environ["POINTSTREAM_FFMPEG_CODEC"] = str(args.ffmpeg_codec)
-    enable_genai = bool(args.enable_genai)
+    enable_genai = bool(args.genai_backend)
     residual_mode = getattr(args, "residual_mode", "full_video").strip().lower()
 
-    if bool(args.genai_backend) and str(args.genai_backend).strip().lower() == "animate-anyone":
-        enable_genai = True
-    if any(
-        value is not None
-        for value in (
-            args.animate_anyone_repo_dir,
-            args.animate_anyone_model_variant,
-            args.animate_anyone_model_dir,
-            args.animate_anyone_window,
-            args.genai_preroll_frames,
-            args.animate_anyone_transparent_threshold,
-            args.genai_resize_mode,
-            args.animate_anyone_adaptive_threshold,
-            args.animate_anyone_alpha_smoothing,
-        )
-    ):
-        enable_genai = True
-    if bool(args.disable_genai):
-        enable_genai = False
-
     # Residual mode 'none' always disables GenAI. For other modes, keep GenAI
-    # opt-in via explicit flags/backend/knobs to preserve lightweight defaults.
+    # opt-in via backend selection to preserve lightweight defaults.
     if residual_mode == "none":
         enable_genai = False
 
@@ -428,8 +415,6 @@ def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
         os.environ["POINTSTREAM_GENAI_BACKEND"] = str(args.genai_backend)
     if args.animate_anyone_repo_dir is not None:
         os.environ["POINTSTREAM_ANIMATE_ANYONE_REPO_DIR"] = str(Path(args.animate_anyone_repo_dir).expanduser())
-    if args.animate_anyone_model_variant is not None:
-        os.environ["POINTSTREAM_ANIMATE_ANYONE_MODEL_VARIANT"] = str(args.animate_anyone_model_variant)
     if args.animate_anyone_model_dir is not None:
         os.environ["POINTSTREAM_ANIMATE_ANYONE_MODEL_DIR"] = str(Path(args.animate_anyone_model_dir).expanduser())
     if args.animate_anyone_window is not None:
@@ -486,11 +471,64 @@ def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
         os.environ["POINTSTREAM_ALLOW_AUTO_MODEL_DOWNLOAD"] = "1"
     if args.postgen_segmenter_model is not None:
         os.environ["POINTSTREAM_POSTGEN_SEGMENTER_MODEL"] = str(args.postgen_segmenter_model)
-    debug_enabled = bool(getattr(args, "enable_debug_artifacts", False)) and not bool(
-        getattr(args, "disable_debug_artifacts", False)
-    )
+    debug_enabled = bool(getattr(args, "debug", False))
     os.environ["POINTSTREAM_DISABLE_DEBUG_ARTIFACTS"] = "0" if debug_enabled else "1"
+    os.environ["POINTSTREAM_LOG_LEVEL"] = str(getattr(args, "log_level", "info")).strip().lower()
     os.environ["POINTSTREAM_ENABLE_SHIFTED_BALL"] = "1" if bool(args.enable_shifted_ball) else "0"
+
+
+def _load_config_overrides(config_path: str | Path) -> dict[str, Any]:
+    path = Path(config_path).expanduser().resolve()
+    if not path.exists() or not path.is_file():
+        raise FileNotFoundError(f"Config file does not exist: {path}")
+
+    suffix = path.suffix.strip().lower()
+    raw_text = path.read_text(encoding="utf-8")
+    if suffix == ".json":
+        payload = json.loads(raw_text)
+    elif suffix in {".yaml", ".yml"}:
+        if yaml is None:
+            raise RuntimeError("YAML config requires PyYAML. Install dependency: pyyaml")
+        payload = yaml.safe_load(raw_text)
+    else:
+        raise ValueError("--config supports only .json, .yaml, and .yml files")
+
+    if payload is None:
+        return {}
+    if not isinstance(payload, dict):
+        raise ValueError("Config root must be a mapping/object")
+
+    normalized = {
+        str(key).strip().replace("-", "_"): value
+        for key, value in payload.items()
+    }
+    if "input" in normalized and "source_uri" not in normalized:
+        normalized["source_uri"] = normalized.pop("input")
+    return normalized
+
+
+def _detect_auto_worker_counts() -> tuple[int, int]:
+    cpu_workers = max(1, int(os.cpu_count() or 1))
+    visible_devices = str(os.environ.get("CUDA_VISIBLE_DEVICES", "")).strip()
+    if visible_devices and visible_devices not in {"-1", "none"}:
+        gpu_workers = max(1, len([tok for tok in visible_devices.split(",") if tok.strip()]))
+    else:
+        gpu_workers = 1
+    return cpu_workers, gpu_workers
+
+
+def _resolve_worker_counts(args: argparse.Namespace) -> tuple[int, int]:
+    auto_cpu, auto_gpu = _detect_auto_worker_counts()
+
+    cpu_workers_arg = getattr(args, "cpu_workers", None)
+    gpu_workers_arg = getattr(args, "gpu_workers", None)
+    auto_requested = cpu_workers_arg is None or gpu_workers_arg is None
+    if auto_requested:
+        cpu_workers = auto_cpu if cpu_workers_arg is None else int(cpu_workers_arg)
+        gpu_workers = auto_gpu if gpu_workers_arg is None else int(gpu_workers_arg)
+        return cpu_workers, gpu_workers
+
+    return int(cpu_workers_arg), int(gpu_workers_arg)
 
 
 def _build_cli_parser() -> argparse.ArgumentParser:
@@ -499,6 +537,12 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "Run PointStream on one input video chunk. Runtime artifacts are always written under "
             "outputs/<timestamp>/ in the project root."
         ),
+    )
+    parser.add_argument(
+        "--config",
+        type=str,
+        default=None,
+        help="Path to JSON or YAML file with CLI defaults.",
     )
     parser.add_argument(
         "--input",
@@ -513,9 +557,10 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         help="Optional maximum number of frames to process from the input video.",
     )
     parser.add_argument(
-        "--no-summary-file",
+        "--summary-file",
         action="store_true",
-        help="Do not write a summary JSON file in outputs/<timestamp>; print summary to stdout only.",
+        default=True,
+        help="Write a summary JSON file in outputs/<timestamp> (enabled by default).",
     )
     parser.add_argument(
         "--ffmpeg-codec",
@@ -525,6 +570,19 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "FFmpeg video encoder library used for all video outputs (decoded video, residuals, "
             "debug/mock clips). Default: libsvtav1."
         ),
+    )
+    parser.add_argument(
+        "--log-level",
+        choices=("debug", "info", "warning", "error"),
+        default="info",
+        help="Runtime log verbosity level.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        "--validate-only",
+        dest="dry_run",
+        action="store_true",
+        help="Validate arguments and dependencies only; skip pipeline execution.",
     )
     parser.add_argument(
         "--transport",
@@ -541,14 +599,14 @@ def _build_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--cpu-workers",
         type=int,
-        default=1,
-        help="CPU worker count for tagged execution pool.",
+        default=None,
+        help="CPU worker count for tagged execution pool. If omitted, auto-detected.",
     )
     parser.add_argument(
         "--gpu-workers",
         type=int,
-        default=1,
-        help="GPU worker count for tagged execution pool.",
+        default=None,
+        help="GPU worker count for tagged execution pool. If omitted, auto-detected.",
     )
     parser.add_argument(
         "--actor-extractor",
@@ -597,16 +655,20 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Disable actor keyframe skeleton debug image generation.",
     )
-    parser.add_argument(
-        "--enable-debug-artifacts",
+    debug_group = parser.add_mutually_exclusive_group()
+    debug_group.add_argument(
+        "--debug",
+        dest="debug",
         action="store_true",
-        help="Enable optional debug artifacts (disabled by default).",
+        help="Enable optional debug artifacts.",
     )
-    parser.add_argument(
-        "--disable-debug-artifacts",
-        action="store_true",
-        help="Force-disable optional debug artifacts.",
+    debug_group.add_argument(
+        "--no-debug",
+        dest="debug",
+        action="store_false",
+        help="Disable optional debug artifacts.",
     )
+    parser.set_defaults(debug=False)
     parser.add_argument(
         "--enable-shifted-ball",
         action="store_true",
@@ -731,9 +793,15 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         help="Explicit model file for postgen segmenter backend.",
     )
     parser.add_argument(
-        "--evaluate-after-run",
+        "--evaluation-mode",
+        choices=("none", "psnr"),
+        default="none",
+        help="Post-run evaluation preset. 'psnr' computes framewise PSNR metrics.",
+    )
+    parser.add_argument(
+        "--skip-eval",
         action="store_true",
-        help="Run post-pipeline evaluation after the main pipeline completes.",
+        help="Force-disable post-run evaluation regardless of evaluation-mode.",
     )
     parser.add_argument(
         "--evaluation-max-frames",
@@ -742,32 +810,16 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         help="Optional cap on frames used for post-pipeline PSNR evaluation.",
     )
 
-    genai_group = parser.add_mutually_exclusive_group()
-    genai_group.add_argument(
-        "--enable-genai",
-        action="store_true",
-        help="Enable heavy GenAI compositor path for decoding.",
-    )
-    genai_group.add_argument(
-        "--disable-genai",
-        action="store_true",
-        help="Force lightweight mock compositor path.",
-    )
     parser.add_argument(
         "--genai-backend",
         choices=("controlnet", "animate-anyone"),
         default=None,
-        help="GenAI backend strategy when GenAI is enabled.",
+        help="GenAI backend strategy. If omitted, GenAI is disabled.",
     )
     parser.add_argument(
         "--animate-anyone-repo-dir",
         default=None,
         help="Path to Moore-AnimateAnyone repository.",
-    )
-    parser.add_argument(
-        "--animate-anyone-model-variant",
-        default=None,
-        help="AnimateAnyone model variant alias (for example: original, finetuned_tennis).",
     )
     parser.add_argument(
         "--animate-anyone-model-dir",
@@ -822,20 +874,13 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         default=None,
         help="Resize mode for GenAI actor placement in the decode ROI.",
     )
-    adaptive_group = parser.add_mutually_exclusive_group()
-    adaptive_group.add_argument(
+    parser.add_argument(
         "--animate-anyone-adaptive-threshold",
         dest="animate_anyone_adaptive_threshold",
         action="store_true",
         help="Enable adaptive border-threshold masking for AnimateAnyone black backgrounds.",
     )
-    adaptive_group.add_argument(
-        "--disable-animate-anyone-adaptive-threshold",
-        dest="animate_anyone_adaptive_threshold",
-        action="store_false",
-        help="Disable adaptive border-threshold masking for AnimateAnyone black backgrounds.",
-    )
-    parser.set_defaults(animate_anyone_adaptive_threshold=None)
+    parser.set_defaults(animate_anyone_adaptive_threshold=False)
     parser.add_argument(
         "--animate-anyone-alpha-smoothing",
         type=float,
@@ -871,7 +916,28 @@ def _build_cli_parser() -> argparse.ArgumentParser:
 
 def run_cli(argv: list[str] | None = None) -> int:
     parser = _build_cli_parser()
-    args = parser.parse_args(argv)
+    argv_list = list(sys.argv[1:] if argv is None else argv)
+
+    bootstrap_parser = argparse.ArgumentParser(add_help=False)
+    bootstrap_parser.add_argument("--config", type=str, default=None)
+    bootstrap_args, _ = bootstrap_parser.parse_known_args(argv_list)
+
+    config_overrides: dict[str, Any] = {}
+    if bootstrap_args.config is not None:
+        config_overrides = _load_config_overrides(bootstrap_args.config)
+    if config_overrides:
+        parser.set_defaults(**config_overrides)
+
+    args = parser.parse_args(argv_list)
+
+    logging.basicConfig(
+        level=getattr(logging, str(args.log_level).upper(), logging.INFO),
+        format="%(asctime)s [%(levelname)s] %(message)s",
+    )
+
+    cpu_workers, gpu_workers = _resolve_worker_counts(args)
+    args.cpu_workers = int(cpu_workers)
+    args.gpu_workers = int(gpu_workers)
 
     if args.num_frames is not None and args.num_frames <= 0:
         raise ValueError("--num-frames must be a positive integer")
@@ -902,12 +968,26 @@ def run_cli(argv: list[str] | None = None) -> int:
             raise FileNotFoundError(f"Input video does not exist: {source_path}")
         source_uri = str(source_path)
 
-    debug_enabled = bool(args.enable_debug_artifacts) and not bool(args.disable_debug_artifacts)
+    debug_enabled = bool(args.debug)
     if not debug_enabled:
         # Keep actor debug keyframes aligned with global debug-artifact disable switch.
         args.disable_debug_keyframes = True
 
     _apply_runtime_env_overrides(args)
+
+    if bool(args.dry_run):
+        summary = {
+            "status": "dry-run",
+            "config": str(args.config) if args.config is not None else None,
+            "execution_pool": str(args.execution_pool),
+            "cpu_workers": int(args.cpu_workers),
+            "gpu_workers": int(args.gpu_workers),
+            "debug": bool(args.debug),
+            "evaluation_mode": str(args.evaluation_mode),
+            "source_uri": source_uri,
+        }
+        print(json.dumps(summary, indent=2))
+        return 0
 
     run_output_root = _create_timestamped_output_dir(base_root=_project_root() / "outputs")
     chunk_id = "0001"
@@ -965,7 +1045,8 @@ def run_cli(argv: list[str] | None = None) -> int:
         runtime_output_root=run_output_root,
     )
 
-    if bool(args.evaluate_after_run):
+    should_evaluate = str(args.evaluation_mode).strip().lower() != "none" and not bool(args.skip_eval)
+    if should_evaluate:
         summary["evaluation"] = evaluate_run_summary(
             summary=summary,
             experiment_dir=run_output_root,
@@ -975,7 +1056,7 @@ def run_cli(argv: list[str] | None = None) -> int:
     summary_json = json.dumps(summary, indent=2)
     print(summary_json)
 
-    if not bool(args.no_summary_file):
+    if bool(args.summary_file):
         summary_path = run_output_root / "run_summary.json"
         summary_path.parent.mkdir(parents=True, exist_ok=True)
         summary_path.write_text(f"{summary_json}\n", encoding="utf-8")

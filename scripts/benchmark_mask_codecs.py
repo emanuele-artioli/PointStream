@@ -111,7 +111,6 @@ def _build_main_command(
         "src.main",
         "--num-frames",
         str(num_frames),
-        "--disable-genai",
         "--disable-debug-keyframes",
         "--compositing-mask-mode",
         "metadata-source-mask",

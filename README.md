@@ -119,24 +119,27 @@ metadata.msgpack: intentionally stores panorama\_uri and omits raw panorama\_ima
 ### **Useful CLI options & Ablations**
 
 * \--num-frames N: process only the first N frames  
-* \--no-summary-file: print summary only (do not write run\_summary.json)  
-* \--execution-pool inline|tagged with \--cpu-workers and \--gpu-workers  
+* \--summary-file: write run\_summary.json (enabled by default)  
+* \--config /path/to/run.json|.yaml: load defaults from a JSON/YAML config file  
+* \--execution-pool inline|tagged with \--cpu-workers and \--gpu-workers (auto-detected when omitted)  
+* \--log-level debug|info|warning|error  
+* \--dry-run (alias: \--validate-only): validate arguments/dependencies without running the pipeline  
 * \--actor-extractor real|mock  
 * \--detector yolo26|yoloe and \--detector-caption "tennis player"  
 * \--pose-estimator yolo|dwpose  
 * \--segmenter yolo|yoloe|sam3|sam|none  
 * \--ball-extractor difference|mock  
 * \--gpu-dtype fp16|fp32|bf16|fp8\_e4m3fn|fp8\_e5m2
+* \--evaluation-mode none|psnr and optional \--skip-eval
+* \--debug or \--no-debug
 
 GenAI backend switches:
 
-* \--enable-genai or \--disable-genai  
-* \--genai-backend controlnet|animate-anyone  
-* \--animate-anyone-model-variant original|finetuned\_tennis  
+* \--genai-backend controlnet|animate-anyone (omit to disable GenAI)  
 * \--animate-anyone-model-dir /path/to/model/profile  
 * \--compositing-mask-mode alpha-heuristic|metadata-source-mask|postgen-seg-client
 
-Selecting \--genai-backend animate-anyone also enables the GenAI decode path unless you explicitly pass \--disable-genai.
+Selecting \--genai-backend animate-anyone enables the GenAI decode path.
 
 ### **Baseline & Component Ablation Strategy**
 

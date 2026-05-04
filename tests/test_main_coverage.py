@@ -233,7 +233,7 @@ def test_run_cli_accepts_input_and_writes_default_summary(monkeypatch, tmp_path:
     assert summary["chunk_id"] == "0001"
 
 
-def test_run_cli_supports_no_summary_file(monkeypatch, tmp_path: Path) -> None:
+def test_run_cli_accepts_summary_file_flag(monkeypatch, tmp_path: Path) -> None:
     source_video = tmp_path / "input.mp4"
     source_video.write_bytes(b"x")
     output_dir = tmp_path / "artifacts"
@@ -257,11 +257,11 @@ def test_run_cli_supports_no_summary_file(monkeypatch, tmp_path: Path) -> None:
         [
             "--input",
             str(source_video),
-            "--no-summary-file",
+            "--summary-file",
         ]
     )
     assert exit_code == 0
-    assert not (output_dir / "run_summary.json").exists()
+    assert (output_dir / "run_summary.json").exists()
 
 
 def test_run_cli_can_evaluate_after_run(monkeypatch, tmp_path: Path) -> None:
@@ -306,7 +306,8 @@ def test_run_cli_can_evaluate_after_run(monkeypatch, tmp_path: Path) -> None:
         [
             "--input",
             str(source_video),
-            "--evaluate-after-run",
+            "--evaluation-mode",
+            "psnr",
         ]
     )
 
@@ -316,6 +317,49 @@ def test_run_cli_can_evaluate_after_run(monkeypatch, tmp_path: Path) -> None:
     assert summary_file.exists()
     summary = json.loads(summary_file.read_text(encoding="utf-8"))
     assert summary["evaluation"]["psnr_mean"] == 42.0
+
+
+def test_run_cli_skip_eval_overrides_evaluation_mode(monkeypatch, tmp_path: Path) -> None:
+    source_video = tmp_path / "input.mp4"
+    source_video.write_bytes(b"source")
+    output_dir = tmp_path / "artifacts"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    monkeypatch.setattr(
+        main_module,
+        "run_mock_pipeline",
+        lambda **kwargs: {
+            "chunk_id": "0003",
+            "run_output_root": str(output_dir),
+            "source_uri": str(source_video),
+            "num_actor_packets": 1,
+            "num_rigid_object_packets": 0,
+            "ball_object_id": "ball_0",
+            "residual_uri": "memory://residual/chunk.mp4",
+            "decoded_uri": "memory://decoded/chunk.mp4",
+        },
+    )
+    monkeypatch.setattr(main_module, "_create_timestamped_output_dir", lambda base_root=None: output_dir)
+    evaluate_called = {"value": False}
+
+    def _fake_eval(**kwargs):
+        evaluate_called["value"] = True
+        return {"psnr_mean": 1.0}
+
+    monkeypatch.setattr(main_module, "evaluate_run_summary", _fake_eval)
+
+    exit_code = main_module.run_cli(
+        [
+            "--input",
+            str(source_video),
+            "--evaluation-mode",
+            "psnr",
+            "--skip-eval",
+        ]
+    )
+
+    assert exit_code == 0
+    assert evaluate_called["value"] is False
 
 
 def test_run_cli_rejects_invalid_num_frames(monkeypatch) -> None:
@@ -397,6 +441,8 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
     monkeypatch.delenv("POINTSTREAM_COMPOSITING_MASK_MODE", raising=False)
     monkeypatch.delenv("POINTSTREAM_POSTGEN_SEGMENTER_BACKEND", raising=False)
     monkeypatch.delenv("POINTSTREAM_METADATA_MASK_CODEC", raising=False)
+    monkeypatch.delenv("POINTSTREAM_LOG_LEVEL", raising=False)
+    monkeypatch.delenv("POINTSTREAM_DISABLE_DEBUG_ARTIFACTS", raising=False)
 
     exit_code = main_module.run_cli(
         [
@@ -418,7 +464,6 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
             "uniform",
             "--seed",
             "7",
-            "--disable-genai",
             "--genai-backend",
             "controlnet",
             "--genai-preroll-frames",
@@ -438,7 +483,9 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
             "heuristic",
             "--metadata-mask-codec",
             "rle-v1",
-            "--no-summary-file",
+            "--debug",
+            "--log-level",
+            "warning",
         ]
     )
 
@@ -451,7 +498,7 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
     assert captured["ball_extractor"] is not None
     assert captured["reference_extractor"] is not None
     assert captured["residual_calculator"] is not None
-    assert os.environ.get("POINTSTREAM_ENABLE_GENAI") == "0"
+    assert os.environ.get("POINTSTREAM_ENABLE_GENAI") == "1"
     assert os.environ.get("POINTSTREAM_GENAI_BACKEND") == "controlnet"
     assert os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES") == "2"
     assert os.environ.get("POINTSTREAM_GPU_DTYPE") == "fp32"
@@ -462,6 +509,8 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
     assert os.environ.get("POINTSTREAM_COMPOSITING_MASK_MODE") == "postgen-seg-client"
     assert os.environ.get("POINTSTREAM_POSTGEN_SEGMENTER_BACKEND") == "heuristic"
     assert os.environ.get("POINTSTREAM_METADATA_MASK_CODEC") == "rle-v1"
+    assert os.environ.get("POINTSTREAM_LOG_LEVEL") == "warning"
+    assert os.environ.get("POINTSTREAM_DISABLE_DEBUG_ARTIFACTS") == "0"
 
 
 def test_run_cli_enables_genai_for_animate_anyone_backend(monkeypatch, tmp_path: Path) -> None:
@@ -495,7 +544,6 @@ def test_run_cli_enables_genai_for_animate_anyone_backend(monkeypatch, tmp_path:
             str(source_video),
             "--genai-backend",
             "animate-anyone",
-            "--no-summary-file",
         ]
     )
 
@@ -503,6 +551,116 @@ def test_run_cli_enables_genai_for_animate_anyone_backend(monkeypatch, tmp_path:
     assert Path(str(captured["transport_root"])) == output_dir
     assert os.environ.get("POINTSTREAM_ENABLE_GENAI") == "1"
     assert os.environ.get("POINTSTREAM_GENAI_BACKEND") == "animate-anyone"
+
+
+def test_run_cli_supports_json_config(monkeypatch, tmp_path: Path) -> None:
+    source_video = tmp_path / "input.mp4"
+    source_video.write_bytes(b"x")
+    output_dir = tmp_path / "results"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    config_path = tmp_path / "run_config.json"
+    config_path.write_text(
+        json.dumps(
+            {
+                "input": str(source_video),
+                "execution_pool": "tagged",
+                "cpu_workers": 2,
+                "gpu_workers": 3,
+                "actor_extractor": "mock",
+                "log_level": "debug",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    captured: dict[str, Any] = {}
+
+    def _fake_run_mock_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "chunk_id": "ablation_04",
+            "num_actor_packets": 0,
+            "num_rigid_object_packets": 0,
+            "ball_object_id": "ball_0",
+            "residual_uri": "memory://residual/chunk.mp4",
+            "decoded_uri": "memory://decoded/chunk.mp4",
+            "transport_backend": "disk",
+        }
+
+    monkeypatch.setattr(main_module, "run_mock_pipeline", _fake_run_mock_pipeline)
+    monkeypatch.setattr(main_module, "_create_timestamped_output_dir", lambda base_root=None: output_dir)
+
+    exit_code = main_module.run_cli(["--config", str(config_path)])
+
+    assert exit_code == 0
+    assert captured["execution_pool"] is not None
+    assert captured["actor_extractor"] is not None
+
+
+def test_run_cli_dry_run_skips_pipeline_execution(monkeypatch, tmp_path: Path, capsys) -> None:
+    source_video = tmp_path / "input.mp4"
+    source_video.write_bytes(b"x")
+
+    called = {"value": False}
+
+    def _fake_run_mock_pipeline(**kwargs):
+        called["value"] = True
+        return {}
+
+    monkeypatch.setattr(main_module, "run_mock_pipeline", _fake_run_mock_pipeline)
+
+    exit_code = main_module.run_cli(["--input", str(source_video), "--dry-run"])
+    output = capsys.readouterr().out
+    payload = json.loads(output)
+
+    assert exit_code == 0
+    assert called["value"] is False
+    assert payload["status"] == "dry-run"
+
+
+def test_run_cli_auto_workers_defaults_when_omitted(monkeypatch, tmp_path: Path) -> None:
+    source_video = tmp_path / "input.mp4"
+    source_video.write_bytes(b"x")
+    output_dir = tmp_path / "results"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    captured_config: dict[str, Any] = {}
+
+    class _FakeTaggedPool:
+        def __init__(self, config) -> None:
+            captured_config["config"] = config
+
+        def shutdown(self) -> None:
+            return None
+
+    monkeypatch.setattr(main_module, "TaggedMultiprocessPool", _FakeTaggedPool)
+    monkeypatch.setattr(main_module, "_create_timestamped_output_dir", lambda base_root=None: output_dir)
+    monkeypatch.setattr(
+        main_module,
+        "run_mock_pipeline",
+        lambda **kwargs: {
+            "chunk_id": "ablation_05",
+            "num_actor_packets": 0,
+            "num_rigid_object_packets": 0,
+            "ball_object_id": "ball_0",
+            "residual_uri": "memory://residual/chunk.mp4",
+            "decoded_uri": "memory://decoded/chunk.mp4",
+            "transport_backend": "disk",
+        },
+    )
+
+    exit_code = main_module.run_cli(
+        [
+            "--input",
+            str(source_video),
+            "--execution-pool",
+            "tagged",
+        ]
+    )
+
+    assert exit_code == 0
+    assert int(captured_config["config"].cpu_workers) >= 1
+    assert int(captured_config["config"].gpu_workers) >= 1
 
 
 def test_build_actor_extractor_forces_real_pipeline_for_metadata_masks(monkeypatch) -> None:

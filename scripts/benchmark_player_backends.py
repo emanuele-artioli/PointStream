@@ -91,7 +91,6 @@ def _build_command(
         "src.main",
         "--num-frames",
         str(num_frames),
-        "--disable-genai",
         "--disable-debug-keyframes",
         "--execution-pool",
         "inline",
