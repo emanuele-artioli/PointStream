@@ -258,7 +258,6 @@ def _build_actor_extractor(
         and pose_estimator == "yolo"
         and segmenter == "yolo"
         and segmenter_caption.strip().lower() == "tennis player"
-        and not disable_debug_keyframes
         and float(pose_delta_threshold) == 20.0
         and not include_mask_metadata
     )
@@ -401,13 +400,10 @@ def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
     if bool(args.disable_genai):
         enable_genai = False
 
-    # Residual mode controls defaults for deterministic residual generation, but
-    # explicit user disable must still win.
-    if not bool(args.disable_genai):
-        if residual_mode == "none":
-            enable_genai = False
-        elif residual_mode in {"players_only", "full_video"}:
-            enable_genai = True
+    # Residual mode 'none' always disables GenAI. For other modes, keep GenAI
+    # opt-in via explicit flags/backend/knobs to preserve lightweight defaults.
+    if residual_mode == "none":
+        enable_genai = False
 
     os.environ["POINTSTREAM_ENABLE_GENAI"] = "1" if enable_genai else "0"
 
