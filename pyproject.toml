@@ -60,5 +60,7 @@ omit = [
   "config-*.py",
   "*/config-*.py",
   "src/encoder/actor_components.py",
+  "src/encoder/segmentation_ball_extractor.py",
+  "scripts/*.py",
   "scripts/benchmark_player_backends.py",
 ]
