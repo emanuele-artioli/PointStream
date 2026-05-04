@@ -119,7 +119,8 @@ def test_render_genai_baseline_uses_preroll_and_fixed_temporal_window(monkeypatc
     out = renderer._render_genai_baseline(frame_tensor)
 
     assert torch.equal(out, frame_tensor)
-    assert spy.window_lengths == [4, 4]
+    # Causal temporal window without padding: frame 1 sees 2 poses, frame 2 sees 3 poses.
+    assert spy.window_lengths == [2, 3]
 
 
 def test_decoder_actor_mask_decode_supports_legacy_png_payload(mock_encoder_pipeline, test_run_artifacts_dir: Path) -> None:

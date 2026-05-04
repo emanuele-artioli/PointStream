@@ -497,21 +497,19 @@ class ResidualCalculator:
         frame_idx: int,
         temporal_window: int,
     ) -> torch.Tensor:
-        """Build temporal pose window for temporal GenAI compositors."""
-        window_half = temporal_window // 2
-        start_idx = max(0, frame_idx - window_half)
-        end_idx = min(int(dense_pose_tensor.shape[0]), frame_idx + window_half + 1)
+        """Build causal temporal pose window for temporal GenAI compositors.
 
-        poses: list[torch.Tensor] = []
-        for idx in range(start_idx, end_idx):
-            if idx < int(dense_pose_tensor.shape[0]):
-                poses.append(dense_pose_tensor[idx])
+        Residual generation must avoid future-pose leakage; using look-ahead windows causes
+        actor synthesis to lead motion and increases residual payload with shadow corrections.
+        """
+        start_idx = max(0, int(frame_idx) - int(temporal_window) + 1)
+        sequence = dense_pose_tensor[start_idx : int(frame_idx) + 1]
 
-        if not poses:
-            return dense_pose_tensor[frame_idx]
+        if int(sequence.shape[0]) == 0:
+            return dense_pose_tensor[int(frame_idx)].unsqueeze(0)
 
         # Keep temporal conditioning as [Frames, 18, 3]; concatenation would flatten to [Frames*18, 3].
-        return torch.stack(poses, dim=0)
+        return sequence
 
     def _default_residual_path(self, chunk: VideoChunk) -> Path:
         project_root = Path(__file__).resolve().parents[2]

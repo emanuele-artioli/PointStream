@@ -251,13 +251,6 @@ class DecoderRenderer:
     ) -> torch.Tensor:
         start_idx = max(0, int(frame_idx) - int(temporal_window) + 1)
         sequence = dense_pose_tensor[start_idx : int(frame_idx) + 1]
-        if int(sequence.shape[0]) >= int(temporal_window):
-            return sequence
-
         if int(sequence.shape[0]) == 0:
-            first_pose = dense_pose_tensor[0].unsqueeze(0)
-            return first_pose.repeat(int(temporal_window), 1, 1)
-
-        pad_count = int(temporal_window) - int(sequence.shape[0])
-        first_pose = sequence[0].unsqueeze(0).repeat(pad_count, 1, 1)
-        return torch.cat([first_pose, sequence], dim=0)
+            return dense_pose_tensor[int(frame_idx)].unsqueeze(0)
+        return sequence
