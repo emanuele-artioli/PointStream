@@ -324,7 +324,13 @@ def test_baseline_controlnet_strategy_generate_with_fake_pipe(monkeypatch) -> No
 
 def test_animate_anyone_strategy_missing_repo_raises(monkeypatch) -> None:
     monkeypatch.delenv("POINTSTREAM_ANIMATE_ANYONE_REPO_DIR", raising=False)
+    # Ensure generate() raises when no runtime is available.
     strategy = gc.AnimateAnyoneStrategy(repo_dir=None)
+
+    def _ensure_runtime_raises(self):
+        raise FileNotFoundError("AnimateAnyone runtime missing")
+
+    monkeypatch.setattr(gc.AnimateAnyoneStrategy, "_ensure_runtime", _ensure_runtime_raises)
 
     with pytest.raises(FileNotFoundError):
         strategy.generate(

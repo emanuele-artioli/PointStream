@@ -7,6 +7,7 @@ import sys
 import types
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Any
 
 import pytest
 
@@ -184,7 +185,7 @@ def test_run_cli_accepts_input_and_writes_default_summary(monkeypatch, tmp_path:
     output_dir = tmp_path / "artifacts"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    captured: dict[str, object | None] = {
+    captured: dict[str, Any] = {
         "transport_root": None,
         "runtime_output_root": None,
         "chunk_id": None,
@@ -271,7 +272,7 @@ def test_run_cli_can_evaluate_after_run(monkeypatch, tmp_path: Path) -> None:
     output_dir = tmp_path / "artifacts"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    captured: dict[str, object] = {}
+    captured: dict[str, Any] = {}
 
     def _fake_run_mock_pipeline(**kwargs):
         captured.update(kwargs)
@@ -369,7 +370,7 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
     output_dir = tmp_path / "results"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    captured: dict[str, object] = {}
+    captured: dict[str, Any] = {}
 
     def _fake_run_mock_pipeline(**kwargs):
         captured.update(kwargs)
@@ -469,7 +470,7 @@ def test_run_cli_enables_genai_for_animate_anyone_backend(monkeypatch, tmp_path:
     output_dir = tmp_path / "results"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    captured: dict[str, object] = {}
+    captured: dict[str, Any] = {}
 
     def _fake_run_mock_pipeline(**kwargs):
         captured.update(kwargs)
@@ -505,7 +506,7 @@ def test_run_cli_enables_genai_for_animate_anyone_backend(monkeypatch, tmp_path:
 
 
 def test_build_actor_extractor_forces_real_pipeline_for_metadata_masks(monkeypatch) -> None:
-    captured: dict[str, object] = {}
+    captured: dict[str, Any] = {}
 
     class _FakeActorExtractor:
         def __init__(self, **kwargs) -> None:

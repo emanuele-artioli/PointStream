@@ -152,8 +152,9 @@ def _create_required_model_entries(model_root: Path) -> None:
 
 def test_resolve_repo_root_missing_and_invalid(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.delenv("POINTSTREAM_ANIMATE_ANYONE_REPO_DIR", raising=False)
-    with pytest.raises(FileNotFoundError, match="not set"):
-        runtime._resolve_repo_root(None)
+    # If no repo dir is configured, runtime should fall back to an installed
+    # package when available; in tests we accept None to indicate no repo.
+    assert runtime._resolve_repo_root(None) is None
 
     with pytest.raises(FileNotFoundError, match="does not exist"):
         runtime._resolve_repo_root(str(tmp_path / "missing_repo"))

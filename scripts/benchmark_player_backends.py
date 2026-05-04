@@ -251,7 +251,8 @@ def _run_one(
             "transport_savings_percent": evaluation.get("transport_savings_percent"),
             "decoded_vs_reference_percent": evaluation.get("decoded_vs_reference_percent"),
         }
-    except Exception as eval_error:
+    except Exception:
+        # Evaluation is non-fatal for the benchmark runner; ignore errors.
         pass
 
     return AblationRun(

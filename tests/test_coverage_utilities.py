@@ -3,8 +3,6 @@ from __future__ import annotations
 from pathlib import Path
 import sys
 import types
-
-import cv2
 import numpy as np
 import pytest
 import torch

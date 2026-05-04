@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 from types import SimpleNamespace
-import tempfile
 import types
+from typing import Any, cast
 
 import cv2
 import numpy as np
@@ -182,7 +182,7 @@ def test_residual_calculator_covers_players_only_and_full_video(monkeypatch: pyt
     class _FakeSynthesisEngine(SynthesisEngine):
         def __init__(self) -> None:
             self.seed = 7
-            self.device = "cpu"
+            self.device: Any = "cpu"
             self._compositor = _FakeCompositor()
 
         def synthesize(self, payload, include_guidance_overlays=False):
@@ -221,8 +221,8 @@ def test_residual_calculator_covers_players_only_and_full_video(monkeypatch: pyt
         assert residual_packet.residual_video_uri.endswith(".mp4")
 
         compositor = calculator._synthesis_engine.get_genai_compositor()
-        assert compositor.seen_shapes == [(1, 18, 3), (2, 18, 3)]
-        assert compositor.seen_metadata[0][1] == (0, 0, 2, 2)
+        assert getattr(compositor, "seen_shapes") == [(1, 18, 3), (2, 18, 3)]
+        assert getattr(compositor, "seen_metadata")[0][1] == (0, 0, 2, 2)
 
     assert len(encoded_outputs) == 4
 
@@ -303,10 +303,10 @@ def test_encoder_pipeline_streams_actor_states_and_uses_shifted_ball(monkeypatch
         actor_extractor=_FakeActorExtractor(),
         ball_extractor=_FakeBallExtractor(),
         reference_extractor=_FakeReferenceExtractor(),
-        residual_calculator=_FakeResidualCalculator(),
+        residual_calculator=cast(Any, _FakeResidualCalculator()),
     )
-    pipeline._background_modeler = _FakeBackgroundModeler()
-    pipeline._object_tracker = types.SimpleNamespace(process=lambda chunk: [RigidObjectPacket(chunk_id=chunk.chunk_id, object_id="rigid_1", trajectory_spec=TensorSpec(name="rigid", shape=[1, 4], dtype="torch.float32"), events=[])])
+    pipeline._background_modeler = cast(Any, _FakeBackgroundModeler())
+    pipeline._object_tracker = cast(Any, types.SimpleNamespace(process=lambda chunk: [RigidObjectPacket(chunk_id=chunk.chunk_id, object_id="rigid_1", trajectory_spec=TensorSpec(name="rigid", shape=[1, 4], dtype="torch.float32"), events=[])]))
 
     monkeypatch.setenv("POINTSTREAM_ENABLE_SHIFTED_BALL", "1")
 
