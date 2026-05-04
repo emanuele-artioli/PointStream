@@ -3,7 +3,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from dataclasses import dataclass
-from datetime import datetime
 import os
 from pathlib import Path
 
@@ -247,13 +246,14 @@ class ResidualCalculator:
 
                 yield np.asarray(encoded_residual.permute(1, 2, 0).contiguous().cpu().numpy(), dtype=np.uint8)
 
+        residual_codec = os.environ.get("POINTSTREAM_FFMPEG_CODEC", "libsvtav1")
         encode_video_frames_ffmpeg(
             output_path=output_path,
             frames_bgr=_iter_encoded_frames(),
             fps=float(chunk.fps),
             width=int(chunk.width),
             height=int(chunk.height),
-            codec="libx265",
+            codec=residual_codec,
             pix_fmt="yuv420p",
             crf=28,
             preset="medium",
@@ -261,7 +261,7 @@ class ResidualCalculator:
 
         return ResidualPacket(
             chunk_id=chunk.chunk_id,
-            codec="libx265",
+            codec=residual_codec,
             residual_video_uri=str(output_path),
             mode=ResidualMode.PLAYERS_ONLY,
         )
@@ -330,13 +330,14 @@ class ResidualCalculator:
 
                 yield np.asarray(encoded_residual.permute(1, 2, 0).contiguous().cpu().numpy(), dtype=np.uint8)
 
+        residual_codec = os.environ.get("POINTSTREAM_FFMPEG_CODEC", "libsvtav1")
         encode_video_frames_ffmpeg(
             output_path=output_path,
             frames_bgr=_iter_encoded_frames(),
             fps=float(chunk.fps),
             width=int(chunk.width),
             height=int(chunk.height),
-            codec="libx265",
+            codec=residual_codec,
             pix_fmt="yuv420p",
             crf=28,
             preset="medium",
@@ -344,7 +345,7 @@ class ResidualCalculator:
 
         return ResidualPacket(
             chunk_id=chunk.chunk_id,
-            codec="libx265",
+            codec=residual_codec,
             residual_video_uri=str(output_path),
             mode=ResidualMode.FULL_VIDEO,
         )
@@ -512,9 +513,7 @@ class ResidualCalculator:
         return sequence
 
     def _default_residual_path(self, chunk: VideoChunk) -> Path:
-        project_root = Path(__file__).resolve().parents[2]
-        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_%f")
-        return project_root / "outputs" / timestamp / "debug" / f"residual_{chunk.chunk_id}.mp4"
+        return Path.cwd() / f"chunk_{chunk.chunk_id}" / "residual.mp4"
 
     def _load_original_frames(self, chunk: VideoChunk) -> torch.Tensor:
         decoded = probe_video_metadata(chunk.source_uri)

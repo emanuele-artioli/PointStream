@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 from collections.abc import Iterator
@@ -12,6 +13,9 @@ from typing import Any
 
 import numpy as np
 import torch
+
+
+_FFMPEG_ENCODER_CACHE: dict[str, bool] = {}
 
 
 @dataclass(frozen=True)
@@ -150,7 +154,7 @@ def encode_video_frames_ffmpeg(
     fps: float,
     width: int,
     height: int,
-    codec: str = "libx264",
+    codec: str | None = None,
     pix_fmt: str = "yuv420p",
     crf: int | None = 23,
     preset: str | None = "veryfast",
@@ -160,6 +164,12 @@ def encode_video_frames_ffmpeg(
     destination.parent.mkdir(parents=True, exist_ok=True)
 
     ffmpeg_bin = _resolve_binary_path("FFMPEG_BIN", "ffmpeg")
+    resolved_codec = str(codec or os.environ.get("POINTSTREAM_FFMPEG_CODEC", "libsvtav1")).strip()
+    if not resolved_codec:
+        raise ValueError("FFmpeg codec must not be empty")
+    _assert_ffmpeg_encoder_available(ffmpeg_bin=ffmpeg_bin, codec=resolved_codec)
+    normalized_preset = _normalize_preset_for_codec(codec=resolved_codec, preset=preset)
+
     ffmpeg_cmd = [
         ffmpeg_bin,
         "-hide_banner",
@@ -177,10 +187,10 @@ def encode_video_frames_ffmpeg(
         "-",
         "-an",
         "-c:v",
-        codec,
+        resolved_codec,
     ]
-    if preset is not None:
-        ffmpeg_cmd.extend(["-preset", preset])
+    if normalized_preset is not None:
+        ffmpeg_cmd.extend(["-preset", normalized_preset])
     if crf is not None:
         ffmpeg_cmd.extend(["-crf", str(int(crf))])
     ffmpeg_cmd.extend(["-pix_fmt", pix_fmt])
@@ -331,3 +341,70 @@ def _resolve_binary_path(env_var: str, binary_name: str) -> str:
         f"Required binary '{binary_name}' was not found in PATH. "
         f"Install FFmpeg tools or set {env_var} to the executable path."
     )
+
+
+def ensure_ffmpeg_encoder_available(codec: str) -> None:
+    ffmpeg_bin = _resolve_binary_path("FFMPEG_BIN", "ffmpeg")
+    _assert_ffmpeg_encoder_available(ffmpeg_bin=ffmpeg_bin, codec=str(codec))
+
+
+def _assert_ffmpeg_encoder_available(ffmpeg_bin: str, codec: str) -> None:
+    cache_key = f"{ffmpeg_bin}::{codec}"
+    cached = _FFMPEG_ENCODER_CACHE.get(cache_key)
+    if cached is True:
+        return
+    if cached is False:
+        raise RuntimeError(
+            f"Requested FFmpeg encoder '{codec}' is not available in '{ffmpeg_bin}'."
+        )
+
+
+def _normalize_preset_for_codec(codec: str, preset: str | None) -> str | None:
+    if preset is None:
+        return None
+
+    normalized_codec = str(codec).strip().lower()
+    normalized_preset = str(preset).strip().lower()
+
+    if normalized_codec != "libsvtav1":
+        return str(preset)
+
+    # FFmpeg libsvtav1 expects numeric preset values (0..13).
+    if normalized_preset.isdigit():
+        return normalized_preset
+
+    preset_aliases = {
+        "ultrafast": "12",
+        "superfast": "11",
+        "veryfast": "10",
+        "faster": "9",
+        "fast": "8",
+        "medium": "7",
+        "slow": "6",
+        "slower": "5",
+        "veryslow": "4",
+    }
+    return preset_aliases.get(normalized_preset, "8")
+
+    process = subprocess.run(
+        [ffmpeg_bin, "-hide_banner", "-encoders"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        text=True,
+    )
+    if process.returncode != 0:
+        stderr_text = (process.stderr or "").strip()
+        raise RuntimeError(
+            f"Unable to query FFmpeg encoders via '{ffmpeg_bin} -encoders': {stderr_text or 'unknown error'}"
+        )
+
+    encoder_lines = (process.stdout or "").splitlines()
+    token_pattern = re.compile(rf"\b{re.escape(codec)}\b")
+    available = any(token_pattern.search(line) for line in encoder_lines)
+    _FFMPEG_ENCODER_CACHE[cache_key] = available
+
+    if not available:
+        raise RuntimeError(
+            f"Requested FFmpeg encoder '{codec}' is not available in '{ffmpeg_bin}'."
+        )

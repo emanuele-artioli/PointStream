@@ -80,7 +80,7 @@ class DecoderRenderer:
             fps=float(chunk.fps),
             width=int(chunk.width),
             height=int(chunk.height),
-            codec="libx264",
+            codec=os.environ.get("POINTSTREAM_FFMPEG_CODEC", "libsvtav1"),
             pix_fmt="yuv420p",
             crf=18,
             preset="veryfast",

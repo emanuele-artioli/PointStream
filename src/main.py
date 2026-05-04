@@ -26,6 +26,7 @@ from src.encoder.residual_calculator import BinaryActorImportanceMapper
 from src.encoder.residual_calculator import ResidualCalculator
 from src.encoder.residual_calculator import UniformImportanceMapper
 from src.encoder.video_io import encode_video_frames_ffmpeg, probe_video_metadata
+from src.encoder.video_io import ensure_ffmpeg_encoder_available
 from src.shared.schemas import VideoChunk
 from src.shared.schemas import ResidualMode
 from src.shared.synthesis_engine import SynthesisEngine
@@ -119,9 +120,18 @@ def run_mock_pipeline(
     )
 
     previous_debug_artifact_dir = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")
+    debug_disabled = os.environ.get("POINTSTREAM_DISABLE_DEBUG_ARTIFACTS", "1").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
     previous_cwd = Path.cwd()
     os.chdir(resolved_runtime_root)
-    os.environ["POINTSTREAM_DEBUG_ARTIFACT_DIR"] = str(resolved_runtime_root / "debug")
+    if debug_disabled:
+        os.environ.pop("POINTSTREAM_DEBUG_ARTIFACT_DIR", None)
+    else:
+        os.environ["POINTSTREAM_DEBUG_ARTIFACT_DIR"] = str(resolved_runtime_root / "debug")
     try:
         payload = encoder.encode_chunk(chunk)
     finally:
@@ -361,6 +371,8 @@ def _build_residual_calculator_with_mode(
 
 
 def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
+    if args.ffmpeg_codec is not None:
+        os.environ["POINTSTREAM_FFMPEG_CODEC"] = str(args.ffmpeg_codec)
     enable_genai = bool(args.enable_genai)
     residual_mode = getattr(args, "residual_mode", "full_video").strip().lower()
 
@@ -456,7 +468,10 @@ def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
         os.environ["POINTSTREAM_ALLOW_AUTO_MODEL_DOWNLOAD"] = "1"
     if args.postgen_segmenter_model is not None:
         os.environ["POINTSTREAM_POSTGEN_SEGMENTER_MODEL"] = str(args.postgen_segmenter_model)
-    os.environ["POINTSTREAM_DISABLE_DEBUG_ARTIFACTS"] = "1" if bool(args.disable_debug_artifacts) else "0"
+    debug_enabled = bool(getattr(args, "enable_debug_artifacts", False)) and not bool(
+        getattr(args, "disable_debug_artifacts", False)
+    )
+    os.environ["POINTSTREAM_DISABLE_DEBUG_ARTIFACTS"] = "0" if debug_enabled else "1"
     os.environ["POINTSTREAM_ENABLE_SHIFTED_BALL"] = "1" if bool(args.enable_shifted_ball) else "0"
 
 
@@ -483,6 +498,15 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         "--no-summary-file",
         action="store_true",
         help="Do not write a summary JSON file in outputs/<timestamp>; print summary to stdout only.",
+    )
+    parser.add_argument(
+        "--ffmpeg-codec",
+        type=str,
+        default="libsvtav1",
+        help=(
+            "FFmpeg video encoder library used for all video outputs (decoded video, residuals, "
+            "debug/mock clips). Default: libsvtav1."
+        ),
     )
     parser.add_argument(
         "--transport",
@@ -556,9 +580,14 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         help="Disable actor keyframe skeleton debug image generation.",
     )
     parser.add_argument(
+        "--enable-debug-artifacts",
+        action="store_true",
+        help="Enable optional debug artifacts (disabled by default).",
+    )
+    parser.add_argument(
         "--disable-debug-artifacts",
         action="store_true",
-        help="Disable optional debug artifacts such as panorama debug images and actor keyframe renders.",
+        help="Force-disable optional debug artifacts.",
     )
     parser.add_argument(
         "--enable-shifted-ball",
@@ -833,6 +862,9 @@ def run_cli(argv: list[str] | None = None) -> int:
         raise ValueError("--genai-preroll-frames must be a non-negative integer")
     if args.animate_anyone_alpha_smoothing is not None and not (0.0 <= args.animate_anyone_alpha_smoothing <= 1.0):
         raise ValueError("--animate-anyone-alpha-smoothing must be in range [0.0, 1.0]")
+    if not str(args.ffmpeg_codec).strip():
+        raise ValueError("--ffmpeg-codec must not be empty")
+    ensure_ffmpeg_encoder_available(str(args.ffmpeg_codec))
 
     source_uri: str | None = args.source_uri
     if source_uri is not None:
@@ -841,7 +873,8 @@ def run_cli(argv: list[str] | None = None) -> int:
             raise FileNotFoundError(f"Input video does not exist: {source_path}")
         source_uri = str(source_path)
 
-    if bool(args.disable_debug_artifacts):
+    debug_enabled = bool(args.enable_debug_artifacts) and not bool(args.disable_debug_artifacts)
+    if not debug_enabled:
         # Keep actor debug keyframes aligned with global debug-artifact disable switch.
         args.disable_debug_keyframes = True
 
@@ -942,7 +975,7 @@ def _ensure_mock_source_video(runtime_output_root: str | Path | None = None) -> 
         fps=30.0,
         width=1280,
         height=720,
-        codec="libx264",
+        codec=os.environ.get("POINTSTREAM_FFMPEG_CODEC", "libsvtav1"),
         pix_fmt="yuv420p",
         crf=18,
         preset="veryfast",
