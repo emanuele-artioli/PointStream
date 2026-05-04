@@ -16,6 +16,7 @@ import torch
 
 
 _FFMPEG_ENCODER_CACHE: dict[str, bool] = {}
+_FFMPEG_ENCODER_NAME_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.+-]*$")
 
 
 @dataclass(frozen=True)
@@ -358,6 +359,46 @@ def _assert_ffmpeg_encoder_available(ffmpeg_bin: str, codec: str) -> None:
             f"Requested FFmpeg encoder '{codec}' is not available in '{ffmpeg_bin}'."
         )
 
+    process = subprocess.run(
+        [ffmpeg_bin, "-hide_banner", "-encoders"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        text=True,
+    )
+    if process.returncode != 0:
+        stderr_text = (process.stderr or "").strip()
+        raise RuntimeError(
+            f"Unable to query FFmpeg encoders via '{ffmpeg_bin} -encoders': {stderr_text or 'unknown error'}"
+        )
+
+    encoder_names = _parse_ffmpeg_encoder_names(process.stdout or "")
+    available = codec in encoder_names
+    _FFMPEG_ENCODER_CACHE[cache_key] = available
+
+    if not available:
+        raise RuntimeError(
+            f"Requested FFmpeg encoder '{codec}' is not available in '{ffmpeg_bin}'."
+        )
+
+
+def _parse_ffmpeg_encoder_names(ffmpeg_output: str) -> set[str]:
+    encoder_names: set[str] = set()
+    for line in ffmpeg_output.splitlines():
+        tokens = line.split()
+        if len(tokens) < 2:
+            continue
+
+        flags, encoder_name = tokens[0], tokens[1]
+        if len(flags) != 6:
+            continue
+        if not _FFMPEG_ENCODER_NAME_PATTERN.fullmatch(encoder_name):
+            continue
+
+        encoder_names.add(encoder_name)
+
+    return encoder_names
+
 
 def _normalize_preset_for_codec(codec: str, preset: str | None) -> str | None:
     if preset is None:
@@ -385,26 +426,3 @@ def _normalize_preset_for_codec(codec: str, preset: str | None) -> str | None:
         "veryslow": "4",
     }
     return preset_aliases.get(normalized_preset, "8")
-
-    process = subprocess.run(
-        [ffmpeg_bin, "-hide_banner", "-encoders"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        check=False,
-        text=True,
-    )
-    if process.returncode != 0:
-        stderr_text = (process.stderr or "").strip()
-        raise RuntimeError(
-            f"Unable to query FFmpeg encoders via '{ffmpeg_bin} -encoders': {stderr_text or 'unknown error'}"
-        )
-
-    encoder_lines = (process.stdout or "").splitlines()
-    token_pattern = re.compile(rf"\b{re.escape(codec)}\b")
-    available = any(token_pattern.search(line) for line in encoder_lines)
-    _FFMPEG_ENCODER_CACHE[cache_key] = available
-
-    if not available:
-        raise RuntimeError(
-            f"Requested FFmpeg encoder '{codec}' is not available in '{ffmpeg_bin}'."
-        )

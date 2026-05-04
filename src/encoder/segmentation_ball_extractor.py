@@ -1,12 +1,9 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from dataclasses import dataclass
 import os
-from pathlib import Path
 from typing import Any
 
-import cv2
 import numpy as np
 import torch
 

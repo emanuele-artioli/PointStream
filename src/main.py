@@ -188,6 +188,11 @@ def run_mock_pipeline(
         transported_components.append(actor_reference_size_bytes)
     transport_total_size_bytes = int(sum(transported_components))
 
+    residual_mode_obj = getattr(received_payload.residual, "mode", ResidualMode.FULL_VIDEO)
+    residual_mode_value = (
+        residual_mode_obj.value if isinstance(residual_mode_obj, ResidualMode) else str(residual_mode_obj)
+    )
+
     summary = {
         "chunk_id": received_payload.chunk.chunk_id,
         "run_output_root": str(resolved_transport_root),
@@ -195,7 +200,7 @@ def run_mock_pipeline(
         "num_rigid_object_packets": len(received_payload.rigid_objects),
         "ball_object_id": received_payload.ball.object_id,
         "residual_uri": received_payload.residual.residual_video_uri,
-            "residual_mode": received_payload.residual.mode,
+        "residual_mode": residual_mode_value,
         "decoded_uri": decoded.output_uri,
         "transport_backend": normalized_transport,
         "source_size_bytes": source_size_bytes,
@@ -396,13 +401,13 @@ def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
     if bool(args.disable_genai):
         enable_genai = False
 
-    # Residual mode has final precedence over all other toggles.
-    # - none: server skips GenAI
-    # - players_only/full_video: server computes GenAI predictions for deterministic residuals
-    if residual_mode == "none":
-        enable_genai = False
-    elif residual_mode in {"players_only", "full_video"}:
-        enable_genai = True
+    # Residual mode controls defaults for deterministic residual generation, but
+    # explicit user disable must still win.
+    if not bool(args.disable_genai):
+        if residual_mode == "none":
+            enable_genai = False
+        elif residual_mode in {"players_only", "full_video"}:
+            enable_genai = True
 
     os.environ["POINTSTREAM_ENABLE_GENAI"] = "1" if enable_genai else "0"
 

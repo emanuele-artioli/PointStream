@@ -4,7 +4,6 @@
 from pathlib import Path
 import argparse
 import json
-import msgpack
 import numpy as np
 import cv2
 
@@ -70,7 +69,7 @@ def main():
         translation_threshold_px=args.translation_threshold_px,
     )
 
-    print(f"\nPanorama generation:")
+    print("\nPanorama generation:")
     print(f"  Selected keyframes: {panorama.selected_frame_indices}")
     print(f"  Output canvas size: {panorama.frame_width}x{panorama.frame_height}")
     print(f"  Input video size:   {chunk.width}x{chunk.height}")

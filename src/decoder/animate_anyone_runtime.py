@@ -46,7 +46,10 @@ def _runtime_config() -> _RuntimeConfig:
 def _resolve_repo_root(repo_dir: str | None) -> Path | None:
     configured = repo_dir or os.environ.get("POINTSTREAM_ANIMATE_ANYONE_REPO_DIR")
     if configured is None:
-        return None
+        raise FileNotFoundError(
+            "Animate Anyone repository path is not set. "
+            "Provide --animate-anyone-repo-dir or set POINTSTREAM_ANIMATE_ANYONE_REPO_DIR."
+        )
 
     repo_root = Path(configured).expanduser().resolve()
     if not repo_root.exists() or not repo_root.is_dir():
@@ -142,24 +145,33 @@ def _load_pipeline(repo_root: Path | None, model_root: Path, device: str) -> Any
             from omegaconf import OmegaConf
             from transformers import CLIPVisionModelWithProjection
 
-            from animate_anyone.models.pose_guider import PoseGuider
-            from animate_anyone.models.unet_2d_condition import UNet2DConditionModel
-            from animate_anyone.models.unet_3d import UNet3DConditionModel
-            from animate_anyone.pipelines.pipeline_pose2vid_long import Pose2VideoPipeline
+            try:
+                from animate_anyone.models.pose_guider import PoseGuider
+                from animate_anyone.models.unet_2d_condition import UNet2DConditionModel
+                from animate_anyone.models.unet_3d import UNet3DConditionModel
+                from animate_anyone.pipelines.pipeline_pose2vid_long import Pose2VideoPipeline
 
-            import animate_anyone as animate_anyone_pkg
+                import animate_anyone as animate_anyone_pkg
+            except ModuleNotFoundError:
+                from src.models.pose_guider import PoseGuider
+                from src.models.unet_2d_condition import UNet2DConditionModel
+                from src.models.unet_3d import UNet3DConditionModel
+                from src.pipelines.pipeline_pose2vid_long import Pose2VideoPipeline
+
+                animate_anyone_pkg = None
         except ModuleNotFoundError as exc:
             raise RuntimeError(
                 "AnimateAnyone backend dependencies are missing. "
                 "Install the Moore-AnimateAnyone runtime dependencies in the active environment."
             ) from exc
 
-        package_root = Path(animate_anyone_pkg.__file__).resolve().parent
-        config_path = package_root / "configs" / "inference" / "inference_v2.yaml"
+        if animate_anyone_pkg is not None and getattr(animate_anyone_pkg, "__file__", None):
+            package_root = Path(str(animate_anyone_pkg.__file__)).resolve().parent
+            config_path = package_root / "configs" / "inference" / "inference_v2.yaml"
+        else:
+            config_path = Path("/nonexistent")
         if not config_path.exists() and repo_root is not None:
             config_path = repo_root / "configs" / "inference" / "inference_v2.yaml"
-        if not config_path.exists():
-            raise FileNotFoundError(f"AnimateAnyone inference config not found: {config_path}")
         infer_config = OmegaConf.load(str(config_path))
 
         pretrained_vae_path = str(model_root / "sd-vae-ft-mse")
