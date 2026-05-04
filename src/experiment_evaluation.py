@@ -21,42 +21,108 @@ def _compute_psnr(reference_video: Path, predicted_video: Path, max_frames: int 
     if not predicted_video.exists() or not predicted_video.is_file():
         return {"psnr_mean": None, "psnr_std": None, "psnr_num_frames": 0, "note": "missing predicted video"}
 
-    reference_capture = cv2.VideoCapture(str(reference_video))
-    predicted_capture = cv2.VideoCapture(str(predicted_video))
-    if not reference_capture.isOpened() or not predicted_capture.isOpened():
-        reference_capture.release()
-        predicted_capture.release()
-        return {"psnr_mean": None, "psnr_std": None, "psnr_num_frames": 0, "note": "failed to open video"}
+    # Unified frame pairing helper: index-first streaming, then timestamp-nearest fallback.
+    def _get_frame_pairs(ref_path: Path, pred_path: Path, max_frames: int | None = None) -> list[tuple[np.ndarray, np.ndarray]]:
+        # Try index-wise streaming pairing first (minimal memory).
+        ref_cap = cv2.VideoCapture(str(ref_path))
+        pred_cap = cv2.VideoCapture(str(pred_path))
+        if not ref_cap.isOpened() or not pred_cap.isOpened():
+            ref_cap.release()
+            pred_cap.release()
+            return []
 
-    # We use index-wise pairing (frame 0 -> frame 0, frame 1 -> frame 1, ...)
-    # This is the unified default pairing strategy for per-frame metrics.
+        pairs: list[tuple[np.ndarray, np.ndarray]] = []
+        idx = 0
+        try:
+            while True:
+                if max_frames is not None and idx >= max_frames:
+                    break
+                ref_ok, ref_frame = ref_cap.read()
+                pred_ok, pred_frame = pred_cap.read()
+                if not ref_ok or not pred_ok:
+                    break
+
+                pairs.append((ref_frame, pred_frame))
+                idx += 1
+        finally:
+            ref_cap.release()
+            pred_cap.release()
+
+        if pairs:
+            return pairs
+
+        # Streaming pairing produced no pairs; fall back to timestamp-based nearest matching.
+        ref_cap = cv2.VideoCapture(str(ref_path))
+        pred_cap = cv2.VideoCapture(str(pred_path))
+        if not ref_cap.isOpened() or not pred_cap.isOpened():
+            ref_cap.release()
+            pred_cap.release()
+            return []
+
+        ref_frames: list[np.ndarray] = []
+        ref_times: list[float] = []
+        pred_frames: list[np.ndarray] = []
+        pred_times: list[float] = []
+        try:
+            while True:
+                ok, frame = ref_cap.read()
+                if not ok:
+                    break
+                t_ms = float(ref_cap.get(cv2.CAP_PROP_POS_MSEC) or 0.0)
+                ref_frames.append(frame)
+                ref_times.append(t_ms)
+
+            while True:
+                ok, frame = pred_cap.read()
+                if not ok:
+                    break
+                t_ms = float(pred_cap.get(cv2.CAP_PROP_POS_MSEC) or 0.0)
+                pred_frames.append(frame)
+                pred_times.append(t_ms)
+        finally:
+            ref_cap.release()
+            pred_cap.release()
+
+        if not ref_frames or not pred_frames:
+            return []
+
+        # Build nearest-neighbor mapping from reference times to prediction frames.
+        used_pred: set[int] = set()
+        out_pairs: list[tuple[np.ndarray, np.ndarray]] = []
+        for i, rt in enumerate(ref_times):
+            diffs = [abs(rt - pt) for pt in pred_times]
+            j = int(np.argmin(np.array(diffs, dtype=float)))
+            if j in used_pred:
+                order = np.argsort(np.array(diffs, dtype=float))
+                found = False
+                for cand in order:
+                    if int(cand) not in used_pred:
+                        j = int(cand)
+                        found = True
+                        break
+                if not found:
+                    j = int(order[0])
+            used_pred.add(j)
+            out_pairs.append((ref_frames[i], pred_frames[j]))
+            if max_frames is not None and len(out_pairs) >= max_frames:
+                break
+
+        return out_pairs
+
+    pairs = _get_frame_pairs(reference_video, predicted_video, max_frames=max_frames)
     psnr_values: list[float] = []
-    frame_idx = 0
-    try:
-        while True:
-            if max_frames is not None and frame_idx >= max_frames:
-                break
-            ref_ok, reference_frame = reference_capture.read()
-            pred_ok, predicted_frame = predicted_capture.read()
-            if not ref_ok or not pred_ok:
-                break
-
-            if reference_frame.shape[:2] != predicted_frame.shape[:2]:
-                predicted_frame = cv2.resize(
-                    predicted_frame,
-                    (reference_frame.shape[1], reference_frame.shape[0]),
-                    interpolation=cv2.INTER_LINEAR,
-                )
-
-            # cv2.PSNR may return +inf for identical frames. Keep those values
-            # so we can report how many frames were perfectly identical.
-            psnr = cv2.PSNR(reference_frame, predicted_frame)
-            if np.isfinite(psnr) or np.isinf(psnr):
-                psnr_values.append(float(psnr))
-            frame_idx += 1
-    finally:
-        reference_capture.release()
-        predicted_capture.release()
+    for (reference_frame, predicted_frame) in pairs:
+        if reference_frame is None or predicted_frame is None:
+            continue
+        if reference_frame.shape[:2] != predicted_frame.shape[:2]:
+            predicted_frame = cv2.resize(
+                predicted_frame,
+                (reference_frame.shape[1], reference_frame.shape[0]),
+                interpolation=cv2.INTER_LINEAR,
+            )
+        psnr = cv2.PSNR(reference_frame, predicted_frame)
+        if np.isfinite(psnr) or np.isinf(psnr):
+            psnr_values.append(float(psnr))
 
     if not psnr_values:
         return {"psnr_mean": None, "psnr_std": None, "psnr_num_frames": 0, "psnr_infinite_frames": 0, "note": "no valid frame pairs"}
@@ -69,9 +135,6 @@ def _compute_psnr(reference_video: Path, predicted_video: Path, max_frames: int 
         mean_val = float(np.mean(finite_vals))
         std_val = float(np.std(finite_vals))
     else:
-        # No finite PSNR values (all frames identical -> +inf). We cannot
-        # serialize +inf to JSON reliably, so set mean/std to None but report
-        # that all frames were infinite.
         mean_val = None
         std_val = None
 
