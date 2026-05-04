@@ -154,6 +154,7 @@ def encode_video_frames_ffmpeg(
     pix_fmt: str = "yuv420p",
     crf: int | None = 23,
     preset: str | None = "veryfast",
+    ffmpeg_extra_args: list[str] | None = None,
     overwrite: bool = True,
 ) -> Path:
     destination = Path(output_path)
@@ -183,6 +184,8 @@ def encode_video_frames_ffmpeg(
         ffmpeg_cmd.extend(["-preset", preset])
     if crf is not None:
         ffmpeg_cmd.extend(["-crf", str(int(crf))])
+    if ffmpeg_extra_args:
+        ffmpeg_cmd.extend([str(arg) for arg in ffmpeg_extra_args])
     ffmpeg_cmd.extend(["-pix_fmt", pix_fmt])
     ffmpeg_cmd.append("-y" if overwrite else "-n")
     ffmpeg_cmd.append(str(destination))

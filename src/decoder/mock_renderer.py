@@ -249,15 +249,26 @@ class DecoderRenderer:
         frame_idx: int,
         temporal_window: int,
     ) -> torch.Tensor:
-        start_idx = max(0, int(frame_idx) - int(temporal_window) + 1)
-        sequence = dense_pose_tensor[start_idx : int(frame_idx) + 1]
-        if int(sequence.shape[0]) >= int(temporal_window):
-            return sequence
+        """Build temporal pose window for temporal GenAI compositors.
+        
+        CRITICAL FIX: Match the encoder's implementation!
+        The encoder uses a centered temporal window with no padding,
+        while the decoder was using a backward-looking window with repeated-frame padding.
+        This mismatch caused temporal desynchronization (motion lag artifacts).
+        
+        Now uses the same centered approach as the encoder to ensure encoder/decoder consistency.
+        """
+        window_half = int(temporal_window) // 2
+        start_idx = max(0, int(frame_idx) - window_half)
+        end_idx = min(int(dense_pose_tensor.shape[0]), int(frame_idx) + window_half + 1)
 
-        if int(sequence.shape[0]) == 0:
-            first_pose = dense_pose_tensor[0].unsqueeze(0)
-            return first_pose.repeat(int(temporal_window), 1, 1)
+        poses: list[torch.Tensor] = []
+        for idx in range(start_idx, end_idx):
+            if idx < int(dense_pose_tensor.shape[0]):
+                poses.append(dense_pose_tensor[idx])
 
-        pad_count = int(temporal_window) - int(sequence.shape[0])
-        first_pose = sequence[0].unsqueeze(0).repeat(pad_count, 1, 1)
-        return torch.cat([first_pose, sequence], dim=0)
+        if not poses:
+            return dense_pose_tensor[int(frame_idx)]
+
+        # Keep temporal conditioning as [Frames, 18, 3]
+        return torch.stack(poses, dim=0)

@@ -312,7 +312,13 @@ def generate_frame(
     device: str = "cuda",
     repo_dir: str | None = None,
 ) -> np.ndarray:
-    """Generate one actor frame via Moore-AnimateAnyone from PointStream-owned runtime glue."""
+    """Generate one actor frame via Moore-AnimateAnyone from PointStream-owned runtime glue.
+    
+    CRITICAL FIX FOR TEMPORAL DESYNCHRONIZATION:
+    When single-frame poses are passed (shape [18,3]), Animate-Anyone lacks temporal context for its
+    motion module, causing motion lag artifacts (yellow-green shadows ahead of players).
+    Solution: Expand single-frame poses to temporal windows by repeating the pose 3x.
+    """
     if reference_image_bgr.ndim != 3 or reference_image_bgr.shape[2] != 3:
         raise ValueError(f"Expected reference_image_bgr [H,W,3], got {reference_image_bgr.shape}")
 
@@ -338,6 +344,13 @@ def generate_frame(
     reference_pil = Image.fromarray(reference_rgb)
 
     dense_pose_sequence = np.asarray(dense_pose_sequence, dtype=np.float32)
+    
+    # FIX: Expand single-frame poses to temporal window for motion module context
+    if dense_pose_sequence.ndim == 2 and dense_pose_sequence.shape[0] == 18:
+        # Single pose [18,3] -> repeat 3 times to create [3,18,3] temporal window
+        # This gives Animate-Anyone temporal context for its motion module
+        dense_pose_sequence = np.tile(dense_pose_sequence[np.newaxis, :, :], (3, 1, 1))
+    
     pose_pil_sequence = _prepare_pose_sequence(
         dense_pose_sequence=dense_pose_sequence,
         width=width,

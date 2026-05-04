@@ -254,9 +254,10 @@ class ResidualCalculator:
             width=int(chunk.width),
             height=int(chunk.height),
             codec="libx265",
-            pix_fmt="yuv420p",
-            crf=28,
+            pix_fmt="yuv444p",
+            crf=24,
             preset="medium",
+            ffmpeg_extra_args=["-x265-params", "bframes=0:ref=1"],
         )
 
         return ResidualPacket(
@@ -337,9 +338,10 @@ class ResidualCalculator:
             width=int(chunk.width),
             height=int(chunk.height),
             codec="libx265",
-            pix_fmt="yuv420p",
-            crf=28,
+            pix_fmt="yuv444p",
+            crf=24,
             preset="medium",
+            ffmpeg_extra_args=["-x265-params", "bframes=0:ref=1"],
         )
 
         return ResidualPacket(
