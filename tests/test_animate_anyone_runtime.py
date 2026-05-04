@@ -93,6 +93,9 @@ def test_resolve_repo_root_and_model_root(monkeypatch, tmp_path: Path) -> None:
     repo_root = tmp_path / "moore_aa"
     repo_root.mkdir(parents=True)
 
+    monkeypatch.delenv("POINTSTREAM_ANIMATE_ANYONE_REPO_DIR", raising=False)
+    assert runtime._resolve_repo_root(None) is None
+
     monkeypatch.setenv("POINTSTREAM_ANIMATE_ANYONE_REPO_DIR", str(repo_root))
     resolved_repo = runtime._resolve_repo_root(None)
     assert resolved_repo == repo_root.resolve()

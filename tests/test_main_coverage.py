@@ -263,6 +263,60 @@ def test_run_cli_supports_no_summary_file(monkeypatch, tmp_path: Path) -> None:
     assert not (output_dir / "run_summary.json").exists()
 
 
+def test_run_cli_can_evaluate_after_run(monkeypatch, tmp_path: Path) -> None:
+    source_video = tmp_path / "input.mp4"
+    decoded_video = tmp_path / "decoded.mp4"
+    source_video.write_bytes(b"source")
+    decoded_video.write_bytes(b"decoded")
+    output_dir = tmp_path / "artifacts"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    captured: dict[str, object] = {}
+
+    def _fake_run_mock_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "chunk_id": "0003",
+            "run_output_root": str(output_dir),
+            "source_uri": str(source_video),
+            "num_actor_packets": 1,
+            "num_rigid_object_packets": 0,
+            "ball_object_id": "ball_0",
+            "residual_uri": "memory://residual/chunk.mp4",
+            "decoded_uri": str(decoded_video),
+            "source_size_bytes": 6,
+            "transport_total_size_bytes": 2,
+            "pipeline_total_sec": 1.5,
+            "encode_chunk_sec": 0.7,
+            "transport_send_sec": 0.1,
+            "transport_receive_sec": 0.1,
+            "decode_sec": 0.2,
+        }
+
+    def _fake_evaluate_run_summary(**kwargs):
+        captured["evaluation_args"] = kwargs
+        return {"psnr_mean": 42.0, "psnr_std": 0.0, "psnr_num_frames": 2}
+
+    monkeypatch.setattr(main_module, "run_mock_pipeline", _fake_run_mock_pipeline)
+    monkeypatch.setattr(main_module, "evaluate_run_summary", _fake_evaluate_run_summary)
+    monkeypatch.setattr(main_module, "_create_timestamped_output_dir", lambda base_root=None: output_dir)
+
+    exit_code = main_module.run_cli(
+        [
+            "--input",
+            str(source_video),
+            "--evaluate-after-run",
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured["evaluation_args"]["experiment_dir"] == output_dir
+    summary_file = output_dir / "run_summary.json"
+    assert summary_file.exists()
+    summary = json.loads(summary_file.read_text(encoding="utf-8"))
+    assert summary["evaluation"]["psnr_mean"] == 42.0
+
+
 def test_run_cli_rejects_invalid_num_frames(monkeypatch) -> None:
     monkeypatch.setattr(
         main_module,

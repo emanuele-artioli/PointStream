@@ -46,10 +46,7 @@ def _runtime_config() -> _RuntimeConfig:
 def _resolve_repo_root(repo_dir: str | None) -> Path | None:
     configured = repo_dir or os.environ.get("POINTSTREAM_ANIMATE_ANYONE_REPO_DIR")
     if configured is None:
-        raise FileNotFoundError(
-            "Animate Anyone repository path is not set. "
-            "Provide --animate-anyone-repo-dir or set POINTSTREAM_ANIMATE_ANYONE_REPO_DIR."
-        )
+        return None
 
     repo_root = Path(configured).expanduser().resolve()
     if not repo_root.exists() or not repo_root.is_dir():

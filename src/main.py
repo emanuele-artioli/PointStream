@@ -5,6 +5,7 @@ from datetime import datetime
 import json
 import os
 from pathlib import Path
+from time import perf_counter
 from typing import Any
 
 import cv2
@@ -27,6 +28,7 @@ from src.encoder.residual_calculator import ResidualCalculator
 from src.encoder.residual_calculator import UniformImportanceMapper
 from src.encoder.video_io import encode_video_frames_ffmpeg, probe_video_metadata
 from src.encoder.video_io import ensure_ffmpeg_encoder_available
+from src.experiment_evaluation import evaluate_run_summary
 from src.shared.schemas import VideoChunk
 from src.shared.schemas import ResidualMode
 from src.shared.synthesis_engine import SynthesisEngine
@@ -82,6 +84,7 @@ def run_mock_pipeline(
     chunk_id: str = "0001",
     runtime_output_root: str | Path | None = None,
 ) -> dict[str, object]:
+    pipeline_started = perf_counter()
     resolved_transport_root = (
         Path(transport_root).expanduser() if transport_root is not None else _create_timestamped_output_dir()
     )
@@ -133,7 +136,9 @@ def run_mock_pipeline(
     else:
         os.environ["POINTSTREAM_DEBUG_ARTIFACT_DIR"] = str(resolved_runtime_root / "debug")
     try:
+        encode_started = perf_counter()
         payload = encoder.encode_chunk(chunk)
+        encode_finished = perf_counter()
     finally:
         encoder.shutdown()
         if previous_debug_artifact_dir is None:
@@ -147,8 +152,12 @@ def run_mock_pipeline(
         raise ValueError(f"Unsupported transport backend: {transport_backend}")
 
     transport = DiskTransport(root_dir=resolved_transport_root)
+    transport_send_started = perf_counter()
     transport.send(payload)
+    transport_send_finished = perf_counter()
+    transport_receive_started = perf_counter()
     received_payload = transport.receive(chunk.chunk_id)
+    transport_receive_finished = perf_counter()
 
     resolved_decoder_root = (
         Path(decoder_output_root).expanduser()
@@ -160,7 +169,9 @@ def run_mock_pipeline(
     except TypeError:
         # Keep tests/simple stubs working when DecoderRenderer is monkeypatched.
         decoder = DecoderRenderer()
+    decode_started = perf_counter()
     decoded = decoder.process(received_payload)
+    decode_finished = perf_counter()
 
     chunk_dir = resolved_transport_root / f"chunk_{received_payload.chunk.chunk_id}"
     metadata_size_bytes = _safe_file_size(chunk_dir / "metadata.msgpack")
@@ -196,6 +207,7 @@ def run_mock_pipeline(
     summary = {
         "chunk_id": received_payload.chunk.chunk_id,
         "run_output_root": str(resolved_transport_root),
+        "source_uri": resolved_source_uri,
         "num_actor_packets": len(received_payload.actors),
         "num_rigid_object_packets": len(received_payload.rigid_objects),
         "ball_object_id": received_payload.ball.object_id,
@@ -209,6 +221,11 @@ def run_mock_pipeline(
         "residual_size_bytes": residual_size_bytes,
         "panorama_size_bytes": panorama_size_bytes,
         "transport_total_size_bytes": transport_total_size_bytes,
+        "pipeline_total_sec": float(perf_counter() - pipeline_started),
+        "encode_chunk_sec": float(encode_finished - encode_started),
+        "transport_send_sec": float(transport_send_finished - transport_send_started),
+        "transport_receive_sec": float(transport_receive_finished - transport_receive_started),
+        "decode_sec": float(decode_finished - decode_started),
         "compositing_mask_mode": os.environ.get("POINTSTREAM_COMPOSITING_MASK_MODE", "postgen-seg-client"),
         "postgen_segmenter_backend": os.environ.get("POINTSTREAM_POSTGEN_SEGMENTER_BACKEND", "yolo"),
         "metadata_mask_codec": os.environ.get("POINTSTREAM_METADATA_MASK_CODEC", "auto"),
@@ -713,6 +730,17 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         default=None,
         help="Explicit model file for postgen segmenter backend.",
     )
+    parser.add_argument(
+        "--evaluate-after-run",
+        action="store_true",
+        help="Run post-pipeline evaluation after the main pipeline completes.",
+    )
+    parser.add_argument(
+        "--evaluation-max-frames",
+        type=int,
+        default=None,
+        help="Optional cap on frames used for post-pipeline PSNR evaluation.",
+    )
 
     genai_group = parser.add_mutually_exclusive_group()
     genai_group.add_argument(
@@ -936,6 +964,13 @@ def run_cli(argv: list[str] | None = None) -> int:
         chunk_id=chunk_id,
         runtime_output_root=run_output_root,
     )
+
+    if bool(args.evaluate_after_run):
+        summary["evaluation"] = evaluate_run_summary(
+            summary=summary,
+            experiment_dir=run_output_root,
+            max_frames=args.evaluation_max_frames,
+        )
 
     summary_json = json.dumps(summary, indent=2)
     print(summary_json)

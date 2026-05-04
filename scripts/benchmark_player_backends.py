@@ -18,6 +18,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from src.experiment_evaluation import evaluate_run_summary  # noqa: E402
 from src.transport.disk import DiskTransport  # noqa: E402
 
 DEFAULT_DETECTORS = ("yolo26", "yoloe")
@@ -45,6 +46,11 @@ class AblationRun:
     interpolate_events: int | None = None
     mask_frame_count: int | None = None
     mask_frame_coverage: float | None = None
+    psnr_mean: float | None = None
+    psnr_std: float | None = None
+    psnr_num_frames: int | None = None
+    transport_savings_percent: float | None = None
+    decoded_vs_reference_percent: float | None = None
     error_message: str | None = None
 
 
@@ -231,6 +237,23 @@ def _run_one(
         num_frames=num_frames,
     )
 
+    evaluation_metrics: dict[str, Any] = {}
+    try:
+        evaluation = evaluate_run_summary(
+            summary=summary,
+            experiment_dir=run_output_root,
+            max_frames=num_frames,
+        )
+        evaluation_metrics = {
+            "psnr_mean": evaluation.get("psnr_mean"),
+            "psnr_std": evaluation.get("psnr_std"),
+            "psnr_num_frames": evaluation.get("psnr_num_frames"),
+            "transport_savings_percent": evaluation.get("transport_savings_percent"),
+            "decoded_vs_reference_percent": evaluation.get("decoded_vs_reference_percent"),
+        }
+    except Exception as eval_error:
+        pass
+
     return AblationRun(
         detector=detector,
         segmenter=segmenter,
@@ -251,6 +274,11 @@ def _run_one(
         interpolate_events=payload_metrics["interpolate_events"],
         mask_frame_count=payload_metrics["mask_frame_count"],
         mask_frame_coverage=payload_metrics["mask_frame_coverage"],
+        psnr_mean=evaluation_metrics.get("psnr_mean"),
+        psnr_std=evaluation_metrics.get("psnr_std"),
+        psnr_num_frames=evaluation_metrics.get("psnr_num_frames"),
+        transport_savings_percent=evaluation_metrics.get("transport_savings_percent"),
+        decoded_vs_reference_percent=evaluation_metrics.get("decoded_vs_reference_percent"),
     )
 
 
@@ -292,11 +320,17 @@ def _aggregate(rows: list[AblationRun]) -> list[dict[str, Any]]:
             avg_transport = float(
                 statistics.fmean(float(entry.transport_total_size_bytes or 0) for entry in ok_entries)
             )
+            psnr_with_values = [float(entry.psnr_mean) for entry in ok_entries if entry.psnr_mean is not None]
+            avg_psnr = float(statistics.fmean(psnr_with_values)) if psnr_with_values else None
+            savings_with_values = [float(entry.transport_savings_percent) for entry in ok_entries if entry.transport_savings_percent is not None]
+            avg_savings = float(statistics.fmean(savings_with_values)) if savings_with_values else None
         else:
             avg_elapsed = float("inf")
             avg_fragmentation = float("inf")
             avg_mask_coverage = 0.0
             avg_transport = float("inf")
+            avg_psnr = None
+            avg_savings = None
 
         aggregates.append(
             {
@@ -309,6 +343,8 @@ def _aggregate(rows: list[AblationRun]) -> list[dict[str, Any]]:
                 "avg_actor_reference_fragmentation": None if not ok_entries else avg_fragmentation,
                 "avg_mask_frame_coverage": None if not ok_entries else avg_mask_coverage,
                 "avg_transport_total_size_bytes": None if not ok_entries else int(round(avg_transport)),
+                "avg_psnr_mean": avg_psnr,
+                "avg_transport_savings_percent": avg_savings,
             }
         )
 
@@ -333,6 +369,8 @@ def _write_aggregate_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "avg_actor_reference_fragmentation",
         "avg_mask_frame_coverage",
         "avg_transport_total_size_bytes",
+        "avg_psnr_mean",
+        "avg_transport_savings_percent",
     ]
     with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)

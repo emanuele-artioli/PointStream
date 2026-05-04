@@ -1,0 +1,129 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any
+
+import cv2
+import numpy as np
+
+
+def _safe_file_size(path_like: str | Path | None) -> int | None:
+    if path_like is None:
+        return None
+    candidate = Path(str(path_like))
+    if not candidate.exists() or not candidate.is_file():
+        return None
+    return int(candidate.stat().st_size)
+
+
+def _compute_psnr(reference_video: Path, predicted_video: Path, max_frames: int | None = None) -> dict[str, Any]:
+    if not reference_video.exists() or not reference_video.is_file():
+        return {"psnr_mean": None, "psnr_std": None, "psnr_num_frames": 0, "note": "missing reference video"}
+    if not predicted_video.exists() or not predicted_video.is_file():
+        return {"psnr_mean": None, "psnr_std": None, "psnr_num_frames": 0, "note": "missing predicted video"}
+
+    reference_capture = cv2.VideoCapture(str(reference_video))
+    predicted_capture = cv2.VideoCapture(str(predicted_video))
+    if not reference_capture.isOpened() or not predicted_capture.isOpened():
+        reference_capture.release()
+        predicted_capture.release()
+        return {"psnr_mean": None, "psnr_std": None, "psnr_num_frames": 0, "note": "failed to open video"}
+
+    # We use index-wise pairing (frame 0 -> frame 0, frame 1 -> frame 1, ...)
+    # This is the unified default pairing strategy for per-frame metrics.
+    psnr_values: list[float] = []
+    frame_idx = 0
+    try:
+        while True:
+            if max_frames is not None and frame_idx >= max_frames:
+                break
+            ref_ok, reference_frame = reference_capture.read()
+            pred_ok, predicted_frame = predicted_capture.read()
+            if not ref_ok or not pred_ok:
+                break
+
+            if reference_frame.shape[:2] != predicted_frame.shape[:2]:
+                predicted_frame = cv2.resize(
+                    predicted_frame,
+                    (reference_frame.shape[1], reference_frame.shape[0]),
+                    interpolation=cv2.INTER_LINEAR,
+                )
+
+            # cv2.PSNR may return +inf for identical frames. Keep those values
+            # so we can report how many frames were perfectly identical.
+            psnr = cv2.PSNR(reference_frame, predicted_frame)
+            if np.isfinite(psnr) or np.isinf(psnr):
+                psnr_values.append(float(psnr))
+            frame_idx += 1
+    finally:
+        reference_capture.release()
+        predicted_capture.release()
+
+    if not psnr_values:
+        return {"psnr_mean": None, "psnr_std": None, "psnr_num_frames": 0, "psnr_infinite_frames": 0, "note": "no valid frame pairs"}
+
+    arr = np.array(psnr_values, dtype=float)
+    infinite_count = int(np.isinf(arr).sum())
+    finite_vals = arr[np.isfinite(arr)]
+
+    if finite_vals.size > 0:
+        mean_val = float(np.mean(finite_vals))
+        std_val = float(np.std(finite_vals))
+    else:
+        # No finite PSNR values (all frames identical -> +inf). We cannot
+        # serialize +inf to JSON reliably, so set mean/std to None but report
+        # that all frames were infinite.
+        mean_val = None
+        std_val = None
+
+    return {
+        "psnr_mean": mean_val,
+        "psnr_std": std_val,
+        "psnr_num_frames": int(len(psnr_values)),
+        "psnr_infinite_frames": infinite_count,
+        "note": None,
+    }
+
+
+def evaluate_run_summary(summary: dict[str, Any], experiment_dir: str | Path, max_frames: int | None = None) -> dict[str, Any]:
+    resolved_experiment_dir = Path(experiment_dir).expanduser()
+    source_uri = summary.get("source_uri")
+    decoded_uri = summary.get("decoded_uri")
+    transport_total_size_bytes = summary.get("transport_total_size_bytes")
+    source_size_bytes = summary.get("source_size_bytes")
+
+    source_path = Path(str(source_uri)).expanduser() if source_uri is not None else None
+    decoded_path = Path(str(decoded_uri)).expanduser() if decoded_uri is not None else None
+
+    psnr = _compute_psnr(
+        reference_video=source_path if source_path is not None else resolved_experiment_dir / "missing_source.mp4",
+        predicted_video=decoded_path if decoded_path is not None else resolved_experiment_dir / "missing_decoded.mp4",
+        max_frames=max_frames,
+    )
+
+    evaluation = {
+        "experiment_dir": str(resolved_experiment_dir),
+        "source_uri": str(source_path) if source_path is not None else None,
+        "decoded_uri": str(decoded_path) if decoded_path is not None else None,
+        "reference_video_size_bytes": source_size_bytes,
+        "decoded_video_size_bytes": _safe_file_size(decoded_path) if decoded_path is not None else None,
+        "transport_total_size_bytes": transport_total_size_bytes,
+        "pipeline_total_sec": summary.get("pipeline_total_sec"),
+        "encode_chunk_sec": summary.get("encode_chunk_sec"),
+        "transport_send_sec": summary.get("transport_send_sec"),
+        "transport_receive_sec": summary.get("transport_receive_sec"),
+        "decode_sec": summary.get("decode_sec"),
+        "transport_savings_percent": None,
+        "decoded_vs_reference_percent": None,
+    }
+
+    if isinstance(source_size_bytes, int) and source_size_bytes > 0:
+        if isinstance(transport_total_size_bytes, int):
+            evaluation["transport_savings_percent"] = (1.0 - float(transport_total_size_bytes) / float(source_size_bytes)) * 100.0
+        decoded_size_bytes = evaluation["decoded_video_size_bytes"]
+        if isinstance(decoded_size_bytes, int):
+            evaluation["decoded_vs_reference_percent"] = (1.0 - float(decoded_size_bytes) / float(source_size_bytes)) * 100.0
+
+    evaluation.update(psnr)
+    return evaluation
