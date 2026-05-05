@@ -24,6 +24,7 @@ class _ClientActorState:
     object_id: str
     reference_crop_tensor: torch.Tensor
     dense_pose_tensor: torch.Tensor
+    keyframe_frame_ids: frozenset[int] = field(default_factory=frozenset)
     metadata_masks_by_frame: dict[int, "_DecodedActorMaskFrame"] = field(default_factory=dict)
 
 
@@ -116,11 +117,17 @@ class DecoderRenderer:
             if reference_crop is None or dense_pose is None:
                 continue
             metadata_masks = self._decode_actor_masks(actor_packet)
+            keyframe_ids = frozenset(
+                int(event.frame_id)
+                for event in actor_packet.events
+                if getattr(event, "event_type", None) == "keyframe"
+            )
             actor_state[track_id] = _ClientActorState(
                 track_id=track_id,
                 object_id=actor_packet.object_id,
                 reference_crop_tensor=reference_crop,
                 dense_pose_tensor=dense_pose,
+                keyframe_frame_ids=keyframe_ids,
                 metadata_masks_by_frame=metadata_masks,
             )
         return actor_state
@@ -191,6 +198,10 @@ class DecoderRenderer:
         if not self._actor_state:
             return frame_tensor
 
+        keyframe_only = os.environ.get("POINTSTREAM_GENAI_KEYFRAME_ONLY", "0").strip().lower() in {"1", "true", "yes", "on"}
+        if keyframe_only:
+            return self._render_genai_keyframe_only(frame_tensor=frame_tensor)
+
         use_temporal_window = bool(
             hasattr(self._genai_compositor, "uses_temporal_pose_sequence")
             and self._genai_compositor.uses_temporal_pose_sequence()
@@ -252,6 +263,87 @@ class DecoderRenderer:
             out_frames.append(composited)
 
         return torch.stack(out_frames, dim=0)
+
+    def _render_genai_keyframe_only(self, frame_tensor: torch.Tensor) -> torch.Tensor:
+        frame_count = int(frame_tensor.shape[0])
+        if frame_count <= 0:
+            return frame_tensor
+
+        selected_indices = self._collect_genai_keyframe_indices(frame_count=frame_count)
+        if len(selected_indices) <= 1:
+            return self._render_genai_baseline(frame_tensor=frame_tensor)
+
+        generated_frames: list[torch.Tensor] = []
+        generated_indices: list[int] = []
+        for frame_idx in selected_indices:
+            composited = frame_tensor[frame_idx]
+            global_frame_id = int(self._chunk_start_frame_id) + int(frame_idx)
+            for actor_state in self._actor_state.values():
+                if frame_idx >= int(actor_state.dense_pose_tensor.shape[0]):
+                    continue
+
+                pose_condition = actor_state.dense_pose_tensor[frame_idx]
+                metadata_entry = actor_state.metadata_masks_by_frame.get(global_frame_id)
+                metadata_mask = None if metadata_entry is None else metadata_entry.mask_gray
+                metadata_bbox = None if metadata_entry is None else metadata_entry.bbox
+
+                try:
+                    composited = self._genai_compositor.process(
+                        reference_crop_tensor=actor_state.reference_crop_tensor,
+                        dense_dwpose_tensor=pose_condition,
+                        warped_background_frame=composited,
+                        actor_identity=actor_state.object_id,
+                        metadata_mask=metadata_mask,
+                        metadata_bbox=metadata_bbox,
+                    ).to(frame_tensor.device)
+                except TypeError:
+                    composited = self._genai_compositor.process(
+                        reference_crop_tensor=actor_state.reference_crop_tensor,
+                        dense_dwpose_tensor=pose_condition,
+                        warped_background_frame=composited,
+                        actor_identity=actor_state.object_id,
+                    ).to(frame_tensor.device)
+
+            generated_indices.append(int(frame_idx))
+            generated_frames.append(composited)
+
+        out_frames: list[torch.Tensor] = []
+        anchor_idx = 0
+        for frame_idx in range(frame_count):
+            if frame_idx <= generated_indices[0]:
+                out_frames.append(generated_frames[0])
+                continue
+            while anchor_idx + 1 < len(generated_indices) and frame_idx > generated_indices[anchor_idx + 1]:
+                anchor_idx += 1
+            if anchor_idx + 1 >= len(generated_indices):
+                out_frames.append(generated_frames[-1])
+                continue
+
+            left_idx = generated_indices[anchor_idx]
+            right_idx = generated_indices[anchor_idx + 1]
+            left_frame = generated_frames[anchor_idx].to(dtype=torch.float32)
+            right_frame = generated_frames[anchor_idx + 1].to(dtype=torch.float32)
+            if right_idx <= left_idx:
+                out_frames.append(generated_frames[anchor_idx])
+                continue
+            alpha = float(frame_idx - left_idx) / float(right_idx - left_idx)
+            blended = torch.lerp(left_frame, right_frame, alpha).clamp(0.0, 255.0).to(torch.uint8)
+            out_frames.append(blended)
+
+        return torch.stack(out_frames, dim=0)
+    def _collect_genai_keyframe_indices(self, frame_count: int) -> list[int]:
+        selected: set[int] = set()
+        for actor_state in self._actor_state.values():
+            selected.update(idx for idx in actor_state.keyframe_frame_ids if 0 <= idx < frame_count)
+
+        if not selected:
+            return list(range(frame_count))
+        ordered = sorted(selected)
+        if ordered[0] != 0:
+            ordered.insert(0, 0)
+        if ordered[-1] != frame_count - 1:
+            ordered.append(frame_count - 1)
+        return sorted(set(ordered))
 
     def _build_temporal_pose_condition(
         self,

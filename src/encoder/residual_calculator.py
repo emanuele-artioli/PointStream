@@ -32,6 +32,7 @@ class _ServerActorState:
     object_id: str
     reference_crop_tensor: torch.Tensor
     dense_pose_tensor: torch.Tensor
+    keyframe_frame_ids: frozenset[int]
     metadata_masks_by_frame: dict[int, _DecodedActorMaskFrame]
 
 
@@ -468,6 +469,14 @@ class ResidualCalculator:
         if not isinstance(compositor, DiffusersCompositor):
             raise RuntimeError("GenAI residual path requires DiffusersCompositor when POINTSTREAM_ENABLE_GENAI=1")
 
+        if os.environ.get("POINTSTREAM_GENAI_KEYFRAME_ONLY", "0").strip().lower() in {"1", "true", "yes", "on"}:
+            return self._render_server_genai_keyframe_only(
+                payload=payload,
+                frame_tensor=frame_tensor,
+                actor_state=actor_state,
+                compositor=compositor,
+            )
+
         use_temporal_window = compositor.uses_temporal_pose_sequence()
         temporal_window = max(1, int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW", "16")))
         preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
@@ -509,6 +518,93 @@ class ResidualCalculator:
             out_frames.append(composited)
 
         return torch.stack(out_frames, dim=0)
+    def _render_server_genai_keyframe_only(
+        self,
+        payload: EncodedChunkPayload,
+        frame_tensor: torch.Tensor,
+        actor_state: dict[int, _ServerActorState],
+        compositor: DiffusersCompositor,
+    ) -> torch.Tensor:
+        frame_count = int(frame_tensor.shape[0])
+        if frame_count <= 0 or not actor_state:
+            return frame_tensor
+
+        selected: set[int] = set()
+        for state in actor_state.values():
+            selected.update(idx for idx in state.keyframe_frame_ids if 0 <= idx < frame_count)
+        if not selected:
+            return frame_tensor
+
+        selected_indices = sorted(selected)
+        if selected_indices[0] != 0:
+            selected_indices.insert(0, 0)
+        if selected_indices[-1] != frame_count - 1:
+            selected_indices.append(frame_count - 1)
+        selected_indices = sorted(set(selected_indices))
+
+        use_temporal_window = compositor.uses_temporal_pose_sequence()
+        temporal_window = max(1, int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW", "16")))
+        preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
+        chunk_start = int(payload.chunk.start_frame_id)
+
+        generated_frames: list[torch.Tensor] = []
+        for frame_idx in selected_indices:
+            composited = frame_tensor[frame_idx]
+            global_frame_id = chunk_start + frame_idx
+            for state in actor_state.values():
+                if frame_idx >= int(state.dense_pose_tensor.shape[0]):
+                    continue
+
+                if use_temporal_window:
+                    if frame_idx < preroll_frames:
+                        continue
+                    pose_condition = self._build_temporal_pose_condition(
+                        dense_pose_tensor=state.dense_pose_tensor,
+                        frame_idx=frame_idx,
+                        temporal_window=temporal_window,
+                    )
+                else:
+                    pose_condition = state.dense_pose_tensor[frame_idx]
+
+                metadata_entry = state.metadata_masks_by_frame.get(global_frame_id)
+                metadata_mask = None if metadata_entry is None else metadata_entry.mask_gray
+                metadata_bbox = None if metadata_entry is None else metadata_entry.bbox
+
+                composited = compositor.process(
+                    reference_crop_tensor=state.reference_crop_tensor,
+                    dense_dwpose_tensor=pose_condition,
+                    warped_background_frame=composited,
+                    actor_identity=state.object_id,
+                    metadata_mask=metadata_mask,
+                    metadata_bbox=metadata_bbox,
+                ).to(frame_tensor.device)
+
+            generated_frames.append(composited)
+
+        out_frames: list[torch.Tensor] = []
+        anchor_idx = 0
+        for frame_idx in range(frame_count):
+            if frame_idx <= selected_indices[0]:
+                out_frames.append(generated_frames[0])
+                continue
+            while anchor_idx + 1 < len(selected_indices) and frame_idx > selected_indices[anchor_idx + 1]:
+                anchor_idx += 1
+            if anchor_idx + 1 >= len(selected_indices):
+                out_frames.append(generated_frames[-1])
+                continue
+
+            left_idx = selected_indices[anchor_idx]
+            right_idx = selected_indices[anchor_idx + 1]
+            left_frame = generated_frames[anchor_idx].to(dtype=torch.float32)
+            right_frame = generated_frames[anchor_idx + 1].to(dtype=torch.float32)
+            if right_idx <= left_idx:
+                out_frames.append(generated_frames[anchor_idx])
+                continue
+            alpha = float(frame_idx - left_idx) / float(right_idx - left_idx)
+            blended = torch.lerp(left_frame, right_frame, alpha).clamp(0.0, 255.0).to(torch.uint8)
+            out_frames.append(blended)
+
+        return torch.stack(out_frames, dim=0)
 
     def _build_actor_state(self, payload: EncodedChunkPayload) -> dict[int, _ServerActorState]:
         decoded_references = self._decode_reference_crops(payload)
@@ -526,6 +622,11 @@ class ResidualCalculator:
                 object_id=actor_packet.object_id,
                 reference_crop_tensor=reference_crop,
                 dense_pose_tensor=dense_pose,
+                keyframe_frame_ids=frozenset(
+                    int(event.frame_id)
+                    for event in actor_packet.events
+                    if getattr(event, "event_type", None) == "keyframe"
+                ),
                 metadata_masks_by_frame=self._decode_actor_masks(actor_packet),
             )
         return actor_state

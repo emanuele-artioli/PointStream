@@ -462,6 +462,7 @@ def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
         os.environ["POINTSTREAM_ANIMATE_ANYONE_HEIGHT"] = str(int(args.animate_anyone_height))
     if args.genai_preroll_frames is not None:
         os.environ["POINTSTREAM_GENAI_PREROLL_FRAMES"] = str(int(args.genai_preroll_frames))
+    os.environ["POINTSTREAM_GENAI_KEYFRAME_ONLY"] = "1" if bool(args.genai_keyframe_only) else "0"
     if args.animate_anyone_transparent_threshold is not None:
         os.environ["POINTSTREAM_ANIMATE_ANYONE_TRANSPARENT_THRESHOLD"] = str(
             int(args.animate_anyone_transparent_threshold)
@@ -923,6 +924,11 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         type=int,
         default=None,
         help="Frames to keep residual-only before temporal GenAI compositing starts.",
+    )
+    parser.add_argument(
+        "--genai-keyframe-only",
+        action="store_true",
+        help="Run GenAI only on received keyframe skeletons and interpolate generated frames locally.",
     )
     parser.add_argument(
         "--animate-anyone-transparent-threshold",

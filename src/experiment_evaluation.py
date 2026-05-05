@@ -131,15 +131,10 @@ def evaluate_run_summary(summary: dict[str, Any], experiment_dir: str | Path, ma
         "transport_receive_sec": summary.get("transport_receive_sec"),
         "decode_sec": summary.get("decode_sec"),
         "transport_savings_percent": None,
-        "decoded_vs_reference_percent": None,
     }
 
-    if isinstance(source_size_bytes, int) and source_size_bytes > 0:
-        if isinstance(transport_total_size_bytes, int):
-            evaluation["transport_savings_percent"] = (1.0 - float(transport_total_size_bytes) / float(source_size_bytes)) * 100.0
-        decoded_size_bytes = evaluation["decoded_video_size_bytes"]
-        if isinstance(decoded_size_bytes, int):
-            evaluation["decoded_vs_reference_percent"] = (1.0 - float(decoded_size_bytes) / float(source_size_bytes)) * 100.0
+    if isinstance(source_size_bytes, int) and source_size_bytes > 0 and isinstance(transport_total_size_bytes, int):
+        evaluation["transport_savings_percent"] = (1.0 - float(transport_total_size_bytes) / float(source_size_bytes)) * 100.0
 
     evaluation.update(psnr)
     return evaluation

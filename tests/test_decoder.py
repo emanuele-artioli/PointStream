@@ -124,6 +124,57 @@ def test_render_genai_baseline_uses_preroll_and_fixed_temporal_window(monkeypatc
     assert spy.window_lengths == [2, 3]
 
 
+def test_render_genai_baseline_keyframe_only_interpolates_missing_frames(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setenv("POINTSTREAM_GENAI_KEYFRAME_ONLY", "1")
+
+    renderer = DecoderRenderer(output_root=tmp_path)
+
+    class _KeyframeSpyCompositor:
+        def __init__(self) -> None:
+            self.calls: list[int] = []
+
+        def uses_temporal_pose_sequence(self) -> bool:
+            return False
+
+        def process(
+            self,
+            reference_crop_tensor,
+            dense_dwpose_tensor,
+            warped_background_frame,
+            actor_identity=None,
+            metadata_mask=None,
+            metadata_bbox=None,
+        ):
+            _ = reference_crop_tensor
+            _ = dense_dwpose_tensor
+            _ = actor_identity
+            _ = metadata_mask
+            _ = metadata_bbox
+            self.calls.append(int(warped_background_frame.sum().item()))
+            return warped_background_frame + 1
+
+    spy = _KeyframeSpyCompositor()
+    setattr(renderer, "_genai_compositor", spy)
+
+    reference_crop = torch.full((3, 16, 16), 128, dtype=torch.uint8)
+    dense_pose = torch.zeros((3, 18, 3), dtype=torch.float32)
+    renderer._actor_state = {
+        1: _ClientActorState(
+            track_id=1,
+            object_id="person_1",
+            reference_crop_tensor=reference_crop,
+            dense_pose_tensor=dense_pose,
+            keyframe_frame_ids=frozenset({0, 2}),
+        )
+    }
+
+    frame_tensor = torch.zeros((3, 3, 32, 32), dtype=torch.uint8)
+    out = renderer._render_genai_baseline(frame_tensor)
+
+    assert out.shape == frame_tensor.shape
+    assert len(spy.calls) == 2
+
+
 def test_decoder_actor_mask_decode_supports_legacy_png_payload(mock_encoder_pipeline, test_run_artifacts_dir: Path) -> None:
     video_path = create_dummy_video(
         path=test_run_artifacts_dir / "test_chunks" / "legacy_mask_decode.mp4",
