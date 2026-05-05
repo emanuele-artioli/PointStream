@@ -60,8 +60,11 @@ reference-padding-ratio: 0.10         # Padding ratio for reference crop extract
 # Residual and Importance Mapping
 # ============================================================================
 importance-mapper: binary             # Residual weighting strategy: binary or uniform
-residual-mode: full_video             # Residual mode: none, players_only, full_video
 residual-background-downscale: 2      # Downscale factor for background residuals (use None to disable)
+residual-batch-size: 8                # Number of frames processed per GPU batch
+downscale-interpolation: bilinear     # Background downscale interpolation: nearest, bilinear, bicubic, area
+residual-block-size: 8                # Block size used for pooled residual activity gating
+residual-block-threshold: 0.0         # Average absolute error threshold per block in pixel units
 seed: 1337                            # Deterministic seed for synthesis and GenAI
 
 # ============================================================================

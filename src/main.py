@@ -383,25 +383,34 @@ def _parse_optional_int_or_none(value: str) -> int | None:
 
 
 def _build_residual_calculator(seed: int, importance_mapper: str) -> ResidualCalculator | None:
-    return _build_residual_calculator_with_mode(
+    return _build_residual_calculator_impl(
         seed=seed,
         importance_mapper=importance_mapper,
-        residual_mode=ResidualMode.FULL_VIDEO,
         background_block_downscale_factor=2,
+        residual_batch_size=8,
+        downscale_interpolation="bilinear",
+        residual_block_size=8,
+        block_information_threshold=0.0,
     )
 
 
-def _build_residual_calculator_with_mode(
+def _build_residual_calculator_impl(
     seed: int,
     importance_mapper: str,
-    residual_mode: ResidualMode = ResidualMode.FULL_VIDEO,
     background_block_downscale_factor: int | None = 2,
+    residual_batch_size: int = 8,
+    downscale_interpolation: str = "bilinear",
+    residual_block_size: int = 8,
+    block_information_threshold: float = 0.0,
 ) -> ResidualCalculator | None:
     uses_default = (
         int(seed) == 1337
         and importance_mapper.strip().lower() == "binary"
-        and residual_mode == ResidualMode.FULL_VIDEO
         and background_block_downscale_factor == 2
+        and int(residual_batch_size) == 8
+        and str(downscale_interpolation).strip().lower() == "bilinear"
+        and int(residual_block_size) == 8
+        and float(block_information_threshold) == 0.0
     )
     if uses_default:
         return None
@@ -410,8 +419,11 @@ def _build_residual_calculator_with_mode(
     return ResidualCalculator(
         synthesis_engine=SynthesisEngine(seed=int(seed)),
         importance_mapper=mapper,
-        residual_mode=residual_mode,
         background_block_downscale_factor=background_block_downscale_factor,
+        residual_batch_size=residual_batch_size,
+        downscale_interpolation=downscale_interpolation,
+        residual_block_size=residual_block_size,
+        block_information_threshold=block_information_threshold,
     )
 
 
@@ -419,12 +431,6 @@ def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
     if args.ffmpeg_codec is not None:
         os.environ["POINTSTREAM_FFMPEG_CODEC"] = str(args.ffmpeg_codec)
     enable_genai = bool(args.genai_backend)
-    residual_mode = getattr(args, "residual_mode", "full_video").strip().lower()
-
-    # Residual mode 'none' always disables GenAI. For other modes, keep GenAI
-    # opt-in via backend selection to preserve lightweight defaults.
-    if residual_mode == "none":
-        enable_genai = False
 
     os.environ["POINTSTREAM_ENABLE_GENAI"] = "1" if enable_genai else "0"
 
@@ -756,17 +762,6 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
-        "--residual-mode",
-        choices=("none", "players_only", "full_video"),
-        default="full_video",
-        help=(
-            "Residual calculation scope (determines WHICH REGIONS are encoded): "
-            "'none' (no residuals, server skips GenAI), "
-            "'players_only' (residuals for player regions only), "
-            "'full_video' (whole-video residuals after full reconstruction, default)."
-        ),
-    )
-    parser.add_argument(
         "--residual-background-downscale",
         type=_parse_optional_int_or_none,
         default=2,
@@ -774,6 +769,30 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "Optional downscale factor for background residual regions in full-video mode. "
             "Use 'None' to disable adaptive downscaling. Default: 2."
         ),
+    )
+    parser.add_argument(
+        "--residual-batch-size",
+        type=int,
+        default=8,
+        help="Number of frames to process per GPU batch in the residual calculator.",
+    )
+    parser.add_argument(
+        "--downscale-interpolation",
+        choices=("nearest", "bilinear", "bicubic", "area"),
+        default="bilinear",
+        help="Interpolation mode used when downscaling background residuals.",
+    )
+    parser.add_argument(
+        "--residual-block-size",
+        type=int,
+        default=8,
+        help="Block size used for residual activity pooling and block dropping.",
+    )
+    parser.add_argument(
+        "--residual-block-threshold",
+        type=float,
+        default=0.0,
+        help="Average absolute residual threshold per block in pixel units.",
     )
     parser.add_argument(
         "--seed",
@@ -1050,17 +1069,14 @@ def run_cli(argv: list[str] | None = None) -> int:
         jpeg_quality=int(args.reference_jpeg_quality),
         padding_ratio=float(args.reference_padding_ratio),
     )
-    residual_mode_str = str(args.residual_mode).strip().lower()
-    try:
-        residual_mode = ResidualMode(residual_mode_str)
-    except ValueError:
-        residual_mode = ResidualMode.FULL_VIDEO
-
-    residual_calculator = _build_residual_calculator_with_mode(
+    residual_calculator = _build_residual_calculator(
         seed=int(args.seed),
         importance_mapper=str(args.importance_mapper),
-        residual_mode=residual_mode,
         background_block_downscale_factor=args.residual_background_downscale,
+        residual_batch_size=int(args.residual_batch_size),
+        downscale_interpolation=str(args.downscale_interpolation),
+        residual_block_size=int(args.residual_block_size),
+        block_information_threshold=float(args.residual_block_threshold),
     )
 
     run_summary = run_mock_pipeline(

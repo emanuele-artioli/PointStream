@@ -157,6 +157,10 @@ class ResidualCalculator:
         device: str | torch.device | None = None,
         residual_mode: ResidualMode = ResidualMode.FULL_VIDEO,
         background_block_downscale_factor: int | None = 2,
+        residual_batch_size: int = 8,
+        downscale_interpolation: str = "bilinear",
+        residual_block_size: int = 8,
+        block_information_threshold: float = 0.0,
     ) -> None:
         self._synthesis_engine = synthesis_engine or SynthesisEngine()
         if device is None:
@@ -172,6 +176,12 @@ class ResidualCalculator:
         else:
             factor = int(background_block_downscale_factor)
             self._background_block_downscale_factor = factor if factor >= 2 else None
+        self._residual_batch_size = max(1, int(residual_batch_size))
+        self._downscale_interpolation = str(downscale_interpolation).strip().lower()
+        if self._downscale_interpolation not in {"nearest", "bilinear", "bicubic", "area"}:
+            raise ValueError(f"Unsupported downscale interpolation: {self._downscale_interpolation}")
+        self._residual_block_size = max(1, int(residual_block_size))
+        self._block_information_threshold = max(0.0, float(block_information_threshold))
 
     @gpu_bound
     def process(
@@ -181,18 +191,6 @@ class ResidualCalculator:
         frame_states: list[FrameState],
         debug_output_path: str | Path | None = None,
     ) -> ResidualPacket:
-        """
-        Process residuals based on residual_mode and importance_mapper.
-        
-        These are complementary (NOT redundant):
-        - residual_mode: Controls SCOPE - which regions/frames get encoded
-          - NONE: Skip all residuals
-          - PLAYERS_ONLY: Only encode player regions (via ROI masking)
-          - FULL_VIDEO: Encode entire video
-        - importance_mapper: Controls PRECISION - per-pixel weight/quality within encoded regions
-          - BinaryActorImportanceMapper: Zero weight on background (saves bandwidth)
-          - UniformImportanceMapper: Equal weight everywhere (ground truth, used with FULL_VIDEO)
-        """
         if self._residual_mode == ResidualMode.NONE:
             return ResidualPacket(
                 chunk_id=chunk.chunk_id,
@@ -200,21 +198,15 @@ class ResidualCalculator:
                 residual_video_uri="",
                 mode=ResidualMode.NONE,
             )
-        elif self._residual_mode == ResidualMode.PLAYERS_ONLY:
-            return self._process_players_only(chunk, payload, frame_states, debug_output_path)
-        elif self._residual_mode == ResidualMode.FULL_VIDEO:
-            return self._process_full_video(chunk, payload, frame_states, debug_output_path)
-        else:
-            raise ValueError(f"Unknown residual mode: {self._residual_mode}")
+        return self._process_residuals(chunk, payload, frame_states, debug_output_path)
 
-    def _process_players_only(
+    def _process_residuals(
         self,
         chunk: VideoChunk,
         payload: EncodedChunkPayload,
         frame_states: list[FrameState],
         debug_output_path: str | Path | None,
     ) -> ResidualPacket:
-        """Calculate residuals for players only (masked prediction residuals)."""
         predicted_frames = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False).frames_bgr
         if self._is_genai_enabled():
             predicted_frames = self._render_server_genai_prediction(payload=payload, frame_tensor=predicted_frames)
@@ -246,33 +238,65 @@ class ResidualCalculator:
                 raise ValueError("ResidualCalculator could not seek to chunk start frame in source video")
 
         def _iter_encoded_frames() -> Iterator[np.ndarray]:
-            for frame_idx in range(valid_frames):
-                try:
-                    original_np = next(source_iter)
-                except StopIteration:
+            frame_idx = 0
+            while frame_idx < valid_frames:
+                batch_end = min(valid_frames, frame_idx + self._residual_batch_size)
+                batch_originals: list[torch.Tensor] = []
+                batch_predicted: list[torch.Tensor] = []
+                batch_actor_masks: list[torch.Tensor] = []
+
+                for batch_frame_idx in range(frame_idx, batch_end):
+                    try:
+                        original_np = next(source_iter)
+                    except StopIteration:
+                        batch_end = batch_frame_idx
+                        break
+
+                    batch_originals.append(
+                        torch.from_numpy(np.asarray(original_np, dtype=np.uint8))
+                        .permute(2, 0, 1)
+                        .to(self._device, dtype=torch.float32)
+                    )
+                    batch_predicted.append(predicted_frames[batch_frame_idx].to(self._device, dtype=torch.float32))
+                    frame_state = self._select_frame_state(frame_states=frame_states, frame_idx=batch_frame_idx)
+                    batch_actor_masks.append(
+                        self._build_actor_mask(
+                            frame_state=frame_state,
+                            frame_height=int(chunk.height),
+                            frame_width=int(chunk.width),
+                            device=self._device,
+                        )
+                    )
+
+                if not batch_originals:
                     break
 
-                frame_state = self._select_frame_state(frame_states=frame_states, frame_idx=frame_idx)
-                importance_map = self._importance_mapper.build_importance_map(
-                    frame_state=frame_state,
-                    frame_height=int(chunk.height),
-                    frame_width=int(chunk.width),
-                    device=self._device,
+                originals = torch.stack(batch_originals, dim=0)
+                predicted = torch.stack(batch_predicted, dim=0)
+                actor_masks = torch.stack(batch_actor_masks, dim=0)
+
+                residual_batch = originals - predicted
+
+                if not self._importance_mapper_is_uniform():
+                    residual_batch = residual_batch * actor_masks.unsqueeze(1)
+
+                residual_batch = self._apply_block_activity_gate(
+                    residual=residual_batch,
+                    block_size=self._residual_block_size,
+                    threshold=self._block_information_threshold,
+                )
+                residual_batch = self._apply_background_downscale(
+                    residual=residual_batch,
+                    actor_mask=actor_masks,
+                    factor=self._background_block_downscale_factor,
+                    interpolation=self._downscale_interpolation,
                 )
 
-                original_tensor = (
-                    torch.from_numpy(np.asarray(original_np, dtype=np.uint8))
-                    .permute(2, 0, 1)
-                    .to(self._device, dtype=torch.float32)
-                )
-                predicted_tensor = predicted_frames[frame_idx].to(self._device, dtype=torch.float32)
+                encoded_batch = torch.clamp(residual_batch + 128.0, 0.0, 255.0).to(torch.uint8)
+                for encoded_residual in encoded_batch:
+                    yield np.asarray(encoded_residual.permute(1, 2, 0).contiguous().cpu().numpy(), dtype=np.uint8)
 
-                # Shape: [Channels, Height, Width]
-                raw_diff = original_tensor - predicted_tensor
-                masked_diff = raw_diff * importance_map.unsqueeze(0)
-                encoded_residual = torch.clamp(masked_diff + 128.0, 0.0, 255.0).to(torch.uint8)
-
-                yield np.asarray(encoded_residual.permute(1, 2, 0).contiguous().cpu().numpy(), dtype=np.uint8)
+                frame_idx = batch_end
 
         residual_codec = os.environ.get("POINTSTREAM_FFMPEG_CODEC", "libsvtav1")
         encode_video_frames_ffmpeg(
@@ -294,139 +318,133 @@ class ResidualCalculator:
             mode=ResidualMode.PLAYERS_ONLY,
         )
 
-    def _process_full_video(
+    def _apply_block_activity_gate(
         self,
-        chunk: VideoChunk,
-        payload: EncodedChunkPayload,
-        frame_states: list[FrameState],
-        debug_output_path: str | Path | None,
-    ) -> ResidualPacket:
-        """Calculate residuals for the entire video after full reconstruction pipeline."""
-        # Run full client-side reconstruction: panorama warp + GenAI + overlay
-        predicted_frames = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False).frames_bgr
-
-        # Apply GenAI on the server side (always for FULL_VIDEO mode)
-        genai_enabled = self._is_genai_enabled()
-        if genai_enabled:
-            predicted_frames = self._render_server_genai_prediction(payload=payload, frame_tensor=predicted_frames)
-
-        source_metadata = probe_video_metadata(chunk.source_uri)
-        available_source_frames = max(0, int(source_metadata.num_frames) - int(chunk.start_frame_id))
-
-        valid_frames = min(
-            int(chunk.num_frames),
-            int(predicted_frames.shape[0]),
-            int(available_source_frames),
-        )
-        if valid_frames <= 0:
-            raise ValueError("ResidualCalculator received zero valid frames")
-
-        output_path = Path(debug_output_path) if debug_output_path is not None else self._default_residual_path(chunk)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-
-        source_iter = iter_video_frames_ffmpeg(
-            chunk.source_uri,
-            width=int(chunk.width),
-            height=int(chunk.height),
-        )
-
-        for _ in range(int(chunk.start_frame_id)):
-            try:
-                next(source_iter)
-            except StopIteration:
-                raise ValueError("ResidualCalculator could not seek to chunk start frame in source video")
-
-        def _iter_encoded_frames() -> Iterator[np.ndarray]:
-            for frame_idx in range(valid_frames):
-                try:
-                    original_np = next(source_iter)
-                except StopIteration:
-                    break
-
-                # For FULL_VIDEO mode, use uniform importance to capture all residuals
-                original_tensor = (
-                    torch.from_numpy(np.asarray(original_np, dtype=np.uint8))
-                    .permute(2, 0, 1)
-                    .to(self._device, dtype=torch.float32)
-                )
-                predicted_tensor = predicted_frames[frame_idx].to(self._device, dtype=torch.float32)
-
-                # Shape: [Channels, Height, Width]
-                raw_diff = original_tensor - predicted_tensor
-
-                frame_state = self._select_frame_state(frame_states=frame_states, frame_idx=frame_idx)
-                importance_map = self._importance_mapper.build_importance_map(
-                    frame_state=frame_state,
-                    frame_height=int(chunk.height),
-                    frame_width=int(chunk.width),
-                    device=self._device,
-                )
-                adapted_diff = self._apply_adaptive_background_downscale(
-                    raw_diff=raw_diff,
-                    importance_map=importance_map,
-                )
-
-                encoded_residual = torch.clamp(adapted_diff + 128.0, 0.0, 255.0).to(torch.uint8)
-
-                yield np.asarray(encoded_residual.permute(1, 2, 0).contiguous().cpu().numpy(), dtype=np.uint8)
-
-        residual_codec = os.environ.get("POINTSTREAM_FFMPEG_CODEC", "libsvtav1")
-        encode_video_frames_ffmpeg(
-            output_path=output_path,
-            frames_bgr=_iter_encoded_frames(),
-            fps=float(chunk.fps),
-            width=int(chunk.width),
-            height=int(chunk.height),
-            codec=residual_codec,
-            pix_fmt="yuv420p",
-            crf=28,
-            preset="medium",
-        )
-
-        return ResidualPacket(
-            chunk_id=chunk.chunk_id,
-            codec=residual_codec,
-            residual_video_uri=str(output_path),
-            mode=ResidualMode.FULL_VIDEO,
-        )
-
-    def _apply_adaptive_background_downscale(
-        self,
-        raw_diff: torch.Tensor,
-        importance_map: torch.Tensor,
+        residual: torch.Tensor,
+        block_size: int,
+        threshold: float,
     ) -> torch.Tensor:
-        factor = self._background_block_downscale_factor
+        """Drop low-activity blocks using pooled mean absolute error.
+
+        The threshold is the average absolute residual value per block in pixel units,
+        so a threshold of 2.0 drops blocks whose mean error is below 2 gray levels.
+        """
+        if block_size <= 1 or threshold <= 0.0:
+            return residual
+
+        squeeze_batch = False
+        if residual.dim() == 3:
+            residual = residual.unsqueeze(0)
+            squeeze_batch = True
+        elif residual.dim() != 4:
+            raise ValueError(f"Expected residual tensor with 3 or 4 dims, got {tuple(residual.shape)}")
+
+        _, _, height, width = residual.shape
+        pad_h = (block_size - (height % block_size)) % block_size
+        pad_w = (block_size - (width % block_size)) % block_size
+        padded = F.pad(residual, (0, pad_w, 0, pad_h), mode="replicate")
+
+        activity = F.avg_pool2d(
+            padded.abs().mean(dim=1, keepdim=True),
+            kernel_size=block_size,
+            stride=block_size,
+        )
+        keep_blocks = (activity >= float(threshold)).to(dtype=padded.dtype)
+        keep_full = F.interpolate(keep_blocks, size=padded.shape[-2:], mode="nearest")
+
+        gated = padded * keep_full
+        gated = gated[:, :, :height, :width]
+        return gated[0] if squeeze_batch else gated
+
+    def _apply_background_downscale(
+        self,
+        residual: torch.Tensor,
+        actor_mask: torch.Tensor,
+        factor: int | None,
+        interpolation: str,
+    ) -> torch.Tensor:
         if factor is None:
-            return raw_diff
+            return residual
 
-        # Shape: [Height, Width]
-        player_mask = importance_map > 0.0
-        if bool(torch.all(player_mask)):
-            return raw_diff
+        squeeze_batch = False
+        if residual.dim() == 3:
+            residual = residual.unsqueeze(0)
+            actor_mask = actor_mask.unsqueeze(0)
+            squeeze_batch = True
+        elif residual.dim() != 4:
+            raise ValueError(f"Expected residual tensor with 3 or 4 dims, got {tuple(residual.shape)}")
 
-        # Shape: [Channels, Height, Width]
-        background_diff = torch.where(player_mask.unsqueeze(0), torch.zeros_like(raw_diff), raw_diff)
-
-        _, height, width = raw_diff.shape
+        _, _, height, width = residual.shape
         down_h = max(1, int(np.ceil(height / float(factor))))
         down_w = max(1, int(np.ceil(width / float(factor))))
 
-        # Shape: [1, Channels, DownHeight, DownWidth]
-        downscaled_background = F.interpolate(
-            background_diff.unsqueeze(0),
-            size=(down_h, down_w),
-            mode="bilinear",
-            align_corners=False,
-        )
-        # Shape: [Channels, Height, Width]
-        upscaled_background = F.interpolate(
-            downscaled_background,
-            size=(height, width),
-            mode="bilinear",
-            align_corners=False,
-        )[0]
+        actor_mask_bool = actor_mask.unsqueeze(1) > 0.0
+        if bool(torch.all(actor_mask_bool)):
+            return residual[0] if squeeze_batch else residual
 
-        return torch.where(player_mask.unsqueeze(0), raw_diff, upscaled_background)
+        downsample_kwargs: dict[str, object] = {}
+        if interpolation in {"bilinear", "bicubic"}:
+            downsample_kwargs["align_corners"] = False
+
+        background_full = F.interpolate(
+            F.interpolate(
+                residual,
+                size=(down_h, down_w),
+                mode=interpolation,
+                **downsample_kwargs,
+            ),
+            size=(height, width),
+            mode="nearest",
+        )
+
+        blended = torch.where(actor_mask_bool, residual, background_full)
+        return blended[0] if squeeze_batch else blended
+
+    def _build_actor_mask(
+        self,
+        frame_state: FrameState,
+        frame_height: int,
+        frame_width: int,
+        device: torch.device,
+    ) -> torch.Tensor:
+        actor_mask = torch.zeros((frame_height, frame_width), dtype=torch.float32, device=device)
+
+        for actor in frame_state.actors:
+            if actor.class_name not in {"player", "racket"}:
+                continue
+            if actor.mask is None:
+                continue
+
+            x1, y1, x2, y2 = self._clip_bbox(actor.bbox, frame_width=frame_width, frame_height=frame_height)
+            if x2 <= x1 or y2 <= y1:
+                continue
+
+            raw_mask = np.asarray(actor.mask, dtype=np.float32)
+            if raw_mask.ndim != 2 or raw_mask.size == 0:
+                continue
+
+            mask_tensor = torch.from_numpy(raw_mask).to(device=device, dtype=torch.float32)
+            mask_tensor = mask_tensor.unsqueeze(0).unsqueeze(0)
+            resized_mask = F.interpolate(
+                mask_tensor,
+                size=(y2 - y1, x2 - x1),
+                mode="bilinear",
+                align_corners=False,
+            )[0, 0].clamp(0.0, 1.0)
+            actor_mask[y1:y2, x1:x2] = torch.maximum(actor_mask[y1:y2, x1:x2], resized_mask)
+
+        return actor_mask.clamp(0.0, 1.0)
+
+    def _clip_bbox(self, bbox: list[float], frame_width: int, frame_height: int) -> tuple[int, int, int, int]:
+        x1, y1, x2, y2 = bbox
+        clipped_x1 = max(0, min(frame_width - 1, int(np.floor(x1))))
+        clipped_y1 = max(0, min(frame_height - 1, int(np.floor(y1))))
+        clipped_x2 = max(clipped_x1 + 1, min(frame_width, int(np.ceil(x2))))
+        clipped_y2 = max(clipped_y1 + 1, min(frame_height, int(np.ceil(y2))))
+        return clipped_x1, clipped_y1, clipped_x2, clipped_y2
+
+    def _importance_mapper_is_uniform(self) -> bool:
+        return isinstance(self._importance_mapper, UniformImportanceMapper)
 
     def _is_genai_enabled(self) -> bool:
         return os.environ.get("POINTSTREAM_ENABLE_GENAI", "0").strip() == "1"
