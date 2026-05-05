@@ -87,7 +87,7 @@ class ActorExtractor:
 
         pose_estimator: BasePoseEstimator
         normalized_pose_backend = pose_backend.strip().lower()
-        if normalized_pose_backend in {"yolo", "yolo-pose", "yolo_pose"}:
+        if normalized_pose_backend in {"yolo", "yolo26", "yolo26n", "yolo-pose", "yolo_pose"}:
             pose_estimator = YoloPoseEstimator(model_name="yolo26n-pose.pt", model=pose_model)
         elif normalized_pose_backend in {"dwpose", "dw-pose", "dw_pose"}:
             pose_estimator = DwposeEstimator(torchscript_device=dwpose_device)
@@ -96,7 +96,7 @@ class ActorExtractor:
 
         segmenter: BaseSegmenter
         normalized_segmenter_backend = segmenter_backend.strip().lower()
-        if normalized_segmenter_backend in {"yolo", "yolo-seg", "yolo_seg"}:
+        if normalized_segmenter_backend in {"yolo", "yolo26", "yolo26n", "yolo-seg", "yolo_seg"}:
             segmenter = YoloSegmenter(model_name="yolo26n-seg.pt", model=segmenter_model)
         elif normalized_segmenter_backend in {"yoloe", "yolo-e", "yolo_e"}:
             segmenter_caption_list = [part.strip() for part in str(segmenter_caption).split(",") if part.strip()]

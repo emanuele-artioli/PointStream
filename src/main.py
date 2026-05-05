@@ -382,15 +382,23 @@ def _parse_optional_int_or_none(value: str) -> int | None:
     return int(value)
 
 
-def _build_residual_calculator(seed: int, importance_mapper: str) -> ResidualCalculator | None:
+def _build_residual_calculator(
+    seed: int,
+    importance_mapper: str,
+    background_block_downscale_factor: int | None = 2,
+    residual_batch_size: int = 8,
+    downscale_interpolation: str = "bilinear",
+    residual_block_size: int = 8,
+    block_information_threshold: float = 0.0,
+) -> ResidualCalculator | None:
     return _build_residual_calculator_impl(
         seed=seed,
         importance_mapper=importance_mapper,
-        background_block_downscale_factor=2,
-        residual_batch_size=8,
-        downscale_interpolation="bilinear",
-        residual_block_size=8,
-        block_information_threshold=0.0,
+        background_block_downscale_factor=background_block_downscale_factor,
+        residual_batch_size=residual_batch_size,
+        downscale_interpolation=downscale_interpolation,
+        residual_block_size=residual_block_size,
+        block_information_threshold=block_information_threshold,
     )
 
 

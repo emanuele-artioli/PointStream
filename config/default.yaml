@@ -26,7 +26,7 @@ gpu-workers: null                     # GPU worker count (null = auto-detect)
 actor-extractor: real                 # Actor extraction: real or mock
 detector: yolo26                      # Player detector: yolo26 or yoloe (open-vocabulary)
 detector-caption: tennis player       # Caption for YOLOE open-vocabulary detector
-pose-estimator: yolo26                # Pose estimator: yolo26 (YOLOv8) or dwpose (OpenMMPose)
+pose-estimator: yolo26                # Pose estimator: yolo26n or dwpose (OpenMMPose)
 segmenter: yolo26                     # Segmentation: yolo26, yoloe, sam3, sam, none
 segmenter-caption: tennis player      # Caption for YOLOE open-vocabulary segmenter
 payload-pose-delta-threshold: 20.0    # Pose keyframe delta threshold
@@ -59,7 +59,7 @@ reference-padding-ratio: 0.10         # Padding ratio for reference crop extract
 # ============================================================================
 # Residual and Importance Mapping
 # ============================================================================
-importance-mapper: binary             # Residual weighting strategy: binary or uniform
+importance-mapper: uniform             # Residual weighting strategy: binary or uniform
 residual-background-downscale: 2      # Downscale factor for background residuals (use None to disable)
 residual-batch-size: 8                # Number of frames processed per GPU batch
 downscale-interpolation: bilinear     # Background downscale interpolation: nearest, bilinear, bicubic, area
