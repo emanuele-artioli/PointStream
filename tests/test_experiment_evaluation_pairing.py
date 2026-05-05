@@ -1,9 +1,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-import tempfile
-import types
-from typing import Any
 
 import cv2
 import numpy as np
@@ -12,7 +9,8 @@ from src.experiment_evaluation import _compute_psnr
 
 
 def _write_video(path: Path, frames: list[np.ndarray], fps: float = 30.0) -> None:
-    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+    fourcc_fn = getattr(cv2, "VideoWriter_fourcc")
+    fourcc = int(fourcc_fn(*"mp4v"))
     h, w = frames[0].shape[:2]
     out = cv2.VideoWriter(str(path), fourcc, fps, (w, h))
     for f in frames:

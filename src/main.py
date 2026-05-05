@@ -14,7 +14,7 @@ import cv2
 import numpy as np
 
 try:
-    import yaml
+    import yaml  # type: ignore[import-untyped]
 except ImportError:  # pragma: no cover - exercised when optional dependency is missing.
     yaml = None
 
@@ -528,6 +528,8 @@ def _resolve_worker_counts(args: argparse.Namespace) -> tuple[int, int]:
         gpu_workers = auto_gpu if gpu_workers_arg is None else int(gpu_workers_arg)
         return cpu_workers, gpu_workers
 
+    if cpu_workers_arg is None or gpu_workers_arg is None:
+        return auto_cpu, auto_gpu
     return int(cpu_workers_arg), int(gpu_workers_arg)
 
 
@@ -976,7 +978,7 @@ def run_cli(argv: list[str] | None = None) -> int:
     _apply_runtime_env_overrides(args)
 
     if bool(args.dry_run):
-        summary = {
+        dry_run_summary: dict[str, Any] = {
             "status": "dry-run",
             "config": str(args.config) if args.config is not None else None,
             "execution_pool": str(args.execution_pool),
@@ -986,7 +988,7 @@ def run_cli(argv: list[str] | None = None) -> int:
             "evaluation_mode": str(args.evaluation_mode),
             "source_uri": source_uri,
         }
-        print(json.dumps(summary, indent=2))
+        print(json.dumps(dry_run_summary, indent=2))
         return 0
 
     run_output_root = _create_timestamped_output_dir(base_root=_project_root() / "outputs")
@@ -1031,7 +1033,7 @@ def run_cli(argv: list[str] | None = None) -> int:
         residual_mode=residual_mode,
     )
 
-    summary = run_mock_pipeline(
+    run_summary = run_mock_pipeline(
         transport_root=run_output_root,
         execution_pool=execution_pool,
         source_uri=source_uri,
@@ -1047,13 +1049,13 @@ def run_cli(argv: list[str] | None = None) -> int:
 
     should_evaluate = str(args.evaluation_mode).strip().lower() != "none" and not bool(args.skip_eval)
     if should_evaluate:
-        summary["evaluation"] = evaluate_run_summary(
-            summary=summary,
+        run_summary["evaluation"] = evaluate_run_summary(
+            summary=run_summary,
             experiment_dir=run_output_root,
             max_frames=args.evaluation_max_frames,
         )
 
-    summary_json = json.dumps(summary, indent=2)
+    summary_json = json.dumps(run_summary, indent=2)
     print(summary_json)
 
     if bool(args.summary_file):
