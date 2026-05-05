@@ -92,13 +92,12 @@ def test_full_codec_loop_composites_signed_residual_into_final_reconstruction(
         decoder = DecoderRenderer(output_root=test_run_artifacts_dir)
         decoded = decoder.process(recovered_payload, output_path=final_output)
 
-    assert decoded.output_uri == str(final_output)
-    assert final_output.exists()
+    decoded_dir = Path(decoded.output_uri)
+    assert decoded_dir == final_output.with_suffix("")
+    assert decoded_dir.is_dir()
 
-    recon_meta = probe_video_metadata(final_output)
-    assert recon_meta.num_frames == 10
-    assert recon_meta.width == payload.chunk.width
-    assert recon_meta.height == payload.chunk.height
+    frame_paths = sorted(decoded_dir.glob("frame_*.png"))
+    assert len(frame_paths) == 10
 
     source_frames = list(
         iter_video_frames_ffmpeg(
@@ -107,13 +106,7 @@ def test_full_codec_loop_composites_signed_residual_into_final_reconstruction(
             height=payload.chunk.height,
         )
     )
-    recon_frames = list(
-        iter_video_frames_ffmpeg(
-            final_output,
-            width=payload.chunk.width,
-            height=payload.chunk.height,
-        )
-    )
+    recon_frames = [cv2.imread(str(frame_path), cv2.IMREAD_COLOR) for frame_path in frame_paths]
 
     assert len(source_frames) == len(recon_frames) == 10
     source_np = np.stack(source_frames, axis=0).astype(np.float32)

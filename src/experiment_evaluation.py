@@ -11,105 +11,60 @@ def _safe_file_size(path_like: str | Path | None) -> int | None:
         return None
     candidate = Path(str(path_like))
     if not candidate.exists() or not candidate.is_file():
+        if candidate.exists() and candidate.is_dir():
+            return int(sum(path.stat().st_size for path in candidate.rglob("*") if path.is_file()))
         return None
     return int(candidate.stat().st_size)
+
+
+def _load_frame_sequence(path: Path, max_frames: int | None = None) -> list[np.ndarray]:
+    if path.is_dir():
+        frame_paths = sorted(
+            [candidate for candidate in path.iterdir() if candidate.is_file() and candidate.suffix.lower() in {".png", ".jpg", ".jpeg"}],
+            key=lambda candidate: candidate.name,
+        )
+        if max_frames is not None:
+            frame_paths = frame_paths[:max_frames]
+        frames: list[np.ndarray] = []
+        for frame_path in frame_paths:
+            frame = cv2.imread(str(frame_path), cv2.IMREAD_COLOR)
+            if frame is None or frame.size == 0:
+                continue
+            frames.append(frame)
+        return frames
+
+    cap = cv2.VideoCapture(str(path))
+    if not cap.isOpened():
+        cap.release()
+        return []
+
+    frames: list[np.ndarray] = []
+    try:
+        while True:
+            if max_frames is not None and len(frames) >= max_frames:
+                break
+            ok, frame = cap.read()
+            if not ok:
+                break
+            frames.append(frame)
+    finally:
+        cap.release()
+    return frames
 
 
 def _compute_psnr(reference_video: Path, predicted_video: Path, max_frames: int | None = None) -> dict[str, Any]:
     if not reference_video.exists() or not reference_video.is_file():
         return {"psnr_mean": None, "psnr_std": None, "psnr_num_frames": 0, "note": "missing reference video"}
-    if not predicted_video.exists() or not predicted_video.is_file():
-        return {"psnr_mean": None, "psnr_std": None, "psnr_num_frames": 0, "note": "missing predicted video"}
+    if not predicted_video.exists():
+        return {"psnr_mean": None, "psnr_std": None, "psnr_num_frames": 0, "note": "missing predicted artifact"}
 
-    # Unified frame pairing helper: index-first streaming, then timestamp-nearest fallback.
-    def _get_frame_pairs(ref_path: Path, pred_path: Path, max_frames: int | None = None) -> list[tuple[np.ndarray, np.ndarray]]:
-        # Try index-wise streaming pairing first (minimal memory).
-        ref_cap = cv2.VideoCapture(str(ref_path))
-        pred_cap = cv2.VideoCapture(str(pred_path))
-        if not ref_cap.isOpened() or not pred_cap.isOpened():
-            ref_cap.release()
-            pred_cap.release()
-            return []
+    reference_frames = _load_frame_sequence(reference_video, max_frames=max_frames)
+    predicted_frames = _load_frame_sequence(predicted_video, max_frames=max_frames)
+    if not reference_frames or not predicted_frames:
+        return {"psnr_mean": None, "psnr_std": None, "psnr_num_frames": 0, "note": "no valid frame pairs"}
 
-        pairs: list[tuple[np.ndarray, np.ndarray]] = []
-        idx = 0
-        try:
-            while True:
-                if max_frames is not None and idx >= max_frames:
-                    break
-                ref_ok, ref_frame = ref_cap.read()
-                pred_ok, pred_frame = pred_cap.read()
-                if not ref_ok or not pred_ok:
-                    break
-
-                pairs.append((ref_frame, pred_frame))
-                idx += 1
-        finally:
-            ref_cap.release()
-            pred_cap.release()
-
-        if pairs:
-            return pairs
-
-        # Streaming pairing produced no pairs; fall back to timestamp-based nearest matching.
-        ref_cap = cv2.VideoCapture(str(ref_path))
-        pred_cap = cv2.VideoCapture(str(pred_path))
-        if not ref_cap.isOpened() or not pred_cap.isOpened():
-            ref_cap.release()
-            pred_cap.release()
-            return []
-
-        ref_frames: list[np.ndarray] = []
-        ref_times: list[float] = []
-        pred_frames: list[np.ndarray] = []
-        pred_times: list[float] = []
-        try:
-            while True:
-                ok, frame = ref_cap.read()
-                if not ok:
-                    break
-                t_ms = float(ref_cap.get(cv2.CAP_PROP_POS_MSEC) or 0.0)
-                ref_frames.append(frame)
-                ref_times.append(t_ms)
-
-            while True:
-                ok, frame = pred_cap.read()
-                if not ok:
-                    break
-                t_ms = float(pred_cap.get(cv2.CAP_PROP_POS_MSEC) or 0.0)
-                pred_frames.append(frame)
-                pred_times.append(t_ms)
-        finally:
-            ref_cap.release()
-            pred_cap.release()
-
-        if not ref_frames or not pred_frames:
-            return []
-
-        # Build nearest-neighbor mapping from reference times to prediction frames.
-        used_pred: set[int] = set()
-        out_pairs: list[tuple[np.ndarray, np.ndarray]] = []
-        for i, rt in enumerate(ref_times):
-            diffs = [abs(rt - pt) for pt in pred_times]
-            j = int(np.argmin(np.array(diffs, dtype=float)))
-            if j in used_pred:
-                order = np.argsort(np.array(diffs, dtype=float))
-                found = False
-                for cand in order:
-                    if int(cand) not in used_pred:
-                        j = int(cand)
-                        found = True
-                        break
-                if not found:
-                    j = int(order[0])
-            used_pred.add(j)
-            out_pairs.append((ref_frames[i], pred_frames[j]))
-            if max_frames is not None and len(out_pairs) >= max_frames:
-                break
-
-        return out_pairs
-
-    pairs = _get_frame_pairs(reference_video, predicted_video, max_frames=max_frames)
+    pair_count = min(len(reference_frames), len(predicted_frames))
+    pairs = list(zip(reference_frames[:pair_count], predicted_frames[:pair_count]))
     psnr_values: list[float] = []
     for (reference_frame, predicted_frame) in pairs:
         if reference_frame is None or predicted_frame is None:

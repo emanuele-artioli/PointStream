@@ -60,14 +60,15 @@ def test_decoder_output_matches_chunk_dimensions(mock_encoder_pipeline, test_run
     assert rendered_meta.height == payload.chunk.height
 
     decoded = DecoderRenderer(output_root=test_run_artifacts_dir).process(payload)
+    decoded_dir = Path(decoded.output_uri)
 
     assert decoded.chunk_id == "dec001"
     assert decoded.num_frames == 6
     assert decoded.width == 640
     assert decoded.height == 360
-    assert decoded.output_uri.endswith("dec001.mp4")
-    assert Path(decoded.output_uri).parent == test_run_artifacts_dir
-    assert reconstruction_path.exists()
+    assert decoded_dir.is_dir()
+    assert decoded_dir.name == "dec001"
+    assert len(sorted(decoded_dir.glob("frame_*.png"))) == 6
 
 
 class _TemporalSpyCompositor:

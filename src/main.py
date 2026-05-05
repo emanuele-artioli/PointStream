@@ -270,11 +270,13 @@ def _build_actor_extractor(
     pose_estimator: str,
     segmenter: str,
     segmenter_caption: str,
-    debug_enabled: bool,
-    pose_delta_threshold: float,
-    compositing_mask_mode: str,
-    metadata_mask_codec: str,
+    debug_enabled: bool = False,
+    pose_delta_threshold: float = 20.0,
+    compositing_mask_mode: str = "alpha-heuristic",
+    metadata_mask_codec: str = "auto",
+    disable_debug_keyframes: bool | None = None,
 ) -> ActorExtractor | MockActorExtractor | None:
+    _ = disable_debug_keyframes
     normalized_mode = mode.strip().lower()
     if normalized_mode == "mock":
         return MockActorExtractor()

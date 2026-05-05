@@ -68,27 +68,37 @@ class DecoderRenderer:
         )
         if not genai_enabled:
             frame_tensor = self._render_genai_baseline(frame_tensor)
-        frames_bgr = [
-            np.asarray(frame.permute(1, 2, 0).cpu().numpy(), dtype=np.uint8)
-            for frame in frame_tensor
-        ]
-        target_output = Path(output_path) if output_path is not None else self._output_root / f"{chunk.chunk_id}.mp4"
-        target_output.parent.mkdir(parents=True, exist_ok=True)
-        encode_video_frames_ffmpeg(
-            output_path=target_output,
-            frames_bgr=frames_bgr,
-            fps=float(chunk.fps),
-            width=int(chunk.width),
-            height=int(chunk.height),
-            codec=os.environ.get("POINTSTREAM_FFMPEG_CODEC", "libsvtav1"),
-            pix_fmt="yuv420p",
-            crf=18,
-            preset="veryfast",
-        )
+        frames_bgr = [np.asarray(frame.permute(1, 2, 0).cpu().numpy(), dtype=np.uint8) for frame in frame_tensor]
+        target_path = Path(output_path) if output_path is not None else self._output_root / chunk.chunk_id
+        if target_path.suffix:
+            frame_output_dir = target_path.with_suffix("")
+            debug_video_path = target_path
+        else:
+            frame_output_dir = target_path
+            debug_video_path = target_path.with_suffix(".mp4")
+        frame_output_dir.mkdir(parents=True, exist_ok=True)
+
+        for frame_idx, frame_bgr in enumerate(frames_bgr):
+            frame_path = frame_output_dir / f"frame_{frame_idx:06d}.png"
+            cv2.imwrite(str(frame_path), frame_bgr)
+
+        debug_enabled = os.environ.get("POINTSTREAM_DISABLE_DEBUG_ARTIFACTS", "1").strip().lower() in {"0", "false", "no", "off"}
+        if debug_enabled:
+            encode_video_frames_ffmpeg(
+                output_path=debug_video_path,
+                frames_bgr=frames_bgr,
+                fps=float(chunk.fps),
+                width=int(chunk.width),
+                height=int(chunk.height),
+                codec=os.environ.get("POINTSTREAM_FFMPEG_CODEC", "libsvtav1"),
+                pix_fmt="yuv420p",
+                crf=18,
+                preset="veryfast",
+            )
 
         return DecodedChunkResult(
             chunk_id=chunk.chunk_id,
-            output_uri=str(target_output),
+            output_uri=str(frame_output_dir),
             num_frames=chunk.num_frames,
             width=chunk.width,
             height=chunk.height,

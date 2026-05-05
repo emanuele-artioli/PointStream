@@ -75,7 +75,7 @@ class _FakeDecoderRenderer:
         _FakeDecoderRenderer.instances.append(self)
 
     def process(self, payload):
-        return SimpleNamespace(output_uri=f"/tmp/{payload.chunk.chunk_id}_decoded.mp4")
+        return SimpleNamespace(output_uri=f"/tmp/{payload.chunk.chunk_id}_decoded")
 
 
 def _patch_pipeline_dependencies(monkeypatch, metadata_num_frames: int = 12):
@@ -112,7 +112,7 @@ def test_run_mock_pipeline_builds_summary_with_provided_source(monkeypatch) -> N
     assert summary["num_rigid_object_packets"] == 1
     assert summary["ball_object_id"] == "ball_0"
     assert str(summary["residual_uri"]).endswith("chunk.mp4")
-    assert str(summary["decoded_uri"]).endswith("0001_decoded.mp4")
+    assert str(summary["decoded_uri"]).endswith("0001_decoded")
     assert summary["transport_backend"] == "disk"
 
     encoder = _FakeEncoderPipeline.instances[0]
