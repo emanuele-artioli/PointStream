@@ -95,6 +95,7 @@ class EncoderPipeline:
         self._reference_extractor = reference_extractor or ReferenceExtractor()
         self._residual_calculator = residual_calculator or ResidualCalculator(SynthesisEngine())
         self._register_nodes()
+        self._last_dag_profile: dict[str, float] = {}
 
     @staticmethod
     def _make_chunk_node(process_method: Any):
@@ -284,6 +285,8 @@ class EncoderPipeline:
 
     def encode_chunk(self, chunk: VideoChunk) -> EncodedChunkPayload:
         context = self._dag.run(initial_context={"chunk": chunk})
+        # capture DAG profiling produced by the orchestrator
+        self._last_dag_profile = context.get("dag_profile", {})
         return EncodedChunkPayload(
             chunk=context["chunk"],
             panorama=context["panorama"],
@@ -315,6 +318,8 @@ class EncoderPipeline:
         )
 
         context = self._dag.run(initial_context={"chunk": chunk})
+        # capture DAG profiling produced by the orchestrator
+        self._last_dag_profile = context.get("dag_profile", {})
         payload = EncodedChunkPayload(
             chunk=context["chunk"],
             panorama=context["panorama"],
@@ -351,6 +356,8 @@ class EncoderPipeline:
         )
 
         context = self._dag.run(initial_context={"chunk": chunk})
+        # capture DAG profiling produced by the orchestrator
+        self._last_dag_profile = context.get("dag_profile", {})
         payload = EncodedChunkPayload(
             chunk=context["chunk"],
             panorama=context["panorama"],

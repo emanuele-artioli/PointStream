@@ -93,8 +93,8 @@ class DecoderRenderer:
                 height=int(chunk.height),
                 codec=os.environ.get("POINTSTREAM_FFMPEG_CODEC", "libsvtav1"),
                 pix_fmt="yuv420p",
-                crf=18,
-                preset="veryfast",
+                crf=int(os.environ.get("POINTSTREAM_CODEC_CRF", "18")),
+                preset=os.environ.get("POINTSTREAM_CODEC_PRESET", "veryfast"),
             )
 
         return DecodedChunkResult(

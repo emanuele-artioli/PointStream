@@ -300,6 +300,8 @@ class ResidualCalculator:
                 frame_idx = batch_end
 
         residual_codec = os.environ.get("POINTSTREAM_FFMPEG_CODEC", "libsvtav1")
+        residual_crf = int(os.environ.get("POINTSTREAM_CODEC_CRF_RESIDUAL", os.environ.get("POINTSTREAM_CODEC_CRF", "28")))
+        residual_preset = os.environ.get("POINTSTREAM_CODEC_PRESET_RESIDUAL", os.environ.get("POINTSTREAM_CODEC_PRESET", "medium"))
         encode_video_frames_ffmpeg(
             output_path=output_path,
             frames_bgr=_iter_encoded_frames(),
@@ -308,8 +310,8 @@ class ResidualCalculator:
             height=int(chunk.height),
             codec=residual_codec,
             pix_fmt="yuv420p",
-            crf=28,
-            preset="medium",
+            crf=residual_crf,
+            preset=residual_preset,
         )
 
         return ResidualPacket(

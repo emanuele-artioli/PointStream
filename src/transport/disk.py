@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 import shutil
+from time import perf_counter
+import logging
 
 import cv2
 import msgpack
@@ -11,6 +13,8 @@ from src.shared.interfaces import BaseTransport
 from src.shared.schemas import EncodedChunkPayload, ResidualMode, SceneActorReference
 from src.shared.tags import cpu_bound
 from src.transport.panorama_encoder import BasePanoramaEncoder, build_panorama_encoder
+
+_logger = logging.getLogger(__name__)
 
 
 class DiskTransport(BaseTransport):
@@ -28,12 +32,16 @@ class DiskTransport(BaseTransport):
 
     @cpu_bound
     def send(self, payload: EncodedChunkPayload) -> None:
+        send_started = perf_counter()
         chunk_dir = self._chunk_dir(payload.chunk.chunk_id)
         chunk_dir.mkdir(parents=True, exist_ok=True)
 
         metadata_path = chunk_dir / "metadata.msgpack"
         residual_path = chunk_dir / "residual.mp4"
+        
+        panorama_started = perf_counter()
         panorama_path = self._materialize_panorama(payload=payload, chunk_dir=chunk_dir)
+        panorama_elapsed = perf_counter() - panorama_started
 
         source_residual_uri = str(payload.residual.residual_video_uri or "").strip()
         residual_mode = payload.residual.mode
@@ -41,6 +49,7 @@ class DiskTransport(BaseTransport):
             residual_mode = ResidualMode(residual_mode)
 
         materialized_residual_uri = ""
+        residual_copy_started = perf_counter()
         if residual_mode != ResidualMode.NONE and source_residual_uri:
             source_residual = Path(source_residual_uri)
             if not source_residual.exists() or not source_residual.is_file():
@@ -50,8 +59,11 @@ class DiskTransport(BaseTransport):
             if source_residual.resolve() != residual_path.resolve():
                 shutil.copy2(source_residual, residual_path)
             materialized_residual_uri = str(residual_path)
+        residual_copy_elapsed = perf_counter() - residual_copy_started
 
+        references_started = perf_counter()
         materialized_references = self._materialize_actor_references(payload=payload, chunk_dir=chunk_dir)
+        references_elapsed = perf_counter() - references_started
 
         payload_for_disk = payload.model_copy(
             update={
@@ -70,10 +82,30 @@ class DiskTransport(BaseTransport):
             }
         )
 
+        msgpack_started = perf_counter()
         metadata_bytes = msgpack.packb(payload_for_disk.model_dump(mode="python"), use_bin_type=True)
         metadata_path.write_bytes(metadata_bytes)
+        msgpack_elapsed = perf_counter() - msgpack_started
+
+        send_elapsed = perf_counter() - send_started
+        _logger.debug(
+            f"DiskTransport.send() breakdown: "
+            f"panorama={panorama_elapsed:.3f}s, "
+            f"residual_copy={residual_copy_elapsed:.3f}s, "
+            f"references={references_elapsed:.3f}s, "
+            f"msgpack={msgpack_elapsed:.3f}s, "
+            f"total={send_elapsed:.3f}s"
+        )
 
     def _materialize_panorama(self, payload: EncodedChunkPayload, chunk_dir: Path) -> Path:
+        """Encode and write panorama to disk.
+        
+        Note: Panorama JPEG encoding is the primary bottleneck in transport latency (~97% of send time).
+        If transport latency is critical, consider:
+        - Reducing panorama image resolution
+        - Decreasing JPEG quality (controlled by --panorama-jpeg-quality, default 50)
+        - Using --panorama-codec png and increasing compression for extreme latency reduction
+        """
         panorama_np = self._resolve_panorama_image(payload=payload)
         return self._panorama_encoder.encode(
             image_bgr=panorama_np,
@@ -143,6 +175,7 @@ class DiskTransport(BaseTransport):
 
     @cpu_bound
     def receive(self, chunk_id: str) -> EncodedChunkPayload:
+        receive_started = perf_counter()
         chunk_dir = self._chunk_dir(chunk_id)
         metadata_path = chunk_dir / "metadata.msgpack"
 
@@ -151,5 +184,21 @@ class DiskTransport(BaseTransport):
                 f"No payload found for chunk '{chunk_id}' in '{chunk_dir}'."
             )
 
-        metadata_raw = msgpack.unpackb(metadata_path.read_bytes(), raw=False)
-        return EncodedChunkPayload.model_validate(metadata_raw)
+        read_started = perf_counter()
+        metadata_raw = metadata_path.read_bytes()
+        read_elapsed = perf_counter() - read_started
+
+        unpack_started = perf_counter()
+        metadata_dict = msgpack.unpackb(metadata_raw, raw=False)
+        payload = EncodedChunkPayload.model_validate(metadata_dict)
+        unpack_elapsed = perf_counter() - unpack_started
+
+        receive_elapsed = perf_counter() - receive_started
+        _logger.debug(
+            f"DiskTransport.receive() breakdown: "
+            f"read={read_elapsed:.3f}s, "
+            f"unpack={unpack_elapsed:.3f}s, "
+            f"total={receive_elapsed:.3f}s"
+        )
+
+        return payload
