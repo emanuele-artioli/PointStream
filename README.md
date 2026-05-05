@@ -132,6 +132,7 @@ metadata.msgpack: intentionally stores panorama\_uri and omits raw panorama\_ima
 * \--gpu-dtype fp16|fp32|bf16|fp8\_e4m3fn|fp8\_e5m2
 * \--evaluation-mode none|psnr and optional \--skip-eval
 * \--debug or \--no-debug
+* \--residual-background-downscale N|None: downscale only background residual regions in full-video mode (default: 2; use None to disable)
 
 GenAI backend switches:
 

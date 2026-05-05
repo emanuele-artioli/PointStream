@@ -139,6 +139,7 @@ class ResidualCalculator:
         importance_mapper: BaseImportanceMapper | None = None,
         device: str | torch.device | None = None,
         residual_mode: ResidualMode = ResidualMode.FULL_VIDEO,
+        background_block_downscale_factor: int | None = 2,
     ) -> None:
         self._synthesis_engine = synthesis_engine or SynthesisEngine()
         if device is None:
@@ -149,6 +150,11 @@ class ResidualCalculator:
             self._device = torch.device("cpu")
         self._importance_mapper = importance_mapper or BinaryActorImportanceMapper()
         self._residual_mode = residual_mode
+        if background_block_downscale_factor is None:
+            self._background_block_downscale_factor = None
+        else:
+            factor = int(background_block_downscale_factor)
+            self._background_block_downscale_factor = factor if factor >= 2 else None
 
     @gpu_bound
     def process(
@@ -324,9 +330,21 @@ class ResidualCalculator:
                 predicted_tensor = predicted_frames[frame_idx].to(self._device, dtype=torch.float32)
 
                 # Shape: [Channels, Height, Width]
-                # For FULL_VIDEO, we include all differences; no masking applied
                 raw_diff = original_tensor - predicted_tensor
-                encoded_residual = torch.clamp(raw_diff + 128.0, 0.0, 255.0).to(torch.uint8)
+
+                frame_state = self._select_frame_state(frame_states=frame_states, frame_idx=frame_idx)
+                importance_map = self._importance_mapper.build_importance_map(
+                    frame_state=frame_state,
+                    frame_height=int(chunk.height),
+                    frame_width=int(chunk.width),
+                    device=self._device,
+                )
+                adapted_diff = self._apply_adaptive_background_downscale(
+                    raw_diff=raw_diff,
+                    importance_map=importance_map,
+                )
+
+                encoded_residual = torch.clamp(adapted_diff + 128.0, 0.0, 255.0).to(torch.uint8)
 
                 yield np.asarray(encoded_residual.permute(1, 2, 0).contiguous().cpu().numpy(), dtype=np.uint8)
 
@@ -349,6 +367,44 @@ class ResidualCalculator:
             residual_video_uri=str(output_path),
             mode=ResidualMode.FULL_VIDEO,
         )
+
+    def _apply_adaptive_background_downscale(
+        self,
+        raw_diff: torch.Tensor,
+        importance_map: torch.Tensor,
+    ) -> torch.Tensor:
+        factor = self._background_block_downscale_factor
+        if factor is None:
+            return raw_diff
+
+        # Shape: [Height, Width]
+        player_mask = importance_map > 0.0
+        if bool(torch.all(player_mask)):
+            return raw_diff
+
+        # Shape: [Channels, Height, Width]
+        background_diff = torch.where(player_mask.unsqueeze(0), torch.zeros_like(raw_diff), raw_diff)
+
+        _, height, width = raw_diff.shape
+        down_h = max(1, int(np.ceil(height / float(factor))))
+        down_w = max(1, int(np.ceil(width / float(factor))))
+
+        # Shape: [1, Channels, DownHeight, DownWidth]
+        downscaled_background = F.interpolate(
+            background_diff.unsqueeze(0),
+            size=(down_h, down_w),
+            mode="bilinear",
+            align_corners=False,
+        )
+        # Shape: [Channels, Height, Width]
+        upscaled_background = F.interpolate(
+            downscaled_background,
+            size=(height, width),
+            mode="bilinear",
+            align_corners=False,
+        )[0]
+
+        return torch.where(player_mask.unsqueeze(0), raw_diff, upscaled_background)
 
     def _is_genai_enabled(self) -> bool:
         return os.environ.get("POINTSTREAM_ENABLE_GENAI", "0").strip() == "1"

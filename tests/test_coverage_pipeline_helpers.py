@@ -227,6 +227,95 @@ def test_residual_calculator_covers_players_only_and_full_video(monkeypatch: pyt
     assert len(encoded_outputs) == 4
 
 
+def test_residual_calculator_adaptive_background_downscale_preserves_player_region(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    chunk, payload, frame_states = _build_minimal_payload(tmp_path)
+
+    # Keep a compact player ROI in the top-left; background occupies the remaining area.
+    frame_states = [
+        FrameState(
+            frame_id=0,
+            actors=[
+                SceneActor(
+                    track_id="person_1",
+                    class_name="player",
+                    bbox=[0.0, 0.0, 2.0, 2.0],
+                    mask=[[1, 1], [1, 1]],
+                    pose_dw=[[0.0, 0.0, 1.0] for _ in range(18)],
+                )
+            ],
+        )
+    ]
+
+    # Shape: [Height, Width, Channels]
+    original_frame = np.array(
+        [
+            [[10, 10, 10], [30, 30, 30], [180, 180, 180], [20, 20, 20]],
+            [[40, 40, 40], [60, 60, 60], [40, 40, 40], [220, 220, 220]],
+            [[200, 200, 200], [30, 30, 30], [250, 250, 250], [20, 20, 20]],
+            [[15, 15, 15], [210, 210, 210], [35, 35, 35], [240, 240, 240]],
+        ],
+        dtype=np.uint8,
+    )
+
+    monkeypatch.setattr(
+        residual_calc,
+        "probe_video_metadata",
+        lambda _uri: SimpleNamespace(num_frames=1, fps=30.0, width=4, height=4),
+    )
+    monkeypatch.setattr(
+        residual_calc,
+        "iter_video_frames_ffmpeg",
+        lambda *args, **kwargs: iter([original_frame]),
+    )
+
+    encoded_outputs: list[np.ndarray] = []
+
+    def _fake_encode_video_frames_ffmpeg(**kwargs):
+        encoded_outputs.extend(list(kwargs["frames_bgr"]))
+        return Path(kwargs["output_path"])
+
+    monkeypatch.setattr(residual_calc, "encode_video_frames_ffmpeg", _fake_encode_video_frames_ffmpeg)
+    monkeypatch.setenv("POINTSTREAM_ENABLE_GENAI", "0")
+
+    class _FakeSynthesisEngine(SynthesisEngine):
+        def __init__(self) -> None:
+            self.seed = 7
+            self.device: Any = "cpu"
+
+        def synthesize(self, payload, include_guidance_overlays=False):
+            _ = (payload, include_guidance_overlays)
+            # Shape: [Frames, Channels, Height, Width]
+            return SimpleNamespace(frames_bgr=torch.zeros((1, 3, 4, 4), dtype=torch.float32))
+
+    calculator = residual_calc.ResidualCalculator(
+        synthesis_engine=_FakeSynthesisEngine(),
+        importance_mapper=residual_calc.BinaryActorImportanceMapper(),
+        residual_mode=ResidualMode.FULL_VIDEO,
+        background_block_downscale_factor=2,
+    )
+
+    calculator.process(
+        chunk=chunk.model_copy(update={"num_frames": 1}),
+        payload=payload,
+        frame_states=frame_states,
+        debug_output_path=tmp_path / "adaptive_full_video.mp4",
+    )
+
+    assert len(encoded_outputs) == 1
+    encoded = encoded_outputs[0]
+
+    # Player ROI must remain full-resolution signed residual (original - predicted + 128).
+    expected_player = np.clip(original_frame[:2, :2].astype(np.int16) + 128, 0, 255).astype(np.uint8)
+    np.testing.assert_array_equal(encoded[:2, :2], expected_player)
+
+    # Background is adaptively downscaled/upscaled, so high-frequency pixels should be altered.
+    expected_raw = np.clip(original_frame.astype(np.int16) + 128, 0, 255).astype(np.uint8)
+    assert not np.array_equal(encoded[2:, 2:], expected_raw[2:, 2:])
+
+
 def test_encoder_pipeline_streams_actor_states_and_uses_shifted_ball(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     chunk = VideoChunk(
         chunk_id="pipe_cov",

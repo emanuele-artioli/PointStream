@@ -395,6 +395,17 @@ def test_run_cli_rejects_invalid_alpha_smoothing(monkeypatch) -> None:
         main_module.run_cli(["--animate-anyone-alpha-smoothing", "1.5"])
 
 
+def test_run_cli_rejects_invalid_residual_background_downscale(monkeypatch) -> None:
+    monkeypatch.setattr(
+        main_module,
+        "run_mock_pipeline",
+        lambda **kwargs: {},
+    )
+
+    with pytest.raises(ValueError, match=r">= 2"):
+        main_module.run_cli(["--residual-background-downscale", "1"])
+
+
 def test_run_cli_rejects_missing_input_video(monkeypatch, tmp_path: Path) -> None:
     missing_video = tmp_path / "missing.mp4"
 
@@ -511,6 +522,46 @@ def test_run_cli_passes_module_switches_and_env_overrides(monkeypatch, tmp_path:
     assert os.environ.get("POINTSTREAM_METADATA_MASK_CODEC") == "rle-v1"
     assert os.environ.get("POINTSTREAM_LOG_LEVEL") == "warning"
     assert os.environ.get("POINTSTREAM_DISABLE_DEBUG_ARTIFACTS") == "0"
+
+
+def test_run_cli_accepts_none_residual_background_downscale(monkeypatch, tmp_path: Path) -> None:
+    source_video = tmp_path / "input.mp4"
+    source_video.write_bytes(b"x")
+    output_dir = tmp_path / "results"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    captured: dict[str, Any] = {}
+
+    def _fake_run_mock_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "chunk_id": "ablation_03",
+            "num_actor_packets": 0,
+            "num_rigid_object_packets": 0,
+            "ball_object_id": "ball_0",
+            "residual_uri": "memory://residual/chunk.mp4",
+            "decoded_uri": "memory://decoded/chunk.mp4",
+            "transport_backend": "disk",
+        }
+
+    monkeypatch.setattr(main_module, "run_mock_pipeline", _fake_run_mock_pipeline)
+    monkeypatch.setattr(main_module, "_create_timestamped_output_dir", lambda base_root=None: output_dir)
+
+    exit_code = main_module.run_cli(
+        [
+            "--input",
+            str(source_video),
+            "--residual-background-downscale",
+            "None",
+            "--seed",
+            "11",
+        ]
+    )
+
+    assert exit_code == 0
+    calculator = captured["residual_calculator"]
+    assert calculator is not None
+    assert getattr(calculator, "_background_block_downscale_factor") is None
 
 
 def test_run_cli_enables_genai_for_animate_anyone_backend(monkeypatch, tmp_path: Path) -> None:

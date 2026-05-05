@@ -369,11 +369,19 @@ def _build_importance_mapper(name: str) -> BaseImportanceMapper:
     return BinaryActorImportanceMapper()
 
 
+def _parse_optional_int_or_none(value: str) -> int | None:
+    normalized = str(value).strip().lower()
+    if normalized in {"none", "null"}:
+        return None
+    return int(value)
+
+
 def _build_residual_calculator(seed: int, importance_mapper: str) -> ResidualCalculator | None:
     return _build_residual_calculator_with_mode(
         seed=seed,
         importance_mapper=importance_mapper,
         residual_mode=ResidualMode.FULL_VIDEO,
+        background_block_downscale_factor=2,
     )
 
 
@@ -381,11 +389,13 @@ def _build_residual_calculator_with_mode(
     seed: int,
     importance_mapper: str,
     residual_mode: ResidualMode = ResidualMode.FULL_VIDEO,
+    background_block_downscale_factor: int | None = 2,
 ) -> ResidualCalculator | None:
     uses_default = (
         int(seed) == 1337
         and importance_mapper.strip().lower() == "binary"
         and residual_mode == ResidualMode.FULL_VIDEO
+        and background_block_downscale_factor == 2
     )
     if uses_default:
         return None
@@ -395,6 +405,7 @@ def _build_residual_calculator_with_mode(
         synthesis_engine=SynthesisEngine(seed=int(seed)),
         importance_mapper=mapper,
         residual_mode=residual_mode,
+        background_block_downscale_factor=background_block_downscale_factor,
     )
 
 
@@ -748,6 +759,15 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--residual-background-downscale",
+        type=_parse_optional_int_or_none,
+        default=2,
+        help=(
+            "Optional downscale factor for background residual regions in full-video mode. "
+            "Use 'None' to disable adaptive downscaling. Default: 2."
+        ),
+    )
+    parser.add_argument(
         "--seed",
         type=int,
         default=1337,
@@ -957,6 +977,8 @@ def run_cli(argv: list[str] | None = None) -> int:
         raise ValueError("--reference-padding-ratio must be in range [0.0, 1.0)")
     if args.genai_preroll_frames is not None and args.genai_preroll_frames < 0:
         raise ValueError("--genai-preroll-frames must be a non-negative integer")
+    if args.residual_background_downscale is not None and args.residual_background_downscale < 2:
+        raise ValueError("--residual-background-downscale must be >= 2, or None to disable")
     if args.animate_anyone_alpha_smoothing is not None and not (0.0 <= args.animate_anyone_alpha_smoothing <= 1.0):
         raise ValueError("--animate-anyone-alpha-smoothing must be in range [0.0, 1.0]")
     if not str(args.ffmpeg_codec).strip():
@@ -1031,6 +1053,7 @@ def run_cli(argv: list[str] | None = None) -> int:
         seed=int(args.seed),
         importance_mapper=str(args.importance_mapper),
         residual_mode=residual_mode,
+        background_block_downscale_factor=args.residual_background_downscale,
     )
 
     run_summary = run_mock_pipeline(
