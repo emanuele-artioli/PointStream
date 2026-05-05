@@ -1,0 +1,67 @@
+# PointStream GenAI-Enabled Configuration
+# Enables AnimateAnyone for full synthesis pipeline with residual correction.
+
+source_uri: null                      # Override with your input video path
+summary-file: true
+ffmpeg-codec: libsvtav1
+log-level: info
+dry-run: false
+transport: disk
+
+# Execution pool with both CPU and GPU workers
+execution-pool: tagged                # Use tagged pool for CPU/GPU scheduling
+# cpu-workers: null                   # Auto-detect
+# gpu-workers: null                   # Auto-detect
+
+# Real actor extraction for synthesis
+actor-extractor: real
+detector: yolo26
+detector-caption: tennis player
+pose-estimator: yolo
+segmenter: yolo
+segmenter-caption: tennis player
+payload-pose-delta-threshold: 20.0
+
+# Ball extraction
+ball-extractor: segmentation          # Use ML-based detection for accuracy
+ball-min-blob-area: 6
+
+# Reference crops
+reference-jpeg-quality: 90            # Higher quality for GenAI conditioning
+reference-padding-ratio: 0.10
+
+# Importance mapping and residuals
+importance-mapper: binary
+residual-mode: full_video             # Full-video residual correction after GenAI synthesis
+residual-background-downscale: 2
+seed: 1337
+
+# GPU optimization for GenAI
+gpu-dtype: fp16                       # Use mixed precision for speed
+panorama-warp-batch-size: 4
+
+# ============================================================================
+# GenAI/AnimateAnyone Settings
+# ============================================================================
+genai-backend: animate-anyone         # Enable AnimateAnyone synthesis
+# animate-anyone-model-dir: null      # Override if models are in non-standard location
+animate-anyone-steps: 20              # Diffusion steps (quality vs speed tradeoff)
+animate-anyone-cfg: 7.5               # Guidance scale
+animate-anyone-width: 512             # Output resolution
+animate-anyone-height: 512
+animate-anyone-window: 4              # Temporal window for smoothness
+genai-preroll-frames: 0               # Start GenAI from frame 0
+animate-anyone-transparent-threshold: 64
+genai-resize-mode: aspect-recovery    # Preserve aspect ratio
+animate-anyone-adaptive-threshold: true
+animate-anyone-alpha-smoothing: 0.5   # Temporal smoothing for alpha
+
+# Compositing strategy
+compositing-mask-mode: postgen-seg-client
+postgen-segmenter-backend: yolo
+# metadata-mask-codec: null
+
+# Debug and evaluation
+debug: false
+evaluation-mode: psnr                 # Evaluate synthesis quality
+# evaluation-max-frames: null

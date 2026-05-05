@@ -1,0 +1,110 @@
+# PointStream Default Configuration
+# This is the default configuration with sensible values for all CLI arguments.
+# Use this as a template for creating custom configs for ablation tests and performance optimization.
+
+# ============================================================================
+# Core Input/Output Settings
+# ============================================================================
+# source_uri: null                    # Path to input video (optional; mock source used if omitted)
+num-frames: null                      # Maximum number of frames to process (null = all frames)
+summary-file: true                    # Write run_summary.json
+ffmpeg-codec: libsvtav1               # FFmpeg encoder: libsvtav1, libx265, etc.
+log-level: info                       # Log verbosity: debug, info, warning, error
+dry-run: false                        # Validate only without executing pipeline
+transport: disk                       # Transport backend: currently only 'disk'
+
+# ============================================================================
+# Execution Pool Configuration
+# ============================================================================
+execution-pool: inline                # DAG execution mode: inline or tagged
+cpu-workers: null                     # CPU worker count (null = auto-detect)
+gpu-workers: null                     # GPU worker count (null = auto-detect)
+
+# ============================================================================
+# Actor Extraction Pipeline
+# ============================================================================
+actor-extractor: real                 # Actor extraction: real or mock
+detector: yolo                        # Player detector: yolo26 or yoloe
+detector-caption: tennis player       # Caption for YOLOE open-vocabulary detector
+pose-estimator: yolo                  # Pose estimator: yolo or dwpose
+segmenter: yolo                       # Segmentation backend: yolo, yoloe, sam3, sam, none
+segmenter-caption: tennis player      # Caption for YOLOE open-vocabulary segmenter
+payload-pose-delta-threshold: 20.0    # Pose keyframe delta threshold
+disable-debug-keyframes: false        # Disable actor keyframe skeleton debug images
+
+# ============================================================================
+# Debug Settings
+# ============================================================================
+debug: false                          # Enable optional debug artifacts
+enable-shifted-ball: false            # Stream actor frame states one frame early for ball extraction
+
+# ============================================================================
+# Ball Extraction Configuration
+# ============================================================================
+ball-extractor: difference            # Ball extraction: difference, segmentation, cascade, mock
+ball-difference-threshold: 18.0       # Pixel-difference threshold for difference-based extraction
+ball-min-blob-area: 6                 # Minimum connected-component area for ball detection
+ball-max-side: 0                      # Max frame side for ball extraction (0 = native resolution)
+ball-det-conf: null                 # Detection confidence threshold for segmentation-based detector
+ball-det-model: null                # Model filename/path for segmentation-based detector
+ball-class-id: null                 # Class ID for segmentation-based detector
+
+# ============================================================================
+# Reference Crop Configuration
+# ============================================================================
+reference-jpeg-quality: 50            # JPEG quality for actor reference crops
+reference-padding-ratio: 0.10         # Padding ratio for reference crop extraction
+
+# ============================================================================
+# Residual and Importance Mapping
+# ============================================================================
+importance-mapper: binary             # Residual weighting strategy: binary or uniform
+residual-mode: full_video             # Residual mode: none, players_only, full_video
+residual-background-downscale: 2      # Downscale factor for background residuals (use None to disable)
+seed: 1337                            # Deterministic seed for synthesis and GenAI
+
+# ============================================================================
+# GPU and Performance Tuning
+# ============================================================================
+gpu-dtype: fp16                     # GPU compute dtype: fp16, fp32, bf16, fp8_e4m3fn, fp8_e5m2
+panorama-warp-batch-size: null      # Batch size for panorama warp operations
+panorama-codec: jpeg                # Panorama codec: jpeg or png
+panorama-jpeg-quality: 50           # JPEG quality when --panorama-codec=jpeg
+panorama-png-compression: null      # PNG compression level when --panorama-codec=png
+
+# ============================================================================
+# Model and Dependencies
+# ============================================================================
+allow-auto-model-download: true      # Allow automatic model downloads
+postgen-segmenter-model: null        # Explicit model file for postgen segmenter
+
+# ============================================================================
+# Evaluation Settings
+# ============================================================================
+evaluation-mode: psnr                 # Post-run evaluation: none or psnr
+skip-eval: false                      # Force-disable post-run evaluation
+evaluation-max-frames: null           # Optional frame cap for quality evaluation
+
+# ============================================================================
+# GenAI and AnimateAnyone Configuration
+# ============================================================================                
+genai-backend: animate-anyone             # GenAI backend: controlnet, animate-anyone (null disables GenAI)
+animate-anyone-repo-dir: null             # Path to Moore-AnimateAnyone repository
+animate-anyone-model-dir: null            # Override if models are in non-standard location
+animate-anyone-steps: 3                   # Diffusion inference steps for AnimateAnyone
+animate-anyone-cfg: 7.5                   # Guidance (CFG) scale for AnimateAnyone
+animate-anyone-width: 512                 # Width for AnimateAnyone model (pixels)
+animate-anyone-height: 512                # Height for AnimateAnyone model (pixels)
+animate-anyone-window: 4                  # Temporal conditioning window length
+genai-preroll-frames: 0                   # Frames to keep residual-only before temporal GenAI starts
+animate-anyone-transparent-threshold: 64  # Black-background alpha threshold
+genai-resize-mode: aspect-recovery        # Resize mode: plain or aspect-recovery
+animate-anyone-adaptive-threshold: true   # Enable adaptive border-threshold masking
+animate-anyone-alpha-smoothing: 0.5       # Temporal smoothing factor [0, 1]
+
+# ============================================================================
+# Compositing and Masking
+# ============================================================================
+compositing-mask-mode: postgen-seg-client  # Actor compositing: alpha-heuristic, metadata-source-mask, postgen-seg-client
+postgen-segmenter-backend: yolo            # Segmenter backend: yolo, heuristic
+metadata-mask-codec: auto                  # Mask codec: auto, rle-v1, bitpack-z1, png, segmenter-native, yolo-native

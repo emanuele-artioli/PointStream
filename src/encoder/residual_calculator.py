@@ -569,7 +569,16 @@ class ResidualCalculator:
         return sequence
 
     def _default_residual_path(self, chunk: VideoChunk) -> Path:
-        return Path.cwd() / f"chunk_{chunk.chunk_id}" / "residual.mp4"
+        runtime_output_dir = os.environ.get("POINTSTREAM_RUNTIME_OUTPUT_DIR")
+        if runtime_output_dir:
+            base_dir = Path(runtime_output_dir).expanduser()
+        else:
+            try:
+                base_dir = Path.cwd()
+            except FileNotFoundError:
+                base_dir = Path(__file__).resolve().parents[2] / "outputs"
+
+        return base_dir / f"chunk_{chunk.chunk_id}" / "residual.mp4"
 
     def _load_original_frames(self, chunk: VideoChunk) -> torch.Tensor:
         decoded = probe_video_metadata(chunk.source_uri)

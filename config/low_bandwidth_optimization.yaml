@@ -1,0 +1,67 @@
+# PointStream Low-Bandwidth Optimization Configuration
+# Optimized for minimal bitrate transmission at the cost of compute on the decoder.
+# Uses reduced quality settings, lightweight models, and compressed residuals.
+
+source_uri: null                      # Override with your input video path
+num-frames: null
+summary-file: true
+ffmpeg-codec: libsvtav1               # Could also use libx265 for better compression
+log-level: info
+dry-run: false
+transport: disk
+
+# Execution with GPU focus for fast synthesis
+execution-pool: tagged
+# cpu-workers: 2                       # Minimal CPU workers
+# gpu-workers: 1                       # Single GPU for synthesis
+
+# Real extractors but optimized for speed
+actor-extractor: real
+detector: yolo26
+detector-caption: tennis player
+pose-estimator: yolo                  # Faster than dwpose
+segmenter: yolo                       # Faster than SAM variants
+payload-pose-delta-threshold: 30.0    # Higher threshold = fewer keyframes transmitted
+
+# Ball extraction
+ball-extractor: cascade               # Optimized detector fallback
+ball-difference-threshold: 18.0
+ball-min-blob-area: 8                 # Slightly larger blobs
+
+# Reference crops with compression
+reference-jpeg-quality: 30            # Lower quality to reduce bandwidth
+reference-padding-ratio: 0.05         # Minimal padding
+
+# Importance mapping
+importance-mapper: binary
+# Minimize residual transmission
+residual-mode: players_only           # Only player regions, not full video
+residual-background-downscale: null      # Aggressive downscaling
+seed: 1337
+
+# GPU optimization for bandwidth reduction
+gpu-dtype: fp16                       # Mixed precision
+panorama-warp-batch-size: 8
+
+# GenAI for reconstruction from minimal data
+genai-backend: animate-anyone
+animate-anyone-steps: 30              # Fewer steps for speed
+animate-anyone-cfg: 5.0               # Lower guidance for randomness (less to transmit)
+animate-anyone-width: 448             # Slightly lower resolution
+animate-anyone-height: 448
+animate-anyone-window: 3              # Shorter temporal context
+genai-preroll-frames: 2               # Allow residual-only startup
+animate-anyone-transparent-threshold: 128
+genai-resize-mode: plain
+animate-anyone-adaptive-threshold: false
+animate-anyone-alpha-smoothing: 0.3   # More smoothing tolerance
+
+# Compositing
+compositing-mask-mode: alpha-heuristic  # Faster alpha extraction
+# postgen-segmenter-backend: null      # Skip post-gen segmentation
+
+# Evaluation
+debug: false
+evaluation-mode: psnr
+skip-eval: false
+# evaluation-max-frames: 100

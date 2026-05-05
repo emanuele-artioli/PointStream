@@ -106,7 +106,7 @@ You can still override explicitly with:
 ## **Run the Pipeline**
 
 Run with a custom input video:  
-python \-m src.main \--input /path/to/input.mp4
+python \-m src.main \--input /path/to/input.mp4 \--config config/default.yaml
 
 The run always writes runtime artifacts under a timestamped directory with:
 

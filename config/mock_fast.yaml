@@ -1,0 +1,39 @@
+# PointStream Mock/Fast Testing Configuration
+# Optimized for quick validation and testing with lightweight mock extractors.
+# Uses mock actors and balls for rapid iteration without heavy model inference.
+
+source_uri: null                      # Override with your input video path
+num-frames: 30                        # Quick test on first 30 frames
+summary-file: true
+ffmpeg-codec: libsvtav1
+log-level: info
+dry-run: false
+transport: disk
+
+# Fast execution with inline pool
+execution-pool: inline
+
+# Mock extractors for speed
+actor-extractor: mock                 # FAST: Uses lightweight mock
+ball-extractor: mock                  # FAST: Uses mock ball tracking
+detector: yolo26
+pose-estimator: yolo
+segmenter: none                       # FAST: Skip segmentation for mock
+importance-mapper: uniform            # Simpler importance calculation
+
+# Disable debug artifacts for faster runs
+debug: false
+disable-debug-keyframes: true
+enable-shifted-ball: false
+
+# Minimal residuals
+residual-mode: players_only           # Focus on player regions only
+residual-background-downscale: 2
+seed: 1337
+
+# Disable GenAI for speed
+# genai-backend: null
+
+# Use lighter GPU settings if available
+evaluation-mode: none
+skip-eval: true                       # Skip evaluation for speed

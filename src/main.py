@@ -130,6 +130,7 @@ def run_mock_pipeline(
     )
 
     previous_debug_artifact_dir = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")
+    previous_runtime_output_dir = os.environ.get("POINTSTREAM_RUNTIME_OUTPUT_DIR")
     debug_disabled = os.environ.get("POINTSTREAM_DISABLE_DEBUG_ARTIFACTS", "1").strip().lower() in {
         "1",
         "true",
@@ -138,6 +139,7 @@ def run_mock_pipeline(
     }
     previous_cwd = Path.cwd()
     os.chdir(resolved_runtime_root)
+    os.environ["POINTSTREAM_RUNTIME_OUTPUT_DIR"] = str(resolved_runtime_root)
     if debug_disabled:
         os.environ.pop("POINTSTREAM_DEBUG_ARTIFACT_DIR", None)
     else:
@@ -152,6 +154,10 @@ def run_mock_pipeline(
             os.environ.pop("POINTSTREAM_DEBUG_ARTIFACT_DIR", None)
         else:
             os.environ["POINTSTREAM_DEBUG_ARTIFACT_DIR"] = previous_debug_artifact_dir
+        if previous_runtime_output_dir is None:
+            os.environ.pop("POINTSTREAM_RUNTIME_OUTPUT_DIR", None)
+        else:
+            os.environ["POINTSTREAM_RUNTIME_OUTPUT_DIR"] = previous_runtime_output_dir
         os.chdir(previous_cwd)
 
     normalized_transport = transport_backend.strip().lower()
