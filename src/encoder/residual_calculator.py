@@ -51,7 +51,14 @@ class BaseImportanceMapper(ABC):
 
 
 class BinaryActorImportanceMapper(BaseImportanceMapper):
-    """Baseline binary saliency map from player/racket segmentation masks."""
+    """Binary saliency map: residuals only on detected actors/rackets.
+    
+    This mapper creates an importance map with value 1.0 on all pixels belonging to actors
+    (players, rackets, etc.) and 0.0 elsewhere. This focuses residual transmission on regions
+    with semantic importance, reducing bandwidth for background regions that GenAI can hallucinate.
+    
+    Best for: Low-bandwidth scenarios where background reconstruction is less critical.
+    """
 
     def __init__(self, target_classes: set[str] | None = None) -> None:
         self._target_classes = target_classes or {"player", "racket"}
@@ -117,7 +124,17 @@ class BinaryActorImportanceMapper(BaseImportanceMapper):
 
 
 class UniformImportanceMapper(BaseImportanceMapper):
-    """Ablation mapper that applies full residual weight everywhere."""
+    """Uniform saliency map: full residuals everywhere.
+    
+    This mapper assigns equal importance (1.0) to every pixel in every frame.
+    All pixels receive equal residual bandwidth regardless of semantic content.
+    
+    Use case: Ablation studies and ground-truth reconstruction. This provides a upper bound
+    on achievable reconstruction quality (perfect reconstruction) by transmitting all residuals.
+    Compare against BinaryActorImportanceMapper to measure how much GenAI handles background.
+    
+    Best for: Baseline comparisons and measuring the effectiveness of semantic masking.
+    """
 
     def build_importance_map(
         self,
@@ -165,11 +182,16 @@ class ResidualCalculator:
         debug_output_path: str | Path | None = None,
     ) -> ResidualPacket:
         """
-        Process residuals based on the configured mode.
+        Process residuals based on residual_mode and importance_mapper.
         
-        - NONE: Return placeholder without computing residuals (server skips GenAI)
-        - PLAYERS_ONLY: Masked residuals for players only (server generates players with same seed)
-        - FULL_VIDEO: Whole-video residuals after full client-side reconstruction (server runs full pipeline)
+        These are complementary (NOT redundant):
+        - residual_mode: Controls SCOPE - which regions/frames get encoded
+          - NONE: Skip all residuals
+          - PLAYERS_ONLY: Only encode player regions (via ROI masking)
+          - FULL_VIDEO: Encode entire video
+        - importance_mapper: Controls PRECISION - per-pixel weight/quality within encoded regions
+          - BinaryActorImportanceMapper: Zero weight on background (saves bandwidth)
+          - UniformImportanceMapper: Equal weight everywhere (ground truth, used with FULL_VIDEO)
         """
         if self._residual_mode == ResidualMode.NONE:
             return ResidualPacket(

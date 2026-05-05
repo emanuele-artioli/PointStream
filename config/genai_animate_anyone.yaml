@@ -17,8 +17,8 @@ execution-pool: tagged                # Use tagged pool for CPU/GPU scheduling
 actor-extractor: real
 detector: yolo26
 detector-caption: tennis player
-pose-estimator: yolo
-segmenter: yolo
+pose-estimator: yolo26
+segmenter: yolo26
 segmenter-caption: tennis player
 payload-pose-delta-threshold: 20.0
 

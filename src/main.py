@@ -270,7 +270,7 @@ def _build_actor_extractor(
     pose_estimator: str,
     segmenter: str,
     segmenter_caption: str,
-    disable_debug_keyframes: bool,
+    debug_enabled: bool,
     pose_delta_threshold: float,
     compositing_mask_mode: str,
     metadata_mask_codec: str,
@@ -295,7 +295,7 @@ def _build_actor_extractor(
         return None
 
     return ActorExtractor(
-        render_debug_keyframes=not disable_debug_keyframes,
+        render_debug_keyframes=debug_enabled,
         detector_backend=detector,
         detector_caption=detector_caption,
         pose_backend=pose_estimator,
@@ -647,15 +647,18 @@ def _build_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--pose-estimator",
-        choices=("yolo", "dwpose"),
-        default="yolo",
-        help="Pose estimator backend for real actor extractor.",
+        choices=("yolo26", "dwpose"),
+        default="yolo26",
+        help="Pose estimator backend: yolo26 (YOLO26n pose model from assets/weights) or dwpose (OpenMMPose).",
     )
     parser.add_argument(
         "--segmenter",
-        choices=("yolo", "yoloe", "sam3", "sam", "none"),
-        default="yolo",
-        help="Segmentation backend for real actor extractor.",
+        choices=("yolo26", "yoloe", "sam3", "sam", "none"),
+        default="yolo26",
+        help=(
+            "Segmentation backend: yolo26 (YOLO26n from assets/weights), "
+            "yoloe (YOLO-E for open-vocab), sam3/sam (segment-anything), none (no segmentation)."
+        ),
     )
     parser.add_argument(
         "--segmenter-caption",
@@ -668,11 +671,6 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         type=float,
         default=20.0,
         help="Pose keyframe delta threshold used by payload encoder.",
-    )
-    parser.add_argument(
-        "--disable-debug-keyframes",
-        action="store_true",
-        help="Disable actor keyframe skeleton debug image generation.",
     )
     debug_group = parser.add_mutually_exclusive_group()
     debug_group.add_argument(
@@ -751,16 +749,20 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         "--importance-mapper",
         choices=("binary", "uniform"),
         default="binary",
-        help="Residual weighting strategy.",
+        help=(
+            "Residual weighting strategy (determines PER-PIXEL WEIGHT/PRECISION within residual regions): "
+            "'binary' (weight 1.0 on actors, 0.0 elsewhere - low bandwidth), "
+            "'uniform' (weight 1.0 everywhere - ablation/ground truth baseline)."
+        ),
     )
     parser.add_argument(
         "--residual-mode",
         choices=("none", "players_only", "full_video"),
         default="full_video",
         help=(
-            "Residual calculation mode: "
+            "Residual calculation scope (determines WHICH REGIONS are encoded): "
             "'none' (no residuals, server skips GenAI), "
-            "'players_only' (residuals for players only), "
+            "'players_only' (residuals for player regions only), "
             "'full_video' (whole-video residuals after full reconstruction, default)."
         ),
     )
@@ -788,8 +790,11 @@ def _build_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--panorama-warp-batch-size",
         type=int,
-        default=None,
-        help="Batch size used by panorama warp operations (performance tuning).",
+        default=4,
+        help=(
+            "Batch size for panorama warping operations during synthesis (performance tuning). "
+            "Higher values trade memory for speed. Default: 4."
+        ),
     )
     parser.add_argument(
         "--panorama-codec",
@@ -999,10 +1004,6 @@ def run_cli(argv: list[str] | None = None) -> int:
         source_uri = str(source_path)
 
     debug_enabled = bool(args.debug)
-    if not debug_enabled:
-        # Keep actor debug keyframes aligned with global debug-artifact disable switch.
-        args.disable_debug_keyframes = True
-
     _apply_runtime_env_overrides(args)
 
     if bool(args.dry_run):
@@ -1034,7 +1035,7 @@ def run_cli(argv: list[str] | None = None) -> int:
         pose_estimator=str(args.pose_estimator),
         segmenter=str(args.segmenter),
         segmenter_caption=str(args.segmenter_caption),
-        disable_debug_keyframes=bool(args.disable_debug_keyframes),
+        debug_enabled=debug_enabled,
         pose_delta_threshold=float(args.payload_pose_delta_threshold),
         compositing_mask_mode=str(args.compositing_mask_mode),
         metadata_mask_codec=str(args.metadata_mask_codec or "auto"),

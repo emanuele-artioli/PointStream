@@ -22,8 +22,7 @@ segmenter: none                       # FAST: Skip segmentation for mock
 importance-mapper: uniform            # Simpler importance calculation
 
 # Disable debug artifacts for faster runs
-debug: false
-disable-debug-keyframes: true
+debug: false                          # When false, skips all debug artifacts including keyframes
 enable-shifted-ball: false
 
 # Minimal residuals

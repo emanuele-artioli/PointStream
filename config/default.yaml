@@ -24,16 +24,17 @@ gpu-workers: null                     # GPU worker count (null = auto-detect)
 # Actor Extraction Pipeline
 # ============================================================================
 actor-extractor: real                 # Actor extraction: real or mock
-detector: yolo                        # Player detector: yolo26 or yoloe
+detector: yolo26                      # Player detector: yolo26 or yoloe (open-vocabulary)
 detector-caption: tennis player       # Caption for YOLOE open-vocabulary detector
-pose-estimator: yolo                  # Pose estimator: yolo or dwpose
-segmenter: yolo                       # Segmentation backend: yolo, yoloe, sam3, sam, none
+pose-estimator: yolo26                # Pose estimator: yolo26 (YOLOv8) or dwpose (OpenMMPose)
+segmenter: yolo26                     # Segmentation: yolo26, yoloe, sam3, sam, none
 segmenter-caption: tennis player      # Caption for YOLOE open-vocabulary segmenter
 payload-pose-delta-threshold: 20.0    # Pose keyframe delta threshold
-disable-debug-keyframes: false        # Disable actor keyframe skeleton debug images
 
 # ============================================================================
 # Debug Settings
+# ============================================================================
+debug: false                          # Enable optional debug artifacts and actor keyframe skeleton images
 # ============================================================================
 debug: false                          # Enable optional debug artifacts
 enable-shifted-ball: false            # Stream actor frame states one frame early for ball extraction
