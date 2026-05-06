@@ -359,6 +359,10 @@ class DiffusersCompositor(MockCompositor):
 
         self._strategy = self._build_strategy(self._backend)
 
+    def clear_history(self) -> None:
+        """Reset temporal state such as alpha smoothing history."""
+        self._alpha_history_by_actor.clear()
+
     def _build_strategy(self, backend: str) -> BaseGenAIStrategy:
         if backend in {"controlnet", "baseline", "baseline-controlnet"}:
             return BaselineControlNetStrategy()
@@ -380,9 +384,10 @@ class DiffusersCompositor(MockCompositor):
         metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         # Deterministic generation is required so residual encoding remains stable.
-        torch.manual_seed(self._seed)
-        if torch.cuda.is_available():
-            torch.cuda.manual_seed_all(self._seed)
+        if self._seed is not None:
+            torch.manual_seed(self._seed)
+            if torch.cuda.is_available():
+                torch.cuda.manual_seed_all(self._seed)
 
         generated_actor = self._strategy.generate(
             reference_crop_tensor=reference_crop_tensor,

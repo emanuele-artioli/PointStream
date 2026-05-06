@@ -208,9 +208,14 @@ class ResidualCalculator:
         frame_states: list[FrameState],
         debug_output_path: str | Path | None,
     ) -> ResidualPacket:
-        predicted_frames = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False).frames_bgr
+        compositor = self._synthesis_engine.get_genai_compositor()
+        if hasattr(compositor, "clear_history"):
+            compositor.clear_history()
+
+        base_frames = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False).frames_bgr
+        predicted_frames = base_frames
         if self._is_genai_enabled():
-            predicted_frames = self._render_server_genai_prediction(payload=payload, frame_tensor=predicted_frames)
+            predicted_frames = self._render_server_genai_prediction(payload=payload, frame_tensor=base_frames.clone())
 
         source_metadata = probe_video_metadata(chunk.source_uri)
         available_source_frames = max(0, int(source_metadata.num_frames) - int(chunk.start_frame_id))
@@ -275,6 +280,14 @@ class ResidualCalculator:
                 originals = torch.stack(batch_originals, dim=0)
                 predicted = torch.stack(batch_predicted, dim=0)
                 actor_masks = torch.stack(batch_actor_masks, dim=0)
+
+                if self._is_genai_enabled():
+                    # If GenAI is enabled, expand the mask to include areas where GenAI made a prediction.
+                    # This is crucial for KEYFRAME_ONLY mode where interpolation creates ghosts outside GT regions.
+                    # We compare predicted_frames with the base warped background.
+                    base_frames_batch = base_frames[frame_idx:batch_end].to(self._device, dtype=torch.float32)
+                    predicted_actor_mask = (predicted - base_frames_batch).abs().max(dim=1)[0] > 10.0
+                    actor_masks = torch.logical_or(actor_masks > 0.5, predicted_actor_mask).to(torch.float32)
 
                 residual_batch = originals - predicted
 
@@ -547,9 +560,10 @@ class ResidualCalculator:
         preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
         chunk_start = int(payload.chunk.start_frame_id)
 
-        generated_frames: list[torch.Tensor] = []
+        generated_deltas: list[torch.Tensor] = []
         for frame_idx in selected_indices:
-            composited = frame_tensor[frame_idx]
+            bg_frame = frame_tensor[frame_idx]
+            composited = bg_frame
             global_frame_id = chunk_start + frame_idx
             for state in actor_state.values():
                 if frame_idx >= int(state.dense_pose_tensor.shape[0]):
@@ -579,30 +593,30 @@ class ResidualCalculator:
                     metadata_bbox=metadata_bbox,
                 ).to(frame_tensor.device)
 
-            generated_frames.append(composited)
+            generated_deltas.append(composited.to(dtype=torch.float32) - bg_frame.to(dtype=torch.float32))
 
         out_frames: list[torch.Tensor] = []
         anchor_idx = 0
         for frame_idx in range(frame_count):
             if frame_idx <= selected_indices[0]:
-                out_frames.append(generated_frames[0])
+                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[0]).clamp(0.0, 255.0).to(torch.uint8))
                 continue
             while anchor_idx + 1 < len(selected_indices) and frame_idx > selected_indices[anchor_idx + 1]:
                 anchor_idx += 1
             if anchor_idx + 1 >= len(selected_indices):
-                out_frames.append(generated_frames[-1])
+                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[-1]).clamp(0.0, 255.0).to(torch.uint8))
                 continue
 
             left_idx = selected_indices[anchor_idx]
             right_idx = selected_indices[anchor_idx + 1]
-            left_frame = generated_frames[anchor_idx].to(dtype=torch.float32)
-            right_frame = generated_frames[anchor_idx + 1].to(dtype=torch.float32)
+            left_delta = generated_deltas[anchor_idx]
+            right_delta = generated_deltas[anchor_idx + 1]
             if right_idx <= left_idx:
-                out_frames.append(generated_frames[anchor_idx])
+                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + left_delta).clamp(0.0, 255.0).to(torch.uint8))
                 continue
             alpha = float(frame_idx - left_idx) / float(right_idx - left_idx)
-            blended = torch.lerp(left_frame, right_frame, alpha).clamp(0.0, 255.0).to(torch.uint8)
-            out_frames.append(blended)
+            blended_delta = torch.lerp(left_delta, right_delta, alpha)
+            out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + blended_delta).clamp(0.0, 255.0).to(torch.uint8))
 
         return torch.stack(out_frames, dim=0)
 
