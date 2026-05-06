@@ -97,10 +97,10 @@ evaluation-max-frames: null           # Optional frame cap for quality evaluatio
 genai-backend: animate-anyone             # GenAI backend: controlnet, animate-anyone (null disables GenAI)
 animate-anyone-repo-dir: null             # Path to Moore-AnimateAnyone repository
 animate-anyone-model-dir: null            # Override if models are in non-standard location
-animate-anyone-steps: 30                  # Diffusion inference steps for AnimateAnyone
+animate-anyone-steps: 3                  # Diffusion inference steps for AnimateAnyone
 animate-anyone-cfg: 7.5                   # Guidance (CFG) scale for AnimateAnyone
-animate-anyone-width: 512                 # Width for AnimateAnyone model (pixels)
-animate-anyone-height: 512                # Height for AnimateAnyone model (pixels)
+animate-anyone-width: 256                 # Width for AnimateAnyone model (pixels)
+animate-anyone-height: 256                # Height for AnimateAnyone model (pixels)
 animate-anyone-window: 4                  # Temporal conditioning window length
 genai-preroll-frames: 0                   # Frames to keep residual-only before temporal GenAI starts
 genai-keyframe-only: true                 # Run GenAI only on received keyframe skeletons and interpolate outputs locally

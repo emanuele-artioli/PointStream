@@ -217,7 +217,7 @@ class ResidualCalculator:
         base_frames = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False).frames_bgr
         predicted_frames = base_frames
         if self._is_genai_enabled():
-            predicted_frames = self._render_server_genai_prediction(payload=payload, frame_tensor=base_frames.clone())
+            predicted_frames = self._render_server_actor_prediction(payload=payload, frame_tensor=base_frames.clone())
 
         source_metadata = probe_video_metadata(chunk.source_uri)
         available_source_frames = max(0, int(source_metadata.num_frames) - int(chunk.start_frame_id))
