@@ -29,6 +29,30 @@ class SegmentationBallExtractor:
     This extractor is best-effort: if detector or weights missing, it raises a
     RuntimeError. It outputs the same BallPacket semantics as the residual
     extractor so it can be swapped in the pipeline.
+
+    ## Design Note: Detection Duplication
+
+    When the actor extractor and ball extractor both use YOLO detection, they run
+    independently and perform two forward passes. This creates redundant compute.
+
+    **Optimization Opportunity (Future Work):**
+    A future refactor could share detection results by:
+    1. Running actor detector once with both actor and ball class IDs
+    2. Caching results in the DAG's frame_state or orchestrator
+    3. Passing cached detections to SegmentationBallExtractor to skip its own detection
+
+    **Why Not Done Now:**
+    - ActorExtractor's PipelineBuilder orchestrates detection internally and wouldn't
+      naturally expose cached results.
+    - The orchestrator DAG wires actor and ball extractors independently with no
+      result-sharing mechanism.
+    - The ROI-based approach here means ball detection only runs in a small region
+      (~128x128 px typical), so redundant compute is relatively low-cost.
+    - Refactoring would require invasive changes to the pipeline architecture.
+
+    **Mitigation:** For now, the `cascade` mode attempts segmentation first, then
+    falls back to residual-based extraction if it fails, which provides flexibility.
+    When segmentation works, it saves on residual bitrate.
     """
 
     def __init__(

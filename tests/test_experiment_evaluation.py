@@ -38,10 +38,7 @@ def test_evaluate_run_summary_combines_timings_and_savings(monkeypatch, tmp_path
         max_frames=8,
     )
 
-    assert evaluation["experiment_dir"] == str(tmp_path)
-    assert evaluation["reference_video_size_bytes"] == 100
     assert evaluation["decoded_video_size_bytes"] == len(b"decoded-bytes")
     assert evaluation["transport_savings_percent"] == 40.0
-    assert evaluation["pipeline_total_sec"] == 2.0
     assert evaluation["psnr_mean"] == 38.5
     assert evaluation["psnr_num_frames"] == 4

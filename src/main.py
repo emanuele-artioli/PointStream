@@ -249,6 +249,14 @@ def run_mock_pipeline(
         ratio = float(transport_total_size_bytes) / float(source_size_bytes)
         summary["transport_to_source_ratio"] = ratio
         summary["transport_savings_percent"] = (1.0 - ratio) * 100.0
+    # include DAG profiling produced during encoding, if available
+    try:
+        profiling = getattr(encoder, "_last_dag_profile", None)
+        if profiling is not None:
+            summary["profiling"] = profiling
+    except Exception:
+        # defensive: don't fail summary construction on profiling issues
+        pass
     return summary
 
 
@@ -440,6 +448,10 @@ def _build_residual_calculator_impl(
 def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
     if args.ffmpeg_codec is not None:
         os.environ["POINTSTREAM_FFMPEG_CODEC"] = str(args.ffmpeg_codec)
+    if args.codec_crf is not None:
+        os.environ["POINTSTREAM_CODEC_CRF"] = str(int(args.codec_crf))
+    if args.codec_preset is not None:
+        os.environ["POINTSTREAM_CODEC_PRESET"] = str(args.codec_preset)
     enable_genai = bool(args.genai_backend)
 
     os.environ["POINTSTREAM_ENABLE_GENAI"] = "1" if enable_genai else "0"
@@ -605,6 +617,26 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         help=(
             "FFmpeg video encoder library used for all video outputs (decoded video, residuals, "
             "debug/mock clips). Default: libsvtav1."
+        ),
+    )
+    parser.add_argument(
+        "--codec-crf",
+        type=int,
+        default=None,
+        help=(
+            "FFmpeg codec quality setting (CRF - Constant Rate Factor). "
+            "Lower values = higher quality. Range depends on codec (e.g., 0-63 for libx264/libx265/libsvtav1). "
+            "If omitted, uses codec-specific defaults."
+        ),
+    )
+    parser.add_argument(
+        "--codec-preset",
+        type=str,
+        default=None,
+        help=(
+            "FFmpeg codec preset/speed setting. "
+            "Common values: ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow. "
+            "For libsvtav1, use numeric values 0-13. If omitted, uses codec-specific defaults."
         ),
     )
     parser.add_argument(
@@ -1158,8 +1190,8 @@ def _ensure_mock_source_video(runtime_output_root: str | Path | None = None) -> 
         height=720,
         codec=os.environ.get("POINTSTREAM_FFMPEG_CODEC", "libsvtav1"),
         pix_fmt="yuv420p",
-        crf=18,
-        preset="veryfast",
+        crf=int(os.environ.get("POINTSTREAM_CODEC_CRF", "18")),
+        preset=os.environ.get("POINTSTREAM_CODEC_PRESET", "veryfast"),
     )
     return str(source_path)
 

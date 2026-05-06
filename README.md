@@ -112,7 +112,8 @@ The run always writes runtime artifacts under a timestamped directory with:
 
 * metadata.msgpack: for semantic metadata/events  
 * panorama.jpg: encoded sidecar image for background re-warping  
-* residual.mp4: encoded signed residual stream (H.265 / libx265)
+* residual.mp4: encoded signed residual stream (H.265 / libx265)  
+* decoded/: directory containing PNG frame reconstructions (primary artifact for quality comparison)
 
 metadata.msgpack: intentionally stores panorama\_uri and omits raw panorama\_image pixels to keep metadata size bounded. DiskTransport always writes panorama as an encoded sidecar image (never raw pixel arrays in metadata), using a pluggable encoder strategy.
 
@@ -123,15 +124,19 @@ metadata.msgpack: intentionally stores panorama\_uri and omits raw panorama\_ima
 * \--config /path/to/run.json|.yaml: load defaults from a JSON/YAML config file  
 * \--execution-pool inline|tagged with \--cpu-workers and \--gpu-workers (auto-detected when omitted)  
 * \--log-level debug|info|warning|error  
+* \--ffmpeg-codec libsvtav1|libx265|etc: FFmpeg encoder for all video outputs  
+* \--codec-crf N: FFmpeg CRF quality setting (lower = better; defaults: 18 for decoded, 28 for residuals)  
+* \--codec-preset ultrafast|veryfast|medium|slow|etc: FFmpeg encoding preset (defaults: veryfast for decoded, medium for residuals)  
 * \--dry-run (alias: \--validate-only): validate arguments/dependencies without running the pipeline  
 * \--actor-extractor real|mock  
 * \--detector yolo26|yoloe and \--detector-caption "tennis player"  
-* \--pose-estimator yolo|dwpose  
-* \--segmenter yolo|yoloe|sam3|sam|none  
-* \--ball-extractor difference|mock  
+* \--pose-estimator yolo26|dwpose  
+* \--segmenter yolo26|yoloe|sam3|sam|none  
+* \--ball-extractor difference|mock|segmentation|cascade  
 * \--gpu-dtype fp16|fp32|bf16|fp8\_e4m3fn|fp8\_e5m2
 * \--evaluation-mode none|psnr and optional \--skip-eval
 * \--debug or \--no-debug
+* \--genai-keyframe-only: run GenAI only on received keyframes and interpolate missing frames locally  
 * \--residual-background-downscale N|None: downscale only background residual regions in full-video mode (default: 2; use None to disable)
 
 GenAI backend switches:

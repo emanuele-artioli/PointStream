@@ -11,6 +11,7 @@ import torch
 
 from src.decoder.compositor import ResidualCompositor
 from src.encoder.video_io import encode_video_frames_ffmpeg
+from src.shared.genai_debug import debug_export_compositor_input, debug_export_compositor_output
 from src.shared.mask_codec import decode_binary_mask
 from src.shared.schemas import ActorPacket, DecodedChunkResult, EncodedChunkPayload
 from src.shared.synthesis_engine import SynthesisEngine
@@ -58,10 +59,10 @@ class DecoderRenderer:
         self._actor_state = self._build_actor_state(payload)
         synthesis = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False)
 
-        genai_enabled = os.environ.get("POINTSTREAM_ENABLE_GENAI", "0").strip() == "1"
-        predicted_frames = synthesis.frames_bgr
-        if genai_enabled:
-            predicted_frames = self._render_genai_baseline(predicted_frames)
+        # Always render actors (GenAI baseline or mock) onto the predicted frames
+        # before applying residuals so the residual stream corrects the final
+        # composited pixels (foreground + warped background).
+        predicted_frames = self._render_genai_baseline(synthesis.frames_bgr)
 
         frame_tensor = self._compositor.composite(
             predicted_frames=predicted_frames,
@@ -69,8 +70,6 @@ class DecoderRenderer:
             width=int(chunk.width),
             height=int(chunk.height),
         )
-        if not genai_enabled:
-            frame_tensor = self._render_genai_baseline(frame_tensor)
         frames_bgr = [np.asarray(frame.permute(1, 2, 0).cpu().numpy(), dtype=np.uint8) for frame in frame_tensor]
         target_path = Path(output_path) if output_path is not None else self._output_root / chunk.chunk_id
         if target_path.suffix:
@@ -95,13 +94,16 @@ class DecoderRenderer:
                 height=int(chunk.height),
                 codec=os.environ.get("POINTSTREAM_FFMPEG_CODEC", "libsvtav1"),
                 pix_fmt="yuv420p",
-                crf=18,
-                preset="veryfast",
+                crf=int(os.environ.get("POINTSTREAM_CODEC_CRF", "18")),
+                preset=os.environ.get("POINTSTREAM_CODEC_PRESET", "veryfast"),
             )
 
+        # If a debug video was produced (target_path had a suffix and debug is enabled),
+        # return the video path so callers expecting a file get the MP4. Otherwise
+        # return the frame directory path.
         return DecodedChunkResult(
             chunk_id=chunk.chunk_id,
-            output_uri=str(frame_output_dir),
+            output_uri=str(debug_video_path) if debug_enabled and debug_video_path.exists() else str(frame_output_dir),
             num_frames=chunk.num_frames,
             width=chunk.width,
             height=chunk.height,
@@ -235,6 +237,15 @@ class DecoderRenderer:
                 metadata_mask = None if metadata_entry is None else metadata_entry.mask_gray
                 metadata_bbox = None if metadata_entry is None else metadata_entry.bbox
 
+                debug_export_compositor_input(
+                    stage="decoder",
+                    frame_idx=frame_idx,
+                    actor_id=actor_state.track_id,
+                    reference_crop_tensor=actor_state.reference_crop_tensor,
+                    dense_pose_tensor=pose_condition,
+                    warped_bg_tensor=composited,
+                )
+
                 try:
                     composited = self._genai_compositor.process(
                         reference_crop_tensor=actor_state.reference_crop_tensor,
@@ -244,6 +255,14 @@ class DecoderRenderer:
                         metadata_mask=metadata_mask,
                         metadata_bbox=metadata_bbox,
                     ).to(frame_tensor.device)
+
+                    debug_export_compositor_output(
+                        stage="decoder",
+                        frame_idx=frame_idx,
+                        actor_id=actor_state.track_id,
+                        composited_frame_tensor=composited,
+                        bbox=metadata_bbox,
+                    )
                 except TypeError:
                     try:
                         # Keep compatibility with existing test doubles that don't accept metadata_bbox.
@@ -254,6 +273,14 @@ class DecoderRenderer:
                             actor_identity=actor_state.object_id,
                             metadata_mask=metadata_mask,
                         ).to(frame_tensor.device)
+
+                        debug_export_compositor_output(
+                            stage="decoder",
+                            frame_idx=frame_idx,
+                            actor_id=actor_state.track_id,
+                            composited_frame_tensor=composited,
+                            bbox=metadata_bbox,
+                        )
                     except TypeError:
                         # Keep compatibility with older test doubles that don't accept metadata args.
                         composited = self._genai_compositor.process(
@@ -262,6 +289,14 @@ class DecoderRenderer:
                             warped_background_frame=composited,
                             actor_identity=actor_state.object_id,
                         ).to(frame_tensor.device)
+
+                        debug_export_compositor_output(
+                            stage="decoder",
+                            frame_idx=frame_idx,
+                            actor_id=actor_state.track_id,
+                            composited_frame_tensor=composited,
+                            bbox=metadata_bbox,
+                        )
             out_frames.append(composited)
 
         return torch.stack(out_frames, dim=0)

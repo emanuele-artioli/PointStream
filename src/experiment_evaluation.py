@@ -103,7 +103,12 @@ def _compute_psnr(reference_video: Path, predicted_video: Path, max_frames: int 
 
 
 def evaluate_run_summary(summary: dict[str, Any], experiment_dir: str | Path, max_frames: int | None = None) -> dict[str, Any]:
-    resolved_experiment_dir = Path(experiment_dir).expanduser()
+    """Compute evaluation metrics (PSNR, sizes) for a completed pipeline run.
+    
+    Note: Only includes metrics that are computed by this function. Fields that are
+    already present in the run_summary (pipeline_total_sec, encode_chunk_sec, etc.)
+    are NOT duplicated here to avoid redundancy in the JSON output.
+    """
     source_uri = summary.get("source_uri")
     decoded_uri = summary.get("decoded_uri")
     transport_total_size_bytes = summary.get("transport_total_size_bytes")
@@ -113,23 +118,14 @@ def evaluate_run_summary(summary: dict[str, Any], experiment_dir: str | Path, ma
     decoded_path = Path(str(decoded_uri)).expanduser() if decoded_uri is not None else None
 
     psnr = _compute_psnr(
-        reference_video=source_path if source_path is not None else resolved_experiment_dir / "missing_source.mp4",
-        predicted_video=decoded_path if decoded_path is not None else resolved_experiment_dir / "missing_decoded.mp4",
+        reference_video=source_path if source_path is not None else Path(experiment_dir) / "missing_source.mp4",
+        predicted_video=decoded_path if decoded_path is not None else Path(experiment_dir) / "missing_decoded.mp4",
         max_frames=max_frames,
     )
 
+    # Only include metrics computed by evaluation; omit copies of run_summary fields
     evaluation = {
-        "experiment_dir": str(resolved_experiment_dir),
-        "source_uri": str(source_path) if source_path is not None else None,
-        "decoded_uri": str(decoded_path) if decoded_path is not None else None,
-        "reference_video_size_bytes": source_size_bytes,
         "decoded_video_size_bytes": _safe_file_size(decoded_path) if decoded_path is not None else None,
-        "transport_total_size_bytes": transport_total_size_bytes,
-        "pipeline_total_sec": summary.get("pipeline_total_sec"),
-        "encode_chunk_sec": summary.get("encode_chunk_sec"),
-        "transport_send_sec": summary.get("transport_send_sec"),
-        "transport_receive_sec": summary.get("transport_receive_sec"),
-        "decode_sec": summary.get("decode_sec"),
         "transport_savings_percent": None,
     }
 

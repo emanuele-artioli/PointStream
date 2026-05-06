@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from src.encoder.execution_pool import BaseExecutionPool, InlineExecutionPool
+from src.shared.profiling import PipelineProfiler
 
 
 @dataclass(frozen=True)
@@ -63,19 +64,24 @@ class DAGOrchestrator:
 
     def run(self, initial_context: dict[str, Any]) -> dict[str, Any]:
         context: dict[str, Any] = dict(initial_context)
+        profiler = PipelineProfiler()
         for node_name in self._topological_order():
             node = self._nodes[node_name]
             dependency_outputs = {
                 dependency: context[dependency] for dependency in node.dependencies
             }
             execution_tag = getattr(node.func, "_execution_tag", "cpu")
-            context[node.name] = self._execution_pool.execute(
-                tag=execution_tag,
-                func=node.func,
-                context=context,
-                deps=dependency_outputs,
-            )
+            with profiler.stage(node.name):
+                context[node.name] = self._execution_pool.execute(
+                    tag=execution_tag,
+                    func=node.func,
+                    context=context,
+                    deps=dependency_outputs,
+                )
             context[f"{node.name}__tag"] = execution_tag
+
+        # attach profiler timings to context for consumers (EncoderPipeline)
+        context["dag_profile"] = profiler.get_timings()
         return context
 
     def shutdown(self) -> None:
