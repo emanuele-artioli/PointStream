@@ -54,6 +54,8 @@ class DecoderRenderer:
     def process(self, payload: EncodedChunkPayload, output_path: str | Path | None = None) -> DecodedChunkResult:
         chunk = payload.chunk
         self._chunk_start_frame_id = int(chunk.start_frame_id)
+        if hasattr(self._genai_compositor, "clear_history"):
+            self._genai_compositor.clear_history()
         self._actor_state = self._build_actor_state(payload)
         synthesis = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False)
 
@@ -308,16 +310,34 @@ class DecoderRenderer:
         if len(selected_indices) <= 1:
             return self._render_genai_baseline(frame_tensor=frame_tensor)
 
-        generated_frames: list[torch.Tensor] = []
+        generated_deltas: list[torch.Tensor] = []
         generated_indices: list[int] = []
         for frame_idx in selected_indices:
-            composited = frame_tensor[frame_idx]
+            bg_frame = frame_tensor[frame_idx]
+            composited = bg_frame
             global_frame_id = int(self._chunk_start_frame_id) + int(frame_idx)
+            use_temporal_window = bool(
+                hasattr(self._genai_compositor, "uses_temporal_pose_sequence")
+                and self._genai_compositor.uses_temporal_pose_sequence()
+            )
+            temporal_window = max(1, int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW", "16")))
+            preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
+
             for actor_state in self._actor_state.values():
                 if frame_idx >= int(actor_state.dense_pose_tensor.shape[0]):
                     continue
 
-                pose_condition = actor_state.dense_pose_tensor[frame_idx]
+                if use_temporal_window:
+                    if frame_idx < preroll_frames:
+                        continue
+                    pose_condition = self._build_temporal_pose_condition(
+                        dense_pose_tensor=actor_state.dense_pose_tensor,
+                        frame_idx=frame_idx,
+                        temporal_window=temporal_window,
+                    )
+                else:
+                    pose_condition = actor_state.dense_pose_tensor[frame_idx]
+
                 metadata_entry = actor_state.metadata_masks_by_frame.get(global_frame_id)
                 metadata_mask = None if metadata_entry is None else metadata_entry.mask_gray
                 metadata_bbox = None if metadata_entry is None else metadata_entry.bbox
@@ -332,6 +352,7 @@ class DecoderRenderer:
                         metadata_bbox=metadata_bbox,
                     ).to(frame_tensor.device)
                 except TypeError:
+                    # Fallback for mock/test compositors
                     composited = self._genai_compositor.process(
                         reference_crop_tensor=actor_state.reference_crop_tensor,
                         dense_dwpose_tensor=pose_condition,
@@ -340,30 +361,30 @@ class DecoderRenderer:
                     ).to(frame_tensor.device)
 
             generated_indices.append(int(frame_idx))
-            generated_frames.append(composited)
+            generated_deltas.append(composited.to(dtype=torch.float32) - bg_frame.to(dtype=torch.float32))
 
         out_frames: list[torch.Tensor] = []
         anchor_idx = 0
         for frame_idx in range(frame_count):
             if frame_idx <= generated_indices[0]:
-                out_frames.append(generated_frames[0])
+                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[0]).clamp(0.0, 255.0).to(torch.uint8))
                 continue
             while anchor_idx + 1 < len(generated_indices) and frame_idx > generated_indices[anchor_idx + 1]:
                 anchor_idx += 1
             if anchor_idx + 1 >= len(generated_indices):
-                out_frames.append(generated_frames[-1])
+                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[-1]).clamp(0.0, 255.0).to(torch.uint8))
                 continue
 
             left_idx = generated_indices[anchor_idx]
             right_idx = generated_indices[anchor_idx + 1]
-            left_frame = generated_frames[anchor_idx].to(dtype=torch.float32)
-            right_frame = generated_frames[anchor_idx + 1].to(dtype=torch.float32)
+            left_delta = generated_deltas[anchor_idx]
+            right_delta = generated_deltas[anchor_idx + 1]
             if right_idx <= left_idx:
-                out_frames.append(generated_frames[anchor_idx])
+                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + left_delta).clamp(0.0, 255.0).to(torch.uint8))
                 continue
             alpha = float(frame_idx - left_idx) / float(right_idx - left_idx)
-            blended = torch.lerp(left_frame, right_frame, alpha).clamp(0.0, 255.0).to(torch.uint8)
-            out_frames.append(blended)
+            blended_delta = torch.lerp(left_delta, right_delta, alpha)
+            out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + blended_delta).clamp(0.0, 255.0).to(torch.uint8))
 
         return torch.stack(out_frames, dim=0)
     def _collect_genai_keyframe_indices(self, frame_count: int) -> list[int]:
@@ -386,8 +407,10 @@ class DecoderRenderer:
         frame_idx: int,
         temporal_window: int,
     ) -> torch.Tensor:
-        start_idx = max(0, int(frame_idx) - int(temporal_window) + 1)
-        sequence = dense_pose_tensor[start_idx : int(frame_idx) + 1]
-        if int(sequence.shape[0]) == 0:
-            return dense_pose_tensor[int(frame_idx)].unsqueeze(0)
-        return sequence
+        start = max(0, int(frame_idx) - int(temporal_window) + 1)
+        end = int(frame_idx) + 1
+        window = dense_pose_tensor[start:end]
+        if window.shape[0] < temporal_window:
+            padding = window[0:1].repeat(temporal_window - window.shape[0], 1, 1)
+            window = torch.cat([padding, window], dim=0)
+        return window
