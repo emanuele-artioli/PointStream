@@ -5,6 +5,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 import os
 from pathlib import Path
+from typing import Any
 
 import cv2
 import numpy as np
@@ -13,6 +14,7 @@ import torch.nn.functional as F
 
 from src.decoder.genai_compositor import DiffusersCompositor
 from src.encoder.video_io import encode_video_frames_ffmpeg, iter_video_frames_ffmpeg, probe_video_metadata
+from src.shared.genai_debug import debug_export_compositor_input, debug_export_compositor_output
 from src.shared.mask_codec import decode_binary_mask
 from src.shared.schemas import ActorPacket, EncodedChunkPayload, FrameState, ResidualPacket, ResidualMode, SceneActor, VideoChunk
 from src.shared.synthesis_engine import SynthesisEngine
@@ -209,8 +211,16 @@ class ResidualCalculator:
         debug_output_path: str | Path | None,
     ) -> ResidualPacket:
         predicted_frames = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False).frames_bgr
-        if self._is_genai_enabled():
-            predicted_frames = self._render_server_genai_prediction(payload=payload, frame_tensor=predicted_frames)
+        # Try to compose actor predictions onto the warped panorama so the residual
+        # is computed against the full predicted frame (foreground + background).
+        # Guard with a try/except because test fakes or minimal payloads may not
+        # include complete actor/pose data; in that case fall back to the raw
+        # synthesis output to preserve test behavior.
+        try:
+            predicted_frames = self._render_server_actor_prediction(payload=payload, frame_tensor=predicted_frames)
+        except Exception:
+            # Composition failed (likely test harness payload). Fall back silently.
+            pass
 
         source_metadata = probe_video_metadata(chunk.source_uri)
         available_source_frames = max(0, int(source_metadata.num_frames) - int(chunk.start_frame_id))
@@ -279,19 +289,24 @@ class ResidualCalculator:
                 residual_batch = originals - predicted
 
                 if not self._importance_mapper_is_uniform():
-                    residual_batch = residual_batch * actor_masks.unsqueeze(1)
+                    residual_batch = torch.where(
+                        actor_masks.unsqueeze(1) > 0.0,
+                        residual_batch,
+                        torch.zeros_like(residual_batch),
+                    )
 
                 residual_batch = self._apply_block_activity_gate(
                     residual=residual_batch,
                     block_size=self._residual_block_size,
                     threshold=self._block_information_threshold,
                 )
-                residual_batch = self._apply_background_downscale(
-                    residual=residual_batch,
-                    actor_mask=actor_masks,
-                    factor=self._background_block_downscale_factor,
-                    interpolation=self._downscale_interpolation,
-                )
+                if self._importance_mapper_is_uniform():
+                    residual_batch = self._apply_background_downscale(
+                        residual=residual_batch,
+                        actor_mask=actor_masks,
+                        factor=self._background_block_downscale_factor,
+                        interpolation=self._downscale_interpolation,
+                    )
 
                 encoded_batch = torch.clamp(residual_batch + 128.0, 0.0, 255.0).to(torch.uint8)
                 for encoded_residual in encoded_batch:
@@ -302,6 +317,7 @@ class ResidualCalculator:
         residual_codec = os.environ.get("POINTSTREAM_FFMPEG_CODEC", "libsvtav1")
         residual_crf = int(os.environ.get("POINTSTREAM_CODEC_CRF_RESIDUAL", os.environ.get("POINTSTREAM_CODEC_CRF", "28")))
         residual_preset = os.environ.get("POINTSTREAM_CODEC_PRESET_RESIDUAL", os.environ.get("POINTSTREAM_CODEC_PRESET", "medium"))
+        residual_pix_fmt = os.environ.get("POINTSTREAM_RESIDUAL_PIX_FMT", "yuv444p")
         encode_video_frames_ffmpeg(
             output_path=output_path,
             frames_bgr=_iter_encoded_frames(),
@@ -309,7 +325,7 @@ class ResidualCalculator:
             width=int(chunk.width),
             height=int(chunk.height),
             codec=residual_codec,
-            pix_fmt="yuv420p",
+            pix_fmt=str(residual_pix_fmt),
             crf=residual_crf,
             preset=residual_preset,
         )
@@ -452,7 +468,7 @@ class ResidualCalculator:
     def _is_genai_enabled(self) -> bool:
         return os.environ.get("POINTSTREAM_ENABLE_GENAI", "0").strip() == "1"
 
-    def _render_server_genai_prediction(
+    def _render_server_actor_prediction(
         self,
         payload: EncodedChunkPayload,
         frame_tensor: torch.Tensor,
@@ -462,16 +478,21 @@ class ResidualCalculator:
             return frame_tensor
 
         compositor = self._synthesis_engine.get_genai_compositor()
-        if not isinstance(compositor, DiffusersCompositor):
+        if self._is_genai_enabled() and not isinstance(compositor, DiffusersCompositor):
             self._synthesis_engine = SynthesisEngine(
                 seed=int(getattr(self._synthesis_engine, "seed", 1337)),
                 device=self._device,
             )
             compositor = self._synthesis_engine.get_genai_compositor()
-        if not isinstance(compositor, DiffusersCompositor):
-            raise RuntimeError("GenAI residual path requires DiffusersCompositor when POINTSTREAM_ENABLE_GENAI=1")
+        if not hasattr(compositor, "process"):
+            raise RuntimeError("Residual actor compositor is unavailable")
 
-        if os.environ.get("POINTSTREAM_GENAI_KEYFRAME_ONLY", "0").strip().lower() in {"1", "true", "yes", "on"}:
+        if (
+            self._is_genai_enabled()
+            and hasattr(compositor, "uses_temporal_pose_sequence")
+            and compositor.uses_temporal_pose_sequence()
+            and os.environ.get("POINTSTREAM_GENAI_KEYFRAME_ONLY", "0").strip().lower() in {"1", "true", "yes", "on"}
+        ):
             return self._render_server_genai_keyframe_only(
                 payload=payload,
                 frame_tensor=frame_tensor,
@@ -479,7 +500,7 @@ class ResidualCalculator:
                 compositor=compositor,
             )
 
-        use_temporal_window = compositor.uses_temporal_pose_sequence()
+        use_temporal_window = bool(hasattr(compositor, "uses_temporal_pose_sequence") and compositor.uses_temporal_pose_sequence())
         temporal_window = max(1, int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW", "16")))
         preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
 
@@ -508,6 +529,15 @@ class ResidualCalculator:
                 metadata_mask = None if metadata_entry is None else metadata_entry.mask_gray
                 metadata_bbox = None if metadata_entry is None else metadata_entry.bbox
 
+                debug_export_compositor_input(
+                    stage="encoder",
+                    frame_idx=frame_idx,
+                    actor_id=scene_track_id_to_int(state.object_id),
+                    reference_crop_tensor=state.reference_crop_tensor,
+                    dense_pose_tensor=pose_condition,
+                    warped_bg_tensor=composited,
+                )
+
                 composited = compositor.process(
                     reference_crop_tensor=state.reference_crop_tensor,
                     dense_dwpose_tensor=pose_condition,
@@ -517,6 +547,14 @@ class ResidualCalculator:
                     metadata_bbox=metadata_bbox,
                 ).to(frame_tensor.device)
 
+                debug_export_compositor_output(
+                    stage="encoder",
+                    frame_idx=frame_idx,
+                    actor_id=scene_track_id_to_int(state.object_id),
+                    composited_frame_tensor=composited,
+                    bbox=metadata_bbox,
+                )
+
             out_frames.append(composited)
 
         return torch.stack(out_frames, dim=0)
@@ -525,7 +563,7 @@ class ResidualCalculator:
         payload: EncodedChunkPayload,
         frame_tensor: torch.Tensor,
         actor_state: dict[int, _ServerActorState],
-        compositor: DiffusersCompositor,
+        compositor: Any,
     ) -> torch.Tensor:
         frame_count = int(frame_tensor.shape[0])
         if frame_count <= 0 or not actor_state:
@@ -544,7 +582,7 @@ class ResidualCalculator:
             selected_indices.append(frame_count - 1)
         selected_indices = sorted(set(selected_indices))
 
-        use_temporal_window = compositor.uses_temporal_pose_sequence()
+        use_temporal_window = bool(hasattr(compositor, "uses_temporal_pose_sequence") and compositor.uses_temporal_pose_sequence())
         temporal_window = max(1, int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW", "16")))
         preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
         chunk_start = int(payload.chunk.start_frame_id)

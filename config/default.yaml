@@ -55,7 +55,7 @@ ball-class-id: null                 # Class ID for segmentation-based detector
 # ============================================================================
 # Reference Crop Configuration
 # ============================================================================
-reference-jpeg-quality: 50            # JPEG quality for actor reference crops
+reference-jpeg-quality: 95            # JPEG quality for actor reference crops
 reference-padding-ratio: 0.10         # Padding ratio for reference crop extraction
 
 # ============================================================================
@@ -97,15 +97,15 @@ evaluation-max-frames: null           # Optional frame cap for quality evaluatio
 genai-backend: animate-anyone             # GenAI backend: controlnet, animate-anyone (null disables GenAI)
 animate-anyone-repo-dir: null             # Path to Moore-AnimateAnyone repository
 animate-anyone-model-dir: null            # Override if models are in non-standard location
-animate-anyone-steps: 3                   # Diffusion inference steps for AnimateAnyone
+animate-anyone-steps: 30                  # Diffusion inference steps for AnimateAnyone
 animate-anyone-cfg: 7.5                   # Guidance (CFG) scale for AnimateAnyone
-animate-anyone-width: 256                 # Width for AnimateAnyone model (pixels)
-animate-anyone-height: 256                # Height for AnimateAnyone model (pixels)
+animate-anyone-width: 512                 # Width for AnimateAnyone model (pixels)
+animate-anyone-height: 512                # Height for AnimateAnyone model (pixels)
 animate-anyone-window: 4                  # Temporal conditioning window length
 genai-preroll-frames: 0                   # Frames to keep residual-only before temporal GenAI starts
 genai-keyframe-only: true                 # Run GenAI only on received keyframe skeletons and interpolate outputs locally
 animate-anyone-transparent-threshold: 64  # Black-background alpha threshold
-genai-resize-mode: aspect-recovery        # Resize mode: plain or aspect-recovery
+genai-resize-mode: plain        # Resize mode: plain or aspect-recovery
 animate-anyone-adaptive-threshold: true   # Enable adaptive border-threshold masking
 animate-anyone-alpha-smoothing: 0.5       # Temporal smoothing factor [0, 1]
 
