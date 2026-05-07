@@ -8,6 +8,7 @@ from typing import Any
 
 import cv2
 import numpy as np
+import os
 import torch
 
 from src.shared.dwpose_draw import draw_dwpose_canvas
@@ -532,22 +533,29 @@ class DiffusersCompositor(MockCompositor):
         )
 
         num_frames = int(dense_pose_sequence_tensor.shape[0])
+        
+        # 1. First Pass: Resolve all bboxes and find the global UNION BBox to prevent shrinking/drifting.
+        all_bboxes = []
+        for i in range(num_frames):
+            m_bbox = metadata_bboxes[i] if metadata_bboxes is not None else None
+            pose_np = self._to_pose_numpy(dense_pose_sequence_tensor[i])
+            
+            # Use dummy dimensions for probe, we just need the raw coords
+            bx1, by1, bx2, by2 = self._resolve_target_bbox(
+                pose_np=pose_np,
+                frame_height=int(warped_background_frames.shape[2]),
+                frame_width=int(warped_background_frames.shape[3]),
+                metadata_bbox=m_bbox,
+            )
+            all_bboxes.append((bx1, by1, bx2, by2))
+            
+        # 2. Second Pass: Composite using these stable coords.
         out_frames = []
         for i in range(num_frames):
             frame_np = self._to_frame_numpy(warped_background_frames[i])
             generated_np = self._to_crop_numpy(generated_sequence[i])
-            pose_np = self._to_pose_numpy(dense_pose_sequence_tensor[i])
-
-            m_mask = metadata_masks[i] if metadata_masks is not None else None
-            m_bbox = metadata_bboxes[i] if metadata_bboxes is not None else None
-
-            x1, y1, x2, y2 = self._resolve_target_bbox(
-                pose_np=pose_np,
-                frame_height=int(frame_np.shape[0]),
-                frame_width=int(frame_np.shape[1]),
-                metadata_bbox=m_bbox,
-            )
-
+            
+            x1, y1, x2, y2 = all_bboxes[i]
             target_h = max(1, y2 - y1)
             target_w = max(1, x2 - x1)
 
@@ -557,6 +565,7 @@ class DiffusersCompositor(MockCompositor):
             else:
                 actor_resized = cv2.resize(generated_np, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
 
+            m_mask = metadata_masks[i] if metadata_masks is not None else None
             alpha_mask = self._select_compositing_alpha(
                 actor_resized=actor_resized,
                 metadata_mask=m_mask,
@@ -602,21 +611,29 @@ class DiffusersCompositor(MockCompositor):
         if target_w <= 0 or target_h <= 0:
             return actor_bgr
 
-        # Inverse of resize-and-pad used by legacy PointStream path.
-        if target_w >= target_h:
+        # Diffusion models like Animate-Anyone generate square frames (e.g. 512x512)
+        # by scaling and padding the input actor to a square. 
+        # To recover the original aspect ratio without "squeezing", we must crop the square 
+        # back to the aspect ratio of the target bounding box before final resizing.
+        target_aspect = float(target_w) / float(target_h)
+        frame_aspect = float(frame_w) / float(frame_h)
+
+        if target_aspect >= frame_aspect:
+            # Target is wider than or equal to generated frame aspect (rare for actors)
             content_w = frame_w
-            content_h = max(1, int(round(frame_h * (float(target_h) / float(target_w)))))
-            content_h = min(content_h, frame_h)
-            pad_top = max(0, (frame_h - content_h) // 2)
-            pad_bottom = max(0, frame_h - content_h - pad_top)
-            cropped = actor_bgr[pad_top:frame_h - pad_bottom, :]
+            content_h = max(1, int(round(frame_w / target_aspect)))
         else:
+            # Target is taller than generated frame aspect (common for actors)
             content_h = frame_h
-            content_w = max(1, int(round(frame_w * (float(target_w) / float(target_h)))))
-            content_w = min(content_w, frame_w)
-            pad_left = max(0, (frame_w - content_w) // 2)
-            pad_right = max(0, frame_w - content_w - pad_left)
-            cropped = actor_bgr[:, pad_left:frame_w - pad_right]
+            content_w = max(1, int(round(frame_h * target_aspect)))
+
+        content_h = min(content_h, frame_h)
+        content_w = min(content_w, frame_w)
+
+        pad_top = (frame_h - content_h) // 2
+        pad_left = (frame_w - content_w) // 2
+        
+        cropped = actor_bgr[pad_top : pad_top + content_h, pad_left : pad_left + content_w]
 
         if cropped.size == 0:
             cropped = actor_bgr

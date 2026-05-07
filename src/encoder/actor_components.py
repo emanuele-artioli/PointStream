@@ -1110,7 +1110,8 @@ class DwposeEstimator(BasePoseEstimator):
         if actor.class_name != "player":
             return actor
 
-        crop, (ox, oy) = _build_crop_with_padding(frame_bgr, actor.bbox, pad_ratio=0.10)
+        pad_ratio = float(os.environ.get("POINTSTREAM_GENAI_PADDING_RATIO", "0.10"))
+        crop, (ox, oy) = _build_crop_with_padding(frame_bgr, actor.bbox, pad_ratio=pad_ratio)
         if crop.size == 0:
             return actor
 

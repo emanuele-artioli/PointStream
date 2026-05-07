@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import cv2
 import numpy as np
+import os
 
 from src.encoder.video_io import iter_video_frames_ffmpeg, probe_video_metadata
 from src.shared.schemas import FrameState, SceneActor, SceneActorReference, VideoChunk
@@ -59,7 +60,7 @@ class ReferenceExtractor:
                 bbox=bbox,
                 frame_width=int(chunk.width),
                 frame_height=int(chunk.height),
-                ratio=self._bbox_padding_ratio,
+                ratio=float(os.environ.get("POINTSTREAM_GENAI_PADDING_RATIO", "0.10")),
             )
             crop = frame_bgr[padded[1] : padded[3], padded[0] : padded[2]]
             if crop.size == 0:
