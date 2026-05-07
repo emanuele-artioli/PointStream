@@ -32,9 +32,8 @@ applyTo: '\*\*/\*.py, \*\*/environment.yaml, \*\*/pyproject.toml, \*\*/README.md
 * Prefer functional programming for data transformations, but use OOP for stateful engines and Base Interfaces.  
 * Use pydantic models or dataclasses for all cross-module communication. Never use raw dictionaries.  
 * **Shape Hints are mandatory:** Every PyTorch tensor must have a shape hint in the comments (e.g., \# Shape: \[Batch, Frames, Keypoints, Coords\]).  
-* Implement **Event-Driven Sparsity (Non-Uniform Keyframing)**.  
-* Include frame\_id and object\_id in every transmitted semantic event for strict tracking.  
-* **Shared Synthesis Architecture:** The server MUST use the exact same standalone SynthesisEngine as the client to predict hallucinated frames and calculate true generative residuals.  
+<!-- *   Implement **Event-Driven Sparsity (Non-Uniform Keyframing)** for geometric and static assets. **Exception**: Video GenAI backends (e.g., Animate-Anyone) MUST use **Dense Chunk-Based Generation** to preserve temporal attention and motion coherence.
+*   **Shared Synthesis Architecture**: The server MUST use the exact same standalone SynthesisEngine (and GenAI Chunk-Based pass) as the client to predict hallucinated frames and calculate true generative residuals. -->
 * **Scene Classification Routing:** The architecture must modularly support routing scenes to a traditional fallback codec (for static "Interludes" like crowd shots) versus the Pointstream semantic pipeline (for active "Exchanges").  
 * **Ablation & Baseline Strategy:** Evaluate new components by comparing them against the "Whole-Frame Residual Baseline" (panorama \+ generated actors \+ whole-frame residual catching missing rackets/balls). Iteratively enable specialized extractors to measure their exact impact on reducing the residual payload size.  
 * Orchestrate tasks using a Directed Acyclic Graph (DAG) and the InlineExecutionPool or TaggedMultiprocessPool.  

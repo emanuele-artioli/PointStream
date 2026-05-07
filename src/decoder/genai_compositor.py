@@ -58,6 +58,17 @@ class BaseGenAIStrategy(ABC):
     ) -> torch.Tensor:
         raise NotImplementedError
 
+    @abstractmethod
+    def generate_sequence(
+        self,
+        reference_crop_tensor: torch.Tensor,
+        dense_pose_sequence_tensor: torch.Tensor,
+        seed: int,
+        device: torch.device,
+    ) -> torch.Tensor:
+        """Efficiently generate a sequence of frames in one batch if supported."""
+        raise NotImplementedError
+
 
 class BaselineControlNetStrategy(BaseGenAIStrategy):
     """Standard SD + ControlNet OpenPose baseline backend."""
@@ -143,6 +154,25 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
         generated_rgb = np.asarray(output.images[0], dtype=np.uint8)
         generated_bgr = cv2.cvtColor(generated_rgb, cv2.COLOR_RGB2BGR)
         return torch.from_numpy(generated_bgr).permute(2, 0, 1).contiguous().to(torch.uint8)
+    def generate_sequence(
+        self,
+        reference_crop_tensor: torch.Tensor,
+        dense_pose_sequence_tensor: torch.Tensor,
+        seed: int,
+        device: torch.device,
+    ) -> torch.Tensor:
+        # ControlNet baseline is inherently single-frame; fallback to loop.
+        results = []
+        for i in range(dense_pose_sequence_tensor.shape[0]):
+            results.append(
+                self.generate(
+                    reference_crop_tensor=reference_crop_tensor,
+                    dense_dwpose_tensor=dense_pose_sequence_tensor[i],
+                    seed=seed,
+                    device=device,
+                )
+            )
+        return torch.stack(results, dim=0)
 
 
 class AnimateAnyoneStrategy(BaseGenAIStrategy):
@@ -200,6 +230,47 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
                 f"Animate Anyone runtime returned invalid frame shape: {tuple(generated_bgr.shape)}"
             )
         return torch.from_numpy(generated_bgr).permute(2, 0, 1).contiguous().to(torch.uint8)
+
+    def generate_sequence(
+        self,
+        reference_crop_tensor: torch.Tensor,
+        dense_pose_sequence_tensor: torch.Tensor,
+        seed: int,
+        device: torch.device,
+    ) -> torch.Tensor:
+        runtime_fn = self._ensure_runtime()
+        reference_np = _to_numpy_bgr(reference_crop_tensor)
+        pose_np = dense_pose_sequence_tensor.detach().cpu().numpy().astype(np.float32)
+
+        # Optimization: We pass the entire sequence to the runtime at once.
+        # This is exactly what AnimateAnyone is designed for (sequence generation).
+        try:
+            from src.decoder.animate_anyone_runtime import generate_video
+            generated_video = generate_video(
+                reference_image_bgr=reference_np,
+                dense_pose_sequence=pose_np,
+                seed=int(seed),
+                device=str(device),
+                repo_dir=self._repo_dir,
+            )
+        except ImportError as e:
+            import warnings
+            warnings.warn(f"Falling back to generate_frame loop: {e}")
+            # Fallback to generate_frame loop if generate_video is not available
+            results = []
+            for i in range(pose_np.shape[0]):
+                results.append(
+                    self.generate(
+                        reference_crop_tensor=reference_crop_tensor,
+                        dense_dwpose_tensor=dense_pose_sequence_tensor[i],
+                        seed=seed,
+                        device=device,
+                    )
+                )
+            return torch.stack(results, dim=0)
+
+        # generate_video returns [T, H, W, C] BGR
+        return torch.from_numpy(generated_video).permute(0, 3, 1, 2).contiguous().to(torch.uint8)
 
 
 class MockCompositor:
@@ -287,8 +358,13 @@ class MockCompositor:
 
         width = max(1, x2 - x1)
         height = max(1, y2 - y1)
-        pad_x = max(3, int(round(width * 0.15)))
-        pad_y = max(4, int(round(height * 0.20)))
+        
+        # Sync with ReferenceExtractor default (0.10) to ensure residual mask alignment.
+        pad_x_ratio = float(os.environ.get("POINTSTREAM_GENAI_PADDING_X", "0.10"))
+        pad_y_ratio = float(os.environ.get("POINTSTREAM_GENAI_PADDING_Y", "0.10"))
+        
+        pad_x = max(2, int(round(width * pad_x_ratio)))
+        pad_y = max(2, int(round(height * pad_y_ratio)))
 
         bx1 = max(0, x1 - pad_x)
         by1 = max(0, y1 - pad_y)
@@ -431,6 +507,74 @@ class DiffusersCompositor(MockCompositor):
         blended = actor_resized.astype(np.float32) * alpha_3 + roi.astype(np.float32) * (1.0 - alpha_3)
         frame_np[y1:y2, x1:x2] = np.asarray(np.clip(blended, 0.0, 255.0), dtype=np.uint8)
         return torch.from_numpy(frame_np).permute(2, 0, 1).contiguous().to(torch.uint8)
+
+    @gpu_bound
+    def process_sequence(
+        self,
+        reference_crop_tensor: torch.Tensor,
+        dense_pose_sequence_tensor: torch.Tensor,
+        warped_background_frames: torch.Tensor,
+        actor_identity: str | None = None,
+        metadata_masks: list[np.ndarray | None] | None = None,
+        metadata_bboxes: list[tuple[int, int, int, int] | None] | None = None,
+    ) -> torch.Tensor:
+        """Generate and composite a full sequence of frames efficiently."""
+        if self._seed is not None:
+            torch.manual_seed(self._seed)
+            if torch.cuda.is_available():
+                torch.cuda.manual_seed_all(self._seed)
+
+        generated_sequence = self._strategy.generate_sequence(
+            reference_crop_tensor=reference_crop_tensor,
+            dense_pose_sequence_tensor=dense_pose_sequence_tensor,
+            seed=self._seed,
+            device=self._device,
+        )
+
+        num_frames = int(dense_pose_sequence_tensor.shape[0])
+        out_frames = []
+        for i in range(num_frames):
+            frame_np = self._to_frame_numpy(warped_background_frames[i])
+            generated_np = self._to_crop_numpy(generated_sequence[i])
+            pose_np = self._to_pose_numpy(dense_pose_sequence_tensor[i])
+
+            m_mask = metadata_masks[i] if metadata_masks is not None else None
+            m_bbox = metadata_bboxes[i] if metadata_bboxes is not None else None
+
+            x1, y1, x2, y2 = self._resolve_target_bbox(
+                pose_np=pose_np,
+                frame_height=int(frame_np.shape[0]),
+                frame_width=int(frame_np.shape[1]),
+                metadata_bbox=m_bbox,
+            )
+
+            target_h = max(1, y2 - y1)
+            target_w = max(1, x2 - x1)
+
+            is_animate_anyone = self.uses_temporal_pose_sequence()
+            if is_animate_anyone and self._resize_mode == "aspect-recovery":
+                actor_resized = self._resize_actor_with_aspect_recovery(generated_np, target_w=target_w, target_h=target_h)
+            else:
+                actor_resized = cv2.resize(generated_np, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
+
+            alpha_mask = self._select_compositing_alpha(
+                actor_resized=actor_resized,
+                metadata_mask=m_mask,
+                is_animate_anyone=is_animate_anyone,
+            )
+            alpha_mask = self._apply_temporal_alpha_smoothing(alpha_mask=alpha_mask, actor_identity=actor_identity)
+
+            if alpha_mask is None or int(np.count_nonzero(alpha_mask > 0.01)) == 0:
+                out_frames.append(torch.from_numpy(frame_np).permute(2, 0, 1).contiguous().to(torch.uint8))
+                continue
+
+            roi = frame_np[y1:y2, x1:x2]
+            alpha_3 = np.asarray(alpha_mask[:, :, None], dtype=np.float32)
+            blended = actor_resized.astype(np.float32) * alpha_3 + roi.astype(np.float32) * (1.0 - alpha_3)
+            frame_np[y1:y2, x1:x2] = np.asarray(np.clip(blended, 0.0, 255.0), dtype=np.uint8)
+            out_frames.append(torch.from_numpy(frame_np).permute(2, 0, 1).contiguous().to(torch.uint8))
+
+        return torch.stack(out_frames, dim=0)
 
     def _resolve_target_bbox(
         self,

@@ -494,11 +494,11 @@ class ResidualCalculator:
 
         if (
             self._is_genai_enabled()
-            and hasattr(compositor, "uses_temporal_pose_sequence")
-            and compositor.uses_temporal_pose_sequence()
-            and os.environ.get("POINTSTREAM_GENAI_KEYFRAME_ONLY", "0").strip().lower() in {"1", "true", "yes", "on"}
+            and hasattr(compositor, "process_sequence")
         ):
-            return self._render_server_genai_keyframe_only(
+            # Proposed Chunk-Based Approach: Use efficient batch sequence generation
+            # instead of sliding windows or sparse keyframe interpolation.
+            return self._render_server_genai_chunk_based(
                 payload=payload,
                 frame_tensor=frame_tensor,
                 actor_state=actor_state,
@@ -563,94 +563,45 @@ class ResidualCalculator:
             out_frames.append(composited)
 
         return torch.stack(out_frames, dim=0)
-    def _render_server_genai_keyframe_only(
+    def _render_server_genai_chunk_based(
         self,
         payload: EncodedChunkPayload,
         frame_tensor: torch.Tensor,
         actor_state: dict[int, _ServerActorState],
         compositor: Any,
     ) -> torch.Tensor:
+        """Proposed Chunk-Based Generation: Process the entire chunk in one batched pass."""
         frame_count = int(frame_tensor.shape[0])
         if frame_count <= 0 or not actor_state:
             return frame_tensor
 
-        selected: set[int] = set()
-        for state in actor_state.values():
-            selected.update(idx for idx in state.keyframe_frame_ids if 0 <= idx < frame_count)
-        if not selected:
-            return frame_tensor
-
-        selected_indices = sorted(selected)
-        if selected_indices[0] != 0:
-            selected_indices.insert(0, 0)
-        if selected_indices[-1] != frame_count - 1:
-            selected_indices.append(frame_count - 1)
-        selected_indices = sorted(set(selected_indices))
-
-        use_temporal_window = bool(hasattr(compositor, "uses_temporal_pose_sequence") and compositor.uses_temporal_pose_sequence())
-        temporal_window = max(1, int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW", "16")))
-        preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
         chunk_start = int(payload.chunk.start_frame_id)
+        composited_sequence = frame_tensor.clone()
 
-        generated_deltas: list[torch.Tensor] = []
-        for frame_idx in selected_indices:
-            bg_frame = frame_tensor[frame_idx]
-            composited = bg_frame
-            global_frame_id = chunk_start + frame_idx
-            for state in actor_state.values():
-                if frame_idx >= int(state.dense_pose_tensor.shape[0]):
-                    continue
-
-                if use_temporal_window:
-                    if frame_idx < preroll_frames:
-                        continue
-                    pose_condition = self._build_temporal_pose_condition(
-                        dense_pose_tensor=state.dense_pose_tensor,
-                        frame_idx=frame_idx,
-                        temporal_window=temporal_window,
-                    )
-                else:
-                    pose_condition = state.dense_pose_tensor[frame_idx]
-
+        for state in actor_state.values():
+            num_actor_frames = int(state.dense_pose_tensor.shape[0])
+            # Ensure we only process frames where we have poses
+            active_frames = min(frame_count, num_actor_frames)
+            
+            masks = []
+            bboxes = []
+            for i in range(active_frames):
+                global_frame_id = chunk_start + i
                 metadata_entry = state.metadata_masks_by_frame.get(global_frame_id)
-                metadata_mask = None if metadata_entry is None else metadata_entry.mask_gray
-                metadata_bbox = None if metadata_entry is None else metadata_entry.bbox
+                masks.append(None if metadata_entry is None else metadata_entry.mask_gray)
+                bboxes.append(None if metadata_entry is None else metadata_entry.bbox)
 
-                composited = compositor.process(
-                    reference_crop_tensor=state.reference_crop_tensor,
-                    dense_dwpose_tensor=pose_condition,
-                    warped_background_frame=composited,
-                    actor_identity=state.object_id,
-                    metadata_mask=metadata_mask,
-                    metadata_bbox=metadata_bbox,
-                ).to(frame_tensor.device)
+            # Generate and composite the whole sequence for this actor in one batch
+            composited_sequence[:active_frames] = compositor.process_sequence(
+                reference_crop_tensor=state.reference_crop_tensor,
+                dense_pose_sequence_tensor=state.dense_pose_tensor[:active_frames],
+                warped_background_frames=composited_sequence[:active_frames],
+                actor_identity=state.object_id,
+                metadata_masks=masks,
+                metadata_bboxes=bboxes,
+            )
 
-            generated_deltas.append(composited.to(dtype=torch.float32) - bg_frame.to(dtype=torch.float32))
-
-        out_frames: list[torch.Tensor] = []
-        anchor_idx = 0
-        for frame_idx in range(frame_count):
-            if frame_idx <= selected_indices[0]:
-                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[0]).clamp(0.0, 255.0).to(torch.uint8))
-                continue
-            while anchor_idx + 1 < len(selected_indices) and frame_idx > selected_indices[anchor_idx + 1]:
-                anchor_idx += 1
-            if anchor_idx + 1 >= len(selected_indices):
-                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[-1]).clamp(0.0, 255.0).to(torch.uint8))
-                continue
-
-            left_idx = selected_indices[anchor_idx]
-            right_idx = selected_indices[anchor_idx + 1]
-            left_delta = generated_deltas[anchor_idx]
-            right_delta = generated_deltas[anchor_idx + 1]
-            if right_idx <= left_idx:
-                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + left_delta).clamp(0.0, 255.0).to(torch.uint8))
-                continue
-            alpha = float(frame_idx - left_idx) / float(right_idx - left_idx)
-            blended_delta = torch.lerp(left_delta, right_delta, alpha)
-            out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + blended_delta).clamp(0.0, 255.0).to(torch.uint8))
-
-        return torch.stack(out_frames, dim=0)
+        return composited_sequence
 
     def _build_actor_state(self, payload: EncodedChunkPayload) -> dict[int, _ServerActorState]:
         decoded_references = self._decode_reference_crops(payload)

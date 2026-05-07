@@ -458,6 +458,12 @@ def _apply_runtime_env_overrides(args: argparse.Namespace) -> None:
 
     if args.genai_backend is not None:
         os.environ["POINTSTREAM_GENAI_BACKEND"] = str(args.genai_backend)
+        
+    # Ensure GenAI placement matches extraction padding to avoid "shrunk" residuals.
+    if args.reference_padding_ratio is not None:
+        ratio_str = str(float(args.reference_padding_ratio))
+        os.environ.setdefault("POINTSTREAM_GENAI_PADDING_X", ratio_str)
+        os.environ.setdefault("POINTSTREAM_GENAI_PADDING_Y", ratio_str)
     if args.animate_anyone_repo_dir is not None:
         os.environ["POINTSTREAM_ANIMATE_ANYONE_REPO_DIR"] = str(Path(args.animate_anyone_repo_dir).expanduser())
     if args.animate_anyone_model_dir is not None:

@@ -376,3 +376,73 @@ def generate_frame(
     generated_rgb = (generated.permute(1, 2, 0).cpu().numpy() * 255.0).astype(np.uint8)
     generated_bgr = cv2.cvtColor(generated_rgb, cv2.COLOR_RGB2BGR)
     return generated_bgr
+def generate_video(
+    reference_image_bgr: np.ndarray,
+    dense_pose_sequence: np.ndarray,
+    seed: int,
+    device: str = "cuda",
+    repo_dir: str | None = None,
+) -> np.ndarray:
+    """Generate a sequence of actor frames via Moore-AnimateAnyone in a single pass."""
+    if reference_image_bgr.ndim != 3 or reference_image_bgr.shape[2] != 3:
+        raise ValueError(f"Expected reference_image_bgr [H,W,3], got {reference_image_bgr.shape}")
+
+    try:
+        from PIL import Image
+    except ModuleNotFoundError as exc:
+        raise RuntimeError("Pillow is required for AnimateAnyone backend") from exc
+
+    runtime = _runtime_config()
+    repo_root = _resolve_repo_root(repo_dir=repo_dir)
+    model_root = _resolve_model_root(repo_root=repo_root, runtime=runtime)
+
+    resolved_device = "cpu"
+    if str(device).startswith("cuda") and torch.cuda.is_available() and is_cuda_device_usable(torch.device("cuda")):
+        resolved_device = "cuda"
+    pipe = _load_pipeline(repo_root=repo_root, model_root=model_root, device=resolved_device)
+
+    width = int(runtime.width)
+    height = int(runtime.height)
+
+    reference_rgb = cv2.cvtColor(reference_image_bgr, cv2.COLOR_BGR2RGB)
+    reference_rgb = _letterbox_resize_rgb(reference_rgb, target_w=width, target_h=height)
+    reference_pil = Image.fromarray(reference_rgb)
+
+    dense_pose_sequence = np.asarray(dense_pose_sequence, dtype=np.float32)
+    pose_pil_sequence = _prepare_pose_sequence(
+        dense_pose_sequence=dense_pose_sequence,
+        width=width,
+        height=height,
+    )
+    if not pose_pil_sequence:
+        pose_pil_sequence = [Image.fromarray(np.zeros((height, width, 3), dtype=np.uint8))]
+
+    generator = torch.Generator(device=resolved_device).manual_seed(int(seed))
+    with torch.no_grad():
+        output = pipe(
+            reference_pil,
+            pose_pil_sequence,
+            width,
+            height,
+            len(pose_pil_sequence),
+            int(runtime.inference_steps),
+            float(runtime.guidance_scale),
+            generator=generator,
+        ).videos
+
+    # output shape: [1, Channels, Time, Height, Width]
+    # return shape: [Time, Height, Width, Channels]
+    generated = output[0].detach().float()
+    if float(torch.min(generated)) < 0.0:
+        generated = (generated + 1.0) * 0.5
+    generated = generated.clamp(0.0, 1.0)
+
+    # Convert [C, T, H, W] -> [T, H, W, C]
+    generated_np = (generated.permute(1, 2, 3, 0).cpu().numpy() * 255.0).astype(np.uint8)
+    
+    # Convert RGB to BGR for each frame
+    out_bgr = []
+    for i in range(generated_np.shape[0]):
+        out_bgr.append(cv2.cvtColor(generated_np[i], cv2.COLOR_RGB2BGR))
+    
+    return np.stack(out_bgr, axis=0)
