@@ -217,7 +217,7 @@ class ResidualCalculator:
         base_frames = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False).frames_bgr
         predicted_frames = base_frames
         if self._is_genai_enabled():
-            predicted_frames = self._render_server_genai_prediction(payload=payload, frame_tensor=base_frames.clone())
+            predicted_frames = self._render_server_actor_prediction(payload=payload, frame_tensor=base_frames.clone())
 
         source_metadata = probe_video_metadata(chunk.source_uri)
         available_source_frames = max(0, int(source_metadata.num_frames) - int(chunk.start_frame_id))
@@ -473,6 +473,19 @@ class ResidualCalculator:
     def _is_genai_enabled(self) -> bool:
         return os.environ.get("POINTSTREAM_ENABLE_GENAI", "0").strip() == "1"
 
+    def _resolve_temporal_window(self, default_window: int) -> int:
+        raw = os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW")
+        if raw is None:
+            return default_window
+        raw = raw.strip().lower()
+        if raw in {"", "none", "null", "off", "0"}:
+            return default_window
+        try:
+            value = int(raw)
+        except ValueError:
+            return default_window
+        return max(1, value)
+
     def _render_server_actor_prediction(
         self,
         payload: EncodedChunkPayload,
@@ -505,8 +518,20 @@ class ResidualCalculator:
                 compositor=compositor,
             )
 
+        if (
+            self._is_genai_enabled()
+            and hasattr(compositor, "process_sequence")
+            and hasattr(compositor, "uses_temporal_pose_sequence")
+            and compositor.uses_temporal_pose_sequence()
+        ):
+            return self._render_server_genai_sequence(
+                payload=payload,
+                frame_tensor=frame_tensor,
+                actor_state=actor_state,
+                compositor=compositor,
+            )
+
         use_temporal_window = bool(hasattr(compositor, "uses_temporal_pose_sequence") and compositor.uses_temporal_pose_sequence())
-        temporal_window = max(1, int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW", "16")))
         preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
 
         out_frames: list[torch.Tensor] = []
@@ -522,6 +547,7 @@ class ResidualCalculator:
                 if use_temporal_window:
                     if frame_idx < preroll_frames:
                         continue
+                    temporal_window = self._resolve_temporal_window(default_window=int(frame_idx) + 1)
                     pose_condition = self._build_temporal_pose_condition(
                         dense_pose_tensor=state.dense_pose_tensor,
                         frame_idx=frame_idx,
@@ -588,7 +614,6 @@ class ResidualCalculator:
         selected_indices = sorted(set(selected_indices))
 
         use_temporal_window = bool(hasattr(compositor, "uses_temporal_pose_sequence") and compositor.uses_temporal_pose_sequence())
-        temporal_window = max(1, int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW", "16")))
         preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
         chunk_start = int(payload.chunk.start_frame_id)
 
@@ -604,6 +629,7 @@ class ResidualCalculator:
                 if use_temporal_window:
                     if frame_idx < preroll_frames:
                         continue
+                    temporal_window = self._resolve_temporal_window(default_window=int(frame_idx) + 1)
                     pose_condition = self._build_temporal_pose_condition(
                         dense_pose_tensor=state.dense_pose_tensor,
                         frame_idx=frame_idx,
@@ -651,6 +677,49 @@ class ResidualCalculator:
             out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + blended_delta).clamp(0.0, 255.0).to(torch.uint8))
 
         return torch.stack(out_frames, dim=0)
+
+    def _render_server_genai_sequence(
+        self,
+        payload: EncodedChunkPayload,
+        frame_tensor: torch.Tensor,
+        actor_state: dict[int, _ServerActorState],
+        compositor: Any,
+    ) -> torch.Tensor:
+        frame_count = int(frame_tensor.shape[0])
+        if frame_count <= 0 or not actor_state:
+            return frame_tensor
+
+        out_frames = frame_tensor
+        chunk_start = int(payload.chunk.start_frame_id)
+        for state in actor_state.values():
+            pose_count = int(state.dense_pose_tensor.shape[0])
+            valid_count = min(frame_count, pose_count)
+            if valid_count <= 0:
+                continue
+
+            metadata_masks: list[np.ndarray | None] = []
+            metadata_bboxes: list[tuple[int, int, int, int] | None] = []
+            for frame_idx in range(valid_count):
+                global_frame_id = chunk_start + frame_idx
+                metadata_entry = state.metadata_masks_by_frame.get(global_frame_id)
+                metadata_masks.append(None if metadata_entry is None else metadata_entry.mask_gray)
+                metadata_bboxes.append(None if metadata_entry is None else metadata_entry.bbox)
+
+            processed = compositor.process_sequence(
+                reference_crop_tensor=state.reference_crop_tensor,
+                dense_dwpose_tensor=state.dense_pose_tensor[:valid_count],
+                warped_background_frames=out_frames[:valid_count],
+                actor_identity=state.object_id,
+                metadata_masks=metadata_masks,
+                metadata_bboxes=metadata_bboxes,
+            ).to(frame_tensor.device)
+
+            if valid_count < frame_count:
+                out_frames = torch.cat([processed, out_frames[valid_count:]], dim=0)
+            else:
+                out_frames = processed
+
+        return out_frames
 
     def _build_actor_state(self, payload: EncodedChunkPayload) -> dict[int, _ServerActorState]:
         decoded_references = self._decode_reference_crops(payload)

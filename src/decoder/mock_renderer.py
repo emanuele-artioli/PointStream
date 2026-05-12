@@ -210,8 +210,10 @@ class DecoderRenderer:
             hasattr(self._genai_compositor, "uses_temporal_pose_sequence")
             and self._genai_compositor.uses_temporal_pose_sequence()
         )
-        temporal_window = max(1, int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW", "16")))
         preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
+
+        if use_temporal_window and hasattr(self._genai_compositor, "process_sequence"):
+            return self._render_genai_sequence(frame_tensor=frame_tensor)
 
         out_frames: list[torch.Tensor] = []
         frame_count = int(frame_tensor.shape[0])
@@ -225,6 +227,7 @@ class DecoderRenderer:
                 if use_temporal_window:
                     if frame_idx < preroll_frames:
                         continue
+                    temporal_window = self._resolve_temporal_window(default_window=int(frame_idx) + 1)
                     pose_condition = self._build_temporal_pose_condition(
                         dense_pose_tensor=actor_state.dense_pose_tensor,
                         frame_idx=frame_idx,
@@ -320,7 +323,6 @@ class DecoderRenderer:
                 hasattr(self._genai_compositor, "uses_temporal_pose_sequence")
                 and self._genai_compositor.uses_temporal_pose_sequence()
             )
-            temporal_window = max(1, int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW", "16")))
             preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
 
             for actor_state in self._actor_state.values():
@@ -330,6 +332,7 @@ class DecoderRenderer:
                 if use_temporal_window:
                     if frame_idx < preroll_frames:
                         continue
+                    temporal_window = self._resolve_temporal_window(default_window=int(frame_idx) + 1)
                     pose_condition = self._build_temporal_pose_condition(
                         dense_pose_tensor=actor_state.dense_pose_tensor,
                         frame_idx=frame_idx,
@@ -387,6 +390,43 @@ class DecoderRenderer:
             out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + blended_delta).clamp(0.0, 255.0).to(torch.uint8))
 
         return torch.stack(out_frames, dim=0)
+
+    def _render_genai_sequence(self, frame_tensor: torch.Tensor) -> torch.Tensor:
+        frame_count = int(frame_tensor.shape[0])
+        if frame_count <= 0:
+            return frame_tensor
+
+        out_frames = frame_tensor
+        chunk_start = int(self._chunk_start_frame_id)
+        for actor_state in self._actor_state.values():
+            pose_count = int(actor_state.dense_pose_tensor.shape[0])
+            valid_count = min(frame_count, pose_count)
+            if valid_count <= 0:
+                continue
+
+            metadata_masks: list[np.ndarray | None] = []
+            metadata_bboxes: list[tuple[int, int, int, int] | None] = []
+            for frame_idx in range(valid_count):
+                global_frame_id = chunk_start + frame_idx
+                metadata_entry = actor_state.metadata_masks_by_frame.get(global_frame_id)
+                metadata_masks.append(None if metadata_entry is None else metadata_entry.mask_gray)
+                metadata_bboxes.append(None if metadata_entry is None else metadata_entry.bbox)
+
+            processed = self._genai_compositor.process_sequence(
+                reference_crop_tensor=actor_state.reference_crop_tensor,
+                dense_dwpose_tensor=actor_state.dense_pose_tensor[:valid_count],
+                warped_background_frames=out_frames[:valid_count],
+                actor_identity=actor_state.object_id,
+                metadata_masks=metadata_masks,
+                metadata_bboxes=metadata_bboxes,
+            ).to(frame_tensor.device)
+
+            if valid_count < frame_count:
+                out_frames = torch.cat([processed, out_frames[valid_count:]], dim=0)
+            else:
+                out_frames = processed
+
+        return out_frames
     def _collect_genai_keyframe_indices(self, frame_count: int) -> list[int]:
         selected: set[int] = set()
         for actor_state in self._actor_state.values():
@@ -400,6 +440,19 @@ class DecoderRenderer:
         if ordered[-1] != frame_count - 1:
             ordered.append(frame_count - 1)
         return sorted(set(ordered))
+
+    def _resolve_temporal_window(self, default_window: int) -> int:
+        raw = os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW")
+        if raw is None:
+            return default_window
+        raw = raw.strip().lower()
+        if raw in {"", "none", "null", "off", "0"}:
+            return default_window
+        try:
+            value = int(raw)
+        except ValueError:
+            return default_window
+        return max(1, value)
 
     def _build_temporal_pose_condition(
         self,

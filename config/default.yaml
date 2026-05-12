@@ -97,15 +97,15 @@ evaluation-max-frames: null           # Optional frame cap for quality evaluatio
 genai-backend: animate-anyone             # GenAI backend: controlnet, animate-anyone (null disables GenAI)
 animate-anyone-repo-dir: null             # Path to Moore-AnimateAnyone repository
 animate-anyone-model-dir: null            # Override if models are in non-standard location
-animate-anyone-steps: 30                  # Diffusion inference steps for AnimateAnyone
+animate-anyone-steps: 10                  # Diffusion inference steps for AnimateAnyone
 animate-anyone-cfg: 7.5                   # Guidance (CFG) scale for AnimateAnyone
-animate-anyone-width: 512                 # Width for AnimateAnyone model (pixels)
-animate-anyone-height: 512                # Height for AnimateAnyone model (pixels)
-animate-anyone-window: 4                  # Temporal conditioning window length
+animate-anyone-width: 256                 # Width for AnimateAnyone model (pixels)
+animate-anyone-height: 256                # Height for AnimateAnyone model (pixels)
+animate-anyone-window: null                  # Temporal conditioning window length
 genai-preroll-frames: 0                   # Frames to keep residual-only before temporal GenAI starts
-genai-keyframe-only: true                 # Run GenAI only on received keyframe skeletons and interpolate outputs locally
+genai-keyframe-only: false                # Run GenAI only on received keyframe skeletons and interpolate outputs locally
 animate-anyone-transparent-threshold: 64  # Black-background alpha threshold
-genai-resize-mode: plain        # Resize mode: plain or aspect-recovery
+genai-resize-mode: aspect-recovery        # Resize mode: plain or aspect-recovery
 animate-anyone-adaptive-threshold: true   # Enable adaptive border-threshold masking
 animate-anyone-alpha-smoothing: 0.5       # Temporal smoothing factor [0, 1]
 
@@ -115,3 +115,7 @@ animate-anyone-alpha-smoothing: 0.5       # Temporal smoothing factor [0, 1]
 compositing-mask-mode: postgen-seg-client  # Actor compositing: alpha-heuristic, metadata-source-mask, postgen-seg-client
 postgen-segmenter-backend: yolo            # Segmenter backend: yolo, heuristic
 metadata-mask-codec: auto                  # Mask codec: auto, rle-v1, bitpack-z1, png, segmenter-native, yolo-native
+
+# genai-keyframe-only: false                # Run GenAI only on received keyframe skeletons and interpolate outputs locally
+# animate-anyone-transparent-threshold: 64  # Black-background alpha threshold
+# genai-resize-mode: aspect-recovery        # Resize mode: plain or aspect-recovery

@@ -201,6 +201,41 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
             )
         return torch.from_numpy(generated_bgr).permute(2, 0, 1).contiguous().to(torch.uint8)
 
+    def generate_sequence(
+        self,
+        reference_crop_tensor: torch.Tensor,
+        dense_dwpose_tensor: torch.Tensor,
+        seed: int,
+        device: torch.device,
+    ) -> torch.Tensor:
+        from src.decoder.animate_anyone_runtime import generate_sequence
+
+        reference_np = _to_numpy_bgr(reference_crop_tensor)
+        pose_np = dense_dwpose_tensor.detach().cpu().numpy().astype(np.float32)
+
+        try:
+            generated_bgr = generate_sequence(
+                reference_image_bgr=reference_np,
+                dense_pose_sequence=pose_np,
+                seed=int(seed),
+                device=str(device),
+                repo_dir=self._repo_dir,
+            )
+        except TypeError:
+            generated_bgr = generate_sequence(
+                reference_image_bgr=reference_np,
+                dense_pose_sequence=pose_np,
+                seed=int(seed),
+                device=str(device),
+            )
+
+        generated_bgr = np.asarray(generated_bgr, dtype=np.uint8)
+        if generated_bgr.ndim != 4 or generated_bgr.shape[-1] != 3:
+            raise ValueError(
+                f"Animate Anyone runtime returned invalid sequence shape: {tuple(generated_bgr.shape)}"
+            )
+        return torch.from_numpy(generated_bgr).permute(0, 3, 1, 2).contiguous().to(torch.uint8)
+
 
 class MockCompositor:
     """Lightweight fallback compositor used when GenAI is disabled."""
@@ -395,7 +430,88 @@ class DiffusersCompositor(MockCompositor):
             seed=self._seed,
             device=self._device,
         )
+        return self._composite_actor_frame(
+            generated_actor=generated_actor,
+            dense_dwpose_tensor=dense_dwpose_tensor,
+            warped_background_frame=warped_background_frame,
+            actor_identity=actor_identity,
+            metadata_mask=metadata_mask,
+            metadata_bbox=metadata_bbox,
+        )
 
+    @gpu_bound
+    def process_sequence(
+        self,
+        reference_crop_tensor: torch.Tensor,
+        dense_dwpose_tensor: torch.Tensor,
+        warped_background_frames: torch.Tensor,
+        actor_identity: str | None = None,
+        metadata_masks: list[np.ndarray | None] | None = None,
+        metadata_bboxes: list[tuple[int, int, int, int] | None] | None = None,
+    ) -> torch.Tensor:
+        if not self.uses_temporal_pose_sequence():
+            raise RuntimeError("process_sequence is only supported for temporal GenAI backends")
+        if not hasattr(self._strategy, "generate_sequence"):
+            raise RuntimeError("GenAI strategy does not support sequence generation")
+
+        if dense_dwpose_tensor.ndim == 2:
+            dense_dwpose_tensor = dense_dwpose_tensor.unsqueeze(0)
+        if dense_dwpose_tensor.ndim != 3:
+            raise ValueError(
+                f"Expected dense pose sequence [Frames,18,3], got {tuple(dense_dwpose_tensor.shape)}"
+            )
+        if warped_background_frames.ndim != 4:
+            raise ValueError(
+                f"Expected background frames [Frames,C,H,W], got {tuple(warped_background_frames.shape)}"
+            )
+
+        frame_count = int(dense_dwpose_tensor.shape[0])
+        if int(warped_background_frames.shape[0]) != frame_count:
+            raise ValueError("Dense pose sequence length must match background frame count")
+
+        # Shape: [Frames, Channels, Height, Width]
+        generated_sequence = self._strategy.generate_sequence(
+            reference_crop_tensor=reference_crop_tensor,
+            dense_dwpose_tensor=dense_dwpose_tensor,
+            seed=self._seed,
+            device=self._device,
+        )
+        if generated_sequence.ndim != 4 or int(generated_sequence.shape[0]) != frame_count:
+            raise ValueError(
+                f"Generated sequence shape mismatch: expected {frame_count} frames, got {tuple(generated_sequence.shape)}"
+            )
+
+        out_frames: list[torch.Tensor] = []
+        for frame_idx in range(frame_count):
+            metadata_mask = None
+            if metadata_masks is not None and frame_idx < len(metadata_masks):
+                metadata_mask = metadata_masks[frame_idx]
+            metadata_bbox = None
+            if metadata_bboxes is not None and frame_idx < len(metadata_bboxes):
+                metadata_bbox = metadata_bboxes[frame_idx]
+
+            out_frames.append(
+                self._composite_actor_frame(
+                    generated_actor=generated_sequence[frame_idx],
+                    dense_dwpose_tensor=dense_dwpose_tensor[frame_idx],
+                    warped_background_frame=warped_background_frames[frame_idx],
+                    actor_identity=actor_identity,
+                    metadata_mask=metadata_mask,
+                    metadata_bbox=metadata_bbox,
+                )
+            )
+
+        return torch.stack(out_frames, dim=0)
+
+    def _composite_actor_frame(
+        self,
+        generated_actor: torch.Tensor,
+        dense_dwpose_tensor: torch.Tensor,
+        warped_background_frame: torch.Tensor,
+        actor_identity: str | None = None,
+        metadata_mask: np.ndarray | None = None,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
+    ) -> torch.Tensor:
         frame_np = self._to_frame_numpy(warped_background_frame)
         generated_np = self._to_crop_numpy(generated_actor)
         pose_np = self._to_pose_numpy(dense_dwpose_tensor)

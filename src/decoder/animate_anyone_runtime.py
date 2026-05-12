@@ -33,6 +33,20 @@ _PIPELINE_MODEL_ROOT: str | None = None
 _PIPELINE_LOCK = threading.Lock()
 
 
+def _resolve_window_from_env() -> int | None:
+    raw = os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW")
+    if raw is None:
+        return None
+    raw = raw.strip().lower()
+    if raw in {"", "none", "null", "off", "0"}:
+        return None
+    try:
+        value = int(raw)
+    except ValueError:
+        return None
+    return max(1, value)
+
+
 def _runtime_config() -> _RuntimeConfig:
     return _RuntimeConfig(
         width=int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WIDTH", "512")),
@@ -314,14 +328,40 @@ def _letterbox_resize_rgb(image_rgb: np.ndarray, target_w: int, target_h: int) -
     return canvas
 
 
-def generate_frame(
+def _convert_video_to_bgr_sequence(video_tensor: torch.Tensor) -> np.ndarray:
+    if video_tensor.ndim != 4:
+        raise ValueError(f"Expected video tensor with 4 dims, got {tuple(video_tensor.shape)}")
+
+    if video_tensor.shape[0] in {1, 3}:
+        # Shape: [Channels, Frames, Height, Width]
+        frames = video_tensor.permute(1, 2, 3, 0)
+    else:
+        # Shape: [Frames, Channels, Height, Width]
+        frames = video_tensor.permute(0, 2, 3, 1)
+
+    if float(torch.min(frames)) < 0.0:
+        frames = (frames + 1.0) * 0.5
+    frames = frames.clamp(0.0, 1.0)
+
+    frames_rgb = (frames.cpu().numpy() * 255.0).astype(np.uint8)
+    if frames_rgb.ndim != 4 or frames_rgb.shape[-1] != 3:
+        raise ValueError(f"Expected RGB frames [F,H,W,3], got {frames_rgb.shape}")
+
+    return np.asarray([cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) for frame in frames_rgb], dtype=np.uint8)
+
+
+def generate_sequence(
     reference_image_bgr: np.ndarray,
     dense_pose_sequence: np.ndarray,
     seed: int,
     device: str = "cuda",
     repo_dir: str | None = None,
+    max_window: int | None = None,
 ) -> np.ndarray:
-    """Generate one actor frame via Moore-AnimateAnyone from PointStream-owned runtime glue."""
+    """Generate an actor clip via Moore-AnimateAnyone.
+
+    Returns a full frame sequence in BGR order with shape [Frames, Height, Width, 3].
+    """
     if reference_image_bgr.ndim != 3 or reference_image_bgr.shape[2] != 3:
         raise ValueError(f"Expected reference_image_bgr [H,W,3], got {reference_image_bgr.shape}")
 
@@ -355,24 +395,52 @@ def generate_frame(
     if not pose_pil_sequence:
         pose_pil_sequence = [Image.fromarray(np.zeros((height, width, 3), dtype=np.uint8))]
 
+    window = max_window if max_window is not None else _resolve_window_from_env()
+    frame_count = len(pose_pil_sequence)
+    if window is None or window >= frame_count:
+        windows = [(0, frame_count)]
+    else:
+        windows = [(start, min(frame_count, start + window)) for start in range(0, frame_count, window)]
+
     generator = torch.Generator(device=resolved_device).manual_seed(int(seed))
-    with torch.no_grad():
-        output = pipe(
-            reference_pil,
-            pose_pil_sequence,
-            width,
-            height,
-            len(pose_pil_sequence),
-            int(runtime.inference_steps),
-            float(runtime.guidance_scale),
-            generator=generator,
-        ).videos
+    generated_chunks: list[np.ndarray] = []
+    for start, end in windows:
+        pose_window = pose_pil_sequence[start:end]
+        with torch.no_grad():
+            output = pipe(
+                reference_pil,
+                pose_window,
+                width,
+                height,
+                len(pose_window),
+                int(runtime.inference_steps),
+                float(runtime.guidance_scale),
+                generator=generator,
+            ).videos
 
-    generated = output[0, :, -1].detach().float()
-    if float(torch.min(generated)) < 0.0:
-        generated = (generated + 1.0) * 0.5
-    generated = generated.clamp(0.0, 1.0)
+        if output.ndim < 2:
+            raise ValueError(f"AnimateAnyone pipeline returned invalid video tensor shape: {tuple(output.shape)}")
+        video_tensor = output[0]
+        generated_chunks.append(_convert_video_to_bgr_sequence(video_tensor))
 
-    generated_rgb = (generated.permute(1, 2, 0).cpu().numpy() * 255.0).astype(np.uint8)
-    generated_bgr = cv2.cvtColor(generated_rgb, cv2.COLOR_RGB2BGR)
-    return generated_bgr
+    if len(generated_chunks) == 1:
+        return generated_chunks[0]
+    return np.concatenate(generated_chunks, axis=0)
+
+
+def generate_frame(
+    reference_image_bgr: np.ndarray,
+    dense_pose_sequence: np.ndarray,
+    seed: int,
+    device: str = "cuda",
+    repo_dir: str | None = None,
+) -> np.ndarray:
+    """Generate one actor frame via Moore-AnimateAnyone from PointStream-owned runtime glue."""
+    sequence = generate_sequence(
+        reference_image_bgr=reference_image_bgr,
+        dense_pose_sequence=dense_pose_sequence,
+        seed=seed,
+        device=device,
+        repo_dir=repo_dir,
+    )
+    return sequence[-1]
