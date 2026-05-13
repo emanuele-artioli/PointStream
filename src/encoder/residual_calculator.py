@@ -214,11 +214,12 @@ class ResidualCalculator:
         frame_states: list[FrameState],
         debug_output_path: str | Path | None,
     ) -> ResidualPacket:
-        compositor = self._synthesis_engine.get_genai_compositor()
-        if hasattr(compositor, "set_debug_stage"):
-            compositor.set_debug_stage("encoder")
-        if hasattr(compositor, "clear_history"):
-            compositor.clear_history()
+        if self._is_genai_enabled():
+            compositor = self._synthesis_engine.get_genai_compositor()
+            if hasattr(compositor, "set_debug_stage"):
+                compositor.set_debug_stage("encoder")
+            if hasattr(compositor, "clear_history"):
+                compositor.clear_history()
 
         base_frames = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False).frames_bgr
         predicted_frames = base_frames
@@ -359,7 +360,7 @@ class ResidualCalculator:
             chunk_id=chunk.chunk_id,
             codec=residual_codec,
             residual_video_uri=str(output_path),
-            mode=ResidualMode.PLAYERS_ONLY,
+            mode=self._residual_mode,
         )
 
     def _apply_block_activity_gate(
@@ -426,7 +427,7 @@ class ResidualCalculator:
         if bool(torch.all(actor_mask_bool)):
             return residual[0] if squeeze_batch else residual
 
-        downsample_kwargs: dict[str, object] = {}
+        downsample_kwargs: dict[str, bool] = {}
         if interpolation in {"bilinear", "bicubic"}:
             downsample_kwargs["align_corners"] = False
 
@@ -493,6 +494,16 @@ class ResidualCalculator:
     def _is_genai_enabled(self) -> bool:
         return os.environ.get("POINTSTREAM_ENABLE_GENAI", "0").strip() == "1"
 
+    def _use_temporal_sequence(self, compositor: Any) -> bool:
+        if not self._is_genai_enabled():
+            return False
+        if not (hasattr(compositor, "process_sequence") and hasattr(compositor, "uses_temporal_pose_sequence")):
+            return False
+        if not compositor.uses_temporal_pose_sequence():
+            return False
+        raw = os.environ.get("POINTSTREAM_GENAI_USE_SEQUENCE", "0").strip().lower()
+        return raw in {"1", "true", "yes", "on"}
+
     def _resolve_temporal_window(self, default_window: int) -> int:
         raw = os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW")
         if raw is None:
@@ -504,7 +515,7 @@ class ResidualCalculator:
             value = int(raw)
         except ValueError:
             return default_window
-        return max(1, value)
+        return max(1, min(value, default_window))
 
     def _render_server_actor_prediction(
         self,
@@ -538,12 +549,7 @@ class ResidualCalculator:
                 compositor=compositor,
             )
 
-        if (
-            self._is_genai_enabled()
-            and hasattr(compositor, "process_sequence")
-            and hasattr(compositor, "uses_temporal_pose_sequence")
-            and compositor.uses_temporal_pose_sequence()
-        ):
+        if self._use_temporal_sequence(compositor):
             return self._render_server_genai_sequence(
                 payload=payload,
                 frame_tensor=frame_tensor,
@@ -660,7 +666,7 @@ class ResidualCalculator:
         logged_delta = False
         if use_temporal_window and hasattr(compositor, "process_sequence"):
             selected_frames = torch.stack([frame_tensor[idx] for idx in selected_indices], dim=0)
-            out_frames = selected_frames.clone()
+            genai_frames = selected_frames.clone()
             for state in actor_state.values():
                 pose_count = int(state.dense_pose_tensor.shape[0])
                 selected_positions = [pos for pos, idx in enumerate(selected_indices) if idx < pose_count]
@@ -678,7 +684,7 @@ class ResidualCalculator:
                     metadata_masks.append(None if metadata_entry is None else metadata_entry.mask_gray)
                     metadata_bboxes.append(None if metadata_entry is None else metadata_entry.bbox)
                     pose_sequence.append(state.dense_pose_tensor[frame_idx])
-                    background_sequence.append(out_frames[pos])
+                    background_sequence.append(genai_frames[pos])
 
                 processed = compositor.process_sequence(
                     reference_crop_tensor=state.reference_crop_tensor,
@@ -690,11 +696,11 @@ class ResidualCalculator:
                 ).to(frame_tensor.device)
 
                 for offset, pos in enumerate(selected_positions):
-                    out_frames[pos] = processed[offset]
+                    genai_frames[pos] = processed[offset]
 
             generated_deltas = []
-            for idx in range(out_frames.shape[0]):
-                delta = out_frames[idx].to(dtype=torch.float32) - selected_frames[idx].to(dtype=torch.float32)
+            for idx in range(genai_frames.shape[0]):
+                delta = genai_frames[idx].to(dtype=torch.float32) - selected_frames[idx].to(dtype=torch.float32)
                 if _LOGGER.isEnabledFor(logging.DEBUG) and not logged_delta:
                     _LOGGER.debug(
                         "GenAI encoder keyframe delta stats: mean=%.2f max=%.2f",
@@ -747,16 +753,16 @@ class ResidualCalculator:
                     logged_delta = True
                 generated_deltas.append(delta)
 
-        out_frames: list[torch.Tensor] = []
+        result_frames: list[torch.Tensor] = []
         anchor_idx = 0
         for frame_idx in range(frame_count):
             if frame_idx <= selected_indices[0]:
-                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[0]).clamp(0.0, 255.0).to(torch.uint8))
+                result_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[0]).clamp(0.0, 255.0).to(torch.uint8))
                 continue
             while anchor_idx + 1 < len(selected_indices) and frame_idx > selected_indices[anchor_idx + 1]:
                 anchor_idx += 1
             if anchor_idx + 1 >= len(selected_indices):
-                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[-1]).clamp(0.0, 255.0).to(torch.uint8))
+                result_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[-1]).clamp(0.0, 255.0).to(torch.uint8))
                 continue
 
             left_idx = selected_indices[anchor_idx]
@@ -764,13 +770,13 @@ class ResidualCalculator:
             left_delta = generated_deltas[anchor_idx]
             right_delta = generated_deltas[anchor_idx + 1]
             if right_idx <= left_idx:
-                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + left_delta).clamp(0.0, 255.0).to(torch.uint8))
+                result_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + left_delta).clamp(0.0, 255.0).to(torch.uint8))
                 continue
             alpha = float(frame_idx - left_idx) / float(right_idx - left_idx)
             blended_delta = torch.lerp(left_delta, right_delta, alpha)
-            out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + blended_delta).clamp(0.0, 255.0).to(torch.uint8))
+            result_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + blended_delta).clamp(0.0, 255.0).to(torch.uint8))
 
-        return torch.stack(out_frames, dim=0)
+        return torch.stack(result_frames, dim=0)
 
     def _render_server_genai_sequence(
         self,

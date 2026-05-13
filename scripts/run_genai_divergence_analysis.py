@@ -11,8 +11,6 @@ import json
 project_root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(project_root))
 
-from src.shared.genai_debug import create_debug_report
-
 def setup_debug_dir():
     """Create and return debug directory."""
     debug_dir = project_root / "outputs" / "genai_debug_comparison"
@@ -44,7 +42,7 @@ def run_pipeline_with_genai():
         "--num-frames", "8",
     ]
     
-    print(f"Running pipeline with GenAI enabled...")
+    print("Running pipeline with GenAI enabled...")
     print(f"Debug output: {debug_dir}")
     print(f"Command: {' '.join(cmd)}")
     
@@ -59,6 +57,8 @@ def run_pipeline_with_genai():
 
 def generate_comparison_report(debug_dir):
     """Generate detailed comparison report."""
+    from src.shared.genai_debug import create_debug_report
+
     report = create_debug_report(str(debug_dir))
     
     report_file = debug_dir / "DIVERGENCE_REPORT.txt"
@@ -107,7 +107,7 @@ def analyze_frame_directories(debug_dir):
     with open(analysis_file, "w") as f:
         json.dump(analysis, f, indent=2)
     
-    print(f"\nFrame analysis:")
+    print("\nFrame analysis:")
     print(f"  Encoder frames: {analysis['encoder_frames']}")
     print(f"  Decoder frames: {analysis['decoder_frames']}")
     print(f"  Comparison frames: {analysis['comparison_frames']}")
@@ -131,7 +131,7 @@ def main():
     
     # Analyze results
     print("\nAnalyzing debug outputs...")
-    analysis = analyze_frame_directories(debug_dir)
+    analyze_frame_directories(debug_dir)
     
     # Generate report
     report_file = generate_comparison_report(debug_dir)

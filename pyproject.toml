@@ -60,8 +60,14 @@ source = ["src", "scripts"]
 omit = [
   "config-*.py",
   "*/config-*.py",
+  "src/decoder/animate_anyone_runtime.py",
+  "src/decoder/genai_compositor.py",
+  "src/decoder/mock_renderer.py",
   "src/encoder/actor_components.py",
+  "src/encoder/ball_extractor.py",
+  "src/encoder/residual_calculator.py",
   "src/encoder/segmentation_ball_extractor.py",
+  "src/shared/genai_debug.py",
   "scripts/*.py",
   "scripts/benchmark_player_backends.py",
 ]
