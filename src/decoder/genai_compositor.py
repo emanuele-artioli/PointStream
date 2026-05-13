@@ -349,6 +349,7 @@ class DiffusersCompositor(MockCompositor):
     ) -> None:
         super().__init__(confidence_threshold=confidence_threshold)
         self._seed = int(seed)
+        self._debug_stage = "unknown"
         if device is None:
             self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         else:
@@ -393,6 +394,9 @@ class DiffusersCompositor(MockCompositor):
         self._postgen_segmenter_disabled = False
 
         self._strategy = self._build_strategy(self._backend)
+
+    def set_debug_stage(self, stage: str) -> None:
+        self._debug_stage = str(stage)
 
     def clear_history(self) -> None:
         """Reset temporal state such as alpha smoothing history."""
@@ -539,11 +543,56 @@ class DiffusersCompositor(MockCompositor):
         )
         alpha_mask = self._apply_temporal_alpha_smoothing(alpha_mask=alpha_mask, actor_identity=actor_identity)
 
+        if _LOGGER.isEnabledFor(logging.DEBUG):
+            if alpha_mask is None:
+                _LOGGER.debug(
+                    "GenAI alpha mask missing stage=%s actor=%s mode=%s backend=%s",
+                    self._debug_stage,
+                    actor_identity,
+                    self._compositing_mask_mode,
+                    self._backend,
+                )
+            else:
+                nonzero = float(np.count_nonzero(alpha_mask > 0.01))
+                total = float(alpha_mask.size)
+                _LOGGER.debug(
+                    "GenAI alpha mask stats stage=%s actor=%s mode=%s backend=%s nonzero=%.1f%%",
+                    self._debug_stage,
+                    actor_identity,
+                    self._compositing_mask_mode,
+                    self._backend,
+                    100.0 * nonzero / max(1.0, total),
+                )
+
         if alpha_mask is None or int(np.count_nonzero(alpha_mask > 0.01)) == 0:
+            _LOGGER.debug(
+                "GenAI compositor produced empty alpha stage=%s actor=%s mode=%s backend=%s",
+                self._debug_stage,
+                actor_identity,
+                self._compositing_mask_mode,
+                self._backend,
+            )
             return torch.from_numpy(frame_np).permute(2, 0, 1).contiguous().to(torch.uint8)
 
         roi = frame_np[y1:y2, x1:x2]
         alpha_3 = np.asarray(alpha_mask[:, :, None], dtype=np.float32)
+        if _LOGGER.isEnabledFor(logging.DEBUG):
+            try:
+                delta = np.abs(actor_resized.astype(np.float32) - roi.astype(np.float32))
+                _LOGGER.debug(
+                    "GenAI actor vs ROI stage=%s actor=%s mean=%.2f max=%.2f",
+                    self._debug_stage,
+                    actor_identity,
+                    float(delta.mean()),
+                    float(delta.max()),
+                )
+            except Exception as exc:
+                _LOGGER.debug(
+                    "GenAI actor vs ROI stage=%s actor=%s diff unavailable: %s",
+                    self._debug_stage,
+                    actor_identity,
+                    exc,
+                )
         blended = actor_resized.astype(np.float32) * alpha_3 + roi.astype(np.float32) * (1.0 - alpha_3)
         frame_np[y1:y2, x1:x2] = np.asarray(np.clip(blended, 0.0, 255.0), dtype=np.uint8)
         return torch.from_numpy(frame_np).permute(2, 0, 1).contiguous().to(torch.uint8)
@@ -641,6 +690,13 @@ class DiffusersCompositor(MockCompositor):
             alpha = self._segment_generated_actor(actor_resized=actor_resized, is_animate_anyone=is_animate_anyone)
             if alpha is not None:
                 return alpha
+            metadata_alpha = self._alpha_from_metadata_mask(
+                metadata_mask=metadata_mask,
+                target_w=int(actor_resized.shape[1]),
+                target_h=int(actor_resized.shape[0]),
+            )
+            if metadata_alpha is not None:
+                return metadata_alpha
 
         if is_animate_anyone:
             return self._segment_black_background(actor_resized)

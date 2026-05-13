@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
+import logging
 import os
 from pathlib import Path
 
@@ -17,6 +18,9 @@ from src.shared.schemas import ActorPacket, DecodedChunkResult, EncodedChunkPayl
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import gpu_bound
 from src.shared.track_id import scene_track_id_to_int
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -47,6 +51,8 @@ class DecoderRenderer:
         self._synthesis_engine = SynthesisEngine(seed=deterministic_seed)
         self._compositor = ResidualCompositor(device=self._synthesis_engine.device)
         self._genai_compositor = self._synthesis_engine.get_genai_compositor()
+        if hasattr(self._genai_compositor, "set_debug_stage"):
+            self._genai_compositor.set_debug_stage("decoder")
         self._actor_state: dict[int, _ClientActorState] = {}
         self._chunk_start_frame_id: int = 0
 
@@ -313,58 +319,117 @@ class DecoderRenderer:
         if len(selected_indices) <= 1:
             return self._render_genai_baseline(frame_tensor=frame_tensor)
 
+        if _LOGGER.isEnabledFor(logging.DEBUG):
+            _LOGGER.debug(
+                "GenAI keyframe-only decoder: %s keyframes selected across %s frames",
+                len(selected_indices),
+                frame_count,
+            )
+            for actor_state in self._actor_state.values():
+                pose_count = int(actor_state.dense_pose_tensor.shape[0])
+                available_masks = sum(
+                    1 for idx in selected_indices if (self._chunk_start_frame_id + idx) in actor_state.metadata_masks_by_frame
+                )
+                _LOGGER.debug(
+                    "Actor %s: poses=%s, keyframes=%s, metadata_masks=%s",
+                    actor_state.object_id,
+                    pose_count,
+                    len(selected_indices),
+                    available_masks,
+                )
+
         generated_deltas: list[torch.Tensor] = []
         generated_indices: list[int] = []
-        for frame_idx in selected_indices:
-            bg_frame = frame_tensor[frame_idx]
-            composited = bg_frame
-            global_frame_id = int(self._chunk_start_frame_id) + int(frame_idx)
-            use_temporal_window = bool(
-                hasattr(self._genai_compositor, "uses_temporal_pose_sequence")
-                and self._genai_compositor.uses_temporal_pose_sequence()
-            )
-            preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
-
+        use_temporal_window = bool(
+            hasattr(self._genai_compositor, "uses_temporal_pose_sequence")
+            and self._genai_compositor.uses_temporal_pose_sequence()
+        )
+        if use_temporal_window and hasattr(self._genai_compositor, "process_sequence"):
+            selected_frames = torch.stack([frame_tensor[idx] for idx in selected_indices], dim=0)
+            out_frames = selected_frames.clone()
             for actor_state in self._actor_state.values():
-                if frame_idx >= int(actor_state.dense_pose_tensor.shape[0]):
+                pose_count = int(actor_state.dense_pose_tensor.shape[0])
+                selected_positions = [pos for pos, idx in enumerate(selected_indices) if idx < pose_count]
+                if not selected_positions:
                     continue
 
-                if use_temporal_window:
-                    if frame_idx < preroll_frames:
+                metadata_masks: list[np.ndarray | None] = []
+                metadata_bboxes: list[tuple[int, int, int, int] | None] = []
+                pose_sequence: list[torch.Tensor] = []
+                background_sequence: list[torch.Tensor] = []
+                for pos in selected_positions:
+                    frame_idx = selected_indices[pos]
+                    global_frame_id = int(self._chunk_start_frame_id) + int(frame_idx)
+                    metadata_entry = actor_state.metadata_masks_by_frame.get(global_frame_id)
+                    metadata_masks.append(None if metadata_entry is None else metadata_entry.mask_gray)
+                    metadata_bboxes.append(None if metadata_entry is None else metadata_entry.bbox)
+                    pose_sequence.append(actor_state.dense_pose_tensor[frame_idx])
+                    background_sequence.append(out_frames[pos])
+
+                processed = self._genai_compositor.process_sequence(
+                    reference_crop_tensor=actor_state.reference_crop_tensor,
+                    dense_dwpose_tensor=torch.stack(pose_sequence, dim=0),
+                    warped_background_frames=torch.stack(background_sequence, dim=0),
+                    actor_identity=actor_state.object_id,
+                    metadata_masks=metadata_masks,
+                    metadata_bboxes=metadata_bboxes,
+                ).to(frame_tensor.device)
+
+                for offset, pos in enumerate(selected_positions):
+                    out_frames[pos] = processed[offset]
+
+            generated_indices = list(selected_indices)
+            generated_deltas = [
+                out_frames[idx].to(dtype=torch.float32) - selected_frames[idx].to(dtype=torch.float32)
+                for idx in range(out_frames.shape[0])
+            ]
+        else:
+            for frame_idx in selected_indices:
+                bg_frame = frame_tensor[frame_idx]
+                composited = bg_frame
+                global_frame_id = int(self._chunk_start_frame_id) + int(frame_idx)
+                preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
+
+                for actor_state in self._actor_state.values():
+                    if frame_idx >= int(actor_state.dense_pose_tensor.shape[0]):
                         continue
-                    temporal_window = self._resolve_temporal_window(default_window=int(frame_idx) + 1)
-                    pose_condition = self._build_temporal_pose_condition(
-                        dense_pose_tensor=actor_state.dense_pose_tensor,
-                        frame_idx=frame_idx,
-                        temporal_window=temporal_window,
-                    )
-                else:
-                    pose_condition = actor_state.dense_pose_tensor[frame_idx]
 
-                metadata_entry = actor_state.metadata_masks_by_frame.get(global_frame_id)
-                metadata_mask = None if metadata_entry is None else metadata_entry.mask_gray
-                metadata_bbox = None if metadata_entry is None else metadata_entry.bbox
+                    if use_temporal_window:
+                        if frame_idx < preroll_frames:
+                            continue
+                        temporal_window = self._resolve_temporal_window(default_window=int(frame_idx) + 1)
+                        pose_condition = self._build_temporal_pose_condition(
+                            dense_pose_tensor=actor_state.dense_pose_tensor,
+                            frame_idx=frame_idx,
+                            temporal_window=temporal_window,
+                        )
+                    else:
+                        pose_condition = actor_state.dense_pose_tensor[frame_idx]
 
-                try:
-                    composited = self._genai_compositor.process(
-                        reference_crop_tensor=actor_state.reference_crop_tensor,
-                        dense_dwpose_tensor=pose_condition,
-                        warped_background_frame=composited,
-                        actor_identity=actor_state.object_id,
-                        metadata_mask=metadata_mask,
-                        metadata_bbox=metadata_bbox,
-                    ).to(frame_tensor.device)
-                except TypeError:
-                    # Fallback for mock/test compositors
-                    composited = self._genai_compositor.process(
-                        reference_crop_tensor=actor_state.reference_crop_tensor,
-                        dense_dwpose_tensor=pose_condition,
-                        warped_background_frame=composited,
-                        actor_identity=actor_state.object_id,
-                    ).to(frame_tensor.device)
+                    metadata_entry = actor_state.metadata_masks_by_frame.get(global_frame_id)
+                    metadata_mask = None if metadata_entry is None else metadata_entry.mask_gray
+                    metadata_bbox = None if metadata_entry is None else metadata_entry.bbox
 
-            generated_indices.append(int(frame_idx))
-            generated_deltas.append(composited.to(dtype=torch.float32) - bg_frame.to(dtype=torch.float32))
+                    try:
+                        composited = self._genai_compositor.process(
+                            reference_crop_tensor=actor_state.reference_crop_tensor,
+                            dense_dwpose_tensor=pose_condition,
+                            warped_background_frame=composited,
+                            actor_identity=actor_state.object_id,
+                            metadata_mask=metadata_mask,
+                            metadata_bbox=metadata_bbox,
+                        ).to(frame_tensor.device)
+                    except TypeError:
+                        # Fallback for mock/test compositors
+                        composited = self._genai_compositor.process(
+                            reference_crop_tensor=actor_state.reference_crop_tensor,
+                            dense_dwpose_tensor=pose_condition,
+                            warped_background_frame=composited,
+                            actor_identity=actor_state.object_id,
+                        ).to(frame_tensor.device)
+
+                generated_indices.append(int(frame_idx))
+                generated_deltas.append(composited.to(dtype=torch.float32) - bg_frame.to(dtype=torch.float32))
 
         out_frames: list[torch.Tensor] = []
         anchor_idx = 0

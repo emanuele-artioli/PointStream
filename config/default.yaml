@@ -9,9 +9,9 @@
 num-frames: null                      # Maximum number of frames to process (null = all frames)
 summary-file: true                    # Write run_summary.json
 ffmpeg-codec: libsvtav1               # FFmpeg encoder: libsvtav1, libx265, etc.
-codec-crf: 15                         # FFmpeg CRF quality (lower = better). null uses codec defaults
+codec-crf: 35                         # FFmpeg CRF quality (lower = better). null uses codec defaults
 codec-preset: slow                    # FFmpeg preset/speed (e.g., veryfast, medium, slow). null uses codec defaults
-log-level: info                       # Log verbosity: debug, info, warning, error
+log-level: debug                       # Log verbosity: debug, info, warning, error
 dry-run: false                        # Validate only without executing pipeline
 transport: disk                       # Transport backend: currently only 'disk'
 
@@ -97,10 +97,10 @@ evaluation-max-frames: null           # Optional frame cap for quality evaluatio
 genai-backend: animate-anyone             # GenAI backend: controlnet, animate-anyone (null disables GenAI)
 animate-anyone-repo-dir: null             # Path to Moore-AnimateAnyone repository
 animate-anyone-model-dir: null            # Override if models are in non-standard location
-animate-anyone-steps: 10                  # Diffusion inference steps for AnimateAnyone
+animate-anyone-steps: 3                  # Diffusion inference steps for AnimateAnyone
 animate-anyone-cfg: 7.5                   # Guidance (CFG) scale for AnimateAnyone
-animate-anyone-width: 256                 # Width for AnimateAnyone model (pixels)
-animate-anyone-height: 256                # Height for AnimateAnyone model (pixels)
+animate-anyone-width: 512                 # Width for AnimateAnyone model (pixels)
+animate-anyone-height: 512                # Height for AnimateAnyone model (pixels)
 animate-anyone-window: null                  # Temporal conditioning window length
 genai-preroll-frames: 0                   # Frames to keep residual-only before temporal GenAI starts
 genai-keyframe-only: false                # Run GenAI only on received keyframe skeletons and interpolate outputs locally
@@ -115,7 +115,3 @@ animate-anyone-alpha-smoothing: 0.5       # Temporal smoothing factor [0, 1]
 compositing-mask-mode: postgen-seg-client  # Actor compositing: alpha-heuristic, metadata-source-mask, postgen-seg-client
 postgen-segmenter-backend: yolo            # Segmenter backend: yolo, heuristic
 metadata-mask-codec: auto                  # Mask codec: auto, rle-v1, bitpack-z1, png, segmenter-native, yolo-native
-
-# genai-keyframe-only: false                # Run GenAI only on received keyframe skeletons and interpolate outputs locally
-# animate-anyone-transparent-threshold: 64  # Black-background alpha threshold
-# genai-resize-mode: aspect-recovery        # Resize mode: plain or aspect-recovery

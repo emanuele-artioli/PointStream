@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from dataclasses import dataclass
+import logging
 import os
 from pathlib import Path
 from typing import Any
@@ -21,6 +22,9 @@ from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import gpu_bound
 from src.shared.track_id import scene_track_id_to_int
 from src.shared.torch_dtype import is_cuda_device_usable
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -211,6 +215,8 @@ class ResidualCalculator:
         debug_output_path: str | Path | None,
     ) -> ResidualPacket:
         compositor = self._synthesis_engine.get_genai_compositor()
+        if hasattr(compositor, "set_debug_stage"):
+            compositor.set_debug_stage("encoder")
         if hasattr(compositor, "clear_history"):
             compositor.clear_history()
 
@@ -218,6 +224,20 @@ class ResidualCalculator:
         predicted_frames = base_frames
         if self._is_genai_enabled():
             predicted_frames = self._render_server_actor_prediction(payload=payload, frame_tensor=base_frames.clone())
+            if _LOGGER.isEnabledFor(logging.DEBUG):
+                try:
+                    diff = (predicted_frames.to(dtype=torch.float32) - base_frames.to(dtype=torch.float32)).abs()
+                    mean_diff = float(diff.mean().item())
+                    max_diff = float(diff.max().item())
+                    pct = float((diff > 1.0).float().mean().item() * 100.0)
+                    _LOGGER.debug(
+                        "GenAI encoder diff stats: mean=%.2f max=%.2f pct>1=%.1f%%",
+                        mean_diff,
+                        max_diff,
+                        pct,
+                    )
+                except Exception as exc:
+                    _LOGGER.debug("GenAI encoder diff stats unavailable: %s", exc)
 
         source_metadata = probe_video_metadata(chunk.source_uri)
         available_source_frames = max(0, int(source_metadata.num_frames) - int(chunk.start_frame_id))
@@ -613,45 +633,119 @@ class ResidualCalculator:
             selected_indices.append(frame_count - 1)
         selected_indices = sorted(set(selected_indices))
 
+        if _LOGGER.isEnabledFor(logging.DEBUG):
+            _LOGGER.debug(
+                "GenAI keyframe-only encoder: %s keyframes selected across %s frames",
+                len(selected_indices),
+                frame_count,
+            )
+            for state in actor_state.values():
+                pose_count = int(state.dense_pose_tensor.shape[0])
+                available_masks = sum(
+                    1 for idx in selected_indices if (payload.chunk.start_frame_id + idx) in state.metadata_masks_by_frame
+                )
+                _LOGGER.debug(
+                    "Actor %s: poses=%s, keyframes=%s, metadata_masks=%s",
+                    state.object_id,
+                    pose_count,
+                    len(selected_indices),
+                    available_masks,
+                )
+
         use_temporal_window = bool(hasattr(compositor, "uses_temporal_pose_sequence") and compositor.uses_temporal_pose_sequence())
         preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
         chunk_start = int(payload.chunk.start_frame_id)
 
         generated_deltas: list[torch.Tensor] = []
-        for frame_idx in selected_indices:
-            bg_frame = frame_tensor[frame_idx]
-            composited = bg_frame
-            global_frame_id = chunk_start + frame_idx
+        logged_delta = False
+        if use_temporal_window and hasattr(compositor, "process_sequence"):
+            selected_frames = torch.stack([frame_tensor[idx] for idx in selected_indices], dim=0)
+            out_frames = selected_frames.clone()
             for state in actor_state.values():
-                if frame_idx >= int(state.dense_pose_tensor.shape[0]):
+                pose_count = int(state.dense_pose_tensor.shape[0])
+                selected_positions = [pos for pos, idx in enumerate(selected_indices) if idx < pose_count]
+                if not selected_positions:
                     continue
 
-                if use_temporal_window:
-                    if frame_idx < preroll_frames:
-                        continue
-                    temporal_window = self._resolve_temporal_window(default_window=int(frame_idx) + 1)
-                    pose_condition = self._build_temporal_pose_condition(
-                        dense_pose_tensor=state.dense_pose_tensor,
-                        frame_idx=frame_idx,
-                        temporal_window=temporal_window,
-                    )
-                else:
-                    pose_condition = state.dense_pose_tensor[frame_idx]
+                metadata_masks: list[np.ndarray | None] = []
+                metadata_bboxes: list[tuple[int, int, int, int] | None] = []
+                pose_sequence: list[torch.Tensor] = []
+                background_sequence: list[torch.Tensor] = []
+                for pos in selected_positions:
+                    frame_idx = selected_indices[pos]
+                    global_frame_id = chunk_start + frame_idx
+                    metadata_entry = state.metadata_masks_by_frame.get(global_frame_id)
+                    metadata_masks.append(None if metadata_entry is None else metadata_entry.mask_gray)
+                    metadata_bboxes.append(None if metadata_entry is None else metadata_entry.bbox)
+                    pose_sequence.append(state.dense_pose_tensor[frame_idx])
+                    background_sequence.append(out_frames[pos])
 
-                metadata_entry = state.metadata_masks_by_frame.get(global_frame_id)
-                metadata_mask = None if metadata_entry is None else metadata_entry.mask_gray
-                metadata_bbox = None if metadata_entry is None else metadata_entry.bbox
-
-                composited = compositor.process(
+                processed = compositor.process_sequence(
                     reference_crop_tensor=state.reference_crop_tensor,
-                    dense_dwpose_tensor=pose_condition,
-                    warped_background_frame=composited,
+                    dense_dwpose_tensor=torch.stack(pose_sequence, dim=0),
+                    warped_background_frames=torch.stack(background_sequence, dim=0),
                     actor_identity=state.object_id,
-                    metadata_mask=metadata_mask,
-                    metadata_bbox=metadata_bbox,
+                    metadata_masks=metadata_masks,
+                    metadata_bboxes=metadata_bboxes,
                 ).to(frame_tensor.device)
 
-            generated_deltas.append(composited.to(dtype=torch.float32) - bg_frame.to(dtype=torch.float32))
+                for offset, pos in enumerate(selected_positions):
+                    out_frames[pos] = processed[offset]
+
+            generated_deltas = []
+            for idx in range(out_frames.shape[0]):
+                delta = out_frames[idx].to(dtype=torch.float32) - selected_frames[idx].to(dtype=torch.float32)
+                if _LOGGER.isEnabledFor(logging.DEBUG) and not logged_delta:
+                    _LOGGER.debug(
+                        "GenAI encoder keyframe delta stats: mean=%.2f max=%.2f",
+                        float(delta.abs().mean().item()),
+                        float(delta.abs().max().item()),
+                    )
+                    logged_delta = True
+                generated_deltas.append(delta)
+        else:
+            for frame_idx in selected_indices:
+                bg_frame = frame_tensor[frame_idx]
+                composited = bg_frame
+                global_frame_id = chunk_start + frame_idx
+                for state in actor_state.values():
+                    if frame_idx >= int(state.dense_pose_tensor.shape[0]):
+                        continue
+
+                    if use_temporal_window:
+                        if frame_idx < preroll_frames:
+                            continue
+                        temporal_window = self._resolve_temporal_window(default_window=int(frame_idx) + 1)
+                        pose_condition = self._build_temporal_pose_condition(
+                            dense_pose_tensor=state.dense_pose_tensor,
+                            frame_idx=frame_idx,
+                            temporal_window=temporal_window,
+                        )
+                    else:
+                        pose_condition = state.dense_pose_tensor[frame_idx]
+
+                    metadata_entry = state.metadata_masks_by_frame.get(global_frame_id)
+                    metadata_mask = None if metadata_entry is None else metadata_entry.mask_gray
+                    metadata_bbox = None if metadata_entry is None else metadata_entry.bbox
+
+                    composited = compositor.process(
+                        reference_crop_tensor=state.reference_crop_tensor,
+                        dense_dwpose_tensor=pose_condition,
+                        warped_background_frame=composited,
+                        actor_identity=state.object_id,
+                        metadata_mask=metadata_mask,
+                        metadata_bbox=metadata_bbox,
+                    ).to(frame_tensor.device)
+
+                delta = composited.to(dtype=torch.float32) - bg_frame.to(dtype=torch.float32)
+                if _LOGGER.isEnabledFor(logging.DEBUG) and not logged_delta:
+                    _LOGGER.debug(
+                        "GenAI encoder keyframe delta stats: mean=%.2f max=%.2f",
+                        float(delta.abs().mean().item()),
+                        float(delta.abs().max().item()),
+                    )
+                    logged_delta = True
+                generated_deltas.append(delta)
 
         out_frames: list[torch.Tensor] = []
         anchor_idx = 0
