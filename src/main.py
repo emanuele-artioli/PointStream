@@ -395,6 +395,42 @@ def _parse_optional_int_or_none(value: str) -> int | None:
     return int(value)
 
 
+def _parse_evaluation_mode(value: Any | None) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if not normalized or normalized == "none":
+            return []
+        items = [item.strip().lower() for item in normalized.split(",")]
+    elif isinstance(value, (list, tuple, set)):
+        items = [str(item).strip().lower() for item in value]
+    else:
+        raise ValueError("--evaluation-mode must be a comma-separated string or list")
+
+    items = [item for item in items if item]
+    if not items:
+        return []
+    if "none" in items:
+        if len(items) > 1:
+            raise ValueError("--evaluation-mode cannot include 'none' with other values")
+        return []
+
+    allowed = {"psnr", "ssim", "vmaf"}
+    invalid = [item for item in items if item not in allowed]
+    if invalid:
+        raise ValueError(f"Unsupported --evaluation-mode values: {', '.join(sorted(set(invalid)))}")
+
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for item in items:
+        if item in seen:
+            continue
+        seen.add(item)
+        ordered.append(item)
+    return ordered
+
+
 def _build_residual_calculator(
     seed: int,
     importance_mapper: str,
@@ -892,9 +928,12 @@ def _build_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--evaluation-mode",
-        choices=("none", "psnr"),
+        nargs="+",
         default="none",
-        help="Post-run evaluation preset. 'psnr' computes framewise PSNR metrics.",
+        help=(
+            "Post-run evaluation metrics. Use one or more of psnr, ssim, vmaf; "
+            "pass none to disable evaluation."
+        ),
     )
     parser.add_argument(
         "--skip-eval",
@@ -1084,7 +1123,7 @@ def run_cli(argv: list[str] | None = None) -> int:
             "cpu_workers": int(args.cpu_workers),
             "gpu_workers": int(args.gpu_workers),
             "debug": bool(args.debug),
-            "evaluation_mode": str(args.evaluation_mode),
+            "evaluation_mode": _parse_evaluation_mode(args.evaluation_mode),
             "source_uri": source_uri,
         }
         print(json.dumps(dry_run_summary, indent=2))
@@ -1144,12 +1183,14 @@ def run_cli(argv: list[str] | None = None) -> int:
         runtime_output_root=run_output_root,
     )
 
-    should_evaluate = str(args.evaluation_mode).strip().lower() != "none" and not bool(args.skip_eval)
+    evaluation_metrics = _parse_evaluation_mode(args.evaluation_mode)
+    should_evaluate = bool(evaluation_metrics) and not bool(args.skip_eval)
     if should_evaluate:
         run_summary["evaluation"] = evaluate_run_summary(
             summary=run_summary,
             experiment_dir=run_output_root,
             max_frames=args.evaluation_max_frames,
+            metrics=evaluation_metrics,
         )
 
     summary_json = json.dumps(run_summary, indent=2)

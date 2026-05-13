@@ -2,6 +2,12 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+import json
+import os
+import shutil
+import subprocess
+import tempfile
+
 import cv2
 import numpy as np
 
@@ -172,7 +178,222 @@ def _compute_psnr(reference_video: Path, predicted_video: Path, max_frames: int 
     }
 
 
-def evaluate_run_summary(summary: dict[str, Any], experiment_dir: str | Path, max_frames: int | None = None) -> dict[str, Any]:
+def _resolve_binary_path(env_var: str, binary_name: str) -> str:
+    explicit = os.environ.get(env_var)
+    if explicit:
+        return explicit
+
+    resolved = shutil.which(binary_name)
+    if resolved:
+        return resolved
+
+    raise FileNotFoundError(
+        f"Required binary '{binary_name}' was not found in PATH. "
+        f"Install FFmpeg tools or set {env_var} to the executable path."
+    )
+
+
+def _compute_ssim_ffmpeg(reference_video: Path, predicted_video: Path, max_frames: int | None = None) -> dict[str, Any]:
+    if not reference_video.exists() or not reference_video.is_file():
+        return {"ssim_mean": None, "ssim_std": None, "ssim_num_frames": 0, "note": "missing reference video"}
+    if not predicted_video.exists():
+        return {"ssim_mean": None, "ssim_std": None, "ssim_num_frames": 0, "note": "missing predicted artifact"}
+
+    ffmpeg_bin = _resolve_binary_path("FFMPEG_BIN", "ffmpeg")
+    stats_file = tempfile.NamedTemporaryFile(suffix=".txt", delete=False)
+    stats_path = Path(stats_file.name)
+    stats_file.close()
+
+    filter_complex = f"[0:v][1:v]ssim=stats_file={stats_path}"
+    ffmpeg_cmd = [
+        ffmpeg_bin,
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-i",
+        str(reference_video),
+        "-i",
+        str(predicted_video),
+    ]
+    if max_frames is not None:
+        ffmpeg_cmd.extend(["-frames:v", str(int(max_frames))])
+    ffmpeg_cmd.extend(["-filter_complex", filter_complex, "-f", "null", "-"])
+
+    try:
+        process = subprocess.run(
+            ffmpeg_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            text=True,
+        )
+        if process.returncode != 0:
+            stderr_text = (process.stderr or "").strip()
+            return {
+                "ssim_mean": None,
+                "ssim_std": None,
+                "ssim_num_frames": 0,
+                "note": f"ffmpeg ssim failed: {stderr_text or 'unknown error'}",
+            }
+
+        if not stats_path.exists():
+            return {
+                "ssim_mean": None,
+                "ssim_std": None,
+                "ssim_num_frames": 0,
+                "note": "ffmpeg ssim did not emit stats",
+            }
+
+        values: list[float] = []
+        for line in stats_path.read_text(encoding="utf-8", errors="replace").splitlines():
+            if "All:" not in line:
+                continue
+            for token in line.split():
+                if token.startswith("All:"):
+                    try:
+                        values.append(float(token.split(":", maxsplit=1)[1]))
+                    except ValueError:
+                        pass
+                    break
+
+        if not values:
+            return {
+                "ssim_mean": None,
+                "ssim_std": None,
+                "ssim_num_frames": 0,
+                "note": "ffmpeg ssim returned no values",
+            }
+
+        arr = np.array(values, dtype=float)
+        return {
+            "ssim_mean": float(np.mean(arr)),
+            "ssim_std": float(np.std(arr)),
+            "ssim_num_frames": int(arr.size),
+            "note": None,
+        }
+    finally:
+        if stats_path.exists():
+            stats_path.unlink(missing_ok=True)
+
+
+def _compute_vmaf_ffmpeg(reference_video: Path, predicted_video: Path, max_frames: int | None = None) -> dict[str, Any]:
+    if not reference_video.exists() or not reference_video.is_file():
+        return {"vmaf_mean": None, "vmaf_num_frames": 0, "note": "missing reference video"}
+    if not predicted_video.exists():
+        return {"vmaf_mean": None, "vmaf_num_frames": 0, "note": "missing predicted artifact"}
+
+    ffmpeg_bin = _resolve_binary_path("FFMPEG_BIN", "ffmpeg")
+    log_file = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
+    log_path = Path(log_file.name)
+    log_file.close()
+
+    filter_complex = f"[0:v][1:v]libvmaf=log_path={log_path}:log_fmt=json"
+    ffmpeg_cmd = [
+        ffmpeg_bin,
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-i",
+        str(reference_video),
+        "-i",
+        str(predicted_video),
+    ]
+    if max_frames is not None:
+        ffmpeg_cmd.extend(["-frames:v", str(int(max_frames))])
+    ffmpeg_cmd.extend(["-filter_complex", filter_complex, "-f", "null", "-"])
+
+    try:
+        process = subprocess.run(
+            ffmpeg_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            text=True,
+        )
+        if process.returncode != 0:
+            stderr_text = (process.stderr or "").strip()
+            return {
+                "vmaf_mean": None,
+                "vmaf_num_frames": 0,
+                "note": f"ffmpeg vmaf failed: {stderr_text or 'unknown error'}",
+            }
+
+        if not log_path.exists():
+            return {
+                "vmaf_mean": None,
+                "vmaf_num_frames": 0,
+                "note": "ffmpeg vmaf did not emit log",
+            }
+
+        payload = json.loads(log_path.read_text(encoding="utf-8", errors="replace"))
+        vmaf_mean = None
+        pooled = payload.get("pooled_metrics", {})
+        if isinstance(pooled, dict):
+            vmaf = pooled.get("vmaf", {})
+            if isinstance(vmaf, dict):
+                if "mean" in vmaf:
+                    vmaf_mean = vmaf.get("mean")
+                elif "value" in vmaf:
+                    vmaf_mean = vmaf.get("value")
+        if vmaf_mean is None and isinstance(payload.get("aggregate"), dict):
+            aggregate = payload.get("aggregate", {})
+            vmaf_mean = aggregate.get("VMAF_score")
+
+        frames = payload.get("frames")
+        num_frames = int(len(frames)) if isinstance(frames, list) else 0
+
+        return {
+            "vmaf_mean": float(vmaf_mean) if vmaf_mean is not None else None,
+            "vmaf_num_frames": num_frames,
+            "note": None if vmaf_mean is not None else "ffmpeg vmaf returned no score",
+        }
+    finally:
+        if log_path.exists():
+            log_path.unlink(missing_ok=True)
+
+
+def _normalize_evaluation_metrics(metrics: Any | None) -> list[str]:
+    if metrics is None:
+        return ["psnr"]
+    if isinstance(metrics, str):
+        normalized = metrics.strip().lower()
+        if not normalized or normalized == "none":
+            return []
+        items = [item.strip().lower() for item in normalized.split(",")]
+    elif isinstance(metrics, (list, tuple, set)):
+        items = [str(item).strip().lower() for item in metrics]
+    else:
+        raise ValueError("evaluation metrics must be a string or list")
+
+    items = [item for item in items if item]
+    if not items:
+        return []
+    if "none" in items:
+        if len(items) > 1:
+            raise ValueError("evaluation metrics cannot include 'none' with other values")
+        return []
+
+    allowed = {"psnr", "ssim", "vmaf"}
+    invalid = [item for item in items if item not in allowed]
+    if invalid:
+        raise ValueError(f"unsupported evaluation metrics: {', '.join(sorted(set(invalid)))}")
+
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for item in items:
+        if item in seen:
+            continue
+        seen.add(item)
+        ordered.append(item)
+    return ordered
+
+
+def evaluate_run_summary(
+    summary: dict[str, Any],
+    experiment_dir: str | Path,
+    max_frames: int | None = None,
+    metrics: list[str] | None = None,
+) -> dict[str, Any]:
     """Compute evaluation metrics (PSNR, sizes) for a completed pipeline run.
     
     Note: Only includes metrics that are computed by this function. Fields that are
@@ -187,11 +408,9 @@ def evaluate_run_summary(summary: dict[str, Any], experiment_dir: str | Path, ma
     source_path = Path(str(source_uri)).expanduser() if source_uri is not None else None
     decoded_path = Path(str(decoded_uri)).expanduser() if decoded_uri is not None else None
 
-    psnr = _compute_psnr(
-        reference_video=source_path if source_path is not None else Path(experiment_dir) / "missing_source.mp4",
-        predicted_video=decoded_path if decoded_path is not None else Path(experiment_dir) / "missing_decoded.mp4",
-        max_frames=max_frames,
-    )
+    normalized_metrics = _normalize_evaluation_metrics(metrics)
+    reference_video = source_path if source_path is not None else Path(experiment_dir) / "missing_source.mp4"
+    predicted_video = decoded_path if decoded_path is not None else Path(experiment_dir) / "missing_decoded.mp4"
 
     # Only include metrics computed by evaluation; omit copies of run_summary fields
     transport_savings_percent: float | None = None
@@ -203,5 +422,28 @@ def evaluate_run_summary(summary: dict[str, Any], experiment_dir: str | Path, ma
         "transport_savings_percent": transport_savings_percent,
     }
 
-    evaluation.update(psnr)
+    if "psnr" in normalized_metrics:
+        evaluation.update(
+            _compute_psnr(
+                reference_video=reference_video,
+                predicted_video=predicted_video,
+                max_frames=max_frames,
+            )
+        )
+    if "ssim" in normalized_metrics:
+        evaluation.update(
+            _compute_ssim_ffmpeg(
+                reference_video=reference_video,
+                predicted_video=predicted_video,
+                max_frames=max_frames,
+            )
+        )
+    if "vmaf" in normalized_metrics:
+        evaluation.update(
+            _compute_vmaf_ffmpeg(
+                reference_video=reference_video,
+                predicted_video=predicted_video,
+                max_frames=max_frames,
+            )
+        )
     return evaluation

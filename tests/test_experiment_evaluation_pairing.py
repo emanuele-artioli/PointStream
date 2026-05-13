@@ -5,6 +5,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
+import src.experiment_evaluation as eval_module
 from src.experiment_evaluation import _compute_psnr
 
 
@@ -111,3 +112,44 @@ def test_timestamp_nearest_fallback_matching(monkeypatch, tmp_path: Path) -> Non
     res = _compute_psnr(reference_video=ref_file, predicted_video=pred_file, max_frames=None)
     # Should have 3 pairs (one per reference frame)
     assert res["psnr_num_frames"] == 3
+
+
+def test_evaluate_run_summary_dispatches_requested_metrics(monkeypatch, tmp_path: Path) -> None:
+    summary = {
+        "source_uri": str(tmp_path / "source.mp4"),
+        "decoded_uri": str(tmp_path / "decoded.mp4"),
+        "source_size_bytes": 10,
+        "transport_total_size_bytes": 4,
+    }
+    (tmp_path / "source.mp4").write_bytes(b"source")
+    (tmp_path / "decoded.mp4").write_bytes(b"decoded")
+
+    calls: list[str] = []
+
+    def _fake_psnr(**kwargs):
+        calls.append("psnr")
+        return {"psnr_mean": 30.0, "psnr_std": 0.0, "psnr_num_frames": 1, "note": None}
+
+    def _fake_ssim(**kwargs):
+        calls.append("ssim")
+        return {"ssim_mean": 0.9, "ssim_std": 0.0, "ssim_num_frames": 1, "note": None}
+
+    def _fake_vmaf(**kwargs):
+        calls.append("vmaf")
+        return {"vmaf_mean": 95.0, "vmaf_num_frames": 1, "note": None}
+
+    monkeypatch.setattr(eval_module, "_compute_psnr", _fake_psnr)
+    monkeypatch.setattr(eval_module, "_compute_ssim_ffmpeg", _fake_ssim)
+    monkeypatch.setattr(eval_module, "_compute_vmaf_ffmpeg", _fake_vmaf)
+
+    result = eval_module.evaluate_run_summary(
+        summary=summary,
+        experiment_dir=tmp_path,
+        max_frames=2,
+        metrics=["psnr", "ssim", "vmaf"],
+    )
+
+    assert calls == ["psnr", "ssim", "vmaf"]
+    assert result["psnr_mean"] == 30.0
+    assert result["ssim_mean"] == 0.9
+    assert result["vmaf_mean"] == 95.0

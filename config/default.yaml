@@ -87,7 +87,7 @@ postgen-segmenter-model: null        # Explicit model file for postgen segmenter
 # ============================================================================
 # Evaluation Settings
 # ============================================================================
-evaluation-mode: psnr                 # Post-run evaluation: none or psnr
+evaluation-mode: [psnr, ssim, vmaf]              # Post-run evaluation metrics: none, [psnr], [psnr, ssim, vmaf]
 skip-eval: false                      # Force-disable post-run evaluation
 evaluation-max-frames: null           # Optional frame cap for quality evaluation
 

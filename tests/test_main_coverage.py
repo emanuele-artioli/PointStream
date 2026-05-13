@@ -308,15 +308,25 @@ def test_run_cli_can_evaluate_after_run(monkeypatch, tmp_path: Path) -> None:
             str(source_video),
             "--evaluation-mode",
             "psnr",
+            "ssim",
+            "vmaf",
         ]
     )
 
     assert exit_code == 0
     assert captured["evaluation_args"]["experiment_dir"] == output_dir
+    assert captured["evaluation_args"]["metrics"] == ["psnr", "ssim", "vmaf"]
     summary_file = output_dir / "run_summary.json"
     assert summary_file.exists()
     summary = json.loads(summary_file.read_text(encoding="utf-8"))
     assert summary["evaluation"]["psnr_mean"] == 42.0
+
+
+def test_parse_evaluation_mode_supports_lists_and_none() -> None:
+    assert main_module._parse_evaluation_mode("none") == []
+    assert main_module._parse_evaluation_mode("psnr") == ["psnr"]
+    assert main_module._parse_evaluation_mode(["psnr", "ssim", "vmaf"]) == ["psnr", "ssim", "vmaf"]
+    assert main_module._parse_evaluation_mode("psnr,ssim,vmaf") == ["psnr", "ssim", "vmaf"]
 
 
 def test_run_cli_skip_eval_overrides_evaluation_mode(monkeypatch, tmp_path: Path) -> None:

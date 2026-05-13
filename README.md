@@ -32,7 +32,7 @@ The client uses the sparse semantic data to hallucinate the video back into exis
 
 Pointstream expects system-level FFmpeg tools to be available before running tests or pipeline commands:
 
-* ffmpeg  
+* ffmpeg with `libvmaf` enabled for VMAF evaluation
 * ffprobe
 
 On Ubuntu/Debian:  
@@ -134,7 +134,7 @@ metadata.msgpack: intentionally stores panorama\_uri and omits raw panorama\_ima
 * \--segmenter yolo26|yoloe|sam3|sam|none  
 * \--ball-extractor difference|mock|segmentation|cascade  
 * \--gpu-dtype fp16|fp32|bf16|fp8\_e4m3fn|fp8\_e5m2
-* \--evaluation-mode none|psnr and optional \--skip-eval
+* \--evaluation-mode none|psnr|ssim|vmaf or a list such as `psnr ssim vmaf`, and optional \--skip-eval
 * \--debug or \--no-debug
 * \--genai-keyframe-only: run GenAI only on received keyframes and interpolate missing frames locally  
 * \--residual-background-downscale N|None: downscale only background residual regions in full-video mode (default: 2; use None to disable)
