@@ -193,9 +193,6 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
                 seed=int(seed),
                 device=str(device),
             )
-        except (FileNotFoundError, RuntimeError) as exc:
-            _LOGGER.warning("AnimateAnyone runtime unavailable (%s). Using reference crop fallback.", exc)
-            generated_bgr = reference_np
 
         generated_bgr = np.asarray(generated_bgr, dtype=np.uint8)
         if generated_bgr.ndim != 3 or generated_bgr.shape[2] != 3:
@@ -231,9 +228,6 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
                 seed=int(seed),
                 device=str(device),
             )
-        except (FileNotFoundError, RuntimeError) as exc:
-            _LOGGER.warning("AnimateAnyone sequence runtime unavailable (%s). Using reference crop fallback.", exc)
-            generated_bgr = np.repeat(reference_np[None, ...], repeats=pose_np.shape[0], axis=0)
 
         generated_bgr = np.asarray(generated_bgr, dtype=np.uint8)
         if generated_bgr.ndim != 4 or generated_bgr.shape[-1] != 3:

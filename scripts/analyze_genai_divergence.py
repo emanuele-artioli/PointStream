@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Detailed frame-by-frame comparison of encoder vs decoder GenAI outputs."""
 
+import os
 import sys
 from pathlib import Path
 import json
@@ -130,7 +131,7 @@ def compute_frame_pair_diff(debug_dir, stage1="encoder", stage2="decoder"):
                     report_lines.append(f"  Warped background match: {details['inputs_match']['warped_background']}")
                     report_lines.append("")
     
-    report_lines.append("\nStatistics:")
+    report_lines.append(f"\nStatistics:")
     report_lines.append(f"  Matched pairs: {matched_pairs}")
     report_lines.append(f"  Divergent pairs (mean_diff > 0.5): {divergence_pairs}")
     if matched_pairs > 0:
@@ -185,7 +186,7 @@ def main():
     # Analyze divergence patterns
     if frame_diffs:
         mean_diffs = [d["mean_diff"] for d in frame_diffs]
-        print("\nDifference distribution:")
+        print(f"\nDifference distribution:")
         print(f"  Min: {min(mean_diffs):.3f}")
         print(f"  Max: {max(mean_diffs):.3f}")
         print(f"  Mean: {np.mean(mean_diffs):.3f}")

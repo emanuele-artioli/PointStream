@@ -5,7 +5,6 @@ from datetime import datetime
 import logging
 import os
 from pathlib import Path
-from typing import Any, cast
 
 import cv2
 import numpy as np
@@ -78,7 +77,6 @@ class DecoderRenderer:
             height=int(chunk.height),
         )
         frames_bgr = [np.asarray(frame.permute(1, 2, 0).cpu().numpy(), dtype=np.uint8) for frame in frame_tensor]
-        self._overlay_ball_states(frames_bgr=frames_bgr, payload=payload)
         target_path = Path(output_path) if output_path is not None else self._output_root / chunk.chunk_id
         if target_path.suffix:
             frame_output_dir = target_path.with_suffix("")
@@ -93,8 +91,7 @@ class DecoderRenderer:
             cv2.imwrite(str(frame_path), frame_bgr)
 
         debug_enabled = os.environ.get("POINTSTREAM_DISABLE_DEBUG_ARTIFACTS", "1").strip().lower() in {"0", "false", "no", "off"}
-        write_video = debug_enabled or bool(target_path.suffix)
-        if write_video:
+        if debug_enabled:
             encode_video_frames_ffmpeg(
                 output_path=debug_video_path,
                 frames_bgr=frames_bgr,
@@ -112,45 +109,11 @@ class DecoderRenderer:
         # return the frame directory path.
         return DecodedChunkResult(
             chunk_id=chunk.chunk_id,
-            output_uri=str(debug_video_path) if write_video else str(frame_output_dir),
+            output_uri=str(debug_video_path) if debug_enabled and debug_video_path.exists() else str(frame_output_dir),
             num_frames=chunk.num_frames,
             width=chunk.width,
             height=chunk.height,
         )
-
-    def _overlay_ball_states(self, frames_bgr: list[np.ndarray], payload: EncodedChunkPayload) -> None:
-        if not payload.ball.states:
-            return
-        frame_width = int(payload.chunk.width)
-        frame_height = int(payload.chunk.height)
-        start_frame = int(payload.chunk.start_frame_id)
-
-        for state in payload.ball.states:
-            if not state.is_visible:
-                continue
-            local_idx = int(state.frame_id) - start_frame
-            if local_idx < 0 or local_idx >= len(frames_bgr):
-                continue
-            px, py = self._ball_state_to_pixel(
-                x=float(state.ball_x),
-                y=float(state.ball_y),
-                width=frame_width,
-                height=frame_height,
-            )
-            frame = np.ascontiguousarray(frames_bgr[local_idx])
-            cv2.circle(frame, (px, py), 3, (90, 235, 250), thickness=-1, lineType=cv2.LINE_AA)
-            frames_bgr[local_idx] = frame
-
-    def _ball_state_to_pixel(self, x: float, y: float, width: int, height: int) -> tuple[int, int]:
-        if 0.0 <= x <= 1.2 and 0.0 <= y <= 1.2:
-            px = int(round(x * float(width - 1)))
-            py = int(round(y * float(height - 1)))
-        else:
-            px = int(round(x))
-            py = int(round(y))
-        px = int(np.clip(px, 0, max(0, width - 1)))
-        py = int(np.clip(py, 0, max(0, height - 1)))
-        return px, py
 
     def _build_actor_state(self, payload: EncodedChunkPayload) -> dict[int, _ClientActorState]:
         decoded_references = self._decode_reference_crops(payload)
@@ -383,7 +346,7 @@ class DecoderRenderer:
         )
         if use_temporal_window and hasattr(self._genai_compositor, "process_sequence"):
             selected_frames = torch.stack([frame_tensor[idx] for idx in selected_indices], dim=0)
-            genai_frames = selected_frames.clone()
+            out_frames = selected_frames.clone()
             for actor_state in self._actor_state.values():
                 pose_count = int(actor_state.dense_pose_tensor.shape[0])
                 selected_positions = [pos for pos, idx in enumerate(selected_indices) if idx < pose_count]
@@ -401,7 +364,7 @@ class DecoderRenderer:
                     metadata_masks.append(None if metadata_entry is None else metadata_entry.mask_gray)
                     metadata_bboxes.append(None if metadata_entry is None else metadata_entry.bbox)
                     pose_sequence.append(actor_state.dense_pose_tensor[frame_idx])
-                    background_sequence.append(genai_frames[pos])
+                    background_sequence.append(out_frames[pos])
 
                 processed = self._genai_compositor.process_sequence(
                     reference_crop_tensor=actor_state.reference_crop_tensor,
@@ -413,12 +376,12 @@ class DecoderRenderer:
                 ).to(frame_tensor.device)
 
                 for offset, pos in enumerate(selected_positions):
-                    genai_frames[pos] = processed[offset]
+                    out_frames[pos] = processed[offset]
 
             generated_indices = list(selected_indices)
             generated_deltas = [
-                genai_frames[idx].to(dtype=torch.float32) - selected_frames[idx].to(dtype=torch.float32)
-                for idx in range(genai_frames.shape[0])
+                out_frames[idx].to(dtype=torch.float32) - selected_frames[idx].to(dtype=torch.float32)
+                for idx in range(out_frames.shape[0])
             ]
         else:
             for frame_idx in selected_indices:
@@ -468,16 +431,16 @@ class DecoderRenderer:
                 generated_indices.append(int(frame_idx))
                 generated_deltas.append(composited.to(dtype=torch.float32) - bg_frame.to(dtype=torch.float32))
 
-        result_frames: list[torch.Tensor] = []
+        out_frames: list[torch.Tensor] = []
         anchor_idx = 0
         for frame_idx in range(frame_count):
             if frame_idx <= generated_indices[0]:
-                result_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[0]).clamp(0.0, 255.0).to(torch.uint8))
+                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[0]).clamp(0.0, 255.0).to(torch.uint8))
                 continue
             while anchor_idx + 1 < len(generated_indices) and frame_idx > generated_indices[anchor_idx + 1]:
                 anchor_idx += 1
             if anchor_idx + 1 >= len(generated_indices):
-                result_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[-1]).clamp(0.0, 255.0).to(torch.uint8))
+                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[-1]).clamp(0.0, 255.0).to(torch.uint8))
                 continue
 
             left_idx = generated_indices[anchor_idx]
@@ -485,13 +448,13 @@ class DecoderRenderer:
             left_delta = generated_deltas[anchor_idx]
             right_delta = generated_deltas[anchor_idx + 1]
             if right_idx <= left_idx:
-                result_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + left_delta).clamp(0.0, 255.0).to(torch.uint8))
+                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + left_delta).clamp(0.0, 255.0).to(torch.uint8))
                 continue
             alpha = float(frame_idx - left_idx) / float(right_idx - left_idx)
             blended_delta = torch.lerp(left_delta, right_delta, alpha)
-            result_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + blended_delta).clamp(0.0, 255.0).to(torch.uint8))
+            out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + blended_delta).clamp(0.0, 255.0).to(torch.uint8))
 
-        return torch.stack(result_frames, dim=0)
+        return torch.stack(out_frames, dim=0)
 
     def _render_genai_sequence(self, frame_tensor: torch.Tensor) -> torch.Tensor:
         frame_count = int(frame_tensor.shape[0])
@@ -514,8 +477,7 @@ class DecoderRenderer:
                 metadata_masks.append(None if metadata_entry is None else metadata_entry.mask_gray)
                 metadata_bboxes.append(None if metadata_entry is None else metadata_entry.bbox)
 
-            compositor = cast(Any, self._genai_compositor)
-            processed = compositor.process_sequence(
+            processed = self._genai_compositor.process_sequence(
                 reference_crop_tensor=actor_state.reference_crop_tensor,
                 dense_dwpose_tensor=actor_state.dense_pose_tensor[:valid_count],
                 warped_background_frames=out_frames[:valid_count],
@@ -555,7 +517,7 @@ class DecoderRenderer:
             value = int(raw)
         except ValueError:
             return default_window
-        return max(1, min(value, default_window))
+        return max(1, value)
 
     def _build_temporal_pose_condition(
         self,

@@ -121,10 +121,9 @@ def run_mock_pipeline(
         height=source_metadata.height,
     )
 
-    resolved_actor_extractor = actor_extractor or MockActorExtractor()
     encoder = EncoderPipeline(
         execution_pool=execution_pool,
-        actor_extractor=resolved_actor_extractor,
+        actor_extractor=actor_extractor,
         ball_extractor=ball_extractor,
         reference_extractor=reference_extractor,
         residual_calculator=residual_calculator,
@@ -293,13 +292,11 @@ def _build_actor_extractor(
     normalized_mask_mode = compositing_mask_mode.strip().lower()
     include_mask_metadata = normalized_mask_mode == "metadata-source-mask"
 
-    normalized_pose = str(pose_estimator).strip().lower()
-    normalized_segmenter = str(segmenter).strip().lower()
     uses_default = (
         detector == "yolo26"
         and detector_caption.strip().lower() == "tennis player"
-        and normalized_pose in {"yolo", "yolo26", "yolo26n"}
-        and normalized_segmenter in {"yolo", "yolo26", "yolo26n"}
+        and pose_estimator == "yolo"
+        and segmenter == "yolo"
         and segmenter_caption.strip().lower() == "tennis player"
         and float(pose_delta_threshold) == 20.0
         and not include_mask_metadata
