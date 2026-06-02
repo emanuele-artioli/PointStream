@@ -214,11 +214,12 @@ class ResidualCalculator:
         frame_states: list[FrameState],
         debug_output_path: str | Path | None,
     ) -> ResidualPacket:
-        compositor = self._synthesis_engine.get_genai_compositor()
-        if hasattr(compositor, "set_debug_stage"):
-            compositor.set_debug_stage("encoder")
-        if hasattr(compositor, "clear_history"):
-            compositor.clear_history()
+        if self._is_genai_enabled():
+            compositor = self._synthesis_engine.get_genai_compositor()
+            if hasattr(compositor, "set_debug_stage"):
+                compositor.set_debug_stage("encoder")
+            if hasattr(compositor, "clear_history"):
+                compositor.clear_history()
 
         base_frames = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False).frames_bgr
         predicted_frames = base_frames
@@ -359,7 +360,7 @@ class ResidualCalculator:
             chunk_id=chunk.chunk_id,
             codec=residual_codec,
             residual_video_uri=str(output_path),
-            mode=ResidualMode.PLAYERS_ONLY,
+            mode=self._residual_mode,
         )
 
     def _apply_block_activity_gate(
