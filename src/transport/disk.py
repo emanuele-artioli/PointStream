@@ -20,12 +20,14 @@ _logger = logging.getLogger(__name__)
 class DiskTransport(BaseTransport):
     def __init__(
         self,
+        config: Any = None,
         root_dir: str | Path = ".pointstream",
         panorama_encoder: str | BasePanoramaEncoder | None = None,
     ) -> None:
+        self.config = config
         self._root_dir = Path(root_dir)
         self._root_dir.mkdir(parents=True, exist_ok=True)
-        self._panorama_encoder = build_panorama_encoder(panorama_encoder)
+        self._panorama_encoder = build_panorama_encoder(panorama_encoder, config=self.config)
 
     def _chunk_dir(self, chunk_id: str) -> Path:
         return self._root_dir / f"chunk_{chunk_id}"

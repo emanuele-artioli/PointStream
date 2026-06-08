@@ -159,7 +159,9 @@ class ResidualCalculator:
 
     def __init__(
         self,
+        config: Any,
         synthesis_engine: SynthesisEngine | None = None,
+        seed: int = 1337,
         importance_mapper: BaseImportanceMapper | None = None,
         device: str | torch.device | None = None,
         residual_mode: ResidualMode = ResidualMode.FULL_VIDEO,
@@ -169,26 +171,29 @@ class ResidualCalculator:
         residual_block_size: int = 8,
         block_information_threshold: float = 0.0,
     ) -> None:
-        self._synthesis_engine = synthesis_engine or SynthesisEngine()
+        self.config = config
+        self._synthesis_engine = synthesis_engine or SynthesisEngine(config=self.config)
+        self._seed = seed
         if device is None:
             self._device = torch.device(self._synthesis_engine.device)
         else:
             self._device = torch.device(device)
         if self._device.type == "cuda" and not is_cuda_device_usable(self._device):
             self._device = torch.device("cpu")
-        self._importance_mapper = importance_mapper or BinaryActorImportanceMapper()
-        self._residual_mode = residual_mode
-        if background_block_downscale_factor is None:
-            self._background_block_downscale_factor = None
+        if importance_mapper is not None:
+            self._importance_mapper = importance_mapper
         else:
-            factor = int(background_block_downscale_factor)
-            self._background_block_downscale_factor = factor if factor >= 2 else None
-        self._residual_batch_size = max(1, int(residual_batch_size))
-        self._downscale_interpolation = str(downscale_interpolation).strip().lower()
-        if self._downscale_interpolation not in {"nearest", "bilinear", "bicubic", "area"}:
-            raise ValueError(f"Unsupported downscale interpolation: {self._downscale_interpolation}")
-        self._residual_block_size = max(1, int(residual_block_size))
-        self._block_information_threshold = max(0.0, float(block_information_threshold))
+            strategy = getattr(self.config, "importance_mapper", "uniform").strip().lower()
+            if strategy == "uniform":
+                self._importance_mapper = UniformImportanceMapper()
+            else:
+                self._importance_mapper = BinaryActorImportanceMapper()
+        self._residual_mode = residual_mode
+        self._background_block_downscale_factor = background_block_downscale_factor
+        self._residual_batch_size = residual_batch_size
+        self._downscale_interpolation = downscale_interpolation
+        self._residual_block_size = residual_block_size
+        self._block_information_threshold = block_information_threshold
 
     @gpu_bound
     def process(
@@ -305,9 +310,6 @@ class ResidualCalculator:
                 actor_masks = torch.stack(batch_actor_masks, dim=0)
 
                 if self._is_genai_enabled():
-                    # If GenAI is enabled, expand the mask to include areas where GenAI made a prediction.
-                    # This is crucial for KEYFRAME_ONLY mode where interpolation creates ghosts outside GT regions.
-                    # We compare predicted_frames with the base warped background.
                     base_frames_batch = base_frames[frame_idx:batch_end].to(self._device, dtype=torch.float32)
                     predicted_actor_mask = (predicted - base_frames_batch).abs().max(dim=1)[0] > 10.0
                     actor_masks = torch.logical_or(actor_masks > 0.5, predicted_actor_mask).to(torch.float32)
@@ -340,10 +342,10 @@ class ResidualCalculator:
 
                 frame_idx = batch_end
 
-        residual_codec = os.environ.get("POINTSTREAM_FFMPEG_CODEC", "libsvtav1")
-        residual_crf = int(os.environ.get("POINTSTREAM_CODEC_CRF_RESIDUAL", os.environ.get("POINTSTREAM_CODEC_CRF", "28")))
-        residual_preset = os.environ.get("POINTSTREAM_CODEC_PRESET_RESIDUAL", os.environ.get("POINTSTREAM_CODEC_PRESET", "medium"))
-        residual_pix_fmt = os.environ.get("POINTSTREAM_RESIDUAL_PIX_FMT", "yuv444p")
+        residual_codec = self.config.ffmpeg_codec
+        residual_crf = self.config.codec_crf or 28
+        residual_preset = self.config.codec_preset or "medium"
+        residual_pix_fmt = "yuv444p"
         encode_video_frames_ffmpeg(
             output_path=output_path,
             frames_bgr=_iter_encoded_frames(),
@@ -492,10 +494,10 @@ class ResidualCalculator:
         return isinstance(self._importance_mapper, UniformImportanceMapper)
 
     def _is_genai_enabled(self) -> bool:
-        return os.environ.get("POINTSTREAM_ENABLE_GENAI", "0").strip() == "1"
+        return bool(self.config.genai_backend)
 
     def _resolve_temporal_window(self, default_window: int) -> int:
-        raw = os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW")
+        raw = getattr(self.config, "animate_anyone_window", None)
         if raw is None:
             return default_window
         raw = raw.strip().lower()
@@ -519,8 +521,9 @@ class ResidualCalculator:
         compositor = self._synthesis_engine.get_genai_compositor()
         if self._is_genai_enabled() and not isinstance(compositor, DiffusersCompositor):
             self._synthesis_engine = SynthesisEngine(
-                seed=int(getattr(self._synthesis_engine, "seed", 1337)),
+                seed=self._seed,
                 device=self._device,
+                config=self.config,
             )
             compositor = self._synthesis_engine.get_genai_compositor()
         if not hasattr(compositor, "process"):
@@ -528,9 +531,7 @@ class ResidualCalculator:
 
         if (
             self._is_genai_enabled()
-            and hasattr(compositor, "uses_temporal_pose_sequence")
-            and compositor.uses_temporal_pose_sequence()
-            and os.environ.get("POINTSTREAM_GENAI_KEYFRAME_ONLY", "0").strip().lower() in {"1", "true", "yes", "on"}
+            and self.config.genai_keyframe_only
         ):
             return self._render_server_genai_keyframe_only(
                 payload=payload,
@@ -553,7 +554,7 @@ class ResidualCalculator:
             )
 
         use_temporal_window = bool(hasattr(compositor, "uses_temporal_pose_sequence") and compositor.uses_temporal_pose_sequence())
-        preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
+        preroll_frames = max(0, self.config.genai_preroll_frames)
 
         out_frames: list[torch.Tensor] = []
         frame_count = int(frame_tensor.shape[0])
@@ -588,6 +589,7 @@ class ResidualCalculator:
                     reference_crop_tensor=state.reference_crop_tensor,
                     dense_pose_tensor=pose_condition,
                     warped_bg_tensor=composited,
+                    debug_dir=debug_output_path,
                 )
 
                 composited = compositor.process(
@@ -605,6 +607,7 @@ class ResidualCalculator:
                     actor_id=scene_track_id_to_int(state.object_id),
                     composited_frame_tensor=composited,
                     bbox=metadata_bbox,
+                    debug_dir=debug_output_path,
                 )
 
             out_frames.append(composited)
@@ -654,7 +657,7 @@ class ResidualCalculator:
                 )
 
         use_temporal_window = bool(hasattr(compositor, "uses_temporal_pose_sequence") and compositor.uses_temporal_pose_sequence())
-        preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
+        preroll_frames = max(0, self.config.genai_preroll_frames)
         chunk_start = int(payload.chunk.start_frame_id)
 
         generated_deltas: list[torch.Tensor] = []
@@ -920,7 +923,7 @@ class ResidualCalculator:
         return sequence
 
     def _default_residual_path(self, chunk: VideoChunk) -> Path:
-        runtime_output_dir = os.environ.get("POINTSTREAM_RUNTIME_OUTPUT_DIR")
+        runtime_output_dir = getattr(self.config, "runtime_output_dir", None)
         if runtime_output_dir:
             base_dir = Path(runtime_output_dir).expanduser()
         else:

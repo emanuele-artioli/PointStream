@@ -7,13 +7,15 @@ from typing import Any
 
 import pytest
 
-from src.encoder.mock_extractors import ActorExtractor, MockActorExtractor
+from src.encoder.actor_pipeline import ActorExtractor
+from tests.mock_components import MockActorExtractor
 from src.encoder.orchestrator import EncoderPipeline
 from src.encoder.video_io import (
     encode_video_frames_ffmpeg,
     iter_video_frames_ffmpeg,
     probe_video_metadata,
 )
+from src.shared.config import PointstreamConfig
 
 
 def _create_test_run_artifacts_dir() -> Path:
@@ -80,7 +82,7 @@ def real_actor_extractor(yolo_model_bundle: dict[str, Any]) -> ActorExtractor:
 
 @pytest.fixture()
 def real_encoder_pipeline(real_actor_extractor: ActorExtractor):
-    pipeline = EncoderPipeline(actor_extractor=real_actor_extractor)
+    pipeline = EncoderPipeline(config=PointstreamConfig(), actor_extractor=real_actor_extractor)
     try:
         yield pipeline
     finally:
@@ -89,7 +91,7 @@ def real_encoder_pipeline(real_actor_extractor: ActorExtractor):
 
 @pytest.fixture()
 def mock_encoder_pipeline():
-    pipeline = EncoderPipeline(actor_extractor=MockActorExtractor())
+    pipeline = EncoderPipeline(config=PointstreamConfig(), actor_extractor=MockActorExtractor())
     try:
         yield pipeline
     finally:

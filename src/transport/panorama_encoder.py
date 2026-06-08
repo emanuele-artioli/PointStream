@@ -30,16 +30,6 @@ def _ensure_bgr_uint8(image_bgr: np.ndarray) -> np.ndarray:
     return image
 
 
-def _parse_int_env(name: str, default: int) -> int:
-    value = os.environ.get(name)
-    if value is None:
-        return int(default)
-    try:
-        return int(value)
-    except ValueError as exc:
-        raise ValueError(f"Environment variable {name} must be an integer, got '{value}'") from exc
-
-
 class JpegPanoramaEncoder(BasePanoramaEncoder):
     name = "jpeg"
     extension = ".jpg"
@@ -80,20 +70,22 @@ class PngPanoramaEncoder(BasePanoramaEncoder):
         return output_path
 
 
-def build_panorama_encoder(panorama_encoder: str | BasePanoramaEncoder | None = None) -> BasePanoramaEncoder:
+from typing import Any
+
+def build_panorama_encoder(panorama_encoder: str | BasePanoramaEncoder | None = None, config: Any = None) -> BasePanoramaEncoder:
     if isinstance(panorama_encoder, BasePanoramaEncoder):
         return panorama_encoder
 
-    codec = panorama_encoder or os.environ.get("POINTSTREAM_PANORAMA_CODEC", "jpeg")
+    codec = panorama_encoder or (config.panorama_codec if config else "jpeg")
     normalized = str(codec).strip().lower()
 
     if normalized in {"jpeg", "jpg"}:
-        quality = _parse_int_env("POINTSTREAM_PANORAMA_JPEG_QUALITY", default=90)
-        return JpegPanoramaEncoder(quality=quality)
+        quality = config.panorama_jpeg_quality if config and config.panorama_jpeg_quality else 90
+        return JpegPanoramaEncoder(quality=int(quality))
 
     if normalized == "png":
-        compression = _parse_int_env("POINTSTREAM_PANORAMA_PNG_COMPRESSION", default=3)
-        return PngPanoramaEncoder(compression=compression)
+        compression = config.panorama_png_compression if config and config.panorama_png_compression is not None else 3
+        return PngPanoramaEncoder(compression=int(compression))
 
     raise ValueError(
         f"Unsupported panorama encoder '{codec}'. "

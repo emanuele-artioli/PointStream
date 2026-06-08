@@ -65,12 +65,12 @@ def _require_local_or_optin_weight(model_name: str) -> str:
     if local_path is not None:
         return str(local_path)
 
-    if os.environ.get("POINTSTREAM_ALLOW_AUTO_MODEL_DOWNLOAD", "0") == "1":
+    if getattr(config, "allow_auto_model_download", True):
         return model_name
 
     raise FileNotFoundError(
         f"Required model weights not found for '{model_name}'. "
-        "Place weights in assets/weights/ or set POINTSTREAM_ALLOW_AUTO_MODEL_DOWNLOAD=1."
+        "Place weights in assets/weights/ or set allow-auto-model-download: true in config."
     )
 
 
@@ -1154,8 +1154,7 @@ class PayloadEncoder:
         self._last_transmitted_pose_coords: dict[str, np.ndarray] = {}
         codec_raw = str(self.metadata_mask_codec).strip()
         if codec_raw == "auto":
-            codec_raw = os.environ.get("POINTSTREAM_METADATA_MASK_CODEC", codec_raw)
-
+            codec_raw = "poly-v1"
         codec_normalized = codec_raw.strip().lower().replace("_", "-")
         if codec_normalized in {"segmenter-native", "yolo-native"}:
             self.metadata_mask_codec = "segmenter-native"

@@ -11,10 +11,9 @@ from src.encoder.background_modeler import BackgroundModeler
 from src.encoder.ball_extractor import BallExtractor
 from src.encoder.dag import DAGNode, DAGOrchestrator
 from src.encoder.execution_pool import BaseExecutionPool
-from src.encoder.mock_extractors import (
+from src.encoder.actor_pipeline import (
     ActorExtractionResult,
     ActorExtractor,
-    ObjectTracker,
 )
 from src.encoder.reference_extractor import ReferenceExtractor
 from src.encoder.residual_calculator import ResidualCalculator
@@ -81,19 +80,20 @@ class _StreamingActorBundle:
 class EncoderPipeline:
     def __init__(
         self,
+        config: Any, # We use Any to avoid circular import or we can import PointstreamConfig
         execution_pool: BaseExecutionPool | None = None,
         actor_extractor: Any | None = None,
         ball_extractor: Any | None = None,
         reference_extractor: Any | None = None,
         residual_calculator: ResidualCalculator | None = None,
     ) -> None:
+        self.config = config
         self._dag = DAGOrchestrator(execution_pool=execution_pool)
-        self._background_modeler = BackgroundModeler()
-        self._actor_extractor = actor_extractor or ActorExtractor()
-        self._object_tracker = ObjectTracker()
+        self._background_modeler = BackgroundModeler(config=self.config)
+        self._actor_extractor = actor_extractor or ActorExtractor(config=self.config)
         self._ball_extractor = ball_extractor or BallExtractor()
         self._reference_extractor = reference_extractor or ReferenceExtractor()
-        self._residual_calculator = residual_calculator or ResidualCalculator(SynthesisEngine())
+        self._residual_calculator = residual_calculator or ResidualCalculator(config=self.config, synthesis_engine=SynthesisEngine(config=self.config))
         self._register_nodes()
         self._last_dag_profile: dict[str, float] = {}
 
@@ -191,7 +191,7 @@ class EncoderPipeline:
         self._dag.add_node(
             DAGNode(
                 name="rigid_objects",
-                func=self._make_chunk_node(self._object_tracker.process),
+                func=lambda context, deps: [],
                 dependencies=("chunk",),
             )
         )
@@ -257,7 +257,7 @@ class EncoderPipeline:
 
     @gpu_bound
     def _process_actor_bundle(self, chunk: VideoChunk) -> Any:
-        shifted_enabled = os.environ.get("POINTSTREAM_ENABLE_SHIFTED_BALL", "0").strip() == "1"
+        shifted_enabled = getattr(self.config, "enable_shifted_ball", False)
         supports_streaming = hasattr(self._actor_extractor, "process_with_states_streaming")
         supports_shifted_ball = hasattr(self._ball_extractor, "process_shifted")
 

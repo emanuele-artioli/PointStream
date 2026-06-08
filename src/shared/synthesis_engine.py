@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 import torch
 
-from src.decoder.genai_compositor import DiffusersCompositor, MockCompositor
+from src.decoder.genai_compositor import DiffusersCompositor
 from src.shared.dwpose_draw import draw_dwpose_canvas
 from src.shared.schemas import ActorPacket, EncodedChunkPayload
 from src.shared.tags import gpu_bound
@@ -35,7 +35,8 @@ class _BallRenderState:
 class SynthesisEngine:
     """Shared deterministic synthesis engine used symmetrically by encoder and decoder."""
 
-    def __init__(self, seed: int = 1337, device: str | torch.device | None = None) -> None:
+    def __init__(self, seed: int = 1337, device: str | torch.device | None = None, config: Any = None) -> None:
+        self.config = config
         self._configure_cuda_determinism_env()
         self.seed = int(seed)
         if device is None:
@@ -47,17 +48,20 @@ class SynthesisEngine:
         self._compute_dtype = resolve_torch_dtype_for_device(
             self.device,
             default_cuda=torch.float16,
+            config_dtype=self.config.gpu_dtype if self.config and hasattr(self.config, "gpu_dtype") else None,
         )
         self._set_global_seed(self.seed)
         self._genai_compositor = self._build_genai_compositor()
 
-    def _build_genai_compositor(self) -> MockCompositor | DiffusersCompositor:
-        enabled = os.environ.get("POINTSTREAM_ENABLE_GENAI", "0").strip() == "1"
-        if enabled:
-            return DiffusersCompositor(seed=self.seed, device=self.device)
-        return MockCompositor()
+    def _build_genai_compositor(self) -> DiffusersCompositor | None:
+        enabled = bool(self.config and self.config.genai_backend)
+        if not enabled:
+            return None
+        return DiffusersCompositor(seed=self.seed, device=self.device, config=self.config)
 
-    def get_genai_compositor(self) -> MockCompositor | DiffusersCompositor:
+    def get_genai_compositor(self) -> DiffusersCompositor:
+        if self._genai_compositor is None:
+            raise ValueError("GenAI backend must be enabled in config to use SynthesisEngine.")
         return self._genai_compositor
 
     def _configure_cuda_determinism_env(self) -> None:
@@ -158,7 +162,7 @@ class SynthesisEngine:
                 homographies = homographies[:frame_count]
 
             inverse_h = torch.linalg.inv(homographies).to(dtype=self._compute_dtype)
-            batch_size = max(1, int(os.environ.get("POINTSTREAM_PANORAMA_WARP_BATCH_SIZE", "4")))
+            batch_size = max(1, self.config.panorama_warp_batch_size if self.config and self.config.panorama_warp_batch_size else 4)
             warped_uint8 = torch.empty(
                 (frame_count, 3, output_height, output_width),
                 dtype=torch.uint8,

@@ -125,3 +125,6 @@ assets/*
 outputs/*
 old/*
 mobileclip_blt.ts
+TODO.md
+.agents/*
+TODO.md

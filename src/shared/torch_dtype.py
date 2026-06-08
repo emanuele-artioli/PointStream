@@ -35,8 +35,7 @@ def _dtype_name(dtype: torch.dtype) -> str:
     return text
 
 
-def parse_gpu_dtype_env(env_var: str = "POINTSTREAM_GPU_DTYPE") -> torch.dtype | None:
-    raw = os.environ.get(env_var)
+def parse_gpu_dtype(raw: str | None) -> torch.dtype | None:
     if raw is None:
         return None
 
@@ -51,7 +50,7 @@ def parse_gpu_dtype_env(env_var: str = "POINTSTREAM_GPU_DTYPE") -> torch.dtype |
 
     supported = ", ".join(sorted(set(aliases.keys())))
     warnings.warn(
-        f"Unsupported {env_var}='{raw}'. Supported values: {supported}. Falling back to defaults.",
+        f"Unsupported gpu_dtype='{raw}'. Supported values: {supported}. Falling back to defaults.",
         RuntimeWarning,
         stacklevel=2,
     )
@@ -80,13 +79,13 @@ def resolve_torch_dtype_for_device(
     *,
     default_cuda: torch.dtype = torch.float16,
     allowed_cuda: set[torch.dtype] | None = None,
-    env_var: str = "POINTSTREAM_GPU_DTYPE",
+    config_dtype: str | None = None,
 ) -> torch.dtype:
     resolved_device = torch.device(device)
     if resolved_device.type != "cuda":
         return torch.float32
 
-    requested = parse_gpu_dtype_env(env_var=env_var)
+    requested = parse_gpu_dtype(config_dtype)
     candidate = requested or default_cuda
 
     if allowed_cuda is not None and candidate not in allowed_cuda:

@@ -33,8 +33,8 @@ _PIPELINE_MODEL_ROOT: str | None = None
 _PIPELINE_LOCK = threading.Lock()
 
 
-def _resolve_window_from_env() -> int | None:
-    raw = os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW")
+def _resolve_window_from_env(config: Any = None) -> int | None:
+    raw = getattr(config, "animate_anyone_window", None)
     if raw is None:
         return None
     raw = raw.strip().lower()
@@ -47,18 +47,18 @@ def _resolve_window_from_env() -> int | None:
     return max(1, value)
 
 
-def _runtime_config() -> _RuntimeConfig:
+def _runtime_config(config: Any = None) -> _RuntimeConfig:
     return _RuntimeConfig(
-        width=int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WIDTH", "512")),
-        height=int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_HEIGHT", "512")),
-        inference_steps=int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_STEPS", "3")),
-        guidance_scale=float(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_CFG", "3.5")),
-        model_variant=os.environ.get("POINTSTREAM_ANIMATE_ANYONE_MODEL_VARIANT", "finetuned_tennis"),
+        width=int(getattr(config, "animate_anyone_width", "512")),
+        height=int(getattr(config, "animate_anyone_height", "512")),
+        inference_steps=int(getattr(config, "animate_anyone_steps", "3")),
+        guidance_scale=float(getattr(config, "animate_anyone_cfg", "3.5")),
+        model_variant=getattr(config, "animate_anyone_model_variant", "finetuned_tennis"),
     )
 
 
-def _resolve_repo_root(repo_dir: str | None) -> Path | None:
-    configured = repo_dir or os.environ.get("POINTSTREAM_ANIMATE_ANYONE_REPO_DIR")
+def _resolve_repo_root(repo_dir: str | None, config: Any = None) -> Path | None:
+    configured = repo_dir or getattr(config, "animate_anyone_repo_dir", None)
     if configured is None:
         return None
 
@@ -71,8 +71,8 @@ def _resolve_repo_root(repo_dir: str | None) -> Path | None:
     return repo_root
 
 
-def _resolve_model_root(repo_root: Path | None, runtime: _RuntimeConfig) -> Path:
-    explicit_model_dir = os.environ.get("POINTSTREAM_ANIMATE_ANYONE_MODEL_DIR")
+def _resolve_model_root(repo_root: Path | None, runtime: _RuntimeConfig, config: Any = None) -> Path:
+    explicit_model_dir = config.animate_anyone_model_dir if config else None
     if explicit_model_dir:
         model_root = Path(explicit_model_dir).expanduser()
         if not model_root.is_absolute():
@@ -107,7 +107,7 @@ def _resolve_model_root(repo_root: Path | None, runtime: _RuntimeConfig) -> Path
             existing = [root.resolve() for root in canonical_roots if root.exists()]
             if not existing:
                 raise FileNotFoundError(
-                    "AnimateAnyone model directory was not found. Set POINTSTREAM_ANIMATE_ANYONE_MODEL_DIR, "
+                    "AnimateAnyone model directory was not found. Set animate-anyone-model-dir in config, "
                     "or place models under assets/animate-anyone/profiles/<variant> "
                     "(or ~/Models/AnimateAnyone/profiles/<variant>)."
                 )
@@ -133,7 +133,7 @@ def _resolve_model_root(repo_root: Path | None, runtime: _RuntimeConfig) -> Path
     return model_root
 
 
-def _load_pipeline(repo_root: Path | None, model_root: Path, device: str) -> Any:
+def _load_pipeline(repo_root: Path | None, model_root: Path, device: str, config: Any = None) -> Any:
     global _PIPELINE, _PIPELINE_DEVICE, _PIPELINE_DTYPE, _PIPELINE_REPO_ROOT, _PIPELINE_MODEL_ROOT
 
     with _PIPELINE_LOCK:
@@ -141,6 +141,7 @@ def _load_pipeline(repo_root: Path | None, model_root: Path, device: str) -> Any
             torch.device(device),
             default_cuda=torch.float16,
             allowed_cuda={torch.float16, torch.bfloat16, torch.float32},
+            config_dtype=config.gpu_dtype if config and hasattr(config, "gpu_dtype") else None,
         )
         if (
             _PIPELINE is not None
@@ -213,9 +214,9 @@ def _load_pipeline(repo_root: Path | None, model_root: Path, device: str) -> Any
         sched_kwargs = cast(dict[str, Any], sched_container)
         scheduler = DDIMScheduler(**sched_kwargs)
 
-        denoising_unet.load_state_dict(torch.load(denoising_unet_path, map_location="cpu"), strict=False)
-        reference_unet.load_state_dict(torch.load(reference_unet_path, map_location="cpu"), strict=False)
-        pose_guider.load_state_dict(torch.load(pose_guider_path, map_location="cpu"), strict=False)
+        denoising_unet.load_state_dict(torch.load(denoising_unet_path, map_location="cpu", weights_only=True), strict=False)
+        reference_unet.load_state_dict(torch.load(reference_unet_path, map_location="cpu", weights_only=True), strict=False)
+        pose_guider.load_state_dict(torch.load(pose_guider_path, map_location="cpu", weights_only=True), strict=False)
 
         pipe = Pose2VideoPipeline(
             vae=vae,
@@ -357,6 +358,7 @@ def generate_sequence(
     device: str = "cuda",
     repo_dir: str | None = None,
     max_window: int | None = None,
+    config: Any = None,
 ) -> np.ndarray:
     """Generate an actor clip via Moore-AnimateAnyone.
 
@@ -370,14 +372,14 @@ def generate_sequence(
     except ModuleNotFoundError as exc:
         raise RuntimeError("Pillow is required for AnimateAnyone backend") from exc
 
-    runtime = _runtime_config()
-    repo_root = _resolve_repo_root(repo_dir=repo_dir)
-    model_root = _resolve_model_root(repo_root=repo_root, runtime=runtime)
+    runtime = _runtime_config(config=config)
+    repo_root = _resolve_repo_root(repo_dir=repo_dir, config=config)
+    model_root = _resolve_model_root(repo_root=repo_root, runtime=runtime, config=config)
 
     resolved_device = "cpu"
     if str(device).startswith("cuda") and torch.cuda.is_available() and is_cuda_device_usable(torch.device("cuda")):
         resolved_device = "cuda"
-    pipe = _load_pipeline(repo_root=repo_root, model_root=model_root, device=resolved_device)
+    pipe = _load_pipeline(repo_root=repo_root, model_root=model_root, device=resolved_device, config=config)
 
     width = int(runtime.width)
     height = int(runtime.height)
@@ -395,7 +397,7 @@ def generate_sequence(
     if not pose_pil_sequence:
         pose_pil_sequence = [Image.fromarray(np.zeros((height, width, 3), dtype=np.uint8))]
 
-    window = max_window if max_window is not None else _resolve_window_from_env()
+    window = max_window if max_window is not None else _resolve_window_from_env(config=config)
     frame_count = len(pose_pil_sequence)
     if window is None or window >= frame_count:
         windows = [(0, frame_count)]
@@ -434,6 +436,7 @@ def generate_frame(
     seed: int,
     device: str = "cuda",
     repo_dir: str | None = None,
+    config: Any = None,
 ) -> np.ndarray:
     """Generate one actor frame via Moore-AnimateAnyone from PointStream-owned runtime glue."""
     sequence = generate_sequence(
@@ -442,5 +445,6 @@ def generate_frame(
         seed=seed,
         device=device,
         repo_dir=repo_dir,
+        config=config,
     )
     return sequence[-1]

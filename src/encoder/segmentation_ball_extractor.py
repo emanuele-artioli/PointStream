@@ -71,7 +71,7 @@ class SegmentationBallExtractor:
         self._model = YOLO(weight_ref)
         self._conf = float(confidence)
         self._device = device
-        self._class_id = int(os.environ.get("POINTSTREAM_BALL_CLASS_ID", "32"))
+        self._class_id = getattr(config, "ball_class_id", 32)
 
     @gpu_bound
     def process(self, chunk: VideoChunk, panorama: PanoramaPacket, frame_states: list[FrameState]) -> BallPacket:

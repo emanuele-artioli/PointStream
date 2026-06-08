@@ -40,7 +40,16 @@ class _DecodedActorMaskFrame:
 
 
 class DecoderRenderer:
-    def __init__(self, output_root: str | Path | None = None, deterministic_seed: int = 1337) -> None:
+    def __init__(
+        self,
+        config: Any = None,
+        synthesis_engine: SynthesisEngine | None = None,
+        device: str | torch.device | None = None,
+        seed: int = 1337,
+        output_root: str | Path | None = None,
+    ) -> None:
+        self.config = config
+        self._synthesis_engine = synthesis_engine or SynthesisEngine(config=self.config, seed=seed)
         project_root = Path(__file__).resolve().parents[2]
         if output_root is None:
             timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_%f")
@@ -48,9 +57,11 @@ class DecoderRenderer:
         else:
             self._output_root = Path(output_root)
         self._output_root.mkdir(parents=True, exist_ok=True)
-        self._synthesis_engine = SynthesisEngine(seed=deterministic_seed)
         self._compositor = ResidualCompositor(device=self._synthesis_engine.device)
-        self._genai_compositor = self._synthesis_engine.get_genai_compositor()
+        try:
+            self._genai_compositor = self._synthesis_engine.get_genai_compositor()
+        except ValueError:
+            self._genai_compositor = None
         if hasattr(self._genai_compositor, "set_debug_stage"):
             self._genai_compositor.set_debug_stage("decoder")
         self._actor_state: dict[int, _ClientActorState] = {}
@@ -90,7 +101,7 @@ class DecoderRenderer:
             frame_path = frame_output_dir / f"frame_{frame_idx:06d}.png"
             cv2.imwrite(str(frame_path), frame_bgr)
 
-        debug_enabled = os.environ.get("POINTSTREAM_DISABLE_DEBUG_ARTIFACTS", "1").strip().lower() in {"0", "false", "no", "off"}
+        debug_enabled = not self.config.disable_debug_artifacts if self.config else True
         if debug_enabled:
             encode_video_frames_ffmpeg(
                 output_path=debug_video_path,
@@ -98,10 +109,10 @@ class DecoderRenderer:
                 fps=float(chunk.fps),
                 width=int(chunk.width),
                 height=int(chunk.height),
-                codec=os.environ.get("POINTSTREAM_FFMPEG_CODEC", "libsvtav1"),
+                codec=self.config.ffmpeg_codec if self.config else "libsvtav1",
                 pix_fmt="yuv420p",
-                crf=int(os.environ.get("POINTSTREAM_CODEC_CRF", "18")),
-                preset=os.environ.get("POINTSTREAM_CODEC_PRESET", "veryfast"),
+                crf=self.config.codec_crf if self.config and self.config.codec_crf else 18,
+                preset=self.config.codec_preset if self.config and self.config.codec_preset else "veryfast",
             )
 
         # If a debug video was produced (target_path had a suffix and debug is enabled),
@@ -205,10 +216,10 @@ class DecoderRenderer:
         return decoded
 
     def _render_genai_baseline(self, frame_tensor: torch.Tensor) -> torch.Tensor:
-        if not self._actor_state:
+        if not self._actor_state or self._genai_compositor is None:
             return frame_tensor
 
-        keyframe_only = os.environ.get("POINTSTREAM_GENAI_KEYFRAME_ONLY", "0").strip().lower() in {"1", "true", "yes", "on"}
+        keyframe_only = bool(self.config.genai_keyframe_only) if self.config else False
         if keyframe_only:
             return self._render_genai_keyframe_only(frame_tensor=frame_tensor)
 
@@ -216,11 +227,12 @@ class DecoderRenderer:
             hasattr(self._genai_compositor, "uses_temporal_pose_sequence")
             and self._genai_compositor.uses_temporal_pose_sequence()
         )
-        preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
+        preroll_frames = max(0, self.config.genai_preroll_frames if self.config and self.config.genai_preroll_frames else 1)
 
         if use_temporal_window and hasattr(self._genai_compositor, "process_sequence"):
             return self._render_genai_sequence(frame_tensor=frame_tensor)
 
+        output_path = self.config.debug_artifact_dir if self.config else None
         out_frames: list[torch.Tensor] = []
         frame_count = int(frame_tensor.shape[0])
         for frame_idx in range(frame_count):
@@ -253,6 +265,7 @@ class DecoderRenderer:
                     reference_crop_tensor=actor_state.reference_crop_tensor,
                     dense_pose_tensor=pose_condition,
                     warped_bg_tensor=composited,
+                    debug_dir=output_path,
                 )
 
                 try:
@@ -271,6 +284,7 @@ class DecoderRenderer:
                         actor_id=actor_state.track_id,
                         composited_frame_tensor=composited,
                         bbox=metadata_bbox,
+                        debug_dir=output_path,
                     )
                 except TypeError:
                     try:
@@ -289,6 +303,7 @@ class DecoderRenderer:
                             actor_id=actor_state.track_id,
                             composited_frame_tensor=composited,
                             bbox=metadata_bbox,
+                            debug_dir=output_path,
                         )
                     except TypeError:
                         # Keep compatibility with older test doubles that don't accept metadata args.
@@ -305,6 +320,7 @@ class DecoderRenderer:
                             actor_id=actor_state.track_id,
                             composited_frame_tensor=composited,
                             bbox=metadata_bbox,
+                            debug_dir=output_path,
                         )
             out_frames.append(composited)
 
@@ -388,7 +404,7 @@ class DecoderRenderer:
                 bg_frame = frame_tensor[frame_idx]
                 composited = bg_frame
                 global_frame_id = int(self._chunk_start_frame_id) + int(frame_idx)
-                preroll_frames = max(0, int(os.environ.get("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")))
+                preroll_frames = max(0, self.config.genai_preroll_frames if self.config and self.config.genai_preroll_frames else 1)
 
                 for actor_state in self._actor_state.values():
                     if frame_idx >= int(actor_state.dense_pose_tensor.shape[0]):
@@ -507,7 +523,7 @@ class DecoderRenderer:
         return sorted(set(ordered))
 
     def _resolve_temporal_window(self, default_window: int) -> int:
-        raw = os.environ.get("POINTSTREAM_ANIMATE_ANYONE_WINDOW")
+        raw = getattr(self.config, "animate_anyone_window", None) if self.config else None
         if raw is None:
             return default_window
         raw = raw.strip().lower()

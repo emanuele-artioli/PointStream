@@ -165,7 +165,7 @@ def encode_video_frames_ffmpeg(
     destination.parent.mkdir(parents=True, exist_ok=True)
 
     ffmpeg_bin = _resolve_binary_path("FFMPEG_BIN", "ffmpeg")
-    resolved_codec = str(codec or os.environ.get("POINTSTREAM_FFMPEG_CODEC", "libsvtav1")).strip()
+    resolved_codec = str(codec or "libsvtav1").strip()
     if not resolved_codec:
         raise ValueError("FFmpeg codec must not be empty")
     _assert_ffmpeg_encoder_available(ffmpeg_bin=ffmpeg_bin, codec=resolved_codec)

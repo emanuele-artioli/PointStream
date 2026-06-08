@@ -11,10 +11,6 @@ import torch
 
 logger = logging.getLogger(__name__)
 
-DEBUG_GENAI_DIR = os.environ.get("POINTSTREAM_DEBUG_GENAI_DIR", "")
-ENABLE_GENAI_DEBUG = DEBUG_GENAI_DIR and Path(DEBUG_GENAI_DIR).exists()
-
-
 def debug_export_compositor_input(
     stage: str,  # "encoder" or "decoder"
     frame_idx: int,
@@ -22,13 +18,14 @@ def debug_export_compositor_input(
     reference_crop_tensor: Optional[torch.Tensor],
     dense_pose_tensor: Optional[torch.Tensor],
     warped_bg_tensor: Optional[torch.Tensor],
+    debug_dir: str | Path | None = None,
 ) -> None:
     """Export compositor inputs for comparison."""
-    if not ENABLE_GENAI_DEBUG:
+    if not debug_dir or not Path(debug_dir).exists():
         return
 
-    debug_dir = Path(DEBUG_GENAI_DIR) / stage / f"frame_{frame_idx:04d}" / f"actor_{actor_id}"
-    debug_dir.mkdir(parents=True, exist_ok=True)
+    output_dir = Path(debug_dir) / stage / f"frame_{frame_idx:04d}" / f"actor_{actor_id}"
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     # Export reference crop
     if reference_crop_tensor is not None:
@@ -37,7 +34,7 @@ def debug_export_compositor_input(
             if len(ref_np.shape) == 3 and ref_np.shape[0] == 3:
                 ref_np = np.transpose(ref_np, (1, 2, 0))
                 ref_np = cv2.cvtColor(ref_np, cv2.COLOR_RGB2BGR) if ref_np.shape[2] == 3 else ref_np
-        cv2.imwrite(str(debug_dir / "00_reference_crop.png"), ref_np)
+        cv2.imwrite(str(output_dir / "00_reference_crop.png"), ref_np)
 
     # Export pose
     if dense_pose_tensor is not None:
@@ -45,14 +42,14 @@ def debug_export_compositor_input(
         pose_np = np.asarray(pose_np * 255.0, dtype=np.uint8) if pose_np.dtype != np.uint8 else pose_np
         if len(pose_np.shape) == 3 and pose_np.shape[0] == 3:
             pose_np = np.transpose(pose_np, (1, 2, 0))
-        cv2.imwrite(str(debug_dir / "01_pose_condition.png"), pose_np)
+        cv2.imwrite(str(output_dir / "01_pose_condition.png"), pose_np)
 
     # Export warped background
     if warped_bg_tensor is not None:
         bg_np = warped_bg_tensor.cpu().numpy()
         if len(bg_np.shape) == 3 and bg_np.shape[0] == 3:
             bg_np = np.transpose(bg_np, (1, 2, 0))
-        cv2.imwrite(str(debug_dir / "02_warped_background.png"), bg_np)
+        cv2.imwrite(str(output_dir / "02_warped_background.png"), bg_np)
 
 
 def debug_export_compositor_output(
@@ -63,25 +60,26 @@ def debug_export_compositor_output(
     generated_actor_np: Optional[np.ndarray] = None,
     bbox: Optional[tuple[int, int, int, int]] = None,
     alpha_mask: Optional[np.ndarray] = None,
+    debug_dir: str | Path | None = None,
 ) -> None:
     """Export compositor outputs for comparison."""
-    if not ENABLE_GENAI_DEBUG:
+    if not debug_dir or not Path(debug_dir).exists():
         return
 
-    debug_dir = Path(DEBUG_GENAI_DIR) / stage / f"frame_{frame_idx:04d}" / f"actor_{actor_id}"
-    debug_dir.mkdir(parents=True, exist_ok=True)
+    output_dir = Path(debug_dir) / stage / f"frame_{frame_idx:04d}" / f"actor_{actor_id}"
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     # Export generated actor before compositing
     if generated_actor_np is not None:
         actor_np = generated_actor_np.copy()
         if len(actor_np.shape) == 3 and actor_np.shape[0] == 3:
             actor_np = np.transpose(actor_np, (1, 2, 0))
-        cv2.imwrite(str(debug_dir / "03_generated_actor.png"), actor_np)
+        cv2.imwrite(str(output_dir / "03_generated_actor.png"), actor_np)
 
     # Export bbox metadata
     if bbox is not None:
         x1, y1, x2, y2 = bbox
-        with open(debug_dir / "bbox.txt", "w") as f:
+        with open(output_dir / "bbox.txt", "w") as f:
             f.write(f"x1={x1} y1={y1} x2={x2} y2={y2} w={x2-x1} h={y2-y1}\n")
 
     # Export alpha mask
@@ -89,25 +87,26 @@ def debug_export_compositor_output(
         alpha_np = np.asarray(alpha_mask * 255.0, dtype=np.uint8)
         if len(alpha_np.shape) == 3:
             alpha_np = alpha_np[:, :, 0]
-        cv2.imwrite(str(debug_dir / "04_alpha_mask.png"), alpha_np)
+        cv2.imwrite(str(output_dir / "04_alpha_mask.png"), alpha_np)
 
     # Export final composited frame
     composited_np = composited_frame_tensor.cpu().numpy()
     if len(composited_np.shape) == 3 and composited_np.shape[0] == 3:
         composited_np = np.transpose(composited_np, (1, 2, 0))
-    cv2.imwrite(str(debug_dir / "05_composited_frame.png"), composited_np)
+    cv2.imwrite(str(output_dir / "05_composited_frame.png"), composited_np)
 
 
 def debug_export_frame_pair(
     frame_idx: int,
     encoder_tensor: torch.Tensor,
     decoder_tensor: torch.Tensor,
+    debug_dir: str | Path | None = None,
 ) -> None:
     """Export encoder/decoder frame pairs for direct comparison."""
-    if not ENABLE_GENAI_DEBUG:
+    if not debug_dir or not Path(debug_dir).exists():
         return
 
-    comparison_dir = Path(DEBUG_GENAI_DIR) / "comparison" / f"frame_{frame_idx:04d}"
+    comparison_dir = Path(debug_dir) / "comparison" / f"frame_{frame_idx:04d}"
     comparison_dir.mkdir(parents=True, exist_ok=True)
 
     # Export encoder version
@@ -146,9 +145,9 @@ def debug_export_frame_pair(
         logger.info(f"Frame {frame_idx}: encoder vs decoder diff = {diff_mean:.2f} (max {diff_max:.2f})")
 
 
-def create_debug_report(debug_root: Optional[str] = None) -> str:
+def create_debug_report(debug_root: str | Path) -> str:
     """Generate a comparison report from debug exports."""
-    root = Path(debug_root or DEBUG_GENAI_DIR)
+    root = Path(debug_root)
     if not root.exists():
         return "Debug directory does not exist."
 

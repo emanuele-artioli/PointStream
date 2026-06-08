@@ -35,6 +35,7 @@ class BallExtractor:
         min_blob_area: int = 6,
         device: str | torch.device | None = None,
         detection_max_side: int | None = None,
+        config: Any = None,
     ) -> None:
         self._difference_threshold = float(difference_threshold)
         self._min_blob_area = int(min_blob_area)
@@ -45,11 +46,15 @@ class BallExtractor:
         if self._device.type == "cuda" and not is_cuda_device_usable(self._device):
             self._device = torch.device("cpu")
         if detection_max_side is None:
-            env_max_side = int(os.environ.get("POINTSTREAM_BALL_MAX_SIDE", "0"))
+            env_max_side = getattr(config, "ball_max_side", 0)
             self._detection_max_side = max(0, env_max_side)
         else:
             self._detection_max_side = max(0, int(detection_max_side))
-        self._compute_dtype = resolve_torch_dtype_for_device(self._device, default_cuda=torch.float16)
+        self._compute_dtype = resolve_torch_dtype_for_device(
+            self._device, 
+            default_cuda=torch.float16,
+            config_dtype=config.gpu_dtype if config and hasattr(config, "gpu_dtype") else None,
+        )
         self._frame_buffer: torch.Tensor | None = None
         self._background_buffer: torch.Tensor | None = None
         self._actor_mask_buffer: torch.Tensor | None = None

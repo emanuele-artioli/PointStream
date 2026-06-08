@@ -31,17 +31,17 @@ def _resolve_local_weight_path(model_name: str) -> Path | None:
     return None
 
 
-def _require_local_or_optin_weight(model_name: str) -> str:
+def _require_local_or_optin_weight(model_name: str, allow_download: bool = False) -> str:
     local_path = _resolve_local_weight_path(model_name)
     if local_path is not None:
         return str(local_path)
 
-    if os.environ.get("POINTSTREAM_ALLOW_AUTO_MODEL_DOWNLOAD", "0") == "1":
+    if allow_download:
         return model_name
 
     raise FileNotFoundError(
         f"Required model weights not found for '{model_name}'. "
-        "Place weights in assets/weights/ or set POINTSTREAM_ALLOW_AUTO_MODEL_DOWNLOAD=1."
+        "Place weights in assets/weights/ or set allow-auto-model-download to true."
     )
 
 
@@ -87,6 +87,7 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
             device,
             default_cuda=torch.float16,
             allowed_cuda={torch.float16, torch.bfloat16, torch.float32},
+            config_dtype=config.gpu_dtype if config and hasattr(config, "gpu_dtype") else None,
         )
         controlnet = ControlNetModel.from_pretrained(self._controlnet_id, torch_dtype=dtype)
         pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
@@ -151,8 +152,10 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
     def __init__(
         self,
         repo_dir: str | None = None,
+        config: Any = None,
     ) -> None:
-        self._repo_dir = repo_dir or os.environ.get("POINTSTREAM_ANIMATE_ANYONE_REPO_DIR")
+        self.config = config
+        self._repo_dir = repo_dir or (self.config.animate_anyone_repo_dir if self.config else None)
         self._runtime_fn: Any | None = None
 
     def _ensure_runtime(self) -> Any:
@@ -184,6 +187,7 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
                 seed=int(seed),
                 device=str(device),
                 repo_dir=self._repo_dir,
+                config=self.config,
             )
         except TypeError:
             # Keep tests/stubs simple when monkeypatching _ensure_runtime.
@@ -220,6 +224,7 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
                 seed=int(seed),
                 device=str(device),
                 repo_dir=self._repo_dir,
+                config=self.config,
             )
         except TypeError:
             generated_bgr = generate_sequence(
@@ -237,8 +242,8 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
         return torch.from_numpy(generated_bgr).permute(0, 3, 1, 2).contiguous().to(torch.uint8)
 
 
-class MockCompositor:
-    """Lightweight fallback compositor used when GenAI is disabled."""
+class BaseCompositor:
+    """Base compositor providing helper methods."""
 
     def __init__(self, confidence_threshold: float = 0.2) -> None:
         self._confidence_threshold = float(confidence_threshold)
@@ -253,24 +258,7 @@ class MockCompositor:
         metadata_mask: np.ndarray | None = None,
         metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
-        _ = actor_identity
-        _ = metadata_mask
-        _ = metadata_bbox
-        frame_np = self._to_frame_numpy(warped_background_frame)
-        pose_np = self._to_pose_numpy(dense_dwpose_tensor)
-        crop_np = self._to_crop_numpy(reference_crop_tensor)
-
-        x1, y1, x2, y2 = self._estimate_bbox_from_pose(pose_np=pose_np, frame_height=frame_np.shape[0], frame_width=frame_np.shape[1])
-
-        # Draw a filled placeholder silhouette to prove compositor wiring end-to-end.
-        cv2.rectangle(frame_np, (x1, y1), (x2, y2), color=(35, 80, 210), thickness=-1)
-
-        crop_h = max(1, y2 - y1)
-        crop_w = max(1, x2 - x1)
-        resized_crop = cv2.resize(crop_np, (crop_w, crop_h), interpolation=cv2.INTER_LINEAR)
-        frame_np[y1:y2, x1:x2] = resized_crop
-
-        return torch.from_numpy(frame_np).permute(2, 0, 1).contiguous().to(torch.uint8)
+        raise NotImplementedError("BaseCompositor does not implement process. Subclasses must implement it.")
 
     def _to_frame_numpy(self, frame_tensor: torch.Tensor) -> np.ndarray:
         if frame_tensor.ndim != 3:
@@ -337,7 +325,7 @@ class MockCompositor:
         return bx1, by1, bx2, by2
 
 
-class DiffusersCompositor(MockCompositor):
+class DiffusersCompositor(BaseCompositor):
     """Feature-gated real GenAI compositor with strategy-selectable backends."""
 
     def __init__(
@@ -346,8 +334,10 @@ class DiffusersCompositor(MockCompositor):
         backend: str | None = None,
         seed: int = 1337,
         device: str | torch.device | None = None,
+        config: Any = None,
     ) -> None:
         super().__init__(confidence_threshold=confidence_threshold)
+        self.config = config
         self._seed = int(seed)
         self._debug_stage = "unknown"
         if device is None:
@@ -356,25 +346,27 @@ class DiffusersCompositor(MockCompositor):
             self._device = torch.device(device)
         if self._device.type == "cuda" and not is_cuda_device_usable(self._device):
             self._device = torch.device("cpu")
-        backend_value = backend if backend is not None else os.environ.get("POINTSTREAM_GENAI_BACKEND")
+            
+        backend_value = backend if backend is not None else (self.config.genai_backend if self.config else None)
         if backend_value is None:
             backend_value = "controlnet"
         self._backend = backend_value.strip().lower()
-        threshold = int(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_TRANSPARENT_THRESHOLD", "8"))
+        
+        threshold = self.config.animate_anyone_transparent_threshold if self.config else 8
         self._animate_anyone_transparent_threshold = int(np.clip(threshold, 0, 255))
-        resize_mode = os.environ.get("POINTSTREAM_GENAI_RESIZE_MODE", "aspect-recovery").strip().lower()
+        
+        resize_mode = (self.config.genai_resize_mode if self.config else "aspect-recovery").strip().lower()
         if resize_mode not in {"plain", "aspect-recovery"}:
             resize_mode = "aspect-recovery"
         self._resize_mode = resize_mode
 
-        adaptive_raw = os.environ.get("POINTSTREAM_ANIMATE_ANYONE_ADAPTIVE_THRESHOLD", "1").strip().lower()
-        self._use_adaptive_black_threshold = adaptive_raw not in {"0", "false", "off", "no"}
+        self._use_adaptive_black_threshold = bool(self.config.animate_anyone_adaptive_threshold) if self.config else True
 
-        alpha_smoothing_raw = float(os.environ.get("POINTSTREAM_ANIMATE_ANYONE_ALPHA_SMOOTHING", "0.25"))
+        alpha_smoothing_raw = float(self.config.animate_anyone_alpha_smoothing if self.config else 0.25)
         self._alpha_temporal_smoothing = float(np.clip(alpha_smoothing_raw, 0.0, 0.95))
         self._alpha_history_by_actor: dict[str, np.ndarray] = {}
 
-        raw_mask_mode = os.environ.get("POINTSTREAM_COMPOSITING_MASK_MODE", "postgen-seg-client").strip().lower()
+        raw_mask_mode = (self.config.compositing_mask_mode if self.config else "postgen-seg-client").strip().lower()
         mask_mode_aliases = {
             "alpha": "alpha-heuristic",
             "alpha-heuristic": "alpha-heuristic",
@@ -387,9 +379,9 @@ class DiffusersCompositor(MockCompositor):
         }
         self._compositing_mask_mode = mask_mode_aliases.get(raw_mask_mode, "postgen-seg-client")
 
-        backend_raw = os.environ.get("POINTSTREAM_POSTGEN_SEGMENTER_BACKEND", "yolo").strip().lower()
+        backend_raw = (self.config.postgen_segmenter_backend if self.config else "yolo").strip().lower()
         self._postgen_segmenter_backend = backend_raw if backend_raw in {"yolo", "heuristic"} else "yolo"
-        self._postgen_segmenter_model = os.environ.get("POINTSTREAM_POSTGEN_SEGMENTER_MODEL", "yolo26n-seg.pt")
+        self._postgen_segmenter_model = self.config.postgen_segmenter_model if self.config and self.config.postgen_segmenter_model else "yolo26n-seg.pt"
         self._postgen_segmenter: Any | None = None
         self._postgen_segmenter_disabled = False
 
@@ -406,8 +398,8 @@ class DiffusersCompositor(MockCompositor):
         if backend in {"controlnet", "baseline", "baseline-controlnet"}:
             return BaselineControlNetStrategy()
         if backend in {"animate-anyone", "animate_anyone", "animateanyone"}:
-            return AnimateAnyoneStrategy()
-        raise ValueError(f"Unsupported POINTSTREAM_GENAI_BACKEND value: {backend}")
+            return AnimateAnyoneStrategy(config=self.config)
+        raise ValueError(f"Unsupported genai-backend value in config: {backend}")
 
     def uses_temporal_pose_sequence(self) -> bool:
         return isinstance(self._strategy, AnimateAnyoneStrategy)
@@ -785,7 +777,7 @@ class DiffusersCompositor(MockCompositor):
         try:
             from ultralytics import YOLO
 
-            weight_ref = _require_local_or_optin_weight(self._postgen_segmenter_model)
+            weight_ref = _require_local_or_optin_weight(self._postgen_segmenter_model, allow_download=self.config.allow_auto_model_download if self.config else False)
             self._postgen_segmenter = YOLO(weight_ref)
             return self._postgen_segmenter
         except Exception as exc:
@@ -955,4 +947,4 @@ def _render_pose_condition(pose_tensor: torch.Tensor, output_height: int, output
 
 
 # Backward-compatible alias used by existing decode tests.
-GenAICompositor = MockCompositor
+GenAICompositor = BaseCompositor

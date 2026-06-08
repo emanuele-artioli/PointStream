@@ -17,6 +17,9 @@ from src.shared.tags import cpu_bound
 class BackgroundModeler:
     """Real background modeler with KLT + dynamic keyframe panorama stitching."""
 
+    def __init__(self, config: Any = None) -> None:
+        self.config = config
+
     @cpu_bound
     def process(
         self,
@@ -83,11 +86,10 @@ class BackgroundModeler:
         )
 
     def _debug_artifacts_enabled(self) -> bool:
-        raw = os.environ.get("POINTSTREAM_DISABLE_DEBUG_ARTIFACTS", "0").strip().lower()
-        return raw not in {"1", "true", "yes", "on"}
+        return not self.config.disable_debug_artifacts if self.config else True
 
     def _resolve_debug_root(self) -> Path:
-        override = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")
+        override = self.config.debug_artifact_dir if self.config else None
         if override:
             return Path(override)
 

@@ -61,26 +61,16 @@ def _stream_frame_pairs(
     predicted_video: Path,
     max_frames: int | None = None,
 ) -> list[tuple[np.ndarray, np.ndarray]]:
-    cap_ref = cv2.VideoCapture(str(reference_video))
-    cap_pred = cv2.VideoCapture(str(predicted_video))
-    if not cap_ref.isOpened() or not cap_pred.isOpened():
-        cap_ref.release()
-        cap_pred.release()
-        return []
-
     pairs: list[tuple[np.ndarray, np.ndarray]] = []
-    try:
-        while True:
-            if max_frames is not None and len(pairs) >= max_frames:
-                break
-            ok_ref, ref_frame = cap_ref.read()
-            ok_pred, pred_frame = cap_pred.read()
-            if not ok_ref or not ok_pred:
-                break
-            pairs.append((ref_frame, pred_frame))
-    finally:
-        cap_ref.release()
-        cap_pred.release()
+    
+    ref_frames = _load_frame_sequence(reference_video, max_frames=max_frames)
+    pred_frames = _load_frame_sequence(predicted_video, max_frames=max_frames)
+    
+    if not ref_frames or not pred_frames:
+        return []
+        
+    for ref, pred in zip(ref_frames, pred_frames):
+        pairs.append((ref, pred))
     return pairs
 
 
@@ -204,17 +194,24 @@ def _compute_ssim_ffmpeg(reference_video: Path, predicted_video: Path, max_frame
     stats_path = Path(stats_file.name)
     stats_file.close()
 
-    filter_complex = f"[0:v][1:v]ssim=stats_file={stats_path}"
+    filter_complex = "[0:v][1:v]ssim=stats_file=" + str(stats_path)
+    
     ffmpeg_cmd = [
         ffmpeg_bin,
         "-hide_banner",
         "-loglevel",
-        "warning",
-        "-i",
-        str(reference_video),
-        "-i",
-        str(predicted_video),
+        "warning"
     ]
+    
+    if reference_video.is_dir():
+        ffmpeg_cmd.extend(["-f", "image2", "-pattern_type", "glob", "-i", str(reference_video / "*.png")])
+    else:
+        ffmpeg_cmd.extend(["-i", str(reference_video)])
+        
+    if predicted_video.is_dir():
+        ffmpeg_cmd.extend(["-f", "image2", "-pattern_type", "glob", "-i", str(predicted_video / "*.png")])
+    else:
+        ffmpeg_cmd.extend(["-i", str(predicted_video)])
     if max_frames is not None:
         ffmpeg_cmd.extend(["-frames:v", str(int(max_frames))])
     ffmpeg_cmd.extend(["-filter_complex", filter_complex, "-f", "null", "-"])
@@ -287,17 +284,24 @@ def _compute_vmaf_ffmpeg(reference_video: Path, predicted_video: Path, max_frame
     log_path = Path(log_file.name)
     log_file.close()
 
-    filter_complex = f"[0:v][1:v]libvmaf=log_path={log_path}:log_fmt=json"
+    filter_complex = "[0:v][1:v]libvmaf=log_path=" + str(log_path) + ":log_fmt=json"
+    
     ffmpeg_cmd = [
         ffmpeg_bin,
         "-hide_banner",
         "-loglevel",
-        "warning",
-        "-i",
-        str(reference_video),
-        "-i",
-        str(predicted_video),
+        "warning"
     ]
+    
+    if reference_video.is_dir():
+        ffmpeg_cmd.extend(["-f", "image2", "-pattern_type", "glob", "-i", str(reference_video / "*.png")])
+    else:
+        ffmpeg_cmd.extend(["-i", str(reference_video)])
+        
+    if predicted_video.is_dir():
+        ffmpeg_cmd.extend(["-f", "image2", "-pattern_type", "glob", "-i", str(predicted_video / "*.png")])
+    else:
+        ffmpeg_cmd.extend(["-i", str(predicted_video)])
     if max_frames is not None:
         ffmpeg_cmd.extend(["-frames:v", str(int(max_frames))])
     ffmpeg_cmd.extend(["-filter_complex", filter_complex, "-f", "null", "-"])

@@ -1,15 +1,9 @@
-from __future__ import annotations
-
-from dataclasses import dataclass
-from datetime import datetime
-import os
-from pathlib import Path
-from typing import Any
-
+import cv2
 import numpy as np
 import torch
 
-from src.encoder.video_io import iter_video_frames_ffmpeg, probe_video_metadata
+from src.decoder.genai_compositor import BaseCompositor
+from src.encoder.actor_pipeline import ActorExtractionResult
 from src.shared.schemas import (
     ActorPacket,
     BallPacket,
@@ -24,181 +18,6 @@ from src.shared.schemas import (
     VideoChunk,
 )
 from src.shared.tags import gpu_bound
-
-
-@dataclass(frozen=True)
-class ActorExtractionResult:
-    frame_states: list[FrameState]
-    actor_packets: list[ActorPacket]
-
-
-class ActorExtractor:
-    def __init__(
-        self,
-        detector_model: Any | None = None,
-        segmenter_model: Any | None = None,
-        pose_model: Any | None = None,
-        render_debug_keyframes: bool = True,
-        detector_backend: str = "yolo26",
-        detector_caption: str = "tennis player",
-        pose_backend: str = "yolo26",
-        segmenter_backend: str = "yolo26",
-        segmenter_caption: str = "tennis player",
-        pose_delta_threshold: float = 20.0,
-        include_mask_metadata: bool = False,
-        metadata_mask_codec: str = "auto",
-        dwpose_device: str = "cuda",
-    ) -> None:
-        from src.encoder.actor_components import (
-            BaseDetector,
-            BasePoseEstimator,
-            BaseSegmenter,
-            DwposeEstimator,
-            NoOpSegmenter,
-            PayloadEncoder,
-            PipelineBuilder,
-            SamSegmenter,
-            StandardTennisHeuristic,
-            YoloEDetector,
-            Yolo26Detector,
-            YoloPoseEstimator,
-            YoloeSegmenter,
-            YoloSegmenter,
-        )
-
-        self._render_debug_keyframes = render_debug_keyframes
-
-        caption_list = [part.strip() for part in str(detector_caption).split(",") if part.strip()]
-        if not caption_list:
-            caption_list = ["tennis player"]
-
-        detector: BaseDetector
-        normalized_detector_backend = detector_backend.strip().lower()
-        if normalized_detector_backend in {"yolo", "yolo26", "yolo26n"}:
-            detector = Yolo26Detector(model_name="yolo26n.pt", model=detector_model)
-        elif normalized_detector_backend in {"yoloe", "yolo-e", "yolo_e"}:
-            detector = YoloEDetector(
-                model_name="yoloe-26n-seg.pt",
-                model=detector_model,
-                captions=caption_list,
-            )
-        else:
-            raise ValueError(f"Unsupported detector backend: {detector_backend}")
-
-        pose_estimator: BasePoseEstimator
-        normalized_pose_backend = pose_backend.strip().lower()
-        if normalized_pose_backend in {"yolo", "yolo26", "yolo26n", "yolo-pose", "yolo_pose"}:
-            pose_estimator = YoloPoseEstimator(model_name="yolo26n-pose.pt", model=pose_model)
-        elif normalized_pose_backend in {"dwpose", "dw-pose", "dw_pose"}:
-            pose_estimator = DwposeEstimator(torchscript_device=dwpose_device)
-        else:
-            raise ValueError(f"Unsupported pose backend: {pose_backend}")
-
-        segmenter: BaseSegmenter
-        normalized_segmenter_backend = segmenter_backend.strip().lower()
-        if normalized_segmenter_backend in {"yolo", "yolo26", "yolo26n", "yolo-seg", "yolo_seg"}:
-            segmenter = YoloSegmenter(model_name="yolo26n-seg.pt", model=segmenter_model)
-        elif normalized_segmenter_backend in {"yoloe", "yolo-e", "yolo_e"}:
-            segmenter_caption_list = [part.strip() for part in str(segmenter_caption).split(",") if part.strip()]
-            if not segmenter_caption_list:
-                segmenter_caption_list = ["tennis player"]
-            segmenter = YoloeSegmenter(
-                model_name="yoloe-26n-seg.pt",
-                model=segmenter_model,
-                captions=segmenter_caption_list,
-            )
-        elif normalized_segmenter_backend in {"sam3", "sam-3"}:
-            segmenter = SamSegmenter(model_name="sam3.pt", model=segmenter_model)
-        elif normalized_segmenter_backend in {"sam", "sam2", "sam-2"}:
-            segmenter = SamSegmenter(model_name="sam2_b.pt", model=segmenter_model)
-        elif normalized_segmenter_backend in {"none", "off", "noop", "no-op"}:
-            segmenter = NoOpSegmenter()
-        else:
-            raise ValueError(f"Unsupported segmenter backend: {segmenter_backend}")
-
-        # Models are loaded once in component initialization and reused frame-by-frame.
-        self._pipeline = PipelineBuilder(
-            detector=detector,
-            heuristic=StandardTennisHeuristic(),
-            segmenter=segmenter,
-            pose_estimator=pose_estimator,
-            payload_encoder=PayloadEncoder(
-                pose_delta_threshold=float(pose_delta_threshold),
-                include_mask_metadata=bool(include_mask_metadata),
-                metadata_mask_codec=str(metadata_mask_codec),
-            ),
-        )
-
-    @gpu_bound
-    def process(self, chunk: VideoChunk) -> list[ActorPacket]:
-        return self.process_with_states(chunk).actor_packets
-
-    @gpu_bound
-    def process_with_states(self, chunk: VideoChunk) -> ActorExtractionResult:
-        frames_bgr = self._load_frames(chunk)
-        frame_states, packets = self._pipeline.run(chunk=chunk, frames_bgr=frames_bgr)
-        if self._render_debug_keyframes:
-            self._pipeline.render_debug_keyframes(
-                chunk=chunk,
-                frames_bgr=frames_bgr,
-                frame_states=frame_states,
-                actor_packets=packets,
-                out_dir=self._resolve_debug_keyframes_dir(),
-            )
-        return ActorExtractionResult(frame_states=frame_states, actor_packets=packets)
-
-    @gpu_bound
-    def process_with_states_streaming(
-        self,
-        chunk: VideoChunk,
-        on_frame_state: Any | None = None,
-    ) -> ActorExtractionResult:
-        frames_bgr = self._load_frames(chunk)
-        filtered_states: list[FrameState] = []
-        for state in self._pipeline.iter_filtered_states(chunk=chunk, frames_bgr=frames_bgr):
-            filtered_states.append(state)
-            if on_frame_state is not None:
-                on_frame_state(state)
-
-        packets = self._pipeline.payload_encoder.encode(chunk=chunk, frame_states=filtered_states)
-        if self._render_debug_keyframes:
-            self._pipeline.render_debug_keyframes(
-                chunk=chunk,
-                frames_bgr=frames_bgr,
-                frame_states=filtered_states,
-                actor_packets=packets,
-                out_dir=self._resolve_debug_keyframes_dir(),
-            )
-        return ActorExtractionResult(frame_states=filtered_states, actor_packets=packets)
-
-    def _resolve_debug_keyframes_dir(self) -> Path:
-        override = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")
-        if override:
-            return Path(override) / "debug_actors"
-
-        project_root = Path(__file__).resolve().parents[2]
-        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_%f")
-        return project_root / "outputs" / timestamp / "debug" / "debug_actors"
-
-    def _load_frames(self, chunk: VideoChunk) -> list[np.ndarray]:
-        source = Path(chunk.source_uri)
-        if not source.exists() or not source.is_file():
-            raise FileNotFoundError(f"ActorExtractor source video not found: {source}")
-
-        metadata = probe_video_metadata(source)
-        frames: list[np.ndarray] = []
-        for frame in iter_video_frames_ffmpeg(
-            source,
-            width=metadata.width,
-            height=metadata.height,
-        ):
-            frames.append(frame)
-            if len(frames) >= chunk.num_frames:
-                break
-        if not frames:
-            raise ValueError(f"ActorExtractor decoded zero frames from source: {source}")
-
-        return frames
 
 
 class MockActorExtractor:
@@ -426,3 +245,36 @@ class BallTracker:
             ),
             events=ball_events,
         )
+
+
+class MockCompositor(BaseCompositor):
+    """Lightweight fallback compositor used when GenAI is disabled in tests."""
+
+    @gpu_bound
+    def process(
+        self,
+        reference_crop_tensor: torch.Tensor,
+        dense_dwpose_tensor: torch.Tensor,
+        warped_background_frame: torch.Tensor,
+        actor_identity: str | None = None,
+        metadata_mask: np.ndarray | None = None,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
+    ) -> torch.Tensor:
+        _ = actor_identity
+        _ = metadata_mask
+        _ = metadata_bbox
+        frame_np = self._to_frame_numpy(warped_background_frame)
+        pose_np = self._to_pose_numpy(dense_dwpose_tensor)
+        crop_np = self._to_crop_numpy(reference_crop_tensor)
+
+        x1, y1, x2, y2 = self._estimate_bbox_from_pose(pose_np=pose_np, frame_height=frame_np.shape[0], frame_width=frame_np.shape[1])
+
+        # Draw a filled placeholder silhouette to prove compositor wiring end-to-end.
+        cv2.rectangle(frame_np, (x1, y1), (x2, y2), color=(35, 80, 210), thickness=-1)
+
+        crop_h = max(1, y2 - y1)
+        crop_w = max(1, x2 - x1)
+        resized_crop = cv2.resize(crop_np, (crop_w, crop_h), interpolation=cv2.INTER_LINEAR)
+        frame_np[y1:y2, x1:x2] = resized_crop
+
+        return torch.from_numpy(frame_np).permute(2, 0, 1).contiguous().to(torch.uint8)
