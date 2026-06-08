@@ -208,7 +208,8 @@ def test_run_cli_accepts_input_and_config(monkeypatch, tmp_path: Path) -> None:
     monkeypatch.setattr(main_module, "run_pipeline", _fake_run_pipeline)
     monkeypatch.setattr(main_module, "_create_timestamped_output_dir", lambda base_root=None: output_dir)
     try:
-        import yaml  # noqa: F401  # type: ignore[import-untyped, unused-ignore]
+        import importlib
+        importlib.import_module("yaml")
         monkeypatch.setattr(main_module, "load_config", lambda path, cli_overrides=None: PointstreamConfig(**(cli_overrides or {"source_uri": "/tmp/ignore.mp4"})))
     except ImportError:
         monkeypatch.setattr(main_module, "load_config", lambda path, cli_overrides=None: PointstreamConfig(**(cli_overrides or {"source_uri": "/tmp/ignore.mp4"})))

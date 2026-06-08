@@ -4,9 +4,11 @@ from pathlib import Path
 from typing import Any, Optional
 
 try:
-    import yaml  # type: ignore[import-untyped, unused-ignore]
+    import importlib
+    yaml: Any = importlib.import_module("yaml")
     HAS_YAML = True
 except ImportError:
+    yaml = None
     HAS_YAML = False
 
 
