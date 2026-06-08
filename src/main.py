@@ -251,10 +251,29 @@ def run_cli(argv: list[str] | None = None) -> int:
         
     config = load_config(args.config, cli_overrides)
     
+    root_level = getattr(logging, config.log_level.upper(), logging.INFO)
     logging.basicConfig(
-        level=getattr(logging, config.log_level.upper(), logging.INFO),
+        level=root_level,
         format="%(asctime)s [%(levelname)s] %(message)s",
     )
+
+    try:
+        import transformers
+        transformers.logging.set_verbosity(root_level)
+    except ImportError:
+        pass
+
+    try:
+        import diffusers
+        diffusers.logging.set_verbosity(root_level)
+    except ImportError:
+        pass
+
+    try:
+        import huggingface_hub
+        huggingface_hub.utils.logging.set_verbosity(root_level)
+    except ImportError:
+        pass
     
     ensure_ffmpeg_encoder_available(config.ffmpeg_codec)
     

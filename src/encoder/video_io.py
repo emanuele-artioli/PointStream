@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import json
+import logging
 import os
 from pathlib import Path
 import re
@@ -17,6 +18,19 @@ import torch
 
 _FFMPEG_ENCODER_CACHE: dict[str, bool] = {}
 _FFMPEG_ENCODER_NAME_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.+-]*$")
+
+def _get_ffmpeg_loglevel() -> str:
+    level = logging.getLogger().getEffectiveLevel()
+    if level <= logging.DEBUG:
+        return "debug"
+    elif level <= logging.INFO:
+        return "info"
+    elif level <= logging.WARNING:
+        return "warning"
+    elif level <= logging.ERROR:
+        return "error"
+    else:
+        return "fatal"
 
 
 @dataclass(frozen=True)
@@ -71,7 +85,7 @@ def iter_video_frames_ffmpeg(
         ffmpeg_bin,
         "-hide_banner",
         "-loglevel",
-        "warning",
+        _get_ffmpeg_loglevel(),
         "-i",
         str(source),
         "-f",
@@ -175,7 +189,7 @@ def encode_video_frames_ffmpeg(
         ffmpeg_bin,
         "-hide_banner",
         "-loglevel",
-        "warning",
+        _get_ffmpeg_loglevel(),
         "-f",
         "rawvideo",
         "-pix_fmt",
