@@ -152,6 +152,8 @@ def _load_pipeline(repo_root: Path | None, model_root: Path, device: str, config
             return _PIPELINE
 
         try:
+            import diffusers.utils
+            diffusers.utils.USE_PEFT_BACKEND = True
             from diffusers import AutoencoderKL, DDIMScheduler
             from omegaconf import OmegaConf
             from transformers import CLIPVisionModelWithProjection

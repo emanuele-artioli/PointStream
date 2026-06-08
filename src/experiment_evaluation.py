@@ -183,6 +183,32 @@ def _resolve_binary_path(env_var: str, binary_name: str) -> str:
     )
 
 
+def _get_video_framerate(video_path: Path) -> str:
+    if video_path.is_dir():
+        return "30"
+    try:
+        ffprobe_bin = _resolve_binary_path("FFPROBE_BIN", "ffprobe")
+    except FileNotFoundError:
+        return "30"
+    
+    cmd = [
+        ffprobe_bin,
+        "-v", "error",
+        "-select_streams", "v:0",
+        "-show_entries", "stream=r_frame_rate",
+        "-of", "default=noprint_wrappers=1:nokey=1",
+        str(video_path)
+    ]
+    try:
+        res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+        fps = res.stdout.strip()
+        if not fps or fps == "0/0":
+            return "30"
+        return fps
+    except Exception:
+        return "30"
+
+
 def _compute_ssim_ffmpeg(reference_video: Path, predicted_video: Path, max_frames: int | None = None) -> dict[str, Any]:
     if not reference_video.exists() or not reference_video.is_file():
         return {"ssim_mean": None, "ssim_std": None, "ssim_num_frames": 0, "note": "missing reference video"}
@@ -203,13 +229,19 @@ def _compute_ssim_ffmpeg(reference_video: Path, predicted_video: Path, max_frame
         "warning"
     ]
     
+    fps = "30"
+    if not reference_video.is_dir():
+        fps = _get_video_framerate(reference_video)
+    elif not predicted_video.is_dir():
+        fps = _get_video_framerate(predicted_video)
+        
     if reference_video.is_dir():
-        ffmpeg_cmd.extend(["-f", "image2", "-pattern_type", "glob", "-i", str(reference_video / "*.png")])
+        ffmpeg_cmd.extend(["-framerate", fps, "-i", str(reference_video / "frame_%06d.png")])
     else:
         ffmpeg_cmd.extend(["-i", str(reference_video)])
         
     if predicted_video.is_dir():
-        ffmpeg_cmd.extend(["-f", "image2", "-pattern_type", "glob", "-i", str(predicted_video / "*.png")])
+        ffmpeg_cmd.extend(["-framerate", fps, "-i", str(predicted_video / "frame_%06d.png")])
     else:
         ffmpeg_cmd.extend(["-i", str(predicted_video)])
     if max_frames is not None:
@@ -293,13 +325,19 @@ def _compute_vmaf_ffmpeg(reference_video: Path, predicted_video: Path, max_frame
         "warning"
     ]
     
+    fps = "30"
+    if not reference_video.is_dir():
+        fps = _get_video_framerate(reference_video)
+    elif not predicted_video.is_dir():
+        fps = _get_video_framerate(predicted_video)
+
     if reference_video.is_dir():
-        ffmpeg_cmd.extend(["-f", "image2", "-pattern_type", "glob", "-i", str(reference_video / "*.png")])
+        ffmpeg_cmd.extend(["-framerate", fps, "-i", str(reference_video / "frame_%06d.png")])
     else:
         ffmpeg_cmd.extend(["-i", str(reference_video)])
         
     if predicted_video.is_dir():
-        ffmpeg_cmd.extend(["-f", "image2", "-pattern_type", "glob", "-i", str(predicted_video / "*.png")])
+        ffmpeg_cmd.extend(["-framerate", fps, "-i", str(predicted_video / "frame_%06d.png")])
     else:
         ffmpeg_cmd.extend(["-i", str(predicted_video)])
     if max_frames is not None:
