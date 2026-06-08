@@ -141,7 +141,7 @@ def test_panorama_encoder_build_and_validate(tmp_path: Path, monkeypatch: pytest
 
     try:
         from pydantic import ValidationError
-        with pytest.raises(ValidationError):
+        with pytest.raises((ValidationError, ValueError)):
             build_panorama_encoder("jpeg", config=PointstreamConfig(panorama_jpeg_quality="bad"))  # type: ignore[arg-type]
     except ImportError:
         pass

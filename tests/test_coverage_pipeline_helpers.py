@@ -181,7 +181,7 @@ def test_residual_calculator_covers_players_only_and_full_video(monkeypatch: pyt
             return (warped_background_frame + 1).to(torch.float32)
 
     class _FakeSynthesisEngine(SynthesisEngine):
-        def __init__(self, *args, **kwargs):
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
             if "config" not in kwargs:
                 kwargs["config"] = PointstreamConfig()
             super().__init__(*args, **kwargs)
@@ -287,7 +287,7 @@ def test_residual_calculator_adaptive_background_downscale_preserves_player_regi
     monkeypatch.setenv("POINTSTREAM_ENABLE_GENAI", "0")
 
     class _FakeSynthesisEngine(SynthesisEngine):
-        def __init__(self, *args, **kwargs):
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
             if "config" not in kwargs:
                 kwargs["config"] = PointstreamConfig()
             super().__init__(*args, **kwargs)

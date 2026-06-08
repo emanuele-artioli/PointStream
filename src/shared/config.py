@@ -5,8 +5,9 @@ from typing import Any, Optional
 
 try:
     import yaml
+    HAS_YAML = True
 except ImportError:
-    yaml = None  # type: ignore[assignment]
+    HAS_YAML = False
 
 
 @dataclass
@@ -147,7 +148,7 @@ def load_config(config_path: str | Path, cli_overrides: Optional[dict[str, Any]]
     if suffix == ".json":
         payload = json.loads(raw_text)
     elif suffix in {".yaml", ".yml"}:
-        if yaml is None:
+        if not HAS_YAML:
             raise RuntimeError("YAML config requires PyYAML. Install dependency: pyyaml")
         payload = yaml.safe_load(raw_text)
     else:

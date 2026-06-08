@@ -74,7 +74,7 @@ def test_reference_extractor_prefers_first_confident_observation(test_run_artifa
         cv2.IMREAD_COLOR,
     )
     assert decoded is not None
-    mean_bgr = np.mean(decoded, axis=(0, 1))  # type: ignore[arg-type]
+    mean_bgr = decoded.mean(axis=(0, 1))
     assert float(mean_bgr[0]) > float(mean_bgr[1])
 
 

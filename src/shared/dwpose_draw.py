@@ -129,7 +129,8 @@ def _draw_dwpose_fallback(people_dw: np.ndarray, height: int, width: int, confid
             color = tuple(float(channel) for channel in colors[limb_idx])
             cv2.fillConvexPoly(canvas, polygon_np, color)
 
-    canvas = np.asarray(canvas.astype(np.float32) * 0.6, dtype=np.uint8)  # type: ignore[assignment]
+    import typing
+    canvas = typing.cast(typing.Any, np.asarray(canvas.astype(np.float32) * 0.6, dtype=np.uint8))
 
     for person in people:
         valid = person[:, 2] >= confidence_threshold

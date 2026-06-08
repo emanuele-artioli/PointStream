@@ -6,6 +6,7 @@ from typing import Any
 import warnings
 
 import cv2
+import typing
 import numpy as np
 import torch
 
@@ -339,7 +340,7 @@ class BackgroundModeler:
                     if pose_mask is None:
                         # Do not exclude full bbox rectangles when segmentation is missing.
                         continue
-                    mask = np.asarray(cv2.bitwise_or(mask, pose_mask), dtype=np.uint8)  # type: ignore[assignment]
+                    mask = typing.cast(typing.Any, np.asarray(cv2.bitwise_or(mask, pose_mask), dtype=np.uint8))
                     continue
                 roi = mask[y1:y2, x1:x2]
                 roi[polygon_mask > 0] = 255
@@ -384,7 +385,7 @@ class BackgroundModeler:
         cv2.fillConvexPoly(pose_mask, hull, color=(255.0,))
         dilate_radius = max(3, int(round(min(frame_height, frame_width) * 0.015)))
         kernel = np.ones((dilate_radius, dilate_radius), dtype=np.uint8)
-        pose_mask = np.asarray(cv2.dilate(pose_mask, kernel, iterations=1), dtype=np.uint8)  # type: ignore[assignment]
+        pose_mask = typing.cast(typing.Any, np.asarray(cv2.dilate(pose_mask, kernel, iterations=1), dtype=np.uint8))
         return pose_mask
 
     def _build_polygon_mask(self, actor: SceneActor, width: int, height: int) -> np.ndarray | None:
