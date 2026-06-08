@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-import os
 from typing import Any
 
 import numpy as np
@@ -60,7 +59,9 @@ class SegmentationBallExtractor:
         model_name: str = "yolo26n.pt",
         confidence: float = 0.25,
         device: str | None = None,
+        config: Any = None,
     ) -> None:
+        self.config = config
         try:
             from ultralytics import YOLO
         except Exception as exc:
@@ -71,7 +72,7 @@ class SegmentationBallExtractor:
         self._model = YOLO(weight_ref)
         self._conf = float(confidence)
         self._device = device
-        self._class_id = getattr(config, "ball_class_id", 32)
+        self._class_id = getattr(self.config, "ball_class_id", 32)
 
     @gpu_bound
     def process(self, chunk: VideoChunk, panorama: PanoramaPacket, frame_states: list[FrameState]) -> BallPacket:

@@ -1,7 +1,6 @@
 """Debug instrumentation for GenAI compositor divergence analysis."""
 
 import logging
-import os
 from pathlib import Path
 from typing import Optional
 

@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from dataclasses import dataclass
 import logging
-import os
 from pathlib import Path
 from typing import Any
 
@@ -229,7 +228,11 @@ class ResidualCalculator:
         base_frames = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False).frames_bgr
         predicted_frames = base_frames
         if self._is_genai_enabled():
-            predicted_frames = self._render_server_actor_prediction(payload=payload, frame_tensor=base_frames.clone())
+            predicted_frames = self._render_server_actor_prediction(
+                payload=payload,
+                frame_tensor=base_frames.clone(),
+                debug_output_path=debug_output_path,
+            )
             if _LOGGER.isEnabledFor(logging.DEBUG):
                 try:
                     diff = (predicted_frames.to(dtype=torch.float32) - base_frames.to(dtype=torch.float32)).abs()
@@ -438,7 +441,7 @@ class ResidualCalculator:
                 residual,
                 size=(down_h, down_w),
                 mode=interpolation,
-                **downsample_kwargs,
+                **downsample_kwargs,  # type: ignore[arg-type]
             ),
             size=(height, width),
             mode="nearest",
@@ -513,6 +516,7 @@ class ResidualCalculator:
         self,
         payload: EncodedChunkPayload,
         frame_tensor: torch.Tensor,
+        debug_output_path: str | Path | None = None,
     ) -> torch.Tensor:
         actor_state = self._build_actor_state(payload)
         if not actor_state:
@@ -556,7 +560,7 @@ class ResidualCalculator:
         use_temporal_window = bool(hasattr(compositor, "uses_temporal_pose_sequence") and compositor.uses_temporal_pose_sequence())
         preroll_frames = max(0, self.config.genai_preroll_frames)
 
-        out_frames: list[torch.Tensor] = []
+        blended_frames: list[torch.Tensor] = []
         frame_count = int(frame_tensor.shape[0])
         chunk_start = int(payload.chunk.start_frame_id)
         for frame_idx in range(frame_count):
@@ -610,9 +614,9 @@ class ResidualCalculator:
                     debug_dir=debug_output_path,
                 )
 
-            out_frames.append(composited)
+            blended_frames.append(composited)
 
-        return torch.stack(out_frames, dim=0)
+        return torch.stack(blended_frames, dim=0)
     def _render_server_genai_keyframe_only(
         self,
         payload: EncodedChunkPayload,
@@ -751,16 +755,16 @@ class ResidualCalculator:
                     logged_delta = True
                 generated_deltas.append(delta)
 
-        out_frames: list[torch.Tensor] = []
+        blended_frames: list[torch.Tensor] = []
         anchor_idx = 0
         for frame_idx in range(frame_count):
             if frame_idx <= selected_indices[0]:
-                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[0]).clamp(0.0, 255.0).to(torch.uint8))
+                blended_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[0]).clamp(0.0, 255.0).to(torch.uint8))
                 continue
             while anchor_idx + 1 < len(selected_indices) and frame_idx > selected_indices[anchor_idx + 1]:
                 anchor_idx += 1
             if anchor_idx + 1 >= len(selected_indices):
-                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[-1]).clamp(0.0, 255.0).to(torch.uint8))
+                blended_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[-1]).clamp(0.0, 255.0).to(torch.uint8))
                 continue
 
             left_idx = selected_indices[anchor_idx]
@@ -768,13 +772,13 @@ class ResidualCalculator:
             left_delta = generated_deltas[anchor_idx]
             right_delta = generated_deltas[anchor_idx + 1]
             if right_idx <= left_idx:
-                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + left_delta).clamp(0.0, 255.0).to(torch.uint8))
+                blended_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + left_delta).clamp(0.0, 255.0).to(torch.uint8))
                 continue
             alpha = float(frame_idx - left_idx) / float(right_idx - left_idx)
             blended_delta = torch.lerp(left_delta, right_delta, alpha)
-            out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + blended_delta).clamp(0.0, 255.0).to(torch.uint8))
+            blended_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + blended_delta).clamp(0.0, 255.0).to(torch.uint8))
 
-        return torch.stack(out_frames, dim=0)
+        return torch.stack(blended_frames, dim=0)
 
     def _render_server_genai_sequence(
         self,

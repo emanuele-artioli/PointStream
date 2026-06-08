@@ -60,8 +60,8 @@ def test_decoder_output_matches_chunk_dimensions(mock_encoder_pipeline, test_run
     assert rendered_meta.width == payload.chunk.width
     assert rendered_meta.height == payload.chunk.height
 
-    decoded = DecoderRenderer(output_root=test_run_artifacts_dir).process(payload)
-    decoded_dir = Path(decoded.output_uri)
+    decoded = DecoderRenderer(output_root=test_run_artifacts_dir, config=PointstreamConfig(ffmpeg_codec='png')).process(payload)
+    decoded_dir = Path(decoded.output_uri).with_suffix("")
 
     assert decoded.chunk_id == "dec001"
     assert decoded.num_frames == 6
@@ -119,8 +119,8 @@ def test_render_genai_baseline_uses_preroll_and_fixed_temporal_window(monkeypatc
     out = renderer._render_genai_baseline(frame_tensor)
 
     assert torch.equal(out, frame_tensor)
-    # Causal temporal window without padding: frame 1 sees 2 poses, frame 2 sees 3 poses.
-    assert spy.window_lengths == [2, 3]
+    # With animate_anyone_window=4, causal padding will result in a uniform window of 4 for all calls.
+    assert spy.window_lengths == [4, 4]
 
 
 def test_render_genai_baseline_keyframe_only_interpolates_missing_frames(monkeypatch, tmp_path: Path) -> None:

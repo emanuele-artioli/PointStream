@@ -180,14 +180,14 @@ def test_residual_calculator_covers_players_only_and_full_video(monkeypatch: pyt
             self.seen_metadata.append((metadata_mask, None if metadata_bbox is None else tuple(metadata_bbox)))
             return (warped_background_frame + 1).to(torch.float32)
 
-        class _FakeSynthesisEngine(SynthesisEngine):
-            def __init__(self, *args, **kwargs):
-                if "config" not in kwargs:
-                    kwargs["config"] = PointstreamConfig()
-                super().__init__(*args, **kwargs)
-                self.seed = 7
-                self.device: Any = "cpu"
-                self._compositor = _FakeCompositor()
+    class _FakeSynthesisEngine(SynthesisEngine):
+        def __init__(self, *args, **kwargs):
+            if "config" not in kwargs:
+                kwargs["config"] = PointstreamConfig()
+            super().__init__(*args, **kwargs)
+            self.seed = 7
+            self.device: Any = "cpu"
+            self._compositor = _FakeCompositor()
 
         def synthesize(self, payload, include_guidance_overlays=False):
             _ = (payload, include_guidance_overlays)
@@ -376,7 +376,8 @@ def test_encoder_pipeline_streams_actor_states_and_uses_shifted_ball(monkeypatch
                 states=[],
             )
 
-        process = process_shifted
+        def process(self, chunk, panorama, frame_states):
+            return self.process_shifted(chunk, panorama, frame_states)
 
     class _FakeReferenceExtractor:
         def process(self, chunk, frame_states):
@@ -405,7 +406,7 @@ def test_encoder_pipeline_streams_actor_states_and_uses_shifted_ball(monkeypatch
             return ResidualPacket(chunk_id=chunk.chunk_id, codec="libsvtav1", residual_video_uri=str(tmp_path / "residual.mp4"))
 
     pipeline = orchestrator.EncoderPipeline(
-        config=PointstreamConfig(),
+        config=PointstreamConfig(enable_shifted_ball=True),
         actor_extractor=_FakeActorExtractor(),
         ball_extractor=_FakeBallExtractor(),
         reference_extractor=_FakeReferenceExtractor(),

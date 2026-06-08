@@ -8,9 +8,9 @@ import numpy as np
 import pytest
 
 from src.decoder.mock_renderer import DecoderRenderer
-from src.encoder.residual_calculator import BinaryActorImportanceMapper, ResidualCalculator
+from src.encoder.residual_calculator import ResidualCalculator
 from src.shared.config import PointstreamConfig
-from src.shared.schemas import FrameState, SceneActor, VideoChunk, ResidualMode
+from src.shared.schemas import ResidualMode
 from src.encoder.video_io import iter_video_frames_ffmpeg, probe_video_metadata
 from src.transport.disk import DiskTransport
 

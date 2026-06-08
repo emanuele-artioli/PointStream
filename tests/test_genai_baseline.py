@@ -74,7 +74,7 @@ def test_reference_extractor_prefers_first_confident_observation(test_run_artifa
         cv2.IMREAD_COLOR,
     )
     assert decoded is not None
-    mean_bgr = np.mean(decoded, axis=(0, 1))
+    mean_bgr = np.mean(decoded, axis=(0, 1))  # type: ignore[arg-type]
     assert float(mean_bgr[0]) > float(mean_bgr[1])
 
 
@@ -199,8 +199,9 @@ def test_decoder_mock_genai_stage_uses_transmitted_reference_crops(
         )
         assert len(frames_with) == int(payload.chunk.num_frames)
 
-        # Compare pre-encode tensors to avoid FFmpeg codec variability across CI runners.
         renderer_compare = DecoderRenderer(output_root=test_run_artifacts_dir)
+        from tests.mock_components import MockCompositor
+        renderer_compare._genai_compositor = MockCompositor()  # type: ignore[assignment]
         actor_state_with = renderer_compare._build_actor_state(recovered_payload)
         actor_state_without = renderer_compare._build_actor_state(payload_without_refs)
 

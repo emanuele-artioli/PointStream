@@ -163,15 +163,15 @@ def test_resolve_model_root_explicit_relative_and_absolute(tmp_path: Path) -> No
     repo_root = tmp_path / "repo"
     repo_root.mkdir(parents=True)
 
-    relative_model = repo_root / "custom_models"
+    relative_model = repo_root / "Models" / "custom_models"
     _create_required_model_entries(relative_model)
 
-    resolved_relative = runtime._resolve_model_root(repo_root=repo_root, runtime=runtime._RuntimeConfig(model_dir="custom_models"))
+    resolved_relative = runtime._resolve_model_root(repo_root=repo_root, runtime=runtime._RuntimeConfig(model_variant="custom_models"))
     assert resolved_relative == relative_model.resolve()
 
     absolute_model = tmp_path / "absolute_models"
     _create_required_model_entries(absolute_model)
-    resolved_absolute = runtime._resolve_model_root(repo_root=repo_root, runtime=runtime._RuntimeConfig(model_dir=str(absolute_model)))
+    resolved_absolute = runtime._resolve_model_root(repo_root=repo_root, runtime=runtime._RuntimeConfig(model_variant=str(absolute_model)))
     assert resolved_absolute == absolute_model.resolve()
 
 
@@ -209,7 +209,7 @@ def test_load_pipeline_success_and_cache(monkeypatch: pytest.MonkeyPatch, tmp_pa
     _install_fake_animate_anyone_modules(monkeypatch)
 
     monkeypatch.setattr(runtime, "resolve_torch_dtype_for_device", lambda *args, **kwargs: torch.float32)
-    monkeypatch.setattr(runtime.torch, "load", lambda path, map_location=None: {})
+    monkeypatch.setattr(runtime.torch, "load", lambda path, map_location=None, weights_only=False: {})
 
     repo_root = tmp_path / "repo"
     model_root = tmp_path / "model"
@@ -258,9 +258,9 @@ def test_generate_frame_uses_cuda_when_available_and_usable(monkeypatch: pytest.
     repo_root.mkdir(parents=True)
     model_root.mkdir(parents=True)
 
-    monkeypatch.setattr(runtime, "_resolve_repo_root", lambda repo_dir: repo_root)
-    monkeypatch.setattr(runtime, "_resolve_repo_root", lambda repo_dir: repo_root)
-    monkeypatch.setattr(runtime, "_resolve_model_root", lambda repo_root, runtime: model_root)
+    monkeypatch.setattr(runtime, "_resolve_repo_root", lambda repo_dir, config=None: repo_root)
+    monkeypatch.setattr(runtime, "_resolve_repo_root", lambda repo_dir, config=None: repo_root)
+    monkeypatch.setattr(runtime, "_resolve_model_root", lambda repo_root, runtime, config=None: model_root)
     monkeypatch.setattr(runtime, "_prepare_pose_sequence", lambda dense_pose_sequence, width, height: [])
 
     monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
@@ -284,7 +284,7 @@ def test_generate_frame_uses_cuda_when_available_and_usable(monkeypatch: pytest.
             videos = torch.zeros((1, 3, 1, 16, 16), dtype=torch.float32)
             return SimpleNamespace(videos=videos)
 
-    def _load_pipeline(repo_root: Path, model_root: Path, device: str):
+    def _load_pipeline(repo_root: Path, model_root: Path, device: str, config=None):
         _ = (repo_root, model_root)
         captured["device"] = device
         return _StubPipe()

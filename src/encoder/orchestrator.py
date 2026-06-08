@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from pathlib import Path
 import threading
 from typing import Any
@@ -85,12 +84,14 @@ class EncoderPipeline:
         actor_extractor: Any | None = None,
         ball_extractor: Any | None = None,
         reference_extractor: Any | None = None,
+        object_tracker: Any | None = None,
         residual_calculator: ResidualCalculator | None = None,
     ) -> None:
         self.config = config
         self._dag = DAGOrchestrator(execution_pool=execution_pool)
         self._background_modeler = BackgroundModeler(config=self.config)
         self._actor_extractor = actor_extractor or ActorExtractor(config=self.config)
+        self._object_tracker = object_tracker
         self._ball_extractor = ball_extractor or BallExtractor()
         self._reference_extractor = reference_extractor or ReferenceExtractor()
         self._residual_calculator = residual_calculator or ResidualCalculator(config=self.config, synthesis_engine=SynthesisEngine(config=self.config))
@@ -188,10 +189,18 @@ class EncoderPipeline:
                 dependencies=("chunk", "frame_states"),
             )
         )
+        def build_rigid_objects_node(context, deps):
+            if hasattr(self, "_object_tracker") and self._object_tracker is not None:
+                return self._object_tracker.process(deps["chunk"])
+            return []
+        tracker = getattr(self, '_object_tracker', None)
+        tag = getattr(tracker.process, '_execution_tag', 'cpu') if tracker is not None else 'cpu'
+        setattr(build_rigid_objects_node, '_execution_tag', tag)
+
         self._dag.add_node(
             DAGNode(
                 name="rigid_objects",
-                func=lambda context, deps: [],
+                func=build_rigid_objects_node,
                 dependencies=("chunk",),
             )
         )

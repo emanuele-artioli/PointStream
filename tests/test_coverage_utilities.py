@@ -4,6 +4,7 @@ from pathlib import Path
 import sys
 import types
 import numpy as np
+from src.shared.config import PointstreamConfig
 import pytest
 import torch
 
@@ -141,7 +142,7 @@ def test_panorama_encoder_build_and_validate(tmp_path: Path, monkeypatch: pytest
     try:
         from pydantic import ValidationError
         with pytest.raises(ValidationError):
-            build_panorama_encoder("jpeg", config=PointstreamConfig(panorama_jpeg_quality="bad"))
+            build_panorama_encoder("jpeg", config=PointstreamConfig(panorama_jpeg_quality="bad"))  # type: ignore[arg-type]
     except ImportError:
         pass
 

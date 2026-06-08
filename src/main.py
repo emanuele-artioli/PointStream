@@ -4,7 +4,6 @@ import argparse
 from datetime import datetime
 import json
 import logging
-import os
 from pathlib import Path
 import sys
 from time import perf_counter
@@ -51,10 +50,10 @@ def _build_execution_pool(config: PointstreamConfig) -> BaseExecutionPool | None
     if mode == "inline":
         return None
     if mode == "tagged":
-        return TaggedMultiprocessPool(
+        return TaggedMultiprocessPool(  # type: ignore[call-arg]
             cpu_workers=config.cpu_workers or 1,
             gpu_workers=config.gpu_workers or 1,
-            worker_config=WorkerConfig(gpu_dtype=config.gpu_dtype),
+            worker_config=WorkerConfig(gpu_dtype=config.gpu_dtype),  # type: ignore[call-arg]
         )
     raise ValueError(f"Unknown execution pool mode: {mode}")
 
@@ -79,10 +78,9 @@ def _build_ball_extractor(config: PointstreamConfig) -> Any | None:
     mode = config.ball_extractor.strip().lower()
     if mode == "segmentation":
         return SegmentationBallExtractor(
-            detection_max_side=config.ball_max_side,
-            confidence_threshold=config.ball_det_conf or 0.25,
+            confidence=config.ball_det_conf or 0.25,
             model_name=config.ball_det_model or "yolo26n.pt",
-            class_id=config.ball_class_id or 32,
+            config=config,
         )
     return BallExtractor(
         difference_threshold=config.ball_difference_threshold,
@@ -265,7 +263,7 @@ def run_cli(argv: list[str] | None = None) -> int:
 
     try:
         import diffusers
-        diffusers.logging.set_verbosity(root_level)
+        diffusers.logging.set_verbosity(root_level)  # type: ignore[attr-defined]
     except ImportError:
         pass
 

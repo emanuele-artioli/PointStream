@@ -2,25 +2,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-import os
 from pathlib import Path
 from typing import Any
 
 import numpy as np
-import torch
 
 from src.encoder.video_io import iter_video_frames_ffmpeg, probe_video_metadata
 from src.shared.schemas import (
     ActorPacket,
-    BallPacket,
     FrameState,
-    InterpolateCommandEvent,
-    KeyframeEvent,
-    ObjectClass,
-    RigidObjectPacket,
-    SceneActor,
-    SemanticEvent,
-    TensorSpec,
     VideoChunk,
 )
 from src.shared.tags import gpu_bound
@@ -55,7 +45,6 @@ class ActorExtractor:
             BasePoseEstimator,
             BaseSegmenter,
             DwposeEstimator,
-            NoOpSegmenter,
             PayloadEncoder,
             PipelineBuilder,
             SamSegmenter,
@@ -87,7 +76,7 @@ class ActorExtractor:
         else:
             raise ValueError(f"Unsupported detector backend: {detector_backend}")
 
-        pose_estimator: BasePoseEstimator
+        pose_estimator: BasePoseEstimator | None
         normalized_pose_backend = pose_backend.strip().lower()
         if normalized_pose_backend in {"none", ""}:
             pose_estimator = None
@@ -98,7 +87,7 @@ class ActorExtractor:
         else:
             raise ValueError(f"Unsupported pose backend: {pose_backend}")
 
-        segmenter: BaseSegmenter
+        segmenter: BaseSegmenter | None
         normalized_segmenter_backend = segmenter_backend.strip().lower()
         if normalized_segmenter_backend in {"none", ""}:
             segmenter = None
@@ -122,8 +111,8 @@ class ActorExtractor:
         self._pipeline = PipelineBuilder(
             detector=detector,
             heuristic=StandardTennisHeuristic(),
-            segmenter=segmenter,
-            pose_estimator=pose_estimator,
+            segmenter=segmenter,  # type: ignore[arg-type]
+            pose_estimator=pose_estimator,  # type: ignore[arg-type]
             payload_encoder=PayloadEncoder(
                 pose_delta_threshold=float(pose_delta_threshold),
                 include_mask_metadata=bool(include_mask_metadata),

@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 import logging
-import os
 from pathlib import Path
+from typing import Any
 
 import cv2
 import numpy as np
@@ -61,7 +61,7 @@ class DecoderRenderer:
         try:
             self._genai_compositor = self._synthesis_engine.get_genai_compositor()
         except ValueError:
-            self._genai_compositor = None
+            self._genai_compositor = None  # type: ignore[assignment]
         if hasattr(self._genai_compositor, "set_debug_stage"):
             self._genai_compositor.set_debug_stage("decoder")
         self._actor_state: dict[int, _ClientActorState] = {}
@@ -447,16 +447,16 @@ class DecoderRenderer:
                 generated_indices.append(int(frame_idx))
                 generated_deltas.append(composited.to(dtype=torch.float32) - bg_frame.to(dtype=torch.float32))
 
-        out_frames: list[torch.Tensor] = []
+        blended_frames: list[torch.Tensor] = []
         anchor_idx = 0
         for frame_idx in range(frame_count):
             if frame_idx <= generated_indices[0]:
-                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[0]).clamp(0.0, 255.0).to(torch.uint8))
+                blended_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[0]).clamp(0.0, 255.0).to(torch.uint8))
                 continue
             while anchor_idx + 1 < len(generated_indices) and frame_idx > generated_indices[anchor_idx + 1]:
                 anchor_idx += 1
             if anchor_idx + 1 >= len(generated_indices):
-                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[-1]).clamp(0.0, 255.0).to(torch.uint8))
+                blended_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + generated_deltas[-1]).clamp(0.0, 255.0).to(torch.uint8))
                 continue
 
             left_idx = generated_indices[anchor_idx]
@@ -464,13 +464,13 @@ class DecoderRenderer:
             left_delta = generated_deltas[anchor_idx]
             right_delta = generated_deltas[anchor_idx + 1]
             if right_idx <= left_idx:
-                out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + left_delta).clamp(0.0, 255.0).to(torch.uint8))
+                blended_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + left_delta).clamp(0.0, 255.0).to(torch.uint8))
                 continue
             alpha = float(frame_idx - left_idx) / float(right_idx - left_idx)
             blended_delta = torch.lerp(left_delta, right_delta, alpha)
-            out_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + blended_delta).clamp(0.0, 255.0).to(torch.uint8))
+            blended_frames.append((frame_tensor[frame_idx].to(dtype=torch.float32) + blended_delta).clamp(0.0, 255.0).to(torch.uint8))
 
-        return torch.stack(out_frames, dim=0)
+        return torch.stack(blended_frames, dim=0)
 
     def _render_genai_sequence(self, frame_tensor: torch.Tensor) -> torch.Tensor:
         frame_count = int(frame_tensor.shape[0])
@@ -526,7 +526,9 @@ class DecoderRenderer:
         raw = getattr(self.config, "animate_anyone_window", None) if self.config else None
         if raw is None:
             return default_window
-        raw = raw.strip().lower()
+        if isinstance(raw, int):
+            return max(1, raw)
+        raw = str(raw).strip().lower()
         if raw in {"", "none", "null", "off", "0"}:
             return default_window
         try:

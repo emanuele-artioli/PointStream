@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Diagnose warped background panorama divergence."""
 
-import os
 import sys
 from pathlib import Path
 

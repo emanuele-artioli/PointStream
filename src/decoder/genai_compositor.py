@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 import logging
-import os
 from pathlib import Path
 from typing import Any
 
@@ -66,9 +65,11 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
         self,
         model_id: str = "runwayml/stable-diffusion-v1-5",
         controlnet_id: str = "lllyasviel/control_v11p_sd15_openpose",
+        config: Any = None,
     ) -> None:
         self._model_id = model_id
         self._controlnet_id = controlnet_id
+        self.config = config
         self._pipe: Any | None = None
 
     def _ensure_pipeline(self, device: torch.device) -> Any:
@@ -87,7 +88,7 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
             device,
             default_cuda=torch.float16,
             allowed_cuda={torch.float16, torch.bfloat16, torch.float32},
-            config_dtype=config.gpu_dtype if config and hasattr(config, "gpu_dtype") else None,
+            config_dtype=self.config.gpu_dtype if self.config and hasattr(self.config, "gpu_dtype") else None,
         )
         controlnet = ControlNetModel.from_pretrained(self._controlnet_id, torch_dtype=dtype)
         pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
@@ -396,7 +397,7 @@ class DiffusersCompositor(BaseCompositor):
 
     def _build_strategy(self, backend: str) -> BaseGenAIStrategy:
         if backend in {"controlnet", "baseline", "baseline-controlnet"}:
-            return BaselineControlNetStrategy()
+            return BaselineControlNetStrategy(config=self.config)
         if backend in {"animate-anyone", "animate_anyone", "animateanyone"}:
             return AnimateAnyoneStrategy(config=self.config)
         raise ValueError(f"Unsupported genai-backend value in config: {backend}")

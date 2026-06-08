@@ -7,7 +7,6 @@ from typing import Any
 
 import numpy as np
 import pytest
-import torch
 
 from src.shared.config import PointstreamConfig
 from src.encoder import actor_pipeline as me

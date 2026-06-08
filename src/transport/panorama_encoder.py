@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-import os
 from pathlib import Path
+from typing import Any
 
 import cv2
 import numpy as np
@@ -69,8 +69,6 @@ class PngPanoramaEncoder(BasePanoramaEncoder):
             raise RuntimeError(f"Failed to encode PNG panorama sidecar: {output_path}")
         return output_path
 
-
-from typing import Any
 
 def build_panorama_encoder(panorama_encoder: str | BasePanoramaEncoder | None = None, config: Any = None) -> BasePanoramaEncoder:
     if isinstance(panorama_encoder, BasePanoramaEncoder):

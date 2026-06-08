@@ -3,7 +3,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 import logging
-import os
 from pathlib import Path
 from typing import Any
 
@@ -60,12 +59,12 @@ def _resolve_local_weight_path(model_name: str) -> Path | None:
     return None
 
 
-def _require_local_or_optin_weight(model_name: str) -> str:
+def _require_local_or_optin_weight(model_name: str, allow_download: bool = True) -> str:
     local_path = _resolve_local_weight_path(model_name)
     if local_path is not None:
         return str(local_path)
 
-    if getattr(config, "allow_auto_model_download", True):
+    if allow_download:
         return model_name
 
     raise FileNotFoundError(

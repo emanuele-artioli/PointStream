@@ -1,13 +1,12 @@
-import argparse
 from dataclasses import dataclass, field, fields
 import json
 from pathlib import Path
 from typing import Any, Optional
 
 try:
-    import yaml  # type: ignore[import-untyped]
+    import yaml
 except ImportError:
-    yaml = None
+    yaml = None  # type: ignore[assignment]
 
 
 @dataclass

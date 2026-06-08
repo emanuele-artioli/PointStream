@@ -133,8 +133,8 @@ def test_generate_frame_smoke_with_stub_pipeline(monkeypatch, tmp_path: Path) ->
     model_root = tmp_path / "models"
     model_root.mkdir(parents=True)
 
-    monkeypatch.setattr(runtime, "_resolve_repo_root", lambda repo_dir: repo_root)
-    monkeypatch.setattr(runtime, "_resolve_model_root", lambda repo_root, runtime: model_root)
+    monkeypatch.setattr(runtime, "_resolve_repo_root", lambda repo_dir, config=None: repo_root)
+    monkeypatch.setattr(runtime, "_resolve_model_root", lambda repo_root, runtime, config=None: model_root)
     monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
 
     class _StubPipe:
@@ -145,7 +145,7 @@ def test_generate_frame_smoke_with_stub_pipeline(monkeypatch, tmp_path: Path) ->
             videos = torch.linspace(-1.0, 1.0, steps=1 * 3 * 2 * 96 * 64, dtype=torch.float32).reshape(1, 3, 2, 96, 64)
             return SimpleNamespace(videos=videos)
 
-    monkeypatch.setattr(runtime, "_load_pipeline", lambda repo_root, model_root, device: _StubPipe())
+    monkeypatch.setattr(runtime, "_load_pipeline", lambda repo_root, model_root, device, config=None: _StubPipe())
 
     reference = np.zeros((80, 40, 3), dtype=np.uint8)
     reference[:, :, 2] = 220
@@ -175,8 +175,8 @@ def test_generate_frame_fallback_pose_sequence(monkeypatch, tmp_path: Path) -> N
     model_root = tmp_path / "models"
     model_root.mkdir(parents=True)
 
-    monkeypatch.setattr(runtime, "_resolve_repo_root", lambda repo_dir: repo_root)
-    monkeypatch.setattr(runtime, "_resolve_model_root", lambda repo_root, runtime: model_root)
+    monkeypatch.setattr(runtime, "_resolve_repo_root", lambda repo_dir, config=None: repo_root)
+    monkeypatch.setattr(runtime, "_resolve_model_root", lambda repo_root, runtime, config=None: model_root)
     monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
     monkeypatch.setattr(runtime, "_prepare_pose_sequence", lambda dense_pose_sequence, width, height: [])
 
@@ -187,7 +187,7 @@ def test_generate_frame_fallback_pose_sequence(monkeypatch, tmp_path: Path) -> N
             videos = torch.zeros((1, 3, 1, 32, 32), dtype=torch.float32)
             return SimpleNamespace(videos=videos)
 
-    monkeypatch.setattr(runtime, "_load_pipeline", lambda repo_root, model_root, device: _StubPipe())
+    monkeypatch.setattr(runtime, "_load_pipeline", lambda repo_root, model_root, device, config=None: _StubPipe())
 
     reference = np.zeros((16, 16, 3), dtype=np.uint8)
     pose_seq = np.zeros((1, 18, 3), dtype=np.float32)

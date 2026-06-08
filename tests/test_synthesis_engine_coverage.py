@@ -125,7 +125,7 @@ def test_resolve_panorama_image_errors_for_invalid_shapes_and_missing_files(tmp_
     engine = se.SynthesisEngine(config=PointstreamConfig(), device="cpu")
 
     payload_bad_shape = _make_payload()
-    payload_bad_shape.panorama.panorama_image = np.zeros((24, 32), dtype=np.uint8).tolist()
+    payload_bad_shape.panorama.panorama_image = np.zeros((24, 32), dtype=np.uint8).tolist()  # type: ignore[assignment]
     with pytest.raises(ValueError, match="Invalid panorama image shape"):
         engine._resolve_panorama_image(payload_bad_shape)
 

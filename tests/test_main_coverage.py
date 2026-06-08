@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
 import runpy
 import sys
 import types
@@ -59,7 +58,7 @@ class _FakeDiskTransport:
 class _FakeDecoderRenderer:
     instances: list["_FakeDecoderRenderer"] = []
 
-    def __init__(self, output_root=None, deterministic_seed=1337) -> None:
+    def __init__(self, output_root=None, deterministic_seed=1337, config=None) -> None:
         self.output_root = output_root
         self.deterministic_seed = deterministic_seed
         _FakeDecoderRenderer.instances.append(self)
@@ -202,7 +201,7 @@ def test_run_cli_accepts_input_and_config(monkeypatch, tmp_path: Path) -> None:
     monkeypatch.setattr(main_module, "run_pipeline", _fake_run_pipeline)
     monkeypatch.setattr(main_module, "_create_timestamped_output_dir", lambda base_root=None: output_dir)
     try:
-        import yaml
+        import yaml  # noqa: F401  # type: ignore
         monkeypatch.setattr(main_module, "load_config", lambda path, cli_overrides=None: PointstreamConfig(**(cli_overrides or {"source_uri": "/tmp/ignore.mp4"})))
     except ImportError:
         monkeypatch.setattr(main_module, "load_config", lambda path, cli_overrides=None: PointstreamConfig(**(cli_overrides or {"source_uri": "/tmp/ignore.mp4"})))
