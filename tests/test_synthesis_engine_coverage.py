@@ -7,7 +7,6 @@ import types
 
 import numpy as np
 import pytest
-import typing
 import torch
 
 from src.shared import synthesis_engine as se

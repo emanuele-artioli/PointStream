@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 try:
-    import yaml
+    import yaml  # type: ignore[import-untyped, unused-ignore]
     HAS_YAML = True
 except ImportError:
     HAS_YAML = False
