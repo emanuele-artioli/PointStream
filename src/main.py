@@ -276,6 +276,8 @@ def run_cli(argv: list[str] | None = None) -> int:
     ensure_ffmpeg_encoder_available(config.ffmpeg_codec)
     
     run_output_root = _create_timestamped_output_dir(base_root=_project_root() / "outputs")
+    config.runtime_output_dir = str(run_output_root)
+    config.debug_artifact_dir = str(run_output_root / "debug")
     
     run_summary = run_pipeline(
         config=config,

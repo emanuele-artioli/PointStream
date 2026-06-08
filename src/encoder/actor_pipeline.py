@@ -163,7 +163,7 @@ class ActorExtractor:
         return ActorExtractionResult(frame_states=filtered_states, actor_packets=packets)
 
     def _resolve_debug_keyframes_dir(self) -> Path:
-        override = getattr(self._config, "runtime_output_root", None)
+        override = getattr(self._config, "debug_artifact_dir", None)
         if override:
             return Path(override) / "debug_actors"
 
