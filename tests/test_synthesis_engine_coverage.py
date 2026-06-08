@@ -10,6 +10,7 @@ import pytest
 import torch
 
 from src.shared import synthesis_engine as se
+from src.shared.config import PointstreamConfig
 from src.shared.schemas import (
     ActorPacket,
     BallPacket,
@@ -106,14 +107,14 @@ def _make_payload(
 
 def test_synthesis_engine_builds_diffusers_when_genai_enabled(monkeypatch: pytest.MonkeyPatch) -> None:
     class _DummyDiffusersCompositor:
-        def __init__(self, seed: int, device: torch.device) -> None:
+        def __init__(self, seed: int, device: torch.device, config: PointstreamConfig | None = None) -> None:
             self.seed = seed
             self.device = device
 
     monkeypatch.setenv("POINTSTREAM_ENABLE_GENAI", "1")
     monkeypatch.setattr(se, "DiffusersCompositor", _DummyDiffusersCompositor)
 
-    engine = se.SynthesisEngine(seed=2026, device="cpu")
+    engine = se.SynthesisEngine(config=PointstreamConfig(genai_backend="animate-anyone"), seed=2026, device="cpu")
     compositor = engine.get_genai_compositor()
 
     assert isinstance(compositor, _DummyDiffusersCompositor)
@@ -121,7 +122,7 @@ def test_synthesis_engine_builds_diffusers_when_genai_enabled(monkeypatch: pytes
 
 
 def test_resolve_panorama_image_errors_for_invalid_shapes_and_missing_files(tmp_path: Path) -> None:
-    engine = se.SynthesisEngine(device="cpu")
+    engine = se.SynthesisEngine(config=PointstreamConfig(), device="cpu")
 
     payload_bad_shape = _make_payload()
     payload_bad_shape.panorama.panorama_image = np.zeros((24, 32), dtype=np.uint8).tolist()
@@ -135,7 +136,7 @@ def test_resolve_panorama_image_errors_for_invalid_shapes_and_missing_files(tmp_
 
 
 def test_collect_keyframes_and_interpolation_mask_branches() -> None:
-    engine = se.SynthesisEngine(device="cpu")
+    engine = se.SynthesisEngine(config=PointstreamConfig(), device="cpu")
 
     invalid_actor = ActorPacket(
         chunk_id="syn001",
@@ -166,7 +167,7 @@ def test_collect_keyframes_and_interpolation_mask_branches() -> None:
 
 
 def test_unroll_ball_states_from_events_interpolates_and_holds_tail() -> None:
-    engine = se.SynthesisEngine(device="cpu")
+    engine = se.SynthesisEngine(config=PointstreamConfig(), device="cpu")
 
     events = [
         KeyframeEvent(
@@ -194,7 +195,7 @@ def test_unroll_ball_states_from_events_interpolates_and_holds_tail() -> None:
 
 
 def test_unroll_ball_states_from_states_propagates_last_visible_position() -> None:
-    engine = se.SynthesisEngine(device="cpu")
+    engine = se.SynthesisEngine(config=PointstreamConfig(), device="cpu")
 
     states = [
         BallState(frame_id=10, ball_x=14.0, ball_y=9.0, velocity_x=1.0, velocity_y=0.5, is_visible=True),
@@ -210,7 +211,7 @@ def test_unroll_ball_states_from_states_propagates_last_visible_position() -> No
 
 
 def test_draw_motion_blurred_ball_handles_visibility_and_coordinate_modes() -> None:
-    engine = se.SynthesisEngine(device="cpu")
+    engine = se.SynthesisEngine(config=PointstreamConfig(), device="cpu")
     frame = np.zeros((40, 60, 3), dtype=np.uint8)
 
     engine._draw_motion_blurred_ball(
@@ -235,7 +236,7 @@ def test_draw_motion_blurred_ball_handles_visibility_and_coordinate_modes() -> N
 
 
 def test_reconstruct_background_frames_handles_homography_padding_and_truncation(monkeypatch: pytest.MonkeyPatch) -> None:
-    engine = se.SynthesisEngine(device="cpu")
+    engine = se.SynthesisEngine(config=PointstreamConfig(), device="cpu")
 
     def _warp_perspective(src, M, dsize, mode, padding_mode, align_corners):
         _ = (M, mode, padding_mode, align_corners)
@@ -257,7 +258,7 @@ def test_reconstruct_background_frames_handles_homography_padding_and_truncation
 
 
 def test_reconstruct_background_frames_requires_kornia(monkeypatch: pytest.MonkeyPatch) -> None:
-    engine = se.SynthesisEngine(device="cpu")
+    engine = se.SynthesisEngine(config=PointstreamConfig(), device="cpu")
     monkeypatch.setitem(sys.modules, "kornia", None)
 
     with pytest.raises(RuntimeError, match="kornia is required"):
@@ -265,7 +266,7 @@ def test_reconstruct_background_frames_requires_kornia(monkeypatch: pytest.Monke
 
 
 def test_reconstruct_background_frames_rejects_empty_homography_list(monkeypatch: pytest.MonkeyPatch) -> None:
-    engine = se.SynthesisEngine(device="cpu")
+    engine = se.SynthesisEngine(config=PointstreamConfig(), device="cpu")
 
     def _warp_perspective(src, M, dsize, mode, padding_mode, align_corners):
         _ = (M, mode, padding_mode, align_corners)

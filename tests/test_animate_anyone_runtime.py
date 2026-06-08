@@ -74,14 +74,8 @@ def test_letterbox_resize_preserves_content_visibility() -> None:
     assert int(np.count_nonzero(out[:, :, 1])) > 0
 
 
-def test_runtime_config_reads_environment(monkeypatch) -> None:
-    monkeypatch.setenv("POINTSTREAM_ANIMATE_ANYONE_WIDTH", "640")
-    monkeypatch.setenv("POINTSTREAM_ANIMATE_ANYONE_HEIGHT", "360")
-    monkeypatch.setenv("POINTSTREAM_ANIMATE_ANYONE_STEPS", "22")
-    monkeypatch.setenv("POINTSTREAM_ANIMATE_ANYONE_CFG", "4.2")
-    monkeypatch.setenv("POINTSTREAM_ANIMATE_ANYONE_MODEL_VARIANT", "original")
-
-    cfg = runtime._runtime_config()
+def test_runtime_config_reads_environment() -> None:
+    cfg = runtime._RuntimeConfig(width=640, height=360, inference_steps=22, guidance_scale=4.2, model_variant="original")
     assert cfg.width == 640
     assert cfg.height == 360
     assert cfg.inference_steps == 22
@@ -89,15 +83,13 @@ def test_runtime_config_reads_environment(monkeypatch) -> None:
     assert cfg.model_variant == "original"
 
 
-def test_resolve_repo_root_and_model_root(monkeypatch, tmp_path: Path) -> None:
+def test_resolve_repo_root_and_model_root(tmp_path: Path) -> None:
     repo_root = tmp_path / "moore_aa"
     repo_root.mkdir(parents=True)
 
-    monkeypatch.delenv("POINTSTREAM_ANIMATE_ANYONE_REPO_DIR", raising=False)
     assert runtime._resolve_repo_root(None) is None
 
-    monkeypatch.setenv("POINTSTREAM_ANIMATE_ANYONE_REPO_DIR", str(repo_root))
-    resolved_repo = runtime._resolve_repo_root(None)
+    resolved_repo = runtime._resolve_repo_root(str(repo_root))
     assert resolved_repo == repo_root.resolve()
 
     model_root = repo_root / "Models" / "finetuned_tennis"
@@ -141,7 +133,6 @@ def test_generate_frame_smoke_with_stub_pipeline(monkeypatch, tmp_path: Path) ->
     model_root = tmp_path / "models"
     model_root.mkdir(parents=True)
 
-    monkeypatch.setattr(runtime, "_runtime_config", lambda: runtime._RuntimeConfig(width=64, height=96, inference_steps=5, guidance_scale=2.0, model_variant="finetuned_tennis"))
     monkeypatch.setattr(runtime, "_resolve_repo_root", lambda repo_dir: repo_root)
     monkeypatch.setattr(runtime, "_resolve_model_root", lambda repo_root, runtime: model_root)
     monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
@@ -168,6 +159,7 @@ def test_generate_frame_smoke_with_stub_pipeline(monkeypatch, tmp_path: Path) ->
         dense_pose_sequence=pose_seq,
         seed=123,
         device="cuda",
+        config=runtime._RuntimeConfig(width=64, height=96, inference_steps=5, guidance_scale=2.0, model_variant="finetuned_tennis")
     )
 
     assert out.shape == (96, 64, 3)
@@ -183,7 +175,6 @@ def test_generate_frame_fallback_pose_sequence(monkeypatch, tmp_path: Path) -> N
     model_root = tmp_path / "models"
     model_root.mkdir(parents=True)
 
-    monkeypatch.setattr(runtime, "_runtime_config", lambda: runtime._RuntimeConfig(width=32, height=32, inference_steps=3, guidance_scale=1.0, model_variant="finetuned_tennis"))
     monkeypatch.setattr(runtime, "_resolve_repo_root", lambda repo_dir: repo_root)
     monkeypatch.setattr(runtime, "_resolve_model_root", lambda repo_root, runtime: model_root)
     monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
@@ -205,6 +196,7 @@ def test_generate_frame_fallback_pose_sequence(monkeypatch, tmp_path: Path) -> N
         dense_pose_sequence=pose_seq,
         seed=321,
         device="cpu",
+        config=runtime._RuntimeConfig(width=32, height=32, inference_steps=3, guidance_scale=1.0, model_variant="finetuned_tennis")
     )
     assert out.shape == (32, 32, 3)
 
@@ -213,4 +205,4 @@ def test_generate_frame_validates_reference_shape() -> None:
     bad_reference = np.zeros((40, 40), dtype=np.uint8)
     pose_seq = np.zeros((1, 18, 3), dtype=np.float32)
     with pytest.raises(ValueError):
-        runtime.generate_frame(bad_reference, pose_seq, seed=1, device="cpu")
+        runtime.generate_frame(bad_reference, pose_seq, seed=1, device="cpu", config=runtime._RuntimeConfig())

@@ -4,8 +4,10 @@ from pathlib import Path
 
 import torch
 
+from src.decoder.genai_compositor import DiffusersCompositor
 import src.decoder.genai_compositor as gc
-from src.encoder.residual_calculator import ResidualCalculator
+from src.encoder.residual_calculator import BinaryActorImportanceMapper, ResidualCalculator
+from src.shared.config import PointstreamConfig
 from tests.video_utils import create_dummy_video
 
 
@@ -14,8 +16,8 @@ def test_residual_calculator_uses_genai_compositor_when_enabled(
     mock_encoder_pipeline,
     test_run_artifacts_dir: Path,
 ) -> None:
-    monkeypatch.setenv("POINTSTREAM_ENABLE_GENAI", "1")
-    monkeypatch.setenv("POINTSTREAM_GENAI_BACKEND", "animate-anyone")
+    pipeline_config = PointstreamConfig(genai_backend="animate-anyone")
+    mock_encoder_pipeline = type(mock_encoder_pipeline)(config=pipeline_config, actor_extractor=mock_encoder_pipeline._actor_extractor)
 
     calls = {"count": 0}
 
@@ -49,7 +51,7 @@ def test_residual_calculator_uses_genai_compositor_when_enabled(
         start_frame_id=0,
     )
 
-    calculator = ResidualCalculator(device="cpu")
+    calculator = ResidualCalculator(config=PointstreamConfig(), device="cpu")
     compositor = calculator._synthesis_engine.get_genai_compositor()
     assert isinstance(compositor, gc.DiffusersCompositor)
     assert compositor.uses_temporal_pose_sequence() is True

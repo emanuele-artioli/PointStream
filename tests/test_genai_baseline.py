@@ -8,7 +8,7 @@ import numpy as np
 import torch
 
 from src.decoder.mock_renderer import DecoderRenderer
-from src.encoder.mock_extractors import MockActorExtractor
+from tests.mock_components import MockActorExtractor
 from src.encoder.reference_extractor import ReferenceExtractor
 from src.encoder.video_io import encode_video_frames_ffmpeg, iter_video_frames_ffmpeg, probe_video_metadata
 from src.shared.schemas import FrameState, SceneActor, VideoChunk

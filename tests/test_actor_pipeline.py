@@ -7,8 +7,11 @@ from typing import Any
 
 import numpy as np
 import pytest
+import torch
 
-from src.encoder import mock_extractors as me
+from src.shared.config import PointstreamConfig
+from src.encoder import actor_pipeline as me
+from tests import mock_components as mc
 from src.shared.schemas import VideoChunk
 
 
@@ -172,7 +175,7 @@ def test_actor_extractor_process_with_states_renders_debug(monkeypatch: pytest.M
 
     monkeypatch.setenv("POINTSTREAM_DEBUG_ARTIFACT_DIR", str(tmp_path / "debug"))
 
-    extractor = me.ActorExtractor(render_debug_keyframes=True)
+    extractor = me.ActorExtractor(config=PointstreamConfig(), render_debug_keyframes=True)
     chunk = _make_chunk(source, frames=2)
     result = extractor.process_with_states(chunk)
 
@@ -188,7 +191,7 @@ def test_mock_trackers_emit_contract_packets(tmp_path: Path) -> None:
     source.write_bytes(b"x")
     chunk = _make_chunk(source, frames=6)
 
-    rigid_packets = me.ObjectTracker().process(chunk)
+    rigid_packets = mc.ObjectTracker().process(chunk)
     assert len(rigid_packets) == 1
     rigid = rigid_packets[0]
     assert rigid.object_id == "racket_0"
@@ -196,7 +199,7 @@ def test_mock_trackers_emit_contract_packets(tmp_path: Path) -> None:
     assert rigid.events[0].event_type == "keyframe"
     assert rigid.events[1].event_type == "interpolate"
 
-    ball = me.BallTracker().process(chunk)
+    ball = mc.BallTracker().process(chunk)
     assert ball.object_id == "ball_0"
     assert ball.trajectory_spec.shape == [1, 6, 4]
     assert ball.events[0].event_type == "keyframe"

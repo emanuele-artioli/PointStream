@@ -23,23 +23,18 @@ def clear_cuda_dtype_cache() -> None:
     td._is_cuda_dtype_supported.cache_clear()
 
 
-def test_parse_gpu_dtype_env_handles_missing_and_blank(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.delenv("POINTSTREAM_GPU_DTYPE", raising=False)
-    assert td.parse_gpu_dtype_env() is None
-
-    monkeypatch.setenv("POINTSTREAM_GPU_DTYPE", "   ")
-    assert td.parse_gpu_dtype_env() is None
+def test_parse_gpu_dtype_handles_missing_and_blank() -> None:
+    assert td.parse_gpu_dtype(None) is None
+    assert td.parse_gpu_dtype("   ") is None
 
 
-def test_parse_gpu_dtype_env_parses_alias(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("POINTSTREAM_GPU_DTYPE", "Fp16")
-    assert td.parse_gpu_dtype_env() == torch.float16
+def test_parse_gpu_dtype_parses_alias() -> None:
+    assert td.parse_gpu_dtype("Fp16") == torch.float16
 
 
-def test_parse_gpu_dtype_env_warns_on_invalid(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("POINTSTREAM_GPU_DTYPE", "invalid-dtype")
-    with pytest.warns(RuntimeWarning, match="Unsupported POINTSTREAM_GPU_DTYPE"):
-        assert td.parse_gpu_dtype_env() is None
+def test_parse_gpu_dtype_warns_on_invalid() -> None:
+    with pytest.warns(RuntimeWarning, match="Unsupported gpu_dtype"):
+        assert td.parse_gpu_dtype("invalid-dtype") is None
 
 
 def test_is_cuda_dtype_supported_returns_false_when_cuda_unavailable(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -74,7 +69,7 @@ def test_resolve_torch_dtype_for_device_returns_float32_on_cpu() -> None:
 
 
 def test_resolve_torch_dtype_for_device_uses_supported_candidate(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(td, "parse_gpu_dtype_env", lambda env_var="POINTSTREAM_GPU_DTYPE": torch.bfloat16)
+    monkeypatch.setattr(td, "parse_gpu_dtype", lambda raw: torch.bfloat16)
     monkeypatch.setattr(td, "_is_cuda_dtype_supported", lambda dtype_name, device_index: dtype_name == "bfloat16")
 
     assert td.resolve_torch_dtype_for_device("cuda:0") == torch.bfloat16
@@ -83,7 +78,7 @@ def test_resolve_torch_dtype_for_device_uses_supported_candidate(monkeypatch: py
 def test_resolve_torch_dtype_for_device_warns_when_requested_not_allowed(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(td, "parse_gpu_dtype_env", lambda env_var="POINTSTREAM_GPU_DTYPE": torch.bfloat16)
+    monkeypatch.setattr(td, "parse_gpu_dtype", lambda raw: torch.bfloat16)
     monkeypatch.setattr(td, "_is_cuda_dtype_supported", lambda dtype_name, device_index: dtype_name == "float16")
 
     with pytest.warns(RuntimeWarning, match="not allowed"):
@@ -93,7 +88,7 @@ def test_resolve_torch_dtype_for_device_warns_when_requested_not_allowed(
 def test_resolve_torch_dtype_for_device_falls_back_when_candidate_unsupported(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(td, "parse_gpu_dtype_env", lambda env_var="POINTSTREAM_GPU_DTYPE": torch.float16)
+    monkeypatch.setattr(td, "parse_gpu_dtype", lambda raw: torch.float16)
 
     def _support(dtype_name: str, device_index: int) -> bool:
         _ = device_index
@@ -116,7 +111,7 @@ def test_resolve_torch_dtype_for_device_falls_back_when_candidate_unsupported(
 def test_resolve_torch_dtype_for_device_falls_back_to_float32_when_none_supported(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(td, "parse_gpu_dtype_env", lambda env_var="POINTSTREAM_GPU_DTYPE": torch.float16)
+    monkeypatch.setattr(td, "parse_gpu_dtype", lambda raw: torch.float16)
     monkeypatch.setattr(td, "_is_cuda_dtype_supported", lambda dtype_name, device_index: False)
 
     with pytest.warns(RuntimeWarning, match="Falling back to float32"):

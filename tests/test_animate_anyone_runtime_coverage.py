@@ -150,8 +150,7 @@ def _create_required_model_entries(model_root: Path) -> None:
             path.mkdir(parents=True, exist_ok=True)
 
 
-def test_resolve_repo_root_missing_and_invalid(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    monkeypatch.delenv("POINTSTREAM_ANIMATE_ANYONE_REPO_DIR", raising=False)
+def test_resolve_repo_root_missing_and_invalid(tmp_path: Path) -> None:
     # If no repo dir is configured, runtime should fall back to an installed
     # package when available; in tests we accept None to indicate no repo.
     assert runtime._resolve_repo_root(None) is None
@@ -160,21 +159,19 @@ def test_resolve_repo_root_missing_and_invalid(monkeypatch: pytest.MonkeyPatch, 
         runtime._resolve_repo_root(str(tmp_path / "missing_repo"))
 
 
-def test_resolve_model_root_explicit_relative_and_absolute(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_resolve_model_root_explicit_relative_and_absolute(tmp_path: Path) -> None:
     repo_root = tmp_path / "repo"
     repo_root.mkdir(parents=True)
 
     relative_model = repo_root / "custom_models"
     _create_required_model_entries(relative_model)
 
-    monkeypatch.setenv("POINTSTREAM_ANIMATE_ANYONE_MODEL_DIR", "custom_models")
-    resolved_relative = runtime._resolve_model_root(repo_root=repo_root, runtime=runtime._RuntimeConfig())
+    resolved_relative = runtime._resolve_model_root(repo_root=repo_root, runtime=runtime._RuntimeConfig(model_dir="custom_models"))
     assert resolved_relative == relative_model.resolve()
 
     absolute_model = tmp_path / "absolute_models"
     _create_required_model_entries(absolute_model)
-    monkeypatch.setenv("POINTSTREAM_ANIMATE_ANYONE_MODEL_DIR", str(absolute_model))
-    resolved_absolute = runtime._resolve_model_root(repo_root=repo_root, runtime=runtime._RuntimeConfig())
+    resolved_absolute = runtime._resolve_model_root(repo_root=repo_root, runtime=runtime._RuntimeConfig(model_dir=str(absolute_model)))
     assert resolved_absolute == absolute_model.resolve()
 
 
@@ -261,7 +258,7 @@ def test_generate_frame_uses_cuda_when_available_and_usable(monkeypatch: pytest.
     repo_root.mkdir(parents=True)
     model_root.mkdir(parents=True)
 
-    monkeypatch.setattr(runtime, "_runtime_config", lambda: runtime._RuntimeConfig(width=16, height=16, inference_steps=2, guidance_scale=1.0, model_variant="finetuned_tennis"))
+    monkeypatch.setattr(runtime, "_resolve_repo_root", lambda repo_dir: repo_root)
     monkeypatch.setattr(runtime, "_resolve_repo_root", lambda repo_dir: repo_root)
     monkeypatch.setattr(runtime, "_resolve_model_root", lambda repo_root, runtime: model_root)
     monkeypatch.setattr(runtime, "_prepare_pose_sequence", lambda dense_pose_sequence, width, height: [])
@@ -297,6 +294,9 @@ def test_generate_frame_uses_cuda_when_available_and_usable(monkeypatch: pytest.
     reference = np.zeros((8, 8, 3), dtype=np.uint8)
     pose_seq = np.zeros((1, 18, 3), dtype=np.float32)
 
-    out = runtime.generate_frame(reference, pose_seq, seed=7, device="cuda")
+    out = runtime.generate_frame(
+        reference, pose_seq, seed=7, device="cuda",
+        config=runtime._RuntimeConfig(width=16, height=16, inference_steps=2, guidance_scale=1.0, model_variant="finetuned_tennis")
+    )
     assert captured["device"] == "cuda"
     assert out.shape == (16, 16, 3)

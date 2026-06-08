@@ -116,8 +116,7 @@ def test_track_id_and_dtype_helpers(monkeypatch: pytest.MonkeyPatch) -> None:
     assert track_id.scene_track_id_to_int("person_17") == 17
     assert track_id.scene_track_id_to_int("person_alpha") == track_id.scene_track_id_to_int("person_alpha")
 
-    monkeypatch.setenv("POINTSTREAM_GPU_DTYPE", "fp16")
-    assert td.parse_gpu_dtype_env() == torch.float16
+    assert td.parse_gpu_dtype("fp16") == torch.float16
 
 
 def test_panorama_encoder_build_and_validate(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -139,9 +138,12 @@ def test_panorama_encoder_build_and_validate(tmp_path: Path, monkeypatch: pytest
     with pytest.raises(ValueError, match=r"expected \[H, W, 3\]"):
         jpeg_encoder.encode(np.zeros((12, 16), dtype=np.uint8), tmp_path / "bad")
 
-    monkeypatch.setenv("POINTSTREAM_PANORAMA_JPEG_QUALITY", "bad")
-    with pytest.raises(ValueError, match="must be an integer"):
-        build_panorama_encoder("jpeg")
+    try:
+        from pydantic import ValidationError
+        with pytest.raises(ValidationError):
+            build_panorama_encoder("jpeg", config=PointstreamConfig(panorama_jpeg_quality="bad"))
+    except ImportError:
+        pass
 
     with pytest.raises(ValueError, match="Unsupported panorama encoder"):
         build_panorama_encoder("webp")

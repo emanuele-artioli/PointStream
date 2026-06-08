@@ -9,9 +9,10 @@ import pytest
 
 from src.decoder.mock_renderer import DecoderRenderer
 from src.encoder.ball_extractor import BallExtractor
-from src.encoder.mock_extractors import MockActorExtractor
-from src.encoder.orchestrator import EncoderPipeline
 from src.encoder.video_io import encode_video_frames_ffmpeg, iter_video_frames_ffmpeg
+from src.shared.config import PointstreamConfig
+from tests.mock_components import MockActorExtractor
+from src.encoder.orchestrator import EncoderPipeline
 from src.shared.schemas import CameraPose, FrameState, PanoramaPacket, VideoChunk
 from src.transport.disk import DiskTransport
 
@@ -126,7 +127,7 @@ def test_end_to_end_reconstruction_contains_tracked_ball(test_run_artifacts_dir:
         fps=fps,
     )
 
-    pipeline = EncoderPipeline(actor_extractor=MockActorExtractor())
+    pipeline = EncoderPipeline(config=PointstreamConfig(), actor_extractor=MockActorExtractor())
     try:
         payload, _decoded = pipeline.encode_video_file(
             video_path=video_path,

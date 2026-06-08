@@ -8,6 +8,7 @@ import torch
 
 from src.decoder.mock_renderer import DecoderRenderer, _ClientActorState
 from src.encoder.video_io import encode_video_frames_ffmpeg, probe_video_metadata
+from src.shared.config import PointstreamConfig
 from src.shared.schemas import ActorMaskFrame
 from src.shared.synthesis_engine import SynthesisEngine
 from tests.video_utils import create_dummy_video
@@ -31,7 +32,7 @@ def test_decoder_output_matches_chunk_dimensions(mock_encoder_pipeline, test_run
         start_frame_id=0,
     )
 
-    engine = SynthesisEngine(seed=2026)
+    engine = SynthesisEngine(config=PointstreamConfig(), seed=2026)
     synthesis = engine.synthesize(payload)
     synthesis_repeat = engine.synthesize(payload)
     assert np.array_equal(
@@ -94,10 +95,8 @@ class _TemporalSpyCompositor:
 
 
 def test_render_genai_baseline_uses_preroll_and_fixed_temporal_window(monkeypatch, tmp_path: Path) -> None:
-    monkeypatch.setenv("POINTSTREAM_ANIMATE_ANYONE_WINDOW", "4")
-    monkeypatch.setenv("POINTSTREAM_GENAI_PREROLL_FRAMES", "1")
-
-    renderer = DecoderRenderer(output_root=tmp_path)
+    config = PointstreamConfig(animate_anyone_window=4, genai_preroll_frames=1, genai_backend="controlnet")
+    renderer = DecoderRenderer(output_root=tmp_path, config=config)
     spy = _TemporalSpyCompositor()
     setattr(renderer, "_genai_compositor", spy)
 
@@ -125,9 +124,8 @@ def test_render_genai_baseline_uses_preroll_and_fixed_temporal_window(monkeypatc
 
 
 def test_render_genai_baseline_keyframe_only_interpolates_missing_frames(monkeypatch, tmp_path: Path) -> None:
-    monkeypatch.setenv("POINTSTREAM_GENAI_KEYFRAME_ONLY", "1")
-
-    renderer = DecoderRenderer(output_root=tmp_path)
+    config = PointstreamConfig(genai_keyframe_only=True, genai_backend="controlnet")
+    renderer = DecoderRenderer(output_root=tmp_path, config=config)
 
     class _KeyframeSpyCompositor:
         def __init__(self) -> None:

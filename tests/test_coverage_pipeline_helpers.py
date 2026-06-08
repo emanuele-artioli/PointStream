@@ -10,8 +10,9 @@ import numpy as np
 import pytest
 import torch
 
-import src.encoder.orchestrator as orchestrator
-import src.encoder.residual_calculator as residual_calc
+from src.encoder import orchestrator
+from src.encoder import residual_calculator as residual_calc
+from src.shared.config import PointstreamConfig
 from src.shared.schemas import (
     ActorMaskFrame,
     ActorPacket,
@@ -179,11 +180,14 @@ def test_residual_calculator_covers_players_only_and_full_video(monkeypatch: pyt
             self.seen_metadata.append((metadata_mask, None if metadata_bbox is None else tuple(metadata_bbox)))
             return (warped_background_frame + 1).to(torch.float32)
 
-    class _FakeSynthesisEngine(SynthesisEngine):
-        def __init__(self) -> None:
-            self.seed = 7
-            self.device: Any = "cpu"
-            self._compositor = _FakeCompositor()
+        class _FakeSynthesisEngine(SynthesisEngine):
+            def __init__(self, *args, **kwargs):
+                if "config" not in kwargs:
+                    kwargs["config"] = PointstreamConfig()
+                super().__init__(*args, **kwargs)
+                self.seed = 7
+                self.device: Any = "cpu"
+                self._compositor = _FakeCompositor()
 
         def synthesize(self, payload, include_guidance_overlays=False):
             _ = (payload, include_guidance_overlays)
@@ -204,8 +208,10 @@ def test_residual_calculator_covers_players_only_and_full_video(monkeypatch: pyt
     monkeypatch.setenv("POINTSTREAM_FFMPEG_CODEC", "libsvtav1")
 
     for mode in (ResidualMode.PLAYERS_ONLY, ResidualMode.FULL_VIDEO):
+        cfg = PointstreamConfig(genai_backend="animate-anyone")
         calculator = residual_calc.ResidualCalculator(
-            synthesis_engine=_FakeSynthesisEngine(),
+            config=cfg,
+            synthesis_engine=_FakeSynthesisEngine(config=cfg),
             importance_mapper=residual_calc.BinaryActorImportanceMapper(),
             residual_mode=mode,
         )
@@ -281,7 +287,10 @@ def test_residual_calculator_adaptive_background_downscale_preserves_player_regi
     monkeypatch.setenv("POINTSTREAM_ENABLE_GENAI", "0")
 
     class _FakeSynthesisEngine(SynthesisEngine):
-        def __init__(self) -> None:
+        def __init__(self, *args, **kwargs):
+            if "config" not in kwargs:
+                kwargs["config"] = PointstreamConfig()
+            super().__init__(*args, **kwargs)
             self.seed = 7
             self.device: Any = "cpu"
 
@@ -290,8 +299,10 @@ def test_residual_calculator_adaptive_background_downscale_preserves_player_regi
             # Shape: [Frames, Channels, Height, Width]
             return SimpleNamespace(frames_bgr=torch.zeros((1, 3, 4, 4), dtype=torch.float32))
 
+    cfg = PointstreamConfig(genai_backend=None)
     calculator = residual_calc.ResidualCalculator(
-        synthesis_engine=_FakeSynthesisEngine(),
+        config=cfg,
+        synthesis_engine=_FakeSynthesisEngine(config=cfg),
         importance_mapper=residual_calc.BinaryActorImportanceMapper(),
         residual_mode=ResidualMode.FULL_VIDEO,
         background_block_downscale_factor=2,
@@ -347,6 +358,9 @@ def test_encoder_pipeline_streams_actor_states_and_uses_shifted_ball(monkeypatch
             )
             return orchestrator.ActorExtractionResult(frame_states=states, actor_packets=[packet])
 
+        def process_with_states(self, chunk):
+            return self.process_with_states_streaming(chunk)
+
     class _FakeBallExtractor:
         def process_shifted(self, chunk, panorama, actor_bundle):
             _ = (chunk, panorama)
@@ -384,15 +398,18 @@ def test_encoder_pipeline_streams_actor_states_and_uses_shifted_ball(monkeypatch
             )
 
     class _FakeResidualCalculator:
+        def __init__(self, **kwargs) -> None:
+            pass
         def process(self, chunk, payload, frame_states, debug_output_path=None):
             _ = (chunk, payload, frame_states, debug_output_path)
             return ResidualPacket(chunk_id=chunk.chunk_id, codec="libsvtav1", residual_video_uri=str(tmp_path / "residual.mp4"))
 
     pipeline = orchestrator.EncoderPipeline(
+        config=PointstreamConfig(),
         actor_extractor=_FakeActorExtractor(),
         ball_extractor=_FakeBallExtractor(),
         reference_extractor=_FakeReferenceExtractor(),
-        residual_calculator=cast(Any, _FakeResidualCalculator()),
+        residual_calculator=cast(Any, _FakeResidualCalculator(config=PointstreamConfig())),
     )
     pipeline._background_modeler = cast(Any, _FakeBackgroundModeler())
     pipeline._object_tracker = cast(Any, types.SimpleNamespace(process=lambda chunk: [RigidObjectPacket(chunk_id=chunk.chunk_id, object_id="rigid_1", trajectory_spec=TensorSpec(name="rigid", shape=[1, 4], dtype="torch.float32"), events=[])]))

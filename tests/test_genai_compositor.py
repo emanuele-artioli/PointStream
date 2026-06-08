@@ -9,7 +9,9 @@ import numpy as np
 import pytest
 import torch
 
+from src.shared.config import PointstreamConfig
 import src.decoder.genai_compositor as gc
+from tests import mock_components as mc
 
 
 def _install_fake_pillow(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -35,7 +37,7 @@ def _make_pose_sequence(valid_confidence: float = 0.95) -> torch.Tensor:
 
 
 def test_mock_compositor_process_changes_frame() -> None:
-    compositor = gc.MockCompositor()
+    compositor = mc.MockCompositor()
 
     reference = torch.full((3, 96, 64), 200, dtype=torch.uint8)
     pose = _make_pose_sequence(valid_confidence=0.9)
@@ -53,7 +55,7 @@ def test_mock_compositor_process_changes_frame() -> None:
 
 
 def test_mock_compositor_handles_no_visible_pose() -> None:
-    compositor = gc.MockCompositor()
+    compositor = mc.MockCompositor()
 
     reference = torch.full((3, 80, 48), 120, dtype=torch.uint8)
     pose = _make_pose_sequence(valid_confidence=0.0)
@@ -115,10 +117,14 @@ def test_diffusers_compositor_defaults_to_postgen_yolo_masking(monkeypatch) -> N
 
 
 def test_diffusers_compositor_metadata_mask_mode_limits_blending(monkeypatch) -> None:
-    monkeypatch.setenv("POINTSTREAM_COMPOSITING_MASK_MODE", "metadata-source-mask")
     monkeypatch.setattr(gc.DiffusersCompositor, "_build_strategy", lambda self, backend: _DummyStrategy())
 
-    compositor = gc.DiffusersCompositor(backend="controlnet", seed=1234, device="cpu")
+    compositor = gc.DiffusersCompositor(
+        backend="controlnet",
+        seed=1234,
+        device="cpu",
+        config=PointstreamConfig(compositing_mask_mode="metadata-source-mask")
+    )
     compositor._alpha_temporal_smoothing = 0.0
 
     reference = torch.full((3, 64, 48), 180, dtype=torch.uint8)
@@ -147,10 +153,14 @@ def test_diffusers_compositor_metadata_mask_mode_limits_blending(monkeypatch) ->
 
 
 def test_diffusers_compositor_metadata_mode_uses_metadata_bbox_for_placement(monkeypatch) -> None:
-    monkeypatch.setenv("POINTSTREAM_COMPOSITING_MASK_MODE", "metadata-source-mask")
     monkeypatch.setattr(gc.DiffusersCompositor, "_build_strategy", lambda self, backend: _DummyStrategy())
 
-    compositor = gc.DiffusersCompositor(backend="controlnet", seed=1234, device="cpu")
+    compositor = gc.DiffusersCompositor(
+        backend="controlnet",
+        seed=1234,
+        device="cpu",
+        config=PointstreamConfig(compositing_mask_mode="metadata-source-mask")
+    )
     compositor._alpha_temporal_smoothing = 0.0
 
     reference = torch.full((3, 64, 48), 180, dtype=torch.uint8)
