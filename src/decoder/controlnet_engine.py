@@ -148,8 +148,13 @@ class CaptionControlNetStrategy(BaseGenAIStrategy):
             x1, y1, x2, y2 = metadata_bbox
             bw = max(1, x2 - x1)
             bh = max(1, y2 - y1)
-            gen_h = max(8, (bh // 8) * 8)
-            gen_w = max(8, (bw // 8) * 8)
+            
+            scale = 512.0 / max(bh, bw)
+            if scale < 1.0:
+                scale = 1.0
+                
+            gen_h = max(8, (int(bh * scale) // 8) * 8)
+            gen_w = max(8, (int(bw * scale) // 8) * 8)
             
             pose_tensor = dense_dwpose_tensor.clone()
             pose_tensor[..., 0] -= x1
@@ -161,8 +166,12 @@ class CaptionControlNetStrategy(BaseGenAIStrategy):
             target_w = gen_w
         else:
             bh, bw = int(reference_np.shape[0]), int(reference_np.shape[1])
-            target_h = max(8, (bh // 8) * 8)
-            target_w = max(8, (bw // 8) * 8)
+            scale = 512.0 / max(bh, bw)
+            if scale < 1.0:
+                scale = 1.0
+                
+            target_h = max(8, (int(bh * scale) // 8) * 8)
+            target_w = max(8, (int(bw * scale) // 8) * 8)
             pose_tensor = dense_dwpose_tensor.clone()
             pose_tensor[..., 0] *= float(target_w) / float(bw)
             pose_tensor[..., 1] *= float(target_h) / float(bh)
@@ -177,6 +186,9 @@ class CaptionControlNetStrategy(BaseGenAIStrategy):
         )
 
         reference_rgb = cv2.cvtColor(reference_np, cv2.COLOR_BGR2RGB)
+        if reference_rgb.shape[0] != target_h or reference_rgb.shape[1] != target_w:
+            reference_rgb = cv2.resize(reference_rgb, (target_w, target_h), interpolation=cv2.INTER_LANCZOS4)
+            
         # _render_pose_condition returns an RGB canvas natively. Do not swap to BGR.
         pose_rgb = pose_image
         init_image = Image.fromarray(reference_rgb)
