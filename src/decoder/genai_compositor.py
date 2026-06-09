@@ -125,46 +125,54 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
             bh = max(1, y2 - y1)
             
             scale = 512.0 / max(bh, bw)
-            if scale < 1.0:
-                scale = 1.0
-                
-            gen_h = max(8, (int(bh * scale) // 8) * 8)
-            gen_w = max(8, (int(bw * scale) // 8) * 8)
+            scaled_h = int(bh * scale)
+            scaled_w = int(bw * scale)
+            
+            offset_x = (512 - scaled_w) // 2
+            offset_y = (512 - scaled_h) // 2
             
             pose_tensor = dense_dwpose_tensor.clone()
             pose_tensor[..., 0] -= x1
             pose_tensor[..., 1] -= y1
-            pose_tensor[..., 0] *= float(gen_w) / float(bw)
-            pose_tensor[..., 1] *= float(gen_h) / float(bh)
+            pose_tensor[..., 0] *= float(scaled_w) / float(bw)
+            pose_tensor[..., 1] *= float(scaled_h) / float(bh)
+            pose_tensor[..., 0] += offset_x
+            pose_tensor[..., 1] += offset_y
             
-            target_h = gen_h
-            target_w = gen_w
         else:
             bh, bw = int(reference_np.shape[0]), int(reference_np.shape[1])
             scale = 512.0 / max(bh, bw)
-            if scale < 1.0:
-                scale = 1.0
-            target_h = max(8, (int(bh * scale) // 8) * 8)
-            target_w = max(8, (int(bw * scale) // 8) * 8)
+            scaled_h = int(bh * scale)
+            scaled_w = int(bw * scale)
+            
+            offset_x = (512 - scaled_w) // 2
+            offset_y = (512 - scaled_h) // 2
+            
             pose_tensor = dense_dwpose_tensor.clone()
-            pose_tensor[..., 0] *= float(target_w) / float(bw)
-            pose_tensor[..., 1] *= float(target_h) / float(bh)
+            pose_tensor[..., 0] *= float(scaled_w) / float(bw)
+            pose_tensor[..., 1] *= float(scaled_h) / float(bh)
+            pose_tensor[..., 0] += offset_x
+            pose_tensor[..., 1] += offset_y
 
         if pose_tensor.ndim == 3:
             pose_tensor = pose_tensor[-1]
+            
         pose_image = _render_pose_condition(
             pose_tensor=pose_tensor,
-            output_height=target_h,
-            output_width=target_w,
+            output_height=512,
+            output_width=512,
         )
 
         reference_rgb = cv2.cvtColor(reference_np, cv2.COLOR_BGR2RGB)
-        if reference_rgb.shape[0] != target_h or reference_rgb.shape[1] != target_w:
-            reference_rgb = cv2.resize(reference_rgb, (target_w, target_h), interpolation=cv2.INTER_LANCZOS4)
+        if reference_rgb.shape[0] != scaled_h or reference_rgb.shape[1] != scaled_w:
+            reference_rgb = cv2.resize(reference_rgb, (scaled_w, scaled_h), interpolation=cv2.INTER_LANCZOS4)
+            
+        padded_reference = np.zeros((512, 512, 3), dtype=np.uint8)
+        padded_reference[offset_y:offset_y+scaled_h, offset_x:offset_x+scaled_w] = reference_rgb
             
         # _render_pose_condition returns an RGB canvas natively. Do not swap to BGR.
         pose_rgb = pose_image
-        init_image = Image.fromarray(reference_rgb)
+        init_image = Image.fromarray(padded_reference)
         control_image = Image.fromarray(pose_rgb)
 
         generator = torch.Generator(device=device).manual_seed(int(seed))
@@ -172,15 +180,16 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
             prompt="photorealistic tennis player, broadcast sports shot",
             image=init_image,
             control_image=control_image,
-            height=target_h,
-            width=target_w,
+            height=512,
+            width=512,
             num_inference_steps=20,
             strength=0.65,
             guidance_scale=7.0,
             generator=generator,
         )
         generated_rgb = np.asarray(output.images[0], dtype=np.uint8)
-        generated_bgr = cv2.cvtColor(generated_rgb, cv2.COLOR_RGB2BGR)
+        generated_cropped = generated_rgb[offset_y:offset_y+scaled_h, offset_x:offset_x+scaled_w]
+        generated_bgr = cv2.cvtColor(generated_cropped, cv2.COLOR_RGB2BGR)
         return torch.from_numpy(generated_bgr).permute(2, 0, 1).contiguous().to(torch.uint8)
 
 
