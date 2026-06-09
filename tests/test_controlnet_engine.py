@@ -13,8 +13,8 @@ def test_mock_caption_controlnet_strategy() -> None:
     assert out.shape == (3, 64, 64)
     assert out.dtype == torch.uint8
 
-    # Check with metadata_bbox omitted since it was removed
-    out2 = strategy.generate(reference, pose, seed=42, device=torch.device("cpu"))
+    # Check with metadata_bbox included
+    out2 = strategy.generate(reference, pose, seed=42, device=torch.device("cpu"), metadata_bbox=(0, 0, 64, 64))
     assert out2.shape == (3, 64, 64)
 
 def test_caption_controlnet_strategy_init() -> None:
@@ -98,5 +98,5 @@ def test_caption_controlnet_strategy_generate(monkeypatch) -> None:
     reference = torch.zeros((3, 64, 64), dtype=torch.float32)
     pose = torch.zeros((18, 3), dtype=torch.float32)
     
-    out = strategy.generate(reference, pose, seed=42, device=torch.device("cpu"))
+    out = strategy.generate(reference, pose, seed=42, device=torch.device("cpu"), metadata_bbox=(10, 10, 50, 50))
     assert out.shape == (3, 256, 256)

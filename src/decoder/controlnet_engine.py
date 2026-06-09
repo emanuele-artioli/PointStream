@@ -25,6 +25,7 @@ class MockCaptionControlNetStrategy(BaseGenAIStrategy):
         dense_dwpose_tensor: torch.Tensor,
         seed: int,
         device: torch.device,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         # Validate inputs
         if reference_crop_tensor.ndim != 3 or reference_crop_tensor.shape[0] != 3:
@@ -139,24 +140,46 @@ class CaptionControlNetStrategy(BaseGenAIStrategy):
         dense_dwpose_tensor: torch.Tensor,
         seed: int,
         device: torch.device,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         pipe = self._ensure_pipeline(device)
 
         reference_np = _to_numpy_bgr(reference_crop_tensor)
 
-        bh, bw = int(reference_np.shape[0]), int(reference_np.shape[1])
-        scale = float(max(self._width, self._height)) / max(bh, bw)
-        scaled_h = int(bh * scale)
-        scaled_w = int(bw * scale)
-        
-        offset_x = (self._width - scaled_w) // 2
-        offset_y = (self._height - scaled_h) // 2
-        
-        pose_tensor = dense_dwpose_tensor.clone()
-        pose_tensor[..., 0] *= float(scaled_w) / float(bw)
-        pose_tensor[..., 1] *= float(scaled_h) / float(bh)
-        pose_tensor[..., 0] += offset_x
-        pose_tensor[..., 1] += offset_y
+        if metadata_bbox is not None:
+            x1, y1, x2, y2 = metadata_bbox
+            bw = max(1, x2 - x1)
+            bh = max(1, y2 - y1)
+            
+            scale = float(max(self._width, self._height)) / max(bh, bw)
+            scaled_h = int(bh * scale)
+            scaled_w = int(bw * scale)
+            
+            offset_x = (self._width - scaled_w) // 2
+            offset_y = (self._height - scaled_h) // 2
+            
+            pose_tensor = dense_dwpose_tensor.clone()
+            pose_tensor[..., 0] -= x1
+            pose_tensor[..., 1] -= y1
+            pose_tensor[..., 0] *= float(scaled_w) / float(bw)
+            pose_tensor[..., 1] *= float(scaled_h) / float(bh)
+            pose_tensor[..., 0] += offset_x
+            pose_tensor[..., 1] += offset_y
+            
+        else:
+            bh, bw = int(reference_np.shape[0]), int(reference_np.shape[1])
+            scale = float(max(self._width, self._height)) / max(bh, bw)
+            scaled_h = int(bh * scale)
+            scaled_w = int(bw * scale)
+            
+            offset_x = (self._width - scaled_w) // 2
+            offset_y = (self._height - scaled_h) // 2
+            
+            pose_tensor = dense_dwpose_tensor.clone()
+            pose_tensor[..., 0] *= float(scaled_w) / float(bw)
+            pose_tensor[..., 1] *= float(scaled_h) / float(bh)
+            pose_tensor[..., 0] += offset_x
+            pose_tensor[..., 1] += offset_y
 
         if pose_tensor.ndim == 3:
             pose_tensor = pose_tensor[-1]

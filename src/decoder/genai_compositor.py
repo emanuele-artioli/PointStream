@@ -54,6 +54,7 @@ class BaseGenAIStrategy(ABC):
         dense_dwpose_tensor: torch.Tensor,
         seed: int,
         device: torch.device,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         raise NotImplementedError
 
@@ -114,6 +115,7 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
         dense_dwpose_tensor: torch.Tensor,
         seed: int,
         device: torch.device,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         pipe = self._ensure_pipeline(device)
         try:
@@ -123,19 +125,40 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
 
         reference_np = _to_numpy_bgr(reference_crop_tensor)
 
-        bh, bw = int(reference_np.shape[0]), int(reference_np.shape[1])
-        scale = float(max(self._width, self._height)) / max(bh, bw)
-        scaled_h = int(bh * scale)
-        scaled_w = int(bw * scale)
-        
-        offset_x = (self._width - scaled_w) // 2
-        offset_y = (self._height - scaled_h) // 2
-        
-        pose_tensor = dense_dwpose_tensor.clone()
-        pose_tensor[..., 0] *= float(scaled_w) / float(bw)
-        pose_tensor[..., 1] *= float(scaled_h) / float(bh)
-        pose_tensor[..., 0] += offset_x
-        pose_tensor[..., 1] += offset_y
+        if metadata_bbox is not None:
+            x1, y1, x2, y2 = metadata_bbox
+            bw = max(1, x2 - x1)
+            bh = max(1, y2 - y1)
+            
+            scale = float(max(self._width, self._height)) / max(bh, bw)
+            scaled_h = int(bh * scale)
+            scaled_w = int(bw * scale)
+            
+            offset_x = (self._width - scaled_w) // 2
+            offset_y = (self._height - scaled_h) // 2
+            
+            pose_tensor = dense_dwpose_tensor.clone()
+            pose_tensor[..., 0] -= x1
+            pose_tensor[..., 1] -= y1
+            pose_tensor[..., 0] *= float(scaled_w) / float(bw)
+            pose_tensor[..., 1] *= float(scaled_h) / float(bh)
+            pose_tensor[..., 0] += offset_x
+            pose_tensor[..., 1] += offset_y
+            
+        else:
+            bh, bw = int(reference_np.shape[0]), int(reference_np.shape[1])
+            scale = float(max(self._width, self._height)) / max(bh, bw)
+            scaled_h = int(bh * scale)
+            scaled_w = int(bw * scale)
+            
+            offset_x = (self._width - scaled_w) // 2
+            offset_y = (self._height - scaled_h) // 2
+            
+            pose_tensor = dense_dwpose_tensor.clone()
+            pose_tensor[..., 0] *= float(scaled_w) / float(bw)
+            pose_tensor[..., 1] *= float(scaled_h) / float(bh)
+            pose_tensor[..., 0] += offset_x
+            pose_tensor[..., 1] += offset_y
 
         if pose_tensor.ndim == 3:
             pose_tensor = pose_tensor[-1]
@@ -214,6 +237,7 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
         dense_dwpose_tensor: torch.Tensor,
         seed: int,
         device: torch.device,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         runtime_fn = self._ensure_runtime()
 
@@ -257,6 +281,7 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
         dense_dwpose_tensor: torch.Tensor,
         seed: int,
         device: torch.device,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         from src.decoder.animate_anyone_runtime import generate_sequence
 
@@ -481,13 +506,20 @@ class DiffusersCompositor(BaseCompositor):
             if torch.cuda.is_available():
                 torch.cuda.manual_seed_all(self._seed)
 
-        # x1, y1, x2, y2 calculation is handled inside _composite_actor_frame
+        x1, y1, x2, y2 = self._resolve_target_bbox(
+            pose_np=self._to_pose_numpy(dense_dwpose_tensor),
+            frame_height=int(warped_background_frame.shape[1]),
+            frame_width=int(warped_background_frame.shape[2]),
+            metadata_bbox=metadata_bbox,
+        )
+        resolved_bbox = (x1, y1, x2, y2)
 
         generated_actor = self._strategy.generate(
             reference_crop_tensor=reference_crop_tensor,
             dense_dwpose_tensor=dense_dwpose_tensor,
             seed=self._seed,
             device=self._device,
+            metadata_bbox=resolved_bbox,
         )
         return self._composite_actor_frame(
             generated_actor=generated_actor,
