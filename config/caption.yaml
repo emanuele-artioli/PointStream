@@ -1,0 +1,9 @@
+# PointStream Caption-ControlNet Configuration
+# Includes overrides from default.yaml
+
+evaluation-mode: [psnr, ssim, vmaf]
+evaluation-max-frames: 30
+
+genai-backend: caption-controlnet
+compositing-mask-mode: postgen-seg-client
+postgen-segmenter-backend: heuristic

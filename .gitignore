@@ -123,8 +123,7 @@ celerybeat.pid
 experiments/*
 assets/*
 outputs/*
-old/*
+old/
 mobileclip_blt.ts
 TODO.md
 .agents/*
-TODO.md

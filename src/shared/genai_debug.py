@@ -32,15 +32,53 @@ def debug_export_compositor_input(
         if ref_np.dtype in (np.uint8,):
             if len(ref_np.shape) == 3 and ref_np.shape[0] == 3:
                 ref_np = np.transpose(ref_np, (1, 2, 0))
-                ref_np = cv2.cvtColor(ref_np, cv2.COLOR_RGB2BGR) if ref_np.shape[2] == 3 else ref_np
+                # Removed COLOR_RGB2BGR because the tensor is natively BGR
         cv2.imwrite(str(output_dir / "00_reference_crop.png"), ref_np)
 
     # Export pose
     if dense_pose_tensor is not None:
-        pose_np = dense_pose_tensor.cpu().numpy()
-        pose_np = np.asarray(pose_np * 255.0, dtype=np.uint8) if pose_np.dtype != np.uint8 else pose_np
-        if len(pose_np.shape) == 3 and pose_np.shape[0] == 3:
-            pose_np = np.transpose(pose_np, (1, 2, 0))
+        try:
+            # Render the skeleton to a canvas to match what the model sees
+            from src.decoder.genai_compositor import _render_pose_condition
+            
+            # We must shift the absolute tensor coordinates into the local crop space just like the actual generation logic
+            pose_tensor = dense_pose_tensor.clone()
+            if pose_tensor.ndim == 3:
+                pose_tensor = pose_tensor[-1]
+            pose_np_raw = pose_tensor.cpu().numpy()
+            
+            valid = pose_np_raw[:, 2] >= 0.2
+            if np.any(valid):
+                xs = pose_np_raw[valid, 0]
+                ys = pose_np_raw[valid, 1]
+                x1 = int(np.floor(np.min(xs)))
+                y1 = int(np.floor(np.min(ys)))
+                x2 = int(np.ceil(np.max(xs)))
+                y2 = int(np.ceil(np.max(ys)))
+                bw = max(1, x2 - x1)
+                bh = max(1, y2 - y1)
+                gen_h = max(8, (bh // 8) * 8)
+                gen_w = max(8, (bw // 8) * 8)
+                
+                pose_tensor[..., 0] -= x1
+                pose_tensor[..., 1] -= y1
+                pose_tensor[..., 0] *= float(gen_w) / float(bw)
+                pose_tensor[..., 1] *= float(gen_h) / float(bh)
+                target_h, target_w = gen_h, gen_w
+            else:
+                target_h = int(reference_crop_tensor.shape[1]) if reference_crop_tensor is not None else 256
+                target_w = int(reference_crop_tensor.shape[2]) if reference_crop_tensor is not None else 256
+                
+            pose_np = _render_pose_condition(pose_tensor, output_height=target_h, output_width=target_w)
+            # pose_np is RGB natively from draw_dwpose_canvas, so we convert it to BGR for cv2.imwrite
+            pose_np = cv2.cvtColor(pose_np, cv2.COLOR_RGB2BGR)
+        except Exception as e:
+            # Fallback to the raw tensor logic if rendering fails
+            logger.warning(f"Failed to render pose for debug output: {e}")
+            pose_np = dense_pose_tensor.cpu().numpy()
+            pose_np = np.asarray(pose_np * 255.0, dtype=np.uint8) if pose_np.dtype != np.uint8 else pose_np
+            if len(pose_np.shape) == 3 and pose_np.shape[0] == 3:
+                pose_np = np.transpose(pose_np, (1, 2, 0))
         cv2.imwrite(str(output_dir / "01_pose_condition.png"), pose_np)
 
     # Export warped background

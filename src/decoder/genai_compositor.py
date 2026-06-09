@@ -54,6 +54,7 @@ class BaseGenAIStrategy(ABC):
         dense_dwpose_tensor: torch.Tensor,
         seed: int,
         device: torch.device,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         raise NotImplementedError
 
@@ -108,6 +109,7 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
         dense_dwpose_tensor: torch.Tensor,
         seed: int,
         device: torch.device,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         pipe = self._ensure_pipeline(device)
         try:
@@ -116,9 +118,30 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
             raise RuntimeError("Pillow is required for ControlNet strategy") from exc
 
         reference_np = _to_numpy_bgr(reference_crop_tensor)
-        target_h, target_w = int(reference_np.shape[0]), int(reference_np.shape[1])
 
-        pose_tensor = dense_dwpose_tensor
+        if metadata_bbox is not None:
+            x1, y1, x2, y2 = metadata_bbox
+            bw = max(1, x2 - x1)
+            bh = max(1, y2 - y1)
+            gen_h = max(8, (bh // 8) * 8)
+            gen_w = max(8, (bw // 8) * 8)
+            
+            pose_tensor = dense_dwpose_tensor.clone()
+            pose_tensor[..., 0] -= x1
+            pose_tensor[..., 1] -= y1
+            pose_tensor[..., 0] *= float(gen_w) / float(bw)
+            pose_tensor[..., 1] *= float(gen_h) / float(bh)
+            
+            target_h = gen_h
+            target_w = gen_w
+        else:
+            bh, bw = int(reference_np.shape[0]), int(reference_np.shape[1])
+            target_h = max(8, (bh // 8) * 8)
+            target_w = max(8, (bw // 8) * 8)
+            pose_tensor = dense_dwpose_tensor.clone()
+            pose_tensor[..., 0] *= float(target_w) / float(bw)
+            pose_tensor[..., 1] *= float(target_h) / float(bh)
+
         if pose_tensor.ndim == 3:
             pose_tensor = pose_tensor[-1]
         pose_image = _render_pose_condition(
@@ -128,7 +151,8 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
         )
 
         reference_rgb = cv2.cvtColor(reference_np, cv2.COLOR_BGR2RGB)
-        pose_rgb = cv2.cvtColor(pose_image, cv2.COLOR_BGR2RGB)
+        # _render_pose_condition returns an RGB canvas natively. Do not swap to BGR.
+        pose_rgb = pose_image
         init_image = Image.fromarray(reference_rgb)
         control_image = Image.fromarray(pose_rgb)
 
@@ -137,6 +161,8 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
             prompt="photorealistic tennis player, broadcast sports shot",
             image=init_image,
             control_image=control_image,
+            height=target_h,
+            width=target_w,
             num_inference_steps=20,
             strength=0.65,
             guidance_scale=7.0,
@@ -400,6 +426,12 @@ class DiffusersCompositor(BaseCompositor):
             return BaselineControlNetStrategy(config=self.config)
         if backend in {"animate-anyone", "animate_anyone", "animateanyone"}:
             return AnimateAnyoneStrategy(config=self.config)
+        if backend in {"caption-controlnet", "caption_controlnet"}:
+            from src.decoder.controlnet_engine import CaptionControlNetStrategy
+            return CaptionControlNetStrategy(config=self.config)
+        if backend in {"mock-caption-controlnet", "mock_caption_controlnet"}:
+            from src.decoder.controlnet_engine import MockCaptionControlNetStrategy
+            return MockCaptionControlNetStrategy(config=self.config)
         raise ValueError(f"Unsupported genai-backend value in config: {backend}")
 
     def uses_temporal_pose_sequence(self) -> bool:
@@ -421,11 +453,20 @@ class DiffusersCompositor(BaseCompositor):
             if torch.cuda.is_available():
                 torch.cuda.manual_seed_all(self._seed)
 
+        x1, y1, x2, y2 = self._resolve_target_bbox(
+            pose_np=self._to_pose_numpy(dense_dwpose_tensor),
+            frame_height=int(warped_background_frame.shape[1]),
+            frame_width=int(warped_background_frame.shape[2]),
+            metadata_bbox=metadata_bbox,
+        )
+        resolved_bbox = (x1, y1, x2, y2)
+
         generated_actor = self._strategy.generate(
             reference_crop_tensor=reference_crop_tensor,
             dense_dwpose_tensor=dense_dwpose_tensor,
             seed=self._seed,
             device=self._device,
+            metadata_bbox=resolved_bbox,
         )
         return self._composite_actor_frame(
             generated_actor=generated_actor,
