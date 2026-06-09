@@ -485,6 +485,9 @@ class DiffusersCompositor(BaseCompositor):
         if backend in {"mock-caption-controlnet", "mock_caption_controlnet"}:
             from src.decoder.controlnet_engine import MockCaptionControlNetStrategy
             return MockCaptionControlNetStrategy(config=self.config)
+        if backend in {"ip-adapter-controlnet", "ip_adapter_controlnet"}:
+            from src.decoder.controlnet_engine import IPAdapterControlNetStrategy
+            return IPAdapterControlNetStrategy(config=self.config)
         raise ValueError(f"Unsupported genai-backend value in config: {backend}")
 
     def uses_temporal_pose_sequence(self) -> bool:

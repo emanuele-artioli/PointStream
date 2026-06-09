@@ -100,3 +100,66 @@ def test_caption_controlnet_strategy_generate(monkeypatch) -> None:
     
     out = strategy.generate(reference, pose, seed=42, device=torch.device("cpu"), metadata_bbox=(10, 10, 50, 50))
     assert out.shape == (3, 256, 256)
+
+
+def test_ipadapter_controlnet_strategy_init() -> None:
+    from src.decoder.controlnet_engine import IPAdapterControlNetStrategy
+    class DummyConfig:
+        controlnet_steps = 15
+        controlnet_cfg = 8.0
+        controlnet_width = 256
+        controlnet_height = 256
+        ip_adapter_scale = 0.7
+        ip_adapter_weight = "custom.bin"
+        
+    strategy = IPAdapterControlNetStrategy(
+        model_id="runwayml/stable-diffusion-v1-5",
+        controlnet_id="lllyasviel/control_v11p_sd15_openpose",
+        config=DummyConfig(),
+    )
+    assert strategy._steps == 15
+    assert strategy._ip_adapter_scale == 0.7
+    assert strategy._ip_adapter_weight == "custom.bin"
+
+
+def test_ipadapter_controlnet_strategy_generate(monkeypatch) -> None:
+    from src.decoder.controlnet_engine import IPAdapterControlNetStrategy
+    class DummyConfig:
+        controlnet_steps = 15
+        controlnet_cfg = 8.0
+        controlnet_width = 256
+        controlnet_height = 256
+        ip_adapter_scale = 0.7
+        
+    strategy = IPAdapterControlNetStrategy(config=DummyConfig())
+    
+    class _StubPipe:
+        def set_progress_bar_config(self, **kwargs):
+            pass
+        def to(self, device):
+            return self
+        def load_ip_adapter(self, *args, **kwargs):
+            self.loaded_ip_adapter = True
+        def set_ip_adapter_scale(self, scale):
+            self.ip_adapter_scale = scale
+        def __call__(self, *args, **kwargs):
+            import numpy as np
+            from PIL import Image
+            assert "ip_adapter_image" in kwargs
+            img = Image.fromarray(np.zeros((kwargs.get("height", 512), kwargs.get("width", 512), 3), dtype=np.uint8))
+            return SimpleNamespace(images=[img])
+            
+    class _StubModel:
+        @classmethod
+        def from_pretrained(cls, *args, **kwargs):
+            return _StubPipe()
+            
+    import diffusers
+    monkeypatch.setattr(diffusers, "ControlNetModel", _StubModel)
+    monkeypatch.setattr(diffusers, "StableDiffusionControlNetPipeline", _StubModel)
+    
+    reference = torch.zeros((3, 64, 64), dtype=torch.float32)
+    pose = torch.zeros((18, 3), dtype=torch.float32)
+    
+    out = strategy.generate(reference, pose, seed=42, device=torch.device("cpu"), metadata_bbox=(10, 10, 50, 50))
+    assert out.shape == (3, 256, 256)

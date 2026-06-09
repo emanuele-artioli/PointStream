@@ -81,7 +81,7 @@ evaluation-max-frames: 5           # Optional frame cap for quality evaluation
 # ============================================================================
 # GenAI and AnimateAnyone Configuration
 # ============================================================================                
-genai-backend: caption-controlnet             # GenAI backend: caption-controlnet, animate-anyone (null disables GenAI)
+genai-backend: ip-adapter-controlnet          # GenAI backend: caption-controlnet, ip-adapter-controlnet, animate-anyone (null disables GenAI)
 animate-anyone-repo-dir: null             # Path to Moore-AnimateAnyone repository
 animate-anyone-model-dir: null            # Override if models are in non-standard location
 animate-anyone-steps: 3                  # Diffusion inference steps for AnimateAnyone
@@ -100,6 +100,10 @@ controlnet-height: 512                    # Height for ControlNet generated fram
 controlnet-steps: 20                      # Diffusion inference steps for ControlNet
 controlnet-strength: 0.65                 # Img2Img strength for ControlNet
 controlnet-cfg: 7.0                       # Guidance scale for ControlNet
+ip-adapter-repo: h94/IP-Adapter           # HuggingFace repository for IP-Adapter
+ip-adapter-subfolder: models              # Subfolder containing IP-Adapter weights
+ip-adapter-weight: ip-adapter_sd15.bin    # IP-Adapter weight file
+ip-adapter-scale: 0.5                     # Strength of the visual prompt for IP-Adapter
 
 # ============================================================================
 # Compositing and Masking

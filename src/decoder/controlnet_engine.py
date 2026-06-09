@@ -222,3 +222,156 @@ class CaptionControlNetStrategy(BaseGenAIStrategy):
         
         # Shape: [Channels, Height, Width]
         return torch.from_numpy(generated_bgr).permute(2, 0, 1).contiguous().to(torch.uint8)
+
+
+class IPAdapterControlNetStrategy(BaseGenAIStrategy):
+    """ControlNet strategy with IP-Adapter visual prompting (txt2img)."""
+
+    def __init__(
+        self,
+        model_id: str = "assets/weights/stable-diffusion-v1-5",
+        controlnet_id: str = "assets/weights/control_v11p_sd15_openpose",
+        config: Any = None,
+    ) -> None:
+        self._model_id = model_id
+        self._controlnet_id = controlnet_id
+        self.config = config
+        
+        self._pipe: Any | None = None
+        
+        self._width = int(config.controlnet_width) if config and hasattr(config, "controlnet_width") else 512
+        self._height = int(config.controlnet_height) if config and hasattr(config, "controlnet_height") else 512
+        self._steps = int(config.controlnet_steps) if config and hasattr(config, "controlnet_steps") else 20
+        self._cfg = float(config.controlnet_cfg) if config and hasattr(config, "controlnet_cfg") else 7.0
+        
+        self._ip_adapter_repo = getattr(config, "ip_adapter_repo", "h94/IP-Adapter") if config else "h94/IP-Adapter"
+        self._ip_adapter_subfolder = getattr(config, "ip_adapter_subfolder", "models") if config else "models"
+        self._ip_adapter_weight = getattr(config, "ip_adapter_weight", "ip-adapter_sd15.bin") if config else "ip-adapter_sd15.bin"
+        self._ip_adapter_scale = float(getattr(config, "ip_adapter_scale", 0.5)) if config else 0.5
+
+    def _ensure_pipeline(self, device: torch.device) -> Any:
+        if self._pipe is not None:
+            return self._pipe
+
+        try:
+            from diffusers import ControlNetModel, StableDiffusionControlNetPipeline
+        except ModuleNotFoundError as exc:
+            raise RuntimeError("diffusers is required for IP-Adapter ControlNet strategy") from exc
+
+        dtype = resolve_torch_dtype_for_device(
+            device,
+            default_cuda=torch.float16,
+            allowed_cuda={torch.float16, torch.bfloat16, torch.float32},
+            config_dtype=self.config.gpu_dtype if self.config and hasattr(self.config, "gpu_dtype") else None,
+        )
+        
+        _LOGGER.info(f"Loading ControlNet model {self._controlnet_id}...")
+        controlnet = ControlNetModel.from_pretrained(self._controlnet_id, torch_dtype=dtype)
+        
+        _LOGGER.info(f"Loading Stable Diffusion model {self._model_id}...")
+        pipe = StableDiffusionControlNetPipeline.from_pretrained(
+            self._model_id,
+            controlnet=controlnet,
+            torch_dtype=dtype,
+            safety_checker=None,
+        )
+        pipe = pipe.to(device)
+        
+        _LOGGER.info(f"Loading IP-Adapter from {self._ip_adapter_repo} ({self._ip_adapter_weight})...")
+        pipe.load_ip_adapter(
+            self._ip_adapter_repo,
+            subfolder=self._ip_adapter_subfolder,
+            weight_name=self._ip_adapter_weight,
+        )
+        pipe.set_ip_adapter_scale(self._ip_adapter_scale)
+        
+        pipe.set_progress_bar_config(disable=True)
+        self._pipe = pipe
+        return pipe
+
+    def generate(
+        self,
+        reference_crop_tensor: torch.Tensor,
+        dense_dwpose_tensor: torch.Tensor,
+        seed: int,
+        device: torch.device,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
+    ) -> torch.Tensor:
+        pipe = self._ensure_pipeline(device)
+
+        reference_np = _to_numpy_bgr(reference_crop_tensor)
+
+        if metadata_bbox is not None:
+            x1, y1, x2, y2 = metadata_bbox
+            bw = max(1, x2 - x1)
+            bh = max(1, y2 - y1)
+            
+            scale = float(max(self._width, self._height)) / max(bh, bw)
+            scaled_h = int(bh * scale)
+            scaled_w = int(bw * scale)
+            
+            offset_x = (self._width - scaled_w) // 2
+            offset_y = (self._height - scaled_h) // 2
+            
+            pose_tensor = dense_dwpose_tensor.clone()
+            pose_tensor[..., 0] -= x1
+            pose_tensor[..., 1] -= y1
+            pose_tensor[..., 0] *= float(scaled_w) / float(bw)
+            pose_tensor[..., 1] *= float(scaled_h) / float(bh)
+            pose_tensor[..., 0] += offset_x
+            pose_tensor[..., 1] += offset_y
+            
+        else:
+            bh, bw = int(reference_np.shape[0]), int(reference_np.shape[1])
+            scale = float(max(self._width, self._height)) / max(bh, bw)
+            scaled_h = int(bh * scale)
+            scaled_w = int(bw * scale)
+            
+            offset_x = (self._width - scaled_w) // 2
+            offset_y = (self._height - scaled_h) // 2
+            
+            pose_tensor = dense_dwpose_tensor.clone()
+            pose_tensor[..., 0] *= float(scaled_w) / float(bw)
+            pose_tensor[..., 1] *= float(scaled_h) / float(bh)
+            pose_tensor[..., 0] += offset_x
+            pose_tensor[..., 1] += offset_y
+
+        if pose_tensor.ndim == 3:
+            pose_tensor = pose_tensor[-1]
+            
+        pose_image = _render_pose_condition(
+            pose_tensor=pose_tensor,
+            output_height=self._height,
+            output_width=self._width,
+        )
+
+        reference_rgb = cv2.cvtColor(reference_np, cv2.COLOR_BGR2RGB)
+        if reference_rgb.shape[0] != scaled_h or reference_rgb.shape[1] != scaled_w:
+            reference_rgb = cv2.resize(reference_rgb, (scaled_w, scaled_h), interpolation=cv2.INTER_LANCZOS4)
+            
+        padded_reference = np.zeros((self._height, self._width, 3), dtype=np.uint8)
+        padded_reference[offset_y:offset_y+scaled_h, offset_x:offset_x+scaled_w] = reference_rgb
+            
+        pose_rgb = pose_image
+        init_image = Image.fromarray(padded_reference)
+        control_image = Image.fromarray(pose_rgb)
+
+        prompt = "photorealistic tennis player, broadcast sports shot"
+
+        generator = torch.Generator(device=device).manual_seed(int(seed))
+        output = pipe(
+            prompt=prompt,
+            image=control_image,
+            ip_adapter_image=init_image,
+            height=self._height,
+            width=self._width,
+            num_inference_steps=self._steps,
+            guidance_scale=self._cfg,
+            generator=generator,
+        )
+        generated_rgb = np.asarray(output.images[0], dtype=np.uint8)
+        generated_cropped = generated_rgb[offset_y:offset_y+scaled_h, offset_x:offset_x+scaled_w]
+        generated_bgr = cv2.cvtColor(generated_cropped, cv2.COLOR_RGB2BGR)
+        
+        # Shape: [Channels, Height, Width]
+        return torch.from_numpy(generated_bgr).permute(2, 0, 1).contiguous().to(torch.uint8)
