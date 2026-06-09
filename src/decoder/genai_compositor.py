@@ -72,6 +72,12 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
         self._controlnet_id = controlnet_id
         self.config = config
         self._pipe: Any | None = None
+        
+        self._width = int(config.controlnet_width) if config and hasattr(config, "controlnet_width") else 512
+        self._height = int(config.controlnet_height) if config and hasattr(config, "controlnet_height") else 512
+        self._steps = int(config.controlnet_steps) if config and hasattr(config, "controlnet_steps") else 20
+        self._strength = float(config.controlnet_strength) if config and hasattr(config, "controlnet_strength") else 0.65
+        self._cfg = float(config.controlnet_cfg) if config and hasattr(config, "controlnet_cfg") else 7.0
 
     def _ensure_pipeline(self, device: torch.device) -> Any:
         if self._pipe is not None:
@@ -124,12 +130,12 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
             bw = max(1, x2 - x1)
             bh = max(1, y2 - y1)
             
-            scale = 512.0 / max(bh, bw)
+            scale = float(max(self._width, self._height)) / max(bh, bw)
             scaled_h = int(bh * scale)
             scaled_w = int(bw * scale)
             
-            offset_x = (512 - scaled_w) // 2
-            offset_y = (512 - scaled_h) // 2
+            offset_x = (self._width - scaled_w) // 2
+            offset_y = (self._height - scaled_h) // 2
             
             pose_tensor = dense_dwpose_tensor.clone()
             pose_tensor[..., 0] -= x1
@@ -141,12 +147,12 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
             
         else:
             bh, bw = int(reference_np.shape[0]), int(reference_np.shape[1])
-            scale = 512.0 / max(bh, bw)
+            scale = float(max(self._width, self._height)) / max(bh, bw)
             scaled_h = int(bh * scale)
             scaled_w = int(bw * scale)
             
-            offset_x = (512 - scaled_w) // 2
-            offset_y = (512 - scaled_h) // 2
+            offset_x = (self._width - scaled_w) // 2
+            offset_y = (self._height - scaled_h) // 2
             
             pose_tensor = dense_dwpose_tensor.clone()
             pose_tensor[..., 0] *= float(scaled_w) / float(bw)
@@ -159,15 +165,15 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
             
         pose_image = _render_pose_condition(
             pose_tensor=pose_tensor,
-            output_height=512,
-            output_width=512,
+            output_height=self._height,
+            output_width=self._width,
         )
 
         reference_rgb = cv2.cvtColor(reference_np, cv2.COLOR_BGR2RGB)
         if reference_rgb.shape[0] != scaled_h or reference_rgb.shape[1] != scaled_w:
             reference_rgb = cv2.resize(reference_rgb, (scaled_w, scaled_h), interpolation=cv2.INTER_LANCZOS4)
             
-        padded_reference = np.zeros((512, 512, 3), dtype=np.uint8)
+        padded_reference = np.zeros((self._height, self._width, 3), dtype=np.uint8)
         padded_reference[offset_y:offset_y+scaled_h, offset_x:offset_x+scaled_w] = reference_rgb
             
         # _render_pose_condition returns an RGB canvas natively. Do not swap to BGR.
@@ -180,11 +186,11 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
             prompt="photorealistic tennis player, broadcast sports shot",
             image=init_image,
             control_image=control_image,
-            height=512,
-            width=512,
-            num_inference_steps=20,
-            strength=0.65,
-            guidance_scale=7.0,
+            height=self._height,
+            width=self._width,
+            num_inference_steps=self._steps,
+            strength=self._strength,
+            guidance_scale=self._cfg,
             generator=generator,
         )
         generated_rgb = np.asarray(output.images[0], dtype=np.uint8)
@@ -903,9 +909,9 @@ class DiffusersCompositor(BaseCompositor):
         cv2.fillConvexPoly(mask, hull, 255)
         
         # Adaptive dilation based on target bounds
-        # Expand hull to cover expected body thickness roughly 15% of width/height
-        kernel_x = max(3, int(target_w * 0.15))
-        kernel_y = max(3, int(target_h * 0.15))
+        dilation = float(self.config.pose_heuristic_mask_dilation if self.config and hasattr(self.config, "pose_heuristic_mask_dilation") else 0.15)
+        kernel_x = max(3, int(target_w * dilation))
+        kernel_y = max(3, int(target_h * dilation))
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (kernel_x, kernel_y))
         
         mask = cv2.dilate(mask, kernel, iterations=1)

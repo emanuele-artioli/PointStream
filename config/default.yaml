@@ -71,7 +71,7 @@ panorama-png-compression: null        # PNG compression level when --panorama-co
 # Model and Dependencies
 # ============================================================================
 allow-auto-model-download: true       # Allow automatic model downloads
-postgen-segmenter-model: null         # Explicit model file for postgen segmenter
+
 
 # ============================================================================
 # Evaluation Settings
@@ -82,7 +82,7 @@ evaluation-max-frames: null           # Optional frame cap for quality evaluatio
 # ============================================================================
 # GenAI and AnimateAnyone Configuration
 # ============================================================================                
-genai-backend: animate-anyone             # GenAI backend: controlnet, animate-anyone (null disables GenAI)
+genai-backend: controlnet             # GenAI backend: controlnet, animate-anyone (null disables GenAI)
 animate-anyone-repo-dir: null             # Path to Moore-AnimateAnyone repository
 animate-anyone-model-dir: null            # Override if models are in non-standard location
 animate-anyone-steps: 3                  # Diffusion inference steps for AnimateAnyone
@@ -96,13 +96,21 @@ animate-anyone-transparent-threshold: 64  # Black-background alpha threshold
 genai-resize-mode: aspect-recovery        # Resize mode: plain or aspect-recovery
 animate-anyone-adaptive-threshold: true   # Enable adaptive border-threshold masking
 animate-anyone-alpha-smoothing: 0.5       # Temporal smoothing factor [0, 1]
+controlnet-width: 512                     # Width for ControlNet generated frame (pixels)
+controlnet-height: 512                    # Height for ControlNet generated frame (pixels)
+controlnet-steps: 20                      # Diffusion inference steps for ControlNet
+controlnet-strength: 0.65                 # Img2Img strength for ControlNet
+controlnet-cfg: 7.0                       # Guidance scale for ControlNet
+
 
 # ============================================================================
 # Compositing and Masking
 # ============================================================================
 compositing-mask-mode: postgen-seg-client # Actor compositing: alpha-heuristic, metadata-source-mask, postgen-seg-client, pose-heuristic-mask
 postgen-segmenter-backend: yolo           # Segmenter backend: yolo, heuristic
+postgen-segmenter-model: null         # Explicit model file for postgen segmenter
 metadata-mask-codec: auto                 # Mask codec: auto, rle-v1, bitpack-z1, png, segmenter-native, yolo-native
+pose-heuristic-mask-dilation: 0.15        # Fraction of bounding box size to use for mask boundary dilation
 
 # ============================================================================
 # Optimizations and Execution
