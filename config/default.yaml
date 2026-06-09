@@ -100,7 +100,7 @@ animate-anyone-alpha-smoothing: 0.5       # Temporal smoothing factor [0, 1]
 # ============================================================================
 # Compositing and Masking
 # ============================================================================
-compositing-mask-mode: postgen-seg-client # Actor compositing: alpha-heuristic, metadata-source-mask, postgen-seg-client
+compositing-mask-mode: postgen-seg-client # Actor compositing: alpha-heuristic, metadata-source-mask, postgen-seg-client, pose-heuristic-mask
 postgen-segmenter-backend: yolo           # Segmenter backend: yolo, heuristic
 metadata-mask-codec: auto                 # Mask codec: auto, rle-v1, bitpack-z1, png, segmenter-native, yolo-native
 

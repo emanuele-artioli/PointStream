@@ -423,6 +423,8 @@ class DiffusersCompositor(BaseCompositor):
             "source-mask": "metadata-source-mask",
             "postgen-seg-client": "postgen-seg-client",
             "postgen": "postgen-seg-client",
+            "pose-heuristic-mask": "pose-heuristic-mask",
+            "pose-hull": "pose-heuristic-mask",
         }
         self._compositing_mask_mode = mask_mode_aliases.get(raw_mask_mode, "postgen-seg-client")
 
@@ -594,6 +596,8 @@ class DiffusersCompositor(BaseCompositor):
             actor_resized=actor_resized,
             metadata_mask=metadata_mask,
             is_animate_anyone=is_animate_anyone,
+            pose_np=pose_np,
+            target_bbox=(x1, y1, x2, y2),
         )
         alpha_mask = self._apply_temporal_alpha_smoothing(alpha_mask=alpha_mask, actor_identity=actor_identity)
 
@@ -703,8 +707,18 @@ class DiffusersCompositor(BaseCompositor):
         actor_resized: np.ndarray,
         metadata_mask: np.ndarray | None,
         is_animate_anyone: bool,
+        pose_np: np.ndarray,
+        target_bbox: tuple[int, int, int, int],
     ) -> np.ndarray | None:
         mode = self._compositing_mask_mode
+
+        if mode == "pose-heuristic-mask":
+            return self._alpha_from_pose_hull(
+                pose_np=pose_np,
+                target_bbox=target_bbox,
+                target_w=int(actor_resized.shape[1]),
+                target_h=int(actor_resized.shape[0]),
+            )
 
         if mode == "metadata-source-mask":
             metadata_alpha = self._alpha_from_metadata_mask(
@@ -868,6 +882,36 @@ class DiffusersCompositor(BaseCompositor):
 
         min_pixels = max(10, actor_bgr.shape[0] * actor_bgr.shape[1] // 80)
         return self._postprocess_binary_mask(mask_u8, min_pixels=min_pixels)
+
+    def _alpha_from_pose_hull(
+        self, pose_np: np.ndarray, target_bbox: tuple[int, int, int, int], target_w: int, target_h: int
+    ) -> np.ndarray | None:
+        valid = pose_np[:, 2] >= self._confidence_threshold
+        if not np.any(valid):
+            return None
+            
+        x1, y1, x2, y2 = target_bbox
+        
+        # Shift keypoints to local crop coordinates
+        xs = pose_np[valid, 0] - x1
+        ys = pose_np[valid, 1] - y1
+        
+        points = np.stack([xs, ys], axis=1).astype(np.float32)
+        hull = cv2.convexHull(points).astype(np.int32)
+        
+        mask = np.zeros((target_h, target_w), dtype=np.uint8)
+        cv2.fillConvexPoly(mask, hull, 255)
+        
+        # Adaptive dilation based on target bounds
+        # Expand hull to cover expected body thickness roughly 15% of width/height
+        kernel_x = max(3, int(target_w * 0.15))
+        kernel_y = max(3, int(target_h * 0.15))
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (kernel_x, kernel_y))
+        
+        mask = cv2.dilate(mask, kernel, iterations=1)
+        
+        # Return strict sharp edge mask 
+        return mask.astype(np.float32) / 255.0
 
     def _segment_foreground(self, actor_bgr: np.ndarray) -> np.ndarray | None:
         hsv = cv2.cvtColor(actor_bgr, cv2.COLOR_BGR2HSV)

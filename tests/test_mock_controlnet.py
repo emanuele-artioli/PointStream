@@ -9,8 +9,12 @@ def test_mock_controlnet():
     # Shape: [C, H, W]
     reference_crop = torch.zeros((3, 256, 128), dtype=torch.uint8)
     
-    # Shape: [Frames, 18, 3] or [18, 3] for pose
+    # Shape: [18, 3] for pose
     dense_dwpose = torch.zeros((18, 3), dtype=torch.float32)
+    # Give a few points high confidence to trigger the convex hull mask
+    dense_dwpose[0] = torch.tensor([50.0, 50.0, 0.9])
+    dense_dwpose[1] = torch.tensor([150.0, 50.0, 0.9])
+    dense_dwpose[2] = torch.tensor([100.0, 200.0, 0.9])
     
     # Warped background
     warped_background = torch.zeros((3, 1080, 1920), dtype=torch.uint8)
@@ -22,7 +26,7 @@ def test_mock_controlnet():
         genai_resize_mode="aspect-recovery",
         animate_anyone_adaptive_threshold=True,
         animate_anyone_alpha_smoothing=0.25,
-        compositing_mask_mode="postgen-seg-client",
+        compositing_mask_mode="pose-heuristic-mask",
         postgen_segmenter_backend="heuristic",  # Use heuristic to avoid loading YOLO in basic test
         postgen_segmenter_model=None,
         allow_auto_model_download=False,
