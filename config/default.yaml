@@ -81,7 +81,7 @@ evaluation-max-frames: 5           # Optional frame cap for quality evaluation
 # ============================================================================
 # GenAI and AnimateAnyone Configuration
 # ============================================================================                
-genai-backend: animate-anyone             # GenAI backend: controlnet, animate-anyone (null disables GenAI)
+genai-backend: caption-controlnet             # GenAI backend: caption-controlnet, animate-anyone (null disables GenAI)
 animate-anyone-repo-dir: null             # Path to Moore-AnimateAnyone repository
 animate-anyone-model-dir: null            # Override if models are in non-standard location
 animate-anyone-steps: 3                  # Diffusion inference steps for AnimateAnyone

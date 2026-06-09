@@ -481,13 +481,7 @@ class DiffusersCompositor(BaseCompositor):
             if torch.cuda.is_available():
                 torch.cuda.manual_seed_all(self._seed)
 
-        x1, y1, x2, y2 = self._resolve_target_bbox(
-            pose_np=self._to_pose_numpy(dense_dwpose_tensor),
-            frame_height=int(warped_background_frame.shape[1]),
-            frame_width=int(warped_background_frame.shape[2]),
-            metadata_bbox=metadata_bbox,
-        )
-        resolved_bbox = (x1, y1, x2, y2)
+        # x1, y1, x2, y2 calculation is handled inside _composite_actor_frame
 
         generated_actor = self._strategy.generate(
             reference_crop_tensor=reference_crop_tensor,
@@ -905,8 +899,8 @@ class DiffusersCompositor(BaseCompositor):
         points = np.stack([xs, ys], axis=1).astype(np.float32)
         hull = cv2.convexHull(points).astype(np.int32)
         
-        mask = np.zeros((target_h, target_w), dtype=np.uint8)
-        cv2.fillConvexPoly(mask, hull, 255)
+        mask: np.ndarray = np.zeros((target_h, target_w), dtype=np.uint8)
+        cv2.fillConvexPoly(mask, hull, (255,))
         
         # Adaptive dilation based on target bounds
         dilation = float(self.config.pose_heuristic_mask_dilation if self.config and hasattr(self.config, "pose_heuristic_mask_dilation") else 0.15)
@@ -914,10 +908,10 @@ class DiffusersCompositor(BaseCompositor):
         kernel_y = max(3, int(target_h * dilation))
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (kernel_x, kernel_y))
         
-        mask = cv2.dilate(mask, kernel, iterations=1)
+        dilated_mask: np.ndarray = cv2.dilate(mask, kernel, iterations=1)
         
         # Return strict sharp edge mask 
-        return mask.astype(np.float32) / 255.0
+        return dilated_mask.astype(np.float32) / 255.0
 
     def _segment_foreground(self, actor_bgr: np.ndarray) -> np.ndarray | None:
         hsv = cv2.cvtColor(actor_bgr, cv2.COLOR_BGR2HSV)
