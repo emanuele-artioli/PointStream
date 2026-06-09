@@ -56,12 +56,11 @@ def _runtime_config(config: Any = None) -> _RuntimeConfig:
     )
 
 
-def _resolve_repo_root(repo_dir: str | None, config: Any = None) -> Path | None:
-    configured = repo_dir or getattr(config, "animate_anyone_repo_dir", None)
-    if configured is None:
+def _resolve_repo_root(repo_dir: str | None) -> Path | None:
+    if repo_dir is None:
         return None
 
-    repo_root = Path(configured).expanduser().resolve()
+    repo_root = Path(repo_dir).expanduser().resolve()
     if not repo_root.exists() or not repo_root.is_dir():
         raise FileNotFoundError(f"Animate Anyone repository path does not exist: {repo_root}")
 
@@ -70,10 +69,9 @@ def _resolve_repo_root(repo_dir: str | None, config: Any = None) -> Path | None:
     return repo_root
 
 
-def _resolve_model_root(repo_root: Path | None, runtime: _RuntimeConfig, config: Any = None) -> Path:
-    explicit_model_dir = config.animate_anyone_model_dir if config else None
-    if explicit_model_dir:
-        model_root = Path(explicit_model_dir).expanduser()
+def _resolve_model_root(repo_root: Path | None, model_dir: str | None, model_variant: str) -> Path:
+    if model_dir:
+        model_root = Path(model_dir).expanduser()
         if not model_root.is_absolute():
             if repo_root is not None:
                 model_root = (repo_root / model_root).resolve()
@@ -82,7 +80,7 @@ def _resolve_model_root(repo_root: Path | None, runtime: _RuntimeConfig, config:
         else:
             model_root = model_root.resolve()
     else:
-        variant = runtime.model_variant.strip().lower().replace("-", "_")
+        variant = model_variant.strip().lower().replace("-", "_")
         alias_map = {
             "original": "original",
             "base": "original",
@@ -91,7 +89,7 @@ def _resolve_model_root(repo_root: Path | None, runtime: _RuntimeConfig, config:
             "tennis": "finetuned_tennis",
             "finetuned": "finetuned_tennis",
         }
-        model_folder = alias_map.get(variant, runtime.model_variant)
+        model_folder = alias_map.get(variant, model_variant)
 
         if repo_root is not None:
             model_root = (repo_root / "Models" / model_folder).resolve()
@@ -132,7 +130,7 @@ def _resolve_model_root(repo_root: Path | None, runtime: _RuntimeConfig, config:
     return model_root
 
 
-def _load_pipeline(repo_root: Path | None, model_root: Path, device: str, config: Any = None) -> Any:
+def _load_pipeline(repo_root: Path | None, model_root: Path, device: str, gpu_dtype: Any = None) -> Any:
     global _PIPELINE, _PIPELINE_DEVICE, _PIPELINE_DTYPE, _PIPELINE_REPO_ROOT, _PIPELINE_MODEL_ROOT
 
     with _PIPELINE_LOCK:
@@ -140,7 +138,7 @@ def _load_pipeline(repo_root: Path | None, model_root: Path, device: str, config
             torch.device(device),
             default_cuda=torch.float16,
             allowed_cuda={torch.float16, torch.bfloat16, torch.float32},
-            config_dtype=config.gpu_dtype if config and hasattr(config, "gpu_dtype") else None,
+            config_dtype=gpu_dtype,
         )
         if (
             _PIPELINE is not None
@@ -358,8 +356,14 @@ def generate_sequence(
     seed: int,
     device: str = "cuda",
     repo_dir: str | None = None,
-    max_window: int | None = None,
-    config: Any = None,
+    steps: int = 3,
+    cfg: float = 7.5,
+    width: int = 256,
+    height: int = 256,
+    window: int | None = None,
+    model_dir: str | None = None,
+    model_variant: str = "finetuned_tennis",
+    gpu_dtype: Any = None,
 ) -> np.ndarray:
     """Generate an actor clip via Moore-AnimateAnyone.
 
@@ -373,17 +377,16 @@ def generate_sequence(
     except ModuleNotFoundError as exc:
         raise RuntimeError("Pillow is required for AnimateAnyone backend") from exc
 
-    runtime = _runtime_config(config=config)
-    repo_root = _resolve_repo_root(repo_dir=repo_dir, config=config)
-    model_root = _resolve_model_root(repo_root=repo_root, runtime=runtime, config=config)
+    repo_root = _resolve_repo_root(repo_dir=repo_dir)
+    model_root = _resolve_model_root(repo_root=repo_root, model_dir=model_dir, model_variant=model_variant)
 
     resolved_device = "cpu"
     if str(device).startswith("cuda") and torch.cuda.is_available() and is_cuda_device_usable(torch.device("cuda")):
         resolved_device = "cuda"
-    pipe = _load_pipeline(repo_root=repo_root, model_root=model_root, device=resolved_device, config=config)
+    pipe = _load_pipeline(repo_root=repo_root, model_root=model_root, device=resolved_device, gpu_dtype=gpu_dtype)
 
-    width = int(runtime.width)
-    height = int(runtime.height)
+    width = int(width)
+    height = int(height)
 
     reference_rgb = cv2.cvtColor(reference_image_bgr, cv2.COLOR_BGR2RGB)
     reference_rgb = _letterbox_resize_rgb(reference_rgb, target_w=width, target_h=height)
@@ -398,7 +401,6 @@ def generate_sequence(
     if not pose_pil_sequence:
         pose_pil_sequence = [Image.fromarray(np.zeros((height, width, 3), dtype=np.uint8))]
 
-    window = max_window if max_window is not None else _resolve_window_from_env(config=config)
     frame_count = len(pose_pil_sequence)
     if window is None or window >= frame_count:
         windows = [(0, frame_count)]
@@ -416,8 +418,8 @@ def generate_sequence(
                 width,
                 height,
                 len(pose_window),
-                int(runtime.inference_steps),
-                float(runtime.guidance_scale),
+                int(steps),
+                float(cfg),
                 generator=generator,
             ).videos
 
@@ -437,7 +439,13 @@ def generate_frame(
     seed: int,
     device: str = "cuda",
     repo_dir: str | None = None,
-    config: Any = None,
+    steps: int = 3,
+    cfg: float = 7.5,
+    width: int = 256,
+    height: int = 256,
+    model_dir: str | None = None,
+    model_variant: str = "finetuned_tennis",
+    gpu_dtype: Any = None,
 ) -> np.ndarray:
     """Generate one actor frame via Moore-AnimateAnyone from PointStream-owned runtime glue."""
     sequence = generate_sequence(
@@ -446,6 +454,13 @@ def generate_frame(
         seed=seed,
         device=device,
         repo_dir=repo_dir,
-        config=config,
+        steps=steps,
+        cfg=cfg,
+        width=width,
+        height=height,
+        window=None,
+        model_dir=model_dir,
+        model_variant=model_variant,
+        gpu_dtype=gpu_dtype,
     )
     return sequence[-1]

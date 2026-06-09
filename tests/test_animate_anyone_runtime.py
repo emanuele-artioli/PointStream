@@ -81,18 +81,14 @@ def test_runtime_config_reads_environment() -> None:
     assert cfg.inference_steps == 22
     assert abs(cfg.guidance_scale - 4.2) < 1e-6
     assert cfg.model_variant == "original"
-
-
 def test_resolve_repo_root_and_model_root(tmp_path: Path) -> None:
     repo_root = tmp_path / "moore_aa"
     repo_root.mkdir(parents=True)
 
-    assert runtime._resolve_repo_root(None) is None
+    resolved_repo = runtime._resolve_repo_root(repo_dir=str(repo_root))
+    assert resolved_repo == repo_root
 
-    resolved_repo = runtime._resolve_repo_root(str(repo_root))
-    assert resolved_repo == repo_root.resolve()
-
-    model_root = repo_root / "Models" / "finetuned_tennis"
+    model_root = repo_root / "Models" / "custom_finetune"
     model_root.mkdir(parents=True)
     required = [
         "stable-diffusion-v1-5",
@@ -110,8 +106,13 @@ def test_resolve_repo_root_and_model_root(tmp_path: Path) -> None:
         else:
             target.mkdir(parents=True, exist_ok=True)
 
-    cfg = runtime._RuntimeConfig(model_variant="tennis")
-    resolved_model = runtime._resolve_model_root(repo_root=resolved_repo, runtime=cfg)
+    resolved_model = runtime._resolve_model_root(
+        repo_root=repo_root,
+        model_dir=None,
+        model_variant="custom_finetune",
+    )
+
+    resolved_model = runtime._resolve_model_root(repo_root=resolved_repo, model_dir=None, model_variant="custom_finetune")
     assert resolved_model == model_root.resolve()
 
 
@@ -120,9 +121,8 @@ def test_resolve_model_root_missing_entries_raises(tmp_path: Path) -> None:
     model_root = repo_root / "Models" / "finetuned_tennis"
     model_root.mkdir(parents=True)
 
-    cfg = runtime._RuntimeConfig(model_variant="finetuned_tennis")
     with pytest.raises(FileNotFoundError):
-        runtime._resolve_model_root(repo_root=repo_root, runtime=cfg)
+        runtime._resolve_model_root(repo_root=repo_root, model_dir=None, model_variant="finetuned_tennis")
 
 
 def test_generate_frame_smoke_with_stub_pipeline(monkeypatch, tmp_path: Path) -> None:
@@ -133,8 +133,8 @@ def test_generate_frame_smoke_with_stub_pipeline(monkeypatch, tmp_path: Path) ->
     model_root = tmp_path / "models"
     model_root.mkdir(parents=True)
 
-    monkeypatch.setattr(runtime, "_resolve_repo_root", lambda repo_dir, config=None: repo_root)
-    monkeypatch.setattr(runtime, "_resolve_model_root", lambda repo_root, runtime, config=None: model_root)
+    monkeypatch.setattr(runtime, "_resolve_repo_root", lambda repo_dir: repo_root)
+    monkeypatch.setattr(runtime, "_resolve_model_root", lambda repo_root, model_dir, model_variant: model_root)
     monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
 
     class _StubPipe:
@@ -145,7 +145,7 @@ def test_generate_frame_smoke_with_stub_pipeline(monkeypatch, tmp_path: Path) ->
             videos = torch.linspace(-1.0, 1.0, steps=1 * 3 * 2 * 96 * 64, dtype=torch.float32).reshape(1, 3, 2, 96, 64)
             return SimpleNamespace(videos=videos)
 
-    monkeypatch.setattr(runtime, "_load_pipeline", lambda repo_root, model_root, device, config=None: _StubPipe())
+    monkeypatch.setattr(runtime, "_load_pipeline", lambda repo_root, model_root, device, gpu_dtype=None: _StubPipe())
 
     reference = np.zeros((80, 40, 3), dtype=np.uint8)
     reference[:, :, 2] = 220
@@ -159,7 +159,11 @@ def test_generate_frame_smoke_with_stub_pipeline(monkeypatch, tmp_path: Path) ->
         dense_pose_sequence=pose_seq,
         seed=123,
         device="cuda",
-        config=runtime._RuntimeConfig(width=64, height=96, inference_steps=5, guidance_scale=2.0, model_variant="finetuned_tennis")
+        width=64,
+        height=96,
+        steps=5,
+        cfg=2.0,
+        model_variant="finetuned_tennis",
     )
 
     assert out.shape == (96, 64, 3)
@@ -175,10 +179,10 @@ def test_generate_frame_fallback_pose_sequence(monkeypatch, tmp_path: Path) -> N
     model_root = tmp_path / "models"
     model_root.mkdir(parents=True)
 
-    monkeypatch.setattr(runtime, "_resolve_repo_root", lambda repo_dir, config=None: repo_root)
-    monkeypatch.setattr(runtime, "_resolve_model_root", lambda repo_root, runtime, config=None: model_root)
+    monkeypatch.setattr(runtime, "_resolve_repo_root", lambda repo_dir: repo_root)
+    monkeypatch.setattr(runtime, "_resolve_model_root", lambda repo_root, model_dir, model_variant: model_root)
     monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
-    monkeypatch.setattr(runtime, "_prepare_pose_sequence", lambda dense_pose_sequence, width, height: [])
+    monkeypatch.setattr(runtime, "_resolve_repo_root", lambda repo_dir: repo_root)
 
     class _StubPipe:
         def __call__(self, *args, **kwargs):
@@ -187,7 +191,7 @@ def test_generate_frame_fallback_pose_sequence(monkeypatch, tmp_path: Path) -> N
             videos = torch.zeros((1, 3, 1, 32, 32), dtype=torch.float32)
             return SimpleNamespace(videos=videos)
 
-    monkeypatch.setattr(runtime, "_load_pipeline", lambda repo_root, model_root, device, config=None: _StubPipe())
+    monkeypatch.setattr(runtime, "_load_pipeline", lambda repo_root, model_root, device, gpu_dtype=None: _StubPipe())
 
     reference = np.zeros((16, 16, 3), dtype=np.uint8)
     pose_seq = np.zeros((1, 18, 3), dtype=np.float32)
@@ -196,7 +200,11 @@ def test_generate_frame_fallback_pose_sequence(monkeypatch, tmp_path: Path) -> N
         dense_pose_sequence=pose_seq,
         seed=321,
         device="cpu",
-        config=runtime._RuntimeConfig(width=32, height=32, inference_steps=3, guidance_scale=1.0, model_variant="finetuned_tennis")
+        width=32,
+        height=32,
+        steps=3,
+        cfg=1.0,
+        model_variant="finetuned_tennis",
     )
     assert out.shape == (32, 32, 3)
 
@@ -205,4 +213,4 @@ def test_generate_frame_validates_reference_shape() -> None:
     bad_reference = np.zeros((40, 40), dtype=np.uint8)
     pose_seq = np.zeros((1, 18, 3), dtype=np.float32)
     with pytest.raises(ValueError):
-        runtime.generate_frame(bad_reference, pose_seq, seed=1, device="cpu", config=runtime._RuntimeConfig())
+        runtime.generate_frame(bad_reference, pose_seq, seed=1, device="cpu")

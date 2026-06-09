@@ -72,17 +72,16 @@ panorama-png-compression: null        # PNG compression level when --panorama-co
 # ============================================================================
 allow-auto-model-download: true       # Allow automatic model downloads
 
-
 # ============================================================================
 # Evaluation Settings
 # ============================================================================
-evaluation-mode: [psnr, ssim, vmaf]   # Post-run evaluation metrics: none, [psnr], [psnr, ssim, vmaf]
-evaluation-max-frames: null           # Optional frame cap for quality evaluation
+evaluation-mode: [psnr]   # Post-run evaluation metrics: none, [psnr], [psnr, ssim, vmaf]
+evaluation-max-frames: 5           # Optional frame cap for quality evaluation
 
 # ============================================================================
 # GenAI and AnimateAnyone Configuration
 # ============================================================================                
-genai-backend: controlnet             # GenAI backend: controlnet, animate-anyone (null disables GenAI)
+genai-backend: animate-anyone             # GenAI backend: controlnet, animate-anyone (null disables GenAI)
 animate-anyone-repo-dir: null             # Path to Moore-AnimateAnyone repository
 animate-anyone-model-dir: null            # Override if models are in non-standard location
 animate-anyone-steps: 3                  # Diffusion inference steps for AnimateAnyone
@@ -101,7 +100,6 @@ controlnet-height: 512                    # Height for ControlNet generated fram
 controlnet-steps: 20                      # Diffusion inference steps for ControlNet
 controlnet-strength: 0.65                 # Img2Img strength for ControlNet
 controlnet-cfg: 7.0                       # Guidance scale for ControlNet
-
 
 # ============================================================================
 # Compositing and Masking

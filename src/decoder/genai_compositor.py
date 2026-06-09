@@ -54,7 +54,6 @@ class BaseGenAIStrategy(ABC):
         dense_dwpose_tensor: torch.Tensor,
         seed: int,
         device: torch.device,
-        metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         raise NotImplementedError
 
@@ -115,7 +114,6 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
         dense_dwpose_tensor: torch.Tensor,
         seed: int,
         device: torch.device,
-        metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         pipe = self._ensure_pipeline(device)
         try:
@@ -125,40 +123,19 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
 
         reference_np = _to_numpy_bgr(reference_crop_tensor)
 
-        if metadata_bbox is not None:
-            x1, y1, x2, y2 = metadata_bbox
-            bw = max(1, x2 - x1)
-            bh = max(1, y2 - y1)
-            
-            scale = float(max(self._width, self._height)) / max(bh, bw)
-            scaled_h = int(bh * scale)
-            scaled_w = int(bw * scale)
-            
-            offset_x = (self._width - scaled_w) // 2
-            offset_y = (self._height - scaled_h) // 2
-            
-            pose_tensor = dense_dwpose_tensor.clone()
-            pose_tensor[..., 0] -= x1
-            pose_tensor[..., 1] -= y1
-            pose_tensor[..., 0] *= float(scaled_w) / float(bw)
-            pose_tensor[..., 1] *= float(scaled_h) / float(bh)
-            pose_tensor[..., 0] += offset_x
-            pose_tensor[..., 1] += offset_y
-            
-        else:
-            bh, bw = int(reference_np.shape[0]), int(reference_np.shape[1])
-            scale = float(max(self._width, self._height)) / max(bh, bw)
-            scaled_h = int(bh * scale)
-            scaled_w = int(bw * scale)
-            
-            offset_x = (self._width - scaled_w) // 2
-            offset_y = (self._height - scaled_h) // 2
-            
-            pose_tensor = dense_dwpose_tensor.clone()
-            pose_tensor[..., 0] *= float(scaled_w) / float(bw)
-            pose_tensor[..., 1] *= float(scaled_h) / float(bh)
-            pose_tensor[..., 0] += offset_x
-            pose_tensor[..., 1] += offset_y
+        bh, bw = int(reference_np.shape[0]), int(reference_np.shape[1])
+        scale = float(max(self._width, self._height)) / max(bh, bw)
+        scaled_h = int(bh * scale)
+        scaled_w = int(bw * scale)
+        
+        offset_x = (self._width - scaled_w) // 2
+        offset_y = (self._height - scaled_h) // 2
+        
+        pose_tensor = dense_dwpose_tensor.clone()
+        pose_tensor[..., 0] *= float(scaled_w) / float(bw)
+        pose_tensor[..., 1] *= float(scaled_h) / float(bh)
+        pose_tensor[..., 0] += offset_x
+        pose_tensor[..., 1] += offset_y
 
         if pose_tensor.ndim == 3:
             pose_tensor = pose_tensor[-1]
@@ -209,6 +186,16 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
     ) -> None:
         self.config = config
         self._repo_dir = repo_dir or (self.config.animate_anyone_repo_dir if self.config else None)
+        
+        self._steps = int(self.config.animate_anyone_steps if self.config and hasattr(self.config, "animate_anyone_steps") else 3)
+        self._cfg = float(self.config.animate_anyone_cfg if self.config and hasattr(self.config, "animate_anyone_cfg") else 7.5)
+        self._width = int(self.config.animate_anyone_width if self.config and hasattr(self.config, "animate_anyone_width") else 256)
+        self._height = int(self.config.animate_anyone_height if self.config and hasattr(self.config, "animate_anyone_height") else 256)
+        self._window = int(self.config.animate_anyone_window) if self.config and getattr(self.config, "animate_anyone_window", None) else None
+        self._model_dir = getattr(self.config, "animate_anyone_model_dir", None) if self.config else None
+        self._model_variant = getattr(self.config, "animate_anyone_model_variant", "finetuned_tennis") if self.config else "finetuned_tennis"
+        self._gpu_dtype = getattr(self.config, "gpu_dtype", None) if self.config else None
+        
         self._runtime_fn: Any | None = None
 
     def _ensure_runtime(self) -> Any:
@@ -227,7 +214,6 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
         dense_dwpose_tensor: torch.Tensor,
         seed: int,
         device: torch.device,
-        metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         runtime_fn = self._ensure_runtime()
 
@@ -241,7 +227,13 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
                 seed=int(seed),
                 device=str(device),
                 repo_dir=self._repo_dir,
-                config=self.config,
+                steps=self._steps,
+                cfg=self._cfg,
+                width=self._width,
+                height=self._height,
+                model_dir=self._model_dir,
+                model_variant=self._model_variant,
+                gpu_dtype=self._gpu_dtype,
             )
         except TypeError:
             # Keep tests/stubs simple when monkeypatching _ensure_runtime.
@@ -265,7 +257,6 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
         dense_dwpose_tensor: torch.Tensor,
         seed: int,
         device: torch.device,
-        metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         from src.decoder.animate_anyone_runtime import generate_sequence
 
@@ -279,7 +270,14 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
                 seed=int(seed),
                 device=str(device),
                 repo_dir=self._repo_dir,
-                config=self.config,
+                steps=self._steps,
+                cfg=self._cfg,
+                width=self._width,
+                height=self._height,
+                window=self._window,
+                model_dir=self._model_dir,
+                model_variant=self._model_variant,
+                gpu_dtype=self._gpu_dtype,
             )
         except TypeError:
             generated_bgr = generate_sequence(
@@ -496,7 +494,6 @@ class DiffusersCompositor(BaseCompositor):
             dense_dwpose_tensor=dense_dwpose_tensor,
             seed=self._seed,
             device=self._device,
-            metadata_bbox=resolved_bbox,
         )
         return self._composite_actor_frame(
             generated_actor=generated_actor,
@@ -607,7 +604,8 @@ class DiffusersCompositor(BaseCompositor):
             pose_np=pose_np,
             target_bbox=(x1, y1, x2, y2),
         )
-        alpha_mask = self._apply_temporal_alpha_smoothing(alpha_mask=alpha_mask, actor_identity=actor_identity)
+        if is_animate_anyone:
+            alpha_mask = self._apply_temporal_alpha_smoothing(alpha_mask=alpha_mask, actor_identity=actor_identity)
 
         if _LOGGER.isEnabledFor(logging.DEBUG):
             if alpha_mask is None:
