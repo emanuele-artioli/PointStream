@@ -76,6 +76,7 @@ class _DummyStrategy(gc.BaseGenAIStrategy):
         dense_dwpose_tensor: torch.Tensor,
         seed: int,
         device: torch.device,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         _ = dense_dwpose_tensor
         _ = seed
@@ -314,7 +315,7 @@ def test_baseline_controlnet_strategy_generate_with_fake_pipe(monkeypatch) -> No
     class _FakePipe:
         def __call__(self, **kwargs):
             _ = kwargs
-            fake_rgb = np.full((64, 48, 3), 140, dtype=np.uint8)
+            fake_rgb = np.full((512, 512, 3), 140, dtype=np.uint8)
             return SimpleNamespace(images=[pil_image.fromarray(fake_rgb)])
 
     monkeypatch.setattr(strategy, "_ensure_pipeline", lambda device: _FakePipe())
@@ -328,7 +329,7 @@ def test_baseline_controlnet_strategy_generate_with_fake_pipe(monkeypatch) -> No
         device=torch.device("cpu"),
     )
 
-    assert tuple(out.shape) == (3, 64, 48)
+    assert tuple(out.shape) == (3, 512, 384)
     assert out.dtype == torch.uint8
 
 
@@ -354,7 +355,7 @@ def test_animate_anyone_strategy_missing_repo_raises(monkeypatch) -> None:
 def test_animate_anyone_strategy_generate_with_stub_runtime(monkeypatch) -> None:
     strategy = gc.AnimateAnyoneStrategy(repo_dir="/tmp/does-not-matter")
 
-    def _runtime_fn(reference_image_bgr, dense_pose_sequence, seed, device):
+    def _runtime_fn(reference_image_bgr, dense_pose_sequence, seed, device, **kwargs):
         _ = dense_pose_sequence
         _ = seed
         _ = device

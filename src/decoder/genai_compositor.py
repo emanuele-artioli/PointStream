@@ -227,6 +227,7 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
         dense_dwpose_tensor: torch.Tensor,
         seed: int,
         device: torch.device,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         runtime_fn = self._ensure_runtime()
 
@@ -264,6 +265,7 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
         dense_dwpose_tensor: torch.Tensor,
         seed: int,
         device: torch.device,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         from src.decoder.animate_anyone_runtime import generate_sequence
 

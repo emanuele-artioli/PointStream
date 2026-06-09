@@ -105,6 +105,10 @@ def _install_fake_animate_anyone_modules(monkeypatch: pytest.MonkeyPatch) -> Non
     setattr(diffusers, "AutoencoderKL", _AutoencoderKL)
     setattr(diffusers, "DDIMScheduler", _DDIMScheduler)
     monkeypatch.setitem(sys.modules, "diffusers", diffusers)
+    
+    diffusers_utils: Any = types.ModuleType("diffusers.utils")
+    monkeypatch.setitem(sys.modules, "diffusers.utils", diffusers_utils)
+    setattr(diffusers, "utils", diffusers_utils)
 
     transformers: Any = types.ModuleType("transformers")
     setattr(transformers, "CLIPVisionModelWithProjection", _CLIPVisionModelWithProjection)
