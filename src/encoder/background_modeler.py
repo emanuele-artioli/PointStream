@@ -48,15 +48,6 @@ class BackgroundModeler:
             debug_root.mkdir(parents=True, exist_ok=True)
             chunk_debug_path = debug_root / f"debug_panorama_{chunk.chunk_id}.jpg"
             cv2.imwrite(str(chunk_debug_path), panorama)
-
-            # Keep a canonical debug artifact only for non-fallback decoding paths
-            # that produce an expanded stitched canvas.
-            latest_debug_path = debug_root / "debug_panorama.jpg"
-            source_height = int(frames.shape[1])
-            source_width = int(frames.shape[2])
-            is_expanded_canvas = panorama.shape[0] > source_height or panorama.shape[1] > source_width
-            if is_expanded_canvas:
-                cv2.imwrite(str(latest_debug_path), panorama)
             panorama_uri = str(chunk_debug_path)
         else:
             panorama_uri = f"memory://panorama/{chunk.chunk_id}.jpg"
@@ -429,10 +420,31 @@ class BackgroundModeler:
         )
         corners_h = np.concatenate([base_corners, np.ones((4, 1), dtype=np.float64)], axis=1)
 
+        max_allowed_w = float(width) * 5.0
+        max_allowed_h = float(height) * 5.0
+
         transformed_corners: list[np.ndarray] = []
         for frame_idx in selected_indices:
             warped = (homographies[frame_idx] @ corners_h.T).T
             warped = warped[:, :2] / warped[:, 2:3]
+            
+            min_x, max_x = np.min(warped[:, 0]), np.max(warped[:, 0])
+            min_y, max_y = np.min(warped[:, 1]), np.max(warped[:, 1])
+
+            is_bad = False
+            if not (np.isfinite(min_x) and np.isfinite(max_x) and np.isfinite(min_y) and np.isfinite(max_y)):
+                is_bad = True
+            else:
+                w_span = max_x - min_x
+                h_span = max_y - min_y
+                is_bad = (w_span > max_allowed_w) or (h_span > max_allowed_h) or \
+                         (min_x < -max_allowed_w) or (max_x > max_allowed_w * 2.0) or \
+                         (min_y < -max_allowed_h) or (max_y > max_allowed_h * 2.0)
+
+            if is_bad:
+                homographies[frame_idx] = np.eye(3, dtype=np.float64)
+                warped = base_corners.copy()
+
             transformed_corners.append(warped)
 
         all_corners = np.concatenate(transformed_corners, axis=0)

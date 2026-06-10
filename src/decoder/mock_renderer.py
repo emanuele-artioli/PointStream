@@ -12,7 +12,6 @@ import torch
 
 from src.decoder.compositor import ResidualCompositor
 from src.encoder.video_io import encode_video_frames_ffmpeg
-from src.shared.genai_debug import debug_export_compositor_input, debug_export_compositor_output
 from src.shared.mask_codec import decode_binary_mask
 from src.shared.schemas import ActorPacket, DecodedChunkResult, EncodedChunkPayload
 from src.shared.synthesis_engine import SynthesisEngine
@@ -258,16 +257,6 @@ class DecoderRenderer:
                 metadata_mask = None if metadata_entry is None else metadata_entry.mask_gray
                 metadata_bbox = None if metadata_entry is None else metadata_entry.bbox
 
-                debug_export_compositor_input(
-                    stage="decoder",
-                    frame_idx=frame_idx,
-                    actor_id=actor_state.track_id,
-                    reference_crop_tensor=actor_state.reference_crop_tensor,
-                    dense_pose_tensor=pose_condition,
-                    warped_bg_tensor=composited,
-                    debug_dir=output_path,
-                )
-
                 try:
                     composited = self._genai_compositor.process(
                         reference_crop_tensor=actor_state.reference_crop_tensor,
@@ -276,16 +265,10 @@ class DecoderRenderer:
                         actor_identity=actor_state.object_id,
                         metadata_mask=metadata_mask,
                         metadata_bbox=metadata_bbox,
+                        debug_dir=output_path,
+                        frame_idx=frame_idx,
                     ).to(frame_tensor.device)
 
-                    debug_export_compositor_output(
-                        stage="decoder",
-                        frame_idx=frame_idx,
-                        actor_id=actor_state.track_id,
-                        composited_frame_tensor=composited,
-                        bbox=metadata_bbox,
-                        debug_dir=output_path,
-                    )
                 except TypeError:
                     try:
                         # Keep compatibility with existing test doubles that don't accept metadata_bbox.
@@ -297,14 +280,6 @@ class DecoderRenderer:
                             metadata_mask=metadata_mask,
                         ).to(frame_tensor.device)
 
-                        debug_export_compositor_output(
-                            stage="decoder",
-                            frame_idx=frame_idx,
-                            actor_id=actor_state.track_id,
-                            composited_frame_tensor=composited,
-                            bbox=metadata_bbox,
-                            debug_dir=output_path,
-                        )
                     except TypeError:
                         # Keep compatibility with older test doubles that don't accept metadata args.
                         composited = self._genai_compositor.process(
@@ -313,15 +288,6 @@ class DecoderRenderer:
                             warped_background_frame=composited,
                             actor_identity=actor_state.object_id,
                         ).to(frame_tensor.device)
-
-                        debug_export_compositor_output(
-                            stage="decoder",
-                            frame_idx=frame_idx,
-                            actor_id=actor_state.track_id,
-                            composited_frame_tensor=composited,
-                            bbox=metadata_bbox,
-                            debug_dir=output_path,
-                        )
             out_frames.append(composited)
 
         return torch.stack(out_frames, dim=0)

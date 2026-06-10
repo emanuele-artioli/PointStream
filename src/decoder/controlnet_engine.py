@@ -6,6 +6,7 @@ import torch
 import cv2
 import numpy as np
 from PIL import Image
+from pathlib import Path
 
 from src.decoder.genai_compositor import BaseGenAIStrategy, _to_numpy_bgr, _render_pose_condition
 from src.shared.torch_dtype import resolve_torch_dtype_for_device
@@ -133,6 +134,56 @@ class CaptionControlNetStrategy(BaseGenAIStrategy):
         self._cached_prompt = full_prompt
         self._cached_reference_hash = ref_hash
         return full_prompt
+
+    def get_debug_inputs(
+        self,
+        reference_crop_tensor: torch.Tensor,
+        dense_dwpose_tensor: torch.Tensor,
+    ) -> dict[str, np.ndarray]:
+        artifacts = {}
+        ref_np = _to_numpy_bgr(reference_crop_tensor)
+        artifacts["00_reference_crop.png"] = ref_np
+        
+        try:
+            pose_tensor = dense_dwpose_tensor.clone()
+            if pose_tensor.ndim == 3:
+                pose_tensor = pose_tensor[-1]
+            pose_np_raw = pose_tensor.cpu().numpy()
+            
+            valid = pose_np_raw[:, 2] >= 0.2
+            if np.any(valid):
+                xs = pose_np_raw[valid, 0]
+                ys = pose_np_raw[valid, 1]
+                x1 = int(np.floor(np.min(xs)))
+                y1 = int(np.floor(np.min(ys)))
+                x2 = int(np.ceil(np.max(xs)))
+                y2 = int(np.ceil(np.max(ys)))
+                bw = max(1, x2 - x1)
+                bh = max(1, y2 - y1)
+                gen_h = max(8, (bh // 8) * 8)
+                gen_w = max(8, (bw // 8) * 8)
+                
+                pose_tensor[..., 0] -= x1
+                pose_tensor[..., 1] -= y1
+                pose_tensor[..., 0] *= float(gen_w) / float(bw)
+                pose_tensor[..., 1] *= float(gen_h) / float(bh)
+                target_h, target_w = gen_h, gen_w
+            else:
+                target_h = int(reference_crop_tensor.shape[1])
+                target_w = int(reference_crop_tensor.shape[2])
+                
+            pose_np = _render_pose_condition(pose_tensor, output_height=target_h, output_width=target_w)
+            pose_np = cv2.cvtColor(pose_np, cv2.COLOR_RGB2BGR)
+        except Exception as e:
+            _LOGGER.warning(f"Failed to render pose for debug output: {e}")
+            pose_np = dense_dwpose_tensor.cpu().numpy()
+            if pose_np.ndim == 3:
+                pose_np = pose_np[-1]
+            pose_np = np.asarray(pose_np * 255.0, dtype=np.uint8) if pose_np.dtype != np.uint8 else pose_np
+            if len(pose_np.shape) == 3 and pose_np.shape[0] == 3:
+                pose_np = np.transpose(pose_np, (1, 2, 0))
+        artifacts["01_pose_condition.png"] = pose_np
+        return artifacts
 
     def generate(
         self,
@@ -289,6 +340,56 @@ class IPAdapterControlNetStrategy(BaseGenAIStrategy):
         self._pipe = pipe
         return pipe
 
+    def get_debug_inputs(
+        self,
+        reference_crop_tensor: torch.Tensor,
+        dense_dwpose_tensor: torch.Tensor,
+    ) -> dict[str, np.ndarray]:
+        artifacts = {}
+        ref_np = _to_numpy_bgr(reference_crop_tensor)
+        artifacts["00_reference_crop.png"] = ref_np
+        
+        try:
+            pose_tensor = dense_dwpose_tensor.clone()
+            if pose_tensor.ndim == 3:
+                pose_tensor = pose_tensor[-1]
+            pose_np_raw = pose_tensor.cpu().numpy()
+            
+            valid = pose_np_raw[:, 2] >= 0.2
+            if np.any(valid):
+                xs = pose_np_raw[valid, 0]
+                ys = pose_np_raw[valid, 1]
+                x1 = int(np.floor(np.min(xs)))
+                y1 = int(np.floor(np.min(ys)))
+                x2 = int(np.ceil(np.max(xs)))
+                y2 = int(np.ceil(np.max(ys)))
+                bw = max(1, x2 - x1)
+                bh = max(1, y2 - y1)
+                gen_h = max(8, (bh // 8) * 8)
+                gen_w = max(8, (bw // 8) * 8)
+                
+                pose_tensor[..., 0] -= x1
+                pose_tensor[..., 1] -= y1
+                pose_tensor[..., 0] *= float(gen_w) / float(bw)
+                pose_tensor[..., 1] *= float(gen_h) / float(bh)
+                target_h, target_w = gen_h, gen_w
+            else:
+                target_h = int(reference_crop_tensor.shape[1])
+                target_w = int(reference_crop_tensor.shape[2])
+                
+            pose_np = _render_pose_condition(pose_tensor, output_height=target_h, output_width=target_w)
+            pose_np = cv2.cvtColor(pose_np, cv2.COLOR_RGB2BGR)
+        except Exception as e:
+            _LOGGER.warning(f"Failed to render pose for debug output: {e}")
+            pose_np = dense_dwpose_tensor.cpu().numpy()
+            if pose_np.ndim == 3:
+                pose_np = pose_np[-1]
+            pose_np = np.asarray(pose_np * 255.0, dtype=np.uint8) if pose_np.dtype != np.uint8 else pose_np
+            if len(pose_np.shape) == 3 and pose_np.shape[0] == 3:
+                pose_np = np.transpose(pose_np, (1, 2, 0))
+        artifacts["01_pose_condition.png"] = pose_np
+        return artifacts
+
     def generate(
         self,
         reference_crop_tensor: torch.Tensor,
@@ -427,6 +528,23 @@ class CannyControlNetStrategy(BaseGenAIStrategy):
         pipe.set_progress_bar_config(disable=True)
         self._pipe = pipe
         return pipe
+
+    def get_debug_inputs(
+        self,
+        reference_crop_tensor: torch.Tensor,
+        dense_dwpose_tensor: torch.Tensor,
+    ) -> dict[str, np.ndarray]:
+        artifacts = {}
+        ref_np = _to_numpy_bgr(reference_crop_tensor)
+        artifacts["00_reference_crop.png"] = ref_np
+        
+        # Save the mask/canny condition
+        mask_np = dense_dwpose_tensor.detach().cpu().squeeze().numpy()
+        if mask_np.ndim == 2:
+            mask_uint8 = np.clip(mask_np, 0, 255).astype(np.uint8)
+            artifacts["01_mask_condition.png"] = mask_uint8
+            
+        return artifacts
 
     def generate(
         self,

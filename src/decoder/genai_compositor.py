@@ -10,9 +10,9 @@ import numpy as np
 import torch
 
 from src.shared.dwpose_draw import draw_dwpose_canvas
+from src.shared.genai_debug import export_compositor_artifacts
 from src.shared.tags import gpu_bound
 from src.shared.torch_dtype import is_cuda_device_usable, resolve_torch_dtype_for_device
-
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -57,6 +57,14 @@ class BaseGenAIStrategy(ABC):
         metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
         raise NotImplementedError
+
+    def get_debug_inputs(
+        self,
+        reference_crop_tensor: torch.Tensor,
+        dense_dwpose_tensor: torch.Tensor,
+    ) -> dict[str, np.ndarray]:
+        return {}
+
 
 
 class BaselineControlNetStrategy(BaseGenAIStrategy):
@@ -108,6 +116,56 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
         pipe.set_progress_bar_config(disable=True)
         self._pipe = pipe
         return pipe
+
+    def get_debug_inputs(
+        self,
+        reference_crop_tensor: torch.Tensor,
+        dense_dwpose_tensor: torch.Tensor,
+    ) -> dict[str, np.ndarray]:
+        artifacts = {}
+        ref_np = _to_numpy_bgr(reference_crop_tensor)
+        artifacts["00_reference_crop.png"] = ref_np
+        
+        try:
+            pose_tensor = dense_dwpose_tensor.clone()
+            if pose_tensor.ndim == 3:
+                pose_tensor = pose_tensor[-1]
+            pose_np_raw = pose_tensor.cpu().numpy()
+            
+            valid = pose_np_raw[:, 2] >= 0.2
+            if np.any(valid):
+                xs = pose_np_raw[valid, 0]
+                ys = pose_np_raw[valid, 1]
+                x1 = int(np.floor(np.min(xs)))
+                y1 = int(np.floor(np.min(ys)))
+                x2 = int(np.ceil(np.max(xs)))
+                y2 = int(np.ceil(np.max(ys)))
+                bw = max(1, x2 - x1)
+                bh = max(1, y2 - y1)
+                gen_h = max(8, (bh // 8) * 8)
+                gen_w = max(8, (bw // 8) * 8)
+                
+                pose_tensor[..., 0] -= x1
+                pose_tensor[..., 1] -= y1
+                pose_tensor[..., 0] *= float(gen_w) / float(bw)
+                pose_tensor[..., 1] *= float(gen_h) / float(bh)
+                target_h, target_w = gen_h, gen_w
+            else:
+                target_h = int(reference_crop_tensor.shape[1])
+                target_w = int(reference_crop_tensor.shape[2])
+                
+            pose_np = _render_pose_condition(pose_tensor, output_height=target_h, output_width=target_w)
+            pose_np = cv2.cvtColor(pose_np, cv2.COLOR_RGB2BGR)
+        except Exception as e:
+            _LOGGER.warning(f"Failed to render pose for debug output: {e}")
+            pose_np = dense_dwpose_tensor.cpu().numpy()
+            if pose_np.ndim == 3:
+                pose_np = pose_np[-1]
+            pose_np = np.asarray(pose_np * 255.0, dtype=np.uint8) if pose_np.dtype != np.uint8 else pose_np
+            if len(pose_np.shape) == 3 and pose_np.shape[0] == 3:
+                pose_np = np.transpose(pose_np, (1, 2, 0))
+        artifacts["01_pose_condition.png"] = pose_np
+        return artifacts
 
     def generate(
         self,
@@ -231,6 +289,56 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
         self._runtime_fn = runtime_fn
         return runtime_fn
 
+    def get_debug_inputs(
+        self,
+        reference_crop_tensor: torch.Tensor,
+        dense_dwpose_tensor: torch.Tensor,
+    ) -> dict[str, np.ndarray]:
+        artifacts = {}
+        ref_np = _to_numpy_bgr(reference_crop_tensor)
+        artifacts["00_reference_crop.png"] = ref_np
+        
+        try:
+            pose_tensor = dense_dwpose_tensor.clone()
+            if pose_tensor.ndim == 3:
+                pose_tensor = pose_tensor[-1]
+            pose_np_raw = pose_tensor.cpu().numpy()
+            
+            valid = pose_np_raw[:, 2] >= 0.2
+            if np.any(valid):
+                xs = pose_np_raw[valid, 0]
+                ys = pose_np_raw[valid, 1]
+                x1 = int(np.floor(np.min(xs)))
+                y1 = int(np.floor(np.min(ys)))
+                x2 = int(np.ceil(np.max(xs)))
+                y2 = int(np.ceil(np.max(ys)))
+                bw = max(1, x2 - x1)
+                bh = max(1, y2 - y1)
+                gen_h = max(8, (bh // 8) * 8)
+                gen_w = max(8, (bw // 8) * 8)
+                
+                pose_tensor[..., 0] -= x1
+                pose_tensor[..., 1] -= y1
+                pose_tensor[..., 0] *= float(gen_w) / float(bw)
+                pose_tensor[..., 1] *= float(gen_h) / float(bh)
+                target_h, target_w = gen_h, gen_w
+            else:
+                target_h = int(reference_crop_tensor.shape[1])
+                target_w = int(reference_crop_tensor.shape[2])
+                
+            pose_np = _render_pose_condition(pose_tensor, output_height=target_h, output_width=target_w)
+            pose_np = cv2.cvtColor(pose_np, cv2.COLOR_RGB2BGR)
+        except Exception as e:
+            _LOGGER.warning(f"Failed to render pose for debug output: {e}")
+            pose_np = dense_dwpose_tensor.cpu().numpy()
+            if pose_np.ndim == 3:
+                pose_np = pose_np[-1]
+            pose_np = np.asarray(pose_np * 255.0, dtype=np.uint8) if pose_np.dtype != np.uint8 else pose_np
+            if len(pose_np.shape) == 3 and pose_np.shape[0] == 3:
+                pose_np = np.transpose(pose_np, (1, 2, 0))
+        artifacts["01_pose_condition.png"] = pose_np
+        return artifacts
+
     def generate(
         self,
         reference_crop_tensor: torch.Tensor,
@@ -335,6 +443,8 @@ class BaseCompositor:
         actor_identity: str | None = None,
         metadata_mask: np.ndarray | None = None,
         metadata_bbox: tuple[int, int, int, int] | None = None,
+        debug_dir: str | Path | None = None,
+        frame_idx: int | None = None,
     ) -> torch.Tensor:
         raise NotImplementedError("BaseCompositor does not implement process. Subclasses must implement it.")
 
@@ -403,6 +513,7 @@ class BaseCompositor:
         return bx1, by1, bx2, by2
 
 
+
 class DiffusersCompositor(BaseCompositor):
     """Feature-gated real GenAI compositor with strategy-selectable backends."""
 
@@ -464,6 +575,7 @@ class DiffusersCompositor(BaseCompositor):
         self._postgen_segmenter_model = self.config.postgen_segmenter_model if self.config and self.config.postgen_segmenter_model else "yolo26n-seg.pt"
         self._postgen_segmenter: Any | None = None
         self._postgen_segmenter_disabled = False
+        self._current_debug_artifacts: dict[str, np.ndarray] | None = None
 
         self._strategy = self._build_strategy(self._backend)
 
@@ -508,6 +620,8 @@ class DiffusersCompositor(BaseCompositor):
         actor_identity: str | None = None,
         metadata_mask: np.ndarray | None = None,
         metadata_bbox: tuple[int, int, int, int] | None = None,
+        debug_dir: str | Path | None = None,
+        frame_idx: int | None = None,
     ) -> torch.Tensor:
         # Deterministic generation is required so residual encoding remains stable.
         if self._seed is not None:
@@ -533,6 +647,18 @@ class DiffusersCompositor(BaseCompositor):
                 mask_np = mask_np[:, :, 0]
             control_tensor = torch.from_numpy(mask_np).unsqueeze(0).to(self._device)
 
+        if debug_dir is not None and frame_idx is not None and actor_identity is not None:
+            self._current_debug_artifacts = self._strategy.get_debug_inputs(
+                reference_crop_tensor=reference_crop_tensor,
+                dense_dwpose_tensor=control_tensor,
+            )
+            bg_np = warped_background_frame.cpu().numpy()
+            if len(bg_np.shape) == 3 and bg_np.shape[0] == 3:
+                bg_np = np.transpose(bg_np, (1, 2, 0))
+            self._current_debug_artifacts["02_warped_background.png"] = bg_np
+        else:
+            self._current_debug_artifacts = None
+
         generated_actor = self._strategy.generate(
             reference_crop_tensor=reference_crop_tensor,
             dense_dwpose_tensor=control_tensor,
@@ -540,6 +666,13 @@ class DiffusersCompositor(BaseCompositor):
             device=self._device,
             metadata_bbox=resolved_bbox,
         )
+        
+        if self._current_debug_artifacts is not None:
+            actor_np = generated_actor.cpu().numpy()
+            if len(actor_np.shape) == 3 and actor_np.shape[0] == 3:
+                actor_np = np.transpose(actor_np, (1, 2, 0))
+            self._current_debug_artifacts["03_generated_actor.png"] = actor_np
+
         return self._composite_actor_frame(
             generated_actor=generated_actor,
             dense_dwpose_tensor=dense_dwpose_tensor,
@@ -547,6 +680,8 @@ class DiffusersCompositor(BaseCompositor):
             actor_identity=actor_identity,
             metadata_mask=metadata_mask,
             metadata_bbox=metadata_bbox,
+            debug_dir=debug_dir,
+            frame_idx=frame_idx,
         )
 
     @gpu_bound
@@ -558,6 +693,8 @@ class DiffusersCompositor(BaseCompositor):
         actor_identity: str | None = None,
         metadata_masks: list[np.ndarray | None] | None = None,
         metadata_bboxes: list[tuple[int, int, int, int] | None] | None = None,
+        debug_dir: str | Path | None = None,
+        start_frame_idx: int | None = None,
     ) -> torch.Tensor:
         if not self.uses_temporal_pose_sequence():
             raise RuntimeError("process_sequence is only supported for temporal GenAI backends")
@@ -593,6 +730,26 @@ class DiffusersCompositor(BaseCompositor):
 
         out_frames: list[torch.Tensor] = []
         for frame_idx in range(frame_count):
+            global_frame_id = start_frame_idx + frame_idx if start_frame_idx is not None else None
+            
+            if debug_dir is not None and global_frame_id is not None and actor_identity is not None:
+                self._current_debug_artifacts = self._strategy.get_debug_inputs(
+                    reference_crop_tensor=reference_crop_tensor,
+                    dense_dwpose_tensor=dense_dwpose_tensor[frame_idx],
+                )
+                bg_np = warped_background_frames[frame_idx].cpu().numpy()
+                if len(bg_np.shape) == 3 and bg_np.shape[0] == 3:
+                    bg_np = np.transpose(bg_np, (1, 2, 0))
+                self._current_debug_artifacts["02_warped_background.png"] = bg_np
+            else:
+                self._current_debug_artifacts = None
+                
+            if self._current_debug_artifacts is not None:
+                actor_np = generated_sequence[frame_idx].cpu().numpy()
+                if len(actor_np.shape) == 3 and actor_np.shape[0] == 3:
+                    actor_np = np.transpose(actor_np, (1, 2, 0))
+                self._current_debug_artifacts["03_generated_actor.png"] = actor_np
+                
             metadata_mask = None
             if metadata_masks is not None and frame_idx < len(metadata_masks):
                 metadata_mask = metadata_masks[frame_idx]
@@ -608,6 +765,8 @@ class DiffusersCompositor(BaseCompositor):
                     actor_identity=actor_identity,
                     metadata_mask=metadata_mask,
                     metadata_bbox=metadata_bbox,
+                    debug_dir=debug_dir,
+                    frame_idx=global_frame_id,
                 )
             )
 
@@ -621,6 +780,8 @@ class DiffusersCompositor(BaseCompositor):
         actor_identity: str | None = None,
         metadata_mask: np.ndarray | None = None,
         metadata_bbox: tuple[int, int, int, int] | None = None,
+        debug_dir: str | Path | None = None,
+        frame_idx: int | None = None,
     ) -> torch.Tensor:
         frame_np = self._to_frame_numpy(warped_background_frame)
         generated_np = self._to_crop_numpy(generated_actor)
@@ -682,6 +843,12 @@ class DiffusersCompositor(BaseCompositor):
                 self._backend,
             )
             return torch.from_numpy(frame_np).permute(2, 0, 1).contiguous().to(torch.uint8)
+            
+        if self._current_debug_artifacts is not None:
+            alpha_out = np.asarray(alpha_mask * 255.0, dtype=np.uint8)
+            if len(alpha_out.shape) == 3:
+                alpha_out = alpha_out[:, :, 0]
+            self._current_debug_artifacts["04_alpha_mask.png"] = alpha_out
 
         roi = frame_np[y1:y2, x1:x2]
         alpha_3 = np.asarray(alpha_mask[:, :, None], dtype=np.float32)
@@ -704,6 +871,18 @@ class DiffusersCompositor(BaseCompositor):
                 )
         blended = actor_resized.astype(np.float32) * alpha_3 + roi.astype(np.float32) * (1.0 - alpha_3)
         frame_np[y1:y2, x1:x2] = np.asarray(np.clip(blended, 0.0, 255.0), dtype=np.uint8)
+        
+        if self._current_debug_artifacts is not None:
+            self._current_debug_artifacts["05_composited_frame.png"] = frame_np
+            export_compositor_artifacts(
+                debug_dir=debug_dir,
+                stage=self._debug_stage,
+                frame_idx=frame_idx,
+                actor_id=actor_identity,
+                artifacts=self._current_debug_artifacts,
+            )
+            self._current_debug_artifacts = None
+            
         return torch.from_numpy(frame_np).permute(2, 0, 1).contiguous().to(torch.uint8)
 
     def _resolve_target_bbox(

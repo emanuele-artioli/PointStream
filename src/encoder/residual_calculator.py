@@ -14,8 +14,6 @@ import torch.nn.functional as F
 
 from src.decoder.genai_compositor import DiffusersCompositor
 from src.encoder.video_io import encode_video_frames_ffmpeg, iter_video_frames_ffmpeg, probe_video_metadata
-from src.shared.genai_debug import debug_export_compositor_input, debug_export_compositor_output
-from src.shared.mask_codec import decode_binary_mask
 from src.shared.schemas import ActorPacket, EncodedChunkPayload, FrameState, ResidualPacket, ResidualMode, SceneActor, VideoChunk
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import gpu_bound
@@ -555,6 +553,7 @@ class ResidualCalculator:
                 frame_tensor=frame_tensor,
                 actor_state=actor_state,
                 compositor=compositor,
+                debug_dir=debug_output_path,
             )
 
         use_temporal_window = bool(hasattr(compositor, "uses_temporal_pose_sequence") and compositor.uses_temporal_pose_sequence())
@@ -586,16 +585,6 @@ class ResidualCalculator:
                 metadata_mask = None if metadata_entry is None else metadata_entry.mask_gray
                 metadata_bbox = None if metadata_entry is None else metadata_entry.bbox
 
-                debug_export_compositor_input(
-                    stage="encoder",
-                    frame_idx=frame_idx,
-                    actor_id=scene_track_id_to_int(state.object_id),
-                    reference_crop_tensor=state.reference_crop_tensor,
-                    dense_pose_tensor=pose_condition,
-                    warped_bg_tensor=composited,
-                    debug_dir=debug_output_path,
-                )
-
                 composited = compositor.process(
                     reference_crop_tensor=state.reference_crop_tensor,
                     dense_dwpose_tensor=pose_condition,
@@ -603,16 +592,9 @@ class ResidualCalculator:
                     actor_identity=state.object_id,
                     metadata_mask=metadata_mask,
                     metadata_bbox=metadata_bbox,
-                ).to(frame_tensor.device)
-
-                debug_export_compositor_output(
-                    stage="encoder",
-                    frame_idx=frame_idx,
-                    actor_id=scene_track_id_to_int(state.object_id),
-                    composited_frame_tensor=composited,
-                    bbox=metadata_bbox,
                     debug_dir=debug_output_path,
-                )
+                    frame_idx=frame_idx,
+                ).to(frame_tensor.device)
 
             blended_frames.append(composited)
 
@@ -786,6 +768,7 @@ class ResidualCalculator:
         frame_tensor: torch.Tensor,
         actor_state: dict[int, _ServerActorState],
         compositor: Any,
+        debug_dir: str | Path | None = None,
     ) -> torch.Tensor:
         frame_count = int(frame_tensor.shape[0])
         if frame_count <= 0 or not actor_state:
@@ -814,6 +797,8 @@ class ResidualCalculator:
                 actor_identity=state.object_id,
                 metadata_masks=metadata_masks,
                 metadata_bboxes=metadata_bboxes,
+                debug_dir=debug_dir,
+                start_frame_idx=chunk_start,
             ).to(frame_tensor.device)
 
             if valid_count < frame_count:

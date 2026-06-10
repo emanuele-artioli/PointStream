@@ -10,127 +10,25 @@ import torch
 
 logger = logging.getLogger(__name__)
 
-def debug_export_compositor_input(
-    stage: str,  # "encoder" or "decoder"
+
+def export_compositor_artifacts(
+    debug_dir: str | Path | None,
+    stage: str,
     frame_idx: int,
-    actor_id: int,
-    reference_crop_tensor: Optional[torch.Tensor],
-    dense_pose_tensor: Optional[torch.Tensor],
-    warped_bg_tensor: Optional[torch.Tensor],
-    debug_dir: str | Path | None = None,
+    actor_id: str,
+    artifacts: dict[str, np.ndarray],
 ) -> None:
-    """Export compositor inputs for comparison."""
+    """Export compositor artifacts provided by strategy and compositor."""
     if not debug_dir or not Path(debug_dir).exists():
         return
 
     output_dir = Path(debug_dir) / stage / f"frame_{frame_idx:04d}" / f"actor_{actor_id}"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Export reference crop
-    if reference_crop_tensor is not None:
-        ref_np = reference_crop_tensor.cpu().numpy()
-        if ref_np.dtype in (np.uint8,):
-            if len(ref_np.shape) == 3 and ref_np.shape[0] == 3:
-                ref_np = np.transpose(ref_np, (1, 2, 0))
-                # Removed COLOR_RGB2BGR because the tensor is natively BGR
-        cv2.imwrite(str(output_dir / "00_reference_crop.png"), ref_np)
-
-    # Export pose
-    if dense_pose_tensor is not None:
-        try:
-            # Render the skeleton to a canvas to match what the model sees
-            from src.decoder.genai_compositor import _render_pose_condition
-            
-            # We must shift the absolute tensor coordinates into the local crop space just like the actual generation logic
-            pose_tensor = dense_pose_tensor.clone()
-            if pose_tensor.ndim == 3:
-                pose_tensor = pose_tensor[-1]
-            pose_np_raw = pose_tensor.cpu().numpy()
-            
-            valid = pose_np_raw[:, 2] >= 0.2
-            if np.any(valid):
-                xs = pose_np_raw[valid, 0]
-                ys = pose_np_raw[valid, 1]
-                x1 = int(np.floor(np.min(xs)))
-                y1 = int(np.floor(np.min(ys)))
-                x2 = int(np.ceil(np.max(xs)))
-                y2 = int(np.ceil(np.max(ys)))
-                bw = max(1, x2 - x1)
-                bh = max(1, y2 - y1)
-                gen_h = max(8, (bh // 8) * 8)
-                gen_w = max(8, (bw // 8) * 8)
-                
-                pose_tensor[..., 0] -= x1
-                pose_tensor[..., 1] -= y1
-                pose_tensor[..., 0] *= float(gen_w) / float(bw)
-                pose_tensor[..., 1] *= float(gen_h) / float(bh)
-                target_h, target_w = gen_h, gen_w
-            else:
-                target_h = int(reference_crop_tensor.shape[1]) if reference_crop_tensor is not None else 256
-                target_w = int(reference_crop_tensor.shape[2]) if reference_crop_tensor is not None else 256
-                
-            pose_np = _render_pose_condition(pose_tensor, output_height=target_h, output_width=target_w)
-            # pose_np is RGB natively from draw_dwpose_canvas, so we convert it to BGR for cv2.imwrite
-            pose_np = cv2.cvtColor(pose_np, cv2.COLOR_RGB2BGR)
-        except Exception as e:
-            # Fallback to the raw tensor logic if rendering fails
-            logger.warning(f"Failed to render pose for debug output: {e}")
-            pose_np = dense_pose_tensor.cpu().numpy()
-            pose_np = np.asarray(pose_np * 255.0, dtype=np.uint8) if pose_np.dtype != np.uint8 else pose_np
-            if len(pose_np.shape) == 3 and pose_np.shape[0] == 3:
-                pose_np = np.transpose(pose_np, (1, 2, 0))
-        cv2.imwrite(str(output_dir / "01_pose_condition.png"), pose_np)
-
-    # Export warped background
-    if warped_bg_tensor is not None:
-        bg_np = warped_bg_tensor.cpu().numpy()
-        if len(bg_np.shape) == 3 and bg_np.shape[0] == 3:
-            bg_np = np.transpose(bg_np, (1, 2, 0))
-        cv2.imwrite(str(output_dir / "02_warped_background.png"), bg_np)
-
-
-def debug_export_compositor_output(
-    stage: str,  # "encoder" or "decoder"
-    frame_idx: int,
-    actor_id: int,
-    composited_frame_tensor: torch.Tensor,
-    generated_actor_np: Optional[np.ndarray] = None,
-    bbox: Optional[tuple[int, int, int, int]] = None,
-    alpha_mask: Optional[np.ndarray] = None,
-    debug_dir: str | Path | None = None,
-) -> None:
-    """Export compositor outputs for comparison."""
-    if not debug_dir or not Path(debug_dir).exists():
-        return
-
-    output_dir = Path(debug_dir) / stage / f"frame_{frame_idx:04d}" / f"actor_{actor_id}"
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    # Export generated actor before compositing
-    if generated_actor_np is not None:
-        actor_np = generated_actor_np.copy()
-        if len(actor_np.shape) == 3 and actor_np.shape[0] == 3:
-            actor_np = np.transpose(actor_np, (1, 2, 0))
-        cv2.imwrite(str(output_dir / "03_generated_actor.png"), actor_np)
-
-    # Export bbox metadata
-    if bbox is not None:
-        x1, y1, x2, y2 = bbox
-        with open(output_dir / "bbox.txt", "w") as f:
-            f.write(f"x1={x1} y1={y1} x2={x2} y2={y2} w={x2-x1} h={y2-y1}\n")
-
-    # Export alpha mask
-    if alpha_mask is not None:
-        alpha_np = np.asarray(alpha_mask * 255.0, dtype=np.uint8)
-        if len(alpha_np.shape) == 3:
-            alpha_np = alpha_np[:, :, 0]
-        cv2.imwrite(str(output_dir / "04_alpha_mask.png"), alpha_np)
-
-    # Export final composited frame
-    composited_np = composited_frame_tensor.cpu().numpy()
-    if len(composited_np.shape) == 3 and composited_np.shape[0] == 3:
-        composited_np = np.transpose(composited_np, (1, 2, 0))
-    cv2.imwrite(str(output_dir / "05_composited_frame.png"), composited_np)
+    for filename, img_np in artifacts.items():
+        if img_np is None:
+            continue
+        cv2.imwrite(str(output_dir / filename), img_np)
 
 
 def debug_export_frame_pair(

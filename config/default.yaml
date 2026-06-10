@@ -6,11 +6,11 @@
 # Core Input/Output Settings
 # ============================================================================
 # source-uri: null                    # Path to input video (optional; mock source used if omitted)
-num-frames: null                      # Maximum number of frames to process (null = all frames)
+num-frames: 10                      # Maximum number of frames to process (null = all frames)
 summary-file: true                    # Write run_summary.json
 ffmpeg-codec: libsvtav1               # FFmpeg encoder: libsvtav1, libx265, etc.
 codec-crf: 35                         # FFmpeg CRF quality (lower = better). null uses codec defaults
-codec-preset: slow                    # FFmpeg preset/speed (e.g., veryfast, medium, slow). null uses codec defaults
+codec-preset: fast                    # FFmpeg preset/speed (e.g., veryfast, medium, slow). null uses codec defaults
 log-level: debug                      # Log verbosity: debug, info, warning, error
 transport: disk                       # Transport backend: currently only 'disk'
 
@@ -76,12 +76,12 @@ allow-auto-model-download: true       # Allow automatic model downloads
 # Evaluation Settings
 # ============================================================================
 evaluation-mode: [psnr]   # Post-run evaluation metrics: none, [psnr], [psnr, ssim, vmaf]
-evaluation-max-frames: 5           # Optional frame cap for quality evaluation
+evaluation-max-frames: null           # Optional frame cap for quality evaluation
 
 # ============================================================================
 # GenAI and AnimateAnyone Configuration
 # ============================================================================                
-genai-backend: seg-controlnet          # GenAI backend: caption-controlnet, ip-adapter-controlnet, canny-controlnet, seg-controlnet, animate-anyone (null disables GenAI)
+genai-backend: animate-anyone          # GenAI backend: caption-controlnet, ip-adapter-controlnet, canny-controlnet, seg-controlnet, animate-anyone (null disables GenAI)
 animate-anyone-repo-dir: null             # Path to Moore-AnimateAnyone repository
 animate-anyone-model-dir: null            # Override if models are in non-standard location
 animate-anyone-steps: 3                  # Diffusion inference steps for AnimateAnyone
