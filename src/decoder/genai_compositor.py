@@ -640,12 +640,26 @@ class DiffusersCompositor(BaseCompositor):
         # Check if the backend is one of these and a mask was provided.
         is_mask_backend = self._backend in {"canny-controlnet", "seg-controlnet", "canny_controlnet", "seg_controlnet"}
         control_tensor = dense_dwpose_tensor
-        if is_mask_backend and metadata_mask is not None:
-            # metadata_mask is [H, W] or [H, W, 1]. Create [1, H, W] tensor.
-            mask_np = np.asarray(metadata_mask, dtype=np.uint8)
-            if mask_np.ndim == 3:
-                mask_np = mask_np[:, :, 0]
-            control_tensor = torch.from_numpy(mask_np).unsqueeze(0).to(self._device)
+        if is_mask_backend:
+            if metadata_mask is not None:
+                # metadata_mask is [H, W] or [H, W, 1]. Create [1, H, W] tensor.
+                mask_np = np.asarray(metadata_mask, dtype=np.uint8)
+                if mask_np.ndim == 3:
+                    mask_np = mask_np[:, :, 0]
+                control_tensor = torch.from_numpy(mask_np).unsqueeze(0).to(self._device)
+            else:
+                target_w = max(1, x2 - x1)
+                target_h = max(1, y2 - y1)
+                fallback_mask = self._alpha_from_pose_hull(
+                    pose_np=self._to_pose_numpy(dense_dwpose_tensor),
+                    target_bbox=resolved_bbox,
+                    target_w=target_w,
+                    target_h=target_h,
+                )
+                if fallback_mask is None:
+                    fallback_mask = np.zeros((target_h, target_w), dtype=np.float32)
+                fallback_u8 = np.asarray(fallback_mask * 255.0, dtype=np.uint8)
+                control_tensor = torch.from_numpy(fallback_u8).unsqueeze(0).to(self._device)
 
         if debug_dir is not None and frame_idx is not None and actor_identity is not None:
             self._current_debug_artifacts = self._strategy.get_debug_inputs(
@@ -900,10 +914,6 @@ class DiffusersCompositor(BaseCompositor):
             clipped_x2 = max(clipped_x1 + 1, min(frame_width, int(x2)))
             clipped_y2 = max(clipped_y1 + 1, min(frame_height, int(y2)))
             return clipped_x1, clipped_y1, clipped_x2, clipped_y2
-
-        if is_mask_backend and metadata_bbox is None:
-            # Fallback if no metadata_bbox is provided but we need it for mask backend
-            raise ValueError(f"metadata_bbox is required for {self._backend} but was not provided.")
 
         return self._estimate_bbox_from_pose(
             pose_np=pose_np,
