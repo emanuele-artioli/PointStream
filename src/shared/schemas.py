@@ -130,12 +130,12 @@ class ActorPacket(BaseModel):
 class ActorMaskFrame(BaseModel):
     frame_id: int = Field(ge=0)
     bbox: list[int] = Field(min_length=4, max_length=4)
-    mask_codec: Literal["rle-v1", "bitpack-z1", "png", "poly-v1"] = "rle-v1"
+    mask_codec: Literal["rle-v1", "bitpack-z1", "png", "poly-v1", "jpeg"] = "rle-v1"
     mask_payload: bytes | None = None
     mask_height: int | None = Field(default=None, gt=0)
     mask_width: int | None = Field(default=None, gt=0)
     mask_png: bytes | None = None
-    source: Literal["source", "postgen-server"] = "source"
+    source: Literal["source", "postgen-server", "canny"] = "source"
 
 
 class RigidObjectPacket(BaseModel):

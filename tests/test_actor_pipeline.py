@@ -101,6 +101,11 @@ def _install_fake_actor_components(monkeypatch: pytest.MonkeyPatch) -> None:
             self.model_name = model_name
             self.model = model
 
+    class CannySegmenter(BaseSegmenter):
+        def __init__(self, lower_threshold="auto", upper_threshold="auto") -> None:
+            self.lower_threshold = lower_threshold
+            self.upper_threshold = upper_threshold
+
     module: Any = types.ModuleType("src.encoder.actor_components")
     setattr(module, "BaseDetector", BaseDetector)
     setattr(module, "BasePoseEstimator", BasePoseEstimator)
@@ -116,6 +121,7 @@ def _install_fake_actor_components(monkeypatch: pytest.MonkeyPatch) -> None:
     setattr(module, "YoloSegmenter", YoloSegmenter)
     setattr(module, "YoloeSegmenter", YoloeSegmenter)
     setattr(module, "SamSegmenter", SamSegmenter)
+    setattr(module, "CannySegmenter", CannySegmenter)
     monkeypatch.setitem(sys.modules, "src.encoder.actor_components", module)
 
 

@@ -870,6 +870,38 @@ class NoOpSegmenter(BaseSegmenter):
         return actor
 
 
+class CannySegmenter(BaseSegmenter):
+    def __init__(self, lower_threshold: str | int = "auto", upper_threshold: str | int = "auto") -> None:
+        self.lower_threshold = lower_threshold
+        self.upper_threshold = upper_threshold
+
+    def segment(self, frame_bgr: np.ndarray, actor: SceneActor) -> SceneActor:
+        if actor.mask is not None:
+            return actor
+
+        crop, _ = _build_crop_with_padding(frame_bgr, actor.bbox, pad_ratio=0.0)
+        if crop.size == 0:
+            return actor
+
+        gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+        
+        low = self.lower_threshold
+        high = self.upper_threshold
+        
+        if str(low).lower() == "auto" or str(high).lower() == "auto":
+            v = float(np.median(gray))  # type: ignore
+            sigma = 0.33
+            if str(low).lower() == "auto":
+                low = int(max(0.0, (1.0 - sigma) * v))
+            if str(high).lower() == "auto":
+                high = int(min(255.0, (1.0 + sigma) * v))
+                
+        edges = cv2.Canny(gray, int(low), int(high))
+        mask_bin = (edges > 127).astype(np.uint8).tolist()
+        
+        return actor.model_copy(update={"mask": mask_bin})
+
+
 class YoloSegmenter(BaseSegmenter):
     def __init__(self, model_name: str = "yolo26n-seg.pt", model: Any | None = None) -> None:
         self.model_name = model_name
@@ -1221,13 +1253,13 @@ class PayloadEncoder:
                         )
                     )
 
-        actor_ids = sorted(actor_events.keys())
+        actor_ids = sorted(set(actor_events.keys()) | set(actor_masks.keys()))
 
         if not actor_ids:
             return []
 
         packets: list[ActorPacket] = []
-        for actor_id in sorted(actor_events.keys())[:2]:
+        for actor_id in actor_ids[:2]:
             packets.append(
                 ActorPacket(
                     chunk_id=chunk.chunk_id,
@@ -1242,7 +1274,7 @@ class PayloadEncoder:
                         shape=[1, chunk.num_frames, 18, 3],
                         dtype=str(torch.float32),
                     ),
-                    events=actor_events[actor_id],
+                    events=actor_events.get(actor_id, []),
                     mask_frames=actor_masks.get(actor_id, []),
                 )
             )
@@ -1362,8 +1394,8 @@ class PipelineBuilder:
 
             updated_actors: list[SceneActor] = []
             for actor in selected.actors:
-                segmented = self.segmenter.segment(frame, actor)
-                with_pose = self.pose_estimator.estimate(frame, segmented)
+                segmented = self.segmenter.segment(frame, actor) if self.segmenter else actor
+                with_pose = self.pose_estimator.estimate(frame, segmented) if self.pose_estimator else segmented
                 updated_actors.append(with_pose)
 
             yield FrameState(frame_id=state.frame_id, actors=updated_actors)
@@ -1390,6 +1422,8 @@ class PipelineBuilder:
             for event in packet.events:
                 if event.event_type == "keyframe":
                     keyframe_ids.add(int(event.frame_id))
+            for mask_frame in packet.mask_frames:
+                keyframe_ids.add(int(mask_frame.frame_id))
 
         frame_state_by_id = {chunk.start_frame_id + s.frame_id: s for s in frame_states}
         for global_frame_id in sorted(keyframe_ids):
@@ -1402,9 +1436,16 @@ class PipelineBuilder:
             if state is None:
                 continue
 
+            stem = f"{chunk.chunk_id}_frame_{global_frame_id:05d}"
+            
             people_dw = []
             for actor in state.actors:
-                if actor.class_name != "player" or actor.pose_dw is None:
+                if actor.class_name != "player":
+                    continue
+                if actor.mask is not None:
+                    mask_img = np.clip(np.asarray(actor.mask, dtype=np.float32) * 255, 0, 255).astype(np.uint8)
+                    cv2.imwrite(str(out_path / f"{stem}_{actor.track_id}_mask.png"), mask_img)
+                if actor.pose_dw is None:
                     continue
                 pose = np.asarray(actor.pose_dw, dtype=np.float32)
                 if pose.shape == (18, 3):
@@ -1422,12 +1463,11 @@ class PipelineBuilder:
                 )
             except ModuleNotFoundError as exc:
                 _LOGGER.warning("Skipping debug skeleton rendering because dwpose is unavailable: %s", exc)
-                return
+                continue
             overlay = frame.copy()
             mask = np.any(skeleton_canvas > 0, axis=2)
             overlay[mask] = skeleton_canvas[mask]
 
-            stem = f"{chunk.chunk_id}_frame_{global_frame_id:05d}"
             cv2.imwrite(str(out_path / f"{stem}_skeleton_black.png"), skeleton_canvas)
             cv2.imwrite(str(out_path / f"{stem}_skeleton_overlay.png"), overlay)
 

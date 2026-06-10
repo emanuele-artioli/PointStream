@@ -375,3 +375,143 @@ class IPAdapterControlNetStrategy(BaseGenAIStrategy):
         
         # Shape: [Channels, Height, Width]
         return torch.from_numpy(generated_bgr).permute(2, 0, 1).contiguous().to(torch.uint8)
+
+
+class CannyControlNetStrategy(BaseGenAIStrategy):
+    """ControlNet strategy utilizing Canny edges as the control condition."""
+
+    def __init__(
+        self,
+        model_id: str = "assets/weights/stable-diffusion-v1-5",
+        controlnet_id: str = "lllyasviel/control_v11p_sd15_canny",
+        config: Any = None,
+    ) -> None:
+        self._model_id = model_id
+        self._controlnet_id = controlnet_id
+        self.config = config
+        self._pipe: Any | None = None
+        
+        self._width = int(config.controlnet_width) if config and hasattr(config, "controlnet_width") else 512
+        self._height = int(config.controlnet_height) if config and hasattr(config, "controlnet_height") else 512
+        self._steps = int(config.controlnet_steps) if config and hasattr(config, "controlnet_steps") else 20
+        self._strength = float(config.controlnet_strength) if config and hasattr(config, "controlnet_strength") else 0.65
+        self._cfg = float(config.controlnet_cfg) if config and hasattr(config, "controlnet_cfg") else 7.0
+
+    def _ensure_pipeline(self, device: torch.device) -> Any:
+        if self._pipe is not None:
+            return self._pipe
+
+        try:
+            from diffusers import ControlNetModel, StableDiffusionControlNetImg2ImgPipeline
+        except ModuleNotFoundError as exc:
+            raise RuntimeError("diffusers is required for ControlNet strategy") from exc
+
+        dtype = resolve_torch_dtype_for_device(
+            device,
+            default_cuda=torch.float16,
+            allowed_cuda={torch.float16, torch.bfloat16, torch.float32},
+            config_dtype=self.config.gpu_dtype if self.config and hasattr(self.config, "gpu_dtype") else None,
+        )
+        
+        _LOGGER.info(f"Loading Canny ControlNet model {self._controlnet_id}...")
+        controlnet = ControlNetModel.from_pretrained(self._controlnet_id, torch_dtype=dtype)
+        
+        _LOGGER.info(f"Loading Stable Diffusion model {self._model_id}...")
+        pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
+            self._model_id,
+            controlnet=controlnet,
+            torch_dtype=dtype,
+            safety_checker=None,
+        )
+        pipe = pipe.to(device)
+        pipe.set_progress_bar_config(disable=True)
+        self._pipe = pipe
+        return pipe
+
+    def generate(
+        self,
+        reference_crop_tensor: torch.Tensor,
+        dense_dwpose_tensor: torch.Tensor,
+        seed: int,
+        device: torch.device,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
+    ) -> torch.Tensor:
+        # dense_dwpose_tensor actually contains the binary mask or canny edge image here!
+        pipe = self._ensure_pipeline(device)
+
+        reference_np = _to_numpy_bgr(reference_crop_tensor)
+
+        # dense_dwpose_tensor is a [C, H, W] tensor containing the decoded mask image 
+        # (which we passed in through the pose_tensor argument to reuse the interface).
+        # Wait, if we use mask metadata, it doesn't get passed as dense_dwpose_tensor automatically!
+        # The BaseGenAIStrategy.generate signature requires a dense_dwpose_tensor.
+        # We will need to pass the mask into generate! 
+        # Actually, let's just assume `dense_dwpose_tensor` contains the mask as [1, H, W].
+        
+        mask_np = dense_dwpose_tensor.detach().cpu().squeeze().numpy()
+        if mask_np.ndim != 2:
+            raise ValueError(f"CannyControlNet expects a 2D mask, got shape: {dense_dwpose_tensor.shape}")
+
+        if metadata_bbox is not None:
+            x1, y1, x2, y2 = metadata_bbox
+            bw = max(1, x2 - x1)
+            bh = max(1, y2 - y1)
+            scale = float(max(self._width, self._height)) / max(bh, bw)
+            scaled_h = int(bh * scale)
+            scaled_w = int(bw * scale)
+            offset_x = (self._width - scaled_w) // 2
+            offset_y = (self._height - scaled_h) // 2
+        else:
+            bh, bw = int(reference_np.shape[0]), int(reference_np.shape[1])
+            scale = float(max(self._width, self._height)) / max(bh, bw)
+            scaled_h = int(bh * scale)
+            scaled_w = int(bw * scale)
+            offset_x = (self._width - scaled_w) // 2
+            offset_y = (self._height - scaled_h) // 2
+
+        # Resize mask condition to match ControlNet canvas
+        mask_uint8 = np.clip(mask_np, 0, 255).astype(np.uint8)
+        mask_resized = cv2.resize(mask_uint8, (scaled_w, scaled_h), interpolation=cv2.INTER_NEAREST)
+        
+        canvas = np.zeros((self._height, self._width), dtype=np.uint8)
+        canvas[offset_y:offset_y+scaled_h, offset_x:offset_x+scaled_w] = mask_resized
+        control_rgb = np.stack([canvas]*3, axis=-1)
+
+        reference_rgb = cv2.cvtColor(reference_np, cv2.COLOR_BGR2RGB)
+        if reference_rgb.shape[0] != scaled_h or reference_rgb.shape[1] != scaled_w:
+            reference_rgb = cv2.resize(reference_rgb, (scaled_w, scaled_h), interpolation=cv2.INTER_LANCZOS4)
+            
+        padded_reference = np.zeros((self._height, self._width, 3), dtype=np.uint8)
+        padded_reference[offset_y:offset_y+scaled_h, offset_x:offset_x+scaled_w] = reference_rgb
+            
+        init_image = Image.fromarray(padded_reference)
+        control_image = Image.fromarray(control_rgb)
+
+        generator = torch.Generator(device=device).manual_seed(int(seed))
+        output = pipe(
+            prompt="photorealistic tennis player, broadcast sports shot",
+            image=init_image,
+            control_image=control_image,
+            height=self._height,
+            width=self._width,
+            num_inference_steps=self._steps,
+            strength=self._strength,
+            guidance_scale=self._cfg,
+            generator=generator,
+        )
+        generated_rgb = np.asarray(output.images[0], dtype=np.uint8)
+        generated_cropped = generated_rgb[offset_y:offset_y+scaled_h, offset_x:offset_x+scaled_w]
+        generated_bgr = cv2.cvtColor(generated_cropped, cv2.COLOR_RGB2BGR)
+        return torch.from_numpy(generated_bgr).permute(2, 0, 1).contiguous().to(torch.uint8)
+
+
+class SegControlNetStrategy(CannyControlNetStrategy):
+    """ControlNet strategy utilizing segmentation masks as the control condition."""
+
+    def __init__(
+        self,
+        model_id: str = "assets/weights/stable-diffusion-v1-5",
+        controlnet_id: str = "lllyasviel/control_v11p_sd15_seg",
+        config: Any = None,
+    ) -> None:
+        super().__init__(model_id=model_id, controlnet_id=controlnet_id, config=config)

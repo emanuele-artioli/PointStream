@@ -488,6 +488,12 @@ class DiffusersCompositor(BaseCompositor):
         if backend in {"ip-adapter-controlnet", "ip_adapter_controlnet"}:
             from src.decoder.controlnet_engine import IPAdapterControlNetStrategy
             return IPAdapterControlNetStrategy(config=self.config)
+        if backend in {"canny-controlnet", "canny_controlnet"}:
+            from src.decoder.controlnet_engine import CannyControlNetStrategy
+            return CannyControlNetStrategy(config=self.config)
+        if backend in {"seg-controlnet", "seg_controlnet"}:
+            from src.decoder.controlnet_engine import SegControlNetStrategy
+            return SegControlNetStrategy(config=self.config)
         raise ValueError(f"Unsupported genai-backend value in config: {backend}")
 
     def uses_temporal_pose_sequence(self) -> bool:
@@ -516,10 +522,20 @@ class DiffusersCompositor(BaseCompositor):
             metadata_bbox=metadata_bbox,
         )
         resolved_bbox = (x1, y1, x2, y2)
+        # For canny/seg controlnet, we pass the mask through the dense_dwpose_tensor argument.
+        # Check if the backend is one of these and a mask was provided.
+        is_mask_backend = self._backend in {"canny-controlnet", "seg-controlnet", "canny_controlnet", "seg_controlnet"}
+        control_tensor = dense_dwpose_tensor
+        if is_mask_backend and metadata_mask is not None:
+            # metadata_mask is [H, W] or [H, W, 1]. Create [1, H, W] tensor.
+            mask_np = np.asarray(metadata_mask, dtype=np.uint8)
+            if mask_np.ndim == 3:
+                mask_np = mask_np[:, :, 0]
+            control_tensor = torch.from_numpy(mask_np).unsqueeze(0).to(self._device)
 
         generated_actor = self._strategy.generate(
             reference_crop_tensor=reference_crop_tensor,
-            dense_dwpose_tensor=dense_dwpose_tensor,
+            dense_dwpose_tensor=control_tensor,
             seed=self._seed,
             device=self._device,
             metadata_bbox=resolved_bbox,
@@ -697,13 +713,18 @@ class DiffusersCompositor(BaseCompositor):
         frame_width: int,
         metadata_bbox: tuple[int, int, int, int] | None,
     ) -> tuple[int, int, int, int]:
-        if self._compositing_mask_mode == "metadata-source-mask" and metadata_bbox is not None:
+        is_mask_backend = self._backend in {"canny-controlnet", "seg-controlnet", "canny_controlnet", "seg_controlnet"}
+        if (self._compositing_mask_mode == "metadata-source-mask" or is_mask_backend) and metadata_bbox is not None:
             x1, y1, x2, y2 = metadata_bbox
             clipped_x1 = max(0, min(frame_width - 1, int(x1)))
             clipped_y1 = max(0, min(frame_height - 1, int(y1)))
             clipped_x2 = max(clipped_x1 + 1, min(frame_width, int(x2)))
             clipped_y2 = max(clipped_y1 + 1, min(frame_height, int(y2)))
             return clipped_x1, clipped_y1, clipped_x2, clipped_y2
+
+        if is_mask_backend and metadata_bbox is None:
+            # Fallback if no metadata_bbox is provided but we need it for mask backend
+            raise ValueError(f"metadata_bbox is required for {self._backend} but was not provided.")
 
         return self._estimate_bbox_from_pose(
             pose_np=pose_np,

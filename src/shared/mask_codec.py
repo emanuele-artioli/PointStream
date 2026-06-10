@@ -8,8 +8,8 @@ import cv2
 import numpy as np
 
 
-MaskCodecName = Literal["rle-v1", "bitpack-z1", "png", "poly-v1"]
-MaskCodecChoice = Literal["rle-v1", "bitpack-z1", "png", "poly-v1", "auto"]
+MaskCodecName = Literal["rle-v1", "bitpack-z1", "png", "poly-v1", "jpeg"]
+MaskCodecChoice = Literal["rle-v1", "bitpack-z1", "png", "poly-v1", "jpeg", "auto"]
 
 
 def normalize_mask_codec(codec: str | None) -> MaskCodecChoice:
@@ -28,6 +28,8 @@ def normalize_mask_codec(codec: str | None) -> MaskCodecChoice:
         "polygon": "poly-v1",
         "poly-v1": "poly-v1",
         "png": "png",
+        "jpeg": "jpeg",
+        "jpg": "jpeg",
     }
     return cast(MaskCodecChoice, aliases.get(normalized, "auto"))
 
@@ -49,6 +51,13 @@ def encode_binary_mask(mask: np.ndarray, codec: str | None = None) -> tuple[Mask
         if not ok:
             raise RuntimeError("Failed to encode binary mask as PNG")
         return "png", encoded.tobytes(), int(height), int(width)
+
+    if selected == "jpeg":
+        # Hardcode a quality of 90 for mask jpeg compression, but Canny expects 0-255 pixels
+        ok, encoded = cv2.imencode(".jpg", binary * 255, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+        if not ok:
+            raise RuntimeError("Failed to encode binary mask as JPEG")
+        return "jpeg", encoded.tobytes(), int(height), int(width)
 
     if selected == "bitpack-z1":
         return "bitpack-z1", _encode_bitpack_z1(binary), int(height), int(width)
@@ -98,6 +107,15 @@ def decode_binary_mask(
         if decoded is None or decoded.size == 0:
             raise ValueError("Failed to decode PNG mask payload")
         return _to_binary_mask(decoded) * 255
+
+    if normalized == "jpeg":
+        encoded_np = np.frombuffer(payload, dtype=np.uint8)
+        decoded = cv2.imdecode(encoded_np, cv2.IMREAD_GRAYSCALE)
+        if decoded is None or decoded.size == 0:
+            raise ValueError("Failed to decode JPEG mask payload")
+        # Threshold at 127 since jpeg is lossy
+        _, thresh = cv2.threshold(decoded, 127, 255, cv2.THRESH_BINARY)
+        return thresh
 
     if normalized == "poly-v1":
         return _decode_poly_v1(payload=payload, height=height, width=width)

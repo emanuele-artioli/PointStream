@@ -44,6 +44,7 @@ class ActorExtractor:
             BaseDetector,
             BasePoseEstimator,
             BaseSegmenter,
+            CannySegmenter,
             DwposeEstimator,
             PayloadEncoder,
             PipelineBuilder,
@@ -58,6 +59,10 @@ class ActorExtractor:
 
         self._render_debug_keyframes = render_debug_keyframes
         self._config = config
+        
+        genai_backend = getattr(config, "genai_backend", "") if config else ""
+        if genai_backend is None:
+            genai_backend = ""
 
         caption_list = [part.strip() for part in str(detector_caption).split(",") if part.strip()]
         if not caption_list:
@@ -78,7 +83,10 @@ class ActorExtractor:
 
         pose_estimator: BasePoseEstimator | None
         normalized_pose_backend = pose_backend.strip().lower()
-        if normalized_pose_backend in {"none", ""}:
+        if "seg-controlnet" in genai_backend or "canny-controlnet" in genai_backend:
+            # Exclusivity: Seg and Canny don't use pose estimator
+            pose_estimator = None
+        elif normalized_pose_backend in {"none", ""}:
             pose_estimator = None
         elif "yolo" in normalized_pose_backend:
             pose_estimator = YoloPoseEstimator(model_name=pose_backend.strip(), model=pose_model)
@@ -89,7 +97,15 @@ class ActorExtractor:
 
         segmenter: BaseSegmenter | None
         normalized_segmenter_backend = segmenter_backend.strip().lower()
-        if normalized_segmenter_backend in {"none", ""}:
+        if "canny-controlnet" in genai_backend:
+            # Exclusivity: Canny uses CannySegmenter, disables YOLO segmenter
+            low = getattr(config, "canny_lower_threshold", "auto") if config else "auto"
+            high = getattr(config, "canny_upper_threshold", "auto") if config else "auto"
+            segmenter = CannySegmenter(lower_threshold=low, upper_threshold=high)
+            
+            # Since Canny is replacing the mask metadata for ControlNet, make sure mask is transmitted
+            include_mask_metadata = True
+        elif normalized_segmenter_backend in {"none", ""}:
             segmenter = None
         elif "yoloe" in normalized_segmenter_backend:
             segmenter_caption_list = [part.strip() for part in str(segmenter_caption).split(",") if part.strip()]
@@ -106,6 +122,10 @@ class ActorExtractor:
             segmenter = SamSegmenter(model_name=segmenter_backend.strip(), model=segmenter_model)
         else:
             raise ValueError(f"Unsupported segmenter backend: {segmenter_backend}")
+
+        if "seg-controlnet" in genai_backend:
+            # Ensure mask metadata is transmitted for seg controlnet
+            include_mask_metadata = True
 
         # Models are loaded once in component initialization and reused frame-by-frame.
         self._pipeline = PipelineBuilder(
