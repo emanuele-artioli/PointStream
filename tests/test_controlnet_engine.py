@@ -59,9 +59,12 @@ def test_caption_controlnet_strategy_generate(monkeypatch) -> None:
         def from_pretrained(cls, *args, **kwargs):
             return _StubPipe()
             
-    import diffusers
-    monkeypatch.setattr(diffusers, "ControlNetModel", _StubModel)
-    monkeypatch.setattr(diffusers, "StableDiffusionControlNetImg2ImgPipeline", _StubModel)
+    import sys
+    from types import ModuleType
+    mock_diffusers = ModuleType("diffusers")
+    mock_diffusers.ControlNetModel = _StubModel
+    mock_diffusers.StableDiffusionControlNetImg2ImgPipeline = _StubModel
+    monkeypatch.setitem(sys.modules, "diffusers", mock_diffusers)
     
     # Mock VLM
     class _StubProcessor:
@@ -154,9 +157,12 @@ def test_ipadapter_controlnet_strategy_generate(monkeypatch) -> None:
         def from_pretrained(cls, *args, **kwargs):
             return _StubPipe()
             
-    import diffusers
-    monkeypatch.setattr(diffusers, "ControlNetModel", _StubModel)
-    monkeypatch.setattr(diffusers, "StableDiffusionControlNetPipeline", _StubModel)
+    import sys
+    from types import ModuleType
+    mock_diffusers = ModuleType("diffusers")
+    mock_diffusers.ControlNetModel = _StubModel
+    mock_diffusers.StableDiffusionControlNetPipeline = _StubModel
+    monkeypatch.setitem(sys.modules, "diffusers", mock_diffusers)
     
     reference = torch.zeros((3, 64, 64), dtype=torch.float32)
     pose = torch.zeros((18, 3), dtype=torch.float32)

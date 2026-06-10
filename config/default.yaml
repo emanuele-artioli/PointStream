@@ -100,9 +100,6 @@ controlnet-height: 512                    # Height for ControlNet generated fram
 controlnet-steps: 20                      # Diffusion inference steps for ControlNet
 controlnet-strength: 0.65                 # Img2Img strength for ControlNet
 controlnet-cfg: 7.0                       # Guidance scale for ControlNet
-ip-adapter-repo: h94/IP-Adapter           # HuggingFace repository for IP-Adapter
-ip-adapter-subfolder: models              # Subfolder containing IP-Adapter weights
-ip-adapter-weight: ip-adapter_sd15.bin    # IP-Adapter weight file
 ip-adapter-scale: 0.5                     # Strength of the visual prompt for IP-Adapter
 
 # ============================================================================
