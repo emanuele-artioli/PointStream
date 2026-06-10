@@ -62,7 +62,7 @@ omit = [
   "*/config-*.py",
   "src/decoder/animate_anyone_runtime.py",
   "src/decoder/genai_compositor.py",
-  "src/decoder/mock_renderer.py",
+  "src/decoder/decoder_renderer.py",
   "src/encoder/actor_components.py",
   "src/encoder/ball_extractor.py",
   "src/encoder/residual_calculator.py",

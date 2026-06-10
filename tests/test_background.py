@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 import pytest
 
-from src.decoder.mock_renderer import DecoderRenderer
+from src.decoder.decoder_renderer import DecoderRenderer
 from src.transport.disk import DiskTransport
 
 

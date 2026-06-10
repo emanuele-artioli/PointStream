@@ -16,7 +16,7 @@ from src.shared.config import PointstreamConfig, load_config
 from src.encoder.ball_extractor import BallExtractor
 from src.encoder.segmentation_ball_extractor import SegmentationBallExtractor
 from src.encoder.execution_pool import BaseExecutionPool, TaggedMultiprocessPool, WorkerConfig
-from src.decoder.mock_renderer import DecoderRenderer
+from src.decoder.decoder_renderer import DecoderRenderer
 from src.encoder.actor_pipeline import ActorExtractor
 from src.encoder.orchestrator import EncoderPipeline
 from src.encoder.reference_extractor import ReferenceExtractor

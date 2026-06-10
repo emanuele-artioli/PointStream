@@ -3,7 +3,7 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
-from src.decoder.mock_renderer import DecoderRenderer
+from src.decoder.decoder_renderer import DecoderRenderer
 from src.encoder.video_io import iter_video_frames_ffmpeg, probe_video_metadata
 from src.transport.disk import DiskTransport
 from tests.video_utils import create_dummy_video

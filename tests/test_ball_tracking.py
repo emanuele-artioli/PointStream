@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 import pytest
 
-from src.decoder.mock_renderer import DecoderRenderer
+from src.decoder.decoder_renderer import DecoderRenderer
 from src.encoder.ball_extractor import BallExtractor
 from src.encoder.video_io import encode_video_frames_ffmpeg, iter_video_frames_ffmpeg
 from src.shared.config import PointstreamConfig

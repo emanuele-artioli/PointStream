@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 import pytest
 
-from src.decoder.mock_renderer import DecoderRenderer
+from src.decoder.decoder_renderer import DecoderRenderer
 from src.encoder.residual_calculator import ResidualCalculator
 from src.shared.config import PointstreamConfig
 from src.shared.schemas import ResidualMode

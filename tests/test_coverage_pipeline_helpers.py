@@ -174,7 +174,7 @@ def test_residual_calculator_covers_players_only_and_full_video(monkeypatch: pyt
         def uses_temporal_pose_sequence(self) -> bool:
             return True
 
-        def process(self, reference_crop_tensor, dense_dwpose_tensor, warped_background_frame, actor_identity=None, metadata_mask=None, metadata_bbox=None):
+        def process(self, reference_crop_tensor, dense_dwpose_tensor, warped_background_frame, actor_identity=None, metadata_mask=None, metadata_bbox=None, debug_dir=None, frame_idx=None):
             _ = (reference_crop_tensor, actor_identity)
             self.seen_shapes.append(tuple(dense_dwpose_tensor.shape))
             self.seen_metadata.append((metadata_mask, None if metadata_bbox is None else tuple(metadata_bbox)))
