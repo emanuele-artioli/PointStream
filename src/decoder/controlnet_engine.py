@@ -62,8 +62,7 @@ class CaptionControlNetStrategy(BaseGenAIStrategy):
         self._vlm_processor: Any | None = None
         self._vlm_model: Any | None = None
         
-        self._cached_prompt: str | None = None
-        self._cached_reference_hash: int | None = None
+        self._cached_prompts: dict[int, str] = {}
         
         self._width = int(config.controlnet_width) if config and hasattr(config, "controlnet_width") else 512
         self._height = int(config.controlnet_height) if config and hasattr(config, "controlnet_height") else 512
@@ -119,8 +118,11 @@ class CaptionControlNetStrategy(BaseGenAIStrategy):
     def _generate_caption(self, reference_image: Image.Image, device: torch.device) -> str:
         # Cache captioning per run assuming reference stays identical to avoid redundant VLM calls
         ref_hash = hash(reference_image.tobytes())
-        if self._cached_prompt is not None and self._cached_reference_hash == ref_hash:
-            return self._cached_prompt
+        if ref_hash in getattr(self, "_cached_prompts", {}):
+            return self._cached_prompts[ref_hash]
+            
+        if not hasattr(self, "_cached_prompts"):
+            self._cached_prompts = {}
 
         processor, model = self._ensure_vlm(device)
         inputs = processor(reference_image, return_tensors="pt").to(device)
@@ -131,8 +133,7 @@ class CaptionControlNetStrategy(BaseGenAIStrategy):
         full_prompt = f"{caption}, {base_prompt}"
         _LOGGER.info(f"Generated ControlNet prompt via BLIP: {full_prompt}")
         
-        self._cached_prompt = full_prompt
-        self._cached_reference_hash = ref_hash
+        self._cached_prompts[ref_hash] = full_prompt
         return full_prompt
 
     def get_debug_inputs(
@@ -253,7 +254,8 @@ class CaptionControlNetStrategy(BaseGenAIStrategy):
         init_image = Image.fromarray(padded_reference)
         control_image = Image.fromarray(pose_rgb)
 
-        prompt = self._generate_caption(init_image, device)
+        original_ref_image = Image.fromarray(cv2.cvtColor(reference_np, cv2.COLOR_BGR2RGB))
+        prompt = self._generate_caption(original_ref_image, device)
 
         generator = torch.Generator(device=device).manual_seed(int(seed))
         output = pipe(
