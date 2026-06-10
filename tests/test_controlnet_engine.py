@@ -62,8 +62,8 @@ def test_caption_controlnet_strategy_generate(monkeypatch) -> None:
     import sys
     from types import ModuleType
     mock_diffusers = ModuleType("diffusers")
-    mock_diffusers.ControlNetModel = _StubModel
-    mock_diffusers.StableDiffusionControlNetImg2ImgPipeline = _StubModel
+    setattr(mock_diffusers, "ControlNetModel", _StubModel)
+    setattr(mock_diffusers, "StableDiffusionControlNetImg2ImgPipeline", _StubModel)
     monkeypatch.setitem(sys.modules, "diffusers", mock_diffusers)
     
     # Mock VLM
@@ -90,13 +90,14 @@ def test_caption_controlnet_strategy_generate(monkeypatch) -> None:
             return _StubProcessor()
             
     # Mock Transformers
-    import transformers
-    monkeypatch.setattr(transformers, "BlipProcessor", _StubVLMProcessorModel)
-    monkeypatch.setattr(transformers, "BlipForConditionalGeneration", _StubVLMModel)
+    mock_transformers = ModuleType("transformers")
+    setattr(mock_transformers, "BlipProcessor", _StubVLMProcessorModel)
+    setattr(mock_transformers, "BlipForConditionalGeneration", _StubVLMModel)
+    monkeypatch.setitem(sys.modules, "transformers", mock_transformers)
     
     import src.decoder.controlnet_engine as engine
-    monkeypatch.setattr(engine, "BlipProcessor", transformers.BlipProcessor, raising=False)
-    monkeypatch.setattr(engine, "BlipForConditionalGeneration", transformers.BlipForConditionalGeneration, raising=False)
+    monkeypatch.setattr(engine, "BlipProcessor", _StubVLMProcessorModel, raising=False)
+    monkeypatch.setattr(engine, "BlipForConditionalGeneration", _StubVLMModel, raising=False)
     
     reference = torch.zeros((3, 64, 64), dtype=torch.float32)
     pose = torch.zeros((18, 3), dtype=torch.float32)
@@ -160,8 +161,8 @@ def test_ipadapter_controlnet_strategy_generate(monkeypatch) -> None:
     import sys
     from types import ModuleType
     mock_diffusers = ModuleType("diffusers")
-    mock_diffusers.ControlNetModel = _StubModel
-    mock_diffusers.StableDiffusionControlNetPipeline = _StubModel
+    setattr(mock_diffusers, "ControlNetModel", _StubModel)
+    setattr(mock_diffusers, "StableDiffusionControlNetPipeline", _StubModel)
     monkeypatch.setitem(sys.modules, "diffusers", mock_diffusers)
     
     reference = torch.zeros((3, 64, 64), dtype=torch.float32)
