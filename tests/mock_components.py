@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import torch
+from pathlib import Path
 
 from src.decoder.genai_compositor import BaseCompositor
 from src.encoder.actor_pipeline import ActorExtractionResult
@@ -259,6 +260,8 @@ class MockCompositor(BaseCompositor):
         actor_identity: str | None = None,
         metadata_mask: np.ndarray | None = None,
         metadata_bbox: tuple[int, int, int, int] | None = None,
+        debug_dir: str | Path | None = None,
+        frame_idx: int | None = None,
     ) -> torch.Tensor:
         _ = actor_identity
         _ = metadata_mask

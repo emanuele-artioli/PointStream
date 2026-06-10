@@ -14,6 +14,7 @@ import torch.nn.functional as F
 
 from src.decoder.genai_compositor import DiffusersCompositor
 from src.encoder.video_io import encode_video_frames_ffmpeg, iter_video_frames_ffmpeg, probe_video_metadata
+from src.shared.mask_codec import decode_binary_mask
 from src.shared.schemas import ActorPacket, EncodedChunkPayload, FrameState, ResidualPacket, ResidualMode, SceneActor, VideoChunk
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import gpu_bound

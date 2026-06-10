@@ -889,7 +889,7 @@ class CannySegmenter(BaseSegmenter):
         high = self.upper_threshold
         
         if str(low).lower() == "auto" or str(high).lower() == "auto":
-            v = float(np.median(gray))  # type: ignore
+            v = float(np.median(gray))
             sigma = 0.33
             if str(low).lower() == "auto":
                 low = int(max(0.0, (1.0 - sigma) * v))

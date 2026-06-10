@@ -891,8 +891,8 @@ class DiffusersCompositor(BaseCompositor):
             export_compositor_artifacts(
                 debug_dir=debug_dir,
                 stage=self._debug_stage,
-                frame_idx=frame_idx,
-                actor_id=actor_identity,
+                frame_idx=frame_idx or 0,
+                actor_id=actor_identity or "unknown",
                 artifacts=self._current_debug_artifacts,
             )
             self._current_debug_artifacts = None
