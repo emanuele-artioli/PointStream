@@ -218,9 +218,11 @@ class DecoderRenderer:
         if not self._actor_state or self._genai_compositor is None:
             return frame_tensor
 
+        output_path = self.config.debug_artifact_dir if self.config else None
+
         keyframe_only = bool(self.config.genai_keyframe_only) if self.config else False
         if keyframe_only:
-            return self._render_genai_keyframe_only(frame_tensor=frame_tensor)
+            return self._render_genai_keyframe_only(frame_tensor=frame_tensor, debug_output_path=output_path)
 
         use_temporal_window = bool(
             hasattr(self._genai_compositor, "uses_temporal_pose_sequence")
@@ -229,9 +231,8 @@ class DecoderRenderer:
         preroll_frames = max(0, self.config.genai_preroll_frames if self.config and self.config.genai_preroll_frames else 1)
 
         if use_temporal_window and hasattr(self._genai_compositor, "process_sequence"):
-            return self._render_genai_sequence(frame_tensor=frame_tensor)
+            return self._render_genai_sequence(frame_tensor=frame_tensor, debug_output_path=output_path)
 
-        output_path = self.config.debug_artifact_dir if self.config else None
         out_frames: list[torch.Tensor] = []
         frame_count = int(frame_tensor.shape[0])
         for frame_idx in range(frame_count):
@@ -292,7 +293,7 @@ class DecoderRenderer:
 
         return torch.stack(out_frames, dim=0)
 
-    def _render_genai_keyframe_only(self, frame_tensor: torch.Tensor) -> torch.Tensor:
+    def _render_genai_keyframe_only(self, frame_tensor: torch.Tensor, debug_output_path: str | Path | None = None) -> torch.Tensor:
         frame_count = int(frame_tensor.shape[0])
         if frame_count <= 0:
             return frame_tensor
@@ -355,6 +356,8 @@ class DecoderRenderer:
                     actor_identity=actor_state.object_id,
                     metadata_masks=metadata_masks,
                     metadata_bboxes=metadata_bboxes,
+                    debug_dir=debug_output_path,
+                    global_frame_ids=[int(self._chunk_start_frame_id) + int(idx) for idx in selected_indices if idx < pose_count],
                 ).to(frame_tensor.device)
 
                 for offset, pos in enumerate(selected_positions):
@@ -438,7 +441,7 @@ class DecoderRenderer:
 
         return torch.stack(blended_frames, dim=0)
 
-    def _render_genai_sequence(self, frame_tensor: torch.Tensor) -> torch.Tensor:
+    def _render_genai_sequence(self, frame_tensor: torch.Tensor, debug_output_path: str | Path | None = None) -> torch.Tensor:
         frame_count = int(frame_tensor.shape[0])
         if frame_count <= 0:
             return frame_tensor
@@ -466,6 +469,8 @@ class DecoderRenderer:
                 actor_identity=actor_state.object_id,
                 metadata_masks=metadata_masks,
                 metadata_bboxes=metadata_bboxes,
+                debug_dir=debug_output_path,
+                global_frame_ids=[chunk_start + i for i in range(valid_count)],
             ).to(frame_tensor.device)
 
             if valid_count < frame_count:

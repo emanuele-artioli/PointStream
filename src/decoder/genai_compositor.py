@@ -694,7 +694,7 @@ class DiffusersCompositor(BaseCompositor):
         metadata_masks: list[np.ndarray | None] | None = None,
         metadata_bboxes: list[tuple[int, int, int, int] | None] | None = None,
         debug_dir: str | Path | None = None,
-        start_frame_idx: int | None = None,
+        global_frame_ids: list[int] | None = None,
     ) -> torch.Tensor:
         if not self.uses_temporal_pose_sequence():
             raise RuntimeError("process_sequence is only supported for temporal GenAI backends")
@@ -730,7 +730,7 @@ class DiffusersCompositor(BaseCompositor):
 
         out_frames: list[torch.Tensor] = []
         for frame_idx in range(frame_count):
-            global_frame_id = start_frame_idx + frame_idx if start_frame_idx is not None else None
+            global_frame_id = global_frame_ids[frame_idx] if global_frame_ids is not None else None
             
             if debug_dir is not None and global_frame_id is not None and actor_identity is not None:
                 self._current_debug_artifacts = self._strategy.get_debug_inputs(

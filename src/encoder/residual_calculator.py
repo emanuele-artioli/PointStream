@@ -798,7 +798,7 @@ class ResidualCalculator:
                 metadata_masks=metadata_masks,
                 metadata_bboxes=metadata_bboxes,
                 debug_dir=debug_dir,
-                start_frame_idx=chunk_start,
+                global_frame_ids=[chunk_start + i for i in range(valid_count)],
             ).to(frame_tensor.device)
 
             if valid_count < frame_count:
