@@ -444,8 +444,11 @@ def evaluate_run_summary(
     """
     source_uri = summary.get("source_uri")
     decoded_uri = summary.get("decoded_uri")
-    transport_total_size_bytes = summary.get("transport_total_size_bytes")
-    source_size_bytes = summary.get("source_size_bytes")
+    evaluation_block = summary.get("evaluation", {})
+    sizes_block = evaluation_block.get("sizes_bytes", {})
+    
+    transport_total_size_bytes = sizes_block.get("transport_total")
+    source_size_bytes = sizes_block.get("source")
 
     source_path = Path(str(source_uri)).expanduser() if source_uri is not None else None
     decoded_path = Path(str(decoded_uri)).expanduser() if decoded_uri is not None else None
@@ -460,8 +463,10 @@ def evaluate_run_summary(
         transport_savings_percent = (1.0 - float(transport_total_size_bytes) / float(source_size_bytes)) * 100.0
 
     evaluation = {
-        "decoded_video_size_bytes": _safe_file_size(decoded_path) if decoded_path is not None else None,
-        "transport_savings_percent": transport_savings_percent,
+        "sizes_bytes": {
+            "decoded_video": _safe_file_size(decoded_path) if decoded_path is not None else None,
+            "transport_savings_percent": transport_savings_percent,
+        },
     }
 
     if "psnr" in normalized_metrics:

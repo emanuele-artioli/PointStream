@@ -207,6 +207,7 @@ def run_pipeline(
         "chunk_id": received_payload.chunk.chunk_id,
         "run_output_root": str(resolved_transport_root),
         "source_uri": resolved_source_uri,
+        "num_frames": chunk.num_frames,
         "num_actor_packets": len(received_payload.actors),
         "num_rigid_object_packets": len(received_payload.rigid_objects),
         "ball_object_id": received_payload.ball.object_id,
@@ -214,25 +215,74 @@ def run_pipeline(
         "residual_mode": residual_mode_value,
         "decoded_uri": decoded.output_uri,
         "transport_backend": normalized_transport,
-        "source_size_bytes": source_size_bytes,
-        "metadata_size_bytes": metadata_size_bytes,
-        "actor_reference_size_bytes": actor_reference_size_bytes,
-        "residual_size_bytes": residual_size_bytes,
-        "panorama_size_bytes": panorama_size_bytes,
-        "transport_total_size_bytes": transport_total_size_bytes,
-        "pipeline_total_sec": float(perf_counter() - pipeline_started),
-        "encode_chunk_sec": float(encode_finished - encode_started),
-        "transport_send_sec": float(transport_send_finished - transport_send_started),
-        "transport_receive_sec": float(transport_receive_finished - transport_receive_started),
-        "decode_sec": float(decode_finished - decode_started),
         "compositing_mask_mode": config.compositing_mask_mode,
         "postgen_segmenter_backend": config.postgen_segmenter_backend,
         "metadata_mask_codec": config.metadata_mask_codec,
         "genai_enabled": bool(config.genai_backend),
         "genai_backend": config.genai_backend,
     }
+    profile = encoder.get_detailed_profile() if hasattr(encoder, "get_detailed_profile") else {}
+    
+    actor_bundle_timings = {
+        "total": profile.pop("actor_bundle", 0.0),
+        "detection": profile.pop("detection", 0.0),
+        "heuristic": profile.pop("heuristic", 0.0),
+        "segmentation": profile.pop("segmentation", 0.0),
+        "pose_estimation": profile.pop("pose_estimation", 0.0),
+        "metadata_generation": profile.pop("metadata_generation", 0.0),
+    }
+
+    encode_chunk_timings = {
+        "total": float(encode_finished - encode_started),
+        "actor_bundle": actor_bundle_timings,
+    }
+    
+    residual_total = profile.pop("residual", 0.0)
+    residual_timings = {
+        "total": residual_total,
+        "synthesis": profile.pop("residual_synthesis", 0.0),
+        "genai_baseline": profile.pop("residual_genai_baseline", 0.0),
+        "computation": profile.pop("residual_computation", 0.0),
+    }
+    encode_chunk_timings["residual"] = residual_timings
+    
+    for k, v in profile.items():
+        if not k.endswith("__tag") and k != "chunk":
+            encode_chunk_timings[k] = v
+
+    decode_timings = {
+        "total": float(decode_finished - decode_started),
+    }
+    if hasattr(decoder, "get_detailed_profile"):
+        for k, v in decoder.get_detailed_profile().items():
+            decode_timings[k] = v
+
+    timings_sec = {
+        "pipeline_total": float(perf_counter() - pipeline_started),
+        "encode_chunk": encode_chunk_timings,
+        "transport_send": float(transport_send_finished - transport_send_started),
+        "transport_receive": float(transport_receive_finished - transport_receive_started),
+        "decode": decode_timings,
+    }
+
+    sizes_bytes = {
+        "source": source_size_bytes,
+        "metadata": metadata_size_bytes,
+        "actor_reference": actor_reference_size_bytes,
+        "residual": residual_size_bytes,
+        "panorama": panorama_size_bytes,
+        "transport_total": transport_total_size_bytes,
+    }
+
     if source_size_bytes is not None and source_size_bytes > 0:
-        summary["transport_to_source_ratio"] = float(transport_total_size_bytes) / float(source_size_bytes)
+        sizes_bytes["transport_to_source_ratio"] = float(transport_total_size_bytes) / float(source_size_bytes)
+
+    evaluation = {
+        "sizes_bytes": sizes_bytes,
+        "timings_sec": timings_sec,
+    }
+        
+    summary["evaluation"] = evaluation
 
     return summary
 
@@ -287,12 +337,25 @@ def run_cli(argv: list[str] | None = None) -> int:
     )
     
     if config.evaluation_mode:
-        run_summary["evaluation"] = evaluate_run_summary(
+        from time import perf_counter
+        eval_start = perf_counter()
+        eval_result = evaluate_run_summary(
             summary=run_summary,
             experiment_dir=run_output_root,
             max_frames=config.evaluation_max_frames,
             metrics=config.evaluation_mode,
         )
+        
+        q_sec = float(perf_counter() - eval_start)
+        if "evaluation" not in run_summary:
+            run_summary["evaluation"] = {}
+            
+        if "sizes_bytes" in eval_result and "sizes_bytes" in run_summary["evaluation"]:
+            run_summary["evaluation"]["sizes_bytes"].update(eval_result.pop("sizes_bytes"))
+            
+        run_summary["evaluation"].update(eval_result)
+        if "timings_sec" in run_summary["evaluation"]:
+            run_summary["evaluation"]["timings_sec"]["quality_evaluation"] = q_sec
 
     summary_json = json.dumps(run_summary, indent=2)
     print(summary_json)

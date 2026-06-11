@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -20,6 +20,7 @@ from src.shared.tags import gpu_bound
 class ActorExtractionResult:
     frame_states: list[FrameState]
     actor_packets: list[ActorPacket]
+    profile: dict[str, float] = field(default_factory=dict)
 
 
 class ActorExtractor:
@@ -156,7 +157,11 @@ class ActorExtractor:
                 actor_packets=packets,
                 out_dir=self._resolve_debug_keyframes_dir(),
             )
-        return ActorExtractionResult(frame_states=frame_states, actor_packets=packets)
+        return ActorExtractionResult(
+            frame_states=frame_states,
+            actor_packets=packets,
+            profile=self._pipeline.get_timings(),
+        )
 
     @gpu_bound
     def process_with_states_streaming(
@@ -171,7 +176,9 @@ class ActorExtractor:
             if on_frame_state is not None:
                 on_frame_state(state)
 
-        packets = self._pipeline.payload_encoder.encode(chunk=chunk, frame_states=filtered_states)
+        with self._pipeline.profiler.stage("metadata_generation"):
+            packets = self._pipeline.payload_encoder.encode(chunk=chunk, frame_states=filtered_states)
+            
         if self._render_debug_keyframes:
             self._pipeline.render_debug_keyframes(
                 chunk=chunk,
@@ -180,7 +187,11 @@ class ActorExtractor:
                 actor_packets=packets,
                 out_dir=self._resolve_debug_keyframes_dir(),
             )
-        return ActorExtractionResult(frame_states=filtered_states, actor_packets=packets)
+        return ActorExtractionResult(
+            frame_states=filtered_states,
+            actor_packets=packets,
+            profile=self._pipeline.get_timings(),
+        )
 
     def _resolve_debug_keyframes_dir(self) -> Path:
         override = getattr(self._config, "debug_artifact_dir", None)

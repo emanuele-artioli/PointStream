@@ -606,6 +606,9 @@ class DiffusersCompositor(BaseCompositor):
         if backend in {"seg-controlnet", "seg_controlnet"}:
             from src.decoder.controlnet_engine import SegControlNetStrategy
             return SegControlNetStrategy(config=self.config)
+        if backend in {"pix2pix"}:
+            from src.decoder.pix2pix_engine import Pix2PixStrategy
+            return Pix2PixStrategy(config=self.config)
         raise ValueError(f"Unsupported genai-backend value in config: {backend}")
 
     def uses_temporal_pose_sequence(self) -> bool:

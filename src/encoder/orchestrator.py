@@ -97,6 +97,16 @@ class EncoderPipeline:
         self._residual_calculator = residual_calculator or ResidualCalculator(config=self.config, synthesis_engine=SynthesisEngine(config=self.config))
         self._register_nodes()
         self._last_dag_profile: dict[str, float] = {}
+        self._last_actor_profile: dict[str, float] = {}
+        self._last_residual_profile: dict[str, float] = {}
+
+    def get_detailed_profile(self) -> dict[str, float]:
+        profile = dict(self._last_dag_profile)
+        for k, v in self._last_actor_profile.items():
+            profile[k] = v
+        for k, v in self._last_residual_profile.items():
+            profile[f"residual_{k}"] = v
+        return profile
 
     @staticmethod
     def _make_chunk_node(process_method: Any):
@@ -296,6 +306,19 @@ class EncoderPipeline:
         context = self._dag.run(initial_context={"chunk": chunk})
         # capture DAG profiling produced by the orchestrator
         self._last_dag_profile = context.get("dag_profile", {})
+        actor_bundle = context.get("actor_bundle")
+        if hasattr(actor_bundle, "finalize"):
+            self._last_actor_profile = actor_bundle.finalize().profile
+        elif hasattr(actor_bundle, "profile"):
+            self._last_actor_profile = actor_bundle.profile
+        else:
+            self._last_actor_profile = {}
+            
+        if hasattr(self._residual_calculator, "get_detailed_profile"):
+            self._last_residual_profile = self._residual_calculator.get_detailed_profile()
+        else:
+            self._last_residual_profile = {}
+            
         return EncodedChunkPayload(
             chunk=context["chunk"],
             panorama=context["panorama"],
@@ -329,6 +352,19 @@ class EncoderPipeline:
         context = self._dag.run(initial_context={"chunk": chunk})
         # capture DAG profiling produced by the orchestrator
         self._last_dag_profile = context.get("dag_profile", {})
+        actor_bundle = context.get("actor_bundle")
+        if hasattr(actor_bundle, "finalize"):
+            self._last_actor_profile = actor_bundle.finalize().profile
+        elif hasattr(actor_bundle, "profile"):
+            self._last_actor_profile = actor_bundle.profile
+        else:
+            self._last_actor_profile = {}
+            
+        if hasattr(self._residual_calculator, "get_detailed_profile"):
+            self._last_residual_profile = self._residual_calculator.get_detailed_profile()
+        else:
+            self._last_residual_profile = {}
+
         payload = EncodedChunkPayload(
             chunk=context["chunk"],
             panorama=context["panorama"],
@@ -367,6 +403,19 @@ class EncoderPipeline:
         context = self._dag.run(initial_context={"chunk": chunk})
         # capture DAG profiling produced by the orchestrator
         self._last_dag_profile = context.get("dag_profile", {})
+        actor_bundle = context.get("actor_bundle")
+        if hasattr(actor_bundle, "finalize"):
+            self._last_actor_profile = actor_bundle.finalize().profile
+        elif hasattr(actor_bundle, "profile"):
+            self._last_actor_profile = actor_bundle.profile
+        else:
+            self._last_actor_profile = {}
+            
+        if hasattr(self._residual_calculator, "get_detailed_profile"):
+            self._last_residual_profile = self._residual_calculator.get_detailed_profile()
+        else:
+            self._last_residual_profile = {}
+
         payload = EncodedChunkPayload(
             chunk=context["chunk"],
             panorama=context["panorama"],

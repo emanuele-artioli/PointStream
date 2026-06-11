@@ -57,7 +57,10 @@ class PipelineProfiler:
             yield
         finally:
             elapsed = perf_counter() - started
-            self._timings[stage_name] = elapsed
+            if stage_name in self._timings:
+                self._timings[stage_name] += elapsed
+            else:
+                self._timings[stage_name] = elapsed
 
     def get_timings(self) -> dict[str, float]:
         """Return all recorded timings as {stage_name: elapsed_sec}."""

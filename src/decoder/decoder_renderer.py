@@ -13,6 +13,7 @@ import torch
 from src.decoder.compositor import ResidualCompositor
 from src.encoder.video_io import encode_video_frames_ffmpeg
 from src.shared.mask_codec import decode_binary_mask
+from src.shared.profiling import PipelineProfiler
 from src.shared.schemas import ActorPacket, DecodedChunkResult, EncodedChunkPayload
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import gpu_bound
@@ -65,6 +66,10 @@ class DecoderRenderer:
             self._genai_compositor.set_debug_stage("decoder")
         self._actor_state: dict[int, _ClientActorState] = {}
         self._chunk_start_frame_id: int = 0
+        self.profiler = PipelineProfiler()
+
+    def get_detailed_profile(self) -> dict[str, float]:
+        return self.profiler.get_timings()
 
     @gpu_bound
     def process(self, payload: EncodedChunkPayload, output_path: str | Path | None = None) -> DecodedChunkResult:
@@ -72,47 +77,55 @@ class DecoderRenderer:
         self._chunk_start_frame_id = int(chunk.start_frame_id)
         if hasattr(self._genai_compositor, "clear_history"):
             self._genai_compositor.clear_history()
-        self._actor_state = self._build_actor_state(payload)
-        synthesis = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False)
+            
+        with self.profiler.stage("actor_state_build"):
+            self._actor_state = self._build_actor_state(payload)
+            
+        with self.profiler.stage("synthesis"):
+            synthesis = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False)
 
         # Always render actors (GenAI baseline or mock) onto the predicted frames
         # before applying residuals so the residual stream corrects the final
         # composited pixels (foreground + warped background).
-        predicted_frames = self._render_genai_baseline(synthesis.frames_bgr)
+        with self.profiler.stage("genai_baseline"):
+            predicted_frames = self._render_genai_baseline(synthesis.frames_bgr)
 
-        frame_tensor = self._compositor.composite(
-            predicted_frames=predicted_frames,
-            residual_video_uri=payload.residual.residual_video_uri,
-            width=int(chunk.width),
-            height=int(chunk.height),
-        )
-        frames_bgr = [np.asarray(frame.permute(1, 2, 0).cpu().numpy(), dtype=np.uint8) for frame in frame_tensor]
-        target_path = Path(output_path) if output_path is not None else self._output_root / chunk.chunk_id
-        if target_path.suffix:
-            frame_output_dir = target_path.with_suffix("")
-            debug_video_path = target_path
-        else:
-            frame_output_dir = target_path
-            debug_video_path = target_path.with_suffix(".mp4")
-        frame_output_dir.mkdir(parents=True, exist_ok=True)
-
-        for frame_idx, frame_bgr in enumerate(frames_bgr):
-            frame_path = frame_output_dir / f"frame_{frame_idx:06d}.png"
-            cv2.imwrite(str(frame_path), frame_bgr)
-
-        debug_enabled = not self.config.disable_debug_artifacts if self.config else True
-        if debug_enabled:
-            encode_video_frames_ffmpeg(
-                output_path=debug_video_path,
-                frames_bgr=frames_bgr,
-                fps=float(chunk.fps),
+        with self.profiler.stage("composite"):
+            frame_tensor = self._compositor.composite(
+                predicted_frames=predicted_frames,
+                residual_video_uri=payload.residual.residual_video_uri,
                 width=int(chunk.width),
                 height=int(chunk.height),
-                codec=self.config.ffmpeg_codec if self.config else "libsvtav1",
-                pix_fmt="yuv420p",
-                crf=self.config.codec_crf if self.config and self.config.codec_crf else 18,
-                preset=self.config.codec_preset if self.config and self.config.codec_preset else "veryfast",
             )
+            frames_bgr = [np.asarray(frame.permute(1, 2, 0).cpu().numpy(), dtype=np.uint8) for frame in frame_tensor]
+            
+        with self.profiler.stage("video_encoding"):
+            target_path = Path(output_path) if output_path is not None else self._output_root / chunk.chunk_id
+            if target_path.suffix:
+                frame_output_dir = target_path.with_suffix("")
+                debug_video_path = target_path
+            else:
+                frame_output_dir = target_path
+                debug_video_path = target_path.with_suffix(".mp4")
+            frame_output_dir.mkdir(parents=True, exist_ok=True)
+    
+            for frame_idx, frame_bgr in enumerate(frames_bgr):
+                frame_path = frame_output_dir / f"frame_{frame_idx:06d}.png"
+                cv2.imwrite(str(frame_path), frame_bgr)
+    
+            debug_enabled = not self.config.disable_debug_artifacts if self.config else True
+            if debug_enabled:
+                encode_video_frames_ffmpeg(
+                    output_path=debug_video_path,
+                    frames_bgr=frames_bgr,
+                    fps=float(chunk.fps),
+                    width=int(chunk.width),
+                    height=int(chunk.height),
+                    codec=self.config.ffmpeg_codec if self.config else "libsvtav1",
+                    pix_fmt="yuv420p",
+                    crf=self.config.codec_crf if self.config and self.config.codec_crf else 18,
+                    preset=self.config.codec_preset if self.config and self.config.codec_preset else "veryfast",
+                )
 
         # If a debug video was produced (target_path had a suffix and debug is enabled),
         # return the video path so callers expecting a file get the MP4. Otherwise

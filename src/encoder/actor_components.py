@@ -24,6 +24,7 @@ from src.shared.schemas import (
 )
 from src.shared.mask_codec import encode_binary_mask, encode_polygon_mask, normalize_mask_codec
 from src.shared.dwpose_draw import draw_dwpose_canvas
+from src.shared.profiling import PipelineProfiler
 
 
 _COCO_PERSON_CLASS_ID = 0
@@ -1382,20 +1383,34 @@ class PipelineBuilder:
         self.segmenter = segmenter
         self.pose_estimator = pose_estimator
         self.payload_encoder = payload_encoder
+        self.profiler = PipelineProfiler()
+
+    def get_timings(self) -> dict[str, float]:
+        return self.profiler.get_timings()
 
     def iter_filtered_states(self, chunk: VideoChunk, frames_bgr: list[np.ndarray]):
-        for state in self.detector.iter_track(frames_bgr):
+        iterator = self.detector.iter_track(frames_bgr)
+        while True:
+            with self.profiler.stage("detection"):
+                try:
+                    state = next(iterator)
+                except StopIteration:
+                    break
+
             if state.frame_id >= len(frames_bgr):
                 continue
 
             frame = frames_bgr[state.frame_id]
             h, w = frame.shape[:2]
-            selected = self.heuristic.select(state, frame_shape=(h, w))
+            with self.profiler.stage("heuristic"):
+                selected = self.heuristic.select(state, frame_shape=(h, w))
 
             updated_actors: list[SceneActor] = []
             for actor in selected.actors:
-                segmented = self.segmenter.segment(frame, actor) if self.segmenter else actor
-                with_pose = self.pose_estimator.estimate(frame, segmented) if self.pose_estimator else segmented
+                with self.profiler.stage("segmentation"):
+                    segmented = self.segmenter.segment(frame, actor) if self.segmenter else actor
+                with self.profiler.stage("pose_estimation"):
+                    with_pose = self.pose_estimator.estimate(frame, segmented) if self.pose_estimator else segmented
                 updated_actors.append(with_pose)
 
             yield FrameState(frame_id=state.frame_id, actors=updated_actors)
@@ -1403,7 +1418,8 @@ class PipelineBuilder:
     def run(self, chunk: VideoChunk, frames_bgr: list[np.ndarray]) -> tuple[list[FrameState], list[ActorPacket]]:
         filtered_states = list(self.iter_filtered_states(chunk=chunk, frames_bgr=frames_bgr))
 
-        packets = self.payload_encoder.encode(chunk=chunk, frame_states=filtered_states)
+        with self.profiler.stage("metadata_generation"):
+            packets = self.payload_encoder.encode(chunk=chunk, frame_states=filtered_states)
         return filtered_states, packets
 
     def render_debug_keyframes(

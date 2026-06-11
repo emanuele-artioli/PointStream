@@ -15,6 +15,7 @@ import torch.nn.functional as F
 from src.decoder.genai_compositor import DiffusersCompositor
 from src.encoder.video_io import encode_video_frames_ffmpeg, iter_video_frames_ffmpeg, probe_video_metadata
 from src.shared.mask_codec import decode_binary_mask
+from src.shared.profiling import PipelineProfiler
 from src.shared.schemas import ActorPacket, EncodedChunkPayload, FrameState, ResidualPacket, ResidualMode, SceneActor, VideoChunk
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import gpu_bound
@@ -192,6 +193,10 @@ class ResidualCalculator:
         self._downscale_interpolation = downscale_interpolation
         self._residual_block_size = residual_block_size
         self._block_information_threshold = block_information_threshold
+        self.profiler = PipelineProfiler()
+
+    def get_detailed_profile(self) -> dict[str, float]:
+        return self.profiler.get_timings()
 
     @gpu_bound
     def process(
@@ -224,14 +229,17 @@ class ResidualCalculator:
             if hasattr(compositor, "clear_history"):
                 compositor.clear_history()
 
-        base_frames = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False).frames_bgr
-        predicted_frames = base_frames
+        with self.profiler.stage("synthesis"):
+            base_frames = self._synthesis_engine.synthesize(payload, include_guidance_overlays=False).frames_bgr
+            predicted_frames = base_frames
+
         if self._is_genai_enabled():
-            predicted_frames = self._render_server_actor_prediction(
-                payload=payload,
-                frame_tensor=base_frames.clone(),
-                debug_output_path=debug_output_path,
-            )
+            with self.profiler.stage("genai_baseline"):
+                predicted_frames = self._render_server_actor_prediction(
+                    payload=payload,
+                    frame_tensor=base_frames.clone(),
+                    debug_output_path=debug_output_path,
+                )
             if _LOGGER.isEnabledFor(logging.DEBUG):
                 try:
                     diff = (predicted_frames.to(dtype=torch.float32) - base_frames.to(dtype=torch.float32)).abs()
@@ -344,21 +352,22 @@ class ResidualCalculator:
 
                 frame_idx = batch_end
 
-        residual_codec = self.config.ffmpeg_codec
-        residual_crf = self.config.codec_crf or 28
-        residual_preset = self.config.codec_preset or "medium"
-        residual_pix_fmt = "yuv444p"
-        encode_video_frames_ffmpeg(
-            output_path=output_path,
-            frames_bgr=_iter_encoded_frames(),
-            fps=float(chunk.fps),
-            width=int(chunk.width),
-            height=int(chunk.height),
-            codec=residual_codec,
-            pix_fmt=str(residual_pix_fmt),
-            crf=residual_crf,
-            preset=residual_preset,
-        )
+        with self.profiler.stage("computation"):
+            residual_codec = self.config.ffmpeg_codec
+            residual_crf = self.config.codec_crf or 28
+            residual_preset = self.config.codec_preset or "medium"
+            residual_pix_fmt = "yuv444p"
+            encode_video_frames_ffmpeg(
+                output_path=output_path,
+                frames_bgr=_iter_encoded_frames(),
+                fps=float(chunk.fps),
+                width=int(chunk.width),
+                height=int(chunk.height),
+                codec=residual_codec,
+                pix_fmt=str(residual_pix_fmt),
+                crf=residual_crf,
+                preset=residual_preset,
+            )
 
         return ResidualPacket(
             chunk_id=chunk.chunk_id,
