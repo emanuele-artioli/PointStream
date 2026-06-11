@@ -6,7 +6,7 @@
 # Core Input/Output Settings
 # ============================================================================
 # source-uri: null                    # Path to input video (optional; mock source used if omitted)
-num-frames: 10                      # Maximum number of frames to process (null = all frames)
+num-frames: null                      # Maximum number of frames to process (null = all frames)
 summary-file: true                    # Write run_summary.json
 ffmpeg-codec: libsvtav1               # FFmpeg encoder: libsvtav1, libx265, etc.
 codec-crf: 35                         # FFmpeg CRF quality (lower = better). null uses codec defaults
@@ -81,7 +81,7 @@ evaluation-max-frames: null           # Optional frame cap for quality evaluatio
 # ============================================================================
 # GenAI and AnimateAnyone Configuration
 # ============================================================================                
-genai-backend: canny-controlnet          # GenAI backend: caption-controlnet, ip-adapter-controlnet, canny-controlnet, seg-controlnet, animate-anyone (null disables GenAI)
+genai-backend: pix2pix                   # GenAI backend: caption-controlnet, ip-adapter-controlnet, canny-controlnet, seg-controlnet, animate-anyone, pix2pix (null disables GenAI)
 animate-anyone-repo-dir: null             # Path to Moore-AnimateAnyone repository
 animate-anyone-model-dir: null            # Override if models are in non-standard location
 animate-anyone-steps: 3                  # Diffusion inference steps for AnimateAnyone
