@@ -4,441 +4,463 @@ import glob
 import subprocess
 import cv2
 import numpy as np
-import json
 import torch
 import shutil
-import tempfile
-import multiprocessing
-from concurrent.futures import ProcessPoolExecutor, as_completed
 
-def get_available_gpus(min_free_mb=3000):
-    try:
-        smi = subprocess.check_output(['nvidia-smi', '--query-gpu=index,memory.free', '--format=csv,noheader,nounits']).decode('utf-8')
-        gpus = []
-        for line in smi.strip().split('\n'):
-            idx, free = line.split(', ')
-            if int(free) >= min_free_mb:
-                gpus.append(int(idx))
-        return gpus
-    except:
-        if torch.cuda.is_available():
-            return list(range(torch.cuda.device_count()))
-        return []
+REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-# --- SPLIT MODE HELPERS ---
+def get_available_gpu():
+    if torch.cuda.is_available():
+        return 0
+    return -1
 
-def _adaptive_detect_scene_chunk(chunk_info):
-    chunk_path, offset, dur = chunk_info
-    width, height = 64, 64
+def mode_filter(args: argparse.Namespace) -> None:
+    """
+    Stage 1: filter
+    Reads the raw video with ffmpeg at 4fps in native resolution.
+    Saves the extracted frames to assets/dataset/<video_name>/frames/
+    """
+    video_path = args.input
+    vname = os.path.splitext(os.path.basename(video_path))[0]
+    frames_dir = os.path.join(REPO_ROOT, 'assets', 'dataset', vname, 'frames')
+    
+    if os.path.exists(frames_dir):
+        print(f'[filter] Removing existing frames directory: {frames_dir}')
+        shutil.rmtree(frames_dir)
+    os.makedirs(frames_dir, exist_ok=True)
     
     cmd = [
-        "ffmpeg", "-hide_banner", "-loglevel", "error",
-        "-i", chunk_path,
-        "-s", f"{width}x{height}",
-        "-pix_fmt", "gray",
-        "-f", "image2pipe",
-        "-vcodec", "rawvideo",
-        "-"
+        'ffmpeg', '-hide_banner', '-loglevel', 'error', '-y',
+        '-i', video_path, 
+        '-vf', 'fps=8',
+        os.path.join(frames_dir, 'frame_%06d.png')
     ]
     
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    print(f'[filter] Extracting frames to {frames_dir} at 8 fps...')
+    subprocess.run(cmd, check=True)
+    print('[filter] Done.')
+
+def mode_segment(args: argparse.Namespace) -> None:
+    """
+    Stage 2: segment
+    Reads frames from the filter stage, passes them to yoloe-26x-seg.pt (at 1080p).
+    Tracks up to 5 people, 2 rackets, and 1 ball.
+    Saves detection crops and masks as 4-channel RGBA PNGs to assets/dataset/<video_name>/segmentations/
+    """
+    video_path = args.input
+    vname = os.path.splitext(os.path.basename(video_path))[0]
+    base_dir = os.path.join(REPO_ROOT, 'assets', 'dataset', vname)
+    frames_dir = os.path.join(base_dir, 'frames')
+    seg_dir = os.path.join(base_dir, 'segmentations')
     
-    prev_frame = None
-    frame_idx = 0
-    diffs = []
-    frame_size = width * height
-    
-    while True:
-        raw = process.stdout.read(frame_size)
-        if not raw or len(raw) != frame_size:
-            break
-            
-        frame = np.frombuffer(raw, dtype=np.uint8).astype(np.int16)
-        
-        if prev_frame is not None:
-            diff = np.mean(np.abs(frame - prev_frame))
-            diffs.append((frame_idx, diff))
-            
-        prev_frame = frame
-        frame_idx += 1
-        
-    process.stdout.close()
-    process.wait()
-    
-    if not diffs:
-        return []
-        
-    N = len(diffs) + 1
-    fps = N / dur
-    frame_duration = dur / N
-    
-    diff_values = np.array([d for _, d in diffs])
-    min_scene_len_frames = int(.5 * fps)
-    base_threshold = 10.0
-    
-    peaks = []
-    last_cut = -min_scene_len_frames
-    
-    for i in range(1, len(diff_values)-1):
-        if diff_values[i] > diff_values[i-1] and diff_values[i] > diff_values[i+1]:
-            if diff_values[i] > base_threshold:
-                start_idx = max(0, i - int(fps))
-                end_idx = min(len(diff_values), i + int(fps))
-                neighborhood = diff_values[start_idx:end_idx]
-                
-                sorted_neigh = np.sort(neighborhood)
-                if len(sorted_neigh) > 10:
-                    local_mean = np.mean(sorted_neigh[:-5])
-                else:
-                    local_mean = np.mean(sorted_neigh)
-                    
-                if diff_values[i] > local_mean * 3.0:
-                    if i - last_cut >= min_scene_len_frames:
-                        peaks.append((diffs[i][0], diff_values[i], local_mean * 3.0))
-                        last_cut = i
-                        
-    # For perfect frame accuracy, offset the timestamp to exactly halfway between the old and new frame
-    timestamps_info = [((p * frame_duration) - (frame_duration / 2) + offset, float(d), float(th)) for p, d, th in peaks]
-    return timestamps_info
-
-def _extract_clip(task):
-    in_path, out_path, start, end = task
-    if os.path.exists(out_path): return
-    cmd = [
-        "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
-        "-ss", str(start), "-to", str(end),
-        "-i", in_path, "-map", "0:v:0", "-c:v", "libx264", "-crf", "23", "-preset", "fast", "-an", out_path
-    ]
-    subprocess.run(cmd)
-
-def mode_split(args):
-    raw_dir = "assets/dataset/raw"
-    split_dir = "assets/dataset/split"
-    os.makedirs(split_dir, exist_ok=True)
-    
-    videos = glob.glob(os.path.join(raw_dir, "*.mp4"))
-    for video in videos:
-        vname = os.path.splitext(os.path.basename(video))[0]
-        out_folder = os.path.join(split_dir, vname)
-        os.makedirs(out_folder, exist_ok=True)
-        
-        print(f"Splitting {vname}...")
-        with tempfile.TemporaryDirectory() as tmpdir:
-            # Chunk video losslessly
-            chunk_pattern = os.path.join(tmpdir, "chunk_%04d.mp4")
-            chunk_cmd = [
-                "ffmpeg", "-hide_banner", "-loglevel", "error", "-i", video,
-                "-f", "segment", "-segment_time", "60", "-c", "copy", chunk_pattern
-            ]
-            subprocess.run(chunk_cmd)
-            
-            chunks = sorted(glob.glob(os.path.join(tmpdir, "chunk_*.mp4")))
-            chunk_tasks = []
-            current_offset = 0.0
-            
-            for c in chunks:
-                # get duration
-                dur_cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", c]
-                res = subprocess.run(dur_cmd, capture_output=True, text=True)
-                dur = float(res.stdout.strip())
-                chunk_tasks.append((c, current_offset, dur))
-                current_offset += dur
-                
-            total_dur = current_offset
-            scene_cuts_info = []
-            print(f"  Detecting scenes across {len(chunks)} chunks using adaptive thresholding...")
-            with ProcessPoolExecutor(max_workers=min(len(chunks), 64)) as executor:
-                for cuts in executor.map(_adaptive_detect_scene_chunk, chunk_tasks):
-                    scene_cuts_info.extend(cuts)
-                    
-            scene_cuts_info.sort(key=lambda x: x[0])
-            
-            unique_cuts = []
-            last_t = -1.0
-            for t, d, th in scene_cuts_info:
-                if t - last_t > 0.1:
-                    unique_cuts.append((t, d, th))
-                    last_t = t
-                    
-            info_file = os.path.join(out_folder, "scene_cuts.json")
-            with open(info_file, "w") as f:
-                json.dump([{"timestamp": round(t, 3), "diff": round(d, 2), "threshold": round(th, 2)} for t, d, th in unique_cuts], f, indent=2)
-                
-            scene_cuts = [t for t, d, th in unique_cuts]
-            boundaries = [0.0] + scene_cuts + [total_dur]
-            
-            extract_tasks = []
-            for i, (start, end) in enumerate(zip(boundaries[:-1], boundaries[1:])):
-                # Trim 0.04 seconds (~2.5 frames at 60fps) from boundaries to guarantee no frame bleeding
-                clip_start = start + 0.04 if start > 0.0 else start
-                clip_end = end - 0.04 if end < total_dur else end
-                
-                if clip_end - clip_start > 0.5:
-                    out_path = os.path.join(out_folder, f"{i:03d}.mp4")
-                    extract_tasks.append((video, out_path, clip_start, clip_end))
-                    
-            print(f"  Extracting {len(extract_tasks)} clips...")
-            with ProcessPoolExecutor(max_workers=32) as executor:
-                list(executor.map(_extract_clip, extract_tasks))
-        print(f"Finished {vname}.")
-
-# --- FILTER MODE HELPERS ---
-
-def _extract_middle_frame(mp4_path):
-    cap = cv2.VideoCapture(mp4_path)
-    total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    fps = cap.get(cv2.CAP_PROP_FPS)
-    if total > 0 and fps > 0:
-        sec = (total//2)/fps
-        cmd = ['ffmpeg', '-v', 'error', '-ss', str(sec), '-i', mp4_path, '-vframes', '1', '-f', 'image2pipe', '-vcodec', 'png', '-']
-        try:
-            p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-            arr = np.asarray(bytearray(p.stdout), dtype=np.uint8)
-            if len(arr) > 0: return (mp4_path, cv2.imdecode(arr, cv2.IMREAD_COLOR))
-        except: pass
-    return (mp4_path, None)
-
-def mode_filter(args):
-    split_dir = "assets/dataset/split"
-    to_delete_file = "assets/dataset/to_delete.txt"
-    with open(to_delete_file, "w") as out_f:
-        for match_dir in sorted(glob.glob(os.path.join(split_dir, "*"))):
-            if not os.path.isdir(match_dir): continue
-            files = sorted(glob.glob(os.path.join(match_dir, "*.mp4")))
-            if not files: continue
-            
-            print(f"Filtering {os.path.basename(match_dir)}...")
-            frames_dict = {}
-            with ProcessPoolExecutor(max_workers=64) as executor:
-                for path, img in executor.map(_extract_middle_frame, files):
-                    if img is not None:
-                        frames_dict[path] = cv2.resize(img, (64,64)).astype(np.float32)
-            
-            valid_files = list(frames_dict.keys())
-            if not valid_files: continue
-            
-            frames = np.array([frames_dict[f] for f in valid_files])
-            N = len(frames)
-            mse_matrix = np.zeros((N, N))
-            for i in range(N):
-                mse_matrix[i] = np.mean((frames - frames[i])**2, axis=(1,2,3))
-            
-            visited = set()
-            clusters = []
-            for i in range(N):
-                if i in visited: continue
-                visited.add(i)
-                neighbors = set(np.where(mse_matrix[i] < 3000.0)[0])
-                if len(neighbors) < 3: continue
-                cluster = set([i])
-                queue = list(neighbors - {i})
-                while queue:
-                    p = queue.pop(0)
-                    if p not in visited:
-                        visited.add(p)
-                        p_neighbors = set(np.where(mse_matrix[p] < 3000.0)[0])
-                        if len(p_neighbors) >= 3:
-                            queue.extend(list(p_neighbors - visited))
-                    cluster.add(p)
-                clusters.append(list(cluster))
-                
-            if not clusters:
-                point_indices = set()
-            else:
-                clusters.sort(key=len, reverse=True)
-                point_indices = set(clusters[0])
-                
-            for i, f in enumerate(valid_files):
-                if i not in point_indices:
-                    out_f.write(f"{f}\n")
-    print(f"Written false-positives to {to_delete_file}")
-
-def mode_delete(args):
-    fpath = "assets/dataset/to_delete.txt"
-    if not os.path.exists(fpath): return
-    with open(fpath, "r") as f:
-        for line in f:
-            p = line.strip()
-            if os.path.exists(p): os.remove(p)
-    print("Deleted flagged files.")
-
-# --- DETECT MODE HELPERS ---
-
-def compute_iou(boxA, boxB):
-    xA, yA = max(boxA[0], boxB[0]), max(boxA[1], boxB[1])
-    xB, yB = min(boxA[2], boxB[2]), min(boxA[3], boxB[3])
-    inter = max(0, xB - xA) * max(0, yB - yA)
-    areaA = (boxA[2] - boxA[0]) * (boxA[3] - boxA[1])
-    areaB = (boxB[2] - boxB[0]) * (boxB[3] - boxB[1])
-    if (areaA + areaB - inter) == 0: return 0
-    return inter / float(areaA + areaB - inter)
-
-def _detect_scene(args):
-    scene_file, out_folder, gpu_id = args
-    os.makedirs(out_folder, exist_ok=True)
-    from ultralytics import YOLO
-    model = YOLO('assets/weights/yoloe-26x.pt')
-    model.to(f'cuda:{gpu_id}')
-    
-    cap = cv2.VideoCapture(scene_file)
-    fps = cap.get(cv2.CAP_PROP_FPS) or 25
-    frame_interval = max(1, int(fps / 4.0))
-    
-    frame_idx = 0
-    while True:
-        ret, frame = cap.read()
-        if not ret: break
-        if frame_idx % frame_interval == 0:
-            results = model.track(frame, persist=True, verbose=False, classes=[0, 32, 38])
-            if results and len(results) > 0 and results[0].boxes is not None:
-                boxes = results[0].boxes
-                persons, rackets, balls = [], [], []
-                for box in boxes:
-                    cls = int(box.cls[0])
-                    xyxy = box.xyxy[0].cpu().numpy()
-                    if cls == 0: persons.append(xyxy)
-                    elif cls == 38: rackets.append(xyxy)
-                    elif cls == 32: balls.append(xyxy)
-                
-                if len(persons) == 2:
-                    persons.sort(key=lambda b: b[3])
-                    player_far, player_near = persons[0], persons[1]
-                    
-                    valid_rackets = [r for r in rackets if compute_iou(r, player_near) > 0 or compute_iou(r, player_far) > 0]
-                    valid_balls = []
-                    p1_x, p2_x = (player_near[0]+player_near[2])/2, (player_far[0]+player_far[2])/2
-                    for b in balls:
-                        bx = (b[0]+b[2])/2
-                        if min(p1_x, p2_x) <= bx <= max(p1_x, p2_x): valid_balls.append(b)
-                        
-                    if len(valid_rackets) <= 2 and len(valid_balls) <= 1:
-                        cinfo = {}
-                        def save_c(name, b):
-                            x1, y1, x2, y2 = max(0, int(b[0])), max(0, int(b[1])), min(frame.shape[1], int(b[2])), min(frame.shape[0], int(b[3]))
-                            if x2 > x1 and y2 > y1:
-                                cv2.imwrite(os.path.join(out_folder, f"frame_{frame_idx}_{name}.jpg"), frame[y1:y2, x1:x2])
-                                cinfo[name] = {"top_left": [x1, y1], "width": x2-x1, "height": y2-y1}
-                        
-                        save_c("player_far", player_far)
-                        save_c("player_near", player_near)
-                        for r in valid_rackets:
-                            ry = (r[1]+r[3])/2
-                            if abs(ry - (player_near[1]+player_near[3])/2) < abs(ry - (player_far[1]+player_far[3])/2):
-                                save_c("racket_near", r)
-                            else: save_c("racket_far", r)
-                        for b in valid_balls: save_c("ball", b)
-                        
-                        with open(os.path.join(out_folder, f"frame_{frame_idx}_info.json"), "w") as f:
-                            json.dump(cinfo, f)
-        frame_idx += 1
-    cap.release()
-
-def mode_detect(args):
-    gpus = get_available_gpus()
-    if not gpus:
-        print("No free GPUs.")
+    if not os.path.exists(frames_dir):
+        print(f'[segment] Frames dir not found: {frames_dir}. Run the filter stage first.')
         return
+        
+    if os.path.exists(seg_dir):
+        print(f'[segment] Removing existing segmentations directory: {seg_dir}')
+        shutil.rmtree(seg_dir)
+    os.makedirs(seg_dir, exist_ok=True)
     
-    tasks = []
-    split_dir = "assets/dataset/split"
-    detected_dir = "assets/dataset/detected"
-    gpu_idx = 0
-    for m in glob.glob(os.path.join(split_dir, "*")):
-        if not os.path.isdir(m): continue
-        mname = os.path.basename(m)
-        for s in glob.glob(os.path.join(m, "*.mp4")):
-            sname = os.path.splitext(os.path.basename(s))[0]
-            out = os.path.join(detected_dir, mname, sname)
-            tasks.append((s, out, gpus[gpu_idx % len(gpus)]))
-            gpu_idx += 1
-            
-    print(f"Running detection on {len(tasks)} scenes across {len(gpus)} GPUs...")
-    workers = len(gpus) * 12
-    with ProcessPoolExecutor(max_workers=workers) as executor:
-        list(executor.map(_detect_scene, tasks))
-
-# --- SEGMENT MODE HELPERS ---
-
-def _segment_image(args):
-    img_path, out_path, gpu_id = args
-    if os.path.exists(out_path): return
-    from ultralytics import SAM
-    model = SAM('assets/weights/sam3.pt')
-    model.to(f'cuda:{gpu_id}')
-    img = cv2.imread(img_path)
-    if img is None: return
-    results = model(img, verbose=False)
-    if results and len(results) > 0 and results[0].masks is not None:
-        masks = results[0].masks.data.cpu().numpy()
-        if len(masks) > 0:
-            best_mask = max(masks, key=lambda m: m.sum())
-            cv2.imwrite(out_path, (best_mask * 255).astype(np.uint8))
-
-def mode_segment(args):
-    gpus = get_available_gpus()
-    if not gpus: return
+    from ultralytics import YOLO
     
-    detected_dir = "assets/dataset/detected"
-    masks_dir = "assets/dataset/masks"
-    tasks = []
-    gpu_idx = 0
-    for root, _, files in os.walk(detected_dir):
-        for f in files:
-            if not f.endswith(".jpg"): continue
-            img_path = os.path.join(root, f)
-            rel_dir = os.path.relpath(root, detected_dir)
-            out_folder = os.path.join(masks_dir, rel_dir)
-            os.makedirs(out_folder, exist_ok=True)
-            out_path = os.path.join(out_folder, f.replace(".jpg", ".png"))
-            tasks.append((img_path, out_path, gpus[gpu_idx % len(gpus)]))
-            gpu_idx += 1
-            
-    print(f"Segmenting {len(tasks)} crops across {len(gpus)} GPUs...")
-    with ProcessPoolExecutor(max_workers=len(gpus)*12) as executor:
-        list(executor.map(_segment_image, tasks))
-
-# --- FUSE MODE HELPERS ---
-
-def _fuse_image(args):
-    img_path, mask_path, out_path = args
-    if not os.path.exists(mask_path): return
-    img = cv2.imread(img_path)
-    mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
-    if img is None or mask is None: return
-    if img.shape[:2] != mask.shape[:2]:
-        mask = cv2.resize(mask, (img.shape[1], img.shape[0]))
-    b, g, r = cv2.split(img)
-    rgba = cv2.merge([b, g, r, mask])
-    cv2.imwrite(out_path, rgba)
-
-def mode_fuse(args):
-    detected_dir = "assets/dataset/detected"
-    masks_dir = "assets/dataset/masks"
-    segmented_dir = "assets/dataset/segmented"
-    tasks = []
-    for root, _, files in os.walk(detected_dir):
-        for f in files:
-            if not f.endswith(".jpg"): continue
-            img_path = os.path.join(root, f)
-            rel_dir = os.path.relpath(root, detected_dir)
-            mask_path = os.path.join(masks_dir, rel_dir, f.replace(".jpg", ".png"))
-            out_folder = os.path.join(segmented_dir, rel_dir)
-            os.makedirs(out_folder, exist_ok=True)
-            out_path = os.path.join(out_folder, f.replace(".jpg", ".png"))
-            tasks.append((img_path, mask_path, out_path))
-            
-    print(f"Fusing {len(tasks)} crops using CPU...")
-    with ProcessPoolExecutor(max_workers=64) as executor:
-        list(executor.map(_fuse_image, tasks))
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("mode", choices=["split", "filter", "delete", "detect", "segment", "fuse"])
-    args = parser.parse_args()
+    gpu = get_available_gpu()
+    device = f'cuda:{gpu}' if gpu >= 0 else 'cpu'
+    weights_path = os.path.join(REPO_ROOT, 'assets', 'weights', 'yoloe-26x-seg.pt')
     
-    if args.mode == "split": mode_split(args)
-    elif args.mode == "filter": mode_filter(args)
-    elif args.mode == "delete": mode_delete(args)
-    elif args.mode == "detect": mode_detect(args)
-    elif args.mode == "segment": mode_segment(args)
-    elif args.mode == "fuse": mode_fuse(args)
+    print(f'[segment] Loading YOLO model from {weights_path} to {device}...')
+    model = YOLO(weights_path)
+    model.to(device)
+    
+    if hasattr(model, 'set_classes'):
+        try:
+            model.set_classes(["person", "tennis racket", "tennis ball"])
+        except Exception as e:
+            print(f'[segment] Warning: set_classes failed: {e}')
+
+    frame_files = sorted(glob.glob(os.path.join(frames_dir, 'frame_*.png')))
+    if not frame_files:
+        print('[segment] No frames found in the frames directory.')
+        return
+
+    print(f'[segment] Processing {len(frame_files)} frames...')
+    empty_frames_streak = 0
+    track_history = {} # tid -> (prev_gray, prev_mask)
+    movement_scores = {} # tid -> float
+    player_tids = set()
+    burn_in_counter = 0
+    saved_person_files = {} # tid -> [file_path, ...]
+    
+    for frame_path in frame_files:
+        frame_id_str = os.path.splitext(os.path.basename(frame_path))[0].split('_')[1]
+        frame_id = int(frame_id_str)
+        
+        img = cv2.imread(frame_path)
+        if img is None: 
+            continue
+        
+        h, w = img.shape[:2]
+        inf_size = min(max(h, w), 1920)
+        
+        results = model.track(img, persist=True, verbose=False, imgsz=inf_size)
+        result = results[0]
+        
+        if result.boxes is None or len(result.boxes) == 0:
+            empty_frames_streak += 1
+            if empty_frames_streak > 5:
+                print(f'[segment] 5 empty frames in a row at frame {frame_id}. Flushing tracker state.')
+                # Completely reinitialize the model to flush the tracker safely
+                model = YOLO(weights_path)
+                model.to(device)
+                if hasattr(model, 'set_classes'):
+                    try:
+                        model.set_classes(["person", "tennis racket", "tennis ball"])
+                    except Exception:
+                        pass
+                empty_frames_streak = 0
+                track_history.clear()
+                movement_scores.clear()
+                player_tids.clear()
+                burn_in_counter = 0
+                saved_person_files.clear()
+            continue
+            
+        empty_frames_streak = 0
+        dets = []
+        
+        for i, box in enumerate(result.boxes):
+            cls_idx = int(box.cls[0])
+            cls_name = result.names[cls_idx].lower()
+            conf = float(box.conf[0])
+            tid = int(box.id[0]) if box.id is not None else -1
+            
+            if tid == -1: 
+                continue 
+            
+            x1, y1, x2, y2 = map(int, box.xyxy[0].cpu().numpy().tolist())
+            
+            mask_data = None
+            if result.masks is not None:
+                mask_data = result.masks.data[i].cpu().numpy()
+                
+            dets.append({
+                'cls': cls_name, 'conf': conf, 'tid': tid, 
+                'bbox': (x1, y1, x2, y2), 'mask': mask_data
+            })
+            
+        filtered_dets = dets
+        
+        active_player_count = sum(1 for d in filtered_dets if d['tid'] in player_tids and d['cls'] == 'person')
+        
+        if active_player_count < 2:
+            burn_in_counter += 1
+        else:
+            burn_in_counter = 0
+            
+        if burn_in_counter == 17:
+            sorted_tids = sorted(movement_scores.keys(), key=lambda t: movement_scores[t], reverse=True)
+            for tid in sorted_tids:
+                if tid not in player_tids:
+                    player_tids.add(tid)
+                if len(player_tids) >= 2:
+                    break
+            
+            print(f"[segment] Frame {frame_id}: Burn-in complete. Selected player tids: {player_tids}")
+            
+            for tid, files in saved_person_files.items():
+                if tid not in player_tids:
+                    for fpath in files:
+                        try:
+                            os.remove(fpath)
+                        except OSError:
+                            pass
+                    saved_person_files[tid] = []
+                    
+            movement_scores.clear()
+            burn_in_counter = 0
+            
+        for det in filtered_dets:
+            x1, y1, x2, y2 = det['bbox']
+            # Bound check
+            x1, y1 = max(0, x1), max(0, y1)
+            x2, y2 = min(img.shape[1], x2), min(img.shape[0], y2)
+            
+            if x2 <= x1 or y2 <= y1:
+                continue
+                
+            crop_img = img[y1:y2, x1:x2]
+            
+            mask = det['mask']
+            if mask is not None:
+                if mask.shape != img.shape[:2]:
+                    mask = cv2.resize(mask, (img.shape[1], img.shape[0]))
+                crop_mask = mask[y1:y2, x1:x2]
+                crop_mask = (crop_mask * 255).astype(np.uint8)
+            else:
+                # Fallback solid mask if SAM/Seg fails
+                crop_mask = np.ones((y2-y1, x2-x1), dtype=np.uint8) * 255
+                
+            tid = det['tid']
+            if det['cls'] == 'person':
+                if active_player_count >= 2 and tid not in player_tids:
+                    continue
+                    
+                gray = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
+                gray = cv2.resize(gray, (128, 128))
+                rs_mask = cv2.resize(crop_mask, (128, 128))
+                
+                if tid in track_history:
+                    prev_gray, prev_mask = track_history[tid]
+                    flow = cv2.calcOpticalFlowFarneback(prev_gray, gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+                    mag, _ = cv2.cartToPolar(flow[..., 0], flow[..., 1])
+                    valid_mask = cv2.bitwise_and(prev_mask, rs_mask)
+                    if np.count_nonzero(valid_mask) > 0:
+                        avg_mag = np.mean(mag[valid_mask > 0])
+                        movement_scores[tid] = movement_scores.get(tid, 0) + avg_mag
+                        
+                track_history[tid] = (gray, rs_mask)
+
+            b, g, r_ch = cv2.split(crop_img)
+            rgba = cv2.merge([b, g, r_ch, crop_mask])
+            
+            safe_cls = det['cls'].replace(' ', '_')
+            out_name = f"frame_{frame_id:06d}_track_{tid:04d}_cls_{safe_cls}_bbox_{x1}_{y1}_{x2}_{y2}.png"
+            out_path = os.path.join(seg_dir, out_name)
+            cv2.imwrite(out_path, rgba)
+            
+            if det['cls'] == 'person':
+                saved_person_files.setdefault(tid, []).append(out_path)
+
+    print('[segment] Done.')
+
+def get_iou(boxA, boxB):
+    xA = max(boxA[0], boxB[0])
+    yA = max(boxA[1], boxB[1])
+    xB = min(boxA[2], boxB[2])
+    yB = min(boxA[3], boxB[3])
+    interArea = max(0, xB - xA) * max(0, yB - yA)
+    boxAArea = (boxA[2] - boxA[0]) * (boxA[3] - boxA[1])
+    boxBArea = (boxB[2] - boxB[0]) * (boxB[3] - boxB[1])
+    return interArea / float(boxAArea + boxBArea - interArea + 1e-6)
+
+def get_union(boxA, boxB):
+    return (
+        min(boxA[0], boxB[0]),
+        min(boxA[1], boxB[1]),
+        max(boxA[2], boxB[2]),
+        max(boxA[3], boxB[3])
+    )
+
+def mode_fuse(args: argparse.Namespace) -> None:
+    """
+    Stage 3: fuse
+    Fuses broken tracks together based on IoU and temporal distance.
+    Fuses person and racket tracks that occur in the same frame into a single player track crop.
+    """
+    video_path = args.input
+    vname = os.path.splitext(os.path.basename(video_path))[0]
+    base_dir = os.path.join(REPO_ROOT, 'assets', 'dataset', vname)
+    seg_dir = os.path.join(base_dir, 'segmentations')
+    frames_dir = os.path.join(base_dir, 'frames')
+    
+    if not os.path.exists(seg_dir):
+        print(f'[fuse] Segmentations dir not found: {seg_dir}')
+        return
+        
+    files = glob.glob(os.path.join(seg_dir, '*.png'))
+    
+    parsed = []
+    for fpath in files:
+        fname = os.path.basename(fpath)
+        parts = fname.replace('.png', '').split('_')
+        try:
+            frame_id = int(parts[1])
+            tid = int(parts[3])
+            bbox_idx = parts.index('bbox')
+            cls_name = '_'.join(parts[5:bbox_idx])
+            x1, y1, x2, y2 = map(int, parts[bbox_idx+1:])
+            parsed.append({
+                'path': fpath,
+                'fname': fname,
+                'frame_id': frame_id,
+                'tid': tid,
+                'cls': cls_name,
+                'bbox': (x1, y1, x2, y2)
+            })
+        except Exception:
+            continue
+            
+    # Group by track id
+    tracks = {}
+    for p in parsed:
+        tracks.setdefault(p['tid'], []).append(p)
+        
+    for tid in tracks:
+        tracks[tid].sort(key=lambda x: x['frame_id'])
+        
+    print(f'[fuse] Loaded {len(tracks)} tracks. Commencing stitching...')
+    
+    tids = sorted(list(tracks.keys()))
+    parent = {t:t for t in tids}
+    
+    def find(i):
+        if parent[i] == i: return i
+        parent[i] = find(parent[i])
+        return parent[i]
+        
+    def union(i, j):
+        root_i = find(i)
+        root_j = find(j)
+        if root_i != root_j:
+            parent[root_j] = root_i
+            
+    for i in range(len(tids)):
+        for j in range(i+1, len(tids)):
+            tA = tids[i]
+            tB = tids[j]
+            A_last = tracks[tA][-1]
+            B_first = tracks[tB][0]
+            
+            # Check A_last -> B_first
+            if 0 < B_first['frame_id'] - A_last['frame_id'] < 10:
+                iou = get_iou(A_last['bbox'], B_first['bbox'])
+                if iou > 0.5:
+                    union(tA, tB)
+                    continue
+                    
+            A_first = tracks[tA][0]
+            B_last = tracks[tB][-1]
+            # Check B_last -> A_first
+            if 0 < A_first['frame_id'] - B_last['frame_id'] < 10:
+                iou = get_iou(B_last['bbox'], A_first['bbox'])
+                if iou > 0.5:
+                    union(tA, tB)
+
+    # Apply track renames
+    merged_tracks = {}
+    for p in parsed:
+        new_tid = find(p['tid'])
+        p['new_tid'] = new_tid
+        merged_tracks.setdefault(new_tid, []).append(p)
+        
+    for p in parsed:
+        if p['new_tid'] != p['tid']:
+            new_fname = f"frame_{p['frame_id']:06d}_track_{p['new_tid']:04d}_cls_{p['cls']}_bbox_{p['bbox'][0]}_{p['bbox'][1]}_{p['bbox'][2]}_{p['bbox'][3]}.png"
+            new_path = os.path.join(seg_dir, new_fname)
+            os.rename(p['path'], new_path)
+            p['path'] = new_path
+            p['tid'] = p['new_tid']
+
+    print(f'[fuse] Stitched tracks down to {len(merged_tracks)} distinct tracks.')
+    print(f'[fuse] Commencing person-racket fusion...')
+    
+    by_frame = {}
+    for p in parsed:
+        by_frame.setdefault(p['frame_id'], []).append(p)
+        
+    fusion_count = 0
+    for frame_id, items in by_frame.items():
+        persons = [x for x in items if x['cls'] == 'person']
+        rackets = [x for x in items if 'racket' in x['cls']]
+        
+        for r in rackets:
+            best_p = None
+            best_iou = 0
+            for p in persons:
+                ixA = max(r['bbox'][0], p['bbox'][0])
+                iyA = max(r['bbox'][1], p['bbox'][1])
+                ixB = min(r['bbox'][2], p['bbox'][2])
+                iyB = min(r['bbox'][3], p['bbox'][3])
+                interArea = max(0, ixB - ixA) * max(0, iyB - iyA)
+                rArea = (r['bbox'][2] - r['bbox'][0]) * (r['bbox'][3] - r['bbox'][1])
+                
+                # Check how much of the racket is inside the person's bounding box
+                overlap_ratio = interArea / float(rArea + 1e-6)
+                
+                if overlap_ratio > 0.01:
+                    if overlap_ratio > best_iou:
+                        best_iou = overlap_ratio
+                        best_p = p
+                        
+            if best_p is not None:
+                # Fuse best_p and r
+                frame_path = os.path.join(frames_dir, f'frame_{frame_id:06d}.png')
+                full_img = cv2.imread(frame_path)
+                if full_img is None: 
+                    continue
+                
+                p_rgba = cv2.imread(best_p['path'], cv2.IMREAD_UNCHANGED)
+                r_rgba = cv2.imread(r['path'], cv2.IMREAD_UNCHANGED)
+                
+                if p_rgba is None or r_rgba is None: 
+                    continue
+                if p_rgba.shape[2] != 4 or r_rgba.shape[2] != 4: 
+                    continue
+                
+                # Canvas for the full mask
+                full_mask = np.zeros(full_img.shape[:2], dtype=np.uint8)
+                
+                px1, py1, px2, py2 = best_p['bbox']
+                p_mask = p_rgba[:, :, 3]
+                try:
+                    full_mask[py1:py2, px1:px2] = cv2.bitwise_or(full_mask[py1:py2, px1:px2], p_mask)
+                except Exception:
+                    pass
+                    
+                rx1, ry1, rx2, ry2 = r['bbox']
+                r_mask = r_rgba[:, :, 3]
+                try:
+                    full_mask[ry1:ry2, rx1:rx2] = cv2.bitwise_or(full_mask[ry1:ry2, rx1:rx2], r_mask)
+                except Exception:
+                    pass
+                    
+                ux1, uy1, ux2, uy2 = get_union(best_p['bbox'], r['bbox'])
+                ux1, uy1 = max(0, ux1), max(0, uy1)
+                ux2, uy2 = min(full_img.shape[1], ux2), min(full_img.shape[0], uy2)
+                
+                if ux2 <= ux1 or uy2 <= uy1:
+                    continue
+                
+                u_crop = full_img[uy1:uy2, ux1:ux2]
+                u_mask = full_mask[uy1:uy2, ux1:ux2]
+                
+                b, g, r_ch = cv2.split(u_crop)
+                u_rgba = cv2.merge([b, g, r_ch, u_mask])
+                
+                out_name = f"frame_{frame_id:06d}_track_{best_p['tid']:04d}_cls_player_bbox_{ux1}_{uy1}_{ux2}_{uy2}.png"
+                cv2.imwrite(os.path.join(seg_dir, out_name), u_rgba)
+                
+                try:
+                    os.remove(best_p['path'])
+                    os.remove(r['path'])
+                except Exception:
+                    pass
+                    
+                fusion_count += 1
+                persons.remove(best_p)
+
+    print(f'[fuse] Performed {fusion_count} person-racket fusions into "player" tracks.')
+    print('[fuse] Done.')
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Pointstream dataset processing pipeline (3-stage).',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        'mode',
+        choices=['filter', 'segment', 'fuse'],
+        help='Pipeline stage to run'
+    )
+    parser.add_argument(
+        '--input', required=True,
+        help='Path to the source video file'
+    )
+    parsed = parser.parse_args()
+
+    modes = {
+        'filter': mode_filter,
+        'segment': mode_segment,
+        'fuse': mode_fuse,
+    }
+    modes[parsed.mode](parsed)
