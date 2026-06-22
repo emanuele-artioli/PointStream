@@ -414,7 +414,6 @@ def classify_scenes(video_path, out_dir, device):
         probas = best_gmm.predict_proba(merged_pca)
         
         for i, s in enumerate(valid_merged):
-            # We keep their current string classification ("cluster_1"), but update their confidence
             cname = s['classification']
             try:
                 cluster_id = int(cname.replace("cluster_", ""))
@@ -422,45 +421,66 @@ def classify_scenes(video_path, out_dir, device):
             except:
                 s['cluster_confidence'] = 0.0
             
-        for s in scene_stats:
-            if 'cluster_confidence' not in s:
-                s['cluster_confidence'] = 0.0
+        # Determine heuristics & dynamic threshold
+        if raw_centroids:
+            # The point cluster should be a major cluster. Find clusters with >= 5% of scenes.
+            total_scenes = len([s for s in scene_stats if s['classification'] != "error_blank"])
+            valid_cnames = [k for k, v in raw_centroids.items() if v['count'] >= total_scenes * 0.05]
+            if not valid_cnames:
+                valid_cnames = list(raw_centroids.keys())
+                
+            point_cluster = min(valid_cnames, key=lambda k: raw_centroids[k]['avg_score']['mean'])
+            point_mean = raw_centroids[point_cluster]['avg_score']['mean']
+            point_max = raw_centroids[point_cluster]['avg_score']['max']
             
+            # Dynamic threshold based on the distribution of the point cluster
+            # The threshold is a buffer (1.5x) above the maximum motion found inside the point cluster itself.
+            # Fallback to 2.0x mean if the cluster is extremely tight.
+            dynamic_threshold = max(point_max * 1.5, point_mean * 2.0)
+            
+            # Map all clusters based on camera movement relative to the dynamic threshold
+            target_mapping = {}
+            for k, v in raw_centroids.items():
+                if v['avg_score']['mean'] > dynamic_threshold:
+                    target_mapping[k] = 'cluster_interlude'
+                else:
+                    target_mapping[k] = 'cluster_point'
+            
+            conf_scores = [s.get('cluster_confidence', 0.0) for s in scene_stats if s.get('cluster_confidence', 0.0) > 0]
+            if conf_scores:
+                threshold = np.percentile(conf_scores, 10)
+                threshold = min(threshold, 0.98) # cap at 0.98
+            else:
+                threshold = 0.98
+                
+            for s in scene_stats:
+                if s['classification'] == "error_blank":
+                    continue
+                cname = s['classification']
+                conf = s.get('cluster_confidence', 0.0)
+                
+                target_class = target_mapping.get(cname, 'cluster_other')
+                if conf >= threshold:
+                    s['classification'] = target_class
+                else:
+                    s['classification'] = 'cluster_other'
+
     else:
         # Robust fallback for < 6 valid scenes
         raw_centroids = {}
         for s in valid_scenes:
             if s['avg_score'] < 0.005 and s['duration'] > 3.0:
-                s['classification'] = "cluster_point_fallback"
+                s['classification'] = "cluster_point"
             else:
-                s['classification'] = "cluster_other_fallback"
+                s['classification'] = "cluster_other"
             
         for s in scene_stats:
             s['cluster_confidence'] = 0.0
             
-    import json
-    json_data = {
-        "video_name": vname,
-        "total_scenes": len(scene_stats),
-        "cluster_info": raw_centroids,
-        "scenes": [
-            {
-                "t_start": s['t_start'],
-                "t_end": s['t_end'],
-                "duration": s['duration'],
-                "avg_score": s['avg_score'],
-                "std_score": s['std_score'],
-                "max_score": s['max_score'],
-                "cluster": s['classification'],
-                "cluster_confidence": s.get('cluster_confidence', 0.0)
-            } for s in scene_stats
-        ]
-    }
-    with open(os.path.join(dataset_dir, 'dynamic_cuts.json'), 'w') as f:
-        json.dump(json_data, f, indent=4)
 
-    # Third pass: Extract frames
+    # Third pass: Extract frames with final classification
     for s in scene_stats:
+        if s['classification'] == "error_blank": continue
         avg_s = s['avg_score']
         dur = s['duration']
         std_s = s['std_score']
@@ -476,7 +496,6 @@ def classify_scenes(video_path, out_dir, device):
         t_first = t_start + 0.05
         t_last = max(t_start + 0.1, t_end - 0.05)
         
-        # Extract and stack first and last frame vertically
         subprocess.run([
             'ffmpeg', '-hide_banner', '-loglevel', 'error',
             '-hwaccel', 'cuda',
@@ -487,6 +506,28 @@ def classify_scenes(video_path, out_dir, device):
             '-q:v', '2',
             '-y', frame_path
         ], check=False)
+
+    # Write JSON output
+    import json
+    json_data = {
+        "video_name": vname,
+        "total_scenes": len(scene_stats),
+        "cluster_info": raw_centroids,
+        "scenes": [
+            {
+                "t_start": s['t_start'],
+                "t_end": s['t_end'],
+                "duration": s['duration'],
+                "avg_score": s['avg_score'],
+                "std_score": s['std_score'],
+                "max_score": s['max_score'],
+                "cluster": s['classification'],
+                "cluster_confidence": s.get('cluster_confidence', 0.0)
+            } for s in scene_stats if s['classification'] != "error_blank"
+        ]
+    }
+    with open(os.path.join(dataset_dir, 'dynamic_cuts.json'), 'w') as f:
+        json.dump(json_data, f, indent=4)
         
     print(f"[{device}] [classify_scenes] Finished {vname}")
 
@@ -495,6 +536,10 @@ def process_gpu_phase(args):
     classify_scenes(video_path, scenes_dir, device)
 
 
+'''
+rm -f assets/dataset/*/scenes/*.jpg
+python scripts/dataset_processing.py --input assets/raw_4k
+'''
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process dataset videos and classify scenes.')
     parser.add_argument('--input', required=True, help='Path to input video file or folder containing .mp4 files')
