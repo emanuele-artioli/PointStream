@@ -1,5 +1,16 @@
-import argparse
+import torch
+import numpy as np
+
+_original_from_numpy = torch.from_numpy
+def _patched_from_numpy(x):
+    try:
+        return _original_from_numpy(x)
+    except TypeError:
+        import torch.utils.dlpack
+        return torch.utils.dlpack.from_dlpack(x.__dlpack__())
+torch.from_numpy = _patched_from_numpy
 import os
+import argparse
 import subprocess
 import glob
 import re
@@ -7,6 +18,29 @@ import csv
 import sys
 import multiprocessing as mp
 import math
+import tempfile
+import cv2
+import json
+
+try:
+    from ultralytics.engine.results import BaseTensor
+    _old_numpy = BaseTensor.numpy
+    def _new_numpy(self):
+        if type(self.data).__name__ == "ndarray" or isinstance(self.data, np.ndarray):
+            return self
+        arr = np.array(self.data.tolist(), dtype=np.float32)
+        return self.__class__(arr, self.orig_shape)
+    BaseTensor.numpy = _new_numpy
+    from ultralytics.engine.results import Boxes
+    _old_boxes_numpy = Boxes.numpy
+    def _new_boxes_numpy(self):
+        if type(self.data).__name__ == "ndarray" or isinstance(self.data, np.ndarray):
+            return self
+        arr = np.array(self.data.tolist(), dtype=np.float32)
+        return self.__class__(arr, self.orig_shape)
+    Boxes.numpy = _new_boxes_numpy
+except ImportError:
+    pass
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -111,6 +145,33 @@ def process_cpu_phase(args):
     extract_scene_scores(video_path, cache_file, threads)
         
     return video_path, scenes_dir
+
+def get_iou(boxA, boxB):
+    xA = max(boxA[0], boxB[0])
+    yA = max(boxA[1], boxB[1])
+    xB = min(boxA[2], boxB[2])
+    yB = min(boxA[3], boxB[3])
+    interArea = max(0, xB - xA) * max(0, yB - yA)
+    boxAArea = (boxA[2] - boxA[0]) * (boxA[3] - boxA[1])
+    boxBArea = (boxB[2] - boxB[0]) * (boxB[3] - boxB[1])
+    return interArea / float(boxAArea + boxBArea - interArea + 1e-6)
+
+def get_union(boxA, boxB):
+    return (
+        min(boxA[0], boxB[0]),
+        min(boxA[1], boxB[1]),
+        max(boxA[2], boxB[2]),
+        max(boxA[3], boxB[3])
+    )
+
+def segment_and_fuse_scene(video_path, dataset_dir, scene_idx, t_start, t_end, device):
+    import multiprocessing as mp
+    ctx = mp.get_context('spawn')
+    p = ctx.Process(target=_segment_and_fuse_scene_worker, args=(video_path, dataset_dir, scene_idx, t_start, t_end, device))
+    p.start()
+    p.join()
+    if p.exitcode != 0:
+        print(f"[{device}] Scene segmentation failed for scene {scene_idx}")
 
 import math
 import statistics
@@ -532,22 +593,391 @@ def classify_scenes(video_path, out_dir, device):
     print(f"[{device}] [classify_scenes] Finished {vname}")
 
 def process_gpu_phase(args):
-    video_path, scenes_dir, device = args
-    classify_scenes(video_path, scenes_dir, device)
+    video_path, scenes_dir, device, stages = args
+    if 'classify' in stages:
+        classify_scenes(video_path, scenes_dir, device)
+        
+    if 'segment' in stages:
+        vname = os.path.splitext(os.path.basename(video_path))[0]
+        dataset_dir = os.path.join(REPO_ROOT, 'assets', 'dataset', vname)
+        json_path = os.path.join(dataset_dir, 'dynamic_cuts.json')
+        if not os.path.exists(json_path):
+            print(f"[{device}] No cuts found for {vname}, skipping segment.")
+            return
+            
+        with open(json_path, 'r') as f:
+            data = json.load(f)
+            
+        scenes = data.get('scenes', [])
+        for i, s in enumerate(scenes):
+            if s['cluster'] == 'cluster_point':
+                print(f"[{device}] Segmenting scene {i} ({s['t_start']:.2f}s - {s['t_end']:.2f}s)")
+                segment_and_fuse_scene(video_path, dataset_dir, i, s['t_start'], s['t_end'], device)
 
 
 '''
 rm -f assets/dataset/*/scenes/*.jpg
 python scripts/dataset_processing.py --input assets/raw_4k
 '''
+
+def get_iou(boxA, boxB):
+            xA = max(boxA[0], boxB[0])
+            yA = max(boxA[1], boxB[1])
+            xB = min(boxA[2], boxB[2])
+            yB = min(boxA[3], boxB[3])
+            interArea = max(0, xB - xA) * max(0, yB - yA)
+            boxAArea = (boxA[2] - boxA[0]) * (boxA[3] - boxA[1])
+            boxBArea = (boxB[2] - boxB[0]) * (boxB[3] - boxB[1])
+            return interArea / float(boxAArea + boxBArea - interArea + 1e-6)
+
+def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, t_end, device):
+
+    
+    REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    weights_path = os.path.join(REPO_ROOT, 'assets', 'weights', 'yoloe-26x-seg.pt')
+    
+    # Save segs in a common 'segmentations' folder
+    seg_dir = os.path.join(dataset_dir, 'segmentations', f'scene_{scene_idx:03d}')
+    videos_dir = os.path.join(dataset_dir, 'videos')
+    os.makedirs(seg_dir, exist_ok=True)
+    os.makedirs(videos_dir, exist_ok=True)
+    
+    from ultralytics import YOLO
+    model = YOLO(weights_path)
+    model.to(device)
+    if hasattr(model, 'set_classes'):
+        try:
+            model.set_classes(["person", "tennis racket", "tennis ball"])
+        except Exception:
+            pass
+            
+    fps = 8
+    
+    with tempfile.TemporaryDirectory() as tmp_frames_dir:
+        cmd = [
+            'ffmpeg', '-hide_banner', '-loglevel', 'error', '-y',
+            '-ss', str(t_start),
+            '-i', video_path,
+            '-t', str(t_end - t_start),
+            '-r', '8',
+            os.path.join(tmp_frames_dir, 'frame_%06d.png')
+        ]
+        
+        try:
+            subprocess.run(cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"[{device}] Error extracting frames for scene {scene_idx}: {e}")
+            return
+            
+        frame_files = sorted(glob.glob(os.path.join(tmp_frames_dir, '*.png')))
+        if not frame_files:
+            return
+            
+        def get_iou(boxA, boxB):
+            xA = max(boxA[0], boxB[0])
+            yA = max(boxA[1], boxB[1])
+            xB = min(boxA[2], boxB[2])
+            yB = min(boxA[3], boxB[3])
+            interArea = max(0, xB - xA) * max(0, yB - yA)
+            boxAArea = (boxA[2] - boxA[0]) * (boxA[3] - boxA[1])
+            boxBArea = (boxB[2] - boxB[0]) * (boxB[3] - boxB[1])
+            return interArea / float(boxAArea + boxBArea - interArea + 1e-6)
+
+        def get_global_motion(prev_gray, curr_gray):
+            prev_small = cv2.resize(prev_gray, (256, 256)).astype(np.float32)
+            curr_small = cv2.resize(curr_gray, (256, 256)).astype(np.float32)
+            
+            # create hanning window to reduce edge artifacts
+            hanning = cv2.createHanningWindow((256, 256), cv2.CV_32F)
+            (dx, dy), _ = cv2.phaseCorrelate(prev_small, curr_small, hanning)
+            
+            scale_x = curr_gray.shape[1] / 256.0
+            scale_y = curr_gray.shape[0] / 256.0
+            return dx * scale_x, dy * scale_y
+
+        parsed_dets = []
+        frames = []
+        
+        active_tracks = {}
+        next_tid = 1
+        
+        prev_gray = None
+        cumulative_dx, cumulative_dy = 0.0, 0.0
+        
+        global_centroids = {}
+        racket_scores = {}
+            
+        for frame_id, fpath in enumerate(frame_files):
+            img = cv2.imread(fpath)
+            if img is None:
+                continue
+            frames.append(img)
+            
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            if prev_gray is not None:
+                dx, dy = get_global_motion(prev_gray, gray)
+                cumulative_dx += dx
+                cumulative_dy += dy
+            prev_gray = gray
+                
+            h, w = img.shape[:2]
+            inf_size = min(max(h, w), 1920)
+            
+            results = model.predict(img, verbose=False, imgsz=inf_size)
+            result = results[0]
+            
+            frame_dets = []
+            current_frame_tids = set()
+            
+            if result.boxes is not None and len(result.boxes) > 0:
+                for i, box in enumerate(result.boxes):
+                    cls_idx = int(box.cls[0])
+                    cls_name = result.names[cls_idx].lower()
+                    conf = float(box.conf[0])
+                    
+                    x1, y1, x2, y2 = map(int, box.xyxy[0].cpu().numpy().tolist())
+                    bbox = (x1, y1, x2, y2)
+                    
+                    tid = -1
+                    if cls_name == 'person':
+                        best_iou = 0.1
+                        for t, t_bbox in active_tracks.items():
+                            if t in current_frame_tids:
+                                continue
+                            iou = get_iou(bbox, t_bbox)
+                            if iou > best_iou:
+                                best_iou = iou
+                                tid = t
+                        
+                        if tid == -1:
+                            tid = next_tid
+                            next_tid += 1
+                            
+                        active_tracks[tid] = bbox
+                        current_frame_tids.add(tid)
+                        
+                        cx = (x1 + x2) / 2.0
+                        cy = (y1 + y2) / 2.0
+                        g_cx = cx - cumulative_dx
+                        g_cy = cy - cumulative_dy
+                        global_centroids.setdefault(tid, []).append((g_cx, g_cy))
+                    
+                    mask_data = None
+                    if result.masks is not None:
+                        m = np.array(result.masks.data[i].cpu().tolist(), dtype=np.float32)
+                        if m.shape != img.shape[:2]:
+                            m = cv2.resize(m, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_NEAREST)
+                        mask_data = (m > 0.5).astype(np.uint8) * 255
+                        
+                    frame_dets.append({
+                        'cls': cls_name, 'conf': conf, 'tid': tid, 
+                        'bbox': bbox, 'mask': mask_data
+                    })
+            
+            rackets = [d for d in frame_dets if d['cls'] == 'tennis racket']
+            persons = [d for d in frame_dets if d['cls'] == 'person']
+            
+            for r in rackets:
+                rx = (r['bbox'][0] + r['bbox'][2]) / 2.0
+                ry = (r['bbox'][1] + r['bbox'][3]) / 2.0
+                best_tid = None
+                best_dist = float('inf')
+                for p in persons:
+                    px = (p['bbox'][0] + p['bbox'][2]) / 2.0
+                    py = (p['bbox'][1] + p['bbox'][3]) / 2.0
+                    dist = (px - rx)**2 + (py - ry)**2
+                    if dist < best_dist:
+                        best_dist = dist
+                        best_tid = p['tid']
+                if best_tid is not None:
+                    racket_scores[best_tid] = racket_scores.get(best_tid, 0) + 1
+                        
+            parsed_dets.append(frame_dets)
+            
+        if not frames:
+            return
+            
+        print(f"[{device}] Extracted {len(frames)} frames for scene {scene_idx}. Running YOLO...")
+        
+        sorted_racket = sorted(racket_scores.keys(), key=lambda t: racket_scores[t], reverse=True)
+        top_racket_tids = sorted_racket[:2]
+        
+        movement_scores = {}
+        for tid, points in global_centroids.items():
+            if len(points) < 5:
+                movement_scores[tid] = 0
+            else:
+                xs = [p[0] for p in points]
+                ys = [p[1] for p in points]
+                var = np.std(xs) + np.std(ys)
+                movement_scores[tid] = var
+                
+        sorted_movement = sorted(movement_scores.keys(), key=lambda t: movement_scores[t], reverse=True)
+        top_movement_tids = sorted_movement[:2]
+        
+        player_tids = set(top_racket_tids + top_movement_tids)
+        
+        print(f"[{device}] Scene {scene_idx} - Racket TIDs: {top_racket_tids}, Movement TIDs: {top_movement_tids}. Merged: {player_tids}")
+        
+        track_crops = {}
+        
+        for frame_id, (img, dets) in enumerate(zip(frames, parsed_dets)):
+            persons = []
+            rackets = []
+            balls = []
+            
+            for det in dets:
+                x1, y1, x2, y2 = det['bbox']
+                x1, y1 = max(0, x1), max(0, y1)
+                
+                if det['cls'] == 'person' and det['tid'] in player_tids:
+                    persons.append(det)
+                elif det['cls'] == 'tennis racket':
+                    rackets.append(det)
+                elif det['cls'] == 'tennis ball':
+                    balls.append(det)
+                    
+            for det_list in [persons, rackets, balls]:
+                for det in det_list:
+                    x1, y1, x2, y2 = det['bbox']
+                    crop_img = img[y1:y2, x1:x2]
+                    if crop_img.size == 0: continue
+                    
+                    crop_mask = det['mask']
+                    if crop_mask is not None:
+                        crop_mask = crop_mask[y1:y2, x1:x2]
+                    else:
+                        crop_mask = np.ones((y2-y1, x2-x1), dtype=np.uint8) * 255
+                        
+                    b, g, r_ch = cv2.split(crop_img)
+                    rgba = cv2.merge([b, g, r_ch, crop_mask])
+                    
+                    safe_cls = det['cls'].replace(' ', '_')
+                    tid_str = f"{det['tid']:04d}" if det.get('tid', -1) != -1 else "none"
+                    out_name = f"frame_{frame_id:06d}_track_{tid_str}_cls_{safe_cls}_bbox_{x1}_{y1}_{x2}_{y2}.png"
+                    cv2.imwrite(os.path.join(seg_dir, out_name), rgba)
+                    
+            fused_tracks = []
+            for p in persons:
+                px1, py1, px2, py2 = p['bbox']
+                
+                best_racket = None
+                best_iou = 0
+                for r in rackets:
+                    rx1, ry1, rx2, ry2 = r['bbox']
+                    inter_x1 = max(px1, rx1)
+                    inter_y1 = max(py1, ry1)
+                    inter_x2 = min(px2, rx2)
+                    inter_y2 = min(py2, ry2)
+                    if inter_x2 > inter_x1 and inter_y2 > inter_y1:
+                        inter_area = (inter_x2 - inter_x1) * (inter_y2 - inter_y1)
+                        r_area = (rx2 - rx1) * (ry2 - ry1)
+                        iou = inter_area / r_area
+                        if iou > best_iou:
+                            best_iou = iou
+                            best_racket = r
+                            
+                fused_tracks.append({
+                    'tid': p['tid'],
+                    'person': p,
+                    'racket': best_racket if best_iou > 0.1 else None,
+                    'ball': None 
+                })
+                
+            for track in fused_tracks:
+                tid = track['tid']
+                p_bbox = track['person']['bbox']
+                r_bbox = track['racket']['bbox'] if track['racket'] else None
+                
+                p_mask = track['person']['mask']
+                if r_bbox and track['racket']['mask'] is not None:
+                    p_mask = cv2.bitwise_or(p_mask, track['racket']['mask'])
+                
+                min_x = p_bbox[0]
+                min_y = p_bbox[1]
+                max_x = p_bbox[2]
+                max_y = p_bbox[3]
+                
+                if r_bbox:
+                    min_x = min(min_x, r_bbox[0])
+                    min_y = min(min_y, r_bbox[1])
+                    max_x = max(max_x, r_bbox[2])
+                    max_y = max(max_y, r_bbox[3])
+                    
+                w = max_x - min_x
+                h = max_y - min_y
+                size = max(w, h)
+                cx = min_x + w // 2
+                cy = min_y + h // 2
+                
+                pad = int(size * 0.2)
+                size += pad * 2
+                
+                x1 = max(0, cx - size // 2)
+                y1 = max(0, cy - size // 2)
+                x2 = min(img.shape[1], x1 + size)
+                y2 = min(img.shape[0], y1 + size)
+                
+                crop = img[y1:y2, x1:x2].copy()
+                crop_mask = p_mask[y1:y2, x1:x2] if p_mask is not None else None
+                
+                if crop_mask is not None:
+                    crop = cv2.bitwise_and(crop, crop, mask=crop_mask)
+                    
+                crop = cv2.resize(crop, (512, 512))
+                
+                if (tid, 'fused') not in track_crops:
+                    track_crops[(tid, 'fused')] = []
+                
+                track_crops[(tid, 'fused')].append({
+                    'frame_id': frame_id,
+                    'crop': crop,
+                    'bbox': (x1, y1, x2, y2)
+                })
+
+        for (tid, cls_name), items in track_crops.items():
+            if len(items) < 5:
+                continue
+                
+            out_video = os.path.join(videos_dir, f'scene_{scene_idx:03d}_track_{tid:04d}_{cls_name}.mp4')
+            out_meta = os.path.join(videos_dir, f'scene_{scene_idx:03d}_track_{tid:04d}_{cls_name}.json')
+            
+            meta_data = []
+            with tempfile.TemporaryDirectory() as tmp_vid_dir:
+                for i, item in enumerate(items):
+                    frame_path = os.path.join(tmp_vid_dir, f'frame_{i:06d}.png')
+                    cv2.imwrite(frame_path, item['crop'])
+                    meta_data.append({
+                        'frame_id': item['frame_id'],
+                        'bbox': item['bbox']
+                    })
+                    
+                cmd = [
+                    'ffmpeg', '-hide_banner', '-loglevel', 'error', '-y',
+                    '-framerate', str(fps),
+                    '-i', os.path.join(tmp_vid_dir, 'frame_%06d.png'),
+                    '-c:v', 'libsvtav1',
+                    '-preset', '4',
+                    '-crf', '15',
+                    '-pix_fmt', 'yuv420p10le',
+                    out_video
+                ]
+                subprocess.run(cmd, check=True)
+            
+            with open(out_meta, 'w') as f:
+                json.dump(meta_data, f, indent=2)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process dataset videos and classify scenes.')
     parser.add_argument('--input', required=True, help='Path to input video file or folder containing .mp4 files')
     parser.add_argument('--threshold', type=float, default=0.3, help='Scene detection threshold (default: 0.3)')
     parser.add_argument('--workers-per-gpu', type=int, default=3, help='Number of worker processes per GPU (default: 3)')
+    parser.add_argument('--stages', nargs='+', default=['classify', 'segment'], help='Stages to run: classify, segment')
     
     args = parser.parse_args()
     input_path = args.input
+    stages = args.stages
     
     if not os.path.exists(input_path):
         print(f"Error: Input path '{input_path}' does not exist.")
@@ -587,16 +1017,23 @@ if __name__ == '__main__':
     
     cpu_args = []
     for video in videos:
-        # We need to skip processing if it's already fully extracted, BUT process_cpu_phase handles that.
         cpu_args.append((video, threads_per_video))
         
     cpu_results = []
-    ctx = mp.get_context('spawn')
-    with ctx.Pool(processes=cpu_workers) as pool:
-        for result in pool.imap_unordered(process_cpu_phase, cpu_args):
-            cpu_results.append(result)
+    if 'classify' in stages:
+        ctx = mp.get_context('spawn')
+        with ctx.Pool(processes=cpu_workers) as pool:
+            for result in pool.imap_unordered(process_cpu_phase, cpu_args):
+                cpu_results.append(result)
+    else:
+        # Just populate results if skipping CPU phase
+        for video in videos:
+            vname = os.path.splitext(os.path.basename(video))[0]
+            dataset_dir = os.path.join(REPO_ROOT, 'assets', 'dataset', vname)
+            scenes_dir = os.path.join(dataset_dir, 'scenes')
+            cpu_results.append((video, scenes_dir))
             
-    # Phase 2: GPU-bound classification
+    # Phase 2: GPU-bound classification and segmentation
     print("\n--- PHASE 2: Scene Classification ---")
     gpu_devices = ['cuda:0', 'cuda:1']
     gpu_workers = 6 # Total GPU workers
@@ -606,10 +1043,13 @@ if __name__ == '__main__':
     for i, res in enumerate(cpu_results):
         video_path, scenes_dir = res
         device = gpu_devices[i % len(gpu_devices)]
-        gpu_args.append((video_path, scenes_dir, device))
-        
-    ctx = mp.get_context('spawn')
-    with ctx.Pool(processes=gpu_workers) as pool:
-        pool.map(process_gpu_phase, gpu_args)
+        gpu_args.append((video_path, scenes_dir, device, stages))
+    try:
+        from multiprocessing.dummy import Pool as ThreadPool
+        with ThreadPool(gpu_workers) as pool:
+            pool.map(process_gpu_phase, gpu_args)
+    except Exception as e:
+        print(f"Error during GPU phase: {e}")
         
     print("\nDataset processing complete!")
+
