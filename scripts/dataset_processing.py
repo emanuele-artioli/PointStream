@@ -164,10 +164,10 @@ def get_union(boxA, boxB):
         max(boxA[3], boxB[3])
     )
 
-def segment_and_fuse_scene(video_path, dataset_dir, scene_idx, t_start, t_end, device):
+def segment_and_fuse_scene(video_path, dataset_dir, scene_idx, t_start, t_end, device, debug_video=False):
     import multiprocessing as mp
     ctx = mp.get_context('spawn')
-    p = ctx.Process(target=_segment_and_fuse_scene_worker, args=(video_path, dataset_dir, scene_idx, t_start, t_end, device))
+    p = ctx.Process(target=_segment_and_fuse_scene_worker, args=(video_path, dataset_dir, scene_idx, t_start, t_end, device, debug_video))
     p.start()
     p.join()
     if p.exitcode != 0:
@@ -554,6 +554,9 @@ def classify_scenes(video_path, out_dir, device):
         base_name = f"{t_end:08.3f}_dur_{dur:.1f}_avg_{avg_s:.4f}_std_{std_s:.4f}_max_{max_score:.4f}_class_{classification}_conf_{cluster_conf:.2f}"
         frame_path = os.path.join(out_dir, f"{base_name}.jpg")
         
+        if os.path.exists(frame_path):
+            continue
+            
         t_first = t_start + 0.05
         t_last = max(t_start + 0.1, t_end - 0.05)
         
@@ -587,22 +590,26 @@ def classify_scenes(video_path, out_dir, device):
             } for s in scene_stats if s['classification'] != "error_blank"
         ]
     }
-    with open(os.path.join(dataset_dir, 'dynamic_cuts.json'), 'w') as f:
+    with open(os.path.join(dataset_dir, 'scene_metadata.json'), 'w') as f:
         json.dump(json_data, f, indent=4)
         
     print(f"[{device}] [classify_scenes] Finished {vname}")
 
 def process_gpu_phase(args):
-    video_path, scenes_dir, device, stages = args
+    video_path, scenes_dir, device, stages, pose_model, debug_video = args
+    vname = os.path.splitext(os.path.basename(video_path))[0]
+    dataset_dir = os.path.join(REPO_ROOT, 'assets', 'dataset', vname)
+    json_path = os.path.join(dataset_dir, 'scene_metadata.json')
+
     if 'classify' in stages:
-        classify_scenes(video_path, scenes_dir, device)
+        if os.path.exists(json_path):
+            print(f"[{device}] Classification for {vname} already exists. Skipping.")
+        else:
+            classify_scenes(video_path, scenes_dir, device)
         
-    if 'segment' in stages:
-        vname = os.path.splitext(os.path.basename(video_path))[0]
-        dataset_dir = os.path.join(REPO_ROOT, 'assets', 'dataset', vname)
-        json_path = os.path.join(dataset_dir, 'dynamic_cuts.json')
+    if 'segment' in stages or 'pose' in stages or 'skeleton' in stages:
         if not os.path.exists(json_path):
-            print(f"[{device}] No cuts found for {vname}, skipping segment.")
+            print(f"[{device}] No cuts found for {vname}, skipping downstream.")
             return
             
         with open(json_path, 'r') as f:
@@ -611,8 +618,21 @@ def process_gpu_phase(args):
         scenes = data.get('scenes', [])
         for i, s in enumerate(scenes):
             if s['cluster'] == 'cluster_point':
-                print(f"[{device}] Segmenting scene {i} ({s['t_start']:.2f}s - {s['t_end']:.2f}s)")
-                segment_and_fuse_scene(video_path, dataset_dir, i, s['t_start'], s['t_end'], device)
+                if 'segment' in stages:
+                    seg_dir = os.path.join(dataset_dir, 'segmentations', f'scene_{i:03d}')
+                    if os.path.exists(seg_dir) and len(os.listdir(seg_dir)) > 0:
+                        print(f"[{device}] Segmentations for scene {i} already exist. Skipping.")
+                    else:
+                        print(f"[{device}] Segmenting scene {i} ({s['t_start']:.2f}s - {s['t_end']:.2f}s)")
+                        segment_and_fuse_scene(video_path, dataset_dir, i, s['t_start'], s['t_end'], device, debug_video)
+                
+                if 'pose' in stages:
+                    print(f"[{device}] Extracting pose for scene {i}")
+                    _extract_pose_worker(video_path, dataset_dir, i, device, pose_model)
+                    
+                if 'skeleton' in stages:
+                    print(f"[{device}] Rendering skeleton for scene {i}")
+                    _render_skeleton_worker(video_path, dataset_dir, i, device)
 
 
 '''
@@ -630,7 +650,7 @@ def get_iou(boxA, boxB):
             boxBArea = (boxB[2] - boxB[0]) * (boxB[3] - boxB[1])
             return interArea / float(boxAArea + boxBArea - interArea + 1e-6)
 
-def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, t_end, device):
+def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, t_end, device, debug_video=False):
 
     
     REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -696,7 +716,7 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
             return dx * scale_x, dy * scale_y
 
         parsed_dets = []
-        frames = []
+        cumulative_rackets = 0
         
         active_tracks = {}
         next_tid = 1
@@ -711,7 +731,7 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
             img = cv2.imread(fpath)
             if img is None:
                 continue
-            frames.append(img)
+            
             
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             if prev_gray is not None:
@@ -741,19 +761,34 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
                     tid = -1
                     if cls_name == 'person':
                         best_iou = 0.1
-                        for t, t_bbox in active_tracks.items():
+                        best_dist = 150.0 # max distance to link
+                        for t, t_info in active_tracks.items():
                             if t in current_frame_tids:
                                 continue
-                            iou = get_iou(bbox, t_bbox)
-                            if iou > best_iou:
-                                best_iou = iou
-                                tid = t
+                            t_bbox = t_info['bbox']
+                            gap = frame_id - t_info['last_seen']
+                            
+                            if gap <= 30: # stitch up to ~4 seconds gap
+                                iou = get_iou(bbox, t_bbox)
+                                if iou > best_iou:
+                                    best_iou = iou
+                                    tid = t
+                                    best_dist = 0 # Priority over pure distance
+                                
+                                if best_iou == 0.1: # Fallback to proximity
+                                    cx1, cy1 = (bbox[0]+bbox[2])/2.0, (bbox[1]+bbox[3])/2.0
+                                    cx2, cy2 = (t_bbox[0]+t_bbox[2])/2.0, (t_bbox[1]+t_bbox[3])/2.0
+                                    import math
+                                    dist = math.sqrt((cx1-cx2)**2 + (cy1-cy2)**2)
+                                    if dist < best_dist:
+                                        best_dist = dist
+                                        tid = t
                         
                         if tid == -1:
                             tid = next_tid
                             next_tid += 1
                             
-                        active_tracks[tid] = bbox
+                        active_tracks[tid] = {'bbox': bbox, 'last_seen': frame_id}
                         current_frame_tids.add(tid)
                         
                         cx = (x1 + x2) / 2.0
@@ -765,8 +800,6 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
                     mask_data = None
                     if result.masks is not None:
                         m = np.array(result.masks.data[i].cpu().tolist(), dtype=np.float32)
-                        if m.shape != img.shape[:2]:
-                            m = cv2.resize(m, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_NEAREST)
                         mask_data = (m > 0.5).astype(np.uint8) * 255
                         
                     frame_dets.append({
@@ -776,6 +809,7 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
             
             rackets = [d for d in frame_dets if d['cls'] == 'tennis racket']
             persons = [d for d in frame_dets if d['cls'] == 'person']
+            cumulative_rackets += len(rackets)
             
             for r in rackets:
                 rx = (r['bbox'][0] + r['bbox'][2]) / 2.0
@@ -794,10 +828,14 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
                         
             parsed_dets.append(frame_dets)
             
-        if not frames:
+            if frame_id == 240 and cumulative_rackets == 0:
+                print(f"[{device}] Scene {scene_idx} aborted early: 0 rackets found in first 30s.")
+                return
+            
+        if not parsed_dets:
             return
             
-        print(f"[{device}] Extracted {len(frames)} frames for scene {scene_idx}. Running YOLO...")
+        print(f"[{device}] YOLO prediction finished for scene {scene_idx} ({len(frame_files)} frames).")
         
         sorted_racket = sorted(racket_scores.keys(), key=lambda t: racket_scores[t], reverse=True)
         top_racket_tids = sorted_racket[:2]
@@ -821,7 +859,10 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
         
         track_crops = {}
         
-        for frame_id, (img, dets) in enumerate(zip(frames, parsed_dets)):
+        for frame_id, fpath in enumerate(frame_files):
+            img = cv2.imread(fpath)
+            if img is None: continue
+            dets = parsed_dets[frame_id]
             persons = []
             rackets = []
             balls = []
@@ -836,26 +877,6 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
                     rackets.append(det)
                 elif det['cls'] == 'tennis ball':
                     balls.append(det)
-                    
-            for det_list in [persons, rackets, balls]:
-                for det in det_list:
-                    x1, y1, x2, y2 = det['bbox']
-                    crop_img = img[y1:y2, x1:x2]
-                    if crop_img.size == 0: continue
-                    
-                    crop_mask = det['mask']
-                    if crop_mask is not None:
-                        crop_mask = crop_mask[y1:y2, x1:x2]
-                    else:
-                        crop_mask = np.ones((y2-y1, x2-x1), dtype=np.uint8) * 255
-                        
-                    b, g, r_ch = cv2.split(crop_img)
-                    rgba = cv2.merge([b, g, r_ch, crop_mask])
-                    
-                    safe_cls = det['cls'].replace(' ', '_')
-                    tid_str = f"{det['tid']:04d}" if det.get('tid', -1) != -1 else "none"
-                    out_name = f"frame_{frame_id:06d}_track_{tid_str}_cls_{safe_cls}_bbox_{x1}_{y1}_{x2}_{y2}.png"
-                    cv2.imwrite(os.path.join(seg_dir, out_name), rgba)
                     
             fused_tracks = []
             for p in persons:
@@ -890,82 +911,211 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
                 r_bbox = track['racket']['bbox'] if track['racket'] else None
                 
                 p_mask = track['person']['mask']
+                if p_mask is not None and p_mask.shape != img.shape[:2]:
+                    p_mask = cv2.resize(p_mask, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_NEAREST)
+                    
                 if r_bbox and track['racket']['mask'] is not None:
-                    p_mask = cv2.bitwise_or(p_mask, track['racket']['mask'])
+                    r_mask = track['racket']['mask']
+                    if r_mask.shape != img.shape[:2]:
+                        r_mask = cv2.resize(r_mask, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_NEAREST)
+                    if p_mask is not None:
+                        p_mask = cv2.bitwise_or(p_mask, r_mask)
+                    else:
+                        p_mask = r_mask
                 
-                min_x = p_bbox[0]
-                min_y = p_bbox[1]
-                max_x = p_bbox[2]
-                max_y = p_bbox[3]
+                min_x = max(0, p_bbox[0])
+                min_y = max(0, p_bbox[1])
+                max_x = min(img.shape[1], p_bbox[2])
+                max_y = min(img.shape[0], p_bbox[3])
                 
                 if r_bbox:
-                    min_x = min(min_x, r_bbox[0])
-                    min_y = min(min_y, r_bbox[1])
-                    max_x = max(max_x, r_bbox[2])
-                    max_y = max(max_y, r_bbox[3])
-                    
-                w = max_x - min_x
-                h = max_y - min_y
-                size = max(w, h)
-                cx = min_x + w // 2
-                cy = min_y + h // 2
+                    min_x = max(0, min(min_x, r_bbox[0]))
+                    min_y = max(0, min(min_y, r_bbox[1]))
+                    max_x = min(img.shape[1], max(max_x, r_bbox[2]))
+                    max_y = min(img.shape[0], max(max_y, r_bbox[3]))
                 
-                pad = int(size * 0.2)
-                size += pad * 2
-                
-                x1 = max(0, cx - size // 2)
-                y1 = max(0, cy - size // 2)
-                x2 = min(img.shape[1], x1 + size)
-                y2 = min(img.shape[0], y1 + size)
-                
-                crop = img[y1:y2, x1:x2].copy()
-                crop_mask = p_mask[y1:y2, x1:x2] if p_mask is not None else None
+                crop = img[min_y:max_y, min_x:max_x].copy()
+                crop_mask = p_mask[min_y:max_y, min_x:max_x] if p_mask is not None else None
                 
                 if crop_mask is not None:
-                    crop = cv2.bitwise_and(crop, crop, mask=crop_mask)
+                    b, g, r_ch = cv2.split(crop)
+                    crop_rgba = cv2.merge([b, g, r_ch, crop_mask])
+                else:
+                    b, g, r_ch = cv2.split(crop)
+                    alpha = np.ones((crop.shape[0], crop.shape[1]), dtype=np.uint8) * 255
+                    crop_rgba = cv2.merge([b, g, r_ch, alpha])
                     
-                crop = cv2.resize(crop, (512, 512))
+                track_dir = os.path.join(seg_dir, f'track_{tid:04d}')
+                os.makedirs(track_dir, exist_ok=True)
+                out_path = os.path.join(track_dir, f'frame_{frame_id:06d}.png')
+                cv2.imwrite(out_path, crop_rgba)
                 
                 if (tid, 'fused') not in track_crops:
                     track_crops[(tid, 'fused')] = []
                 
+                if r_bbox:
+                    rx1, ry1, rx2, ry2 = r_bbox
+                    racket_bbox_crop = [
+                        (rx1 - min_x),
+                        (ry1 - min_y),
+                        (rx2 - min_x),
+                        (ry2 - min_y)
+                    ]
+                else:
+                    racket_bbox_crop = None
+
                 track_crops[(tid, 'fused')].append({
                     'frame_id': frame_id,
-                    'crop': crop,
-                    'bbox': (x1, y1, x2, y2)
+                    'bbox': (min_x, min_y, max_x, max_y),
+                    'racket_bbox_crop': racket_bbox_crop
                 })
 
         for (tid, cls_name), items in track_crops.items():
             if len(items) < 5:
                 continue
                 
-            out_video = os.path.join(videos_dir, f'scene_{scene_idx:03d}_track_{tid:04d}_{cls_name}.mp4')
-            out_meta = os.path.join(videos_dir, f'scene_{scene_idx:03d}_track_{tid:04d}_{cls_name}.json')
-            
+            track_meta_file = os.path.join(seg_dir, f'track_{tid:04d}_metadata.json')
             meta_data = []
-            with tempfile.TemporaryDirectory() as tmp_vid_dir:
-                for i, item in enumerate(items):
-                    frame_path = os.path.join(tmp_vid_dir, f'frame_{i:06d}.png')
-                    cv2.imwrite(frame_path, item['crop'])
-                    meta_data.append({
-                        'frame_id': item['frame_id'],
-                        'bbox': item['bbox']
-                    })
-                    
+            for item in items:
+                meta_data.append({
+                    'frame_id': item['frame_id'],
+                    'bbox': item['bbox'],
+                    'racket_bbox_crop': item.get('racket_bbox_crop')
+                })
+            with open(track_meta_file, 'w') as f:
+                json.dump(meta_data, f, indent=2)
+                
+            if debug_video:
+                out_video = os.path.join(videos_dir, f'scene_{scene_idx:03d}_track_{tid:04d}_{cls_name}_debug.mp4')
                 cmd = [
                     'ffmpeg', '-hide_banner', '-loglevel', 'error', '-y',
                     '-framerate', str(fps),
-                    '-i', os.path.join(tmp_vid_dir, 'frame_%06d.png'),
-                    '-c:v', 'libsvtav1',
-                    '-preset', '4',
-                    '-crf', '15',
-                    '-pix_fmt', 'yuv420p10le',
+                    '-i', os.path.join(seg_dir, f'track_{tid:04d}', 'frame_%06d.png'),
+                    '-vf', 'pad=ceil(iw/2)*2:ceil(ih/2)*2',
+                    '-c:v', 'libx264',
+                    '-preset', 'fast',
+                    '-crf', '22',
+                    '-pix_fmt', 'yuv420p',
                     out_video
                 ]
-                subprocess.run(cmd, check=True)
+                subprocess.run(cmd, check=False)
+
+
+def _extract_pose_worker(video_path, dataset_dir, scene_idx, device, pose_model_name):
+    seg_dir = os.path.join(dataset_dir, 'segmentations', f'scene_{scene_idx:03d}')
+    videos_dir = os.path.join(dataset_dir, 'videos')
+    if not os.path.exists(videos_dir): return
+    
+    import glob
+    import json
+    from ultralytics import YOLO
+    from src.encoder.actor_components import coco17_to_dwpose18
+    import torch
+    
+    REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    weights_path = os.path.join(REPO_ROOT, 'assets', 'weights', pose_model_name)
+    
+    model = None
+    
+    track_dirs = glob.glob(os.path.join(seg_dir, 'track_*'))
+    for tdir in track_dirs:
+        tid = os.path.basename(tdir).split('_')[1]
+        out_json = os.path.join(seg_dir, f'track_{tid}_keypoints.json')
+        if os.path.exists(out_json):
+            continue
             
-            with open(out_meta, 'w') as f:
-                json.dump(meta_data, f, indent=2)
+        if model is None:
+            model = YOLO(weights_path)
+            model.to(device)
+            
+        import cv2
+        frame_files = sorted(glob.glob(os.path.join(tdir, '*.png')))
+        all_kpts = []
+        for frame_idx, fpath in enumerate(frame_files):
+            frame = cv2.imread(fpath)
+            if frame is None:
+                all_kpts.append({'frame_id': frame_idx, 'keypoints': None})
+                continue
+                
+            # Drop alpha channel for YOLO
+            if frame.shape[2] == 4:
+                frame = frame[:, :, :3]
+                
+            results = model.predict(frame, verbose=False)
+            if len(results) > 0 and results[0].keypoints is not None and len(results[0].keypoints.xy) > 0:
+                xy = results[0].keypoints.xy[0].cpu().numpy()
+                conf = results[0].keypoints.conf[0].cpu().numpy()
+                coco17 = np.concatenate([xy, conf[:, None]], axis=-1)
+                dw18 = coco17_to_dwpose18(coco17)
+                all_kpts.append({
+                    'frame_id': frame_idx,
+                    'keypoints': dw18.tolist()
+                })
+            else:
+                all_kpts.append({
+                    'frame_id': frame_idx,
+                    'keypoints': None
+                })
+            
+        with open(out_json, 'w') as f:
+            json.dump(all_kpts, f, indent=2)
+
+def _render_skeleton_worker(video_path, dataset_dir, scene_idx, device):
+    videos_dir = os.path.join(dataset_dir, 'videos')
+    if not os.path.exists(videos_dir): return
+    
+    import glob
+    import json
+    import numpy as np
+    import tempfile
+    import subprocess
+    import cv2
+    from src.shared.racket_heuristic import render_pose_with_racket
+    
+    seg_dir = os.path.join(dataset_dir, 'segmentations', f'scene_{scene_idx:03d}')
+    track_dirs = glob.glob(os.path.join(seg_dir, 'track_*'))
+    for tdir in track_dirs:
+        if tdir.endswith('_skeleton'): continue
+        tid = os.path.basename(tdir).split('_')[1]
+        
+        meta_path = os.path.join(seg_dir, f'track_{tid}_metadata.json')
+        kpt_path = os.path.join(seg_dir, f'track_{tid}_keypoints.json')
+        out_skel_dir = os.path.join(seg_dir, f'track_{tid}_skeleton')
+        
+        if os.path.exists(out_skel_dir):
+            continue
+            
+        if not os.path.exists(meta_path) or not os.path.exists(kpt_path):
+            continue
+            
+        with open(meta_path, 'r') as f:
+            meta_data = json.load(f)
+            
+        with open(kpt_path, 'r') as f:
+            kpt_data = json.load(f)
+            
+        if len(meta_data) != len(kpt_data):
+            continue
+            
+        os.makedirs(out_skel_dir, exist_ok=True)
+        for i, (m, k) in enumerate(zip(meta_data, kpt_data)):
+            kpts = k['keypoints']
+            racket_bbox = m.get('racket_bbox_crop')
+            
+            # Use original bbox to determine canvas size since crops are native res
+            w = m['bbox'][2] - m['bbox'][0]
+            h = m['bbox'][3] - m['bbox'][1]
+            
+            if kpts is not None:
+                kpts_np = np.array(kpts, dtype=np.float32)
+                if racket_bbox is None:
+                    racket_bbox = (0.0, 0.0, 0.0, 0.0)
+                canvas = render_pose_with_racket(kpts_np, tuple(racket_bbox), int(h), int(w))
+            else:
+                canvas = np.zeros((int(h), int(w), 3), dtype=np.uint8)
+                
+            frame_path = os.path.join(out_skel_dir, f'frame_{i:06d}.png')
+            cv2.imwrite(frame_path, canvas)
 
 
 if __name__ == '__main__':
@@ -973,11 +1123,15 @@ if __name__ == '__main__':
     parser.add_argument('--input', required=True, help='Path to input video file or folder containing .mp4 files')
     parser.add_argument('--threshold', type=float, default=0.3, help='Scene detection threshold (default: 0.3)')
     parser.add_argument('--workers-per-gpu', type=int, default=3, help='Number of worker processes per GPU (default: 3)')
-    parser.add_argument('--stages', nargs='+', default=['classify', 'segment'], help='Stages to run: classify, segment')
+    parser.add_argument('--pose-model', type=str, default='yolov8n-pose.pt', help='Pose model to use for keypoint extraction')
+    parser.add_argument('--stages', nargs='+', default=['classify', 'segment', 'pose', 'skeleton'], help='Stages to run: classify, segment, pose, skeleton')
+    parser.add_argument('--debug-video', action='store_true', help='Generate AVC debug videos for stitched tracks')
     
     args = parser.parse_args()
     input_path = args.input
     stages = args.stages
+    pose_model = args.pose_model
+    debug_video = args.debug_video
     
     if not os.path.exists(input_path):
         print(f"Error: Input path '{input_path}' does not exist.")
@@ -1043,7 +1197,7 @@ if __name__ == '__main__':
     for i, res in enumerate(cpu_results):
         video_path, scenes_dir = res
         device = gpu_devices[i % len(gpu_devices)]
-        gpu_args.append((video_path, scenes_dir, device, stages))
+        gpu_args.append((video_path, scenes_dir, device, stages, pose_model, debug_video))
     try:
         from multiprocessing.dummy import Pool as ThreadPool
         with ThreadPool(gpu_workers) as pool:
