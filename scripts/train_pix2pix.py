@@ -172,12 +172,7 @@ def main_worker(gpu, ngpus_per_node, args):
     criterion_GAN = nn.BCEWithLogitsLoss().to(device)
     criterion_pixelwise = nn.L1Loss().to(device)
 
-    transform_pipeline = transforms.Compose([
-        transforms.Resize((args.img_size, args.img_size * 3), Image.BICUBIC),
-        transforms.ToTensor(),
-    ])
-
-    dataset = TennisSkeletonDataset(args.data_root, subset=args.subset, transform=transform_pipeline)
+    dataset = TennisSkeletonDataset(args.data_root, target_size=args.img_size, include_reference=True)
 
     if ngpus_per_node > 1:
         sampler = DistributedSampler(dataset)
@@ -216,8 +211,9 @@ def main_worker(gpu, ngpus_per_node, args):
         else:
             iterator = enumerate(dataloader)
 
-        for i, (real_A, real_B) in iterator:
+        for i, (real_A, ref_img, real_B) in iterator:
             real_A = real_A.to(device)
+            ref_img = ref_img.to(device)
             real_B = real_B.to(device)
 
             valid = torch.ones((real_A.size(0), 1, real_A.size(2) // 16, real_A.size(3) // 16), device=device, requires_grad=False)
@@ -296,8 +292,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
 def main():
     parser = argparse.ArgumentParser(description="Train Pix2Pix for Pointstream GenAI Backend")
-    parser.add_argument("--data-root", type=str, default="assets/dataset/pix2pix", help="Path to pix2pix dataset root")
-    parser.add_argument("--subset", type=str, default="all", help="Subset folder name inside data-root or 'all' to use all subsets")
+    parser.add_argument("--data-root", type=str, default="assets/dataset", help="Path to dataset root")
     parser.add_argument("--epochs", type=int, default=200)
     parser.add_argument("--batch-size", type=str, default="auto", help="Batch size per GPU ('auto' maps to 64)")
     parser.add_argument("--img-size", type=int, default=512)

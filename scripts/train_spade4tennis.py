@@ -489,12 +489,11 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
     vgg_loss = VGG19PerceptualLoss(weights_path=vgg_weights).to(device)
 
     # --- Data ---
-    transform_pipeline = transforms.Compose([
-        transforms.Resize((args.img_size, args.img_size * 3), Image.BICUBIC),
-        transforms.ToTensor(),
-    ])
-
-    dataset = TennisSkeletonDataset(args.data_root, subset=args.subset, transform=transform_pipeline, include_reference=True)
+    dataset = TennisSkeletonDataset(
+        root_dir=args.data_root, 
+        target_size=args.img_size, 
+        include_reference=True
+    )
 
     if ngpus_per_node > 1:
         sampler = DistributedSampler(dataset)
@@ -663,8 +662,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Train Spade4Tennis for Pointstream GenAI Backend")
     parser.add_argument("--model-size", type=str, default="lite", choices=["lite", "full"],
                         help="Model tier: lite (ResNet-9, fast) or full (with local enhancer)")
-    parser.add_argument("--data-root", type=str, default="assets/dataset/pix2pix",
-                        help="Path to dataset root")
+    parser.add_argument("--data-root", type=str, default="assets/dataset", help="Dataset root path")
     parser.add_argument("--subset", type=str, default="all",
                         help="Subset name or 'all'")
     parser.add_argument("--epochs", type=int, default=200)
