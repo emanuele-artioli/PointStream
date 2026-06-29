@@ -556,47 +556,6 @@ def classify_scenes(video_path, out_dir, device):
     print(f"[{device}] [classify_scenes] Finished {vname}")
 
 
-def _build_training_pairs_worker(video_path, dataset_dir, scene_idx, device):
-    import glob
-    import os
-    import shutil
-    
-    seg_dir = os.path.join(dataset_dir, 'segmentations', f'scene_{scene_idx:03d}')
-    out_dir = os.path.join(dataset_dir, 'training_pairs', f'scene_{scene_idx:03d}')
-    videos_dir = os.path.join(dataset_dir, 'videos')
-    
-    if not os.path.exists(seg_dir) or not os.path.exists(videos_dir):
-        return
-        
-    track_dirs = glob.glob(os.path.join(seg_dir, 'track_*_skeleton'))
-    if len(track_dirs) < 2:
-        print(f"[{device}] Scene {scene_idx} rejected: not enough players.")
-        return
-        
-    os.makedirs(out_dir, exist_ok=True)
-    
-    # We will copy color frames and skeletons
-    for tdir in track_dirs:
-        tid = os.path.basename(tdir).split('_')[1]
-        skel_frames = glob.glob(os.path.join(tdir, 'frame_*.png'))
-        if len(skel_frames) < 10:
-            continue
-            
-        tid_out = os.path.join(out_dir, f"track_{tid}")
-        os.makedirs(tid_out, exist_ok=True)
-        
-        for sf in skel_frames:
-            fname = os.path.basename(sf)
-            shutil.copy(sf, os.path.join(tid_out, f"skeleton_{fname}"))
-            
-            # Crop corresponding color frame? 
-            # In Spade4Tennis dataset, we need color crops and skeletons. 
-            # But wait, color frames are cropped in tracking logic! We should use crop from metadata if needed.
-            # For now, just indicate it was processed.
-            pass
-            
-    print(f"[{device}] Built training pairs for scene {scene_idx}")
-
 def process_gpu_phase(args):
     video_path, scenes_dir, device, stages, pose_model, debug_video = args
     vname = os.path.splitext(os.path.basename(video_path))[0]
@@ -636,9 +595,7 @@ def process_gpu_phase(args):
                     print(f"[{device}] Rendering skeleton for scene {i}")
                     _render_skeleton_worker(video_path, dataset_dir, i, device)
 
-                if 'build_training_pairs' in stages:
-                    print(f"[{device}] Building training pairs for scene {i}")
-                    _build_training_pairs_worker(video_path, dataset_dir, i, device)
+
 
 
 
@@ -668,7 +625,7 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
         except Exception:
             pass
             
-    fps = 8
+    fps = 24
     
     with tempfile.TemporaryDirectory() as tmp_frames_dir:
         cmd = [
@@ -676,7 +633,7 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
             '-ss', str(t_start),
             '-i', video_path,
             '-t', str(t_end - t_start),
-            '-r', '8',
+            '-r', '24',
             os.path.join(tmp_frames_dir, 'frame_%06d.png')
         ]
         
@@ -772,9 +729,6 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
             
         print(f"[{device}] YOLO prediction finished for scene {scene_idx} ({len(frame_files)} frames).")
         
-        sorted_racket = sorted(racket_scores.keys(), key=lambda t: racket_scores[t], reverse=True)
-        top_racket_tids = sorted_racket[:2]
-        
         movement_scores = {}
         for tid, points in global_centroids.items():
             if len(points) < 5:
@@ -783,14 +737,25 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
                 xs = [p[0] for p in points]
                 ys = [p[1] for p in points]
                 var = np.std(xs) + np.std(ys)
-                movement_scores[tid] = var
+                movement_scores[tid] = float(var)
                 
-        sorted_movement = sorted(movement_scores.keys(), key=lambda t: movement_scores[t], reverse=True)
-        top_movement_tids = sorted_movement[:2]
+        # Normalize movement scores to combine with racket scores
+        max_movement = max(movement_scores.values()) if movement_scores else 1.0
+        if max_movement == 0: max_movement = 1.0
         
-        player_tids = set(top_racket_tids + top_movement_tids)
+        combined_scores = {}
+        all_tids = set(racket_scores.keys()).union(set(movement_scores.keys()))
+        for tid in all_tids:
+            # Racket score is dominant (each racket assoc is a big deal)
+            # Give it a heavy weight so 1 racket assoc > any amount of movement
+            r_score = racket_scores.get(tid, 0) * 1000.0
+            m_score = (movement_scores.get(tid, 0) / max_movement) * 100.0
+            combined_scores[tid] = r_score + m_score
+
+        sorted_tids = sorted(combined_scores.keys(), key=lambda t: combined_scores[t], reverse=True)
+        player_tids = set(sorted_tids[:2])
         
-        print(f"[{device}] Scene {scene_idx} - Racket TIDs: {top_racket_tids}, Movement TIDs: {top_movement_tids}. Merged: {player_tids}")
+        print(f"[{device}] Scene {scene_idx} - Selected TIDs: {player_tids}")
         
         track_crops = {}
         
@@ -810,8 +775,6 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
                     persons.append(det)
                 elif det['cls'] == 'tennis racket':
                     rackets.append(det)
-                elif det['cls'] == 'tennis ball':
-                    balls.append(det)
                     
             fused_tracks = []
             for p in persons:
@@ -1129,10 +1092,9 @@ if __name__ == '__main__':
     parser.add_argument('--input', required=True, help='Path to input video file or folder containing .mp4 files')
     parser.add_argument('--threshold', type=float, default=0.3, help='Scene detection threshold (default: 0.3)')
     parser.add_argument('--workers-per-gpu', type=int, default=3, help='Number of worker processes per GPU (default: 3)')
-    parser.add_argument('--pose-model', type=str, default='yolov8n-pose.pt', help='Pose model to use for keypoint extraction')
-    parser.add_argument('--stages', nargs='+', default=['classify', 'segment', 'pose', 'skeleton', 'build_training_pairs'], help='Stages to run')
+    parser.add_argument('--pose-model', type=str, default='yolov8x-pose.pt', help='Pose model to use for keypoint extraction')
+    parser.add_argument('--stages', nargs='+', default=['classify', 'segment', 'pose', 'skeleton'], help='Stages to run')
     parser.add_argument('--debug-video', action='store_true', help='Generate AVC debug videos for stitched tracks')
-    parser.add_argument('--build-training-pairs', action='store_true', help='Copy valid scenes to training dataset folders')
     
     args = parser.parse_args()
     input_path = args.input

@@ -175,16 +175,21 @@ def render_pose_with_racket(
         hx1, hy1 = int(round(racket_skel['head_left'][0])), int(round(racket_skel['head_left'][1]))
         hx2, hy2 = int(round(racket_skel['head_right'][0])), int(round(racket_skel['head_right'][1]))
         
+        # Calculate dynamic line thickness based on canvas size
+        stick_width = max(1, int(round(min(width, height) / 80)))
+        head_width = max(1, int(round(min(width, height) / 100)))
+        circle_radius = max(1, int(round(min(width, height) / 90)))
+        
         # Draw racket shaft (wrist to tip)
-        cv2.line(canvas, (wx, wy), (tx, ty), (255, 255, 255), 4, cv2.LINE_AA)
+        cv2.line(canvas, (wx, wy), (tx, ty), (255, 255, 255), stick_width, cv2.LINE_AA)
         
         # Draw racket head width
-        cv2.line(canvas, (hx1, hy1), (hx2, hy2), (200, 200, 200), 3, cv2.LINE_AA)
+        cv2.line(canvas, (hx1, hy1), (hx2, hy2), (200, 200, 200), head_width, cv2.LINE_AA)
         
         # Draw points
-        cv2.circle(canvas, (wx, wy), 5, (0, 0, 255), -1, cv2.LINE_AA) # wrist (red)
-        cv2.circle(canvas, (cx, cy), 5, (0, 255, 0), -1, cv2.LINE_AA) # center (green)
-        cv2.circle(canvas, (tx, ty), 5, (255, 0, 0), -1, cv2.LINE_AA) # tip (blue)
+        cv2.circle(canvas, (wx, wy), circle_radius, (0, 0, 255), -1, cv2.LINE_AA) # wrist (red)
+        cv2.circle(canvas, (cx, cy), circle_radius, (0, 255, 0), -1, cv2.LINE_AA) # center (green)
+        cv2.circle(canvas, (tx, ty), circle_radius, (255, 0, 0), -1, cv2.LINE_AA) # tip (blue)
 
     return canvas
 

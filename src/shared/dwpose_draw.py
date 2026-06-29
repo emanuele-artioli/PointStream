@@ -100,7 +100,8 @@ def _draw_dwpose_fallback(people_dw: np.ndarray, height: int, width: int, confid
         (255, 0, 170),
         (255, 0, 85),
     ]
-    stick_width = 4
+    stick_width = max(1, int(round(min(width, height) / 80)))
+    circle_radius = max(1, int(round(min(width, height) / 100)))
 
     for person in people:
         valid = person[:, 2] >= confidence_threshold
@@ -137,7 +138,7 @@ def _draw_dwpose_fallback(people_dw: np.ndarray, height: int, width: int, confid
         for idx in np.where(valid)[0]:
             x = int(np.clip(round(float(person[idx, 0]) * float(width)), 0, width - 1))
             y = int(np.clip(round(float(person[idx, 1]) * float(height)), 0, height - 1))
-            cv2.circle(canvas, (x, y), 4, colors[int(idx)], thickness=-1, lineType=cv2.LINE_AA)
+            cv2.circle(canvas, (x, y), circle_radius, colors[int(idx)], thickness=-1, lineType=cv2.LINE_AA)
 
     return canvas
 
