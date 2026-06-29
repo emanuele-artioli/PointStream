@@ -39,7 +39,7 @@ def get_dominant_wrist(person_kpts: np.ndarray, racket_bbox: Optional[Tuple[floa
     else:
         return (float(l_wrist[0]), float(l_wrist[1]), 7)
 
-def get_racket_heuristic_skeleton(person_kpts: np.ndarray, racket_bbox: Optional[Tuple[float, float, float, float]], dominant_hand: Optional[int] = None) -> Optional[dict]:
+def get_racket_heuristic_skeleton(person_kpts: np.ndarray, racket_bbox: Optional[Tuple[float, float, float, float]], dominant_hand: Optional[int] = None, racket_mask_points: Optional[dict] = None) -> Optional[dict]:
     """
     Computes the heuristic racket skeleton.
     Returns a dict with:
@@ -67,36 +67,67 @@ def get_racket_heuristic_skeleton(person_kpts: np.ndarray, racket_bbox: Optional
     if vx == 0 and vy == 0:
         return None
 
-    # Find tip (intersection of ray from wrist through center with bbox)
-    t_x = float('inf')
-    if vx > 0:
-        t_x = (rx2 - wx) / vx
-    elif vx < 0:
-        t_x = (rx1 - wx) / vx
+    # If we have the exact points from the mask's convex hull, use them!
+    if racket_mask_points is not None:
+        p1 = racket_mask_points['p1']
+        p2 = racket_mask_points['p2']
+        p3 = racket_mask_points['p3']
+        p4 = racket_mask_points['p4']
+        
+        # Which point is the handle? (closest to wrist)
+        dist_p1 = math.hypot(wx - p1[0], wy - p1[1])
+        dist_p2 = math.hypot(wx - p2[0], wy - p2[1])
+        
+        if dist_p1 < dist_p2:
+            base = p1
+            tip = p2
+        else:
+            base = p2
+            tip = p1
+            
+        # Tie the handle strictly to the wrist to avoid floating disconnected rackets
+        offset_x = wx - base[0]
+        offset_y = wy - base[1]
+        
+        return {
+            'handle_base': (wx, wy),
+            'center': (((base[0] + tip[0]) / 2.0) + offset_x, ((base[1] + tip[1]) / 2.0) + offset_y),
+            'tip': (tip[0] + offset_x, tip[1] + offset_y),
+            'head_left': (p3[0] + offset_x, p3[1] + offset_y),
+            'head_right': (p4[0] + offset_x, p4[1] + offset_y)
+        }
+    else:
+        # Fallback to AABB intersection (can inflate width if racket is diagonal)
+        t_x = float('inf')
+        if vx > 0:
+            t_x = (rx2 - wx) / vx
+        elif vx < 0:
+            t_x = (rx1 - wx) / vx
 
-    t_y = float('inf')
-    if vy > 0:
-        t_y = (ry2 - wy) / vy
-    elif vy < 0:
-        t_y = (ry1 - wy) / vy
+        t_y = float('inf')
+        if vy > 0:
+            t_y = (ry2 - wy) / vy
+        elif vy < 0:
+            t_y = (ry1 - wy) / vy
 
-    t = min(t_x, t_y)
-    tx = wx + t * vx
-    ty = wy + t * vy
+        t = min(t_x, t_y)
+        tx = wx + t * vx
+        ty = wy + t * vy
 
-    # Find head width points (perpendicular line passing through center, bounded by bbox)
-    length = math.hypot(vx, vy)
-    nx = -vy / length
-    ny = vx / length
+        # Find head width points (perpendicular line passing through center, bounded by bbox)
+        length = math.hypot(vx, vy)
+        nx = -vy / length if length > 0 else 0
+        ny = vx / length if length > 0 else 0
 
-    s_x = float('inf')
-    if nx != 0:
-        s_x = min(abs((rx2 - cx) / nx), abs((rx1 - cx) / nx))
-    s_y = float('inf')
-    if ny != 0:
-        s_y = min(abs((ry2 - cy) / ny), abs((ry1 - cy) / ny))
+        s_x = float('inf')
+        if nx != 0:
+            s_x = min(abs((rx2 - cx) / nx), abs((rx1 - cx) / nx))
+        s_y = float('inf')
+        if ny != 0:
+            s_y = min(abs((ry2 - cy) / ny), abs((ry1 - cy) / ny))
 
-    s = min(s_x, s_y)
+        s = min(s_x, s_y)
+        
     hx1 = cx + s * nx
     hy1 = cy + s * ny
     hx2 = cx - s * nx
@@ -115,7 +146,8 @@ def render_pose_with_racket(
     racket_bbox: Optional[Tuple[float, float, float, float]], 
     height: int, 
     width: int,
-    dominant_hand: Optional[int] = None
+    dominant_hand: Optional[int] = None,
+    racket_mask_points: Optional[dict] = None
 ) -> np.ndarray:
     """
     Renders DWPose and the racket heuristic skeleton onto a canvas.
@@ -135,7 +167,7 @@ def render_pose_with_racket(
     canvas = draw_dwpose_canvas(height=height, width=width, people_dw=people_dw, confidence_threshold=0.2)
     
     # Draw racket
-    racket_skel = get_racket_heuristic_skeleton(person_kpts, racket_bbox, dominant_hand)
+    racket_skel = get_racket_heuristic_skeleton(person_kpts, racket_bbox, dominant_hand, racket_mask_points)
     if racket_skel is not None:
         wx, wy = int(round(racket_skel['handle_base'][0])), int(round(racket_skel['handle_base'][1]))
         cx, cy = int(round(racket_skel['center'][0])), int(round(racket_skel['center'][1]))

@@ -961,13 +961,64 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
                         (rx2 - min_x),
                         (ry2 - min_y)
                     ]
+                    racket_mask_points = None
+                    if track['racket']['mask'] is not None:
+                        contours, _ = cv2.findContours(r_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                        if contours:
+                            c = max(contours, key=cv2.contourArea)
+                            if len(c) >= 5:
+                                hull = cv2.convexHull(c)
+                                max_dist = -1
+                                p1, p2 = None, None
+                                for i in range(len(hull)):
+                                    for j in range(i+1, len(hull)):
+                                        pt1 = hull[i][0]
+                                        pt2 = hull[j][0]
+                                        dist = (pt1[0] - pt2[0])**2 + (pt1[1] - pt2[1])**2
+                                        if dist > max_dist:
+                                            max_dist = dist
+                                            p1 = tuple(pt1)
+                                            p2 = tuple(pt2)
+                                
+                                if p1 and p2:
+                                    vx = p2[0] - p1[0]
+                                    vy = p2[1] - p1[1]
+                                    import math
+                                    length = math.hypot(vx, vy)
+                                    if length > 0:
+                                        ux, uy = vx / length, vy / length
+                                        nx, ny = -uy, ux
+                                        
+                                        max_proj = -float('inf')
+                                        min_proj = float('inf')
+                                        p3, p4 = None, None
+                                        
+                                        for pt_arr in c:
+                                            pt = pt_arr[0]
+                                            proj = pt[0] * nx + pt[1] * ny
+                                            if proj > max_proj:
+                                                max_proj = proj
+                                                p3 = tuple(pt)
+                                            if proj < min_proj:
+                                                min_proj = proj
+                                                p4 = tuple(pt)
+                                                
+                                        if p3 and p4:
+                                            racket_mask_points = {
+                                                'p1': (float(p1[0] - min_x), float(p1[1] - min_y)),
+                                                'p2': (float(p2[0] - min_x), float(p2[1] - min_y)),
+                                                'p3': (float(p3[0] - min_x), float(p3[1] - min_y)),
+                                                'p4': (float(p4[0] - min_x), float(p4[1] - min_y)),
+                                            }
                 else:
                     racket_bbox_crop = None
+                    racket_mask_points = None
 
                 track_crops[(tid, 'fused')].append({
                     'frame_id': frame_id,
                     'bbox': (min_x, min_y, max_x, max_y),
-                    'racket_bbox_crop': racket_bbox_crop
+                    'racket_bbox_crop': racket_bbox_crop,
+                    'racket_mask_points': racket_mask_points
                 })
 
         for (tid, cls_name), items in track_crops.items():
@@ -980,7 +1031,8 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
                 meta_data.append({
                     'frame_id': item['frame_id'],
                     'bbox': item['bbox'],
-                    'racket_bbox_crop': item.get('racket_bbox_crop')
+                    'racket_bbox_crop': item.get('racket_bbox_crop'),
+                    'racket_mask_points': item.get('racket_mask_points')
                 })
             with open(track_meta_file, 'w') as f:
                 json.dump(meta_data, f, indent=2)
@@ -1017,7 +1069,7 @@ def _extract_pose_worker(video_path, dataset_dir, scene_idx, device, pose_model_
     
     model = None
     
-    track_dirs = glob.glob(os.path.join(seg_dir, 'track_*'))
+    track_dirs = [d for d in glob.glob(os.path.join(seg_dir, 'track_*')) if os.path.isdir(d) and not d.endswith('_skeleton')]
     for tdir in track_dirs:
         tid = os.path.basename(tdir).split('_')[1]
         out_json = os.path.join(seg_dir, f'track_{tid}_keypoints.json')
@@ -1107,8 +1159,12 @@ def _render_skeleton_worker(video_path, dataset_dir, scene_idx, device):
                     
                     if not before:
                         meta_data[i]['racket_bbox_crop'] = meta_data[after[0]]['racket_bbox_crop']
+                        if meta_data[after[0]].get('racket_mask_points'):
+                            meta_data[i]['racket_mask_points'] = meta_data[after[0]]['racket_mask_points']
                     elif not after:
                         meta_data[i]['racket_bbox_crop'] = meta_data[before[-1]]['racket_bbox_crop']
+                        if meta_data[before[-1]].get('racket_mask_points'):
+                            meta_data[i]['racket_mask_points'] = meta_data[before[-1]]['racket_mask_points']
                     else:
                         idx_b = before[-1]
                         idx_a = after[0]
@@ -1118,6 +1174,17 @@ def _render_skeleton_worker(video_path, dataset_dir, scene_idx, device):
                         meta_data[i]['racket_bbox_crop'] = [
                             bbox_b[j] + weight * (bbox_a[j] - bbox_b[j]) for j in range(4)
                         ]
+                        
+                        pts_b = meta_data[idx_b].get('racket_mask_points')
+                        pts_a = meta_data[idx_a].get('racket_mask_points')
+                        if pts_b and pts_a:
+                            interp_pts = {}
+                            for k in ['p1', 'p2', 'p3', 'p4']:
+                                interp_pts[k] = (
+                                    pts_b[k][0] + weight * (pts_a[k][0] - pts_b[k][0]),
+                                    pts_b[k][1] + weight * (pts_a[k][1] - pts_b[k][1])
+                                )
+                            meta_data[i]['racket_mask_points'] = interp_pts
                         
         from src.shared.racket_heuristic import get_dominant_wrist
         hand_votes = {4: 0, 7: 0}
@@ -1149,7 +1216,8 @@ def _render_skeleton_worker(video_path, dataset_dir, scene_idx, device):
                 kpts_np = np.array(kpts, dtype=np.float32)
                 if racket_bbox is not None:
                     racket_bbox = tuple(racket_bbox)
-                canvas = render_pose_with_racket(kpts_np, racket_bbox, int(h), int(w), dominant_hand=majority_hand)
+                racket_mask_points = m.get('racket_mask_points')
+                canvas = render_pose_with_racket(kpts_np, racket_bbox, int(h), int(w), dominant_hand=majority_hand, racket_mask_points=racket_mask_points)
             else:
                 canvas = np.zeros((int(h), int(w), 3), dtype=np.uint8)
                 
