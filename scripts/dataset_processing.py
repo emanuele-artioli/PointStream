@@ -1097,6 +1097,45 @@ def _render_skeleton_worker(video_path, dataset_dir, scene_idx, device):
         if len(meta_data) != len(kpt_data):
             continue
             
+        # Interpolate missing racket bounding boxes over time if they exist somewhere in the track
+        valid_indices = [idx for idx, m in enumerate(meta_data) if m.get('racket_bbox_crop') is not None]
+        if len(valid_indices) > 0 and len(valid_indices) < len(meta_data):
+            for i in range(len(meta_data)):
+                if meta_data[i].get('racket_bbox_crop') is None:
+                    before = [idx for idx in valid_indices if idx < i]
+                    after = [idx for idx in valid_indices if idx > i]
+                    
+                    if not before:
+                        meta_data[i]['racket_bbox_crop'] = meta_data[after[0]]['racket_bbox_crop']
+                    elif not after:
+                        meta_data[i]['racket_bbox_crop'] = meta_data[before[-1]]['racket_bbox_crop']
+                    else:
+                        idx_b = before[-1]
+                        idx_a = after[0]
+                        bbox_b = meta_data[idx_b]['racket_bbox_crop']
+                        bbox_a = meta_data[idx_a]['racket_bbox_crop']
+                        weight = (i - idx_b) / float(idx_a - idx_b)
+                        meta_data[i]['racket_bbox_crop'] = [
+                            bbox_b[j] + weight * (bbox_a[j] - bbox_b[j]) for j in range(4)
+                        ]
+                        
+        from src.shared.racket_heuristic import get_dominant_wrist
+        hand_votes = {4: 0, 7: 0}
+        for m, k in zip(meta_data, kpt_data):
+            kpts = k['keypoints']
+            racket_bbox = m.get('racket_bbox_crop')
+            if kpts is not None and racket_bbox is not None:
+                kpts_np = np.array(kpts, dtype=np.float32)
+                wrist_info = get_dominant_wrist(kpts_np, tuple(racket_bbox))
+                if wrist_info is not None:
+                    hand_votes[wrist_info[2]] += 1
+                    
+        majority_hand = None
+        if hand_votes[4] > hand_votes[7]:
+            majority_hand = 4
+        elif hand_votes[7] > hand_votes[4]:
+            majority_hand = 7
+
         os.makedirs(out_skel_dir, exist_ok=True)
         for i, (m, k) in enumerate(zip(meta_data, kpt_data)):
             kpts = k['keypoints']
@@ -1108,9 +1147,9 @@ def _render_skeleton_worker(video_path, dataset_dir, scene_idx, device):
             
             if kpts is not None:
                 kpts_np = np.array(kpts, dtype=np.float32)
-                if racket_bbox is None:
-                    racket_bbox = (0.0, 0.0, 0.0, 0.0)
-                canvas = render_pose_with_racket(kpts_np, tuple(racket_bbox), int(h), int(w))
+                if racket_bbox is not None:
+                    racket_bbox = tuple(racket_bbox)
+                canvas = render_pose_with_racket(kpts_np, racket_bbox, int(h), int(w), dominant_hand=majority_hand)
             else:
                 canvas = np.zeros((int(h), int(w), 3), dtype=np.uint8)
                 
