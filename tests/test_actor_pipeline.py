@@ -51,6 +51,9 @@ def _install_fake_actor_components(monkeypatch: pytest.MonkeyPatch) -> None:
             _ = chunk
             _ = frames_bgr
             return [], []
+            
+        def get_timings(self):
+            return None
 
         def render_debug_keyframes(
             self,

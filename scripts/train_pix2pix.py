@@ -18,75 +18,9 @@ import torch.multiprocessing as mp
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data.distributed import DistributedSampler
+from src.shared.tennis_dataset import TennisSkeletonDataset
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-
-class Pix2PixDataset(Dataset):
-    def __init__(self, root_dir, subset="djokovic_front", transform=None):
-        self.root_dir = Path(root_dir)
-        self.transform = transform
-        
-        if subset.lower() == "all":
-            self.subsets = ["djokovic_front", "djokovic_back", "federer_front", "federer_back"]
-        else:
-            self.subsets = [subset]
-            
-        self.items = []
-        self.subset_to_colors = {s: [] for s in self.subsets}
-        
-        for s in self.subsets:
-            color_dir = self.root_dir / s
-            skeleton_dir = self.root_dir / f"output_task_1_{s}"
-            
-            if not color_dir.exists() or not skeleton_dir.exists():
-                continue
-                
-            for f in os.listdir(skeleton_dir):
-                if f.startswith("skeleton_") and f.endswith(".png"):
-                    color_name = f.replace("skeleton_", "")
-                    color_path = color_dir / color_name
-                    if color_path.exists():
-                        skeleton_path = skeleton_dir / f
-                        self.items.append((s, color_path, skeleton_path))
-                        self.subset_to_colors[s].append(color_path)
-
-    def __len__(self):
-        return len(self.items)
-
-    def __getitem__(self, idx):
-        subset, color_path, skeleton_path = self.items[idx]
-        
-        # Pick a random reference image from the same subset
-        ref_color_path = random.choice(self.subset_to_colors[subset])
-        
-        color_img = Image.open(color_path).convert("RGB")
-        skeleton_img = Image.open(skeleton_path).convert("RGB")
-        ref_img = Image.open(ref_color_path).convert("RGB")
-        
-        if self.transform:
-            combined = Image.new("RGB", (color_img.width * 3, color_img.height))
-            combined.paste(skeleton_img, (0, 0))
-            combined.paste(ref_img, (color_img.width, 0))
-            combined.paste(color_img, (color_img.width * 2, 0))
-            
-            combined_tensor = self.transform(combined)
-            
-            _, h, w = combined_tensor.shape
-            third_w = w // 3
-            skeleton_tensor = combined_tensor[:, :, :third_w]
-            ref_tensor = combined_tensor[:, :, third_w:third_w*2]
-            color_tensor = combined_tensor[:, :, third_w*2:]
-        else:
-            to_tensor = transforms.ToTensor()
-            color_tensor = to_tensor(color_img)
-            skeleton_tensor = to_tensor(skeleton_img)
-            ref_tensor = to_tensor(ref_img)
-
-        skeleton_tensor = (skeleton_tensor - 0.5) * 2.0
-        ref_tensor = (ref_tensor - 0.5) * 2.0
-        color_tensor = (color_tensor - 0.5) * 2.0
-        
-        return skeleton_tensor, ref_tensor, color_tensor
 
 class UNetDown(nn.Module):
     def __init__(self, in_channels, out_channels, normalize=True, dropout=0.0):
@@ -243,7 +177,7 @@ def main_worker(gpu, ngpus_per_node, args):
         transforms.ToTensor(),
     ])
 
-    dataset = Pix2PixDataset(args.data_root, subset=args.subset, transform=transform_pipeline)
+    dataset = TennisSkeletonDataset(args.data_root, subset=args.subset, transform=transform_pipeline)
 
     if ngpus_per_node > 1:
         sampler = DistributedSampler(dataset)
@@ -282,9 +216,8 @@ def main_worker(gpu, ngpus_per_node, args):
         else:
             iterator = enumerate(dataloader)
 
-        for i, (real_A, ref_img, real_B) in iterator:
+        for i, (real_A, real_B) in iterator:
             real_A = real_A.to(device)
-            ref_img = ref_img.to(device)
             real_B = real_B.to(device)
 
             valid = torch.ones((real_A.size(0), 1, real_A.size(2) // 16, real_A.size(3) // 16), device=device, requires_grad=False)

@@ -187,3 +187,42 @@ def render_pose_with_racket(
         cv2.circle(canvas, (tx, ty), 5, (255, 0, 0), -1, cv2.LINE_AA) # tip (blue)
 
     return canvas
+
+def interpolate_racket_track(meta_data: list[dict]) -> list[dict]:
+    """Interpolate missing racket bounding boxes and mask points over time."""
+    valid_indices = [idx for idx, m in enumerate(meta_data) if m.get('racket_bbox_crop') is not None]
+    if len(valid_indices) > 0 and len(valid_indices) < len(meta_data):
+        for i in range(len(meta_data)):
+            if meta_data[i].get('racket_bbox_crop') is None:
+                before = [idx for idx in valid_indices if idx < i]
+                after = [idx for idx in valid_indices if idx > i]
+                
+                if not before:
+                    meta_data[i]['racket_bbox_crop'] = meta_data[after[0]]['racket_bbox_crop']
+                    if meta_data[after[0]].get('racket_mask_points'):
+                        meta_data[i]['racket_mask_points'] = meta_data[after[0]]['racket_mask_points']
+                elif not after:
+                    meta_data[i]['racket_bbox_crop'] = meta_data[before[-1]]['racket_bbox_crop']
+                    if meta_data[before[-1]].get('racket_mask_points'):
+                        meta_data[i]['racket_mask_points'] = meta_data[before[-1]]['racket_mask_points']
+                else:
+                    idx_b = before[-1]
+                    idx_a = after[0]
+                    bbox_b = meta_data[idx_b]['racket_bbox_crop']
+                    bbox_a = meta_data[idx_a]['racket_bbox_crop']
+                    weight = (i - idx_b) / float(idx_a - idx_b)
+                    meta_data[i]['racket_bbox_crop'] = [
+                        bbox_b[j] + weight * (bbox_a[j] - bbox_b[j]) for j in range(4)
+                    ]
+                    
+                    pts_b = meta_data[idx_b].get('racket_mask_points')
+                    pts_a = meta_data[idx_a].get('racket_mask_points')
+                    if pts_b and pts_a:
+                        interp_pts = {}
+                        for k in ['p1', 'p2', 'p3', 'p4']:
+                            interp_pts[k] = (
+                                pts_b[k][0] + weight * (pts_a[k][0] - pts_b[k][0]),
+                                pts_b[k][1] + weight * (pts_a[k][1] - pts_b[k][1])
+                            )
+                        meta_data[i]['racket_mask_points'] = interp_pts
+    return meta_data

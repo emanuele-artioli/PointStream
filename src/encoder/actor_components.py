@@ -1,4 +1,5 @@
 from __future__ import annotations
+from src.shared.player_extraction import build_crop_with_padding
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -22,6 +23,8 @@ from src.shared.schemas import (
     TensorSpec,
     VideoChunk,
 )
+from src.shared.geometry import get_iou
+from src.shared.player_extraction import extract_pose_dwpose18, match_rackets_to_players
 from src.shared.mask_codec import encode_binary_mask, encode_polygon_mask, normalize_mask_codec
 from src.shared.dwpose_draw import draw_dwpose_canvas
 from src.shared.profiling import PipelineProfiler
@@ -74,6 +77,14 @@ def _require_local_or_optin_weight(model_name: str, allow_download: bool = True)
     )
 
 
+def _bbox_area(bbox: list[float]) -> float:
+    x1, y1, x2, y2 = bbox
+    return max(0.0, x2 - x1) * max(0.0, y2 - y1)
+
+def _bbox_center(bbox: list[float]) -> tuple[float, float]:
+    x1, y1, x2, y2 = bbox
+    return ((x1 + x2) * 0.5, (y1 + y2) * 0.5)
+
 def _clip_bbox(bbox: list[float], width: int, height: int) -> list[float]:
     x1, y1, x2, y2 = bbox
     x1 = float(np.clip(x1, 0.0, width - 1.0))
@@ -81,69 +92,6 @@ def _clip_bbox(bbox: list[float], width: int, height: int) -> list[float]:
     x2 = float(np.clip(x2, x1 + 1.0, width))
     y2 = float(np.clip(y2, y1 + 1.0, height))
     return [x1, y1, x2, y2]
-
-
-def _bbox_area(bbox: list[float]) -> float:
-    x1, y1, x2, y2 = bbox
-    return max(0.0, x2 - x1) * max(0.0, y2 - y1)
-
-
-def _bbox_center(bbox: list[float]) -> tuple[float, float]:
-    x1, y1, x2, y2 = bbox
-    return ((x1 + x2) * 0.5, (y1 + y2) * 0.5)
-
-
-def _intersection_area(a: list[float], b: list[float]) -> float:
-    ax1, ay1, ax2, ay2 = a
-    bx1, by1, bx2, by2 = b
-    x1 = max(ax1, bx1)
-    y1 = max(ay1, by1)
-    x2 = min(ax2, bx2)
-    y2 = min(ay2, by2)
-    return max(0.0, x2 - x1) * max(0.0, y2 - y1)
-
-
-def _build_crop_with_padding(frame_bgr: np.ndarray, bbox: list[float], pad_ratio: float = 0.15) -> tuple[np.ndarray, tuple[int, int]]:
-    h, w = frame_bgr.shape[:2]
-    x1, y1, x2, y2 = bbox
-    bw = max(1.0, x2 - x1)
-    bh = max(1.0, y2 - y1)
-    pad_x = bw * pad_ratio
-    pad_y = bh * pad_ratio
-
-    cx1 = int(max(0, np.floor(x1 - pad_x)))
-    cy1 = int(max(0, np.floor(y1 - pad_y)))
-    cx2 = int(min(w, np.ceil(x2 + pad_x)))
-    cy2 = int(min(h, np.ceil(y2 + pad_y)))
-    if cx2 <= cx1 or cy2 <= cy1:
-        return np.empty((0, 0, 3), dtype=np.uint8), (0, 0)
-
-    return frame_bgr[cy1:cy2, cx1:cx2].copy(), (cx1, cy1)
-
-
-def coco17_to_dwpose18(coco17: np.ndarray, confidence_threshold: float = 0.2) -> np.ndarray:
-    """Convert a COCO-17 pose [17,3] into a DWPose/OpenPose-18 pose [18,3]."""
-    if coco17.shape != (17, 3):
-        raise ValueError(f"Expected COCO pose shape [17,3], got: {coco17.shape}")
-
-    out = np.zeros((18, 3), dtype=np.float32)
-    # openpose18 index -> coco17 index, neck is synthesized
-    op18_from_coco17 = [0, None, 6, 8, 10, 5, 7, 9, 12, 14, 16, 11, 13, 15, 2, 1, 4, 3]
-
-    for op_idx, coco_idx in enumerate(op18_from_coco17):
-        if coco_idx is None:
-            continue
-        out[op_idx] = coco17[coco_idx]
-
-    # Synthesize neck if both shoulders are confident.
-    lsho = coco17[5]
-    rsho = coco17[6]
-    if float(lsho[2]) >= confidence_threshold and float(rsho[2]) >= confidence_threshold:
-        neck_xy = 0.5 * (lsho[:2] + rsho[:2])
-        neck_conf = min(float(lsho[2]), float(rsho[2]))
-        out[1] = np.array([neck_xy[0], neck_xy[1], neck_conf], dtype=np.float32)
-
-    return out
 
 
 class BaseDetector(ABC):
@@ -332,7 +280,7 @@ class Yolo26Detector(BaseDetector):
         return recovered
 
     def _recover_from_roi(self, frame_bgr: np.ndarray, class_name: str, seed_actor: SceneActor) -> SceneActor | None:
-        crop, (ox, oy) = _build_crop_with_padding(frame_bgr, seed_actor.bbox, pad_ratio=0.20)
+        crop, (ox, oy) = build_crop_with_padding(frame_bgr, seed_actor.bbox, pad_ratio=0.20)
         if crop.size == 0:
             return None
 
@@ -462,7 +410,7 @@ class YoloEDetector(Yolo26Detector):
         return detections
 
     def _recover_from_roi(self, frame_bgr: np.ndarray, class_name: str, seed_actor: SceneActor) -> SceneActor | None:
-        crop, (ox, oy) = _build_crop_with_padding(frame_bgr, seed_actor.bbox, pad_ratio=0.20)
+        crop, (ox, oy) = build_crop_with_padding(frame_bgr, seed_actor.bbox, pad_ratio=0.20)
         if crop.size == 0:
             return None
 
@@ -535,7 +483,7 @@ class StandardTennisHeuristic(BaseHeuristic):
         scored: list[tuple[float, SceneActor]] = []
         frame_diag = max(1.0, float(np.hypot(frame_width, frame_height)))
         for actor in players:
-            overlap_score = sum(_intersection_area(actor.bbox, racket.bbox) for racket in rackets)
+            overlap_score = sum(get_iou(actor.bbox, racket.bbox) for racket in rackets)
             area_score = _bbox_area(actor.bbox)
             cx, cy = _bbox_center(actor.bbox)
             center_score = 1.0 - abs(cx - frame_width * 0.5) / max(1.0, frame_width * 0.5)
@@ -669,9 +617,9 @@ class StandardTennisHeuristic(BaseHeuristic):
         for racket in rackets:
             area_score = _bbox_area(racket.bbox)
             proximity = 0.0
-            rx, ry = _bbox_center(racket.bbox)
+            rx, ry = ((racket.bbox[0] + racket.bbox[2]) * 0.5, (racket.bbox[1] + racket.bbox[3]) * 0.5)
             for player in selected_players:
-                px, py = _bbox_center(player.bbox)
+                px, py = ((player.bbox[0] + player.bbox[2]) * 0.5, (player.bbox[1] + player.bbox[3]) * 0.5)
                 distance = float(np.hypot(rx - px, ry - py))
                 proximity += 1.0 / max(distance, 1.0)
             score = area_score * 0.02 + proximity * 1000.0
@@ -806,7 +754,7 @@ class StandardTennisHeuristic(BaseHeuristic):
         if slot_from_source_track is not None:
             return slot_from_source_track
 
-        cx, cy = _bbox_center(player.bbox)
+        cx, cy = ((player.bbox[0] + player.bbox[2]) * 0.5, (player.bbox[1] + player.bbox[3]) * 0.5)
         far_prev = self._last_player_bboxes.get("player_far")
         near_prev = self._last_player_bboxes.get("player_near")
 
@@ -833,13 +781,13 @@ class StandardTennisHeuristic(BaseHeuristic):
             if player is None:
                 continue
 
-            px, py = _bbox_center(player.bbox)
+            px, py = ((player.bbox[0] + player.bbox[2]) * 0.5, (player.bbox[1] + player.bbox[3]) * 0.5)
             best_idx: int | None = None
             best_distance = float("inf")
             for idx, racket in enumerate(selected_rackets):
                 if idx in used:
                     continue
-                rx, ry = _bbox_center(racket.bbox)
+                rx, ry = ((racket.bbox[0] + racket.bbox[2]) * 0.5, (racket.bbox[1] + racket.bbox[3]) * 0.5)
                 distance = float(np.hypot(rx - px, ry - py))
                 if distance < best_distance:
                     best_distance = distance
@@ -880,7 +828,7 @@ class CannySegmenter(BaseSegmenter):
         if actor.mask is not None:
             return actor
 
-        crop, _ = _build_crop_with_padding(frame_bgr, actor.bbox, pad_ratio=0.0)
+        crop, _ = build_crop_with_padding(frame_bgr, actor.bbox, pad_ratio=0.0)
         if crop.size == 0:
             return actor
 
@@ -921,7 +869,7 @@ class YoloSegmenter(BaseSegmenter):
         if actor.mask is not None:
             return actor
 
-        crop, _ = _build_crop_with_padding(frame_bgr, actor.bbox, pad_ratio=0.0)
+        crop, _ = build_crop_with_padding(frame_bgr, actor.bbox, pad_ratio=0.0)
         if crop.size == 0:
             return actor
 
@@ -1086,43 +1034,10 @@ class YoloPoseEstimator(BasePoseEstimator):
         if actor.class_name != "player":
             return actor
 
-        crop, (ox, oy) = _build_crop_with_padding(frame_bgr, actor.bbox, pad_ratio=0.10)
-        if crop.size == 0:
-            return actor
-
-        results = self._model.predict(source=crop, verbose=False, conf=0.2)
-
-        if not results:
-            return actor
-
-        keypoints = getattr(results[0], "keypoints", None)
-        if keypoints is None or getattr(keypoints, "xy", None) is None or len(keypoints.xy) == 0:
-            return actor
-
-        xy = keypoints.xy[0]
-        conf = keypoints.conf[0] if getattr(keypoints, "conf", None) is not None else None
-
-        if hasattr(xy, "cpu"):
-            xy_np = xy.cpu().numpy()
-        else:
-            xy_np = np.asarray(xy)
-
-        if conf is None:
-            conf_np = np.ones((xy_np.shape[0],), dtype=np.float32)
-        elif hasattr(conf, "cpu"):
-            conf_np = conf.cpu().numpy().astype(np.float32)
-        else:
-            conf_np = np.asarray(conf, dtype=np.float32)
-
-        if xy_np.shape[0] != 17:
-            raise ValueError(f"YOLO pose keypoint shape mismatch for actor {actor.track_id}: {xy_np.shape}")
-
-        coco17 = np.concatenate([xy_np, conf_np[:, None]], axis=-1).astype(np.float32)
-        coco17[:, 0] += float(ox)
-        coco17[:, 1] += float(oy)
-
-        pose_dw = coco17_to_dwpose18(coco17)
-        return actor.model_copy(update={"pose_dw": pose_dw.tolist()})
+        pose_dw = extract_pose_dwpose18(frame_bgr, actor.bbox, self._model, model_type="yolo", pad_ratio=0.10)
+        if pose_dw is not None:
+            return actor.model_copy(update={"pose_dw": pose_dw.tolist()})
+        return actor
 
 
 class DwposeEstimator(BasePoseEstimator):
@@ -1142,38 +1057,10 @@ class DwposeEstimator(BasePoseEstimator):
         if actor.class_name != "player":
             return actor
 
-        crop, (ox, oy) = _build_crop_with_padding(frame_bgr, actor.bbox, pad_ratio=0.10)
-        if crop.size == 0:
-            return actor
-
-        _canvas, pose_json, _ = self._model(
-            crop,
-            output_type="np",
-            image_and_json=True,
-            include_body=True,
-            include_hand=False,
-            include_face=False,
-        )
-
-        people = pose_json.get("people", []) if isinstance(pose_json, dict) else []
-        if not people:
-            return actor
-
-        raw = people[0].get("pose_keypoints_2d")
-        if not raw:
-            return actor
-
-        pts = np.asarray(raw, dtype=np.float32).reshape(-1, 3)
-        if pts.shape[0] == 17:
-            dw = coco17_to_dwpose18(pts)
-        elif pts.shape[0] >= 18:
-            dw = pts[:18].copy()
-        else:
-            return actor
-
-        dw[:, 0] += float(ox)
-        dw[:, 1] += float(oy)
-        return actor.model_copy(update={"pose_dw": dw.tolist()})
+        pose_dw = extract_pose_dwpose18(frame_bgr, actor.bbox, self._model, model_type="dwpose", pad_ratio=0.10)
+        if pose_dw is not None:
+            return actor.model_copy(update={"pose_dw": pose_dw.tolist()})
+        return actor
 
 
 @dataclass

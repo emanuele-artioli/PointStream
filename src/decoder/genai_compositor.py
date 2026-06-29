@@ -609,6 +609,9 @@ class DiffusersCompositor(BaseCompositor):
         if backend in {"pix2pix"}:
             from src.decoder.pix2pix_engine import Pix2PixStrategy
             return Pix2PixStrategy(config=self.config)
+        if backend in {"spade4tennis", "spade-4-tennis", "spade_4_tennis"}:
+            from src.decoder.spade4tennis_engine import Spade4TennisStrategy
+            return Spade4TennisStrategy(config=self.config)
         raise ValueError(f"Unsupported genai-backend value in config: {backend}")
 
     def uses_temporal_pose_sequence(self) -> bool:
@@ -1298,6 +1301,20 @@ def _render_pose_condition(pose_tensor: torch.Tensor, output_height: int, output
         people_dw=pose_np[np.newaxis, ...],
         confidence_threshold=0.2,
     )
+
+
+def _render_pose_with_racket(
+    pose_tensor: torch.Tensor,
+    racket_bbox: tuple[float, float, float, float] | list[float] | None,
+    output_height: int,
+    output_width: int,
+) -> np.ndarray:
+    pose_np = pose_tensor.detach().cpu().numpy()
+    if pose_np.ndim == 3:
+        pose_np = pose_np[-1]
+    
+    # render_pose_with_racket returns a BGR/RGB canvas
+    return render_pose_with_racket(pose_np, racket_bbox, output_height, output_width)
 
 
 # Backward-compatible alias used by existing decode tests.
