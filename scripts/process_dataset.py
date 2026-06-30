@@ -125,10 +125,10 @@ def process_cpu_phase(args):
         
     return video_path, scenes_dir
 
-def segment_and_fuse_scene(video_path, dataset_dir, scene_idx, t_start, t_end, device, debug_video=False):
+def segment_and_fuse_scene(video_path, dataset_dir, scene_idx, t_start, t_end, device, seg_model, debug_video=False):
     import multiprocessing as mp
     ctx = mp.get_context('spawn')
-    p = ctx.Process(target=_segment_and_fuse_scene_worker, args=(video_path, dataset_dir, scene_idx, t_start, t_end, device, debug_video))
+    p = ctx.Process(target=_segment_and_fuse_scene_worker, args=(video_path, dataset_dir, scene_idx, t_start, t_end, device, seg_model, debug_video))
     p.start()
     p.join()
     if p.exitcode != 0:
@@ -554,7 +554,7 @@ def classify_scenes(video_path, out_dir, device):
 
 
 def process_gpu_phase(args):
-    video_path, scenes_dir, device, stages, pose_model, debug_video = args
+    video_path, scenes_dir, device, stages, pose_model, debug_video, seg_model, max_scenes = args
     vname = os.path.splitext(os.path.basename(video_path))[0]
     dataset_dir = os.path.join(REPO_ROOT, 'assets', 'dataset', vname)
     json_path = os.path.join(dataset_dir, 'scene_metadata.json')
@@ -574,15 +574,19 @@ def process_gpu_phase(args):
             data = json.load(f)
             
         scenes = data.get('scenes', [])
+        point_scenes_processed = 0
         for i, s in enumerate(scenes):
             if s['cluster'] == 'cluster_point':
+                if point_scenes_processed >= max_scenes:
+                    continue
+                point_scenes_processed += 1
                 if 'segment' in stages:
                     seg_dir = os.path.join(dataset_dir, 'segmentations', f'scene_{i:03d}')
                     if os.path.exists(seg_dir) and len(os.listdir(seg_dir)) > 0:
                         print(f"[{device}] Segmentations for scene {i} already exist. Skipping.")
                     else:
                         print(f"[{device}] Segmenting scene {i} ({s['t_start']:.2f}s - {s['t_end']:.2f}s)")
-                        segment_and_fuse_scene(video_path, dataset_dir, i, s['t_start'], s['t_end'], device, debug_video)
+                        segment_and_fuse_scene(video_path, dataset_dir, i, s['t_start'], s['t_end'], device, seg_model, debug_video)
                 
                 if 'pose' in stages:
                     print(f"[{device}] Extracting pose for scene {i}")
@@ -601,11 +605,11 @@ rm -f assets/dataset/*/scenes/*.jpg
 python scripts/dataset_processing.py --input assets/raw_4k
 '''
 
-def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, t_end, device, debug_video=False):
+def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, t_end, device, seg_model, debug_video=False):
 
     
     REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    weights_path = os.path.join(REPO_ROOT, 'assets', 'weights', 'yoloe-26x-seg.pt')
+    weights_path = os.path.join(REPO_ROOT, 'assets', 'weights', seg_model)
     
     # Save segs in a common 'segmentations' folder
     seg_dir = os.path.join(dataset_dir, 'segmentations', f'scene_{scene_idx:03d}')
@@ -1086,7 +1090,9 @@ if __name__ == '__main__':
     parser.add_argument('--input', required=True, help='Path to input video file or folder containing .mp4 files')
     parser.add_argument('--threshold', type=float, default=0.3, help='Scene detection threshold (default: 0.3)')
     parser.add_argument('--workers-per-gpu', type=int, default=3, help='Number of worker processes per GPU (default: 3)')
-    parser.add_argument('--pose-model', type=str, default='yolov8x-pose.pt', help='Pose model to use for keypoint extraction')
+    parser.add_argument('--seg-model', type=str, default='yolo26x-eg.pt', help='Segmentation model to use')
+    parser.add_argument('--pose-model', type=str, default='yolo26x-pose.pt', help='Pose model to use for keypoint extraction')
+    parser.add_argument('--max-scenes', type=int, default=10, help='Maximum number of point scenes to process per video')
     parser.add_argument('--stages', nargs='+', default=['classify', 'segment', 'pose', 'skeleton'], help='Stages to run')
     parser.add_argument('--debug-video', action='store_true', help='Generate AVC debug videos for stitched tracks')
     
@@ -1094,6 +1100,8 @@ if __name__ == '__main__':
     input_path = args.input
     stages = args.stages
     pose_model = args.pose_model
+    seg_model = args.seg_model
+    max_scenes = args.max_scenes
     debug_video = args.debug_video
     
     if not os.path.exists(input_path):
@@ -1162,7 +1170,7 @@ if __name__ == '__main__':
     for i, res in enumerate(cpu_results):
         video_path, scenes_dir = res
         device = gpu_devices[i % len(gpu_devices)]
-        gpu_args.append((video_path, scenes_dir, device, stages, pose_model, debug_video))
+        gpu_args.append((video_path, scenes_dir, device, stages, pose_model, debug_video, seg_model, max_scenes))
     try:
         from multiprocessing.dummy import Pool as ThreadPool
         with ThreadPool(gpu_workers) as pool:
