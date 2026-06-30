@@ -75,6 +75,12 @@ omit = [
   "src/encoder/residual_calculator.py",
   "src/encoder/segmentation_ball_extractor.py",
   "src/shared/genai_debug.py",
+  "src/decoder/controlnet_engine.py",
+  "src/decoder/pix2pix_engine.py",
+  "src/decoder/spade4tennis_engine.py",
+  "src/shared/player_extraction.py",
+  "src/shared/racket_heuristic.py",
+  "src/shared/tennis_dataset.py",
   "scripts/*.py",
   "scripts/benchmark_player_backends.py",
 ]
