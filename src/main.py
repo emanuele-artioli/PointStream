@@ -328,8 +328,6 @@ def run_cli(argv: list[str] | None = None) -> int:
     run_output_root = _create_timestamped_output_dir(base_root=_project_root() / "outputs")
     config.runtime_output_dir = str(run_output_root)
     config.debug_artifact_dir = str(run_output_root / "debug")
-    
-    from typing import Any
     run_summary: dict[str, Any] = run_pipeline(
         config=config,
         transport_root=run_output_root,

@@ -91,7 +91,7 @@ class TennisSkeletonDataset(Dataset):
 
     def _process_image(self, img_path: Path) -> torch.Tensor:
         """Loads, pads to square with black, resizes to target_size, and converts to tensor."""
-        img = Image.open(img_path)
+        img: Image.Image = Image.open(img_path)
         if img.mode == 'RGBA':
             background = Image.new('RGBA', img.size, (0, 0, 0, 255))
             img = Image.alpha_composite(background, img).convert("RGB")
