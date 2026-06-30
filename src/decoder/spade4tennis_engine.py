@@ -10,8 +10,6 @@ from typing import Any
 import cv2
 import numpy as np
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
 from torchvision import transforms
 
 from src.decoder.genai_compositor import (
@@ -20,8 +18,7 @@ from src.decoder.genai_compositor import (
     _require_local_or_optin_weight,
     _to_numpy_bgr,
 )
-from src.shared.racket_heuristic import render_pose_with_racket
-from src.shared.spade4tennis_arch import SPADE, SPADEResBlock, ReferenceEncoder, SPADEResNet9Generator
+from src.shared.spade4tennis_arch import SPADEResNet9Generator
 
 _LOGGER = logging.getLogger(__name__)
 

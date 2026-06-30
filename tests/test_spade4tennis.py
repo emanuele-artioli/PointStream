@@ -13,9 +13,7 @@ Tests:
 import sys
 import os
 
-import pytest
 import torch
-import torch.nn as nn
 
 # Ensure project root is on path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -25,7 +23,7 @@ class TestSPADE:
     """Tests for the SPADE normalization layer."""
 
     def test_output_shape_matches_input(self):
-        from scripts.train_spade4tennis import SPADE
+        from src.shared.spade4tennis_arch import SPADE
 
         spade = SPADE(norm_nc=128, cond_nc=256, hidden_nc=64)
         x = torch.randn(2, 128, 32, 32)     # Shape: [B, norm_nc, H, W]
@@ -34,7 +32,7 @@ class TestSPADE:
         assert out.shape == (2, 128, 32, 32), f"Expected (2, 128, 32, 32), got {out.shape}"
 
     def test_condition_same_spatial_dims(self):
-        from scripts.train_spade4tennis import SPADE
+        from src.shared.spade4tennis_arch import SPADE
 
         spade = SPADE(norm_nc=64, cond_nc=64)
         x = torch.randn(1, 64, 16, 16)
@@ -47,7 +45,7 @@ class TestSPADEResBlock:
     """Tests for the SPADE residual block."""
 
     def test_same_channels(self):
-        from scripts.train_spade4tennis import SPADEResBlock
+        from src.shared.spade4tennis_arch import SPADEResBlock
 
         block = SPADEResBlock(fin=256, fout=256, cond_nc=256)
         x = torch.randn(2, 256, 16, 16)
@@ -56,7 +54,7 @@ class TestSPADEResBlock:
         assert out.shape == (2, 256, 16, 16)
 
     def test_different_channels(self):
-        from scripts.train_spade4tennis import SPADEResBlock
+        from src.shared.spade4tennis_arch import SPADEResBlock
 
         block = SPADEResBlock(fin=128, fout=256, cond_nc=256)
         x = torch.randn(1, 128, 32, 32)
@@ -70,7 +68,7 @@ class TestReferenceEncoder:
     """Tests for the reference image encoder."""
 
     def test_downsampling(self):
-        from scripts.train_spade4tennis import ReferenceEncoder
+        from src.shared.spade4tennis_arch import ReferenceEncoder
 
         enc = ReferenceEncoder(in_nc=3, nf=64)
         x = torch.randn(2, 3, 512, 512)
@@ -83,7 +81,7 @@ class TestSPADEResNet9Generator:
     """Tests for the full generator."""
 
     def test_forward_shape(self):
-        from scripts.train_spade4tennis import SPADEResNet9Generator
+        from src.shared.spade4tennis_arch import SPADEResNet9Generator
 
         gen = SPADEResNet9Generator(in_nc=3, out_nc=3, ngf=64, n_blocks=9)
         skeleton = torch.randn(1, 3, 256, 256)
@@ -92,7 +90,7 @@ class TestSPADEResNet9Generator:
         assert out.shape == (1, 3, 256, 256), f"Expected (1, 3, 256, 256), got {out.shape}"
 
     def test_output_range(self):
-        from scripts.train_spade4tennis import SPADEResNet9Generator
+        from src.shared.spade4tennis_arch import SPADEResNet9Generator
 
         gen = SPADEResNet9Generator(in_nc=3, out_nc=3, ngf=32, n_blocks=3)
         skeleton = torch.randn(1, 3, 64, 64)
@@ -103,7 +101,7 @@ class TestSPADEResNet9Generator:
             f"Output range [{out.min():.2f}, {out.max():.2f}] outside [-1, 1]"
 
     def test_param_count_lite(self):
-        from scripts.train_spade4tennis import SPADEResNet9Generator
+        from src.shared.spade4tennis_arch import SPADEResNet9Generator
 
         gen = SPADEResNet9Generator(in_nc=3, out_nc=3, ngf=64, n_blocks=9)
         n_params = sum(p.numel() for p in gen.parameters())
@@ -123,7 +121,7 @@ class TestMultiscaleDiscriminator:
         results = disc(real, cond)
         assert len(results) == 2, f"Expected 2 scales, got {len(results)}"
 
-    def test_three_scales(self):
+    def test_forward_returns_multiple_scales(self):
         from scripts.train_spade4tennis import MultiscaleDiscriminator
 
         disc = MultiscaleDiscriminator(input_nc=6, ndf=64, n_layers=3, num_D=3)
@@ -132,7 +130,7 @@ class TestMultiscaleDiscriminator:
         results = disc(real, cond)
         assert len(results) == 3
 
-    def test_feature_output(self):
+    def test_feature_matching_shapes(self):
         from scripts.train_spade4tennis import MultiscaleDiscriminator
 
         disc = MultiscaleDiscriminator(input_nc=6, ndf=64, n_layers=3, num_D=2)
@@ -148,7 +146,7 @@ class TestMultiscaleDiscriminator:
 class TestLosses:
     """Tests for loss functions."""
 
-    def test_hinge_d(self):
+    def test_hinge_loss_d(self):
         from scripts.train_spade4tennis import hinge_loss_d
 
         real_pred = torch.randn(4, 1, 8, 8)
@@ -156,7 +154,7 @@ class TestLosses:
         loss = hinge_loss_d(real_pred, fake_pred)
         assert loss.ndim == 0  # scalar
 
-    def test_hinge_g(self):
+    def test_hinge_loss_g(self):
         from scripts.train_spade4tennis import hinge_loss_g
 
         fake_pred = torch.randn(4, 1, 8, 8)
@@ -190,7 +188,6 @@ class TestSpade4TennisStrategy:
 
     def test_backend_registration(self):
         """Verify spade4tennis is registered in the compositor."""
-        from src.decoder.genai_compositor import BaseCompositor
 
         # Just verify the import path works without crashing
         from src.decoder.spade4tennis_engine import Spade4TennisStrategy

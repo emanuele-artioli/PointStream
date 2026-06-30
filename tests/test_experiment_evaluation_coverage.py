@@ -23,8 +23,12 @@ def test_evaluate_run_summary_missing_files(tmp_path: Path):
     summary = {
         "source_uri": "does_not_exist.mp4",
         "decoded_uri": "does_not_exist_either.mp4",
-        "transport_total_size_bytes": 500,
-        "source_size_bytes": 1000,
+        "evaluation": {
+            "sizes_bytes": {
+                "transport_total": 500,
+                "source": 1000,
+            }
+        }
     }
     
     metrics = evaluate_run_summary(
@@ -34,7 +38,7 @@ def test_evaluate_run_summary_missing_files(tmp_path: Path):
         metrics=["psnr", "ssim", "vmaf"],
     )
     
-    assert metrics["transport_savings_percent"] == 50.0
+    assert metrics["sizes_bytes"]["transport_savings_percent"] == 50.0
     assert metrics["psnr_num_frames"] == 0
     assert metrics["ssim_num_frames"] == 0
     assert metrics["vmaf_num_frames"] == 0

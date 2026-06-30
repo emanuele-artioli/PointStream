@@ -307,9 +307,9 @@ class EncoderPipeline:
         # capture DAG profiling produced by the orchestrator
         self._last_dag_profile = context.get("dag_profile", {})
         actor_bundle = context.get("actor_bundle")
-        if hasattr(actor_bundle, "finalize"):
+        if actor_bundle is not None and hasattr(actor_bundle, "finalize"):
             self._last_actor_profile = actor_bundle.finalize().profile
-        elif hasattr(actor_bundle, "profile"):
+        elif actor_bundle is not None and hasattr(actor_bundle, "profile"):
             self._last_actor_profile = actor_bundle.profile
         else:
             self._last_actor_profile = {}
@@ -353,9 +353,9 @@ class EncoderPipeline:
         # capture DAG profiling produced by the orchestrator
         self._last_dag_profile = context.get("dag_profile", {})
         actor_bundle = context.get("actor_bundle")
-        if hasattr(actor_bundle, "finalize"):
+        if actor_bundle is not None and hasattr(actor_bundle, "finalize"):
             self._last_actor_profile = actor_bundle.finalize().profile
-        elif hasattr(actor_bundle, "profile"):
+        elif actor_bundle is not None and hasattr(actor_bundle, "profile"):
             self._last_actor_profile = actor_bundle.profile
         else:
             self._last_actor_profile = {}
@@ -404,9 +404,9 @@ class EncoderPipeline:
         # capture DAG profiling produced by the orchestrator
         self._last_dag_profile = context.get("dag_profile", {})
         actor_bundle = context.get("actor_bundle")
-        if hasattr(actor_bundle, "finalize"):
+        if actor_bundle is not None and hasattr(actor_bundle, "finalize"):
             self._last_actor_profile = actor_bundle.finalize().profile
-        elif hasattr(actor_bundle, "profile"):
+        elif actor_bundle is not None and hasattr(actor_bundle, "profile"):
             self._last_actor_profile = actor_bundle.profile
         else:
             self._last_actor_profile = {}

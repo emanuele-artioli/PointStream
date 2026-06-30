@@ -12,8 +12,9 @@ import cv2
 import json
 import torch
 import numpy as np
+from scipy.signal import find_peaks
 
-from src.shared.geometry import get_iou, get_global_motion
+from src.shared.geometry import get_global_motion
 from src.shared.player_extraction import track_persons_iou, match_rackets_to_players
 from src.shared.racket_heuristic import interpolate_racket_track
 
@@ -133,12 +134,6 @@ def segment_and_fuse_scene(video_path, dataset_dir, scene_idx, t_start, t_end, d
     if p.exitcode != 0:
         print(f"[{device}] Scene segmentation failed for scene {scene_idx}")
 
-import math
-import statistics
-import numpy as np
-from scipy.signal import find_peaks
-from scipy.cluster.vq import kmeans2
-
 def classify_scenes(video_path, out_dir, device):
     """
     Step 1 classification: calculate intra-scene score statistics, and save first/last frames.
@@ -216,10 +211,10 @@ def classify_scenes(video_path, out_dir, device):
                         # If histograms are highly similar, it's a continuous pan, not a hard cut
                         if similarity > 0.85:
                             continue # Discard cut, fusing the scenes
-                    except Exception as e:
+                    except Exception:
                         pass # Keep the cut if extraction fails
                 valid_cuts.append(t)
-        except Exception as e:
+        except Exception:
             valid_cuts = base_cuts
         finally:
             if clip is not None:
@@ -402,7 +397,8 @@ def classify_scenes(video_path, out_dir, device):
         raw_centroids = {}
         for cname in unique_clusters:
             c_scenes = [s for s in valid_merged if s['classification'] == cname]
-            if not c_scenes: continue
+            if not c_scenes:
+                continue
             
             durs = [s['duration'] for s in c_scenes]
             avgs = [s['avg_score'] for s in c_scenes]
@@ -439,7 +435,7 @@ def classify_scenes(video_path, out_dir, device):
             try:
                 cluster_id = int(cname.replace("cluster_", ""))
                 s['cluster_confidence'] = float(probas[i][cluster_id])
-            except:
+            except Exception:
                 s['cluster_confidence'] = 0.0
             
         # Determine heuristics & dynamic threshold
@@ -501,7 +497,8 @@ def classify_scenes(video_path, out_dir, device):
 
     # Third pass: Extract frames with final classification
     for s in scene_stats:
-        if s['classification'] == "error_blank": continue
+        if s['classification'] == "error_blank":
+            continue
         avg_s = s['avg_score']
         dur = s['duration']
         std_s = s['std_score']
@@ -647,24 +644,21 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
         if not frame_files:
             return
             
-        
-        parsed_dets = []
-        cumulative_rackets = 0
-        
+        # We will map each tracked object to a single consistent track ID
         active_tracks = {}
-        next_tid = 1
         
         prev_gray = None
         cumulative_dx, cumulative_dy = 0.0, 0.0
         
         global_centroids = {}
         racket_scores = {}
+        parsed_dets = []
+        cumulative_rackets = 0
             
         for frame_id, fpath in enumerate(frame_files):
             img = cv2.imread(fpath)
             if img is None:
                 continue
-            
             
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             if prev_gray is not None:
@@ -680,7 +674,6 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
             result = results[0]
             
             frame_dets = []
-            current_frame_tids = set()
             
             persons = []
             rackets = []
@@ -741,7 +734,8 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
                 
         # Normalize movement scores to combine with racket scores
         max_movement = max(movement_scores.values()) if movement_scores else 1.0
-        if max_movement == 0: max_movement = 1.0
+        if max_movement == 0:
+            max_movement = 1.0
         
         combined_scores = {}
         all_tids = set(racket_scores.keys()).union(set(movement_scores.keys()))
@@ -761,11 +755,11 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
         
         for frame_id, fpath in enumerate(frame_files):
             img = cv2.imread(fpath)
-            if img is None: continue
+            if img is None:
+                continue
             dets = parsed_dets[frame_id]
             persons = []
             rackets = []
-            balls = []
             
             for det in dets:
                 x1, y1, x2, y2 = det['bbox']
@@ -953,13 +947,13 @@ def _segment_and_fuse_scene_worker(video_path, dataset_dir, scene_idx, t_start, 
 def _extract_pose_worker(video_path, dataset_dir, scene_idx, device, pose_model_name):
     seg_dir = os.path.join(dataset_dir, 'segmentations', f'scene_{scene_idx:03d}')
     videos_dir = os.path.join(dataset_dir, 'videos')
-    if not os.path.exists(videos_dir): return
+    if not os.path.exists(videos_dir):
+        return
     
     import glob
     import json
     from ultralytics import YOLO
     from src.shared.player_extraction import coco17_to_dwpose18
-    import torch
     
     REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     weights_path = os.path.join(REPO_ROOT, 'assets', 'weights', pose_model_name)
@@ -1011,20 +1005,20 @@ def _extract_pose_worker(video_path, dataset_dir, scene_idx, device, pose_model_
 
 def _render_skeleton_worker(video_path, dataset_dir, scene_idx, device):
     videos_dir = os.path.join(dataset_dir, 'videos')
-    if not os.path.exists(videos_dir): return
+    if not os.path.exists(videos_dir):
+        return
     
     import glob
     import json
     import numpy as np
-    import tempfile
-    import subprocess
     import cv2
     from src.shared.racket_heuristic import render_pose_with_racket
     
     seg_dir = os.path.join(dataset_dir, 'segmentations', f'scene_{scene_idx:03d}')
     track_dirs = glob.glob(os.path.join(seg_dir, 'track_*'))
     for tdir in track_dirs:
-        if tdir.endswith('_skeleton'): continue
+        if tdir.endswith('_skeleton'):
+            continue
         tid = os.path.basename(tdir).split('_')[1]
         
         meta_path = os.path.join(seg_dir, f'track_{tid}_metadata.json')
@@ -1115,7 +1109,7 @@ if __name__ == '__main__':
         videos = [input_path]
         
     if not videos:
-        print(f"No .mp4 files found to process.")
+        print("No .mp4 files found to process.")
         sys.exit(0)
 
     import torch
@@ -1123,19 +1117,19 @@ if __name__ == '__main__':
     num_gpus = torch.cuda.device_count() if torch.cuda.is_available() else 0
     num_videos = len(videos)
 
-    print(f"\n=======================================================")
-    print(f"Hardware Resources:")
+    print("\n=======================================================")
+    print("Hardware Resources:")
     print(f"  CPU Cores: {num_cpus}")
     print(f"  GPUs:      {num_gpus}")
     print(f"Videos to process: {num_videos}")
-    print(f"=======================================================\n")
+    print("=======================================================\n")
 
     # Phase 1: CPU-Bound Processing
     # Distribute threads across videos. If fewer videos than CPUs, use multiple threads per video.
     threads_per_video = max(1, math.floor(num_cpus / num_videos))
     cpu_workers = min(num_videos, num_cpus)
     
-    print(f"--- PHASE 1: FFmpeg Extraction ---")
+    print("--- PHASE 1: FFmpeg Extraction ---")
     print(f"Using {cpu_workers} parallel workers, allocating {threads_per_video} threads per video.")
     
     cpu_args = []
@@ -1178,6 +1172,7 @@ if __name__ == '__main__':
         
     print("\n--- PHASE 3: Dataset Metadata Generation ---")
     import json
+    from pathlib import Path
     meta_entries = []
     
     # We processed multiple videos. The root is assets/dataset

@@ -265,7 +265,7 @@ def run_pipeline(
         "decode": decode_timings,
     }
 
-    sizes_bytes = {
+    sizes_bytes: dict[str, Any] = {
         "source": source_size_bytes,
         "metadata": metadata_size_bytes,
         "actor_reference": actor_reference_size_bytes,
@@ -329,7 +329,8 @@ def run_cli(argv: list[str] | None = None) -> int:
     config.runtime_output_dir = str(run_output_root)
     config.debug_artifact_dir = str(run_output_root / "debug")
     
-    run_summary = run_pipeline(
+    from typing import Any
+    run_summary: dict[str, Any] = run_pipeline(
         config=config,
         transport_root=run_output_root,
         chunk_id="0001",

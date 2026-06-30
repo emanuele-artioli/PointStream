@@ -19,17 +19,13 @@ os.environ["NCCL_IB_DISABLE"] = "1"
 import argparse
 import logging
 import math
-import random
-from pathlib import Path
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-import torchvision.transforms as transforms
 import torchvision.utils as vutils
-from PIL import Image
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 import torch.distributed as dist
@@ -37,202 +33,9 @@ import torch.multiprocessing as mp
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data.distributed import DistributedSampler
 from src.shared.tennis_dataset import TennisSkeletonDataset
-from src.shared.spade4tennis_arch import SPADE, SPADEResBlock, ReferenceEncoder, SPADEResNet9Generator
+from src.shared.spade4tennis_arch import SPADEResNet9Generator
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-
-# ---------------------------------------------------------------------------
-# Dataset
-# ---------------------------------------------------------------------------
-
-
-# ---------------------------------------------------------------------------
-# SPADE Normalization
-# ---------------------------------------------------------------------------
-
-class SPADE(nn.Module):
-    """Spatially-Adaptive Denormalization.
-
-    Replaces standard BatchNorm: instead of using learned affine parameters,
-    SPADE computes spatially-varying gamma/beta from a conditioning input
-    (the reference image features) via a small conv network.
-    """
-
-    def __init__(self, norm_nc: int, cond_nc: int, hidden_nc: int = 128):
-        super().__init__()
-        self.norm = nn.InstanceNorm2d(norm_nc, affine=False)  # Instance norm (no learnt affine)
-        self.shared = nn.Sequential(
-            nn.Conv2d(cond_nc, hidden_nc, 3, padding=1),
-            nn.ReLU(inplace=False),
-        )
-        self.gamma = nn.Conv2d(hidden_nc, norm_nc, 3, padding=1)  # Learned scale
-        self.beta = nn.Conv2d(hidden_nc, norm_nc, 3, padding=1)   # Learned bias
-
-    def forward(self, x: torch.Tensor, cond: torch.Tensor) -> torch.Tensor:
-        # x     Shape: [B, norm_nc, H, W]
-        # cond  Shape: [B, cond_nc, H_c, W_c]
-        normalised = self.norm(x)  # Shape: [B, norm_nc, H, W]
-
-        # Resize condition to match spatial dims of x
-        if cond.shape[2:] != x.shape[2:]:
-            cond = F.interpolate(cond, size=x.shape[2:], mode="bilinear", align_corners=False)
-            # Shape: [B, cond_nc, H, W]
-
-        shared = self.shared(cond)        # Shape: [B, hidden_nc, H, W]
-        gamma = self.gamma(shared)        # Shape: [B, norm_nc, H, W]
-        beta = self.beta(shared)          # Shape: [B, norm_nc, H, W]
-
-        return normalised * (1 + gamma) + beta  # Shape: [B, norm_nc, H, W]
-
-
-class SPADEResBlock(nn.Module):
-    """Residual block with SPADE normalization at each conv layer."""
-
-    def __init__(self, fin: int, fout: int, cond_nc: int):
-        super().__init__()
-        fmid = min(fin, fout)
-        self.learned_skip = (fin != fout)
-
-        self.norm_0 = SPADE(fin, cond_nc)
-        self.conv_0 = nn.Conv2d(fin, fmid, 3, padding=1)
-        self.norm_1 = SPADE(fmid, cond_nc)
-        self.conv_1 = nn.Conv2d(fmid, fout, 3, padding=1)
-
-        if self.learned_skip:
-            self.norm_s = SPADE(fin, cond_nc)
-            self.conv_s = nn.Conv2d(fin, fout, 1, bias=False)
-
-    def forward(self, x: torch.Tensor, cond: torch.Tensor) -> torch.Tensor:
-        # x    Shape: [B, fin, H, W]
-        # cond Shape: [B, cond_nc, H_c, W_c]
-        dx = self.conv_0(F.leaky_relu(self.norm_0(x, cond), 0.2))  # Shape: [B, fmid, H, W]
-        dx = self.conv_1(F.leaky_relu(self.norm_1(dx, cond), 0.2)) # Shape: [B, fout, H, W]
-
-        if self.learned_skip:
-            skip = self.conv_s(F.leaky_relu(self.norm_s(x, cond), 0.2))  # Shape: [B, fout, H, W]
-        else:
-            skip = x  # Shape: [B, fout, H, W]
-
-        return dx + skip  # Shape: [B, fout, H, W]
-
-
-# ---------------------------------------------------------------------------
-# Reference Encoder (lightweight)
-# ---------------------------------------------------------------------------
-
-class ReferenceEncoder(nn.Module):
-    """Encodes the reference image into a multi-scale feature representation
-    that will be injected into the generator via SPADE layers."""
-
-    def __init__(self, in_nc: int = 3, nf: int = 64):
-        super().__init__()
-        self.layer1 = nn.Sequential(
-            nn.Conv2d(in_nc, nf, 3, stride=2, padding=1),
-            nn.InstanceNorm2d(nf),
-            nn.LeakyReLU(0.2, inplace=False),
-        )  # Output: [B, 64, H/2, W/2]
-        self.layer2 = nn.Sequential(
-            nn.Conv2d(nf, nf * 2, 3, stride=2, padding=1),
-            nn.InstanceNorm2d(nf * 2),
-            nn.LeakyReLU(0.2, inplace=False),
-        )  # Output: [B, 128, H/4, W/4]
-        self.layer3 = nn.Sequential(
-            nn.Conv2d(nf * 2, nf * 4, 3, stride=2, padding=1),
-            nn.InstanceNorm2d(nf * 4),
-            nn.LeakyReLU(0.2, inplace=False),
-        )  # Output: [B, 256, H/8, W/8]
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # x Shape: [B, 3, H, W]
-        x = self.layer1(x)  # Shape: [B, 64, H/2, W/2]
-        x = self.layer2(x)  # Shape: [B, 128, H/4, W/4]
-        x = self.layer3(x)  # Shape: [B, 256, H/8, W/8]
-        return x  # Shape: [B, 256, H/8, W/8]
-
-
-# ---------------------------------------------------------------------------
-# Generators
-# ---------------------------------------------------------------------------
-
-class SPADEResNet9Generator(nn.Module):
-    """Lite generator: ResNet-9 backbone with SPADE reference injection.
-
-    The skeleton is encoded via a standard conv encoder. The reference image
-    is encoded separately by a ``ReferenceEncoder`` and injected at every
-    SPADE residual block in the decoder.
-    """
-
-    def __init__(self, in_nc: int = 3, out_nc: int = 3, ngf: int = 64, n_blocks: int = 9):
-        super().__init__()
-        self.ref_encoder = ReferenceEncoder(in_nc=3, nf=ngf)
-        cond_nc = ngf * 4  # 256 – output channels of reference encoder
-
-        # --- Skeleton encoder (no SPADE, just standard convs) ---
-        self.enc_head = nn.Sequential(
-            nn.ReflectionPad2d(3),
-            nn.Conv2d(in_nc, ngf, 7, padding=0),
-            nn.InstanceNorm2d(ngf),
-            nn.ReLU(inplace=False),
-        )  # Output: [B, 64, H, W]
-
-        self.enc_down1 = nn.Sequential(
-            nn.Conv2d(ngf, ngf * 2, 3, stride=2, padding=1),
-            nn.InstanceNorm2d(ngf * 2),
-            nn.ReLU(inplace=False),
-        )  # Output: [B, 128, H/2, W/2]
-
-        self.enc_down2 = nn.Sequential(
-            nn.Conv2d(ngf * 2, ngf * 4, 3, stride=2, padding=1),
-            nn.InstanceNorm2d(ngf * 4),
-            nn.ReLU(inplace=False),
-        )  # Output: [B, 256, H/4, W/4]
-
-        # --- SPADE ResNet blocks in bottleneck ---
-        self.spade_blocks = nn.ModuleList([
-            SPADEResBlock(ngf * 4, ngf * 4, cond_nc) for _ in range(n_blocks)
-        ])
-
-        # --- Decoder (upsampling) ---
-        self.dec_up1 = nn.Sequential(
-            nn.ConvTranspose2d(ngf * 4, ngf * 2, 3, stride=2, padding=1, output_padding=1),
-            nn.InstanceNorm2d(ngf * 2),
-            nn.ReLU(inplace=False),
-        )  # Output: [B, 128, H/2, W/2]
-
-        self.dec_up2 = nn.Sequential(
-            nn.ConvTranspose2d(ngf * 2, ngf, 3, stride=2, padding=1, output_padding=1),
-            nn.InstanceNorm2d(ngf),
-            nn.ReLU(inplace=False),
-        )  # Output: [B, 64, H, W]
-
-        self.dec_head = nn.Sequential(
-            nn.ReflectionPad2d(3),
-            nn.Conv2d(ngf, out_nc, 7, padding=0),
-            nn.Tanh(),
-        )  # Output: [B, 3, H, W]
-
-    def forward(self, skeleton: torch.Tensor, reference: torch.Tensor) -> torch.Tensor:
-        # skeleton  Shape: [B, 3, H, W]
-        # reference Shape: [B, 3, H, W]
-
-        # Encode reference
-        ref_feat = self.ref_encoder(reference)  # Shape: [B, 256, H/8, W/8]
-
-        # Encode skeleton
-        x = self.enc_head(skeleton)  # Shape: [B, 64, H, W]
-        x = self.enc_down1(x)       # Shape: [B, 128, H/2, W/2]
-        x = self.enc_down2(x)       # Shape: [B, 256, H/4, W/4]
-
-        # SPADE bottleneck: reference features injected here
-        for block in self.spade_blocks:
-            x = block(x, ref_feat)   # Shape: [B, 256, H/4, W/4]
-
-        # Decode
-        x = self.dec_up1(x)          # Shape: [B, 128, H/2, W/2]
-        x = self.dec_up2(x)          # Shape: [B, 64, H, W]
-        x = self.dec_head(x)         # Shape: [B, 3, H, W]
-
-        return x
 
 
 # ---------------------------------------------------------------------------
@@ -471,8 +274,8 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
 
     # DDP wrapping
     if ngpus_per_node > 1:
-        generator = DDP(generator, device_ids=[gpu])
-        discriminator = DDP(discriminator, device_ids=[gpu])
+        generator = DDP(generator, device_ids=[gpu])  # type: ignore[assignment]
+        discriminator = DDP(discriminator, device_ids=[gpu])  # type: ignore[assignment]
 
     # --- Optimisers ---
     optimizer_G = optim.Adam(generator.parameters(), lr=args.lr, betas=(args.b1, args.b2))
@@ -483,8 +286,8 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
         optimizer_D.load_state_dict(ckpt["opt_D"])
 
     # --- Losses ---
-    vgg_weights = "assets/weights/vgg19-bn.pth"
-    if not os.path.exists(vgg_weights):
+    vgg_weights: str | None = "assets/weights/vgg19-bn.pth"
+    if vgg_weights and not os.path.exists(vgg_weights):
         vgg_weights = None
     vgg_loss = VGG19PerceptualLoss(weights_path=vgg_weights).to(device)
 
@@ -495,6 +298,7 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
         include_reference=True
     )
 
+    sampler: DistributedSampler | None = None
     if ngpus_per_node > 1:
         sampler = DistributedSampler(dataset)
     else:

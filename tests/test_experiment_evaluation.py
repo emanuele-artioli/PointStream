@@ -26,19 +26,25 @@ def test_evaluate_run_summary_combines_timings_and_savings(monkeypatch, tmp_path
         summary={
             "source_uri": str(source_video),
             "decoded_uri": str(decoded_video),
-            "source_size_bytes": 100,
-            "transport_total_size_bytes": 60,
-            "pipeline_total_sec": 2.0,
-            "encode_chunk_sec": 1.0,
-            "transport_send_sec": 0.2,
-            "transport_receive_sec": 0.1,
-            "decode_sec": 0.3,
+            "evaluation": {
+                "sizes_bytes": {
+                    "source": 100,
+                    "transport_total": 60,
+                },
+                "timings_sec": {
+                    "pipeline_total_sec": 2.0,
+                    "encode_chunk_sec": 1.0,
+                    "transport_send_sec": 0.2,
+                    "transport_receive_sec": 0.1,
+                    "decode_sec": 0.3,
+                }
+            }
         },
         experiment_dir=tmp_path,
         max_frames=8,
     )
 
-    assert evaluation["decoded_video_size_bytes"] == len(b"decoded-bytes")
-    assert evaluation["transport_savings_percent"] == 40.0
+    assert evaluation["sizes_bytes"]["decoded_video"] == len(b"decoded-bytes")
+    assert evaluation["sizes_bytes"]["transport_savings_percent"] == 40.0
     assert evaluation["psnr_mean"] == 38.5
     assert evaluation["psnr_num_frames"] == 4

@@ -92,7 +92,7 @@ class Pix2PixStrategy(BaseGenAIStrategy):
 
     def __init__(self, config: Any = None):
         self.config = config
-        self._model = None
+        self._model: UNetGenerator | None = None
         self._width = int(config.controlnet_width) if config and hasattr(config, "controlnet_width") else 512
         self._height = int(config.controlnet_height) if config and hasattr(config, "controlnet_height") else 512
 

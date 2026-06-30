@@ -1,9 +1,6 @@
 import torch
 import cv2
 import numpy as np
-from pathlib import Path
-import glob
-import sys
 
 from src.shared.tennis_dataset import TennisSkeletonDataset
 from scripts.train_pix2pix import UNetGenerator
@@ -47,7 +44,7 @@ def test_inference():
             out_p2p = p2p_net(torch.cat((skel, ref), 1))
         
         cv2.imwrite("outputs/inference_pix2pix.jpg", tensor_to_image(out_p2p[0]))
-        print(f"Saved Pix2Pix inference to outputs/inference_pix2pix.jpg")
+        print("Saved Pix2Pix inference to outputs/inference_pix2pix.jpg")
     except Exception as e:
         print(f"Pix2Pix inference failed: {e}")
         
@@ -66,7 +63,7 @@ def test_inference():
             out_spade = spade_net(skel, ref)
             
         cv2.imwrite("outputs/inference_spade.jpg", tensor_to_image(out_spade[0]))
-        print(f"Saved SPADE inference to outputs/inference_spade.jpg")
+        print("Saved SPADE inference to outputs/inference_spade.jpg")
     except Exception as e:
         print(f"SPADE inference failed: {e}")
 

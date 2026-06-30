@@ -119,7 +119,8 @@ def match_rackets_to_players(
     across frames (not done here directly, this function just returns best matches for *this* frame).
     Returns {person_tid: {'racket': racket_det}} for the current frame.
     """
-    matches = {}
+    from typing import Any, Dict
+    matches: Dict[int, Dict[Any, Any]] = {}
     if not person_dets or not racket_dets:
         return matches
         

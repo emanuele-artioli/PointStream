@@ -11,6 +11,7 @@ import torch
 
 from src.shared.dwpose_draw import draw_dwpose_canvas
 from src.shared.genai_debug import export_compositor_artifacts
+from src.shared.racket_heuristic import render_pose_with_racket
 from src.shared.tags import gpu_bound
 from src.shared.torch_dtype import is_cuda_device_usable, resolve_torch_dtype_for_device
 
@@ -1312,9 +1313,11 @@ def _render_pose_with_racket(
     pose_np = pose_tensor.detach().cpu().numpy()
     if pose_np.ndim == 3:
         pose_np = pose_np[-1]
-    
+    racket_bbox_tuple: tuple[float, float, float, float] | None = None
+    if isinstance(racket_bbox, (tuple, list)) and len(racket_bbox) == 4:
+        racket_bbox_tuple = (float(racket_bbox[0]), float(racket_bbox[1]), float(racket_bbox[2]), float(racket_bbox[3]))
     # render_pose_with_racket returns a BGR/RGB canvas
-    return render_pose_with_racket(pose_np, racket_bbox, output_height, output_width)
+    return render_pose_with_racket(pose_np, racket_bbox_tuple, output_height, output_width)
 
 
 # Backward-compatible alias used by existing decode tests.

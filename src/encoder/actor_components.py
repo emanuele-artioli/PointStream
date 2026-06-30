@@ -24,7 +24,7 @@ from src.shared.schemas import (
     VideoChunk,
 )
 from src.shared.geometry import get_iou
-from src.shared.player_extraction import extract_pose_dwpose18, match_rackets_to_players
+from src.shared.player_extraction import extract_pose_dwpose18
 from src.shared.mask_codec import encode_binary_mask, encode_polygon_mask, normalize_mask_codec
 from src.shared.dwpose_draw import draw_dwpose_canvas
 from src.shared.profiling import PipelineProfiler
