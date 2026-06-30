@@ -1176,5 +1176,33 @@ if __name__ == '__main__':
     except Exception as e:
         print(f"Error during GPU phase: {e}")
         
+    print("\n--- PHASE 3: Dataset Metadata Generation ---")
+    import json
+    meta_entries = []
+    
+    # We processed multiple videos. The root is assets/dataset
+    dataset_root = os.path.join(REPO_ROOT, 'assets', 'dataset')
+    search_pattern = os.path.join(dataset_root, "*", "segmentations", "scene_*", "track_*")
+    all_tracks = glob.glob(search_pattern)
+    for track_dir_str in all_tracks:
+        if track_dir_str.endswith("_skeleton"):
+            continue
+        track_dir = Path(track_dir_str)
+        skel_dir = track_dir.with_name(f"{track_dir.name}_skeleton")
+        if not skel_dir.exists():
+            continue
+        color_frames = list(track_dir.glob("frame_*.png"))
+        if len(color_frames) < 2:
+            continue
+        meta_entries.append({
+            "video_path": str(track_dir.resolve()),
+            "kps_path": str(skel_dir.resolve())
+        })
+    
+    out_json = os.path.join(dataset_root, "pointstream_aa_meta.json")
+    with open(out_json, "w") as f:
+        json.dump(meta_entries, f, indent=4)
+    print(f"Generated Animate Anyone meta info with {len(meta_entries)} sequences at {out_json}")
+
     print("\nDataset processing complete!")
 

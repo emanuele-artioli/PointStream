@@ -103,6 +103,27 @@ You can still override explicitly with:
 
 * `--animate-anyone-model-dir /absolute/path/to/profile`
 
+### **Fine-Tuning Animate-Anyone**
+
+If you want to train or fine-tune Animate-Anyone on your own dataset, Pointstream provides a pipeline to prepare the dataset and launch the training natively via the `animate_anyone` python module, bypassing the need to compress your data into `.mp4` files.
+
+1. **Prepare the Dataset:**  
+   First, process your raw videos to extract the tracks, skeletons, and segmentations.
+   ```shell
+   python scripts/process_dataset.py
+   ```
+2. **Generate Meta Info:**  
+   Generate the `meta.json` required by the Animate Anyone dataloader. This script scans the processed dataset and points to the native, uncompressed `.png` sequence directories.
+   ```shell
+   python scripts/generate_aa_meta.py
+   ```
+3. **Run Training (Stage 1 & 2):**  
+   Launch the training natively via the packaged `animate_anyone` module using the provided configs. The configurations are set to automatically read your `.png` sequences and apply aspect-ratio-preserving padding.
+   ```shell
+   accelerate launch -m animate_anyone.scripts.train_stage_1 --config assets/animate-anyone/configs/finetune_stage1.yaml
+   accelerate launch -m animate_anyone.scripts.train_stage_2 --config assets/animate-anyone/configs/finetune_stage2.yaml
+   ```
+
 ## **Run the Pipeline**
 
 Run with a custom input video:  
