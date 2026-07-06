@@ -565,7 +565,7 @@ def process_gpu_phase(args):
         else:
             classify_scenes(video_path, scenes_dir, device)
         
-    if 'segment' in stages or 'pose' in stages or 'skeleton' in stages:
+    if 'segment' in stages or 'pose' in stages or 'skeleton' in stages or 'canny' in stages or 'caption' in stages:
         if not os.path.exists(json_path):
             print(f"[{device}] No cuts found for {vname}, skipping downstream.")
             return
@@ -595,6 +595,14 @@ def process_gpu_phase(args):
                 if 'skeleton' in stages:
                     print(f"[{device}] Rendering skeleton for scene {i}")
                     _render_skeleton_worker(video_path, dataset_dir, i, device)
+                    
+                if 'canny' in stages:
+                    print(f"[{device}] Extracting canny edges for scene {i}")
+                    _extract_canny_worker(video_path, dataset_dir, i, device)
+                    
+                if 'caption' in stages:
+                    print(f"[{device}] Extracting captions for scene {i}")
+                    _extract_caption_worker(video_path, dataset_dir, i, device)
 
 
 
@@ -1085,6 +1093,86 @@ def _render_skeleton_worker(video_path, dataset_dir, scene_idx, device):
             cv2.imwrite(frame_path, canvas)
 
 
+def _extract_canny_worker(video_path, dataset_dir, scene_idx, device):
+    import glob
+    import os
+    import cv2
+    import numpy as np
+
+    seg_dir = os.path.join(dataset_dir, 'segmentations', f'scene_{scene_idx:03d}')
+    track_dirs = [d for d in glob.glob(os.path.join(seg_dir, 'track_*')) if os.path.isdir(d) and not d.endswith('_skeleton') and not d.endswith('_canny')]
+    for tdir in track_dirs:
+        tid = os.path.basename(tdir).split('_')[1]
+        out_canny_dir = os.path.join(seg_dir, f'track_{tid}_canny')
+        if os.path.exists(out_canny_dir) and len(os.listdir(out_canny_dir)) > 0:
+            continue
+            
+        os.makedirs(out_canny_dir, exist_ok=True)
+        frame_files = sorted(glob.glob(os.path.join(tdir, '*.png')))
+        for fpath in frame_files:
+            fname = os.path.basename(fpath)
+            frame = cv2.imread(fpath)
+            if frame is None:
+                continue
+            if frame.shape[2] == 4:
+                frame = frame[:, :, :3]
+            
+            # Canny edge detection
+            # Auto threshold based on median
+            v = np.median(frame)
+            lower = int(max(0, (1.0 - 0.33) * v))
+            upper = int(min(255, (1.0 + 0.33) * v))
+            edges = cv2.Canny(frame, lower, upper)
+            # Expand to 3 channels
+            edges_bgr = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
+            out_path = os.path.join(out_canny_dir, fname)
+            cv2.imwrite(out_path, edges_bgr)
+
+
+def _extract_caption_worker(video_path, dataset_dir, scene_idx, device):
+    import glob
+    import os
+    import json
+    from PIL import Image
+
+    seg_dir = os.path.join(dataset_dir, 'segmentations', f'scene_{scene_idx:03d}')
+    track_dirs = [d for d in glob.glob(os.path.join(seg_dir, 'track_*')) if os.path.isdir(d) and not d.endswith('_skeleton') and not d.endswith('_canny')]
+    
+    # We only load the model if there's actually work to do
+    processor = None
+    model = None
+    
+    for tdir in track_dirs:
+        tid = os.path.basename(tdir).split('_')[1]
+        out_caption_json = os.path.join(seg_dir, f'track_{tid}_caption.json')
+        if os.path.exists(out_caption_json):
+            continue
+            
+        frame_files = sorted(glob.glob(os.path.join(tdir, '*.png')))
+        if not frame_files:
+            continue
+            
+        first_frame_path = frame_files[0]
+        image = Image.open(first_frame_path).convert('RGB')
+        
+        if processor is None:
+            from transformers import BlipProcessor, BlipForConditionalGeneration
+            REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+            vlm_id = os.path.join(REPO_ROOT, 'assets', 'weights', 'blip-image-captioning-base')
+            processor = BlipProcessor.from_pretrained(vlm_id)
+            model = BlipForConditionalGeneration.from_pretrained(vlm_id).to(device)
+            
+        inputs = processor(image, return_tensors="pt").to(device)
+        out = model.generate(**inputs, max_new_tokens=50)
+        caption = processor.decode(out[0], skip_special_tokens=True)
+        
+        base_prompt = "photorealistic tennis player, broadcast sports shot"
+        full_prompt = f"{caption}, {base_prompt}"
+        
+        with open(out_caption_json, 'w') as f:
+            json.dump({'caption': full_prompt}, f, indent=2)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process dataset videos and classify scenes.')
     parser.add_argument('--input', required=True, help='Path to input video file or folder containing .mp4 files')
@@ -1093,7 +1181,7 @@ if __name__ == '__main__':
     parser.add_argument('--seg-model', type=str, default='yolo26x-eg.pt', help='Segmentation model to use')
     parser.add_argument('--pose-model', type=str, default='yolo26x-pose.pt', help='Pose model to use for keypoint extraction')
     parser.add_argument('--max-scenes', type=int, default=10, help='Maximum number of point scenes to process per video')
-    parser.add_argument('--stages', nargs='+', default=['classify', 'segment', 'pose', 'skeleton'], help='Stages to run')
+    parser.add_argument('--stages', nargs='+', default=['classify', 'segment', 'pose', 'skeleton', 'canny', 'caption'], help='Stages to run')
     parser.add_argument('--debug-video', action='store_true', help='Generate AVC debug videos for stitched tracks')
     
     args = parser.parse_args()

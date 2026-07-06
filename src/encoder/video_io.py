@@ -98,7 +98,7 @@ def iter_video_frames_ffmpeg(
     process = subprocess.Popen(
         ffmpeg_cmd,
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
         bufsize=10**7,
     )
 
@@ -122,16 +122,11 @@ def iter_video_frames_ffmpeg(
     finally:
         if process.stdout is not None:
             process.stdout.close()
-        stderr_output = b""
-        if process.stderr is not None:
-            stderr_output = process.stderr.read()
-            process.stderr.close()
-
+            
         return_code = process.wait()
         if yielded_frames == 0:
-            stderr_text = stderr_output.decode("utf-8", errors="replace").strip()
             raise ValueError(
-                f"FFmpeg produced no decodable frames for '{source}': {stderr_text or 'unknown error'}"
+                f"FFmpeg produced no decodable frames for '{source}'."
             )
 
         # Treat warnings/non-zero return as non-fatal if valid frame bytes were produced.

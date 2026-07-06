@@ -603,7 +603,8 @@ class DiffusersCompositor(BaseCompositor):
             return IPAdapterControlNetStrategy(config=self.config)
         if backend in {"canny-controlnet", "canny_controlnet"}:
             from src.decoder.controlnet_engine import CannyControlNetStrategy
-            return CannyControlNetStrategy(config=self.config)
+            cnet_id = getattr(self.config, "controlnet_id", "lllyasviel/control_v11p_sd15_canny")
+            return CannyControlNetStrategy(controlnet_id=cnet_id, config=self.config)
         if backend in {"seg-controlnet", "seg_controlnet"}:
             from src.decoder.controlnet_engine import SegControlNetStrategy
             return SegControlNetStrategy(config=self.config)
@@ -666,6 +667,11 @@ class DiffusersCompositor(BaseCompositor):
                 if fallback_mask is None:
                     fallback_mask = np.zeros((target_h, target_w), dtype=np.float32)
                 fallback_u8 = np.asarray(fallback_mask * 255.0, dtype=np.uint8)
+                
+                if self._backend in {"canny-controlnet", "canny_controlnet"}:
+                    import cv2
+                    fallback_u8 = cv2.Canny(fallback_u8, 100, 200)
+                    
                 control_tensor = torch.from_numpy(fallback_u8).unsqueeze(0).to(self._device)
 
         if debug_dir is not None and frame_idx is not None and actor_identity is not None:

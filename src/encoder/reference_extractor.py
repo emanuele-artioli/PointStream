@@ -19,13 +19,15 @@ class ReferenceExtractor:
     @cpu_bound
     def process(self, chunk: VideoChunk, frame_states: list[FrameState]) -> list[SceneActorReference]:
         metadata = probe_video_metadata(chunk.source_uri)
-        frames = list(
-            iter_video_frames_ffmpeg(
-                chunk.source_uri,
-                width=metadata.width,
-                height=metadata.height,
-            )
-        )
+        frames = []
+        for frame in iter_video_frames_ffmpeg(
+            chunk.source_uri,
+            width=metadata.width,
+            height=metadata.height,
+        ):
+            frames.append(frame)
+            if len(frames) >= chunk.num_frames:
+                break
         if not frames:
             return []
 

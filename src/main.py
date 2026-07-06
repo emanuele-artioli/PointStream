@@ -114,6 +114,7 @@ def run_pipeline(
     chunk_id: str = "0001",
     runtime_output_root: str | Path | None = None,
 ) -> dict[str, object]:
+    print("HELLO FROM RUN_PIPELINE 1", flush=True)
     pipeline_started = perf_counter()
     resolved_transport_root = Path(transport_root).expanduser() if transport_root is not None else _create_timestamped_output_dir()
     resolved_transport_root.mkdir(parents=True, exist_ok=True)
@@ -121,14 +122,17 @@ def run_pipeline(
     resolved_runtime_root = Path(runtime_output_root).expanduser() if runtime_output_root is not None else resolved_transport_root
     resolved_runtime_root.mkdir(parents=True, exist_ok=True)
 
+    print("HELLO FROM RUN_PIPELINE 2", flush=True)
     if config.source_uri is None:
         resolved_source_uri = _ensure_mock_source_video(config, runtime_output_root=resolved_runtime_root)
     else:
         resolved_source_uri = str(Path(config.source_uri).expanduser().resolve())
         
+    print("HELLO FROM RUN_PIPELINE 3", flush=True)
     source_metadata = probe_video_metadata(resolved_source_uri)
     chunk_frames = source_metadata.num_frames if config.num_frames is None else min(source_metadata.num_frames, config.num_frames)
 
+    print("HELLO FROM RUN_PIPELINE 4", flush=True)
     chunk = VideoChunk(
         chunk_id=chunk_id,
         source_uri=resolved_source_uri,
@@ -153,10 +157,12 @@ def run_pipeline(
         reference_extractor=reference_extractor,
         residual_calculator=residual_calculator,
     )
-
+    print("HELLO FROM RUN_PIPELINE 5", flush=True)
     try:
         encode_started = perf_counter()
+        print("HELLO FROM RUN_PIPELINE 6 - ABOUT TO ENCODE CHUNK", flush=True)
         payload = encoder.encode_chunk(chunk)
+        print("HELLO FROM RUN_PIPELINE 7 - CHUNK ENCODED", flush=True)
         encode_finished = perf_counter()
     finally:
         encoder.shutdown()
@@ -287,53 +293,68 @@ def run_pipeline(
     return summary
 
 
-def run_cli(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run PointStream pipeline.")
+def run_cli() -> int:
+    print("HELLO FROM RUN_CLI 1", flush=True)
+    logging.basicConfig(level=logging.INFO)
+    print("HELLO FROM RUN_CLI 2", flush=True)
+    parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=str, default="config/default.yaml", help="Path to config file.")
-    parser.add_argument("--input", dest="source_uri", type=str, default=None, help="Input video override.")
-    
-    args = parser.parse_args(sys.argv[1:] if argv is None else argv)
-    cli_overrides = {}
-    if args.source_uri is not None:
-        cli_overrides["source_uri"] = args.source_uri
-        
+    parser.add_argument("--input", type=str, dest="source_uri", help="Input video override.")
+    args = parser.parse_args()
+    print("HELLO FROM RUN_CLI 3", flush=True)
+
+    cli_overrides = {k: v for k, v in vars(args).items() if v is not None}
     config = load_config(args.config, cli_overrides)
+    print("HELLO FROM RUN_CLI 4", flush=True)
+    
+    print("HELLO FROM RUN_CLI 4", flush=True)
     
     root_level = getattr(logging, config.log_level.upper(), logging.INFO)
     logging.basicConfig(
         level=root_level,
         format="%(asctime)s [%(levelname)s] %(message)s",
     )
+    print("HELLO FROM RUN_CLI 4.1", flush=True)
 
     try:
         import transformers
+        print("HELLO FROM RUN_CLI 4.2", flush=True)
         transformers.logging.set_verbosity(root_level)
     except ImportError:
         pass
 
+    print("HELLO FROM RUN_CLI 4.3", flush=True)
     try:
         import diffusers
+        print("HELLO FROM RUN_CLI 4.4", flush=True)
         diffusers.logging.set_verbosity(root_level)  # type: ignore[attr-defined]
     except ImportError:
         pass
 
+    print("HELLO FROM RUN_CLI 4.5", flush=True)
     try:
         import huggingface_hub
+        print("HELLO FROM RUN_CLI 4.6", flush=True)
         huggingface_hub.utils.logging.set_verbosity(root_level)
     except ImportError:
         pass
+    print("HELLO FROM RUN_CLI 4.7", flush=True)
     
+    print("HELLO FROM RUN_CLI 5", flush=True)
     ensure_ffmpeg_encoder_available(config.ffmpeg_codec)
+    print("HELLO FROM RUN_CLI 6", flush=True)
     
     run_output_root = _create_timestamped_output_dir(base_root=_project_root() / "outputs")
     config.runtime_output_dir = str(run_output_root)
     config.debug_artifact_dir = str(run_output_root / "debug")
+    print("HELLO FROM RUN_CLI 7", flush=True)
     run_summary: dict[str, Any] = run_pipeline(
         config=config,
         transport_root=run_output_root,
         chunk_id="0001",
         runtime_output_root=run_output_root,
     )
+    print("HELLO FROM RUN_CLI 8", flush=True)
     
     if config.evaluation_mode:
         from time import perf_counter
