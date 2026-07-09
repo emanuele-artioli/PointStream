@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
+import os
 from pathlib import Path
 from typing import Any
 
@@ -201,9 +202,13 @@ class ActorExtractor:
         if override:
             return Path(override) / "debug_actors"
 
+        env_override = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")
+        if env_override:
+            return Path(env_override) / "debug_actors"
+
         project_root = Path(__file__).resolve().parents[2]
         timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_%f")
-        return project_root / "outputs" / timestamp / "debug" / "debug_actors"
+        return project_root / "outputs" / "tests" / timestamp / "debug" / "debug_actors"
 
     def _load_frames(self, chunk: VideoChunk) -> list[np.ndarray]:
         source = Path(chunk.source_uri)

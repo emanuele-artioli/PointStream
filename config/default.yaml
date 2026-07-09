@@ -24,16 +24,16 @@ gpu-workers: null                     # GPU worker count (null = auto-detect)
 # ============================================================================
 # Actor Extraction Pipeline
 # ============================================================================
-detector: yolo26n.pt                  # Player detector model filename: mock, yolo26n.pt or yoloe26n.pt (open-vocabulary)
+detector: yolo26n.pt                  # Player detector: any name containing "yolo" or "yoloe" (open-vocabulary)
 target-class-caption: tennis player   # Caption for open-vocabulary detectors and segmenters
-pose-estimator: yolo26n-pose.pt       # Pose estimator model filename: mock, yolo26n-pose.pt or dw-pose
-segmenter: yolo26n-seg.pt             # Segmentation model filename: mock, yolo26n-seg.pt or yoloe26n-seg.pt (open-vocabulary)
+pose-estimator: yolo26n-pose.pt       # Pose estimator: name containing "yolo", or "dwpose" for DwposeEstimator
+segmenter: yolo26n-seg.pt             # Segmenter: name containing "yolo", "yoloe" (open-vocab), or "sam"
 payload-pose-delta-threshold: 20.0    # Pose keyframe delta threshold
 
 # ============================================================================
 # Ball Extraction Configuration
 # ============================================================================
-ball-extractor: difference            # Ball extraction: difference, segmentation, cascade, mock
+ball-extractor: difference            # Ball extraction: "segmentation" selects SegmentationBallExtractor; any other value (including this default) uses the difference-based BallExtractor
 ball-difference-threshold: 18.0       # Pixel-difference threshold for difference-based extraction
 ball-min-blob-area: 6                 # Minimum connected-component area for ball detection
 ball-max-side: 0                      # Max frame side for ball extraction (0 = native resolution)

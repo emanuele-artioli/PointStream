@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 import logging
+import os
 from pathlib import Path
 from typing import Any
 
@@ -52,8 +53,12 @@ class DecoderRenderer:
         self._synthesis_engine = synthesis_engine or SynthesisEngine(config=self.config, seed=seed)
         project_root = Path(__file__).resolve().parents[2]
         if output_root is None:
-            timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_%f")
-            self._output_root = project_root / "outputs" / timestamp / "decoded"
+            env_override = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")
+            if env_override:
+                self._output_root = Path(env_override) / "decoded"
+            else:
+                timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_%f")
+                self._output_root = project_root / "outputs" / "tests" / timestamp / "decoded"
         else:
             self._output_root = Path(output_root)
         self._output_root.mkdir(parents=True, exist_ok=True)

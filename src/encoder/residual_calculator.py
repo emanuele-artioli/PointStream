@@ -3,7 +3,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from dataclasses import dataclass
+from datetime import datetime
 import logging
+import os
 from pathlib import Path
 from typing import Any
 
@@ -926,10 +928,14 @@ class ResidualCalculator:
         if runtime_output_dir:
             base_dir = Path(runtime_output_dir).expanduser()
         else:
-            try:
-                base_dir = Path.cwd()
-            except FileNotFoundError:
-                base_dir = Path(__file__).resolve().parents[2] / "outputs"
+            env_override = os.environ.get("POINTSTREAM_DEBUG_ARTIFACT_DIR")
+            if env_override:
+                base_dir = Path(env_override).expanduser()
+            else:
+                # No configured/test output root (e.g. a script built its own
+                # config without going through run_cli): never write into cwd.
+                timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_%f")
+                base_dir = Path(__file__).resolve().parents[2] / "outputs" / "tests" / timestamp
 
         return base_dir / f"chunk_{chunk.chunk_id}" / "residual.mp4"
 

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import torch
 import cv2
 import numpy as np
@@ -5,6 +7,8 @@ import numpy as np
 from src.shared.tennis_dataset import TennisSkeletonDataset
 from scripts.train_pix2pix import UNetGenerator
 from src.shared.spade4tennis_arch import SPADEResNet9Generator
+
+OUTPUT_DIR = Path("outputs/inference_smoke")
 
 def tensor_to_image(tensor):
     # tensor: [C, H, W] in range [-1, 1]
@@ -17,6 +21,7 @@ def tensor_to_image(tensor):
 
 def test_inference():
     print("Testing inference on Pix2Pix and SPADE...")
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
     dataset = TennisSkeletonDataset(
@@ -43,8 +48,9 @@ def test_inference():
         with torch.no_grad():
             out_p2p = p2p_net(torch.cat((skel, ref), 1))
         
-        cv2.imwrite("outputs/inference_pix2pix.jpg", tensor_to_image(out_p2p[0]))
-        print("Saved Pix2Pix inference to outputs/inference_pix2pix.jpg")
+        out_path = OUTPUT_DIR / "pix2pix.jpg"
+        cv2.imwrite(str(out_path), tensor_to_image(out_p2p[0]))
+        print(f"Saved Pix2Pix inference to {out_path}")
     except Exception as e:
         print(f"Pix2Pix inference failed: {e}")
         
@@ -62,8 +68,9 @@ def test_inference():
         with torch.no_grad():
             out_spade = spade_net(skel, ref)
             
-        cv2.imwrite("outputs/inference_spade.jpg", tensor_to_image(out_spade[0]))
-        print("Saved SPADE inference to outputs/inference_spade.jpg")
+        out_path = OUTPUT_DIR / "spade.jpg"
+        cv2.imwrite(str(out_path), tensor_to_image(out_spade[0]))
+        print(f"Saved SPADE inference to {out_path}")
     except Exception as e:
         print(f"SPADE inference failed: {e}")
 
