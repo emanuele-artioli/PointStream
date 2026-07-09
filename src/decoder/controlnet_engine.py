@@ -9,6 +9,7 @@ from PIL import Image
 
 from src.decoder.genai_compositor import BaseGenAIStrategy, _to_numpy_bgr, _render_pose_condition
 from src.shared.torch_dtype import resolve_torch_dtype_for_device
+from .attention_injection import ReferenceAttentionProcessor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,6 +27,7 @@ class MockCaptionControlNetStrategy(BaseGenAIStrategy):
         seed: int,
         device: torch.device,
         metadata_bbox: tuple[int, int, int, int] | None = None,
+        **kwargs: Any,
     ) -> torch.Tensor:
         # Validate inputs
         if reference_crop_tensor.ndim != 3 or reference_crop_tensor.shape[0] != 3:
@@ -192,6 +194,7 @@ class CaptionControlNetStrategy(BaseGenAIStrategy):
         seed: int,
         device: torch.device,
         metadata_bbox: tuple[int, int, int, int] | None = None,
+        **kwargs: Any,
     ) -> torch.Tensor:
         pipe = self._ensure_pipeline(device)
 
@@ -398,6 +401,7 @@ class IPAdapterControlNetStrategy(BaseGenAIStrategy):
         seed: int,
         device: torch.device,
         metadata_bbox: tuple[int, int, int, int] | None = None,
+        **kwargs: Any,
     ) -> torch.Tensor:
         pipe = self._ensure_pipeline(device)
 
@@ -527,8 +531,23 @@ class CannyControlNetStrategy(BaseGenAIStrategy):
         )
         pipe = pipe.to(device)
         pipe.set_progress_bar_config(disable=True)
+        
+        # Attach custom attention processor for cross-frame temporal consistency
+        self._attn_processor = ReferenceAttentionProcessor()
+        pipe.unet.set_attn_processor(self._attn_processor)
+        
         self._pipe = pipe
         return pipe
+
+    def _upscale_sr(self, image_rgb: np.ndarray, target_w: int, target_h: int) -> np.ndarray:
+        """
+        Upscale the reference crop to the target ControlNet canvas size.
+        TODO: Replace this placeholder with a trained RealESRGAN/SwinIR model
+        fine-tuned on the high-res broadcast datasets for optimal facial/fabric details.
+        For now, we use cv2.INTER_LANCZOS4 as the mathematically optimal traditional upsampler.
+        """
+        _LOGGER.debug(f"SR Upscaling reference from {image_rgb.shape[:2]} to {(target_h, target_w)}")
+        return cv2.resize(image_rgb, (target_w, target_h), interpolation=cv2.INTER_LANCZOS4)
 
     def get_debug_inputs(
         self,
@@ -554,6 +573,8 @@ class CannyControlNetStrategy(BaseGenAIStrategy):
         seed: int,
         device: torch.device,
         metadata_bbox: tuple[int, int, int, int] | None = None,
+        init_image_override: Any = None,
+        strength_override: float | None = None,
     ) -> torch.Tensor:
         # dense_dwpose_tensor actually contains the binary mask or canny edge image here!
         pipe = self._ensure_pipeline(device)
@@ -598,13 +619,23 @@ class CannyControlNetStrategy(BaseGenAIStrategy):
 
         reference_rgb = cv2.cvtColor(reference_np, cv2.COLOR_BGR2RGB)
         if reference_rgb.shape[0] != scaled_h or reference_rgb.shape[1] != scaled_w:
-            reference_rgb = cv2.resize(reference_rgb, (scaled_w, scaled_h), interpolation=cv2.INTER_LANCZOS4)
+            reference_rgb = self._upscale_sr(reference_rgb, scaled_w, scaled_h)
             
         padded_reference = np.zeros((self._height, self._width, 3), dtype=np.uint8)
         padded_reference[offset_y:offset_y+scaled_h, offset_x:offset_x+scaled_w] = reference_rgb
             
-        init_image = Image.fromarray(padded_reference)
+        if init_image_override is not None:
+            init_image = init_image_override
+        else:
+            init_image = Image.fromarray(padded_reference)
+            
         control_image = Image.fromarray(control_rgb)
+
+        strength = strength_override if strength_override is not None else self._strength
+
+        # Set keyframe status on the attention processor. 
+        # If there's no init_image_override, it's the reference keyframe, so cache K/V.
+        self._attn_processor.is_keyframe = (init_image_override is None)
 
         generator = torch.Generator(device=device).manual_seed(int(seed))
         output = pipe(
@@ -614,7 +645,7 @@ class CannyControlNetStrategy(BaseGenAIStrategy):
             height=self._height,
             width=self._width,
             num_inference_steps=self._steps,
-            strength=self._strength,
+            strength=strength,
             guidance_scale=self._cfg,
             generator=generator,
         )

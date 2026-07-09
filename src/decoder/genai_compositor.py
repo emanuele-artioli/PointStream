@@ -56,6 +56,8 @@ class BaseGenAIStrategy(ABC):
         seed: int,
         device: torch.device,
         metadata_bbox: tuple[int, int, int, int] | None = None,
+        init_image_override: Any = None,
+        strength_override: float | None = None,
     ) -> torch.Tensor:
         raise NotImplementedError
 
@@ -73,13 +75,13 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
 
     def __init__(
         self,
-        model_id: str = "runwayml/stable-diffusion-v1-5",
-        controlnet_id: str = "lllyasviel/control_v11p_sd15_openpose",
+        model_id: str = "assets/weights/stable-diffusion-v1-5",
+        controlnet_id: str = "assets/weights/control_v11p_sd15_openpose",
         config: Any = None,
     ) -> None:
-        self._model_id = model_id
-        self._controlnet_id = controlnet_id
         self.config = config
+        self._model_id = model_id
+        self._controlnet_id = getattr(config, "controlnet_id", controlnet_id) if config else controlnet_id
         self._pipe: Any | None = None
         
         self._width = int(config.controlnet_width) if config and hasattr(config, "controlnet_width") else 512
@@ -175,6 +177,8 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
         seed: int,
         device: torch.device,
         metadata_bbox: tuple[int, int, int, int] | None = None,
+        init_image_override: Any = None,
+        strength_override: float | None = None,
     ) -> torch.Tensor:
         pipe = self._ensure_pipeline(device)
         try:
@@ -237,8 +241,14 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
             
         # _render_pose_condition returns an RGB canvas natively. Do not swap to BGR.
         pose_rgb = pose_image
-        init_image = Image.fromarray(padded_reference)
+        if init_image_override is not None:
+            init_image = init_image_override
+        else:
+            init_image = Image.fromarray(padded_reference)
+            
         control_image = Image.fromarray(pose_rgb)
+
+        strength = strength_override if strength_override is not None else self._strength
 
         generator = torch.Generator(device=device).manual_seed(int(seed))
         output = pipe(
@@ -248,7 +258,7 @@ class BaselineControlNetStrategy(BaseGenAIStrategy):
             height=self._height,
             width=self._width,
             num_inference_steps=self._steps,
-            strength=self._strength,
+            strength=strength,
             guidance_scale=self._cfg,
             generator=generator,
         )
@@ -347,6 +357,7 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
         seed: int,
         device: torch.device,
         metadata_bbox: tuple[int, int, int, int] | None = None,
+        **kwargs: Any,
     ) -> torch.Tensor:
         runtime_fn = self._ensure_runtime()
 
@@ -579,6 +590,10 @@ class DiffusersCompositor(BaseCompositor):
         self._current_debug_artifacts: dict[str, np.ndarray] | None = None
 
         self._strategy = self._build_strategy(self._backend)
+        self._last_actor_crop_by_actor: dict[str, np.ndarray] = {}
+        self._last_actor_bbox_by_actor: dict[str, tuple[int, int, int, int]] = {}
+        self._last_condition_canvas_by_actor: dict[str, np.ndarray] = {}
+        self._actor_frame_counter: dict[str, int] = {}
 
     def set_debug_stage(self, stage: str) -> None:
         self._debug_stage = str(stage)
@@ -586,6 +601,10 @@ class DiffusersCompositor(BaseCompositor):
     def clear_history(self) -> None:
         """Reset temporal state such as alpha smoothing history."""
         self._alpha_history_by_actor.clear()
+        self._last_actor_crop_by_actor.clear()
+        self._last_actor_bbox_by_actor.clear()
+        self._last_condition_canvas_by_actor.clear()
+        self._actor_frame_counter.clear()
 
     def _build_strategy(self, backend: str) -> BaseGenAIStrategy:
         if backend in {"controlnet", "baseline", "baseline-controlnet"}:
@@ -600,14 +619,16 @@ class DiffusersCompositor(BaseCompositor):
             return MockCaptionControlNetStrategy(config=self.config)
         if backend in {"ip-adapter-controlnet", "ip_adapter_controlnet"}:
             from src.decoder.controlnet_engine import IPAdapterControlNetStrategy
-            return IPAdapterControlNetStrategy(config=self.config)
+            cnet_id = getattr(self.config, "controlnet_id", "assets/weights/control_v11p_sd15_openpose")
+            return IPAdapterControlNetStrategy(controlnet_id=cnet_id, config=self.config)
         if backend in {"canny-controlnet", "canny_controlnet"}:
             from src.decoder.controlnet_engine import CannyControlNetStrategy
             cnet_id = getattr(self.config, "controlnet_id", "lllyasviel/control_v11p_sd15_canny")
             return CannyControlNetStrategy(controlnet_id=cnet_id, config=self.config)
         if backend in {"seg-controlnet", "seg_controlnet"}:
             from src.decoder.controlnet_engine import SegControlNetStrategy
-            return SegControlNetStrategy(config=self.config)
+            cnet_id = getattr(self.config, "controlnet_id", "lllyasviel/control_v11p_sd15_seg")
+            return SegControlNetStrategy(controlnet_id=cnet_id, config=self.config)
         if backend in {"pix2pix"}:
             from src.decoder.pix2pix_engine import Pix2PixStrategy
             return Pix2PixStrategy(config=self.config)
@@ -631,6 +652,26 @@ class DiffusersCompositor(BaseCompositor):
         debug_dir: str | Path | None = None,
         frame_idx: int | None = None,
     ) -> torch.Tensor:
+        if not hasattr(self, "_segmented_refs"):
+            self._segmented_refs = {}
+
+        if actor_identity is not None:
+            ref_id = f"{actor_identity}_{hash(reference_crop_tensor.data_ptr())}"
+            if ref_id not in self._segmented_refs:
+                ref_np = _to_numpy_bgr(reference_crop_tensor)
+                ref_alpha = self._segment_generated_actor_with_yolo(ref_np)
+                if ref_alpha is not None:
+                    kernel = np.ones((5, 5), np.float32)
+                    ref_alpha = cv2.dilate(ref_alpha.astype(np.float32), kernel, iterations=1)
+                    ref_alpha = np.clip(ref_alpha, 0.0, 1.0)
+                    ref_alpha_3ch = np.stack([ref_alpha]*3, axis=-1)
+                    ref_np = (ref_np * ref_alpha_3ch).astype(np.uint8)
+                    self._segmented_refs[ref_id] = torch.from_numpy(ref_np).permute(2, 0, 1).contiguous().to(self._device)
+                else:
+                    self._segmented_refs[ref_id] = reference_crop_tensor
+            
+            reference_crop_tensor = self._segmented_refs[ref_id]
+
         # Deterministic generation is required so residual encoding remains stable.
         if self._seed is not None:
             torch.manual_seed(self._seed)
@@ -669,7 +710,6 @@ class DiffusersCompositor(BaseCompositor):
                 fallback_u8 = np.asarray(fallback_mask * 255.0, dtype=np.uint8)
                 
                 if self._backend in {"canny-controlnet", "canny_controlnet"}:
-                    import cv2
                     fallback_u8 = cv2.Canny(fallback_u8, 100, 200)
                     
                 control_tensor = torch.from_numpy(fallback_u8).unsqueeze(0).to(self._device)
@@ -684,7 +724,109 @@ class DiffusersCompositor(BaseCompositor):
                 bg_np = np.transpose(bg_np, (1, 2, 0))
             self._current_debug_artifacts["02_warped_background.png"] = bg_np
         else:
-            self._current_debug_artifacts = None
+            self._current_debug_artifacts = {}
+
+        width = getattr(self._strategy, "_width", 512)
+        height = getattr(self._strategy, "_height", 512)
+
+        bw = max(1, x2 - x1)
+        bh = max(1, y2 - y1)
+        scale = float(max(width, height)) / max(bh, bw)
+        scaled_h = int(bh * scale)
+        scaled_w = int(bw * scale)
+        offset_x = (width - scaled_w) // 2
+        offset_y = (height - scaled_h) // 2
+
+        if is_mask_backend:
+            mask_np = control_tensor[0].cpu().numpy()
+            mask_resized = cv2.resize(mask_np, (scaled_w, scaled_h), interpolation=cv2.INTER_NEAREST)
+            canvas = np.zeros((height, width), dtype=np.uint8)
+            canvas[offset_y:offset_y+scaled_h, offset_x:offset_x+scaled_w] = mask_resized
+            curr_cond = np.stack([canvas]*3, axis=-1)
+        else:
+            pose_tensor = dense_dwpose_tensor.clone()
+            pose_tensor[..., 0] -= x1
+            pose_tensor[..., 1] -= y1
+            pose_tensor[..., 0] *= float(scaled_w) / float(bw)
+            pose_tensor[..., 1] *= float(scaled_h) / float(bh)
+            pose_tensor[..., 0] += offset_x
+            pose_tensor[..., 1] += offset_y
+            if pose_tensor.ndim == 3:
+                pose_tensor = pose_tensor[-1]
+            curr_cond = _render_pose_condition(pose_tensor, output_height=height, output_width=width)
+
+        init_image_override = None
+        strength_override = None
+
+        # --- Keyframe reset + adaptive temporal strength ---
+        keyframe_interval = int(getattr(self.config, "controlnet_temporal_keyframe_interval", 8))
+        strength_min = float(getattr(self.config, "controlnet_temporal_strength_min", 0.30))
+        strength_max = float(getattr(self.config, "controlnet_temporal_strength_max", 0.55))
+        flow_scale = float(getattr(self.config, "controlnet_temporal_flow_scale", 0.02))
+
+        if actor_identity is not None:
+            frame_count = self._actor_frame_counter.get(actor_identity, 0)
+            is_keyframe = (frame_count % keyframe_interval == 0) if keyframe_interval > 0 else False
+
+            if is_keyframe:
+                # Keyframe: discard previous generation to break feedback loops.
+                self._last_actor_crop_by_actor.pop(actor_identity, None)
+                self._last_condition_canvas_by_actor.pop(actor_identity, None)
+                _LOGGER.info(
+                    "[Temporal] KEYFRAME RESET for actor=%s frame_count=%d",
+                    actor_identity, frame_count,
+                )
+
+            if actor_identity in self._last_actor_crop_by_actor:
+                prev_gen = self._last_actor_crop_by_actor[actor_identity]
+                prev_cond = self._last_condition_canvas_by_actor[actor_identity]
+
+                gray_prev = cv2.cvtColor(prev_cond, cv2.COLOR_RGB2GRAY)
+                gray_curr = cv2.cvtColor(curr_cond, cv2.COLOR_RGB2GRAY)
+
+                flow = cv2.calcOpticalFlowFarneback(
+                    gray_prev, gray_curr, None, 0.5, 3, 15, 3, 5, 1.2, 0,
+                )
+                h, w = prev_gen.shape[:2]
+                flow_map_x, flow_map_y = np.meshgrid(np.arange(w), np.arange(h))
+                map_x = (flow_map_x + flow[..., 0]).astype(np.float32)
+                map_y = (flow_map_y + flow[..., 1]).astype(np.float32)
+                warped_gen = cv2.remap(prev_gen, map_x, map_y, cv2.INTER_LINEAR)
+
+                # Adaptive strength: higher flow magnitude -> higher denoising strength
+                # so the model has more freedom to adapt to large motion changes.
+                flow_magnitude = float(np.mean(np.sqrt(flow[..., 0] ** 2 + flow[..., 1] ** 2)))
+                adaptive_strength = min(
+                    strength_max,
+                    max(strength_min, strength_min + flow_magnitude * flow_scale),
+                )
+
+                from PIL import Image
+                init_image_override = Image.fromarray(warped_gen)
+                strength_override = adaptive_strength
+                _LOGGER.info(
+                    "[Temporal] WARPING actor=%s frame_count=%d flow_mag=%.2f strength=%.3f",
+                    actor_identity, frame_count, flow_magnitude, adaptive_strength,
+                )
+            else:
+                _LOGGER.info(
+                    "[Temporal] FRESH generation for actor=%s frame_count=%d (no history)",
+                    actor_identity, frame_count,
+                )
+
+            self._actor_frame_counter[actor_identity] = frame_count + 1
+
+        # Save the actual init_image being passed to the model as a debug artifact.
+        if self._current_debug_artifacts is not None:
+            if init_image_override is not None:
+                self._current_debug_artifacts["01b_actual_init_image.png"] = np.asarray(init_image_override)
+            else:
+                # No temporal override — the strategy will use the padded reference.
+                ref_np = _to_numpy_bgr(reference_crop_tensor)
+                ref_rgb = cv2.cvtColor(ref_np, cv2.COLOR_BGR2RGB)
+                self._current_debug_artifacts["01b_actual_init_image_ref.png"] = ref_rgb
+            # Save current condition canvas
+            self._current_debug_artifacts["01c_condition_canvas.png"] = curr_cond
 
         generated_actor = self._strategy.generate(
             reference_crop_tensor=reference_crop_tensor,
@@ -692,9 +834,28 @@ class DiffusersCompositor(BaseCompositor):
             seed=self._seed,
             device=self._device,
             metadata_bbox=resolved_bbox,
+            init_image_override=init_image_override,
+            strength_override=strength_override,
         )
+
+        # Cache the full-canvas generated output for temporal warping.
+        # The strategy returns a CROPPED tensor [3, scaled_h, scaled_w] (not full canvas).
+        # We need to reconstruct the full canvas so the next frame's optical flow
+        # operates on matching spatial coordinates.
+        if actor_identity is not None:
+            gen_crop_bgr = np.transpose(generated_actor.cpu().numpy(), (1, 2, 0))  # [scaled_h, scaled_w, 3] BGR
+            gen_crop_rgb = cv2.cvtColor(gen_crop_bgr, cv2.COLOR_BGR2RGB)
+            full_canvas = np.zeros((height, width, 3), dtype=np.uint8)
+            crop_h, crop_w = gen_crop_rgb.shape[:2]
+            paste_h = min(crop_h, height - offset_y)
+            paste_w = min(crop_w, width - offset_x)
+            if paste_h > 0 and paste_w > 0:
+                full_canvas[offset_y:offset_y+paste_h, offset_x:offset_x+paste_w] = gen_crop_rgb[:paste_h, :paste_w]
+
+            self._last_actor_crop_by_actor[actor_identity] = full_canvas
+            self._last_condition_canvas_by_actor[actor_identity] = curr_cond
         
-        if self._current_debug_artifacts is not None:
+        if self._current_debug_artifacts:
             actor_np = generated_actor.cpu().numpy()
             if len(actor_np.shape) == 3 and actor_np.shape[0] == 3:
                 actor_np = np.transpose(actor_np, (1, 2, 0))
@@ -771,7 +932,7 @@ class DiffusersCompositor(BaseCompositor):
             else:
                 self._current_debug_artifacts = None
                 
-            if self._current_debug_artifacts is not None:
+            if self._current_debug_artifacts:
                 actor_np = generated_sequence[frame_idx].cpu().numpy()
                 if len(actor_np.shape) == 3 and actor_np.shape[0] == 3:
                     actor_np = np.transpose(actor_np, (1, 2, 0))
@@ -871,7 +1032,7 @@ class DiffusersCompositor(BaseCompositor):
             )
             return torch.from_numpy(frame_np).permute(2, 0, 1).contiguous().to(torch.uint8)
             
-        if self._current_debug_artifacts is not None:
+        if self._current_debug_artifacts:
             alpha_out = np.asarray(alpha_mask * 255.0, dtype=np.uint8)
             if len(alpha_out.shape) == 3:
                 alpha_out = alpha_out[:, :, 0]
@@ -899,7 +1060,7 @@ class DiffusersCompositor(BaseCompositor):
         blended = actor_resized.astype(np.float32) * alpha_3 + roi.astype(np.float32) * (1.0 - alpha_3)
         frame_np[y1:y2, x1:x2] = np.asarray(np.clip(blended, 0.0, 255.0), dtype=np.uint8)
         
-        if self._current_debug_artifacts is not None:
+        if self._current_debug_artifacts:
             self._current_debug_artifacts["05_composited_frame.png"] = frame_np
             export_compositor_artifacts(
                 debug_dir=debug_dir,
@@ -958,7 +1119,7 @@ class DiffusersCompositor(BaseCompositor):
         if cropped.size == 0:
             cropped = actor_bgr
 
-        return cv2.resize(cropped, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
+        return cv2.resize(cropped, (target_w, target_h), interpolation=cv2.INTER_LANCZOS4)
 
     def _select_compositing_alpha(
         self,

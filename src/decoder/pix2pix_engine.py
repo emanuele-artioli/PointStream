@@ -172,6 +172,7 @@ class Pix2PixStrategy(BaseGenAIStrategy):
         seed: int,
         device: torch.device,
         metadata_bbox: tuple[int, int, int, int] | None = None,
+        **kwargs: Any,
     ) -> torch.Tensor:
         model = self._ensure_model(device)
         

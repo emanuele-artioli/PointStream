@@ -98,33 +98,36 @@ class ActorExtractor:
 
         segmenter: BaseSegmenter | None
         normalized_segmenter_backend = segmenter_backend.strip().lower()
-        if "canny-controlnet" in genai_backend:
-            # Exclusivity: Canny uses CannySegmenter, disables YOLO segmenter
-            low = getattr(config, "canny_lower_threshold", "auto") if config else "auto"
-            high = getattr(config, "canny_upper_threshold", "auto") if config else "auto"
-            segmenter = CannySegmenter(lower_threshold=low, upper_threshold=high)
-            
-            # Since Canny is replacing the mask metadata for ControlNet, make sure mask is transmitted
-            include_mask_metadata = True
-        elif normalized_segmenter_backend in {"none", ""}:
-            segmenter = None
+        
+        base_segmenter: BaseSegmenter | None = None
+        if normalized_segmenter_backend in {"none", ""}:
+            base_segmenter = None
         elif "yoloe" in normalized_segmenter_backend:
             segmenter_caption_list = [part.strip() for part in str(segmenter_caption).split(",") if part.strip()]
             if not segmenter_caption_list:
                 segmenter_caption_list = ["tennis player"]
-            segmenter = YoloeSegmenter(
+            base_segmenter = YoloeSegmenter(
                 model_name=segmenter_backend.strip(),
                 model=segmenter_model,
                 captions=segmenter_caption_list,
             )
         elif "yolo" in normalized_segmenter_backend:
-            segmenter = YoloSegmenter(model_name=segmenter_backend.strip(), model=segmenter_model)
+            base_segmenter = YoloSegmenter(model_name=segmenter_backend.strip(), model=segmenter_model)
         elif "sam" in normalized_segmenter_backend:
-            segmenter = SamSegmenter(model_name=segmenter_backend.strip(), model=segmenter_model)
+            base_segmenter = SamSegmenter(model_name=segmenter_backend.strip(), model=segmenter_model)
         else:
             raise ValueError(f"Unsupported segmenter backend: {segmenter_backend}")
 
-        if "seg-controlnet" in genai_backend:
+        segmenter: BaseSegmenter | None = base_segmenter
+        if "canny-controlnet" in genai_backend:
+            # Wrap the base segmenter with CannySegmenter
+            low = getattr(config, "canny_lower_threshold", "auto") if config else "auto"
+            high = getattr(config, "canny_upper_threshold", "auto") if config else "auto"
+            segmenter = CannySegmenter(base_segmenter=base_segmenter, lower_threshold=low, upper_threshold=high)
+            
+            # Since Canny is replacing the mask metadata for ControlNet, make sure mask is transmitted
+            include_mask_metadata = True
+        elif "seg-controlnet" in genai_backend:
             # Ensure mask metadata is transmitted for seg controlnet
             include_mask_metadata = True
 

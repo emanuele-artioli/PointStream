@@ -82,7 +82,7 @@ evaluation-max-frames: null           # Optional frame cap for quality evaluatio
 # GenAI and AnimateAnyone Configuration
 # ============================================================================                
 genai-backend: canny-controlnet                   # GenAI backend: caption-controlnet, ip-adapter-controlnet, canny-controlnet, seg-controlnet, animate-anyone, pix2pix (null disables GenAI)
-controlnet-id: assets/weights/custom-controlnet   # Custom ControlNet path
+controlnet-id: assets/weights/custom-controlnet   # Custom ControlNet path (canny)
 animate-anyone-repo-dir: null             # Path to Moore-AnimateAnyone repository
 animate-anyone-model-dir: null            # Override if models are in non-standard location
 animate-anyone-steps: 3                  # Diffusion inference steps for AnimateAnyone
@@ -99,11 +99,21 @@ animate-anyone-alpha-smoothing: 0.5       # Temporal smoothing factor [0, 1]
 controlnet-width: 512                     # Width for ControlNet generated frame (pixels)
 controlnet-height: 512                    # Height for ControlNet generated frame (pixels)
 controlnet-steps: 20                      # Diffusion inference steps for ControlNet
-controlnet-strength: 0.65                 # Img2Img strength for ControlNet
+controlnet-strength: 0.65                 # Img2Img strength for ControlNet (full generation)
+controlnet-strength-temporal: 0.35        # Img2Img strength for ControlNet when resuming from warped previous frame
+controlnet-temporal-keyframe-interval: 8  # Generate from scratch every N frames to break artifact feedback loops
+controlnet-temporal-strength-min: 0.30    # Minimum adaptive temporal denoising strength
+controlnet-temporal-strength-max: 0.55    # Maximum adaptive temporal denoising strength (for large motion)
+controlnet-temporal-flow-scale: 0.02      # Scaling factor: flow_magnitude * scale maps to strength increase
 controlnet-cfg: 7.0                       # Guidance scale for ControlNet
 ip-adapter-scale: 0.5                     # Strength of the visual prompt for IP-Adapter
 canny-lower-threshold: auto               # Lower threshold for Canny edge detection (auto computes using median)
 canny-upper-threshold: auto               # Upper threshold for Canny edge detection (auto computes using median)
+
+# ============================================================================
+# Debugging
+# ============================================================================
+debug-artifact-dir: outputs/debug
 
 # ============================================================================
 # Compositing and Masking

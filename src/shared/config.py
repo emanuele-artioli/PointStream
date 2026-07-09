@@ -89,6 +89,20 @@ class PointstreamConfig:
     animate_anyone_adaptive_threshold: bool = True
     animate_anyone_alpha_smoothing: float = 0.5
 
+    # ControlNet Configuration
+    controlnet_id: Optional[str] = None
+    controlnet_width: int = 512
+    controlnet_height: int = 512
+    controlnet_steps: int = 20
+    controlnet_strength: float = 0.65
+    controlnet_strength_temporal: float = 0.35
+    controlnet_temporal_keyframe_interval: int = 8
+    controlnet_temporal_strength_min: float = 0.30
+    controlnet_temporal_strength_max: float = 0.55
+    controlnet_temporal_flow_scale: float = 0.02
+    controlnet_cfg: float = 7.0
+    ip_adapter_scale: float = 0.5
+
     # Compositing and Masking
     compositing_mask_mode: str = "postgen-seg-client"
     postgen_segmenter_backend: str = "yolo"

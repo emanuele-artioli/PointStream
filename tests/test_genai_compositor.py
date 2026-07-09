@@ -77,6 +77,7 @@ class _DummyStrategy(gc.BaseGenAIStrategy):
         seed: int,
         device: torch.device,
         metadata_bbox: tuple[int, int, int, int] | None = None,
+        **kwargs: Any,
     ) -> torch.Tensor:
         _ = dense_dwpose_tensor
         _ = seed

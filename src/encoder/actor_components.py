@@ -820,13 +820,21 @@ class NoOpSegmenter(BaseSegmenter):
 
 
 class CannySegmenter(BaseSegmenter):
-    def __init__(self, lower_threshold: str | int = "auto", upper_threshold: str | int = "auto") -> None:
+    def __init__(self, base_segmenter: BaseSegmenter | None = None, lower_threshold: str | int = "auto", upper_threshold: str | int = "auto") -> None:
+        self.base_segmenter = base_segmenter
         self.lower_threshold = lower_threshold
         self.upper_threshold = upper_threshold
 
     def segment(self, frame_bgr: np.ndarray, actor: SceneActor) -> SceneActor:
         if actor.mask is not None:
             return actor
+
+        # Optional: run semantic segmentation first
+        semantic_mask = None
+        if self.base_segmenter is not None:
+            actor = self.base_segmenter.segment(frame_bgr, actor)
+            if actor.mask is not None:
+                semantic_mask = np.asarray(actor.mask, dtype=np.uint8)
 
         crop, _ = build_crop_with_padding(frame_bgr, actor.bbox, pad_ratio=0.0)
         if crop.size == 0:
@@ -846,8 +854,20 @@ class CannySegmenter(BaseSegmenter):
                 high = int(min(255.0, (1.0 + sigma) * v))
                 
         edges = cv2.Canny(gray, int(low), int(high))
-        mask_bin = (edges > 127).astype(np.uint8).tolist()
         
+        if semantic_mask is not None:
+            if semantic_mask.shape != edges.shape:
+                semantic_mask = cv2.resize(semantic_mask, (edges.shape[1], edges.shape[0]), interpolation=cv2.INTER_NEAREST)
+            
+            # Dilate the semantic mask to ensure it covers the Canny edges of the player boundary
+            # Use a kernel size relative to the crop size, e.g., 5x5 or 7x7
+            kernel = np.ones((5, 5), np.uint8)
+            semantic_mask_dilated = cv2.dilate(semantic_mask, kernel, iterations=1)
+            
+            # Mask the Canny edges with the dilated semantic mask
+            edges = cv2.bitwise_and(edges, edges, mask=semantic_mask_dilated)
+            
+        mask_bin = ((edges > 127).astype(np.uint8) * 255).tolist()
         return actor.model_copy(update={"mask": mask_bin})
 
 
