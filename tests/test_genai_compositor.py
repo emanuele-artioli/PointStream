@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 from types import SimpleNamespace
 import types
+from typing import Any
 
 import cv2
 import numpy as np

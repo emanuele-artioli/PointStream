@@ -123,10 +123,18 @@ celerybeat.pid
 assets/*
 outputs/*
 old/*
-mobileclip_blt.ts
 TODO.md
-.agents/*
-paper/*
 Farzad/*
-.github/*
 tennis_processed/*
+
+# Nested Overleaf-synced paper repo (its own git history)
+67a9ea6275d3d9785ce57026/
+
+# Antigravity rules dir picks up sibling-project rules too; only track pointstream's own
+.agents/*
+!.agents/rules
+.agents/rules/*
+!.agents/rules/pointstream.md
+
+# Claude Code: local permission grants are machine-specific, not shared
+.claude/settings.local.json

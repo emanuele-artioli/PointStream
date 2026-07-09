@@ -5,7 +5,6 @@ import json
 import logging
 from pathlib import Path
 from PIL import Image
-import numpy as np
 
 import torch
 import torch.nn.functional as F
