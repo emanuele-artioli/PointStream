@@ -8,7 +8,6 @@ import shutil
 import subprocess
 import tempfile
 
-import cv2
 import numpy as np
 
 
@@ -23,149 +22,128 @@ def _safe_file_size(path_like: str | Path | None) -> int | None:
     return int(candidate.stat().st_size)
 
 
-def _load_frame_sequence(path: Path, max_frames: int | None = None) -> list[np.ndarray]:
-    frames: list[np.ndarray] = []
-    if path.is_dir():
-        frame_paths = sorted(
-            [candidate for candidate in path.iterdir() if candidate.is_file() and candidate.suffix.lower() in {".png", ".jpg", ".jpeg"}],
-            key=lambda candidate: candidate.name,
-        )
-        if max_frames is not None:
-            frame_paths = frame_paths[:max_frames]
-        for frame_path in frame_paths:
-            frame = cv2.imread(str(frame_path), cv2.IMREAD_COLOR)
-            if frame is None or frame.size == 0:
-                continue
-            frames.append(frame)
-        return frames
-
-    cap = cv2.VideoCapture(str(path))
-    if not cap.isOpened():
-        cap.release()
-        return []
-    try:
-        while True:
-            if max_frames is not None and len(frames) >= max_frames:
-                break
-            ok, frame = cap.read()
-            if not ok:
-                break
-            frames.append(frame)
-    finally:
-        cap.release()
-    return frames
-
-
-def _stream_frame_pairs(
-    reference_video: Path,
-    predicted_video: Path,
-    max_frames: int | None = None,
-) -> list[tuple[np.ndarray, np.ndarray]]:
-    pairs: list[tuple[np.ndarray, np.ndarray]] = []
-    
-    ref_frames = _load_frame_sequence(reference_video, max_frames=max_frames)
-    pred_frames = _load_frame_sequence(predicted_video, max_frames=max_frames)
-    
-    if not ref_frames or not pred_frames:
-        return []
-        
-    for ref, pred in zip(ref_frames, pred_frames):
-        pairs.append((ref, pred))
-    return pairs
-
-
-def _read_frames_with_timestamps(
-    path: Path,
-    max_frames: int | None = None,
-) -> list[tuple[float, np.ndarray]]:
-    cap = cv2.VideoCapture(str(path))
-    if not cap.isOpened():
-        cap.release()
-        return []
-
-    frames: list[tuple[float, np.ndarray]] = []
-    try:
-        while True:
-            if max_frames is not None and len(frames) >= max_frames:
-                break
-            ok, frame = cap.read()
-            if not ok:
-                break
-            timestamp_ms = float(cap.get(cv2.CAP_PROP_POS_MSEC))
-            frames.append((timestamp_ms, frame))
-    finally:
-        cap.release()
-    return frames
-
-
-def _match_nearest_timestamp_pairs(
-    reference_frames: list[tuple[float, np.ndarray]],
-    predicted_frames: list[tuple[float, np.ndarray]],
-) -> list[tuple[np.ndarray, np.ndarray]]:
-    if not reference_frames or not predicted_frames:
-        return []
-
-    pred_times = [ts for ts, _ in predicted_frames]
-    pred_images = [frame for _, frame in predicted_frames]
-    pairs: list[tuple[np.ndarray, np.ndarray]] = []
-    for ref_time, ref_frame in reference_frames:
-        nearest_idx = min(range(len(pred_times)), key=lambda idx: abs(pred_times[idx] - ref_time))
-        pairs.append((ref_frame, pred_images[nearest_idx]))
-    return pairs
-
-
 def _compute_psnr(reference_video: Path, predicted_video: Path, max_frames: int | None = None) -> dict[str, Any]:
+    """Compute PSNR via the system ffmpeg's `psnr` filter.
+
+    cv2.VideoCapture uses opencv-python's bundled ffmpeg libs, which are built
+    without an AV1 decoder — decoded chunks encoded with libsvtav1 open
+    (isOpened() True) but yield zero frames from read(), so any cv2-based
+    pairing silently finds "no valid frame pairs". SSIM/VMAF already sidestep
+    this by shelling out to the system ffmpeg binary; PSNR now does the same.
+    """
     if not reference_video.exists() or not reference_video.is_file():
         return {"psnr_mean": None, "psnr_std": None, "psnr_num_frames": 0, "note": "missing reference video"}
     if not predicted_video.exists():
         return {"psnr_mean": None, "psnr_std": None, "psnr_num_frames": 0, "note": "missing predicted artifact"}
 
-    pairs = _stream_frame_pairs(
-        reference_video=reference_video,
-        predicted_video=predicted_video,
-        max_frames=max_frames,
-    )
-    if not pairs:
-        reference_frames = _read_frames_with_timestamps(reference_video, max_frames=max_frames)
-        predicted_frames = _read_frames_with_timestamps(predicted_video, max_frames=max_frames)
-        pairs = _match_nearest_timestamp_pairs(reference_frames, predicted_frames)
-    if not pairs:
-        return {"psnr_mean": None, "psnr_std": None, "psnr_num_frames": 0, "note": "no valid frame pairs"}
-    psnr_values: list[float] = []
-    for (reference_frame, predicted_frame) in pairs:
-        if reference_frame is None or predicted_frame is None:
-            continue
-        if reference_frame.shape[:2] != predicted_frame.shape[:2]:
-            predicted_frame = cv2.resize(
-                predicted_frame,
-                (reference_frame.shape[1], reference_frame.shape[0]),
-                interpolation=cv2.INTER_LINEAR,
-            )
-        psnr = cv2.PSNR(reference_frame, predicted_frame)
-        if np.isfinite(psnr) or np.isinf(psnr):
-            psnr_values.append(float(psnr))
+    ffmpeg_bin = _resolve_binary_path("FFMPEG_BIN", "ffmpeg")
+    stats_file = tempfile.NamedTemporaryFile(suffix=".txt", delete=False)
+    stats_path = Path(stats_file.name)
+    stats_file.close()
 
-    if not psnr_values:
-        return {"psnr_mean": None, "psnr_std": None, "psnr_num_frames": 0, "psnr_infinite_frames": 0, "note": "no valid frame pairs"}
-
-    arr = np.array(psnr_values, dtype=float)
-    infinite_count = int(np.isinf(arr).sum())
-    finite_vals = arr[np.isfinite(arr)]
-
-    if finite_vals.size > 0:
-        mean_val = float(np.mean(finite_vals))
-        std_val = float(np.std(finite_vals))
+    reference_dims = _get_video_dimensions(reference_video)
+    predicted_dims = _get_video_dimensions(predicted_video)
+    if reference_dims is not None and predicted_dims is not None and reference_dims != predicted_dims:
+        width, height = reference_dims
+        filter_complex = (
+            f"[1:v]scale={width}:{height}[psnr_pred_scaled];"
+            f"[0:v][psnr_pred_scaled]psnr=stats_file=" + str(stats_path)
+        )
     else:
-        mean_val = None
-        std_val = None
+        filter_complex = "[0:v][1:v]psnr=stats_file=" + str(stats_path)
 
-    return {
-        "psnr_mean": mean_val,
-        "psnr_std": std_val,
-        "psnr_num_frames": int(len(psnr_values)),
-        "psnr_infinite_frames": infinite_count,
-        "note": None,
-    }
+    ffmpeg_cmd = [
+        ffmpeg_bin,
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+    ]
+
+    fps = "30"
+    if not reference_video.is_dir():
+        fps = _get_video_framerate(reference_video)
+    elif not predicted_video.is_dir():
+        fps = _get_video_framerate(predicted_video)
+
+    if reference_video.is_dir():
+        ffmpeg_cmd.extend(["-framerate", fps, "-i", str(reference_video / "frame_%06d.png")])
+    else:
+        ffmpeg_cmd.extend(["-i", str(reference_video)])
+
+    if predicted_video.is_dir():
+        ffmpeg_cmd.extend(["-framerate", fps, "-i", str(predicted_video / "frame_%06d.png")])
+    else:
+        ffmpeg_cmd.extend(["-i", str(predicted_video)])
+    if max_frames is not None:
+        ffmpeg_cmd.extend(["-frames:v", str(int(max_frames))])
+    ffmpeg_cmd.extend(["-filter_complex", filter_complex, "-f", "null", "-"])
+
+    try:
+        process = subprocess.run(
+            ffmpeg_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            text=True,
+        )
+        if process.returncode != 0:
+            stderr_text = (process.stderr or "").strip()
+            return {
+                "psnr_mean": None,
+                "psnr_std": None,
+                "psnr_num_frames": 0,
+                "note": f"ffmpeg psnr failed: {stderr_text or 'unknown error'}",
+            }
+
+        if not stats_path.exists():
+            return {
+                "psnr_mean": None,
+                "psnr_std": None,
+                "psnr_num_frames": 0,
+                "note": "ffmpeg psnr did not emit stats",
+            }
+
+        values: list[float] = []
+        for line in stats_path.read_text(encoding="utf-8", errors="replace").splitlines():
+            for token in line.split():
+                if token.startswith("psnr_avg:"):
+                    raw = token.split(":", maxsplit=1)[1]
+                    try:
+                        values.append(float("inf") if raw.lower() == "inf" else float(raw))
+                    except ValueError:
+                        pass
+                    break
+
+        if not values:
+            return {
+                "psnr_mean": None,
+                "psnr_std": None,
+                "psnr_num_frames": 0,
+                "psnr_infinite_frames": 0,
+                "note": "no valid frame pairs",
+            }
+
+        arr = np.array(values, dtype=float)
+        infinite_count = int(np.isinf(arr).sum())
+        finite_vals = arr[np.isfinite(arr)]
+
+        if finite_vals.size > 0:
+            mean_val = float(np.mean(finite_vals))
+            std_val = float(np.std(finite_vals))
+        else:
+            mean_val = None
+            std_val = None
+
+        return {
+            "psnr_mean": mean_val,
+            "psnr_std": std_val,
+            "psnr_num_frames": int(arr.size),
+            "psnr_infinite_frames": infinite_count,
+            "note": None,
+        }
+    finally:
+        if stats_path.exists():
+            stats_path.unlink(missing_ok=True)
 
 
 def _resolve_binary_path(env_var: str, binary_name: str) -> str:
@@ -207,6 +185,39 @@ def _get_video_framerate(video_path: Path) -> str:
         return fps
     except Exception:
         return "30"
+
+
+def _get_video_dimensions(video_path: Path) -> tuple[int, int] | None:
+    probe_target = video_path
+    if video_path.is_dir():
+        frame_paths = sorted(
+            candidate
+            for candidate in video_path.iterdir()
+            if candidate.is_file() and candidate.suffix.lower() in {".png", ".jpg", ".jpeg"}
+        )
+        if not frame_paths:
+            return None
+        probe_target = frame_paths[0]
+
+    try:
+        ffprobe_bin = _resolve_binary_path("FFPROBE_BIN", "ffprobe")
+    except FileNotFoundError:
+        return None
+
+    cmd = [
+        ffprobe_bin,
+        "-v", "error",
+        "-select_streams", "v:0",
+        "-show_entries", "stream=width,height",
+        "-of", "csv=p=0",
+        str(probe_target),
+    ]
+    try:
+        res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+        width_str, _, height_str = res.stdout.strip().partition(",")
+        return int(width_str), int(height_str)
+    except Exception:
+        return None
 
 
 def _compute_ssim_ffmpeg(reference_video: Path, predicted_video: Path, max_frames: int | None = None) -> dict[str, Any]:

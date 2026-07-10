@@ -1,6 +1,5 @@
 import pytest
 from pathlib import Path
-import numpy as np
 
 from src.experiment_evaluation import evaluate_run_summary, _normalize_evaluation_metrics
 
@@ -54,35 +53,18 @@ def test_evaluate_run_summary_with_dummy_images(monkeypatch, tmp_path: Path):
         "source_uri": str(src),
         "decoded_uri": str(dec),
     }
-    
-    # Mock cv2 to pretend these are valid videos
-    import cv2
-    class DummyCap:
-        def __init__(self, *args, **kwargs):
-            self.frames_yielded = 0
-        def isOpened(self):
-            return True
-        def read(self):
-            if self.frames_yielded >= 2:
-                return False, None
-            self.frames_yielded += 1
-            return True, np.zeros((64, 64, 3), dtype=np.uint8)
-        def get(self, prop):
-            return 100.0 * self.frames_yielded
-        def release(self):
-            pass
-            
-    monkeypatch.setattr(cv2, "VideoCapture", DummyCap)
-    monkeypatch.setattr(cv2, "PSNR", lambda a, b: 40.0)
-    
-    # Mock subprocess for ffmpeg
+
+    # Mock subprocess for ffmpeg/ffprobe (PSNR, SSIM, and VMAF are all
+    # computed by shelling out to the system ffmpeg binary, mirroring how
+    # opencv-python's bundled ffmpeg lacks an AV1 decoder and cannot read
+    # real decoder output).
     import subprocess
     class DummyProcess:
         def __init__(self):
             self.returncode = 0
             self.stdout = "fake stdout"
             self.stderr = ""
-            
+
     def fake_run(*args, **kwargs):
         # Depending on args, write to stats_file or log_file if they are passed in filter_complex
         cmd = args[0] if args else kwargs.get("args", [])
@@ -90,8 +72,11 @@ def test_evaluate_run_summary_with_dummy_images(monkeypatch, tmp_path: Path):
         for i, c in enumerate(cmd):
             if c == "-filter_complex" and i + 1 < len(cmd):
                 filter_complex = cmd[i+1]
-                
-        if "ssim=stats_file=" in filter_complex:
+
+        if "psnr=stats_file=" in filter_complex:
+            path = filter_complex.split("stats_file=")[1]
+            Path(path).write_text("n:1 mse_avg:4.22 psnr_avg:40.00\n")
+        elif "ssim=stats_file=" in filter_complex:
             path = filter_complex.split("stats_file=")[1]
             Path(path).write_text("n:1 Y:0.99 U:0.99 V:0.99 All:0.990000 (20.0)\n")
         elif "libvmaf=log_path=" in filter_complex:
@@ -101,7 +86,7 @@ def test_evaluate_run_summary_with_dummy_images(monkeypatch, tmp_path: Path):
                 "pooled_metrics": {"vmaf": {"mean": 95.5}},
                 "frames": [{"vmaf": 95.5}, {"vmaf": 95.5}]
             }))
-            
+
         return DummyProcess()
         
     monkeypatch.setattr(subprocess, "run", fake_run)

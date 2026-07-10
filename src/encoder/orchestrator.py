@@ -4,6 +4,7 @@ from pathlib import Path
 import threading
 from typing import Any
 
+import numpy as np
 import torch
 
 from src.encoder.background_modeler import BackgroundModeler
@@ -20,6 +21,7 @@ from src.encoder.video_io import decode_video_to_tensor, probe_video_metadata
 from src.shared.schemas import EncodedChunkPayload, FrameState, ResidualPacket, VideoChunk
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import cpu_bound, gpu_bound
+from src.transport.panorama_encoder import build_panorama_encoder, round_trip_panorama
 
 
 class _StreamingActorBundle:
@@ -90,6 +92,7 @@ class EncoderPipeline:
         self.config = config
         self._dag = DAGOrchestrator(execution_pool=execution_pool)
         self._background_modeler = BackgroundModeler(config=self.config)
+        self._panorama_encoder = build_panorama_encoder(config=self.config)
         self._actor_extractor = actor_extractor or ActorExtractor(config=self.config)
         self._object_tracker = object_tracker
         self._ball_extractor = ball_extractor or BallExtractor()
@@ -163,10 +166,21 @@ class EncoderPipeline:
         )
 
         def build_panorama_node(context, deps):
-            return self._background_modeler.process(
+            panorama_packet = self._background_modeler.process(
                 chunk=deps["chunk"],
                 decoded_video_tensor=context.get("decoded_video_tensor"),
                 frame_states=None,
+            )
+            # Residual Guarantee: synthesize against the codec-decoded panorama the
+            # client will actually reconstruct from, not the raw pre-codec pixels.
+            panorama_np = np.asarray(panorama_packet.panorama_image, dtype=np.uint8)
+            encoded_bytes, decoded_np = round_trip_panorama(panorama_np, self._panorama_encoder)
+            return panorama_packet.model_copy(
+                update={
+                    "panorama_image": decoded_np.tolist(),
+                    "panorama_codec_bytes": encoded_bytes,
+                    "panorama_codec_id": self._panorama_encoder.codec_id,
+                }
             )
 
         setattr(

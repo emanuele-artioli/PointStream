@@ -14,10 +14,27 @@ class BasePanoramaEncoder(ABC):
     name: str
     extension: str
 
+    @property
     @abstractmethod
+    def codec_id(self) -> str:
+        """Identifier capturing codec name and quality/compression settings.
+
+        Two encoders with the same `codec_id` are guaranteed to produce byte-identical
+        output for the same input pixels; matching only `name` would miss a quality
+        mismatch (e.g. jpeg q50 vs jpeg q90).
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def encode_bytes(self, image_bgr: np.ndarray) -> bytes:
+        """Encode a BGR panorama image to codec bytes, without touching disk."""
+        raise NotImplementedError
+
     def encode(self, image_bgr: np.ndarray, output_stem: Path) -> Path:
         """Encode a BGR panorama image to disk and return the encoded path."""
-        raise NotImplementedError
+        output_path = output_stem.with_suffix(self.extension)
+        output_path.write_bytes(self.encode_bytes(image_bgr))
+        return output_path
 
 
 def _ensure_bgr_uint8(image_bgr: np.ndarray) -> np.ndarray:
@@ -37,17 +54,20 @@ class JpegPanoramaEncoder(BasePanoramaEncoder):
     def __init__(self, quality: int = 90) -> None:
         self._quality = int(np.clip(int(quality), 1, 100))
 
-    def encode(self, image_bgr: np.ndarray, output_stem: Path) -> Path:
+    @property
+    def codec_id(self) -> str:
+        return f"jpeg:{self._quality}"
+
+    def encode_bytes(self, image_bgr: np.ndarray) -> bytes:
         image = _ensure_bgr_uint8(image_bgr)
-        output_path = output_stem.with_suffix(self.extension)
-        ok = cv2.imwrite(
-            str(output_path),
+        ok, buffer = cv2.imencode(
+            ".jpg",
             image,
             [int(cv2.IMWRITE_JPEG_QUALITY), int(self._quality)],
         )
         if not ok:
-            raise RuntimeError(f"Failed to encode JPEG panorama sidecar: {output_path}")
-        return output_path
+            raise RuntimeError("Failed to encode JPEG panorama bytes")
+        return bytes(buffer)
 
 
 class PngPanoramaEncoder(BasePanoramaEncoder):
@@ -57,17 +77,34 @@ class PngPanoramaEncoder(BasePanoramaEncoder):
     def __init__(self, compression: int = 3) -> None:
         self._compression = int(np.clip(int(compression), 0, 9))
 
-    def encode(self, image_bgr: np.ndarray, output_stem: Path) -> Path:
+    @property
+    def codec_id(self) -> str:
+        return f"png:{self._compression}"
+
+    def encode_bytes(self, image_bgr: np.ndarray) -> bytes:
         image = _ensure_bgr_uint8(image_bgr)
-        output_path = output_stem.with_suffix(self.extension)
-        ok = cv2.imwrite(
-            str(output_path),
+        ok, buffer = cv2.imencode(
+            ".png",
             image,
             [int(cv2.IMWRITE_PNG_COMPRESSION), int(self._compression)],
         )
         if not ok:
-            raise RuntimeError(f"Failed to encode PNG panorama sidecar: {output_path}")
-        return output_path
+            raise RuntimeError("Failed to encode PNG panorama bytes")
+        return bytes(buffer)
+
+
+def round_trip_panorama(image_bgr: np.ndarray, encoder: BasePanoramaEncoder) -> tuple[bytes, np.ndarray]:
+    """Encode then decode `image_bgr` through `encoder`, returning the sidecar bytes and resulting pixels.
+
+    The encoder pipeline calls this so residuals are computed against the same lossy
+    reconstruction the client will decode from the transmitted panorama sidecar, instead
+    of against pre-codec pixels the client never sees (Residual Guarantee, CLAUDE.md).
+    """
+    encoded_bytes = encoder.encode_bytes(image_bgr)
+    decoded = cv2.imdecode(np.frombuffer(encoded_bytes, dtype=np.uint8), cv2.IMREAD_COLOR)
+    if decoded is None or decoded.size == 0:
+        raise RuntimeError(f"Failed to decode round-tripped panorama bytes for codec '{encoder.name}'")
+    return encoded_bytes, np.asarray(decoded, dtype=np.uint8)
 
 
 def build_panorama_encoder(panorama_encoder: str | BasePanoramaEncoder | None = None, config: Any = None) -> BasePanoramaEncoder:

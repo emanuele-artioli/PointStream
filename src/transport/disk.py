@@ -74,6 +74,8 @@ class DiskTransport(BaseTransport):
                     update={
                         "panorama_uri": str(panorama_path),
                         "panorama_image": None,
+                        "panorama_codec_bytes": None,
+                        "panorama_codec_id": None,
                     }
                 ),
                 "residual": payload.residual.model_copy(
@@ -109,6 +111,16 @@ class DiskTransport(BaseTransport):
         - Decreasing JPEG quality (controlled by --panorama-jpeg-quality, default 50)
         - Using --panorama-codec png and increasing compression for extreme latency reduction
         """
+        codec_bytes = payload.panorama.panorama_codec_bytes
+        codec_id = payload.panorama.panorama_codec_id
+        if codec_bytes and codec_id == self._panorama_encoder.codec_id:
+            # The encoder already round-tripped the panorama through this exact codec
+            # to compute its residual; write those bytes verbatim so the client decodes
+            # the identical sidecar (Residual Guarantee) instead of a re-encoded copy.
+            output_path = (chunk_dir / "panorama").with_suffix(self._panorama_encoder.extension)
+            output_path.write_bytes(codec_bytes)
+            return output_path
+
         panorama_np = self._resolve_panorama_image(payload=payload)
         return self._panorama_encoder.encode(
             image_bgr=panorama_np,

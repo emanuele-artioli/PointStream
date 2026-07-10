@@ -116,6 +116,12 @@ class PanoramaPacket(BaseModel):
     panorama_image: list[list[list[int]]] | None = None
     homography_matrices: list[list[list[float]]]
     selected_frame_indices: list[int] = Field(default_factory=list)
+    # Exact sidecar bytes `panorama_image` was decoded from (Residual Guarantee: the
+    # encoder must synthesize against what the client will actually decode, not the
+    # raw pre-codec pixels). Set by the encoder pipeline, consumed verbatim by
+    # DiskTransport when its configured codec+settings match `panorama_codec_id`.
+    panorama_codec_bytes: bytes | None = None
+    panorama_codec_id: str | None = None
 
 
 class ActorPacket(BaseModel):
