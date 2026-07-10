@@ -32,6 +32,14 @@ Evaluate modern vision models to balance quality against real-time constraints:
 *   **Traditional Codecs**: Benchmark exclusively against **AV1** (addresses R2, R5).
 *   **Learned Codecs**: Identify and benchmark against a well-documented, modern neural codec (e.g., **HNeRV** or a modern DVC equivalent like **DCVC**) to satisfy reviewers without struggling with obsolete models.
 
+### E2. End-to-End Full-Match Evaluation (added 2026-07-10)
+The dataset-as-contribution framing, the runtime interlude/point scene
+routing (currently missing from `src/`), the complexity-tier configs
+(yolo26n runtime vs yolo26x curation), and the speed/compression Pareto
+experiment are owned by `10_dataset_and_end_to_end_evaluation_report.md` —
+see its 4-phase implementation plan. That report is the source of truth for
+taking POINTSTREAM from single-clip runs to whole raw_4k matches.
+
 ### E. Component Ablation Experiments
 Leverage the "Ablation Testing Framework" (described in Section 1) to validate our heuristics. Since we lack a validated ground-truth dataset, we will measure success purely by bitrate reduction:
 *   Show how **Convex Hull Racket Tracking** and **Wrist Translation Offsets** reduce the residual size compared to naive bounding boxes.

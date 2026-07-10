@@ -29,6 +29,27 @@ class ResidualMode(str, Enum):
 
 
 
+class SceneClass(str, Enum):
+    """Runtime routing decision for a segmented scene span."""
+
+    POINT = "point"  # Low camera motion; eligible for the semantic pipeline.
+    INTERLUDE = "interlude"  # High camera motion (pans/replays); routed to the fallback codec.
+    OTHER = "other"  # Low-confidence cluster assignment; routed to the fallback codec.
+    BLANK = "blank"  # Near-zero motion signal (e.g. black frames); routed to the fallback codec.
+
+
+class SceneSpan(BaseModel):
+    """One scene as produced by point-anchored scene classification (report 2)."""
+
+    t_start: float = Field(ge=0)
+    t_end: float
+    scene_class: SceneClass
+    confidence: float = Field(ge=0, le=1)
+    avg_score: float
+    std_score: float
+    max_score: float
+
+
 class VideoChunk(BaseModel):
     chunk_id: str
     source_uri: str

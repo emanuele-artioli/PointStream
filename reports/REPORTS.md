@@ -3,7 +3,7 @@
 *This file is the source of truth for the experimental effort. Update it (via
 `/update-reports`) whenever a report changes or a workstream moves.*
 
-*Last updated: 2026-07-10*
+*Last updated: 2026-07-11*
 
 ## The goal: the Residual Guarantee
 
@@ -31,9 +31,11 @@ whole video; each enabled component must pay for itself. Full framing:
 | Animate-Anyone integration | ⚠️ Evaluated, not final | Fork reads RGBA PNG + DWPose dataset format ([4](4_animate_anyone_integration_research.md)) |
 | ControlNet temporal consistency | ⚠️ Mechanisms built | Optical-flow warping, adaptive denoising, keyframe resets, cross-frame attention ([5](5_genai_temporal_consistency_research.md)) |
 | Background panorama stitching (camera motion) | ⬜ Open | [7](7_implementation_plan.md) §2B |
-| Codec baselines (AV1, HNeRV/DCVC) | ⬜ Open | Reviewer-critical ([6](6_action_matrix.md)) |
+| Codec baselines (AV1, HNeRV/DCVC) | ⚠️ In progress | Reviewer-critical ([6](6_action_matrix.md)); full-length AV1/HEVC anchor curve done (AV1 beats HEVC by 5-32% at matched VMAF, `slow`/`veryslow`) — still need to overlay a real PointStream run + learned codec baseline ([9](9_codec_baselines_report.md)) |
 | Residual-Guarantee benchmark harness | ✅ Working | `scripts/benchmark_matrix.py`; first run exposed a panorama symmetry violation, now fixed ([8](8_residual_guarantee_benchmarks_report.md)) |
 | Detector selection (SAM3 vs YOLOv26 vs RF-DETR) | ⬜ Open | [7](7_implementation_plan.md) §2C |
+| Dataset curation (raw_4k → assets/dataset) | ✅ Built, now catalogued | 7 videos (≈2h37m 4K) / 952 scenes / 399 points / 114 deep-annotated tracks; quality-tier models (yolo26x), manually supervised ([10](10_dataset_and_end_to_end_evaluation_report.md)) |
+| End-to-end full-match evaluation (runtime scene routing, complexity tiers, speed/compression Pareto) | ⚠️ In progress | Phase 1 done (2026-07-11): `src/shared/scene_classification.py` ports point-anchored classification into `src/`, verified against real cached `alcaraz_ruud` data; Phases 2–4 open ([10](10_dataset_and_end_to_end_evaluation_report.md)) |
 | TOMM resubmission | ⚠️ In progress | Action matrix tracks all 8 reviewer themes ([6](6_action_matrix.md)) |
 
 ## Prioritized next steps
@@ -53,6 +55,18 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    evaluation, compare against SPADE, pick one for the paper (R1, R5).
 3. AV1 baseline benchmark on the tennis dataset; one learned codec
    (HNeRV or DCVC) (R2, R5).
+   *AV1/HEVC anchor curve done (2026-07-10):* `scripts/codec_baseline_sweep.py`
+   encodes the raw source directly with AV1/HEVC across a CRF ladder using
+   the pipeline's own FFmpeg wrapper, now supports sweeping multiple presets
+   in one run, and can report side-by-side against a PointStream
+   `run_summary.json`. Hit and fixed a preset-parity bug along the way
+   (`fast` on both codecs made HEVC dominate AV1 — a preset-name mismatch,
+   not a real reversal). Full-length run (all 60 frames, `slow` +
+   `veryslow`) confirms AV1's expected edge once compared at matched VMAF:
+   5-32% fewer bytes than HEVC, widening at lower bitrates
+   ([9](9_codec_baselines_report.md)). Still owed: run PointStream itself at
+   a matching preset and overlay via `--pointstream-run` to get the actual
+   paper claim, plus the learned-codec baseline.
 4. Component ablations under the Residual-Guarantee framework: racket
    heuristics and dynamic thresholding vs residual payload size, and the
    panorama-quality trade-off itself.
@@ -64,7 +78,23 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    The dynamic thresholding ablation remains owed as a full-length (`num-frames: null`) swept matrix.
 5. Background panorama stitching for moderate camera motion.
 6. Detector/segmenter selection: SAM3 vs YOLOv26 vs RF-DETR (R3).
-7. Deferred (post-core): second domain, MOS study, demo video, VVC,
+7. **End-to-end full-match evaluation** — the headline experiment
+   ([10](10_dataset_and_end_to_end_evaluation_report.md)):
+   ~~Phase 1 port scene classification into `src/`~~ **done (2026-07-11)**
+   (shared module, deterministic cuts shared across tiers,
+   `tests/test_scene_classification.py`, verified byte-faithful against
+   real cached `alcaraz_ruud` data). Phase 2 full-match orchestrator (interludes →
+   baseline codec, points → semantic pipeline, outcome-safe routing,
+   match-level `run_summary.json`); Phase 3 complexity-tier configs +
+   realtime factor + variant-ladder sweep harness with intermediate/anchor
+   caching; Phase 4 headline BD-rate vs post-hoc AV1/HEVC anchors on the
+   held-out videos (`alcaraz_highlights`, `djokovic_zverev`) +
+   speed/compression Pareto. *Methodology locked (2026-07-11)* — held-out
+   split, post-hoc anchor protocol, ablations unified with speed sweeps as
+   variant ladders, LPIPS/FVD added ([10](10_dataset_and_end_to_end_evaluation_report.md)
+   findings 2026-07-11). **Gate:** generative models must be retrained
+   without the held-out videos before any G2 quality claim.
+8. Deferred (post-core): second domain, MOS study, demo video, VVC,
    Multi-ControlNet — see [7](7_implementation_plan.md) §4.
 
 ## Reports catalog
@@ -82,10 +112,12 @@ reports follow the numbering and the standard format below.
 | [6_action_matrix.md](6_action_matrix.md) | Matrix | ACM MM reviews → TOMM resubmission: reviewer themes, status, execution checklist |
 | [7_implementation_plan.md](7_implementation_plan.md) | Plan | Comprehensive source of truth: Residual-Guarantee paradigm, engineering tasks, paper structure |
 | [8_residual_guarantee_benchmarks_report.md](8_residual_guarantee_benchmarks_report.md) | Report | Benchmark harness (`scripts/benchmark_matrix.py`) + ablation findings: panorama symmetry violation (fixed 2026-07-10), null-PSNR evaluation bug (fixed 2026-07-10) |
+| [9_codec_baselines_report.md](9_codec_baselines_report.md) | Report | Conventional-codec anchor sweep (`scripts/codec_baseline_sweep.py`): AV1/HEVC direct encode of the source video, no semantics, for the reviewer-requested baseline comparison |
+| [10_dataset_and_end_to_end_evaluation_report.md](10_dataset_and_end_to_end_evaluation_report.md) | Report | The end-to-end story: raw_4k/dataset inventory (dataset-as-contribution), trained-checkpoint census, gap analysis (runtime scene routing missing from `src/`), and the 4-phase full-match evaluation plan (routing, tiers, speed/compression Pareto) |
 
 ## Standard report format (new reports)
 
-Name new reports `N_<topic>_report.md`, continuing the numbering (next: 9).
+Name new reports `N_<topic>_report.md`, continuing the numbering (next: 11).
 Every report follows:
 
 ```markdown
