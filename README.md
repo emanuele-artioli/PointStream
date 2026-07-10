@@ -129,6 +129,22 @@ If you want to train or fine-tune Animate-Anyone on your own dataset, Pointstrea
 Run with a custom input video:  
 python src/main.py --input /path/to/input.mp4 --config config/default.yaml
 
+### **Benchmark ablations (Residual Guarantee)**
+
+To compare a baseline config against variants and check whether each
+component pays for itself (shrinks the residual by more than the metadata it
+adds), write a matrix spec (see `config/benchmarks/example_panorama_quality.yaml`)
+and run:
+
+```shell
+python -m scripts.benchmark_matrix run config/benchmarks/<spec>.yaml
+```
+
+Results land in `outputs/benchmarks/<name>_<timestamp>/` (materialized
+configs, per-variant logs, symlinks to run dirs, `report.md`/`report.json`).
+Interrupted matrices resume with `--dir <benchmark_dir>`; existing run dirs
+can be compared ad hoc with `python -m scripts.benchmark_matrix report <baseline_dir> <variant_dir>...`.
+
 The run always writes runtime artifacts under a timestamped directory with:
 
 * metadata.msgpack: for semantic metadata/events  

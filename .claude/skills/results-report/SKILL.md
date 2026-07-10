@@ -42,6 +42,12 @@ The claim under test is always
 
 ## Workflow
 
+0. If the runs came from the benchmark harness (`outputs/benchmarks/<name>_<ts>/`
+   with a `manifest.json`), start from its `report.md`/`report.json` — or
+   regenerate with `python -m scripts.benchmark_matrix report <bench_dir>`.
+   For ad-hoc existing runs, `... report <baseline_run_dir> <variant_run_dir>...`
+   builds the same pays-for-itself table (first dir = baseline; it will warn
+   that codec/CRF/seed can't be verified from summaries alone).
 1. Enumerate candidate runs: `ls outputs/` and check each
    `run_summary.json`'s config echo to find matched pairs (use
    python/jq — don't eyeball 100-line JSONs).

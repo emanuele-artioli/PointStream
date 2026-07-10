@@ -9,6 +9,7 @@ description: When working on Pointstream: Object-Centric Semantic Neural Codec
 * **Conda Context:** Run all scripts and terminal pipelines exclusively within the `pointstream` conda environment.
 * **Verification Paths:** The standard evaluation video target is `/home/itec/emanuele/pointstream/assets/real_tennis.mp4`.
 * **Real Experiment Mandate:** End-to-end testing must explicitly define `--input /home/itec/emanuele/pointstream/assets/real_tennis.mp4` to bypass mock stream generation fallbacks.
+* **Ablation Benchmarks:** For baseline-vs-variant Residual-Guarantee comparisons, use `python -m scripts.benchmark_matrix run config/benchmarks/<spec>.yaml` (matrix spec = base config + per-variant overrides) instead of hand-running configs; it writes the pays-for-itself report under `outputs/benchmarks/`.
 * **Scaffold Integrity:** You must maintain the exact architectural layout. Do not dump monolithic scripts. File additions must strictly sit in: `src/main.py`, `src/shared/`, `src/encoder/`, `src/decoder/`, `src/transport/`, `scripts/`, `assets/`, `tests/`, `outputs/`.
 
 ## 2. Weight Management & Prototyping

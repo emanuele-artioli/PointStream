@@ -285,13 +285,13 @@ def run_pipeline(
     return summary
 
 
-def run_cli() -> int:
+def run_cli(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=str, default="config/default.yaml", help="Path to config file.")
     parser.add_argument("--input", type=str, dest="source_uri", help="Input video override.")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
-    cli_overrides = {k: v for k, v in vars(args).items() if v is not None}
+    cli_overrides = {k: v for k, v in vars(args).items() if v is not None and k != "config"}
     config = load_config(args.config, cli_overrides)
 
     root_level = getattr(logging, config.log_level.upper(), logging.INFO)

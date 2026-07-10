@@ -80,6 +80,14 @@ detector/pose-estimator/segmenter, `execution-pool: inline`,
    `residual + metadata` vs the run without it? A run without its
    comparison target is not a result.
 
+For a baseline-vs-variants ablation, don't run configs by hand — write a
+matrix spec in `config/benchmarks/` and use the harness:
+`python -m scripts.benchmark_matrix run config/benchmarks/<spec>.yaml`.
+It materializes one config per variant, runs them sequentially (resumable —
+completed variants are skipped on rerun), symlinks the run dirs under
+`outputs/benchmarks/<name>_<ts>/runs/`, and emits the pays-for-itself table
+(`report.md` + `report.json`). See `config/benchmarks/example_panorama_quality.yaml`.
+
 ## Gotchas
 
 - Run from the repo root — `src/` uses `from src....` absolute imports.

@@ -3,7 +3,7 @@
 *This file is the source of truth for the experimental effort. Update it (via
 `/update-reports`) whenever a report changes or a workstream moves.*
 
-*Last updated: 2026-07-09*
+*Last updated: 2026-07-10*
 
 ## The goal: the Residual Guarantee
 
@@ -32,6 +32,7 @@ whole video; each enabled component must pay for itself. Full framing:
 | ControlNet temporal consistency | ⚠️ Mechanisms built | Optical-flow warping, adaptive denoising, keyframe resets, cross-frame attention ([5](5_genai_temporal_consistency_research.md)) |
 | Background panorama stitching (camera motion) | ⬜ Open | [7](7_implementation_plan.md) §2B |
 | Codec baselines (AV1, HNeRV/DCVC) | ⬜ Open | Reviewer-critical ([6](6_action_matrix.md)) |
+| Residual-Guarantee benchmark harness | ✅ Working | `scripts/benchmark_matrix.py`; first run exposed a suspected panorama symmetry violation ([8](8_residual_guarantee_benchmarks_report.md)) |
 | Detector selection (SAM3 vs YOLOv26 vs RF-DETR) | ⬜ Open | [7](7_implementation_plan.md) §2C |
 | TOMM resubmission | ⚠️ In progress | Action matrix tracks all 8 reviewer themes ([6](6_action_matrix.md)) |
 
@@ -41,15 +42,24 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
 [7_implementation_plan.md](7_implementation_plan.md); strike items through
 (`~~…~~ **done (date)**`) rather than deleting them.
 
-1. Finalize the generative architecture: complete ControlNet + Animate-Anyone
+1. **Fix the suspected panorama symmetry violation** — server residuals are
+   computed against the raw panorama while the client decodes the JPEG, so
+   the residual doesn't perfectly correct the client reconstruction; this
+   undercuts the core thesis and gates all ablation numbers
+   ([8](8_residual_guarantee_benchmarks_report.md), 2026-07-10 entry).
+2. Finalize the generative architecture: complete ControlNet + Animate-Anyone
    evaluation, compare against SPADE, pick one for the paper (R1, R5).
-2. AV1 baseline benchmark on the tennis dataset; one learned codec
+3. AV1 baseline benchmark on the tennis dataset; one learned codec
    (HNeRV or DCVC) (R2, R5).
-3. Component ablations under the Residual-Guarantee framework: racket
+4. Component ablations under the Residual-Guarantee framework: racket
    heuristics and dynamic thresholding vs residual payload size.
-4. Background panorama stitching for moderate camera motion.
-5. Detector/segmenter selection: SAM3 vs YOLOv26 vs RF-DETR (R3).
-6. Deferred (post-core): second domain, MOS study, demo video, VVC,
+   *Tooling ready (2026-07-10):* `scripts/benchmark_matrix.py` runs a
+   baseline-vs-variants matrix from a spec in `config/benchmarks/` and
+   emits the pays-for-itself table; the ablations themselves are still owed
+   and are gated on item 1.
+5. Background panorama stitching for moderate camera motion.
+6. Detector/segmenter selection: SAM3 vs YOLOv26 vs RF-DETR (R3).
+7. Deferred (post-core): second domain, MOS study, demo video, VVC,
    Multi-ControlNet — see [7](7_implementation_plan.md) §4.
 
 ## Reports catalog
@@ -66,10 +76,11 @@ reports follow the numbering and the standard format below.
 | [5_genai_temporal_consistency_research.md](5_genai_temporal_consistency_research.md) | Research | ControlNet conditioning + temporal consistency: flow warping, adaptive denoising, keyframe resets, cross-frame attention |
 | [6_action_matrix.md](6_action_matrix.md) | Matrix | ACM MM reviews → TOMM resubmission: reviewer themes, status, execution checklist |
 | [7_implementation_plan.md](7_implementation_plan.md) | Plan | Comprehensive source of truth: Residual-Guarantee paradigm, engineering tasks, paper structure |
+| [8_residual_guarantee_benchmarks_report.md](8_residual_guarantee_benchmarks_report.md) | Report | Benchmark harness (`scripts/benchmark_matrix.py`) + ablation findings: panorama symmetry violation, null-PSNR evaluation bug |
 
 ## Standard report format (new reports)
 
-Name new reports `N_<topic>_report.md`, continuing the numbering (next: 8).
+Name new reports `N_<topic>_report.md`, continuing the numbering (next: 9).
 Every report follows:
 
 ```markdown

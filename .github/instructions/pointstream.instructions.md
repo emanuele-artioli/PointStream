@@ -17,6 +17,7 @@ applyTo: '\*\*/\*.py, \*\*/environment.yaml, \*\*/pyproject.toml, \*\*/README.md
 * **Execution Environment:** Check for the existence of the pointstream conda environment and run all scripts within it.  
 * **Default Test File:** Unless specified otherwise, always use the following file for testing and runs: /home/itec/emanuele/pointstream/assets/real\_tennis.mp4  
 * **Real Experiment Input Requirement:** Any real experiment (non-synthetic evaluation intended to validate end-to-end behavior) MUST pass `--input /home/itec/emanuele/pointstream/assets/real_tennis.mp4` explicitly. Do not rely on the mock-source fallback.  
+* **Ablation Benchmarks:** For baseline-vs-variant Residual-Guarantee comparisons, use `python -m scripts.benchmark_matrix run config/benchmarks/<spec>.yaml` (matrix spec = base config + per-variant overrides) instead of hand-running configs; it writes the pays-for-itself report under `outputs/benchmarks/`.  
 * **Testing & Review Workflow:** Use test-driven generation. Immediately test generated code and continue bugfixing until successful. When a task is complete, review it:  
   * **Analysis Focus:** Analyze code quality, structure, performance bottlenecks, potential bugs, security issues, and user experience/accessibility.  
   * **Important Guidelines:** Structure feedback with clear headings. Ask clarifying questions about design decisions. Focus on *what* should be changed and *why*.  

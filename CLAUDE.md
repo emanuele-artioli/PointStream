@@ -154,6 +154,10 @@ fold it back in with the `/update-reports` skill.
 ## Where to look for more
 
 - Running the pipeline, config knobs, reading outputs → `/run-pipeline` skill
+- Residual-Guarantee ablations (baseline vs variants, pays-for-itself
+  verdicts) → `python -m scripts.benchmark_matrix run <spec.yaml>` with a
+  matrix spec in `config/benchmarks/` (see
+  `example_panorama_quality.yaml`); `report` mode re-tables existing runs
 - Summarizing/comparing runs, size accounting → `/results-report` skill
 - Folding findings into `reports/` → `/update-reports` skill
 - TOMM revision checklist workflow → `/reviewer-response` skill

@@ -1,0 +1,21 @@
+# Example Residual-Guarantee matrix (also a cheap smoke test for the harness).
+#
+# Question: does spending more bytes on the panorama (higher JPEG quality)
+# pay for itself by shrinking the residual?
+#
+# num-frames is capped for a fast run; a real experiment needs
+# num-frames: null and should live in its own spec file.
+name: example-panorama-quality
+input: assets/real_tennis.mp4
+base-config: config/default.yaml
+common-overrides:
+  num-frames: 3
+  genai-backend: null
+  execution-pool: inline
+variants:
+  - name: panorama-q50
+    baseline: true
+    overrides: {}
+  - name: panorama-q90
+    overrides:
+      panorama-jpeg-quality: 90
