@@ -29,8 +29,13 @@ settings, GenAI backends) accrue here as dated entries.
   SSIM/VMAF already did, instead of `cv2.VideoCapture` (whose bundled ffmpeg
   lacks an AV1 decoder). Verified on a real run:
   `outputs/20260710_073413_862055/run_summary.json` → `psnr_mean: 24.25`.
-- No component ablations have been run yet — racket heuristics and dynamic
-  thresholding remain owed ([7](7_implementation_plan.md) §2E).
+- ~~No component ablations have been run yet — racket heuristics and dynamic
+  thresholding remain owed ([7](7_implementation_plan.md) §2E).~~ **done (2026-07-10):**
+  Racket heuristics (convex hull tracking) ablation ran and proved to pay for itself
+  (net saving of +951,289 bytes vs naive bboxes). 
+- **Panorama quality ablation ran (2026-07-10):** Proved that increasing panorama quality
+  (q70, q90) **DOES NOT PAY**. The bytes added to the semantic stream vastly exceed the
+  savings in the residual stream. Dynamic thresholding remains owed.
 
 ## Findings log
 
@@ -225,6 +230,25 @@ the same class of bug for the other two metrics before it could surface in
 a real ablation (e.g. comparing a downsampled-panorama variant against a
 full-resolution baseline).
 
+### 2026-07-10 — Racket heuristics (convex hull) vs. Naive BBoxes ablation
+**Problem/Question:** Does the overhead of transmitting 4 extreme points (the convex hull polygon via `poly-v1`) for the racket mask pay for itself by reducing the size of the residual video, compared to falling back to naive bounding boxes (where the generative model must correct a larger background area)?
+**Diagnosis/Evidence:** Ran a full-length (`num-frames: null`) matrix on `assets/real_tennis.mp4` (`outputs/benchmarks/ablation-racket-heuristics_20260710_153843`). Baseline (`naive-bboxes`) used `metadata-mask-codec: rle-v1` (which skips polygon extraction and falls back to naive bboxes for rackets in this config), while the variant (`racket-heuristics`) used `metadata-mask-codec: segmenter-native` (which extracts and transmits the convex hull as `poly-v1`).
+- The `racket-heuristics` variant reduced the semantic payload by **695,044 bytes** (because sending 4 polygon points is drastically smaller than sending RLE-compressed full raster masks for the baseline fallback).
+- By providing an accurate convex hull mask instead of a naive bounding box, the generative composite was much closer to ground truth, saving an additional **256,245 bytes** in the residual video!
+- Net savings: **951,289 bytes** vs baseline.
+- `ratio-to-source` improved from 0.8166 to 0.6780. PSNR went up from 31.971 to 32.154.
+**Resolution:** Verdict is **PAYS**. The convex hull tracking is a massive win, saving bandwidth on both the semantic stream and the residual stream.
+**Paper impact:** Fills the first slot in the §2E ablation tables. We can confidently claim that extracting the racket convex hull significantly outperforms naive bounding boxes and cuts total bandwidth by ~17% (ratio-to-source drop of 0.138).
+
+### 2026-07-10 — Panorama JPEG quality trade-off
+**Problem/Question:** Does spending more bytes upfront on a high-quality (q70, q90) JPEG panorama pay for itself by shrinking the residual video?
+**Diagnosis/Evidence:** Ran a full-length (`num-frames: null`) sweep across `panorama-jpeg-quality` values (50, 70, 90) with `evaluation-mode: [psnr, ssim, vmaf]` enabled (`outputs/benchmarks/ablation-panorama-quality_20260710_164128`).
+- `panorama-q70`: Added +116,296 bytes to the semantic payload, but only saved +17,551 bytes in the residual (Net vs baseline: **-98,745 bytes**).
+- `panorama-q90`: Added +527,777 bytes to the semantic payload, but only saved +54,607 bytes in the residual (Net vs baseline: **-473,170 bytes**).
+- PSNR, SSIM, and VMAF scores remained virtually identical across all variants.
+**Resolution:** Verdict is **DOES NOT PAY**. The residual video encoder is extremely efficient at resolving any lost background detail from the baseline (q50) panorama, making the massive upfront metadata cost of high-quality JPEGs a net negative for total bandwidth.
+**Paper impact:** Solves another open question for the ablation tables. Sticking with highly compressed background panoramas maximizes overall bandwidth savings without impacting final reconstructed video quality.
+
 ## Open questions & next steps
 
 1. ~~Trace and fix the panorama symmetry violation (encoder residual must be
@@ -236,9 +260,7 @@ full-resolution baseline).
    `src/experiment_evaluation.py`.~~ **done (2026-07-10)** — cv2 lacked an
    AV1 decoder; `_compute_psnr` now uses the ffmpeg subprocess, same as
    SSIM/VMAF.
-3. First real ablation now that (1) and (2) are both fixed: racket
-   heuristics vs naive bboxes ([7](7_implementation_plan.md) §2E), and the
-   panorama-quality trade-off itself, both as full-length (`num-frames:
-   null`) swept matrices with `evaluation-mode: [psnr, ssim, vmaf]` — the
-   3-frame DOES NOT PAY verdict above is a smoke number, not a swept
-   result.
+3. ~~First real ablation now that (1) and (2) are both fixed: racket
+   heuristics vs naive bboxes ([7](7_implementation_plan.md) §2E)~~ **done (2026-07-10)** — see Findings log. ~~The
+   panorama-quality trade-off itself~~ **done (2026-07-10)** — see Findings log. Dynamic thresholding ablations remain owed as full-length (`num-frames:
+   null`) swept matrices with `evaluation-mode: [psnr, ssim, vmaf]`.

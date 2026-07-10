@@ -1,0 +1,17 @@
+name: ablation-panorama-quality
+input: assets/real_tennis.mp4
+base-config: config/default.yaml
+common-overrides:
+  num-frames: null
+  evaluation-mode: [psnr, ssim, vmaf]
+variants:
+  - name: panorama-q50
+    baseline: true
+    overrides:
+      panorama-jpeg-quality: 50
+  - name: panorama-q70
+    overrides:
+      panorama-jpeg-quality: 70
+  - name: panorama-q90
+    overrides:
+      panorama-jpeg-quality: 90

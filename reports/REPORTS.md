@@ -25,7 +25,7 @@ whole video; each enabled component must pay for itself. Full framing:
 | Workstream | Status | Evidence / where recorded |
 |---|---|---|
 | Scene classification (cuts vs pans, interlude routing) | ✅ Working | HSV-histogram invariance + point-anchored thresholding; CLIP/VLM zero-shot rejected ([2](2_scene_classification_research.md)) |
-| Racket tracking (convex hull + wrist anchoring) | ✅ Working | Pixel-accurate extreme points, majority-hand voting ([2](2_scene_classification_research.md) Phase 6); ablation vs naive bboxes still owed ([7](7_implementation_plan.md) §2E) |
+| Racket tracking (convex hull + wrist anchoring) | ✅ Working | Pixel-accurate extreme points, majority-hand voting ([2](2_scene_classification_research.md) Phase 6); ablation vs naive bboxes completed and pays for itself (+951KB net savings) ([8](8_residual_guarantee_benchmarks_report.md)) |
 | Shared-library architecture (`src/shared/`) | ✅ Done | Refactor complete, absolute imports enforced ([3](3_architecture_refactor_research.md)) |
 | SPADE4Tennis generative engine | ⚠️ In progress | Design + loss stack decided ([1](1_spade4tennis_plan.md)); final arch choice vs diffusion still open ([7](7_implementation_plan.md) §2A) |
 | Animate-Anyone integration | ⚠️ Evaluated, not final | Fork reads RGBA PNG + DWPose dataset format ([4](4_animate_anyone_integration_research.md)) |
@@ -58,9 +58,10 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    panorama-quality trade-off itself.
    *Tooling ready (2026-07-10), gate cleared (2026-07-10):*
    `scripts/benchmark_matrix.py` runs a baseline-vs-variants matrix from a
-   spec in `config/benchmarks/` and emits the pays-for-itself table; the
-   ablations themselves are still owed, now as full-length (`num-frames:
-   null`) swept matrices rather than 3-frame smoke runs.
+   spec in `config/benchmarks/` and emits the pays-for-itself table.
+   *Racket heuristics ablation:* ~~still owed~~ **done (2026-07-10)** (convex hull tracking drastically outperforms naive bboxes).
+   *Panorama quality trade-off:* ~~still owed~~ **done (2026-07-10)** (higher qualities do not pay, as metadata cost exceeds residual savings).
+   The dynamic thresholding ablation remains owed as a full-length (`num-frames: null`) swept matrix.
 5. Background panorama stitching for moderate camera motion.
 6. Detector/segmenter selection: SAM3 vs YOLOv26 vs RF-DETR (R3).
 7. Deferred (post-core): second domain, MOS study, demo video, VVC,

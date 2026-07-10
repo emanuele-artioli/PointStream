@@ -1,0 +1,14 @@
+name: ablation-racket-heuristics
+input: assets/real_tennis.mp4
+base-config: config/default.yaml
+common-overrides:
+  num-frames: null
+  compositing-mask-mode: metadata-source-mask
+variants:
+  - name: naive-bboxes
+    baseline: true
+    overrides:
+      metadata-mask-codec: rle-v1
+  - name: racket-heuristics
+    overrides:
+      metadata-mask-codec: segmenter-native
