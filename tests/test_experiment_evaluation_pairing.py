@@ -6,7 +6,7 @@ import numpy as np
 
 import src.experiment_evaluation as eval_module
 from src.encoder.video_io import encode_video_frames_ffmpeg
-from src.experiment_evaluation import _compute_psnr
+from src.experiment_evaluation import _compute_psnr, _compute_ssim_ffmpeg, _compute_vmaf_ffmpeg
 
 
 def _make_frames(num_frames: int, width: int, height: int, value: int) -> list[np.ndarray]:
@@ -39,6 +39,43 @@ def test_mismatched_dimensions_are_scaled_and_psnr_is_finite(tmp_path: Path) -> 
     assert res["psnr_num_frames"] == 3
     assert res["psnr_infinite_frames"] == 0
     assert res["psnr_mean"] is not None
+
+
+def test_mismatched_dimensions_are_scaled_and_ssim_is_computed(tmp_path: Path) -> None:
+    """SSIM is a framesync filter like PSNR: ffmpeg requires equal input
+    resolutions and errors out on mismatch without an explicit scale step.
+    """
+    ref_frames = _make_frames(3, width=32, height=24, value=10)
+    pred_frames = _make_frames(3, width=16, height=12, value=200)
+    ref = tmp_path / "ref_ssim.mp4"
+    pred = tmp_path / "pred_ssim.mp4"
+    encode_video_frames_ffmpeg(ref, ref_frames, fps=15.0, width=32, height=24, codec="libx264")
+    encode_video_frames_ffmpeg(pred, pred_frames, fps=15.0, width=16, height=12, codec="libx264")
+
+    res = _compute_ssim_ffmpeg(reference_video=ref, predicted_video=pred, max_frames=None)
+    assert res["note"] is None
+    assert res["ssim_num_frames"] == 3
+    assert res["ssim_mean"] is not None
+
+
+def test_mismatched_dimensions_are_scaled_and_vmaf_is_computed(tmp_path: Path) -> None:
+    """VMAF is a framesync filter like PSNR: ffmpeg requires equal input
+    resolutions and errors out on mismatch without an explicit scale step.
+
+    Reference dims must exceed libvmaf's ADM minimum (>32px each side) since
+    both streams are compared at the (scaled-to-)reference resolution.
+    """
+    ref_frames = _make_frames(3, width=64, height=48, value=10)
+    pred_frames = _make_frames(3, width=32, height=24, value=200)
+    ref = tmp_path / "ref_vmaf.mp4"
+    pred = tmp_path / "pred_vmaf.mp4"
+    encode_video_frames_ffmpeg(ref, ref_frames, fps=15.0, width=64, height=48, codec="libx264")
+    encode_video_frames_ffmpeg(pred, pred_frames, fps=15.0, width=32, height=24, codec="libx264")
+
+    res = _compute_vmaf_ffmpeg(reference_video=ref, predicted_video=pred, max_frames=None)
+    assert res["note"] is None
+    assert res["vmaf_num_frames"] == 3
+    assert res["vmaf_mean"] is not None
 
 
 def test_av1_encoded_predicted_video_is_readable(tmp_path: Path) -> None:

@@ -197,6 +197,34 @@ this fix changed or was asked to change.
 tables; unblocked — the codec comparison tables can now report PSNR
 alongside SSIM/VMAF.
 
+### 2026-07-10 — SSIM/VMAF also hard-error on reference/predicted dimension mismatch
+**Problem/Question:** The PSNR fix above added an explicit `scale=W:H`
+filter step ahead of `psnr=stats_file=...` when reference/predicted
+dimensions differ, because "ffmpeg's `psnr` filter hard-errors on dimension
+mismatch". `_compute_ssim_ffmpeg`/`_compute_vmaf_ffmpeg` were not given the
+same treatment in that fix — open question: do they have the same bug?
+**Diagnosis/Evidence:** Yes. `ssim` and `libvmaf` are framesync-based
+dual-input filters exactly like `psnr` and carry the same equal-resolution
+requirement. Added `test_mismatched_dimensions_are_scaled_and_ssim_is_computed`/
+`..._vmaf_is_computed` to `tests/test_experiment_evaluation_pairing.py`;
+confirmed both fail pre-fix (`git stash` of the src change) with real
+ffmpeg errors — SSIM: `[Parsed_ssim_0] Failed to configure output pad`-class
+mismatch error (input width/height differ); VMAF:
+`libvmaf ERROR adm: invalid size (32x24), width/height must be greater than
+32` on a first attempt with 32×24 reference dims, then
+`[Parsed_libvmaf_0] input width must match` confirmed as the real trigger
+once dims were bumped past libvmaf's ADM minimum (>32px per side) to
+isolate the mismatch from the unrelated minimum-size constraint.
+**Resolution:** Fixed. `_compute_ssim_ffmpeg`/`_compute_vmaf_ffmpeg` now
+build the identical `[1:v]scale={width}:{height}[..._pred_scaled]` filter
+graph as `_compute_psnr` when dimensions differ. Verified: both new tests
+pass post-fix; full `pytest -q` suite green; `ruff`/`mypy` clean on
+`src/experiment_evaluation.py`.
+**Paper impact:** None beyond the existing PSNR fix's impact — this closes
+the same class of bug for the other two metrics before it could surface in
+a real ablation (e.g. comparing a downsampled-panorama variant against a
+full-resolution baseline).
+
 ## Open questions & next steps
 
 1. ~~Trace and fix the panorama symmetry violation (encoder residual must be

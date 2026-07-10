@@ -231,7 +231,16 @@ def _compute_ssim_ffmpeg(reference_video: Path, predicted_video: Path, max_frame
     stats_path = Path(stats_file.name)
     stats_file.close()
 
-    filter_complex = "[0:v][1:v]ssim=stats_file=" + str(stats_path)
+    reference_dims = _get_video_dimensions(reference_video)
+    predicted_dims = _get_video_dimensions(predicted_video)
+    if reference_dims is not None and predicted_dims is not None and reference_dims != predicted_dims:
+        width, height = reference_dims
+        filter_complex = (
+            f"[1:v]scale={width}:{height}[ssim_pred_scaled];"
+            f"[0:v][ssim_pred_scaled]ssim=stats_file=" + str(stats_path)
+        )
+    else:
+        filter_complex = "[0:v][1:v]ssim=stats_file=" + str(stats_path)
     
     ffmpeg_cmd = [
         ffmpeg_bin,
@@ -327,7 +336,16 @@ def _compute_vmaf_ffmpeg(reference_video: Path, predicted_video: Path, max_frame
     log_path = Path(log_file.name)
     log_file.close()
 
-    filter_complex = "[0:v][1:v]libvmaf=log_path=" + str(log_path) + ":log_fmt=json"
+    reference_dims = _get_video_dimensions(reference_video)
+    predicted_dims = _get_video_dimensions(predicted_video)
+    if reference_dims is not None and predicted_dims is not None and reference_dims != predicted_dims:
+        width, height = reference_dims
+        filter_complex = (
+            f"[1:v]scale={width}:{height}[vmaf_pred_scaled];"
+            f"[0:v][vmaf_pred_scaled]libvmaf=log_path=" + str(log_path) + ":log_fmt=json"
+        )
+    else:
+        filter_complex = "[0:v][1:v]libvmaf=log_path=" + str(log_path) + ":log_fmt=json"
     
     ffmpeg_cmd = [
         ffmpeg_bin,
