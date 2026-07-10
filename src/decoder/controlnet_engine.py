@@ -27,7 +27,8 @@ class MockCaptionControlNetStrategy(BaseGenAIStrategy):
         seed: int,
         device: torch.device,
         metadata_bbox: tuple[int, int, int, int] | None = None,
-        **kwargs: Any,
+        init_image_override: Any = None,
+        strength_override: float | None = None,
     ) -> torch.Tensor:
         # Validate inputs
         if reference_crop_tensor.ndim != 3 or reference_crop_tensor.shape[0] != 3:
@@ -194,7 +195,8 @@ class CaptionControlNetStrategy(BaseGenAIStrategy):
         seed: int,
         device: torch.device,
         metadata_bbox: tuple[int, int, int, int] | None = None,
-        **kwargs: Any,
+        init_image_override: Any = None,
+        strength_override: float | None = None,
     ) -> torch.Tensor:
         pipe = self._ensure_pipeline(device)
 
@@ -401,7 +403,8 @@ class IPAdapterControlNetStrategy(BaseGenAIStrategy):
         seed: int,
         device: torch.device,
         metadata_bbox: tuple[int, int, int, int] | None = None,
-        **kwargs: Any,
+        init_image_override: Any = None,
+        strength_override: float | None = None,
     ) -> torch.Tensor:
         pipe = self._ensure_pipeline(device)
 

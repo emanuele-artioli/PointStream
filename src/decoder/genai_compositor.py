@@ -357,7 +357,8 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
         seed: int,
         device: torch.device,
         metadata_bbox: tuple[int, int, int, int] | None = None,
-        **kwargs: Any,
+        init_image_override: Any = None,
+        strength_override: float | None = None,
     ) -> torch.Tensor:
         runtime_fn = self._ensure_runtime()
 
@@ -653,7 +654,7 @@ class DiffusersCompositor(BaseCompositor):
         frame_idx: int | None = None,
     ) -> torch.Tensor:
         if not hasattr(self, "_segmented_refs"):
-            self._segmented_refs = {}
+            self._segmented_refs: dict[str, torch.Tensor] = {}
 
         if actor_identity is not None:
             ref_id = f"{actor_identity}_{hash(reference_crop_tensor.data_ptr())}"
@@ -710,7 +711,7 @@ class DiffusersCompositor(BaseCompositor):
                 fallback_u8 = np.asarray(fallback_mask * 255.0, dtype=np.uint8)
                 
                 if self._backend in {"canny-controlnet", "canny_controlnet"}:
-                    fallback_u8 = cv2.Canny(fallback_u8, 100, 200)
+                    fallback_u8 = np.asarray(cv2.Canny(fallback_u8, 100, 200), dtype=np.uint8)
                     
                 control_tensor = torch.from_numpy(fallback_u8).unsqueeze(0).to(self._device)
 
@@ -784,7 +785,7 @@ class DiffusersCompositor(BaseCompositor):
                 gray_prev = cv2.cvtColor(prev_cond, cv2.COLOR_RGB2GRAY)
                 gray_curr = cv2.cvtColor(curr_cond, cv2.COLOR_RGB2GRAY)
 
-                flow = cv2.calcOpticalFlowFarneback(
+                flow = cv2.calcOpticalFlowFarneback(  # type: ignore[call-overload]
                     gray_prev, gray_curr, None, 0.5, 3, 15, 3, 5, 1.2, 0,
                 )
                 h, w = prev_gen.shape[:2]

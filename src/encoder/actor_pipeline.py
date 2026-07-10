@@ -119,7 +119,7 @@ class ActorExtractor:
         else:
             raise ValueError(f"Unsupported segmenter backend: {segmenter_backend}")
 
-        segmenter: BaseSegmenter | None = base_segmenter
+        segmenter = base_segmenter
         if "canny-controlnet" in genai_backend:
             # Wrap the base segmenter with CannySegmenter
             low = getattr(config, "canny_lower_threshold", "auto") if config else "auto"

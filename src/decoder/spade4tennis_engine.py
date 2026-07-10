@@ -120,7 +120,8 @@ class Spade4TennisStrategy(BaseGenAIStrategy):
         seed: int,
         device: torch.device,
         metadata_bbox: tuple[int, int, int, int] | None = None,
-        **kwargs: Any,
+        init_image_override: Any = None,
+        strength_override: float | None = None,
     ) -> torch.Tensor:
         """Generate a player+racket image from skeleton pose and reference."""
         model = self._ensure_model(device)

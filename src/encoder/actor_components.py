@@ -857,7 +857,10 @@ class CannySegmenter(BaseSegmenter):
         
         if semantic_mask is not None:
             if semantic_mask.shape != edges.shape:
-                semantic_mask = cv2.resize(semantic_mask, (edges.shape[1], edges.shape[0]), interpolation=cv2.INTER_NEAREST)
+                semantic_mask = np.asarray(
+                    cv2.resize(semantic_mask, (edges.shape[1], edges.shape[0]), interpolation=cv2.INTER_NEAREST),
+                    dtype=np.uint8,
+                )
             
             # Dilate the semantic mask to ensure it covers the Canny edges of the player boundary
             # Use a kernel size relative to the crop size, e.g., 5x5 or 7x7

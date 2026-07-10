@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 from pathlib import Path
+import shutil
+import subprocess
 
 import numpy as np
+import pytest
 
 import src.experiment_evaluation as eval_module
 from src.encoder.video_io import encode_video_frames_ffmpeg
@@ -11,6 +14,20 @@ from src.experiment_evaluation import _compute_psnr, _compute_ssim_ffmpeg, _comp
 
 def _make_frames(num_frames: int, width: int, height: int, value: int) -> list[np.ndarray]:
     return [np.full((height, width, 3), value, dtype=np.uint8) for _ in range(num_frames)]
+
+
+def _ffmpeg_has_libvmaf() -> bool:
+    ffmpeg_bin = shutil.which("ffmpeg")
+    if not ffmpeg_bin:
+        return False
+    result = subprocess.run([ffmpeg_bin, "-hide_banner", "-filters"], capture_output=True, text=True, check=False)
+    return "libvmaf" in result.stdout
+
+
+# Ubuntu's apt ffmpeg package (e.g. CI runners) is not reliably built with
+# libvmaf; skip rather than fail so VMAF-dependent tests don't block CI on an
+# environment gap unrelated to the code under test.
+_HAS_LIBVMAF = _ffmpeg_has_libvmaf()
 
 
 def test_identical_videos_yield_high_or_infinite_psnr(tmp_path: Path) -> None:
@@ -58,6 +75,7 @@ def test_mismatched_dimensions_are_scaled_and_ssim_is_computed(tmp_path: Path) -
     assert res["ssim_mean"] is not None
 
 
+@pytest.mark.skipif(not _HAS_LIBVMAF, reason="ffmpeg on PATH lacks the libvmaf filter")
 def test_mismatched_dimensions_are_scaled_and_vmaf_is_computed(tmp_path: Path) -> None:
     """VMAF is a framesync filter like PSNR: ffmpeg requires equal input
     resolutions and errors out on mismatch without an explicit scale step.
