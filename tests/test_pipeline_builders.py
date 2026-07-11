@@ -151,3 +151,23 @@ class TestBuildResidualCalculator:
         config = PointstreamConfig(importance_mapper="binary")
         pb.build_residual_calculator(config)
         assert isinstance(captured["importance_mapper"], pb.BinaryActorImportanceMapper)
+
+    def test_residual_tuning_knobs_are_forwarded_from_config(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        # Regression: these five config keys were previously read nowhere —
+        # editing them in a YAML config silently had zero effect (report 10
+        # Phase 5.0 / report 8 2026-07-11 entry).
+        captured: dict[str, Any] = {}
+        monkeypatch.setattr(pb, "ResidualCalculator", lambda **kwargs: captured.update(kwargs) or object())
+        config = PointstreamConfig(
+            residual_background_downscale=4,
+            residual_batch_size=16,
+            downscale_interpolation="nearest",
+            residual_block_size=4,
+            residual_block_threshold=2.0,
+        )
+        pb.build_residual_calculator(config)
+        assert captured["background_block_downscale_factor"] == 4
+        assert captured["residual_batch_size"] == 16
+        assert captured["downscale_interpolation"] == "nearest"
+        assert captured["residual_block_size"] == 4
+        assert captured["block_information_threshold"] == 2.0

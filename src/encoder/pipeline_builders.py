@@ -86,4 +86,9 @@ def build_residual_calculator(config: PointstreamConfig) -> ResidualCalculator:
         config=config,
         seed=config.seed,
         importance_mapper=mapper,
+        background_block_downscale_factor=config.residual_background_downscale,
+        residual_batch_size=config.residual_batch_size,
+        downscale_interpolation=config.downscale_interpolation,
+        residual_block_size=config.residual_block_size,
+        block_information_threshold=config.residual_block_threshold,
     )

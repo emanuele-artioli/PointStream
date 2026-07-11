@@ -65,6 +65,7 @@ class PointstreamConfig:
     downscale_interpolation: str = "bilinear"
     residual_block_size: int = 8
     residual_block_threshold: float = 0.0
+    residual_pix_fmt: str = "yuv444p"
     seed: int = 1337
 
     # GPU and Performance Tuning

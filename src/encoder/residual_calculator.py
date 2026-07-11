@@ -351,7 +351,7 @@ class ResidualCalculator:
             residual_codec = self.config.ffmpeg_codec
             residual_crf = self.config.codec_crf or 28
             residual_preset = self.config.codec_preset or "medium"
-            residual_pix_fmt = "yuv444p"
+            residual_pix_fmt = getattr(self.config, "residual_pix_fmt", "yuv444p") or "yuv444p"
             encode_video_frames_ffmpeg(
                 output_path=output_path,
                 frames_bgr=_iter_encoded_frames(),
