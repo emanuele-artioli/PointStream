@@ -1,5 +1,5 @@
 # Codec Baselines — Report
-*Status: Active | Last updated: 2026-07-10 | Code: scripts/codec_baseline_sweep.py*
+*Status: Active | Last updated: 2026-07-11 | Code: scripts/codec_baseline_sweep.py, scripts/hnerv_baseline.py*
 
 ## Scope
 
@@ -40,7 +40,15 @@ true floor/ceiling anchor a reviewer would expect.
 - Not yet compared side-by-side against a real PointStream `run_summary.json`
   via `--pointstream-run` — that's the next step to actually answer "does
   PointStream's semantic decomposition beat these curves."
-- One learned codec (HNeRV or DCVC) baseline remains entirely open (R2, R5).
+- ~~One learned codec (HNeRV or DCVC) baseline remains entirely open (R2,
+  R5).~~ **Closed (2026-07-11):** a from-scratch HNeRV implementation
+  (`src/shared/hnerv_arch.py`, `scripts/hnerv_baseline.py`) trained and
+  scored on the real 60-frame `assets/real_tennis.mp4` clip — see the dated
+  entry below. **Honest result: it loses.** Every AV1/HEVC operating point
+  in the full-length sweep above beats HNeRV on bytes *and* quality
+  simultaneously except HEVC CRF18 (which is bigger but far higher quality).
+  The reviewer-critical gap was "no learned-codec comparison exists" — one
+  now exists, with real numbers, whichever way they land.
 
 ## Findings log
 
@@ -229,6 +237,82 @@ paper table on.
 needs (R2, R5). Still missing the actual PointStream data point(s) to
 overlay — that's the next step, not yet done.
 
+### 2026-07-11 — HNeRV learned-codec baseline: implemented, trained for real, and it loses
+
+**Problem/Question:** Close the reviewer-critical "no learned-codec
+baseline exists" gap (R2, R5; `reports/6_action_matrix.md`: "Benchmark
+against at least one recent semantic codec (e.g., DVC or NeRV)"). This
+report's TL;DR had flagged it as "entirely open" since 2026-07-10.
+
+**Diagnosis/Evidence:** No pretrained HNeRV weights or reference
+implementation existed anywhere under the shared `/home/itec/emanuele/Models`
+cache (searched first, per CLAUDE.md's weights convention), so this required
+a from-scratch implementation rather than a fetch-and-run. Built
+`src/shared/hnerv_arch.py` — a simplified HNeRV (arXiv 2304.02633):
+NeRVBlock (conv + PixelShuffle + GELU) decoder stack, a lightweight
+strided-conv content-adaptive encoder standing in for the paper's ConvNeXt
+encoder (discarded after training — only decoder weights + per-frame
+embeddings are ever "transmitted," matching how HNeRV's own compression
+numbers are reported), int8 embedding quantization + fp16 decoder weights,
+gzip-compressed checkpoint serialization. `scripts/hnerv_baseline.py` wraps
+it in the same shape as `scripts/codec_baseline_sweep.py`: train (per-video
+overfit) → serialize → decode (decoder-only forward pass reloaded from
+disk) → score via `src.experiment_evaluation.evaluate_run_summary`, the
+identical PSNR/SSIM/VMAF code path the AV1/HEVC sweep uses, so the numbers
+land on the same axes. Mock-first per CLAUDE.md: `tests/test_hnerv_arch.py`
++ `tests/test_hnerv_baseline.py` (fast, shapes/quantization round
+trip/checkpoint round trip/CLI/report rendering) and
+`tests/test_hnerv_baseline_integration.py` (integration+slow, proves the
+full train→serialize→decode→score loop on a tiny synthetic clip) all pass;
+ruff/mypy clean.
+
+**Real run:** trained on all 60 frames of `assets/real_tennis.mp4` at a
+reduced 640×360 training resolution (embedding grid 16×9×64, decoder
+strides `[5, 4, 2]`, 3,101,795 decoder params, 15,000 epochs — a genuine
+per-video overfit, not a smoke test), ~3,316 s (~55 min) wall-clock GPU
+training, 0.44 s decode. `evaluate_run_summary` auto-scales the decoded
+frames back to source resolution before scoring, the same mechanism the
+AV1/HEVC sweep relies on for any resolution mismatch, so this stays
+apples-to-apples. Artifacts: `outputs/hnerv_baseline/20260711_150415/`
+(`report.md`, `report.json`, `history.json`, `progress.jsonl`,
+`decoded_frames/`).
+
+| codec | bytes | ratio-to-source | psnr | ssim | vmaf |
+|---|---|---|---|---|---|
+| HNeRV | 5,939,951 | 0.8656 | 32.502 | 0.918 | 79.079 |
+
+**Compared directly against the full-length AV1/HEVC sweep above** (same
+source video, same `evaluate_run_summary` scoring, so this is a real
+apples-to-apples read, not an approximation): **HNeRV is strictly dominated
+by every AV1 operating point tested.** AV1 CRF50/slow is 453,237 bytes —
+13× *smaller* than HNeRV's 5.94 MB checkpoint — yet reaches PSNR
+38.644/VMAF 93.094, far above HNeRV's PSNR 32.502/VMAF 79.079. The only
+HEVC points bigger than HNeRV are CRF18 (slow 6.56 MB, veryslow 6.81 MB),
+and those still reach PSNR ≈39.34–39.35/VMAF ≈98.25–98.26 — again far
+higher quality at a comparable size. Every other HEVC point (CRF23/28/33,
+both presets) is both smaller and higher-quality than HNeRV.
+
+**Resolution:** Code landed on `main` as `7047207` (built on the spawned
+worktree `worktree-agent-aa2b3e1a2a0fbcb8e`). Note on process: the agent
+that built and trained this was cut off by a tooling outage before it
+could fold the (already-complete) real run into this report — the
+background training process kept running and finished on its own with the
+numbers above; only the report-folding step was left undone. Re-verified
+independently before landing: ruff, mypy, the full fast suite, and
+`tests/test_hnerv_baseline_integration.py` all re-run from a clean state
+and passed, not just trusted from the subagent's own claim.
+
+**Paper impact:** Closes the R2/R5 "no learned-codec baseline" gap for the
+Results section — the honest headline is that this specific from-scratch
+HNeRV configuration (640×360 training resolution, 15,000-epoch
+single-video overfit, ~3.1M decoder params) does not beat a well-tuned
+AV1/HEVC anchor on this clip, on either bytes or quality. That is a
+legitimate, reportable result: the ask was "does at least one recent
+learned/semantic codec baseline exist for comparison," not "does it win."
+Higher training resolution, more capacity, or more epochs could plausibly
+close some of this gap and would be a natural follow-up if the paper wants
+a stronger learned-codec showing, but is not required to close this gap.
+
 ## Open questions & next steps
 
 1. Run a real PointStream pipeline pass (`num-frames: null`) at a
@@ -237,8 +321,11 @@ overlay — that's the next step, not yet done.
    `outputs/<timestamp>/` dir via `--pointstream-run` to get the direct
    side-by-side table (PointStream `transport_total` vs the AV1/HEVC curve).
    This is the step that actually answers the paper's core claim.
-2. Learned-codec baseline (HNeRV or DCVC) — not started; heavier lift (new
-   dependency, likely GPU).
+2. ~~Learned-codec baseline (HNeRV or DCVC) — not started; heavier lift (new
+   dependency, likely GPU).~~ **Done (2026-07-11)** — HNeRV implemented and
+   trained for real; see the dated entry above. It loses to AV1/HEVC on this
+   clip as configured; a higher-capacity/higher-resolution re-run is a
+   possible follow-up, not a blocker.
 3. Consider a VVC anchor too — currently deferred post-core per
    [7_implementation_plan.md](7_implementation_plan.md) §4, but cheap to add
    to this same script if `libx266`/`vvenc` becomes available via FFmpeg on
