@@ -12,14 +12,16 @@ import cv2
 import numpy as np
 
 from src.shared.config import PointstreamConfig, load_config
-from src.encoder.ball_extractor import BallExtractor
-from src.encoder.segmentation_ball_extractor import SegmentationBallExtractor
-from src.encoder.execution_pool import BaseExecutionPool, TaggedMultiprocessPool, WorkerConfig
 from src.decoder.decoder_renderer import DecoderRenderer
-from src.encoder.actor_pipeline import ActorExtractor
 from src.encoder.orchestrator import EncoderPipeline
-from src.encoder.reference_extractor import ReferenceExtractor
-from src.encoder.residual_calculator import BaseImportanceMapper, BinaryActorImportanceMapper, ResidualCalculator, UniformImportanceMapper
+from src.encoder.match_orchestrator import encode_full_match
+from src.encoder.pipeline_builders import (
+    build_actor_extractor,
+    build_ball_extractor,
+    build_execution_pool,
+    build_reference_extractor,
+    build_residual_calculator,
+)
 from src.encoder.video_io import encode_video_frames_ffmpeg, probe_video_metadata, ensure_ffmpeg_encoder_available
 from src.experiment_evaluation import evaluate_run_summary
 from src.shared.schemas import VideoChunk, ResidualMode
@@ -44,75 +46,12 @@ def _safe_file_size(path_like: str | Path | None) -> int | None:
         return None
     return int(candidate.stat().st_size)
 
-def _build_execution_pool(config: PointstreamConfig) -> BaseExecutionPool | None:
-    mode = config.execution_pool.strip().lower()
-    if mode == "inline":
-        return None
-    if mode == "tagged":
-        return TaggedMultiprocessPool(  # type: ignore[call-arg]
-            cpu_workers=config.cpu_workers or 1,
-            gpu_workers=config.gpu_workers or 1,
-            worker_config=WorkerConfig(gpu_dtype=config.gpu_dtype),  # type: ignore[call-arg]
-        )
-    raise ValueError(f"Unknown execution pool mode: {mode}")
-
-def _build_actor_extractor(config: PointstreamConfig) -> ActorExtractor | None:
-    normalized_mask_mode = config.compositing_mask_mode.strip().lower()
-    include_mask_metadata = normalized_mask_mode == "metadata-source-mask"
-    
-    return ActorExtractor(
-        config=config,
-        render_debug_keyframes=False, # Debug output handling moved to explicit checks if needed
-        detector_backend=config.detector,
-        detector_caption=config.target_class_caption,
-        pose_backend=config.pose_estimator,
-        segmenter_backend=config.segmenter,
-        segmenter_caption=config.target_class_caption,
-        pose_delta_threshold=config.payload_pose_delta_threshold,
-        include_mask_metadata=include_mask_metadata,
-        metadata_mask_codec=config.metadata_mask_codec,
-    )
-
-def _build_ball_extractor(config: PointstreamConfig) -> Any | None:
-    mode = config.ball_extractor.strip().lower()
-    if mode == "segmentation":
-        return SegmentationBallExtractor(
-            confidence=config.ball_det_conf or 0.25,
-            model_name=config.ball_det_model or "yolo26n.pt",
-            config=config,
-        )
-    return BallExtractor(
-        difference_threshold=config.ball_difference_threshold,
-        min_blob_area=config.ball_min_blob_area,
-        detection_max_side=config.ball_max_side,
-    )
-
-def _build_reference_extractor(config: PointstreamConfig) -> ReferenceExtractor:
-    return ReferenceExtractor(
-        jpeg_quality=config.reference_jpeg_quality,
-        bbox_padding_ratio=config.reference_padding_ratio,
-    )
-
-def _build_residual_calculator(config: PointstreamConfig) -> ResidualCalculator:
-    mapper_mode = config.importance_mapper.strip().lower()
-    mapper: BaseImportanceMapper
-    if mapper_mode == "uniform":
-        mapper = UniformImportanceMapper()
-    else:
-        mapper = BinaryActorImportanceMapper()
-        
-    return ResidualCalculator(
-        config=config,
-        seed=config.seed,
-        importance_mapper=mapper,
-    )
-
 def run_pipeline(
     config: PointstreamConfig,
     transport_root: str | Path | None = None,
     chunk_id: str = "0001",
     runtime_output_root: str | Path | None = None,
-) -> dict[str, object]:
+) -> dict[str, Any]:
     pipeline_started = perf_counter()
     resolved_transport_root = Path(transport_root).expanduser() if transport_root is not None else _create_timestamped_output_dir()
     resolved_transport_root.mkdir(parents=True, exist_ok=True)
@@ -138,11 +77,11 @@ def run_pipeline(
         height=source_metadata.height,
     )
     
-    execution_pool = _build_execution_pool(config)
-    actor_extractor = _build_actor_extractor(config)
-    ball_extractor = _build_ball_extractor(config)
-    reference_extractor = _build_reference_extractor(config)
-    residual_calculator = _build_residual_calculator(config)
+    execution_pool = build_execution_pool(config)
+    actor_extractor = build_actor_extractor(config)
+    ball_extractor = build_ball_extractor(config)
+    reference_extractor = build_reference_extractor(config)
+    residual_calculator = build_residual_calculator(config)
 
     encoder = EncoderPipeline(
         config=config,
@@ -323,33 +262,48 @@ def run_cli(argv: list[str] | None = None) -> int:
     run_output_root = _create_timestamped_output_dir(base_root=_project_root() / "outputs")
     config.runtime_output_dir = str(run_output_root)
     config.debug_artifact_dir = str(run_output_root / "debug")
-    run_summary: dict[str, Any] = run_pipeline(
-        config=config,
-        transport_root=run_output_root,
-        chunk_id="0001",
-        runtime_output_root=run_output_root,
-    )
 
-    if config.evaluation_mode:
-        from time import perf_counter
-        eval_start = perf_counter()
-        eval_result = evaluate_run_summary(
-            summary=run_summary,
-            experiment_dir=run_output_root,
-            max_frames=config.evaluation_max_frames,
-            metrics=config.evaluation_mode,
+    run_summary: dict[str, Any]
+    if config.run_mode.strip().lower() == "full_match":
+        # Report 10 Phase 2: scene-routed full-match encode. Byte/timing
+        # accounting only (G1 scope) — quality scoring is G2 (Phase 4), once
+        # the held-out-video generative models exist, so evaluation_mode is
+        # not applied here.
+        if config.source_uri is None:
+            raise ValueError("run_mode 'full_match' requires an explicit --input video.")
+        run_summary = encode_full_match(
+            config=config,
+            video_path=config.source_uri,
+            transport_root=run_output_root,
         )
-        
-        q_sec = float(perf_counter() - eval_start)
-        if "evaluation" not in run_summary:
-            run_summary["evaluation"] = {}
-            
-        if "sizes_bytes" in eval_result and "sizes_bytes" in run_summary["evaluation"]:
-            run_summary["evaluation"]["sizes_bytes"].update(eval_result.pop("sizes_bytes"))
-            
-        run_summary["evaluation"].update(eval_result)
-        if "timings_sec" in run_summary["evaluation"]:
-            run_summary["evaluation"]["timings_sec"]["quality_evaluation"] = q_sec
+    else:
+        run_summary = run_pipeline(
+            config=config,
+            transport_root=run_output_root,
+            chunk_id="0001",
+            runtime_output_root=run_output_root,
+        )
+
+        if config.evaluation_mode:
+            from time import perf_counter
+            eval_start = perf_counter()
+            eval_result = evaluate_run_summary(
+                summary=run_summary,
+                experiment_dir=run_output_root,
+                max_frames=config.evaluation_max_frames,
+                metrics=config.evaluation_mode,
+            )
+
+            q_sec = float(perf_counter() - eval_start)
+            if "evaluation" not in run_summary:
+                run_summary["evaluation"] = {}
+
+            if "sizes_bytes" in eval_result and "sizes_bytes" in run_summary["evaluation"]:
+                run_summary["evaluation"]["sizes_bytes"].update(eval_result.pop("sizes_bytes"))
+
+            run_summary["evaluation"].update(eval_result)
+            if "timings_sec" in run_summary["evaluation"]:
+                run_summary["evaluation"]["timings_sec"]["quality_evaluation"] = q_sec
 
     summary_json = json.dumps(run_summary, indent=2)
     print(summary_json)

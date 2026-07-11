@@ -87,11 +87,11 @@ def _patch_pipeline_dependencies(monkeypatch, metadata_num_frames: int = 12):
     monkeypatch.setattr(main_module, "DecoderRenderer", _FakeDecoderRenderer)
     
     # Mock builders
-    monkeypatch.setattr(main_module, "_build_execution_pool", lambda config: object())
-    monkeypatch.setattr(main_module, "_build_actor_extractor", lambda config: object())
-    monkeypatch.setattr(main_module, "_build_ball_extractor", lambda config: object())
-    monkeypatch.setattr(main_module, "_build_reference_extractor", lambda config: object())
-    monkeypatch.setattr(main_module, "_build_residual_calculator", lambda config: object())
+    monkeypatch.setattr(main_module, "build_execution_pool", lambda config: object())
+    monkeypatch.setattr(main_module, "build_actor_extractor", lambda config: object())
+    monkeypatch.setattr(main_module, "build_ball_extractor", lambda config: object())
+    monkeypatch.setattr(main_module, "build_reference_extractor", lambda config: object())
+    monkeypatch.setattr(main_module, "build_residual_calculator", lambda config: object())
 
 
 def test_run_pipeline_builds_summary_with_provided_source(monkeypatch) -> None:

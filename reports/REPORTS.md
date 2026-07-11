@@ -35,7 +35,7 @@ whole video; each enabled component must pay for itself. Full framing:
 | Residual-Guarantee benchmark harness | ✅ Working | `scripts/benchmark_matrix.py`; first run exposed a panorama symmetry violation, now fixed ([8](8_residual_guarantee_benchmarks_report.md)) |
 | Detector selection (SAM3 vs YOLOv26 vs RF-DETR) | ⬜ Open | [7](7_implementation_plan.md) §2C |
 | Dataset curation (raw_4k → assets/dataset) | ✅ Built, now catalogued | 7 videos (≈2h37m 4K) / 952 scenes / 399 points / 114 deep-annotated tracks; quality-tier models (yolo26x), manually supervised ([10](10_dataset_and_end_to_end_evaluation_report.md)) |
-| End-to-end full-match evaluation (runtime scene routing, complexity tiers, speed/compression Pareto) | ⚠️ In progress | Phase 1 done (2026-07-11): `src/shared/scene_classification.py` ports point-anchored classification into `src/`, verified against real cached `alcaraz_ruud` data; Phases 2–4 open ([10](10_dataset_and_end_to_end_evaluation_report.md)) |
+| End-to-end full-match evaluation (runtime scene routing, complexity tiers, speed/compression Pareto) | ⚠️ In progress | Phases 1–2 done (2026-07-11): scene classifier ported to `src/`; `src/encoder/match_orchestrator.py` routes scenes + outcome-safe semantic-vs-fallback selection, real run passed on `assets/real_tennis.mp4`; Phases 3–4 open ([10](10_dataset_and_end_to_end_evaluation_report.md)) |
 | TOMM resubmission | ⚠️ In progress | Action matrix tracks all 8 reviewer themes ([6](6_action_matrix.md)) |
 
 ## Prioritized next steps
@@ -75,7 +75,7 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    spec in `config/benchmarks/` and emits the pays-for-itself table.
    *Racket heuristics ablation:* ~~still owed~~ **done (2026-07-10)** (convex hull tracking drastically outperforms naive bboxes).
    *Panorama quality trade-off:* ~~still owed~~ **done (2026-07-10)** (higher qualities do not pay, as metadata cost exceeds residual savings).
-   The dynamic thresholding ablation remains owed as a full-length (`num-frames: null`) swept matrix.
+   *Dynamic thresholding:* ~~still owed~~ **done (2026-07-10)** (threshold 1.0 optimally gates noise and saves bitrate).
 5. Background panorama stitching for moderate camera motion.
 6. Detector/segmenter selection: SAM3 vs YOLOv26 vs RF-DETR (R3).
 7. **End-to-end full-match evaluation** — the headline experiment
@@ -83,17 +83,23 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    ~~Phase 1 port scene classification into `src/`~~ **done (2026-07-11)**
    (shared module, deterministic cuts shared across tiers,
    `tests/test_scene_classification.py`, verified byte-faithful against
-   real cached `alcaraz_ruud` data). Phase 2 full-match orchestrator (interludes →
-   baseline codec, points → semantic pipeline, outcome-safe routing,
-   match-level `run_summary.json`); Phase 3 complexity-tier configs +
-   realtime factor + variant-ladder sweep harness with intermediate/anchor
-   caching; Phase 4 headline BD-rate vs post-hoc AV1/HEVC anchors on the
-   held-out videos (`alcaraz_highlights`, `djokovic_zverev`) +
-   speed/compression Pareto. *Methodology locked (2026-07-11)* — held-out
-   split, post-hoc anchor protocol, ablations unified with speed sweeps as
-   variant ladders, LPIPS/FVD added ([10](10_dataset_and_end_to_end_evaluation_report.md)
-   findings 2026-07-11). **Gate:** generative models must be retrained
-   without the held-out videos before any G2 quality claim.
+   real cached `alcaraz_ruud` data).
+   ~~Phase 2 full-match orchestrator~~ **done (2026-07-11)**
+   (`src/encoder/match_orchestrator.py`: interludes → baseline codec,
+   points → semantic pipeline in sub-chunks, outcome-safe
+   semantic-vs-fallback routing per sub-chunk, match-level summary dict;
+   model builders extracted to `src/encoder/pipeline_builders.py` so
+   weights load once per match, not per chunk; real run passed on a
+   ~3.4 s `assets/real_tennis.mp4` clip, 101 s). Phase 3 complexity-tier
+   configs + realtime factor + variant-ladder sweep harness with
+   intermediate/anchor caching; Phase 4 headline BD-rate vs post-hoc
+   AV1/HEVC anchors on the held-out videos (`alcaraz_highlights`,
+   `djokovic_zverev`) + speed/compression Pareto. *Methodology locked
+   (2026-07-11)* — held-out split, post-hoc anchor protocol, ablations
+   unified with speed sweeps as variant ladders, LPIPS/FVD added
+   ([10](10_dataset_and_end_to_end_evaluation_report.md) findings
+   2026-07-11). **Gate:** generative models must be retrained without the
+   held-out videos before any G2 quality claim.
 8. Deferred (post-core): second domain, MOS study, demo video, VVC,
    Multi-ControlNet — see [7](7_implementation_plan.md) §4.
 

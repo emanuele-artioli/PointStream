@@ -24,6 +24,15 @@ class PointstreamConfig:
     log_level: str = "debug"
     transport: str = "disk"
 
+    # Full-Match Orchestration (report 10 Phase 2)
+    # "chunk" (default): existing single-VideoChunk behavior, source-uri is
+    # one pre-trimmed clip. "full_match": source-uri is a full raw_4k match;
+    # src.encoder.match_orchestrator splits it into scenes and routes each
+    # (point -> semantic pipeline in scene-chunk-duration-sec sub-chunks,
+    # interlude/other/blank -> fallback codec directly).
+    run_mode: str = "chunk"
+    scene_chunk_duration_sec: float = 2.0
+
     # Execution Pool
     execution_pool: str = "inline"
     cpu_workers: Optional[int] = None
