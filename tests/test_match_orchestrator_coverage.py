@@ -30,9 +30,11 @@ class _FakeEncoderPipeline:
     def __init__(self, **kwargs: Any) -> None:
         self.kwargs = kwargs
         self.shutdown_called = False
+        self.encoded_chunks: list[Any] = []
         _FakeEncoderPipeline.instances.append(self)
 
     def encode_chunk(self, chunk: Any) -> Any:
+        self.encoded_chunks.append(chunk)
         return SimpleNamespace(
             chunk=SimpleNamespace(chunk_id=chunk.chunk_id),
             panorama=SimpleNamespace(panorama_uri=None),
@@ -197,6 +199,22 @@ class TestEncodeFullMatch:
         for s in (scenes[0], scenes[2]):
             for sub_chunk in s["sub_chunks"]:
                 assert sub_chunk["fallback_cache_hit"] is False
+
+        # Regression (found via a real run against djokovic_federer.mp4,
+        # report 10 Phase 4 G1): every constructed VideoChunk must use
+        # start_frame_id=0, never the match-global frame_cursor. Each
+        # extracted clip is a self-contained per-chunk file, but
+        # ResidualCalculator._process_residuals seeks start_frame_id frames
+        # into chunk.source_uri before reading -- a nonzero, growing
+        # frame_cursor there runs past a small clip's own frame count and
+        # raises "ResidualCalculator received zero valid frames" on any
+        # scene beyond the first. global_start_frame in the sub-chunk
+        # result dict carries the real match-position bookkeeping instead.
+        encoded_chunks = _FakeEncoderPipeline.instances[0].encoded_chunks
+        assert len(encoded_chunks) == 3
+        assert all(c.start_frame_id == 0 for c in encoded_chunks)
+        global_starts = [sc["global_start_frame"] for s in scenes if s["sub_chunks"] for sc in s["sub_chunks"]]
+        assert global_starts == sorted(global_starts)  # monotonically non-decreasing
 
     def test_second_run_on_same_video_hits_the_anchor_cache(
         self, monkeypatch: pytest.MonkeyPatch, tiny_source_video: Path, tmp_path: Path
