@@ -25,10 +25,11 @@ def build_execution_pool(config: PointstreamConfig) -> BaseExecutionPool | None:
     if mode == "inline":
         return None
     if mode == "tagged":
-        return TaggedMultiprocessPool(  # type: ignore[call-arg]
-            cpu_workers=config.cpu_workers or 1,
-            gpu_workers=config.gpu_workers or 1,
-            worker_config=WorkerConfig(gpu_dtype=config.gpu_dtype),  # type: ignore[call-arg]
+        return TaggedMultiprocessPool(
+            config=WorkerConfig(
+                cpu_workers=config.cpu_workers or 1,
+                gpu_workers=config.gpu_workers or 1,
+            ),
         )
     raise ValueError(f"Unknown execution pool mode: {mode}")
 
