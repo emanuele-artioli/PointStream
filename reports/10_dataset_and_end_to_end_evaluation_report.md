@@ -669,16 +669,35 @@ follows 5.1 (overlapping config/orchestrator surfaces); 5.5 needs
 5.1–5.3 merged. The session-to-agent table at the end of this section is
 the reference for who tackles what.
 
+**2026-07-11 (later session) — 5.0(a) closed: `start_frame_id` no longer
+seeks.** The G1-night uncommitted diff on
+`src/encoder/residual_calculator.py` (removing the seek-by-`start_frame_id`
+loop and its `available_source_frames` trim) was finished and committed as
+`f25fc7b`. `ResidualCalculator` now matches every other DAG node's
+convention — `start_frame_id` is numbering-only, never a seek offset into
+`chunk.source_uri` — closing the `ResidualCalculator`/`ActorExtractor`
+inconsistency flagged in the Phase 4 G1 finding above. Regression test
+added: `tests/test_residual.py::test_residual_calculator_does_not_seek_into_source_by_start_frame_id`
+(new `real_tennis_20f_video` fixture in `tests/conftest.py`) encodes two
+chunks against the identical 20-frame source with different
+`start_frame_id` and asserts their residuals are near-identical instead of
+seek-shifted; run for real against the actual pipeline (not mocked — real
+ffmpeg I/O + real actor extraction, ~7 min) and passed. The existing fast
+unit suite touching `ResidualCalculator` (35 tests across
+`test_coverage_pipeline_helpers.py`, `test_main_coverage.py`,
+`test_match_orchestrator_coverage.py`, `test_pipeline_builders.py`,
+`test_residual_genai_sync.py`, `test_residual_guarantee.py`) stayed green.
+**Still open:** 5.0(b) `residual_block_threshold` wiring and 5.0(c) the new
+`residual_pix_fmt` key — same file, same serial gate, not touched by this
+commit.
+
 **5.0 — Residual-calculator fixes (serial gate, small).** *(Scope widened
 2026-07-11 after absorbing `reports/implementation_plan.md`, the
 Gemini-session plan — all three items touch the same file, so they land
 in one session to avoid a repeat of the clobbering incident.)*
-(a) Finish making `VideoChunk.start_frame_id` numbering-only everywhere —
-an uncommitted working-tree diff on `src/encoder/residual_calculator.py`
-(removing the seek loop) already exists from the G1-night follow-ups and
-must be finished or stashed before anything else touches that file. Flip
-the regression tests to the new contract (seek behavior gone; numbering
-arithmetic asserted). (b) Wire the dead `residual_block_threshold` config
+(a) ~~Finish making `VideoChunk.start_frame_id` numbering-only
+everywhere~~ **done (2026-07-11, later session)** — see resolution note
+below. (b) Wire the dead `residual_block_threshold` config
 knob (`src/shared/config.py:67` — read *nowhere* today) into
 `ResidualCalculator` via `build_residual_calculator`
 (`src/encoder/pipeline_builders.py:84`) and the orchestrator fallback
@@ -819,13 +838,11 @@ touch `src/encoder/residual_calculator.py` concurrently.
    2s/100-frame 4K sub-chunk during the G1 run, which does not scale to
    full matches (or even the held-out videos in full) without
    parallelism. *Now Phase 5.1(a).*
-9. **New (2026-07-11):** fix the `ResidualCalculator`/`ActorExtractor`
-   `start_frame_id` contract inconsistency found during G1 (flagged
-   separately) — dormant today only because every real caller uses
-   `start_frame_id=0`, but a real correctness hazard for any future
-   shared-source-file, multi-chunk usage pattern. *Now Phase 5.0 (the
-   serial gate); a partial uncommitted diff already sits in the working
-   tree and must be finished or stashed first.*
+9. ~~**New (2026-07-11):** fix the `ResidualCalculator`/`ActorExtractor`
+   `start_frame_id` contract inconsistency found during G1~~ **done
+   (2026-07-11, later session)** — commit `f25fc7b`; see Phase 5.0(a) above.
+   5.0(b)/(c) (`residual_block_threshold` wiring, `residual_pix_fmt` key)
+   remain open on the same file.
 10. **New (2026-07-11):** execute Phase 5 (per-stage FPS profiling →
     real-time tier → background-layer ladder → gated G2 training campaign
     → promoted Phase 3b harness → residual-compression matrix); see

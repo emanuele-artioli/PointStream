@@ -130,10 +130,11 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    FFmpeg write), spatial/temporal down-processing as Residual-Guarantee
    layers (LCEVC-style), and concurrency (tagged pool). Workstreams, in
    dependency order: **5.0** residual-calculator fixes (serial gate:
-   the `start_frame_id` contract — partial diff already in the working
-   tree — plus wiring the dead `residual_block_threshold` config knob and
-   a new `residual_pix_fmt` key, absorbed 2026-07-11 from the Gemini
-   plan; all same-file) → parallel **5.1** execution & profiling, **5.3**
+   ~~the `start_frame_id` contract~~ **fixed 2026-07-11** (commit
+   `f25fc7b`, [10](10_dataset_and_end_to_end_evaluation_report.md) Phase
+   5.0(a)) — still open: wiring the dead `residual_block_threshold` config
+   knob and a new `residual_pix_fmt` key, absorbed 2026-07-11 from the
+   Gemini plan; same file) → parallel **5.1** execution & profiling, **5.3**
    background-layer ladder (panorama-static / panorama+delta / ROI
    background video), **5.4** gated G2 training campaign (train-split
    probe set, successive halving across ControlNet/Animate-Anyone/SPADE —
