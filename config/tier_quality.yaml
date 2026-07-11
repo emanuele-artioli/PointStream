@@ -1,0 +1,36 @@
+# Quality complexity tier (report 10 Phase 3).
+#
+# Slowest, highest-fidelity rung of the speed/compression trade-off ladder:
+# extra-large YOLO backends (matching scripts/process_dataset.py's dataset
+# curation defaults — see report 10's "quality tier" convention),
+# segmentation-based ball extraction, full-step generative compositing,
+# and the full quality-metric suite.
+#
+# Any key not set here falls back to PointstreamConfig's dataclass default
+# (see src/shared/config.py).
+
+run-mode: full_match
+scene-chunk-duration-sec: 2.0
+
+log-level: info
+execution-pool: inline
+
+# Actor extraction: extra-large backends (dataset-curation quality tier).
+detector: yolo26x-eg.pt
+pose-estimator: yolo26x-pose.pt
+segmenter: yolo26x-eg.pt
+ball-extractor: segmentation
+ball-det-model: yolo26x-eg.pt
+
+# Full-step generative compositing at full resolution.
+genai-backend: canny-controlnet
+controlnet-id: assets/weights/custom-controlnet
+controlnet-steps: 20
+controlnet-width: 512
+controlnet-height: 512
+
+ffmpeg-codec: libsvtav1
+codec-crf: 22
+codec-preset: slow
+
+evaluation-mode: [psnr, ssim, vmaf]

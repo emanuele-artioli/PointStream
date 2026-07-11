@@ -32,6 +32,7 @@ import time
 from pathlib import Path
 from typing import Any
 
+from src.encoder import anchor_cache
 from src.encoder.orchestrator import EncoderPipeline
 from src.encoder.pipeline_builders import (
     build_actor_extractor,
@@ -175,6 +176,41 @@ def _fallback_encode(clip_path: Path, output_path: Path, config: PointstreamConf
     return int(output_path.stat().st_size), elapsed
 
 
+def _cached_fallback_encode(
+    anchor_cache_root: Path,
+    original_video_path: Path,
+    t_start: float,
+    t_end: float,
+    clip_path: Path,
+    output_path: Path,
+    config: PointstreamConfig,
+) -> tuple[int, float, bool]:
+    """Fallback-encode through the anchor cache (report 10 Phase 3), keyed
+    on the *original* video's scene span rather than the extracted temp
+    clip — repeated `encode_full_match` runs on the same video reuse the
+    same fallback encode, since scene cuts are deterministic (methodology
+    decision 3) and never change across tiers/runs on a given video.
+    """
+    elapsed_box: dict[str, float] = {"elapsed": 0.0}
+
+    def _do_encode(dest: Path) -> None:
+        _size, elapsed = _fallback_encode(clip_path, dest, config)
+        elapsed_box["elapsed"] = elapsed
+
+    size, cache_hit = anchor_cache.get_or_encode(
+        cache_root=anchor_cache_root,
+        video_path=original_video_path,
+        t_start=t_start,
+        t_end=t_end,
+        codec=config.ffmpeg_codec,
+        crf=config.codec_crf,
+        preset=config.codec_preset,
+        output_path=output_path,
+        encode_fn=_do_encode,
+    )
+    return size, elapsed_box["elapsed"], cache_hit
+
+
 def _transport_total_bytes(chunk_dir: Path, received_payload: Any) -> int:
     metadata_size = _safe_file_size(chunk_dir / "metadata.msgpack")
     residual_size = _safe_file_size(received_payload.residual.residual_video_uri)
@@ -211,6 +247,7 @@ def _process_point_scene(
     decoder: DecoderRenderer,
     config: PointstreamConfig,
     start_frame_id: int,
+    anchor_cache_root: Path,
 ) -> tuple[dict[str, Any], int]:
     sub_chunk_results: list[dict[str, Any]] = []
     total_bytes = 0
@@ -239,18 +276,29 @@ def _process_point_scene(
             height=clip_metadata.height,
         )
 
-        semantic_started = time.perf_counter()
+        encode_started = time.perf_counter()
         payload = encoder.encode_chunk(video_chunk)
         transport.send(payload)
         received = transport.receive(chunk_id)
+        encode_elapsed = time.perf_counter() - encode_started
+
+        decode_started = time.perf_counter()
         decoder.process(received)
-        semantic_elapsed = time.perf_counter() - semantic_started
+        decode_elapsed = time.perf_counter() - decode_started
 
         chunk_dir = transport_root / f"chunk_{chunk_id}"
         semantic_bytes = _transport_total_bytes(chunk_dir, received)
 
         fallback_path = clips_dir / f"scene{scene_idx:04d}_chunk{chunk_idx:04d}_fallback.mp4"
-        fallback_bytes, fallback_elapsed = _fallback_encode(clip_path, fallback_path, config)
+        fallback_bytes, fallback_elapsed, fallback_cache_hit = _cached_fallback_encode(
+            anchor_cache_root=anchor_cache_root,
+            original_video_path=video_path,
+            t_start=cs,
+            t_end=ce,
+            clip_path=clip_path,
+            output_path=fallback_path,
+            config=config,
+        )
 
         routing = choose_routing(semantic_bytes, fallback_bytes)
         chosen_bytes = semantic_bytes if routing == "semantic" else fallback_bytes
@@ -267,8 +315,13 @@ def _process_point_scene(
                 "num_frames": clip_metadata.num_frames,
                 "semantic_bytes": semantic_bytes,
                 "fallback_bytes": fallback_bytes,
+                "fallback_cache_hit": fallback_cache_hit,
                 "routing": routing,
-                "elapsed_sec": {"semantic": semantic_elapsed, "fallback": fallback_elapsed},
+                "elapsed_sec": {
+                    "semantic_encode": encode_elapsed,
+                    "semantic_decode": decode_elapsed,
+                    "fallback": fallback_elapsed,
+                },
             }
         )
 
@@ -301,6 +354,7 @@ def _process_fallback_scene(
     scene: SceneSpan,
     clips_dir: Path,
     config: PointstreamConfig,
+    anchor_cache_root: Path,
 ) -> tuple[dict[str, Any], int]:
     clip_path = clips_dir / f"scene{scene_idx:04d}_full.mp4"
     _extract_scene_clip(video_path, clip_path, scene.t_start, scene.t_end)
@@ -321,7 +375,15 @@ def _process_fallback_scene(
         return scene_result, 0
 
     output_path = clips_dir / f"scene{scene_idx:04d}_full_fallback.mp4"
-    fallback_bytes, elapsed = _fallback_encode(clip_path, output_path, config)
+    fallback_bytes, elapsed, cache_hit = _cached_fallback_encode(
+        anchor_cache_root=anchor_cache_root,
+        original_video_path=video_path,
+        t_start=scene.t_start,
+        t_end=scene.t_end,
+        clip_path=clip_path,
+        output_path=output_path,
+        config=config,
+    )
 
     scene_result = {
         "scene_index": scene_idx,
@@ -333,6 +395,7 @@ def _process_fallback_scene(
         "num_frames": clip_metadata.num_frames,
         "sub_chunks": None,
         "elapsed_sec": elapsed,
+        "cache_hit": cache_hit,
     }
     return scene_result, clip_metadata.num_frames
 
@@ -342,13 +405,17 @@ def encode_full_match(
     video_path: str | Path,
     transport_root: str | Path,
     scene_cache_root: str | Path | None = None,
+    anchor_cache_root: str | Path | None = None,
 ) -> dict[str, Any]:
     """Encode a full match end to end: classify scenes, route each one,
     and return a match-level summary dict (JSON-serializable, mirrors
     `run_summary.json`'s top-level style).
 
     `scene_cache_root` defaults to `assets/dataset` (production
-    convention); pass an isolated directory in tests.
+    convention); pass an isolated directory in tests. `anchor_cache_root`
+    defaults to `outputs/_anchor_cache` (a derived/regenerable cache, kept
+    out of `assets/dataset` which is reserved for curated dataset content);
+    also overridable for tests.
     """
     match_started = time.perf_counter()
     resolved_video_path = Path(video_path).expanduser().resolve()
@@ -362,6 +429,13 @@ def encode_full_match(
     )
     dataset_dir, cache_file = scene_cache_paths(resolved_cache_root, resolved_video_path)
     dataset_dir.mkdir(parents=True, exist_ok=True)
+
+    resolved_anchor_cache_root = (
+        Path(anchor_cache_root).expanduser()
+        if anchor_cache_root is not None
+        else _project_root() / "outputs" / "_anchor_cache" / resolved_video_path.stem
+    )
+    resolved_anchor_cache_root.mkdir(parents=True, exist_ok=True)
 
     classify_started = time.perf_counter()
     extract_scene_scores(str(resolved_video_path), str(cache_file))
@@ -405,6 +479,7 @@ def encode_full_match(
                     decoder=decoder,
                     config=config,
                     start_frame_id=frame_cursor,
+                    anchor_cache_root=resolved_anchor_cache_root,
                 )
             else:
                 result, frames_used = _process_fallback_scene(
@@ -413,6 +488,7 @@ def encode_full_match(
                     scene=scene,
                     clips_dir=clips_dir,
                     config=config,
+                    anchor_cache_root=resolved_anchor_cache_root,
                 )
             frame_cursor += frames_used
             scene_results.append(result)
@@ -421,6 +497,23 @@ def encode_full_match(
 
     total_bytes = sum(int(s["bytes"]) for s in scene_results)
     source_bytes = int(resolved_video_path.stat().st_size)
+
+    # Report 10 Phase 3: realtime factor (wall-clock / source duration),
+    # encoder and decoder tracked separately. "Encoder" here includes both
+    # attempted paths for point sub-chunks (semantic + fallback) since the
+    # outcome-safe comparison genuinely pays for both; "decoder" is only the
+    # semantic DecoderRenderer.process() cost (fallback-routed scenes never
+    # run our decoder).
+    encode_total_sec = classify_elapsed
+    decode_total_sec = 0.0
+    for s in scene_results:
+        if s["sub_chunks"]:
+            for sub_chunk in s["sub_chunks"]:
+                elapsed = sub_chunk["elapsed_sec"]
+                encode_total_sec += elapsed["semantic_encode"] + elapsed["fallback"]
+                decode_total_sec += elapsed["semantic_decode"]
+        else:
+            encode_total_sec += float(s.get("elapsed_sec") or 0.0)
 
     num_point_scenes = sum(1 for s in scene_results if s["scene_class"] == SceneClass.POINT.value)
     num_point_subchunks = sum(len(s["sub_chunks"] or []) for s in scene_results if s["sub_chunks"] is not None)
@@ -450,6 +543,10 @@ def encode_full_match(
         },
         "timings_sec": {
             "scene_classification": classify_elapsed,
+            "encode_total": encode_total_sec,
+            "decode_total": decode_total_sec,
+            "encoder_realtime_factor": (encode_total_sec / video_duration_sec) if video_duration_sec > 0 else None,
+            "decoder_realtime_factor": (decode_total_sec / video_duration_sec) if video_duration_sec > 0 else None,
             "total": float(time.perf_counter() - match_started),
         },
     }

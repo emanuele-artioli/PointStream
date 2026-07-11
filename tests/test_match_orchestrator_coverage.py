@@ -79,6 +79,11 @@ def _alternating_fallback_encode(sizes: list[int]):
     def _fake(clip_path: Path, output_path: Path, config: PointstreamConfig) -> tuple[int, float]:
         size = sizes[counter["i"] % len(sizes)]
         counter["i"] += 1
+        # _cached_fallback_encode's wrapper stats the real file afterward
+        # (to also support cache-hit copies), so this fake must actually
+        # write it, not just return a byte count.
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_bytes(b"\x00" * size)
         return size, 0.001
 
     return _fake
@@ -142,6 +147,7 @@ class TestEncodeFullMatch:
             video_path=tiny_source_video,
             transport_root=tmp_path / "transport",
             scene_cache_root=tmp_path / "scene_cache",
+            anchor_cache_root=tmp_path / "anchor_cache",
         )
 
         assert summary["totals"]["num_scenes"] == 3
@@ -175,6 +181,55 @@ class TestEncodeFullMatch:
 
         assert _FakeEncoderPipeline.instances[0].shutdown_called is True
 
+        # Report 10 Phase 3: realtime factor fields present and sane.
+        timings = summary["timings_sec"]
+        assert timings["encode_total"] > 0
+        assert timings["decode_total"] > 0
+        assert timings["encoder_realtime_factor"] == pytest.approx(
+            timings["encode_total"] / summary["duration_sec"]
+        )
+        assert timings["decoder_realtime_factor"] == pytest.approx(
+            timings["decode_total"] / summary["duration_sec"]
+        )
+
+        # First run on a fresh anchor cache: nothing was cached yet.
+        assert scenes[1]["cache_hit"] is False
+        for s in (scenes[0], scenes[2]):
+            for sub_chunk in s["sub_chunks"]:
+                assert sub_chunk["fallback_cache_hit"] is False
+
+    def test_second_run_on_same_video_hits_the_anchor_cache(
+        self, monkeypatch: pytest.MonkeyPatch, tiny_source_video: Path, tmp_path: Path
+    ) -> None:
+        monkeypatch.setattr(mo, "classify_video_scenes", _fixed_three_scene_split)
+        monkeypatch.setattr(mo, "_fallback_encode", _alternating_fallback_encode([100, 2000, 100]))
+
+        config = PointstreamConfig(source_uri=str(tiny_source_video), run_mode="full_match")
+        shared_anchor_cache = tmp_path / "anchor_cache"
+
+        first = mo.encode_full_match(
+            config=config,
+            video_path=tiny_source_video,
+            transport_root=tmp_path / "transport_run1",
+            scene_cache_root=tmp_path / "scene_cache",
+            anchor_cache_root=shared_anchor_cache,
+        )
+        second = mo.encode_full_match(
+            config=config,
+            video_path=tiny_source_video,
+            transport_root=tmp_path / "transport_run2",
+            scene_cache_root=tmp_path / "scene_cache",
+            anchor_cache_root=shared_anchor_cache,
+        )
+
+        assert first["scenes"][1]["cache_hit"] is False
+        assert second["scenes"][1]["cache_hit"] is True
+        for sub_chunk in second["scenes"][0]["sub_chunks"]:
+            assert sub_chunk["fallback_cache_hit"] is True
+        # Bytes must be identical across runs since the same cached anchors
+        # were reused for the fallback side of the comparison.
+        assert first["totals"]["total_bytes"] == second["totals"]["total_bytes"]
+
     def test_raises_when_classification_yields_no_scenes(
         self, monkeypatch: pytest.MonkeyPatch, tiny_source_video: Path, tmp_path: Path
     ) -> None:
@@ -187,6 +242,7 @@ class TestEncodeFullMatch:
                 video_path=tiny_source_video,
                 transport_root=tmp_path / "transport",
                 scene_cache_root=tmp_path / "scene_cache",
+            anchor_cache_root=tmp_path / "anchor_cache",
             )
 
     def test_raises_when_scenes_do_not_tile_video_duration(
@@ -207,6 +263,7 @@ class TestEncodeFullMatch:
                 video_path=tiny_source_video,
                 transport_root=tmp_path / "transport",
                 scene_cache_root=tmp_path / "scene_cache",
+            anchor_cache_root=tmp_path / "anchor_cache",
             )
 
 
@@ -287,6 +344,7 @@ class TestProcessFallbackSceneZeroFrames:
             scene=scene,
             clips_dir=tmp_path,
             config=PointstreamConfig(),
+            anchor_cache_root=tmp_path / "anchor_cache",
         )
 
         assert frames_used == 0

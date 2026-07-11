@@ -74,12 +74,14 @@ def test_encode_full_match_real_smoke(real_tennis_point_clip: Path, tmp_path: Pa
 
     transport_root = tmp_path / "transport"
     cache_root = tmp_path / "scene_cache"
+    anchor_cache_root = tmp_path / "anchor_cache"
 
     summary = mo.encode_full_match(
         config=config,
         video_path=real_tennis_point_clip,
         transport_root=transport_root,
         scene_cache_root=cache_root,
+        anchor_cache_root=anchor_cache_root,
     )
 
     source_metadata = probe_video_metadata(real_tennis_point_clip)

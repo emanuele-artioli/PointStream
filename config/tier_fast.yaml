@@ -1,0 +1,37 @@
+# Fast complexity tier (report 10 Phase 3).
+#
+# The cheapest rung of the speed/compression trade-off ladder: smallest
+# YOLO backends, no GenAI compositing, cheapest ball extractor. This is
+# the tier a real-time deployment would actually run. Intended for
+# `run-mode: full_match` (a whole raw_4k match, routed scene-by-scene) —
+# use `--input assets/raw_4k/<video>.mp4`.
+#
+# Any key not set here falls back to PointstreamConfig's dataclass default
+# (see src/shared/config.py) — this file only states the tier-defining
+# knobs, not every option (unlike config/default.yaml, which documents all
+# of them for the single-chunk smoke-test path).
+
+run-mode: full_match
+scene-chunk-duration-sec: 2.0          # ~2s VideoChunks per point scene
+
+log-level: info
+execution-pool: inline
+
+# Actor extraction: nano-tier backends (real-time class).
+detector: yolo26n.pt
+pose-estimator: yolo26n-pose.pt
+segmenter: yolo26n-seg.pt
+ball-extractor: difference             # cheaper than segmentation-based detection
+
+# No generative compositing at this tier.
+genai-backend: null
+
+# Fallback codec for interlude/other/blank scenes and the outcome-safe
+# comparison anchor for point scenes.
+ffmpeg-codec: libsvtav1
+codec-crf: 35
+codec-preset: fast
+
+# G1-scope (report 10): full_match mode does byte/timing accounting only;
+# evaluation-mode is unused by run_mode: full_match today.
+evaluation-mode: [psnr]

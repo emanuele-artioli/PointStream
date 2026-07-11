@@ -194,12 +194,24 @@ def run_pipeline(
         for k, v in decoder.get_detailed_profile().items():
             decode_timings[k] = v
 
+    # Report 10 Phase 3: realtime factor (wall-clock / chunk duration),
+    # encoder and decoder tracked separately.
+    chunk_duration_sec = (chunk.num_frames / chunk.fps) if chunk.fps > 0 else None
+    encoder_realtime_factor = (
+        float(encode_finished - encode_started) / chunk_duration_sec if chunk_duration_sec else None
+    )
+    decoder_realtime_factor = (
+        float(decode_finished - decode_started) / chunk_duration_sec if chunk_duration_sec else None
+    )
+
     timings_sec = {
         "pipeline_total": float(perf_counter() - pipeline_started),
         "encode_chunk": encode_chunk_timings,
         "transport_send": float(transport_send_finished - transport_send_started),
         "transport_receive": float(transport_receive_finished - transport_receive_started),
         "decode": decode_timings,
+        "encoder_realtime_factor": encoder_realtime_factor,
+        "decoder_realtime_factor": decoder_realtime_factor,
     }
 
     sizes_bytes: dict[str, Any] = {

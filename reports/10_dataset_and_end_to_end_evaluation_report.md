@@ -388,18 +388,68 @@ tagged` has been completely non-functional; discovered because a new real
 test for `pipeline_builders.py` actually reached that code path for the
 first time.
 
-### Phase 3 — Complexity tiers, sweep harness + speed reporting
-Three configs in `config/` (e.g. `tier_fast.yaml` = yolo26n\* +
-`genai-backend: null` or lightest engine; `tier_balanced.yaml`;
-`tier_quality.yaml` = yolo26x\*-class backends + chosen GenAI engine), and a
-**realtime factor** (encode wall-clock ÷ source duration; encoder and
-decoder reported separately) computed in the evaluation block of every
-`run_summary.json`. Timings plumbing already exists
-(`src/shared/profiling.py`). Also in this phase: the
-§Experiment-efficiency machinery — variant-ladder specs (extending
-`scripts/benchmark_matrix.py`), the content-addressed intermediate cache on
-the DAG, multi-variant GPU fan-out with per-variant timing, and the
-anchor-encode cache.
+### Phase 3 — Complexity tiers, realtime factor + anchor-encode cache — **3a done (2026-07-11), 3b deferred**
+
+**3a (done):** Three standalone configs — `config/tier_fast.yaml` (yolo26n\*,
+`genai-backend: null`, `ball-extractor: difference`), `config/tier_balanced.yaml`
+(same nano-tier extraction — no yolo26s weight exists locally, see the
+file's own comment — differentiated instead on the GenAI axis:
+`canny-controlnet` at 10 steps / 384px), `config/tier_quality.yaml`
+(yolo26x\*-class extraction matching `scripts/process_dataset.py`'s dataset-
+curation defaults, `ball-extractor: segmentation`, `canny-controlnet` at 20
+steps / 512px, full `evaluation-mode: [psnr, ssim, vmaf]`). All three set
+`run-mode: full_match` and parse cleanly through `load_config`
+(spot-checked: correct `detector`/`genai_backend`/`scene_chunk_duration_sec`
+per tier).
+
+**Realtime factor** (wall-clock ÷ duration, encoder/decoder separate) added
+to both entry points: `src/main.py:run_pipeline`'s `timings_sec` gains
+`encoder_realtime_factor`/`decoder_realtime_factor` (chunk duration from
+`chunk.num_frames`/`chunk.fps`); `match_orchestrator.py`'s match summary
+gains `timings_sec.encode_total`/`decode_total`/
+`encoder_realtime_factor`/`decoder_realtime_factor` (encoder time counts
+*both* attempted paths per point sub-chunk — semantic + fallback — since
+outcome-safe routing genuinely pays for both; decoder time is the semantic
+`DecoderRenderer.process()` cost only, since fallback-routed scenes never
+run it).
+
+**Anchor-encode cache** (`src/encoder/anchor_cache.py`): content-addressed
+on `(video fingerprint, t_start, t_end, codec, crf, preset)` — fingerprint
+is path+size+mtime (cheap, sufficient; full-file hashing would be correct
+but expensive for multi-GB 4K matches we don't edit in place). Wired into
+`match_orchestrator.py` via `_cached_fallback_encode`, keyed on the
+*original* video and scene span (not the temp extracted clip, which gets a
+fresh path every run) — so a second `encode_full_match` run on the same
+video reuses every fallback encode instead of redoing them, exactly the
+"anchors encoded once per video, ever" efficiency this report's
+methodology section committed to. Defaults to
+`outputs/_anchor_cache/<video_stem>/` (kept out of `assets/dataset`, which
+is reserved for curated dataset content). Every sub-chunk/scene result now
+carries a `cache_hit`/`fallback_cache_hit` flag for observability.
+
+**Verification:** `tests/test_anchor_cache.py` (7 tests: key stability/
+sensitivity to span/codec/video-content changes, miss-then-populate,
+hit-skips-encode-fn, distinct spans don't collide) +
+`tests/test_match_orchestrator_coverage.py` gained a same-video-twice test
+proving the second `encode_full_match` run reports `cache_hit`/
+`fallback_cache_hit: true` everywhere and produces byte-identical totals +
+realtime-factor-field assertions on the existing routing test. Real
+integration test (`assets/real_tennis.mp4`, same ~3.4s clip as Phase 2)
+re-passed with all Phase 3 changes in place, 105s. Full `pytest -q` (273
+passed, 1 skipped) and `ruff`/`mypy` clean. Coverage: 84% total
+(`anchor_cache.py` 100%, `match_orchestrator.py` 95%, `pipeline_builders.py`
+100%) — passes CI's 80%, one point short of the local 85% default; same
+judgment call as Phase 2 (gap concentrated in pre-existing files this diff
+didn't touch).
+
+**3b (explicitly deferred, not started):** the variant-ladder spec
+extending `scripts/benchmark_matrix.py`, the content-addressed intermediate
+cache on the DAG orchestrator, and multi-variant GPU fan-out with
+per-variant timing. Per this report's own goal-driven sequencing (§Goal
+ladder), none of G1 (plumbing) or G2 (headline BD-rate) need this
+machinery — only G3 (the trade-off curves) does. Deferred rather than
+built hastily and undertested under tonight's time budget; pick this up
+when G3 is actually being pursued, not before.
 
 ### Phase 4 — The headline experiments (goals G2→G4)
 On the **held-out videos** (`alcaraz_highlights`, `djokovic_zverev`;

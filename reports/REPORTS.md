@@ -35,7 +35,7 @@ whole video; each enabled component must pay for itself. Full framing:
 | Residual-Guarantee benchmark harness | ✅ Working | `scripts/benchmark_matrix.py`; first run exposed a panorama symmetry violation, now fixed ([8](8_residual_guarantee_benchmarks_report.md)) |
 | Detector selection (SAM3 vs YOLOv26 vs RF-DETR) | ⬜ Open | [7](7_implementation_plan.md) §2C |
 | Dataset curation (raw_4k → assets/dataset) | ✅ Built, now catalogued | 7 videos (≈2h37m 4K) / 952 scenes / 399 points / 114 deep-annotated tracks; quality-tier models (yolo26x), manually supervised ([10](10_dataset_and_end_to_end_evaluation_report.md)) |
-| End-to-end full-match evaluation (runtime scene routing, complexity tiers, speed/compression Pareto) | ⚠️ In progress | Phases 1–2 done (2026-07-11): scene classifier ported to `src/`; `src/encoder/match_orchestrator.py` routes scenes + outcome-safe semantic-vs-fallback selection, real run passed on `assets/real_tennis.mp4`; Phases 3–4 open ([10](10_dataset_and_end_to_end_evaluation_report.md)) |
+| End-to-end full-match evaluation (runtime scene routing, complexity tiers, speed/compression Pareto) | ⚠️ In progress | Phases 1–3a done (2026-07-11): scene classifier + full-match orchestrator + 3 tier configs + realtime factor + anchor-encode cache; 3b (variant-ladder/DAG-cache/GPU-fanout) explicitly deferred to G3; Phase 4 open ([10](10_dataset_and_end_to_end_evaluation_report.md)) |
 | TOMM resubmission | ⚠️ In progress | Action matrix tracks all 8 reviewer themes ([6](6_action_matrix.md)) |
 
 ## Prioritized next steps
@@ -90,9 +90,14 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    semantic-vs-fallback routing per sub-chunk, match-level summary dict;
    model builders extracted to `src/encoder/pipeline_builders.py` so
    weights load once per match, not per chunk; real run passed on a
-   ~3.4 s `assets/real_tennis.mp4` clip, 101 s). Phase 3 complexity-tier
-   configs + realtime factor + variant-ladder sweep harness with
-   intermediate/anchor caching; Phase 4 headline BD-rate vs post-hoc
+   ~3.4 s `assets/real_tennis.mp4` clip, 101 s).
+   ~~Phase 3a tier configs + realtime factor + anchor cache~~ **done
+   (2026-07-11)** (`config/tier_{fast,balanced,quality}.yaml`;
+   `src/encoder/anchor_cache.py` — content-addressed on video+span+codec,
+   second run on the same video reuses every fallback encode). *Phase 3b
+   (variant-ladder harness, DAG intermediate cache, GPU fan-out) explicitly
+   deferred* — only needed for G3, not G1/G2, per this report's own
+   goal-driven sequencing. Phase 4 headline BD-rate vs post-hoc
    AV1/HEVC anchors on the held-out videos (`alcaraz_highlights`,
    `djokovic_zverev`) + speed/compression Pareto. *Methodology locked
    (2026-07-11)* — held-out split, post-hoc anchor protocol, ablations

@@ -1,0 +1,36 @@
+# Balanced complexity tier (report 10 Phase 3).
+#
+# Middle rung of the speed/compression trade-off ladder. No medium-sized
+# YOLO weight exists locally (only nano "n" and extra-large "x" variants
+# are downloaded, see assets/weights/), so this tier's complexity axis is
+# the GenAI backend rather than the detector: nano-tier extraction (same
+# as tier_fast) plus a lightweight generative pass at reduced diffusion
+# steps, which is the dominant cost driver anyway.
+#
+# Any key not set here falls back to PointstreamConfig's dataclass default
+# (see src/shared/config.py).
+
+run-mode: full_match
+scene-chunk-duration-sec: 2.0
+
+log-level: info
+execution-pool: inline
+
+# Actor extraction: still nano-tier (no yolo26s weight available).
+detector: yolo26n.pt
+pose-estimator: yolo26n-pose.pt
+segmenter: yolo26n-seg.pt
+ball-extractor: difference
+
+# Lightweight generative compositing: half the default steps.
+genai-backend: canny-controlnet
+controlnet-id: assets/weights/custom-controlnet
+controlnet-steps: 10
+controlnet-width: 384
+controlnet-height: 384
+
+ffmpeg-codec: libsvtav1
+codec-crf: 30
+codec-preset: medium
+
+evaluation-mode: [psnr, ssim]
