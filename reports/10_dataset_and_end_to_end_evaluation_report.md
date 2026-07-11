@@ -46,6 +46,11 @@ record of what changed, not re-collapsed into one "done" row):
 | Speed/compression trade-off across model-complexity tiers | ✅ this report, Phase 3a (2026-07-11) | ⚠️ 3 tier configs + realtime factor + anchor-encode cache done (Phase 3a); variant-ladder sweep harness, DAG intermediate cache, GPU fan-out **deferred to G3** (Phase 3b) |
 
 The implementation plan to close these gaps is in §Implementation plan.
+**Speed reality check (2026-07-11):** profiled in FPS terms, the full
+GenAI pipeline runs at ~0.09 fps encode / ~0.06 fps decode at 4K against a
+12 fps source — every stage is 5–150× off real time, so §Phase 5 defines
+the combined speed/real-time + gated-training campaign (six workstreams,
+parallel-session split included).
 **Methodology locked 2026-07-11** (see that findings entry): held-out test
 split = `alcaraz_highlights` + `djokovic_zverev` (no cross-validation);
 anchors encoded post-hoc on PointStream's own scene spans; scene cuts
@@ -230,6 +235,97 @@ combinatorially expensive and hard to condense into clear results.
 **Paper impact:** This *is* the evaluation-protocol section: held-out
 split, anchor definition, BD-rate protocol, metrics suite, and the routing
 safety valve as a methodological contribution.
+
+### 2026-07-11 — Per-stage FPS profile; combined speed/real-time + training campaign (Phase 5)
+
+**Problem/Question:** G1 measured the pipeline at ~15–20 min per 2 s
+sub-chunk. The user directed a systematic response: profile every stage in
+**FPS terms** (raw seconds mislead across different chunk lengths/framerates),
+re-evaluate each stage for inefficiency before assuming concurrency solves
+it, add spatial *and* temporal down-processing knobs, make the panorama
+stateful across scenes (or replace it with an ROI-weighted background
+video), and run G2 retraining as a gated multi-variant campaign instead of
+one long blind run.
+
+**Diagnosis/Evidence:** single run (not swept),
+`outputs/20260710_234603_892275/run_summary.json` — 60 frames of
+`assets/real_tennis.mp4` (3840×2160 @ 12 fps, i.e. 5 s of video),
+`genai_backend: canny-controlnet`, single chunk. Converted to throughput:
+
+| Stage | Wall-clock | FPS | vs 12 fps source |
+|---|---|---|---|
+| encode total | 679.0 s | 0.088 | 136× too slow |
+| decode total | 931.1 s | 0.064 | 186× too slow |
+| genai_baseline (encoder) | 363.8 s | 0.16 | |
+| genai_baseline (decoder) | 786.5 s | 0.076 | **2.16× the encoder's — suspect** |
+| panorama | 130.5 s | 0.46 | |
+| decode video_encoding (final 4K write) | 114.0 s | 0.53 | **suspect for an FFmpeg write** |
+| detection | 60.6 s | 0.99 | |
+| residual computation | 39.8 s | 1.5 | |
+| ball | 38.9 s | 1.5 | |
+| segmentation | 24.4 s | 2.5 | |
+| composite (decoder) | 29.6 s | 2.0 | |
+
+Reading: no single villain — *every* stage is 5–150× off real time at 4K,
+so concurrency (tagged pool) alone cannot close the gap; per-stage
+efficiency and resolution/framerate reduction are both required. Two
+anomalies deserve diagnosis before optimization: (a) the **same**
+canny-controlnet engine on the **same** 60 frames costs 2.16× more on the
+decoder side than the encoder side — cost asymmetry in what must be a
+byte-identical computation is also a cheap tripwire for a symmetry
+(Residual Guarantee) violation, so the diagnosis must include a
+bit-identity check of server-vs-client generated frames; (b) the decoder's
+final video write at 0.53 fps suggests FFmpeg threading/preset flags are
+not propagating. Also noted: `run_summary.json` does not echo the config
+that produced it (the `config` key is absent) — a profiling campaign needs
+that closed.
+
+**Resolution:** plan locked as **§Phase 5** (below) — six workstreams
+(contract fix; execution & profiling; resolution/framerate ladders;
+background-layer variants; gated G2 training campaign; Phase 3b harness,
+promoted), with an explicit parallel-agent-session split and worktree
+isolation required (process lesson from the G1 concurrency clobber).
+Key design decisions folded in:
+
+1. **FPS is the canonical speed unit.** Every stage timing in
+   `run_summary.json` gains a derived `fps_throughput`; realtime factor is
+   computed against the *source* framerate (the 12 fps eval asset flatters
+   us ~2–5× vs 25–60 fps broadcast).
+2. **Temporal decimation is a first-class ladder rung**, not a hack: actor
+   motion already supports sparse keyframes + client interpolation
+   (`keyframe`/`interpolate`/`static` events, `src/shared/schemas.py`); the
+   extension is a deterministic frame interpolator *inside*
+   `SynthesisEngine` so decimated-fps residuals stay guarantee-exact.
+   Caution flagged: the ball is the fastest object in frame — ball
+   extraction may need full-rate input even when other stages decimate.
+3. **Spatial down-processing likewise:** a global processing-resolution
+   key (semantic metadata is coordinates, hence resolution-independent) +
+   a deterministic upsampler inside `SynthesisEngine`, making full-res
+   residuals a *layer* priced by the Residual Guarantee (LCEVC-style
+   scalability, same framework as every other component).
+4. **Background layer becomes a ladder**, not an a-priori choice:
+   `panorama-static` (today) → `panorama+delta` (stateful panorama, send
+   full once then per-scene deltas — scoreboard/crowd updates ride the
+   delta; both sides hold identical panorama state, so it is
+   guarantee-compatible) → `roi-video` (actors masked out, very low
+   bitrate, FFmpeg `addroi` quality boost on umpire/ball-kids/scoreboard —
+   note `addroi` is consumed by libx264/libx265, **not** libsvtav1).
+   `benchmark_matrix` decides which rung pays.
+5. **GenAI speed ladder = the G2 training campaign.** If Animate-Anyone
+   cannot be accelerated without destroying it, we don't fight it — the
+   already-planned engine roster *is* the speed ladder: SPADE4Tennis
+   (single forward pass — the fast rung by construction, a new reason to
+   keep report 1 alive), ControlNet at reduced denoising steps (mid),
+   Animate-Anyone (quality). Training multiple variants for G2 and
+   producing G3's speed/quality trade-off rungs are the same work.
+6. **G2 training is gated, not blind:** fixed probe set drawn from
+   *training-split* videos only (held-out stays untouched), checkpoint
+   evaluation (PSNR/SSIM/LPIPS on probes) every N steps, successive
+   halving across variants — prune losers early, give survivors the GPU.
+
+**Paper impact:** feeds the G3 Pareto figure (x = realtime factor) and adds
+two candidate paper points: the layered spatial/temporal scalability under
+the Residual Guarantee, and the outcome-safe background-layer ladder.
 
 ## Experiment-efficiency architecture
 
@@ -555,6 +651,80 @@ routed-vs-all-semantic routing ablation. Run via the `pipeline-runner`
 agent; these are multi-hour-to-multi-day jobs. **Prerequisite:** generative
 models retrained without the held-out videos before any G2 quality claim.
 
+### Phase 5 — Speed, real-time tier, and the gated training campaign (2026-07-11)
+
+Locked in response to the per-stage FPS profile (see the 2026-07-11
+findings entry). Six workstreams, designed to be handed to **separate
+agent sessions in isolated worktrees** (mandatory after the G1-night
+clobbering incident; commit early and often). Dependency shape: 5.0 is a
+small serial gate; 5.1/5.3/5.4 then run in parallel; 5.2 follows 5.1
+(overlapping config/orchestrator surfaces); 5.5 needs 5.1–5.3 merged.
+
+**5.0 — `start_frame_id` contract fix (serial gate, small).**
+Finish making `VideoChunk.start_frame_id` numbering-only everywhere — an
+uncommitted working-tree diff on `src/encoder/residual_calculator.py`
+(removing the seek loop) already exists from the G1-night follow-ups and
+must be finished or stashed before anything else touches that file. Flip
+the regression tests to the new contract (seek behavior gone; numbering
+arithmetic asserted), run the suite, commit. Removes the known correctness
+hazard from the equation before profiling starts.
+*Session: quick interactive; no GPU.*
+
+**5.1 — Execution & profiling.**
+(a) Fix `execution-pool: tagged` (currently broken; prerequisite for any
+full-match-scale run). (b) Add per-stage `fps_throughput` and full config
+echo to `run_summary.json`. (c) Diagnose the GenAI decoder-vs-encoder
+2.16× cost asymmetry **including a bit-identity check** of server/client
+generated frames (symmetry tripwire). (d) Profile the FFmpeg paths (final
+4K write at 0.53 fps; residual-encode threading/preset propagation).
+(e) Per-scene panorama compute cache on the encoder (background is
+near-static within a point; 0.46 fps stage today).
+*Session: code + short pipeline-runner validation runs.*
+
+**5.2 — Resolution & framerate ladders → `tier_realtime`.**
+(a) Global processing-resolution config key (decode chunk frames at e.g.
+960×540; keypoints/boxes are resolution-independent coordinates) with a
+deterministic upsampler inside `SynthesisEngine` — full-res residual
+becomes an optional layer priced by the Residual Guarantee. (b) Temporal
+decimation key (process at N fps < native) with a deterministic frame
+interpolator inside `SynthesisEngine`; actors already interpolate via
+semantic events; ball extraction likely keeps full-rate input. (c)
+`config/tier_realtime.yaml`: low res, decimated fps, yolo26n, `difference`
+ball, cached panorama, `libx264 ultrafast`, no GenAI — completes
+`tier_fast`'s own stated real-time intent.
+*Session: after 5.1 merges (same surfaces); code + short validation runs.*
+
+**5.3 — Background-layer ladder.**
+Rungs: `panorama-static` (today) → `panorama+delta` (stateful panorama:
+full send once, per-scene deltas for scoreboard/crowd; identical state
+both sides keeps the guarantee) → `roi-video` (masked-actor low-bitrate
+background video, `addroi` ROI boost for umpire/ball-kids/scoreboard;
+needs libx264/x265 — libsvtav1 ignores ROI side data). Benchmark all
+rungs via `benchmark_matrix`; the pays-for-itself table decides, not
+architecture preference.
+*Session: parallel with 5.1 (mostly disjoint encoder files).*
+
+**5.4 — G2 training campaign (GPU long pole; start ASAP in parallel).**
+(a) Protocol first: fixed probe set from **training-split videos only**;
+checkpoint eval script scoring PSNR/SSIM/LPIPS on probes every N steps;
+curves written to disk for cheap monitoring. (b) Launch variants —
+ControlNet fine-tunes, Animate-Anyone, SPADE4Tennis — under successive
+halving: evaluate at early checkpoints, prune losers, promote survivors.
+(c) The surviving variants double as the GenAI speed-ladder rungs for G3
+(SPADE fast / reduced-step ControlNet mid / Animate-Anyone quality).
+Only after survivors stabilize: the G2 BD-rate headline run.
+*Session: protocol design interactive, then hand training to
+`pipeline-runner`; owns the GPU — 5.1/5.2 validation runs coordinate
+around it.*
+
+**5.5 — Phase 3b harness, promoted (this is G3).**
+With the knobs from 5.1–5.3 merged, implement the variant-ladder sweep
+harness + DAG intermediate cache + GPU fan-out (§Experiment-efficiency
+architecture) and run the tier × component ladder on one held-out video:
+the per-component **quality / time (FPS) / bitrate** attribution table and
+the speed/compression Pareto figure fall out of the same run.
+*Session: last; pipeline-runner for the sweep.*
+
 ### Explicitly out of scope / decisions needed
 - **Multi-ControlNet**: stays deferred (report 7 §4) unless the Phase 4
   results make single-condition ControlNet the bottleneck — revisit then.
@@ -590,9 +760,17 @@ models retrained without the held-out videos before any G2 quality claim.
    full-match scale — `inline` execution measured ~15-20 min per real
    2s/100-frame 4K sub-chunk during the G1 run, which does not scale to
    full matches (or even the held-out videos in full) without
-   parallelism.
+   parallelism. *Now Phase 5.1(a).*
 9. **New (2026-07-11):** fix the `ResidualCalculator`/`ActorExtractor`
    `start_frame_id` contract inconsistency found during G1 (flagged
    separately) — dormant today only because every real caller uses
    `start_frame_id=0`, but a real correctness hazard for any future
-   shared-source-file, multi-chunk usage pattern.
+   shared-source-file, multi-chunk usage pattern. *Now Phase 5.0 (the
+   serial gate); a partial uncommitted diff already sits in the working
+   tree and must be finished or stashed first.*
+10. **New (2026-07-11):** execute Phase 5 (per-stage FPS profiling →
+    real-time tier → background-layer ladder → gated G2 training campaign
+    → promoted Phase 3b harness); see §Phase 5 for the six workstreams and
+    the parallel-agent-session split. Immediate open diagnoses inside it:
+    the GenAI decoder/encoder 2.16× cost asymmetry (+ bit-identity
+    symmetry check) and the 0.53 fps decoder-side FFmpeg write.

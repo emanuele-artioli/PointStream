@@ -35,7 +35,7 @@ whole video; each enabled component must pay for itself. Full framing:
 | Residual-Guarantee benchmark harness | ✅ Working | `scripts/benchmark_matrix.py`; first run exposed a panorama symmetry violation, now fixed ([8](8_residual_guarantee_benchmarks_report.md)) |
 | Detector selection (SAM3 vs YOLOv26 vs RF-DETR) | ⬜ Open | [7](7_implementation_plan.md) §2C |
 | Dataset curation (raw_4k → assets/dataset) | ✅ Built, now catalogued | 7 videos (≈2h37m 4K) / 952 scenes / 399 points / 114 deep-annotated tracks; quality-tier models (yolo26x), manually supervised ([10](10_dataset_and_end_to_end_evaluation_report.md)) |
-| End-to-end full-match evaluation (runtime scene routing, complexity tiers, speed/compression Pareto) | ⚠️ In progress | Phases 1–3a + Phase 4 G1 done (2026-07-11): real `encode_full_match` run against a real `djokovic_federer.mp4` excerpt found and fixed a `start_frame_id` bug, then completed 11 real point sub-chunks + 4 fallback scenes with zero crashes; 3b + G2-G4 open ([10](10_dataset_and_end_to_end_evaluation_report.md)) |
+| End-to-end full-match evaluation (runtime scene routing, complexity tiers, speed/compression Pareto) | ⚠️ In progress | Phases 1–3a + Phase 4 G1 done (2026-07-11): real `encode_full_match` run against a real `djokovic_federer.mp4` excerpt found and fixed a `start_frame_id` bug, then completed 11 real point sub-chunks + 4 fallback scenes with zero crashes; 3b + G2-G4 open. Phase 5 locked (2026-07-11): FPS profile shows every stage 5–150× off real time at 4K → six-workstream speed/real-time + gated-training campaign with a parallel-agent split ([10](10_dataset_and_end_to_end_evaluation_report.md)) |
 | TOMM resubmission | ⚠️ In progress | Action matrix tracks all 8 reviewer themes ([6](6_action_matrix.md)) |
 
 ## Prioritized next steps
@@ -121,6 +121,24 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    held-out videos before any G2 quality claim; `execution-pool: tagged`
    (currently broken, flagged separately) likely needs fixing first too,
    given the `inline`-mode timing observed during G1.
+   **Phase 5 locked (2026-07-11)** — the execution path for all of the
+   above ([10](10_dataset_and_end_to_end_evaluation_report.md) §Phase 5):
+   per-stage FPS profiling showed the GenAI pipeline at ~0.09 fps encode /
+   ~0.06 fps decode at 4K (every stage 5–150× off real time), so speed is
+   attacked on three axes at once — per-stage efficiency (incl. two open
+   diagnoses: GenAI decode costing 2.16× encode, and a 0.53 fps decoder
+   FFmpeg write), spatial/temporal down-processing as Residual-Guarantee
+   layers (LCEVC-style), and concurrency (tagged pool). Workstreams, in
+   dependency order: **5.0** `start_frame_id` contract fix (serial gate;
+   partial diff already in the working tree) → parallel **5.1** execution
+   & profiling, **5.3** background-layer ladder (panorama-static /
+   panorama+delta / ROI background video), **5.4** gated G2 training
+   campaign (train-split probe set, successive halving across
+   ControlNet/Animate-Anyone/SPADE — survivors double as G3's GenAI speed
+   ladder) → **5.2** resolution/framerate knobs + `tier_realtime` →
+   **5.5** promoted Phase 3b harness = G3's per-component
+   quality/FPS/bitrate table. Parallel sessions must use isolated
+   worktrees (G1-night clobbering lesson).
 8. Deferred (post-core): second domain, MOS study, demo video, VVC,
    Multi-ControlNet — see [7](7_implementation_plan.md) §4.
 
