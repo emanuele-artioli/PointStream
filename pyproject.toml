@@ -28,6 +28,9 @@ dependencies = [
   "decord==0.6.0",
   "onnxruntime-gpu==1.16.3",
   "mediapipe==0.10.5",
+  "pytorchvideo==0.1.5",
+  "fvcore==0.1.5.post20221221",
+  "iopath==0.1.10",
   "moore-animateanyone @ git+https://github.com/emanuele-artioli/Moore-AnimateAnyone.git@master"
 ]
 

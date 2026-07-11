@@ -58,6 +58,13 @@ deterministic and shared across all tiers; ablations unified with speed
 sweeps as per-component variant ladders with "off" as the leftmost rung;
 LPIPS + FVD added alongside PSNR/SSIM/VMAF(4K model); routing made
 outcome-safe via the server-side residual check.
+**FVD implemented 2026-07-11** (`src/shared/fvd.py`, I3D R50/Kinetics-400
+via `pytorchvideo`, wired into `evaluate_run_summary()`; see the dated
+entry below) — real-data verified, `FVD(self,self)=0.0`,
+`FVD(self,degraded)=7.20` on `assets/real_tennis.mp4`. **LPIPS is still
+unimplemented** — despite this section reading as a package, only FVD was
+built; a prior claim that LPIPS was "already backfilled" was checked and
+found false (no `lpips` code anywhere in `src/`).
 
 ## Dataset inventory (as of 2026-07-10)
 
@@ -331,6 +338,80 @@ Key design decisions folded in:
 **Paper impact:** feeds the G3 Pareto figure (x = realtime factor) and adds
 two candidate paper points: the layered spatial/temporal scalability under
 the Residual Guarantee, and the outcome-safe background-layer ladder.
+
+### 2026-07-11 — FVD implemented and wired into evaluation; LPIPS still unimplemented
+
+**Problem/Question:** this report's methodology lock (§2026-07-11 above)
+named "LPIPS + FVD added alongside PSNR/SSIM/VMAF" as a package. A follow-up
+task assumed LPIPS was already done ("we already have LPIPS backfilled")
+and asked only for FVD on top. That assumption was checked and is false: a
+repo-wide grep of `src/` for `lpips` found no implementation anywhere — the
+only hits were this report's own planning language (here and at the old
+line ~814) describing LPIPS/FVD as methodology *to add*, not code that
+exists. **Correction: as of this entry, FVD is implemented; LPIPS is not.**
+
+**Diagnosis/Evidence:** `/home/itec/emanuele/Models` had no I3D checkpoint
+of any kind (`find ... -iname "*i3d*"` empty), so the standard "search
+Models first" step came up empty and a real fetch was required.
+`pytorchvideo`'s I3D R50 (Carreira & Zisserman architecture, Kinetics-400,
+the "8x8" checkpoint — 8 frames at temporal stride 8) was downloaded from
+`https://dl.fbaipublicfiles.com/pytorchvideo/model_zoo/kinetics/I3D_8x8_R50.pyth`
+(224 MB) and cached under the shared host `Models/i3d/` directory, symlinked
+to `assets/weights/i3d_r50_kinetics.pyth` per the weights convention (never
+the absolute host path). New pip deps in `pyproject.toml`:
+`pytorchvideo==0.1.5`, `fvcore==0.1.5.post20221221`, `iopath==0.1.10`.
+
+**Resolution:**
+- `src/shared/fvd.py` — the metric: `frechet_distance`/
+  `compute_feature_statistics` (pure numpy/scipy math, unit-tested with
+  synthetic feature arrays, no model load required — mock-first per
+  CLAUDE.md), `sample_clip_frame_indices`/`preprocess_frames_for_i3d`
+  (BGR→RGB, Kinetics normalization, 8×8-stride clip windows with a
+  single-clip fallback for videos shorter than 64 frames), and
+  `I3DFeatureExtractor` (lazy-loaded I3D R50, classification head replaced
+  with `nn.Identity()` to expose the pooled 2048-d pre-classifier feature).
+- `src/experiment_evaluation.py` — `_compute_fvd` follows the existing
+  `_compute_psnr`/`_compute_ssim_ffmpeg`/`_compute_vmaf_ffmpeg` pattern
+  (existence checks, exceptions caught into a `note` field rather than
+  raised) and is wired into `evaluate_run_summary()`'s metric dispatch and
+  `_normalize_evaluation_metrics`'s allowed set (`"fvd"`). Unlike the other
+  three, it decodes real frame tensors via `video_io.decode_video_to_tensor`
+  (ffmpeg subprocess, not opencv — sidesteps the same AV1-decode gap noted
+  in `_compute_psnr`'s docstring) rather than only shelling out to ffmpeg
+  filters, since I3D needs actual pixel tensors.
+- `scripts/download_weights.py` gained `ensure_fvd_i3d_weight()`, which
+  actually downloads (the rest of the script only presence-checks and
+  errors with instructions) since the I3D URL is stable and public.
+- Tests: `tests/test_fvd.py` (fast, pure math + clip sampling — Frechet
+  distance is 0 for identical distributions, grows with a synthetic mean
+  shift, is symmetric, BGR→RGB swap verified numerically),
+  `tests/test_experiment_evaluation_fvd.py` (fast, wiring + missing-file/
+  decode-failure error paths via monkeypatch, mirroring
+  `test_experiment_evaluation_coverage.py`'s existing PSNR/SSIM/VMAF
+  pattern), `tests/test_fvd_integration.py` (`pytestmark = [pytest.mark.
+  integration, pytest.mark.slow]`, real I3D weights + real video decode,
+  self-comparison ≈ 0 and a degraded copy scoring clearly higher).
+- **Real verification** (not just unit tests), run from this worktree:
+  `assets/real_tennis.mp4` (3840×2160 @ 12 fps, 60 frames — below the
+  64-frame single-clip window, so this exercises the degenerate/fallback
+  covariance path) against itself and against a copy degraded by 20×
+  downscale/upscale + additive noise + `libx264 -crf 45`:
+  `FVD(self, self) = 0.0`, `FVD(self, degraded) = 7.20` — clearly higher,
+  non-degenerate. Separately, `assets/scene_004.mp4` (3840×2160 @ 50 fps,
+  248 frames, ≥3 full 64-frame windows) exercised the **non-degenerate
+  multi-clip covariance path**: 3 clips per side, `FVD(self, self) = 0.0`,
+  no fallback-path note, ~74 s of compute (model load + feature extraction
+  + 2048×2048 `scipy.linalg.sqrtm` twice) after a ~51 s 4K ffmpeg decode.
+  Full commands and output are in this session's transcript; not re-run
+  under `pytest` at 4K scale (that belongs in `test_fvd_integration.py`'s
+  smaller `real_tennis_10f_video` fixture instead, which was the actual
+  regression test added).
+
+**Paper impact:** FVD is now a real, wired-in metric for the G2 headline
+comparison and the LPIPS/FVD generative-degradation substitute for VMAF
+named in the methodology lock — only the LPIPS half of that pairing remains
+open. No G2 numbers exist yet (blocked on the retraining gate, unchanged by
+this entry); this closes the *tooling* gap, not a headline claim.
 
 ## Experiment-efficiency architecture
 
