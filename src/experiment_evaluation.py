@@ -10,6 +10,9 @@ import tempfile
 
 import numpy as np
 
+from src.encoder.video_io import decode_video_to_tensor
+from src.shared.fvd import compute_fvd_from_frames
+
 
 def _safe_file_size(path_like: str | Path | None) -> int | None:
     if path_like is None:
@@ -423,6 +426,40 @@ def _compute_vmaf_ffmpeg(reference_video: Path, predicted_video: Path, max_frame
             log_path.unlink(missing_ok=True)
 
 
+def _compute_fvd(reference_video: Path, predicted_video: Path, max_frames: int | None = None) -> dict[str, Any]:
+    """Compute Frechet Video Distance via a pretrained I3D (Kinetics-400) backbone.
+
+    Unlike PSNR/SSIM/VMAF this does not shell out to ffmpeg filters — it
+    decodes both videos to frame tensors (reusing `video_io.decode_video_to_tensor`,
+    which already sidesteps the AV1-decode gap in opencv-python's bundled
+    ffmpeg libs), builds I3D clips, and computes the Frechet distance between
+    per-video clip-feature distributions (see `src.shared.fvd`).
+    """
+    if not reference_video.exists() or not reference_video.is_file():
+        return {"fvd": None, "fvd_num_clips_reference": 0, "fvd_num_clips_predicted": 0, "note": "missing reference video"}
+    if not predicted_video.exists():
+        return {"fvd": None, "fvd_num_clips_reference": 0, "fvd_num_clips_predicted": 0, "note": "missing predicted artifact"}
+
+    try:
+        reference_decoded = decode_video_to_tensor(reference_video)
+        predicted_decoded = decode_video_to_tensor(predicted_video)
+
+        reference_frames = reference_decoded.tensor
+        predicted_frames = predicted_decoded.tensor
+        if max_frames is not None:
+            reference_frames = reference_frames[: int(max_frames)]
+            predicted_frames = predicted_frames[: int(max_frames)]
+
+        return compute_fvd_from_frames(reference_frames, predicted_frames)
+    except Exception as exc:  # noqa: BLE001 - surface any failure as a metric note, matching PSNR/SSIM/VMAF
+        return {
+            "fvd": None,
+            "fvd_num_clips_reference": 0,
+            "fvd_num_clips_predicted": 0,
+            "note": f"fvd computation failed: {exc}",
+        }
+
+
 def _normalize_evaluation_metrics(metrics: Any | None) -> list[str]:
     if metrics is None:
         return ["psnr"]
@@ -444,7 +481,7 @@ def _normalize_evaluation_metrics(metrics: Any | None) -> list[str]:
             raise ValueError("evaluation metrics cannot include 'none' with other values")
         return []
 
-    allowed = {"psnr", "ssim", "vmaf"}
+    allowed = {"psnr", "ssim", "vmaf", "fvd"}
     invalid = [item for item in items if item not in allowed]
     if invalid:
         raise ValueError(f"unsupported evaluation metrics: {', '.join(sorted(set(invalid)))}")
@@ -517,6 +554,14 @@ def evaluate_run_summary(
     if "vmaf" in normalized_metrics:
         evaluation.update(
             _compute_vmaf_ffmpeg(
+                reference_video=reference_video,
+                predicted_video=predicted_video,
+                max_frames=max_frames,
+            )
+        )
+    if "fvd" in normalized_metrics:
+        evaluation.update(
+            _compute_fvd(
                 reference_video=reference_video,
                 predicted_video=predicted_video,
                 max_frames=max_frames,
