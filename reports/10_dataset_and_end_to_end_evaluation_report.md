@@ -30,17 +30,20 @@ chunk of `real_tennis.mp4`" to "a whole broadcast match, end to end."
 
 ## Current state (TL;DR)
 
-**The vision above was NOT fully documented anywhere before 2026-07-10, and
-its runtime half is NOT implemented.** Gap analysis:
+**As of 2026-07-10 this vision was not fully documented anywhere, and its
+runtime half was not implemented.** As of 2026-07-11 (Phases 1–3a + Phase 4
+G1), the runtime half exists and has been validated on real raw_4k data;
+Phase 3b and Phase 4 G2–G4 remain open. Gap analysis (kept as a historical
+record of what changed, not re-collapsed into one "done" row):
 
 | Piece | Documented? | Implemented? |
 |---|---|---|
 | Dataset curation pipeline mechanics | ✅ Reports 2 (scene classification), 3 (pipeline unification), 4 (universal RGBA+DWPose format), 5 (canny/captions) | ✅ `scripts/process_dataset.py` (stages: classify, segment, pose, skeleton, canny, caption) |
-| Dataset **as a catalogued contribution** (inventory, stats, curation methodology, coverage caveats) | ❌ → now §Dataset inventory below | ✅ data exists on disk |
+| Dataset **as a catalogued contribution** (inventory, stats, curation methodology, coverage caveats) | ✅ §Dataset inventory below (2026-07-10) | ✅ data exists on disk |
 | GenAI finetuning on the dataset | ✅ Reports 1, 4, 5 | ✅ checkpoints in `assets/weights/` (pose/seg/ip-adapter/custom controlnets, `spade4tennis_lite_generator.pt`, pix2pix); Multi-ControlNet **deferred** (report 7 §4) |
-| **Runtime** scene classification + interlude/point routing | ⚠️ named as an architecture rule (CLAUDE.md "scene-classification routing stays modular") and as paper section 3.1 in report 7 — but no plan for the runtime port | ❌ **zero scene/interlude code under `src/`**; classifier lives only in `scripts/process_dataset.py:classify_scenes` |
-| Full-match orchestrator (scene split → route → per-scene encode → aggregate accounting) | ❌ | ❌ `src/main.py` processes one chunk of one clip |
-| Speed/compression trade-off across model-complexity tiers | ❌ (fast-vs-slow tiering exists only implicitly: runtime defaults yolo26n\*, curation defaults yolo26x\*) | ⚠️ per-stage timings exist (`PipelineProfiler`, `timings_sec` in `run_summary.json`) but no realtime-factor metric, no tier configs |
+| **Runtime** scene classification + interlude/point routing | ✅ this report, Phase 1 (2026-07-11) | ✅ `src/shared/scene_classification.py`, verified byte-faithful against real cached data (Phase 1) |
+| Full-match orchestrator (scene split → route → per-scene encode → aggregate accounting) | ✅ this report, Phase 2 (2026-07-11) | ✅ `src/encoder/match_orchestrator.py`, outcome-safe routing; validated on a real raw_4k excerpt with real evidence (Phase 4 G1, 2026-07-11) |
+| Speed/compression trade-off across model-complexity tiers | ✅ this report, Phase 3a (2026-07-11) | ⚠️ 3 tier configs + realtime factor + anchor-encode cache done (Phase 3a); variant-ladder sweep harness, DAG intermediate cache, GPU fan-out **deferred to G3** (Phase 3b) |
 
 The implementation plan to close these gaps is in §Implementation plan.
 **Methodology locked 2026-07-11** (see that findings entry): held-out test
@@ -452,18 +455,105 @@ built hastily and undertested under tonight's time budget; pick this up
 when G3 is actually being pursued, not before.
 
 ### Phase 4 — The headline experiments (goals G2→G4)
-On the **held-out videos** (`alcaraz_highlights`, `djokovic_zverev`;
-methodology decision 2): **G2** — full match at the balanced tier vs
-post-hoc AV1/HEVC anchors on PointStream's own scene spans (decision 1),
-BD-rate via the residual-CRF sweep with the metadata floor shown (decision
-4), all-scenes win/loss distribution + aggregate, both anchor forms
-(continuous + segmented). **G3** — per-component variant ladders → composed
-tiers → the speed/compression Pareto (x = realtime factor, y = bytes at
-matched VMAF; anchor presets on the same plot). **G4** — ablation verdicts
-read off the ladders' "off" rungs + the routed-vs-all-semantic routing
-ablation. Run via the `pipeline-runner` agent; these are multi-hour jobs.
-**Prerequisite:** generative models retrained without the held-out videos
-before any G2 quality claim.
+
+**G1 (plumbing validation) — done (2026-07-11), with a real bug found and
+fixed along the way.** Scope note before G2: G2's full BD-rate headline run
+needs the generative models retrained without the held-out videos first (a
+genuine multi-hour-to-multi-day GPU training commitment) and G3/G4 need
+the explicitly-deferred Phase 3b machinery (§Phase 3) — neither is
+appropriate to start unsupervised overnight. G1 ("orchestrator runs
+end-to-end on real data; frame-count invariant holds; accounting adds up;
+no quality claims yet") was in scope and is what got validated tonight.
+
+**Real run:** a 90 s excerpt of `assets/raw_4k/djokovic_federer.mp4`
+(chosen for dense scene cutting — 632 scenes over the full 78 min match,
+so even a short prefix samples real point/interlude diversity) through
+`encode_full_match` at `config/tier_fast.yaml`.
+
+**Bug found (real, in this report's own code, fixed same session):** the
+first real run crashed with `ResidualCalculator received zero valid
+frames` on the second point sub-chunk. Root cause:
+`src/encoder/residual_calculator.py:_process_residuals` treats
+`chunk.start_frame_id` as a literal seek offset into `chunk.source_uri`
+(skips that many frames before reading), while `ActorExtractor` and every
+other DAG node (`ball_extractor.py`, `segmentation_ball_extractor.py`,
+`background_modeler.py`, `actor_components.py`, `synthesis_engine.py`,
+`decoder_renderer.py`) only ever do `start_frame_id + local_idx`
+arithmetic for frame_id numbering — never seek. `match_orchestrator.py`
+had set `start_frame_id` to the match-global running frame counter, which
+the residual calculator then tried to skip *into* each small,
+self-contained extracted clip, running out of frames on every scene after
+the first. **Fixed** by using `start_frame_id=0` for every extracted
+sub-chunk (matching the convention every other consumer actually
+implements); the match-global position is preserved as a new
+`global_start_frame` field on each sub-chunk's result dict instead, purely
+for bookkeeping. The underlying `ResidualCalculator`/`ActorExtractor`
+inconsistency is real and separately dangerous (a shared multi-chunk
+source file with `start_frame_id > 0` would misalign what actors were
+detected on vs. what the residual is computed against) but is
+**pre-existing and not fixed here** — flagged as its own follow-up task;
+dormant until tonight because every existing real caller always used
+`start_frame_id=0` and the test suite's nonzero cases only ever hit mocked
+or synthetic-dummy paths. Regression test added:
+`tests/test_match_orchestrator_coverage.py`'s routing test now asserts
+every constructed `VideoChunk.start_frame_id == 0` and that
+`global_start_frame` is monotonically non-decreasing across sub-chunks.
+
+**Real evidence gathered (partial, by design — see below):** 11 real point
+sub-chunks (`s0004c0000`–`s0004c0010`) completed successfully end to end —
+real yolo26n detector/pose/segmenter actor extraction, real residual
+computation producing genuine `metadata.msgpack` (40–87 KB)/`residual.mp4`
+(3.4–12.6 MB)/`panorama.jpg` files, real `DecoderRenderer.process()`
+output, real fallback-codec encodes, real outcome-safe size comparison —
+plus 4 real fallback-only scenes (interlude/other/blank spans). Zero
+crashes after the fix. **Notable real finding:** at `tier_fast`
+(`genai-backend: null`, no generative compositing), the semantic payload
+was *larger* than the fallback encode on **every single** point
+sub-chunk observed (e.g. sub-chunk 0: metadata+residual = 12.7 MB vs.
+fallback = 2.75 MB) — outcome-safe routing would pick fallback throughout.
+This is expected, not a bug: with no generative reconstruction to shrink
+the residual, the semantic path is close to the Whole-Frame Residual
+Baseline (report 7 §1), which a well-tuned AV1 fallback beats easily on
+real broadcast footage. It's a real, live demonstration of the routing
+safety valve doing exactly its job (capping a non-paying tier's damage at
+zero) rather than of `tier_fast`'s bitrate viability — that question is
+G2/G3's, not G1's.
+
+**Why partial, not the full 90 s:** each 2 s/100-frame real 4K sub-chunk
+took ~15–20 minutes at `execution-pool: inline` (single-threaded, no
+parallelism) — far slower than anticipated (CLAUDE.md's "~3 min for 3
+frames" smoke-test timing doesn't extrapolate linearly to 100-frame real
+chunks). The full excerpt would have taken several more hours for a single
+validation pass; per the user's explicit call (asked mid-run), the 11
+completed real sub-chunks plus 4 completed fallback scenes were accepted
+as sufficient plumbing evidence rather than waiting out the full run.
+**Implication for G2/G3/G4 planning:** `execution-pool: tagged` would
+parallelize this substantially, but that mode is currently broken
+(flagged separately) — fixing it is close to a prerequisite for G2's
+full-match-scale runs being practical at all, not just a nice-to-have.
+
+**Concurrency note:** this session ran alongside several spawned follow-up
+sessions (each in what should be an isolated worktree per their own tool's
+description) fixing the issues flagged above; despite that, one in-flight
+edit to `match_orchestrator.py`/its test was clobbered mid-session and had
+to be redone from scratch and committed immediately. Recorded here as a
+process lesson, not a Phase 4 finding: don't leave fixes uncommitted for
+extended periods when other sessions may be touching the same working
+directory.
+
+**G2/G3/G4 — not started tonight**, per the scope note above. On the
+**held-out videos** (`alcaraz_highlights`, `djokovic_zverev`; methodology
+decision 2): **G2** — full match at the balanced tier vs post-hoc AV1/HEVC
+anchors on PointStream's own scene spans (decision 1), BD-rate via the
+residual-CRF sweep with the metadata floor shown (decision 4), all-scenes
+win/loss distribution + aggregate, both anchor forms (continuous +
+segmented). **G3** — per-component variant ladders → composed tiers → the
+speed/compression Pareto (x = realtime factor, y = bytes at matched VMAF;
+anchor presets on the same plot) — needs Phase 3b (deferred). **G4** —
+ablation verdicts read off the ladders' "off" rungs + the
+routed-vs-all-semantic routing ablation. Run via the `pipeline-runner`
+agent; these are multi-hour-to-multi-day jobs. **Prerequisite:** generative
+models retrained without the held-out videos before any G2 quality claim.
 
 ### Explicitly out of scope / decisions needed
 - **Multi-ControlNet**: stays deferred (report 7 §4) unless the Phase 4
@@ -474,14 +564,19 @@ before any G2 quality claim.
 
 ## Open questions & next steps
 
-1. Phase 1: shared scene-classification module + runtime port (open).
-2. Phase 2: full-match orchestrator + match-level summary + outcome-safe
-   routing + frame-count-invariant test (open).
-3. Phase 3: tier configs, realtime factor, variant-ladder harness,
-   intermediate/anchor caches, GPU fan-out (open).
-4. Phase 4 / G2–G4: headline BD-rate on held-out videos, Pareto figure,
-   ladder ablations (open; depends 1–3 **and** on retraining the
-   generative models without `alcaraz_highlights` + `djokovic_zverev`).
+1. ~~Phase 1: shared scene-classification module + runtime port~~ **done
+   (2026-07-11)**.
+2. ~~Phase 2: full-match orchestrator + match-level summary + outcome-safe
+   routing + frame-count-invariant test~~ **done (2026-07-11)**.
+3. Phase 3a (tier configs, realtime factor, anchor-encode cache) **done
+   (2026-07-11)**. Phase 3b (variant-ladder harness, DAG intermediate
+   cache, GPU fan-out) **still open** — deferred until G3 is pursued.
+4. ~~Phase 4 G1: real end-to-end validation~~ **done (2026-07-11)** — real
+   run on a `djokovic_federer.mp4` excerpt, found and fixed a real
+   `start_frame_id` bug along the way (see Phase 4 findings). G2–G4 remain
+   **open**: G2 needs the generative models retrained without
+   `alcaraz_highlights` + `djokovic_zverev` first (a real multi-hour+ GPU
+   commitment, not started); G3/G4 need Phase 3b.
 5. Decide whether the dataset itself is released/described as a standalone
    contribution in the paper (affects report 7 §3.3 wording).
 6. ~~Should interlude routing also get a Residual-Guarantee-style
@@ -490,3 +585,14 @@ before any G2 quality claim.
    (methodology decision 5).
 7. Add LPIPS + FVD (and the VMAF 4K model) to the evaluation stack in
    `src/experiment_evaluation.py` (open; needed by G2).
+8. **New (2026-07-11):** fix `execution-pool: tagged` (currently broken,
+   see the flagged follow-up task) before attempting G2/G3 at real
+   full-match scale — `inline` execution measured ~15-20 min per real
+   2s/100-frame 4K sub-chunk during the G1 run, which does not scale to
+   full matches (or even the held-out videos in full) without
+   parallelism.
+9. **New (2026-07-11):** fix the `ResidualCalculator`/`ActorExtractor`
+   `start_frame_id` contract inconsistency found during G1 (flagged
+   separately) — dormant today only because every real caller uses
+   `start_frame_id=0`, but a real correctness hazard for any future
+   shared-source-file, multi-chunk usage pattern.

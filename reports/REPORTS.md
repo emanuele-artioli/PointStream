@@ -35,7 +35,7 @@ whole video; each enabled component must pay for itself. Full framing:
 | Residual-Guarantee benchmark harness | ✅ Working | `scripts/benchmark_matrix.py`; first run exposed a panorama symmetry violation, now fixed ([8](8_residual_guarantee_benchmarks_report.md)) |
 | Detector selection (SAM3 vs YOLOv26 vs RF-DETR) | ⬜ Open | [7](7_implementation_plan.md) §2C |
 | Dataset curation (raw_4k → assets/dataset) | ✅ Built, now catalogued | 7 videos (≈2h37m 4K) / 952 scenes / 399 points / 114 deep-annotated tracks; quality-tier models (yolo26x), manually supervised ([10](10_dataset_and_end_to_end_evaluation_report.md)) |
-| End-to-end full-match evaluation (runtime scene routing, complexity tiers, speed/compression Pareto) | ⚠️ In progress | Phases 1–3a done (2026-07-11): scene classifier + full-match orchestrator + 3 tier configs + realtime factor + anchor-encode cache; 3b (variant-ladder/DAG-cache/GPU-fanout) explicitly deferred to G3; Phase 4 open ([10](10_dataset_and_end_to_end_evaluation_report.md)) |
+| End-to-end full-match evaluation (runtime scene routing, complexity tiers, speed/compression Pareto) | ⚠️ In progress | Phases 1–3a + Phase 4 G1 done (2026-07-11): real `encode_full_match` run against a real `djokovic_federer.mp4` excerpt found and fixed a `start_frame_id` bug, then completed 11 real point sub-chunks + 4 fallback scenes with zero crashes; 3b + G2-G4 open ([10](10_dataset_and_end_to_end_evaluation_report.md)) |
 | TOMM resubmission | ⚠️ In progress | Action matrix tracks all 8 reviewer themes ([6](6_action_matrix.md)) |
 
 ## Prioritized next steps
@@ -97,14 +97,30 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    second run on the same video reuses every fallback encode). *Phase 3b
    (variant-ladder harness, DAG intermediate cache, GPU fan-out) explicitly
    deferred* — only needed for G3, not G1/G2, per this report's own
-   goal-driven sequencing. Phase 4 headline BD-rate vs post-hoc
-   AV1/HEVC anchors on the held-out videos (`alcaraz_highlights`,
-   `djokovic_zverev`) + speed/compression Pareto. *Methodology locked
-   (2026-07-11)* — held-out split, post-hoc anchor protocol, ablations
-   unified with speed sweeps as variant ladders, LPIPS/FVD added
+   goal-driven sequencing.
+   ~~Phase 4 G1: real end-to-end validation~~ **done (2026-07-11)** — a
+   real `encode_full_match` run on a 90s real `djokovic_federer.mp4`
+   excerpt at `tier_fast` found and fixed a real bug
+   (`VideoChunk.start_frame_id` was set to the match-global frame counter,
+   but `ResidualCalculator` seeks that many frames into `source_uri` while
+   every other DAG node only does numbering arithmetic — fixed by using
+   `start_frame_id=0` per extracted sub-chunk); after the fix, 11 real
+   point sub-chunks + 4 real fallback scenes completed with zero crashes
+   (stopped there by design — full-90s completion would have taken several
+   more hours at `execution-pool: inline`, ~15-20 min per real 2s/100-frame
+   4K sub-chunk). Notable real finding: at `tier_fast` (no GenAI), the
+   semantic payload was larger than the fallback encode on every observed
+   sub-chunk — outcome-safe routing picking fallback throughout, exactly
+   as designed, not a bug. G2-G4 headline BD-rate vs post-hoc AV1/HEVC
+   anchors on the held-out videos (`alcaraz_highlights`,
+   `djokovic_zverev`) + speed/compression Pareto remain open. *Methodology
+   locked (2026-07-11)* — held-out split, post-hoc anchor protocol,
+   ablations unified with speed sweeps as variant ladders, LPIPS/FVD added
    ([10](10_dataset_and_end_to_end_evaluation_report.md) findings
    2026-07-11). **Gate:** generative models must be retrained without the
-   held-out videos before any G2 quality claim.
+   held-out videos before any G2 quality claim; `execution-pool: tagged`
+   (currently broken, flagged separately) likely needs fixing first too,
+   given the `inline`-mode timing observed during G1.
 8. Deferred (post-core): second domain, MOS study, demo video, VVC,
    Multi-ControlNet — see [7](7_implementation_plan.md) §4.
 
