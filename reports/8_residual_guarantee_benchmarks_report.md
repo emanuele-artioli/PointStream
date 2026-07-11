@@ -320,6 +320,44 @@ ablation tables; the combined matrix will fill the residual-compression
 row properly. The determinism by-catch supports the symmetric-synthesis
 claim (§Residual Guarantee).
 
+### 2026-07-11 — `libsvtav1` has no pixel-format flexibility: the residual-compression matrix needs `libx264`
+
+**Problem/Question:** before handing the residual-compression matrix
+(above) to an unsupervised multi-hour GPU run, sanity-check that
+`residual-pix-fmt` can actually produce different bytes under the
+pipeline's real default codec — otherwise the matrix reproduces the
+exact "dead knob" signature this report just diagnosed, for a new reason.
+
+**Diagnosis/Evidence:** `ffmpeg -h encoder=libsvtav1` lists **exactly
+one** supported pixel format: `yuv420p` (plus its 10-bit variant). A
+synthetic check confirms the practical effect —
+`ffmpeg -f lavfi -i testsrc2=duration=2:size=320x240:rate=10 -pix_fmt
+{yuv444p,yuv420p,gray} -c:v libsvtav1 -crf 35` produced **byte-identical
+33,779-byte output for all three inputs**; `ffprobe` shows the encoded
+stream as `yuv420p` regardless of what was fed in — FFmpeg's swscale
+silently downconverts anything libsvtav1 doesn't support before handing
+it to the encoder. So the hardcoded `yuv444p` this report already flagged
+as suspicious never actually took effect under the project's default
+codec — residual streams have been `yuv420p` in practice all along,
+which also means the `yuv420p`-vs-`yuv444p` half of the matrix is moot
+unless run under a codec that supports the difference.
+`libx264`/`libx265` both do (`ffmpeg -h encoder=libx264` lists
+`yuv420p yuv422p yuv444p ... gray ...`, likewise for `libx265`).
+
+**Resolution:** `config/benchmarks/ablation_residual_compression.yaml`
+overrides `ffmpeg-codec: libx264` for this ablation only (everything else
+unchanged — `codec-crf`/`codec-preset` stay at `config/default.yaml`'s
+35/fast). This also anticipates Phase 5.2's `tier_realtime`, which is
+already heading toward H.264 (`ultrafast` preset) for its speed argument,
+so validating pixel-format behavior under libx264 serves double duty.
+Spec validated (`load_matrix_spec`/`materialize_config` both checked
+against the file — all 6 variants materialize the intended
+codec/pix-fmt/threshold combination).
+
+**Paper impact:** worth a footnote if the residual stream ever ships on
+a non-AV1 codec — the "residual pixel format" claim is codec-dependent,
+not a universal property of the technique.
+
 ## Open questions & next steps
 
 1. ~~Trace and fix the panorama symmetry violation (encoder residual must be

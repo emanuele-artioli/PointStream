@@ -1,0 +1,44 @@
+# Residual pixel-format x dynamic-threshold ablation (report 10 Phase 5.6,
+# report 8 2026-07-11 entry). ffmpeg-codec is overridden to libx264 here
+# ONLY for this ablation: verified via `ffmpeg -h encoder=libsvtav1` that
+# libsvtav1 (the project default) supports exactly one pixel format --
+# yuv420p -- so yuv444p/yuv420p/gray inputs all silently downconvert to
+# byte-identical yuv420p output under it (confirmed with a synthetic
+# testsrc2 encode: all three variants produced the same 33779-byte file).
+# libx264/libx265 both genuinely support yuv420p/yuv444p/gray
+# (`ffmpeg -h encoder=libx264`), so this sweep needs one of them to answer
+# anything -- libx264 chosen since Phase 5.2's tier_realtime is already
+# heading that direction (H.264 preset ultrafast for real-time).
+name: ablation-residual-compression
+input: assets/real_tennis.mp4
+base-config: config/default.yaml
+common-overrides:
+  num-frames: null
+  evaluation-mode: [psnr, ssim, vmaf]
+  ffmpeg-codec: libx264
+variants:
+  - name: thresh0.0-yuv444p
+    baseline: true
+    overrides:
+      residual-block-threshold: 0.0
+      residual-pix-fmt: yuv444p
+  - name: thresh0.0-yuv420p
+    overrides:
+      residual-block-threshold: 0.0
+      residual-pix-fmt: yuv420p
+  - name: thresh0.0-gray
+    overrides:
+      residual-block-threshold: 0.0
+      residual-pix-fmt: gray
+  - name: thresh1.0-yuv444p
+    overrides:
+      residual-block-threshold: 1.0
+      residual-pix-fmt: yuv444p
+  - name: thresh1.0-yuv420p
+    overrides:
+      residual-block-threshold: 1.0
+      residual-pix-fmt: yuv420p
+  - name: thresh1.0-gray
+    overrides:
+      residual-block-threshold: 1.0
+      residual-pix-fmt: gray
