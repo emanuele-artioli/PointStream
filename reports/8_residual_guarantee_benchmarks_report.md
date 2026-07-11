@@ -1,5 +1,5 @@
 # Residual-Guarantee Benchmarks — Report
-*Status: Active | Last updated: 2026-07-10 | Code: scripts/benchmark_matrix.py, src/shared/synthesis_engine.py, src/experiment_evaluation.py, src/encoder/orchestrator.py, src/transport/disk.py, src/transport/panorama_encoder.py*
+*Status: Active | Last updated: 2026-07-11 | Code: scripts/benchmark_matrix.py, src/shared/synthesis_engine.py, src/experiment_evaluation.py, src/encoder/orchestrator.py, src/transport/disk.py, src/transport/panorama_encoder.py*
 
 ## Scope
 
@@ -35,7 +35,15 @@ settings, GenAI backends) accrue here as dated entries.
   (net saving of +951,289 bytes vs naive bboxes). 
 - **Panorama quality ablation ran (2026-07-10):** Proved that increasing panorama quality
   (q70, q90) **DOES NOT PAY**. The bytes added to the semantic stream vastly exceed the
-  savings in the residual stream. Dynamic thresholding remains owed.
+  savings in the residual stream.
+- **Dynamic thresholding is NOT done (2026-07-11):** the config knob was
+  never wired into `ResidualCalculator` (dead since introduction); the one
+  matrix that showed variation ran uncommitted, since-lost code. The prior
+  "threshold 1.0 pays" claim is unverified. Re-run owed as the combined
+  threshold × pixel-format matrix (see the 2026-07-11 entry; execution
+  scheduled as report 10 Phase 5.0 wiring + 5.6 matrix). By-catch from the
+  dead-knob run: four byte-identical independent GenAI pipeline runs —
+  direct evidence of seeded determinism.
 
 ## Findings log
 
@@ -249,6 +257,69 @@ full-resolution baseline).
 **Resolution:** Verdict is **DOES NOT PAY**. The residual video encoder is extremely efficient at resolving any lost background detail from the baseline (q50) panorama, making the massive upfront metadata cost of high-quality JPEGs a net negative for total bandwidth.
 **Paper impact:** Solves another open question for the ablation tables. Sticking with highly compressed background panoramas maximizes overall bandwidth savings without impacting final reconstructed video quality.
 
+### 2026-07-11 — Dynamic-thresholding ablation invalid: the knob was never wired, and the run that showed variation used lost uncommitted code
+
+**Problem/Question:** REPORTS.md claimed the dynamic-thresholding ablation
+was **done (2026-07-10)** ("threshold 1.0 optimally gates noise and saves
+bitrate") — but this report never got a findings entry for it, and a plan
+written with Gemini (`reports/implementation_plan.md`, absorbed here and
+into report 10 §Phase 5) asserted that `ResidualCalculator` ignores the
+config's threshold entirely. Both can't be true.
+
+**Diagnosis/Evidence:**
+- **The knob is dead in `src/` today:** `residual_block_threshold`
+  (`src/shared/config.py:67`) is read *nowhere* in `src/` or `scripts/`;
+  `ResidualCalculator.__init__`'s `block_information_threshold` parameter
+  defaults to `0.0` and no caller passes it
+  (`src/encoder/pipeline_builders.py:84`,
+  `src/encoder/orchestrator.py:100`); `_apply_block_threshold` no-ops at
+  `threshold <= 0.0`. `git log -S residual_block_threshold -- src/` shows
+  no commit ever wired the config key to the constructor.
+- **Two thresholding matrices exist on disk and tell the whole story:**
+  - `outputs/benchmarks/ablation-dynamic-thresholding_20260710_221518/`:
+    all four variants (0.0/1.0/2.0/3.0) produced **byte-identical**
+    payloads (5,503,374 B total each, identical PSNR/SSIM/VMAF to the
+    last digit) — the dead-knob signature. Valuable by-catch: four
+    independent full GenAI pipeline runs producing byte-identical output
+    is direct evidence the seeded pipeline is **deterministic**
+    (Residual-Guarantee-relevant).
+  - `outputs/benchmarks/ablation-dynamic-thresholding_20260711_001729/`:
+    variants **do** differ (thresh-1.0: +12,988 B net, PAYS; thresh-2.0:
+    +10,961 B, PAYS; thresh-3.0: −14,824 B, DOES NOT PAY — the "14KB"
+    the Gemini plan discusses). For this run to vary, the threshold must
+    have been live — i.e. an (uncommitted) wiring edit existed at 00:17
+    and is gone from today's tree, almost certainly a casualty of the
+    G1-night concurrent-session clobbering (report 10 Phase 4).
+- REPORTS.md's "threshold 1.0" claim traces to the 00:17 matrix — a real
+  run, but of code that no longer exists; not reproducible.
+- Related hardcoding found while verifying: the residual encode pins
+  `residual_pix_fmt = "yuv444p"` (`src/encoder/residual_calculator.py:354`)
+  — full-resolution chroma for a residual stream, untested against
+  `yuv420p` (¼ the raw chroma) and `gray` (luma-only). The decoder side
+  needs no change to support these: `iter_video_frames_ffmpeg`
+  (`src/encoder/video_io.py:93`) normalizes any input back to bgr24.
+
+**Resolution:** REPORTS.md corrected (claim marked superseded/unverified).
+Re-run owed as a **combined residual-compression matrix** (absorbed from
+the Gemini plan): fix the wiring (read `residual_block_threshold` from
+config in the builder — landing inside report 10 Phase 5.0 since it
+touches the same file as the `start_frame_id` fix), add a
+`residual_pix_fmt` config key (default `yuv444p` for backward
+compatibility), then sweep `residual-block-threshold` [0.0, 1.0] ×
+`residual-pix-fmt` [yuv444p, yuv420p, gray] full-length
+(`config/benchmarks/ablation_residual_compression.yaml`, report 10
+Phase 5.6). The matrix answers: does 420p beat 444p; does luma-only add
+enough over 420p to justify losing color correction; does the threshold
+stack with subsampling (the thresh-3.0 result suggests aggressive
+zeroing *creates* blocky edges the codec pays for — worth confirming at
+1.0). Run with the current (pre-retrain) checkpoints for comparability
+with the other entries in this report.
+
+**Paper impact:** removes an unsupported claim before it reached the
+ablation tables; the combined matrix will fill the residual-compression
+row properly. The determinism by-catch supports the symmetric-synthesis
+claim (§Residual Guarantee).
+
 ## Open questions & next steps
 
 1. ~~Trace and fix the panorama symmetry violation (encoder residual must be
@@ -264,3 +335,10 @@ full-resolution baseline).
    heuristics vs naive bboxes ([7](7_implementation_plan.md) §2E)~~ **done (2026-07-10)** — see Findings log. ~~The
    panorama-quality trade-off itself~~ **done (2026-07-10)** — see Findings log. Dynamic thresholding ablations remain owed as full-length (`num-frames:
    null`) swept matrices with `evaluation-mode: [psnr, ssim, vmaf]`.
+4. **New (2026-07-11):** the combined residual-compression matrix
+   (`residual-block-threshold` [0.0, 1.0] × `residual-pix-fmt`
+   [yuv444p, yuv420p, gray]) once the wiring fix + `residual_pix_fmt`
+   config key land (report 10 Phase 5.0); spec to be added as
+   `config/benchmarks/ablation_residual_compression.yaml`; run via
+   `pipeline-runner` with current pre-retrain checkpoints (report 10
+   Phase 5.6). This supersedes the plain thresholding re-run in (3).

@@ -285,6 +285,11 @@ that closed.
 background-layer variants; gated G2 training campaign; Phase 3b harness,
 promoted), with an explicit parallel-agent-session split and worktree
 isolation required (process lesson from the G1 concurrency clobber).
+*Amended later the same day:* a seventh workstream (5.6,
+residual-compression matrix) and a widened 5.0 were absorbed from the
+Gemini-session `reports/implementation_plan.md`, which also exposed that
+the earlier dynamic-thresholding "done" claim was invalid — full
+diagnosis in report 8's 2026-07-11 entry.
 Key design decisions folded in:
 
 1. **FPS is the canonical speed unit.** Every stage timing in
@@ -654,20 +659,37 @@ models retrained without the held-out videos before any G2 quality claim.
 ### Phase 5 — Speed, real-time tier, and the gated training campaign (2026-07-11)
 
 Locked in response to the per-stage FPS profile (see the 2026-07-11
-findings entry). Six workstreams, designed to be handed to **separate
-agent sessions in isolated worktrees** (mandatory after the G1-night
-clobbering incident; commit early and often). Dependency shape: 5.0 is a
-small serial gate; 5.1/5.3/5.4 then run in parallel; 5.2 follows 5.1
-(overlapping config/orchestrator surfaces); 5.5 needs 5.1–5.3 merged.
+findings entry); amended same day after absorbing
+`reports/implementation_plan.md` (Gemini-session plan → 5.0 scope widened,
+5.6 added). Seven workstreams (5.0–5.6), designed to be handed to
+**separate agent sessions in isolated worktrees** (mandatory after the
+G1-night clobbering incident; commit early and often). Dependency shape:
+5.0 is a small serial gate; 5.1/5.3/5.4/5.6 then run in parallel; 5.2
+follows 5.1 (overlapping config/orchestrator surfaces); 5.5 needs
+5.1–5.3 merged. The session-to-agent table at the end of this section is
+the reference for who tackles what.
 
-**5.0 — `start_frame_id` contract fix (serial gate, small).**
-Finish making `VideoChunk.start_frame_id` numbering-only everywhere — an
-uncommitted working-tree diff on `src/encoder/residual_calculator.py`
+**5.0 — Residual-calculator fixes (serial gate, small).** *(Scope widened
+2026-07-11 after absorbing `reports/implementation_plan.md`, the
+Gemini-session plan — all three items touch the same file, so they land
+in one session to avoid a repeat of the clobbering incident.)*
+(a) Finish making `VideoChunk.start_frame_id` numbering-only everywhere —
+an uncommitted working-tree diff on `src/encoder/residual_calculator.py`
 (removing the seek loop) already exists from the G1-night follow-ups and
 must be finished or stashed before anything else touches that file. Flip
 the regression tests to the new contract (seek behavior gone; numbering
-arithmetic asserted), run the suite, commit. Removes the known correctness
-hazard from the equation before profiling starts.
+arithmetic asserted). (b) Wire the dead `residual_block_threshold` config
+knob (`src/shared/config.py:67` — read *nowhere* today) into
+`ResidualCalculator` via `build_residual_calculator`
+(`src/encoder/pipeline_builders.py:84`) and the orchestrator fallback
+constructor; this re-lands a fix that provably existed uncommitted on
+2026-07-10 night and was lost (see report 8's 2026-07-11 entry — the
+"threshold 1.0 pays" claim is invalidated until 5.6 re-runs it). (c) Add
+a `residual_pix_fmt` config key (default `"yuv444p"` for backward
+compatibility) replacing the hardcoded value at
+`src/encoder/residual_calculator.py:354`; the decoder needs no change
+(`iter_video_frames_ffmpeg` normalizes any format back to bgr24). Run the
+suite, commit.
 *Session: quick interactive; no GPU.*
 
 **5.1 — Execution & profiling.**
@@ -725,6 +747,42 @@ the per-component **quality / time (FPS) / bitrate** attribution table and
 the speed/compression Pareto figure fall out of the same run.
 *Session: last; pipeline-runner for the sweep.*
 
+**5.6 — Residual-compression matrix (added 2026-07-11, from the Gemini
+plan).** Once 5.0(b)/(c) land: new spec
+`config/benchmarks/ablation_residual_compression.yaml` sweeping
+`residual-block-threshold` [0.0, 1.0] × `residual-pix-fmt`
+[yuv444p, yuv420p, gray] full-length on `assets/real_tennis.mp4` with
+`evaluation-mode: [psnr, ssim, vmaf]`. Answers three questions at once:
+does 4:2:0 chroma subsampling beat the current hardcoded 4:4:4; does
+luma-only add enough over 4:2:0 to justify dropping color correction
+entirely; does the block threshold stack with subsampling (the old
+thresh-3.0 observation — aggressive zeroing *adding* 14.8 KB by creating
+artificial block edges — wants confirming at 1.0). This **replaces** the
+invalidated dynamic-thresholding ablation (report 8, 2026-07-11 entry);
+run with current pre-retrain checkpoints so results stay comparable with
+report 8's racket/panorama entries. ~6 variants × ~28 min ≈ 3 h GPU —
+schedule before 5.4's training occupies the GPU, or interleave.
+*Session: pipeline-runner, spec written by whichever session closes 5.0.*
+
+#### Session-to-agent assignment (the parallel split, for reference)
+
+| # | Workstream | Agent / session | Isolation | Depends on | GPU |
+|---|---|---|---|---|---|
+| S1 | 5.0 residual-calculator fixes (a+b+c) | interactive main session (small, review-worthy diff) | main checkout — it owns the dirty file | — | no |
+| S2 | 5.6 residual-compression matrix | `pipeline-runner` | none (run-only, writes `outputs/benchmarks/`) | S1 merged | yes (~3 h) |
+| S3 | 5.1 execution & profiling (tagged pool, FPS metrics, 2 diagnoses, panorama compute cache) | `general-purpose` in an **isolated worktree**; short validation runs via `pipeline-runner` | worktree | S1 | brief |
+| S4 | 5.3 background-layer ladder | `general-purpose` in an **isolated worktree** | worktree | S1 | brief |
+| S5 | 5.4 training protocol, then variant training | protocol: interactive; training: `pipeline-runner` | worktree for protocol code | S1 (protocol); GPU free (training) | yes (multi-day, owns GPU once started) |
+| S6 | 5.2 resolution/framerate knobs + `tier_realtime` | `general-purpose` in an isolated worktree | worktree | S3 merged (shared surfaces) | brief |
+| S7 | 5.5 Phase 3b harness + G3 ladder run | `general-purpose` + `pipeline-runner` for sweeps | worktree | S3, S4, S6 merged | yes |
+
+GPU scheduling rule: S2's 3 h matrix and S3/S4/S6's short validation runs
+go **before** S5's multi-day training starts; once training owns the GPU,
+code-only work continues but real-run verification queues behind it.
+Process rules (from the G1-night clobbering): every parallel session works
+in an isolated worktree, commits early and often, and no two sessions may
+touch `src/encoder/residual_calculator.py` concurrently.
+
 ### Explicitly out of scope / decisions needed
 - **Multi-ControlNet**: stays deferred (report 7 §4) unless the Phase 4
   results make single-condition ControlNet the bottleneck — revisit then.
@@ -770,7 +828,8 @@ the speed/compression Pareto figure fall out of the same run.
    tree and must be finished or stashed first.*
 10. **New (2026-07-11):** execute Phase 5 (per-stage FPS profiling →
     real-time tier → background-layer ladder → gated G2 training campaign
-    → promoted Phase 3b harness); see §Phase 5 for the six workstreams and
-    the parallel-agent-session split. Immediate open diagnoses inside it:
-    the GenAI decoder/encoder 2.16× cost asymmetry (+ bit-identity
-    symmetry check) and the 0.53 fps decoder-side FFmpeg write.
+    → promoted Phase 3b harness → residual-compression matrix); see
+    §Phase 5 for the seven workstreams and the session-to-agent
+    assignment table. Immediate open diagnoses inside it: the GenAI
+    decoder/encoder 2.16× cost asymmetry (+ bit-identity symmetry check)
+    and the 0.53 fps decoder-side FFmpeg write.

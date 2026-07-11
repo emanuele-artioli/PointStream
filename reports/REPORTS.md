@@ -75,7 +75,7 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    spec in `config/benchmarks/` and emits the pays-for-itself table.
    *Racket heuristics ablation:* ~~still owed~~ **done (2026-07-10)** (convex hull tracking drastically outperforms naive bboxes).
    *Panorama quality trade-off:* ~~still owed~~ **done (2026-07-10)** (higher qualities do not pay, as metadata cost exceeds residual savings).
-   *Dynamic thresholding:* ~~still owed~~ **done (2026-07-10)** (threshold 1.0 optimally gates noise and saves bitrate).
+   *Dynamic thresholding:* ~~still owed~~ ~~**done (2026-07-10)** (threshold 1.0 optimally gates noise and saves bitrate)~~ **Superseded 2026-07-11 — claim invalid:** the config knob was never wired into `ResidualCalculator`; the matrix that varied ran uncommitted, since-lost code ([8](8_residual_guarantee_benchmarks_report.md) 2026-07-11 entry). Re-run owed as the combined threshold × pixel-format matrix (report 10 Phase 5.0 wiring + 5.6 run).
 5. Background panorama stitching for moderate camera motion.
 6. Detector/segmenter selection: SAM3 vs YOLOv26 vs RF-DETR (R3).
 7. **End-to-end full-match evaluation** — the headline experiment
@@ -129,15 +129,22 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    diagnoses: GenAI decode costing 2.16× encode, and a 0.53 fps decoder
    FFmpeg write), spatial/temporal down-processing as Residual-Guarantee
    layers (LCEVC-style), and concurrency (tagged pool). Workstreams, in
-   dependency order: **5.0** `start_frame_id` contract fix (serial gate;
-   partial diff already in the working tree) → parallel **5.1** execution
-   & profiling, **5.3** background-layer ladder (panorama-static /
-   panorama+delta / ROI background video), **5.4** gated G2 training
-   campaign (train-split probe set, successive halving across
-   ControlNet/Animate-Anyone/SPADE — survivors double as G3's GenAI speed
-   ladder) → **5.2** resolution/framerate knobs + `tier_realtime` →
-   **5.5** promoted Phase 3b harness = G3's per-component
-   quality/FPS/bitrate table. Parallel sessions must use isolated
+   dependency order: **5.0** residual-calculator fixes (serial gate:
+   the `start_frame_id` contract — partial diff already in the working
+   tree — plus wiring the dead `residual_block_threshold` config knob and
+   a new `residual_pix_fmt` key, absorbed 2026-07-11 from the Gemini
+   plan; all same-file) → parallel **5.1** execution & profiling, **5.3**
+   background-layer ladder (panorama-static / panorama+delta / ROI
+   background video), **5.4** gated G2 training campaign (train-split
+   probe set, successive halving across ControlNet/Animate-Anyone/SPADE —
+   survivors double as G3's GenAI speed ladder), **5.6**
+   residual-compression matrix (threshold × yuv444p/yuv420p/gray;
+   replaces the invalidated thresholding ablation,
+   [8](8_residual_guarantee_benchmarks_report.md) 2026-07-11 entry) →
+   **5.2** resolution/framerate knobs + `tier_realtime` → **5.5**
+   promoted Phase 3b harness = G3's per-component quality/FPS/bitrate
+   table. Session-to-agent assignments are written down in report 10
+   §Phase 5 (session table). Parallel sessions must use isolated
    worktrees (G1-night clobbering lesson).
 8. Deferred (post-core): second domain, MOS study, demo video, VVC,
    Multi-ControlNet — see [7](7_implementation_plan.md) §4.
