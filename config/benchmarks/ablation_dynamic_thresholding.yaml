@@ -1,0 +1,20 @@
+name: ablation-dynamic-thresholding
+input: assets/real_tennis.mp4
+base-config: config/default.yaml
+common-overrides:
+  num-frames: null
+  evaluation-mode: [psnr, ssim, vmaf]
+variants:
+  - name: thresh-0.0
+    baseline: true
+    overrides:
+      residual-block-threshold: 0.0
+  - name: thresh-1.0
+    overrides:
+      residual-block-threshold: 1.0
+  - name: thresh-2.0
+    overrides:
+      residual-block-threshold: 2.0
+  - name: thresh-3.0
+    overrides:
+      residual-block-threshold: 3.0
