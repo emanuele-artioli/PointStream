@@ -113,15 +113,18 @@ the same pass.
 
 ## Concurrent sessions & git hygiene
 
-Multiple Claude sessions — including spawned follow-up tasks from
-`spawn_task` chips — often work in this repo at the same time, sharing
-this working directory rather than an isolated worktree. A session's
-uncommitted edit can be silently overwritten by another session's
-read-modify-write cycle on the same file; this isn't a Claude bug, it's
-the same hazard as any two processes editing a file without locking.
-Confirmed 2026-07-11: an uncommitted `match_orchestrator.py` fix was
-clobbered mid-session while a long real-world validation run was in
-flight and four spawned sessions were active.
+This repo gets worked on by multiple agent sessions at once — Claude
+sessions (interactive or spawned via `spawn_task` chips, which do run in
+their own isolated worktree under `.claude/worktrees/`) and other tools
+that read their own copies of these rules here (Antigravity, Copilot; see
+"This tooling is meant to evolve" below). Any session working directly in
+this checkout's main working directory — not an isolated worktree — can
+silently overwrite another session's uncommitted edit on the same file
+via an ordinary read-modify-write race; this isn't specific to any one
+tool, it's the same hazard as any two processes editing a file without
+locking. Confirmed 2026-07-11: an uncommitted `match_orchestrator.py` fix
+was clobbered mid-session while a long real-world validation run was in
+flight and other sessions were concurrently active on this repo.
 
 - **Commit a fix as soon as it passes fast checks** (ruff/mypy/unit
   tests) — don't leave it uncommitted while running a slow verification
