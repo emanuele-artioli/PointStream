@@ -111,6 +111,33 @@ numpy 1.26.4 ABI coupling (`reports/2_scene_classification_research.md`).
 dependencies or structure change, update `pyproject.toml` and `README.md` in
 the same pass.
 
+## Concurrent sessions & git hygiene
+
+Multiple Claude sessions — including spawned follow-up tasks from
+`spawn_task` chips — often work in this repo at the same time, sharing
+this working directory rather than an isolated worktree. A session's
+uncommitted edit can be silently overwritten by another session's
+read-modify-write cycle on the same file; this isn't a Claude bug, it's
+the same hazard as any two processes editing a file without locking.
+Confirmed 2026-07-11: an uncommitted `match_orchestrator.py` fix was
+clobbered mid-session while a long real-world validation run was in
+flight and four spawned sessions were active.
+
+- **Commit a fix as soon as it passes fast checks** (ruff/mypy/unit
+  tests) — don't leave it uncommitted while running a slow verification
+  (a multi-minute integration test, a real GPU/pipeline run) or while
+  moving on to unrelated work. Commit the code under test *before*
+  kicking off the slow run, and let that run validate the committed
+  state; if it finds a problem, fix and commit again rather than holding
+  the fix uncommitted for the run's duration.
+- Before committing, a surprising `git diff --stat <file>` showing no
+  changes on a file you just edited is the tell that something reverted
+  it — re-apply and commit immediately, don't spend time diagnosing why.
+- For work that must not be touched by other sessions, prefer
+  worktree-isolated agents over same-directory spawned sessions, or
+  sequence spawned tasks instead of launching several at once against
+  files they might overlap on.
+
 ## Testing — this repo has a real suite
 
 - `python scripts/check_coverage_gate.py` is the CI entry point (runs
