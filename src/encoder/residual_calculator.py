@@ -170,7 +170,7 @@ class ResidualCalculator:
         residual_batch_size: int = 8,
         downscale_interpolation: str = "bilinear",
         residual_block_size: int = 8,
-        block_information_threshold: float = 0.0,
+        block_information_threshold: float | None = None,
     ) -> None:
         self.config = config
         self._synthesis_engine = synthesis_engine or SynthesisEngine(config=self.config)
@@ -194,7 +194,12 @@ class ResidualCalculator:
         self._residual_batch_size = residual_batch_size
         self._downscale_interpolation = downscale_interpolation
         self._residual_block_size = residual_block_size
-        self._block_information_threshold = block_information_threshold
+        
+        if block_information_threshold is not None:
+            self._block_information_threshold = block_information_threshold
+        else:
+            self._block_information_threshold = float(getattr(self.config, "residual_block_threshold", 0.0)) if self.config else 0.0
+            
         self.profiler = PipelineProfiler()
 
     def get_detailed_profile(self) -> dict[str, float]:

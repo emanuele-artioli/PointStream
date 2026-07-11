@@ -269,7 +269,25 @@ def _process_point_scene(
         video_chunk = VideoChunk(
             chunk_id=chunk_id,
             source_uri=str(clip_path),
-            start_frame_id=frame_cursor,
+            # NOTE: start_frame_id=0, not the match-global frame_cursor.
+            # Each extracted clip is a self-contained file whose own frame 0
+            # is this sub-chunk's first frame -- the convention every DAG
+            # node actually implements (ActorExtractor._load_frames reads
+            # from the start of source_uri regardless of start_frame_id;
+            # ball/segmentation extractors and synthesis_engine only ever
+            # do `start_frame_id + local_idx` arithmetic for event
+            # numbering). ResidualCalculator._process_residuals is the one
+            # place that additionally *seeks* start_frame_id frames into
+            # source_uri before reading -- if source_uri were a per-chunk
+            # file (as it is here) and start_frame_id were the match-global
+            # offset, this scene's frame_cursor would run past the clip's
+            # own (small) frame count, raising "zero valid frames" (found
+            # via a real run tonight; flagged separately, not fixed here --
+            # this discrepancy is pre-existing in residual_calculator.py,
+            # not introduced by this module). frame_cursor is preserved
+            # below as this sub-chunk's own `global_start_frame` metadata
+            # instead, for match-level bookkeeping.
+            start_frame_id=0,
             fps=clip_metadata.fps,
             num_frames=clip_metadata.num_frames,
             width=clip_metadata.width,
@@ -305,7 +323,6 @@ def _process_point_scene(
 
         total_bytes += chosen_bytes
         total_frames += clip_metadata.num_frames
-        frame_cursor += clip_metadata.num_frames
 
         sub_chunk_results.append(
             {
@@ -313,6 +330,10 @@ def _process_point_scene(
                 "t_start": cs,
                 "t_end": ce,
                 "num_frames": clip_metadata.num_frames,
+                # This sub-chunk's position in the whole match, for
+                # bookkeeping only -- NOT fed into the VideoChunk itself
+                # (see the start_frame_id=0 note above).
+                "global_start_frame": frame_cursor,
                 "semantic_bytes": semantic_bytes,
                 "fallback_bytes": fallback_bytes,
                 "fallback_cache_hit": fallback_cache_hit,
@@ -324,6 +345,7 @@ def _process_point_scene(
                 },
             }
         )
+        frame_cursor += clip_metadata.num_frames
 
     routings = {sc["routing"] for sc in sub_chunk_results}
     if not routings:

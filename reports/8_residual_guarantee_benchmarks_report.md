@@ -35,7 +35,11 @@ settings, GenAI backends) accrue here as dated entries.
   (net saving of +951,289 bytes vs naive bboxes). 
 - **Panorama quality ablation ran (2026-07-10):** Proved that increasing panorama quality
   (q70, q90) **DOES NOT PAY**. The bytes added to the semantic stream vastly exceed the
-  savings in the residual stream. Dynamic thresholding remains owed.
+  savings in the residual stream.
+- **Dynamic thresholding ablation ran (2026-07-10):** A threshold of 1.0 pays for itself 
+  (saves ~13KB with imperceptible VMAF drop), but higher thresholds hurt encoder entropy 
+  and quality.
+- Fixed a bug where `ResidualCalculator` ignored the threshold config.
 
 ## Findings log
 
@@ -249,6 +253,21 @@ full-resolution baseline).
 **Resolution:** Verdict is **DOES NOT PAY**. The residual video encoder is extremely efficient at resolving any lost background detail from the baseline (q50) panorama, making the massive upfront metadata cost of high-quality JPEGs a net negative for total bandwidth.
 **Paper impact:** Solves another open question for the ablation tables. Sticking with highly compressed background panoramas maximizes overall bandwidth savings without impacting final reconstructed video quality.
 
+### 2026-07-10 — Residual block threshold ignored (Bug Fix)
+**Problem:** During the first run of the dynamic thresholding ablation, all variants produced identical residual sizes (3,962,197 bytes).
+**Diagnosis:** The `EncoderPipeline` was not passing `residual-block-threshold` from the config into the `ResidualCalculator` constructor, so the kwarg defaulted to `0.0` and no blocks were ever gated.
+**Resolution:** Updated `ResidualCalculator` to fall back to `self.config.residual_block_threshold` if the constructor argument is omitted.
+**Paper impact:** Corrects the implementation, ensuring the dynamic thresholding experiments reflect reality.
+
+### 2026-07-10 — Dynamic Thresholding (Residual Block Gating) ablation
+**Problem/Question:** Does dropping low-activity residual blocks (average error below a threshold) save total bandwidth, and what is the optimal threshold vs quality trade-off?
+**Diagnosis/Evidence:** Ran a full-length matrix on `assets/real_tennis.mp4` across `residual-block-threshold` = [0.0, 1.0, 2.0, 3.0] (`outputs/benchmarks/ablation-dynamic-thresholding_20260711_001729`).
+- `thresh-1.0`: Saved **+12,988 bytes** of residual bandwidth. Minimal quality impact (VMAF: 82.873 -> 82.757). Verdict: **PAYS**.
+- `thresh-2.0`: Saved **+10,961 bytes**. (VMAF: 82.735). Verdict: **PAYS**, but diminishing returns compared to 1.0.
+- `thresh-3.0`: Paradoxically *increased* the residual size by 14KB (likely due to encoder entropy/blocking artifacts when aggressively zeroing out blocks), and notably dropped quality (VMAF: 82.507). Verdict: **DOES NOT PAY**.
+**Resolution:** A modest dynamic threshold of 1.0 is optimal. It cleanly zeros out noise without disrupting the H.264 residual encoder's macroblock entropy, effectively "paying for itself."
+**Paper impact:** Completes the Component Ablation Experiments for the paper! We can show that gently gating noise from the residual stream adds free bandwidth savings.
+
 ## Open questions & next steps
 
 1. ~~Trace and fix the panorama symmetry violation (encoder residual must be
@@ -262,5 +281,5 @@ full-resolution baseline).
    SSIM/VMAF.
 3. ~~First real ablation now that (1) and (2) are both fixed: racket
    heuristics vs naive bboxes ([7](7_implementation_plan.md) §2E)~~ **done (2026-07-10)** — see Findings log. ~~The
-   panorama-quality trade-off itself~~ **done (2026-07-10)** — see Findings log. Dynamic thresholding ablations remain owed as full-length (`num-frames:
-   null`) swept matrices with `evaluation-mode: [psnr, ssim, vmaf]`.
+   panorama-quality trade-off itself~~ **done (2026-07-10)** — see Findings log. ~~Dynamic thresholding ablations remain owed as full-length (`num-frames:
+   null`) swept matrices with `evaluation-mode: [psnr, ssim, vmaf]`.~~ **done (2026-07-10)** — see Findings log. All core ablations are complete!
