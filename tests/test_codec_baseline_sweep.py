@@ -24,6 +24,11 @@ def test_parse_crf_overrides() -> None:
     assert overrides == {"libsvtav1": [20, 30, 40], "libx265": [18, 28]}
 
 
+def test_parse_preset_overrides() -> None:
+    overrides = sweep._parse_preset_overrides(["libsvtav1=slow, veryslow", "libx265=medium"])
+    assert overrides == {"libsvtav1": ["slow", "veryslow"], "libx265": ["medium"]}
+
+
 def _fake_encode_fn(bytes_by_crf: dict[int, int]):
     def _fn(
         input_path: Path,
@@ -83,13 +88,39 @@ def test_run_sweep_default_crf_ladder_used_when_no_override(tmp_path: Path) -> N
         output_root,
         codecs=["libx265"],
         crf_overrides={},
-        preset_overrides={"libx265": "medium"},
+        preset_overrides={"libx265": ["medium"]},
         encode_fn=_fake_encode_fn(dict.fromkeys(sweep.DEFAULT_CRFS["libx265"], 1)),
         evaluate_fn=_fake_evaluate_fn(dict.fromkeys(sweep.DEFAULT_CRFS["libx265"], 40.0)),
     )
 
     assert [p.crf for p in points] == list(sweep.DEFAULT_CRFS["libx265"])
     assert all(p.preset == "medium" for p in points)
+
+
+def test_run_sweep_cross_products_multiple_presets_with_crf(tmp_path: Path) -> None:
+    input_path = tmp_path / "source.mp4"
+    input_path.write_bytes(b"\x00" * 10)
+    output_root = tmp_path / "sweep_out"
+
+    points = sweep.run_sweep(
+        input_path,
+        output_root,
+        codecs=["libsvtav1"],
+        crf_overrides={"libsvtav1": [20, 40]},
+        preset_overrides={"libsvtav1": ["slow", "veryslow"]},
+        encode_fn=_fake_encode_fn({20: 1, 40: 1}),
+        evaluate_fn=_fake_evaluate_fn({20: 40.0, 40: 30.0}),
+    )
+
+    assert len(points) == 4
+    assert {(p.preset, p.crf) for p in points} == {
+        ("slow", 20),
+        ("slow", 40),
+        ("veryslow", 20),
+        ("veryslow", 40),
+    }
+    # Every point gets a distinct output path (preset baked into the filename).
+    assert len({p.output_path for p in points}) == 4
 
 
 def test_load_pointstream_point_reads_run_summary(tmp_path: Path) -> None:
