@@ -778,29 +778,36 @@ Gemini-session plan — all three items touch the same file, so they land
 in one session to avoid a repeat of the clobbering incident.)*
 (a) ~~Finish making `VideoChunk.start_frame_id` numbering-only
 everywhere~~ **done (2026-07-11, later session)** — see resolution note
-below. (b) Wire the dead `residual_block_threshold` config
-knob (`src/shared/config.py:67` — read *nowhere* today) into
-`ResidualCalculator` via `build_residual_calculator`
-(`src/encoder/pipeline_builders.py:84`) and the orchestrator fallback
-constructor; this re-lands a fix that provably existed uncommitted on
-2026-07-10 night and was lost (see report 8's 2026-07-11 entry — the
-"threshold 1.0 pays" claim is invalidated until 5.6 re-runs it). (c) Add
-a `residual_pix_fmt` config key (default `"yuv444p"` for backward
-compatibility) replacing the hardcoded value at
-`src/encoder/residual_calculator.py:354`; the decoder needs no change
-(`iter_video_frames_ffmpeg` normalizes any format back to bgr24). Run the
-suite, commit.
+below. (b)(c) ~~Wire the dead `residual_block_threshold` config knob and
+add `residual_pix_fmt`~~ **done (2026-07-11)** — commit `3dea9ce`:
+`build_residual_calculator` (`src/encoder/pipeline_builders.py:84`) now
+forwards all five previously-dropped residual knobs
+(`residual_background_downscale`, `residual_batch_size`,
+`downscale_interpolation`, `residual_block_size`,
+`residual_block_threshold`), and `residual_pix_fmt` (new config key,
+default `"yuv444p"`) replaces the hardcode at
+`src/encoder/residual_calculator.py:354`. Regression test added
+(`tests/test_pipeline_builders.py::test_residual_tuning_knobs_are_forwarded_from_config`);
+full suite + ruff + mypy clean; CI green
+(run 29169921077). **5.0 fully closed** — 5.6 is now unblocked.
 *Session: quick interactive; no GPU.*
 
 **5.1 — Execution & profiling.**
-(a) Fix `execution-pool: tagged` (currently broken; prerequisite for any
-full-match-scale run). (b) Add per-stage `fps_throughput` and full config
-echo to `run_summary.json`. (c) Diagnose the GenAI decoder-vs-encoder
-2.16× cost asymmetry **including a bit-identity check** of server/client
-generated frames (symmetry tripwire). (d) Profile the FFmpeg paths (final
-4K write at 0.53 fps; residual-encode threading/preset propagation).
-(e) Per-scene panorama compute cache on the encoder (background is
-near-static within a point; 0.46 fps stage today).
+(a) ~~Fix `execution-pool: tagged`~~ **done (2026-07-11)** — commit
+`768cb5d`, landed from a spawned worktree
+(`.claude/worktrees/nifty-mestorf-07c943`): `TaggedMultiprocessPool` was
+being called with kwargs that didn't match its real single-`config=`
+constructor (silenced with `# type: ignore[call-arg]` instead of fixed),
+so `execution-pool: tagged` was completely non-functional (`TypeError`)
+since the call was written — now fixed and tests exercise the real
+objects instead of mocking around the bug. **Remaining, still open:**
+(b) per-stage `fps_throughput` + full config echo in `run_summary.json`.
+(c) diagnose the GenAI decoder-vs-encoder 2.16× cost asymmetry
+**including a bit-identity check** of server/client generated frames
+(symmetry tripwire). (d) profile the FFmpeg paths (final 4K write at
+0.53 fps; residual-encode threading/preset propagation). (e) per-scene
+panorama compute cache on the encoder (background is near-static within
+a point; 0.46 fps stage today).
 *Session: code + short pipeline-runner validation runs.*
 
 **5.2 — Resolution & framerate ladders → `tier_realtime`.**
@@ -868,9 +875,9 @@ schedule before 5.4's training occupies the GPU, or interleave.
 
 | # | Workstream | Agent / session | Isolation | Depends on | GPU |
 |---|---|---|---|---|---|
-| S1 | 5.0 residual-calculator fixes (a+b+c) | interactive main session (small, review-worthy diff) | main checkout — it owns the dirty file | — | no |
-| S2 | 5.6 residual-compression matrix | `pipeline-runner` | none (run-only, writes `outputs/benchmarks/`) | S1 merged | yes (~3 h) |
-| S3 | 5.1 execution & profiling (tagged pool, FPS metrics, 2 diagnoses, panorama compute cache) | `general-purpose` in an **isolated worktree**; short validation runs via `pipeline-runner` | worktree | S1 | brief |
+| S1 | ~~5.0 residual-calculator fixes (a+b+c)~~ **done (2026-07-11)** | interactive main session (small, review-worthy diff) | main checkout — it owns the dirty file | — | no |
+| S2 | 5.6 residual-compression matrix | `pipeline-runner` | none (run-only, writes `outputs/benchmarks/`) | S1 done — **unblocked** | yes (~3 h) |
+| S3 | 5.1 execution & profiling (**(a) tagged pool done 2026-07-11** — remaining: FPS metrics, 2 diagnoses, panorama compute cache) | `general-purpose` in an **isolated worktree**; short validation runs via `pipeline-runner` | worktree | S1 done | brief |
 | S4 | 5.3 background-layer ladder | `general-purpose` in an **isolated worktree** | worktree | S1 | brief |
 | S5 | 5.4 training protocol, then variant training | protocol: interactive; training: `pipeline-runner` | worktree for protocol code | S1 (protocol); GPU free (training) | yes (multi-day, owns GPU once started) |
 | S6 | 5.2 resolution/framerate knobs + `tier_realtime` | `general-purpose` in an isolated worktree | worktree | S3 merged (shared surfaces) | brief |
@@ -882,6 +889,28 @@ code-only work continues but real-run verification queues behind it.
 Process rules (from the G1-night clobbering): every parallel session works
 in an isolated worktree, commits early and often, and no two sessions may
 touch `src/encoder/residual_calculator.py` concurrently.
+
+**Worktree sweep (2026-07-11 night):** before spawning new S3/S4/S5
+sessions, swept all `.claude/worktrees/*` for unmerged work rather than
+assuming a clean slate. Found and landed one real gem:
+`agent-aa2b3e1a2a0fbcb8e` held a complete, tested, unmerged HNeRV
+baseline (commit `411c11b`) — cherry-picked onto main as `7047207` after
+re-verifying ruff/mypy/full pytest against current main (CI green, run
+29170256706); see report 9's 2026-07-11 findings entry for the trained
+result. `agent-ae1da0250adb4230e` (the FVD work, `c8f3025`) was already
+merged. Three worktrees (`cranky-robinson-6bbeb2`, `exciting-jones-5d660b`,
+`nifty-mestorf-07c943`) hold only stale uncommitted diffs that are
+no-ops against current main (their fixes already landed via other
+commits) — left alone, safe to disregard or garbage-collect later.
+**One worktree needs a human decision, left untouched:**
+`suspicious-blackwell-724748` has a substantial uncommitted diff (13
+files) removing the unused `RigidObjectPacket`/`object_tracker` concept
+end-to-end (`src/encoder/orchestrator.py`, `src/main.py`,
+`src/shared/schemas.py`, plus test fixtures) — looks like legitimate
+dead-code cleanup (real G1 runs already show
+`num_rigid_object_packets: 0` everywhere) but it's mid-work, stale
+against current main, and not this session's to finish or discard;
+flagged here rather than touched.
 
 ### Explicitly out of scope / decisions needed
 - **Multi-ControlNet**: stays deferred (report 7 §4) unless the Phase 4

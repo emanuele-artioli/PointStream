@@ -133,22 +133,32 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    above ([10](10_dataset_and_end_to_end_evaluation_report.md) §Phase 5):
    per-stage FPS profiling showed the GenAI pipeline at ~0.09 fps encode /
    ~0.06 fps decode at 4K (every stage 5–150× off real time), so speed is
-   attacked on three axes at once — per-stage efficiency (incl. two open
-   diagnoses: GenAI decode costing 2.16× encode, and a 0.53 fps decoder
-   FFmpeg write), spatial/temporal down-processing as Residual-Guarantee
-   layers (LCEVC-style), and concurrency (tagged pool). Workstreams, in
-   dependency order: **5.0** residual-calculator fixes (serial gate:
-   ~~the `start_frame_id` contract~~ **fixed 2026-07-11** (commit
-   `f25fc7b`, [10](10_dataset_and_end_to_end_evaluation_report.md) Phase
-   5.0(a)) — still open: wiring the dead `residual_block_threshold` config
-   knob and a new `residual_pix_fmt` key, absorbed 2026-07-11 from the
-   Gemini plan; same file) → parallel **5.1** execution & profiling, **5.3**
-   background-layer ladder (panorama-static / panorama+delta / ROI
-   background video), **5.4** gated G2 training campaign (train-split
-   probe set, successive halving across ControlNet/Animate-Anyone/SPADE —
-   survivors double as G3's GenAI speed ladder), **5.6**
-   residual-compression matrix (threshold × yuv444p/yuv420p/gray;
-   replaces the invalidated thresholding ablation,
+   attacked on three axes at once — per-stage efficiency, spatial/temporal
+   down-processing as Residual-Guarantee layers (LCEVC-style), and
+   concurrency (tagged pool). **5.0 fully closed same night**: the
+   `start_frame_id` contract (commit `f25fc7b`) and the dead
+   `residual_block_threshold`/new `residual_pix_fmt` wiring (commit
+   `3dea9ce`) are both done — **5.6 is now unblocked**. **5.1(a) also
+   closed**: `execution-pool: tagged` was calling
+   `TaggedMultiprocessPool`/`WorkerConfig` with kwargs that didn't match
+   their real constructors (silenced with `# type: ignore`, never fixed)
+   — fixed in commit `768cb5d`. **Bonus find while sweeping worktrees for
+   unmerged work before spawning new sessions:** a complete, tested HNeRV
+   learned-codec baseline (report 9) was sitting unmerged in a spawned
+   worktree — cherry-picked onto main as commit `7047207`, CI green. One
+   worktree (`suspicious-blackwell-724748`) holds a substantial
+   in-progress `RigidObjectPacket` dead-code removal, left untouched
+   pending a human decision (report 10 §Phase 5 session-table note).
+   Remaining workstreams, in dependency order: **5.1(b–e)** FPS metrics +
+   config echo, GenAI decode-vs-encode 2.16× cost-asymmetry diagnosis (+
+   bit-identity symmetry check), 0.53 fps FFmpeg-write diagnosis,
+   per-scene panorama cache → parallel with **5.3** background-layer
+   ladder (panorama-static / panorama+delta / ROI background video),
+   **5.4** gated G2 training campaign (train-split probe set, successive
+   halving across ControlNet/Animate-Anyone/SPADE — survivors double as
+   G3's GenAI speed ladder — protocol/harness only, not the real training
+   run), **5.6** residual-compression matrix (threshold ×
+   yuv444p/yuv420p/gray; replaces the invalidated thresholding ablation,
    [8](8_residual_guarantee_benchmarks_report.md) 2026-07-11 entry) →
    **5.2** resolution/framerate knobs + `tier_realtime` → **5.5**
    promoted Phase 3b harness = G3's per-component quality/FPS/bitrate
