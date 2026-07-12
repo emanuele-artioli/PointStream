@@ -154,10 +154,15 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    bit-identity symmetry check), 0.53 fps FFmpeg-write diagnosis,
    per-scene panorama cache → parallel with **5.3** background-layer
    ladder (panorama-static / panorama+delta / ROI background video),
-   **5.4** gated G2 training campaign (train-split probe set, successive
-   halving across ControlNet/Animate-Anyone/SPADE — survivors double as
-   G3's GenAI speed ladder — protocol/harness only, not the real training
-   run), **5.6** residual-compression matrix (threshold ×
+   **5.4** gated G2 training campaign — protocol/harness **done
+   (2026-07-12)**: `scripts/select_probe_set.py`, `scripts/eval_checkpoint.py`,
+   `scripts/train_campaign.py` (successive halving across
+   ControlNet/Pix2Pix/SPADE4Tennis; Animate-Anyone confirmed to have a
+   training script but not wired as a variant yet), `src/shared/lpips_metric.py`
+   (closes the LPIPS gap); validated via a <1-minute smoke test only — the
+   **real training run is still fully open**, gated on a human deciding to
+   spend the GPU-hours (report 10's 2026-07-12 findings entry). **5.6**
+   residual-compression matrix (threshold ×
    yuv444p/yuv420p/gray; replaces the invalidated thresholding ablation,
    [8](8_residual_guarantee_benchmarks_report.md) 2026-07-11 entry) →
    **5.2** resolution/framerate knobs + `tier_realtime` → **5.5**

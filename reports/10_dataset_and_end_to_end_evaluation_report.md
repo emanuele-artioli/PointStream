@@ -413,6 +413,106 @@ named in the methodology lock — only the LPIPS half of that pairing remains
 open. No G2 numbers exist yet (blocked on the retraining gate, unchanged by
 this entry); this closes the *tooling* gap, not a headline claim.
 
+### 2026-07-12 — Phase 5.4 protocol/harness built; G2 training campaign still gated
+
+**Scope note, up front:** this session built the protocol/harness only, per
+explicit instruction — **no real multi-hour/multi-day G2 training campaign
+was launched.** Only the shortest possible smoke case ran for real (below).
+A human still needs to decide when the real campaign is worth the GPU-hours.
+
+**Built:**
+- `scripts/select_probe_set.py` — deterministic (seeded) probe-clip sampler,
+  drawn only from the 5 training-split videos, round-robin across videos for
+  diversity. Writes a JSON manifest recording exactly which
+  video/scene/track/frame_ids were selected, and can materialize a
+  symlink-tree `--data-root` view (`--materialize-training-view`) that
+  excludes the selected tracks — a track-granularity second-level split, so
+  `scripts/train_{controlnet,pix2pix,spade4tennis}.py` never train on what
+  the probe set scores against. Validated for real against the actual
+  curated dataset: 10 clips selected across all 5 training videos (seed
+  `20260712`), and the materialized view was checked directly (`os.path
+  .exists`) to confirm all 10 excluded tracks are unreachable while an
+  unrelated track in the same video stays reachable.
+- `scripts/eval_checkpoint.py` — runs pix2pix/spade4tennis/controlnet
+  inference on a probe manifest's clips and scores PSNR/SSIM/VMAF/FVD(+LPIPS)
+  per clip (not concatenated across clips, so FVD's I3D window never
+  straddles a seam between unrelated clips), then appends one aggregate
+  JSONL record per (step, variant) — the cheap, on-disk curve the whole
+  workstream exists to provide.
+- `scripts/train_campaign.py` — successive-halving driver wrapping the 3
+  existing training entry points. **Exact rule:** each rung trains every
+  alive variant to a cumulative-epoch budget target (rung 0:
+  `--initial-epochs`; rung *n*: 2× rung *n-1*'s target), scores every
+  variant via `eval_checkpoint`, ranks by a composite score (per metric,
+  min-max normalize across variants present that rung, flip sign for
+  lower-is-better metrics FVD/LPIPS, average the metrics available per
+  variant — a metric only counts if ≥2 variants reported it), then keeps the
+  top `ceil(n_alive / 2)`. With the 3 default candidates this converges in 2
+  rungs. **Runs exactly one rung per invocation and stops by default**,
+  printing the ranking/survivors so a human reviews the probe-log curve
+  before authorizing the next (bigger) rung; `--auto-continue` opts into
+  unattended operation and is documented as being for an already-approved
+  campaign, not for validating the harness.
+  `verify_data_root_excludes_probe_set()` refuses to start training at all
+  if the given `--data-root` can reach any probe-set track, closing the loop
+  with `select_probe_set.py`'s exclusion. Animate-Anyone: confirmed a real
+  training script exists (`animate_anyone.scripts.train_stage_1`/`stage_2`,
+  installed from the vendored `moore-animateanyone` pip package; YAML-config
+  driven via `assets/animate-anyone/configs/`, needs a separate
+  `extract_meta_info.py` pre-pass) but is **not wired as a default variant**
+  this pass — documented in the module docstring for whoever picks it up,
+  rather than silently omitted.
+- `src/shared/lpips_metric.py` — closes the LPIPS gap flagged in the
+  2026-07-11 entry above (claimed done, verified false). **This is not the
+  real LPIPS** — no BAPPS-calibrated linear weights are available on this
+  host — it's an explicitly-labeled approximation (`lpips_vgg_uncalibrated`
+  key everywhere): uncalibrated L2 distance between VGG-19-bn feature maps at
+  the same 4 relu layers `train_spade4tennis.py`'s `VGG19PerceptualLoss`
+  already uses, reusing the same `assets/weights/vgg19-bn.pth`.
+
+**Bug found and fixed during real-data validation:** `compute_lpips_from_frames`
+initially ran frames through VGG at whatever resolution they arrived at, with
+no resize step (unlike `fvd.py`'s `I3D_FRAME_SIZE` convention) — against real
+`assets/real_tennis.mp4` (4K), this tried to allocate ~20 GiB for an early
+conv activation and OOM'd the GPU. Fixed by adding `LPIPS_FRAME_SIZE = 256`
+(applied to both reference and predicted frames before feature extraction)
+and batching `extract_features()` (default `batch_size=8`). Both LPIPS
+integration tests pass against real `assets/real_tennis.mp4` after the fix
+(~10 s). Recorded here as a reminder that "mirrors an existing pattern" isn't
+verified until it's actually run against real data at real resolution.
+
+**Smoke-test validation (the only real run this session performed):** a
+standalone tiny dataset (16 real frames from `alcaraz_ruud/scene_002/
+track_0021` as training data, 8 real frames from a disjoint
+`sinner_alcaraz/scene_012/track_0001` as the probe clip — different track
+entirely, so non-overlap holds by construction) driven through the real
+`scripts/train_campaign.py` CLI end to end: real `train_pix2pix.py` and
+real `train_spade4tennis.py` subprocesses (1 epoch each, `--batch-size 4`,
+`CUDA_VISIBLE_DEVICES=0` to stay off the GPU another session's benchmark
+matrix was saturating), real checkpoint saves, real `eval_checkpoint`
+inference + PSNR/SSIM/LPIPS scoring against the real probe frames, real
+ranking (composite scores 0.667/0.333, not a coincidental tie — PSNR favored
+spade4tennis, SSIM+LPIPS favored pix2pix), real pruning
+(`spade4tennis_lite` dropped, `pix2pix` survives to rung 1), and a real
+JSONL log + `campaign_state.json` on disk. **Wall-clock: ~40 s** for the
+full 2-variant rung (a separate earlier run without LPIPS took ~49 s; a
+convergence-detection re-invocation with no retraining took ~2 s). Also
+separately confirmed: `select_probe_set.py --materialize-training-view`
+against the real, full curated dataset (not the smoke dataset) as noted
+above. **VMAF/ControlNet were not exercised in the smoke run** (VMAF skipped
+for wall-clock; ControlNet needs a full SD1.5 diffusion sampling pass per
+frame and was left for whoever runs the real campaign) — both are
+implemented and unit-tested, just not smoke-run for real this session.
+**No real training campaign was launched** — every run above completes in
+under a minute and touches only a handful of frames.
+
+**Still open for whoever runs the real campaign:** wire Animate-Anyone as a
+4th variant (YAML templating for its config-driven training scripts); decide
+real per-rung epoch budgets and dataset scale (the smoke test's 16 frames
+say nothing about real convergence behavior); consider whether ControlNet's
+per-frame diffusion-sampling eval cost needs a faster inference-step count
+during training-time probing vs. the final quality check.
+
 ## Experiment-efficiency architecture
 
 The design that keeps the G3/G4 campaign linear instead of combinatorial:
@@ -834,14 +934,25 @@ architecture preference.
 *Session: parallel with 5.1 (mostly disjoint encoder files).*
 
 **5.4 — G2 training campaign (GPU long pole; start ASAP in parallel).**
-(a) Protocol first: fixed probe set from **training-split videos only**;
+(a) ~~Protocol first: fixed probe set from **training-split videos only**;
 checkpoint eval script scoring PSNR/SSIM/LPIPS on probes every N steps;
-curves written to disk for cheap monitoring. (b) Launch variants —
-ControlNet fine-tunes, Animate-Anyone, SPADE4Tennis — under successive
-halving: evaluate at early checkpoints, prune losers, promote survivors.
-(c) The surviving variants double as the GenAI speed-ladder rungs for G3
-(SPADE fast / reduced-step ControlNet mid / Animate-Anyone quality).
-Only after survivors stabilize: the G2 BD-rate headline run.
+curves written to disk for cheap monitoring.~~ **protocol/harness done
+(2026-07-12)** — see that findings entry:
+`scripts/select_probe_set.py` (probe set + non-overlap exclusion),
+`scripts/eval_checkpoint.py` (PSNR/SSIM/VMAF/FVD/LPIPS scoring → JSONL),
+`src/shared/lpips_metric.py` (uncalibrated-VGG LPIPS approximation, real gap
+now closed). (b) ~~Launch variants — ControlNet fine-tunes, Animate-Anyone,
+SPADE4Tennis — under successive halving: evaluate at early checkpoints,
+prune losers, promote survivors.~~ **driver built (2026-07-12)**:
+`scripts/train_campaign.py` wraps ControlNet/Pix2Pix/SPADE4Tennis (Animate-Anyone
+confirmed to have a training script but not wired as a variant yet — see
+findings entry) under successive halving, one rung per invocation with a
+human review gate by default. **Still fully open:** the real launch itself —
+per this workstream's explicit scope gate, no real multi-hour/multi-day
+campaign has been started; only a <1-minute smoke test validated the harness
+end to end. (c) The surviving variants double as the GenAI speed-ladder
+rungs for G3 (SPADE fast / reduced-step ControlNet mid / Animate-Anyone
+quality). Only after survivors stabilize: the G2 BD-rate headline run.
 *Session: protocol design interactive, then hand training to
 `pipeline-runner`; owns the GPU — 5.1/5.2 validation runs coordinate
 around it.*
