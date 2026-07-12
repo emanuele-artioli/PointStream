@@ -1,6 +1,6 @@
 # Dataset Curation & End-to-End Full-Match Evaluation — Report
 
-*Status: Active | Last updated: 2026-07-11 | Code: scripts/process_dataset.py, src/main.py (gaps: see §Findings)*
+*Status: Active | Last updated: 2026-07-12 | Code: scripts/process_dataset.py, src/main.py (gaps: see §Findings)*
 
 ## Scope
 
@@ -823,14 +823,68 @@ ball, cached panorama, `libx264 ultrafast`, no GenAI — completes
 `tier_fast`'s own stated real-time intent.
 *Session: after 5.1 merges (same surfaces); code + short validation runs.*
 
-**5.3 — Background-layer ladder.**
-Rungs: `panorama-static` (today) → `panorama+delta` (stateful panorama:
-full send once, per-scene deltas for scoreboard/crowd; identical state
-both sides keeps the guarantee) → `roi-video` (masked-actor low-bitrate
-background video, `addroi` ROI boost for umpire/ball-kids/scoreboard;
-needs libx264/x265 — libsvtav1 ignores ROI side data). Benchmark all
-rungs via `benchmark_matrix`; the pays-for-itself table decides, not
-architecture preference.
+**5.3 — Background-layer ladder.** ~~Rungs: `panorama-static` (today) →
+`panorama+delta` (stateful panorama: full send once, per-scene deltas for
+scoreboard/crowd; identical state both sides keeps the guarantee) →
+`roi-video` (masked-actor low-bitrate background video, `addroi` ROI boost
+for umpire/ball-kids/scoreboard; needs libx264/x265 — libsvtav1 ignores ROI
+side data). Benchmark all rungs via `benchmark_matrix`; the pays-for-itself
+table decides, not architecture preference.~~ **implemented (2026-07-12,
+isolated worktree `agent-a5f3d2600c1d479c3`):**
+- `panorama-static` is unchanged (rung 1, no code change).
+- `panorama-delta` (rung 2): `VideoChunk.scene_id` (new schema field, only
+  set by `match_orchestrator._process_point_scene`'s sub-chunk loop) lets
+  `EncoderPipeline` (`src/encoder/orchestrator.py`) track the last
+  reconstructed panorama per scene and, when
+  `background-layer: panorama-delta`, send a full panorama for a scene's
+  first sub-chunk and a diff-image delta (`round_trip_panorama_delta`,
+  `src/transport/panorama_encoder.py`) for later ones.
+  `SynthesisEngine._resolve_panorama_image` carries the matching decoder-side
+  scene cache so the client reconstructs `previous + diff` from the exact
+  same arithmetic. **Symmetry verified**: `tests/test_panorama_encoder.py::test_synthesis_engine_reconstructs_delta_chunk_bit_identically_to_encoder`
+  drives two independent `SynthesisEngine` instances (encoder-side and a
+  fresh "client" one) through a full-then-delta chunk pair and asserts
+  bit-identical reconstructed pixels; a companion test asserts a delta chunk
+  with no prior scene state raises instead of silently misbehaving.
+  Known limitation: the diff is carried in a uint8 image (±127 per channel
+  representable range) — fine for the intended small background drift
+  between sub-chunks of one point, not a general-purpose codec (documented
+  in `compute_panorama_delta`'s docstring, tested by
+  `test_compute_and_apply_panorama_delta_clips_large_jumps`). **Real payoff
+  is not measurable through the standard single-VideoChunk benchmark
+  harness** — see the caveat in `config/benchmarks/ablation_background_layer.yaml`
+  and report 8's dated entry below; it requires `run-mode: full_match`
+  (multi-scene), which doesn't support `evaluation-mode` yet.
+- `roi-video` (rung 3): `RoiVideoPanoramaEncoder`
+  (`src/transport/panorama_encoder.py`) encodes the panorama as a
+  single-frame `libx264` video with chained `addroi` filters over four fixed
+  fractional regions (scoreboard corner, umpire-chair band, two baseline
+  ball-kid corners — no court/net/scoreboard detector exists anywhere in
+  `src/`, verified by grep; this is a documented heuristic, not derived from
+  real detection). Always uses `libx264` regardless of the pipeline's
+  `ffmpeg-codec` (libsvtav1 has no ROI mechanism, same precedent as report
+  8's 2026-07-11 entry). Real bug found and fixed during validation: the
+  stitched panorama canvas is not guaranteed even-dimensioned (hit
+  3841×2190 against `assets/real_tennis.mp4`), and libx264+yuv420p requires
+  even width/height — `encode_bytes` now truncates by ≤1px/edge
+  deterministically before encoding, so encoder and (stateless, bytes-only)
+  decoder land on the identical cropped shape without needing extra state.
+- Config: `background-layer` (panorama-static/panorama-delta — roi-video is
+  selected via the existing `panorama-codec` knob), `panorama-roi-crf`,
+  `panorama-roi-preset` (`config/default.yaml`, `src/shared/config.py`).
+- Verified with real (non-mock) 3-frame runs against `assets/real_tennis.mp4`
+  (`execution-pool: inline`, `genai-backend: null`): `panorama-delta`
+  completes end-to-end (degenerates to a full send, as expected, no scene_id
+  in the single-chunk pipeline); `roi-video` completes end-to-end
+  (panorama sidecar 213,200 bytes, PSNR 24.25/SSIM 0.82, comparable to the
+  rung-1 numbers this report's other entries already established).
+- New spec `config/benchmarks/ablation_background_layer.yaml` (3 variants,
+  full-length, `evaluation-mode: [psnr, ssim, vmaf]`) — **not run as a full
+  sweep**: another session's 3-hour `ablation-residual-compression` matrix
+  was occupying the GPU/CPU at the time (per this workstream's own
+  GPU-scheduling rule below), so the full sweep is left as an explicit
+  next step rather than forced through. ruff/mypy/full fast pytest all
+  green throughout.
 *Session: parallel with 5.1 (mostly disjoint encoder files).*
 
 **5.4 — G2 training campaign (GPU long pole; start ASAP in parallel).**
@@ -880,7 +934,7 @@ lands.
 | S1 | ~~5.0 residual-calculator fixes (a+b+c)~~ **done (2026-07-11)** | interactive main session (small, review-worthy diff) | main checkout — it owns the dirty file | — | no |
 | S2 | ~~5.6 residual-compression matrix~~ **done (2026-07-11)** | `pipeline-runner` | none (run-only, writes `outputs/benchmarks/`) | S1 done | yes (~2.7 h, completed) |
 | S3 | 5.1 execution & profiling (**(a) tagged pool done 2026-07-11** — remaining: FPS metrics, 2 diagnoses, panorama compute cache) | `general-purpose` in an **isolated worktree**; short validation runs via `pipeline-runner` | worktree | S1 done | brief |
-| S4 | 5.3 background-layer ladder | `general-purpose` in an **isolated worktree** | worktree | S1 | brief |
+| S4 | ~~5.3 background-layer ladder~~ **done (2026-07-12)** | `general-purpose` in an **isolated worktree** | worktree | S1 | brief |
 | S5 | 5.4 training protocol, then variant training | protocol: interactive; training: `pipeline-runner` | worktree for protocol code | S1 (protocol); GPU free (training) | yes (multi-day, owns GPU once started) |
 | S6 | 5.2 resolution/framerate knobs + `tier_realtime` | `general-purpose` in an isolated worktree | worktree | S3 merged (shared surfaces) | brief |
 | S7 | 5.5 Phase 3b harness + G3 ladder run | `general-purpose` + `pipeline-runner` for sweeps | worktree | S3, S4, S6 merged | yes |

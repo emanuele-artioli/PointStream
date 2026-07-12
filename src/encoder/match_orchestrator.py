@@ -292,6 +292,12 @@ def _process_point_scene(
             num_frames=clip_metadata.num_frames,
             width=clip_metadata.width,
             height=clip_metadata.height,
+            # Background-layer ladder rung 2 (report 10 Phase 5.3): groups this
+            # scene's sub-chunks so EncoderPipeline can send a full panorama for
+            # chunk_idx=0 and deltas for chunk_idx>0 when
+            # config.background_layer == "panorama-delta". A no-op (both rungs
+            # send full panoramas) under the default panorama-static layer.
+            scene_id=f"scene{scene_idx:04d}",
         )
 
         encode_started = time.perf_counter()

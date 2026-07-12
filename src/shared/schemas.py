@@ -58,6 +58,14 @@ class VideoChunk(BaseModel):
     num_frames: int = Field(gt=0)
     width: int = Field(gt=0)
     height: int = Field(gt=0)
+    # Groups sub-chunks that belong to the same scene/point (report 10 Phase
+    # 5.3, "background-layer ladder"). Set by src.encoder.match_orchestrator
+    # for point-scene sub-chunks so the panorama+delta rung can tell "first
+    # sub-chunk of this scene" (send a full panorama) from "later sub-chunk,
+    # same scene" (send a delta against the scene's last panorama). None in
+    # the default single-VideoChunk pipeline, where there is only ever one
+    # chunk/scene, so panorama+delta always degenerates to a full send.
+    scene_id: str | None = None
 
 
 class SceneActor(BaseModel):
@@ -143,6 +151,16 @@ class PanoramaPacket(BaseModel):
     # DiskTransport when its configured codec+settings match `panorama_codec_id`.
     panorama_codec_bytes: bytes | None = None
     panorama_codec_id: str | None = None
+    # Background-layer ladder rung 2 ("panorama+delta", report 10 Phase 5.3):
+    # "full" means panorama_codec_bytes/panorama_image are the actual panorama
+    # (today's rung-1 behavior); "delta" means panorama_codec_bytes encodes a
+    # diff against the previous panorama sent for this VideoChunk.scene_id,
+    # and panorama_image is already the *reconstructed* current panorama (the
+    # encoder round-trips the delta before computing residuals against it --
+    # see src.transport.panorama_encoder.round_trip_panorama_delta). The
+    # decoder must perform the identical reconstruction from panorama_uri
+    # (see SynthesisEngine._resolve_panorama_image's scene cache).
+    panorama_mode: Literal["full", "delta"] = "full"
 
 
 class ActorPacket(BaseModel):

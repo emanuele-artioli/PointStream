@@ -75,6 +75,20 @@ class PointstreamConfig:
     panorama_jpeg_quality: int = 50
     panorama_png_compression: Optional[int] = None
 
+    # Background-layer ladder (report 10 Phase 5.3):
+    # "panorama-static" (default, rung 1): today's behavior, one full
+    #   panorama per chunk via `panorama_codec`.
+    # "panorama-delta" (rung 2): the first sub-chunk of a scene
+    #   (`VideoChunk.scene_id`) sends a full panorama; later sub-chunks of
+    #   the same scene send a delta against the previous one. No-op (same
+    #   bytes as rung 1) when scene_id is unset -- only
+    #   `src.encoder.match_orchestrator`'s point-scene sub-chunk loop sets it.
+    # "roi-video" (rung 3): still one image per chunk, but encoded via
+    #   `panorama_roi_*` (libx264 + addroi) instead of `panorama_codec`.
+    background_layer: str = "panorama-static"
+    panorama_roi_crf: Optional[int] = 30
+    panorama_roi_preset: Optional[str] = "veryfast"
+
     # Model and Dependencies
     allow_auto_model_download: bool = True
     postgen_segmenter_model: Optional[str] = None

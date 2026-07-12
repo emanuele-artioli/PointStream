@@ -14,6 +14,7 @@ from src.shared.dwpose_draw import draw_dwpose_canvas
 from src.shared.schemas import ActorPacket, EncodedChunkPayload
 from src.shared.tags import gpu_bound
 from src.shared.torch_dtype import is_cuda_device_usable, resolve_torch_dtype_for_device
+from src.transport.panorama_encoder import apply_panorama_delta, read_panorama_pixels_from_path
 
 
 @dataclass(frozen=True)
@@ -53,6 +54,14 @@ class SynthesisEngine:
         )
         self._set_global_seed(self.seed)
         self._genai_compositor = self._build_genai_compositor()
+        # Background-layer ladder rung 2 ("panorama+delta", report 10 Phase
+        # 5.3): last reconstructed panorama pixels per VideoChunk.scene_id,
+        # so a chunk whose panorama_mode is "delta" can be reconstructed as
+        # `previous + diff`. Mirrors EncoderPipeline._scene_panorama_state
+        # (src/encoder/orchestrator.py) -- both sides run this exact same
+        # arithmetic (src.transport.panorama_encoder.apply_panorama_delta),
+        # which is what keeps the Residual Guarantee intact for this rung.
+        self._scene_panorama_cache: dict[str, np.ndarray] = {}
 
     def _build_genai_compositor(self) -> DiffusersCompositor | None:
         enabled = bool(self.config and self.config.genai_backend)
@@ -87,14 +96,20 @@ class SynthesisEngine:
         return SynthesisResult(frames_bgr=composited_frames)
 
     def _resolve_panorama_image(self, payload: EncodedChunkPayload) -> np.ndarray:
+        scene_id = payload.chunk.scene_id
         panorama_pixels = payload.panorama.panorama_image
         if panorama_pixels is not None:
+            # In-memory path: the encoder pipeline already reconstructed these
+            # pixels (full or delta -- see EncoderPipeline.build_panorama_node)
+            # before computing the residual against them, so use them as-is.
             panorama_np = np.asarray(panorama_pixels, dtype=np.uint8)
             if panorama_np.ndim != 3 or panorama_np.shape[2] != 3:
                 raise ValueError(
                     "Invalid panorama image shape in payload: "
                     f"expected [H, W, 3], got {tuple(panorama_np.shape)}"
                 )
+            if scene_id is not None:
+                self._scene_panorama_cache[scene_id] = panorama_np
             return panorama_np
 
         panorama_path = Path(str(payload.panorama.panorama_uri))
@@ -104,10 +119,31 @@ class SynthesisEngine:
                 "Payload must include panorama_image pixels or a valid panorama_uri file."
             )
 
-        decoded_panorama = cv2.imread(str(panorama_path), cv2.IMREAD_COLOR)
-        if decoded_panorama is None or decoded_panorama.size == 0:
-            raise ValueError(f"Failed to decode panorama image from {panorama_path}")
-        return np.asarray(decoded_panorama, dtype=np.uint8)
+        # Post-transport path (the client/decoder): panorama_image was stripped
+        # by DiskTransport, so decode from the materialized sidecar file. For
+        # panorama_mode="full" that file already *is* the panorama (rung 1 and
+        # rung 3/roi-video); for "delta" (rung 2) the file holds a diff image
+        # that must be added to the last panorama reconstructed for this same
+        # scene_id -- the identical arithmetic the encoder used, so both sides
+        # derive byte-identical pixels (Residual Guarantee).
+        decoded = read_panorama_pixels_from_path(panorama_path)
+        if payload.panorama.panorama_mode == "delta":
+            if scene_id is None or scene_id not in self._scene_panorama_cache:
+                raise ValueError(
+                    f"Received panorama_mode='delta' for chunk '{payload.chunk.chunk_id}' "
+                    f"(scene_id={scene_id!r}) with no prior full panorama cached for that "
+                    "scene -- protocol violation: a scene's first sub-chunk must be 'full'."
+                )
+            reconstructed = apply_panorama_delta(
+                previous_bgr=self._scene_panorama_cache[scene_id],
+                diff_bgr=decoded,
+            )
+        else:
+            reconstructed = decoded
+
+        if scene_id is not None:
+            self._scene_panorama_cache[scene_id] = reconstructed
+        return reconstructed
 
     def _set_global_seed(self, seed: int) -> None:
         torch.manual_seed(seed)

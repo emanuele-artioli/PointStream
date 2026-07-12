@@ -149,12 +149,18 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    worktree (`suspicious-blackwell-724748`) holds a substantial
    in-progress `RigidObjectPacket` dead-code removal, left untouched
    pending a human decision (report 10 §Phase 5 session-table note).
+   **5.3 background-layer ladder done (2026-07-12, isolated worktree):**
+   `panorama-static`/`panorama-delta`/`roi-video` all implemented behind
+   `background-layer`/`panorama-codec`; panorama-delta's server/client
+   symmetry unit-tested bit-identical, roi-video real-run-verified (found
+   and fixed a real odd-canvas-dimension libx264 bug in the process). No
+   pays-for-itself verdict yet — full sweep and a `run-mode: full_match`
+   run (needed for panorama-delta specifically) both left as next steps;
+   see [8](8_residual_guarantee_benchmarks_report.md)'s 2026-07-12 entry.
    Remaining workstreams, in dependency order: **5.1(b–e)** FPS metrics +
    config echo, GenAI decode-vs-encode 2.16× cost-asymmetry diagnosis (+
    bit-identity symmetry check), 0.53 fps FFmpeg-write diagnosis,
-   per-scene panorama cache → parallel with **5.3** background-layer
-   ladder (panorama-static / panorama+delta / ROI background video),
-   **5.4** gated G2 training campaign (train-split probe set, successive
+   per-scene panorama cache, **5.4** gated G2 training campaign (train-split probe set, successive
    halving across ControlNet/Animate-Anyone/SPADE — survivors double as
    G3's GenAI speed ladder — protocol/harness only, not the real training
    run). **5.6 done (2026-07-11):** residual-compression matrix ran under

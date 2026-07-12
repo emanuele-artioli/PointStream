@@ -6,14 +6,17 @@ import shutil
 from time import perf_counter
 import logging
 
-import cv2
 import msgpack
 import numpy as np
 
 from src.shared.interfaces import BaseTransport
 from src.shared.schemas import EncodedChunkPayload, ResidualMode, SceneActorReference
 from src.shared.tags import cpu_bound
-from src.transport.panorama_encoder import BasePanoramaEncoder, build_panorama_encoder
+from src.transport.panorama_encoder import (
+    BasePanoramaEncoder,
+    build_panorama_encoder,
+    read_panorama_pixels_from_path,
+)
 
 _logger = logging.getLogger(__name__)
 
@@ -113,7 +116,15 @@ class DiskTransport(BaseTransport):
         """
         codec_bytes = payload.panorama.panorama_codec_bytes
         codec_id = payload.panorama.panorama_codec_id
-        if codec_bytes and codec_id == self._panorama_encoder.codec_id:
+        # Background-layer rung 2 (panorama+delta) suffixes the base codec_id with
+        # "+delta" (see EncoderPipeline.build_panorama_node) since the bytes are a
+        # diff image, not a full panorama, but they're still encoded through this
+        # exact base codec -- same trust rationale as the exact-match case below.
+        codec_matches = codec_id is not None and (
+            codec_id == self._panorama_encoder.codec_id
+            or codec_id == f"{self._panorama_encoder.codec_id}+delta"
+        )
+        if codec_bytes and codec_matches:
             # The encoder already round-tripped the panorama through this exact codec
             # to compute its residual; write those bytes verbatim so the client decodes
             # the identical sidecar (Residual Guarantee) instead of a re-encoded copy.
@@ -183,10 +194,7 @@ class DiskTransport(BaseTransport):
             frame_width = max(1, frame_width)
             return np.zeros((frame_height, frame_width, 3), dtype=np.uint8)
 
-        decoded = cv2.imread(str(source_path), cv2.IMREAD_COLOR)
-        if decoded is None or decoded.size == 0:
-            raise ValueError(f"Failed to decode panorama image from {source_path}")
-        return np.asarray(decoded, dtype=np.uint8)
+        return read_panorama_pixels_from_path(source_path)
 
     @cpu_bound
     def receive(self, chunk_id: str) -> EncodedChunkPayload:
