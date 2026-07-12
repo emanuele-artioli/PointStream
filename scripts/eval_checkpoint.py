@@ -99,14 +99,14 @@ def load_image_rgb01(path: Path, size: int) -> torch.Tensor:
 
     from src.shared.tennis_dataset import pad_to_square
 
-    img = Image.open(path)
+    img: Image.Image = Image.open(path)
     if img.mode == "RGBA":
         background = Image.new("RGBA", img.size, (0, 0, 0, 255))
         img = Image.alpha_composite(background, img).convert("RGB")
     else:
         img = img.convert("RGB")
     img = pad_to_square(img, fill=0)
-    img = img.resize((size, size), resample=Image.BILINEAR)
+    img = img.resize((size, size), resample=Image.Resampling.BILINEAR)
     array = np.asarray(img, dtype=np.float32) / 255.0  # Shape: [H, W, 3]
     return torch.from_numpy(array).permute(2, 0, 1).contiguous()  # Shape: [3, H, W]
 
