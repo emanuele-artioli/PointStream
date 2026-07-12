@@ -18,7 +18,7 @@ from src.encoder.actor_pipeline import (
 from src.encoder.reference_extractor import ReferenceExtractor
 from src.encoder.residual_calculator import ResidualCalculator
 from src.encoder.video_io import decode_video_to_tensor, probe_video_metadata
-from src.shared.schemas import EncodedChunkPayload, FrameState, ResidualPacket, VideoChunk
+from src.shared.schemas import EncodedChunkPayload, FrameState, PanoramaPacket, ResidualPacket, VideoChunk
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import cpu_bound, gpu_bound
 from src.transport.panorama_encoder import build_panorama_encoder, round_trip_panorama
@@ -102,6 +102,43 @@ class EncoderPipeline:
         self._last_dag_profile: dict[str, float] = {}
         self._last_actor_profile: dict[str, float] = {}
         self._last_residual_profile: dict[str, float] = {}
+        # Report 10 Phase 5.1(e): per-scene panorama cache. `None` (the
+        # default) disables caching entirely -- callers that never opt in via
+        # `set_scene_context()` keep today's per-chunk recompute behavior.
+        self._panorama_scene_key: Any | None = None
+        self._panorama_scene_cache: PanoramaPacket | None = None
+
+    def set_scene_context(self, scene_key: Any | None) -> None:
+        """Mark the start of a new scene for panorama caching.
+
+        Background is near-static within one tennis point/scene (this
+        project's constrained domain, see CLAUDE.md), so recomputing the
+        panorama via `BackgroundModeler` for every sub-chunk of the same
+        scene is wasted work (measured 0.46 fps stage in report 10 Phase 5).
+        `src.encoder.match_orchestrator` calls this once per scene, before
+        that scene's first sub-chunk `encode_chunk()`, with a key that is
+        stable within the scene and changes across scenes (e.g. the scene
+        index) -- changing the key invalidates the cache and the next
+        `encode_chunk()` recomputes via `BackgroundModeler` as before.
+        Passing `None` disables caching (the safe default for any caller
+        that does not opt in, e.g. the single-chunk `run_pipeline` path).
+
+        Residual Guarantee note: the cached object is exactly the
+        post-codec-round-trip `PanoramaPacket` this pipeline transmits (see
+        `build_panorama_node` below) -- reusing it verbatim for later
+        sub-chunks in the same scene never diverges from what the client
+        actually receives, because the cache *is* the transmitted bytes,
+        not a separate copy that could go stale. Reused sub-chunks may have
+        a different `num_frames`/`start_frame_id` than the sub-chunk that
+        produced the cache; `SynthesisEngine._reconstruct_background_frames`
+        already pads `homography_matrices` with identity transforms (or
+        truncates) to match the current chunk's own frame count, so this is
+        the same defensive path already exercised whenever a real payload's
+        homography count and chunk frame count merely happen to differ.
+        """
+        if scene_key != self._panorama_scene_key:
+            self._panorama_scene_key = scene_key
+            self._panorama_scene_cache = None
 
     def get_detailed_profile(self) -> dict[str, float]:
         profile = dict(self._last_dag_profile)
@@ -166,6 +203,15 @@ class EncoderPipeline:
         )
 
         def build_panorama_node(context, deps):
+            # Report 10 Phase 5.1(e): reuse the same scene's cached, already
+            # codec-round-tripped panorama packet instead of recomputing via
+            # BackgroundModeler. See `set_scene_context()`'s docstring for why
+            # this cannot diverge from what actually gets transmitted -- the
+            # cached object *is* the transmitted packet, just re-keyed to this
+            # sub-chunk's own chunk_id for bookkeeping.
+            if self._panorama_scene_key is not None and self._panorama_scene_cache is not None:
+                return self._panorama_scene_cache.model_copy(update={"chunk_id": deps["chunk"].chunk_id})
+
             panorama_packet = self._background_modeler.process(
                 chunk=deps["chunk"],
                 decoded_video_tensor=context.get("decoded_video_tensor"),
@@ -175,13 +221,16 @@ class EncoderPipeline:
             # client will actually reconstruct from, not the raw pre-codec pixels.
             panorama_np = np.asarray(panorama_packet.panorama_image, dtype=np.uint8)
             encoded_bytes, decoded_np = round_trip_panorama(panorama_np, self._panorama_encoder)
-            return panorama_packet.model_copy(
+            result = panorama_packet.model_copy(
                 update={
                     "panorama_image": decoded_np.tolist(),
                     "panorama_codec_bytes": encoded_bytes,
                     "panorama_codec_id": self._panorama_encoder.codec_id,
                 }
             )
+            if self._panorama_scene_key is not None:
+                self._panorama_scene_cache = result
+            return result
 
         setattr(
             build_panorama_node,
