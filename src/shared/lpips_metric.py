@@ -36,6 +36,12 @@ _LAYER_INDICES = [3, 8, 17, 26]  # relu1_1, relu2_1, relu3_1, relu4_1 (matches V
 _IMAGENET_MEAN = (0.485, 0.456, 0.406)
 _IMAGENET_STD = (0.229, 0.224, 0.225)
 
+# Frames are resized to this before hitting VGG (mirrors src/shared/fvd.py's
+# I3D_FRAME_SIZE convention). Without this, full-resolution (e.g. 4K) source
+# frames blow up VGG's early conv activations to tens of GiB and OOM the GPU
+# — this bit for real during this workstream's real-data validation.
+LPIPS_FRAME_SIZE = 256
+
 _MODEL_CACHE: dict[tuple[str, str], "VGGFeatureExtractor"] = {}
 
 
@@ -125,15 +131,21 @@ class VGGFeatureExtractor:
         return self._slices
 
     @torch.no_grad()
-    def extract_features(self, frames_rgb01: torch.Tensor) -> list[torch.Tensor]:  # pragma: no cover - requires real VGG weights
-        """frames_rgb01: [N, 3, H, W] in [0, 1] -> list of 4 relu feature maps."""
+    def extract_features(
+        self, frames_rgb01: torch.Tensor, batch_size: int = 8
+    ) -> list[torch.Tensor]:  # pragma: no cover - requires real VGG weights
+        """frames_rgb01: [N, 3, H, W] in [0, 1] -> list of 4 relu feature maps, processed in batches."""
         slices = self._load_model()
-        x = normalize_for_vgg(frames_rgb01.to(self._device))
-        outputs = []
-        for layer in slices:
-            x = layer(x)
-            outputs.append(x)
-        return outputs
+        per_batch_outputs: list[list[torch.Tensor]] = []
+        for start in range(0, frames_rgb01.shape[0], batch_size):
+            x = normalize_for_vgg(frames_rgb01[start : start + batch_size].to(self._device))
+            batch_features = []
+            for layer in slices:
+                x = layer(x)
+                batch_features.append(x)
+            per_batch_outputs.append(batch_features)
+        # Concatenate each layer's feature maps back across the batch dimension.
+        return [torch.cat([batch[layer_idx] for batch in per_batch_outputs], dim=0) for layer_idx in range(len(slices))]
 
 
 def get_cached_extractor(weights_path: Path | None = None, device: str | None = None) -> VGGFeatureExtractor:
@@ -168,13 +180,12 @@ def compute_lpips_from_frames(  # pragma: no cover - orchestrates real VGG infer
     if reference_frames_rgb01.shape[0] == 0:
         return {"lpips_vgg_uncalibrated": None, "note": "no frames to compare"}
 
-    if reference_frames_rgb01.shape[-2:] != predicted_frames_rgb01.shape[-2:]:
-        predicted_frames_rgb01 = F.interpolate(
-            predicted_frames_rgb01,
-            size=reference_frames_rgb01.shape[-2:],
-            mode="bilinear",
-            align_corners=False,
-        )
+    # Always resize to a fixed, small size before VGG (see LPIPS_FRAME_SIZE's
+    # docstring) — this also makes the reference/predicted resolution mismatch
+    # case a no-op special case rather than a separate code path.
+    target_size = (LPIPS_FRAME_SIZE, LPIPS_FRAME_SIZE)
+    reference_frames_rgb01 = F.interpolate(reference_frames_rgb01, size=target_size, mode="bilinear", align_corners=False)
+    predicted_frames_rgb01 = F.interpolate(predicted_frames_rgb01, size=target_size, mode="bilinear", align_corners=False)
 
     extractor = get_cached_extractor(weights_path=weights_path, device=device)
     features_ref = extractor.extract_features(reference_frames_rgb01)
