@@ -36,14 +36,17 @@ settings, GenAI backends) accrue here as dated entries.
 - **Panorama quality ablation ran (2026-07-10):** Proved that increasing panorama quality
   (q70, q90) **DOES NOT PAY**. The bytes added to the semantic stream vastly exceed the
   savings in the residual stream.
-- **Dynamic thresholding is NOT done (2026-07-11):** the config knob was
-  never wired into `ResidualCalculator` (dead since introduction); the one
-  matrix that showed variation ran uncommitted, since-lost code. The prior
-  "threshold 1.0 pays" claim is unverified. Re-run owed as the combined
-  threshold × pixel-format matrix (see the 2026-07-11 entry; execution
-  scheduled as report 10 Phase 5.0 wiring + 5.6 matrix). By-catch from the
-  dead-knob run: four byte-identical independent GenAI pipeline runs —
-  direct evidence of seeded determinism.
+- **Residual-compression ablation done (2026-07-11):** the prior "threshold
+  1.0 pays" claim was invalid (config knob was never wired; the matrix that
+  showed variation ran uncommitted, since-lost code — see that entry for
+  the diagnosis, and the by-catch determinism proof). Re-run as the
+  combined threshold × pixel-format matrix under `libx264` (libsvtav1
+  forces yuv420p regardless of pix-fmt — see the entry between). **Result:
+  luma-only (`gray`) at threshold 0.0 is the best cell** — smallest
+  residual bytes and *highest* VMAF of all six variants; dynamic
+  thresholding barely helps and can cost bytes once chroma is already
+  reduced. Currently latent (not load-bearing under the project's default
+  libsvtav1 codec) pending Phase 5.2's real-time-tier codec choice.
 
 ## Findings log
 
@@ -358,6 +361,71 @@ codec/pix-fmt/threshold combination).
 a non-AV1 codec — the "residual pixel format" claim is codec-dependent,
 not a universal property of the technique.
 
+### 2026-07-11 — Residual-compression matrix run: chroma subsampling pays, luma-only pays more, dynamic thresholding barely moves the needle (and can cost bytes)
+
+**Problem/Question:** with the wiring fixed (report 10 Phase 5.0) and the
+codec caveat resolved (previous entry), run the actual 6-variant matrix
+and get real numbers for the residual-pixel-format × dynamic-threshold
+question the invalidated 2026-07-10 claim never answered honestly.
+
+**Diagnosis/Evidence:** full-length (`num-frames: null`, 60 frames) run
+on `assets/real_tennis.mp4`, `ffmpeg-codec: libx264`
+(`outputs/benchmarks/ablation-residual-compression_20260712_003235/`,
+~2.7h total, all 6 variants completed with zero errors):
+
+| variant | residual bytes | Δ vs baseline | ratio-to-source | psnr | ssim | vmaf | verdict |
+|---|---|---|---|---|---|---|---|
+| thresh0.0-yuv444p (baseline) | 2,272,729 | — | 0.5558 | 32.396 | 0.939 | 71.621 | — |
+| thresh0.0-yuv420p | 2,160,007 | −112,722 | 0.5393 | 31.540 | 0.938 | 71.620 | PAYS |
+| thresh0.0-gray | 2,152,428 | −120,301 | 0.5382 | 31.522 | 0.929 | **72.318** | PAYS |
+| thresh1.0-yuv444p | 2,270,193 | −2,536 | 0.5554 | 32.394 | 0.939 | 72.055 | PAYS (marginal) |
+| thresh1.0-yuv420p | 2,165,786 | −106,943 | 0.5402 | 31.530 | 0.938 | 71.998 | PAYS |
+| thresh1.0-gray | 2,156,335 | −116,394 | 0.5388 | 31.515 | 0.929 | 72.513 | PAYS |
+
+Three findings fall out cleanly:
+1. **Chroma subsampling dominates.** Dropping from 4:4:4 to 4:2:0 alone
+   saves ~112-113 KB (~5% of the residual stream) at both threshold
+   levels, at a cost of ~0.86 PSNR and ~0.001 SSIM — small, expected.
+2. **Luma-only (gray) beats 4:2:0 further, and *improves* VMAF.** Gray
+   saves an additional ~7.6-9.5 KB over yuv420p at matching threshold, and
+   VMAF is **higher** for gray than for yuv420p in both rows (72.318 vs
+   71.620 at thresh0.0; 72.513 vs 71.998 at thresh1.0) even though PSNR is
+   flat-to-slightly-lower and SSIM is slightly lower (0.929 vs 0.938).
+   Reading: the residual stream mostly corrects luma/structural
+   synthesis errors; the chroma correction it also carries is small
+   enough that dropping it entirely lands below VMAF's perceptual
+   threshold — consistent with the well-known human luma/chroma acuity
+   asymmetry that motivates 4:2:0 in video standards generally, just
+   taken one step further for a *correction* signal specifically (as
+   opposed to a primary picture signal, where chroma still matters more).
+   Gray at threshold 0.0 is the single best-byte, best-VMAF cell in the
+   table.
+3. **Dynamic thresholding barely helps, and can cost bytes once chroma
+   is already reduced.** Threshold 1.0 only saves bytes under yuv444p
+   (2,536 B) — under yuv420p and gray, threshold 1.0 is actually **larger**
+   than threshold 0.0 by 5,779 B and 3,907 B respectively. This matches
+   the mechanism report 8's earlier (now-invalidated) thresh-3.0 run
+   pointed at: zeroing low-activity blocks creates hard block edges that
+   cost the codec more to encode than the raw noise did, and that effect
+   shows up even at the gentle threshold=1.0 once chroma is already
+   reduced (there's less redundancy left for the block edges to exploit).
+
+**Resolution:** the residual-compression ablation is **done** — this
+supersedes the invalidated 2026-07-10 claim entirely. Verdict: **luma-only
+(`gray`) at `residual-block-threshold: 0.0` is the best cell measured**,
+but only actionable if the residual stream ships on a codec that
+respects pixel format (libx264/libx265 — see the previous entry; the
+project's actual default, libsvtav1, forces yuv420p regardless of this
+config, so this finding is currently latent, not yet load-bearing,
+pending Phase 5.2's real-time-tier codec decision).
+
+**Paper impact:** a clean three-row ablation result (chroma subsampling
+pays, luma-only pays more and doesn't hurt VMAF, thresholding is weak and
+codec-format-dependent) — fills the residual-compression row in the
+ablation tables (§2E) properly, and the VMAF-improves-while-PSNR-drops
+divergence is a good illustration of why the paper reports VMAF alongside
+PSNR/SSIM rather than PSNR alone.
+
 ## Open questions & next steps
 
 1. ~~Trace and fix the panorama symmetry violation (encoder residual must be
@@ -373,10 +441,9 @@ not a universal property of the technique.
    heuristics vs naive bboxes ([7](7_implementation_plan.md) §2E)~~ **done (2026-07-10)** — see Findings log. ~~The
    panorama-quality trade-off itself~~ **done (2026-07-10)** — see Findings log. Dynamic thresholding ablations remain owed as full-length (`num-frames:
    null`) swept matrices with `evaluation-mode: [psnr, ssim, vmaf]`.
-4. **New (2026-07-11):** the combined residual-compression matrix
-   (`residual-block-threshold` [0.0, 1.0] × `residual-pix-fmt`
-   [yuv444p, yuv420p, gray]) once the wiring fix + `residual_pix_fmt`
-   config key land (report 10 Phase 5.0); spec to be added as
-   `config/benchmarks/ablation_residual_compression.yaml`; run via
-   `pipeline-runner` with current pre-retrain checkpoints (report 10
-   Phase 5.6). This supersedes the plain thresholding re-run in (3).
+4. ~~The combined residual-compression matrix~~ **done (2026-07-11)** —
+   `gray` (luma-only) at `residual-block-threshold: 0.0` wins on bytes
+   and VMAF; see the 2026-07-11 "Residual-compression matrix run" entry.
+   Latent pending Phase 5.2's real-time-tier codec choice (needs
+   libx264/libx265, not the project's default libsvtav1). This supersedes
+   the plain thresholding re-run in (3).

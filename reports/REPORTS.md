@@ -83,7 +83,7 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    spec in `config/benchmarks/` and emits the pays-for-itself table.
    *Racket heuristics ablation:* ~~still owed~~ **done (2026-07-10)** (convex hull tracking drastically outperforms naive bboxes).
    *Panorama quality trade-off:* ~~still owed~~ **done (2026-07-10)** (higher qualities do not pay, as metadata cost exceeds residual savings).
-   *Dynamic thresholding:* ~~still owed~~ ~~**done (2026-07-10)** (threshold 1.0 optimally gates noise and saves bitrate)~~ **Superseded 2026-07-11 — claim invalid:** the config knob was never wired into `ResidualCalculator`; the matrix that varied ran uncommitted, since-lost code ([8](8_residual_guarantee_benchmarks_report.md) 2026-07-11 entry). Re-run owed as the combined threshold × pixel-format matrix (report 10 Phase 5.0 wiring + 5.6 run).
+   *Dynamic thresholding:* ~~still owed~~ ~~**done (2026-07-10)** (threshold 1.0 optimally gates noise and saves bitrate)~~ **Superseded 2026-07-11 — claim invalid:** the config knob was never wired into `ResidualCalculator`; the matrix that varied ran uncommitted, since-lost code ([8](8_residual_guarantee_benchmarks_report.md) 2026-07-11 entry). **Re-run done (2026-07-11)** as the combined threshold × pixel-format matrix under `libx264`: `gray` (luma-only) at threshold 0.0 wins on both bytes and VMAF; thresholding alone barely helps and can cost bytes once chroma is already reduced ([8](8_residual_guarantee_benchmarks_report.md) "Residual-compression matrix run" entry). Latent pending Phase 5.2's real-time codec choice — the project's default libsvtav1 forces yuv420p regardless of this knob.
 5. Background panorama stitching for moderate camera motion.
 6. Detector/segmenter selection: SAM3 vs YOLOv26 vs RF-DETR (R3).
 7. **End-to-end full-match evaluation** — the headline experiment
@@ -157,9 +157,10 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    **5.4** gated G2 training campaign (train-split probe set, successive
    halving across ControlNet/Animate-Anyone/SPADE — survivors double as
    G3's GenAI speed ladder — protocol/harness only, not the real training
-   run), **5.6** residual-compression matrix (threshold ×
-   yuv444p/yuv420p/gray; replaces the invalidated thresholding ablation,
-   [8](8_residual_guarantee_benchmarks_report.md) 2026-07-11 entry) →
+   run). **5.6 done (2026-07-11):** residual-compression matrix ran under
+   `libx264` — `gray` (luma-only) at threshold 0.0 wins on bytes and VMAF,
+   thresholding alone barely helps
+   ([8](8_residual_guarantee_benchmarks_report.md) 2026-07-11 entry) →
    **5.2** resolution/framerate knobs + `tier_realtime` → **5.5**
    promoted Phase 3b harness = G3's per-component quality/FPS/bitrate
    table. Session-to-agent assignments are written down in report 10

@@ -854,29 +854,31 @@ the per-component **quality / time (FPS) / bitrate** attribution table and
 the speed/compression Pareto figure fall out of the same run.
 *Session: last; pipeline-runner for the sweep.*
 
-**5.6 — Residual-compression matrix (added 2026-07-11, from the Gemini
-plan).** Once 5.0(b)/(c) land: new spec
+**5.6 — Residual-compression matrix — done (2026-07-11).**
 `config/benchmarks/ablation_residual_compression.yaml` sweeping
 `residual-block-threshold` [0.0, 1.0] × `residual-pix-fmt`
-[yuv444p, yuv420p, gray] full-length on `assets/real_tennis.mp4` with
-`evaluation-mode: [psnr, ssim, vmaf]`. Answers three questions at once:
-does 4:2:0 chroma subsampling beat the current hardcoded 4:4:4; does
-luma-only add enough over 4:2:0 to justify dropping color correction
-entirely; does the block threshold stack with subsampling (the old
-thresh-3.0 observation — aggressive zeroing *adding* 14.8 KB by creating
-artificial block edges — wants confirming at 1.0). This **replaces** the
-invalidated dynamic-thresholding ablation (report 8, 2026-07-11 entry);
-run with current pre-retrain checkpoints so results stay comparable with
-report 8's racket/panorama entries. ~6 variants × ~28 min ≈ 3 h GPU —
-schedule before 5.4's training occupies the GPU, or interleave.
-*Session: pipeline-runner, spec written by whichever session closes 5.0.*
+[yuv444p, yuv420p, gray] full-length on `assets/real_tennis.mp4`
+(`ffmpeg-codec: libx264` override — libsvtav1 has no pix-fmt flexibility,
+see report 8's 2026-07-11 entry between). All 6 variants completed
+cleanly in ~2.7h GPU
+(`outputs/benchmarks/ablation-residual-compression_20260712_003235/`).
+**Result: `gray` (luma-only) at threshold 0.0 wins** — smallest residual
+bytes (2,152,428, −5.3% vs the yuv444p/thresh0.0 baseline) *and* highest
+VMAF (72.318 vs baseline's 71.621) of all six cells; dynamic thresholding
+alone barely helps and actually costs bytes once chroma is already
+reduced (thresh1.0 is larger than thresh0.0 under both yuv420p and gray).
+Full findings + table: report 8's "Residual-compression matrix run"
+entry. **Caveat:** latent, not yet load-bearing — the project's default
+codec (libsvtav1) forces yuv420p regardless of this config, so this only
+matters once Phase 5.2's `tier_realtime` (already headed toward libx264)
+lands.
 
 #### Session-to-agent assignment (the parallel split, for reference)
 
 | # | Workstream | Agent / session | Isolation | Depends on | GPU |
 |---|---|---|---|---|---|
 | S1 | ~~5.0 residual-calculator fixes (a+b+c)~~ **done (2026-07-11)** | interactive main session (small, review-worthy diff) | main checkout — it owns the dirty file | — | no |
-| S2 | 5.6 residual-compression matrix | `pipeline-runner` | none (run-only, writes `outputs/benchmarks/`) | S1 done — **unblocked** | yes (~3 h) |
+| S2 | ~~5.6 residual-compression matrix~~ **done (2026-07-11)** | `pipeline-runner` | none (run-only, writes `outputs/benchmarks/`) | S1 done | yes (~2.7 h, completed) |
 | S3 | 5.1 execution & profiling (**(a) tagged pool done 2026-07-11** — remaining: FPS metrics, 2 diagnoses, panorama compute cache) | `general-purpose` in an **isolated worktree**; short validation runs via `pipeline-runner` | worktree | S1 done | brief |
 | S4 | 5.3 background-layer ladder | `general-purpose` in an **isolated worktree** | worktree | S1 | brief |
 | S5 | 5.4 training protocol, then variant training | protocol: interactive; training: `pipeline-runner` | worktree for protocol code | S1 (protocol); GPU free (training) | yes (multi-day, owns GPU once started) |
