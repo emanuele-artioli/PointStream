@@ -216,6 +216,13 @@ class TestEncodeFullMatch:
         global_starts = [sc["global_start_frame"] for s in scenes if s["sub_chunks"] for sc in s["sub_chunks"]]
         assert global_starts == sorted(global_starts)  # monotonically non-decreasing
 
+        # Background-layer ladder rung 2 (report 10 Phase 5.3): every
+        # sub-chunk of the same scene must carry the same scene_id (so
+        # EncoderPipeline's panorama-delta state groups them), and different
+        # scenes must get different scene_ids. scene0 has 2 sub-chunks,
+        # scene2 has 1.
+        assert [c.scene_id for c in encoded_chunks] == ["scene0000", "scene0000", "scene0002"]
+
     def test_second_run_on_same_video_hits_the_anchor_cache(
         self, monkeypatch: pytest.MonkeyPatch, tiny_source_video: Path, tmp_path: Path
     ) -> None:

@@ -21,7 +21,11 @@ from src.encoder.video_io import decode_video_to_tensor, probe_video_metadata
 from src.shared.schemas import EncodedChunkPayload, FrameState, ResidualPacket, VideoChunk
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import cpu_bound, gpu_bound
-from src.transport.panorama_encoder import build_panorama_encoder, round_trip_panorama
+from src.transport.panorama_encoder import (
+    build_panorama_encoder,
+    round_trip_panorama,
+    round_trip_panorama_delta,
+)
 
 
 class _StreamingActorBundle:
@@ -98,6 +102,13 @@ class EncoderPipeline:
         self._ball_extractor = ball_extractor or BallExtractor()
         self._reference_extractor = reference_extractor or ReferenceExtractor()
         self._residual_calculator = residual_calculator or ResidualCalculator(config=self.config, synthesis_engine=SynthesisEngine(config=self.config))
+        # Background-layer ladder rung 2 ("panorama+delta", report 10 Phase
+        # 5.3): last reconstructed (decoded) panorama + its codec_id per
+        # VideoChunk.scene_id, so a later sub-chunk of the same scene can be
+        # sent as a delta against it instead of a fresh full panorama. Keyed
+        # by scene_id, not chunk_id, and grows for the lifetime of this
+        # EncoderPipeline instance (one per match in match_orchestrator).
+        self._scene_panorama_state: dict[str, tuple[np.ndarray, str]] = {}
         self._register_nodes()
         self._last_dag_profile: dict[str, float] = {}
         self._last_actor_profile: dict[str, float] = {}
@@ -166,20 +177,49 @@ class EncoderPipeline:
         )
 
         def build_panorama_node(context, deps):
+            chunk = deps["chunk"]
             panorama_packet = self._background_modeler.process(
-                chunk=deps["chunk"],
+                chunk=chunk,
                 decoded_video_tensor=context.get("decoded_video_tensor"),
                 frame_states=None,
             )
             # Residual Guarantee: synthesize against the codec-decoded panorama the
             # client will actually reconstruct from, not the raw pre-codec pixels.
             panorama_np = np.asarray(panorama_packet.panorama_image, dtype=np.uint8)
-            encoded_bytes, decoded_np = round_trip_panorama(panorama_np, self._panorama_encoder)
+
+            background_layer = str(
+                getattr(self.config, "background_layer", "panorama-static") or "panorama-static"
+            ).strip().lower()
+            scene_id = chunk.scene_id
+            previous_state = self._scene_panorama_state.get(scene_id) if scene_id else None
+
+            if background_layer == "panorama-delta" and scene_id is not None and previous_state is not None:
+                # Not the scene's first sub-chunk: send a delta against the last
+                # panorama sent for this scene instead of a fresh full one.
+                previous_np, _previous_codec_id = previous_state
+                encoded_bytes, decoded_np = round_trip_panorama_delta(
+                    current_bgr=panorama_np,
+                    previous_bgr=previous_np,
+                    encoder=self._panorama_encoder,
+                )
+                codec_id = f"{self._panorama_encoder.codec_id}+delta"
+                panorama_mode = "delta"
+            else:
+                # Rung 1 (panorama-static) or this scene's first sub-chunk under
+                # panorama-delta: send the full panorama, same as today.
+                encoded_bytes, decoded_np = round_trip_panorama(panorama_np, self._panorama_encoder)
+                codec_id = self._panorama_encoder.codec_id
+                panorama_mode = "full"
+
+            if scene_id is not None:
+                self._scene_panorama_state[scene_id] = (decoded_np, codec_id)
+
             return panorama_packet.model_copy(
                 update={
                     "panorama_image": decoded_np.tolist(),
                     "panorama_codec_bytes": encoded_bytes,
-                    "panorama_codec_id": self._panorama_encoder.codec_id,
+                    "panorama_codec_id": codec_id,
+                    "panorama_mode": panorama_mode,
                 }
             )
 

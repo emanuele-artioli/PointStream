@@ -63,9 +63,18 @@ seed: 1337                            # Deterministic seed for synthesis and Gen
 # ============================================================================
 gpu-dtype: fp16                       # GPU compute dtype: fp16, fp32, bf16, fp8_e4m3fn, fp8_e5m2
 panorama-warp-batch-size: null        # Batch size for panorama warp operations
-panorama-codec: jpeg                  # Panorama codec: jpeg or png
+panorama-codec: jpeg                  # Panorama codec: jpeg, png, or roi-video
 panorama-jpeg-quality: 50             # JPEG quality when --panorama-codec=jpeg
 panorama-png-compression: null        # PNG compression level when --panorama-codec=png
+background-layer: panorama-static     # Background-layer ladder (report 10 5.3): panorama-static
+                                       # (rung 1, today's one-JPEG-per-chunk), panorama-delta (rung 2,
+                                       # full panorama once per scene then deltas for later sub-chunks
+                                       # of that scene -- no-op outside run-mode: full_match, which is
+                                       # the only place VideoChunk.scene_id is set), or roi-video
+                                       # (rung 3, libx264+addroi instead of --panorama-codec).
+panorama-roi-crf: 30                  # CRF for --background-layer=roi-video (always libx264, not
+                                       # --ffmpeg-codec -- libsvtav1 has no addroi equivalent)
+panorama-roi-preset: veryfast         # libx264 preset for --background-layer=roi-video
 
 # ============================================================================
 # Model and Dependencies

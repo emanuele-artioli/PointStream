@@ -1,0 +1,39 @@
+# Background-layer ladder (report 10 Phase 5.3): panorama-static (rung 1,
+# today's one-JPEG-per-chunk) vs panorama-delta (rung 2, full panorama once
+# per scene + deltas for later sub-chunks of that scene) vs roi-video (rung 3,
+# libx264+addroi instead of a JPEG still image).
+#
+# Caveat (read before trusting the panorama-delta row): this spec runs
+# through the standard single-VideoChunk pipeline (src/main.py's default
+# run-mode: chunk), where the whole input is exactly one VideoChunk/scene, so
+# there is only ever one panorama send total. VideoChunk.scene_id (the field
+# panorama-delta keys its state on) is only ever set by
+# src.encoder.match_orchestrator's point-scene sub-chunk loop (run-mode:
+# full_match), which does not support evaluation-mode (psnr/ssim/vmaf) yet
+# (see src/main.py's run_cli). So panorama-delta is expected to produce
+# byte-identical output to panorama-static here -- that is the correct,
+# honest result for this harness, not a bug. Its real symmetry/byte-savings
+# behavior is unit-tested directly (tests/test_panorama_encoder.py) and its
+# real-world payoff requires a multi-scene full_match run, left as a
+# follow-up (see report 10 Phase 5.3 and report 8's dated findings entry).
+name: ablation-background-layer
+input: assets/real_tennis.mp4
+base-config: config/default.yaml
+common-overrides:
+  num-frames: null
+  evaluation-mode: [psnr, ssim, vmaf]
+variants:
+  - name: panorama-static
+    baseline: true
+    overrides:
+      background-layer: panorama-static
+      panorama-codec: jpeg
+  - name: panorama-delta
+    overrides:
+      background-layer: panorama-delta
+      panorama-codec: jpeg
+  - name: roi-video
+    overrides:
+      panorama-codec: roi-video
+      panorama-roi-crf: 30
+      panorama-roi-preset: veryfast
