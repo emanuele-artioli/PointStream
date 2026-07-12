@@ -175,14 +175,19 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    true current panorama each sub-chunk to diff correctly) — otherwise the
    cache would have silently made the delta rung a permanent no-op. See
    report 10's 2026-07-12 findings entries for both workstreams.
-   Remaining workstreams, in dependency order: **5.4** gated G2 training
-   campaign (train-split probe set, successive
-   halving across ControlNet/Animate-Anyone/SPADE — survivors double as
-   G3's GenAI speed ladder — protocol/harness only, not the real training
-   run). **5.6 done (2026-07-11):** residual-compression matrix ran under
-   `libx264` — `gray` (luma-only) at threshold 0.0 wins on bytes and VMAF,
-   thresholding alone barely helps
-   ([8](8_residual_guarantee_benchmarks_report.md) 2026-07-11 entry) →
+   **5.4 protocol/harness done (2026-07-12, third isolated worktree)** —
+   `scripts/select_probe_set.py`, `scripts/eval_checkpoint.py`,
+   `scripts/train_campaign.py` (successive halving across
+   ControlNet/Pix2Pix/SPADE4Tennis; Animate-Anyone confirmed to have a
+   training script but not wired as a variant yet), `src/shared/lpips_metric.py`
+   (closes the LPIPS gap); validated via a <1-minute smoke test only — the
+   **real training run is still fully open**, gated on a human deciding to
+   spend the GPU-hours (report 10's 2026-07-12 findings entry). **5.6 done
+   (2026-07-11):** residual-compression matrix ran under `libx264` —
+   `gray` (luma-only) at threshold 0.0 wins on bytes and VMAF, thresholding
+   alone barely helps
+   ([8](8_residual_guarantee_benchmarks_report.md) 2026-07-11 entry).
+   Remaining workstreams, in dependency order:
    **5.2** resolution/framerate knobs + `tier_realtime` → **5.5**
    promoted Phase 3b harness = G3's per-component quality/FPS/bitrate
    table. Session-to-agent assignments are written down in report 10
