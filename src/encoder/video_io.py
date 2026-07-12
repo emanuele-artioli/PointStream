@@ -198,6 +198,14 @@ def encode_video_frames_ffmpeg(
         "-an",
         "-c:v",
         resolved_codec,
+        # Report 10 Phase 5.1(d): let ffmpeg auto-detect the encoder thread
+        # count instead of leaving it unset. Measured harmless-but-mostly-moot
+        # for libsvtav1 (SVT-AV1 already self-parallelizes across all logical
+        # cores independently of this AVOption), but it is a real win for
+        # thread-count-sensitive codecs (e.g. libx264/libx265) used by the
+        # fallback/anchor encode path, so it stays on unconditionally.
+        "-threads",
+        "0",
     ]
     if normalized_preset is not None:
         ffmpeg_cmd.extend(["-preset", normalized_preset])

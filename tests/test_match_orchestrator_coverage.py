@@ -31,7 +31,11 @@ class _FakeEncoderPipeline:
         self.kwargs = kwargs
         self.shutdown_called = False
         self.encoded_chunks: list[Any] = []
+        self.scene_contexts: list[Any] = []
         _FakeEncoderPipeline.instances.append(self)
+
+    def set_scene_context(self, scene_key: Any) -> None:
+        self.scene_contexts.append(scene_key)
 
     def encode_chunk(self, chunk: Any) -> Any:
         self.encoded_chunks.append(chunk)
@@ -193,6 +197,30 @@ class TestEncodeFullMatch:
         assert timings["decoder_realtime_factor"] == pytest.approx(
             timings["decode_total"] / summary["duration_sec"]
         )
+
+        # Report 10 Phase 5.1(b): fps_throughput mirrors timings_sec (skipping
+        # the realtime-factor ratio keys) and the full resolved config is
+        # echoed so the run_summary alone is self-describing.
+        fps_throughput = summary["fps_throughput"]
+        assert fps_throughput["encode_total"] == pytest.approx(
+            summary["num_frames_total"] / timings["encode_total"]
+        )
+        assert fps_throughput["decode_total"] == pytest.approx(
+            summary["num_frames_total"] / timings["decode_total"]
+        )
+        assert "encoder_realtime_factor" not in fps_throughput
+        assert "decoder_realtime_factor" not in fps_throughput
+
+        assert summary["config"]["source_uri"] == str(tiny_source_video)
+        assert summary["config"]["run_mode"] == "full_match"
+        assert summary["config"]["scene_chunk_duration_sec"] == 2.0
+        assert summary["config"]["ffmpeg_codec"] == "libsvtav1"
+
+        # Report 10 Phase 5.1(e): set_scene_context() is called once per
+        # POINT scene (scenes 0 and 2 here; the interlude scene at index 1
+        # never touches EncoderPipeline at all) with that scene's own index,
+        # so the panorama cache resets exactly at scene boundaries.
+        assert _FakeEncoderPipeline.instances[0].scene_contexts == [0, 2]
 
         # First run on a fresh anchor cache: nothing was cached yet.
         assert scenes[1]["cache_hit"] is False

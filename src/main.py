@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import asdict
 from datetime import datetime
 import json
 import logging
@@ -24,6 +25,7 @@ from src.encoder.pipeline_builders import (
 )
 from src.encoder.video_io import encode_video_frames_ffmpeg, probe_video_metadata, ensure_ffmpeg_encoder_available
 from src.experiment_evaluation import evaluate_run_summary
+from src.shared.profiling import derive_fps_throughput
 from src.shared.schemas import VideoChunk, ResidualMode
 from src.transport.disk import DiskTransport
 
@@ -157,6 +159,10 @@ def run_pipeline(
         "metadata_mask_codec": config.metadata_mask_codec,
         "genai_enabled": bool(config.genai_backend),
         "genai_backend": config.genai_backend,
+        # Report 10 Phase 5.1(b): echo the full resolved config so a
+        # run_summary.json alone (no cross-referencing the YAML that produced
+        # it) is enough to know exactly what settings produced these numbers.
+        "config": asdict(config),
     }
     profile = encoder.get_detailed_profile() if hasattr(encoder, "get_detailed_profile") else {}
     
@@ -229,8 +235,13 @@ def run_pipeline(
     evaluation = {
         "sizes_bytes": sizes_bytes,
         "timings_sec": timings_sec,
+        # Report 10 Phase 5.1(b): fps_throughput sibling of timings_sec
+        # (frames / stage_seconds per stage) -- a single VideoChunk drives
+        # both encode and decode here, so chunk.num_frames is the natural
+        # frame count for every stage.
+        "fps_throughput": derive_fps_throughput(timings_sec, chunk.num_frames),
     }
-        
+
     summary["evaluation"] = evaluation
 
     return summary

@@ -40,7 +40,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from time import perf_counter
-from typing import Generator
+from typing import Any, Generator
 
 
 @dataclass(frozen=False)
@@ -69,3 +69,32 @@ class PipelineProfiler:
     def to_summary_dict(self) -> dict[str, float | None]:
         """Convert to JSON-serializable format for run_summary inclusion."""
         return {f"profile_{k}": v for k, v in self._timings.items()}
+
+
+def derive_fps_throughput(timings_sec: dict[str, Any], num_frames: int) -> dict[str, Any]:
+    """Mirror a `timings_sec`-shaped dict with `frames / stage_seconds` figures.
+
+    Report 10 Phase 5.1(b): every stage in `evaluation.timings_sec` gets a
+    matching entry here so a `run_summary.json` alone shows each stage's
+    real-time throughput without hand-computing it against `num_frames`.
+
+    Returns a *sibling* structure (same nesting as `timings_sec`) rather than
+    mutating `timings_sec` in place, so existing numeric-leaf consumers of
+    `timings_sec` (e.g. `scripts/benchmark_matrix.py` reading
+    `timings_sec["pipeline_total"]` as a float) keep working unchanged.
+
+    Keys ending in `_factor` or `_ratio` are skipped (already-derived ratios,
+    not wall-clock seconds) and their fps sibling is simply omitted so the
+    two dicts don't have to line up key-for-key.
+    """
+    result: dict[str, Any] = {}
+    for key, value in timings_sec.items():
+        if key.endswith("_factor") or key.endswith("_ratio"):
+            continue
+        if isinstance(value, dict):
+            nested = derive_fps_throughput(value, num_frames)
+            if nested:
+                result[key] = nested
+        elif isinstance(value, (int, float)) and not isinstance(value, bool):
+            result[key] = (float(num_frames) / value) if value and value > 0 else None
+    return result

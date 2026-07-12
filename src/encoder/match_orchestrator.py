@@ -27,6 +27,7 @@ G2 (Phase 4), once the held-out-video generative models exist.
 
 from __future__ import annotations
 
+from dataclasses import asdict
 import subprocess
 import time
 from pathlib import Path
@@ -48,6 +49,7 @@ from src.encoder.video_io import (
 )
 from src.decoder.decoder_renderer import DecoderRenderer
 from src.shared.config import PointstreamConfig
+from src.shared.profiling import derive_fps_throughput
 from src.shared.scene_classification import classify_video_scenes, extract_scene_scores
 from src.shared.schemas import SceneClass, SceneSpan, VideoChunk
 from src.transport.disk import DiskTransport
@@ -253,6 +255,13 @@ def _process_point_scene(
     total_bytes = 0
     total_frames = 0
     frame_cursor = start_frame_id
+
+    # Report 10 Phase 5.1(e): scene_idx is unique and stable across this
+    # scene's sub-chunks (the encoder is built once per match and reused
+    # across every scene, see encode_full_match), so this both invalidates
+    # any previous scene's cached panorama and lets every sub-chunk below
+    # reuse the first one's BackgroundModeler.process() result.
+    encoder.set_scene_context(scene_idx)
 
     boundaries = split_scene_into_subchunks(
         scene.t_start, scene.t_end, config.scene_chunk_duration_sec
@@ -553,6 +562,15 @@ def encode_full_match(
         if sc["routing"] == "fallback"
     )
 
+    timings_sec = {
+        "scene_classification": classify_elapsed,
+        "encode_total": encode_total_sec,
+        "decode_total": decode_total_sec,
+        "encoder_realtime_factor": (encode_total_sec / video_duration_sec) if video_duration_sec > 0 else None,
+        "decoder_realtime_factor": (decode_total_sec / video_duration_sec) if video_duration_sec > 0 else None,
+        "total": float(time.perf_counter() - match_started),
+    }
+
     match_summary: dict[str, Any] = {
         "video_path": str(resolved_video_path),
         "fps": source_metadata.fps,
@@ -569,13 +587,15 @@ def encode_full_match(
             "source_bytes": source_bytes,
             "bytes_to_source_ratio": (float(total_bytes) / source_bytes) if source_bytes else None,
         },
-        "timings_sec": {
-            "scene_classification": classify_elapsed,
-            "encode_total": encode_total_sec,
-            "decode_total": decode_total_sec,
-            "encoder_realtime_factor": (encode_total_sec / video_duration_sec) if video_duration_sec > 0 else None,
-            "decoder_realtime_factor": (decode_total_sec / video_duration_sec) if video_duration_sec > 0 else None,
-            "total": float(time.perf_counter() - match_started),
-        },
+        "timings_sec": timings_sec,
+        # Report 10 Phase 5.1(b): fps_throughput sibling of timings_sec
+        # (frames / stage_seconds); num_frames_total is the natural frame
+        # count here since encode_total/decode_total both accumulate over
+        # every scene's frames across the whole match.
+        "fps_throughput": derive_fps_throughput(timings_sec, source_metadata.num_frames),
+        # Report 10 Phase 5.1(b): echo the full resolved config so a
+        # run_summary.json alone is enough to know exactly what settings
+        # produced these numbers, without cross-referencing the source YAML.
+        "config": asdict(config),
     }
     return match_summary

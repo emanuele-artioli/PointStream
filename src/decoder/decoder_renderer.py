@@ -236,7 +236,28 @@ class DecoderRenderer:
         if not self._actor_state or self._genai_compositor is None:
             return frame_tensor
 
-        output_path = self.config.debug_artifact_dir if self.config else None
+        # Report 10 Phase 5.1(c): only wire a debug dir through when debug
+        # artifacts are actually enabled. Previously this unconditionally
+        # passed `config.debug_artifact_dir` (always set by main.py for every
+        # real run) regardless of `disable_debug_artifacts`, so every
+        # decoder-side GenAI compositor call wrote five PNGs per actor per
+        # frame (including two full-resolution frame dumps,
+        # "02_warped_background.png"/"05_composited_frame.png") to disk via
+        # `export_compositor_artifacts` -- while the encoder-side call in
+        # `ResidualCalculator._process_residuals` never passes a debug dir at
+        # all in the real DAG path (`orchestrator.py`'s `build_residual_node`
+        # never forwards one). That asymmetry -- not a compute difference --
+        # was almost the entire measured 2.16x decode/encode GenAI cost gap
+        # (see the report 10 finding this closes). Gating it here restores
+        # parity and matches the existing `disable_debug_artifacts` convention
+        # used by `BackgroundModeler._debug_artifacts_enabled()`. This is a
+        # pure I/O side effect: `_composite_actor_frame`'s returned tensor
+        # does not depend on whether `debug_dir` is set, so disabling it
+        # cannot change the (bit-identical, Residual-Guarantee-relevant)
+        # generated pixels -- see
+        # tests/test_decoder_genai_debug_parity.py::test_disabling_debug_artifacts_does_not_change_generated_frames.
+        debug_artifacts_enabled = (not self.config.disable_debug_artifacts) if self.config else True
+        output_path = self.config.debug_artifact_dir if (self.config and debug_artifacts_enabled) else None
 
         keyframe_only = bool(self.config.genai_keyframe_only) if self.config else False
         if keyframe_only:

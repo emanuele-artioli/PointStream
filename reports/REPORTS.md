@@ -157,10 +157,26 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    pays-for-itself verdict yet — full sweep and a `run-mode: full_match`
    run (needed for panorama-delta specifically) both left as next steps;
    see [8](8_residual_guarantee_benchmarks_report.md)'s 2026-07-12 entry.
-   Remaining workstreams, in dependency order: **5.1(b–e)** FPS metrics +
-   config echo, GenAI decode-vs-encode 2.16× cost-asymmetry diagnosis (+
-   bit-identity symmetry check), 0.53 fps FFmpeg-write diagnosis,
-   per-scene panorama cache, **5.4** gated G2 training campaign (train-split probe set, successive
+   **5.1(b–e) done (2026-07-12, separate isolated worktree)** — FPS metrics
+   + config echo (`derive_fps_throughput`, `dataclasses.asdict(config)` in
+   both `run_summary.json` shapes); the GenAI decode-vs-encode 2.16× cost
+   asymmetry diagnosed as a debug-artifact I/O asymmetry (decoder
+   unconditionally wired a debug dir into the GenAI compositor, encoder
+   never did) and fixed, with a bit-identity tripwire confirming pixels
+   were never affected (no Residual Guarantee risk); the 0.53 fps FFmpeg
+   write got a `-threads 0` fix but no further lever (architectural,
+   deferred to §5.2's `tier_realtime`); per-scene panorama cache added via
+   `EncoderPipeline.set_scene_context()` — **5.1 fully closed**, 5.2 now
+   unblocked. **Reconciled on merge (2026-07-12):** 5.1(e)'s full-packet
+   scene cache and 5.3's panorama-delta rung both hooked
+   `build_panorama_node`; merged by hand so the cache only short-circuits
+   for panorama-static/roi-video (rungs where every sub-chunk sends an
+   identical packet), never for panorama-delta (which must recompute the
+   true current panorama each sub-chunk to diff correctly) — otherwise the
+   cache would have silently made the delta rung a permanent no-op. See
+   report 10's 2026-07-12 findings entries for both workstreams.
+   Remaining workstreams, in dependency order: **5.4** gated G2 training
+   campaign (train-split probe set, successive
    halving across ControlNet/Animate-Anyone/SPADE — survivors double as
    G3's GenAI speed ladder — protocol/harness only, not the real training
    run). **5.6 done (2026-07-11):** residual-compression matrix ran under

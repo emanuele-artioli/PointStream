@@ -117,6 +117,31 @@ def test_run_pipeline_builds_summary_with_provided_source(monkeypatch) -> None:
     assert encoder.shutdown_called is True
 
 
+def test_run_pipeline_summary_echoes_config_and_fps_throughput(monkeypatch) -> None:
+    _patch_pipeline_dependencies(monkeypatch, metadata_num_frames=12)
+
+    config = PointstreamConfig(source_uri="/tmp/input.mp4", num_frames=5, ffmpeg_codec="libx264")
+    summary = main_module.run_pipeline(
+        config=config,
+        transport_root="/tmp/pointstream_tests",
+    )
+
+    # Report 10 Phase 5.1(b): run_summary.json alone must be enough to know
+    # exactly what settings produced it, without cross-referencing the YAML.
+    assert summary["config"]["source_uri"] == "/tmp/input.mp4"
+    assert summary["config"]["num_frames"] == 5
+    assert summary["config"]["ffmpeg_codec"] == "libx264"
+    assert summary["config"]["seed"] == config.seed
+
+    fps_throughput = summary["evaluation"]["fps_throughput"]
+    timings = summary["evaluation"]["timings_sec"]
+    assert fps_throughput["pipeline_total"] == pytest.approx(
+        summary["num_frames"] / timings["pipeline_total"]
+    ) if timings["pipeline_total"] > 0 else fps_throughput["pipeline_total"] is None
+    assert "encoder_realtime_factor" not in fps_throughput
+    assert "decoder_realtime_factor" not in fps_throughput
+
+
 def test_run_pipeline_uses_generated_source_when_missing_uri(monkeypatch) -> None:
     _patch_pipeline_dependencies(monkeypatch, metadata_num_frames=9)
 
