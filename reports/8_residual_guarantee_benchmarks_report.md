@@ -1,5 +1,5 @@
 # Residual-Guarantee Benchmarks — Report
-*Status: Active | Last updated: 2026-07-11 | Code: scripts/benchmark_matrix.py, src/shared/synthesis_engine.py, src/experiment_evaluation.py, src/encoder/orchestrator.py, src/transport/disk.py, src/transport/panorama_encoder.py*
+*Status: Active | Last updated: 2026-07-12 | Code: scripts/benchmark_matrix.py, src/shared/synthesis_engine.py, src/experiment_evaluation.py, src/encoder/orchestrator.py, src/encoder/match_orchestrator.py, src/transport/disk.py, src/transport/panorama_encoder.py*
 
 ## Scope
 
@@ -44,6 +44,14 @@ settings, GenAI backends) accrue here as dated entries.
   scheduled as report 10 Phase 5.0 wiring + 5.6 matrix). By-catch from the
   dead-knob run: four byte-identical independent GenAI pipeline runs —
   direct evidence of seeded determinism.
+- **Background-layer ladder implemented (2026-07-12):** `panorama-static` /
+  `panorama-delta` / `roi-video` all exist behind `background-layer` /
+  `panorama-codec`; panorama-delta's server/client symmetry is unit-tested
+  bit-identical, roi-video sanity-checked and real-run-verified (a real
+  odd-canvas-dimension ffmpeg bug found and fixed in the process). No
+  pays-for-itself verdict yet — the full `ablation_background_layer.yaml`
+  sweep and (for panorama-delta specifically) a `run-mode: full_match` run
+  are both owed; see the dated entry below.
 
 ## Findings log
 
@@ -358,6 +366,86 @@ codec/pix-fmt/threshold combination).
 a non-AV1 codec — the "residual pixel format" claim is codec-dependent,
 not a universal property of the technique.
 
+### 2026-07-12 — Background-layer ladder implemented; roi-video sanity-checked, panorama-delta symmetry unit-tested; full sweep left as a next step
+
+**Problem/Question:** Report 10 Phase 5.3 asks for a 3-rung background-layer
+ladder (`panorama-static` today's baseline, `panorama+delta` stateful
+per-scene deltas, `roi-video` `addroi`-boosted libx264 video) benchmarked
+the same pays-for-itself way as the racket-heuristics and panorama-quality
+entries above — implemented in an isolated worktree
+(`agent-a5f3d2600c1d479c3`).
+
+**Diagnosis/Evidence:**
+- **roi-video sanity check caught a real bug before the real run**, same
+  spirit as the 2026-07-11 `libsvtav1` entry above: a synthetic round-trip
+  of `RoiVideoPanoramaEncoder` against a random image the exact size of
+  `assets/real_tennis.mp4`'s stitched panorama canvas (3841×2190) failed —
+  `ffmpeg`/`libx264` rejected it with `width not divisible by 2`. The
+  homography-stitched canvas (`src/encoder/background_modeler.py`) is not
+  guaranteed even-dimensioned, unlike a raw video frame. Fixed by truncating
+  ≤1px off the bottom/right edge before encoding (deterministic from the
+  image alone, so the decoder — which never sees the pre-encode shape —
+  reproduces the identical cropped size independently). Confirmed with a
+  real 3-frame `--input assets/real_tennis.mp4` run
+  (`execution-pool: inline`, `genai-backend: null`,
+  `panorama-codec: roi-video`): completed end-to-end, panorama sidecar
+  213,200 bytes, PSNR 24.25 / SSIM 0.82 — no crash, comparable rung-1-range
+  quality numbers.
+- **panorama-delta's symmetry is the load-bearing property** (CLAUDE.md's
+  Residual Guarantee: server and client must derive byte-identical state).
+  Verified directly at the unit level rather than only via an end-to-end
+  run: `tests/test_panorama_encoder.py::test_synthesis_engine_reconstructs_delta_chunk_bit_identically_to_encoder`
+  builds a full-panorama chunk then a delta chunk for the same
+  `scene_id`, feeds only the *transmitted bytes* (never the encoder's
+  in-memory pixels) to a second, independent `SynthesisEngine` instance
+  standing in for the client, and asserts its reconstruction is
+  `np.array_equal` to the pixels the encoder used for its own residual
+  computation. A second test confirms a delta chunk arriving with no prior
+  full panorama for its scene raises instead of silently reconstructing
+  garbage. This is the same class of bug the 2026-07-10 "Panorama JPEG
+  quality does not affect the residual" entry above describes (residual
+  computed against pixels the client never actually gets) — guarded here
+  before it could reoccur under the new rung.
+- **panorama-delta cannot show real savings through this report's harness
+  as currently used.** `scripts/benchmark_matrix.py` always runs
+  `src/main.py`'s default `run-mode: chunk`, which treats the whole input
+  video as exactly one `VideoChunk` (one scene, one panorama send, full
+  stop). `VideoChunk.scene_id` — what panorama-delta keys its per-scene
+  state on — is only ever populated by
+  `src.encoder.match_orchestrator`'s point-scene sub-chunk loop
+  (`run-mode: full_match`), and that mode doesn't wire up
+  `evaluation-mode` (psnr/ssim/vmaf) yet (`src/main.py`'s `run_cli`
+  explicitly skips it for `full_match`, "quality scoring is G2"). Ran the
+  real 3-frame single-chunk smoke test anyway to confirm no crash/silent
+  wrong-answer: it correctly degenerates to a full send (there's no second
+  sub-chunk to diff against), byte-identical to rung 1, which is the
+  *correct* behavior for this harness, not a bug.
+- Full `config/benchmarks/ablation_background_layer.yaml` sweep (3 variants,
+  full-length `assets/real_tennis.mp4`, `evaluation-mode: [psnr, ssim, vmaf]`)
+  was **not run**: another session's `ablation-residual-compression` matrix
+  was actively consuming the GPU/CPU (per report 10's own GPU-scheduling
+  rule — S2's 3h matrix goes before other sessions' validation runs) at
+  the time this workstream reached that step.
+
+**Resolution:** rung 1 unchanged; rung 2 (panorama-delta) implemented with
+scene-state on both `EncoderPipeline` and `SynthesisEngine`, delta
+arithmetic in `src/transport/panorama_encoder.py`
+(`compute_panorama_delta`/`apply_panorama_delta`/`round_trip_panorama_delta`),
+`VideoChunk.scene_id` wired through `match_orchestrator`; rung 3
+(roi-video) implemented as `RoiVideoPanoramaEncoder`, selected via the
+existing `panorama-codec` knob. Verdict on rung 2 vs rung 1 and rung 3 vs
+rung 1 is **not yet determined** — that requires the full sweep above
+(rung 3, which the single-chunk harness *can* measure) and a
+`run-mode: full_match` run with real scene boundaries (rung 2, which it
+cannot). Both left as explicit next steps, not assumed.
+
+**Paper impact:** none yet — no pays-for-itself verdict exists for either
+rung. Once run, this fills the third background-representation row in the
+ablation tables; until then the ladder's *existence* (three interchangeable
+strategies behind one `background-layer`/`panorama-codec` knob, chosen by
+future measurement rather than architecture preference) is itself worth
+citing as the report's methodology in action.
+
 ## Open questions & next steps
 
 1. ~~Trace and fix the panorama symmetry violation (encoder residual must be
@@ -380,3 +468,11 @@ not a universal property of the technique.
    `config/benchmarks/ablation_residual_compression.yaml`; run via
    `pipeline-runner` with current pre-retrain checkpoints (report 10
    Phase 5.6). This supersedes the plain thresholding re-run in (3).
+5. **New (2026-07-12):** run `config/benchmarks/ablation_background_layer.yaml`
+   (report 10 Phase 5.3) once the GPU is free — this gives roi-video vs
+   panorama-static a real pays-for-itself verdict. Separately, a
+   `run-mode: full_match` run against a multi-scene raw match is needed to
+   get any real byte comparison for panorama-delta (the single-VideoChunk
+   harness structurally cannot exercise it — see the 2026-07-12 entry
+   above); that in turn wants `evaluation-mode` wired into `full_match`
+   first, which it isn't today.
