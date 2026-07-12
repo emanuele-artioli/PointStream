@@ -800,15 +800,26 @@ being called with kwargs that didn't match its real single-`config=`
 constructor (silenced with `# type: ignore[call-arg]` instead of fixed),
 so `execution-pool: tagged` was completely non-functional (`TypeError`)
 since the call was written — now fixed and tests exercise the real
-objects instead of mocking around the bug. **Remaining, still open:**
-(b) per-stage `fps_throughput` + full config echo in `run_summary.json`.
-(c) diagnose the GenAI decoder-vs-encoder 2.16× cost asymmetry
-**including a bit-identity check** of server/client generated frames
-(symmetry tripwire). (d) profile the FFmpeg paths (final 4K write at
-0.53 fps; residual-encode threading/preset propagation). (e) per-scene
-panorama compute cache on the encoder (background is near-static within
-a point; 0.46 fps stage today).
-*Session: code + short pipeline-runner validation runs.*
+objects instead of mocking around the bug.
+(b) ~~per-stage `fps_throughput` + full config echo in `run_summary.json`~~
+**done (2026-07-12)**. (c) ~~diagnose the GenAI decoder-vs-encoder 2.16×
+cost asymmetry including a bit-identity check~~ **done (2026-07-12)** —
+found and fixed a debug-artifact I/O asymmetry (decoder unconditionally
+wired a debug dir into the GenAI compositor, encoder never did); bit-identity
+tripwire passed (pixels are identical regardless of debug I/O, so this was
+never a Residual Guarantee risk, just a cost one). (d) ~~profile the FFmpeg
+paths~~ **done (2026-07-12)** — added `-threads 0`; no further Python-side
+or preset lever found without breaking an existing test contract, see the
+2026-07-12 findings entry; the 0.53 fps final-4K-write cost is an
+architectural/tier question (§5.2), not a quick fix. (e) ~~per-scene
+panorama compute cache~~ **done (2026-07-12)** — `EncoderPipeline.set_scene_context()`.
+**5.1 fully closed** — see the 2026-07-12 findings entry above for the full
+diagnosis/resolution of (b)–(e); 5.2 is now unblocked.
+*Session: code + short pipeline-runner validation runs — done as unit
+tests + one real 3-frame smoke run (`execution-pool: inline`,
+`genai-backend: null`); no GPU-heavy real GenAI re-measurement was run, to
+avoid contending with the concurrent residual-compression benchmark matrix
+(flagged as the natural pipeline-runner follow-up in the findings entry).*
 
 **5.2 — Resolution & framerate ladders → `tier_realtime`.**
 (a) Global processing-resolution config key (decode chunk frames at e.g.
@@ -877,7 +888,7 @@ schedule before 5.4's training occupies the GPU, or interleave.
 |---|---|---|---|---|---|
 | S1 | ~~5.0 residual-calculator fixes (a+b+c)~~ **done (2026-07-11)** | interactive main session (small, review-worthy diff) | main checkout — it owns the dirty file | — | no |
 | S2 | 5.6 residual-compression matrix | `pipeline-runner` | none (run-only, writes `outputs/benchmarks/`) | S1 done — **unblocked** | yes (~3 h) |
-| S3 | 5.1 execution & profiling (**(a) tagged pool done 2026-07-11** — remaining: FPS metrics, 2 diagnoses, panorama compute cache) | `general-purpose` in an **isolated worktree**; short validation runs via `pipeline-runner` | worktree | S1 done | brief |
+| S3 | ~~5.1 execution & profiling~~ **done (2026-07-12)** — (a) tagged pool 2026-07-11; (b)–(e) FPS metrics/config echo, GenAI debug-I/O asymmetry fix, FFmpeg profiling, panorama cache 2026-07-12 | `general-purpose` in an **isolated worktree**; short validation runs via `pipeline-runner` | worktree | S1 done | brief |
 | S4 | 5.3 background-layer ladder | `general-purpose` in an **isolated worktree** | worktree | S1 | brief |
 | S5 | 5.4 training protocol, then variant training | protocol: interactive; training: `pipeline-runner` | worktree for protocol code | S1 (protocol); GPU free (training) | yes (multi-day, owns GPU once started) |
 | S6 | 5.2 resolution/framerate knobs + `tier_realtime` | `general-purpose` in an isolated worktree | worktree | S3 merged (shared surfaces) | brief |
@@ -911,6 +922,177 @@ dead-code cleanup (real G1 runs already show
 `num_rigid_object_packets: 0` everywhere) but it's mid-work, stale
 against current main, and not this session's to finish or discard;
 flagged here rather than touched.
+
+**2026-07-12 — 5.1(b)(c)(d)(e) closed: FPS/config instrumentation, GenAI
+debug-I/O asymmetry fix, FFmpeg profiling, per-scene panorama cache.**
+*Session: `general-purpose` in an isolated worktree
+(`.claude/worktrees/agent-a98a0c3d5582868af`), per the S3 assignment above.*
+
+**Problem/Question:** four items remained open on 5.1 after (a)'s
+`execution-pool: tagged` fix: (b) `run_summary.json` had no per-stage
+fps/realtime figures and `config` was `None` in the real profiled run,
+forcing cross-referencing against whichever YAML happened to produce a
+given run; (c) `decode/genai_baseline` measured 786.5s vs
+`encode_chunk/residual/genai_baseline`'s 363.8s for the *same* 60 frames and
+the *same* canny-controlnet engine (2.16x) — a compute asymmetry that would
+be suspicious for two supposedly-identical `SynthesisEngine`-driven
+computations; (d) `decode/video_encoding` measured 114.0s/60 frames
+(0.53 fps) for what should be a straightforward FFmpeg write; (e)
+`BackgroundModeler.process()` re-stitches the panorama from scratch on
+every sub-chunk of a scene (130.5s/chunk, 0.46 fps) despite
+`EncoderPipeline` being built once per match and reused across a whole
+scene's sub-chunks, even though the background is near-static within one
+tennis point.
+
+**Diagnosis/Evidence:**
+- **(c) root cause found, not just perf — an I/O asymmetry, not a compute
+  one.** `DecoderRenderer._render_genai_baseline`
+  (`src/decoder/decoder_renderer.py:239`, pre-fix) unconditionally wired
+  `self.config.debug_artifact_dir` into every `GenAI compositor.process()`
+  call's `debug_dir` argument — and `main.py:276` sets
+  `config.debug_artifact_dir` on *every* real run regardless of
+  `disable_debug_artifacts`. Meanwhile the encoder-side call in
+  `ResidualCalculator._process_residuals` (`src/encoder/residual_calculator.py:240`)
+  only ever receives the `debug_output_path` argument that
+  `orchestrator.py`'s real DAG node (`build_residual_node`,
+  `src/encoder/orchestrator.py:272`) never forwards — it is always `None` in
+  the real pipeline (confirmed by `tests/test_residual_genai_sync.py`, which
+  shows `debug_output_path` there is dual-purpose: it's *also* literally the
+  residual video's own output path). So on a real run with
+  `disable_debug_artifacts=False` (the default whenever `log_level: debug`,
+  itself the dataclass default), the decoder wrote five PNGs per actor per
+  frame via `export_compositor_artifacts`
+  (`src/shared/genai_debug.py:13`) — including two full-resolution frame
+  dumps (`02_warped_background.png`, `05_composited_frame.png`) — while the
+  encoder wrote none. Confirmed this is a pure side effect: nothing in
+  `_composite_actor_frame`'s returned tensor depends on `debug_dir`, so
+  gating it changes cost, not pixels (see the new bit-identity test below).
+  This alone plausibly explains most/all of the 2.16x — a Residual Guarantee
+  *tripwire* was the point of chasing this (an actual pixel divergence
+  between server/client would have been the far more serious finding), and
+  it came back negative: encoder and decoder compute pixel-identical frames
+  regardless of debug I/O.
+- **(d) FFmpeg profiling — no single Python-side inefficiency found.**
+  `-threads` was never passed to `encode_video_frames_ffmpeg`
+  (`src/encoder/video_io.py`). Verified via real ffmpeg invocations
+  (12 synthetic 3840x2160 frames): libsvtav1 self-parallelizes across all
+  logical cores independently of ffmpeg's generic `-threads` AVOption
+  (`Svt[info]: Number of logical cores available: 256` appears regardless),
+  so `-threads` is close to a no-op for the codec this project defaults to
+  — but it is a real, free win for the thread-count-sensitive codecs
+  (`libx264`/`libx265`) used by the anchor/fallback-encode path, so it was
+  added unconditionally. A/B'd `codec_preset` on the same 12 synthetic 4K
+  frames: `slow` (preset 6) at 23.8s vs `veryfast` (preset 10) at 28.2s —
+  comparable, `slow` even edged faster once — so preset choice is not the
+  smoking gun either. Also checked `cv2.imwrite`'s per-frame PNG dump
+  (`decoder_renderer.py`'s `video_encoding` stage writes one PNG per frame
+  *before* the gated ffmpeg encode, unconditionally): compression-level A/B
+  on synthetic gradient content (default vs levels 1/3/6/9) showed OpenCV's
+  default already near the fastest setting, no clear lever there either.
+  Conclusion: the ~114s/60 frames (0.53 fps) is dominated by encoding a full
+  4K video via AV1 *at all*, at any reasonable preset, on this hardware —
+  an architectural/tier-selection question (§5.2's `tier_realtime`:
+  lower-res, decimated fps, fast codec) rather than a quick code fix.
+  Separately noted but **not changed**: the per-frame PNG dump is not
+  purely a debug artifact today —
+  `tests/test_decoder.py::test_decoder_output_matches_chunk_dimensions`
+  asserts these PNGs exist even when the debug mp4 is *also* produced, and
+  `DecodedChunkResult.output_uri` falls back to the frame directory when
+  `disable_debug_artifacts=True` — so skipping the redundant PNG write
+  whenever the mp4 already serves as `output_uri` would change an existing,
+  asserted contract. Flagging for whoever picks up §5.2/tier work: decouple
+  "final reconstruction/debug preview" from "primary decoded output" rather
+  than silently changing today's behavior.
+- **(e) confirmed the cache is safe against the Residual Guarantee.**
+  `SynthesisEngine._reconstruct_background_frames`
+  (`src/shared/synthesis_engine.py:155`) already pads
+  `payload.panorama.homography_matrices` with identity transforms (or
+  truncates) whenever its length differs from the chunk's own `num_frames`
+  — i.e. the defensive path a cached packet from an earlier, possibly
+  differently-sized sub-chunk would exercise already exists and is already
+  covered by other tests, it isn't new risk introduced by caching.
+
+**Resolution:**
+- **(b)** Added `derive_fps_throughput()` (`src/shared/profiling.py`) — a
+  pure function that mirrors a `timings_sec`-shaped dict with
+  `num_frames / stage_seconds` at every numeric leaf, skipping
+  `*_factor`/`*_ratio` keys (already-derived ratios). It's a *sibling*
+  structure (`evaluation.fps_throughput` in chunk-mode, top-level
+  `fps_throughput` in full-match mode) rather than mutating `timings_sec`
+  in place, so `scripts/benchmark_matrix.py`'s existing
+  `timings_sec["pipeline_total"]` float read keeps working. Wired into both
+  `src/main.py::run_pipeline` (keyed on `chunk.num_frames`) and
+  `src/encoder/match_orchestrator.py::encode_full_match` (keyed on
+  `source_metadata.num_frames`). Also echoed the full resolved
+  `PointstreamConfig` (`dataclasses.asdict(config)`) into both summaries'
+  `config` key, closing the `None` gap confirmed in
+  `outputs/20260710_234603_892275/run_summary.json`. New tests:
+  `tests/test_profiling.py` (6 cases on `derive_fps_throughput`/
+  `PipelineProfiler`), plus new/updated assertions in
+  `tests/test_main_coverage.py` and `tests/test_match_orchestrator_coverage.py`.
+- **(c)** `DecoderRenderer._render_genai_baseline` now only wires
+  `config.debug_artifact_dir` through when
+  `not config.disable_debug_artifacts` — matching the
+  `BackgroundModeler._debug_artifacts_enabled()` convention already used
+  elsewhere in the encoder. New tests:
+  `tests/test_decoder_genai_debug_parity.py` —
+  `test_decoder_only_wires_debug_dir_into_compositor_when_enabled` (spy on
+  the compositor asserting `debug_dir` is `None` iff
+  `disable_debug_artifacts`) and
+  `test_disabling_debug_artifacts_does_not_change_generated_pixels` (the
+  bit-identity tripwire, using the real `DiffusersCompositor` with the
+  `mock-caption-controlnet` backend — no GPU/weights needed — asserting
+  `torch.equal()` between debug-on and debug-off outputs). **Not
+  independently re-measured against the original 786.5s/363.8s real numbers**
+  — that would need a real canny-controlnet 60-frame run, which this
+  session deliberately avoided per the "keep GPU usage brief, don't starve
+  the concurrent benchmark matrix" instruction; a short `pipeline-runner`
+  validation re-measuring `decode/genai_baseline` vs
+  `encode_chunk/residual/genai_baseline` after this fix is the natural
+  follow-up, and if a residual gap remains, per-frame compositor input
+  differences (actor count, pose data reaching each side) would be the next
+  suspect, not I/O.
+- **(d)** Added `-threads 0` to `encode_video_frames_ffmpeg`
+  (`src/encoder/video_io.py`) — harmless-to-moot for libsvtav1, a real win
+  for the fallback path's libx264/libx265. No other change applied (see
+  Diagnosis: no clear further lever found without changing an asserted test
+  contract or guessing at codec internals). Verified the modified command
+  still encodes correctly via a real ffmpeg invocation
+  (3840x2160 and 64x64 both round-tripped through
+  `probe_video_metadata` successfully).
+- **(e)** Added `EncoderPipeline.set_scene_context(scene_key)`
+  (`src/encoder/orchestrator.py`): `None` (default) disables caching
+  entirely (single-chunk `run_pipeline` never opts in, so its behavior is
+  unchanged); a non-`None` key caches the panorama DAG node's *already
+  codec-round-tripped* `PanoramaPacket` result and reuses it verbatim
+  (re-keyed only to the new sub-chunk's `chunk_id`) until the key changes.
+  Because the cached object *is* the transmitted packet rather than a
+  separate copy, there is nothing for it to go stale relative to — the
+  Residual Guarantee concern the task flagged doesn't apply by
+  construction. `src/encoder/match_orchestrator.py::_process_point_scene`
+  calls `encoder.set_scene_context(scene_idx)` once per scene, before that
+  scene's sub-chunk loop. New tests:
+  `tests/test_encoder_pipeline.py::test_panorama_cache_reused_across_subchunks_in_same_scene`
+  (spies on `BackgroundModeler.process` via `MagicMock(wraps=...)`, asserts
+  call count 1 across two sub-chunks of one scene, then 2 after
+  `set_scene_context` changes) and
+  `test_panorama_cache_disabled_by_default_recomputes_every_chunk`
+  (no-`set_scene_context` callers keep today's per-chunk behavior); plus a
+  `tests/test_match_orchestrator_coverage.py` assertion that
+  `set_scene_context` is called exactly once per POINT scene with that
+  scene's own index (`[0, 2]` in the existing 3-scene fixture).
+- **Verification:** full fast suite (`pytest`, excludes `integration`/`slow`)
+  green after all four changes; `ruff check src tests scripts` and `mypy`
+  clean. Real smoke run: `assets/real_tennis.mp4`, `num-frames: 3`,
+  `execution-pool: inline`, `genai-backend: null` — see the run command and
+  `run_summary.json` figures below.
+
+**Paper impact:** none directly (instrumentation + perf + a correctness
+tripwire, no quality-affecting change); the closed 2.16x asymmetry removes a
+potential Residual-Guarantee red flag from the G2/G3 speed story before it
+reaches the paper, and the new `config`/`fps_throughput` fields make every
+future `run_summary.json` self-describing for the eventual speed/compression
+Pareto figure (§5.5).
 
 ### Explicitly out of scope / decisions needed
 - **Multi-ControlNet**: stays deferred (report 7 §4) unless the Phase 4

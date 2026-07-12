@@ -149,11 +149,19 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    worktree (`suspicious-blackwell-724748`) holds a substantial
    in-progress `RigidObjectPacket` dead-code removal, left untouched
    pending a human decision (report 10 §Phase 5 session-table note).
-   Remaining workstreams, in dependency order: **5.1(b–e)** FPS metrics +
-   config echo, GenAI decode-vs-encode 2.16× cost-asymmetry diagnosis (+
-   bit-identity symmetry check), 0.53 fps FFmpeg-write diagnosis,
-   per-scene panorama cache → parallel with **5.3** background-layer
-   ladder (panorama-static / panorama+delta / ROI background video),
+   **5.1(b–e) done (2026-07-12)** — FPS metrics + config echo
+   (`derive_fps_throughput`, `dataclasses.asdict(config)` in both
+   `run_summary.json` shapes); the GenAI decode-vs-encode 2.16× cost
+   asymmetry diagnosed as a debug-artifact I/O asymmetry (decoder
+   unconditionally wired a debug dir into the GenAI compositor, encoder
+   never did) and fixed, with a bit-identity tripwire confirming pixels
+   were never affected (no Residual Guarantee risk); the 0.53 fps FFmpeg
+   write got a `-threads 0` fix but no further lever (architectural,
+   deferred to §5.2's `tier_realtime`); per-scene panorama cache added via
+   `EncoderPipeline.set_scene_context()` — **5.1 fully closed**, 5.2 now
+   unblocked (see report 10's 2026-07-12 findings entry). Remaining
+   workstreams, in dependency order: **5.3** background-layer ladder
+   (panorama-static / panorama+delta / ROI background video),
    **5.4** gated G2 training campaign (train-split probe set, successive
    halving across ControlNet/Animate-Anyone/SPADE — survivors double as
    G3's GenAI speed ladder — protocol/harness only, not the real training
