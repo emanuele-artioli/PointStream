@@ -125,6 +125,7 @@ def build_train_command(
     rung_epochs: int,
     resume: bool,
     python_bin: str | None = None,
+    batch_size: str | None = None,
 ) -> list[str]:
     """Builds the training-script invocation for one variant's rung.
 
@@ -135,6 +136,12 @@ def build_train_command(
     `rung_epochs` *more* epochs on top of whatever `--controlnet-model-id`
     points at (the previous rung's saved directory), or starts
     `--from-scratch` on rung 0.
+
+    `batch_size` (str, since pix2pix/spade4tennis accept "auto") is passed
+    through as-is when given; left at each script's own default otherwise.
+    Needed for tiny smoke-test datasets — pix2pix/spade4tennis's "auto"
+    default (64/32) plus drop_last=True silently empties the dataloader
+    when the dataset has fewer images than that.
     """
     py = python_bin or sys.executable
 
@@ -147,6 +154,8 @@ def build_train_command(
             "--checkpoint-path", str(ckpt_dir / "pix2pix_checkpoint.pt"),
             "--sample-dir", str(ckpt_dir / "samples"),
         ]
+        if batch_size is not None:
+            cmd.extend(["--batch-size", batch_size])
         if resume:
             cmd.append("--resume")
         return cmd
@@ -161,6 +170,8 @@ def build_train_command(
             "--checkpoint-path", str(ckpt_dir / f"spade4tennis_{variant.model_size}_checkpoint.pt"),
             "--sample-dir", str(ckpt_dir / "samples"),
         ]
+        if batch_size is not None:
+            cmd.extend(["--batch-size", batch_size])
         if resume:
             cmd.append("--resume")
         return cmd
@@ -331,6 +342,7 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--skip-lpips", action="store_true")
     parser.add_argument("--device", type=str, default=None)
     parser.add_argument("--train-timeout-sec", type=float, default=None)
+    parser.add_argument("--train-batch-size", type=str, default=None, help="Passed through to pix2pix/spade4tennis --batch-size (e.g. for tiny smoke datasets)")
     parser.add_argument("--auto-continue", action="store_true", help="Run all remaining rungs unattended (NOT for harness validation — see module docstring)")
     parser.add_argument("--dry-run", action="store_true", help="Print training commands without executing them or scoring")
     parser.add_argument(
@@ -400,7 +412,10 @@ def main(argv: list[str] | None = None) -> int:
             resume = prev > 0
             rung_epochs = target_epochs - prev
 
-            cmd = build_train_command(variant, args.data_root, ckpt_dir, target_epochs, rung_epochs, resume)
+            cmd = build_train_command(
+                variant, args.data_root, ckpt_dir, target_epochs, rung_epochs, resume,
+                batch_size=args.train_batch_size,
+            )
 
             if args.dry_run:
                 print(f"[dry-run] rung {rung} {name}: {' '.join(cmd)}")

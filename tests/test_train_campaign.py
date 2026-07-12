@@ -89,6 +89,21 @@ def test_build_train_command_controlnet_resumes_from_previous_dir(tmp_path: Path
     assert "--from-scratch" not in cmd
 
 
+def test_build_train_command_passes_through_batch_size(tmp_path: Path) -> None:
+    variant = Variant(name="pix2pix", arch="pix2pix", kind="pix2pix")
+    cmd = build_train_command(
+        variant, tmp_path / "data", tmp_path / "ckpt", cumulative_epochs=1, rung_epochs=1, resume=False,
+        python_bin="python", batch_size="4",
+    )
+    assert "--batch-size" in cmd and cmd[cmd.index("--batch-size") + 1] == "4"
+
+
+def test_build_train_command_omits_batch_size_when_not_given(tmp_path: Path) -> None:
+    variant = Variant(name="pix2pix", arch="pix2pix", kind="pix2pix")
+    cmd = build_train_command(variant, tmp_path / "data", tmp_path / "ckpt", cumulative_epochs=1, rung_epochs=1, resume=False, python_bin="python")
+    assert "--batch-size" not in cmd
+
+
 def test_build_train_command_rejects_unknown_kind(tmp_path: Path) -> None:
     bogus = Variant(name="x", arch="x", kind="not-a-kind")
     with pytest.raises(ValueError, match="unknown variant kind"):
