@@ -13,13 +13,16 @@ from typing import Any
 
 import pytest
 
+import scripts.train_campaign as train_campaign
 from scripts.train_campaign import (
     Variant,
     build_train_command,
     checkpoint_path_for_eval,
     default_variants,
+    halved_batch_size,
     init_state,
     load_state,
+    main,
     promote_survivors,
     rank_variants,
     save_state,
@@ -183,3 +186,43 @@ def test_state_json_is_serializable(tmp_path: Path) -> None:
     save_state(path, state)
     # Just verify plain json can parse it (no custom types leaked in).
     assert isinstance(json.loads(path.read_text()), dict)
+
+
+def test_halved_batch_size_halves_numeric_and_leaves_non_numeric() -> None:
+    assert halved_batch_size("16") == "8"
+    assert halved_batch_size("1") == "1"  # floors at 1, never 0
+    assert halved_batch_size("auto") == "auto"
+    assert halved_batch_size(None) is None
+
+
+def test_main_aborts_rung_without_ranking_when_a_variant_fails_training_twice(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A training subprocess that fails twice (e.g. a shared-GPU OOM) must not be
+    scored as a quality loss and pruned — the old behavior this regression-tests
+    against (see reports/13_g2_campaign_completion_plan.md, Defect 1)."""
+    campaign_dir = tmp_path / "campaign"
+    data_root = tmp_path / "data_root"
+    data_root.mkdir()
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(json.dumps({"excluded_training_keys": [], "probe_clips": []}))
+
+    # Every training subprocess invocation "fails" (simulates an OOM that a batch-size
+    # retry doesn't fix), regardless of args — run_training_subprocess is the only
+    # thing that should be monkeypatched (build_train_command runs for real).
+    monkeypatch.setattr(train_campaign, "run_training_subprocess", lambda *a, **k: 1)
+
+    exit_code = main([
+        "--campaign-dir", str(campaign_dir),
+        "--manifest", str(manifest_path),
+        "--data-root", str(data_root),
+        "--variants", "pix2pix,spade4tennis_lite",
+        "--initial-epochs", "1",
+    ])
+
+    assert exit_code == 1
+    state = load_state(campaign_dir / "campaign_state.json")
+    assert state["rung"] == 0
+    assert set(state["alive"]) == {"pix2pix", "spade4tennis_lite"}
+    assert all(v == 0 for v in state["cumulative_epochs"].values())
+    assert state["history"] == []  # never reached ranking

@@ -275,6 +275,13 @@ def variants_from_state(state: dict[str, Any]) -> dict[str, Variant]:
 # ---------------------------------------------------------------------------
 
 
+def halved_batch_size(batch_size: str | None) -> str | None:
+    """Halve a numeric --train-batch-size for a retry; leave non-numeric values (e.g. "auto") unchanged."""
+    if batch_size is None or not batch_size.isdigit():
+        return batch_size
+    return str(max(1, int(batch_size) // 2))
+
+
 def run_training_subprocess(cmd: list[str], log_path: Path, timeout: float | None, repo_root: Path) -> int:
     log_path.parent.mkdir(parents=True, exist_ok=True)
     with log_path.open("w") as log_file:
@@ -344,6 +351,14 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--train-timeout-sec", type=float, default=None)
     parser.add_argument("--train-batch-size", type=str, default=None, help="Passed through to pix2pix/spade4tennis --batch-size (e.g. for tiny smoke datasets)")
     parser.add_argument("--auto-continue", action="store_true", help="Run all remaining rungs unattended (NOT for harness validation — see module docstring)")
+    parser.add_argument(
+        "--prune-on-train-failure",
+        action="store_true",
+        help="Rank/prune a rung even when a variant's training subprocess failed (old, dangerous "
+        "behavior — an infra failure such as CUDA OOM would be scored as a quality loss). Default "
+        "off: a training failure that survives one halved-batch-size retry aborts the rung without "
+        "ranking or mutating state, so a human can fix the infra issue and resume.",
+    )
     parser.add_argument("--dry-run", action="store_true", help="Print training commands without executing them or scoring")
     parser.add_argument(
         "--variants",
@@ -405,6 +420,7 @@ def main(argv: list[str] | None = None) -> int:
         target_epochs = args.initial_epochs if rung == 0 else prev_cumulative * 2
 
         aggregate_by_variant: dict[str, dict[str, Any]] = {}
+        rung_train_failed = False
         for name in state["alive"]:
             variant = variant_by_name[name]
             ckpt_dir = args.campaign_dir / "checkpoints" / name
@@ -412,9 +428,10 @@ def main(argv: list[str] | None = None) -> int:
             resume = prev > 0
             rung_epochs = target_epochs - prev
 
+            batch_size = args.train_batch_size
             cmd = build_train_command(
                 variant, args.data_root, ckpt_dir, target_epochs, rung_epochs, resume,
-                batch_size=args.train_batch_size,
+                batch_size=batch_size,
             )
 
             if args.dry_run:
@@ -422,12 +439,37 @@ def main(argv: list[str] | None = None) -> int:
                 continue
 
             print(f"Rung {rung}: training {name} to {target_epochs} cumulative epoch(s)...")
-            returncode = run_training_subprocess(
-                cmd, args.campaign_dir / "logs" / f"{name}_rung{rung}.log", args.train_timeout_sec, repo_root
-            )
+            log_path_variant = args.campaign_dir / "logs" / f"{name}_rung{rung}.log"
+            returncode = run_training_subprocess(cmd, log_path_variant, args.train_timeout_sec, repo_root)
+
             if returncode != 0:
-                print(f"WARNING: {name} training subprocess exited {returncode}; skipping its eval this rung")
-                continue
+                retry_batch_size = halved_batch_size(batch_size)
+                print(
+                    f"WARNING: {name} training subprocess exited {returncode}; retrying once with "
+                    f"--train-batch-size {retry_batch_size} (was {batch_size}) in case this was a "
+                    "shared-GPU OOM, not a real quality failure."
+                )
+                retry_cmd = build_train_command(
+                    variant, args.data_root, ckpt_dir, target_epochs, rung_epochs, resume,
+                    batch_size=retry_batch_size,
+                )
+                returncode = run_training_subprocess(
+                    retry_cmd, args.campaign_dir / "logs" / f"{name}_rung{rung}_retry.log",
+                    args.train_timeout_sec, repo_root,
+                )
+
+            if returncode != 0:
+                print(f"ERROR: {name} training failed twice this rung (exit {returncode}).")
+                if args.prune_on_train_failure:
+                    print(f"--prune-on-train-failure set: skipping {name}'s eval and continuing this rung.")
+                    rung_train_failed = True
+                    continue
+                print(
+                    f"Aborting rung {rung} without ranking or pruning — a training failure is not a "
+                    f"quality result. Fix the failure (see {log_path_variant.with_name(log_path_variant.stem + '_retry.log')}) "
+                    "and resume by re-running this command; state is unchanged."
+                )
+                return 1
 
             aggregate_by_variant[name] = eval_variant(
                 variant, ckpt_dir, manifest, args.eval_dataset_root, target_epochs, rung, log_path,
@@ -442,6 +484,12 @@ def main(argv: list[str] | None = None) -> int:
         if not aggregate_by_variant:
             print("No variant produced a scorable checkpoint this rung; stopping.")
             break
+
+        if rung_train_failed:
+            print(
+                "NOTE: this rung's ranking excludes at least one variant that failed training twice "
+                "(--prune-on-train-failure was set, so it will be pruned as if it lost on quality)."
+            )
 
         ranked, composite = rank_variants(aggregate_by_variant)
         survivors = promote_survivors(ranked)
