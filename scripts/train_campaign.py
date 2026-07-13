@@ -434,19 +434,23 @@ def main(argv: list[str] | None = None) -> int:
             resume = prev > 0
             rung_epochs = target_epochs - prev
 
-            batch_size = args.train_batch_size
-            cmd = build_train_command(
-                variant, args.data_root, ckpt_dir, target_epochs, rung_epochs, resume,
-                batch_size=batch_size,
-            )
+            if rung_epochs <= 0:
+                print(f"Rung {rung}: {name} already has {prev} cumulative epoch(s) (target {target_epochs}); skipping training.")
+                returncode = 0
+            else:
+                batch_size = args.train_batch_size
+                cmd = build_train_command(
+                    variant, args.data_root, ckpt_dir, target_epochs, rung_epochs, resume,
+                    batch_size=batch_size,
+                )
 
-            if args.dry_run:
-                print(f"[dry-run] rung {rung} {name}: {' '.join(cmd)}")
-                continue
+                if args.dry_run:
+                    print(f"[dry-run] rung {rung} {name}: {' '.join(cmd)}")
+                    continue
 
-            print(f"Rung {rung}: training {name} to {target_epochs} cumulative epoch(s)...")
-            log_path_variant = args.campaign_dir / "logs" / f"{name}_rung{rung}.log"
-            returncode = run_training_subprocess(cmd, log_path_variant, args.train_timeout_sec, repo_root)
+                print(f"Rung {rung}: training {name} to {target_epochs} cumulative epoch(s)...")
+                log_path_variant = args.campaign_dir / "logs" / f"{name}_rung{rung}.log"
+                returncode = run_training_subprocess(cmd, log_path_variant, args.train_timeout_sec, repo_root)
 
             if returncode != 0:
                 retry_batch_size = halved_batch_size(batch_size)
