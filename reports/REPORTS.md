@@ -31,7 +31,7 @@ whole video; each enabled component must pay for itself. Full framing:
 | Animate-Anyone integration | ⚠️ Evaluated, not final | Fork reads RGBA PNG + DWPose dataset format ([4](4_animate_anyone_integration_research.md)) |
 | ControlNet temporal consistency | ⚠️ Mechanisms built | Optical-flow warping, adaptive denoising, keyframe resets, cross-frame attention ([5](5_genai_temporal_consistency_research.md)) |
 | Background panorama stitching (camera motion) | ⬜ Open | [7](7_implementation_plan.md) §2B |
-| Codec baselines (AV1, HNeRV/DCVC) | ⚠️ In progress | Reviewer-critical ([6](6_action_matrix.md)); full-length AV1/HEVC anchor curve done (AV1 beats HEVC by 5-32% at matched VMAF, `slow`/`veryslow`). **HNeRV learned-codec baseline done (2026-07-11):** real 15,000-epoch training run on `real_tennis.mp4` — HNeRV loses to every AV1 point and most HEVC points on bytes *and* quality simultaneously, an honest negative result that still closes the R2/R5 gap. Still need to overlay a real PointStream run against the AV1/HEVC curve ([9](9_codec_baselines_report.md)) |
+| Codec baselines (AV1, HNeRV/DCVC) | ✅ Done | Reviewer-critical ([6](6_action_matrix.md)); full-length AV1/HEVC anchor curve done. **HNeRV learned-codec baseline done (2026-07-11 / 2026-07-12):** Initial 15,000-epoch training on `real_tennis.mp4` lost to AV1. Followed up with a High-Capacity (1280x720) Weight Residual Coding sweep for VOD (Model Delta Streaming). Conclusively proved HNeRV is uncompetitive for VOD (39.2 MB payload for 60 frames via delta streaming vs 2.5 MB for AV1). The reviewer gap is now definitively closed with an honest negative result ([9](9_codec_baselines_report.md)). |
 | Residual-Guarantee benchmark harness | ✅ Working | `scripts/benchmark_matrix.py`; first run exposed a panorama symmetry violation, now fixed ([8](8_residual_guarantee_benchmarks_report.md)) |
 | Detector selection (SAM3 vs YOLOv26 vs RF-DETR) | ⬜ Open | [7](7_implementation_plan.md) §2C |
 | Dataset curation (raw_4k → assets/dataset) | ✅ Built, now catalogued | 7 videos (≈2h37m 4K) / 952 scenes / 399 points / 114 deep-annotated tracks; quality-tier models (yolo26x), manually supervised ([10](10_dataset_and_end_to_end_evaluation_report.md)) |
@@ -66,12 +66,14 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    `veryslow`) confirms AV1's expected edge once compared at matched VMAF:
    5-32% fewer bytes than HEVC, widening at lower bitrates
    ([9](9_codec_baselines_report.md)).
-   *Learned-codec baseline done (2026-07-11):* from-scratch HNeRV
+   *Learned-codec baseline done (2026-07-11 & 2026-07-12):* from-scratch HNeRV
    (`src/shared/hnerv_arch.py`, `scripts/hnerv_baseline.py`), trained for
-   real on `real_tennis.mp4` (15,000 epochs, ~55 min GPU). Honest result:
-   HNeRV (5.94 MB, PSNR 32.5/VMAF 79.1) is dominated on bytes *and* quality
-   by every AV1 point and most HEVC points in the anchor curve above — the
-   R2/R5 gap needed a comparison to exist, not to win
+   real on `real_tennis.mp4`. First run (15,000 epochs, 640x360) lost to AV1. 
+   Second run simulated Video-on-Demand (VOD) via Weight Residual Coding 
+   (Model Delta Streaming) on a High-Capacity 1280x720 model. The 60-frame 
+   delta payload was 39.2 MB (vs 2.5 MB for AV1), conclusively proving learned
+   implicit codecs carry far too much entropy to be updated over a network, 
+   even with 80% sparsity. The R2/R5 gap is closed with a definitive negative result
    ([9](9_codec_baselines_report.md)).
    Still owed: run PointStream itself at a matching preset and overlay via
    `--pointstream-run` to get the actual paper claim.

@@ -64,7 +64,9 @@ class TennisSkeletonDataset(Dataset):
             track_name = parts[-1]
             unique_track_id = f"{video_name}_{scene_name}_{track_name}"
             
-            color_frames = list(track_dir.glob("frame_*.png"))
+            color_frames = sorted(track_dir.glob("frame_*.png"))
+            skel_frames = sorted(skel_dir.glob("frame_*.png"))
+            
             if len(color_frames) < 2 and self.include_reference:
                 # We need at least 2 frames if we want to pick a different reference frame
                 continue
@@ -72,13 +74,13 @@ class TennisSkeletonDataset(Dataset):
             if unique_track_id not in self.track_to_colors:
                 self.track_to_colors[unique_track_id] = []
                 
-            for color_path in color_frames:
-                frame_name = color_path.name
-                skel_path = skel_dir / frame_name
-                
-                if skel_path.exists():
-                    self.items.append((color_path, skel_path, unique_track_id))
-                    self.track_to_colors[unique_track_id].append(color_path)
+            # Pair them sequentially by order, accommodating missing frames at the tail if extractor stopped early
+            min_len = min(len(color_frames), len(skel_frames))
+            for i in range(min_len):
+                color_path = color_frames[i]
+                skel_path = skel_frames[i]
+                self.items.append((color_path, skel_path, unique_track_id))
+                self.track_to_colors[unique_track_id].append(color_path)
 
         # Base transform for converting to tensor and resizing
         self.base_transform = transforms.Compose([

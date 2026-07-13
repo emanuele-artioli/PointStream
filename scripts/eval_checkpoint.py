@@ -65,12 +65,23 @@ def clip_color_dir(dataset_root: Path, clip: dict) -> Path:
 
 
 def clip_condition_dir(dataset_root: Path, clip: dict, condition: str) -> Path:
-    suffix = {"skeleton": "_skeleton", "canny": "_canny"}[condition]
+    suffix = {"skeleton": "_skeleton", "canny": "_canny", "pose": "_skeleton"}[condition]
     return dataset_root / clip["video"] / "segmentations" / clip["scene"] / f"{clip['track']}{suffix}"
 
 
 def clip_frame_paths(directory: Path, frame_ids: list[int]) -> list[Path]:
     return [directory / f"frame_{fid:06d}.png" for fid in frame_ids]
+
+
+def clip_condition_frame_paths(dataset_root: Path, clip: dict, condition: str) -> list[Path]:
+    cond_dir = clip_condition_dir(dataset_root, clip, condition)
+    color_dir = clip_color_dir(dataset_root, clip)
+    all_frame_ids = sorted(
+        int(m.group(1)) for f in color_dir.glob("frame_*.png") if (m := _FRAME_ID_RE.search(f.name)) is not None
+    )
+    id_to_index = {fid: idx for idx, fid in enumerate(all_frame_ids)}
+    all_cond_paths = sorted(cond_dir.glob("frame_*.png"))
+    return [all_cond_paths[id_to_index[fid]] for fid in clip["frame_ids"]]
 
 
 def resolve_reference_frame_path(dataset_root: Path, clip: dict) -> Path:
@@ -327,8 +338,9 @@ def evaluate_checkpoint(
     with tempfile.TemporaryDirectory(prefix="eval_checkpoint_") as tmp:
         tmp_dir = Path(tmp)
         for clip in manifest["probe_clips"]:
-            color_paths = clip_frame_paths(clip_color_dir(dataset_root, clip), clip["frame_ids"])
-            cond_paths = clip_frame_paths(clip_condition_dir(dataset_root, clip, condition), clip["frame_ids"])
+            frame_ids = sorted(clip["frame_ids"])
+            color_paths = clip_frame_paths(clip_color_dir(dataset_root, clip), frame_ids)
+            cond_paths = clip_condition_frame_paths(dataset_root, clip, condition)
             ref_path = resolve_reference_frame_path(dataset_root, clip)
 
             ground_truth = load_clip_tensor(color_paths, img_size)  # Shape: [N, 3, size, size]
