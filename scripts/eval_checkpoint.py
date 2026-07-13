@@ -48,7 +48,7 @@ from src.shared.lpips_metric import compute_lpips_from_frames
 _FRAME_ID_RE = re.compile(r"frame_(\d+)\.png$")
 
 DEFAULT_METRICS = ("psnr", "ssim", "vmaf", "fvd")
-ARCH_CHOICES = ("pix2pix", "spade4tennis", "controlnet")
+ARCH_CHOICES = ("pix2pix", "spade4tennis", "controlnet", "multi-controlnet")
 
 
 # ---------------------------------------------------------------------------
@@ -125,6 +125,26 @@ def load_image_rgb01(path: Path, size: int) -> torch.Tensor:
 def load_clip_tensor(paths: list[Path], size: int) -> torch.Tensor:
     """paths -> [N, 3, size, size] float32 in [0, 1]."""
     return torch.stack([load_image_rgb01(p, size) for p in paths], dim=0)
+
+
+def load_seg_rgb01(path: Path, size: int) -> torch.Tensor:
+    from PIL import Image
+    from src.shared.tennis_dataset import pad_to_square
+    
+    img = Image.open(path)
+    if img.mode == 'RGBA':
+        alpha = img.split()[-1]
+        seg_mask = Image.merge("RGB", (alpha, alpha, alpha))
+    else:
+        seg_mask = Image.new("RGB", img.size, (255, 255, 255))
+        
+    seg_mask = pad_to_square(seg_mask, fill=0)
+    seg_mask = seg_mask.resize((size, size), resample=Image.Resampling.BILINEAR)
+    array = np.asarray(seg_mask, dtype=np.float32) / 255.0
+    return torch.from_numpy(array).permute(2, 0, 1).contiguous()
+
+def load_seg_clip_tensor(paths: list[Path], size: int) -> torch.Tensor:
+    return torch.stack([load_seg_rgb01(p, size) for p in paths], dim=0)
 
 
 def rgb01_to_bgr_uint8_frames(frames_rgb01: torch.Tensor) -> list[np.ndarray]:
@@ -230,16 +250,76 @@ def run_controlnet_inference(  # pragma: no cover - requires real SD1.5 + Contro
     return torch.stack(outputs, dim=0)  # Shape: [N, 3, H, W] in [0, 1]
 
 
+def run_multi_controlnet_inference(  # pragma: no cover
+    checkpoint_path: Path,  # unused (we load the 4 specific models)
+    condition_frames: dict[str, torch.Tensor],
+    reference_frame: torch.Tensor,
+    device: str,
+    base_model_id: str = "assets/weights/stable-diffusion-v1-5",
+    prompt: str = "photorealistic tennis player, broadcast sports shot",
+    num_inference_steps: int = 20,
+    generator_seed: int = 0,
+    controlnet_conditioning_scale: list[float] = [1.0, 1.0, 1.0, 1.0],
+) -> torch.Tensor:
+    from diffusers import StableDiffusionControlNetPipeline, ControlNetModel
+    from PIL import Image
+
+    paths = [
+        "assets/weights/pose-controlnet",
+        "assets/weights/custom-controlnet",
+        "assets/weights/seg-controlnet",
+        "assets/weights/ip-adapter-controlnet"
+    ]
+    import torch
+
+    controlnets = [ControlNetModel.from_pretrained(p, torch_dtype=torch.float16).to(device) for p in paths]
+    pipe = StableDiffusionControlNetPipeline.from_pretrained(
+        base_model_id, controlnet=controlnets, safety_checker=None, torch_dtype=torch.float16
+    ).to(device)
+
+    outputs = []
+    # condition_frames is a dict containing 'pose', 'canny', 'seg'
+    num_frames = condition_frames["pose"].shape[0]
+    
+    ref_pil = Image.fromarray((reference_frame.permute(1, 2, 0).numpy() * 255).astype(np.uint8))
+    
+    for i in range(num_frames):
+        pose_img = condition_frames["pose"][i].permute(1, 2, 0).numpy()
+        pose_pil = Image.fromarray((pose_img * 255).astype(np.uint8))
+        
+        canny_img = condition_frames["canny"][i].permute(1, 2, 0).numpy()
+        canny_pil = Image.fromarray((canny_img * 255).astype(np.uint8))
+        
+        seg_img = condition_frames["seg"][i].permute(1, 2, 0).numpy()
+        seg_pil = Image.fromarray((seg_img * 255).astype(np.uint8))
+        
+        gen = torch.Generator(device=device).manual_seed(generator_seed)
+        
+        result = pipe(
+            prompt, 
+            image=[pose_pil, canny_pil, seg_pil, ref_pil], 
+            num_inference_steps=num_inference_steps, 
+            generator=gen,
+            controlnet_conditioning_scale=controlnet_conditioning_scale,
+        ).images[0]
+        
+        result_array = np.asarray(result, dtype=np.float32) / 255.0
+        outputs.append(torch.from_numpy(result_array).permute(2, 0, 1))
+
+    return torch.stack(outputs, dim=0)
+
 ARCH_INFERENCE: dict[str, Callable[..., torch.Tensor]] = {
     "pix2pix": run_pix2pix_inference,
     "spade4tennis": run_spade4tennis_inference,
     "controlnet": run_controlnet_inference,
+    "multi-controlnet": run_multi_controlnet_inference,
 }
 
 ARCH_CONDITION: dict[str, str] = {
     "pix2pix": "skeleton",
     "spade4tennis": "skeleton",
     "controlnet": "skeleton",  # overridden by --controlnet-condition-type
+    "multi-controlnet": "skeleton",
 }
 
 
@@ -340,12 +420,22 @@ def evaluate_checkpoint(
         for clip in manifest["probe_clips"]:
             frame_ids = sorted(clip["frame_ids"])
             color_paths = clip_frame_paths(clip_color_dir(dataset_root, clip), frame_ids)
-            cond_paths = clip_condition_frame_paths(dataset_root, clip, condition)
             ref_path = resolve_reference_frame_path(dataset_root, clip)
 
             ground_truth = load_clip_tensor(color_paths, img_size)  # Shape: [N, 3, size, size]
-            condition_tensor = load_clip_tensor(cond_paths, img_size)  # Shape: [N, 3, size, size]
             reference_tensor = load_image_rgb01(ref_path, img_size)  # Shape: [3, size, size]
+
+            if arch == "multi-controlnet":
+                pose_paths = clip_condition_frame_paths(dataset_root, clip, "skeleton")
+                canny_paths = clip_condition_frame_paths(dataset_root, clip, "canny")
+                condition_tensor = {
+                    "pose": load_clip_tensor(pose_paths, img_size),
+                    "canny": load_clip_tensor(canny_paths, img_size),
+                    "seg": load_seg_clip_tensor(color_paths, img_size),
+                }
+            else:
+                cond_paths = clip_condition_frame_paths(dataset_root, clip, condition)
+                condition_tensor = load_clip_tensor(cond_paths, img_size)  # Shape: [N, 3, size, size]
 
             predicted = infer_fn(checkpoint_path, condition_tensor, reference_tensor, device, **arch_kwargs)
 
@@ -375,6 +465,7 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--controlnet-condition-type", type=str, default="pose", choices=["pose", "canny"])
     parser.add_argument("--controlnet-base-model", type=str, default="assets/weights/stable-diffusion-v1-5")
     parser.add_argument("--controlnet-num-inference-steps", type=int, default=20)
+    parser.add_argument("--controlnet-conditioning-scale", type=str, default="1.0,1.0,1.0,1.0", help="Comma-separated list of 4 scales for multi-controlnet")
     return parser
 
 
@@ -394,6 +485,15 @@ def main(argv: list[str] | None = None) -> int:
         arch_kwargs = {
             "base_model_id": args.controlnet_base_model,
             "num_inference_steps": args.controlnet_num_inference_steps,
+        }
+    elif args.arch == "multi-controlnet":
+        scales = [float(x.strip()) for x in args.controlnet_conditioning_scale.split(",")]
+        if len(scales) != 4:
+            raise ValueError(f"multi-controlnet requires exactly 4 scales, got {len(scales)}")
+        arch_kwargs = {
+            "base_model_id": args.controlnet_base_model,
+            "num_inference_steps": args.controlnet_num_inference_steps,
+            "controlnet_conditioning_scale": scales,
         }
 
     result = evaluate_checkpoint(

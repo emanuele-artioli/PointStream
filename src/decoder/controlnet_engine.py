@@ -668,3 +668,203 @@ class SegControlNetStrategy(CannyControlNetStrategy):
         config: Any = None,
     ) -> None:
         super().__init__(model_id=model_id, controlnet_id=controlnet_id, config=config)
+
+
+class MultiControlNetStrategy(BaseGenAIStrategy):
+    """Multi-Condition ControlNet strategy: Pose, Canny, Seg, Reference."""
+
+    def __init__(
+        self,
+        model_id: str = "assets/weights/stable-diffusion-v1-5",
+        config: Any = None,
+    ) -> None:
+        self.config = config
+        self._model_id = model_id
+        self._pipe: Any | None = None
+        
+        self._width = int(config.controlnet_width) if config and hasattr(config, "controlnet_width") else 512
+        self._height = int(config.controlnet_height) if config and hasattr(config, "controlnet_height") else 512
+        self._steps = int(config.controlnet_steps) if config and hasattr(config, "controlnet_steps") else 20
+        self._strength = float(config.controlnet_strength) if config and hasattr(config, "controlnet_strength") else 0.65
+        self._cfg = float(config.controlnet_cfg) if config and hasattr(config, "controlnet_cfg") else 7.0
+
+        if hasattr(self.config, "controlnet_conditioning_scale"):
+            scale_attr = self.config.controlnet_conditioning_scale
+            if isinstance(scale_attr, str):
+                self._scales = [float(x.strip()) for x in scale_attr.split(",")]
+            elif isinstance(scale_attr, list):
+                self._scales = [float(x) for x in scale_attr]
+            else:
+                self._scales = [1.0, 1.0, 1.0, 1.0]
+        else:
+            self._scales = [1.0, 1.0, 1.0, 1.0]
+
+        if len(self._scales) != 4:
+            _LOGGER.warning(f"MultiControlNetStrategy expects 4 scales, got {len(self._scales)}. Defaulting to [1.0, 1.0, 1.0, 1.0].")
+            self._scales = [1.0, 1.0, 1.0, 1.0]
+
+    def _ensure_pipeline(self, device: torch.device) -> Any:
+        if self._pipe is not None:
+            return self._pipe
+
+        try:
+            from diffusers import ControlNetModel, StableDiffusionControlNetImg2ImgPipeline
+        except ModuleNotFoundError as exc:
+            raise RuntimeError("diffusers is required for ControlNet strategy") from exc
+
+        dtype = resolve_torch_dtype_for_device(
+            device,
+            default_cuda=torch.float16,
+            allowed_cuda={torch.float16, torch.bfloat16, torch.float32},
+            config_dtype=self.config.gpu_dtype if self.config and hasattr(self.config, "gpu_dtype") else None,
+        )
+
+        paths = [
+            "assets/weights/pose-controlnet",
+            "assets/weights/custom-controlnet",
+            "assets/weights/seg-controlnet",
+            "assets/weights/ip-adapter-controlnet"
+        ]
+        import os
+        for p in paths:
+            if not os.path.exists(p):
+                raise FileNotFoundError(f"MultiControlNet required checkpoint missing: {p}")
+            _LOGGER.info(f"MultiControlNet: resolved condition path {p}")
+
+        _LOGGER.info("Loading Multi-Condition ControlNet models...")
+        controlnets = [ControlNetModel.from_pretrained(p, torch_dtype=dtype) for p in paths]
+        
+        _LOGGER.info(f"Loading Stable Diffusion model {self._model_id}...")
+        pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
+            self._model_id,
+            controlnet=controlnets,
+            torch_dtype=dtype,
+            safety_checker=None,
+        )
+        pipe = pipe.to(device)
+        pipe.set_progress_bar_config(disable=True)
+        
+        self._attn_processor = ReferenceAttentionProcessor()
+        pipe.unet.set_attn_processor(self._attn_processor)
+        
+        self._pipe = pipe
+        return pipe
+
+    def generate(
+        self,
+        reference_crop_tensor: torch.Tensor,
+        dense_dwpose_tensor: Any,
+        seed: int,
+        device: torch.device,
+        metadata_bbox: tuple[int, int, int, int] | None = None,
+        init_image_override: Any = None,
+        strength_override: float | None = None,
+    ) -> torch.Tensor:
+        pipe = self._ensure_pipeline(device)
+
+        reference_np = _to_numpy_bgr(reference_crop_tensor)
+
+        if isinstance(dense_dwpose_tensor, tuple):
+            pose_tensor, mask_tensor = dense_dwpose_tensor
+        else:
+            pose_tensor = dense_dwpose_tensor
+            mask_tensor = torch.zeros((1, int(reference_crop_tensor.shape[1]), int(reference_crop_tensor.shape[2])), dtype=torch.uint8, device=device)
+
+        if metadata_bbox is not None:
+            x1, y1, x2, y2 = metadata_bbox
+            bw = max(1, x2 - x1)
+            bh = max(1, y2 - y1)
+            
+            scale = float(max(self._width, self._height)) / max(bh, bw)
+            scaled_h = int(bh * scale)
+            scaled_w = int(bw * scale)
+            
+            offset_x = (self._width - scaled_w) // 2
+            offset_y = (self._height - scaled_h) // 2
+            
+            p_tensor = pose_tensor.clone()
+            p_tensor[..., 0] -= x1
+            p_tensor[..., 1] -= y1
+            p_tensor[..., 0] *= float(scaled_w) / float(bw)
+            p_tensor[..., 1] *= float(scaled_h) / float(bh)
+            p_tensor[..., 0] += offset_x
+            p_tensor[..., 1] += offset_y
+        else:
+            bh, bw = int(reference_np.shape[0]), int(reference_np.shape[1])
+            scale = float(max(self._width, self._height)) / max(bh, bw)
+            scaled_h = int(bh * scale)
+            scaled_w = int(bw * scale)
+            
+            offset_x = (self._width - scaled_w) // 2
+            offset_y = (self._height - scaled_h) // 2
+            
+            p_tensor = pose_tensor.clone()
+            p_tensor[..., 0] *= float(scaled_w) / float(bw)
+            p_tensor[..., 1] *= float(scaled_h) / float(bh)
+            p_tensor[..., 0] += offset_x
+            p_tensor[..., 1] += offset_y
+
+        if p_tensor.ndim == 3:
+            p_tensor = p_tensor[-1]
+            
+        # 1. Pose
+        pose_rgb = _render_pose_condition(p_tensor, output_height=self._height, output_width=self._width)
+        
+        # 2. Canny & 3. Seg
+        mask_np = mask_tensor.detach().cpu().squeeze().numpy()
+        mask_resized = cv2.resize(mask_np, (scaled_w, scaled_h), interpolation=cv2.INTER_NEAREST)
+        
+        seg_canvas = np.zeros((self._height, self._width), dtype=np.uint8)
+        seg_canvas[offset_y:offset_y+scaled_h, offset_x:offset_x+scaled_w] = mask_resized
+        seg_rgb = np.stack([seg_canvas]*3, axis=-1)
+        
+        canny_mask = np.asarray(cv2.Canny(mask_np, 100, 200), dtype=np.uint8)
+        canny_resized = cv2.resize(canny_mask, (scaled_w, scaled_h), interpolation=cv2.INTER_NEAREST)
+        canny_canvas = np.zeros((self._height, self._width), dtype=np.uint8)
+        canny_canvas[offset_y:offset_y+scaled_h, offset_x:offset_x+scaled_w] = canny_resized
+        canny_rgb = np.stack([canny_canvas]*3, axis=-1)
+
+        # 4. Reference Condition
+        reference_rgb = cv2.cvtColor(reference_np, cv2.COLOR_BGR2RGB)
+        if reference_rgb.shape[0] != scaled_h or reference_rgb.shape[1] != scaled_w:
+            reference_rgb = cv2.resize(reference_rgb, (scaled_w, scaled_h), interpolation=cv2.INTER_LANCZOS4)
+            
+        padded_reference = np.zeros((self._height, self._width, 3), dtype=np.uint8)
+        padded_reference[offset_y:offset_y+scaled_h, offset_x:offset_x+scaled_w] = reference_rgb
+
+        # StableDiffusionControlNetImg2ImgPipeline init_image
+        if init_image_override is not None:
+            init_image = init_image_override
+        else:
+            # We use the same padded/resized reference image as the initial image!
+            init_image = Image.fromarray(padded_reference)
+            
+        strength = strength_override if strength_override is not None else self._strength
+        self._attn_processor.is_keyframe = (init_image_override is None)
+
+        generator = torch.Generator(device=device).manual_seed(int(seed))
+        
+        # Pack the 4 conditions in order: Pose, Canny, Seg, Reference
+        control_images = [
+            Image.fromarray(pose_rgb),
+            Image.fromarray(canny_rgb),
+            Image.fromarray(seg_rgb),
+            Image.fromarray(padded_reference)
+        ]
+        
+        output = pipe(
+            prompt="photorealistic tennis player, broadcast sports shot",
+            image=init_image,
+            control_image=control_images,
+            controlnet_conditioning_scale=self._scales,
+            height=self._height,
+            width=self._width,
+            num_inference_steps=self._steps,
+            strength=strength,
+            guidance_scale=self._cfg,
+            generator=generator,
+        )
+        generated_rgb = np.asarray(output.images[0], dtype=np.uint8)
+        generated_cropped = generated_rgb[offset_y:offset_y+scaled_h, offset_x:offset_x+scaled_w]
+        generated_bgr = cv2.cvtColor(generated_cropped, cv2.COLOR_RGB2BGR)
+        return torch.from_numpy(generated_bgr).permute(2, 0, 1).contiguous().to(torch.uint8)

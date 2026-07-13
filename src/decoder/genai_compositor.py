@@ -52,7 +52,7 @@ class BaseGenAIStrategy(ABC):
     def generate(
         self,
         reference_crop_tensor: torch.Tensor,
-        dense_dwpose_tensor: torch.Tensor,
+        dense_dwpose_tensor: Any,
         seed: int,
         device: torch.device,
         metadata_bbox: tuple[int, int, int, int] | None = None,
@@ -630,6 +630,9 @@ class DiffusersCompositor(BaseCompositor):
             from src.decoder.controlnet_engine import SegControlNetStrategy
             cnet_id = getattr(self.config, "controlnet_id", "lllyasviel/control_v11p_sd15_seg")
             return SegControlNetStrategy(controlnet_id=cnet_id, config=self.config)
+        if backend in {"multi-controlnet", "multi_controlnet"}:
+            from src.decoder.controlnet_engine import MultiControlNetStrategy
+            return MultiControlNetStrategy(config=self.config)
         if backend in {"pix2pix"}:
             from src.decoder.pix2pix_engine import Pix2PixStrategy
             return Pix2PixStrategy(config=self.config)
@@ -689,14 +692,15 @@ class DiffusersCompositor(BaseCompositor):
         # For canny/seg controlnet, we pass the mask through the dense_dwpose_tensor argument.
         # Check if the backend is one of these and a mask was provided.
         is_mask_backend = self._backend in {"canny-controlnet", "seg-controlnet", "canny_controlnet", "seg_controlnet"}
+        is_multi_backend = self._backend in {"multi-controlnet", "multi_controlnet"}
         control_tensor = dense_dwpose_tensor
-        if is_mask_backend:
+        if is_mask_backend or is_multi_backend:
             if metadata_mask is not None:
                 # metadata_mask is [H, W] or [H, W, 1]. Create [1, H, W] tensor.
                 mask_np = np.asarray(metadata_mask, dtype=np.uint8)
                 if mask_np.ndim == 3:
                     mask_np = mask_np[:, :, 0]
-                control_tensor = torch.from_numpy(mask_np).unsqueeze(0).to(self._device)
+                mask_tensor = torch.from_numpy(mask_np).unsqueeze(0).to(self._device)
             else:
                 target_w = max(1, x2 - x1)
                 target_h = max(1, y2 - y1)
@@ -713,7 +717,13 @@ class DiffusersCompositor(BaseCompositor):
                 if self._backend in {"canny-controlnet", "canny_controlnet"}:
                     fallback_u8 = np.asarray(cv2.Canny(fallback_u8, 100, 200), dtype=np.uint8)
                     
-                control_tensor = torch.from_numpy(fallback_u8).unsqueeze(0).to(self._device)
+                mask_tensor = torch.from_numpy(fallback_u8).unsqueeze(0).to(self._device)
+            
+            if is_mask_backend:
+                control_tensor = mask_tensor
+            else:
+                # For multi-controlnet, we need BOTH the pose and the mask (for seg and canny computation)
+                control_tensor = (dense_dwpose_tensor, mask_tensor)
 
         if debug_dir is not None and frame_idx is not None and actor_identity is not None:
             self._current_debug_artifacts = self._strategy.get_debug_inputs(
