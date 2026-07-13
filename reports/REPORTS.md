@@ -31,7 +31,7 @@ whole video; each enabled component must pay for itself. Full framing:
 | Animate-Anyone integration | ⚠️ Evaluated, not final | Fork reads RGBA PNG + DWPose dataset format ([4](4_animate_anyone_integration_research.md)) |
 | ControlNet temporal consistency | ⚠️ Mechanisms built | Optical-flow warping, adaptive denoising, keyframe resets, cross-frame attention ([5](5_genai_temporal_consistency_research.md)) |
 | Background panorama stitching (camera motion) | ⬜ Open | [7](7_implementation_plan.md) §2B |
-| Codec baselines (AV1, HNeRV/DCVC) | ⚠️ Mostly done | Reviewer-critical ([6](6_action_matrix.md)); full-length AV1/HEVC anchor curve done. **HNeRV single-checkpoint baseline done (2026-07-11):** 15,000-epoch training on `real_tennis.mp4` loses to AV1 — legitimate citable negative. **The 2026-07-12 Weight-Residual-Coding "conclusive" verdict was invalidated 2026-07-13:** its P-chunk fine-tuning collapsed (2 of 4 chunks ~6 dB constant frames) and the protocol shipped fp16 weights with no byte budget — redo per [11](11_hnerv_wrc_v2_plan.md) before any VOD/delta-streaming claim ([9](9_codec_baselines_report.md) 2026-07-13 entry). |
+| Codec baselines (AV1, HNeRV/DCVC) | ⚠️ Mostly done | Reviewer-critical ([6](6_action_matrix.md)); full-length AV1/HEVC anchor curve done. **HNeRV single-checkpoint baseline done (2026-07-11):** 15,000-epoch training on `real_tennis.mp4` loses to AV1 — legitimate citable negative. **The 2026-07-12 Weight-Residual-Coding "conclusive" verdict was invalidated 2026-07-13.** **HNeRV WRC v2 Phase 1 run (2026-07-13):** byte-budgeted RD curve trained and int8 serialization confirmed working (bytes/param ≤ 1.3), but the result has an unexplained non-monotonic anomaly (3.5M budget scores *worse* VMAF than 1.8M despite +3.3 dB better training quality) and is scoped to a single 60-frame clip with no background-layer handling — usable only as a short-clip ablation, not a general HNeRV/WRC verdict. Original entry used banned "conclusive/definitive" language; corrected. Phase 2 paused pending the anomaly ([9](9_codec_baselines_report.md) 2026-07-13 entries, [11](11_hnerv_wrc_v2_plan.md)). |
 | Residual-Guarantee benchmark harness | ✅ Working | `scripts/benchmark_matrix.py`; first run exposed a panorama symmetry violation, now fixed ([8](8_residual_guarantee_benchmarks_report.md)) |
 | Detector selection (SAM3 vs YOLOv26 vs RF-DETR) | ⬜ Open | [7](7_implementation_plan.md) §2C |
 | Dataset curation (raw_4k → assets/dataset) | ✅ Built, now catalogued | 7 videos (≈2h37m 4K) / 952 scenes / 399 points / 114 deep-annotated tracks; quality-tier models (yolo26x), manually supervised ([10](10_dataset_and_end_to_end_evaluation_report.md)) |
@@ -76,16 +76,16 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    `veryslow`) confirms AV1's expected edge once compared at matched VMAF:
    5-32% fewer bytes than HEVC, widening at lower bitrates
    ([9](9_codec_baselines_report.md)).
-   *Learned-codec baseline (2026-07-11, partially superseded 2026-07-13):*
+   *Learned-codec baseline (2026-07-11, updated 2026-07-13):*
    from-scratch HNeRV (`src/shared/hnerv_arch.py`, `scripts/hnerv_baseline.py`),
    trained for real on `real_tennis.mp4`. First run (15,000 epochs, 640x360)
-   lost to AV1 — that result stands and is citable. The 2026-07-12
-   Weight-Residual-Coding VOD follow-up (39.2 MB claim) is **invalid**: its
-   P-chunk fine-tuning diverged (progress.jsonl shows loss rising 0.14→0.46
-   and two chunks decoding to ~6 dB constant frames) and weights were shipped
-   fp16 with no byte budget. Redo per [11](11_hnerv_wrc_v2_plan.md); until
-   then the paper may cite only the 2026-07-11 single-checkpoint result
-   ([9](9_codec_baselines_report.md) 2026-07-13 entry).
+   lost to AV1. The 2026-07-12 Weight-Residual-Coding VOD follow-up was
+   invalidated. **HNeRV WRC v2 Phase 1 run (2026-07-13)**: byte-budgeted RD
+   curve with confirmed-working int8 serialization, but the 1.8M/3.5M points
+   are non-monotonic in an unexplained way and the whole experiment is
+   scoped to one 60-frame clip — a short-clip ablation, not a general
+   verdict on HNeRV or WRC ([9](9_codec_baselines_report.md) 2026-07-13
+   entries). Phase 2 paused pending the anomaly.
    Still owed: run PointStream itself at a matching preset and overlay via
    `--pointstream-run` to get the actual paper claim.
 4. Component ablations under the Residual-Guarantee framework: racket

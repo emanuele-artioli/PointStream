@@ -71,7 +71,7 @@ from typing import Any
 
 import torch
 
-from scripts.eval_checkpoint import DEFAULT_METRICS, append_jsonl_log, evaluate_checkpoint, load_manifest
+from scripts.eval_checkpoint import append_jsonl_log, evaluate_checkpoint, load_manifest
 
 LOWER_IS_BETTER = {"fvd", "lpips_vgg_uncalibrated"}
 HIGHER_IS_BETTER = {"psnr_mean", "ssim_mean", "vmaf_mean"}
@@ -301,9 +301,12 @@ def eval_variant(
     img_size: int,
     metrics: tuple[str, ...],
     include_lpips: bool,
+    eval_steps: int,
 ) -> dict[str, Any]:
     checkpoint = checkpoint_path_for_eval(variant, ckpt_dir)
     condition_type = variant.condition_type if variant.kind == "controlnet" else None
+
+    arch_kwargs = {"num_inference_steps": eval_steps} if variant.kind == "controlnet" else {}
 
     result = evaluate_checkpoint(
         checkpoint_path=checkpoint,
@@ -316,6 +319,7 @@ def eval_variant(
         include_lpips=include_lpips,
         fps=24.0,
         condition_type=condition_type,
+        arch_kwargs=arch_kwargs,
     )
 
     record = {
@@ -324,6 +328,7 @@ def eval_variant(
         "step": step,
         "variant": variant.name,
         "arch": variant.arch,
+        "eval_steps": eval_steps,
         "checkpoint": str(checkpoint),
         **result["aggregate"],
     }
@@ -344,8 +349,9 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--eval-dataset-root", type=Path, default=Path("assets/dataset"), help="Full (unfiltered) dataset root, for reading probe-clip ground truth")
     parser.add_argument("--initial-epochs", type=int, default=2)
     parser.add_argument("--max-rungs", type=int, default=None)
-    parser.add_argument("--eval-img-size", type=int, default=256)
-    parser.add_argument("--eval-metrics", type=str, default=",".join(DEFAULT_METRICS))
+    parser.add_argument("--eval-img-size", type=int, default=512, help="Eval output resolution (square)")
+    parser.add_argument("--eval-steps", type=int, default=10, help="Inference steps for diffusion variants during campaign eval")
+    parser.add_argument("--eval-metrics", type=str, default="psnr,ssim,vmaf", help="Comma separated metrics")
     parser.add_argument("--skip-lpips", action="store_true")
     parser.add_argument("--device", type=str, default=None)
     parser.add_argument("--train-timeout-sec", type=float, default=None)
@@ -473,7 +479,7 @@ def main(argv: list[str] | None = None) -> int:
 
             aggregate_by_variant[name] = eval_variant(
                 variant, ckpt_dir, manifest, args.eval_dataset_root, target_epochs, rung, log_path,
-                device, args.eval_img_size, metrics, not args.skip_lpips,
+                device, args.eval_img_size, metrics, not args.skip_lpips, args.eval_steps,
             )
             state["cumulative_epochs"][name] = target_epochs
 

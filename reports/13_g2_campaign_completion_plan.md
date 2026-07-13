@@ -82,6 +82,109 @@ Batch 16 @ 512 px OOM'd spade at 00:24 while other users held ~14 GB.
 gradient accumulation to an effective 16 unless ≥ 30 GB are free. The
 campaign runs for hours — other users' allocations *will* change under it.
 
+## Defect 4 (2026-07-13, found post-repair): a stale-state relaunch clobbered the real controlnet checkpoint and silently downgraded rung 0 to 2 epochs
+
+**What happened:** after Defect 1's harness fix landed, the *original*
+orchestrator process (already running with the pre-fix code loaded in
+memory — a fix on disk cannot change an already-running process) was left
+to finish or was restarted; either way, a second `train_campaign`
+invocation was launched:
+
+```
+python -m scripts.train_campaign --campaign-dir outputs/campaign/g2_overnight \
+  --data-root assets/probe_set/training_view --manifest assets/probe_set/manifest.json \
+  --train-batch-size 16 --auto-continue --eval-steps 10 --train-timeout-sec 7200
+```
+
+**`--initial-epochs` is missing from this command** — it silently fell
+back to the argparse default of **2**. `campaign_state.json`'s history now
+shows rung 0 completed at `target_epochs: 2`, not the intended 20:
+
+| variant | rung-0 result at 2 epochs |
+|---|---|
+| pix2pix | PSNR 21.02, VMAF 6.07 |
+| spade4tennis_lite | PSNR 21.89, VMAF 3.00 |
+| controlnet_pose | PSNR 9.76, VMAF 0.11 — pruned |
+
+**None of these numbers mean anything.** VMAF in the single digits for
+*every* variant is what 2-epoch, barely-started training looks like for
+all three architectures — this is not a real quality comparison, and
+controlnet_pose was not "atrociously bad relative to the others," the
+whole rung was undertrained.
+
+**Worse: the real 20-epoch ControlNet checkpoint was overwritten.**
+`eval_checkpoint`'s controlnet path reads the *top-level* files in
+`checkpoints/controlnet_pose/` (`config.json`,
+`diffusion_pytorch_model.safetensors`), not a numbered `checkpoint-epoch-N`
+subdirectory. Those top-level files' mtimes are 2026-07-13 15:43 — i.e.
+they were rewritten by this second invocation's ~3-minute rung-0 pass
+(`logs/controlnet_pose_rung0.log`: load at 15:40:18, save at 15:43:32 — far
+too short to be 2 real epochs of SD1.5 ControlNet fine-tuning on 16k+
+images, meaning `rung_epochs` for this call likely evaluated to zero or a
+negative number from a state/`--initial-epochs` mismatch). The genuinely
+completed 20-epoch fine-tune from the original overnight run is **not
+lost** — it survives intact in
+`checkpoints/controlnet_pose/checkpoint-epoch-20/` (`config.json` +
+`diffusion_pytorch_model.safetensors`, dated 07:05, untouched) — but the
+file the harness actually evaluates and would resume from is now the
+corrupted near-empty retrain.
+
+pix2pix and spade4tennis are not similarly recoverable: pix2pix's resume
+path requires *both* `--resume` *and* an existing
+`pix2pix_checkpoint.pt` (`scripts/train_pix2pix.py:145`) — no such file
+exists in `checkpoints/pix2pix/` (only the final `pix2pix_generator.pt`,
+which the 2-epoch rerun overwrote at 21:23 today), so pix2pix's real
+in-flight 20-epoch progress from the original run is gone. spade4tennis's
+generator file is similarly dated 15:35 today (from the harness's
+Defect-1 retry, not the original run).
+
+**Also compounding this:** rung 1 is currently running
+(`--auto-continue`), training pix2pix/spade4tennis toward 4 cumulative
+epochs *on top of* this corrupted 2-epoch foundation — every additional
+hour it runs is spent extending a campaign whose rung 0 answer is
+meaningless.
+
+**Recovery steps:**
+1. **Stop the running campaign** (`pid` from `ps aux | grep train_campaign`)
+   before it advances further — do not let rung 1 (or beyond) compound this.
+2. **Recover the real ControlNet checkpoint:** copy
+   `checkpoints/controlnet_pose/checkpoint-epoch-20/{config.json,diffusion_pytorch_model.safetensors}`
+   over the clobbered top-level files in `checkpoints/controlnet_pose/`.
+3. **Accept pix2pix/spade4tennis's real progress is gone** — their
+   original in-flight training was never checkpointed anywhere the harness
+   can recover from; restarting them from scratch at a real epoch budget
+   is the only option (their own training scripts are fast enough — hours,
+   not the ControlNet's ~7h — that this is a minor loss compared to
+   ControlNet's).
+4. **Reset `campaign_state.json` cleanly**: `rung: 0`, `alive`: all three,
+   `cumulative_epochs`: `{"pix2pix": 0, "spade4tennis_lite": 0,
+   "controlnet_pose": 20}` (reflecting the just-recovered real checkpoint —
+   NOT 0, or the next rung will treat it as needing a `--from-scratch`
+   retrain), `history: []`.
+5. **Relaunch with `--initial-epochs` set explicitly** (20, matching the
+   original intent — never rely on the argparse default for a real
+   campaign) alongside the Defect-1/2/3 fixes already in place
+   (`--eval-steps 10`, a checked batch size). Since `cumulative_epochs`
+   for controlnet_pose is already 20, rung 0's `target_epochs=20` will
+   correctly make controlnet_pose a no-op resume for this rung (0 more
+   epochs needed) while pix2pix/spade4tennis train their real 20 from
+   scratch — reconcile in code if `rung_epochs` going to zero for a
+   variant needs special-casing (skip the training subprocess entirely
+   rather than invoking it with `--epochs 20 --resume` for no-op work).
+6. **Verify before trusting any number this produces:** re-check
+   `controlnet_pose_rung0.log`'s new timestamp span is consistent with 20
+   real epochs (~6-7h, per the original run), not another 3-minute no-op.
+
+**Root cause / standing rule:** a `train_campaign` relaunch command must
+always carry the *same* `--initial-epochs` (and other budget-defining
+flags) as the invocation whose state it's resuming — the harness has no
+way to detect a mismatched relaunch and will silently treat "no flag
+given" as "start a tiny smoke test," even against a state file that
+implies a much larger campaign is in progress. Consider a follow-up
+harness change: persist `--initial-epochs` into `campaign_state.json` on
+first launch and error out on a relaunch that passes a different value
+without an explicit `--force-rebudget` flag.
+
 ## From repaired rung 0 to the G2 claim (order matters)
 
 1. **Rung 0 complete + accepted** (3 scored variants, defect-1 repair).

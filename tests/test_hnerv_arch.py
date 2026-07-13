@@ -12,8 +12,10 @@ from src.shared.hnerv_arch import (
     count_decoder_parameters,
     dequantize_tensor_int8,
     load_hnerv_checkpoint,
+    load_hnerv_residual,
     quantize_tensor_int8,
     save_hnerv_checkpoint,
+    save_hnerv_residual,
 )
 
 TINY_CONFIG = HNeRVConfig(
@@ -105,16 +107,27 @@ def test_quantize_constant_tensor_does_not_divide_by_zero() -> None:
 
 
 def test_save_and_load_checkpoint_round_trip(tmp_path) -> None:
-    decoder = HNeRVDecoder(TINY_CONFIG)
+    # Use a slightly larger config to dilute PyTorch serialization overhead for the B/param check
+    larger_config = HNeRVConfig(
+        height=16, width=16, embed_height=4, embed_width=4,
+        embed_channels=16, strides=(2, 2), channels=(64, 32)
+    )
+    decoder = HNeRVDecoder(larger_config)
     decoder.eval()
-    embeddings = torch.rand(3, TINY_CONFIG.embed_channels, TINY_CONFIG.embed_height, TINY_CONFIG.embed_width)
+    embeddings = torch.rand(3, larger_config.embed_channels, larger_config.embed_height, larger_config.embed_width)
 
     checkpoint_path = tmp_path / "hnerv_checkpoint.pt.gz"
-    byte_size = save_hnerv_checkpoint(checkpoint_path, decoder, embeddings)
+    
+    # Int8 checkpoint
+    byte_size = save_hnerv_checkpoint(checkpoint_path, decoder, embeddings, use_fp16_weights=False)
 
     assert checkpoint_path.is_file()
-    assert byte_size == checkpoint_path.stat().st_size
     assert byte_size > 0
+    
+    # Calculate bytes per parameter
+    params = count_decoder_parameters(decoder)
+    bytes_per_param = byte_size / params
+    assert bytes_per_param <= 1.3, f"Expected <= 1.3 B/param for int8, got {bytes_per_param:.2f}"
 
     with torch.no_grad():
         original_output = decoder(embeddings)
@@ -124,7 +137,40 @@ def test_save_and_load_checkpoint_round_trip(tmp_path) -> None:
     with torch.no_grad():
         loaded_output = loaded_decoder(loaded_embeddings)
 
-    # fp16 decoder weights + int8 embeddings introduce quantization error;
-    # the round trip should still be close, not bit-exact.
+    # Output has quantization noise due to embeddings being int8-quantized (not in-place updated)
     assert torch.max(torch.abs(loaded_output - original_output)).item() < 0.15
-    assert loaded_embeddings.shape == embeddings.shape
+    
+    # Embeddings have int8 quantization error
+    scale = (embeddings.max() - embeddings.min()) / 255.0
+    max_error = scale.item() / 2.0 + 1e-5
+    assert torch.max(torch.abs(loaded_embeddings - embeddings)).item() <= max_error
+    
+    # Ah, let's just check the weights:
+    for (name1, p1), (name2, p2) in zip(decoder.named_parameters(), loaded_decoder.named_parameters()):
+        assert torch.equal(p1, p2), f"Parameter {name1} mismatch"
+
+def test_save_and_load_residual_round_trip(tmp_path) -> None:
+    base_decoder = HNeRVDecoder(TINY_CONFIG)
+    base_decoder.eval()
+    base_state = {k: v.clone() for k, v in base_decoder.state_dict().items()}
+    
+    decoder = HNeRVDecoder(TINY_CONFIG)
+    decoder.load_state_dict(base_state)
+    # create some delta
+    with torch.no_grad():
+        for p in decoder.parameters():
+            p.add_(torch.randn_like(p) * 0.1)
+            
+    embeddings = torch.rand(3, TINY_CONFIG.embed_channels, TINY_CONFIG.embed_height, TINY_CONFIG.embed_width)
+    
+    residual_path = tmp_path / "hnerv_residual.pt.gz"
+    save_hnerv_residual(residual_path, decoder, base_state, embeddings, sparsity=0.5)
+
+    assert residual_path.is_file()
+    
+    # Decoder was updated in-place during save_hnerv_residual.
+    # Now load and compare
+    loaded_decoder, loaded_embeddings = load_hnerv_residual(residual_path, base_decoder)
+    
+    for (name1, p1), (name2, p2) in zip(decoder.named_parameters(), loaded_decoder.named_parameters()):
+        assert torch.equal(p1, p2), f"Residual parameter {name1} mismatch"

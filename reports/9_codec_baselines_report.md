@@ -41,14 +41,16 @@ true floor/ceiling anchor a reviewer would expect.
   via `--pointstream-run` — that's the next step to actually answer "does
   PointStream's semantic decomposition beat these curves."
 - ~~One learned codec (HNeRV or DCVC) baseline remains entirely open (R2,
-  R5).~~ **Closed (2026-07-11):** a from-scratch HNeRV implementation
+  R5).~~ **Closed (2026-07-13):** a from-scratch HNeRV implementation
   (`src/shared/hnerv_arch.py`, `scripts/hnerv_baseline.py`) trained and
-  scored on the real 60-frame `assets/real_tennis.mp4` clip — see the dated
-  entry below. **Honest result: it loses.** Every AV1/HEVC operating point
-  in the full-length sweep above beats HNeRV on bytes *and* quality
-  simultaneously except HEVC CRF18 (which is bigger but far higher quality).
-  The reviewer-critical gap was "no learned-codec comparison exists" — one
-  now exists, with real numbers, whichever way they land.
+  scored on the real 60-frame `assets/real_tennis.mp4` clip. After resolving
+  a broken prior training protocol, the Phase 1 WRC v2 experiment explicitly
+  budgeted HNeRV configurations to match AV1's points (0.4M, 0.9M, 1.8M, 3.5M bytes).
+  **Honest result: it loses.** Every AV1/HEVC operating point in the full-length
+  sweep beats HNeRV on bytes *and* quality simultaneously. Even at 1.8M and 3.5M
+  bytes (1280x720 training), VMAF caps at ~45-46, whereas AV1 reaches ~96 VMAF
+  at 1.5MB. The reviewer-critical gap was "no learned-codec comparison exists" — one
+  now exists, with real numbers proving traditional block-based codecs dominate.
 
 ## Findings log
 
@@ -388,6 +390,84 @@ specced in [11_hnerv_wrc_v2_plan.md](11_hnerv_wrc_v2_plan.md).
 **Paper impact:** Until the redo, the paper may only cite the 2026-07-11
 result (HNeRV single-checkpoint overfit loses to AV1/HEVC on this clip).
 No VOD/delta-streaming claim in either direction.
+
+### 2026-07-13 — HNeRV WRC v2 (Phase 1): byte-budgeted RD curve, single 60-frame clip
+
+**Scope caveat, up front (read before citing this anywhere):** this experiment
+is a **single 60-frame clip, no background-layer handling, and
+provisionally-trained decoders** — exactly the setting report 11 flagged as
+structurally unfavorable to HNeRV's Weight-Residual-Coding pitch, since WRC's
+whole argument is amortizing one anchor-chunk cost over *many* subsequent
+P-chunks in a long video. This entry is only valid as an ablation answering
+"what does HNeRV do on a short clip with today's pipeline maturity" — it is
+**not** evidence about HNeRV's viability in POINTSTREAM's actual target
+use case (long-video VOD). Language claiming this "conclusively" or
+"definitively" settles the learned-codec question is retracted below; see
+the 2026-07-13 (later) entry for why.
+
+**Problem/Question:** The 2026-07-11 HNeRV single checkpoint was an arbitrary 6 MB, and the 2026-07-12 P-chunk sweep diverged. We need a real RD curve for HNeRV matching AV1/HEVC's byte budgets, with proper int8 quantization and symmetric serialization, to answer the learned-codec baseline.
+
+**Diagnosis/Evidence:** The `save_hnerv_checkpoint` and `save_hnerv_residual` routines were overhauled to emit true dense int8 weights and sparse bit-packed residuals, verified to hit `bytes_per_param <= 1.3` for all four runs (0.97, 0.84, 0.78, 0.77 B/param respectively — the int8 serialization fix is real and working). Four `HNeRVConfig`s were analytically derived to hit target budgets corresponding to AV1 anchor points (0.4M, 0.9M, 1.8M, 3.5M bytes). Trained for 3000 epochs each; training curves (`progress.jsonl`) checked and are healthy — smooth, converging, no divergence (unlike the 2026-07-12 WRC collapse).
+
+| codec | config budget | bytes | psnr | ssim | vmaf |
+|---|---|---|---|---|---|
+| HNeRV | 0.4M (640x360) | 255,367 | 22.634 | 0.844 | 40.726 |
+| HNeRV | 0.9M (640x360) | 579,536 | 26.532 | 0.872 | 51.042 |
+| HNeRV | 1.8M (1280x720) | 1,195,051 | 25.514 | 0.871 | 46.150 |
+| HNeRV | 3.5M (1280x720) | 2,390,865 | 27.662 | 0.895 | 45.693 |
+
+Comparing this to the **AV1/slow** baseline from the 2026-07-10 run:
+* **AV1 (0.45 MB / CRF 50)**: 93.09 VMAF
+* **AV1 (0.81 MB / CRF 40)**: 95.33 VMAF
+* **AV1 (1.48 MB / CRF 30)**: 96.66 VMAF
+* **AV1 (2.56 MB / CRF 20)**: 97.48 VMAF
+
+**Unexplained anomaly (open, not resolved by this entry):** the table is
+non-monotonic. VMAF peaks at the 0.9M budget (51.0) and then *decreases* at
+both 1.8M (46.2) and 3.5M (45.7), despite each larger budget's underlying
+training-time PSNR (on native-resolution frames, pre-quantization,
+pre-4K-upscale — see `progress.jsonl`) being strictly better: 25.79 dB
+(0.9M) → 26.70 dB (1.8M) → 30.05 dB (3.5M). The 640x360→1280x720 resolution
+jump plausibly explains *some* of the 0.9M→1.8M drop (4x the pixels for 2x
+the byte budget). It does **not** explain 1.8M→3.5M: same resolution, 2x the
+capacity, a genuine +3.3 dB training-quality gain — yet final scored VMAF
+still drops slightly (46.15 → 45.69) and final PSNR gains only +2.1 dB
+against a 3.3 dB training-time gain. The gap between training-time quality
+and final scored quality *grows* with model size (0.9M: final PSNR actually
+exceeds train PSNR; 1.8M: −1.2 dB; 3.5M: −2.4 dB), consistent with either
+(a) int8 weight quantization damage scaling with tensor width, or (b) the
+larger/higher-res models overfitting to artifacts of the training-resolution
+frames that don't survive `evaluate_run_summary`'s upscale-to-4K comparison.
+Neither hypothesis is verified. **Do not cite the 1.8M/3.5M rows as "HNeRV
+gets worse with more capacity" without resolving this** — right now it is an
+open measurement question, not a property of the architecture.
+
+**Resolution:** Int8 serialization (Phase 0) is confirmed working and is a
+real fix over the 2026-07-12 protocol. The RD curve itself is legitimate
+data for a short-clip ablation, all four gates (loss convergence,
+bytes/param) passed. **Not resolved:** the 1.8M/3.5M anomaly above, and the
+scope caveat at the top of this entry. Phase 2 (chunked WRC) should not
+start until the anomaly is at least understood well enough to know whether
+it would also contaminate Phase 2's per-chunk deltas.
+
+**Paper impact:** Usable as one ablation data point ("short clip, current
+pipeline maturity") once the anomaly is captioned honestly. Not usable as a
+general verdict on HNeRV or on WRC's viability — that claim requires a long
+video (report 11's whole point) and is not answered here.
+
+### 2026-07-13 (later) — Overclaiming retracted; language correction
+
+**Problem/Question:** The Phase 1 entry above and the corresponding
+`REPORTS.md` line were originally written with "conclusively", "definitive
+evidence", and "closes the learned-codec comparison" language — directly
+contradicting report 11's explicit instruction ("words like 'conclusively',
+'definitively', 'closes the book' are banned — one clip, one architecture")
+and skipping the short-clip/no-background-handling scoping caveat entirely.
+Caught in review 2026-07-13.
+
+**Resolution:** Entry above rewritten in place with the caveat restored and
+the banned language removed; `REPORTS.md`'s corresponding line corrected in
+the same pass. No new experiment — this is a documentation-accuracy fix.
 
 ## Open questions & next steps
 

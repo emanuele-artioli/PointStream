@@ -36,6 +36,7 @@ import math
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import torch
 import torch.nn as nn
 
@@ -201,20 +202,32 @@ def dequantize_tensor_int8(quantized: torch.Tensor, scale: float, zero_point: fl
     return quantized.to(torch.float32) * scale + zero_point
 
 
-def save_hnerv_checkpoint(path: str | Path, decoder: HNeRVDecoder, embeddings: torch.Tensor) -> int:
-    """Serialize decoder (fp16) + quantized (int8) embeddings, gzip-compressed.
-
-    Only the decoder and per-frame embeddings are saved — the encoder is
-    encode-time-only and is never part of the transmitted "bytes" for this
-    baseline, matching how HNeRV's own compression accounting works.
-
-    Returns the size in bytes of the file written to `path`.
+def save_hnerv_checkpoint(path: str | Path, decoder: HNeRVDecoder, embeddings: torch.Tensor, use_fp16_weights: bool = False) -> int:
+    """Serialize decoder + quantized (int8) embeddings, gzip-compressed.
+    By default, decoder weights are per-tensor int8 quantized to match paper.
+    If use_fp16_weights is True, ships fp16 weights instead.
     """
     quantized, scale, zero_point = quantize_tensor_int8(embeddings)
-    decoder_state_fp16 = {key: value.half().cpu() for key, value in decoder.state_dict().items()}
+    decoder_state: dict[str, torch.Tensor] = {}
+    decoder_metadata: dict[str, tuple[float, float] | None] = {}
+
+    with torch.no_grad():
+        for key, value in decoder.state_dict().items():
+            if use_fp16_weights:
+                decoder_state[key] = value.half().cpu()
+                decoder_metadata[key] = None
+            else:
+                q_val, s, zp = quantize_tensor_int8(value)
+                decoder_state[key] = q_val.cpu()
+                decoder_metadata[key] = (s, zp)
+                # Apply lossy int8 delta back to decoder to ensure symmetric evaluation
+                value.copy_(dequantize_tensor_int8(q_val, s, zp).to(value.device))
+
     payload = {
         "config": decoder.config.as_dict(),
-        "decoder_state_dict": decoder_state_fp16,
+        "decoder_state_dict": decoder_state,
+        "decoder_metadata": decoder_metadata,
+        "use_fp16_weights": use_fp16_weights,
         "embeddings_int8": quantized.cpu(),
         "embed_scale": scale,
         "embed_zero_point": zero_point,
@@ -229,18 +242,22 @@ def save_hnerv_checkpoint(path: str | Path, decoder: HNeRVDecoder, embeddings: t
 
 
 def load_hnerv_checkpoint(path: str | Path, device: str | torch.device = "cpu") -> tuple[HNeRVDecoder, torch.Tensor]:
-    """Inverse of `save_hnerv_checkpoint`: rebuilds the decoder and dequantizes embeddings.
-
-    This is the "decode" side of the Residual-Guarantee-style symmetry check:
-    a real client would load exactly this file and run exactly this forward
-    pass — no information beyond what was written to disk is used.
-    """
+    """Inverse of `save_hnerv_checkpoint`: rebuilds the decoder and dequantizes embeddings."""
     compressed = Path(path).read_bytes()
     raw = gzip.decompress(compressed)
     payload = torch.load(io.BytesIO(raw), map_location="cpu", weights_only=False)
     config = HNeRVConfig.from_dict(payload["config"])
     decoder = HNeRVDecoder(config)
-    decoder.load_state_dict({key: value.float() for key, value in payload["decoder_state_dict"].items()})
+    
+    new_state = {}
+    for key, val in payload["decoder_state_dict"].items():
+        if payload.get("use_fp16_weights"):
+            new_state[key] = val.float()
+        else:
+            s, zp = payload["decoder_metadata"][key]
+            new_state[key] = dequantize_tensor_int8(val, s, zp).float()
+            
+    decoder.load_state_dict(new_state)
     decoder = decoder.to(device)
     embeddings = dequantize_tensor_int8(
         payload["embeddings_int8"].to(device), payload["embed_scale"], payload["embed_zero_point"]
@@ -255,15 +272,13 @@ def save_hnerv_residual(
     embeddings: torch.Tensor,
     sparsity: float = 0.8,
 ) -> int:
-    """Serialize sparse decoder weight deltas (fp16) + embeddings (int8), gzip-compressed.
-
-    Modifies the `decoder`'s state in-place to apply the exact lossy (pruned/fp16) delta
-    so the subsequent encoding/decoding perfectly matches what the client sees (Symmetry Check).
-
+    """Serialize sparse decoder weight deltas (int8) + embeddings (int8), gzip-compressed.
+    Modifies the `decoder`'s state in-place to apply the exact lossy delta for Symmetry Check.
     Returns the size in bytes of the residual payload.
     """
     quantized, scale, zero_point = quantize_tensor_int8(embeddings)
-    delta_state_fp16 = {}
+    delta_state = {}
+    delta_metadata = {}
 
     with torch.no_grad():
         for key, value in decoder.state_dict().items():
@@ -272,19 +287,37 @@ def save_hnerv_residual(
 
             if sparsity > 0:
                 abs_delta = delta.abs()
-                # Compute threshold safely for non-empty tensors
                 if abs_delta.numel() > 0:
                     threshold = torch.quantile(abs_delta.float(), sparsity)
                     delta[abs_delta < threshold] = 0.0
 
-            delta_fp16 = delta.half().cpu()
-            delta_state_fp16[key] = delta_fp16
+            flat_delta = delta.view(-1)
+            nonzero_mask = (flat_delta != 0.0)
+            
+            mask_numpy = nonzero_mask.cpu().numpy()
+            packed_mask = np.packbits(mask_numpy)
+            
+            surviving_values = flat_delta[nonzero_mask]
+            
+            if surviving_values.numel() > 0:
+                q_surviving, s, zp = quantize_tensor_int8(surviving_values)
+            else:
+                q_surviving = torch.empty(0, dtype=torch.uint8)
+                s, zp = 1.0, 0.0
+                
+            delta_state[key] = (torch.from_numpy(packed_mask), q_surviving.cpu())
+            delta_metadata[key] = (s, zp, list(delta.shape))
 
-            # Apply lossy delta back to decoder to ensure symmetric evaluation
-            value.copy_(base_val + delta_fp16.to(value.device).float())
+            reconstructed_flat = torch.zeros_like(flat_delta)
+            if surviving_values.numel() > 0:
+                reconstructed_flat[nonzero_mask] = dequantize_tensor_int8(q_surviving, s, zp).to(value.device)
+            reconstructed_delta = reconstructed_flat.view(delta.shape)
+            
+            value.copy_(base_val + reconstructed_delta)
 
     payload = {
-        "delta_state_dict": delta_state_fp16,
+        "delta_state_dict": delta_state,
+        "delta_metadata": delta_metadata,
         "embeddings_int8": quantized.cpu(),
         "embed_scale": scale,
         "embed_zero_point": zero_point,
@@ -306,13 +339,24 @@ def load_hnerv_residual(
     raw = gzip.decompress(compressed)
     payload = torch.load(io.BytesIO(raw), map_location="cpu", weights_only=False)
 
-    # Use the same config as the base decoder
     decoder = HNeRVDecoder(base_decoder.config).to(device)
     new_state = {}
     base_state = base_decoder.state_dict()
-    for key, delta_fp16 in payload["delta_state_dict"].items():
+    
+    for key, (packed_mask_tensor, q_surviving) in payload["delta_state_dict"].items():
         base_val = base_state[key].to(device)
-        new_state[key] = base_val + delta_fp16.to(device).float()
+        s, zp, shape = payload["delta_metadata"][key]
+        
+        packed_mask = packed_mask_tensor.numpy()
+        mask_numpy = np.unpackbits(packed_mask)[:math.prod(shape)].astype(bool)
+        nonzero_mask = torch.from_numpy(mask_numpy).to(device)
+        
+        flat_delta = torch.zeros(math.prod(shape), device=device, dtype=torch.float32)
+        if q_surviving.numel() > 0:
+            flat_delta[nonzero_mask] = dequantize_tensor_int8(q_surviving.to(device), s, zp)
+            
+        reconstructed_delta = flat_delta.view(shape)
+        new_state[key] = base_val + reconstructed_delta
 
     decoder.load_state_dict(new_state)
     embeddings = dequantize_tensor_int8(
