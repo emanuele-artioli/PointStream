@@ -246,3 +246,76 @@ def load_hnerv_checkpoint(path: str | Path, device: str | torch.device = "cpu") 
         payload["embeddings_int8"].to(device), payload["embed_scale"], payload["embed_zero_point"]
     )
     return decoder, embeddings
+
+
+def save_hnerv_residual(
+    path: str | Path,
+    decoder: HNeRVDecoder,
+    base_decoder_state: dict[str, torch.Tensor],
+    embeddings: torch.Tensor,
+    sparsity: float = 0.8,
+) -> int:
+    """Serialize sparse decoder weight deltas (fp16) + embeddings (int8), gzip-compressed.
+
+    Modifies the `decoder`'s state in-place to apply the exact lossy (pruned/fp16) delta
+    so the subsequent encoding/decoding perfectly matches what the client sees (Symmetry Check).
+
+    Returns the size in bytes of the residual payload.
+    """
+    quantized, scale, zero_point = quantize_tensor_int8(embeddings)
+    delta_state_fp16 = {}
+
+    with torch.no_grad():
+        for key, value in decoder.state_dict().items():
+            base_val = base_decoder_state[key].to(value.device)
+            delta = value - base_val
+
+            if sparsity > 0:
+                abs_delta = delta.abs()
+                # Compute threshold safely for non-empty tensors
+                if abs_delta.numel() > 0:
+                    threshold = torch.quantile(abs_delta.float(), sparsity)
+                    delta[abs_delta < threshold] = 0.0
+
+            delta_fp16 = delta.half().cpu()
+            delta_state_fp16[key] = delta_fp16
+
+            # Apply lossy delta back to decoder to ensure symmetric evaluation
+            value.copy_(base_val + delta_fp16.to(value.device).float())
+
+    payload = {
+        "delta_state_dict": delta_state_fp16,
+        "embeddings_int8": quantized.cpu(),
+        "embed_scale": scale,
+        "embed_zero_point": zero_point,
+    }
+    buffer = io.BytesIO()
+    torch.save(payload, buffer)
+    compressed = gzip.compress(buffer.getvalue(), compresslevel=9)
+    out_path = Path(path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_bytes(compressed)
+    return len(compressed)
+
+
+def load_hnerv_residual(
+    path: str | Path, base_decoder: HNeRVDecoder, device: str | torch.device = "cpu"
+) -> tuple[HNeRVDecoder, torch.Tensor]:
+    """Inverse of `save_hnerv_residual`: applies the weight delta to the base decoder."""
+    compressed = Path(path).read_bytes()
+    raw = gzip.decompress(compressed)
+    payload = torch.load(io.BytesIO(raw), map_location="cpu", weights_only=False)
+
+    # Use the same config as the base decoder
+    decoder = HNeRVDecoder(base_decoder.config).to(device)
+    new_state = {}
+    base_state = base_decoder.state_dict()
+    for key, delta_fp16 in payload["delta_state_dict"].items():
+        base_val = base_state[key].to(device)
+        new_state[key] = base_val + delta_fp16.to(device).float()
+
+    decoder.load_state_dict(new_state)
+    embeddings = dequantize_tensor_int8(
+        payload["embeddings_int8"].to(device), payload["embed_scale"], payload["embed_zero_point"]
+    )
+    return decoder, embeddings

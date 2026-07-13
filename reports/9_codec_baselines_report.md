@@ -313,6 +313,82 @@ Higher training resolution, more capacity, or more epochs could plausibly
 close some of this gap and would be a natural follow-up if the paper wants
 a stronger learned-codec showing, but is not required to close this gap.
 
+### 2026-07-12 — High-Capacity HNeRV and Weight Residual Coding (Model Delta Streaming) for VOD
+
+**Superseded 2026-07-13:** see the 2026-07-13 entry below — the P-chunk
+fine-tuning in this run collapsed (2 of 4 chunks decode to a near-constant
+frame at ~6 dB PSNR), so neither the 39.2 MB payload nor the
+"conclusively closes the book" verdict is usable evidence. Redo per
+[11_hnerv_wrc_v2_plan.md](11_hnerv_wrc_v2_plan.md).
+
+**Problem/Question:** The initial HNeRV baseline was trained as a single static checkpoint. To evaluate HNeRV realistically for Video-on-Demand (VOD), we must implement "Weight Residual Coding" (streaming model deltas for P-frames). Additionally, the initial model was low-capacity (640x360). Can a high-capacity model (1280x720, 12.4M params) with weight-residual P-chunks compete with AV1?
+
+**Diagnosis/Evidence:** We updated the architecture to support P-chunks:
+1. **Chunking**: The 60-frame video was split into 4 chunks (15 frames each).
+2. **Anchor Chunk (I-frame equivalent)**: Trained from scratch for 2,000 epochs. Size: 22.9 MB.
+3. **Residual Chunks (P-frames)**: Initialized from the previous chunk's state, fine-tuned for 500 epochs, and the fp16 weight delta was calculated. To simulate arithmetic entropy coding, we applied 80% magnitude pruning to the deltas and serialized them with `gzip`.
+
+**Result:**
+The sweep proved that even with heavy pruning, the P-chunks are staggeringly large.
+* Anchor Chunk (Frames 0-14): 22.9 MB
+* P-Chunk 1 (Frames 15-29): 5.7 MB
+* P-Chunk 2 (Frames 30-44): 5.1 MB
+* P-Chunk 3 (Frames 45-59): 5.4 MB
+* **Total Payload:** 39.2 MB (5.7x larger than the uncompressed source).
+
+A single 15-frame P-chunk (5.7 MB) costs double the payload of the *entire 60-frame* AV1 CRF20 encode (2.5 MB). 
+
+**Conclusion/Resolution:** This experiment conclusively closes the book on learned implicit codecs for our baseline matrix. Even when perfectly simulating a VOD stream via sparse Model Delta transmission, HNeRV cannot compete with traditional block-based codecs on bitrate. The 12.4M parameters simply carry far too much entropy to be updated over a network, even with 80% sparsity.
+
+### 2026-07-13 — WRC run invalidated: P-chunk fine-tuning collapsed; protocol was also stacked against HNeRV
+
+**Problem/Question:** Post-hoc review of the 2026-07-12 Weight Residual
+Coding sweep (`outputs/hnerv_vod_sweep_short/20260712_234755/`) before
+accepting its "conclusive" negative verdict.
+
+**Diagnosis/Evidence:** Two independent problems, either of which alone
+invalidates the verdict:
+
+1. **The run itself is broken.** `progress.jsonl` shows the per-chunk
+   training trajectories:
+   - Anchor (frames 0–14, 2,000 epochs): loss 0.156 → 0.010, PSNR → 32.9 dB. Healthy.
+   - P-chunk 1 (500 epochs): PSNR → 23.5 dB — 9 dB below the anchor, still
+     converging when stopped.
+   - P-chunks 2 and 3: **diverged** — loss *rises* from ~0.14 to ~0.42–0.46
+     within 100 epochs and pins there; PSNR ~5.9–6.7 dB, i.e. an MSE of
+     ~0.25 on [0,1] data = the model outputs a near-constant frame.
+   The published aggregate (PSNR 17.644, VMAF 44.881) averages one healthy
+   chunk, one undertrained chunk, and two collapsed ones. Likely mechanism:
+   each P-chunk rebuilds `HNeRVModel(config)` with a **fresh random
+   encoder** (only the decoder state is carried over), then fine-tunes
+   everything at the full initial LR with a restarted cosine schedule; the
+   base decoder for chunks 2+ has additionally been degraded by the lossy
+   80 %-pruned fp16 delta.
+2. **Even if training had converged, the protocol could not have won.**
+   (a) Model sizing was backwards: 12.4 M params (~22.9 MB at fp16+gzip)
+   were allocated to a 15-frame chunk with no byte budget in mind — the
+   competitive question is what quality HNeRV reaches *at a payload matched
+   to the AV1 anchor points*, i.e. ≤ ~1–2 MB total. (b) Weights were
+   shipped as fp16; HNeRV's own compression protocol quantizes weights to
+   8-bit (the embeddings here already are int8 — the asymmetry is an
+   oversight). (c) "Simulating entropy coding" as dense-fp16 + 80 %
+   zeroing + gzip stores every surviving delta at 2 bytes: 12.4 M × 20 % ×
+   2 B ≈ 5 MB — exactly the observed P-chunk sizes, i.e. the pruning bought
+   nothing beyond what it zeroed.
+
+**Resolution:** The 2026-07-12 entry is marked superseded. The dashboard
+claim "conclusively proved HNeRV is uncompetitive" is withdrawn; the
+*first* (2026-07-11) single-checkpoint result stands as a legitimate
+honest-loss data point. A redo with a defensible protocol (byte-budgeted
+model sizing, int8 weights + real sparse serialization, carried-over
+encoder state, reduced fine-tune LR, and hard convergence gates so a
+collapsed chunk halts the run instead of polluting the aggregate) is
+specced in [11_hnerv_wrc_v2_plan.md](11_hnerv_wrc_v2_plan.md).
+
+**Paper impact:** Until the redo, the paper may only cite the 2026-07-11
+result (HNeRV single-checkpoint overfit loses to AV1/HEVC on this clip).
+No VOD/delta-streaming claim in either direction.
+
 ## Open questions & next steps
 
 1. Run a real PointStream pipeline pass (`num-frames: null`) at a
