@@ -31,9 +31,27 @@ inference step count in every eval so runs are comparable.
 
 ## Existing assets (verify these paths before starting; if one is missing, STOP and report)
 
-- Fine-tuned single-condition ControlNets in `assets/weights/`
-  (pose / canny / seg / ip-adapter — see report 10's checkpoint census,
-  plus fresher ones under `outputs/campaign/g2_overnight/checkpoints/`).
+**Verified 2026-07-13 — two corrections to what this section originally said:**
+
+- Fine-tuned single-condition ControlNets in `assets/weights/`, exact directory names
+  (do not guess — "canny-controlnet" does **not** exist as a path):
+  - pose → `assets/weights/pose-controlnet`
+  - canny → `assets/weights/custom-controlnet` (confirmed via `config.json`'s
+    `_name_or_path: lllyasviel/control_v11p_sd15_canny` — this generic name is the fine-tuned
+    Canny checkpoint)
+  - seg → `assets/weights/seg-controlnet`
+  - reference → `assets/weights/ip-adapter-controlnet`, **but this is architecturally a fourth
+    `ControlNetModel`, not a diffusers-native IP-Adapter.** `scripts/train_controlnet.py`'s
+    `ControlNetDataset.__getitem__` shows condition_type `"ip-adapter"` was trained with the
+    *target actor image itself* (padded/resized) as the ControlNet conditioning input, on an
+    OpenPose-architecture base. Compose it as a fourth entry in `MultiControlNetModel` alongside
+    pose/canny/seg — do not call `pipe.load_ip_adapter()` on it, that API expects a different
+    checkpoint format entirely and will not work with this file. Fresher checkpoints also exist
+    under `outputs/campaign/g2_overnight/checkpoints/` for the pose variant specifically (the G2
+    campaign's own `controlnet_pose`).
+- The "reference" condition's own preprocessing (RGBA-composite onto black, pad to square with
+  fill=0, resize) must mirror `ControlNetDataset.__getitem__`'s `img`/`cond_transform` path
+  exactly at inference time, or train/inference preprocessing will diverge silently.
 - Dataset conditions per track, already materialized:
   `assets/dataset/<video>/segmentations/scene_*/track_XXXX` (RGBA actor
   crops) with sibling dirs `track_XXXX_skeleton`, `track_XXXX_canny`,
@@ -50,7 +68,12 @@ inference step count in every eval so runs are comparable.
 
 Compose the **already fine-tuned** single-condition ControlNets with
 diffusers' `MultiControlNetModel` (list of ControlNets + per-model
-`controlnet_conditioning_scale`), plus IP-Adapter for the reference crop.
+`controlnet_conditioning_scale`) — **four** ControlNets: pose, canny, seg,
+and reference. The "reference" checkpoint (`ip-adapter-controlnet` on
+disk) is architecturally a ControlNetModel too, not a diffusers-native
+IP-Adapter — see "Existing assets" above. Do not use
+`pipe.load_ip_adapter()`; compose reference the same way as the other
+three, as a fourth `MultiControlNetModel` entry.
 
 1. Add a `multi-controlnet` GenAI backend next to the existing
    `canny-controlnet` engine in `src/decoder/` (same interface, same
@@ -63,7 +86,8 @@ diffusers' `MultiControlNetModel` (list of ControlNets + per-model
    `controlnet_pose` eval (image size, steps, seed) and put the rows in
    the same JSONL so `rank_variants` maths applies.
 4. Sweep only the conditioning scales, coarsely: pose/canny/seg each in
-   {0.5, 1.0}, reference (IP-Adapter scale) in {0.3, 0.6} — 16 combos max,
+   {0.5, 1.0}, reference (its own `controlnet_conditioning_scale`, same
+   mechanism as the other three) in {0.3, 0.6} — 16 combos max,
    probe-set only, 10 inference steps to keep it to hours not days.
 
 **Gate A (decision, not stop):** best composition vs best single
@@ -92,14 +116,21 @@ Two candidate designs; **B2 is the default** unless Phase A's evidence
 argues otherwise:
 
 - **B1 — joint fine-tune of the MultiControlNet stack.** Faithful to
-  report 5's proposal but trains 3× ControlNet params; VRAM-heavy (the
-  spade OOM on this shared 48 GB GPU is a warning), and inference cost
-  is 3 ControlNet forward passes per step.
+  report 5's proposal but trains 4× ControlNet params (pose, canny, seg,
+  reference — see "Existing assets" above, reference is a ControlNet here
+  too, not a separate lighter-weight mechanism); VRAM-heavy (the spade
+  OOM on this shared 48 GB GPU is a warning), and inference cost is 4
+  ControlNet forward passes per step.
 - **B2 — single ControlNet, fused RGB condition (default).** Render one
   3-channel control image per frame: **R = canny map, G = skeleton
-  render, B = seg mask**; reference photometrics stay with IP-Adapter at
-  inference. One model, same VRAM and inference cost as any single
-  ControlNet, trivially fits the existing training/eval plumbing.
+  render, B = seg mask**; reference photometrics need a 4th channel or a
+  separate mechanism since B2's whole premise is collapsing conditions
+  into one 3-channel image — decide how to fold reference in (a 4th
+  input channel via a modified ControlNet input conv, or drop reference
+  from B2 and keep it only in B1) before implementing, don't discover
+  this mid-training. Otherwise: one model, same VRAM and inference cost
+  as any single ControlNet, trivially fits the existing training/eval
+  plumbing.
 
 Implementation for B2:
 1. `ControlNetDataset`: add `condition_type: "fused"` that loads the
