@@ -3,7 +3,7 @@
 *This file is the source of truth for the experimental effort. Update it (via
 `/update-reports`) whenever a report changes or a workstream moves.*
 
-*Last updated: 2026-07-11*
+*Last updated: 2026-07-13*
 
 ## The goal: the Residual Guarantee
 
@@ -31,7 +31,7 @@ whole video; each enabled component must pay for itself. Full framing:
 | Animate-Anyone integration | ⚠️ Evaluated, not final | Fork reads RGBA PNG + DWPose dataset format ([4](4_animate_anyone_integration_research.md)) |
 | ControlNet temporal consistency | ⚠️ Mechanisms built | Optical-flow warping, adaptive denoising, keyframe resets, cross-frame attention ([5](5_genai_temporal_consistency_research.md)) |
 | Background panorama stitching (camera motion) | ⬜ Open | [7](7_implementation_plan.md) §2B |
-| Codec baselines (AV1, HNeRV/DCVC) | ✅ Done | Reviewer-critical ([6](6_action_matrix.md)); full-length AV1/HEVC anchor curve done. **HNeRV learned-codec baseline done (2026-07-11 / 2026-07-12):** Initial 15,000-epoch training on `real_tennis.mp4` lost to AV1. Followed up with a High-Capacity (1280x720) Weight Residual Coding sweep for VOD (Model Delta Streaming). Conclusively proved HNeRV is uncompetitive for VOD (39.2 MB payload for 60 frames via delta streaming vs 2.5 MB for AV1). The reviewer gap is now definitively closed with an honest negative result ([9](9_codec_baselines_report.md)). |
+| Codec baselines (AV1, HNeRV/DCVC) | ⚠️ Mostly done | Reviewer-critical ([6](6_action_matrix.md)); full-length AV1/HEVC anchor curve done. **HNeRV single-checkpoint baseline done (2026-07-11):** 15,000-epoch training on `real_tennis.mp4` loses to AV1 — legitimate citable negative. **The 2026-07-12 Weight-Residual-Coding "conclusive" verdict was invalidated 2026-07-13:** its P-chunk fine-tuning collapsed (2 of 4 chunks ~6 dB constant frames) and the protocol shipped fp16 weights with no byte budget — redo per [11](11_hnerv_wrc_v2_plan.md) before any VOD/delta-streaming claim ([9](9_codec_baselines_report.md) 2026-07-13 entry). |
 | Residual-Guarantee benchmark harness | ✅ Working | `scripts/benchmark_matrix.py`; first run exposed a panorama symmetry violation, now fixed ([8](8_residual_guarantee_benchmarks_report.md)) |
 | Detector selection (SAM3 vs YOLOv26 vs RF-DETR) | ⬜ Open | [7](7_implementation_plan.md) §2C |
 | Dataset curation (raw_4k → assets/dataset) | ✅ Built, now catalogued | 7 videos (≈2h37m 4K) / 952 scenes / 399 points / 114 deep-annotated tracks; quality-tier models (yolo26x), manually supervised ([10](10_dataset_and_end_to_end_evaluation_report.md)) |
@@ -54,6 +54,16 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    ([8](8_residual_guarantee_benchmarks_report.md), 2026-07-10 entry).
 2. Finalize the generative architecture: complete ControlNet + Animate-Anyone
    evaluation, compare against SPADE, pick one for the paper (R1, R5).
+   *Real G2 campaign launched (2026-07-13, Gemini session)* — rung 0 of the
+   successive-halving campaign is running in `outputs/campaign/g2_overnight/`
+   (pix2pix / spade4tennis_lite / controlnet_pose), on the correct
+   held-out-excluding `training_view`. **But rung 0 is damaged:**
+   spade4tennis OOM-crashed at launch and the harness would silently prune
+   it as if it lost on quality — repair + completion protocol in
+   [13](13_g2_campaign_completion_plan.md). **Multi-condition ControlNet
+   un-deferred (2026-07-13, user decision)** — plan in
+   [12](12_multi_condition_controlnet_plan.md); joins the campaign as a
+   variant once its Phase B smoke gates pass.
 3. ~~AV1 baseline benchmark on the tennis dataset; one learned codec
    (HNeRV or DCVC) (R2, R5).~~
    *AV1/HEVC anchor curve done (2026-07-10):* `scripts/codec_baseline_sweep.py`
@@ -66,15 +76,16 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    `veryslow`) confirms AV1's expected edge once compared at matched VMAF:
    5-32% fewer bytes than HEVC, widening at lower bitrates
    ([9](9_codec_baselines_report.md)).
-   *Learned-codec baseline done (2026-07-11 & 2026-07-12):* from-scratch HNeRV
-   (`src/shared/hnerv_arch.py`, `scripts/hnerv_baseline.py`), trained for
-   real on `real_tennis.mp4`. First run (15,000 epochs, 640x360) lost to AV1. 
-   Second run simulated Video-on-Demand (VOD) via Weight Residual Coding 
-   (Model Delta Streaming) on a High-Capacity 1280x720 model. The 60-frame 
-   delta payload was 39.2 MB (vs 2.5 MB for AV1), conclusively proving learned
-   implicit codecs carry far too much entropy to be updated over a network, 
-   even with 80% sparsity. The R2/R5 gap is closed with a definitive negative result
-   ([9](9_codec_baselines_report.md)).
+   *Learned-codec baseline (2026-07-11, partially superseded 2026-07-13):*
+   from-scratch HNeRV (`src/shared/hnerv_arch.py`, `scripts/hnerv_baseline.py`),
+   trained for real on `real_tennis.mp4`. First run (15,000 epochs, 640x360)
+   lost to AV1 — that result stands and is citable. The 2026-07-12
+   Weight-Residual-Coding VOD follow-up (39.2 MB claim) is **invalid**: its
+   P-chunk fine-tuning diverged (progress.jsonl shows loss rising 0.14→0.46
+   and two chunks decoding to ~6 dB constant frames) and weights were shipped
+   fp16 with no byte budget. Redo per [11](11_hnerv_wrc_v2_plan.md); until
+   then the paper may cite only the 2026-07-11 single-checkpoint result
+   ([9](9_codec_baselines_report.md) 2026-07-13 entry).
    Still owed: run PointStream itself at a matching preset and overlay via
    `--pointstream-run` to get the actual paper claim.
 4. Component ablations under the Residual-Guarantee framework: racket
@@ -195,8 +206,9 @@ Seeded from [6_action_matrix.md](6_action_matrix.md) and
    table. Session-to-agent assignments are written down in report 10
    §Phase 5 (session table). Parallel sessions must use isolated
    worktrees (G1-night clobbering lesson).
-8. Deferred (post-core): second domain, MOS study, demo video, VVC,
-   Multi-ControlNet — see [7](7_implementation_plan.md) §4.
+8. Deferred (post-core): second domain, MOS study, demo video, VVC — see
+   [7](7_implementation_plan.md) §4. ~~Multi-ControlNet~~ **un-deferred
+   (2026-07-13)** → [12](12_multi_condition_controlnet_plan.md).
 
 ## Reports catalog
 
@@ -215,10 +227,13 @@ reports follow the numbering and the standard format below.
 | [8_residual_guarantee_benchmarks_report.md](8_residual_guarantee_benchmarks_report.md) | Report | Benchmark harness (`scripts/benchmark_matrix.py`) + ablation findings: panorama symmetry violation (fixed 2026-07-10), null-PSNR evaluation bug (fixed 2026-07-10) |
 | [9_codec_baselines_report.md](9_codec_baselines_report.md) | Report | Conventional-codec anchor sweep (`scripts/codec_baseline_sweep.py`): AV1/HEVC direct encode of the source video, no semantics, for the reviewer-requested baseline comparison |
 | [10_dataset_and_end_to_end_evaluation_report.md](10_dataset_and_end_to_end_evaluation_report.md) | Report | The end-to-end story: raw_4k/dataset inventory (dataset-as-contribution), trained-checkpoint census, gap analysis (runtime scene routing missing from `src/`), and the 4-phase full-match evaluation plan (routing, tiers, speed/compression Pareto) |
+| [11_hnerv_wrc_v2_plan.md](11_hnerv_wrc_v2_plan.md) | Plan | Redo of the HNeRV learned-codec baseline with byte-budgeted sizing, int8+sparse serialization, fixed WRC fine-tuning, and hard convergence gates (replaces the invalidated 2026-07-12 run) |
+| [12_multi_condition_controlnet_plan.md](12_multi_condition_controlnet_plan.md) | Plan | Multi-condition ControlNet (canny+pose+seg fused, reference via IP-Adapter): training-free composition first, then a fused-condition trained variant wired into the G2 campaign; zero-metadata-bytes Residual-Guarantee framing |
+| [13_g2_campaign_completion_plan.md](13_g2_campaign_completion_plan.md) | Plan | G2 campaign as-found state (spade OOM, 3.7 h ControlNet evals), harness repairs (no pruning on infra failure), and the exact path from repaired rung 0 to the held-out-video G2 claim |
 
 ## Standard report format (new reports)
 
-Name new reports `N_<topic>_report.md`, continuing the numbering (next: 11).
+Name new reports `N_<topic>_report.md`, continuing the numbering (next: 14).
 Every report follows:
 
 ```markdown
