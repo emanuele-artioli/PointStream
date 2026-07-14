@@ -1,6 +1,7 @@
 import torch
 from pathlib import Path
 from PIL import Image
+from typing import Any
 import numpy as np
 import sys
 
@@ -16,7 +17,7 @@ from diffusers import StableDiffusionControlNetPipeline, ControlNetModel
 dataset_root = Path("assets/probe_set/training_view")
 manifest = load_manifest(Path("assets/probe_set/manifest.json"))
 
-clip = {
+clip: dict[str, Any] = {
     "video": "alcaraz_perricard",
     "scene": "scene_002",
     "track": "track_0001",
