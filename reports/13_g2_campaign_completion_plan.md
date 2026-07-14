@@ -217,6 +217,78 @@ videos. The campaign checkpoints satisfy this; any *older* checkpoint in
 `assets/weights/` does not automatically — check its provenance before
 letting a tier config load it.
 
+## Defect 5 (2026-07-14, found post-relaunch): `--train-timeout-sec` crashes the whole rung, not just one variant, and completed variants' progress is lost
+
+**What happened:** the repaired campaign was relaunched correctly this
+time (`--initial-epochs 20`, real `cumulative_epochs` reset per Defect 4).
+pix2pix genuinely completed all 20 epochs for real
+(`pix2pix_rung0_retry.log`: "Epoch 19/20" through 100%, "Training
+complete." logged, real resumable `pix2pix_checkpoint.pt` +
+`pix2pix_generator.pt` on disk, dated 2026-07-14 00:24). The orchestrator
+then moved to `spade4tennis_lite`: first attempt OOM'd (Defect 3's known
+risk, batch 16/GPU on a shared host — the retry-with-halved-batch from
+Defect 1 correctly kicked in), the retry (batch 8/GPU) trained cleanly to
+Epoch 4/20 over ~2 hours, then hit `--train-timeout-sec 7200` and was
+killed (`spade4tennis_lite_rung0_retry.log` ends in a `KeyboardInterrupt`
+traceback from an orphaned DDP worker — consistent with the top-level
+subprocess receiving `SIGKILL` from `subprocess.run(timeout=...)`; zero
+occurrences of "TimeoutExpired" in the child log is expected, since that
+exception is raised in the *parent* orchestrator process, not the child).
+Real steady-state throughput measured from the log: ~1.5-2.0 s/it × 1017
+it/epoch ≈ 26-34 min/epoch × 20 epochs ≈ **9-11 hours** for a real
+spade4tennis_lite run at batch 8 — `--train-timeout-sec 7200` (2h) was
+never going to be enough for the full run, only for ~4-5 epochs of it.
+
+**The real bug:** `run_training_subprocess` calls
+`subprocess.run(cmd, ..., timeout=timeout)` with no `try/except` around
+it anywhere in the call chain. A `subprocess.TimeoutExpired` is an
+**uncaught exception that crashes the entire orchestrator process** —
+unlike a nonzero exit code (Defect 1's retry-then-abort path), a timeout
+never reaches that logic at all, it just kills `train_campaign.py`
+itself with a Python traceback. Compounding this: `state["cumulative_
+epochs"][name] = target_epochs` is updated in memory per-variant as each
+one finishes, but `save_state(state_path, state)` is only called **once**,
+after the *entire* rung's `for name in state["alive"]` loop completes and
+ranking runs. So when spade4tennis's timeout crashed the orchestrator
+mid-rung, pix2pix's genuinely-completed 20 epochs were never persisted
+to `campaign_state.json` — a relaunch would have silently retrained
+pix2pix from scratch (no `--resume` flag, since `cumulative_epochs
+["pix2pix"]` still read 0), wasting the ~4 real hours it took to finish.
+This is the same *category* of loss as Defect 4 (real training progress
+existing on disk but invisible to the harness's own bookkeeping),
+reached through a different, unrelated cause — meaning the harness has a
+structural weakness (state persisted once per rung, not once per
+variant) that will keep producing this failure mode for any future
+crash cause (another OOM the retry doesn't fix, a node preemption, a
+different timeout), not just this specific one.
+
+**Immediate recovery (done):** `campaign_state.json`'s
+`cumulative_epochs["pix2pix"]` manually corrected from 0 to 20 (verified
+against the real, complete, resumable checkpoint files on disk) before
+any relaunch — otherwise pix2pix would be silently retrained from
+scratch for no reason. `spade4tennis_lite`'s partial progress (Epoch
+4/20) is **not** recoverable — `train_spade4tennis.py` only writes its
+`--checkpoint-path` file on completion, not incrementally, so there is
+no partial checkpoint to resume from; it must restart at epoch 0 next
+run, which is unavoidable, not a bug.
+
+**Relaunch:** use a timeout with real headroom over the measured
+~9-11h estimate — 14h (`--train-timeout-sec 50400`) as originally
+proposed is reasonable. `--auto-continue` is safe to keep.
+
+**Harness fix still owed (do this before the next unattended multi-rung
+run, not urgently right now since nothing is currently running):**
+1. Wrap the `subprocess.run(..., timeout=...)` call in
+   `run_training_subprocess` (or its caller) in a `try/except
+   subprocess.TimeoutExpired`, and route a timeout through the *same*
+   retry-then-abort-without-ranking path Defect 1 built for a nonzero
+   exit code — a timeout is exactly as much "not a quality result" as an
+   OOM is.
+2. Call `save_state(state_path, state)` after **each** variant's
+   `cumulative_epochs` update inside the rung loop, not once at the end
+   — so a later variant's crash can never erase an earlier variant's
+   already-persisted, already-real progress within the same rung.
+
 ## Self-verification checklist (each campaign intervention)
 
 - [ ] `campaign_state.json` is the file you edited/read (not stale `state.json`).

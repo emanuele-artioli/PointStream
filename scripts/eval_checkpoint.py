@@ -425,6 +425,7 @@ def evaluate_checkpoint(
             ground_truth = load_clip_tensor(color_paths, img_size)  # Shape: [N, 3, size, size]
             reference_tensor = load_image_rgb01(ref_path, img_size)  # Shape: [3, size, size]
 
+            condition_tensor: torch.Tensor | dict[str, torch.Tensor]
             if arch == "multi-controlnet":
                 pose_paths = clip_condition_frame_paths(dataset_root, clip, "skeleton")
                 canny_paths = clip_condition_frame_paths(dataset_root, clip, "canny")

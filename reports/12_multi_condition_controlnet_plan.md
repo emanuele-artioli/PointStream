@@ -179,4 +179,73 @@ table like every other component.
 
 ## Findings log
 
-*(append dated entries here as phases complete, standard format)*
+### 2026-07-14 — Phase A implemented, but eval and decoder use divergent (and eval-side privileged) condition sourcing — DO NOT trust a Phase A eval sweep until this is resolved
+
+**Problem/Question:** review before running the real probe-set sweep, since
+Phase A's whole point is deciding whether to invest in Phase B based on
+its numbers.
+
+**Diagnosis/Evidence:** two independent implementations of "multi-controlnet
+inference" exist and source their canny/seg conditions completely
+differently:
+
+- **`scripts/eval_checkpoint.py::run_multi_controlnet_inference`** (what
+  actually scores the probe-set sweep, feeds `rank_variants`, and would
+  produce the Gate-A verdict): sources `condition_frames["canny"]` and
+  `["seg"]` directly from the dataset's real, precomputed per-frame Canny
+  edge maps and segmentation masks (`load_clip_tensor(canny_paths, ...)` —
+  the same files `train_controlnet.py` trained on). These are rich,
+  photographically-detailed condition images (clothing folds, racket,
+  facial features).
+- **`src/decoder/controlnet_engine.py::MultiControlNetStrategy.generate()`**
+  (the class actually wired into the real decoder pipeline via
+  `genai_compositor.py`, i.e. what would run in a real encode/decode pass):
+  has no access to a real per-frame Canny/Seg image at inference time (the
+  decoder is *synthesizing* the actor from sparse semantic data — it can't
+  compute real Canny edges of an image that doesn't exist yet). It derives
+  both conditions from a single crude segmentation-style `mask_tensor`:
+  `seg` is the mask stacked to 3 channels as-is, `canny` is
+  `cv2.Canny(mask, 100, 200)` — i.e. an edge map of a silhouette outline,
+  not of the photographic detail the ControlNet was fine-tuned on.
+
+**These are not the same task.** A Phase A eval sweep using the dataset's
+real Canny/Seg images is testing an "oracle" condition the real decoder
+will never have — a good score there says nothing about what the actual
+production `MultiControlNetStrategy` can achieve, and a bad score doesn't
+indict the real approach either, since they're different inputs entirely.
+The Gate-A comparison (report 12's own "≥2 of {LPIPS,SSIM,VMAF}" rule) is
+meaningless until eval measures what will actually ship.
+
+**This also means the `scratch_dump_conditions.py` alignment check
+(2026-07-13) validated the wrong thing** — it dumped shapes/dtypes using
+the same real dataset canny/seg tensors the eval path uses, confirmed they
+"compose perfectly," but never exercised the decoder's actual crude
+mask-derived condition path at all. A shape/dtype check is not the same
+as a distribution check — this is exactly the "print the loaded paths /
+dump and eyeball the conditions" discipline this report and report 13
+keep having to repeat, applied to the wrong artifact.
+
+**Resolution:** open. Two options, pick one explicitly before running the
+real sweep or starting Phase B:
+1. Make `run_multi_controlnet_inference` call the *same*
+   `MultiControlNetStrategy.generate()` code path the real decoder uses
+   (mask-derived canny/seg), so eval measures the real system. Likely
+   score will drop — that's the honest number.
+2. Keep the oracle-condition eval as a deliberate **upper-bound**
+   experiment (how good could multi-controlnet be *if* rich per-frame
+   conditions were available), but label it as such everywhere it's
+   reported — never compare it directly against the single-condition
+   `controlnet_pose` campaign result as if it were apples-to-apples, and
+   still separately eval the real `MultiControlNetStrategy` path for the
+   number that actually matters for the paper.
+Also worth checking, independent of which option is chosen: is a
+richer-than-silhouette source available anywhere in the real decoder
+pipeline (e.g. the previous frame's own generated output, or an
+intermediate SynthesisEngine rendering) that would beat a raw Canny-of-
+mask without violating the zero-extra-metadata-bytes argument this
+report's whole premise rests on?
+
+**Paper impact:** none yet — do not cite any Phase A number until this is
+resolved, the gap between the two condition sources is large enough that
+an unresolved eval could produce a misleading paper claim in either
+direction.

@@ -693,7 +693,7 @@ class DiffusersCompositor(BaseCompositor):
         # Check if the backend is one of these and a mask was provided.
         is_mask_backend = self._backend in {"canny-controlnet", "seg-controlnet", "canny_controlnet", "seg_controlnet"}
         is_multi_backend = self._backend in {"multi-controlnet", "multi_controlnet"}
-        control_tensor = dense_dwpose_tensor
+        control_tensor: torch.Tensor | tuple[torch.Tensor, torch.Tensor] = dense_dwpose_tensor
         if is_mask_backend or is_multi_backend:
             if metadata_mask is not None:
                 # metadata_mask is [H, W] or [H, W, 1]. Create [1, H, W] tensor.
@@ -726,9 +726,11 @@ class DiffusersCompositor(BaseCompositor):
                 control_tensor = (dense_dwpose_tensor, mask_tensor)
 
         if debug_dir is not None and frame_idx is not None and actor_identity is not None:
+            # get_debug_inputs expects a plain pose tensor; unpack the multi-backend (pose, mask) tuple.
+            debug_pose_tensor = control_tensor[0] if isinstance(control_tensor, tuple) else control_tensor
             self._current_debug_artifacts = self._strategy.get_debug_inputs(
                 reference_crop_tensor=reference_crop_tensor,
-                dense_dwpose_tensor=control_tensor,
+                dense_dwpose_tensor=debug_pose_tensor,
             )
             bg_np = warped_background_frame.cpu().numpy()
             if len(bg_np.shape) == 3 and bg_np.shape[0] == 3:
