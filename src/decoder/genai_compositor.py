@@ -45,6 +45,76 @@ def _require_local_or_optin_weight(model_name: str, allow_download: bool = False
     )
 
 
+def _resolve_strategy_weight(config: Any, model_name: str, allow_download: bool = False) -> str:
+    """Resolve a strategy's primary weight, honouring `genai-checkpoint-override`.
+
+    The override exists so evaluation can score an arbitrary campaign checkpoint
+    (e.g. `outputs/campaign/<name>/checkpoints/<variant>/...`) through the *same*
+    strategy classes the decoder runs, instead of the fixed `assets/weights/`
+    name. When unset, behaviour is identical to `_require_local_or_optin_weight`.
+    """
+    override = getattr(config, "genai_checkpoint_override", None) if config is not None else None
+    if override:
+        candidate = Path(str(override))
+        if not candidate.exists():
+            raise FileNotFoundError(
+                f"genai-checkpoint-override points at a missing path: '{override}'"
+            )
+        return str(candidate)
+    return _require_local_or_optin_weight(model_name, allow_download=allow_download)
+
+
+def build_genai_strategy(backend: str, config: Any = None) -> "BaseGenAIStrategy":
+    """Construct the GenAI strategy for `backend`.
+
+    Single construction path shared by the decoder's compositor and by
+    evaluation. Evaluation MUST go through here: the G2 campaign's ~0 ControlNet
+    scores came from `scripts/eval_checkpoint.py` reimplementing inference as
+    text-to-image-from-noise while the decoder ran img2img from the reference
+    crop, so the campaign scored a mode the system never runs.
+    """
+    if backend in {"controlnet", "baseline", "baseline-controlnet"}:
+        return BaselineControlNetStrategy(config=config)
+    if backend in {"animate-anyone", "animate_anyone", "animateanyone"}:
+        return AnimateAnyoneStrategy(config=config)
+    if backend in {"caption-controlnet", "caption_controlnet"}:
+        from src.decoder.controlnet_engine import CaptionControlNetStrategy
+
+        return CaptionControlNetStrategy(config=config)
+    if backend in {"mock-caption-controlnet", "mock_caption_controlnet"}:
+        from src.decoder.controlnet_engine import MockCaptionControlNetStrategy
+
+        return MockCaptionControlNetStrategy(config=config)
+    if backend in {"ip-adapter-controlnet", "ip_adapter_controlnet"}:
+        from src.decoder.controlnet_engine import IPAdapterControlNetStrategy
+
+        cnet_id = getattr(config, "controlnet_id", None) or "assets/weights/control_v11p_sd15_openpose"
+        return IPAdapterControlNetStrategy(controlnet_id=cnet_id, config=config)
+    if backend in {"canny-controlnet", "canny_controlnet"}:
+        from src.decoder.controlnet_engine import CannyControlNetStrategy
+
+        cnet_id = getattr(config, "controlnet_id", None) or "lllyasviel/control_v11p_sd15_canny"
+        return CannyControlNetStrategy(controlnet_id=cnet_id, config=config)
+    if backend in {"seg-controlnet", "seg_controlnet"}:
+        from src.decoder.controlnet_engine import SegControlNetStrategy
+
+        cnet_id = getattr(config, "controlnet_id", None) or "lllyasviel/control_v11p_sd15_seg"
+        return SegControlNetStrategy(controlnet_id=cnet_id, config=config)
+    if backend in {"multi-controlnet", "multi_controlnet"}:
+        from src.decoder.controlnet_engine import MultiControlNetStrategy
+
+        return MultiControlNetStrategy(config=config)
+    if backend in {"pix2pix"}:
+        from src.decoder.pix2pix_engine import Pix2PixStrategy
+
+        return Pix2PixStrategy(config=config)
+    if backend in {"spade4tennis", "spade-4-tennis", "spade_4_tennis"}:
+        from src.decoder.spade4tennis_engine import Spade4TennisStrategy
+
+        return Spade4TennisStrategy(config=config)
+    raise ValueError(f"Unsupported genai-backend value in config: {backend}")
+
+
 class BaseGenAIStrategy(ABC):
     """Strategy interface for pluggable GenAI actor generation backends."""
 
@@ -608,38 +678,9 @@ class DiffusersCompositor(BaseCompositor):
         self._actor_frame_counter.clear()
 
     def _build_strategy(self, backend: str) -> BaseGenAIStrategy:
-        if backend in {"controlnet", "baseline", "baseline-controlnet"}:
-            return BaselineControlNetStrategy(config=self.config)
-        if backend in {"animate-anyone", "animate_anyone", "animateanyone"}:
-            return AnimateAnyoneStrategy(config=self.config)
-        if backend in {"caption-controlnet", "caption_controlnet"}:
-            from src.decoder.controlnet_engine import CaptionControlNetStrategy
-            return CaptionControlNetStrategy(config=self.config)
-        if backend in {"mock-caption-controlnet", "mock_caption_controlnet"}:
-            from src.decoder.controlnet_engine import MockCaptionControlNetStrategy
-            return MockCaptionControlNetStrategy(config=self.config)
-        if backend in {"ip-adapter-controlnet", "ip_adapter_controlnet"}:
-            from src.decoder.controlnet_engine import IPAdapterControlNetStrategy
-            cnet_id = getattr(self.config, "controlnet_id", "assets/weights/control_v11p_sd15_openpose")
-            return IPAdapterControlNetStrategy(controlnet_id=cnet_id, config=self.config)
-        if backend in {"canny-controlnet", "canny_controlnet"}:
-            from src.decoder.controlnet_engine import CannyControlNetStrategy
-            cnet_id = getattr(self.config, "controlnet_id", "lllyasviel/control_v11p_sd15_canny")
-            return CannyControlNetStrategy(controlnet_id=cnet_id, config=self.config)
-        if backend in {"seg-controlnet", "seg_controlnet"}:
-            from src.decoder.controlnet_engine import SegControlNetStrategy
-            cnet_id = getattr(self.config, "controlnet_id", "lllyasviel/control_v11p_sd15_seg")
-            return SegControlNetStrategy(controlnet_id=cnet_id, config=self.config)
-        if backend in {"multi-controlnet", "multi_controlnet"}:
-            from src.decoder.controlnet_engine import MultiControlNetStrategy
-            return MultiControlNetStrategy(config=self.config)
-        if backend in {"pix2pix"}:
-            from src.decoder.pix2pix_engine import Pix2PixStrategy
-            return Pix2PixStrategy(config=self.config)
-        if backend in {"spade4tennis", "spade-4-tennis", "spade_4_tennis"}:
-            from src.decoder.spade4tennis_engine import Spade4TennisStrategy
-            return Spade4TennisStrategy(config=self.config)
-        raise ValueError(f"Unsupported genai-backend value in config: {backend}")
+        # Delegates to the module-level factory so evaluation constructs
+        # strategies exactly as the decoder does (see build_genai_strategy).
+        return build_genai_strategy(backend, self.config)
 
     def uses_temporal_pose_sequence(self) -> bool:
         return isinstance(self._strategy, AnimateAnyoneStrategy)

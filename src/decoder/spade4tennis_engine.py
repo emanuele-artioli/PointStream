@@ -16,6 +16,7 @@ from src.decoder.genai_compositor import (
     BaseGenAIStrategy,
     _render_pose_condition,
     _require_local_or_optin_weight,
+    _resolve_strategy_weight,
     _to_numpy_bgr,
 )
 from src.shared.spade4tennis_arch import SPADEResNet9Generator
@@ -44,11 +45,16 @@ class Spade4TennisStrategy(BaseGenAIStrategy):
         if self._model is not None:
             return self._model
 
-        # Try lite first, then fall back to full
-        try:
-            model_path = _require_local_or_optin_weight("spade4tennis_lite_generator.pt", allow_download=False)
-        except FileNotFoundError:
-            model_path = _require_local_or_optin_weight("spade4tennis_full_generator.pt", allow_download=False)
+        # An explicit checkpoint override (evaluation) wins; otherwise try lite
+        # first, then fall back to full.
+        override = getattr(self.config, "genai_checkpoint_override", None) if self.config else None
+        if override:
+            model_path = _resolve_strategy_weight(self.config, "spade4tennis_lite_generator.pt")
+        else:
+            try:
+                model_path = _require_local_or_optin_weight("spade4tennis_lite_generator.pt", allow_download=False)
+            except FileNotFoundError:
+                model_path = _require_local_or_optin_weight("spade4tennis_full_generator.pt", allow_download=False)
 
         generator = SPADEResNet9Generator()
         state_dict = torch.load(model_path, map_location="cpu")
@@ -175,8 +181,14 @@ class Spade4TennisStrategy(BaseGenAIStrategy):
         skeleton_tensor = transforms.ToTensor()(pose_image).unsqueeze(0).to(device)  # Shape: [1, 3, H, W]
         skeleton_tensor = (skeleton_tensor - 0.5) * 2.0  # Shape: [1, 3, H, W]
 
-        # Reference → tensor [-1, 1]
-        ref_image = transforms.ToPILImage()(reference_crop_tensor)
+        # Reference → tensor [-1, 1].
+        # reference_crop_tensor is BGR by convention (it originates from
+        # cv2.imdecode in ResidualCalculator._decode_reference_crops), but the
+        # generator was trained on RGB crops loaded via PIL. Swap channels
+        # before handing it over -- without this the appearance cue reaches the
+        # model with red and blue exchanged.
+        ref_rgb_tensor = reference_crop_tensor.flip(0)  # Shape: [3, H, W] BGR -> RGB
+        ref_image = transforms.ToPILImage()(ref_rgb_tensor)
         ref_image = transforms.Resize(
             (self._height, self._width), transforms.InterpolationMode.BICUBIC
         )(ref_image)

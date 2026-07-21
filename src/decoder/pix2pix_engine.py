@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from torchvision import transforms
 
-from src.decoder.genai_compositor import BaseGenAIStrategy, _require_local_or_optin_weight, _to_numpy_bgr, _render_pose_condition
+from src.decoder.genai_compositor import BaseGenAIStrategy, _resolve_strategy_weight, _to_numpy_bgr, _render_pose_condition
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -102,7 +102,7 @@ class Pix2PixStrategy(BaseGenAIStrategy):
         
         # Determine path and load model
         try:
-            model_path = _require_local_or_optin_weight("pix2pix_generator.pt", allow_download=False)
+            model_path = _resolve_strategy_weight(self.config, "pix2pix_generator.pt", allow_download=False)
             generator = UNetGenerator()
             state_dict = torch.load(model_path, map_location="cpu")
             generator.load_state_dict(state_dict)
@@ -177,8 +177,9 @@ class Pix2PixStrategy(BaseGenAIStrategy):
     ) -> torch.Tensor:
         model = self._ensure_model(device)
         
-        # Pix2Pix doesn't use reference_crop_tensor natively (it only maps skeleton -> image)
-        # We just need to render the skeleton properly.
+        # The generator is 6-channel: skeleton (3) + reference (3), matching
+        # scripts/train_pix2pix.py's UNetGenerator(in_channels=6). Both are
+        # prepared below.
         if metadata_bbox is not None:
             x1, y1, x2, y2 = metadata_bbox
             bw = max(1, x2 - x1)
@@ -227,8 +228,14 @@ class Pix2PixStrategy(BaseGenAIStrategy):
         skeleton_tensor = transforms.ToTensor()(pose_image).unsqueeze(0).to(device)
         skeleton_tensor = (skeleton_tensor - 0.5) * 2.0
 
-        # Preprocess reference_crop_tensor for Pix2Pix
-        ref_image = transforms.ToPILImage()(reference_crop_tensor)
+        # Preprocess reference_crop_tensor for Pix2Pix.
+        # reference_crop_tensor is BGR by convention (it originates from
+        # cv2.imdecode in ResidualCalculator._decode_reference_crops), but the
+        # generator was trained on RGB crops loaded via PIL. Swap channels
+        # before handing it over -- without this the appearance cue reaches the
+        # model with red and blue exchanged.
+        ref_rgb_tensor = reference_crop_tensor.flip(0)  # Shape: [3, H, W] BGR -> RGB
+        ref_image = transforms.ToPILImage()(ref_rgb_tensor)
         ref_image = transforms.Resize((self._height, self._width), transforms.InterpolationMode.BICUBIC)(ref_image)
         ref_tensor = transforms.ToTensor()(ref_image).unsqueeze(0).to(device)
         ref_tensor = (ref_tensor - 0.5) * 2.0
