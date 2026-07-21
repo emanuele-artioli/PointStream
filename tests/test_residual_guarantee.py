@@ -29,7 +29,7 @@ def test_panorama_jpeg_quality_changes_the_residual(test_run_artifacts_dir: Path
     Before the fix, ResidualCalculator synthesized against payload.panorama.panorama_image's
     raw in-memory pixels regardless of panorama_jpeg_quality, so the residual (and thus what
     it corrects the client's JPEG-decoded panorama toward) never changed with the quality
-    setting -- see reports/8_residual_guarantee_benchmarks_report.md, 2026-07-10 entry.
+    setting -- see 67a9ea6275d3d9785ce57026/RESEARCH_LOG.md (Bug registry #1).
     """
     video_path = create_dummy_video(
         path=test_run_artifacts_dir / "test_chunks" / "residual_guarantee.mp4",

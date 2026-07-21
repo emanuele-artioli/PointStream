@@ -200,7 +200,7 @@ def test_main_aborts_rung_without_ranking_when_a_variant_fails_training_twice(
 ) -> None:
     """A training subprocess that fails twice (e.g. a shared-GPU OOM) must not be
     scored as a quality loss and pruned — the old behavior this regression-tests
-    against (see reports/13_g2_campaign_completion_plan.md, Defect 1)."""
+    against (see 67a9ea6275d3d9785ce57026/RESEARCH_LOG.md hard rule 5)."""
     campaign_dir = tmp_path / "campaign"
     data_root = tmp_path / "data_root"
     data_root.mkdir()

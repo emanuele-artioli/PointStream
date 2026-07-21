@@ -58,5 +58,6 @@ The claim under test is always
    itself or doesn't), noting num_frames and any null metrics.
 4. Plots/media go to disk under the scratchpad or `outputs/debug/` — the
    host is headless.
-5. If the finding matters beyond this conversation, fold it into
-   `reports/` with `/update-reports`.
+5. If the finding matters beyond this conversation, fold it into the paper
+   with `/update-paper` (which also owns `RESEARCH_LOG.md`). Check that log's
+   superseded registry before citing any pre-existing number.

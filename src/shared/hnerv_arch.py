@@ -1,7 +1,7 @@
 """HNeRV (Hybrid Neural Representation for Videos, arXiv 2304.02633) architecture.
 
-Learned-codec comparison baseline for `reports/9_codec_baselines_report.md`
-(reviewer-critical gap R2/R5, `reports/6_action_matrix.md`). HNeRV encodes a
+Learned-codec comparison baseline for `67a9ea6275d3d9785ce57026/RESEARCH_LOG.md "Codec anchors"`
+(reviewer-critical gap R2/R5, `67a9ea6275d3d9785ce57026/reviewers_comments.md`). HNeRV encodes a
 video as the *weights* of a small implicit network overfit to that one clip:
 
 - "Encoding" = a per-video training run that jointly learns a lightweight

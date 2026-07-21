@@ -253,7 +253,7 @@ def compute_panorama_delta(current_bgr: np.ndarray, previous_bgr: np.ndarray) ->
     trade-off for background-layer rung 2 ("panorama+delta", report 10 Phase
     5.3): a scene's background is expected to change only slightly between
     consecutive sub-chunks of the same point (scoreboard digits, minor crowd
-    motion), not arbitrarily -- see reports/8_residual_guarantee_benchmarks_report.md.
+    motion), not arbitrarily -- see 67a9ea6275d3d9785ce57026/RESEARCH_LOG.md.
     """
     current = _ensure_bgr_uint8(current_bgr).astype(np.int16)
     previous = _ensure_bgr_uint8(previous_bgr).astype(np.int16)

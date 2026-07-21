@@ -13,6 +13,23 @@ description: When working on Pointstream: Object-Centric Semantic Neural Codec
 * **Ablation Benchmarks:** For baseline-vs-variant Residual-Guarantee comparisons, use `python -m scripts.benchmark_matrix run config/benchmarks/<spec>.yaml` (matrix spec = base config + per-variant overrides) instead of hand-running configs; it writes the pays-for-itself report under `outputs/benchmarks/`.
 * **Scaffold Integrity:** You must maintain the exact architectural layout. Do not dump monolithic scripts. File additions must strictly sit in: `src/main.py`, `src/shared/`, `src/encoder/`, `src/decoder/`, `src/transport/`, `scripts/`, `assets/`, `tests/`, `outputs/`.
 
+## 1b. Research Documentation — the paper is the primary living document
+
+* **Where knowledge lives:** the manuscript `67a9ea6275d3d9785ce57026/main.tex` carries the research plan as machine-readable comment markers (`STATUS/GOAL/HOLE/NOTE/NEXT/CLAIM(anchor):` — spec in that repo's `CLAUDE.md`). `67a9ea6275d3d9785ce57026/RESEARCH_LOG.md` is the secondary store: hard methodology rules, standing results with real numbers, bug registry, dead-end registry, superseded-results registry, asset inventory. **The 13 numbered `reports/*.md` were consolidated into these two files on 2026-07-21 and deleted** (history via `git log --follow -- reports/<file>`). Do not recreate a `reports/` tree.
+* **Before planning any experiment,** grep the paper's markers and run only what the paper needs: `grep -n '^% *\(STATUS\|GOAL\|HOLE\|NOTE\|NEXT\|CLAIM\)(' 67a9ea6275d3d9785ce57026/main.tex`.
+* **After producing committed, tested results,** fold them into the paper — clearing the `HOLE` and writing the `CLAIM(id): src=<outputs path>` line in the same edit — and update `67a9ea6275d3d9785ce57026/reviewers_comments.md` if a referee item advanced. Done means the text or experiment is in place, never a plan.
+
+## 1c. Hard experiment rules (each of these has already produced a wrong conclusion)
+
+* **Symmetry is the guarantee.** The encoder computes residuals against the *codec-decoded* panorama, never the raw in-memory one. That asymmetry was a real bug that silently made panorama quality a no-op. Any new synthesis path gets a bit-identity check before results built on it are trusted.
+* **Verify a config knob is actually wired before ablating it** — grep its consumer, not just the schema. An unwired `residual_block_threshold` produced a clean, plausible, entirely fictional ablation table.
+* **Infra failure is not a quality result.** Never rank or prune a training rung in which an alive variant has no score because it OOM'd or crashed.
+* **Held-out gate:** no generative quality claim unless the model was trained without `alcaraz_highlights` and `djokovic_zverev`.
+* **Scope negative results.** "Conclusively"/"definitively"/"closes the book" are banned on single-clip, single-architecture experiments — that rule was written and violated within a day, and the claim had to be retracted.
+* **Preset names are not comparable across codecs.** Compare at matched VMAF across a CRF ladder and state the preset tier.
+* **Every number cites a path** (`outputs/<timestamp>/`, a `run_summary.json` field, a test, a commit) and is labeled with the config that produced it — the default config caps at `num-frames: 10`.
+* **Invalidated runs are `mv`'d** to `outputs/_superseded/<ts>_<reason>/`, never deleted. `outputs/` and `assets/` are gitignored; so are untracked scratch files — read anything before removing it.
+
 ## 2. Weight Management & Prototyping
 * **Model Mocking Rule:** When introducing a new extractor or neural module, you must follow a mock-first design pattern. Return deterministic dummy PyTorch tensors matching precise target shapes via a `MockActorExtractor` to validate pipeline plumbing prior to loading heavy model weights.
 * **Weights Resolution:** Search for native model weights within `/home/itec/emanuele/Models` and symlink them directly to `assets/weights/`.

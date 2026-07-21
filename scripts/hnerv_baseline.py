@@ -1,7 +1,7 @@
 """HNeRV learned-codec baseline: per-video implicit-network overfit + compression sweep.
 
 Answers the reviewer-critical "learned codec baseline" gap (R2, R5,
-reports/6_action_matrix.md; reports/9_codec_baselines_report.md's TL;DR:
+67a9ea6275d3d9785ce57026/reviewers_comments.md; 67a9ea6275d3d9785ce57026/RESEARCH_LOG.md "Codec anchors":
 "One learned codec (HNeRV or DCVC) baseline remains entirely open"). Unlike
 `scripts/codec_baseline_sweep.py` (a CLI wrapper around AV1/HEVC), HNeRV
 "encodes" a video by training a small implicit network (src/shared/hnerv_arch.py)
