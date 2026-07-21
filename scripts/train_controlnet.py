@@ -60,7 +60,7 @@ class ControlNetDataset(Dataset):
                     prompt = cdata.get("caption", prompt)
                     
             color_frames = sorted(list(track_dir.glob("frame_*.png")))
-            
+
             # Identify the condition directory
             if self.condition_type == "pose":
                 cond_dir = track_dir.with_name(f"{track_dir.name}_skeleton")
@@ -70,19 +70,39 @@ class ControlNetDataset(Dataset):
                 cond_dir = None
             else:
                 raise ValueError(f"Unknown condition type: {self.condition_type}")
-                
-            for color_path in color_frames:
-                frame_name = color_path.name
-                
-                cond_path = None
-                if cond_dir is not None:
-                    cond_path = cond_dir / frame_name
-                    if not cond_path.exists():
-                        continue
-                        
+
+            # Pair POSITIONALLY, matching src/shared/tennis_dataset.py.
+            # Pairing by filename silently produced garbage: `_skeleton` frames
+            # were named by position while colour frames carry the absolute
+            # source frame id, so across the training view 32.7% of items were
+            # paired with the WRONG pose and 22.9% were dropped without a word.
+            # A count mismatch now raises instead of quietly shrinking the
+            # dataset -- a training set that silently loses a quarter of its
+            # data is indistinguishable from one that trained fine.
+            if cond_dir is None:
+                for color_path in color_frames:
+                    self.items.append({"image_path": str(color_path), "cond_path": None, "prompt": prompt})
+                continue
+
+            if not cond_dir.exists():
+                raise FileNotFoundError(
+                    f"Condition directory missing for {track_dir}: {cond_dir}. "
+                    f"Run scripts/process_dataset.py's '{self.condition_type}' stage first."
+                )
+
+            cond_frames = sorted(cond_dir.glob("frame_*.png"))
+            if len(cond_frames) != len(color_frames):
+                raise ValueError(
+                    f"Frame-count mismatch for {track_dir.name}: {len(color_frames)} colour frames "
+                    f"vs {len(cond_frames)} '{self.condition_type}' frames in {cond_dir.name}. "
+                    "Colour and condition sequences must correspond one-to-one; regenerate the "
+                    "condition stage rather than training on a partial pairing."
+                )
+
+            for color_path, cond_path in zip(color_frames, cond_frames):
                 self.items.append({
                     "image_path": str(color_path),
-                    "cond_path": str(cond_path) if cond_path else None,
+                    "cond_path": str(cond_path),
                     "prompt": prompt
                 })
 

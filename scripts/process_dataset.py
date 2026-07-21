@@ -648,11 +648,24 @@ def _render_skeleton_worker(video_path, dataset_dir, scene_idx, device):
         for i, (m, k) in enumerate(zip(meta_data, kpt_data)):
             kpts = k['keypoints']
             racket_bbox = m.get('racket_bbox_crop')
-            
-            # Use original bbox to determine canvas size since crops are native res
+
+            # m['bbox'] is the final, clamped crop rectangle the segmentation
+            # stage actually wrote (see _segment_worker: min_x/min_y/max_x/max_y
+            # after the person-racket union and frame clamping), so it gives the
+            # colour crop's exact dimensions and the keypoints' coordinate space.
             w = m['bbox'][2] - m['bbox'][0]
             h = m['bbox'][3] - m['bbox'][1]
-            
+
+            # The filename must be the ABSOLUTE frame id, matching the colour and
+            # _canny directories. Writing `frame_{i:06d}` from enumerate produced
+            # positional names against absolute-named colour frames (a track
+            # starting at 153 got skeletons named 000000, 000001, ...).
+            # TennisSkeletonDataset pairs positionally and was unaffected, but
+            # ControlNetDataset pairs by FILENAME: across the 16,272-frame
+            # training view that left 44.4% correctly paired, 32.7% paired with
+            # the WRONG pose, and 22.9% silently dropped.
+            frame_id = int(m['frame_id'])
+
             if kpts is not None:
                 kpts_np = np.array(kpts, dtype=np.float32)
                 if racket_bbox is not None:
@@ -661,8 +674,8 @@ def _render_skeleton_worker(video_path, dataset_dir, scene_idx, device):
                 canvas = render_pose_with_racket(kpts_np, racket_bbox, int(h), int(w), dominant_hand=majority_hand, racket_mask_points=racket_mask_points)
             else:
                 canvas = np.zeros((int(h), int(w), 3), dtype=np.uint8)
-                
-            frame_path = os.path.join(out_skel_dir, f'frame_{i:06d}.png')
+
+            frame_path = os.path.join(out_skel_dir, f'frame_{frame_id:06d}.png')
             cv2.imwrite(frame_path, canvas)
 
 
