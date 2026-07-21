@@ -120,7 +120,17 @@ def clip_keypoints(dataset_root: Path, clip: dict, frame_ids: list[int]) -> list
     out: list[np.ndarray] = []
     for fid in frame_ids:
         record = payload[index_of[fid]]
-        out.append(np.asarray(record["keypoints"], dtype=np.float32))  # Shape: [18, 3]
+        keypoints = record.get("keypoints")
+        if keypoints is None:
+            # Pose extraction failed on this frame (11 of 35,713 dataset-wide).
+            # Substitute an all-zero pose: confidence 0 is below the renderer's
+            # 0.2 threshold, so nothing is drawn and the generator works from
+            # the reference alone. Dropping the frame instead would desynchronise
+            # the prediction from the ground truth and silently corrupt every
+            # metric for the clip.
+            out.append(np.zeros((18, 3), dtype=np.float32))  # Shape: [18, 3]
+            continue
+        out.append(np.asarray(keypoints, dtype=np.float32))  # Shape: [18, 3]
     return out
 
 

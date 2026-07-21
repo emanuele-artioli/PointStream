@@ -182,17 +182,25 @@ class Spade4TennisStrategy(BaseGenAIStrategy):
         skeleton_tensor = (skeleton_tensor - 0.5) * 2.0  # Shape: [1, 3, H, W]
 
         # Reference → tensor [-1, 1].
-        # reference_crop_tensor is BGR by convention (it originates from
-        # cv2.imdecode in ResidualCalculator._decode_reference_crops), but the
-        # generator was trained on RGB crops loaded via PIL. Swap channels
-        # before handing it over -- without this the appearance cue reaches the
-        # model with red and blue exchanged.
-        ref_rgb_tensor = reference_crop_tensor.flip(0)  # Shape: [3, H, W] BGR -> RGB
-        ref_image = transforms.ToPILImage()(ref_rgb_tensor)
-        ref_image = transforms.Resize(
-            (self._height, self._width), transforms.InterpolationMode.BICUBIC
-        )(ref_image)
-        ref_tensor = transforms.ToTensor()(ref_image).unsqueeze(0).to(device)  # Shape: [1, 3, H, W]
+        #
+        # Two things have to be right here, and neither used to be:
+        #  1. reference_crop_tensor is BGR by convention (it originates from
+        #     cv2.imdecode in ResidualCalculator._decode_reference_crops), but
+        #     the generator was trained on RGB crops loaded via PIL -- without
+        #     the swap the appearance cue arrives with red and blue exchanged.
+        #  2. The reference must be letterboxed into the canvas at the SAME
+        #     scale and offsets as the pose above. Training pads both inputs to
+        #     square (src/shared/tennis_dataset.py `_process_image`), so a plain
+        #     Resize((H, W)) here stretched the reference while the skeleton
+        #     stayed aspect-correct, leaving the two input channels
+        #     geometrically inconsistent with each other and with training.
+        reference_rgb = cv2.cvtColor(_to_numpy_bgr(reference_crop_tensor), cv2.COLOR_BGR2RGB)  # Shape: [h, w, 3] RGB
+        if reference_rgb.shape[0] != scaled_h or reference_rgb.shape[1] != scaled_w:
+            reference_rgb = cv2.resize(reference_rgb, (scaled_w, scaled_h), interpolation=cv2.INTER_LANCZOS4)
+        padded_reference = np.zeros((self._height, self._width, 3), dtype=np.uint8)  # Shape: [H, W, 3]
+        padded_reference[offset_y:offset_y + scaled_h, offset_x:offset_x + scaled_w] = reference_rgb
+
+        ref_tensor = transforms.ToTensor()(padded_reference).unsqueeze(0).to(device)  # Shape: [1, 3, H, W]
         ref_tensor = (ref_tensor - 0.5) * 2.0  # Shape: [1, 3, H, W]
 
         # --- Forward pass (separate skeleton and reference inputs for SPADE) ---

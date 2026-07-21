@@ -127,6 +127,30 @@ def _write_track_with_gap(root: Path) -> dict:
     return clip
 
 
+def test_clip_keypoints_substitutes_zero_pose_for_a_failed_frame(tmp_path: Path) -> None:
+    """A null-keypoint frame must yield a zero pose, not crash and not be dropped.
+
+    `np.asarray(None)` builds a 0-dim array, which blew up inside the strategy.
+    Dropping the frame instead would desynchronise prediction from ground truth
+    and silently corrupt every metric for the clip.
+    """
+    clip = {"video": "v", "scene": "scene_000", "track": "track_0001", "frame_ids": [10, 11]}
+    seg = tmp_path / "v" / "segmentations" / "scene_000"
+    color = seg / "track_0001"
+    color.mkdir(parents=True, exist_ok=True)
+    for fid in (10, 11):
+        (color / f"frame_{fid:06d}.png").write_bytes(b"fake")
+    (seg / "track_0001_keypoints.json").write_text(
+        json.dumps([{"frame_id": 0, "keypoints": None}, {"frame_id": 1, "keypoints": [[5.0, 6.0, 0.9]] * 18}])
+    )
+
+    poses = clip_keypoints(tmp_path, clip, [10, 11])
+
+    assert poses[0].shape == (18, 3)
+    assert float(np.abs(poses[0]).max()) == 0.0, "failed frame must be an all-zero (zero-confidence) pose"
+    assert poses[1][0][0] == 5.0, "the valid frame must be unaffected"
+
+
 def test_clip_track_index_maps_absolute_ids_to_positions(tmp_path: Path) -> None:
     clip = _write_track_with_gap(tmp_path)
     assert clip_track_index(tmp_path, clip) == {493: 0, 498: 1, 499: 2}
