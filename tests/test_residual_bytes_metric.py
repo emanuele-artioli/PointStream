@@ -58,15 +58,19 @@ def test_block_activity_gate_drops_only_quiet_blocks() -> None:
 # ---------------------------------------------------------------------------
 
 
-_RESIDUAL_KWARGS = dict(
-    codec="libx264", crf=28, preset="veryfast", pix_fmt="yuv444p", block_size=8, block_threshold=0.0
-)
-
-
 def _bytes_for(ground_truth: torch.Tensor, predicted: torch.Tensor) -> int:
     with tempfile.TemporaryDirectory() as tmp:
         return compute_residual_bytes(
-            ground_truth, predicted, fps=24.0, tmp_dir=Path(tmp), **_RESIDUAL_KWARGS
+            ground_truth,
+            predicted,
+            fps=24.0,
+            tmp_dir=Path(tmp),
+            codec="libx264",
+            crf=28,
+            preset="veryfast",
+            pix_fmt="yuv444p",
+            block_size=8,
+            block_threshold=0.0,
         )
 
 
