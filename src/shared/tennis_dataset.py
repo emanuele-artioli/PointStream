@@ -27,32 +27,60 @@ class TennisSkeletonDataset(Dataset):
         assets/dataset/<video>/segmentations/scene_XXX/track_YYY_skeleton/frame_ZZZ.png
     """
 
-    def __init__(self, root_dir: str, target_size: int = 512, transform=None, include_reference: bool = False):
+    #: Directory suffixes that are derived outputs, not tracks.
+    DERIVED_SUFFIXES = ("_skeleton", "_canny", "_pose_racket", "_pose_body")
+
+    #: Selectable pose-condition variants (see scripts/process_dataset.py).
+    #: `pose_body` is the one the decoder can reproduce for free and
+    #: bit-identically; `pose_racket` matches what the legacy checkpoints were
+    #: trained on but needs racket geometry the wire format does not carry.
+    #: `skeleton` is the legacy tree, kept only for reproducing old runs -- its
+    #: filenames are positional, so never pair it by name.
+    CONDITION_SUFFIXES = {
+        "pose_body": "_pose_body",
+        "pose_racket": "_pose_racket",
+        "skeleton": "_skeleton",
+    }
+
+    def __init__(
+        self,
+        root_dir: str,
+        target_size: int = 512,
+        transform=None,
+        include_reference: bool = False,
+        condition: str = "pose_body",
+    ):
         self.root_dir = Path(root_dir)
         self.target_size = target_size
         self.transform = transform
         self.include_reference = include_reference
+        if condition not in self.CONDITION_SUFFIXES:
+            raise ValueError(
+                f"Unknown condition {condition!r}; expected one of {sorted(self.CONDITION_SUFFIXES)}"
+            )
+        self.condition = condition
+        cond_suffix = self.CONDITION_SUFFIXES[condition]
 
-        # Items are tuples of (color_path, skeleton_path, track_id)
+        # Items are tuples of (color_path, condition_path, track_id)
         self.items: list[tuple[Path, Path, str]] = []
-        
+
         # Map track_id to a list of valid color paths in that track (for reference frame sampling)
         self.track_to_colors: dict[str, list[Path]] = {}
 
         # Parse the new directory structure
         # root_dir is usually assets/dataset
-        # We look for */segmentations/scene_*/track_* (excluding *_skeleton)
-        
+        # We look for */segmentations/scene_*/track_* (excluding derived dirs)
+
         search_pattern = os.path.join(str(self.root_dir), "*", "segmentations", "scene_*", "track_*")
         all_tracks = glob.glob(search_pattern)
-        
+
         for track_dir_str in all_tracks:
-            if track_dir_str.endswith("_skeleton"):
+            if track_dir_str.endswith(self.DERIVED_SUFFIXES):
                 continue
-                
+
             track_dir = Path(track_dir_str)
-            skel_dir = track_dir.with_name(f"{track_dir.name}_skeleton")
-            
+            skel_dir = track_dir.with_name(f"{track_dir.name}{cond_suffix}")
+
             if not skel_dir.exists():
                 continue
                 

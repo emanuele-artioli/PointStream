@@ -61,9 +61,16 @@ class ControlNetDataset(Dataset):
                     
             color_frames = sorted(list(track_dir.glob("frame_*.png")))
 
-            # Identify the condition directory
+            # Identify the condition directory.
+            # `pose` selects the body-only variant, which the decoder reproduces
+            # for free and bit-identically; `pose-racket` matches the legacy
+            # checkpoints but needs racket geometry the wire format does not
+            # carry. The legacy `_skeleton` tree is NOT selectable here -- its
+            # filenames are positional and pairing it wrecked this dataset.
             if self.condition_type == "pose":
-                cond_dir = track_dir.with_name(f"{track_dir.name}_skeleton")
+                cond_dir = track_dir.with_name(f"{track_dir.name}_pose_body")
+            elif self.condition_type == "pose-racket":
+                cond_dir = track_dir.with_name(f"{track_dir.name}_pose_racket")
             elif self.condition_type == "canny":
                 cond_dir = track_dir.with_name(f"{track_dir.name}_canny")
             elif self.condition_type in ["seg", "ip-adapter"]:
@@ -165,7 +172,10 @@ class ControlNetDataset(Dataset):
 def main():
     parser = argparse.ArgumentParser(description="Train ControlNet")
     parser.add_argument("--data-root", type=str, default="assets/dataset", help="Dataset root")
-    parser.add_argument("--condition-type", type=str, choices=["pose", "canny", "seg", "ip-adapter"], required=True)
+    parser.add_argument("--condition-type", type=str,
+                        choices=["pose", "pose-racket", "canny", "seg", "ip-adapter"], required=True,
+                        help="pose = body-only skeleton (decoder-reproducible for free); "
+                             "pose-racket = body + racket (needs racket geometry in ActorPacket)")
     parser.add_argument("--model-id", type=str, default="assets/weights/stable-diffusion-v1-5")
     parser.add_argument("--controlnet-model-id", type=str, default=None, help="Path to pre-trained ControlNet to fine-tune")
     parser.add_argument("--from-scratch", action="store_true", help="Initialize ControlNet from scratch (no fine-tuning)")
@@ -196,6 +206,7 @@ def main():
     else:
         defaults = {
             "pose": "assets/weights/control_v11p_sd15_openpose",
+            "pose-racket": "assets/weights/control_v11p_sd15_openpose",
             "canny": "lllyasviel/control_v11p_sd15_canny",
             "seg": "lllyasviel/control_v11p_sd15_seg",
             "ip-adapter": "assets/weights/control_v11p_sd15_openpose"

@@ -168,7 +168,8 @@ def main_worker(gpu, ngpus_per_node, args):
     criterion_GAN = nn.BCEWithLogitsLoss().to(device)
     criterion_pixelwise = nn.L1Loss().to(device)
 
-    dataset = TennisSkeletonDataset(args.data_root, target_size=args.img_size, include_reference=True)
+    dataset = TennisSkeletonDataset(args.data_root, target_size=args.img_size, include_reference=True,
+                                    condition=args.condition)
 
     if ngpus_per_node > 1:
         sampler = DistributedSampler(dataset)
@@ -289,6 +290,12 @@ def main_worker(gpu, ngpus_per_node, args):
 def main():
     parser = argparse.ArgumentParser(description="Train Pix2Pix for Pointstream GenAI Backend")
     parser.add_argument("--data-root", type=str, default="assets/dataset", help="Path to dataset root")
+    parser.add_argument("--condition", type=str, default="pose_body",
+                        choices=["pose_body", "pose_racket", "skeleton"],
+                        help="Pose-condition variant. pose_body is reproducible by the decoder for free "
+                             "and bit-identically; pose_racket matches the legacy checkpoints but needs "
+                             "racket geometry the wire format does not carry; skeleton is the legacy tree "
+                             "(positional filenames) kept only to reproduce old runs.")
     parser.add_argument("--epochs", type=int, default=200)
     parser.add_argument("--batch-size", type=str, default="auto", help="Batch size per GPU ('auto' maps to 64)")
     parser.add_argument("--img-size", type=int, default=512)
