@@ -71,7 +71,11 @@ breaks it.
 |---|---|
 | `decoder/decoder_renderer.py` | Reconstructs frames from the payload. |
 | `decoder/compositor.py` | Composites actors onto the background. |
-| `decoder/genai_compositor.py` | Generative strategies and their factory. |
+| `decoder/compositing/weights.py` | Weight resolution for the generative backends. |
+| `decoder/compositing/pose_render.py` | Pose tensors → the conditioning images every engine consumes. |
+| `decoder/compositing/strategies.py` | The generative strategies a run selects by config name. |
+| `decoder/compositing/compositor.py` | `BaseCompositor` and `DiffusersCompositor` — the decoder half of the Residual Guarantee. |
+| `decoder/genai_compositor.py` | Shim re-exporting the compositing package; the engine modules bind to this path. |
 | `decoder/controlnet_engine.py` | ControlNet inference with temporal conditioning. |
 | `decoder/animate_anyone_runtime.py` | Animate-Anyone backend. |
 | `decoder/pix2pix_engine.py`, `decoder/spade4tennis_engine.py` | GAN backends. |
