@@ -346,6 +346,72 @@ def run_strategy_inference(  # pragma: no cover - requires real checkpoint + GPU
 # ---------------------------------------------------------------------------
 
 
+def compute_residual_bytes(
+    ground_truth_rgb01: torch.Tensor,
+    predicted_rgb01: torch.Tensor,
+    fps: float,
+    tmp_dir: Path,
+    codec: str,
+    crf: int,
+    preset: str,
+    pix_fmt: str,
+    block_size: int,
+    block_threshold: float,
+) -> int:
+    """Encode (original - predicted) as the pipeline would and return its size in bytes.
+
+    **This is the project's ranking currency.** A generator earns its place only
+    by shrinking the residual payload by more than the metadata it adds, so the
+    question is not "which output looks best" but "which output is cheapest to
+    correct". The two can disagree: an aligned but blurry prediction leaves a
+    smooth, low-frequency residual that codes cheaply, while a sharp but
+    misaligned one leaves double edges that are expensive.
+
+    Uses the encoder's exact representation -- the same block-activity gate and
+    the same +128 offset (`apply_block_activity_gate`,
+    `residual_to_encodable_uint8`) -- so the number prices the real signal.
+
+    ⚠️ **Not yet trustworthy as a ranking signal on padded actor crops.**
+    Measured 2026-07-22: **79.1% of a padded 512x512 crop is black** (RGBA
+    composited on black, then padded to square). A prediction of all-zeros is
+    therefore *correct* over four fifths of the frame and scores 811,630 B
+    against pix2pix's 1,514,916 B -- which says nothing about generative quality
+    and everything about the crop representation. Before this ranks anything,
+    the residual must be measured either masked to the actor region or on the
+    full composited frame (the plan's Phase 1.2), which is what the payload
+    actually contains. The mechanism is validated
+    (`tests/test_residual_bytes_metric.py`); the *scale it is applied at* is not.
+    """
+    from src.encoder.residual_calculator import apply_block_activity_gate, residual_to_encodable_uint8
+
+    original = ground_truth_rgb01.clamp(0, 1) * 255.0  # Shape: [N, 3, H, W]
+    predicted = predicted_rgb01.clamp(0, 1) * 255.0  # Shape: [N, 3, H, W]
+    residual = original - predicted  # Shape: [N, 3, H, W], signed pixel units
+    residual = apply_block_activity_gate(residual, block_size, block_threshold)
+    encoded = residual_to_encodable_uint8(residual)  # Shape: [N, 3, H, W] uint8
+
+    height, width = encoded.shape[-2:]
+    frames_bgr = []
+    for frame in encoded:
+        hwc_rgb = frame.permute(1, 2, 0).cpu().numpy()  # Shape: [H, W, 3] RGB
+        frames_bgr.append(np.ascontiguousarray(hwc_rgb[:, :, ::-1]))
+
+    residual_path = tmp_dir / "residual.mp4"
+    residual_path.unlink(missing_ok=True)
+    encode_video_frames_ffmpeg(
+        output_path=residual_path,
+        frames_bgr=frames_bgr,
+        fps=fps,
+        width=width,
+        height=height,
+        codec=codec,
+        pix_fmt=pix_fmt,
+        crf=crf,
+        preset=preset,
+    )
+    return int(residual_path.stat().st_size)
+
+
 def compute_metrics_for_clip(
     ground_truth_rgb01: torch.Tensor,
     predicted_rgb01: torch.Tensor,
@@ -353,6 +419,7 @@ def compute_metrics_for_clip(
     metrics: tuple[str, ...],
     include_lpips: bool,
     tmp_dir: Path,
+    residual_settings: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Builds two tiny mp4s for one clip and scores them with the requested metrics."""
     height, width = ground_truth_rgb01.shape[-2:]
@@ -379,6 +446,10 @@ def compute_metrics_for_clip(
         result.update(_compute_fvd(ref_path, pred_path))
     if include_lpips:
         result.update(compute_lpips_from_frames(ground_truth_rgb01, predicted_rgb01))
+    if residual_settings is not None:
+        result["residual_bytes"] = compute_residual_bytes(
+            ground_truth_rgb01, predicted_rgb01, fps=fps, tmp_dir=tmp_dir, **residual_settings
+        )
 
     return result
 
@@ -391,6 +462,11 @@ _AGGREGATE_NUMERIC_KEYS = (
     "lpips_vgg_uncalibrated",
 )
 
+#: Payload sizes are SUMMED across clips, not averaged -- the quantity of
+#: interest is total bytes on the wire, and averaging would hide a variant that
+#: is cheap on most clips and catastrophic on one.
+_AGGREGATE_SUM_KEYS = ("residual_bytes",)
+
 
 def aggregate_clip_metrics(per_clip: list[dict[str, Any]]) -> dict[str, Any]:
     """Mean of each numeric metric across clips, skipping None/missing entries."""
@@ -398,6 +474,9 @@ def aggregate_clip_metrics(per_clip: list[dict[str, Any]]) -> dict[str, Any]:
     for key in _AGGREGATE_NUMERIC_KEYS:
         values = [clip[key] for clip in per_clip if clip.get(key) is not None]
         aggregate[key] = float(sum(values) / len(values)) if values else None
+    for key in _AGGREGATE_SUM_KEYS:
+        values = [clip[key] for clip in per_clip if clip.get(key) is not None]
+        aggregate[key] = int(sum(values)) if values else None
     aggregate["num_clips_scored"] = sum(1 for clip in per_clip if any(clip.get(k) is not None for k in _AGGREGATE_NUMERIC_KEYS))
     aggregate["num_clips_total"] = len(per_clip)
     return aggregate
@@ -427,6 +506,7 @@ def evaluate_checkpoint(
     condition_type: str | None = None,
     arch_kwargs: dict[str, Any] | None = None,
     seed: int = 0,
+    residual_settings: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Runs inference + scoring for every probe clip in `manifest`; returns per-clip and aggregate metrics.
 
@@ -461,7 +541,13 @@ def evaluate_checkpoint(
             )  # Shape: [N, 3, size, size]
 
             clip_metrics = compute_metrics_for_clip(
-                ground_truth, predicted, fps=fps, metrics=metrics, include_lpips=include_lpips, tmp_dir=tmp_dir
+                ground_truth,
+                predicted,
+                fps=fps,
+                metrics=metrics,
+                include_lpips=include_lpips,
+                tmp_dir=tmp_dir,
+                residual_settings=residual_settings,
             )
             clip_metrics["clip_key"] = f"{clip['video']}/{clip['scene']}/{clip['track']}"
             per_clip_metrics.append(clip_metrics)
@@ -484,6 +570,18 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--metrics", type=str, default=",".join(DEFAULT_METRICS))
     parser.add_argument("--skip-lpips", action="store_true")
     parser.add_argument("--seed", type=int, default=0, help="Generation seed, pinned so runs are comparable")
+    # Residual-bytes settings. These pin the payload the candidate is priced
+    # against, so they are recorded in every log record -- a byte count is
+    # meaningless without the codec/CRF/pix-fmt that produced it.
+    parser.add_argument("--no-residual-bytes", action="store_true",
+                        help="Skip the residual-bytes measurement (it costs one extra encode per clip)")
+    parser.add_argument("--residual-codec", type=str, default="libx264")
+    parser.add_argument("--residual-crf", type=int, default=28)
+    parser.add_argument("--residual-preset", type=str, default="medium")
+    parser.add_argument("--residual-pix-fmt", type=str, default="yuv444p",
+                        help="libsvtav1 forces yuv420p regardless of this; use libx264/libx265 to vary it")
+    parser.add_argument("--residual-block-size", type=int, default=8)
+    parser.add_argument("--residual-block-threshold", type=float, default=0.0)
     # ControlNet knobs map onto PointstreamConfig fields, so eval and the
     # decoder are configured identically rather than through a parallel set of
     # kwargs that only eval understood.
@@ -517,6 +615,15 @@ def main(argv: list[str] | None = None) -> int:
     arch_kwargs["controlnet_width"] = args.img_size
     arch_kwargs["controlnet_height"] = args.img_size
 
+    residual_settings = None if args.no_residual_bytes else {
+        "codec": args.residual_codec,
+        "crf": args.residual_crf,
+        "preset": args.residual_preset,
+        "pix_fmt": args.residual_pix_fmt,
+        "block_size": args.residual_block_size,
+        "block_threshold": args.residual_block_threshold,
+    }
+
     result = evaluate_checkpoint(
         checkpoint_path=args.checkpoint,
         arch=args.arch,
@@ -529,6 +636,7 @@ def main(argv: list[str] | None = None) -> int:
         fps=args.fps,
         arch_kwargs=arch_kwargs,
         seed=args.seed,
+        residual_settings=residual_settings,
     )
 
     record = {
@@ -540,6 +648,7 @@ def main(argv: list[str] | None = None) -> int:
         "manifest": str(args.manifest),
         "seed": args.seed,
         "config_overrides": arch_kwargs,
+        "residual_settings": residual_settings,
         **result["aggregate"],
     }
     append_jsonl_log(args.log, record)
