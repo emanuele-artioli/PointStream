@@ -91,8 +91,7 @@ def real_encoder_pipeline(real_actor_extractor: ActorExtractor):
 
 @pytest.fixture()
 def mock_encoder_pipeline():
-    from tests.mock_components import ObjectTracker
-    pipeline = EncoderPipeline(config=PointstreamConfig(), actor_extractor=MockActorExtractor(), object_tracker=ObjectTracker())
+    pipeline = EncoderPipeline(config=PointstreamConfig(), actor_extractor=MockActorExtractor())
     try:
         yield pipeline
     finally:

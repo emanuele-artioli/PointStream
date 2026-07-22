@@ -165,13 +165,6 @@ class ActorMaskFrame(BaseModel):
     source: Literal["source", "postgen-server", "canny"] = "source"
 
 
-class RigidObjectPacket(BaseModel):
-    chunk_id: str
-    object_id: str
-    trajectory_spec: TensorSpec
-    events: list[SemanticEvent]
-
-
 class BallPacket(BaseModel):
     chunk_id: str
     object_id: str = "ball_0"
@@ -192,7 +185,6 @@ class EncodedChunkPayload(BaseModel):
     panorama: PanoramaPacket
     actors: list[ActorPacket]
     actor_references: list[SceneActorReference] = Field(default_factory=list)
-    rigid_objects: list[RigidObjectPacket]
     ball: BallPacket
     residual: ResidualPacket
 

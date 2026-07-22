@@ -86,7 +86,6 @@ class EncoderPipeline:
         actor_extractor: Any | None = None,
         ball_extractor: Any | None = None,
         reference_extractor: Any | None = None,
-        object_tracker: Any | None = None,
         residual_calculator: ResidualCalculator | None = None,
     ) -> None:
         self.config = config
@@ -94,7 +93,6 @@ class EncoderPipeline:
         self._background_modeler = BackgroundModeler(config=self.config)
         self._panorama_encoder = build_panorama_encoder(config=self.config)
         self._actor_extractor = actor_extractor or ActorExtractor(config=self.config)
-        self._object_tracker = object_tracker
         self._ball_extractor = ball_extractor or BallExtractor()
         self._reference_extractor = reference_extractor or ReferenceExtractor()
         self._residual_calculator = residual_calculator or ResidualCalculator(config=self.config, synthesis_engine=SynthesisEngine(config=self.config))
@@ -213,21 +211,6 @@ class EncoderPipeline:
                 dependencies=("chunk", "frame_states"),
             )
         )
-        def build_rigid_objects_node(context, deps):
-            if hasattr(self, "_object_tracker") and self._object_tracker is not None:
-                return self._object_tracker.process(deps["chunk"])
-            return []
-        tracker = getattr(self, '_object_tracker', None)
-        tag = getattr(tracker.process, '_execution_tag', 'cpu') if tracker is not None else 'cpu'
-        setattr(build_rigid_objects_node, '_execution_tag', tag)
-
-        self._dag.add_node(
-            DAGNode(
-                name="rigid_objects",
-                func=build_rigid_objects_node,
-                dependencies=("chunk",),
-            )
-        )
         def build_ball_node(context, deps):
             actor_bundle = deps["actor_bundle"]
             if hasattr(self._ball_extractor, "process_shifted") and hasattr(actor_bundle, "wait_for_frame_state"):
@@ -265,7 +248,6 @@ class EncoderPipeline:
                 panorama=deps["panorama"],
                 actors=deps["actors"],
                 actor_references=deps["actor_references"],
-                rigid_objects=deps["rigid_objects"],
                 ball=deps["ball"],
                 residual=placeholder_residual,
             )
@@ -284,7 +266,7 @@ class EncoderPipeline:
             DAGNode(
                 name="residual",
                 func=build_residual_node,
-                dependencies=("chunk", "panorama", "actors", "actor_references", "rigid_objects", "ball", "frame_states"),
+                dependencies=("chunk", "panorama", "actors", "actor_references", "ball", "frame_states"),
             )
         )
 
@@ -338,7 +320,6 @@ class EncoderPipeline:
             panorama=context["panorama"],
             actors=context["actors"],
             actor_references=context["actor_references"],
-            rigid_objects=context["rigid_objects"],
             ball=context["ball"],
             residual=context["residual"],
         )
@@ -384,7 +365,6 @@ class EncoderPipeline:
             panorama=context["panorama"],
             actors=context["actors"],
             actor_references=context["actor_references"],
-            rigid_objects=context["rigid_objects"],
             ball=context["ball"],
             residual=context["residual"],
         )
@@ -435,7 +415,6 @@ class EncoderPipeline:
             panorama=context["panorama"],
             actors=context["actors"],
             actor_references=context["actor_references"],
-            rigid_objects=context["rigid_objects"],
             ball=context["ball"],
             residual=context["residual"],
         )

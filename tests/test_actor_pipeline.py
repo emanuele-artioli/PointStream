@@ -199,14 +199,6 @@ def test_mock_trackers_emit_contract_packets(tmp_path: Path) -> None:
     source.write_bytes(b"x")
     chunk = _make_chunk(source, frames=6)
 
-    rigid_packets = mc.ObjectTracker().process(chunk)
-    assert len(rigid_packets) == 1
-    rigid = rigid_packets[0]
-    assert rigid.object_id == "racket_0"
-    assert rigid.trajectory_spec.shape == [1, 6, 32, 2]
-    assert rigid.events[0].event_type == "keyframe"
-    assert rigid.events[1].event_type == "interpolate"
-
     ball = mc.BallTracker().process(chunk)
     assert ball.object_id == "ball_0"
     assert ball.trajectory_spec.shape == [1, 6, 4]

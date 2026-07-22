@@ -4,7 +4,7 @@ from pathlib import Path
 
 from src.encoder.orchestrator import EncoderPipeline
 from src.shared.config import PointstreamConfig
-from tests.mock_components import MockActorExtractor, ObjectTracker
+from tests.mock_components import MockActorExtractor
 from tests.video_utils import create_dummy_video
 
 
@@ -13,7 +13,6 @@ def _encode_residual(video_path: Path, chunk_id: str, panorama_jpeg_quality: int
     pipeline = EncoderPipeline(
         config=config,
         actor_extractor=MockActorExtractor(),
-        object_tracker=ObjectTracker(),
     )
     try:
         payload, _decoded = pipeline.encode_video_file(video_path=video_path, chunk_id=chunk_id)

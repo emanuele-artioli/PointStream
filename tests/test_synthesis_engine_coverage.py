@@ -99,7 +99,6 @@ def _make_payload(
         panorama=panorama,
         actors=[actor],
         actor_references=[],
-        rigid_objects=[],
         ball=ball,
         residual=residual,
     )

@@ -29,7 +29,6 @@ class _FakeEncoderPipeline:
         return SimpleNamespace(
             chunk=SimpleNamespace(chunk_id=chunk.chunk_id),
             actors=[object(), object()],
-            rigid_objects=[object()],
             ball=SimpleNamespace(object_id="ball_0"),
             residual=SimpleNamespace(residual_video_uri="memory://residual/chunk.mp4"),
         )
@@ -105,7 +104,6 @@ def test_run_pipeline_builds_summary_with_provided_source(monkeypatch) -> None:
 
     assert summary["chunk_id"] == "0001"
     assert summary["num_actor_packets"] == 2
-    assert summary["num_rigid_object_packets"] == 1
     assert summary["ball_object_id"] == "ball_0"
     assert str(summary["residual_uri"]).endswith("chunk.mp4")
     assert str(summary["decoded_uri"]).endswith("0001_decoded")
@@ -198,7 +196,6 @@ def test_run_cli_accepts_input_and_config(monkeypatch, tmp_path: Path) -> None:
         return {
             "chunk_id": "0001",
             "num_actor_packets": 1,
-            "num_rigid_object_packets": 1,
             "ball_object_id": "ball_0",
             "residual_uri": "memory://residual/chunk.mp4",
             "decoded_uri": "memory://decoded/chunk.mp4",

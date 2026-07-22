@@ -26,7 +26,6 @@ def test_run_pipeline_emits_summary_and_artifacts(real_actor_extractor, real_ten
         assert summary["chunk_id"] == "0001"
         assert num_actor_packets >= 0
         assert num_actor_packets <= 2
-        assert summary["num_rigid_object_packets"] == 1
         assert summary["ball_object_id"] == "ball_0"
 
         chunk_dir = Path(tmp_dir) / "chunk_0001"

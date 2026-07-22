@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from pathlib import Path
 from types import SimpleNamespace
-import types
 from typing import Any, cast
 
 import cv2
@@ -24,7 +23,6 @@ from src.shared.schemas import (
     PanoramaPacket,
     ResidualMode,
     ResidualPacket,
-    RigidObjectPacket,
     SceneActor,
     SceneActorReference,
     TensorSpec,
@@ -94,14 +92,6 @@ def _build_minimal_payload(tmp_path: Path) -> tuple[VideoChunk, EncodedChunkPayl
         panorama=panorama,
         actors=[actor_packet],
         actor_references=[SceneActorReference(track_id=1, reference_crop_jpeg=reference_jpeg)],
-        rigid_objects=[
-            RigidObjectPacket(
-                chunk_id=chunk.chunk_id,
-                object_id="rigid_1",
-                trajectory_spec=TensorSpec(name="rigid", shape=[1, 4], dtype="torch.float32"),
-                events=[],
-            )
-        ],
         ball=BallPacket(
             chunk_id=chunk.chunk_id,
             object_id="ball_0",
@@ -413,7 +403,6 @@ def test_encoder_pipeline_streams_actor_states_and_uses_shifted_ball(monkeypatch
         residual_calculator=cast(Any, _FakeResidualCalculator(config=PointstreamConfig())),
     )
     pipeline._background_modeler = cast(Any, _FakeBackgroundModeler())
-    pipeline._object_tracker = cast(Any, types.SimpleNamespace(process=lambda chunk: [RigidObjectPacket(chunk_id=chunk.chunk_id, object_id="rigid_1", trajectory_spec=TensorSpec(name="rigid", shape=[1, 4], dtype="torch.float32"), events=[])]))
 
     monkeypatch.setenv("POINTSTREAM_ENABLE_SHIFTED_BALL", "1")
 

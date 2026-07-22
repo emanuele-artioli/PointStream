@@ -12,7 +12,6 @@ from src.shared.schemas import (
     InterpolateCommandEvent,
     KeyframeEvent,
     ObjectClass,
-    RigidObjectPacket,
     SceneActor,
     SemanticEvent,
     TensorSpec,
@@ -172,44 +171,6 @@ class MockActorExtractor:
 
     def _solid_mask(self, mask_h: int, mask_w: int) -> list[list[int]]:
         return np.ones((mask_h, mask_w), dtype=np.uint8).tolist()
-
-
-class ObjectTracker:
-    @gpu_bound
-    def process(self, chunk: VideoChunk) -> list[RigidObjectPacket]:
-        batch = 1
-
-        # Shape: [Batch, Frames, Points, Coords]
-        tracks = torch.zeros(batch, chunk.num_frames, 32, 2, dtype=torch.float32)
-
-        racket_events: list[SemanticEvent] = [
-            KeyframeEvent(
-                frame_id=chunk.start_frame_id,
-                object_id="racket_0",
-                object_class=ObjectClass.RACKET,
-                coordinates=[0.4, 0.5],
-            ),
-            InterpolateCommandEvent(
-                frame_id=chunk.start_frame_id + 1,
-                object_id="racket_0",
-                object_class=ObjectClass.RACKET,
-                target_frame_id=chunk.start_frame_id + min(6, chunk.num_frames - 1),
-                method="linear",
-            ),
-        ]
-
-        return [
-            RigidObjectPacket(
-                chunk_id=chunk.chunk_id,
-                object_id="racket_0",
-                trajectory_spec=TensorSpec(
-                    name="rigid_trajectory",
-                    shape=list(tracks.shape),
-                    dtype=str(tracks.dtype),
-                ),
-                events=racket_events,
-            )
-        ]
 
 
 class BallTracker:

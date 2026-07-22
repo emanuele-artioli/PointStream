@@ -146,7 +146,6 @@ def run_pipeline(
         "source_uri": resolved_source_uri,
         "num_frames": chunk.num_frames,
         "num_actor_packets": len(received_payload.actors),
-        "num_rigid_object_packets": len(received_payload.rigid_objects),
         "ball_object_id": received_payload.ball.object_id,
         "residual_uri": received_payload.residual.residual_video_uri,
         "residual_mode": residual_mode_value,

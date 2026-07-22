@@ -26,7 +26,6 @@ def test_encode_chunk_contract_and_events(mock_encoder_pipeline, test_run_artifa
     assert len(payload.panorama.camera_poses) == 12
     assert len(payload.actors) == 2
     assert len(payload.actor_references) == 2
-    assert len(payload.rigid_objects) == 1
     assert payload.ball.object_id == "ball_0"
     assert len(payload.ball.states) == 12
     assert payload.residual.codec == "libsvtav1"
@@ -58,6 +57,5 @@ def test_execution_tags_are_propagated_to_dag_nodes(mock_encoder_pipeline, test_
     assert context["panorama__tag"] == "cpu"
     assert context["actors__tag"] == "gpu"
     assert context["actor_references__tag"] == "cpu"
-    assert context["rigid_objects__tag"] == "gpu"
     assert context["ball__tag"] == "gpu"
     assert context["residual__tag"] == "gpu"
