@@ -49,7 +49,14 @@ breaks it.
 ### Encoder stages
 | Module | Responsibility |
 |---|---|
-| `encoder/actor_components.py` | Detectors, trackers, segmenters, pose estimators, payload encoding. |
+| `encoder/actors/weights.py` | Weight resolution and bbox geometry, used by all the actor backends. |
+| `encoder/actors/detection.py` | YOLO backends that find people and rackets. |
+| `encoder/actors/heuristics.py` | Deciding which detections are the players, not the ball kids or crowd. |
+| `encoder/actors/segmentation.py` | Masks that drive compositing. |
+| `encoder/actors/pose.py` | Keypoints used as generative conditioning. |
+| `encoder/actors/payload.py` | Packing actors into the transmitted payload. |
+| `encoder/actors/builder.py` | Assembling an actor pipeline from config (backends selected by name). |
+| `encoder/actor_components.py` | Shim re-exporting the actors package; `actor_pipeline` and a test both bind to this path. |
 | `encoder/actor_pipeline.py` | Runs actor extraction over a chunk. |
 | `encoder/ball_extractor.py`, `encoder/segmentation_ball_extractor.py` | Ball localisation. |
 | `encoder/reference_extractor.py` | Reference crops for the generative backends. |
