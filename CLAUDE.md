@@ -90,6 +90,27 @@ The ones that bite most often:
   across a CRF ladder, and state the preset tier.
 - **Invalidated runs get `mv`'d** to `outputs/_superseded/<ts>_<reason>/`,
   never `rm`'d.
+- **Evaluation must run the decoder's own code path.** Symmetry applies to
+  measurement, not just synthesis: `scripts/eval_checkpoint.py` builds
+  strategies via `build_genai_strategy`, the same factory the compositor uses.
+  A reimplemented inference path once scored ControlNet as text-to-image from
+  noise while the decoder ran img2img from the reference crop — fixing only the
+  measurement was worth **+6.3 dB PSNR**. If a variant scores near zero while
+  others look sane, suspect the measurement before the model.
+- **Metrics are scale-specific.** VMAF floor-saturates on 512×512 actor crops
+  (it returned exactly 0.00) — use LPIPS/DISTS there, and keep VMAF/FVD for the
+  final full frame. Ranking is by **residual bytes**; everything else is a
+  diagnostic that explains why a model won or lost.
+
+## Long training runs — never launch attached
+
+The SSH connection to this host drops at least twice a day. Launch every
+multi-hour job detached (`setsid nohup … < /dev/null &`, or `run_in_background`
+from a Claude session) and verify its resume path *before* it is needed. Kill a
+run early on the documented tripwires (nonzero exit, NaN loss, score below the
+reference-copy floor, variance collapse) rather than letting it burn a night —
+and remember an OOM is an infra failure, never a quality result. Full recipe:
+the `/train-campaign` skill.
 
 ## Architecture rules
 

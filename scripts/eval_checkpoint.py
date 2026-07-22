@@ -208,6 +208,29 @@ def load_seg_clip_tensor(paths: list[Path], size: int) -> torch.Tensor:
     return torch.stack([load_seg_rgb01(p, size) for p in paths], dim=0)
 
 
+def load_reference_bgr_native(path: Path) -> torch.Tensor:
+    """Load a reference crop at its NATIVE size as [3, h, w] uint8 BGR.
+
+    Deliberately no pad-to-square and no resize. The decoder receives a
+    native-resolution, non-square crop (`cv2.imdecode` of the transmitted JPEG)
+    and does its own letterboxing into the generation canvas. Handing the
+    strategy an already-square 512x512 reference would make that letterboxing a
+    no-op, so eval would silently exercise a geometry the decoder never sees --
+    and would resample twice on the way out.
+    """
+    from PIL import Image
+
+    img: Image.Image = Image.open(path)
+    if img.mode == "RGBA":
+        background = Image.new("RGBA", img.size, (0, 0, 0, 255))
+        img = Image.alpha_composite(background, img).convert("RGB")
+    else:
+        img = img.convert("RGB")
+    array = np.asarray(img, dtype=np.uint8)  # Shape: [h, w, 3] RGB
+    rgb = torch.from_numpy(array).permute(2, 0, 1).contiguous()  # Shape: [3, h, w] RGB
+    return rgb.flip(0).contiguous()  # Shape: [3, h, w] BGR
+
+
 def rgb01_to_bgr_uint8_tensor(frame_rgb01: torch.Tensor) -> torch.Tensor:
     """[3, H, W] float in [0,1] RGB -> [3, H, W] uint8 BGR.
 
@@ -287,19 +310,21 @@ def build_eval_strategy(arch: str, checkpoint_path: Path, config_overrides: dict
 def run_strategy_inference(  # pragma: no cover - requires real checkpoint + GPU
     strategy: Any,
     keypoints: list[np.ndarray],
-    reference_frame_rgb01: torch.Tensor,
+    reference_bgr_native: torch.Tensor,
     device: str,
     img_size: int,
     seed: int = 0,
 ) -> torch.Tensor:
     """Run the decoder strategy frame-by-frame. Returns [N, 3, img_size, img_size] RGB in [0, 1].
 
-    `keypoints` are crop-local DWPose coordinates -- exactly what the decoder
-    receives in an `ActorPacket` and renders into a condition image itself. The
+    `keypoints` are crop-local DWPose coordinates and `reference_bgr_native` is
+    a native-resolution BGR crop -- exactly what the decoder receives in an
+    `ActorPacket` plus the transmitted reference JPEG. The strategy renders its
+    own condition and does its own letterboxing, as it does at decode time. The
     pre-rendered `_skeleton` PNGs are a training-time artefact the decoder never
     sees, so eval must not feed them either.
     """
-    reference_bgr = rgb01_to_bgr_uint8_tensor(reference_frame_rgb01)  # Shape: [3, H, W] BGR uint8
+    reference_bgr = reference_bgr_native  # Shape: [3, h, w] BGR uint8, native size
     torch_device = torch.device(device)
 
     outputs = []
@@ -423,13 +448,13 @@ def evaluate_checkpoint(
             ref_path = resolve_reference_frame_path(dataset_root, clip)
 
             ground_truth = load_clip_tensor(color_paths, img_size)  # Shape: [N, 3, size, size]
-            reference_tensor = load_image_rgb01(ref_path, img_size)  # Shape: [3, size, size]
+            reference_native = load_reference_bgr_native(ref_path)  # Shape: [3, h, w] BGR uint8
             keypoints = clip_keypoints(dataset_root, clip, frame_ids)  # list of Shape: [18, 3]
 
             predicted = run_strategy_inference(
                 strategy=strategy,
                 keypoints=keypoints,
-                reference_frame_rgb01=reference_tensor,
+                reference_bgr_native=reference_native,
                 device=device,
                 img_size=img_size,
                 seed=seed,
