@@ -6,6 +6,7 @@ from datetime import datetime
 import json
 import logging
 from pathlib import Path
+import sys
 from time import perf_counter
 from typing import Any
 
@@ -328,6 +329,14 @@ def run_cli(argv: list[str] | None = None) -> int:
             if "timings_sec" in run_summary["evaluation"]:
                 run_summary["evaluation"]["timings_sec"]["quality_evaluation"] = q_sec
 
+    # Record whether this run actually supports the claims the paper makes from
+    # runs like it. Stored in the summary rather than only printed, so a run that
+    # violated one cannot be quietly cited weeks later.
+    from src.shared.invariants import check_run
+
+    invariant_failures = check_run(run_summary)
+    run_summary["invariant_failures"] = invariant_failures
+
     summary_json = json.dumps(run_summary, indent=2)
     print(summary_json)
 
@@ -335,6 +344,14 @@ def run_cli(argv: list[str] | None = None) -> int:
         summary_path = run_output_root / "run_summary.json"
         summary_path.parent.mkdir(parents=True, exist_ok=True)
         summary_path.write_text(f"{summary_json}\n", encoding="utf-8")
+
+    if invariant_failures:
+        print(
+            f"\n!! {len(invariant_failures)} INVARIANT FAILURE(S) — this run is NOT citable:",
+            file=sys.stderr,
+        )
+        for failure in invariant_failures:
+            print(f"   - {failure}", file=sys.stderr)
 
     return 0
 
