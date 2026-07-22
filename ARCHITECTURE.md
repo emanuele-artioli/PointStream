@@ -39,7 +39,7 @@ breaks it.
 | Module | Responsibility |
 |---|---|
 | `main.py` | The only CLI (`--input`, `--config`); builds and runs the pipeline. |
-| `experiment_evaluation.py` | Metrics and summary writing for a completed run. |
+| `shared/experiment_evaluation.py` | Metrics and summary writing for a completed run. |
 | `encoder/orchestrator.py` | Drives one chunk through the encoder stages. |
 | `encoder/match_orchestrator.py` | Drives a whole match: scene routing, chunking. |
 | `encoder/dag.py` | Stage graph with `@cpu_bound` / `@gpu_bound` tags. |

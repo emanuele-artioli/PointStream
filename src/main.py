@@ -25,7 +25,7 @@ from src.encoder.pipeline_builders import (
     build_residual_calculator,
 )
 from src.encoder.video_io import encode_video_frames_ffmpeg, probe_video_metadata, ensure_ffmpeg_encoder_available
-from src.experiment_evaluation import evaluate_run_summary
+from src.shared.experiment_evaluation import evaluate_run_summary
 from src.shared.profiling import derive_fps_throughput
 from src.shared.schemas import VideoChunk, ResidualMode
 from src.transport.disk import DiskTransport

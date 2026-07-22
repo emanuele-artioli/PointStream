@@ -1,7 +1,7 @@
 import pytest
 from pathlib import Path
 
-from src.experiment_evaluation import evaluate_run_summary, _normalize_evaluation_metrics
+from src.shared.experiment_evaluation import evaluate_run_summary, _normalize_evaluation_metrics
 
 def test_normalize_evaluation_metrics():
     assert _normalize_evaluation_metrics(None) == ["psnr"]
