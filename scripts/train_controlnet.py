@@ -22,6 +22,9 @@ from tqdm import tqdm
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
+# Derived directories and sidecars under a scene dir -- never training items.
+DERIVED_SUFFIXES = ("_skeleton", "_canny", "_caption", "_pose_racket", "_pose_body")
+
 def pad_to_square(img, fill=0):
     w, h = img.size
     max_dim = max(w, h)
@@ -45,10 +48,13 @@ class ControlNetDataset(Dataset):
         all_tracks = glob.glob(search_pattern)
         
         for track_dir_str in all_tracks:
-            # Skip non-primary track folders
-            if track_dir_str.endswith("_skeleton") or track_dir_str.endswith("_canny") or track_dir_str.endswith("_caption"):
+            # Skip derived directories and sidecar files -- only primary track
+            # dirs are training items. Missing a suffix here makes the loader
+            # treat e.g. `track_0036_pose_body` as a track and hunt for
+            # `track_0036_pose_body_pose_body`.
+            if track_dir_str.endswith(DERIVED_SUFFIXES) or not os.path.isdir(track_dir_str):
                 continue
-                
+
             track_dir = Path(track_dir_str)
             
             # Read caption if available, otherwise fallback
@@ -149,7 +155,7 @@ class ControlNetDataset(Dataset):
         img = pad_to_square(img, fill=0)
         image_tensor = self.transform(img)
         
-        if self.condition_type == "pose" or self.condition_type == "canny":
+        if self.condition_type in ("pose", "pose-racket", "canny"):
             cond_img = Image.open(item["cond_path"]).convert("RGB")
             cond_img = pad_to_square(cond_img, fill=0)
             cond_tensor = self.cond_transform(cond_img)
@@ -158,6 +164,8 @@ class ControlNetDataset(Dataset):
             cond_tensor = self.cond_transform(cond_img)
         elif self.condition_type == "ip-adapter":
             cond_tensor = self.cond_transform(img)
+        else:
+            raise ValueError(f"Unknown condition type: {self.condition_type}")
             
         tokens = self.tokenizer(
             item["prompt"], max_length=self.tokenizer.model_max_length, padding="max_length", truncation=True, return_tensors="pt"

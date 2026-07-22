@@ -228,11 +228,19 @@ def load_manifest(path: Path) -> dict:
     return json.loads(path.read_text())
 
 
+def _link_if_missing(dst: Path, src: Path) -> None:
+    """Symlink dst -> src unless dst already exists (idempotent top-up)."""
+    if dst.is_symlink() or dst.exists():
+        return
+    dst.symlink_to(src.resolve(), target_is_directory=src.is_dir())
+
+
 def materialize_training_view(
     dataset_root: Path,
     output_dir: Path,
     training_videos: tuple[str, ...],
     excluded_training_keys: set[str],
+    refresh: bool = False,
 ) -> None:
     """Build a symlink tree at output_dir suitable for `--data-root`.
 
@@ -243,10 +251,22 @@ def materialize_training_view(
     directories with nothing excluded are symlinked wholesale (cheap, no need
     to descend); only scenes containing an excluded track are rebuilt
     entry-by-entry.
+
+    **Re-runnable on purpose.** The entry-by-entry scenes are a point-in-time
+    snapshot: condition directories added to the dataset later (e.g. a new
+    `_pose_body` variant) are invisible through them, while the wholesale-linked
+    scenes pick them up automatically. That asymmetry silently shrinks the
+    training set — it hid 3,060 of 16,272 frames when the pose variants were
+    regenerated. Re-running tops the tree up: existing links are left alone and
+    missing ones are added. Pass `refresh=True` to allow writing into an
+    existing tree.
     """
-    if output_dir.exists():
-        raise FileExistsError(f"refusing to overwrite existing training view at {output_dir}")
-    output_dir.mkdir(parents=True)
+    if output_dir.exists() and not refresh:
+        raise FileExistsError(
+            f"refusing to overwrite existing training view at {output_dir} "
+            "(pass --refresh-training-view to top it up with newly added condition dirs)"
+        )
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     excluded_by_video_scene: dict[tuple[str, str], set[str]] = {}
     for key in excluded_training_keys:
@@ -258,28 +278,28 @@ def materialize_training_view(
         if not src_video_dir.is_dir():
             continue
         dst_video_dir = output_dir / video
-        dst_video_dir.mkdir()
+        dst_video_dir.mkdir(exist_ok=True)
 
         for entry in sorted(src_video_dir.iterdir()):
             if entry.name != "segmentations":
-                (dst_video_dir / entry.name).symlink_to(entry.resolve(), target_is_directory=entry.is_dir())
+                _link_if_missing(dst_video_dir / entry.name, entry)
                 continue
 
             dst_seg_dir = dst_video_dir / "segmentations"
-            dst_seg_dir.mkdir()
+            dst_seg_dir.mkdir(exist_ok=True)
             for scene_dir in sorted(entry.iterdir()):
                 excluded_tracks = excluded_by_video_scene.get((video, scene_dir.name))
                 if not excluded_tracks:
-                    (dst_seg_dir / scene_dir.name).symlink_to(scene_dir.resolve(), target_is_directory=True)
+                    _link_if_missing(dst_seg_dir / scene_dir.name, scene_dir)
                     continue
 
                 dst_scene_dir = dst_seg_dir / scene_dir.name
-                dst_scene_dir.mkdir()
+                dst_scene_dir.mkdir(exist_ok=True)
                 for item in sorted(scene_dir.iterdir()):
                     track_id = _extract_track_id(item.name)
                     if track_id is not None and track_id in excluded_tracks:
                         continue
-                    (dst_scene_dir / item.name).symlink_to(item.resolve(), target_is_directory=item.is_dir())
+                    _link_if_missing(dst_scene_dir / item.name, item)
 
 
 def _build_arg_parser() -> argparse.ArgumentParser:
@@ -301,6 +321,12 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         type=Path,
         default=None,
         help="If set, also build a symlink tree here for use as training scripts' --data-root",
+    )
+    parser.add_argument(
+        "--refresh-training-view",
+        action="store_true",
+        help="Top up an existing training view with condition directories added since it was built "
+             "(e.g. new _pose_body/_pose_racket variants). Existing links are left untouched.",
     )
     return parser
 
@@ -344,6 +370,7 @@ def main(argv: list[str] | None = None) -> int:
             output_dir=args.materialize_training_view,
             training_videos=training_videos,
             excluded_training_keys=set(manifest["excluded_training_keys"]),
+            refresh=args.refresh_training_view,
         )
         print(f"Materialized probe-excluded training view at {args.materialize_training_view}")
 
