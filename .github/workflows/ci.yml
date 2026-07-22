@@ -9,6 +9,23 @@ on:
   pull_request:
 
 jobs:
+  agent-rules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Agent rule files match CLAUDE.md
+        run: |
+          python3 tools/sync_agent_rules.py --check
+
   lint:
     runs-on: ubuntu-latest
     timeout-minutes: 30
