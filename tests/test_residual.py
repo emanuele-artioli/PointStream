@@ -116,3 +116,69 @@ def test_full_codec_loop_composites_signed_residual_into_final_reconstruction(
     recon_np = np.stack(recon_frames, axis=0).astype(np.float32)
     mae = float(np.mean(np.abs(source_np - recon_np)))
     assert mae < 35.0
+
+
+def test_residual_calculator_does_not_seek_into_source_by_start_frame_id(
+    real_encoder_pipeline,
+    real_tennis_20f_video: Path,
+    test_run_artifacts_dir: Path,
+) -> None:
+    """chunk.source_uri is a self-contained per-chunk file (frame 0 of the file is the
+    chunk's first frame); start_frame_id only labels emitted frame_id numbers, it must
+    never be used to seek into source_uri. Two chunks pointed at the SAME 20-frame source
+    file but carrying different start_frame_id must therefore read/align to the identical
+    underlying frames -- exactly as ActorExtractor already does when detecting actors.
+    A seek-offset regression here silently detects actors on one frame slice while
+    computing the residual against a different, shifted slice.
+    """
+    metadata = probe_video_metadata(real_tennis_20f_video)
+    frames = list(
+        iter_video_frames_ffmpeg(real_tennis_20f_video, width=metadata.width, height=metadata.height)
+    )
+    assert len(frames) == 20
+
+    # Sanity check: frames 8 apart in this clip are genuinely different, not a uniform dummy.
+    frame_gap_diff = float(np.mean(np.abs(frames[0].astype(np.float32) - frames[8].astype(np.float32))))
+    assert frame_gap_diff > 5.0
+
+    payload_a, _decoded_a, frame_states_a = real_encoder_pipeline.encode_video_file_with_states(
+        video_path=real_tennis_20f_video,
+        chunk_id="align_start0",
+        start_frame_id=0,
+        max_frames=10,
+    )
+    payload_b, _decoded_b, frame_states_b = real_encoder_pipeline.encode_video_file_with_states(
+        video_path=real_tennis_20f_video,
+        chunk_id="align_start8",
+        start_frame_id=8,
+        max_frames=10,
+    )
+
+    calculator = ResidualCalculator(
+        config=PointstreamConfig(),
+        device="cpu",
+        background_block_downscale_factor=None,
+    )
+
+    out_a = test_run_artifacts_dir / "debug_residual_align_start0.mp4"
+    out_b = test_run_artifacts_dir / "debug_residual_align_start8.mp4"
+    out_a.unlink(missing_ok=True)
+    out_b.unlink(missing_ok=True)
+
+    calculator.process(chunk=payload_a.chunk, payload=payload_a, frame_states=frame_states_a, debug_output_path=out_a)
+    calculator.process(chunk=payload_b.chunk, payload=payload_b, frame_states=frame_states_b, debug_output_path=out_b)
+
+    frames_a = list(iter_video_frames_ffmpeg(out_a, width=payload_a.chunk.width, height=payload_a.chunk.height))
+    frames_b = list(iter_video_frames_ffmpeg(out_b, width=payload_b.chunk.width, height=payload_b.chunk.height))
+    assert len(frames_a) == len(frames_b) == 10
+
+    stacked_a = np.stack(frames_a, axis=0).astype(np.float32)
+    stacked_b = np.stack(frames_b, axis=0).astype(np.float32)
+
+    # Both chunks share the exact same source file and num_frames, so a correct
+    # implementation reads source frames 0..9 in both cases regardless of start_frame_id,
+    # producing near-identical residuals (only lossy-codec noise between the two runs).
+    # A seek-by-start_frame_id regression instead reads frames 8..17 for the second chunk,
+    # producing a residual dominated by the genuine 8-frame content gap asserted above.
+    mean_abs_diff = float(np.mean(np.abs(stacked_a - stacked_b)))
+    assert mean_abs_diff < 3.0

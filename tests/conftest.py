@@ -137,3 +137,43 @@ def real_tennis_10f_video(tmp_path_factory: pytest.TempPathFactory) -> Path:
         raise RuntimeError("real_tennis.mp4 produced zero decodable frames")
 
     return out_path
+
+
+@pytest.fixture(scope="session")
+def real_tennis_20f_video(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    project_root = Path(__file__).resolve().parents[1]
+    source_path = project_root / "assets" / "real_tennis.mp4"
+    if not source_path.exists():
+        pytest.skip("Expected test asset is missing: assets/real_tennis.mp4")
+
+    metadata = probe_video_metadata(source_path)
+    out_dir = tmp_path_factory.mktemp("integration_videos")
+    out_path = out_dir / "real_tennis_20f.mp4"
+
+    frames: list[Any] = []
+    frame_count = 0
+    for frame in iter_video_frames_ffmpeg(
+        source_path,
+        width=metadata.width,
+        height=metadata.height,
+    ):
+        frames.append(frame)
+        frame_count += 1
+        if frame_count >= 20:
+            break
+
+    encode_video_frames_ffmpeg(
+        output_path=out_path,
+        frames_bgr=frames,
+        fps=metadata.fps,
+        width=metadata.width,
+        height=metadata.height,
+        codec="libx264",
+        pix_fmt="yuv420p",
+        crf=18,
+        preset="veryfast",
+    )
+    if frame_count < 20:
+        pytest.skip("assets/real_tennis.mp4 has fewer than 20 decodable frames")
+
+    return out_path

@@ -258,12 +258,11 @@ class ResidualCalculator:
                     _LOGGER.debug("GenAI encoder diff stats unavailable: %s", exc)
 
         source_metadata = probe_video_metadata(chunk.source_uri)
-        available_source_frames = max(0, int(source_metadata.num_frames) - int(chunk.start_frame_id))
 
         valid_frames = min(
             int(chunk.num_frames),
             int(predicted_frames.shape[0]),
-            int(available_source_frames),
+            int(source_metadata.num_frames),
         )
         if valid_frames <= 0:
             raise ValueError("ResidualCalculator received zero valid frames")
@@ -276,12 +275,6 @@ class ResidualCalculator:
             width=int(chunk.width),
             height=int(chunk.height),
         )
-
-        for _ in range(int(chunk.start_frame_id)):
-            try:
-                next(source_iter)
-            except StopIteration:
-                raise ValueError("ResidualCalculator could not seek to chunk start frame in source video")
 
         def _iter_encoded_frames() -> Iterator[np.ndarray]:
             frame_idx = 0
