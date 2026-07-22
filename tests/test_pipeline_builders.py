@@ -17,47 +17,27 @@ class TestBuildExecutionPool:
         config = PointstreamConfig(execution_pool="inline")
         assert pb.build_execution_pool(config) is None
 
-    # NOTE: `build_execution_pool`'s "tagged" branch has a pre-existing
-    # constructor-signature mismatch against the real `WorkerConfig`/
-    # `TaggedMultiprocessPool` (flagged separately, task_50eedbcf) — both are
-    # faked here so these tests cover this function's own mode-dispatch
-    # logic without tripping over that unrelated, already-broken call.
-    def test_tagged_mode_builds_tagged_pool(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        captured: dict[str, Any] = {}
-
-        class _FakeWorkerConfig:
-            def __init__(self, **kwargs: Any) -> None:
-                captured["worker_config_kwargs"] = kwargs
-
-        class _FakeTaggedPool:
-            def __init__(self, **kwargs: Any) -> None:
-                captured["pool_kwargs"] = kwargs
-
-        monkeypatch.setattr(pb, "WorkerConfig", _FakeWorkerConfig)
-        monkeypatch.setattr(pb, "TaggedMultiprocessPool", _FakeTaggedPool)
+    def test_tagged_mode_builds_tagged_pool(self) -> None:
         config = PointstreamConfig(execution_pool="tagged", cpu_workers=3, gpu_workers=2, gpu_dtype="fp32")
         pool = pb.build_execution_pool(config)
-        assert isinstance(pool, _FakeTaggedPool)
-        assert captured["pool_kwargs"]["cpu_workers"] == 3
-        assert captured["pool_kwargs"]["gpu_workers"] == 2
+        try:
+            assert isinstance(pool, pb.TaggedMultiprocessPool)
+            assert pool._config.cpu_workers == 3
+            assert pool._config.gpu_workers == 2
+        finally:
+            assert pool is not None
+            pool.shutdown()
 
-    def test_tagged_mode_defaults_workers_to_one(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        captured: dict[str, Any] = {}
-
-        class _FakeWorkerConfig:
-            def __init__(self, **kwargs: Any) -> None:
-                pass
-
-        class _FakeTaggedPool:
-            def __init__(self, **kwargs: Any) -> None:
-                captured.update(kwargs)
-
-        monkeypatch.setattr(pb, "WorkerConfig", _FakeWorkerConfig)
-        monkeypatch.setattr(pb, "TaggedMultiprocessPool", _FakeTaggedPool)
+    def test_tagged_mode_defaults_workers_to_one(self) -> None:
         config = PointstreamConfig(execution_pool="tagged", cpu_workers=None, gpu_workers=None)
-        pb.build_execution_pool(config)
-        assert captured["cpu_workers"] == 1
-        assert captured["gpu_workers"] == 1
+        pool = pb.build_execution_pool(config)
+        try:
+            assert isinstance(pool, pb.TaggedMultiprocessPool)
+            assert pool._config.cpu_workers == 1
+            assert pool._config.gpu_workers == 1
+        finally:
+            assert pool is not None
+            pool.shutdown()
 
     def test_unknown_mode_raises(self) -> None:
         config = PointstreamConfig(execution_pool="bogus")
