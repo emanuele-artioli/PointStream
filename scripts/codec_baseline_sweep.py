@@ -12,7 +12,7 @@ on the rate-distortion map.
 
 Reuses `src.encoder.video_io.encode_video_frames_ffmpeg` (the exact FFmpeg
 wrapper the pipeline uses to write residual.mp4) and
-`src.experiment_evaluation.evaluate_run_summary` (the same PSNR/SSIM/VMAF
+`src.shared.experiment_evaluation.evaluate_run_summary` (the same PSNR/SSIM/VMAF
 code the pipeline evaluation uses), so numbers are apples-to-apples with any
 `run_summary.json`.
 
@@ -56,7 +56,7 @@ from src.encoder.video_io import (  # noqa: E402
     iter_video_frames_ffmpeg,
     probe_video_metadata,
 )
-from src.experiment_evaluation import evaluate_run_summary  # noqa: E402
+from src.shared.experiment_evaluation import evaluate_run_summary  # noqa: E402
 
 DEFAULT_CODECS: tuple[str, ...] = ("libsvtav1", "libx265")
 DEFAULT_CRFS: dict[str, tuple[int, ...]] = {

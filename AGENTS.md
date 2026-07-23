@@ -1,7 +1,3 @@
----
-applyTo: '**'
----
-
 <!-- GENERATED from CLAUDE.md by tools/sync_agent_rules.py — DO NOT EDIT.
      Edit CLAUDE.md and re-run the script; a pre-commit hook checks this. -->
 

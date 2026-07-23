@@ -5,6 +5,28 @@ description: Summarize or compare POINTSTREAM run results under outputs/ (payloa
 
 # Summarizing POINTSTREAM results
 
+## Check `invariant_failures` before reporting anything
+
+**A run whose `invariant_failures` list is non-empty is not citable.** The field
+records that the run itself is unsound rather than that its numbers look odd: it
+fell back to a mock source, quality evaluation did not complete (`psnr_mean:
+null`), the payload components do not fit inside the reported total, or the
+transported payload came out larger than the source. Such a run still writes a
+perfectly well-formed summary, which is exactly why the check exists.
+
+Exclude those runs from tables and comparisons, and say which ones you dropped
+and why rather than silently omitting them.
+
+A run with **no** `invariant_failures` key predates the check and has never been
+evaluated. Backfill before relying on it — a missing verdict reads as clean:
+
+```
+python -m src.shared.invariants outputs/
+```
+
+As of 2026-07-22 the backfill flagged 27 of 52 runs, nearly all for a null
+`psnr_mean`.
+
 ## Where results live
 
 Each run is `outputs/<YYYYMMDD_HHMMSS_micros>/run_summary.json`. Key blocks:

@@ -48,7 +48,7 @@ import numpy as np
 import torch
 
 from src.encoder.video_io import encode_video_frames_ffmpeg
-from src.experiment_evaluation import _compute_fvd, _compute_psnr, _compute_ssim_ffmpeg, _compute_vmaf_ffmpeg
+from src.shared.experiment_evaluation import _compute_fvd, _compute_psnr, _compute_ssim_ffmpeg, _compute_vmaf_ffmpeg
 from src.shared.lpips_metric import compute_lpips_from_frames
 
 _FRAME_ID_RE = re.compile(r"frame_(\d+)\.png$")

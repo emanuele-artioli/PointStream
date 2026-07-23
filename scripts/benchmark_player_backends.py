@@ -18,7 +18,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.experiment_evaluation import evaluate_run_summary  # noqa: E402
+from src.shared.experiment_evaluation import evaluate_run_summary  # noqa: E402
 from src.transport.disk import DiskTransport  # noqa: E402
 
 DEFAULT_DETECTORS = ("yolo26", "yoloe")

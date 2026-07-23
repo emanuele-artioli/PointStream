@@ -10,7 +10,7 @@ to overfit that one clip:
     train (per-video)  ->  serialize decoder+embeddings to disk (bytes)
                         ->  decode = one forward pass through the trained
                             decoder, reloaded from that same file
-                        ->  score via src.experiment_evaluation.evaluate_run_summary
+                        ->  score via src.shared.experiment_evaluation.evaluate_run_summary
                             (identical PSNR/SSIM/VMAF code path as the AV1/HEVC
                             sweep, so numbers land on the same axes)
 
@@ -46,7 +46,7 @@ import torch  # noqa: E402
 import torch.nn.functional as F  # noqa: E402
 
 from src.encoder.video_io import iter_video_frames_ffmpeg, probe_video_metadata  # noqa: E402
-from src.experiment_evaluation import evaluate_run_summary  # noqa: E402
+from src.shared.experiment_evaluation import evaluate_run_summary  # noqa: E402
 import copy  # noqa: E402
 from src.shared.hnerv_arch import (  # noqa: E402
     HNeRVConfig,

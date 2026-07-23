@@ -10,25 +10,21 @@ known background, few actors). The companion ACM TOMM paper lives in
 git repo (Overleaf sync) with its own CLAUDE.md and its own conventions; don't
 apply this file's code rules there.
 
-**The core thesis — the Residual Guarantee:**
+**The core thesis — the Residual Guarantee:** server and client run the
+*identical* deterministic `SynthesisEngine` (`src/shared/synthesis_engine.py`),
+so the server can compute the true residual against the original and the
+client can perfectly restore it. A component earns its place only if it
+shrinks the residual payload by **more** than the metadata it adds; benchmark
+every addition against the Whole-Frame Residual Baseline. See the paper repo's
+`RESEARCH_LOG.md` for the full framing.
 
-```
-size(metadata) + size(residual)  <  size(full-frame encoding at equal quality)
-```
-
-Server and client run the *identical* deterministic `SynthesisEngine`
-(`src/shared/synthesis_engine.py`), so the server can compute the true residual
-against the original and the client can perfectly restore it. A component earns
-its place **only if it shrinks the residual payload by more than the metadata
-it adds** — measured against the Whole-Frame Residual Baseline (every component
-disabled, residual = the whole video). This is the project's only ablation
-currency; "looks better" is not a result. Full framing and every measured
-verdict: `67a9ea6275d3d9785ce57026/RESEARCH_LOG.md`.
-
-Antigravity/Copilot read their own copies of these rules
-(`.agents/rules/pointstream.md`, `.github/instructions/pointstream.instructions.md`).
-This file is canonical for Claude sessions; when a convention changes, keep
-the other two in sync rather than letting them drift.
+**This file is the only rule file to edit by hand.** `AGENTS.md`,
+`.agents/rules/pointstream.md` (Antigravity) and
+`.github/instructions/pointstream.instructions.md` (Copilot) are *generated*
+from it by `tools/sync_agent_rules.py`, which also inlines the host-wide
+`~/.claude/CLAUDE.md` that only Claude loads automatically. Edit CLAUDE.md,
+then re-run the script — a pre-commit hook fails the commit if the generated
+files are stale.
 
 ## Entry point
 
@@ -166,9 +162,10 @@ and plots to disk, never `cv2.imshow()`/`plt.show()`. `pyproject.toml` is the
 one and only source of truth for pip packages (add new deps there, then
 `pip install -e .`); `environment.yaml` is strictly the CUDA/PyTorch
 bootstrapper; never create a requirements.txt. Known pin: opencv 4.8 /
-numpy 1.26.4 ABI coupling. `git push` works via stored credential helper.
-When dependencies or structure change, update `pyproject.toml` and `README.md`
-in the same pass.
+numpy 1.26.4 ABI coupling (recorded in the paper repo's `RESEARCH_LOG.md`).
+`git push` works via stored credential helper; no `gh`/PRs needed. When
+dependencies or structure change, update `pyproject.toml` and `README.md` in
+the same pass.
 
 ## Concurrent sessions & git hygiene
 
@@ -197,7 +194,28 @@ mid-session while a long validation run was in flight.
   and `may26` branches, and two stashes still hold unmerged work — don't delete
   any of them without asking.
 
-## Testing — this repo has a real suite
+### Which branch a session works on
+
+A branch only isolates a session if it also has its own working directory —
+two agents sharing this checkout share one HEAD, so "make a branch" alone
+does not prevent the race above.
+
+- **Substantive code change** (a refactor, a new component, anything
+  spanning more than a file or two): take a worktree *and* a branch —
+  `git worktree add ../wt-pointstream/<slug> -b <type>/<slug>` with a
+  `refactor/`, `feat/`, `fix/` or `exp/` prefix. Push after every logical
+  commit so the work survives an SSH drop. When it is green, **suggest**
+  merging and let the human do it — never self-merge to `main`.
+- **Small fix, doc edit, or a session whose real work is running
+  experiments:** stay on `main` in this checkout and commit as soon as fast
+  checks pass. Worktrees don't carry `outputs/` or `assets/`, so run-only
+  sessions belong here anyway.
+- Deleting a branch requires reading it first (`git log main..<branch>`);
+  if it is not empty, `git tag archive/<branch>` and push the tag before
+  deleting. A worktree with uncommitted changes gets those changes
+  committed onto its own branch before removal — never `--force` them away.
+
+## Testing — the suite is a scientific failsafe, not a compile check
 
 - `python scripts/check_coverage_gate.py` is the CI entry point (runs
   `coverage run -m pytest`; threshold 80% in CI, 85% locally, override with
@@ -210,6 +228,52 @@ mid-session while a long validation run was in flight.
   with a real `--input assets/real_tennis.mp4` run and show the command +
   the `run_summary.json` numbers, not just "tests pass". Run `/code-review`
   after non-trivial `src/` changes.
+
+Three tiers, each catching a different kind of wrong:
+
+1. **Unit tier** — behavior and misuse of pure logic, mocks for anything
+   heavy, CPU-only, runs on every push.
+2. **Stage-contract tier** — every stage validates its own output as it
+   produces it, via validators on the `src/shared/schemas.py` models
+   (masks non-empty, panorama and residual dimensions consistent,
+   `sizes_bytes` actually summing, a null `psnr_mean` failing the run).
+   A broken stage fails *there*, not three stages downstream.
+3. **Goal-invariant tier** (`-m invariants`) — checks the *paper's* claim on
+   a real run: the Residual Guarantee itself, payload accounting, quality
+   floors. Violations are written into that run's own `run_summary.json`
+   under `invariant_failures`, and **a run with a non-empty
+   `invariant_failures` is never citable** — re-check it before it reaches a
+   report or the paper.
+
+**Every diagnosed bug or newly imagined edge case gets a test in the same
+session it is diagnosed** — the RESEARCH_LOG dead-end entry and the
+regression test are written together. Deleting a test requires saying why
+its failure mode is now impossible.
+
+Research code, so keep tests honest and thin: cover envisioned behavior and
+plausible misuse of code we own. No tests for unreachable branches, for
+third-party library behavior, or for errors a caller cannot produce. **A test
+that exists only to raise the coverage number is a defect** — if the gate
+fails after deleting padding, lower the gate to the honest number and ratchet
+it back up as real tests land.
+
+## Long jobs must checkpoint at least hourly
+
+SSH to this host drops a couple of times a day, and a job can also be killed
+by accident. The rule is therefore about *how much progress a kill can cost*,
+not about how long a job may run:
+
+- Any job expected to exceed an hour **checkpoints at least every 60 minutes
+  of wall clock**, independent of its epoch or step cadence, and its resume
+  path is verified *before* it is relied on. A training script that cannot
+  checkpoint hourly must be cheap to restart from scratch (well under an
+  hour) or be redesigned.
+- Long-running scripts append a progress line (step, loss or metric,
+  timestamp) to their log **at least every 10 minutes**, so a silent hang is
+  visible in minutes and `Monitor` always has something fresh to match on.
+- Launch detached (`run_in_background`, or `setsid nohup … < /dev/null &`) —
+  never attached to a foreground shell that an SSH drop takes with it. See
+  `/train-campaign` for the full launch/resume/tripwire workflow.
 
 ## `outputs/` and `assets/` — deletion is unrecoverable
 
@@ -233,21 +297,21 @@ next session; skills and CLAUDE.md load fresh each session.
 
 The manuscript (`67a9ea6275d3d9785ce57026/main.tex`) carries the research plan
 as machine-readable comment markers (`STATUS/GOAL/HOLE/NOTE/NEXT/CLAIM(anchor):`
-— spec in the paper repo's CLAUDE.md). **Before planning any experiment, grep
-the paper's `HOLE()` markers** — run only the experiments the paper needs:
+— spec in the paper repo's own CLAUDE.md). **Before planning any experiment,
+grep the paper's `HOLE()` markers** so we only run what the paper needs. After
+a session produces committed, tested results, fold them in with the
+`/update-paper` skill.
 
-```
-grep -n '^% *\(STATUS\|GOAL\|HOLE\|NOTE\|NEXT\|CLAIM\)(' 67a9ea6275d3d9785ce57026/main.tex
-```
+`67a9ea6275d3d9785ce57026/RESEARCH_LOG.md` is the secondary store: hard
+methodology rules, standing results with their real numbers, the codec
+anchors, the invalid-G2-campaign record, and the bug / dead-end / superseded
+registries. **Read it before re-attempting anything** — it exists to stop us
+repeating disproven work. `67a9ea6275d3d9785ce57026/reviewers_comments.md` is
+the authoritative TOMM referee checklist.
 
-After a session produces committed, tested results, fold them in with the
-`/update-paper` skill. `67a9ea6275d3d9785ce57026/RESEARCH_LOG.md` is the
-secondary store: hard methodology rules, standing results with their real
-numbers, the bug registry, the dead-end registry (read it before re-attempting
-anything), the superseded-results registry (**check it before citing any
-number** — several results here have been retracted), and the asset inventory.
-The 13 numbered technical reports were consolidated into it on 2026-07-21
-(full history via `git log --follow -- reports/<file>`).
+The 13 numbered reports under `reports/` were consolidated into the paper and
+RESEARCH_LOG on 2026-07-21 and the tree was deleted; **do not recreate a
+`reports/` tree** (full history via `git log --follow` in the paper repo).
 
 ## Where to look for more
 
@@ -257,7 +321,9 @@ The 13 numbered technical reports were consolidated into it on 2026-07-21
   matrix spec in `config/benchmarks/`; `report` mode re-tables existing runs
 - Summarizing/comparing runs, size accounting → `/results-report` skill
 - Folding findings into the paper → `/update-paper` skill
-- TOMM reviewer checklist workflow → `/reviewer-response` skill
+- TOMM revision checklist workflow → `/reviewer-response` skill
+- Multi-hour GPU training (launch, resume, tripwires) → `/train-campaign` skill
+- Choosing and writing tests for a component → `/test-design` skill
 - Long GPU runs / training jobs → `pipeline-runner` agent
 - Paper text edits → `paper-editor` agent
 - Evidence, hard rules, past dead ends →
