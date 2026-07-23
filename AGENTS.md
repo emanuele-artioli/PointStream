@@ -282,7 +282,8 @@ not about how long a job may run:
 
 Both are gitignored: `outputs/` holds GPU runs that cost minutes-to-hours to
 recompute, `assets/` holds the dataset, raw 4K sources, and the weight
-symlinks. A `.claude/hooks/guard-rm.py` PreToolUse hook blocks `rm` against
+symlinks. A `~/.agent-rules/scripts/guard-rm.py` PreToolUse hook (centralized
+across projects, configured via `.claude/settings.json`) blocks `rm` against
 the whole `outputs/` or `assets/` tree; deleting one specific
 `outputs/<timestamp>/` run dir stays allowed. Never test destructive commands
 against these real directories. **This extends to untracked files anywhere in
