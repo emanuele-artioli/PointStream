@@ -293,9 +293,10 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
 
     # --- Data ---
     dataset = TennisSkeletonDataset(
-        root_dir=args.data_root, 
-        target_size=args.img_size, 
-        include_reference=True
+        root_dir=args.data_root,
+        target_size=args.img_size,
+        include_reference=True,
+        condition=args.condition,
     )
 
     sampler: DistributedSampler | None = None
@@ -467,6 +468,12 @@ def main() -> None:
     parser.add_argument("--model-size", type=str, default="lite", choices=["lite", "full"],
                         help="Model tier: lite (ResNet-9, fast) or full (with local enhancer)")
     parser.add_argument("--data-root", type=str, default="assets/dataset", help="Dataset root path")
+    parser.add_argument("--condition", type=str, default="pose_body",
+                        choices=["pose_body", "pose_racket", "skeleton"],
+                        help="Pose-condition variant. pose_body is reproducible by the decoder for free "
+                             "and bit-identically; pose_racket matches the legacy checkpoints but needs "
+                             "racket geometry the wire format does not carry; skeleton is the legacy tree "
+                             "(positional filenames) kept only to reproduce old runs.")
     parser.add_argument("--subset", type=str, default="all",
                         help="Subset name or 'all'")
     parser.add_argument("--epochs", type=int, default=200)

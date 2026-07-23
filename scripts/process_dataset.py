@@ -21,6 +21,13 @@ apply_compat_patches()
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
+# Condition-variant directory suffixes emitted by the skeleton stage.
+# `_skeleton` (legacy, positional filenames) is superseded by these two and is
+# left on disk untouched; see _render_skeleton_worker for why.
+_POSE_RACKET_SUFFIX = '_pose_racket'
+_POSE_BODY_SUFFIX = '_pose_body'
+_DERIVED_SUFFIXES = ('_skeleton', '_canny', _POSE_RACKET_SUFFIX, _POSE_BODY_SUFFIX)
+
 def process_cpu_phase(args):
     video_path, threads = args
     vname = os.path.splitext(os.path.basename(video_path))[0]
@@ -545,7 +552,7 @@ def _extract_pose_worker(video_path, dataset_dir, scene_idx, device, pose_model_
     
     model = None
     
-    track_dirs = [d for d in glob.glob(os.path.join(seg_dir, 'track_*')) if os.path.isdir(d) and not d.endswith('_skeleton')]
+    track_dirs = [d for d in glob.glob(os.path.join(seg_dir, 'track_*')) if os.path.isdir(d) and not d.endswith(_DERIVED_SUFFIXES)]
     for tdir in track_dirs:
         tid = os.path.basename(tdir).split('_')[1]
         out_json = os.path.join(seg_dir, f'track_{tid}_keypoints.json')
@@ -602,17 +609,34 @@ def _render_skeleton_worker(video_path, dataset_dir, scene_idx, device):
     seg_dir = os.path.join(dataset_dir, 'segmentations', f'scene_{scene_idx:03d}')
     track_dirs = glob.glob(os.path.join(seg_dir, 'track_*'))
     for tdir in track_dirs:
-        if tdir.endswith('_skeleton'):
+        # Derived directories are not tracks. `_skeleton` is the LEGACY output
+        # (positional filenames, superseded -- see below); it is left on disk
+        # untouched and simply skipped here.
+        if tdir.endswith(_DERIVED_SUFFIXES):
             continue
         tid = os.path.basename(tdir).split('_')[1]
-        
+
         meta_path = os.path.join(seg_dir, f'track_{tid}_metadata.json')
         kpt_path = os.path.join(seg_dir, f'track_{tid}_keypoints.json')
-        out_skel_dir = os.path.join(seg_dir, f'track_{tid}_skeleton')
-        
-        if os.path.exists(out_skel_dir):
+
+        # Two condition variants are emitted so the Residual-Guarantee matrix can
+        # decide whether the racket earns its place in the conditioning signal:
+        #   _pose_racket -- body + racket, what the models were trained on, but
+        #                   the decoder can only reproduce it if racket geometry
+        #                   is added to ActorPacket (it is not there today);
+        #   _pose_body   -- body only, which the decoder reproduces for FREE and
+        #                   bit-identically (draw_dwpose_canvas is byte-equal to
+        #                   render_pose_with_racket with racket=None), at the
+        #                   cost of leaving the racket to the residual.
+        out_racket_dir = os.path.join(seg_dir, f'track_{tid}{_POSE_RACKET_SUFFIX}')
+        out_body_dir = os.path.join(seg_dir, f'track_{tid}{_POSE_BODY_SUFFIX}')
+
+        if os.path.exists(out_racket_dir) and os.path.exists(out_body_dir):
             continue
-            
+
+        if not os.path.exists(meta_path) or not os.path.exists(kpt_path):
+            continue
+
         if not os.path.exists(meta_path) or not os.path.exists(kpt_path):
             continue
             
@@ -644,26 +668,50 @@ def _render_skeleton_worker(video_path, dataset_dir, scene_idx, device):
         elif hand_votes[7] > hand_votes[4]:
             majority_hand = 7
 
-        os.makedirs(out_skel_dir, exist_ok=True)
-        for i, (m, k) in enumerate(zip(meta_data, kpt_data)):
+        os.makedirs(out_racket_dir, exist_ok=True)
+        os.makedirs(out_body_dir, exist_ok=True)
+        for m, k in zip(meta_data, kpt_data):
             kpts = k['keypoints']
             racket_bbox = m.get('racket_bbox_crop')
-            
-            # Use original bbox to determine canvas size since crops are native res
-            w = m['bbox'][2] - m['bbox'][0]
-            h = m['bbox'][3] - m['bbox'][1]
-            
-            if kpts is not None:
-                kpts_np = np.array(kpts, dtype=np.float32)
-                if racket_bbox is not None:
-                    racket_bbox = tuple(racket_bbox)
-                racket_mask_points = m.get('racket_mask_points')
-                canvas = render_pose_with_racket(kpts_np, racket_bbox, int(h), int(w), dominant_hand=majority_hand, racket_mask_points=racket_mask_points)
-            else:
-                canvas = np.zeros((int(h), int(w), 3), dtype=np.uint8)
-                
-            frame_path = os.path.join(out_skel_dir, f'frame_{i:06d}.png')
-            cv2.imwrite(frame_path, canvas)
+
+            # m['bbox'] is the final, clamped crop rectangle the segmentation
+            # stage actually wrote (see _segment_worker: min_x/min_y/max_x/max_y
+            # after the person-racket union and frame clamping), so it gives the
+            # colour crop's exact dimensions and the keypoints' coordinate space.
+            w = int(m['bbox'][2] - m['bbox'][0])
+            h = int(m['bbox'][3] - m['bbox'][1])
+
+            # The filename must be the ABSOLUTE frame id, matching the colour and
+            # _canny directories. The legacy `_skeleton` stage wrote
+            # `frame_{i:06d}` from enumerate against absolute-named colour frames
+            # (a track starting at 153 got skeletons named 000000, 000001, ...).
+            # TennisSkeletonDataset pairs positionally and was unaffected, but
+            # ControlNetDataset pairs by FILENAME: across the 16,272-frame
+            # training view that left 44.4% correctly paired, 32.7% paired with
+            # the WRONG pose, and 22.9% silently dropped.
+            frame_id = int(m['frame_id'])
+            frame_name = f'frame_{frame_id:06d}.png'
+
+            if kpts is None:
+                blank = np.zeros((h, w, 3), dtype=np.uint8)
+                cv2.imwrite(os.path.join(out_racket_dir, frame_name), blank)
+                cv2.imwrite(os.path.join(out_body_dir, frame_name), blank)
+                continue
+
+            kpts_np = np.array(kpts, dtype=np.float32)
+            racket_bbox_tuple = tuple(racket_bbox) if racket_bbox is not None else None
+            racket_mask_points = m.get('racket_mask_points')
+
+            with_racket = render_pose_with_racket(
+                kpts_np, racket_bbox_tuple, h, w,
+                dominant_hand=majority_hand, racket_mask_points=racket_mask_points,
+            )
+            # racket_bbox=None yields the body alone, which is byte-equal to the
+            # decoder's draw_dwpose_canvas (verified mean|diff| = 0.0).
+            body_only = render_pose_with_racket(kpts_np, None, h, w, dominant_hand=majority_hand)
+
+            cv2.imwrite(os.path.join(out_racket_dir, frame_name), with_racket)
+            cv2.imwrite(os.path.join(out_body_dir, frame_name), body_only)
 
 
 def _extract_canny_worker(video_path, dataset_dir, scene_idx, device):
@@ -673,7 +721,7 @@ def _extract_canny_worker(video_path, dataset_dir, scene_idx, device):
     import numpy as np
 
     seg_dir = os.path.join(dataset_dir, 'segmentations', f'scene_{scene_idx:03d}')
-    track_dirs = [d for d in glob.glob(os.path.join(seg_dir, 'track_*')) if os.path.isdir(d) and not d.endswith('_skeleton') and not d.endswith('_canny')]
+    track_dirs = [d for d in glob.glob(os.path.join(seg_dir, 'track_*')) if os.path.isdir(d) and not d.endswith(_DERIVED_SUFFIXES)]
     for tdir in track_dirs:
         tid = os.path.basename(tdir).split('_')[1]
         out_canny_dir = os.path.join(seg_dir, f'track_{tid}_canny')
@@ -709,7 +757,7 @@ def _extract_caption_worker(video_path, dataset_dir, scene_idx, device):
     from PIL import Image
 
     seg_dir = os.path.join(dataset_dir, 'segmentations', f'scene_{scene_idx:03d}')
-    track_dirs = [d for d in glob.glob(os.path.join(seg_dir, 'track_*')) if os.path.isdir(d) and not d.endswith('_skeleton') and not d.endswith('_canny')]
+    track_dirs = [d for d in glob.glob(os.path.join(seg_dir, 'track_*')) if os.path.isdir(d) and not d.endswith(_DERIVED_SUFFIXES)]
     
     # We only load the model if there's actually work to do
     processor = None

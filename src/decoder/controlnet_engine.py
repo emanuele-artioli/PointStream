@@ -56,10 +56,18 @@ class CaptionControlNetStrategy(BaseGenAIStrategy):
         config: Any = None,
     ) -> None:
         self._model_id = model_id
-        self._controlnet_id = controlnet_id
+        # Resolution order: an explicit evaluation checkpoint override, then the
+        # config's controlnet-id, then the constructor default. Without this the
+        # strategy silently loaded the STOCK OpenPose ControlNet and ignored the
+        # fine-tuned checkpoint entirely, in the decoder as well as in eval.
+        self._controlnet_id = (
+            (getattr(config, "genai_checkpoint_override", None) if config else None)
+            or (getattr(config, "controlnet_id", None) if config else None)
+            or controlnet_id
+        )
         self._vlm_id = vlm_id
         self.config = config
-        
+
         self._pipe: Any | None = None
         self._vlm_processor: Any | None = None
         self._vlm_model: Any | None = None

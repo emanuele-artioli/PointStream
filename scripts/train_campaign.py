@@ -77,6 +77,14 @@ LOWER_IS_BETTER = {"fvd", "lpips_vgg_uncalibrated"}
 HIGHER_IS_BETTER = {"psnr_mean", "ssim_mean", "vmaf_mean"}
 RANKED_METRICS = tuple(sorted(HIGHER_IS_BETTER | LOWER_IS_BETTER))
 
+#: The project's ranking currency. Under the Residual Guarantee a component is
+#: justified only by shrinking the residual payload by more than the metadata it
+#: adds, so the winner is the checkpoint whose output is cheapest to *correct* --
+#: not the one that scores best perceptually. The two genuinely disagree: an
+#: aligned but blurry prediction leaves a smooth residual that codes cheaply,
+#: while a sharp but misaligned one leaves expensive double edges.
+PRIMARY_METRIC = "residual_bytes"
+
 
 # ---------------------------------------------------------------------------
 # Variant definitions
@@ -215,7 +223,17 @@ def verify_data_root_excludes_probe_set(data_root: Path, manifest: dict) -> list
 
 
 def rank_variants(aggregate_by_variant: dict[str, dict[str, Any]]) -> tuple[list[str], dict[str, float]]:
-    """Composite-score ranking; see module docstring step 3 for the exact rule."""
+    """Rank candidates, primarily by residual bytes.
+
+    `PRIMARY_METRIC` decides whenever every scored variant has it: fewest bytes
+    wins, because that is the quantity the Residual Guarantee is denominated in.
+    The perceptual composite is retained only as a fallback (for runs scored with
+    `--no-residual-bytes`) and as a diagnostic that explains *why* a variant won
+    -- it must never silently outvote the payload.
+
+    Returns (ranked_names, composite_scores). The composite is always reported so
+    a bytes-win with poor perceptual scores is visible rather than hidden.
+    """
     normalized: dict[str, dict[str, float]] = {v: {} for v in aggregate_by_variant}
 
     for key in RANKED_METRICS:
@@ -231,7 +249,17 @@ def rank_variants(aggregate_by_variant: dict[str, dict[str, Any]]) -> tuple[list
             normalized[v][key] = norm
 
     composite = {v: (sum(scores.values()) / len(scores) if scores else 0.0) for v, scores in normalized.items()}
-    ranked = sorted(composite, key=lambda v: (-composite[v], v))
+
+    payloads = {
+        v: agg[PRIMARY_METRIC]
+        for v, agg in aggregate_by_variant.items()
+        if agg.get(PRIMARY_METRIC) is not None
+    }
+    if payloads and len(payloads) == len(aggregate_by_variant):
+        # Fewest bytes wins; composite breaks exact ties only.
+        ranked = sorted(payloads, key=lambda v: (payloads[v], -composite[v], v))
+    else:
+        ranked = sorted(composite, key=lambda v: (-composite[v], v))
     return ranked, composite
 
 
@@ -302,6 +330,7 @@ def eval_variant(
     metrics: tuple[str, ...],
     include_lpips: bool,
     eval_steps: int,
+    residual_settings: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     checkpoint = checkpoint_path_for_eval(variant, ckpt_dir)
     condition_type = variant.condition_type if variant.kind == "controlnet" else None
@@ -320,6 +349,7 @@ def eval_variant(
         fps=24.0,
         condition_type=condition_type,
         arch_kwargs=arch_kwargs,
+        residual_settings=residual_settings,
     )
 
     record = {
@@ -352,6 +382,17 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--eval-img-size", type=int, default=512, help="Eval output resolution (square)")
     parser.add_argument("--eval-steps", type=int, default=10, help="Inference steps for diffusion variants during campaign eval")
     parser.add_argument("--eval-metrics", type=str, default="psnr,ssim,vmaf", help="Comma separated metrics")
+    # Residual bytes is the ranking currency (PRIMARY_METRIC). Disabling it
+    # falls the ranking back to the perceptual composite, which is a weaker
+    # basis for an architecture decision -- see rank_variants.
+    parser.add_argument("--no-residual-bytes", action="store_true",
+                        help="Skip residual-byte pricing and rank on the perceptual composite instead")
+    parser.add_argument("--residual-codec", type=str, default="libx264")
+    parser.add_argument("--residual-crf", type=int, default=28)
+    parser.add_argument("--residual-preset", type=str, default="medium")
+    parser.add_argument("--residual-pix-fmt", type=str, default="yuv444p")
+    parser.add_argument("--residual-block-size", type=int, default=8)
+    parser.add_argument("--residual-block-threshold", type=float, default=0.0)
     parser.add_argument("--skip-lpips", action="store_true")
     parser.add_argument("--device", type=str, default=None)
     parser.add_argument("--train-timeout-sec", type=float, default=None)
@@ -391,6 +432,14 @@ def main(argv: list[str] | None = None) -> int:
 
     device = args.device or ("cuda:0" if torch.cuda.is_available() else "cpu")
     metrics = tuple(m.strip().lower() for m in args.eval_metrics.split(",") if m.strip())
+    residual_settings = None if args.no_residual_bytes else {
+        "codec": args.residual_codec,
+        "crf": args.residual_crf,
+        "preset": args.residual_preset,
+        "pix_fmt": args.residual_pix_fmt,
+        "block_size": args.residual_block_size,
+        "block_threshold": args.residual_block_threshold,
+    }
 
     state_path = args.campaign_dir / "campaign_state.json"
     log_path = args.campaign_dir / "probe_log.jsonl"
@@ -484,6 +533,7 @@ def main(argv: list[str] | None = None) -> int:
             aggregate_by_variant[name] = eval_variant(
                 variant, ckpt_dir, manifest, args.eval_dataset_root, target_epochs, rung, log_path,
                 device, args.eval_img_size, metrics, not args.skip_lpips, args.eval_steps,
+                residual_settings=residual_settings,
             )
             state["cumulative_epochs"][name] = target_epochs
 

@@ -1,19 +1,25 @@
 """Fast, cheap checkpoint-quality signal for the G2 training campaign (report 10, Phase 5.4).
 
 Given a checkpoint + the probe-set manifest written by `scripts/select_probe_set.py`,
-runs inference on every probe clip's conditioning frames (skeleton/canny), scores
-the generated frames against ground truth with PSNR/SSIM/VMAF/FVD (+ an
-uncalibrated VGG "LPIPS-like" distance, see `src/shared/lpips_metric.py`), and
-appends one JSONL record to an on-disk log so a human (or `scripts/train_campaign.py`)
-can plot a curve across steps without waiting for a full training run to finish.
+runs inference on every probe clip, scores the generated frames against ground
+truth with PSNR/SSIM/VMAF/FVD (+ an uncalibrated VGG "LPIPS-like" distance, see
+`src/shared/lpips_metric.py`), and appends one JSONL record to an on-disk log so
+a human (or `scripts/train_campaign.py`) can plot a curve across steps without
+waiting for a full training run to finish.
 
-Architectures supported (dispatch table at the bottom, `ARCH_INFERENCE`):
-  - pix2pix       -> scripts/train_pix2pix.py's UNetGenerator (skeleton+ref -> color)
-  - spade4tennis  -> scripts/train_spade4tennis.py's SPADEResNet9Generator (same I/O)
-  - controlnet    -> scripts/train_controlnet.py's ControlNetModel + base SD1.5 pipeline
-                     (heavy: full diffusion sampling per frame; only exercised for
-                     real ControlNet checkpoints, not needed for the pix2pix/spade4tennis
-                     smoke path)
+**Inference runs the decoder's own strategy classes** (`build_eval_strategy` ->
+`src.decoder.genai_compositor.build_genai_strategy`), configured through a real
+`PointstreamConfig`. This is the Residual-Guarantee symmetry principle applied
+to evaluation: one code path, or the number is fiction. It is not optional
+hygiene -- this script previously reimplemented inference and diverged, scoring
+ControlNet as text-to-image from pure noise (reference frame unused) while the
+decoder ran img2img seeded from the reference crop. That divergence, not model
+quality, produced the G2 campaign's PSNR 9.76 / VMAF 0.11.
+
+Strategies render their own condition from **raw keypoints**, exactly as the
+decoder does from an `ActorPacket`. The pre-rendered `_skeleton`/`_canny` PNG
+directories are training-time artefacts the decoder never sees, so eval does not
+feed them either.
 
 Metrics are computed **per probe clip** (not concatenated across clips) so FVD's
 I3D temporal window never straddles a seam between two unrelated clips; the
@@ -36,7 +42,7 @@ import re
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 import torch
@@ -82,6 +88,61 @@ def clip_condition_frame_paths(dataset_root: Path, clip: dict, condition: str) -
     id_to_index = {fid: idx for idx, fid in enumerate(all_frame_ids)}
     all_cond_paths = sorted(cond_dir.glob("frame_*.png"))
     return [all_cond_paths[id_to_index[fid]] for fid in clip["frame_ids"]]
+
+
+def clip_track_index(dataset_root: Path, clip: dict) -> dict[int, int]:
+    """Map absolute frame id -> positional index within the track.
+
+    The three per-track artefacts use *different* id conventions and must be
+    joined positionally, never by frame_id:
+      - `frame_*.png` filenames and `track_*_metadata.json` carry the **absolute**
+        source frame id (e.g. 493, 498, 499 -- note the gaps, tracks are not
+        contiguous);
+      - `track_*_keypoints.json` carries a **0-based index** into the track.
+    """
+    color_dir = clip_color_dir(dataset_root, clip)
+    all_frame_ids = sorted(
+        int(m.group(1)) for f in color_dir.glob("frame_*.png") if (m := _FRAME_ID_RE.search(f.name)) is not None
+    )
+    return {fid: idx for idx, fid in enumerate(all_frame_ids)}
+
+
+def clip_keypoints(dataset_root: Path, clip: dict, frame_ids: list[int]) -> list[np.ndarray]:
+    """Per-frame DWPose keypoints in crop-local coordinates. Shape: [18, 3] each.
+
+    This is what the decoder actually receives (via `ActorPacket`) and renders
+    into a condition image itself -- the pre-rendered `_skeleton` PNGs are a
+    training-time artefact the decoder never sees.
+    """
+    scene_dir = clip_color_dir(dataset_root, clip).parent
+    payload = json.loads((scene_dir / f"{clip['track']}_keypoints.json").read_text())
+    index_of = clip_track_index(dataset_root, clip)
+    out: list[np.ndarray] = []
+    for fid in frame_ids:
+        record = payload[index_of[fid]]
+        keypoints = record.get("keypoints")
+        if keypoints is None:
+            # Pose extraction failed on this frame (11 of 35,713 dataset-wide).
+            # Substitute an all-zero pose: confidence 0 is below the renderer's
+            # 0.2 threshold, so nothing is drawn and the generator works from
+            # the reference alone. Dropping the frame instead would desynchronise
+            # the prediction from the ground truth and silently corrupt every
+            # metric for the clip.
+            out.append(np.zeros((18, 3), dtype=np.float32))  # Shape: [18, 3]
+            continue
+        out.append(np.asarray(keypoints, dtype=np.float32))  # Shape: [18, 3]
+    return out
+
+
+def clip_racket_bboxes(dataset_root: Path, clip: dict, frame_ids: list[int]) -> list[list[float] | None]:
+    """Per-frame racket bbox in crop-local coordinates, or None where absent."""
+    scene_dir = clip_color_dir(dataset_root, clip).parent
+    meta_path = scene_dir / f"{clip['track']}_metadata.json"
+    if not meta_path.exists():
+        return [None] * len(frame_ids)
+    payload = json.loads(meta_path.read_text())
+    index_of = clip_track_index(dataset_root, clip)
+    return [payload[index_of[fid]].get("racket_bbox_crop") for fid in frame_ids]
 
 
 def resolve_reference_frame_path(dataset_root: Path, clip: dict) -> Path:
@@ -147,6 +208,56 @@ def load_seg_clip_tensor(paths: list[Path], size: int) -> torch.Tensor:
     return torch.stack([load_seg_rgb01(p, size) for p in paths], dim=0)
 
 
+def load_reference_bgr_native(path: Path) -> torch.Tensor:
+    """Load a reference crop at its NATIVE size as [3, h, w] uint8 BGR.
+
+    Deliberately no pad-to-square and no resize. The decoder receives a
+    native-resolution, non-square crop (`cv2.imdecode` of the transmitted JPEG)
+    and does its own letterboxing into the generation canvas. Handing the
+    strategy an already-square 512x512 reference would make that letterboxing a
+    no-op, so eval would silently exercise a geometry the decoder never sees --
+    and would resample twice on the way out.
+    """
+    from PIL import Image
+
+    img: Image.Image = Image.open(path)
+    if img.mode == "RGBA":
+        background = Image.new("RGBA", img.size, (0, 0, 0, 255))
+        img = Image.alpha_composite(background, img).convert("RGB")
+    else:
+        img = img.convert("RGB")
+    array = np.asarray(img, dtype=np.uint8)  # Shape: [h, w, 3] RGB
+    rgb = torch.from_numpy(array).permute(2, 0, 1).contiguous()  # Shape: [3, h, w] RGB
+    return rgb.flip(0).contiguous()  # Shape: [3, h, w] BGR
+
+
+def rgb01_to_bgr_uint8_tensor(frame_rgb01: torch.Tensor) -> torch.Tensor:
+    """[3, H, W] float in [0,1] RGB -> [3, H, W] uint8 BGR.
+
+    BGR uint8 is the `reference_crop_tensor` convention every decoder strategy
+    expects (it originates from `cv2.imdecode` in the encoder).
+    """
+    rgb_uint8 = (frame_rgb01.clamp(0, 1) * 255.0).round().to(torch.uint8)  # Shape: [3, H, W] RGB
+    return rgb_uint8.flip(0).contiguous()  # Shape: [3, H, W] BGR
+
+
+def bgr_uint8_to_rgb01(frame_bgr_uint8: torch.Tensor, size: int) -> torch.Tensor:
+    """[3, h, w] uint8 BGR (strategy output, at the crop's own size) -> [3, size, size] float RGB in [0,1].
+
+    Matches `load_image_rgb01`'s geometry so predictions and ground truth are
+    comparable: pad to square with black, then resize.
+    """
+    from PIL import Image
+
+    from src.shared.tennis_dataset import pad_to_square
+
+    rgb = frame_bgr_uint8.flip(0).permute(1, 2, 0).cpu().numpy()  # Shape: [h, w, 3] RGB
+    img = pad_to_square(Image.fromarray(rgb.astype(np.uint8)), fill=0)
+    img = img.resize((size, size), resample=Image.Resampling.BILINEAR)
+    array = np.asarray(img, dtype=np.float32) / 255.0  # Shape: [size, size, 3]
+    return torch.from_numpy(array).permute(2, 0, 1).contiguous()  # Shape: [3, size, size]
+
+
 def rgb01_to_bgr_uint8_frames(frames_rgb01: torch.Tensor) -> list[np.ndarray]:
     """[N, 3, H, W] in [0,1] -> list of [H, W, 3] BGR uint8 arrays for encode_video_frames_ffmpeg."""
     frames_np = (frames_rgb01.clamp(0, 1) * 255.0).round().byte().numpy()  # Shape: [N, 3, H, W]
@@ -163,169 +274,142 @@ def rgb01_to_bgr_uint8_frames(frames_rgb01: torch.Tensor) -> list[np.ndarray]:
 # ---------------------------------------------------------------------------
 
 
-def run_pix2pix_inference(  # pragma: no cover - requires real checkpoint + GPU, exercised by integration/smoke run
-    checkpoint_path: Path,
-    condition_frames: torch.Tensor,
-    reference_frame: torch.Tensor,
-    device: str,
-) -> torch.Tensor:
-    """condition_frames/reference_frame in [0,1]; UNetGenerator expects [-1,1]. Returns [N,3,H,W] in [0,1]."""
-    import importlib.util
-
-    spec = importlib.util.spec_from_file_location("train_pix2pix_module", Path(__file__).with_name("train_pix2pix.py"))
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-
-    generator = module.UNetGenerator(in_channels=6, out_channels=3).to(device)
-    state_dict = torch.load(str(checkpoint_path), map_location=device)
-    generator.load_state_dict(state_dict)
-    generator.eval()
-
-    skeleton = (condition_frames.to(device) - 0.5) * 2.0  # Shape: [N, 3, H, W]
-    ref = (reference_frame.to(device) - 0.5) * 2.0  # Shape: [3, H, W]
-    ref_batch = ref.unsqueeze(0).expand(skeleton.shape[0], -1, -1, -1)  # Shape: [N, 3, H, W]
-
-    with torch.no_grad():
-        gen_input = torch.cat((skeleton, ref_batch), dim=1)  # Shape: [N, 6, H, W]
-        predicted = generator(gen_input)  # Shape: [N, 3, H, W] in [-1, 1]
-
-    return ((predicted.clamp(-1, 1) + 1.0) / 2.0).cpu()  # Shape: [N, 3, H, W] in [0, 1]
-
-
-def run_spade4tennis_inference(  # pragma: no cover - requires real checkpoint + GPU, exercised by integration/smoke run
-    checkpoint_path: Path,
-    condition_frames: torch.Tensor,
-    reference_frame: torch.Tensor,
-    device: str,
-) -> torch.Tensor:
-    from src.shared.spade4tennis_arch import SPADEResNet9Generator
-
-    generator = SPADEResNet9Generator(in_nc=3, out_nc=3, ngf=64, n_blocks=9).to(device)
-    state_dict = torch.load(str(checkpoint_path), map_location=device)
-    generator.load_state_dict(state_dict, strict=False)
-    generator.eval()
-
-    skeleton = (condition_frames.to(device) - 0.5) * 2.0
-    ref = (reference_frame.to(device) - 0.5) * 2.0
-    ref_batch = ref.unsqueeze(0).expand(skeleton.shape[0], -1, -1, -1)
-
-    with torch.no_grad():
-        predicted = generator(skeleton, ref_batch)  # Shape: [N, 3, H, W] in [-1, 1]
-
-    return ((predicted.clamp(-1, 1) + 1.0) / 2.0).cpu()
-
-
-def run_controlnet_inference(  # pragma: no cover - requires real SD1.5 + ControlNet checkpoint + GPU
-    checkpoint_path: Path,
-    condition_frames: torch.Tensor,
-    reference_frame: torch.Tensor,  # unused (ControlNet is not reference-conditioned); kept for a uniform signature
-    device: str,
-    base_model_id: str = "assets/weights/stable-diffusion-v1-5",
-    prompt: str = "photorealistic tennis player, broadcast sports shot",
-    num_inference_steps: int = 20,
-    generator_seed: int = 0,
-) -> torch.Tensor:
-    """Runs the diffusers ControlNet pipeline frame-by-frame. Slow (full diffusion
-    sampling per frame) — this is why the campaign smoke test in this workstream
-    exercises pix2pix/spade4tennis instead, not ControlNet, for wall-clock reasons."""
-    from diffusers import StableDiffusionControlNetPipeline, ControlNetModel
-
-    controlnet = ControlNetModel.from_pretrained(str(checkpoint_path)).to(device)
-    pipe = StableDiffusionControlNetPipeline.from_pretrained(
-        base_model_id, controlnet=controlnet, safety_checker=None
-    ).to(device)
-
-    outputs = []
-    for i in range(condition_frames.shape[0]):
-        cond_img = condition_frames[i].permute(1, 2, 0).numpy()  # Shape: [H, W, 3] in [0,1]
-        from PIL import Image
-
-        cond_pil = Image.fromarray((cond_img * 255).astype(np.uint8))
-        gen = torch.Generator(device=device).manual_seed(generator_seed)
-        result = pipe(prompt, image=cond_pil, num_inference_steps=num_inference_steps, generator=gen).images[0]
-        result_array = np.asarray(result, dtype=np.float32) / 255.0  # Shape: [H, W, 3]
-        outputs.append(torch.from_numpy(result_array).permute(2, 0, 1))
-
-    return torch.stack(outputs, dim=0)  # Shape: [N, 3, H, W] in [0, 1]
-
-
-def run_multi_controlnet_inference(  # pragma: no cover
-    checkpoint_path: Path,  # unused (we load the 4 specific models)
-    condition_frames: dict[str, torch.Tensor],
-    reference_frame: torch.Tensor,
-    device: str,
-    base_model_id: str = "assets/weights/stable-diffusion-v1-5",
-    prompt: str = "photorealistic tennis player, broadcast sports shot",
-    num_inference_steps: int = 20,
-    generator_seed: int = 0,
-    controlnet_conditioning_scale: list[float] = [1.0, 1.0, 1.0, 1.0],
-) -> torch.Tensor:
-    from diffusers import StableDiffusionControlNetPipeline, ControlNetModel
-    from PIL import Image
-
-    paths = [
-        "assets/weights/pose-controlnet",
-        "assets/weights/custom-controlnet",
-        "assets/weights/seg-controlnet",
-        "assets/weights/ip-adapter-controlnet"
-    ]
-    import torch
-
-    controlnets = [ControlNetModel.from_pretrained(p, torch_dtype=torch.float16).to(device) for p in paths]
-    pipe = StableDiffusionControlNetPipeline.from_pretrained(
-        base_model_id, controlnet=controlnets, safety_checker=None, torch_dtype=torch.float16
-    ).to(device)
-
-    outputs = []
-    # condition_frames is a dict containing 'pose', 'canny', 'seg'
-    num_frames = condition_frames["pose"].shape[0]
-    
-    ref_pil = Image.fromarray((reference_frame.permute(1, 2, 0).numpy() * 255).astype(np.uint8))
-    
-    for i in range(num_frames):
-        pose_img = condition_frames["pose"][i].permute(1, 2, 0).numpy()
-        pose_pil = Image.fromarray((pose_img * 255).astype(np.uint8))
-        
-        canny_img = condition_frames["canny"][i].permute(1, 2, 0).numpy()
-        canny_pil = Image.fromarray((canny_img * 255).astype(np.uint8))
-        
-        seg_img = condition_frames["seg"][i].permute(1, 2, 0).numpy()
-        seg_pil = Image.fromarray((seg_img * 255).astype(np.uint8))
-        
-        gen = torch.Generator(device=device).manual_seed(generator_seed)
-        
-        result = pipe(
-            prompt, 
-            image=[pose_pil, canny_pil, seg_pil, ref_pil], 
-            num_inference_steps=num_inference_steps, 
-            generator=gen,
-            controlnet_conditioning_scale=controlnet_conditioning_scale,
-        ).images[0]
-        
-        result_array = np.asarray(result, dtype=np.float32) / 255.0
-        outputs.append(torch.from_numpy(result_array).permute(2, 0, 1))
-
-    return torch.stack(outputs, dim=0)
-
-ARCH_INFERENCE: dict[str, Callable[..., torch.Tensor]] = {
-    "pix2pix": run_pix2pix_inference,
-    "spade4tennis": run_spade4tennis_inference,
-    "controlnet": run_controlnet_inference,
-    "multi-controlnet": run_multi_controlnet_inference,
+ARCH_TO_BACKEND: dict[str, str] = {
+    "pix2pix": "pix2pix",
+    "spade4tennis": "spade4tennis",
+    "controlnet": "caption-controlnet",
+    "multi-controlnet": "multi-controlnet",
 }
 
-ARCH_CONDITION: dict[str, str] = {
-    "pix2pix": "skeleton",
-    "spade4tennis": "skeleton",
-    "controlnet": "skeleton",  # overridden by --controlnet-condition-type
-    "multi-controlnet": "skeleton",
-}
+
+def build_eval_strategy(arch: str, checkpoint_path: Path, config_overrides: dict[str, Any] | None = None) -> Any:
+    """Construct the *decoder's* strategy for `arch`, pointed at `checkpoint_path`.
+
+    Evaluation must run the same code path the decoder runs. The previous
+    implementation reimplemented inference here and diverged badly: ControlNet
+    was scored with `StableDiffusionControlNetPipeline` (text-to-image from pure
+    noise, with the reference frame explicitly unused) while the decoder runs
+    `StableDiffusionControlNetImg2ImgPipeline` seeded from the reference crop.
+    That divergence produced the G2 campaign's PSNR 9.76 / VMAF 0.11 -- the
+    arithmetic expectation when an unconditional sample is compared against a
+    specific target, not a model-quality result.
+    """
+    from src.decoder.genai_compositor import build_genai_strategy
+    from src.shared.config import PointstreamConfig
+
+    config = PointstreamConfig()
+    config.genai_backend = ARCH_TO_BACKEND[arch]
+    config.genai_checkpoint_override = str(checkpoint_path)
+    for key, value in (config_overrides or {}).items():
+        if not hasattr(config, key):
+            raise ValueError(f"Unknown PointstreamConfig field for eval override: {key!r}")
+        setattr(config, key, value)
+    return build_genai_strategy(config.genai_backend, config)
+
+
+def run_strategy_inference(  # pragma: no cover - requires real checkpoint + GPU
+    strategy: Any,
+    keypoints: list[np.ndarray],
+    reference_bgr_native: torch.Tensor,
+    device: str,
+    img_size: int,
+    seed: int = 0,
+) -> torch.Tensor:
+    """Run the decoder strategy frame-by-frame. Returns [N, 3, img_size, img_size] RGB in [0, 1].
+
+    `keypoints` are crop-local DWPose coordinates and `reference_bgr_native` is
+    a native-resolution BGR crop -- exactly what the decoder receives in an
+    `ActorPacket` plus the transmitted reference JPEG. The strategy renders its
+    own condition and does its own letterboxing, as it does at decode time. The
+    pre-rendered `_skeleton` PNGs are a training-time artefact the decoder never
+    sees, so eval must not feed them either.
+    """
+    reference_bgr = reference_bgr_native  # Shape: [3, h, w] BGR uint8, native size
+    torch_device = torch.device(device)
+
+    outputs = []
+    for pose in keypoints:
+        pose_tensor = torch.from_numpy(pose)  # Shape: [18, 3]
+        generated = strategy.generate(
+            reference_crop_tensor=reference_bgr,
+            dense_dwpose_tensor=pose_tensor,
+            seed=seed,
+            device=torch_device,
+        )  # Shape: [3, h, w] BGR uint8
+        outputs.append(bgr_uint8_to_rgb01(generated, img_size))
+
+    return torch.stack(outputs, dim=0)  # Shape: [N, 3, img_size, img_size]
 
 
 # ---------------------------------------------------------------------------
 # Metric scoring
 # ---------------------------------------------------------------------------
+
+
+def compute_residual_bytes(
+    ground_truth_rgb01: torch.Tensor,
+    predicted_rgb01: torch.Tensor,
+    fps: float,
+    tmp_dir: Path,
+    codec: str,
+    crf: int,
+    preset: str,
+    pix_fmt: str,
+    block_size: int,
+    block_threshold: float,
+) -> int:
+    """Encode (original - predicted) as the pipeline would and return its size in bytes.
+
+    **This is the project's ranking currency.** A generator earns its place only
+    by shrinking the residual payload by more than the metadata it adds, so the
+    question is not "which output looks best" but "which output is cheapest to
+    correct". The two can disagree: an aligned but blurry prediction leaves a
+    smooth, low-frequency residual that codes cheaply, while a sharp but
+    misaligned one leaves double edges that are expensive.
+
+    Uses the encoder's exact representation -- the same block-activity gate and
+    the same +128 offset (`apply_block_activity_gate`,
+    `residual_to_encodable_uint8`) -- so the number prices the real signal.
+
+    ⚠️ **Not yet trustworthy as a ranking signal on padded actor crops.**
+    Measured 2026-07-22: **79.1% of a padded 512x512 crop is black** (RGBA
+    composited on black, then padded to square). A prediction of all-zeros is
+    therefore *correct* over four fifths of the frame and scores 811,630 B
+    against pix2pix's 1,514,916 B -- which says nothing about generative quality
+    and everything about the crop representation. Before this ranks anything,
+    the residual must be measured either masked to the actor region or on the
+    full composited frame (the plan's Phase 1.2), which is what the payload
+    actually contains. The mechanism is validated
+    (`tests/test_residual_bytes_metric.py`); the *scale it is applied at* is not.
+    """
+    from src.encoder.residual_calculator import apply_block_activity_gate, residual_to_encodable_uint8
+
+    original = ground_truth_rgb01.clamp(0, 1) * 255.0  # Shape: [N, 3, H, W]
+    predicted = predicted_rgb01.clamp(0, 1) * 255.0  # Shape: [N, 3, H, W]
+    residual = original - predicted  # Shape: [N, 3, H, W], signed pixel units
+    residual = apply_block_activity_gate(residual, block_size, block_threshold)
+    encoded = residual_to_encodable_uint8(residual)  # Shape: [N, 3, H, W] uint8
+
+    height, width = encoded.shape[-2:]
+    frames_bgr = []
+    for frame in encoded:
+        hwc_rgb = frame.permute(1, 2, 0).cpu().numpy()  # Shape: [H, W, 3] RGB
+        frames_bgr.append(np.ascontiguousarray(hwc_rgb[:, :, ::-1]))
+
+    residual_path = tmp_dir / "residual.mp4"
+    residual_path.unlink(missing_ok=True)
+    encode_video_frames_ffmpeg(
+        output_path=residual_path,
+        frames_bgr=frames_bgr,
+        fps=fps,
+        width=width,
+        height=height,
+        codec=codec,
+        pix_fmt=pix_fmt,
+        crf=crf,
+        preset=preset,
+    )
+    return int(residual_path.stat().st_size)
 
 
 def compute_metrics_for_clip(
@@ -335,6 +419,7 @@ def compute_metrics_for_clip(
     metrics: tuple[str, ...],
     include_lpips: bool,
     tmp_dir: Path,
+    residual_settings: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Builds two tiny mp4s for one clip and scores them with the requested metrics."""
     height, width = ground_truth_rgb01.shape[-2:]
@@ -361,6 +446,10 @@ def compute_metrics_for_clip(
         result.update(_compute_fvd(ref_path, pred_path))
     if include_lpips:
         result.update(compute_lpips_from_frames(ground_truth_rgb01, predicted_rgb01))
+    if residual_settings is not None:
+        result["residual_bytes"] = compute_residual_bytes(
+            ground_truth_rgb01, predicted_rgb01, fps=fps, tmp_dir=tmp_dir, **residual_settings
+        )
 
     return result
 
@@ -373,6 +462,11 @@ _AGGREGATE_NUMERIC_KEYS = (
     "lpips_vgg_uncalibrated",
 )
 
+#: Payload sizes are SUMMED across clips, not averaged -- the quantity of
+#: interest is total bytes on the wire, and averaging would hide a variant that
+#: is cheap on most clips and catastrophic on one.
+_AGGREGATE_SUM_KEYS = ("residual_bytes",)
+
 
 def aggregate_clip_metrics(per_clip: list[dict[str, Any]]) -> dict[str, Any]:
     """Mean of each numeric metric across clips, skipping None/missing entries."""
@@ -380,6 +474,9 @@ def aggregate_clip_metrics(per_clip: list[dict[str, Any]]) -> dict[str, Any]:
     for key in _AGGREGATE_NUMERIC_KEYS:
         values = [clip[key] for clip in per_clip if clip.get(key) is not None]
         aggregate[key] = float(sum(values) / len(values)) if values else None
+    for key in _AGGREGATE_SUM_KEYS:
+        values = [clip[key] for clip in per_clip if clip.get(key) is not None]
+        aggregate[key] = int(sum(values)) if values else None
     aggregate["num_clips_scored"] = sum(1 for clip in per_clip if any(clip.get(k) is not None for k in _AGGREGATE_NUMERIC_KEYS))
     aggregate["num_clips_total"] = len(per_clip)
     return aggregate
@@ -408,11 +505,19 @@ def evaluate_checkpoint(
     fps: float,
     condition_type: str | None = None,
     arch_kwargs: dict[str, Any] | None = None,
+    seed: int = 0,
+    residual_settings: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Runs inference + scoring for every probe clip in `manifest`; returns per-clip and aggregate metrics."""
-    arch_kwargs = arch_kwargs or {}
-    condition = condition_type or ARCH_CONDITION[arch]
-    infer_fn = ARCH_INFERENCE[arch]
+    """Runs inference + scoring for every probe clip in `manifest`; returns per-clip and aggregate metrics.
+
+    Inference goes through the decoder's own strategy classes (see
+    `build_eval_strategy`) so the score describes the system as it actually
+    runs. `condition_type` is accepted for CLI compatibility but no longer
+    selects a pre-rendered condition directory: the strategy renders its own
+    condition from raw keypoints, exactly as the decoder does.
+    """
+    del condition_type  # strategies render their own condition from keypoints
+    strategy = build_eval_strategy(arch, checkpoint_path, arch_kwargs)
 
     per_clip_metrics = []
     with tempfile.TemporaryDirectory(prefix="eval_checkpoint_") as tmp:
@@ -423,25 +528,26 @@ def evaluate_checkpoint(
             ref_path = resolve_reference_frame_path(dataset_root, clip)
 
             ground_truth = load_clip_tensor(color_paths, img_size)  # Shape: [N, 3, size, size]
-            reference_tensor = load_image_rgb01(ref_path, img_size)  # Shape: [3, size, size]
+            reference_native = load_reference_bgr_native(ref_path)  # Shape: [3, h, w] BGR uint8
+            keypoints = clip_keypoints(dataset_root, clip, frame_ids)  # list of Shape: [18, 3]
 
-            condition_tensor: torch.Tensor | dict[str, torch.Tensor]
-            if arch == "multi-controlnet":
-                pose_paths = clip_condition_frame_paths(dataset_root, clip, "skeleton")
-                canny_paths = clip_condition_frame_paths(dataset_root, clip, "canny")
-                condition_tensor = {
-                    "pose": load_clip_tensor(pose_paths, img_size),
-                    "canny": load_clip_tensor(canny_paths, img_size),
-                    "seg": load_seg_clip_tensor(color_paths, img_size),
-                }
-            else:
-                cond_paths = clip_condition_frame_paths(dataset_root, clip, condition)
-                condition_tensor = load_clip_tensor(cond_paths, img_size)  # Shape: [N, 3, size, size]
-
-            predicted = infer_fn(checkpoint_path, condition_tensor, reference_tensor, device, **arch_kwargs)
+            predicted = run_strategy_inference(
+                strategy=strategy,
+                keypoints=keypoints,
+                reference_bgr_native=reference_native,
+                device=device,
+                img_size=img_size,
+                seed=seed,
+            )  # Shape: [N, 3, size, size]
 
             clip_metrics = compute_metrics_for_clip(
-                ground_truth, predicted, fps=fps, metrics=metrics, include_lpips=include_lpips, tmp_dir=tmp_dir
+                ground_truth,
+                predicted,
+                fps=fps,
+                metrics=metrics,
+                include_lpips=include_lpips,
+                tmp_dir=tmp_dir,
+                residual_settings=residual_settings,
             )
             clip_metrics["clip_key"] = f"{clip['video']}/{clip['scene']}/{clip['track']}"
             per_clip_metrics.append(clip_metrics)
@@ -463,10 +569,30 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--device", type=str, default=None)
     parser.add_argument("--metrics", type=str, default=",".join(DEFAULT_METRICS))
     parser.add_argument("--skip-lpips", action="store_true")
-    parser.add_argument("--controlnet-condition-type", type=str, default="pose", choices=["pose", "canny"])
-    parser.add_argument("--controlnet-base-model", type=str, default="assets/weights/stable-diffusion-v1-5")
-    parser.add_argument("--controlnet-num-inference-steps", type=int, default=20)
-    parser.add_argument("--controlnet-conditioning-scale", type=str, default="1.0,1.0,1.0,1.0", help="Comma-separated list of 4 scales for multi-controlnet")
+    parser.add_argument("--seed", type=int, default=0, help="Generation seed, pinned so runs are comparable")
+    # Residual-bytes settings. These pin the payload the candidate is priced
+    # against, so they are recorded in every log record -- a byte count is
+    # meaningless without the codec/CRF/pix-fmt that produced it.
+    parser.add_argument("--no-residual-bytes", action="store_true",
+                        help="Skip the residual-bytes measurement (it costs one extra encode per clip)")
+    parser.add_argument("--residual-codec", type=str, default="libx264")
+    parser.add_argument("--residual-crf", type=int, default=28)
+    parser.add_argument("--residual-preset", type=str, default="medium")
+    parser.add_argument("--residual-pix-fmt", type=str, default="yuv444p",
+                        help="libsvtav1 forces yuv420p regardless of this; use libx264/libx265 to vary it")
+    parser.add_argument("--residual-block-size", type=int, default=8)
+    parser.add_argument("--residual-block-threshold", type=float, default=0.0)
+    # ControlNet knobs map onto PointstreamConfig fields, so eval and the
+    # decoder are configured identically rather than through a parallel set of
+    # kwargs that only eval understood.
+    parser.add_argument("--controlnet-num-inference-steps", type=int, default=None, dest="controlnet_steps")
+    parser.add_argument(
+        "--controlnet-strength",
+        type=float,
+        default=None,
+        help="img2img denoising strength. Lower preserves more of the reference appearance; "
+        "the decoder default (0.65) is high for a reconstruction task.",
+    )
     return parser
 
 
@@ -479,23 +605,24 @@ def main(argv: list[str] | None = None) -> int:
 
     manifest = load_manifest(args.manifest)
 
+    # Only overrides the user actually set; everything else keeps the decoder's
+    # own defaults so eval and the pipeline stay configured identically.
     arch_kwargs: dict[str, Any] = {}
-    condition_type = None
-    if args.arch == "controlnet":
-        condition_type = "canny" if args.controlnet_condition_type == "canny" else "skeleton"
-        arch_kwargs = {
-            "base_model_id": args.controlnet_base_model,
-            "num_inference_steps": args.controlnet_num_inference_steps,
-        }
-    elif args.arch == "multi-controlnet":
-        scales = [float(x.strip()) for x in args.controlnet_conditioning_scale.split(",")]
-        if len(scales) != 4:
-            raise ValueError(f"multi-controlnet requires exactly 4 scales, got {len(scales)}")
-        arch_kwargs = {
-            "base_model_id": args.controlnet_base_model,
-            "num_inference_steps": args.controlnet_num_inference_steps,
-            "controlnet_conditioning_scale": scales,
-        }
+    if args.controlnet_steps is not None:
+        arch_kwargs["controlnet_steps"] = args.controlnet_steps
+    if args.controlnet_strength is not None:
+        arch_kwargs["controlnet_strength"] = args.controlnet_strength
+    arch_kwargs["controlnet_width"] = args.img_size
+    arch_kwargs["controlnet_height"] = args.img_size
+
+    residual_settings = None if args.no_residual_bytes else {
+        "codec": args.residual_codec,
+        "crf": args.residual_crf,
+        "preset": args.residual_preset,
+        "pix_fmt": args.residual_pix_fmt,
+        "block_size": args.residual_block_size,
+        "block_threshold": args.residual_block_threshold,
+    }
 
     result = evaluate_checkpoint(
         checkpoint_path=args.checkpoint,
@@ -507,8 +634,9 @@ def main(argv: list[str] | None = None) -> int:
         metrics=metrics,
         include_lpips=not args.skip_lpips,
         fps=args.fps,
-        condition_type=condition_type,
         arch_kwargs=arch_kwargs,
+        seed=args.seed,
+        residual_settings=residual_settings,
     )
 
     record = {
@@ -518,6 +646,9 @@ def main(argv: list[str] | None = None) -> int:
         "arch": args.arch,
         "checkpoint": str(args.checkpoint),
         "manifest": str(args.manifest),
+        "seed": args.seed,
+        "config_overrides": arch_kwargs,
+        "residual_settings": residual_settings,
         **result["aggregate"],
     }
     append_jsonl_log(args.log, record)

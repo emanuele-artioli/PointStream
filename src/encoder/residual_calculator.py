@@ -155,6 +155,56 @@ class UniformImportanceMapper(BaseImportanceMapper):
         return torch.ones((frame_height, frame_width), dtype=torch.float32, device=device)
 
 
+def apply_block_activity_gate(
+    residual: torch.Tensor,
+    block_size: int,
+    threshold: float,
+) -> torch.Tensor:
+    """Drop low-activity blocks using pooled mean absolute error.
+
+    The threshold is the average absolute residual value per block in pixel
+    units, so a threshold of 2.0 drops blocks whose mean error is below 2 gray
+    levels. Module-level so `scripts/eval_checkpoint.py` can price a candidate's
+    residual with the encoder's exact formula rather than an approximation of it.
+    """
+    if block_size <= 1 or threshold <= 0.0:
+        return residual
+
+    squeeze_batch = False
+    if residual.dim() == 3:
+        residual = residual.unsqueeze(0)
+        squeeze_batch = True
+    elif residual.dim() != 4:
+        raise ValueError(f"Expected residual tensor with 3 or 4 dims, got {tuple(residual.shape)}")
+
+    _, _, height, width = residual.shape
+    pad_h = (block_size - (height % block_size)) % block_size
+    pad_w = (block_size - (width % block_size)) % block_size
+    padded = F.pad(residual, (0, pad_w, 0, pad_h), mode="replicate")
+
+    activity = F.avg_pool2d(
+        padded.abs().mean(dim=1, keepdim=True),
+        kernel_size=block_size,
+        stride=block_size,
+    )
+    keep_blocks = (activity >= float(threshold)).to(dtype=padded.dtype)
+    keep_full = F.interpolate(keep_blocks, size=padded.shape[-2:], mode="nearest")
+
+    gated = padded * keep_full
+    gated = gated[:, :, :height, :width]
+    return gated[0] if squeeze_batch else gated
+
+
+def residual_to_encodable_uint8(residual: torch.Tensor) -> torch.Tensor:
+    """Residual (signed, pixel units) -> uint8 with the encoder's +128 offset.
+
+    The residual stream is transmitted as ordinary video, so signed error is
+    biased into [0, 255] and clamped. Any byte-cost measurement must use this
+    same representation or it is pricing a different signal.
+    """
+    return torch.clamp(residual + 128.0, 0.0, 255.0).to(torch.uint8)
+
+
 class ResidualCalculator:
     """Server-side weighted residual calculator with support for multiple residual modes."""
 
@@ -341,7 +391,7 @@ class ResidualCalculator:
                         interpolation=self._downscale_interpolation,
                     )
 
-                encoded_batch = torch.clamp(residual_batch + 128.0, 0.0, 255.0).to(torch.uint8)
+                encoded_batch = residual_to_encodable_uint8(residual_batch)
                 for encoded_residual in encoded_batch:
                     yield np.asarray(encoded_residual.permute(1, 2, 0).contiguous().cpu().numpy(), dtype=np.uint8)
 
@@ -377,37 +427,10 @@ class ResidualCalculator:
         block_size: int,
         threshold: float,
     ) -> torch.Tensor:
-        """Drop low-activity blocks using pooled mean absolute error.
+        # Delegates to the module-level function so evaluation computes its
+        # residual byte cost with the encoder's exact formula.
+        return apply_block_activity_gate(residual, block_size, threshold)
 
-        The threshold is the average absolute residual value per block in pixel units,
-        so a threshold of 2.0 drops blocks whose mean error is below 2 gray levels.
-        """
-        if block_size <= 1 or threshold <= 0.0:
-            return residual
-
-        squeeze_batch = False
-        if residual.dim() == 3:
-            residual = residual.unsqueeze(0)
-            squeeze_batch = True
-        elif residual.dim() != 4:
-            raise ValueError(f"Expected residual tensor with 3 or 4 dims, got {tuple(residual.shape)}")
-
-        _, _, height, width = residual.shape
-        pad_h = (block_size - (height % block_size)) % block_size
-        pad_w = (block_size - (width % block_size)) % block_size
-        padded = F.pad(residual, (0, pad_w, 0, pad_h), mode="replicate")
-
-        activity = F.avg_pool2d(
-            padded.abs().mean(dim=1, keepdim=True),
-            kernel_size=block_size,
-            stride=block_size,
-        )
-        keep_blocks = (activity >= float(threshold)).to(dtype=padded.dtype)
-        keep_full = F.interpolate(keep_blocks, size=padded.shape[-2:], mode="nearest")
-
-        gated = padded * keep_full
-        gated = gated[:, :, :height, :width]
-        return gated[0] if squeeze_batch else gated
 
     def _apply_background_downscale(
         self,

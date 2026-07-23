@@ -1,46 +1,56 @@
 ---
 name: reviewer-response
-description: Work a reviewer-driven item for the POINTSTREAM ACM TOMM resubmission — scope the required experiment/code/text change, implement it, and update the action matrix. Use when the user references a reviewer comment, asks what's left for the TOMM revision, or wants to close an action-matrix item.
+description: Work a reviewer-driven item for the POINTSTREAM ACM TOMM resubmission — scope the required experiment/code/text change, implement it, and update the reviewer checklist. Use when the user references a reviewer comment, asks what's left for the TOMM revision, or wants to close a checklist item.
 ---
 
 # Working the TOMM reviewer-response checklist
 
-## The paper trail
+## The paper trail (all in `67a9ea6275d3d9785ce57026/`)
 
-- **Raw reviews:** `67a9ea6275d3d9785ce57026/reviews.md` — the 5 ACM MM
-  reviews that led to rejection; the resubmission target is ACM TOMM.
-- **Authoritative checklist:** `reports/6_action_matrix.md` — reviewer
-  themes → status (🟢 tackled / 🟡 partial / 🔴 not) → action → effort, plus
-  the two-phase execution checklist. This is what gets updated when an item
-  closes.
-- **Paper source:** `67a9ea6275d3d9785ce57026/main.tex` (+ `ref.bib`,
-  `figures/`) — a separate nested git repo (Overleaf sync). This is a
-  **fresh submission, not a tracked revision**: there are no `\rev{}`/`\del{}`
-  macros; edit the text directly. `main_old.tex` and `backup/` are reference
-  material — don't edit or delete them.
+- **Raw reviews:** `reviews.md` — the 5 ACM MM reviews that led to rejection;
+  the resubmission target is ACM TOMM.
+- **Authoritative checklist:** `reviewers_comments.md` — one entry per theme
+  with Reviewers / Status / Evidence / Owed. This is what gets updated when an
+  item advances. **Done means the text or experiment is actually in place**,
+  never a plan — the previous action matrix drifted precisely because it
+  recorded plans and invalidated runs as Done.
+- **Paper source:** `main.tex` (+ `ref.bib`, `figures/`), a separate nested git
+  repo (Overleaf sync). Fresh submission, not a tracked revision: no
+  `\rev{}`/`\del{}` macros, edit directly. `main_old.tex` and `backup/` are
+  reference only.
+- **Evidence base:** `RESEARCH_LOG.md` — hard rules, standing results with real
+  numbers, dead-end and superseded registries.
 
-## Current snapshot (2026-07-09 — re-read 6_action_matrix.md, it moves)
+## Where the leverage is (2026-07-21 — re-read `reviewers_comments.md`, it moves)
 
-- 🟢 Tackled, needs paper text: generative-model choice (SPADE vs diffusion,
-  R1/R5), temporal coherence mechanisms (R3/R4), dynamic backgrounds/cuts
-  (R2).
-- 🟡 Partial: temporal segmentation / SAM2 question (R3).
-- 🔴 Open, needs experiments: AV1 + learned-codec baselines (R2/R5),
-  generalizability beyond tennis (R2–R5), MOS study (R2/R4), shadow handling
-  (R3 — answered conceptually by the Residual Guarantee, needs a paragraph).
+- **Cheapest wins, no new experiment needed:** dynamic backgrounds/cuts (R2 —
+  fully solved in `src/shared/scene_classification.py`, just unwritten) and
+  shadow handling (R3 — answered by the Residual Guarantee, needs a paragraph).
+  Both are blocked only on the missing System Design section.
+- **Blocked on the generative engine:** generative-model choice (R1/R5),
+  temporal coherence proof (R3/R4), demo video (R3). The G2 campaign never
+  completed a rung and no architecture has been selected on evidence.
+- **Blocked on one unrun experiment:** missing baselines (R2/R5) — the anchors
+  exist, PointStream has never been placed on the curve.
+- **Untouched, high effort:** second domain (R2/R3/R4/R5 — the most-requested
+  single item), MOS study (R2/R4), VVC anchor, SAM2 comparison (R3).
 
 ## Workflow
 
-1. Read the specific review section in `reviews.md` and the matching action
-   matrix row — the matrix's "Action Required" is the scoped task.
-2. Classify the work: **experiment** (→ `/run-pipeline`, results via
-   `/results-report`), **code change** (normal repo rules, tests +
-   real-input verification), or **paper text** (→ `paper-editor` agent for
-   substantive edits).
-3. For paper claims about the implementation, verify against `src/` and the
-   `reports/` findings before writing — several reviewer answers (shadows,
-   cuts, temporal coherence) are already substantiated in reports 2, 5, 7.
-4. When done, update `reports/6_action_matrix.md` in the same pass: flip the
-   status emoji, check the execution-checklist box, and add one line saying
-   concretely what closed it (section added, table added, outputs/<ts> run).
-5. Fold any new experimental evidence into `reports/` via `/update-reports`.
+1. Read the specific review section in `reviews.md` and the matching entry in
+   `reviewers_comments.md` — its "Owed" line is the scoped task.
+2. Check the paper's markers for where the work lands:
+   `grep -n '^% *\(GOAL\|HOLE\|NOTE\|NEXT\|CLAIM\)(' main.tex`.
+   Several reviewer answers map onto `HOLE(sec:system-design)` and
+   `HOLE(sec:evaluation)`, which are whole missing sections.
+3. Classify the work: **experiment** (→ `/run-pipeline`, results via
+   `/results-report`), **code change** (normal repo rules: ruff/mypy/pytest +
+   real-input verification, commit before long runs), or **paper text** (→
+   `paper-editor` agent for substantive edits).
+4. For paper claims about the implementation, verify against `src/` and
+   `outputs/` before writing — and check `RESEARCH_LOG.md`'s superseded
+   registry, because more than one previously-cited result has been retracted.
+5. When done, update `reviewers_comments.md` in the same pass: Status plus one
+   concrete Resolution line (section added, table added, `outputs/<ts>` run).
+6. Fold new evidence in via `/update-paper` — clearing the `HOLE` and writing
+   the `CLAIM` line in the same edit.

@@ -112,6 +112,10 @@ class PointstreamConfig:
     genai_resize_mode: str = "aspect-recovery"
     animate_anyone_adaptive_threshold: bool = True
     animate_anyone_alpha_smoothing: float = 0.5
+    # Overrides the strategy's primary weight path so evaluation can score an
+    # arbitrary campaign checkpoint through the decoder's own strategy classes.
+    # Unset in normal pipeline runs; set by scripts/eval_checkpoint.py.
+    genai_checkpoint_override: Optional[str] = None
 
     # ControlNet Configuration
     controlnet_id: Optional[str] = None

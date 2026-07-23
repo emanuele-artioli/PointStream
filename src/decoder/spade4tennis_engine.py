@@ -16,6 +16,7 @@ from src.decoder.genai_compositor import (
     BaseGenAIStrategy,
     _render_pose_condition,
     _require_local_or_optin_weight,
+    _resolve_strategy_weight,
     _to_numpy_bgr,
 )
 from src.shared.spade4tennis_arch import SPADEResNet9Generator
@@ -44,11 +45,16 @@ class Spade4TennisStrategy(BaseGenAIStrategy):
         if self._model is not None:
             return self._model
 
-        # Try lite first, then fall back to full
-        try:
-            model_path = _require_local_or_optin_weight("spade4tennis_lite_generator.pt", allow_download=False)
-        except FileNotFoundError:
-            model_path = _require_local_or_optin_weight("spade4tennis_full_generator.pt", allow_download=False)
+        # An explicit checkpoint override (evaluation) wins; otherwise try lite
+        # first, then fall back to full.
+        override = getattr(self.config, "genai_checkpoint_override", None) if self.config else None
+        if override:
+            model_path = _resolve_strategy_weight(self.config, "spade4tennis_lite_generator.pt")
+        else:
+            try:
+                model_path = _require_local_or_optin_weight("spade4tennis_lite_generator.pt", allow_download=False)
+            except FileNotFoundError:
+                model_path = _require_local_or_optin_weight("spade4tennis_full_generator.pt", allow_download=False)
 
         generator = SPADEResNet9Generator()
         state_dict = torch.load(model_path, map_location="cpu")
@@ -175,12 +181,26 @@ class Spade4TennisStrategy(BaseGenAIStrategy):
         skeleton_tensor = transforms.ToTensor()(pose_image).unsqueeze(0).to(device)  # Shape: [1, 3, H, W]
         skeleton_tensor = (skeleton_tensor - 0.5) * 2.0  # Shape: [1, 3, H, W]
 
-        # Reference → tensor [-1, 1]
-        ref_image = transforms.ToPILImage()(reference_crop_tensor)
-        ref_image = transforms.Resize(
-            (self._height, self._width), transforms.InterpolationMode.BICUBIC
-        )(ref_image)
-        ref_tensor = transforms.ToTensor()(ref_image).unsqueeze(0).to(device)  # Shape: [1, 3, H, W]
+        # Reference → tensor [-1, 1].
+        #
+        # Two things have to be right here, and neither used to be:
+        #  1. reference_crop_tensor is BGR by convention (it originates from
+        #     cv2.imdecode in ResidualCalculator._decode_reference_crops), but
+        #     the generator was trained on RGB crops loaded via PIL -- without
+        #     the swap the appearance cue arrives with red and blue exchanged.
+        #  2. The reference must be letterboxed into the canvas at the SAME
+        #     scale and offsets as the pose above. Training pads both inputs to
+        #     square (src/shared/tennis_dataset.py `_process_image`), so a plain
+        #     Resize((H, W)) here stretched the reference while the skeleton
+        #     stayed aspect-correct, leaving the two input channels
+        #     geometrically inconsistent with each other and with training.
+        reference_rgb = cv2.cvtColor(_to_numpy_bgr(reference_crop_tensor), cv2.COLOR_BGR2RGB)  # Shape: [h, w, 3] RGB
+        if reference_rgb.shape[0] != scaled_h or reference_rgb.shape[1] != scaled_w:
+            reference_rgb = cv2.resize(reference_rgb, (scaled_w, scaled_h), interpolation=cv2.INTER_LANCZOS4)
+        padded_reference = np.zeros((self._height, self._width, 3), dtype=np.uint8)  # Shape: [H, W, 3]
+        padded_reference[offset_y:offset_y + scaled_h, offset_x:offset_x + scaled_w] = reference_rgb
+
+        ref_tensor = transforms.ToTensor()(padded_reference).unsqueeze(0).to(device)  # Shape: [1, 3, H, W]
         ref_tensor = (ref_tensor - 0.5) * 2.0  # Shape: [1, 3, H, W]
 
         # --- Forward pass (separate skeleton and reference inputs for SPADE) ---

@@ -3,7 +3,7 @@
 Runs a matrix of pipeline configs against a shared baseline and reports, for
 each variant, whether the component under test pays for itself: does it
 shrink the residual payload by more than the semantic metadata it adds?
-(See reports/7_implementation_plan.md §1 and reports/REPORTS.md.)
+(See 67a9ea6275d3d9785ce57026/RESEARCH_LOG.md "The thesis".)
 
 Usage:
     # Run a matrix spec (materializes configs, runs variants, writes report):

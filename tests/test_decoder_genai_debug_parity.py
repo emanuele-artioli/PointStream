@@ -1,7 +1,7 @@
 """Report 10 Phase 5.1(c): regression coverage for the decoder-side GenAI
 debug-artifact wiring fix.
 
-Diagnosis (see reports/10_dataset_and_end_to_end_evaluation_report.md, Phase
+Diagnosis (see 67a9ea6275d3d9785ce57026/RESEARCH_LOG.md, Bug registry #5; Phase
 5.1(c) finding): a real full-match profile found `decode/genai_baseline`
 running 2.16x slower than the encoder's `encode_chunk/residual/genai_baseline`
 for the *same* 60 frames and the same canny-controlnet engine. The cause was

@@ -1,7 +1,7 @@
 """Direct-codec anchor sweep: AV1/HEVC on the raw source video, no semantics.
 
 Answers the reviewer-critical "missing baselines" gap (R2, R5,
-reports/6_action_matrix.md): what does a conventional codec achieve on the
+67a9ea6275d3d9785ce57026/reviewers_comments.md): what does a conventional codec achieve on the
 same tennis footage, at the same encoder settings PointStream already uses
 for its own residual stream (see `ffmpeg-codec`/`codec-preset` in
 config/default.yaml)? This is a *whole-video* anchor — no actor extraction,
@@ -71,7 +71,7 @@ CODEC_LABELS: dict[str, str] = {"libsvtav1": "AV1", "libx265": "HEVC"}
 # conventional x264-derived name both libsvtav1's preset-alias table and
 # libx265 recognize as "thorough, well past real-time" — the standard choice
 # for RD-curve baselines in the literature (see 2026-07-10 finding in
-# reports/9_codec_baselines_report.md: preset "fast" on both codecs made
+# 67a9ea6275d3d9785ce57026/RESEARCH_LOG.md "Codec anchors": preset "fast" on both codecs made
 # HEVC dominate AV1, which is not the expected shape).
 DEFAULT_PRESET = "slow"
 
