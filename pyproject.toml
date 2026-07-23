@@ -72,9 +72,19 @@ omit = [
   "config-*.py",
   "*/config-*.py",
   "src/decoder/animate_anyone_runtime.py",
-  "src/decoder/genai_compositor.py",
+  # The GPU/model-backed halves of the compositing package. weights.py and
+  # pose_render.py are deliberately absent — splitting genai_compositor.py made
+  # them reachable without a diffusion pipeline loaded.
+  "src/decoder/compositing/strategies.py",
+  "src/decoder/compositing/compositor.py",
   "src/decoder/decoder_renderer.py",
-  "src/encoder/actor_components.py",
+  # The GPU/model-backed halves of the actors package. weights.py, heuristics.py
+  # and payload.py are deliberately absent — splitting actor_components.py is
+  # what made them reachable without model weights, and an entry here is a debt
+  # to repay rather than a permanent exemption.
+  "src/encoder/actors/detection.py",
+  "src/encoder/actors/segmentation.py",
+  "src/encoder/actors/pose.py",
   "src/encoder/ball_extractor.py",
   "src/encoder/residual_calculator.py",
   "src/encoder/segmentation_ball_extractor.py",

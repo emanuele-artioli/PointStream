@@ -4,8 +4,8 @@ from pathlib import Path
 
 import torch
 
-import src.experiment_evaluation as experiment_evaluation
-from src.experiment_evaluation import _normalize_evaluation_metrics, evaluate_run_summary
+import src.shared.experiment_evaluation as experiment_evaluation
+from src.shared.experiment_evaluation import _normalize_evaluation_metrics, evaluate_run_summary
 
 
 def test_normalize_evaluation_metrics_accepts_fvd() -> None:

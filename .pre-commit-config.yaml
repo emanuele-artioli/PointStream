@@ -19,3 +19,12 @@ repos:
       - id: mypy
         additional_dependencies: ["pydantic==2.11.2", "numpy==1.26.4", "msgpack==1.1.0"]
         args: ["--config-file=pyproject.toml"]
+
+  - repo: local
+    hooks:
+      - id: sync-agent-rules
+        name: agent rule files match CLAUDE.md
+        entry: python3 tools/sync_agent_rules.py --check
+        language: system
+        pass_filenames: false
+        files: ^(CLAUDE\.md|AGENTS\.md|\.agents/rules/|\.github/instructions/|tools/sync_agent_rules\.py)

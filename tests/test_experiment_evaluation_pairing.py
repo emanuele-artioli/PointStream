@@ -7,9 +7,9 @@ import subprocess
 import numpy as np
 import pytest
 
-import src.experiment_evaluation as eval_module
+import src.shared.experiment_evaluation as eval_module
 from src.encoder.video_io import encode_video_frames_ffmpeg
-from src.experiment_evaluation import _compute_psnr, _compute_ssim_ffmpeg, _compute_vmaf_ffmpeg
+from src.shared.experiment_evaluation import _compute_psnr, _compute_ssim_ffmpeg, _compute_vmaf_ffmpeg
 
 
 def _make_frames(num_frames: int, width: int, height: int, value: int) -> list[np.ndarray]:

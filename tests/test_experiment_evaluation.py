@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import src.experiment_evaluation as experiment_evaluation
+import src.shared.experiment_evaluation as experiment_evaluation
 
 
 def test_evaluate_run_summary_combines_timings_and_savings(monkeypatch, tmp_path: Path) -> None:
