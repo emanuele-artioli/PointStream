@@ -6,6 +6,7 @@ file fails here rather than triggering a silent download mid-run."""
 from __future__ import annotations
 import logging
 from pathlib import Path
+from typing import Any
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -32,3 +33,22 @@ def _require_local_or_optin_weight(model_name: str, allow_download: bool = False
         f"Required model weights not found for '{model_name}'. "
         "Place weights in assets/weights/ or set allow-auto-model-download to true."
     )
+
+
+def _resolve_strategy_weight(config: Any, model_name: str, allow_download: bool = False) -> str:
+    """Resolve a strategy's primary weight, honouring `genai-checkpoint-override`.
+
+    The override exists so evaluation can score an arbitrary campaign checkpoint
+    (e.g. `outputs/campaign/<name>/checkpoints/<variant>/...`) through the *same*
+    strategy classes the decoder runs, instead of the fixed `assets/weights/`
+    name. When unset, behaviour is identical to `_require_local_or_optin_weight`.
+    """
+    override = getattr(config, "genai_checkpoint_override", None) if config is not None else None
+    if override:
+        candidate = Path(str(override))
+        if not candidate.exists():
+            raise FileNotFoundError(
+                f"genai-checkpoint-override points at a missing path: '{override}'"
+            )
+        return str(candidate)
+    return _require_local_or_optin_weight(model_name, allow_download=allow_download)
