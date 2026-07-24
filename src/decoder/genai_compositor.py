@@ -23,7 +23,9 @@ from src.decoder.compositing import (  # noqa: F401
     _render_pose_with_racket,
     _require_local_or_optin_weight,
     _resolve_local_weight_path,
+    _resolve_strategy_weight,
     _to_numpy_bgr,
+    build_genai_strategy,
 )
 
 __all__ = [
@@ -33,4 +35,5 @@ __all__ = [
     "BaselineControlNetStrategy",
     "DiffusersCompositor",
     "GenAICompositor",
+    "build_genai_strategy",
 ]

@@ -24,6 +24,7 @@ from src.decoder.compositing.strategies import (
     AnimateAnyoneStrategy,
     BaselineControlNetStrategy,
     BaseGenAIStrategy,
+    build_genai_strategy,
 )
 
 # Private helpers re-exported for the engine modules that import them from the
@@ -36,6 +37,7 @@ from src.decoder.compositing.pose_render import (  # noqa: F401
 from src.decoder.compositing.weights import (  # noqa: F401
     _require_local_or_optin_weight,
     _resolve_local_weight_path,
+    _resolve_strategy_weight,
 )
 
 __all__ = [
@@ -45,4 +47,5 @@ __all__ = [
     "BaselineControlNetStrategy",
     "DiffusersCompositor",
     "GenAICompositor",
+    "build_genai_strategy",
 ]
