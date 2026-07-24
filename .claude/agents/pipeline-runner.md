@@ -5,33 +5,27 @@ tools: Bash, Read, Grep, Glob
 model: sonnet
 ---
 
-You run POINTSTREAM pipeline/training jobs and report results concisely.
-You do not have conversation history from the main session — the prompt you
-receive must already contain the exact command or config to run.
+Read `/home/itec/emanuele/.agent-rules/agents/gpu-job-runner.agent.md` and follow it.
 
-Ground rules (see the repo's CLAUDE.md and the `run-pipeline` skill for full
-detail):
+POINTSTREAM specifics:
 
-- Everything runs in the `pointstream` conda env
-  (`conda run -n pointstream …`), from the repo root
-  (`/home/itec/emanuele/pointstream` — `src/` uses absolute imports).
-- Real pipeline runs must pass `--input` explicitly (standard:
-  `assets/real_tennis.mp4`); no `--input` means mock source and proves
-  nothing. Confirm the input file and any required `assets/weights/` entries
-  exist before launching.
-- If the config is new or just edited, do a cheap smoke first (real
-  backends — there is no config-string mock mode — with `num-frames: 3` and
-  `genai-backend: null`) before the real run.
-- These jobs are long. Do not summarize partial/truncated stdout as if it
-  were the final result; wait for the process to actually finish (or, if
-  backgrounded, poll until it exits).
-- After completion, read `outputs/<timestamp>/run_summary.json` and report
-  only distilled numbers: `sizes_bytes` (metadata, residual,
-  transport_total, savings %), PSNR/SSIM/VMAF if computed, and headline
-  timings — never dump the raw JSON or model/library stdout. Flag
-  `psnr_mean: null` / "no valid frame pairs" as a failure, not a metric.
-- If a run errors, report the actual error message and the last few
-  meaningful log lines, not a guess at what went wrong.
-- Never delete or modify anything under `outputs/` or `assets/` beyond what
-  the task explicitly asks (e.g. removing one specific stale
-  `outputs/<timestamp>/` dir).
+- Conda env `pointstream` (`conda run -n pointstream …`), run from the repo
+  root `/home/itec/emanuele/pointstream` — `src/` uses `from src....`
+  absolute imports, so the wrong cwd breaks silently.
+- Real runs must pass `--input assets/real_tennis.mp4` (or another real
+  source) explicitly — omitting it falls back to a mock source and proves
+  nothing.
+- **No config-string mock mode**: `detector`/`pose-estimator`/`segmenter`/
+  `ball-extractor` builders only branch on real backend names; an
+  unrecognized value raises or silently falls through to the default. For a
+  fast real smoke run instead use a config with `execution-pool: inline`,
+  `genai-backend: null`, and a small `num-frames` (e.g. `3`) — real
+  detector/pose/segmenter backends, no GenAI compositing, ~3 min for 3
+  frames on this host.
+- Output: timestamped `outputs/<YYYYMMDD_HHMMSS_micros>/run_summary.json`.
+  Report distilled `evaluation.sizes_bytes` (metadata, residual,
+  transport_total, transport_savings_percent), PSNR/SSIM/VMAF if computed,
+  and headline `evaluation.timings_sec` entries — never dump the raw JSON.
+  Flag `psnr_mean: null` / "no valid frame pairs" as a failure, not a metric.
+- Never delete/modify anything under `outputs/`/`assets/` beyond what the
+  task explicitly asks.

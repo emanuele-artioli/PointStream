@@ -27,7 +27,7 @@
           },
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-long-run.py\""
+            "command": "/home/itec/emanuele/.agent-rules/scripts/guard-long-run.py --entry-point train_controlnet --entry-point train_pix2pix --entry-point train_spade4tennis --entry-point train_campaign"
           },
           {
             "type": "command",
