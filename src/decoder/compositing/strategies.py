@@ -404,3 +404,54 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
                 f"Animate Anyone runtime returned invalid sequence shape: {tuple(generated_bgr.shape)}"
             )
         return torch.from_numpy(generated_bgr).permute(0, 3, 1, 2).contiguous().to(torch.uint8)
+
+
+def build_genai_strategy(backend: str, config: Any = None) -> BaseGenAIStrategy:
+    """Construct the GenAI strategy for `backend`.
+
+    Single construction path shared by the decoder's compositor and by
+    evaluation. Evaluation MUST go through here: the G2 campaign's ~0 ControlNet
+    scores came from `scripts/eval_checkpoint.py` reimplementing inference as
+    text-to-image-from-noise while the decoder ran img2img from the reference
+    crop, so the campaign scored a mode the system never runs.
+    """
+    if backend in {"controlnet", "baseline", "baseline-controlnet"}:
+        return BaselineControlNetStrategy(config=config)
+    if backend in {"animate-anyone", "animate_anyone", "animateanyone"}:
+        return AnimateAnyoneStrategy(config=config)
+    if backend in {"caption-controlnet", "caption_controlnet"}:
+        from src.decoder.controlnet_engine import CaptionControlNetStrategy
+
+        return CaptionControlNetStrategy(config=config)
+    if backend in {"mock-caption-controlnet", "mock_caption_controlnet"}:
+        from src.decoder.controlnet_engine import MockCaptionControlNetStrategy
+
+        return MockCaptionControlNetStrategy(config=config)
+    if backend in {"ip-adapter-controlnet", "ip_adapter_controlnet"}:
+        from src.decoder.controlnet_engine import IPAdapterControlNetStrategy
+
+        cnet_id = getattr(config, "controlnet_id", None) or "assets/weights/control_v11p_sd15_openpose"
+        return IPAdapterControlNetStrategy(controlnet_id=cnet_id, config=config)
+    if backend in {"canny-controlnet", "canny_controlnet"}:
+        from src.decoder.controlnet_engine import CannyControlNetStrategy
+
+        cnet_id = getattr(config, "controlnet_id", None) or "lllyasviel/control_v11p_sd15_canny"
+        return CannyControlNetStrategy(controlnet_id=cnet_id, config=config)
+    if backend in {"seg-controlnet", "seg_controlnet"}:
+        from src.decoder.controlnet_engine import SegControlNetStrategy
+
+        cnet_id = getattr(config, "controlnet_id", None) or "lllyasviel/control_v11p_sd15_seg"
+        return SegControlNetStrategy(controlnet_id=cnet_id, config=config)
+    if backend in {"multi-controlnet", "multi_controlnet"}:
+        from src.decoder.controlnet_engine import MultiControlNetStrategy
+
+        return MultiControlNetStrategy(config=config)
+    if backend in {"pix2pix"}:
+        from src.decoder.pix2pix_engine import Pix2PixStrategy
+
+        return Pix2PixStrategy(config=config)
+    if backend in {"spade4tennis", "spade-4-tennis", "spade_4_tennis"}:
+        from src.decoder.spade4tennis_engine import Spade4TennisStrategy
+
+        return Spade4TennisStrategy(config=config)
+    raise ValueError(f"Unsupported genai-backend value in config: {backend}")
