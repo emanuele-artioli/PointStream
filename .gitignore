@@ -130,11 +130,14 @@ tennis_processed/*
 # Nested Overleaf-synced paper repo (its own git history)
 67a9ea6275d3d9785ce57026/
 
-# Antigravity rules dir picks up sibling-project rules too; only track pointstream's own
+# Cross-agent project layout: real skills/agents under .claude/; .agents/
+# holds symlinks plus the workflows tree Cursor and Antigravity share.
+# Ignore stray Antigravity droppings; allow only what we intentionally ship.
 .agents/*
-!.agents/rules
-.agents/rules/*
-!.agents/rules/pointstream.md
+!.agents/agents
+!.agents/skills
+!.agents/workflows
+!.agents/workflows/**
 
 # Claude Code: local permission grants are machine-specific, not shared
 .claude/settings.local.json
