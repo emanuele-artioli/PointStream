@@ -4,6 +4,12 @@
 every session on every task, so it carries only what cannot be enforced in code
 and what every session needs regardless of what it is doing.*
 
+*`CLAUDE.md` is a symlink to this file — Claude Code reads that name, Cursor and
+others read this one. Do not delete it as a duplicate, and do not let the two
+diverge; if Claude-specific instructions ever become necessary, replace the
+symlink with a file that imports `@AGENTS.md` and adds only what is genuinely
+Claude-only.*
+
 PointStream is an object-centric semantic video codec. The encoder transmits
 each salient object's appearance and motion plus a background model and an
 optional corrective residual; the client reconstructs frames generatively. The
