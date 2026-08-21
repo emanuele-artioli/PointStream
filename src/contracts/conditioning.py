@@ -53,6 +53,7 @@ from src.contracts.capabilities import (
     CONDITION_POSE,
 )
 from src.contracts.errors import MissingConditioningError, UnsupportedCapabilityError
+from src.contracts.lattice import CONDITION_SOURCES
 from src.contracts.registry import BackendSpec
 
 # --------------------------------------------------------------------------
@@ -87,22 +88,6 @@ Device: TypeAlias = Any
 # Stages and wire items a conditioning requirement implies
 # --------------------------------------------------------------------------
 
-STAGE_POSE_ESTIMATION: Final = "pose-estimation"
-STAGE_SEGMENTATION: Final = "segmentation"
-STAGE_CANNY_EXTRACTION: Final = "canny-extraction"
-STAGE_APPEARANCE_EXTRACTION: Final = "appearance-extraction"
-STAGE_MOTION_ESTIMATION: Final = "motion-estimation"
-
-ALL_STAGES: Final = frozenset(
-    {
-        STAGE_POSE_ESTIMATION,
-        STAGE_SEGMENTATION,
-        STAGE_CANNY_EXTRACTION,
-        STAGE_APPEARANCE_EXTRACTION,
-        STAGE_MOTION_ESTIMATION,
-    }
-)
-
 TRANSMIT_KEYPOINTS: Final = "keypoints"
 TRANSMIT_MASK: Final = "mask"
 TRANSMIT_CANNY: Final = "canny-edges"
@@ -112,13 +97,17 @@ TRANSMIT_MOTION_FIELD: Final = "motion-field"
 #: Which encoder-side stage each conditioning kind makes necessary. The whole
 #: cross-axis question — "does the pose estimator need to run?" — is answered by
 #: a lookup here against what the generator declared, and nowhere else.
+#:
+#: Taken from the stage catalogue rather than restated. Two lists of stage names
+#: would be two things to keep in step, and one of them would eventually be
+#: wrong — precisely the drift this package exists to prevent.
 STAGES_FOR_CONDITION: Final[Mapping[str, tuple[str, ...]]] = {
-    CONDITION_POSE: (STAGE_POSE_ESTIMATION,),
-    CONDITION_MASK: (STAGE_SEGMENTATION,),
-    CONDITION_CANNY: (STAGE_CANNY_EXTRACTION,),
-    CONDITION_APPEARANCE: (STAGE_APPEARANCE_EXTRACTION,),
-    CONDITION_MOTION_FIELD: (STAGE_MOTION_ESTIMATION,),
+    condition: (stage_name,) for condition, stage_name in CONDITION_SOURCES.items()
 }
+
+#: Every stage a conditioning requirement can ask for. A subset of the full
+#: catalogue: stages like transport or metrics are never implied by conditioning.
+ALL_STAGES: Final[frozenset[str]] = frozenset(CONDITION_SOURCES.values())
 
 #: What each conditioning kind costs on the wire. The decoder cannot recompute
 #: any of these — it never sees the source frame — so a required condition is a

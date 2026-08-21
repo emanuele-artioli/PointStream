@@ -22,10 +22,8 @@ from src.contracts.capabilities import (
     CONDITION_MASK,
     CONDITION_POSE,
 )
+from src.contracts.lattice import STAGE_DETECTION, STAGE_POSE, STAGE_SEGMENTATION, STAGES
 from src.contracts.conditioning import (
-    STAGE_CANNY_EXTRACTION,
-    STAGE_POSE_ESTIMATION,
-    STAGE_SEGMENTATION,
     STAGES_FOR_CONDITION,
     TRANSMIT_CANNY,
     TRANSMIT_FOR_CONDITION,
@@ -189,10 +187,10 @@ def test_a_canny_generator_does_not_make_pose_estimation_run() -> None:
     plan = ConditioningPlan.derive(_spec("canny-controlnet", {CONDITION_CANNY, CONDITION_APPEARANCE}))
 
     assert CONDITION_POSE not in plan.conditioning
-    assert not plan.needs_stage(STAGE_POSE_ESTIMATION)
-    assert plan.needs_stage(STAGE_CANNY_EXTRACTION)
+    assert not plan.needs_stage(STAGE_POSE)
+    assert plan.needs_stage(STAGE_DETECTION)
     assert TRANSMIT_CANNY in plan.transmit
-    assert STAGE_POSE_ESTIMATION in unused_stages(plan)
+    assert STAGE_POSE in unused_stages(plan)
 
 
 def test_a_multi_condition_generator_enables_every_stage_it_declared() -> None:
@@ -200,9 +198,9 @@ def test_a_multi_condition_generator_enables_every_stage_it_declared() -> None:
         _spec("multi-controlnet", {CONDITION_POSE, CONDITION_MASK, CONDITION_APPEARANCE})
     )
 
-    assert plan.needs_stage(STAGE_POSE_ESTIMATION)
+    assert plan.needs_stage(STAGE_POSE)
     assert plan.needs_stage(STAGE_SEGMENTATION)
-    assert not plan.needs_stage(STAGE_CANNY_EXTRACTION)
+    assert not plan.needs_stage(STAGE_DETECTION)
 
 
 def test_plan_check_rejects_a_bundle_missing_what_the_generator_declared() -> None:
@@ -222,10 +220,23 @@ def test_a_registry_entry_with_a_misspelled_requirement_fails_to_plan() -> None:
 
 
 def test_an_unknown_stage_name_is_rejected_rather_than_answered_false() -> None:
-    """`needs_stage("pose")` returning False would read as "skip it"."""
+    """A misspelt stage answering False would read as "skip it", not "you typo'd"."""
     plan = ConditioningPlan.derive(_spec("pose-controlnet", {CONDITION_POSE}))
-    with pytest.raises(ValueError, match="Unknown stage 'pose'"):
-        plan.needs_stage("pose")
+    with pytest.raises(ValueError, match="Unknown stage 'pose-estimation'"):
+        plan.needs_stage("pose-estimation")
+
+
+def test_stage_names_come_from_the_catalogue() -> None:
+    """One vocabulary, not two.
+
+    These names were briefly declared twice — once here and once in the stage
+    catalogue — with `pose` in one and `pose-estimation` in the other. Two lists
+    of the same thing drift, and a stage named twice is the drift this package
+    exists to prevent.
+    """
+    assert set(STAGES_FOR_CONDITION.values()) <= {(name,) for name in STAGES}
+    assert STAGES_FOR_CONDITION[CONDITION_POSE] == (STAGE_POSE,)
+    assert STAGES_FOR_CONDITION[CONDITION_MASK] == (STAGE_SEGMENTATION,)
 
 
 def test_every_conditioning_kind_has_a_stage_and_a_wire_cost() -> None:
