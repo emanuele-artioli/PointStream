@@ -85,8 +85,10 @@ everything off, residual included, and what remains is the source video.
 
 Three things follow, and they are why the architecture is shaped this way:
 
-- Component ablations share **one currency** — the change in total transmitted
-  payload — measured identically for every component.
+- Component ablations share **one currency** — BD-rate against a common anchor,
+  measured identically for every component (§5). Payload alone is not the
+  currency: two corners never land at the same quality, so a byte count on its
+  own compares nothing.
 - Alternative encodings of the same thing are directly comparable.
 - The whole-frame baseline is not a special mode; it is a corner of the lattice.
 
@@ -148,14 +150,51 @@ a `CLAIM(id): src=` line naming a real `outputs/` path. A result that turns out
 weak either moves to an appendix or is deleted before submission — it does not
 accumulate in a side file.
 
+### The currency is BD-rate, not a byte count
+
+**Two configurations will not land at the same bitrate, and will not land at the
+same quality.** Comparing them at one operating point each therefore compares
+nothing: a corner that spends more bytes and scores better has told you only that
+more bytes buy more quality. This is the same error as comparing a
+region-of-interest arm against a baseline at matched QP.
+
+So **every comparison sweeps a rate ladder and compares curves.** Each lattice
+corner is run at several residual coarsenesses (and, where relevant, several
+codec rate points), producing a rate–distortion curve. Configurations are then
+compared by **Bjøntegaard delta rate (BD-rate)** against a common anchor — the
+average bitrate difference at equal quality, integrated over the overlapping
+quality range — with BD-PSNR/BD-VMAF reported alongside.
+
+This changes what "pays for itself" means, and it is the definition to implement:
+
+> A component earns its place if enabling it **improves BD-rate against the same
+> anchor**. Not if it reduces payload at one operating point, and not if it looks
+> better.
+
+Consequences that must reach the code:
+
+- **A single run is never a result.** The unit of evaluation is a swept curve.
+  An experiment harness that produces one point per configuration is producing
+  something uncomparable.
+- **Curves must overlap in quality** for BD-rate to be defined. Report the
+  overlap range; a comparison over a sliver of shared quality is weak evidence
+  and should say so.
+- **A point comparison is valid only under dominance** — one arm better on both
+  axes. Where that holds, say so and use it; where it does not, BD-rate is the
+  only honest answer.
+- **With the residual absent there is no guarantee**, so the comparison against
+  the baseline codec is not "did we reconstruct exactly" but "where does this
+  configuration's RD curve sit relative to the anchor's". That is the question
+  every residual-free corner has to answer.
+
 In priority order:
 
 1. **PointStream against the codec ladder** — AVC/HEVC/AV1/VVC, with and without
    region arms, **at matched rate**. Rate, quality *and encode time* on the same
    axes. The core claim. Verified never run: every sweep in
    `outputs/codec_baselines/` has a null PointStream point.
-2. **The ablation lattice** — each component off in turn, measured in payload
-   change against the all-off corner.
+2. **The ablation lattice** — each component off in turn, each swept across a
+   rate ladder, compared by BD-rate against the all-off corner.
 3. **The residual-coarseness curve** — absent through fine, plus a lossless
    ceiling calibration.
 4. **Object representation** — keypoints versus sparse trajectories versus

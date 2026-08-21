@@ -23,6 +23,15 @@ question better. The existing FVD wiring is prior art to read, not to keep.
 pipeline evaluation — a gap that has been mis-reported as closed twice. Wiring it
 into the pipeline path is this stream's most load-bearing task.
 
+**Rate-distortion comparison.** Implement **BD-rate** (Bjontegaard delta rate)
+and BD-PSNR/BD-VMAF over a pair of rate-distortion curves, plus the overlap
+range the integral is defined on. This is the currency every component ablation
+and every codec comparison is settled in (`PLAN.md` §5), so it belongs here
+rather than in an experiment script. Two configurations never land at the same
+bitrate or the same quality, so a point-to-point comparison compares nothing;
+the only exception is dominance, where one arm is better on both axes, and a
+helper that detects that case is worth having.
+
 ## Traps specific to this stream
 
 **Quality is measured in every configuration, without exception.** Not an
@@ -44,4 +53,6 @@ for reasons that have nothing to do with correctness.
 - A run with no metrics is impossible.
 - Ranking code never special-cases direction — higher-better and lower-better are
   declared.
+- BD-rate is computed from curves, reports its quality-overlap range, and refuses
+  to return a number when the curves barely overlap.
 - `ruff`, `mypy`, tests pass; import direction clean.

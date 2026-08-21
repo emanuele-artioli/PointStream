@@ -55,6 +55,11 @@ same encode without it. A prior project abandoned that path unfinished.
 moves quality, and already establishes that AV1's is precisely localized at
 matched QP. Extend it with `--match-bitrate` rather than writing a new harness.
 
+**Sweeps, not points.** Every arm this stream produces is walked across a rate
+ladder, because comparisons are settled by BD-rate over curves (`PLAN.md` §5).
+A harness that emits one point per configuration is emitting something
+uncomparable.
+
 ## Done when
 
 - Every rung encodes and decodes through one command builder, replacing the
