@@ -68,16 +68,19 @@ ALL_APPEARANCE: Final = frozenset(
 #: so it applies to humans and animals but not to vehicles or arbitrary shapes.
 MOTION_KEYPOINTS: Final = "keypoints"
 
-#: Per-frame dense or block motion field. Class-agnostic — the option that makes
-#: skeleton-less objects a configuration rather than a redesign.
-MOTION_VECTORS: Final = "motion-vectors"
+#: A handful to ~100 tracked points per clip, expanded to dense motion by the
+#: decoder. Class-agnostic — the option that makes skeleton-less objects a
+#: configuration rather than a redesign. Named for what is transmitted:
+#: transmitting a dense per-pixel field would cost the same order as classical
+#: block motion vectors, which is the thing this representation exists to avoid.
+MOTION_SPARSE_TRAJECTORIES: Final = "sparse-trajectories"
 
 #: The object crop encoded as a literal video after its appearance keyframe.
 #: The classical codec answer applied per object, and the baseline the
 #: generative representations have to beat.
 MOTION_ENCODED_VIDEO: Final = "encoded-video"
 
-ALL_MOTION: Final = frozenset({MOTION_KEYPOINTS, MOTION_VECTORS, MOTION_ENCODED_VIDEO})
+ALL_MOTION: Final = frozenset({MOTION_KEYPOINTS, MOTION_SPARSE_TRAJECTORIES, MOTION_ENCODED_VIDEO})
 
 
 # --------------------------------------------------------------------------

@@ -94,7 +94,7 @@ class TestMotionIsPerClass:
         resolved = config.default().motion.resolve(domain.profile("tennis"))
 
         assert resolved.by_class["player"] == "keypoints"
-        assert resolved.by_class["racket"] == "encoded-video"
+        assert resolved.by_class["racket"] == "sparse-trajectories"
         assert "racket" in resolved.fell_back
         assert "player" not in resolved.fell_back
 
@@ -104,9 +104,9 @@ class TestMotionIsPerClass:
             config.load({"motion": {"per_class": {"racket": "keypoints"}}})
 
     def test_an_explicit_override_the_class_supports_is_accepted(self) -> None:
-        loaded = config.load({"motion": {"per_class": {"racket": "motion-vectors"}}})
+        loaded = config.load({"motion": {"per_class": {"racket": "sparse-trajectories"}}})
         resolved = loaded.motion.resolve(loaded.profile)
-        assert resolved.by_class["racket"] == "motion-vectors"
+        assert resolved.by_class["racket"] == "sparse-trajectories"
         assert "racket" not in resolved.fell_back
 
 

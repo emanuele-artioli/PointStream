@@ -53,7 +53,7 @@ def generators() -> Registry[object]:
             capabilities=caps.appearance(
                 caps.APPEARANCE_COMPRESSED_IMAGE, caps.APPEARANCE_DIFFUSION_LATENT
             )
-            | caps.motion(caps.MOTION_VECTORS)
+            | caps.motion(caps.MOTION_SPARSE_TRAJECTORIES)
             | {caps.CAP_TEMPORAL_SEQUENCE},
             requires=frozenset({caps.CONDITION_MOTION_FIELD}),
         )
@@ -203,7 +203,7 @@ def test_upscaling_an_object_crop_is_rejected_rather_than_silently_allowed():
 
 def test_a_registered_pairing_resolves_to_the_generator_that_accepts_it():
     spec = assert_decodable(
-        caps.APPEARANCE_DIFFUSION_LATENT, caps.MOTION_VECTORS, generators()
+        caps.APPEARANCE_DIFFUSION_LATENT, caps.MOTION_SPARSE_TRAJECTORIES, generators()
     )
     assert spec.name == "mofa-trajectories"
 
@@ -223,7 +223,7 @@ def test_a_pairing_each_half_of_which_is_supported_can_still_be_undecodable():
     """The trap the check exists for: both halves are registered, but not by the
     same generator, so nothing can actually decode the combination."""
     registry = generators()
-    assert decodable_by(caps.APPEARANCE_DIFFUSION_LATENT, caps.MOTION_VECTORS, registry)
+    assert decodable_by(caps.APPEARANCE_DIFFUSION_LATENT, caps.MOTION_SPARSE_TRAJECTORIES, registry)
     assert decodable_by(caps.APPEARANCE_COMPRESSED_IMAGE, caps.MOTION_KEYPOINTS, registry)
     assert not decodable_by(
         caps.APPEARANCE_DIFFUSION_LATENT, caps.MOTION_KEYPOINTS, registry

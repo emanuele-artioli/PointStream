@@ -36,7 +36,7 @@ from src.contracts.capabilities import (
     ALL_MOTION,
     MOTION_ENCODED_VIDEO,
     MOTION_KEYPOINTS,
-    MOTION_VECTORS,
+    MOTION_SPARSE_TRAJECTORIES,
 )
 from src.contracts.errors import ConfigValueError, UnknownBackendError
 from src.contracts.keypoints import CANONICAL_HUMAN, KeypointSchema
@@ -161,7 +161,7 @@ class SalientClass:
         class-agnostic by construction, which is the point of having them.
         Keypoints need a skeleton.
         """
-        base = {MOTION_VECTORS, MOTION_ENCODED_VIDEO}
+        base = {MOTION_SPARSE_TRAJECTORIES, MOTION_ENCODED_VIDEO}
         if self.has_skeleton:
             base.add(MOTION_KEYPOINTS)
         return frozenset(base)

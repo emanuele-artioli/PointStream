@@ -54,7 +54,7 @@ from src.contracts.capabilities import (
     APPEARANCE_IMAGE_EMBEDDING,
     MOTION_ENCODED_VIDEO,
     MOTION_KEYPOINTS,
-    MOTION_VECTORS,
+    MOTION_SPARSE_TRAJECTORIES,
     NS_APPEARANCE,
     NS_MOTION,
 )
@@ -398,13 +398,10 @@ class SparseTrajectories:
             confidence channel is carried too.
         bytes_per_value: Declared quantization per scalar.
 
-    Registered under the `motion-vectors` capability value, which is the name
-    the vocabulary already uses for "class-agnostic motion field". The class is
-    named for what is actually transmitted: **sparse trajectories, never dense
-    flow**. Dense per-pixel flow costs what block motion vectors cost, so
-    transmitting it would defeat the point of the whole system; the models that
-    matter here (MOFA-Video, DragNUWA, Tora) consume sparse points and do the
-    expansion themselves.
+    Registered as `sparse-trajectories`, named for what is actually transmitted.
+    Dense per-pixel flow costs what block motion vectors cost, so transmitting it
+    would defeat the point of the whole system; the models that matter here
+    consume sparse points and do the expansion to dense motion themselves.
     """
 
     point_count: int
@@ -437,7 +434,7 @@ class SparseTrajectories:
 
     @property
     def kind(self) -> str:
-        return MOTION_VECTORS
+        return MOTION_SPARSE_TRAJECTORIES
 
     def cost(self) -> WireCost:
         values = self.point_count * self.values_per_point
@@ -1185,6 +1182,6 @@ APPEARANCE_TYPES: Final[Mapping[str, type[Any]]] = {
 
 MOTION_TYPES: Final[Mapping[str, type[Any]]] = {
     MOTION_KEYPOINTS: KeypointMotion,
-    MOTION_VECTORS: SparseTrajectories,
+    MOTION_SPARSE_TRAJECTORIES: SparseTrajectories,
     MOTION_ENCODED_VIDEO: EncodedVideoMotion,
 }

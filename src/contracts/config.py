@@ -33,7 +33,7 @@ from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any
 
-from src.contracts import codecs, keypoints, metrics
+from src.contracts import capabilities, codecs, keypoints, metrics
 from src.contracts import domain as domains
 from src.contracts import lattice as stages
 from src.contracts.errors import (
@@ -104,11 +104,11 @@ class MotionConfig:
     system-wide `keypoints` setting is not expressible — the player can carry
     keypoints and the racket cannot, in the same run.
 
-    `representation` is the preference. A class that cannot carry it falls back
-    to the class-agnostic default, and `resolve` reports that it did rather than
-    quietly substituting: a silent fallback here would mean a stream carrying an
-    empty motion representation, which reads as a quality loss rather than as a
-    misconfiguration.
+    `representation` is the preference. A class that cannot carry it takes the
+    best option it can from `FALLBACK_ORDER`, and `resolve` reports that it did
+    rather than quietly substituting: a silent fallback would mean a stream
+    carrying a different representation than the one requested, and a number
+    measured under it is not comparable with one measured under the request.
     """
 
     representation: str = "keypoints"
@@ -116,10 +116,20 @@ class MotionConfig:
     max_points: int = 64
     """Trajectory count, for the sparse-trajectory representation."""
 
-    #: What a class carries when it cannot carry the preferred representation.
-    #: Encoded video is class-agnostic by construction, which is why it is the
-    #: floor rather than a special case.
-    FALLBACK = "encoded-video"
+    #: What a class falls back to, best first, when it cannot carry the
+    #: preferred representation.
+    #:
+    #: Sparse trajectories come before encoded video deliberately. Both are
+    #: class-agnostic, but trajectories are the cheap semantic option — a
+    #: skeleton's worth of points, expanded to dense motion by the decoder —
+    #: while encoding the object crop as a literal video is the classical answer
+    #: this system is trying to beat. A racket with no skeleton should still get
+    #: the semantic treatment; dropping it straight to encoded video would
+    #: concede the comparison before running it.
+    FALLBACK_ORDER: tuple[str, ...] = (
+        capabilities.MOTION_SPARSE_TRAJECTORIES,
+        capabilities.MOTION_ENCODED_VIDEO,
+    )
 
     def resolve(self, profile: domains.DomainProfile) -> MotionResolution:
         """Work out what each salient class actually carries, and why."""
@@ -130,10 +140,22 @@ class MotionConfig:
             if override is not None:
                 chosen[salient.name] = override
                 continue
-            if self.representation in salient.supported_motion():
+            supported = salient.supported_motion()
+            if self.representation in supported:
                 chosen[salient.name] = self.representation
                 continue
-            chosen[salient.name] = self.FALLBACK
+            substitute = next(
+                (option for option in self.FALLBACK_ORDER if option in supported),
+                None,
+            )
+            if substitute is None:
+                raise ConfigValueError(
+                    f"motion.per_class.{salient.name}",
+                    f"class {salient.name!r} supports no motion representation this "
+                    f"system can fall back to. It supports {sorted(supported)}; the "
+                    f"fallback order is {list(self.FALLBACK_ORDER)}.",
+                )
+            chosen[salient.name] = substitute
             fell_back.append(salient.name)
         return MotionResolution(by_class=chosen, fell_back=tuple(fell_back))
 

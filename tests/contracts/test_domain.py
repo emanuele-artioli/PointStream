@@ -5,7 +5,7 @@ import pytest
 from src.contracts.capabilities import (
     MOTION_ENCODED_VIDEO,
     MOTION_KEYPOINTS,
-    MOTION_VECTORS,
+    MOTION_SPARSE_TRAJECTORIES,
 )
 from src.contracts.domain import (
     ALL_BACKGROUND_METHODS,
@@ -137,14 +137,14 @@ def test_keypoints_on_a_class_with_no_skeleton_are_rejected():
         TENNIS.assert_motion_supported("racket", MOTION_KEYPOINTS)
     message = str(excinfo.value)
     assert "no skeleton" in message
-    assert MOTION_VECTORS in message and MOTION_ENCODED_VIDEO in message
+    assert MOTION_SPARSE_TRAJECTORIES in message and MOTION_ENCODED_VIDEO in message
 
 
 def test_class_agnostic_representations_apply_to_everything():
     """This is what makes skeleton-less objects a configuration rather than a
     separate design."""
     for name in TENNIS.class_names:
-        TENNIS.assert_motion_supported(name, MOTION_VECTORS)
+        TENNIS.assert_motion_supported(name, MOTION_SPARSE_TRAJECTORIES)
         TENNIS.assert_motion_supported(name, MOTION_ENCODED_VIDEO)
 
 
@@ -152,7 +152,7 @@ def test_all_three_representations_apply_to_humans():
     """Which is what gives the paper its controlled comparison, on identical
     objects with identical appearance."""
     supported = TENNIS.class_of("player").supported_motion()
-    assert supported == {MOTION_KEYPOINTS, MOTION_VECTORS, MOTION_ENCODED_VIDEO}
+    assert supported == {MOTION_KEYPOINTS, MOTION_SPARSE_TRAJECTORIES, MOTION_ENCODED_VIDEO}
 
 
 def test_a_motion_kind_outside_the_vocabulary_is_named_as_such():

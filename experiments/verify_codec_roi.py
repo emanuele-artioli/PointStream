@@ -16,24 +16,31 @@ QP, so under any rate control free to move that base the offsets stop meaning
 anything fixed. It is also the matched-rate discipline the codec contract
 enforces — the baseline here differs from the ROI arm in exactly one thing.
 
-**Measured on SVT-AV1 1.8.0, 2026-08-21: the map works and is precisely
-localized.** Holding the outside offset at zero and setting the inside to -30
-moved the mapped region +0.35 dB and left the rest at 39.17 dB — unchanged to two
-decimals — while spending more bytes. The mirror test (inside 0, outside +30) cost
-the outside 0.91 dB and left the inside alone. Bits go where the map says and
-nowhere else.
+**What this currently establishes, and what it does not.** On SVT-AV1 1.8.0 the
+map is *precisely localized*: a -30 offset over a centred region with zero
+elsewhere moved that region +0.35 dB and left the rest unchanged to two decimals.
+Bits go where the map says and nowhere else.
 
-Two things that cost an hour to learn, recorded so they do not have to be learned
-again:
+**It does not establish that region control is worth anything**, because both
+arms were encoded at matched **QP**, and the region arm therefore also spent more
+bytes (31374 against 31374 -> 32341). More bits buying more quality is not a
+result. The claim that matters is quality *redistribution at equal bitrate*:
+binary-search the base QP until both arms land on the same byte count, then ask
+whether the region gained at the background's expense. That is unimplemented —
+see `--match-bitrate`, which is the next thing this script needs.
+
+This is the same trap that invalidated a prior project's region-of-interest
+table, where fixed-QP region arms were compared against target-bitrate baselines
+on an encoder that overshoots its target by 30-45%.
+
+Two reproducibility notes worth keeping:
 
 **Offsets are in q_index units, not QP units.** AV1's q_index runs 0-255 against
 SVT-AV1's `--qp` 0-63, so an offset of -30 is about -7.5 QP steps, not -30. A
 prediction made in QP units overestimates the effect roughly fourfold.
 
 **Very large offsets are not simply stronger.** At -120/+60 the differentiation
-between regions *shrank* rather than grew, and both regions lost quality. Stay in
-the moderate range where behaviour is monotonic; if a bigger effect is needed,
-move the base QP rather than the offsets.
+between regions *shrank* rather than grew, and both regions lost quality.
 
 Run:
     python -m experiments.verify_codec_roi --codec av1
@@ -218,11 +225,11 @@ def extract_source(source: Path, target: Path, *, width: int, height: int, frame
 def encoder_version(encoder: str) -> str:
     """The encoder's self-reported version.
 
-    Recorded in the report because it decides the answer. This host carries two
-    SVT-AV1 builds — 1.8.0 in `/opt/local/bin` and 1.4.1 inside the conda
-    environment, which shadows it — and only the newer one has `--roi-map-file`
-    at all. Testing the wrong one yields "ROI does not work" for a reason that
-    has nothing to do with ROI.
+    Recorded in the report because it decides the answer. `--roi-map-file` only
+    exists from SVT-AV1 1.8; an older build rejects the flag outright, which
+    reads as "region control does not work" for a reason unrelated to region
+    control. This host briefly carried two builds, the older one shadowing the
+    newer inside the conda environment.
     """
     result = subprocess.run([encoder, "--version"], capture_output=True, text=True, check=False)
     return (result.stdout or result.stderr).splitlines()[0].strip()
@@ -348,7 +355,11 @@ def verdict(
     outside_ok, outside_note = judge(outside_offset, outside_change, "outside")
 
     if inside_ok and outside_ok:
-        return True, f"WORKS — {inside_note}; {outside_note}."
+        return True, (
+            f"LOCALIZED — {inside_note}; {outside_note}. "
+            f"Note this is at matched QP, so it does not yet show that region "
+            f"control pays: compare at matched bitrate for that."
+        )
     if (
         abs(inside_change) < WORKS_THRESHOLD_DB
         and abs(outside_change) < WORKS_THRESHOLD_DB
@@ -380,12 +391,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--aq-mode", type=int, default=None, help="SVT-AV1 docs tie ROI to aq-mode 1.")
     parser.add_argument(
         "--encoder-bin",
-        default="/opt/local/bin/SvtAv1EncApp",
-        help=(
-            "Explicit encoder path. Defaults to the system build rather than whatever "
-            "is first on PATH, because the conda environment shadows it with an older "
-            "SVT-AV1 that has no --roi-map-file."
-        ),
+        default="SvtAv1EncApp",
+        help="Encoder to drive. Its version is recorded in the report.",
     )
     parser.add_argument("--out", type=Path, default=None, help="Where to write report.json.")
     args = parser.parse_args(argv)
