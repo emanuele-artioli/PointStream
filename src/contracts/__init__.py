@@ -13,6 +13,14 @@ without the runtime dependencies of the backends themselves installed.
 
 from __future__ import annotations
 
+from src.contracts.codecs import CodecCapabilities, EncodeRequest, RateControl
+from src.contracts.conditioning import (
+    ConditioningBundle,
+    ConditioningPlan,
+    GenerationParams,
+)
+from src.contracts.config import PointstreamConfig, load, parse, validate
+from src.contracts.domain import CameraMotion, DomainProfile, SalientClass
 from src.contracts.errors import (
     CodecConstraintError,
     ConfigError,
@@ -26,20 +34,39 @@ from src.contracts.errors import (
     UnknownBackendError,
     UnsupportedCapabilityError,
 )
+from src.contracts.keypoints import KeypointSchema
+from src.contracts.lattice import StageLattice
+from src.contracts.metrics import MetricSpec
 from src.contracts.registry import BackendSpec, Registry
 
 __all__ = [
     "BackendSpec",
+    "CameraMotion",
+    "CodecCapabilities",
     "CodecConstraintError",
+    "ConditioningBundle",
+    "ConditioningPlan",
     "ConfigError",
     "ConfigKeyError",
     "ConfigValueError",
     "ContractError",
+    "DomainProfile",
     "DuplicateBackendError",
+    "EncodeRequest",
+    "GenerationParams",
+    "KeypointSchema",
     "LayerViolationError",
+    "MetricSpec",
     "MissingConditioningError",
+    "PointstreamConfig",
+    "RateControl",
     "Registry",
+    "SalientClass",
+    "StageLattice",
     "UndecodableStreamError",
     "UnknownBackendError",
     "UnsupportedCapabilityError",
+    "load",
+    "parse",
+    "validate",
 ]
