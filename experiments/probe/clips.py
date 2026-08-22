@@ -136,8 +136,13 @@ def _condition_dir(track_dir: Path, suffix: str) -> Path:
 def _optical_flow(prev_rgb: np.ndarray, next_rgb: np.ndarray) -> np.ndarray:
     import cv2
 
+    nxt_rgb = next_rgb
+    if nxt_rgb.shape[:2] != prev_rgb.shape[:2]:
+        nxt_rgb = cv2.resize(
+            nxt_rgb, (prev_rgb.shape[1], prev_rgb.shape[0]), interpolation=cv2.INTER_LINEAR
+        )
     prev = cv2.cvtColor(prev_rgb, cv2.COLOR_RGB2GRAY)
-    nxt = cv2.cvtColor(next_rgb, cv2.COLOR_RGB2GRAY)
+    nxt = cv2.cvtColor(nxt_rgb, cv2.COLOR_RGB2GRAY)
     seed_flow = np.zeros((*prev.shape, 2), dtype=np.float32)
     flow = cv2.calcOpticalFlowFarneback(prev, nxt, seed_flow, 0.5, 3, 15, 3, 5, 1.2, 0)
     return np.transpose(np.asarray(flow, dtype=np.float32), (2, 0, 1))

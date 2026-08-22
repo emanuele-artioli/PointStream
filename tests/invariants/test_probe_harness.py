@@ -104,7 +104,16 @@ def test_frame_index_out_of_range_is_an_index_error(tmp_path: Path) -> None:
         load_frame(clips[0], 2)
 
 
-def test_mismatched_channel_counts_are_refused(tmp_path: Path) -> None:
+def test_optical_flow_accepts_a_neighbor_with_a_different_crop_size(tmp_path: Path) -> None:
+    """Player crops change size frame to frame; Farneback cannot see that."""
+    root = _tiny_probe_set(tmp_path, n_frames=2)
+    crop_dir = root / "clips" / TRAINING_SPLIT_VIDEOS[0] / "scene_001" / "track_0001"
+    other = np.zeros((40, 20, 4), dtype=np.uint8)
+    other[5:35, 5:15, :3] = 90
+    other[5:35, 5:15, 3] = 255
+    _write_png(crop_dir / "frame_000001.png", other)
+    frame = load_frame(list_clips(root)[0], 0)
+    assert frame.motion_field.shape == (2, 32, 16)
     root = _tiny_probe_set(tmp_path, n_frames=2)
     extra = root / "clips" / TRAINING_SPLIT_VIDEOS[0] / "scene_001" / "track_0001_skeleton"
     _write_png(extra / "frame_000002.png", np.zeros((32, 16, 3), dtype=np.uint8))
