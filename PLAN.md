@@ -29,7 +29,8 @@ Target: **ACM TOMM, September 30.**
 |---|---|---|
 | A — contracts and concepts | ✅ done | — |
 | B — components | ✅ **done** | Merged-ready on `phase-b/integrate` (still unmerged to main) |
-| **B′ — the engine roster** | Wave 1 ✅ | Wave 2 is `BP5` — not started; see §2.1 |
+| **B′ — the engine roster** | Wave 1 ✅ | `BP7` merges and fixes pose alignment, then Wave 2 |
+| C — pipeline and runner | ⬜ | `C1`/`C2` can start with Wave 2; `C3` after both |
 | C — pipeline and runner | ⬜ | Blocked on B′ |
 | D — experiments layer | ⬜ | Blocked on C |
 | E — experiments and paper | ⬜ | Ordered by §7 |

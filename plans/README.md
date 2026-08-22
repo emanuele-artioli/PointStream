@@ -83,14 +83,29 @@ _add(
 )
 ```
 
-### Wave 2
+### Wave 1.5 — integration, sequential
+
+| Brief | What |
+|---|---|
+| `BP7-merge-and-align.md` | Fix the pose alignment, re-run BP3's numbers, merge the four branches, apply the registry entries |
+
+**Not parallel.** It touches every Wave-1 branch and the shared registry. It also
+fixes a live fault: 5 of 12 probe clips have colour frames and no skeleton
+(`PLAN.md` §2.3), so Wave 2 cannot rank engines until it lands.
+
+### Wave 2 — four parallel streams
 
 | Brief | Depends on | Owns |
 |---|---|---|
-| `BP5-roster-decision.md` | all of Wave 1 | the probe harness, the invariants, the roster |
+| `BP5-roster-decision.md` | `BP7` | the probe harness, the invariants, the roster |
+| `C1-reconstruction-residual.md` | `BP7` merge only | reconstruction, the residual spectrum |
+| `C2-encoder-pipeline.md` | `BP7` merge only | the stage DAG, the encoder |
+| `D-cleanups.md` | nothing | mypy in tests, the AVC region arm |
+
+`C1` and `C2` do not depend on the roster — they are pipeline structure, and
+which generator wins does not change them. `C3` (the runner) waits for both.
 
 ### Also live
-
 | File | What |
 |---|---|
 | `DEFERRED.md` | Real work deliberately not now: mypy in tests, SAM3, the AVC region arm, MOFA |
