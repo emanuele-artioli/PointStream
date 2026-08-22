@@ -518,6 +518,7 @@ def validate_backends(
     config: PointstreamConfig,
     *,
     generators: Any = None,
+    registries: Mapping[str, Any] | None = None,
 ) -> None:
     """The pass that needs the component registries.
 
@@ -529,26 +530,68 @@ def validate_backends(
         config: An already-`validate`d document.
         generators: The generator registry, when available. Without it the
             appearance/motion pairing cannot be checked, and is skipped.
+        registries: Optional mapping of axis name -> Registry. When given,
+            every named backend on that axis is checked to exist. Axes whose
+            registry is omitted are skipped, so streams can wire one axis at
+            a time. A backend of ``""`` or ``"none"`` is treated as unset.
 
     Raises:
         ConfigError: With one entry per problem.
         UndecodableStreamError: If no registered generator accepts the chosen
             appearance and motion representations together.
     """
-    if generators is None:
-        return
+    problems: list[ContractError] = []
 
-    from src.contracts import objectstream
+    if registries:
+        named = {
+            "detector": config.detector.backend,
+            "selection": config.selection.backend,
+            "tracking": config.tracking.backend,
+            "pose": config.pose.backend,
+            "segmenter": config.segmenter.backend,
+            "generator": config.generator.resolved_name,
+            "rigid": config.rigid.backend,
+            "transport": config.transport,
+            "codec": config.fallback.codec,
+            "domain": config.domain,
+            "background": config.background.method,
+            "appearance": config.appearance.representation,
+            "motion": config.motion.representation,
+        }
+        for axis, registry in registries.items():
+            name = named.get(axis)
+            if name in (None, "", "none"):
+                continue
+            try:
+                registry.spec(name)
+            except ContractError as exc:
+                problems.append(exc)
+        if config.evaluation.metrics and "metric" in registries:
+            for metric_name in config.evaluation.metrics:
+                try:
+                    registries["metric"].spec(metric_name)
+                except ContractError as exc:
+                    problems.append(exc)
 
-    # Every representation actually in play, not just the preferred one: a class
-    # that fell back to encoded video still needs something able to decode it.
-    resolution = config.motion.resolve(config.profile)
-    wanted = {config.motion.representation, *resolution.by_class.values()}
+    if generators is not None:
+        from src.contracts import objectstream
 
-    for motion in sorted(wanted):
-        objectstream.assert_decodable(
-            config.appearance.representation, motion, generators
-        )
+        # Every representation actually in play, not just the preferred one: a
+        # class that fell back to encoded video still needs something able to
+        # decode it.
+        resolution = config.motion.resolve(config.profile)
+        wanted = {config.motion.representation, *resolution.by_class.values()}
+
+        for motion in sorted(wanted):
+            try:
+                objectstream.assert_decodable(
+                    config.appearance.representation, motion, generators
+                )
+            except ContractError as exc:
+                problems.append(exc)
+
+    if problems:
+        raise ConfigError(problems)
 
 
 def load(data: Mapping[str, Any]) -> PointstreamConfig:
