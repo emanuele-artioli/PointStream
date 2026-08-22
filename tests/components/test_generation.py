@@ -107,12 +107,13 @@ def test_no_registered_generator_accepts_conditioning_as_a_later_positional():
             )
 
 
-def test_calling_generate_with_seed_as_a_positional_argument_is_a_typeerror():
+def test_calling_generate_with_seed_as_a_positional_argument_is_a_typeerror() -> None:
     gen = UpscaleRefineGenerator()
     bundle = ConditioningBundle(appearance=_checker())
     params = GenerationParams(width=32, height=32)
+    generate = getattr(gen, "generate")
     with pytest.raises(TypeError):
-        gen.generate(bundle, 0, "cpu", params)  # type: ignore[misc]
+        generate(bundle, 0, "cpu", params)
 
 
 def test_temporal_capability_is_read_from_the_declaration_not_from_class_identity():
