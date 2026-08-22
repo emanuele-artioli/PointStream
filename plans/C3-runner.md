@@ -68,6 +68,24 @@ editing C1 now.
 in contracts. This stream does not grow a third copy: always go through
 `Encoder.build` and pass the generator's `requires`.
 
+## Review (2026-08-22) — three decisions, then implement
+
+1. **Encoder-side generation wraps C1 `dispatch`.** The DAG `generation`
+   callable calls `dispatch` with the same `GeneratorRef` client-side
+   `reconstruct` uses, so residual can consume `ART_GENERATED_FRAMES`. Do not
+   construct a second generator. Generation off: no `GeneratorRef`, no
+   construct, residual absorbs the subjects.
+2. **Leave `assert_coherent` in contracts.** Do not call it from
+   `config.validate()` in this stream. C3 only passes `GeneratorRef.requires`
+   into `Encoder.build`.
+3. **Keep both quality views; do not collapse them.** `reconstruct()` scores
+   reconstruction vs source (`QualityReport`) — always. DAG `STAGE_METRICS`
+   scores the *delivered* payload (`ART_DELIVERED` → `ART_QUALITY`) — also
+   always, because metrics is a required stage. They answer different
+   questions. A run missing either is a failed run. The returned record
+   carries the `QualityReport` and the bag's `ART_QUALITY`; C1's report is
+   not a substitute for the metrics stage.
+
 ## Traps specific to this stream
 
 **Two accountings.** The pre-rewrite tree split size ledgers. One
