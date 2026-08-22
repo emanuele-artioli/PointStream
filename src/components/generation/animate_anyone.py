@@ -170,21 +170,31 @@ class AnimateAnyoneGenerator(BaseFrameGenerator):
     def _prepare(
         self, conditioning: ConditioningBundle, params: GenerationParams
     ) -> dict[str, Any]:
+        """Letterbox appearance and pose independently onto the same canvas.
+
+        The coding task feeds a keyframe as appearance and a *later* pose.
+        Those crops have different sizes on every probe clip. Resizing the
+        pose onto the appearance canvas (the previous path) puts the skeleton
+        in the keyframe's geometry and then scores against the later frame's
+        geometry — the model never sees a pose that matches the target.
+
+        Each image keeps its own aspect and is fitted with ``fit_to_canvas``.
+        Same-size inputs (self-reconstruction) still share one layout.
+        """
         canvas_width, canvas_height = self.canvas_size(params)
         appearance = as_hwc(conditioning.appearance)
         src_h, src_w = appearance.shape[:2]
-        box = letterbox_from_bbox(
+        appearance_box = letterbox_from_bbox(
             conditioning.bbox, src_w, src_h, canvas_width, canvas_height
         )
         pose = as_hwc(conditioning.pose)
-        if pose.shape[:2] != (src_h, src_w):
-            import cv2
-
-            pose = cv2.resize(pose, (src_w, src_h), interpolation=cv2.INTER_NEAREST)
+        pose_h, pose_w = pose.shape[:2]
+        pose_box = letterbox_from_bbox(None, pose_w, pose_h, canvas_width, canvas_height)
         return {
-            "appearance": letterbox_image(appearance, box),
-            "pose": letterbox_image(pose, box),
-            "letterbox": box,
+            "appearance": letterbox_image(appearance, appearance_box),
+            "pose": letterbox_image(pose, pose_box),
+            "letterbox": appearance_box,
+            "pose_letterbox": pose_box,
             "caveat": TENNIS_MATCH_FINETUNE_CAVEAT,
         }
 
@@ -212,25 +222,35 @@ class AnimateAnyoneGenerator(BaseFrameGenerator):
         _reset_cuda_peak(resolved_device)
         started = time.perf_counter()
         pipeline = self._load_pipeline(device)
-        reference = Image.fromarray(prepared[0]["appearance"][..., :3])
-        pose_images = [Image.fromarray(item["pose"][..., :3]) for item in prepared]
+        reference_rgb = prepared[0]["appearance"][..., :3]
+        pose_rgb = [item["pose"][..., :3] for item in prepared]
+        reference = Image.fromarray(reference_rgb)
+        pose_images = [Image.fromarray(item) for item in pose_rgb]
+        feed = _reference_feed_stats(reference_rgb, pose_rgb[0])
+        ref_unet_probe = _install_reference_unet_probe(pipeline)
+        restore_unet = ref_unet_probe.pop("_restore", None)
 
         import torch
 
-        generator = torch.Generator(device=resolved_device).manual_seed(int(seed))
-        with torch.no_grad():
-            output = pipeline(
-                reference,
-                pose_images,
-                width,
-                height,
-                len(pose_images),
-                int(steps),
-                float(guidance),
-                generator=generator,
-            ).videos
+        try:
+            generator = torch.Generator(device=resolved_device).manual_seed(int(seed))
+            with torch.no_grad():
+                output = pipeline(
+                    reference,
+                    pose_images,
+                    width,
+                    height,
+                    len(pose_images),
+                    int(steps),
+                    float(guidance),
+                    generator=generator,
+                ).videos
+        finally:
+            if restore_unet is not None:
+                restore_unet()
         wall_s = time.perf_counter() - started
         frames = _videos_to_chw(output)
+        scheduler_info = _scheduler_info(pipeline)
         self.last_run = {
             "wall_s": wall_s,
             "peak_vram_bytes": (
@@ -242,8 +262,14 @@ class AnimateAnyoneGenerator(BaseFrameGenerator):
             "width": width,
             "height": height,
             "steps": int(steps),
+            "guidance": float(guidance),
             "caveat": TENNIS_MATCH_FINETUNE_CAVEAT,
             "checkpoint": str(resolve_checkpoint(self.checkpoint)),
+            "scheduler": scheduler_info,
+            "reference_feed": feed,
+            "reference_unet": ref_unet_probe,
+            "appearance_letterbox": _letterbox_info(prepared[0]["letterbox"]),
+            "pose_letterbox": _letterbox_info(prepared[0]["pose_letterbox"]),
         }
         if len(frames) != len(conditioning):
             raise RuntimeError(
@@ -372,6 +398,81 @@ def _cuda_peak_bytes(device: str) -> int:
     if not str(device).startswith("cuda") or not torch.cuda.is_available():
         return 0
     return int(torch.cuda.max_memory_allocated(_cuda_index(device)))
+
+
+def _letterbox_info(box: Any) -> dict[str, Any]:
+    return {
+        "source_width": int(box.source_width),
+        "source_height": int(box.source_height),
+        "scaled_width": int(box.scaled_width),
+        "scaled_height": int(box.scaled_height),
+        "offset_x": int(box.offset_x),
+        "offset_y": int(box.offset_y),
+        "scale": float(box.scale),
+    }
+
+
+def _reference_feed_stats(reference_rgb: np.ndarray, pose_rgb: np.ndarray) -> dict[str, Any]:
+    """What the pipeline is about to be handed, before any model call."""
+    ref = np.asarray(reference_rgb)
+    pose = np.asarray(pose_rgb)
+    return {
+        "reference_mean": float(ref.mean()),
+        "reference_max": int(ref.max()) if ref.size else 0,
+        "pose_mean": float(pose.mean()),
+        "pose_max": int(pose.max()) if pose.size else 0,
+        "reference_equals_pose": bool(ref.shape == pose.shape and np.array_equal(ref, pose)),
+        "reference_is_blank": bool(ref.size == 0 or int(ref.max()) == 0),
+        "pose_is_blank": bool(pose.size == 0 or int(pose.max()) == 0),
+        "reference_shape": [int(n) for n in ref.shape],
+        "pose_shape": [int(n) for n in pose.shape],
+    }
+
+
+def _scheduler_info(pipeline: Any) -> dict[str, Any]:
+    scheduler = getattr(pipeline, "scheduler", None)
+    if scheduler is None:
+        return {"class": None}
+    config = getattr(scheduler, "config", scheduler)
+    return {
+        "class": type(scheduler).__name__,
+        "prediction_type": getattr(config, "prediction_type", None),
+        "timestep_spacing": getattr(config, "timestep_spacing", None),
+        "rescale_betas_zero_snr": getattr(config, "rescale_betas_zero_snr", None),
+        "steps_offset": getattr(config, "steps_offset", None),
+        "beta_schedule": getattr(config, "beta_schedule", None),
+        "clip_sample": getattr(config, "clip_sample", None),
+    }
+
+
+def _install_reference_unet_probe(pipeline: Any) -> dict[str, Any]:
+    """Record that ReferenceNet saw a non-zero latent, then restore the forward.
+
+    A blank or dropped reference shows up as a near-zero latent. We hook one
+    forward, not the training loop — this is a feed check, not a tuner.
+    """
+    unet = getattr(pipeline, "reference_unet", None)
+    captured: dict[str, Any] = {"called": False}
+    if unet is None or not callable(getattr(unet, "forward", None)):
+        captured["error"] = "reference_unet missing"
+        return captured
+    original = unet.forward
+
+    def _probed(*args: Any, **kwargs: Any) -> Any:
+        sample = kwargs.get("sample", args[0] if args else None)
+        captured["called"] = True
+        if sample is not None:
+            import torch
+
+            tensor = sample.detach() if isinstance(sample, torch.Tensor) else torch.as_tensor(sample)
+            captured["sample_shape"] = [int(n) for n in tensor.shape]
+            captured["sample_abs_mean"] = float(tensor.float().abs().mean().cpu())
+            captured["sample_is_zero"] = bool(float(tensor.float().abs().max().cpu()) == 0.0)
+        return original(*args, **kwargs)
+
+    unet.forward = _probed
+    captured["_restore"] = lambda: setattr(unet, "forward", original)
+    return captured
 
 
 def _videos_to_chw(video_tensor: Any) -> list[np.ndarray]:
