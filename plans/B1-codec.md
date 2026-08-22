@@ -69,3 +69,27 @@ uncomparable.
 - Encoder path and version appear in the run record.
 - Matched-bitrate region comparison runs and reports redistribution.
 - `ruff`, `mypy`, and the stream's tests pass; import direction clean.
+
+---
+
+## Delivered — 2026-08-22
+
+Landed in `src/components/codec/`: `backend.py`, `command.py`, `encode.py`,
+`roi.py`, `tools.py`, `y4m.py`. All four rungs registered (`avc`, `hevc`, `av1`,
+`vvc`), all four construct.
+
+**Gate passed, verified by driving it:** an `av1` request with `pix_fmt=yuv444p`
+raises `CodecConstraintError` naming the supported format, instead of silently
+emitting yuv420p. `yuv420p` builds a real `SvtAv1EncApp` argv.
+
+**Region control per rung** is recorded in `roi.py`: native delta-QP for AV1
+(`--roi-map-file`, 64x64 superblocks, q_index units) and HEVC (kvazaar `--roi`,
+signed 8-bit CTU offsets); pixel-domain in-house arm for VVC (no region map at
+all) and AVC (ffmpeg `addroi` unverified).
+
+**Empirically grounded, and worth keeping:** AV1 offsets past about −120 / +60
+make the regions *converge* and both lose quality. Measured on SVT-AV1 1.8 and
+encoded as `AV1_OFFSET_MIN` / `AV1_OFFSET_MAX`. A ROI table built outside those
+bounds is not a result.
+
+**Outstanding:** the AVC `addroi` arm is still unverified against a real encode.

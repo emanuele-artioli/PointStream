@@ -56,3 +56,37 @@ for reasons that have nothing to do with correctness.
 - BD-rate is computed from curves, reports its quality-overlap range, and refuses
   to return a number when the curves barely overlap.
 - `ruff`, `mypy`, tests pass; import direction clean.
+
+---
+
+## Delivered — 2026-08-22 — and this stream closed the standing blocker
+
+Landed in `src/components/metrics/`. **All five metrics compute real numbers**,
+verified by scoring identical against degraded frames rather than by reading the
+code:
+
+| Metric | identical | degraded |
+|---|---|---|
+| PSNR | `inf` | 22.53 dB |
+| SSIM | 1.0 | 0.9885 |
+| VMAF | 97.43 | 28.93 |
+| LPIPS | 0.0 | 0.00108 |
+| FVMD | correctly refuses T=1 — it is a temporal metric | — |
+
+VMAF runs through real libvmaf. This closes the blocker that had stood since
+July, when no configuration produced a quality number at all.
+
+**BD-rate landed** in `bd_rate.py` with the pieces `PLAN.md` §5 requires:
+`compare_rd_curves`, `RDCurve`, `OperatingPoint`, `MIN_OVERLAP_FRACTION`,
+`MIN_POINTS`, and an explicit `InsufficientOverlapError` — so a comparison over
+a sliver of shared quality raises rather than quietly returning a number.
+
+**Note on the VMAF reading:** 97.4 rather than 100.0 on identical 64x64 synthetic
+frames is expected — the VMAF model is trained on 1080p content and is not exact
+at tiny synthetic resolutions. It is not evidence of a wiring fault. Re-check on
+real frames at real resolution before treating any deviation as a bug.
+
+**Outstanding:** LPIPS is wired into the metrics registry, but the claim that
+matters — LPIPS on the *pipeline* evaluation path — cannot be verified until
+Phase C exists. That gap has been mis-reported as closed twice before; it is not
+closed yet.

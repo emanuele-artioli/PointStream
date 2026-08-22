@@ -74,3 +74,34 @@ non-commercial-leaning terms.
   validation with the workable pairings named.
 - `config.validate_backends` is wired for this axis.
 - `ruff`, `mypy`, tests pass; import direction clean.
+
+---
+
+## Delivered — 2026-08-22, and the gap that remains
+
+**The contracts work landed and is good.** `ConditioningBundle` replaces the
+overloaded `dense_dwpose_tensor` parameter: every input has its own typed
+optional field and `require()` fails by name at the call site. Temporal
+capability is read from a registry declaration, never from `isinstance`. An
+appearance/motion pair no generator accepts is rejected at config validation
+with the workable pairings named. Ten generators registered; appearance
+(`compressed-image`, `diffusion-latent`, `image-embedding`) and motion
+(`keypoints`, `sparse-trajectories`, `encoded-video`) axes complete.
+
+### ⚠️ No generator can load weights
+
+Every `_load_model` and `_load_pipeline` in this package is an unconditional
+`raise RuntimeError(...has no pipeline loaded...)`. Driving all ten:
+**`upscale-refine` produces pixels; the other nine refuse.** The tests pass
+because they inject a `_FakePipe`, and the one `@pytest.mark.integration` test
+asserts only that a checkpoint *path was recorded*.
+
+The weights are on disk, unused: `assets/weights/pose-controlnet` (10 fine-tuned
+epochs), `seg-controlnet` (7), `ip-adapter-controlnet` (10), full
+`stable-diffusion-v1-5`, `pix2pix_generator.pt`,
+`spade4tennis_lite_generator.pt`.
+
+This is the socket built with nothing plugged into it. Closing it is **Phase B′**
+— see `PLAN.md` §6 and `plans/BP-engine-roster.md`. That brief, not this one,
+owns the work; this section exists so nobody re-reads B3 and concludes generation
+is finished.

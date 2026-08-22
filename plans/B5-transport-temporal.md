@@ -43,3 +43,11 @@ prior art to read, not as a working foundation.
 - All three sparsity levels are selectable and compose.
 - A reduced temporal setting is genuinely cheaper to encode, not just nominally.
 - `ruff`, `mypy`, tests pass; import direction clean.
+
+---
+
+## Delivered — 2026-08-22
+
+Landed in `src/components/transport/` (`disk.py`, `medium.py`, `payload.py`,
+`serialize.py`) and `src/components/temporal/policy.py`. All backends construct.
+The smallest stream by volume (~1.0k lines source), which matches its scope.

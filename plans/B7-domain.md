@@ -53,3 +53,12 @@ comes later and is not this stream's job.
   message.
 - Minimal datasets for both profiles exist and a run completes on each.
 - `ruff`, `mypy`, tests pass; import direction clean.
+
+---
+
+## Delivered — 2026-08-22
+
+Landed in `src/components/domain/`: `profiles.py` plus `datasets/catalog.py`,
+`tennis.yaml`, `general.yaml`. Both profiles register and construct, and both
+carry their constraint — `general` records that a free-moving camera makes a
+panorama background invalid, rather than merely less accurate.

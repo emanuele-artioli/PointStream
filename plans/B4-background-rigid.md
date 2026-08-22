@@ -42,3 +42,17 @@ enforces this, and an explicit override that violates it is rejected.
 - Both rigid strategies are switchable off, and the payload change is measurable.
 - Panorama validity is checked against the domain's camera assumption.
 - `ruff`, `mypy`, tests pass; import direction clean.
+
+---
+
+## Delivered — 2026-08-22
+
+Landed in `src/components/background/` (`plate.py`, `delta.py`, `sidecar.py`,
+`strategy.py`) and `src/components/rigid/` (`ball.py`, `racket.py`,
+`strategy.py`). Registered and constructing: background `none` /
+`panorama-full` / `panorama-delta`; rigid `none` / `tennis` / `racket-hull` /
+`ball-difference` / `ball-segmentation`.
+
+The `none` entry on both axes is a real registered backend rather than a routing
+special case, which is what the ablation lattice needs — turning the component
+off is a configuration, not a code path.

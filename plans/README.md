@@ -18,3 +18,8 @@ report rather than making it.
 | `B5-transport-temporal.md` | payload serialization, temporal policy | 15, 7 |
 | `B6-metrics.md` | quality measurement | 16 |
 | `B7-domain.md` | domain profiles | domain |
+| `BP-engine-roster.md` | **B′ — wiring generator weights, fixing the roster** | 12 |
+
+**Phase B is done.** Each `B*.md` brief now ends with a *Delivered* section
+recording what actually landed and what is still outstanding — read that before
+assuming a stream is finished. `BP-engine-roster.md` is the live one.

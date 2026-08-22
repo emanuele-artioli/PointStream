@@ -59,3 +59,23 @@ wasted payload, and payload is the ranking currency.
 - Open-vocabulary and heuristic selection are both selectable.
 - Every weight named by a shipped config resolves, checked in tests.
 - `ruff`, `mypy`, tests pass; import direction clean.
+
+---
+
+## Delivered — 2026-08-22
+
+Landed in `src/components/{scene,detection,selection,tracking,pose,segmentation}/`.
+Registered: detectors `yolo` / `sam3` / `rf-detr`, pose `yolo` (COCO-17 stored as
+canonical WholeBody-133), selection `heuristic` / `identity` / `prompt`,
+segmentation `yolo` / `sam3`, scene `hsv` / `routing`, tracking with recovery.
+
+**Two backends cannot construct, both honestly reported:**
+
+- **SAM3** — `ModuleNotFoundError: torch.nn.attention`. Torch 2.2.2 is too old.
+  This blocks `PLAN.md` §7 P1 item 10 (detector comparison including SAM3) and
+  the SAM3 segmenter with it. Needs a second conda env, which is a scoped
+  decision, not a quick fix.
+- **RF-DETR** — needs `transformers>=5.1`, this env pins 4.46.3.
+
+Both are registered and say exactly why they fail, which is the right behaviour;
+neither is usable today. YOLO26 loads and runs on GPU.
