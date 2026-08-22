@@ -271,6 +271,8 @@ def drive(
     steps: int,
     fit: str,
     engine: str,
+    checkpoint: str | None = None,
+    epoch: int | None = None,
 ) -> dict[str, Any]:
     clips = list_clips(probe_root)
     bounds_path = out_dir / "bounds.json"
@@ -286,7 +288,12 @@ def drive(
     elif engine in {"ip-adapter-controlnet", "pose-ref-controlnet"}:
         from src.components.generation import REGISTRY as GENERATORS
 
-        generator = GENERATORS.build(engine)
+        build_kwargs: dict[str, Any] = {}
+        if checkpoint:
+            build_kwargs["checkpoint"] = checkpoint
+        if epoch is not None:
+            build_kwargs["epoch"] = epoch
+        generator = GENERATORS.build(engine, **build_kwargs)
 
     started = time.perf_counter()
     last_progress = started
@@ -358,6 +365,16 @@ def drive(
                 Image.fromarray(prepared["target"]).save(dump / "target.png")
                 Image.fromarray(pred_hwc).save(dump / "generated.png")
                 Image.fromarray(prepared["appearance"]).save(dump / "static_copy.png")
+                if engine == "pose-ref-controlnet":
+                    from src.components.generation.controlnet import (
+                        compose_pose_on_appearance,
+                    )
+
+                    Image.fromarray(
+                        compose_pose_on_appearance(
+                            prepared["pose"], prepared["appearance"]
+                        )
+                    ).save(dump / "control.png")
         else:
             raise ValueError(f"unknown engine {engine!r}")
 
@@ -455,6 +472,12 @@ def main() -> None:
         default="animate-anyone",
     )
     parser.add_argument("--bounds-only", action="store_true")
+    parser.add_argument(
+        "--checkpoint",
+        default=None,
+        help="ControlNet checkpoint directory (pose-ref mid-train step dirs).",
+    )
+    parser.add_argument("--epoch", type=int, default=None)
     args = parser.parse_args()
     out_dir = args.out_dir
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -472,6 +495,8 @@ def main() -> None:
             steps=args.steps,
             fit=args.fit,
             engine=args.engine,
+            checkpoint=args.checkpoint,
+            epoch=args.epoch,
         )
     except Exception:
         log_path = out_dir / "failed.log"
