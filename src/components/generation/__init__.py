@@ -106,7 +106,12 @@ _add(
 _add(
     "ip-adapter-controlnet",
     "src.components.generation.controlnet:ControlNetGenerator",
-    summary="ControlNet + IP-Adapter. Appearance as image or embedding, pose for structure.",
+    summary=(
+        "Stock SD-1.5 + h94/IP-Adapter + stock OpenPose ControlNet. "
+        "Appearance through the adapter, pose through ControlNet. "
+        "The tennis directory named ip-adapter-controlnet is a mislabelled "
+        "segmentation ControlNet and is not loaded."
+    ),
     capabilities=(
         appearance(APPEARANCE_COMPRESSED_IMAGE, APPEARANCE_IMAGE_EMBEDDING)
         | motion(MOTION_KEYPOINTS)

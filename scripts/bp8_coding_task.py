@@ -230,6 +230,22 @@ def write_bounds(path: Path) -> dict[str, Any]:
                 "(PLAN.md §2.4)."
             ),
         },
+        "ip_adapter": {
+            "worst_db": 10.0,
+            "best_db": 28.0,
+            "alarm_low_db": 9.0,
+            "alarm_high_db": 35.0,
+            "must_beat_floor_by_db": 1.0,
+            "success_min_db": STATIC_COPY_FLOOR_DB + 1.0,
+            "basis": (
+                "Real IP-Adapter (h94/IP-Adapter) on stock SD-1.5 + stock OpenPose. "
+                "The tennis ip-adapter-controlnet directory is a mislabelled seg "
+                "ControlNet and is not this arm. A working appearance path must beat "
+                "11.82 by ~1 dB. The known txt2img floor (~11 dB) is what the "
+                "mislabeled checkpoint posted; beating the static-copy floor is the "
+                "test that appearance entered."
+            ),
+        },
         "in_domain": True,
         "in_domain_reason": (
             "Animate-Anyone fine-tune set contains alcaraz_highlights and "
@@ -256,17 +272,21 @@ def drive(
     fit: str,
     engine: str,
 ) -> dict[str, Any]:
-    from src.components.generation.animate_anyone import AnimateAnyoneGenerator
-
     clips = list_clips(probe_root)
     bounds_path = out_dir / "bounds.json"
     if not bounds_path.is_file():
         write_bounds(bounds_path)
 
     rows: list[dict[str, Any]] = []
-    generator: AnimateAnyoneGenerator | None = None
+    generator: Any = None
     if engine == "animate-anyone":
+        from src.components.generation.animate_anyone import AnimateAnyoneGenerator
+
         generator = AnimateAnyoneGenerator(width=CANVAS, height=CANVAS, steps=steps)
+    elif engine == "ip-adapter-controlnet":
+        from src.components.generation import REGISTRY as GENERATORS
+
+        generator = GENERATORS.build(engine)
 
     started = time.perf_counter()
     last_progress = started
@@ -291,11 +311,14 @@ def drive(
         if engine == "static-copy":
             row["object_psnr_db"] = static_score["object_psnr_db"]
             row["frame_psnr_db"] = static_score["frame_psnr_db"]
-        elif engine == "animate-anyone":
+        elif engine in {"animate-anyone", "ip-adapter-controlnet"}:
             assert generator is not None
+            # Independently letterboxed (or stretched) 512 canvases. Passing the
+            # raw crops would let ControlNet's shared-box prepare resize the
+            # later pose onto the keyframe canvas — the coding-task fault.
             bundle = ConditioningBundle(
-                appearance=as_chw(pair["appearance_rgb"] if fit == "letterbox" else prepared["appearance"]),
-                pose=as_chw(pair["pose_rgb"] if fit == "letterbox" else prepared["pose"]),
+                appearance=as_chw(prepared["appearance"]),
+                pose=as_chw(prepared["pose"]),
                 frame_index=TARGET,
                 object_id=pair["key"],
             )
@@ -309,7 +332,15 @@ def drive(
             wall_s = time.perf_counter() - t0
             pred_hwc = as_hwc(predicted)[..., :3]
             gen_score = score_canvases(prepared["target"], pred_hwc, prepared["mask"])
-            last_run = dict(generator.last_run)
+            last_run = dict(getattr(generator, "last_run", None) or {})
+            if not last_run:
+                last_run = {
+                    "loaded_checkpoint": getattr(generator, "loaded_checkpoint", None),
+                    "loaded_epoch": getattr(generator, "loaded_epoch", None),
+                    "variant": getattr(generator, "variant", None),
+                    "steps": steps,
+                    "ip_adapter_scale": getattr(generator, "ip_adapter_scale", None),
+                }
             row.update(
                 {
                     "object_psnr_db": gen_score["object_psnr_db"],
@@ -388,8 +419,12 @@ def drive(
         "clips": rows,
     }
     if generator is not None:
-        summary["checkpoint"] = generator.last_run.get("checkpoint")
-        summary["scheduler"] = generator.last_run.get("scheduler")
+        last = getattr(generator, "last_run", None) or {}
+        summary["checkpoint"] = last.get("checkpoint") or getattr(
+            generator, "loaded_checkpoint", None
+        )
+        summary["loaded_epoch"] = getattr(generator, "loaded_epoch", None)
+        summary["scheduler"] = last.get("scheduler")
         summary["reference_feed_first_clip"] = rows[0].get("last_run", {}).get("reference_feed")
         summary["reference_unet_first_clip"] = rows[0].get("last_run", {}).get("reference_unet")
     _write_json(out_dir / f"{engine}-{fit}.json", summary)
@@ -411,7 +446,7 @@ def main() -> None:
     parser.add_argument("--fit", choices=("letterbox", "stretch"), default="letterbox")
     parser.add_argument(
         "--engine",
-        choices=("static-copy", "animate-anyone"),
+        choices=("static-copy", "animate-anyone", "ip-adapter-controlnet"),
         default="animate-anyone",
     )
     parser.add_argument("--bounds-only", action="store_true")

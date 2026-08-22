@@ -44,17 +44,21 @@ _KNOWN = frozenset(VARIANT_REQUIRES)
 
 #: Last trained epoch of each fine-tune campaign. Hard-coded so an extra
 #: checkpoint written later cannot silently change which weights we load.
+#: ``ip-adapter`` is not here: the directory ``ip-adapter-controlnet`` is a
+#: mislabelled segmentation ControlNet (``scripts/train_controlnet.py`` line 82
+#: puts ``"ip-adapter"`` on the ``seg`` branch with ``cond_dir = None``). A
+#: real IP-Adapter is the stock SD-1.5 backbone plus ``h94/IP-Adapter`` plus
+#: stock OpenPose ControlNet — no tennis ControlNet epoch.
 FINAL_EPOCH: Final[dict[str, int]] = {
     "pose": 10,
     "seg": 7,
-    "ip-adapter": 10,
     "trajectory": 10,  # same OpenPose ControlNet as the keypoint arm
 }
 
 _CONTROLNET_DIR: Final[dict[str, str]] = {
     "pose": "pose-controlnet",
     "seg": "seg-controlnet",
-    "ip-adapter": "ip-adapter-controlnet",
+    "ip-adapter": "control_v11p_sd15_openpose",
     "trajectory": "pose-controlnet",
     "canny": "control_v11p_sd15_canny",
 }
