@@ -25,6 +25,29 @@ class SsimMetric:
         values = [_frame_ssim(ref[index], pred[index]) for index in range(ref.shape[0])]
         return float(sum(values) / len(values))
 
+    def score_masked(
+        self, reference: np.ndarray, predicted: np.ndarray, mask: np.ndarray
+    ) -> float:
+        """Global SSIM over True pixels of ``mask``. Not interchangeable with a crop."""
+        return masked_ssim(reference, predicted, mask)
+
+
+def masked_ssim(reference: np.ndarray, predicted: np.ndarray, mask: np.ndarray) -> float:
+    """Mean per-frame global SSIM restricted to a boolean mask."""
+    ref, pred = paired(reference, predicted)
+    selected = np.asarray(mask, dtype=bool)
+    if selected.ndim == 2:
+        selected = np.broadcast_to(selected, (ref.shape[0], *selected.shape))
+    if selected.shape != ref.shape[:3]:
+        raise ValueError(
+            f"mask shape {np.asarray(mask).shape} does not match clip {ref.shape[:3]}"
+        )
+    values = [
+        _frame_ssim_masked(ref[index], pred[index], selected[index])
+        for index in range(ref.shape[0])
+    ]
+    return float(sum(values) / len(values))
+
 
 def _frame_ssim(reference: np.ndarray, predicted: np.ndarray) -> float:
     channels = [
@@ -40,6 +63,18 @@ def _channel_ssim(reference: np.ndarray, predicted: np.ndarray) -> float:
     if min(reference.shape[:2]) < _WINDOW:
         return _global_ssim(reference, predicted, c1, c2)
     return _windowed_ssim(reference, predicted, c1, c2)
+
+
+def _frame_ssim_masked(
+    reference: np.ndarray, predicted: np.ndarray, mask: np.ndarray
+) -> float:
+    c1 = (_K1 * _PEAK) ** 2
+    c2 = (_K2 * _PEAK) ** 2
+    channels = [
+        _global_ssim(reference[:, :, channel][mask], predicted[:, :, channel][mask], c1, c2)
+        for channel in range(reference.shape[-1])
+    ]
+    return float(sum(channels) / len(channels))
 
 
 def _global_ssim(reference: np.ndarray, predicted: np.ndarray, c1: float, c2: float) -> float:
