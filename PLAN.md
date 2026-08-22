@@ -29,7 +29,7 @@ Target: **ACM TOMM, September 30.**
 |---|---|---|
 | A — contracts and concepts | ✅ done | — |
 | B — components | ✅ **done** | Merged-ready on `phase-b/integrate` (still unmerged to main) |
-| **B′ — the engine roster** | Wave 1.5 ✅ | Wave 2 (`BP5`/`C1`/`C2`/`D-cleanups`) can start |
+| **B′ — the engine roster** | Wave 3 in flight | Quality flagship **unset** until pose-ref ControlNet posts a coding-task number. Wave-2 roster (ControlNet holds both slots) is **void** — self-reconstruction. |
 | C — pipeline and runner | ⬜ | `C1`/`C2` can start with Wave 2; `C3` after both |
 | C — pipeline and runner | ⬜ | Blocked on B′ |
 | D — experiments layer | ⬜ | Blocked on C |
@@ -215,6 +215,36 @@ Option 2 is the default unless someone argues otherwise. Whatever is chosen, the
 paper says which, because an unlabelled in-training score is the kind of thing a
 reviewer finds.
 
+### 2.6 Coding-task numbers (BP8) — Wave-2 roster is void
+
+Wave 2 ranked engines on **self-reconstruction** (score against the conditioning
+image). That ranking is not a coding result. Re-measured on the coding task:
+appearance from track-local frame 0, pose from frame 24, score against frame 24,
+12 clips, seed 42, 20 steps, independently letterboxed 512 canvases, `cuda:0`.
+Pairing is by position in the sorted `frame_*.png` lists.
+
+| Arm | Object PSNR | vs static | Path | In-domain? |
+|---|---|---|---|---|
+| **static copy** (paste keyframe, no model) | **11.47 dB** (this letterbox run; published shared-geometry paste was **11.82**) | floor | `outputs/bp8-coding-task/` | n/a |
+| pose-controlnet (Wave-2 / published) | 11.20 dB | **−0.62** vs 11.82 | not this driver | n/a |
+| seg-controlnet (published) | 11.01 dB | **−0.81** vs 11.82 | not this driver | n/a |
+| Animate-Anyone, 20 DDIM, letterbox | **8.96 dB** | −2.51 vs 11.47 | ReferenceNet fed a non-blank, non-pose reference. Scheduler v-pred / trailing / zero-SNR. `outputs/bp8-coding-task/animate-anyone-letterbox.json` | **yes** — AA saw both held-out videos (§2.5) |
+| real IP-Adapter + stock OpenPose | **8.90 dB** | −2.56 vs 11.47 | Not the mislabelled `ip-adapter-controlnet` dir. `outputs/bp8-coding-task-ipadapter/` | n/a |
+
+An engine at or below the static-copy floor is **not using appearance**, in those
+words. AA and IP-Adapter both lose to doing nothing. Tuning (guidance / steps /
+strength) is ruled out: the models were not trained with appearance as an input,
+except AA, whose ReferenceNet path was driven and still lost.
+
+**Option A in flight.** Pose ControlNet is being fine-tuned with a same-track
+reference painted under the skeleton (`pose-ref-controlnet`). Smoke (driven, not
+read): `residual_delta=2.69` on two ControlNet forwards that differed only in
+the reference; composed control dump at `outputs/bp8-pose-ref-smoke/`. Train:
+`cuda:0`, init `pose-controlnet/checkpoint-epoch-10`, 10 epochs, batch 4,
+dataset 35713, log `outputs/bp8-pose-ref-train/train.log`. Bounds written to
+`outputs/bp8-pose-ref-train/bounds.json` **before** generate. Success is
+**≥ 12.82 dB** object-scoped (11.82 + 1). Below 11.82 it still is not using
+appearance.
 
 ---
 
@@ -413,20 +443,24 @@ set of alternatives that differ along axes the paper measures.
 
 #### 6.2 Two flagships, because two questions are being asked
 
-`eval-ladder` and `eval-object` want different things and are best served by
-different engines. Trying to satisfy both with one engine compromises both.
+`eval-ladder` and `eval-object` want different things. Wave 2 assigned both
+quality slots to ControlNet on **self-reconstruction** numbers. That assignment
+is **void**. On the coding task (§2.6) every trained generator loses to pasting
+the keyframe.
 
 | Role | Engine | Serves | Why |
 |---|---|---|---|
-| **Quality flagship** | Animate-Anyone, or a stronger modern replacement (§6.3) | `eval-ladder`, `eval-metrics` | The headline figure must show the best PointStream can do. Temporal modelling also makes the FVMD claim meaningful. |
-| **Comparison backbone** | ControlNet on SD-1.5 (pose / seg / ip-adapter / trajectory-render) | `eval-object` | The only family where the backbone genuinely stays fixed while the conditioning changes — which is what makes `eval-object` a result about *representations* rather than about models. |
-| Speed rung | pix2pix | `eval-operating` | One forward pass, no diffusion loop. Without it there is no real-time point to report. |
-| Floor | upscale-refine | all | Already works. The non-generative control that says whether generation buys anything at all. |
+| **Quality flagship** | **Unset.** Pose-ref ControlNet is training; nothing else beat static copy. | `eval-ladder` | AA 8.96 dB in-domain, real IP-Adapter 8.90 dB, published pose/seg ControlNet 11.20 / 11.01 — all at or below the 11.82 dB static-copy floor. An engine at or below that floor is not using appearance. |
+| **Comparison backbone** | ControlNet on SD-1.5, **pose-ref first** once it has a coding-task number | `eval-object` | Still the only family where the backbone stays fixed while the conditioning changes. The pose arm is being retrained with a same-track reference under the skeleton so appearance is actually an input. Do not cite Wave-2 object dB. |
+| Temporal / FVMD | Animate-Anyone (in-domain only) | `eval-metrics` | Only temporal engine that ran. ReferenceNet path was driven and is not the fault; 8.96 dB still loses to static copy. In-domain only (§2.5 option 2). |
+| Speed rung | pix2pix | `eval-operating` | One forward pass. Not re-measured on the coding task this wave. |
+| Floor | **static copy of the keyframe** | all | 11.47 dB object-scoped on independent letterbox (published 11.82 on shared-geometry paste). The non-generative control that says whether generation uses appearance. |
 
-**Neither flagship is fixed until B′ measures them.** If the comparison backbone
-turns out to also be the best performer, the roles collapse and the narrative
-gets simpler; if a modern replacement beats Animate-Anyone, it takes the slot.
-Stay open, and let the probe numbers decide.
+**Do the two flagship roles collapse?** Not yet: there is no quality flagship
+until pose-ref (or a later engine) beats 11.82 dB by ~1 dB on the coding task.
+If pose-ref does, the comparison backbone *is* the quality engine and the roles
+share a family without sharing a row. If it does not, Option C (change what the
+paper claims is transmitted) is a reported finding, not an escape.
 
 **The trajectory arm does not need MOFA-Video.** MOFA is licence-blocked, and
 routing around it improves the experiment: render sparse trajectories as a
@@ -436,19 +470,20 @@ MOFA-vs-ControlNet comparison never could.
 
 #### 6.2.1 Which existing engines survive, and why
 
-The 2026 models (§6.3) are better at exactly one thing: synthesising a single
-convincing person from a pose. That is not the only thing this paper measures, so
-most of the existing roster keeps its place — **each for a structural reason, not
-because it is already wired.**
+Wave-2 "ControlNet holds both quality slots" was decided on self-reconstruction
+and is withdrawn. Survival below is about *what the paper still needs*, not
+about who won a probe that scored against the conditioning image.
 
-| Engine | Verdict | What no modern model does instead |
+| Engine | Verdict | Coding-task object PSNR |
 |---|---|---|
-| **ControlNet family** | **Keep — now more important** | The only family with swappable control encoders over a fixed backbone. `eval-object` is a claim about *representations*; with a pose-only model it silently becomes a claim about models. It is also the only thing here fine-tuned on our own data. |
-| **pix2pix** | **Keep** | One forward pass, no sampling loop. StableAnimator wants ~10–16 GB and a diffusion schedule. Without pix2pix, `eval-operating` has no real-time point to report at all. |
-| **upscale-refine** | **Keep — value went up** | The non-generative floor. If a 2026 SOTA animator barely beats bicubic upsampling at our bitrates, that is a headline finding, and only this control can show it. |
-| **Animate-Anyone** | **Keep as the evaluable incumbent — with a leakage caveat** | Wired on `phase-bp/bp4` to `~/Models/AnimateAnyone/profiles/finetuned_tennis`. Fine-tuned on **114 tracks across 7 videos** (`assets/dataset/pointstream_aa_meta.json`) — the "single tennis match" caveat was stale and is withdrawn. 3 DDIM steps melted (9.65 dB); class default is now 20 steps, 14.0 dB in-set. **But its training set includes both probe-set held-out videos** — `alcaraz_highlights` (20 tracks) and `djokovic_zverev` (16). See §2.5: for this engine the held-out split does not hold out. |
-| **SPADE4Tennis** | **Keep for now** | Architecturally close to ControlNet+pix2pix, which makes it a useful control: if a tennis-specific SPADE generator matches or beats a fine-tuned general backbone on tennis, that says something about how much domain specialisation is worth. Judge it on the probe numbers, not in advance. |
-| **MOFA-Video** | Stays dropped | Licence-blocked; the rendered-trajectory arm replaces it and is a better experiment. |
+| **static copy** | **Keep — the appearance floor** | **11.47 dB** (letterbox) / **11.82 dB** (published shared-geometry). Generation that cannot beat this is not using appearance. |
+| **ControlNet family** | **Keep as comparison backbone; quality flagship pending pose-ref** | pose 11.20 / seg 11.01 (published, lose to static). `ip-adapter-controlnet` directory is a mislabelled seg ControlNet — do not load it. Real IP-Adapter 8.90 dB, **not using appearance**. Pose-ref retrain in flight. |
+| **pix2pix** | **Keep** | Not re-measured this wave. Still the one-forward-pass rung. |
+| **upscale-refine** | **Keep** | Not re-measured this wave. Distinct from static copy: this stretches; static copy pastes the letterboxed keyframe. |
+| **Animate-Anyone** | **Keep as temporal incumbent, not quality flagship** | **8.96 dB**, 20 DDIM, in-domain. ReferenceNet path driven (reference not blank, not the pose canvas, non-zero latent). Still **not using appearance**. |
+| **SPADE4Tennis** | **Keep as a domain-specialisation control** | Not re-measured on the coding task this wave. |
+| **MOFA-Video** | Stays dropped | Licence-blocked. |
+| **StableAnimator** | Wrapped, not shipped | Generate refuses (SVD-XT). Cannot be flagship. |
 
 **What gets added:** StableAnimator is wrapped on `phase-bp/bp4` but **cannot
 be the shipped flagship** until SVD-XT is licence-cleared — the Apache-2.0
