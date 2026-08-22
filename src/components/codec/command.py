@@ -46,7 +46,7 @@ def build_command(
         ffmpeg: Required for decode, and recorded even when the encoder is a
             binary. Encode of ffmpeg rungs uses ``encoder`` as ffmpeg.
         roi_file: Native delta-QP map already formatted for this encoder.
-        addroi: ffmpeg ``addroi=...`` filter string for the unverified AVC arm.
+        addroi: ffmpeg ``addroi=...`` filter string for the AVC native arm.
         width, height, fps: Required by kvazaar (no y4m header trust). Optional
             for the others; y4m supplies them.
     """

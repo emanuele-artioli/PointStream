@@ -1,13 +1,41 @@
 """Region-of-interest maps, encoder-native formatting, and the pixel-domain arm.
 
 Native delta-QP maps exist for AV1 (``--roi-map-file``, 64x64, q_index units)
-and HEVC (kvazaar ``--roi``, signed 8-bit CTU offsets). VVC has no region map;
-AVC's ffmpeg ``addroi`` is unverified. Both of those use the in-house arm:
-degrade non-salient blocks in the pixel domain, then encode without a map.
+and HEVC (kvazaar ``--roi``, signed 8-bit CTU offsets). VVC has no region map.
+AVC's ffmpeg ``addroi`` is driven by ``experiments.verify_codec_roi --codec avc
+--roi-arm native``; ``auto`` still selects the pixel arm because this is not a
+delta-QP map. See the AVC bound-and-result note below.
 
 AV1 offsets are q_index (0–255) against ``--qp`` (0–63), roughly four per QP
 step. Offsets past about −120 / +60 make the regions *converge* and both lose
 quality — that is not "stronger ROI", and a table built on it is not a result.
+
+AVC ``addroi`` bound, written 2026-08-22 *before* the encode. Clip
+``assets/real_tennis.mp4`` at 640x384, 20 frames, libx264 ``-qp 45``
+``-preset veryfast``, centred region fraction 0.4, inside offset −30
+(qoffset ≈ −0.588), outside 0. Encoder ``/opt/local/bin/ffmpeg``
+``n7.1.1-56-gc2184b65d2`` with ``--enable-libx264``. Inside PSNR change
+(ROI minus baseline): best +1.0 to +6.0 dB — qoffset −0.59 is a large
+quality request at QP 45, stronger than AV1's verified −30 q_index
+(~7.5 QP, +0.35 dB). Worst that still counts as working: +0.25 dB inside,
+outside unmoved within ±0.1 dB. A no-op is both |Δ| < 0.25 dB in the
+labelled region — the filter is accepted and ignored, including under
+constant QP if libx264 only applies ROI through AQ. Alarm: inside gets
+worse, or |outside| > 0.1 dB (a global shift, not region control), or
+bitstreams byte-identical. File size alone is not evidence.
+
+Measured (same clip, same binary, ``--roi-arm native``): baseline and ROI
+were byte-identical (7627 bytes) and luma PSNR was unchanged in the labelled
+region (30.09 dB in, 28.18 dB out). Δ = 0.00 dB, inside the no-op bound.
+The command did contain ``-vf addroi=192:128:256:128:-0.588…``. A CRF 45
+diagnostic on the same clip — not a paper comparison; the contract forbids
+CRF for an ROI arm — moved the labelled region +17.00 dB and left the
+outside at −0.00 dB (6283 → 30064 bytes). libx264 honours the side data
+when AQ is active and ignores it under ``-qp``. Native AVC ROI is therefore
+unusable under the QP discipline the other rungs use; ``auto`` stays on the
+pixel arm. The CRF diagnostic bound (+0.25 to +4 dB) was too tight:
+qoffset −0.59 at CRF 45 is most of the addroi scale toward lossless, not a
+mild AQ nudge.
 """
 
 from __future__ import annotations
@@ -186,8 +214,9 @@ def degrade_luma(luma: np.ndarray, map_: BlockRoiMap) -> np.ndarray:
 
     Negative offsets mean "spend more" — those blocks are left intact so the
     encoder can. Strength grows with the offset: a +1 step halves the number
-    of reconstructible luma levels in that block. This is the VVC (and
-    unverified-AVC) ROI arm; it is a pre-process, not an encoder flag.
+    of reconstructible luma levels in that block. This is the VVC ROI arm
+    (and AVC's until native addroi is shown to move the labelled region); it
+    is a pre-process, not an encoder flag.
     """
     if luma.ndim != 2:
         raise ValueError(f"degrade_luma expects (H, W), got {luma.shape}")
