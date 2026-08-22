@@ -1,0 +1,34 @@
+# Minimal tennis set. Enough to exercise a runner end to end; not the full
+# training tree. Paths are relative to each search root. This stream does not
+# download data — a missing file is a clear error, not a silent empty set.
+domain: tennis
+selector: heuristic
+summary: A handful of broadcast tennis tracks plus the short encode-smoke clip.
+search_roots:
+  - assets
+  - /home/itec/emanuele/pointstream/assets
+clips:
+  - id: real_tennis
+    kind: video
+    path: real_tennis.mp4
+    summary: Short broadcast clip used by the existing encode smoke tests.
+  - id: alcaraz_highlights_scene035_track0096
+    kind: frames
+    path: dataset/alcaraz_highlights/segmentations/scene_035/track_0096
+    pattern: frame_*.png
+    summary: Player track from alcaraz_highlights.
+  - id: federer_djokovic_scene015_track0010
+    kind: frames
+    path: dataset/federer_djokovic/segmentations/scene_015/track_0010
+    pattern: frame_*.png
+    summary: Player track from federer_djokovic.
+  - id: sinner_alcaraz_scene001_track0002
+    kind: frames
+    path: dataset/sinner_alcaraz/segmentations/scene_001/track_0002
+    pattern: frame_*.png
+    summary: Player track from sinner_alcaraz.
+  - id: djokovic_federer_scene013_track0053
+    kind: frames
+    path: dataset/djokovic_federer/segmentations/scene_013/track_0053
+    pattern: frame_*.png
+    summary: Player track from djokovic_federer.

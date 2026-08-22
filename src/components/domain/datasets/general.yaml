@@ -1,0 +1,36 @@
+# Minimal general set: DAVIS sequences that contain humans. Handheld / free-
+# moving camera, so a panorama background is invalid. Football is not in
+# scope — kid-football is deliberately absent. This stream does not download
+# DAVIS; missing roots fail clearly.
+domain: general
+selector: identity
+summary: DAVIS clips containing people, for the generalizability experiment.
+search_roots:
+  - assets/davis
+  - /home/itec/emanuele/Datasets/DAVIS
+clips:
+  - id: parkour
+    kind: frames
+    path: parkour
+    pattern: "*.jpg"
+    summary: Handheld parkour; people against a translating background.
+  - id: breakdance
+    kind: frames
+    path: breakdance
+    pattern: "*.jpg"
+    summary: Breakdancer, close handheld motion.
+  - id: dance-twirl
+    kind: frames
+    path: dance-twirl
+    pattern: "*.jpg"
+    summary: Dancer twirling; free-moving camera.
+  - id: judo
+    kind: frames
+    path: judo
+    pattern: "*.jpg"
+    summary: Two people; short clip, nothing for scene routing to do.
+  - id: lucia
+    kind: frames
+    path: lucia
+    pattern: "*.jpg"
+    summary: Single person walking, handheld follow.
