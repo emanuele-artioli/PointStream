@@ -69,15 +69,23 @@ actually differs in the labelled region.
 
 ---
 
-## D4 — MOFA-Video, and the trajectory arm
+## D4 — SVD-licensed generators (MOFA-Video, StableAnimator)
 
-**What.** Registered as a candidate; construction refuses because its SVD weights
-are Stability-AI-licensed and not bundled.
+**What.** Two backends refuse a shippable load because inference needs
+Stability-AI-licensed SVD weights that are not bundled.
 
-**Why deferred, and probably permanently.** `PLAN.md` §6.2 routes around it by
-rendering sparse trajectories into the ControlNet backbone, which is a *better*
-experiment — it keeps `eval-object`'s backbone genuinely fixed, which a
-MOFA-vs-ControlNet comparison could not.
+- **MOFA-Video** — registered; construction refuses by design.
+- **StableAnimator** — wrapped on `phase-bp/bp4`. HF card Apache-2.0
+  (`FrancisRing/StableAnimator`, checked 2026-08-22); GitHub code MIT;
+  inference needs SVD-XT plus InsightFace `antelopev2`. Construction succeeds;
+  loading the real stack raises until a runtime is injected.
 
-**Revisit only if** the rendered-trajectory arm turns out to be a strawman, in
-which case a licence-cleared trajectory model becomes worth the trouble.
+**Why deferred.** For MOFA, `PLAN.md` §6.2 routes around it by rendering sparse
+trajectories into the ControlNet backbone, which is a *better* experiment — it
+keeps `eval-object`'s backbone genuinely fixed. For StableAnimator, it cannot
+be the shipped quality flagship until SVD is cleared; Animate-Anyone stays the
+evaluable incumbent. Do not `pip install` the missing stack into the
+`pointstream` env.
+
+**Revisit only if** a licence-cleared SVD-free flagship appears, or the
+rendered-trajectory arm turns out to be a strawman.

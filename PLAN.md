@@ -28,8 +28,8 @@ Target: **ACM TOMM, September 30.**
 | Phase | State | Next action |
 |---|---|---|
 | A — contracts and concepts | ✅ done | — |
-| B — components | ✅ **done**, one gap | Generation cannot load weights — see §2.1 |
-| **B′ — the engine roster** | ⬜ **next** | Wave 1: `BP1`–`BP4` in parallel, then `BP5` (§6) |
+| B — components | ✅ **done** | Merged-ready on `phase-b/integrate` (still unmerged to main) |
+| **B′ — the engine roster** | Wave 1 ✅ | Wave 2 is `BP5` — not started; see §2.1 |
 | C — pipeline and runner | ⬜ | Blocked on B′ |
 | D — experiments layer | ⬜ | Blocked on C |
 | E — experiments and paper | ⬜ | Ordered by §7 |
@@ -56,56 +56,74 @@ tier config producing those numbers end to end — because there is no pipeline.
 Evaluation is a skeleton of `GOAL`/`HOLE` markers waiting for results.
 Conclusion absent until there are results to conclude from.
 
-### 2.1 The one real gap: generation cannot load weights
+### 2.1 Generation loaders — Wave 1, unmerged
 
-Every `_load_model` and `_load_pipeline` under `src/components/generation/` is an
-unconditional `raise RuntimeError(...has no pipeline loaded...)`. Ten generators
-are registered, the conditioning contracts and pairing validation are correct and
-tested, and **only `upscale-refine` — the non-generative bicubic baseline —
-actually produces pixels.** The tests pass because they inject a fake pipeline.
+The Phase-B socket is plugged on the B′ branches. Tests that inject `_FakePipe`
+remain; the loaders now load real weights when not injected. Driven 2026-08-22
+on leftover `cuda:0` VRAM (~11.6 GB); the other user's `tokengs` jobs were not
+touched. Seed **42**. These are triage numbers, not results.
 
-The weights are on disk and unused: `assets/weights/pose-controlnet` (ten
-fine-tuned epochs), `seg-controlnet` (seven), `ip-adapter-controlnet` (ten), full
-`stable-diffusion-v1-5`, `pix2pix_generator.pt`, `spade4tennis_lite_generator.pt`.
+**Comparison backbone** (`phase-bp/bp3`):
 
-This is the socket built without anything plugged into it, and it is what B′
-exists to close.
+| Engine | Checkpoint | PSNR vs letterboxed appearance | Notes |
+|---|---|---|---|
+| pose-controlnet | epoch **10** | 20.3 dB | Smeared but recognisable player. Bounds were 12–32. |
+| seg-controlnet | epoch **7** | 21.7 dB | Same band. |
+| ip-adapter-controlnet | epoch **10** + `h94/IP-Adapter` | 11.3 dB | Below the ControlNet “&lt;15 = path bug” line; above the 10 dB txt2img bound written first. Darker, weaker; not identity. Not tuned. |
+| pix2pix | `pix2pix_generator.pt` | 16.6 dB (CPU) | Recognisable, pose leak. |
+| spade4tennis | `spade4tennis_lite_generator.pt` | 14.5 dB (CPU) | Cheap blurry blob; wired because it was cheap. |
+| trajectory-render | pose-controlnet epoch **10** | 20.5 dB | Same backbone. Four synthetic sticks barely moved it; needs denser tracks in Wave 2. |
 
-### 2.3 The probe set is broken — verified 2026-08-22
+**Quality flagship** (`phase-bp/bp4`): Animate-Anyone loads
+`~/Models/AnimateAnyone/profiles/finetuned_tennis` (7 matches, 114 tracks — not
+one). 3 DDIM steps melted (9.65 dB, below the 12 dB floor). 20 steps: 14.0 dB
+in-set, 5.0 GiB, 32.5 s warm. StableAnimator is wrapped; SVD-XT not bundled
+(§2.4). Sparse2Dense still has no public code.
 
-`assets/probe_set` cannot be used, and using it naively would produce silently
-wrong results rather than an error. It was inherited from the pre-rewrite
-implementation and never checked. Two independent faults:
+**Registry not yet edited.** BP3 and BP4 both left
+`src/components/generation/__init__.py` alone. Apply at Wave-1 merge — see
+`plans/README.md`.
 
-**1. The manifest and the materialised view name different clips.** `manifest.json`
-seeds a selection of 12 clips; `training_view/` symlinks an entirely *different*
-set. Not one of the 12 manifest-named tracks is present in the view:
+### 2.3 The probe set — rebuilt 2026-08-22 on `phase-bp/bp1`
 
-| manifest wants | view materialised |
-|---|---|
-| `alcaraz_perricard/scene_002/track_0002` | `track_0001` |
-| `alcaraz_ruud/scene_002/track_0021` | `track_0100` |
-| `djokovic_federer/scene_015/track_0003` | `track_0075` |
-| `federer_djokovic/scene_001/track_0071` | `track_0006` |
+The inherited v1 view was unusable. Using it naively produced silently wrong
+results rather than an error. Two faults were diagnosed; only the first
+survived measurement.
 
-So a harness reading the manifest finds nothing, and one reading the view
-evaluates on an unseeded, unrecorded selection.
+**1. The manifest and the materialised view named different clips.** That is
+the fault that actually fires. `manifest.json` seeded 12 clips;
+`training_view/` symlinked an entirely *different* set. Zero of the 12
+manifest-named tracks were in the view (driven: 17 verifier violations on the
+v1 snapshot at `assets/probe_set.broken-v1/`). A harness reading the manifest
+found nothing; one reading the view evaluated an unseeded, unrecorded
+selection.
 
-**2. Two coordinate systems, silently confused.** The manifest records **global
-video frame indices** (e.g. 223–270, 948–995). The extracted per-track PNG
-sequences are numbered **track-locally from zero** (`frame_000000` …
-`frame_000117`). Where the ranges happen to overlap you get *the wrong frames
-with no error*; where they do not, all 48 are missing. Checked against the full
-dataset: **5 of 12 clips miss every frame, and the other 7 would silently return
-frames that were never selected.**
+**2. Two coordinate systems — the bound was wrong.** The v1 diagnosis claimed
+the manifest stored global video indices while PNG names were track-local from
+zero, so **5 of 12 clips would miss every frame** and the other 7 would return
+frames nobody selected. Re-measured against `assets/dataset` on 2026-08-22:
+**0/12 missing, 48/48 files present for every clip.** The bound had been
+derived in the wrong units: on this dataset the PNG names *are* the source-video
+indices the v1 manifest stored (`frame_id` matches the filename). Filename
+lookup against the dataset happened to work. The identity fault in (1) is what
+made the set unusable.
 
-The good news: `assets/dataset` itself is rich and intact — all 12 named tracks
-exist there, with per-track crops, canny, `pose_body`, `pose_racket`, skeleton
-sequences, keypoints, captions and metadata, plus the 15 GB of 4K source in
-`assets/raw_4k`. The data is fine; the probe *view* and its manifest are not.
+The underlying `assets/dataset` was never the problem — all 12 named tracks
+exist there, with crops, canny, `pose_body`, `pose_racket`, skeleton,
+keypoints, captions and metadata, plus the 15 GB of 4K source in
+`assets/raw_4k`.
 
-Rebuilding and verifying it is `plans/BP1-probe-set.md`, and it blocks every
-number B′ would otherwise produce.
+**Rebuilt as `pointstream.probe_set.v2` on `phase-bp/bp1`.** Track-local
+indexing, `global_offset` plus `global_frame_ids` (two of twelve windows are
+not contiguous in source numbering). The clips view is written first; the
+manifest is walked off that tree. Same seed (`20260712`) kept the same 12
+tracks; 576 colour frames. The verifier fails on the v1 snapshot and passes on
+`assets/probe_set`. Locked 5-train / 2-held-out split asserted.
+
+Still outstanding, not this stream: `scripts/eval_checkpoint.py` still treats
+`frame_ids` as dataset filename numbers; pointed at `assets/dataset` with a v2
+manifest it would load the start of the track, not the selected window.
+`scripts/select_probe_set.py` still writes v1 and must not be the regenerator.
 
 ### 2.4 Known environment limits
 
@@ -117,6 +135,12 @@ number B′ would otherwise produce.
 - **MOFA-Video is a candidate, not an integration.** Its SVD weights are
   Stability-AI-licensed and not bundled, so construction refuses by design. §6.2
   says what replaces it for the trajectory arm.
+- **StableAnimator is the same SVD class.** Wrapper on `phase-bp/bp4`. HF card
+  `FrancisRing/StableAnimator` is Apache-2.0 (checked 2026-08-22); GitHub code
+  is MIT; inference needs SVD-XT (Stability AI Community / SVD research licence)
+  and InsightFace `antelopev2`, neither bundled. Cannot ship as a flagship until
+  SVD is cleared. Live inference was not run: leftover VRAM ~11.6 GiB, VAE decode
+  wants ~16 GiB.
 
 ---
 
@@ -348,14 +372,16 @@ because it is already wired.**
 | **ControlNet family** | **Keep — now more important** | The only family with swappable control encoders over a fixed backbone. `eval-object` is a claim about *representations*; with a pose-only model it silently becomes a claim about models. It is also the only thing here fine-tuned on our own data. |
 | **pix2pix** | **Keep** | One forward pass, no sampling loop. StableAnimator wants ~10–16 GB and a diffusion schedule. Without pix2pix, `eval-operating` has no real-time point to report at all. |
 | **upscale-refine** | **Keep — value went up** | The non-generative floor. If a 2026 SOTA animator barely beats bicubic upsampling at our bitrates, that is a headline finding, and only this control can show it. |
-| **Animate-Anyone** | **Demote to an arm** | Its distinctive asset was temporal modelling; StableAnimator has that, is better, and is Apache-2.0. But it is fine-tuned on *our* domain and StableAnimator is not — so "fine-tuned old vs pretrained new" is precisely the `eval-general` experiment. |
+| **Animate-Anyone** | **Keep as the evaluable incumbent** | Wired on `phase-bp/bp4` to `~/Models/AnimateAnyone/profiles/finetuned_tennis`. Fine-tuned on **7 matches, 114 tracks** (`assets/dataset/pointstream_aa_meta.json`) — the "single tennis match" caveat was stale. 3 DDIM steps (the old default) melted: 9.65 dB, below the 12 dB floor; that is under-sampled diffusion, not a metric bug. Class default is now 20 steps. Still tennis-set, not a general human model. |
 | **SPADE4Tennis** | **Keep for now** | Architecturally close to ControlNet+pix2pix, which makes it a useful control: if a tennis-specific SPADE generator matches or beats a fine-tuned general backbone on tennis, that says something about how much domain specialisation is worth. Judge it on the probe numbers, not in advance. |
 | **MOFA-Video** | Stays dropped | Licence-blocked; the rendered-trajectory arm replaces it and is a better experiment. |
 
-**What gets added:** StableAnimator as the quality-flagship candidate, and
-possibly MTVCrafter — its 4D motion tokenisation is not just a better generator,
-it is *a motion representation*, which makes it a candidate fourth arm in
-`eval-object` rather than only a flagship contender.
+**What gets added:** StableAnimator is wrapped on `phase-bp/bp4` but **cannot
+be the shipped flagship** until SVD-XT is licence-cleared — the Apache-2.0
+claim applied to the adapter card, not the inference stack (see §2.4).
+MTVCrafter is still a candidate *motion representation* (4D/SMPL tokens), not a
+drop-in generator; not wrapped this wave. Sparse2Dense still has no public code
+or weights (rechecked 2026-08-22).
 
 #### 6.3 What the 2026 literature says we should consider
 
@@ -368,7 +394,7 @@ we could adopt them:
 
 | Candidate | Why | Cost |
 |---|---|---|
-| **StableAnimator** | Apache-2.0, weights on HF, ~10 GB VRAM for the 16-frame UNet. Best reported identity preservation (CSIM) and FVD in its class. The cheapest real upgrade. | low |
+| **StableAnimator** | Best reported identity preservation (CSIM) and FVD in its class. Adapter Apache-2.0 on HF; inference needs SVD-XT (not bundled) — **same licence class as MOFA**, so "cheapest real upgrade" was wrong. Wrapped; live run blocked on VRAM and the pinned env. | high (licence) |
 | **MTVCrafter** | SOTA on TikTok, +65% FID-VID over second best. Tokenises raw 4D motion rather than 2D pose images — *directly relevant to our motion-representation axis*. | medium |
 | DisPose / Animate-X / StableAnimator++ | Incremental over the above | defer |
 
@@ -439,10 +465,10 @@ A triage number is never citable and never gets a `CLAIM` line.
 
 #### 6.6 Validate small before scaling
 
-- **B′.1 — fix the probe set.** It is broken (§2.3) and nothing downstream can be
-  trusted until it is rebuilt and verified.
-- **B′.2 — wire the loaders and probe.** Region-scoped PSNR per engine per clip.
-  Triage, not results.
+- **B′.1 — fix the probe set.** ✅ Rebuilt as v2 on `phase-bp/bp1` (§2.3). The
+  verifier fails on the v1 snapshot and passes on the new tree.
+- **B′.2 — wire the loaders and probe.** Loaders wired on `phase-bp/bp3` /
+  `phase-bp/bp4` (§2.1). The cross-engine probe is Wave 2 (`BP5`).
 - **B′.3 — fix the roster in writing**, with the reason each engine holds its
   slot. **Only then** prepare the full dataset.
 

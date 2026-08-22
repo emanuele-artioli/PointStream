@@ -28,7 +28,10 @@ assuming a stream is finished.
 Split for parallel sessions. **A wave starts only once every stream it depends on
 has reported back**, and all streams in a wave launch together.
 
-### Wave 1 — five independent streams
+### Wave 1 — five independent streams ✅ reported 2026-08-22
+
+Branches: `phase-bp/bp1` … `bp4` (from `phase-b/integrate`), paper `phase-bp/bp6`.
+Not merged. Wave 2 (`BP5`) has not started.
 
 | Brief | Owns | Why it is independent |
 |---|---|---|
@@ -39,8 +42,46 @@ has reported back**, and all streams in a wave launch together.
 | `BP6-related-work.md` | the **paper repo** only | Different git repo entirely |
 
 `BP3` and `BP4` both touch `src/components/generation/` but **own disjoint
-files**. Neither edits the registry table in `__init__.py` without saying so in
-its report — that is the one contention point between them.
+files**. Neither edited the registry table in `__init__.py`. Apply both
+entries in one edit at Wave-1 merge (implementations live on those two
+branches; registering them on `phase-b/integrate` alone would name modules
+that are not there yet):
+
+```python
+# After pose-controlnet. Same OpenPose ControlNet, sparse-trajectory control.
+_add(
+    "trajectory-controlnet",
+    "src.components.generation.controlnet:ControlNetGenerator",
+    summary=(
+        "ControlNet OpenPose driven by a rendered trajectory image. "
+        "Same backbone as pose-controlnet; the control image changes."
+    ),
+    capabilities=(
+        appearance(APPEARANCE_COMPRESSED_IMAGE)
+        | motion(MOTION_SPARSE_TRAJECTORIES)
+        | {CAP_PER_FRAME}
+    ),
+    requires=frozenset({CONDITION_MOTION_FIELD, CONDITION_APPEARANCE}),
+    aliases=("trajectory-render",),
+    defaults={"variant": "trajectory"},
+)
+
+# Replace the animate-anyone summary: not a single match.
+# assets/dataset/pointstream_aa_meta.json is 7 matches, 114 tracks.
+
+_add(
+    "stable-animator",
+    "src.components.generation.stable_animator:StableAnimatorGenerator",
+    summary=(
+        "StableAnimator pose-to-video. Adapter Apache-2.0 on HF card "
+        "FrancisRing/StableAnimator (checked 2026-08-22); inference needs "
+        "SVD-XT (Stability AI, not bundled). GitHub code is MIT."
+    ),
+    capabilities=_PER_FRAME_IMAGE_POSE | {CAP_TEMPORAL_SEQUENCE},
+    requires=frozenset({CONDITION_POSE, CONDITION_APPEARANCE}),
+    aliases=("stableanimator", "stable_animator"),
+)
+```
 
 ### Wave 2
 
