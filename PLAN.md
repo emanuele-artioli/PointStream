@@ -336,6 +336,27 @@ control image into the same ControlNet backbone the keypoint arm uses. That make
 `eval-object`'s "backbone fixed" promise literally true, which a
 MOFA-vs-ControlNet comparison never could.
 
+#### 6.2.1 Which existing engines survive, and why
+
+The 2026 models (§6.3) are better at exactly one thing: synthesising a single
+convincing person from a pose. That is not the only thing this paper measures, so
+most of the existing roster keeps its place — **each for a structural reason, not
+because it is already wired.**
+
+| Engine | Verdict | What no modern model does instead |
+|---|---|---|
+| **ControlNet family** | **Keep — now more important** | The only family with swappable control encoders over a fixed backbone. `eval-object` is a claim about *representations*; with a pose-only model it silently becomes a claim about models. It is also the only thing here fine-tuned on our own data. |
+| **pix2pix** | **Keep** | One forward pass, no sampling loop. StableAnimator wants ~10–16 GB and a diffusion schedule. Without pix2pix, `eval-operating` has no real-time point to report at all. |
+| **upscale-refine** | **Keep — value went up** | The non-generative floor. If a 2026 SOTA animator barely beats bicubic upsampling at our bitrates, that is a headline finding, and only this control can show it. |
+| **Animate-Anyone** | **Demote to an arm** | Its distinctive asset was temporal modelling; StableAnimator has that, is better, and is Apache-2.0. But it is fine-tuned on *our* domain and StableAnimator is not — so "fine-tuned old vs pretrained new" is precisely the `eval-general` experiment. |
+| **SPADE4Tennis** | **Ask before dropping** | Tennis-specific and superseded; serves no marker that ControlNet and pix2pix do not. Likely dead weight — but per §6, a component with no marker is a question, not a verdict. |
+| **MOFA-Video** | Stays dropped | Licence-blocked; the rendered-trajectory arm replaces it and is a better experiment. |
+
+**What gets added:** StableAnimator as the quality-flagship candidate, and
+possibly MTVCrafter — its 4D motion tokenisation is not just a better generator,
+it is *a motion representation*, which makes it a candidate fourth arm in
+`eval-object` rather than only a flagship contender.
+
 #### 6.3 What the 2026 literature says we should consider
 
 Surveyed 2026-08-22. Two findings matter and both are actionable.

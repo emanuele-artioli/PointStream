@@ -28,7 +28,7 @@ assuming a stream is finished.
 Split for parallel sessions. **A wave starts only once every stream it depends on
 has reported back**, and all streams in a wave launch together.
 
-### Wave 1 — four independent streams
+### Wave 1 — five independent streams
 
 | Brief | Owns | Why it is independent |
 |---|---|---|
@@ -36,6 +36,7 @@ has reported back**, and all streams in a wave launch together.
 | `BP2-region-metrics.md` | `src/components/metrics/**` | Metrics only |
 | `BP3-generator-loaders.md` | ControlNet family, pix2pix, spade, upscale | Disjoint files from BP4 |
 | `BP4-flagship-candidates.md` | `animate_anyone.py`, `mofa.py`, new engines | Disjoint files from BP3 |
+| `BP6-related-work.md` | the **paper repo** only | Different git repo entirely |
 
 `BP3` and `BP4` both touch `src/components/generation/` but **own disjoint
 files**. Neither edits the registry table in `__init__.py` without saying so in
