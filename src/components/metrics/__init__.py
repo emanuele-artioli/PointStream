@@ -6,6 +6,13 @@ torch, cv2, or encoder binaries. Do not change ``REGISTRY`` or its axis string
 — the parent package and the shared smoke test key on both.
 """
 
+from src.components.metrics.evaluator import (
+    EvaluationRecord,
+    Evaluator,
+    ScopedScore,
+    triage,
+)
+from src.components.metrics.region import MIN_REGION_PIXELS, Region, RegionKind, RegionRole
 from src.contracts.metrics import FVMD, LPIPS, PSNR, SSIM, VMAF
 from src.contracts.registry import BackendSpec, Registry
 
@@ -51,3 +58,15 @@ REGISTRY.register(
         summary=FVMD.summary,
     )
 )
+
+__all__ = [
+    "MIN_REGION_PIXELS",
+    "REGISTRY",
+    "EvaluationRecord",
+    "Evaluator",
+    "Region",
+    "RegionKind",
+    "RegionRole",
+    "ScopedScore",
+    "triage",
+]
