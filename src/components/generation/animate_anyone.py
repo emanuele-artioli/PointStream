@@ -360,6 +360,9 @@ def _reset_cuda_peak(device: str) -> None:
 
     if not str(device).startswith("cuda") or not torch.cuda.is_available():
         return
+    # reset_peak_memory_stats(0) raises "Invalid device argument 0: did you
+    # call init?" if nothing has touched CUDA yet in this process.
+    torch.cuda.init()
     torch.cuda.reset_peak_memory_stats(_cuda_index(device))
 
 

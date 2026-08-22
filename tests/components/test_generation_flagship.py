@@ -131,7 +131,11 @@ def test_animate_anyone_without_runtime_names_the_caveat_when_profile_is_absent(
         )
 
 
-def test_animate_anyone_injected_runtime_returns_chw_of_requested_length() -> None:
+def test_cuda_peak_helpers_are_safe_on_cpu() -> None:
+    from src.components.generation.animate_anyone import _cuda_peak_bytes, _reset_cuda_peak
+
+    _reset_cuda_peak("cpu")
+    assert _cuda_peak_bytes("cpu") == 0
     runtime = _fake_runtime(fill=9)
     gen = AnimateAnyoneGenerator(runtime=runtime, width=8, height=8)
     frames = gen.generate_sequence(
