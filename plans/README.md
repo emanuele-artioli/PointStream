@@ -107,6 +107,12 @@ Branches: `phase-bp/bp5`, `phase-c/c1`, `phase-c/c2`, `phase-d/cleanups` (from `
 `C1` and `C2` do not depend on the roster — they are pipeline structure, and
 which generator wins does not change them. `C3` (the runner) waits for both.
 
+### Next — the critical path
+
+| Brief | What |
+|---|---|
+| `BP8-appearance-conditioning.md` | The generators never had appearance as a training input, and lose to a static copy. Fix that before any roster claim. |
+
 ### Also live
 | File | What |
 |---|---|

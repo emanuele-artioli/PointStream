@@ -174,6 +174,59 @@ with a v2 manifest it would load the start of the track, not the selected
 window. `scripts/select_probe_set.py` now delegates to
 `python -m experiments.probe_set` and is not the regenerator.
 
+### 2.6 Why every engine scores badly: they were trained for the wrong task
+
+Verified 2026-08-22 by driving the engines, not by reading the roster table.
+This supersedes any reading of the Wave-2 numbers as "the models are weak".
+
+**The probe measured self-reconstruction, not coding.**
+`experiments/probe/run.py` passes `frame.appearance_rgb` as the *conditioning*
+and the same `frame.appearance_rgb` as the *scoring reference*. Each engine was
+asked: "here is an image and its pose — reproduce that image." That is not what
+PointStream does, and it is in direct tension with the harness's own
+`differs_from_input` check: the more an engine changes its input, the worse it
+scores, while an unchanged output is failed outright.
+
+**Re-run on the actual coding task** — appearance from frame 0, pose from frame
+24, scored against frame 24, 12 clips, seed 42, 20 steps:
+
+| Arm | Object PSNR | Frame PSNR |
+|---|---|---|
+| **static copy** (paste the keyframe, no model) | **11.82 dB** | 8.90 dB |
+| seg-controlnet | 11.01 dB (**−0.81**) | 13.40 dB |
+| pose-controlnet | 11.20 dB (**−0.62**) | 13.31 dB |
+
+**Both generators lose to doing nothing.** The pose conditioning buys less than
+zero on the object. They win on whole-frame only because they produce a
+well-framed canvas.
+
+**The cause is in the training script, and it is structural.**
+`scripts/train_controlnet.py`'s `ControlNetDataset` yields
+`{image_path, cond_path, prompt}` — **there is no appearance/reference image in
+training at all.** These checkpoints were trained as:
+
+> condition (pose / seg / canny) + the text prompt
+> *"photorealistic tennis player, broadcast sports shot"* → image
+
+So they synthesise *a* plausible tennis player from a pose. They have no
+mechanism to reproduce *this* player, because appearance was never an input.
+At inference the harness feeds appearance as an img2img init image — a path the
+model was never trained on. A static copy beats them on the object precisely
+because it at least has the right person in it.
+
+**`ip-adapter-controlnet` is not an IP-Adapter checkpoint.** Line 82 of the
+training script puts `"ip-adapter"` in the same branch as `"seg"` with
+`cond_dir = None`. It was trained as a segmentation ControlNet. Its 7.9 dB — the
+worst of the roster — is explained by that, not by the adapter being weak.
+
+**What this changes.** This is not a tuning problem and no amount of parameter
+search fixes it. The architecture requires appearance to be transmitted and
+*used* by the generator; these checkpoints implement a codec that transmits pose
+and a text prompt. `PLAN.md` §6.6's cost order — tune, then fine-tune, then
+swap — starts at the wrong rung: tuning is ruled out on evidence.
+
+The live options are in `plans/BP8-appearance-conditioning.md`.
+
 ### 2.4 Known environment limits
 
 - **SAM3 cannot load.** `torch.nn.attention` does not exist in torch 2.2.2. This
