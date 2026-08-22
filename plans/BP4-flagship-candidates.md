@@ -41,6 +41,12 @@ order:
 | **StableAnimator** | Apache-2.0, weights on HF, ~10 GB VRAM for the 16-frame UNet (VAE decoder wants 16 GB, can run on CPU). Best reported identity preservation and FVD in its class. **Start here.** | low |
 | **MTVCrafter** | SOTA on TikTok, +65% FID-VID over second best. Tokenises raw 4D motion instead of 2D pose images — *directly relevant to our motion-representation axis*, so it may matter beyond this slot. | medium |
 | DisPose, Animate-X, StableAnimator++ | Incremental over the above | defer |
+| **Sparse2Dense** (DCC 2026) | Architecturally a *generator* in our terms — VVC-coded reference frame + 3D keypoints. Would slot straight into our contract. | **check first** |
+
+**On Sparse2Dense:** no public code or weights were found as of 2026-08-22.
+**Check once whether that has changed** — if released, it is a strong candidate
+backend rather than only related work, because its interface is already ours.
+If not released, record that and move on; do not attempt a reimplementation.
 
 **Adopt exactly one to begin with.** Wrap it against the existing
 `ConditioningBundle` contract like any other backend — if the contract fights the

@@ -349,7 +349,7 @@ because it is already wired.**
 | **pix2pix** | **Keep** | One forward pass, no sampling loop. StableAnimator wants ~10–16 GB and a diffusion schedule. Without pix2pix, `eval-operating` has no real-time point to report at all. |
 | **upscale-refine** | **Keep — value went up** | The non-generative floor. If a 2026 SOTA animator barely beats bicubic upsampling at our bitrates, that is a headline finding, and only this control can show it. |
 | **Animate-Anyone** | **Demote to an arm** | Its distinctive asset was temporal modelling; StableAnimator has that, is better, and is Apache-2.0. But it is fine-tuned on *our* domain and StableAnimator is not — so "fine-tuned old vs pretrained new" is precisely the `eval-general` experiment. |
-| **SPADE4Tennis** | **Ask before dropping** | Tennis-specific and superseded; serves no marker that ControlNet and pix2pix do not. Likely dead weight — but per §6, a component with no marker is a question, not a verdict. |
+| **SPADE4Tennis** | **Keep for now** | Architecturally close to ControlNet+pix2pix, which makes it a useful control: if a tennis-specific SPADE generator matches or beats a fine-tuned general backbone on tennis, that says something about how much domain specialisation is worth. Judge it on the probe numbers, not in advance. |
 | **MOFA-Video** | Stays dropped | Licence-blocked; the rendered-trajectory arm replaces it and is a better experiment. |
 
 **What gets added:** StableAnimator as the quality-flagship candidate, and
@@ -372,23 +372,38 @@ we could adopt them:
 | **MTVCrafter** | SOTA on TikTok, +65% FID-VID over second best. Tokenises raw 4D motion rather than 2D pose images — *directly relevant to our motion-representation axis*. | medium |
 | DisPose / Animate-X / StableAnimator++ | Incremental over the above | defer |
 
-**There is now direct competition, and it bounds our claims.** These must be
-cited in Related Work and we must position against them:
+**The other new work is not a competitor system — it is a corner of our lattice.**
+This was initially mis-read here, and the correction matters because it is the
+stronger position. These systems all share one construction: code a reference
+frame conventionally, send a compact per-frame motion signal, and synthesise the
+rest. In this project's vocabulary that is an *appearance representation* plus a
+*motion representation* plus a generator — with detection, selection, tracking,
+rigid objects, background, residual and codec fallback all switched off.
 
-- **Sparse2Dense** — keypoint-driven generative human video compression,
-  reporting **74.5% BD-rate reduction against VVC** on DISTS. The closest prior
-  work to our keypoint arm, and the number our own BD-rate must be read against.
-- **T-GVC** — trajectory-guided generative coding below 0.005 bpp. It occupies
-  the exact ground of our sparse-trajectory arm.
-- **GVC-RT / ReGenVC** — real-time generative coding at ultra-low bitrate.
-  Directly relevant to `eval-operating`, where our measured speed is very poor.
+| Work | As a lattice corner | What it does not have |
+|---|---|---|
+| **Sparse2Dense** (DCC 2026) | appearance = VVC-coded key-reference frame; motion = sparse **3D** keypoints; generator = keypoint-aware multi-task net | one subject; no background model, no non-person objects, no residual, no fallback |
+| **T-GVC** | appearance = coded keyframe; motion = semantically weighted sparse trajectories; generator = training-free steered diffusion | whole-frame rather than per-object; one motion representation; no corrective channel |
+| **ReGenVC** | appearance = neurally coded first frame; motion = per-frame pose keypoints | talking heads; single subject |
 
-**What still differentiates PointStream**, and the narrative should lean on it:
-this work is evaluated on **full broadcast scenes** — multiple objects, a
-background model, a corrective residual, and a codec fallback — where those
-systems handle a single centred subject on talking-head or TikTok-style
-material. The ablation lattice and the residual are ours; the generative decoder
-is not, and the paper should stop implying otherwise.
+So the positioning is not "we compete with these". It is: **each of these
+corresponds to a single configuration of the lattice this paper defines, and
+PointStream is the framework in which such a configuration is one cell among
+many** — with the components they lack, and with the representation comparison
+none of them runs. `GVC-RT` is the exception and sits outside this framing; it
+bears on `eval-operating`, where our measured speed is poor, and should be cited
+plainly.
+
+Say *corresponds to*, never *is a special case of ours*. These are independent
+systems whose designs happen to land on corners we also define; claiming they are
+instances of our framework would be both wrong and rude.
+
+**Can we plug them in?** Architecturally yes — Sparse2Dense satisfies our
+generator contract exactly. Practically, **no public code or weights were found**
+for Sparse2Dense (verify once more before concluding), and T-GVC is an unreviewed
+preprint. What *is* adoptable is the idea: **3D keypoints as a motion
+representation**, against our current 2D COCO-17 stored as WholeBody-133. That is
+a candidate arm for `eval-object` and costs a keypoint schema, not a new model.
 
 **Bound before believing:** Sparse2Dense's 74.5% BD-rate against VVC is the
 state of the art on an easier problem. A PointStream BD-rate substantially
