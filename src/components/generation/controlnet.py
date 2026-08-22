@@ -194,7 +194,8 @@ def render_trajectory_control(
         y1 = int(round((y + dy) * scale_y))
         angle = (np.arctan2(dy, dx) + np.pi) / (2.0 * np.pi)
         hue = int(np.clip(angle * 179.0, 0, 179))
-        colour = cv2.cvtColor(np.uint8([[[hue, 255, 255]]]), cv2.COLOR_HSV2RGB)[0, 0]
+        hsv = np.array([[[hue, 255, 255]]], dtype=np.uint8)
+        colour = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)[0, 0]
         rgb = (int(colour[0]), int(colour[1]), int(colour[2]))
         cv2.line(canvas, (x0, y0), (x1, y1), rgb, 2, cv2.LINE_AA)
         cv2.circle(canvas, (x0, y0), 2, rgb, -1)
@@ -429,6 +430,10 @@ class ControlNetGenerator(BaseFrameGenerator):
                 safety_checker=None,
                 local_files_only=True,
             )
+            pipe.set_progress_bar_config(disable=True)
+            # Attention slicing replaces attn processors; load IP-Adapter after
+            # placement so those processors stay installed.
+            pipe = _place_pipeline(pipe, device, attention_slicing=False)
             pipe.load_ip_adapter(
                 _IP_ADAPTER_REPO,
                 subfolder=_IP_ADAPTER_SUBFOLDER,
@@ -444,9 +449,8 @@ class ControlNetGenerator(BaseFrameGenerator):
                 safety_checker=None,
                 local_files_only=True,
             )
-
-        pipe.set_progress_bar_config(disable=True)
-        pipe = _place_pipeline(pipe, device)
+            pipe.set_progress_bar_config(disable=True)
+            pipe = _place_pipeline(pipe, device)
         self._pipeline = pipe
         return pipe
 
@@ -491,17 +495,20 @@ def _dtype_for(device: Device) -> Any:
     )
 
 
-def _place_pipeline(pipe: Any, device: Device) -> Any:
+def _place_pipeline(pipe: Any, device: Device, *, attention_slicing: bool = True) -> Any:
     """Move a pipeline onto ``device`` without grabbing a busy GPU whole.
 
     Shared GPUs on this host often have ~10 GB leftover. ``to(cuda)`` of SD-1.5
     + ControlNet in fp16 fits that; if it does not, fall back to CPU offload
     rather than OOM a neighbour. CPU stays on CPU.
+
+    Attention slicing is optional: IP-Adapter installs its own attn processors,
+    and slicing after that load replaces them and crashes at step 0.
     """
     import torch
 
     resolved = torch.device(device) if not isinstance(device, torch.device) else device
-    if hasattr(pipe, "enable_attention_slicing"):
+    if attention_slicing and hasattr(pipe, "enable_attention_slicing"):
         pipe.enable_attention_slicing()
     if resolved.type != "cuda":
         return pipe.to(resolved)
