@@ -88,6 +88,22 @@ _add(
     defaults={"variant": "pose"},
 )
 _add(
+    "trajectory-controlnet",
+    "src.components.generation.controlnet:ControlNetGenerator",
+    summary=(
+        "ControlNet OpenPose driven by a rendered trajectory image. "
+        "Same backbone as pose-controlnet; the control image changes."
+    ),
+    capabilities=(
+        appearance(APPEARANCE_COMPRESSED_IMAGE)
+        | motion(MOTION_SPARSE_TRAJECTORIES)
+        | {CAP_PER_FRAME}
+    ),
+    requires=frozenset({CONDITION_MOTION_FIELD, CONDITION_APPEARANCE}),
+    aliases=("trajectory-render",),
+    defaults={"variant": "trajectory"},
+)
+_add(
     "ip-adapter-controlnet",
     "src.components.generation.controlnet:ControlNetGenerator",
     summary="ControlNet + IP-Adapter. Appearance as image or embedding, pose for structure.",
@@ -125,12 +141,24 @@ _add(
     "animate-anyone",
     "src.components.generation.animate_anyone:AnimateAnyoneGenerator",
     summary=(
-        "Animate-Anyone pose-to-video. Checkpoint was fine-tuned on a single "
-        "tennis match; scores are scoped to that match."
+        "Animate-Anyone pose-to-video. Fine-tuned on 7 matches, 114 tracks "
+        "(assets/dataset/pointstream_aa_meta.json); not a single match."
     ),
     capabilities=_PER_FRAME_IMAGE_POSE | {CAP_TEMPORAL_SEQUENCE},
     requires=frozenset({CONDITION_POSE, CONDITION_APPEARANCE}),
     aliases=("animate_anyone", "animateanyone"),
+)
+_add(
+    "stable-animator",
+    "src.components.generation.stable_animator:StableAnimatorGenerator",
+    summary=(
+        "StableAnimator pose-to-video. Adapter Apache-2.0 on HF card "
+        "FrancisRing/StableAnimator (checked 2026-08-22); inference needs "
+        "SVD-XT (Stability AI, not bundled). GitHub code is MIT."
+    ),
+    capabilities=_PER_FRAME_IMAGE_POSE | {CAP_TEMPORAL_SEQUENCE},
+    requires=frozenset({CONDITION_POSE, CONDITION_APPEARANCE}),
+    aliases=("stableanimator", "stable_animator"),
 )
 _add(
     "mofa-video",

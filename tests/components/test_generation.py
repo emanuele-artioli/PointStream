@@ -132,7 +132,9 @@ def test_temporal_capability_is_read_from_the_declaration_not_from_class_identit
 
 def test_animate_anyone_caveat_travels_with_the_registry_entry():
     spec = GENERATORS.spec("animate-anyone")
-    assert "single tennis match" in spec.summary
+    assert "114 tracks" in spec.summary
+    assert "7 matches" in spec.summary
+    assert "not a single match" in spec.summary
     assert "single tennis match" in TENNIS_MATCH_FINETUNE_CAVEAT
 
 
