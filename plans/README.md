@@ -103,7 +103,8 @@ fixes a live fault: 5 of 12 probe clips have colour frames and no skeleton
 | `D-cleanups.md` | nothing | mypy in tests, the AVC region arm |
 
 `C1` and `C2` do not depend on the roster — they are pipeline structure, and
-which generator wins does not change them. `C3` (the runner) waits for both.
+which generator wins does not change them. `C3` (the runner) waits for both —
+brief: `C3-runner.md`.
 
 ### Also live
 | File | What |
