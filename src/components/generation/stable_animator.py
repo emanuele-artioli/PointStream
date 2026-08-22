@@ -85,14 +85,22 @@ Incumbent — Animate-Anyone (`finetuned_tennis`)
 - Wired to ~/Models/AnimateAnyone/profiles/finetuned_tennis.
 - Training meta is assets/dataset/pointstream_aa_meta.json: 7 matches, 114
   tracks. The registry line "single tennis match" is stale.
+- In-set probe (alcaraz_highlights/scene_035/track_0096, frames 69-77, 256px,
+  4 frames). 3 DDIM steps: melted frames, region PSNR 9.65 dB (ALARM: below
+  the 12-28 bound; the config default of 3 steps is not an evaluable
+  setting). 20 steps: recognizable player, region PSNR 14.04 dB (per-frame
+  17.4 / 13.4 / 13.0 / 12.4), inside bounds. Copying the letterboxed first
+  crop onto later frames scored 14.6-15.5 dB — the generator lost to that
+  trivial baseline on frames 1-3 of this short window.
+- Peak VRAM 5.00 GiB (bound 6-14 was pessimistic at 256px). Cold load wall
+  267 s; warm 20-step wall 32.5 s (bound 8-90 missed disk cache: first load
+  of the 8 GB .pth files dominated).
 - Contract fit is clean: appearance crop + rendered pose images.
-- Case for keeping it: it is the only temporal engine fine-tuned on *this*
-  tennis set. A pretrained 2026 model that wins on TikTok can still lose on
-  broadcast tennis (small figures, blur, occlusion, moving camera). That
-  comparison is the eval-general experiment, not a reason to delete the
-  incumbent before measuring.
-- Case for demoting it: it is old, known for face/body distortion in recent
-  papers, and every number it posts is tennis-set-scoped.
+- Case for keeping it: only temporal engine fine-tuned on this tennis set;
+  pretrained 2026 models can still lose on broadcast tennis. That comparison
+  is eval-general, not a reason to delete the incumbent before measuring.
+- Case for demoting it: old, known face/body distortion, tennis-set-scoped,
+  and on this probe it lost a pixel PSNR contest to copying frame 0.
 
 Candidate — StableAnimator
 - Adopted as the one modern wrap this wave. Licence: adapter Apache-2.0 on

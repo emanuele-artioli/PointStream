@@ -113,7 +113,7 @@ class AnimateAnyoneGenerator(BaseFrameGenerator):
         self,
         width: int = 512,
         height: int = 512,
-        steps: int = 10,
+        steps: int = 20,
         guidance: float = 7.5,
         checkpoint: str | None = None,
         runtime: Any = None,
