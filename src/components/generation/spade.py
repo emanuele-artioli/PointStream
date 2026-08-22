@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 import numpy as np
 
-from src.components.generation._numpy import as_chw, as_hwc
+from src.components.generation._numpy import as_chw, as_hwc, prepare_letterboxed
 from src.components.generation.base import BaseFrameGenerator
-from src.components.generation.pose import letterbox_from_bbox, letterbox_image
 from src.contracts.capabilities import CONDITION_APPEARANCE, CONDITION_POSE
 from src.contracts.conditioning import ConditioningBundle, Device, GenerationParams
+
+_DEFAULT_WEIGHT = "spade4tennis_lite_generator.pt"
 
 
 class Spade4TennisGenerator(BaseFrameGenerator):
@@ -29,26 +31,20 @@ class Spade4TennisGenerator(BaseFrameGenerator):
         self.height = height
         self.checkpoint = checkpoint
         self._model = model
+        self.loaded_checkpoint: str | None = None
+        self.last_seed: int | None = None
 
     def prepare(
         self, conditioning: ConditioningBundle, params: GenerationParams
     ) -> dict[str, Any]:
         canvas_width, canvas_height = self.canvas_size(params)
-        appearance = as_hwc(conditioning.appearance)
-        src_h, src_w = appearance.shape[:2]
-        box = letterbox_from_bbox(
-            conditioning.bbox, src_w, src_h, canvas_width, canvas_height
+        return prepare_letterboxed(
+            conditioning.appearance,
+            conditioning.bbox,
+            canvas_width,
+            canvas_height,
+            extras={"pose": conditioning.pose},
         )
-        pose = as_hwc(conditioning.pose)
-        if pose.shape[:2] != (src_h, src_w):
-            import cv2
-
-            pose = cv2.resize(pose, (src_w, src_h), interpolation=cv2.INTER_NEAREST)
-        return {
-            "appearance": letterbox_image(appearance, box),
-            "pose": letterbox_image(pose, box),
-            "letterbox": box,
-        }
 
     def _generate(
         self,
@@ -58,15 +54,85 @@ class Spade4TennisGenerator(BaseFrameGenerator):
         device: Device,
         params: GenerationParams,
     ) -> np.ndarray:
-        del seed
         prepared = self.prepare(conditioning, params)
         model = self._model if self._model is not None else self._load_model(device)
+        self.last_seed = int(seed)
         output = model(prepared["appearance"], prepared["pose"])
         return as_chw(output)
 
     def _load_model(self, device: Device) -> Any:
-        raise RuntimeError(
-            f"spade4tennis has no model loaded. Pass model=... for tests, or a "
-            f"local checkpoint once weights are available. device={device!r}, "
-            f"checkpoint={self.checkpoint!r}."
+        from src.shared.spade4tennis_arch import SPADEResNet9Generator
+
+        path = _resolve_weight(self.checkpoint, _DEFAULT_WEIGHT)
+        net = SPADEResNet9Generator(in_nc=3, out_nc=3, ngf=64, n_blocks=9)
+        net.load_state_dict(_load_state_dict(path))
+        net.to(device)
+        net.eval()
+        self.loaded_checkpoint = str(path)
+        self._model = _SpadeForward(net, device)
+        return self._model
+
+
+class _SpadeForward:
+    """Maps ``(appearance, pose)`` numpy to the module's ``(skeleton, reference)``."""
+
+    def __init__(self, module: Any, device: Device) -> None:
+        self.module = module
+        self.device = device
+
+    def __call__(self, appearance: np.ndarray, pose: np.ndarray) -> np.ndarray:
+        import torch
+
+        skeleton = _hwc_to_batch(pose).to(self.device)
+        reference = _hwc_to_batch(appearance).to(self.device)
+        with torch.no_grad():
+            output = self.module(skeleton, reference)
+        return _batch_to_uint8_chw(output)
+
+
+def _repo_root() -> Path:
+    return Path(__file__).resolve().parents[3]
+
+
+def _resolve_weight(checkpoint: str | None, default_name: str) -> Path:
+    if checkpoint:
+        path = Path(checkpoint)
+        if not path.is_absolute():
+            planted = _repo_root() / "assets" / "weights" / checkpoint
+            path = planted if planted.exists() else path
+    else:
+        path = _repo_root() / "assets" / "weights" / default_name
+    if not path.is_file():
+        raise FileNotFoundError(
+            f"spade4tennis has no model loaded and weight file is missing at {path}. "
+            f"Pass model=... for tests, or place {default_name} under assets/weights/. "
+            f"Lite ResNet-9 is cheap to wire; a missing file is the only reason to drop it."
         )
+    return path.resolve()
+
+
+def _load_state_dict(path: Path) -> Any:
+    import torch
+
+    try:
+        state = torch.load(path, map_location="cpu", weights_only=True)
+    except TypeError:
+        state = torch.load(path, map_location="cpu")
+    if isinstance(state, dict) and "state_dict" in state:
+        state = state["state_dict"]
+    if isinstance(state, dict) and any(str(key).startswith("module.") for key in state):
+        state = {str(key).removeprefix("module."): value for key, value in state.items()}
+    return state
+
+
+def _hwc_to_batch(image: np.ndarray) -> Any:
+    import torch
+
+    hwc = as_hwc(image)
+    tensor = torch.from_numpy(np.transpose(hwc, (2, 0, 1)).astype(np.float32) / 255.0)
+    return ((tensor - 0.5) * 2.0).unsqueeze(0)
+
+
+def _batch_to_uint8_chw(batch: Any) -> np.ndarray:
+    image = (batch.detach().cpu().squeeze(0) + 1.0) / 2.0
+    return (image.clamp(0, 1).numpy() * 255.0).astype(np.uint8)
