@@ -14,9 +14,15 @@ from src.components.generation.animate_anyone import (
     TENNIS_MATCH_FINETUNE_CAVEAT,
     AnimateAnyoneGenerator,
 )
-from src.components.generation.controlnet import ControlNetGenerator
+from src.components.generation.controlnet import (
+    FINAL_EPOCH,
+    ControlNetGenerator,
+    render_trajectory_control,
+    resolve_controlnet_checkpoint,
+)
 from src.components.generation.mofa import MofaVideoGenerator
 from src.components.generation.pix2pix import Pix2PixGenerator
+from src.components.generation.spade import Spade4TennisGenerator
 from src.components.generation.upscale import UpscaleRefineGenerator
 from src.contracts.conditioning import (
     ConditioningBundle,
@@ -223,8 +229,109 @@ def test_resolved_name_canny_controlnet_is_the_registry_key():
 
 
 def test_controlnet_without_weights_names_the_missing_pipeline():
-    gen = ControlNetGenerator(variant="pose")
-    with pytest.raises(RuntimeError, match="no pipeline loaded"):
+    gen = ControlNetGenerator(variant="pose", checkpoint="/no/such/pose-controlnet")
+    with pytest.raises(FileNotFoundError, match="epoch 10"):
+        gen.generate(
+            ConditioningBundle(appearance=_chw(), pose=_chw(fill=255)),
+            seed=0,
+            device="cpu",
+            params=GenerationParams(width=16, height=16),
+        )
+
+
+def test_controlnet_epoch_resolution_uses_the_named_epoch_not_the_last_sorted(tmp_path):
+    """Silently taking checkpoint-epoch-99 because it sorts last is the defect."""
+    base = tmp_path / "pose-controlnet"
+    (base / "checkpoint-epoch-1").mkdir(parents=True)
+    (base / "checkpoint-epoch-99").mkdir()
+    with pytest.raises(FileNotFoundError, match="Refusing to pick another by sort order"):
+        resolve_controlnet_checkpoint("pose", str(base), epoch=10)
+    path, epoch = resolve_controlnet_checkpoint("pose", str(base), epoch=1)
+    assert epoch == 1
+    assert path.name == "checkpoint-epoch-1"
+    assert FINAL_EPOCH["pose"] == 10
+    assert FINAL_EPOCH["seg"] == 7
+
+
+def test_trajectory_variant_requires_a_motion_field_not_a_pose():
+    gen = ControlNetGenerator(variant="trajectory", pipeline=_FakePipe())
+    with pytest.raises(MissingConditioningError, match="motion-field"):
+        gen.generate(
+            ConditioningBundle(appearance=_chw(), pose=_chw(fill=255)),
+            seed=0,
+            device="cpu",
+            params=GenerationParams(width=16, height=16),
+        )
+
+
+def test_trajectory_render_draws_sticks_that_are_not_a_blank_canvas():
+    field = np.zeros((2, 32, 32), dtype=np.float32)
+    field[0, 8, 8] = 12.0
+    field[1, 8, 8] = -6.0
+    canvas = render_trajectory_control(field, width=32, height=32, stride=8)
+    assert canvas.shape == (32, 32, 3)
+    assert canvas.dtype == np.uint8
+    assert canvas.sum() > 0
+    blank = render_trajectory_control(
+        np.zeros((2, 32, 32), dtype=np.float32), width=32, height=32
+    )
+    assert blank.sum() == 0
+
+
+def test_trajectory_render_rejects_a_pose_shaped_array_as_a_motion_field():
+    with pytest.raises(ValueError, match=r"\(2, H, W\)"):
+        render_trajectory_control(np.zeros((3, 16, 16), dtype=np.float32), width=16, height=16)
+
+
+def test_trajectory_prepare_letterboxes_the_rendered_control():
+    gen = ControlNetGenerator(variant="trajectory", width=100, height=50)
+    appearance = np.full((3, 100, 50), 128, dtype=np.uint8)
+    field = np.zeros((2, 100, 50), dtype=np.float32)
+    field[0, 50, 25] = 8.0
+    prepared = gen.prepare(
+        ConditioningBundle(appearance=appearance, motion_field=field),
+        GenerationParams(width=100, height=50),
+    )
+    assert "trajectory" in prepared
+    assert prepared["trajectory"].shape[:2] == (50, 100)
+    gen._pipeline = _FakePipe()
+    out = gen.generate(
+        ConditioningBundle(appearance=appearance, motion_field=field),
+        seed=7,
+        device="cpu",
+        params=GenerationParams(width=100, height=50),
+    )
+    assert gen.last_seed == 7
+    assert out.shape[0] == 3
+
+
+def test_seed_is_recorded_on_a_fake_pipeline_call():
+    gen = ControlNetGenerator(variant="pose", pipeline=_FakePipe())
+    gen.generate(
+        ConditioningBundle(appearance=_chw(), pose=_chw(fill=255)),
+        seed=42,
+        device="cpu",
+        params=GenerationParams(width=16, height=16),
+    )
+    assert gen.last_seed == 42
+
+
+def test_pix2pix_without_weights_names_the_missing_file(tmp_path):
+    missing = tmp_path / "no_such_pix2pix.pt"
+    gen = Pix2PixGenerator(checkpoint=str(missing), width=16, height=16)
+    with pytest.raises(FileNotFoundError, match="pix2pix"):
+        gen.generate(
+            ConditioningBundle(appearance=_chw(), pose=_chw(fill=255)),
+            seed=0,
+            device="cpu",
+            params=GenerationParams(width=16, height=16),
+        )
+
+
+def test_spade_without_weights_names_the_missing_file(tmp_path):
+    missing = tmp_path / "no_such_spade.pt"
+    gen = Spade4TennisGenerator(checkpoint=str(missing), width=16, height=16)
+    with pytest.raises(FileNotFoundError, match="spade4tennis"):
         gen.generate(
             ConditioningBundle(appearance=_chw(), pose=_chw(fill=255)),
             seed=0,
@@ -234,11 +341,16 @@ def test_controlnet_without_weights_names_the_missing_pipeline():
 
 
 @pytest.mark.integration
-def test_pose_controlnet_constructs_against_a_local_checkpoint() -> None:
+def test_pose_controlnet_resolves_epoch_10_on_disk() -> None:
     from pathlib import Path
 
-    sd = Path("assets/weights/stable-diffusion-v1-5")
-    if not sd.exists():
-        pytest.skip(f"no local Stable Diffusion checkpoint at {sd}")
-    gen = ControlNetGenerator(variant="pose", checkpoint=str(sd))
-    assert gen.checkpoint == str(sd)
+    base = Path("assets/weights/pose-controlnet")
+    if not base.exists():
+        pytest.skip(f"no pose-controlnet weights at {base}")
+    path, epoch = resolve_controlnet_checkpoint("pose", str(base), epoch=10)
+    assert epoch == 10
+    assert path.name == "checkpoint-epoch-10"
+    assert (path / "diffusion_pytorch_model.safetensors").is_file()
+    gen = ControlNetGenerator(variant="pose", checkpoint=str(base), epoch=10)
+    assert gen.epoch == 10
+    assert gen.checkpoint == str(base)
