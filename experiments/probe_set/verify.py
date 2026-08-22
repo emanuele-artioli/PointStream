@@ -202,13 +202,6 @@ def collect_violations(
             violations.append(
                 f"{key}: manifest names frames that are not files: {missing_ids[:8]}"
             )
-        if claimed_count is not None and int(claimed_count) != len(on_disk):
-            # The view may hold only the selected window (v2) or a whole track
-            # (v1 wholesale symlink). Counts must match what the manifest claims
-            # for the named frame_ids, which is the missing-ids check above;
-            # a whole-track view with extra files is not itself a frame-count
-            # fault unless the named ones are absent.
-            pass
         if len(frame_ids) != len(on_disk) and set(frame_ids) <= set(on_disk):
             # Named frames exist but the directory has extras — allowed only
             # when we are looking at a dataset-style whole-track symlink (v1).
