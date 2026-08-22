@@ -246,6 +246,22 @@ def write_bounds(path: Path) -> dict[str, Any]:
                 "test that appearance entered."
             ),
         },
+        "pose_ref": {
+            "worst_db": 10.0,
+            "best_db": 20.0,
+            "alarm_low_db": 8.0,
+            "alarm_high_db": 35.0,
+            "must_beat_floor_by_db": 1.0,
+            "success_min_db": STATIC_COPY_FLOOR_DB + 1.0,
+            "basis": (
+                "Pose ControlNet fine-tuned with a same-track reference painted "
+                "under the skeleton. A working appearance path must beat 11.82 dB "
+                "object-scoped by ~1 dB (success >= 12.82). At or below 11.82 it is "
+                "not using appearance. Best plausible ~20 dB for a moving player "
+                "from a still keyframe plus pose. Alarm below ~8 dB is melt; above "
+                "35 dB is scoring the source against itself."
+            ),
+        },
         "in_domain": True,
         "in_domain_reason": (
             "Animate-Anyone fine-tune set contains alcaraz_highlights and "
