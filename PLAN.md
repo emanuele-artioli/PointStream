@@ -29,7 +29,7 @@ Target: **ACM TOMM, September 30.**
 |---|---|---|
 | A — contracts and concepts | ✅ done | — |
 | B — components | ✅ **done**, one gap | Generation cannot load weights — see §2.1 |
-| **B′ — the engine roster** | ⬜ **next** | Wire weights, validate on the probe set (§6) |
+| **B′ — the engine roster** | ⬜ **next** | Wave 1: `BP1`–`BP4` in parallel, then `BP5` (§6) |
 | C — pipeline and runner | ⬜ | Blocked on B′ |
 | D — experiments layer | ⬜ | Blocked on C |
 | E — experiments and paper | ⬜ | Ordered by §7 |
@@ -71,7 +71,43 @@ fine-tuned epochs), `seg-controlnet` (seven), `ip-adapter-controlnet` (ten), ful
 This is the socket built without anything plugged into it, and it is what B′
 exists to close.
 
-### 2.2 Known environment limits
+### 2.3 The probe set is broken — verified 2026-08-22
+
+`assets/probe_set` cannot be used, and using it naively would produce silently
+wrong results rather than an error. It was inherited from the pre-rewrite
+implementation and never checked. Two independent faults:
+
+**1. The manifest and the materialised view name different clips.** `manifest.json`
+seeds a selection of 12 clips; `training_view/` symlinks an entirely *different*
+set. Not one of the 12 manifest-named tracks is present in the view:
+
+| manifest wants | view materialised |
+|---|---|
+| `alcaraz_perricard/scene_002/track_0002` | `track_0001` |
+| `alcaraz_ruud/scene_002/track_0021` | `track_0100` |
+| `djokovic_federer/scene_015/track_0003` | `track_0075` |
+| `federer_djokovic/scene_001/track_0071` | `track_0006` |
+
+So a harness reading the manifest finds nothing, and one reading the view
+evaluates on an unseeded, unrecorded selection.
+
+**2. Two coordinate systems, silently confused.** The manifest records **global
+video frame indices** (e.g. 223–270, 948–995). The extracted per-track PNG
+sequences are numbered **track-locally from zero** (`frame_000000` …
+`frame_000117`). Where the ranges happen to overlap you get *the wrong frames
+with no error*; where they do not, all 48 are missing. Checked against the full
+dataset: **5 of 12 clips miss every frame, and the other 7 would silently return
+frames that were never selected.**
+
+The good news: `assets/dataset` itself is rich and intact — all 12 named tracks
+exist there, with per-track crops, canny, `pose_body`, `pose_racket`, skeleton
+sequences, keypoints, captions and metadata, plus the 15 GB of 4K source in
+`assets/raw_4k`. The data is fine; the probe *view* and its manifest are not.
+
+Rebuilding and verifying it is `plans/BP1-probe-set.md`, and it blocks every
+number B′ would otherwise produce.
+
+### 2.4 Known environment limits
 
 - **SAM3 cannot load.** `torch.nn.attention` does not exist in torch 2.2.2. This
   blocks the SAM3 detector comparison (§7 P1 item 10) unless a second env is
@@ -257,73 +293,127 @@ it, or beating them proves nothing.
 
 The narrative comes first. **The paper decides which experiments matter, the
 experiments decide which models we need, and only those models get built.** This
-is the rule that keeps us from spending September on runs nothing cites. Every
-model below is here because a named `GOAL` in the paper's Evaluation section
-cannot be answered without it — and a model no `GOAL` needs does not get wired,
-however easy it would be.
+is what keeps September from filling up with runs nothing cites.
 
-**We do not need every generator to work. We need a flagship, plus alternatives
-that differ along an axis the paper actually measures.**
+**When a component has no marker to serve, that is a question, not a verdict.**
+Raise it rather than silently dropping it — the paper is a work in progress and
+does not yet contain every `GOAL` we will want. A component with no home may be
+telling us the evaluation is missing something.
+
+**We do not need every generator to work.** We need two flagships and a small
+set of alternatives that differ along axes the paper measures.
 
 #### 6.1 What the paper asks of the generator
 
-| Paper slot | What it demands of the roster |
+| Paper slot | What it demands |
 |---|---|
-| `subsec:eval-ladder` | **One** engine good enough to put a real RD curve against the codec ladder |
-| `subsec:eval-object` | Keypoints vs sparse trajectories vs encoded video **with the backbone held fixed** |
+| `subsec:eval-ladder` | The **best** engine we have, to put PointStream's strongest RD curve against the codec ladder |
+| `subsec:eval-object` | Keypoints vs sparse trajectories vs encoded video, **backbone held fixed** |
 | `subsec:eval-general` | Tennis *and* DAVIS, pretrained *and* fine-tuned |
-| `subsec:eval-operating` | A compute-unbounded point *and* something fast enough to have a real-time point at all |
+| `subsec:eval-operating` | A compute-unbounded point *and* something fast enough to have a real-time point |
 | `subsec:eval-metrics` | Temporal coherence worth measuring with FVMD |
 
-#### 6.2 The roster that follows
+#### 6.2 Two flagships, because two questions are being asked
 
-The binding constraint is `subsec:eval-object`: *"with the generative backbone
-fixed across arms."* Only one family can satisfy it, and that decides the
-flagship.
+`eval-ladder` and `eval-object` want different things and are best served by
+different engines. Trying to satisfy both with one engine compromises both.
 
-| Role | Engine | Why the narrative needs it |
-|---|---|---|
-| **Flagship** | **ControlNet on SD-1.5** (pose / seg / ip-adapter variants) | The only family where the backbone genuinely stays fixed while the conditioning signal changes — which is what makes `eval-object` a representation result rather than a model result. Three variants are already fine-tuned on disk. |
-| Temporal arm | **Animate-Anyone** | The only engine with real temporal modelling, so the only one that makes an FVMD claim meaningful. Its score stays scoped to the single match it was fine-tuned on, every time it is quoted. |
-| Speed rung | **pix2pix** | One forward pass, no diffusion loop. Without it `eval-operating` has no real-time point to report. |
-| Floor | **upscale-refine** | Already works. The cheap non-generative baseline every generative arm must beat, and the control that tells us whether generation is buying anything at all. |
-| Domain control | **SPADE4Tennis** | Tennis-specific; useful only as a contrast to the general backbone. Wire it if cheap, drop it if not. |
+| Role | Engine | Serves | Why |
+|---|---|---|---|
+| **Quality flagship** | Animate-Anyone, or a stronger modern replacement (§6.3) | `eval-ladder`, `eval-metrics` | The headline figure must show the best PointStream can do. Temporal modelling also makes the FVMD claim meaningful. |
+| **Comparison backbone** | ControlNet on SD-1.5 (pose / seg / ip-adapter / trajectory-render) | `eval-object` | The only family where the backbone genuinely stays fixed while the conditioning changes — which is what makes `eval-object` a result about *representations* rather than about models. |
+| Speed rung | pix2pix | `eval-operating` | One forward pass, no diffusion loop. Without it there is no real-time point to report. |
+| Floor | upscale-refine | all | Already works. The non-generative control that says whether generation buys anything at all. |
+
+**Neither flagship is fixed until B′ measures them.** If the comparison backbone
+turns out to also be the best performer, the roles collapse and the narrative
+gets simpler; if a modern replacement beats Animate-Anyone, it takes the slot.
+Stay open, and let the probe numbers decide.
 
 **The trajectory arm does not need MOFA-Video.** MOFA is licence-blocked, and
-routing around it also *improves* the experiment: render sparse trajectories as a
-control image into the same ControlNet backbone the keypoint arm uses. That keeps
-`eval-object`'s "backbone fixed" promise literally true, which a MOFA-vs-ControlNet
-comparison never could — it would have confounded representation with model.
+routing around it improves the experiment: render sparse trajectories as a
+control image into the same ControlNet backbone the keypoint arm uses. That makes
+`eval-object`'s "backbone fixed" promise literally true, which a
+MOFA-vs-ControlNet comparison never could.
 
-#### 6.3 Validate small before scaling
+#### 6.3 What the 2026 literature says we should consider
 
-Two stages, in this order, because the expensive one is only worth running once
-the cheap one says the roster is real.
+Surveyed 2026-08-22. Two findings matter and both are actionable.
 
-- **B′.1 — wire and probe.** Implement the loaders, then drive each engine on
-  `assets/probe_set` (the existing minimal set) for a starting number per engine:
-  PSNR, SSIM, VMAF, LPIPS on a handful of scenes. Purpose is **triage, not
-  results** — which engines produce a plausible frame at all, and how far apart
-  they are. Nothing measured here is citable and nothing here gets a `CLAIM`
-  line.
-- **B′.2 — decide the roster.** From those numbers, confirm or replace the
-  flagship. Expect the fine-tuned ControlNet variants to beat the pretrained
-  backbone on tennis and lose on DAVIS; expect Animate-Anyone to look strong on
-  its own match and poor elsewhere. Both of those are *findings the paper wants*,
-  not failures — `eval-general` exists precisely to report that gap.
-- **Only then** prepare the full dataset and let §7 drive the real sweeps.
+**Our engines are old.** Animate-Anyone is repeatedly outperformed in recent
+comparisons, showing face and body distortion where newer work does not.
+Candidates worth probing for the quality-flagship slot, in order of how cheaply
+we could adopt them:
 
-**Bound before believing (§8 applies here).** These checkpoints are lightly
-trained, some on a single video, some not trained by us at all. A first-pass VMAF
-in the **25–45** band is the expected outcome and is a *pass* for B′.1: it means
-the engine runs and the pipeline is honest. Below ~15 suspect a broken inference
-path before concluding the model is weak — that exact mistake has already been
-made once, when ControlNet's 0.11 VMAF was read as a model result and was in fact
-a broken path. Above ~70 on a first pass, suspect the reference.
+| Candidate | Why | Cost |
+|---|---|---|
+| **StableAnimator** | Apache-2.0, weights on HF, ~10 GB VRAM for the 16-frame UNet. Best reported identity preservation (CSIM) and FVD in its class. The cheapest real upgrade. | low |
+| **MTVCrafter** | SOTA on TikTok, +65% FID-VID over second best. Tokenises raw 4D motion rather than 2D pose images — *directly relevant to our motion-representation axis*. | medium |
+| DisPose / Animate-X / StableAnimator++ | Incremental over the above | defer |
 
-**Improving the numbers is a separate decision, taken after B′.2**, and in this
-order of cost: parameter tuning first, then fine-tuning on our own dataset, then
-swapping a model. Do not start any of them before the roster is fixed.
+**There is now direct competition, and it bounds our claims.** These must be
+cited in Related Work and we must position against them:
+
+- **Sparse2Dense** — keypoint-driven generative human video compression,
+  reporting **74.5% BD-rate reduction against VVC** on DISTS. The closest prior
+  work to our keypoint arm, and the number our own BD-rate must be read against.
+- **T-GVC** — trajectory-guided generative coding below 0.005 bpp. It occupies
+  the exact ground of our sparse-trajectory arm.
+- **GVC-RT / ReGenVC** — real-time generative coding at ultra-low bitrate.
+  Directly relevant to `eval-operating`, where our measured speed is very poor.
+
+**What still differentiates PointStream**, and the narrative should lean on it:
+this work is evaluated on **full broadcast scenes** — multiple objects, a
+background model, a corrective residual, and a codec fallback — where those
+systems handle a single centred subject on talking-head or TikTok-style
+material. The ablation lattice and the residual are ours; the generative decoder
+is not, and the paper should stop implying otherwise.
+
+**Bound before believing:** Sparse2Dense's 74.5% BD-rate against VVC is the
+state of the art on an easier problem. A PointStream BD-rate substantially
+better than that on harder content is an **alarm**, not a triumph — check the
+anchor, the overlap range and the region scoping before believing it.
+
+#### 6.4 Measure the part we generate, not the whole frame
+
+**A frame-level score hides a broken object.** A reconstruction whose background
+is perfect and whose player is mangled still posts a respectable frame PSNR,
+because the player occupies a small fraction of the pixels. Every evaluation must
+therefore be **scoped to the region the component under test produced**:
+
+- object generation → scored on the **object crop / mask**, not the frame;
+- background modelling → scored on the **background region**, with objects excluded;
+- the whole frame → reported *as well*, never *instead*.
+
+This is an architectural requirement, not an evaluation preference, and it is why
+`BP2-region-metrics.md` exists. Today `src/components/metrics/` has no concept of
+a region at all.
+
+#### 6.5 Metric discipline: PSNR to develop, the rest to publish
+
+**PSNR is the internal check.** It is fast, always comparable, and enough to
+answer "did this engine run and produce something plausible". VMAF, SSIM, LPIPS
+and FVMD are slow, and computing them during triage buys nothing.
+
+- **Triage and development:** PSNR only, region-scoped.
+- **Paper results:** the full set, once the roster is fixed and the runs are the
+  ones we intend to cite.
+
+A triage number is never citable and never gets a `CLAIM` line.
+
+#### 6.6 Validate small before scaling
+
+- **B′.1 — fix the probe set.** It is broken (§2.3) and nothing downstream can be
+  trusted until it is rebuilt and verified.
+- **B′.2 — wire the loaders and probe.** Region-scoped PSNR per engine per clip.
+  Triage, not results.
+- **B′.3 — fix the roster in writing**, with the reason each engine holds its
+  slot. **Only then** prepare the full dataset.
+
+Improving numbers is a separate decision taken after B′.3, in this order of
+cost: parameter tuning, then fine-tuning on our data, then swapping a model.
+Tuning an engine that is about to be dropped is the most expensive way to waste
+September.
 
 **Phase C — pipeline and runner.**
 - *C1 reconstruction and residual*: decompose `SynthesisEngine` (512 lines doing
@@ -408,9 +498,11 @@ Phase gates:
   has a region arm or a recorded reason it cannot; `python -m src.components`
   lists every registered backend on every axis. Verified by driving each, not by
   reading the code.
-- **After B′:** every engine on the §6.2 roster loads real weights and returns a
-  frame that is not the input; each has a probe-set number recorded; the roster
-  is fixed in writing with the reason each engine is on it.
+- **After B′:** the probe-set verifier fails on the old set and passes on the
+  rebuilt one; a perfect-background/destroyed-object reconstruction posts a good
+  frame PSNR and a bad object-scoped PSNR; every engine on the §6.2 roster loads
+  real weights and returns a frame that is not its input; the roster is fixed in
+  writing with the reason each engine holds its slot.
 - **After C — the decisive gate:** `config/tier_fast.yaml` and
   `config/tier_quality.yaml` each produce a run summary carrying **real PSNR,
   SSIM, VMAF and LPIPS numbers**; a residual-absent run completes and reports its

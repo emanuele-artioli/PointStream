@@ -18,8 +18,41 @@ report rather than making it.
 | `B5-transport-temporal.md` | payload serialization, temporal policy | 15, 7 |
 | `B6-metrics.md` | quality measurement | 16 |
 | `B7-domain.md` | domain profiles | domain |
-| `BP-engine-roster.md` | **B′ — wiring generator weights, fixing the roster** | 12 |
 
-**Phase B is done.** Each `B*.md` brief now ends with a *Delivered* section
+**Phase B is done.** Each `B*.md` brief above now ends with a *Delivered* section
 recording what actually landed and what is still outstanding — read that before
-assuming a stream is finished. `BP-engine-roster.md` is the live one.
+assuming a stream is finished.
+
+## Phase B′ — the live work
+
+Split for parallel sessions. **A wave starts only once every stream it depends on
+has reported back**, and all streams in a wave launch together.
+
+### Wave 1 — four independent streams
+
+| Brief | Owns | Why it is independent |
+|---|---|---|
+| `BP1-probe-set.md` | `assets/probe_set`, probe tooling | Data, no model code |
+| `BP2-region-metrics.md` | `src/components/metrics/**` | Metrics only |
+| `BP3-generator-loaders.md` | ControlNet family, pix2pix, spade, upscale | Disjoint files from BP4 |
+| `BP4-flagship-candidates.md` | `animate_anyone.py`, `mofa.py`, new engines | Disjoint files from BP3 |
+
+`BP3` and `BP4` both touch `src/components/generation/` but **own disjoint
+files**. Neither edits the registry table in `__init__.py` without saying so in
+its report — that is the one contention point between them.
+
+### Wave 2
+
+| Brief | Depends on | Owns |
+|---|---|---|
+| `BP5-roster-decision.md` | all of Wave 1 | the probe harness, the invariants, the roster |
+
+### Also live
+
+| File | What |
+|---|---|
+| `DEFERRED.md` | Real work deliberately not now: mypy in tests, SAM3, the AVC region arm, MOFA |
+
+Phase C briefs are written once `BP5` fixes the roster — the residual and
+reconstruction work (C1) is largely independent and is the natural candidate to
+join a later wave.
