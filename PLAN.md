@@ -413,49 +413,54 @@ set of alternatives that differ along axes the paper measures.
 
 #### 6.2 Two flagships, because two questions are being asked
 
-`eval-ladder` and `eval-object` want different things and are best served by
-different engines. Trying to satisfy both with one engine compromises both.
+`eval-ladder` and `eval-object` want different things. The Wave-2 probe
+(`outputs/bp5-probe/summary.json`, seed 42, `cuda:0`, track-local frame 24,
+object-scoped PSNR on crop alpha, 12 training-split clips, **not citable**)
+decides who holds which slot. Animate-Anyone does **not** keep the quality
+flagship. StableAnimator cannot take it: generate refuses, SVD-XT is not
+licence-cleared (§2.4).
+
+**Held-out (PLAN.md §2.5), option 2.** Animate-Anyone has seen both probe-set
+held-out videos. Report it as in-domain only. A pretrained engine (the
+ControlNet family, or pix2pix) carries the held-out arm. Option 1 needs new
+source; option 3 (retrain) stays out of scope.
 
 | Role | Engine | Serves | Why |
 |---|---|---|---|
-| **Quality flagship** | Animate-Anyone, or a stronger modern replacement (§6.3) | `eval-ladder`, `eval-metrics` | The headline figure must show the best PointStream can do. Temporal modelling also makes the FVMD claim meaningful. |
-| **Comparison backbone** | ControlNet on SD-1.5 (pose / seg / ip-adapter / trajectory-render) | `eval-object` | The only family where the backbone genuinely stays fixed while the conditioning changes — which is what makes `eval-object` a result about *representations* rather than about models. |
-| Speed rung | pix2pix | `eval-operating` | One forward pass, no diffusion loop. Without it there is no real-time point to report. |
-| Floor | upscale-refine | all | Already works. The non-generative control that says whether generation buys anything at all. |
+| **Quality flagship** | ControlNet on SD-1.5, best arm **seg-controlnet** (object 16.2 dB; pose 15.9) | `eval-ladder` | Highest object-scoped PSNR on the aligned probe. The ladder figure shows the best PointStream can currently do. |
+| **Comparison backbone** | Same ControlNet family (pose / seg / ip-adapter / trajectory-controlnet) | `eval-object` | The only family where the backbone stays fixed while the conditioning changes. Seg beat pose by 0.3 dB; trajectory 14.9; ip-adapter frame 11.1 is the known txt2img floor (object 7.9 is that floor, scoped — not a path bug). |
+| Temporal / FVMD | Animate-Anyone | `eval-metrics` | Only temporal engine that actually ran. Object 10.4 dB at 512 px, one frame; ~6 dB behind ControlNet, not a 15 dB wiring stop. In-domain only (option 2). |
+| Speed rung | pix2pix | `eval-operating` | 37 ms, 0.32 GiB, object 15.4 dB — within 1 dB of pose-controlnet. Without it there is no real-time point. |
+| Floor | upscale-refine | all | Object 14.5 dB. Frame PSNR inverts because this backend *stretches* the crop onto 512² while scoring letterboxes; the fair number is object-scoped. |
 
-**Neither flagship is fixed until B′ measures them.** If the comparison backbone
-turns out to also be the best performer, the roles collapse and the narrative
-gets simpler; if a modern replacement beats Animate-Anyone, it takes the slot.
-Stay open, and let the probe numbers decide.
+**Do the two flagship roles collapse?** For quality, yes: the comparison
+backbone *is* the best evaluable engine, so `eval-ladder` and `eval-object`
+share a family. They do not collapse into one row. `eval-object` still needs
+the four conditionings; `eval-metrics` still needs a temporal model;
+`eval-operating` still needs pix2pix.
 
-**The trajectory arm does not need MOFA-Video.** MOFA is licence-blocked, and
-routing around it improves the experiment: render sparse trajectories as a
-control image into the same ControlNet backbone the keypoint arm uses. That makes
-`eval-object`'s "backbone fixed" promise literally true, which a
-MOFA-vs-ControlNet comparison never could.
+**The trajectory arm does not need MOFA-Video.** MOFA refused construction
+(licence). Trajectory-controlnet object 14.9 dB sits next to pose 15.9 on the
+same epoch-10 OpenPose checkpoint — the control image is the thing that
+changed. That is the `eval-object` experiment.
 
 #### 6.2.1 Which existing engines survive, and why
 
-The 2026 models (§6.3) are better at exactly one thing: synthesising a single
-convincing person from a pose. That is not the only thing this paper measures, so
-most of the existing roster keeps its place — **each for a structural reason, not
-because it is already wired.**
+Most of the roster keeps its place — **each for a structural reason, now
+backed by the probe, not because it is already wired.**
 
 | Engine | Verdict | What no modern model does instead |
 |---|---|---|
-| **ControlNet family** | **Keep — now more important** | The only family with swappable control encoders over a fixed backbone. `eval-object` is a claim about *representations*; with a pose-only model it silently becomes a claim about models. It is also the only thing here fine-tuned on our own data. |
-| **pix2pix** | **Keep** | One forward pass, no sampling loop. StableAnimator wants ~10–16 GB and a diffusion schedule. Without pix2pix, `eval-operating` has no real-time point to report at all. |
-| **upscale-refine** | **Keep — value went up** | The non-generative floor. If a 2026 SOTA animator barely beats bicubic upsampling at our bitrates, that is a headline finding, and only this control can show it. |
-| **Animate-Anyone** | **Keep as the evaluable incumbent — with a leakage caveat** | Wired on `phase-bp/bp4` to `~/Models/AnimateAnyone/profiles/finetuned_tennis`. Fine-tuned on **114 tracks across 7 videos** (`assets/dataset/pointstream_aa_meta.json`) — the "single tennis match" caveat was stale and is withdrawn. 3 DDIM steps melted (9.65 dB); class default is now 20 steps, 14.0 dB in-set. **But its training set includes both probe-set held-out videos** — `alcaraz_highlights` (20 tracks) and `djokovic_zverev` (16). See §2.5: for this engine the held-out split does not hold out. |
-| **SPADE4Tennis** | **Keep for now** | Architecturally close to ControlNet+pix2pix, which makes it a useful control: if a tennis-specific SPADE generator matches or beats a fine-tuned general backbone on tennis, that says something about how much domain specialisation is worth. Judge it on the probe numbers, not in advance. |
-| **MOFA-Video** | Stays dropped | Licence-blocked; the rendered-trajectory arm replaces it and is a better experiment. |
+| **ControlNet family** | **Keep — quality flagship and comparison backbone** | Swappable control encoders over a fixed backbone. Fine-tuned on our data. Seg 16.2 / pose 15.9 / trajectory 14.9 object dB, epoch 10/7/10, ~3.3 GiB, ~4–6 s/frame after warmup. ip-adapter stays in the family as the weak arm (frame 11.1 dB known floor). |
+| **pix2pix** | **Keep** | One forward pass. Object 15.4 dB in 37 ms at 0.32 GiB. Without it, `eval-operating` has no real-time point. |
+| **upscale-refine** | **Keep** | Non-generative floor, object 14.5 dB. Generation still buys ~1.7 dB over it on this triage (seg vs floor). Score object-scoped; do not rank it on canvas PSNR. |
+| **Animate-Anyone** | **Keep as the temporal incumbent, not the quality flagship** | Only temporal engine that ran (5.4 GiB, 20 steps). Object 10.4 dB. Fine-tuned on 114 tracks / 7 videos including both held-out videos — **option 2: in-domain only**. 3 DDIM steps remain unevaluable; default stays 20. |
+| **SPADE4Tennis** | **Keep as a domain-specialisation control, not a contender** | Object 12.0 dB, frame 15.2 matching BP7's canvas 15.1. It lost to the fine-tuned general backbone. That *is* the comparison: domain SPADE did not beat ControlNet on tennis. |
+| **MOFA-Video** | Stays dropped | Construction refuses (SVD licence). Trajectory-controlnet replaces it. |
+| **StableAnimator** | Wrapped, not shipped | Constructs; generate refuses (SVD-XT not bundled). Cannot be flagship until the licence clears. Not ranked. |
 
-**What gets added:** StableAnimator is wrapped on `phase-bp/bp4` but **cannot
-be the shipped flagship** until SVD-XT is licence-cleared — the Apache-2.0
-claim applied to the adapter card, not the inference stack (see §2.4).
 MTVCrafter is still a candidate *motion representation* (4D/SMPL tokens), not a
-drop-in generator; not wrapped this wave. Sparse2Dense still has no public code
-or weights (rechecked 2026-08-22).
+drop-in generator. Sparse2Dense still has no public code or weights.
 
 #### 6.3 What the 2026 literature says we should consider
 

@@ -41,6 +41,22 @@ IP_ADAPTER_ENGINE = "ip-adapter-controlnet"
 # treated as an alarm by itself.
 FRAME_MINUS_OBJECT_SMALL_GAP_DB = 0.5
 
+# Revisions after outputs/bp5-probe (the constants above were not moved).
+# 1. Prior band (pose ~19, ip-adapter ~11, AA ~14) was whole-canvas vs
+#    letterboxed appearance. Object-scoped (crop alpha) sits ~3–4 dB below
+#    that on every ControlNet arm. Applying the 10 dB path-bug floor to
+#    *object* PSNR therefore alarms ip-adapter at 7.9 dB even though its
+#    frame PSNR is 11.1 dB — the same known txt2img floor, scoped. Output
+#    differed from input. Not a new path bug.
+# 2. SPADE object 12.0 is below the 14–28 expected band; frame 15.2 matches
+#    BP7's 15.1 canvas number. Same unit mismatch as (1).
+# 3. Upscale-refine inverts the frame/object gap because it *stretches* the
+#    crop onto 512² while scoring letterboxes. Object 14.5 dB is the fair
+#    floor; the inverted frame score is a canvas convention, not a model.
+# 4. Animate-Anyone object 10.4 is below expected. Gap to ControlNet is ~6 dB
+#    (not 15). Single-frame 512 px vs BP4's 256 px 4-frame window. Not a
+#    wiring stop; it loses the quality-flagship slot on this triage.
+
 
 @dataclass(frozen=True)
 class BoundVerdict:
