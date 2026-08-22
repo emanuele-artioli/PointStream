@@ -97,84 +97,31 @@ one). 3 DDIM steps melted (9.65 dB, below the 12 dB floor). 20 steps: 14.0 dB
 in-set, 5.0 GiB, 32.5 s warm. StableAnimator is wrapped; SVD-XT not bundled
 (§2.4). Sparse2Dense still has no public code.
 
-### 2.3 The probe set — rebuilt 2026-08-22 on `phase-bp/bp1`
+### 2.2 The probe set — rebuilt and aligned
 
-The inherited v1 view was unusable. Using it naively produced silently wrong
-results rather than an error. Two faults were diagnosed; only the first
-survived measurement.
+The inherited v1 set was unusable and is kept at `assets/probe_set.broken-v1/`.
+Rebuilt as `pointstream.probe_set.v2` on `phase-bp/bp1`, merged, and now
+**12/12 clips have matching colour and skeleton frame counts**. Same seed
+(`20260712`), same 12 tracks, locked 5-train / 2-held-out split asserted by a
+verifier that fails on the v1 snapshot.
 
-**1. The manifest and the materialised view named different clips.** That is
-the fault that actually fires. `manifest.json` seeded 12 clips;
-`training_view/` symlinked an entirely *different* set. Zero of the 12
-manifest-named tracks were in the view (driven: 17 verifier violations on the
-v1 snapshot at `assets/probe_set.broken-v1/`). A harness reading the manifest
-found nothing; one reading the view evaluated an unseeded, unrecorded
-selection.
+**The lesson worth keeping, because it defeated two agents in a row:**
+`assets/dataset` uses **two frame-naming conventions inside one track group** —
+crop, `_canny`, `_pose_body` and `_pose_racket` carry global source frame ids,
+while `_skeleton` is track-local from zero. 50 of 114 tracks (44%) carry the
+offset; the rest align only because they start at frame 0. Two separate
+measurements reached opposite conclusions because each read a different directory
+and neither said which.
 
-**2. Two naming conventions in one track group — the live fault, still open.**
-Both earlier diagnoses were wrong, in opposite directions, and the truth is
-worse than either. Verified 2026-08-22 by listing every track directory:
+**Always resolve a frame by its position in the track, never by rebuilding a
+filename.** `src/shared/tennis_dataset.py:95-110` has always done this correctly
+and is the pattern to copy. Note its docstring describes the wrong convention —
+do not "fix" the code to match the comment.
 
-| Directory | Naming | Count |
-|---|---|---|
-| crop, `_canny`, `_pose_body`, `_pose_racket` | **global source frame ids** | consistent |
-| `_skeleton` | **track-local, zero-based** | 50/50 sampled |
+Still outstanding: `scripts/select_probe_set.py` writes v1 and must not be used
+as the regenerator.
 
-So a track that starts at source frame 29 has its crop at `frame_000029.png` and
-its *pose* for that same instant at `frame_000000.png`. **50 of 114 tracks (44%)
-carry this offset**; the other 64 align only because they happen to start at
-source frame 0. Frame counts always match — it is a pure re-indexing.
-
-The v1 measurement that found "5 of 12 clips missing every frame" was measuring
-`_skeleton` and was **correct for the pose channel**. The re-measurement that
-found "0/12 missing" was measuring the colour crop and was **correct for that
-channel**. Neither noticed the two disagree.
-
-**This survived into the first v2 tree and is now closed.** `materialize.py`
-copied the crop strictly (raising on a missing frame) but copied every
-conditioning directory with the *same* global `source_id` under
-`if src.is_file()` — silently skipping what it cannot find. Result, verified
-on the snapshot at `assets/probe_set.broken-v2-unaligned/`:
-
-| Clips | Colour frames | Skeleton frames |
-|---|---|---|
-| 7 of 12 | 48 | 48 |
-| **5 of 12** | 48 | **0** |
-
-The five are `alcaraz_perricard/scene_006/track_0196`,
-`alcaraz_ruud/scene_004/track_0257`, `alcaraz_ruud/scene_004/track_0297`,
-`federer_djokovic/scene_001/track_0071`,
-`sinner_alcaraz/scene_012/track_0058` — the same five as v1.
-
-**Fix, landed on `phase-bp/integrate`.** Every channel is resolved by the
-frame's *position in the track* (sorted `frame_*.png` lists, pair by index),
-never by reconstructing a filename. The verifier asserts each conditioning
-directory has the same frame count as the crop — it failed on the unaligned
-v2 snapshot (5 clips, `_skeleton has 0 frames, crop has 48`) and passes on
-the rematerialised tree. Driven: all 12 clips have 48 colour frames **and**
-48 skeleton frames. `assets/dataset` was not renamed.
-
-The underlying `assets/dataset` was never the problem — all 12 named tracks
-exist there, with crops, canny, `pose_body`, `pose_racket`, skeleton,
-keypoints, captions and metadata, plus the 15 GB of 4K source in
-`assets/raw_4k`.
-
-**Rebuilt as `pointstream.probe_set.v2` on `phase-bp/bp1`, alignment-fixed on
-`phase-bp/integrate`.** Track-local indexing, `global_offset` plus
-`global_frame_ids` (two of twelve windows are not contiguous in source
-numbering). The clips view is written first; the manifest is walked off that
-tree. Same seed (`20260712`) kept the same 12 tracks; 576 colour frames and
-576 skeleton frames. The verifier fails on the v1 snapshot and on the
-unaligned v2 snapshot, and passes on `assets/probe_set`. Locked 5-train /
-2-held-out split asserted.
-
-Still outstanding, not this stream: `scripts/eval_checkpoint.py` still treats
-`frame_ids` as dataset filename numbers when pointed at `assets/dataset`;
-with a v2 manifest it would load the start of the track, not the selected
-window. `scripts/select_probe_set.py` now delegates to
-`python -m experiments.probe_set` and is not the regenerator.
-
-### 2.6 Why every engine scores badly: they were trained for the wrong task
+### 2.3 Why every engine scores badly: they were trained for the wrong task
 
 Verified 2026-08-22 by driving the engines, not by reading the roster table.
 This supersedes any reading of the Wave-2 numbers as "the models are weak".
@@ -225,25 +172,14 @@ search fixes it. The architecture requires appearance to be transmitted and
 and a text prompt. `PLAN.md` §6.6's cost order — tune, then fine-tune, then
 swap — starts at the wrong rung: tuning is ruled out on evidence.
 
-The live options are in `plans/BP8-appearance-conditioning.md`.
+The live options are in `plans/BP8-appearance-conditioning.md`, ordered by cost:
+re-examine Animate-Anyone's inference path first (hours — it is the one
+reference-conditioned architecture on the roster), then wire a real IP-Adapter,
+then retrain ControlNet with the reference frame `tennis_dataset.py` already
+samples. `plans/BP9-probe-harness.md` fixes what the probe measures and makes
+the static-copy floor a permanent arm.
 
-### 2.4 Known environment limits
-
-- **SAM3 cannot load.** `torch.nn.attention` does not exist in torch 2.2.2. This
-  blocks the SAM3 detector comparison (§7 P1 item 10) unless a second env is
-  built. Both the detector and segmenter entries fail construction and say so.
-- **RF-DETR is not installed.** It needs `transformers>=5.1`; this env pins
-  4.46.3. Registered, honest about it, not usable.
-- **MOFA-Video is a candidate, not an integration.** Its SVD weights are
-  Stability-AI-licensed and not bundled, so construction refuses by design. §6.2
-  says what replaces it for the trajectory arm.
-- **StableAnimator is the same SVD class.** Wrapper on `phase-bp/bp4`. HF card
-  `FrancisRing/StableAnimator` is Apache-2.0 (checked 2026-08-22); GitHub code
-  is MIT; inference needs SVD-XT (Stability AI Community / SVD research licence)
-  and InsightFace `antelopev2`, neither bundled. Cannot ship as a flagship until
-  SVD is cleared. Live inference was not run: leftover VRAM ~11.6 GiB, VAE decode
-  wants ~16 GiB.
-### 2.5 Animate-Anyone has seen the held-out videos
+### 2.4 Animate-Anyone has seen the held-out videos
 
 Verified 2026-08-22 from `assets/dataset/pointstream_aa_meta.json`. The probe set
 holds out `alcaraz_highlights` and `djokovic_zverev`. Animate-Anyone's
@@ -267,6 +203,22 @@ Option 2 is the default unless someone argues otherwise. Whatever is chosen, the
 paper says which, because an unlabelled in-training score is the kind of thing a
 reviewer finds.
 
+### 2.5 Known environment limits
+
+- **SAM3 cannot load.** `torch.nn.attention` does not exist in torch 2.2.2. This
+  blocks the SAM3 detector comparison (§7 P1 item 10) unless a second env is
+  built. Both the detector and segmenter entries fail construction and say so.
+- **RF-DETR is not installed.** It needs `transformers>=5.1`; this env pins
+  4.46.3. Registered, honest about it, not usable.
+- **MOFA-Video is a candidate, not an integration.** Its SVD weights are
+  Stability-AI-licensed and not bundled, so construction refuses by design. §6.2
+  says what replaces it for the trajectory arm.
+- **StableAnimator is the same SVD class.** Wrapper on `phase-bp/bp4`. HF card
+  `FrancisRing/StableAnimator` is Apache-2.0 (checked 2026-08-22); GitHub code
+  is MIT; inference needs SVD-XT (Stability AI Community / SVD research licence)
+  and InsightFace `antelopev2`, neither bundled. Cannot ship as a flagship until
+  SVD is cleared. Live inference was not run: leftover VRAM ~11.6 GiB, VAE decode
+  wants ~16 GiB.
 
 ---
 

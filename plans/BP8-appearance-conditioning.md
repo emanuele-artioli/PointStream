@@ -45,15 +45,29 @@ off-the-shelf model gives us.
 **11.82 dB** object-scoped. Beating it by less than ~1 dB is not a result. Below
 it, the model still is not using appearance.
 
-### Option B — use an architecture built for reference conditioning
+### Option B — re-examine Animate-Anyone first (do this before A)
 
-Animate-Anyone (ReferenceNet), a properly-wired IP-Adapter, or StableAnimator
-all take a reference image **by design**.
+**Start here, not with A.** Animate-Anyone is the one architecture on the roster
+whose entire purpose is reference conditioning — appearance enters through
+ReferenceNet by design. It scored 10.4 dB and was dropped as flagship *on the
+self-reconstruction framing*, which is the framing that also made ControlNet look
+acceptable. A low score from the one reference-conditioned model is more likely
+an inference-path fault than a model verdict.
 
-Animate-Anyone scored 10.4 dB and was dropped as flagship — **re-examine that
-number before accepting it.** It is the one architecture here whose whole purpose
-is reference conditioning, so a low score is more likely an inference-path fault
-than a model verdict. That is the same mistake pattern as ControlNet's 0.11 VMAF.
+This is the same mistake pattern as ControlNet's 0.11 VMAF, which was read as a
+model result and was a broken path. Check, in order: that the reference image
+actually reaches ReferenceNet; the DDIM step count (3 steps melted, 20 is the
+class default); the letterboxing agreement between reference and pose; and the
+scheduler configuration.
+
+It is hours of work and it may be the whole answer. A is days.
+
+### Option B2 — other architectures built for reference conditioning
+
+A properly-wired IP-Adapter is the cheapest of these: the existing
+`ip-adapter-controlnet` checkpoint is a mislabelled segmentation ControlNet
+(`PLAN.md` §2.6), but the *architecture* accepts an image as appearance. Wiring
+a real IP-Adapter against the stock SD-1.5 backbone needs no retraining.
 
 StableAnimator remains licence-blocked on SVD-XT (`PLAN.md` §2.4).
 
@@ -84,9 +98,19 @@ loses to a static copy, so the roster is not settled.
 **This does not invalidate the rest.** The probe set, region metrics, C1 and C2
 all stand. The pipeline work is unaffected; only the roster claim is.
 
+## Order of work
+
+1. **Re-examine Animate-Anyone's inference path** (Option B). Hours. May be the
+   whole answer.
+2. **Wire a real IP-Adapter** (Option B2) if B does not settle it. No retraining.
+3. **Retrain pose-ControlNet with the reference frame** (Option A) if neither
+   does. Days, but it is the option that preserves the fixed comparison backbone
+   `subsec:eval-object` depends on.
+4. **Option C only if 1–3 all fail**, and then as a reported finding, never as an
+   escape.
+
 ## Done when
 
 - One engine beats the 11.82 dB static-copy floor on the coding task, or all
-  three options are tried and the negative result is written down with numbers.
-- The probe scores against a later frame and keeps a static-copy baseline.
+  options are tried and the negative result is written down with numbers.
 - `PLAN.md` §6.2 roster is re-decided on coding-task numbers.
