@@ -7,25 +7,17 @@ Nothing here is a nice-to-have wish: if an item stops being true, delete it.
 
 ---
 
-## D1 — 61 mypy errors in the component tests
+## D1 — 61 mypy errors in the component tests (closed 2026-08-22)
 
-**What.** `mypy --config-file pyproject.toml` reports 61 errors, **all** in
-`tests/components/`, none in `src/`. Mostly `dict[str, object]` where a typed
-protocol is expected, plus `type: ignore` comments carrying the wrong error code.
+**What.** `mypy --config-file pyproject.toml` reported 61 errors, all in
+`tests/components/`, none in `src/`. Mostly `Registry.build` returning
+`object`, plus `type: ignore` comments carrying the wrong error code
+(`union-attr` on an `attr-defined` error). Five more came from
+`tests/test_select_probe_set.py` importing v1 helpers that BP7 deleted.
 
-Distribution: `test_background.py` 24, `test_rigid.py` 15, `test_domain.py` 13,
-`test_temporal.py` 4, and one or two each in `test_metrics.py`,
-`test_segmentation.py`, `test_generation.py`, `test_detection.py`.
-
-**Why deferred.** It blocks nothing that produces a result, and the source tree
-is already clean.
-
-**Why it still matters.** `AGENTS.md` requires mypy clean before merge, so this
-is the one thing standing between `phase-b/integrate` and a tidy merge to main.
-Every session that runs mypy meanwhile has to know these are pre-existing, which
-is exactly the kind of noise that hides a real error later.
-
-**Cost.** An hour or two, mechanical. Good first task for a spare parallel slot.
+**Status.** Closed on `phase-d/cleanups`. Tests now narrow `build()` to the
+backend they constructed. The v1 probe-set file is a module-level skip;
+v2 coverage is `tests/components/test_probe_set.py`. No new ignores.
 
 ---
 
@@ -51,21 +43,36 @@ work, not an afternoon, which is precisely why it waits.
 
 ---
 
-## D3 — The AVC region arm is unverified
+## D3 — AVC `addroi` is a no-op under QP (verified 2026-08-22)
 
-**What.** `roi.py` records ffmpeg's `addroi` filter for AVC as unverified. AV1
-and HEVC have native delta-QP maps that have been driven; AVC's has not.
+**What.** ffmpeg's `addroi` filter is on the native AVC command and is listed
+in this build's filter table. AV1 and HEVC have native delta-QP maps that
+have been driven.
 
-**Why deferred.** AVC is the speed rung, not the quality anchor, and the
-region-controlled comparison that matters most is against AV1 and HEVC.
+**Finding.** `/opt/local/bin/ffmpeg` (`n7.1.1-56-gc2184b65d2`,
+`--enable-libx264`) inserts `addroi=192:128:256:128:-0.588…` under
+`--roi-arm native`. At matched QP 45 / preset veryfast on 20 frames of
+`assets/real_tennis.mp4` (640×384, centred region, inside offset −30),
+baseline and ROI bitstreams were byte-identical (7627 bytes) and luma PSNR
+was unchanged in the labelled region (30.09 dB in, 28.18 dB out). Bound
+written first: a no-op is both |Δ| < 0.25 dB in the region; measured Δ =
+0.00 dB, inside that bound. File size alone would not have been evidence;
+here even the bytes matched. A CRF 45 diagnostic on the same clip — not a
+paper comparison; the contract forbids CRF for an ROI arm — moved the
+labelled region +17.00 dB and left the outside at −0.00 dB, so libx264 can
+honour the side data when AQ is active. Native AVC ROI is therefore
+unusable under the QP discipline the other rungs use; keep the pixel arm.
+The CRF diagnostic bound (+0.25 to +4 dB) was too tight: qoffset −0.59 at
+CRF 45 is most of the addroi scale toward lossless, not a mild AQ nudge.
 
-**Why it still matters.** `NOTE(sec:evaluation)` item (c) commits the paper to
-giving every baseline region control *wherever its encoder supports it*. If
-`addroi` works and we did not use it, the AVC comparison is weaker than it
-claims; if it does not work, the paper must say so rather than leave it silent.
+**Why it still matters.** `NOTE(sec:evaluation)` item (c) commits the paper
+to giving every baseline region control *wherever its encoder supports it*.
+Say that AVC's encoder supports `addroi` only under CRF, which this
+comparison is not allowed to use, rather than leaving the arm silent or
+pretending the QP flag works.
 
-**Cost.** An afternoon: encode one clip with and without, confirm the bitstream
-actually differs in the labelled region.
+**Status.** Closed as a recorded finding. Do not put native AVC `addroi` in
+the evaluation bin.
 
 ---
 

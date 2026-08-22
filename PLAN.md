@@ -29,9 +29,8 @@ Target: **ACM TOMM, September 30.**
 |---|---|---|
 | A — contracts and concepts | ✅ done | — |
 | B — components | ✅ **done** | Merged-ready on `phase-b/integrate` (still unmerged to main) |
-| **B′ — the engine roster** | Wave 1 ✅ | `BP7` merges and fixes pose alignment, then Wave 2 |
-| C — pipeline and runner | ⬜ | `C1`/`C2` can start with Wave 2; `C3` after both |
-| C — pipeline and runner | ⬜ | Blocked on B′ |
+| **B′ — the engine roster** | Wave 2 ✅ | ControlNet holds both quality slots; Animate-Anyone in-domain only |
+| C — pipeline and runner | ⬜ | `C1`/`C2` landed unmerged; `C3` is next |
 | D — experiments layer | ⬜ | Blocked on C |
 | E — experiments and paper | ⬜ | Ordered by §7 |
 
@@ -39,7 +38,7 @@ Target: **ACM TOMM, September 30.**
 sixteen axes: ~8.6k lines of source, ~3.3k of tests, 52 registered backends of
 which 48 construct. 392 contract and component tests pass, plus 13 integration
 tests that drive real tools. `ruff` and `python -m src.contracts.layers` are
-clean. `mypy` reports 61 errors, all in `tests/components/`, none in `src/`.
+clean. `mypy` is clean on `phase-d/cleanups` (was 66 in tests; D1 closed).
 
 All three Phase-B gates pass: `av1` + `yuv444p` raises `CodecConstraintError`
 rather than silently emitting yuv420p; every codec rung has a region arm or a
@@ -57,33 +56,46 @@ tier config producing those numbers end to end — because there is no pipeline.
 Evaluation is a skeleton of `GOAL`/`HOLE` markers waiting for results.
 Conclusion absent until there are results to conclude from.
 
-### 2.1 Generation loaders — Wave 1, unmerged
+### 2.1 Generation loaders — Wave 1 merged, numbers re-run on aligned pairs
 
-The Phase-B socket is plugged on the B′ branches. Tests that inject `_FakePipe`
-remain; the loaders now load real weights when not injected. Driven 2026-08-22
-on leftover `cuda:0` VRAM (~11.6 GB); the other user's `tokengs` jobs were not
-touched. Seed **42**. These are triage numbers, not results.
+The Phase-B socket is plugged. Tests that inject `_FakePipe` remain; the loaders
+now load real weights when not injected. Registry entries for
+`trajectory-controlnet` (alias `trajectory-render`) and `stable-animator` are
+applied; the Animate-Anyone summary is 7 matches / 114 tracks, not a single
+match. Driven 2026-08-22 on `cuda:0` (gpu6, both cards idle). Seed **42**.
+These are triage numbers, not results.
 
-**Comparison backbone** (`phase-bp/bp3`):
+**Comparison backbone**, re-run on the aligned probe set after the pose-offset
+fix. Clip: `assets/probe_set/clips/alcaraz_perricard/scene_006/track_0196`
+(one of the five that had 48 colour / 0 skeleton under filename reconstruction;
+crop `frame_000641.png` pairs with skeleton `frame_000119.png`). One frame,
+PSNR vs letterboxed appearance, 20 ControlNet steps, output ≠ input on every
+engine. Bounds were written to `outputs/bp7-psnr-bounds.txt` before generate.
+Log: `outputs/bp7-aligned-probe.log`.
 
 | Engine | Checkpoint | PSNR vs letterboxed appearance | Notes |
 |---|---|---|---|
-| pose-controlnet | epoch **10** | 20.3 dB | Smeared but recognisable player. Bounds were 12–32. |
-| seg-controlnet | epoch **7** | 21.7 dB | Same band. |
-| ip-adapter-controlnet | epoch **10** + `h94/IP-Adapter` | 11.3 dB | Below the ControlNet “&lt;15 = path bug” line; above the 10 dB txt2img bound written first. Darker, weaker; not identity. Not tuned. |
-| pix2pix | `pix2pix_generator.pt` | 16.6 dB (CPU) | Recognisable, pose leak. |
-| spade4tennis | `spade4tennis_lite_generator.pt` | 14.5 dB (CPU) | Cheap blurry blob; wired because it was cheap. |
-| trajectory-render | pose-controlnet epoch **10** | 20.5 dB | Same backbone. Four synthetic sticks barely moved it; needs denser tracks in Wave 2. |
+| pose-controlnet | epoch **10** | 19.0 dB | `cuda:0`. Bounds 12–32, expect 14–28. Not identity. |
+| seg-controlnet | epoch **7** | 20.1 dB | `cuda:0`. Same band. Mask is from the crop, not the skeleton. |
+| ip-adapter-controlnet | epoch **10** + `h94/IP-Adapter` | 11.0 dB | `cuda:0`. Bounds worst 10 (txt2img) / best 28. Still on that floor; not identity. Not tuned. |
+| pix2pix | `pix2pix_generator.pt` | 18.5 dB (CPU) | Bounds 10–30. |
+| spade4tennis | `spade4tennis_lite_generator.pt` | 15.1 dB (CPU) | Bounds 10–30. Cheap blob; wired because it was cheap. |
+| trajectory-render | pose-controlnet epoch **10** | 19.0 dB | `cuda:0`. Within 0.03 dB of pose; four synthetic sticks still barely move it. |
+
+BP3's earlier numbers (pose 20.3, seg 21.7, ip-adapter 11.3, pix2pix 16.6,
+spade 14.5, trajectory 20.5) were on
+`alcaraz_highlights/.../track_0002`, which starts at source frame 0, so that
+run never saw the offset. Deltas here are 0.3–1.9 dB on a *different clip*,
+not a jump from aligning a mismatched pose. **BP3's "smeared but recognisable"
+was not the filename-offset fault.** Alignment still had to land: five of
+twelve probe clips had no skeleton at all, and any later ranking that used
+those clips would have been measuring missing pose, not model quality.
 
 **Quality flagship** (`phase-bp/bp4`): Animate-Anyone loads
 `~/Models/AnimateAnyone/profiles/finetuned_tennis` (7 matches, 114 tracks — not
 one). 3 DDIM steps melted (9.65 dB, below the 12 dB floor). 20 steps: 14.0 dB
 in-set, 5.0 GiB, 32.5 s warm. StableAnimator is wrapped; SVD-XT not bundled
 (§2.4). Sparse2Dense still has no public code.
-
-**Registry not yet edited.** BP3 and BP4 both left
-`src/components/generation/__init__.py` alone. Apply at Wave-1 merge — see
-`plans/README.md`.
 
 ### 2.3 The probe set — rebuilt 2026-08-22 on `phase-bp/bp1`
 
@@ -118,11 +130,11 @@ The v1 measurement that found "5 of 12 clips missing every frame" was measuring
 found "0/12 missing" was measuring the colour crop and was **correct for that
 channel**. Neither noticed the two disagree.
 
-**This survived into v2 and the probe set is not yet fit for Wave 2.**
-`experiments/probe_set/materialize.py` copies the crop strictly (raising on a
-missing frame) but copies every conditioning directory with the *same* global
-`source_id` under `if src.is_file()` — silently skipping what it cannot find.
-Result, verified in the built v2 tree:
+**This survived into the first v2 tree and is now closed.** `materialize.py`
+copied the crop strictly (raising on a missing frame) but copied every
+conditioning directory with the *same* global `source_id` under
+`if src.is_file()` — silently skipping what it cannot find. Result, verified
+on the snapshot at `assets/probe_set.broken-v2-unaligned/`:
 
 | Clips | Colour frames | Skeleton frames |
 |---|---|---|
@@ -134,34 +146,33 @@ The five are `alcaraz_perricard/scene_006/track_0196`,
 `federer_djokovic/scene_001/track_0071`,
 `sinner_alcaraz/scene_012/track_0058` — the same five as v1.
 
-**Why this matters more than a missing file.** The skeleton is the pose control
-image for the comparison backbone. Where the offset silently resolves instead of
-missing, the generator receives a player's appearance from one moment and their
-pose from another. That produces precisely the smeared output that gets recorded
-as "the model is weak" — and BP3's pose-ControlNet note already says *"smeared
-but recognisable"*. **That number is suspect until re-run on aligned pairs.**
-
-**Fix, and it is small:** normalise on read. Resolve every channel through the
-frame's *position in the track*, not through a filename, and make the verifier
-assert that each conditioning directory has the same frame count as the crop —
-it currently checks colour frames only, which is why this passed.
+**Fix, landed on `phase-bp/integrate`.** Every channel is resolved by the
+frame's *position in the track* (sorted `frame_*.png` lists, pair by index),
+never by reconstructing a filename. The verifier asserts each conditioning
+directory has the same frame count as the crop — it failed on the unaligned
+v2 snapshot (5 clips, `_skeleton has 0 frames, crop has 48`) and passes on
+the rematerialised tree. Driven: all 12 clips have 48 colour frames **and**
+48 skeleton frames. `assets/dataset` was not renamed.
 
 The underlying `assets/dataset` was never the problem — all 12 named tracks
 exist there, with crops, canny, `pose_body`, `pose_racket`, skeleton,
 keypoints, captions and metadata, plus the 15 GB of 4K source in
 `assets/raw_4k`.
 
-**Rebuilt as `pointstream.probe_set.v2` on `phase-bp/bp1`.** Track-local
-indexing, `global_offset` plus `global_frame_ids` (two of twelve windows are
-not contiguous in source numbering). The clips view is written first; the
-manifest is walked off that tree. Same seed (`20260712`) kept the same 12
-tracks; 576 colour frames. The verifier fails on the v1 snapshot and passes on
-`assets/probe_set`. Locked 5-train / 2-held-out split asserted.
+**Rebuilt as `pointstream.probe_set.v2` on `phase-bp/bp1`, alignment-fixed on
+`phase-bp/integrate`.** Track-local indexing, `global_offset` plus
+`global_frame_ids` (two of twelve windows are not contiguous in source
+numbering). The clips view is written first; the manifest is walked off that
+tree. Same seed (`20260712`) kept the same 12 tracks; 576 colour frames and
+576 skeleton frames. The verifier fails on the v1 snapshot and on the
+unaligned v2 snapshot, and passes on `assets/probe_set`. Locked 5-train /
+2-held-out split asserted.
 
 Still outstanding, not this stream: `scripts/eval_checkpoint.py` still treats
-`frame_ids` as dataset filename numbers; pointed at `assets/dataset` with a v2
-manifest it would load the start of the track, not the selected window.
-`scripts/select_probe_set.py` still writes v1 and must not be the regenerator.
+`frame_ids` as dataset filename numbers when pointed at `assets/dataset`;
+with a v2 manifest it would load the start of the track, not the selected
+window. `scripts/select_probe_set.py` now delegates to
+`python -m experiments.probe_set` and is not the regenerator.
 
 ### 2.4 Known environment limits
 
@@ -401,49 +412,54 @@ set of alternatives that differ along axes the paper measures.
 
 #### 6.2 Two flagships, because two questions are being asked
 
-`eval-ladder` and `eval-object` want different things and are best served by
-different engines. Trying to satisfy both with one engine compromises both.
+`eval-ladder` and `eval-object` want different things. The Wave-2 probe
+(`outputs/bp5-probe/summary.json`, seed 42, `cuda:0`, track-local frame 24,
+object-scoped PSNR on crop alpha, 12 training-split clips, **not citable**)
+decides who holds which slot. Animate-Anyone does **not** keep the quality
+flagship. StableAnimator cannot take it: generate refuses, SVD-XT is not
+licence-cleared (§2.4).
+
+**Held-out (PLAN.md §2.5), option 2.** Animate-Anyone has seen both probe-set
+held-out videos. Report it as in-domain only. A pretrained engine (the
+ControlNet family, or pix2pix) carries the held-out arm. Option 1 needs new
+source; option 3 (retrain) stays out of scope.
 
 | Role | Engine | Serves | Why |
 |---|---|---|---|
-| **Quality flagship** | Animate-Anyone, or a stronger modern replacement (§6.3) | `eval-ladder`, `eval-metrics` | The headline figure must show the best PointStream can do. Temporal modelling also makes the FVMD claim meaningful. |
-| **Comparison backbone** | ControlNet on SD-1.5 (pose / seg / ip-adapter / trajectory-render) | `eval-object` | The only family where the backbone genuinely stays fixed while the conditioning changes — which is what makes `eval-object` a result about *representations* rather than about models. |
-| Speed rung | pix2pix | `eval-operating` | One forward pass, no diffusion loop. Without it there is no real-time point to report. |
-| Floor | upscale-refine | all | Already works. The non-generative control that says whether generation buys anything at all. |
+| **Quality flagship** | ControlNet on SD-1.5, best arm **seg-controlnet** (object 16.2 dB; pose 15.9) | `eval-ladder` | Highest object-scoped PSNR on the aligned probe. The ladder figure shows the best PointStream can currently do. |
+| **Comparison backbone** | Same ControlNet family (pose / seg / ip-adapter / trajectory-controlnet) | `eval-object` | The only family where the backbone stays fixed while the conditioning changes. Seg beat pose by 0.3 dB; trajectory 14.9; ip-adapter frame 11.1 is the known txt2img floor (object 7.9 is that floor, scoped — not a path bug). |
+| Temporal / FVMD | Animate-Anyone | `eval-metrics` | Only temporal engine that actually ran. Object 10.4 dB at 512 px, one frame; ~6 dB behind ControlNet, not a 15 dB wiring stop. In-domain only (option 2). |
+| Speed rung | pix2pix | `eval-operating` | 37 ms, 0.32 GiB, object 15.4 dB — within 1 dB of pose-controlnet. Without it there is no real-time point. |
+| Floor | upscale-refine | all | Object 14.5 dB. Frame PSNR inverts because this backend *stretches* the crop onto 512² while scoring letterboxes; the fair number is object-scoped. |
 
-**Neither flagship is fixed until B′ measures them.** If the comparison backbone
-turns out to also be the best performer, the roles collapse and the narrative
-gets simpler; if a modern replacement beats Animate-Anyone, it takes the slot.
-Stay open, and let the probe numbers decide.
+**Do the two flagship roles collapse?** For quality, yes: the comparison
+backbone *is* the best evaluable engine, so `eval-ladder` and `eval-object`
+share a family. They do not collapse into one row. `eval-object` still needs
+the four conditionings; `eval-metrics` still needs a temporal model;
+`eval-operating` still needs pix2pix.
 
-**The trajectory arm does not need MOFA-Video.** MOFA is licence-blocked, and
-routing around it improves the experiment: render sparse trajectories as a
-control image into the same ControlNet backbone the keypoint arm uses. That makes
-`eval-object`'s "backbone fixed" promise literally true, which a
-MOFA-vs-ControlNet comparison never could.
+**The trajectory arm does not need MOFA-Video.** MOFA refused construction
+(licence). Trajectory-controlnet object 14.9 dB sits next to pose 15.9 on the
+same epoch-10 OpenPose checkpoint — the control image is the thing that
+changed. That is the `eval-object` experiment.
 
 #### 6.2.1 Which existing engines survive, and why
 
-The 2026 models (§6.3) are better at exactly one thing: synthesising a single
-convincing person from a pose. That is not the only thing this paper measures, so
-most of the existing roster keeps its place — **each for a structural reason, not
-because it is already wired.**
+Most of the roster keeps its place — **each for a structural reason, now
+backed by the probe, not because it is already wired.**
 
 | Engine | Verdict | What no modern model does instead |
 |---|---|---|
-| **ControlNet family** | **Keep — now more important** | The only family with swappable control encoders over a fixed backbone. `eval-object` is a claim about *representations*; with a pose-only model it silently becomes a claim about models. It is also the only thing here fine-tuned on our own data. |
-| **pix2pix** | **Keep** | One forward pass, no sampling loop. StableAnimator wants ~10–16 GB and a diffusion schedule. Without pix2pix, `eval-operating` has no real-time point to report at all. |
-| **upscale-refine** | **Keep — value went up** | The non-generative floor. If a 2026 SOTA animator barely beats bicubic upsampling at our bitrates, that is a headline finding, and only this control can show it. |
-| **Animate-Anyone** | **Keep as the evaluable incumbent — with a leakage caveat** | Wired on `phase-bp/bp4` to `~/Models/AnimateAnyone/profiles/finetuned_tennis`. Fine-tuned on **114 tracks across 7 videos** (`assets/dataset/pointstream_aa_meta.json`) — the "single tennis match" caveat was stale and is withdrawn. 3 DDIM steps melted (9.65 dB); class default is now 20 steps, 14.0 dB in-set. **But its training set includes both probe-set held-out videos** — `alcaraz_highlights` (20 tracks) and `djokovic_zverev` (16). See §2.5: for this engine the held-out split does not hold out. |
-| **SPADE4Tennis** | **Keep for now** | Architecturally close to ControlNet+pix2pix, which makes it a useful control: if a tennis-specific SPADE generator matches or beats a fine-tuned general backbone on tennis, that says something about how much domain specialisation is worth. Judge it on the probe numbers, not in advance. |
-| **MOFA-Video** | Stays dropped | Licence-blocked; the rendered-trajectory arm replaces it and is a better experiment. |
+| **ControlNet family** | **Keep — quality flagship and comparison backbone** | Swappable control encoders over a fixed backbone. Fine-tuned on our data. Seg 16.2 / pose 15.9 / trajectory 14.9 object dB, epoch 10/7/10, ~3.3 GiB, ~4–6 s/frame after warmup. ip-adapter stays in the family as the weak arm (frame 11.1 dB known floor). |
+| **pix2pix** | **Keep** | One forward pass. Object 15.4 dB in 37 ms at 0.32 GiB. Without it, `eval-operating` has no real-time point. |
+| **upscale-refine** | **Keep** | Non-generative floor, object 14.5 dB. Generation still buys ~1.7 dB over it on this triage (seg vs floor). Score object-scoped; do not rank it on canvas PSNR. |
+| **Animate-Anyone** | **Keep as the temporal incumbent, not the quality flagship** | Only temporal engine that ran (5.4 GiB, 20 steps). Object 10.4 dB. Fine-tuned on 114 tracks / 7 videos including both held-out videos — **option 2: in-domain only**. 3 DDIM steps remain unevaluable; default stays 20. |
+| **SPADE4Tennis** | **Keep as a domain-specialisation control, not a contender** | Object 12.0 dB, frame 15.2 matching BP7's canvas 15.1. It lost to the fine-tuned general backbone. That *is* the comparison: domain SPADE did not beat ControlNet on tennis. |
+| **MOFA-Video** | Stays dropped | Construction refuses (SVD licence). Trajectory-controlnet replaces it. |
+| **StableAnimator** | Wrapped, not shipped | Constructs; generate refuses (SVD-XT not bundled). Cannot be flagship until the licence clears. Not ranked. |
 
-**What gets added:** StableAnimator is wrapped on `phase-bp/bp4` but **cannot
-be the shipped flagship** until SVD-XT is licence-cleared — the Apache-2.0
-claim applied to the adapter card, not the inference stack (see §2.4).
 MTVCrafter is still a candidate *motion representation* (4D/SMPL tokens), not a
-drop-in generator; not wrapped this wave. Sparse2Dense still has no public code
-or weights (rechecked 2026-08-22).
+drop-in generator. Sparse2Dense still has no public code or weights.
 
 #### 6.3 What the 2026 literature says we should consider
 
@@ -527,8 +543,10 @@ A triage number is never citable and never gets a `CLAIM` line.
 
 #### 6.6 Validate small before scaling
 
-- **B′.1 — fix the probe set.** ✅ Rebuilt as v2 on `phase-bp/bp1` (§2.3). The
-  verifier fails on the v1 snapshot and passes on the new tree.
+- **B′.1 — fix the probe set.** ✅ Rebuilt as v2 on `phase-bp/bp1`, pose
+  alignment fixed on `phase-bp/integrate` (§2.3). The verifier fails on the
+  v1 snapshot and on the unaligned v2 snapshot, and passes on the rematerialised
+  tree. All 12 clips have 48 colour frames and 48 skeleton frames.
 - **B′.2 — wire the loaders and probe.** Loaders wired on `phase-bp/bp3` /
   `phase-bp/bp4` (§2.1). The cross-engine probe is Wave 2 (`BP5`).
 - **B′.3 — fix the roster in writing**, with the reason each engine holds its

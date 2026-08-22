@@ -31,7 +31,7 @@ has reported back**, and all streams in a wave launch together.
 ### Wave 1 — five independent streams ✅ reported 2026-08-22
 
 Branches: `phase-bp/bp1` … `bp4` (from `phase-b/integrate`), paper `phase-bp/bp6`.
-Not merged. Wave 2 (`BP5`) has not started.
+Merged into `phase-bp/integrate` by BP7. Wave 2 reported 2026-08-22 (unmerged).
 
 | Brief | Owns | Why it is independent |
 |---|---|---|
@@ -93,14 +93,16 @@ _add(
 fixes a live fault: 5 of 12 probe clips have colour frames and no skeleton
 (`PLAN.md` §2.3), so Wave 2 cannot rank engines until it lands.
 
-### Wave 2 — four parallel streams
+### Wave 2 — four parallel streams ✅ reported 2026-08-22
 
-| Brief | Depends on | Owns |
-|---|---|---|
-| `BP5-roster-decision.md` | `BP7` | the probe harness, the invariants, the roster |
-| `C1-reconstruction-residual.md` | `BP7` merge only | reconstruction, the residual spectrum |
-| `C2-encoder-pipeline.md` | `BP7` merge only | the stage DAG, the encoder |
-| `D-cleanups.md` | nothing | mypy in tests, the AVC region arm |
+Branches: `phase-bp/bp5`, `phase-c/c1`, `phase-c/c2`, `phase-d/cleanups` (from `phase-bp/integrate` `18bf21e`). Not merged. C3 has not started.
+
+| Brief | Depends on | Owns | Head |
+|---|---|---|---|
+| `BP5-roster-decision.md` | `BP7` | the probe harness, the invariants, the roster | `36e511d` |
+| `C1-reconstruction-residual.md` | `BP7` merge only | reconstruction, the residual spectrum | `8ce3450` |
+| `C2-encoder-pipeline.md` | `BP7` merge only | the stage DAG, the encoder | `26533b0` |
+| `D-cleanups.md` | nothing | mypy in tests, the AVC region arm | `8470211` |
 
 `C1` and `C2` do not depend on the roster — they are pipeline structure, and
 which generator wins does not change them. `C3` (the runner) waits for both.
