@@ -30,6 +30,7 @@ from experiments.probe.bounds import (
     STATIC_COPY_EXPECTED_HIGH_DB,
     STATIC_COPY_EXPECTED_LOW_DB,
     appearance_use_label,
+    judge_static_copy_clip,
     judge_static_copy_object_psnr,
 )
 from experiments.probe.clips import list_clips, load_coding_sample, load_frame
@@ -99,6 +100,8 @@ def test_bounds_are_anchored_on_the_static_copy_floor() -> None:
     assert STATIC_COPY_EXPECTED_LOW_DB == 8.0
     assert STATIC_COPY_EXPECTED_HIGH_DB == 16.0
     assert judge_static_copy_object_psnr(11.82).status == "expected"
+    assert judge_static_copy_clip(5.91).status == "ok"
+    assert judge_static_copy_clip(3.0).status == "alarm-low"
     assert appearance_use_label(11.01, 11.82) == NOT_USING_APPEARANCE
     assert appearance_use_label(11.82, 11.82) == NOT_USING_APPEARANCE
     assert appearance_use_label(13.0, 11.82) == "beats floor"

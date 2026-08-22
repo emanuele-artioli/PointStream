@@ -49,9 +49,17 @@ ENGINE_EXPECTED_BEAT_HIGH_DB = 12.0
 ENGINE_ALARM_BEAT_DB = 20.0
 ENGINE_ALARM_HIGH_ABS_DB = 35.0
 
-# Revisions (none yet — these constants have not been moved after a run).
-# When a bound is wrong, add a numbered note here and leave the constant
-# that fired in place so the mistake stays visible.
+# Revisions after outputs/bp9-static-copy (the constants above were not moved).
+# 1. The 8–16 dB expected band is for the 12-clip *mean* at offset 24. Applying
+#    it per clip, per offset, fired against a correct result:
+#    sinner_alcaraz/scene_012/track_0058 at offset 8 scored 5.91 dB object
+#    (outside-expected). The keyframe crop is 319x164 and the target is
+#    263x230; each is letterboxed independently onto 512, so a pasted
+#    keyframe lands in a different content box than the reference. Raw
+#    same-size crop PSNR on that pair is ~12 dB. Alarm gates (4 / 28) did
+#    not fire. Offset-24 mean was 11.47 dB, inside the band. Per-clip
+#    judging therefore uses only the alarm gates; the expected band stays
+#    on the headline mean.
 
 
 @dataclass(frozen=True)
@@ -71,8 +79,38 @@ def appearance_use_label(engine_psnr: float, floor_psnr: float) -> str:
     return BEATS_FLOOR
 
 
+def judge_static_copy_clip(value: float) -> BoundVerdict:
+    """Per-clip floor. Alarm gates only; the 8–16 dB band is the offset-24 mean."""
+    if value < STATIC_COPY_ALARM_LOW_DB:
+        return BoundVerdict(
+            metric="object_psnr_db",
+            value=value,
+            status="alarm-low",
+            note=(
+                "static copy below ~4 dB: suspect scoring a black canvas or "
+                "the wrong reference, not a moved player"
+            ),
+        )
+    if value > STATIC_COPY_ALARM_HIGH_DB:
+        return BoundVerdict(
+            metric="object_psnr_db",
+            value=value,
+            status="alarm-high",
+            note=(
+                "static copy above ~28 dB: suspect scoring the keyframe "
+                "against itself instead of the later frame"
+            ),
+        )
+    return BoundVerdict(
+        metric="object_psnr_db",
+        value=value,
+        status="ok",
+        note="per-clip static copy; 8–16 dB expected band is the offset-24 mean",
+    )
+
+
 def judge_static_copy_object_psnr(value: float) -> BoundVerdict:
-    """Classify the floor itself. Absolute dB, offset-24 band."""
+    """Classify the 12-clip mean floor. Absolute dB, offset-24 band."""
     if value < STATIC_COPY_ALARM_LOW_DB:
         return BoundVerdict(
             metric="object_psnr_db",

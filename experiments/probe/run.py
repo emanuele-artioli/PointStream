@@ -23,6 +23,7 @@ from experiments.probe.bounds import (
     STATIC_COPY_EXPECTED_LOW_DB,
     appearance_use_label,
     judge_frame_gap,
+    judge_static_copy_clip,
     judge_static_copy_object_psnr,
     judge_vs_floor,
 )
@@ -213,7 +214,7 @@ def _apply_floor(row: ClipResult, floor_by_key: Mapping[tuple[str, int], float] 
     if row.object_psnr_db is None or row.engine == STATIC_COPY:
         if row.engine == STATIC_COPY and row.object_psnr_db is not None:
             row.appearance_use = "floor"
-            row.object_bound = judge_static_copy_object_psnr(row.object_psnr_db).status
+            row.object_bound = judge_static_copy_clip(row.object_psnr_db).status
         return
     if floor_by_key is None:
         return
