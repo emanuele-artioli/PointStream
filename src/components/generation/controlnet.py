@@ -35,6 +35,7 @@ VARIANT_REQUIRES: dict[str, tuple[str, ...]] = {
     "canny": (CONDITION_CANNY, CONDITION_APPEARANCE),
     "seg": (CONDITION_MASK, CONDITION_APPEARANCE),
     "pose": (CONDITION_POSE, CONDITION_APPEARANCE),
+    "pose-ref": (CONDITION_POSE, CONDITION_APPEARANCE),
     "ip-adapter": (CONDITION_APPEARANCE, CONDITION_POSE),
     "multi": (CONDITION_POSE, CONDITION_MASK, CONDITION_APPEARANCE),
     "trajectory": (CONDITION_MOTION_FIELD, CONDITION_APPEARANCE),
@@ -57,6 +58,7 @@ FINAL_EPOCH: Final[dict[str, int]] = {
 
 _CONTROLNET_DIR: Final[dict[str, str]] = {
     "pose": "pose-controlnet",
+    "pose-ref": "pose-ref-controlnet",
     "seg": "seg-controlnet",
     "ip-adapter": "control_v11p_sd15_openpose",
     "trajectory": "pose-controlnet",
@@ -150,6 +152,29 @@ def _available_epochs(base: Path) -> list[int]:
             except ValueError:
                 continue
     return sorted(found)
+
+
+def compose_pose_on_appearance(
+    pose: np.ndarray,
+    appearance: np.ndarray,
+    *,
+    threshold: int = 8,
+) -> np.ndarray:
+    """3-channel control: appearance where the pose canvas is black, skeleton on top.
+
+    Keeps the OpenPose ControlNet backbone (3-channel condition) while making a
+    same-track reference actually enter the condition image. Both inputs must
+    already share a canvas; this function does not resize.
+    """
+    pose_hwc = as_hwc(pose)[..., :3]
+    appearance_hwc = as_hwc(appearance)[..., :3]
+    if pose_hwc.shape[:2] != appearance_hwc.shape[:2]:
+        raise ValueError(
+            "compose_pose_on_appearance needs pose and appearance on the same canvas, "
+            f"got pose {pose_hwc.shape[:2]} vs appearance {appearance_hwc.shape[:2]}."
+        )
+    skeleton = pose_hwc.max(axis=2, keepdims=True) > threshold
+    return np.where(skeleton, pose_hwc, appearance_hwc)
 
 
 def render_trajectory_control(
@@ -376,6 +401,8 @@ class ControlNetGenerator(BaseFrameGenerator):
             return [prepared["pose"], prepared["mask"]]
         if self.variant == "trajectory":
             return prepared["trajectory"]
+        if self.variant == "pose-ref":
+            return compose_pose_on_appearance(prepared["pose"], prepared["appearance"])
         return prepared["pose"]
 
     def _load_pipeline(self, device: Device) -> Any:

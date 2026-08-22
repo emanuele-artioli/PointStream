@@ -88,6 +88,18 @@ _add(
     defaults={"variant": "pose"},
 )
 _add(
+    "pose-ref-controlnet",
+    "src.components.generation.controlnet:ControlNetGenerator",
+    summary=(
+        "OpenPose ControlNet with the same-track reference painted under the "
+        "skeleton. Appearance enters the 3-channel control image; this is not "
+        "the mislabelled ip-adapter-controlnet directory."
+    ),
+    capabilities=_PER_FRAME_IMAGE_POSE,
+    requires=frozenset({CONDITION_POSE, CONDITION_APPEARANCE}),
+    defaults={"variant": "pose-ref"},
+)
+_add(
     "trajectory-controlnet",
     "src.components.generation.controlnet:ControlNetGenerator",
     summary=(

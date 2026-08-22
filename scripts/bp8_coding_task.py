@@ -283,7 +283,7 @@ def drive(
         from src.components.generation.animate_anyone import AnimateAnyoneGenerator
 
         generator = AnimateAnyoneGenerator(width=CANVAS, height=CANVAS, steps=steps)
-    elif engine == "ip-adapter-controlnet":
+    elif engine in {"ip-adapter-controlnet", "pose-ref-controlnet"}:
         from src.components.generation import REGISTRY as GENERATORS
 
         generator = GENERATORS.build(engine)
@@ -311,7 +311,7 @@ def drive(
         if engine == "static-copy":
             row["object_psnr_db"] = static_score["object_psnr_db"]
             row["frame_psnr_db"] = static_score["frame_psnr_db"]
-        elif engine in {"animate-anyone", "ip-adapter-controlnet"}:
+        elif engine in {"animate-anyone", "ip-adapter-controlnet", "pose-ref-controlnet"}:
             assert generator is not None
             # Independently letterboxed (or stretched) 512 canvases. Passing the
             # raw crops would let ControlNet's shared-box prepare resize the
@@ -446,7 +446,12 @@ def main() -> None:
     parser.add_argument("--fit", choices=("letterbox", "stretch"), default="letterbox")
     parser.add_argument(
         "--engine",
-        choices=("static-copy", "animate-anyone", "ip-adapter-controlnet"),
+        choices=(
+            "static-copy",
+            "animate-anyone",
+            "ip-adapter-controlnet",
+            "pose-ref-controlnet",
+        ),
         default="animate-anyone",
     )
     parser.add_argument("--bounds-only", action="store_true")
