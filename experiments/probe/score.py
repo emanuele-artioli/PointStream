@@ -1,4 +1,4 @@
-"""Region-scoped PSNR for a generated crop against letterboxed appearance."""
+"""Region-scoped PSNR for a generated crop against a later reference frame."""
 
 from __future__ import annotations
 
@@ -19,6 +19,7 @@ class ProbeScore:
     n_object_pixels: int
     n_frame_pixels: int
     differs_from_input: bool
+    differs_from_reference: bool
     region_kind: str
 
 
@@ -31,28 +32,33 @@ def _letterbox_mask(mask: np.ndarray, box: Letterbox) -> np.ndarray:
 
 
 def score_generation(
-    appearance: np.ndarray,
+    reference: np.ndarray,
     predicted: np.ndarray,
     *,
     object_mask: np.ndarray | None,
     canvas_width: int,
     canvas_height: int,
+    appearance: np.ndarray | None = None,
 ) -> ProbeScore:
-    """Score ``predicted`` against letterboxed ``appearance``.
+    """Score ``predicted`` against letterboxed ``reference``.
 
-    Object scope is the letterboxed alpha/mask when supplied, otherwise the
-    letterbox content box. Whole-frame is the entire generation canvas. Both
-    are always returned.
+    Object scope is the letterboxed alpha/mask of the reference when supplied,
+    otherwise the letterbox content box. Whole-frame is the entire generation
+    canvas. Both are always returned.
+
+    ``appearance`` is the keyframe that was handed to the engine. When given,
+    ``differs_from_input`` compares the prediction to that image, not to the
+    reference. That is the diagnostic the old harness mixed up with the score.
     """
-    prepared = prepare_letterboxed(appearance, None, canvas_width, canvas_height)
-    reference = as_hwc(prepared["appearance"])[..., :3]
+    prepared = prepare_letterboxed(reference, None, canvas_width, canvas_height)
+    reference_hwc = as_hwc(prepared["appearance"])[..., :3]
     predicted_hwc = as_hwc(predicted)[..., :3]
-    if predicted_hwc.shape[:2] != reference.shape[:2]:
+    if predicted_hwc.shape[:2] != reference_hwc.shape[:2]:
         import cv2
 
         predicted_hwc = cv2.resize(
             predicted_hwc,
-            (reference.shape[1], reference.shape[0]),
+            (reference_hwc.shape[1], reference_hwc.shape[0]),
             interpolation=cv2.INTER_LINEAR,
         )
     box: Letterbox = prepared["letterbox"]
@@ -71,19 +77,25 @@ def score_generation(
         )
         region_kind = "box"
 
-    record = triage(reference[None, ...], predicted_hwc[None, ...], regions=[region])
+    record = triage(reference_hwc[None, ...], predicted_hwc[None, ...], regions=[region])
     object_scores = record.for_role("object")
     frame_scores = record.for_role("whole-frame")
     if not object_scores or not frame_scores:
         raise RuntimeError("triage did not return object and whole-frame PSNR")
     object_psnr = float(object_scores[0].value)
     frame_psnr = float(frame_scores[0].value)
-    differs = not np.array_equal(predicted_hwc, reference)
+    differs_from_reference = not np.array_equal(predicted_hwc, reference_hwc)
+    if appearance is None:
+        differs_from_input = differs_from_reference
+    else:
+        init = as_hwc(prepare_letterboxed(appearance, None, canvas_width, canvas_height)["appearance"])
+        differs_from_input = not np.array_equal(predicted_hwc, init[..., :3])
     return ProbeScore(
         object_psnr_db=object_psnr,
         frame_psnr_db=frame_psnr,
         n_object_pixels=int(object_scores[0].n_pixels),
         n_frame_pixels=int(frame_scores[0].n_pixels),
-        differs_from_input=differs,
+        differs_from_input=differs_from_input,
+        differs_from_reference=differs_from_reference,
         region_kind=region_kind,
     )

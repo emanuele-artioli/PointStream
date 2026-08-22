@@ -1,7 +1,8 @@
-"""Load one aligned frame (or a cheap set) from the rebuilt probe set.
+"""Load aligned frames from the rebuilt probe set.
 
 Channels are paired by position in the sorted ``frame_*.png`` list, never by
-reconstructing a filename. That is the pose-offset fault BP7 closed.
+reconstructing a filename. Crop / canny / pose use global source ids;
+``_skeleton`` is track-local from zero. 44% of tracks carry that offset.
 """
 
 from __future__ import annotations
@@ -18,8 +19,9 @@ from experiments.probe_set.schema import HELD_OUT_VIDEOS, SCHEMA_ID, TRAINING_SP
 from src.components.generation._numpy import as_chw
 
 DEFAULT_PROBE_ROOT = Path("assets") / "probe_set"
-DIFFUSION_FRAME_INDEX = 24
-ONE_PASS_FRAME_INDICES = (0, 16, 24, 32, 47)
+DEFAULT_KEYFRAME = 0
+HEADLINE_OFFSET = 24
+DEFAULT_OFFSETS = (8, 16, 24, 32)
 
 
 @dataclass(frozen=True)
@@ -33,6 +35,27 @@ class ProbeFrame:
     frame_index: int
     n_frames: int
     appearance_rgb: np.ndarray
+    object_mask: np.ndarray
+    pose_rgb: np.ndarray
+    canny: np.ndarray
+    motion_field: np.ndarray
+    split: str
+
+
+@dataclass(frozen=True)
+class CodingSample:
+    """Appearance from a keyframe, conditioning and reference from a later frame."""
+
+    key: str
+    video: str
+    scene: str
+    track: str
+    appearance_frame_index: int
+    target_frame_index: int
+    offset: int
+    n_frames: int
+    appearance_rgb: np.ndarray
+    reference_rgb: np.ndarray
     object_mask: np.ndarray
     pose_rgb: np.ndarray
     canny: np.ndarray
@@ -148,18 +171,7 @@ def _optical_flow(prev_rgb: np.ndarray, next_rgb: np.ndarray) -> np.ndarray:
     return np.transpose(np.asarray(flow, dtype=np.float32), (2, 0, 1))
 
 
-def load_frame(clip: ProbeClip, frame_index: int) -> ProbeFrame:
-    """Load appearance, pose, canny, mask, and a motion field at ``frame_index``.
-
-    Pairing is by position: the Nth file in each channel directory. A filename
-    reconstructed from a global source id is how the unaligned v2 set went
-    silent; this path does not do that.
-    """
-    if frame_index < 0 or frame_index >= clip.n_frames:
-        raise IndexError(
-            f"frame_index {frame_index} out of range for {clip.key} "
-            f"({clip.n_frames} frames)"
-        )
+def _channel_files(clip: ProbeClip) -> tuple[list[Path], list[Path], list[Path]]:
     crop_files = _sorted_frames(clip.path)
     pose_files = _sorted_frames(_condition_dir(clip.path, "_skeleton"))
     canny_files = _sorted_frames(_condition_dir(clip.path, "_canny"))
@@ -172,15 +184,34 @@ def load_frame(clip: ProbeClip, frame_index: int) -> ProbeFrame:
                 f"{clip.key} {label} has {len(files)} frames, crop has {len(crop_files)}. "
                 "Channels must be paired by position."
             )
-    appearance, mask = _load_rgba(crop_files[frame_index])
-    pose = _load_rgb(pose_files[frame_index])
-    canny = _load_gray(canny_files[frame_index])
+    return crop_files, pose_files, canny_files
+
+
+def _motion_at(crop_files: list[Path], frame_index: int, appearance: np.ndarray) -> np.ndarray:
     neighbor = frame_index + 1 if frame_index + 1 < len(crop_files) else frame_index - 1
     neighbor_rgb, _ = _load_rgba(crop_files[neighbor])
     if neighbor < frame_index:
-        motion = _optical_flow(neighbor_rgb, appearance)
-    else:
-        motion = _optical_flow(appearance, neighbor_rgb)
+        return _optical_flow(neighbor_rgb, appearance)
+    return _optical_flow(appearance, neighbor_rgb)
+
+
+def load_frame(clip: ProbeClip, frame_index: int) -> ProbeFrame:
+    """Load appearance, pose, canny, mask, and a motion field at ``frame_index``.
+
+    Pairing is by position: the Nth file in each channel directory. A filename
+    reconstructed from a global source id is how the unaligned v2 set went
+    silent; this path does not do that.
+    """
+    if frame_index < 0 or frame_index >= clip.n_frames:
+        raise IndexError(
+            f"frame_index {frame_index} out of range for {clip.key} "
+            f"({clip.n_frames} frames)"
+        )
+    crop_files, pose_files, canny_files = _channel_files(clip)
+    appearance, mask = _load_rgba(crop_files[frame_index])
+    pose = _load_rgb(pose_files[frame_index])
+    canny = _load_gray(canny_files[frame_index])
+    motion = _motion_at(crop_files, frame_index, appearance)
     return ProbeFrame(
         key=clip.key,
         video=clip.video,
@@ -197,8 +228,58 @@ def load_frame(clip: ProbeClip, frame_index: int) -> ProbeFrame:
     )
 
 
+def load_coding_sample(
+    clip: ProbeClip,
+    appearance_index: int,
+    offset: int,
+) -> CodingSample:
+    """Appearance from ``appearance_index``, conditioning and reference from later.
+
+    ``offset`` is how far the target sits after the appearance frame. It must
+    be positive: offset 0 is self-reconstruction, which this loader refuses.
+    """
+    if offset <= 0:
+        raise ValueError(
+            f"coding-task offset must be a later frame than appearance; got {offset}"
+        )
+    target_index = appearance_index + offset
+    if appearance_index < 0 or target_index >= clip.n_frames:
+        raise IndexError(
+            f"appearance {appearance_index} offset {offset} out of range for "
+            f"{clip.key} ({clip.n_frames} frames)"
+        )
+    crop_files, pose_files, canny_files = _channel_files(clip)
+    if target_index >= len(crop_files) or appearance_index >= len(crop_files):
+        raise IndexError(
+            f"appearance {appearance_index} offset {offset} out of range for "
+            f"{clip.key} ({len(crop_files)} crop files)"
+        )
+    appearance, _ = _load_rgba(crop_files[appearance_index])
+    reference, mask = _load_rgba(crop_files[target_index])
+    pose = _load_rgb(pose_files[target_index])
+    canny = _load_gray(canny_files[target_index])
+    motion = _motion_at(crop_files, target_index, reference)
+    return CodingSample(
+        key=clip.key,
+        video=clip.video,
+        scene=clip.scene,
+        track=clip.track,
+        appearance_frame_index=appearance_index,
+        target_frame_index=target_index,
+        offset=offset,
+        n_frames=clip.n_frames,
+        appearance_rgb=appearance,
+        reference_rgb=reference,
+        object_mask=np.asarray(mask, dtype=bool),
+        pose_rgb=pose,
+        canny=canny,
+        motion_field=motion,
+        split=clip.split,
+    )
+
+
 def bundle_arrays(frame: ProbeFrame) -> dict[str, Any]:
-    """Named arrays for ``ConditioningBundle`` construction."""
+    """Named arrays for a self-reconstruction ``ConditioningBundle``."""
     return {
         "appearance": as_chw(frame.appearance_rgb),
         "pose": as_chw(frame.pose_rgb),
@@ -207,4 +288,17 @@ def bundle_arrays(frame: ProbeFrame) -> dict[str, Any]:
         "motion_field": frame.motion_field,
         "frame_index": frame.frame_index,
         "object_id": frame.key,
+    }
+
+
+def bundle_coding(sample: CodingSample) -> dict[str, Any]:
+    """Named arrays: appearance from the keyframe, everything else from the target."""
+    return {
+        "appearance": as_chw(sample.appearance_rgb),
+        "pose": as_chw(sample.pose_rgb),
+        "mask": np.where(sample.object_mask, np.uint8(255), np.uint8(0)),
+        "canny": sample.canny,
+        "motion_field": sample.motion_field,
+        "frame_index": sample.target_frame_index,
+        "object_id": sample.key,
     }
