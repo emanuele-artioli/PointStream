@@ -63,39 +63,87 @@ def dataset_track_dir(dataset_root: Path, video: str, scene: str, track: str) ->
     return dataset_root / video / "segmentations" / scene / track
 
 
+def sorted_frame_files(directory: Path) -> list[Path]:
+    """``frame_*.png`` paths in sorted filename order. Position is the track index.
+
+    Crop, canny, ``_pose_body`` and ``_pose_racket`` name files by global source
+    id; ``_skeleton`` names them track-local and zero-based. Pairing by this
+    list's index, never by reconstructing a filename, is what keeps those
+    conventions aligned.
+    """
+    frames = [
+        path
+        for path in directory.glob("frame_*.png")
+        if FRAME_ID_RE.match(path.name) is not None
+    ]
+    frames.sort(key=lambda path: path.name)
+    return frames
+
+
+def window_positions(
+    crop_frames: list[Path], source_frame_ids: tuple[int, ...]
+) -> list[int]:
+    """Map each selected source id to its index in the sorted crop list."""
+    id_to_idx: dict[int, int] = {}
+    for idx, path in enumerate(crop_frames):
+        match = FRAME_ID_RE.match(path.name)
+        if match is None:
+            continue
+        id_to_idx[int(match.group(1))] = idx
+    missing = [sid for sid in source_frame_ids if sid not in id_to_idx]
+    if missing:
+        raise ProbeSetError(
+            [f"source frames missing from crop listing: {missing[:8]}"]
+        )
+    return [id_to_idx[sid] for sid in source_frame_ids]
+
+
 def materialize_clip(
     dataset_root: Path,
     clips_dir: Path,
     clip: ProbeClip,
 ) -> Path:
-    """Write one clip directory of track-local frame symlinks. Returns that dir."""
+    """Write one clip directory of track-local frame symlinks. Returns that dir.
+
+    Every channel is resolved by the frame's position in the track's sorted
+    ``frame_*.png`` list. Reconstructing ``frame_{source_id:06d}.png`` under
+    ``_skeleton`` silently skipped every file on tracks that do not start at
+    source frame 0.
+    """
     source_track = dataset_track_dir(dataset_root, clip.video, clip.scene, clip.track)
     dest_track = clips_dir / clip.video / clip.scene / clip.track
     dest_track.mkdir(parents=True, exist_ok=True)
 
-    missing: list[str] = []
-    for local_id, source_id in enumerate(clip.source_frame_ids):
-        src = source_track / f"frame_{source_id:06d}.png"
-        if not src.is_file():
-            missing.append(src.name)
-            continue
-        _symlink(src, dest_track / f"frame_{local_id:06d}.png")
-    if missing:
+    crop_frames = sorted_frame_files(source_track)
+    if not crop_frames:
+        raise ProbeSetError([f"{clip.key}: source track has no frames"])
+    try:
+        positions = window_positions(crop_frames, clip.source_frame_ids)
+    except ProbeSetError as exc:
         raise ProbeSetError(
-            [f"{clip.key}: source frames missing while materialising: {missing[:8]}"]
-        )
+            [f"{clip.key}: {item}" for item in exc.violations]
+        ) from exc
+
+    for local_id, pos in enumerate(positions):
+        _symlink(crop_frames[pos], dest_track / f"frame_{local_id:06d}.png")
 
     scene_dir = source_track.parent
     for suffix in CONDITION_DIR_SUFFIXES:
         source_cond = scene_dir / f"{clip.track}{suffix}"
         if not source_cond.is_dir():
             continue
+        cond_frames = sorted_frame_files(source_cond)
+        if len(cond_frames) != len(crop_frames):
+            raise ProbeSetError(
+                [
+                    f"{clip.key}: {suffix} has {len(cond_frames)} frames, "
+                    f"crop has {len(crop_frames)}"
+                ]
+            )
         dest_cond = clips_dir / clip.video / clip.scene / f"{clip.track}{suffix}"
         dest_cond.mkdir(parents=True, exist_ok=True)
-        for local_id, source_id in enumerate(clip.source_frame_ids):
-            src = source_cond / f"frame_{source_id:06d}.png"
-            if src.is_file():
-                _symlink(src, dest_cond / f"frame_{local_id:06d}.png")
+        for local_id, pos in enumerate(positions):
+            _symlink(cond_frames[pos], dest_cond / f"frame_{local_id:06d}.png")
 
     dest_scene = clips_dir / clip.video / clip.scene
     for suffix in SIDECAR_SUFFIXES:

@@ -2,12 +2,17 @@
 
 Behaviour the caller relies on: a harness reading the manifest finds the
 frames the view actually holds, in track-local indices, and the view holds
-exactly those tracks. Plausible misuse is the silent kind — a wrong symlink
-that still exists, a v1 schema that looks complete, a held-out video leaking
-into the training view.
+exactly those tracks. Conditioning directories are paired by position in the
+sorted ``frame_*.png`` list, never by reconstructing a filename — crop and
+``_skeleton`` do not share names.
+
+Plausible misuse is the silent kind — a wrong symlink that still exists, a
+v1 schema that looks complete, a held-out video leaking into the training
+view, a conditioning dir whose frame count does not match the crop (the
+fault that left 5 of 12 v2 clips with 48 colour frames and 0 skeletons).
 
 Deliberately not tested: PNG contents, argparse help text, third-party
-filesystem iteration order, the legacy ``scripts/select_probe_set.py``.
+filesystem iteration order, renaming anything in ``assets/dataset``.
 """
 
 from __future__ import annotations
@@ -31,6 +36,7 @@ from experiments.probe_set.verify import collect_violations, locked_split_violat
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 BROKEN_PROBE_SET = REPO_ROOT / "assets" / "probe_set.broken-v1"
+UNALIGNED_V2_PROBE_SET = REPO_ROOT / "assets" / "probe_set.broken-v2-unaligned"
 LIVE_PROBE_SET = REPO_ROOT / "assets" / "probe_set"
 LIVE_DATASET = REPO_ROOT / "assets" / "dataset"
 
@@ -57,8 +63,10 @@ def _make_track(
     if with_skeleton:
         skel = scene_dir / f"{track}_skeleton"
         skel.mkdir(parents=True, exist_ok=True)
-        for fid in source_frame_ids:
-            _write_png(skel / f"frame_{fid:06d}.png")
+        # Match the live dataset: skeleton files are track-local and zero-based,
+        # not named with the crop's global source ids.
+        for local_id, _fid in enumerate(source_frame_ids):
+            _write_png(skel / f"frame_{local_id:06d}.png")
     (scene_dir / f"{track}_caption.json").write_text('{"caption": "test"}')
     (scene_dir / f"{track}_metadata.json").write_text("[]")
     (scene_dir / f"{track}_keypoints.json").write_text("[]")
@@ -285,6 +293,35 @@ class TestVerifierCatchesTheOriginalFaults:
         with pytest.raises(ProbeSetError, match="missing manifest"):
             verify(tmp_path)
 
+    def test_conditioning_frame_count_must_match_crop(self, tmp_path: Path) -> None:
+        """The assertion that would have caught 48 colour / 0 skeleton."""
+        track = tmp_path / "clips" / "alcaraz_ruud" / "scene_002" / "track_0021"
+        skel = tmp_path / "clips" / "alcaraz_ruud" / "scene_002" / "track_0021_skeleton"
+        _write_png(track / "frame_000000.png")
+        _write_png(track / "frame_000001.png")
+        skel.mkdir(parents=True)
+        manifest = {
+            "schema": SCHEMA_ID,
+            "coordinate_system": COORDINATE_SYSTEM,
+            "view": "clips",
+            "training_videos": ["alcaraz_ruud"],
+            "held_out_videos": list(HELD_OUT_VIDEOS),
+            "num_probe_clips": 1,
+            "probe_clips": [
+                {
+                    "video": "alcaraz_ruud",
+                    "scene": "scene_002",
+                    "track": "track_0021",
+                    "frame_ids": [0, 1],
+                    "num_frames": 2,
+                }
+            ],
+        }
+        (tmp_path / "manifest.json").write_text(json.dumps(manifest))
+        (tmp_path / "training_view").mkdir()
+        violations = collect_violations(tmp_path)
+        assert any("_skeleton has 0 frames, crop has 2" in item for item in violations)
+
 
 class TestRegenerator:
     def test_manifest_is_derived_from_the_view(
@@ -381,6 +418,55 @@ class TestRegenerator:
         assert "federer_djokovic/scene_001/track_0099" not in keys
         assert "alcaraz_ruud/scene_002/track_0021" in keys
 
+    def test_skeleton_pairs_by_track_position_not_filename(
+        self, tmp_path: Path, fake_dataset: Path
+    ) -> None:
+        output = _regenerated(tmp_path, fake_dataset, num_clips=3, clip_len_frames=8)
+        manifest = json.loads((output / "manifest.json").read_text())
+        diverged = False
+        for clip in manifest["probe_clips"]:
+            source_crop = (
+                fake_dataset / clip["video"] / "segmentations" / clip["scene"] / clip["track"]
+            )
+            source_skel = source_crop.with_name(f"{clip['track']}_skeleton")
+            crop_ids = [
+                int(path.name[6:12]) for path in sorted(source_crop.glob("frame_*.png"))
+            ]
+            window_start = crop_ids.index(clip["global_frame_ids"][0])
+            view_skel = (
+                output / "clips" / clip["video"] / clip["scene"] / f"{clip['track']}_skeleton"
+            )
+            assert len(list(view_skel.glob("frame_*.png"))) == clip["num_frames"]
+            for local_id, source_id in enumerate(clip["global_frame_ids"]):
+                link = view_skel / f"frame_{local_id:06d}.png"
+                positional = source_skel / f"frame_{window_start + local_id:06d}.png"
+                assert link.is_symlink()
+                assert link.resolve() == positional.resolve()
+                if source_id != window_start + local_id:
+                    diverged = True
+                    reconstructed = source_skel / f"frame_{source_id:06d}.png"
+                    assert not reconstructed.exists()
+        assert diverged, "fixture must include a track whose crop names are not 0-based"
+
+    def test_condition_count_mismatch_raises_instead_of_skipping(
+        self, tmp_path: Path
+    ) -> None:
+        dataset = tmp_path / "dataset"
+        _make_track(dataset, "alcaraz_ruud", "scene_002", "track_0021", list(range(100, 160)))
+        skel = dataset / "alcaraz_ruud" / "segmentations" / "scene_002" / "track_0021_skeleton"
+        for path in list(skel.glob("frame_*.png"))[8:]:
+            path.unlink()
+        with pytest.raises(ProbeSetError, match="_skeleton has 8 frames, crop has 60"):
+            regenerate(
+                dataset,
+                tmp_path / "probe_set",
+                seed=7,
+                num_clips=1,
+                clip_len_frames=8,
+                min_frames=8,
+                training_videos=("alcaraz_ruud",),
+            )
+
 
 class TestLockedSplit:
     def test_training_and_held_out_are_disjoint(self) -> None:
@@ -414,6 +500,17 @@ class TestAgainstTheRealTrees:
         joined = "\n".join(violations)
         assert LEGACY_SCHEMA_ID in joined
         assert "missing tracks the manifest names" in joined
+
+    def test_verifier_fails_on_the_unaligned_v2_snapshot(self) -> None:
+        if not (UNALIGNED_V2_PROBE_SET / "manifest.json").is_file():
+            pytest.skip("assets/probe_set.broken-v2-unaligned is not present")
+        violations = collect_violations(
+            UNALIGNED_V2_PROBE_SET, dataset_root=LIVE_DATASET, check_locked_split=True
+        )
+        assert violations, "a verifier that passes on the unaligned v2 set is not a verifier"
+        joined = "\n".join(violations)
+        assert "_skeleton has 0 frames" in joined
+        assert "crop has 48" in joined
 
     def test_verifier_passes_on_the_rebuilt_set(self) -> None:
         if not (LIVE_PROBE_SET / "manifest.json").is_file():

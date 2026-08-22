@@ -15,6 +15,7 @@ from typing import Any
 
 from experiments.probe_set.schema import (
     CLIPS_VIEW_NAME,
+    CONDITION_DIR_SUFFIXES,
     COORDINATE_SYSTEM,
     HELD_OUT_VIDEOS,
     LEGACY_SCHEMA_ID,
@@ -209,6 +210,17 @@ def collect_violations(
             if declared_view == CLIPS_VIEW_NAME and view_dir.name == CLIPS_VIEW_NAME:
                 violations.append(
                     f"{key}: view has {len(on_disk)} frames, manifest names {len(frame_ids)}"
+                )
+
+        scene_dir = track_dir.parent
+        for suffix in CONDITION_DIR_SUFFIXES:
+            cond_dir = scene_dir / f"{track}{suffix}"
+            if not cond_dir.is_dir():
+                continue
+            n_cond = len(list_source_frame_ids(cond_dir))
+            if n_cond != len(on_disk):
+                violations.append(
+                    f"{key}: {suffix} has {n_cond} frames, crop has {len(on_disk)}"
                 )
 
         named_source = (
