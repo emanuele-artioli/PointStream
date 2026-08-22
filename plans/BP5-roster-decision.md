@@ -8,6 +8,30 @@ engines that actually load (B′3, B′4).
 roster section of `PLAN.md` §6.2.
 **Read first:** `PLAN.md` §6.2–6.6, and the reports from all four Wave-1 streams.
 
+## ⚠️ Do this first: the probe set is not fit to run on
+
+Verified 2026-08-22 (`PLAN.md` §2.3). **5 of the 12 v2 clips have 48 colour
+frames and 0 skeleton frames.** The dataset names crop/canny/pose directories by
+*global source frame id* and `_skeleton` by *track-local index*;
+`experiments/probe_set/materialize.py` copies conditioning directories with the
+global id under `if src.is_file()`, so where it does not match it silently skips.
+
+Two consequences, and the second is the dangerous one:
+
+- On those 5 clips a pose-conditioned generator has **no pose input at all**.
+- On any track where the global id happens to land inside the skeleton's range,
+  it silently links **the wrong skeleton frame** — appearance from one moment,
+  pose from another.
+
+**BP3's pose-ControlNet 20.3 dB and its "smeared but recognisable" note are
+suspect until re-run on aligned pairs.** Do not rank engines on numbers produced
+before this is fixed.
+
+**Fix before probing:** resolve every channel by the frame's *position in the
+track* rather than by filename, and extend the verifier to assert each
+conditioning directory has the same frame count as the crop. It currently checks
+colour frames only, which is exactly why this passed.
+
 ## What to build
 
 ### 1. The probe harness
@@ -29,7 +53,9 @@ Update `PLAN.md` §6.2 with the decision and, for each engine, the reason it hol
 its slot. Two questions to settle on evidence:
 
 - **Does Animate-Anyone keep the quality-flagship slot**, or does the modern
-  candidate take it?
+  candidate take it? Note it cannot carry the held-out arm at all — its
+  fine-tuning set contains both held-out videos (`PLAN.md` §2.5). Decide and
+  record which of the three options there applies.
 - **Do the two flagship roles collapse into one?** If the comparison backbone is
   also the best performer, say so and simplify the narrative.
 

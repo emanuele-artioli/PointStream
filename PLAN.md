@@ -98,15 +98,52 @@ v1 snapshot at `assets/probe_set.broken-v1/`). A harness reading the manifest
 found nothing; one reading the view evaluated an unseeded, unrecorded
 selection.
 
-**2. Two coordinate systems — the bound was wrong.** The v1 diagnosis claimed
-the manifest stored global video indices while PNG names were track-local from
-zero, so **5 of 12 clips would miss every frame** and the other 7 would return
-frames nobody selected. Re-measured against `assets/dataset` on 2026-08-22:
-**0/12 missing, 48/48 files present for every clip.** The bound had been
-derived in the wrong units: on this dataset the PNG names *are* the source-video
-indices the v1 manifest stored (`frame_id` matches the filename). Filename
-lookup against the dataset happened to work. The identity fault in (1) is what
-made the set unusable.
+**2. Two naming conventions in one track group — the live fault, still open.**
+Both earlier diagnoses were wrong, in opposite directions, and the truth is
+worse than either. Verified 2026-08-22 by listing every track directory:
+
+| Directory | Naming | Count |
+|---|---|---|
+| crop, `_canny`, `_pose_body`, `_pose_racket` | **global source frame ids** | consistent |
+| `_skeleton` | **track-local, zero-based** | 50/50 sampled |
+
+So a track that starts at source frame 29 has its crop at `frame_000029.png` and
+its *pose* for that same instant at `frame_000000.png`. **50 of 114 tracks (44%)
+carry this offset**; the other 64 align only because they happen to start at
+source frame 0. Frame counts always match — it is a pure re-indexing.
+
+The v1 measurement that found "5 of 12 clips missing every frame" was measuring
+`_skeleton` and was **correct for the pose channel**. The re-measurement that
+found "0/12 missing" was measuring the colour crop and was **correct for that
+channel**. Neither noticed the two disagree.
+
+**This survived into v2 and the probe set is not yet fit for Wave 2.**
+`experiments/probe_set/materialize.py` copies the crop strictly (raising on a
+missing frame) but copies every conditioning directory with the *same* global
+`source_id` under `if src.is_file()` — silently skipping what it cannot find.
+Result, verified in the built v2 tree:
+
+| Clips | Colour frames | Skeleton frames |
+|---|---|---|
+| 7 of 12 | 48 | 48 |
+| **5 of 12** | 48 | **0** |
+
+The five are `alcaraz_perricard/scene_006/track_0196`,
+`alcaraz_ruud/scene_004/track_0257`, `alcaraz_ruud/scene_004/track_0297`,
+`federer_djokovic/scene_001/track_0071`,
+`sinner_alcaraz/scene_012/track_0058` — the same five as v1.
+
+**Why this matters more than a missing file.** The skeleton is the pose control
+image for the comparison backbone. Where the offset silently resolves instead of
+missing, the generator receives a player's appearance from one moment and their
+pose from another. That produces precisely the smeared output that gets recorded
+as "the model is weak" — and BP3's pose-ControlNet note already says *"smeared
+but recognisable"*. **That number is suspect until re-run on aligned pairs.**
+
+**Fix, and it is small:** normalise on read. Resolve every channel through the
+frame's *position in the track*, not through a filename, and make the verifier
+assert that each conditioning directory has the same frame count as the crop —
+it currently checks colour frames only, which is why this passed.
 
 The underlying `assets/dataset` was never the problem — all 12 named tracks
 exist there, with crops, canny, `pose_body`, `pose_racket`, skeleton,
@@ -141,6 +178,30 @@ manifest it would load the start of the track, not the selected window.
   and InsightFace `antelopev2`, neither bundled. Cannot ship as a flagship until
   SVD is cleared. Live inference was not run: leftover VRAM ~11.6 GiB, VAE decode
   wants ~16 GiB.
+### 2.5 Animate-Anyone has seen the held-out videos
+
+Verified 2026-08-22 from `assets/dataset/pointstream_aa_meta.json`. The probe set
+holds out `alcaraz_highlights` and `djokovic_zverev`. Animate-Anyone's
+fine-tuning set contains **both**: 20 tracks from the first, 16 from the second,
+out of 114 total across 7 videos.
+
+**So for Animate-Anyone there is currently no held-out data at all**, and any
+number it posts on the held-out split is an in-training number wearing the wrong
+label. This bears directly on `subsec:eval-general`, which exists to separate
+what fine-tuning buys from what a pretrained backbone already delivers.
+
+Three options, and the choice is a decision for `BP5`, not an assumption:
+
+1. **Re-split** so the held-out videos are ones AA never saw — cheapest, but AA
+   saw 7 of the 7 videos we have, so this needs new source material.
+2. **Report AA as in-domain only** and let a pretrained engine carry the
+   held-out arm. Honest, and costs nothing.
+3. **Retrain AA** on a proper split — explicitly out of scope (§7 P2 item 17).
+
+Option 2 is the default unless someone argues otherwise. Whatever is chosen, the
+paper says which, because an unlabelled in-training score is the kind of thing a
+reviewer finds.
+
 
 ---
 
@@ -372,7 +433,7 @@ because it is already wired.**
 | **ControlNet family** | **Keep — now more important** | The only family with swappable control encoders over a fixed backbone. `eval-object` is a claim about *representations*; with a pose-only model it silently becomes a claim about models. It is also the only thing here fine-tuned on our own data. |
 | **pix2pix** | **Keep** | One forward pass, no sampling loop. StableAnimator wants ~10–16 GB and a diffusion schedule. Without pix2pix, `eval-operating` has no real-time point to report at all. |
 | **upscale-refine** | **Keep — value went up** | The non-generative floor. If a 2026 SOTA animator barely beats bicubic upsampling at our bitrates, that is a headline finding, and only this control can show it. |
-| **Animate-Anyone** | **Keep as the evaluable incumbent** | Wired on `phase-bp/bp4` to `~/Models/AnimateAnyone/profiles/finetuned_tennis`. Fine-tuned on **7 matches, 114 tracks** (`assets/dataset/pointstream_aa_meta.json`) — the "single tennis match" caveat was stale. 3 DDIM steps (the old default) melted: 9.65 dB, below the 12 dB floor; that is under-sampled diffusion, not a metric bug. Class default is now 20 steps. Still tennis-set, not a general human model. |
+| **Animate-Anyone** | **Keep as the evaluable incumbent — with a leakage caveat** | Wired on `phase-bp/bp4` to `~/Models/AnimateAnyone/profiles/finetuned_tennis`. Fine-tuned on **114 tracks across 7 videos** (`assets/dataset/pointstream_aa_meta.json`) — the "single tennis match" caveat was stale and is withdrawn. 3 DDIM steps melted (9.65 dB); class default is now 20 steps, 14.0 dB in-set. **But its training set includes both probe-set held-out videos** — `alcaraz_highlights` (20 tracks) and `djokovic_zverev` (16). See §2.5: for this engine the held-out split does not hold out. |
 | **SPADE4Tennis** | **Keep for now** | Architecturally close to ControlNet+pix2pix, which makes it a useful control: if a tennis-specific SPADE generator matches or beats a fine-tuned general backbone on tennis, that says something about how much domain specialisation is worth. Judge it on the probe numbers, not in advance. |
 | **MOFA-Video** | Stays dropped | Licence-blocked; the rendered-trajectory arm replaces it and is a better experiment. |
 
