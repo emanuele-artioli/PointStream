@@ -285,8 +285,21 @@ def test_reid_separates_two_people_on_ground_truth_pairs() -> None:
     )
 
 
+#: Pairs per side. The full sweep is 106 same and 53 different across seven
+#: videos and blew a 15-minute timeout on CPU — an invariant nobody can afford
+#: to run is one that rots. At this cap the four tests here take **~4.5 minutes
+#: on CPU**, which is why they carry the `integration` marker and are deselected
+#: by default rather than being made faster still. The standard error is ~0.03
+#: against a separation of ~0.33, so the gate cannot be decided by the sample
+#: size. Full-scale figures: `outputs/bp18-reid-calibration.txt`.
+MAX_PAIRS_PER_SIDE = 24
+
+
 def _ground_truth_pair_scores(backend: MetricBackend) -> tuple[float, float]:
-    """``(same person, different person)`` means, derived, never labelled."""
+    """``(same person, different person)`` means, derived, never labelled.
+
+    Capped and taken in a deterministic order, so two runs agree.
+    """
     from pathlib import Path
 
     from PIL import Image
@@ -318,7 +331,11 @@ def _ground_truth_pair_scores(backend: MetricBackend) -> tuple[float, float]:
     same: list[float] = []
     seen: set[tuple[str, str]] = set()
     for video in videos:
+        if len(different) >= MAX_PAIRS_PER_SIDE and len(same) >= MAX_PAIRS_PER_SIDE:
+            break
         for left, right, frame_id in cooccurring_pairs(video):
+            if len(different) >= MAX_PAIRS_PER_SIDE and len(same) >= MAX_PAIRS_PER_SIDE:
+                break
             left_index = crop_index_of(video, left, frame_id)
             right_index = crop_index_of(video, right, frame_id)
             if left_index is None or right_index is None:
@@ -326,12 +343,13 @@ def _ground_truth_pair_scores(backend: MetricBackend) -> tuple[float, float]:
             first, second = crop(video, left, left_index), crop(video, right, right_index)
             if first is None or second is None:
                 continue
-            try:
-                different.append(float(backend.score(first, second)))
-            except FileNotFoundError as exc:  # weights absent
-                pytest.skip(str(exc))
+            if len(different) < MAX_PAIRS_PER_SIDE:
+                try:
+                    different.append(float(backend.score(first, second)))
+                except FileNotFoundError as exc:  # weights absent
+                    pytest.skip(str(exc))
             for key in (left, right):
-                if (video, key) in seen:
+                if (video, key) in seen or len(same) >= MAX_PAIRS_PER_SIDE:
                     continue
                 seen.add((video, key))
                 scene, track = key.split("/")
