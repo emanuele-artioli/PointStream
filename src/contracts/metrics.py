@@ -48,8 +48,13 @@ class MetricTier(str, Enum):
     """Standard video-quality scoring, for headline tables."""
 
     PERCEPTUAL = "perceptual"
-    """Learned perceptual similarity, for generated content — where a
-    pixel-difference metric rewards a blurry frame over a plausible one."""
+    """For judging generated content, where a pixel-difference metric rewards a
+    blurry frame over a plausible one.
+
+    Mostly learned similarity, but not by definition: `palette` sits here
+    because it is only meaningful beside `reid`, and selecting one without the
+    other loses the cross-check that is the reason both exist. The tier is
+    about what a metric is *for*, not how it is implemented."""
 
     TEMPORAL = "temporal"
     """Operates on a sequence rather than on frames, for coherence claims."""
@@ -185,6 +190,40 @@ LPIPS = MetricSpec(
     ),
 )
 
+REID = MetricSpec(
+    name="reid",
+    tier=MetricTier.PERCEPTUAL,
+    direction=Direction.HIGHER_IS_BETTER,
+    cost=MetricCost.MODERATE,
+    range=(-1.0, 1.0),
+    summary=(
+        "Person re-identification similarity: did the right body appear, rather "
+        "than merely a different one. The only metric here that is not a "
+        "distance to the target frame, and the reason it exists is that a "
+        "pasted keyframe wins every distance-based test of appearance use. "
+        "Read it BESIDE a distortion metric, never instead of one. Cosine "
+        "similarity has no natural zero on person crops: measured on this "
+        "dataset two different people in the same match score 0.510 and two "
+        "unrelated clips 0.37-0.42 depending on which pairs are sampled, "
+        "against 1.000 for an identical crop. Quote the floor with the number."
+    ),
+)
+
+PALETTE = MetricSpec(
+    name="palette",
+    tier=MetricTier.PERCEPTUAL,
+    direction=Direction.HIGHER_IS_BETTER,
+    cost=MetricCost.TRIVIAL,
+    range=(0.0, 1.0),
+    summary=(
+        "Colour-palette overlap of the subject crop, as a check on the learned "
+        "identity metric rather than a result of its own. Kit colour is most of "
+        "what tells two players apart here, so `reid` is partly a colour "
+        "detector; when these two disagree one of them is wrong and it is worth "
+        "finding out which. Cannot separate two people in the same kit."
+    ),
+)
+
 FVMD = MetricSpec(
     name="fvmd",
     tier=MetricTier.TEMPORAL,
@@ -200,7 +239,7 @@ FVMD = MetricSpec(
 
 #: Every metric, by config name.
 METRICS: Final[Mapping[str, MetricSpec]] = {
-    spec.name: spec for spec in (PSNR, SSIM, VMAF, LPIPS, FVMD)
+    spec.name: spec for spec in (PSNR, SSIM, VMAF, LPIPS, REID, PALETTE, FVMD)
 }
 
 #: Metrics no configuration may switch off. One entry today, and the reason

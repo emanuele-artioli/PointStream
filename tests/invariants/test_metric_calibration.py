@@ -218,3 +218,220 @@ def test_metric_absolute_scale_matches_its_published_range(name: str) -> None:
         f"range [{low}, {high}]. The scale is wrong even if the ordering is "
         f"not — which is exactly how the uncalibrated VGG stand-in shipped."
     )
+
+
+# ---------------------------------------------------------------------------
+# BP18: the identity metric, calibrated on real players.
+#
+# These need `assets/dataset` and the ReID weights, so they are marked
+# `integration` and deselected by default. The synthetic anchors above cannot
+# stand in: the question is whether the embedding separates two people who
+# share a court, a broadcast and a lighting setup, and no procedural texture
+# poses that question.
+#
+# Measured 2026-08-23 on 27 labelled tracks across three videos, cosine
+# similarity, OSNet x1_0 / MSMT17:
+#
+#   identical crop                       1.0000
+#   same track, offset 8   (n=27)        0.8506 +/- 0.0185   <- ground truth
+#   same track, offset 24  (n=27)        0.8063 +/- 0.0193
+#   same player, other track (n=42)      0.7200 +/- 0.0150   <- inferred label
+#   DIFFERENT PLAYER, same match (n=52)  0.5097 +/- 0.0130
+#   different video        (n=60)        0.4167 +/- 0.0136
+#   player vs official     (n=14)        0.3943 +/- 0.0242
+#
+# Bounds in `outputs/bp18-reid-bounds.txt` were written first. Three of them
+# fired high, and the reason is recorded there and in PLAN.md: cosine
+# similarity on person crops has no natural zero, so "unrelated" sits near 0.42
+# rather than 0. The bands were wrong, not the metric. Assertions below are
+# therefore on ORDERING and on the separation against the MEASURED floor.
+
+_REID_ANCHOR_ORDER = (
+    "identical",
+    "same track, offset 8",
+    "same player, different track",
+    "different player, same match",
+    "different video",
+)
+
+#: Below this the metric cannot tell two players in one match apart, and must
+#: not be used to rank anything however well-ordered its output looks.
+REID_MIN_SEPARATION = 0.25
+
+
+@pytest.mark.integration
+def test_reid_separates_two_players_in_the_same_match() -> None:
+    """The gate that decides whether this instrument may be used at all.
+
+    A metric that scores the wrong player as highly as the right one still
+    produces a perfectly ordered ranking. That is how the uncalibrated LPIPS
+    shipped, and it is why this asserts a *magnitude*, not just an order.
+    """
+    scores = _reid_anchor_scores()
+    separation = scores["same track, offset 8"] - scores["different player, same match"]
+    assert separation >= REID_MIN_SEPARATION, (
+        f"ReID separates same-player from different-player-same-match by only "
+        f"{separation:.4f}, below the {REID_MIN_SEPARATION} gate. Anchors: {scores}. "
+        "Do not rank engines on this metric until that is explained."
+    )
+
+
+@pytest.mark.integration
+def test_reid_anchors_are_ordered_from_identical_down_to_unrelated() -> None:
+    scores = _reid_anchor_scores()
+    values = [scores[name] for name in _REID_ANCHOR_ORDER]
+    for first, second, left, right in zip(
+        _REID_ANCHOR_ORDER, _REID_ANCHOR_ORDER[1:], values, values[1:]
+    ):
+        assert left > right, (
+            f"ReID scores '{second}' ({right:.4f}) at least as high as '{first}' "
+            f"({left:.4f}). Full curve: {scores}"
+        )
+
+
+@pytest.mark.integration
+def test_reid_is_reported_against_a_measured_floor_not_against_zero() -> None:
+    """Cosine similarity on person crops has no natural zero: every upright
+    human in a tennis crop shares a large component. Quoting 0.51 as though 0
+    were the floor overstates the distance by a factor of two."""
+    scores = _reid_anchor_scores()
+    floor = scores["different video"]
+    assert 0.25 < floor < 0.60, (
+        f"the unrelated-clip floor moved to {floor:.4f}; the numbers quoted in "
+        "PLAN.md and in the metric summary are anchored on ~0.42 and need re-stating"
+    )
+
+
+def _reid_anchor_scores() -> dict[str, float]:
+    """Mean similarity per anchor, computed from the hand labels."""
+    from src.components.metrics.reid import ReidMetric
+
+    return _anchor_scores(ReidMetric(device="cpu"))
+
+
+def _anchor_scores(backend: MetricBackend) -> dict[str, float]:
+    """Every anchor for one backend. Shared so the two are compared like for like."""
+    from pathlib import Path
+
+    from PIL import Image
+
+    from experiments.probe.player_labels import (
+        OFFICIAL,
+        PLAYER_LABELS,
+        different_player_pairs,
+        labelled_tracks,
+        same_player_pairs,
+    )
+
+    root = Path("assets") / "dataset"
+    if not root.is_dir():
+        pytest.skip("assets/dataset is not present")
+    cache: dict[tuple[str, str, int], np.ndarray] = {}
+
+    def frames(video: str, key: str) -> list[Path]:
+        scene, track = key.split("/")
+        return sorted((root / video / "segmentations" / scene / track).glob("frame_*.png"))
+
+    def crop(video: str, key: str, index: int = 0) -> np.ndarray:
+        cache_key = (video, key, index)
+        if cache_key not in cache:
+            found = frames(video, key)
+            if not found:
+                pytest.skip(f"no frames for {video}/{key}")
+            chosen = found[min(index, len(found) - 1)]
+            cache[cache_key] = np.asarray(Image.open(chosen).convert("RGB"))[None, ...]
+        return cache[cache_key]
+
+    def mean(values: list[float]) -> float:
+        if not values:
+            pytest.skip("an anchor had no usable pairs")
+        return sum(values) / len(values)
+
+    keys = [(video, key) for video in PLAYER_LABELS for key in labelled_tracks(video)]
+    try:
+        identical = mean([backend.score(crop(v, k), crop(v, k)) for v, k in keys])
+    except FileNotFoundError as exc:  # weights absent
+        pytest.skip(str(exc))
+    offset = mean(
+        [
+            backend.score(crop(v, k, 0), crop(v, k, 8))
+            for v, k in keys
+            if len(frames(v, k)) > 8
+        ]
+    )
+    same = mean(
+        [
+            backend.score(crop(v, a), crop(v, b))
+            for v in PLAYER_LABELS
+            for a, b in same_player_pairs(v)
+        ]
+    )
+    different = mean(
+        [
+            backend.score(crop(v, a), crop(v, b))
+            for v in PLAYER_LABELS
+            for a, b in different_player_pairs(v)
+        ]
+    )
+    across = mean(
+        [
+            backend.score(crop(*left), crop(*right))
+            for index, left in enumerate(keys)
+            for right in keys[index + 1 :]
+            if left[0] != right[0]
+        ][:60]
+    )
+    official = mean(
+        [
+            backend.score(crop(v, a), crop(v, b))
+            for v in PLAYER_LABELS
+            for a, left_label in labelled_tracks(v).items()
+            for b, right_label in labelled_tracks(v).items()
+            if left_label == OFFICIAL and right_label != OFFICIAL
+        ]
+        or [float("nan")]
+    )
+    return {
+        "identical": identical,
+        "same track, offset 8": offset,
+        "same player, different track": same,
+        "different player, same match": different,
+        "player vs official": official,
+        "different video": across,
+    }
+
+
+@pytest.mark.integration
+def test_the_palette_companion_disagrees_where_it_should() -> None:
+    """The reason `palette` is registered at all.
+
+    Kit colour is most of what separates two players here, so `reid` is partly
+    a colour detector and a learned metric with nothing to check it against is
+    how the uncalibrated LPIPS shipped. The check is only worth keeping if the
+    two can disagree, and they do, in the direction each is built for:
+
+    * an **official** in a black tracksuit shares colour mass with a
+      dark-shirted player, so `palette` scores that pair *higher* than two
+      players — while `reid` scores it *lower*, because an umpire is not doing
+      the thing a player is doing;
+    * measured 2026-08-23, `reid` 0.394 vs 0.510 and `palette` 0.502 vs 0.364.
+
+    If this ever stops holding, the two metrics have collapsed into one and the
+    companion is no longer buying anything.
+    """
+    reid = _reid_anchor_scores()
+    palette = _palette_anchor_scores()
+    assert reid["player vs official"] < reid["different player, same match"], (
+        "reid no longer ranks an official below two players: "
+        f"{reid['player vs official']:.4f} vs {reid['different player, same match']:.4f}"
+    )
+    assert palette["player vs official"] > palette["different player, same match"], (
+        "palette no longer confuses an official's kit with a player's; the two "
+        "metrics may have collapsed into one measurement"
+    )
+
+
+def _palette_anchor_scores() -> dict[str, float]:
+    from src.components.metrics.palette import PaletteMetric
+
+    return _anchor_scores(PaletteMetric())

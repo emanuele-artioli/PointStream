@@ -761,16 +761,16 @@ def test_absence_of_an_appearance_effect_is_a_claim_about_the_interval() -> None
     a 1.5-sigma effect is not a direction. Both were reported here as findings."""
     from experiments.probe.bounds import judge_cross_appearance
 
-    anchored = {"copy_delta": 0.285}
-    tight = judge_cross_appearance(0.001, sigmas=0.1, standard_error=0.004, **anchored)
+    paste = 0.285  # what a pure copy scores; the anchor every verdict needs
+    tight = judge_cross_appearance(0.001, sigmas=0.1, standard_error=0.004, copy_delta=paste)
     assert tight.status == "reference-independent"
-    loose = judge_cross_appearance(0.001, sigmas=0.02, standard_error=0.050, **anchored)
+    loose = judge_cross_appearance(0.001, sigmas=0.02, standard_error=0.050, copy_delta=paste)
     assert loose.status == "inside-noise", "wide interval cannot rule an effect out"
-    weak = judge_cross_appearance(0.09, sigmas=1.5, standard_error=0.060, **anchored)
+    weak = judge_cross_appearance(0.09, sigmas=1.5, standard_error=0.060, copy_delta=paste)
     assert weak.status == "inside-noise"
-    leak = judge_cross_appearance(0.05, sigmas=3.0, standard_error=0.017, **anchored)
+    leak = judge_cross_appearance(0.05, sigmas=3.0, standard_error=0.017, copy_delta=paste)
     assert leak.status == "weakly reference-dependent"
-    works = judge_cross_appearance(0.16, sigmas=4.0, standard_error=0.040, **anchored)
+    works = judge_cross_appearance(0.16, sigmas=4.0, standard_error=0.040, copy_delta=paste)
     assert works.status == "reference-dependent"
 
 

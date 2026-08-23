@@ -578,6 +578,79 @@ understand, and one was never built. That is a better description of where this
 project stands than "the generators do not use appearance".
 
 
+### 2.12 An instrument that can tell the right body from a moving output
+
+Built and calibrated 2026-08-23 (`BP18`). `outputs/bp18-reid-calibration.txt`,
+bounds in `outputs/bp18-reid-bounds.txt` written first.
+
+§2.10 left a gap: the cross-appearance control cannot say whether a generator
+renders the *right person*, because a paste tops it. Every proposal that follows
+— retraining, a new dataset, a new architecture — would have been judged with a
+yardstick that cannot answer the question. So the instrument came first.
+
+**Not faces.** CSIM/ArcFace is the literature's answer and does not apply here:
+we reconstruct bodies in motion, a player box averages ~88k px in a 4K frame,
+and the face inside it is a few tens of pixels, often turned away. **DISTS is
+not the answer either** — it is a distortion metric with LPIPS's structure, so a
+paste tops it too; it stays for comparability with Sparse2Dense, which headlines
+DISTS, and it is *not* registered on the metric axis today.
+
+**What was built.** `reid`: OSNet x1_0 trained on MSMT17, embedding a full-body
+crop; cosine similarity against the ground-truth target frame, pose-invariant by
+design. Architecture vendored (MIT) rather than installed, because `torchreid`
+risks moving torch and several pinned forks here cannot survive that; nothing
+downloads at runtime. Beside it `palette`, an 8-bin RGB histogram intersection —
+deliberately crude, as a check on the learned one.
+
+**Calibrated on 27 hand-labelled tracks** across three videos
+(`experiments/probe/player_labels.py`), n as shown:
+
+| anchor | n | `reid` | `palette` |
+|---|---|---|---|
+| identical | 27 | 1.0000 | 1.0000 |
+| same track, offset 8 *(ground truth)* | 27 | 0.8506 ± 0.0185 | 0.8455 ± 0.0147 |
+| same player, other track *(inferred)* | 42 | 0.7200 ± 0.0150 | 0.4961 ± 0.0300 |
+| **different player, same match** | 52 | **0.5097 ± 0.0130** | 0.3644 ± 0.0173 |
+| player vs official | 14 | 0.3943 ± 0.0242 | 0.5018 ± 0.0390 |
+| different video | 60 | 0.3739 ± 0.0120 | 0.1937 ± 0.0066 |
+
+**`reid` passes its gate at 15.1σ** — separation 0.3410 ± 0.0226, which is 54%
+of the usable range, and the ordering is monotone across every anchor. Usable.
+
+**Three bounds fired high, and the bounds were wrong.** They were written as
+though cosine similarity had a natural zero for "unrelated". It does not: every
+upright human in a tennis crop shares a large component with every other, so the
+floor for two different people sits near 0.4. Quoting 0.51 as though 0 were the
+floor overstates the distance by about a factor of two. Fixed by reporting
+against the *measured* floor. Recorded rather than quietly redrawn, per the rule
+in `AGENTS.md`.
+
+**The companion earned its place immediately**, by disagreeing:
+
+- `palette` separates two players in one match *more* sharply than `reid`
+  (0.481 vs 0.341). Kit colour really is most of the signal, and `reid` is
+  partly a colour detector — worth knowing before anyone calls it "identity".
+- But `palette` is **fooled by the official**: an umpire in a black tracksuit
+  scores *higher* against a dark-shirted player (0.502) than two players score
+  against each other (0.364), while `reid` puts the official lowest of all
+  (0.394).
+- And `palette` collapses across scenes for the same player (0.496 against
+  `reid`'s 0.720) — a histogram has no invariance to lighting or scale.
+
+So: **`reid` is the identity number, `palette` is the check, and where they
+disagree, go and look.** An invariant asserts that disagreement, because if the
+two ever collapse into one measurement the companion has stopped buying
+anything.
+
+**What this does not claim.** Cross-track "same player" labels are inferred from
+kit, and kit is part of what both metrics read; the primary same-player anchor
+is therefore same-track-different-frame, which is ground truth. Both players in
+a match share a court, a broadcast and a lighting rig, all of which push their
+embeddings together — so the decisive test is conservative rather than
+flattering. And this settles nothing about any engine. It is an instrument; §7's
+question is now answerable, not answered.
+
+
 ---
 
 ## 3. Architecture

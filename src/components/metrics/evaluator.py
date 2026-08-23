@@ -31,7 +31,10 @@ from src.contracts.metrics import ALWAYS_ON, DEFAULT_METRICS, MetricSelection, r
 
 #: Metrics that need a rectangle. A mask or a background (a frame with a hole)
 #: is not a rectangle; those scopes use PSNR (and SSIM on a mask).
-_RECTANGULAR = frozenset({"vmaf", "lpips", "fvmd"})
+#: ``reid`` is here because it embeds a crop of a whole person — a masked frame
+#: with a person-shaped hole in it is not something a ReID backbone has ever
+#: seen, and it would return a number anyway.
+_RECTANGULAR = frozenset({"vmaf", "lpips", "fvmd", "reid", "palette"})
 
 
 class MetricBackend(Protocol):

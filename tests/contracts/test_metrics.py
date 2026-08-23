@@ -95,7 +95,16 @@ def test_a_comma_separated_string_resolves_like_a_list() -> None:
 def test_the_tiers_are_the_ones_the_plan_specifies() -> None:
     assert {spec.name for spec in by_tier(MetricTier.FAST)} == {"psnr"}
     assert {spec.name for spec in by_tier(MetricTier.TRADITIONAL)} == {"ssim", "vmaf"}
-    assert {spec.name for spec in by_tier(MetricTier.PERCEPTUAL)} == {"lpips"}
+    # `reid` and `palette` joined this tier with BP18. Neither is a distance to
+    # the target like LPIPS, so nothing here may assume tier implies direction;
+    # `Direction` and the summaries carry that. `palette` is not learned and is
+    # here anyway — it is only meaningful beside `reid`, and a tier that split
+    # them would let a config select one without its cross-check.
+    assert {spec.name for spec in by_tier(MetricTier.PERCEPTUAL)} == {
+        "lpips",
+        "reid",
+        "palette",
+    }
     assert {spec.name for spec in by_tier(MetricTier.TEMPORAL)} == {"fvmd"}
     # FVMD rather than FVD: the reviewer question is about temporal coherence
     # specifically, and the existing FVD wiring is prior art, not the default.

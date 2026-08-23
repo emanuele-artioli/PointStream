@@ -113,3 +113,74 @@ in the same commit.
 - DISTS's role is written down: final-results comparability, not identity.
 - `PLAN.md` §2.10's closing paragraph is updated to point at the instrument that
   now exists, or to record that ReID failed calibration on this content.
+
+---
+
+## Delivered — 2026-08-23
+
+Numbers and their reading are in `PLAN.md` §2.12;
+`outputs/bp18-reid-calibration.txt` is the record and
+`outputs/bp18-reid-bounds.txt` was written before any anchor was scored.
+
+**`reid` is registered and usable.** OSNet x1_0 / MSMT17. Separation between
+same-player and different-player-in-the-same-match is **0.3410 ± 0.0226, 15.1σ,
+n=52 different-player pairs** — clearing the ≥0.25 gate — with a monotone
+ordering across all six anchors.
+
+**`palette` is registered beside it** and immediately justified itself by
+disagreeing: sharper on within-match player separation, fooled by an official in
+a black tracksuit where `reid` is not, and collapsing across scenes where `reid`
+holds. An invariant asserts that disagreement, so a future change that collapses
+them into one measurement fails loudly.
+
+### Decisions worth carrying forward
+
+- **Vendored, not installed.** `torchreid` is absent and pulling it risks moving
+  torch, which several pinned forks cannot survive. The architecture depends on
+  nothing but torch, so it is copied with its MIT licence and the gdown
+  machinery removed. Nothing downloads at runtime. `pyproject.toml` unchanged.
+- **Licences read before integrating, both of them**: code MIT
+  (KaiyangZhou/deep-person-reid), weights MIT (kaiyangzhou/osnet model card),
+  checked 2026-08-23 and recorded in the module docstring rather than in a
+  commit message.
+- **This metric does not require pixel alignment**, and that is the point. A
+  `paired()` call in the score path would silently re-impose the constraint it
+  exists to escape; a test pins it.
+- **Hand labels were unavoidable.** The dataset carries no player identity, so
+  27 tracks across three videos were labelled by eye from contact sheets. Two
+  videos are left unlabelled rather than guessed at — in `alcaraz_ruud` every
+  sampled track wears the same kit. The circularity (labels from kit, metrics
+  read kit) is written into `experiments/probe/player_labels.py`.
+
+### What was found on the way
+
+- **Two unrelated white-noise clips score 0.97** on this backbone. A learned
+  metric finds noise self-similar. Noise is not a valid "unrelated" anchor and
+  was not used as one.
+- **The bounds were wrong in a specific, reusable way**: they assumed cosine
+  similarity has a natural zero for "unrelated". It does not, for person crops.
+  Report against the measured floor.
+- **`palette` beats `reid` at within-match player separation.** Worth stating
+  plainly before anyone describes the learned metric as measuring "identity":
+  on this content, most of the signal is what the player is wearing.
+
+### Done when — status
+
+- [x] `reid` registered on the metrics axis, region-scoped, refusing a mask
+      region rather than scoring a person-shaped hole.
+- [x] Calibrated against the anchors, asserted as invariants, with the decisive
+      separation quantified. **Passed** rather than rejected.
+- [x] `palette` registered beside it, with an invariant on their disagreement.
+- [x] DISTS's role written down: comparability with Sparse2Dense, not identity.
+      Noted also that it is **not currently registered** on the metric axis —
+      it is used ad hoc. Registering it is a loose end for whoever needs it.
+- [x] §2.10's closing paragraph is superseded by §2.12.
+
+### Not done, deliberately
+
+- **No engine was scored.** Landing an instrument settles nothing, and reporting
+  a roster ranking in the same session would have been the exact mistake this
+  brief exists to prevent. `BP17` and `BP19` are where it gets used.
+- **The 12 probe clips are not re-scored on `reid`.** That belongs to whichever
+  brief next drives the roster, so the identity number arrives beside a
+  distortion number in one table rather than as a standalone league table.

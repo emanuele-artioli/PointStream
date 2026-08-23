@@ -13,7 +13,7 @@ from src.components.metrics.evaluator import (
     triage,
 )
 from src.components.metrics.region import MIN_REGION_PIXELS, Region, RegionKind, RegionRole
-from src.contracts.metrics import FVMD, LPIPS, PSNR, SSIM, VMAF
+from src.contracts.metrics import FVMD, LPIPS, PALETTE, PSNR, REID, SSIM, VMAF
 from src.contracts.registry import BackendSpec, Registry
 
 REGISTRY: Registry[object] = Registry("metric")
@@ -48,6 +48,22 @@ REGISTRY.register(
         target="src.components.metrics.lpips:LpipsMetric",
         capabilities=frozenset({"frame", "reference"}),
         summary=LPIPS.summary,
+    )
+)
+REGISTRY.register(
+    BackendSpec(
+        name=REID.name,
+        target="src.components.metrics.reid:ReidMetric",
+        capabilities=frozenset({"frame", "reference", "identity"}),
+        summary=REID.summary,
+    )
+)
+REGISTRY.register(
+    BackendSpec(
+        name=PALETTE.name,
+        target="src.components.metrics.palette:PaletteMetric",
+        capabilities=frozenset({"frame", "reference", "identity"}),
+        summary=PALETTE.summary,
     )
 )
 REGISTRY.register(
