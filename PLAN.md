@@ -29,7 +29,7 @@ Target: **ACM TOMM, September 30.**
 |---|---|---|
 | A — contracts and concepts | ✅ done | — |
 | B — components | ✅ **done** | Merged-ready on `phase-b/integrate` (still unmerged to main) |
-| **B′ — the engine roster** | Wave 3 in flight | Quality flagship **unset** until pose-ref ControlNet posts a coding-task number. Wave-2 roster (ControlNet holds both slots) is **void** — self-reconstruction. |
+| **B′ — the engine roster** | Wave 3 Option A **failed** | Quality flagship **unset** (honest negative). Pose-ref epoch 10 is 11.18 dB, below the 11.47 letterbox floor. Wave-2 roster remains **void**. Option C is a reported finding, not an escape. |
 | C — pipeline and runner | ⬜ | `C1`/`C2` can start with Wave 2; `C3` after both |
 | C — pipeline and runner | ⬜ | Blocked on B′ |
 | D — experiments layer | ⬜ | Blocked on C |
@@ -238,27 +238,32 @@ Pairing is by position in the sorted `frame_*.png` lists.
 | pose-ref epoch 5 | 11.18 dB | −0.29 vs 11.47 | `outputs/bp8-coding-task-pose-ref-epoch5/` | n/a |
 | pose-ref epoch 6 | 11.19 dB | −0.27 vs 11.47 | `outputs/bp8-coding-task-pose-ref-epoch6/` | n/a |
 | pose-ref epoch 7 | 11.18 dB | −0.29 vs 11.47 | `outputs/bp8-coding-task-pose-ref-epoch7/` | n/a |
+| pose-ref epoch 8 | 11.11 dB | −0.35 vs 11.47 | `outputs/bp8-coding-task-pose-ref-epoch8/` | n/a |
+| pose-ref epoch 9 | 11.26 dB | −0.21 vs 11.47 | `outputs/bp8-coding-task-pose-ref-epoch9/` | n/a |
+| pose-ref epoch 10 | **11.18 dB** | −0.28 vs 11.47 | `outputs/bp8-coding-task-pose-ref-epoch10/` | n/a |
 
 An engine at or below the static-copy floor is **not using appearance**, in those
 words. AA and IP-Adapter both lose to doing nothing. Tuning (guidance / steps /
 strength) is ruled out: the models were not trained with appearance as an input,
 except AA, whose ReferenceNet path was driven and still lost.
 
-**Option A in flight — mid-train still below the floor.** Pose ControlNet is
-being fine-tuned with a same-track reference painted under the skeleton
-(`pose-ref-controlnet`). Smoke (driven, not read): `residual_delta=2.69` on two
-ControlNet forwards that differed only in the reference; composed control dump
-at `outputs/bp8-pose-ref-smoke/`. Train: `cuda:0`, init
-`pose-controlnet/checkpoint-epoch-10`, 10 epochs, batch 4, dataset 35713, log
-`outputs/bp8-pose-ref-train/train.log`. Coding-task evals of epoch checkpoints
-ran on `cuda:1` (same protocol: seed 42, 12 clips, letterbox, bounds written
-first). Bounds: `outputs/bp8-pose-ref-train/bounds.json` **before** generate.
-Success is **≥ 12.82 dB** object-scoped (11.82 + 1). Below 11.82 it still is
-not using appearance. Epochs 1–7 all landed in **11.18–11.33 dB** (static-copy
-letterbox floor 11.47 on this driver). The series is flat-to-down (epoch 1
-11.33 → epochs 5–7 11.18–11.19). That band is evidence the reference paint is
-not teaching identity; epoch 10 is the number that decides the roster, not a
-reason to train longer in this session.
+**Option A failed.** Pose ControlNet was fine-tuned with a same-track reference
+painted under the skeleton (`pose-ref-controlnet`). Smoke (driven, not read):
+`residual_delta=2.69` on two ControlNet forwards that differed only in the
+reference; composed control dump at `outputs/bp8-pose-ref-smoke/`. Train
+finished cleanly: `cuda:0`, init `pose-controlnet/checkpoint-epoch-10`, 10
+epochs, batch 4, dataset 35713, log `outputs/bp8-pose-ref-train/train.log`,
+final checkpoint `assets/weights/pose-ref-controlnet/checkpoint-epoch-10`.
+Coding-task evals of every epoch checkpoint ran on `cuda:1` (seed 42, 12 clips,
+letterbox, bounds written first). Bounds:
+`outputs/bp8-pose-ref-train/bounds.json` **before** generate. Success was
+**≥ 12.82 dB** object-scoped (11.82 + 1). Epoch 10 posted **11.18 dB** — below
+this driver's 11.47 letterbox floor and below the published 11.82 paste floor.
+The whole series (epochs 1–10) sat in **11.11–11.33 dB**, flat-to-down from
+epoch 1. The reference paint entered the ControlNet and did not teach identity.
+No bound fired: every mean landed inside the 8–35 dB alarm window. **Option C**
+(change what the paper claims is transmitted) is the reported finding, not an
+escape, and not a reason to train longer on this recipe.
 
 ---
 
@@ -464,17 +469,16 @@ the keyframe.
 
 | Role | Engine | Serves | Why |
 |---|---|---|---|
-| **Quality flagship** | **Unset.** Pose-ref ControlNet is still training (epoch 10 decides). Epochs 1–7 did not beat static copy. | `eval-ladder` | AA 8.96 dB in-domain, real IP-Adapter 8.90 dB, published pose/seg ControlNet 11.20 / 11.01, pose-ref epochs 1–7 **11.33 / 11.25 / 11.24 / 11.24 / 11.18 / 11.19 / 11.18** — all at or below the 11.82 dB static-copy floor (this driver's letterbox floor 11.47). An engine at or below that floor is not using appearance. |
-| **Comparison backbone** | ControlNet on SD-1.5, **pose-ref first** once epoch 10 has a coding-task number | `eval-object` | Still the only family where the backbone stays fixed while the conditioning changes. Mid-train pose-ref is in the 11.2–11.3 dB band; do not cite Wave-2 object dB. |
+| **Quality flagship** | **Unset.** Honest negative: no engine beat static copy on the coding task. | `eval-ladder` | AA 8.96 dB in-domain, real IP-Adapter 8.90 dB, published pose/seg ControlNet 11.20 / 11.01, pose-ref epoch 10 **11.18 dB** (series 11.11–11.33). All at or below the 11.82 dB static-copy floor (this driver's letterbox floor 11.47). An engine at or below that floor is not using appearance. |
+| **Comparison backbone** | ControlNet on SD-1.5 (pose / seg / pose-ref arms). Pose-ref does **not** hold the quality slot. | `eval-object` | Still the only family where the backbone stays fixed while the conditioning changes. Pose-ref epoch 10 is 11.18 dB, **not using appearance**. Do not cite Wave-2 object dB. |
 | Temporal / FVMD | Animate-Anyone (in-domain only) | `eval-metrics` | Only temporal engine that ran. ReferenceNet path was driven and is not the fault; 8.96 dB still loses to static copy. In-domain only (§2.5 option 2). |
 | Speed rung | pix2pix | `eval-operating` | One forward pass. Not re-measured on the coding task this wave. |
 | Floor | **static copy of the keyframe** | all | 11.47 dB object-scoped on independent letterbox (published 11.82 on shared-geometry paste). The non-generative control that says whether generation uses appearance. |
 
-**Do the two flagship roles collapse?** Not yet: there is no quality flagship
-until pose-ref (or a later engine) beats 11.82 dB by ~1 dB on the coding task.
-If pose-ref does, the comparison backbone *is* the quality engine and the roles
-share a family without sharing a row. If it does not, Option C (change what the
-paper claims is transmitted) is a reported finding, not an escape.
+**Do the two flagship roles collapse?** No: there is no quality flagship.
+Pose-ref epoch 10 lost to static copy, so the comparison backbone is not the
+quality engine. **Option C** (change what the paper claims is transmitted) is
+a reported finding from this coding task, not an escape.
 
 **The trajectory arm does not need MOFA-Video.** MOFA is licence-blocked, and
 routing around it improves the experiment: render sparse trajectories as a
@@ -491,7 +495,7 @@ about who won a probe that scored against the conditioning image.
 | Engine | Verdict | Coding-task object PSNR |
 |---|---|---|
 | **static copy** | **Keep — the appearance floor** | **11.47 dB** (letterbox) / **11.82 dB** (published shared-geometry). Generation that cannot beat this is not using appearance. |
-| **ControlNet family** | **Keep as comparison backbone; quality flagship pending pose-ref epoch 10** | pose 11.20 / seg 11.01 (published, lose to static). `ip-adapter-controlnet` directory is a mislabelled seg ControlNet — do not load it. Real IP-Adapter 8.90 dB, **not using appearance**. Pose-ref epochs 1–7: 11.33 / 11.25 / 11.24 / 11.24 / 11.18 / 11.19 / 11.18 dB, all **not using appearance**. |
+| **ControlNet family** | **Keep as comparison backbone; not quality flagship** | pose 11.20 / seg 11.01 (published, lose to static). `ip-adapter-controlnet` directory is a mislabelled seg ControlNet — do not load it. Real IP-Adapter 8.90 dB, **not using appearance**. Pose-ref epoch 10: **11.18 dB** (epochs 1–10: 11.33 / 11.25 / 11.24 / 11.24 / 11.18 / 11.19 / 11.18 / 11.11 / 11.26 / 11.18), all **not using appearance**. Option A failed. |
 | **pix2pix** | **Keep** | Not re-measured this wave. Still the one-forward-pass rung. |
 | **upscale-refine** | **Keep** | Not re-measured this wave. Distinct from static copy: this stretches; static copy pastes the letterboxed keyframe. |
 | **Animate-Anyone** | **Keep as temporal incumbent, not quality flagship** | **8.96 dB**, 20 DDIM, in-domain. ReferenceNet path driven (reference not blank, not the pose canvas, non-zero latent). Still **not using appearance**. |
