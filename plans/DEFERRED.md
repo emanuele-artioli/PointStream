@@ -152,3 +152,27 @@ polluter costs more than the module has left to live.
 anyone can make in one command, and a real regression could hide behind a
 failure everyone has learned to ignore. If the module outlives Phase C, fix the
 isolation instead of deleting the tests.
+
+---
+
+## D7 — Train with a stopping rule, not a fixed epoch count
+
+The pose-ref retrain burned ~14 GPU hours for a flat-to-down series:
+epoch 1 = 11.33 dB, epoch 10 = 11.18 dB, never above the 11.47 dB static-copy
+floor. **Epoch 1 already showed it.**
+
+**The rule for every training run from now on:**
+
+- **Evaluate on the probe set every epoch** (or more often early), on the real
+  task, against the floor — not on training loss, which fell while the metric
+  did not move.
+- **Write the success bar before starting**, as `bounds.json` already does, and
+  **stop when the series cannot reach it**: no improvement over the floor by
+  epoch 3, or a flat-to-down trend across three consecutive evaluations.
+- **A run that cannot clear the bar is a finding, delivered in hours.** The
+  14-hour version told us nothing the 90-minute version would not have.
+
+**Why it was not obvious:** training loss decreased throughout. The model was
+learning *something* — just not identity, because the reference was in the
+control image, which the control branch cannot use for appearance (§2.3). A
+falling loss is not evidence that the thing you want is being learned.
