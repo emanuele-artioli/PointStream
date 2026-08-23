@@ -8,9 +8,9 @@ reconstructing a filename. Crop / canny / pose use global source ids;
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 import numpy as np
 from PIL import Image
@@ -22,6 +22,14 @@ DEFAULT_PROBE_ROOT = Path("assets") / "probe_set"
 DEFAULT_KEYFRAME = 0
 HEADLINE_OFFSET = 24
 DEFAULT_OFFSETS = (8, 16, 24, 32)
+
+#: Clip mode drives a temporal model over a *contiguous* run of frames, because
+#: its motion module attends across adjacent timesteps. Sparse offsets like
+#: ``DEFAULT_OFFSETS`` are not a clip. Offsets 1..8 also span the regime where
+#: the static-copy floor moves most (21.5 dB down to 11.2 dB, PLAN.md §2.5),
+#: which is where an engine has room to show a difference.
+CLIP_LENGTH = 8
+CLIP_MODE_OFFSETS = tuple(range(1, CLIP_LENGTH + 1))
 
 
 @dataclass(frozen=True)
@@ -302,3 +310,32 @@ def bundle_coding(sample: CodingSample) -> dict[str, Any]:
         "frame_index": sample.target_frame_index,
         "object_id": sample.key,
     }
+
+
+def load_coding_sequence(
+    clip: ProbeClip,
+    appearance_index: int,
+    offsets: Sequence[int],
+) -> tuple[CodingSample, ...]:
+    """One ``CodingSample`` per offset, sharing a single appearance keyframe.
+
+    Clip mode hands all of these to ``generate_sequence`` in one call. Offsets
+    are sorted and de-duplicated so the sequence is monotonic in time — a
+    temporal model handed shuffled poses is being driven wrongly, which is the
+    kind of fault this project keeps finding after the fact.
+    """
+    ordered = sorted({int(offset) for offset in offsets})
+    if not ordered:
+        raise ValueError("a clip-mode sequence needs at least one offset")
+    return tuple(load_coding_sample(clip, appearance_index, offset) for offset in ordered)
+
+
+def with_appearance(sample: CodingSample, appearance_rgb: np.ndarray) -> CodingSample:
+    """The same coding sample with a different keyframe as its appearance.
+
+    This is the cross-appearance control: hold the model, the pose, the target
+    and the metric fixed and vary *only* which player is shown to the engine.
+    The reference stays the true target, so an engine that uses appearance
+    scores worse with someone else's keyframe.
+    """
+    return replace(sample, appearance_rgb=np.asarray(appearance_rgb, dtype=np.uint8))

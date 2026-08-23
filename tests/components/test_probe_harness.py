@@ -10,9 +10,17 @@ Plausible misuse is the silent kind — pairing channels by reconstructing a
 filename, scoring the keyframe against itself, ranking on the diagnostic
 PSNR, treating a pasted keyframe as a low-ranking engine.
 
+Clip mode, the LPIPS ranking key and the null control arrived with BP12. The
+faults they exist to catch are all of the silent kind: a temporal model driven
+one frame at a time, a ranking taken on a metric with no dynamic range, and a
+"control" that quietly pastes the right player.
+
 Deliberately not tested: live probe-set PNG contents, argparse help, real
-generator weights, VMAF/LPIPS, Wave-2 self-reconstruction numbers as a
-regression target, construct.py's SAM3 leftover.
+generator weights, VMAF, real LPIPS *values* (anchored against published
+figures in tests/invariants/test_metric_calibration.py — duplicating them here
+would only be slower), _pad_box arithmetic beyond the one growing case,
+Animate-Anyone's own pipeline internals, Wave-2 self-reconstruction numbers as
+a regression target, construct.py's SAM3 leftover.
 """
 
 from __future__ import annotations
@@ -30,12 +38,26 @@ from experiments.probe.bounds import (
     STATIC_COPY_EXPECTED_HIGH_DB,
     STATIC_COPY_EXPECTED_LOW_DB,
     appearance_use_label,
+    judge_engine_lpips,
+    judge_null_separation,
     judge_static_copy_clip,
+    judge_static_copy_lpips,
     judge_static_copy_object_psnr,
+    judge_unrelated_lpips,
 )
-from experiments.probe.clips import list_clips, load_coding_sample, load_frame
-from experiments.probe.engines import STATIC_COPY, plan_for
-from experiments.probe.run import drive_all, drive_engine, rank_engines
+from experiments.probe.clips import (
+    list_clips,
+    load_coding_sample,
+    load_coding_sequence,
+    load_frame,
+)
+from experiments.probe.engines import STATIC_COPY, UNRELATED_IMAGE, plan_for
+from experiments.probe.run import (
+    donor_for,
+    drive_all,
+    drive_engine,
+    rank_engines,
+)
 from experiments.probe.score import score_generation
 from experiments.probe_set.schema import SCHEMA_ID, TRAINING_SPLIT_VIDEOS
 from src.contracts.conditioning import ConditioningBundle, GenerationParams
@@ -46,28 +68,24 @@ def _write_png(path: Path, array: np.ndarray) -> None:
     Image.fromarray(array).save(path)
 
 
-def _tiny_probe_set(
-    tmp_path: Path,
+def _write_clip(
+    root: Path,
     *,
-    n_frames: int = 5,
-    crop_ids: list[int] | None = None,
-    skeleton_ids: list[int] | None = None,
-) -> Path:
-    root = tmp_path / "probe_set"
-    video = TRAINING_SPLIT_VIDEOS[0]
-    scene = "scene_001"
-    track = "track_0001"
+    video: str,
+    scene: str,
+    track: str,
+    n_frames: int,
+    crop_ids: list[int],
+    skeleton_ids: list[int],
+    base_colour: int,
+) -> dict[str, Any]:
     crop_dir = root / "clips" / video / scene / track
     skel_dir = root / "clips" / video / scene / f"{track}_skeleton"
     canny_dir = root / "clips" / video / scene / f"{track}_canny"
     h, w = 32, 16
-    crop_ids = list(range(n_frames)) if crop_ids is None else crop_ids
-    skeleton_ids = list(range(n_frames)) if skeleton_ids is None else skeleton_ids
-    if len(crop_ids) != n_frames or len(skeleton_ids) != n_frames:
-        raise AssertionError("fixture ids must match n_frames")
     for index in range(n_frames):
         rgba = np.zeros((h, w, 4), dtype=np.uint8)
-        rgba[4:28, 4:12, :3] = (40 + index * 10, 80, 120)
+        rgba[4:28, 4:12, :3] = (base_colour + index * 10, 80, 120)
         rgba[4:28, 4:12, 3] = 255
         pose = np.zeros((h, w, 3), dtype=np.uint8)
         pose[6:26, 7:9] = 255
@@ -77,20 +95,62 @@ def _tiny_probe_set(
         _write_png(crop_dir / f"frame_{crop_ids[index]:06d}.png", rgba)
         _write_png(skel_dir / f"frame_{skeleton_ids[index]:06d}.png", pose)
         _write_png(canny_dir / f"frame_{crop_ids[index]:06d}.png", canny)
-    manifest = {
-        "schema": SCHEMA_ID,
-        "probe_clips": [
-            {
-                "video": video,
-                "scene": scene,
-                "track": track,
-                "key": f"{video}/{scene}/{track}",
-                "path": f"clips/{video}/{scene}/{track}",
-                "num_frames": n_frames,
-                "frame_ids": crop_ids,
-            }
-        ],
+    return {
+        "video": video,
+        "scene": scene,
+        "track": track,
+        "key": f"{video}/{scene}/{track}",
+        "path": f"clips/{video}/{scene}/{track}",
+        "num_frames": n_frames,
+        "frame_ids": crop_ids,
     }
+
+
+def _tiny_probe_set(
+    tmp_path: Path,
+    *,
+    n_frames: int = 5,
+    crop_ids: list[int] | None = None,
+    skeleton_ids: list[int] | None = None,
+    n_clips: int = 1,
+) -> Path:
+    """``n_clips=2`` puts the second clip in a *different video*.
+
+    The null control borrows a keyframe from another video, so anything that
+    drives the full arm list needs at least two. One clip is enough for the
+    loader tests and keeps their row counts readable.
+    """
+    root = tmp_path / "probe_set"
+    crop_ids = list(range(n_frames)) if crop_ids is None else crop_ids
+    skeleton_ids = list(range(n_frames)) if skeleton_ids is None else skeleton_ids
+    if len(crop_ids) != n_frames or len(skeleton_ids) != n_frames:
+        raise AssertionError("fixture ids must match n_frames")
+    records = [
+        _write_clip(
+            root,
+            video=TRAINING_SPLIT_VIDEOS[0],
+            scene="scene_001",
+            track="track_0001",
+            n_frames=n_frames,
+            crop_ids=crop_ids,
+            skeleton_ids=skeleton_ids,
+            base_colour=40,
+        )
+    ]
+    if n_clips > 1:
+        records.append(
+            _write_clip(
+                root,
+                video=TRAINING_SPLIT_VIDEOS[1],
+                scene="scene_002",
+                track="track_0002",
+                n_frames=n_frames,
+                crop_ids=crop_ids,
+                skeleton_ids=skeleton_ids,
+                base_colour=170,
+            )
+        )
+    manifest = {"schema": SCHEMA_ID, "probe_clips": records}
     root.mkdir(parents=True, exist_ok=True)
     (root / "manifest.json").write_text(json.dumps(manifest))
     return root
@@ -268,8 +328,38 @@ class _PaintPipe:
         return as_chw(canvas)
 
 
+class _ImprovePipe:
+    """Nudges the keyframe toward the target: the fixture's ramp is +10 red per
+    frame, so this lands on the reference whatever colour a clip starts from.
+
+    A constant-colour pipe cannot beat the floor on two clips at once, and the
+    thing under test is the label, not the pipe.
+    """
+
+    def __init__(self, red_shift: int) -> None:
+        self.red_shift = red_shift
+
+    def generate(
+        self,
+        conditioning: ConditioningBundle,
+        *,
+        seed: int,
+        device: Any,
+        params: GenerationParams,
+    ) -> np.ndarray:
+        del seed, device
+        from src.components.generation._numpy import as_chw, as_hwc, prepare_letterboxed
+
+        width = params.width if params.width is not None else 512
+        height = params.height if params.height is not None else 512
+        appearance = as_hwc(conditioning.appearance).astype(np.int16)
+        appearance[..., 0] = np.clip(appearance[..., 0] + self.red_shift, 0, 255)
+        prepared = prepare_letterboxed(appearance.astype(np.uint8), None, width, height)
+        return as_chw(prepared["appearance"])
+
+
 def test_static_copy_always_runs_and_records_offset(tmp_path: Path) -> None:
-    root = _tiny_probe_set(tmp_path, n_frames=5)
+    root = _tiny_probe_set(tmp_path, n_frames=5, n_clips=2)
     summary = drive_all(
         device="cpu",
         seed=0,
@@ -280,6 +370,7 @@ def test_static_copy_always_runs_and_records_offset(tmp_path: Path) -> None:
         keyframe_index=0,
         offsets=(1, 2),
         self_recon=True,
+        lpips_metric=_FakeLpips(),
         progress=lambda *_args, **_kwargs: None,
     )
     assert STATIC_COPY in summary["engines"]
@@ -291,11 +382,11 @@ def test_static_copy_always_runs_and_records_offset(tmp_path: Path) -> None:
     assert offsets == {1, 2}
     assert all(row["appearance_frame_index"] == 0 for row in dumped["clips"])
     assert all(row["target_frame_index"] == 0 + row["offset"] for row in dumped["clips"])
-    assert len(dumped["clips"]) == 2
+    assert len(dumped["clips"]) == 4  # two clips x two offsets
 
 
 def test_at_or_below_floor_is_labelled_not_using_appearance(tmp_path: Path) -> None:
-    root = _tiny_probe_set(tmp_path, n_frames=4)
+    root = _tiny_probe_set(tmp_path, n_frames=4, n_clips=2)
     summary = drive_all(
         device="cpu",
         seed=0,
@@ -306,6 +397,7 @@ def test_at_or_below_floor_is_labelled_not_using_appearance(tmp_path: Path) -> N
         keyframe_index=0,
         offsets=(2,),
         self_recon=False,
+        lpips_metric=_FakeLpips(),
         progress=lambda *_args, **_kwargs: None,
     )
     headline = summary["engines"]["upscale-refine"]["headline"]
@@ -319,17 +411,18 @@ def test_at_or_below_floor_is_labelled_not_using_appearance(tmp_path: Path) -> N
 
 
 def test_engine_that_beats_the_floor_is_not_labelled_unused(tmp_path: Path) -> None:
-    root = _tiny_probe_set(tmp_path, n_frames=4)
+    root = _tiny_probe_set(tmp_path, n_frames=4, n_clips=2)
     summary = drive_all(
         device="cpu",
         seed=0,
         out_dir=tmp_path / "out",
         probe_root=root,
         engines=("pix2pix",),
-        generators={"pix2pix": _PaintPipe((60, 80, 120))},
+        generators={"pix2pix": _ImprovePipe(20)},
         keyframe_index=0,
         offsets=(2,),
         self_recon=False,
+        lpips_metric=_FakeLpips(),
         progress=lambda *_args, **_kwargs: None,
     )
     headline = summary["engines"]["pix2pix"]["headline"]
@@ -339,17 +432,16 @@ def test_engine_that_beats_the_floor_is_not_labelled_unused(tmp_path: Path) -> N
 
 def test_self_reconstruction_is_recorded_and_not_used_for_ranking() -> None:
     summaries = {
-        STATIC_COPY: {
-            "headline": {"object_psnr_db": 12.0, "self_reconstruction_psnr": 99.0}
-        },
-        "weak": {"headline": {"object_psnr_db": 10.0, "self_reconstruction_psnr": 40.0}},
-        "strong": {"headline": {"object_psnr_db": 14.0, "self_reconstruction_psnr": 8.0}},
+        STATIC_COPY: {"headline": {"object_lpips": 0.40, "self_reconstruction_psnr": 99.0}},
+        UNRELATED_IMAGE: {"headline": {"object_lpips": 0.65}},
+        "weak": {"headline": {"object_lpips": 0.60, "self_reconstruction_psnr": 40.0}},
+        "strong": {"headline": {"object_lpips": 0.30, "self_reconstruction_psnr": 8.0}},
     }
     assert rank_engines(summaries) == ["strong", "weak"]
 
 
 def test_driven_self_reconstruction_is_on_the_record_not_the_rank_key(tmp_path: Path) -> None:
-    root = _tiny_probe_set(tmp_path, n_frames=4)
+    root = _tiny_probe_set(tmp_path, n_frames=4, n_clips=2)
     summary = drive_all(
         device="cpu",
         seed=0,
@@ -360,13 +452,300 @@ def test_driven_self_reconstruction_is_on_the_record_not_the_rank_key(tmp_path: 
         keyframe_index=0,
         offsets=(2,),
         self_recon=True,
+        lpips_metric=_FakeLpips(),
         progress=lambda *_args, **_kwargs: None,
     )
     headline = summary["engines"]["upscale-refine"]["headline"]
     assert headline["self_reconstruction_psnr"] is not None
-    assert headline["ranking_uses"] == "object_psnr_db"
+    assert headline["ranking_uses"] == "object_lpips"
     assert "self_reconstruction_psnr" in headline["ranking_ignores"]
-    assert summary["ranking_uses"] == "object_psnr_db"
+    assert summary["ranking_uses"] == "object_lpips"
     rows = json.loads((tmp_path / "out" / "upscale-refine.json").read_text())["clips"]
     assert rows[0]["self_reconstruction_psnr"] is not None
     assert rows[0]["object_psnr_db"] != rows[0]["self_reconstruction_psnr"]
+
+
+# ---------------------------------------------------------------------------
+# BP12: clip mode, the LPIPS ranking key, and the null control.
+
+
+class _FakeLpips:
+    """A deterministic stand-in with real dynamic range.
+
+    The published anchors are asserted in the metric calibration invariants.
+    What is worth checking *here* is the plumbing: that a distance reaches the
+    rows, the headline and the ranking. A fake keeps these tests CPU-fast and
+    lets a caller construct the cases a real metric will not produce on demand.
+    """
+
+    name = "lpips"
+
+    def score(self, reference: np.ndarray, predicted: np.ndarray) -> float:
+        ref = np.asarray(reference, dtype=np.float64)
+        pred = np.asarray(predicted, dtype=np.float64)
+        return float(np.abs(ref - pred).mean() / 255.0)
+
+
+class _RecordingSequencePipe:
+    """A temporal generator that records exactly how it was driven."""
+
+    def __init__(self) -> None:
+        self.sequence_calls: list[list[int]] = []
+        self.frame_calls = 0
+
+    def generate_sequence(
+        self,
+        conditioning: Any,
+        *,
+        seed: int,
+        device: Any,
+        params: GenerationParams,
+    ) -> list[np.ndarray]:
+        del seed, device
+        bundles = list(conditioning)
+        self.sequence_calls.append([int(bundle.frame_index) for bundle in bundles])
+        from src.components.generation._numpy import as_chw, prepare_letterboxed
+
+        width = params.width if params.width is not None else 512
+        height = params.height if params.height is not None else 512
+        return [
+            as_chw(prepare_letterboxed(bundle.appearance, None, width, height)["appearance"])
+            for bundle in bundles
+        ]
+
+    def generate(
+        self,
+        conditioning: ConditioningBundle,
+        *,
+        seed: int,
+        device: Any,
+        params: GenerationParams,
+    ) -> np.ndarray:
+        del conditioning, seed, device, params
+        self.frame_calls += 1
+        raise AssertionError("a temporal engine must not reach the single-frame path")
+
+
+class _ShortSequencePipe(_RecordingSequencePipe):
+    """Returns one frame fewer than it was asked for."""
+
+    def generate_sequence(
+        self,
+        conditioning: Any,
+        *,
+        seed: int,
+        device: Any,
+        params: GenerationParams,
+    ) -> list[np.ndarray]:
+        frames = super().generate_sequence(
+            conditioning, seed=seed, device=device, params=params
+        )
+        return frames[:-1]
+
+
+def _temporal_plan(offsets: tuple[int, ...]) -> Any:
+    from experiments.probe.engines import EnginePlan
+
+    return EnginePlan(
+        name="animate-anyone",
+        kind="temporal",
+        offsets=offsets,
+        steps=2,
+        sequence=True,
+        notes="test",
+    )
+
+
+def test_a_temporal_engine_is_driven_once_per_clip_not_once_per_offset(
+    tmp_path: Path,
+) -> None:
+    """The T=1 fault. AA carries a motion module and was called frame by frame."""
+    clips = list_clips(_tiny_probe_set(tmp_path, n_frames=6))
+    pipe = _RecordingSequencePipe()
+    result = drive_engine(
+        _temporal_plan((1, 2, 3)),
+        clips,
+        device="cpu",
+        seed=0,
+        out_dir=tmp_path / "out",
+        generator=pipe,
+        keyframe_index=0,
+        offsets=(1, 2, 3),
+        lpips_metric=_FakeLpips(),
+        progress=lambda *_args, **_kwargs: None,
+    )
+    assert pipe.frame_calls == 0
+    assert pipe.sequence_calls == [[1, 2, 3]], "one call per clip, in time order"
+    assert result.drive_mode == "clip"
+    assert [row.offset for row in result.clips] == [1, 2, 3]
+    assert all(row.drive_mode == "clip" for row in result.clips)
+
+
+def test_a_sequence_plan_without_a_sequence_path_refuses_to_fall_back(
+    tmp_path: Path,
+) -> None:
+    """Falling back to generate() is worse than crashing: it produces a number."""
+    clips = list_clips(_tiny_probe_set(tmp_path, n_frames=4))
+    with pytest.raises(RuntimeError, match="no generate_sequence"):
+        drive_engine(
+            _temporal_plan((1, 2)),
+            clips,
+            device="cpu",
+            seed=0,
+            out_dir=tmp_path / "out",
+            generator=_CopyPipe(),
+            offsets=(1, 2),
+            lpips_metric=_FakeLpips(),
+            progress=lambda *_args, **_kwargs: None,
+        )
+
+
+def test_a_short_sequence_is_an_error_not_a_truncated_zip(tmp_path: Path) -> None:
+    """zip() would silently pair frame 1's output with frame 1's target and drop
+    the last — every row plausible, the clip quietly one frame short."""
+    clips = list_clips(_tiny_probe_set(tmp_path, n_frames=6))
+    result = drive_engine(
+        _temporal_plan((1, 2, 3)),
+        clips,
+        device="cpu",
+        seed=0,
+        out_dir=tmp_path / "out",
+        generator=_ShortSequencePipe(),
+        offsets=(1, 2, 3),
+        lpips_metric=_FakeLpips(),
+        progress=lambda *_args, **_kwargs: None,
+    )
+    assert all(row.error is not None for row in result.clips)
+    assert "returned 2 frames for 3 bundles" in (result.clips[0].error or "")
+
+
+def test_a_clip_sequence_shares_one_keyframe_and_is_time_ordered(tmp_path: Path) -> None:
+    clips = list_clips(_tiny_probe_set(tmp_path, n_frames=6))
+    samples = load_coding_sequence(clips[0], 0, (3, 1, 2, 1))
+    assert [sample.offset for sample in samples] == [1, 2, 3]
+    assert all(sample.appearance_frame_index == 0 for sample in samples)
+    assert [sample.target_frame_index for sample in samples] == [1, 2, 3]
+    first = samples[0].appearance_rgb
+    assert all(np.array_equal(sample.appearance_rgb, first) for sample in samples)
+
+
+def test_lpips_reaches_the_rows_the_headline_and_the_ranking(tmp_path: Path) -> None:
+    root = _tiny_probe_set(tmp_path, n_frames=4, n_clips=2)
+    summary = drive_all(
+        device="cpu",
+        seed=0,
+        out_dir=tmp_path / "out",
+        probe_root=root,
+        engines=("pix2pix",),
+        generators={"pix2pix": _PaintPipe((60, 80, 120))},
+        keyframe_index=0,
+        offsets=(1, 2),
+        self_recon=False,
+        lpips_metric=_FakeLpips(),
+        progress=lambda *_args, **_kwargs: None,
+    )
+    headline = summary["engines"]["pix2pix"]["headline"]
+    assert headline["object_lpips"] is not None
+    assert headline["object_psnr_db"] is not None, "PSNR is reported beside, not instead"
+    assert headline["ranking_lower_is_better"] is True
+    assert "object_psnr_db" in headline["reported_beside"]
+    assert headline["anchors"]["static_copy_lpips"] is not None
+    assert headline["anchors"]["unrelated_image_lpips"] is not None
+    rows = json.loads((tmp_path / "out" / "pix2pix.json").read_text())["clips"]
+    assert all(row["object_lpips"] is not None for row in rows)
+
+
+def test_ranking_follows_lpips_even_when_psnr_disagrees() -> None:
+    """The two orders are not the same order. Mixing them is how a table lies."""
+    summaries = {
+        STATIC_COPY: {"headline": {"object_lpips": 0.40, "object_psnr_db": 12.0}},
+        UNRELATED_IMAGE: {"headline": {"object_lpips": 0.65, "object_psnr_db": 9.0}},
+        "sharp": {"headline": {"object_lpips": 0.30, "object_psnr_db": 10.0}},
+        "blurry": {"headline": {"object_lpips": 0.55, "object_psnr_db": 14.0}},
+    }
+    assert rank_engines(summaries) == ["sharp", "blurry"]
+
+
+def test_an_engine_without_lpips_is_left_out_rather_than_ranked_on_psnr() -> None:
+    summaries: dict[str, dict[str, Any]] = {
+        "measured": {"headline": {"object_lpips": 0.50, "object_psnr_db": 11.0}},
+        "unmeasured": {"headline": {"object_lpips": None, "object_psnr_db": 20.0}},
+    }
+    assert rank_engines(summaries) == ["measured"]
+
+
+def test_the_null_control_borrows_a_keyframe_from_another_video(tmp_path: Path) -> None:
+    root = _tiny_probe_set(tmp_path, n_frames=4, n_clips=2)
+    clips = list_clips(root)
+    assert donor_for(clips, 0).video != clips[0].video
+    summary = drive_all(
+        device="cpu",
+        seed=0,
+        out_dir=tmp_path / "out",
+        probe_root=root,
+        engines=(),
+        keyframe_index=0,
+        offsets=(1, 2),
+        self_recon=False,
+        lpips_metric=_FakeLpips(),
+        progress=lambda *_args, **_kwargs: None,
+    )
+    assert summary["donors"][clips[0].key] == clips[1].key
+    rows = json.loads((tmp_path / "out" / "unrelated-image.json").read_text())["clips"]
+    assert all(row["appearance_source"].startswith("donor:") for row in rows)
+    assert summary["control"]["readable"] is True
+    assert summary["control"]["separation"] > 0
+
+
+def test_one_clip_cannot_supply_a_null_control(tmp_path: Path) -> None:
+    """A control that pastes the right player is not a control."""
+    clips = list_clips(_tiny_probe_set(tmp_path, n_frames=4))
+    with pytest.raises(ValueError, match="needs a second clip"):
+        donor_for(clips, 0)
+
+
+def test_a_run_whose_control_does_not_separate_ranks_nothing(tmp_path: Path) -> None:
+    """The 2026-08-23 fault, made structural: a metric that cannot tell the
+    right player from the wrong one used to still produce a ranking."""
+
+    class _BlindLpips:
+        name = "lpips"
+
+        def score(self, reference: np.ndarray, predicted: np.ndarray) -> float:
+            del reference, predicted
+            return 0.5
+
+    root = _tiny_probe_set(tmp_path, n_frames=4, n_clips=2)
+    summary = drive_all(
+        device="cpu",
+        seed=0,
+        out_dir=tmp_path / "out",
+        probe_root=root,
+        engines=("pix2pix",),
+        generators={"pix2pix": _PaintPipe((60, 80, 120))},
+        keyframe_index=0,
+        offsets=(1, 2),
+        self_recon=False,
+        lpips_metric=_BlindLpips(),
+        progress=lambda *_args, **_kwargs: None,
+    )
+    assert summary["control"]["readable"] is False
+    assert summary["control"]["status"] == "alarm-low"
+    assert summary["rank"] == []
+    assert summary["engines"]["pix2pix"]["headline"]["object_lpips"] == 0.5
+
+
+def test_lpips_bounds_fire_where_they_were_written() -> None:
+    assert judge_static_copy_lpips(0.42).status == "expected"
+    assert judge_static_copy_lpips(0.02).status == "alarm-low"
+    assert judge_unrelated_lpips(0.65).status == "expected"
+    assert judge_unrelated_lpips(0.30).status == "alarm-low"
+    assert judge_null_separation(0.42, 0.47).status == "alarm-low"
+    assert judge_null_separation(0.42, 0.65).status == "ok"
+    # near-identity from a 20-step generation is a scoring fault, not a win
+    assert judge_engine_lpips(0.02, 0.42, 0.65).status == "alarm-low"
+    assert judge_engine_lpips(0.30, 0.42, 0.65).status == "beats-floor"
+    assert judge_engine_lpips(0.70, 0.42, 0.65).status == "at-or-worse-than-null"
+    between = judge_engine_lpips(0.57, 0.42, 0.65)
+    assert between.status == "between-floor-and-null"
+    assert "0.420" in between.note and "0.650" in between.note

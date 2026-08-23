@@ -224,3 +224,189 @@ def judge_frame_gap(frame_psnr: float, object_psnr: float) -> BoundVerdict:
         status="frame-higher",
         note="whole-frame better than object-scoped",
     )
+
+
+# ---------------------------------------------------------------------------
+# LPIPS bounds for clip mode, written 2026-08-23 before this harness produced
+# a single LPIPS number. BP12 makes LPIPS the ranking key; PSNR stays reported
+# beside it. Lower is better and the scale is anchored, which is why an
+# absolute band is meaningful here where it was not for PSNR.
+#
+# Published calibration anchors for the wrapped ``lpips`` package (PLAN.md
+# §2.7, asserted in tests/invariants/test_metric_calibration.py):
+#
+#     identical 0.000 | mild noise 0.250 | heavy blur 0.430 | unrelated 0.645
+#
+# The bands below are for the **12-clip mean over offsets 1-8**, scored on the
+# bounding box of the letterboxed player mask.
+#
+# static-copy floor. §2.7 measured 0.239 at offset 1 and 0.582 at offset 8 on
+# 4 clips with a box this harness does not reproduce exactly, so the mean over
+# 1-8 should land near 0.42 and the band is widened for the box change:
+#   * worst ~0.60 — fast clips, the player has left the box by offset 8
+#   * best  ~0.20 — near-static clips where a paste is nearly right
+# An alarm below 0.05 means the score is being taken against the keyframe
+# rather than the later frame; above 0.75 means the paste is landing somewhere
+# other than the player.
+STATIC_COPY_LPIPS_EXPECTED_LOW = 0.20
+STATIC_COPY_LPIPS_EXPECTED_HIGH = 0.60
+STATIC_COPY_LPIPS_ALARM_LOW = 0.05
+STATIC_COPY_LPIPS_ALARM_HIGH = 0.75
+
+# unrelated-image null control. The published unrelated-image anchor is 0.645
+# and these crops are all tennis players on a court, so some structure is
+# shared and the control should sit a little under a random-image pair:
+#   * expected 0.55-0.80
+# Below 0.40 the control is scoring as well as a real match, which means the
+# metric or the wiring cannot tell the right player from the wrong one — the
+# exact fault that voided every ranking before 2026-08-23.
+UNRELATED_LPIPS_EXPECTED_LOW = 0.55
+UNRELATED_LPIPS_EXPECTED_HIGH = 0.80
+UNRELATED_LPIPS_ALARM_LOW = 0.40
+
+# The separation the whole run rests on. If a paste of the *right* player is
+# not clearly better than a paste of the *wrong* one, nothing downstream is
+# readable, whatever the engines score.
+NULL_SEPARATION_MIN = 0.10
+
+# An engine at or below 0.05 is not a good result, it is a scoring fault:
+# 20-step diffusion from a pose does not reproduce a photograph.
+ENGINE_LPIPS_ALARM_LOW = 0.05
+
+
+def judge_static_copy_lpips(value: float) -> BoundVerdict:
+    """Classify the 12-clip mean floor on LPIPS. Absolute, offsets 1-8."""
+    if value < STATIC_COPY_LPIPS_ALARM_LOW:
+        return BoundVerdict(
+            metric="object_lpips",
+            value=value,
+            status="alarm-low",
+            note=(
+                "static copy near zero LPIPS: suspect scoring the keyframe "
+                "against itself instead of the later frame"
+            ),
+        )
+    if value > STATIC_COPY_LPIPS_ALARM_HIGH:
+        return BoundVerdict(
+            metric="object_lpips",
+            value=value,
+            status="alarm-high",
+            note=(
+                "static copy worse than an unrelated image: suspect the paste "
+                "or the crop box, not the player's motion"
+            ),
+        )
+    if STATIC_COPY_LPIPS_EXPECTED_LOW <= value <= STATIC_COPY_LPIPS_EXPECTED_HIGH:
+        return BoundVerdict(
+            metric="object_lpips",
+            value=value,
+            status="expected",
+            note="pasted keyframe vs a moved player, offsets 1-8, 0.20-0.60",
+        )
+    return BoundVerdict(
+        metric="object_lpips",
+        value=value,
+        status="outside-expected",
+        note=(
+            f"inside the alarm gates but outside {STATIC_COPY_LPIPS_EXPECTED_LOW:g}-"
+            f"{STATIC_COPY_LPIPS_EXPECTED_HIGH:g} expected floor band"
+        ),
+    )
+
+
+def judge_unrelated_lpips(value: float) -> BoundVerdict:
+    """Classify the null control. Below the alarm, the run is not readable."""
+    if value < UNRELATED_LPIPS_ALARM_LOW:
+        return BoundVerdict(
+            metric="object_lpips",
+            value=value,
+            status="alarm-low",
+            note=(
+                "the wrong player scores like a match. The metric or the "
+                "appearance wiring cannot separate them; no ranking in this "
+                "run is readable until that is explained"
+            ),
+        )
+    if UNRELATED_LPIPS_EXPECTED_LOW <= value <= UNRELATED_LPIPS_EXPECTED_HIGH:
+        return BoundVerdict(
+            metric="object_lpips",
+            value=value,
+            status="expected",
+            note="unrelated keyframe, 0.55-0.80 against a 0.645 published anchor",
+        )
+    return BoundVerdict(
+        metric="object_lpips",
+        value=value,
+        status="outside-expected",
+        note=(
+            f"outside {UNRELATED_LPIPS_EXPECTED_LOW:g}-"
+            f"{UNRELATED_LPIPS_EXPECTED_HIGH:g}; report the value with the anchors"
+        ),
+    )
+
+
+def judge_null_separation(floor_lpips: float, unrelated_lpips: float) -> BoundVerdict:
+    """The right player minus the wrong one. This gates the whole run."""
+    delta = unrelated_lpips - floor_lpips
+    if delta < NULL_SEPARATION_MIN:
+        return BoundVerdict(
+            metric="null_separation_lpips",
+            value=delta,
+            status="alarm-low",
+            note=(
+                f"right player and wrong player differ by only {delta:.3f} LPIPS. "
+                "The instrument is not resolving identity on this content; do "
+                "not rank engines from this run"
+            ),
+        )
+    return BoundVerdict(
+        metric="null_separation_lpips",
+        value=delta,
+        status="ok",
+        note=f"the wrong player costs {delta:.3f} LPIPS; the instrument separates identity",
+    )
+
+
+def judge_engine_lpips(
+    engine_lpips: float, floor_lpips: float, unrelated_lpips: float
+) -> BoundVerdict:
+    """Place an engine on the floor-to-null scale, with both ends quoted.
+
+    ``0.067`` means nothing on its own. This returns the number *with* the two
+    anchors measured in the same run, which is the form a result may be
+    reported in.
+    """
+    anchors = f"floor {floor_lpips:.3f}, unrelated {unrelated_lpips:.3f}"
+    if engine_lpips < ENGINE_LPIPS_ALARM_LOW:
+        return BoundVerdict(
+            metric="object_lpips",
+            value=engine_lpips,
+            status="alarm-low",
+            note=(
+                f"{engine_lpips:.3f} is near-identity from a 20-step generation "
+                f"({anchors}): suspect the prediction is the reference"
+            ),
+        )
+    if engine_lpips <= floor_lpips:
+        return BoundVerdict(
+            metric="object_lpips",
+            value=engine_lpips,
+            status="beats-floor",
+            note=f"{engine_lpips:.3f} beats the static-copy floor ({anchors})",
+        )
+    if engine_lpips >= unrelated_lpips:
+        return BoundVerdict(
+            metric="object_lpips",
+            value=engine_lpips,
+            status="at-or-worse-than-null",
+            note=(
+                f"{engine_lpips:.3f} is no better than showing the wrong player "
+                f"({anchors})"
+            ),
+        )
+    return BoundVerdict(
+        metric="object_lpips",
+        value=engine_lpips,
+        status="between-floor-and-null",
+        note=f"{engine_lpips:.3f} sits between the two anchors ({anchors})",
+    )
