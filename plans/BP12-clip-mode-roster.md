@@ -2,27 +2,36 @@
 
 **The critical path. Supersedes `BP10` and takes priority over `BP11`.**
 
-**Read first:** `PLAN.md` §2.7 — Animate-Anyone was being driven at T=1, and
-clip mode improves its LPIPS 4.7×.
+**Read first:** `PLAN.md` §2.7 — Animate-Anyone was being driven at T=1.
+Clip mode is better. It is not a working engine.
 
 ## Why this is now the top item
 
-Every Animate-Anyone number this project has produced came from calling the
-single-frame path on a temporal model. Corrected:
+Every Animate-Anyone number this project produced until 2026-08-23 came from
+calling the single-frame path on a temporal model, and most of them were read
+through a metric that was not LPIPS. Corrected (calibrated LPIPS on the player
+bbox, offsets 1–8):
 
 | Path | Object PSNR | LPIPS |
 |---|---|---|
-| frame-by-frame | 8.81 dB | 0.3143 |
-| **clip mode** | **11.57 dB** | **0.0666** |
+| frame-by-frame | 8.81 dB | 0.751 |
+| **clip mode** | **11.57 dB** | **0.570** |
+| static copy @ offset 1 | 17.00 dB | 0.239 |
+| static copy @ offset 8 | 11.16 dB | 0.582 |
+| unrelated image | — | 0.645 |
 
-AA is now the best engine we have on perceptual quality, and it is the
-architecture the literature says should win: ReferenceNet injects reference
-features **into the UNet's spatial self-attention**, whereas ControlNet adds its
-condition **residually** and relies on CLIP embeddings that *"lack fine-grained
-spatial details, causing appearance drift under large deformations."* Our failed
-reference-in-the-control-image retrain was fighting that boundary, and the
-literature already documents it — which makes our negative result **citable
-rather than embarrassing**.
+Clip mode is a real improvement over T=1. **AA at 0.570 still sits closer to an
+unrelated image than to heavy blur (0.430)**, and only marginally ahead of a
+static copy at offset 8. The withdrawn "best engine at LPIPS 0.067" claim was
+the broken metric.
+
+The architecture argument is unchanged and still worth testing, not a result:
+ReferenceNet injects reference features **into the UNet's spatial
+self-attention**, whereas ControlNet adds its condition **residually** and
+relies on CLIP embeddings that *"lack fine-grained spatial details, causing
+appearance drift under large deformations."* Our failed
+reference-in-the-control-image retrain was fighting that boundary, which makes
+that negative result **citable rather than embarrassing**.
 
 ## What to do
 
@@ -42,15 +51,12 @@ The +0.93 dB measured frame-by-frame says nothing about a pathway that was
 structurally disabled. Re-run it and judge against `BP10`'s bounds: **≥ +3 dB =
 ReferenceNet works**, ≈ +0.9 = generic leakage, ≈ 0 = wiring fault.
 
-### 3. Make LPIPS cheap, then use it during development
+### 3. Use LPIPS as the ranking key — it is already cheap
 
-Measured: PSNR 4.5 ms/frame, VMAF 39, SSIM 78, **LPIPS 138 ms/frame** — and
-LPIPS is slow only because `src/components/metrics/lpips.py` loads with
-`map_location="cpu"`. Move it to the run device.
-
-**The cost argument is settled either way:** generation is **4–6 s per frame**,
-so LPIPS at 138 ms is ~2% of the loop, and on GPU it is ~0.2%. It is affordable
-during development. VMAF and DISTS stay for final results only.
+The published `lpips` package is **3.5 ms/frame** (`PLAN.md` §2.7). The 138 ms
+CPU-VGG number was the fake backend; do not re-open it. Generation is
+**4–6 s per frame**, so LPIPS is a rounding error. VMAF and DISTS stay for
+final results only.
 
 ### 4. Then extend the roster
 
@@ -89,5 +95,4 @@ videos, so it is in-domain only whatever it scores.
 
 - The roster is re-ranked in clip mode with LPIPS as the key and PSNR beside it.
 - The cross-appearance control is re-run in clip mode and judged against bounds.
-- LPIPS runs on the GPU.
 - `PLAN.md` §6.2's roster is re-decided on that evidence.
