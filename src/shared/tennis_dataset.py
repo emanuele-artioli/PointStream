@@ -22,9 +22,14 @@ def pad_to_square(img, fill=0):
 class TennisSkeletonDataset(Dataset):
     """Paired skeleton (+ optional reference) → colour dataset for Pix2Pix and Spade4Tennis.
 
-    Directory layout:
-        assets/dataset/<video>/segmentations/scene_XXX/track_YYY/frame_ZZZ.png
-        assets/dataset/<video>/segmentations/scene_XXX/track_YYY_skeleton/frame_ZZZ.png
+    Directory layout (two naming conventions in one track group):
+        crop / _canny / _pose_body / _pose_racket: ``frame_{global_source_id}.png``
+        ``_skeleton``: ``frame_{track_local_index}.png`` (zero-based)
+
+    Colour and skeleton files do **not** share names. A track that starts at
+    source frame 29 has crop ``frame_000029.png`` and skeleton
+    ``frame_000000.png`` for the same instant. Pair them by position in the
+    sorted ``frame_*.png`` lists, never by reconstructing a filename.
     """
 
     #: Directory suffixes that are derived outputs, not tracks.
