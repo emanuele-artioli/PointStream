@@ -91,7 +91,7 @@ evaluation-max-frames: null           # Optional frame cap for quality evaluatio
 # GenAI and AnimateAnyone Configuration
 # ============================================================================                
 genai-backend: canny-controlnet                   # GenAI backend: caption-controlnet, ip-adapter-controlnet, canny-controlnet, seg-controlnet, animate-anyone, pix2pix (null disables GenAI)
-controlnet-id: assets/weights/custom-controlnet   # Custom ControlNet path (canny)
+controlnet-id: custom-controlnet                 # Directory name under assets/weights/ (canny)
 animate-anyone-repo-dir: null             # Path to Moore-AnimateAnyone repository
 animate-anyone-model-dir: null            # Override if models are in non-standard location
 animate-anyone-steps: 3                  # Diffusion inference steps for AnimateAnyone

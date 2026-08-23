@@ -1,5 +1,8 @@
 name: pointstream-ci
 
+# main is expected green. A red main is a merge blocker: twelve consecutive
+# failures on one weights-on-disk test made every later regression invisible.
+
 on:
   push:
     branches:

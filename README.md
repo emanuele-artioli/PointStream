@@ -85,3 +85,6 @@ Pre-commit hooks: `pre-commit install`, then `pre-commit run --all-files`.
 CPU and GPU images build from `Dockerfile.cpu` and `Dockerfile.gpu`; the GPU
 image needs the NVIDIA Container Toolkit. CI runs lint, typecheck and tests on
 every push and pull request; `release.yml` builds distributions on a `v*` tag.
+**CI on `main` is expected to be green. A red `main` blocks merging** — the next
+real regression is otherwise invisible. Weights are gitignored, so tests that
+need them are marked `integration` and are deselected on the runner.

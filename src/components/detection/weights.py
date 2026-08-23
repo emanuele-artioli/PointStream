@@ -17,6 +17,10 @@ from src.contracts.errors import ConfigValueError
 #: Config slots whose ``model`` field names a checkpoint file.
 WEIGHT_SLOTS: tuple[str, ...] = ("detector", "pose", "segmenter")
 
+#: POSIX prefix the resolver plants under. A config value that already starts
+#: with this must be treated as repo-relative, or the path doubles.
+_WEIGHTS_POSIX_PREFIX = "assets/weights/"
+
 
 class WeightResolutionError(FileNotFoundError):
     """A named checkpoint is missing, or the path is a dangling symlink."""
@@ -29,6 +33,23 @@ def repo_root() -> Path:
 
 def weights_dir(root: Path | None = None) -> Path:
     return (root or repo_root()) / "assets" / "weights"
+
+
+def intended_weight_path(name: str, *, root: Path | None = None) -> Path:
+    """Where `name` would live, without requiring that it does.
+
+    Bare names plant under ``assets/weights/``. A name that already starts with
+    that prefix is treated as repo-relative so the resolver cannot produce
+    ``assets/weights/assets/weights/...``.
+    """
+    base = root or repo_root()
+    raw = Path(name)
+    if raw.is_absolute():
+        return raw
+    posix = name.replace("\\", "/").lstrip("./")
+    if posix.startswith(_WEIGHTS_POSIX_PREFIX):
+        return base / name
+    return weights_dir(base) / name
 
 
 def named_weights(config: PointstreamConfig) -> dict[str, str]:
@@ -65,7 +86,7 @@ def resolve_weight(name: str, *, root: Path | None = None) -> Path:
 
     candidate = Path(name)
     if not candidate.is_absolute():
-        planted = weights_dir(root) / name
+        planted = intended_weight_path(name, root=root)
         if _is_present(planted) or planted.is_symlink():
             candidate = planted
         elif candidate.exists() or candidate.is_symlink():

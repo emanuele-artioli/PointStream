@@ -16,15 +16,15 @@ log-level: info
 execution-pool: inline
 
 # Actor extraction: extra-large backends (dataset-curation quality tier).
-detector: yolo26x-eg.pt
+detector: yolo26x-seg.pt
 pose-estimator: yolo26x-pose.pt
-segmenter: yolo26x-eg.pt
+segmenter: yolo26x-seg.pt
 ball-extractor: segmentation
-ball-det-model: yolo26x-eg.pt
+ball-det-model: yolo26x-seg.pt
 
 # Full-step generative compositing at full resolution.
 genai-backend: canny-controlnet
-controlnet-id: assets/weights/custom-controlnet
+controlnet-id: custom-controlnet
 controlnet-steps: 20
 controlnet-width: 512
 controlnet-height: 512

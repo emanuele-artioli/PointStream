@@ -24,7 +24,7 @@ ball-extractor: difference
 
 # Lightweight generative compositing: half the default steps.
 genai-backend: canny-controlnet
-controlnet-id: assets/weights/custom-controlnet
+controlnet-id: custom-controlnet
 controlnet-steps: 10
 controlnet-width: 384
 controlnet-height: 384
