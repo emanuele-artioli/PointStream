@@ -1,17 +1,25 @@
+<<<<<<< HEAD
 """Drive one engine over the probe set on the coding task.
 
 Appearance from a keyframe, conditioning from frame N, score against frame N.
 Static copy is a permanent arm. Checkpoint after every clip.
 """
+=======
+"""Drive one engine over the probe set. Checkpoint after every clip."""
+>>>>>>> phase-bp/bp5
 
 from __future__ import annotations
 
 import json
+<<<<<<< HEAD
 import math
+=======
+>>>>>>> phase-bp/bp5
 import time
 import traceback
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+<<<<<<< HEAD
 from typing import Any, Mapping
 
 import numpy as np
@@ -57,6 +65,20 @@ from src.contracts.conditioning import ConditioningBundle, GenerationParams
 
 RANKING_METRIC = "object_psnr_db"
 NOT_RANKED = ("self_reconstruction_psnr",)
+=======
+from typing import Any
+
+import numpy as np
+
+from experiments.probe.bounds import BoundVerdict, judge_frame_gap, judge_object_psnr
+from experiments.probe.clips import ProbeClip, ProbeFrame, bundle_arrays, list_clips, load_frame
+from experiments.probe.construct import stated_reason
+from experiments.probe.engines import CANVAS, DEVICE, SEED, EnginePlan, PLANS, plan_for
+from experiments.probe.score import ProbeScore, score_generation
+from src.contracts.conditioning import ConditioningBundle, GenerationParams
+
+HEADLINE_FRAME_INDEX = 24
+>>>>>>> phase-bp/bp5
 
 
 @dataclass
@@ -64,24 +86,36 @@ class ClipResult:
     engine: str
     clip_key: str
     split: str
+<<<<<<< HEAD
     appearance_frame_index: int
     target_frame_index: int
     offset: int
     object_psnr_db: float | None
     frame_psnr_db: float | None
     self_reconstruction_psnr: float | None
+=======
+    frame_index: int
+    object_psnr_db: float | None
+    frame_psnr_db: float | None
+>>>>>>> phase-bp/bp5
     seed: int
     checkpoint_epoch: int | str | None
     peak_vram_bytes: int | None
     wall_s: float | None
     differs_from_input: bool | None
+<<<<<<< HEAD
     differs_from_reference: bool | None
+=======
+>>>>>>> phase-bp/bp5
     n_object_pixels: int | None
     region_kind: str | None
     object_bound: str | None
     gap_bound: str | None
+<<<<<<< HEAD
     vs_static_copy_db: float | None = None
     appearance_use: str | None = None
+=======
+>>>>>>> phase-bp/bp5
     error: str | None = None
 
 
@@ -144,6 +178,7 @@ def _epoch_of(generator: Any) -> int | str | None:
     return None
 
 
+<<<<<<< HEAD
 def _json_ready(value: Any) -> Any:
     if isinstance(value, float) and not math.isfinite(value):
         return "inf" if value > 0 else ("-inf" if value < 0 else "nan")
@@ -173,6 +208,9 @@ def _coding_bundle(sample: CodingSample) -> ConditioningBundle:
 
 
 def _self_bundle(frame: ProbeFrame) -> ConditioningBundle:
+=======
+def _bundle(frame: ProbeFrame) -> ConditioningBundle:
+>>>>>>> phase-bp/bp5
     payload = bundle_arrays(frame)
     return ConditioningBundle(
         appearance=payload["appearance"],
@@ -185,6 +223,7 @@ def _self_bundle(frame: ProbeFrame) -> ConditioningBundle:
     )
 
 
+<<<<<<< HEAD
 def _score_coding(sample: CodingSample, predicted: np.ndarray) -> ProbeScore:
     return score_generation(
         sample.reference_rgb,
@@ -224,17 +263,39 @@ def _apply_floor(row: ClipResult, floor_by_key: Mapping[tuple[str, int], float] 
     row.vs_static_copy_db = float(row.object_psnr_db) - float(floor)
     row.appearance_use = appearance_use_label(float(row.object_psnr_db), float(floor))
     row.object_bound = judge_vs_floor(float(row.object_psnr_db), float(floor)).status
+=======
+def _score(frame: ProbeFrame, predicted: np.ndarray) -> ProbeScore:
+    return score_generation(
+        frame.appearance_rgb,
+        predicted,
+        object_mask=frame.object_mask,
+        canvas_width=CANVAS,
+        canvas_height=CANVAS,
+    )
+
+
+def _bounds(engine: str, score: ProbeScore) -> tuple[BoundVerdict, BoundVerdict]:
+    return (
+        judge_object_psnr(engine, score.object_psnr_db),
+        judge_frame_gap(score.frame_psnr_db, score.object_psnr_db),
+    )
+>>>>>>> phase-bp/bp5
 
 
 def _clip_row(
     plan: EnginePlan,
+<<<<<<< HEAD
     sample: CodingSample,
+=======
+    frame: ProbeFrame,
+>>>>>>> phase-bp/bp5
     score: ProbeScore,
     *,
     seed: int,
     epoch: int | str | None,
     peak: int | None,
     wall_s: float,
+<<<<<<< HEAD
     self_reconstruction_psnr: float | None,
     floor_by_key: Mapping[tuple[str, int], float] | None,
 ) -> ClipResult:
@@ -249,11 +310,23 @@ def _clip_row(
         object_psnr_db=score.object_psnr_db,
         frame_psnr_db=score.frame_psnr_db,
         self_reconstruction_psnr=self_reconstruction_psnr,
+=======
+) -> ClipResult:
+    object_bound, gap_bound = _bounds(plan.name, score)
+    return ClipResult(
+        engine=plan.name,
+        clip_key=frame.key,
+        split=frame.split,
+        frame_index=frame.frame_index,
+        object_psnr_db=score.object_psnr_db,
+        frame_psnr_db=score.frame_psnr_db,
+>>>>>>> phase-bp/bp5
         seed=seed,
         checkpoint_epoch=epoch,
         peak_vram_bytes=peak,
         wall_s=wall_s,
         differs_from_input=score.differs_from_input,
+<<<<<<< HEAD
         differs_from_reference=score.differs_from_reference,
         n_object_pixels=score.n_object_pixels,
         region_kind=score.region_kind,
@@ -455,6 +528,52 @@ def _refused(
         peak_vram_bytes=peak,
         headline={"refused": True, "at": at, "reason": reason},
     )
+=======
+        n_object_pixels=score.n_object_pixels,
+        region_kind=score.region_kind,
+        object_bound=object_bound.status,
+        gap_bound=gap_bound.status,
+    )
+
+
+def _headline(plan: EnginePlan, rows: list[ClipResult]) -> dict[str, Any]:
+    matched = [
+        row
+        for row in rows
+        if row.error is None
+        and row.frame_index == HEADLINE_FRAME_INDEX
+        and row.object_psnr_db is not None
+    ]
+    if not matched:
+        matched = [row for row in rows if row.error is None and row.object_psnr_db is not None]
+    if not matched:
+        return {"n": 0, "object_psnr_db": None, "frame_psnr_db": None}
+    object_values = [float(row.object_psnr_db) for row in matched if row.object_psnr_db is not None]
+    frame_values = [float(row.frame_psnr_db) for row in matched if row.frame_psnr_db is not None]
+    mean_object = sum(object_values) / len(object_values)
+    mean_frame = sum(frame_values) / len(frame_values)
+    verdict = judge_object_psnr(plan.name, mean_object)
+    gap = judge_frame_gap(mean_frame, mean_object)
+    identity_fail = [row.clip_key for row in matched if row.differs_from_input is False]
+    return {
+        "n": len(matched),
+        "frame_index": HEADLINE_FRAME_INDEX,
+        "object_psnr_db": mean_object,
+        "frame_psnr_db": mean_frame,
+        "object_bound": verdict.status,
+        "object_bound_note": verdict.note,
+        "gap_bound": gap.status,
+        "gap_db": mean_frame - mean_object,
+        "identity_failures": identity_fail,
+        "mean_wall_s": sum(float(row.wall_s or 0.0) for row in matched) / len(matched),
+        "peak_vram_bytes": max((row.peak_vram_bytes or 0) for row in matched),
+    }
+
+
+def _write_json(path: Path, payload: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, default=str))
+>>>>>>> phase-bp/bp5
 
 
 def drive_engine(
@@ -465,22 +584,29 @@ def drive_engine(
     seed: int,
     out_dir: Path,
     generator: Any | None = None,
+<<<<<<< HEAD
     keyframe_index: int = DEFAULT_KEYFRAME,
     offsets: tuple[int, ...] | None = None,
     floor_by_key: Mapping[tuple[str, int], float] | None = None,
     floor_headline: float | None = None,
     self_recon: bool = True,
+=======
+>>>>>>> phase-bp/bp5
     progress: Any = print,
 ) -> EngineResult:
     """Run ``plan`` over ``clips``. ``generator`` is injected in tests."""
     from src.components.generation import REGISTRY as GENERATORS
 
     started = time.perf_counter()
+<<<<<<< HEAD
     used_offsets = offsets if offsets is not None else plan.offsets
     progress(
         f"[probe] {plan.name} kind={plan.kind} clips={len(clips)} "
         f"keyframe={keyframe_index} offsets={used_offsets} device={device}"
     )
+=======
+    progress(f"[probe] {plan.name} kind={plan.kind} clips={len(clips)} device={device}")
+>>>>>>> phase-bp/bp5
     if plan.refuse_at == "construct":
         try:
             GENERATORS.build(plan.name)
@@ -499,17 +625,49 @@ def drive_engine(
         except Exception as exc:
             reason = stated_reason(exc, axis="generator", name=plan.name) or str(exc)
             progress(f"[probe] {plan.name} refused at construct: {reason[:180]}")
+<<<<<<< HEAD
             result = _refused(plan, seed=seed, reason=reason, at="construct")
+=======
+            result = EngineResult(
+                engine=plan.name,
+                kind=plan.kind,
+                notes=plan.notes,
+                refused=True,
+                refuse_reason=reason,
+                seed=seed,
+                checkpoint_epoch=None,
+                peak_vram_bytes=None,
+                headline={"refused": True, "at": "construct", "reason": reason},
+            )
+>>>>>>> phase-bp/bp5
             _write_json(out_dir / f"{plan.name}.json", asdict(result))
             return result
 
     built: Any = generator
+<<<<<<< HEAD
     if built is None and plan.name != STATIC_COPY:
+=======
+    if built is None:
+>>>>>>> phase-bp/bp5
         try:
             built = GENERATORS.build(plan.name)
         except Exception as exc:
             construct_reason = stated_reason(exc, axis="generator", name=plan.name) or str(exc)
+<<<<<<< HEAD
             result = _refused(plan, seed=seed, reason=construct_reason, at="construct")
+=======
+            result = EngineResult(
+                engine=plan.name,
+                kind=plan.kind,
+                notes=plan.notes,
+                refused=True,
+                refuse_reason=construct_reason,
+                seed=seed,
+                checkpoint_epoch=None,
+                peak_vram_bytes=None,
+                headline={"refused": True, "at": "construct", "reason": construct_reason},
+            )
+>>>>>>> phase-bp/bp5
             _write_json(out_dir / f"{plan.name}.json", asdict(result))
             return result
 
@@ -517,6 +675,7 @@ def drive_engine(
     engine_peak = 0
     epoch: int | str | None = None
     params = GenerationParams(width=CANVAS, height=CANVAS, steps=plan.steps)
+<<<<<<< HEAD
     recon_at = _self_recon_offset(used_offsets) if self_recon else None
 
     for clip in clips:
@@ -567,12 +726,46 @@ def drive_engine(
                     f"offset={offset} object={score.object_psnr_db:.2f} "
                     f"frame={score.frame_psnr_db:.2f} "
                     f"use={row.appearance_use} bound={row.object_bound} "
+=======
+
+    for clip in clips:
+        indices = plan.frame_indices or (HEADLINE_FRAME_INDEX,)
+        for frame_index in indices:
+            try:
+                frame = load_frame(clip, frame_index)
+                bundle = _bundle(frame)
+                _reset_peak(device)
+                t0 = time.perf_counter()
+                predicted = built.generate(bundle, seed=seed, device=device, params=params)
+                wall_s = time.perf_counter() - t0
+                peak = _peak_bytes(device)
+                engine_peak = max(engine_peak, peak)
+                aa_run = getattr(built, "last_run", None)
+                if isinstance(aa_run, dict) and aa_run.get("peak_vram_bytes"):
+                    engine_peak = max(engine_peak, int(aa_run["peak_vram_bytes"]))
+                    peak = max(peak, int(aa_run["peak_vram_bytes"]))
+                epoch = _epoch_of(built)
+                score = _score(frame, np.asarray(predicted))
+                row = _clip_row(
+                    plan, frame, score, seed=seed, epoch=epoch, peak=peak, wall_s=wall_s
+                )
+                if not score.differs_from_input:
+                    row.error = (
+                        f"{plan.name} output is identical to letterboxed appearance "
+                        f"on {clip.key} frame {frame_index}"
+                    )
+                progress(
+                    f"[probe] {plan.name} {clip.key} f={frame_index} "
+                    f"object={score.object_psnr_db:.2f} frame={score.frame_psnr_db:.2f} "
+                    f"bound={row.object_bound} differs={score.differs_from_input} "
+>>>>>>> phase-bp/bp5
                     f"{wall_s:.1f}s"
                 )
             except Exception as exc:
                 generate_reason = stated_reason(exc, axis="generator", name=plan.name)
                 if plan.refuse_at == "generate" and generate_reason:
                     progress(f"[probe] {plan.name} refused at generate: {generate_reason[:180]}")
+<<<<<<< HEAD
                     result = _refused(
                         plan,
                         seed=seed,
@@ -591,6 +784,38 @@ def drive_engine(
                     offset=offset,
                     seed=seed,
                     epoch=epoch,
+=======
+                    result = EngineResult(
+                        engine=plan.name,
+                        kind=plan.kind,
+                        notes=plan.notes,
+                        refused=True,
+                        refuse_reason=generate_reason,
+                        seed=seed,
+                        checkpoint_epoch=epoch,
+                        peak_vram_bytes=engine_peak or None,
+                        headline={"refused": True, "at": "generate", "reason": generate_reason},
+                    )
+                    _write_json(out_dir / f"{plan.name}.json", asdict(result))
+                    return result
+                progress(f"[probe] {plan.name} FAIL {clip.key} f={frame_index}: {exc}")
+                row = ClipResult(
+                    engine=plan.name,
+                    clip_key=clip.key,
+                    split=clip.split,
+                    frame_index=frame_index,
+                    object_psnr_db=None,
+                    frame_psnr_db=None,
+                    seed=seed,
+                    checkpoint_epoch=epoch,
+                    peak_vram_bytes=None,
+                    wall_s=None,
+                    differs_from_input=None,
+                    n_object_pixels=None,
+                    region_kind=None,
+                    object_bound=None,
+                    gap_bound=None,
+>>>>>>> phase-bp/bp5
                     error=f"{type(exc).__name__}: {exc}\n{traceback.format_exc()}",
                 )
             rows.append(row)
@@ -607,6 +832,7 @@ def drive_engine(
                         checkpoint_epoch=epoch,
                         peak_vram_bytes=engine_peak or None,
                         clips=rows,
+<<<<<<< HEAD
                         headline=_headline(
                             plan,
                             rows,
@@ -614,11 +840,18 @@ def drive_engine(
                             keyframe_index=keyframe_index,
                             headline_offset=HEADLINE_OFFSET,
                         ),
+=======
+                        headline=_headline(plan, rows),
+>>>>>>> phase-bp/bp5
                     )
                 ),
             )
 
+<<<<<<< HEAD
     if built is not generator and built is not None:
+=======
+    if built is not generator:
+>>>>>>> phase-bp/bp5
         del built
         _release(device)
     result = EngineResult(
@@ -631,6 +864,7 @@ def drive_engine(
         checkpoint_epoch=epoch,
         peak_vram_bytes=engine_peak or None,
         clips=rows,
+<<<<<<< HEAD
         headline=_headline(
             plan,
             rows,
@@ -638,12 +872,16 @@ def drive_engine(
             keyframe_index=keyframe_index,
             headline_offset=HEADLINE_OFFSET,
         ),
+=======
+        headline=_headline(plan, rows),
+>>>>>>> phase-bp/bp5
     )
     result.headline["engine_wall_s"] = time.perf_counter() - started
     _write_json(out_dir / f"{plan.name}.json", asdict(result))
     return result
 
 
+<<<<<<< HEAD
 def _engine_summary(result: EngineResult) -> dict[str, Any]:
     return {
         "refused": result.refused,
@@ -655,6 +893,8 @@ def _engine_summary(result: EngineResult) -> dict[str, Any]:
     }
 
 
+=======
+>>>>>>> phase-bp/bp5
 def drive_all(
     *,
     device: str = DEVICE,
@@ -662,6 +902,7 @@ def drive_all(
     out_dir: Path,
     probe_root: Path | None = None,
     engines: tuple[str, ...] | None = None,
+<<<<<<< HEAD
     generators: Mapping[str, Any] | None = None,
     keyframe_index: int = DEFAULT_KEYFRAME,
     offsets: tuple[int, ...] | None = None,
@@ -679,11 +920,27 @@ def drive_all(
         "anchored_on": "static-copy floor, not absolute engine dB",
         "task": "appearance from keyframe, score against later frame",
     }
+=======
+    progress: Any = print,
+) -> dict[str, Any]:
+    from experiments.probe.bounds import (
+        FRAME_MINUS_OBJECT_SMALL_GAP_DB,
+        IP_ADAPTER_KNOWN_FLOOR_DB,
+        OBJECT_PSNR_ALARM_HIGH_DB,
+        OBJECT_PSNR_ALARM_LOW_DB,
+        OBJECT_PSNR_EXPECTED_HIGH_DB,
+        OBJECT_PSNR_EXPECTED_LOW_DB,
+    )
+
+    clips = list_clips(probe_root)
+    chosen = tuple(plan_for(name) for name in engines) if engines else PLANS
+>>>>>>> phase-bp/bp5
     summary: dict[str, Any] = {
         "citable": False,
         "seed": seed,
         "device": device,
         "canvas": CANVAS,
+<<<<<<< HEAD
         "keyframe_index": keyframe_index,
         "offsets": list(used_offsets),
         "headline_offset": HEADLINE_OFFSET,
@@ -691,12 +948,25 @@ def drive_all(
         "ranking_ignores": list(NOT_RANKED),
         "n_clips": len(clips),
         "bounds_written_before_generate": bounds_record,
+=======
+        "headline_frame_index": HEADLINE_FRAME_INDEX,
+        "n_clips": len(clips),
+        "bounds_written_before_generate": {
+            "object_alarm_low_db": OBJECT_PSNR_ALARM_LOW_DB,
+            "object_expected_low_db": OBJECT_PSNR_EXPECTED_LOW_DB,
+            "object_expected_high_db": OBJECT_PSNR_EXPECTED_HIGH_DB,
+            "object_alarm_high_db": OBJECT_PSNR_ALARM_HIGH_DB,
+            "ip_adapter_known_floor_db": IP_ADAPTER_KNOWN_FLOOR_DB,
+            "small_frame_gap_db": FRAME_MINUS_OBJECT_SMALL_GAP_DB,
+        },
+>>>>>>> phase-bp/bp5
         "split_note": (
             "All 12 probe clips are from the 5 training-split videos. "
             "Animate-Anyone has also seen both held-out videos (PLAN.md §2.5); "
             "option 2: report AA as in-domain only. A pretrained engine carries "
             "the held-out arm when that arm is run."
         ),
+<<<<<<< HEAD
         "static_copy": {},
         "engines": {},
         "rank": [],
@@ -755,4 +1025,23 @@ def drive_all(
         progress(f"[probe] checkpointed {plan.name} -> {out_dir / 'summary.json'}")
     summary["rank"] = rank_engines(summary["engines"])
     _write_json(out_dir / "summary.json", summary)
+=======
+        "engines": {},
+    }
+    _write_json(out_dir / "summary.json", summary)
+    for plan in chosen:
+        result = drive_engine(
+            plan, clips, device=device, seed=seed, out_dir=out_dir, progress=progress
+        )
+        summary["engines"][plan.name] = {
+            "refused": result.refused,
+            "refuse_reason": result.refuse_reason,
+            "checkpoint_epoch": result.checkpoint_epoch,
+            "peak_vram_bytes": result.peak_vram_bytes,
+            "headline": result.headline,
+            "n_clip_rows": len(result.clips),
+        }
+        _write_json(out_dir / "summary.json", summary)
+        progress(f"[probe] checkpointed {plan.name} -> {out_dir / 'summary.json'}")
+>>>>>>> phase-bp/bp5
     return summary
