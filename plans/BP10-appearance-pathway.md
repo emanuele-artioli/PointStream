@@ -1,3 +1,21 @@
+> **VOID — 2026-08-23. Do not use the bands in this brief.**
+>
+> This brief's premise is that a cross-appearance delta measures whether an
+> engine has a working appearance pathway, with **"≥ +3 dB = ReferenceNet
+> works"** as the gate. It does not, and that gate certifies a paste: driven
+> through the same harness, `static-copy` — no model of any kind — scores
+> **+4.45 dB and +0.285 LPIPS, the top of the scale**, ahead of every generator.
+>
+> The delta measures how much of the reference image survives into the output,
+> which copying maximises by construction. It is kept as a measure of
+> *dependence on the reference*, reported beside each arm's own score against
+> the static-copy floor, and withdrawn as a test of appearance use.
+>
+> See `PLAN.md` §2.10 and the *Delivered* section of
+> `plans/BP12-clip-mode-roster.md`. Separating "the output moved" from "the
+> right person appeared" needs an identity metric (CSIM/ArcFace); this project
+> does not have one yet.
+
 # B′10 — Find an appearance pathway that works
 
 **The critical path.** Replaces `BP8`, whose options are now spent or

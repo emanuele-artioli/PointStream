@@ -29,7 +29,7 @@ Target: **ACM TOMM, September 30.**
 |---|---|---|
 | A — contracts and concepts | ✅ done | — |
 | B — components | ✅ **done** | Merged-ready on `phase-b/integrate` (still unmerged to main) |
-| **B′ — the engine roster** | Wave 3 ✅ | Quality flagship **unset** (honest negative). Pose-ref epoch 10 is 11.18 dB, below the 11.47 letterbox floor. Wave-2 roster remains void. |
+| **B′ — the engine roster** | BP12 ✅ | Re-ranked in clip mode on calibrated LPIPS (§2.10). Quality flagship stays **unset**: every engine loses to a pasted keyframe at 2.5σ–10.6σ, and the top three are not separable. The cross-appearance test is withdrawn as a test of appearance use — a paste tops it. |
 | C — pipeline and runner | ⬜ | `C1`/`C2`/`C3` landed unmerged |
 | D — experiments layer | ⬜ | Blocked on C |
 | E — experiments and paper | ⬜ | Ordered by §7 |
@@ -406,6 +406,130 @@ reviewer finds.
   SVD is cleared. Live inference was not run: leftover VRAM ~11.6 GiB, VAE decode
   wants ~16 GiB.
 
+### 2.10 The clip-mode roster, and the control that retired its own test
+
+Run 2026-08-23 on `gpu5`, seed 42, 12 probe clips, offsets **1–8** contiguous,
+`cuda:1` for the roster and `cuda:0` for the control. LPIPS bounds were written
+into `experiments/probe/bounds.py` before a single number was generated.
+`outputs/bp12-clip-roster/` (`report.json`, per-engine records), log
+`outputs/bp12-clip-roster.log`. **Not citable**: 12 clips, all from the five
+training-split videos.
+
+**Both baselines ran before any engine, and the run refuses to rank at all if
+they do not separate.**
+
+| Anchor | Object LPIPS | Object PSNR |
+|---|---|---|
+| **static copy** — right player, wrong pose | **0.4505 ± 0.0220** | 13.51 ± 0.44 dB |
+| **unrelated image** — wrong player | **0.7358 ± 0.0075** | 9.06 ± 0.13 dB |
+| separation | **0.285** | 4.45 dB |
+
+The floor reproduces §2.5 and §2.7 independently: 17.00 dB / 0.239 at offset 1,
+11.16 dB / 0.582 at offset 8. The null arm is *flat* across offsets
+(0.722 → 0.743) where the floor climbs, which is what identity-sensitivity looks
+like — show the wrong person and distance in time stops mattering.
+
+#### The roster
+
+LPIPS is the ranking key, PSNR beside it. Scope differs between the two columns
+and the report says so: PSNR over the letterboxed player **mask**, LPIPS over
+the **bounding box** of that mask, because LPIPS is a patch metric and cannot
+take a mask. Each column compares across arms; the two are not one measurement.
+
+| Engine | Driven | Object LPIPS | Object PSNR | s/frame |
+|---|---|---|---|---|
+| upscale-refine | frame | **0.5585** | 12.73 dB | 0.00 |
+| seg-controlnet | frame | 0.5595 | 12.19 | 0.94 |
+| **animate-anyone** | **clip** | 0.5692 | 12.21 | 0.99 |
+| pose-controlnet | frame | 0.6031 | 12.03 | 0.96 |
+| trajectory-controlnet | frame | 0.6229 | 11.78 | 0.95 |
+| ip-adapter-controlnet | frame | 0.7606 | 9.00 | 0.97 |
+| pix2pix | frame | 0.7820 | 12.60 | 0.03 |
+| spade4tennis | frame | 0.8342 | 9.89 | 0.03 |
+
+`stable-animator` refused at generate and `mofa-video` at construct, both by
+design (§2.9).
+
+**Three things the table alone would not say, and the paired comparisons do.**
+
+1. **Every engine loses to the static-copy floor**, at 2.5σ to 10.6σ. There is
+   no exception and no near miss.
+2. **The top three are not separable.** upscale-refine vs seg-controlnet is
+   0.0σ; seg vs animate-anyone is 0.4σ. So "AA is the best engine" is not
+   supportable — and neither is any generative engine beating a plain upscaler.
+   Only two adjacent pairs in the whole ranking are clear.
+3. **PSNR and LPIPS give different orders.** pix2pix is 2nd on PSNR and 7th on
+   LPIPS. That is the concrete case for §2.5's choice of ranking key, measured
+   rather than argued.
+
+Three engines — ip-adapter-controlnet, pix2pix, spade4tennis — score **worse
+than showing a completely different player**.
+
+AA's clip-mode 0.5692 reproduces §2.7's 0.570, measured there on 4 clips and
+here on 12, on a different GPU. Clip mode costs 6.2 GiB against 3.3 for a
+ControlNet, at the same ~1 s/frame; `subsec:eval-operating` needs both.
+
+#### The cross-appearance control, and why its own reading is withdrawn
+
+Hold the model, pose, target and metric fixed; vary only which keyframe the
+engine sees — its own, or a donor from a different video. **This was the test
+BP10 and BP12 called decisive.** It is not, and the reason is worth more than
+the result.
+
+A prediction was written down before the last two arms finished
+(`outputs/bp12-cross-appearance-prediction.txt`): the ControlNets should land at
+0.03–0.09 LPIPS, well below Animate-Anyone's +0.107, because §2.4 says they have
+no trained appearance path. It named the failure branch too — *a ControlNet near
++0.107 means investigate the harness before reporting anything about AA.*
+
+They came in at **+0.166 and +0.176**, above AA. So the copying baselines were
+driven through the identical code path:
+
+| Arm | Δ LPIPS (wrong − right) | share of a paste | Δ PSNR |
+|---|---|---|---|
+| **static-copy — no model at all** | **+0.285** | **100%** | +4.45 dB |
+| **upscale-refine — non-generative** | **+0.185** | 65% | +2.64 |
+| seg-controlnet | +0.176 | 62% | +3.43 |
+| pose-controlnet | +0.166 | 58% | +2.93 |
+| animate-anyone (clip) | +0.107 | 37% | +3.46 |
+| ip-adapter-controlnet | +0.055 | 19% | +0.25 |
+
+n=12 clips, paired, every comparison in `report.json`.
+
+**The arm with no network wins the test.** The delta measures how much of the
+reference image survives into the output — copying — which a paste maximises by
+construction. It cannot say whether a model renders the right *person*, because
+the arm that renders nothing tops the scale.
+
+On PSNR this kills BP10's threshold outright. BP10 set **"≥ +3 dB means
+ReferenceNet works"**. A pasted keyframe scores **+4.45 dB**. That gate would
+have certified a paste as having a working ReferenceNet.
+
+**The harness is not the fault, and said so.** static-copy driven through the
+cross-appearance path scores exactly the 0.285 computed independently from the
+two roster baselines. The instrument agrees with itself; the reading was wrong.
+
+**What survives.** The control is kept as a measure of *dependence on the
+reference*, always reported beside the arm's own score against the floor, and
+withdrawn as a test of "uses appearance". `judge_cross_appearance` now refuses
+to classify without a copying anchor, and `report.py` re-judges stored records
+with the current bound rather than the status they were written with — this
+bound has been wrong once already.
+
+**What is left standing about Animate-Anyone.** It is the only arm whose quality
+sits in the top group while depending *least* on copying the reference: +0.107
+against seg-controlnet's +0.176 at 2.5σ, with LPIPS 0.5692 against 0.5595 at
+0.4σ. That is consistent with feature injection rather than pixel blending, and
+it is **not** established by this test. Establishing it needs a measurement that
+separates "the output moved" from "the right person appeared" — which the
+literature does with an identity metric (CSIM/ArcFace), not with a distance to
+the target frame. §7 should carry that as work, not as a settled result.
+
+**And the standing negative is unchanged.** No engine on this roster
+reconstructs a usable player. The best of them sits 0.108 LPIPS above a paste of
+the keyframe, and a paste is not a codec.
+
+
 ---
 
 ## 3. Architecture
@@ -601,56 +725,67 @@ set of alternatives that differ along axes the paper measures.
 | `subsec:eval-operating` | A compute-unbounded point *and* something fast enough to have a real-time point |
 | `subsec:eval-metrics` | Temporal coherence worth measuring with FVMD |
 
-#### 6.2 Two flagships, because two questions are being asked
+#### 6.2 The roster, re-decided on the clip-mode run
 
-`eval-ladder` and `eval-object` want different things. The Wave-2 probe
-(`outputs/bp5-probe/summary.json`, seed 42, `cuda:0`, track-local frame 24,
-object-scoped PSNR on crop alpha, 12 training-split clips, **not citable**)
-decides who holds which slot. Animate-Anyone does **not** keep the quality
-flagship. StableAnimator cannot take it: generate refuses, SVD-XT is not
-licence-cleared (§2.4).
+**Everything the previous version of this section said is void.** It ranked
+engines on Wave-2 self-reconstruction PSNR (seg 16.2, pose 15.9, trajectory
+14.9, pix2pix 15.4, upscale 14.5, AA 10.4, SPADE 12.0) — a task that asks each
+engine to reproduce an image it was handed (§2.3), scored by a metric the
+subfield rejects for this content (§2.5), through an LPIPS that could not tell a
+match from an unrelated image (§2.7). The numbers below are from
+`outputs/bp12-clip-roster/` (§2.10): the coding task, calibrated LPIPS as the
+key, PSNR beside it, both baselines in the same session, and every comparison
+paired with a standard error.
 
-**Held-out (PLAN.md §2.5), option 2.** Animate-Anyone has seen both probe-set
-held-out videos. Report it as in-domain only. A pretrained engine (the
-ControlNet family, or pix2pix) carries the held-out arm. Option 1 needs new
-source; option 3 (retrain) stays out of scope.
+**The decision this run forces, and it is uncomfortable.** No engine holds a
+quality flagship, because **no engine beats pasting the keyframe**, and the top
+three — upscale-refine, seg-controlnet, animate-anyone — are not separable from
+each other at n=12. Naming a flagship among them would be naming noise.
 
-| Role | Engine | Serves | Why |
+| Role | Engine | Serves | Why, on this run |
 |---|---|---|---|
-| **Quality flagship** | ControlNet on SD-1.5, best arm **seg-controlnet** (object 16.2 dB; pose 15.9) | `eval-ladder` | Highest object-scoped PSNR on the aligned probe. The ladder figure shows the best PointStream can currently do. |
-| **Comparison backbone** | Same ControlNet family (pose / seg / ip-adapter / trajectory-controlnet) | `eval-object` | The only family where the backbone stays fixed while the conditioning changes. Seg beat pose by 0.3 dB; trajectory 14.9; ip-adapter frame 11.1 is the known txt2img floor (object 7.9 is that floor, scoped — not a path bug). |
-| Temporal / FVMD | Animate-Anyone | `eval-metrics` | Only temporal engine that actually ran. Object 10.4 dB at 512 px, one frame; ~6 dB behind ControlNet, not a 15 dB wiring stop. In-domain only (option 2). |
-| Speed rung | pix2pix | `eval-operating` | 37 ms, 0.32 GiB, object 15.4 dB — within 1 dB of pose-controlnet. Without it there is no real-time point. |
-| Floor | upscale-refine | all | Object 14.5 dB. Frame PSNR inverts because this backend *stretches* the crop onto 512² while scoring letterboxes; the fair number is object-scoped. |
+| **Quality flagship** | **unset — honest negative** | `eval-ladder` | Every arm loses to the static-copy floor at 2.5σ–10.6σ. The ladder figure cannot yet show "the best PointStream can do" because nothing does better than not running a model. |
+| **Comparison backbone** | ControlNet family (pose / seg / ip-adapter / trajectory) | `eval-object` | Unchanged and still the right choice: the only family where the backbone is fixed while the conditioning changes. Seg 0.5595, pose 0.6031, trajectory 0.6229, ip-adapter 0.7606 LPIPS. Seg vs pose is 1.4σ — report the ordering as unresolved, not as a result. |
+| Temporal / FVMD | Animate-Anyone, **clip mode only** | `eval-metrics` | 0.5692 LPIPS, 12.21 dB, 6.2 GiB, ~1 s/frame over an 8-frame clip. The single-frame path is now refused by the harness. In-domain only (option 2, §2.8). |
+| Speed rung | pix2pix | `eval-operating` | 0.03 s/frame at 0.3 GiB, and that is the whole case. Its quality is 7th of eight on LPIPS and *worse than showing an unrelated player* — report it as the speed corner, never as a quality point. |
+| Floor | upscale-refine | all | 0.5585 LPIPS, the best of the eight, and it is not a generative model. That is the finding, not a footnote. |
+| Null control | unrelated-image | all | 0.7358 LPIPS. New permanent arm; three engines score worse than it. |
 
-**Do the two flagship roles collapse?** For quality, yes: the comparison
-backbone *is* the best evaluable engine, so `eval-ladder` and `eval-object`
-share a family. They do not collapse into one row. `eval-object` still needs
-the four conditionings; `eval-metrics` still needs a temporal model;
-`eval-operating` still needs pix2pix.
+**Do the two flagship roles collapse?** The question is moot while the quality
+slot is empty. `eval-object` still needs the four conditionings, `eval-metrics`
+still needs a temporal model, `eval-operating` still needs pix2pix.
 
-**The trajectory arm does not need MOFA-Video.** MOFA refused construction
-(licence). Trajectory-controlnet object 14.9 dB sits next to pose 15.9 on the
-same epoch-10 OpenPose checkpoint — the control image is the thing that
-changed. That is the `eval-object` experiment.
+**The trajectory arm still does not need MOFA-Video.** Trajectory-controlnet
+0.6229 sits beside pose 0.6031 on the same epoch-10 OpenPose checkpoint at 1.4σ
+— the control image is the only thing that changed, and the difference is not
+resolved at this n. That is the `eval-object` experiment, and it currently has a
+null result.
 
 #### 6.2.1 Which existing engines survive, and why
 
-Most of the roster keeps its place — **each for a structural reason, now
-backed by the probe, not because it is already wired.**
+Each keeps its place for a structural reason, **now backed by the clip-mode
+run**. Every LPIPS figure is object-scoped on the player bbox, offsets 1–8,
+n=12 clips, against a static-copy floor of 0.4505 and an unrelated-image null of
+0.7358 measured in the same session.
 
-| Engine | Verdict | What no modern model does instead |
+| Engine | Verdict | On this evidence |
 |---|---|---|
-| **ControlNet family** | **Keep — quality flagship and comparison backbone** | Swappable control encoders over a fixed backbone. Fine-tuned on our data. Seg 16.2 / pose 15.9 / trajectory 14.9 object dB, epoch 10/7/10, ~3.3 GiB, ~4–6 s/frame after warmup. ip-adapter stays in the family as the weak arm (frame 11.1 dB known floor). |
-| **pix2pix** | **Keep** | One forward pass. Object 15.4 dB in 37 ms at 0.32 GiB. Without it, `eval-operating` has no real-time point. |
-| **upscale-refine** | **Keep** | Non-generative floor, object 14.5 dB. Generation still buys ~1.7 dB over it on this triage (seg vs floor). Score object-scoped; do not rank it on canvas PSNR. |
-| **Animate-Anyone** | **Keep as the temporal incumbent, not the quality flagship** | Only temporal engine that ran (5.4 GiB, 20 steps). Object 10.4 dB. Fine-tuned on 114 tracks / 7 videos including both held-out videos — **option 2: in-domain only**. 3 DDIM steps remain unevaluable; default stays 20. |
-| **SPADE4Tennis** | **Keep as a domain-specialisation control, not a contender** | Object 12.0 dB, frame 15.2 matching BP7's canvas 15.1. It lost to the fine-tuned general backbone. That *is* the comparison: domain SPADE did not beat ControlNet on tennis. |
+| **ControlNet family** | **Keep — comparison backbone. Not a flagship.** | Seg 0.5595 / pose 0.6031 / trajectory 0.6229 / ip-adapter 0.7606, epochs 7/10/10, ~3.3 GiB, ~0.95 s/frame. All lose to the floor. ip-adapter is worse than the null and remains the mislabelled seg checkpoint of §2.3. |
+| **Animate-Anyone** | **Keep as the temporal incumbent. Clip mode is mandatory.** | 0.5692 LPIPS in clip mode, indistinguishable from seg (0.4σ). Depends least on copying the reference of any arm that reaches the top group (§2.10) — suggestive of feature injection, not established. In-domain only. |
+| **upscale-refine** | **Keep, and promote it in the writing** | Best LPIPS on the roster (0.5585) while being non-generative. Generation currently buys **nothing** over it; the earlier "~1.7 dB" was self-reconstruction PSNR. |
+| **pix2pix** | **Keep as the speed corner only** | 0.03 s/frame, 0.3 GiB. LPIPS 0.7820 — worse than an unrelated image, and 2nd on PSNR, which is the roster's clearest example of the two metrics disagreeing. |
+| **SPADE4Tennis** | **Keep as a domain-specialisation control** | 0.8342 LPIPS, last of eight and worst of all. Domain-specific SPADE did not beat the fine-tuned general backbone. That *is* the comparison. |
 | **MOFA-Video** | Stays dropped | Construction refuses (SVD licence). Trajectory-controlnet replaces it. |
-| **StableAnimator** | Wrapped, not shipped | Constructs; generate refuses (SVD-XT not bundled). Cannot be flagship until the licence clears. Not ranked. |
+| **StableAnimator** | Wrapped, not shipped | Constructs; generate refuses (SVD-XT not bundled). Not ranked. |
 
 MTVCrafter is still a candidate *motion representation* (4D/SMPL tokens), not a
 drop-in generator. Sparse2Dense still has no public code or weights.
+
+**What this section cannot tell you, and BP12 assumed it could.** Whether any of
+these engines has a working appearance pathway. The cross-appearance test was
+supposed to answer it and cannot — a pasted keyframe tops that scale with no
+network at all (§2.10). Answering it needs an identity metric, which is §7 work.
+
 
 #### 6.3 What the 2026 literature says we should consider
 
