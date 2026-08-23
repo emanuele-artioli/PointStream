@@ -410,3 +410,113 @@ def judge_engine_lpips(
         status="between-floor-and-null",
         note=f"{engine_lpips:.3f} sits between the two anchors ({anchors})",
     )
+
+
+# ---------------------------------------------------------------------------
+# Cross-appearance bounds, written 2026-08-23 before the control ran in clip
+# mode. The test: hold the model, the pose, the target and the metric fixed,
+# and vary *only* which keyframe the engine is shown. An engine that uses
+# appearance scores better with the right one.
+#
+# This is the test that settles whether a generator has an appearance pathway
+# at all. The static-copy floor does not settle it: a paste is real pixels in
+# the wrong pose while a generator is synthetic pixels in the right pose, and
+# MSE structurally favours the former (PLAN.md §2.4).
+#
+# **The scale comes from the same run.** Pasting the right keyframe instead of
+# the wrong one is worth ~0.285 LPIPS on this probe set (0.4505 against
+# 0.7358, measured 2026-08-23 over 12 clips at offsets 1-8). That is what
+# perfect use of the appearance signal is worth to this metric on this task,
+# so a generator's delta is reported as a *fraction* of it rather than as a
+# bare number.
+#
+# BP10 set the PSNR bands: >= +3 dB the pathway works, ~ +0.9 dB is img2img
+# init leakage (what both ControlNets showed, and what survived the retrain
+# unchanged), ~ 0 is a wiring fault. The LPIPS bands below are set at the same
+# places on the 0.285 scale: a third of it is a working pathway, a twentieth
+# is leakage.
+CROSS_APPEARANCE_WORKS_DB = 3.0
+CROSS_APPEARANCE_LEAKAGE_DB = 0.5
+
+CROSS_APPEARANCE_WORKS_LPIPS = 0.10
+CROSS_APPEARANCE_LEAKAGE_LPIPS = 0.02
+
+CROSS_USES_APPEARANCE = "uses appearance"
+CROSS_LEAKAGE = "init leakage only"
+CROSS_NO_PATHWAY = "no appearance pathway"
+
+
+def judge_cross_appearance(
+    delta_lpips: float,
+    *,
+    sigmas: float,
+    standard_error: float,
+    paste_separation: float | None = None,
+    underpowered: bool = False,
+) -> BoundVerdict:
+    """Classify a cross-appearance LPIPS delta (wrong minus right; higher is better).
+
+    Three questions, in order, because they need different evidence.
+
+    1. **Is the sample big enough to say anything?** ``underpowered`` carries
+       ``compare_paired``'s own small-sample refusal, and a large sigma on three
+       clips does not overrule it.
+    2. **Can we say the effect is absent?** That needs the *interval* to sit
+       below the leakage band, not just the point estimate: ``0.001 +/- 0.05``
+       is equally consistent with a working pathway. Absence is a claim about
+       the upper bound, which is why it is checked before significance.
+    3. **Is a claimed effect real?** Two standard errors, because a +0.98 dB
+       one-and-a-half-sigma difference was reported here as a finding.
+    """
+    share = ""
+    if paste_separation:
+        share = f", {delta_lpips / paste_separation:.0%} of the {paste_separation:.3f} a paste is worth"
+    if underpowered:
+        return BoundVerdict(
+            metric="cross_appearance_lpips",
+            value=delta_lpips,
+            status="underpowered",
+            note=(
+                f"{delta_lpips:+.3f} LPIPS{share}: too few clips to call a "
+                "direction, whatever the sigma says"
+            ),
+        )
+    upper = delta_lpips + 2.0 * standard_error
+    if upper < CROSS_APPEARANCE_LEAKAGE_LPIPS:
+        return BoundVerdict(
+            metric="cross_appearance_lpips",
+            value=delta_lpips,
+            status=CROSS_NO_PATHWAY,
+            note=(
+                f"{delta_lpips:+.3f} LPIPS, at most {upper:+.3f} at two standard "
+                f"errors{share}: the wrong player costs this engine nothing. "
+                "Check the wiring before the architecture"
+            ),
+        )
+    if sigmas < 2.0:
+        return BoundVerdict(
+            metric="cross_appearance_lpips",
+            value=delta_lpips,
+            status="inside-noise",
+            note=(
+                f"{delta_lpips:+.3f} LPIPS at {sigmas:.1f}σ{share}: the sample "
+                "does not support a direction, and the interval does not rule "
+                "an effect out either"
+            ),
+        )
+    if delta_lpips >= CROSS_APPEARANCE_WORKS_LPIPS:
+        return BoundVerdict(
+            metric="cross_appearance_lpips",
+            value=delta_lpips,
+            status=CROSS_USES_APPEARANCE,
+            note=f"{delta_lpips:+.3f} LPIPS at {sigmas:.1f}σ{share}",
+        )
+    return BoundVerdict(
+        metric="cross_appearance_lpips",
+        value=delta_lpips,
+        status=CROSS_LEAKAGE,
+        note=(
+            f"{delta_lpips:+.3f} LPIPS at {sigmas:.1f}σ{share}: real but small, "
+            "the size of an untrained img2img init path"
+        ),
+    )

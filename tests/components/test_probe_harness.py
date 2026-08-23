@@ -68,6 +68,22 @@ def _write_png(path: Path, array: np.ndarray) -> None:
     Image.fromarray(array).save(path)
 
 
+def _clip_colour(index: int) -> tuple[int, int, int]:
+    """A distinct player colour per clip, on all three channels.
+
+    Separating the clips on red alone is not enough: a distance averaged over
+    channels divides a one-channel difference by three, and the fixture's null
+    control then fails to separate for a reason that has nothing to do with the
+    code under test. Red also carries the +10-per-frame ramp, so its base stays
+    low enough that a clip's last frame still fits in a byte.
+    """
+    return (
+        40 + (index * 61) % 120,
+        30 + (index * 83) % 180,
+        20 + (index * 97) % 200,
+    )
+
+
 def _write_clip(
     root: Path,
     *,
@@ -77,7 +93,7 @@ def _write_clip(
     n_frames: int,
     crop_ids: list[int],
     skeleton_ids: list[int],
-    base_colour: int,
+    colour: tuple[int, int, int],
 ) -> dict[str, Any]:
     crop_dir = root / "clips" / video / scene / track
     skel_dir = root / "clips" / video / scene / f"{track}_skeleton"
@@ -85,7 +101,7 @@ def _write_clip(
     h, w = 32, 16
     for index in range(n_frames):
         rgba = np.zeros((h, w, 4), dtype=np.uint8)
-        rgba[4:28, 4:12, :3] = (base_colour + index * 10, 80, 120)
+        rgba[4:28, 4:12, :3] = (colour[0] + index * 10, colour[1], colour[2])
         rgba[4:28, 4:12, 3] = 255
         pose = np.zeros((h, w, 3), dtype=np.uint8)
         pose[6:26, 7:9] = 255
@@ -114,10 +130,11 @@ def _tiny_probe_set(
     skeleton_ids: list[int] | None = None,
     n_clips: int = 1,
 ) -> Path:
-    """``n_clips=2`` puts the second clip in a *different video*.
+    """Clips cycle through the training-split videos, one per clip.
 
-    The null control borrows a keyframe from another video, so anything that
-    drives the full arm list needs at least two. One clip is enough for the
+    The null control borrows a keyframe from another *video*, so anything that
+    drives the full arm list needs at least two clips, and a paired comparison
+    wants eight before it will call a direction. One clip is enough for the
     loader tests and keeps their row counts readable.
     """
     root = tmp_path / "probe_set"
@@ -128,28 +145,16 @@ def _tiny_probe_set(
     records = [
         _write_clip(
             root,
-            video=TRAINING_SPLIT_VIDEOS[0],
-            scene="scene_001",
-            track="track_0001",
+            video=TRAINING_SPLIT_VIDEOS[index % len(TRAINING_SPLIT_VIDEOS)],
+            scene=f"scene_{index + 1:03d}",
+            track=f"track_{index + 1:04d}",
             n_frames=n_frames,
             crop_ids=crop_ids,
             skeleton_ids=skeleton_ids,
-            base_colour=40,
+            colour=_clip_colour(index),
         )
+        for index in range(n_clips)
     ]
-    if n_clips > 1:
-        records.append(
-            _write_clip(
-                root,
-                video=TRAINING_SPLIT_VIDEOS[1],
-                scene="scene_002",
-                track="track_0002",
-                n_frames=n_frames,
-                crop_ids=crop_ids,
-                skeleton_ids=skeleton_ids,
-                base_colour=170,
-            )
-        )
     manifest = {"schema": SCHEMA_ID, "probe_clips": records}
     root.mkdir(parents=True, exist_ok=True)
     (root / "manifest.json").write_text(json.dumps(manifest))
@@ -749,3 +754,152 @@ def test_lpips_bounds_fire_where_they_were_written() -> None:
     between = judge_engine_lpips(0.57, 0.42, 0.65)
     assert between.status == "between-floor-and-null"
     assert "0.420" in between.note and "0.650" in between.note
+
+
+def test_absence_of_an_appearance_effect_is_a_claim_about_the_interval() -> None:
+    """A near-zero point estimate with a wide interval rules nothing out, and
+    a 1.5-sigma effect is not a direction. Both were reported here as findings."""
+    from experiments.probe.bounds import judge_cross_appearance
+
+    tight = judge_cross_appearance(0.001, sigmas=0.1, standard_error=0.004)
+    assert tight.status == "no appearance pathway"
+    loose = judge_cross_appearance(0.001, sigmas=0.02, standard_error=0.050)
+    assert loose.status == "inside-noise", "wide interval cannot rule an effect out"
+    weak = judge_cross_appearance(0.09, sigmas=1.5, standard_error=0.060)
+    assert weak.status == "inside-noise"
+    leak = judge_cross_appearance(0.05, sigmas=3.0, standard_error=0.017)
+    assert leak.status == "init leakage only"
+    works = judge_cross_appearance(0.16, sigmas=4.0, standard_error=0.040)
+    assert works.status == "uses appearance"
+
+
+# ---------------------------------------------------------------------------
+# BP12: the cross-appearance control.
+
+
+def _cross_kwargs(tmp_path: Path, root: Path, **extra: Any) -> dict[str, Any]:
+    return {
+        "device": "cpu",
+        "seed": 0,
+        "out_dir": tmp_path / "cross",
+        "probe_root": root,
+        "keyframe_index": 0,
+        "offsets": (1, 2),
+        "lpips_metric": _FakeLpips(),
+        "paste_separation_lpips": 0.285,
+        "progress": lambda *_args, **_kwargs: None,
+        **extra,
+    }
+
+
+class _IgnoresAppearancePipe:
+    """Paints the same thing whatever it is shown. The wiring-fault case."""
+
+    def generate(
+        self,
+        conditioning: ConditioningBundle,
+        *,
+        seed: int,
+        device: Any,
+        params: GenerationParams,
+    ) -> np.ndarray:
+        del conditioning, seed, device
+        from src.components.generation._numpy import as_chw
+
+        width = params.width if params.width is not None else 512
+        height = params.height if params.height is not None else 512
+        canvas = np.zeros((height, width, 3), dtype=np.uint8)
+        canvas[:] = (90, 90, 90)
+        return as_chw(canvas)
+
+
+def test_an_engine_that_ignores_appearance_shows_no_cross_appearance_delta(
+    tmp_path: Path,
+) -> None:
+    from experiments.probe.cross_appearance import run_cross_appearance
+
+    root = _tiny_probe_set(tmp_path, n_frames=4, n_clips=10)
+    result = run_cross_appearance(
+        "pix2pix",
+        generator=_IgnoresAppearancePipe(),
+        **_cross_kwargs(tmp_path, root),
+    )
+    verdict = result.verdict
+    assert verdict["readable"] is True
+    assert verdict["n"] == 10
+    assert verdict["status"] == "no appearance pathway"
+    assert abs(verdict["lpips"]["delta"]) < 1e-9
+    assert "Check the wiring before the architecture" in verdict["note"]
+
+
+def test_an_engine_that_uses_appearance_shows_a_clear_delta(tmp_path: Path) -> None:
+    from experiments.probe.cross_appearance import run_cross_appearance
+
+    root = _tiny_probe_set(tmp_path, n_frames=4, n_clips=10)
+    result = run_cross_appearance(
+        "upscale-refine",
+        generator=_CopyPipe(),
+        **_cross_kwargs(tmp_path, root),
+    )
+    verdict = result.verdict
+    assert verdict["status"] == "uses appearance"
+    assert verdict["lpips"]["delta"] > 0.10
+    assert verdict["lpips"]["sigmas"] >= 2.0
+    assert "of the 0.285 a paste is worth" in verdict["note"]
+    assert verdict["psnr_db"]["delta"] > 0, "PSNR agrees, and is reported beside"
+
+
+def test_too_few_clips_claims_no_direction_however_large_the_effect(
+    tmp_path: Path,
+) -> None:
+    """A large sigma on three clips is not a result; compare_paired says so and
+    the bound must not overrule it."""
+    from experiments.probe.cross_appearance import run_cross_appearance
+
+    root = _tiny_probe_set(tmp_path, n_frames=4, n_clips=3)
+    result = run_cross_appearance(
+        "upscale-refine",
+        generator=_CopyPipe(),
+        **_cross_kwargs(tmp_path, root),
+    )
+    assert result.verdict["status"] == "underpowered"
+    assert result.verdict["lpips"]["delta"] > 0.10
+
+
+def test_both_arms_are_driven_through_the_same_path(tmp_path: Path) -> None:
+    """If the correct and the wrong appearance took different code paths, the
+    delta would compare invocations rather than appearances."""
+    from experiments.probe.cross_appearance import run_cross_appearance
+
+    root = _tiny_probe_set(tmp_path, n_frames=5, n_clips=2)
+    pipe = _RecordingSequencePipe()
+    result = run_cross_appearance(
+        "animate-anyone",
+        generator=pipe,
+        **_cross_kwargs(tmp_path, root, offsets=(1, 2, 3)),
+    )
+    assert result.drive_mode == "clip"
+    assert pipe.frame_calls == 0
+    # two clips x (own, wrong), one sequence call each, all in time order
+    assert pipe.sequence_calls == [[1, 2, 3]] * 4
+    assert [pair.donor_key for pair in result.pairs] == [
+        result.pairs[1].clip_key,
+        result.pairs[0].clip_key,
+    ]
+
+
+def test_a_single_usable_clip_is_not_a_comparison(tmp_path: Path) -> None:
+    from experiments.probe.cross_appearance import CrossAppearanceResult, summarise
+
+    empty = CrossAppearanceResult(
+        engine="pix2pix",
+        drive_mode="frame",
+        seed=0,
+        device="cpu",
+        offsets=[1],
+        keyframe_index=0,
+        paste_separation_lpips=0.285,
+    )
+    verdict = summarise(empty)
+    assert verdict["readable"] is False
+    assert "at least" in verdict["note"]
