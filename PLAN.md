@@ -183,7 +183,57 @@ the paper claims is transmitted — is the reported finding, not an escape.
 `plans/BP9-probe-harness.md` made the static-copy floor a permanent arm
 (`phase-bp/bp9`).
 
-### 2.4 Animate-Anyone has seen the held-out videos
+### 2.4 What the cross-appearance control actually shows
+
+Wave 3 concluded that no engine "uses appearance", reading each engine's
+object PSNR against the 11.47 dB static-copy floor. **That gate does not measure
+what it was taken to measure**, and a control run on 2026-08-23 separates the two
+questions.
+
+**The test.** Hold the model, the pose and the metric fixed; vary *only* the
+appearance. Generate twice — once with this clip's keyframe, once with another
+clip's keyframe — and score both against the true target. A model that uses
+appearance scores higher with the correct one. This is decisive where the floor
+is not, because a static copy is *real pixels in the wrong pose* while a
+generator is *synthetic pixels in the right pose*, and MSE structurally favours
+the former.
+
+| Engine | Δ correct − wrong | Δ LPIPS | Reading |
+|---|---|---|---|
+| `pose-controlnet` (no reference in training) | **+0.86 dB** | −0.004 | img2img init leakage |
+| `pose-ref-controlnet` (retrained *with* reference) | **+0.98 dB** | −0.007 | **same as above; the retrain added nothing** |
+| `ip-adapter-controlnet` | **+0.08 dB** | +0.009 | no appearance path at all |
+
+n=12, per-clip sd ≈ 2.0 dB, so se ≈ 0.58. The two ControlNet figures are ~1.5σ —
+suggestive, not solid. The IP-Adapter figure is solidly zero.
+
+**What this changes.** Three sharper statements replace "no engine uses
+appearance":
+
+1. **The only appearance signal reaching any ControlNet is the img2img init
+   image** (`strength=0.65`, so roughly a third of the init survives). That path
+   is untrained and identical before and after the retrain.
+2. **The retrain failed specifically, and the reason is architectural.** Painting
+   the reference under the skeleton puts identity into the *control* image, and
+   the control branch is trained to read structure. +0.12 dB over the
+   un-retrained model is inside noise. **Do not repeat this recipe.**
+3. **`ip-adapter-controlnet`'s dedicated appearance path is dead**, consistent
+   with it being the mislabelled segmentation checkpoint.
+
+**The static-copy floor is not a pass/fail gate for a generative arm on PSNR.**
+It remains a useful published reference and it is what exposed the original
+fault, but "below the floor" and "does not use appearance" are different claims
+and only the cross-appearance delta settles the second. The paper already says
+PSNR is the least informative metric for generatively reconstructed content;
+a gate was nonetheless built on it.
+
+**Still open, and it is the decisive one:** Animate-Anyone has not been run
+through this test. It is the only remaining architecture with a *designed*
+appearance pathway (ReferenceNet cross-attention rather than an init image).
+Wave 3 fed it a valid reference and read 8.96 dB against the floor — which, per
+the above, does not establish whether ReferenceNet is working.
+
+### 2.5 Animate-Anyone has seen the held-out videos
 
 Verified 2026-08-22 from `assets/dataset/pointstream_aa_meta.json`. The probe set
 holds out `alcaraz_highlights` and `djokovic_zverev`. Animate-Anyone's
@@ -207,7 +257,7 @@ Option 2 is the default unless someone argues otherwise. Whatever is chosen, the
 paper says which, because an unlabelled in-training score is the kind of thing a
 reviewer finds.
 
-### 2.5 Known environment limits
+### 2.6 Known environment limits
 
 - **SAM3 cannot load.** `torch.nn.attention` does not exist in torch 2.2.2. This
   blocks the SAM3 detector comparison (§7 P1 item 10) unless a second env is

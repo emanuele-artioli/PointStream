@@ -1,3 +1,9 @@
+> **SUPERSEDED 2026-08-23 by `BP10-appearance-pathway.md`.** Its options were
+> tried in Wave 3. Option A (retrain with a reference) is measured, flat and
+> understood — do not repeat it. Options B and B2 were read against the
+> static-copy floor, which `PLAN.md` §2.4 shows answers a different question.
+> Kept for the bounds discipline and the record of what was tried.
+
 # B′8 — Make the generator actually use appearance
 
 **The critical path. Everything in `PLAN.md` §7 P0 except item 1 is behind it.**
