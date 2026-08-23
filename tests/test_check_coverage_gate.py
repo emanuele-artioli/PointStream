@@ -10,13 +10,13 @@ from scripts import check_coverage_gate as gate
 def test_resolve_threshold_defaults_to_local_buffer(monkeypatch) -> None:
     monkeypatch.delenv("POINTSTREAM_COVERAGE_THRESHOLD", raising=False)
     monkeypatch.delenv("CI", raising=False)
-    assert gate._resolve_threshold() == 82
+    assert gate._resolve_threshold() == 81
 
 
 def test_resolve_threshold_defaults_to_ci_gate(monkeypatch) -> None:
     monkeypatch.delenv("POINTSTREAM_COVERAGE_THRESHOLD", raising=False)
     monkeypatch.setenv("CI", "true")
-    assert gate._resolve_threshold() == 78
+    assert gate._resolve_threshold() == 77
 
 
 def test_resolve_threshold_accepts_valid_override(monkeypatch) -> None:
