@@ -111,6 +111,100 @@ def paired_on_shared_clips(
     )
 
 
+@dataclass(frozen=True)
+class CrossRows:
+    engine: str
+    donor_mode: str
+    drive_mode: str
+    status: str
+    note: str
+    per_clip_lpips_delta: dict[str, float]
+    per_clip_psnr_delta: dict[str, float]
+
+
+def load_cross(out_dir: Path) -> list[CrossRows]:
+    """Every ``cross-appearance-*.json`` in ``out_dir``, keyed per clip."""
+    rows: list[CrossRows] = []
+    for path in sorted(out_dir.glob("cross-appearance-*.json")):
+        payload = json.loads(path.read_text())
+        verdict = payload.get("verdict") or {}
+        lpips: dict[str, float] = {}
+        psnr: dict[str, float] = {}
+        for pair in payload.get("pairs", []):
+            if pair.get("error"):
+                continue
+            key = str(pair["clip_key"])
+            if isinstance(pair.get("delta_lpips"), (int, float)):
+                lpips[key] = float(pair["delta_lpips"])
+            if isinstance(pair.get("delta_psnr_db"), (int, float)):
+                psnr[key] = float(pair["delta_psnr_db"])
+        rows.append(
+            CrossRows(
+                engine=str(payload["engine"]),
+                donor_mode=payload.get("donor_mode", "different-video"),
+                drive_mode=payload.get("drive_mode", "frame"),
+                status=str(verdict.get("status", "no verdict")),
+                note=str(verdict.get("note", "")),
+                per_clip_lpips_delta=lpips,
+                per_clip_psnr_delta=psnr,
+            )
+        )
+    return rows
+
+
+def cross_report(out_dir: Path) -> dict[str, Any]:
+    """Cross-appearance deltas, and every engine paired against every other.
+
+    Pairing the *deltas* is the comparison that matters. "This engine's
+    appearance pathway is stronger than that one's" is a claim about the
+    difference of two differences, and the clips are shared, so it is a paired
+    comparison and gets a standard error like any other.
+    """
+    rows = load_cross(out_dir)
+    report: dict[str, Any] = {"arms": [], "between": []}
+    for row in rows:
+        values = list(row.per_clip_lpips_delta.values())
+        psnr_values = list(row.per_clip_psnr_delta.values())
+        report["arms"].append(
+            {
+                "engine": row.engine,
+                "donor_mode": row.donor_mode,
+                "drive_mode": row.drive_mode,
+                "n_clips": len(values),
+                "delta_lpips": _mean(values),
+                "delta_psnr_db": _mean(psnr_values),
+                "status": row.status,
+                "note": row.note,
+            }
+        )
+    for first, second in _ordered_pairs(rows):
+        shared = sorted(set(first.per_clip_lpips_delta) & set(second.per_clip_lpips_delta))
+        if len(shared) < 2:
+            continue
+        comparison = compare_paired(
+            f"{first.engine}[{first.donor_mode}]",
+            [first.per_clip_lpips_delta[key] for key in shared],
+            f"{second.engine}[{second.donor_mode}]",
+            [second.per_clip_lpips_delta[key] for key in shared],
+            higher_is_better=True,
+        )
+        report["between"].append(
+            {"describe": comparison.describe(), "verdict": comparison.verdict,
+             "winner": comparison.winner}
+        )
+    return report
+
+
+def _ordered_pairs(rows: list[CrossRows]) -> list[tuple[CrossRows, CrossRows]]:
+    ordered = sorted(
+        rows,
+        key=lambda row: -(_mean(list(row.per_clip_lpips_delta.values())) or 0.0),
+    )
+    return [(ordered[i], ordered[j])
+            for i in range(len(ordered))
+            for j in range(i + 1, len(ordered))]
+
+
 def build_report(out_dir: Path) -> dict[str, Any]:
     """The ranked table, its anchors, and every comparison with its uncertainty."""
     loaded = load_run(out_dir)
@@ -146,6 +240,7 @@ def build_report(out_dir: Path) -> dict[str, Any]:
             for name, rows in sorted(loaded.items())
             if rows.refused
         },
+        "cross_appearance": cross_report(out_dir),
     }
     for rows in ranked:
         report["rows"].append(
@@ -214,6 +309,26 @@ def format_report(report: Mapping[str, Any]) -> str:
         lines.append(f"  {item['describe']}")
     if not report["adjacent"]:
         lines.append("  (fewer than two ranked engines)")
+    cross = report.get("cross_appearance") or {}
+    if cross.get("arms"):
+        lines += [
+            "",
+            "Cross-appearance: what the WRONG keyframe costs (higher = more use of appearance)",
+            f"  scale: a paste of the right player instead of the wrong one is worth "
+            f"{_f(null - floor) if floor and null else 'n/a'} LPIPS",
+            "",
+            f"{'engine':<24} {'donors':<16} {'n':>3} {'dLPIPS':>8} {'dPSNR':>7}  verdict",
+            "-" * 78,
+        ]
+        for arm in cross["arms"]:
+            lines.append(
+                f"{arm['engine']:<24} {arm['donor_mode']:<16} {arm['n_clips']:>3} "
+                f"{_f(arm['delta_lpips'], 3):>8} {_f(arm['delta_psnr_db'], 2):>7}  {arm['status']}"
+            )
+        if cross.get("between"):
+            lines += ["", "  Between arms (paired on clips, on the deltas themselves):"]
+            for item in cross["between"]:
+                lines.append(f"    {item['describe']}")
     if report["refused"]:
         lines += ["", "Refused:"]
         for engine, reason in report["refused"].items():

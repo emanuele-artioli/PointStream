@@ -936,3 +936,26 @@ def test_donor_modes_are_recorded_separately_and_never_overwrite(tmp_path: Path)
         "cross-appearance-pix2pix.json",
         "cross-appearance-pix2pix.same-video.json",
     ]
+
+
+def test_cross_appearance_arms_are_compared_on_their_deltas(tmp_path: Path) -> None:
+    """"This engine uses appearance more than that one" is a difference of two
+    differences, on shared clips, and needs a standard error like anything else."""
+    from experiments.probe.cross_appearance import run_cross_appearance
+    from experiments.probe.report import cross_report
+
+    root = _tiny_probe_set(tmp_path, n_frames=4, n_clips=10)
+    out = tmp_path / "cross"
+    run_cross_appearance(
+        "upscale-refine", generator=_CopyPipe(), **_cross_kwargs(tmp_path, root)
+    )
+    run_cross_appearance(
+        "pix2pix", generator=_IgnoresAppearancePipe(), **_cross_kwargs(tmp_path, root)
+    )
+    report = cross_report(out)
+    arms = {arm["engine"]: arm for arm in report["arms"]}
+    assert arms["upscale-refine"]["delta_lpips"] > arms["pix2pix"]["delta_lpips"]
+    assert len(report["between"]) == 1
+    between = report["between"][0]
+    assert between["verdict"] == "clear"
+    assert between["winner"] == "upscale-refine[different-video]"
