@@ -1,0 +1,154 @@
+# B′19 — The conditioning architecture: what to retrain, and the shared backbone
+
+**Owns:** `scripts/train_controlnet.py`, `src/components/generation/controlnet.py`
+and any new generator module, `src/contracts/capabilities.py` if a new
+conditioning capability is needed.
+
+**GATED. Do not start this brief on its own initiative.** It is Wave 3 in
+`WAVE-2026-08-24.md` and it is the only stream here that spends real GPU time.
+Four things must land first:
+
+| Gate | Brief | Why |
+|---|---|---|
+| **Headroom** | `BP13` | If a conventional encoder spends <10% of its bits on the player regions, none of this is worth training. The fork is written down in the wave plan. |
+| **Stop rule** | `BP14` | The last training run burned 14 GPU hours on a series flat from epoch 1, because it stopped on nothing. |
+| **Instrument** | `BP18` | Without an identity metric you cannot tell a retrain that works from one that merely moves the output. That is exactly how `BP10` went wrong. |
+| **Caption channel** | `BP17` | One appearance channel is already trained and switched off. Measure what it is worth before training a second one. |
+
+## Where the conditioning actually stands
+
+Not "the generators do not use appearance" — that is too coarse to plan from.
+Three channels are registered and all three are in a different state
+(`PLAN.md` §2.11):
+
+| Channel | Registered as | State | What this brief owes it |
+|---|---|---|---|
+| **text / caption** | `pose-controlnet`, alias `caption-controlnet` | **trained, never driven** | nothing — `BP17` handles it, no training |
+| **keyframe / reference image** | `pose-ref-controlnet` | trained, measured, **failed for a known reason** | a *correct* reference pathway, not the failed recipe |
+| **latent / image embedding** | `ip-adapter-controlnet` *declares* `appearance:image-embedding` | **declared, never trained** — the checkpoint is the mislabelled segmentation ControlNet (§2.3) | actually train one |
+
+There is also **`multi-controlnet`**, registered with pose *and* mask as separate
+conditions, deliberately excluded from the roster drive list and therefore
+**never measured**. It is the existing multi-condition arm and the cheapest
+possible probe of the shared-conditioning idea. Measure it before building
+anything.
+
+**Why `pose-ref-controlnet` failed, so it is not repeated.** The reference was
+painted *into the control image*, under the skeleton. The control branch is
+trained to read structure; putting identity there fights the branch's job.
++0.12 dB over the un-retrained model, inside noise (§2.4). **Do not repeat that
+recipe.** A reference must enter through a path built to carry appearance —
+cross-attention or an adapter — not through the structure channel.
+
+## The three candidates, cheapest first
+
+### 1. A real IP-Adapter arm — cheapest, closes a known gap
+
+`ip-adapter-controlnet` claims an image-embedding pathway it does not have,
+because line 82 of the training script put `"ip-adapter"` in the same branch as
+`"seg"` with `cond_dir = None`. An actual IP-Adapter is a small cross-attention
+adapter over a frozen backbone: cheap to train, and it makes the registry entry
+honest either way. **Even a negative result here is worth having**, because the
+roster currently carries an arm whose declared capability is fiction.
+
+Note the expected ceiling before training: IP-Adapter conditions on a **CLIP
+image embedding**, and §2.7's literature note is that those "lack fine-grained
+spatial details, causing appearance drift under large deformations". So expect a
+*semantic* appearance match — right kit colour, roughly right build — not
+identity. That is a real result to report, not a disappointment.
+
+### 2. Retrain a ControlNet on the coding task — medium
+
+Every current checkpoint was trained as *condition + prompt → image*. That is not
+what PointStream asks at inference, which is *reference + condition → this
+person at this pose*. `ControlNetDataset` yields `{image_path, cond_path, prompt}`
+and has an `include_reference` path already; the training task, not the
+hyperparameters, is what needs changing.
+
+**The reference must not go into the control image.** See above.
+
+### 3. Uni-ControlNet — the shared backbone with per-condition heads
+
+This is the architecture for "one model that takes any input type, with a head
+per input converting it to a common shape". It exists and is SD-1.5 based, which
+matches our stack.
+
+**What it does**, to be verified against the paper and repo before any
+integration: two adapters over a frozen SD-1.5 backbone —
+
+- a **local control adapter** taking structural conditions (canny, HED, sketch,
+  depth, segmentation, openpose, …) through condition-specific entry
+  convolutions into a **shared** feature path injected by feature
+  denormalisation, so N structural conditions cost one adapter rather than N
+  ControlNets;
+- a **global control adapter** taking a CLIP **image** embedding, which is the
+  appearance channel.
+
+That maps onto our axes almost exactly: the local adapter is the comparison
+backbone's conditioning slot (`eval-object` varies exactly these), and the global
+adapter is the appearance slot. It would also make the lattice cheaper — today
+each conditioning arm is a separate fine-tune.
+
+**UniControl** and **Composer** solve the same problem differently and are worth
+one paragraph of comparison in Related Work regardless of what we build.
+
+**Check the licence, and the weights' licence separately, before integrating.**
+That is the rule that stranded MOFA-Video and StableAnimator after the work was
+done, twice. Do not take a licence claim from this brief or from memory — read
+the repository and the model card, record the date checked, and write the finding
+into `DEFERRED.md` if it blocks.
+
+## The ReferenceNet extension, deferred from BP12
+
+`BP12` item 4 proposed adding **Champ** and **MusePose** — SD-1.5 ReferenceNet
+siblings of Animate-Anyone. That was deferred deliberately, and the reasoning
+still holds: the rationale rested on the cross-appearance test showing AA's
+pathway working, and that test cannot show it (§2.10). Adding two more arms
+before `BP18` exists buys two more rows that lose to a pasted keyframe.
+
+**Revisit only after `BP18` lands**, and then judge them on the identity axis,
+not on a distance-to-target metric. Licence check before integration, as above.
+
+## Bounds, to be written properly before any run
+
+Placeholders here on purpose — the real bounds must be written against `BP18`'s
+calibrated instrument, which does not exist yet, and against `BP13`'s headroom.
+What is already known and must not be forgotten:
+
+- **The static-copy floor is 0.4505 LPIPS / 13.51 dB** on this probe set, and no
+  engine has beaten it. Any retrain that does not beat it has not changed the
+  conclusion, whatever its training loss did.
+- **A falling diffusion loss is not evidence.** It fell throughout the last run
+  while sample quality was flat from epoch 1. `BP14` exists for this.
+- **A large cross-appearance delta is not evidence either.** A paste scores the
+  maximum on it.
+
+## Traps
+
+**Never a version bump on the pinned env.** Several forked models here are
+version-sensitive; a stray `pip install` has broken them before. New packages go
+in `pyproject.toml`, or into a separate conda env that is named in the report.
+
+**Train on the aligned data.** `assets/dataset` carries two frame-naming
+conventions inside one track group, and 44% of tracks are offset (§2.2). Pair by
+position, never by rebuilding a filename. `src/shared/tennis_dataset.py:95-110`
+is the correct pattern; its docstring describes the wrong convention, so do not
+"fix" the code to match the comment.
+
+**Animate-Anyone has seen both held-out videos** (§2.8). Any new arm trained on
+the same data inherits that problem, and the split must be stated.
+
+**One variable per run.** A retrain that also changes the conditioning, the
+prompt and the offsets measures nothing.
+
+## Done when
+
+Deliberately not fixed yet — the shape of "done" depends on `BP13`'s fork. At
+minimum, whatever is attempted here reports:
+
+- what was trained, on what task, with what stopping criterion and why it stopped;
+- its score against the static-copy floor **and** against `BP18`'s identity
+  instrument, with n and a standard error, paired on clips;
+- the licence status of anything integrated, with the date checked;
+- and, if the answer is that the architecture does not close the gap, that
+  written as a scoped finding rather than as a call for more tuning.

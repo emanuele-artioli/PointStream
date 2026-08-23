@@ -49,6 +49,7 @@ collide, and Wave 3 forks on BP13's number.
 | `BP17-caption-channel.md` | drive the trained-but-disabled caption channel | 2 |
 | `BP15-test-cull.md` | retire the pre-rewrite tree and its 433 tests | 2 — **after** BP16, never folded into it |
 | `BP14-training-stop-rule.md` | stop a run that cannot clear the bar | before any training, in any wave |
+| `BP19-conditioning-architecture.md` | IP-Adapter arm, retrain on the coding task, Uni-ControlNet shared backbone, ReferenceNet extension | **3 — gated**, does not self-start |
 | `DEFERRED.md` | — | real work deliberately not now |
 
 ## Done
