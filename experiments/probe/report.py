@@ -22,6 +22,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
 
+from experiments.probe.bounds import judge_cross_appearance
+from experiments.probe.cross_appearance import OWN, WRONG
 from experiments.probe.engines import BASELINES, STATIC_COPY, UNRELATED_IMAGE
 from src.components.metrics.comparison import PairedComparison, compare_paired
 
@@ -152,6 +154,38 @@ def load_cross(out_dir: Path) -> list[CrossRows]:
     return rows
 
 
+def rejudge(row: CrossRows, *, copy_delta: float | None) -> tuple[str, str]:
+    """Re-run the current bound over a stored record.
+
+    The status written into a record is the one that was current when it ran.
+    This bound has already been wrong once, so the report re-judges from the
+    per-clip deltas rather than trusting a stored verdict — otherwise fixing a
+    bound leaves every earlier record still asserting the retired reading.
+    """
+    values = list(row.per_clip_lpips_delta.values())
+    if len(values) < 2:
+        return "underpowered", f"{len(values)} usable clip(s)"
+    comparison = compare_paired(
+        WRONG, values, OWN, [0.0] * len(values), higher_is_better=True
+    )
+    verdict = judge_cross_appearance(
+        comparison.mean_difference,
+        sigmas=comparison.sigmas,
+        standard_error=comparison.standard_error,
+        copy_delta=copy_delta,
+        underpowered=comparison.verdict == "underpowered",
+    )
+    return verdict.status, verdict.note
+
+
+def copy_baseline_delta(rows: list[CrossRows]) -> float | None:
+    """What a pure paste scores on this control — the top of the copying axis."""
+    for row in rows:
+        if row.engine == STATIC_COPY and row.donor_mode == "different-video":
+            return _mean(list(row.per_clip_lpips_delta.values()))
+    return None
+
+
 def cross_report(out_dir: Path) -> dict[str, Any]:
     """Cross-appearance deltas, and every engine paired against every other.
 
@@ -161,10 +195,21 @@ def cross_report(out_dir: Path) -> dict[str, Any]:
     comparison and gets a standard error like any other.
     """
     rows = load_cross(out_dir)
-    report: dict[str, Any] = {"arms": [], "between": []}
+    copy_delta = copy_baseline_delta(rows)
+    report: dict[str, Any] = {
+        "arms": [],
+        "between": [],
+        "copy_baseline_lpips": copy_delta,
+        "reads_as": (
+            "dependence on the reference image, not quality. A pure paste tops "
+            "this scale with no network at all; read each delta beside that arm's "
+            "own score against the static-copy floor."
+        ),
+    }
     for row in rows:
         values = list(row.per_clip_lpips_delta.values())
         psnr_values = list(row.per_clip_psnr_delta.values())
+        status, note = rejudge(row, copy_delta=copy_delta)
         report["arms"].append(
             {
                 "engine": row.engine,
@@ -173,10 +218,14 @@ def cross_report(out_dir: Path) -> dict[str, Any]:
                 "n_clips": len(values),
                 "delta_lpips": _mean(values),
                 "delta_psnr_db": _mean(psnr_values),
-                "status": row.status,
-                "note": row.note,
+                "share_of_copy": (
+                    (_mean(values) or 0.0) / copy_delta if copy_delta else None
+                ),
+                "status": status,
+                "note": note,
             }
         )
+    report["arms"].sort(key=lambda arm: -(arm["delta_lpips"] or 0.0))
     for first, second in _ordered_pairs(rows):
         shared = sorted(set(first.per_clip_lpips_delta) & set(second.per_clip_lpips_delta))
         if len(shared) < 2:
@@ -317,17 +366,20 @@ def format_report(report: Mapping[str, Any]) -> str:
     if cross.get("arms"):
         lines += [
             "",
-            "Cross-appearance: what the WRONG keyframe costs (higher = more use of appearance)",
-            f"  scale: a paste of the right player instead of the wrong one is worth "
-            f"{_f(null - floor) if floor and null else 'n/a'} LPIPS",
+            "Cross-appearance: what the WRONG keyframe costs.",
+            f"  Reads as: {cross['reads_as']}",
+            f"  Copying anchor (a pure paste): {_f(cross.get('copy_baseline_lpips'), 3)} LPIPS",
             "",
-            f"{'engine':<24} {'donors':<16} {'n':>3} {'dLPIPS':>8} {'dPSNR':>7}  verdict",
-            "-" * 78,
+            f"{'arm':<24} {'donors':<16} {'n':>3} {'dLPIPS':>8} {'share':>6} {'dPSNR':>7}  verdict",
+            "-" * 86,
         ]
         for arm in cross["arms"]:
+            share = arm.get("share_of_copy")
+            share_text = f"{share:.0%}" if isinstance(share, float) else "n/a"
             lines.append(
                 f"{arm['engine']:<24} {arm['donor_mode']:<16} {arm['n_clips']:>3} "
-                f"{_f(arm['delta_lpips'], 3):>8} {_f(arm['delta_psnr_db'], 2):>7}  {arm['status']}"
+                f"{_f(arm['delta_lpips'], 3):>8} {share_text:>6} "
+                f"{_f(arm['delta_psnr_db'], 2):>7}  {arm['status']}"
             )
         if cross.get("between"):
             lines += ["", "  Between arms (paired on clips, on the deltas themselves):"]

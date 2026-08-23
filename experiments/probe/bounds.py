@@ -413,37 +413,54 @@ def judge_engine_lpips(
 
 
 # ---------------------------------------------------------------------------
-# Cross-appearance bounds, written 2026-08-23 before the control ran in clip
-# mode. The test: hold the model, the pose, the target and the metric fixed,
-# and vary *only* which keyframe the engine is shown. An engine that uses
-# appearance scores better with the right one.
+# Cross-appearance bounds. Written 2026-08-23 before the control ran, and
+# **rewritten the same day because the first version was wrong**. Both versions
+# are described here, because how a bound failed is worth as much as the bound.
 #
-# This is the test that settles whether a generator has an appearance pathway
-# at all. The static-copy floor does not settle it: a paste is real pixels in
-# the wrong pose while a generator is synthetic pixels in the right pose, and
-# MSE structurally favours the former (PLAN.md §2.4).
+# The test: hold the model, the pose, the target and the metric fixed, and vary
+# only which keyframe the engine is shown. The delta is what showing the wrong
+# player costs.
 #
-# **The scale comes from the same run.** Pasting the right keyframe instead of
-# the wrong one is worth ~0.285 LPIPS on this probe set (0.4505 against
-# 0.7358, measured 2026-08-23 over 12 clips at offsets 1-8). That is what
-# perfect use of the appearance signal is worth to this metric on this task,
-# so a generator's delta is reported as a *fraction* of it rather than as a
-# bare number.
+# WHAT THE FIRST VERSION CLAIMED, AND WHY IT WAS WRONG
 #
-# BP10 set the PSNR bands: >= +3 dB the pathway works, ~ +0.9 dB is img2img
-# init leakage (what both ControlNets showed, and what survived the retrain
-# unchanged), ~ 0 is a wiring fault. The LPIPS bands below are set at the same
-# places on the 0.285 scale: a third of it is a working pathway, a twentieth
-# is leakage.
-CROSS_APPEARANCE_WORKS_DB = 3.0
-CROSS_APPEARANCE_LEAKAGE_DB = 0.5
+# It read a large delta as "this engine has a working appearance pathway", took
+# BP10's PSNR bands (>= +3 dB works, ~ +0.9 leakage, ~ 0 wiring fault) onto the
+# LPIPS scale, and called the 0.285 LPIPS a paste is worth "what perfect use of
+# the appearance signal buys".
+#
+# Then the copying baselines were driven through the identical code path:
+#
+#     static-copy    (no model at all)   +0.285   100%
+#     upscale-refine (non-generative)    +0.185    65%
+#     pose-controlnet                    +0.166    58%
+#     animate-anyone (clip mode)         +0.107    37%
+#     ip-adapter-controlnet              +0.055    19%
+#
+# **The two arms with no generative network score highest.** The delta measures
+# how much of the reference image survives into the output -- copying -- and a
+# paste maximises it by definition. It does not measure whether a model renders
+# the right person; it cannot, because the arm that renders nothing wins.
+#
+# So 0.285 is the top of a *copying* axis, not of an appearance-use axis, and
+# "uses appearance" was never a reading this number could support. A generator
+# scoring below a paste on it is the expected case, not a finding.
+#
+# WHAT THIS VERSION CLAIMS
+#
+# Only that the output does or does not depend on the reference image, and by
+# how much relative to a pure copy measured in the same run. Whether that
+# dependence is *useful* is a separate question, answered by the arm's own
+# quality score against the static-copy floor -- where every engine currently
+# loses (PLAN.md 2.10).
+#
+# A verdict therefore requires the copying anchor. Without it this returns
+# "unanchored" rather than a number dressed as a conclusion.
+CROSS_DEPENDENT_LPIPS = 0.10
+CROSS_WEAK_LPIPS = 0.02
 
-CROSS_APPEARANCE_WORKS_LPIPS = 0.10
-CROSS_APPEARANCE_LEAKAGE_LPIPS = 0.02
-
-CROSS_USES_APPEARANCE = "uses appearance"
-CROSS_LEAKAGE = "init leakage only"
-CROSS_NO_PATHWAY = "no appearance pathway"
+CROSS_REFERENCE_DEPENDENT = "reference-dependent"
+CROSS_WEAKLY_DEPENDENT = "weakly reference-dependent"
+CROSS_REFERENCE_INDEPENDENT = "reference-independent"
 
 
 def judge_cross_appearance(
@@ -451,26 +468,39 @@ def judge_cross_appearance(
     *,
     sigmas: float,
     standard_error: float,
-    paste_separation: float | None = None,
+    copy_delta: float | None = None,
     underpowered: bool = False,
 ) -> BoundVerdict:
-    """Classify a cross-appearance LPIPS delta (wrong minus right; higher is better).
+    """Classify a cross-appearance LPIPS delta (wrong minus right; higher = more dependent).
 
-    Three questions, in order, because they need different evidence.
+    Says only how far the output moves when the reference changes, against what
+    a pure paste scores in the same run. It does **not** say the engine uses
+    appearance well: a paste tops this scale with no network at all.
 
-    1. **Is the sample big enough to say anything?** ``underpowered`` carries
-       ``compare_paired``'s own small-sample refusal, and a large sigma on three
-       clips does not overrule it.
-    2. **Can we say the effect is absent?** That needs the *interval* to sit
-       below the leakage band, not just the point estimate: ``0.001 +/- 0.05``
-       is equally consistent with a working pathway. Absence is a claim about
-       the upper bound, which is why it is checked before significance.
-    3. **Is a claimed effect real?** Two standard errors, because a +0.98 dB
-       one-and-a-half-sigma difference was reported here as a finding.
+    Four questions, in order, because they need different evidence.
+
+    1. **Is there an anchor?** Without a copying baseline the number has no
+       scale, and this project has published a bare "0.067" before.
+    2. **Is the sample big enough to say anything?** ``underpowered`` carries
+       ``compare_paired``'s small-sample refusal, which a large sigma on three
+       clips does not overrule.
+    3. **Can we say the effect is absent?** That is a claim about the *interval*,
+       not the point estimate: ``0.001 +/- 0.05`` is equally consistent with a
+       real dependence, so absence needs ``delta + 2se`` below the weak band.
+    4. **Is a claimed effect real?** Two standard errors, because a 1.5-sigma
+       +0.98 dB difference was reported here as a finding.
     """
-    share = ""
-    if paste_separation:
-        share = f", {delta_lpips / paste_separation:.0%} of the {paste_separation:.3f} a paste is worth"
+    if copy_delta is None:
+        return BoundVerdict(
+            metric="cross_appearance_lpips",
+            value=delta_lpips,
+            status="unanchored",
+            note=(
+                f"{delta_lpips:+.3f} LPIPS with no copying baseline measured in "
+                "this run. The scale is unknown, so this is a number, not a result"
+            ),
+        )
+    share = f", {delta_lpips / copy_delta:.0%} of the {copy_delta:.3f} a pure paste scores"
     if underpowered:
         return BoundVerdict(
             metric="cross_appearance_lpips",
@@ -482,14 +512,14 @@ def judge_cross_appearance(
             ),
         )
     upper = delta_lpips + 2.0 * standard_error
-    if upper < CROSS_APPEARANCE_LEAKAGE_LPIPS:
+    if upper < CROSS_WEAK_LPIPS:
         return BoundVerdict(
             metric="cross_appearance_lpips",
             value=delta_lpips,
-            status=CROSS_NO_PATHWAY,
+            status=CROSS_REFERENCE_INDEPENDENT,
             note=(
                 f"{delta_lpips:+.3f} LPIPS, at most {upper:+.3f} at two standard "
-                f"errors{share}: the wrong player costs this engine nothing. "
+                f"errors{share}: the wrong reference costs this engine nothing. "
                 "Check the wiring before the architecture"
             ),
         )
@@ -504,17 +534,20 @@ def judge_cross_appearance(
                 "an effect out either"
             ),
         )
-    if delta_lpips >= CROSS_APPEARANCE_WORKS_LPIPS:
+    if delta_lpips >= CROSS_DEPENDENT_LPIPS:
         return BoundVerdict(
             metric="cross_appearance_lpips",
             value=delta_lpips,
-            status=CROSS_USES_APPEARANCE,
-            note=f"{delta_lpips:+.3f} LPIPS at {sigmas:.1f}σ{share}",
+            status=CROSS_REFERENCE_DEPENDENT,
+            note=(
+                f"{delta_lpips:+.3f} LPIPS at {sigmas:.1f}σ{share}. Dependence, "
+                "not quality: read it beside this arm's own score against the floor"
+            ),
         )
     return BoundVerdict(
         metric="cross_appearance_lpips",
         value=delta_lpips,
-        status=CROSS_LEAKAGE,
+        status=CROSS_WEAKLY_DEPENDENT,
         note=(
             f"{delta_lpips:+.3f} LPIPS at {sigmas:.1f}σ{share}: real but small, "
             "the size of an untrained img2img init path"

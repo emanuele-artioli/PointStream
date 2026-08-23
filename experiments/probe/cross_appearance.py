@@ -1,23 +1,27 @@
-"""The cross-appearance control: does this engine use the appearance at all?
+"""The cross-appearance control: how much does the output depend on the reference?
 
 Hold the model, the pose, the target frame and the metric fixed. Vary **only**
-which keyframe the engine is shown — this clip's own, or a donor clip's from a
-different video. Score both against the true target. An engine with a working
-appearance pathway is worse with the wrong player; one without is indifferent.
+which keyframe the engine is shown — this clip's own, or a donor clip's. Score
+both against the true target. The delta is what showing the wrong player costs.
 
-**Why this and not the static-copy floor.** A paste is real pixels in the wrong
-pose; a generator is synthetic pixels in the right pose, and MSE structurally
-favours the former. "Below the floor" and "does not use appearance" are
-different claims and only this one settles the second (``PLAN.md`` §2.4).
+**What this does not measure, learned the hard way on 2026-08-23.** It was built
+to answer "does this engine use appearance at all", and it cannot. Driving the
+copying baselines through this same code path put ``static-copy`` — no model of
+any kind — at the **top** of the scale, with ``upscale-refine`` second, both
+above every generator. The delta ranks how much of the reference image survives
+into the output. A paste maximises that by construction.
 
-**The scale is measured, not assumed.** Pasting the right keyframe rather than
-the wrong one is worth ~0.285 LPIPS on this probe set. That is what perfect use
-of the appearance signal buys on this metric and this task, so an engine's
-delta is reported as a share of it.
+So read a delta as *dependence*, never as *quality*, and always beside the arm's
+own score against the static-copy floor. The two say different things: an engine
+can depend heavily on the reference and still reconstruct the player badly, and
+on this probe set every engine does (``PLAN.md`` §2.10).
 
-Clip mode matters here more than anywhere: the delta measured frame-by-frame
-says nothing about a pathway that was structurally disabled by driving a
-temporal model at T=1.
+**The scale is measured, not assumed.** A pure paste scores ~0.285 LPIPS on this
+probe set, and that is the top of a *copying* axis. Without that anchor the
+verdict refuses to classify at all.
+
+Clip mode still matters here: a delta measured frame-by-frame says nothing about
+a temporal model that was being driven at T=1.
 """
 
 from __future__ import annotations
@@ -40,7 +44,14 @@ from experiments.probe.clips import (
     load_coding_sequence,
     with_appearance,
 )
-from experiments.probe.engines import CANVAS, DEVICE, SEED, EnginePlan, plan_for
+from experiments.probe.engines import (
+    BASELINES,
+    CANVAS,
+    DEVICE,
+    SEED,
+    EnginePlan,
+    plan_for,
+)
 from experiments.probe.run import (
     DONOR_MODES,
     _coding_bundle,
@@ -187,7 +198,15 @@ def run_cross_appearance(
     probe_clips = clips if clips is not None else list_clips(probe_root)
     donors = donor_appearances(probe_clips, keyframe_index, mode=donor_mode)
     metric = lpips_metric if lpips_metric is not None else build_lpips(device)
-    built = generator if generator is not None else GENERATORS.build(engine)
+    if generator is not None:
+        built: Any = generator
+    elif engine in BASELINES:
+        # A baseline has no model. It goes through this control precisely so the
+        # scale can be read: a pasted keyframe is pure copying, and whatever it
+        # scores is what this test rewards in the absence of any pathway at all.
+        built = None
+    else:
+        built = GENERATORS.build(engine)
     _require_sequence_path(plan, built)
     params = GenerationParams(width=CANVAS, height=CANVAS, steps=plan.steps)
     drive_mode = "clip" if plan.sequence else "frame"
@@ -294,7 +313,7 @@ def summarise(result: CrossAppearanceResult) -> dict[str, Any]:
         lpips_cmp.mean_difference,
         sigmas=lpips_cmp.sigmas,
         standard_error=lpips_cmp.standard_error,
-        paste_separation=result.paste_separation_lpips,
+        copy_delta=result.paste_separation_lpips,
         underpowered=lpips_cmp.verdict == "underpowered",
     )
     payload: dict[str, Any] = {
@@ -310,7 +329,7 @@ def summarise(result: CrossAppearanceResult) -> dict[str, Any]:
             "sigmas": lpips_cmp.sigmas,
             "comparison": lpips_cmp.describe(),
         },
-        "paste_separation_lpips": result.paste_separation_lpips,
+        "copy_baseline_lpips": result.paste_separation_lpips,
     }
     own_psnr = [
         float(pair.own.object_psnr_db)

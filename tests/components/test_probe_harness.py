@@ -761,16 +761,43 @@ def test_absence_of_an_appearance_effect_is_a_claim_about_the_interval() -> None
     a 1.5-sigma effect is not a direction. Both were reported here as findings."""
     from experiments.probe.bounds import judge_cross_appearance
 
-    tight = judge_cross_appearance(0.001, sigmas=0.1, standard_error=0.004)
-    assert tight.status == "no appearance pathway"
-    loose = judge_cross_appearance(0.001, sigmas=0.02, standard_error=0.050)
+    anchored = {"copy_delta": 0.285}
+    tight = judge_cross_appearance(0.001, sigmas=0.1, standard_error=0.004, **anchored)
+    assert tight.status == "reference-independent"
+    loose = judge_cross_appearance(0.001, sigmas=0.02, standard_error=0.050, **anchored)
     assert loose.status == "inside-noise", "wide interval cannot rule an effect out"
-    weak = judge_cross_appearance(0.09, sigmas=1.5, standard_error=0.060)
+    weak = judge_cross_appearance(0.09, sigmas=1.5, standard_error=0.060, **anchored)
     assert weak.status == "inside-noise"
-    leak = judge_cross_appearance(0.05, sigmas=3.0, standard_error=0.017)
-    assert leak.status == "init leakage only"
-    works = judge_cross_appearance(0.16, sigmas=4.0, standard_error=0.040)
-    assert works.status == "uses appearance"
+    leak = judge_cross_appearance(0.05, sigmas=3.0, standard_error=0.017, **anchored)
+    assert leak.status == "weakly reference-dependent"
+    works = judge_cross_appearance(0.16, sigmas=4.0, standard_error=0.040, **anchored)
+    assert works.status == "reference-dependent"
+
+
+def test_a_cross_appearance_delta_without_a_copying_anchor_is_not_a_verdict() -> None:
+    """A pure paste tops this scale with no network at all, so the number means
+    nothing until that baseline is measured in the same run."""
+    from experiments.probe.bounds import judge_cross_appearance
+
+    unanchored = judge_cross_appearance(0.16, sigmas=4.0, standard_error=0.040)
+    assert unanchored.status == "unanchored"
+    assert "not a result" in unanchored.note
+
+
+def test_a_pure_copy_outscores_a_generator_on_this_control(tmp_path: Path) -> None:
+    """The finding that retired the first reading of this test: the arm with no
+    model wins it. A delta is dependence on the reference, never quality."""
+    from experiments.probe.cross_appearance import run_cross_appearance
+
+    root = _tiny_probe_set(tmp_path, n_frames=4, n_clips=10)
+    paste = run_cross_appearance(
+        "static-copy", **_cross_kwargs(tmp_path, root)
+    )
+    engine = run_cross_appearance(
+        "pix2pix", generator=_PaintPipe((90, 90, 90)), **_cross_kwargs(tmp_path, root)
+    )
+    assert paste.verdict["lpips"]["delta"] > engine.verdict["lpips"]["delta"]
+    assert paste.verdict["status"] == "reference-dependent"
 
 
 # ---------------------------------------------------------------------------
@@ -827,7 +854,7 @@ def test_an_engine_that_ignores_appearance_shows_no_cross_appearance_delta(
     verdict = result.verdict
     assert verdict["readable"] is True
     assert verdict["n"] == 10
-    assert verdict["status"] == "no appearance pathway"
+    assert verdict["status"] == "reference-independent"
     assert abs(verdict["lpips"]["delta"]) < 1e-9
     assert "Check the wiring before the architecture" in verdict["note"]
 
@@ -842,10 +869,11 @@ def test_an_engine_that_uses_appearance_shows_a_clear_delta(tmp_path: Path) -> N
         **_cross_kwargs(tmp_path, root),
     )
     verdict = result.verdict
-    assert verdict["status"] == "uses appearance"
+    assert verdict["status"] == "reference-dependent"
     assert verdict["lpips"]["delta"] > 0.10
     assert verdict["lpips"]["sigmas"] >= 2.0
-    assert "of the 0.285 a paste is worth" in verdict["note"]
+    assert "of the 0.285 a pure paste scores" in verdict["note"]
+    assert "Dependence, not quality" in verdict["note"]
     assert verdict["psnr_db"]["delta"] > 0, "PSNR agrees, and is reported beside"
 
 

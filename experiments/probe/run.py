@@ -688,7 +688,7 @@ def _require_sequence_path(plan: EnginePlan, built: Any) -> None:
     rounds of void Animate-Anyone verdicts. A silent fallback is worse than a
     crash because it produces a number.
     """
-    if not plan.sequence:
+    if not plan.sequence or plan.name in BASELINES:
         return
     if built is None or not hasattr(built, "generate_sequence"):
         raise RuntimeError(
