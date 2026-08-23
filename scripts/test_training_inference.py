@@ -6,7 +6,7 @@ import numpy as np
 
 from src.shared.tennis_dataset import TennisSkeletonDataset
 from scripts.train_pix2pix import UNetGenerator
-from src.shared.spade4tennis_arch import SPADEResNet9Generator
+from src.components.generation.spade4tennis_arch import SPADEResNet9Generator
 
 OUTPUT_DIR = Path("outputs/inference_smoke")
 

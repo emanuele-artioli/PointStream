@@ -61,7 +61,7 @@ class Spade4TennisGenerator(BaseFrameGenerator):
         return as_chw(output)
 
     def _load_model(self, device: Device) -> Any:
-        from src.shared.spade4tennis_arch import SPADEResNet9Generator
+        from src.components.generation.spade4tennis_arch import SPADEResNet9Generator
 
         path = _resolve_weight(self.checkpoint, _DEFAULT_WEIGHT)
         net = SPADEResNet9Generator(in_nc=3, out_nc=3, ngf=64, n_blocks=9)

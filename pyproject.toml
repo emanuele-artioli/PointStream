@@ -73,7 +73,7 @@ source = ["src", "scripts"]
 omit = [
   "config-*.py",
   "*/config-*.py",
-  "src/decoder/animate_anyone_runtime.py",
+  "src/components/generation/animate_anyone_runtime.py",
   # The GPU/model-backed halves of the compositing package. weights.py and
   # pose_render.py are deliberately absent — splitting genai_compositor.py made
   # them reachable without a diffusion pipeline loaded.

@@ -10,7 +10,7 @@ import torch
 
 from src.shared import dwpose_draw
 from src.shared import track_id
-from src.shared import torch_dtype as td
+from src.components.generation import torch_dtype as td
 from src.transport.panorama_encoder import (
     JpegPanoramaEncoder,
     PngPanoramaEncoder,

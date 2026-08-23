@@ -10,20 +10,14 @@ Tests:
   7. Hinge losses: correct scalar output
   8. Spade4TennisStrategy: instantiates correctly
 """
-import sys
-import os
-
 import torch
-
-# Ensure project root is on path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 
 class TestSPADE:
     """Tests for the SPADE normalization layer."""
 
     def test_output_shape_matches_input(self):
-        from src.shared.spade4tennis_arch import SPADE
+        from src.components.generation.spade4tennis_arch import SPADE
 
         spade = SPADE(norm_nc=128, cond_nc=256, hidden_nc=64)
         x = torch.randn(2, 128, 32, 32)     # Shape: [B, norm_nc, H, W]
@@ -32,7 +26,7 @@ class TestSPADE:
         assert out.shape == (2, 128, 32, 32), f"Expected (2, 128, 32, 32), got {out.shape}"
 
     def test_condition_same_spatial_dims(self):
-        from src.shared.spade4tennis_arch import SPADE
+        from src.components.generation.spade4tennis_arch import SPADE
 
         spade = SPADE(norm_nc=64, cond_nc=64)
         x = torch.randn(1, 64, 16, 16)
@@ -45,7 +39,7 @@ class TestSPADEResBlock:
     """Tests for the SPADE residual block."""
 
     def test_same_channels(self):
-        from src.shared.spade4tennis_arch import SPADEResBlock
+        from src.components.generation.spade4tennis_arch import SPADEResBlock
 
         block = SPADEResBlock(fin=256, fout=256, cond_nc=256)
         x = torch.randn(2, 256, 16, 16)
@@ -54,7 +48,7 @@ class TestSPADEResBlock:
         assert out.shape == (2, 256, 16, 16)
 
     def test_different_channels(self):
-        from src.shared.spade4tennis_arch import SPADEResBlock
+        from src.components.generation.spade4tennis_arch import SPADEResBlock
 
         block = SPADEResBlock(fin=128, fout=256, cond_nc=256)
         x = torch.randn(1, 128, 32, 32)
@@ -68,7 +62,7 @@ class TestReferenceEncoder:
     """Tests for the reference image encoder."""
 
     def test_downsampling(self):
-        from src.shared.spade4tennis_arch import ReferenceEncoder
+        from src.components.generation.spade4tennis_arch import ReferenceEncoder
 
         enc = ReferenceEncoder(in_nc=3, nf=64)
         x = torch.randn(2, 3, 512, 512)
@@ -81,7 +75,7 @@ class TestSPADEResNet9Generator:
     """Tests for the full generator."""
 
     def test_forward_shape(self):
-        from src.shared.spade4tennis_arch import SPADEResNet9Generator
+        from src.components.generation.spade4tennis_arch import SPADEResNet9Generator
 
         gen = SPADEResNet9Generator(in_nc=3, out_nc=3, ngf=64, n_blocks=9)
         skeleton = torch.randn(1, 3, 256, 256)
@@ -90,7 +84,7 @@ class TestSPADEResNet9Generator:
         assert out.shape == (1, 3, 256, 256), f"Expected (1, 3, 256, 256), got {out.shape}"
 
     def test_output_range(self):
-        from src.shared.spade4tennis_arch import SPADEResNet9Generator
+        from src.components.generation.spade4tennis_arch import SPADEResNet9Generator
 
         gen = SPADEResNet9Generator(in_nc=3, out_nc=3, ngf=32, n_blocks=3)
         skeleton = torch.randn(1, 3, 64, 64)
@@ -101,7 +95,7 @@ class TestSPADEResNet9Generator:
             f"Output range [{out.min():.2f}, {out.max():.2f}] outside [-1, 1]"
 
     def test_param_count_lite(self):
-        from src.shared.spade4tennis_arch import SPADEResNet9Generator
+        from src.components.generation.spade4tennis_arch import SPADEResNet9Generator
 
         gen = SPADEResNet9Generator(in_nc=3, out_nc=3, ngf=64, n_blocks=9)
         n_params = sum(p.numel() for p in gen.parameters())

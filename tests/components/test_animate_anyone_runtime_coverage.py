@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 import torch
 
-from src.decoder import animate_anyone_runtime as runtime
+from src.components.generation import animate_anyone_runtime as runtime
 
 
 @pytest.fixture(autouse=True)

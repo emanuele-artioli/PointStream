@@ -519,7 +519,7 @@ def _torch_generator(device: Device, seed: int) -> Any:
 def _dtype_for(device: Device) -> Any:
     import torch
 
-    from src.shared.torch_dtype import resolve_torch_dtype_for_device
+    from src.components.generation.torch_dtype import resolve_torch_dtype_for_device
 
     return resolve_torch_dtype_for_device(
         device, default_cuda=torch.float16, allowed_cuda={torch.float16, torch.bfloat16, torch.float32}

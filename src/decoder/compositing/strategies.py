@@ -10,7 +10,7 @@ from typing import Any
 import cv2
 import numpy as np
 import torch
-from src.shared.torch_dtype import resolve_torch_dtype_for_device
+from src.components.generation.torch_dtype import resolve_torch_dtype_for_device
 from src.decoder.compositing.pose_render import _render_pose_condition, _to_numpy_bgr
 _LOGGER = logging.getLogger(__name__)
 
@@ -259,7 +259,7 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
         if self._runtime_fn is not None:
             return self._runtime_fn
 
-        from src.decoder.animate_anyone_runtime import generate_frame
+        from src.components.generation.animate_anyone_runtime import generate_frame
 
         runtime_fn = generate_frame
         self._runtime_fn = runtime_fn
@@ -369,7 +369,7 @@ class AnimateAnyoneStrategy(BaseGenAIStrategy):
         device: torch.device,
         metadata_bbox: tuple[int, int, int, int] | None = None,
     ) -> torch.Tensor:
-        from src.decoder.animate_anyone_runtime import generate_sequence
+        from src.components.generation.animate_anyone_runtime import generate_sequence
 
         reference_np = _to_numpy_bgr(reference_crop_tensor)
         pose_np = dense_dwpose_tensor.detach().cpu().numpy().astype(np.float32)

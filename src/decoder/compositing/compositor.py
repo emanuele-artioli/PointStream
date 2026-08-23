@@ -13,7 +13,7 @@ import numpy as np
 import torch
 from src.shared.genai_debug import export_compositor_artifacts
 from src.shared.tags import gpu_bound
-from src.shared.torch_dtype import is_cuda_device_usable
+from src.components.generation.torch_dtype import is_cuda_device_usable
 from src.decoder.compositing.pose_render import _render_pose_condition, _to_numpy_bgr
 from src.decoder.compositing.weights import _require_local_or_optin_weight
 from src.decoder.compositing.strategies import (

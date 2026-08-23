@@ -19,7 +19,7 @@ from src.decoder.genai_compositor import (
     _resolve_strategy_weight,
     _to_numpy_bgr,
 )
-from src.shared.spade4tennis_arch import SPADEResNet9Generator
+from src.components.generation.spade4tennis_arch import SPADEResNet9Generator
 
 _LOGGER = logging.getLogger(__name__)
 

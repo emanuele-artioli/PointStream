@@ -33,7 +33,7 @@ import torch.multiprocessing as mp
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data.distributed import DistributedSampler
 from src.shared.tennis_dataset import TennisSkeletonDataset
-from src.shared.spade4tennis_arch import SPADEResNet9Generator
+from src.components.generation.spade4tennis_arch import SPADEResNet9Generator
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 

@@ -8,7 +8,7 @@ import numpy as np
 from PIL import Image
 
 from src.decoder.genai_compositor import BaseGenAIStrategy, _to_numpy_bgr, _render_pose_condition
-from src.shared.torch_dtype import resolve_torch_dtype_for_device
+from src.components.generation.torch_dtype import resolve_torch_dtype_for_device
 from .attention_injection import ReferenceAttentionProcessor
 
 _LOGGER = logging.getLogger(__name__)

@@ -13,7 +13,7 @@ from src.decoder.genai_compositor import DiffusersCompositor
 from src.shared.dwpose_draw import draw_dwpose_canvas
 from src.shared.schemas import ActorPacket, EncodedChunkPayload
 from src.shared.tags import gpu_bound
-from src.shared.torch_dtype import is_cuda_device_usable, resolve_torch_dtype_for_device
+from src.components.generation.torch_dtype import is_cuda_device_usable, resolve_torch_dtype_for_device
 from src.transport.panorama_encoder import apply_panorama_delta, read_panorama_pixels_from_path
 
 

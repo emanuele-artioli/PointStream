@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 import torch
 
-from src.shared import torch_dtype as td
+from src.components.generation import torch_dtype as td
 
 
 class _FakeSample:

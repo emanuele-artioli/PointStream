@@ -22,7 +22,7 @@ from src.shared.schemas import ActorPacket, EncodedChunkPayload, FrameState, Res
 from src.shared.synthesis_engine import SynthesisEngine
 from src.shared.tags import gpu_bound
 from src.shared.track_id import scene_track_id_to_int
-from src.shared.torch_dtype import is_cuda_device_usable
+from src.components.generation.torch_dtype import is_cuda_device_usable
 
 
 _LOGGER = logging.getLogger(__name__)

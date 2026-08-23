@@ -22,7 +22,7 @@ from src.shared.schemas import (
     VideoChunk,
 )
 from src.shared.tags import gpu_bound
-from src.shared.torch_dtype import is_cuda_device_usable, resolve_torch_dtype_for_device
+from src.components.generation.torch_dtype import is_cuda_device_usable, resolve_torch_dtype_for_device
 
 
 class BallExtractor:
