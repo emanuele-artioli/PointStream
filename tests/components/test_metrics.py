@@ -8,7 +8,6 @@ numerics, third-party SSIM window edge handling. Those are either integration
 from __future__ import annotations
 
 import math
-from pathlib import Path
 
 import numpy as np
 import pytest
