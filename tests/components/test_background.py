@@ -8,7 +8,7 @@ import pytest
 from src.components.background import REGISTRY as BACKGROUND
 from src.components.background.plate import build_plate
 from src.components.background.sidecar import ALL_SIDECAR_CODECS, build_sidecar, normalize_sidecar
-from src.components.background.strategy import bind
+from src.components.background.strategy import BackgroundModel, bind
 from src.components.background.types import MODE_DELTA, MODE_FULL, MODE_NONE
 from src.components.rigid import REGISTRY as RIGID
 from src.contracts import config
@@ -22,6 +22,12 @@ from src.contracts.domain import (
 from src.contracts.errors import ConfigError, ConfigValueError, UnknownBackendError
 
 _REGISTRIES = {"background": BACKGROUND, "rigid": RIGID}
+
+
+def _model(name: str, **kwargs: object) -> BackgroundModel:
+    built = BACKGROUND.build(name, **kwargs)
+    assert isinstance(built, BackgroundModel)
+    return built
 
 
 def _photo_plate(height: int = 32, width: int = 48, seed: int = 0) -> np.ndarray:
@@ -63,15 +69,15 @@ class TestStrategyAndSidecarAreIndependent:
             BACKGROUND_NONE,
         ):
             assert name in BACKGROUND
-            built = BACKGROUND.build(name, codec="png")
-            assert built.method == name  # type: ignore[attr-defined]
+            built = _model(name, codec="png")
+            assert built.method == name
 
     def test_sidecar_choice_does_not_change_the_strategy(self) -> None:
         plate = _photo_plate()
-        jpeg = BACKGROUND.build("panorama-full", codec="jpeg", jpeg_quality=50)
-        png = BACKGROUND.build("panorama-full", codec="png")
-        jpeg_art = jpeg.transmit(plate, chunk_id="c0")  # type: ignore[union-attr]
-        png_art = png.transmit(plate, chunk_id="c0")  # type: ignore[union-attr]
+        jpeg = _model("panorama-full", codec="jpeg", jpeg_quality=50)
+        png = _model("panorama-full", codec="png")
+        jpeg_art = jpeg.transmit(plate, chunk_id="c0")
+        png_art = png.transmit(plate, chunk_id="c0")
         assert jpeg_art.method == png_art.method == BACKGROUND_PANORAMA_FULL
         assert jpeg_art.mode == png_art.mode == MODE_FULL
         assert jpeg_art.codec != png_art.codec
@@ -119,10 +125,10 @@ class TestPanoramaNeedsAPlanarCamera:
 class TestDeltaVersusFull:
     def test_single_chunk_delta_is_byte_identical_to_full(self) -> None:
         plate = _photo_plate(seed=3)
-        full = BACKGROUND.build("panorama-full", codec="png")
-        delta = BACKGROUND.build("panorama-delta", codec="png")
-        full_art = full.transmit(plate, scene_id="s0", chunk_id="c0")  # type: ignore[union-attr]
-        delta_art = delta.transmit(plate, scene_id="s0", chunk_id="c0")  # type: ignore[union-attr]
+        full = _model("panorama-full", codec="png")
+        delta = _model("panorama-delta", codec="png")
+        full_art = full.transmit(plate, scene_id="s0", chunk_id="c0")
+        delta_art = delta.transmit(plate, scene_id="s0", chunk_id="c0")
         assert full_art.payload == delta_art.payload
         assert full_art.mode == delta_art.mode == MODE_FULL
         assert full_art.cost().byte_count == delta_art.cost().byte_count
@@ -130,16 +136,16 @@ class TestDeltaVersusFull:
     def test_second_chunk_of_a_scene_can_differ(self) -> None:
         first = _photo_plate(seed=4)
         second = _perturb(first, seed=5)
-        full = BACKGROUND.build("panorama-full", codec="png")
-        delta = BACKGROUND.build("panorama-delta", codec="png")
+        full = _model("panorama-full", codec="png")
+        delta = _model("panorama-delta", codec="png")
 
-        first_full = full.transmit(first, scene_id="s0", chunk_id="c0")  # type: ignore[union-attr]
-        first_delta = delta.transmit(first, scene_id="s0", chunk_id="c0")  # type: ignore[union-attr]
+        first_full = full.transmit(first, scene_id="s0", chunk_id="c0")
+        first_delta = delta.transmit(first, scene_id="s0", chunk_id="c0")
         assert first_full.payload == first_delta.payload
 
-        decoded = delta.decode_payload(first_delta)  # type: ignore[union-attr]
-        second_full = full.transmit(second, scene_id="s0", chunk_id="c1")  # type: ignore[union-attr]
-        second_delta = delta.transmit(  # type: ignore[union-attr]
+        decoded = delta.decode_payload(first_delta)
+        second_full = full.transmit(second, scene_id="s0", chunk_id="c1")
+        second_delta = delta.transmit(
             second,
             previous_decoded=decoded,
             scene_id="s0",
@@ -153,10 +159,10 @@ class TestDeltaVersusFull:
     def test_a_new_scene_sends_full_even_under_delta(self) -> None:
         plate_a = _photo_plate(seed=6)
         plate_b = _photo_plate(seed=7)
-        delta = BACKGROUND.build("panorama-delta", codec="png")
-        first = delta.transmit(plate_a, scene_id="s0", chunk_id="c0")  # type: ignore[union-attr]
-        decoded = delta.decode_payload(first)  # type: ignore[union-attr]
-        second = delta.transmit(  # type: ignore[union-attr]
+        delta = _model("panorama-delta", codec="png")
+        first = delta.transmit(plate_a, scene_id="s0", chunk_id="c0")
+        decoded = delta.decode_payload(first)
+        second = delta.transmit(
             plate_b,
             previous_decoded=decoded,
             scene_id="s1",

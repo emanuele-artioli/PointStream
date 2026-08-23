@@ -14,7 +14,7 @@ import numpy as np
 import pytest
 
 from src.components.metrics import REGISTRY
-from src.components.metrics.evaluator import Evaluator
+from src.components.metrics.evaluator import Evaluator, MetricBackend
 from src.components.metrics.fvmd import FvmdMetric, frechet_distance
 from src.components.metrics.identity import bit_identical, close
 from src.components.metrics.lpips import LpipsMetric, perceptual_distance
@@ -90,7 +90,7 @@ def test_every_tier_scores_a_synthetic_clip_on_the_pipeline_path() -> None:
     """LPIPS is scored here, on frames, not only inside checkpoint evaluation."""
     ref = _uniform_clip(120, frames=3)
     pred = _uniform_clip(80, frames=3)
-    backends = {
+    backends: dict[str, MetricBackend] = {
         "vmaf": VmafMetric(model=_mock_vmaf),
         "lpips": LpipsMetric(extractor=_mean_color_extractor),
         "fvmd": FvmdMetric(tracker=_slide_tracker),
@@ -175,7 +175,9 @@ def test_registry_names_match_the_contract_and_do_not_include_fvd() -> None:
     assert set(REGISTRY.names()) == set(CONTRACT_METRICS)
     assert "fvmd" in REGISTRY
     assert "fvd" not in REGISTRY
-    assert REGISTRY.build("psnr").score(_uniform_clip(10), _uniform_clip(10)) == math.inf
+    psnr = REGISTRY.build("psnr")
+    assert isinstance(psnr, PsnrMetric)
+    assert psnr.score(_uniform_clip(10), _uniform_clip(10)) == math.inf
 
 
 def test_validate_backends_accepts_every_contract_metric() -> None:

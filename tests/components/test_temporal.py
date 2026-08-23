@@ -27,6 +27,12 @@ def _policy(**flags: bool) -> ConfigurableTemporalPolicy:
     )
 
 
+def _named(name: str) -> ConfigurableTemporalPolicy:
+    built = TEMPORAL.build(name)
+    assert isinstance(built, ConfigurableTemporalPolicy)
+    return built
+
+
 def _plan(policy: ConfigurableTemporalPolicy, n: int = 12, motion: list[float] | None = None):
     series = motion if motion is not None else [0.0] * n
     return policy.plan(frame_count=n, object_ids=("p1",), motion=series)
@@ -97,10 +103,10 @@ def test_reduced_pipeline_sparsity_schedules_fewer_perception_frames() -> None:
 
 
 def test_named_backends_select_the_three_levels() -> None:
-    meta = TEMPORAL.build("metadata-sparsity")
-    gen = TEMPORAL.build("generation-sparsity")
-    pipe = TEMPORAL.build("pipeline-sparsity")
-    none = TEMPORAL.build("none")
+    meta = _named("metadata-sparsity")
+    gen = _named("generation-sparsity")
+    pipe = _named("pipeline-sparsity")
+    none = _named("none")
     assert meta.config.metadata_sparsity and not meta.config.pipeline_sparsity
     assert gen.config.generation_sparsity and not gen.config.metadata_sparsity
     assert pipe.config.pipeline_sparsity and not pipe.config.generation_sparsity

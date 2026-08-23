@@ -46,7 +46,7 @@ def _result(boxes: SimpleNamespace, names: dict[int, str] | None = None) -> Simp
 class _PredictModel:
     def __init__(self, result: SimpleNamespace) -> None:
         self.result = result
-        self.calls: list[dict[object, object]] = []
+        self.calls: list[dict[str, object]] = []
 
     def predict(self, **kwargs: object) -> list[SimpleNamespace]:
         self.calls.append(kwargs)

@@ -21,15 +21,21 @@ _DETECTOR_BACKENDS = (
 )
 
 
+def _domain(name: str) -> DomainBackend:
+    built = DOMAINS.build(name)
+    assert isinstance(built, DomainBackend)
+    return built
+
+
 @pytest.mark.parametrize("name", ["tennis", "general"])
 def test_profiles_resolve_by_name_and_round_trip(name: str) -> None:
     spec = DOMAINS.spec(name)
-    built = DOMAINS.build(name)
+    built = _domain(name)
     assert spec.name == name
     assert built.name == name
     assert built.profile is profile(name)
     assert profile(built.name) is built.profile
-    again = DOMAINS.build(built.name)
+    again = _domain(built.name)
     assert again.profile is built.profile
     assert again.selector == spec.defaults["selector"]
 
@@ -50,7 +56,7 @@ def test_a_panorama_under_general_is_rejected_with_a_usable_message() -> None:
     A panorama under a free-moving camera is quietly incoherent, not slightly
     worse — the message has to say that, and name the residual fallback.
     """
-    general = DOMAINS.build("general")
+    general = _domain("general")
     with pytest.raises(ConfigValueError) as excinfo:
         general.assert_background_valid(BACKGROUND_PANORAMA_FULL)
     message = str(excinfo.value)
@@ -60,7 +66,7 @@ def test_a_panorama_under_general_is_rejected_with_a_usable_message() -> None:
 
 
 def test_tennis_still_accepts_a_panorama() -> None:
-    tennis = DOMAINS.build("tennis")
+    tennis = _domain("tennis")
     tennis.assert_background_valid(BACKGROUND_PANORAMA_FULL)
     assert tennis.profile is TENNIS
 
@@ -83,8 +89,8 @@ def test_a_profile_does_not_name_a_detector_backend() -> None:
 
 
 def test_the_profile_names_a_selector_it_does_not_encode_the_rule() -> None:
-    tennis = DOMAINS.build("tennis")
-    general = DOMAINS.build("general")
+    tennis = _domain("tennis")
+    general = _domain("general")
     assert tennis.selector == "heuristic"
     assert general.selector == "identity"
     assert not hasattr(tennis, "select_players")

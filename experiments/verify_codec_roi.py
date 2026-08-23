@@ -21,6 +21,14 @@ map is *precisely localized*: a -30 offset over a centred region with zero
 elsewhere moved that region +0.35 dB and left the rest unchanged to two decimals.
 Bits go where the map says and nowhere else.
 
+On ffmpeg n7.1.1-56 (`/opt/local/bin/ffmpeg`, libx264) native `addroi` at
+matched **QP** is a no-op: 20 frames of `assets/real_tennis.mp4` at 640x384,
+QP 45, preset veryfast, inside offset -30, produced byte-identical bitstreams
+and 0.00 dB PSNR change in the labelled region. The same filter at **CRF** 45
+is localized (+17.00 dB inside, 0.00 dB outside). CQP disables the AQ path
+libx264 uses for ROI, so AVC has no native arm under the contract's QP
+discipline. `--roi-arm auto` correctly stays on the pixel arm.
+
 **Matched QP is not matched rate.** The region arm at the same QP spends more
 bytes; more bits buying more quality is not a result. `--match-bitrate` walks a
 QP ladder, binary-searches the ROI-arm base QP onto each baseline's byte count,
@@ -46,6 +54,11 @@ Run:
     python -m experiments.verify_codec_roi --codec av1 --inside-offset -30 --outside-offset 0
     python -m experiments.verify_codec_roi --codec av1 --match-bitrate
     python -m experiments.verify_codec_roi --codec av1 --match-bitrate --ladder 40,45,50
+    python -m experiments.verify_codec_roi --codec avc --roi-arm native --preset veryfast
+
+AVC: ``--roi-arm auto`` selects the pixel arm (addroi is not a verified
+delta-QP map). Native addroi needs ``--roi-arm native`` and an x264 preset
+name, not the SVT-AV1 default ``8``.
 """
 
 from __future__ import annotations
@@ -445,8 +458,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--qp", type=int, default=45, help="High enough that QP offsets have room to act.")
     parser.add_argument(
         "--preset",
-        default="8",
-        help="Encoder preset in that codec's own vocabulary (svtav1 0-13, x264 names, vvenc names).",
+        default=None,
+        help="Encoder preset in that codec's own vocabulary (svtav1 0-13, x264 names, vvenc names). "
+        "Default: 8 for av1, veryfast for avc, ultrafast for hevc, faster for vvc.",
     )
     parser.add_argument("--inside-offset", type=int, default=-30, help="Negative means better quality. AV1: q_index units, ~4 per QP step.")
     parser.add_argument(
@@ -480,6 +494,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--match-tolerance", type=float, default=0.08)
     parser.add_argument("--out", type=Path, default=None, help="Where to write report.json.")
     args = parser.parse_args(argv)
+    if args.preset is None:
+        args.preset = {"av1": "8", "avc": "veryfast", "hevc": "ultrafast", "vvc": "faster"}[args.codec]
 
     if args.encoder_bin:
         env_key = {"av1": "SVTAV1_BIN", "hevc": "KVAZAAR_BIN", "avc": "FFMPEG_BIN", "vvc": "FFMPEG_BIN"}[args.codec]

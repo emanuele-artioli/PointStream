@@ -7,13 +7,19 @@ import pytest
 
 from src.components.background import REGISTRY as BACKGROUND
 from src.components.rigid import REGISTRY as RIGID
-from src.components.rigid.strategy import bind
+from src.components.rigid.strategy import TennisRigid, bind
 from src.components.rigid.types import ObservedObject, PlayerPose
 from src.contracts import config
 from src.contracts.config import BackendConfig, LatticeConfig, PointstreamConfig, validate_backends
 from src.contracts.errors import ConfigError, ConfigValueError, UnknownBackendError
 
 _REGISTRIES = {"background": BACKGROUND, "rigid": RIGID}
+
+
+def _backend(name: str, **kwargs: object) -> TennisRigid:
+    built = RIGID.build(name, **kwargs)
+    assert isinstance(built, TennisRigid)
+    return built
 
 
 def _racket_mask(height: int = 40, width: int = 40) -> np.ndarray:
@@ -72,8 +78,8 @@ class TestTennisBackendIsRegistered:
         assert loaded.rigid.backend == "tennis"
         validate_backends(loaded, registries=_REGISTRIES)
         assert "tennis" in RIGID
-        built = RIGID.build("tennis")
-        assert built.name == "tennis"  # type: ignore[attr-defined]
+        built = _backend("tennis")
+        assert built.name == "tennis"
 
     def test_class_strategies_are_switchable(self) -> None:
         for name in ("racket-hull", "ball-difference", "ball-segmentation", "none"):
@@ -99,8 +105,10 @@ class TestRigidOffChangesThePayload:
             objects, player_poses=poses, frames=frame[np.newaxis, ...], background_plate=plate
         )
 
-        assert on.cost().byte_count > 0
-        assert off.cost().byte_count == 0
+        on_bytes = on.cost().byte_count
+        off_bytes = off.cost().byte_count
+        assert on_bytes is not None and on_bytes > 0
+        assert off_bytes == 0
         assert off.payload != on.payload
         assert on.artifact_counts.get("racket", 0) >= 1
         assert off.artifact_counts == {}
@@ -110,10 +118,10 @@ class TestRigidOffChangesThePayload:
     def test_turning_one_class_off_changes_artifacts(self) -> None:
         objects = [_racket_object(), _ball_object()]
         poses = [_player_pose(0, (20.0, 30.0))]
-        both = RIGID.build("tennis", racket="hull", ball="segmentation")
-        racket_only = RIGID.build("tennis", racket="hull", ball="none")
-        both_payload = both.extract(objects, player_poses=poses)  # type: ignore[union-attr]
-        racket_payload = racket_only.extract(objects, player_poses=poses)  # type: ignore[union-attr]
+        both = _backend("tennis", racket="hull", ball="segmentation")
+        racket_only = _backend("tennis", racket="hull", ball="none")
+        both_payload = both.extract(objects, player_poses=poses)
+        racket_payload = racket_only.extract(objects, player_poses=poses)
         assert both_payload.artifact_counts.get("ball", 0) == 1
         assert racket_payload.artifact_counts.get("ball", 0) == 0
         assert "ball" in racket_payload.deferred_to_residual
@@ -123,7 +131,7 @@ class TestRigidOffChangesThePayload:
 class TestRacketIsAHullNotAPose:
     def test_hull_is_anchored_to_the_player_wrist(self) -> None:
         wrist = (20.0, 34.0)
-        payload = RIGID.build("racket-hull").extract(  # type: ignore[union-attr]
+        payload = _backend("racket-hull").extract(
             [_racket_object()],
             player_poses=[_player_pose(0, wrist)],
         )
@@ -143,7 +151,7 @@ class TestRacketIsAHullNotAPose:
 
     def test_keypoints_on_a_racket_are_rejected(self) -> None:
         with pytest.raises(ConfigValueError, match="no skeleton"):
-            RIGID.build("tennis").extract([_racket_object(with_keypoints=True)])  # type: ignore[union-attr]
+            _backend("tennis").extract([_racket_object(with_keypoints=True)])
 
     def test_keypoints_on_a_ball_are_rejected(self) -> None:
         ball = ObservedObject(
@@ -154,13 +162,13 @@ class TestRacketIsAHullNotAPose:
             keypoints=np.zeros((17, 3), dtype=np.float32),
         )
         with pytest.raises(ConfigValueError, match="no skeleton"):
-            RIGID.build("ball-segmentation").extract([ball])  # type: ignore[union-attr]
+            _backend("ball-segmentation").extract([ball])
 
 
 class TestBallStrategies:
     def test_difference_finds_a_blob_the_plate_does_not_have(self) -> None:
         frame, plate = _difference_frame()
-        payload = RIGID.build("ball-difference").extract(  # type: ignore[union-attr]
+        payload = _backend("ball-difference").extract(
             [],
             frames=frame[np.newaxis, ...],
             background_plate=plate,
@@ -174,7 +182,7 @@ class TestBallStrategies:
         assert 19 <= cy <= 27
 
     def test_segmentation_uses_the_mask_not_a_pose(self) -> None:
-        payload = RIGID.build("ball-segmentation").extract([_ball_object()])  # type: ignore[union-attr]
+        payload = _backend("ball-segmentation").extract([_ball_object()])
         assert len(payload.shapes) == 1
         assert payload.shapes[0].kind == "segmentation"
         assert payload.shapes[0].wrist_anchor is None

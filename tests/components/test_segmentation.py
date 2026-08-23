@@ -44,7 +44,7 @@ def test_sam3_segmenter_crops_a_full_frame_mask_to_the_box() -> None:
     full = np.zeros((40, 50), dtype=np.float32)
     full[6:14, 8:18] = 1.0
     result = SimpleNamespace(masks=SimpleNamespace(data=full[None, ...]))
-    calls: list[dict[object, object]] = []
+    calls: list[dict[str, object]] = []
 
     def predict(**kwargs: object) -> list[SimpleNamespace]:
         calls.append(kwargs)
