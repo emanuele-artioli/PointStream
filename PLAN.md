@@ -808,6 +808,14 @@ variable-keypoint training-regime robustness; representations with no decoder.
 Per stream before merge: `ruff` and `mypy` clean; the required-behaviour suite
 passes; tests cover plausible misuse, not line coverage.
 
+**Before any comparison is reported**, use
+`src.components.metrics.comparison.compare_paired`. It pairs arms on the same
+items, reports n and the standard error, and **refuses to name a winner the
+sample cannot support**. A +0.98 dB effect over 12 clips with a per-clip sd of
+2.0 dB is ~1.7σ, and was reported here as a finding because nothing in the path
+computed that. Under ~1σ is inside noise; 1–2σ is suggestive; fewer than 8 items
+is underpowered.
+
 **The required-behaviour suite** replaces a percentage gate, because a percentage
 gate is satisfiable by padding and this one is not. It asserts: **every metric is
 calibrated against known anchors** — ordering from identical through mild to
