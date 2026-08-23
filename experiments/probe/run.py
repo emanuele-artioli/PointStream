@@ -277,14 +277,25 @@ def _self_bundle(frame: ProbeFrame) -> ConditioningBundle:
     )
 
 
-def donor_for(clips: Sequence[ProbeClip], index: int) -> ProbeClip:
-    """The clip whose keyframe stands in for a wrong appearance.
+#: How a wrong appearance is chosen. The two answers measure different things.
+#:
+#: ``different-video`` is the default and the stronger null: a different court,
+#: kit and lighting as well as a different player.
+#:
+#: ``same-video`` is the *tighter* control. It holds the broadcast fixed and
+#: changes only the track, so a delta that survives it is not the model copying
+#: scene colour. Read it as a lower bound and nothing more: a tennis video has
+#: two players, so a same-video donor is sometimes the same person, and a small
+#: delta here is ambiguous between "copies the scene" and "drew the right man".
+DONOR_MODES = ("different-video", "same-video")
 
-    Prefers a different *video*, not merely a different track: two tracks from
-    one broadcast can hold the same two players, which would make the null
-    control secretly a match. Falls back to the next clip when every clip
-    shares a video.
-    """
+
+def donor_for(
+    clips: Sequence[ProbeClip], index: int, *, mode: str = "different-video"
+) -> ProbeClip:
+    """The clip whose keyframe stands in for a wrong appearance."""
+    if mode not in DONOR_MODES:
+        raise ValueError(f"donor mode must be one of {DONOR_MODES}; got {mode!r}")
     if len(clips) < 2:
         raise ValueError(
             "the null control needs a second clip to borrow an appearance from. "
@@ -292,20 +303,24 @@ def donor_for(clips: Sequence[ProbeClip], index: int) -> ProbeClip:
         )
     this = clips[index]
     n = len(clips)
+    want_same = mode == "same-video"
     for step in range(1, n):
         candidate = clips[(index + step) % n]
-        if candidate.video != this.video:
+        if (candidate.video == this.video) == want_same:
             return candidate
     return clips[(index + 1) % n]
 
 
 def donor_appearances(
-    clips: Sequence[ProbeClip], keyframe_index: int
+    clips: Sequence[ProbeClip],
+    keyframe_index: int,
+    *,
+    mode: str = "different-video",
 ) -> dict[str, tuple[str, np.ndarray]]:
     """``clip.key -> (donor key, that donor's keyframe RGB)``. Deterministic."""
     out: dict[str, tuple[str, np.ndarray]] = {}
     for index, clip in enumerate(clips):
-        donor = donor_for(clips, index)
+        donor = donor_for(clips, index, mode=mode)
         out[clip.key] = (donor.key, load_frame(donor, keyframe_index).appearance_rgb)
     return out
 

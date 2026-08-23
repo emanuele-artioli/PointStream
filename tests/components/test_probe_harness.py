@@ -903,3 +903,36 @@ def test_a_single_usable_clip_is_not_a_comparison(tmp_path: Path) -> None:
     verdict = summarise(empty)
     assert verdict["readable"] is False
     assert "at least" in verdict["note"]
+
+
+def test_donor_modes_pick_different_kinds_of_wrong_appearance(tmp_path: Path) -> None:
+    """Same-video isolates the player from the court; different-video does not."""
+    from experiments.probe.run import donor_for
+
+    root = _tiny_probe_set(tmp_path, n_frames=4, n_clips=6)
+    clips = list_clips(root)
+    # the fixture cycles five videos over six clips, so clip 0 and clip 5 share one
+    assert clips[0].video == clips[5].video
+    assert donor_for(clips, 0, mode="different-video").video != clips[0].video
+    assert donor_for(clips, 0, mode="same-video").key == clips[5].key
+    with pytest.raises(ValueError, match="donor mode must be one of"):
+        donor_for(clips, 0, mode="whatever")
+
+
+def test_donor_modes_are_recorded_separately_and_never_overwrite(tmp_path: Path) -> None:
+    from experiments.probe.cross_appearance import run_cross_appearance
+
+    root = _tiny_probe_set(tmp_path, n_frames=4, n_clips=10)
+    for mode in ("different-video", "same-video"):
+        result = run_cross_appearance(
+            "pix2pix",
+            generator=_IgnoresAppearancePipe(),
+            donor_mode=mode,
+            **_cross_kwargs(tmp_path, root),
+        )
+        assert result.donor_mode == mode
+    written = sorted(path.name for path in (tmp_path / "cross").glob("cross-appearance-*"))
+    assert written == [
+        "cross-appearance-pix2pix.json",
+        "cross-appearance-pix2pix.same-video.json",
+    ]

@@ -42,6 +42,7 @@ from experiments.probe.clips import (
 )
 from experiments.probe.engines import CANVAS, DEVICE, SEED, EnginePlan, plan_for
 from experiments.probe.run import (
+    DONOR_MODES,
     _coding_bundle,
     _generate_clip,
     _release,
@@ -88,6 +89,7 @@ class CrossAppearanceResult:
     offsets: list[int]
     keyframe_index: int
     paste_separation_lpips: float | None
+    donor_mode: str = "different-video"
     pairs: list[ClipPair] = field(default_factory=list)
     verdict: dict[str, Any] = field(default_factory=dict)
 
@@ -175,6 +177,7 @@ def run_cross_appearance(
     lpips_metric: Any = None,
     paste_separation_lpips: float | None = None,
     clips: tuple[ProbeClip, ...] | None = None,
+    donor_mode: str = "different-video",
     progress: Any = print,
 ) -> CrossAppearanceResult:
     """Drive ``engine`` twice per clip and compare. Checkpoints after every clip."""
@@ -182,7 +185,7 @@ def run_cross_appearance(
 
     plan = plan_for(engine)
     probe_clips = clips if clips is not None else list_clips(probe_root)
-    donors = donor_appearances(probe_clips, keyframe_index)
+    donors = donor_appearances(probe_clips, keyframe_index, mode=donor_mode)
     metric = lpips_metric if lpips_metric is not None else build_lpips(device)
     built = generator if generator is not None else GENERATORS.build(engine)
     _require_sequence_path(plan, built)
@@ -197,9 +200,10 @@ def run_cross_appearance(
         offsets=list(offsets),
         keyframe_index=keyframe_index,
         paste_separation_lpips=paste_separation_lpips,
+        donor_mode=donor_mode,
     )
     progress(
-        f"[cross] {engine} mode={drive_mode} clips={len(probe_clips)} "
+        f"[cross] {engine} mode={drive_mode} donors={donor_mode} clips={len(probe_clips)} "
         f"offsets={offsets} device={device} seed={seed}"
     )
     for clip in probe_clips:
@@ -252,9 +256,9 @@ def run_cross_appearance(
             )
         result.pairs.append(pair)
         result.verdict = summarise(result)
-        _write_json(out_dir / f"cross-appearance-{engine}.json", asdict(result))
+        _write_json(out_dir / _record_name(engine, donor_mode), asdict(result))
     result.verdict = summarise(result)
-    _write_json(out_dir / f"cross-appearance-{engine}.json", asdict(result))
+    _write_json(out_dir / _record_name(engine, donor_mode), asdict(result))
     progress(f"[cross] {engine}: {result.verdict.get('note', 'no verdict')}")
     return result
 
@@ -331,6 +335,13 @@ def summarise(result: CrossAppearanceResult) -> dict[str, Any]:
     return payload
 
 
+def _record_name(engine: str, donor_mode: str) -> str:
+    """Different donor modes answer different questions, so they never overwrite."""
+    if donor_mode == "different-video":
+        return f"cross-appearance-{engine}.json"
+    return f"cross-appearance-{engine}.{donor_mode}.json"
+
+
 def _fmt(value: float | None) -> str:
     return "n/a" if value is None else f"{value:.3f}"
 
@@ -362,6 +373,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--offset", action="append", type=int, dest="offsets",
         help="Repeatable. Default: the contiguous clip-mode offsets 1-8.",
+    )
+    parser.add_argument(
+        "--donor-mode",
+        choices=DONOR_MODES,
+        default="different-video",
+        help=(
+            "different-video: the stronger null. same-video: the tighter control "
+            "-- same court and lighting, different track -- read as a lower bound, "
+            "because a tennis video has two players and the donor is sometimes "
+            "the same one."
+        ),
     )
     parser.add_argument(
         "--separation-from",
@@ -397,6 +419,7 @@ def main(argv: list[str] | None = None) -> int:
             lpips_metric=metric,
             paste_separation_lpips=separation,
             clips=clips,
+            donor_mode=args.donor_mode,
         )
         _release(args.device)
     return 0
