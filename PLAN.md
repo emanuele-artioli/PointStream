@@ -233,7 +233,67 @@ appearance pathway (ReferenceNet cross-attention rather than an init image).
 Wave 3 fed it a valid reference and read 8.96 dB against the floor — which, per
 the above, does not establish whether ReferenceNet is working.
 
-### 2.5 Animate-Anyone has seen the held-out videos
+### 2.5 Why 11 dB, and why the number was never going to work
+
+Measured 2026-08-23. The 11 dB floor is **not** a model result and not really a
+metric artefact either — it is what this task scores when framed as pixel
+fidelity on a tracked crop.
+
+**Static copy, keyframe 0 pasted at frame N, object-scoped PSNR:**
+
+| Offset | Per-frame letterbox | Source coordinates |
+|---|---|---|
+| 1 | 17.00 dB | **21.53 dB** |
+| 2 | 15.02 | 16.94 |
+| 4 | 13.30 | 13.49 |
+| 8 | 11.16 | 11.36 |
+| 24 | 11.47 | 9.71 |
+
+Three things follow, and the third is the one that matters.
+
+**1. The tracking box is violently unstable.** Over one track: width 313–984 px,
+aspect ratio **0.30 to 1.14**, adjacent frames differing by ~29 px in width and
+~23 px in x. Each frame is letterboxed to 512² independently, so the player lands
+at a different scale and position in every canvas. That costs ~4.5 dB at adjacent
+frames (17.0 vs 21.5) and is a real, fixable defect.
+
+**2. But fixing geometry does not rescue the scale.** Even in exact source
+coordinates, two *adjacent* frames of the same player reach only 21.5 dB, and by
+offset 8 everything converges to ~11 dB whichever way it is measured. At larger
+offsets the letterbox is *better*, because re-centring accidentally compensates
+for real motion. So the usable dynamic range is roughly **11–21 dB**, with a
+per-clip sd of ~2 dB. Effects worth about 1 dB are being sought inside noise of
+about 2 dB across a span of about 10 dB. **No engine ranking taken in that band
+is trustworthy, in either direction.**
+
+**3. The field does not evaluate this with PSNR, and says so explicitly.**
+Generative face video coding states that because these methods do not optimise
+pixel-level distortion, *"traditional measures like PSNR and SSIM are not
+suitable"*, and uses **DISTS and LPIPS** instead. Sparse2Dense's headline
+74.5% BD-rate is **DISTS**, with LPIPS and FVD alongside — not PSNR. Our own
+Evaluation section already says PSNR is the least informative metric for
+generatively reconstructed content. We then built the gate on it.
+
+### 2.6 The players are 1% of the frame
+
+Measured over 40 tracks: a player bounding box averages **88,415 px, or 1.07% of
+a 4K frame**. Two players ≈ **2.1%**. So ~98% of every frame is background and
+court, which the background model carries and the codec would otherwise spend
+bits on.
+
+This has a consequence the component triage kept hiding: **the paper's claim is a
+frame-level rate–distortion claim, and it has never been run** (§7 P0 item 2).
+Every measurement so far has been pixel fidelity of a 1%-of-frame crop, judged by
+a metric the subfield rejects for exactly this content.
+
+**The bounding question, and it is cheap to answer:** how many bits does a
+conventional encoder actually spend on that 2%? Encode a clip normally, encode it
+again with the player regions flattened, and difference the bitrates. That number
+is the entire headroom of this paper. If the player region costs 30% of the
+bitrate there is a real prize; if it costs 3%, the premise is weak and we should
+know that before another engine is wired. **Run this before anything else.**
+
+### 2.7 Animate-Anyone has seen the held-out videos
 
 Verified 2026-08-22 from `assets/dataset/pointstream_aa_meta.json`. The probe set
 holds out `alcaraz_highlights` and `djokovic_zverev`. Animate-Anyone's
@@ -257,7 +317,7 @@ Option 2 is the default unless someone argues otherwise. Whatever is chosen, the
 paper says which, because an unlabelled in-training score is the kind of thing a
 reviewer finds.
 
-### 2.6 Known environment limits
+### 2.8 Known environment limits
 
 - **SAM3 cannot load.** `torch.nn.attention` does not exist in torch 2.2.2. This
   blocks the SAM3 detector comparison (§7 P1 item 10) unless a second env is
