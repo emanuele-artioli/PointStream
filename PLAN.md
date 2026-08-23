@@ -809,8 +809,10 @@ Per stream before merge: `ruff` and `mypy` clean; the required-behaviour suite
 passes; tests cover plausible misuse, not line coverage.
 
 **The required-behaviour suite** replaces a percentage gate, because a percentage
-gate is satisfiable by padding and this one is not. It asserts: bit-identity for
-deterministic stages; every lattice corner produces a runnable pipeline; config
+gate is satisfiable by padding and this one is not. It asserts: **every metric is
+calibrated against known anchors** — ordering from identical through mild to
+severe, a mild perturbation ranked above an unrelated image, and an absolute
+scale inside the published range; bit-identity for deterministic stages; every lattice corner produces a runnable pipeline; config
 rejects unknown keys; codec constraint violations raise; an undecodable
 appearance/motion pair is rejected; no layer imports outward; every registered
 backend constructs; every domain profile round-trips; every weight a shipped
