@@ -132,3 +132,23 @@ this is broken.
 
 **Cost.** Half a day. Deferred because `BP10` decides whether there is a paper at
 all, and this decides how clean it is.
+
+---
+
+## D6 — Two Animate-Anyone tests fail only in the full suite
+
+`tests/test_animate_anyone_runtime_coverage.py::test_load_pipeline_success_and_cache`
+and `::test_load_pipeline_raises_when_scheduler_config_is_not_mapping` **pass
+when the file runs alone (7/7) and fail when the whole suite runs.** That is test
+pollution, not a defect in `src/decoder/animate_anyone_runtime.py`: the file
+stubs `sys.modules` entries and something earlier in the suite leaves state
+behind.
+
+**Why deferred.** It is a pre-rewrite test file against a pre-rewrite module that
+Phase C deletes (`PLAN.md` §8: they die with their modules). Chasing the
+polluter costs more than the module has left to live.
+
+**Why it still matters.** Until then, "the suite is green" is not a statement
+anyone can make in one command, and a real regression could hide behind a
+failure everyone has learned to ignore. If the module outlives Phase C, fix the
+isolation instead of deleting the tests.
