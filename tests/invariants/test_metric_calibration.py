@@ -21,6 +21,8 @@ every other measurement in the project is read through.
 
 from __future__ import annotations
 
+from typing import cast
+
 import numpy as np
 import pytest
 
@@ -103,7 +105,7 @@ def test_metric_orders_identical_above_mild_above_severe(
     """
     from src.components.metrics import REGISTRY
 
-    metric: MetricBackend = REGISTRY.build(name)
+    metric = cast(MetricBackend, REGISTRY.build(name))
     reference, mild, severe, _unrelated = _anchors()
     try:
         scores = [
@@ -135,7 +137,7 @@ def test_metric_ranks_a_mild_perturbation_above_an_unrelated_image(
     against 0.085 for a good reconstruction, so a ranking on it was noise."""
     from src.components.metrics import REGISTRY
 
-    metric: MetricBackend = REGISTRY.build(name)
+    metric = cast(MetricBackend, REGISTRY.build(name))
     reference, mild, _severe, unrelated = _anchors()
     try:
         near = metric.score(reference, mild)
@@ -154,7 +156,7 @@ def test_metric_separates_a_mild_perturbation_from_an_unrelated_image(name: str)
     instrument is noise."""
     from src.components.metrics import REGISTRY
 
-    metric: MetricBackend = REGISTRY.build(name)
+    metric = cast(MetricBackend, REGISTRY.build(name))
     reference, mild, _severe, unrelated = _anchors()
     try:
         near = metric.score(reference, mild)
@@ -204,7 +206,7 @@ def test_metric_absolute_scale_matches_its_published_range(name: str) -> None:
     from src.components.metrics import REGISTRY
 
     low, high = _ABSOLUTE_ANCHORS[name]
-    metric: MetricBackend = REGISTRY.build(name)
+    metric = cast(MetricBackend, REGISTRY.build(name))
     reference, _mild, _severe, unrelated = _anchors()
     try:
         far = metric.score(reference, unrelated)
