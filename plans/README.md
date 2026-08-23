@@ -43,11 +43,9 @@ collide, and Wave 3 forks on BP13's number.
 
 | Brief | Owns | Wave |
 |---|---|---|
-| `BP16-ci-signal.md` | un-red the CI so regressions are visible again | **1** |
-| `BP13-motivating-headroom.md` | FG + BG headroom; rewrite the motivating example | **1 — the one that can change the plan** |
-| `BP18-appearance-identity-metric.md` | an instrument that separates "the output moved" from "the right body appeared" | **1** |
+| `BP20-headroom-real-ladder.md` | the headroom on **real 4K** across the codec ladder | **the one that can change the plan** |
+| `BP15-test-cull.md` | retire the pre-rewrite tree and its 433 tests | **unblocked** — CI is green |
 | `BP17-caption-channel.md` | drive the trained-but-disabled caption channel | 2 |
-| `BP15-test-cull.md` | retire the pre-rewrite tree and its 433 tests | 2 — **after** BP16, never folded into it |
 | `BP14-training-stop-rule.md` | stop a run that cannot clear the bar | before any training, in any wave |
 | `BP19-conditioning-architecture.md` | IP-Adapter arm, retrain on the coding task, Uni-ControlNet shared backbone, ReferenceNet extension | **3 — gated**, does not self-start |
 | `DEFERRED.md` | — | real work deliberately not now |
@@ -56,6 +54,8 @@ collide, and Wave 3 forks on BP13's number.
 
 `done/` holds finished briefs, each ending with a *Delivered* section. History,
 not instructions — `done/README.md` indexes them.
+
+**`BP16` (CI signal), `BP18` (identity instrument) and `BP13` (headroom harness) are done** (2026-08-23). `BP13`'s *number* is superseded by `BP20`: it measured a 96×128 synthetic court, and the decision taken from it is withdrawn (`PLAN.md` §2.13).
 
 **`BP12-clip-mode-roster.md` is done** (2026-08-23) and still sits here rather
 than in `done/` because its closing section is the current roster verdict.

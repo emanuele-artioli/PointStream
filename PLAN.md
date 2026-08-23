@@ -671,6 +671,59 @@ flattering. And this settles nothing about any engine. It is an instrument; §7'
 question is now answerable, not answered.
 
 
+### 2.13 The headroom harness is real; its number is synthetic
+
+`BP13` landed 2026-08-23 and did most of what it was asked. It also measured the
+wrong thing, and the distinction matters because a project decision was taken on
+the result.
+
+**What is sound.** `experiments/headroom/` encodes, removes and differences at
+matched quality; bounds were written before the encode; nulls were run (empty
+mask 0% saving, duplicate-encode rate ratio 1.0); the tool was resolved by path
+and version (`/opt/local/bin/ffmpeg n7.1.1-56-gc2184b65d2`). The paper paragraph
+is scoped honestly and says "synthetic" in its first clause.
+
+**What is not.** The clip is **96×128 and synthetic**
+(`experiments/headroom/synthetic.py`); nothing under `experiments/headroom/`
+reads `assets/`. So:
+
+| | measured | real |
+|---|---|---|
+| player area | ~4.7% of pixels | **~2.3%** (from 4K bboxes; §2.6 puts one player at 1.07%) |
+| codec | libx264 alone | the paper's ladder is **AVC/HEVC/AV1/VVC** (§7) |
+
+Both push the same way. Getting player area wrong by 2× matters because the
+quantity *is* what the players cost. And a stronger codec compresses the
+near-static background better, so the players take a **larger** share of what
+remains — making AVC the conservative rung and 12.2% possibly a floor.
+
+**The numbers, so they are on the record and not re-derived:** FG plate removal
+**12.2% ± 0.26 pp** (n=3 seeds), flat fill 3.6% ± 0.24, court-median 9.0%;
+BG panorama plate + homographies **17.4×** smaller than JPEG-coding the
+background over 24 frames — against a *still-image* baseline, which overstates
+conventional cost relative to inter-predicted video.
+
+**The alarm is real and survives.** Flat fill was written down as the arm that
+*overstates* the prize. It **understated** it — 3.6% against plate's 12.2% —
+because a grey hole in a green court is a high-contrast object and the encoder
+spends bits on its edges. Court-median fill sat between at 9.0%. So the
+bracketing assumption in `BP13` is void: **plate is both the honest
+reconstruction and the cheaper one to code here.** Carry all three fills forward.
+
+**The Wave-3 fork is WITHDRAWN.** It read "FG is in the 10–25% modest band;
+background and residual carry the paper; generator work is an improvement
+track". That is a project-steering decision taken from a 96×128 toy, and it does
+not stand. Nothing about direction is settled until `BP20` reports.
+
+**The material for the real measurement is on this host**, and the recorded
+reason for skipping it — "no full-frame player masks" — was wrong.
+`assets/raw_4k/` holds seven 3840×2160 matches, already AV1; and
+`track_<id>_metadata.json` carries a per-frame **bbox in full-frame
+coordinates**, which composites with the crop alpha into exactly the mask
+thought to be missing. §2.12's identity work reads the same sidecars.
+`plans/BP20-headroom-real-ladder.md` is the replacement.
+
+
 ---
 
 ## 3. Architecture
