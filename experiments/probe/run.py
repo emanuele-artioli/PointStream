@@ -64,6 +64,7 @@ from experiments.probe.clips import (
     ProbeFrame,
     bundle_arrays,
     bundle_coding,
+    caption_names_a_colour,
     list_clips,
     load_coding_sample,
     load_coding_sequence,
@@ -153,6 +154,9 @@ class ClipResult:
     vs_static_copy_db: float | None = None
     vs_static_copy_lpips: float | None = None
     appearance_use: str | None = None
+    prompt: str | None = None
+    prompt_source: str | None = None
+    caption_names_colour: bool | None = None
     error: str | None = None
 
 
@@ -251,6 +255,14 @@ def _write_json(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(_json_ready(payload), indent=2, default=str))
 
 
+def _prompt_meta(generator: Any) -> tuple[str | None, str | None]:
+    prompt = getattr(generator, "last_prompt", None)
+    source = getattr(generator, "last_prompt_source", None)
+    if isinstance(prompt, str) and prompt:
+        return prompt, str(source) if source else None
+    return None, None
+
+
 def _coding_bundle(sample: CodingSample) -> ConditioningBundle:
     payload = bundle_coding(sample)
     return ConditioningBundle(
@@ -261,6 +273,7 @@ def _coding_bundle(sample: CodingSample) -> ConditioningBundle:
         motion_field=payload["motion_field"],
         frame_index=payload["frame_index"],
         object_id=payload["object_id"],
+        caption=payload.get("caption"),
     )
 
 
@@ -274,6 +287,7 @@ def _self_bundle(frame: ProbeFrame) -> ConditioningBundle:
         motion_field=payload["motion_field"],
         frame_index=payload["frame_index"],
         object_id=payload["object_id"],
+        caption=payload.get("caption"),
     )
 
 
@@ -392,6 +406,8 @@ def _clip_row(
     anchors: Anchors,
     drive_mode: str,
     appearance_source: str | None,
+    prompt: str | None = None,
+    prompt_source: str | None = None,
 ) -> ClipResult:
     gap = judge_frame_gap(score.frame_psnr_db, score.object_psnr_db)
     row = ClipResult(
@@ -419,6 +435,9 @@ def _clip_row(
         lpips_box_padded=score.lpips_box_padded,
         drive_mode=drive_mode,
         appearance_source=appearance_source,
+        prompt=prompt,
+        prompt_source=prompt_source,
+        caption_names_colour=caption_names_a_colour(sample.caption) if sample.caption else False,
     )
     _apply_anchors(row, anchors)
     return row
@@ -844,6 +863,7 @@ def drive_engine(
                 engine_peak = max(engine_peak, peak)
                 epoch = _epoch_of(built)
                 per_frame = clip_wall / max(len(samples), 1)
+                prompt, source = _prompt_meta(built)
                 for sample, predicted in zip(samples, frames):
                     score = _score_coding(sample, predicted, lpips_metric=lpips_metric)
                     row = _clip_row(
@@ -858,6 +878,8 @@ def drive_engine(
                         anchors=used_anchors,
                         drive_mode=drive_mode,
                         appearance_source="own-keyframe",
+                        prompt=prompt,
+                        prompt_source=source,
                     )
                     rows.append(row)
                     progress(
@@ -948,6 +970,8 @@ def drive_engine(
                     anchors=used_anchors,
                     drive_mode=drive_mode,
                     appearance_source=appearance_source,
+                    prompt=_prompt_meta(built)[0],
+                    prompt_source=_prompt_meta(built)[1],
                 )
                 progress(
                     f"[probe] {plan.name} {clip.key} offset={offset} "

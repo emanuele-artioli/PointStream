@@ -18,8 +18,10 @@ from src.components.generation.animate_anyone import (
 from src.components.generation.controlnet import (
     FINAL_EPOCH,
     ControlNetGenerator,
+    _PROMPT,
     render_trajectory_control,
     resolve_controlnet_checkpoint,
+    resolve_prompt,
 )
 from src.components.generation.mofa import MofaVideoGenerator
 from src.components.generation.pix2pix import Pix2PixGenerator
@@ -92,6 +94,53 @@ def test_canny_controlnet_does_not_read_a_mask_out_of_the_pose_slot():
         params=GenerationParams(width=16, height=16),
     )
     assert out.shape[0] == 3
+
+
+def test_resolve_prompt_uses_the_track_caption_and_falls_back_when_it_is_empty() -> None:
+    """The trained text channel. Empty / whitespace is the generic fallback."""
+    prompt, source = resolve_prompt("a man in a purple shirt playing tennis")
+    assert source == "caption"
+    assert "purple" in prompt
+    for empty in (None, "", "   "):
+        prompt, source = resolve_prompt(empty)
+        assert source == "fallback"
+        assert prompt == _PROMPT
+
+
+def test_pose_controlnet_passes_the_track_caption_into_the_pipeline() -> None:
+    """Until this, generate always sent the generic fallback regardless of caption."""
+
+    class _CapturingPipe:
+        last: dict[str, Any] = {}
+
+        def __call__(self, **kwargs: Any) -> np.ndarray:
+            type(self).last = kwargs
+            return kwargs["image"]
+
+    gen = ControlNetGenerator(variant="pose", pipeline=_CapturingPipe())
+    caption = "a man in a purple shirt playing tennis"
+    gen.generate(
+        ConditioningBundle(
+            appearance=_chw(fill=10),
+            pose=_chw(fill=255),
+            caption=caption,
+        ),
+        seed=0,
+        device="cpu",
+        params=GenerationParams(width=16, height=16),
+    )
+    assert _CapturingPipe.last["prompt"] == caption
+    assert gen.last_prompt == caption
+    assert gen.last_prompt_source == "caption"
+
+    gen.generate(
+        ConditioningBundle(appearance=_chw(fill=10), pose=_chw(fill=255)),
+        seed=0,
+        device="cpu",
+        params=GenerationParams(width=16, height=16),
+    )
+    assert _CapturingPipe.last["prompt"] == _PROMPT
+    assert gen.last_prompt_source == "fallback"
 
 
 def test_no_registered_generator_accepts_conditioning_as_a_later_positional():

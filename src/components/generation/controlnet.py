@@ -73,6 +73,19 @@ _IP_ADAPTER_WEIGHT: Final = "ip-adapter_sd15.bin"
 _PROMPT: Final = "photorealistic tennis player, broadcast sports shot"
 
 
+def resolve_prompt(caption: str | None) -> tuple[str, str]:
+    """Return ``(prompt, source)``. ``source`` is ``caption`` or ``fallback``.
+
+    Training read the per-track BLIP caption when it existed. Inference
+    hardcoded the fallback, so every published ControlNet number ran with
+    that text channel off. Empty strings count as missing.
+    """
+    text = (caption or "").strip()
+    if text:
+        return text, "caption"
+    return _PROMPT, "fallback"
+
+
 def _repo_root() -> Path:
     return Path(__file__).resolve().parents[3]
 
@@ -267,6 +280,8 @@ class ControlNetGenerator(BaseFrameGenerator):
         self.loaded_checkpoint: str | None = None
         self.loaded_epoch: int | None = None
         self.last_seed: int | None = None
+        self.last_prompt: str | None = None
+        self.last_prompt_source: str | None = None
 
     def prepare(
         self, conditioning: ConditioningBundle, params: GenerationParams
@@ -315,6 +330,9 @@ class ControlNetGenerator(BaseFrameGenerator):
         init_hwc = as_hwc(init) if init is not None else appearance
         control = self._control_image(prepared)
         self.last_seed = int(seed)
+        prompt, source = resolve_prompt(conditioning.caption)
+        self.last_prompt = prompt
+        self.last_prompt_source = source
 
         output = self._call_pipeline(
             pipeline,
@@ -328,6 +346,7 @@ class ControlNetGenerator(BaseFrameGenerator):
             guidance=guidance,
             width=width,
             height=height,
+            prompt=prompt,
         )
         return as_chw(_coerce_output(output))
 
@@ -345,9 +364,10 @@ class ControlNetGenerator(BaseFrameGenerator):
         guidance: float,
         width: int,
         height: int,
+        prompt: str,
     ) -> Any:
         kwargs: dict[str, Any] = {
-            "prompt": _PROMPT,
+            "prompt": prompt,
             "height": height,
             "width": width,
             "num_inference_steps": steps,

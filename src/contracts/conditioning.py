@@ -255,6 +255,9 @@ class ConditioningBundle:
         frame_index: Index within the clip, for logging and for temporal
             backends that need to know where in a window they are.
         object_id: Stable identity of the object across frames.
+        caption: Optional per-track text prompt. ControlNets were trained with
+            these; inference used to ignore them. Empty/None means the
+            backend's generic fallback.
     """
 
     appearance: ArrayLike | None = None
@@ -266,6 +269,7 @@ class ConditioningBundle:
     bbox: tuple[int, int, int, int] | None = None
     frame_index: int | None = None
     object_id: str | None = None
+    caption: str | None = None
 
     def __post_init__(self) -> None:
         if self.bbox is not None:
@@ -348,11 +352,13 @@ class ConditioningBundle:
         in-place edit on one side is a divergence. Attaching the previously
         generated frame between calls is the common case.
         """
-        unknown = sorted(set(changes) - set(FIELDS) - {"bbox", "frame_index", "object_id"})
+        unknown = sorted(
+            set(changes) - set(FIELDS) - {"bbox", "frame_index", "object_id", "caption"}
+        )
         if unknown:
             raise ValueError(
                 f"ConditioningBundle has no field(s) {unknown}. "
-                f"Fields: {', '.join(sorted(FIELDS))}, bbox, frame_index, object_id."
+                f"Fields: {', '.join(sorted(FIELDS))}, bbox, frame_index, object_id, caption."
             )
         return replace(self, **changes)
 

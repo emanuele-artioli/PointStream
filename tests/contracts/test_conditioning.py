@@ -166,6 +166,16 @@ def test_with_fields_copies_rather_than_mutates() -> None:
     assert updated.object_id == "player_1"
 
 
+def test_caption_is_optional_and_survives_with_fields() -> None:
+    """The trained text channel. Optional so every existing caller stays valid."""
+    bare = ConditioningBundle(appearance=FakeArray())
+    assert bare.caption is None
+    labelled = bare.with_fields(caption="a man in a purple shirt playing tennis")
+    assert labelled.caption is not None
+    assert "purple" in labelled.caption
+    assert bare.caption is None
+
+
 def test_with_fields_rejects_a_field_that_does_not_exist() -> None:
     """A dict would have accepted this silently, and diverged the two sides."""
     with pytest.raises(ValueError, match="dense_dwpose_tensor"):

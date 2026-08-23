@@ -48,6 +48,7 @@ class ProbeFrame:
     canny: np.ndarray
     motion_field: np.ndarray
     split: str
+    caption: str | None = None
 
 
 @dataclass(frozen=True)
@@ -69,6 +70,7 @@ class CodingSample:
     canny: np.ndarray
     motion_field: np.ndarray
     split: str
+    caption: str | None = None
 
 
 @dataclass(frozen=True)
@@ -81,6 +83,76 @@ class ProbeClip:
     n_frames: int
     split: str
     record: dict[str, Any]
+    caption: str | None = None
+
+
+COLOUR_WORDS = (
+    "red",
+    "blue",
+    "green",
+    "yellow",
+    "white",
+    "black",
+    "orange",
+    "purple",
+    "pink",
+    "navy",
+    "maroon",
+    "gold",
+    "silver",
+    "grey",
+    "gray",
+    "teal",
+    "cyan",
+    "magenta",
+    "brown",
+    "beige",
+)
+
+
+def caption_names_a_colour(caption: str | None) -> bool:
+    if not caption:
+        return False
+    text = caption.lower()
+    return any(word in text.split() or word in text for word in COLOUR_WORDS)
+
+
+def load_track_caption(
+    track_dir: Path,
+    *,
+    video: str | None = None,
+    scene: str | None = None,
+    track: str | None = None,
+) -> str | None:
+    """Per-track BLIP sidecar. Probe-set copy first, then the dataset original.
+
+    Training read ``{track_dir.parent}/{track_dir.name}_caption.json``. Copying
+    that file into the probe set at materialise time is cleaner than reaching
+    across; this loader still falls back to ``assets/dataset`` so a probe set
+    built before that copy still finds the captions.
+    """
+    sidecar = track_dir.parent / f"{track_dir.name}_caption.json"
+    text = _caption_from_json(sidecar)
+    if text:
+        return text
+    if video and scene and track:
+        dataset = repo_root() / "assets" / "dataset" / video / "segmentations" / scene / f"{track}_caption.json"
+        return _caption_from_json(dataset)
+    return None
+
+
+def _caption_from_json(path: Path) -> str | None:
+    if not path.is_file():
+        return None
+    payload = json.loads(path.read_text())
+    if isinstance(payload, str):
+        text = payload.strip()
+        return text or None
+    if isinstance(payload, dict):
+        raw = payload.get("caption") or payload.get("text") or payload.get("prompt")
+        if isinstance(raw, str) and raw.strip():
+            return raw.strip()
+    return None
 
 
 def repo_root() -> Path:
@@ -129,6 +201,9 @@ def list_clips(root: Path | None = None) -> tuple[ProbeClip, ...]:
                 n_frames=int(record["num_frames"]),
                 split=split,
                 record=record,
+                caption=load_track_caption(
+                    track_dir, video=video, scene=str(record["scene"]), track=str(record["track"])
+                ),
             )
         )
     return tuple(clips)
@@ -233,6 +308,7 @@ def load_frame(clip: ProbeClip, frame_index: int) -> ProbeFrame:
         canny=canny,
         motion_field=motion,
         split=clip.split,
+        caption=clip.caption,
     )
 
 
@@ -283,6 +359,7 @@ def load_coding_sample(
         canny=canny,
         motion_field=motion,
         split=clip.split,
+        caption=clip.caption,
     )
 
 
@@ -296,6 +373,7 @@ def bundle_arrays(frame: ProbeFrame) -> dict[str, Any]:
         "motion_field": frame.motion_field,
         "frame_index": frame.frame_index,
         "object_id": frame.key,
+        "caption": frame.caption,
     }
 
 
@@ -309,6 +387,7 @@ def bundle_coding(sample: CodingSample) -> dict[str, Any]:
         "motion_field": sample.motion_field,
         "frame_index": sample.target_frame_index,
         "object_id": sample.key,
+        "caption": sample.caption,
     }
 
 
