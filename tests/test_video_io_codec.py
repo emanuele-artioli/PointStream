@@ -4,7 +4,7 @@ from types import SimpleNamespace
 
 import pytest
 
-import src.encoder.video_io as video_io
+import src.shared.video_io as video_io
 
 
 def test_ffmpeg_encoder_check_uses_exact_encoder_names(monkeypatch) -> None:

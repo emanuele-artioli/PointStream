@@ -5,7 +5,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from src.encoder.video_io import encode_video_frames_ffmpeg
+from src.shared.video_io import encode_video_frames_ffmpeg
 
 
 def create_dummy_video(path: Path, num_frames: int, width: int, height: int, fps: float) -> Path:

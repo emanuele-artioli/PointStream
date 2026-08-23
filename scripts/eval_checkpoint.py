@@ -47,7 +47,7 @@ from typing import Any
 import numpy as np
 import torch
 
-from src.encoder.video_io import encode_video_frames_ffmpeg
+from src.shared.video_io import encode_video_frames_ffmpeg
 from src.shared.experiment_evaluation import _compute_fvd, _compute_psnr, _compute_ssim_ffmpeg, _compute_vmaf_ffmpeg
 from src.shared.lpips_metric import compute_lpips_from_frames
 
@@ -371,45 +371,14 @@ def compute_residual_bytes(
     the same +128 offset (`apply_block_activity_gate`,
     `residual_to_encodable_uint8`) -- so the number prices the real signal.
 
-    ⚠️ **Not yet trustworthy as a ranking signal on padded actor crops.**
-    Measured 2026-07-22: **79.1% of a padded 512x512 crop is black** (RGBA
-    composited on black, then padded to square). A prediction of all-zeros is
-    therefore *correct* over four fifths of the frame and scores 811,630 B
-    against pix2pix's 1,514,916 B -- which says nothing about generative quality
-    and everything about the crop representation. Before this ranks anything,
-    the residual must be measured either masked to the actor region or on the
-    full composited frame (the plan's Phase 1.2), which is what the payload
-    actually contains. The mechanism is validated
-    (`tests/test_residual_bytes_metric.py`); the *scale it is applied at* is not.
+    Retired with ``src.encoder.residual_calculator``. The G2 finding stands:
+    this helper was not a ranking signal on padded crops (79% black). Score
+    generators on the decoder path instead.
     """
-    from src.encoder.residual_calculator import apply_block_activity_gate, residual_to_encodable_uint8
-
-    original = ground_truth_rgb01.clamp(0, 1) * 255.0  # Shape: [N, 3, H, W]
-    predicted = predicted_rgb01.clamp(0, 1) * 255.0  # Shape: [N, 3, H, W]
-    residual = original - predicted  # Shape: [N, 3, H, W], signed pixel units
-    residual = apply_block_activity_gate(residual, block_size, block_threshold)
-    encoded = residual_to_encodable_uint8(residual)  # Shape: [N, 3, H, W] uint8
-
-    height, width = encoded.shape[-2:]
-    frames_bgr = []
-    for frame in encoded:
-        hwc_rgb = frame.permute(1, 2, 0).cpu().numpy()  # Shape: [H, W, 3] RGB
-        frames_bgr.append(np.ascontiguousarray(hwc_rgb[:, :, ::-1]))
-
-    residual_path = tmp_dir / "residual.mp4"
-    residual_path.unlink(missing_ok=True)
-    encode_video_frames_ffmpeg(
-        output_path=residual_path,
-        frames_bgr=frames_bgr,
-        fps=fps,
-        width=width,
-        height=height,
-        codec=codec,
-        pix_fmt=pix_fmt,
-        crf=crf,
-        preset=preset,
+    raise RuntimeError(
+        "compute_residual_bytes retired with src.encoder.residual_calculator; "
+        "score generators on the decoder path, not this residual helper"
     )
-    return int(residual_path.stat().st_size)
 
 
 def compute_metrics_for_clip(

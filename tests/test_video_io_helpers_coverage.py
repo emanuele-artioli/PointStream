@@ -5,7 +5,7 @@ import io
 import numpy as np
 import pytest
 
-import src.encoder.video_io as video_io
+import src.shared.video_io as video_io
 
 
 def test_video_io_helper_parsers_and_presets() -> None:

@@ -45,7 +45,7 @@ import numpy as np  # noqa: E402
 import torch  # noqa: E402
 import torch.nn.functional as F  # noqa: E402
 
-from src.encoder.video_io import iter_video_frames_ffmpeg, probe_video_metadata  # noqa: E402
+from src.shared.video_io import iter_video_frames_ffmpeg, probe_video_metadata  # noqa: E402
 from src.shared.experiment_evaluation import evaluate_run_summary  # noqa: E402
 import copy  # noqa: E402
 from src.shared.hnerv_arch import (  # noqa: E402

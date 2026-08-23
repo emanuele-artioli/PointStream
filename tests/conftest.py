@@ -7,15 +7,11 @@ from typing import Any
 
 import pytest
 
-from src.encoder.actor_pipeline import ActorExtractor
-from tests.mock_components import MockActorExtractor
-from src.encoder.orchestrator import EncoderPipeline
-from src.encoder.video_io import (
+from src.shared.video_io import (
     encode_video_frames_ffmpeg,
     iter_video_frames_ffmpeg,
     probe_video_metadata,
 )
-from src.shared.config import PointstreamConfig
 
 
 def _create_test_run_artifacts_dir() -> Path:
@@ -42,61 +38,6 @@ def configure_test_debug_artifact_env(test_run_artifacts_dir: Path):
             os.environ.pop("POINTSTREAM_DEBUG_ARTIFACT_DIR", None)
         else:
             os.environ["POINTSTREAM_DEBUG_ARTIFACT_DIR"] = previous
-
-
-def _required_weight_paths() -> dict[str, Path]:
-    project_root = Path(__file__).resolve().parents[1]
-    weights_dir = project_root / "assets" / "weights"
-    paths = {
-        "detector": weights_dir / "yolo26n.pt",
-        "segmenter": weights_dir / "yolo26n-seg.pt",
-        "pose": weights_dir / "yolo26n-pose.pt",
-    }
-    missing = [name for name, path in paths.items() if not path.exists()]
-    if missing:
-        pytest.skip(f"Missing required actor weights in {weights_dir}: {', '.join(missing)}")
-    return paths
-
-
-@pytest.fixture(scope="session")
-def yolo_model_bundle() -> dict[str, Any]:
-    ultralytics = pytest.importorskip("ultralytics")
-    yolo_ctor = ultralytics.YOLO
-    paths = _required_weight_paths()
-    return {
-        "detector": yolo_ctor(str(paths["detector"])),
-        "segmenter": yolo_ctor(str(paths["segmenter"])),
-        "pose": yolo_ctor(str(paths["pose"])),
-    }
-
-
-@pytest.fixture()
-def real_actor_extractor(yolo_model_bundle: dict[str, Any]) -> ActorExtractor:
-    return ActorExtractor(
-        detector_model=yolo_model_bundle["detector"],
-        segmenter_model=yolo_model_bundle["segmenter"],
-        pose_model=yolo_model_bundle["pose"],
-        render_debug_keyframes=False,
-    )
-
-
-@pytest.fixture()
-def real_encoder_pipeline(real_actor_extractor: ActorExtractor):
-    pipeline = EncoderPipeline(config=PointstreamConfig(), actor_extractor=real_actor_extractor)
-    try:
-        yield pipeline
-    finally:
-        pipeline.shutdown()
-
-
-@pytest.fixture()
-def mock_encoder_pipeline():
-    from tests.mock_components import ObjectTracker
-    pipeline = EncoderPipeline(config=PointstreamConfig(), actor_extractor=MockActorExtractor(), object_tracker=ObjectTracker())
-    try:
-        yield pipeline
-    finally:
-        pipeline.shutdown()
 
 
 @pytest.fixture(scope="session")

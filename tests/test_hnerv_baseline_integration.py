@@ -13,7 +13,7 @@ import numpy as np
 import pytest
 
 from scripts import hnerv_baseline as hnerv
-from src.encoder.video_io import encode_video_frames_ffmpeg
+from src.shared.video_io import encode_video_frames_ffmpeg
 
 pytestmark = [pytest.mark.integration, pytest.mark.slow]
 

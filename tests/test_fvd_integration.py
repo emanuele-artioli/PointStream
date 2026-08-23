@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from src.encoder.video_io import decode_video_to_tensor, encode_video_frames_ffmpeg, iter_video_frames_ffmpeg, probe_video_metadata
+from src.shared.video_io import decode_video_to_tensor, encode_video_frames_ffmpeg, iter_video_frames_ffmpeg, probe_video_metadata
 from src.shared.fvd import compute_fvd_from_frames, default_weights_path
 
 

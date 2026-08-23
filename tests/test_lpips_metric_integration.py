@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from src.encoder.video_io import decode_video_to_tensor
+from src.shared.video_io import decode_video_to_tensor
 from src.shared.lpips_metric import compute_lpips_from_frames, default_weights_path
 
 pytestmark = [pytest.mark.integration, pytest.mark.slow]

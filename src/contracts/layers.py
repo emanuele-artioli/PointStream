@@ -70,11 +70,9 @@ LAYER_PACKAGES: dict[str, str] = {
 #: replaced; when this is empty, remove it.
 LEGACY_PACKAGES: frozenset[str] = frozenset(
     {
-        "src.encoder",
         "src.decoder",
         "src.shared",
         "src.transport",
-        "src.main",
     }
 )
 

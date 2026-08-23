@@ -1,10 +1,11 @@
+from dataclasses import dataclass, field
+from pathlib import Path
+
 import cv2
 import numpy as np
 import torch
-from pathlib import Path
 
 from src.decoder.genai_compositor import BaseCompositor
-from src.encoder.actor_pipeline import ActorExtractionResult
 from src.shared.schemas import (
     ActorPacket,
     BallPacket,
@@ -19,6 +20,15 @@ from src.shared.schemas import (
     VideoChunk,
 )
 from src.shared.tags import gpu_bound
+
+
+@dataclass
+class ActorExtractionResult:
+    """Stand-in for the retired encoder actor-pipeline result type."""
+
+    frame_states: list[FrameState]
+    actor_packets: list[ActorPacket]
+    profile: dict[str, float] = field(default_factory=dict)
 
 
 class MockActorExtractor:

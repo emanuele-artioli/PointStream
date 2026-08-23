@@ -10,7 +10,7 @@ import tempfile
 
 import numpy as np
 
-from src.encoder.video_io import decode_video_to_tensor
+from src.shared.video_io import decode_video_to_tensor
 from src.shared.fvd import compute_fvd_from_frames
 
 

@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from src.encoder.video_io import iter_video_frames_ffmpeg
+from src.shared.video_io import iter_video_frames_ffmpeg
 from src.components.generation.torch_dtype import is_cuda_device_usable
 
 

@@ -84,12 +84,6 @@ omit = [
   # and payload.py are deliberately absent — splitting actor_components.py is
   # what made them reachable without model weights, and an entry here is a debt
   # to repay rather than a permanent exemption.
-  "src/encoder/actors/detection.py",
-  "src/encoder/actors/segmentation.py",
-  "src/encoder/actors/pose.py",
-  "src/encoder/ball_extractor.py",
-  "src/encoder/residual_calculator.py",
-  "src/encoder/segmentation_ball_extractor.py",
   "src/shared/genai_debug.py",
   "src/decoder/controlnet_engine.py",
   "src/decoder/pix2pix_engine.py",

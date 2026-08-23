@@ -12,7 +12,7 @@ import numpy as np
 import torch
 
 from src.decoder.compositor import ResidualCompositor
-from src.encoder.video_io import encode_video_frames_ffmpeg
+from src.shared.video_io import encode_video_frames_ffmpeg
 from src.shared.mask_codec import decode_binary_mask
 from src.shared.profiling import PipelineProfiler
 from src.shared.schemas import ActorPacket, DecodedChunkResult, EncodedChunkPayload

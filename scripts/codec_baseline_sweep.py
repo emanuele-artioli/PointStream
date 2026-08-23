@@ -10,7 +10,7 @@ from the pipeline's Whole-Frame Residual Baseline (which still pays for
 panorama + actor references). Compare the two together to place PointStream
 on the rate-distortion map.
 
-Reuses `src.encoder.video_io.encode_video_frames_ffmpeg` (the exact FFmpeg
+Reuses `src.shared.video_io.encode_video_frames_ffmpeg` (the exact FFmpeg
 wrapper the pipeline uses to write residual.mp4) and
 `src.shared.experiment_evaluation.evaluate_run_summary` (the same PSNR/SSIM/VMAF
 code the pipeline evaluation uses), so numbers are apples-to-apples with any
@@ -51,7 +51,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.encoder.video_io import (  # noqa: E402
+from src.shared.video_io import (  # noqa: E402
     encode_video_frames_ffmpeg,
     iter_video_frames_ffmpeg,
     probe_video_metadata,
