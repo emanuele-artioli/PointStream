@@ -1,0 +1,103 @@
+"""One payload ledger for a run.
+
+The pre-rewrite tree split size counts across evaluation and invariants.
+This module is the only place the runner writes ``sizes_bytes``. Parts use
+the names the existing invariant check already reads: ``metadata``,
+``actor_reference``, ``residual``, ``panorama``, plus ``source`` and
+``transport_total``.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+from src.contracts.objectstream import WireCost
+
+#: Same tolerance the legacy invariant used. A second constant here would be
+#: a second ledger in disguise.
+SIZE_SUM_TOLERANCE = 0.02
+
+PARTS = ("metadata", "actor_reference", "residual", "panorama")
+
+
+@dataclass(frozen=True)
+class SizesBytes:
+    """What one run (or one chunk) sent, in bytes.
+
+    ``byte_count`` comes from measured ``WireCost`` / residual payloads, never
+    from a model of an encoder.
+    """
+
+    source: int
+    residual: int = 0
+    panorama: int = 0
+    actor_reference: int = 0
+    metadata: int = 0
+    transport_total: int = 0
+
+    def as_dict(self) -> dict[str, int | float]:
+        ratio = (
+            float(self.transport_total) / float(self.source) if self.source > 0 else 0.0
+        )
+        return {
+            "source": self.source,
+            "residual": self.residual,
+            "panorama": self.panorama,
+            "actor_reference": self.actor_reference,
+            "metadata": self.metadata,
+            "transport_total": self.transport_total,
+            "transport_to_source_ratio": ratio,
+        }
+
+    @property
+    def parts_sum(self) -> int:
+        return self.metadata + self.actor_reference + self.residual + self.panorama
+
+    def parts_fit(self) -> bool:
+        """Whether the named parts do not exceed the transported total."""
+        if self.transport_total <= 0:
+            return False
+        return self.parts_sum <= self.transport_total * (1.0 + SIZE_SUM_TOLERANCE)
+
+    def __add__(self, other: SizesBytes) -> SizesBytes:
+        return SizesBytes(
+            source=self.source + other.source,
+            residual=self.residual + other.residual,
+            panorama=self.panorama + other.panorama,
+            actor_reference=self.actor_reference + other.actor_reference,
+            metadata=self.metadata + other.metadata,
+            transport_total=self.transport_total + other.transport_total,
+        )
+
+
+def measured(cost: WireCost) -> int:
+    """Bytes from a stated ``WireCost``, or 0 when the cost is not on the wire."""
+    if cost.byte_count is None:
+        return 0
+    return int(cost.byte_count)
+
+
+def sizes_bytes(
+    *,
+    source: int,
+    residual: int = 0,
+    panorama: int = 0,
+    actor_reference: int = 0,
+    metadata: int = 0,
+) -> SizesBytes:
+    """Build one ledger. ``transport_total`` is the sum of transmitted parts.
+
+    All-off transmits the source itself, so when every semantic part is zero
+    the transported total is the source size — that is the baseline corner,
+    not a missing measurement.
+    """
+    parts = metadata + actor_reference + residual + panorama
+    transport_total = parts if parts > 0 else source
+    return SizesBytes(
+        source=source,
+        residual=residual,
+        panorama=panorama,
+        actor_reference=actor_reference,
+        metadata=metadata,
+        transport_total=transport_total,
+    )
