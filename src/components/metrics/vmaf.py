@@ -53,7 +53,15 @@ def _libvmaf_on_clips(reference: np.ndarray, predicted: np.ndarray) -> float:
         log_path = root / "vmaf.json"
         _write_png_clip(ref_dir, reference)
         _write_png_clip(pred_dir, predicted)
-        filter_complex = f"[0:v][1:v]libvmaf=log_path={log_path}:log_fmt=json"
+        # ffmpeg's libvmaf takes [distorted][reference], in that order. Input 0
+        # here is the reference and input 1 the prediction, so the labels are
+        # crossed deliberately. Passing them straight through scored a blurred
+        # clip at 100.0 against 97.4 for an identical one — see the calibration
+        # test in tests/components/test_metrics_integration.py.
+        filter_complex = (
+            f"[1:v]format=yuv420p[dist];[0:v]format=yuv420p[ref];"
+            f"[dist][ref]libvmaf=log_path={log_path}:log_fmt=json"
+        )
         command = [
             ffmpeg,
             "-hide_banner",
