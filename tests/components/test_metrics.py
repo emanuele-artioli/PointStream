@@ -17,7 +17,7 @@ from src.components.metrics import REGISTRY
 from src.components.metrics.evaluator import Evaluator, MetricBackend
 from src.components.metrics.fvmd import FvmdMetric, frechet_distance
 from src.components.metrics.identity import bit_identical, close
-from src.components.metrics.lpips import LpipsMetric, perceptual_distance
+from src.components.metrics.lpips import LpipsMetric
 from src.components.metrics.psnr import PsnrMetric
 from src.components.metrics.ranking import rank
 from src.components.metrics.ssim import SsimMetric
@@ -33,9 +33,11 @@ def _uniform_clip(value: float, *, frames: int = 2, size: int = 8) -> np.ndarray
     return np.full((frames, size, size, 3), value, dtype=np.uint8)
 
 
-def _mean_color_extractor(clip: np.ndarray) -> list[np.ndarray]:
-    mean = clip.mean(axis=(1, 2), keepdims=True) / 255.0
-    return [np.transpose(mean, (0, 3, 1, 2))]
+def _mean_color_extractor(reference: np.ndarray, predicted: np.ndarray) -> float:
+    """Stand-in for the calibrated network: mean-colour distance, no torch."""
+    left = reference.mean(axis=(1, 2)) / 255.0
+    right = predicted.mean(axis=(1, 2)) / 255.0
+    return float(np.abs(left - right).mean())
 
 
 def _static_tracker(clip: np.ndarray) -> np.ndarray:
@@ -110,11 +112,12 @@ def test_every_tier_scores_a_synthetic_clip_on_the_pipeline_path() -> None:
 
 
 def test_lpips_is_zero_for_identical_frames_and_grows_with_color_shift() -> None:
-    """Bound: identical features → 0. A 40/255 mean shift → (40/255)^2 ≈ 0.0246."""
+    """Bound: identical → 0. A 40/255 mean shift → 40/255 ≈ 0.157 under the
+    injected mean-colour stand-in, which reports absolute difference."""
     ref = _uniform_clip(120)
     pred = _uniform_clip(80)
     metric = LpipsMetric(extractor=_mean_color_extractor)
-    expected = ((40.0 / 255.0) ** 2)
+    expected = 40.0 / 255.0
     assert metric.score(ref, ref) == pytest.approx(0.0, abs=1e-12)
     assert metric.score(ref, pred) == pytest.approx(expected, rel=1e-12)
 
@@ -256,12 +259,7 @@ def test_vmaf_without_a_model_or_ffmpeg_does_not_invent_a_number(monkeypatch: py
         VmafMetric().score(_uniform_clip(8), _uniform_clip(8))
 
 
-def test_lpips_without_weights_or_extractor_raises(tmp_path: Path) -> None:
-    missing = tmp_path / "no-vgg.pth"
-    with pytest.raises(FileNotFoundError, match="VGG"):
-        LpipsMetric(weights_path=missing).score(_uniform_clip(8), _uniform_clip(8))
-
-
-def test_perceptual_distance_rejects_a_layer_mismatch() -> None:
-    with pytest.raises(ValueError, match="length mismatch"):
-        perceptual_distance([np.zeros((1, 2, 2, 2))], [])
+def test_lpips_identical_frames_score_zero_through_the_injected_extractor() -> None:
+    metric = LpipsMetric(extractor=_mean_color_extractor)
+    clip = _uniform_clip(8)
+    assert metric.score(clip, clip) == pytest.approx(0.0, abs=1e-9)

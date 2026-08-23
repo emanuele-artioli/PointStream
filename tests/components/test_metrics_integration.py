@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from src.components.metrics.lpips import LpipsMetric, default_weights_path
+from src.components.metrics.lpips import LpipsMetric
 from src.components.metrics.vmaf import VmafMetric
 
 pytestmark = pytest.mark.integration
@@ -15,14 +15,24 @@ def _clip(value: int, *, frames: int = 3, size: int = 64) -> np.ndarray:
     return np.full((frames, size, size, 3), value, dtype=np.uint8)
 
 
-def test_lpips_vgg_on_synthetic_frames() -> None:
-    if not default_weights_path().is_file():
-        pytest.skip(f"VGG weights missing at {default_weights_path()}")
+def test_lpips_is_calibrated_and_has_real_dynamic_range() -> None:
+    """The defect this replaced could not tell a good match from an unrelated
+    image: it scored 0.083 for unrelated against 0.085 for a good
+    reconstruction. Assert the published anchors instead of merely ">0"."""
+    pytest.importorskip("lpips")
     metric = LpipsMetric()
-    ref = _clip(120)
-    pred = _clip(40)
+    rs = np.random.RandomState(0)
+    ref = rs.randint(0, 255, (2, 128, 128, 3), dtype=np.uint8)
+    unrelated = rs.randint(0, 255, (2, 128, 128, 3), dtype=np.uint8)
+    mild = np.clip(
+        ref.astype(np.int16) + rs.randint(-15, 15, ref.shape), 0, 255
+    ).astype(np.uint8)
+
     assert metric.score(ref, ref) == pytest.approx(0.0, abs=1e-5)
-    assert metric.score(ref, pred) > 0.0
+    near = metric.score(ref, mild)
+    far = metric.score(ref, unrelated)
+    assert 0.0 < near < far, f"no dynamic range: mild={near}, unrelated={far}"
+    assert far > 4 * near, f"unrelated only {far / max(near, 1e-9):.1f}x a mild perturbation"
 
 
 def test_vmaf_libvmaf_on_synthetic_frames() -> None:

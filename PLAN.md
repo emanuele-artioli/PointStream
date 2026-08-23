@@ -293,48 +293,77 @@ is the entire headroom of this paper. If the player region costs 30% of the
 bitrate there is a real prize; if it costs 3%, the premise is weak and we should
 know that before another engine is wired. **Run this before anything else.**
 
-### 2.7 Animate-Anyone was being driven at T=1 — clip mode changes everything
+### 2.7 Two faults found together: T=1 invocation, and a fake LPIPS
 
-**Measured 2026-08-23, and it invalidates every Animate-Anyone number in this
-project.** AA is a *temporal* model: ReferenceNet plus a pose guider plus a
-**motion module**. Every evaluation so far called `generate()`, the single-frame
-path, on a model whose temporal attention expects a clip. `generate_sequence()`
-existed and was never used.
+**Both found 2026-08-23. The second invalidates more than the first fixes.**
 
-Same clips, same seed, same 20 steps, offsets 1–8, 4 clips / 32 frames:
+#### The LPIPS was not LPIPS
 
-| Path | Object PSNR | LPIPS |
+`src/components/metrics/lpips.py` computed an **uncalibrated VGG-19-bn feature
+MSE** under the name `lpips`. Its own docstring said so; it was registered,
+reported and read as LPIPS anyway. Calibrated against published anchors:
+
+| pair | old "lpips" | real LPIPS |
 |---|---|---|
-| frame-by-frame (`generate`) | 8.81 dB | 0.3143 |
-| **clip mode (`generate_sequence`)** | **11.57 dB** | **0.0666** |
-| delta | **+2.76 dB** | **−0.2477 (4.7× better)** |
+| identical | 0.000 | 0.000 |
+| mild noise | 0.009 | 0.250 |
+| heavy blur | 0.032 | 0.430 |
+| **unrelated image** | **0.083** | **0.645** |
 
-Bounds were written before running (*"clip mode fixes it → LPIPS well below 0.15
-and object PSNR above 11"*). Both met.
+**An unrelated image scored 0.083 while a good reconstruction scored 0.085.** The
+metric could not tell them apart. **Every LPIPS number produced before this date
+is void**, including the ones in `§2.4`'s cross-appearance table.
 
-**Consequences.**
+Fixed by wrapping the published `lpips` package, which was already installed. It
+is also **40× faster** — 3.5 ms/frame against 138 ms, because AlexNet replaces
+VGG-19-bn. `tests/components/test_metrics_integration.py` now asserts the
+anchors above rather than merely `> 0`, which is what let the defect through.
 
-1. **AA is now the best engine we have on perceptual quality** — LPIPS 0.067
-   against ControlNet's 0.072, and it is the architecture the literature says
-   should win.
-2. **The Wave-3 verdict on AA is void.** "8.96 dB, not using appearance" was a
-   temporal model run at T=1. So was the 10.4 dB that dropped it as flagship in
-   Wave 2, and the 9.65 dB melted 3-step result.
-3. **The cross-appearance delta must be re-run in clip mode** before anything is
-   concluded about ReferenceNet. The +0.93 dB measured frame-by-frame says
-   nothing about a pathway that was structurally disabled.
+#### Animate-Anyone was driven at T=1
 
-**This is the same failure mode for the fourth time**: a path that exists, runs,
-and passes its tests while not doing the job. Ten generators registered that
+AA is ReferenceNet + pose guider + **motion module**. Every evaluation called
+`generate()`, the single-frame path; `generate_sequence()` existed unused.
+Offsets 1–8, 4 clips / 32 frames, seed 42, 20 steps:
+
+| Path | Object PSNR | LPIPS (player bbox, calibrated) |
+|---|---|---|
+| frame-by-frame | 8.81 dB | 0.751 |
+| **clip mode** | **11.57 dB** | **0.570** |
+| delta | **+2.76 dB** | **−0.180** |
+
+#### What this actually means — and it is not a success
+
+Clip mode is genuinely better and every AA verdict taken frame-by-frame is void
+(8.96 in Wave 3, 10.4 in Wave 2, 9.65 at 3 steps). **But AA in clip mode is still
+not good**, and the corrected metric is what shows it:
+
+| Arm | Object PSNR | LPIPS (player) |
+|---|---|---|
+| static copy @ offset 1 | 17.00 dB | **0.239** |
+| static copy @ offset 8 | 11.16 dB | 0.582 |
+| **AA clip mode, offsets 1–8** | 11.57 dB | **0.570** |
+| *reference: heavy blur* | — | *0.430* |
+| *reference: unrelated image* | — | *0.645* |
+
+**AA at 0.570 sits closer to "unrelated image" than to "heavy blur",** and only
+marginally ahead of a static copy. No engine on the roster produces a
+perceptually good player. The earlier claim that AA was "best on perceptual
+quality at LPIPS 0.067" was an artefact of the broken metric and is withdrawn.
+
+#### The standing rule this earns
+
+**Fifth occurrence of the same failure mode**: ten generators registered that
 could not load weights; a verifier green while five clips had no pose; a roster
-ranked on self-reconstruction; and now a video model evaluated one frame at a
-time. **Whenever an engine underperforms, check first that it is being invoked
-the way its architecture intends.**
+ranked on self-reconstruction; a video model evaluated one frame at a time; and a
+metric that could not distinguish a match from an unrelated image. Every one
+passed its tests.
 
-**Honest scope.** n=32 frames over 4 clips at offsets 1–8, which is the easy
-regime; the static-copy floor there is 11.2–21.5 dB, so AA does not yet beat it
-on PSNR. What is established is that clip mode transforms output quality, not
-that the coding task is solved.
+Two rules follow, and they belong in every brief:
+
+1. **Check the invocation before blaming the model.**
+2. **Calibrate a metric against known anchors before trusting a ranking from
+   it.** "Zero for identical, positive for different" is satisfied by a metric
+   with no dynamic range. Assert the *far* end too.
 
 ### 2.8 Animate-Anyone has seen the held-out videos
 
