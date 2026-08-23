@@ -1,15 +1,8 @@
-<<<<<<< HEAD
 """Load aligned frames from the rebuilt probe set.
 
 Channels are paired by position in the sorted ``frame_*.png`` list, never by
 reconstructing a filename. Crop / canny / pose use global source ids;
 ``_skeleton`` is track-local from zero. 44% of tracks carry that offset.
-=======
-"""Load one aligned frame (or a cheap set) from the rebuilt probe set.
-
-Channels are paired by position in the sorted ``frame_*.png`` list, never by
-reconstructing a filename. That is the pose-offset fault BP7 closed.
->>>>>>> phase-bp/bp5
 """
 
 from __future__ import annotations
@@ -26,14 +19,9 @@ from experiments.probe_set.schema import HELD_OUT_VIDEOS, SCHEMA_ID, TRAINING_SP
 from src.components.generation._numpy import as_chw
 
 DEFAULT_PROBE_ROOT = Path("assets") / "probe_set"
-<<<<<<< HEAD
 DEFAULT_KEYFRAME = 0
 HEADLINE_OFFSET = 24
 DEFAULT_OFFSETS = (8, 16, 24, 32)
-=======
-DIFFUSION_FRAME_INDEX = 24
-ONE_PASS_FRAME_INDICES = (0, 16, 24, 32, 47)
->>>>>>> phase-bp/bp5
 
 
 @dataclass(frozen=True)
@@ -55,7 +43,6 @@ class ProbeFrame:
 
 
 @dataclass(frozen=True)
-<<<<<<< HEAD
 class CodingSample:
     """Appearance from a keyframe, conditioning and reference from a later frame."""
 
@@ -77,8 +64,6 @@ class CodingSample:
 
 
 @dataclass(frozen=True)
-=======
->>>>>>> phase-bp/bp5
 class ProbeClip:
     key: str
     video: str
@@ -186,7 +171,6 @@ def _optical_flow(prev_rgb: np.ndarray, next_rgb: np.ndarray) -> np.ndarray:
     return np.transpose(np.asarray(flow, dtype=np.float32), (2, 0, 1))
 
 
-<<<<<<< HEAD
 def _channel_files(clip: ProbeClip) -> tuple[list[Path], list[Path], list[Path]]:
     crop_files = _sorted_frames(clip.path)
     pose_files = _sorted_frames(_condition_dir(clip.path, "_skeleton"))
@@ -211,8 +195,6 @@ def _motion_at(crop_files: list[Path], frame_index: int, appearance: np.ndarray)
     return _optical_flow(appearance, neighbor_rgb)
 
 
-=======
->>>>>>> phase-bp/bp5
 def load_frame(clip: ProbeClip, frame_index: int) -> ProbeFrame:
     """Load appearance, pose, canny, mask, and a motion field at ``frame_index``.
 
@@ -225,35 +207,11 @@ def load_frame(clip: ProbeClip, frame_index: int) -> ProbeFrame:
             f"frame_index {frame_index} out of range for {clip.key} "
             f"({clip.n_frames} frames)"
         )
-<<<<<<< HEAD
     crop_files, pose_files, canny_files = _channel_files(clip)
     appearance, mask = _load_rgba(crop_files[frame_index])
     pose = _load_rgb(pose_files[frame_index])
     canny = _load_gray(canny_files[frame_index])
     motion = _motion_at(crop_files, frame_index, appearance)
-=======
-    crop_files = _sorted_frames(clip.path)
-    pose_files = _sorted_frames(_condition_dir(clip.path, "_skeleton"))
-    canny_files = _sorted_frames(_condition_dir(clip.path, "_canny"))
-    for label, files in (
-        ("skeleton", pose_files),
-        ("canny", canny_files),
-    ):
-        if len(files) != len(crop_files):
-            raise ValueError(
-                f"{clip.key} {label} has {len(files)} frames, crop has {len(crop_files)}. "
-                "Channels must be paired by position."
-            )
-    appearance, mask = _load_rgba(crop_files[frame_index])
-    pose = _load_rgb(pose_files[frame_index])
-    canny = _load_gray(canny_files[frame_index])
-    neighbor = frame_index + 1 if frame_index + 1 < len(crop_files) else frame_index - 1
-    neighbor_rgb, _ = _load_rgba(crop_files[neighbor])
-    if neighbor < frame_index:
-        motion = _optical_flow(neighbor_rgb, appearance)
-    else:
-        motion = _optical_flow(appearance, neighbor_rgb)
->>>>>>> phase-bp/bp5
     return ProbeFrame(
         key=clip.key,
         video=clip.video,
@@ -270,7 +228,6 @@ def load_frame(clip: ProbeClip, frame_index: int) -> ProbeFrame:
     )
 
 
-<<<<<<< HEAD
 def load_coding_sample(
     clip: ProbeClip,
     appearance_index: int,
@@ -323,10 +280,6 @@ def load_coding_sample(
 
 def bundle_arrays(frame: ProbeFrame) -> dict[str, Any]:
     """Named arrays for a self-reconstruction ``ConditioningBundle``."""
-=======
-def bundle_arrays(frame: ProbeFrame) -> dict[str, Any]:
-    """Named arrays for ``ConditioningBundle`` construction."""
->>>>>>> phase-bp/bp5
     return {
         "appearance": as_chw(frame.appearance_rgb),
         "pose": as_chw(frame.pose_rgb),
@@ -336,7 +289,6 @@ def bundle_arrays(frame: ProbeFrame) -> dict[str, Any]:
         "frame_index": frame.frame_index,
         "object_id": frame.key,
     }
-<<<<<<< HEAD
 
 
 def bundle_coding(sample: CodingSample) -> dict[str, Any]:
@@ -350,5 +302,3 @@ def bundle_coding(sample: CodingSample) -> dict[str, Any]:
         "frame_index": sample.target_frame_index,
         "object_id": sample.key,
     }
-=======
->>>>>>> phase-bp/bp5

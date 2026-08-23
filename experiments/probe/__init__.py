@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 """Cross-engine probe harness. Coding-task triage only — nothing here is citable."""
 
 from experiments.probe.bounds import (
@@ -22,23 +21,4 @@ __all__ = [
     "STATIC_COPY_ALARM_LOW_DB",
     "STATIC_COPY_EXPECTED_HIGH_DB",
     "STATIC_COPY_EXPECTED_LOW_DB",
-=======
-"""Cross-engine probe harness. Triage only — nothing here is citable."""
-
-from experiments.probe.bounds import (
-    OBJECT_PSNR_ALARM_HIGH_DB,
-    OBJECT_PSNR_ALARM_LOW_DB,
-    OBJECT_PSNR_EXPECTED_HIGH_DB,
-    OBJECT_PSNR_EXPECTED_LOW_DB,
-)
-from experiments.probe.engines import PLANS, SEED
-
-__all__ = [
-    "OBJECT_PSNR_ALARM_HIGH_DB",
-    "OBJECT_PSNR_ALARM_LOW_DB",
-    "OBJECT_PSNR_EXPECTED_HIGH_DB",
-    "OBJECT_PSNR_EXPECTED_LOW_DB",
-    "PLANS",
-    "SEED",
->>>>>>> phase-bp/bp5
 ]
