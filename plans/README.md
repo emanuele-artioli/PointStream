@@ -9,15 +9,21 @@ you need a change there, say so in your report rather than making it.
 
 | Brief | Owns | Status |
 |---|---|---|
-| `BP8-appearance-conditioning.md` | generation loaders, training script | **critical path** |
-| `BP9-probe-harness.md` | `experiments/probe/**` | parallel with BP8 |
-| `P1-paper-catchup.md` | the paper repo only | parallel with everything |
+| `BP8-appearance-conditioning.md` | generation loaders, training script | landed unmerged — **honest negative** |
+| `BP9-probe-harness.md` | `experiments/probe/**` | landed unmerged `phase-bp/bp9` |
+| `P1-paper-catchup.md` | the paper repo only | landed unmerged `phase-p/p1` |
+| `C3-runner.md` | `src/runner/**` | landed unmerged `phase-c/c3` |
 | `DEFERRED.md` | — | real work deliberately not now |
 
 **The one thing to know before reading anything else:** the generative engines
-were trained without appearance as an input and lose to pasting the keyframe
-forward. `PLAN.md` §2.6 has the evidence; `BP8` has the options. Any plan that
-assumes a working generator is out of date.
+do not use appearance and lose to pasting the keyframe forward. That survived
+re-examining Animate-Anyone, wiring a real IP-Adapter, and retraining pose
+ControlNet with a same-track reference (epoch 10: **11.18 dB** vs **11.47 dB**
+letterbox floor). Quality flagship is unset. Any plan that assumes a working
+generator is out of date.
+
+**Cursor Wave-3 report for Claude:** `plans/wave3-report.md` (copy at
+`/tmp/cursor-report-wave3.md`). Parse block at the top.
 
 ## Done
 
@@ -30,6 +36,6 @@ probe that scored engines against their own conditioning image.
 
 ## Not yet written
 
-`C3` — the runner: one run path, one accounting implementation, quality
-evaluation mandatory on every path. It needs `C1` and `C2`, which are both done,
-so it is writable whenever a slot is free.
+Nothing in this tree. Wave 3 reported 2026-08-23; nothing merged to `main`.
+Option C (what the paper claims is transmitted) is the finding BP8 left, not a
+new code stream.

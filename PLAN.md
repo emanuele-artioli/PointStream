@@ -29,8 +29,8 @@ Target: **ACM TOMM, September 30.**
 |---|---|---|
 | A — contracts and concepts | ✅ done | — |
 | B — components | ✅ **done** | Merged-ready on `phase-b/integrate` (still unmerged to main) |
-| **B′ — the engine roster** | Wave 2 ✅ | ControlNet holds both quality slots; Animate-Anyone in-domain only |
-| C — pipeline and runner | ⬜ | `C1`/`C2` landed unmerged; `C3` is next |
+| **B′ — the engine roster** | Wave 3 ✅ | Quality flagship **unset** (honest negative). Pose-ref epoch 10 is 11.18 dB, below the 11.47 letterbox floor. Wave-2 roster remains void. |
+| C — pipeline and runner | ⬜ | `C1`/`C2`/`C3` landed unmerged |
 | D — experiments layer | ⬜ | Blocked on C |
 | E — experiments and paper | ⬜ | Ordered by §7 |
 
@@ -172,12 +172,16 @@ search fixes it. The architecture requires appearance to be transmitted and
 and a text prompt. `PLAN.md` §6.6's cost order — tune, then fine-tune, then
 swap — starts at the wrong rung: tuning is ruled out on evidence.
 
-The live options are in `plans/BP8-appearance-conditioning.md`, ordered by cost:
-re-examine Animate-Anyone's inference path first (hours — it is the one
-reference-conditioned architecture on the roster), then wire a real IP-Adapter,
-then retrain ControlNet with the reference frame `tennis_dataset.py` already
-samples. `plans/BP9-probe-harness.md` fixes what the probe measures and makes
-the static-copy floor a permanent arm.
+Those options were driven on `phase-bp/bp8` (2026-08-23). Animate-Anyone 20 DDIM
+letterbox: **8.96 dB**. Real IP-Adapter: **8.90 dB**. Pose-ref ControlNet, ten
+epochs with a same-track reference painted under the skeleton: **11.18 dB**
+(series 11.11–11.33; smoke `residual_delta=2.69` showed the reference entered
+the net). All lose to this driver's static-copy floor (**11.47 dB** letterbox;
+published shared-geometry paste **11.82 dB**). Success was ≥ 12.82 dB. Paths
+under `pointstream-wt/bp8/outputs/bp8-coding-task*`. **Option C** — change what
+the paper claims is transmitted — is the reported finding, not an escape.
+`plans/BP9-probe-harness.md` made the static-copy floor a permanent arm
+(`phase-bp/bp9`).
 
 ### 2.4 Animate-Anyone has seen the held-out videos
 
@@ -595,8 +599,9 @@ re-read rather than followed blindly.
 3. The residual-coarseness curve.
 4. The core ablation lattice.
 5. A working generative engine, or an honest scoped negative result.
-   *This is B′, and it is the true critical path — items 2, 3, 4 and 6 are all
-   blocked behind it.*
+   *The negative landed 2026-08-23: no engine beat static copy on the coding
+   task. Items 2–4 can proceed on residual/all-off corners; a quality flagship
+   RD curve cannot.*
 6. Generalization on the general/DAVIS profile.
 7. Evaluation and Conclusion sections; abstract reconciled with what was measured.
 
