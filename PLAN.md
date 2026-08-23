@@ -530,6 +530,54 @@ reconstructs a usable player. The best of them sits 0.108 LPIPS above a paste of
 the keyframe, and a paste is not a codec.
 
 
+### 2.11 The caption channel was trained and has never been switched on
+
+Found 2026-08-23 while checking, not assuming, what appearance channels exist.
+
+`scripts/train_controlnet.py` reads a **per-track BLIP caption** and falls back
+to a generic prompt only when none exists. **114 caption files exist**, one per
+track, and they carry appearance:
+
+> *"a man in a purple shirt and blue shorts playing tennis, photorealistic
+> tennis player, broadcast sports shot"*
+
+**53 of 114 (46%) name a colour**; there are 57 distinct captions over 114
+tracks. At inference `src/components/generation/controlnet.py:73` hardcodes the
+*fallback* — `"photorealistic tennis player, broadcast sports shot"` — for every
+frame of every clip, and `ConditioningBundle` has no caption field at all, so
+there is no way to pass one.
+
+**Every ControlNet number this project has measured, including §2.10's, was
+taken with the text channel disabled.** §2.3 quoted the fallback prompt as
+though it were the only prompt, which is how this stayed hidden through three
+rounds of engine triage.
+
+**Occurrence nine of the standing failure mode**: a pathway exists, is trained,
+passes its tests, and is not driven. It is also the cheapest outstanding thing
+that could move the roster, because it needs no training —
+`plans/BP17-caption-channel.md`.
+
+**Do not over-read it in advance.** A caption is a few tokens through CLIP text
+encoding; it can say "purple shirt", not *this* player, and §2.7's own
+literature note is that CLIP embeddings lack fine spatial detail. Half the
+tracks name no colour. The expected result is a small effect or none — but every
+roster number is currently labelled with a training condition that was never
+true, and that is worth one probe run to correct.
+
+**What this changes about the appearance story.** Three channels are registered;
+their real status differs, and §6.2's roster should be read with this table:
+
+| Channel | Registered as | Actual status |
+|---|---|---|
+| text / caption | `pose-controlnet` (alias `caption-controlnet`) | **trained, never driven** |
+| keyframe / reference image | `pose-ref-controlnet` | trained, measured, **failed for a known architectural reason** (§2.4) |
+| latent / image embedding | `ip-adapter-controlnet` (declares `appearance:image-embedding`) | **declared, never trained** — the checkpoint is the mislabelled segmentation ControlNet of §2.3 |
+
+Of three appearance pathways, one is switched off, one failed for a reason we
+understand, and one was never built. That is a better description of where this
+project stands than "the generators do not use appearance".
+
+
 ---
 
 ## 3. Architecture

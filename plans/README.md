@@ -20,7 +20,13 @@ Two things are true and both are load-bearing:
    ReferenceNet works" gate at +4.45 dB. It is kept only as a measure of
    *dependence on the reference*. Deciding whether any engine renders the right
    *person* needs an identity metric, which does not exist here yet.
-2. **Two of the three metrics were broken until 2026-08-23** — LPIPS had no
+2. **One appearance channel is switched off, not missing.** The ControlNets
+   were trained with per-track captions naming kit colour, and inference
+   hardcodes a generic fallback (`PLAN.md` §2.11). Of three registered
+   appearance pathways, one is off, one failed for a known architectural reason,
+   and one was never trained. "The generators do not use appearance" is too
+   coarse a summary to plan from.
+3. **Two of the three metrics were broken until 2026-08-23** — LPIPS had no
    dynamic range, VMAF had its inputs crossed. **Every engine ranking taken
    before that date is void**, including the roster verdicts in `done/`. Metrics
    now have calibration invariants (`tests/invariants/test_metric_calibration.py`)
@@ -31,11 +37,18 @@ Two things are true and both are load-bearing:
 
 ## Live
 
-| Brief | Owns | Status |
+**`WAVE-2026-08-24.md` says which of these run together and in what order.**
+Read it before picking one up; the waves exist so parallel sessions do not
+collide, and Wave 3 forks on BP13's number.
+
+| Brief | Owns | Wave |
 |---|---|---|
-| `BP13-motivating-headroom.md` | FG + BG headroom; rewrite the motivating example | **critical path** |
-| `BP14-training-stop-rule.md` | stop a run that cannot clear the bar | before any training |
-| `BP15-test-cull.md` | retire the pre-rewrite tree and its 433 tests | housekeeping |
+| `BP16-ci-signal.md` | un-red the CI so regressions are visible again | **1** |
+| `BP13-motivating-headroom.md` | FG + BG headroom; rewrite the motivating example | **1 — the one that can change the plan** |
+| `BP18-appearance-identity-metric.md` | an instrument that separates "the output moved" from "the right body appeared" | **1** |
+| `BP17-caption-channel.md` | drive the trained-but-disabled caption channel | 2 |
+| `BP15-test-cull.md` | retire the pre-rewrite tree and its 433 tests | 2 — **after** BP16, never folded into it |
+| `BP14-training-stop-rule.md` | stop a run that cannot clear the bar | before any training, in any wave |
 | `DEFERRED.md` | — | real work deliberately not now |
 
 ## Done
