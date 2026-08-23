@@ -260,20 +260,88 @@ REID_MIN_SEPARATION = 0.25
 
 
 @pytest.mark.integration
-def test_reid_separates_two_players_in_the_same_match() -> None:
+def test_reid_separates_two_people_on_ground_truth_pairs() -> None:
     """The gate that decides whether this instrument may be used at all.
 
-    A metric that scores the wrong player as highly as the right one still
-    produces a perfectly ordered ranking. That is how the uncalibrated LPIPS
-    shipped, and it is why this asserts a *magnitude*, not just an order.
+    **Both sides are ground truth, with nobody's judgement in them.** Same
+    person is one track at two frames — a track is one individual by
+    construction of the tracker. Different people are two tracks visible in the
+    *same source frame*, which cannot be the same individual, scored at that
+    shared frame so the camera and the light are held fixed too.
+
+    A metric that scores two different people as highly as one person twice
+    still produces a perfectly ordered ranking. That is how the uncalibrated
+    LPIPS shipped, so this asserts a *magnitude*, not an order.
     """
-    scores = _reid_anchor_scores()
-    separation = scores["same track, offset 8"] - scores["different player, same match"]
+    from src.components.metrics.reid import ReidMetric
+
+    same, different = _ground_truth_pair_scores(ReidMetric(device="cpu"))
+    separation = same - different
     assert separation >= REID_MIN_SEPARATION, (
-        f"ReID separates same-player from different-player-same-match by only "
-        f"{separation:.4f}, below the {REID_MIN_SEPARATION} gate. Anchors: {scores}. "
-        "Do not rank engines on this metric until that is explained."
+        f"reid separates same-person ({same:.4f}) from different-person "
+        f"({different:.4f}) by only {separation:.4f}, below the "
+        f"{REID_MIN_SEPARATION} gate. Do not rank anything on this metric "
+        "until that is explained."
     )
+
+
+def _ground_truth_pair_scores(backend: MetricBackend) -> tuple[float, float]:
+    """``(same person, different person)`` means, derived, never labelled."""
+    from pathlib import Path
+
+    from PIL import Image
+
+    from experiments.probe.player_labels import (
+        cooccurring_pairs,
+        crop_index_of,
+        track_frame_ids,
+    )
+
+    root = Path("assets") / "dataset"
+    if not root.is_dir():
+        pytest.skip("assets/dataset is not present")
+    videos = sorted(item.name for item in root.iterdir() if item.is_dir())
+    cache: dict[tuple[str, str, int], np.ndarray] = {}
+
+    def crop(video: str, key: str, index: int) -> np.ndarray | None:
+        cache_key = (video, key, index)
+        if cache_key not in cache:
+            scene, track = key.split("/")
+            found = sorted((root / video / "segmentations" / scene / track).glob("frame_*.png"))
+            if not found:
+                return None
+            chosen = found[min(index, len(found) - 1)]
+            cache[cache_key] = np.asarray(Image.open(chosen).convert("RGB"))[None, ...]
+        return cache[cache_key]
+
+    different: list[float] = []
+    same: list[float] = []
+    seen: set[tuple[str, str]] = set()
+    for video in videos:
+        for left, right, frame_id in cooccurring_pairs(video):
+            left_index = crop_index_of(video, left, frame_id)
+            right_index = crop_index_of(video, right, frame_id)
+            if left_index is None or right_index is None:
+                continue
+            first, second = crop(video, left, left_index), crop(video, right, right_index)
+            if first is None or second is None:
+                continue
+            try:
+                different.append(float(backend.score(first, second)))
+            except FileNotFoundError as exc:  # weights absent
+                pytest.skip(str(exc))
+            for key in (left, right):
+                if (video, key) in seen:
+                    continue
+                seen.add((video, key))
+                scene, track = key.split("/")
+                if len(track_frame_ids(video, scene, track)) > 8:
+                    start, later = crop(video, key, 0), crop(video, key, 8)
+                    if start is not None and later is not None:
+                        same.append(float(backend.score(start, later)))
+    if len(different) < 8 or len(same) < 8:
+        pytest.skip("too few ground-truth pairs to calibrate on")
+    return sum(same) / len(same), sum(different) / len(different)
 
 
 @pytest.mark.integration

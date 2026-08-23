@@ -1,43 +1,48 @@
-"""Who is in each track, labelled by eye, because the dataset does not say.
+"""Who is in each track — derived from the data first, labelled by eye only where it cannot be.
 
-`BP18` needs one anchor that nothing else in this repo can supply: **two
-different players in the same match**. Without it there is no way to tell an
-identity metric that works from one that merely scores "person on a tennis
-court" highly, and a metric like that produces perfectly ordered rankings while
-measuring nothing — which is how the uncalibrated LPIPS shipped.
+`BP18` needs one anchor nothing else supplies: **two different players in the
+same match**. Without it there is no way to tell an identity metric that works
+from one that merely scores "person on a tennis court" highly, and a metric like
+that produces perfectly ordered rankings while measuring nothing.
 
-**Provenance.** Hand-labelled on 2026-08-23 by inspecting the first frame of
-each track in a contact sheet, one sheet per video. Kit is the cue: within a
-single broadcast the two players wear different colours, and officials wear
-something different again. Three of the five training-split videos are labelled;
-the other two are omitted rather than guessed at — in `alcaraz_ruud` every
-sampled track wears the same rust shirt and white shorts, so no honest
-different-player pair can be drawn from it.
+**The good source is derivation, not labelling.** ``track_<id>_metadata.json``
+carries a ``frame_id`` per entry, so two tracks in one scene whose frame ranges
+**overlap are two people on court at the same instant** — necessarily different
+individuals, with no judgement from anyone. `cooccurring_pairs` is that, and it
+is what the calibration gate uses. Pairing them *at a shared frame* holds the
+camera, the lighting and the moment fixed too.
 
-**The circularity, stated because it is real.** Labels come from clothing, and
-clothing is much of what a ReID embedding keys on. So a *cross-track* label is
-partly the thing being tested. Two things keep the calibration honest:
+Combined with **same track, different frame** — one person by construction of
+the tracker — the decisive calibration needs no labels at all:
 
-* the primary same-player anchor is **the same track at a different frame**,
-  which is ground truth — a track is one person by construction of the tracker,
-  and needs no label from this file;
-* the different-player pairs here are *conservative*, because both players share
-  a court, a broadcast and a lighting setup, all of which push their embeddings
-  together.
+* same person  = same track, two frames
+* different people = two tracks visible in the same frame
 
-What this file therefore supports is the narrower, honest claim: within a match,
-**can the metric tell the two players apart**. For this project that is the
-question that matters — a reconstruction of the wrong player is the failure to
-catch — but it is not a claim about identity in general.
+**The hand labels below are secondary** and no longer carry the gate. They were
+written first (2026-08-23, from contact sheets, kit as the cue) and are kept for
+two jobs derivation cannot do: marking **officials**, who are neither player,
+and supplying *same-player-across-scenes* pairs, which no metadata implies. Both
+are reported beside the derived anchors, never instead of them.
 
-`OFFICIAL` marks umpires and line judges. They are not players and are kept
-separate rather than dropped: "player versus official" is a useful third anchor,
-and a metric that scores them as similar as two players is telling you something.
+**The circularity, stated because it is real, and now confined.** Hand labels
+come from clothing and clothing is much of what an embedding reads, so a
+cross-track *label* is partly the thing being tested. That weakness no longer
+touches the gate — it only affects the two secondary anchors, which are marked
+"inferred" wherever they are reported.
+
+Nothing here is training data. These pairs are read only when calibrating a
+metric; no model is fitted to them.
 """
 
 from __future__ import annotations
 
+import json
+from functools import lru_cache
+from pathlib import Path
+
 OFFICIAL = "official"
+
+DATASET_ROOT = Path("assets") / "dataset"
 
 #: ``video -> {"scene/track": player label}``. Labels are per video; ``"A"`` in
 #: one video has nothing to do with ``"A"`` in another.
@@ -119,3 +124,78 @@ def _pairs(video: str, *, same: bool, include_officials: bool) -> list[tuple[str
             if (left_label == right_label) is same:
                 out.append((left, right))
     return out
+
+
+# ---------------------------------------------------------------------------
+# Derived from the data. No judgement, and what the calibration gate uses.
+
+
+def repo_root() -> Path:
+    return Path(__file__).resolve().parents[2]
+
+
+def _scene_dir(video: str, scene: str, root: Path | None = None) -> Path:
+    return (root or repo_root()) / DATASET_ROOT / video / "segmentations" / scene
+
+
+@lru_cache(maxsize=None)
+def track_frame_ids(video: str, scene: str, track: str) -> tuple[int, ...]:
+    """Source frame ids this track appears in, in file order.
+
+    The position of an id in this tuple is also the index of the matching crop
+    PNG — the same positional pairing the rest of the probe uses, and the reason
+    a filename is never rebuilt from an id.
+    """
+    path = _scene_dir(video, scene) / f"{track}_metadata.json"
+    if not path.is_file():
+        return ()
+    records = json.loads(path.read_text())
+    return tuple(int(record["frame_id"]) for record in records if "frame_id" in record)
+
+
+def cooccurring_pairs(video: str, root: Path | None = None) -> list[tuple[str, str, int]]:
+    """``(scene/trackA, scene/trackB, shared frame id)`` for tracks seen together.
+
+    Two tracks visible in the same source frame are two different people. This
+    is ground truth from the annotation, not an opinion about anybody's shirt.
+    """
+    base = (root or repo_root()) / DATASET_ROOT / video / "segmentations"
+    if not base.is_dir():
+        return []
+    out: list[tuple[str, str, int]] = []
+    for scene_dir in sorted(base.iterdir()):
+        if not scene_dir.is_dir():
+            continue
+        tracks = sorted(
+            item.name
+            for item in scene_dir.iterdir()
+            if item.is_dir() and not item.name.endswith(_DERIVED_SUFFIXES)
+        )
+        seen = {
+            track: set(track_frame_ids(video, scene_dir.name, track)) for track in tracks
+        }
+        for index, left in enumerate(tracks):
+            for right in tracks[index + 1 :]:
+                shared = seen[left] & seen[right]
+                if shared:
+                    out.append(
+                        (
+                            f"{scene_dir.name}/{left}",
+                            f"{scene_dir.name}/{right}",
+                            min(shared),
+                        )
+                    )
+    return out
+
+
+def crop_index_of(video: str, key: str, frame_id: int) -> int | None:
+    """Where ``frame_id`` sits in this track's file order, or None."""
+    scene, track = key.split("/")
+    ids = track_frame_ids(video, scene, track)
+    try:
+        return ids.index(frame_id)
+    except ValueError:
+        return None
+
+
+_DERIVED_SUFFIXES = ("_skeleton", "_canny", "_pose_body", "_pose_racket")

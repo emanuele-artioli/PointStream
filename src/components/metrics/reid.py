@@ -40,6 +40,7 @@ Higher is better; 1.0 is the same crop.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
 
@@ -187,3 +188,74 @@ def _to_batch(clip: np.ndarray) -> np.ndarray:
 
 def build(**kwargs: Any) -> ReidMetric:
     return ReidMetric(**kwargs)
+
+
+# ---------------------------------------------------------------------------
+# Reporting a score against its measured floor.
+#
+# A bare "0.51" invites the reading that this is halfway between nothing and a
+# perfect match. It is not. Cosine similarity on person crops has no natural
+# zero: every upright human in a broadcast crop shares a large component with
+# every other, so two *different* people already score ~0.53. Quoting 0.51
+# against an imagined zero floor overstates the distance about twofold.
+#
+# That mistake was made here on 2026-08-23, in the bounds written before this
+# metric first ran. It was recorded, and then this was added, because a lesson
+# that lives only in prose gets re-learned.
+
+
+@dataclass(frozen=True)
+class IdentityScale:
+    """The two measured anchors a ``reid`` score should be read between.
+
+    ``same_person`` and ``different_person`` come from a calibration run on the
+    content being scored, never from a constant someone remembered. Re-measure
+    both if the backbone, the crop convention or the domain changes.
+    """
+
+    same_person: float
+    different_person: float
+    source: str = ""
+
+    def __post_init__(self) -> None:
+        if self.same_person <= self.different_person:
+            raise ValueError(
+                "an identity scale needs same_person above different_person; got "
+                f"{self.same_person} and {self.different_person}. On this ordering "
+                "the metric does not resolve identity and nothing may be ranked on it."
+            )
+
+    @property
+    def span(self) -> float:
+        """How much room there is between the two anchors."""
+        return self.same_person - self.different_person
+
+    def normalised(self, score: float) -> float:
+        """0.0 at the different-person anchor, 1.0 at the same-person anchor.
+
+        Deliberately not clamped: a value below 0 means *less* like the target
+        than a stranger is, which is a real and reportable outcome, and hiding
+        it behind a clamp would turn a red flag into a floor.
+        """
+        return (float(score) - self.different_person) / self.span
+
+    def describe(self, score: float) -> str:
+        """The number with both anchors beside it. The only form to report in."""
+        return (
+            f"{float(score):.4f} ({self.normalised(score):+.0%} of the way from "
+            f"a different person at {self.different_person:.4f} to the same "
+            f"person at {self.same_person:.4f})"
+        )
+
+
+#: Measured 2026-08-23 on ground-truth pairs across all seven videos:
+#: *same person* is one track at two frames (n=106) and *different person* is
+#: two tracks visible in the same source frame (n=53). Separation
+#: 0.3348 +/- 0.0195, 17.1 sigma. `outputs/bp18-reid-calibration.txt`.
+#: **These are for this dataset and this backbone.** Re-measure before quoting
+#: them anywhere else.
+TENNIS_SCALE = IdentityScale(
+    same_person=0.8663,
+    different_person=0.5315,
+    source="bp18-reid-calibration, 2026-08-23, 7 videos, ground-truth pairs",
+)

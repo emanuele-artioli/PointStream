@@ -142,3 +142,34 @@ def test_palette_cannot_separate_two_subjects_in_the_same_colour() -> None:
     right = np.zeros((60, 30, 3), dtype=np.uint8)
     right[5:55, 8:22] = (200, 40, 90)
     assert PaletteMetric().score(left[None, ...], right[None, ...]) > 0.9
+
+
+def test_an_identity_score_is_reported_between_its_two_measured_anchors() -> None:
+    """A bare 0.53 reads as "halfway to a match". It is the floor: two different
+    people already score that. The scale makes quoting it correctly the easy path."""
+    from src.components.metrics.reid import IdentityScale
+
+    scale = IdentityScale(same_person=0.8663, different_person=0.5315)
+    assert scale.normalised(0.5315) == pytest.approx(0.0)
+    assert scale.normalised(0.8663) == pytest.approx(1.0)
+    assert scale.normalised(0.7) == pytest.approx(0.503, abs=0.01)
+    described = scale.describe(0.7)
+    assert "0.5315" in described and "0.8663" in described
+
+
+def test_a_score_below_the_stranger_floor_is_not_clamped_away() -> None:
+    """Worse than a stranger is a real outcome and a red flag. Clamping it at
+    zero would turn that flag into an ordinary floor value."""
+    from src.components.metrics.reid import IdentityScale
+
+    scale = IdentityScale(same_person=0.87, different_person=0.53)
+    assert scale.normalised(0.40) < 0
+
+
+def test_an_inverted_identity_scale_is_refused() -> None:
+    """If the same person does not out-score a stranger, the metric has not
+    resolved identity and nothing may be ranked on it."""
+    from src.components.metrics.reid import IdentityScale
+
+    with pytest.raises(ValueError, match="does not resolve identity"):
+        IdentityScale(same_person=0.40, different_person=0.60)

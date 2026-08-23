@@ -602,8 +602,21 @@ risks moving torch and several pinned forks here cannot survive that; nothing
 downloads at runtime. Beside it `palette`, an 8-bin RGB histogram intersection —
 deliberately crude, as a check on the learned one.
 
-**Calibrated on 27 hand-labelled tracks** across three videos
-(`experiments/probe/player_labels.py`), n as shown:
+**The decisive gate is ground truth, with nobody's judgement in it.**
+`track_<id>_metadata.json` carries a `frame_id` per entry, so two tracks in one
+scene whose frame ranges **overlap are two people on court at the same instant**
+— necessarily different individuals. Scored at that shared frame, across all
+seven videos:
+
+| | n | `reid` | `palette` |
+|---|---|---|---|
+| same person *(one track, two frames)* | 106 | 0.8663 ± 0.0094 | 0.8637 ± 0.0072 |
+| **different people** *(two tracks, one frame)* | 53 | **0.5315 ± 0.0171** | 0.4147 ± 0.0226 |
+| **separation** | | **0.3348 ± 0.0195 (17.1σ)** | 0.4490 ± 0.0237 (19.0σ) |
+
+Hand labels are secondary and no longer carry the gate; they remain only for the
+two things derivation cannot do — marking **officials**, and same-player pairs
+*across scenes*. Those anchors, on 27 hand-labelled tracks in three videos:
 
 | anchor | n | `reid` | `palette` |
 |---|---|---|---|
@@ -614,16 +627,23 @@ deliberately crude, as a check on the learned one.
 | player vs official | 14 | 0.3943 ± 0.0242 | 0.5018 ± 0.0390 |
 | different video | 60 | 0.3739 ± 0.0120 | 0.1937 ± 0.0066 |
 
-**`reid` passes its gate at 15.1σ** — separation 0.3410 ± 0.0226, which is 54%
-of the usable range, and the ordering is monotone across every anchor. Usable.
+**`reid` passes its gate at 17.1σ on ground-truth pairs**, and the
+hand-labelled anchors agree (0.3410 ± 0.0226, 15.1σ) with a monotone ordering
+across all six. Usable.
 
 **Three bounds fired high, and the bounds were wrong.** They were written as
 though cosine similarity had a natural zero for "unrelated". It does not: every
-upright human in a tennis crop shares a large component with every other, so the
-floor for two different people sits near 0.4. Quoting 0.51 as though 0 were the
-floor overstates the distance by about a factor of two. Fixed by reporting
-against the *measured* floor. Recorded rather than quietly redrawn, per the rule
-in `AGENTS.md`.
+upright human in a tennis crop shares a large component with every other, so two
+*different* people already score ~0.53. Quoting 0.51 against an imagined zero
+overstates the distance about twofold.
+
+**Recording that was not enough, so it is now a code path.** `IdentityScale`
+carries the two measured anchors and prints a score between them — 0.5097 reads
+as *"−7% of the way from a different person at 0.5315 to the same person at
+0.8663"*, which is the honest sentence. `TENNIS_SCALE` holds the constants for
+this dataset and backbone, dated, with an instruction to re-measure; an inverted
+scale raises rather than returning a number. A lesson that lives only in prose
+gets re-learned.
 
 **The companion earned its place immediately**, by disagreeing:
 
