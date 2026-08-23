@@ -146,6 +146,84 @@ def test_cuda_peak_helpers_are_safe_on_cpu() -> None:
     assert frames[0].dtype == np.uint8
 
 
+def test_prepare_letterboxes_appearance_and_pose_independently_when_sizes_differ() -> None:
+    """Coding-task geometry: keyframe appearance and a later pose, different crops.
+
+    Canvas 100x50. Appearance is 50x100 (tall); pose is 100x50 (wide). The old
+    path resized the pose onto the appearance canvas, so the skeleton landed in
+    a 25-wide strip and scoring against the later frame compared two layouts.
+    Independent letterbox: appearance 25x50 at x=37; pose fills 100x50.
+    """
+    from src.components.generation.pose import fit_to_canvas
+
+    appearance = np.full((3, 100, 50), 200, dtype=np.uint8)
+    pose = np.full((3, 50, 100), 255, dtype=np.uint8)
+    gen = AnimateAnyoneGenerator(runtime=_fake_runtime(), width=100, height=50)
+    prepared = gen._prepare(
+        ConditioningBundle(appearance=appearance, pose=pose),
+        GenerationParams(width=100, height=50),
+    )
+    expected_app = fit_to_canvas(50, 100, 100, 50)
+    expected_pose = fit_to_canvas(100, 50, 100, 50)
+    assert prepared["letterbox"] == expected_app
+    assert prepared["pose_letterbox"] == expected_pose
+    app_hwc = prepared["appearance"]
+    pose_hwc = prepared["pose"]
+    assert app_hwc.shape[:2] == (50, 100)
+    assert pose_hwc.shape[:2] == (50, 100)
+    assert app_hwc[:, :37].sum() == 0
+    assert int(app_hwc[:, 37:62].max()) == 200
+    assert int(pose_hwc.min()) == 255
+    assert not np.array_equal(app_hwc, pose_hwc)
+
+
+def test_prepare_does_not_replace_the_reference_with_the_pose_canvas() -> None:
+    """A dropped reference looks like a pose-coloured canvas. Appearance stays red."""
+    appearance = np.zeros((3, 16, 8), dtype=np.uint8)
+    appearance[0] = 180
+    pose = np.zeros((3, 8, 16), dtype=np.uint8)
+    pose[1] = 220
+    gen = AnimateAnyoneGenerator(runtime=_fake_runtime(), width=16, height=16)
+    prepared = gen._prepare(
+        ConditioningBundle(appearance=appearance, pose=pose),
+        GenerationParams(width=16, height=16),
+    )
+    ref = prepared["appearance"]
+    pose_canvas = prepared["pose"]
+    assert int(ref[:, :, 0].max()) == 180
+    assert int(ref[:, :, 1].max()) == 0
+    assert int(pose_canvas[:, :, 1].max()) == 220
+    assert int(pose_canvas[:, :, 0].max()) == 0
+
+
+def test_prepare_same_size_inputs_share_one_letterbox() -> None:
+    appearance = np.full((3, 16, 8), 40, dtype=np.uint8)
+    pose = np.full((3, 16, 8), 255, dtype=np.uint8)
+    gen = AnimateAnyoneGenerator(runtime=_fake_runtime(), width=16, height=16)
+    prepared = gen._prepare(
+        ConditioningBundle(appearance=appearance, pose=pose),
+        GenerationParams(width=16, height=16),
+    )
+    assert prepared["letterbox"] == prepared["pose_letterbox"]
+
+
+def test_reference_feed_stats_flag_a_blank_or_pose_copied_reference() -> None:
+    from src.components.generation.animate_anyone import _reference_feed_stats
+
+    pose = np.full((8, 8, 3), 90, dtype=np.uint8)
+    blank = np.zeros((8, 8, 3), dtype=np.uint8)
+    copied = pose.copy()
+    real = np.full((8, 8, 3), 40, dtype=np.uint8)
+    blank_stats = _reference_feed_stats(blank, pose)
+    copied_stats = _reference_feed_stats(copied, pose)
+    real_stats = _reference_feed_stats(real, pose)
+    assert blank_stats["reference_is_blank"] is True
+    assert copied_stats["reference_equals_pose"] is True
+    assert real_stats["reference_is_blank"] is False
+    assert real_stats["reference_equals_pose"] is False
+    assert real_stats["reference_mean"] == 40.0
+
+
 # -- StableAnimator: licence + contract --------------------------------------
 
 

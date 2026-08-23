@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import inspect
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -253,6 +254,92 @@ def test_controlnet_epoch_resolution_uses_the_named_epoch_not_the_last_sorted(tm
     assert path.name == "checkpoint-epoch-1"
     assert FINAL_EPOCH["pose"] == 10
     assert FINAL_EPOCH["seg"] == 7
+    assert "ip-adapter" not in FINAL_EPOCH
+
+
+def test_ip_adapter_resolves_stock_openpose_not_the_mislabeled_finetune(tmp_path: Path) -> None:
+    """The tennis ip-adapter-controlnet directory is a seg ControlNet. Do not load it."""
+    weights = tmp_path / "assets" / "weights"
+    openpose = weights / "control_v11p_sd15_openpose"
+    openpose.mkdir(parents=True)
+    mislabelled = weights / "ip-adapter-controlnet" / "checkpoint-epoch-10"
+    mislabelled.mkdir(parents=True)
+    path, epoch = resolve_controlnet_checkpoint("ip-adapter", root=tmp_path)
+    assert path == openpose.resolve()
+    assert epoch is None
+    assert "ip-adapter-controlnet" not in str(path)
+
+
+def test_compose_pose_on_appearance_keeps_the_reference_in_the_black() -> None:
+    from src.components.generation.controlnet import compose_pose_on_appearance
+
+    appearance = np.full((8, 8, 3), 40, dtype=np.uint8)
+    pose = np.zeros((8, 8, 3), dtype=np.uint8)
+    pose[2:5, 3:6] = 255
+    composed = compose_pose_on_appearance(pose, appearance)
+    assert composed.shape == (8, 8, 3)
+    assert int(composed[0, 0, 0]) == 40
+    assert int(composed[3, 4, 0]) == 255
+
+
+def test_compose_pose_on_appearance_rejects_a_size_mismatch() -> None:
+    from src.components.generation.controlnet import compose_pose_on_appearance
+
+    with pytest.raises(ValueError, match="same canvas"):
+        compose_pose_on_appearance(
+            np.zeros((4, 4, 3), dtype=np.uint8),
+            np.zeros((8, 8, 3), dtype=np.uint8),
+        )
+
+
+def test_pose_ref_control_image_is_appearance_with_the_skeleton_on_top() -> None:
+    from src.components.generation.controlnet import compose_pose_on_appearance
+
+    captured: dict[str, Any] = {}
+
+    def pipe(**kwargs: Any) -> np.ndarray:
+        captured.update(kwargs)
+        return np.asarray(kwargs["image"])
+
+    gen = ControlNetGenerator(variant="pose-ref", pipeline=pipe, width=8, height=8)
+    appearance = _chw(8, 8, fill=40)
+    pose = np.zeros((3, 8, 8), dtype=np.uint8)
+    pose[:, 2:6, 2:6] = 255
+    gen.generate(
+        ConditioningBundle(appearance=appearance, pose=pose),
+        seed=0,
+        device="cpu",
+        params=GenerationParams(width=8, height=8, strength=0.5),
+    )
+    control = np.asarray(captured["control_image"])
+    expected = compose_pose_on_appearance(
+        np.transpose(pose, (1, 2, 0)), np.transpose(appearance, (1, 2, 0))
+    )
+    np.testing.assert_array_equal(control, expected)
+
+
+def test_ip_adapter_feeds_appearance_to_the_adapter_and_pose_as_control() -> None:
+    captured: dict[str, Any] = {}
+
+    def pipe(**kwargs: Any) -> np.ndarray:
+        captured.update(kwargs)
+        return np.asarray(kwargs["ip_adapter_image"])
+
+    gen = ControlNetGenerator(variant="ip-adapter", pipeline=pipe, width=8, height=8)
+    appearance = _chw(8, 8, fill=40)
+    pose = _chw(8, 8, fill=255)
+    out = gen.generate(
+        ConditioningBundle(appearance=appearance, pose=pose),
+        seed=0,
+        device="cpu",
+        params=GenerationParams(width=8, height=8),
+    )
+    assert "ip_adapter_image" in captured
+    assert "control_image" not in captured
+    assert int(np.asarray(captured["ip_adapter_image"]).mean()) < int(
+        np.asarray(captured["image"]).mean()
+    )
+    assert out.shape[0] == 3
 
 
 def test_trajectory_variant_requires_a_motion_field_not_a_pose():
