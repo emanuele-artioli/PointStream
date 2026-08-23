@@ -285,6 +285,10 @@ def format_report(report: Mapping[str, Any]) -> str:
     lines = [
         f"Probe run: {report['out_dir']}",
         f"Unit: {report['unit']}",
+        "Scope: PSNR over the letterboxed player MASK; LPIPS over the BOUNDING BOX",
+        "       of that mask, because LPIPS is a patch metric and cannot take a",
+        "       mask. Every arm uses the same scope, so each column compares; the",
+        "       two columns are not the same region as each other.",
         "",
         "Anchors measured in this run:",
         f"  static copy (right player, wrong pose) : LPIPS {_f(floor)}  PSNR {_f(anchors['static_copy_psnr_db'], 2)} dB",
