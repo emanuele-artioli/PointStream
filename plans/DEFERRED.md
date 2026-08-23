@@ -96,3 +96,39 @@ evaluable incumbent. Do not `pip install` the missing stack into the
 
 **Revisit only if** a licence-cleared SVD-free flagship appears, or the
 rendered-trajectory arm turns out to be a strawman.
+
+---
+
+## D5 — The all-off corner is a branch, not an architecture
+
+**Surfaced by the Wave-3 merge on 2026-08-23**, which is what merges are for.
+`tests/pipeline/test_dag.py::test_pipeline_source_has_no_baseline_routing_branch`
+**fails on main and should stay failing until this is fixed.**
+
+C2 wrote a test forbidding `if baseline:` / `is_source_passthrough` anywhere in
+`src/pipeline`, correctly encoding `PLAN.md` §3: *"Graceful degradation to the
+baseline codec is a property of the architecture, not a routing special case."*
+
+C1 wrote `src/pipeline/reconstruction/reconstruct.py:96`:
+
+```python
+if request.lattice.is_source_passthrough:
+    frames = source.copy()
+    return ReconstructionResult(..., path="source-passthrough", ...)
+```
+
+**So C1's headline claim — "the all-off corner reduces to the source video" — is
+delivered by a hardcoded shortcut, not by the architecture.** That is exactly the
+shape of gate that lies: the assertion passes while the property it stands for
+goes untested.
+
+**The fix** is to make the generic path degrade correctly — background off yields
+the source background, objects off composite nothing, residual off corrects
+nothing — so the result is the source with no branch anywhere. Then delete the
+shortcut and watch C1's own test still pass.
+
+**Do not delete C2's test to make the suite green.** It is the only record that
+this is broken.
+
+**Cost.** Half a day. Deferred because `BP10` decides whether there is a paper at
+all, and this decides how clean it is.
