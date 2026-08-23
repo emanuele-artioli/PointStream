@@ -44,6 +44,7 @@ from experiments.probe.engines import CANVAS, DEVICE, SEED, EnginePlan, plan_for
 from experiments.probe.run import (
     _coding_bundle,
     _generate_clip,
+    _release,
     _require_sequence_path,
     _write_json,
     build_lpips,
@@ -397,6 +398,7 @@ def main(argv: list[str] | None = None) -> int:
             paste_separation_lpips=separation,
             clips=clips,
         )
+        _release(args.device)
     return 0
 
 
