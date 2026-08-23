@@ -293,7 +293,50 @@ is the entire headroom of this paper. If the player region costs 30% of the
 bitrate there is a real prize; if it costs 3%, the premise is weak and we should
 know that before another engine is wired. **Run this before anything else.**
 
-### 2.7 Animate-Anyone has seen the held-out videos
+### 2.7 Animate-Anyone was being driven at T=1 — clip mode changes everything
+
+**Measured 2026-08-23, and it invalidates every Animate-Anyone number in this
+project.** AA is a *temporal* model: ReferenceNet plus a pose guider plus a
+**motion module**. Every evaluation so far called `generate()`, the single-frame
+path, on a model whose temporal attention expects a clip. `generate_sequence()`
+existed and was never used.
+
+Same clips, same seed, same 20 steps, offsets 1–8, 4 clips / 32 frames:
+
+| Path | Object PSNR | LPIPS |
+|---|---|---|
+| frame-by-frame (`generate`) | 8.81 dB | 0.3143 |
+| **clip mode (`generate_sequence`)** | **11.57 dB** | **0.0666** |
+| delta | **+2.76 dB** | **−0.2477 (4.7× better)** |
+
+Bounds were written before running (*"clip mode fixes it → LPIPS well below 0.15
+and object PSNR above 11"*). Both met.
+
+**Consequences.**
+
+1. **AA is now the best engine we have on perceptual quality** — LPIPS 0.067
+   against ControlNet's 0.072, and it is the architecture the literature says
+   should win.
+2. **The Wave-3 verdict on AA is void.** "8.96 dB, not using appearance" was a
+   temporal model run at T=1. So was the 10.4 dB that dropped it as flagship in
+   Wave 2, and the 9.65 dB melted 3-step result.
+3. **The cross-appearance delta must be re-run in clip mode** before anything is
+   concluded about ReferenceNet. The +0.93 dB measured frame-by-frame says
+   nothing about a pathway that was structurally disabled.
+
+**This is the same failure mode for the fourth time**: a path that exists, runs,
+and passes its tests while not doing the job. Ten generators registered that
+could not load weights; a verifier green while five clips had no pose; a roster
+ranked on self-reconstruction; and now a video model evaluated one frame at a
+time. **Whenever an engine underperforms, check first that it is being invoked
+the way its architecture intends.**
+
+**Honest scope.** n=32 frames over 4 clips at offsets 1–8, which is the easy
+regime; the static-copy floor there is 11.2–21.5 dB, so AA does not yet beat it
+on PSNR. What is established is that clip mode transforms output quality, not
+that the coding task is solved.
+
+### 2.8 Animate-Anyone has seen the held-out videos
 
 Verified 2026-08-22 from `assets/dataset/pointstream_aa_meta.json`. The probe set
 holds out `alcaraz_highlights` and `djokovic_zverev`. Animate-Anyone's
@@ -317,7 +360,7 @@ Option 2 is the default unless someone argues otherwise. Whatever is chosen, the
 paper says which, because an unlabelled in-training score is the kind of thing a
 reviewer finds.
 
-### 2.8 Known environment limits
+### 2.9 Known environment limits
 
 - **SAM3 cannot load.** `torch.nn.attention` does not exist in torch 2.2.2. This
   blocks the SAM3 detector comparison (§7 P1 item 10) unless a second env is
