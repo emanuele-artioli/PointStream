@@ -71,3 +71,33 @@ def test_compose_tensor_puts_appearance_in_the_pose_black() -> None:
     composed = compose_pose_on_appearance_tensor(pose, appearance)
     assert float(composed[0, 0, 0, 0]) == pytest.approx(0.2)
     assert float(composed[0, 0, 1, 1]) == pytest.approx(1.0)
+
+
+def test_ip_adapter_refuses_to_train_without_a_reference(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="image-embedding pathway"):
+        ControlNetDataset(str(tmp_path), "ip-adapter", tokenizer=_FakeTokenizer())
+
+
+def test_ip_adapter_pairs_pose_not_the_seg_branch(tmp_path: Path) -> None:
+    video = tmp_path / "alcaraz_ruud" / "segmentations" / "scene_001"
+    track = video / "track_0001"
+    pose = video / "track_0001_pose_body"
+    _write_png(track / "frame_000010.png", 10)
+    _write_png(track / "frame_000011.png", 200)
+    _write_png(pose / "frame_000000.png", 40)
+    _write_png(pose / "frame_000001.png", 40)
+    dataset = ControlNetDataset(
+        str(tmp_path),
+        "ip-adapter",
+        target_size=16,
+        tokenizer=_FakeTokenizer(),
+        include_reference=True,
+    )
+    assert len(dataset) == 2
+    sample = dataset[0]
+    assert "reference_pixel_values" in sample
+    # Pose canvas is fill 40 with black letterbox, not the colour crop (fill 10).
+    cond_mean = float(sample["conditioning_pixel_values"].mean())
+    colour_mean = float(sample["pixel_values"].mean())
+    assert cond_mean > 0.08
+    assert cond_mean > colour_mean

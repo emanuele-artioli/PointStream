@@ -138,4 +138,4 @@ training is BP19.
 alone. `src/components/metrics/**` was not edited; the stop eval *uses*
 calibrated LPIPS and masked PSNR. The paper was not touched.
 
-**CI.** Recorded after push.
+**CI.** Watched green: GitHub Actions run `32747593873` on PR https://github.com/emanuele-artioli/PointStream/pull/20 (`wave3/bp14-bp19`).

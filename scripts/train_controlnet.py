@@ -186,6 +186,13 @@ class ControlNetDataset(Dataset):
         self.tokenizer = tokenizer
         self.include_reference = include_reference
         self.items = []
+        if self.condition_type == "ip-adapter" and not self.include_reference:
+            raise ValueError(
+                "ip-adapter is an image-embedding pathway. Pass --include-reference "
+                "so appearance enters the adapter, not the pose control. "
+                "Painting the reference into the control image is the pose-ref "
+                "recipe that already failed (PLAN.md §2.4)."
+            )
         self.track_to_colors: dict[str, list[str]] = {}
         
         search_pattern = os.path.join(str(self.root_dir), "*", "segmentations", "scene_*", "track_*")
@@ -227,7 +234,12 @@ class ControlNetDataset(Dataset):
                 cond_dir = track_dir.with_name(f"{track_dir.name}_pose_racket")
             elif self.condition_type == "canny":
                 cond_dir = track_dir.with_name(f"{track_dir.name}_canny")
-            elif self.condition_type in ["seg", "ip-adapter"]:
+            elif self.condition_type == "ip-adapter":
+                # Appearance goes through the image-embedding adapter, pose
+                # through ControlNet. This used to share the seg branch with
+                # cond_dir = None, which is why the registry entry was fiction.
+                cond_dir = track_dir.with_name(f"{track_dir.name}_pose_body")
+            elif self.condition_type == "seg":
                 cond_dir = None
             else:
                 raise ValueError(f"Unknown condition type: {self.condition_type}")
@@ -311,15 +323,13 @@ class ControlNetDataset(Dataset):
         img = pad_to_square(img, fill=0)
         image_tensor = self.transform(img)
         
-        if self.condition_type in ("pose", "pose-racket", "canny"):
+        if self.condition_type in ("pose", "pose-racket", "canny", "ip-adapter"):
             cond_img = Image.open(item["cond_path"]).convert("RGB")
             cond_img = pad_to_square(cond_img, fill=0)
             cond_tensor = self.cond_transform(cond_img)
         elif self.condition_type == "seg":
             cond_img = pad_to_square(seg_mask, fill=0)
             cond_tensor = self.cond_transform(cond_img)
-        elif self.condition_type == "ip-adapter":
-            cond_tensor = self.cond_transform(img)
         else:
             raise ValueError(f"Unknown condition type: {self.condition_type}")
             
@@ -632,7 +642,7 @@ def main():
                 noisy_latents = noise_scheduler.add_noise(latents, noise, timesteps)
                 encoder_hidden_states = text_encoder(batch["input_ids"])[0]
                 controlnet_image = batch["conditioning_pixel_values"].to(dtype=weight_dtype)
-                if args.include_reference:
+                if args.include_reference and args.condition_type != "ip-adapter":
                     controlnet_image = compose_pose_on_appearance_tensor(
                         controlnet_image,
                         batch["reference_pixel_values"].to(dtype=weight_dtype),

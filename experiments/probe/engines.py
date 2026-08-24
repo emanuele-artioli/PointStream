@@ -146,9 +146,26 @@ PLANS: tuple[EnginePlan, ...] = (
 )
 
 
+# Not in the default drive list. `--engine multi-controlnet` still has to
+# resolve a plan; this is how BP19 measures the existing multi-condition arm
+# without quietly adding a row to every later roster run.
+EXTRA_PLANS: tuple[EnginePlan, ...] = (
+    EnginePlan(
+        name="multi-controlnet",
+        kind="diffusion",
+        offsets=CLIP_MODE_OFFSETS,
+        steps=20,
+        notes=(
+            "Pose and mask as separate ControlNets. Deliberately left out of "
+            "the BP12 roster; BP19 measures it before building a shared backbone."
+        ),
+    ),
+)
+
+
 def plan_for(name: str) -> EnginePlan:
-    for plan in PLANS:
+    for plan in (*PLANS, *EXTRA_PLANS):
         if plan.name == name:
             return plan
-    known = ", ".join(item.name for item in PLANS)
+    known = ", ".join(item.name for item in (*PLANS, *EXTRA_PLANS))
     raise KeyError(f"unknown probe engine {name!r}. Driven engines: {known}.")
