@@ -102,39 +102,66 @@ def encode_qp_with_vvc_fallback(
     ) from last_error
 
 
+def _curve_bitstreams(
+    root: Path, codec_name: str, qps: tuple[int, ...]
+) -> tuple[Path, ...]:
+    suffix = BITSTREAM_SUFFIX[codec_name]
+    return tuple(Path(root) / f"{codec_name}_qp{qp}{suffix}" for qp in qps)
+
+
+def _complete_curve(root: Path, codec_name: str, qps: tuple[int, ...]) -> bool:
+    return all(path.is_file() and path.stat().st_size > 0 for path in _curve_bitstreams(root, codec_name, qps))
+
+
+def _clear_curve(work_dir: Path, codec_name: str, qps: tuple[int, ...]) -> None:
+    suffix = BITSTREAM_SUFFIX[codec_name]
+    for qp in qps:
+        for name in (f"{codec_name}_qp{qp}{suffix}", f"decoded_qp{qp}.y4m"):
+            path = work_dir / name
+            if path.exists():
+                path.unlink()
+
+
 def seed_reuse(
     work_dir: Path,
     reuse_dirs: tuple[Path, ...],
     codec_name: str,
     qps: tuple[int, ...],
 ) -> int:
-    """Copy matching QP bitstreams (and decoded y4m) from a prior run.
+    """Copy a *complete* QP curve from a prior run.
 
-    Only the requested QPs are copied. A different QP, codec, or clip is a
-    miss and will be encoded. Returns how many bitstreams were seeded.
+    Mixing leftover QP 32/40 bitstreams with a freshly encoded QP 46 is what
+    crashed BP21: rates (266601, 125198, 141623) were not monotonic. A curve
+    is reused only when every requested QP exists in one directory. A partial
+    set in ``work_dir`` is deleted so the missing points are not stitched on.
     """
+    work_dir = Path(work_dir)
+    work_dir.mkdir(parents=True, exist_ok=True)
+    if _complete_curve(work_dir, codec_name, qps):
+        return 0
+    _clear_curve(work_dir, codec_name, qps)
     if not reuse_dirs:
         return 0
     suffix = BITSTREAM_SUFFIX[codec_name]
-    copied = 0
-    work_dir = Path(work_dir)
-    work_dir.mkdir(parents=True, exist_ok=True)
-    for qp in qps:
-        dest = work_dir / f"{codec_name}_qp{qp}{suffix}"
-        if dest.exists() and dest.stat().st_size > 0:
+    work_resolved = work_dir.resolve()
+    for root in reuse_dirs:
+        root_path = Path(root)
+        if root_path.resolve() == work_resolved:
             continue
-        decoded_dest = work_dir / f"decoded_qp{qp}.y4m"
-        for root in reuse_dirs:
-            src = Path(root) / dest.name
-            if not (src.is_file() and src.stat().st_size > 0):
-                continue
+        if not _complete_curve(root_path, codec_name, qps):
+            continue
+        copied = 0
+        for qp in qps:
+            dest = work_dir / f"{codec_name}_qp{qp}{suffix}"
+            src = root_path / dest.name
             shutil.copy2(src, dest)
-            src_decoded = Path(root) / decoded_dest.name
+            decoded_dest = work_dir / f"decoded_qp{qp}.y4m"
+            src_decoded = root_path / decoded_dest.name
             if src_decoded.is_file() and src_decoded.stat().st_size > 0:
                 shutil.copy2(src_decoded, decoded_dest)
             copied += 1
-            break
-    return copied
+        return copied
+    return 0
 
 
 def qp_request(codec_name: str, qp: int) -> EncodeRequest:

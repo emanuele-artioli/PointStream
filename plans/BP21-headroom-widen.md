@@ -191,7 +191,12 @@ PR https://github.com/emanuele-artioli/PointStream/pull/18
 
 - `alcaraz_ruud` point scenes are 120–370 s, above the 30 s extract cap, so that match is absent. Six matches still satisfy ≥4.
 - Two clips tie at MAE 0.0 on both 24 fps conventions; winner is dict-order (`extract_24_position`). Worth a tie-break toward `extract_24_frame_id` if a later stream touches diagnosis; window MAE already gates the region.
-- Encode continues at `outputs/bp21-headroom/`. Fill the n≥8 mean±SE table from `report.json` once `finished_at` is set. Resume is safe: finished codec/clip arms are kept. `PLAN.md` §2.14 is not edited here.
+- Encode crashed 2026-08-24T20:58Z on `alcaraz_highlights/scene_010` original:
+  leftover QP 32/40 bitstreams from 03:49 (266601 / 125198 B) mixed with a new
+  QP 46 (141623 B). Rates were not monotonic; the check aborted. Six AVC clips
+  were already checkpointed. Reuse now copies only a complete QP set; a partial
+  arm is deleted and re-encoded together. The poisoned `scene_010` originals
+  were wiped and the ladder resumed. `PLAN.md` §2.14 is not edited here.
 
 ### Tests landed (approved bug-fix cases only)
 
@@ -199,5 +204,8 @@ PR https://github.com/emanuele-artioli/PointStream/pull/18
 2. Chooser returns ≥8 point scenes from ≥4 matches (mocked listing).
 3. Paste-back failure is recorded and the clip is dropped, not encoded.
 4. Common-interval BD-rate helper: two shifted two-point curves integrate only on the overlap (hand-computed saving ≈ 0.3675).
+
+5. `seed_reuse` copies a complete QP set and deletes a partial 32/40 leftover
+   rather than stitching on a new 46.
 
 Deliberately not tested: encoder binaries, libvvenc empty bitstreams, full 4K encode.

@@ -376,3 +376,50 @@ def test_common_interval_bd_rate_integrates_only_on_the_overlap() -> None:
     assert result["sliced"] is True
     assert result["saving"] == pytest.approx(1.0 - 10 ** (np.log10(200.0) - 2.5), rel=1e-6)
     assert result["interval"] == pytest.approx([30.0, 40.0])
+
+
+def test_seed_reuse_does_not_copy_a_partial_qp_set(tmp_path: Path) -> None:
+    """BP21 crashed by stitching leftover QP 32/40 onto a new QP 46."""
+    from experiments.headroom.ladder import seed_reuse
+
+    prior = tmp_path / "prior"
+    prior.mkdir()
+    (prior / "avc_qp32.mp4").write_bytes(b"old32")
+    (prior / "avc_qp40.mp4").write_bytes(b"old40")
+    dest = tmp_path / "dest"
+    dest.mkdir()
+    (dest / "avc_qp32.mp4").write_bytes(b"stale32")
+    (dest / "avc_qp40.mp4").write_bytes(b"stale40")
+    copied = seed_reuse(dest, (prior,), "avc", (32, 40, 46))
+    assert copied == 0
+    assert not (dest / "avc_qp32.mp4").exists()
+    assert not (dest / "avc_qp40.mp4").exists()
+    assert not (dest / "avc_qp46.mp4").exists()
+
+
+def test_seed_reuse_copies_only_a_complete_qp_set(tmp_path: Path) -> None:
+    from experiments.headroom.ladder import seed_reuse
+
+    prior = tmp_path / "prior"
+    prior.mkdir()
+    for qp, payload in ((32, b"a32"), (40, b"a40"), (46, b"a46")):
+        (prior / f"avc_qp{qp}.mp4").write_bytes(payload)
+        (prior / f"decoded_qp{qp}.y4m").write_bytes(b"dec")
+    dest = tmp_path / "dest"
+    copied = seed_reuse(dest, (prior,), "avc", (32, 40, 46))
+    assert copied == 3
+    assert (dest / "avc_qp46.mp4").read_bytes() == b"a46"
+    assert (dest / "decoded_qp46.y4m").read_bytes() == b"dec"
+
+
+def test_seed_reuse_keeps_a_complete_curve_already_in_work_dir(tmp_path: Path) -> None:
+    from experiments.headroom.ladder import seed_reuse
+
+    dest = tmp_path / "dest"
+    dest.mkdir()
+    (dest / "avc_qp32.mp4").write_bytes(b"keep32")
+    (dest / "avc_qp40.mp4").write_bytes(b"keep40")
+    (dest / "avc_qp46.mp4").write_bytes(b"keep46")
+    copied = seed_reuse(dest, (), "avc", (32, 40, 46))
+    assert copied == 0
+    assert (dest / "avc_qp32.mp4").read_bytes() == b"keep32"
