@@ -119,3 +119,53 @@ Write per-codec bands before running, and record why any bound was wrong.
 - `sections/problem.tex` carries the real numbers, the provisional paragraph is
   removed, and the `CLAIM` line names the new `outputs/` path.
 - `PLAN.md` §2.13's withdrawn fork is **re-decided** on these numbers.
+
+---
+
+## Delivered — 2026-08-23
+
+**The premise holds, measured on real 4K.** Full numbers in `PLAN.md` §2.14;
+`outputs/bp20-headroom/`.
+
+Input, first line as the brief demanded: `alcaraz_highlights/scene_000` frames
+[38:86] and `federer_djokovic/scene_001` frames [93:141], 3840×2160, 48 frames
+each, from `assets/raw_4k/`.
+
+**The correctness gate passed and mattered.** Pasting each crop back into its
+sidecar `bbox` reproduces the source at **MAE 0.0** under the
+`extract_24_frame_id` convention — and the native-fps and positional conventions
+both **failed** it. §2.2 bit for a third time and was caught this time. Nulls:
+empty mask 0.0, duplicate-encode ratio 1.0.
+
+**Foreground.** Plate-inpaint BD-rate saving: AVC 0.244 ± 0.017, HEVC
+0.234 ± 0.017, AV1 0.229 ± 0.030, VVC 0.167 ± 0.015. Player area by **alpha
+silhouette** 0.55% and 1.02%. **A player pixel costs 15–47× an average pixel.**
+
+**Background.** A plate plus homographies (1728 B) saves **34–69%** of the
+background bitrate, best on VVC. Not orders of magnitude — inter prediction
+already handles a near-static background — but a real second half.
+
+**Bounds that fired, and why they were wrong.** The player-area band was written
+on *bbox* area while the measurement correctly used the *alpha silhouette*,
+about half of it — wrong by construction. The FG bands were carried from the
+synthetic run and were too low. The BG [1.5, 12] gate was derived from the
+discredited synthetic JPEG comparison. **Flat fill understates the prize on real
+4K too** (0.12 against plate's 0.24), confirming the synthetic alarm on real
+content; "flat is an upper bracket" stays void.
+
+**The AV1 ≥ HEVC ≥ AVC prediction fails as stated**, but the first reading of
+that — "headroom shrinks as codecs strengthen" — was over-reading n=2. AVC, HEVC
+and AV1 agree; VVC is a ~0.077 step down that repeats on both clips. See §2.14
+for the two candidate explanations, including the QP-47 confound.
+
+### Left open, deliberately
+
+- **n = 2 clips.** The project's own bar is n ≥ 8, and this is the paper's
+  opening argument. Widening it is the first item of the follow-on brief.
+- **AV1's background BD-rate is unreported**: PSNR overlap 0.46 and 0.20, below
+  the 50% floor. Widen the QP sweep.
+- **VVC's QP-47 confound is not ruled out.**
+- **`sections/problem.tex` still carries the provisional synthetic paragraph.**
+  The rewrite is assigned separately.
+- `src/components/background/plate.py` emits `All-NaN slice` from `nanmedian` on
+  real 4K masks. Recorded, not fixed.

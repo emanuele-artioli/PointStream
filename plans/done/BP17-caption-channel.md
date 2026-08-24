@@ -115,3 +115,38 @@ caption run that also changes steps or strength measures nothing.
   `outputs/bp12-clip-roster/`, split by whether the caption names a colour.
 - `PLAN.md` §2.11 says what the channel is worth, including if the answer is
   "nothing measurable".
+
+---
+
+## Delivered — 2026-08-23
+
+**The channel is reachable now, and it is worth nothing measurable.** Full
+numbers in `PLAN.md` §2.15; `outputs/bp17-caption/`.
+
+- `ConditioningBundle` carries an optional caption; the ControlNet resolves the
+  track caption and falls back to the generic prompt; every row records
+  `prompt`, `prompt_source` and `caption_names_colour`.
+- **Checkpoint provenance was checked, not assumed.** Captions landed on disk
+  2026-07-01, the trainer began reading them in `d1efbcf` (2026-07-06), and pose
+  epoch 10 and seg epoch 7 both post-date it — so for those two arms this really
+  was switching a channel *back* on. `ip-adapter` loads a stock OpenPose
+  ControlNet, so there it only switches SD's text encoder on. That distinction
+  is in the plan.
+- **The control is exact**: both no-model arms moved by **0.000 ± 0.000**
+  (static-copy 0.4505, unrelated-image 0.7358, unchanged to four decimals), so
+  the two runs are comparable and nothing else drifted.
+
+| Arm | captions on − generic (LPIPS, lower better) | verdict |
+|---|---|---|
+| pose-controlnet | +0.020 ± 0.014 (1.5σ) | suggestive that captions are *worse* |
+| seg-controlnet | +0.002 ± 0.011 | inside noise |
+| ip-adapter-controlnet | −0.002 ± 0.008 | inside noise |
+| trajectory-controlnet | +0.001 ± 0.019 | inside noise |
+
+**Only 5 of 12 probe clips name a colour**, which caps how much this channel
+could ever have carried. The predicted outcome — inside noise — is what
+happened.
+
+**What it bought.** Not quality. It retires the possibility that §2.10's roster
+was measured unfairly, and it closes a genuine defect: a trained pathway that no
+inference path could reach. The appearance problem is not in the text channel.

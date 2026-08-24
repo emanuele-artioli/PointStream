@@ -108,3 +108,27 @@ so in the commit — never add a test to raise it back
 - `gh run list --branch main` shows a **green** run, verified not assumed.
 - No new `ruff` / `mypy` / layer-check findings, and the coverage gate is either
   unchanged or lowered with a stated reason.
+
+---
+
+## Delivered — 2026-08-23
+
+**CI is green on `main` and has stayed green.** It had failed on every push for
+at least twelve consecutive runs, always on the same test.
+
+- The two real config faults the test was correctly reporting were fixed
+  **first**, and verified against the invariant in its strict form:
+  `tier_quality.yaml`'s `yolo26x-eg.pt` → `yolo26x-seg.pt` (the typo had been
+  papered over with a symlink), and the doubled `assets/weights/assets/weights/`
+  prefix on `controlnet-id`.
+- The named-weight invariant is split as the brief asked: the **structural**
+  half runs everywhere including CI, the **file-existence** half is
+  `@pytest.mark.integration` and runs where the weights are.
+- CI watched green with `gh run watch`, not inferred from job names.
+
+**Reported, not changed** (outside this brief's "owns"): the decoder still passes
+a bare `custom-controlnet` to `from_pretrained`, and
+`scripts/process_dataset.py` still defaults to `yolo26x-eg.pt`.
+
+**BP15 was correctly not folded in.** It needed the green baseline this brief
+restored, and it landed separately.

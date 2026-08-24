@@ -4,16 +4,19 @@
 and any new generator module, `src/contracts/capabilities.py` if a new
 conditioning capability is needed.
 
-**GATED. Do not start this brief on its own initiative.** It is Wave 3 in
-`WAVE-2026-08-24.md` and it is the only stream here that spends real GPU time.
-Four things must land first:
+**Three of four gates are now passed. `BP14` is the one that remains**, and it is
+not optional: the last training run burned 14 GPU hours on a series that was flat
+from epoch 1 because it stopped on nothing.
+
+This is now **the critical path**. It is also the only stream that spends real
+GPU time, so it goes second in its wave, behind whatever else can run free.
 
 | Gate | Brief | Why |
 |---|---|---|
-| **Headroom** | `BP13` | If a conventional encoder spends <10% of its bits on the player regions, none of this is worth training. The fork is written down in the wave plan. |
-| **Stop rule** | `BP14` | The last training run burned 14 GPU hours on a series flat from epoch 1, because it stopped on nothing. |
-| **Instrument** | `BP18` | Without an identity metric you cannot tell a retrain that works from one that merely moves the output. That is exactly how `BP10` went wrong. |
-| **Caption channel** | `BP17` | One appearance channel is already trained and switched off. Measure what it is worth before training a second one. |
+| ~~Headroom~~ | `BP20` | ✅ **PASSED 2026-08-23.** A player is ~1% of the pixels and **17–24%** of the bitrate on real 4K, a 15–47× concentration (`PLAN.md` §2.14). The premise holds; this brief is unblocked on that gate. |
+| **Stop rule** | `BP14` | ⬜ **STILL REQUIRED.** The last training run burned 14 GPU hours on a series flat from epoch 1, because it stopped on nothing. |
+| ~~Instrument~~ | `BP18` | ✅ **DONE 2026-08-23.** `reid` + `palette`, calibrated on ground-truth pairs at 17.1σ, with `IdentityScale` so a score is quoted between its measured anchors (`PLAN.md` §2.12). Use it. |
+| ~~Caption channel~~ | `BP17` | ✅ **DONE 2026-08-23, and the answer is nothing.** Switching it on moved three arms inside noise and pose-controlnet 1.5σ *worse* (`PLAN.md` §2.15). The text channel is not where the appearance problem lives — do not spend more on it. |
 
 ## Where the conditioning actually stands
 
@@ -111,8 +114,17 @@ not on a distance-to-target metric. Licence check before integration, as above.
 
 ## Bounds, to be written properly before any run
 
-Placeholders here on purpose — the real bounds must be written against `BP18`'s
-calibrated instrument, which does not exist yet, and against `BP13`'s headroom.
+`BP18`'s instrument now exists, so these can be concrete. Write the per-arm
+bands before the first sample, and evaluate on **both axes together**:
+
+- **`reid`**, quoted through `IdentityScale` — a raw 0.53 is the *stranger
+  floor*, not a halfway mark. `TENNIS_SCALE` holds the measured anchors.
+- **LPIPS**, against the static-copy floor of **0.4505** and the
+  unrelated-image null of **0.7358**.
+
+The combination is the point: high `reid` with poor LPIPS is a paste, good LPIPS
+with low `reid` is a convincing stranger, and only both together is success.
+
 What is already known and must not be forgotten:
 
 - **The static-copy floor is 0.4505 LPIPS / 13.51 dB** on this probe set, and no
