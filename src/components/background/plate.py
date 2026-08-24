@@ -12,9 +12,11 @@ pre-rewrite stitcher is prior art to read, not a foundation to trust.
 from __future__ import annotations
 
 from collections.abc import Sequence
+import warnings
 
 import cv2
 import numpy as np
+from scipy.ndimage import distance_transform_edt
 
 MAX_CANVAS_SCALE = 4
 
@@ -103,8 +105,41 @@ def _canvas(
 
 
 def _nanmedian(stacked: np.ndarray) -> np.ndarray:
-    with np.errstate(all="ignore"):
+    """Median along frame 0, leaving All-NaN pixels as NaN.
+
+    ``np.nanmedian`` warns on an All-NaN slice (a canvas column masked in
+    every frame, or a warp margin that never saw a source pixel). The warning
+    is suppressed here because ``_nearest_finite_fill`` is the documented
+    follow-up — not a silent zero.
+    """
+    with np.errstate(all="ignore"), warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="All-NaN slice encountered")
         return np.nanmedian(stacked, axis=0)
+
+
+def _nearest_finite_fill(image: np.ndarray) -> tuple[np.ndarray, int]:
+    """Replace remaining NaN pixels with the nearest finite pixel (Euclidean).
+
+    This is the explicit fill for holes ``nanmedian`` cannot score: an
+    all-masked column, or a canvas margin that never saw a source pixel.
+    A plate with no finite pixel at all is a recorded hole, not a zero fill.
+    """
+    out = np.asarray(image, dtype=np.float64).copy()
+    if out.ndim != 3:
+        raise ValueError(f"expected HxWxC plate, got {tuple(out.shape)}")
+    hole = np.isnan(out).any(axis=-1)
+    n_holes = int(hole.sum())
+    if n_holes == 0:
+        return out, 0
+    if not np.any(~hole):
+        raise RuntimeError(
+            "background plate has no finite pixels; nearest-valid fill cannot "
+            "run. This is a recorded hole, not a silent zero."
+        )
+    _dist, indices = distance_transform_edt(hole, return_indices=True)
+    del _dist
+    out[hole] = out[indices[0][hole], indices[1][hole]]
+    return out, n_holes
 
 
 def build_plate(
@@ -112,6 +147,11 @@ def build_plate(
     masks: np.ndarray | Sequence[np.ndarray] | None = None,
 ) -> tuple[np.ndarray, tuple[tuple[float, ...], ...]]:
     """Median-composite a plate, excluding ``masks`` (nonzero = foreground).
+
+    Pixels that are masked (or off-canvas) in every frame have no median.
+    Those holes are filled with the nearest finite plate pixel, not with
+    the player colour and not with a silent zero. A plate that is NaN
+    everywhere raises rather than encoding black.
 
     Returns the uint8 BGR plate and the per-frame homographies as 9-tuples.
     """
@@ -129,7 +169,6 @@ def build_plate(
     exclusion = _normalize_masks(masks, n_frames, height, width)
 
     masked_stack: list[np.ndarray] = []
-    unmasked_stack: list[np.ndarray] = []
     valid_src = np.full((height, width), 255, dtype=np.uint8)
     for index in range(n_frames):
         warped = cv2.warpPerspective(
@@ -148,10 +187,6 @@ def build_plate(
             borderValue=(0.0,),
         )
         invalid = warped_valid < 127
-        unmasked = warped.copy()
-        unmasked[invalid] = np.nan
-        unmasked_stack.append(unmasked)
-
         masked = warped.copy()
         if exclusion is not None:
             warped_excl = cv2.warpPerspective(
@@ -168,9 +203,7 @@ def build_plate(
         masked_stack.append(masked)
 
     filled = _nanmedian(np.stack(masked_stack, axis=0))
-    fallback = _nanmedian(np.stack(unmasked_stack, axis=0))
-    filled = np.where(np.isnan(filled), fallback, filled)
-    filled = np.nan_to_num(filled, nan=0.0, posinf=255.0, neginf=0.0)
+    filled, _n_nearest = _nearest_finite_fill(filled)
     plate = np.asarray(np.clip(filled, 0.0, 255.0), dtype=np.uint8)
     packed = tuple(tuple(float(v) for v in matrix.reshape(-1)) for matrix in maps)
     return plate, packed

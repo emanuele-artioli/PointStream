@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import shutil
 
 import numpy as np
 
@@ -14,8 +15,11 @@ from src.components.metrics.psnr import PsnrMetric, masked_psnr
 from src.contracts.codecs import EncodeRequest, RateControl
 from experiments.headroom.remove import as_mask, even_size, rgb_to_luma
 
-DEFAULT_QPS: tuple[int, ...] = (32, 40, 48)
+DEFAULT_QPS: tuple[int, ...] = (32, 40, 46)
 DEFAULT_CODEC = "avc"
+# Extra AV1 QPs for the background arms: BP20's 32/40/48 overlap was 0.46 and
+# 0.20, below the 50% BD-rate needs. Widen both ends of the quality range.
+AV1_BG_QPS: tuple[int, ...] = (24, 32, 40, 46, 56, 63)
 
 
 def encoders_available(codec_name: str = DEFAULT_CODEC) -> bool:
@@ -41,14 +45,15 @@ def resolved_tools(codec_name: str = DEFAULT_CODEC) -> dict[str, str]:
 
 
 def qps_for_codec(codec_name: str, qps: tuple[int, ...]) -> tuple[int, ...]:
-    """libvvenc 1.11.0 writes an empty 4K bitstream at QP 48 on smooth fills.
+    """libvvenc 1.11.0 writes an empty 4K bitstream at QP 48, and at 47 on some fills.
 
     Original tennis pixels encode at 48; plate/flat do not (exit 0, 0 bytes).
-    QP 47 still produces a stream. Keep the three-point curve; do not pretend 48 ran.
+    QP 46 still produces a stream on the fills BP20 saw empty at 47. Keep the
+    three-point curve; do not pretend 48 or 47 ran.
     """
     if codec_name != "vvc":
         return qps
-    return tuple(47 if qp >= 48 else qp for qp in qps)
+    return tuple(46 if qp >= 47 else qp for qp in qps)
 
 
 def encode_qp_with_vvc_fallback(
@@ -97,6 +102,41 @@ def encode_qp_with_vvc_fallback(
     ) from last_error
 
 
+def seed_reuse(
+    work_dir: Path,
+    reuse_dirs: tuple[Path, ...],
+    codec_name: str,
+    qps: tuple[int, ...],
+) -> int:
+    """Copy matching QP bitstreams (and decoded y4m) from a prior run.
+
+    Only the requested QPs are copied. A different QP, codec, or clip is a
+    miss and will be encoded. Returns how many bitstreams were seeded.
+    """
+    if not reuse_dirs:
+        return 0
+    suffix = BITSTREAM_SUFFIX[codec_name]
+    copied = 0
+    work_dir = Path(work_dir)
+    work_dir.mkdir(parents=True, exist_ok=True)
+    for qp in qps:
+        dest = work_dir / f"{codec_name}_qp{qp}{suffix}"
+        if dest.exists() and dest.stat().st_size > 0:
+            continue
+        decoded_dest = work_dir / f"decoded_qp{qp}.y4m"
+        for root in reuse_dirs:
+            src = Path(root) / dest.name
+            if not (src.is_file() and src.stat().st_size > 0):
+                continue
+            shutil.copy2(src, dest)
+            src_decoded = Path(root) / decoded_dest.name
+            if src_decoded.is_file() and src_decoded.stat().st_size > 0:
+                shutil.copy2(src_decoded, decoded_dest)
+            copied += 1
+            break
+    return copied
+
+
 def qp_request(codec_name: str, qp: int) -> EncodeRequest:
     presets = {"avc": "veryfast", "hevc": "ultrafast", "av1": "10", "vvc": "faster"}
     return EncodeRequest(
@@ -117,6 +157,7 @@ def encode_luma_curve(
     masks: np.ndarray | None = None,
     label: str = "",
     fps: float = 25.0,
+    reuse_dirs: tuple[Path, ...] = (),
 ) -> dict[str, object]:
     """Encode RGB ``frames`` at ``qps``. Quality is PSNR against this clip's luma."""
     if not encoders_available(codec_name):
@@ -126,10 +167,13 @@ def encode_luma_curve(
     if used_qps != tuple(qps):
         notes.append(
             f"{codec_name} QPs {tuple(qps)} remapped to {used_qps}: "
-            "libvvenc 1.11.0 writes an empty bitstream at QP 48 on some 4K fills"
+            "libvvenc 1.11.0 writes an empty bitstream at QP 47/48 on some 4K fills"
         )
     work_dir = Path(work_dir)
     work_dir.mkdir(parents=True, exist_ok=True)
+    seeded = seed_reuse(work_dir, reuse_dirs, codec_name, used_qps)
+    if seeded:
+        notes.append(f"reused {seeded} {codec_name} bitstreams for {label} from prior run")
     clip = even_size(np.asarray(frames))
     luma = rgb_to_luma(clip)
     source = work_dir / "source.y4m"

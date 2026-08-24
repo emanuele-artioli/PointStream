@@ -187,6 +187,24 @@ class TestPlateBuilder:
         assert recovered[12, 14].mean() < 80
         assert len(homographies) == 5
 
+    def test_all_masked_column_is_nearest_filled_not_silently_zeroed(self) -> None:
+        """A column masked in every frame has no median; nearest-valid fill, not 0."""
+        import warnings
+
+        height, width = 16, 24
+        frames = np.full((4, height, width, 3), 80, dtype=np.uint8)
+        masks = np.zeros((4, height, width), dtype=np.uint8)
+        masks[:, :, 0] = 255
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            plate, _homographies = build_plate(frames, masks=masks)
+        nan_warnings = [w for w in caught if "All-NaN" in str(w.message)]
+        assert nan_warnings == []
+        # Silent zero was the old behaviour. Nearest-valid copies column 1 (~80).
+        assert plate[:, 0].mean() > 40
+        assert abs(float(plate[:, 0].mean()) - float(plate[:, 1].mean())) < 8
+        assert not np.array_equal(plate[:, 0], np.zeros_like(plate[:, 0]))
+
 
 class TestUnknownBackend:
     def test_validate_backends_rejects_an_unregistered_method(self) -> None:

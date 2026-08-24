@@ -9,7 +9,11 @@ from typing import Any
 import numpy as np
 
 from src.components.background.sidecar import JpegSidecar
-from src.components.metrics.bd_rate import InsufficientOverlapError, compare_rd_curves
+from src.components.metrics.bd_rate import (
+    InsufficientOverlapError,
+    RDCurve,
+    compare_rd_curves,
+)
 from experiments.headroom.remove import plate_fill, player_fraction, prepare_fills
 
 # Written down before any clip is encoded. FG is a fraction of conventional
@@ -24,7 +28,14 @@ EncodeFn = Callable[..., dict[str, Any]]
 
 
 def declared_bounds() -> dict[str, Any]:
-    """The bars this measurement is judged against. Not derived from the run."""
+    """The bars this measurement is judged against. Not derived from the run.
+
+    BP21 copies the parent file written 2026-08-24T15:17Z at
+    ``outputs/bp21-headroom/bounds-before-run.json``, before any paste-back
+    or encode in this stream. Stream A's confirm is
+    ``outputs/bp21-headroom/bounds-stream-a.json``. Bands are BP20's n=2
+    means ± 0.06, not the synthetic BP13 figures that fired as false alarms.
+    """
     return {
         "fg_strong_saving": FG_STRONG,
         "fg_modest_saving": FG_MODEST,
@@ -33,24 +44,29 @@ def declared_bounds() -> dict[str, Any]:
         "written_before_measurement": True,
         "instrument_psnr_range": "finite PSNR in dB; identical frames are +inf; typical coded 20–50 dB",
         "instrument_rate_range": "positive payload bytes; a duplicate encode of the same clip must match within a few percent",
-        # Per-codec FG saving bands, written before any 4K encode. Basis: the
-        # withdrawn synthetic AVC figure was 12.2% at ~4.7% player area; real
-        # 4K area is ~2.3% so a linear guess is half that, and a stronger
-        # codec compresses the near-static court harder, so the players' share
-        # of leftover bits should rise. AVC is the conservative rung.
-        "fg_saving_band_avc": [0.03, 0.18],
-        "fg_saving_band_hevc": [0.04, 0.22],
-        "fg_saving_band_av1": [0.05, 0.28],
-        "fg_saving_band_vvc": [0.05, 0.30],
+        "fg_saving_band_avc": [0.184, 0.304],
+        "fg_saving_band_hevc": [0.174, 0.294],
+        "fg_saving_band_av1": [0.169, 0.289],
+        "fg_saving_band_vvc": [0.107, 0.227],
         "fg_codec_ranking_prediction": "AV1 >= HEVC >= AVC on FG saving for the same clip",
         "fg_saving_below_zero_is_alarm": True,
         "fg_saving_above_0_40_is_alarm": True,
-        "bg_intercoded_ratio_band": [1.5, 12.0],
-        "player_area_band": [0.015, 0.035],
+        "bg_intercoded_ratio_band": [1.2, 12.0],
+        "bg_saving_band": [0.25, 0.75],
+        "player_area_band": [0.004, 0.020],
+        "concentration_band": [10.0, 60.0],
+        "vvc_gap_expect_survive": True,
+        "vvc_gap_avc_minus_vvc": [0.04, 0.10],
+        "plate_nan_fg_delta_abs_max": 0.01,
+        "plate_nan_fg_delta_alarm": 0.02,
         "paste_back_mae_opaque_max": 2.0,
         "flat_fill_is_not_an_upper_bound": True,
         "empty_mask_saving_abs_max": 0.02,
         "duplicate_rate_ratio_band": [0.97, 1.03],
+        "bounds_source": (
+            "outputs/bp21-headroom/bounds-before-run.json "
+            "(parent 2026-08-24T15:17Z); stream-a confirm, no disagreements"
+        ),
     }
 
 
@@ -84,6 +100,86 @@ def _saving(anchor_curve: Any, candidate_curve: Any) -> dict[str, Any]:
         "overlap_fraction": comparison.overlap_fraction,
         "verdict": fg_verdict(saving),
     }
+
+
+def common_quality_interval(*curves: RDCurve) -> tuple[float, float]:
+    """Quality range every curve covers: ``[max(mins), min(maxes)]``."""
+    if not curves:
+        raise ValueError("common_quality_interval needs at least one curve")
+    low = max(min(curve.qualities) for curve in curves)
+    high = min(max(curve.qualities) for curve in curves)
+    return float(low), float(high)
+
+
+def _log_rate_at(curve: RDCurve, quality: float) -> float:
+    """Linear interpolation of log10(rate) vs quality. Exact on two-point curves."""
+    order = sorted(range(len(curve.qualities)), key=lambda i: curve.qualities[i])
+    qs = [float(curve.qualities[i]) for i in order]
+    log_r = [float(np.log10(curve.rates[i])) for i in order]
+    log_val = float(np.interp(quality, qs, log_r))
+    return float(10.0**log_val)
+
+
+def slice_rd_curve(curve: RDCurve, q_low: float, q_high: float) -> RDCurve:
+    """Restrict a curve to ``[q_low, q_high]`` before ``compare_rd_curves``.
+
+    Interior measured points in the interval are kept. Endpoints are added by
+    interpolating log10(rate) vs quality so two curves whose quality ranges
+    only overlap on a shift still have two points on the common interval.
+    The integral then covers only that interval.
+    """
+    if q_high <= q_low:
+        raise InsufficientOverlapError((q_low, q_high), 0.0, 0.5)
+    curve_lo, curve_hi = min(curve.qualities), max(curve.qualities)
+    if q_low < curve_lo - 1e-9 or q_high > curve_hi + 1e-9:
+        raise InsufficientOverlapError(
+            (max(q_low, curve_lo), min(q_high, curve_hi)),
+            0.0,
+            0.5,
+        )
+    points: list[tuple[float, float]] = []
+    for quality, rate in zip(curve.qualities, curve.rates):
+        if q_low - 1e-9 <= float(quality) <= q_high + 1e-9:
+            points.append((float(quality), float(rate)))
+    for end in (float(q_low), float(q_high)):
+        if not any(abs(quality - end) < 1e-9 for quality, _rate in points):
+            points.append((end, _log_rate_at(curve, end)))
+    points.sort(key=lambda item: item[0])
+    deduped: list[tuple[float, float]] = []
+    for quality, rate in points:
+        if deduped and abs(deduped[-1][0] - quality) < 1e-9:
+            continue
+        deduped.append((quality, rate))
+    if len(deduped) < 2:
+        raise InsufficientOverlapError((q_low, q_high), 0.0, 0.5)
+    return RDCurve(
+        rates=tuple(rate for _q, rate in deduped),
+        qualities=tuple(quality for quality, _r in deduped),
+        label=f"{curve.label}[{q_low:.3f},{q_high:.3f}]",
+    )
+
+
+def saving_on_interval(
+    anchor: RDCurve, candidate: RDCurve, interval: tuple[float, float]
+) -> dict[str, Any]:
+    """BD-rate of ``candidate`` vs ``anchor`` after slicing both to ``interval``."""
+    try:
+        sliced_anchor = slice_rd_curve(anchor, interval[0], interval[1])
+        sliced_candidate = slice_rd_curve(candidate, interval[0], interval[1])
+    except InsufficientOverlapError as exc:
+        return {
+            "saving": None,
+            "bd_rate": None,
+            "overlap": list(exc.overlap),
+            "overlap_fraction": exc.overlap_fraction,
+            "interval": [float(interval[0]), float(interval[1])],
+            "sliced": True,
+            "error": str(exc),
+        }
+    result = _saving(sliced_anchor, sliced_candidate)
+    result["interval"] = [float(interval[0]), float(interval[1])]
+    result["sliced"] = True
+    return result
 
 
 def fg_headroom(
@@ -261,10 +357,10 @@ def bg_headroom_intercoded(
     ]
     finite = [float(r) for r in ratios if r is not None]
     mean_ratio = float(sum(finite) / len(finite)) if finite else None
-    from src.components.metrics.bd_rate import RDCurve
+    from src.components.metrics.bd_rate import RDCurve as _RDCurve
 
     plate_curve = plate_enc["curve"]
-    adjusted = RDCurve(
+    adjusted = _RDCurve(
         rates=tuple(float(r) + homog_bytes for r in plate_curve.rates),
         qualities=plate_curve.qualities,
         label="plate_still+homog",
