@@ -9,11 +9,11 @@ there, say so in your report rather than making it.
 Two things are true and both are load-bearing:
 
 0. **The premise is measured and it holds** (`PLAN.md` §2.14): on real 4K a
-   player is ~1% of the pixels and 17–24% of the bitrate. But the headroom
-   **shrinks against stronger codecs** (24.4% AVC → 16.7% VVC), and the
-   **panorama half is dead** — against inter-coded video a transmitted plate is
-   worth 1.39×, not the 17.4× a synthetic run suggested. Quote VVC, and do not
-   lean on the background.
+   player is ~1% of the pixels and **17–24%** of the bitrate, and a panorama
+   plate plus homographies saves **34–69%** of the background bitrate. AVC,
+   HEVC and AV1 agree on the foreground; **VVC is ~0.077 lower and is the
+   exception to name**, with a QP-47 confound still to rule out. Report every
+   cell; claim no trend at n=2.
 1. **No generative engine here produces a usable player.** Re-ranked in clip
    mode on calibrated LPIPS over 12 clips (`PLAN.md` §2.10): **every one of the
    eight loses to pasting the keyframe**, at 2.5σ–10.6σ, and the best of them is

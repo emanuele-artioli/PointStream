@@ -724,7 +724,7 @@ thought to be missing. §2.12's identity work reads the same sidecars.
 `plans/BP20-headroom-real-ladder.md` is the replacement.
 
 
-### 2.14 The real headroom: the premise holds, and it shrinks against better codecs
+### 2.14 The real headroom: the premise holds across the ladder
 
 Measured 2026-08-23 on **real 4K** (`BP20`), replacing §2.13's synthetic number.
 `outputs/bp20-headroom/`. Two broadcast scenes — `alcaraz_highlights/scene_000`
@@ -756,34 +756,70 @@ That concentration is the motivating example, measured rather than asserted.
 n=2 clips, so it is a direction, not a final figure — the project's own bar is
 n≥8.
 
-#### The finding that changes how the paper argues
+#### VVC behaves differently; the rest of the ladder agrees
 
-**The predicted ordering AV1 ≥ HEVC ≥ AVC failed, monotonically the other way.**
-The headroom *shrinks* as the codec gets stronger: 24.4% against AVC, 16.7%
-against VVC.
+The prediction was **AV1 ≥ HEVC ≥ AVC** on FG saving. Read as a 4-point
+ordering it fails, and this section first said the headroom "shrinks as the
+codec strengthens". **That was over-reading n=2.** Paired on the same clips:
 
-The prediction was mine and the reasoning behind it was wrong. I argued a
-stronger codec compresses the near-static background better, so the players take
-a larger share of what remains. What it also does — and this dominates — is code
-the **players** better. The background is nearly free for every codec in the
-ladder; the modern tools (finer motion compensation, larger transforms, better
-intra) pay off precisely on the hard, moving, detailed content, which *is* the
-player region. So removing the players saves proportionally less the better the
-codec is.
+| pair | per clip | mean |
+|---|---|---|
+| AVC − HEVC | +0.009, +0.010 | +0.009 |
+| AVC − AV1 | +0.001, **+0.029** | +0.015 |
+| **AVC − VVC** | **+0.078, +0.075** | **+0.077** |
 
-**Consequence for the submission.** The honest rung to quote is the strongest
-one. Against VVC the headroom is **16.7%**, not 24%, and the trend says it keeps
-shrinking with future codecs. A paper that leads with the AVC number and is
-asked about VVC at review has a problem; one that leads with VVC and notes the
-AVC number is larger does not.
+**AVC, HEVC and AV1 sit together** — the gaps between them are small and, for
+AV1, inconsistent between the two clips (+0.001 on one, +0.029 on the other),
+which is what noise looks like at this n. **VVC is a step down of ~0.077, and
+that step is the one thing here that repeats cleanly on both clips.**
 
-#### The background half is much weaker than believed
+So the honest statement is not a trend. It is: *the premise holds across the
+ladder, and VVC is the exception worth naming.*
 
-§2.13's 17.4× was a panorama plate against **JPEG stills**. Against **inter-coded
-video** the ratio is **1.39–1.46**, below the pre-written [1.5, 12] band. Inter
-prediction already handles a near-static background almost as well as a
-transmitted plate does. The "panorama pays for itself by orders of magnitude"
-claim is **dead on real footage** and must not reappear in the paper.
+**Two candidate explanations, and they are not separated yet.**
+
+1. VVC codes the player region better, so removing it saves less. Plausible —
+   modern tools pay off on hard moving detail — but a claim about codec
+   generations cannot be made from one codec at n=2.
+2. **VVC ran at a different operating point.** QP 32/40/**47** against
+   32/40/48 for everything else, because `libvvenc` 1.11.0 writes an empty
+   bitstream at 48 on some 4K fills. A different rate ladder changes the
+   BD-rate integration interval. **This confound must be ruled out before the
+   codec is blamed** — re-run VVC at a matched ladder, or integrate all codecs
+   over the common interval.
+
+Report every cell, flag VVC, claim no trend.
+
+#### The background is worth 34–69%, not "orders of magnitude" and not nothing
+
+This section first said the panorama half was "dead on real footage". **That was
+wrong, and wrong by cherry-picking**: it quoted 1.39×, the single least
+favourable cell in the table, and generalised from it. The table:
+
+| Codec | alcaraz_highlights | federer_djokovic |
+|---|---|---|
+| AVC | 1.391× / **34.4%** | 1.830× / **58.6%** |
+| HEVC | 1.459× / 38.3% | 1.879× / 57.2% |
+| AV1 | 1.525× / *not reported* | 2.245× / *not reported* |
+| VVC | 2.195× / **59.9%** | 2.487× / **68.9%** |
+
+*(ratio of conventional to panorama rate; BD-rate saving at matched quality.
+Homographies cost 1728 B per clip.)*
+
+A transmitted plate plus per-frame warps saves **34–69% of the background
+bitrate**. That is a real and reportable result. What it is *not* is the 17.4×
+the synthetic JPEG-still comparison suggested — inter prediction already handles
+a near-static background well, so the panorama competes with a strong baseline
+rather than a trivial one. The pre-written [1.5, 12] band was derived from that
+discredited synthetic number and is not a fair gate.
+
+**And the background inverts the foreground's pattern**: BG saving *improves*
+with codec strength (VVC best at 59.9% / 68.9%) while FG saving is lowest for
+VVC. Both halves are worth showing.
+
+**AV1's BG BD-rate is not reported** — PSNR overlap between the arms was 0.46
+and 0.20, below the 50% the BD-rate implementation requires. That is a gap to
+close by widening the QP sweep, not a result.
 
 #### Bounds that were wrong, and why
 
