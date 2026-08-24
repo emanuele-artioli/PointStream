@@ -1,4 +1,6 @@
-"""Rendering pose tensors into the conditioning images backends consume.
+"""Pinned: still used by decoder compositing and the engine strategies. Not retired in BP15.
+
+Rendering pose tensors into the conditioning images backends consume.
 
 Shared by every engine (ControlNet, pix2pix, SPADE), which is why these
 live apart from any one strategy."""

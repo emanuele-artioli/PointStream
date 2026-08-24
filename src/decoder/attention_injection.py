@@ -1,3 +1,4 @@
+"""Pinned: still used by src.decoder.controlnet_engine. Not retired in BP15."""
 from typing import Any, Optional, Dict
 import torch
 
