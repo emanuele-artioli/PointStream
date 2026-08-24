@@ -4,10 +4,12 @@ import glob
 import json
 import logging
 import random
+import shutil
 import time
 from pathlib import Path
 from PIL import Image
 
+import numpy as np
 import torch
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
@@ -22,10 +24,142 @@ from diffusers import (
 from transformers import CLIPTextModel, CLIPTokenizer
 from tqdm import tqdm
 
+from src.components.metrics.lpips import LpipsMetric
+from src.shared.training.stop import StopBounds, TaskStopRule
+from src.shared.training.task_eval import (
+    ItemScore,
+    mean_scores,
+    score_item,
+    static_copy_scores,
+)
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+STOP_EVAL_N_CLIPS = 4
+STOP_EVAL_OFFSET = 8
+STOP_EVAL_SEED = 42
+STOP_EVAL_CANVAS = 512
+STOP_EVAL_STEPS = 4
+CONDITION_TO_VARIANT = {
+    "pose": "pose",
+    "pose-racket": "pose",
+    "canny": "canny",
+    "seg": "seg",
+    "ip-adapter": "ip-adapter",
+}
 
 # Derived directories and sidecars under a scene dir -- never training items.
 DERIVED_SUFFIXES = ("_skeleton", "_canny", "_caption", "_pose_racket", "_pose_body")
+
+
+def _letterbox(image, mask, canvas: int = STOP_EVAL_CANVAS):
+    from src.components.generation._numpy import prepare_letterboxed
+
+    mask_u8 = (np.asarray(mask, dtype=bool).astype("uint8") * 255)
+    prepared = prepare_letterboxed(
+        image, None, canvas, canvas, extras={"mask": mask_u8}
+    )
+    boxed_mask = np.asarray(prepared["mask"])
+    if boxed_mask.ndim == 3:
+        boxed_mask = boxed_mask[..., 0]
+    return prepared["appearance"], boxed_mask > 0
+
+
+def load_stop_samples(n_clips: int = STOP_EVAL_N_CLIPS, offset: int = STOP_EVAL_OFFSET):
+    """A handful of coding-task crops. Stopping signal, not a result."""
+    from experiments.probe.clips import list_clips, load_coding_sample
+
+    clips = [clip for clip in list_clips() if clip.n_frames > offset]
+    if len(clips) < 2:
+        raise RuntimeError(
+            f"task-stop eval needs at least 2 probe clips with >{offset} frames; "
+            f"found {len(clips)}"
+        )
+    chosen = clips[:n_clips]
+    return [load_coding_sample(clip, 0, offset) for clip in chosen]
+
+
+def measure_stop_floors(samples, lpips: LpipsMetric) -> StopBounds:
+    """Static-copy floor and unrelated-image null, on the stop-eval items."""
+    copies: list[ItemScore] = []
+    unrelated: list[ItemScore] = []
+    for index, sample in enumerate(samples):
+        appearance, mask = _letterbox(sample.appearance_rgb, sample.object_mask)
+        target, target_mask = _letterbox(sample.reference_rgb, sample.object_mask)
+        copies.append(
+            static_copy_scores(
+                appearance, target, target_mask, key=sample.key, lpips=lpips
+            )
+        )
+        donor = samples[(index + 1) % len(samples)]
+        donor_app, _ = _letterbox(donor.appearance_rgb, donor.object_mask)
+        lpips_value, psnr, n_pixels = score_item(
+            target, donor_app, target_mask, lpips=lpips
+        )
+        unrelated.append(
+            ItemScore(
+                key=f"{sample.key}<-{donor.key}",
+                lpips=lpips_value,
+                psnr=psnr,
+                n_mask_pixels=n_pixels,
+            )
+        )
+    copy_mean = mean_scores(copies)
+    null_mean = mean_scores(unrelated)
+    return StopBounds(
+        floor_psnr=copy_mean.psnr,
+        floor_lpips=copy_mean.lpips,
+        null_lpips=null_mean.lpips,
+        source=(
+            f"stop-eval static-copy n={copy_mean.n} offset={STOP_EVAL_OFFSET} "
+            f"seed={STOP_EVAL_SEED}; unrelated n={null_mean.n}"
+        ),
+    )
+
+
+def score_stop_generations(samples, predictions, lpips: LpipsMetric):
+    from src.components.generation._numpy import as_hwc
+
+    items: list[ItemScore] = []
+    for sample, predicted in zip(samples, predictions, strict=True):
+        target, mask = _letterbox(sample.reference_rgb, sample.object_mask)
+        pred = as_hwc(predicted)
+        if pred.shape[:2] != target.shape[:2]:
+            pred, _ = _letterbox(pred, sample.object_mask)
+        lpips_value, psnr, n_pixels = score_item(target, pred, mask, lpips=lpips)
+        items.append(
+            ItemScore(
+                key=sample.key, lpips=lpips_value, psnr=psnr, n_mask_pixels=n_pixels
+            )
+        )
+    return mean_scores(items)
+
+
+def generate_stop_predictions(
+    samples,
+    *,
+    checkpoint: str,
+    variant: str,
+    device: str,
+    steps: int,
+):
+    """Drive the coding task through the live generator. Not a citable eval."""
+    from experiments.probe.run import _coding_bundle
+    from src.components.generation.controlnet import ControlNetGenerator
+    from src.contracts.conditioning import GenerationParams
+
+    generator = ControlNetGenerator(variant=variant, checkpoint=checkpoint, steps=steps)
+    params = GenerationParams(steps=steps)
+    images = []
+    for sample in samples:
+        bundle = _coding_bundle(sample)
+        images.append(
+            generator.generate(
+                bundle, seed=STOP_EVAL_SEED, device=device, params=params
+            )
+        )
+    return images
+
 
 def pad_to_square(img, fill=0):
     w, h = img.size
@@ -298,6 +432,21 @@ def main():
         help="Before training, drive two ControlNet forwards that differ only in the reference.",
     )
     parser.add_argument("--num-workers", type=int, default=4)
+    parser.add_argument(
+        "--no-task-stop",
+        action="store_true",
+        help="Disable the coding-task stop rule. Default is on: a run that cannot "
+        "clear the static-copy floor stops by epoch 3–4 instead of burning GPU hours.",
+    )
+    parser.add_argument(
+        "--eval-every-steps",
+        type=int,
+        default=2000,
+        help="Extra coding-task evals inside an epoch. 0 = epoch-end only. "
+        "Mid-epoch evals cannot stop before --min-stop-epochs.",
+    )
+    parser.add_argument("--task-eval-steps", type=int, default=STOP_EVAL_STEPS)
+    parser.add_argument("--task-eval-clips", type=int, default=STOP_EVAL_N_CLIPS)
     args = parser.parse_args()
 
     if args.include_reference and args.controlnet_model_id is None and not args.from_scratch:
@@ -381,6 +530,26 @@ def main():
     last_ckpt_wall = time.monotonic()
     last_progress_wall = time.monotonic()
     started_wall = time.monotonic()
+    Path(args.output_dir).mkdir(parents=True, exist_ok=True)
+
+    stop_rule: TaskStopRule | None = None
+    stop_samples = None
+    stop_lpips: LpipsMetric | None = None
+    if not args.no_task_stop:
+        if accelerator.is_main_process:
+            logging.info("Measuring coding-task floors before the first training step.")
+            stop_lpips = LpipsMetric(device=str(accelerator.device))
+            stop_samples = load_stop_samples(n_clips=args.task_eval_clips)
+            bounds = measure_stop_floors(stop_samples, stop_lpips)
+            stop_rule = TaskStopRule(bounds, Path(args.output_dir))
+            logging.info(
+                "task-stop bounds floor_lpips=%.4f floor_psnr=%.2f null_lpips=%.4f n=%s",
+                bounds.floor_lpips,
+                bounds.floor_psnr,
+                bounds.null_lpips,
+                len(stop_samples),
+            )
+        accelerator.wait_for_everyone()
 
     def _save(tag: str) -> None:
         if not accelerator.is_main_process:
@@ -388,6 +557,66 @@ def main():
         dest = os.path.join(args.output_dir, tag)
         logging.info("Saving ControlNet checkpoint to %s", dest)
         accelerator.unwrap_model(controlnet).save_pretrained(dest)
+
+    def _broadcast_stop(stop: bool) -> bool:
+        if accelerator.num_processes == 1:
+            return stop
+        flag = torch.tensor([1.0 if stop else 0.0], device=accelerator.device)
+        flag = accelerator.reduce(flag, reduction="max")
+        return bool(flag.item() >= 0.5)
+
+    def _run_task_eval(epoch_1: int, *, kind: str, step: int | None = None) -> bool:
+        stop = False
+        if (
+            not args.no_task_stop
+            and accelerator.is_main_process
+            and stop_rule is not None
+            and stop_samples is not None
+            and stop_lpips is not None
+        ):
+            tag = f"checkpoint-epoch-{epoch_1}"
+            ckpt = os.path.join(args.output_dir, tag)
+            if not Path(ckpt).is_dir():
+                _save(tag)
+            variant = CONDITION_TO_VARIANT[args.condition_type]
+            predictions = generate_stop_predictions(
+                stop_samples,
+                checkpoint=ckpt,
+                variant=variant,
+                device=str(accelerator.device),
+                steps=args.task_eval_steps,
+            )
+            scores = score_stop_generations(stop_samples, predictions, stop_lpips)
+            eval_kind = "mid" if kind == "mid" else "epoch"
+            decision = stop_rule.observe(
+                epoch=epoch_1,
+                lpips=scores.lpips,
+                psnr=scores.psnr,
+                step=step,
+                kind=eval_kind,
+            )
+            logging.info(
+                "task-eval epoch=%s kind=%s lpips=%.4f (floor %.4f) psnr=%.2f "
+                "(floor %.2f) n=%s best=%s stop=%s %s",
+                epoch_1,
+                eval_kind,
+                scores.lpips,
+                stop_rule.bounds.floor_lpips,
+                scores.psnr,
+                stop_rule.bounds.floor_psnr,
+                scores.n,
+                decision.keep_as_best,
+                decision.stop,
+                decision.reason,
+            )
+            if decision.keep_as_best:
+                best = Path(args.output_dir) / "checkpoint-best"
+                if best.exists():
+                    shutil.rmtree(best)
+                shutil.copytree(ckpt, best)
+            stop = decision.stop
+        accelerator.wait_for_everyone()
+        return _broadcast_stop(stop)
 
     for epoch in range(args.epochs):
         logging.info(f"Starting epoch {epoch+1}/{args.epochs}")
@@ -484,6 +713,14 @@ def main():
                 accelerator.wait_for_everyone()
                 _save(f"checkpoint-step-{global_step}")
                 last_ckpt_wall = now
+            if (
+                args.eval_every_steps
+                and global_step > 0
+                and global_step % args.eval_every_steps == 0
+            ):
+                if _run_task_eval(epoch + 1, kind="mid", step=global_step):
+                    logging.info("task-stop fired at step %s", global_step)
+                    return
             if args.max_steps is not None and global_step >= args.max_steps:
                 logging.info("Reached --max-steps %s", args.max_steps)
                 accelerator.wait_for_everyone()
@@ -494,6 +731,9 @@ def main():
         accelerator.wait_for_everyone()
         if accelerator.is_main_process:
             _save(f"checkpoint-epoch-{epoch+1}")
+        if _run_task_eval(epoch + 1, kind="epoch"):
+            logging.info("task-stop fired at epoch %s: %s", epoch + 1, getattr(stop_rule, "stop_reason", ""))
+            return
 
     accelerator.wait_for_everyone()
     if accelerator.is_main_process:
