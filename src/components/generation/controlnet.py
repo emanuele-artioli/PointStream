@@ -154,6 +154,26 @@ def resolve_controlnet_checkpoint(
     return epoch_dir.resolve(), chosen
 
 
+def controlnet_weight_paths(
+    variant: str,
+    checkpoint: str | None = None,
+    epoch: int | None = None,
+    *,
+    root: Path | None = None,
+) -> list[tuple[Path, int | None]]:
+    """Which ControlNet dirs this variant loads.
+
+    ``multi`` is the existing pose and seg arms together. There is no
+    ``assets/weights/multi-controlnet`` directory.
+    """
+    if variant == "multi":
+        return [
+            resolve_controlnet_checkpoint("pose", None, epoch, root=root),
+            resolve_controlnet_checkpoint("seg", None, None, root=root),
+        ]
+    return [resolve_controlnet_checkpoint(variant, checkpoint, epoch, root=root)]
+
+
 def _available_epochs(base: Path) -> list[int]:
     found: list[int] = []
     if not base.is_dir():
@@ -435,24 +455,24 @@ class ControlNetGenerator(BaseFrameGenerator):
                 f"Requested device={device!r}, checkpoint={self.checkpoint!r}."
             ) from exc
 
-        control_path, loaded_epoch = resolve_controlnet_checkpoint(
+        sources = controlnet_weight_paths(
             self.variant, self.checkpoint, self.epoch
         )
         sd_path = self._resolve_sd()
         dtype = _dtype_for(device)
-        _LOGGER.info(
-            "Loading %s-controlnet from %s (epoch=%s, sd=%s, dtype=%s, device=%s)",
-            self.variant,
-            control_path,
-            loaded_epoch,
-            sd_path,
-            dtype,
-            device,
-        )
-
         if self.variant == "multi":
-            pose_path, pose_epoch = resolve_controlnet_checkpoint("pose", None, self.epoch)
-            seg_path, seg_epoch = resolve_controlnet_checkpoint("seg", None, None)
+            (pose_path, pose_epoch), (seg_path, seg_epoch) = sources
+            _LOGGER.info(
+                "Loading multi-controlnet from pose=%s (epoch=%s) + seg=%s (epoch=%s) "
+                "(sd=%s, dtype=%s, device=%s)",
+                pose_path,
+                pose_epoch,
+                seg_path,
+                seg_epoch,
+                sd_path,
+                dtype,
+                device,
+            )
             controlnet = [
                 ControlNetModel.from_pretrained(
                     str(pose_path), torch_dtype=dtype, local_files_only=True
@@ -463,8 +483,17 @@ class ControlNetGenerator(BaseFrameGenerator):
             ]
             self.loaded_checkpoint = f"{pose_path}+{seg_path}"
             self.loaded_epoch = pose_epoch
-            _LOGGER.info("multi-controlnet epochs pose=%s seg=%s", pose_epoch, seg_epoch)
         else:
+            control_path, loaded_epoch = sources[0]
+            _LOGGER.info(
+                "Loading %s-controlnet from %s (epoch=%s, sd=%s, dtype=%s, device=%s)",
+                self.variant,
+                control_path,
+                loaded_epoch,
+                sd_path,
+                dtype,
+                device,
+            )
             controlnet = ControlNetModel.from_pretrained(
                 str(control_path), torch_dtype=dtype, local_files_only=True
             )
