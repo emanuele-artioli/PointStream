@@ -4,9 +4,9 @@
 and any new generator module, `src/contracts/capabilities.py` if a new
 conditioning capability is needed.
 
-**Three of four gates are now passed. `BP14` is the one that remains**, and it is
-not optional: the last training run burned 14 GPU hours on a series that was flat
-from epoch 1 because it stopped on nothing.
+**All four gates are now passed.** `BP14` landed 2026-08-24. The last training
+run burned 14 GPU hours on a series that was flat from epoch 1 because it
+stopped on nothing; that is no longer allowed.
 
 This is now **the critical path**. It is also the only stream that spends real
 GPU time, so it goes second in its wave, behind whatever else can run free.
@@ -14,7 +14,7 @@ GPU time, so it goes second in its wave, behind whatever else can run free.
 | Gate | Brief | Why |
 |---|---|---|
 | ~~Headroom~~ | `BP20` | ✅ **PASSED 2026-08-23.** A player is ~1% of the pixels and **17–24%** of the bitrate on real 4K, a 15–47× concentration (`PLAN.md` §2.14). The premise holds; this brief is unblocked on that gate. |
-| **Stop rule** | `BP14` | ⬜ **STILL REQUIRED.** The last training run burned 14 GPU hours on a series flat from epoch 1, because it stopped on nothing. |
+| **Stop rule** | `BP14` | ✅ **LANDED 2026-08-24.** `TaskStopRule` observes coding-task LPIPS, never diffusion loss. CI `32747593873`. |
 | ~~Instrument~~ | `BP18` | ✅ **DONE 2026-08-23.** `reid` + `palette`, calibrated on ground-truth pairs at 17.1σ, with `IdentityScale` so a score is quoted between its measured anchors (`PLAN.md` §2.12). Use it. |
 | ~~Caption channel~~ | `BP17` | ✅ **DONE 2026-08-23, and the answer is nothing.** Switching it on moved three arms inside noise and pose-controlnet 1.5σ *worse* (`PLAN.md` §2.15). The text channel is not where the appearance problem lives — do not spend more on it. |
 
@@ -164,3 +164,35 @@ minimum, whatever is attempted here reports:
 - the licence status of anything integrated, with the date checked;
 - and, if the answer is that the architecture does not close the gap, that
   written as a scoped finding rather than as a call for more tuning.
+
+## Delivered so far — 2026-08-24
+
+**`multi-controlnet` measured, both axes, not citable.** Pose epoch 10 + seg
+epoch 7, seed 42, 12 clips × offsets 1–8. Licences were checked the same day
+(IP-Adapter Apache-2.0 code and weights; Uni-ControlNet MIT code and weights)
+and recorded in `outputs/bp19-conditioning/bounds-before-run.json` before any
+generate.
+
+LPIPS (object bbox of the letterboxed mask): **0.579 ± 0.013** (n=96).
+Identical 0, this-run unrelated null 0.736, static-copy floor 0.451. Pre-written
+band 0.50–0.78; inside it. `compare_paired` vs the paste: **+0.128 ± 0.013
+(10.2σ, n=96; 4.5σ on 12 clip means) — static-copy ahead.** Vs the unrelated
+null: 15.3σ, multi ahead. Object PSNR 11.38 dB vs floor 13.51 dB. The harness
+labels the arm *not using appearance*.
+
+`reid` through `TENNIS_SCALE` (same-person 0.8663, different-person 0.5315):
+**0.628 ± 0.013** (n=96), **+29% of the span**. Pre-written band 0.50–0.72;
+inside it. Same-session GT: same-person 0.878 ± 0.009, different-video donor
+0.491 ± 0.008. Engine vs GT same: **−0.250 ± 0.014 (17.8σ, 7.0σ on clip
+means) — not a paste.** Engine vs donor: **+0.137 ± 0.016 (8.7σ, 3.3σ on clip
+means) — some identity signal, not a stranger.** 20/96 rows sit below the
+different-person anchor; 1/96 above same-person.
+
+Reading both together: middling LPIPS and middling reid. Two conditions do not
+create an appearance path, which is what the bounds said.
+
+**Dataset honesty for IP-Adapter landed** (`4aa7c94`): `"ip-adapter"` is no
+longer on the `seg` branch. The training loop still optimises ControlNet
+parameters only — `reference_pixel_values` is loaded and then unused for this
+condition. Do not launch `--condition-type ip-adapter` until the 22M adapter is
+what the optimiser sees. That is the next step; do not repeat pose-ref.
