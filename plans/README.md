@@ -50,6 +50,7 @@ collide. The Wave-3 fork is now decided (`PLAN.md` §2.14).
 | Brief | Owns | Wave |
 |---|---|---|
 | `BP15-test-cull.md` | finish retiring the pre-rewrite tree | partly done — decoder and `src/shared` still pinned by `eval_checkpoint` and training |
+| `BP21-headroom-widen.md` | widen the headroom to n≥8, close the VVC/AV1/NaN gaps | high — the paper's opening argument rests on n=2 |
 | `BP14-training-stop-rule.md` | stop a run that cannot clear the bar | before any training, in any wave |
 | `BP19-conditioning-architecture.md` | IP-Adapter arm, retrain on the coding task, Uni-ControlNet shared backbone, ReferenceNet extension | **now the critical path** — headroom gate passed; still needs `BP14` first |
 | `DEFERRED.md` | — | real work deliberately not now |
