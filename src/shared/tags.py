@@ -1,3 +1,4 @@
+"""Pinned: still used by src.transport.disk and decoder compositing. Not retired in BP15."""
 from __future__ import annotations
 
 from collections.abc import Callable

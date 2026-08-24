@@ -1,4 +1,6 @@
-"""Debug instrumentation for GenAI compositor divergence analysis."""
+"""Pinned: still used by src.decoder.compositing.compositor. Not retired in BP15.
+
+Debug instrumentation for GenAI compositor divergence analysis."""
 
 import logging
 from pathlib import Path

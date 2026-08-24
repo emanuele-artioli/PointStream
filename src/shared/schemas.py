@@ -1,3 +1,4 @@
+"""Pinned: still used by src.transport.disk. Not retired in BP15."""
 from __future__ import annotations
 
 from enum import Enum

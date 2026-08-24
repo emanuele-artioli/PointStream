@@ -9,7 +9,6 @@ import pytest
 import torch
 
 from src.shared import dwpose_draw
-from src.shared import track_id
 from src.components.generation import torch_dtype as td
 from src.transport.panorama_encoder import (
     JpegPanoramaEncoder,
@@ -113,10 +112,7 @@ def test_dwpose_canvas_falls_back_when_renderer_fails(monkeypatch: pytest.Monkey
     assert int(canvas.max()) > 0
 
 
-def test_track_id_and_dtype_helpers(monkeypatch: pytest.MonkeyPatch) -> None:
-    assert track_id.scene_track_id_to_int("person_17") == 17
-    assert track_id.scene_track_id_to_int("person_alpha") == track_id.scene_track_id_to_int("person_alpha")
-
+def test_dtype_helpers() -> None:
     assert td.parse_gpu_dtype("fp16") == torch.float16
 
 

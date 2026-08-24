@@ -1,3 +1,8 @@
+"""Pinned: still used by pix2pix/spade training, eval_checkpoint, and process-dataset tooling. Not retired in BP15.
+
+Directory layout uses two naming conventions in one track group — pair by
+position in the sorted frame lists, never by reconstructing a filename.
+"""
 import os
 import random
 import glob
