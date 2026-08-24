@@ -468,12 +468,25 @@ def _y4m_to_raw(source: Path, dest: Path, ffmpeg: ResolvedTool, *, pix_fmt: str)
     _run(argv, dest)
 
 
-def _run(argv: list[str], dest: Path) -> subprocess.CompletedProcess[str]:
-    """Run ``argv``. Kvazaar can crash after writing a valid stream — judge the file."""
-    result = subprocess.run(argv, capture_output=True, text=True, check=False)
-    if dest.exists() and dest.stat().st_size > 0:
-        return result
-    detail = (result.stderr or result.stdout or "").strip()[-2000:]
-    raise RuntimeError(
-        f"command failed ({result.returncode}): {' '.join(argv)}\n{detail}"
-    )
+def _run(
+    argv: list[str], dest: Path, *, attempts: int = 3
+) -> subprocess.CompletedProcess[str]:
+    """Run ``argv``. Judge the file: Kvazaar can crash after a valid write,
+    and libvvenc can exit 0 after a 0-byte 4K QP-48 bitstream."""
+    last: subprocess.CompletedProcess[str] | None = None
+    for attempt in range(1, attempts + 1):
+        if dest.exists() and dest.stat().st_size == 0:
+            dest.unlink()
+        last = subprocess.run(argv, capture_output=True, text=True, check=False)
+        if dest.exists() and dest.stat().st_size > 0:
+            if attempt > 1:
+                print(f"encode retry {attempt}/{attempts} wrote {dest}", flush=True)
+            return last
+        print(
+            f"encode attempt {attempt}/{attempts} left empty {dest} "
+            f"(exit {last.returncode})",
+            flush=True,
+        )
+    detail = ((last.stderr or last.stdout or "") if last else "").strip()[-2000:]
+    code = last.returncode if last is not None else "n/a"
+    raise RuntimeError(f"command failed ({code}): {' '.join(argv)}\n{detail}")

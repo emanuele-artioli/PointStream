@@ -244,3 +244,30 @@ class TestToolResolution:
         monkeypatch.setenv("SVTAV1_BIN", str(missing))
         with pytest.raises(FileNotFoundError, match="SVTAV1_BIN"):
             resolve_tool("SVTAV1_BIN", "SvtAv1EncApp")
+
+
+def test_run_retries_when_the_encoder_writes_an_empty_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """libvvenc has exited 0 after a 0-byte 4K QP-48 bitstream more than once."""
+    from src.components.codec import encode as encode_mod
+
+    dest = tmp_path / "out.vvc"
+    calls = {"n": 0}
+
+    def fake_run(argv: list[str], **kwargs: object) -> object:
+        del argv, kwargs
+        calls["n"] += 1
+        dest.write_bytes(b"" if calls["n"] == 1 else b"vvc-bytes")
+
+        class Result:
+            returncode = 0
+            stderr = ""
+            stdout = ""
+
+        return Result()
+
+    monkeypatch.setattr(encode_mod.subprocess, "run", fake_run)
+    encode_mod._run(["ffmpeg", "-y", str(dest)], dest)
+    assert calls["n"] == 2
+    assert dest.read_bytes() == b"vvc-bytes"
