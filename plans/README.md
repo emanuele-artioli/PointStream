@@ -8,6 +8,12 @@ there, say so in your report rather than making it.
 
 Two things are true and both are load-bearing:
 
+0. **The premise is measured and it holds** (`PLAN.md` §2.14): on real 4K a
+   player is ~1% of the pixels and 17–24% of the bitrate. But the headroom
+   **shrinks against stronger codecs** (24.4% AVC → 16.7% VVC), and the
+   **panorama half is dead** — against inter-coded video a transmitted plate is
+   worth 1.39×, not the 17.4× a synthetic run suggested. Quote VVC, and do not
+   lean on the background.
 1. **No generative engine here produces a usable player.** Re-ranked in clip
    mode on calibrated LPIPS over 12 clips (`PLAN.md` §2.10): **every one of the
    eight loses to pasting the keyframe**, at 2.5σ–10.6σ, and the best of them is
@@ -39,15 +45,13 @@ Two things are true and both are load-bearing:
 
 **`WAVE-2026-08-24.md` says which of these run together and in what order.**
 Read it before picking one up; the waves exist so parallel sessions do not
-collide, and Wave 3 forks on BP13's number.
+collide. The Wave-3 fork is now decided (`PLAN.md` §2.14).
 
 | Brief | Owns | Wave |
 |---|---|---|
-| `BP20-headroom-real-ladder.md` | the headroom on **real 4K** across the codec ladder | **the one that can change the plan** |
-| `BP15-test-cull.md` | retire the pre-rewrite tree and its 433 tests | **unblocked** — CI is green |
-| `BP17-caption-channel.md` | drive the trained-but-disabled caption channel | 2 |
+| `BP15-test-cull.md` | finish retiring the pre-rewrite tree | partly done — decoder and `src/shared` still pinned by `eval_checkpoint` and training |
 | `BP14-training-stop-rule.md` | stop a run that cannot clear the bar | before any training, in any wave |
-| `BP19-conditioning-architecture.md` | IP-Adapter arm, retrain on the coding task, Uni-ControlNet shared backbone, ReferenceNet extension | **3 — gated**, does not self-start |
+| `BP19-conditioning-architecture.md` | IP-Adapter arm, retrain on the coding task, Uni-ControlNet shared backbone, ReferenceNet extension | **now the critical path** — headroom gate passed; still needs `BP14` first |
 | `DEFERRED.md` | — | real work deliberately not now |
 
 ## Done
@@ -55,7 +59,7 @@ collide, and Wave 3 forks on BP13's number.
 `done/` holds finished briefs, each ending with a *Delivered* section. History,
 not instructions — `done/README.md` indexes them.
 
-**`BP16` (CI signal), `BP18` (identity instrument) and `BP13` (headroom harness) are done** (2026-08-23). `BP13`'s *number* is superseded by `BP20`: it measured a 96×128 synthetic court, and the decision taken from it is withdrawn (`PLAN.md` §2.13).
+**`BP16`, `BP18`, `BP13`, `BP20`, `BP15` and `BP17` are done** (2026-08-23). `BP20` replaced `BP13`'s synthetic number with a real-4K one and **decided the fork**: the players are ~1% of pixels and 17–24% of the bitrate, so the premise holds (`PLAN.md` §2.14). `BP17` found the caption channel worth nothing measurable (§2.15).
 
 **`BP12-clip-mode-roster.md` is done** (2026-08-23) and still sits here rather
 than in `done/` because its closing section is the current roster verdict.

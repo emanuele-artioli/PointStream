@@ -724,6 +724,111 @@ thought to be missing. §2.12's identity work reads the same sidecars.
 `plans/BP20-headroom-real-ladder.md` is the replacement.
 
 
+### 2.14 The real headroom: the premise holds, and it shrinks against better codecs
+
+Measured 2026-08-23 on **real 4K** (`BP20`), replacing §2.13's synthetic number.
+`outputs/bp20-headroom/`. Two broadcast scenes — `alcaraz_highlights/scene_000`
+frames [38:86] and `federer_djokovic/scene_001` frames [93:141] — 3840×2160,
+48 frames each, from `assets/raw_4k/`.
+
+**The correctness gate that makes the rest meaningful.** Pasting each track crop
+back into its sidecar `bbox` reproduces the source frame at **MAE 0.0**, under
+the `extract_24_frame_id` convention. Native-fps and positional conventions both
+failed it — §2.2 biting for the third time, and the reason this check is now
+mandatory before any headroom byte is trusted. Nulls: empty mask saves 0.0,
+duplicate-encode rate ratio 1.0.
+
+#### The result the paper needs
+
+| Codec | FG saving, plate inpaint (BD-rate, matched quality) |
+|---|---|
+| AVC | **0.244 ± 0.017** |
+| HEVC | 0.234 ± 0.017 |
+| AV1 | 0.229 ± 0.030 |
+| **VVC** | **0.167 ± 0.015** |
+
+Player area by **alpha silhouette** is **0.55%** and **1.02%** of frame. So:
+
+> **A player pixel costs 15–47× what an average pixel costs.** The players are
+> about 1% of the picture and about a quarter of the bitrate.
+
+That concentration is the motivating example, measured rather than asserted.
+n=2 clips, so it is a direction, not a final figure — the project's own bar is
+n≥8.
+
+#### The finding that changes how the paper argues
+
+**The predicted ordering AV1 ≥ HEVC ≥ AVC failed, monotonically the other way.**
+The headroom *shrinks* as the codec gets stronger: 24.4% against AVC, 16.7%
+against VVC.
+
+The prediction was mine and the reasoning behind it was wrong. I argued a
+stronger codec compresses the near-static background better, so the players take
+a larger share of what remains. What it also does — and this dominates — is code
+the **players** better. The background is nearly free for every codec in the
+ladder; the modern tools (finer motion compensation, larger transforms, better
+intra) pay off precisely on the hard, moving, detailed content, which *is* the
+player region. So removing the players saves proportionally less the better the
+codec is.
+
+**Consequence for the submission.** The honest rung to quote is the strongest
+one. Against VVC the headroom is **16.7%**, not 24%, and the trend says it keeps
+shrinking with future codecs. A paper that leads with the AVC number and is
+asked about VVC at review has a problem; one that leads with VVC and notes the
+AVC number is larger does not.
+
+#### The background half is much weaker than believed
+
+§2.13's 17.4× was a panorama plate against **JPEG stills**. Against **inter-coded
+video** the ratio is **1.39–1.46**, below the pre-written [1.5, 12] band. Inter
+prediction already handles a near-static background almost as well as a
+transmitted plate does. The "panorama pays for itself by orders of magnitude"
+claim is **dead on real footage** and must not reappear in the paper.
+
+#### Bounds that were wrong, and why
+
+- **Player-area band [0.015, 0.035]** was written from *bbox* area; the
+  measurement correctly used the *alpha silhouette*, which is roughly half.
+  Wrong by construction, not retconned.
+- **FG bands** were carried over from the synthetic run and were too low; AVC and
+  HEVC both landed above them.
+- **Flat fill understates the prize on real 4K too** (0.12 against plate's 0.24),
+  confirming §2.13's alarm on real content. "Flat is an upper bracket" stays
+  void; plate is both the honest reconstruction and the cheaper one to code.
+
+VVC ran at QP 32/40/**47**: `libvvenc` 1.11.0 writes an empty bitstream at 48 on
+some 4K fills, and stepping down beats pretending the third curve point ran.
+
+### 2.15 The caption channel is worth nothing measurable
+
+`BP17`, run 2026-08-23 on the same 12 clips, seed 42, offsets 1–8 — everything
+identical to §2.10 except the prompt. `outputs/bp17-caption/`.
+
+**The control is exact.** Both no-model arms moved by **0.000 ± 0.000**:
+static-copy 0.4505 and unrelated-image 0.7358, unchanged to four decimals. The
+two runs are comparable.
+
+| Arm | captions on − generic prompt | verdict |
+|---|---|---|
+| pose-controlnet | +0.020 ± 0.014 (1.5σ) | suggestive that captions are *worse*; not a result |
+| seg-controlnet | +0.002 ± 0.011 (0.2σ) | inside noise |
+| ip-adapter-controlnet | −0.002 ± 0.008 (0.2σ) | inside noise |
+| trajectory-controlnet | +0.001 ± 0.019 (0.1σ) | inside noise |
+
+Positive is worse; LPIPS is lower-better. **Switching on a channel the models
+were trained with changes nothing**, and if anything mildly hurts. That is what
+§2.11 predicted, and it is worth having: it retires the possibility that the
+§2.10 roster was measured unfairly. The defect is still real and still fixed —
+inference can now reach the channel — but the channel is not where the
+appearance problem lives.
+
+Checkpoint provenance was checked rather than assumed: captions landed on disk
+2026-07-01, the trainer began reading them in `d1efbcf` (2026-07-06), and pose
+epoch 10 (2026-07-07) and seg epoch 7 (2026-07-06 17:53) both post-date it. For
+those two this really was switching a channel *back* on. `ip-adapter` loads a
+stock OpenPose ControlNet, so for that arm it only switches SD's text encoder on.
+
+
 ---
 
 ## 3. Architecture
