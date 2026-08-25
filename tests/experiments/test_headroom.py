@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Any
 
 import numpy as np
 import pytest
@@ -486,7 +487,7 @@ def test_fill_common_interval_drops_av1_so_the_window_is_not_empty() -> None:
         return {"rates": list(curve.rates), "qualities": list(curve.qualities), "label": curve.label}
 
     key = "match/scene_000"
-    report = {
+    report: dict[str, Any] = {
         "codecs": ["avc", "hevc", "av1", "vvc"],
         "fg": {
             "avc": {key: {"original_curve": payload(avc), "plate_curve": payload(avc_plate)}},
