@@ -26,7 +26,6 @@ from src.pipeline.reconstruction.quality import (
     ROLE_BACKGROUND,
     ROLE_FRAME,
     ROLE_OBJECT,
-    NumpyPsnrEvaluator,
 )
 from src.runner.evaluation import ComponentMetricEvaluator, evaluator_for
 
@@ -45,9 +44,34 @@ def _split_clip():
     return reference, mask
 
 
-def test_psnr_only_stays_on_the_pipeline_floor() -> None:
-    """The cheap path must not reach for a registry it does not need."""
-    assert isinstance(evaluator_for(_config("psnr")), NumpyPsnrEvaluator)
+def test_every_config_gets_the_same_psnr_convention() -> None:
+    """A PSNR-only config must not be scored by a different implementation.
+
+    The pipeline floor pools the MSE across the clip; the components metric
+    averages per-frame PSNRs. Both are defensible and they are not equal — on
+    one 4K clip they read 47.63 dB and 48.28 dB on the same pixels. Binding the
+    floor for cheap configs and the registry for rich ones would make a tier
+    ladder measure its evaluator.
+    """
+    floor = evaluator_for(_config("psnr"))
+    rich = evaluator_for(_config("psnr", "ssim"))
+    assert isinstance(floor, ComponentMetricEvaluator)
+    assert isinstance(rich, ComponentMetricEvaluator)
+
+    reference, _mask = _split_clip()
+    predicted = reference.copy()
+    predicted[:, :, :32] = 60
+    assert floor.evaluate(reference, predicted).whole_frame() == pytest.approx(
+        rich.evaluate(reference, predicted).whole_frame()
+    )
+    # And it is not the pooled convention, which is reported separately. The
+    # two only separate when the per-frame error varies, so the clip has to
+    # vary — on a uniform one they agree and the check would pass for free.
+    uneven = reference.copy()
+    for index, level in enumerate((2, 40, 90)):
+        uneven[index, :, :32] = level
+    report = floor.evaluate(reference, uneven)
+    assert report.whole_frame() != pytest.approx(report.closeness.psnr, rel=1e-6)
 
 
 def test_a_richer_metric_set_binds_the_components_registry() -> None:

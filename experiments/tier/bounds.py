@@ -101,7 +101,7 @@ def check(report_path: Path, bounds_path: Path) -> dict[str, Any]:
         band = bounds["unaided_whole_frame_psnr_dB"]
         checks.append(
             _band(
-                _number(recon["pixel_psnr_dB"]),
+                _number(recon["pooled_mse_psnr_dB"]),
                 band["low"],
                 band["high"],
                 f"{tier}: unaided whole-frame PSNR (pooled-MSE convention)",
@@ -131,7 +131,7 @@ def check(report_path: Path, bounds_path: Path) -> dict[str, Any]:
         band = bounds["delivered_whole_frame_psnr_dB"][_DELIVERED_KEYS[tier]]
         checks.append(
             _band(
-                _number(delivered["pixel_psnr_dB"]),
+                _number(delivered["pooled_mse_psnr_dB"]),
                 band["low"],
                 band["high"],
                 f"{tier}: delivered whole-frame PSNR",
@@ -194,7 +194,7 @@ def check(report_path: Path, bounds_path: Path) -> dict[str, Any]:
         )
 
     ladder = [
-        (tier, _number(runs[tier]["delivered_quality"]["pixel_psnr_dB"]))
+        (tier, _number(runs[tier]["delivered_quality"]["pooled_mse_psnr_dB"]))
         for tier in ("fast", "balanced", "quality")
         if tier in runs
     ]

@@ -83,7 +83,13 @@ def quality_record(report: QualityReport) -> dict[str, Any]:
             "bit_identical": report.bit_identical,
             "mean_abs_diff": report.closeness.mean_abs_diff,
             "max_abs_diff": report.closeness.max_abs_diff,
-            "pixel_psnr_dB": report.closeness.psnr,
+            "pooled_mse_psnr_dB": report.closeness.psnr,
+            "psnr_convention_note": (
+                "pooled_mse_psnr_dB is one PSNR over the whole clip's MSE. The "
+                "'psnr' row under scoped is the mean of per-frame PSNRs, which "
+                "is the convention src/components/metrics/psnr.py uses. They "
+                "are not equal and neither is wrong; quote which one."
+            ),
             "enforced": list(report.enforced),
             "scoped": [
                 {

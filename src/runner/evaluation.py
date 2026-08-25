@@ -166,17 +166,22 @@ class ComponentMetricEvaluator:
 
 
 def evaluator_for(config: PointstreamConfig) -> QualityEvaluator:
-    """The scorer a config asks for.
+    """The scorer a config asks for — the same one for every config.
 
-    A config naming only PSNR gets the pipeline's own floor rather than a
-    registry lookup, so the cheap path stays cheap and stays importable without
-    the components layer.
+    A tempting shortcut here is to hand a PSNR-only config the pipeline's numpy
+    floor and skip the registry. Measured on one 4K clip, that shortcut makes a
+    tier ladder incomparable with itself: the floor's whole-frame PSNR is the
+    pooled-MSE convention while the components metric is the mean of per-frame
+    PSNRs, and on the same delivered pixels the two read 47.63 dB and 48.28 dB.
+    A ladder whose PSNR convention changes between its rungs measures the
+    evaluator, not the tier.
+
+    So every config gets the same evaluator. `closeness` on the returned report
+    still carries the pooled-MSE number, labelled as its own thing, because
+    bit-identity has to be a pixel comparison rather than an inference from a
+    metric that came back infinite.
     """
-    names = tuple(config.evaluation.metrics)
-    if not names or set(names) == {"psnr"}:
-        from src.pipeline.reconstruction.quality import NumpyPsnrEvaluator
-
-        return NumpyPsnrEvaluator()
+    names = tuple(config.evaluation.metrics) or ("psnr",)
     return ComponentMetricEvaluator(names)
 
 
