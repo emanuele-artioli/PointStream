@@ -108,6 +108,11 @@ def common_quality_interval(*curves: RDCurve) -> tuple[float, float]:
         raise ValueError("common_quality_interval needs at least one curve")
     low = max(min(curve.qualities) for curve in curves)
     high = min(max(curve.qualities) for curve in curves)
+    if low >= high:
+        raise ValueError(
+            f"no shared quality range: [{float(low)}, {float(high)}] "
+            "(max of mins is above min of maxes)"
+        )
     return float(low), float(high)
 
 

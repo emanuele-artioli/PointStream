@@ -268,6 +268,87 @@ def test_vvc_empty_bitstream_steps_qp_down(tmp_path: Path, monkeypatch: pytest.M
     assert "encoded at QP 46" in notes[0]
 
 
+def test_vvc_fallback_skips_occupied_and_reserved_qps() -> None:
+    from experiments.headroom.ladder import vvc_fallback_qps
+
+    tries = vvc_fallback_qps(40, occupied=frozenset({32}), reserved=frozenset({32, 46}))
+    assert tries[0] == 40
+    assert 32 not in tries
+    assert 46 not in tries
+    assert 39 in tries
+    assert 41 in tries
+
+
+def test_vvc_empty_at_32_steps_to_31(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from experiments.headroom.ladder import encode_qp_with_vvc_fallback
+
+    source = tmp_path / "source.y4m"
+    source.write_bytes(b"y4m")
+    notes: list[str] = []
+
+    class _Record:
+        size_bytes = 12
+
+    def fake_encode(_src, dest, request):
+        qp = int(request.rate)
+        if qp == 32:
+            dest.write_bytes(b"")
+            raise RuntimeError("command failed (0): empty")
+        dest.write_bytes(b"bitstream")
+        return _Record()
+
+    monkeypatch.setattr("experiments.headroom.ladder.encode", fake_encode)
+    used, dest, record = encode_qp_with_vvc_fallback(
+        source, tmp_path, "vvc", 32, notes, "original"
+    )
+    assert used == 31
+    assert dest.read_bytes() == b"bitstream"
+    assert record is not None
+    assert "encoded at QP 31" in notes[0]
+
+
+def test_vvc_fallback_does_not_reuse_another_curve_point(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """alcaraz_perricard original: QP 40 empty, leftover QP 32 looked complete."""
+    from experiments.headroom.ladder import encode_qp_with_vvc_fallback
+
+    source = tmp_path / "source.y4m"
+    source.write_bytes(b"y4m")
+    (tmp_path / "vvc_qp32.vvc").write_bytes(b"point32")
+    notes: list[str] = []
+    calls: list[int] = []
+
+    class _Record:
+        size_bytes = 12
+
+    def fake_encode(_src, dest, request):
+        qp = int(request.rate)
+        calls.append(qp)
+        if qp == 40:
+            dest.write_bytes(b"")
+            raise RuntimeError("command failed (0): empty")
+        dest.write_bytes(f"qp{qp}".encode())
+        return _Record()
+
+    monkeypatch.setattr("experiments.headroom.ladder.encode", fake_encode)
+    used, dest, record = encode_qp_with_vvc_fallback(
+        source,
+        tmp_path,
+        "vvc",
+        40,
+        notes,
+        "original",
+        occupied=frozenset({32}),
+        reserved=frozenset({32, 46}),
+    )
+    assert used == 39
+    assert dest.read_bytes() == b"qp39"
+    assert record is not None
+    assert 32 not in calls
+    assert calls[0] == 40
+
+
 def _fake_scenes(video: str) -> list[dict]:
     n = {"a": 3, "b": 3, "c": 2, "d": 2}[video]
     return [
@@ -376,6 +457,52 @@ def test_common_interval_bd_rate_integrates_only_on_the_overlap() -> None:
     assert result["sliced"] is True
     assert result["saving"] == pytest.approx(1.0 - 10 ** (np.log10(200.0) - 2.5), rel=1e-6)
     assert result["interval"] == pytest.approx([30.0, 40.0])
+
+
+def test_common_quality_interval_rejects_a_disjoint_range() -> None:
+    from experiments.headroom.measure import common_quality_interval
+
+    low = RDCurve(rates=(1000.0, 100.0), qualities=(20.0, 30.0), label="low")
+    high = RDCurve(rates=(200.0, 20.0), qualities=(40.0, 50.0), label="high")
+    with pytest.raises(ValueError, match="no shared quality range"):
+        common_quality_interval(low, high)
+
+
+def test_fill_common_interval_drops_av1_so_the_window_is_not_empty() -> None:
+    """Intersecting AV1 with AVC emptied the PSNR window on every BP21 clip."""
+    from experiments.headroom.real_ladder import _fill_common_interval
+
+    avc = RDCurve(rates=(1000.0, 400.0, 100.0), qualities=(42.0, 38.0, 34.0), label="avc")
+    avc_plate = RDCurve(rates=(800.0, 300.0, 80.0), qualities=(42.2, 38.2, 34.2), label="avc_p")
+    hevc = RDCurve(rates=(700.0, 300.0, 90.0), qualities=(41.8, 37.5, 34.1), label="hevc")
+    hevc_plate = RDCurve(rates=(550.0, 220.0, 70.0), qualities=(42.0, 37.8, 34.4), label="hevc_p")
+    vvc = RDCurve(rates=(500.0, 200.0, 80.0), qualities=(43.0, 38.5, 34.7), label="vvc")
+    vvc_plate = RDCurve(rates=(400.0, 160.0, 60.0), qualities=(43.3, 38.9, 35.1), label="vvc_p")
+    av1 = RDCurve(rates=(2000.0, 900.0, 400.0), qualities=(47.5, 45.4, 43.7), label="av1")
+    av1_plate = RDCurve(rates=(1600.0, 700.0, 300.0), qualities=(47.6, 45.6, 44.0), label="av1_p")
+
+    def payload(curve: RDCurve) -> dict:
+        return {"rates": list(curve.rates), "qualities": list(curve.qualities), "label": curve.label}
+
+    key = "match/scene_000"
+    report = {
+        "codecs": ["avc", "hevc", "av1", "vvc"],
+        "fg": {
+            "avc": {key: {"original_curve": payload(avc), "plate_curve": payload(avc_plate)}},
+            "hevc": {key: {"original_curve": payload(hevc), "plate_curve": payload(hevc_plate)}},
+            "av1": {key: {"original_curve": payload(av1), "plate_curve": payload(av1_plate)}},
+            "vvc": {key: {"original_curve": payload(vvc), "plate_curve": payload(vvc_plate)}},
+        },
+    }
+    clip = type("Clip", (), {"video": "match", "scene": "scene_000"})()
+    _fill_common_interval(report, [clip])
+    record = report["common_interval"][key]
+    assert record["interval"][0] < record["interval"][1]
+    assert "av1" in record["excluded"]
+    assert "av1" not in record["codecs"]
+    sliced = report["fg"]["avc"][key]["plate_vs_original_common_interval"]
+    assert sliced["saving"] is not None
+    assert report["fg"]["av1"][key].get("plate_vs_original_common_interval") is None
 
 
 def test_seed_reuse_does_not_copy_a_partial_qp_set(tmp_path: Path) -> None:

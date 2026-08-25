@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 import statistics
 import sys
+from types import SimpleNamespace
 from typing import Any
 
 import numpy as np
@@ -46,6 +47,10 @@ from experiments.headroom.real import (
 from experiments.headroom.remove import player_fraction, prepare_fills
 
 CODECS = ("avc", "hevc", "av1", "vvc")
+# AV1 at QP 32/40/46 sits 5–10 dB above AVC/HEVC/VVC. Intersecting all four
+# empties the window (max of mins > min of maxes). The VVC confound is an
+# AVC-vs-VVC question, so the shared PSNR slice is the three that share a band.
+COMMON_PSNR_CODECS = ("avc", "hevc", "vvc")
 N_FRAMES = 48
 FPS = 24.0
 BP20_DIR = Path("outputs/bp20-headroom")
@@ -425,7 +430,7 @@ def _plate_nan_check(
     _write(report, report_path)
 
 
-def _summarize(report: dict[str, Any], clips: list[SceneClip], bounds: dict[str, Any]) -> None:
+def _summarize(report: dict[str, Any], clips: list[Any], bounds: dict[str, Any]) -> None:
     keys = [f"{c.video}/{c.scene}" for c in clips]
     areas = [float(c.player_area) for c in clips]
     summary: dict[str, Any] = {
@@ -525,6 +530,49 @@ def _summarize(report: dict[str, Any], clips: list[SceneClip], bounds: dict[str,
         gap_band = bounds.get("vvc_gap_avc_minus_vvc") or [0.04, 0.10]
         gap = paired.mean_difference
         survived = gap_band[0] <= gap <= gap_band[1]
+        avc_common: list[float] = []
+        vvc_common: list[float] = []
+        for key in keys:
+            for codec_name, bucket in (("avc", avc_common), ("vvc", vvc_common)):
+                saving = (
+                    (((report.get("fg") or {}).get(codec_name) or {}).get(key) or {}).get(
+                        "plate_vs_original_common_interval"
+                    )
+                    or {}
+                ).get("saving")
+                if isinstance(saving, (int, float)):
+                    bucket.append(float(saving))
+        common_psnr: dict[str, Any] | None = None
+        if len(avc_common) >= 2 and len(avc_common) == len(vvc_common) == len(avc):
+            common_paired = compare_paired(
+                "avc", avc_common, "vvc", vvc_common, higher_is_better=True
+            )
+            common_psnr = {
+                "n": common_paired.n,
+                "mean_difference": common_paired.mean_difference,
+                "standard_error": common_paired.standard_error,
+                "verdict": common_paired.verdict,
+                "winner": common_paired.winner,
+                "describe": common_paired.describe(),
+            }
+        if survived:
+            sentence = (
+                "codec: the AVC−VVC FG gap survived a common QP set"
+                + (
+                    " and a common PSNR interval."
+                    if common_psnr is not None
+                    else "; no shared PSNR window across AVC/HEVC/VVC."
+                )
+            )
+        else:
+            sentence = (
+                "confound: the AVC−VVC FG gap did not survive a common QP set"
+                + (
+                    "; it also did not survive a common PSNR interval."
+                    if common_psnr is not None
+                    else "."
+                )
+            )
         summary["vvc_gap"] = {
             "avc_minus_vvc": gap,
             "n": paired.n,
@@ -532,13 +580,8 @@ def _summarize(report: dict[str, Any], clips: list[SceneClip], bounds: dict[str,
             "expect_survive": bounds.get("vvc_gap_expect_survive"),
             "expect_band": gap_band,
             "survived": survived,
-            "sentence": (
-                "codec: the AVC−VVC FG gap survived a common QP set and a "
-                "common PSNR interval."
-                if survived
-                else "confound: the AVC−VVC FG gap did not survive a common "
-                "QP set / common PSNR interval."
-            ),
+            "common_psnr_interval": common_psnr,
+            "sentence": sentence,
         }
     area_mean = summary["player_area"]["mean"]
     if area_mean is not None:
@@ -548,9 +591,17 @@ def _summarize(report: dict[str, Any], clips: list[SceneClip], bounds: dict[str,
     report["summary"] = summary
 
 
-def _fill_common_interval(report: dict[str, Any], clips: list[SceneClip]) -> None:
-    """Slice every codec's original/plate curves to the clip's common PSNR range."""
-    codecs = [name for name in (report.get("codecs") or CODECS) if name in (report.get("fg") or {})]
+def _fill_common_interval(report: dict[str, Any], clips: list[Any]) -> None:
+    """Slice AVC/HEVC/VVC original/plate curves to the clip's common PSNR range.
+
+    AV1 is excluded: at the same QPs it lives 5–10 dB above the other three, so
+    intersecting all four codecs produced an inverted empty window.
+    """
+    codecs = [
+        name
+        for name in COMMON_PSNR_CODECS
+        if name in (report.get("fg") or {})
+    ]
     per_clip: dict[str, Any] = {}
     for clip in clips:
         key = f"{clip.video}/{clip.scene}"
@@ -564,17 +615,61 @@ def _fill_common_interval(report: dict[str, Any], clips: list[SceneClip]) -> Non
                 continue
             curves.extend([original, plate])
             pairs[codec_name] = (original, plate)
+        record: dict[str, Any] = {
+            "n_curves": len(curves),
+            "codecs": list(pairs),
+            "excluded": [
+                name
+                for name in (report.get("codecs") or CODECS)
+                if name not in COMMON_PSNR_CODECS
+            ],
+        }
         if len(curves) < 2:
+            record["error"] = "fewer than two curves"
+            per_clip[key] = record
             continue
         try:
             interval = common_quality_interval(*curves)
-        except ValueError:
+        except ValueError as exc:
+            record["error"] = str(exc)
+            per_clip[key] = record
             continue
-        per_clip[key] = {"interval": list(interval), "n_curves": len(curves)}
+        record["interval"] = list(interval)
+        per_clip[key] = record
         for codec_name, (original, plate) in pairs.items():
             sliced = saving_on_interval(original, plate, interval)
             report["fg"][codec_name][key]["plate_vs_original_common_interval"] = sliced
     report["common_interval"] = per_clip
+
+
+def clip_refs_from_report(report: dict[str, Any]) -> list[Any]:
+    refs: list[Any] = []
+    for row in report.get("clips") or []:
+        refs.append(
+            SimpleNamespace(
+                video=row["video"],
+                scene=row["scene"],
+                player_area=float(row["player_area"]),
+            )
+        )
+    return refs
+
+
+def refresh_summary(report: dict[str, Any]) -> dict[str, Any]:
+    """Recompute the common-PSNR slice and n=8 summary from stored curves."""
+    clips = clip_refs_from_report(report)
+    if not clips:
+        raise RuntimeError("report has no clips to summarise")
+    bounds = report.get("bounds_written_before_measurement") or declared_bounds()
+    report["alarms"] = [
+        alarm
+        for alarm in report.get("alarms") or []
+        if " mean FG plate " not in alarm and not str(alarm).startswith("mean player_area ")
+    ]
+    _fill_common_interval(report, clips)
+    _summarize(report, clips, bounds)
+    report["summarized_at"] = _now()
+    return report
 
 
 def run(
@@ -881,7 +976,19 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--av1-bg-qps", nargs="+", type=int, default=list(AV1_BG_QPS))
     parser.add_argument("--reuse-from", type=Path, default=BP20_DIR)
     parser.add_argument("--paste-back-only", action="store_true")
+    parser.add_argument(
+        "--summarize-only",
+        action="store_true",
+        help="Recompute common-PSNR slice and summary from an existing report.json.",
+    )
     args = parser.parse_args(argv)
+    if args.summarize_only:
+        report_path = args.out / "report.json"
+        report = json.loads(report_path.read_text())
+        report = refresh_summary(report)
+        _write(report, report_path)
+        print(json.dumps(_jsonable(report.get("summary") or {}), indent=2, default=str))
+        return 0
     reuse = args.reuse_from if args.reuse_from is not None else None
     try:
         report = run(

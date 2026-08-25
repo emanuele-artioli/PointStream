@@ -126,7 +126,6 @@ n=8 clips, 6 matches (alcaraz_ruud has no 2–30 s point scene on disk, so it co
 
 - Did not touch `67a9ea6275d3d9785ce57026/` (`sections/problem.tex`), `PLAN.md` §2, `plans/README.md`, `src/components/metrics/**`, `src/decoder/**`, `src/shared/**`, `scripts/train_controlnet.py`.
 - Did not test third-party encoder binaries, libvvenc empty-bitstream behaviour, or a full 4K encode in CI.
-- Did not wait for the n≥8 ladder to finish in this session. 4K is the long pole; the job is running and checkpointing. **n=1 encode is a direction, not a result.** `compare_paired` will refuse a winner until n=8; that refusal is correct.
 
 ### Paste-back
 
@@ -176,6 +175,49 @@ AV1 BG: **not yet measured.** Wider QP sweep is wired; overlap fractions will be
 
 Nulls: scheduled on a non-BP20 clip after all codecs; not yet run.
 
+### n=8 result (citable only with the alarms below)
+
+Encode finished 2026-08-25T11:57:44Z. All four codecs have n=8 FG cells, 6 matches. Nulls on `sinner_alcaraz/scene_001` (not a BP20 clip): empty-mask plate saving −0.0, duplicate-rate ratio 1.0.
+
+**Bounds were written before the run** in `outputs/bp21-headroom/bounds-stream-a.json`. A mean outside its band is an alarm, not a finding.
+
+| metric | n | mean ± SE | pre-written band | |
+|---|---|---|---|---|
+| AVC FG plate | 8 | 0.170 ± 0.031 | [0.184, 0.304] | **outside** |
+| HEVC FG plate | 8 | 0.183 ± 0.034 | [0.174, 0.294] | inside |
+| AV1 FG plate | 8 | 0.154 ± 0.028 | [0.169, 0.289] | **outside** |
+| VVC FG plate | 8 | 0.142 ± 0.026 | [0.107, 0.227] | inside |
+| player area | 8 | 0.0111 ± 0.0032 | [0.004, 0.020] | mean inside; one clip outside |
+| concentration AVC | 8 | 18.9 ± 5.0 × | [10, 60] | inside |
+| AV1 BG (widened QP) | 8 | 0.780 ± 0.056 | [0.25, 0.75] | **outside** (above) |
+| VVC BG | 8 | 0.761 ± 0.039 | [0.25, 0.75] | **outside** (above) |
+| AVC BG | 6 | 0.643 ± 0.084 | [0.25, 0.75] | inside; two clips had 0 overlap |
+
+Flat still understates plate on every codec (AVC 0.109 vs 0.170). Instrument: PSNR ~20–50 dB; rate = payload bytes.
+
+**Per-clip AVC plate** (the mean's drivers):
+
+| clip | plate | area | conc. | BG overlap |
+|---|---|---|---|---|
+| alcaraz_highlights/scene_000 | 0.264 | 0.0055 | 47.8× | 0.94 |
+| federer_djokovic/scene_001 | 0.225 | 0.0102 | 22.0× | 0.80 |
+| sinner_alcaraz/scene_001 | 0.231 | 0.0083 | 27.8× | 0.89 |
+| alcaraz_perricard/scene_002 | 0.249 | 0.0327 | 7.6× | 0.56 |
+| djokovic_federer/scene_003 | 0.165 | 0.0099 | 16.7× | 0.67 |
+| djokovic_zverev/scene_002 | **0.011** | 0.0054 | 2.1× | 0.00 |
+| alcaraz_highlights/scene_010 | 0.117 | 0.0067 | 17.5× | 0.69 |
+| federer_djokovic/scene_003 | **0.099** | 0.0103 | 9.6× | 0.00 |
+
+**Why two clips are near zero (not a paste-back miss).** Paste-back MAE was 0.0 on both. On `djokovic_zverev/scene_002` the AVC original and plate bitstreams are almost the same size (1.671 MB vs 1.657 MB at QP 32). The player is 0.54% of pixels; the rest is high-rate content the plate does not cheapen. Concentration 2.1× is below the 10× floor *on that clip*; the n=8 mean stays at 18.9× because the other clips are high. `federer_djokovic/scene_003` is the same shape, milder (0.099, 9.6×). BP20's n=2 were the two *high*-saving clips (0.26 and 0.22). The ±0.06 band around those is too tight for match diversity — same class of miss as the player-area bound. Bound not retconned. **Do not cite "17%" as the opening argument without the SE and these two clips.**
+
+**VVC confound.** Prediction, written before any BP21 encode: the ~0.077 gap survives, AVC−VVC in [0.04, 0.10]. Observed, common QP 32/40/46: **+0.028 ± 0.015** (n=8, 1.8σ, suggestive only). Common PSNR slice (AVC/HEVC/VVC, AV1 excluded): **+0.023 ± 0.017** (1.3σ). Sentence in `summary.vvc_gap.sentence`: *confound: the AVC−VVC FG gap did not survive a common QP set; it also did not survive a common PSNR interval.* `djokovic_federer/scene_003` used QP **31** in place of 32 (`faster` libvvenc wrote 0 frames at 32; 31 and `medium` both work).
+
+**Common PSNR window was inverted because AV1 was in the intersection.** At QP 32/40/46 AV1 lives at ~44–48 dB; AVC/HEVC/VVC at ~34–43 dB. `max(mins)` > `min(maxes)` → empty interval, n=0, and the first VVC sentence claimed a slice that never ran. Fix: raise on a disjoint range; slice only AVC/HEVC/VVC. AV1 BG is reported on its own widened QP ladder (overlap 0.62–0.92, all eight ≥ 50%).
+
+**AV1 background** is no longer a missing cell. n=8, mean 0.780 ± 0.056, above the pre-written [0.25, 0.75] band. The bound was taken from BP20's 34–69% on two clips; a still plate against a 4K intercoded background can save more than that. Alarm, not retconned.
+
+`PLAN.md` §2.14 is **not** edited here. Report these numbers; the plan edit is made centrally.
+
 ### Tools (resolved by path+version)
 
 - ffmpeg/ffprobe: `/opt/local/bin/ffmpeg`, `ffmpeg version n7.1.1-56-gc2184b65d2`
@@ -207,5 +249,9 @@ PR https://github.com/emanuele-artioli/PointStream/pull/18
 
 5. `seed_reuse` copies a complete QP set and deletes a partial 32/40 leftover
    rather than stitching on a new 46.
+6. VVC empty bitstream does not reuse another curve point's QP file
+   (`qps=(32, 32, 46)` on alcaraz_perricard).
+7. Disjoint quality ranges raise; the common-PSNR slice drops AV1 so the
+   window is not empty.
 
 Deliberately not tested: encoder binaries, libvvenc empty bitstreams, full 4K encode.

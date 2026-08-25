@@ -56,6 +56,33 @@ def qps_for_codec(codec_name: str, qps: tuple[int, ...]) -> tuple[int, ...]:
     return tuple(46 if qp >= 47 else qp for qp in qps)
 
 
+# libvvenc 1.11.0 writes 0 bytes at some clip×QP cells even well below 47.
+# Floor 32 was the previous stop; djokovic_federer/scene_003 original is empty
+# at faster QP 32 and fine at 31. Ceiling stays under the 47/48 remap band.
+VVC_FALLBACK_FLOOR = 24
+VVC_FALLBACK_CEILING = 51
+
+
+def vvc_fallback_qps(
+    qp: int,
+    *,
+    occupied: frozenset[int] = frozenset(),
+    reserved: frozenset[int] = frozenset(),
+    floor: int = VVC_FALLBACK_FLOOR,
+    ceiling: int = VVC_FALLBACK_CEILING,
+) -> tuple[int, ...]:
+    """QPs to try after libvvenc writes 0 bytes. Down first, then up.
+
+    Occupied QPs are already a point on this curve. Reserved QPs are other
+    requested points still needed. Reusing an occupied file as a different
+    requested QP produced ``qps=(32, 32, 46)`` on alcaraz_perricard.
+    """
+    blocked = (occupied | reserved) - {qp}
+    down = tuple(q for q in range(qp, floor - 1, -1) if q not in blocked)
+    up = tuple(q for q in range(qp + 1, ceiling + 1) if q not in blocked)
+    return down + up
+
+
 def encode_qp_with_vvc_fallback(
     source: Path,
     work_dir: Path,
@@ -63,15 +90,17 @@ def encode_qp_with_vvc_fallback(
     qp: int,
     notes: list[str],
     label: str,
+    occupied: frozenset[int] = frozenset(),
+    reserved: frozenset[int] = frozenset(),
 ) -> tuple[int, Path, EncodeRecord | None]:
-    """Encode at ``qp``. If libvvenc writes 0 bytes, step QP down rather than abort.
+    """Encode at ``qp``. If libvvenc writes 0 bytes, try nearby QPs rather than abort.
 
     Federer plate is empty at 47 and fine at 46. Alcaraz plate is fine at 47.
-    The third curve point must exist; pretending QP 48/47 ran is the failure.
+    Some 4K originals are empty at faster QP 32 and fine at 31. The third curve
+    point must exist; pretending QP 48/47 ran is the failure.
     """
     suffix = BITSTREAM_SUFFIX[codec_name]
-    floor = 32
-    tries = range(qp, floor - 1, -1) if codec_name == "vvc" else (qp,)
+    tries = vvc_fallback_qps(qp, occupied=occupied, reserved=reserved) if codec_name == "vvc" else (qp,)
     last_error: Exception | None = None
     for try_qp in tries:
         dest = work_dir / f"{codec_name}_qp{try_qp}{suffix}"
@@ -93,12 +122,12 @@ def encode_qp_with_vvc_fallback(
             last_error = exc
             if codec_name != "vvc":
                 raise
-            print(f"vvc qp={try_qp} empty for {label}; trying lower", flush=True)
+            print(f"vvc qp={try_qp} empty for {label}; trying another qp", flush=True)
             if dest.exists() and dest.stat().st_size == 0:
                 dest.unlink()
             continue
     raise RuntimeError(
-        f"vvc would not emit a bitstream for {label or source} at QP <= {qp}"
+        f"vvc would not emit a bitstream for {label or source} near QP {qp}"
     ) from last_error
 
 
@@ -219,7 +248,14 @@ def encode_luma_curve(
     actual_qps: list[int] = []
     for qp in used_qps:
         used_qp, bitstream, record = encode_qp_with_vvc_fallback(
-            source, work_dir, codec_name, qp, notes, label
+            source,
+            work_dir,
+            codec_name,
+            qp,
+            notes,
+            label,
+            occupied=frozenset(actual_qps),
+            reserved=frozenset(q for q in used_qps if q != qp),
         )
         actual_qps.append(used_qp)
         request = qp_request(codec_name, used_qp)
