@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -248,8 +249,8 @@ def test_vvc_empty_bitstream_steps_qp_down(tmp_path: Path, monkeypatch: pytest.M
     class _Record:
         size_bytes = 12
 
-    def fake_encode(_src, dest, request):
-        qp = int(request.rate)
+    def fake_encode(_src: Path, dest: Path, request: object) -> object:
+        qp = int(getattr(request, "rate"))
         calls.append(qp)
         if qp >= 47:
             dest.write_bytes(b"")
@@ -289,8 +290,8 @@ def test_vvc_empty_at_32_steps_to_31(tmp_path: Path, monkeypatch: pytest.MonkeyP
     class _Record:
         size_bytes = 12
 
-    def fake_encode(_src, dest, request):
-        qp = int(request.rate)
+    def fake_encode(_src: Path, dest: Path, request: object) -> object:
+        qp = int(getattr(request, "rate"))
         if qp == 32:
             dest.write_bytes(b"")
             raise RuntimeError("command failed (0): empty")
@@ -322,8 +323,8 @@ def test_vvc_fallback_does_not_reuse_another_curve_point(
     class _Record:
         size_bytes = 12
 
-    def fake_encode(_src, dest, request):
-        qp = int(request.rate)
+    def fake_encode(_src: Path, dest: Path, request: object) -> object:
+        qp = int(getattr(request, "rate"))
         calls.append(qp)
         if qp == 40:
             dest.write_bytes(b"")
@@ -494,7 +495,7 @@ def test_fill_common_interval_drops_av1_so_the_window_is_not_empty() -> None:
             "vvc": {key: {"original_curve": payload(vvc), "plate_curve": payload(vvc_plate)}},
         },
     }
-    clip = type("Clip", (), {"video": "match", "scene": "scene_000"})()
+    clip = SimpleNamespace(video="match", scene="scene_000")
     _fill_common_interval(report, [clip])
     record = report["common_interval"][key]
     assert record["interval"][0] < record["interval"][1]

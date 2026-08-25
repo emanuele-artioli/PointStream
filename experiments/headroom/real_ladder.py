@@ -13,7 +13,7 @@ from pathlib import Path
 import statistics
 import sys
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, Sequence
 
 import numpy as np
 
@@ -430,7 +430,7 @@ def _plate_nan_check(
     _write(report, report_path)
 
 
-def _summarize(report: dict[str, Any], clips: list[Any], bounds: dict[str, Any]) -> None:
+def _summarize(report: dict[str, Any], clips: Sequence[Any], bounds: dict[str, Any]) -> None:
     keys = [f"{c.video}/{c.scene}" for c in clips]
     areas = [float(c.player_area) for c in clips]
     summary: dict[str, Any] = {
@@ -591,7 +591,7 @@ def _summarize(report: dict[str, Any], clips: list[Any], bounds: dict[str, Any])
     report["summary"] = summary
 
 
-def _fill_common_interval(report: dict[str, Any], clips: list[Any]) -> None:
+def _fill_common_interval(report: dict[str, Any], clips: Sequence[Any]) -> None:
     """Slice AVC/HEVC/VVC original/plate curves to the clip's common PSNR range.
 
     AV1 is excluded: at the same QPs it lives 5–10 dB above the other three, so
