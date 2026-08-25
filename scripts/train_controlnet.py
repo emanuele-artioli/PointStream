@@ -366,6 +366,86 @@ def compose_pose_on_appearance_tensor(
     return torch.where(mask, pose, appearance)
 
 
+def controlnet_cond_for_batch(
+    batch: dict,
+    *,
+    condition_type: str,
+    include_reference: bool,
+    weight_dtype,
+):
+    """Pose/canny/seg tensor that ControlNet sees. IP-Adapter never paints the reference here."""
+    pose = batch["conditioning_pixel_values"].to(dtype=weight_dtype)
+    if condition_type == "ip-adapter":
+        return pose
+    if include_reference:
+        return compose_pose_on_appearance_tensor(
+            pose, batch["reference_pixel_values"].to(dtype=weight_dtype)
+        )
+    return pose
+
+
+def collect_ip_adapter_parameters(unet) -> list:
+    """The ~22M adapter: image projection plus IP-Attn to_k_ip / to_v_ip."""
+    params = []
+    proj = getattr(unet, "encoder_hid_proj", None)
+    if proj is not None:
+        params.extend(proj.parameters())
+    for proc in getattr(unet, "attn_processors", {}).values():
+        if hasattr(proc, "to_k_ip"):
+            params.extend(proc.parameters())
+    return params
+
+
+def load_ip_adapter_state_dict(
+    repo: str = "h94/IP-Adapter",
+    subfolder: str = "models",
+    weight_name: str = "ip-adapter_sd15.bin",
+):
+    from huggingface_hub import hf_hub_download
+
+    path = hf_hub_download(
+        repo_id=repo, filename=f"{subfolder}/{weight_name}", local_files_only=True
+    )
+    return torch.load(path, map_location="cpu")
+
+
+def attach_ip_adapter(unet, state_dict) -> None:
+    """Install h94 processors on a frozen UNet, then unfreeze only the adapter."""
+    unet.requires_grad_(False)
+    unet._load_ip_adapter_weights([state_dict])
+    for param in collect_ip_adapter_parameters(unet):
+        param.requires_grad = True
+
+
+def export_ip_adapter_state_dict(unet) -> dict:
+    """Write the h94 ``image_proj`` / ``ip_adapter`` layout so inference can reload."""
+    ip_adapter = {}
+    key_id = 1
+    for proc in unet.attn_processors.values():
+        if not hasattr(proc, "to_k_ip"):
+            continue
+        ip_adapter[f"{key_id}.to_k_ip.weight"] = proc.to_k_ip[0].weight.detach().cpu().contiguous()
+        ip_adapter[f"{key_id}.to_v_ip.weight"] = proc.to_v_ip[0].weight.detach().cpu().contiguous()
+        key_id += 2
+    proj = unet.encoder_hid_proj
+    inner = proj.image_projection_layers[0] if hasattr(proj, "image_projection_layers") else proj
+    return {"image_proj": {k: v.detach().cpu().contiguous() for k, v in inner.state_dict().items()}, "ip_adapter": ip_adapter}
+
+
+def encode_reference_image_embeds(
+    image_encoder, feature_extractor, reference, *, device, dtype
+):
+    """CLIP image embeds for IP-Adapter. ``reference`` is BCHW in [0, 1]."""
+    from torchvision.transforms.functional import to_pil_image
+
+    pils = [to_pil_image(frame.detach().float().cpu().clamp(0, 1)) for frame in reference]
+    pixel_values = feature_extractor(images=pils, return_tensors="pt").pixel_values
+    pixel_values = pixel_values.to(device=device, dtype=dtype)
+    with torch.no_grad():
+        embeds = image_encoder(pixel_values).image_embeds
+    return [embeds]
+
+
 def assert_reference_enters_controlnet(
     controlnet, batch, *, weight_dtype, timesteps, noisy_latents, encoder_hidden_states
 ) -> float:
@@ -459,7 +539,12 @@ def main():
     parser.add_argument("--task-eval-clips", type=int, default=STOP_EVAL_N_CLIPS)
     args = parser.parse_args()
 
-    if args.include_reference and args.controlnet_model_id is None and not args.from_scratch:
+    if (
+        args.include_reference
+        and args.controlnet_model_id is None
+        and not args.from_scratch
+        and args.condition_type != "ip-adapter"
+    ):
         args.controlnet_model_id = "assets/weights/pose-controlnet/checkpoint-epoch-10"
         logging.info(
             "include-reference defaults to fine-tuning the tennis pose ControlNet at %s",
@@ -499,9 +584,34 @@ def main():
     vae.requires_grad_(False)
     text_encoder.requires_grad_(False)
     unet.requires_grad_(False)
-    controlnet.train()
+    image_encoder = None
+    feature_extractor = None
+    if args.condition_type == "ip-adapter":
+        from transformers import CLIPImageProcessor, CLIPVisionModelWithProjection
 
-    optimizer = torch.optim.AdamW(controlnet.parameters(), lr=args.lr)
+        logging.info("Attaching h94 IP-Adapter; ControlNet stays frozen stock OpenPose.")
+        attach_ip_adapter(unet, load_ip_adapter_state_dict())
+        controlnet.requires_grad_(False)
+        controlnet.eval()
+        adapter_params = collect_ip_adapter_parameters(unet)
+        n_adapter = sum(p.numel() for p in adapter_params)
+        logging.info("IP-Adapter trainable parameters: %s", n_adapter)
+        if not (10_000_000 <= n_adapter <= 40_000_000):
+            raise RuntimeError(
+                f"IP-Adapter should be ~22M trainable params; got {n_adapter}. "
+                "The optimiser is not looking at the adapter."
+            )
+        optimizer = torch.optim.AdamW(adapter_params, lr=args.lr)
+        image_encoder = CLIPVisionModelWithProjection.from_pretrained(
+            "h94/IP-Adapter", subfolder="models/image_encoder", local_files_only=True
+        )
+        image_encoder.requires_grad_(False)
+        feature_extractor = CLIPImageProcessor.from_pretrained(
+            "h94/IP-Adapter", subfolder="models/image_encoder", local_files_only=True
+        )
+    else:
+        controlnet.train()
+        optimizer = torch.optim.AdamW(controlnet.parameters(), lr=args.lr)
 
     dataset = ControlNetDataset(
         args.data_root,
@@ -516,9 +626,14 @@ def main():
         dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers
     )
 
-    controlnet, optimizer, dataloader = accelerator.prepare(
-        controlnet, optimizer, dataloader
-    )
+    if args.condition_type == "ip-adapter":
+        unet, controlnet, optimizer, dataloader = accelerator.prepare(
+            unet, controlnet, optimizer, dataloader
+        )
+    else:
+        controlnet, optimizer, dataloader = accelerator.prepare(
+            controlnet, optimizer, dataloader
+        )
 
     weight_dtype = torch.float32
     if accelerator.mixed_precision == "fp16":
@@ -528,9 +643,17 @@ def main():
 
     vae.to(accelerator.device, dtype=weight_dtype)
     text_encoder.to(accelerator.device, dtype=weight_dtype)
-    unet.to(accelerator.device, dtype=weight_dtype)
+    if args.condition_type != "ip-adapter":
+        unet.to(accelerator.device, dtype=weight_dtype)
+    if image_encoder is not None:
+        image_encoder.to(accelerator.device, dtype=weight_dtype)
 
-    if args.include_reference and args.controlnet_model_id is None and not args.from_scratch:
+    if (
+        args.include_reference
+        and args.controlnet_model_id is None
+        and not args.from_scratch
+        and args.condition_type != "ip-adapter"
+    ):
         logging.info(
             "include-reference fine-tunes the pose ControlNet with appearance under the skeleton. "
             "Pass --controlnet-model-id to choose weights; default OpenPose is used otherwise."
@@ -565,8 +688,14 @@ def main():
         if not accelerator.is_main_process:
             return
         dest = os.path.join(args.output_dir, tag)
-        logging.info("Saving ControlNet checkpoint to %s", dest)
+        logging.info("Saving checkpoint to %s", dest)
+        Path(dest).mkdir(parents=True, exist_ok=True)
         accelerator.unwrap_model(controlnet).save_pretrained(dest)
+        if args.condition_type == "ip-adapter":
+            torch.save(
+                export_ip_adapter_state_dict(accelerator.unwrap_model(unet)),
+                os.path.join(dest, "ip-adapter.bin"),
+            )
 
     def _broadcast_stop(stop: bool) -> bool:
         if accelerator.num_processes == 1:
@@ -631,7 +760,8 @@ def main():
     for epoch in range(args.epochs):
         logging.info(f"Starting epoch {epoch+1}/{args.epochs}")
         for step, batch in enumerate(tqdm(dataloader, disable=not accelerator.is_local_main_process)):
-            with accelerator.accumulate(controlnet):
+            trained = unet if args.condition_type == "ip-adapter" else controlnet
+            with accelerator.accumulate(trained):
                 latents = vae.encode(batch["pixel_values"].to(dtype=weight_dtype)).latent_dist.sample()
                 latents = latents * vae.config.scaling_factor
 
@@ -641,16 +771,21 @@ def main():
 
                 noisy_latents = noise_scheduler.add_noise(latents, noise, timesteps)
                 encoder_hidden_states = text_encoder(batch["input_ids"])[0]
-                controlnet_image = batch["conditioning_pixel_values"].to(dtype=weight_dtype)
-                if args.include_reference and args.condition_type != "ip-adapter":
-                    controlnet_image = compose_pose_on_appearance_tensor(
-                        controlnet_image,
-                        batch["reference_pixel_values"].to(dtype=weight_dtype),
-                    )
+                controlnet_image = controlnet_cond_for_batch(
+                    batch,
+                    condition_type=args.condition_type,
+                    include_reference=args.include_reference,
+                    weight_dtype=weight_dtype,
+                )
 
                 if args.smoke_check_reference and global_step == 0:
                     if not args.include_reference:
                         raise ValueError("--smoke-check-reference requires --include-reference")
+                    if args.condition_type == "ip-adapter":
+                        raise ValueError(
+                            "--smoke-check-reference paints the reference into ControlNet; "
+                            "that is the pose-ref recipe. IP-Adapter appearance is the CLIP path."
+                        )
                     delta = assert_reference_enters_controlnet(
                         controlnet,
                         batch,
@@ -692,6 +827,20 @@ def main():
                     return_dict=False,
                 )
 
+                unet_kwargs = {}
+                if args.condition_type == "ip-adapter":
+                    if image_encoder is None or feature_extractor is None:
+                        raise RuntimeError("ip-adapter training is missing the CLIP image encoder")
+                    unet_kwargs["added_cond_kwargs"] = {
+                        "image_embeds": encode_reference_image_embeds(
+                            image_encoder,
+                            feature_extractor,
+                            batch["reference_pixel_values"],
+                            device=accelerator.device,
+                            dtype=weight_dtype,
+                        )
+                    }
+
                 model_pred = unet(
                     noisy_latents,
                     timesteps,
@@ -699,6 +848,7 @@ def main():
                     down_block_additional_residuals=[sample.to(dtype=weight_dtype) for sample in down_block_res_samples],
                     mid_block_additional_residual=mid_block_res_sample.to(dtype=weight_dtype),
                     return_dict=False,
+                    **unet_kwargs,
                 )[0]
 
                 loss = F.mse_loss(model_pred.float(), noise.float(), reduction="mean")
@@ -750,6 +900,11 @@ def main():
         logging.info(f"Saving ControlNet to {args.output_dir}")
         controlnet = accelerator.unwrap_model(controlnet)
         controlnet.save_pretrained(args.output_dir)
+        if args.condition_type == "ip-adapter":
+            torch.save(
+                export_ip_adapter_state_dict(accelerator.unwrap_model(unet)),
+                os.path.join(args.output_dir, "ip-adapter.bin"),
+            )
 
 
 if __name__ == "__main__":

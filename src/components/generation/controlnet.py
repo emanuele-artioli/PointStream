@@ -520,6 +520,15 @@ class ControlNetGenerator(BaseFrameGenerator):
                 weight_name=_IP_ADAPTER_WEIGHT,
                 local_files_only=True,
             )
+            if self.checkpoint:
+                trained = Path(self.checkpoint) / "ip-adapter.bin"
+                if trained.is_file():
+                    import torch
+
+                    _LOGGER.info("Loading trained IP-Adapter weights from %s", trained)
+                    pipe.unet._load_ip_adapter_weights(
+                        [torch.load(trained, map_location="cpu")]
+                    )
             pipe.set_ip_adapter_scale(self.ip_adapter_scale)
         else:
             pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(

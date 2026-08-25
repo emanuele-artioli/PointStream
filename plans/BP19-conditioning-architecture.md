@@ -191,8 +191,31 @@ different-person anchor; 1/96 above same-person.
 Reading both together: middling LPIPS and middling reid. Two conditions do not
 create an appearance path, which is what the bounds said.
 
-**Dataset honesty for IP-Adapter landed** (`4aa7c94`): `"ip-adapter"` is no
-longer on the `seg` branch. The training loop still optimises ControlNet
-parameters only — `reference_pixel_values` is loaded and then unused for this
-condition. Do not launch `--condition-type ip-adapter` until the 22M adapter is
-what the optimiser sees. That is the next step; do not repeat pose-ref.
+**Dataset honesty for IP-Adapter landed** (`4aa7c94`).
+
+**IP-Adapter training loop is wired.** `--condition-type ip-adapter --include-reference` now:
+
+- loads stock OpenPose ControlNet and **freezes** it
+- attaches `h94/IP-Adapter` (`ip-adapter_sd15.bin`, ~22M) on the frozen UNet
+- optimiser sees only adapter parameters (image proj + IP-Attn); a count outside 10–40M aborts
+- reference goes through CLIP vision, not into the control image
+- checkpoints write `ip-adapter.bin` next to the frozen ControlNet so the stop-rule generator can load it
+
+Do not repeat pose-ref. `--smoke-check-reference` is refused on this condition because that flag paints the reference under the skeleton.
+
+**Bounds, written before the first training sample** (2026-08-25):
+
+- Coding-task LPIPS through `TaskStopRule` / `TENNIS_SCALE` is not the train metric; stop on coding-task LPIPS vs static-copy floor as BP14.
+- After a run that is allowed to finish: object-bbox LPIPS expected **0.50–0.78** (pose 0.60, paste 0.45, unrelated 0.74). A number below 0.45 is an alarm (paste-through). Above 0.74 is an alarm (worse than unrelated).
+- `reid` through `TENNIS_SCALE` (same 0.8663, different 0.5315): expected **0.53–0.72**. Ceiling is semantic appearance (kit colour, build), not identity — CLIP image embeds lack spatial detail. A score at the same-person anchor (0.87) is an alarm.
+
+Launch (not a result until it stops on the task):
+
+```
+conda run -n pointstream --no-capture-output python -u scripts/train_controlnet.py \
+  --condition-type ip-adapter --include-reference \
+  --output-dir assets/weights/ip-adapter-trained \
+  --batch-size 4 --epochs 10
+```
+
+Uni-ControlNet remains last.
