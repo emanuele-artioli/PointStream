@@ -56,6 +56,11 @@ class ChunkResult:
     """One chunk after the single run path."""
 
     frames: np.ndarray
+    """The client's clip, after the residual is applied."""
+    encoder_frames: np.ndarray
+    """The encoder's copy of the same thing, at the same point in the pipeline.
+    Kept so symmetry over a whole run is the concatenation of the per-chunk
+    pairs rather than a second, differently-derived comparison."""
     reconstruction: ReconstructionResult
     quality: QualityReport
     delivered_quality: QualityReport
@@ -120,7 +125,7 @@ def run(
     lattice = config.stages
     generation_on = lattice.is_enabled(STAGE_GENERATION)
     ref = bind_generator(config, injected=generator, factory=bind_generator_fn)
-    scorer = bind_evaluator(evaluator)
+    scorer = bind_evaluator(evaluator, config)
     resolver = BackgroundResolver()
     ctx = StageContext(
         lattice=lattice,
@@ -207,10 +212,17 @@ def _finish_chunk(
         frames = client.frames
         encoder_frames = _encoder_frames(bag, client.frames)
 
-    symmetry = measure_symmetry(encoder_frames, client.frames)
+    # Both sides at the same point in the pipeline. `residual.reconstructed` is
+    # the encoder's own copy *after* the residual is applied, so it belongs
+    # against the client's clip after the residual, not against the client's
+    # unaided reconstruction. Comparing across that step measured the residual
+    # rather than the encoder/client gap, and reported a mismatch on every
+    # corner where the residual does anything at all.
+    symmetry = measure_symmetry(encoder_frames, frames)
     sizes = ledger_from_bag(bag, source)
     return ChunkResult(
         frames=frames,
+        encoder_frames=encoder_frames,
         reconstruction=client,
         quality=client.quality,
         delivered_quality=delivered_quality,
@@ -275,15 +287,13 @@ def _assemble(
 
 
 def _combined_symmetry(results: Sequence[ChunkResult]) -> Closeness:
+    """The run's encoder/client closeness: the per-chunk pairs, concatenated.
+
+    Deriving it a second way here is how the two comparisons drift apart, so
+    it reuses exactly the clips `_finish_chunk` already paired.
+    """
     if len(results) == 1:
         return results[0].symmetry
-    encoder = []
-    client = []
-    for item in results:
-        residual = item.bag.get(ART_RESIDUAL_STREAM)
-        if isinstance(residual, ResidualResult):
-            encoder.append(residual.reconstructed)
-        else:
-            encoder.append(item.reconstruction.frames)
-        client.append(item.reconstruction.frames)
-    return measure_symmetry(np.concatenate(encoder, axis=0), np.concatenate(client, axis=0))
+    encoder = np.concatenate([item.encoder_frames for item in results], axis=0)
+    client = np.concatenate([item.frames for item in results], axis=0)
+    return measure_symmetry(encoder, client)

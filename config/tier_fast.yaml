@@ -1,37 +1,113 @@
-# Fast complexity tier (report 10 Phase 3).
+# Fast complexity tier — the cheapest rung of the speed/compression ladder.
 #
-# The cheapest rung of the speed/compression trade-off ladder: smallest
-# YOLO backends, no GenAI compositing, cheapest ball extractor. This is
-# the tier a real-time deployment would actually run. Intended for
-# `run-mode: full_match` (a whole raw_4k match, routed scene-by-scene) —
-# use `--input assets/raw_4k/<video>.mp4`.
+# Rewritten 2026-08-25 (BP23). The previous version of this file was written in
+# the retired flat schema (`run-mode`, `genai-backend`, `controlnet-steps`, ...).
+# Every one of its keys was rejected by `src/contracts/config.py`; it had never
+# been run. See `outputs/bp23-tier/report.json`.
 #
-# Any key not set here falls back to PointstreamConfig's dataclass default
-# (see src/shared/config.py) — this file only states the tier-defining
-# knobs, not every option (unlike config/default.yaml, which documents all
-# of them for the single-chunk smoke-test path).
+# Only keys naming a real field exist here — the schema rejects anything it does
+# not recognise, which is what stops a documented-but-unreachable knob producing
+# a clean, plausible, entirely fictional ablation.
+#
+# The tier axis is **residual coarseness**, the rate axis defined in
+# `src/pipeline/residual/spectrum.py`. fast = `Coarseness.COARSE`.
+#
+# Generation is off in all three tiers. Every engine on the roster loses to
+# pasting the keyframe (`PLAN.md` 2.10), so a tier that switched one on would be
+# measuring a known negative rather than a tier. With generation off the subjects
+# land in the residual, which is what the lattice says an off stage means.
 
-run-mode: full_match
-scene-chunk-duration-sec: 2.0          # ~2s VideoChunks per point scene
+run:
+  seed: 1337
+  log-level: info
+  chunk-duration-sec: 2.0
 
-log-level: info
-execution-pool: inline
+domain: tennis
 
-# Actor extraction: nano-tier backends (real-time class).
-detector: yolo26n.pt
-pose-estimator: yolo26n-pose.pt
-segmenter: yolo26n-seg.pt
-ball-extractor: difference             # cheaper than segmentation-based detection
+lattice:
+  scene-classification: true
+  detection: true
+  selection: true
+  tracking: true
+  appearance: true
+  motion: true
+  temporal-policy: true
+  pose: true
+  segmentation: true
+  rigid-objects: true
+  background: true
+  generation: false
+  residual: true
 
-# No generative compositing at this tier.
-genai-backend: null
+# Perception: nano-tier backends, the real-time class.
+#
+# Measured in BP23 and true as of that date: the runner's default stage
+# callables for these axes are pass-throughs — they forward artifacts the caller
+# put on the bag and do not load a detector. Changing the names below therefore
+# changes nothing in a run today. They state the tier's intent; they do not yet
+# drive it.
+detector:
+  backend: yolo
+  model: yolo26n.pt
+  prompt: tennis player
+selection:
+  backend: heuristic
+tracking:
+  backend: tracker
+pose:
+  backend: yolo
+  model: yolo26n-pose.pt
+segmenter:
+  backend: yolo
+  model: yolo26n-seg.pt
+rigid:
+  backend: tennis
 
-# Fallback codec for interlude/other/blank scenes and the outcome-safe
-# comparison anchor for point scenes.
-ffmpeg-codec: libsvtav1
-codec-crf: 35
-codec-preset: fast
+appearance:
+  representation: compressed-image
+  jpeg-quality: 85
+  downscale: 2
 
-# G1-scope (report 10): full_match mode does byte/timing accounting only;
-# evaluation-mode is unused by run_mode: full_match today.
-evaluation-mode: [psnr]
+motion:
+  representation: keypoints
+  max-points: 64
+
+temporal:
+  metadata-sparsity: true
+  generation-sparsity: false
+  pipeline-sparsity: true
+  delta-threshold: 20.0
+  keyframe-interval: 8
+
+background:
+  method: panorama-full
+  codec: jpeg
+  jpeg-quality: 50
+
+generator:
+  backend: none
+
+# Coarse rung: zero blocks whose mean absolute error is under 16 grey levels,
+# and carry the background residual at quarter resolution.
+residual:
+  codec: av1
+  rate-control: crf
+  rate: 63
+  preset: "10"
+  pix-fmt: yuv420p
+  block-size: 16
+  block-threshold: 16.0
+  background-downscale: 4
+
+fallback:
+  codec: av1
+  rate-control: crf
+  rate: 35
+  preset: "10"
+  pix-fmt: yuv420p
+  roi: false
+
+transport: disk
+
+evaluation:
+  metrics: [psnr]

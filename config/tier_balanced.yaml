@@ -1,36 +1,98 @@
-# Balanced complexity tier (report 10 Phase 3).
+# Balanced complexity tier — the middle rung of the speed/compression ladder.
 #
-# Middle rung of the speed/compression trade-off ladder. No medium-sized
-# YOLO weight exists locally (only nano "n" and extra-large "x" variants
-# are downloaded, see assets/weights/), so this tier's complexity axis is
-# the GenAI backend rather than the detector: nano-tier extraction (same
-# as tier_fast) plus a lightweight generative pass at reduced diffusion
-# steps, which is the dominant cost driver anyway.
+# Rewritten 2026-08-25 (BP23), same reason as `tier_fast.yaml`: the previous
+# file was in the retired flat schema and had never been run.
 #
-# Any key not set here falls back to PointstreamConfig's dataclass default
-# (see src/shared/config.py).
+# Tier axis = residual coarseness. balanced = `Coarseness.MEDIUM`: the block
+# gate drops to 4 grey levels and the background residual is carried at half
+# resolution instead of a quarter. It also asks for SSIM alongside PSNR, which
+# is the second axis this tier ladder actually moves today.
+#
+# Generation stays off — see `tier_fast.yaml` for why.
 
-run-mode: full_match
-scene-chunk-duration-sec: 2.0
+run:
+  seed: 1337
+  log-level: info
+  chunk-duration-sec: 2.0
 
-log-level: info
-execution-pool: inline
+domain: tennis
 
-# Actor extraction: still nano-tier (no yolo26s weight available).
-detector: yolo26n.pt
-pose-estimator: yolo26n-pose.pt
-segmenter: yolo26n-seg.pt
-ball-extractor: difference
+lattice:
+  scene-classification: true
+  detection: true
+  selection: true
+  tracking: true
+  appearance: true
+  motion: true
+  temporal-policy: true
+  pose: true
+  segmentation: true
+  rigid-objects: true
+  background: true
+  generation: false
+  residual: true
 
-# Lightweight generative compositing: half the default steps.
-genai-backend: canny-controlnet
-controlnet-id: custom-controlnet
-controlnet-steps: 10
-controlnet-width: 384
-controlnet-height: 384
+detector:
+  backend: yolo
+  model: yolo26n.pt
+  prompt: tennis player
+selection:
+  backend: heuristic
+tracking:
+  backend: tracker
+pose:
+  backend: yolo
+  model: yolo26n-pose.pt
+segmenter:
+  backend: yolo
+  model: yolo26n-seg.pt
+rigid:
+  backend: tennis
 
-ffmpeg-codec: libsvtav1
-codec-crf: 30
-codec-preset: medium
+appearance:
+  representation: compressed-image
+  jpeg-quality: 90
+  downscale: 1
 
-evaluation-mode: [psnr, ssim]
+motion:
+  representation: keypoints
+  max-points: 64
+
+temporal:
+  metadata-sparsity: true
+  generation-sparsity: false
+  pipeline-sparsity: false
+  delta-threshold: 20.0
+  keyframe-interval: 8
+
+background:
+  method: panorama-full
+  codec: jpeg
+  jpeg-quality: 75
+
+generator:
+  backend: none
+
+# Medium rung.
+residual:
+  codec: av1
+  rate-control: crf
+  rate: 45
+  preset: "8"
+  pix-fmt: yuv420p
+  block-size: 8
+  block-threshold: 4.0
+  background-downscale: 2
+
+fallback:
+  codec: av1
+  rate-control: crf
+  rate: 35
+  preset: "8"
+  pix-fmt: yuv420p
+  roi: false
+
+transport: disk
+
+evaluation:
+  metrics: [psnr, ssim]

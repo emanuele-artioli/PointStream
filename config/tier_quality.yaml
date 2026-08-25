@@ -1,36 +1,101 @@
-# Quality complexity tier (report 10 Phase 3).
+# Quality complexity tier — the slowest, highest-fidelity rung.
 #
-# Slowest, highest-fidelity rung of the speed/compression trade-off ladder:
-# extra-large YOLO backends (matching scripts/process_dataset.py's dataset
-# curation defaults — see report 10's "quality tier" convention),
-# segmentation-based ball extraction, full-step generative compositing,
-# and the full quality-metric suite.
+# Rewritten 2026-08-25 (BP23), same reason as `tier_fast.yaml`: the previous
+# file was in the retired flat schema and had never been run.
 #
-# Any key not set here falls back to PointstreamConfig's dataclass default
-# (see src/shared/config.py).
+# Tier axis = residual coarseness. quality = `Coarseness.FINE`: no block gate
+# and no background downscale, so the residual carries every pixel that changed.
+# Lossless is deliberately NOT this tier — `spectrum.py` calls lossless a
+# ceiling calibration, not an operating point.
+#
+# Perception names the extra-large backends (the dataset-curation quality tier).
+# As on the other tiers those names do not yet drive anything; see `tier_fast`.
+#
+# Generation stays off — see `tier_fast.yaml` for why.
 
-run-mode: full_match
-scene-chunk-duration-sec: 2.0
+run:
+  seed: 1337
+  log-level: info
+  chunk-duration-sec: 2.0
 
-log-level: info
-execution-pool: inline
+domain: tennis
 
-# Actor extraction: extra-large backends (dataset-curation quality tier).
-detector: yolo26x-seg.pt
-pose-estimator: yolo26x-pose.pt
-segmenter: yolo26x-seg.pt
-ball-extractor: segmentation
-ball-det-model: yolo26x-seg.pt
+lattice:
+  scene-classification: true
+  detection: true
+  selection: true
+  tracking: true
+  appearance: true
+  motion: true
+  temporal-policy: true
+  pose: true
+  segmentation: true
+  rigid-objects: true
+  background: true
+  generation: false
+  residual: true
 
-# Full-step generative compositing at full resolution.
-genai-backend: canny-controlnet
-controlnet-id: custom-controlnet
-controlnet-steps: 20
-controlnet-width: 512
-controlnet-height: 512
+detector:
+  backend: yolo
+  model: yolo26x-seg.pt
+  prompt: tennis player
+selection:
+  backend: heuristic
+tracking:
+  backend: tracker
+pose:
+  backend: yolo
+  model: yolo26x-pose.pt
+segmenter:
+  backend: yolo
+  model: yolo26x-seg.pt
+rigid:
+  backend: tennis
 
-ffmpeg-codec: libsvtav1
-codec-crf: 22
-codec-preset: slow
+appearance:
+  representation: compressed-image
+  jpeg-quality: 95
+  downscale: 1
 
-evaluation-mode: [psnr, ssim, vmaf]
+motion:
+  representation: keypoints
+  max-points: 64
+
+temporal:
+  metadata-sparsity: false
+  generation-sparsity: false
+  pipeline-sparsity: false
+  delta-threshold: 20.0
+  keyframe-interval: 8
+
+background:
+  method: panorama-full
+  codec: jpeg
+  jpeg-quality: 95
+
+generator:
+  backend: none
+
+# Fine rung: nothing gated, nothing downscaled.
+residual:
+  codec: av1
+  rate-control: crf
+  rate: 28
+  preset: "4"
+  pix-fmt: yuv420p
+  block-size: 8
+  block-threshold: 0.0
+  background-downscale: 1
+
+fallback:
+  codec: av1
+  rate-control: crf
+  rate: 28
+  preset: "4"
+  pix-fmt: yuv420p
+  roi: false
+
+transport: disk
+
+evaluation:
+  metrics: [psnr, ssim, vmaf]

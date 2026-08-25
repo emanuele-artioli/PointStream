@@ -290,9 +290,18 @@ def ledger_from_bag(bag: Mapping[str, Any], source: np.ndarray) -> SizesBytes:
     residual_bytes = 0
     residual = bag.get(ART_RESIDUAL_STREAM)
     if isinstance(residual, ResidualResult):
-        residual_bytes = residual.payload.byte_count
-        if residual_bytes == 0:
-            residual_bytes = measured(residual.payload.cost)
+        # The stated `WireCost` first, not `payload.byte_count`. For a lossy
+        # residual `byte_count` is the *dense* array size, which does not shrink
+        # when the block gate zeroes a block — so a ledger reading it reports the
+        # same payload for a coarse residual as for a fine one and makes
+        # coarseness look free. `src/pipeline/residual/signal.py` says as much in
+        # its own docstring. The cost carries the information content (nonzero
+        # bytes); for a lossless residual the two are equal, so nothing moves.
+        cost = residual.payload.cost
+        if cost.byte_count is not None:
+            residual_bytes = measured(cost)
+        else:
+            residual_bytes = residual.payload.byte_count
     panorama_bytes = 0
     view = bag.get(ART_BACKGROUND_MODEL) or bag.get(STAGE_BACKGROUND)
     if isinstance(view, BackgroundModelView) and view.plate is not None:
