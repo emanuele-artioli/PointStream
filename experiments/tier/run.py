@@ -22,7 +22,7 @@ import json
 import math
 import time
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -181,6 +181,19 @@ def run_all_off(clip: TierClip) -> TierRun:
     return run_config("all-off (control)", config, clip, objects=False)
 
 
+def run_residual_absent(clip: TierClip) -> TierRun:
+    """`tier_fast` with the residual switched off — the unaided reconstruction.
+
+    Named in the Phase C gate (`PLAN.md` §8): a residual-absent run has to
+    complete and report its measured quality drop, rather than the residual
+    being a stage the pipeline cannot do without. It is also the honest floor
+    for the tier ladder: everything the three tiers gain, they gain from here.
+    """
+    base = load_tier("fast")
+    config = base.with_(lattice=replace(base.lattice, residual=False))
+    return run_config("residual-absent (control)", config, clip)
+
+
 def probe_perception_knobs(clip: TierClip) -> dict[str, Any]:
     """Do the detector / pose / segmenter names in a tier config change anything?
 
@@ -281,6 +294,15 @@ def main(argv: list[str] | None = None) -> int:
     print(
         f"control all-off  {control.seconds:.1f}s  "
         f"bit_identical={control_record['source_bit_identical']}",
+        flush=True,
+    )
+
+    unaided = run_residual_absent(clip)
+    records.append(unaided.record())
+    print(
+        f"control residual-absent {unaided.seconds:.1f}s  "
+        f"delivered psnr={unaided.result.delivered_quality.whole_frame():.2f} dB  "
+        f"residual={unaided.result.sizes.residual} B",
         flush=True,
     )
 

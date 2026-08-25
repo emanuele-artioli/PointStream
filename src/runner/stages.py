@@ -147,50 +147,103 @@ def make_generation(ctx: StageContext) -> StageCallable:
     return generation
 
 
+def encoder_side(ctx: StageContext, bag: Mapping[str, Any]) -> Any:
+    """The encoder's own copy of what the client will build.
+
+    Shared by the residual stage and the codec stage so there is one definition
+    of it. Generated crops arrive as ``supplied_crop``, so this never dispatches
+    a generator a second time.
+    """
+    source = as_clip(bag[SOURCE], path=SOURCE)
+    view = _as_background(bag.get(ART_BACKGROUND_MODEL) or bag.get(STAGE_BACKGROUND))
+    objects = _with_supplied_crops(_subjects(bag), bag.get(ART_GENERATED_FRAMES))
+    return reconstruct(
+        ReconstructionRequest(
+            lattice=ctx.lattice,
+            source=source,
+            background=view,
+            objects=objects,
+            generator=None,
+            evaluator=ctx.evaluator,
+            resolver=ctx.resolver,
+            seed=ctx.seed,
+            params=ctx.params,
+        )
+    )
+
+
 def make_residual(ctx: StageContext) -> StageCallable:
     """Encoder-side residual. Uses generated crops; does not dispatch again."""
 
     def residual(bag: Mapping[str, Any]) -> ResidualResult:
         source = as_clip(bag[SOURCE], path=SOURCE)
-        view = _as_background(bag.get(ART_BACKGROUND_MODEL) or bag.get(STAGE_BACKGROUND))
-        generated = bag.get(ART_GENERATED_FRAMES)
-        subjects = _subjects(bag)
-        objects = _with_supplied_crops(subjects, generated)
-        encoder_side = reconstruct(
-            ReconstructionRequest(
-                lattice=ctx.lattice,
-                source=source,
-                background=view,
-                objects=objects,
-                generator=None,
-                evaluator=ctx.evaluator,
-                resolver=ctx.resolver,
-                seed=ctx.seed,
-                params=ctx.params,
-            )
-        )
+        built = encoder_side(ctx, bag)
         return compute_residual(
             source,
-            encoder_side.frames,
+            built.frames,
             lattice=ctx.lattice,
             residual=ctx.residual,
-            actor_mask=encoder_side.object_mask,
+            actor_mask=built.object_mask,
         )
 
     return residual
 
 
-def codec(bag: Mapping[str, Any]) -> dict[str, Any]:
-    """Identity encode: pixels that will be delivered, plus a byte count."""
-    source = as_clip(bag[SOURCE], path=SOURCE)
-    residual = bag.get(ART_RESIDUAL_STREAM)
-    if isinstance(residual, ResidualResult):
-        frames = residual.reconstructed
-        byte_count = residual.payload.byte_count
-    else:
-        frames = source
-        byte_count = int(source.nbytes)
-    return {"frames": frames, "byte_count": int(byte_count)}
+def make_codec(ctx: StageContext) -> StageCallable:
+    """Identity encode: the pixels that will be delivered, plus a byte count.
+
+    Three cases, and the middle one is the one that was wrong. With a residual
+    the delivered clip is the reconstruction plus that residual. On the all-off
+    corner it is the source, because all-off *is* the source. Between those two
+    sits the corner with semantic stages on and the residual switched off — and
+    that used to fall through to "deliver the source", so a residual-absent run
+    reported an infinite PSNR and a perfect copy of the video it was supposed to
+    be approximating. It has to deliver the unaided reconstruction, which is
+    exactly what "nothing corrects generation error" means in the catalogue.
+
+    One corner it still cannot serve: generation on *and* residual off. The
+    catalogue does not list `generated-frames` among the codec stage's inputs
+    (`src/contracts/lattice.py`, `STAGE_CODEC.optional_inputs`), so the DAG is
+    free to run the codec before the generator and the crops are not there to
+    composite. Rather than dispatch a second generator — which would be a
+    different sample, not the encoder's copy — that case says so on the
+    artifact it returns.
+    """
+
+    def codec(bag: Mapping[str, Any]) -> dict[str, Any]:
+        source = as_clip(bag[SOURCE], path=SOURCE)
+        residual = bag.get(ART_RESIDUAL_STREAM)
+        if isinstance(residual, ResidualResult) and not residual.payload.is_absent:
+            return {
+                "frames": residual.reconstructed,
+                "byte_count": int(residual.payload.byte_count),
+            }
+        if ctx.lattice.is_source_passthrough:
+            return {"frames": source, "byte_count": int(source.nbytes)}
+        if ctx.lattice.is_enabled(STAGE_GENERATION) and bag.get(ART_GENERATED_FRAMES) is None:
+            return {
+                "frames": source,
+                "byte_count": int(source.nbytes),
+                "fallback_reason": (
+                    "generation is on and the residual is off, but no "
+                    "ART_GENERATED_FRAMES reached the codec stage: the catalogue "
+                    "does not declare it as an input, so the DAG may order codec "
+                    "before generation. This clip is the SOURCE, not a "
+                    "reconstruction — do not read its quality as a result."
+                ),
+            }
+        built = encoder_side(ctx, bag)
+        # No encoder runs here, so there is no coded size to report. The
+        # measured semantic parts are what this corner actually transmits, and
+        # inventing anything else would be a modelled byte count wearing a
+        # measurement's clothes.
+        return {"frames": built.frames, "byte_count": _semantic_bytes(bag)}
+
+    return codec
+
+
+def _semantic_bytes(bag: Mapping[str, Any]) -> int:
+    return _panorama_bytes(bag) + _measured_actor_bytes(bag)
 
 
 def transport(bag: Mapping[str, Any]) -> dict[str, Any]:
@@ -233,7 +286,7 @@ def default_backends(ctx: StageContext) -> dict[str, StageCallable]:
         STAGE_BACKGROUND: background,
         STAGE_GENERATION: make_generation(ctx),
         STAGE_RESIDUAL: make_residual(ctx),
-        STAGE_CODEC: codec,
+        STAGE_CODEC: make_codec(ctx),
         STAGE_TRANSPORT: transport,
         STAGE_METRICS: make_metrics(ctx),
     }
@@ -302,17 +355,28 @@ def ledger_from_bag(bag: Mapping[str, Any], source: np.ndarray) -> SizesBytes:
             residual_bytes = measured(cost)
         else:
             residual_bytes = residual.payload.byte_count
-    panorama_bytes = 0
-    view = bag.get(ART_BACKGROUND_MODEL) or bag.get(STAGE_BACKGROUND)
-    if isinstance(view, BackgroundModelView) and view.plate is not None:
-        if not view.deferred_to_residual and view.mode != "none":
-            panorama_bytes = int(np.asarray(view.plate).nbytes)
     return sizes_bytes(
         source=int(clip.nbytes),
         residual=residual_bytes,
-        panorama=panorama_bytes,
+        panorama=_panorama_bytes(bag),
         actor_reference=_measured_actor_bytes(bag),
     )
+
+
+def _panorama_bytes(bag: Mapping[str, Any]) -> int:
+    """Raw plate size.
+
+    Not a coded size: `background.codec` and `background.jpeg_quality` reach
+    nothing on this path, so a plate counted here is uncompressed pixels. The
+    number is honest about what it is rather than modelling a JPEG that was
+    never made.
+    """
+    view = bag.get(ART_BACKGROUND_MODEL) or bag.get(STAGE_BACKGROUND)
+    if not isinstance(view, BackgroundModelView) or view.plate is None:
+        return 0
+    if view.deferred_to_residual or view.mode == "none":
+        return 0
+    return int(np.asarray(view.plate).nbytes)
 
 
 def _measured_actor_bytes(bag: Mapping[str, Any]) -> int:

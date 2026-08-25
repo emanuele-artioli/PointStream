@@ -18,6 +18,7 @@ uses a real 4K clip.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -183,6 +184,48 @@ def test_the_all_off_corner_is_the_source_and_anchors_the_tier_runs() -> None:
     assert math.isinf(result.quality.whole_frame())
     assert result.sizes.transport_total == clip.nbytes
     assert result.sizes.residual == 0
+
+
+def test_a_residual_absent_run_reports_its_quality_drop_instead_of_the_source() -> None:
+    """Named in the Phase C gate, and it used to be silently false.
+
+    With the residual switched off the codec stage fell through to "deliver the
+    source", so the corner whose whole point is *unaided* quality reported an
+    infinite PSNR and a bit-perfect copy of the video. Nothing failed; the
+    number was simply the wrong number. The delivered clip has to be the
+    reconstruction the client would build.
+    """
+    clip, mask = _moving_block_clip()
+    base = load_tier("fast")
+    config = base.with_(lattice=dataclasses.replace(base.lattice, residual=False))
+    result = run(
+        config,
+        [clip],
+        bind_generator_fn=_never_constructs,
+        objects=(_objects(clip, mask),),
+    )
+    assert result.sizes.residual == 0
+    assert not result.delivered_quality.bit_identical, (
+        "a residual-absent run delivered a bit-perfect copy of the source"
+    )
+    delivered = result.delivered_quality.whole_frame()
+    assert math.isfinite(delivered)
+    # Delivered and reconstruction are the same pixels on this corner: with no
+    # residual there is nothing between them.
+    assert delivered == pytest.approx(result.quality.whole_frame(), rel=1e-9)
+
+
+def test_the_all_off_corner_still_delivers_the_source_after_that_fix() -> None:
+    """The fix must not turn the baseline corner into an approximation.
+
+    All-off is the one corner where delivering the source is correct, and it is
+    correct because the corner *is* the source — not because the codec stage
+    has a special case for it.
+    """
+    clip, _mask = _moving_block_clip()
+    config = PointstreamConfig(lattice=lattice_config_from(SOURCE_PASSTHROUGH))
+    result = run(config, [clip], bind_generator_fn=_never_constructs)
+    assert result.delivered_quality.bit_identical
 
 
 def test_the_tier_ladder_is_a_ladder_and_not_three_names_for_one_setting() -> None:

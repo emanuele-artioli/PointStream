@@ -167,7 +167,10 @@ def check(report_path: Path, bounds_path: Path) -> dict[str, Any]:
             )
         )
         requested = set(item["config"]["requested_metrics"])
-        reported = set(item["metrics_reported"])
+        # Derived from the scores themselves rather than from a summary field:
+        # the question is which metrics actually came back, and a summary that
+        # restates the request would answer a different one.
+        reported = {row["metric"] for row in delivered["scoped"]}
         checks.append(
             Check(
                 name=f"{tier}: every requested metric was reported",
@@ -252,3 +255,7 @@ def main(argv: list[str] | None = None) -> int:
 
 
 __all__ = ["Check", "check", "main"]
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

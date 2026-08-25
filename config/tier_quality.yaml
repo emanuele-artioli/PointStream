@@ -98,4 +98,4 @@ fallback:
 transport: disk
 
 evaluation:
-  metrics: [psnr, ssim, vmaf]
+  metrics: [psnr, ssim, vmaf, lpips]
