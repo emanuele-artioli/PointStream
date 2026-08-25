@@ -1,4 +1,16 @@
 import os
+import sys
+from pathlib import Path as _Path
+
+# Run as `python scripts/train_controlnet.py`, sys.path[0] is `scripts/` and the
+# repo root is nowhere on the path. The pinned env carries an editable install
+# whose finder hard-maps `src` -> /home/itec/emanuele/pointstream/src, so from a
+# git worktree `from src... import ...` silently resolved against MAIN's tree and
+# this branch's own modules looked missing. Put this checkout first.
+_REPO_ROOT = str(_Path(__file__).resolve().parents[1])
+if _REPO_ROOT not in sys.path:
+    sys.path.insert(0, _REPO_ROOT)
+
 import argparse
 import glob
 import json
@@ -429,7 +441,21 @@ def export_ip_adapter_state_dict(unet) -> dict:
         key_id += 2
     proj = unet.encoder_hid_proj
     inner = proj.image_projection_layers[0] if hasattr(proj, "image_projection_layers") else proj
-    return {"image_proj": {k: v.detach().cpu().contiguous() for k, v in inner.state_dict().items()}, "ip_adapter": ip_adapter}
+    # Write the ORIGINAL h94 layout, not the diffusers-internal one.
+    # `_convert_ip_adapter_image_proj_to_diffusers` branches on `proj.weight`
+    # and renames proj -> image_embeds itself. Saving the converted keys makes
+    # that branch miss, so it falls through to the IP-Adapter-Full branch and
+    # dies on KeyError: 'proj.0.weight'. Undo the rename on the way out.
+    image_proj = {}
+    for key, value in inner.state_dict().items():
+        out_key = "proj" + key[len("image_embeds"):] if key.startswith("image_embeds") else key
+        image_proj[out_key] = value.detach().cpu().contiguous()
+    if "proj.weight" not in image_proj:
+        raise RuntimeError(
+            "exported image_proj lacks 'proj.weight'; diffusers would mis-detect the "
+            f"projection type. Keys: {sorted(image_proj)}"
+        )
+    return {"image_proj": image_proj, "ip_adapter": ip_adapter}
 
 
 def encode_reference_image_embeds(
@@ -443,6 +469,17 @@ def encode_reference_image_embeds(
     pixel_values = pixel_values.to(device=device, dtype=dtype)
     with torch.no_grad():
         embeds = image_encoder(pixel_values).image_embeds
+    # MultiIPAdapterImageProjection wants each list entry as
+    # [batch, num_images, embed_dim]. Handing it the bare [batch, embed_dim]
+    # makes it read embed_dim as num_images, flatten to a 1-D tensor and hit
+    # `mat1 and mat2 shapes cannot be multiplied (1x2048 and 1024x3072)`.
+    # Inference builds the same 3-D shape (pipeline_controlnet.py:
+    # `image_embeds.append(single_image_embeds[None, :])`).
+    embeds = embeds.unsqueeze(1)
+    if embeds.ndim != 3 or embeds.shape[1] != 1:
+        raise RuntimeError(
+            f"image embeds must be [batch, 1, embed_dim]; got {tuple(embeds.shape)}"
+        )
     return [embeds]
 
 
@@ -606,8 +643,16 @@ def main():
             "h94/IP-Adapter", subfolder="models/image_encoder", local_files_only=True
         )
         image_encoder.requires_grad_(False)
-        feature_extractor = CLIPImageProcessor.from_pretrained(
-            "h94/IP-Adapter", subfolder="models/image_encoder", local_files_only=True
+        # The h94 snapshot ships the vision encoder's config.json and weights but
+        # no preprocessor_config.json, and this host is offline. Build the same
+        # processor diffusers builds at inference time
+        # (loaders/ip_adapter.py: CLIPImageProcessor(size=..., crop_size=...) from
+        # image_encoder.config.image_size) so train and inference preprocess
+        # identically. Those defaults are the standard OpenAI CLIP mean/std, which
+        # is also what assets/weights/stable-diffusion-v1-5/feature_extractor holds.
+        clip_image_size = image_encoder.config.image_size
+        feature_extractor = CLIPImageProcessor(
+            size=clip_image_size, crop_size=clip_image_size
         )
     else:
         controlnet.train()
