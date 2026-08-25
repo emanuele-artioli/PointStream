@@ -139,15 +139,23 @@ class ComponentMetricEvaluator:
                 Region.background(mask=_frame_mask(object_mask), name=object_name)
             )
 
-        frame_record = self._evaluator.evaluate(ref, pred, regions=None)
-        rows = list(frame_record.scoped)
-        if regions and self._region_evaluator is not None:
-            region_record = self._region_evaluator.evaluate(ref, pred, regions=regions)
-            rows.extend(
-                item
-                for item in region_record.scoped
-                if _ROLES[item.role] != ROLE_FRAME
-            )
+        if not self._skipped_on_regions:
+            # Every requested metric can score a mask, so one pass does it all.
+            # The components evaluator always prepends the whole frame, so
+            # splitting this into two calls would score the whole frame twice —
+            # which at 4K is a second full pass over ~200 MB per metric.
+            frame_record = self._evaluator.evaluate(ref, pred, regions=regions or None)
+            rows = list(frame_record.scoped)
+        else:
+            frame_record = self._evaluator.evaluate(ref, pred, regions=None)
+            rows = list(frame_record.scoped)
+            if regions and self._region_evaluator is not None:
+                region_record = self._region_evaluator.evaluate(ref, pred, regions=regions)
+                rows.extend(
+                    item
+                    for item in region_record.scoped
+                    if _ROLES[item.role] != ROLE_FRAME
+                )
         scoped = tuple(
             RegionScore(
                 metric=item.metric,
