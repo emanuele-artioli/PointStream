@@ -30,8 +30,8 @@ Target: **ACM TOMM, September 30.**
 | A — contracts and concepts | ✅ done | — |
 | B — components | ✅ **done** | Merged-ready on `phase-b/integrate` (still unmerged to main) |
 | **B′ — the engine roster** | BP12 ✅ | Re-ranked in clip mode on calibrated LPIPS (§2.10). Quality flagship stays **unset**: every engine loses to a pasted keyframe at 2.5σ–10.6σ, and the top three are not separable. The cross-appearance test is withdrawn as a test of appearance use — a paste tops it. |
-| C — pipeline and runner | ⬜ | `C1`/`C2`/`C3` landed unmerged |
-| D — experiments layer | ⬜ | Blocked on C |
+| C — pipeline and runner | ✅ **done** | `C1`/`C2`/`C3` merged. A tier config runs end to end and is scored (§2.16, BP23). |
+| D — experiments layer | 🟡 partly unblocked | Ablations need §2.16's inert-field fix (BP26); rate-based experiments need a real encoder (BP24). |
 | E — experiments and paper | ⬜ | Ordered by §7 |
 
 **Code.** `src/contracts/` is complete and green. `src/components/` now covers all
@@ -867,6 +867,59 @@ stock OpenPose ControlNet, so for that arm it only switches SD's text encoder on
 
 ---
 
+### 2.16 The platform runs end to end — and it is not measuring rate
+
+`BP23` (2026-08-26) drove all three tier configs plus two controls through the
+runner on `alcaraz_highlights/scene_000` (8 frames, 3840x2160, players 0.573% of
+pixels, paste-back MAE 0.0). **P0 item 1 is closed.**
+
+| run | wall | delivered | residual bytes |
+|---|---|---|---|
+| all-off (control) | 11.0 s | bit-identical, PSNR inf | 0 |
+| residual-absent (control) | 22.9 s | 34.88 dB | 0 |
+| `tier_fast` | 29.1 s | 43.75 dB | 1,241,086 |
+| `tier_balanced` | 131.6 s | 48.28 dB, SSIM 0.9970 | 2,523,202 |
+| `tier_quality` | 299.6 s | 56.74 dB, SSIM 0.9999, VMAF 97.4986, LPIPS 0.0002 | 37,919,751 |
+
+**These are not rate points.** The codec stage is an identity round-trip and no
+encoder binary runs, so every byte count is pixel payload, not coded bytes, and
+`transport_to_source_ratio` is not a compression ratio. The caveat is a field in
+`outputs/bp23-tier/report.json`, not just prose. BD-rate needs a real bitstream
+(`BP24`).
+
+**Eight defects had to be fixed to get there, four of them silent wrong answers
+rather than failures.** The one that mattered most: the size ledger read the
+residual's dense array size, which does not shrink when the block gate zeroes a
+block — without that fix the entire tier ladder would have been flat. Also: two
+different PSNR conventions inside one ladder (47.63 vs 48.28 dB on identical
+pixels), a residual-absent corner that delivered the source itself at PSNR inf,
+and an encoder/client symmetry check comparing different pipeline points.
+
+**A second confirmation of §2.6 from an independent direction.** The unaided
+static plate scores 34.88 dB on the frame but **14.30 dB on the object** against
+39.46 dB on the background — a 25 dB gap concentrated on 0.57% of pixels.
+
+**27 of 32 config fields are inert** (`outputs/bp23-tier/inert-config-fields.json`,
+driven one field at a time rather than read off the code). Only
+`evaluation.metrics` and four `residual.*` knobs change a run. Generation knobs
+are inert *in this corner* because generation is off — a statement about the
+corner, not the knob — but detector, pose, appearance, motion and temporal names
+currently reach nothing. `BP26` closes this; until then the ablation lattice is
+not measurable.
+
+**Metric calibration, and two findings that outlive this stream**
+(`outputs/bp23-tier/metric-calibration.json`). All four metrics order correctly
+at 4K. But **VMAF's ceiling on this content is 97.54, not 100**, and it **floors
+at 0.00 for both severe blur and an unrelated clip** — nothing resolves below its
+floor. And **LPIPS's ordering inverted at 960x540** while holding at 4K:
+calibration anchors do not transfer across resolution. Given that two metrics
+here were broken until 2026-08-23 (§2.7), both belong in the invariants (`BP27`).
+
+**Reported, not patched:** `STAGE_CODEC.optional_inputs` in
+`src/contracts/lattice.py` omits `generated-frames`, so a generation-on /
+residual-off corner may order the codec first and cannot deliver a
+reconstruction.
+
 ## 3. Architecture
 
 Enough here that seven parallel sessions do not make conflicting decisions.
@@ -1272,18 +1325,22 @@ When a result lands and changes what the narrative can claim, this order is
 re-read rather than followed blindly.
 
 **P0 — without these there is no paper**
-1. Quality measurement working at all — a tier config producing real numbers.
-   *Half done: the metrics compute (§2), the tier config cannot run yet.*
+1. ✅ **DONE 2026-08-26** — quality measurement working at all: a tier config
+   producing real numbers. All three tiers plus two controls ran end to end on a
+   real 4K clip and returned PSNR, SSIM, VMAF and LPIPS (§2.16, BP23).
 2. PointStream against the codec ladder, including region arms.
-3. The residual-coarseness curve.
-4. The core ablation lattice. *BP26 (2026-08-26): detector, pose, segmenter,
-   appearance, motion and temporal names now change a run. The lattice itself
-   is still un-run (Phase D). Codec / fallback / residual.codec remain unwired
-   (`BP24`).*
+   *Blocked on `BP24`: the runner's codec stage is an identity round-trip and no
+   encoder binary runs, so there is no bitstream and no rate axis yet.*
+3. The residual-coarseness curve. *Same blocker as item 2.*
+4. The core ablation lattice. *Blocked on `BP26`: 27 of 32 config fields reach
+   nothing, so the detector/pose/appearance/motion/temporal axes are not yet
+   measurable.*
 5. A working generative engine, or an honest scoped negative result.
-   *The negative landed 2026-08-23: no engine beat static copy on the coding
-   task. Items 2–4 can proceed on residual/all-off corners; a quality flagship
-   RD curve cannot.*
+   *Still open, and the earlier negative is now narrower than it looked. No
+   engine beat static copy on the coding task (2026-08-23). IP-Adapter trained
+   and self-stopped at epoch 3 (2026-08-25), but its stop-eval generates at 4
+   diffusion steps and scores that against undegraded images, so it cannot rank
+   models — the run is `not_citable` by its own artifacts. `BP25` settles it.*
 6. Generalization on the general/DAVIS profile.
 7. Evaluation and Conclusion sections; abstract reconciled with what was measured.
 
