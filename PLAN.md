@@ -960,6 +960,15 @@ path's total is not a rate point, and `transport_to_source_ratio` is not a
 compression ratio. A partially-coded total is more misleading than an obviously
 raw one, so a path reports its ratio only when no component in it is still raw.
 
+**Checked, not assumed: the residual is not entropy coded either.**
+`ResidualResult.payload.byte_count` is `int(stored.nbytes)` / `int(encoded.nbytes)`
+(`src/pipeline/residual/signal.py:245,281`) — the size of a quantised, block-gated
+array, not a coded stream. BP23's fix made that array reflect the block gate, which
+is why the coarseness ladder stopped being flat; it did not make it a rate. So the
+residual needs a real encoder under `residual.codec`, not a relabelling. The
+`WireCost` record already carries `exact: bool` and a `basis` string for exactly
+this distinction, and every component's cost should set them honestly.
+
 ### The ablation lattice
 
 **Every component is optional, and the residual absorbs whatever the disabled
