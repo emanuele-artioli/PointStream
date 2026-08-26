@@ -8,7 +8,10 @@ Tests:
   5. MultiscaleDiscriminator: correct number of scales
   6. VGG19PerceptualLoss: correct feature extraction shapes
   7. Hinge losses: correct scalar output
-  8. Spade4TennisStrategy: instantiates correctly
+
+Inference construction lives on ``Spade4TennisGenerator`` in
+``tests/components/test_generation.py``. The pre-rewrite
+``src.decoder.spade4tennis_engine.Spade4TennisStrategy`` is not this axis.
 """
 import torch
 
@@ -163,26 +166,3 @@ class TestLosses:
         loss = feature_matching_loss(real_feats, fake_feats)
         assert loss.ndim == 0
         assert loss.item() > 0
-
-
-class TestSpade4TennisStrategy:
-    """Tests for the inference strategy."""
-
-    def test_instantiates(self):
-        from src.decoder.spade4tennis_engine import Spade4TennisStrategy
-
-        class MockConfig:
-            controlnet_width = 256
-            controlnet_height = 256
-
-        strategy = Spade4TennisStrategy(config=MockConfig())
-        assert strategy._width == 256
-        assert strategy._height == 256
-        assert strategy._model is None
-
-    def test_backend_registration(self):
-        """Verify spade4tennis is registered in the compositor."""
-
-        # Just verify the import path works without crashing
-        from src.decoder.spade4tennis_engine import Spade4TennisStrategy
-        assert issubclass(Spade4TennisStrategy, object)
