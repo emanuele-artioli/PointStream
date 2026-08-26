@@ -1,13 +1,27 @@
 import os
+import sys
+from pathlib import Path as _Path
+
+# Run as `python scripts/train_controlnet.py`, sys.path[0] is `scripts/` and the
+# repo root is nowhere on the path. The pinned env carries an editable install
+# whose finder hard-maps `src` -> /home/itec/emanuele/pointstream/src, so from a
+# git worktree `from src... import ...` silently resolved against MAIN's tree and
+# this branch's own modules looked missing. Put this checkout first.
+_REPO_ROOT = str(_Path(__file__).resolve().parents[1])
+if _REPO_ROOT not in sys.path:
+    sys.path.insert(0, _REPO_ROOT)
+
 import argparse
 import glob
 import json
 import logging
 import random
+import shutil
 import time
 from pathlib import Path
 from PIL import Image
 
+import numpy as np
 import torch
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
@@ -22,10 +36,142 @@ from diffusers import (
 from transformers import CLIPTextModel, CLIPTokenizer
 from tqdm import tqdm
 
+from src.components.metrics.lpips import LpipsMetric
+from src.shared.training.stop import StopBounds, TaskStopRule
+from src.shared.training.task_eval import (
+    ItemScore,
+    mean_scores,
+    score_item,
+    static_copy_scores,
+)
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+STOP_EVAL_N_CLIPS = 4
+STOP_EVAL_OFFSET = 8
+STOP_EVAL_SEED = 42
+STOP_EVAL_CANVAS = 512
+STOP_EVAL_STEPS = 4
+CONDITION_TO_VARIANT = {
+    "pose": "pose",
+    "pose-racket": "pose",
+    "canny": "canny",
+    "seg": "seg",
+    "ip-adapter": "ip-adapter",
+}
 
 # Derived directories and sidecars under a scene dir -- never training items.
 DERIVED_SUFFIXES = ("_skeleton", "_canny", "_caption", "_pose_racket", "_pose_body")
+
+
+def _letterbox(image, mask, canvas: int = STOP_EVAL_CANVAS):
+    from src.components.generation._numpy import prepare_letterboxed
+
+    mask_u8 = (np.asarray(mask, dtype=bool).astype("uint8") * 255)
+    prepared = prepare_letterboxed(
+        image, None, canvas, canvas, extras={"mask": mask_u8}
+    )
+    boxed_mask = np.asarray(prepared["mask"])
+    if boxed_mask.ndim == 3:
+        boxed_mask = boxed_mask[..., 0]
+    return prepared["appearance"], boxed_mask > 0
+
+
+def load_stop_samples(n_clips: int = STOP_EVAL_N_CLIPS, offset: int = STOP_EVAL_OFFSET):
+    """A handful of coding-task crops. Stopping signal, not a result."""
+    from experiments.probe.clips import list_clips, load_coding_sample
+
+    clips = [clip for clip in list_clips() if clip.n_frames > offset]
+    if len(clips) < 2:
+        raise RuntimeError(
+            f"task-stop eval needs at least 2 probe clips with >{offset} frames; "
+            f"found {len(clips)}"
+        )
+    chosen = clips[:n_clips]
+    return [load_coding_sample(clip, 0, offset) for clip in chosen]
+
+
+def measure_stop_floors(samples, lpips: LpipsMetric) -> StopBounds:
+    """Static-copy floor and unrelated-image null, on the stop-eval items."""
+    copies: list[ItemScore] = []
+    unrelated: list[ItemScore] = []
+    for index, sample in enumerate(samples):
+        appearance, mask = _letterbox(sample.appearance_rgb, sample.object_mask)
+        target, target_mask = _letterbox(sample.reference_rgb, sample.object_mask)
+        copies.append(
+            static_copy_scores(
+                appearance, target, target_mask, key=sample.key, lpips=lpips
+            )
+        )
+        donor = samples[(index + 1) % len(samples)]
+        donor_app, _ = _letterbox(donor.appearance_rgb, donor.object_mask)
+        lpips_value, psnr, n_pixels = score_item(
+            target, donor_app, target_mask, lpips=lpips
+        )
+        unrelated.append(
+            ItemScore(
+                key=f"{sample.key}<-{donor.key}",
+                lpips=lpips_value,
+                psnr=psnr,
+                n_mask_pixels=n_pixels,
+            )
+        )
+    copy_mean = mean_scores(copies)
+    null_mean = mean_scores(unrelated)
+    return StopBounds(
+        floor_psnr=copy_mean.psnr,
+        floor_lpips=copy_mean.lpips,
+        null_lpips=null_mean.lpips,
+        source=(
+            f"stop-eval static-copy n={copy_mean.n} offset={STOP_EVAL_OFFSET} "
+            f"seed={STOP_EVAL_SEED}; unrelated n={null_mean.n}"
+        ),
+    )
+
+
+def score_stop_generations(samples, predictions, lpips: LpipsMetric):
+    from src.components.generation._numpy import as_hwc
+
+    items: list[ItemScore] = []
+    for sample, predicted in zip(samples, predictions, strict=True):
+        target, mask = _letterbox(sample.reference_rgb, sample.object_mask)
+        pred = as_hwc(predicted)
+        if pred.shape[:2] != target.shape[:2]:
+            pred, _ = _letterbox(pred, sample.object_mask)
+        lpips_value, psnr, n_pixels = score_item(target, pred, mask, lpips=lpips)
+        items.append(
+            ItemScore(
+                key=sample.key, lpips=lpips_value, psnr=psnr, n_mask_pixels=n_pixels
+            )
+        )
+    return mean_scores(items)
+
+
+def generate_stop_predictions(
+    samples,
+    *,
+    checkpoint: str,
+    variant: str,
+    device: str,
+    steps: int,
+):
+    """Drive the coding task through the live generator. Not a citable eval."""
+    from experiments.probe.run import _coding_bundle
+    from src.components.generation.controlnet import ControlNetGenerator
+    from src.contracts.conditioning import GenerationParams
+
+    generator = ControlNetGenerator(variant=variant, checkpoint=checkpoint, steps=steps)
+    params = GenerationParams(steps=steps)
+    images = []
+    for sample in samples:
+        bundle = _coding_bundle(sample)
+        images.append(
+            generator.generate(
+                bundle, seed=STOP_EVAL_SEED, device=device, params=params
+            )
+        )
+    return images
+
 
 def pad_to_square(img, fill=0):
     w, h = img.size
@@ -52,6 +198,13 @@ class ControlNetDataset(Dataset):
         self.tokenizer = tokenizer
         self.include_reference = include_reference
         self.items = []
+        if self.condition_type == "ip-adapter" and not self.include_reference:
+            raise ValueError(
+                "ip-adapter is an image-embedding pathway. Pass --include-reference "
+                "so appearance enters the adapter, not the pose control. "
+                "Painting the reference into the control image is the pose-ref "
+                "recipe that already failed (PLAN.md §2.4)."
+            )
         self.track_to_colors: dict[str, list[str]] = {}
         
         search_pattern = os.path.join(str(self.root_dir), "*", "segmentations", "scene_*", "track_*")
@@ -93,7 +246,12 @@ class ControlNetDataset(Dataset):
                 cond_dir = track_dir.with_name(f"{track_dir.name}_pose_racket")
             elif self.condition_type == "canny":
                 cond_dir = track_dir.with_name(f"{track_dir.name}_canny")
-            elif self.condition_type in ["seg", "ip-adapter"]:
+            elif self.condition_type == "ip-adapter":
+                # Appearance goes through the image-embedding adapter, pose
+                # through ControlNet. This used to share the seg branch with
+                # cond_dir = None, which is why the registry entry was fiction.
+                cond_dir = track_dir.with_name(f"{track_dir.name}_pose_body")
+            elif self.condition_type == "seg":
                 cond_dir = None
             else:
                 raise ValueError(f"Unknown condition type: {self.condition_type}")
@@ -177,15 +335,13 @@ class ControlNetDataset(Dataset):
         img = pad_to_square(img, fill=0)
         image_tensor = self.transform(img)
         
-        if self.condition_type in ("pose", "pose-racket", "canny"):
+        if self.condition_type in ("pose", "pose-racket", "canny", "ip-adapter"):
             cond_img = Image.open(item["cond_path"]).convert("RGB")
             cond_img = pad_to_square(cond_img, fill=0)
             cond_tensor = self.cond_transform(cond_img)
         elif self.condition_type == "seg":
             cond_img = pad_to_square(seg_mask, fill=0)
             cond_tensor = self.cond_transform(cond_img)
-        elif self.condition_type == "ip-adapter":
-            cond_tensor = self.cond_transform(img)
         else:
             raise ValueError(f"Unknown condition type: {self.condition_type}")
             
@@ -220,6 +376,111 @@ def compose_pose_on_appearance_tensor(
     """Tensor twin of ``compose_pose_on_appearance``. CHW, values in [0, 1]."""
     mask = pose.amax(dim=1, keepdim=True) > threshold
     return torch.where(mask, pose, appearance)
+
+
+def controlnet_cond_for_batch(
+    batch: dict,
+    *,
+    condition_type: str,
+    include_reference: bool,
+    weight_dtype,
+):
+    """Pose/canny/seg tensor that ControlNet sees. IP-Adapter never paints the reference here."""
+    pose = batch["conditioning_pixel_values"].to(dtype=weight_dtype)
+    if condition_type == "ip-adapter":
+        return pose
+    if include_reference:
+        return compose_pose_on_appearance_tensor(
+            pose, batch["reference_pixel_values"].to(dtype=weight_dtype)
+        )
+    return pose
+
+
+def collect_ip_adapter_parameters(unet) -> list:
+    """The ~22M adapter: image projection plus IP-Attn to_k_ip / to_v_ip."""
+    params = []
+    proj = getattr(unet, "encoder_hid_proj", None)
+    if proj is not None:
+        params.extend(proj.parameters())
+    for proc in getattr(unet, "attn_processors", {}).values():
+        if hasattr(proc, "to_k_ip"):
+            params.extend(proc.parameters())
+    return params
+
+
+def load_ip_adapter_state_dict(
+    repo: str = "h94/IP-Adapter",
+    subfolder: str = "models",
+    weight_name: str = "ip-adapter_sd15.bin",
+):
+    from huggingface_hub import hf_hub_download
+
+    path = hf_hub_download(
+        repo_id=repo, filename=f"{subfolder}/{weight_name}", local_files_only=True
+    )
+    return torch.load(path, map_location="cpu")
+
+
+def attach_ip_adapter(unet, state_dict) -> None:
+    """Install h94 processors on a frozen UNet, then unfreeze only the adapter."""
+    unet.requires_grad_(False)
+    unet._load_ip_adapter_weights([state_dict])
+    for param in collect_ip_adapter_parameters(unet):
+        param.requires_grad = True
+
+
+def export_ip_adapter_state_dict(unet) -> dict:
+    """Write the h94 ``image_proj`` / ``ip_adapter`` layout so inference can reload."""
+    ip_adapter = {}
+    key_id = 1
+    for proc in unet.attn_processors.values():
+        if not hasattr(proc, "to_k_ip"):
+            continue
+        ip_adapter[f"{key_id}.to_k_ip.weight"] = proc.to_k_ip[0].weight.detach().cpu().contiguous()
+        ip_adapter[f"{key_id}.to_v_ip.weight"] = proc.to_v_ip[0].weight.detach().cpu().contiguous()
+        key_id += 2
+    proj = unet.encoder_hid_proj
+    inner = proj.image_projection_layers[0] if hasattr(proj, "image_projection_layers") else proj
+    # Write the ORIGINAL h94 layout, not the diffusers-internal one.
+    # `_convert_ip_adapter_image_proj_to_diffusers` branches on `proj.weight`
+    # and renames proj -> image_embeds itself. Saving the converted keys makes
+    # that branch miss, so it falls through to the IP-Adapter-Full branch and
+    # dies on KeyError: 'proj.0.weight'. Undo the rename on the way out.
+    image_proj = {}
+    for key, value in inner.state_dict().items():
+        out_key = "proj" + key[len("image_embeds"):] if key.startswith("image_embeds") else key
+        image_proj[out_key] = value.detach().cpu().contiguous()
+    if "proj.weight" not in image_proj:
+        raise RuntimeError(
+            "exported image_proj lacks 'proj.weight'; diffusers would mis-detect the "
+            f"projection type. Keys: {sorted(image_proj)}"
+        )
+    return {"image_proj": image_proj, "ip_adapter": ip_adapter}
+
+
+def encode_reference_image_embeds(
+    image_encoder, feature_extractor, reference, *, device, dtype
+):
+    """CLIP image embeds for IP-Adapter. ``reference`` is BCHW in [0, 1]."""
+    from torchvision.transforms.functional import to_pil_image
+
+    pils = [to_pil_image(frame.detach().float().cpu().clamp(0, 1)) for frame in reference]
+    pixel_values = feature_extractor(images=pils, return_tensors="pt").pixel_values
+    pixel_values = pixel_values.to(device=device, dtype=dtype)
+    with torch.no_grad():
+        embeds = image_encoder(pixel_values).image_embeds
+    # MultiIPAdapterImageProjection wants each list entry as
+    # [batch, num_images, embed_dim]. Handing it the bare [batch, embed_dim]
+    # makes it read embed_dim as num_images, flatten to a 1-D tensor and hit
+    # `mat1 and mat2 shapes cannot be multiplied (1x2048 and 1024x3072)`.
+    # Inference builds the same 3-D shape (pipeline_controlnet.py:
+    # `image_embeds.append(single_image_embeds[None, :])`).
+    embeds = embeds.unsqueeze(1)
+    if embeds.ndim != 3 or embeds.shape[1] != 1:
+        raise RuntimeError(
+            f"image embeds must be [batch, 1, embed_dim]; got {tuple(embeds.shape)}"
+        )
+    return [embeds]
 
 
 def assert_reference_enters_controlnet(
@@ -298,9 +559,29 @@ def main():
         help="Before training, drive two ControlNet forwards that differ only in the reference.",
     )
     parser.add_argument("--num-workers", type=int, default=4)
+    parser.add_argument(
+        "--no-task-stop",
+        action="store_true",
+        help="Disable the coding-task stop rule. Default is on: a run that cannot "
+        "clear the static-copy floor stops by epoch 3–4 instead of burning GPU hours.",
+    )
+    parser.add_argument(
+        "--eval-every-steps",
+        type=int,
+        default=2000,
+        help="Extra coding-task evals inside an epoch. 0 = epoch-end only. "
+        "Mid-epoch evals cannot stop before --min-stop-epochs.",
+    )
+    parser.add_argument("--task-eval-steps", type=int, default=STOP_EVAL_STEPS)
+    parser.add_argument("--task-eval-clips", type=int, default=STOP_EVAL_N_CLIPS)
     args = parser.parse_args()
 
-    if args.include_reference and args.controlnet_model_id is None and not args.from_scratch:
+    if (
+        args.include_reference
+        and args.controlnet_model_id is None
+        and not args.from_scratch
+        and args.condition_type != "ip-adapter"
+    ):
         args.controlnet_model_id = "assets/weights/pose-controlnet/checkpoint-epoch-10"
         logging.info(
             "include-reference defaults to fine-tuning the tennis pose ControlNet at %s",
@@ -340,9 +621,42 @@ def main():
     vae.requires_grad_(False)
     text_encoder.requires_grad_(False)
     unet.requires_grad_(False)
-    controlnet.train()
+    image_encoder = None
+    feature_extractor = None
+    if args.condition_type == "ip-adapter":
+        from transformers import CLIPImageProcessor, CLIPVisionModelWithProjection
 
-    optimizer = torch.optim.AdamW(controlnet.parameters(), lr=args.lr)
+        logging.info("Attaching h94 IP-Adapter; ControlNet stays frozen stock OpenPose.")
+        attach_ip_adapter(unet, load_ip_adapter_state_dict())
+        controlnet.requires_grad_(False)
+        controlnet.eval()
+        adapter_params = collect_ip_adapter_parameters(unet)
+        n_adapter = sum(p.numel() for p in adapter_params)
+        logging.info("IP-Adapter trainable parameters: %s", n_adapter)
+        if not (10_000_000 <= n_adapter <= 40_000_000):
+            raise RuntimeError(
+                f"IP-Adapter should be ~22M trainable params; got {n_adapter}. "
+                "The optimiser is not looking at the adapter."
+            )
+        optimizer = torch.optim.AdamW(adapter_params, lr=args.lr)
+        image_encoder = CLIPVisionModelWithProjection.from_pretrained(
+            "h94/IP-Adapter", subfolder="models/image_encoder", local_files_only=True
+        )
+        image_encoder.requires_grad_(False)
+        # The h94 snapshot ships the vision encoder's config.json and weights but
+        # no preprocessor_config.json, and this host is offline. Build the same
+        # processor diffusers builds at inference time
+        # (loaders/ip_adapter.py: CLIPImageProcessor(size=..., crop_size=...) from
+        # image_encoder.config.image_size) so train and inference preprocess
+        # identically. Those defaults are the standard OpenAI CLIP mean/std, which
+        # is also what assets/weights/stable-diffusion-v1-5/feature_extractor holds.
+        clip_image_size = image_encoder.config.image_size
+        feature_extractor = CLIPImageProcessor(
+            size=clip_image_size, crop_size=clip_image_size
+        )
+    else:
+        controlnet.train()
+        optimizer = torch.optim.AdamW(controlnet.parameters(), lr=args.lr)
 
     dataset = ControlNetDataset(
         args.data_root,
@@ -357,9 +671,14 @@ def main():
         dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers
     )
 
-    controlnet, optimizer, dataloader = accelerator.prepare(
-        controlnet, optimizer, dataloader
-    )
+    if args.condition_type == "ip-adapter":
+        unet, controlnet, optimizer, dataloader = accelerator.prepare(
+            unet, controlnet, optimizer, dataloader
+        )
+    else:
+        controlnet, optimizer, dataloader = accelerator.prepare(
+            controlnet, optimizer, dataloader
+        )
 
     weight_dtype = torch.float32
     if accelerator.mixed_precision == "fp16":
@@ -369,9 +688,17 @@ def main():
 
     vae.to(accelerator.device, dtype=weight_dtype)
     text_encoder.to(accelerator.device, dtype=weight_dtype)
-    unet.to(accelerator.device, dtype=weight_dtype)
+    if args.condition_type != "ip-adapter":
+        unet.to(accelerator.device, dtype=weight_dtype)
+    if image_encoder is not None:
+        image_encoder.to(accelerator.device, dtype=weight_dtype)
 
-    if args.include_reference and args.controlnet_model_id is None and not args.from_scratch:
+    if (
+        args.include_reference
+        and args.controlnet_model_id is None
+        and not args.from_scratch
+        and args.condition_type != "ip-adapter"
+    ):
         logging.info(
             "include-reference fine-tunes the pose ControlNet with appearance under the skeleton. "
             "Pass --controlnet-model-id to choose weights; default OpenPose is used otherwise."
@@ -381,18 +708,105 @@ def main():
     last_ckpt_wall = time.monotonic()
     last_progress_wall = time.monotonic()
     started_wall = time.monotonic()
+    Path(args.output_dir).mkdir(parents=True, exist_ok=True)
+
+    stop_rule: TaskStopRule | None = None
+    stop_samples = None
+    stop_lpips: LpipsMetric | None = None
+    if not args.no_task_stop:
+        if accelerator.is_main_process:
+            logging.info("Measuring coding-task floors before the first training step.")
+            stop_lpips = LpipsMetric(device=str(accelerator.device))
+            stop_samples = load_stop_samples(n_clips=args.task_eval_clips)
+            bounds = measure_stop_floors(stop_samples, stop_lpips)
+            stop_rule = TaskStopRule(bounds, Path(args.output_dir))
+            logging.info(
+                "task-stop bounds floor_lpips=%.4f floor_psnr=%.2f null_lpips=%.4f n=%s",
+                bounds.floor_lpips,
+                bounds.floor_psnr,
+                bounds.null_lpips,
+                len(stop_samples),
+            )
+        accelerator.wait_for_everyone()
 
     def _save(tag: str) -> None:
         if not accelerator.is_main_process:
             return
         dest = os.path.join(args.output_dir, tag)
-        logging.info("Saving ControlNet checkpoint to %s", dest)
+        logging.info("Saving checkpoint to %s", dest)
+        Path(dest).mkdir(parents=True, exist_ok=True)
         accelerator.unwrap_model(controlnet).save_pretrained(dest)
+        if args.condition_type == "ip-adapter":
+            torch.save(
+                export_ip_adapter_state_dict(accelerator.unwrap_model(unet)),
+                os.path.join(dest, "ip-adapter.bin"),
+            )
+
+    def _broadcast_stop(stop: bool) -> bool:
+        if accelerator.num_processes == 1:
+            return stop
+        flag = torch.tensor([1.0 if stop else 0.0], device=accelerator.device)
+        flag = accelerator.reduce(flag, reduction="max")
+        return bool(flag.item() >= 0.5)
+
+    def _run_task_eval(epoch_1: int, *, kind: str, step: int | None = None) -> bool:
+        stop = False
+        if (
+            not args.no_task_stop
+            and accelerator.is_main_process
+            and stop_rule is not None
+            and stop_samples is not None
+            and stop_lpips is not None
+        ):
+            tag = f"checkpoint-epoch-{epoch_1}"
+            ckpt = os.path.join(args.output_dir, tag)
+            if not Path(ckpt).is_dir():
+                _save(tag)
+            variant = CONDITION_TO_VARIANT[args.condition_type]
+            predictions = generate_stop_predictions(
+                stop_samples,
+                checkpoint=ckpt,
+                variant=variant,
+                device=str(accelerator.device),
+                steps=args.task_eval_steps,
+            )
+            scores = score_stop_generations(stop_samples, predictions, stop_lpips)
+            eval_kind = "mid" if kind == "mid" else "epoch"
+            decision = stop_rule.observe(
+                epoch=epoch_1,
+                lpips=scores.lpips,
+                psnr=scores.psnr,
+                step=step,
+                kind=eval_kind,
+            )
+            logging.info(
+                "task-eval epoch=%s kind=%s lpips=%.4f (floor %.4f) psnr=%.2f "
+                "(floor %.2f) n=%s best=%s stop=%s %s",
+                epoch_1,
+                eval_kind,
+                scores.lpips,
+                stop_rule.bounds.floor_lpips,
+                scores.psnr,
+                stop_rule.bounds.floor_psnr,
+                scores.n,
+                decision.keep_as_best,
+                decision.stop,
+                decision.reason,
+            )
+            if decision.keep_as_best:
+                best = Path(args.output_dir) / "checkpoint-best"
+                if best.exists():
+                    shutil.rmtree(best)
+                shutil.copytree(ckpt, best)
+            stop = decision.stop
+        accelerator.wait_for_everyone()
+        return _broadcast_stop(stop)
 
     for epoch in range(args.epochs):
         logging.info(f"Starting epoch {epoch+1}/{args.epochs}")
         for step, batch in enumerate(tqdm(dataloader, disable=not accelerator.is_local_main_process)):
-            with accelerator.accumulate(controlnet):
+            trained = unet if args.condition_type == "ip-adapter" else controlnet
+            with accelerator.accumulate(trained):
                 latents = vae.encode(batch["pixel_values"].to(dtype=weight_dtype)).latent_dist.sample()
                 latents = latents * vae.config.scaling_factor
 
@@ -402,16 +816,21 @@ def main():
 
                 noisy_latents = noise_scheduler.add_noise(latents, noise, timesteps)
                 encoder_hidden_states = text_encoder(batch["input_ids"])[0]
-                controlnet_image = batch["conditioning_pixel_values"].to(dtype=weight_dtype)
-                if args.include_reference:
-                    controlnet_image = compose_pose_on_appearance_tensor(
-                        controlnet_image,
-                        batch["reference_pixel_values"].to(dtype=weight_dtype),
-                    )
+                controlnet_image = controlnet_cond_for_batch(
+                    batch,
+                    condition_type=args.condition_type,
+                    include_reference=args.include_reference,
+                    weight_dtype=weight_dtype,
+                )
 
                 if args.smoke_check_reference and global_step == 0:
                     if not args.include_reference:
                         raise ValueError("--smoke-check-reference requires --include-reference")
+                    if args.condition_type == "ip-adapter":
+                        raise ValueError(
+                            "--smoke-check-reference paints the reference into ControlNet; "
+                            "that is the pose-ref recipe. IP-Adapter appearance is the CLIP path."
+                        )
                     delta = assert_reference_enters_controlnet(
                         controlnet,
                         batch,
@@ -453,6 +872,20 @@ def main():
                     return_dict=False,
                 )
 
+                unet_kwargs = {}
+                if args.condition_type == "ip-adapter":
+                    if image_encoder is None or feature_extractor is None:
+                        raise RuntimeError("ip-adapter training is missing the CLIP image encoder")
+                    unet_kwargs["added_cond_kwargs"] = {
+                        "image_embeds": encode_reference_image_embeds(
+                            image_encoder,
+                            feature_extractor,
+                            batch["reference_pixel_values"],
+                            device=accelerator.device,
+                            dtype=weight_dtype,
+                        )
+                    }
+
                 model_pred = unet(
                     noisy_latents,
                     timesteps,
@@ -460,6 +893,7 @@ def main():
                     down_block_additional_residuals=[sample.to(dtype=weight_dtype) for sample in down_block_res_samples],
                     mid_block_additional_residual=mid_block_res_sample.to(dtype=weight_dtype),
                     return_dict=False,
+                    **unet_kwargs,
                 )[0]
 
                 loss = F.mse_loss(model_pred.float(), noise.float(), reduction="mean")
@@ -484,6 +918,14 @@ def main():
                 accelerator.wait_for_everyone()
                 _save(f"checkpoint-step-{global_step}")
                 last_ckpt_wall = now
+            if (
+                args.eval_every_steps
+                and global_step > 0
+                and global_step % args.eval_every_steps == 0
+            ):
+                if _run_task_eval(epoch + 1, kind="mid", step=global_step):
+                    logging.info("task-stop fired at step %s", global_step)
+                    return
             if args.max_steps is not None and global_step >= args.max_steps:
                 logging.info("Reached --max-steps %s", args.max_steps)
                 accelerator.wait_for_everyone()
@@ -494,12 +936,20 @@ def main():
         accelerator.wait_for_everyone()
         if accelerator.is_main_process:
             _save(f"checkpoint-epoch-{epoch+1}")
+        if _run_task_eval(epoch + 1, kind="epoch"):
+            logging.info("task-stop fired at epoch %s: %s", epoch + 1, getattr(stop_rule, "stop_reason", ""))
+            return
 
     accelerator.wait_for_everyone()
     if accelerator.is_main_process:
         logging.info(f"Saving ControlNet to {args.output_dir}")
         controlnet = accelerator.unwrap_model(controlnet)
         controlnet.save_pretrained(args.output_dir)
+        if args.condition_type == "ip-adapter":
+            torch.save(
+                export_ip_adapter_state_dict(accelerator.unwrap_model(unet)),
+                os.path.join(args.output_dir, "ip-adapter.bin"),
+            )
 
 
 if __name__ == "__main__":

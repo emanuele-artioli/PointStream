@@ -4,9 +4,9 @@
 and any new generator module, `src/contracts/capabilities.py` if a new
 conditioning capability is needed.
 
-**Three of four gates are now passed. `BP14` is the one that remains**, and it is
-not optional: the last training run burned 14 GPU hours on a series that was flat
-from epoch 1 because it stopped on nothing.
+**All four gates are now passed.** `BP14` landed 2026-08-24. The last training
+run burned 14 GPU hours on a series that was flat from epoch 1 because it
+stopped on nothing; that is no longer allowed.
 
 This is now **the critical path**. It is also the only stream that spends real
 GPU time, so it goes second in its wave, behind whatever else can run free.
@@ -14,7 +14,7 @@ GPU time, so it goes second in its wave, behind whatever else can run free.
 | Gate | Brief | Why |
 |---|---|---|
 | ~~Headroom~~ | `BP20` | ✅ **PASSED 2026-08-23.** A player is ~1% of the pixels and **17–24%** of the bitrate on real 4K, a 15–47× concentration (`PLAN.md` §2.14). The premise holds; this brief is unblocked on that gate. |
-| **Stop rule** | `BP14` | ⬜ **STILL REQUIRED.** The last training run burned 14 GPU hours on a series flat from epoch 1, because it stopped on nothing. |
+| **Stop rule** | `BP14` | ✅ **LANDED 2026-08-24.** `TaskStopRule` observes coding-task LPIPS, never diffusion loss. CI `32747593873`. |
 | ~~Instrument~~ | `BP18` | ✅ **DONE 2026-08-23.** `reid` + `palette`, calibrated on ground-truth pairs at 17.1σ, with `IdentityScale` so a score is quoted between its measured anchors (`PLAN.md` §2.12). Use it. |
 | ~~Caption channel~~ | `BP17` | ✅ **DONE 2026-08-23, and the answer is nothing.** Switching it on moved three arms inside noise and pose-controlnet 1.5σ *worse* (`PLAN.md` §2.15). The text channel is not where the appearance problem lives — do not spend more on it. |
 
@@ -164,3 +164,58 @@ minimum, whatever is attempted here reports:
 - the licence status of anything integrated, with the date checked;
 - and, if the answer is that the architecture does not close the gap, that
   written as a scoped finding rather than as a call for more tuning.
+
+## Delivered so far — 2026-08-24
+
+**`multi-controlnet` measured, both axes, not citable.** Pose epoch 10 + seg
+epoch 7, seed 42, 12 clips × offsets 1–8. Licences were checked the same day
+(IP-Adapter Apache-2.0 code and weights; Uni-ControlNet MIT code and weights)
+and recorded in `outputs/bp19-conditioning/bounds-before-run.json` before any
+generate.
+
+LPIPS (object bbox of the letterboxed mask): **0.579 ± 0.013** (n=96).
+Identical 0, this-run unrelated null 0.736, static-copy floor 0.451. Pre-written
+band 0.50–0.78; inside it. `compare_paired` vs the paste: **+0.128 ± 0.013
+(10.2σ, n=96; 4.5σ on 12 clip means) — static-copy ahead.** Vs the unrelated
+null: 15.3σ, multi ahead. Object PSNR 11.38 dB vs floor 13.51 dB. The harness
+labels the arm *not using appearance*.
+
+`reid` through `TENNIS_SCALE` (same-person 0.8663, different-person 0.5315):
+**0.628 ± 0.013** (n=96), **+29% of the span**. Pre-written band 0.50–0.72;
+inside it. Same-session GT: same-person 0.878 ± 0.009, different-video donor
+0.491 ± 0.008. Engine vs GT same: **−0.250 ± 0.014 (17.8σ, 7.0σ on clip
+means) — not a paste.** Engine vs donor: **+0.137 ± 0.016 (8.7σ, 3.3σ on clip
+means) — some identity signal, not a stranger.** 20/96 rows sit below the
+different-person anchor; 1/96 above same-person.
+
+Reading both together: middling LPIPS and middling reid. Two conditions do not
+create an appearance path, which is what the bounds said.
+
+**Dataset honesty for IP-Adapter landed** (`4aa7c94`).
+
+**IP-Adapter training loop is wired.** `--condition-type ip-adapter --include-reference` now:
+
+- loads stock OpenPose ControlNet and **freezes** it
+- attaches `h94/IP-Adapter` (`ip-adapter_sd15.bin`, ~22M) on the frozen UNet
+- optimiser sees only adapter parameters (image proj + IP-Attn); a count outside 10–40M aborts
+- reference goes through CLIP vision, not into the control image
+- checkpoints write `ip-adapter.bin` next to the frozen ControlNet so the stop-rule generator can load it
+
+Do not repeat pose-ref. `--smoke-check-reference` is refused on this condition because that flag paints the reference under the skeleton.
+
+**Bounds, written before the first training sample** (2026-08-25):
+
+- Coding-task LPIPS through `TaskStopRule` / `TENNIS_SCALE` is not the train metric; stop on coding-task LPIPS vs static-copy floor as BP14.
+- After a run that is allowed to finish: object-bbox LPIPS expected **0.50–0.78** (pose 0.60, paste 0.45, unrelated 0.74). A number below 0.45 is an alarm (paste-through). Above 0.74 is an alarm (worse than unrelated).
+- `reid` through `TENNIS_SCALE` (same 0.8663, different 0.5315): expected **0.53–0.72**. Ceiling is semantic appearance (kit colour, build), not identity — CLIP image embeds lack spatial detail. A score at the same-person anchor (0.87) is an alarm.
+
+Launch (not a result until it stops on the task):
+
+```
+conda run -n pointstream --no-capture-output python -u scripts/train_controlnet.py \
+  --condition-type ip-adapter --include-reference \
+  --output-dir assets/weights/ip-adapter-trained \
+  --batch-size 4 --epochs 10
+```
+
+Uni-ControlNet remains last.

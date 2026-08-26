@@ -19,6 +19,7 @@ from src.components.generation.controlnet import (
     FINAL_EPOCH,
     ControlNetGenerator,
     _PROMPT,
+    controlnet_weight_paths,
     render_trajectory_control,
     resolve_controlnet_checkpoint,
     resolve_prompt,
@@ -279,6 +280,23 @@ def test_resolved_name_canny_controlnet_is_the_registry_key():
     cfg = default().with_(generator=GeneratorConfig(backend="controlnet", variant="canny"))
     assert cfg.generator.resolved_name == "canny-controlnet"
     GENERATORS.spec(cfg.generator.resolved_name)
+
+
+def test_multi_controlnet_loads_pose_and_seg_without_a_dedicated_dir(tmp_path: Path) -> None:
+    """The BP19 probe scored n=0 because load asked for assets/weights/multi-controlnet."""
+    weights = tmp_path / "assets" / "weights"
+    pose = weights / "pose-controlnet" / "checkpoint-epoch-10"
+    seg = weights / "seg-controlnet" / "checkpoint-epoch-7"
+    pose.mkdir(parents=True)
+    seg.mkdir(parents=True)
+    sources = controlnet_weight_paths("multi", root=tmp_path)
+    assert [path.name for path, _epoch in sources] == [
+        "checkpoint-epoch-10",
+        "checkpoint-epoch-7",
+    ]
+    assert [epoch for _path, epoch in sources] == [10, 7]
+    with pytest.raises(FileNotFoundError, match="multi-controlnet"):
+        resolve_controlnet_checkpoint("multi", root=tmp_path)
 
 
 def test_controlnet_without_weights_names_the_missing_pipeline():
