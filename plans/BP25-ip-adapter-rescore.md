@@ -1,90 +1,42 @@
 # B'25 — Re-score IP-Adapter on an instrument that can rank models
 
-**Closes `PLAN.md` §7 P0 item 5, either way.** An honest negative closes it as
-well as a win. What is not acceptable is the current state: a number that looks
-like a verdict and is not one.
+**Closed `PLAN.md` §7 P0 item 5 on 2026-08-26.** Honest scoped negative on a
+working engine (still loses to a paste). The appearance path is real.
 
 **Owns:** `scripts/train_controlnet.py` (eval path only),
 `src/shared/training/task_eval.py`, `outputs/bp25-ip-adapter/**`,
 `plans/BP19-conditioning-architecture.md`.
-**Read first:** `AGENTS.md` ("control the instrument, then the result"),
-`PLAN.md` §2.10 and §2.12, `plans/BP19-conditioning-architecture.md` L206-211.
 
-## What happened, and why it settles nothing
+## Result
 
-Training ran 2026-08-25 on GPU 1 and self-stopped at epoch 3, step 18000:
-*"flat-to-down over the last 3 epoch evals and still below the static-copy
-floor."* The **stop rule worked exactly as BP14 designed** — that part is a
-genuine validation and is not in question.
+Calibration first, 12 clips at offset 8. 4-step vs 20-step on the same stock
+IP-Adapter txt2img pipeline: +0.079 ± 0.023 LPIPS, 3.5σ. The tripwire is not
+blind. At 4 steps the stock adapter is worse than an unrelated photo (3.8σ),
+so that eval cannot rank models against real-image anchors. Ranking used 20
+steps, the §2.10 protocol.
 
-| | LPIPS |
-|---|---|
-| static-copy floor | 0.5269 |
-| unrelated null | 0.7497 |
-| stock untrained IP-Adapter | 0.7606 |
-| best checkpoint (epoch 1) | **0.8112** |
-| final (epoch 3) | 0.8281 |
+| Arm | object LPIPS (n=96) | `reid` |
+|---|---|---|
+| static-copy | 0.4505 ± 0.0220 | 0.9135 ± 0.0087 |
+| unrelated | 0.7358 ± 0.0075 | 0.4998 ± 0.0064 |
+| stock | 0.7586 ± 0.0092 | 0.5519 ± 0.0157 |
+| epoch 1 (best) | **0.6922 ± 0.0094** | 0.5647 ± 0.0147 |
+| epoch 1 shuffled | 0.7662 ± 0.0085 | 0.4893 ± 0.0106 |
 
-Every value sits **above the unrelated null**, which the pre-written bound calls
-an alarm. Two defects in the measurement explain why it cannot be read as a
-result:
+Stock reproduces 0.7606. Extra check on clip means (n=12): epoch 1 beats stock
+5.5σ, uses appearance vs shuffled 3.8σ, loses to paste 4.1σ. Vs unrelated is
+1.3σ — not claimed.
 
-1. **The stop-eval generates at 4 diffusion steps** (`STOP_EVAL_STEPS = 4`,
-   straight into `ControlNetGenerator(steps=4)`). Vanilla SD1.5 needs 20-50. And
-   the two anchors it is scored against — the static-copy floor and the unrelated
-   null — are **real images that never pass through diffusion at all**. A
-   barely-denoised generation is being compared with undegraded photographs. It
-   loses regardless of how well the adapter trained.
-2. **Most evals scored stale weights.** 11 evals, **5 distinct values**.
-   `_run_task_eval` writes `checkpoint-epoch-N` only when that directory does not
-   already exist, so every mid-epoch eval after the first in an epoch re-scores
-   frozen weights.
+Stale-checkpoint bug: mid-epoch evals now write
+`checkpoint-epoch-{N}-step-{S}` and always save before scoring.
 
-Both `bounds.json` and `stop_series.json` already carry `"not_citable": true`.
+Uni-ControlNet remains last. Artifacts: `outputs/bp25-ip-adapter/`.
+`PLAN.md` §2.17.
 
-## What to do
+## History — why the 2026-08-25 stop-eval was not a ranking
 
-1. **Calibrate the instrument first, before re-scoring anything.** Generate a
-   known-good sample at 4 steps and at 30 steps and score both. The question to
-   answer in writing: *can the 4-step eval distinguish a good generation from a
-   bad one at all?* If it cannot, that is itself a finding — the tripwire is
-   confirmed fit only for stopping runs, never for ranking models.
-2. **Score against a fair anchor.** If the candidate goes through diffusion, the
-   floor must too, or the comparison is a step-count comparison wearing a model
-   comparison's clothes. Say which anchoring you chose and why.
-3. **Re-score the three saved checkpoints** (`checkpoint-epoch-1/2/3`, all on
-   disk under `assets/weights/ip-adapter-trained/`) at 20-30 steps, with **n and
-   standard error**. n=4 clips is too thin for a verdict — widen it.
-4. **Fix the stale-checkpoint bug** so the series measures what it claims.
-5. **Then, and only then, state whether IP-Adapter uses appearance.**
-
-## Bounds — already written, do not rewrite
-
-From `plans/BP19-conditioning-architecture.md` (2026-08-25): object-bbox LPIPS
-expected **0.50-0.78** (pose 0.60, paste 0.45, unrelated 0.74); below 0.45 is an
-alarm for paste-through, above 0.74 an alarm for worse-than-unrelated. `reid`
-through `TENNIS_SCALE` expected **0.53-0.72**; a score at the same-person anchor
-(0.8663) is an alarm.
-
-The declared ceiling stands: **semantic appearance match — kit colour, roughly
-right build — not identity**, because CLIP image embeddings lack fine spatial
-detail. That is a real result to report, not a disappointment.
-
-**The number to beat to have done anything at all is 0.7606**, the stock
-untrained adapter.
-
-## Traps
-
-- **Do not retrain first.** Three checkpoints are on disk; the cheap experiment
-  comes before the expensive one.
-- **If the re-score comes out good, add a check rather than stopping.** Better
-  than the static-copy floor would be the first such result in this project's
-  history.
-- **Do not repeat pose-ref.** Uni-ControlNet remains last.
-
-## Done when
-
-- The 4-step instrument is calibrated and its verdict written down.
-- The three checkpoints are re-scored at a realistic step count with n and SE.
-- The stale-checkpoint bug is fixed.
-- `PLAN.md` §7 P0 item 5 is marked closed with whichever result is true.
+Training self-stopped at epoch 3, step 18000. The stop rule worked. The number
+it stopped on did not: 4 diffusion steps scored against undegraded photographs,
+and mid-epoch evals re-scored frozen weights. Epoch 1 then read 0.8112 LPIPS,
+above the unrelated null. That run stays `not_citable`. The table above is the
+ranking.

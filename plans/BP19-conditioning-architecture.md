@@ -219,3 +219,17 @@ conda run -n pointstream --no-capture-output python -u scripts/train_controlnet.
 ```
 
 Uni-ControlNet remains last.
+
+## Result (BP25, 2026-08-26)
+
+The 2026-08-25 stop-eval is not a ranking. Re-scored at 20 steps on the §2.10
+protocol (n=96, seed 42, GPU 0). Bounds above were not rewritten.
+
+Epoch 1: object LPIPS **0.6922 ± 0.0094**. Stock 0.7586 ± 0.0092. Static copy
+0.4505 ± 0.0220. Unrelated 0.7358 ± 0.0075. `reid` 0.5647 ± 0.0147 (+10% of
+TENNIS_SCALE). Inside the band. Epochs 2 and 3 are flat with epoch 1.
+
+**Clip-mean extra check** (n=12, after the item-level result looked good):
+beats stock 5.5σ; own vs shuffled appearance 3.8σ LPIPS / 3.6σ reid — **uses
+appearance**; loses to paste 4.1σ; vs unrelated 1.3σ — not a result. Details
+`outputs/bp25-ip-adapter/`, `PLAN.md` §2.17.

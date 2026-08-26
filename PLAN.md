@@ -29,7 +29,7 @@ Target: **ACM TOMM, September 30.**
 |---|---|---|
 | A — contracts and concepts | ✅ done | — |
 | B — components | ✅ **done** | Merged-ready on `phase-b/integrate` (still unmerged to main) |
-| **B′ — the engine roster** | BP12 ✅ | Re-ranked in clip mode on calibrated LPIPS (§2.10). Quality flagship stays **unset**: every engine loses to a pasted keyframe at 2.5σ–10.6σ, and the top three are not separable. The cross-appearance test is withdrawn as a test of appearance use — a paste tops it. |
+| **B′ — the engine roster** | BP12 ✅, BP25 ✅ | Re-ranked in clip mode on calibrated LPIPS (§2.10). IP-Adapter now has a trained appearance path (§2.17) and still loses to a paste. Quality flagship stays **unset**. |
 | C — pipeline and runner | ✅ **done** | `C1`/`C2`/`C3` merged. A tier config runs end to end and is scored (§2.16, BP23). |
 | D — experiments layer | 🟡 partly unblocked | Ablations need §2.16's inert-field fix (BP26); rate-based experiments need a real encoder (BP24). |
 | E — experiments and paper | ⬜ | Ordered by §7 |
@@ -571,11 +571,11 @@ their real status differs, and §6.2's roster should be read with this table:
 |---|---|---|
 | text / caption | `pose-controlnet` (alias `caption-controlnet`) | **trained, never driven** |
 | keyframe / reference image | `pose-ref-controlnet` | trained, measured, **failed for a known architectural reason** (§2.4) |
-| latent / image embedding | `ip-adapter-controlnet` (declares `appearance:image-embedding`) | **declared, never trained** — the checkpoint is the mislabelled segmentation ControlNet of §2.3 |
+| latent / image embedding | `ip-adapter-controlnet` (declares `appearance:image-embedding`) | **trained, uses appearance, still loses to a paste** (§2.17). The tennis directory named `ip-adapter-controlnet` remains the mislabelled segmentation ControlNet of §2.3 and is not loaded. |
 
 Of three appearance pathways, one is switched off, one failed for a reason we
-understand, and one was never built. That is a better description of where this
-project stands than "the generators do not use appearance".
+understand, and one now works as a *path* without working as an engine: it
+moves when the reference is shuffled, and a paste still wins.
 
 
 ### 2.12 An instrument that can tell the right body from a moving output
@@ -919,6 +919,45 @@ here were broken until 2026-08-23 (§2.7), both belong in the invariants (`BP27`
 `src/contracts/lattice.py` omits `generated-frames`, so a generation-on /
 residual-off corner may order the codec first and cannot deliver a
 reconstruction.
+
+
+### 2.17 IP-Adapter uses appearance and still loses to a paste
+
+`BP25`, 2026-08-26, GPU 0. Bounds in `outputs/bp25-ip-adapter/bounds-before-run.json`
+were written before the first generation. Protocol matches §2.10: 20 steps,
+12 clips, offsets 1–8, object-bbox LPIPS, seed 42. Extra check after a pleasing
+item-level result: the same comparisons on **clip means** (n=12), in
+`outputs/bp25-ip-adapter/clip-means.json`.
+
+The 4-step stop-eval is a tripwire, not a ranking instrument. Same stock adapter
+at 4 vs 20 steps separates at 3.5σ (n=12, offset 8), so 4 steps is not blind —
+but at 4 steps the stock adapter is worse than an unrelated photo (3.8σ). Ranking
+stays at 20 steps against real-image anchors.
+
+| Arm | object LPIPS | `reid` on TENNIS_SCALE |
+|---|---|---|
+| static-copy | **0.4505 ± 0.0220** | 0.9135 ± 0.0087 (paste; same-person alarm fires, correctly) |
+| unrelated image | 0.7358 ± 0.0075 | 0.4998 ± 0.0064 |
+| stock IP-Adapter | 0.7586 ± 0.0092 | 0.5519 ± 0.0157 (+6% of span) |
+| **epoch 1 (best)** | **0.6922 ± 0.0094** | 0.5647 ± 0.0147 (+10% of span) |
+| epoch 2 | 0.6953 ± 0.0103 | 0.5589 ± 0.0149 |
+| epoch 3 | 0.6947 ± 0.0101 | 0.5604 ± 0.0150 |
+| epoch 1, shuffled appearance | 0.7662 ± 0.0085 | 0.4893 ± 0.0106 |
+
+n=96 (12 clips × 8 offsets) unless noted. Stock reproduces §2.10's 0.7606.
+
+**What holds at clip level (n=12), which is the extra check.** Epoch 1 beats stock
+(−0.066 ± 0.012, 5.5σ). It uses appearance: own keyframe vs shuffled, −0.074 ±
+0.020 LPIPS (3.8σ) and +0.075 ± 0.021 reid (3.6σ). It still loses to a paste
+(+0.242 ± 0.059, 4.1σ). Vs unrelated is only 1.3σ on clip means — suggestive,
+not a result.
+
+Inside the pre-written band (LPIPS 0.50–0.78, reid 0.53–0.72). Not identity.
+Not a working engine. The stop rule was right that epochs 2–3 were flat; the
+4-step number it stopped on was not a ranking.
+
+Uni-ControlNet remains last. P0 item 5 closes on this scoped result.
+
 
 ## 3. Architecture
 
@@ -1335,12 +1374,11 @@ re-read rather than followed blindly.
 4. The core ablation lattice. *Blocked on `BP26`: 27 of 32 config fields reach
    nothing, so the detector/pose/appearance/motion/temporal axes are not yet
    measurable.*
-5. A working generative engine, or an honest scoped negative result.
-   *Still open, and the earlier negative is now narrower than it looked. No
-   engine beat static copy on the coding task (2026-08-23). IP-Adapter trained
-   and self-stopped at epoch 3 (2026-08-25), but its stop-eval generates at 4
-   diffusion steps and scores that against undegraded images, so it cannot rank
-   models — the run is `not_citable` by its own artifacts. `BP25` settles it.*
+5. ✅ **DONE 2026-08-26** — a working generative engine, or an honest scoped
+   negative. No engine beats a pasted keyframe. IP-Adapter *uses* appearance
+   (epoch 1 vs shuffled, 3.8σ on clip means) and beats the untrained adapter
+   (5.5σ) but still loses to static copy (4.1σ). `reid` +10% of the
+   same/different-person span — semantic match, not identity. §2.17, BP25.
 6. Generalization on the general/DAVIS profile.
 7. Evaluation and Conclusion sections; abstract reconciled with what was measured.
 
