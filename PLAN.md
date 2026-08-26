@@ -1249,7 +1249,10 @@ re-read rather than followed blindly.
    *Half done: the metrics compute (§2), the tier config cannot run yet.*
 2. PointStream against the codec ladder, including region arms.
 3. The residual-coarseness curve.
-4. The core ablation lattice.
+4. The core ablation lattice. *BP26 (2026-08-26): detector, pose, segmenter,
+   appearance, motion and temporal names now change a run. The lattice itself
+   is still un-run (Phase D). Codec / fallback / residual.codec remain unwired
+   (`BP24`).*
 5. A working generative engine, or an honest scoped negative result.
    *The negative landed 2026-08-23: no engine beat static copy on the coding
    task. Items 2–4 can proceed on residual/all-off corners; a quality flagship

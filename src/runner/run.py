@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 
@@ -48,7 +49,14 @@ from src.runner.routing import (
     bind_generator,
     generation_params,
 )
-from src.runner.stages import OBJECTS, StageContext, _as_background, _delivered_frames, ledger_from_bag
+from src.runner.stages import (
+    OBJECTS,
+    StageContext,
+    _as_background,
+    _delivered_frames,
+    _subjects_for_reconstruct,
+    ledger_from_bag,
+)
 
 
 @dataclass(frozen=True)
@@ -95,6 +103,8 @@ def run(
     bind_generator_fn: Callable[[], GeneratorRef] | None = None,
     evaluator: QualityEvaluator | None = None,
     objects: Sequence[tuple[ObjectRequest, ...]] | None = None,
+    components: Mapping[str, object] | None = None,
+    builders: Mapping[str, Callable[..., Any]] | None = None,
 ) -> RunResult:
     """Encode, reconstruct, score, and account every chunk.
 
@@ -112,6 +122,14 @@ def run(
             ``generator`` was not passed. All-off must not call this.
         evaluator: Injected scorer. Defaults to C1's numpy PSNR floor.
         objects: Per-chunk ``ObjectRequest`` tuples, aligned with ``chunks``.
+        components: Optional already-built perception backends (``detector``,
+            ``pose``, ``segmenter``, ``appearance``, ``motion``, ``temporal``).
+            Tests use this so a name swap does not load YOLO. A real run leaves
+            it empty and routing builds from the config the first time a stage
+            needs the backend.
+        builders: Optional per-axis factory ``(name, **kwargs) -> backend``.
+            Changing a config name must change which factory argument is
+            passed; that is the proof the name reaches the run.
     """
     if not chunks:
         raise ValueError("run needs at least one source chunk; a reconstruction of nothing cannot be scored.")
@@ -127,6 +145,7 @@ def run(
     ref = bind_generator(config, injected=generator, factory=bind_generator_fn)
     scorer = bind_evaluator(evaluator, config)
     resolver = BackgroundResolver()
+    bound = dict(components or {})
     ctx = StageContext(
         lattice=lattice,
         residual=config.residual,
@@ -135,6 +154,14 @@ def run(
         resolver=resolver,
         seed=config.run.seed,
         params=generation_params(config),
+        config=config,
+        builders=builders,
+        detector=bound.get("detector"),
+        pose_estimator=bound.get("pose"),
+        segmenter=bound.get("segmenter"),
+        appearance_encoder=bound.get("appearance"),
+        motion_encoder=bound.get("motion"),
+        temporal_policy=bound.get("temporal"),
     )
     roster = bind_backends(ctx, backends)
     conditioning = tuple(ref.requires) if ref is not None else ()
@@ -143,6 +170,8 @@ def run(
     results: list[ChunkResult] = []
     for index, raw in enumerate(chunks):
         source = as_clip(raw, path=f"{SOURCE}[{index}]")
+        if config.run.max_frames is not None:
+            source = source[: config.run.max_frames]
         chunk_objects = objects[index] if objects is not None else ()
         bag = encoder.encode({SOURCE: source, OBJECTS: chunk_objects})
         results.append(
@@ -185,12 +214,13 @@ def _finish_chunk(
         )
 
     view = _as_background(bag.get(ART_BACKGROUND_MODEL) or bag.get(STAGE_BACKGROUND))
+    client_objects = _subjects_for_reconstruct(bag) or objects
     client = reconstruct(
         ReconstructionRequest(
             lattice=lattice,
             source=source,
             background=view,
-            objects=objects,
+            objects=client_objects,
             generator=ref if generation_on else None,
             evaluator=scorer,
             resolver=resolver,

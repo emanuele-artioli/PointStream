@@ -68,6 +68,22 @@ def _never_constructs() -> GeneratorRef:
     raise AssertionError("a tier with generation off must not construct a generator")
 
 
+def _light_perception() -> dict[str, object]:
+    """Stand-ins so a tier path test does not load YOLO pose/seg weights."""
+
+    class _SkipPose:
+        def estimate(self, frame, detection, **kwargs):  # noqa: ANN001
+            _ = (frame, detection, kwargs)
+            return None
+
+    class _SkipSeg:
+        def segment(self, frame, detection):  # noqa: ANN001
+            _ = (frame, detection)
+            return None
+
+    return {"pose": _SkipPose(), "segmenter": _SkipSeg()}
+
+
 def _run_tier(name: str):
     clip, mask = _moving_block_clip()
     config = load_tier(name)
@@ -80,6 +96,7 @@ def _run_tier(name: str):
         backends=dict(counters),
         bind_generator_fn=_never_constructs,
         objects=(_objects(clip, mask),),
+        components=_light_perception(),
     )
     return config, result, counters, clip
 
@@ -203,6 +220,7 @@ def test_a_residual_absent_run_reports_its_quality_drop_instead_of_the_source() 
         [clip],
         bind_generator_fn=_never_constructs,
         objects=(_objects(clip, mask),),
+        components=_light_perception(),
     )
     assert result.sizes.residual == 0
     assert not result.delivered_quality.bit_identical, (
