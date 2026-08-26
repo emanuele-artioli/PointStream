@@ -47,13 +47,13 @@ def _ffmpeg_has_libvmaf() -> bool:
     ffmpeg = shutil.which("ffmpeg")
     if not ffmpeg:
         return False
-    result = subprocess.run(
+    process = subprocess.run(
         [ffmpeg, "-hide_banner", "-filters"],
         capture_output=True,
         text=True,
         check=False,
     )
-    return "libvmaf" in result.stdout
+    return "libvmaf" in (process.stdout or "")
 
 
 def _moving_block_clip(frames: int = 3, height: int = 96, width: int = 128):
@@ -84,20 +84,6 @@ def _never_constructs() -> GeneratorRef:
     raise AssertionError("a tier with generation off must not construct a generator")
 
 
-def _ffmpeg_has_libvmaf() -> bool:
-    """CI's apt ffmpeg is not built with libvmaf. The quality file still names VMAF."""
-    ffmpeg = shutil.which("ffmpeg")
-    if not ffmpeg:
-        return False
-    process = subprocess.run(
-        [ffmpeg, "-hide_banner", "-filters"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    return "libvmaf" in (process.stdout or "")
-
-
 def _light_perception() -> dict[str, object]:
     """Stand-ins so a tier path test does not load YOLO pose/seg weights."""
 
@@ -115,8 +101,6 @@ def _light_perception() -> dict[str, object]:
 
 
 def _run_tier(name: str):
-    if name == "quality" and not _ffmpeg_has_libvmaf():
-        pytest.skip("quality tier asks for VMAF; this ffmpeg has no libvmaf")
     clip, mask = _moving_block_clip()
     config = load_tier(name)
     asked = tuple(config.evaluation.metrics)
@@ -297,12 +281,8 @@ def test_the_tier_ladder_is_a_ladder_and_not_three_names_for_one_setting() -> No
     """
     rungs = []
     for tier in TIERS:
-        if tier == "quality" and not _ffmpeg_has_libvmaf():
-            continue
         config, result, _counters, _clip = _run_tier(tier)
         rungs.append((tier, config.residual, result.delivered_quality.whole_frame()))
-
-    assert len(rungs) >= 2, "a ladder needs at least two rungs that can run here"
 
     coarseness = [(item[1].block_threshold, item[1].background_downscale) for item in rungs]
     assert len(set(coarseness)) == len(rungs), (
