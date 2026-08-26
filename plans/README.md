@@ -8,12 +8,15 @@ there, say so in your report rather than making it.
 
 Two things are true and both are load-bearing:
 
-0. **The premise is measured and it holds** (`PLAN.md` §2.14): on real 4K a
-   player is ~1% of the pixels and **17–24%** of the bitrate, and a panorama
-   plate plus homographies saves **34–69%** of the background bitrate. AVC,
-   HEVC and AV1 agree on the foreground; **VVC is ~0.077 lower and is the
-   exception to name**, with a QP-47 confound still to rule out. Report every
-   cell; claim no trend at n=2.
+0. **The premise holds, but its codec-comparison leg does not** (`PLAN.md`
+   §2.14, corrected at n=8 by `BP21`). Concentration survives: a player is ~1%
+   of the pixels and carries a **15–19×** concentration of bitrate, inside its
+   pre-written band. **The VVC exception did not survive.** The pre-registered
+   rule was that an AVC−VVC gap under 0.04 means the codec-generation confound
+   is the story; measured at n=8 it is **+0.028 ± 0.015** at common QP (1.8σ)
+   and **+0.023 ± 0.017** at common PSNR (1.3σ). Do not name VVC as the
+   exception. Do not cite "17%" without its standard error and the two
+   near-zero clips. The n=2 framing above this line was wrong and is retired.
 1. **No generative engine here produces a usable player.** Re-ranked in clip
    mode on calibrated LPIPS over 12 clips (`PLAN.md` §2.10): **every one of the
    eight loses to pasting the keyframe**, at 2.5σ–10.6σ, and the best of them is
