@@ -1,26 +1,28 @@
-"""Pinned: still used by tests/invariants/test_outputs_tree.py. Not retired in BP15.
+"""Machine-checkable versions of the methodology rules.
 
-Machine-checkable versions of the methodology rules in CLAUDE.md.
+Moved out of condemned ``src.shared`` (BP22). This module stays in contracts
+because it imports nothing heavy — validating a run summary must not require
+torch — and because the verdict is a rule every layer is written against.
 
 The rules that matter here are the ones a bad run does not announce. A pipeline
 that silently fell back to a mock source, or whose payload accounting does not
 add up, or whose PSNR came back null, still writes a perfectly well-formed
-`run_summary.json` — and three weeks later that summary is indistinguishable
-from a good one. Prose in CLAUDE.md cannot prevent it being cited; a verdict
-stored in the run itself can.
+``run_summary.json`` — and three weeks later that summary is indistinguishable
+from a good one. Prose cannot prevent it being cited; a verdict stored in the
+run itself can.
 
-The verdict is written into the summary under `invariant_failures`. **A run
-with a non-empty `invariant_failures` is not citable** — `/results-report` and
-`/update-paper` refuse it. A run with *no* verdict at all predates the checks
-and must be backfilled, because a missing verdict reads as clean:
+The verdict is written into the summary under ``invariant_failures``. **A run
+with a non-empty ``invariant_failures`` is not citable** — ``results-report``
+and ``update-paper`` refuse it. A run with *no* verdict at all predates the
+checks and must be backfilled, because a missing verdict reads as clean:
 
-    python -m src.shared.invariants outputs/
+    python -m src.contracts.invariants outputs/
 """
 
 from __future__ import annotations
 
 import math
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 # The core thesis: the payload we send must be smaller than the source it
 # replaces. A run where it is not has not disproved the approach — it has failed
@@ -33,11 +35,11 @@ MAX_TRANSPORT_TO_SOURCE_RATIO = 1.0
 SIZE_SUM_TOLERANCE = 0.02
 
 
-def _as_number(value: Any) -> Optional[float]:
+def _as_number(value: Any) -> float | None:
     """The value as a float, or None if it is absent or not a real measurement.
 
-    `bool` is excluded deliberately: it passes `isinstance(x, int)`, so a
-    summary carrying `psnr_mean: true` would otherwise sail through as 1.0.
+    ``bool`` is excluded deliberately: it passes ``isinstance(x, int)``, so a
+    summary carrying ``psnr_mean: true`` would otherwise sail through as 1.0.
     """
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         return None
@@ -46,9 +48,9 @@ def _as_number(value: Any) -> Optional[float]:
     return float(value)
 
 
-def check_run(summary: Dict[str, Any]) -> List[str]:
+def check_run(summary: dict[str, Any]) -> list[str]:
     """Everything checkable from one run summary. Returns failure descriptions."""
-    failures: List[str] = []
+    failures: list[str] = []
     failures += _check_ran_on_real_input(summary)
     failures += _check_quality_measured(summary)
     failures += _check_size_accounting(summary)
@@ -56,7 +58,7 @@ def check_run(summary: Dict[str, Any]) -> List[str]:
     return failures
 
 
-def _check_ran_on_real_input(summary: Dict[str, Any]) -> List[str]:
+def _check_ran_on_real_input(summary: dict[str, Any]) -> list[str]:
     """Omitting --input falls back to a mock source and silently tests nothing.
 
     The run completes and produces numbers, which is precisely the problem.
@@ -76,7 +78,7 @@ def _check_ran_on_real_input(summary: Dict[str, Any]) -> List[str]:
     return []
 
 
-def _check_quality_measured(summary: Dict[str, Any]) -> List[str]:
+def _check_quality_measured(summary: dict[str, Any]) -> list[str]:
     """A null PSNR is a failed evaluation, not a quality of zero."""
     evaluation = summary.get("evaluation") or {}
     if not evaluation:
@@ -96,7 +98,7 @@ def _check_quality_measured(summary: Dict[str, Any]) -> List[str]:
     return failures
 
 
-def _check_size_accounting(summary: Dict[str, Any]) -> List[str]:
+def _check_size_accounting(summary: dict[str, Any]) -> list[str]:
     """The payload parts must roughly sum to the transported total.
 
     If they do not, the size axis of every Residual-Guarantee claim is measuring
@@ -124,7 +126,7 @@ def _check_size_accounting(summary: Dict[str, Any]) -> List[str]:
     return []
 
 
-def _check_residual_guarantee(summary: Dict[str, Any]) -> List[str]:
+def _check_residual_guarantee(summary: dict[str, Any]) -> list[str]:
     """The thesis: what we send must be smaller than the source it replaces."""
     sizes = (summary.get("evaluation") or {}).get("sizes_bytes") or {}
     ratio = _as_number(sizes.get("transport_to_source_ratio"))
@@ -139,7 +141,7 @@ def _check_residual_guarantee(summary: Dict[str, Any]) -> List[str]:
     return []
 
 
-def backfill(outputs_dir: str = "outputs", force: bool = False) -> Dict[str, List[str]]:
+def backfill(outputs_dir: str = "outputs", force: bool = False) -> dict[str, list[str]]:
     """Write an `invariant_failures` verdict into every run_summary.json in place.
 
     Metadata only — no re-running, no re-evaluation — and re-entrant.
@@ -148,7 +150,7 @@ def backfill(outputs_dir: str = "outputs", force: bool = False) -> Dict[str, Lis
     import json
     import os
 
-    offenders: Dict[str, List[str]] = {}
+    offenders: dict[str, list[str]] = {}
     for entry in sorted(os.listdir(outputs_dir)):
         path = os.path.join(outputs_dir, entry, "run_summary.json")
         if not os.path.isfile(path):
@@ -174,7 +176,7 @@ def backfill(outputs_dir: str = "outputs", force: bool = False) -> Dict[str, Lis
 
 
 def main() -> None:
-    """`python -m src.shared.invariants [outputs_dir] [--force]`"""
+    """``python -m src.contracts.invariants [outputs_dir] [--force]``"""
     import sys
 
     args = [a for a in sys.argv[1:] if not a.startswith("-")]

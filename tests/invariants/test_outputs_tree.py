@@ -19,7 +19,7 @@ from pathlib import Path
 
 import pytest
 
-from src.shared.invariants import check_run
+from src.contracts.invariants import check_run
 
 OUTPUTS = Path(__file__).resolve().parents[2] / "outputs"
 
@@ -43,12 +43,12 @@ def load_all():
 def test_every_run_carries_a_verdict():
     """The one state the citation rule cannot act on is a missing verdict.
 
-    Backfill with: python -m src.shared.invariants outputs/
+    Backfill with: python -m src.contracts.invariants outputs/
     """
     missing = [name for name, s in load_all() if "invariant_failures" not in s]
     assert not missing, (
         f"{len(missing)} run(s) have no invariant verdict and would be treated as "
-        f"citable by default; run `python -m src.shared.invariants outputs/`. "
+        f"citable by default; run `python -m src.contracts.invariants outputs/`. "
         f"First few: {missing[:10]}"
     )
 
@@ -64,7 +64,7 @@ def test_stored_verdicts_match_the_current_checks():
             stale.append(name)
     assert not stale, (
         f"{len(stale)} run(s) carry a verdict that disagrees with the current checks; "
-        f"re-run `python -m src.shared.invariants outputs/ --force`. "
+        f"re-run `python -m src.contracts.invariants outputs/ --force`. "
         f"First few: {stale[:10]}"
     )
 
