@@ -1,3 +1,6 @@
+# ruff: noqa: E402 - the sys.path bootstrap below MUST run before the first
+# `from src...` import: the pinned env's editable install hard-maps `src` to
+# MAIN's tree, so without it a git worktree silently imports the wrong code.
 import os
 import sys
 from pathlib import Path as _Path
