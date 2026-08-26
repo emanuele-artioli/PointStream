@@ -2,8 +2,8 @@
 
 **This script trains for real when invoked without --dry-run.** It is the
 "launch variants under successive halving" half of the protocol; the probe
-set (`scripts/select_probe_set.py`) and checkpoint scoring
-(`scripts/eval_checkpoint.py`) are its building blocks. Per this workstream's
+set (`scripts/select_probe_set.py`) and checkpoint scoring through the
+runner are its building blocks. Per this workstream's
 explicit scope gate: this driver is meant to be validated with tiny budgets
 (a couple of epochs, a couple of minutes) — a human decides separately when
 to point it at the real multi-day campaign with realistic epoch budgets.
@@ -12,7 +12,8 @@ Successive-halving rule (exact)
 --------------------------------
 1. Rung 0: every alive variant trains for `--initial-epochs` (from scratch).
 2. After training, each variant's checkpoint is scored on the probe set
-   (`scripts/eval_checkpoint.py`'s `evaluate_checkpoint`), producing an
+   (`evaluate_checkpoint` — retired with src.decoder in BP22; rewire to
+   the runner before the next real campaign), producing an
    aggregate PSNR/SSIM/VMAF/FVD(+LPIPS) record.
 3. Rank variants by a composite score: for each metric, min-max normalize
    across the variants *present this rung* (lower-is-better metrics — FVD,
@@ -71,7 +72,22 @@ from typing import Any
 
 import torch
 
-from scripts.eval_checkpoint import append_jsonl_log, evaluate_checkpoint, load_manifest
+def load_manifest(path: Path) -> dict:
+    return json.loads(path.read_text())
+
+
+def append_jsonl_log(log_path: Path, record: dict[str, Any]) -> None:
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    with log_path.open("a") as handle:
+        handle.write(json.dumps(record, sort_keys=False) + "\n")
+
+
+def evaluate_checkpoint(**kwargs: Any) -> dict[str, Any]:
+    """Retired with ``src.decoder`` (BP22). The runner is the eval path now."""
+    raise RuntimeError(
+        "scripts.eval_checkpoint was retired with src.decoder (BP22). "
+        "Score checkpoints through the runner; do not restore the old compositor."
+    )
 
 LOWER_IS_BETTER = {"fvd", "lpips_vgg_uncalibrated"}
 HIGHER_IS_BETTER = {"psnr_mean", "ssim_mean", "vmaf_mean"}
