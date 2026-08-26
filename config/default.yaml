@@ -1,139 +1,103 @@
-# PointStream Default Configuration
-# This is the default configuration with sensible values for all CLI arguments.
-# Use this as a template for creating custom configs for ablation tests and performance optimization.
+# PointStream default configuration.
+# Generated from src.contracts.config.render_default() so every key is a real field.
+# Do not add knobs here that the schema does not have.
 
-# ============================================================================
-# Core Input/Output Settings
-# ============================================================================
-# source-uri: null                    # Path to input video (optional; mock source used if omitted)
-num-frames: 10                      # Maximum number of frames to process (null = all frames)
-summary-file: true                    # Write run_summary.json
-ffmpeg-codec: libsvtav1               # FFmpeg encoder: libsvtav1, libx265, etc.
-codec-crf: 35                         # FFmpeg CRF quality (lower = better). null uses codec defaults
-codec-preset: fast                    # FFmpeg preset/speed (e.g., veryfast, medium, slow). null uses codec defaults
-log-level: debug                      # Log verbosity: debug, info, warning, error
-transport: disk                       # Transport backend: currently only 'disk'
-
-# ============================================================================
-# Execution Pool Configuration
-# ============================================================================
-execution-pool: inline                # DAG execution mode: inline or tagged
-cpu-workers: null                     # CPU worker count (null = auto-detect)
-gpu-workers: null                     # GPU worker count (null = auto-detect)
-
-# ============================================================================
-# Actor Extraction Pipeline
-# ============================================================================
-detector: yolo26n.pt                  # Player detector: any name containing "yolo" or "yoloe" (open-vocabulary)
-target-class-caption: tennis player   # Caption for open-vocabulary detectors and segmenters
-pose-estimator: yolo26n-pose.pt       # Pose estimator: name containing "yolo", or "dwpose" for DwposeEstimator
-segmenter: yolo26n-seg.pt             # Segmenter: name containing "yolo", "yoloe" (open-vocab), or "sam"
-payload-pose-delta-threshold: 20.0    # Pose keyframe delta threshold
-
-# ============================================================================
-# Ball Extraction Configuration
-# ============================================================================
-ball-extractor: difference            # Ball extraction: "segmentation" selects SegmentationBallExtractor; any other value (including this default) uses the difference-based BallExtractor
-ball-difference-threshold: 18.0       # Pixel-difference threshold for difference-based extraction
-ball-min-blob-area: 6                 # Minimum connected-component area for ball detection
-ball-max-side: 0                      # Max frame side for ball extraction (0 = native resolution)
-ball-det-conf: null                   # Detection confidence threshold for segmentation-based detector
-ball-det-model: null                  # Model filename/path for segmentation-based detector
-ball-class-id: null                   # Class ID for segmentation-based detector
-
-# ============================================================================
-# Reference Crop Configuration
-# ============================================================================
-reference-jpeg-quality: 95            # JPEG quality for actor reference crops
-reference-padding-ratio: 0.10         # Padding ratio for reference crop extraction
-
-# ============================================================================
-# Residual and Importance Mapping
-# ============================================================================
-importance-mapper: uniform            # Residual weighting strategy: binary or uniform
-residual-background-downscale: 2      # Downscale factor for background residuals (use None to disable)
-residual-batch-size: 8                # Number of frames processed per GPU batch
-downscale-interpolation: bilinear     # Background downscale interpolation: nearest, bilinear, bicubic, area
-residual-block-size: 8                # Block size used for pooled residual activity gating
-residual-block-threshold: 0.0         # Average absolute error threshold per block in pixel units
-seed: 1337                            # Deterministic seed for synthesis and GenAI
-
-# ============================================================================
-# GPU and Performance Tuning
-# ============================================================================
-gpu-dtype: fp16                       # GPU compute dtype: fp16, fp32, bf16, fp8_e4m3fn, fp8_e5m2
-panorama-warp-batch-size: null        # Batch size for panorama warp operations
-panorama-codec: jpeg                  # Panorama codec: jpeg, png, or roi-video
-panorama-jpeg-quality: 50             # JPEG quality when --panorama-codec=jpeg
-panorama-png-compression: null        # PNG compression level when --panorama-codec=png
-background-layer: panorama-static     # Background-layer ladder (report 10 5.3): panorama-static
-                                       # (rung 1, today's one-JPEG-per-chunk), panorama-delta (rung 2,
-                                       # full panorama once per scene then deltas for later sub-chunks
-                                       # of that scene -- no-op outside run-mode: full_match, which is
-                                       # the only place VideoChunk.scene_id is set), or roi-video
-                                       # (rung 3, libx264+addroi instead of --panorama-codec).
-panorama-roi-crf: 30                  # CRF for --background-layer=roi-video (always libx264, not
-                                       # --ffmpeg-codec -- libsvtav1 has no addroi equivalent)
-panorama-roi-preset: veryfast         # libx264 preset for --background-layer=roi-video
-
-# ============================================================================
-# Model and Dependencies
-# ============================================================================
-allow-auto-model-download: true       # Allow automatic model downloads
-
-# ============================================================================
-# Evaluation Settings
-# ============================================================================
-evaluation-mode: [psnr]   # Post-run evaluation metrics: none, [psnr], [psnr, ssim, vmaf]
-evaluation-max-frames: null           # Optional frame cap for quality evaluation
-
-# ============================================================================
-# GenAI and AnimateAnyone Configuration
-# ============================================================================                
-genai-backend: canny-controlnet                   # GenAI backend: caption-controlnet, ip-adapter-controlnet, canny-controlnet, seg-controlnet, animate-anyone, pix2pix (null disables GenAI)
-controlnet-id: custom-controlnet                 # Directory name under assets/weights/ (canny)
-animate-anyone-repo-dir: null             # Path to Moore-AnimateAnyone repository
-animate-anyone-model-dir: null            # Override if models are in non-standard location
-animate-anyone-steps: 3                  # Diffusion inference steps for AnimateAnyone
-animate-anyone-cfg: 7.5                   # Guidance (CFG) scale for AnimateAnyone
-animate-anyone-width: 256                 # Width for AnimateAnyone model (pixels)
-animate-anyone-height: 256                # Height for AnimateAnyone model (pixels)
-animate-anyone-window: null               # Temporal conditioning window length
-genai-preroll-frames: 0                   # Frames to keep residual-only before temporal GenAI starts
-genai-keyframe-only: false                # Run GenAI only on received keyframe skeletons and interpolate outputs locally
-animate-anyone-transparent-threshold: 64  # Black-background alpha threshold
-genai-resize-mode: aspect-recovery        # Resize mode: plain or aspect-recovery
-animate-anyone-adaptive-threshold: true   # Enable adaptive border-threshold masking
-animate-anyone-alpha-smoothing: 0.5       # Temporal smoothing factor [0, 1]
-controlnet-width: 512                     # Width for ControlNet generated frame (pixels)
-controlnet-height: 512                    # Height for ControlNet generated frame (pixels)
-controlnet-steps: 20                      # Diffusion inference steps for ControlNet
-controlnet-strength: 0.65                 # Img2Img strength for ControlNet (full generation)
-controlnet-strength-temporal: 0.35        # Img2Img strength for ControlNet when resuming from warped previous frame
-controlnet-temporal-keyframe-interval: 8  # Generate from scratch every N frames to break artifact feedback loops
-controlnet-temporal-strength-min: 0.30    # Minimum adaptive temporal denoising strength
-controlnet-temporal-strength-max: 0.55    # Maximum adaptive temporal denoising strength (for large motion)
-controlnet-temporal-flow-scale: 0.02      # Scaling factor: flow_magnitude * scale maps to strength increase
-controlnet-cfg: 7.0                       # Guidance scale for ControlNet
-ip-adapter-scale: 0.5                     # Strength of the visual prompt for IP-Adapter
-canny-lower-threshold: auto               # Lower threshold for Canny edge detection (auto computes using median)
-canny-upper-threshold: auto               # Upper threshold for Canny edge detection (auto computes using median)
-
-# ============================================================================
-# Debugging
-# ============================================================================
-debug-artifact-dir: outputs/debug
-
-# ============================================================================
-# Compositing and Masking
-# ============================================================================
-compositing-mask-mode: postgen-seg-client # Actor compositing: alpha-heuristic, metadata-source-mask, postgen-seg-client, pose-heuristic-mask
-postgen-segmenter-backend: yolo           # Segmenter backend: yolo, heuristic
-postgen-segmenter-model: null         # Explicit model file for postgen segmenter
-metadata-mask-codec: auto                 # Mask codec: auto, rle-v1, bitpack-z1, png, segmenter-native, yolo-native
-pose-heuristic-mask-dilation: 0.15        # Fraction of bounding box size to use for mask boundary dilation
-
-# ============================================================================
-# Optimizations and Execution
-# ============================================================================
-enable-shifted-ball: false                # Stream actor frame states one frame early for ball extraction
+run:
+  source: null
+  output-root: outputs
+  max-frames: null
+  chunk-duration-sec: 2.0
+  seed: 1337
+  log-level: info
+domain: tennis
+lattice:
+  scene-classification: true
+  detection: true
+  selection: true
+  tracking: true
+  appearance: true
+  motion: true
+  temporal-policy: true
+  pose: true
+  segmentation: true
+  rigid-objects: true
+  background: true
+  generation: false
+  residual: true
+detector:
+  backend: yolo
+  model: yolo26n.pt
+  prompt: null
+selection:
+  backend: heuristic
+  model: null
+  prompt: null
+tracking:
+  backend: tracker
+  model: null
+  prompt: null
+pose:
+  backend: yolo
+  model: yolo26n-pose.pt
+  prompt: null
+  schema: coco-wholebody-133
+segmenter:
+  backend: yolo
+  model: yolo26n-seg.pt
+  prompt: null
+appearance:
+  representation: compressed-image
+  jpeg-quality: 90
+  downscale: 1
+motion:
+  representation: keypoints
+  per-class: {}
+  max-points: 64
+  FALLBACK-ORDER:
+  - sparse-trajectories
+  - encoded-video
+temporal:
+  metadata-sparsity: true
+  generation-sparsity: false
+  pipeline-sparsity: false
+  delta-threshold: 20.0
+  keyframe-interval: 8
+  preroll-frames: 0
+rigid:
+  backend: tennis
+  model: null
+  prompt: null
+background:
+  method: panorama-full
+  codec: jpeg
+  jpeg-quality: 50
+generator:
+  backend: none
+  variant: null
+  checkpoint: null
+  width: 512
+  height: 512
+  steps: 20
+  strength: 0.65
+  guidance: 7.0
+residual:
+  codec: av1
+  rate-control: crf
+  rate: 35
+  preset: '8'
+  pix-fmt: yuv420p
+  block-size: 8
+  block-threshold: 0.0
+  background-downscale: 2
+fallback:
+  codec: av1
+  rate-control: crf
+  rate: 35
+  preset: '8'
+  pix-fmt: yuv420p
+  roi: false
+transport: disk
+evaluation:
+  metrics:
+  - psnr
+  max-frames: null

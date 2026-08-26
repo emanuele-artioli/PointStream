@@ -31,7 +31,7 @@ Target: **ACM TOMM, September 30.**
 | B — components | ✅ **done** | Merged-ready on `phase-b/integrate` (still unmerged to main) |
 | **B′ — the engine roster** | BP12 ✅ | Re-ranked in clip mode on calibrated LPIPS (§2.10). Quality flagship stays **unset**: every engine loses to a pasted keyframe at 2.5σ–10.6σ, and the top three are not separable. The cross-appearance test is withdrawn as a test of appearance use — a paste tops it. |
 | C — pipeline and runner | ✅ **done** | `C1`/`C2`/`C3` merged. A tier config runs end to end and is scored (§2.16, BP23). |
-| D — experiments layer | 🟡 partly unblocked | Ablations need §2.16's inert-field fix (BP26); rate-based experiments need a real encoder (BP24). |
+| D — experiments layer | 🟡 partly unblocked | `BP26` wired the six ablation axes (2026-08-26), so the lattice is now *measurable* but still un-run. Rate-based experiments still need a real encoder (`BP24`). |
 | E — experiments and paper | ⬜ | Ordered by §7 |
 
 **Code.** `src/contracts/` is complete and green. `src/components/` now covers all
@@ -945,6 +945,33 @@ paper's System Design section, which explains why.
 scripts shell out to the CLI and scrape stdout, which is what an unchecked
 boundary decays into.
 
+### What `src/shared/` is (BP22, 2026-08-26)
+
+**(b) — `src/shared/` stays condemned.** It is not a layer. `src.contracts.layers`
+already lists `src.shared` in `LEGACY_PACKAGES` (`src.decoder` was deleted this
+wave); the diagram
+above has no place for a junk drawer. Promoting it to a real layer would freeze
+training helpers, a tennis dataset, skeleton drawing, old schemas, video IO,
+and leftover eval metrics as architecture. Those do not share a contract.
+
+Evidence on this tree (`7cf8e89`): `src/pipeline` and `src/runner` import
+nothing from `src.shared` or `src.decoder`. The only rewrite-tree inbound was
+`src.components.generation.animate_anyone_runtime` → `src.shared.dwpose_draw`
+(moved to `src.components.generation.dwpose_draw`). Everything else that still
+imports `src.shared` is a pre-rewrite script, legacy `src.transport`, or a
+top-level `tests/test_*.py`. BP14's stop rule (`src/shared/training/`) is new
+code that belongs under `src/experiments/` or a training helper in
+`src/components/` — not a reason to invent a sixth layer.
+
+**This wave does not move** `src/shared/tennis_dataset.py` or
+`src/shared/training/**` / `scripts/train_controlnet.py` (Stream B is live on
+the training path). They stay in condemned `src.shared` until that stream
+lands. `src/shared/{schemas,interfaces,tags}.py` stay too: the only caller is
+legacy `src.transport.disk`, which this stream does not own. `src.decoder` and
+`scripts/eval_checkpoint.py` are gone — that script was the decoder's last
+caller. Remaining pre-rewrite training scripts keep ``tennis_dataset``. The
+rest of `src/shared/` that this stream could delete is gone.
+
 ### The ablation lattice
 
 **Every component is optional, and the residual absorbs whatever the disabled
@@ -1305,9 +1332,12 @@ re-read rather than followed blindly.
    *Blocked on `BP24`: the runner's codec stage is an identity round-trip and no
    encoder binary runs, so there is no bitstream and no rate axis yet.*
 3. The residual-coarseness curve. *Same blocker as item 2.*
-4. The core ablation lattice. *Blocked on `BP26`: 27 of 32 config fields reach
-   nothing, so the detector/pose/appearance/motion/temporal axes are not yet
-   measurable.*
+4. The core ablation lattice. *`BP26` (2026-08-26): detector, pose, segmenter,
+   appearance, motion and temporal names now change a run. The lattice itself
+   is still un-run (Phase D). Codec / fallback / `residual.codec` remain unwired
+   (`BP24`). Note that the pose axis moved keypoints without moving PSNR, so a
+   lattice quoting only PSNR will show a row of zeros for pose — see
+   `plans/wave5-report.md`.*
 5. A working generative engine, or an honest scoped negative result.
    *Still open, and the earlier negative is now narrower than it looked. No
    engine beat static copy on the coding task (2026-08-23). IP-Adapter trained

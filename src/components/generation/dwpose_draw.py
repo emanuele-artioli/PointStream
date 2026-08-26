@@ -1,4 +1,9 @@
-"""Pinned: still used by src.components.generation.animate_anyone_runtime and decoder compositing. Not retired in BP15."""
+"""Draw DWPose-18 skeletons onto a canvas.
+
+Moved out of condemned ``src.shared`` (BP22). Animate-Anyone and any other
+generator that needs a skeleton image call this; ``pose.py`` is letterbox
+only and does not replace it.
+"""
 from __future__ import annotations
 
 import math

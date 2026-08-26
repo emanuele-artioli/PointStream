@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from src.shared.invariants import check_run
+from src.contracts.invariants import check_run
 
 
 def good_summary(**overrides):
