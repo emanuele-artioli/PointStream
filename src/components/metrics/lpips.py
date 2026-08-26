@@ -12,14 +12,24 @@ measured on 2026-08-23, an *unrelated image* scored 0.083 while a good
 reconstruction scored 0.085, so it could not tell them apart. Engine rankings
 taken on it are void.
 
-Calibration anchors for the current implementation, asserted in the tests:
+Calibration anchors for the current implementation, asserted in the tests.
 
-| pair | this module | old VGG-MSE |
+**Tier content at 3840×2160** (``alcaraz_highlights/scene_000``, 2 frames, BP23):
+
+| pair | calibrated LPIPS | old VGG-MSE |
 |---|---|---|
 | identical | 0.000 | 0.000 |
-| mild noise | 0.250 | 0.009 |
-| heavy blur | 0.430 | 0.032 |
-| unrelated image | 0.645 | 0.083 |
+| mild blur | 0.017 | 0.009 |
+| severe blur | 0.298 | 0.032 |
+| unrelated clip | **0.549** | 0.083 |
+
+Quote **0.549** beside any LPIPS from this dataset — a result that does not beat
+that unrelated anchor is not distinguishable from an irrelevant frame.
+
+**Resolution matters.** The ordering above holds at 4K. At 960×540 the same
+anchors invert: severe blur (0.613) scores *worse* than unrelated (0.522).
+Calibrate at the resolution you measure; ``experiments/tier/calibrate.py`` refuses
+to downscale for this reason.
 
 A caller injects ``extractor`` to mock the network; the real one loads lazily so
 importing this module does not require torch.
@@ -48,7 +58,12 @@ def _load_model(net: str, device: str) -> Any:
 
 
 class LpipsMetric:
-    """Calibrated LPIPS. Lower is better; 0 if identical."""
+    """Calibrated LPIPS distance. Lower is better; 0 on identical frames.
+
+    Usable range on tier content at 3840×2160: identical 0.000, mild blur ~0.017,
+    severe blur ~0.298, unrelated clip **0.549** (the floor to quote). Ordering
+    does not transfer across resolution — see the module docstring.
+    """
 
     name = "lpips"
 

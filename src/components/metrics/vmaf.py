@@ -25,6 +25,20 @@ class VmafMetric:
     writing the clip and calling ffmpeg's ``libvmaf``. There is no arithmetic
     stand-in: a missing model and a missing libvmaf raise rather than return a
     PSNR-shaped number labelled VMAF.
+
+    **Usable range on this host's tier content (3840×2160, measured BP23).**
+    Quote a score beside these anchors from ``outputs/bp23-tier/metric-calibration.json``:
+
+    | pair | VMAF |
+    |---|---|
+    | identical | **97.54** (ceiling — not 100) |
+    | mild blur | 84.96 |
+    | severe blur | **0.00** (floor) |
+    | unrelated clip | **0.00** (floor) |
+
+    The ceiling is below 100 even on identical frames. Severe blur and an unrelated
+    broadcast clip both hit the floor: two arms near 0 are not ranked. Use PSNR or
+    LPIPS to separate anything in that region.
     """
 
     name = VMAF.name

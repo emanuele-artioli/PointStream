@@ -221,6 +221,162 @@ def test_metric_absolute_scale_matches_its_published_range(name: str) -> None:
 
 
 # ---------------------------------------------------------------------------
+# BP27: BP23 tier anchors on real 4K content.
+#
+# Numbers from outputs/bp23-tier/metric-calibration.json and metric-notes.md.
+# Pin them; do not re-derive. Tolerances are wide enough for a different
+# ffmpeg/torch build and narrow enough to catch crossed VMAF inputs or an
+# uncalibrated LPIPS stand-in.
+#
+# Deliberately not covered here: PSNR/SSIM tier anchors (BP23 already pins
+# ordering in calibrate.py); LPIPS mild-blur absolute at 960×540; VMAF mild-blur
+# absolute scale; any metric on synthetic procedural textures (covered above).
+# ---------------------------------------------------------------------------
+
+#: BP23 measured on 2 frames of alcaraz_highlights/scene_000 at 3840×2160.
+_BP23_VMAF_IDENTICAL = 97.54
+_BP23_VMAF_FLOOR = 0.0
+_BP23_VMAF_TOLERANCE = 2.0
+
+_BP23_LPIPS_4K: dict[str, float] = {
+    "identical": 0.0,
+    "mild-blur": 0.0171,
+    "severe-blur": 0.2982,
+    "unrelated-clip": 0.5493,
+}
+_BP23_LPIPS_TOLERANCE = 0.08
+
+#: At 960×540 severe blur scores worse than unrelated — inversion from 4K.
+_BP23_LPIPS_960_SEVERE = 0.613
+_BP23_LPIPS_960_UNRELATED = 0.522
+_BP23_LPIPS_960_TOLERANCE = 0.12
+
+
+def _tier_reference_4k(n_frames: int = 2) -> np.ndarray:
+    """First ``n_frames`` of the BP23 calibration clip at native 4K."""
+    from experiments.tier.clip import ClipUnusable, load_tier_clip
+
+    try:
+        return load_tier_clip(n_frames=n_frames).frames
+    except ClipUnusable as exc:
+        pytest.skip(str(exc))
+
+
+def _tier_anchor_table(reference: np.ndarray) -> dict[str, np.ndarray]:
+    from experiments.tier.calibrate import _unrelated_frames, anchors
+
+    table = anchors(reference)
+    if "unrelated-clip" not in table:
+        unrelated_4k = _unrelated_frames((reference.shape[0], 2160, 3840, 3))
+        if unrelated_4k is None:
+            pytest.skip("unrelated anchor frames unavailable at native 4K")
+        height, width = int(reference.shape[1]), int(reference.shape[2])
+        table["unrelated-clip"] = _downscale_frames(unrelated_4k, width, height)
+    return table
+
+
+def _downscale_frames(frames: np.ndarray, width: int, height: int) -> np.ndarray:
+    import cv2
+
+    return np.stack(
+        [cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA) for frame in frames]
+    )
+
+
+def test_vmaf_tier_anchor_ceiling_is_below_100_on_identical_4k() -> None:
+    """VMAF does not reach 100 on identical tier frames at 4K — ceiling is ~97.5."""
+    from src.components.metrics import REGISTRY
+
+    reference = _tier_reference_4k()
+    metric = cast(MetricBackend, REGISTRY.build("vmaf"))
+    try:
+        score = metric.score(reference, reference)
+    except RuntimeError as exc:
+        pytest.skip(f"vmaf backend unavailable: {exc}")
+
+    assert abs(score - _BP23_VMAF_IDENTICAL) <= _BP23_VMAF_TOLERANCE, (
+        f"VMAF identical tier anchor is {score:.2f}, expected ~{_BP23_VMAF_IDENTICAL} "
+        f"(±{_BP23_VMAF_TOLERANCE}). A score near 100 means crossed libvmaf inputs."
+    )
+    assert score < 99.0, (
+        f"VMAF identical tier anchor is {score:.2f} — above 99, so the ceiling "
+        "reads as 'almost perfect' rather than 'at the top of this host's scale'."
+    )
+
+
+def test_vmaf_tier_anchor_floors_at_zero_for_severe_and_unrelated_4k() -> None:
+    """Severe blur and an unrelated clip both hit VMAF's floor on tier content."""
+    from src.components.metrics import REGISTRY
+
+    reference = _tier_reference_4k()
+    table = _tier_anchor_table(reference)
+    metric = cast(MetricBackend, REGISTRY.build("vmaf"))
+    try:
+        severe = metric.score(reference, table["severe-blur"])
+        unrelated = metric.score(reference, table["unrelated-clip"])
+    except RuntimeError as exc:
+        pytest.skip(f"vmaf backend unavailable: {exc}")
+
+    assert severe <= _BP23_VMAF_FLOOR + 1.0, (
+        f"VMAF severe-blur tier anchor is {severe:.2f}, above the measured floor "
+        f"({_BP23_VMAF_FLOOR}). The instrument no longer saturates at the bottom."
+    )
+    assert unrelated <= _BP23_VMAF_FLOOR + 1.0, (
+        f"VMAF unrelated-clip tier anchor is {unrelated:.2f}, above the measured "
+        f"floor ({_BP23_VMAF_FLOOR}). Quote unrelated beside any VMAF score."
+    )
+
+
+def test_lpips_tier_anchor_absolute_scale_at_4k() -> None:
+    """LPIPS absolute scale on tier anchors at 4K — ordering alone is not enough."""
+    from src.components.metrics import REGISTRY
+
+    reference = _tier_reference_4k()
+    table = _tier_anchor_table(reference)
+    metric = cast(MetricBackend, REGISTRY.build("lpips"))
+    failures: list[str] = []
+    for name, expected in _BP23_LPIPS_4K.items():
+        try:
+            score = metric.score(reference, table[name])
+        except RuntimeError as exc:
+            pytest.skip(f"lpips backend unavailable: {exc}")
+        if abs(score - expected) > _BP23_LPIPS_TOLERANCE:
+            failures.append(f"{name}: got {score:.4f}, expected {expected:.4f}")
+    assert not failures, (
+        "LPIPS tier anchors at 4K drifted from BP23 calibration: "
+        + "; ".join(failures)
+        + f" (tolerance ±{_BP23_LPIPS_TOLERANCE})."
+    )
+
+
+def test_lpips_anchor_ordering_inverts_when_downscaled_to_960x540() -> None:
+    """LPIPS anchors measured at 4K do not transfer to 960×540."""
+    from src.components.metrics import REGISTRY
+
+    reference = _downscale_frames(_tier_reference_4k(), 960, 540)
+    table = _tier_anchor_table(reference)
+    metric = cast(MetricBackend, REGISTRY.build("lpips"))
+    try:
+        severe = metric.score(reference, table["severe-blur"])
+        unrelated = metric.score(reference, table["unrelated-clip"])
+    except RuntimeError as exc:
+        pytest.skip(f"lpips backend unavailable: {exc}")
+
+    assert severe > unrelated, (
+        f"At 960×540 LPIPS should invert: severe blur ({severe:.4f}) worse than "
+        f"unrelated ({unrelated:.4f}). A 4K calibration does not transfer."
+    )
+    assert abs(severe - _BP23_LPIPS_960_SEVERE) <= _BP23_LPIPS_960_TOLERANCE, (
+        f"960×540 severe-blur LPIPS is {severe:.4f}, expected "
+        f"~{_BP23_LPIPS_960_SEVERE} (±{_BP23_LPIPS_960_TOLERANCE})."
+    )
+    assert abs(unrelated - _BP23_LPIPS_960_UNRELATED) <= _BP23_LPIPS_960_TOLERANCE, (
+        f"960×540 unrelated-clip LPIPS is {unrelated:.4f}, expected "
+        f"~{_BP23_LPIPS_960_UNRELATED} (±{_BP23_LPIPS_960_TOLERANCE})."
+    )
+
+
+# ---------------------------------------------------------------------------
 # BP18: the identity metric, calibrated on real players.
 #
 # These need `assets/dataset` and the ReID weights, so they are marked
