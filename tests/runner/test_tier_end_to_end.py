@@ -110,7 +110,7 @@ def _run_tier(name: str):
         config = config.with_(
             evaluation=dataclasses.replace(
                 config.evaluation,
-                metrics=[metric for metric in asked if metric != "vmaf"],
+                metrics=tuple(metric for metric in asked if metric != "vmaf"),
             )
         )
     counters = {
