@@ -32,13 +32,14 @@ from experiments.probe.clips import (
     with_appearance,
 )
 from experiments.probe.engines import CANVAS, SEED
-from experiments.probe.reid_pass import _crop, _crop_on_canvas
 from experiments.probe.run import (
     _coding_bundle,
     _score_coding,
     donor_appearances,
     predict_static_copy,
 )
+from experiments.probe.score import _letterbox_mask, _mask_bbox
+from src.components.generation._numpy import as_hwc, prepare_letterboxed
 from src.components.generation.controlnet import ControlNetGenerator
 from src.components.metrics.comparison import compare_paired
 from src.components.metrics.lpips import LpipsMetric
@@ -50,6 +51,9 @@ log = logging.getLogger("bp25")
 
 WEIGHTS = Path("assets") / "weights" / "ip-adapter-trained"
 STOCK_NUMBER_TO_BEAT = 0.7606
+ALARM_PASTE_THROUGH = 0.45
+ALARM_WORSE_THAN_UNRELATED = 0.74
+ALARM_SAME_PERSON = 0.8663
 
 # Written to disk before any generate. Do not edit after looking at a result.
 BOUNDS = {
@@ -97,6 +101,27 @@ BOUNDS = {
         "basis": "BP19 / TENNIS_SCALE. Ceiling is semantic appearance, not identity.",
     },
 }
+
+
+def _crop(rgb: np.ndarray, mask: np.ndarray) -> np.ndarray:
+    prepared = prepare_letterboxed(rgb, None, CANVAS, CANVAS)
+    hwc = as_hwc(prepared["appearance"])[..., :3]
+    letterboxed = _letterbox_mask(mask, prepared["letterbox"])
+    box = _mask_bbox(letterboxed)
+    if box is None:
+        raise ValueError("empty player mask; reid cannot score a hole")
+    x1, y1, x2, y2 = box
+    return hwc[y1:y2, x1:x2]
+
+
+def _crop_on_canvas(canvas_hwc: np.ndarray, rgb_for_box: np.ndarray, mask: np.ndarray) -> np.ndarray:
+    prepared = prepare_letterboxed(rgb_for_box, None, CANVAS, CANVAS)
+    letterboxed = _letterbox_mask(mask, prepared["letterbox"])
+    box = _mask_bbox(letterboxed)
+    if box is None:
+        raise ValueError("empty player mask; reid cannot score a hole")
+    x1, y1, x2, y2 = box
+    return as_hwc(canvas_hwc)[y1:y2, x1:x2, :3]
 
 
 def _mean_se(values: list[float]) -> tuple[float, float]:
@@ -337,24 +362,19 @@ def _describe(comparison) -> str:
 
 def _alarms(lpips_mean: float, reid_mean: float | None) -> list[str]:
     fired: list[str] = []
-    lpips_bounds = BOUNDS["object_lpips"]
-    if lpips_mean < lpips_bounds["alarm_paste_through_below"]:
+    if lpips_mean < ALARM_PASTE_THROUGH:
         fired.append(
-            f"LPIPS {lpips_mean:.4f} below paste-through alarm "
-            f"{lpips_bounds['alarm_paste_through_below']}"
+            f"LPIPS {lpips_mean:.4f} below paste-through alarm {ALARM_PASTE_THROUGH}"
         )
-    if lpips_mean > lpips_bounds["alarm_worse_than_unrelated_above"]:
+    if lpips_mean > ALARM_WORSE_THAN_UNRELATED:
         fired.append(
             f"LPIPS {lpips_mean:.4f} above worse-than-unrelated alarm "
-            f"{lpips_bounds['alarm_worse_than_unrelated_above']}"
+            f"{ALARM_WORSE_THAN_UNRELATED}"
         )
-    if reid_mean is not None:
-        reid_bounds = BOUNDS["reid"]
-        if reid_mean >= reid_bounds["alarm_same_person_anchor"] - 0.02:
-            fired.append(
-                f"reid {reid_mean:.4f} at the same-person anchor "
-                f"{reid_bounds['alarm_same_person_anchor']}"
-            )
+    if reid_mean is not None and reid_mean >= ALARM_SAME_PERSON - 0.02:
+        fired.append(
+            f"reid {reid_mean:.4f} at the same-person anchor {ALARM_SAME_PERSON}"
+        )
     return fired
 
 
