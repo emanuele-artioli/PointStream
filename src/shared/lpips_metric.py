@@ -1,4 +1,6 @@
-"""LPIPS-like perceptual distance — an uncalibrated VGG-19-bn feature metric.
+"""Pinned: still used by scripts/eval_checkpoint.py. Not retired in BP15.
+
+LPIPS-like perceptual distance — an uncalibrated VGG-19-bn feature metric.
 
 **This is not the official LPIPS** ("The Unreasonable Effectiveness of Deep
 Features as a Perceptual Metric", Zhang et al. 2018). Real LPIPS applies a

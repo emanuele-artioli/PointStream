@@ -1,3 +1,4 @@
+"""Pinned: still used by eval_checkpoint, evaluate_experiments, codec_baseline_sweep, hnerv_baseline. Not retired in BP15."""
 from __future__ import annotations
 from pathlib import Path
 from typing import Any

@@ -1,4 +1,6 @@
-"""HNeRV (Hybrid Neural Representation for Videos, arXiv 2304.02633) architecture.
+"""Pinned: still used by scripts/hnerv_baseline.py. Not retired in BP15.
+
+HNeRV (Hybrid Neural Representation for Videos, arXiv 2304.02633) architecture.
 
 Learned-codec comparison baseline for `67a9ea6275d3d9785ce57026/RESEARCH_LOG.md "Codec anchors"`
 (reviewer-critical gap R2/R5, `67a9ea6275d3d9785ce57026/reviewers_comments.md`). HNeRV encodes a

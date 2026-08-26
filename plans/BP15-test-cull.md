@@ -78,3 +78,74 @@ than dropping it — and say which ones you ported.
 - `python -m src.contracts.layers` is clean and the suite is green without the
   D6 `xfail`s.
 - The report says what was ported rather than deleted, and why.
+
+## Delivered
+
+Wave 3 Stream B on `wave3/bp15-cull`. Encoder / `src.main` / the three generation
+moves were already on main (`14d7ef2`, `6390e3e`). This stream did the remainder:
+`src/decoder/**` and `src/shared/**`. PR:
+https://github.com/emanuele-artioli/PointStream/pull/19
+
+**Ported:** nothing. `eval_checkpoint.py` still has to call
+`src.decoder.genai_compositor.build_genai_strategy` — that is the Residual
+Guarantee for eval (same classes the old decoder ran). The new
+`BaseFrameGenerator.generate(ConditioningBundle, *, seed, device, params)` is a
+different API. Porting it would be a rewrite, not a mechanical move, so
+compositing stays.
+
+**Deleted (decoder, `3eece7d`):**
+- `src/decoder/decoder_renderer.py` — no rewrite inbound, no training/eval
+  script. Only `tests/test_decoder_genai_debug_parity.py` called it.
+- `src/decoder/compositor.py` (`ResidualCompositor`) — only `DecoderRenderer`
+  used it. The new runner has `src.pipeline.residual.signal`.
+- `tests/test_decoder_genai_debug_parity.py` — goes with `DecoderRenderer`
+  (that was the failure mode).
+
+**Tagged and left (decoder):** compositing package, `genai_compositor` shim,
+`controlnet_engine` / `pix2pix_engine` / `spade4tennis_engine`,
+`attention_injection`. Callers: `scripts/eval_checkpoint.py` and
+`tests/components/test_spade4tennis.py`.
+
+**Deleted (shared, `dd8c2ae`):**
+- `src/shared/synthesis_engine.py` + `tests/test_synthesis_engine_coverage.py`
+  + the two `SynthesisEngine` tests in `tests/test_panorama_encoder.py`.
+  Panorama encoder tests stay; they test `src.transport.panorama_encoder`.
+- `src/shared/mask_codec.py` + `tests/test_mask_codec.py` +
+  `tests/test_mask_codec_coverage.py`. Only `DecoderRenderer` imported the
+  module.
+- `src/shared/profiling.py` + `tests/test_profiling.py`. Same.
+- `src/shared/track_id.py`. Only `DecoderRenderer`. The `track_id` asserts in
+  `tests/test_coverage_utilities.py` went with it; the dtype assert stays.
+
+**Tagged and left (shared):** `schemas`, `interfaces`, `tags` (`src.transport.disk`);
+`dwpose_draw` (`animate_anyone_runtime` and compositing); `video_io`,
+`experiment_evaluation`, `fvd`, `lpips_metric`, `config` (eval / hnerv /
+codec-baseline scripts); `tennis_dataset` (pix2pix/spade training,
+`eval_checkpoint.pad_to_square`, `debug_dataloader` — the two-naming-convention
+docstring is still on the class); `geometry`, `player_extraction`,
+`racket_heuristic`, `scene_classification` (`process_dataset`); `hnerv_arch`;
+`genai_debug` (compositing); `invariants` (`tests/invariants/test_outputs_tree.py`).
+`train_controlnet.py` was not edited. It does not import `tennis_dataset`; it
+copies the positional-pairing comment and has its own dataset class.
+
+**`benchmark_mask_codecs` (`aecd107`):** deleted the script and
+`tests/test_benchmark_mask_codecs.py`. It subprocessed `-m src.main`, which is
+gone. Rewriting it against the new runner is another stream's pipeline work.
+
+**Coverage gate:** still 77. Deleting those tests did not drop CI below the
+floor, so the gate was not lowered.
+
+**CI watched green:**
+- decoder `3eece7d`: [32746645150](https://github.com/emanuele-artioli/PointStream/actions/runs/32746645150)
+- shared `dd8c2ae`: [32747406198](https://github.com/emanuele-artioli/PointStream/actions/runs/32747406198)
+- benchmark `aecd107`: [32747869455](https://github.com/emanuele-artioli/PointStream/actions/runs/32747869455)
+
+**Outside this stream's files:**
+- Unexpected live rewrite import: `src.components.generation.animate_anyone_runtime`
+  still imports `src.shared.dwpose_draw`. There is no skeleton-drawing
+  replacement under `src.components.generation` (`pose.py` is letterbox only),
+  so `dwpose_draw` is tagged, not moved.
+- `tests/components/test_spade4tennis.py` still constructs
+  `src.decoder.spade4tennis_engine.Spade4TennisStrategy`.
+- `src.components.scene.hsv` mentions `src.shared.scene_classification` in a
+  docstring only; it does not import it.
