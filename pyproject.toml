@@ -74,8 +74,6 @@ omit = [
   "config-*.py",
   "*/config-*.py",
   "src/components/generation/animate_anyone_runtime.py",
-  "src/shared/player_extraction.py",
-  "src/shared/racket_heuristic.py",
   "src/shared/tennis_dataset.py",
   "scripts/*.py",
   "scripts/benchmark_player_backends.py",

@@ -916,9 +916,8 @@ the training path). They stay in condemned `src.shared` until that stream
 lands. `src/shared/{schemas,interfaces,tags}.py` stay too: the only caller is
 legacy `src.transport.disk`, which this stream does not own. `src.decoder` and
 `scripts/eval_checkpoint.py` are gone — that script was the decoder's last
-caller. Remaining pre-rewrite scripts (`process_dataset`, `hnerv_baseline`,
-and the like) are not rewritten here; modules they uniquely need stay until
-those scripts move. The rest of `src/shared/` dies with its tests.
+caller. Remaining pre-rewrite training scripts keep ``tennis_dataset``. The
+rest of `src/shared/` that this stream could delete is gone.
 
 ### The ablation lattice
 
