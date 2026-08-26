@@ -1,4 +1,6 @@
-"""Compositing actors onto the reconstructed background.
+"""Pinned: still used by scripts/eval_checkpoint.py via DiffusersCompositor. Not retired in BP15.
+
+Compositing actors onto the reconstructed background.
 
 `DiffusersCompositor` is the decoder half of the Residual Guarantee: it
 must reconstruct exactly what the encoder's SynthesisEngine did, or the

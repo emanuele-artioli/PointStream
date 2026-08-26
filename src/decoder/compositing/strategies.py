@@ -1,4 +1,6 @@
-"""The generative strategies a run can select.
+"""Pinned: still used by scripts/eval_checkpoint.py via build_genai_strategy. Not retired in BP15.
+
+The generative strategies a run can select.
 
 Selected by name string from config, so the mapping between a config
 value and the class chosen here is part of the config contract."""

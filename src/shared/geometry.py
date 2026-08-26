@@ -1,3 +1,4 @@
+"""Pinned: still used by scripts/process_dataset.py and player_extraction. Not retired in BP15."""
 import cv2
 import numpy as np
 

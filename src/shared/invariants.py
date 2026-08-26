@@ -1,4 +1,6 @@
-"""Machine-checkable versions of the methodology rules in CLAUDE.md.
+"""Pinned: still used by tests/invariants/test_outputs_tree.py. Not retired in BP15.
+
+Machine-checkable versions of the methodology rules in CLAUDE.md.
 
 The rules that matter here are the ones a bad run does not announce. A pipeline
 that silently fell back to a mock source, or whose payload accounting does not

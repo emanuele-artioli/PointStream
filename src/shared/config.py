@@ -1,3 +1,4 @@
+"""Pinned: still used by scripts/eval_checkpoint.py (PointstreamConfig). Not retired in BP15."""
 from dataclasses import dataclass, field, fields
 import json
 from pathlib import Path

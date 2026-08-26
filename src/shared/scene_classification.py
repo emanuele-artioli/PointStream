@@ -1,4 +1,6 @@
-"""Point-anchored scene classification (report 2, report 10 Phase 1).
+"""Pinned: still used by scripts/process_dataset.py. Not retired in BP15.
+
+Point-anchored scene classification (report 2, report 10 Phase 1).
 
 Splits a video's HSV/motion scene-score signal into scenes and classifies
 each as a low-motion "point" (eligible for the semantic pipeline) or a
