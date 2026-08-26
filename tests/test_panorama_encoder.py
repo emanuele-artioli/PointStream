@@ -151,3 +151,37 @@ def test_read_panorama_pixels_from_path_dispatches_by_suffix(tmp_path: Path) -> 
     png_path.write_bytes(png_bytes)
     decoded_png = read_panorama_pixels_from_path(png_path)
     assert np.array_equal(decoded_png, image)  # PNG is lossless
+
+
+def test_encode_writes_jpeg_and_png_suffixes_and_rejects_bad_inputs(tmp_path: Path) -> None:
+    """Ported from tests/test_coverage_utilities.py — path encode and factory rejects."""
+    image = np.zeros((12, 16, 3), dtype=np.uint8)
+    image[:, :, 1] = 255
+
+    jpeg_encoder = build_panorama_encoder("jpeg")
+    assert isinstance(jpeg_encoder, JpegPanoramaEncoder)
+    jpeg_path = jpeg_encoder.encode(image, tmp_path / "pano_jpeg")
+    assert jpeg_path.suffix == ".jpg"
+    assert jpeg_path.exists()
+
+    png_encoder = build_panorama_encoder("png")
+    assert isinstance(png_encoder, PngPanoramaEncoder)
+    png_path = png_encoder.encode(image, tmp_path / "pano_png")
+    assert png_path.suffix == ".png"
+    assert png_path.exists()
+
+    with pytest.raises(ValueError, match=r"expected \[H, W, 3\]"):
+        jpeg_encoder.encode(np.zeros((12, 16), dtype=np.uint8), tmp_path / "bad")
+
+    try:
+        from pydantic import ValidationError
+
+        with pytest.raises((ValidationError, ValueError)):
+            build_panorama_encoder(
+                "jpeg", config=PointstreamConfig(panorama_jpeg_quality="bad")
+            )  # type: ignore[arg-type]
+    except ImportError:
+        pass
+
+    with pytest.raises(ValueError, match="Unsupported panorama encoder"):
+        build_panorama_encoder("webp")
