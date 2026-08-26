@@ -1,1 +1,5 @@
-"""Pinned: still used by transport, generation, and training/eval scripts. Not retired in BP15."""
+"""Condemned pre-rewrite leftovers (BP22). Not a layer.
+
+Occupants: Stream B training path, tennis_dataset, and the old schemas
+``src.transport.disk`` still imports.
+"""

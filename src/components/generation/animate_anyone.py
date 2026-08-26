@@ -8,9 +8,7 @@ the training meta is the source of truth. A full retrain is out of scope.
 
 This wrapper loads the Moore-AnimateAnyone pipeline against a local profile
 (default: ``~/Models/AnimateAnyone/profiles/finetuned_tennis``) and consumes
-``ConditioningBundle`` pose *images*, not raw keypoints. ``scripts/eval_checkpoint.py``
-still has no ``animate-anyone`` entry in ``ARCH_CHOICES`` — that script is owned
-elsewhere; the required change is reported with this stream, not made here.
+``ConditioningBundle`` pose *images*, not raw keypoints.
 """
 
 from __future__ import annotations

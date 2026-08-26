@@ -1,20 +1,18 @@
+"""Skeleton drawing for generators that put a pose on a canvas.
+
+Ported from tests/test_coverage_utilities.py (BP22). Not tested here: the
+third-party ``dwpose.draw_poses`` internals; the fallback path is what we own.
+"""
+
 from __future__ import annotations
 
-from pathlib import Path
 import sys
 import types
-import numpy as np
-from src.shared.config import PointstreamConfig
-import pytest
-import torch
 
-from src.shared import dwpose_draw
-from src.components.generation import torch_dtype as td
-from src.transport.panorama_encoder import (
-    JpegPanoramaEncoder,
-    PngPanoramaEncoder,
-    build_panorama_encoder,
-)
+import numpy as np
+import pytest
+
+from src.components.generation import dwpose_draw
 
 
 def test_dw18_to_pose_results_and_canvas_draw(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -110,37 +108,3 @@ def test_dwpose_canvas_falls_back_when_renderer_fails(monkeypatch: pytest.Monkey
     canvas = dwpose_draw.draw_dwpose_canvas(height=32, width=24, people_dw=pose, confidence_threshold=0.2)
     assert canvas.shape == (32, 24, 3)
     assert int(canvas.max()) > 0
-
-
-def test_dtype_helpers() -> None:
-    assert td.parse_gpu_dtype("fp16") == torch.float16
-
-
-def test_panorama_encoder_build_and_validate(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    image = np.zeros((12, 16, 3), dtype=np.uint8)
-    image[:, :, 1] = 255
-
-    jpeg_encoder = build_panorama_encoder("jpeg")
-    assert isinstance(jpeg_encoder, JpegPanoramaEncoder)
-    jpeg_path = jpeg_encoder.encode(image, tmp_path / "pano_jpeg")
-    assert jpeg_path.suffix == ".jpg"
-    assert jpeg_path.exists()
-
-    png_encoder = build_panorama_encoder("png")
-    assert isinstance(png_encoder, PngPanoramaEncoder)
-    png_path = png_encoder.encode(image, tmp_path / "pano_png")
-    assert png_path.suffix == ".png"
-    assert png_path.exists()
-
-    with pytest.raises(ValueError, match=r"expected \[H, W, 3\]"):
-        jpeg_encoder.encode(np.zeros((12, 16), dtype=np.uint8), tmp_path / "bad")
-
-    try:
-        from pydantic import ValidationError
-        with pytest.raises((ValidationError, ValueError)):
-            build_panorama_encoder("jpeg", config=PointstreamConfig(panorama_jpeg_quality="bad"))  # type: ignore[arg-type]
-    except ImportError:
-        pass
-
-    with pytest.raises(ValueError, match="Unsupported panorama encoder"):
-        build_panorama_encoder("webp")
