@@ -155,7 +155,7 @@ def render_pose_with_racket(
     Note: Coordinates in person_kpts and racket_bbox are assumed to be in the original image coordinate space
     (NOT normalized to [0,1]). If they are relative to the bounding box crop, width and height should be the crop size.
     """
-    from src.shared.dwpose_draw import draw_dwpose_canvas
+    from src.components.generation.dwpose_draw import draw_dwpose_canvas
     
     # dwpose_draw expects normalized coordinates for the drawing fallback, or absolute for draw_poses
     # wait, draw_dwpose_canvas expects absolute coordinates if values > 1.5, otherwise assumes normalized.

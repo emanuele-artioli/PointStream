@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 import numpy as np
 import torch
-from src.shared.dwpose_draw import draw_dwpose_canvas
+from src.components.generation.dwpose_draw import draw_dwpose_canvas
 from src.shared.racket_heuristic import render_pose_with_racket
 _LOGGER = logging.getLogger(__name__)
 
