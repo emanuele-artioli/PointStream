@@ -9,7 +9,7 @@
 # ceiling calibration, not an operating point.
 #
 # Perception names the extra-large backends (the dataset-curation quality tier).
-# As on the other tiers those names do not yet drive anything; see `tier_fast`.
+# The runner binds these names (BP26).
 #
 # Generation stays off — see `tier_fast.yaml` for why.
 

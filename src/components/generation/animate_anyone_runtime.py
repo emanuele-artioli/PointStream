@@ -11,7 +11,7 @@ import cv2
 import numpy as np
 import torch
 
-from src.shared.dwpose_draw import draw_dwpose_canvas
+from src.components.generation.dwpose_draw import draw_dwpose_canvas
 from src.components.generation.torch_dtype import is_cuda_device_usable, resolve_torch_dtype_for_device
 
 

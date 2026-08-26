@@ -68,9 +68,11 @@ LAYER_PACKAGES: dict[str, str] = {
 #: legacy code may import anything, and anything may import legacy code, because
 #: forbidding either would just stall the rebuild. Delete entries as they are
 #: replaced; when this is empty, remove it.
+#:
+#: BP22: ``src.shared`` stays condemned. It is not promoted to a layer. New
+#: code does not go here. The set shrinks as callers move or die.
 LEGACY_PACKAGES: frozenset[str] = frozenset(
     {
-        "src.decoder",
         "src.shared",
         "src.transport",
     }

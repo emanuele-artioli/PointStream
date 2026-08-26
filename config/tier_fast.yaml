@@ -39,13 +39,8 @@ lattice:
   generation: false
   residual: true
 
-# Perception: nano-tier backends, the real-time class.
-#
-# Measured in BP23 and true as of that date: the runner's default stage
-# callables for these axes are pass-throughs — they forward artifacts the caller
-# put on the bag and do not load a detector. Changing the names below therefore
-# changes nothing in a run today. They state the tier's intent; they do not yet
-# drive it.
+# Perception backends. The runner binds these names (BP26). A test that
+# supplies `objects=` still skips the detector so CI never loads YOLO.
 detector:
   backend: yolo
   model: yolo26n.pt

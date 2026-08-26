@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
 
-from src.shared.config import PointstreamConfig
 from src.transport.panorama_encoder import (
     JpegPanoramaEncoder,
     PngPanoramaEncoder,
@@ -131,7 +131,12 @@ def test_roi_video_codec_id_distinguishes_crf() -> None:
 
 
 def test_build_panorama_encoder_supports_roi_video() -> None:
-    config = PointstreamConfig(panorama_codec="roi-video", panorama_roi_crf=25, panorama_roi_preset="veryfast")
+    config = SimpleNamespace(
+        panorama_codec="roi-video",
+        panorama_roi_crf=25,
+        panorama_roi_preset="veryfast",
+        panorama_jpeg_quality=None,
+    )
     encoder = build_panorama_encoder(config=config)
     assert isinstance(encoder, RoiVideoPanoramaEncoder)
     assert "crf25" in encoder.codec_id
@@ -151,3 +156,27 @@ def test_read_panorama_pixels_from_path_dispatches_by_suffix(tmp_path: Path) -> 
     png_path.write_bytes(png_bytes)
     decoded_png = read_panorama_pixels_from_path(png_path)
     assert np.array_equal(decoded_png, image)  # PNG is lossless
+
+
+def test_encode_writes_jpeg_and_png_suffixes_and_rejects_bad_inputs(tmp_path: Path) -> None:
+    """Ported from tests/test_coverage_utilities.py — path encode and factory rejects."""
+    image = np.zeros((12, 16, 3), dtype=np.uint8)
+    image[:, :, 1] = 255
+
+    jpeg_encoder = build_panorama_encoder("jpeg")
+    assert isinstance(jpeg_encoder, JpegPanoramaEncoder)
+    jpeg_path = jpeg_encoder.encode(image, tmp_path / "pano_jpeg")
+    assert jpeg_path.suffix == ".jpg"
+    assert jpeg_path.exists()
+
+    png_encoder = build_panorama_encoder("png")
+    assert isinstance(png_encoder, PngPanoramaEncoder)
+    png_path = png_encoder.encode(image, tmp_path / "pano_png")
+    assert png_path.suffix == ".png"
+    assert png_path.exists()
+
+    with pytest.raises(ValueError, match=r"expected \[H, W, 3\]"):
+        jpeg_encoder.encode(np.zeros((12, 16), dtype=np.uint8), tmp_path / "bad")
+
+    with pytest.raises(ValueError, match="Unsupported panorama encoder"):
+        build_panorama_encoder("webp")
