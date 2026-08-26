@@ -75,11 +75,28 @@ def bind_generator(
     return from_spec(spec, backend)
 
 
-def bind_evaluator(injected: QualityEvaluator | None = None) -> QualityEvaluator:
-    """C1's numpy PSNR floor, unless a richer evaluator was injected."""
+def bind_evaluator(
+    injected: QualityEvaluator | None = None,
+    config: PointstreamConfig | None = None,
+) -> QualityEvaluator:
+    """The scorer this run uses.
+
+    An injected evaluator wins. Otherwise the config's `evaluation.metrics`
+    decides: PSNR alone stays on C1's numpy floor, anything richer binds the
+    components-layer metric registry. Without a config the floor is used, which
+    is what every existing caller that passes only chunks gets.
+
+    This is the only place `evaluation.metrics` becomes something that runs. It
+    was previously a field nothing read, so a config naming SSIM and VMAF
+    produced PSNR and said nothing about it.
+    """
     if injected is not None:
         return injected
-    return NumpyPsnrEvaluator()
+    if config is None:
+        return NumpyPsnrEvaluator()
+    from src.runner.evaluation import evaluator_for
+
+    return evaluator_for(config)
 
 
 def bind_backends(
