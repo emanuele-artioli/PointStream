@@ -919,6 +919,47 @@ legacy `src.transport.disk`, which this stream does not own. `src.decoder` and
 caller. Remaining pre-rewrite training scripts keep ``tennis_dataset``. The
 rest of `src/shared/` that this stream could delete is gone.
 
+### What the codec stage codes (BP24, 2026-08-26)
+
+**Decision: the codec stage codes the transmitted payload, not the delivered
+pixels.** C3 left this stage an identity round-trip and did not choose; this is
+the choice, made before any encoder was bound.
+
+PointStream does not transmit a pixel grid. It transmits a background plate
+established once, per-object appearance, per-frame motion, an optional
+corrective residual, and metadata; the client *reconstructs* frames from those.
+Running an encoder over the delivered frames would measure "PointStream's output,
+re-encoded" — a number that double-counts the reconstruction and corresponds to
+nothing the system sends. So the encoder runs over **each transmitted component**,
+and `byte_count` is the sum of real coded sizes.
+
+**The contract.** The codec stage keeps returning the delivered `frames`
+unchanged — reconstruction is not its job and quality must not move when only the
+accounting changes. What changes is the accounting: it returns a per-component
+breakdown of **coded** bytes alongside the total. The existing raw figures stay,
+under names that say they are raw, so BP23's table remains comparable and the
+change in meaning is visible rather than silent (`plans/BP24-encoder-boundary.md`
+step 3).
+
+| Component | Today | After BP24 |
+|---|---|---|
+| background plate | `nbytes` of the raw plate, and `_panorama_bytes` says so | intra encode via `background.codec` |
+| residual | `ResidualResult.payload.byte_count` | coded stream via `residual.codec` |
+| appearance | measured payload bytes | coded where the representation is an image; unchanged otherwise |
+| motion + metadata | serialised bytes | unchanged — already the real transmitted size |
+| **all-off corner** | `source.nbytes` (raw) | **the conventional codec baseline** |
+
+**The all-off consequence is the useful one.** With a real encoder bound, the
+all-off corner stops being "raw source bytes" and becomes exactly the arm P0
+item 2 compares against: the source coded conventionally at a chosen rung. The
+codec ladder's baseline therefore falls out of this change rather than needing a
+separate harness.
+
+**What this does not license.** Until every component on a path is coded, that
+path's total is not a rate point, and `transport_to_source_ratio` is not a
+compression ratio. A partially-coded total is more misleading than an obviously
+raw one, so a path reports its ratio only when no component in it is still raw.
+
 ### The ablation lattice
 
 **Every component is optional, and the residual absorbs whatever the disabled
