@@ -101,3 +101,41 @@ than treating it as a failed job.
 - The best checkpoint is kept by task metric, not by recency.
 - A deliberately hopeless configuration is shown to stop by epoch 3–4 in a test.
 - The series and the stop reason are written to `outputs/`.
+
+---
+
+## Delivered — 2026-08-24
+
+Landed the stop rule **before any new training run**. Proof is a unit test, not
+another GPU campaign.
+
+**What went in.** `src/shared/training/stop.py` observes coding-task LPIPS
+(lower-better) and region PSNR. It never takes a diffusion loss. Bounds go to
+`bounds.json` in the constructor, before `observe` can be called.
+`scripts/train_controlnet.py` measures the static-copy floor and the
+unrelated-image null on 4 probe clips at offset 8, seed 42, **before step 0**,
+then evals those same items at epoch end (and every 2000 steps as a mid-epoch
+signal). Best weights are copied to `checkpoint-best` by LPIPS. The series and
+the stop reason go to `stop_series.json` under the run's `--output-dir`.
+
+**The stopping rule.** Never before epoch 3. Then: 3 epochs without a new best
+LPIPS (patience), **or** the last 3 epoch evals are still worse than the
+static-copy floor and not improving. Mid-epoch evals can update the best
+checkpoint; they cannot stop before epoch 3.
+
+**Hopeless config, in a test.** A flat series at LPIPS 0.70 / PSNR 11.18
+(below the §2.10 floor of 0.4505 / 13.51 dB) stops at **epoch 3**. A slow
+starter 0.70 → 0.62 → 0.54 is not killed. Patience on a run that already beat
+the floor fires at epoch 4. `tests/components/test_training_stop.py`.
+
+**What was deliberately not done.** No GPU training run in this commit — that
+is BP19, and it is gated on this rule. Stop-eval generation uses 4 DDIM steps
+on 4 clips; that number is not citable. `--no-task-stop` exists for a smoke
+that must not load LPIPS, and is off by default. Uni-ControlNet / IP-Adapter
+training is BP19.
+
+**Outside these files.** Stream B was told to leave `src/shared/training/`
+alone. `src/components/metrics/**` was not edited; the stop eval *uses*
+calibrated LPIPS and masked PSNR. The paper was not touched.
+
+**CI.** Watched green: GitHub Actions run `32747593873` on PR https://github.com/emanuele-artioli/PointStream/pull/20 (`wave3/bp14-bp19`).

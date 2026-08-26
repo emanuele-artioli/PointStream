@@ -987,3 +987,13 @@ def test_cross_appearance_arms_are_compared_on_their_deltas(tmp_path: Path) -> N
     between = report["between"][0]
     assert between["verdict"] == "clear"
     assert between["winner"] == "upscale-refine[different-video]"
+
+
+def test_multi_controlnet_is_measurable_without_joining_the_default_roster() -> None:
+    from experiments.probe.engines import EXTRA_PLANS, PLANS, plan_for
+
+    names = {plan.name for plan in PLANS}
+    assert "multi-controlnet" not in names
+    extra = plan_for("multi-controlnet")
+    assert extra.name == "multi-controlnet"
+    assert extra in EXTRA_PLANS

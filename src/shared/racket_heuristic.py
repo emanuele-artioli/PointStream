@@ -1,3 +1,4 @@
+"""Pinned: still used by scripts/process_dataset.py and decoder compositing. Not retired in BP15."""
 import math
 from typing import Tuple, Optional
 import numpy as np

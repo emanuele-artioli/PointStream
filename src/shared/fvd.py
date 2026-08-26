@@ -1,4 +1,6 @@
-"""Frechet Video Distance (FVD) — a spatiotemporal perceptual quality metric.
+"""Pinned: still used by experiment_evaluation and scripts/download_weights.py. Not retired in BP15.
+
+Frechet Video Distance (FVD) — a spatiotemporal perceptual quality metric.
 
 FVD is the video analogue of FID: instead of comparing single-image Inception
 features, it compares clip-level features from a pretrained action-recognition

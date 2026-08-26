@@ -1,3 +1,4 @@
+"""Pinned: still used by src.decoder.compositing.strategies (eval_checkpoint). Not retired in BP15."""
 from __future__ import annotations
 
 import logging

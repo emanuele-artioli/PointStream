@@ -79,7 +79,6 @@ omit = [
   # them reachable without a diffusion pipeline loaded.
   "src/decoder/compositing/strategies.py",
   "src/decoder/compositing/compositor.py",
-  "src/decoder/decoder_renderer.py",
   # The GPU/model-backed halves of the actors package. weights.py, heuristics.py
   # and payload.py are deliberately absent — splitting actor_components.py is
   # what made them reachable without model weights, and an entry here is a debt

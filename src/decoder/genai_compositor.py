@@ -1,4 +1,6 @@
-"""Backwards-compatible shim for the old single-module GenAI compositor.
+"""Pinned: still used by scripts/eval_checkpoint.py and the engine modules. Not retired in BP15.
+
+Backwards-compatible shim for the old single-module GenAI compositor.
 
 The implementation moved to the `src.decoder.compositing` package on
 2026-07-22. This path stays because several engines and tests bind to it

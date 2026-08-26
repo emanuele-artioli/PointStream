@@ -1,3 +1,4 @@
+"""Pinned: still used by eval/hnerv/codec-baseline scripts and experiment_evaluation. Not retired in BP15."""
 from __future__ import annotations
 
 from dataclasses import dataclass

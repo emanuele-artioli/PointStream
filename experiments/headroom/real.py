@@ -12,6 +12,7 @@ from dataclasses import dataclass
 import json
 from pathlib import Path
 import subprocess
+from collections.abc import Callable, Sequence
 from typing import Any
 
 import cv2
@@ -23,6 +24,17 @@ REPO = Path(__file__).resolve().parents[2]
 RAW_4K = REPO / "assets" / "raw_4k"
 DATASET = REPO / "assets" / "dataset"
 DERIVED_SUFFIXES = ("_skeleton", "_canny", "_pose_body", "_pose_racket")
+PREFERRED_VIDEOS = (
+    "alcaraz_highlights",
+    "federer_djokovic",
+    "sinner_alcaraz",
+    "alcaraz_perricard",
+    "djokovic_federer",
+    "djokovic_zverev",
+    "alcaraz_ruud",
+)
+MIN_CLIPS = 8
+MIN_MATCHES = 4
 OPAQUE = 128
 PASTE_MAE_MAX = 2.0
 
@@ -485,36 +497,123 @@ def load_rgb_stack(paths: list[Path]) -> np.ndarray:
     return np.stack([_read_rgb(path) for path in paths], axis=0)
 
 
-def choose_two_point_scenes() -> list[dict[str, Any]]:
-    preferred = (
-        "alcaraz_highlights",
-        "federer_djokovic",
-        "sinner_alcaraz",
-        "alcaraz_perricard",
+def list_match_names(dataset: Path | None = None) -> list[str]:
+    root = DATASET if dataset is None else dataset
+    if not root.is_dir():
+        return []
+    preferred = [name for name in PREFERRED_VIDEOS if (root / name).is_dir()]
+    extra = sorted(
+        path.name
+        for path in root.iterdir()
+        if path.is_dir() and path.name not in preferred
     )
-    videos = [name for name in preferred if (DATASET / name).is_dir()]
-    videos.extend(
-        sorted(
-            path.name
-            for path in DATASET.iterdir()
-            if path.is_dir() and path.name not in videos
-        )
-    )
+    return preferred + extra
+
+
+def iter_point_scenes_spread(
+    n: int | None = None,
+    *,
+    videos: Sequence[str] | None = None,
+    scene_lister: Callable[[str], list[dict[str, Any]]] | None = None,
+) -> list[dict[str, Any]]:
+    """Eligible ``cluster_point`` scenes, round-robin across matches.
+
+    Spread comes first: the k-th scene of every match is taken before the
+    (k+1)-th of any match, so eight scenes are not eight from one match.
+    Interludes are already excluded by ``point_scenes``. ``n`` caps the
+    list; ``None`` returns the full spread order (for paste-back retries).
+    """
+    lister = point_scenes if scene_lister is None else scene_lister
+    names = list(videos) if videos is not None else list_match_names()
+    by_video: list[list[dict[str, Any]]] = []
+    for video in names:
+        scenes = lister(video)
+        if scenes:
+            by_video.append(list(scenes))
     chosen: list[dict[str, Any]] = []
-    seen: set[str] = set()
-    for video in videos:
-        if video in seen:
-            continue
-        scenes = point_scenes(video)
-        if not scenes:
-            continue
-        chosen.append(scenes[0])
-        seen.add(video)
-        if len(chosen) >= 2:
+    round_index = 0
+    while True:
+        progressed = False
+        for bucket in by_video:
+            if round_index >= len(bucket):
+                continue
+            chosen.append(bucket[round_index])
+            progressed = True
+            if n is not None and len(chosen) >= n:
+                return chosen
+        if not progressed:
+            return chosen
+        round_index += 1
+
+
+def choose_point_scenes(
+    n: int = MIN_CLIPS,
+    min_matches: int = MIN_MATCHES,
+    *,
+    videos: Sequence[str] | None = None,
+    scene_lister: Callable[[str], list[dict[str, Any]]] | None = None,
+) -> list[dict[str, Any]]:
+    """Select ≥ ``n`` point scenes from ≥ ``min_matches`` matches."""
+    spread = iter_point_scenes_spread(videos=videos, scene_lister=scene_lister)
+    chosen: list[dict[str, Any]] = []
+    for scene in spread:
+        chosen.append(scene)
+        n_matches = len({str(item["video"]) for item in chosen})
+        if len(chosen) >= n and n_matches >= min_matches:
+            return chosen
+    n_matches = len({str(item["video"]) for item in chosen})
+    raise PasteBackError(
+        f"need ≥{n} point scenes from ≥{min_matches} matches; "
+        f"found {len(chosen)} scenes from {n_matches} matches"
+    )
+
+
+def choose_two_point_scenes() -> list[dict[str, Any]]:
+    """BP20 helper. BP21 uses ``choose_point_scenes``."""
+    return choose_point_scenes(n=2, min_matches=2)
+
+
+def load_clips_until(
+    scenes: Sequence[dict[str, Any]],
+    *,
+    n: int,
+    min_matches: int,
+    work_dir: Path,
+    n_frames: int = 48,
+    load_clip: Callable[..., SceneClip] | None = None,
+) -> tuple[list[SceneClip], list[dict[str, Any]]]:
+    """Paste-back each candidate. Failures are recorded and dropped, never encoded."""
+    loader = load_scene_clip if load_clip is None else load_clip
+    survivors: list[SceneClip] = []
+    dropped: list[dict[str, Any]] = []
+    for scene in scenes:
+        n_ok = len(survivors)
+        n_ok_matches = len({clip.video for clip in survivors})
+        if n_ok >= n and n_ok_matches >= min_matches:
             break
-    if len(chosen) < 2:
-        raise PasteBackError(f"need two point scenes; found {len(chosen)}")
-    return chosen
+        key = f"{scene.get('video')}/{scene.get('scene')}"
+        dest = Path(work_dir) / str(scene.get("video")) / str(scene.get("scene"))
+        print(f"paste-back candidate {key}", flush=True)
+        try:
+            clip = loader(scene, dest, n_frames=n_frames)
+        except PasteBackError as exc:
+            dropped.append(
+                {
+                    "video": scene.get("video"),
+                    "scene": scene.get("scene"),
+                    "reason": str(exc),
+                }
+            )
+            print(f"DROP {key}: {exc}", flush=True)
+            continue
+        survivors.append(clip)
+    n_ok_matches = len({clip.video for clip in survivors})
+    if len(survivors) < n or n_ok_matches < min_matches:
+        raise PasteBackError(
+            f"need ≥{n} paste-back survivors from ≥{min_matches} matches; "
+            f"got {len(survivors)} from {n_ok_matches}. dropped={dropped}"
+        )
+    return survivors, dropped
 
 
 def load_scene_clip(
@@ -594,7 +693,7 @@ def load_scene_clip(
             f"{sum(window_mae) / len(window_mae):.3f} exceeds {PASTE_MAE_MAX} "
             f"(winner={convention} sample_mae={diagnosis.get('winner_mae')})"
         )
-    return SceneClip(
+    clip = SceneClip(
         video=str(scene["video"]),
         scene=str(scene["scene"]),
         video_path=video_path,
@@ -609,4 +708,54 @@ def load_scene_clip(
         player_area=float(masks.mean()),
         paste_back=diagnosis,
         ffmpeg={"path": ffmpeg_path, "version": ffmpeg_version},
+    )
+    save_clip_cache(clip, work_dir)
+    return clip
+
+
+def save_clip_cache(clip: SceneClip, work_dir: Path) -> None:
+    """Write the 48-frame window and masks so a restart does not re-extract."""
+    window = Path(work_dir) / "window"
+    window.mkdir(parents=True, exist_ok=True)
+    for leftover in window.glob("frame_*.png"):
+        leftover.unlink()
+    for index, frame in enumerate(clip.frames):
+        dest = window / f"frame_{clip.window_start + index:06d}.png"
+        bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        if not cv2.imwrite(str(dest), bgr):
+            raise RuntimeError(f"failed to write {dest}")
+    np.savez_compressed(
+        Path(work_dir) / "masks.npz",
+        masks=np.asarray(clip.masks, dtype=np.uint8),
+    )
+
+
+def load_cached_clip(record: dict[str, Any], work_dir: Path) -> SceneClip | None:
+    """Rebuild a clip from a previous paste-back cache. None if incomplete."""
+    window = Path(work_dir) / "window"
+    mask_path = Path(work_dir) / "masks.npz"
+    pngs = sorted(window.glob("frame_*.png")) if window.is_dir() else []
+    n_frames = int(record.get("n_frames") or 0)
+    if len(pngs) < n_frames or n_frames < 1 or not mask_path.is_file():
+        return None
+    frames = load_rgb_stack(pngs[:n_frames])
+    masks = np.asarray(np.load(mask_path)["masks"]).astype(bool)
+    if masks.shape[0] != frames.shape[0]:
+        return None
+    paste = dict(record.get("paste_back") or {})
+    return SceneClip(
+        video=str(record["video"]),
+        scene=str(record["scene"]),
+        video_path=Path(record["video_path"]),
+        t_start=float(record["t_start"]),
+        t_end=float(record["t_end"]),
+        cluster=str(record.get("cluster") or "cluster_point"),
+        convention=str(record.get("convention") or paste.get("winner") or ""),
+        window_start=int(record["window_start"]),
+        n_frames=int(frames.shape[0]),
+        frames=frames,
+        masks=masks,
+        player_area=float(record.get("player_area") or masks.mean()),
+        paste_back=paste,
+        ffmpeg=dict(record.get("ffmpeg") or {}),
     )

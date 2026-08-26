@@ -1,3 +1,4 @@
+"""Pinned: still used by src.components.generation.animate_anyone_runtime and decoder compositing. Not retired in BP15."""
 from __future__ import annotations
 
 import math

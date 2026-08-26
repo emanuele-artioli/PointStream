@@ -1,4 +1,6 @@
-"""Spade4Tennis inference engine for Pointstream GenAI backend.
+"""Pinned: still used by src.decoder.compositing.strategies (eval_checkpoint). Not retired in BP15.
+
+Spade4Tennis inference engine for Pointstream GenAI backend.
 
 Implements ``Spade4TennisStrategy`` which loads the SPADE-conditioned
 ResNet-9 generator and produces player+racket synthesis from a skeleton

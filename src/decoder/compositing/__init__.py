@@ -1,4 +1,6 @@
-"""Generative compositing: putting the actors back on the reconstructed frame.
+"""Pinned: still used by scripts/eval_checkpoint.py via build_genai_strategy. Not retired in BP15.
+
+Generative compositing: putting the actors back on the reconstructed frame.
 
 Split out of the single 1545-line `src.decoder.genai_compositor` module:
 

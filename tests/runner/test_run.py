@@ -74,14 +74,20 @@ def test_one_chunk_and_many_chunks_are_the_same_loop() -> None:
     """A lone chunk is not a branch that skips the runner. Count codec calls."""
 
     class _Count:
+        """All-off delivers the source, so the stand-in is the whole stage.
+
+        It does not call the real codec callable: that one is built from a
+        `StageContext` now, because a corner with the residual switched off has
+        to deliver the reconstruction rather than the source.
+        """
+
         def __init__(self) -> None:
             self.calls = 0
 
         def __call__(self, bag):  # noqa: ANN001
             self.calls += 1
-            from src.runner.stages import codec
-
-            return codec(bag)
+            frames = bag[SOURCE]
+            return {"frames": frames, "byte_count": int(np.asarray(frames).nbytes)}
 
     one_clock = _Count()
     many_clock = _Count()

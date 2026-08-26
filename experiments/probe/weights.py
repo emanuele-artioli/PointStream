@@ -95,7 +95,22 @@ def already_under_weights(name: str) -> bool:
 
 
 def _slot_tail(slot: str) -> str:
-    return slot.split(".")[-1].replace("_", "-")
+    """The part of a dotted key that names the *slot*, not the field.
+
+    The flat schema spelled a checkpoint as `detector: yolo26n.pt`, so the last
+    segment was the slot. The nested schema splits it into
+    `detector: {backend: yolo, model: yolo26n.pt}`, which puts the slot one
+    segment earlier and leaves `model` — a field name, not a slot — at the tail.
+    Stepping back one segment maps the new spelling onto the same table instead
+    of adding a bare `model` entry, which would accept a checkpoint named under
+    any section at all.
+    """
+    parts = [part.replace("_", "-") for part in slot.split(".") if part]
+    if not parts:
+        return ""
+    if parts[-1] == "model" and len(parts) >= 2:
+        return parts[-2]
+    return parts[-1]
 
 
 def is_weight_slot(slot: str) -> bool:

@@ -1,4 +1,6 @@
-"""Weight resolution for the generative backends.
+"""Pinned: still used by decoder compositing and the engine strategies. Not retired in BP15.
+
+Weight resolution for the generative backends.
 
 Weights resolve from assets/weights/ before a backend loads, so a missing
 file fails here rather than triggering a silent download mid-run."""
