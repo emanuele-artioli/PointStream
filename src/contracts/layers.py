@@ -73,7 +73,6 @@ LAYER_PACKAGES: dict[str, str] = {
 #: code does not go here. The set shrinks as callers move or die.
 LEGACY_PACKAGES: frozenset[str] = frozenset(
     {
-        "src.decoder",
         "src.shared",
         "src.transport",
     }
