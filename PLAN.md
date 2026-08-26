@@ -913,10 +913,13 @@ invent a sixth layer.
 `src/shared/training/**` / `scripts/train_controlnet.py` (Stream B is live on
 the training path). They stay in condemned `src.shared` until that stream
 lands. `src/shared/{schemas,interfaces,tags}.py` stay too: the only caller is
-legacy `src.transport.disk`, which this stream does not own. Every other live
-module is ported into `src/components/` or `src/runner/` (or the caller is
-rewritten onto an existing backend). The rest of `src/shared/` and all of
-`src/decoder/` die with their tests.
+legacy `src.transport.disk`, which this stream does not own. Live modules this
+stream can move without touching those files are ported into `src/components/`
+or `src/contracts/` (or the caller is rewritten onto an existing backend).
+Modules whose only remaining callers are pre-rewrite scripts
+(`eval_checkpoint`, `process_dataset`, `hnerv_baseline`, and the like) stay
+until those scripts are rewritten — this stream does not own them. The rest
+of `src/shared/` and `src/decoder/` die with their tests.
 
 ### The ablation lattice
 
