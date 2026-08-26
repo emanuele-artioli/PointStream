@@ -1,9 +1,7 @@
-"""Bind perception and representation backends into C2 stage callables.
+"""Registry lookup and bag helpers the runner stages call.
 
-The runner is the only layer allowed to look a registry up. These helpers
-turn a config name into detections, masks, appearance bytes, motion bytes
-and a temporal schedule. Construction is lazy: a stage that is injected over
-or never invoked never loads weights.
+Construction is lazy: a stage that is injected over or never invoked never
+loads weights. Helpers that stages do not call do not live here.
 """
 
 from __future__ import annotations
@@ -17,9 +15,7 @@ import numpy as np
 from src.components.detection.geometry import Box
 from src.components.detection.types import Detection
 from src.components.transport.payload import PlannedSchedule, dump_schedule
-from src.contracts.keypoints import schema as lookup_schema
 from src.contracts.lattice import ART_KEYPOINTS, ART_SCHEDULE, ART_SUBJECTS
-from src.pipeline.reconstruction.compositor import heuristic_mask
 from src.pipeline.reconstruction.reconstruct import ObjectRequest
 
 #: Same bag key the runner uses for caller-injected subjects (`stages.OBJECTS`).
@@ -31,6 +27,7 @@ class _Ctx(Protocol):
 
     builders: Mapping[str, Callable[..., Any]] | None
     config: Any
+
 
 _AXIS_MODULES = {
     "detector": "src.components.detection",
@@ -66,11 +63,6 @@ def object_tuple(value: object) -> tuple[ObjectRequest, ...]:
     return ()
 
 
-def oracle_objects(bag: Mapping[str, Any]) -> tuple[ObjectRequest, ...]:
-    """Subjects the caller injected. Non-empty means perception backends stay idle."""
-    return object_tuple(bag.get(_ORACLE))
-
-
 def subjects_from_bag(bag: Mapping[str, Any]) -> tuple[ObjectRequest, ...]:
     """Prefer the latest rewritten subject list, then detections, then oracle."""
     for key in ("masks", ART_SUBJECTS, "salient-subjects", "detection", _ORACLE):
@@ -78,35 +70,6 @@ def subjects_from_bag(bag: Mapping[str, Any]) -> tuple[ObjectRequest, ...]:
         if found:
             return found
     return ()
-
-
-def object_from_detection(
-    source: np.ndarray, frame_index: int, detection: Detection
-) -> ObjectRequest:
-    frames, height, width, _ = source.shape
-    box = detection.bbox.clip(width, height)
-    x1, y1, x2, y2 = (
-        int(np.floor(box.x1)),
-        int(np.floor(box.y1)),
-        int(np.ceil(box.x2)),
-        int(np.ceil(box.y2)),
-    )
-    if x2 <= x1:
-        x2 = min(width, x1 + 1)
-    if y2 <= y1:
-        y2 = min(height, y1 + 1)
-    crop = np.asarray(source[frame_index, y1:y2, x1:x2])
-    if crop.size == 0:
-        crop = np.zeros((1, 1, 3), dtype=np.uint8)
-    mask = np.zeros((frames, height, width), dtype=bool)
-    mask[frame_index] = heuristic_mask((x1, y1, x2, y2), height, width)
-    return ObjectRequest(
-        object_id=str(detection.track_id or f"{detection.class_name}-{frame_index}"),
-        appearance=crop,
-        bbox=(x1, y1, x2, y2),
-        mask=mask,
-        frame_index=frame_index,
-    )
 
 
 def as_detection(item: ObjectRequest) -> Detection:
@@ -117,15 +80,6 @@ def as_detection(item: ObjectRequest) -> Detection:
         bbox=Box(float(x1), float(y1), float(x2), float(y2)),
         track_id=item.object_id,
     )
-
-
-def detect_clip(source: np.ndarray, detector: Any) -> tuple[ObjectRequest, ...]:
-    records: list[ObjectRequest] = []
-    for index, frame in enumerate(source):
-        found = detector.detect(frame)
-        for detection in found:
-            records.append(object_from_detection(source, index, detection))
-    return tuple(records)
 
 
 def filter_selected(
@@ -154,90 +108,8 @@ def filter_selected(
     return tuple(kept)
 
 
-def perception_frames(bag: Mapping[str, Any], object_id: str, frame_count: int) -> frozenset[int]:
-    schedule = bag.get(ART_SCHEDULE)
-    if not isinstance(schedule, PlannedSchedule):
-        return frozenset(range(frame_count))
-    marked = schedule.perception_frames(object_id)
-    if not marked:
-        return frozenset(range(frame_count))
-    return frozenset(int(index) for index in marked)
-
-
-def encode_appearance(ctx: _Ctx, subjects: Sequence[ObjectRequest]) -> dict[str, Any]:
-    name = ctx.config.appearance.representation
-    kwargs: dict[str, Any] = {}
-    if name == "compressed-image":
-        kwargs = {
-            "quality": ctx.config.appearance.jpeg_quality,
-            "downscale": ctx.config.appearance.downscale,
-        }
-    encoder = build_backend(ctx, "appearance", name, **kwargs)
-    if encoder is None:
-        return {"byte_count": 0, "representation": name}
-    total = 0
-    for item in subjects:
-        crop = np.asarray(item.appearance)
-        if crop.size == 0:
-            continue
-        _descriptor, payload = encoder.encode(crop)
-        total += len(payload) if isinstance(payload, (bytes, bytearray)) else 0
-    return {"byte_count": int(total), "representation": name}
-
-
-def encode_motion(
-    ctx: _Ctx,
-    subjects: Sequence[ObjectRequest],
-    keypoints: Mapping[str, np.ndarray],
-) -> dict[str, Any]:
-    name = ctx.config.motion.representation
-    kwargs: dict[str, Any] = {}
-    if name == "keypoints":
-        kwargs["schema"] = lookup_schema(ctx.config.pose.schema)
-    encoder = build_backend(ctx, "motion", name, **kwargs)
-    if encoder is None:
-        return {"byte_count": 0, "representation": name}
-    total = 0
-    for item in subjects:
-        if name == "keypoints":
-            array = keypoints.get(item.object_id)
-        else:
-            x1, y1, x2, y2 = item.bbox
-            array = np.asarray(
-                [[x1, y1], [x2, y1], [x2, y2], [x1, y2]], dtype=np.float32
-            )
-        if array is None:
-            continue
-        _descriptor, payload = encoder.encode(array)
-        total += len(payload) if isinstance(payload, (bytes, bytearray)) else 0
-    return {"byte_count": int(total), "representation": name}
-
-
-def plan_temporal(
-    ctx: _Ctx, source: np.ndarray, subjects: Sequence[ObjectRequest]
-) -> PlannedSchedule:
-    from src.components.temporal.policy import ConfigurableTemporalPolicy
-
-    policy = ConfigurableTemporalPolicy(temporal=ctx.config.temporal)
-    ids = tuple(dict.fromkeys(item.object_id for item in subjects)) or ("object",)
-    return policy.plan(
-        frame_count=int(source.shape[0]),
-        object_ids=ids,
-        motion=_frame_motion(subjects, int(source.shape[0])),
-    )
-
-
 def schedule_bytes(planned: PlannedSchedule) -> int:
     return len(json.dumps(dump_schedule(planned), sort_keys=True).encode("utf-8"))
-
-
-def keypoints_from_bag(bag: Mapping[str, Any]) -> dict[str, np.ndarray]:
-    raw = bag.get(ART_KEYPOINTS)
-    if isinstance(raw, Mapping) and "by_object" in raw:
-        values = raw["by_object"]
-        if isinstance(values, Mapping):
-            return {str(key): np.asarray(value) for key, value in values.items()}
-    return {}
 
 
 def metadata_bytes(bag: Mapping[str, Any]) -> int:
@@ -265,38 +137,15 @@ def metadata_bytes(bag: Mapping[str, Any]) -> int:
     return total
 
 
-def _frame_motion(subjects: Sequence[ObjectRequest], frame_count: int) -> list[float]:
-    magnitudes = [0.0] * frame_count
-    by_id: dict[str, list[ObjectRequest]] = {}
-    for item in subjects:
-        by_id.setdefault(item.object_id, []).append(item)
-    for group in by_id.values():
-        ordered = sorted(group, key=lambda item: item.frame_index)
-        previous = None
-        for item in ordered:
-            if previous is not None and 0 <= item.frame_index < frame_count:
-                dx = float(item.bbox[0] - previous.bbox[0])
-                dy = float(item.bbox[1] - previous.bbox[1])
-                magnitudes[item.frame_index] += float(np.hypot(dx, dy))
-            previous = item
-    return magnitudes
-
-
 Builders = Mapping[str, Callable[..., Any]]
 
 __all__ = [
     "Builders",
+    "as_detection",
     "build_backend",
-    "detect_clip",
-    "encode_appearance",
-    "encode_motion",
     "filter_selected",
-    "keypoints_from_bag",
     "metadata_bytes",
     "object_tuple",
-    "oracle_objects",
-    "perception_frames",
-    "plan_temporal",
     "schedule_bytes",
     "subjects_from_bag",
 ]
