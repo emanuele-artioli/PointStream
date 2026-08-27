@@ -13,7 +13,8 @@ from src.components.codec.y4m import from_luma, read, write
 from src.components.metrics.bd_rate import RDCurve
 from src.components.metrics.psnr import PsnrMetric, masked_psnr
 from src.contracts.codecs import EncodeRequest, RateControl
-from experiments.headroom.remove import as_mask, even_size, rgb_to_luma
+from src.components.codec.frames import even_size, rgb_to_luma
+from experiments.headroom.remove import as_mask
 
 DEFAULT_QPS: tuple[int, ...] = (32, 40, 46)
 DEFAULT_CODEC = "avc"

@@ -8,18 +8,10 @@ from dataclasses import dataclass
 import numpy as np
 
 from src.components.background.plate import build_plate
+from src.components.codec.frames import even_size
 
 _FLAT = 128
 
-
-def even_size(frames: np.ndarray) -> np.ndarray:
-    """Crop to even width and height so 4:2:0 y4m is well-defined."""
-    clip = np.asarray(frames)
-    height = clip.shape[1] - (clip.shape[1] % 2)
-    width = clip.shape[2] - (clip.shape[2] % 2)
-    if height < 2 or width < 2:
-        raise ValueError(f"clip {tuple(clip.shape)} is too small for 4:2:0")
-    return clip[:, :height, :width]
 
 
 def as_mask(masks: np.ndarray, n_frames: int, height: int, width: int) -> np.ndarray:
@@ -30,12 +22,6 @@ def as_mask(masks: np.ndarray, n_frames: int, height: int, width: int) -> np.nda
         raise ValueError(f"mask shape {array.shape} does not match {(n_frames, height, width)}")
     return array.astype(bool)
 
-
-def rgb_to_luma(frames: np.ndarray) -> np.ndarray:
-    """BT.601 luma, uint8, shape ``(T, H, W)``."""
-    clip = np.asarray(frames, dtype=np.float64)
-    luma = 0.299 * clip[..., 0] + 0.587 * clip[..., 1] + 0.114 * clip[..., 2]
-    return np.clip(luma, 0, 255).astype(np.uint8)
 
 
 def flat_fill(frames: np.ndarray, masks: np.ndarray, value: int = _FLAT) -> np.ndarray:
