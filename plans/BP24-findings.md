@@ -31,28 +31,31 @@ time.
 - **Not safe: any future codec-vs-codec claim** built on these presets,
   including the P0 item 2 ladder. That is the one this brief hands forward.
 
-**What "fair" would have to mean.** Not settled, and it needs deciding before
-P0 item 2 quotes a cross-codec number. The options, cheapest first:
+**What "fair" would have to mean — and why it mostly dissolves.**
 
-1. **Report the preset with every number and never compare across codecs.**
-   Costs nothing, and makes within-codec results (concentration, residual
-   coarseness, the ablation lattice) fully usable. It does not give the paper a
-   "PointStream vs HEVC" line.
-2. **Match wall-clock encode time per rung**, choosing each encoder's preset to
-   hit a common time budget. Defensible for a systems paper, and it makes the
-   real-time argument concrete. Needs a calibration pass per codec per
-   resolution.
-3. **Use each encoder's own default/`medium` tier.** Cheap and conventional,
-   but "medium" is not a shared unit either — it is only less obviously unfair
-   than `ultrafast` vs `veryfast`.
-4. **Reference software at fixed CTC-style configurations** (HM, VTM). This is
-   what the codec literature actually does and is the only genuinely comparable
-   option. Far slower, and a reviewer will expect it if the paper claims a
-   codec-vs-codec BD-rate at all.
+The decisive point is that **PointStream's goal is not a codec comparison.** The
+claim the paper needs is *PointStream against a codec*, not *codec against
+codec*. That reframing removes most of the problem:
 
-**Recommendation:** (1) immediately, so nothing currently measured is quoted
-unfairly, and (2) or (4) decided explicitly before P0 item 2 publishes a
-cross-codec figure. Whichever is chosen, **state the presets beside the number**.
+> **Pair every arm on one codec at one preset.** For codec X, measure
+> (a) X coding the source, and (b) PointStream using X for its coded components
+> — same encoder, same preset, same rungs. BD-rate between those two curves *is*
+> the PointStream gain, and **the preset cancels**, exactly as it cancels in
+> BP21's concentration result.
+
+So option (1) — report the preset, never compare across codecs — is not a
+stopgap for the real goal. It is **sufficient and correct** for it. The paper
+reports a gain per codec: "PointStream improves BD-rate over AVC by X%, over
+HEVC by Y%", each measured with that codec on both arms.
+
+**The one thing that stays off-limits:** ranking those gains against each other,
+or saying "PointStream beats VVC but not AV1". Comparing the *magnitudes*
+across codecs re-imports the preset unfairness through the back door. State each
+gain beside its preset; do not order them.
+
+Cross-codec fairness only becomes necessary if the paper wants a direct
+codec-vs-codec line, which it does not need. That decision is parked in
+`DEFERRED.md` D-CODEC-PRESETS rather than settled here.
 
 ## 2. `bd_rate`'s overlap guard is relative, so it cannot catch a flat curve
 
