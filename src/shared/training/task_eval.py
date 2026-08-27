@@ -93,3 +93,34 @@ def static_copy_scores(
     """Paste the keyframe (appearance) as the prediction. The floor."""
     lpips_value, psnr, n_pixels = score_item(target, appearance, mask, lpips=lpips)
     return ItemScore(key=key, lpips=lpips_value, psnr=psnr, n_mask_pixels=n_pixels)
+
+
+def eval_snapshot_tag(epoch: int, *, kind: str, step: int | None = None) -> str:
+    """Directory name to write live weights into before a stop-eval.
+
+    The name must start with ``checkpoint-epoch-`` so
+    ``ControlNetGenerator.resolve_controlnet_checkpoint`` loads this directory
+    as-is. A tag that does not would make pose/seg look for a nested
+    ``checkpoint-epoch-<FINAL_EPOCH>`` and miss the live weights.
+
+    Mid-epoch evals include the step. Reusing ``checkpoint-epoch-N`` for every
+    eval in an epoch was the stale-weight bug: the first save created the
+    directory, later evals skipped the save, and the series scored frozen
+    weights.
+    """
+    if kind == "mid":
+        if step is None:
+            raise ValueError(
+                "mid-epoch eval requires step so two evals cannot share a snapshot"
+            )
+        return f"checkpoint-epoch-{epoch}-step-{step}"
+    if kind != "epoch":
+        raise ValueError(f"kind must be 'mid' or 'epoch', got {kind!r}")
+    return f"checkpoint-epoch-{epoch}"
+
+
+def eval_snapshot_is_ephemeral(kind: str) -> bool:
+    """Mid-epoch snapshots exist to be scored, not kept as the epoch artifact."""
+    if kind not in {"mid", "epoch"}:
+        raise ValueError(f"kind must be 'mid' or 'epoch', got {kind!r}")
+    return kind == "mid"

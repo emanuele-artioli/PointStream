@@ -23,6 +23,8 @@ from src.shared.training.stop import (
 )
 from src.shared.training.task_eval import (
     bbox_from_mask,
+    eval_snapshot_is_ephemeral,
+    eval_snapshot_tag,
     mean_scores,
     score_item,
     static_copy_scores,
@@ -192,3 +194,38 @@ def test_write_bounds_round_trip(tmp_path: Path) -> None:
     assert payload["n_eval_clips"] == 4
     assert payload["offset"] == 8
     assert payload["written_before_training"] is True
+
+
+def test_mid_epoch_evals_in_one_epoch_get_distinct_snapshot_tags() -> None:
+    first = eval_snapshot_tag(1, kind="mid", step=2000)
+    second = eval_snapshot_tag(1, kind="mid", step=4000)
+    epoch_end = eval_snapshot_tag(1, kind="epoch")
+    assert first != second
+    assert first != epoch_end
+    assert second != epoch_end
+    assert first.startswith("checkpoint-epoch-")
+    assert second.startswith("checkpoint-epoch-")
+    assert epoch_end == "checkpoint-epoch-1"
+
+
+def test_mid_epoch_snapshot_is_ephemeral_epoch_snapshot_is_kept() -> None:
+    assert eval_snapshot_is_ephemeral("mid") is True
+    assert eval_snapshot_is_ephemeral("epoch") is False
+
+
+def test_mid_epoch_snapshot_tag_requires_a_step() -> None:
+    with pytest.raises(ValueError, match="requires step"):
+        eval_snapshot_tag(1, kind="mid")
+
+
+def test_eval_snapshot_tag_rejects_an_unknown_kind() -> None:
+    with pytest.raises(ValueError, match="kind must be"):
+        eval_snapshot_tag(1, kind="loss", step=1)
+
+
+def test_train_controlnet_always_writes_eval_weights() -> None:
+    """The stale-weight bug was skipping _save when checkpoint-epoch-N existed."""
+    source = Path("scripts/train_controlnet.py").read_text()
+    assert "if not Path(ckpt).is_dir()" not in source
+    assert "eval_snapshot_tag(" in source
+    assert "_save(tag)" in source
