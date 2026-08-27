@@ -742,20 +742,46 @@ def ledger_from_bag(bag: Mapping[str, Any], source: np.ndarray) -> SizesBytes:
     )
 
 
-def _panorama_bytes(bag: Mapping[str, Any]) -> int:
-    """Raw plate size.
-
-    Not a coded size: `background.codec` and `background.jpeg_quality` reach
-    nothing on this path, so a plate counted here is uncompressed pixels. The
-    number is honest about what it is rather than modelling a JPEG that was
-    never made.
-    """
+def _plate_of(bag: Mapping[str, Any]) -> np.ndarray | None:
+    """The plate this run actually transmits, or None when it transmits none."""
     view = bag.get(ART_BACKGROUND_MODEL) or bag.get(STAGE_BACKGROUND)
     if not isinstance(view, BackgroundModelView) or view.plate is None:
-        return 0
+        return None
     if view.deferred_to_residual or view.mode == "none":
-        return 0
-    return int(np.asarray(view.plate).nbytes)
+        return None
+    return np.asarray(view.plate)
+
+
+def _panorama_bytes(bag: Mapping[str, Any]) -> int:
+    """Raw plate size — uncompressed pixels, kept for comparison with BP23.
+
+    This is deliberately *not* the transmitted cost once a sidecar is
+    configured; see `_panorama_coded_bytes`. It stays so the BP23 table remains
+    readable next to the coded one and the change in meaning is visible.
+    """
+    plate = _plate_of(bag)
+    return 0 if plate is None else int(plate.nbytes)
+
+
+def _panorama_coded_bytes(ctx: StageContext, bag: Mapping[str, Any]) -> int | None:
+    """What the plate really costs through `background.codec` (BP24).
+
+    Returns ``None`` when there is no plate to send, so a caller can tell
+    "nothing transmitted" from "transmitted for free". Before BP24 this path
+    reported raw pixels and `background.codec` / `background.jpeg_quality`
+    reached nothing at all — BP23 measured a 24.9 MB plate that way, 95% of
+    `tier_fast`'s entire figure.
+    """
+    plate = _plate_of(bag)
+    if plate is None:
+        return None
+    from src.components.background.sidecar import build_sidecar
+
+    sidecar = build_sidecar(
+        ctx.config.background.codec,
+        jpeg_quality=ctx.config.background.jpeg_quality,
+    )
+    return int(len(sidecar.encode(plate)))
 
 
 def _measured_actor_bytes(bag: Mapping[str, Any]) -> int:
