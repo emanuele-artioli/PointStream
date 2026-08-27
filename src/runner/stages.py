@@ -489,7 +489,12 @@ def _frame_luma_motion(source: np.ndarray) -> list[float]:
 
 
 def background(bag: Mapping[str, Any]) -> BackgroundModelView:
-    """A static plate from the first source frame. Identity warp."""
+    """A static plate from the first source frame. Identity warp.
+
+    Kept for callers that bind stages directly without a config. Any run that
+    has one should use `make_background`, which transmits the plate through the
+    configured sidecar instead of handing over raw pixels.
+    """
     source = as_clip(bag[SOURCE], path=SOURCE)
     return BackgroundModelView(
         plate=source[0],
@@ -499,6 +504,47 @@ def background(bag: Mapping[str, Any]) -> BackgroundModelView:
         height=int(source.shape[1]),
         scene_id=None,
     )
+
+
+def make_background(ctx: StageContext) -> StageCallable:
+    """Transmit the plate through `background.codec` and hand back what the
+    client will actually hold (BP24).
+
+    Before this, the runner's background stage was a stub: it put `source[0]`
+    on the bag as raw pixels, so `background.method`, `background.codec` and
+    `background.jpeg_quality` all reached nothing, and the plate the
+    reconstruction used was never the plate a client would decode. BP23
+    measured that raw plate at 24.9 MB — 95% of `tier_fast`'s whole figure.
+
+    Two things change together, which is the point. The view now carries the
+    **decoded** plate, so quality belongs to the same operating point as the
+    rate; and `ART_BACKGROUND_BYTES` carries the **real payload length**, not a
+    re-encode of already-decoded pixels.
+
+    Still a stub: the plate itself is the first source frame rather than a
+    stitched panorama, so `background.method` selects a transmission strategy
+    over a one-frame plate. That is the next piece, not this one.
+    """
+
+    def background_stage(bag: Mapping[str, Any]) -> BackgroundModelView:
+        from src.components.background.strategy import bind as bind_background
+
+        source = as_clip(bag[SOURCE], path=SOURCE)
+        model = bind_background(ctx.config)
+        artifact = model.transmit(np.asarray(source[0], dtype=np.uint8))
+        decoded = model.decode_payload(artifact)
+        return BackgroundModelView(
+            plate=source[0] if decoded is None else decoded,
+            homographies=(),
+            mode=artifact.mode,
+            deferred_to_residual=artifact.deferred_to_residual,
+            width=int(source.shape[2]),
+            height=int(source.shape[1]),
+            scene_id=artifact.scene_id,
+            payload_bytes=int(len(artifact.payload)),
+        )
+
+    return background_stage
 
 
 def make_generation(ctx: StageContext) -> StageCallable:
@@ -659,7 +705,7 @@ def default_backends(ctx: StageContext) -> dict[str, StageCallable]:
         STAGE_POSE: make_pose(ctx),
         STAGE_SEGMENTATION: make_segmentation(ctx),
         STAGE_RIGID: _empty,
-        STAGE_BACKGROUND: background,
+        STAGE_BACKGROUND: make_background(ctx),
         STAGE_GENERATION: make_generation(ctx),
         STAGE_RESIDUAL: make_residual(ctx),
         STAGE_CODEC: make_codec(ctx),
@@ -772,6 +818,12 @@ def _panorama_coded_bytes(ctx: StageContext, bag: Mapping[str, Any]) -> int | No
     reached nothing at all — BP23 measured a 24.9 MB plate that way, 95% of
     `tier_fast`'s entire figure.
     """
+    view = bag.get(ART_BACKGROUND_MODEL) or bag.get(STAGE_BACKGROUND)
+    if isinstance(view, BackgroundModelView) and view.payload_bytes is not None:
+        # The size the transmission actually produced. Preferred over any
+        # re-encode: `view.plate` is already *decoded* pixels, so encoding it
+        # again measures a second, easier compression of a cleaned-up image.
+        return int(view.payload_bytes)
     plate = _plate_of(bag)
     if plate is None:
         return None
