@@ -31,7 +31,7 @@ Target: **ACM TOMM, September 30.**
 | B — components | ✅ **done** | Merged-ready on `phase-b/integrate` (still unmerged to main) |
 | **B′ — the engine roster** | BP12 ✅, BP25 ✅ | Re-ranked in clip mode on calibrated LPIPS (§2.10). IP-Adapter now has a trained appearance path (§2.17) and still loses to a paste. Quality flagship stays **unset**. |
 | C — pipeline and runner | ✅ **done** | `C1`/`C2`/`C3` merged. A tier config runs end to end and is scored (§2.16, BP23). |
-| D — experiments layer | 🟡 partly unblocked | Ablations need §2.16's inert-field fix (BP26); rate-based experiments need a real encoder (BP24). |
+| D — experiments layer | 🟡 partly unblocked | `BP26` wired the six ablation axes (2026-08-26), so the lattice is now *measurable* but still un-run. Rate-based experiments still need a real encoder (`BP24`). |
 | E — experiments and paper | ⬜ | Ordered by §7 |
 
 **Code.** `src/contracts/` is complete and green. `src/components/` now covers all
@@ -1011,6 +1011,56 @@ legacy `src.transport.disk`, which this stream does not own. `src.decoder` and
 caller. Remaining pre-rewrite training scripts keep ``tennis_dataset``. The
 rest of `src/shared/` that this stream could delete is gone.
 
+### What the codec stage codes (BP24, 2026-08-26)
+
+**Decision: the codec stage codes the transmitted payload, not the delivered
+pixels.** C3 left this stage an identity round-trip and did not choose; this is
+the choice, made before any encoder was bound.
+
+PointStream does not transmit a pixel grid. It transmits a background plate
+established once, per-object appearance, per-frame motion, an optional
+corrective residual, and metadata; the client *reconstructs* frames from those.
+Running an encoder over the delivered frames would measure "PointStream's output,
+re-encoded" — a number that double-counts the reconstruction and corresponds to
+nothing the system sends. So the encoder runs over **each transmitted component**,
+and `byte_count` is the sum of real coded sizes.
+
+**The contract.** The codec stage keeps returning the delivered `frames`
+unchanged — reconstruction is not its job and quality must not move when only the
+accounting changes. What changes is the accounting: it returns a per-component
+breakdown of **coded** bytes alongside the total. The existing raw figures stay,
+under names that say they are raw, so BP23's table remains comparable and the
+change in meaning is visible rather than silent (`plans/BP24-encoder-boundary.md`
+step 3).
+
+| Component | Today | After BP24 |
+|---|---|---|
+| background plate | `nbytes` of the raw plate, and `_panorama_bytes` says so | intra encode via `background.codec` |
+| residual | `ResidualResult.payload.byte_count` | coded stream via `residual.codec` |
+| appearance | measured payload bytes | coded where the representation is an image; unchanged otherwise |
+| motion + metadata | serialised bytes | unchanged — already the real transmitted size |
+| **all-off corner** | `source.nbytes` (raw) | **the conventional codec baseline** |
+
+**The all-off consequence is the useful one.** With a real encoder bound, the
+all-off corner stops being "raw source bytes" and becomes exactly the arm P0
+item 2 compares against: the source coded conventionally at a chosen rung. The
+codec ladder's baseline therefore falls out of this change rather than needing a
+separate harness.
+
+**What this does not license.** Until every component on a path is coded, that
+path's total is not a rate point, and `transport_to_source_ratio` is not a
+compression ratio. A partially-coded total is more misleading than an obviously
+raw one, so a path reports its ratio only when no component in it is still raw.
+
+**Checked, not assumed: the residual is not entropy coded either.**
+`ResidualResult.payload.byte_count` is `int(stored.nbytes)` / `int(encoded.nbytes)`
+(`src/pipeline/residual/signal.py:245,281`) — the size of a quantised, block-gated
+array, not a coded stream. BP23's fix made that array reflect the block gate, which
+is why the coarseness ladder stopped being flat; it did not make it a rate. So the
+residual needs a real encoder under `residual.codec`, not a relabelling. The
+`WireCost` record already carries `exact: bool` and a `basis` string for exactly
+this distinction, and every component's cost should set them honestly.
+
 ### The ablation lattice
 
 **Every component is optional, and the residual absorbs whatever the disabled
@@ -1371,14 +1421,18 @@ re-read rather than followed blindly.
    *Blocked on `BP24`: the runner's codec stage is an identity round-trip and no
    encoder binary runs, so there is no bitstream and no rate axis yet.*
 3. The residual-coarseness curve. *Same blocker as item 2.*
-4. The core ablation lattice. *Blocked on `BP26`: 27 of 32 config fields reach
-   nothing, so the detector/pose/appearance/motion/temporal axes are not yet
-   measurable.*
+4. The core ablation lattice. *`BP26` (2026-08-26): detector, pose, segmenter,
+   appearance, motion and temporal names now change a run. The lattice itself
+   is still un-run (Phase D). Codec / fallback / `residual.codec` remain unwired
+   (`BP24`). Note that the pose axis moved keypoints without moving PSNR, so a
+   lattice quoting only PSNR will show a row of zeros for pose — see
+   `plans/wave5-report.md`.*
 5. ✅ **DONE 2026-08-26** — a working generative engine, or an honest scoped
    negative. No engine beats a pasted keyframe. IP-Adapter *uses* appearance
    (epoch 1 vs shuffled, 3.8σ on clip means) and beats the untrained adapter
    (5.5σ) but still loses to static copy (4.1σ). `reid` +10% of the
    same/different-person span — semantic match, not identity. §2.17, BP25.
+   Roster and direction: `plans/ENGINE-ROSTER.md`.
 6. Generalization on the general/DAVIS profile.
 7. Evaluation and Conclusion sections; abstract reconciled with what was measured.
 
