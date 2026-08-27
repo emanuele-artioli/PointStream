@@ -278,7 +278,17 @@ _CATALOGUE: Final[tuple[StageSpec, ...]] = (
         when_off="not switchable — any transmitted video stream needs an encoder",
         produces=frozenset({ART_BITSTREAM}),
         optional_inputs=frozenset(
-            {ART_RESIDUAL_STREAM, ART_BACKGROUND_MODEL, ART_APPEARANCE_PAYLOAD}
+            {
+                ART_RESIDUAL_STREAM,
+                ART_BACKGROUND_MODEL,
+                ART_APPEARANCE_PAYLOAD,
+                # Without this the DAG is free to order the codec before the
+                # generator, and a generation-on / residual-off corner reaches
+                # this stage with no crops to composite. BP23 found that corner
+                # silently delivering the SOURCE; BP24 declares the edge so the
+                # ordering cannot happen in the first place.
+                ART_GENERATED_FRAMES,
+            }
         ),
         required=True,
         variants=("avc", "hevc", "av1", "vvc"),
