@@ -12,19 +12,28 @@ capabilities: a size without provenance is not evidence.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 import tempfile
 
 import numpy as np
 
-from src.components.codec.encode import BITSTREAM_SUFFIX, encode
+from src.components.codec.encode import BITSTREAM_SUFFIX, decode, encode, sweep_qp
 from src.components.codec.frames import even_size, rgb_to_luma
-from src.components.codec.y4m import from_luma, write
+from src.components.codec.y4m import from_luma, read, write
+from src.components.metrics.bd_rate import RDCurve
 from src.contracts.codecs import EncodeRequest, RateControl
 
 # Presets mirror `experiments/headroom/ladder.py`, so a coded size measured here
 # is comparable with BP21's real-4K ladder rather than a second convention.
+#
+# They are NOT equal effort across codecs, and a cross-codec BD-rate from them
+# understates the newer codec. Measured 2026-08-27 on four real 960x540 frames,
+# HEVC over AVC came out at -4.2% BD-rate where the literature expects 30-50%:
+# x264 `veryfast` against kvazaar `ultrafast` is not a fair fight. Fine for
+# accounting one payload; for a codec-vs-codec claim, match effort first and say
+# which presets were used.
 _PRESETS = {"avc": "veryfast", "hevc": "ultrafast", "av1": "10", "vvc": "faster"}
 
 
@@ -93,3 +102,61 @@ def coded_size(
             tool_path=record.tool_path,
             tool_version=record.tool_version,
         )
+
+
+def _luma_psnr(reference: np.ndarray, decoded: np.ndarray) -> float:
+    ref = reference.astype(np.float64)
+    got = decoded.astype(np.float64)[: ref.shape[0]]
+    mse = float(np.mean((ref - got) ** 2))
+    return float("inf") if mse == 0 else 10.0 * float(np.log10((255.0**2) / mse))
+
+
+def coded_curve(
+    frames: np.ndarray,
+    *,
+    codec_name: str,
+    qps: Sequence[int] = (32, 40, 46),
+    fps: float = 25.0,
+    work_dir: Path | None = None,
+) -> RDCurve:
+    """Sweep ``qps`` and return the rate-quality curve, not a single point.
+
+    **Use this, not `coded_size`, for anything that compares.** A QP is an
+    encoder knob, not a quality level: two codecs at the same QP land at
+    different quality, so their bitrates are not comparable and a ratio between
+    them means nothing. That confound is not hypothetical here — `BP21`'s VVC
+    result collapsed on exactly it, and survived neither a common-QP nor a
+    common-PSNR reading (`PLAN.md` §2.14).
+
+    The honest comparison integrates over the overlapping quality range, which
+    is what `src.components.metrics.bd_rate` does — and it refuses to return a
+    number when that overlap is a sliver.
+    """
+    clip = np.asarray(frames)
+    if clip.ndim == 3:
+        clip = clip[..., np.newaxis].repeat(3, axis=3)
+    if codec_name not in _PRESETS:
+        raise ValueError(f"no preset for codec {codec_name!r}; known: {sorted(_PRESETS)}")
+    clip = even_size(clip)
+    luma = rgb_to_luma(clip)
+
+    with tempfile.TemporaryDirectory(dir=work_dir) as tmp:
+        root = Path(tmp)
+        source = root / "payload.y4m"
+        write(source, from_luma(luma, fps=fps))
+        request = EncodeRequest(
+            codec_name=codec_name,
+            rate_control=RateControl.QP,
+            rate=int(qps[0]),
+            preset=_PRESETS[codec_name],
+            pix_fmt="yuv420p",
+        )
+        records = sweep_qp(source, root, request, list(qps))
+        rates: list[float] = []
+        qualities: list[float] = []
+        for record in records:
+            decoded_path = root / f"decoded_qp{record.rate}.y4m"
+            decode(record.output, decoded_path, request.replace_rate(int(record.rate or 0)))
+            rates.append(float(record.size_bytes))
+            qualities.append(_luma_psnr(luma, read(decoded_path).luma))
+    return RDCurve(rates=tuple(rates), qualities=tuple(qualities), label=codec_name)
