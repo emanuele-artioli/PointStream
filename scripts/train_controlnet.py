@@ -43,6 +43,8 @@ from src.components.metrics.lpips import LpipsMetric
 from src.shared.training.stop import StopBounds, TaskStopRule
 from src.shared.training.task_eval import (
     ItemScore,
+    eval_snapshot_is_ephemeral,
+    eval_snapshot_tag,
     mean_scores,
     score_item,
     static_copy_scores,
@@ -761,10 +763,10 @@ def main():
             and stop_samples is not None
             and stop_lpips is not None
         ):
-            tag = f"checkpoint-epoch-{epoch_1}"
+            eval_kind = "mid" if kind == "mid" else "epoch"
+            tag = eval_snapshot_tag(epoch_1, kind=eval_kind, step=step)
             ckpt = os.path.join(args.output_dir, tag)
-            if not Path(ckpt).is_dir():
-                _save(tag)
+            _save(tag)
             variant = CONDITION_TO_VARIANT[args.condition_type]
             predictions = generate_stop_predictions(
                 stop_samples,
@@ -774,7 +776,6 @@ def main():
                 steps=args.task_eval_steps,
             )
             scores = score_stop_generations(stop_samples, predictions, stop_lpips)
-            eval_kind = "mid" if kind == "mid" else "epoch"
             decision = stop_rule.observe(
                 epoch=epoch_1,
                 lpips=scores.lpips,
@@ -801,6 +802,8 @@ def main():
                 if best.exists():
                     shutil.rmtree(best)
                 shutil.copytree(ckpt, best)
+            if eval_snapshot_is_ephemeral(eval_kind):
+                shutil.rmtree(ckpt, ignore_errors=True)
             stop = decision.stop
         accelerator.wait_for_everyone()
         return _broadcast_stop(stop)
