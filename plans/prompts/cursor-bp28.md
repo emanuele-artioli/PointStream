@@ -1,7 +1,7 @@
 # Prompt for Cursor — BP28, the offset ladder
 
-Paste below the line. One worktree, one stream. **Merge PR #27 first** — this
-builds directly on BP25's harness.
+Paste below the line. One worktree, one stream. BP25's harness
+(`scripts/bp25_rescore.py`) is on `main`, so this is a run, not a build.
 
 ```bash
 git worktree add -b wave6/bp28-offset /home/itec/emanuele/pointstream-w6-a origin/main
@@ -58,6 +58,14 @@ standard error** (n=12), not item-level n=96: eight offsets inside one clip are
 not independent, as you established last time.
 
 ## Host notes
+
+- **A helper script run from outside the worktree imports MAIN's `src`.** Python
+  puts the script's own directory on `sys.path[0]`, not the cwd, so with the
+  editable install your worktree's code is invisible. Keep scripts inside the
+  worktree or set `PYTHONPATH`.
+- **NFS on this host stalls.** A job at ~0% CPU may be blocked in
+  `nfs_wait_bit_killable` — check `wchan` before concluding it hung or blaming
+  your code. It made mypy take 35 minutes on 2026-08-27.
 
 - `conda run` swallows pytest's summary. Use `--junit-xml` and read the XML; a
   piped exit code is not evidence.
