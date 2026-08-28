@@ -156,3 +156,27 @@ isolation instead of deleting the tests.
 ---
 
 *(D7 moved to `plans/BP14-training-stop-rule.md` — it is scheduled work, not deferred.)*
+
+---
+
+## D-CODEC-PRESETS — equal-effort presets for a cross-codec claim
+
+**What.** `_PRESETS` (`src/components/codec/measure.py`, mirroring
+`experiments/headroom/ladder.py`) is not equal effort across encoders: `avc:
+veryfast` against `hevc: ultrafast` measured **−4.2% BD-rate for HEVC over AVC**
+where the literature expects **30–50%**. The bias always understates the newer
+codec.
+
+**Why it waits.** The paper compares **PointStream against a codec**, not codec
+against codec. Pairing both arms on one codec at one preset makes the preset
+cancel, so every number the submission needs is obtainable without settling
+this. See `plans/BP24-findings.md` §1.
+
+**What it costs when it comes due.** Only if the paper ever wants a direct
+codec-vs-codec line, or wants to *rank* its per-codec gains against each other.
+Then: either match wall-clock encode time per rung (a calibration pass per codec
+per resolution), or move to reference software at CTC-style configurations
+(HM/VTM) — far slower, and what a reviewer would expect for that specific claim.
+
+**Until then:** state the preset beside every number, and never order the
+per-codec gains.

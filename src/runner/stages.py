@@ -62,7 +62,12 @@ from src.pipeline.reconstruction.reconstruct import (
     ReconstructionRequest,
     reconstruct,
 )
-from src.pipeline.residual.signal import ResidualResult, compute_residual
+from src.pipeline.residual.signal import (
+    ResidualResult,
+    ResidualVariant,
+    compute_residual,
+    decode_lossy,
+)
 from src.runner.accounting import SizesBytes, measured, sizes_bytes
 
 #: Objects the runner placed on the bag, before detection names them subjects.
@@ -489,7 +494,12 @@ def _frame_luma_motion(source: np.ndarray) -> list[float]:
 
 
 def background(bag: Mapping[str, Any]) -> BackgroundModelView:
-    """A static plate from the first source frame. Identity warp."""
+    """A static plate from the first source frame. Identity warp.
+
+    Kept for callers that bind stages directly without a config. Any run that
+    has one should use `make_background`, which transmits the plate through the
+    configured sidecar instead of handing over raw pixels.
+    """
     source = as_clip(bag[SOURCE], path=SOURCE)
     return BackgroundModelView(
         plate=source[0],
@@ -499,6 +509,47 @@ def background(bag: Mapping[str, Any]) -> BackgroundModelView:
         height=int(source.shape[1]),
         scene_id=None,
     )
+
+
+def make_background(ctx: StageContext) -> StageCallable:
+    """Transmit the plate through `background.codec` and hand back what the
+    client will actually hold (BP24).
+
+    Before this, the runner's background stage was a stub: it put `source[0]`
+    on the bag as raw pixels, so `background.method`, `background.codec` and
+    `background.jpeg_quality` all reached nothing, and the plate the
+    reconstruction used was never the plate a client would decode. BP23
+    measured that raw plate at 24.9 MB — 95% of `tier_fast`'s whole figure.
+
+    Two things change together, which is the point. The view now carries the
+    **decoded** plate, so quality belongs to the same operating point as the
+    rate; and `ART_BACKGROUND_BYTES` carries the **real payload length**, not a
+    re-encode of already-decoded pixels.
+
+    Still a stub: the plate itself is the first source frame rather than a
+    stitched panorama, so `background.method` selects a transmission strategy
+    over a one-frame plate. That is the next piece, not this one.
+    """
+
+    def background_stage(bag: Mapping[str, Any]) -> BackgroundModelView:
+        from src.components.background.strategy import bind as bind_background
+
+        source = as_clip(bag[SOURCE], path=SOURCE)
+        model = bind_background(ctx.config)
+        artifact = model.transmit(np.asarray(source[0], dtype=np.uint8))
+        decoded = model.decode_payload(artifact)
+        return BackgroundModelView(
+            plate=source[0] if decoded is None else decoded,
+            homographies=(),
+            mode=artifact.mode,
+            deferred_to_residual=artifact.deferred_to_residual,
+            width=int(source.shape[2]),
+            height=int(source.shape[1]),
+            scene_id=artifact.scene_id,
+            payload_bytes=int(len(artifact.payload)),
+        )
+
+    return background_stage
 
 
 def make_generation(ctx: StageContext) -> StageCallable:
@@ -590,9 +641,22 @@ def make_codec(ctx: StageContext) -> StageCallable:
         source = as_clip(bag[SOURCE], path=SOURCE)
         residual = bag.get(ART_RESIDUAL_STREAM)
         if isinstance(residual, ResidualResult) and not residual.payload.is_absent:
+            coded = _coded_residual(ctx, residual)
+            if coded is not None:
+                frames, coded_bytes = coded
+                return {
+                    "frames": frames,
+                    "byte_count": coded_bytes,
+                    "raw_byte_count": int(residual.payload.byte_count),
+                    "residual_is_coded": True,
+                }
             return {
                 "frames": residual.reconstructed,
                 "byte_count": int(residual.payload.byte_count),
+                "raw_byte_count": int(residual.payload.byte_count),
+                # The array's size, not a bitstream's. Nothing may divide this
+                # by the source and call the result a compression ratio.
+                "residual_is_coded": False,
             }
         if ctx.lattice.is_source_passthrough:
             return {"frames": source, "byte_count": int(source.nbytes)}
@@ -616,6 +680,41 @@ def make_codec(ctx: StageContext) -> StageCallable:
         return {"frames": built.frames, "byte_count": _semantic_bytes(bag)}
 
     return codec
+
+
+def _coded_residual(
+    ctx: StageContext, residual: ResidualResult
+) -> tuple[np.ndarray, int] | None:
+    """Send the residual through `residual.codec` and rebuild from what returns.
+
+    Returns ``(frames, coded_bytes)``, or ``None`` when no encoder could run —
+    in which case the caller must keep reporting the raw array size and say so.
+
+    Both halves move together on purpose. `residual.reconstructed` was built
+    from the **pre-codec** residual, so reporting a coded size beside it would
+    put the rate and the quality at different operating points (BP24 finding 4).
+    The correction is exact rather than approximate: the delivered clip is
+    ``reconstructed - r + r_coded``, so the base reconstruction never has to be
+    recovered or recomputed.
+    """
+    payload = residual.payload
+    if payload.frames is None or payload.variant is not ResidualVariant.LOSSY:
+        return None
+    from src.components.codec.measure import coded_roundtrip
+
+    try:
+        coded_bytes, decoded = coded_roundtrip(
+            np.asarray(payload.frames, dtype=np.uint8),
+            request=ctx.config.residual.encode_request(),
+        )
+    except (FileNotFoundError, RuntimeError, ValueError):
+        # No encoder on this host, or it refused this payload. Fall back to the
+        # honest raw number rather than inventing a coded one.
+        return None
+    before = decode_lossy(np.asarray(payload.frames, dtype=np.uint8))
+    after = decode_lossy(decoded[: before.shape[0]])
+    frames = np.asarray(residual.reconstructed).astype(np.int16) - before + after
+    return np.clip(frames, 0, 255).astype(np.uint8), int(coded_bytes)
 
 
 def _semantic_bytes(bag: Mapping[str, Any]) -> int:
@@ -659,7 +758,7 @@ def default_backends(ctx: StageContext) -> dict[str, StageCallable]:
         STAGE_POSE: make_pose(ctx),
         STAGE_SEGMENTATION: make_segmentation(ctx),
         STAGE_RIGID: _empty,
-        STAGE_BACKGROUND: background,
+        STAGE_BACKGROUND: make_background(ctx),
         STAGE_GENERATION: make_generation(ctx),
         STAGE_RESIDUAL: make_residual(ctx),
         STAGE_CODEC: make_codec(ctx),
@@ -733,29 +832,88 @@ def ledger_from_bag(bag: Mapping[str, Any], source: np.ndarray) -> SizesBytes:
             residual_bytes = residual.payload.byte_count
     from src.runner.perception import metadata_bytes
 
+    # Which parts are a real bitstream, and which are still an array size.
+    # A part named here withholds the compression ratio rather than quietly
+    # contributing a raw number to a total that claims to be a rate (BP24).
+    raw: list[str] = []
+
+    bitstream = bag.get(ART_BITSTREAM)
+    if isinstance(bitstream, Mapping) and bitstream.get("residual_is_coded"):
+        residual_bytes = int(bitstream.get("byte_count", residual_bytes))
+    elif residual_bytes > 0:
+        raw.append("residual")
+
+    view = bag.get(ART_BACKGROUND_MODEL) or bag.get(STAGE_BACKGROUND)
+    if isinstance(view, BackgroundModelView) and view.payload_bytes is not None:
+        panorama_bytes = int(view.payload_bytes)
+    else:
+        panorama_bytes = _panorama_bytes(bag)
+        if panorama_bytes > 0:
+            raw.append("panorama")
+
+    actor_bytes = _measured_actor_bytes(bag)
+    if actor_bytes > 0:
+        # Appearance reports a measured payload size, but nothing has shown it
+        # is a coded one. Until that is checked it counts as raw rather than
+        # being assumed correct (BP24 finding 4).
+        raw.append("actor_reference")
+
     return sizes_bytes(
         source=int(clip.nbytes),
         residual=residual_bytes,
-        panorama=_panorama_bytes(bag),
-        actor_reference=_measured_actor_bytes(bag),
+        panorama=panorama_bytes,
+        actor_reference=actor_bytes,
         metadata=metadata_bytes(bag),
+        raw_parts=tuple(raw),
     )
 
 
-def _panorama_bytes(bag: Mapping[str, Any]) -> int:
-    """Raw plate size.
-
-    Not a coded size: `background.codec` and `background.jpeg_quality` reach
-    nothing on this path, so a plate counted here is uncompressed pixels. The
-    number is honest about what it is rather than modelling a JPEG that was
-    never made.
-    """
+def _plate_of(bag: Mapping[str, Any]) -> np.ndarray | None:
+    """The plate this run actually transmits, or None when it transmits none."""
     view = bag.get(ART_BACKGROUND_MODEL) or bag.get(STAGE_BACKGROUND)
     if not isinstance(view, BackgroundModelView) or view.plate is None:
-        return 0
+        return None
     if view.deferred_to_residual or view.mode == "none":
-        return 0
-    return int(np.asarray(view.plate).nbytes)
+        return None
+    return np.asarray(view.plate)
+
+
+def _panorama_bytes(bag: Mapping[str, Any]) -> int:
+    """Raw plate size — uncompressed pixels, kept for comparison with BP23.
+
+    This is deliberately *not* the transmitted cost once a sidecar is
+    configured; see `_panorama_coded_bytes`. It stays so the BP23 table remains
+    readable next to the coded one and the change in meaning is visible.
+    """
+    plate = _plate_of(bag)
+    return 0 if plate is None else int(plate.nbytes)
+
+
+def _panorama_coded_bytes(ctx: StageContext, bag: Mapping[str, Any]) -> int | None:
+    """What the plate really costs through `background.codec` (BP24).
+
+    Returns ``None`` when there is no plate to send, so a caller can tell
+    "nothing transmitted" from "transmitted for free". Before BP24 this path
+    reported raw pixels and `background.codec` / `background.jpeg_quality`
+    reached nothing at all — BP23 measured a 24.9 MB plate that way, 95% of
+    `tier_fast`'s entire figure.
+    """
+    view = bag.get(ART_BACKGROUND_MODEL) or bag.get(STAGE_BACKGROUND)
+    if isinstance(view, BackgroundModelView) and view.payload_bytes is not None:
+        # The size the transmission actually produced. Preferred over any
+        # re-encode: `view.plate` is already *decoded* pixels, so encoding it
+        # again measures a second, easier compression of a cleaned-up image.
+        return int(view.payload_bytes)
+    plate = _plate_of(bag)
+    if plate is None:
+        return None
+    from src.components.background.sidecar import build_sidecar
+
+    sidecar = build_sidecar(
+        ctx.config.background.codec,
+        jpeg_quality=ctx.config.background.jpeg_quality,
+    )
+    return int(len(sidecar.encode(plate)))
 
 
 def _measured_actor_bytes(bag: Mapping[str, Any]) -> int:
