@@ -330,7 +330,14 @@ def check_bounds(
             )
 
     for rung in stream_rungs:
-        if not np.isfinite(rung.detail.get("precodec_vs_delivered_dB", float("inf"))):
+        # A rung that transmits no residual has nothing for a codec to run on,
+        # so an infinite gap there is the correct answer rather than an alarm.
+        # The coarseness sweep's `absent` rung is exactly that, and it belongs
+        # on the curve: it is the unaided control.
+        sends_residual = int(rung.detail.get("parts", {}).get("residual", 0)) > 0
+        if sends_residual and not np.isfinite(
+            rung.detail.get("precodec_vs_delivered_dB", float("inf"))
+        ):
             alarms.append(
                 f"pointstream at {rung.rate_value}: the pre-codec and delivered "
                 "reconstructions are identical, so residual.codec did not run "

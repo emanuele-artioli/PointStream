@@ -225,6 +225,55 @@ three push in the same direction, and the honest reading is: **as configured
 today, on this content, PointStream is a more expensive way to send a video than
 the codec it is built on.**
 
+#### P0 item 3 — the residual-coarseness curve, low motion
+
+`outputs/bp24-ladder/av1-coarseness-lowmotion.json`. Same clip, same anchor
+(the five anchor rungs reproduced to the byte and to two decimal places, which
+is a reproducibility check worth having).
+
+| rung | coded bytes | Y-PSNR | plate | residual |
+|---|---:|---:|---:|---:|
+| absent *(control)* | 487,643 | 35.37 | 463,334 | 0 |
+| coarse | 491,977 | 40.77 | 463,334 | 4,334 |
+| medium | 508,413 | 43.33 | 463,334 | 20,770 |
+| fine | 812,971 | 46.11 | 463,334 | 325,328 |
+| lossless *(excluded)* | 398,618,843 | ∞ | 463,334 | 398,155,509 |
+
+> **BD-rate +161.5%** over 39.45–44.02 dB, overlap fraction 1.00.
+
+**The residual is the cheap part, and it is very good value.** Against the
+unaided control:
+
+| from absent to | extra bytes | extra rate | quality gained |
+|---|---:|---:|---:|
+| coarse | +4,334 | +0.9% | **+5.40 dB** |
+| medium | +20,770 | +4.3% | **+7.96 dB** |
+| fine | +325,328 | +66.7% | +10.74 dB |
+
+A residual costing under one percent of the payload buys five and a half dB.
+That is the clearest positive result in this work, and it sharpens rather than
+softens the headline: PointStream's rate problem is **entirely the plate**, and
+the component the architecture argues hardest for is the one earning its bytes.
+
+**The control ran in the same session, as it must.** The unaided corner — plate
+plus pasted crops, no residual — is 487,643 B at 35.37 dB, against av1's
+85,995 B at 39.45 dB. The plate alone is already 5.7x the rate for 4 dB less
+quality, before the residual is asked for anything.
+
+**Three alarms fired, and two of them are the guard working.**
+
+- `lossless` was **excluded from the curve**: `_coded_residual` returns `None`
+  for the lossless variant, so its residual stays a dense int16 array — 398 MB,
+  twice the source — and the ledger correctly withheld the ratio. That rung is
+  the ceiling calibration `coarseness_ladder()` says it is, not an operating
+  point, and it never reached the fit.
+- The same rung tripped the "residual.codec did not run" alarm, which is exactly
+  what happened.
+- The third was a **false positive**: `absent` also reports an infinite
+  pre-codec-versus-delivered gap, because there is no residual to code. The
+  check now skips a rung that transmits no residual. The stored alarm text in
+  this file and in the two later axes predates that fix.
+
 #### Remaining axes
 
 <!-- RESULTS -->
