@@ -15,11 +15,13 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
+import subprocess
 import tempfile
 
 import numpy as np
 
 from src.components.codec.encode import BITSTREAM_SUFFIX, decode, encode, sweep_qp
+from src.components.codec import tools
 from src.components.codec.frames import even_size, rgb_to_luma
 from src.components.codec.y4m import from_luma, read, write
 from src.components.metrics.bd_rate import RDCurve
@@ -160,3 +162,70 @@ def coded_curve(
             rates.append(float(record.size_bytes))
             qualities.append(_luma_psnr(luma, read(decoded_path).luma))
     return RDCurve(rates=tuple(rates), qualities=tuple(qualities), label=codec_name)
+
+
+def coded_roundtrip(
+    frames: np.ndarray,
+    *,
+    request: EncodeRequest,
+    fps: float = 25.0,
+    work_dir: Path | None = None,
+) -> tuple[int, np.ndarray]:
+    """Encode ``frames``, decode them back, and report both cost and result.
+
+    Returns ``(coded_bytes, decoded_frames)``. Both halves matter: a rate is
+    only a rate-distortion point if the quality is measured on what the codec
+    actually returned. Counting coded bytes while reconstructing from the
+    pre-codec array puts the rate and the quality at different operating points
+    — the mistake `BP24` made once on the background plate before catching it.
+
+    **Colour-preserving.** The payload is written as lossless RGB first and the
+    encoder converts to ``request.pix_fmt``. A residual carries a correction per
+    channel, so the luma-only path used by `coded_size` would silently discard
+    two thirds of it.
+    """
+    clip = np.ascontiguousarray(np.asarray(frames, dtype=np.uint8))
+    if clip.ndim != 4 or clip.shape[3] != 3:
+        raise ValueError(f"expected (T,H,W,3) uint8, got {tuple(clip.shape)}")
+    clip = even_size(clip)
+    count, height, width, _ = clip.shape
+    ffmpeg = tools.resolve_ffmpeg()
+
+    with tempfile.TemporaryDirectory(dir=work_dir) as tmp:
+        root = Path(tmp)
+        lossless = root / "payload.mkv"
+        _run_ffmpeg(
+            [
+                ffmpeg.path, "-hide_banner", "-loglevel", "error", "-y",
+                "-f", "rawvideo", "-pix_fmt", "rgb24",
+                "-s", f"{width}x{height}", "-framerate", str(fps),
+                "-i", "-", "-c:v", "ffv1", str(lossless),
+            ],
+            clip.tobytes(),
+        )
+        dest = root / f"payload{BITSTREAM_SUFFIX[request.codec_name]}"
+        record = encode(lossless, dest, request)
+        back = root / "decoded.mkv"
+        decode(dest, back, request)
+        raw = _run_ffmpeg(
+            [
+                ffmpeg.path, "-hide_banner", "-loglevel", "error",
+                "-i", str(back), "-f", "rawvideo", "-pix_fmt", "rgb24", "-",
+            ],
+            None,
+        )
+    decoded = np.frombuffer(raw, dtype=np.uint8)
+    usable = (decoded.size // (height * width * 3)) * height * width * 3
+    decoded = decoded[:usable].reshape(-1, height, width, 3)
+    if decoded.shape[0] < count:
+        pad = np.repeat(decoded[-1:], count - decoded.shape[0], axis=0)
+        decoded = np.concatenate([decoded, pad], axis=0)
+    return int(record.size_bytes), decoded[:count]
+
+
+def _run_ffmpeg(argv: list[str], stdin_bytes: bytes | None) -> bytes:
+    result = subprocess.run(argv, input=stdin_bytes, capture_output=True)
+    if result.returncode != 0:
+        detail = (result.stderr or b"").decode("utf-8", "replace").strip()
+        raise RuntimeError(f"ffmpeg failed ({result.returncode}): {detail[:400]}")
+    return result.stdout
