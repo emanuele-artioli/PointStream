@@ -90,3 +90,75 @@ is incompressible, so a noise-based anchor cannot exercise a rate-quality sweep
 at all; it saturates and reports nonsense in both directions. When calibrating
 anything rate-related, the anchor has to be compressible the way real content
 is.
+
+## 4. Counting coded bytes while reconstructing from the pre-codec array
+
+**The trap that cost the most time this session, and it is invisible in a test.**
+
+A rate is only a rate-distortion point if the quality was measured on **what the
+codec returned**. It is very easy to write code that encodes a payload, records
+`len(bitstream)`, and then reconstructs from the array it still has in memory.
+Every test passes. The byte count is real. The quality is real. They belong to
+**different operating points**, and the resulting RD point is fiction.
+
+BP24 did this once: the first plate commit re-encoded an *already-decoded* plate
+to get a size, while reconstruction used those same decoded pixels. Two separate
+errors in one place — the size was a second, easier compression of a cleaned-up
+image, and nothing tied it to the quality.
+
+**The fix that generalises:** make the API return both halves together.
+`coded_roundtrip` returns `(coded_bytes, decoded_frames)` rather than a size, so
+a caller cannot take the rate without taking the reconstruction that goes with
+it. Shape the interface so the mistake is hard, rather than documenting it.
+
+**Where this still needs applying:** anywhere a component reports a byte count.
+Appearance and motion payloads report measured sizes today; whether those are
+transmitted costs or array sizes has not been checked with the same care.
+
+## 5. A luma-only encode silently discards colour, and still returns a number
+
+`coded_size` converts to luma before encoding. That is right for a still plate
+scored on luma PSNR, and **wrong for anything carrying per-channel information**.
+A residual is a correction in R, G and B; encode it through the luma path and two
+thirds of it vanishes while the byte count still looks plausible.
+
+Caught by checking per-channel correlation between the original and decoded
+residual: **R 0.950, G 0.961, B 0.902** through the colour-preserving path. A
+luma-only route would have shown a healthy R and destroyed B, and no byte count
+would have hinted at it.
+
+**Rule:** when a payload has channels that mean different things, verify each
+channel survives the round-trip, not just the total size.
+
+## 6. The runner's background stage was a stub, and half of it still is
+
+Before BP24, `background()` in `src/runner/stages.py` was `plate=source[0]` with
+an identity warp. It never called `BackgroundStrategy`, never ran a sidecar, and
+`background.method` / `background.codec` / `background.jpeg_quality` reached
+**nothing**. The component layer was correct and careful the whole time —
+`transmit()` even documents that the plate handed forward must be the decoded
+one — the runner simply was not using it.
+
+`make_background` now binds the configured strategy, so the plate is transmitted
+and the view carries the real payload length and the decoded pixels.
+
+**Still a stub, and this is the honest limit of BP24's background work:** the
+plate itself is the **first source frame**, not a stitched panorama. So
+`background.method` currently selects a *transmission strategy* over a one-frame
+plate. Panorama stitching (`build_plate` exists in
+`src/components/background/plate.py`) is not wired into the runner. Any result
+quoting a background saving must say which of these it measured.
+
+## 7. Two measurements that are the easy case, not the typical one
+
+Both headline ratios from BP24 were taken on favourable material and must be
+re-measured before anything quotes them:
+
+- **The residual at 3667×** (9,331,200 B → 2,545 B) was a near-static residual
+  against a static plate, only **2.5% non-zero**. High motion will be far worse.
+- **Round-trip error was mean 0.094 but max 100.** AV1 at CRF 35 smooths isolated
+  large corrections — exactly the pixels a residual exists to fix. Expect the
+  residual's rate-quality curve to be steeper than the plate's.
+
+Neither is a reason to distrust the machinery; both are reasons to run the ladder
+over real clips at several rungs rather than trusting a single operating point.
