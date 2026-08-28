@@ -10,6 +10,7 @@ the names the existing invariant check already reads: ``metadata``,
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 from src.contracts.objectstream import WireCost
 
@@ -34,12 +35,24 @@ class SizesBytes:
     actor_reference: int = 0
     metadata: int = 0
     transport_total: int = 0
+    # Components still counted as raw array size rather than a coded bitstream.
+    # A total mixing coded and raw parts is not a rate, and dividing it by the
+    # source produces a number that looks like a compression ratio and is not
+    # (`PLAN.md` §3, BP24). Empty means every part was really coded.
+    raw_parts: tuple[str, ...] = ()
 
-    def as_dict(self) -> dict[str, int | float]:
-        ratio = (
-            float(self.transport_total) / float(self.source) if self.source > 0 else 0.0
+    @property
+    def is_rate(self) -> bool:
+        """Whether ``transport_total`` may be compared against a codec at all."""
+        return not self.raw_parts
+
+    def as_dict(self) -> dict[str, Any]:
+        ratio: float | None = (
+            float(self.transport_total) / float(self.source)
+            if self.source > 0 and self.is_rate
+            else None
         )
-        return {
+        out: dict[str, Any] = {
             "source": self.source,
             "residual": self.residual,
             "panorama": self.panorama,
@@ -47,7 +60,17 @@ class SizesBytes:
             "metadata": self.metadata,
             "transport_total": self.transport_total,
             "transport_to_source_ratio": ratio,
+            "is_rate": self.is_rate,
         }
+        if self.raw_parts:
+            out["raw_parts"] = list(self.raw_parts)
+            out["not_a_rate"] = (
+                "these parts are raw array sizes, not coded bitstreams: "
+                + ", ".join(self.raw_parts)
+                + ". transport_to_source_ratio is withheld because a mixed "
+                "total is not a compression ratio."
+            )
+        return out
 
     @property
     def parts_sum(self) -> int:

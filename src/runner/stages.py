@@ -62,7 +62,12 @@ from src.pipeline.reconstruction.reconstruct import (
     ReconstructionRequest,
     reconstruct,
 )
-from src.pipeline.residual.signal import ResidualResult, compute_residual
+from src.pipeline.residual.signal import (
+    ResidualResult,
+    ResidualVariant,
+    compute_residual,
+    decode_lossy,
+)
 from src.runner.accounting import SizesBytes, measured, sizes_bytes
 
 #: Objects the runner placed on the bag, before detection names them subjects.
@@ -636,9 +641,22 @@ def make_codec(ctx: StageContext) -> StageCallable:
         source = as_clip(bag[SOURCE], path=SOURCE)
         residual = bag.get(ART_RESIDUAL_STREAM)
         if isinstance(residual, ResidualResult) and not residual.payload.is_absent:
+            coded = _coded_residual(ctx, residual)
+            if coded is not None:
+                frames, coded_bytes = coded
+                return {
+                    "frames": frames,
+                    "byte_count": coded_bytes,
+                    "raw_byte_count": int(residual.payload.byte_count),
+                    "residual_is_coded": True,
+                }
             return {
                 "frames": residual.reconstructed,
                 "byte_count": int(residual.payload.byte_count),
+                "raw_byte_count": int(residual.payload.byte_count),
+                # The array's size, not a bitstream's. Nothing may divide this
+                # by the source and call the result a compression ratio.
+                "residual_is_coded": False,
             }
         if ctx.lattice.is_source_passthrough:
             return {"frames": source, "byte_count": int(source.nbytes)}
@@ -662,6 +680,41 @@ def make_codec(ctx: StageContext) -> StageCallable:
         return {"frames": built.frames, "byte_count": _semantic_bytes(bag)}
 
     return codec
+
+
+def _coded_residual(
+    ctx: StageContext, residual: ResidualResult
+) -> tuple[np.ndarray, int] | None:
+    """Send the residual through `residual.codec` and rebuild from what returns.
+
+    Returns ``(frames, coded_bytes)``, or ``None`` when no encoder could run —
+    in which case the caller must keep reporting the raw array size and say so.
+
+    Both halves move together on purpose. `residual.reconstructed` was built
+    from the **pre-codec** residual, so reporting a coded size beside it would
+    put the rate and the quality at different operating points (BP24 finding 4).
+    The correction is exact rather than approximate: the delivered clip is
+    ``reconstructed - r + r_coded``, so the base reconstruction never has to be
+    recovered or recomputed.
+    """
+    payload = residual.payload
+    if payload.frames is None or payload.variant is not ResidualVariant.LOSSY:
+        return None
+    from src.components.codec.measure import coded_roundtrip
+
+    try:
+        coded_bytes, decoded = coded_roundtrip(
+            np.asarray(payload.frames, dtype=np.uint8),
+            request=ctx.config.residual.encode_request(),
+        )
+    except (FileNotFoundError, RuntimeError, ValueError):
+        # No encoder on this host, or it refused this payload. Fall back to the
+        # honest raw number rather than inventing a coded one.
+        return None
+    before = decode_lossy(np.asarray(payload.frames, dtype=np.uint8))
+    after = decode_lossy(decoded[: before.shape[0]])
+    frames = np.asarray(residual.reconstructed).astype(np.int16) - before + after
+    return np.clip(frames, 0, 255).astype(np.uint8), int(coded_bytes)
 
 
 def _semantic_bytes(bag: Mapping[str, Any]) -> int:
