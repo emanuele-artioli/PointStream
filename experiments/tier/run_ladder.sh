@@ -18,10 +18,10 @@ RUN="conda run -n pointstream --no-capture-output python -u -m experiments.tier.
 
 mkdir -p "$OUT"
 
-echo "=== [1/4] av1, codec-rate sweep, low motion (P0 item 2) ==="
-$RUN --codecs av1 --frames "$FRAMES" --tier balanced --sweep qp \
+echo "=== [1/4] av1, payload sweep, low motion (P0 item 2) ==="
+$RUN --codecs av1 --frames "$FRAMES" --tier balanced --sweep payload \
      --video alcaraz_highlights --scene scene_000 \
-     --out "$OUT/av1-qp-lowmotion.json"
+     --out "$OUT/av1-payload-lowmotion.json"
 
 echo "=== [2/4] av1, residual-coarseness sweep, low motion (P0 item 3) ==="
 $RUN --codecs av1 --frames "$FRAMES" --tier balanced --sweep coarseness \
@@ -32,16 +32,16 @@ $RUN --codecs av1 --frames "$FRAMES" --tier balanced --sweep coarseness \
 # at 7.70 grey levels between consecutive frames against 0.33 for the one above
 # — a factor of 23. Findings §7 predicts PointStream does much worse here,
 # because the plate it transmits is the first source frame.
-echo "=== [3/4] av1, codec-rate sweep, HIGH motion (findings §7 re-measure) ==="
-$RUN --codecs av1 --frames "$FRAMES" --tier balanced --sweep qp \
+echo "=== [3/4] av1, payload sweep, HIGH motion (findings §7 re-measure) ==="
+$RUN --codecs av1 --frames "$FRAMES" --tier balanced --sweep payload \
      --video federer_djokovic --scene scene_003 \
-     --out "$OUT/av1-qp-highmotion.json"
+     --out "$OUT/av1-payload-highmotion.json"
 
 # One gain per codec, each against itself. Never ranked against each other:
 # the presets are not equal effort (findings §1).
 echo "=== [4/4] the rest of the roster, low motion ==="
-$RUN --codecs hevc avc vvc --frames "$FRAMES" --tier balanced --sweep qp \
+$RUN --codecs hevc avc vvc --frames "$FRAMES" --tier balanced --sweep payload \
      --video alcaraz_highlights --scene scene_000 \
-     --out "$OUT/roster-qp-lowmotion.json"
+     --out "$OUT/roster-payload-lowmotion.json"
 
 echo "=== ladder script finished ==="

@@ -75,7 +75,22 @@ OUT_DIR = REPO / "outputs" / "bp24-ladder"
 #: ends up resolving nothing. Capped at 46 because `avc` and `hevc` take QP
 #: 0-51 while `av1` and `vvc` take 0-63 — a rung outside one codec's range would
 #: silently become a different rung there.
-DEFAULT_RUNGS = (22, 30, 38, 46)
+DEFAULT_RUNGS = (15, 25, 35, 45, 55)
+
+#: `(background.jpeg_quality, residual rate)`, coarsest first.
+#:
+#: Sweeping `residual.rate` alone does **not** produce a PointStream RD curve on
+#: this content, and the first run of this ladder is what showed it: over QP
+#: 30 to 46 the payload moved 526,079 -> 495,739 B, a span of 6%, because the
+#: plate was 463,334 B of it — 93% — and the plate does not move with the
+#: residual's knob. The two rungs landed 0.55 dB apart and the comparison had
+#: nothing to integrate over.
+#:
+#: So a rung has to move everything that trades rate for quality. That is what
+#: the shipped tiers already do (`fast` is jpeg 50 with a coarse residual,
+#: `quality` is jpeg 95 with a fine one); this table is that pairing, extended
+#: at both ends so the curve spans enough quality to compare.
+PAYLOAD_RUNGS = ((30, 55), (50, 46), (75, 38), (90, 28), (98, 18))
 
 #: QP, not CRF. `src/contracts/codecs.py` gives CRF to `avc` and `av1` only:
 #: `hevc` (kvazaar) and `vvc` (vvenc) declare QP and BITRATE. QP is the one mode
@@ -142,7 +157,7 @@ def _announce(rung: Rung, arm: str) -> Rung:
     progress line at least every ten minutes so a real hang is visible in
     minutes rather than hours; this is that line.
     """
-    label = rung.detail.get("coarseness") or f"r={rung.rate_value}"
+    label = rung.detail.get("coarseness") or rung.detail.get("rung") or f"r={rung.rate_value}"
     print(
         f"  {arm:<7} {label:>9}  {rung.coded_bytes:>10} B  "
         f"{rung.quality_db:6.2f} dB  {rung.seconds:6.1f}s",
@@ -360,6 +375,61 @@ def coarseness_rung(
     )
 
 
+def payload_rung(
+    clip: TierClip,
+    config: PointstreamConfig,
+    *,
+    jpeg_quality: int,
+    rate_value: int,
+    rank: int,
+) -> Rung:
+    """PointStream at one rung of the whole transmitted payload's quality.
+
+    Moves the plate's sidecar quality and the residual's rate together, because
+    the plate is most of what PointStream sends and a curve that held it fixed
+    would be a curve of the 7% that moved.
+
+    `rank` follows the same convention as every other rung here: **higher means
+    coarser**, so one monotonicity check covers all three sweeps.
+    """
+    tuned = config.with_(
+        background=replace(config.background, jpeg_quality=int(jpeg_quality)),
+        residual=replace(config.residual, rate=int(rate_value)),
+    )
+    started = time.time()
+    outcome = run_config(f"pointstream@q{jpeg_quality}/r{rate_value}", tuned, clip)
+    seconds = time.time() - started
+    sizes = outcome.result.sizes
+    delivered = outcome.result.delivered_frames
+    return Rung(
+        rate_value=rank,
+        coded_bytes=int(sizes.transport_total),
+        quality_db=pooled_psnr(clip.frames, delivered),
+        seconds=seconds,
+        detail={
+            "arm": "pointstream",
+            "rung": f"jpeg{jpeg_quality}/qp{rate_value}",
+            "background_jpeg_quality": int(jpeg_quality),
+            "residual_rate": int(rate_value),
+            "codec": tuned.residual.codec,
+            "preset": tuned.residual.preset,
+            "rate_control": tuned.residual.rate_control.value,
+            "is_rate": bool(sizes.is_rate),
+            "raw_parts": list(sizes.raw_parts),
+            "parts": {
+                "residual": sizes.residual,
+                "panorama": sizes.panorama,
+                "actor_reference": sizes.actor_reference,
+                "metadata": sizes.metadata,
+            },
+            "source_bytes": sizes.source,
+            "precodec_vs_delivered_dB": pooled_psnr(
+                np.asarray(outcome.result.frames), delivered
+            ),
+        },
+    )
+
+
 def pair_for_codec(
     clip: TierClip,
     config: PointstreamConfig,
@@ -414,29 +484,58 @@ def pair_for_codec(
                 )
                 print(f"  stream  r={rate_value:>3}  FAILED {exc!r}", flush=True)
 
+    if sweep == "payload":
+        for index, (jpeg_quality, rate_value) in enumerate(PAYLOAD_RUNGS):
+            try:
+                stream_rungs.append(
+                    _announce(
+                        payload_rung(
+                            clip,
+                            paired,
+                            jpeg_quality=jpeg_quality,
+                            rate_value=rate_value,
+                            rank=len(PAYLOAD_RUNGS) - 1 - index,
+                        ),
+                        "stream",
+                    )
+                )
+            except Exception as exc:  # noqa: BLE001
+                failures.append(
+                    {
+                        "rate_value": f"jpeg{jpeg_quality}/qp{rate_value}",
+                        "arm": "pointstream",
+                        "error": repr(exc),
+                    }
+                )
+                print(
+                    f"  stream  jpeg{jpeg_quality}/qp{rate_value}  FAILED {exc!r}",
+                    flush=True,
+                )
+
     if sweep == "coarseness":
         # The candidate arm sweeps the residual representation instead of the
         # codec's rate. The anchor still sweeps QP, which is fine: BD-rate
         # integrates over the overlapping quality range and does not need the
         # two arms to share rung values.
         for point in coarseness_ladder():
-            tuned_point = (
-                point
-                if point.config is None
-                else replace(
+            # Absent has no encode to configure, and lossless is left exactly as
+            # `coarseness_ladder()` defines it: that rung names AVC on purpose,
+            # because it is the one build on this host that honours
+            # `rate_control=lossless`, and `av1` does not declare LOSSLESS at
+            # all. Overriding it would turn a stated ceiling calibration into an
+            # invalid request. Every lossy rung takes the paired codec.
+            if point.config is None or point.variant is ResidualVariant.LOSSLESS:
+                tuned_point = point
+            else:
+                tuned_point = replace(
                     point,
                     config=replace(
                         point.config,
                         codec=codec_name,
                         preset=PRESETS[codec_name],
-                        rate_control=(
-                            point.config.rate_control
-                            if point.variant is ResidualVariant.LOSSLESS
-                            else LADDER_RATE_CONTROL
-                        ),
+                        rate_control=LADDER_RATE_CONTROL,
                     ),
                 )
-            )
             try:
                 stream_rungs.append(
                     _announce(coarseness_rung(clip, config, tuned_point), "stream")
@@ -520,10 +619,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--frames", type=int, default=8)
     parser.add_argument(
         "--sweep",
-        choices=("qp", "coarseness"),
-        default="qp",
+        choices=("payload", "qp", "coarseness"),
+        default="payload",
         help=(
-            "qp: the candidate arm sweeps the codec rate (P0 item 2). "
+            "payload: the candidate arm sweeps plate quality and residual rate "
+            "together, which is the only one of the three that moves "
+            "PointStream's rate much (P0 item 2). "
+            "qp: it sweeps the residual rate alone, holding the plate fixed. "
             "coarseness: it sweeps the residual-coarseness ladder (P0 item 3)."
         ),
     )
