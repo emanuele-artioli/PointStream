@@ -134,6 +134,23 @@ class Rung:
         }
 
 
+def _announce(rung: Rung, arm: str) -> Rung:
+    """Print a rung the moment it lands, and hand it straight back.
+
+    A 4K rung takes minutes, and printing only once the whole codec's pair
+    finished left a job that looked hung for half an hour. AGENTS.md asks for a
+    progress line at least every ten minutes so a real hang is visible in
+    minutes rather than hours; this is that line.
+    """
+    label = rung.detail.get("coarseness") or f"r={rung.rate_value}"
+    print(
+        f"  {arm:<7} {label:>9}  {rung.coded_bytes:>10} B  "
+        f"{rung.quality_db:6.2f} dB  {rung.seconds:6.1f}s",
+        flush=True,
+    )
+    return rung
+
+
 def anchor_rung(clip: TierClip, request: EncodeRequest) -> Rung:
     """Codec X coding the source clip, at one rung.
 
@@ -381,17 +398,21 @@ def pair_for_codec(
             failures.append({"rate_value": rate_value, "arm": "both", "error": repr(exc)})
             continue
         try:
-            anchor_rungs.append(anchor_rung(clip, request))
+            anchor_rungs.append(_announce(anchor_rung(clip, request), "anchor"))
         except Exception as exc:  # noqa: BLE001
             failures.append({"rate_value": rate_value, "arm": "anchor", "error": repr(exc)})
+            print(f"  anchor  r={rate_value:>3}  FAILED {exc!r}", flush=True)
             continue
         if sweep == "qp":
             try:
-                stream_rungs.append(pointstream_rung(clip, paired, rate_value))
+                stream_rungs.append(
+                    _announce(pointstream_rung(clip, paired, rate_value), "stream")
+                )
             except Exception as exc:  # noqa: BLE001
                 failures.append(
                     {"rate_value": rate_value, "arm": "pointstream", "error": repr(exc)}
                 )
+                print(f"  stream  r={rate_value:>3}  FAILED {exc!r}", flush=True)
 
     if sweep == "coarseness":
         # The candidate arm sweeps the residual representation instead of the
@@ -417,7 +438,9 @@ def pair_for_codec(
                 )
             )
             try:
-                stream_rungs.append(coarseness_rung(clip, config, tuned_point))
+                stream_rungs.append(
+                    _announce(coarseness_rung(clip, config, tuned_point), "stream")
+                )
             except Exception as exc:  # noqa: BLE001
                 failures.append(
                     {
@@ -425,6 +448,9 @@ def pair_for_codec(
                         "arm": "pointstream",
                         "error": repr(exc),
                     }
+                )
+                print(
+                    f"  stream  {point.coarseness.value:>9}  FAILED {exc!r}", flush=True
                 )
 
     # A rung whose total is not a rate is not a point on an RD curve. Drop it
@@ -528,18 +554,6 @@ def main(argv: list[str] | None = None) -> int:
             rungs=tuple(args.rungs),
             sweep=args.sweep,
         )
-        for row in pair["anchor_rungs"]:
-            print(
-                f"  anchor  r={row['rate_value']:>3}  {row['coded_bytes']:>10} B  "
-                f"{row['psnr_dB']:6.2f} dB  {row['seconds']:6.1f}s",
-                flush=True,
-            )
-        for row in pair["pointstream_rungs"]:
-            print(
-                f"  stream  r={row['rate_value']:>3}  {row['coded_bytes']:>10} B  "
-                f"{row['psnr_dB']:6.2f} dB  {row['seconds']:6.1f}s",
-                flush=True,
-            )
         for alarm in pair["bound_alarms"]:
             print(f"  ALARM {alarm}", flush=True)
         print(f"  => {pair.get('reading') or pair.get('blocked_by')}", flush=True)

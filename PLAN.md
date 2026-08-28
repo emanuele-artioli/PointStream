@@ -982,16 +982,48 @@ friendliest possible input; re-measure on high motion before quoting either.
 component still counted as an array size, and `transport_to_source_ratio` is
 withheld entirely while that list is non-empty — including through `__add__`, so
 summing chunks cannot launder an uncoded chunk into a total that claims to be a
-rate. `actor_reference` is currently listed: appearance reports a measured size
-and nobody has shown it is a coded one.
+rate.
 
-**Still open:** the `WireCost` `exact`/`basis` pass, the paired-arm ladder, and
-the plate is still the first source frame rather than a stitched panorama.
-
-**Read `plans/BP24-findings.md` before quoting any rate.** Seven findings,
+**Read `plans/BP24-findings.md` before quoting any rate.** Eleven findings,
 including the one that cost the most time: counting coded bytes while
 reconstructing from the pre-codec array passes every test, uses two real
 numbers, and yields a fictional rate-distortion point.
+
+### 2.19 What `exact` means, and what `actor_reference` turned out to be
+
+`BP24` continued, 2026-08-28. Report: `plans/BP24-ladder-report.md`.
+
+**`WireCost.exact` has one meaning now.** It used to mean "follows from declared
+parameters rather than from a model of the encoder", which was unambiguous only
+while nothing here ran an encoder. Both residual paths sat at `exact=True` on
+top of a basis describing an in-memory array, and two separate mechanisms were
+each deciding whether a byte count was a bitstream. It now means **these bytes
+are transmitted** — a measured bitstream, or a packed payload at a declared
+quantization with no further coding step configured. Both pre-codec residual
+paths are `exact=False`; the absent path stays an exact zero, because sending
+nothing is a measurement.
+
+**`actor_reference` is a wire cost, and it clears the ledger** — driven per
+backend, not argued (`outputs/bp24-ladder/appearance-cost.json`).
+`compressed-image` returns a real JPEG bitstream whose size moves with quality
+(1,448 / 2,020 / 7,732 B at q20 / q60 / q95) and which decodes back to the crop
+at MAE 2.83. `image-embedding` and `diffusion-latent` return a packed float16
+buffer whose length equals the declared cost exactly: a wire cost, but **not a
+coded one**. The flag comes off the payload the appearance stage produces, and
+a payload that does not state `exact` still withholds the ratio, so a backend
+added later cannot clear itself by default.
+
+**Two defects found on the way.** `RunResult.frames` had stopped being the
+delivered clip — it carries the residual as the residual stage produced it,
+while `sizes` costs the coded one, and the two differ by exactly the axis a rate
+ladder sweeps (findings §8). `delivered_frames` now exists. And `bd_rate`'s
+overlap guard was a proportion, so two flat curves overlapped perfectly and
+returned a confident number over 0.5 dB; an absolute 3 dB floor closes it.
+
+**The clip every BP24 ratio was measured on is the most static of the eight
+cached windows**, by 23x against the most dynamic
+(`outputs/bp24-ladder/motion-survey.json`). §2.18's "both are the easy case" is
+now measured on the input rather than inferred from the output.
 
 ## 3. Architecture
 

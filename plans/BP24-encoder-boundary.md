@@ -113,16 +113,15 @@ gone.
 
 ### Not done — pick this up next
 
-1. **The `WireCost` honesty pass.** Both residual paths still set `exact=True`
-   with a `basis` describing an array, which was true before a codec ran and is
-   now ambiguous. `exact` should mean "this is the bitstream size".
+1. ~~The `WireCost` honesty pass.~~ **Done 2026-08-28** — see below.
 2. **Re-run the BP23 ladder as curves**, not single-QP totals. Per the paired-arm
    decision (`plans/BP24-findings.md` §1): for codec X, measure X coding the
    source and PointStream using X, **same preset**, and take BD-rate between
    them. The preset cancels; do not rank the per-codec gains against each other.
-3. **`actor_reference` is marked raw on purpose.** Appearance reports a measured
-   size and nobody has checked whether it is a coded one. Check before clearing
-   it, or the ledger silently regains a raw part.
+   *The harness exists (`experiments/tier/ladder.py`, both sweeps) and the
+   bounds are written; see the second status block for what the runs did.*
+3. ~~`actor_reference` is marked raw on purpose.~~ **Done 2026-08-28** — checked
+   per backend and cleared with evidence; see below.
 4. **The plate is still the first source frame**, not a stitched panorama, so
    `background.method` picks a transmission strategy over one frame.
 
@@ -132,3 +131,43 @@ gone.
 time: counting coded bytes while reconstructing from the pre-codec array passes
 every test and produces a fictional RD point. Both headline ratios above were
 measured on the **easy case** and must be re-measured on high motion.
+
+---
+
+## Status — 2026-08-28, second session (`wave6/bp24-ladder`)
+
+Full report: **`plans/BP24-ladder-report.md`**. Findings added:
+`plans/BP24-findings.md` §§8-11.
+
+### Done
+
+- **The `WireCost` honesty pass (item 1).** `exact` now means "these bytes are
+  transmitted" — a measured bitstream, or a packed payload at a declared
+  quantization with no further coding step configured. Both pre-codec residual
+  paths are `exact=False` with a basis that says so; the absent path stays an
+  exact zero. One mechanism instead of two: the ledger reads the flag.
+- **`actor_reference` settled (item 3), and it clears.** Driven per backend
+  (`outputs/bp24-ladder/appearance-cost.json`): `compressed-image` is a real
+  JPEG bitstream (size moves with quality, decodes back to the crop at MAE
+  2.83); `image-embedding` and `diffusion-latent` are packed float16 buffers
+  whose length equals the declared cost. All three are wire costs, so the part
+  clears — from a flag the appearance stage sets, defaulting to *not* a wire
+  cost, so a later backend cannot clear itself by omission.
+- **`RunResult.delivered_frames`.** `frames` had stopped being the delivered
+  clip once BP24 coded the residual, and the gap is exactly what a rate ladder
+  sweeps (findings §8). No published number was affected.
+- **`bd_rate` gains an absolute span floor.** Findings §2's hole, closed:
+  `MIN_QUALITY_SPAN_DB = 3.0` and `DegenerateCurveError`, which subclasses
+  `InsufficientOverlapError` so existing callers decline rather than crash.
+- **The motion axis is measured, not assumed** (findings §11).
+  `alcaraz_highlights/scene_000` — the clip every BP24 ratio was taken on — is
+  the most static of the eight cached windows, by 23x.
+- **The ladder harness**, `experiments/tier/ladder.py`: paired arms from one
+  `EncodeRequest` per rung, `--sweep qp` for P0 item 2 and
+  `--sweep coarseness` for item 3, bounds evaluated in code and written into
+  every result, and a refusal to rank per-codec gains against each other.
+
+### Not done
+
+See `plans/BP24-ladder-report.md` §4 for exactly where the ladder runs got to
+and what blocked them.
