@@ -386,3 +386,32 @@ together guarantees they belong to the same call. It does not guarantee they
 belong to the same *codec*. The check that would have caught it is the ordinary
 one: a coarser rung must come back visibly worse, and that is now a required
 behaviour test in `tests/components/test_codec_encode.py`.
+
+## 15. An out-of-range rung is caught only by the encoder refusing it
+
+The roster ladder swept QP 15 to 55. kvazaar takes QP 0 to 51 and refused:
+
+```
+Input error: --qp parameter out of range [0..51]
+Failed to open encoder.
+```
+
+`EncodeRequest.validate` did not catch it. `CodecCapabilities` in
+`src/contracts/codecs.py` declares pixel formats and rate-control modes but no
+**rate range**, so nothing between the config and the binary knows that a rung
+is outside the codec's vocabulary.
+
+The run degraded honestly — the anchor rung was recorded as a failure, the
+PointStream rung at the same value could not code its residual so the ledger
+withheld the ratio and the rung was excluded from the fit, and the monotonicity
+check flagged it twice on the way. **But that honesty is kvazaar's, not ours.**
+An encoder that clamped an out-of-range QP to its maximum instead of refusing
+would have produced a rung that looks like a rung, at a quantizer nobody asked
+for, and the only symptom would have been two rungs landing suspiciously close
+together. x264 and vvenc both accepted QP 55 here and produced genuinely
+distinct points (24,141 B at 28.18 dB and 8,939 B at 28.10 dB), so nothing was
+clamped this time.
+
+Worth adding a declared range to `CodecCapabilities` before the ablation lattice
+sweeps the codec axis, where a silently clamped rung would be one row in a table
+nobody re-derives.
