@@ -240,3 +240,38 @@ def test_empty_chunks_are_refused() -> None:
 def test_objects_misaligned_with_chunks_are_refused() -> None:
     with pytest.raises(ValueError, match="track position"):
         run(_all_off(), [_clip(1, frames=1)], objects=((_object(),), (_object(),)))
+
+
+# ---------------------------------------------------------------------------
+# `delivered_frames` — the array the byte count belongs to
+#
+# `RunResult.frames` is the client's clip with the residual applied *as the
+# residual stage produced it*. Since BP24 codes that residual, the clip the
+# pipeline actually delivers is rebuilt from what the codec returned, and the
+# two arrays diverge by exactly the residual's coding loss. Pairing a coded rate
+# with `frames` is `plans/BP24-findings.md` §4 — two real numbers at two
+# different operating points, and on a rate ladder the error would not look
+# like one, because sweeping the residual's rung is what makes them differ.
+# ---------------------------------------------------------------------------
+
+
+def test_delivered_frames_is_what_transport_handed_over() -> None:
+    result = run(_residual_only(), [_clip(80)])
+    expected = _delivered_frames(result.chunks[0].bag[ART_DELIVERED])
+    assert bit_identical(expected, result.delivered_frames)
+
+
+def test_delivered_frames_concatenates_every_chunk() -> None:
+    """A per-chunk property that silently dropped chunks would still 'work'."""
+    chunks = [_clip(80, frames=2), _clip(120, frames=2)]
+    result = run(_residual_only(), chunks)
+    assert result.delivered_frames.shape[0] == 4
+    assert result.delivered_frames.shape == result.frames.shape
+
+
+def test_delivered_quality_is_scored_on_delivered_frames_not_on_frames() -> None:
+    """Ties the array to the score, so the two cannot drift apart again."""
+    source = _clip(80)
+    result = run(_residual_only(), [source])
+    direct = score(source, result.delivered_frames).whole_frame()
+    assert direct == pytest.approx(result.delivered_quality.whole_frame(), nan_ok=True)

@@ -36,7 +36,7 @@ from src.contracts.codecs import EncodeRequest, RateControl
 # x264 `veryfast` against kvazaar `ultrafast` is not a fair fight. Fine for
 # accounting one payload; for a codec-vs-codec claim, match effort first and say
 # which presets were used.
-_PRESETS = {"avc": "veryfast", "hevc": "ultrafast", "av1": "10", "vvc": "faster"}
+PRESETS = {"avc": "veryfast", "hevc": "ultrafast", "av1": "10", "vvc": "faster"}
 
 
 @dataclass(frozen=True)
@@ -73,8 +73,8 @@ def coded_size(
         clip = clip[..., np.newaxis].repeat(3, axis=3)
     if clip.ndim != 4:
         raise ValueError(f"expected (T,H,W,3) or (T,H,W), got {tuple(clip.shape)}")
-    if codec_name not in _PRESETS:
-        raise ValueError(f"no preset for codec {codec_name!r}; known: {sorted(_PRESETS)}")
+    if codec_name not in PRESETS:
+        raise ValueError(f"no preset for codec {codec_name!r}; known: {sorted(PRESETS)}")
 
     raw = int(clip.nbytes)
     clip = even_size(clip)
@@ -92,7 +92,7 @@ def coded_size(
                 codec_name=codec_name,
                 rate_control=RateControl.QP,
                 rate=int(qp),
-                preset=_PRESETS[codec_name],
+                preset=PRESETS[codec_name],
                 pix_fmt="yuv420p",
             ),
         )
@@ -137,8 +137,8 @@ def coded_curve(
     clip = np.asarray(frames)
     if clip.ndim == 3:
         clip = clip[..., np.newaxis].repeat(3, axis=3)
-    if codec_name not in _PRESETS:
-        raise ValueError(f"no preset for codec {codec_name!r}; known: {sorted(_PRESETS)}")
+    if codec_name not in PRESETS:
+        raise ValueError(f"no preset for codec {codec_name!r}; known: {sorted(PRESETS)}")
     clip = even_size(clip)
     luma = rgb_to_luma(clip)
 
@@ -150,7 +150,7 @@ def coded_curve(
             codec_name=codec_name,
             rate_control=RateControl.QP,
             rate=int(qps[0]),
-            preset=_PRESETS[codec_name],
+            preset=PRESETS[codec_name],
             pix_fmt="yuv420p",
         )
         records = sweep_qp(source, root, request, list(qps))

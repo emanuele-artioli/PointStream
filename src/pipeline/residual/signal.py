@@ -249,8 +249,13 @@ def _lossless_payload(signed: np.ndarray, point: ResidualPoint) -> ResidualPaylo
         cost=WireCost(
             values=int(stored.size),
             byte_count=int(stored.nbytes),
-            exact=True,
-            basis="lossless int16 residual, dense",
+            # Not a wire cost. This is the dense array a codec is supposed to
+            # run on next; nobody transmits signed int16 verbatim. Until
+            # `residual.codec` codes it, the size stands in for a number that
+            # does not exist yet, and `exact=False` stops the stand-in being
+            # summed into a total that calls itself a rate (BP24).
+            exact=False,
+            basis="lossless int16 residual, dense array — pre-codec, not a bitstream",
         ),
     )
 
@@ -285,10 +290,16 @@ def _lossy_payload(
         cost=WireCost(
             values=nonzero,
             byte_count=nonzero,
-            exact=True,
+            # Also not a wire cost. Counting nonzero bytes is a better stand-in
+            # than the dense array — it at least moves when the block gate
+            # fires — but it is still the payload handed *to* a codec, not what
+            # the codec returned. The coded number comes from
+            # `src/runner/stages.py::_coded_residual`, which round-trips this
+            # payload through `residual.codec` (BP24).
+            exact=False,
             basis=(
                 f"lossy uint8 residual, {nonzero} nonzero bytes, "
-                f"{active} active blocks of {block}"
+                f"{active} active blocks of {block} — pre-codec, not a bitstream"
             ),
         ),
     )
