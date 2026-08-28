@@ -259,3 +259,78 @@ the input rather than inferred from the output.
 The second column is the one that matters for this architecture, because the
 plate the runner transmits is the *first source frame* (§6). A clip whose last
 frame differs from its first by 13.6 grey levels has no useful plate at all.
+
+## 12. RGB-PSNR cannot be the quality axis against a 4:2:0 codec
+
+The first full ladder run was stopped after three anchor points, because those
+three points said the axis was wrong. Coding the source with av1, preset 10,
+QP, `yuv420p`, on eight 4K frames
+(`outputs/bp24-ladder/rgb-axis-saturation.json`):
+
+| QP | coded bytes | RGB-PSNR |
+|---:|---:|---:|
+| 15 | 851,572 | 40.72 dB |
+| 25 | 526,104 | 40.63 dB |
+| 35 | 289,198 | 40.26 dB |
+
+**A 2.9x change in rate moved the quality by 0.46 dB.** The arm is capped by the
+RGB → 4:2:0 → RGB chroma round-trip, not by the quantizer, so the curve carries
+almost no information about the encoder. This is the degenerate shape §2
+describes, and the new absolute-span guard refuses it — which is the guard
+paying for itself on the first real run after it was written.
+
+**The worse half is that the cap is asymmetric between the arms.** PointStream
+delivers a JPEG plate with source crops pasted over it, so most of its pixels
+never make the 4:2:0 round-trip at all. Its delivered RGB-PSNR on the same clip
+was 42.0-42.6 dB — *above a ceiling the anchor cannot reach at any QP*. The two
+curves therefore had no overlapping quality range whatsoever, and any BD-rate
+taken across them would have been measuring the colour format rather than the
+coding.
+
+BD-rate is now taken on **BT.601 Y-PSNR**, which is what the BD-rate literature
+reports anyway, so this is the conventional axis rather than a convenient one.
+RGB-PSNR is recorded per rung so the chroma cost stays visible instead of being
+quietly dropped.
+
+**The general shape, which is not about colour:** an arm whose quality is capped
+by something other than the knob being swept produces a flat curve, and a flat
+curve against a non-flat one produces either a refusal or a fiction. Before
+sweeping a knob, check that the arm's quality is actually limited by *that* knob
+over the range being swept.
+
+## 13. Sweeping the residual's rung does not move PointStream's rate
+
+The first paired run, on four 4K frames of the static clip: over QP 30 to 46
+PointStream's transmitted total moved **526,079 → 495,739 B, a span of 6%**,
+and its quality moved 0.55 dB. The reason is in the ledger's own breakdown:
+
+| part | bytes at QP 46 | share |
+|---|---:|---:|
+| panorama (the plate) | 463,334 | 93% |
+| actor_reference | 22,542 | 5% |
+| residual | 8,871 | 2% |
+| metadata | 992 | <1% |
+
+**The plate is the payload.** On static content the residual is single-digit
+percent of what PointStream sends, so the residual's rung — the knob `BP24`
+built the rate axis around, and the knob `PLAN.md` §7 P0 item 3 names — cannot
+produce a rate-distortion curve on its own. Neither can the
+residual-coarseness ladder, which moves the same term.
+
+The axis that moves PointStream's rate is **`background.jpeg_quality`**, and a
+rung has to move it together with the residual's rate. That is what the shipped
+tiers already do (`fast` is jpeg 50 with a coarse residual; `quality` is jpeg 95
+with a fine one) — the tier ladder was the right shape all along and nobody had
+said why.
+
+Two consequences worth carrying forward:
+
+- **P0 item 3 as written is close to unanswerable in isolation.** A
+  residual-coarseness curve on this content sweeps 2% of the payload. The
+  honest version of the question is what the residual buys *at a fixed plate
+  quality*, which is a quality-per-byte statement, not an RD curve.
+- **The panorama stub is now the load-bearing one.** §6 recorded that the plate
+  is the first source frame rather than a stitched panorama, filed as a limit on
+  the background work. It is more than that: the plate is 93% of the rate, so
+  the single largest lever on PointStream's compression is the one component
+  still standing in for itself.
