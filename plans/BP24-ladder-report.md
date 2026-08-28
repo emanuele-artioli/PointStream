@@ -168,6 +168,65 @@ a limitation of the background work but **the single largest lever on the rate**
 
 ### Results
 
+#### P0 item 2 — PointStream against av1, paired, low motion
+
+`outputs/bp24-ladder/av1-payload-lowmotion.json`.
+`alcaraz_highlights/scene_000`, 8 frames, 3840x2160, source 199,065,600 B,
+inter-frame MAD 0.33 (the most static of the eight cached windows). av1,
+preset 10, QP, yuv420p — **on both arms**.
+
+| arm | rung | coded bytes | Y-PSNR | RGB-PSNR |
+|---|---|---:|---:|---:|
+| av1 on source | QP 55 | 85,995 | 39.45 | — |
+| av1 on source | QP 45 | 156,710 | 41.65 | — |
+| av1 on source | QP 35 | 289,198 | 42.97 | — |
+| av1 on source | QP 25 | 526,104 | 43.72 | — |
+| av1 on source | QP 15 | 851,572 | 44.02 | — |
+| PointStream via av1 | jpeg30 / qp55 | 318,077 | 39.21 | 36.96 |
+| PointStream via av1 | jpeg50 / qp46 | 390,889 | 41.45 | 39.20 |
+| PointStream via av1 | jpeg75 / qp38 | 525,462 | 43.59 | 41.66 |
+| PointStream via av1 | jpeg90 / qp28 | 808,573 | 45.39 | 43.42 |
+| PointStream via av1 | jpeg98 / qp18 | 1,548,393 | 46.55 | 44.56 |
+
+> **BD-rate +116.8%** over 39.45–44.02 dB, overlap fraction 1.00, BD-quality
+> −0.49 dB. **PointStream costs 2.17x the rate of av1 alone at equal quality.**
+
+No alarms fired. Both arms are monotone in rate and in quality; every
+PointStream rung reported `is_rate: true` with an empty `raw_parts`; no rung was
+excluded and nothing failed. The overlap is 4.57 dB, comfortably past the new
+3 dB floor.
+
+**Inside the bounds, and in the direction they predicted.** The pre-run bounds
+put the plausible range at [−60%, +1500%] and said in as many words that
+PointStream was expected to lose, because generation is off and the fixed plate
+cost does not amortise over eight frames. The revised bound written after the
+smoke run, [−85%, +400%], also holds. +116.8% is a finding, not an alarm.
+
+**Where the bytes go**, at every rung:
+
+| rung | plate | residual | appearance |
+|---|---:|---:|---:|
+| jpeg30 / qp55 | 89% | 3% | 7% |
+| jpeg50 / qp46 | 89% | 5% | 6% |
+| jpeg75 / qp38 | 88% | 7% | 4% |
+| jpeg90 / qp28 | 88% | 9% | 3% |
+| jpeg98 / qp18 | 91% | 7% | 1% |
+
+The plate is 88–91% of the payload at every operating point. PointStream is
+losing to av1 by sending one still image expensively, not by sending a residual
+expensively.
+
+**What this is not.** It is not a statement about PointStream's architecture in
+general. Generation is off in every tier config, so the arm measured here is
+*plate plus pasted crops plus a corrective residual*, with no generative
+decoder. The plate is a single source frame, not a stitched panorama. And eight
+frames is the least favourable amortisation a fixed plate cost can get. All
+three push in the same direction, and the honest reading is: **as configured
+today, on this content, PointStream is a more expensive way to send a video than
+the codec it is built on.**
+
+#### Remaining axes
+
 <!-- RESULTS -->
 
 ## 5. What is still open
