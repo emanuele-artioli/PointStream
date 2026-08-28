@@ -313,11 +313,36 @@ being a comparison.
 That floor was 30 dB, taken from BP23's unaided reconstruction of **34.88 dB** —
 measured on the *static* clip. On a clip 23x more dynamic the unaided
 reconstruction is naturally far worse, so the floor was carried across a
-condition it was never derived under. Recording that is the point: a bound that
-fires for the wrong reason is worth as much as one that fires for the right one,
-provided the reason is written down. The `absent` control on this clip is being
-measured to settle whether the residual is genuinely helping here
-(`outputs/bp24-ladder/av1-coarseness-highmotion.json`).
+condition it was never derived under.
+
+**Closed by measuring the control on this clip**
+(`outputs/bp24-ladder/av1-coarseness-highmotion.json`):
+
+| rung | coded bytes | Y-PSNR | gain over unaided |
+|---|---:|---:|---:|
+| absent *(control)* | 554,215 | **18.36** | — |
+| coarse | 688,553 | 26.26 | **+7.90 dB** |
+| medium | 1,246,979 | 30.69 | +12.33 dB |
+| fine | 2,373,711 | 33.19 | **+14.83 dB** |
+| lossless *(excluded)* | 398,685,415 | ∞ | — |
+
+The unaided reconstruction here is **18.36 dB**, not 34.88. So the residual is
+not damaging anything — it is adding up to 14.8 dB, more than twice what it adds
+on the static clip. The alarm was correct to fire on a rung below its floor and
+the floor was the thing that was wrong; recording *why* it was wrong is the
+point, because a bound that fires for the wrong reason is worth as much as one
+that fires for the right one provided the reason is written down.
+
+Two further readings from that table:
+
+- **The coarseness knobs matter far more on high motion than the plate's
+  quality does.** The payload sweep held the tier's medium coarseness and topped
+  out at 31.00 dB for 4.7 MB; the coarseness sweep, which drops the block gate
+  and the background downscale, reaches 33.19 dB for 2.4 MB — better quality for
+  half the rate. The rung that moves this clip is the residual's *resolution*,
+  not the plate's quality.
+- **It still does not overlap the anchor.** 33.19 dB against av1's worst of
+  38.03. `compare_rd_curves` refused again.
 
 #### Remaining axes
 
