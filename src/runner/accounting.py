@@ -9,6 +9,7 @@ the names the existing invariant check already reads: ``metadata``,
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -90,6 +91,9 @@ class SizesBytes:
             actor_reference=self.actor_reference + other.actor_reference,
             metadata=self.metadata + other.metadata,
             transport_total=self.transport_total + other.transport_total,
+            # A raw part anywhere makes the sum raw. Dropping it here would
+            # launder an uncoded chunk into a total that claims to be a rate.
+            raw_parts=tuple(dict.fromkeys(self.raw_parts + other.raw_parts)),
         )
 
 
@@ -107,15 +111,23 @@ def sizes_bytes(
     panorama: int = 0,
     actor_reference: int = 0,
     metadata: int = 0,
+    raw_parts: Sequence[str] = (),
 ) -> SizesBytes:
     """Build one ledger. ``transport_total`` is the sum of transmitted parts.
 
     All-off transmits the source itself, so when every semantic part is zero
     the transported total is the source size — that is the baseline corner,
     not a missing measurement.
+
+    ``raw_parts`` names any component still counted as an array size rather
+    than a coded bitstream. Anything listed there withholds the ratio, because
+    a total mixing coded and raw parts is not a rate (BP24).
     """
     parts = metadata + actor_reference + residual + panorama
     transport_total = parts if parts > 0 else source
+    unknown = sorted(set(raw_parts) - set(PARTS))
+    if unknown:
+        raise ValueError(f"raw_parts names unknown components: {unknown}; known: {list(PARTS)}")
     return SizesBytes(
         source=source,
         residual=residual,
@@ -123,4 +135,5 @@ def sizes_bytes(
         actor_reference=actor_reference,
         metadata=metadata,
         transport_total=transport_total,
+        raw_parts=tuple(dict.fromkeys(raw_parts)),
     )

@@ -832,12 +832,39 @@ def ledger_from_bag(bag: Mapping[str, Any], source: np.ndarray) -> SizesBytes:
             residual_bytes = residual.payload.byte_count
     from src.runner.perception import metadata_bytes
 
+    # Which parts are a real bitstream, and which are still an array size.
+    # A part named here withholds the compression ratio rather than quietly
+    # contributing a raw number to a total that claims to be a rate (BP24).
+    raw: list[str] = []
+
+    bitstream = bag.get(ART_BITSTREAM)
+    if isinstance(bitstream, Mapping) and bitstream.get("residual_is_coded"):
+        residual_bytes = int(bitstream.get("byte_count", residual_bytes))
+    elif residual_bytes > 0:
+        raw.append("residual")
+
+    view = bag.get(ART_BACKGROUND_MODEL) or bag.get(STAGE_BACKGROUND)
+    if isinstance(view, BackgroundModelView) and view.payload_bytes is not None:
+        panorama_bytes = int(view.payload_bytes)
+    else:
+        panorama_bytes = _panorama_bytes(bag)
+        if panorama_bytes > 0:
+            raw.append("panorama")
+
+    actor_bytes = _measured_actor_bytes(bag)
+    if actor_bytes > 0:
+        # Appearance reports a measured payload size, but nothing has shown it
+        # is a coded one. Until that is checked it counts as raw rather than
+        # being assumed correct (BP24 finding 4).
+        raw.append("actor_reference")
+
     return sizes_bytes(
         source=int(clip.nbytes),
         residual=residual_bytes,
-        panorama=_panorama_bytes(bag),
-        actor_reference=_measured_actor_bytes(bag),
+        panorama=panorama_bytes,
+        actor_reference=actor_bytes,
         metadata=metadata_bytes(bag),
+        raw_parts=tuple(raw),
     )
 
 
