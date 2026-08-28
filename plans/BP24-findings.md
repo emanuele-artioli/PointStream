@@ -334,3 +334,55 @@ Two consequences worth carrying forward:
   the background work. It is more than that: the plate is 93% of the rate, so
   the single largest lever on PointStream's compression is the one component
   still standing in for itself.
+
+## 14. The decode step re-encoded, and it capped every quality it touched
+
+`_decode_command` in `src/components/codec/command.py` named no `-c:v`. ffmpeg
+then picks the muxer's default encoder. To a `.y4m` that is rawvideo and
+harmless — which is why `coded_curve` was always fine. To a `.mkv` it is
+**libx264 at its own default CRF**, so `coded_roundtrip` handed back frames that
+had been through the rung's codec *and then* through x264.
+
+Measured on an av1 anchor, 8 real 4K frames, preset 10, QP sweep, Y-PSNR:
+
+| QP | coded bytes | Y-PSNR |
+|---:|---:|---:|
+| 15 | 851,572 | 41.71 dB |
+| 25 | 526,104 | 41.67 dB |
+| 35 | 289,198 | 41.43 dB |
+| 45 | 156,710 | 40.65 dB |
+| 55 | 85,995 | 38.94 dB |
+
+**A tenfold fall in rate moved the quality by 2.77 dB**, and the fine end is
+flat: 15 to 25 moved 0.04 dB. The rung reached the encoder — the byte counts
+prove that — but the quality never reached the measurement, because a second
+encoder was standing between them holding the output near its own ceiling.
+
+This is why finding §12 was wrong about the cause. The RGB numbers in §12 are
+real and the reasoning about chroma was plausible, but the ceiling was **not**
+4:2:0: switching to Y-PSNR barely moved it (40.72 → 41.71 dB at QP 15), which is
+what showed the cap had to be somewhere else. Two hypotheses, one right, and the
+thing that separated them was changing the metric and watching the ceiling stay
+put. §12's conclusion — take BD-rate on Y-PSNR — stands anyway, because it is
+the conventional axis; its stated *reason* was the wrong one.
+
+**What this contaminated.** Everything downstream of `coded_roundtrip`, which
+BP24 introduced specifically so a rate and its quality could not be separated:
+
+- Every anchor rung this ladder measured before the fix.
+- **The runner's residual.** `_coded_residual` round-trips the residual payload
+  through `coded_roundtrip`, so PointStream's *delivered pixels* carried an
+  extra x264 pass on their correction term. That is a corrupted pipeline output,
+  not just a corrupted measurement.
+- BP24's reported residual round-trip correlations (R 0.950 / G 0.961 /
+  B 0.902) were measured through it and are pessimistic by an unknown amount.
+
+**The lesson, which is not about ffmpeg.** `coded_roundtrip` was built on
+finding §4's principle — return the cost and the reconstruction together so a
+caller cannot take one without the other. It did that faithfully and still
+returned a reconstruction from the wrong operating point, because the defect was
+*inside* the function rather than in how callers used it. Returning both halves
+together guarantees they belong to the same call. It does not guarantee they
+belong to the same *codec*. The check that would have caught it is the ordinary
+one: a coarser rung must come back visibly worse, and that is now a required
+behaviour test in `tests/components/test_codec_encode.py`.
