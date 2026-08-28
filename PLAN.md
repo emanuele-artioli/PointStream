@@ -1025,6 +1025,55 @@ cached windows**, by 23x against the most dynamic
 (`outputs/bp24-ladder/motion-survey.json`). §2.18's "both are the easy case" is
 now measured on the input rather than inferred from the output.
 
+### 2.20 The ladder ran, and PointStream loses to the codec it is built on
+
+`BP24` concluded, 2026-08-28. `PLAN.md` §7 **P0 items 2 and 3 are closed.**
+Report: `plans/BP24-ladder-report.md`. Bounds written before the first encode:
+`outputs/bp24-ladder/bounds-before-run.json`.
+
+**Paired arms, one codec on both, same preset** — the design
+`plans/BP24-findings.md` §1 settled on, so the preset cancels. Y-PSNR, which is
+the conventional BD-rate axis.
+
+| codec | preset | BD-rate | overlap |
+|---|---|---:|---|
+| av1 | `10` | **+116.8%** | 39.45-44.02 dB |
+| hevc | `ultrafast` | **+166.8%** | 38.72-43.47 dB |
+| avc | `veryfast` | **+165.9%** | 35.76-43.87 dB |
+| vvc | `faster` | **+378.1%** | 35.28-43.65 dB |
+
+**Do not rank these against each other.** The presets are not equal effort, so
+an ordering of the magnitudes would be measuring the presets. Each is a gain
+against that codec at that preset, which is the claim shape the paper needs.
+
+This is on `alcaraz_highlights/scene_000`, the **most static** of the eight
+cached windows (inter-frame MAD 0.33 against 7.70 for the most dynamic) — the
+friendliest content available. On the dynamic clip there is **no BD-rate at
+all**: PointStream saturates at 31.0 dB, av1's cheapest rung is 38.0 dB, and the
+curves do not overlap.
+
+**The cause is the plate, not the residual.** The plate is 88-91% of the payload
+at every rung of every sweep. The unaided corner — plate plus pasted crops, no
+residual — is 487,643 B at 35.37 dB against av1's 85,995 B at 39.45 dB, so the
+plate has already lost before the residual is asked for anything. The residual
+is the opposite: 0.9% of the payload for 5.4 dB on static content, up to 14.8 dB
+over unaided on dynamic content. **The plate is still the first source frame
+rather than a stitched panorama, and that stub is now the single largest lever
+on the project's rate.**
+
+**Three defects were found and fixed on the way**, one of them a corrupted
+pipeline output rather than a bad number: the decode step named no `-c:v`, so
+ffmpeg re-encoded to Matroska with x264 at its default CRF, capping every
+quality `coded_roundtrip` returned — including the residual the runner
+delivers. `RunResult.frames` had stopped being the delivered clip. And
+`bd_rate`'s overlap guard was relative and could not see a flat curve. All three
+are in `plans/BP24-findings.md` §§8, 14 and 2.
+
+**Scope, stated rather than implied.** Generation is off in every tier config,
+so no generative decoder was measured. Eight frames is the least favourable
+amortisation a fixed plate cost can get. Y-PSNR only; PointStream's case has
+always been argued perceptually.
+
 ## 3. Architecture
 
 Enough here that seven parallel sessions do not make conflicting decisions.
@@ -1483,12 +1532,19 @@ re-read rather than followed blindly.
 1. ✅ **DONE 2026-08-26** — quality measurement working at all: a tier config
    producing real numbers. All three tiers plus two controls ran end to end on a
    real 4K clip and returned PSNR, SSIM, VMAF and LPIPS (§2.16, BP23).
-2. PointStream against the codec ladder, including region arms.
-   *`BP24` (2026-08-28) built the rate axis: the plate and residual are coded
-   through their configured codecs and the ledger withholds a ratio while any
-   component is still raw. What remains is running the ladder — as **paired
-   curves**, one codec on both arms, per `plans/BP24-findings.md` §1.*
-3. The residual-coarseness curve. *Same remaining step as item 2.*
+2. ✅ **DONE 2026-08-28** — PointStream against the codec ladder, as paired
+   curves, one codec on both arms at one preset. **PointStream loses on every
+   codec**: BD-rate +116.8% (av1, preset 10), +166.8% (hevc, ultrafast),
+   +165.9% (avc, veryfast), +378.1% (vvc, faster), on the most static of the
+   eight cached clips. On the most dynamic clip there is no BD-rate: PointStream
+   saturates at 31.0 dB while av1's cheapest rung is 38.0 dB, so the curves do
+   not overlap. §2.20, `plans/BP24-ladder-report.md`. *Region arms are not in
+   this ladder and remain open.*
+3. ✅ **DONE 2026-08-28** — the residual-coarseness curve, and it is the good
+   news. A residual costing 0.9% of the payload buys 5.4 dB on static content,
+   and up to 14.8 dB over the unaided reconstruction on dynamic content. The
+   rate problem is the plate, which is 88-91% of the payload at every rung.
+   §2.20.
 4. The core ablation lattice. *`BP26` (2026-08-26): detector, pose, segmenter,
    appearance, motion and temporal names now change a run. The lattice itself
    is still un-run (Phase D). Codec / fallback / `residual.codec` remain unwired

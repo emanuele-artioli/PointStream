@@ -167,7 +167,32 @@ Full report: **`plans/BP24-ladder-report.md`**. Findings added:
   `--sweep coarseness` for item 3, bounds evaluated in code and written into
   every result, and a refusal to rank per-codec gains against each other.
 
+- **The ladder ran (item 2), and P0 items 2 and 3 are closed.** Paired arms,
+  one codec on both at one preset, Y-PSNR. BD-rate **+116.8%** (av1, preset 10),
+  **+166.8%** (hevc, ultrafast), **+165.9%** (avc, veryfast), **+378.1%** (vvc,
+  faster) on the most static of the eight cached clips. Not ranked against each
+  other — the presets are not equal effort. On the most dynamic clip there is no
+  BD-rate: PointStream saturates at 31.0 dB against av1's cheapest rung of
+  38.0 dB and the curves do not overlap.
+- **The residual-coarseness curve (item 3) is the good news.** A residual
+  costing 0.9% of the payload buys 5.4 dB on static content, and up to 14.8 dB
+  over the unaided reconstruction on dynamic content.
+- **A third defect, found by the ladder and worse than a bad number.** The
+  decode step named no `-c:v`, so ffmpeg re-encoded to Matroska with x264 at its
+  default CRF. Every quality `coded_roundtrip` returned was capped — including
+  the residual the *runner delivers*. Fixed, with a required-behaviour test that
+  a coarser rung comes back visibly worse.
+
 ### Not done
 
-See `plans/BP24-ladder-report.md` §4 for exactly where the ladder runs got to
-and what blocked them.
+- **The plate is still the first source frame** (item 4), and the ladder makes
+  it the highest-value open item in the project: it is 88-91% of the payload at
+  every rung, and the unaided corner has already lost to the codec before the
+  residual is asked for anything. `build_plate` exists in
+  `src/components/background/plate.py` and is not wired into the runner.
+- **Region arms** are named in P0 item 2 and are not in this ladder.
+- `CodecCapabilities` declares no QP range, so an out-of-range rung is caught
+  only by the encoder refusing it.
+
+Full detail, including scope and what the numbers do not say:
+`plans/BP24-ladder-report.md`.
