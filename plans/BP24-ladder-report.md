@@ -93,6 +93,15 @@ metric must state its own floor — the function refuses rather than applying a 
 number to LPIPS. It earned its place on the first real run, refusing the curve
 the next defect produced.
 
+**It retracts nothing already published.** Every one of BP21's 150 reported
+savings in `outputs/bp21-headroom/report.json` carries an overlap of **3.23 dB
+or wider** (median well above; the widest is 8.45 dB), so the 3 dB floor leaves
+all of them standing. The margin at the narrow end is thin — 0.23 dB on
+`av1/djokovic_federer/scene_003` — which is worth knowing rather than reassuring.
+The one place the guard did fire was a *test stub* sweeping QP 32 to 40 with a
+0.15 dB-per-QP quality model: a 1.2 dB span, which is the unrealistic fixture
+rather than a real result. It now sweeps QP 24 to 52.
+
 **The decode step re-encoded** (findings §14). `_decode_command` named no
 `-c:v`, so ffmpeg picked the muxer's default encoder — rawvideo for a `.y4m`,
 which is why `coded_curve` was always fine, and **libx264 at its own default CRF
