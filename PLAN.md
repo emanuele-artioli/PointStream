@@ -959,6 +959,40 @@ Not a working engine. The stop rule was right that epochs 2–3 were flat; the
 Uni-ControlNet remains last. P0 item 5 closes on this scoped result.
 
 
+### 2.18 A byte count that is a rate
+
+`BP24`, 2026-08-28. Until this landed, every byte count in the project was an
+array size. `PLAN.md` §2.16 recorded the consequence: no compression ratio could
+be quoted from any tier run.
+
+**The boundary decision** (§3): the codec stage codes the **transmitted
+payload** — plate, appearance, motion, residual, metadata — not the delivered
+pixels. Encoding the delivered frames would measure PointStream's output
+re-encoded, double-counting the reconstruction.
+
+| component | raw | coded | measured on |
+|---|---|---|---|
+| background plate | 24,883,200 B | **342,694 B** | one real 4K frame, `jpeg:50`, plate PSNR 40.21 dB |
+| residual | 9,331,200 B | **2,545 B** | 6 frames 960x540, av1 CRF 35, 2.5% non-zero |
+
+**Both are the easy case.** A sparse residual against a static plate is the
+friendliest possible input; re-measure on high motion before quoting either.
+
+**A mixed ledger refuses to report a ratio.** `SizesBytes.raw_parts` names any
+component still counted as an array size, and `transport_to_source_ratio` is
+withheld entirely while that list is non-empty — including through `__add__`, so
+summing chunks cannot launder an uncoded chunk into a total that claims to be a
+rate. `actor_reference` is currently listed: appearance reports a measured size
+and nobody has shown it is a coded one.
+
+**Still open:** the `WireCost` `exact`/`basis` pass, the paired-arm ladder, and
+the plate is still the first source frame rather than a stitched panorama.
+
+**Read `plans/BP24-findings.md` before quoting any rate.** Seven findings,
+including the one that cost the most time: counting coded bytes while
+reconstructing from the pre-codec array passes every test, uses two real
+numbers, and yields a fictional rate-distortion point.
+
 ## 3. Architecture
 
 Enough here that seven parallel sessions do not make conflicting decisions.
@@ -1418,9 +1452,11 @@ re-read rather than followed blindly.
    producing real numbers. All three tiers plus two controls ran end to end on a
    real 4K clip and returned PSNR, SSIM, VMAF and LPIPS (§2.16, BP23).
 2. PointStream against the codec ladder, including region arms.
-   *Blocked on `BP24`: the runner's codec stage is an identity round-trip and no
-   encoder binary runs, so there is no bitstream and no rate axis yet.*
-3. The residual-coarseness curve. *Same blocker as item 2.*
+   *`BP24` (2026-08-28) built the rate axis: the plate and residual are coded
+   through their configured codecs and the ledger withholds a ratio while any
+   component is still raw. What remains is running the ladder — as **paired
+   curves**, one codec on both arms, per `plans/BP24-findings.md` §1.*
+3. The residual-coarseness curve. *Same remaining step as item 2.*
 4. The core ablation lattice. *`BP26` (2026-08-26): detector, pose, segmenter,
    appearance, motion and temporal names now change a run. The lattice itself
    is still un-run (Phase D). Codec / fallback / `residual.codec` remain unwired
