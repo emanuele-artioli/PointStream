@@ -51,14 +51,20 @@ import numpy as np
 
 from experiments.tier.clip import TierClip, load_tier_clip
 from experiments.tier.run import run_config
+from src.components.codec.measure import PRESETS
 from src.components.metrics.bd_rate import (
     InsufficientOverlapError,
     RDCurve,
     compare_rd_curves,
 )
-from src.components.codec.measure import PRESETS
 from src.contracts.codecs import EncodeRequest, RateControl
 from src.contracts.config import PointstreamConfig
+from src.pipeline.residual.spectrum import (
+    Coarseness,
+    ResidualPoint,
+    ResidualVariant,
+    coarseness_ladder,
+)
 from src.runner.config_io import load_tier
 
 REPO = Path(__file__).resolve().parents[2]
@@ -287,12 +293,63 @@ def _curve(rungs: list[Rung], label: str) -> RDCurve:
     )
 
 
+def coarseness_rung(
+    clip: TierClip, config: PointstreamConfig, point: ResidualPoint
+) -> Rung:
+    """PointStream at one rung of the residual-coarseness ladder (P0 item 3).
+
+    The coarseness rung bundles four knobs — the codec's rate, the block gate's
+    size and threshold, and the background downscale — because that is how
+    `coarseness_ladder()` defines the axis. Sweeping it is a different question
+    from sweeping the codec's rate alone: this one asks what the *residual
+    representation* costs, the other what the *codec* costs on a fixed one.
+    """
+    lattice = replace(config.lattice, residual=point.variant is not ResidualVariant.NONE)
+    tuned = config.with_(
+        lattice=lattice,
+        residual=point.config if point.config is not None else config.residual,
+    )
+    started = time.time()
+    outcome = run_config(f"pointstream@{point.coarseness.value}", tuned, clip)
+    seconds = time.time() - started
+    sizes = outcome.result.sizes
+    delivered = outcome.result.delivered_frames
+    return Rung(
+        # Not a QP. `rate_value` is a rank on one convention shared with the QP
+        # sweep: **higher means coarser**, so "a coarser rung must be cheaper
+        # and worse" stays one check rather than two with opposite signs.
+        # `coarseness_ladder()` runs absent-to-lossless, so the rank is that
+        # index reversed. The rung's identity is the `coarseness` name below.
+        rate_value=len(Coarseness) - 1 - list(Coarseness).index(point.coarseness),
+        coded_bytes=int(sizes.transport_total),
+        quality_db=pooled_psnr(clip.frames, delivered),
+        seconds=seconds,
+        detail={
+            "arm": "pointstream",
+            "coarseness": point.coarseness.value,
+            "describes": point.describe(),
+            "is_rate": bool(sizes.is_rate),
+            "raw_parts": list(sizes.raw_parts),
+            "parts": {
+                "residual": sizes.residual,
+                "panorama": sizes.panorama,
+                "actor_reference": sizes.actor_reference,
+                "metadata": sizes.metadata,
+            },
+            "precodec_vs_delivered_dB": pooled_psnr(
+                np.asarray(outcome.result.frames), delivered
+            ),
+        },
+    )
+
+
 def pair_for_codec(
     clip: TierClip,
     config: PointstreamConfig,
     *,
     codec_name: str,
     rungs: tuple[int, ...],
+    sweep: str = "qp",
 ) -> dict[str, Any]:
     """One codec, both arms, same preset — and the BD-rate between them.
 
@@ -328,10 +385,47 @@ def pair_for_codec(
         except Exception as exc:  # noqa: BLE001
             failures.append({"rate_value": rate_value, "arm": "anchor", "error": repr(exc)})
             continue
-        try:
-            stream_rungs.append(pointstream_rung(clip, paired, rate_value))
-        except Exception as exc:  # noqa: BLE001
-            failures.append({"rate_value": rate_value, "arm": "pointstream", "error": repr(exc)})
+        if sweep == "qp":
+            try:
+                stream_rungs.append(pointstream_rung(clip, paired, rate_value))
+            except Exception as exc:  # noqa: BLE001
+                failures.append(
+                    {"rate_value": rate_value, "arm": "pointstream", "error": repr(exc)}
+                )
+
+    if sweep == "coarseness":
+        # The candidate arm sweeps the residual representation instead of the
+        # codec's rate. The anchor still sweeps QP, which is fine: BD-rate
+        # integrates over the overlapping quality range and does not need the
+        # two arms to share rung values.
+        for point in coarseness_ladder():
+            tuned_point = (
+                point
+                if point.config is None
+                else replace(
+                    point,
+                    config=replace(
+                        point.config,
+                        codec=codec_name,
+                        preset=PRESETS[codec_name],
+                        rate_control=(
+                            point.config.rate_control
+                            if point.variant is ResidualVariant.LOSSLESS
+                            else LADDER_RATE_CONTROL
+                        ),
+                    ),
+                )
+            )
+            try:
+                stream_rungs.append(coarseness_rung(clip, config, tuned_point))
+            except Exception as exc:  # noqa: BLE001
+                failures.append(
+                    {
+                        "rate_value": point.coarseness.value,
+                        "arm": "pointstream",
+                        "error": repr(exc),
+                    }
+                )
 
     # A rung whose total is not a rate is not a point on an RD curve. Drop it
     # here rather than letting a mixed total into the fit.
@@ -398,6 +492,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--video", default=None)
     parser.add_argument("--scene", default=None)
     parser.add_argument("--frames", type=int, default=8)
+    parser.add_argument(
+        "--sweep",
+        choices=("qp", "coarseness"),
+        default="qp",
+        help=(
+            "qp: the candidate arm sweeps the codec rate (P0 item 2). "
+            "coarseness: it sweeps the residual-coarseness ladder (P0 item 3)."
+        ),
+    )
     parser.add_argument("--out", default=None)
     args = parser.parse_args(argv)
 
@@ -419,7 +522,11 @@ def main(argv: list[str] | None = None) -> int:
     for codec_name in args.codecs:
         print(f"--- {codec_name} ---", flush=True)
         pair = pair_for_codec(
-            clip, config, codec_name=codec_name, rungs=tuple(args.rungs)
+            clip,
+            config,
+            codec_name=codec_name,
+            rungs=tuple(args.rungs),
+            sweep=args.sweep,
         )
         for row in pair["anchor_rungs"]:
             print(
@@ -454,6 +561,7 @@ def main(argv: list[str] | None = None) -> int:
         "clip": clip.describe(),
         "clip_motion_mad": motion,
         "tier": args.tier,
+        "sweep": args.sweep,
         "rungs_requested": list(args.rungs),
         "pairs": pairs,
     }

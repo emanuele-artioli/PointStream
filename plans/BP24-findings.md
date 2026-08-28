@@ -162,3 +162,100 @@ re-measured before anything quotes them:
 
 Neither is a reason to distrust the machinery; both are reasons to run the ladder
 over real clips at several rungs rather than trusting a single operating point.
+
+---
+
+## Added 2026-08-28, while running the ladder
+
+## 8. `RunResult.frames` stopped being the clip the pipeline delivers
+
+Finding §4 says the fix that generalises is to make the API return both halves
+together. `coded_roundtrip` does that. The **runner** does not.
+
+`src/runner/run.py` builds `frames = apply_residual(client.frames,
+residual.payload)` — the client's reconstruction plus the residual **as the
+residual stage produced it**. Since BP24, `make_codec` round-trips that payload
+through `residual.codec` and rebuilds from what came back, and *that* clip is
+what reaches transport and what `sizes` is the cost of. So `RunResult.frames`
+and `RunResult.delivered_quality` describe two different operating points.
+
+No published number is wrong: BP23's table reads `delivered_quality`, which was
+always scored on the delivered clip. But the *array* was a trap, and it is the
+one a rate ladder reaches for, because `frames` is the obvious attribute and the
+delivered array was reachable only through `chunks[i].bag[ART_DELIVERED]`.
+
+**Why it would not have looked like a mistake.** The two clips differ by exactly
+the residual's coding loss. A ladder sweeping the residual's rung is sweeping
+precisely that difference — so the fictional curve would have been smooth,
+monotone, and better than the real one at every rung.
+
+`RunResult.delivered_frames` now exists and the ladder uses it. The general
+lesson is narrower than §4's and worth stating separately: **it is not enough
+for the component that codes to return both halves. Every layer that carries
+the result forward has to keep them together**, and the runner is a layer.
+
+## 9. `actor_reference` is a wire cost on all three backends — but only one is coded
+
+Driven per backend rather than argued from the code
+(`outputs/bp24-ladder/appearance-cost.json`, `python -m
+experiments.tier.appearance_cost`):
+
+| backend | payload | declared == buffer | moves with quality | verdict |
+|---|---|---|---|---|
+| `compressed-image` | 4,746 B JPEG | yes | 1,448 / 2,020 / 7,732 B at q20/60/95 | **coded** |
+| `image-embedding` | 204 B float16 | yes | n/a — no knob | **packed** |
+| `diffusion-latent` | 3,072 B float16 | yes | n/a — no knob | **packed** |
+
+The JPEG payload also decodes back to the crop (MAE 2.83), so those bytes carry
+the appearance rather than merely being counted.
+
+All three are **wire costs** — the buffer is what would be transmitted — so
+`actor_reference` no longer withholds the ratio. Two things to keep straight:
+
+- **Packed is not coded.** A float16 latent has had no entropy coder applied.
+  It is an honest transmitted size and an *over*-count of what a coded one
+  would be, which is the safe direction for a compression claim, but a table
+  putting a JPEG appearance beside a latent one is comparing a bitstream
+  against an array.
+- `DiffusionLatent.measured_bytes` was documented as "size after any further
+  entropy coding, if applied" while `latent.py` fills it with the length of the
+  raw pack. The docstring was the wrong half of that pair and has been fixed.
+
+## 10. QP is the only rate control the whole codec roster accepts
+
+`src/contracts/codecs.py`: `avc` declares CRF, QP, BITRATE and LOSSLESS; `av1`
+declares CRF, QP and BITRATE; **`hevc` and `vvc` declare only QP and BITRATE**.
+The tier configs all name `rate-control: crf`, which works because they all name
+`av1`.
+
+So a ladder spanning the roster has to sweep QP, and a config that swaps
+`residual.codec` to `hevc` without also changing `rate_control` will be refused
+by `EncodeRequest.validate` rather than silently reinterpreted. Worth knowing
+before the ablation lattice tries to vary the codec axis.
+
+## 11. The clip BP24 measured on is the most static of the eight cached
+
+Measured over the first 8 frames of every cached BP21 window
+(`outputs/bp24-ladder/motion-survey.json`), as mean absolute difference in grey
+levels:
+
+| clip | consecutive frames | vs. the first frame |
+|---|---|---|
+| `alcaraz_highlights/scene_000` | **0.33** | 0.69 |
+| `alcaraz_highlights/scene_010` | 0.47 | 1.31 |
+| `sinner_alcaraz/scene_001` | 0.60 | 1.31 |
+| `federer_djokovic/scene_001` | 0.77 | 1.59 |
+| `djokovic_federer/scene_003` | 0.84 | 2.10 |
+| `alcaraz_perricard/scene_002` | 3.17 | 6.23 |
+| `djokovic_zverev/scene_002` | 5.91 | 12.35 |
+| `federer_djokovic/scene_003` | **7.70** | 13.61 |
+
+`alcaraz_highlights/scene_000` — BP23's clip, and the one every BP24 ratio was
+measured on — is the **most static window available**, by a factor of 23 against
+the most dynamic one. §7 called both headline ratios "the easy case" on the
+evidence of a 2.5%-non-zero residual; this is the same conclusion measured on
+the input rather than inferred from the output.
+
+The second column is the one that matters for this architecture, because the
+plate the runner transmits is the *first source frame* (§6). A clip whose last
+frame differs from its first by 13.6 grey levels has no useful plate at all.
