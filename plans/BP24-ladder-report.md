@@ -344,17 +344,95 @@ Two further readings from that table:
 - **It still does not overlap the anchor.** 33.19 dB against av1's worst of
   38.03. `compare_rd_curves` refused again.
 
-#### Remaining axes
+#### The rest of the roster, low motion
 
-<!-- RESULTS -->
+`outputs/bp24-ladder/roster-payload-lowmotion.json`. Same clip, same rungs, each
+codec on **both** arms at its own preset.
 
-## 5. What is still open
+| codec | preset | BD-rate | overlap (dB) | overlap fraction |
+|---|---|---:|---|---:|
+| av1 | `10` | **+116.8%** | 39.45–44.02 | 1.00 |
+| hevc | `ultrafast` | **+166.8%** | 38.72–43.47 | 0.62 |
+| avc | `veryfast` | **+165.9%** | 35.76–43.87 | 0.75 |
+| vvc | `faster` | **+378.1%** | 35.28–43.65 | 0.74 |
 
-- The plate is still the first source frame, not a stitched panorama
-  (findings §6), so `background.method` selects a transmission strategy over one
-  frame. Any background saving quoted from this work must say so.
-- Generation is off in all three tier configs, so this measures
-  PointStream-as-codec, not PointStream with a generative decoder.
+> **These four numbers must not be ranked against each other.** The presets are
+> not equal effort across codecs (`plans/BP24-findings.md` §1), and ordering the
+> magnitudes would be measuring the presets rather than PointStream. Each number
+> is a gain against *that codec at that preset*, which is the claim shape the
+> paper needs and the only one this design supports.
+
+Two notes on the hevc row. QP 55 is outside kvazaar's range (0–51), so that
+anchor rung failed and is recorded as a failure rather than quietly dropped;
+the PointStream rung at the same value could not code its residual, so the
+ledger withheld the ratio and the rung was **excluded from the fit**. The
+monotonicity check caught it too, twice, before the exclusion did. That leaves
+hevc with four rungs per arm and a 0.62 overlap fraction, which still clears
+both guards. `EncodeRequest.validate` did not catch it, because
+`CodecCapabilities` declares pixel formats and rate-control modes but **no QP
+range** — the encoder's own refusal is currently the only check.
+
+`avc` and `vvc` accepted QP 55 and produced genuinely distinct rungs (24,141 B
+at 28.18 dB and 8,939 B at 28.10 dB, well separated from their QP 45 points), so
+nothing was silently clamped there.
+
+---
+
+## 5. What the ladder says
+
+**PointStream, as configured today, costs more than the codec it is built on —
+on every codec, and by a wide margin on the friendliest content available.**
+
+On the most static of the eight cached clips, with generation off, PointStream
+needs **2.2 to 4.8 times** the rate of the same codec at the same preset to
+reach the same Y-PSNR. On the most dynamic clip it does not reach the codec's
+*worst* operating point at any rate: it saturates at 31.0 dB (33.2 dB with the
+residual's block gate and background downscale removed) while av1's cheapest
+rung is 38.0 dB, so there is no overlap and no BD-rate to report.
+
+**The cause is not the residual.** It is the plate, on every measurement:
+
+- The plate is **88–91%** of the payload at every rung of every sweep.
+- On static content a residual costing **0.9%** of the payload buys **5.4 dB**,
+  and one costing 4.3% buys 8.0 dB.
+- On dynamic content the residual is worth up to **14.8 dB** over the unaided
+  reconstruction — more than twice its value on static content.
+- The unaided corner — plate plus pasted crops, no residual — is 487,643 B at
+  35.37 dB on the static clip, against av1's 85,995 B at 39.45 dB. **The plate
+  alone has already lost** before the residual is asked for anything.
+
+So the component the architecture argues hardest for is the one earning its
+bytes, and the one standing in for itself is the one losing the comparison. The
+plate is the **first source frame**, JPEG-coded, not a stitched panorama
+(`plans/BP24-findings.md` §6). That was filed as a limitation of the background
+work; it is in fact the single largest lever on PointStream's rate, and nothing
+in this ladder will move until it does.
+
+**What this does not say.** Generation is off in every tier config, so no
+generative decoder was measured. Eight frames is the least favourable
+amortisation a fixed plate cost can get, and the direction of that bias is
+known. The comparison is Y-PSNR only; no perceptual or temporal metric was
+involved, and PointStream's case has always been argued on perceptual grounds.
+None of that rescues the numbers above, but a paper quoting them has to say
+which question they answer.
+
+## 6. What is still open
+
+- **The plate.** It is the first source frame, JPEG-coded, not a stitched
+  panorama (findings §6). `build_plate` exists in
+  `src/components/background/plate.py` and is not wired into the runner. This is
+  now the highest-value open item in the project by the ladder's own numbers.
+- **Generation.** Off in all three tier configs, so nothing here measures
+  PointStream with a generative decoder.
+- **Clip length.** Eight frames penalises a fixed plate cost as hard as it can
+  be penalised. A 48-frame window exists in the same cache and would amortise
+  it; the direction of that bias is known but its size is not.
+- **Perceptual metrics.** Y-PSNR only. PointStream's case has always been
+  argued perceptually, and no perceptual or temporal metric was on this ladder.
+- **QP ranges are not declared.** `CodecCapabilities` carries pixel formats and
+  rate-control modes but no QP range, so an out-of-range rung is caught only by
+  the encoder refusing it. kvazaar refuses loudly, which is why the hevc row is
+  honest; a codec that clamped silently would have produced a fictional rung.
 - The lossless coarseness rung cannot be a rate point: `_coded_residual` returns
   `None` for the lossless variant, so its residual stays an array size and the
   ledger correctly withholds the ratio. It is a ceiling calibration, which is
