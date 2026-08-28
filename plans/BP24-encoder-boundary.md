@@ -80,3 +80,55 @@ missing is the binding between the runner's codec stage and those components.
 - A required-behaviour test asserts a codec rung produces coded bytes smaller
   than the source and that the tier ordering holds.
 - The report says explicitly whether P0 items 2 and 3 are now unblocked.
+
+---
+
+## Status — 2026-08-28 (partially landed, `wave6/bp24-codec`)
+
+**The rate axis exists. The ladder has not run.** P0 items 2 and 3 stay blocked
+until it does, but the thing that blocked *them* — no coded byte anywhere — is
+gone.
+
+### Done
+
+- **The boundary decision**, written into `PLAN.md` §3 before any code: the
+  codec stage codes the **transmitted payload**, not the delivered pixels.
+- **`STAGE_CODEC.optional_inputs` declares `generated-frames`**, so the DAG can
+  no longer order the codec before the generator.
+- **`src/components/codec/measure.py`** — `coded_size` (point accounting with
+  encoder path and version), `coded_curve` (a QP sweep returning an `RDCurve`,
+  because a QP is a knob and not a quality level), and `coded_roundtrip`
+  (returns cost *and* decoded frames together, colour-preserving).
+- **The plate is genuinely transmitted.** `make_background` binds the configured
+  strategy; the view carries the decoded plate and the real payload length.
+  Measured: 24,883,200 B raw → **342,694 B** at `jpeg:50`, plate PSNR 40.21 dB.
+- **The residual is coded.** `_coded_residual` round-trips through
+  `residual.codec` and rebuilds as `reconstructed - r + r_coded`. Measured on a
+  sparse residual: 9,331,200 B → **2,545 B**, per-channel correlation
+  R 0.950 / G 0.961 / B 0.902.
+- **A mixed ledger cannot report a ratio.** `raw_parts` / `is_rate` withhold
+  `transport_to_source_ratio` while any component is an array size, `__add__`
+  carries that forward so chunk sums cannot launder it, and six
+  required-behaviour tests drive it.
+
+### Not done — pick this up next
+
+1. **The `WireCost` honesty pass.** Both residual paths still set `exact=True`
+   with a `basis` describing an array, which was true before a codec ran and is
+   now ambiguous. `exact` should mean "this is the bitstream size".
+2. **Re-run the BP23 ladder as curves**, not single-QP totals. Per the paired-arm
+   decision (`plans/BP24-findings.md` §1): for codec X, measure X coding the
+   source and PointStream using X, **same preset**, and take BD-rate between
+   them. The preset cancels; do not rank the per-codec gains against each other.
+3. **`actor_reference` is marked raw on purpose.** Appearance reports a measured
+   size and nobody has checked whether it is a coded one. Check before clearing
+   it, or the ledger silently regains a raw part.
+4. **The plate is still the first source frame**, not a stitched panorama, so
+   `background.method` picks a transmission strategy over one frame.
+
+### Read before trusting any number here
+
+`plans/BP24-findings.md` — seven findings, including the one that cost the most
+time: counting coded bytes while reconstructing from the pre-codec array passes
+every test and produces a fictional RD point. Both headline ratios above were
+measured on the **easy case** and must be re-measured on high motion.
