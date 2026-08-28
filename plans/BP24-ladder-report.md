@@ -4,8 +4,8 @@ What this session set out to do (`plans/prompts/next-session.md`): the
 `WireCost` honesty pass, settle `actor_reference`, and run `PLAN.md` §7 P0
 items 2 and 3 as paired BD-rate curves with their bounds written first.
 
-Read `plans/BP24-findings.md` before quoting any number here. Findings 8-11 were
-added by this session.
+Read `plans/BP24-findings.md` before quoting any number here. Findings 8-14 were
+added by this session, and §14 corrects §12.
 
 ---
 
@@ -72,7 +72,7 @@ size and an over-count of a coded one — the safe direction for a compression
 claim — but a table putting a JPEG appearance beside a latent one is comparing a
 bitstream against an array.
 
-## 3. Two defects found on the way, both fixed
+## 3. Three defects found on the way, all fixed
 
 **`RunResult.frames` was not the delivered clip** (findings §8). The runner
 builds `frames` from the residual *as the residual stage produced it*; since
@@ -90,7 +90,28 @@ curves overlap perfectly. `MIN_QUALITY_SPAN_DB = 3.0` and `DegenerateCurveError`
 close it; the new error subclasses `InsufficientOverlapError` so callers already
 declining on a bad overlap decline here too rather than crashing. A non-PSNR
 metric must state its own floor — the function refuses rather than applying a dB
-number to LPIPS.
+number to LPIPS. It earned its place on the first real run, refusing the curve
+the next defect produced.
+
+**The decode step re-encoded** (findings §14). `_decode_command` named no
+`-c:v`, so ffmpeg picked the muxer's default encoder — rawvideo for a `.y4m`,
+which is why `coded_curve` was always fine, and **libx264 at its own default CRF
+for a `.mkv`**, which is what `coded_roundtrip` writes. Every frame that function
+returned had been through the rung's codec and then through x264. Measured on an
+av1 anchor over QP 15 to 55: the rate fell tenfold, from 851,572 to 85,995
+bytes, and the Y-PSNR moved 2.77 dB, flat at the fine end.
+
+This one reaches past the ladder. `_coded_residual` round-trips the residual
+through `coded_roundtrip`, so PointStream's **delivered pixels** carried an extra
+x264 pass on their correction term — a corrupted pipeline output, not only a
+corrupted number — and BP24's residual round-trip correlations were measured
+through it. `coded_roundtrip` was built on findings §4's principle, returning
+cost and reconstruction together so a caller could not separate them, and it did
+that faithfully while returning a reconstruction from the wrong operating point.
+Returning both halves guarantees they come from the same call; it does not
+guarantee they come from the same codec. What catches that is the ordinary
+check — a coarser rung must come back visibly worse — now a required-behaviour
+test.
 
 ## 4. The ladder
 
@@ -113,18 +134,37 @@ evaluated in code (`check_bounds`) and written into every result, because a
 bound that only exists in a file next to the result is the one that gets skipped
 when the number is exciting.
 
-Two axes are swept:
+Three axes are available, and the default changed once the first run showed
+which of them moves PointStream's rate:
 
-- `--sweep qp` — the candidate arm sweeps the codec's rate. **P0 item 2.**
-- `--sweep coarseness` — it sweeps `coarseness_ladder()`, whose rungs bundle the
-  codec rate with the block gate's size and threshold and the background
-  downscale. **P0 item 3.**
+- `--sweep payload` (default) — plate quality and residual rate together.
+  **P0 item 2.**
+- `--sweep coarseness` — `coarseness_ladder()`, whose rungs bundle the codec
+  rate with the block gate's size and threshold and the background downscale.
+  **P0 item 3.**
+- `--sweep qp` — the residual's rate alone, the plate held fixed. Kept because
+  it is the axis that showed the plate dominates, not because it produces a
+  usable curve on this content.
 
 The clip axis is measured, not assumed
 (`outputs/bp24-ladder/motion-survey.json`, findings §11): every BP24 ratio was
 taken on `alcaraz_highlights/scene_000`, which is the **most static** of the
 eight cached windows — 0.33 grey levels between consecutive frames against 7.70
 for `federer_djokovic/scene_003`.
+
+**BD-rate is taken on BT.601 Y-PSNR**, the conventional axis, with RGB-PSNR
+recorded per rung so the chroma cost stays visible. Note the correction in
+findings §14: the first reason given for that choice — that RGB-PSNR is capped
+by the 4:2:0 round-trip — was wrong. The cap was the re-encoding decode. The
+choice of axis stands on convention, not on that argument.
+
+**A note on the rung, which is a finding in its own right** (findings §13). The
+first paired run swept `residual.rate` alone and moved PointStream's total by 6%,
+because the plate was 93% of the payload and does not move with that knob. The
+default sweep now moves `background.jpeg_quality` and the residual's rate
+together. Two consequences: P0 item 3 as written sweeps ~2% of the payload and is
+close to unanswerable in isolation, and the plate-is-the-first-frame stub is not
+a limitation of the background work but **the single largest lever on the rate**.
 
 ### Results
 
