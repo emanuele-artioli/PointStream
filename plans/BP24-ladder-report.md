@@ -274,6 +274,51 @@ quality, before the residual is asked for anything.
   check now skips a rung that transmits no residual. The stored alarm text in
   this file and in the two later axes predates that fix.
 
+#### The motion axis — the findings §7 re-measure
+
+`outputs/bp24-ladder/av1-payload-highmotion.json`. `federer_djokovic/scene_003`,
+8 frames, 3840x2160, **inter-frame MAD 7.70** against 0.33 for the clip above —
+the most dynamic of the eight cached windows against the most static.
+
+| arm | rung | coded bytes | Y-PSNR |
+|---|---|---:|---:|
+| av1 on source | QP 55 | 129,393 | 38.03 |
+| av1 on source | QP 45 | 242,897 | 40.23 |
+| av1 on source | QP 35 | 472,874 | 41.86 |
+| av1 on source | QP 25 | 892,919 | 42.83 |
+| av1 on source | QP 15 | 1,458,945 | 43.36 |
+| PointStream via av1 | jpeg30 / qp55 | 666,124 | 29.80 |
+| PointStream via av1 | jpeg50 / qp46 | 1,065,429 | 30.64 |
+| PointStream via av1 | jpeg75 / qp38 | 1,667,807 | 30.88 |
+| PointStream via av1 | jpeg90 / qp28 | 2,852,672 | 30.98 |
+| PointStream via av1 | jpeg98 / qp18 | 4,711,054 | 31.00 |
+
+> **No BD-rate.** The curves do not overlap at all: PointStream's *best* rung is
+> 31.00 dB and av1's *worst* is 38.03 dB. `compare_rd_curves` refused, which is
+> the correct answer and a stronger statement than a number would have been.
+
+**PointStream saturates at 31 dB and stops.** Seven times the rate — 666 KB to
+4.7 MB — buys **1.20 dB**. At 4.7 MB, which is 36x av1's cheapest rung, it is
+still 7 dB below what av1 delivers for 129 KB. The quality is not limited by the
+rate; it is limited by the plate, which is the first source frame of a scene
+that has moved 7.7 grey levels per frame away from it. Findings §7 predicted
+"far worse" on high motion. This is worse than far worse: the comparison stops
+being a comparison.
+
+**One alarm fired, and its bound was derived on the wrong clip.**
+
+> pointstream at 4 delivered 29.80 dB, below the unaided reconstruction's
+> neighbourhood.
+
+That floor was 30 dB, taken from BP23's unaided reconstruction of **34.88 dB** —
+measured on the *static* clip. On a clip 23x more dynamic the unaided
+reconstruction is naturally far worse, so the floor was carried across a
+condition it was never derived under. Recording that is the point: a bound that
+fires for the wrong reason is worth as much as one that fires for the right one,
+provided the reason is written down. The `absent` control on this clip is being
+measured to settle whether the residual is genuinely helping here
+(`outputs/bp24-ladder/av1-coarseness-highmotion.json`).
+
 #### Remaining axes
 
 <!-- RESULTS -->
