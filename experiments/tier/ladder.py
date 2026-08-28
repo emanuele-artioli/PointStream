@@ -51,6 +51,7 @@ import numpy as np
 
 from experiments.tier.clip import TierClip, load_tier_clip
 from experiments.tier.run import run_config
+from src.components.codec.frames import rgb_to_luma
 from src.components.codec.measure import PRESETS
 from src.components.metrics.bd_rate import (
     InsufficientOverlapError,
@@ -100,19 +101,55 @@ PAYLOAD_RUNGS = ((30, 55), (50, 46), (75, 38), (90, 28), (98, 18))
 LADDER_RATE_CONTROL = RateControl.QP
 
 
-def pooled_psnr(reference: np.ndarray, candidate: np.ndarray) -> float:
-    """One PSNR over the whole clip's MSE, in RGB. The convention for both arms.
+def pooled_psnr(
+    reference: np.ndarray, candidate: np.ndarray, *, luma: bool = False
+) -> float:
+    """One PSNR over the whole clip's MSE. The convention for both arms.
 
     Not the mean of per-frame PSNRs. Either is defensible; using two inside one
     ladder is not, and BP23 found exactly that (47.63 against 48.28 dB on
     identical pixels).
+
+    ``luma=True`` scores BT.601 luma, which is **the axis the BD-rate is taken
+    on**. RGB is recorded beside it and is not comparable between the arms —
+    see `luma_is_the_axis` below.
     """
     ref = np.asarray(reference, dtype=np.float64)
     got = np.asarray(candidate, dtype=np.float64)
     if ref.shape != got.shape:
         raise ValueError(f"psnr shape mismatch: {ref.shape} vs {got.shape}")
+    if luma:
+        ref = rgb_to_luma(ref).astype(np.float64)
+        got = rgb_to_luma(got).astype(np.float64)
     mse = float(np.mean((ref - got) ** 2))
     return float("inf") if mse == 0.0 else 10.0 * float(np.log10((255.0**2) / mse))
+
+
+#: Why the BD-rate axis is Y-PSNR and not RGB-PSNR.
+#:
+#: Measured on this ladder, 4K tennis, av1 at `yuv420p`: **QP 15 scored 40.72 dB
+#: in RGB and QP 30 scored 40.16 dB.** Fifteen QP steps moved the rate by a
+#: factor of six and the RGB quality by half a dB, because the arm is capped by
+#: the 4:2:0 chroma round-trip rather than by the quantizer. An RGB curve on
+#: that arm resolves nothing — exactly the degenerate shape
+#: `plans/BP24-findings.md` §2 is about.
+#:
+#: Worse, the cap is **asymmetric between the arms**. PointStream delivers a
+#: JPEG plate with source crops pasted over it, so most of its pixels never make
+#: the 4:2:0 round-trip at all; it sits above a ceiling the anchor cannot reach,
+#: and the two curves have no overlapping quality range to integrate over. A
+#: BD-rate taken there would be measuring the colour format.
+#:
+#: Y-PSNR is also what the BD-rate literature reports, so this is the
+#: conventional axis rather than a convenient one. RGB is recorded per rung so
+#: the chroma cost stays visible instead of being quietly dropped.
+LUMA_IS_THE_AXIS = (
+    "BD-rate is taken on BT.601 Y-PSNR. RGB-PSNR is recorded per rung but is "
+    "not the axis: at yuv420p the anchor's RGB score is capped by the 4:2:0 "
+    "round-trip (40.72 dB at QP 15 against 40.16 at QP 30 on this clip), and "
+    "PointStream avoids most of that round-trip, so an RGB comparison would be "
+    "measuring the colour format rather than the coding."
+)
 
 
 def motion_level(frames: np.ndarray) -> float:
@@ -189,10 +226,11 @@ def anchor_rung(clip: TierClip, request: EncodeRequest) -> Rung:
         coded_bytes=int(coded_bytes),
         # Scored on what the decoder returned. `coded_roundtrip` hands back both
         # halves together so this cannot accidentally score the input array.
-        quality_db=pooled_psnr(reference, decoded),
+        quality_db=pooled_psnr(reference, decoded, luma=True),
         seconds=seconds,
         detail={
             "arm": "source-through-codec",
+            "psnr_rgb_dB": pooled_psnr(reference, decoded),
             "codec": request.codec_name,
             "preset": request.preset,
             "rate_control": request.rate_control.value,
@@ -226,10 +264,11 @@ def pointstream_rung(clip: TierClip, config: PointstreamConfig, rate_value: int)
     return Rung(
         rate_value=int(rate_value),
         coded_bytes=int(sizes.transport_total),
-        quality_db=pooled_psnr(clip.frames, delivered),
+        quality_db=pooled_psnr(clip.frames, delivered, luma=True),
         seconds=seconds,
         detail={
             "arm": "pointstream",
+            "psnr_rgb_dB": pooled_psnr(clip.frames, delivered),
             "codec": tuned.residual.codec,
             "preset": tuned.residual.preset,
             "rate_control": tuned.residual.rate_control.value,
@@ -240,7 +279,7 @@ def pointstream_rung(clip: TierClip, config: PointstreamConfig, rate_value: int)
             # not run on the residual and this rung is not on the rate axis at
             # all; a non-zero value is the coding loss the rung is sweeping.
             "precodec_vs_delivered_dB": pooled_psnr(
-                np.asarray(outcome.result.frames), delivered
+                np.asarray(outcome.result.frames), delivered, luma=True
             ),
             "parts": {
                 "residual": sizes.residual,
@@ -354,10 +393,11 @@ def coarseness_rung(
         # index reversed. The rung's identity is the `coarseness` name below.
         rate_value=len(Coarseness) - 1 - list(Coarseness).index(point.coarseness),
         coded_bytes=int(sizes.transport_total),
-        quality_db=pooled_psnr(clip.frames, delivered),
+        quality_db=pooled_psnr(clip.frames, delivered, luma=True),
         seconds=seconds,
         detail={
             "arm": "pointstream",
+            "psnr_rgb_dB": pooled_psnr(clip.frames, delivered),
             "coarseness": point.coarseness.value,
             "describes": point.describe(),
             "is_rate": bool(sizes.is_rate),
@@ -369,7 +409,7 @@ def coarseness_rung(
                 "metadata": sizes.metadata,
             },
             "precodec_vs_delivered_dB": pooled_psnr(
-                np.asarray(outcome.result.frames), delivered
+                np.asarray(outcome.result.frames), delivered, luma=True
             ),
         },
     )
@@ -404,10 +444,11 @@ def payload_rung(
     return Rung(
         rate_value=rank,
         coded_bytes=int(sizes.transport_total),
-        quality_db=pooled_psnr(clip.frames, delivered),
+        quality_db=pooled_psnr(clip.frames, delivered, luma=True),
         seconds=seconds,
         detail={
             "arm": "pointstream",
+            "psnr_rgb_dB": pooled_psnr(clip.frames, delivered),
             "rung": f"jpeg{jpeg_quality}/qp{rate_value}",
             "background_jpeg_quality": int(jpeg_quality),
             "residual_rate": int(rate_value),
@@ -424,7 +465,7 @@ def payload_rung(
             },
             "source_bytes": sizes.source,
             "precodec_vs_delivered_dB": pooled_psnr(
-                np.asarray(outcome.result.frames), delivered
+                np.asarray(outcome.result.frames), delivered, luma=True
             ),
         },
     )
@@ -664,6 +705,7 @@ def main(argv: list[str] | None = None) -> int:
     payload = {
         "brief": "BP24 — the paired ladder (PLAN.md §7 P0 items 2 and 3)",
         "bounds_written_before_measurement": "outputs/bp24-ladder/bounds-before-run.json",
+        "quality_axis": LUMA_IS_THE_AXIS,
         "pairing": (
             "Each codec appears on both arms at the same preset, rate control "
             "and pixel format, from one EncodeRequest per rung. The preset "

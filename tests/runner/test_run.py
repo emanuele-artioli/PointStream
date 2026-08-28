@@ -269,9 +269,34 @@ def test_delivered_frames_concatenates_every_chunk() -> None:
     assert result.delivered_frames.shape == result.frames.shape
 
 
-def test_delivered_quality_is_scored_on_delivered_frames_not_on_frames() -> None:
-    """Ties the array to the score, so the two cannot drift apart again."""
+def test_delivered_frames_follows_the_codec_stage_not_the_residual() -> None:
+    """The divergence itself, forced.
+
+    Without an encoder the two arrays are equal, so a test on the shipped path
+    cannot fail for the reason it claims. A codec stage that returns *different*
+    pixels — which is exactly what a real one does — separates them: `frames`
+    keeps the residual as the residual stage produced it, `delivered_frames`
+    follows what the codec handed on, and `delivered_quality` is scored on the
+    second. Reading the first beside a coded byte count is findings §4.
+    """
     source = _clip(80)
-    result = run(_residual_only(), [source])
-    direct = score(source, result.delivered_frames).whole_frame()
-    assert direct == pytest.approx(result.delivered_quality.whole_frame(), nan_ok=True)
+    darker: dict[str, object] = {}
+
+    def fake_codec(bag: object) -> dict[str, object]:
+        residual = bag["residual-stream"]  # type: ignore[index]
+        assert isinstance(residual, ResidualResult)
+        frames = np.clip(residual.reconstructed.astype(np.int16) - 10, 0, 255).astype(
+            np.uint8
+        )
+        darker["frames"] = frames
+        return {"frames": frames, "byte_count": 1234, "residual_is_coded": True}
+
+    result = run(_residual_only(), [source], backends={STAGE_CODEC: fake_codec})
+
+    assert bit_identical(darker["frames"], result.delivered_frames)  # type: ignore[arg-type]
+    assert not bit_identical(result.frames, result.delivered_frames)
+    # And the score follows the delivered array, not the other one.
+    assert score(source, result.delivered_frames).whole_frame() == pytest.approx(
+        result.delivered_quality.whole_frame()
+    )
+    assert not math.isinf(result.delivered_quality.whole_frame())

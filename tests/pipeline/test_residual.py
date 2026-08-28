@@ -212,13 +212,18 @@ def test_an_absent_residual_is_an_exact_zero_not_a_stand_in() -> None:
     """Sending nothing is a measurement, not an unmeasured cost.
 
     The distinction matters because `exact=False` on a zero would make every
-    residual-off corner refuse to report a ratio, which would be the guard
-    firing on a corner that has nothing to hide.
+    residual-off corner refuse to report a ratio — the guard firing on the one
+    corner with nothing to hide.
+
+    Absence is a *lattice* property, not a coarseness value. `point_for` reads
+    the variant from the lattice first and only then consults `coarseness`, so
+    passing `Coarseness.ABSENT` to an enabled residual stage yields a LOSSY
+    payload labelled absent. The corner is expressed by leaving the stage out.
     """
     absent = compute_residual(
-        _clip(200), _clip(150), lattice=StageLattice.of(STAGE_RESIDUAL),
-        coarseness=Coarseness.ABSENT,
+        _clip(200), _clip(150), lattice=StageLattice.of(STAGE_BACKGROUND)
     )
+    assert absent.payload.is_absent
     assert absent.payload.cost.byte_count == 0
     assert absent.payload.cost.exact is True
 
