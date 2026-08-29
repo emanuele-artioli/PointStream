@@ -28,8 +28,18 @@ from pathlib import Path
 from typing import Final
 
 #: Environment variable naming the directory that holds `assets/` and
-#: `outputs/`. Unset means "the repository root", which is the historical layout.
+#: `outputs/`. Unset means "consult the marker file", then "the repository root".
 ENV_DATA_ROOT: Final = "PS_DATA_ROOT"
+
+#: Per-checkout marker naming the data root, one line, no quoting.
+#:
+#: The environment variable alone is a footgun: it has to be exported in every
+#: shell, every editor terminal, every cron entry and every agent session, and
+#: the failure mode when it is missing is a confusing "file not found" rather
+#: than a clear one. The marker file travels with the checkout instead, so a
+#: process that inherits nothing still finds the data. It is gitignored, because
+#: where the data sits is a property of the machine and not of the branch.
+DATA_ROOT_MARKER: Final = ".ps-data-root"
 
 #: This file is `<repo>/src/contracts/paths.py`, so the root is three up.
 _REPO_ROOT: Final = Path(__file__).resolve().parents[2]
@@ -43,14 +53,26 @@ def repo_root() -> Path:
 def data_root() -> Path:
     """Where `assets/` and `outputs/` live.
 
-    `PS_DATA_ROOT` if it is set and non-empty, otherwise the repository root.
-    The path is returned whether or not it exists: a caller that needs a
+    In order: `PS_DATA_ROOT` if set and non-empty; then a `.ps-data-root` marker
+    file in the repository root; then the repository root itself, which is the
+    historical layout.
+
+    The path is returned whether or not it exists. A caller that needs a
     directory to be present should say so itself, with a message naming what it
     was looking for, rather than being handed a silent fallback here.
     """
     override = os.environ.get(ENV_DATA_ROOT, "").strip()
     if override:
         return Path(override).expanduser().resolve()
+
+    marker = _REPO_ROOT / DATA_ROOT_MARKER
+    try:
+        declared = marker.read_text(encoding="utf-8").strip()
+    except OSError:
+        declared = ""
+    if declared:
+        return Path(declared).expanduser().resolve()
+
     return _REPO_ROOT
 
 
@@ -64,6 +86,19 @@ def outputs() -> Path:
     return data_root() / "outputs"
 
 
+def _source() -> str:
+    """Which of the three mechanisms decided, so a run record can say."""
+    if os.environ.get(ENV_DATA_ROOT, "").strip():
+        return ENV_DATA_ROOT
+    marker = _REPO_ROOT / DATA_ROOT_MARKER
+    try:
+        if marker.read_text(encoding="utf-8").strip():
+            return f"{DATA_ROOT_MARKER} marker file"
+    except OSError:
+        pass
+    return "repo root (default)"
+
+
 def describe() -> dict[str, str]:
     """What the paths resolved to, for a run record to carry.
 
@@ -74,13 +109,14 @@ def describe() -> dict[str, str]:
     return {
         "repo_root": str(repo_root()),
         "data_root": str(data_root()),
-        "data_root_source": ENV_DATA_ROOT if os.environ.get(ENV_DATA_ROOT, "").strip() else "repo root (default)",
+        "data_root_source": _source(),
         "assets": str(assets()),
         "outputs": str(outputs()),
     }
 
 
 __all__ = [
+    "DATA_ROOT_MARKER",
     "ENV_DATA_ROOT",
     "assets",
     "data_root",

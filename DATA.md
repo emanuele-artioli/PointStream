@@ -10,16 +10,22 @@ repositories" indefinitely, and why anything waiting on it did too.
 
 ## Pointing somewhere else
 
-Set `PS_DATA_ROOT` to the directory that contains `assets/` and `outputs/`:
+Three mechanisms, in order of precedence:
 
-```bash
-export PS_DATA_ROOT=/home/itec/emanuele/pointstream-data
-```
+1. **`PS_DATA_ROOT`** in the environment, for a one-off override.
+2. **`.ps-data-root`** — a one-line file in the repository root naming the
+   directory. Gitignored, because where the data sits is a property of the
+   machine, not of the branch.
+3. **The repository root**, which is the historical layout.
 
-Unset, it defaults to the repository root, which is the historical layout — so
-a checkout with its data still in place needs no configuration and behaves
-exactly as before. `src/contracts/paths.py` is the only place that resolves
-this; nothing else should join `"assets"` or `"outputs"` onto a repo root.
+The marker file is the one to use. An environment variable has to be exported in
+every shell, every editor terminal, every cron entry and every agent session,
+and when it is missing the failure is a confusing "file not found" rather than a
+clear one. The marker travels with the checkout, so a process that inherits
+nothing still finds the data.
+
+`src/contracts/paths.py` is the only place that resolves this; nothing else
+should join `"assets"` or `"outputs"` onto a repo root.
 
 **Do not use a symlink.** A symlink inside the project is what tools follow, and
 it is how one dataset became twelve: every git worktree carried `assets` and
@@ -29,16 +35,24 @@ data and leave nothing in the tree to follow.
 
 ## Moving the data
 
+Done on this host, 2026-08-29, to `/home/itec/emanuele/pointstream-data`:
+
 ```bash
 mkdir -p /home/itec/emanuele/pointstream-data
 mv assets outputs /home/itec/emanuele/pointstream-data/
-export PS_DATA_ROOT=/home/itec/emanuele/pointstream-data
+echo /home/itec/emanuele/pointstream-data > .ps-data-root
 ```
 
-Expect the move itself to take a while — at ~6 file opens per second under load,
-565,000 files is not a quick `mv` unless the destination is on the same
-filesystem, in which case it is a rename and effectively instant. Keep it on the
-same mount.
+**Keep the destination on the same filesystem.** Then `mv` is a rename and is
+effectively instant; across filesystems it copies, and at ~6 file opens per
+second under load, 565,000 files is not a quick copy.
+
+Measured effect on this checkout: **579,918 files before, 14,958 after** — a
+factor of 39, and most of what remains is `.git` itself.
+
+The tracked empty `assets/weights/.gitkeep` was removed with the move. It
+existed to keep an empty directory in the tree, and an empty `assets/` in a
+checkout whose data lives elsewhere is a trap rather than a convenience.
 
 ## What this does not change
 
