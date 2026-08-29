@@ -102,22 +102,41 @@ choice is an axis, and the cheap and expensive ends differ a lot in cost:
 |---|---|---|
 | `first` | the previous scene's **first** background frame | free |
 | `last` | the previous scene's **last** background frame | free |
-| `best-scored` | search previous frames, pick the most similar | a similarity pass |
+| `best-scored` | search previous frames, pick the structurally closest | an edge pass |
 | `periodic-i` | force an I-frame every *k* scenes regardless | free |
 
-Two things make this a real ablation rather than a formality:
+**Score by structure, not by pixel distance — Canny is the right shape of
+proxy.** Findings §18 measured the *further apart* pair (federer, 15.10 dB)
+saving **more** (47–53%) than the closer one (alcaraz, 13.75 dB, 31–33%), so
+PSNR distance does not predict coding distance. That is not a curiosity; it is
+the same mechanism that made pixel subtraction fail in §17. What a codec spends
+bits on is **residual structure after motion compensation** — edges that do not
+line up — and not the mean squared difference of two images.
 
-- **PSNR distance does not predict coding distance.** Findings §18 measured the
-  *further apart* pair (federer, 15.10 dB) saving **more** (47–53%) than the
-  closer one (alcaraz, 13.75 dB, 31–33%). So a similarity search that ranks by
-  PSNR may not pick the reference that codes best. **If `best-scored` is
-  implemented, score it by trial encode or by a proxy validated against trial
-  encodes — not by PSNR alone, on the assumption that similar means cheap.**
-- **`periodic-i` is not a baseline, it is a requirement in disguise.** A chain of
-  P-frames means losing payload *n* breaks every payload after it, and gives no
-  random access — a client joining mid-match cannot start. A real system sends a
-  periodic I-frame, and that costs rate. **The ablation must price it**, or the
-  measured saving belongs to a system nobody could deploy.
+So the reference to prefer is the one whose *edge map* matches, and a Canny
+edge map compared by IoU (or a Chamfer distance, which degrades more gracefully
+when edges are near but not coincident) is a cheap stand-in for exactly that. It
+also costs almost nothing: one Canny pass per candidate frame, no encoding.
+
+**Validate the proxy before trusting it**, on the project's usual terms: on a
+handful of candidate pairs, run the real trial encode *and* the Canny score, and
+check they rank the same way. A proxy that has never been checked against the
+thing it proxies is how a search ends up confidently picking the wrong
+reference. If Canny does not track the trial encodes, say so and fall back to
+`first` — which costs nothing and, per §18, is already worth 31–53%.
+
+**`periodic-i` is an ablation, not a constraint.** A pure P-chain has no random
+access and no loss resilience: a client joining mid-match cannot start, and
+losing payload *n* breaks every payload after it. For a **research paper** that
+is acceptable — the system is not being deployed, and assuming a reliable
+channel is a normal scoping decision. So the keyframe interval is swept as an
+axis rather than imposed as a floor.
+
+**But the paper has to say so.** A rate that assumes no keyframes and no losses
+is a rate under a stated assumption, and a reviewer will ask. The ablation
+exists to make that conversation quantitative: reporting the cost of *k* = 2, 4,
+8 and never lets the robustness discussion cite a number instead of a
+hand-wave.
 
 ## 4. Where this goes in the codebase
 
@@ -165,9 +184,11 @@ low-delay, both with the same keyframe interval.
 - **A periodic I-frame every *k* scenes costs roughly `1/k` of a fresh plate.**
   With savings of ~40% on the P scenes, the break-even against all-intra is
   around *k* = 2, so any *k* ≥ 4 should still pay. If it does not, the
-  arithmetic is wrong somewhere.
-- **`best-scored` must beat `first` by enough to pay for the search.** If it
-  wins by under a few percent, `first` is the honest recommendation and the
+  arithmetic is wrong somewhere. Reported as an axis, not imposed.
+- **`best-scored` must beat `first` by enough to pay for the search**, and its
+  Canny score must rank candidates the same way trial encodes do. If the ranking
+  disagrees, the proxy is wrong and the honest report says `first`; if it agrees
+  but wins by under a few percent, `first` is still the recommendation and the
   search is complexity for nothing.
 - **The paired BD-rate must be reported over N scenes on both arms.** A number
   that amortises PointStream's background over 20 scenes against an anchor given
@@ -176,7 +197,8 @@ low-delay, both with the same keyframe interval.
 ## Done when
 
 The background is transmitted as a low-delay stream across scenes, each scene's
-payload independent of every future scene; the four reference modes are ablated
-with the keyframe interval priced in; and the paired BD-rate over N scenes is
+payload independent of every future scene; the four reference modes are ablated,
+with the keyframe interval swept as an axis and its cost reported so the paper's
+robustness paragraph can cite a number; and the paired BD-rate over N scenes is
 reported against an anchor given the same N scenes under the same constraint —
 or the report says precisely which of those failed and why.
