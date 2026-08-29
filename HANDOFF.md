@@ -1,120 +1,173 @@
-# PointStream — handoff, 2026-08-23 (evening)
+# Handoff — PointStream wave 3 (BP21 / BP15 / BP19)
 
-You are picking up a rewrite of an object-centric semantic video codec, targeting
-**ACM TOMM, September 30**. Everything is merged to `main`. The suite is green:
-1050 passed, 3 xfailed, ruff and mypy clean, import direction clean.
+**Triggered by:** session length and a stalled Cursor host. Background
+agent shells stopped returning; they are not GPU work. The user asked to
+collect state and report back to Claude for the next steps. This session
+is Cursor Grok 4.6, 2026-08-25 evening.
 
-## Read, in this order
+A pointer lives at `/home/itec/emanuele/pointstream-w3-c/HANDOFF.md` and
+in `.agent-rules/var/precompact/f478a659-eb99-4069-a21c-b1f4af038fb7.md`.
 
-1. `AGENTS.md` (project) and the host rules it imports.
-2. `PLAN.md` — especially **§2.3 through §2.10**. §2.10 is the newest and
-   supersedes the engine readings in the others.
-3. `plans/README.md` — what is live, and what is void.
-4. Your one brief from `plans/`. Do not read the whole tree.
+## Summary
 
-## The situation in five sentences
+Wave 3 of PointStream: (A) widen the 4K headroom argument from n=2 to n=8
+and settle the VVC QP confound; (B) cull dead decoder code; (C) make
+IP-Adapter a real appearance path. Plan: `plans/BP21-headroom-widen.md`,
+`plans/BP19-conditioning-architecture.md`. Do not edit the paper repo
+`67a9ea6275d3d9785ce57026/`, `src/components/metrics/**`, `PLAN.md` §2, or
+`plans/README.md`. Bound before believing. IdentityScale/TENNIS_SCALE live
+in `src/components/metrics/reid.py` (do not edit).
 
-The component platform is built and works: 16 axes, a rebuilt probe set, a
-pipeline, a runner, region-scoped metrics, and now a probe harness that drives
-temporal models as clips and refuses to rank when its own control fails. **No
-generative engine produces a usable player, and this is now measured properly
-rather than suspected**: all eight lose to *pasting the keyframe* at 2.5σ–10.6σ,
-and the best of them is `upscale-refine`, which is not a generative model. The
-test that was supposed to decide whether any engine "uses appearance" has been
-withdrawn, because a pasted keyframe tops its scale with no network at all. The
-paper's central rate-distortion claim against the codec ladder **has still never
-been run in any configuration**.
+## Current state (verified from git refs and files, 2026-08-25 ~19:25 local)
 
-## What you must not trust
+| Stream | Path | Branch | HEAD | Remote | PR |
+|---|---|---|---|---|---|
+| A BP21 | `/home/itec/emanuele/pointstream-w3-a` | `wave3/bp21-headroom` | `55e267b` | same SHA | [#18](https://github.com/emanuele-artioli/PointStream/pull/18) |
+| B BP15 | `/home/itec/emanuele/pointstream-w3-b` | `wave3/bp15-cull` | `5905675` | — | [#19](https://github.com/emanuele-artioli/PointStream/pull/19) |
+| C BP14/19 | `/home/itec/emanuele/pointstream-w3-c` | `wave3/bp14-bp19` | `c327feb` | same SHA | [#20](https://github.com/emanuele-artioli/PointStream/pull/20) |
 
-- **Every engine ranking taken before 2026-08-23.** Two of three metrics were
-  broken: LPIPS was an uncalibrated VGG feature distance that scored an unrelated
-  image at 0.083 and a good reconstruction at 0.085; VMAF had its ffmpeg inputs
-  crossed and scored blur above a perfect match. Both are fixed and both now have
-  calibration invariants.
-- **`plans/BP10-appearance-pathway.md` — void, and marked so in its own file.**
-  Its gate "≥ +3 dB = ReferenceNet works" certifies a paste, which scores
-  +4.45 dB. Any conclusion drawn from a cross-appearance delta alone is void with
-  it.
-- **Anything in `plans/done/` that ranked engines.** `BP5`'s roster verdict was
-  measured on self-reconstruction.
-- **PSNR as a ranking key for generative arms.** Usable range is ~11–21 dB with a
-  ~2 dB per-clip sd. Rank on calibrated LPIPS; keep PSNR reported alongside. On
-  this roster pix2pix is 2nd on PSNR and 7th on LPIPS — the orders genuinely
-  differ.
+Main checkout: `/home/itec/emanuele/pointstream`. `outputs/` and `assets/`
+are gitignored; worktrees symlink into the main checkout. Do not commit them.
+`conda` env: `pointstream`. `gh` as `emanuele-artioli`.
 
-## Working rules that were learned expensively
+### A — BP21: done, with alarms; typecheck follow-up pushed
 
-**Eight times now, something passed its tests while not doing its job** — ten
-generators registered that could not load weights; a probe verifier green while
-five clips had no pose data; a roster ranked on self-reconstruction; a temporal
-model run at T=1; a metric that could not tell a match from noise; a VMAF wiring
-where blur beat perfection; a training run with no stopping criterion; and a
-*control* that ranked four engines before anyone asked what an arm with no model
-scores on it.
+**Done and verified:** n=8 4K encode finished `2026-08-25T11:57:44Z`.
+Report: `outputs/bp21-headroom/report.json`. Bounds written before the run:
+`outputs/bp21-headroom/bounds-stream-a.json`. Write-up:
+`plans/BP21-headroom-widen.md` § n=8.
 
-So:
+Headline vs pre-written bands (do not cite as clean):
 
-- **Use the `verify-measurement` skill before reporting any measurement.**
-- **A control needs its own null.** When a control produces a ranking, run the
-  degenerate arm through it — the paste, the passthrough, the empty model —
-  *before* reading the ranking. That is the newest rule and it is the one that
-  caught the latest error.
-- **Write the bound down before the number, and the failure branch with it.**
-  BP12's cross-appearance prediction named what "the ControlNets come in above
-  AA" would mean. They did, and the pre-written branch is what stopped a wrong
-  claim.
-- **Quote the instrument's range beside the number.** "0.067" is meaningless.
-- **Use `src.components.metrics.comparison.compare_paired`** for any arm-vs-arm
-  claim, and `python -m experiments.probe.report <run-dir>` for a whole run.
-- **Check the invocation before blaming the model.**
-- **When the news is good, add a check rather than stopping.**
+- AVC FG plate **0.170 ± 0.031** n=8 — **outside** [0.184, 0.304]
+- HEVC 0.183 ± 0.034 — inside
+- AV1 0.154 ± 0.028 — **outside** [0.169, 0.289]
+- VVC 0.142 ± 0.026 — inside
+- VVC gap, common QP: AVC−VVC **+0.028 ± 0.015** (n=8, 1.8σ, suggestive)
+- Same gap, common PSNR (AVC/HEVC/VVC only): **+0.023 ± 0.017** (1.3σ)
+- Sentence: *confound: the AVC−VVC FG gap did not survive a common QP set;
+  it also did not survive a common PSNR interval.*
 
-## Environment
+Two near-zero FG clips (paste-back MAE 0.0): `djokovic_zverev/scene_002`
+0.011, `federer_djokovic/scene_003` 0.099. BP20's n=2 were the high-saving
+clips; the ±0.06 band is too tight. Bound not retconned.
 
-- `conda run -n pointstream --no-capture-output <cmd>`; imports absolute from the
-  repo root. Pass `python -u` for long detached runs — stdout block-buffering
-  delayed BP12's progress lines by minutes.
-- Packages go in `pyproject.toml` and then get installed — never ad-hoc, and
-  never a version bump on a pinned forked model.
-- Before merging: `ruff check`, `mypy --config-file pyproject.toml`, the tests
-  for what you touched, `python -m src.contracts.layers`.
-- Three known `xfail`s, each with a reason: `DEFERRED.md` D5 and D6.
-- The paper is a **separate git repo** at `67a9ea6275d3d9785ce57026/`. Commit
-  there when you change it. **It does not yet know about §2.10.**
+Common-PSNR window was empty because AV1 at QP 32/40/46 sits 5–10 dB above
+the others. Fix: `common_quality_interval` raises on a disjoint range;
+`_fill_common_interval` slices AVC/HEVC/VVC only. Refresh:
+`python -u -m experiments.headroom.real_ladder --out outputs/bp21-headroom --summarize-only`
 
-## What to do next
+libvvenc 1.11.0 at `faster` wrote 0 frames at some clip×QP (including QP 32
+on `djokovic_federer/scene_003` original). Fallback walks nearby QPs and
+must not reuse another curve point (`qps=(32,32,46)`). That clip used QP
+**31** in place of 32.
 
-**`plans/BP13-motivating-headroom.md` is the critical path.** Encode a clip
-normally, encode it again with the player regions flattened, difference the
-bitrates. That number bounds the entire paper: the players are 1.07% of a 4K
-frame each (§2.6), and if a conventional codec spends 3% of its bits on them
-there is no prize here regardless of how good a generator gets. Nothing in BP12
-changes this and BP12 makes it more urgent — we now know the generator side is
-not close, so the premise had better be worth the trouble.
+**CI on `840a6d7`:** lint green, tests green, **typecheck red** (run
+32871918654). Local follow-up `55e267b` is on the branch *and* on
+`origin/wave3/bp21-headroom` (mypy: `Sequence[Any]` instead of `list[Any]`;
+typed test doubles). **Not verified:** whether CI on `55e267b` went green.
+Check: `gh run list --branch wave3/bp21-headroom --limit 3`.
 
-Then, in order:
+**Deliberately not done:** `PLAN.md` §2.14 not edited (central). Paper not
+touched. Do not merge PRs unless asked. Do not rebase C onto B while both
+PRs are open (would drag BP15 into #20).
 
-- **`BP14`** before any training run. The last one burned 14 GPU hours on a
-  series flat from epoch 1.
-- **`BP15`** — retire ~15k lines of pre-rewrite code and its 433 tests.
-- **The paper.** §2.10 is not in it yet. The Evaluation skeleton's `GOAL`/`HOLE`
-  markers now have a real negative result to absorb, and `subsec:eval-operating`
-  can be filled: clip mode costs 6.2 GiB against 3.3 for a ControlNet, both at
-  ~1 s/frame.
+### B — BP15: done
 
-**The open architectural question is now differently shaped.** It is no longer
-"does ReferenceNet work" — nothing here can answer that. It is **"what
-measurement would tell us?"**, and the literature's answer is an identity metric
-(CSIM/ArcFace), which this project does not have. Adding Champ or MusePose before
-that exists buys two more arms that lose to a pasted keyframe. Build the
-instrument first; that is the lesson of the last three weeks in one sentence.
+HEAD `5905675`, PR #19 mergeable. DecoderRenderer/compositor, synthesis_engine,
+mask_codec, profiling, track_id, `benchmark_mask_codecs` culled. Coverage 77.
+CI was green. Do not port or re-cull.
 
-## One thing to hold on to
+### C — BP14 done; multi-controlnet measured; IP-Adapter *wired*, not trained
 
-The negative results here are real, expensively earned, and now properly
-controlled. They belong in the paper as scoped findings — *these checkpoints, on
-this task, measured this way* — not as evidence that the architecture fails. The
-lattice, the residual and the background are independently verified. Do not let
-the generator result contaminate them, and do not soften it into "more tuning
-needed" either.
+BP14 `TaskStopRule` on coding-task LPIPS: `7e5103c`. Dataset honesty:
+ip-adapter is not on the seg branch (`4aa7c94`). Loader bug for multi:
+`c0e2744`. Multi-controlnet measurement (not citable): LPIPS object-bbox
+0.579 ± 0.013 n=96; reid 0.628 ± 0.013 through TENNIS_SCALE. Two ControlNets
+do not create an appearance path. Recorded in `plans/BP19-conditioning-architecture.md`.
+
+**IP-Adapter training loop (`c327feb`, pushed):**
+`--condition-type ip-adapter --include-reference` freezes stock OpenPose
+ControlNet, attaches `h94/IP-Adapter` (`ip-adapter_sd15.bin` ~22M) on the
+UNet, optimiser sees only adapter params (aborts if count not in 10–40M),
+reference goes through CLIP vision not the control image, checkpoints write
+`ip-adapter.bin`. Inference loads that file if present next to the ControlNet
+dir. `--smoke-check-reference` is refused on this condition (pose-ref recipe).
+
+Weights: `~/.cache/huggingface/hub/models--h94--IP-Adapter` (not under
+`assets/weights/ip-adapter-controlnet` — that directory is a mislabelled
+seg ControlNet).
+
+**Bounds written before any train sample** (in the BP19 plan): after a
+finished run, object-bbox LPIPS 0.50–0.78 (below 0.45 = paste alarm; above
+0.74 = worse than unrelated). reid through TENNIS_SCALE 0.53–0.72; a
+same-person 0.87 is an alarm. Expect semantic appearance, not identity.
+
+**Not done:** a training run. A `--max-steps 1` smoke was launched
+2026-08-25 ~16:30Z, produced **no logs**, and Cursor agent shells then
+stopped returning. GPUs at 19:23 local showed **yiying `wan`**, ~6 GiB each,
+0% util — not our process. Do not assume the smoke is still using a GPU;
+check `nvidia-smi` process list. Killing leftover Cursor `tail`/`conda run`
+shells in the IDE is safe.
+
+Do not repeat pose-ref (reference painted into the control image). Uni-ControlNet
+is last. Coding-task ControlNet retrain is after a real IP-Adapter result.
+
+## What's running
+
+Nothing of ours on the GPUs as of the user's `nvidia-smi` 2026-08-25 19:23.
+
+The nine (or more) Cursor **background terminals** are leftover agent
+commands (`gh run watch`, hung `conda run` smoke, hung `git commit`, hung
+`ps`/`kill`). They are not encoding. Safe to close in the IDE. If a
+`train_controlnet.py` python is still in `ps`, it had no GPU footprint;
+killing it loses only an incomplete 1-step smoke under `/tmp/ip-adapter-smoke`.
+
+Check:
+
+```
+nvidia-smi
+ps -eo pid,etime,cmd | rg 'train_controlnet|real_ladder|recover.py' | rg -v rg
+gh run list --branch wave3/bp21-headroom --limit 3
+gh run list --branch wave3/bp14-bp19 --limit 3
+```
+
+## Open questions
+
+1. **Cite BP21 how?** AVC/AV1 means are out-of-band because two clips are
+   near zero. Keep the alarm and quote mean±SE + those clips, or retcon the
+   ±0.06 band with an explicit reason? This session did not retcon.
+2. **Start IP-Adapter training now?** GPUs had ~43 GiB free under yiying's
+   idle 6 GiB jobs. Launch command is in the BP19 plan. First confirm CI on
+   `c327feb` and that no stale smoke python is alive.
+3. **Merge order:** A/B then C rebase after #19 lands. Do not merge unless
+   asked.
+
+## Next steps, in order
+
+1. Close the stuck Cursor background terminals in the UI.
+2. `gh run list --branch wave3/bp21-headroom --limit 3` — confirm typecheck
+   on `55e267b`. If red, `gh run view <id> --log-failed`.
+3. `gh run list --branch wave3/bp14-bp19 --limit 3` — confirm CI on `c327feb`.
+4. If the user wants GPU work next: one-step smoke with logs to a file
+   (`python -u ... >> outputs/ip-adapter-smoke.log 2>&1`), then detached
+   train with BP14 stop:
+   `scripts/train_controlnet.py --condition-type ip-adapter --include-reference --output-dir assets/weights/ip-adapter-trained`
+5. Do not edit `PLAN.md` §2 until asked. Do not launch `--condition-type
+   ip-adapter` without `--include-reference`.
+
+## Landmarks
+
+- A report: `outputs/bp21-headroom/report.json`
+- A bounds: `outputs/bp21-headroom/bounds-stream-a.json`
+- A write-up: `plans/BP21-headroom-widen.md`
+- VVC fallback: `experiments/headroom/ladder.py` (`vvc_fallback_qps`)
+- Common PSNR: `experiments/headroom/measure.py`, `experiments/headroom/real_ladder.py`
+- IP-Adapter train: `scripts/train_controlnet.py` (`attach_ip_adapter`,
+  `controlnet_cond_for_batch`)
+- IP-Adapter load: `src/components/generation/controlnet.py`
+- Tests: `conda run -n pointstream --no-capture-output python -m pytest tests/experiments/test_headroom.py tests/test_controlnet_dataset.py -q`
+- Host rules: `/home/itec/emanuele/AGENTS.md`
+- Skills: `results-report`, `end-of-session`, `evaluate-candidates` (9 open
+  candidates under `.agent-rules/candidates/open`; 2 pending-verification
+  for cursor)
