@@ -415,3 +415,76 @@ clamped this time.
 Worth adding a declared range to `CodecCapabilities` before the ablation lattice
 sweeps the codec axis, where a silently clamped rung would be one row in a table
 nobody re-derives.
+
+---
+
+## Added 2026-08-29, probing the plate
+
+## 16. JPEG is the wrong codec for a 4K plate, by a factor of three to four
+
+The plate is 88-91% of PointStream's payload (§13) and it is coded as a JPEG.
+Measured on the same still — `alcaraz_highlights/scene_000` frame 0, 4K —
+against modern intra coding (`outputs/bp24-ladder/plate-probe.json`,
+`python -m experiments.tier.plate_probe`):
+
+| route | knob | bytes | PSNR |
+|---|---|---:|---:|
+| jpeg | q10 | 199,933 | 31.03 |
+| jpeg | q30 | 283,431 | 37.98 |
+| jpeg | q50 | 345,558 | 40.04 |
+| jpeg | q75 | 461,771 | 42.79 |
+| jpeg | q90 | 709,794 | 45.45 |
+| **av1** | qp55 | **79,726** | **38.25** |
+| av1 | qp45 | 143,925 | 40.83 |
+| av1 | qp35 | 253,346 | 42.55 |
+| av1 | qp25 | 425,296 | 43.50 |
+| **vvc** | qp35 | **68,477** | **38.38** |
+| vvc | qp25 | 179,527 | 41.79 |
+
+Read at matched fidelity rather than at matched knob:
+
+- **~38 dB**: JPEG 283,431 B; av1 **79,726 B** (3.6x smaller, 0.3 dB better);
+  vvc **68,477 B** (4.1x smaller, 0.4 dB better).
+- **~40 dB**: JPEG 345,558 B; av1 143,925 B (2.4x smaller, 0.8 dB better).
+- **~42.8 dB**: JPEG 461,771 B; av1 253,346 B (1.8x smaller, 0.24 dB worse).
+
+The gap is widest exactly where the plate wants to operate — cheap. This is a
+**factor of two to four on 88-91% of the payload**, for no architectural change:
+the plate stays a single still, transmitted once, decoded once.
+
+**It is not even new code.** `src/components/background/sidecar.py` already
+offers `roi-video`, a single-frame libx264 encode with `addroi` bit steering, as
+a value of `background.codec`. Nothing has ever measured it against `jpeg`,
+because `background.codec` reached nothing at all until BP24 wired
+`make_background` (§6). An av1 or vvc intra sidecar would be a third backend on
+the same interface.
+
+**Why it went unnoticed for so long:** `background.jpeg_quality` is a knob on the
+*codec that was already chosen*, so every sweep of it — including BP24's payload
+sweep — explored quality within JPEG and never questioned JPEG. A config axis
+that offers `{jpeg, png, roi-video}` and is only ever set to `jpeg` is
+indistinguishable from a hardcoded constant until somebody drives the others.
+
+## 17. Scenes from one match do not share a background
+
+Tested because it looked like free amortisation: if the camera returns to the
+same court view, one plate could serve several scenes, and — unlike a codec,
+which must start a fresh intra frame at every cut — PointStream could carry it
+across. First frame against first frame, same match
+(`outputs/bp24-ladder/plate-probe.json`):
+
+| match | pair | PSNR | mean abs diff |
+|---|---|---:|---:|
+| `alcaraz_highlights` | scene_000 vs scene_010 | 13.75 dB | 39.39 |
+| `federer_djokovic` | scene_001 vs scene_003 | 15.10 dB | 22.97 |
+
+**The premise does not hold.** At 13.75 dB and a mean absolute difference of 39
+grey levels, these are not the same view; broadcast tennis cuts between camera
+positions, zooms and replays rather than returning to one framing. A plate
+reused across scenes would need geometric registration, not simple reuse — which
+is what panorama stitching does, and is a much larger piece of work than "encode
+it once".
+
+Worth recording as a closed door: the idea is sound in principle, the content
+does not support it in the simple form, and the measurement that says so took
+two minutes.

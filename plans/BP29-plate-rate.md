@@ -1,125 +1,140 @@
-# B'29 — How cheap can the plate get before the residual stops covering for it?
+# B'29 — Where does PointStream win?
 
-**Why this exists.** The BP24 ladder measured the plate at **88–91% of
-PointStream's payload at every rung of every sweep**
-(`plans/BP24-ladder-report.md`). PointStream loses to av1 by +116.8% BD-rate on
-the friendliest clip available, and the plate is where the bytes are. Nothing
-else in the project is a large enough lever to close that gap.
+**The situation.** The BP24 ladder ran and PointStream loses to every anchor:
+BD-rate +116.8% (av1), +166.8% (hevc), +165.9% (avc), +378.1% (vvc), each codec
+on both arms at one preset, on the most static clip available. On the most
+dynamic clip the curves do not overlap at all. A negative result of that shape
+is not a paper.
 
-There are two ways to make the plate cheaper. This brief is the one that needs
-**no new code** — compress the still harder — and it should run before the one
-that does (stitching a real panorama, `plans/prompts/next-session.md`), because
-it is a sweep rather than an implementation and it tells the panorama work what
-target to aim at.
+**The situation is also more tractable than it looks**, because the loss is
+concentrated in one component and that component is a placeholder. The plate is
+**88-91% of the payload at every rung of every sweep**; the residual is 3-9% and
+is the most efficient thing in the system (0.9% of the payload for 5.40 dB).
+This brief is the hunt for a win, ordered by cost.
 
-## The question, precisely
+**Read first:** `plans/BP24-ladder-report.md` · `plans/BP24-findings.md`
+§§6, 13, 16, 17 · `PLAN.md` §2.16 (metric calibration), §2.20.
 
-The background is 99.4% of the pixels and, per BP23, already reconstructs at
-39.46 dB while the objects sit at 14.30 dB — a 25 dB gap on 0.57% of the frame.
-So the plate is being sent at a fidelity nothing is asking for. The intuition is
-that a viewer would not notice a coarser background, and that the residual is
-there to catch what they would.
+---
 
-Both halves of that are testable and neither has been tested:
+## 1. Change the plate's codec. Cheapest, largest, already measured on the still
 
-1. **Does the residual absorb a worse plate?** As the plate coarsens, the
-   residual's input grows everywhere in the background. If the block gate keeps
-   that error the residual grows to match and the total barely moves — the trade
-   is a wash. If the gate drops it, the total falls and the quality falls with
-   it. **Which of those happens is the experiment.**
-2. **Does frame PSNR see it the way a viewer would?** Almost certainly not, and
-   that is the trap below.
+`plans/BP24-findings.md` §16. On the same 4K still, at matched fidelity:
 
-## Why the existing data cannot answer it
+| target | JPEG | av1 intra | vvc intra |
+|---|---:|---:|---:|
+| ~38 dB | 283,431 B | **79,726 B** | **68,477 B** |
+| ~40 dB | 345,558 B | 143,925 B | — |
+| ~42.8 dB | 461,771 B | 253,346 B | — |
 
-The BP24 payload sweep moved plate quality **and** the residual's rate together,
-so the two effects are confounded:
+**A factor of 2 to 4 on 88-91% of the payload, for no architectural change.**
+The plate stays a single still, transmitted once. It is not even new code for
+the x264 route: `src/components/background/sidecar.py` already offers
+`roi-video` — a single-frame libx264 encode — as a value of `background.codec`,
+and **nothing has ever measured it against `jpeg`**, because `background.codec`
+reached nothing at all until BP24 wired `make_background`.
 
-| rung | total | plate | residual | Y-PSNR |
-|---|---:|---:|---:|---:|
-| jpeg30 / qp55 | 318,077 | 283,483 | 10,285 | 39.21 |
-| jpeg50 / qp46 | 390,889 | 345,947 | 20,633 | 41.45 |
-| jpeg75 / qp38 | 525,462 | 463,334 | 37,819 | 43.59 |
-| jpeg90 / qp28 | 808,573 | 713,320 | 70,944 | 45.39 |
-| jpeg98 / qp18 | 1,548,393 | 1,408,247 | 115,837 | 46.55 |
+Do this first:
 
-The residual *grew* as the plate improved, which looks backwards for an
-absorption story — but the residual's own quantizer went from QP 55 to QP 18
-across the same rows, so the table says nothing about absorption either way.
+1. **Sweep `background.codec` over `{jpeg, png, roi-video}`** with the residual
+   held fixed. One config axis, no new code. Report plate bytes and plate PSNR
+   per rung, then re-run the paired ladder at the best one.
+2. **Add an intra-codec sidecar** for `av1` and `vvc` on the same interface —
+   `coded_roundtrip` already codes a single frame, so this is a wrapper. Keep
+   the plate on the **same codec as the anchor** in each pair, or the pairing
+   discipline breaks.
 
-## What to do
+**Bounds, before running.** Substituting av1 intra at matched plate fidelity in
+the jpeg75/qp38 rung takes the plate from 463,334 B to roughly 253,000 B and the
+total from 525,462 B to roughly 315,000 B — a 40% cut. If the whole curve moves
+like that, the rate ratio falls from 2.17x to about 1.30x and the av1 BD-rate
+lands near **+30%**. **That is still losing**, which is the honest expectation to
+write down before the run. It is a much better place to lose from.
 
-1. **Sweep the plate alone.** Hold `residual` completely fixed at the tier's
-   settings and sweep `background.jpeg-quality` over roughly
-   `{10, 20, 30, 50, 75, 90, 98}`. One line in
-   `experiments/tier/ladder.py` — `payload_rung` already takes the two knobs
-   separately, so this is a third `--sweep` mode, not a new harness.
-   Report, per rung: plate bytes, residual bytes, total, and **whether the
-   residual grew to cover the plate's loss**. That last column is the finding.
-2. **Add downscaling as the second axis.** `AppearanceConfig`-style downscale
-   already exists for appearance; the background sidecar takes
-   `background.jpeg-quality` only. Quality-versus-downscale is `PLAN.md` §7 **P2
-   item 15**, written before anyone knew the plate was 90% of the rate. It is
-   not a P2 item any more.
-3. **Score it on more than frame PSNR** — this is the part that decides whether
-   the answer means anything. See below.
-4. **Re-run the paired ladder at the best rung found** and report the BD-rate
-   beside +116.8%.
+## 2. Go where the codec is weakest: very low rate
 
-## The trap, and it is the whole difficulty
+The ladder stopped at QP 55. PointStream's floor is a plate; a codec's floor is
+blocking artefacts, and the two degrade differently. The hypothesis worth testing
+is that below some rate the anchor's quality collapses while PointStream's does
+not, because a clean plate plus pasted crops does not fall apart the way a
+starved transform codec does.
 
-**Frame PSNR cannot reward this trade.** The background is 99.4% of the pixels,
-so a coarser plate moves frame PSNR almost one-for-one, and the ladder's axis is
-frame Y-PSNR. A sweep scored only on that will conclude "compressing the plate
-costs quality", which is arithmetically true and answers the wrong question.
+Extend the anchor to QP 58, 61, 63 (av1's range runs to 63) and put the cheapest
+plate configuration against it. This is four extra encodes and it directly tests
+the "at some level of compression PointStream is smaller" intuition. **On the
+current evidence it is unlikely on frame PSNR** — at QP 55 av1 is already at
+85,995 B against a plate that cannot go below roughly 70,000 B without falling
+apart — but the crossover, if it exists, is a legitimate operating-point claim
+and it is cheap to look for.
 
-The claim being tested is *perceptual* — a viewer tolerates a soft background —
-and the project already owns the instruments to test it:
+## 3. Change what is being measured — but declare it first
 
-- **Region-scoped scoring.** `QualityReport` already reports object, background
-  and frame roles separately (BP23 used it for the 25 dB gap). The object score
-  must not move as the plate coarsens; if it does, the plate is leaking into the
-  objects and that is a defect, not a trade.
-- **VMAF and LPIPS.** Both work (§2.7, §2.16) and both are closer to a viewer
-  than PSNR. **Calibrate first**: §2.16 recorded VMAF's ceiling at 97.54 on this
-  content and a floor of 0.00 for both severe blur and an unrelated clip, and
-  LPIPS's ordering *inverted* at 960x540 while holding at 4K. Anchors do not
-  transfer across resolution — re-anchor at the resolution actually used.
+The architecture is object-centric. Frame PSNR is dominated by the background,
+which is 99.4% of the pixels, so it cannot express the claim the system is built
+to make. BP23 measured object region at **14.30 dB** against background at
+**39.46 dB** on the same frame: the objects are where the error is and where the
+bits should go.
 
-**State which metric answers which question before running**, or the result will
-be a table where the reader picks the column that suits them.
+A foreground-scoped claim — *at equal total bitrate, PointStream delivers better
+object-region quality* — is a real claim, and the machinery exists:
+`QualityReport` already reports object, background and frame roles separately,
+and VMAF and LPIPS both run.
 
-## Bounds — write to `outputs/bp29-plate/bounds-before-run.json` first
+**The integrity condition, and it is not optional.** Choosing the metric after
+seeing the frame-PSNR result is the exact shape of a result fitted to a
+narrative. What makes a foreground-scoped claim defensible rather than
+post-hoc:
 
-- **The plate at jpeg10 must be far smaller than at jpeg98.** BP24 measured
-  283,483 B at q30 and 1,408,247 B at q98, so expect roughly 100–200 KB at q10.
-  A plate that does not shrink means `background.jpeg-quality` is not reaching
-  the sidecar — check before believing anything else.
-- **The total must fall as the plate coarsens.** If it does not, the residual is
-  absorbing the loss byte-for-byte and the trade is a wash — a real result, and
-  the one that would kill this direction.
-- **Frame Y-PSNR will fall.** Expect roughly 1–4 dB from q75 to q10; a fall
-  under 0.5 dB means the plate is not what the frame score is reading, and a
-  fall over 8 dB means the residual is not covering anything at all.
-- **The object-region score must not move.** The objects are pasted crops; the
-  plate should not touch them. Movement over ~0.5 dB is an alarm.
-- **The best case for the whole direction:** closing +116.8% needs the total to
-  roughly halve at unchanged perceptual quality. If the plate can drop to
-  ~150 KB with VMAF holding, PointStream's total lands near 200 KB against av1's
-  86 KB at 39.45 dB — still losing, but by 2.3x rather than the plate alone
-  costing 3.3x av1's whole bitstream. **Note that this is unlikely to be enough
-  on its own**, which is the honest expectation to write down first.
+- **Declare it before the run**, in the bounds file, with the reason stated as
+  an *a priori* property of the architecture (the system spends its budget on
+  objects, so it should be measured on objects) rather than as a response to the
+  frame number.
+- **Report frame PSNR beside it every single time.** A table that shows only the
+  favourable region is the failure mode; a table that shows both, and says which
+  question each answers, is a finding.
+- **Calibrate the region metrics at the working resolution first.** `PLAN.md`
+  §2.16: VMAF's ceiling on this content is 97.54 and it floors at 0.00 for both
+  severe blur and an unrelated clip; LPIPS's ordering *inverted* at 960x540
+  while holding at 4K. Anchors do not transfer across resolution.
+- **Give the anchor region control.** The evaluation section already commits to
+  this: a semantic codec that concentrates its budget on the salient region must
+  not be compared against an anchor forbidden from doing the same. That arm has
+  never been run, and running it is part of making a foreground claim honest.
+
+There is prior art for this framing in the **presley** project — I have not seen
+it, so whoever picks this up should read how the foreground-scoped evaluation was
+constructed there before rebuilding one.
+
+## 4. Closed doors, so nobody re-opens them
+
+- **Reusing one plate across scenes of a match does not work on this content**
+  (`plans/BP24-findings.md` §17). First frames of different scenes in the same
+  match differ by 13.75 dB and 15.10 dB, mean absolute difference 39 and 23 grey
+  levels: broadcast tennis cuts between camera positions rather than returning
+  to one framing. Registration — panorama stitching — is a different and much
+  larger piece of work; simple reuse is not available.
+- **And even if it were, the symmetry argument holds:** a long-GOP codec
+  amortises its own intra frame across the same footage. Any cross-scene
+  amortisation given to PointStream must be given to the anchor as the same
+  total footage, or the comparison is rigged. The one genuine asymmetry is that
+  a codec must start a fresh intra frame at every *cut* while a registered plate
+  need not — but that only pays once the registration exists.
+
+## 5. Sequencing
+
+1. `background.codec` sweep (§1.1) — hours, no new code.
+2. Intra sidecar for av1/vvc (§1.2) — a day, then re-run the ladder.
+3. Low-rate extension (§2) — four encodes, run alongside.
+4. If the rate claim still fails: declare the foreground-scoped claim, calibrate
+   the region metrics, run the region-controlled anchor arms (§3).
+5. Panorama stitching (`build_plate`) — the largest lever and the largest job,
+   and §1 tells it what target to beat.
 
 ## Done when
 
-The plate-quality sweep is run with the residual held fixed, scored on frame
-PSNR *and* region-scoped scores *and* at least one calibrated perceptual metric,
-and the report says whether the residual absorbs a coarser plate — with the
-paired BD-rate at the best rung stated beside BP24's +116.8%.
-
-## Read first
-
-`plans/BP24-ladder-report.md` · `plans/BP24-findings.md` §§6, 13 ·
-`PLAN.md` §2.16 (metric calibration, and the two findings that outlive it),
-§2.20 · `src/components/background/sidecar.py` ·
-`src/runner/stages.py::_panorama_coded_bytes`
+Either the paired BD-rate is materially better than +116.8% with the reason
+attributed to a named change, or a foreground-scoped claim is declared in
+advance, measured with calibrated metrics against a region-controlled anchor, and
+reported beside frame PSNR. **A result that is negative on both is reported as
+such** — but not before §1 and §2 have been run, because both are cheap and
+neither has been tried.
