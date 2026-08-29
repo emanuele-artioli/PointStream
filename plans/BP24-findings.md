@@ -581,3 +581,46 @@ might have is that its plates are composited backgrounds, plausibly more similar
 to each other than two arbitrary frames at a cut are — but "plausibly" is not a
 measurement, and the paired-arm discipline says the anchor gets the same
 material.
+
+## 19. The inter-frame saving is causal — and the control caught a broken config first
+
+§18's 31–53% was measured with the encoders' default configuration, which allows
+B-frames and lookahead. Both let frame *n*'s decisions depend on frame *n+1*, and
+a scheme that depends on the future is not one where each scene's payload is
+independent of every future scene. `plans/BP30-background-stream.md` §1 made
+re-measuring under low delay the first alarm. Re-measured
+(`outputs/bp24-ladder/plate-lowdelay.json`, CRF 38):
+
+| arm | encoder | config | ratio |
+|---|---|---|---:|
+| **control** — consecutive frames, one scene | libx265 | default | 0.033 |
+| **control** | libx265 | no B-frames | 0.033 |
+| **control** | libaom-av1 | default | 0.012 |
+| **control** | libaom-av1 | low-delay, `lag-in-frames 0` | 0.012 |
+| alcaraz 000→010 | libaom-av1 | default | 0.671 |
+| alcaraz 000→010 | libaom-av1 | **low-delay** | **0.671** |
+| alcaraz 000→010 | libx265 | no B-frames | 1.061 |
+| federer 001→003 | libaom-av1 | default | 0.470 |
+| federer 001→003 | libaom-av1 | **low-delay** | **0.470** |
+| federer 001→003 | libx265 | no B-frames | 0.876 |
+
+**av1's saving is unchanged to the byte under low delay**, because
+`-usage realtime` was already lookahead-free — so the 31–53% is causal and
+quotable, and the scheme is achievable live. **x265 is a different story**: it
+saves 12% on one pair and *loses* 6% on the other, which matches §18's
+observation that its own rate-distortion decision preferred intra there. The
+saving is a property of av1's inter tools, not of inter coding in general.
+
+**The control caught a broken configuration, which is the point of having one.**
+The first attempt set `rc-lookahead=0` for x265, reasoning that lookahead breaks
+causality. That is x265's *rate-control* lookahead rather than a prediction
+lookahead, and zeroing it made the P-frame between two nearly identical frames
+come back **larger than a fresh intra** — control ratio 1.075. Without the
+control, that run would have been reported as "low delay costs x265 60% more",
+which is a plausible-sounding finding about nothing.
+
+**One consequence for the design.** Strict causality wants zero rate-control
+lookahead too, and x265's usable minimum is not zero. For one plate per scene a
+lookahead of N frames is a delay of N *scenes*, which is a long time — so av1
+being genuinely lookahead-free is not an academic detail, it is what makes the
+scheme deployable at all.
