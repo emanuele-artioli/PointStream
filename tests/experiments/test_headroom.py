@@ -63,6 +63,18 @@ def test_bounds_are_the_prewritten_bars() -> None:
     assert fg_verdict(0.05) == "weak"
 
 
+#: QP sweep for the stub, wide enough that its curves resolve something.
+#:
+#: The stub models quality as ``45 - 0.15 * qp``, so QP 32 to 40 spans 1.2 dB —
+#: below the absolute floor `bd_rate` gained in BP24, and rightly so: a
+#: comparison integrated over 1.2 dB is fitted to noise. Real runs sweep much
+#: wider (BP21's 150 reported savings span 3.23 to 8.45 dB), so the narrow
+#: fixture was the unrealistic part, not the guard. Widening it here keeps the
+#: test measuring what it is named for — plate saving against flat saving —
+#: rather than the guard.
+STUB_QPS = (24, 52)
+
+
 def _stub_encode(frames, *, work_dir, qps, masks=None, label=""):
     """Rate follows spatial gradient energy — what a codec spends bits on."""
     del work_dir, masks
@@ -78,7 +90,7 @@ def test_fg_plate_saving_is_below_flat_saving(tmp_path: Path) -> None:
     """A flat hole overstates the prize; plate inpaint is the honest arm."""
     frames, masks = tennis_clip(n_frames=8, seed=4)
     result = fg_headroom(
-        frames, masks, work_dir=tmp_path, encode_curve=_stub_encode, qps=(32, 40)
+        frames, masks, work_dir=tmp_path, encode_curve=_stub_encode, qps=STUB_QPS
     )
     plate = result["plate_vs_original"]["saving"]
     flat = result["flat_vs_original"]["saving"]
@@ -95,7 +107,7 @@ def test_fg_null_empty_mask_saves_almost_nothing(tmp_path: Path) -> None:
     frames, _ = tennis_clip(n_frames=6, seed=5)
     empty = np.zeros(frames.shape[:3], dtype=bool)
     result = fg_headroom(
-        frames, empty, work_dir=tmp_path, encode_curve=_stub_encode, qps=(32, 40)
+        frames, empty, work_dir=tmp_path, encode_curve=_stub_encode, qps=STUB_QPS
     )
     saving = result["plate_vs_original"]["saving"]
     assert saving is not None
@@ -194,7 +206,7 @@ def test_declared_bounds_include_codec_ranking() -> None:
 def test_fg_headroom_reports_median_arm(tmp_path: Path) -> None:
     frames, masks = tennis_clip(n_frames=8, seed=4)
     result = fg_headroom(
-        frames, masks, work_dir=tmp_path, encode_curve=_stub_encode, qps=(32, 40)
+        frames, masks, work_dir=tmp_path, encode_curve=_stub_encode, qps=STUB_QPS
     )
     assert "median_vs_original" in result
     assert result["median_vs_original"]["saving"] is not None

@@ -982,16 +982,97 @@ friendliest possible input; re-measure on high motion before quoting either.
 component still counted as an array size, and `transport_to_source_ratio` is
 withheld entirely while that list is non-empty — including through `__add__`, so
 summing chunks cannot launder an uncoded chunk into a total that claims to be a
-rate. `actor_reference` is currently listed: appearance reports a measured size
-and nobody has shown it is a coded one.
+rate.
 
-**Still open:** the `WireCost` `exact`/`basis` pass, the paired-arm ladder, and
-the plate is still the first source frame rather than a stitched panorama.
-
-**Read `plans/BP24-findings.md` before quoting any rate.** Seven findings,
+**Read `plans/BP24-findings.md` before quoting any rate.** Eleven findings,
 including the one that cost the most time: counting coded bytes while
 reconstructing from the pre-codec array passes every test, uses two real
 numbers, and yields a fictional rate-distortion point.
+
+### 2.19 What `exact` means, and what `actor_reference` turned out to be
+
+`BP24` continued, 2026-08-28. Report: `plans/BP24-ladder-report.md`.
+
+**`WireCost.exact` has one meaning now.** It used to mean "follows from declared
+parameters rather than from a model of the encoder", which was unambiguous only
+while nothing here ran an encoder. Both residual paths sat at `exact=True` on
+top of a basis describing an in-memory array, and two separate mechanisms were
+each deciding whether a byte count was a bitstream. It now means **these bytes
+are transmitted** — a measured bitstream, or a packed payload at a declared
+quantization with no further coding step configured. Both pre-codec residual
+paths are `exact=False`; the absent path stays an exact zero, because sending
+nothing is a measurement.
+
+**`actor_reference` is a wire cost, and it clears the ledger** — driven per
+backend, not argued (`outputs/bp24-ladder/appearance-cost.json`).
+`compressed-image` returns a real JPEG bitstream whose size moves with quality
+(1,448 / 2,020 / 7,732 B at q20 / q60 / q95) and which decodes back to the crop
+at MAE 2.83. `image-embedding` and `diffusion-latent` return a packed float16
+buffer whose length equals the declared cost exactly: a wire cost, but **not a
+coded one**. The flag comes off the payload the appearance stage produces, and
+a payload that does not state `exact` still withholds the ratio, so a backend
+added later cannot clear itself by default.
+
+**Two defects found on the way.** `RunResult.frames` had stopped being the
+delivered clip — it carries the residual as the residual stage produced it,
+while `sizes` costs the coded one, and the two differ by exactly the axis a rate
+ladder sweeps (findings §8). `delivered_frames` now exists. And `bd_rate`'s
+overlap guard was a proportion, so two flat curves overlapped perfectly and
+returned a confident number over 0.5 dB; an absolute 3 dB floor closes it.
+
+**The clip every BP24 ratio was measured on is the most static of the eight
+cached windows**, by 23x against the most dynamic
+(`outputs/bp24-ladder/motion-survey.json`). §2.18's "both are the easy case" is
+now measured on the input rather than inferred from the output.
+
+### 2.20 The ladder ran, and PointStream loses to the codec it is built on
+
+`BP24` concluded, 2026-08-28. `PLAN.md` §7 **P0 items 2 and 3 are closed.**
+Report: `plans/BP24-ladder-report.md`. Bounds written before the first encode:
+`outputs/bp24-ladder/bounds-before-run.json`.
+
+**Paired arms, one codec on both, same preset** — the design
+`plans/BP24-findings.md` §1 settled on, so the preset cancels. Y-PSNR, which is
+the conventional BD-rate axis.
+
+| codec | preset | BD-rate | overlap |
+|---|---|---:|---|
+| av1 | `10` | **+116.8%** | 39.45-44.02 dB |
+| hevc | `ultrafast` | **+166.8%** | 38.72-43.47 dB |
+| avc | `veryfast` | **+165.9%** | 35.76-43.87 dB |
+| vvc | `faster` | **+378.1%** | 35.28-43.65 dB |
+
+**Do not rank these against each other.** The presets are not equal effort, so
+an ordering of the magnitudes would be measuring the presets. Each is a gain
+against that codec at that preset, which is the claim shape the paper needs.
+
+This is on `alcaraz_highlights/scene_000`, the **most static** of the eight
+cached windows (inter-frame MAD 0.33 against 7.70 for the most dynamic) — the
+friendliest content available. On the dynamic clip there is **no BD-rate at
+all**: PointStream saturates at 31.0 dB, av1's cheapest rung is 38.0 dB, and the
+curves do not overlap.
+
+**The cause is the plate, not the residual.** The plate is 88-91% of the payload
+at every rung of every sweep. The unaided corner — plate plus pasted crops, no
+residual — is 487,643 B at 35.37 dB against av1's 85,995 B at 39.45 dB, so the
+plate has already lost before the residual is asked for anything. The residual
+is the opposite: 0.9% of the payload for 5.4 dB on static content, up to 14.8 dB
+over unaided on dynamic content. **The plate is still the first source frame
+rather than a stitched panorama, and that stub is now the single largest lever
+on the project's rate.**
+
+**Three defects were found and fixed on the way**, one of them a corrupted
+pipeline output rather than a bad number: the decode step named no `-c:v`, so
+ffmpeg re-encoded to Matroska with x264 at its default CRF, capping every
+quality `coded_roundtrip` returned — including the residual the runner
+delivers. `RunResult.frames` had stopped being the delivered clip. And
+`bd_rate`'s overlap guard was relative and could not see a flat curve. All three
+are in `plans/BP24-findings.md` §§8, 14 and 2.
+
+**Scope, stated rather than implied.** Generation is off in every tier config,
+so no generative decoder was measured. Eight frames is the least favourable
+amortisation a fixed plate cost can get. Y-PSNR only; PointStream's case has
+always been argued perceptually.
 
 ## 3. Architecture
 
@@ -1451,12 +1532,19 @@ re-read rather than followed blindly.
 1. ✅ **DONE 2026-08-26** — quality measurement working at all: a tier config
    producing real numbers. All three tiers plus two controls ran end to end on a
    real 4K clip and returned PSNR, SSIM, VMAF and LPIPS (§2.16, BP23).
-2. PointStream against the codec ladder, including region arms.
-   *`BP24` (2026-08-28) built the rate axis: the plate and residual are coded
-   through their configured codecs and the ledger withholds a ratio while any
-   component is still raw. What remains is running the ladder — as **paired
-   curves**, one codec on both arms, per `plans/BP24-findings.md` §1.*
-3. The residual-coarseness curve. *Same remaining step as item 2.*
+2. ✅ **DONE 2026-08-28** — PointStream against the codec ladder, as paired
+   curves, one codec on both arms at one preset. **PointStream loses on every
+   codec**: BD-rate +116.8% (av1, preset 10), +166.8% (hevc, ultrafast),
+   +165.9% (avc, veryfast), +378.1% (vvc, faster), on the most static of the
+   eight cached clips. On the most dynamic clip there is no BD-rate: PointStream
+   saturates at 31.0 dB while av1's cheapest rung is 38.0 dB, so the curves do
+   not overlap. §2.20, `plans/BP24-ladder-report.md`. *Region arms are not in
+   this ladder and remain open.*
+3. ✅ **DONE 2026-08-28** — the residual-coarseness curve, and it is the good
+   news. A residual costing 0.9% of the payload buys 5.4 dB on static content,
+   and up to 14.8 dB over the unaided reconstruction on dynamic content. The
+   rate problem is the plate, which is 88-91% of the payload at every rung.
+   §2.20.
 4. The core ablation lattice. *`BP26` (2026-08-26): detector, pose, segmenter,
    appearance, motion and temporal names now change a run. The lattice itself
    is still un-run (Phase D). Codec / fallback / `residual.codec` remain unwired
@@ -1472,6 +1560,14 @@ re-read rather than followed blindly.
 6. Generalization on the general/DAVIS profile.
 7. Evaluation and Conclusion sections; abstract reconciled with what was measured.
 
+8. **The plate.** It is 88-91% of PointStream's payload at every rung (§2.20),
+   and it is still the first source frame rather than a stitched panorama. Two
+   levers, in this order: compress the still harder — a sweep, no new code
+   (`plans/BP29-plate-rate.md`) — then stitch a real panorama, which
+   `build_plate` already implements and the runner does not call. *Promoted from
+   P2 items 15 and 18 on 2026-08-28: both were written before anyone knew the
+   plate was 90% of the rate.*
+
 **P1 — strongly strengthens**
 8. Perceptual and temporal metrics. 9. Object-representation comparison — the most
 novel item. 10. Detector comparison including SAM3. 11. Temporal-policy ablation.
@@ -1479,8 +1575,10 @@ novel item. 10. Detector comparison including SAM3. 11. Temporal-policy ablation
 
 **P2 — only if time remains**
 13. Appearance-representation comparison. 14. Keypoint-schema richness.
-15. JPEG quality versus downscaling. 16. Open-vocabulary versus hand-written
-selection. 17. Animate-Anyone full retrain. 18. Background-layer ladder.
+15. ⬆ **promoted to P0 item 8** — JPEG quality versus downscaling, now part of
+the plate work. 16. Open-vocabulary versus hand-written selection.
+17. Animate-Anyone full retrain. 18. ⬆ **promoted to P0 item 8** —
+background-layer ladder.
 19. Football as a third domain.
 
 **Out of scope, named as future work in the paper:** MOS user study;

@@ -86,10 +86,37 @@ class WireCost:
         byte_count: Bytes on the wire. `None` means *not derivable from the
             configuration* — a JPEG's size depends on the pixels, not only on
             the quality setting.
-        exact: Whether the numbers above follow from declared parameters and a
-            declared quantization, rather than from a model of the encoder.
+        exact: Whether `byte_count` **is the number of bytes that go on the
+            wire**. See below — this is the field that decides whether a total
+            containing this part may be called a rate.
         basis: One line saying how the number was arrived at, so a total that
-            mixes measured and derived parts can be read back.
+            mixes measured and stand-in parts can be read back.
+
+    **What `exact` means (redefined by BP24).** It used to mean "follows from
+    declared parameters rather than from a model of the encoder", which was
+    unambiguous only while nothing in this project ran an encoder. Now that the
+    codec stage codes real payloads, the same flag was sitting `True` on top of
+    a `basis` describing an in-memory array, and two different mechanisms were
+    each deciding separately whether a byte count was a bitstream. One meaning:
+
+    * `exact=True` — this many bytes are transmitted. Either a **measured
+      bitstream** an encoder returned, or a **packed payload at a declared
+      quantization** that is sent verbatim because no further coding step is
+      configured for it (an embedding vector, a keypoint array).
+    * `exact=False` — the number is a **stand-in** for a cost nobody has
+      measured: an array handed to a codec that has not run, or a
+      data-dependent size that was never measured. It is not a wire cost and
+      dividing a total containing it by the source size does not produce a
+      compression ratio.
+
+    The test to apply: *would these bytes travel, as they are?* A dense int16
+    residual whose blocks the gate zeroed would not — a codec is supposed to run
+    on it next, and until it does the array's size stands in for a number that
+    does not exist yet. A float16 embedding would; there is no next step.
+
+    `__add__` conjoins the flag, so a sum containing one stand-in is a stand-in.
+    That is the whole point: it stops an uncoded part being laundered into a
+    total that claims to be a rate.
 
     `byte_count` deliberately stays `None` rather than carrying an invented
     estimate. An entropy-coded payload's size is a measurement; a plausible
@@ -240,7 +267,12 @@ class DiffusionLatent:
         width: Latent grid width.
         bytes_per_value: Declared quantization of each latent scalar. Two is
             half precision, which is what the models consume anyway.
-        measured_bytes: Size after any further entropy coding, if applied.
+        measured_bytes: Length of the packed buffer, when one was built.
+            `src/components/appearance/latent.py` fills this with the size of
+            the float16 pack itself — **no entropy coder runs on a latent
+            today**. It is still a wire cost (those bytes are what would be
+            sent), but it is not a coded size, and a reader comparing it with a
+            JPEG appearance is comparing a packed array against a bitstream.
 
     The size of a raw latent *is* derivable, so this representation states its
     cost exactly rather than needing a measurement. That is a genuine advantage

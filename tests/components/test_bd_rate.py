@@ -21,6 +21,7 @@ import pytest
 from src.components.metrics.bd_rate import (
     MIN_OVERLAP_FRACTION,
     BDComparison,
+    DegenerateCurveError,
     InsufficientOverlapError,
     OperatingPoint,
     RDCurve,
@@ -101,3 +102,71 @@ def test_a_curve_with_one_point_is_not_an_rd_curve() -> None:
 def test_non_positive_rate_is_refused() -> None:
     with pytest.raises(ValueError, match="non-positive"):
         RDCurve(rates=(0.0, 100.0), qualities=(20.0, 30.0))
+
+
+# ---------------------------------------------------------------------------
+# The absolute span guard (BP24 finding §2)
+#
+# `MIN_OVERLAP_FRACTION` is a proportion of the shorter curve's span, and a
+# proportion is blind to a span that is absolutely tiny. Two flat curves overlap
+# almost perfectly, so the relative guard reports a healthy 100% and the
+# polynomial fit returns a confident number over a range that resolves nothing.
+# Measured once for real: a 0.5 dB span across QP 32→46 returned −0.88.
+# ---------------------------------------------------------------------------
+
+
+def test_two_flat_curves_are_refused_however_well_they_overlap() -> None:
+    """The exact failure §2 describes: perfect overlap, nothing resolved."""
+    flat_anchor = RDCurve(rates=(100.0, 200.0, 400.0), qualities=(40.00, 40.20, 40.50))
+    flat_candidate = RDCurve(rates=(90.0, 190.0, 380.0), qualities=(40.05, 40.25, 40.45))
+    with pytest.raises(DegenerateCurveError) as caught:
+        compare_rd_curves(flat_anchor, flat_candidate)
+    # The trap made visible: the relative guard was perfectly happy.
+    assert caught.value.overlap_fraction > 0.5
+    assert caught.value.span < 1.0
+
+
+def test_the_span_guard_is_caught_by_callers_handling_weak_overlap() -> None:
+    """Existing callers decline to report a number; they must decline here too.
+
+    `experiments/headroom/measure.py` catches `InsufficientOverlapError` and
+    returns `saving: None`. A sibling exception would have arrived there as an
+    uncaught crash in code that was already handling the other bad case
+    correctly, so the new guard subclasses the old one.
+    """
+    flat_anchor = RDCurve(rates=(100.0, 400.0), qualities=(40.0, 40.4))
+    flat_candidate = RDCurve(rates=(90.0, 380.0), qualities=(40.1, 40.3))
+    with pytest.raises(InsufficientOverlapError):
+        compare_rd_curves(flat_anchor, flat_candidate)
+
+
+def test_a_real_span_still_returns_a_number() -> None:
+    """The guard must reject the degenerate case without touching a usable one.
+
+    The four real 960x540 frames that established the instrument in the same
+    session spanned 14.75 dB. This pair spans 14, well clear of the 3 dB floor.
+    """
+    anchor = RDCurve(rates=(1.0e5, 4.0e5, 1.6e6), qualities=(28.0, 35.0, 42.0))
+    candidate = RDCurve(rates=(0.5e5, 2.0e5, 0.8e6), qualities=(28.0, 35.0, 42.0))
+    comparison = compare_rd_curves(anchor, candidate)
+    # Half the rate at every quality, so exactly −50%, same construction as the
+    # hand-computed pair at the top of this file.
+    assert comparison.bd_rate == pytest.approx(-0.5, abs=1e-6)
+
+
+def test_a_non_psnr_metric_must_state_its_own_span_floor() -> None:
+    """A dB floor applied to LPIPS would reject everything; none would be a hole.
+
+    So the function refuses rather than picking one. Refusing is the behaviour
+    under test — a default here would be a guess wearing a constant's clothes.
+    """
+    lpips = contract_metric("lpips")
+    anchor = RDCurve(rates=(1.0e5, 1.6e6), qualities=(0.30, 0.05))
+    candidate = RDCurve(rates=(0.5e5, 0.8e6), qualities=(0.30, 0.05))
+    with pytest.raises(ValueError, match="no default quality span"):
+        compare_rd_curves(anchor, candidate, quality_spec=lpips)
+    # With a floor in LPIPS's own units it works.
+    comparison = compare_rd_curves(
+        anchor, candidate, quality_spec=lpips, min_quality_span=0.10
+    )
+    assert comparison.bd_rate == pytest.approx(-0.5, abs=1e-6)

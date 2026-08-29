@@ -82,6 +82,17 @@ class RunResult:
     """What a run returns. Importable; nothing here is scraped from stdout."""
 
     frames: np.ndarray
+    """The client's clip with the residual applied **as the residual stage
+    produced it** — before any codec ran on that residual.
+
+    Since BP24 codes the residual this is no longer the clip the pipeline
+    delivers: `make_codec` round-trips the residual payload through
+    `residual.codec` and rebuilds from what came back, and *that* is what
+    reaches transport. Use `delivered_frames` for anything paired with a byte
+    count. Scoring this array beside a coded size is the trap
+    `plans/BP24-findings.md` §4 describes — two real numbers belonging to two
+    different operating points."""
+
     quality: QualityReport
     delivered_quality: QualityReport
     sizes: SizesBytes
@@ -92,6 +103,20 @@ class RunResult:
     @property
     def sizes_bytes(self) -> dict[str, int | float]:
         return self.sizes.as_dict()
+
+    @property
+    def delivered_frames(self) -> np.ndarray:
+        """What transport handed the client — the clip `sizes` is the cost of.
+
+        `delivered_quality` is already scored on this, but the array itself was
+        reachable only through `chunks[i].bag[ART_DELIVERED]`, which is how a
+        caller ends up reaching for `frames` instead and pairing a coded rate
+        with a pre-codec reconstruction.
+        """
+        return np.concatenate(
+            [_delivered_frames(chunk.bag[ART_DELIVERED]) for chunk in self.chunks],
+            axis=0,
+        )
 
 
 def run(

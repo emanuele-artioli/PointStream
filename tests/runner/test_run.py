@@ -240,3 +240,63 @@ def test_empty_chunks_are_refused() -> None:
 def test_objects_misaligned_with_chunks_are_refused() -> None:
     with pytest.raises(ValueError, match="track position"):
         run(_all_off(), [_clip(1, frames=1)], objects=((_object(),), (_object(),)))
+
+
+# ---------------------------------------------------------------------------
+# `delivered_frames` — the array the byte count belongs to
+#
+# `RunResult.frames` is the client's clip with the residual applied *as the
+# residual stage produced it*. Since BP24 codes that residual, the clip the
+# pipeline actually delivers is rebuilt from what the codec returned, and the
+# two arrays diverge by exactly the residual's coding loss. Pairing a coded rate
+# with `frames` is `plans/BP24-findings.md` §4 — two real numbers at two
+# different operating points, and on a rate ladder the error would not look
+# like one, because sweeping the residual's rung is what makes them differ.
+# ---------------------------------------------------------------------------
+
+
+def test_delivered_frames_is_what_transport_handed_over() -> None:
+    result = run(_residual_only(), [_clip(80)])
+    expected = _delivered_frames(result.chunks[0].bag[ART_DELIVERED])
+    assert bit_identical(expected, result.delivered_frames)
+
+
+def test_delivered_frames_concatenates_every_chunk() -> None:
+    """A per-chunk property that silently dropped chunks would still 'work'."""
+    chunks = [_clip(80, frames=2), _clip(120, frames=2)]
+    result = run(_residual_only(), chunks)
+    assert result.delivered_frames.shape[0] == 4
+    assert result.delivered_frames.shape == result.frames.shape
+
+
+def test_delivered_frames_follows_the_codec_stage_not_the_residual() -> None:
+    """The divergence itself, forced.
+
+    Without an encoder the two arrays are equal, so a test on the shipped path
+    cannot fail for the reason it claims. A codec stage that returns *different*
+    pixels — which is exactly what a real one does — separates them: `frames`
+    keeps the residual as the residual stage produced it, `delivered_frames`
+    follows what the codec handed on, and `delivered_quality` is scored on the
+    second. Reading the first beside a coded byte count is findings §4.
+    """
+    source = _clip(80)
+    darker: dict[str, object] = {}
+
+    def fake_codec(bag: object) -> dict[str, object]:
+        residual = bag["residual-stream"]  # type: ignore[index]
+        assert isinstance(residual, ResidualResult)
+        frames = np.clip(residual.reconstructed.astype(np.int16) - 10, 0, 255).astype(
+            np.uint8
+        )
+        darker["frames"] = frames
+        return {"frames": frames, "byte_count": 1234, "residual_is_coded": True}
+
+    result = run(_residual_only(), [source], backends={STAGE_CODEC: fake_codec})
+
+    assert bit_identical(darker["frames"], result.delivered_frames)  # type: ignore[arg-type]
+    assert not bit_identical(result.frames, result.delivered_frames)
+    # And the score follows the delivered array, not the other one.
+    assert score(source, result.delivered_frames).whole_frame() == pytest.approx(
+        result.delivered_quality.whole_frame()
+    )
+    assert not math.isinf(result.delivered_quality.whole_frame())

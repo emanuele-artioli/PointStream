@@ -13,7 +13,7 @@ accepts the flag, returns success, and writes yuv420p.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal
+from typing import Final, Literal
 
 from src.contracts.codecs import Driver, EncodeRequest, RateControl
 from src.contracts.errors import CodecConstraintError
@@ -129,6 +129,23 @@ def _reject_libsvtav1_yuv444(request: EncodeRequest) -> None:
         )
 
 
+#: Lossless intermediate for a decode whose container is not a y4m.
+#:
+#: **A decode that loses information is not a decode.** Without an explicit
+#: ``-c:v`` ffmpeg picks the muxer's default encoder, which for Matroska is
+#: libx264 at its own default CRF — so `coded_roundtrip` was handing back frames
+#: that had been through the rung's codec *and then* through x264. Measured
+#: 2026-08-28: an av1 anchor swept over QP 15 to 55 returned 41.71, 41.67,
+#: 41.43, 40.65 and 38.94 dB of Y-PSNR, pinned near the x264 pass's own ceiling
+#: while its rate fell tenfold. The rung reached the encoder; the quality never
+#: reached the measurement.
+#:
+#: A y4m is rawvideo by construction, so it needs no codec named — which is why
+#: `coded_curve`, which decodes to y4m, was never affected and `coded_roundtrip`,
+#: which decodes to mkv, was.
+DECODE_LOSSLESS_CODEC: Final = "ffv1"
+
+
 def _decode_command(
     ffmpeg: ResolvedTool,
     *,
@@ -136,7 +153,7 @@ def _decode_command(
     dest: Path | str,
     pix_fmt: str,
 ) -> list[str]:
-    return [
+    command = [
         ffmpeg.path,
         "-hide_banner",
         "-loglevel",
@@ -146,8 +163,11 @@ def _decode_command(
         str(source),
         "-pix_fmt",
         pix_fmt,
-        str(dest),
     ]
+    if Path(dest).suffix.lower() != ".y4m":
+        command += ["-c:v", DECODE_LOSSLESS_CODEC]
+    command.append(str(dest))
+    return command
 
 
 def _ffmpeg_encode(

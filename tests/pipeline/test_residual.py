@@ -168,3 +168,75 @@ def test_shape_mismatch_is_refused() -> None:
 def test_l1_energy_of_identical_clips_is_zero() -> None:
     frames = _clip(9)
     assert l1_energy(signed_residual(frames, frames)) == 0.0
+
+
+# ---------------------------------------------------------------------------
+# `WireCost.exact` on the residual — the honesty pass (BP24)
+#
+# `exact` means "byte_count is what goes on the wire". Neither residual path
+# produces that: both hand a pixel payload *to* a codec, and the bitstream that
+# comes back is what is actually transmitted. Before this, both set exact=True
+# on top of a basis describing an array, which was true only while nothing in
+# the project ran an encoder.
+#
+# The consequence is not cosmetic. `__add__` conjoins the flag, so a stand-in
+# left marked exact would be summed into a total that then reports a
+# transport-to-source ratio — a compression ratio computed from an array size.
+# ---------------------------------------------------------------------------
+
+
+def test_a_pre_codec_residual_does_not_claim_to_be_a_bitstream() -> None:
+    lattice = StageLattice.of(STAGE_RESIDUAL)
+    source = _clip(200, frames=2)
+    reconstruction = _clip(150, frames=2)
+
+    lossless = compute_residual(
+        source, reconstruction, lattice=lattice, coarseness=Coarseness.LOSSLESS
+    )
+    assert lossless.payload.cost.exact is False
+    assert "not a bitstream" in lossless.payload.cost.basis
+
+    lossy = compute_residual(
+        source,
+        reconstruction,
+        lattice=lattice,
+        residual=ResidualConfig(block_size=8, block_threshold=0.0),
+        coarseness=Coarseness.MEDIUM,
+    )
+    assert lossy.payload.variant is ResidualVariant.LOSSY
+    assert lossy.payload.cost.exact is False
+    assert "not a bitstream" in lossy.payload.cost.basis
+
+
+def test_an_absent_residual_is_an_exact_zero_not_a_stand_in() -> None:
+    """Sending nothing is a measurement, not an unmeasured cost.
+
+    The distinction matters because `exact=False` on a zero would make every
+    residual-off corner refuse to report a ratio — the guard firing on the one
+    corner with nothing to hide.
+
+    Absence is a *lattice* property, not a coarseness value. `point_for` reads
+    the variant from the lattice first and only then consults `coarseness`, so
+    passing `Coarseness.ABSENT` to an enabled residual stage yields a LOSSY
+    payload labelled absent. The corner is expressed by leaving the stage out.
+    """
+    absent = compute_residual(
+        _clip(200), _clip(150), lattice=StageLattice.of(STAGE_BACKGROUND)
+    )
+    assert absent.payload.is_absent
+    assert absent.payload.cost.byte_count == 0
+    assert absent.payload.cost.exact is True
+
+
+def test_summing_a_stand_in_with_a_real_cost_stays_a_stand_in() -> None:
+    """The laundering case, at the `WireCost` level rather than the ledger's."""
+    from src.contracts.objectstream import WireCost
+
+    coded = WireCost(byte_count=1_000, exact=True, basis="measured bitstream")
+    stand_in = compute_residual(
+        _clip(200, frames=2), _clip(150, frames=2),
+        lattice=StageLattice.of(STAGE_RESIDUAL),
+        coarseness=Coarseness.LOSSLESS,
+    ).payload.cost
+    assert (coded + stand_in).exact is False
+    assert (stand_in + coded).exact is False

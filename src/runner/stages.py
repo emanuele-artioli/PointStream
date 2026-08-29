@@ -320,7 +320,13 @@ def make_segmentation(ctx: StageContext) -> StageCallable:
 
 
 def make_appearance(ctx: StageContext) -> StageCallable:
-    """Named appearance representation. Byte count is the output that moves."""
+    """Named appearance representation. Byte count is the output that moves.
+
+    The payload also carries ``exact``: whether those bytes are the ones that go
+    on the wire (`WireCost`). The ledger reads it rather than assuming, because
+    `actor_reference` was withheld from the rate for exactly this reason — a
+    measured size nobody had shown was a transmitted one (BP24).
+    """
 
     def appearance(bag: Mapping[str, Any]) -> dict[str, Any]:
         from src.runner.routing import ensure_appearance
@@ -328,8 +334,10 @@ def make_appearance(ctx: StageContext) -> StageCallable:
         backend = ensure_appearance(ctx)
         subjects = _subjects(bag)
         if backend is None or not subjects:
-            return {"byte_count": 0, "items": ()}
+            return {"byte_count": 0, "items": (), "exact": True, "basis": "no appearance sent"}
         total = 0
+        exact = True
+        bases: list[str] = []
         items: list[dict[str, Any]] = []
         seen: set[str] = set()
         for item in subjects:
@@ -340,10 +348,20 @@ def make_appearance(ctx: StageContext) -> StageCallable:
             if crop.size == 0:
                 continue
             encoded = backend.encode(crop)
-            nbytes = _encoded_bytes(encoded)
+            nbytes, item_exact, basis = _encoded_cost(encoded)
             total += nbytes
-            items.append({"object_id": item.object_id, "byte_count": nbytes})
-        return {"byte_count": total, "items": tuple(items)}
+            exact = exact and item_exact
+            if basis and basis not in bases:
+                bases.append(basis)
+            items.append(
+                {"object_id": item.object_id, "byte_count": nbytes, "exact": item_exact}
+            )
+        return {
+            "byte_count": total,
+            "items": tuple(items),
+            "exact": exact,
+            "basis": "; ".join(bases),
+        }
 
     return appearance
 
@@ -397,19 +415,39 @@ def make_temporal(ctx: StageContext) -> StageCallable:
 
 
 def _encoded_bytes(encoded: object) -> int:
+    return _encoded_cost(encoded)[0]
+
+
+def _encoded_cost(encoded: object) -> tuple[int, bool, str]:
+    """``(bytes, exact, basis)`` for one appearance encode.
+
+    ``exact`` follows the descriptor's own `WireCost` when the backend returns
+    one, so the judgement lives with the representation rather than being
+    re-derived here from the backend's name. All three shipped appearance
+    backends hand back ``(descriptor, payload)`` where ``payload`` is the
+    buffer that would be transmitted — a real JPEG bitstream for
+    `compressed-image`, a packed float16 buffer for `diffusion-latent` and
+    `image-embedding`. A backend that returns something else gets ``False``:
+    an unrecognised object's size is a stand-in, not a wire cost.
+    """
     if isinstance(encoded, tuple) and len(encoded) == 2:
-        payload = encoded[1]
+        descriptor, payload = encoded
         if isinstance(payload, (bytes, bytearray, memoryview)):
-            return len(payload)
-        array = np.asarray(payload)
-        return int(array.nbytes)
+            size = len(payload)
+        else:
+            size = int(np.asarray(payload).nbytes)
+        cost = getattr(descriptor, "cost", None)
+        if callable(cost):
+            wire = cost()
+            return size, bool(wire.exact), str(wire.basis)
+        return size, False, "appearance payload from a descriptor with no stated cost"
     measured_size = getattr(encoded, "measured_bytes", None)
     if measured_size is not None:
-        return int(measured_size)
+        return int(measured_size), False, "appearance measured_bytes, no payload to check"
     per_frame = getattr(encoded, "measured_bytes_per_frame", None)
     if per_frame is not None:
-        return int(per_frame)
-    return 0
+        return int(per_frame), False, "appearance measured_bytes_per_frame, no payload to check"
+    return 0, True, "no appearance payload"
 
 
 def _motion_bytes(
@@ -841,6 +879,9 @@ def ledger_from_bag(bag: Mapping[str, Any], source: np.ndarray) -> SizesBytes:
     if isinstance(bitstream, Mapping) and bitstream.get("residual_is_coded"):
         residual_bytes = int(bitstream.get("byte_count", residual_bytes))
     elif residual_bytes > 0:
+        # Matches the residual's own `WireCost.exact`, which BP24's honesty pass
+        # set to False on both pre-codec paths: the payload handed *to* a codec
+        # is not the bitstream that comes back.
         raw.append("residual")
 
     view = bag.get(ART_BACKGROUND_MODEL) or bag.get(STAGE_BACKGROUND)
@@ -852,10 +893,14 @@ def ledger_from_bag(bag: Mapping[str, Any], source: np.ndarray) -> SizesBytes:
             raw.append("panorama")
 
     actor_bytes = _measured_actor_bytes(bag)
-    if actor_bytes > 0:
-        # Appearance reports a measured payload size, but nothing has shown it
-        # is a coded one. Until that is checked it counts as raw rather than
-        # being assumed correct (BP24 finding 4).
+    if actor_bytes > 0 and not _actor_bytes_exact(bag):
+        # BP24 left this listed unconditionally, because appearance reported a
+        # measured size and nobody had shown it was a transmitted one. It has
+        # now been checked, per backend, and the answer differs by backend
+        # rather than by axis — so the flag comes off the payload the stage
+        # produced (`_encoded_cost`), not off a rule written here. All three
+        # shipped backends return the buffer they would send; a backend that
+        # returns a bare descriptor still counts as raw.
         raw.append("actor_reference")
 
     return sizes_bytes(
@@ -921,3 +966,16 @@ def _measured_actor_bytes(bag: Mapping[str, Any]) -> int:
     if isinstance(payload, Mapping) and "byte_count" in payload:
         return int(payload["byte_count"])
     return 0
+
+
+def _actor_bytes_exact(bag: Mapping[str, Any]) -> bool:
+    """Whether the appearance bytes are the ones that go on the wire.
+
+    Absent the flag the answer is **no**. A payload that predates
+    `make_appearance` stating `exact` cannot be assumed to be a wire cost, and
+    defaulting the other way is how the ledger would silently regain a raw part.
+    """
+    payload = bag.get(ART_APPEARANCE_PAYLOAD)
+    if isinstance(payload, Mapping):
+        return bool(payload.get("exact", False))
+    return False
