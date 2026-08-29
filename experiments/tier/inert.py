@@ -41,8 +41,9 @@ from src.contracts.config import (
 )
 from src.runner import RunResult
 from src.runner.config_io import load_tier
+from src.contracts import paths as ps_paths
 
-OUT_DIR = Path(__file__).resolve().parents[2] / "outputs" / "bp23-tier"
+OUT_DIR = ps_paths.outputs() / "bp23-tier"
 
 
 def _clip() -> np.ndarray:

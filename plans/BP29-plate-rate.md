@@ -123,6 +123,28 @@ losing at one operating point and winning at another is a measured phenomenon in
 a sibling project, not wishful thinking — which is why §2 is worth running
 before concluding anything.
 
+## 3b. Code the plate sequence as a video — measured, and it pays
+
+**Retracts what §4 used to say.** `plans/BP24-findings.md` §18: coding plate B
+as a **P-frame referencing plate A** — rather than subtracting them — saves
+**31–53%** with av1 between points of a match, against coding B fresh as intra.
+The control (two consecutive frames of one scene) comes in at 1.2–3.3%, so the
+harness is measuring inter prediction rather than something else.
+
+The reframing is the whole idea: **the sequence of per-scene plates is itself a
+video**, at about one frame per point. No new technology is required — not CMAF,
+whose fragments are deliberately independently decodable and therefore exactly
+wrong here. A long GOP is all it is.
+
+`BackgroundConfig.method` already declares **`panorama-delta`** and nothing
+implements it. That is the slot.
+
+**Two constraints on the claim.** The saving is codec-dependent — libx265 chose
+intra for one of the two pairs, av1 did not — so it must be measured per codec
+rather than assumed. And the anchor must be given the same multi-scene footage:
+a codec encoding across a scene join can also predict across it, and the
+paired-arm discipline does not allow amortisation for one arm only.
+
 ## 4. What is closed, and what is emphatically not
 
 **The panorama is NOT closed.** Stitching a background across the frames of one
@@ -135,8 +157,14 @@ scoreboard, which is exactly the condition the cross-point test found missing.
 axes — bitrate range, content type, clip length — on which the background route
 has never been given a fair chance to win.
 
-**Sharing one plate across the points of a match** — closed on three
-measurements, not one (`plans/BP24-findings.md` §17). All four scenes tested are
+**Sharing one plate across the points of a match — REOPENED, see §3b.** What
+follows is what *pixel subtraction* cannot do, and it remains true as stated. It
+is not a statement about inter coding, which findings §18 measures at 31–53%
+cheaper than fresh. Kept because the mechanism it rules out is a natural thing
+to try again.
+
+Closed on three measurements, not one (`plans/BP24-findings.md` §17). All four
+scenes tested are
 labelled `cluster_point` in the dataset's own metadata, so this is the idea
 measured on exactly the content it was proposed for.
 

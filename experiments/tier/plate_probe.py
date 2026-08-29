@@ -19,16 +19,15 @@ on it: how close is scene B's first frame to scene A's?
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from typing import Any
 
 import numpy as np
 
 from experiments.headroom.real import load_rgb_stack
 from experiments.tier.clip import BP21_CLIPS
+from src.contracts import paths as ps_paths
 
-REPO = Path(__file__).resolve().parents[2]
-OUT = REPO / "outputs" / "bp24-ladder" / "plate-probe.json"
+OUT = ps_paths.outputs() / "bp24-ladder" / "plate-probe.json"
 
 #: Quality knobs to sweep, per route. JPEG quality and codec QP are different
 #: scales; the comparison is made at matched *fidelity*, not matched knob.

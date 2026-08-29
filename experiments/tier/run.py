@@ -36,11 +36,11 @@ from src.pipeline.reconstruction.quality import QualityReport
 from src.pipeline.residual.spectrum import point_for
 from src.runner import RunResult, lattice_config_from, run
 from src.runner.config_io import load_tier
+from src.contracts import paths as ps_paths
 
 TIERS = ("fast", "balanced", "quality")
 
-REPO = Path(__file__).resolve().parents[2]
-OUT_DIR = REPO / "outputs" / "bp23-tier"
+OUT_DIR = ps_paths.outputs() / "bp23-tier"
 
 
 class StageCounter:

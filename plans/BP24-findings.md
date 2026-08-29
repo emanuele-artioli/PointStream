@@ -521,3 +521,63 @@ after registration. The idea was sound in principle and the content does not
 support it; what makes it worth recording is that the first measurement said the
 right thing for the wrong reason, and a reader who checked only that one would
 have believed a conclusion that had not been tested.
+
+## 18. Coding the next plate as a P-frame saves 31–53%. §17 measured the wrong mechanism
+
+§17 subtracted two plates pixel by pixel and coded the difference, found it cost
+*more* than coding the plate fresh, and closed the door. **The mechanism was
+wrong.** Pixel subtraction destroys the spatial correlation a transform coder
+depends on; a video codec's inter prediction does block-wise motion search,
+which is exactly what a camera that panned between two plates needs. The right
+question was never "how big is `B − A`?" but "how big is **B as a P-frame whose
+reference is A**?"
+
+Measured (`outputs/bp24-ladder/plate-interframe.json`,
+`python -m experiments.tier.plate_interframe`). Frames `[A, B]` encoded as a
+two-frame video, per-frame sizes from `ffprobe`, against coding B alone all-intra
+at the same encoder and CRF:
+
+| arm | encoder | CRF | frame types | P-frame | fresh intra | ratio |
+|---|---|---:|---|---:|---:|---:|
+| **control**: consecutive frames, one scene | libx265 | 38 | IP | 5,321 | 160,430 | **0.033** |
+| **control** | libaom-av1 | 28 | IP | 11,601 | 758,199 | **0.015** |
+| alcaraz 000→010 | libaom-av1 | 28 | IP | 517,226 | 754,741 | **0.685** |
+| alcaraz 000→010 | libaom-av1 | 38 | IP | 329,183 | 490,943 | **0.671** |
+| alcaraz 000→010 | libx265 | 28 | **II** | 441,593 | 441,591 | 1.000 |
+| federer 001→003 | libaom-av1 | 28 | IP | 489,989 | 962,693 | **0.509** |
+| federer 001→003 | libaom-av1 | 38 | IP | 294,997 | 627,435 | **0.470** |
+| federer 001→003 | libx265 | 38 | IP | 171,388 | 195,687 | 0.876 |
+
+**The control is what makes the arms readable**: two consecutive frames of one
+scene cost 1.2–3.3% as a P-frame, so the harness really is measuring inter
+prediction.
+
+**Between points of a match, av1 saves 31% to 53%.** The same plates that
+subtraction made *more* expensive become substantially cheaper once the codec is
+allowed to use motion vectors. §17's conclusion — that one plate cannot help
+code another — is **wrong and is retracted**; what is true is the narrower
+statement that *pixel subtraction* cannot.
+
+**Two things worth noticing in the table.** libx265 chose to code the second
+alcaraz plate as an I-frame (`types=II`) — its own rate-distortion decision said
+intra was better, and it was right for that encoder — while av1 found inter
+worth 31%. So the saving is codec-dependent and must be measured per codec
+rather than assumed. And the saving is *larger* on the pair whose plates are
+further apart in PSNR (federer, 15.10 dB, saves more than alcaraz at 13.75 dB),
+which is a reminder that PSNR distance does not predict coding distance.
+
+**The reframing that makes this ordinary rather than exotic: the sequence of
+per-scene plates is itself a video**, at roughly one frame per point. Coding it
+as one needs no new technology — not CMAF, whose fragments are deliberately
+independently decodable and therefore the opposite of what is wanted here. It
+needs a long GOP, which is what every video stream already is.
+`BackgroundConfig.method` already declares `panorama-delta` as a strategy and
+nothing implements it; this is what it should be.
+
+**The fairness question this raises, and it is not settled.** Amortising a plate
+across scenes must not be given to PointStream alone: an anchor encoding the
+same footage can also predict across a scene join. The asymmetry PointStream
+might have is that its plates are composited backgrounds, plausibly more similar
+to each other than two arbitrary frames at a cut are — but "plausibly" is not a
+measurement, and the paired-arm discipline says the anchor gets the same
+material.

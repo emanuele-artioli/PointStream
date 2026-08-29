@@ -26,16 +26,15 @@ about whether the idea deserves a properly selected experiment.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from typing import Any
 
 import numpy as np
 
 from experiments.headroom.real import load_rgb_stack
 from experiments.tier.clip import BP21_CLIPS
+from src.contracts import paths as ps_paths
 
-REPO = Path(__file__).resolve().parents[2]
-OUT = REPO / "outputs" / "bp24-ladder" / "plate-delta.json"
+OUT = ps_paths.outputs() / "bp24-ladder" / "plate-delta.json"
 
 OFFSET = 128
 QPS = (25, 35, 45)

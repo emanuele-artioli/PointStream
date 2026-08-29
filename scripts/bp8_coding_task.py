@@ -28,9 +28,9 @@ from src.components.generation.pose import fit_to_canvas, letterbox_image
 from src.components.metrics.evaluator import triage
 from src.components.metrics.region import Region
 from src.contracts.conditioning import ConditioningBundle, GenerationParams
+from src.contracts import paths as ps_paths
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_PROBE = REPO_ROOT / "assets" / "probe_set"
+DEFAULT_PROBE = ps_paths.assets() / "probe_set"
 CANVAS = 512
 KEYFRAME = 0
 TARGET = 24
@@ -472,7 +472,7 @@ def _write_json(path: Path, payload: Any) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--probe-root", type=Path, default=DEFAULT_PROBE)
-    parser.add_argument("--out-dir", type=Path, default=REPO_ROOT / "outputs" / "bp8-coding-task")
+    parser.add_argument("--out-dir", type=Path, default=ps_paths.outputs() / "bp8-coding-task")
     parser.add_argument("--device", default=DEVICE)
     parser.add_argument("--seed", type=int, default=SEED)
     parser.add_argument("--steps", type=int, default=STEPS)

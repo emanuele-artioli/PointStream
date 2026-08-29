@@ -51,6 +51,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import yaml  # noqa: E402
+from src.contracts import paths as ps_paths  # noqa: E402
 
 # Config keys that must match across variants for the byte comparison to be
 # like-with-like; differing values don't abort the run but are flagged in the
@@ -532,7 +533,7 @@ def _cmd_run(args: argparse.Namespace) -> int:
         bench_dir = Path(args.dir).expanduser().resolve()
     else:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        bench_dir = PROJECT_ROOT / "outputs" / "benchmarks" / f"{spec.name}_{timestamp}"
+        bench_dir = ps_paths.outputs() / "benchmarks" / f"{spec.name}_{timestamp}"
     bench_dir.mkdir(parents=True, exist_ok=True)
     print(f"Benchmark dir: {bench_dir}")
 

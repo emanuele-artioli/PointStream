@@ -230,3 +230,12 @@ for the operating point where it wins* is a separate, larger question than
 **Cost.** The three axes above are sweeps, not implementations: extending the QP
 range is four encodes, clip length is a flag, content type is a dataset the
 project already has. Perhaps a day once the panorama lands.
+
+**Update 2026-08-29 — partly reopened.** `plans/BP24-findings.md` §18 measures
+that coding the next plate as a **P-frame** against the previous one saves
+31–53% with av1, where pixel subtraction cost *more*. So the closed half of this
+entry is narrower than it was written: what is closed is subtraction, not
+cross-scene amortisation. `BP29` §3b carries the live version, and
+`BackgroundConfig.method`'s unimplemented `panorama-delta` is the slot for it.
+The fairness question moves to the front: the anchor must be given the same
+multi-scene footage, because a codec can predict across a scene join too.

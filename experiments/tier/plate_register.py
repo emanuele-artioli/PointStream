@@ -23,7 +23,6 @@ warp leaves undefined borders that would otherwise dominate the number.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from typing import Any
 
 import cv2
@@ -31,9 +30,9 @@ import numpy as np
 
 from experiments.headroom.real import load_rgb_stack
 from experiments.tier.clip import BP21_CLIPS
+from src.contracts import paths as ps_paths
 
-REPO = Path(__file__).resolve().parents[2]
-OUT = REPO / "outputs" / "bp24-ladder" / "plate-register.json"
+OUT = ps_paths.outputs() / "bp24-ladder" / "plate-register.json"
 
 #: Below this many good matches a homography is fitted to noise and its result
 #: says nothing. Reported rather than silently accepted.

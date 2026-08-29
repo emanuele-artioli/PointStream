@@ -19,10 +19,10 @@ import cv2
 import numpy as np
 
 from src.components.codec.tools import resolve_ffmpeg
+from src.contracts import paths as ps_paths
 
-REPO = Path(__file__).resolve().parents[2]
-RAW_4K = REPO / "assets" / "raw_4k"
-DATASET = REPO / "assets" / "dataset"
+RAW_4K = ps_paths.assets() / "raw_4k"
+DATASET = ps_paths.assets() / "dataset"
 DERIVED_SUFFIXES = ("_skeleton", "_canny", "_pose_body", "_pose_racket")
 PREFERRED_VIDEOS = (
     "alcaraz_highlights",

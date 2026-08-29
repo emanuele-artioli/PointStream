@@ -21,6 +21,7 @@ import cv2
 import numpy as np
 
 from experiments.tier.clip import BP21_CLIPS, load_tier_clip
+from src.contracts import paths as ps_paths
 
 #: A clip from a different match, used as the unrelated anchor.
 UNRELATED_VIDEO = "sinner_alcaraz"
@@ -113,7 +114,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--metrics", nargs="*", default=["psnr", "ssim", "vmaf", "lpips"])
     parser.add_argument(
         "--out",
-        default=str(Path(__file__).resolve().parents[2] / "outputs" / "bp23-tier" / "metric-calibration.json"),
+        default=str(ps_paths.outputs() / "bp23-tier" / "metric-calibration.json"),
     )
     args = parser.parse_args(argv)
 

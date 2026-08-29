@@ -33,12 +33,12 @@ from experiments.probe_set.schema import (
 )
 from experiments.probe_set.select import discover_candidate_tracks
 from experiments.probe_set.verify import collect_violations, locked_split_violations, verify
+from src.contracts import paths as ps_paths
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-BROKEN_PROBE_SET = REPO_ROOT / "assets" / "probe_set.broken-v1"
-UNALIGNED_V2_PROBE_SET = REPO_ROOT / "assets" / "probe_set.broken-v2-unaligned"
-LIVE_PROBE_SET = REPO_ROOT / "assets" / "probe_set"
-LIVE_DATASET = REPO_ROOT / "assets" / "dataset"
+BROKEN_PROBE_SET = ps_paths.assets() / "probe_set.broken-v1"
+UNALIGNED_V2_PROBE_SET = ps_paths.assets() / "probe_set.broken-v2-unaligned"
+LIVE_PROBE_SET = ps_paths.assets() / "probe_set"
+LIVE_DATASET = ps_paths.assets() / "dataset"
 
 
 def _write_png(path: Path) -> None:

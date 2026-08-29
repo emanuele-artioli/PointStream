@@ -28,9 +28,9 @@ import numpy as np
 
 from experiments.headroom.real import load_rgb_stack
 from experiments.tier.clip import BP21_CLIPS
+from src.contracts import paths as ps_paths
 
-REPO = Path(__file__).resolve().parents[2]
-OUT = REPO / "outputs" / "bp24-ladder" / "motion-survey.json"
+OUT = ps_paths.outputs() / "bp24-ladder" / "motion-survey.json"
 
 
 def survey_window(window: Path, n_frames: int) -> dict[str, Any] | None:
