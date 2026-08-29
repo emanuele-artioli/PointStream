@@ -478,13 +478,46 @@ across. First frame against first frame, same match
 | `alcaraz_highlights` | scene_000 vs scene_010 | 13.75 dB | 39.39 |
 | `federer_djokovic` | scene_001 vs scene_003 | 15.10 dB | 22.97 |
 
-**The premise does not hold.** At 13.75 dB and a mean absolute difference of 39
-grey levels, these are not the same view; broadcast tennis cuts between camera
-positions, zooms and replays rather than returning to one framing. A plate
-reused across scenes would need geometric registration, not simple reuse — which
-is what panorama stitching does, and is a much larger piece of work than "encode
-it once".
+**This first measurement asked the wrong question**, and the correction is the
+useful part. It tested whether two plates are *identical*. Nobody proposed
+sending one unchanged; the proposal was to send a **residual against the
+previous plate**, and a 13.75 dB gap says nothing about what that residual costs
+to code — a large but smooth difference can be very cheap. Two follow-ups
+settled it properly.
 
-Worth recording as a closed door: the idea is sound in principle, the content
-does not support it in the simple form, and the measurement that says so took
-two minutes.
+**All four scenes are points.** The dataset's own `scene_metadata.json` labels
+them `cluster_point` with confidence 1.000, 1.000, 0.957 and 0.886, so this is
+the proposal measured on exactly the content it was proposed for — points of a
+match, not replays or interludes.
+
+**Delta coding is dominated on both axes**
+(`outputs/bp24-ladder/plate-delta.json`). Coding plate B fresh against coding
+`B − A` biased into uint8, same encoder, same QP, quality scored on
+`A + decoded delta`:
+
+| pair | QP | fresh | delta | ratio |
+|---|---:|---|---|---:|
+| alcaraz 000→010 | 35 | 259,211 B @ 42.48 dB | 441,172 B @ 29.76 dB | 1.70x |
+| alcaraz 000→010 | 45 | 151,822 B @ 40.81 dB | 253,226 B @ 29.54 dB | 1.67x |
+| federer 001→003 | 35 | 292,980 B @ 42.38 dB | 452,786 B @ 29.13 dB | 1.55x |
+| federer 001→003 | 45 | 174,615 B @ 40.30 dB | 260,837 B @ 28.89 dB | 1.49x |
+
+**More bytes and 13 dB less quality**, so no rate ladder is needed — the fresh
+arm dominates. The reason is mechanical: a difference of this size is not smooth,
+it is full of edges, and an edge-dense image is *harder* to code than the
+photograph it came from. Delta coding pays only when the reference is close.
+
+**And the gap is content, not camera geometry**
+(`outputs/bp24-ladder/plate-register.json`). SIFT found 534 and 1,203 good
+matches and RANSAC fitted a homography covering 89% and 97% of the frame — so
+the geometry is recoverable — and warping one plate onto the other moved PSNR
+only from 13.75 to 14.60 dB, and from 15.10 to 20.01 dB. What is left after the
+camera motion is removed is crowd, shadow, scoreboard and player position, and
+no warp reaches those.
+
+**The door is closed, now on the right evidence.** One plate cannot serve two
+points of a match on this content — not by reuse, not by delta coding, and not
+after registration. The idea was sound in principle and the content does not
+support it; what makes it worth recording is that the first measurement said the
+right thing for the wrong reason, and a reader who checked only that one would
+have believed a conclusion that had not been tested.
