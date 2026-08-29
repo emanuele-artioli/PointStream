@@ -37,18 +37,32 @@ So: **the single highest-value open item in the project is the plate.**
 
 ## Do these, in order
 
-1. **Wire `build_plate` into the runner.** It exists in
+1. **`plans/BP29-plate-rate.md` — how cheap can the plate get?** Sweep
+   `background.jpeg-quality` with the residual held **fixed**, and find out
+   whether the residual absorbs a coarser plate. No new code: `payload_rung` in
+   `experiments/tier/ladder.py` already takes the two knobs separately, so this
+   is a third `--sweep` mode. Read that brief for the trap — frame PSNR cannot
+   reward this trade, because the background is 99.4% of the pixels, so the
+   sweep has to be scored on region-scoped and calibrated perceptual metrics
+   too or it answers the wrong question.
+2. **Wire `build_plate` into the runner.** It exists in
    `src/components/background/plate.py` and `make_background` does not call it.
    Today `background.method` selects a *transmission strategy* over one frame.
    A stitched panorama amortises across the clip, which is the whole argument
-   for sending a background model at all.
-2. **Re-run the ladder.** `bash experiments/tier/run_ladder.sh 8` reproduces
-   every axis; write bounds to `outputs/bp25-plate/bounds-before-run.json`
-   first. The av1 low-motion number to beat is **+116.8%**.
-3. **Then try a longer clip.** Eight frames is the least favourable
+   for sending a background model at all. Second, not first: item 1 tells this
+   work what target to aim at, and costs a sweep rather than an implementation.
+3. **Re-run the ladder.** `bash experiments/tier/run_ladder.sh 8` reproduces
+   every axis; write bounds first. The av1 low-motion number to beat is
+   **+116.8%**.
+4. **Then try a longer clip.** Eight frames is the least favourable
    amortisation a fixed plate cost can get, and the BP21 cache holds 48-frame
-   windows. This is the second-largest known lever and it costs nothing but
+   windows. This is the third-largest known lever and it costs nothing but
    wall clock.
+5. **Fold the ladder into the paper.** `sec:evaluation` still carries open
+   `HOLE` markers for `subsec:eval-ladder` and `subsec:eval-residual` — the two
+   things this ladder answered. Nobody has updated the manuscript. The paper is
+   a separate git repo (`67a9ea6275d3d9785ce57026/`) with its own rules; the
+   `update-paper` skill is the route.
 
 ## Things that will bite you
 

@@ -1560,6 +1560,14 @@ re-read rather than followed blindly.
 6. Generalization on the general/DAVIS profile.
 7. Evaluation and Conclusion sections; abstract reconciled with what was measured.
 
+8. **The plate.** It is 88-91% of PointStream's payload at every rung (§2.20),
+   and it is still the first source frame rather than a stitched panorama. Two
+   levers, in this order: compress the still harder — a sweep, no new code
+   (`plans/BP29-plate-rate.md`) — then stitch a real panorama, which
+   `build_plate` already implements and the runner does not call. *Promoted from
+   P2 items 15 and 18 on 2026-08-28: both were written before anyone knew the
+   plate was 90% of the rate.*
+
 **P1 — strongly strengthens**
 8. Perceptual and temporal metrics. 9. Object-representation comparison — the most
 novel item. 10. Detector comparison including SAM3. 11. Temporal-policy ablation.
@@ -1567,8 +1575,10 @@ novel item. 10. Detector comparison including SAM3. 11. Temporal-policy ablation
 
 **P2 — only if time remains**
 13. Appearance-representation comparison. 14. Keypoint-schema richness.
-15. JPEG quality versus downscaling. 16. Open-vocabulary versus hand-written
-selection. 17. Animate-Anyone full retrain. 18. Background-layer ladder.
+15. ⬆ **promoted to P0 item 8** — JPEG quality versus downscaling, now part of
+the plate work. 16. Open-vocabulary versus hand-written selection.
+17. Animate-Anyone full retrain. 18. ⬆ **promoted to P0 item 8** —
+background-layer ladder.
 19. Football as a third domain.
 
 **Out of scope, named as future work in the paper:** MOS user study;
