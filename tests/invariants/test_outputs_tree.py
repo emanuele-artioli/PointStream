@@ -15,13 +15,13 @@ consumer of these summaries.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import pytest
 
 from src.contracts.invariants import check_run
+from src.contracts import paths as ps_paths
 
-OUTPUTS = Path(__file__).resolve().parents[2] / "outputs"
+OUTPUTS = ps_paths.outputs()
 
 pytestmark = pytest.mark.invariants
 

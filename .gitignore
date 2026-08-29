@@ -141,4 +141,7 @@ tennis_processed/*
 
 # Claude Code: local permission grants are machine-specific, not shared
 .claude/settings.local.json
-.claude/worktrees/
+.claude/worktrees
+
+# Where assets/ and outputs/ live on this machine (see DATA.md).
+.ps-data-root

@@ -20,7 +20,6 @@ before:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -37,11 +36,11 @@ from experiments.headroom.real import (
     pair_track,
 )
 from src.pipeline.reconstruction.reconstruct import ObjectRequest
+from src.contracts import paths as ps_paths
 
-REPO = Path(__file__).resolve().parents[2]
 
 #: BP21 wrote its 4K windows here, 48 frames per clip, named by frame id.
-BP21_CLIPS = REPO / "outputs" / "bp21-headroom" / "clips"
+BP21_CLIPS = ps_paths.outputs() / "bp21-headroom" / "clips"
 
 #: The default clip. `outputs/bp21-headroom/.../paste_back/diagnosis.json`
 #: records `extract_24_frame_id` winning at MAE 0.0 on this scene, against 28.4

@@ -29,13 +29,12 @@ bitstream against an array, and the report has to say so.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from typing import Any
 
 import numpy as np
+from src.contracts import paths as ps_paths
 
-REPO = Path(__file__).resolve().parents[2]
-OUT = REPO / "outputs" / "bp24-ladder" / "appearance-cost.json"
+OUT = ps_paths.outputs() / "bp24-ladder" / "appearance-cost.json"
 
 
 def _crop(seed: int = 7, height: int = 192, width: int = 128) -> np.ndarray:

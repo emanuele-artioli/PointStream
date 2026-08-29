@@ -101,24 +101,89 @@ post-hoc:
   not be compared against an anchor forbidden from doing the same. That arm has
   never been run, and running it is part of making a foreground claim honest.
 
-There is prior art for this framing in the **presley** project — I have not seen
-it, so whoever picks this up should read how the foreground-scoped evaluation was
-constructed there before rebuilding one.
+**Prior art: read `/home/itec/emanuele/presley` before building any of this.**
+It has already solved the same problem and codified the guard:
 
-## 4. Closed doors, so nobody re-opens them
+- `src/evaluation/masked.py` — region-restricted PSNR/MSE/SSIM and foreground
+  bounding boxes.
+- `src/presley/compare.py` — a JND gate that *"decides whether a quality
+  difference is real, and enforces which keys may back a foreground claim"*. Its
+  hard rules include **"FG claims only from true masked metrics"** and a run
+  with a missing mask yielding a plausible foreground number rather than an
+  error, which is exactly the failure this section is guarding against.
+- `docs/PLAN_OPERATING_MAP.md` — **n≥6 videos before any significance claim**
+  (n≥8 for restorer comparisons), and the distinction between JND (is the
+  difference perceptible?) and significance (is it real, or sampling noise?),
+  which are routinely conflated. Note that the current PointStream ladder is two
+  clips, so it does not meet that bar for any claim at all.
 
-- **Reusing one plate across scenes of a match does not work on this content**
-  (`plans/BP24-findings.md` §17). First frames of different scenes in the same
-  match differ by 13.75 dB and 15.10 dB, mean absolute difference 39 and 23 grey
-  levels: broadcast tennis cuts between camera positions rather than returning
-  to one framing. Registration — panorama stitching — is a different and much
-  larger piece of work; simple reuse is not available.
-- **And even if it were, the symmetry argument holds:** a long-GOP codec
-  amortises its own intra frame across the same footage. Any cross-scene
-  amortisation given to PointStream must be given to the anchor as the same
-  total footage, or the comparison is rigged. The one genuine asymmetry is that
-  a codec must start a fresh intra frame at every *cut* while a registered plate
-  need not — but that only pays once the registration exists.
+One line from that document bears directly on §2 above: *"the same video flips
+sign along the QP ladder, and the same QP flips sign across videos."* A method
+losing at one operating point and winning at another is a measured phenomenon in
+a sibling project, not wishful thinking — which is why §2 is worth running
+before concluding anything.
+
+## 3b. Code the plate sequence as a video — measured, and it pays
+
+**Retracts what §4 used to say.** `plans/BP24-findings.md` §18: coding plate B
+as a **P-frame referencing plate A** — rather than subtracting them — saves
+**31–53%** with av1 between points of a match, against coding B fresh as intra.
+The control (two consecutive frames of one scene) comes in at 1.2–3.3%, so the
+harness is measuring inter prediction rather than something else.
+
+The reframing is the whole idea: **the sequence of per-scene plates is itself a
+video**, at about one frame per point. No new technology is required — not CMAF,
+whose fragments are deliberately independently decodable and therefore exactly
+wrong here. A long GOP is all it is.
+
+`BackgroundConfig.method` already declares **`panorama-delta`** and nothing
+implements it. That is the slot.
+
+**Two constraints on the claim.** The saving is codec-dependent — libx265 chose
+intra for one of the two pairs, av1 did not — so it must be measured per codec
+rather than assumed. And the anchor must be given the same multi-scene footage:
+a codec encoding across a scene join can also predict across it, and the
+paired-arm discipline does not allow amortisation for one arm only.
+
+## 4. What is closed, and what is emphatically not
+
+**The panorama is NOT closed.** Stitching a background across the frames of one
+point — `build_plate`, which exists and the runner does not call — is `PLAN.md`
+P0 item 8 and is the largest remaining lever. What follows closes something
+narrower and easily confused with it: reusing one plate across *different
+points*. Frames within a point are seconds apart and share lighting, crowd and
+scoreboard, which is exactly the condition the cross-point test found missing.
+`plans/DEFERRED.md` D-PANORAMA-REOPEN keeps the distinction and lists the three
+axes — bitrate range, content type, clip length — on which the background route
+has never been given a fair chance to win.
+
+**Sharing one plate across the points of a match — REOPENED, see §3b.** What
+follows is what *pixel subtraction* cannot do, and it remains true as stated. It
+is not a statement about inter coding, which findings §18 measures at 31–53%
+cheaper than fresh. Kept because the mechanism it rules out is a natural thing
+to try again.
+
+Closed on three measurements, not one (`plans/BP24-findings.md` §17). All four
+scenes tested are
+labelled `cluster_point` in the dataset's own metadata, so this is the idea
+measured on exactly the content it was proposed for.
+
+1. The plates differ by 13.75 dB and 15.10 dB.
+2. **Delta coding is dominated**: `B − A` costs 1.49–1.70x the bytes of coding
+   B fresh *and* lands 13 dB lower in quality, at every QP tried. A difference
+   that large is edge-dense, and an edge-dense image is harder to code than the
+   photograph it came from. Delta coding pays only when the reference is close.
+3. **Registration does not rescue it**: SIFT finds 534 and 1,203 good matches
+   and RANSAC fits a homography covering 89% and 97% of the frame, so the camera
+   geometry *is* recoverable — and warping recovers only 0.85 dB and 4.91 dB.
+   What remains is crowd, shadow, scoreboard and player position.
+
+**And the symmetry argument holds regardless:** a long-GOP codec amortises its
+own intra frame across the same footage. Any cross-scene amortisation given to
+PointStream must be given to the anchor as the same total footage. The one
+genuine asymmetry — a codec must start a fresh intra frame at every cut, a
+registered plate need not — only pays once registration exists, and (3) says
+registration does not deliver a usable reference here anyway.
 
 ## 5. Sequencing
 

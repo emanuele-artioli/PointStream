@@ -13,9 +13,9 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+from src.contracts import paths as ps_paths
 
-REPO = Path(__file__).resolve().parents[2]
-OUT_DIR = REPO / "outputs" / "bp23-tier"
+OUT_DIR = ps_paths.outputs() / "bp23-tier"
 
 #: Tier name -> the key its delivered-PSNR band lives under in the bounds file.
 _DELIVERED_KEYS = {

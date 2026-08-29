@@ -14,9 +14,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from typing import Any
+from src.contracts import paths as ps_paths
 
-REPO = Path(__file__).resolve().parents[2]
-OUT_DIR = REPO / "outputs" / "bp24-ladder"
+OUT_DIR = ps_paths.outputs() / "bp24-ladder"
 
 
 def _rows(pair: dict[str, Any], key: str) -> list[dict[str, Any]]:

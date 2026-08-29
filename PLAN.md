@@ -1074,6 +1074,45 @@ so no generative decoder was measured. Eight frames is the least favourable
 amortisation a fixed plate cost can get. Y-PSNR only; PointStream's case has
 always been argued perceptually.
 
+### 2.21 The plate is the lever, and it has three of them
+
+2026-08-29, following §2.20. Briefs: `plans/BP29-plate-rate.md` (where
+PointStream can win) and `plans/BP30-background-stream.md` (the background as a
+stream). Findings: `plans/BP24-findings.md` §§16-18.
+
+**(a) JPEG is the wrong codec for a 4K plate.** Same still, matched fidelity
+near 38 dB: JPEG **283,431 B**, av1-intra **79,726 B**, vvc-intra **68,477 B** —
+a factor of 3.6 to 4.1 on 88-91% of the payload, for no architectural change,
+since a modern intra frame is what AVIF and HEIC already are. It is not even new
+code for one route: `background.codec` already accepts `roi-video`, a
+single-frame x264 encode, and nothing has ever measured it against `jpeg` —
+because that axis reached nothing at all until BP24 wired `make_background`. A
+config axis only ever set to one value is indistinguishable from a constant
+until somebody drives the others.
+
+**(b) The next plate need not be paid for in full.** Coding plate B as a
+**P-frame** referencing plate A saves **31-53%** with av1 between points of a
+match. This **retracts §17**, which subtracted two plates pixel by pixel, found
+the difference cost *more*, and closed the door: subtraction destroys the
+spatial correlation a transform coder depends on, while inter prediction does
+block-wise motion search, which is what a panned camera needs. The control —
+two consecutive frames of one scene — comes in at 1.2-3.3%, which is what makes
+the arms readable.
+
+**Each scene's payload stays independent of every future scene**, because a
+P-frame references the *reconstruction*, which both sides hold without knowing
+the future. That is how every live encoder works. It holds only under low-delay
+P — no B-frames, no lookahead, no multi-pass — and **§18's numbers were measured
+without that constraint**, so they must be re-measured before being quoted as
+achievable live.
+
+**Two cautions carried forward.** The saving is codec-dependent: libx265's own
+rate-distortion decision chose intra where av1 found inter worth 31%. And
+**PSNR distance does not predict coding distance** — the pair further apart in
+PSNR saved *more* — so a reference search must rank by structure (Canny edge
+overlap) rather than by pixel similarity, and the proxy must be validated
+against trial encodes before it is trusted.
+
 ## 3. Architecture
 
 Enough here that seven parallel sessions do not make conflicting decisions.
@@ -1561,12 +1600,17 @@ re-read rather than followed blindly.
 7. Evaluation and Conclusion sections; abstract reconciled with what was measured.
 
 8. **The plate.** It is 88-91% of PointStream's payload at every rung (§2.20),
-   and it is still the first source frame rather than a stitched panorama. Two
-   levers, in this order: compress the still harder — a sweep, no new code
-   (`plans/BP29-plate-rate.md`) — then stitch a real panorama, which
-   `build_plate` already implements and the runner does not call. *Promoted from
-   P2 items 15 and 18 on 2026-08-28: both were written before anyone knew the
-   plate was 90% of the rate.*
+   which makes it the only lever large enough to close a +116.8% gap. **Three**
+   levers, cheapest first (§2.21):
+   *(a)* **change its codec** — JPEG costs 3.6-4.1x what av1/vvc intra costs at
+   matched fidelity, and `background.codec` already accepts an unmeasured
+   `roi-video` (`plans/BP29-plate-rate.md` §1);
+   *(b)* **stop paying for it once per scene** — coding the next plate as a
+   P-frame against the previous saves 31-53% with av1
+   (`plans/BP30-background-stream.md`);
+   *(c)* **stitch a real panorama**, which `build_plate` implements and the
+   runner does not call.
+   *Promoted from P2 items 15 and 18 on 2026-08-28, before (b) was known.*
 
 **P1 — strongly strengthens**
 8. Perceptual and temporal metrics. 9. Object-representation comparison — the most

@@ -13,6 +13,7 @@ import torch
 
 from src.components.generation.dwpose_draw import draw_dwpose_canvas
 from src.components.generation.torch_dtype import is_cuda_device_usable, resolve_torch_dtype_for_device
+from src.contracts import paths as ps_paths
 
 
 @dataclass(frozen=True)
@@ -95,7 +96,7 @@ def _resolve_model_root(repo_root: Path | None, model_dir: str | None, model_var
             model_root = (repo_root / "Models" / model_folder).resolve()
         else:
             project_assets_root = (
-                Path(__file__).resolve().parents[2] / "assets" / "animate-anyone" / "profiles" / model_folder
+                ps_paths.assets() / "animate-anyone" / "profiles" / model_folder
             )
             canonical_roots = [
                 project_assets_root,

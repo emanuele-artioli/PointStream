@@ -67,9 +67,9 @@ from src.pipeline.residual.spectrum import (
     coarseness_ladder,
 )
 from src.runner.config_io import load_tier
+from src.contracts import paths as ps_paths
 
-REPO = Path(__file__).resolve().parents[2]
-OUT_DIR = REPO / "outputs" / "bp24-ladder"
+OUT_DIR = ps_paths.outputs() / "bp24-ladder"
 
 #: Rungs, as QP values. Wide on purpose: the absolute-span guard in `bd_rate`
 #: refuses a comparison over less than 3 dB, and a narrow sweep is how a ladder

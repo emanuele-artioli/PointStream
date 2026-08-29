@@ -180,3 +180,62 @@ per resolution), or move to reference software at CTC-style configurations
 
 **Until then:** state the preset beside every number, and never order the
 per-codec gains.
+
+---
+
+## D-PANORAMA-REOPEN — the background panorama, and where it might still win
+
+**What.** Two distinct ideas got confused in one conversation, and only one of
+them is closed. Recorded here so the open one is not lost with the closed one.
+
+**Closed, on three measurements** (`plans/BP24-findings.md` §17): *sharing one
+plate across the points of a match*. Labelled `cluster_point` scenes differ by
+13.75 and 15.10 dB; coding one as a delta against another costs 1.49–1.70x the
+bytes of coding it fresh and lands 13 dB lower, so the fresh arm dominates; and
+a RANSAC homography over 534 and 1,203 SIFT matches recovers only 0.85 and
+4.91 dB, so what is left is content — crowd, shadow, scoreboard, player
+position — not camera geometry.
+
+**Still open, and it is `PLAN.md` P0 item 8**: *stitching a panorama across the
+frames of one point*. `build_plate` exists in
+`src/components/background/plate.py` and the runner does not call it. That is a
+different proposition entirely: the frames within a point are seconds apart and
+share lighting, crowd state and scoreboard, which is exactly the condition the
+cross-point test found missing.
+
+**Why this entry exists.** Even with a stitched panorama and an intra-coded
+plate, the ladder may still come out positive. Before concluding that the
+background route is exhausted, the question is not "does it win?" but "does it
+win *anywhere*?", and three axes have never been swept:
+
+- **Bitrate range.** The ladder stopped at QP 55. `presley`'s operating map
+  records that *the same video flips sign along the QP ladder*, so a crossover
+  at very low rate is a measured phenomenon in a sibling project rather than a
+  hope. PointStream degrades to a clean plate; a starved transform codec
+  degrades to blocking.
+- **Content type.** Every number so far is broadcast tennis, and the two clips
+  measured differ by 23x in motion with completely different outcomes. A fixed
+  camera, a longer static shot, or a sport with a larger static background
+  fraction is a different regime and has never been tried. `PLAN.md` P2 item 19
+  (football) and P0 item 6 (DAVIS) both touch this.
+- **Clip length.** Eight frames is the least favourable amortisation a fixed
+  plate cost can be given, and the BP21 cache holds 48-frame windows. A
+  panorama's whole argument is amortisation, so measuring it on the shortest
+  available clip understates it by construction.
+
+**Why deferred.** Not deferred as work — the panorama is P0 — but the *search
+for the operating point where it wins* is a separate, larger question than
+"wire `build_plate` in", and it should not silently expand BP29's scope.
+
+**Cost.** The three axes above are sweeps, not implementations: extending the QP
+range is four encodes, clip length is a flag, content type is a dataset the
+project already has. Perhaps a day once the panorama lands.
+
+**Update 2026-08-29 — partly reopened.** `plans/BP24-findings.md` §18 measures
+that coding the next plate as a **P-frame** against the previous one saves
+31–53% with av1, where pixel subtraction cost *more*. So the closed half of this
+entry is narrower than it was written: what is closed is subtraction, not
+cross-scene amortisation. `BP29` §3b carries the live version, and
+`BackgroundConfig.method`'s unimplemented `panorama-delta` is the slot for it.
+The fairness question moves to the front: the anchor must be given the same
+multi-scene footage, because a codec can predict across a scene join too.
