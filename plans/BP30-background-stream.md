@@ -49,10 +49,18 @@ only if the encoder is forbidden from looking ahead:
   set to zero (`x265-params bframes=0:rc-lookahead=0`, `libaom-av1` with
   `-usage realtime -lag-in-frames 0`, SVT-AV1 `--pred-struct 1 --lookahead 0`).
 
-**Findings §18's numbers were measured without that constraint**, on two-frame
-encodes where there was no future frame to look at anyway. At two frames it
-makes no difference; over twenty scenes it will. **Re-measure under low-delay
-before quoting a saving as achievable live** — that is the first alarm in §6.
+**Findings §18's numbers were measured without that constraint. They have since
+been re-measured under it, and they survive** (`plans/BP24-findings.md` §19):
+av1's 0.671 and 0.470 ratios are unchanged **to the byte** with
+`-lag-in-frames 0`, because `-usage realtime` was already lookahead-free. So the
+31–53% is causal and the scheme is achievable live.
+
+Two things that re-measure settled beyond the gate itself. **x265 is not av1
+here** — it saves 12% on one pair and loses 6% on the other, so the saving is a
+property of av1's inter tools rather than of inter coding in general. And
+**strict causality wants zero rate-control lookahead, which x265 cannot usefully
+provide**: for one plate per scene, a lookahead of N frames is a delay of N
+*scenes*. av1 being genuinely lookahead-free is what makes this deployable.
 
 **How the bytes actually get split.** Keep one encoder process alive and feed it
 plates as scenes arrive; its output is a sequence of packets, one per frame, and
@@ -174,10 +182,11 @@ low-delay, both with the same keyframe interval.
 
 ## 6. Bounds — write to `outputs/bp30-background/bounds-before-run.json` first
 
-- **The low-delay re-measure must not be much worse than §18's 31–53%.** If
-  forbidding B-frames and lookahead collapses the saving to under ~10%, the
-  saving was non-causal and the whole idea is unavailable live. **This is the
-  first thing to check and the cheapest.**
+- ~~The low-delay re-measure must not be much worse than §18's 31–53%.~~
+  **CLEARED 2026-08-29** (findings §19): unchanged to the byte for av1. The
+  bound is kept rather than deleted because it fired usefully on the way — the
+  first attempt misconfigured x265 and the control caught it at ratio 1.075.
+  Keep the control in every future run of this.
 - **The control must hold.** Two consecutive frames of one scene coded as I then
   P must land at a few percent (§18 measured 1.2–3.3%). If not, the harness is
   not measuring inter prediction.
