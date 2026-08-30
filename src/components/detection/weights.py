@@ -11,6 +11,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from pathlib import Path
 
+from src.contracts import paths
 from src.contracts.config import PointstreamConfig
 from src.contracts.errors import ConfigValueError
 
@@ -32,7 +33,16 @@ def repo_root() -> Path:
 
 
 def weights_dir(root: Path | None = None) -> Path:
-    return (root or repo_root()) / "assets" / "weights"
+    """Where checkpoints live.
+
+    Since the data move this is under the *data* root, not the checkout —
+    ``src/contracts/paths.py`` is the only place that resolves ``assets/``.
+    An explicit `root` still means "the directory that contains ``assets/``",
+    which is what the tests plant into.
+    """
+    if root is not None:
+        return root / "assets" / "weights"
+    return paths.assets() / "weights"
 
 
 def intended_weight_path(name: str, *, root: Path | None = None) -> Path:
@@ -42,14 +52,14 @@ def intended_weight_path(name: str, *, root: Path | None = None) -> Path:
     that prefix is treated as repo-relative so the resolver cannot produce
     ``assets/weights/assets/weights/...``.
     """
-    base = root or repo_root()
     raw = Path(name)
     if raw.is_absolute():
         return raw
     posix = name.replace("\\", "/").lstrip("./")
     if posix.startswith(_WEIGHTS_POSIX_PREFIX):
-        return base / name
-    return weights_dir(base) / name
+        base = root if root is not None else paths.data_root()
+        return base / posix
+    return weights_dir(root) / name
 
 
 def named_weights(config: PointstreamConfig) -> dict[str, str]:

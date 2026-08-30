@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import urllib.request
+from src.contracts import paths
 
 
 DEFAULT_REQUIRED_WEIGHTS = [
@@ -48,8 +49,7 @@ def ensure_fvd_i3d_weight(weights_dir: Path) -> None:
 
 
 def main() -> None:
-    project_root = Path(__file__).resolve().parents[1]
-    weights_dir = project_root / "assets" / "weights"
+    weights_dir = paths.assets() / "weights"
     weights_dir.mkdir(parents=True, exist_ok=True)
 
     # Standard placeholder behavior for scaffold phase: verify local presence only.

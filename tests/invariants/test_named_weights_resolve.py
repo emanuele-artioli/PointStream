@@ -25,7 +25,8 @@ from experiments.probe.weights import (
     unresolved,
     weights_are_present,
 )
-from src.components.detection.weights import intended_weight_path, repo_root
+from src.components.detection.weights import intended_weight_path, repo_root, weights_dir
+from src.contracts import paths
 
 
 def test_a_missing_weight_is_refused_rather_than_downloaded(tmp_path: Path) -> None:
@@ -120,3 +121,42 @@ def test_every_shipped_config_weight_exists() -> None:
         "named weight(s) do not resolve: "
         + "; ".join(f"{item.source}:{item.slot}={item.name!r} ({item.error})" for item in broken)
     )
+
+
+def test_weights_dir_follows_the_data_root_not_the_checkout(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The defect this pins: `assets/` moved out of the checkout, and the
+    resolver kept joining it onto the repo root, so every weight-loading path
+    failed in every worktree."""
+    monkeypatch.setenv(paths.ENV_DATA_ROOT, str(tmp_path))
+    assert weights_dir() == tmp_path / "assets" / "weights"
+    assert paths.repo_root() not in weights_dir().parents
+
+
+def test_a_bare_name_plants_under_the_data_root(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv(paths.ENV_DATA_ROOT, str(tmp_path))
+    assert (
+        intended_weight_path("yolo26n-pose.pt")
+        == tmp_path / "assets" / "weights" / "yolo26n-pose.pt"
+    )
+
+
+def test_a_prefixed_name_still_does_not_double_under_the_data_root(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv(paths.ENV_DATA_ROOT, str(tmp_path))
+    assert (
+        intended_weight_path("assets/weights/yolo26n-pose.pt")
+        == tmp_path / "assets" / "weights" / "yolo26n-pose.pt"
+    )
+
+
+def test_an_explicit_root_still_means_the_directory_containing_assets(
+    tmp_path: Path,
+) -> None:
+    """Callers (and the existing tests) pass a root they plant into; the data
+    root must not override an explicit one."""
+    assert weights_dir(tmp_path) == tmp_path / "assets" / "weights"
