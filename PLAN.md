@@ -1113,6 +1113,50 @@ PSNR saved *more* — so a reference search must rank by structure (Canny edge
 overlap) rather than by pixel similarity, and the proxy must be validated
 against trial encodes before it is trusted.
 
+### 2.22 The background does amortise, and reference selection is not worth building
+
+2026-08-30, `BP30`. Component: `src/components/background/stream.py`. Findings:
+`plans/BP30-findings.md` §§20-28. Bounds written before the first encode:
+`outputs/bp30-background/bounds-before-run.json`. Results:
+`outputs/bp30-background/{stream-sweep,mode-comparison,canny-validation}.json`.
+
+**Over five videos, 16 scenes cost 49.2% ± 6.2% of 16 fresh plates** at native
+4K (point-class scenes, libaom-av1 low-delay P, CRF 38), best case **29.4%** on
+`djokovic_federer`. The marginal scene costs 0.607 ± 0.015 of a fresh plate on
+`alcaraz_highlights`, against the 0.470-0.671 §18/§19 measured on isolated pairs
+— so the pair result holds up over a sequence. Control 0.0074.
+
+**Each scene's payload is independent of every future scene, and both sides hold
+the same reconstruction.** Both rest on one measured property: a low-delay
+encode is **prefix-stable to the byte** — frame *i*'s packet is unchanged when
+frame *i+1* is appended. A required-behaviour test asserts encoder and client
+reconstructions are bit-identical across a multi-scene sequence, on all four
+reference modes.
+
+**Use `last`; do not build the search.** At five videos `best-scored` does not
+beat simply predicting from the previous scene — paired difference
+**-0.0012 ± 0.0083 (0.1σ)**, winning on 2 of 5 — so the Canny search buys
+nothing over the free baseline. **`first` is the worst free option** and loses to
+`last` on all five videos by 6-16 points; a single-video result that called them
+indistinguishable was the outlier and is withdrawn (§29 supersedes §23). The
+Canny proxy is weakly positive and strongly content-dependent (per-video mean
+rank agreement -0.14 to +0.69, pooled 0.297 ± 0.122) rather than broken — but
+being right on average is not worth paying for when `last` is free.
+
+**The keyframe interval is priced, so the robustness paragraph can cite it.**
+Against the pure P-chain: *k*=2 costs x1.265, *k*=4 x1.129, *k*=8 x1.040 — and
+every *k* still beats sending a fresh plate per scene (*k*=2 saves 21%).
+
+**Scope and caveats, stated.** Five videos, 16 scenes each — approaching but not
+meeting the n>=6 bar, and per-video numbers are reported rather than averaged
+away, because the spread (0.294 to 0.624) is larger than any effect within it. The plates are scene *frames*, not player-masked plates or
+panoramas, which is the conservative choice and keeps the axis shared with
+§§18-19. **Nothing is wired into `make_background`**; that was a parallel
+stream's file this week and is the follow-up that turns these into a ladder
+rate. §27 records a correction: `panorama-delta` *is* implemented, as pixel
+subtraction — the mechanism §18 retracted — so the slot is occupied by the dead
+idea and should be replaced rather than added beside.
+
 ## 3. Architecture
 
 Enough here that seven parallel sessions do not make conflicting decisions.
