@@ -1608,8 +1608,12 @@ re-read rather than followed blindly.
    *(b)* **stop paying for it once per scene** — coding the next plate as a
    P-frame against the previous saves 31-53% with av1
    (`plans/BP30-background-stream.md`);
-   *(c)* **stitch a real panorama**, which `build_plate` implements and the
-   runner does not call.
+   *(c)* ✅ **DONE 2026-08-30 (BP29 stream D)** — **stitch a real panorama**.
+   `make_background` now calls `build_plate`. On a moving clip the residual
+   falls to **0.22x** and delivered Y-PSNR rises **4.9-6.2 dB**; the plate does
+   **not** grow, so the whole gain is the residual. On a near-static clip the
+   trade is neutral, as predicted. One clip per motion regime, not a corpus.
+   `plans/BP29-panorama-report.md`.
    *Promoted from P2 items 15 and 18 on 2026-08-28, before (b) was known.*
 
 **P1 — strongly strengthens**

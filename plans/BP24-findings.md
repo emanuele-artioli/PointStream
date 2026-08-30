@@ -149,6 +149,12 @@ plate. Panorama stitching (`build_plate` exists in
 `src/components/background/plate.py`) is not wired into the runner. Any result
 quoting a background saving must say which of these it measured.
 
+> **Closed 2026-08-30 by BP29 stream D.** `make_background` now calls
+> `build_plate` over the whole chunk, so `background.method` reaches the
+> stitcher and the view carries per-frame homographies. The estimator it found
+> there was undershooting a real pan by half; that is fixed too. Numbers and
+> the controls behind them: `plans/BP29-panorama-report.md`.
+
 ## 7. Two measurements that are the easy case, not the typical one
 
 Both headline ratios from BP24 were taken on favourable material and must be
