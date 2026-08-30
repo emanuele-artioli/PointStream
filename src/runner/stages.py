@@ -549,40 +549,135 @@ def background(bag: Mapping[str, Any]) -> BackgroundModelView:
     )
 
 
-def make_background(ctx: StageContext) -> StageCallable:
-    """Transmit the plate through `background.codec` and hand back what the
-    client will actually hold (BP24).
+def _foreground_stack(
+    bag: Mapping[str, Any], *, frame_count: int, height: int, width: int
+) -> np.ndarray | None:
+    """Per-frame foreground for the plate's median to exclude, or None.
 
-    Before this, the runner's background stage was a stub: it put `source[0]`
-    on the bag as raw pixels, so `background.method`, `background.codec` and
-    `background.jpeg_quality` all reached nothing, and the plate the
-    reconstruction used was never the plate a client would decode. BP23
-    measured that raw plate at 24.9 MB — 95% of `tier_fast`'s whole figure.
+    A player who stands still for part of the chunk burns into an unmasked
+    median, and the plate then carries him as scenery. The masks the runner
+    already holds are per object and come in two shapes: a ``(T, H, W)`` stack,
+    which is what `_object_from_detection` and the cached tier clips produce,
+    or a single frame-sized mask belonging to that object's own frame, which is
+    what the segmentation stage produces. Both are folded in. A mask of any
+    other shape is skipped rather than guessed at — a wrongly reshaped mask
+    would punch a hole in the plate somewhere unrelated to the player.
 
-    Two things change together, which is the point. The view now carries the
-    **decoded** plate, so quality belongs to the same operating point as the
-    rate; and `ART_BACKGROUND_BYTES` carries the **real payload length**, not a
-    re-encode of already-decoded pixels.
-
-    Still a stub: the plate itself is the first source frame rather than a
-    stitched panorama, so `background.method` selects a transmission strategy
-    over a one-frame plate. That is the next piece, not this one.
+    Returns None when nothing usable was found, which is the documented
+    "no masks" input to ``build_plate`` rather than an all-zero stack.
     """
+    subjects = _subjects(bag)
+    named = bag.get(ART_MASKS)
+    stack = np.zeros((frame_count, height, width), dtype=bool)
+    found = False
+    for item in subjects:
+        mask = item.mask
+        if mask is None and isinstance(named, Mapping):
+            mask = named.get(item.object_id)
+        if mask is None:
+            continue
+        array = np.asarray(mask)
+        if array.ndim == 3 and array.shape[1:] == (height, width) and array.shape[0] >= frame_count:
+            stack |= array[:frame_count].astype(bool)
+            found = True
+        elif array.shape == (height, width):
+            index = int(min(max(item.frame_index, 0), frame_count - 1))
+            stack[index] |= array.astype(bool)
+            found = True
+    if not found:
+        return None
+    return stack.astype(np.uint8)
+
+
+def make_background(
+    ctx: StageContext, *, span: int | None = None, register: bool = True
+) -> StageCallable:
+    """Stitch the chunk's plate, transmit it through `background.codec`, and
+    hand back what the client will actually hold.
+
+    Before BP24 the runner's background stage was a stub: it put `source[0]` on
+    the bag as raw pixels, so `background.method`, `background.codec` and
+    `background.jpeg_quality` all reached nothing, and the plate the
+    reconstruction used was never the plate a client would decode. BP24 fixed
+    the transmission half — the view now carries the **decoded** plate, so
+    quality belongs to the same operating point as the rate, and the payload
+    length is the real one rather than a re-encode of decoded pixels.
+
+    BP29 fixes the other half. The plate was still the **first source frame**,
+    so `background.method` chose a transmission strategy over a single frame
+    and a panorama's whole argument — amortising one background across the
+    clip — had never been available. The stage now calls
+    `BackgroundModel.encode_frames`, which runs `build_plate` over the chunk:
+    a median composite of every frame warped into frame-0 coordinates, with the
+    tracked players excluded from the median, plus the per-frame homographies
+    the client needs to warp it back. `background.method` therefore now reaches
+    `build_plate`; `none` still reaches nothing, because `none` sends nothing.
+
+    Args:
+        ctx: The run's bindings.
+        span: How many leading frames of the chunk feed the plate. ``None``
+            (the default, and what `bind_backends` uses) means the whole chunk.
+            ``span=1`` reproduces the pre-BP29 plate exactly — `build_plate`
+            over one frame is an identity warp and a median of one sample, so
+            it returns that frame unchanged — and exists so the panorama can be
+            measured against the thing it replaces through one code path rather
+            than two.
+        register: Forwarded to `build_plate`. False composites the span
+            without estimating any camera motion, which is the control that
+            separates what registration buys from what a temporal median buys.
+            Both defaults together are the shipped behaviour.
+
+    Note that the homographies travel with the artifact but are **not** in the
+    ledger: at eight frames they are 8x9 float64, 576 B against a plate of
+    roughly half a megabyte, so the omission is under 0.15% of the payload —
+    small, but stated rather than assumed.
+    """
+    if span is not None and span < 1:
+        raise ConfigValueError(
+            "runner.background.span",
+            f"span must be at least one frame; got {span}. A plate built from "
+            "no frames is not a plate.",
+        )
 
     def background_stage(bag: Mapping[str, Any]) -> BackgroundModelView:
+        from src.components.background.plate import build_plate
         from src.components.background.strategy import bind as bind_background
 
         source = as_clip(bag[SOURCE], path=SOURCE)
+        frame_count = int(source.shape[0])
+        height, width = int(source.shape[1]), int(source.shape[2])
         model = bind_background(ctx.config)
-        artifact = model.transmit(np.asarray(source[0], dtype=np.uint8))
+        if not model.sends_panorama:
+            # Nothing is transmitted, so nothing is stitched. `build_plate` on
+            # a plate that will not be sent would be minutes of 4K warping for
+            # an empty payload.
+            artifact = model.transmit(np.asarray(source[0], dtype=np.uint8))
+        else:
+            count = frame_count if span is None else min(span, frame_count)
+            # A one-frame span has no second sample to fill a masked pixel
+            # from, so masking it would inpaint the player region from its own
+            # boundary rather than reveal the background behind him. That is a
+            # different operation, and it would stop the one-frame span being
+            # the plate this replaces. Masks apply from two frames up.
+            masks = (
+                None
+                if count < 2
+                else _foreground_stack(bag, frame_count=count, height=height, width=width)
+            )
+            plate, homographies = build_plate(
+                np.asarray(source[:count], dtype=np.uint8),
+                masks=masks,
+                register=register,
+            )
+            artifact = model.transmit(plate, homographies=homographies)
         decoded = model.decode_payload(artifact)
         return BackgroundModelView(
             plate=source[0] if decoded is None else decoded,
-            homographies=(),
+            homographies=artifact.homographies,
             mode=artifact.mode,
             deferred_to_residual=artifact.deferred_to_residual,
-            width=int(source.shape[2]),
-            height=int(source.shape[1]),
+            width=int(artifact.width or width),
+            height=int(artifact.height or height),
             scene_id=artifact.scene_id,
             payload_bytes=int(len(artifact.payload)),
         )

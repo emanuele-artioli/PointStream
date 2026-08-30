@@ -20,6 +20,37 @@ from scipy.ndimage import distance_transform_edt
 
 MAX_CANVAS_SCALE = 4
 
+#: RANSAC reprojection threshold, in pixels, for the frame -> frame-0 fit, with
+#: the iteration budget that threshold needs.
+#:
+#: This started at 3.0 with the OpenCV default iteration count, and on a panning
+#: 4K broadcast shot that fit was wrong in a way that looked plausible: the
+#: median tracked point on `federer_djokovic/scene_003` frame 7 moved 37.7 px
+#: while the fitted homography moved the frame centre only 21.2 px. A loose
+#: threshold lets a 500-point consensus spend the pan on a spurious ~0.2%
+#: per-frame zoom instead, because the scene is not a plane -- court, players
+#: and stands sit at different depths, so no homography fits all of them and the
+#: slack goes somewhere.
+#:
+#: Measured mean background alignment error over frames 1-7, players excluded
+#: (`outputs/bp29-panorama/motion-model-comparison.json`):
+#:
+#: | model | dynamic clip | static clip |
+#: |---|---|---|
+#: | identity (no registration) | 12.32 | 0.411 |
+#: | homography, threshold 3.0 | 4.73 | 0.413 |
+#: | homography, threshold 1.0 | **3.24** | 0.411 |
+#: | affine, 6 DOF | 6.37 | 0.412 |
+#: | similarity, 4 DOF | 4.08 | 0.411 |
+#:
+#: So the fault was the threshold, not the model class: a lower-DOF model does
+#: not beat the tightened homography. On the static clip every candidate ties
+#: with identity, which is the control that says this is fitting real camera
+#: motion rather than fitting noise harder.
+RANSAC_REPROJ_PX = 1.0
+RANSAC_MAX_ITERS = 5000
+RANSAC_CONFIDENCE = 0.999
+
 
 def _as_frames(frames: np.ndarray) -> np.ndarray:
     array = np.asarray(frames)
@@ -68,7 +99,14 @@ def estimate_homographies(frames: np.ndarray) -> list[np.ndarray]:
         if src.shape[0] < 4:
             homographies.append(identity.copy())
             continue
-        mapped, _ = cv2.findHomography(src, dst, method=cv2.RANSAC, ransacReprojThreshold=3.0)
+        mapped, _ = cv2.findHomography(
+            src,
+            dst,
+            method=cv2.RANSAC,
+            ransacReprojThreshold=RANSAC_REPROJ_PX,
+            maxIters=RANSAC_MAX_ITERS,
+            confidence=RANSAC_CONFIDENCE,
+        )
         if mapped is None:
             homographies.append(identity.copy())
         else:
@@ -145,6 +183,8 @@ def _nearest_finite_fill(image: np.ndarray) -> tuple[np.ndarray, int]:
 def build_plate(
     frames: np.ndarray,
     masks: np.ndarray | Sequence[np.ndarray] | None = None,
+    *,
+    register: bool = True,
 ) -> tuple[np.ndarray, tuple[tuple[float, ...], ...]]:
     """Median-composite a plate, excluding ``masks`` (nonzero = foreground).
 
@@ -153,11 +193,26 @@ def build_plate(
     the player colour and not with a silent zero. A plate that is NaN
     everywhere raises rather than encoding black.
 
+    Args:
+        frames: ``(N, H, W, 3)`` uint8 BGR.
+        masks: Foreground to keep out of the median; nonzero is foreground.
+        register: When False, every homography is the identity — the frames
+            are median-composited where they lie, on a frame-sized canvas.
+            This is **the control**, not a mode to ship. A plate does two
+            separable things: it compensates camera motion, and it averages
+            away whatever differs between frames (sensor noise, a masked
+            player's hole, compression dither). Turning registration off
+            leaves only the second, so the two can be told apart instead of
+            being credited to whichever one the story prefers.
+
     Returns the uint8 BGR plate and the per-frame homographies as 9-tuples.
     """
     stack = _as_frames(frames)
     n_frames, height, width, _ = stack.shape
-    homographies = estimate_homographies(stack)
+    if register:
+        homographies = estimate_homographies(stack)
+    else:
+        homographies = [np.eye(3, dtype=np.float64) for _ in range(n_frames)]
     canvas = _canvas(homographies, width, height)
     if canvas is None:
         homographies = [np.eye(3, dtype=np.float64) for _ in range(n_frames)]
