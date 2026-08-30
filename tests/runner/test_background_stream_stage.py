@@ -42,7 +42,7 @@ def _panning_plates(count: int = 4, step: int = 3) -> list[np.ndarray]:
 def _model(method: str, **overrides: object):
     from src.components.background.strategy import bind as bind_background
 
-    settings = {"method": method}
+    settings: dict[str, object] = {"method": method}
     settings.update(overrides)
     return bind_background(cfg.load({"background": settings}))
 
