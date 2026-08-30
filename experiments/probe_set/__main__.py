@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from experiments.probe_set.materialize import regenerate
+from experiments.probe_set.repair_links import repair
 from experiments.probe_set.schema import (
     DEFAULT_CLIP_LEN_FRAMES,
     DEFAULT_MIN_FRAMES,
@@ -16,6 +17,7 @@ from experiments.probe_set.schema import (
     ProbeSetError,
 )
 from experiments.probe_set.verify import collect_violations, verify
+from src.contracts import paths as ps_paths
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -26,8 +28,8 @@ def _build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
 
     regen = sub.add_parser("regenerate", help="Rebuild the probe-set view and derive the manifest from it")
-    regen.add_argument("--dataset-root", type=Path, default=Path("assets/dataset"))
-    regen.add_argument("--output", type=Path, default=Path("assets/probe_set"))
+    regen.add_argument("--dataset-root", type=Path, default=ps_paths.assets() / "dataset")
+    regen.add_argument("--output", type=Path, default=ps_paths.assets() / "probe_set")
     regen.add_argument("--seed", type=int, default=DEFAULT_SEED)
     regen.add_argument("--num-clips", type=int, default=DEFAULT_NUM_CLIPS)
     regen.add_argument("--clip-len-frames", type=int, default=DEFAULT_CLIP_LEN_FRAMES)
@@ -39,8 +41,20 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Training-split videos to sample from. Held-out videos are rejected.",
     )
 
+    fix = sub.add_parser(
+        "repair-links",
+        help="Retarget a pre-existing view's symlinks at the data root, without rebuilding",
+    )
+    fix.add_argument("--root", type=Path, default=None)
+    fix.add_argument("--data-root", type=Path, default=None)
+    fix.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Report what would change and touch nothing.",
+    )
+
     check = sub.add_parser("verify", help="Fail loudly if the probe set is not usable")
-    check.add_argument("--root", type=Path, default=Path("assets/probe_set"))
+    check.add_argument("--root", type=Path, default=ps_paths.assets() / "probe_set")
     check.add_argument("--dataset-root", type=Path, default=None)
     check.add_argument(
         "--locked-split",
@@ -53,6 +67,14 @@ def _build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
+    if args.command == "repair-links":
+        report = repair(root=args.root, data_root=args.data_root, apply=not args.dry_run)
+        print(report.summary())
+        for line in report.unresolved[:20]:
+            print(f"  unresolved: {line}")
+        if len(report.unresolved) > 20:
+            print(f"  ... and {len(report.unresolved) - 20} more")
+        return 0 if report.ok else 1
     if args.command == "regenerate":
         try:
             manifest = regenerate(
