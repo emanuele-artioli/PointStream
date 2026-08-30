@@ -11,6 +11,7 @@ from src.components.generation._numpy import as_chw, as_hwc, prepare_letterboxed
 from src.components.generation.base import BaseFrameGenerator
 from src.contracts.capabilities import CONDITION_APPEARANCE, CONDITION_POSE
 from src.contracts.conditioning import ConditioningBundle, Device, GenerationParams
+from src.contracts import paths
 
 _DEFAULT_WEIGHT = "spade4tennis_lite_generator.pt"
 
@@ -98,10 +99,10 @@ def _resolve_weight(checkpoint: str | None, default_name: str) -> Path:
     if checkpoint:
         path = Path(checkpoint)
         if not path.is_absolute():
-            planted = _repo_root() / "assets" / "weights" / checkpoint
+            planted = paths.assets() / "weights" / checkpoint
             path = planted if planted.exists() else path
     else:
-        path = _repo_root() / "assets" / "weights" / default_name
+        path = paths.assets() / "weights" / default_name
     if not path.is_file():
         raise FileNotFoundError(
             f"spade4tennis has no model loaded and weight file is missing at {path}. "

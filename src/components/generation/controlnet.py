@@ -28,6 +28,7 @@ from src.contracts.capabilities import (
     CONDITION_POSE,
 )
 from src.contracts.conditioning import ConditioningBundle, Device, GenerationParams
+from src.contracts import paths
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -91,7 +92,7 @@ def _repo_root() -> Path:
 
 
 def weights_dir(root: Path | None = None) -> Path:
-    return (root or _repo_root()) / "assets" / "weights"
+    return (root / "assets" / "weights") if root is not None else paths.assets() / "weights"
 
 
 def resolve_controlnet_checkpoint(
