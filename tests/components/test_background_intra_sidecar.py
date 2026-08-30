@@ -68,6 +68,19 @@ def _plate(height: int = 192, width: int = 320, seed: int = 7) -> np.ndarray:
     return np.clip(base + rng.normal(0.0, 12.0, size=base.shape), 0, 255).astype(np.uint8)
 
 
+def _intra(codec: str) -> IntraCodecSidecar:
+    """`build_sidecar` returns the protocol; the intra-only knobs live on the class.
+
+    Narrowing here rather than widening `SidecarCodec`: `preset` and
+    `probe_encoder` are meaningless for the jpeg and png sidecars, and putting
+    them on the shared protocol would oblige every codec to grow an encoder
+    binary it does not have.
+    """
+    built = build_sidecar(codec)
+    assert isinstance(built, IntraCodecSidecar)
+    return built
+
+
 def _psnr(reference: np.ndarray, candidate: np.ndarray) -> float:
     ref = np.asarray(reference, dtype=np.float64)
     got = np.asarray(candidate, dtype=np.float64)
@@ -98,7 +111,7 @@ class TestTheCodecIsSelectableAndComesFromConfig:
 
         for codec, preset in INTRA_PRESETS.items():
             assert PRESETS[codec] == preset
-            assert build_sidecar(codec).preset == preset
+            assert _intra(codec).preset == preset
 
     def test_codec_id_separates_two_encodes_that_are_not_the_same_encode(self) -> None:
         assert build_sidecar("av1", intra_qp=30).codec_id != build_sidecar(
@@ -231,7 +244,7 @@ def test_the_encoder_is_identified_by_path_and_version(codec: str) -> None:
     """A size without the binary that produced it is not evidence."""
     from pathlib import Path
 
-    path, version = build_sidecar(codec).probe_encoder()
+    path, version = _intra(codec).probe_encoder()
     assert Path(path).exists()
     assert version and version != "unknown"
 
