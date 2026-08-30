@@ -589,6 +589,19 @@ def _foreground_stack(
     return stack.astype(np.uint8)
 
 
+def _bound_background(ctx: StageContext) -> Any:
+    """Construct the configured background model once for the whole run.
+
+    Kept as a function so the `src.components` import stays inside a call rather
+    than at module import: `src.runner` may depend on components, but importing
+    them eagerly pulls encoder binaries into any process that merely reads a
+    config.
+    """
+    from src.components.background.strategy import bind as bind_background
+
+    return bind_background(ctx.config)
+
+
 def make_background(
     ctx: StageContext, *, span: int | None = None, register: bool = True
 ) -> StageCallable:
@@ -639,14 +652,23 @@ def make_background(
             "no frames is not a plate.",
         )
 
+    # Bound once, outside the per-chunk body, because the background model is
+    # allowed to be **stateful across chunks**. `panorama-stream` carries the
+    # previous scene's reconstruction so the next plate can be coded against it
+    # (`plans/BP30-findings.md` §§20-22); rebinding per chunk would hand it a
+    # fresh, empty stream every time and every scene would silently pay for a
+    # full keyframe — the amortisation would be configured, reported, and absent.
+    # The stateless strategies are unaffected: they keep no state to carry.
+    #
+    # One bound model is therefore one stream. Two runs must not share a stage.
+    model = _bound_background(ctx)
+
     def background_stage(bag: Mapping[str, Any]) -> BackgroundModelView:
         from src.components.background.plate import build_plate
-        from src.components.background.strategy import bind as bind_background
 
         source = as_clip(bag[SOURCE], path=SOURCE)
         frame_count = int(source.shape[0])
         height, width = int(source.shape[1]), int(source.shape[2])
-        model = bind_background(ctx.config)
         if not model.sends_panorama:
             # Nothing is transmitted, so nothing is stitched. `build_plate` on
             # a plate that will not be sent would be minutes of 4K warping for

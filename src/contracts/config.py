@@ -205,6 +205,28 @@ class BackgroundConfig:
     codec: str = "jpeg"
     jpeg_quality: int = 50
 
+    #: Which already-transmitted reconstruction a scene predicts from, under
+    #: `panorama-stream`. Measured over five videos (`plans/BP30-findings.md`
+    #: §29): `last` wins on all five, `best-scored` does not beat it (0.1 sigma)
+    #: and costs an edge pass per candidate, and `first` is the worst of the
+    #: three. `last` is the default because it is both the best and the free one.
+    reference_mode: str = "last"
+
+    #: Force a keyframe every *k* scenes under `panorama-stream`; 0 means never,
+    #: a pure P-chain. Priced rather than imposed (§25): against the pure chain,
+    #: k=2 costs x1.265 and k=8 x1.040, and every k still beats sending a fresh
+    #: plate per scene. Zero buys the best rate and gives up random access and
+    #: loss resilience, which a paper may assume but must say it is assuming.
+    keyframe_interval: int = 0
+
+    #: Video codec carrying the cross-scene stream. Distinct from `codec`, which
+    #: is the still-image sidecar the non-streaming methods use.
+    stream_codec: str = "av1"
+
+    #: Constant-quality rung for the stream. Compared arms must share it, or the
+    #: comparison is between rungs rather than between methods.
+    stream_crf: int = 38
+
 
 @dataclass(frozen=True)
 class GeneratorConfig:
