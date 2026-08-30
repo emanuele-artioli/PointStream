@@ -26,6 +26,7 @@ import argparse
 import json
 import statistics
 import time
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -53,6 +54,11 @@ from src.contracts import paths as ps_paths
 OUT_DIR = ps_paths.outputs() / "bp30-background"
 BOUNDS_PATH = OUT_DIR / "bounds-before-run.json"
 RESULT_PATH = OUT_DIR / "stream-sweep.json"
+
+
+def result_path(video: str) -> Path:
+    """Per-video results, so a multi-video run does not overwrite itself."""
+    return OUT_DIR / f"stream-sweep-{video}.json"
 
 #: Written before the first encode. Each bound carries the reasoning that
 #: produced it, so a bound that fires wrongly can be diagnosed rather than
@@ -319,8 +325,9 @@ def main() -> int:
         "bounds": BOUNDS,
         "elapsed_seconds": round(time.time() - started, 1),
     }
-    RESULT_PATH.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    print(f"wrote {RESULT_PATH} in {payload['elapsed_seconds']}s", flush=True)
+    destination = result_path(args.video)
+    destination.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    print(f"wrote {destination} in {payload['elapsed_seconds']}s", flush=True)
     return 0
 
 

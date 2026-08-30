@@ -26,6 +26,7 @@ import argparse
 import json
 import statistics
 import time
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -34,7 +35,12 @@ from experiments.tier.scene_plates import extract_plates, list_scenes, load_plat
 from src.components.background.stream import canny_iou, encode_chain, ffmpeg_provenance
 from src.contracts import paths as ps_paths
 
-OUT_PATH = ps_paths.outputs() / "bp30-background" / "canny-validation.json"
+OUT_DIR = ps_paths.outputs() / "bp30-background"
+
+
+def out_path(video: str) -> "Path":
+    """Per-video results, so a multi-video run does not overwrite itself."""
+    return OUT_DIR / f"canny-validation-{video}.json"
 
 
 def spearman(a: list[float], b: list[float]) -> float | None:
@@ -185,10 +191,11 @@ def main() -> int:
         "rows": rows,
         "elapsed_seconds": round(time.time() - started, 1),
     }
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUT_PATH.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    destination = out_path(args.video)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     print(f"\n{verdict}", flush=True)
-    print(f"wrote {OUT_PATH}", flush=True)
+    print(f"wrote {destination}", flush=True)
     return 0
 
 

@@ -8,15 +8,18 @@ Run under `plans/prompts/claude-bp30.md`, whose scope excludes wiring anything
 into `make_background` (stream D's file this week), adding sidecar codecs
 (stream B's), and re-running the paired ladder. None of those were touched.
 
-**In one paragraph.** The background does amortise across scenes: 16 scenes of
-one match cost **62%** of 16 fresh plates at native 4K, and the marginal scene
-costs 0.607 ± 0.015 of a fresh plate — where §18/§19 measured 0.470-0.671 on
+**In one paragraph.** The background does amortise across scenes: over **five
+videos** 16 scenes cost **49.2% ± 6.2%** of 16 fresh plates at native 4K, best
+case 29.4% (§29). The first video measured, at 62%, turned out to be the worst
+of the five. The marginal scene on that video costs 0.607 ± 0.015 of a fresh
+plate — where §18/§19 measured 0.470-0.671 on
 isolated pairs. Each scene's payload is independent of every future scene, and
 encoder and client hold bit-identical reconstructions, both of which rest on a
 low-delay encode being prefix-stable *to the byte* (§20). **Reference selection
-is not worth building**: the whole axis is worth ~6%, `first` and `last` are
-statistically indistinguishable, and the Canny proxy picks the best reference 1
-time in 4 (§§23, 24). A keyframe every *k* scenes costs 26.5% at *k*=2 falling
+is not worth building** — but for a different reason than one video suggested:
+at n=5 videos the Canny search does not beat simply predicting from the previous
+scene (0.1σ, §29), while `first` is the *worst* free option rather than a safe
+default. Use `last`. A keyframe every *k* scenes costs 26.5% at *k*=2 falling
 to 4.0% at *k*=8, and every *k* still beats sending a fresh plate (§25). One
 video, 16 scenes — not a significance claim. Nothing is wired into the runner
 (§26).
@@ -114,6 +117,11 @@ reader can see what the run can and cannot resolve.
 
 ## 23. Reference selection is worth about 6% in total, so `first` is the recommendation
 
+> **Superseded by §29.** This section measured one video. At n=5 the
+> recommendation flips: `first` is the *worst* free option, not a safe default,
+> and `last` is the one to use. The reasoning below is kept because the error is
+> instructive — the single video it rests on turned out to be the outlier.
+
 The three reference modes code the same scenes, so they are compared **paired**
 (`outputs/bp30-background/mode-comparison.json`,
 `python -m experiments.tier.background_stream_compare`):
@@ -143,6 +151,11 @@ from `last`, and it forgoes 3.65 points against a search that costs one Canny
 pass per candidate per scene, i.e. O(n) edge passes at scene n.
 
 ## 24. The Canny proxy does not track trial encodes well enough to trust
+
+> **Qualified by §29.** At n=5 the proxy is weakly positive on average rather
+> than broken, and on one video it is genuinely good. The conclusion that it is
+> not worth searching with survives, but for a different reason: it does not
+> beat the free baseline.
 
 Brief §3 required the proxy be validated against real encodes before being
 believed. It was, and it **largely fails**:
@@ -286,3 +299,60 @@ it appears now rather than then.
 found a broken control. The keyframe bound in §25 was too pessimistic and found
 nothing wrong. Recording both is the point: a bound that only ever fires on bad
 results is not being read honestly.
+
+## 29. At five videos the recommendation flips: use `last`, not `first`
+
+§§22-24 measured one video. That was not enough, and the single video chosen —
+`alcaraz_highlights` — turned out to be the **least favourable of five**. Run on
+four more (`experiments/tier/background_stream.py --video`, per-video results in
+`outputs/bp30-background/stream-sweep-<video>.json`):
+
+| video | kind | `last` | `best-scored` | `first` |
+|---|---|---:|---:|---:|
+| `djokovic_federer` | full match, 224 scenes | **0.294** | 0.307 | 0.454 |
+| `federer_djokovic` | highlights | **0.448** | 0.455 | 0.512 |
+| `sinner_alcaraz` | highlights | **0.471** | 0.484 | 0.552 |
+| `alcaraz_highlights` | highlights | 0.624 | **0.593** | 0.630 |
+| `alcaraz_perricard` | full match, 88 scenes | 0.624 | **0.616** | 0.634 |
+
+**The amortisation is better than §22 reported.** Mean **0.492 ± 0.062** over
+five videos, best case **0.294** — a 71% saving on the plate. §22's 0.624 was
+the worst result available.
+
+**`first` is the worst free option, not a safe default.** §23 recommended it
+because on the one video measured it was indistinguishable from `last` (0.4σ).
+Across five videos it loses to `last` on every one, by 6 to 16 points. That
+recommendation was wrong and is withdrawn.
+
+**`best-scored` does not beat `last`.** Paired over five videos the difference
+is **-0.0012 ± 0.0083, i.e. 0.1σ**, and `best-scored` wins on 2 of 5. §23's
+apparent 3.65-point win for `best-scored` was a win over `first` specifically —
+which is to say it was measuring "use a recent reference", and `last` already
+does that for nothing.
+
+**So the conclusion of §23 survives with its reasoning replaced.** Do not build
+the search — not because reference choice does not matter, but because the free
+baseline already captures what the search finds.
+
+**The proxy is content-dependent, and not along the axis expected.** Per-video
+mean rank agreement: `djokovic_federer` **+0.69**, `sinner_alcaraz` +0.41,
+`alcaraz_highlights` +0.31, `federer_djokovic` +0.21, `alcaraz_perricard`
+**-0.14**. Pooled over 20 targets: **0.297 ± 0.122**, negative on 6, one pick
+costing 30% over the oracle. So the proxy is weakly positive on average and
+genuinely good on one video — the earlier "largely fails" was too strong at
+n=1. But *full match vs highlights does not explain it*: the two full matches
+are the best and the worst of the five.
+
+**A confound checked and ruled out.** Each run takes the first 16 point-class
+scenes, which span different wall-clock in different videos — so a video whose
+scenes sit closer together could amortise better for that reason alone. Spans
+are 275-526 s and `djokovic_federer`, the best result, is mid-range at 307 s.
+The spread is content, not spacing.
+
+**What still stands from §22.** The prefix-stability property, the bit-identity
+of encoder and client reconstructions, and the keyframe ladder are unchanged —
+they are properties of the scheme, not of the video. Only the reference-mode
+recommendation moved.
+
+**n is now 5 videos**, which meets `presley`'s n>=6 bar only approximately; the
+per-video numbers are given so the spread is visible rather than averaged away.
