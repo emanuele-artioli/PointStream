@@ -86,7 +86,10 @@ def main(argv: list[str] | None = None) -> int:
     donors = donor_appearances(clips, 0)
     reid = ReidMetric(device=args.device)
     plan = plan_for("multi-controlnet")
-    engine = GENERATORS.build(plan.name)
+    # `Registry[object].build` is typed `object`; the sibling caller in
+    # experiments/probe/run.py annotates the built generator `Any` for the
+    # same reason, so this matches rather than inventing a second convention.
+    engine: Any = GENERATORS.build(plan.name)
     params = GenerationParams(width=CANVAS, height=CANVAS, steps=plan.steps)
 
     rows: list[dict[str, Any]] = []

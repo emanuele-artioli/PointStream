@@ -61,7 +61,9 @@ def register(video: str, scene_a: str, scene_b: str) -> dict[str, Any]:
     grey_a = cv2.cvtColor(plate_a, cv2.COLOR_RGB2GRAY)
     grey_b = cv2.cvtColor(plate_b, cv2.COLOR_RGB2GRAY)
 
-    detector = cv2.SIFT_create(nfeatures=4000)
+    # cv2's stubs do not declare SIFT_create, which is a real API on this
+    # build. Narrow the ignore to the attribute rather than the module.
+    detector = cv2.SIFT_create(nfeatures=4000)  # type: ignore[attr-defined]
     kp_a, des_a = detector.detectAndCompute(grey_a, None)
     kp_b, des_b = detector.detectAndCompute(grey_b, None)
     if des_a is None or des_b is None:
@@ -87,8 +89,8 @@ def register(video: str, scene_a: str, scene_b: str) -> dict[str, Any]:
         )
         return result
 
-    src = np.float32([kp_a[m.queryIdx].pt for m in good]).reshape(-1, 1, 2)
-    dst = np.float32([kp_b[m.trainIdx].pt for m in good]).reshape(-1, 1, 2)
+    src = np.array([kp_a[m.queryIdx].pt for m in good], dtype=np.float32).reshape(-1, 1, 2)
+    dst = np.array([kp_b[m.trainIdx].pt for m in good], dtype=np.float32).reshape(-1, 1, 2)
     homography, inliers = cv2.findHomography(src, dst, cv2.RANSAC, 5.0)
     if homography is None:
         result["verdict"] = "RANSAC found no consistent homography."

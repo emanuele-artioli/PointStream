@@ -58,7 +58,21 @@ ignore = ["E501"]
 
 [tool.mypy]
 python_version = "3.10"
-files = ["src", "tests", "scripts"]
+# `files` IS the gate. `AGENTS.md` tells every session to run
+# `mypy --config-file pyproject.toml` before merging, and CI runs exactly that
+# with no path arguments — so whatever is missing here is checked by nobody.
+#
+# `experiments` was missing until 2026-08-31 and had accumulated nine errors
+# nothing would ever have reported, in a directory `src/contracts/layers.py`
+# lists as one of the five architectural layers.
+#
+# **Passing paths on the command line overrides this list rather than adding to
+# it.** That is the trap: `mypy ... src experiments` is not a superset of the
+# gate, it is a different set that silently drops `tests`. Both halves of that
+# were hit in one session on 2026-08-30 — a local `src experiments` run went
+# green while CI failed on a test file, and the same run found the nine errors
+# CI could not see. If you want the gate, pass no paths.
+files = ["src", "tests", "scripts", "experiments"]
 ignore_missing_imports = true
 warn_unused_ignores = true
 warn_redundant_casts = true

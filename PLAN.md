@@ -1157,6 +1157,47 @@ rate. §27 records a correction: `panorama-delta` *is* implemented, as pixel
 subtraction — the mechanism §18 retracted — so the slot is occupied by the dead
 idea and should be replaced rather than added beside.
 
+### 2.23 The stream is wired in, and the probe set was quietly broken
+
+2026-08-31, closing out BP30. Code: PRs #39, #40, #41.
+
+**`background.method: panorama-stream` reaches the runner.** The lever measured
+in §2.22 is now a config value rather than a harness result. The one edit that
+mattered: `make_background` bound its model *inside* the per-chunk body, so a
+stateful stream would have started empty every chunk and paid a full keyframe —
+the amortisation configured, reported in the ledger, and absent. That failure is
+invisible from outside (valid plates, real reconstructions, a self-consistent
+ledger; only the byte counts wrong, in the flattering direction), so it is
+guarded by byte-count tests plus one that fails if the bind moves back inside.
+
+**`panorama-delta` was not unimplemented, and both mechanisms are kept.** It
+implements pixel subtraction — what findings §17 measured costing 1.49-1.70x
+more bytes at ~13 dB lower quality across scenes. `panorama-stream` is named
+apart from it rather than replacing it, so the lattice can compare them instead
+of the question being settled by assertion. Its within-scene application has
+never been measured and is a closer reference than §17's cross-scene pairs.
+
+**The probe set had been dangling since 2026-08-29 and it was two faults.** The
+data move dangled all 3,033 symlinks in the view (they were written absolute).
+Repairing every one left the *identical* 576 violations, because the manifest
+stores paths relative to the old checkout root and `verify` resolved them
+against the working directory. Links are now relative, manifest paths anchor at
+the data root, and `python -m experiments.probe_set repair-links` repairs a view
+in place — deliberately not a rebuild, which reselects clips and would move the
+probe set out from under every result measured on it.
+
+**Next: `plans/BP31-paired-ladder-across-scenes.md`** — the paired ladder over N
+scenes with the anchor given the same footage. Until it runs, §2.20's BD-rates
+describe the un-amortised system and BP30's saving is a byte count, not a
+justification.
+
+**One caution that brief carries, recorded here because it generalises to any
+run on this corpus:** the background lever's per-video spread (0.294-0.624 over
+five videos) is larger than every effect measured inside it, and BP30 twice drew
+a conclusion from a single video that inverted at five. §2.20's ladder ran on
+one clip, explicitly the most static of the eight cached. Single-clip numbers on
+this corpus are confident and uninformative.
+
 ## 3. Architecture
 
 Enough here that seven parallel sessions do not make conflicting decisions.

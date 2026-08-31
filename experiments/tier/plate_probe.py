@@ -114,7 +114,7 @@ def cross_scene(video: str, scenes: tuple[str, ...]) -> dict[str, Any]:
         return {"video": video, "note": "fewer than two cached scenes"}
     names = sorted(frames)
     base = frames[names[0]]
-    out = []
+    out: list[dict[str, Any]] = []
     for other in names[1:]:
         candidate = frames[other]
         if candidate.shape != base.shape:
@@ -134,7 +134,7 @@ def cross_scene(video: str, scenes: tuple[str, ...]) -> dict[str, Any]:
 
 def main() -> int:
     plate = _first_frame("alcaraz_highlights", "scene_000")
-    payload = {
+    payload: dict[str, Any] = {
         "question_1": (
             "is JPEG the wrong codec for a 4K plate? Compared against av1-intra "
             "and vvc-intra on the same still, matched on fidelity not on knob."
