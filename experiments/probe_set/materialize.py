@@ -10,6 +10,7 @@ after* this function; it exists to catch a subsequent edit of one side.
 from __future__ import annotations
 
 import json
+import os
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
@@ -53,10 +54,27 @@ def _replace_tree(path: Path) -> None:
 
 
 def _symlink(src: Path, dst: Path) -> None:
+    """Link ``dst`` at ``src``, **relatively** whenever both share a root.
+
+    An absolute link records where the data sat when the view was built, and
+    that is not a stable fact: the 2026-08-29 move of `assets/` and `outputs/`
+    out of the checkout dangled every one of the 3,033 links in this view at
+    once, because each recorded `<repo>/assets/dataset/...`. A relative link
+    records the *relationship* between the view and the dataset, which the two
+    keep when the pair is moved together.
+
+    Falls back to an absolute link when the two are not under a common root —
+    a link that works is better than one that is elegantly relative and wrong.
+    """
     dst.parent.mkdir(parents=True, exist_ok=True)
     if dst.exists() or dst.is_symlink():
         dst.unlink()
-    dst.symlink_to(src.resolve(), target_is_directory=src.is_dir())
+    target = src.resolve()
+    try:
+        target = Path(os.path.relpath(target, dst.parent.resolve()))
+    except ValueError:
+        pass
+    dst.symlink_to(target, target_is_directory=src.is_dir())
 
 
 def dataset_track_dir(dataset_root: Path, video: str, scene: str, track: str) -> Path:

@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+
+from src.contracts import paths as ps_paths
 from typing import Any
 
 from experiments.probe_set.schema import (
@@ -76,6 +78,27 @@ def view_track_key(track_dir: Path, view_dir: Path) -> str:
     if len(parts) >= 3:
         return f"{parts[0]}/{parts[1]}/{parts[-1]}"
     raise ValueError(f"cannot parse track key from {track_dir} under {view_dir}")
+
+
+def _anchor(path: Path) -> Path:
+    """Resolve a manifest path, anchoring a relative one at the **data root**.
+
+    The manifest records `assets/dataset/...` rather than a machine path, which
+    is right — a probe set that hardcodes one checkout's location is not
+    portable between them. But a relative path has to be resolved against
+    something, and `Path.resolve()` silently uses the *current working
+    directory*. That was harmlessly correct while `assets/` sat in the checkout
+    and everything ran from the repo root; after the 2026-08-29 move it points
+    at a directory that does not exist, and every containment check fails
+    against a track it names correctly.
+
+    `src.contracts.paths` is the one place that knows where the data is, so the
+    manifest's relative paths are anchored there. An absolute path in a
+    manifest is left alone.
+    """
+    if path.is_absolute():
+        return path
+    return ps_paths.data_root() / path
 
 
 def _resolved_file(path: Path) -> Path | None:
@@ -174,7 +197,7 @@ def collect_violations(
 
     resolved_dataset = dataset_root
     if resolved_dataset is None and manifest.get("dataset_root"):
-        resolved_dataset = Path(str(manifest["dataset_root"]))
+        resolved_dataset = _anchor(Path(str(manifest["dataset_root"])))
 
     for clip in clips:
         key = _clip_key(clip)
@@ -224,7 +247,7 @@ def collect_violations(
                 )
 
         named_source = (
-            Path(str(clip["source_track"]))
+            _anchor(Path(str(clip["source_track"])))
             if clip.get("source_track")
             else (
                 resolved_dataset / video / "segmentations" / scene / track
