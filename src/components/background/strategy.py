@@ -25,6 +25,7 @@ from src.components.background.types import (
     MODE_DELTA,
     MODE_FULL,
     MODE_NONE,
+    MODE_STREAM,
     BackgroundArtifact,
 )
 from src.contracts.config import PointstreamConfig
@@ -32,6 +33,7 @@ from src.contracts.domain import (
     BACKGROUND_NONE,
     BACKGROUND_PANORAMA_DELTA,
     BACKGROUND_PANORAMA_FULL,
+    BACKGROUND_PANORAMA_STREAM,
     DomainProfile,
     profile as resolve_profile,
 )
@@ -205,6 +207,123 @@ class PanoramaDelta(BackgroundModel):
     sends_panorama = True
 
 
+class PanoramaStream(BackgroundModel):
+    """The plate as a low-delay stream across scenes, not a still per scene.
+
+    Stateful on purpose, and it is the only strategy here that is. Every other
+    backend codes one plate with no memory, which is what made the background
+    88-91% of the payload: each scene paid for its plate from scratch. This one
+    carries the previous **reconstruction** across scenes and codes the next
+    plate against it. Measured over five videos, 16 scenes each
+    (`plans/BP30-findings.md` §29): 49.2% +- 6.2% of coding every plate fresh,
+    best case 29.4%.
+
+    **The reconstruction is never recomputed, only decoded**, which is what
+    keeps encoder and client identical. `decode_payload` returns what the
+    transmitter decoded from its own output rather than decoding this scene's
+    payload alone — a P-frame in isolation does not decode, and the client's
+    copy comes from the same bytes along the same chain. BP30's
+    `test_reconstructions_are_bit_identical_across_scenes` is what backs that.
+
+    **One instance is one stream.** The runner builds stages once and reuses the
+    closure across chunks, so the sequence of chunks is the sequence of scenes.
+    A second run needs a second instance, or it would predict scene 1 of the new
+    run from the last scene of the old one.
+    """
+
+    method = BACKGROUND_PANORAMA_STREAM
+    sends_panorama = True
+
+    def __init__(
+        self,
+        codec: str = "jpeg",
+        jpeg_quality: int = 50,
+        png_compression: int = 3,
+        roi_crf: int = 30,
+        roi_preset: str = "veryfast",
+        domain: DomainProfile | str | None = None,
+        reference_mode: str = "last",
+        keyframe_interval: int = 0,
+        stream_codec: str = "av1",
+        stream_crf: int = 38,
+    ) -> None:
+        super().__init__(
+            codec=codec,
+            jpeg_quality=jpeg_quality,
+            png_compression=png_compression,
+            roi_crf=roi_crf,
+            roi_preset=roi_preset,
+            domain=domain,
+        )
+        from src.components.background.stream import BackgroundStreamTransmitter
+
+        self._transmitter = BackgroundStreamTransmitter(
+            mode=reference_mode,
+            codec=stream_codec,
+            crf=stream_crf,
+            keyframe_interval=keyframe_interval,
+        )
+
+    @property
+    def codec_id(self) -> str:
+        spec = self._transmitter.spec
+        return (
+            f"{spec.name} low-delay crf{self._transmitter.crf} "
+            f"ref={self._transmitter.mode} k={self._transmitter.keyframe_interval}"
+        )
+
+    def transmit(
+        self,
+        plate: np.ndarray,
+        *,
+        previous_decoded: np.ndarray | None = None,
+        scene_id: str | None = None,
+        previous_scene_id: str | None = None,
+        chunk_id: str = "",
+        homographies: tuple[tuple[float, ...], ...] = (),
+    ) -> BackgroundArtifact:
+        """Code this scene's plate against the stream so far.
+
+        ``previous_decoded`` is ignored: the transmitter holds the
+        reconstructions itself, and taking one from a caller is how the two
+        sides start disagreeing about which picture was predicted from.
+        """
+        array = np.asarray(plate, dtype=np.uint8)
+        payload = self._transmitter.push(array)
+        return BackgroundArtifact(
+            method=self.method,
+            codec=self.codec_name,
+            codec_id=self.codec_id,
+            # A keyframe really is a whole plate; saying `full` keeps the ledger
+            # honest about which scenes were not amortised.
+            mode=MODE_FULL if payload.is_keyframe else MODE_STREAM,
+            payload=payload.payload,
+            width=int(array.shape[1]),
+            height=int(array.shape[0]),
+            homographies=homographies,
+            scene_id=scene_id,
+            chunk_id=chunk_id,
+            deferred_to_residual=False,
+        )
+
+    def decode_payload(self, artifact: BackgroundArtifact) -> np.ndarray | None:
+        """The plate the client holds after this scene.
+
+        Not a decode of ``artifact.payload`` on its own — a P-frame needs its
+        chain. This is the reconstruction the transmitter decoded from its own
+        output, which is bit-identical to what a client decoding the chain gets.
+        """
+        reconstructions = self._transmitter.reconstructions
+        return reconstructions[-1] if reconstructions else None
+
+    def reconstruct(
+        self,
+        artifact: BackgroundArtifact,
+        previous_decoded: np.ndarray | None = None,
+    ) -> np.ndarray | None:
+        return self.decode_payload(artifact)
+
+
 class BackgroundNone(BackgroundModel):
     method = BACKGROUND_NONE
     sends_panorama = False
@@ -225,6 +344,15 @@ def bind(config: PointstreamConfig, **overrides: Any) -> BackgroundModel:
         "jpeg_quality": config.background.jpeg_quality,
         "domain": config.profile,
     }
+    if method == BACKGROUND_PANORAMA_STREAM:
+        kwargs.update(
+            {
+                "reference_mode": config.background.reference_mode,
+                "keyframe_interval": config.background.keyframe_interval,
+                "stream_codec": config.background.stream_codec,
+                "stream_crf": config.background.stream_crf,
+            }
+        )
     kwargs.update(overrides)
     built = REGISTRY.build(method, **kwargs)
     if not isinstance(built, BackgroundModel):

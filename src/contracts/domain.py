@@ -92,17 +92,33 @@ BACKGROUND_PANORAMA_FULL: Final = "panorama-full"
 #: A panorama plus per-frame deltas where the plate has gone stale.
 BACKGROUND_PANORAMA_DELTA: Final = "panorama-delta"
 
+#: The plate coded as a **low-delay video stream across scenes**: scene *n* is a
+#: P-frame against a reconstruction both sides already hold.
+#:
+#: Named apart from `panorama-delta` on purpose. Both are "send less than a whole
+#: plate", but they are opposite mechanisms: `panorama-delta` subtracts pixels,
+#: which `plans/BP24-findings.md` §17 measured costing 1.49-1.70x *more* bytes at
+#: ~13 dB lower quality across scenes; this hands the job to a codec's motion
+#: search, which §§18-19 measured saving 31-53%. One name for both would make the
+#: ablation unreadable.
+BACKGROUND_PANORAMA_STREAM: Final = "panorama-stream"
+
 #: No background model at all — the background lands in the residual.
 BACKGROUND_NONE: Final = "none"
 
 ALL_BACKGROUND_METHODS: Final[frozenset[str]] = frozenset(
-    {BACKGROUND_PANORAMA_FULL, BACKGROUND_PANORAMA_DELTA, BACKGROUND_NONE}
+    {
+        BACKGROUND_PANORAMA_FULL,
+        BACKGROUND_PANORAMA_DELTA,
+        BACKGROUND_PANORAMA_STREAM,
+        BACKGROUND_NONE,
+    }
 )
 
 #: The methods that assume one warpable plane, and are therefore invalid under a
 #: parallax camera assumption.
 PANORAMA_METHODS: Final[frozenset[str]] = frozenset(
-    {BACKGROUND_PANORAMA_FULL, BACKGROUND_PANORAMA_DELTA}
+    {BACKGROUND_PANORAMA_FULL, BACKGROUND_PANORAMA_DELTA, BACKGROUND_PANORAMA_STREAM}
 )
 
 

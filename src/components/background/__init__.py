@@ -10,6 +10,7 @@ from src.contracts.domain import (
     BACKGROUND_NONE,
     BACKGROUND_PANORAMA_DELTA,
     BACKGROUND_PANORAMA_FULL,
+    BACKGROUND_PANORAMA_STREAM,
 )
 from src.contracts.registry import BackendSpec, Registry
 
@@ -27,6 +28,13 @@ REGISTRY.register(
         name=BACKGROUND_PANORAMA_DELTA,
         target="src.components.background.strategy:PanoramaDelta",
         summary="Full plate on the first chunk of a scene, signed diffs after.",
+    )
+)
+REGISTRY.register(
+    BackendSpec(
+        name=BACKGROUND_PANORAMA_STREAM,
+        target="src.components.background.strategy:PanoramaStream",
+        summary="Code each scene's plate as a P-frame against the previous reconstruction.",
     )
 )
 REGISTRY.register(

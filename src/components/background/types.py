@@ -17,6 +17,13 @@ MODE_FULL: str = "full"
 MODE_DELTA: str = "delta"
 MODE_NONE: str = "none"
 
+#: One scene of a cross-scene low-delay stream: a P-frame whose reference is a
+#: reconstruction both sides already hold. The payload is the *marginal* cost of
+#: this scene, not a whole plate — `SizesBytes.panorama` means something
+#: different under this mode and a total spanning scenes must still include the
+#: first scene's keyframe.
+MODE_STREAM: str = "stream"
+
 
 @dataclass(frozen=True)
 class BackgroundArtifact:
@@ -30,9 +37,12 @@ class BackgroundArtifact:
             typo is visible rather than silently dropped.
         codec_id: Codec plus its settings, so jpeg q50 and jpeg q90 cannot
             be mistaken for the same arm.
-        mode: ``full``, ``delta``, or ``none``. Under ``panorama-delta`` a
-            first chunk of a scene is ``full`` — that is the correct result,
-            not a fallback leak.
+        mode: ``full``, ``delta``, ``stream``, or ``none``. Under
+            ``panorama-delta`` a first chunk of a scene is ``full`` — that is
+            the correct result, not a fallback leak. Under ``panorama-stream``
+            a forced keyframe is also ``full``, because a keyframe really is a
+            whole plate and the ledger should not read as though it were
+            amortised.
         payload: Encoded sidecar bytes. Empty when the model is off.
         width: Plate width in pixels, 0 when off.
         height: Plate height in pixels, 0 when off.

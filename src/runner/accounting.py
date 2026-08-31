@@ -28,6 +28,17 @@ class SizesBytes:
 
     ``byte_count`` comes from measured ``WireCost`` / residual payloads, never
     from a model of an encoder.
+
+    **``panorama`` under ``panorama-stream`` is a marginal cost.** Every other
+    background method sends a whole plate per chunk, so the per-chunk figure and
+    the per-chunk cost are the same thing. A streamed plate codes scene *n*
+    against scene *n-1*'s reconstruction, so chunk *n*'s figure is only what
+    that scene added — and the first chunk's keyframe is the whole plate.
+
+    Summing across chunks is therefore still correct, and is correct *because*
+    chunk 0 is in the sum. Dropping it, or treating the mean per-chunk figure as
+    the cost of a plate, would report an amortisation the run never achieved.
+    `plans/BP30-findings.md` §22 is the measurement this accounting has to carry.
     """
 
     source: int
