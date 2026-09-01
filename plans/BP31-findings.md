@@ -234,3 +234,98 @@ ladder rather than a note beside it.
 
 Two scenes of `alcaraz_highlights`, one rung, av1 preset 10 — a path validation,
 not a curve.
+
+## 6. A bound fired, and the bound was the wrong instrument
+
+`outputs/bp31-ladder/bounds-before-run.json` said the background's share of the
+payload must fall out of the 88-91% band it occupied with a fresh plate per
+scene, and that a share still at or above 88% means "the stream is not reaching
+the ledger". It fired. The stream is reaching the ledger, and **the share cannot
+tell**.
+
+Two scenes of `alcaraz_highlights`, one rung, same everything but the method:
+
+| arm | panorama | total | share | Y-PSNR |
+|---|---:|---:|---:|---:|
+| `panorama-stream` | 789,304 B | 862,585 B | 0.915 | 41.90 dB |
+| `panorama-full` (control) | 568,954 B | 643,954 B | 0.884 | 39.30 dB |
+
+**Why the bound was wrong, which is the part worth keeping.** Share is
+`plate / (plate + residual + actor + metadata)`, and on this content the
+non-plate parts are about 9% of the payload. That makes the share a *saturating*
+function of the plate's cost: even halving the plate only moves it from 0.91 to
+0.83, and at N=2 — where a keyframe plus one marginal scene is nearly two whole
+plates anyway — it barely moves at all. The share was chosen because §2.20
+reported the problem in those units, but "the number that stated the problem" and
+"the number that detects the fix" are not the same number. The bound inherited
+the units of the complaint.
+
+**The right instrument is plate bytes against a fresh-plate control at matched
+fidelity.** Which is also why the table above settles nothing on its own: the two
+arms are 2.6 dB apart, so the stream is dearer *and* better and they are simply
+at different operating points. Comparing at a matched *knob* rather than matched
+fidelity is the error `plans/BP29-plate-codec-report.md` §3 was written about,
+and reading "the stream costs 1.39x" off that table would be committing it.
+
+So the comparison is being re-run as **two curves over the full payload ladder,
+one per method**, which is the only form in which the question has an answer.
+
+**And N=2 is the wrong N for it regardless.** Amortisation is what scene *n*
+saves given scenes 1..n-1; at two scenes that is one keyframe plus one marginal
+scene, the least favourable case the mechanism can be given. The sweep in §3
+measures 0.646 at twelve scenes on this video. Only two scenes of
+`alcaraz_highlights` have cached BP21 windows with player tracks, so the ladder
+cannot yet be run at the N the mechanism needs — see the handoff note.
+
+## 7. Where this leaves BP31, and what the next session needs
+
+**The brief's plan cannot be run as written** (§1), and the run it describes had
+a blocker nobody could have seen without trying it (§2). What is now true:
+
+- `panorama-stream` completes a multi-scene run. It did not before this session.
+- `background.stream_codec` should be **av1**, now by measurement over a
+  twelve-scene sequence rather than by inheritance (§3).
+- The paired ladder over N scenes exists, with the anchor on the same footage and
+  the fairness condition measured rather than promised (§5).
+- Both anchor arms run, so the low-delay constraint cannot quietly flatter
+  PointStream (§4).
+
+**The blocker on the number the paper needs is data, not code.** The ladder needs
+each scene as a `TierClip` — source frames plus verified player tracks — and
+those come from BP21's cached windows, which exist for **eight scene/video pairs
+in total**, at most two per video:
+
+| video | cached scenes |
+|---|---|
+| `alcaraz_highlights` | `scene_000`, `scene_010` |
+| `federer_djokovic` | `scene_001`, `scene_003` |
+| `alcaraz_perricard`, `djokovic_federer`, `djokovic_zverev`, `sinner_alcaraz` | one each |
+
+So the ladder can run at N=2 on two videos and N=1 elsewhere, and N=2 is the
+least favourable case amortisation can be given (§6). **Materialising more is
+mechanical, not new work**: `experiments/headroom/real.load_scene_clip` writes
+exactly the `window/frame_*.png` layout `load_tier_clip` reads, and the dataset
+carries segmentations for ~10 point-class scenes on each of six videos.
+`iter_point_scenes_spread()` enumerates them. That extraction is a long detached
+job — 4K decode plus paste-back verification per scene — and it is the first
+thing the next session should start, because everything else waits on it.
+
+Target N: ten scenes on each of six videos clears `presley`'s n>=6 bar that
+`plans/BP31-paired-ladder-across-scenes.md` §2 sets, which BP30 (five videos)
+did not.
+
+**Two things deliberately not done.**
+
+- **Making levers (a) and (b) compose** (§1). A keyframe is a still, so coding
+  keyframes through the intra sidecar while P-frames go through the stream is the
+  natural shape — but the transmitter owns the chain and its reconstructions, so
+  the chain must decode a sidecar-coded keyframe bit-exactly. That is an
+  architectural change to a component with tests around it, and folding it into
+  this run would have meant changing the thing being measured while measuring it.
+- **`intra_qp` plumbing** (§1). Worth doing when (a) is next touched; useless
+  before then, because the streamed arm never consults the sidecar.
+
+**The reporting trap in §1 should be closed whatever happens next.**
+`BackgroundArtifact.codec` reports a sidecar name a streamed run never used, so
+a ledger reads as though the intra arm ran. It is a one-line honesty fix and it
+is the kind of thing that silently backs a wrong claim.
