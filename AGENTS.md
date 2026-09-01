@@ -37,6 +37,30 @@ own `AGENTS.md` and its own rules. Commit there when you change it.
 
 ## Rules that code cannot enforce
 
+**The paper's headline claims must land where PointStream wins.** A codec paper
+whose central result is "we lose to the anchor everywhere" is not a submission.
+So finding and naming the regime where an object-centric codec beats a
+conventional one is *part of the work*, not a lucky outcome — and when a run
+comes back negative, the next question is which axis has not been tried
+(content, rate, quality metric, scene count, domain), not whether to write up
+the loss. Scope the headline claim to the regime where it holds and state that
+boundary plainly; a claim that is true in a named regime is a result, and a
+claim that is true everywhere is usually a mistake.
+
+**What this does not license**, because both would sink the paper faster than
+any negative result. **Choosing the configuration after seeing the numbers and
+not saying so** — a regime found by search is a genuine finding when the search
+is reported and the claim is scoped to it, and a fabrication when it is
+presented as though it had been predicted. And **relaxing the checks once the
+news is good**, which is the asymmetry the bounds rule below exists to catch.
+
+**Secondary results may be negative and should be reported as such.** "No engine
+beats a pasted keyframe" (`PLAN.md` §2.17) is a real contribution and stays.
+What may not happen is the *central* claim resting there. If an honest search
+finds no winning regime at all, that is a finding about the approach rather than
+about the run — surface it to the user early, while there is still time to
+change what the paper argues, not at submission.
+
 **Bound before believing.** Before reading any measured result, write down a
 plausible best and worst case and the reasoning behind them. A result outside
 that range is an alarm: investigate the measurement before reporting the number.

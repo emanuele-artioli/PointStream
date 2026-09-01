@@ -100,9 +100,38 @@ and `sections/system_design.tex` a `NOTE(subsec:lattice)` forbidding any claim
 that the component is justified until a BD-rate exists. Clear both with the
 `update-paper` skill, and update `PLAN.md` §7 P0 items 2 and 8.
 
+## If the gap has not closed
+
+**Do not stop at the loss.** `AGENTS.md` is explicit that the paper's headline
+claim must land where PointStream wins, and that a negative central result is
+not a submission. So a ladder that still shows a gap is a **mid-point, not a
+conclusion**: the next question is which axis has not been tried, and the
+per-video data you will already have is the map. Candidates, cheapest first:
+
+- **Content.** §2.20 ran on the most *static* clip of eight — the friendliest
+  case for the anchor and the worst for an object-centric codec, which earns its
+  keep when there is motion to model. BP29 stream D already measured the
+  panorama helping most on a *moving* clip (+4.9-6.2 dB, residual 0.22x). The
+  dynamic regime is the obvious place to look and has never had a ladder.
+- **Scene count.** Amortisation grows with N. Sixteen scenes is not the limit;
+  `djokovic_federer` has 224.
+- **Quality axis.** The paper's case has always been argued perceptually, and
+  the ladder is Y-PSNR. VMAF and LPIPS are wired (`plans/BP27`), and a
+  generative reconstruction is exactly the thing PSNR undersells.
+- **Rate regime.** Check where the curves cross rather than only where they were
+  sampled; BP29 §2 looked at low rate and found no crossover, but not with the
+  plate levers on.
+
+Report what you tried and what it gave, and **scope the claim to the regime that
+works** — a claim true in a named regime is a result; one asserted everywhere is
+usually a mistake. If several axes are exhausted and no regime wins, say so to
+the user early rather than at submission: that is a finding about the approach,
+and there is still time to change what the paper argues.
+
 ## Done when
 
 The paired ladder is reported over N scenes on both arms with every plate lever
-on, per video with the spread, against pre-written bounds — **or** the report
-says precisely which arm failed and why. A negative result, clearly reported, is
-the deliverable if that is what the data says.
+on, per video with the spread, against pre-written bounds; **and** if the gap
+did not close, the axes above have been tried far enough to say where
+PointStream does win or that it does not — with the search reported, not
+presented as though the winning configuration had been predicted.

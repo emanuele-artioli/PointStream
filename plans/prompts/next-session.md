@@ -1,70 +1,74 @@
-# Next session — BP29: find where PointStream wins
+# Prompt — cleanup, then BP31, then wave 9
 
-Paste below the line.
+Paste below the line. Supersedes the older content of this file.
 
 ---
 
-You are continuing **PointStream**, an object-centric video codec targeting ACM
-TOMM on **30 September**.
+You are picking up PointStream, an object-centric video codec targeting ACM TOMM
+on **30 September**. Three jobs, in order. The third depends on the second's
+result and must not be planned before it.
 
-**Read:** `AGENTS.md` · **`plans/BP29-plate-rate.md`** (the brief; short) ·
-`plans/BP24-ladder-report.md` · `plans/BP24-findings.md` §§13, 16, 17.
+**Read first:** `/home/itec/emanuele/.agent-rules/AGENTS.md` · this repo's
+`AGENTS.md` — in particular the rule now at the top of *Rules that code cannot
+enforce*, which is the standing direction for what this project's claims must
+do.
 
-```bash
-git worktree add -b wave7/bp29-plate /home/itec/emanuele/pointstream-w7-a origin/main
-cd /home/itec/emanuele/pointstream-w7-a
-mkdir -p assets && for x in dataset probe_set raw_4k real_tennis.mp4 weights; do ln -sfn /home/itec/emanuele/pointstream/assets/$x assets/$x; done
-ln -sfn /home/itec/emanuele/pointstream/outputs outputs
-```
+## 1. Cleanup (small, do it first)
 
-## The situation
+- **Remove the `pointstream-w8-e` worktree** and its merged branches. Everything
+  in it is on `main`. Follow `AGENTS.md`: read the branch before deleting
+  (`git log main..<branch>`), tag anything unmerged, never `--force` away a
+  worktree with uncommitted changes. As of the last check it was clean and fully
+  merged, but re-check rather than trusting this sentence.
+- **Retire `plans/prompts/wave8-resume-note.md`.** It warned the wave-8 session
+  that its worktrees were stale and that `make_background` had changed
+  load-bearingly. Those worktrees are gone and the wave is closed, so the note is
+  spent. The one fact in it worth keeping is already in `PLAN.md` §2.23 and
+  guarded by `tests/runner/test_background_stream_stage.py`; confirm that before
+  deleting, then delete.
 
-The paired ladder ran. PointStream **loses to every codec** — BD-rate +116.8%
-(av1), +166.8% (hevc), +165.9% (avc), +378.1% (vvc) — on the most static clip
-available, and does not overlap the anchor at all on the most dynamic one.
+## 2. BP31 — the run the paper depends on
 
-The loss is concentrated in one placeholder component. The **plate is 88-91% of
-the payload** and is coded as JPEG; the residual is 3-9% and is the most
-efficient thing in the system. Measured on the same 4K still, at ~38 dB: JPEG
-283,431 B, **av1 intra 79,726 B**, **vvc intra 68,477 B**.
+**`plans/prompts/next-session-bp31.md` is the full prompt. Use it.** It is long
+because the run has been got wrong before; do not summarise it to yourself.
 
-## Do these, in order
+In one line: all three plate levers have moved and none has been priced in a
+ladder, so sweep the plate codec cheaply, then re-run the paired ladder with
+panorama + cross-scene stream + the winning codec all on, over N scenes, with the
+anchor given the same footage.
 
-1. **Sweep `background.codec` over `{jpeg, png, roi-video}`**, residual held
-   fixed. No new code — `roi-video` is already a single-frame x264 encode in
-   `src/components/background/sidecar.py` and has never been measured against
-   `jpeg`. Re-run the paired ladder at the best rung.
-2. **Add an av1/vvc intra sidecar** on the same interface; keep the plate on the
-   **same codec as the anchor** in each pair or the pairing breaks.
-3. **Extend the anchor to QP 58/61/63** and look for a low-rate crossover.
-4. Only if 1-3 still lose: **declare a foreground-scoped claim in the bounds
-   file before running it**, calibrate the region metrics at the working
-   resolution, and run the region-controlled anchor arms. §3 of the brief says
-   what makes that defensible rather than post-hoc — read it before doing it.
+**The standing direction applies most sharply here.** If the ladder still shows a
+gap, that is a mid-point and not a conclusion — the prompt's "If the gap has not
+closed" section lists the untried axes, cheapest first, and the most promising is
+that §2.20 ran on the most *static* clip of eight, which is the friendliest case
+for the anchor and the worst for an object-centric codec. Report the search
+honestly and scope the claim to the regime that works.
 
-Bounds to `outputs/bp29-plate/bounds-before-run.json` before the first encode.
-The number to beat is **+116.8%**; the brief's own estimate for step 1 is about
-**+30%**, i.e. still losing.
+## 3. Wave 9 — plan it only after BP31 reports
 
-## Things that will bite you
+Its shape depends on the answer, which is why it is not planned yet:
 
-- **A decode that names no `-c:v` re-encodes** and caps every quality it
-  returns (findings §14). Flat curve while bytes keep moving → suspect a second
-  encoder before suspecting the content.
-- **A rung must move the thing that dominates the payload** (findings §13).
-- **`RunResult.frames` is not the delivered clip** — use `delivered_frames`.
-- **Do not rank per-codec gains against each other** (findings §1).
-- **Reusing one plate across scenes does not work on this content**
-  (findings §17) — 13.75 dB between scenes of the same match. Closed door.
-- **NFS: ~6 file opens/second.** Imports cost ~160 s per process, warm or cold.
-  Batch work into long-lived processes; `run_ladder.sh` pays it once per axis.
-- **`conda run` swallows pytest's summary and exits 0 anyway** — use
-  `--junit-xml` and read the XML.
-- Never `git add -A` in a worktree. Confirm CI is green before saying it is.
+- **If a winning regime is found:** the remaining `PLAN.md` §7 P0 items are 4
+  (the core ablation lattice, still un-run), 6 (generalization on the
+  general/DAVIS profile) and 7 (Evaluation and Conclusion sections, abstract
+  reconciled with what was measured). Scope the wave around those, and around
+  making the winning regime's claim airtight.
+- **If several axes are exhausted and none wins:** stop and talk to the user
+  before writing anything up. That is a finding about the approach and it changes
+  what the paper argues — it must not be discovered at submission time.
 
-## Done when
+**When you do scope a wave:** give each stream files that no other stream owns.
+The last wave split `BP30` across two PRs purely because one stream owned
+`src/runner/stages.py` and another needed it, which is also what left a stale
+worktree able to silently revert a load-bearing change. One PR per independently
+revertible change; over-splitting burns the Copilot review budget.
 
-Either the BD-rate is materially better than +116.8% with the improvement
-attributed to a named change, or a foreground-scoped claim is declared in
-advance and measured honestly beside frame PSNR — or the report says precisely
-what blocked both.
+## Housekeeping that applies throughout
+
+- `mypy --config-file pyproject.toml` now covers `experiments/`. CI is the faster
+  authority here (~3m30s against 15-25 minutes locally), and it typechecks
+  `tests/` — passing paths on the command line **overrides** the config's file
+  list rather than adding to it.
+- Long runs detached; `conda run` swallows pytest's summary and exits 0, so use
+  `--junit-xml`.
+- Confirm CI green with `gh` before saying it is.
