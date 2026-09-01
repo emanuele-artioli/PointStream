@@ -82,3 +82,155 @@ today, whichever method is selected.
 
 - Probe: `outputs/bp31-ladder/probe-lever-exclusivity.json`.
 - Read against `src/components/background/strategy.py` at `68cf1c9`.
+
+---
+
+## 2. `panorama-stream` had never completed a multi-scene run
+
+Found by running the scene ladder, not by reading. `make_background` passed
+`artifact.mode` straight into `BackgroundModelView`, which accepts only
+`full` / `delta` / `none`. `PanoramaStream.transmit` emits `full` for its
+keyframe and **`stream` for every scene after it**, so:
+
+```
+chunk 0  mode=full    -> fine
+chunk 1  mode=stream  -> ValueError: background mode must be 'full', 'delta' or 'none'
+```
+
+**Every existing test passed one chunk**, which is the only shape in which this
+works. So the cross-scene amortisation BP30 measured, PR #41 wired, and this
+whole brief is built on had **never completed a run through the runner** — and
+nothing was red.
+
+Fixed at the runner boundary: a `stream` scene decodes to a *whole* plate
+(`decode_payload` returns the transmitter's own reconstruction, not a difference
+image), so reconstruction must treat it as `full`. Only `delta` means "add me to
+the previous plate". `artifact.mode` is untouched, so `SizesBytes.panorama`
+keeps its marginal-cost meaning.
+
+Guarded two ways, because the single-chunk blind spot is the whole story here: a
+multi-chunk test, and one that greps the stage for the translation.
+
+**The general shape, which is not about backgrounds.** A component whose entire
+purpose is to carry state *between* units of work cannot be tested one unit at a
+time. `panorama-stream` exists to make scene *n* cheaper given scenes 1..n-1;
+every test that passed it a single scene was testing the one case where that
+purpose is inactive.
+
+## 3. Only av1 amortises across scenes, and the other two fail differently
+
+`outputs/bp31-ladder/stream-codec-sweep-alcaraz_highlights.json`. Twelve
+point-class scene frames of `alcaraz_highlights` at native 4K, each codec against
+**its own** intra baseline. Bounds were written before the first encode.
+
+| codec | crf30 | crf38 | crf45 | crf51 | frame types |
+|---|---:|---:|---:|---:|---|
+| av1 | 0.664 | **0.646** | 0.539 | 0.485 | `IPPPPPPPPPPP` |
+| hevc | 1.042 | 1.036 | 1.001 | 0.932 | `IPPPPPPPPPPP` |
+| avc | 0.998 | 0.995 | 0.991 | 0.986 | `IIIIIIIIIIII` |
+
+**Do not rank these against each other** — the low-delay flag sets are per
+encoder and are not equal effort (findings §1). Each column is that codec
+against itself.
+
+**The controls all passed** (av1 0.0074, hevc 0.0202, avc 0.0136), so no row is
+disqualified for failing to predict at all. av1's control reproduces BP30's
+published 0.0074 **to the digit**, which is the cheapest available check that
+this harness measures what BP30's did.
+
+**av1 at crf38 reads 0.646 against BP30's 0.492 ± 0.062 headline, and that is
+consistent rather than an alarm.** BP30's headline pools five videos;
+`alcaraz_highlights` was the *worst* of them, at 0.607 ± 0.015 over 16 scenes
+(`PLAN.md` §2.22). Twelve scenes amortise the opening keyframe over fewer
+successors than sixteen, so slightly above 0.607 on the same video is what the
+arithmetic predicts. Inside the pre-written band [0.25, 0.75].
+
+**hevc predicts and still loses.** Its frame types are `IPPPPPPPPPPP` — x265 is
+doing inter coding — and the chain costs *more* than coding every plate fresh at
+three of four rungs. This is not a broken flag; it extends findings §18's
+codec-dependence note ("libx265 chose intra for one of the two pairs, av1 did
+not") from a pair to a twelve-scene sequence.
+
+### avc's `IIIIIIIIIIII` was x264 being right, not x264 being misconfigured
+
+The avc row looked like a configuration artefact and was chased down rather than
+reported, because its saving was **exactly 6,948 B at all four CRFs** —
+rate-independent, which prediction never is — and 6,948 B over eleven joins is
+container header overhead, not coding. The obvious reading was that x264's
+scenecut detector fired at every join and the "chain" was twelve independent
+intra frames.
+
+`outputs/bp31-ladder/avc-scenecut-diagnostic.json` tests that by disabling it
+(`-sc_threshold 0`), same plates, same baseline, both arms:
+
+| crf | default | scenecut disabled |
+|---:|---|---|
+| 30 | 2.530, `IPPIIIIIIIIIIIIPII` | 2.501, `IPPPPPPPPPPPPPPPPP` |
+| 38 | 2.464, same | 2.445, `IPPPP…` |
+| 45 | 1.962, same | 1.939, `IPPPP…` |
+| 51 | 1.361, same | 1.361, `IPPPP…` |
+
+**The flag reaches the encoder** — the frame types change completely — **and the
+cost does not move**, by under 1.2% at every rung. So a P-frame across one of
+these scene joins costs what an I-frame costs, and x264's detector was making
+the correct decision. avc's sweep row stands as a measurement rather than being
+withdrawn.
+
+**These absolute ratios are NOT comparable to the sweep table above.** This
+diagnostic uses 18 cached plates and its own single-image intra baseline, not
+the component's `encode_chain`, so it sits on a different axis. Only the
+within-diagnostic comparison — default against scenecut-disabled, which share a
+baseline — is being read here, and that is the only question it was built to
+answer.
+
+### What this settles for the ladder
+
+`background.stream_codec` must be **av1**. That was the default, so nothing
+changes in the config — but it was the default by inheritance from BP30 rather
+than by measurement over a sequence, and the two alternatives are now priced:
+one predicts and loses, the other correctly declines to predict at all.
+
+## 4. Constraining the anchor to low delay is a 20-38% gift to PointStream
+
+The brief's fairness condition asks for "the same low-delay constraint" on both
+arms. Measured before using it, per `AGENTS.md` on flags that exist versus flags
+that work — SvtAv1EncApp v1.8.0, `--pred-struct 1 --lookahead 0 --keyint 1000`:
+
+- a 640x360 synthetic encode goes **66,485 -> 91,805 B, +38%**;
+- the real two-scene 4K anchor goes **154,891 -> 186,437 B, +20%**, *and* loses
+  quality, 38.23 -> 37.45 dB Y.
+
+So the constrained anchor is both dearer and worse, and a ladder reporting only
+that arm would hand PointStream a fifth of its rate and call it fairness. The
+scene ladder therefore runs **both anchors at every rung** rather than taking a
+flag, with the unconstrained one leading as the harder comparison and the
+latency-matched one reported beside it. Which question each answers is in the
+record.
+
+The first version of the flag table was also simply wrong — it assumed ffmpeg
+for every codec, and `src/components/codec/tools.py` sends `avc`/`vvc` to
+ffmpeg, `hevc` to kvazaar and `av1` to `SvtAv1EncApp`. SvtAv1EncApp rejected the
+ffmpeg-style argument outright ("single dash long tokens have been removed"),
+which is the good failure. A codec whose low-delay vocabulary has not been
+checked against its own binary now **refuses** rather than silently running
+unconstrained, because a run that completes with the constraint absent is the
+version of this that gets published.
+
+## 5. The anchor really does predict across a scene join
+
+The fairness condition is measured, not promised. At every rung the scene ladder
+encodes the N scenes **jointly** (the arm) and **separately** (the control):
+
+| arm | joint | separate | joint/separate |
+|---|---:|---:|---:|
+| anchor | 154,891 B | 181,578 B | **0.853** |
+| anchor, low delay | 186,437 B | 212,108 B | **0.879** |
+
+Both below 1.0, so the anchor given the concatenation genuinely predicts across
+the join and takes a 12-15% discount for it. Had these come back at 1.0, the
+anchor would have been effectively running per-scene and any PointStream gain
+against it would have been an artefact of the rig. That check is an alarm in the
+ladder rather than a note beside it.
+
+Two scenes of `alcaraz_highlights`, one rung, av1 preset 10 — a path validation,
+not a curve.

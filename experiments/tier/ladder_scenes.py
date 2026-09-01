@@ -283,6 +283,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--tier", default="balanced")
     parser.add_argument("--stream-crf", type=int, default=38)
     parser.add_argument(
+        "--background-method",
+        default=domains.BACKGROUND_PANORAMA_STREAM,
+        help="`panorama-full` is the control: a fresh plate per scene, which is "
+             "what the cross-scene stream has to beat in the ledger",
+    )
+    parser.add_argument(
         "--skip-low-delay-anchor",
         action="store_true",
         help="run only the unconstrained anchor (halves anchor cost; loses the "
@@ -316,7 +322,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     background = replace(
         base.background,
-        method=domains.BACKGROUND_PANORAMA_STREAM,
+        method=args.background_method,
         stream_codec=args.codec if args.codec in {"av1", "hevc", "avc"} else "av1",
         stream_crf=int(args.stream_crf),
         keyframe_interval=0,
