@@ -22,6 +22,7 @@ import numpy as np
 import pytest
 
 from src.contracts import config as cfg
+from src.components.background.types import MODE_STREAM
 from src.contracts.domain import BACKGROUND_PANORAMA_FULL, BACKGROUND_PANORAMA_STREAM
 
 HEIGHT, WIDTH = 96, 160
@@ -126,3 +127,60 @@ class TestStreamIsDistinctFromDelta:
         fresh = _model(BACKGROUND_PANORAMA_FULL, codec="png")
         fresh_total = sum(len(fresh.transmit(p).payload) for p in plates)
         assert streamed_total < fresh_total
+
+
+@pytest.mark.integration
+class TestTheStreamSurvivesMoreThanOneChunk:
+    """The failure a single-chunk test cannot see.
+
+    `PanoramaStream.transmit` emits `full` for the keyframe and `stream` for
+    every scene after it, and `BackgroundModelView` accepts only
+    `full`/`delta`/`none`. So chunk 0 passed and chunk 1 raised
+    `background mode must be 'full', 'delta' or 'none'` — which means the
+    cross-scene amortisation the component exists for had never completed a run
+    through the runner, while every single-chunk test stayed green.
+
+    These run the stage over more than one chunk for that reason. A test that
+    only ever passes one chunk to a *stateful, cross-chunk* component is testing
+    the case the component was not built for.
+    """
+
+    def test_a_second_scene_reconstructs_rather_than_raising(self) -> None:
+        from src.pipeline.reconstruction.background import (
+            MODE_DELTA,
+            MODE_FULL,
+            MODE_NONE,
+        )
+
+        model = _model(BACKGROUND_PANORAMA_STREAM, keyframe_interval=0)
+        modes = [model.transmit(plate).mode for plate in _panning_plates()]
+        assert modes[0] == "full", "the first scene of a chain is a keyframe"
+        assert "stream" in modes[1:], (
+            "no scene after the first was coded as a stream payload, so this "
+            "test is not exercising the case that used to raise"
+        )
+        # What reconstruction is allowed to receive. `stream` is deliberately
+        # not in this set: the runner maps it to `full`, because a stream scene
+        # decodes to a whole plate rather than to a difference image.
+        assert MODE_STREAM not in {MODE_FULL, MODE_DELTA, MODE_NONE}
+
+    def test_the_runner_maps_a_stream_scene_to_a_full_plate(self) -> None:
+        """Guards the mapping itself, not just that some run completed.
+
+        If `make_background` ever hands `artifact.mode` through untranslated
+        again, this fails here rather than several scenes into a 4K ladder.
+        """
+        import inspect
+
+        from src.runner import stages
+
+        body = inspect.getsource(stages.make_background)
+        stage_body = body.split("def background_stage", 1)[1]
+        assert "MODE_STREAM" in stage_body, (
+            "make_background no longer translates the stream mode; a multi-scene "
+            "run will raise on its second chunk"
+        )
+        assert "mode=artifact.mode," not in stage_body, (
+            "make_background passes artifact.mode through untranslated, which is "
+            "exactly the bug this guards"
+        )

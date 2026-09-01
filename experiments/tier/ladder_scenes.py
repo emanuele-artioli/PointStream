@@ -76,12 +76,48 @@ BOUNDS_PATH = OUT_DIR / "bounds-before-run.json"
 #: lookahead and B-frames the streamed arm is denied, and the pair is comparing
 #: constraints rather than systems. Reported in the record either way: a
 #: constraint that is not in the output is not a constraint anyone can check.
+#:
+#: **These are per-binary, not per-format.** `src/components/codec/tools.py`
+#: sends `avc` and `vvc` to ffmpeg, `hevc` to kvazaar and `av1` to
+#: `SvtAv1EncApp` — three different command-line vocabularies. The first version
+#: of this table assumed ffmpeg for everything and handed SvtAv1EncApp an
+#: ffmpeg-style `-svtav1-params`, which it rejected outright
+#: ("single dash long tokens have been removed"). A codec whose flags have not
+#: been checked against its own binary is absent here rather than guessed at,
+#: because a flag the encoder silently ignores is worse than one it refuses:
+#: the run would complete and the constraint would not be there.
+#:
+#: av1, verified against SvtAv1EncApp v1.8.0 `--help` on this host:
+#:   `--pred-struct 1` low-delay frames, `--lookahead 0`, and a `--keyint`
+#:   larger than any sequence here so the anchor gets one I-frame — matching
+#:   `background.keyframe_interval: 0`, which is a pure P-chain.
 ANCHOR_LOW_DELAY: dict[str, tuple[str, ...]] = {
-    "av1": ("-svtav1-params", "lookahead=0:enable-overlays=0"),
-    "avc": ("-bf", "0", "-x264-params", "bframes=0"),
-    "hevc": (),
-    "vvc": (),
+    "av1": ("--pred-struct", "1", "--lookahead", "0", "--keyint", "1000"),
 }
+
+
+class LowDelayUnavailable(SystemExit):
+    """Asked to constrain an anchor whose flags have not been verified here."""
+
+
+def anchor_low_delay_args(codec: str) -> tuple[str, ...]:
+    """The verified low-delay argv for ``codec``, or a refusal naming why.
+
+    Refusing beats returning ``()``. An empty tuple would run the anchor
+    unconstrained while the report said `--anchor-low-delay` was requested,
+    which is the pairing quietly not holding.
+    """
+    try:
+        return ANCHOR_LOW_DELAY[codec]
+    except KeyError:
+        raise LowDelayUnavailable(
+            f"--anchor-low-delay has no verified flag set for {codec!r}. Verified: "
+            f"{sorted(ANCHOR_LOW_DELAY)}. `avc`/`vvc` run through ffmpeg, `hevc` "
+            "through kvazaar and `av1` through SvtAv1EncApp, so each needs its own "
+            "vocabulary checked against its own binary before it is used here. "
+            "Run without --anchor-low-delay to measure the unconstrained anchor, "
+            "and say so in the report."
+        ) from None
 
 
 def _no_generator() -> GeneratorRef:
@@ -200,17 +236,19 @@ def check_bounds(rows: list[dict[str, Any]]) -> list[str]:
     alarms: list[str] = []
     for row in rows:
         label = row.get("rung")
-        anchor = row.get("anchor") or {}
         stream = row.get("pointstream") or {}
 
-        ratio = anchor.get("joint_over_separate")
-        if isinstance(ratio, (int, float)) and ratio >= 1.0:
-            alarms.append(
-                f"{label}: the anchor's joint encode ({anchor.get('joint_bytes')} B) is not "
-                f"cheaper than N separate encodes ({anchor.get('separate_bytes')} B). It is "
-                "not predicting across the scene joins, so it was effectively run per-scene "
-                "and any PointStream gain here is an artefact of the rig, not a result."
-            )
+        for key in ("anchor", "anchor_low_delay"):
+            anchor = row.get(key) or {}
+            ratio = anchor.get("joint_over_separate")
+            if isinstance(ratio, (int, float)) and ratio >= 1.0:
+                alarms.append(
+                    f"{label}/{key}: the joint encode ({anchor.get('joint_bytes')} B) is not "
+                    f"cheaper than N separate encodes ({anchor.get('separate_bytes')} B). It "
+                    "is not predicting across the scene joins, so it was effectively run "
+                    "per-scene and any PointStream gain against it is an artefact of the "
+                    "rig, not a result."
+                )
 
         share = stream.get("background_share")
         if isinstance(share, (int, float)):
@@ -245,9 +283,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--tier", default="balanced")
     parser.add_argument("--stream-crf", type=int, default=38)
     parser.add_argument(
-        "--anchor-low-delay",
+        "--skip-low-delay-anchor",
         action="store_true",
-        help="constrain the anchor the way the background stream is constrained",
+        help="run only the unconstrained anchor (halves anchor cost; loses the "
+             "latency-matched arm)",
     )
     parser.add_argument(
         "--max-rungs",
@@ -285,7 +324,14 @@ def main(argv: list[str] | None = None) -> int:
     )
     paired = base.with_(residual=residual, background=background)
 
-    extra = ANCHOR_LOW_DELAY.get(args.codec, ()) if args.anchor_low_delay else ()
+    # BOTH anchors run at every rung. Measured on this host, SvtAv1EncApp v1.8.0:
+    # the low-delay flags take a 640x360 test encode from 66,485 B to 91,805 B,
+    # +38%. So constraining the anchor makes it dearer, and a ladder that
+    # reported only the constrained arm would be handing PointStream a 38%
+    # head start and calling it fairness. The unconstrained anchor is the
+    # harder comparison and leads; the latency-matched one is reported beside
+    # it, and which question each answers is stated in the record.
+    extra = () if args.skip_low_delay_anchor else anchor_low_delay_args(args.codec)
 
     rungs = PAYLOAD_RUNGS[: args.max_rungs] if args.max_rungs else PAYLOAD_RUNGS
     if len(rungs) < len(PAYLOAD_RUNGS):
@@ -299,29 +345,34 @@ def main(argv: list[str] | None = None) -> int:
     for index, (jpeg_quality, rate_value) in enumerate(rungs):
         label = f"q{jpeg_quality}/qp{rate_value}"
         request = replace(residual, rate=int(rate_value)).encode_request()
-        request = EncodeRequest(
-            codec_name=request.codec_name,
-            rate_control=request.rate_control,
-            rate=request.rate,
-            preset=request.preset,
-            pix_fmt=request.pix_fmt,
-            extra_args=tuple(extra),
-        )
-        request.validate()
 
         row: dict[str, Any] = {"rung": label, "rank": len(rungs) - 1 - index}
-        try:
-            row["anchor"] = anchor_over_sequence(clips, request)
-            print(
-                f"  anchor  {label:<12} joint {row['anchor']['joint_bytes']:>10} B  "
-                f"sep {row['anchor']['separate_bytes']:>10} B  "
-                f"j/s {row['anchor']['joint_over_separate']}  "
-                f"{row['anchor']['psnr_y_dB']:6.2f} dB",
-                flush=True,
+
+        arms: list[tuple[str, tuple[str, ...]]] = [("anchor", ())]
+        if extra:
+            arms.append(("anchor_low_delay", tuple(extra)))
+        for key, arm_extra in arms:
+            arm_request = EncodeRequest(
+                codec_name=request.codec_name,
+                rate_control=request.rate_control,
+                rate=request.rate,
+                preset=request.preset,
+                pix_fmt=request.pix_fmt,
+                extra_args=arm_extra,
             )
-        except Exception as exc:  # noqa: BLE001 — recorded, not swallowed
-            row["anchor_error"] = repr(exc)
-            print(f"  anchor  {label:<12} FAILED {exc!r}", flush=True)
+            arm_request.validate()
+            try:
+                row[key] = anchor_over_sequence(clips, arm_request)
+                print(
+                    f"  {key:<17} {label:<12} joint {row[key]['joint_bytes']:>10} B  "
+                    f"sep {row[key]['separate_bytes']:>10} B  "
+                    f"j/s {row[key]['joint_over_separate']}  "
+                    f"{row[key]['psnr_y_dB']:6.2f} dB",
+                    flush=True,
+                )
+            except Exception as exc:  # noqa: BLE001 — recorded, not swallowed
+                row[f"{key}_error"] = repr(exc)
+                print(f"  {key:<17} {label:<12} FAILED {exc!r}", flush=True)
 
         tuned = paired.with_(
             background=replace(paired.background, jpeg_quality=int(jpeg_quality)),
@@ -348,7 +399,7 @@ def main(argv: list[str] | None = None) -> int:
         "n_rungs": len(rungs),
         "codec": args.codec,
         "preset": PRESETS[args.codec],
-        "anchor_low_delay": list(extra),
+        "anchor_low_delay_args": list(extra),
         "background": {
             "method": paired.background.method,
             "stream_codec": paired.background.stream_codec,
@@ -360,11 +411,16 @@ def main(argv: list[str] | None = None) -> int:
         "rows": rows,
         "alarms": alarms,
         "reading_note": (
-            "The anchor arm is ONE encode over the concatenated scenes; "
-            "`separate_bytes` is the control proving it predicted across the "
-            "joins. Quality is Y-PSNR on delivered_frames for PointStream and "
-            "on the decoder's output for the anchor. Few scenes on one video is "
-            "a configuration measurement, not a claim."
+            "Two anchor arms at every rung. `anchor` is unconstrained and is "
+            "the harder, primary comparison. `anchor_low_delay` is constrained "
+            "the way PointStream's background stream is, which on this host "
+            "costs SvtAv1EncApp +38% — so it is the latency-matched question, "
+            "not the fair-by-default one, and reporting it alone would hand "
+            "PointStream that 38%. Both are ONE encode over the concatenated "
+            "scenes; `separate_bytes` is the control proving the anchor "
+            "predicted across the joins. Quality is Y-PSNR on delivered_frames "
+            "for PointStream and on the decoder's output for the anchor. Few "
+            "scenes on one video is a configuration measurement, not a claim."
         ),
     }
     dest = Path(args.out) if args.out else OUT_DIR / f"ladder-scenes-{args.video}-{args.codec}.json"
