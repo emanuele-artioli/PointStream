@@ -68,6 +68,26 @@ from src.runner import run
 from src.runner.config_io import load_tier
 from src.contracts import paths as ps_paths
 
+#: The payload rungs for a **streamed** background, as
+#: ``(stream_crf, residual rate)``. `PAYLOAD_RUNGS` pairs
+#: `background.jpeg_quality` with the residual's rate, and `jpeg_quality`
+#: reaches nothing under `panorama-stream` (`plans/BP31-findings.md` §1). Run
+#: with that table, the streamed arm's plate came back **789,304 B at all five
+#: rungs** — byte-identical — so the curve swept the residual against a frozen
+#: plate. That is the exact degenerate shape `PAYLOAD_RUNGS`'s own docstring was
+#: written about: "a rung has to move everything that trades rate for quality".
+#:
+#: `stream_crf` is that knob for this method. The CRFs bracket BP30's operating
+#: point (38) and span the range the §3 sweep measured, paired with the same
+#: residual rates so the two tables describe the same five operating points.
+STREAM_PAYLOAD_RUNGS: tuple[tuple[int, int], ...] = (
+    (51, 55),
+    (45, 46),
+    (38, 38),
+    (30, 28),
+    (22, 18),
+)
+
 OUT_DIR = ps_paths.outputs() / "bp31-ladder"
 BOUNDS_PATH = OUT_DIR / "bounds-before-run.json"
 
@@ -271,6 +291,25 @@ def check_bounds(rows: list[dict[str, Any]]) -> list[str]:
                 f"{label}: ledger withheld the ratio ({stream.get('raw_parts')}), so this "
                 "total is not a rate and the rung is not on the curve."
             )
+
+    # The failure that produced a plausible-looking curve carrying no plate
+    # information: `PAYLOAD_RUNGS` sweeps `background.jpeg_quality`, which reaches
+    # nothing under `panorama-stream`, so all five rungs coded the SAME plate to
+    # the byte and the ladder swept only the residual. A rung must move what
+    # dominates the payload; if the plate never moves, this is not a payload
+    # ladder whatever the report is titled.
+    plates = [
+        int((row.get("pointstream") or {}).get("parts", {}).get("panorama", 0))
+        for row in rows
+        if row.get("pointstream")
+    ]
+    if len(plates) > 1 and len(set(plates)) == 1:
+        alarms.append(
+            f"the plate is {plates[0]} B at every one of {len(plates)} rungs — identical to "
+            "the byte. The rung is not moving the plate, so this sweeps the residual "
+            "against a frozen background and is not a payload ladder. Check that the "
+            "rung table's plate knob is the one this background method reads."
+        )
     return alarms
 
 
@@ -339,7 +378,9 @@ def main(argv: list[str] | None = None) -> int:
     # it, and which question each answers is stated in the record.
     extra = () if args.skip_low_delay_anchor else anchor_low_delay_args(args.codec)
 
-    rungs = PAYLOAD_RUNGS[: args.max_rungs] if args.max_rungs else PAYLOAD_RUNGS
+    streamed = args.background_method == domains.BACKGROUND_PANORAMA_STREAM
+    table = STREAM_PAYLOAD_RUNGS if streamed else PAYLOAD_RUNGS
+    rungs = table[: args.max_rungs] if args.max_rungs else table
     if len(rungs) < len(PAYLOAD_RUNGS):
         print(
             f"NOTE: {len(rungs)} of {len(PAYLOAD_RUNGS)} rungs - this validates the "
@@ -348,8 +389,11 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     rows: list[dict[str, Any]] = []
-    for index, (jpeg_quality, rate_value) in enumerate(rungs):
-        label = f"q{jpeg_quality}/qp{rate_value}"
+    for index, (plate_knob, rate_value) in enumerate(rungs):
+        label = (
+            f"crf{plate_knob}/qp{rate_value}" if streamed
+            else f"q{plate_knob}/qp{rate_value}"
+        )
         request = replace(residual, rate=int(rate_value)).encode_request()
 
         row: dict[str, Any] = {"rung": label, "rank": len(rungs) - 1 - index}
@@ -380,8 +424,14 @@ def main(argv: list[str] | None = None) -> int:
                 row[f"{key}_error"] = repr(exc)
                 print(f"  {key:<17} {label:<12} FAILED {exc!r}", flush=True)
 
+        # The plate knob differs by method, and using the wrong one freezes
+        # the plate while the report still looks like a payload ladder.
+        plate_change = (
+            {"stream_crf": int(plate_knob)} if streamed
+            else {"jpeg_quality": int(plate_knob)}
+        )
         tuned = paired.with_(
-            background=replace(paired.background, jpeg_quality=int(jpeg_quality)),
+            background=replace(paired.background, **plate_change),
             residual=replace(paired.residual, rate=int(rate_value)),
         )
         try:
@@ -406,6 +456,7 @@ def main(argv: list[str] | None = None) -> int:
         "codec": args.codec,
         "preset": PRESETS[args.codec],
         "anchor_low_delay_args": list(extra),
+        "plate_knob": "stream_crf" if streamed else "background.jpeg_quality",
         "background": {
             "method": paired.background.method,
             "stream_codec": paired.background.stream_codec,

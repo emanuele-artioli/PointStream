@@ -329,3 +329,48 @@ did not.
 `BackgroundArtifact.codec` reports a sidecar name a streamed run never used, so
 a ledger reads as though the intra arm ran. It is a one-line honesty fix and it
 is the kind of thing that silently backs a wrong claim.
+
+## 8. The payload ladder froze the plate on the streamed arm
+
+Both curves ran at N=2, and the streamed one is not an RD curve. Panorama bytes
+per rung, `outputs/bp31-ladder/ladder-curve-panorama-{stream,full}.json`:
+
+| rung | `panorama-stream` plate | `panorama-full` plate |
+|---|---:|---:|
+| q30/qp55 | 789,304 | 568,954 |
+| q50/qp46 | **789,304** | 692,087 |
+| q75/qp38 | **789,304** | 920,775 |
+| q90/qp28 | **789,304** | 1,416,592 |
+| q98/qp18 | **789,304** | 2,787,012 |
+
+**Identical to the byte at all five rungs.** `PAYLOAD_RUNGS` pairs
+`background.jpeg_quality` with the residual's rate, and §1 is that
+`jpeg_quality` reaches nothing under `panorama-stream` — so the streamed ladder
+swept the residual against a frozen background. `panorama-full`'s plate moves
+4.9x across the same rungs, which is the control showing the table itself is fine.
+
+This is `PAYLOAD_RUNGS`'s own docstring happening again, to the arm it was
+written for: *"a rung has to move everything that trades rate for quality"*,
+after a first ladder moved the payload 6% because the plate was 93% of it and
+did not move with the residual's knob. The same trap, entered through a
+different knob, one method later.
+
+**It also explains both of §6's alarms.** The high-side one (share stuck at
+91.5%) and the low-side one (share collapsing to 53.0% at the finest rung) are
+the same fact: a fixed plate with a residual growing 25,269 -> 651,086 B under
+it. The share was tracking the residual all along.
+
+**And the streamed curve saturates** — 41.90 to 43.63 dB for 1.7x the rate,
+while `panorama-full` reaches 45.88 dB — because the plate is pinned at av1
+CRF 38 and no residual rung can buy back plate detail that was never sent. A
+BD-rate taken against that would have measured the frozen knob.
+
+**Fixed:** `STREAM_PAYLOAD_RUNGS` sweeps `stream_crf` (51/45/38/30/22) against
+the same residual rates, so the two tables describe the same five operating
+points through whichever knob the method actually reads. **Guarded:** the ladder
+now raises an alarm when the plate is byte-identical across rungs, because this
+failure produces a smooth, monotone, entirely plausible curve.
+
+**No comparison is drawn between the two N=2 curves here.** The streamed one was
+not measuring what it claimed, and the re-run with the corrected rungs is the
+first version of it worth reading.
