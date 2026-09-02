@@ -599,6 +599,7 @@ own* camera motion — and the two scenes do not move alike:
 | 16 | 2161x3841, x1.0007 | 2161x3841, x1.0007 | ok |
 | 24 | 2161x3841, x1.0007 | **2172x3881, x1.0163** | refuses |
 | 32 | 2161x3841, x1.0007 | **2189x3919, x1.0343** | refuses |
+| 48 | 2161x3841, x1.0007 | **2190x3932, x1.0382** | refuses |
 
 **The divergence is asymmetric, and that is the whole mechanism.** The static
 scene's canvas never grows; the panning scene's does. At short spans neither has
