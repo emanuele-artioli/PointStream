@@ -1,74 +1,67 @@
-# Prompt — cleanup, then BP31, then wave 9
+# Prompt — pick up a wave-9 work item
 
-Paste below the line. Supersedes the older content of this file.
+Paste below the line. Supersedes the older content of this file (the cleanup and
+BP31-scoping prompt it used to hold; both are done, and `plans/BP24-ladder-report.md`
+cites this filename for that history).
 
 ---
 
 You are picking up PointStream, an object-centric video codec targeting ACM TOMM
-on **30 September**. Three jobs, in order. The third depends on the second's
-result and must not be planned before it.
+on **30 September**.
 
-**Read first:** `/home/itec/emanuele/.agent-rules/AGENTS.md` · this repo's
-`AGENTS.md` — in particular the rule now at the top of *Rules that code cannot
-enforce*, which is the standing direction for what this project's claims must
-do.
+**Read first, in order:** `/home/itec/emanuele/.agent-rules/AGENTS.md` · this
+repo's `AGENTS.md` — in particular *Rules that code cannot enforce* · **`plans/ROADMAP.md`**
+· then **exactly one brief** from it. Do not read the whole plan tree; a session
+that needs all of it is scoped too broadly.
 
-## 1. Cleanup (small, do it first)
+## Where the project stands in four sentences
 
-- **Remove the `pointstream-w8-e` worktree** and its merged branches. Everything
-  in it is on `main`. Follow `AGENTS.md`: read the branch before deleting
-  (`git log main..<branch>`), tag anything unmerged, never `--force` away a
-  worktree with uncommitted changes. As of the last check it was clean and fully
-  merged, but re-check rather than trusting this sentence.
-- **Retire `plans/prompts/wave8-resume-note.md`.** It warned the wave-8 session
-  that its worktrees were stale and that `make_background` had changed
-  load-bearingly. Those worktrees are gone and the wave is closed, so the note is
-  spent. The one fact in it worth keeping is already in `PLAN.md` §2.23 and
-  guarded by `tests/runner/test_background_stream_stage.py`; confirm that before
-  deleting, then delete.
+PointStream is measured end to end against the codec it is built on and it
+**loses**: BD-rate **+90.97%** against an av1 anchor at two scenes with the
+cross-scene background stream on. The plate — one still image — is **88–91% of
+the payload at every rung**, so the rate problem is not the object stream, and
+the residual is the one component with a measured favourable trade (+0.9% rate
+for +5.40 dB). A parallel session owns the hunt for a winning regime (BP31,
+worktree `pointstream-w9-a`, PR #45) and is about to run a ten-scene, six-video
+ladder. `plans/FORK-bp31.md` holds the three papers that result, one per outcome,
+written before that run reports.
 
-## 2. BP31 — the run the paper depends on
+## Pick one
 
-**`plans/prompts/next-session-bp31.md` is the full prompt. Use it.** It is long
-because the run has been got wrong before; do not summarise it to yourself.
+**If nobody has done them yet, `BP32` and `BP33` come first** — they are cheap,
+they are mostly arithmetic over data already on disk, and either can change what
+the expensive campaign should be spent on. `BP32` reconciles the ~150 BD-rate
+points between the headroom the motivation measured and what the system
+delivers. `BP33` is the observation that every ladder in this project has run at
+eight frames per scene while the cache holds forty-eight, on a cost that is paid
+once per scene.
 
-In one line: all three plate levers have moved and none has been priced in a
-ladder, so sweep the plate codec cheaply, then re-run the paired ladder with
-panorama + cross-scene stream + the winning codec all on, over N scenes, with the
-anchor given the same footage.
+Otherwise take any wave-9 item from `plans/ROADMAP.md` §2. They are file-disjoint
+and none of them touches what PR #45 holds.
 
-**The standing direction applies most sharply here.** If the ladder still shows a
-gap, that is a mid-point and not a conclusion — the prompt's "If the gap has not
-closed" section lists the untried axes, cheapest first, and the most promising is
-that §2.20 ran on the most *static* clip of eight, which is the friendliest case
-for the anchor and the worst for an object-centric codec. Report the search
-honestly and scope the claim to the regime that works.
+## Rules that keep costing time when they are skipped
 
-## 3. Wave 9 — plan it only after BP31 reports
+- **Bound before believing, and two-sided.** Write the band to
+  `outputs/<brief>/bounds-before-run.json` before the first encode. A result
+  outside it is an alarm to investigate, not a number to report.
+- **When the news is good, add a check rather than stopping.** These checks get
+  applied to disappointing results and skipped on exciting ones.
+- **Report per video with the spread.** BP30 drew two conclusions from one video
+  and both inverted at five.
+- **One thing at a time.** Span and scene count are both amortisation axes on the
+  same fixed cost and a two-axis sweep run once will not separate them.
+- **Drive the flag, do not read it.** This project has twice found a config axis
+  that reached nothing; a null result is only readable beside a control where the
+  same probe does separate the arms.
 
-Its shape depends on the answer, which is why it is not planned yet:
+## Housekeeping
 
-- **If a winning regime is found:** the remaining `PLAN.md` §7 P0 items are 4
-  (the core ablation lattice, still un-run), 6 (generalization on the
-  general/DAVIS profile) and 7 (Evaluation and Conclusion sections, abstract
-  reconciled with what was measured). Scope the wave around those, and around
-  making the winning regime's claim airtight.
-- **If several axes are exhausted and none wins:** stop and talk to the user
-  before writing anything up. That is a finding about the approach and it changes
-  what the paper argues — it must not be discovered at submission time.
-
-**When you do scope a wave:** give each stream files that no other stream owns.
-The last wave split `BP30` across two PRs purely because one stream owned
-`src/runner/stages.py` and another needed it, which is also what left a stale
-worktree able to silently revert a load-bearing change. One PR per independently
-revertible change; over-splitting burns the Copilot review budget.
-
-## Housekeeping that applies throughout
-
-- `mypy --config-file pyproject.toml` now covers `experiments/`. CI is the faster
-  authority here (~3m30s against 15-25 minutes locally), and it typechecks
-  `tests/` — passing paths on the command line **overrides** the config's file
-  list rather than adding to it.
-- Long runs detached; `conda run` swallows pytest's summary and exits 0, so use
-  `--junit-xml`.
-- Confirm CI green with `gh` before saying it is.
+- `ruff check` (no paths — passing paths *overrides* the project's file set
+  rather than adding to it, and that trap has been hit here in both ruff and
+  mypy), `mypy --config-file pyproject.toml` with no paths, the tests for what
+  you touched, and `python -m src.contracts.layers`.
+- CI is the faster authority for mypy (~3m30s against 15–25 minutes locally).
+  Confirm green with `gh run view <id> --log-failed` rather than assuming.
+- `conda run` swallows pytest's summary and exits 0 — use `--junit-xml`.
+- Long runs detached, checkpointing at least hourly.
+- One PR per independently revertible change.

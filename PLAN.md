@@ -4,6 +4,13 @@
 `AGENTS.md` plus the one brief in `plans/` for your workstream — that is the
 whole context a session should need.*
 
+**For what is still left and in what order, read `plans/ROADMAP.md`.** This file
+is the record of what the system is and what has been measured; the roadmap is
+the dependency graph over the remaining work, and `plans/FORK-bp31.md` holds the
+three papers that follow from the three possible outcomes of the ladder now in
+flight — written before it reported, which is what makes scoping the headline
+claim to a regime a finding rather than a retrofit.
+
 ---
 
 ## 1. What this is
@@ -1763,11 +1770,21 @@ config names resolves; every run emits at least one quality metric.
 The ~436 pre-rewrite tests are untouched and test modules Phase B and C delete.
 They die with their modules; no separate culling is needed.
 
-**The suite does not exist yet.** `tests/invariants/` is a three-test stub that
-skips for want of a run summary. Most of the assertions above need Phase C, but
-two were checkable at the end of B and were not written: *every registered
-backend constructs* and *every weight a shipped config names resolves*. B′ owns
-writing both, since B′ is where weights start mattering.
+**Corrected 2026-09-02.** The sentence that stood here — *"the suite does not
+exist yet; `tests/invariants/` is a three-test stub that skips for want of a run
+summary"* — stopped being true and was not updated. `tests/invariants/` now holds
+**five modules and 1,145 lines** and they pass: `test_backend_constructs.py`,
+`test_metric_calibration.py`, `test_named_weights_resolve.py`,
+`test_outputs_tree.py`, `test_run_summary.py`. Both assertions B′ was told to
+write — *every registered backend constructs* and *every weight a shipped config
+names resolves* — were written.
+
+What is **not** established is which of the eleven behaviours above are covered
+and which are not; the list has never been audited against the tests.
+`plans/BP37-required-behaviour.md` owns that audit and owns correcting this
+paragraph again when it has the answer. A gate description that understates the
+gate misleads exactly as much as one that overstates it: a session reading this
+paragraph today concludes it has no safety net and behaves accordingly.
 
 Phase gates:
 
