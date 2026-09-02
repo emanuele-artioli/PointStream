@@ -36,11 +36,17 @@ MIN_QUALITY_SPAN_DB = 3.0
 
 @dataclass(frozen=True)
 class RDCurve:
-    """One rate–distortion curve. Rates must be positive; at least two points."""
+    """One rate–distortion curve. Rates must be positive; at least two points.
+
+    ``qualities`` are native metric scores. The quality-axis transform lives on
+    ``quality_spec`` and is applied inside ``compare_rd_curves``, so a lower-
+    is-better curve cannot be integrated as if it were PSNR.
+    """
 
     rates: tuple[float, ...]
     qualities: tuple[float, ...]
     label: str = ""
+    quality_spec: MetricSpec = PSNR
 
     def __post_init__(self) -> None:
         if len(self.rates) != len(self.qualities):
@@ -73,7 +79,12 @@ class BDComparison:
     """Fractional extra rate at equal quality. Negative means the candidate is cheaper."""
 
     bd_quality: float
-    """Mean quality gap at equal rate, in the quality metric's native units."""
+    """Mean quality gap at equal rate, in higher-is-better units.
+
+    Positive means the candidate is better quality at matched rate. Native
+    scores that are lower-is-better are negated before this gap is taken, so
+    LPIPS cannot invert the sign silently.
+    """
 
     overlap: tuple[float, float]
     """Quality range the BD-rate integral is defined on, ``(low, high)``."""
@@ -151,53 +162,69 @@ def compare_rd_curves(
     anchor: RDCurve,
     candidate: RDCurve,
     *,
-    quality_spec: MetricSpec = PSNR,
+    quality_spec: MetricSpec | None = None,
     min_overlap_fraction: float = MIN_OVERLAP_FRACTION,
     min_quality_span: float | None = None,
 ) -> BDComparison:
     """Bjøntegaard delta of ``candidate`` against ``anchor``.
 
-    Fits ``log10(rate) = p(quality)`` with a polynomial of degree at most 3
+    Fits ``log10(rate) = p(quality')`` with a polynomial of degree at most 3
     (degree 1 when a curve has two points, so a hand-computable linear case
-    is exact) and integrates over the overlapping quality range.
+    is exact) and integrates over the overlapping quality range. ``quality'``
+    is the spec's higher-is-better transform of the native scores.
 
     Two guards, and they catch opposite failures. ``min_overlap_fraction`` is
     relative: it rejects curves that barely meet. ``min_quality_span`` is
     absolute: it rejects curves that meet everywhere but span nothing, which
     the relative guard cannot see (`plans/BP24-findings.md` §2).
 
-    ``min_quality_span`` is in the quality metric's own units, so there is no
-    default that is right for every metric. `PSNR` gets `MIN_QUALITY_SPAN_DB`;
-    any other spec must state one, because silently applying a dB floor to an
-    LPIPS curve would reject every real comparison, and silently applying none
-    would reinstate the hole this guard exists to close.
+    The span floor is a property of the metric. PSNR, VMAF, SSIM and LPIPS
+    carry theirs on the spec. A metric with no floor still requires the
+    caller to pass ``min_quality_span``, because silently applying a dB
+    constant to an unbounded axis would either reject everything or reopen
+    the hole this guard exists to close.
 
     Raises:
         InsufficientOverlapError: The curves barely overlap.
         DegenerateCurveError: They overlap, but over a range that resolves
             nothing.
-        ValueError: ``min_quality_span`` was left to the default on a
-            non-PSNR metric.
+        ValueError: The curves disagree on the quality axis, or the axis has
+            no span floor and the caller did not supply one.
     """
+    spec = _resolve_quality_spec(anchor, candidate, quality_spec)
     if min_quality_span is None:
-        if quality_spec.name != PSNR.name:
+        if spec.min_curve_span is None:
             raise ValueError(
                 f"compare_rd_curves has no default quality span for "
-                f"{quality_spec.name!r} — the floor is in the metric's own "
-                f"units ({quality_spec.unit or 'unitless'}), and MIN_QUALITY_SPAN_DB "
-                "is a PSNR figure. Pass min_quality_span explicitly."
+                f"{spec.name!r} — the floor is in the metric's own "
+                f"units ({spec.unit or 'unitless'}), and {spec.name} is not "
+                "a BD-rate axis. Pass min_quality_span explicitly."
             )
-        min_quality_span = MIN_QUALITY_SPAN_DB
+        min_quality_span = spec.min_curve_span
 
-    low, high, fraction = _quality_overlap(anchor, candidate)
+    anchor_q = tuple(spec.to_curve_quality(value) for value in anchor.qualities)
+    candidate_q = tuple(spec.to_curve_quality(value) for value in candidate.qualities)
+    transformed_anchor = RDCurve(
+        rates=anchor.rates, qualities=anchor_q, label=anchor.label, quality_spec=spec
+    )
+    transformed_candidate = RDCurve(
+        rates=candidate.rates, qualities=candidate_q, label=candidate.label, quality_spec=spec
+    )
+
+    low, high, fraction = _quality_overlap(transformed_anchor, transformed_candidate)
+    native_low, native_high = _native_overlap(spec, low, high)
     if high <= low or fraction < min_overlap_fraction:
-        raise InsufficientOverlapError((low, high), fraction, min_overlap_fraction)
+        raise InsufficientOverlapError(
+            (native_low, native_high), fraction, min_overlap_fraction
+        )
     if (high - low) < min_quality_span:
-        raise DegenerateCurveError((low, high), high - low, min_quality_span, fraction)
+        raise DegenerateCurveError(
+            (native_low, native_high), high - low, min_quality_span, fraction
+        )
 
     log_rate_gap = _mean_poly_gap(
-        _sorted(anchor.qualities, np.log10(np.asarray(anchor.rates, dtype=float))),
-        _sorted(candidate.qualities, np.log10(np.asarray(candidate.rates, dtype=float))),
+        _sorted(anchor_q, np.log10(np.asarray(anchor.rates, dtype=float))),
+        _sorted(candidate_q, np.log10(np.asarray(candidate.rates, dtype=float))),
         low,
         high,
     )
@@ -206,18 +233,53 @@ def compare_rd_curves(
     rate_low = max(min(anchor.rates), min(candidate.rates))
     rate_high = min(max(anchor.rates), max(candidate.rates))
     bd_quality = _mean_poly_gap(
-        _sorted(np.log10(np.asarray(anchor.rates, dtype=float)), anchor.qualities),
-        _sorted(np.log10(np.asarray(candidate.rates, dtype=float)), candidate.qualities),
+        _sorted(np.log10(np.asarray(anchor.rates, dtype=float)), anchor_q),
+        _sorted(np.log10(np.asarray(candidate.rates, dtype=float)), candidate_q),
         np.log10(rate_low),
         np.log10(rate_high),
     )
     return BDComparison(
         bd_rate=bd_rate,
         bd_quality=float(bd_quality),
-        overlap=(low, high),
+        overlap=(native_low, native_high),
         overlap_fraction=fraction,
-        quality_metric=quality_spec.name,
+        quality_metric=spec.name,
     )
+
+
+def _resolve_quality_spec(
+    anchor: RDCurve,
+    candidate: RDCurve,
+    quality_spec: MetricSpec | None,
+) -> MetricSpec:
+    """The axis the comparison will use. Curves and the caller must agree.
+
+    An untyped curve still defaults to PSNR, which a caller may override —
+    that is how existing PSNR-shaped tests pass ``quality_spec=lpips``. A
+    curve that already named a different axis cannot be silently re-read.
+    """
+    named = {anchor.quality_spec.name, candidate.quality_spec.name}
+    if quality_spec is None:
+        if len(named) != 1:
+            raise ValueError(
+                f"RD curves disagree on the quality axis: {anchor.quality_spec.name!r} "
+                f"vs {candidate.quality_spec.name!r}. Pass quality_spec explicitly."
+            )
+        return anchor.quality_spec
+    foreign = named - {PSNR.name, quality_spec.name}
+    if foreign:
+        raise ValueError(
+            f"quality_spec={quality_spec.name!r} does not match the curves "
+            f"({anchor.quality_spec.name!r}, {candidate.quality_spec.name!r})."
+        )
+    return quality_spec
+
+
+def _native_overlap(spec: MetricSpec, low: float, high: float) -> tuple[float, float]:
+    """Overlap in native metric units, always ``(smaller, larger)``."""
+    left = spec.from_curve_quality(low)
+    right = spec.from_curve_quality(high)
+    return (min(left, right), max(left, right))
 
 
 def dominates(
@@ -233,6 +295,24 @@ def dominates(
     cheaper = challenger.rate < incumbent.rate
     better = spec.is_better(challenger.quality, incumbent.quality)
     return cheaper and better
+
+
+def meets_or_beats_floor(
+    candidate: OperatingPoint,
+    anchor_floor: OperatingPoint,
+    spec: MetricSpec,
+) -> bool:
+    """Gate-A boundary test when the curves do not overlap.
+
+    True when ``candidate`` is strictly cheaper than the anchor's smallest
+    valid point and at least as good on ``spec``. Equal quality counts; a
+    projected crossover does not.
+    """
+    cheaper = candidate.rate < anchor_floor.rate
+    not_worse = (candidate.quality == anchor_floor.quality) or spec.is_better(
+        candidate.quality, anchor_floor.quality
+    )
+    return cheaper and not_worse
 
 
 def _quality_overlap(anchor: RDCurve, candidate: RDCurve) -> tuple[float, float, float]:

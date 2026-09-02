@@ -20,6 +20,8 @@ import math
 from dataclasses import dataclass
 from typing import Sequence
 
+from src.contracts.metrics import MetricSpec
+
 MIN_READABLE_N = 8
 """Below this, report the effect but never call a direction on it alone."""
 
@@ -44,6 +46,7 @@ class PairedComparison:
     mean_difference: float
     standard_error: float
     higher_is_better: bool
+    quality_metric: str | None = None
 
     @property
     def sigmas(self) -> float:
@@ -74,7 +77,8 @@ class PairedComparison:
 
     def describe(self) -> str:
         delta = f"{self.mean_difference:+.3f} +/- {self.standard_error:.3f}"
-        head = f"{self.name_a} - {self.name_b} = {delta} (n={self.n}, {self.sigmas:.1f}σ)"
+        axis = f"{self.quality_metric} " if self.quality_metric else ""
+        head = f"{self.name_a} - {self.name_b} = {axis}{delta} (n={self.n}, {self.sigmas:.1f}σ)"
         if self.verdict == "underpowered":
             return f"{head} — UNDERPOWERED: n<{MIN_READABLE_N}, no direction claimed."
         if self.verdict == "inside-noise":
@@ -90,15 +94,32 @@ def compare_paired(
     name_b: str,
     scores_b: Sequence[float],
     *,
-    higher_is_better: bool = True,
+    higher_is_better: bool | None = None,
+    quality_spec: MetricSpec | None = None,
 ) -> PairedComparison:
     """Compare two arms scored on the same items, in order.
 
+    ``quality_spec`` carries the axis name and direction. ``higher_is_better``
+    remains for callers that have not yet named a metric; it must not disagree
+    with ``quality_spec`` when both are passed.
+
     Raises:
-        ValueError: If the arms differ in length, or fewer than two items are
-            supplied — a standard error is undefined for one item, and reporting
-            a difference without one is the failure this module exists to stop.
+        ValueError: If the arms differ in length, fewer than two items are
+            supplied, or the direction flags disagree.
     """
+    if quality_spec is not None:
+        spec_higher = quality_spec.higher_is_better
+        if higher_is_better is not None and higher_is_better is not spec_higher:
+            raise ValueError(
+                f"higher_is_better={higher_is_better} disagrees with "
+                f"{quality_spec.name} ({quality_spec.direction.value})."
+            )
+        higher_is_better = spec_higher
+        metric_name = quality_spec.name
+    else:
+        if higher_is_better is None:
+            higher_is_better = True
+        metric_name = None
     if len(scores_a) != len(scores_b):
         raise ValueError(
             f"paired comparison needs the same items in both arms: "
@@ -120,4 +141,5 @@ def compare_paired(
         mean_difference=mean,
         standard_error=math.sqrt(variance / n),
         higher_is_better=higher_is_better,
+        quality_metric=metric_name,
     )
