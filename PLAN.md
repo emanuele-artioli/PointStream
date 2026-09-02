@@ -35,7 +35,7 @@ Target: **ACM TOMM, September 30. This is a hard deadline.**
 | Contracts, components, runner | ✅ on `main` | Keep stable; change only for the winning-regime search |
 | Conventional codec measurement | ✅ real bitstreams and calibrated metrics | Extend AV1/VVC curves into the ultra-low-rate range |
 | First-domain system result | ⚠️ loses: +90.97% BD-rate vs AV1, one video, two scenes, 8 frames/scene | Search low rate, long eligible scenes, and a lean payload |
-| Background reuse across scenes | ⚠️ works through 16 frames; longer scenes reveal incompatible canvas sizes | Build one canonical background canvas per compatible scene group |
+| Background reuse across scenes | Canonical canvas and context resets integrated; synthetic 48-frame runner smoke passes | Native-resolution E1 preflight; late-frame panning quality remains under investigation |
 | Generative reconstruction | ⚠️ no model beats the reference-image paste control | Park training until background and non-generative payload can win |
 | Component ablations | ⚠️ configurable but not yet run | Run a core component ablation matrix after a winning configuration is frozen |
 | Learned-codec baseline | ⬜ absent | Add DCVC-RT after the first-domain win is confirmed |
@@ -47,6 +47,10 @@ against AV1 and VVC. Encode and decode time stay in every report, but a slower
 win is sufficient for the first gate. Only then profile and optimize speed. The
 paper must call a slow configuration offline or compute-intensive; it may not
 call it live or real-time.
+
+**Integration status:** `plans/BP47-integration.md` tracks the consolidated
+BP44–BP46 branch and remaining checks. Gate A is not decided; no broad E1 batch
+has been launched. Confirmation data are incomplete, not fully verified.
 
 **Code.** `src/contracts/`, the components, the end-to-end runner, real coded
 rates, and the paired multi-scene ladder are merged on `main`. Ordinary CI is
@@ -60,8 +64,8 @@ every axis.
 
 **Quality measurement works, with one remaining experiment-layer repair.** VMAF,
 PSNR, SSIM and LPIPS have calibration checks, and BD-rate refuses inadequate
-curve overlap. The perceptual BD-rate path must still represent whether higher
-or lower metric values are better before LPIPS can support a claim.
+curve overlap. BP45 adds metric direction and native-axis overlap reporting;
+the integration checks are recorded in BP47 before these changes reach main.
 
 **Paper.** Introduction, Related Work, System Design and Future Work exist, but
 several visible claims describe intended rather than measured behavior. The

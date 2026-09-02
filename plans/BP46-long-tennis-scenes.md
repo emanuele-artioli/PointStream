@@ -98,7 +98,7 @@ All diagnostic deliverables specified in BP46 and ROADMAP.md D1 have been implem
 ### Confirmation Deficits (Honestly Reported)
 1. Match count: host provides 5 candidate tournament matches (`alcaraz_perricard`, `alcaraz_ruud`, `djokovic_federer`, `djokovic_zverev`, `sinner_alcaraz`), whereas the plan specifies 6 independent confirmation matches.
 2. `alcaraz_ruud`: annotated tracks only track 1 player at a time (0 simultaneous overlap), failing 2-player eligibility across all spans.
-3. 384-frame coverage: only 2 confirmation matches (`djokovic_zverev` [4 scenes], `sinner_alcaraz` [2 scenes], plus 1 scene in `djokovic_federer`) have eligible 384-frame footage; `alcaraz_perricard` track length is 372 < 384 frames.
+3. 384-frame coverage: the report lists 3 confirmation matches (`djokovic_zverev`, `sinner_alcaraz`, and `djokovic_federer`); counts must be taken from the current manifest. `alcaraz_perricard` track length is 372 < 384 frames.
 *Missing confirmation footage need not block the diagnostic search.*
 
 ### Verification Commands & Results

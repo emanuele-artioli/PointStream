@@ -7,9 +7,61 @@ a later session can resume without re-encoding.
 from __future__ import annotations
 
 import json
+import hashlib
+import subprocess
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import asdict, is_dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+import numpy as np
+
+
+def fingerprint(value: Any) -> str:
+    if is_dataclass(value) and not isinstance(value, type):
+        value = asdict(value)
+    return hashlib.sha256(json.dumps(value, sort_keys=True, default=str).encode()).hexdigest()
+
+
+def implementation_digest(root: Path | None = None) -> str:
+    root = root or Path(__file__).resolve().parents[2]
+    names = subprocess.check_output(
+        ["git", "ls-files", "--cached", "--others", "--exclude-standard", "--",
+         "src", "experiments", "config", "pyproject.toml"], cwd=root, text=True,
+    ).splitlines()
+    def digest(name: str) -> tuple[str, str]:
+        return name, hashlib.sha256((root / name).read_bytes()).hexdigest()
+    with ThreadPoolExecutor(max_workers=24) as pool:
+        return fingerprint(list(pool.map(digest, sorted(set(names)))))
+
+
+def source_identity(clips: list[Any]) -> list[dict[str, Any]]:
+    """Hash every decoded input frame, not just three manifest samples."""
+    return [
+        {"context_id": clip.context_id, "shape": list(clip.frames.shape),
+         "sha256": hashlib.sha256(np.ascontiguousarray(clip.frames).data).hexdigest()}
+        for clip in clips
+    ]
+
+
+def guard_checkpoints(directory: Path, identity: dict[str, Any]) -> None:
+    """Fail closed rather than relabel old points with the current configuration."""
+    path = directory / "identity.json"
+    expected = fingerprint(identity)
+    if path.is_file():
+        previous = json.loads(path.read_text())
+        if previous.get("fingerprint") != expected:
+            raise SystemExit("checkpoint identity changed; use a new output directory")
+    elif directory.exists() and any(directory.glob("*.json")):
+        raise SystemExit("unverified legacy checkpoints; use a new output directory")
+    else:
+        write_json(path, {"fingerprint": expected, "identity": identity})
+
+
+def completion_counts(rows: list[dict[str, Any]]) -> dict[str, int]:
+    succeeded = sum(bool((row.get("pointstream") or {}).get("usable")) for row in rows)
+    return {"submitted": len(rows), "succeeded": succeeded, "failed": len(rows) - succeeded}
 
 
 def save_checkpoint(directory: Path, name: str, payload: dict[str, Any]) -> Path:

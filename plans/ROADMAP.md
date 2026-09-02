@@ -6,6 +6,12 @@ session reads `AGENTS.md`, this file, and one named brief.
 
 Last replanned: **2 September 2026**, after BP31 and the 8/16-frame span result.
 
+Integration update: BP44–BP46 and their repairs are consolidated on
+`codex/bp44-bp46-integration`. See `BP47-integration.md` for validation and the
+remaining native-resolution preflight. No broad E1 wave has run; confirmation
+inputs remain incomplete. Earlier workstream reports describe their own commits,
+not the current integration acceptance state.
+
 ## 1. Submission thesis and non-negotiable core
 
 The paper keeps this core idea:

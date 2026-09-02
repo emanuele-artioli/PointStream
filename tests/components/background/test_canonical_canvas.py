@@ -318,9 +318,13 @@ class TestCanonicalStream:
             cfg.load({"background": {"method": BACKGROUND_PANORAMA_STREAM}})
         )
         stream_total = sum(len(streamed.transmit(plate).payload) for plate in plates)
-        independent = bind_background(
-            cfg.load({"background": {"method": BACKGROUND_PANORAMA_FULL, "codec": "png"}})
+        # Reset the same codec at each scene. Comparing against PNG instead
+        # asserts a codec ranking that changes across encoder builds.
+        independent_total = sum(
+            len(bind_background(
+                cfg.load({"background": {"method": BACKGROUND_PANORAMA_STREAM}})
+            ).transmit(plate).payload)
+            for plate in plates
         )
-        independent_total = sum(len(independent.transmit(plate).payload) for plate in plates)
         assert stream_total != independent_total
         assert stream_total < independent_total

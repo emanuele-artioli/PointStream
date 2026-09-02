@@ -1,5 +1,8 @@
 # BP45 M1 — session report
 
+Current integration status: see `BP47-integration.md`. The session report below
+is historical; its merge/run instructions are superseded by the integration gate.
+
 **Outcome:** complete for M1 (quality-axis typing and ultra-low anchor probe). E1 harness and the five call-site integration fixes are in the worktree; the 4K encode wave was not run. Gate A is not decided.
 
 **Roadmap:** M1 done. E1 search still needs D1 on the tree and B1 (canonical canvas) before a long-scene PointStream curve is evidence. Merging B1 does not activate the canvas; the sweep must set it and pass `context_ids`.

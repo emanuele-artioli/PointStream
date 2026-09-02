@@ -22,6 +22,7 @@ from typing import Any
 import numpy as np
 
 from experiments.tier.low_rate_checkpoint import load_checkpoint, save_checkpoint, write_json
+from experiments.tier.low_rate_checkpoint import guard_checkpoints, implementation_digest, source_identity
 from experiments.tier.low_rate_clips import (
     DEFAULT_SCENES,
     DEFAULT_SPAN_FRAMES,
@@ -361,6 +362,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--fps", type=float, default=DECLARED_FPS)
     parser.add_argument("--out-dir", default=None)
     args = parser.parse_args(argv)
+    if args.fps != DECLARED_FPS:
+        raise SystemExit("BP46 inputs and the PointStream runner require 24 fps")
 
     if not BOUNDS_PATH.is_file():
         raise SystemExit(f"{BOUNDS_PATH} does not exist. Bounds first.")
@@ -389,6 +392,10 @@ def main(argv: list[str] | None = None) -> int:
         points_dir = checkpoint_dir(dest)
         preset = primary_preset(codec, override=args.preset)
         qps = reference_qps(codec)
+        identity["source"] = source_identity(clips)
+        identity["preset"] = preset
+        identity["implementation"] = implementation_digest()
+        guard_checkpoints(points_dir, {"input": identity, "preset": preset, "qps": qps})
         print(f"{codec}: preset {preset}  qps {list(qps)}  {dest.name}", flush=True)
         curve = encode_reference_curve(
             clips,

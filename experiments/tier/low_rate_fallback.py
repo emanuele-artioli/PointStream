@@ -138,7 +138,12 @@ def run_fallback_control(
             "aligned fallback request does not equal the reference request. "
             "The control would not be testing the same codec."
         )
-    fb_trip = timed_roundtrip(source, request=fb_request, fps=fps)
+    from src.runner.fallback import deliver_fallback
+
+    config = replace(fallback, codec=codec, rate_control=RateControl.QP,
+                     rate=qp, preset=preset, pix_fmt="yuv420p")
+    delivery = deliver_fallback(source, config, route="conventional_fallback", fps=fps)
+    fb_trip = delivery.trip
     ref_trip = timed_roundtrip(source, request=ref_request, fps=fps)
     fb_row = _score_trip(source, fb_trip)
     ref_row = _score_trip(source, ref_trip)
@@ -152,6 +157,10 @@ def run_fallback_control(
         "fallback": fb_row,
         "reference": ref_row,
         "comparison": comparison,
+        "route": "conventional_fallback",
+        "routing_bytes": len(delivery.routing_header),
+        "transport_bytes": delivery.transport_bytes,
+        "comparison_scope": "codec payload; routing byte reported separately in transport_bytes",
     }
 
 

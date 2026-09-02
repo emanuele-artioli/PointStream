@@ -483,6 +483,10 @@ def test_measure_motion_and_panorama_static() -> None:
     assert pano.growth_factor == 1.0
 
 
+@pytest.mark.skipif(
+    __import__("os").environ.get("POINTSTREAM_DATA_TESTS") != "1",
+    reason="requires external YouTube-derived footage; set POINTSTREAM_DATA_TESTS=1",
+)
 def test_load_long_scene_clip_verified() -> None:
     from experiments.long_scenes.loader import LongSceneError, load_long_scene_clip
 
@@ -509,4 +513,15 @@ def test_load_long_scene_clip_verified() -> None:
     assert fallback_clip.is_eligible is False
     assert fallback_clip.route == "conventional_fallback"
     assert len(fallback_clip.failure_reasons) > 0
-
+    # Small-resolution smoke only: actual ineligible content and recorded route
+    # through the production fallback path, not a rate-quality comparison.
+    from src.runner.fallback import deliver_fallback
+    from src.contracts.config import FallbackConfig
+    from src.contracts.codecs import RateControl
+    source = np.ascontiguousarray(fallback_clip.frames[:, ::12, ::12])
+    delivered = deliver_fallback(
+        source, FallbackConfig(codec="av1", preset="0", rate_control=RateControl.QP, rate=63),
+        route=fallback_clip.route,
+    )
+    assert delivered.trip.frames.shape == source.shape
+    assert delivered.transport_bytes == delivered.trip.size_bytes + len(delivered.routing_header)

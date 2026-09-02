@@ -28,6 +28,9 @@ from experiments.tier.low_rate_canvas import (
     with_canonical_background,
 )
 from experiments.tier.low_rate_checkpoint import load_checkpoint, save_checkpoint, write_json
+from experiments.tier.low_rate_checkpoint import (
+    completion_counts, fingerprint, guard_checkpoints, implementation_digest, source_identity,
+)
 from experiments.tier.low_rate_clips import (
     DEFAULT_SCENES,
     DEFAULT_SPAN_FRAMES,
@@ -144,6 +147,8 @@ def pointstream_e1(clips: list[Any], config: PointstreamConfig) -> dict[str, Any
     wall = time.perf_counter() - started
     source = np.concatenate([np.asarray(clip.frames) for clip in clips], axis=0)
     delivered = result.delivered_frames
+    if delivered.shape != source.shape:
+        raise ValueError(f"PointStream delivered {delivered.shape}, expected {source.shape}")
     sizes = result.sizes
     total = int(sizes.transport_total)
     panorama = int(sizes.panorama)
@@ -251,6 +256,8 @@ def main(argv: list[str] | None = None) -> int:
         help="skip the conventional-fallback equivalence control",
     )
     args = parser.parse_args(argv)
+    if args.fps != DECLARED_FPS:
+        raise SystemExit("BP46 inputs and the PointStream runner require 24 fps")
 
     if not BOUNDS_PATH.is_file():
         raise SystemExit(f"{BOUNDS_PATH} does not exist. Bounds first.")
@@ -277,6 +284,15 @@ def main(argv: list[str] | None = None) -> int:
     context_ids = clip_context_ids(clips)
     base = load_tier(args.tier)
     preset = primary_preset(args.codec, override=args.preset)
+    identity["source"] = source_identity(clips)
+    identity["preset"] = preset
+    identity["implementation"] = implementation_digest()
+    guard_checkpoints(points_dir, {
+        "input": identity, "preset": preset, "config": fingerprint(base),
+        "plan": fingerprint([points_for(name) for name in stage_names()]),
+        "bounds": fingerprint(BOUNDS_PATH.read_text()),
+        "probe": fingerprint(PROBE_PATH.read_text()),
+    })
     rows: list[dict[str, Any]] = []
     category_notes: list[str] = []
     fallback_control: dict[str, Any] | None = None
@@ -310,6 +326,7 @@ def main(argv: list[str] | None = None) -> int:
             "fallback_control": fallback_control,
             "comparisons": comparisons,
             "rows": rows,
+            "completion": completion_counts(rows),
         }
 
     comparisons: dict[str, Any] = {}
@@ -397,7 +414,7 @@ def main(argv: list[str] | None = None) -> int:
 
     write_json(dest, _report())
     print(f"wrote {dest}", flush=True)
-    return 1 if category_notes else 0
+    return 1 if category_notes or completion_counts(rows)["failed"] or not rows else 0
 
 
 if __name__ == "__main__":

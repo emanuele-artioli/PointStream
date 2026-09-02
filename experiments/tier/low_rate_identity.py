@@ -20,6 +20,9 @@ IDENTITY_KEYS: tuple[str, ...] = (
     "frames_per_scene",
     "fps",
     "codec",
+    "source",
+    "implementation",
+    "preset",
 )
 
 

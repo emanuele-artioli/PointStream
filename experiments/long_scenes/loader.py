@@ -144,14 +144,9 @@ def load_long_scene_clip(
     all_pngs = sorted(extract_dir.glob("frame_*.png"))
     pngs = all_pngs[start_frame:end_frame]
     if len(pngs) != n_frames:
-        if allow_ineligible and len(all_pngs) >= n_frames:
-            pngs = all_pngs[:n_frames]
-        elif allow_ineligible and len(all_pngs) > 0:
-            pngs = all_pngs
-        else:
-            raise LongSceneError(
-                f"{video}/{scene} found {len(pngs)} frames in [{start_frame}:{end_frame}], expected {n_frames}"
-            )
+        raise LongSceneError(
+            f"{video}/{scene} found {len(pngs)} frames in [{start_frame}:{end_frame}], expected {n_frames}"
+        )
 
     frames = load_rgb_stack(pngs)
     actual_frames = len(frames)
@@ -204,7 +199,7 @@ def load_long_scene_clip(
     if mae > PASTE_MAE_MAX and not allow_ineligible:
         raise LongSceneError(f"{video}/{scene}: paste-back MAE {mae:.3f} > {PASTE_MAE_MAX}")
 
-    route = str(scene_record.get("eligibility", {}).get("route", "pointstream" if is_eligible else "conventional_fallback"))
+    route = "pointstream" if is_eligible else "conventional_fallback"
 
     return LongSceneClip(
         video=video,

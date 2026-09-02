@@ -101,6 +101,9 @@ Follow `plans/SESSION-REPORT.md`. Include calibration, codec floors, every
 curve and overlap, size/quality/encode/decode time, byte ledgers, alarms, failed
 points, exact commands and the Gate-A decision.
 
+**Current integration status:** `BP47-integration.md` supersedes the "Next"
+instructions and completion wording in the historical reports below.
+
 ## Delivered (M1, 2026-09-02)
 
 **Outcome: complete for M1.** Quality-axis typing and the ultra-low AV1/VVC
