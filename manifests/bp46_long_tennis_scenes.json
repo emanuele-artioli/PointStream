@@ -1,0 +1,2223 @@
+{
+  "schema": "pointstream.long_scenes.v1",
+  "created_utc": "2026-09-02T16:58:52.476570+00:00",
+  "source_data_root": "/home/itec/emanuele/pointstream-data",
+  "target_spans": [
+    48,
+    96,
+    192,
+    384
+  ],
+  "diagnostic_videos": [
+    "alcaraz_highlights",
+    "federer_djokovic"
+  ],
+  "confirmation_videos": [
+    "alcaraz_perricard",
+    "alcaraz_ruud",
+    "djokovic_federer",
+    "djokovic_zverev",
+    "federer_djokovic",
+    "sinner_alcaraz"
+  ],
+  "ineligible_controls": [
+    "alcaraz_highlights/scene_006"
+  ],
+  "summary": {
+    "submitted_scenes": 20,
+    "pointstream_eligible_scenes": 19,
+    "conventional_fallback_scenes": 1,
+    "succeeded_by_span": {
+      "48_frames": 19,
+      "96_frames": 18,
+      "192_frames": 16,
+      "384_frames": 10
+    },
+    "failed_by_span": {
+      "48_frames": 1,
+      "96_frames": 2,
+      "192_frames": 4,
+      "384_frames": 10
+    }
+  },
+  "scenes": [
+    {
+      "video": "alcaraz_highlights",
+      "scene": "scene_000",
+      "t_start": 0.0,
+      "t_end": 18.068056,
+      "duration": 18.068,
+      "cluster": "cluster_point",
+      "context_id": "alcaraz_highlights_main_court",
+      "role": "diagnostic_near_static",
+      "source_metadata": {
+        "video_file": "alcaraz_highlights.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 59.9401,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "af92ede5c64cc9070b4242020ac3c294cbb4a47b6dc243922929dc5367f0dab2"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 434,
+        "camera_motion": {
+          "consecutive_mad": 0.34,
+          "vs_first_frame_mad": 1.329,
+          "last_vs_first_mad": 1.591
+        },
+        "panorama": {
+          "canvas_width": 3841,
+          "canvas_height": 2161,
+          "growth_factor": 1.001,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.0051,
+          "min_separation_px": 951.7,
+          "has_occlusion": false,
+          "track_continuity": false
+        },
+        "paste_back": {
+          "convention": "extract_24_frame_id",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 29,
+          "end_frame": 77,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "0593a996f39279bc1926145911ba45a2b1c23fa5ac2777b9a0c9c6517486d785",
+            "mid": "8551ab5eed6318b382d5dfde396393bf92684f7a93431acfcf3887eee133dc08",
+            "last": "c2bd79f0919bd0d4949d3d63b01f2ebf390011078dc9b24dd23c6100ffbf9210"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 29,
+          "end_frame": 125,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "0593a996f39279bc1926145911ba45a2b1c23fa5ac2777b9a0c9c6517486d785",
+            "mid": "438a619d80a8e1bb4fa97b5c20d3ea3f3980139c465aa7ed815a9a5d078240ec",
+            "last": "8b0fa26555f78854955e5cfc9ea2565e0620b80ce259f250b94df4b0e737147e"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 29,
+          "end_frame": 221,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "0593a996f39279bc1926145911ba45a2b1c23fa5ac2777b9a0c9c6517486d785",
+            "mid": "2fb05dfe2ab91c1c2ed24d6337ab900cbd90b397856b233bbc266d2b8f0d2e5d",
+            "last": "60f67aea30e54917aff1fad11cc5b64c7dacb23a5cb82fd52b292e636ef01193"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 29,
+          "end_frame": 413,
+          "status": "insufficient_duration",
+          "frame_hashes": {},
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": [
+            "track frames 246 < 384"
+          ]
+        }
+      }
+    },
+    {
+      "video": "alcaraz_highlights",
+      "scene": "scene_028",
+      "t_start": 160.210056,
+      "t_end": 179.195689,
+      "duration": 18.986,
+      "cluster": "cluster_point",
+      "context_id": "alcaraz_highlights_main_court",
+      "role": "diagnostic_near_static",
+      "source_metadata": {
+        "video_file": "alcaraz_highlights.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 59.9401,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "af92ede5c64cc9070b4242020ac3c294cbb4a47b6dc243922929dc5367f0dab2"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 456,
+        "camera_motion": {
+          "consecutive_mad": 0.335,
+          "vs_first_frame_mad": 1.55,
+          "last_vs_first_mad": 1.784
+        },
+        "panorama": {
+          "canvas_width": 3841,
+          "canvas_height": 2161,
+          "growth_factor": 1.001,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.00575,
+          "min_separation_px": 1133.4,
+          "has_occlusion": false,
+          "track_continuity": true
+        },
+        "paste_back": {
+          "convention": "extract_24_position",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 72,
+          "end_frame": 120,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "9eaebf2bcc5dd60da3ccee0e899bc46c666fbf04e8697038ab03261668417e25",
+            "mid": "0c9d0d85d7c7d37dcb1c9dc0daa294d270b0d7ca947017924aeebc605041d529",
+            "last": "3f0c46e8545dbac5be64324de90f853e20f4877ecdc3132cebf0f0ddf350e553"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 72,
+          "end_frame": 168,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "9eaebf2bcc5dd60da3ccee0e899bc46c666fbf04e8697038ab03261668417e25",
+            "mid": "5fadb37b465bae06f741ac90eba81c9414e6d66c4f09596dbd9deb5a46db7a9a",
+            "last": "bb536c985424f29f76106d07d80861a07f96e0e28b6fdae45c1a82bcb6c116b5"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 72,
+          "end_frame": 264,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "9eaebf2bcc5dd60da3ccee0e899bc46c666fbf04e8697038ab03261668417e25",
+            "mid": "c911c52055c7150be136615b9b3ee555f90fb36227aa2ae02e9d5f86bbf42c88",
+            "last": "ce0882673d4c86ca42e15bd286222b11b056cfcdea9a5a2ea0b800310bd989aa"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 72,
+          "end_frame": 456,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "9eaebf2bcc5dd60da3ccee0e899bc46c666fbf04e8697038ab03261668417e25",
+            "mid": "e1df05a232368a4c7d73d5743fd3851666794d8968ae577579b9fb4dc7911e7d",
+            "last": "afed641f4a2e27fbb9b94a36c68f88ff8e3d07e2f53a274d437e5f1382832e3c"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        }
+      }
+    },
+    {
+      "video": "alcaraz_highlights",
+      "scene": "scene_010",
+      "t_start": 50.366989,
+      "t_end": 60.894167,
+      "duration": 10.527,
+      "cluster": "cluster_point",
+      "context_id": "alcaraz_highlights_main_court",
+      "role": "diagnostic_near_static",
+      "source_metadata": {
+        "video_file": "alcaraz_highlights.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 59.9401,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "af92ede5c64cc9070b4242020ac3c294cbb4a47b6dc243922929dc5367f0dab2"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 253,
+        "camera_motion": {
+          "consecutive_mad": 3.549,
+          "vs_first_frame_mad": 11.266,
+          "last_vs_first_mad": 18.927
+        },
+        "panorama": {
+          "canvas_width": 3928,
+          "canvas_height": 2193,
+          "growth_factor": 1.039,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.00662,
+          "min_separation_px": 1811.9,
+          "has_occlusion": false,
+          "track_continuity": true
+        },
+        "paste_back": {
+          "convention": "extract_24_frame_id",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 0,
+          "end_frame": 48,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "8a1d5d2f326edee83d8a9a8771886b328efeca3b253d503679974a4458a6e136",
+            "mid": "1a96944e3594c2a26315225550ff4e4a33b6437bcbfc24a7d533b4624d657a2f",
+            "last": "c0f4d51f28f4485a6fd0b8031175d4a2a40dbdbec68b36cd25ad80ed2a65d52a"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.039,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 0,
+          "end_frame": 96,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "8a1d5d2f326edee83d8a9a8771886b328efeca3b253d503679974a4458a6e136",
+            "mid": "52a2ae6e7ab69fea841621b178706e86a458bc10dbec8fa1a54df7dfc5e40f60",
+            "last": "93116261ef9f8c03a768ddb0fd5d74e9a8eb30cd749e605fe331c2c039110796"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.039,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 0,
+          "end_frame": 192,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "8a1d5d2f326edee83d8a9a8771886b328efeca3b253d503679974a4458a6e136",
+            "mid": "2de4454960a879b2a0605bb2fada952f0c3a9fc0569be66963338f92e0008261",
+            "last": "99b8fcda99e4700aae0d9c18c9a57e8e958792c339fd36f2ad837622a364a3ad"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.039,
+          "failure_reasons": []
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 0,
+          "end_frame": 253,
+          "status": "insufficient_duration",
+          "frame_hashes": {},
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.039,
+          "failure_reasons": [
+            "source frames 253 < 384",
+            "track frames 226 < 384"
+          ]
+        }
+      }
+    },
+    {
+      "video": "federer_djokovic",
+      "scene": "scene_001",
+      "t_start": 28.445089,
+      "t_end": 43.460089,
+      "duration": 15.015,
+      "cluster": "cluster_point",
+      "context_id": "federer_djokovic_main_court",
+      "role": "diagnostic_smooth_pan",
+      "source_metadata": {
+        "video_file": "federer_djokovic.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 59.9401,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "eff85ffb73cd980e97d20a3cbb939bfd748d74a6974a995dbb956a72947e0c65"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 361,
+        "camera_motion": {
+          "consecutive_mad": 1.849,
+          "vs_first_frame_mad": 10.162,
+          "last_vs_first_mad": 19.417
+        },
+        "panorama": {
+          "canvas_width": 3884,
+          "canvas_height": 2175,
+          "growth_factor": 1.018,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.00132,
+          "min_separation_px": 0.0,
+          "has_occlusion": false,
+          "track_continuity": false
+        },
+        "paste_back": {
+          "convention": "extract_24_frame_id",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 0,
+          "end_frame": 48,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "897595064f5278317dc0027f256b35424238080f997af5281ed4d6946f753f73",
+            "mid": "9c2df67d7c7bb86349aaf30d35b1e24c4140b5d0a0259777fd6e45d049e172d2",
+            "last": "e80c170b39fd63f4c15cc0bd9c6ca75c11547e59e4f534d99778f740ca76d300"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.018,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 0,
+          "end_frame": 96,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "897595064f5278317dc0027f256b35424238080f997af5281ed4d6946f753f73",
+            "mid": "5b4c4c00d301ff55bb162ca98baeebdc83515ede2b3b9f6e7fcedff80c943888",
+            "last": "9eb87de3b386cfe30fa3c38a122aeae594ebe7dcaea590563ac00e6be55e6463"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.018,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 0,
+          "end_frame": 192,
+          "status": "insufficient_duration",
+          "frame_hashes": {},
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.018,
+          "failure_reasons": [
+            "track frames 118 < 192"
+          ]
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 0,
+          "end_frame": 361,
+          "status": "insufficient_duration",
+          "frame_hashes": {},
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.018,
+          "failure_reasons": [
+            "source frames 361 < 384",
+            "track frames 118 < 384"
+          ]
+        }
+      }
+    },
+    {
+      "video": "federer_djokovic",
+      "scene": "scene_003",
+      "t_start": 54.220833,
+      "t_end": 58.6586,
+      "duration": 4.438,
+      "cluster": "cluster_point",
+      "context_id": "federer_djokovic_main_court",
+      "role": "diagnostic_smooth_pan",
+      "source_metadata": {
+        "video_file": "federer_djokovic.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 59.9401,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "eff85ffb73cd980e97d20a3cbb939bfd748d74a6974a995dbb956a72947e0c65"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 107,
+        "camera_motion": {
+          "consecutive_mad": 1.868,
+          "vs_first_frame_mad": 7.7,
+          "last_vs_first_mad": 13.601
+        },
+        "panorama": {
+          "canvas_width": 3868,
+          "canvas_height": 2162,
+          "growth_factor": 1.008,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.00554,
+          "min_separation_px": 1521.5,
+          "has_occlusion": false,
+          "track_continuity": false
+        },
+        "paste_back": {
+          "convention": "extract_24_frame_id",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 0,
+          "end_frame": 48,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "86d4de18144b5757504aef224f5f85869d7d8cab16108bc4f78d2d193fe93f66",
+            "mid": "e69cc5c5b702be2a4866f283ffdfe3b1a300432c7fbcc3aa8f77782ba2307c8d",
+            "last": "44b4e1e2925ec98036daaeabc9abdc71fc68079813682f6da33585e6ba8b34a1"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.008,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 0,
+          "end_frame": 96,
+          "status": "insufficient_duration",
+          "frame_hashes": {},
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.008,
+          "failure_reasons": [
+            "track frames 85 < 96"
+          ]
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 0,
+          "end_frame": 107,
+          "status": "insufficient_duration",
+          "frame_hashes": {},
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.008,
+          "failure_reasons": [
+            "source frames 107 < 192",
+            "track frames 85 < 192"
+          ]
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 0,
+          "end_frame": 107,
+          "status": "insufficient_duration",
+          "frame_hashes": {},
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.008,
+          "failure_reasons": [
+            "source frames 107 < 384",
+            "track frames 85 < 384"
+          ]
+        }
+      }
+    },
+    {
+      "video": "federer_djokovic",
+      "scene": "scene_007",
+      "t_start": 80.7807,
+      "t_end": 97.664233,
+      "duration": 16.884,
+      "cluster": "cluster_point",
+      "context_id": "federer_djokovic_main_court",
+      "role": "confirmation",
+      "source_metadata": {
+        "video_file": "federer_djokovic.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 59.9401,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "eff85ffb73cd980e97d20a3cbb939bfd748d74a6974a995dbb956a72947e0c65"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 406,
+        "camera_motion": {
+          "consecutive_mad": 2.896,
+          "vs_first_frame_mad": 12.845,
+          "last_vs_first_mad": 19.392
+        },
+        "panorama": {
+          "canvas_width": 3925,
+          "canvas_height": 2182,
+          "growth_factor": 1.033,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.00289,
+          "min_separation_px": 1219.5,
+          "has_occlusion": false,
+          "track_continuity": false
+        },
+        "paste_back": {
+          "convention": "extract_24_frame_id",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 22,
+          "end_frame": 70,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "46055ca6f89d38fa0753f4153904b74590932fd10d12693e49e0a0c6d523e435",
+            "mid": "a423e01e4b29b8d4b83def7676e3227fa2242e2dfaf160448df833dd9b307e77",
+            "last": "52caafab9fafef92e134255dbe7aa822b4bec136ad2b10823c802adfe283df8f"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.033,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 22,
+          "end_frame": 118,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "46055ca6f89d38fa0753f4153904b74590932fd10d12693e49e0a0c6d523e435",
+            "mid": "dfaad521738e7ed29d82752dc6059d31d0795b0720ba2f577cbcc64fe6c93666",
+            "last": "dfe262a539f7f1f322e5d270f738da7660d885f4e1ed10845ee7e7e42ffca676"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.033,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 22,
+          "end_frame": 214,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "46055ca6f89d38fa0753f4153904b74590932fd10d12693e49e0a0c6d523e435",
+            "mid": "81baff1b11aeb87a9daff020b45ffa8c0a22944218d2b6abac27e422d57ade92",
+            "last": "84c1e316275cfa004ad44aef1190502df31c401adb579cc27ad2232e8e484f42"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.033,
+          "failure_reasons": []
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 22,
+          "end_frame": 406,
+          "status": "insufficient_duration",
+          "frame_hashes": {},
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.033,
+          "failure_reasons": [
+            "track frames 345 < 384"
+          ]
+        }
+      }
+    },
+    {
+      "video": "alcaraz_perricard",
+      "scene": "scene_002",
+      "t_start": 68.852122,
+      "t_end": 83.266522,
+      "duration": 14.414,
+      "cluster": "cluster_point",
+      "context_id": "alcaraz_perricard_main_court",
+      "role": "confirmation",
+      "source_metadata": {
+        "video_file": "alcaraz_perricard.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 59.9401,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "a4b2b7139a17cb9e70f8683fbb9a488058284585fe74c2bf8610b34618f26fc9"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 346,
+        "camera_motion": {
+          "consecutive_mad": 2.484,
+          "vs_first_frame_mad": 11.551,
+          "last_vs_first_mad": 19.244
+        },
+        "panorama": {
+          "canvas_width": 3869,
+          "canvas_height": 2209,
+          "growth_factor": 1.03,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.02992,
+          "min_separation_px": 2198.9,
+          "has_occlusion": false,
+          "track_continuity": true
+        },
+        "paste_back": {
+          "convention": "extract_24_frame_id",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 0,
+          "end_frame": 48,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "5d62ae09663c126b61e1dc5538ced05868f668f5d4268525eb67b9a726900e2a",
+            "mid": "7a27b4a75587680196b921b931ee5921fc0efea6df328a67c4565054ac0a7df1",
+            "last": "aabdc5d0d043a588cb4eff548e1db403e1ecedb75f282305ddfeea87c2c2be6b"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.03,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 0,
+          "end_frame": 96,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "5d62ae09663c126b61e1dc5538ced05868f668f5d4268525eb67b9a726900e2a",
+            "mid": "b709e4139223c672bcb115b30b69eb59fb088eed8939173407e4d4872214df7c",
+            "last": "b1690c1cdc9bf3c9bec9d154530ea08b61b78961b366d9e146a120b26eef33bb"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.03,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 0,
+          "end_frame": 192,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "5d62ae09663c126b61e1dc5538ced05868f668f5d4268525eb67b9a726900e2a",
+            "mid": "8c2ae6e90d4ccd5efaec79420d8cf5cb28d60e330ecc1dca5f0105fd50079f94",
+            "last": "9ef147405903c65e562c9beff63711862cbcf76ba9bb41c03d729ebd1a917edf"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.03,
+          "failure_reasons": []
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 0,
+          "end_frame": 346,
+          "status": "insufficient_duration",
+          "frame_hashes": {},
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.03,
+          "failure_reasons": [
+            "source frames 346 < 384",
+            "track frames 323 < 384"
+          ]
+        }
+      }
+    },
+    {
+      "video": "alcaraz_perricard",
+      "scene": "scene_004",
+      "t_start": 94.928167,
+      "t_end": 112.796022,
+      "duration": 17.868,
+      "cluster": "cluster_point",
+      "context_id": "alcaraz_perricard_main_court",
+      "role": "confirmation",
+      "source_metadata": {
+        "video_file": "alcaraz_perricard.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 59.9401,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "a4b2b7139a17cb9e70f8683fbb9a488058284585fe74c2bf8610b34618f26fc9"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 429,
+        "camera_motion": {
+          "consecutive_mad": 2.659,
+          "vs_first_frame_mad": 11.956,
+          "last_vs_first_mad": 17.637
+        },
+        "panorama": {
+          "canvas_width": 3861,
+          "canvas_height": 2170,
+          "growth_factor": 1.01,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.00643,
+          "min_separation_px": 710.9,
+          "has_occlusion": false,
+          "track_continuity": false
+        },
+        "paste_back": {
+          "convention": "extract_24_frame_id",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 45,
+          "end_frame": 93,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "dac820d12bc19e0150c023fdd95d79c1ba13b3649d773c303e76b5651e569c34",
+            "mid": "25bbe19646a97f5fef1ce3dc4a0ec8c1a3c41b5cddec1c589abc18f33592f2c5",
+            "last": "e3a75a9db985c78d72f27793c884baaa7ddb6dbf28cc8575393d99f228a46af7"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.01,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 45,
+          "end_frame": 141,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "dac820d12bc19e0150c023fdd95d79c1ba13b3649d773c303e76b5651e569c34",
+            "mid": "cfb2fefcba2153eab83afe6d3c49df80f7421fc38a6fbc3d67b9d910212b2d5a",
+            "last": "2225809cb2b07ee8bbc9417f47e1023d8b3551bad24777cedefe087e3741bc39"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.01,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 45,
+          "end_frame": 237,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "dac820d12bc19e0150c023fdd95d79c1ba13b3649d773c303e76b5651e569c34",
+            "mid": "0cdc4804673ae6873722478e13237f1cc1c12a791fea7f060d096291e7d0e733",
+            "last": "1fceae7d5c63d3ea38a5020dc0bdb235d09fddba30a2b3d1aea3d49274b6feae"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.01,
+          "failure_reasons": []
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 45,
+          "end_frame": 429,
+          "status": "insufficient_duration",
+          "frame_hashes": {},
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.01,
+          "failure_reasons": [
+            "track frames 372 < 384"
+          ]
+        }
+      }
+    },
+    {
+      "video": "alcaraz_ruud",
+      "scene": "scene_002",
+      "t_start": 8.758756,
+      "t_end": 211.461256,
+      "duration": 202.702,
+      "cluster": "cluster_point",
+      "context_id": "alcaraz_ruud_main_court",
+      "role": "confirmation",
+      "source_metadata": {
+        "video_file": "alcaraz_ruud.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 59.9401,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "d0542c941ec3e3ee3df8145759b1135891495761527d7540f4ef64f334c7fc8e"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 4865,
+        "camera_motion": {
+          "consecutive_mad": 4.625,
+          "vs_first_frame_mad": 16.1,
+          "last_vs_first_mad": 25.587
+        },
+        "panorama": {
+          "canvas_width": 3888,
+          "canvas_height": 2235,
+          "growth_factor": 1.048,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.00282,
+          "min_separation_px": 0.0,
+          "has_occlusion": false,
+          "track_continuity": false
+        },
+        "paste_back": {
+          "convention": "extract_24_frame_id",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 545,
+          "end_frame": 593,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "a7cdc9070a47202cbc04b6f43b1eed79ecdedfea2cc826cec2bf2188c3e930a5",
+            "mid": "6718f9b1025b583bb9d3e6cdad8dc624c8bf2b97a1c0f7bc7bbdef43355a3283",
+            "last": "6d16f145eef137795263d58caecef76cca390d6a3d15400cd906b1386d864ae5"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.048,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 545,
+          "end_frame": 641,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "a7cdc9070a47202cbc04b6f43b1eed79ecdedfea2cc826cec2bf2188c3e930a5",
+            "mid": "0a87037d5c24b7e288534ea18cf6d7534aab0dc5f1401918549d9efbb1775b0b",
+            "last": "5c931ede6140d76cbba669e085f2de87ff7be5ad896aacff95c9b4fd4f0e34c6"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.048,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 545,
+          "end_frame": 737,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "a7cdc9070a47202cbc04b6f43b1eed79ecdedfea2cc826cec2bf2188c3e930a5",
+            "mid": "5663075a4eafca2ba20c8c9993827b865dd6657e4de45ff298fe60157c1b9ed3",
+            "last": "1895f817987b38787887cf3f5f1cba7e66e486b9ee0b418835453b49e1978faa"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.048,
+          "failure_reasons": []
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 545,
+          "end_frame": 929,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "a7cdc9070a47202cbc04b6f43b1eed79ecdedfea2cc826cec2bf2188c3e930a5",
+            "mid": "2f21810c247b1f5c2539fe5f4f3383696bcc30b3a38f29df4d7d77b050062189",
+            "last": "50173a92e554e2038a9353d42adde6dc53501947dc430a797aee5259c2497f42"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.048,
+          "failure_reasons": []
+        }
+      }
+    },
+    {
+      "video": "alcaraz_ruud",
+      "scene": "scene_004",
+      "t_start": 582.031456,
+      "t_end": 702.668633,
+      "duration": 120.637,
+      "cluster": "cluster_point",
+      "context_id": "alcaraz_ruud_main_court",
+      "role": "confirmation",
+      "source_metadata": {
+        "video_file": "alcaraz_ruud.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 59.9401,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "d0542c941ec3e3ee3df8145759b1135891495761527d7540f4ef64f334c7fc8e"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 2896,
+        "camera_motion": {
+          "consecutive_mad": 3.31,
+          "vs_first_frame_mad": 13.643,
+          "last_vs_first_mad": 19.715
+        },
+        "panorama": {
+          "canvas_width": 3860,
+          "canvas_height": 2204,
+          "growth_factor": 1.026,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.00261,
+          "min_separation_px": 0.0,
+          "has_occlusion": false,
+          "track_continuity": false
+        },
+        "paste_back": {
+          "convention": "extract_24_frame_id",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 1811,
+          "end_frame": 1859,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "009fbed2dd862f687759100104e086c9df2b8a13916f283eb7739f8c3d0754be",
+            "mid": "1f36478ea7783bfcbe41969ddb5e5f828c089794de0c2ebd52617f483afd50a3",
+            "last": "859170ff159571ea1a013bd3ad4b9afbac50c1bd33e2f9c57bd19b1070064b01"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.026,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 1811,
+          "end_frame": 1907,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "009fbed2dd862f687759100104e086c9df2b8a13916f283eb7739f8c3d0754be",
+            "mid": "ada3b84b7ac09b33dd538a3ae6e059fb9fc81aaa7a4c6d70f44bd81329524176",
+            "last": "20a49c1dacd08a00086121c5af2a5efe62807e2b248214e38c5a1dee68ccead5"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.026,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 1811,
+          "end_frame": 2003,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "009fbed2dd862f687759100104e086c9df2b8a13916f283eb7739f8c3d0754be",
+            "mid": "1a020371daadc80a70574942d66b0b0b9f33052e036995256affaf102aaed115",
+            "last": "398e8c60a5da6aed446885a47cd1affcec85a7fe0ad55584c78cb2c8facd95b9"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.026,
+          "failure_reasons": []
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 1811,
+          "end_frame": 2195,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "009fbed2dd862f687759100104e086c9df2b8a13916f283eb7739f8c3d0754be",
+            "mid": "38baeed7968397aa5758721fecf588df79af954d14502f1c53dd756fe5d022ee",
+            "last": "a57a613ffee2eb050ded2e5cffeb279d3f79624f9191b0ff2dcced265e31c4ec"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.026,
+          "failure_reasons": []
+        }
+      }
+    },
+    {
+      "video": "djokovic_federer",
+      "scene": "scene_003",
+      "t_start": 19.4,
+      "t_end": 45.64,
+      "duration": 26.24,
+      "cluster": "cluster_point",
+      "context_id": "djokovic_federer_main_court",
+      "role": "confirmation",
+      "source_metadata": {
+        "video_file": "djokovic_federer.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 50.0,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "b093d5635ceaaad0188bf79ed655fdf427ce9ea53287bb916d048a648f7c5e2a"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 630,
+        "camera_motion": {
+          "consecutive_mad": 6.93,
+          "vs_first_frame_mad": 28.473,
+          "last_vs_first_mad": 35.169
+        },
+        "panorama": {
+          "canvas_width": 4087,
+          "canvas_height": 2367,
+          "growth_factor": 1.166,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.00654,
+          "min_separation_px": 1390.6,
+          "has_occlusion": false,
+          "track_continuity": true
+        },
+        "paste_back": {
+          "convention": "extract_24_frame_id",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 246,
+          "end_frame": 294,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "72ecec367f553fabc2ad455f84057c64c173546ad9d40bd030fe9441fad74c9c",
+            "mid": "8451cb0174960f5ffc4975608b6a452a35a94ad3f308eb8ce44b74886cad84a7",
+            "last": "9c0bd80bf3f416b65a90f50fb381e7766c633de6bf1c2961c781ed0f0215fa6e"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.166,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 246,
+          "end_frame": 342,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "72ecec367f553fabc2ad455f84057c64c173546ad9d40bd030fe9441fad74c9c",
+            "mid": "0af8dde4ef2d0b8a345d6f5fd1706335fe1a853acf8fa130efff2aad7e7f02d2",
+            "last": "6ce1c48c28c21b28208a0eaf1414c6e11b78f50c35b199dfc95bd2e0778861ef"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.166,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 246,
+          "end_frame": 438,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "72ecec367f553fabc2ad455f84057c64c173546ad9d40bd030fe9441fad74c9c",
+            "mid": "f9eb6a8f23139af24af89ca0279d34f86b7199c3e1bece5b19f7b52606e41606",
+            "last": "761e011f866d50569cae6fc05aeda4bb2bcc9836a81d1fb43a0752bfe3086bbb"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.166,
+          "failure_reasons": []
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 246,
+          "end_frame": 630,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "72ecec367f553fabc2ad455f84057c64c173546ad9d40bd030fe9441fad74c9c",
+            "mid": "2d9842c4e165e3a77316deaab45cf795849aa898bcbdfcf29bf5f24fa6ae7294",
+            "last": "080209125c8a7c6589c189c87721b41427c495dd77b33883f4da35e68d86dbc4"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.166,
+          "failure_reasons": []
+        }
+      }
+    },
+    {
+      "video": "djokovic_federer",
+      "scene": "scene_015",
+      "t_start": 110.26,
+      "t_end": 136.74,
+      "duration": 26.48,
+      "cluster": "cluster_point",
+      "context_id": "djokovic_federer_main_court",
+      "role": "confirmation",
+      "source_metadata": {
+        "video_file": "djokovic_federer.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 50.0,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "b093d5635ceaaad0188bf79ed655fdf427ce9ea53287bb916d048a648f7c5e2a"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 636,
+        "camera_motion": {
+          "consecutive_mad": 0.737,
+          "vs_first_frame_mad": 3.614,
+          "last_vs_first_mad": 5.38
+        },
+        "panorama": {
+          "canvas_width": 3860,
+          "canvas_height": 2170,
+          "growth_factor": 1.01,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.01102,
+          "min_separation_px": 1524.4,
+          "has_occlusion": false,
+          "track_continuity": true
+        },
+        "paste_back": {
+          "convention": "extract_24_frame_id",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 252,
+          "end_frame": 300,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "b1ee913ddecc466968da811cbac810d4f265b4474537a257b219fd8da5304ac1",
+            "mid": "faf693b17727862c649a2455baadb091f32ba6e56ce8d42ee14db9a73b3cbe74",
+            "last": "2a6bcd39b14ff63a4cccba102693bac43e1adb6e399c412c2a3785cf028cf808"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.01,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 252,
+          "end_frame": 348,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "b1ee913ddecc466968da811cbac810d4f265b4474537a257b219fd8da5304ac1",
+            "mid": "42a1b6fbb3b5b6d046df569aa6ee370fb3ff6ec2ac73d7bb98c6e288f8b80bfe",
+            "last": "2075a34fb50a2d35fd3d26ad7914fb32c3d3a746c13ee4a4e524c8fa8c6b08a8"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.01,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 252,
+          "end_frame": 444,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "b1ee913ddecc466968da811cbac810d4f265b4474537a257b219fd8da5304ac1",
+            "mid": "b46c003f9cac647733eee752ba59222e6b9ec6b9621af81bab786e20d6ff5af0",
+            "last": "c9b1632098c7e788961c96af2552997122b8db78a4f7e2f28a217c31614a2f52"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.01,
+          "failure_reasons": []
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 252,
+          "end_frame": 636,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "b1ee913ddecc466968da811cbac810d4f265b4474537a257b219fd8da5304ac1",
+            "mid": "6673b9d1fdba532fb5524230cfdcc01336766a6d45d55ab2eb9e8b71b26b3263",
+            "last": "15b33947cf980c5ab89773000d74d3b875dd1776d754b7116fe1d04b9a28e9e7"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.01,
+          "failure_reasons": []
+        }
+      }
+    },
+    {
+      "video": "djokovic_federer",
+      "scene": "scene_020",
+      "t_start": 161.3,
+      "t_end": 180.06,
+      "duration": 18.76,
+      "cluster": "cluster_point",
+      "context_id": "djokovic_federer_main_court",
+      "role": "confirmation",
+      "source_metadata": {
+        "video_file": "djokovic_federer.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 50.0,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "b093d5635ceaaad0188bf79ed655fdf427ce9ea53287bb916d048a648f7c5e2a"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 451,
+        "camera_motion": {
+          "consecutive_mad": 0.684,
+          "vs_first_frame_mad": 2.898,
+          "last_vs_first_mad": 3.432
+        },
+        "panorama": {
+          "canvas_width": 3841,
+          "canvas_height": 2161,
+          "growth_factor": 1.001,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.00162,
+          "min_separation_px": 0.0,
+          "has_occlusion": false,
+          "track_continuity": false
+        },
+        "paste_back": {
+          "convention": "extract_24_frame_id",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 67,
+          "end_frame": 115,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "ab8a7ca2ed2554fd670f21b1afdbaec9a8087d991c9c99a8c0e6ddc46791ba76",
+            "mid": "3b369128aaf69c4c12d6277def15d7614149d90f8a3264ab231523eb9eb8c00a",
+            "last": "6264e62663caea9a2380ddddb64b15d4ce09a7a0c5273d39b78ea4dbd9915600"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 67,
+          "end_frame": 163,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "ab8a7ca2ed2554fd670f21b1afdbaec9a8087d991c9c99a8c0e6ddc46791ba76",
+            "mid": "ffab28e5ae83ab5d14f11d9b43ce07c69aac8f5731f7d48677c05933a9a532be",
+            "last": "897f554881badcfc74251ec06314deb2711937ea5b6a7486217e7e40675acf80"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 67,
+          "end_frame": 259,
+          "status": "insufficient_duration",
+          "frame_hashes": {},
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": [
+            "track frames 190 < 192"
+          ]
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 67,
+          "end_frame": 451,
+          "status": "insufficient_duration",
+          "frame_hashes": {},
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": [
+            "track frames 190 < 384"
+          ]
+        }
+      }
+    },
+    {
+      "video": "djokovic_zverev",
+      "scene": "scene_003",
+      "t_start": 139.5,
+      "t_end": 187.666667,
+      "duration": 48.167,
+      "cluster": "cluster_point",
+      "context_id": "djokovic_zverev_main_court",
+      "role": "confirmation",
+      "source_metadata": {
+        "video_file": "djokovic_zverev.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 60.0,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "4d21b393f7bcafe7e7fdf918ed9c9930b5ee0e1068f0289521eee5539a731ddf"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 1157,
+        "camera_motion": {
+          "consecutive_mad": 3.034,
+          "vs_first_frame_mad": 13.128,
+          "last_vs_first_mad": 19.824
+        },
+        "panorama": {
+          "canvas_width": 3846,
+          "canvas_height": 2182,
+          "growth_factor": 1.012,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.00581,
+          "min_separation_px": 1001.9,
+          "has_occlusion": false,
+          "track_continuity": true
+        },
+        "paste_back": {
+          "convention": "extract_24_frame_id",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 365,
+          "end_frame": 413,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "2399566675ababa7f6ca168c71487c78e8131fd62a16d01c2c7b195a46176204",
+            "mid": "483b3170154434100a6cc92e3366c76cec06f1c022ff3e1053db66f167aadb25",
+            "last": "e3c8bc82a52d9506af1dc1f76866f9b1420e3fc3aeac330d95fa1e9db24e82f0"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.012,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 365,
+          "end_frame": 461,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "2399566675ababa7f6ca168c71487c78e8131fd62a16d01c2c7b195a46176204",
+            "mid": "a9828ea78d85f1b4f2d28d5915c4131adf6795473720654ed14ac2b2b862d879",
+            "last": "7e7f3c16ef225adc99e7374b0e481a08cfff0959851aa3e0fdb0955c680c0b74"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.012,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 365,
+          "end_frame": 557,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "2399566675ababa7f6ca168c71487c78e8131fd62a16d01c2c7b195a46176204",
+            "mid": "9cc02301edcdc22e5147143ab57582857affe6a142fd2b130ef2288f58f48837",
+            "last": "d5aa6d7e00ed1c94703e0ba5558ffc64a8125ccf58058e4cd967e617be6da8b5"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.012,
+          "failure_reasons": []
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 365,
+          "end_frame": 749,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "2399566675ababa7f6ca168c71487c78e8131fd62a16d01c2c7b195a46176204",
+            "mid": "4f7be94a231d880fb4bf6519d06ff26ce152f41e319060315ee466663c376d5b",
+            "last": "c1c33ec2f73ed13dfed3c6074a1692b4cd4f4a2e27faf5184df3778a986c6b26"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.012,
+          "failure_reasons": []
+        }
+      }
+    },
+    {
+      "video": "djokovic_zverev",
+      "scene": "scene_004",
+      "t_start": 192.666667,
+      "t_end": 233.666667,
+      "duration": 41.0,
+      "cluster": "cluster_point",
+      "context_id": "djokovic_zverev_main_court",
+      "role": "confirmation",
+      "source_metadata": {
+        "video_file": "djokovic_zverev.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 60.0,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "4d21b393f7bcafe7e7fdf918ed9c9930b5ee0e1068f0289521eee5539a731ddf"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 984,
+        "camera_motion": {
+          "consecutive_mad": 4.076,
+          "vs_first_frame_mad": 17.271,
+          "last_vs_first_mad": 18.274
+        },
+        "panorama": {
+          "canvas_width": 3877,
+          "canvas_height": 2195,
+          "growth_factor": 1.026,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.00493,
+          "min_separation_px": 654.4,
+          "has_occlusion": false,
+          "track_continuity": true
+        },
+        "paste_back": {
+          "convention": "extract_24_frame_id",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 508,
+          "end_frame": 556,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "5044abd5e637e4cc1697aff93cbbb6a3725f75eb509dd8fe82e30785bef551bd",
+            "mid": "4d933d0a7261d971f86da89981b294618f4fa0ad298df5f58264ecbcfbc3470c",
+            "last": "6d2ac03a7495d2f9f2e5bacf419061ee2dbe56029bdeaccc43843c7236a534a8"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.026,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 508,
+          "end_frame": 604,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "5044abd5e637e4cc1697aff93cbbb6a3725f75eb509dd8fe82e30785bef551bd",
+            "mid": "a00f18b236daffeab7265971a495c29dc9d7f5f23f5f915702efd25ad8f91cc5",
+            "last": "596dac77758c7df5b6bfa3c4885f7d4a8d76bf01c96cfe0aba23ccfcebb6a8bc"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.026,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 508,
+          "end_frame": 700,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "5044abd5e637e4cc1697aff93cbbb6a3725f75eb509dd8fe82e30785bef551bd",
+            "mid": "23c72dacb47149d23c01f4bf7509d82fe65614f0bc491b3f52802d7aa69cd1c1",
+            "last": "ac386a4e970ae6918aa14e66809f9d3cdab1ee15e477899ab1da2de71bf6b8a2"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.026,
+          "failure_reasons": []
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 508,
+          "end_frame": 892,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "5044abd5e637e4cc1697aff93cbbb6a3725f75eb509dd8fe82e30785bef551bd",
+            "mid": "a7dfcc58b2fe584ebc3ce530bb5147b5b62c8095b6090a21a3c3b2445396139a",
+            "last": "65549228accdb434627df07031f88094358500b38134ddbea0f502e4ad37e58a"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.026,
+          "failure_reasons": []
+        }
+      }
+    },
+    {
+      "video": "djokovic_zverev",
+      "scene": "scene_006",
+      "t_start": 286.766667,
+      "t_end": 314.166667,
+      "duration": 27.4,
+      "cluster": "cluster_point",
+      "context_id": "djokovic_zverev_main_court",
+      "role": "confirmation",
+      "source_metadata": {
+        "video_file": "djokovic_zverev.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 60.0,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "4d21b393f7bcafe7e7fdf918ed9c9930b5ee0e1068f0289521eee5539a731ddf"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 658,
+        "camera_motion": {
+          "consecutive_mad": 3.439,
+          "vs_first_frame_mad": 13.472,
+          "last_vs_first_mad": 17.097
+        },
+        "panorama": {
+          "canvas_width": 3874,
+          "canvas_height": 2180,
+          "growth_factor": 1.018,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.00509,
+          "min_separation_px": 552.5,
+          "has_occlusion": false,
+          "track_continuity": true
+        },
+        "paste_back": {
+          "convention": "extract_24_position",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 143,
+          "end_frame": 191,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "72593f0381734379973df9c83001a00c46ff8ad048c3d9bb639daa3a57e84f9e",
+            "mid": "55034e801160b80c0cd54ad75b607716c928258e71bc6174fb01d0980d4d1fc9",
+            "last": "960816ca4378ba3fde8acd4bfa6e8462887b94bae934ad05dc7552eadef6f8fe"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.018,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 143,
+          "end_frame": 239,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "72593f0381734379973df9c83001a00c46ff8ad048c3d9bb639daa3a57e84f9e",
+            "mid": "a5134f17a3582093c14f3b9e6b6734eb0b697aa8e8a2ea2d337ffef92116a0ce",
+            "last": "e6dc23351a6d9121f97e0812d3fa3dc7393e79ff0b69e622ab9524ca9308d407"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.018,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 143,
+          "end_frame": 335,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "72593f0381734379973df9c83001a00c46ff8ad048c3d9bb639daa3a57e84f9e",
+            "mid": "2faa267f57f1af1d5e5cec37248da8ab8d4669badd5303126b21c8b5f03c4ecf",
+            "last": "6551e8da5ef101551e5f60b0c91dc50a9477c2ab45d0338e2494e166e2750960"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.018,
+          "failure_reasons": []
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 143,
+          "end_frame": 527,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "72593f0381734379973df9c83001a00c46ff8ad048c3d9bb639daa3a57e84f9e",
+            "mid": "ba9a952c38a4d64eba763eacfe5597805f057c397d2152fab3d0e7353d384db0",
+            "last": "bc2f88c8042d6aee62918084512731aae678d7b94e469370eea73a3f86866e4d"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.018,
+          "failure_reasons": []
+        }
+      }
+    },
+    {
+      "video": "sinner_alcaraz",
+      "scene": "scene_002",
+      "t_start": 14.130789,
+      "t_end": 39.039,
+      "duration": 24.908,
+      "cluster": "cluster_point",
+      "context_id": "sinner_alcaraz_main_court",
+      "role": "confirmation",
+      "source_metadata": {
+        "video_file": "sinner_alcaraz.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 59.9401,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "2693b2230e9e3b2f6d1788ef280d5c1e8b66f93530e482f7863ccd2d49544ab2"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 598,
+        "camera_motion": {
+          "consecutive_mad": 0.74,
+          "vs_first_frame_mad": 2.744,
+          "last_vs_first_mad": 2.976
+        },
+        "panorama": {
+          "canvas_width": 3841,
+          "canvas_height": 2161,
+          "growth_factor": 1.001,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.00792,
+          "min_separation_px": 1184.5,
+          "has_occlusion": false,
+          "track_continuity": true
+        },
+        "paste_back": {
+          "convention": "extract_24_frame_id",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 146,
+          "end_frame": 194,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "b26fa581a12d2cec95b71daffeab5ea95d58dbc38959f4f6edd5b9b35b351596",
+            "mid": "15a1f933d9a3b126e3822ea775865888b04f479b8ce7801c30ae67b4866da42f",
+            "last": "a37958bcfe7f7d1c84f0098f199949eecda242ab520933526a3c4d6f8b57414e"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 146,
+          "end_frame": 242,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "b26fa581a12d2cec95b71daffeab5ea95d58dbc38959f4f6edd5b9b35b351596",
+            "mid": "dd6ed4d645e1e56cc7d463a9051648e3b413826175d789f7348b07d10b96141c",
+            "last": "63c1a6c295ba0a9ec43556d8ec8a573d4d9d1e70f6e7ea7144b3c4de4cf9baea"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 146,
+          "end_frame": 338,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "b26fa581a12d2cec95b71daffeab5ea95d58dbc38959f4f6edd5b9b35b351596",
+            "mid": "79de727fcd1ee9ebfc23f3a667c5da6314c758349f15ab01d0edd50d819ae412",
+            "last": "71eeb5e0ac9caa6bb4eb60b3a0837264a12dfb3fef8a59d174071e6aa07a6f1d"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 146,
+          "end_frame": 530,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "b26fa581a12d2cec95b71daffeab5ea95d58dbc38959f4f6edd5b9b35b351596",
+            "mid": "563dd5f32d23f537f41a74d9491383493cfcb60587ac3c983519c056574c6ed2",
+            "last": "4d47b1ca03f24213b403e48a32db58b30041e3c418023d82fb180e40ccb3532f"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        }
+      }
+    },
+    {
+      "video": "sinner_alcaraz",
+      "scene": "scene_008",
+      "t_start": 120.170056,
+      "t_end": 146.279467,
+      "duration": 26.109,
+      "cluster": "cluster_point",
+      "context_id": "sinner_alcaraz_main_court",
+      "role": "confirmation",
+      "source_metadata": {
+        "video_file": "sinner_alcaraz.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 59.9401,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "2693b2230e9e3b2f6d1788ef280d5c1e8b66f93530e482f7863ccd2d49544ab2"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 627,
+        "camera_motion": {
+          "consecutive_mad": 0.529,
+          "vs_first_frame_mad": 2.47,
+          "last_vs_first_mad": 3.116
+        },
+        "panorama": {
+          "canvas_width": 3841,
+          "canvas_height": 2161,
+          "growth_factor": 1.001,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.00739,
+          "min_separation_px": 1165.0,
+          "has_occlusion": false,
+          "track_continuity": true
+        },
+        "paste_back": {
+          "convention": "extract_24_position",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 0,
+          "end_frame": 48,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "6c683c746036cf6aab1f86ec2b91920562866d58da74b736ca536748c6d1f0e3",
+            "mid": "1ac46a90151c19db692f8d6507b630eb5bf916f8a5563dd909830b6c5155889f",
+            "last": "129dd207a335010aa16140f933dea83154a690aeb587a44a8076b5d168e6e1c6"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 0,
+          "end_frame": 96,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "6c683c746036cf6aab1f86ec2b91920562866d58da74b736ca536748c6d1f0e3",
+            "mid": "9e95dde23e238b8dc1b640ab314369d45cb36a0095514470e670d39b103e7bb3",
+            "last": "db77ecfe0dd733b15addea22eb7ebd128fec4a85cdbcffb0e4f5aec840d2c0b0"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 0,
+          "end_frame": 192,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "6c683c746036cf6aab1f86ec2b91920562866d58da74b736ca536748c6d1f0e3",
+            "mid": "625eec1ce528cfe4d8629ab4d32e44bcb70bec9544491874d5cbcae29fa43f1e",
+            "last": "56dfea9cef427c44ce95cf683e2f58b1e2e819b4f0392b13f861e428018200e3"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 0,
+          "end_frame": 384,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "6c683c746036cf6aab1f86ec2b91920562866d58da74b736ca536748c6d1f0e3",
+            "mid": "67766f793a1bcd717d5560d44dada252b54aed57a0edad6a72106c43cff1814e",
+            "last": "686a31ff03b8ff9c4d08a1b0a18b0e5292bfd7e6cd5c21d99183f0a9511a5ae6"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        }
+      }
+    },
+    {
+      "video": "sinner_alcaraz",
+      "scene": "scene_021",
+      "t_start": 261.3611,
+      "t_end": 276.392789,
+      "duration": 15.032,
+      "cluster": "cluster_point",
+      "context_id": "sinner_alcaraz_main_court",
+      "role": "confirmation",
+      "source_metadata": {
+        "video_file": "sinner_alcaraz.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 59.9401,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "2693b2230e9e3b2f6d1788ef280d5c1e8b66f93530e482f7863ccd2d49544ab2"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 361,
+        "camera_motion": {
+          "consecutive_mad": 0.513,
+          "vs_first_frame_mad": 2.111,
+          "last_vs_first_mad": 3.214
+        },
+        "panorama": {
+          "canvas_width": 3841,
+          "canvas_height": 2161,
+          "growth_factor": 1.001,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 2,
+          "object_class": "player",
+          "player_pixel_fraction": 0.00609,
+          "min_separation_px": 1289.7,
+          "has_occlusion": false,
+          "track_continuity": true
+        },
+        "paste_back": {
+          "convention": "extract_24_frame_id",
+          "opaque_mae": 0.0,
+          "threshold": 2.0,
+          "passes_threshold": true
+        },
+        "route": "pointstream",
+        "ineligibility_reasons": []
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 0,
+          "end_frame": 48,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "0ea0e3953797e9d539d3f5ccca4a646295da2476ec1f17c4ceb83202a1c8b3a3",
+            "mid": "60165a78f7aab9070cfc762282a7668dbfd0faa1d4d8f59479026faf8099a913",
+            "last": "716dc74c4b38f96ff71aa134ec0f7e7513fb8a8647716ee969223701df674f0c"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 0,
+          "end_frame": 96,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "0ea0e3953797e9d539d3f5ccca4a646295da2476ec1f17c4ceb83202a1c8b3a3",
+            "mid": "3dd001499c6e7d018e888649a28f58935a0ca2e0922e546a523e66b9b5054f75",
+            "last": "6f1edb51513625f76713f94d6ccf5f0750fd1680c6f5728e8a550ad9892908e3"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 0,
+          "end_frame": 192,
+          "status": "eligible",
+          "frame_hashes": {
+            "first": "0ea0e3953797e9d539d3f5ccca4a646295da2476ec1f17c4ceb83202a1c8b3a3",
+            "mid": "b45e283eb9ef10166210199ab69e630f9523ffdbb45b1a26f12aff5ad131be2f",
+            "last": "2d52f321add929033fe0a382f37ca96f69967e8df97dac093496f1162b7e9a2c"
+          },
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": []
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 0,
+          "end_frame": 361,
+          "status": "insufficient_duration",
+          "frame_hashes": {},
+          "paste_back_mae": 0.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": [
+            "source frames 361 < 384",
+            "track frames 355 < 384"
+          ]
+        }
+      }
+    },
+    {
+      "video": "alcaraz_highlights",
+      "scene": "scene_006",
+      "t_start": 39.022322,
+      "t_end": 43.993956,
+      "duration": 4.972,
+      "cluster": "cluster_other",
+      "context_id": "alcaraz_highlights_crowd_side",
+      "role": "control_ineligible",
+      "source_metadata": {
+        "video_file": "alcaraz_highlights.mp4",
+        "width": 3840,
+        "height": 2160,
+        "source_fps": 59.9401,
+        "working_fps": 24.0,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "sha256": "af92ede5c64cc9070b4242020ac3c294cbb4a47b6dc243922929dc5367f0dab2"
+      },
+      "eligibility": {
+        "duration_24fps_frames": 120,
+        "camera_motion": {
+          "consecutive_mad": 1.58,
+          "vs_first_frame_mad": 16.245,
+          "last_vs_first_mad": 18.352
+        },
+        "panorama": {
+          "canvas_width": 3841,
+          "canvas_height": 2161,
+          "growth_factor": 1.001,
+          "registration_ok": true
+        },
+        "objects": {
+          "num_objects": 0,
+          "object_class": "player",
+          "player_pixel_fraction": 0.0,
+          "min_separation_px": 0.0,
+          "has_occlusion": false,
+          "track_continuity": false
+        },
+        "paste_back": {
+          "convention": "unknown",
+          "opaque_mae": 999.0,
+          "threshold": 2.0,
+          "passes_threshold": false
+        },
+        "route": "conventional_fallback",
+        "ineligibility_reasons": [
+          "cluster 'cluster_other' is not a valid point camera",
+          "no valid player tracks found",
+          "no track pairs for paste-back check"
+        ]
+      },
+      "intervals": {
+        "48": {
+          "frame_count": 48,
+          "start_frame": 0,
+          "end_frame": 48,
+          "status": "insufficient_duration",
+          "frame_hashes": {},
+          "paste_back_mae": 999.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": [
+            "track frames 0 < 48"
+          ]
+        },
+        "96": {
+          "frame_count": 96,
+          "start_frame": 0,
+          "end_frame": 96,
+          "status": "insufficient_duration",
+          "frame_hashes": {},
+          "paste_back_mae": 999.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": [
+            "track frames 0 < 96"
+          ]
+        },
+        "192": {
+          "frame_count": 192,
+          "start_frame": 0,
+          "end_frame": 120,
+          "status": "insufficient_duration",
+          "frame_hashes": {},
+          "paste_back_mae": 999.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": [
+            "source frames 120 < 192",
+            "track frames 0 < 192"
+          ]
+        },
+        "384": {
+          "frame_count": 384,
+          "start_frame": 0,
+          "end_frame": 120,
+          "status": "insufficient_duration",
+          "frame_hashes": {},
+          "paste_back_mae": 999.0,
+          "canvas_growth": 1.001,
+          "failure_reasons": [
+            "source frames 120 < 384",
+            "track frames 0 < 384"
+          ]
+        }
+      }
+    }
+  ]
+}
