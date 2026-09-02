@@ -166,6 +166,21 @@ def load_scene_sequence(
     return clips
 
 
+def _psnr_by_frame(reference: np.ndarray, candidate: np.ndarray) -> list[float]:
+    """Y-PSNR per frame index, so monotone decay cannot hide inside a clip mean.
+
+    A longer span's most likely failure is not a worse average but a
+    reconstruction that *rots*: the homography drifts off the plate and late
+    frames degrade while early ones stay sharp. Those are different products and
+    a mean scores them the same, so the span sweep reads this rather than the
+    mean (`plans/BP33-span-amortisation.md` §3.3).
+    """
+    ref = np.asarray(reference)
+    got = np.asarray(candidate)
+    count = min(int(ref.shape[0]), int(got.shape[0]))
+    return [round(pooled_psnr(ref[i], got[i], luma=True), 3) for i in range(count)]
+
+
 def anchor_over_sequence(clips: list[TierClip], request: EncodeRequest) -> dict[str, Any]:
     """The anchor coding the N scenes as one sequence, and as N separate ones.
 
@@ -190,6 +205,7 @@ def anchor_over_sequence(clips: list[TierClip], request: EncodeRequest) -> dict[
 
     reference = even_size(joined)
     return {
+        "psnr_y_by_frame": _psnr_by_frame(reference, decoded),
         "joint_bytes": int(joint_bytes),
         "separate_bytes": int(separate_bytes),
         # Below 1.0 means the anchor really did predict across the scene joins.
@@ -227,6 +243,7 @@ def pointstream_over_sequence(
     total = int(sizes.transport_total)
     panorama = int(sizes.panorama)
     return {
+        "psnr_y_by_frame": _psnr_by_frame(source, delivered),
         "coded_bytes": total,
         "psnr_y_dB": pooled_psnr(source, delivered, luma=True),
         "psnr_rgb_dB": pooled_psnr(source, delivered),
