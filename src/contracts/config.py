@@ -227,6 +227,17 @@ class BackgroundConfig:
     #: comparison is between rungs rather than between methods.
     stream_crf: int = 38
 
+    #: Camera/view/venue identity. Scenes that share it share a canonical canvas
+    #: and may be predictively coded. A change forces a new independently coded
+    #: background. Empty means "the whole run is one context".
+    context_id: str = ""
+
+    #: ``independent`` keeps each scene's local canvas (current behaviour).
+    #: ``canonical`` is an offline prepass: union of compatible scene bounds,
+    #: one even-sized origin, then predictive coding. Causal canvas growth is
+    #: not this mode.
+    canvas: str = "independent"
+
 
 @dataclass(frozen=True)
 class GeneratorConfig:
@@ -491,6 +502,14 @@ def validate(config: PointstreamConfig) -> None:
             profile.assert_background_valid(config.background.method)
         except ContractError as exc:
             note(exc)
+        if config.background.canvas not in {"independent", "canonical"}:
+            note(
+                ConfigValueError(
+                    "background.canvas",
+                    f"{config.background.canvas!r} is not 'independent' or 'canonical'. "
+                    "canonical is the offline union canvas; causal growth is not this field.",
+                )
+            )
 
     # Whatever each class ends up carrying has to be something it can carry.
     # Only explicit per-class overrides can be wrong here — the preference falls

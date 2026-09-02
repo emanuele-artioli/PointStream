@@ -14,12 +14,13 @@ Sidecar codec is an independent constructor argument, not a strategy name.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
 
 from src.components.background.delta import apply_delta, compute_delta
-from src.components.background.plate import build_plate
+from src.components.background.plate import CanonicalCanvas, build_plate, prepare_canonical_context
 from src.components.background.sidecar import SidecarCodec, build_sidecar, normalize_sidecar
 from src.components.background.types import (
     MODE_DELTA,
@@ -93,13 +94,17 @@ class BackgroundModel:
         previous_scene_id: str | None = None,
         chunk_id: str = "",
         homographies: tuple[tuple[float, ...], ...] = (),
+        context_id: str | None = None,
     ) -> BackgroundArtifact:
         """Encode one already-built plate under this strategy.
 
         ``previous_decoded`` must be the plate the *client* will have after
         decoding the previous sidecar — not the pre-codec pixels — so a later
         residual is computed against what both sides actually share.
+        ``context_id`` is consumed by the streaming strategy; other methods
+        ignore it.
         """
+        _ = context_id
         if not self.sends_panorama or self._sidecar is None:
             return BackgroundArtifact(
                 method=self.method,
@@ -159,7 +164,7 @@ class BackgroundModel:
                 scene_id=scene_id,
                 chunk_id=chunk_id,
             )
-        plate, homographies = build_plate(frames, masks=masks)
+        plate, homographies = self.stitch(frames, masks=masks)
         return self.transmit(
             plate,
             previous_decoded=previous_decoded,
@@ -168,6 +173,27 @@ class BackgroundModel:
             chunk_id=chunk_id,
             homographies=homographies,
         )
+
+    def stitch(
+        self,
+        frames: np.ndarray,
+        masks: np.ndarray | None = None,
+        *,
+        register: bool = True,
+    ) -> tuple[np.ndarray, tuple[tuple[float, ...], ...]]:
+        """Build this scene's plate. Independent coding uses a local canvas."""
+        return build_plate(frames, masks=masks, register=register)
+
+    def prepare_context(
+        self,
+        scenes: Sequence[np.ndarray],
+        *,
+        context_id: str | None = None,
+        register: bool = True,
+    ) -> CanonicalCanvas | None:
+        """Offline union canvas. Independent coding has nothing to prepare."""
+        _ = (scenes, context_id, register)
+        return None
 
     def decode_payload(self, artifact: BackgroundArtifact) -> np.ndarray | None:
         """Pixels the client reconstructs from ``artifact``.
@@ -246,6 +272,8 @@ class PanoramaStream(BackgroundModel):
         keyframe_interval: int = 0,
         stream_codec: str = "av1",
         stream_crf: int = 38,
+        context_id: str = "",
+        canvas: str = "independent",
     ) -> None:
         super().__init__(
             codec=codec,
@@ -257,12 +285,65 @@ class PanoramaStream(BackgroundModel):
         )
         from src.components.background.stream import BackgroundStreamTransmitter
 
+        if canvas not in {"independent", "canonical"}:
+            raise ValueError(
+                f"background.canvas must be 'independent' or 'canonical', got {canvas!r}"
+            )
+        self.context_id = context_id
+        self.canvas_mode = canvas
         self._transmitter = BackgroundStreamTransmitter(
             mode=reference_mode,
             codec=stream_codec,
             crf=stream_crf,
             keyframe_interval=keyframe_interval,
         )
+        self._active_context: str | None = None
+        self._canvas: CanonicalCanvas | None = None
+        self._alignments: tuple[np.ndarray, ...] = ()
+        self._scene_index = 0
+
+    def prepare_context(
+        self,
+        scenes: Sequence[np.ndarray],
+        *,
+        context_id: str | None = None,
+        register: bool = True,
+    ) -> CanonicalCanvas:
+        """Offline union of scene bounds. Must run before the first transmit.
+
+        This sees every scene in the context, so it is a buffered codec mode.
+        """
+        active = context_id if context_id is not None else (self.context_id or "run")
+        canvas, alignments, _bounds = prepare_canonical_context(
+            scenes, context_id=active, register=register
+        )
+        self._canvas = canvas
+        self._alignments = alignments
+        self._scene_index = 0
+        self.context_id = active
+        return canvas
+
+    def stitch(
+        self,
+        frames: np.ndarray,
+        masks: np.ndarray | None = None,
+        *,
+        register: bool = True,
+    ) -> tuple[np.ndarray, tuple[tuple[float, ...], ...]]:
+        if self._canvas is None:
+            return build_plate(frames, masks=masks, register=register)
+        alignment = None
+        if self._scene_index < len(self._alignments):
+            alignment = self._alignments[self._scene_index]
+        plate, homographies = build_plate(
+            frames,
+            masks=masks,
+            register=register,
+            canvas=self._canvas,
+            alignment=alignment,
+        )
+        self._scene_index += 1
+        return plate, homographies
 
     @property
     def codec_id(self) -> str:
@@ -281,13 +362,24 @@ class PanoramaStream(BackgroundModel):
         previous_scene_id: str | None = None,
         chunk_id: str = "",
         homographies: tuple[tuple[float, ...], ...] = (),
+        context_id: str | None = None,
     ) -> BackgroundArtifact:
         """Code this scene's plate against the stream so far.
 
         ``previous_decoded`` is ignored: the transmitter holds the
         reconstructions itself, and taking one from a caller is how the two
         sides start disagreeing about which picture was predicted from.
+
+        A change of ``context_id`` resets the stream: the next plate is an
+        independently coded keyframe, possibly on a different canvas.
         """
+        active = context_id if context_id is not None else self.context_id
+        if self._active_context is not None and active != self._active_context:
+            self._transmitter.reset()
+            self._canvas = None
+            self._alignments = ()
+            self._scene_index = 0
+        self._active_context = active
         array = np.asarray(plate, dtype=np.uint8)
         payload = self._transmitter.push(array)
         return BackgroundArtifact(
@@ -351,6 +443,8 @@ def bind(config: PointstreamConfig, **overrides: Any) -> BackgroundModel:
                 "keyframe_interval": config.background.keyframe_interval,
                 "stream_codec": config.background.stream_codec,
                 "stream_crf": config.background.stream_crf,
+                "context_id": config.background.context_id,
+                "canvas": config.background.canvas,
             }
         )
     kwargs.update(overrides)

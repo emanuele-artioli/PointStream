@@ -69,6 +69,32 @@ REFERENCE_MODES: Final[tuple[str, ...]] = (
 KEYFRAME_NEVER: Final = 0
 
 
+def context_reset_indices(context_ids: Sequence[str]) -> tuple[int, ...]:
+    """Scene indices that start a new independently coded background.
+
+    The **continuous** AV1/VVC control must reset at exactly these indices —
+    the same boundaries where PointStream starts a new background context —
+    and nowhere else. The **segmented** control resets every scene, which is
+    ``tuple(range(n))``, and is a different product.
+    """
+    if not context_ids:
+        return ()
+    resets = [0]
+    previous = context_ids[0]
+    for index, current in enumerate(context_ids[1:], start=1):
+        if current != previous:
+            resets.append(index)
+            previous = current
+    return tuple(resets)
+
+
+def segmented_reset_indices(n_scenes: int) -> tuple[int, ...]:
+    """Every scene is an independent intra. Not the continuous control."""
+    if n_scenes < 0:
+        raise ValueError(f"n_scenes must be >= 0, got {n_scenes}")
+    return tuple(range(n_scenes))
+
+
 @dataclass(frozen=True)
 class StreamCodec:
     """One encoder, pinned to a low-delay configuration and a raw container.
@@ -422,6 +448,18 @@ class BackgroundStreamTransmitter:
     def reconstructions(self) -> tuple[np.ndarray, ...]:
         """What the encoder holds. Equal, frame for frame, to the client's."""
         return tuple(self._reconstructions)
+
+    def reset(self) -> None:
+        """Start a new independently coded background (a context boundary).
+
+        The next ``push`` is a keyframe. A later context may use a different
+        canvas size; that is not a shape error, because it is not the same
+        stream.
+        """
+        self._originals.clear()
+        self._chains.clear()
+        self._payloads.clear()
+        self._reconstructions.clear()
 
     def _forces_keyframe(self, index: int) -> bool:
         if index == 0:

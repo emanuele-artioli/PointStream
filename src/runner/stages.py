@@ -94,6 +94,7 @@ class StageContext:
     appearance_encoder: Any = None
     motion_encoder: Any = None
     temporal_policy: Any = None
+    source_chunks: Sequence[np.ndarray] | None = None
 
 
 def _subjects(bag: Mapping[str, Any]) -> tuple[ObjectRequest, ...]:
@@ -663,10 +664,15 @@ def make_background(
     #
     # One bound model is therefore one stream. Two runs must not share a stage.
     model = _bound_background(ctx)
+    if ctx.config.background.canvas == "canonical" and ctx.source_chunks:
+        # Offline: the union sees every chunk before the first plate is coded.
+        model.prepare_context(
+            ctx.source_chunks,
+            context_id=ctx.config.background.context_id or "run",
+            register=register,
+        )
 
     def background_stage(bag: Mapping[str, Any]) -> BackgroundModelView:
-        from src.components.background.plate import build_plate
-
         source = as_clip(bag[SOURCE], path=SOURCE)
         frame_count = int(source.shape[0])
         height, width = int(source.shape[1]), int(source.shape[2])
@@ -687,12 +693,16 @@ def make_background(
                 if count < 2
                 else _foreground_stack(bag, frame_count=count, height=height, width=width)
             )
-            plate, homographies = build_plate(
+            plate, homographies = model.stitch(
                 np.asarray(source[:count], dtype=np.uint8),
                 masks=masks,
                 register=register,
             )
-            artifact = model.transmit(plate, homographies=homographies)
+            artifact = model.transmit(
+                plate,
+                homographies=homographies,
+                context_id=ctx.config.background.context_id or None,
+            )
         decoded = model.decode_payload(artifact)
         return BackgroundModelView(
             plate=source[0] if decoded is None else decoded,

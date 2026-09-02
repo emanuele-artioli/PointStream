@@ -71,6 +71,12 @@ background:
   method: panorama-full
   codec: jpeg
   jpeg-quality: 50
+  reference-mode: last
+  keyframe-interval: 0
+  stream-codec: av1
+  stream-crf: 38
+  context-id: ''
+  canvas: independent
 generator:
   backend: none
   variant: null

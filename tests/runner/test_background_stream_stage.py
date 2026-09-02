@@ -184,3 +184,68 @@ class TestTheStreamSurvivesMoreThanOneChunk:
             "make_background passes artifact.mode through untranslated, which is "
             "exactly the bug this guards"
         )
+
+
+@pytest.mark.integration
+class TestCanonicalCanvasAcrossChunks:
+    """The runner prepass must see both chunks before coding the first plate."""
+
+    def test_unequal_local_plates_stream_when_the_canvas_is_canonical(self) -> None:
+        from src.contracts.config import BackgroundConfig, LatticeConfig, PointstreamConfig, ResidualConfig
+        from src.contracts.codecs import RateControl
+        from src.pipeline.reconstruction.background import BackgroundResolver
+        from src.pipeline.reconstruction.dispatch import GeneratorRef
+        from src.pipeline.reconstruction.quality import QualityEvaluator
+        from src.runner.routing import bind_evaluator, generation_params
+        from src.runner.stages import OBJECTS, StageContext, make_background
+        from src.pipeline.encoder.encoder import SOURCE
+        from tests.components.test_plate_registration import _pan, _texture
+
+        height, width, step = 96, 128, 5
+        base = _texture(height, width + step * 6 + 8, seed=7)
+        static = np.stack([base[:, :width] for _ in range(5)])
+        panning = _pan(6, height, width, step)
+        config = PointstreamConfig(
+            lattice=LatticeConfig(
+                scene_classification=False,
+                detection=False,
+                selection=False,
+                tracking=False,
+                appearance=False,
+                motion=False,
+                temporal_policy=False,
+                pose=False,
+                segmentation=False,
+                rigid_objects=False,
+                background=True,
+                generation=False,
+                residual=False,
+            ),
+            background=BackgroundConfig(
+                method=BACKGROUND_PANORAMA_STREAM,
+                canvas="canonical",
+                context_id="court",
+            ),
+            residual=ResidualConfig(rate_control=RateControl.CRF, background_downscale=4),
+        )
+        evaluator: QualityEvaluator = bind_evaluator(None, config)
+        generator: GeneratorRef | None = None
+        ctx = StageContext(
+            lattice=config.stages,
+            residual=config.residual,
+            generator=generator,
+            evaluator=evaluator,
+            resolver=BackgroundResolver(),
+            seed=config.run.seed,
+            params=generation_params(config),
+            config=config,
+            source_chunks=[static, panning],
+        )
+        stage = make_background(ctx)
+        first = stage({SOURCE: static, OBJECTS: ()})
+        second = stage({SOURCE: panning, OBJECTS: ()})
+        assert first.width == second.width
+        assert first.height == second.height
+        assert first.width % 2 == 0 and first.height % 2 == 0
+        assert second.payload_bytes is not None and first.payload_bytes is not None
+        assert second.payload_bytes < first.payload_bytes

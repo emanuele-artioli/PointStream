@@ -171,6 +171,12 @@ def run(
     scorer = bind_evaluator(evaluator, config)
     resolver = BackgroundResolver()
     bound = dict(components or {})
+    prepared: list[np.ndarray] = []
+    for index, raw in enumerate(chunks):
+        source = as_clip(raw, path=f"{SOURCE}[{index}]")
+        if config.run.max_frames is not None:
+            source = source[: config.run.max_frames]
+        prepared.append(source)
     ctx = StageContext(
         lattice=lattice,
         residual=config.residual,
@@ -187,16 +193,14 @@ def run(
         appearance_encoder=bound.get("appearance"),
         motion_encoder=bound.get("motion"),
         temporal_policy=bound.get("temporal"),
+        source_chunks=prepared,
     )
     roster = bind_backends(ctx, backends)
     conditioning = tuple(ref.requires) if ref is not None else ()
     encoder = Encoder.build(lattice, roster, conditioning=conditioning)
 
     results: list[ChunkResult] = []
-    for index, raw in enumerate(chunks):
-        source = as_clip(raw, path=f"{SOURCE}[{index}]")
-        if config.run.max_frames is not None:
-            source = source[: config.run.max_frames]
+    for index, source in enumerate(prepared):
         chunk_objects = objects[index] if objects is not None else ()
         bag = encoder.encode({SOURCE: source, OBJECTS: chunk_objects})
         results.append(
