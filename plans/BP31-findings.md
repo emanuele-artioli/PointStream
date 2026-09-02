@@ -421,3 +421,94 @@ result because it had been derived in the wrong units, and a band written in
 percent against a value returned as a fraction would have read `+0.91%` — a
 spectacular and entirely fictional win, comfortably inside the band, with
 nothing about it looking wrong.
+
+## 10. Plate codecs as curves: the 3.6-4.1x lever is 1.45x where the ladder runs
+
+**This supersedes the single-point probe** this session opened with, which
+compared codecs at operating points they had not been asked to share — `vvc` came
+back both cheaper *and* lower quality than `av1`, which is not a comparison of
+anything. A codec is comparable to another only through curves read at matched
+fidelity, and only with encode time in the same table. Harness:
+`experiments/tier/plate_codec_curves.py`; bounds written first in
+`outputs/bp31-ladder/bounds-before-codec-curves.json`; result in
+`plate-codec-curves-alcaraz_highlights.json`. 25 points on one 4K panorama
+plate, each codec swept over its own knob.
+
+### Size, at matched Y-PSNR, interpolated on each codec's own curve
+
+| target | jpeg | av1 intra | vvc intra |
+|---|---:|---:|---:|
+| 38 dB | 243,892 B | *below its range* | 46,101 B — **x0.189** |
+| 40 dB | 277,512 B | 85,432 B — x0.308 | 71,003 B — x0.256 |
+| 42 dB | 322,866 B | 151,542 B — x0.469 | 130,064 B — x0.403 |
+| **43 dB** | **352,752 B** | **243,861 B — x0.691** | **243,617 B — x0.691** |
+| 45 dB | 434,810 B | *above its range* | *above its range* |
+
+No cell is extrapolated; a target outside a codec's measured span is reported as
+such rather than fitted.
+
+**The lever is strongly quality-dependent, and `PLAN.md` §2.21 quotes it at the
+wrong end.** §2.21 claims "a factor of 3.6 to 4.1" for av1/vvc intra over JPEG on
+88-91% of the payload. That figure is reproduced here — at **38 dB**, where vvc
+is 5.3x cheaper. But the BP24 ladder's reference rung puts the plate near
+**43 dB**, and there both modern codecs come in at **x0.691 — a 1.45x saving, not
+3.6-4.1x**. The ratio falls monotonically as fidelity rises across the whole
+measured band, which is the same crossover shape
+`plans/BP29-plate-codec-report.md` §3 found between jpeg and x264 at ~40 dB.
+
+So lever (a) is real and much smaller than the plan assumes: at the ladder's
+operating point it takes about **31% off the plate**, hence roughly **27% off the
+total payload** at an 88% background share — worth having, not the transformation
+§2.21 implies.
+
+**av1 and vvc are indistinguishable at 43 dB** (243,861 against 243,617 B, 0.1%
+apart). vvc leads at every coarser target. Neither preset is a matched-effort
+setting, so this is what *this plate* costs under each encoder as configured, not
+a statement that one codec beats the other.
+
+### Time, measured rather than interpolated — and only good to an order of magnitude
+
+| codec | median encode over the curve | range | worst within-point spread |
+|---|---:|---:|---:|
+| jpeg | **0.018 s** | 0.016-0.023 | 0.005 |
+| av1 | **12.12 s** | 9.62-15.53 | **12.96** |
+| vvc | **9.94 s** | 7.42-12.96 | **17.40** |
+
+**The within-point spread is larger than the range across the whole knob range**,
+so on this shared host encode time is dominated by co-tenancy rather than by the
+quantiser. Two consequences, both stated rather than smoothed:
+
+- **Encode time is not interpolated against quality anywhere in this harness.**
+  The first run did interpolate it, through an av1 point that measured 34.62 s
+  where its neighbours took 9-12 s, and produced a headline "x1724 slower at
+  43 dB" that was an artefact of one contended sample. Each point is now the
+  median of three repeats, every sample is kept in the record, and the time
+  column was removed from the matched-fidelity table.
+- **av1 and vvc cannot be separated on time by this measurement.** 12.12 against
+  9.94 s, with spreads of 13-17 s, supports no ordering. What it does support is
+  the order of magnitude: both are **500-700x** jpeg's encode cost, and that gap
+  is far larger than any noise here.
+
+**Bytes and Y-PSNR are deterministic and reproduced exactly** across two full
+runs (av1 qp20: 507,138 B at 43.71 dB both times; vvc qp48: 18,321 B at 32.63 dB
+both times), and every repeat's payload is asserted byte-identical inside the
+harness. So the size half of this table is solid and the time half is an
+order-of-magnitude reading. They are reported with different confidence because
+they were earned with different confidence.
+
+### A bound fired and was wrong, again in its basis rather than its interval
+
+The pre-written vvc encode-time floor of 5.0 s fired on three points at
+2.9-4.6 s. Its stated basis was that "VVC intra at 4K is the slowest thing on
+this roster" — and that is simply false here: `vvencapp` at `faster` is *quicker*
+than `SvtAv1EncApp` at preset 10 on this plate. Four things say vvc ran: bytes
+and Y-PSNR both monotone in its own knob over eight points, a decodable
+bitstream, reproduction across two runs, and BP24's independent plate probe
+measuring vvc intra at 68,477 B near 38 dB where this curve brackets it
+(41,330 B at 37.46, 60,242 B at 39.32). The floor was corrected to 1.0 s with
+the reason recorded in the module.
+
+### What this does not decide
+
+Nothing about `panorama-stream`, which never consults this sidecar (§1). This
+prices the plate codec for the `panorama-full` arm only.

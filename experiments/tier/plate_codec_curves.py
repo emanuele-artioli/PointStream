@@ -72,11 +72,32 @@ KNOBS: dict[str, tuple[int, ...]] = {
 #: codec choice is actually made at.
 FIDELITY_TARGETS: tuple[float, ...] = (38.0, 40.0, 42.0, 43.0, 45.0)
 
+#: Encode-time alarm bands, per codec, in seconds for one 4K panorama plate.
+#:
+#: **The vvc floor started at 5.0 s and was wrong.** It fired on three points
+#: measured at 2.9-4.6 s, on the stated basis that "VVC intra at 4K is the
+#: slowest thing on this roster". That basis was the error, not the
+#: measurement: `vvencapp` at `faster` encodes this plate in 2.9-8.0 s while
+#: `SvtAv1EncApp` at preset 10 takes 9-19 s, so vvc here is the *quicker* of the
+#: two. Four independent things say vvc ran — bytes and Y-PSNR both monotone in
+#: its own knob across eight points, a recognised bitstream, and BP24's separate
+#: plate probe measuring vvc intra at 68,477 B near 38 dB where this curve
+#: brackets 41,330 B at 37.46 and 60,242 B at 39.32.
 ENCODE_SECONDS_BAND: dict[str, tuple[float, float]] = {
-    "jpeg": (0.01, 2.0),
+    "jpeg": (0.005, 2.0),
     "av1": (2.0, 90.0),
-    "vvc": (5.0, 300.0),
+    "vvc": (1.0, 300.0),
 }
+
+#: How many times each encode is repeated for the timing lever.
+#:
+#: One sample per point is not a time measurement on a shared host. The first
+#: run produced av1 encode times of 19.05, 14.69, 10.43, 9.06, **34.62**, 12.41,
+#: 11.77 and 11.55 s as the knob went monotonically finer — non-monotone, with a
+#: 3x outlier in the middle, because a co-tenant's job moved rather than because
+#: the quantiser did. Bytes and PSNR are deterministic and need no repeats; wall
+#: time does.
+TIME_REPEATS: int = 3
 
 
 @dataclass(frozen=True)
@@ -90,8 +111,12 @@ class CurvePoint:
     psnr_y_db: float
     psnr_rgb_db: float
     encode_seconds: float
+    """Median of `encode_samples`. A median, not a mean: one contention spike
+    should not move it."""
+
     decode_seconds: float
-    container: str
+    encode_samples: tuple[float, ...] = ()
+    container: str = "unknown"
     detail: dict[str, Any] = field(default_factory=dict)
 
     def record(self) -> dict[str, Any]:
@@ -103,6 +128,9 @@ class CurvePoint:
             "psnr_y_dB": round(self.psnr_y_db, 3),
             "psnr_rgb_dB": round(self.psnr_rgb_db, 3),
             "encode_seconds": round(self.encode_seconds, 3),
+            "encode_samples": [round(x, 3) for x in self.encode_samples],
+            "encode_seconds_min": round(min(self.encode_samples), 3) if self.encode_samples else None,
+            "encode_seconds_max": round(max(self.encode_samples), 3) if self.encode_samples else None,
             "decode_seconds": round(self.decode_seconds, 3),
             "container": self.container,
             **self.detail,
@@ -113,12 +141,34 @@ def _kwargs_for(codec: str, knob: int) -> dict[str, Any]:
     return {"jpeg_quality": knob} if codec == "jpeg" else {"intra_qp": knob}
 
 
-def measure_point(plate: np.ndarray, codec: str, knob: int) -> CurvePoint:
-    """Encode and decode the plate once, timing the two halves apart."""
+def measure_point(
+    plate: np.ndarray, codec: str, knob: int, *, repeats: int = TIME_REPEATS
+) -> CurvePoint:
+    """Encode and decode the plate, timing the two halves apart.
+
+    The encode runs ``repeats`` times and the median is kept. Bytes and PSNR are
+    deterministic — every repeat produces the identical payload, which is
+    asserted rather than assumed — so the repeats buy a time measurement and
+    nothing else.
+    """
+    import statistics
+
     sidecar = build_sidecar(codec, **_kwargs_for(codec, knob))
-    started = time.time()
-    payload = sidecar.encode(plate)
-    encode_seconds = time.time() - started
+    samples: list[float] = []
+    payload = b""
+    for index in range(max(1, repeats)):
+        started = time.time()
+        got = sidecar.encode(plate)
+        samples.append(time.time() - started)
+        if index == 0:
+            payload = got
+        elif got != payload:
+            raise RuntimeError(
+                f"{codec} at {knob}: repeat {index} produced a different payload "
+                f"({len(got)} B against {len(payload)} B). The encode is not "
+                "deterministic, so its bytes cannot be reported as the cost of this rung."
+            )
+    encode_seconds = statistics.median(samples)
 
     started = time.time()
     decoded = sidecar.decode(payload)
@@ -140,6 +190,7 @@ def measure_point(plate: np.ndarray, codec: str, knob: int) -> CurvePoint:
         psnr_rgb_db=pooled_psnr(ref, out),
         encode_seconds=encode_seconds,
         decode_seconds=decode_seconds,
+        encode_samples=tuple(samples),
         container=container_kind(payload),
         detail={"decoded_shape": [int(got.shape[0]), int(got.shape[1])]},
     )
@@ -195,22 +246,52 @@ def three_lever_table(by_codec: dict[str, list[CurvePoint]]) -> dict[str, Any]:
         row: dict[str, Any] = {}
         for codec, points in by_codec.items():
             size = at_fidelity(points, target, value="bytes")
-            secs = at_fidelity(points, target, value="encode_seconds")
             row[codec] = {
                 "bytes": size.get("bytes"),
-                "encode_seconds": secs.get("encode_seconds"),
                 "reason": size.get("reason"),
                 "measured_range_dB": size.get("measured_range_dB"),
             }
         base = (row.get("jpeg") or {}).get("bytes")
-        base_secs = (row.get("jpeg") or {}).get("encode_seconds")
         for entry in row.values():
             if base and entry.get("bytes"):
                 entry["bytes_vs_jpeg"] = round(entry["bytes"] / base, 3)
-            if base_secs and entry.get("encode_seconds"):
-                entry["encode_seconds_vs_jpeg"] = round(entry["encode_seconds"] / base_secs, 1)
         table["targets"][f"{target:.1f} dB"] = row
     return table
+
+
+def encode_time_summary(by_codec: dict[str, list[CurvePoint]]) -> dict[str, Any]:
+    """The time lever, reported as measured rather than interpolated.
+
+    Encode time is **not** interpolated against quality, because it is not
+    monotone in it here: on a shared host the spread between repeats of one
+    point is comparable to the spread across the whole knob range, so a
+    log-linear fit through it would be fitting contention. Each point's median
+    over `TIME_REPEATS` is summarised across the curve instead, and the
+    per-point samples stay in the record so the noise is visible rather than
+    smoothed away.
+    """
+    import statistics
+
+    summary: dict[str, Any] = {}
+    for codec, points in by_codec.items():
+        medians = [p.encode_seconds for p in points]
+        spreads = [
+            (max(p.encode_samples) - min(p.encode_samples)) for p in points if p.encode_samples
+        ]
+        summary[codec] = {
+            "encode_seconds_median_over_curve": round(statistics.median(medians), 3),
+            "encode_seconds_range_over_curve": [round(min(medians), 3), round(max(medians), 3)],
+            "worst_within_point_spread_seconds": round(max(spreads), 3) if spreads else None,
+            "decode_seconds_median": round(
+                statistics.median([p.decode_seconds for p in points]), 3
+            ),
+            "n_repeats": TIME_REPEATS,
+        }
+    base = (summary.get("jpeg") or {}).get("encode_seconds_median_over_curve")
+    for entry in summary.values():
+        if base:
+            entry["encode_vs_jpeg"] = round(entry["encode_seconds_median_over_curve"] / base, 1)
+    return summary
 
 
 def check_bounds(by_codec: dict[str, list[CurvePoint]]) -> list[str]:
@@ -301,7 +382,8 @@ def main(argv: list[str] | None = None) -> int:
         "plate_shape": [int(x) for x in plate.shape],
         "bounds_file": str(BOUNDS_PATH),
         "curves": {codec: [p.record() for p in pts] for codec, pts in by_codec.items()},
-        "matched_fidelity": three_lever_table(by_codec),
+        "matched_fidelity_bytes": three_lever_table(by_codec),
+        "encode_time": encode_time_summary(by_codec),
         "alarms": alarms,
         "reading_note": (
             "Three levers, and all three belong in any sentence comparing two "
@@ -319,8 +401,8 @@ def main(argv: list[str] | None = None) -> int:
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(json.dumps(report, indent=2) + "\n")
 
-    print("\n=== matched fidelity (Y-PSNR): bytes / encode seconds ===", flush=True)
-    for target, row in report["matched_fidelity"]["targets"].items():
+    print("\n=== bytes at matched fidelity (Y-PSNR), interpolated per codec ===", flush=True)
+    for target, row in report["matched_fidelity_bytes"]["targets"].items():
         print(f"  {target}", flush=True)
         for codec in args.codecs:
             entry = row.get(codec, {})
@@ -328,11 +410,21 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"    {codec:<5} — {entry.get('reason')}", flush=True)
             else:
                 print(
-                    f"    {codec:<5} {entry['bytes']:>9} B  {entry['encode_seconds']:>7.2f}s  "
-                    f"(x{entry.get('bytes_vs_jpeg', '?')} bytes, "
-                    f"x{entry.get('encode_seconds_vs_jpeg', '?')} time vs jpeg)",
+                    f"    {codec:<5} {entry['bytes']:>9} B   x{entry.get('bytes_vs_jpeg', '?')} vs jpeg",
                     flush=True,
                 )
+
+    print("\n=== encode time, MEASURED (median of repeats, never interpolated) ===", flush=True)
+    for codec in args.codecs:
+        entry = report["encode_time"].get(codec, {})
+        low, high = entry.get("encode_seconds_range_over_curve", [None, None])
+        print(
+            f"  {codec:<5} median {entry.get('encode_seconds_median_over_curve'):>7}s over the "
+            f"curve, range {low}-{high}s, worst within-point spread "
+            f"{entry.get('worst_within_point_spread_seconds')}s, "
+            f"x{entry.get('encode_vs_jpeg', '?')} vs jpeg",
+            flush=True,
+        )
 
     if alarms:
         print("\n=== ALARMS ===", flush=True)

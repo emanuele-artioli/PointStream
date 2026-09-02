@@ -1090,6 +1090,24 @@ because that axis reached nothing at all until BP24 wired `make_background`. A
 config axis only ever set to one value is indistinguishable from a constant
 until somebody drives the others.
 
+**Correction, 2026-09-01 (BP31 §10): the 3.6-4.1x above is quoted at the wrong
+operating point.** Swept as curves on a 4K panorama plate and read at matched
+Y-PSNR, that factor holds near **38 dB** (vvc 5.3x) and falls monotonically as
+fidelity rises. At **43 dB**, where the BP24 ladder's reference rung puts the
+plate, av1 and vvc both come in at **x0.691 — a 1.45x saving**, and the two are
+indistinguishable there. Lever (a) is real but takes roughly 31% off the plate
+at the ladder's rung, not 72-75%. Encode time is the third lever and is
+500-700x jpeg's for both. The single-point comparison that produced the original
+figure compared codecs at fidelities they had not been asked to share.
+`plans/BP31-findings.md` §10; `outputs/bp31-ladder/plate-codec-curves-alcaraz_highlights.json`.
+
+**Correction, 2026-09-01 (BP31 §1): `background.codec` reaches nothing under
+`panorama-stream`.** Levers (a) and (b) are mutually exclusive as implemented —
+the streamed method never consults the still-image sidecar and codes the plate
+at `stream_codec`/`stream_crf` instead. Measured: three codec values give
+byte-identical payloads under `panorama-stream`, while the same probe separates
+them 4.6x under `panorama-full`.
+
 **(b) The next plate need not be paid for in full.** Coding plate B as a
 **P-frame** referencing plate A saves **31-53%** with av1 between points of a
 match. This **retracts §17**, which subtracted two plates pixel by pixel, found
