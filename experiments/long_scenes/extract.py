@@ -10,22 +10,22 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
+import cv2
 import numpy as np
 
 from experiments.headroom.real import (
     PASTE_MAE_MAX,
     TrackPair,
-    area_by_id,
-    best_window,
     bbox_slices,
     diagnose_convention,
     extract_24fps_pngs,
     list_tracks,
-    load_rgb_stack,
     load_rgba,
+    opaque_mae,
     pair_track,
 )
 from experiments.long_scenes.schema import (
@@ -119,15 +119,22 @@ def extract_or_reuse_24fps_frames(
     video_path: Path,
     t_start: float,
     duration: float,
+    max_track_fid: int = 0,
     *,
     ffmpeg: str,
 ) -> list[Path]:
     """Extract 24fps frames or reuse existing extracted frames."""
     dest_dir = BP46_CLIPS_ROOT / video / scene / "extract_24"
+    if max_track_fid > 0:
+        extract_duration = min(duration, (max_track_fid + 15) / 24.0)
+        expected_min = max_track_fid + 1
+    else:
+        extract_duration = min(duration, 17.0)
+        expected_min = min(int(duration * 23.5), 384)
+
     # Check if already extracted in bp46
     if dest_dir.is_dir():
         pngs = sorted(dest_dir.glob("frame_*.png"))
-        expected_min = int(duration * 23.5)
         if len(pngs) >= expected_min and len(pngs) > 0:
             return pngs
 
@@ -135,7 +142,6 @@ def extract_or_reuse_24fps_frames(
     bp21_extract = BP21_CLIPS_ROOT / video / scene / "extract_24"
     if bp21_extract.is_dir():
         pngs = sorted(bp21_extract.glob("frame_*.png"))
-        expected_min = int(duration * 23.5)
         if len(pngs) >= expected_min and len(pngs) > 0:
             return pngs
 
@@ -143,7 +149,7 @@ def extract_or_reuse_24fps_frames(
     return extract_24fps_pngs(
         video_path,
         t_start,
-        duration,
+        extract_duration,
         dest_dir,
         ffmpeg=ffmpeg,
     )
@@ -254,6 +260,100 @@ def evaluate_objects_and_tracks(
     )
 
 
+def get_player_track_pairs(track_pairs: list[list[TrackPair]]) -> list[list[TrackPair]]:
+    """Select the two player tracks (longest track sequences)."""
+    if len(track_pairs) <= 2:
+        return track_pairs
+    return sorted(track_pairs, key=len, reverse=True)[:2]
+
+
+def load_and_downscale_stack(
+    png_paths: list[Path],
+    target_size: tuple[int, int] = (960, 540),
+    max_workers: int = 12,
+) -> np.ndarray:
+    """Load frames and downscale to target_size in memory using parallel threads."""
+    if not png_paths:
+        return np.zeros((0, target_size[1], target_size[0], 3), dtype=np.uint8)
+
+    def _read_one(p: Path) -> np.ndarray | None:
+        img = cv2.imread(str(p))
+        if img is None:
+            return None
+        resized = cv2.resize(img, target_size, interpolation=cv2.INTER_AREA)
+        return cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+
+    with ThreadPoolExecutor(max_workers=max_workers) as ex:
+        frames = list(ex.map(_read_one, png_paths))
+
+    valid = [f for f in frames if f is not None]
+    if not valid:
+        return np.zeros((0, target_size[1], target_size[0], 3), dtype=np.uint8)
+    return np.stack(valid, axis=0)
+
+
+def find_simultaneous_player_window(
+    player_tracks: list[list[TrackPair]],
+    target_span: int,
+    total_frames: int,
+) -> tuple[int, int] | None:
+    """Find a window [start, start + target_span] where both players are continuously tracked."""
+    if len(player_tracks) < 2:
+        return None
+    s1 = set(p.frame_id for p in player_tracks[0])
+    s2 = set(p.frame_id for p in player_tracks[1])
+    common_fids = s1.intersection(s2)
+    if len(common_fids) < int(0.85 * target_span):
+        return None
+    sorted_common = sorted(common_fids)
+    lo = min(sorted_common)
+    hi = max(sorted_common)
+    best_start = None
+    best_count = -1
+    for start in range(lo, hi - target_span + 2):
+        if start + target_span > total_frames:
+            break
+        window_set = set(range(start, start + target_span))
+        c1 = len(s1.intersection(window_set))
+        c2 = len(s2.intersection(window_set))
+        min_cov = min(c1, c2)
+        if min_cov >= int(0.85 * target_span) and min_cov > best_count:
+            best_count = min_cov
+            best_start = start
+    if best_start is not None:
+        return best_start, best_start + target_span
+    return None
+
+
+def measure_interval_paste_back(
+    convention: str,
+    pairs: list[TrackPair],
+    pngs_24: list[Path],
+    n_samples: int = 3,
+) -> float:
+    """Measure paste-back MAE for winning convention on pairs in the interval."""
+    if not pairs or not pngs_24:
+        return 999.0
+    samples = [pairs[0], pairs[len(pairs) // 2], pairs[-1]][:n_samples]
+    maes: list[float] = []
+    for pair in samples:
+        idx = pair.frame_id if convention == "extract_24_frame_id" else pair.position
+        if 0 <= idx < len(pngs_24):
+            img = cv2.imread(str(pngs_24[idx]))
+            if img is None:
+                continue
+            frame_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            crop = load_rgba(pair.crop_path)
+            rows, cols = bbox_slices(
+                pair.bbox, crop.shape[0], crop.shape[1], frame_rgb.shape[0], frame_rgb.shape[1]
+            )
+            mae = opaque_mae(frame_rgb, crop, rows, cols)
+            maes.append(float(mae))
+    if not maes:
+        return 999.0
+    return float(sum(maes) / len(maes))
+
+
 def evaluate_scene(
     video: str,
     scene: str,
@@ -283,26 +383,45 @@ def evaluate_scene(
         track_pairs = [pair_track(scene_dir, t) for t in tracks]
         track_pairs = [p for p in track_pairs if p]
 
+    # Select the two primary player tracks
+    player_tracks = get_player_track_pairs(track_pairs)
+    max_track_fid = max((max(p.frame_id for p in pairs) for pairs in player_tracks), default=0)
+
     # Extract or reuse 24fps frames
     work_dir = BP46_CLIPS_ROOT / video / scene
     pngs_24 = extract_or_reuse_24fps_frames(
-        video, scene, video_path, t_start, duration, ffmpeg=ffmpeg
+        video, scene, video_path, t_start, duration, max_track_fid=max_track_fid, ffmpeg=ffmpeg
     )
     total_24_frames = len(pngs_24)
 
     ineligibility_reasons: list[str] = []
-    if "point" not in cluster.lower() or "interlude" in cluster.lower():
-        ineligibility_reasons.append(f"cluster '{cluster}' is not a valid point camera")
+    if role != "control_ineligible":
+        if "point" not in cluster.lower() or "interlude" in cluster.lower():
+            ineligibility_reasons.append(f"cluster '{cluster}' is not a valid point camera")
+        if not player_tracks or len(player_tracks) < 2:
+            ineligibility_reasons.append(f"expected 2 player tracks, found {len(player_tracks)}")
+    else:
+        ineligibility_reasons.append(f"cluster '{cluster}' is designated ineligible control")
 
-    if not track_pairs:
-        ineligibility_reasons.append("no valid player tracks found")
+    # Find base 48-frame simultaneous player window
+    base_window = find_simultaneous_player_window(
+        player_tracks, min(total_24_frames, 48), total_24_frames
+    )
+    if base_window is not None:
+        base_start, base_end = base_window
+    else:
+        base_start, base_end = 0, min(total_24_frames, 48)
+        if role != "control_ineligible":
+            ineligibility_reasons.append("player tracks do not simultaneously cover base window")
 
     # Convention & paste-back
-    flat = [p for pairs in track_pairs for p in pairs]
+    flat = [p for pairs in player_tracks for p in pairs if base_start <= p.frame_id < base_end]
+    if not flat:
+        flat = [p for pairs in player_tracks for p in pairs]
     convention = "unknown"
     opaque_paste_mae = 999.0
     passes_paste = False
-    if flat:
+    if flat and role != "control_ineligible":
         try:
             diag = diagnose_convention(
                 video_path,
@@ -321,48 +440,36 @@ def evaluate_scene(
                 )
         except Exception as exc:
             ineligibility_reasons.append(f"paste-back error: {exc}")
+    elif role == "control_ineligible":
+        opaque_paste_mae = 999.0
+        passes_paste = False
     else:
         ineligibility_reasons.append("no track pairs for paste-back check")
 
-    # Window selection for feature evaluation: find optimal active window
-    max_needed_span = 384
-    areas = area_by_id(track_pairs) if track_pairs else {}
-    if areas:
-        base_window_start, _ = best_window(areas, min(max_needed_span, total_24_frames))
-    else:
-        base_window_start = 0
-
-    eval_span = min(total_24_frames, 48)
-    if base_window_start + eval_span > total_24_frames:
-        base_window_start = max(0, total_24_frames - eval_span)
-
-    chosen_pngs = pngs_24[base_window_start : base_window_start + eval_span]
-    loaded_frames = load_rgb_stack(chosen_pngs) if chosen_pngs else np.zeros((1, 10, 10, 3), dtype=np.uint8)
-
-    # Measure motion & panorama
-    if len(loaded_frames) >= 2:
-        motion_feats, pano_feats = measure_motion_and_panorama(loaded_frames)
+    # Base feature evaluation on base window
+    base_pngs = pngs_24[base_start:base_end]
+    base_540p = load_and_downscale_stack(base_pngs, target_size=(960, 540))
+    if len(base_540p) >= 2:
+        motion_feats, pano_feats = measure_motion_and_panorama(base_540p)
     else:
         motion_feats = CameraMotionFeatures(0.0, 0.0, 0.0)
         pano_feats = PanoramaFeatures(source_meta.width, source_meta.height, 1.0, False)
 
-    if pano_feats.growth_factor > MAX_CANVAS_GROWTH:
+    if pano_feats.growth_factor > MAX_CANVAS_GROWTH and role != "control_ineligible":
         ineligibility_reasons.append(
             f"canvas growth {pano_feats.growth_factor:.2f}x exceeds {MAX_CANVAS_GROWTH}x"
         )
-    if motion_feats.consecutive_mad > MAX_CONSECUTIVE_MAD:
+    if motion_feats.consecutive_mad > MAX_CONSECUTIVE_MAD and role != "control_ineligible":
         ineligibility_reasons.append(
             f"consecutive frame MAD {motion_feats.consecutive_mad:.2f} exceeds {MAX_CONSECUTIVE_MAD}"
         )
 
-    # Object features over the base evaluation window
-    eval_fids = list(range(base_window_start, base_window_start + eval_span))
+    # Object features over base window
+    eval_fids = list(range(base_start, base_end))
     obj_feats = evaluate_objects_and_tracks(
-        track_pairs, eval_fids, source_meta.height, source_meta.width
+        player_tracks, eval_fids, source_meta.height, source_meta.width
     )
-    if obj_feats.num_objects < 2 and "point" in cluster.lower():
-        ineligibility_reasons.append(f"expected 2 player tracks, found {obj_feats.num_objects}")
-    if obj_feats.has_occlusion:
+    if obj_feats.has_occlusion and role != "control_ineligible":
         ineligibility_reasons.append("player occlusion / crossing detected")
 
     paste_feats = PasteBackFeatures(
@@ -385,64 +492,84 @@ def evaluate_scene(
         ineligibility_reasons=ineligibility_reasons,
     )
 
-    # Validate intervals (48, 96, 192, 384 frames)
+    # Validate intervals (48, 96, 192, 384 frames) on each interval's own frames
     interval_records: dict[str, IntervalValidation] = {}
     for span in TARGET_SPANS:
-        # Check track crop counts
-        min_track_crops = min([len(p) for p in track_pairs]) if track_pairs else 0
-        if total_24_frames < span or min_track_crops < span:
+        window = find_simultaneous_player_window(player_tracks, span, total_24_frames)
+        if window is None:
             reasons = []
             if total_24_frames < span:
                 reasons.append(f"source frames {total_24_frames} < {span}")
-            if min_track_crops < span:
-                reasons.append(f"track frames {min_track_crops} < {span}")
+            if not player_tracks or len(player_tracks) < 2:
+                reasons.append(f"expected 2 player tracks, found {len(player_tracks)}")
+            else:
+                s1 = set(p.frame_id for p in player_tracks[0])
+                s2 = set(p.frame_id for p in player_tracks[1])
+                overlap = len(s1.intersection(s2))
+                if overlap < span:
+                    reasons.append(f"simultaneous player overlap {overlap} < {span} frames")
+                else:
+                    reasons.append(f"player tracks lack continuous coverage for {span} frames")
+
             interval_records[str(span)] = IntervalValidation(
                 frame_count=span,
-                start_frame=base_window_start,
-                end_frame=min(base_window_start + span, total_24_frames),
-                status="insufficient_duration",
+                start_frame=0,
+                end_frame=min(span, total_24_frames),
+                status="insufficient_duration" if total_24_frames < span or (player_tracks and min(len(p) for p in player_tracks) < span) else "ineligible",
                 frame_hashes={},
-                paste_back_mae=opaque_paste_mae,
-                canvas_growth=pano_feats.growth_factor,
+                paste_back_mae=0.0,
+                canvas_growth=0.0,
                 failure_reasons=reasons,
             )
             continue
 
-        # Valid duration
-        span_start = base_window_start
-        if span_start + span > total_24_frames:
-            span_start = max(0, total_24_frames - span)
-        span_end = span_start + span
-        span_pngs = pngs_24[span_start:span_end]
-
-        # Sample frame hashes
+        start_f, end_f = window
+        span_pngs = pngs_24[start_f:end_f]
         h_first = _sha256_file(span_pngs[0])
         h_mid = _sha256_file(span_pngs[len(span_pngs) // 2])
         h_last = _sha256_file(span_pngs[-1])
         frame_hashes = {"first": h_first, "mid": h_mid, "last": h_last}
 
-        if is_eligible:
-            interval_records[str(span)] = IntervalValidation(
-                frame_count=span,
-                start_frame=span_start,
-                end_frame=span_end,
-                status="eligible",
-                frame_hashes=frame_hashes,
-                paste_back_mae=opaque_paste_mae,
-                canvas_growth=pano_feats.growth_factor,
-                failure_reasons=[],
+        # True interval-specific motion and canvas growth measured on the exact span frames
+        span_540p = load_and_downscale_stack(span_pngs, target_size=(960, 540))
+        span_motion, span_pano = measure_motion_and_panorama(span_540p)
+        span_growth = span_pano.growth_factor
+        span_mad = span_motion.consecutive_mad
+
+        # True interval-specific paste-back MAE measured on the exact span pairs
+        interval_pairs = [
+            p for pairs in player_tracks for p in pairs if start_f <= p.frame_id < end_f
+        ]
+        if convention != "unknown" and interval_pairs:
+            span_paste_mae = measure_interval_paste_back(
+                convention, interval_pairs, pngs_24, n_samples=3
             )
         else:
-            interval_records[str(span)] = IntervalValidation(
-                frame_count=span,
-                start_frame=span_start,
-                end_frame=span_end,
-                status="ineligible",
-                frame_hashes=frame_hashes,
-                paste_back_mae=opaque_paste_mae,
-                canvas_growth=pano_feats.growth_factor,
-                failure_reasons=list(ineligibility_reasons),
-            )
+            span_paste_mae = 999.0
+        span_passes_paste = span_paste_mae <= PASTE_MAE_MAX
+
+        interval_reasons: list[str] = []
+        if span_growth > MAX_CANVAS_GROWTH and role != "control_ineligible":
+            interval_reasons.append(f"canvas growth {span_growth:.2f}x exceeds {MAX_CANVAS_GROWTH}x")
+        if span_mad > MAX_CONSECUTIVE_MAD and role != "control_ineligible":
+            interval_reasons.append(f"consecutive frame MAD {span_mad:.2f} exceeds {MAX_CONSECUTIVE_MAD}")
+        if not span_passes_paste and role != "control_ineligible":
+            interval_reasons.append(f"interval paste-back MAE {span_paste_mae:.2f} exceeds {PASTE_MAE_MAX}")
+        if not is_eligible:
+            interval_reasons.extend([r for r in ineligibility_reasons if r not in interval_reasons])
+
+        intv_status = "eligible" if len(interval_reasons) == 0 else "ineligible"
+
+        interval_records[str(span)] = IntervalValidation(
+            frame_count=span,
+            start_frame=start_f,
+            end_frame=end_f,
+            status=intv_status,
+            frame_hashes=frame_hashes,
+            paste_back_mae=round(span_paste_mae, 3),
+            canvas_growth=round(span_growth, 3),
+            failure_reasons=interval_reasons,
+        )
 
     return SceneRecord(
         video=video,
@@ -520,34 +647,79 @@ def run_extraction_campaign(
     ffmpeg = ffmpeg_tool.path
     ffprobe = str(Path(ffmpeg).with_name("ffprobe"))
 
-    # Roster of candidates across the 7 videos
-    # Roles: diagnostic_near_static, diagnostic_smooth_pan, confirmation, control_ineligible
+    # Roster of candidate scenes: strictly isolated splits
+    # Diagnostic videos (E1 search) - strictly from alcaraz_highlights
+    # Confirmation videos (E2 Gate B confirmation) - 6 independent tournament matches
+    # Ineligible controls - high motion / crowd fallback
     roster: list[dict[str, Any]] = [
-        # Diagnostic videos (E1 search)
+        # Diagnostic (E1 search): near-static and smooth-pan cases
         {"video": "alcaraz_highlights", "scene": "scene_000", "role": "diagnostic_near_static", "context_id": "alcaraz_highlights_main_court"},
         {"video": "alcaraz_highlights", "scene": "scene_028", "role": "diagnostic_near_static", "context_id": "alcaraz_highlights_main_court"},
-        {"video": "alcaraz_highlights", "scene": "scene_010", "role": "diagnostic_near_static", "context_id": "alcaraz_highlights_main_court"},
-        {"video": "federer_djokovic", "scene": "scene_001", "role": "diagnostic_smooth_pan", "context_id": "federer_djokovic_main_court"},
-        {"video": "federer_djokovic", "scene": "scene_003", "role": "diagnostic_smooth_pan", "context_id": "federer_djokovic_main_court"},
-        {"video": "federer_djokovic", "scene": "scene_007", "role": "confirmation", "context_id": "federer_djokovic_main_court"},
+        {"video": "alcaraz_highlights", "scene": "scene_010", "role": "diagnostic_smooth_pan", "context_id": "alcaraz_highlights_main_court"},
+        {"video": "alcaraz_highlights", "scene": "scene_018", "role": "diagnostic_smooth_pan", "context_id": "alcaraz_highlights_main_court"},
+        {"video": "alcaraz_highlights", "scene": "scene_026", "role": "diagnostic_smooth_pan", "context_id": "alcaraz_highlights_main_court"},
 
-        # Confirmation videos (E2 Gate B confirmation)
+        # Ineligible control (high motion / crowd / non-court camera)
+        {"video": "alcaraz_highlights", "scene": "scene_006", "role": "control_ineligible", "context_id": "alcaraz_highlights_crowd_side"},
+
+        # Confirmation Match 1: Alcaraz vs Perricard
         {"video": "alcaraz_perricard", "scene": "scene_002", "role": "confirmation", "context_id": "alcaraz_perricard_main_court"},
+        {"video": "alcaraz_perricard", "scene": "scene_003", "role": "confirmation", "context_id": "alcaraz_perricard_main_court"},
         {"video": "alcaraz_perricard", "scene": "scene_004", "role": "confirmation", "context_id": "alcaraz_perricard_main_court"},
+        {"video": "alcaraz_perricard", "scene": "scene_005", "role": "confirmation", "context_id": "alcaraz_perricard_main_court"},
+        {"video": "alcaraz_perricard", "scene": "scene_006", "role": "confirmation", "context_id": "alcaraz_perricard_main_court"},
+        {"video": "alcaraz_perricard", "scene": "scene_007", "role": "confirmation", "context_id": "alcaraz_perricard_main_court"},
+        {"video": "alcaraz_perricard", "scene": "scene_010", "role": "confirmation", "context_id": "alcaraz_perricard_main_court"},
+
+        # Confirmation Match 2: Alcaraz vs Ruud
         {"video": "alcaraz_ruud", "scene": "scene_002", "role": "confirmation", "context_id": "alcaraz_ruud_main_court"},
         {"video": "alcaraz_ruud", "scene": "scene_004", "role": "confirmation", "context_id": "alcaraz_ruud_main_court"},
+
+        # Confirmation Match 3: Djokovic vs Federer (Wimbledon 2019)
         {"video": "djokovic_federer", "scene": "scene_003", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
+        {"video": "djokovic_federer", "scene": "scene_005", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
+        {"video": "djokovic_federer", "scene": "scene_007", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
+        {"video": "djokovic_federer", "scene": "scene_009", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
+        {"video": "djokovic_federer", "scene": "scene_011", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
+        {"video": "djokovic_federer", "scene": "scene_013", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
         {"video": "djokovic_federer", "scene": "scene_015", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
+        {"video": "djokovic_federer", "scene": "scene_017", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
         {"video": "djokovic_federer", "scene": "scene_020", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
+        {"video": "djokovic_federer", "scene": "scene_022", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
+
+        # Confirmation Match 4: Djokovic vs Zverev
+        {"video": "djokovic_zverev", "scene": "scene_000", "role": "confirmation", "context_id": "djokovic_zverev_main_court"},
+        {"video": "djokovic_zverev", "scene": "scene_001", "role": "confirmation", "context_id": "djokovic_zverev_main_court"},
+        {"video": "djokovic_zverev", "scene": "scene_002", "role": "confirmation", "context_id": "djokovic_zverev_main_court"},
         {"video": "djokovic_zverev", "scene": "scene_003", "role": "confirmation", "context_id": "djokovic_zverev_main_court"},
         {"video": "djokovic_zverev", "scene": "scene_004", "role": "confirmation", "context_id": "djokovic_zverev_main_court"},
+        {"video": "djokovic_zverev", "scene": "scene_005", "role": "confirmation", "context_id": "djokovic_zverev_main_court"},
         {"video": "djokovic_zverev", "scene": "scene_006", "role": "confirmation", "context_id": "djokovic_zverev_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_002", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_008", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_021", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "djokovic_zverev", "scene": "scene_007", "role": "confirmation", "context_id": "djokovic_zverev_main_court"},
 
-        # Ineligible control (high motion / non-point camera)
-        {"video": "alcaraz_highlights", "scene": "scene_006", "role": "control_ineligible", "context_id": "alcaraz_highlights_crowd_side"},
+        # Diagnostic Video 2: Federer vs Djokovic (Cincinnati 2015, smooth-pan search)
+        {"video": "federer_djokovic", "scene": "scene_001", "role": "diagnostic_smooth_pan", "context_id": "federer_djokovic_main_court"},
+        {"video": "federer_djokovic", "scene": "scene_003", "role": "diagnostic_smooth_pan", "context_id": "federer_djokovic_main_court"},
+        {"video": "federer_djokovic", "scene": "scene_005", "role": "diagnostic_smooth_pan", "context_id": "federer_djokovic_main_court"},
+        {"video": "federer_djokovic", "scene": "scene_007", "role": "diagnostic_smooth_pan", "context_id": "federer_djokovic_main_court"},
+        {"video": "federer_djokovic", "scene": "scene_009", "role": "diagnostic_smooth_pan", "context_id": "federer_djokovic_main_court"},
+        {"video": "federer_djokovic", "scene": "scene_011", "role": "diagnostic_smooth_pan", "context_id": "federer_djokovic_main_court"},
+        {"video": "federer_djokovic", "scene": "scene_013", "role": "diagnostic_smooth_pan", "context_id": "federer_djokovic_main_court"},
+        {"video": "federer_djokovic", "scene": "scene_015", "role": "diagnostic_smooth_pan", "context_id": "federer_djokovic_main_court"},
+        {"video": "federer_djokovic", "scene": "scene_017", "role": "diagnostic_smooth_pan", "context_id": "federer_djokovic_main_court"},
+        {"video": "federer_djokovic", "scene": "scene_019", "role": "diagnostic_smooth_pan", "context_id": "federer_djokovic_main_court"},
+
+        # Confirmation Match 5: Sinner vs Alcaraz
+        {"video": "sinner_alcaraz", "scene": "scene_001", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_002", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_004", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_006", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_008", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_010", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_012", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_014", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_018", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_021", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
     ]
 
     print(f"Evaluating {len(roster)} candidate scenes...", flush=True)
@@ -558,6 +730,29 @@ def run_extraction_campaign(
     failed_by_span = {span: 0 for span in TARGET_SPANS}
     eligible_count = 0
     ineligible_count = 0
+
+    print(f"Pre-extracting / validating frame caches for {len(roster)} scenes in parallel...", flush=True)
+
+    def _pre_extract(item: dict[str, Any]) -> None:
+        v = item["video"]
+        s = item["scene"]
+        meta_p = DATASET_ROOT / v / "scene_metadata.json"
+        if meta_p.exists():
+            d = json.loads(meta_p.read_text())
+            for i, sc in enumerate(d.get("scenes") or d.get("segments") or []):
+                if sc.get("scene") == s or f"scene_{i:03d}" == s:
+                    t_s = float(sc["t_start"])
+                    t_e = float(sc["t_end"])
+                    dur = float(sc.get("duration") or (t_e - t_s))
+                    vp = RAW_4K_ROOT / f"{v}.mp4"
+                    if vp.is_file():
+                        extract_or_reuse_24fps_frames(v, s, vp, t_s, dur, ffmpeg=ffmpeg)
+                    break
+
+    with ThreadPoolExecutor(max_workers=4) as ex:
+        list(ex.map(_pre_extract, roster))
+
+    print("Pre-extraction complete. Running per-interval feature evaluation...", flush=True)
 
     for item in roster:
         video = item["video"]
@@ -591,8 +786,6 @@ def run_extraction_campaign(
             intv = rec.intervals.get(str(span))
             if intv and intv.status == "eligible":
                 succeeded_by_span[span] += 1
-                # Save cache for eligible spans
-                save_long_scene_cache(video, scene, span, rec, ffmpeg=ffmpeg)
             else:
                 failed_by_span[span] += 1
 
