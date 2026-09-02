@@ -548,3 +548,78 @@ this column means nothing. x19 means something.
 **Where it bites.** The cross-scene stream buys 19 BD-rate points (§9) and costs
 about 10% more wall clock (2,686 s against 2,443 s) — a good trade on its own
 terms. The x20 gap against the anchor is structural, not the stream's doing.
+
+## 12. Span: the amortisation is real, and it collides with the stream at span 24
+
+Run on the brief a parallel session sent (`plans/BP33-span-amortisation.md`),
+whose bounds were **adopted verbatim** into
+`outputs/bp31-ladder/bounds-before-span-run.json` — they were pre-registered
+before that brief reached this session, and bounds written after hearing a
+prediction are not bounds. Span is the only axis that moves; scene count is held
+at N=2, the value §9's BD-rate was taken at.
+
+**First: the axis needed no extraction at all.** The BP21 cache already holds 48
+frames per clip and both scenes load at 48 with tracks intact and paste-back MAE
+0.000. Every ladder in this project has run at 8.
+
+### The amortisation is real, at the two spans that ran
+
+| span | anchor B/frame | PointStream B/frame | ratio | plate | bg share |
+|---:|---:|---:|---:|---:|---:|
+| 8 | 28,359 | 61,556 | **2.17x** | 789,304 B | 0.801 |
+| 16 | 16,558 | 33,328 | **2.01x** | 768,277 B | 0.720 |
+
+Both arms get cheaper per frame, PointStream slightly faster, and the background
+share falls 0.80 → 0.72. **The plate does not grow — it shrank 2.7%**, which is a
+median over more samples converging, and is comfortably inside BP33's
+[1.00x, 1.60x] band for the static clip.
+
+The asymptote is worth stating because it is the argument's actual shape: at
+span 16 the plate is 768,277 B over 32 frames = 24,009 B/frame of PointStream's
+33,328, so the non-plate cost is ~9,319 B/frame. As span grows the plate's
+per-frame share tends to zero and the ratio tends toward non-plate over anchor.
+That is why the axis matters — but it is an extrapolation until a long span
+actually runs, and the next section is why one did not.
+
+### Span 24 and beyond: the stream refuses, and the reason is structural
+
+```
+span 24  FAILED  scene 1 is (2172, 3881, 3), the stream is (2161, 3841, 3);
+                 inter prediction needs a fixed frame size
+```
+
+`BackgroundStreamTransmitter.push` (`src/components/background/stream.py:456`)
+requires every plate in a chain to have identical shape. `build_plate` sizes the
+canvas from the homographies over the span, so a scene's canvas grows with *its
+own* camera motion — and the two scenes do not move alike:
+
+| span | scene_000 (static) | scene_010 (pans) | stream |
+|---:|---|---|---|
+| 8 | 2161x3841, x1.0007 | 2161x3841, x1.0007 | ok |
+| 16 | 2161x3841, x1.0007 | 2161x3841, x1.0007 | ok |
+| 24 | 2161x3841, x1.0007 | **2172x3881, x1.0163** | refuses |
+| 32 | 2161x3841, x1.0007 | **2189x3919, x1.0343** | refuses |
+
+**The divergence is asymmetric, and that is the whole mechanism.** The static
+scene's canvas never grows; the panning scene's does. At short spans neither has
+moved enough to matter and the shapes coincide by accident. Past ~24 frames the
+panning scene has swept far enough that its canvas is genuinely bigger, and the
+chain cannot hold two frame sizes.
+
+**So BP33's growth worry is unfounded and its blocker is somewhere else.** The
+canvas grows only x1.034 at span 32 against a `MAX_CANVAS_SCALE` of 4 — the plate
+is not running away. What breaks is not size but *size agreement between scenes*,
+which no bound in the brief covers because nobody had run the two levers together.
+
+**What it would take.** A canvas common to the whole run — every scene's plate
+padded to the union of the run's canvases — so the chain sees one frame size.
+That is a change to `stream.py` and `plate.py`, i.e. a component change with
+BP30's tests around it, and it is the prerequisite for measuring span past 16
+under `panorama-stream`. Until then span and the cross-scene stream are
+combinable only up to 16 frames.
+
+**Two clean ways to get the span number sooner**, both avoiding the component
+change: run the span ladder under `panorama-full`, where each scene codes its own
+plate and no shape agreement is needed; or run `panorama-stream` at N=1, where
+there is no second scene to disagree with. Neither answers the combined question,
+and the combined question is the one that matters.
