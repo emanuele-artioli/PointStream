@@ -154,19 +154,117 @@ def test_a_real_span_still_returns_a_number() -> None:
     assert comparison.bd_rate == pytest.approx(-0.5, abs=1e-6)
 
 
-def test_a_non_psnr_metric_must_state_its_own_span_floor() -> None:
+def test_a_metric_without_a_span_floor_must_still_state_one() -> None:
+    """REID is not a BD-rate axis; a dB or LPIPS floor would be a guess."""
+    reid = contract_metric("reid")
+    assert reid.min_curve_span is None
+    anchor = RDCurve(rates=(1.0e5, 1.6e6), qualities=(0.80, 0.50), quality_spec=reid)
+    candidate = RDCurve(rates=(0.5e5, 0.8e6), qualities=(0.80, 0.50), quality_spec=reid)
+    with pytest.raises(ValueError, match="no default quality span"):
+        compare_rd_curves(anchor, candidate)
+    comparison = compare_rd_curves(anchor, candidate, min_quality_span=0.10)
+    assert comparison.bd_rate == pytest.approx(-0.5, abs=1e-6)
+    assert comparison.quality_metric == "reid"
+
+
+def test_lpips_carries_its_own_span_floor_and_negates_for_the_fit() -> None:
     """A dB floor applied to LPIPS would reject everything; none would be a hole.
 
-    So the function refuses rather than picking one. Refusing is the behaviour
-    under test — a default here would be a guess wearing a constant's clothes.
+    The floor now lives on the spec. Half the rate at every native LPIPS still
+    integrates to −50%, and BD-quality is positive because the candidate is
+    better (lower LPIPS) at equal rate after the higher-is-better transform.
     """
     lpips = contract_metric("lpips")
-    anchor = RDCurve(rates=(1.0e5, 1.6e6), qualities=(0.30, 0.05))
-    candidate = RDCurve(rates=(0.5e5, 0.8e6), qualities=(0.30, 0.05))
-    with pytest.raises(ValueError, match="no default quality span"):
-        compare_rd_curves(anchor, candidate, quality_spec=lpips)
-    # With a floor in LPIPS's own units it works.
-    comparison = compare_rd_curves(
-        anchor, candidate, quality_spec=lpips, min_quality_span=0.10
+    assert lpips.min_curve_span == pytest.approx(0.05)
+    assert lpips.curve_quality_transform == "negate"
+    anchor = RDCurve(
+        rates=(1.0e5, 1.6e6),
+        qualities=(0.30, 0.05),
+        quality_spec=lpips,
     )
+    candidate = RDCurve(
+        rates=(0.5e5, 0.8e6),
+        qualities=(0.30, 0.05),
+        quality_spec=lpips,
+    )
+    comparison = compare_rd_curves(anchor, candidate)
     assert comparison.bd_rate == pytest.approx(-0.5, abs=1e-6)
+    assert comparison.quality_metric == "lpips"
+    assert comparison.overlap[0] == pytest.approx(0.05)
+    assert comparison.overlap[1] == pytest.approx(0.30)
+    assert comparison.bd_quality > 0.0
+
+
+def test_a_lower_better_curve_and_its_higher_better_negation_agree() -> None:
+    """−LPIPS labelled higher-is-better must match LPIPS, not invert the sign.
+
+    Forgetting the spec flip is the silent inversion BP35 named. The matching
+    higher-better axis uses the same numeric span, so the rate integral agrees.
+    """
+    lpips = contract_metric("lpips")
+    psnr = contract_metric("psnr")
+    anchor_lpips = RDCurve(rates=(1.0e5, 1.6e6), qualities=(0.30, 0.05), quality_spec=lpips)
+    candidate_lpips = RDCurve(rates=(0.5e5, 0.8e6), qualities=(0.30, 0.05), quality_spec=lpips)
+    correct = compare_rd_curves(anchor_lpips, candidate_lpips)
+
+    anchor_neg = RDCurve(rates=(1.0e5, 1.6e6), qualities=(-0.30, -0.05), quality_spec=psnr)
+    candidate_neg = RDCurve(rates=(0.5e5, 0.8e6), qualities=(-0.30, -0.05), quality_spec=psnr)
+    as_higher = compare_rd_curves(anchor_neg, candidate_neg, min_quality_span=0.05)
+    assert as_higher.bd_rate == pytest.approx(correct.bd_rate, abs=1e-9)
+    assert as_higher.bd_quality == pytest.approx(correct.bd_quality, abs=1e-9)
+
+    forgotten = compare_rd_curves(
+        RDCurve(rates=(1.0e5, 1.6e6), qualities=(0.30, 0.05), quality_spec=psnr),
+        RDCurve(rates=(0.5e5, 0.8e6), qualities=(0.30, 0.05), quality_spec=psnr),
+        min_quality_span=0.05,
+    )
+    assert forgotten.bd_rate == pytest.approx(correct.bd_rate, abs=1e-9)
+    assert forgotten.bd_quality == pytest.approx(-correct.bd_quality, abs=1e-9)
+
+
+def test_vmaf_refuses_a_span_below_ten_points() -> None:
+    """A VMAF sliver of 3 points would pass a leftover dB floor and mean nothing."""
+    vmaf = contract_metric("vmaf")
+    assert vmaf.min_curve_span == pytest.approx(10.0)
+    sliver = RDCurve(rates=(100.0, 400.0), qualities=(90.0, 95.0), quality_spec=vmaf)
+    other = RDCurve(rates=(80.0, 320.0), qualities=(90.0, 95.0), quality_spec=vmaf)
+    with pytest.raises(DegenerateCurveError) as caught:
+        compare_rd_curves(sliver, other)
+    assert caught.value.span == pytest.approx(5.0)
+
+    usable = RDCurve(rates=(100.0, 400.0), qualities=(70.0, 90.0), quality_spec=vmaf)
+    cheap = RDCurve(rates=(50.0, 200.0), qualities=(70.0, 90.0), quality_spec=vmaf)
+    comparison = compare_rd_curves(usable, cheap)
+    assert comparison.bd_rate == pytest.approx(-0.5, abs=1e-6)
+    assert comparison.quality_metric == "vmaf"
+
+
+def test_swapping_arms_flips_the_bd_rate_sign() -> None:
+    lpips = contract_metric("lpips")
+    anchor = RDCurve(rates=(1.0e5, 1.6e6), qualities=(0.30, 0.05), quality_spec=lpips)
+    candidate = RDCurve(rates=(0.5e5, 0.8e6), qualities=(0.30, 0.05), quality_spec=lpips)
+    forward = compare_rd_curves(anchor, candidate)
+    backward = compare_rd_curves(candidate, anchor)
+    assert backward.bd_rate == pytest.approx(-forward.bd_rate / (1.0 + forward.bd_rate), abs=1e-9)
+
+
+def test_gate_a_floor_accepts_equal_quality_when_cheaper() -> None:
+    psnr = contract_metric("psnr")
+    lpips = contract_metric("lpips")
+    floor = OperatingPoint(rate=10_000.0, quality=20.0)
+    winner = OperatingPoint(rate=8_000.0, quality=20.0)
+    loser = OperatingPoint(rate=8_000.0, quality=19.0)
+    from src.components.metrics.bd_rate import meets_or_beats_floor
+
+    assert meets_or_beats_floor(winner, floor, psnr)
+    assert not meets_or_beats_floor(loser, floor, psnr)
+    assert meets_or_beats_floor(
+        OperatingPoint(rate=8_000.0, quality=0.40),
+        OperatingPoint(rate=10_000.0, quality=0.40),
+        lpips,
+    )
+    assert not meets_or_beats_floor(
+        OperatingPoint(rate=8_000.0, quality=0.50),
+        OperatingPoint(rate=10_000.0, quality=0.40),
+        lpips,
+    )

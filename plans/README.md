@@ -6,8 +6,11 @@ need a change there, say so in your report rather than making it.
 
 - **`ROADMAP.md`** — what is left, in what order, with the dependency graph.
   **Start there.**
-- **`FORK-bp31.md`** — the three papers, one per outcome of the run currently
-  in flight, written before that run reports.
+- **`TERMINOLOGY.md`** — plain-language names used in new reports and the paper.
+- **`SESSION-REPORT.md`** — how to assign work to Codex/Claude,
+  Cursor/Antigravity, and what a completed session must return.
+- **`FORK-bp31.md`** — historical pre-result decision record for BP31. It is
+  superseded for scheduling by `ROADMAP.md`.
 - **`DEFERRED.md`** — real work deliberately not now.
 
 ---
@@ -16,7 +19,7 @@ need a change there, say so in your report rather than making it.
 
 Four things are true and all of them are load-bearing.
 
-0. **PointStream loses to the codec it is built on.** BD-rate **+90.97%** against
+0. **PointStream currently loses to the codec it is built on.** BD-rate **+90.97%** against
    an av1 anchor at N=2 scenes with the cross-scene stream on
    (`plans/BP31-findings.md` §9), from +116.8% with a single-frame plate
    (`PLAN.md` §2.20). `AGENTS.md` requires the headline claim to land where
@@ -58,20 +61,19 @@ Four things are true and all of them are load-bearing.
 Ordering, dependencies and file ownership are in **`ROADMAP.md`**. This table is
 the index only.
 
-| Brief | Owns | Wave |
+| Brief / roadmap ID | Owns | Order |
 |---|---|---|
-| `BP31-paired-ladder-across-scenes.md` + `BP31-findings.md` | the paired ladder over N scenes | **running now**, another session, PR #45 |
-| `BP32-rate-budget.md` ⭐ | where the bits go against where the headroom said they could | 9 — do first |
-| `BP33-span-amortisation.md` ⭐ | span: the ladder runs 8 frames, the cache holds 48 | 9 — do first |
-| `BP34-operating-point.md` | encode/decode time, the operating point, the title | 9 |
-| `BP35-perceptual-bdrate.md` | BD-rate on VMAF and LPIPS | 9 |
-| `BP36-second-domain.md` | DAVIS and UVG — P0 item 6 | 9 |
-| `BP37-required-behaviour.md` | the gate `PLAN.md` §8 describes | 9 |
-| `BP38-paper-infrastructure.md` | figures, a DCVC-class anchor, reproducibility, related work | 9 |
-| `BP43-background-representation.md` ⭐ | a smaller plate in pixels — the one plate lever never expressible in config | 9 |
-| `BP39-all-off-corner.md` | D5 — the lattice claim is a hardcoded branch | 10, after PR #45 |
-| `BP40-background-honesty.md` | the background component's three open faults | 10, after PR #45 |
-| `BP41-ablation-lattice.md` | P0 item 4 — the paper's central contribution | 10 |
+| `BP31-paired-ladder-across-scenes.md` + `BP31-findings.md` | completed multi-scene baseline and current negative result | done, PR #45 merged |
+| M1/E1 / `BP45-ultra-low-rate-search.md` | metric direction, ultra-low AV1/VVC range and first search | first |
+| B1 / `BP44-canonical-background-canvas.md` | canonical background canvas and context resets | first |
+| D1 / `BP46-long-tennis-scenes.md` | long eligible first-domain inputs | first |
+| M2 / `BP32-rate-budget.md` + `BP33-span-amortisation.md` | byte ledger and long-scene slope | after B1 |
+| E1 | first-domain low-rate × scene-length search | after M1/B1/D1 |
+| E2 | six-video confirmation | after a candidate win |
+| A1 / `BP41-ablation-lattice.md` | core component ablation matrix | after E2 |
+| L1 / `BP38-paper-infrastructure.md` | DCVC-RT baseline | after E2 |
+| G1 / `BP36-second-domain.md` | independent second domain | after E2 |
+| T1 / `BP34-operating-point.md` | profile and speed optimization | after E2 |
 
 ## Parked, with the reason
 

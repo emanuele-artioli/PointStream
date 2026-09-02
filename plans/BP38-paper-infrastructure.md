@@ -1,5 +1,9 @@
 # BP38 — Paper infrastructure: figures, baselines a referee expects, reproducibility
 
+**Gate update (2026-09-02):** build repair, claim cleanup, figure inventory and
+reproducibility packaging may proceed now. Add the DCVC-RT learned-video-codec
+baseline only after Gate B in `plans/ROADMAP.md`; DCVC-UF is a stretch goal.
+
 **Everything the manuscript needs that does not depend on a result.** Doing it
 now means that when BP31 and BP41 land, the paper is a writing job rather than a
 build job.
@@ -12,7 +16,8 @@ the parent.** Its `AGENTS.md` and marker convention govern there.
 **Read first:** the paper repo's `AGENTS.md` and `sections/README.md` ·
 `appendices/README.md` · `plans/ROADMAP.md` §6.
 
-**No result dependency.** Four separable pieces; they can be four sessions.
+**Mixed dependency.** Paper/build infrastructure has none; the learned baseline
+follows Gate B.
 
 ---
 

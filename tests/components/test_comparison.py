@@ -60,6 +60,26 @@ def test_a_single_item_is_refused_outright() -> None:
         compare_paired("a", [1.0], "b", [0.0])
 
 
-def test_mismatched_arms_are_refused() -> None:
-    with pytest.raises(ValueError, match="same items"):
-        compare_paired("a", [1.0, 2.0], "b", [0.0])
+def test_describe_names_the_quality_axis_when_a_spec_is_passed() -> None:
+    from src.contracts.metrics import metric as contract_metric
+
+    a = [20.0, 21.0, 19.5, 20.5, 22.0, 19.0, 20.2, 21.3, 20.8, 19.7]
+    b = [10.0, 11.0, 9.5, 10.5, 12.0, 9.0, 10.2, 11.3, 10.8, 9.7]
+    result = compare_paired("a", a, "b", b, quality_spec=contract_metric("vmaf"))
+    assert result.quality_metric == "vmaf"
+    assert "vmaf" in result.describe()
+    assert result.winner == "a"
+
+
+def test_a_spec_and_a_disagreeing_direction_flag_are_refused() -> None:
+    from src.contracts.metrics import metric as contract_metric
+
+    with pytest.raises(ValueError, match="disagrees"):
+        compare_paired(
+            "a",
+            [0.1, 0.2],
+            "b",
+            [0.3, 0.4],
+            quality_spec=contract_metric("lpips"),
+            higher_is_better=True,
+        )

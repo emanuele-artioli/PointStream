@@ -165,3 +165,23 @@ def test_out_of_range_scores_are_recognisable_as_alarms() -> None:
     assert not metric("ssim").in_range(-0.2)
     # FVMD declares no bounds, so nothing is out of range for it.
     assert metric("fvmd").in_range(9_999.0)
+
+
+def test_each_headline_metric_declares_its_curve_semantics() -> None:
+    """BD-rate reads these fields off the spec, not flags at the call site."""
+    psnr = metric("psnr")
+    vmaf = metric("vmaf")
+    ssim = metric("ssim")
+    lpips = metric("lpips")
+    assert psnr.min_curve_span == 3.0
+    assert vmaf.min_curve_span == 10.0
+    assert ssim.min_curve_span == 0.05
+    assert lpips.min_curve_span == 0.05
+    assert psnr.curve_quality_transform == "identity"
+    assert lpips.curve_quality_transform == "negate"
+    assert psnr.to_curve_quality(40.0) == 40.0
+    assert lpips.to_curve_quality(0.20) == -0.20
+    assert "negate" in lpips.describe_axis()
+    assert "min span 10.0" in vmaf.describe_axis()
+    assert "higher-is-better" in vmaf.describe_axis()
+    assert "lower-is-better" in lpips.describe_axis()

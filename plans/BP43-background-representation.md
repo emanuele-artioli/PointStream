@@ -43,6 +43,27 @@ median gives a **16% smaller plate on the moving clip** and costs **3.7 dB**.
 Registration is therefore already a priced rate-quality trade, and it is the only
 one in the background component that has both numbers.
 
+## 1b. How much this brief is worth, after the span run
+
+**Read `plans/BP33-span-amortisation.md` §6 before spending anything here.** Two
+measurements shrink the prize:
+
+- **Span drives the plate's per-frame cost toward zero.** It is 80% of the
+  payload at span 8, 72% at 16, and falling. Every lever in this brief acts on a
+  term that a free flag is already shrinking.
+- **The plate codec lever is smaller than `PLAN.md` §2.21 assumed.** At the
+  ladder's operating point (~43 dB) av1 and vvc intra are **x0.691** against
+  jpeg, not the 3.6–4.1x quoted from a single-point comparison at 38 dB
+  (`plans/BP31-findings.md` §10, which corrected §2.21 in place). So a resolution
+  lever multiplies against a base already ~31% smaller than the plan assumed.
+
+**This does not make the brief pointless** — the plate is a real cost at any
+finite span, and a 4x pixel reduction on it is still the largest single
+compression available on that term. It does mean **this is no longer the item
+that decides the paper**, and it should be sized accordingly: one sweep, not a
+campaign, and after the `panorama-full` span points have confirmed or falsified
+the marginal-cost picture.
+
 ## 2. Lever A — make the plate smaller in pixels
 
 **This is the direct answer to "reduce the background size", and it has never

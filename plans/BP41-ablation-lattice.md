@@ -1,4 +1,8 @@
-# BP41 — The core ablation lattice, which is the paper's central contribution
+# BP41 — The core component ablation matrix, which is the paper's central contribution
+
+The manuscript/configuration may still use “lattice” where it has a precise
+structural meaning. New planning and reporting use *component ablation matrix*;
+see `plans/TERMINOLOGY.md`.
 
 **`PLAN.md` §7 P0 item 4, still un-run**, and the only P0 item whose absence
 removes the paper's *stated* contribution rather than one of its results. The
@@ -11,9 +15,9 @@ lattice sweep has ever been run end to end.
 `config/benchmarks/*.yaml`, `sections/evaluation.tex` §`subsec:eval-lattice` and
 §`subsec:eval-object`.
 
-**Blocked on:** the corrected ladder harness (PR #45), and on
+**Blocked on:** Gate B in `plans/ROADMAP.md`, then on
 `plans/BP33-span-amortisation.md` choosing a frames-per-scene value. Running the
-lattice at the wrong span multiplies the wrong number by every axis.
+matrix at the wrong scene length multiplies the wrong number by every axis.
 
 **Read first:** `AGENTS.md` · `PLAN.md` §3 "the ablation lattice", §4, §5, §7 P0
 item 4 · `plans/wave5-report.md` (the pose-axis warning) ·

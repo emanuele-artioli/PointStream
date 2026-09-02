@@ -82,11 +82,12 @@ def calibrate(metrics: list[str], reference: np.ndarray) -> dict[str, Any]:
     for metric in evaluator.metric_names:
         values = [table[name][metric] for name in order]
         numeric = [float("inf") if value == "inf" else float(value) for value in values]
-        # PSNR, SSIM and VMAF are higher-is-better; LPIPS is a distance. The
-        # expected direction is stated per metric rather than inferred, because
-        # inferring it from the numbers is how a metric gets declared correct by
-        # the very data it is supposed to judge.
-        higher_is_better = metric in {"psnr", "ssim", "vmaf"}
+        # Direction is a property of the metric contract, not a set of names
+        # this file has to remember. Inferring it from the scores is how a
+        # metric gets declared correct by the data it is supposed to judge.
+        from src.contracts.metrics import metric as metric_spec
+
+        higher_is_better = metric_spec(metric).higher_is_better
         expected = list(reversed(sorted(numeric))) if higher_is_better else sorted(numeric)
         verdicts[metric] = {
             "by_anchor": dict(zip(order, values, strict=True)),
