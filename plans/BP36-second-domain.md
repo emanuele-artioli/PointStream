@@ -6,7 +6,7 @@ most-requested item* a referee is likely to raise. Nothing has been run in eithe
 domain.
 
 **Owns:** `src/components/domain/**`, `src/components/domain/datasets/*.yaml`,
-`outputs/bp36-general/**`, `sections/evaluation.tex` §`subsec:eval-general`.
+`outputs/bp36-general/**`, a new `datasets/skating.yaml`, `sections/evaluation.tex` §`subsec:eval-general`.
 **Does not own** `experiments/tier/**` or `src/runner/**` while PR #45 is open.
 
 **Read first:** `AGENTS.md` · `PLAN.md` §7 P0 item 6 and §4 ·
@@ -34,31 +34,40 @@ salient, no tennis rules. The tennis profile's court and player heuristics are
 threaded through more of the pipeline than the registry suggests, and the honest
 expectation is that the first `general` run fails somewhere specific. Find where.
 
-## 1. The opportunity nobody has written down
+## 1. The domain order, corrected 2026-09-02
 
-`/home/itec/emanuele/Datasets/UVG/1920x1080` holds **`Jockey` and
-`ReadySteadyGo`**, 1920x1080, 120 fps, 4:2:0 8-bit YUV.
+An earlier version of this brief put **UVG** first, on the reasoning that a
+standard sequence answers "was the regime found or built?" in a way more
+self-curated tennis cannot. **That was the wrong call and is withdrawn as the
+lead.** The ordering below is the project's standing plan — solve tennis, then
+DAVIS, then one more simple sport — and it is better on the merits:
 
-Those are **UVG sequences**, which is to say they are among the handful of clips
-every video-coding referee has seen anchor numbers for. Both are sports with a
-moving camera and a small, fast, salient subject on a large predictable
-background — which is PointStream's stated regime, in a dataset the paper did
-not curate for itself.
+| # | Domain | Data | Why here |
+|---|---|---|---|
+| 1 | **Tennis** | `assets/raw_4k/`, 7 matches, 4K | in progress; the scope the project already chose, and large enough to be a paper on its own |
+| 2 | **DAVIS human sequences** | `/home/itec/emanuele/Datasets/DAVIS`, 50 frames each, annotated | what `general.yaml` already names, what `subsec:eval-general` is written around, and it has ground-truth masks so the perception control is checkable rather than assumed |
+| 3 | **Figure skating** | `EvgeniaMedvedeva2018` (23), `ShomaUno2018` (17), `YuzuruHanyu2018` (16) — 56 clips, 1920x1080, 25 fps, ~42 frames each | already on disk. One or two people on a large, bright, near-static rink, with a panning camera: **the claimed regime, in a second sport** |
+| — | UVG `Jockey`, `ReadySteadyGo` | `/home/itec/emanuele/Datasets/UVG/1920x1080` | optional, and only with the caveats below |
 
-That matters for a reason the current evaluation plan does not address: **every
-number in this paper is measured on broadcast tennis that this project selected,
-segmented and cached itself.** A referee is entitled to ask whether the regime
-was found or built. One standard sequence answers that in a way six more tennis
-matches cannot.
+**Why skating is the better third domain than UVG.** The pipeline is
+person-centric — detector, pose, segmenter and tracker are all built around
+people — and skating gives it exactly that: one or two humans, whole-body,
+against a background with a larger static fraction than tennis has. It is the
+*same* claim in a *different* sport, which is what a generalization section
+needs. The clips are ~42 frames, close to the 48-frame windows the tennis cache
+uses, so `plans/BP33-span-amortisation.md`'s span conclusion transfers.
 
-**Priority order, therefore:**
+**And why UVG is not the free win it looked like.** Both locally available
+sequences are equestrian — a jockey on a horse, and horses at a gate. The salient
+object is a horse plus rider, which the person pipeline handles poorly, so a bad
+number there would measure the detector rather than the codec. They are also
+1920x1080 at 120 fps against the tennis 4K, which confounds resolution and frame
+rate with domain. Only 2 of UVG's 16 sequences are on disk.
 
-1. **UVG `Jockey` and `ReadySteadyGo`** — highest value per hour. Standard,
-   citable, and in the claimed regime.
-2. **DAVIS human sequences** — what `general.yaml` already names, and what
-   `subsec:eval-general` is written around. Broader content, closer to the
-   "degrades gracefully outside its domain" claim the section actually makes.
-3. Football, `PLAN.md` §7 P2 item 19, only if time remains.
+Its one real advantage stands: referees know these clips and published anchors
+exist for them. So keep UVG as an **optional late addition** — run it if there is
+time after skating, state the resolution and frame-rate difference, and do not
+let it carry a generalization claim it is not shaped to carry.
 
 ## 2. What the section must show, and the constraint on it
 
@@ -79,12 +88,16 @@ Two-sided, and note that the *upper* bound matters here as much as the lower:
 this is a different domain, and a result that is suspiciously close to the tennis
 result is as much of an alarm as one that is far away.
 
-- **BD-rate on UVG `Jockey` against av1, same protocol as the tennis ladder:
-  [+20%, +400%]** relative to whatever the tennis number is at the same span and
-  scene count. Inside a factor of two of tennis means the pipeline is domain-
-  agnostic in a way nothing has yet suggested — check the domain profile actually
-  switched. Far above means the perception stage is failing on non-tennis content
-  and the number is measuring a broken detector, not a codec.
+- **BD-rate on a skating clip against av1, same protocol as the tennis ladder:
+  within [0.5x, 3.0x] of the tennis number** at the same span and scene count.
+  Skating is the *friendlier* case — a larger static background fraction — so
+  meaningfully worse than tennis is an alarm, and the first thing to check is
+  whether the perception stage is failing on non-tennis content and the number is
+  measuring a broken detector rather than a codec.
+- **On DAVIS, expect worse than both.** Handheld, free-moving cameras break the
+  homography model the plate depends on. A DAVIS number close to the tennis one
+  would mean the domain profile did not switch. This section's `GOAL` asks for
+  graceful degradation, not for a win.
 - **Person detection recall on DAVIS human sequences ≥ 0.7** against the provided
   annotations. Below that, the pipeline is not seeing the objects and no rate
   claim from it means anything. This is the control, and it runs first.
@@ -106,8 +119,9 @@ whole system.
   fixed or recorded.
 - A perception control (detection recall against annotations) passes on the
   chosen sequences, and is reported beside the rate result.
-- At least one **UVG** sequence and two DAVIS sequences carry a BD-rate against
+- At least three DAVIS sequences and three skating clips carry a BD-rate against
   the same anchor and protocol as the tennis ladder, reported per sequence with
-  the spread.
+  the spread — **and with encode and decode time in the same table**, per
+  `AGENTS.md`'s three-dimension rule. UVG is optional and late.
 - `HOLE(subsec:eval-general)` is cleared by the edit that lands the data, and
   `NEXT(paper-wide)`'s "second evaluation domain" item is struck.
