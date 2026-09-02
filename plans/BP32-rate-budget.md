@@ -71,20 +71,44 @@ one row per term and every row citing the run it came from.
 | PointStream unaided corner (plate + crops, no residual) | 487,643 | same |
 | PointStream appearance/crops | ~24,300 (487,643 − 463,334) | derived |
 
-**The fact that should be the headline of this brief:** the plate alone is
-**5.4x the entire anchor clip** at the anchor's cheapest rung, and it is one
-still image. Everything else in PointStream's payload — crops, residual,
-metadata — is 24,309 B against the anchor's 85,995 B, i.e. **PointStream's
-non-plate payload is already under a third of the anchor's total rate.** The
-system is not losing because object-centric coding is expensive. It is losing
-because it sends one very expensive picture.
+**Corrected 2026-09-02, and the correction is the point of this brief.** The
+sentence that stood here read: *"PointStream's non-plate payload is already under
+a third of the anchor's total rate — the system is not losing because
+object-centric coding is expensive, it is losing because it sends one very
+expensive picture."*
+
+That compared PointStream's **marginal** cost against the anchor's **total**,
+including the anchor's intra keyframe. Both arms have a fixed per-scene cost —
+PointStream's plate, the anchor's keyframe — and comparing one arm's marginal
+against the other's fixed-plus-marginal flatters PointStream by exactly the
+keyframe.
+
+`plans/BP31-findings.md` §12 makes the honest version measurable, because two
+span points separate fixed from marginal. The anchor's marginal is a difference
+quotient, so it does not depend on how many keyframes the joint encode used:
+
+| | fixed, amortised by span | **marginal, per frame** |
+|---|---:|---:|
+| av1 anchor | ~382,000 B (intra) | **4,757 B** |
+| PointStream | 768,277 B (plate) | **9,319 B** (residual + crops + metadata) |
+
+**PointStream's per-frame payload is ~1.96x what av1 spends coding a whole inter
+frame** — a frame that includes the players PointStream sends separately. The
+plate is still 5.4x the anchor clip at span 8, and that is still true; what is
+not true is that removing it would leave PointStream comfortably ahead.
+
+**The ledger must therefore be built at two spans, not one**, and must report
+fixed and marginal separately for both arms. A budget drawn at span 8 alone will
+attribute the whole gap to the plate and be wrong about what to fix.
 
 ### The terms to attribute, cheapest to measure first
 
-1. **Span.** The plate is paid once per scene whatever the scene's length. The
-   ladder runs 8 frames; BP21's cache holds 48. This is `BP33` and it is
-   probably the largest single term — see that brief for the pre-registered
-   bounds.
+1. **Span.** ✅ **Measured 2026-09-02** (`BP31` §12, `BP33` §6). It is real and it
+   is **not** the largest term: span amortises *both* arms' fixed costs, so the
+   ratio moves 2.17x → 2.01x over a doubling and then flattens near 1.9–2.0x.
+   The brief's prediction that PointStream would gain substantially more was
+   wrong. Its real value is diagnostic — it separates fixed from marginal, and
+   the marginal comparison above is what the ledger now has to explain.
 2. **Plate codec.** `BP31` §10 measures av1/vvc intra at **x0.691** against jpeg
    at 43 dB on a 4K panorama plate — a 1.45x saving, not the 3.6–4.1x
    `PLAN.md` §2.21 quotes from a single-point comparison at a fidelity the
@@ -93,13 +117,16 @@ because it sends one very expensive picture.
    of this video, av1 at crf38. Note it **cannot compose with term 2 today** —
    `panorama-stream` never consults the still-image sidecar (`BP31` §1) — so the
    ledger must show them as alternatives, not as a product, and say so.
-4. **The panorama itself.** It does *not* shrink the plate (`BP29` §4: the plate
+4. **Canvas growth.** ✅ **Measured, no longer an extrapolation** (`BP31` §12):
+   x1.0007 at every span on a static scene, topping out at **x1.038 at span 48**
+   on a panning one, with growth stopping after span 32. Not a material cost.
+5. **The panorama itself.** It does *not* shrink the plate (`BP29` §4: the plate
    codes to 0.6% *fewer* bytes while covering 1.8% more canvas). Its whole gain
    is on the residual — 0.22x, +4.9–6.2 dB delivered on a moving clip. So it
    belongs in the ledger as a **quality** term, not a rate term, and putting it
    in the rate column is a mistake this brief exists partly to prevent.
-5. **Everything unattributed.** Whatever the four terms above do not explain is
-   the number that matters. Name it, do not absorb it.
+6. **Everything unattributed.** Whatever the terms above do not explain is the
+   number that matters. Name it, do not absorb it.
 
 ## 3. The sensitivity nobody has priced: the anchor is running at a speed preset
 
@@ -118,10 +145,19 @@ libaom at a CRF — a different encoder with its own settings. Strengthening the
 preset therefore improves the anchor across its whole payload and PointStream
 across the ~9% of its payload that is not plate.
 
-So **the +90.97% on record is measured against a handicapped anchor, and is a
-lower bound on the gap at a quality preset.** A referee will ask why preset 10,
-the honest answer is encode time, and the honest consequence has never been
-measured.
+So **the +90.97% on record is plausibly measured against a handicapped anchor.**
+**Stated as reasoning, not as a result** — nobody has run the anchor at another
+preset, so nothing may be restated as "a lower bound" until this section's two
+encodes exist. A referee will ask why preset 10; the honest answer is encode
+time, and the honest consequence has never been measured.
+
+**Two things sharpen the argument since it was written.** The share it turns on is
+span-dependent — PointStream's non-plate payload is ~9% of its own at span 8 and
+~28% at span 16 (`plans/BP31-findings.md` §12) — so the asymmetry shrinks as span
+grows and must be quoted at a stated span. And it now cuts both ways on the
+*time* axis: PointStream already encodes at **x19.1–19.7** the anchor's wall
+clock, so moving the anchor to a slower preset narrows a gap the paper would
+rather not narrow.
 
 **Price it here, because it is two encodes:** the anchor's rate at presets 10, 6
 and 2 on one cached clip at one rung. Report the anchor's BD-rate against itself
@@ -167,11 +203,13 @@ to explain.
 - **Span is the largest single term**, worth more than plate codec and
   cross-scene amortisation combined. If it is not, that is a genuine surprise and
   `BP33`'s bounds need revising before its run, not after.
-- **The non-plate payload stays under 40% of the anchor's rate** at matched
-  quality in every configuration. It is 28% today. If a configuration pushes it
-  past 40%, the residual or the appearance channel has started to matter and the
-  "the plate is the whole problem" framing has stopped being true — which would
-  be a finding, and would move `PLAN.md` §7 P0 item 8.
+- ~~The non-plate payload stays under 40% of the anchor's rate~~ — **this bound
+  fired and was the wrong instrument, 2026-09-02.** It measured PointStream's
+  marginal against the anchor's total, so it could never fire for the right
+  reason. The replacement is **marginal against marginal**: PointStream's
+  per-frame non-plate cost against the anchor's per-frame inter cost, which is
+  **1.96x** today. That is the quantity "the plate is the whole problem" was
+  hiding, and it has now stopped being true.
 
 ## 6. What this brief must not do
 

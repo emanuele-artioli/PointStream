@@ -35,6 +35,19 @@ The one number on record is **~0.09 fps encode at 4K**, which appears as a
 `NOTE`, has no provenance line, and is a single figure for a pipeline with at
 least six stages.
 
+**A second number arrived 2026-09-02** and it is the one that matters:
+`ladder_scenes_compare.py` now prints wall clock, and PointStream encodes at
+**x19.1** (`panorama-full`) and **x19.7** (`panorama-stream`) the anchor's time —
+on top of roughly twice its rate. The three-dimension rule earned itself in one
+run: a two-column table could not have said that.
+
+**Read it as an order of magnitude only.** `plans/BP31-findings.md` §10 measured
+a within-point spread on repeated 4K encodes larger than a whole knob sweep's
+range, so a factor of 1.2 in that column means nothing. Which is exactly the
+argument for this brief: an order-of-magnitude figure with no stage breakdown
+cannot be acted on, and 19x is large enough that a referee will want to know
+which stage owns it.
+
 ## 1. What to measure
 
 Per stage, per tier config, per resolution, on the same clips the ladder uses so
@@ -57,6 +70,9 @@ the numbers can sit beside rate and quality rather than in their own section.
 
 ## 2. Bounds — `outputs/bp34-timing/bounds-before-run.json` before the first run
 
+- **PointStream/anchor encode-time ratio lands in [8x, 40x]** with generation
+  off, bracketing the x19.1/x19.7 already measured. Well outside means the
+  anchor's preset or the machine's load changed underneath the comparison.
 - **End-to-end encode at 4K lands in [0.02, 0.5] fps** with generation off. The
   0.09 on record is inside that; well above it means the note is stale in the
   good direction and something has been optimised without anyone noticing, which

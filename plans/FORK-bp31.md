@@ -37,6 +37,18 @@ not, and a two-column table cannot tell them apart.
 Current value: **+90.97%**, N=2 scenes, 8 frames per scene, Y-PSNR, one video
 (`plans/BP31-findings.md` §9).
 
+**Always state the span it was measured at.** §12 of the same findings shows the
+number moves with frames-per-scene and that both arms amortise, so a BD-rate
+quoted without its span is not comparable to another one. And the underlying
+quantity, once span is large, is the **marginal** comparison — PointStream's
+per-frame non-plate cost against the anchor's per-frame inter cost, **1.96x**
+today. A branch condition met only at short span, where the anchor is paying for
+an unamortised keyframe, is not a regime; it is a rig.
+
+**Speed is part of the condition, not a caveat on it.** PointStream encodes at
+**x19.1–19.7** the anchor's wall clock. Branch A's "PointStream wins" therefore
+has to say *at what encode cost*, in the same table.
+
 ---
 
 ## Branch A — a regime is found: BD-rate ≤ −5% on ≥6 videos

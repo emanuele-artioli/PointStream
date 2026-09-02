@@ -15,7 +15,8 @@ is the ordering and the dependency graph.
 PointStream is measured, end to end, against the codec it is built on, and **it
 loses**: BD-rate **+90.97%** against an av1 anchor at N=2 scenes with the
 cross-scene stream on (`plans/BP31-findings.md` §9), down from +109.72% without
-it. `AGENTS.md` is explicit that a paper whose central result is "we lose
+it — at **8 frames per scene**, and §0b below is why that qualifier now matters
+more than the number. `AGENTS.md` is explicit that a paper whose central result is "we lose
 everywhere" is not a submission, so **finding the regime where an object-centric
 codec wins is the work**, not a hoped-for outcome. Three things follow, and they
 are the shape of this whole roadmap:
@@ -29,6 +30,54 @@ are the shape of this whole roadmap:
 3. **Everything else divides cleanly** into work that is true whatever BP31
    finds (waves 9 and 10 below) and work whose shape depends on it
    (`plans/FORK-bp31.md`).
+
+---
+
+## 0b. What the span run changed, 2026-09-02 — read this before picking an item
+
+`plans/BP31-findings.md` §12 ran `BP33` before the extraction campaign. The
+mechanism held, **the brief's prediction did not**, and the run exposed something
+that reorders this roadmap.
+
+Span amortises the plate — and it amortises **the anchor's intra keyframe just as
+well**. Over a doubling the ratio moved 2.17x → 2.01x, about 7%, and the fit says
+it flattens near 1.9–2.0x from there. Both arms have a fixed per-scene cost; the
+brief modelled only one of them.
+
+Separating fixed from marginal is what the two span points buy, and the anchor's
+marginal is a difference quotient, so it does not depend on its keyframe count:
+
+| | fixed, amortised by span | **marginal, per frame** |
+|---|---:|---:|
+| av1 anchor | ~382,000 B (intra) | **4,757 B** |
+| PointStream | 768,277 B (plate) | **9,319 B** (residual + crops + metadata) |
+
+> **PointStream's marginal cost is ~1.96x the anchor's.** Its per-frame payload
+> is about twice what av1 spends coding an entire inter frame — one that contains
+> the players PointStream is transmitting separately.
+
+**"The plate is 88–91% of the payload" is a span-8 artifact.** At 8 frames the
+plate is 80% of it, at 16 it is 72%, and it keeps falling. Run at a span the
+cache already supports and the dominant cost is **the residual and the crops**.
+
+**What this reorders.**
+
+- **Plate levers are worth less than `PLAN.md` §7 P0 item 8 assumes.** `BP43`'s
+  resolution sweep and `BP40`'s codec and canvas work all act on a term span is
+  driving toward irrelevance. Still worth doing — the plate is real at any finite
+  span — but they are no longer the item that decides the paper.
+- **`BP41` rises sharply.** The residual and appearance axes are now the ones on
+  the dominant cost, and the lattice is what prices them.
+- **One cheap run comes first, and it falsifies the above if it is wrong.** Span
+  24/32/48 under `panorama-full` needs **no component change** (each scene codes
+  its own plate, so the canvas-agreement blocker in `BP40` §3b does not apply)
+  and gives the third point the two-point fit needs. **And the non-plate split —
+  residual against crops against metadata, per frame** — because nobody can act
+  on a marginal cost quoted as one number.
+
+Two smaller results from the same run, both now folded into their briefs: canvas
+growth is **measured** at x1.038 worst case rather than extrapolated (`BP32`), and
+PointStream encodes at **x19.1–19.7** the anchor's wall clock (`BP34`).
 
 ---
 
@@ -183,8 +232,12 @@ because together they are the answer to "did we miss something".
 3. **The anchor runs at a speed preset.** SVT-AV1 preset 10, and it does *not*
    cancel between the arms the way `DEFERRED.md` D-CODEC-PRESETS assumes,
    because the anchor codes 100% of its pixels through that path and PointStream
-   codes ~9% of its payload through it. The reported gap is a lower bound. →
-   `BP32` §3.
+   codes only its residual through it. **This is an argument, not a measurement**
+   — nobody has run the anchor at another preset, so no number here may be
+   restated as a bound until someone does. Note also that the share it turns on
+   is span-dependent: PointStream's non-plate payload is ~9% at span 8 and ~28%
+   at span 16, so the argument's magnitude shrinks as span grows. `BP32` §3 owns
+   the two encodes that would settle it.
 4. **BD-rate is PSNR-only by construction.** `MIN_QUALITY_SPAN_DB = 3.0` is in
    decibels — a sliver on a VMAF curve, impossible on an LPIPS one — and nothing
    in the module records which direction quality runs, so an LPIPS BD-rate would

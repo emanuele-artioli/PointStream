@@ -70,6 +70,48 @@ worth 0.646 over twelve scenes. Composing them is worth doing if the product is
 worth the architectural change and not if it is not, and that is a number BP32
 produces for free.
 
+## 3b. A run-wide canvas — found 2026-09-02, and it gates the span axis
+
+`plans/BP31-findings.md` §12 hit this running the span sweep. Spans 24, 32 and 48
+refuse under `panorama-stream`:
+
+```
+scene 1 is (2172, 3881, 3), the stream is (2161, 3841, 3);
+inter prediction needs a fixed frame size
+```
+
+`BackgroundStreamTransmitter.push` (`src/components/background/stream.py:456`)
+requires one frame size across a chain, and `build_plate` sizes each scene's
+canvas from *that scene's own* homographies. A static scene's canvas never grows;
+a panning one's does. Below span ~24 the shapes coincide by accident; past it
+they genuinely differ.
+
+**It is a size-*agreement* problem, not a size problem**, and it exists only when
+span and the cross-scene stream are on together — which is why no bound in
+`plans/BP33-span-amortisation.md` covered it.
+
+**The fix:** a canvas common to the whole run — pad every scene's plate to the
+union of the run's canvases, so the chain sees one frame size.
+
+**Bounds before building it.** Canvas growth is now measured, not guessed:
+x1.0007 on a static scene at every span, **x1.038 at span 48** on a panning one,
+against a `MAX_CANVAS_SCALE` of 4.
+
+- **Padding to the union costs [1%, 8%] of plate area** on this content. Above
+  that, the union is being computed over scenes that do not belong in one chain.
+- **The padded region must not cost proportionally.** It is flat fill, which any
+  intra coder handles almost for free, so **plate bytes should rise by less than
+  half the area increase**. If bytes track area one-for-one, the padding is not
+  flat and something is writing content into it.
+- **Every existing single-canvas run reproduces to the byte.** This changes a
+  component with BP30's tests around it; a published number that moves is a
+  regression.
+
+**Do the cheap thing first.** `BP33` §6 shows span amortises the plate toward
+irrelevance, so this fix buys 4% of a term that is shrinking. **Run the span
+points under `panorama-full` first** — no component change needed — and decide
+from those numbers whether the combined question still justifies the change.
+
 ## 4. The bound this component keeps breaking
 
 `plans/BP31-findings.md` §6 is worth re-reading before writing any bound here:
@@ -90,3 +132,6 @@ share, and never at a matched knob.
   it moves the bytes.
 - The (a)/(b) composition is either implemented with its keyframe decode proven
   bit-exact, or declined in writing with BP32's number as the reason.
+- The run-wide canvas is either implemented — with every existing single-canvas
+  run reproducing to the byte — or declined with the `panorama-full` span numbers
+  as the reason.
