@@ -374,3 +374,50 @@ failure produces a smooth, monotone, entirely plausible curve.
 **No comparison is drawn between the two N=2 curves here.** The streamed one was
 not measuring what it claimed, and the re-run with the corrected rungs is the
 first version of it worth reading.
+
+## 9. A BD-rate, at last — and the stream is worth 19 points of it
+
+With the plate knob corrected (§8), both arms produce readable curves and
+`experiments/tier/ladder_scenes_compare.py` integrates them. Two scenes of
+`alcaraz_highlights`, 8 frames each, av1 preset 10 on both arms, anchor encoding
+the concatenation:
+
+| PointStream arm | BD-rate vs av1 anchor | overlap |
+|---|---:|---|
+| `panorama-full` — a fresh plate per scene | **+109.72%** | 39.3-43.9 dB |
+| `panorama-stream` — amortised across scenes | **+90.97%** | — |
+| `panorama-stream` with the frozen plate (§8) | *refused* | — |
+
+Both inside the pre-written band of [-20%, +150%]
+(`outputs/bp31-ladder/bounds-before-run.json`), so no alarm. The third row is
+the guard from §8 doing its job on the run that produced it.
+
+**The cross-scene stream is worth about 19 BD-rate points at N=2**, which is the
+least favourable N amortisation can be given — one keyframe and one marginal
+scene. §3 measures the underlying saving at 0.646 over twelve scenes on this
+same video, so the ladder number should improve with N, and the next session's
+first job is to make N large enough to say by how much.
+
+**What this is not.** It is not comparable to `PLAN.md` §2.20's +116.8%: that was
+one scene against a single-scene anchor, and this is two scenes against an
+anchor encoding both. The right reading is the *within-this-run* comparison,
++109.72% against +90.97%, where everything except the background method is held
+fixed. And two scenes of one video is a configuration measurement, not a claim —
+`presley`'s bar is n>=6 videos.
+
+**PointStream still loses by a wide margin.** +90.97% means it costs roughly
+twice the anchor's rate at equal quality. Closing that is what the untried axes
+in `plans/prompts/next-session-bp31.md` are for, and the content axis is the
+first of them: this ran on `alcaraz_highlights`, which §2.20 chose as the most
+*static* of eight clips — the friendliest case for the anchor and the worst for
+an object-centric codec.
+
+### The units trap, avoided by one reading
+
+`BDComparison.bd_rate` is a **fraction**, not a percentage: `+1.168` is
+`+116.8%`. The comparison module converts once, next to the band, with the
+reason in a comment. `AGENTS.md` records a bound that fired against a correct
+result because it had been derived in the wrong units, and a band written in
+percent against a value returned as a fraction would have read `+0.91%` — a
+spectacular and entirely fictional win, comfortably inside the band, with
+nothing about it looking wrong.
