@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import subprocess
 import tempfile
+import time
 
 import numpy as np
 
@@ -164,26 +165,34 @@ def coded_curve(
     return RDCurve(rates=tuple(rates), qualities=tuple(qualities), label=codec_name)
 
 
-def coded_roundtrip(
+@dataclass(frozen=True)
+class TimedRoundtrip:
+    """One encode/decode of RGB frames, with the two halves timed separately.
+
+    ``encode_seconds`` is the encoder's own wall clock from ``EncodeRecord``.
+    ``decode_seconds`` is bitstream → RGB, including the ffmpeg pixel dump the
+    quality metrics read. The lossless RGB wrap that feeds the encoder is not
+    part of either, because it is not the codec under test.
+    """
+
+    size_bytes: int
+    frames: np.ndarray
+    encode_seconds: float
+    decode_seconds: float
+    tool_path: str
+    tool_version: str
+    preset: str | None
+    qp: int | None
+
+
+def timed_roundtrip(
     frames: np.ndarray,
     *,
     request: EncodeRequest,
     fps: float = 25.0,
     work_dir: Path | None = None,
-) -> tuple[int, np.ndarray]:
-    """Encode ``frames``, decode them back, and report both cost and result.
-
-    Returns ``(coded_bytes, decoded_frames)``. Both halves matter: a rate is
-    only a rate-distortion point if the quality is measured on what the codec
-    actually returned. Counting coded bytes while reconstructing from the
-    pre-codec array puts the rate and the quality at different operating points
-    — the mistake `BP24` made once on the background plate before catching it.
-
-    **Colour-preserving.** The payload is written as lossless RGB first and the
-    encoder converts to ``request.pix_fmt``. A residual carries a correction per
-    channel, so the luma-only path used by `coded_size` would silently discard
-    two thirds of it.
-    """
+) -> TimedRoundtrip:
+    """Encode ``frames``, decode them back, and split encode vs decode time."""
     clip = np.ascontiguousarray(np.asarray(frames, dtype=np.uint8))
     if clip.ndim != 4 or clip.shape[3] != 3:
         raise ValueError(f"expected (T,H,W,3) uint8, got {tuple(clip.shape)}")
@@ -206,6 +215,7 @@ def coded_roundtrip(
         dest = root / f"payload{BITSTREAM_SUFFIX[request.codec_name]}"
         record = encode(lossless, dest, request)
         back = root / "decoded.mkv"
+        decode_started = time.perf_counter()
         decode(dest, back, request)
         raw = _run_ffmpeg(
             [
@@ -214,13 +224,47 @@ def coded_roundtrip(
             ],
             None,
         )
+        decode_seconds = time.perf_counter() - decode_started
     decoded = np.frombuffer(raw, dtype=np.uint8)
     usable = (decoded.size // (height * width * 3)) * height * width * 3
     decoded = decoded[:usable].reshape(-1, height, width, 3)
     if decoded.shape[0] < count:
         pad = np.repeat(decoded[-1:], count - decoded.shape[0], axis=0)
         decoded = np.concatenate([decoded, pad], axis=0)
-    return int(record.size_bytes), decoded[:count]
+    return TimedRoundtrip(
+        size_bytes=int(record.size_bytes),
+        frames=decoded[:count],
+        encode_seconds=float(record.encode_seconds),
+        decode_seconds=float(decode_seconds),
+        tool_path=record.tool_path,
+        tool_version=record.tool_version,
+        preset=record.preset,
+        qp=record.rate,
+    )
+
+
+def coded_roundtrip(
+    frames: np.ndarray,
+    *,
+    request: EncodeRequest,
+    fps: float = 25.0,
+    work_dir: Path | None = None,
+) -> tuple[int, np.ndarray]:
+    """Encode ``frames``, decode them back, and report both cost and result.
+
+    Returns ``(coded_bytes, decoded_frames)``. Both halves matter: a rate is
+    only a rate-distortion point if the quality is measured on what the codec
+    actually returned. Counting coded bytes while reconstructing from the
+    pre-codec array puts the rate and the quality at different operating points
+    — the mistake `BP24` made once on the background plate before catching it.
+
+    **Colour-preserving.** The payload is written as lossless RGB first and the
+    encoder converts to ``request.pix_fmt``. A residual carries a correction per
+    channel, so the luma-only path used by `coded_size` would silently discard
+    two thirds of it.
+    """
+    trip = timed_roundtrip(frames, request=request, fps=fps, work_dir=work_dir)
+    return trip.size_bytes, trip.frames
 
 
 def _run_ffmpeg(argv: list[str], stdin_bytes: bytes | None) -> bytes:

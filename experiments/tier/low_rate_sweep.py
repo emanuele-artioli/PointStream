@@ -2,29 +2,36 @@
 
 Generation stays off. Each stage moves one rate-bearing family, records the
 full byte ledger, and asserts that the intended categories moved — or records
-why they did not. AV1 and VVC run on the same frames, size, frame rate and
-colour convention, as one joint encode (continuous) and as independent
-segments (segmented). The headline control is the one that matches the
-product claim; the other is an access-pattern tradeoff.
+why they did not.
 
-E1 evidence still needs B1 (canonical canvas) and D1 (long eligible scenes).
-This module is the search harness; a diagnostic run on current short clips
-does not become a Gate-A result.
+AV1 and VVC reference curves are encoded separately
+(``python -m experiments.tier.low_rate_references``) on the same frames, size,
+frame rate and colour, as continuous and segmented access patterns. This sweep
+does not re-encode those anchors at the residual QP.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import time
 from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from experiments.tier.ladder_scenes import (
-    anchor_over_sequence,
-    load_scene_sequence,
-    pointstream_over_sequence,
+import numpy as np
+
+from experiments.tier.low_rate_clips import (
+    DEFAULT_SCENES,
+    DEFAULT_SPAN_FRAMES,
+    DEFAULT_VIDEO,
+    load_e1_sequence,
+)
+from experiments.tier.low_rate_measure import (
+    late_frame_report,
+    primary_preset,
+    score_headlines,
 )
 from experiments.tier.low_rate_plan import (
     SweepPoint,
@@ -33,18 +40,25 @@ from experiments.tier.low_rate_plan import (
     points_for,
     stage_names,
 )
+from experiments.tier.low_rate_references import (
+    ACCESS_PATTERNS,
+    compare_candidate_to_anchor,
+    load_reference_curve,
+    references_path,
+)
 from experiments.tier.low_rate_validate import BOUNDS_PATH, DECLARED_FPS, OUT_DIR, PROBE_PATH
-from src.components.codec.measure import PRESETS
-from src.contracts.codecs import EncodeRequest, RateControl
+from src.contracts.codecs import RateControl
 from src.contracts.config import PointstreamConfig
-from src.runner.config_io import load_tier
+from src.pipeline.reconstruction.dispatch import GeneratorRef
 
 
-def apply_point(base: PointstreamConfig, point: SweepPoint, *, codec: str) -> PointstreamConfig:
+def apply_point(
+    base: PointstreamConfig, point: SweepPoint, *, codec: str, preset: str
+) -> PointstreamConfig:
     residual = replace(
         base.residual,
         codec=codec,
-        preset=PRESETS[codec],
+        preset=preset,
         rate_control=RateControl.QP,
         rate=int(point.residual_qp) if point.residual_qp is not None else 55,
     )
@@ -85,6 +99,55 @@ def apply_point(base: PointstreamConfig, point: SweepPoint, *, codec: str) -> Po
     )
 
 
+def _no_generator() -> GeneratorRef:
+    raise AssertionError("generation is off in every low-rate config used here")
+
+
+def pointstream_e1(clips: list[Any], config: PointstreamConfig) -> dict[str, Any]:
+    """One ``run()`` over the long scenes, scored on delivered frames."""
+    from src.runner import run
+
+    started = time.perf_counter()
+    result = run(
+        config,
+        [np.asarray(clip.frames) for clip in clips],
+        bind_generator_fn=_no_generator,
+        objects=tuple(clip.objects for clip in clips),
+    )
+    wall = time.perf_counter() - started
+    source = np.concatenate([np.asarray(clip.frames) for clip in clips], axis=0)
+    delivered = result.delivered_frames
+    sizes = result.sizes
+    total = int(sizes.transport_total)
+    panorama = int(sizes.panorama)
+    scores = score_headlines(source, delivered)
+    late = late_frame_report(source, delivered)
+    return {
+        "coded_bytes": total,
+        "bytes": total,
+        "usable": isinstance(scores.get("vmaf"), float) and bool(sizes.is_rate),
+        "scores": scores,
+        "late_frame": late,
+        "is_rate": bool(sizes.is_rate),
+        "raw_parts": list(sizes.raw_parts),
+        "parts": {
+            "residual": int(sizes.residual),
+            "panorama": panorama,
+            "actor_reference": int(sizes.actor_reference),
+            "metadata": int(sizes.metadata),
+        },
+        "background_share": round(panorama / total, 4) if total else None,
+        "n_chunks": len(result.chunks),
+        "n_frames": int(source.shape[0]),
+        "encode_seconds": round(wall, 3),
+        "decode_seconds": None,
+        "timing_note": (
+            "PointStream reconstruction lives inside run(); the runner does not "
+            "split encode vs decode. encode_seconds is the wall of that call."
+        ),
+    }
+
+
 def run_point(
     clips: list[Any],
     base: PointstreamConfig,
@@ -92,10 +155,8 @@ def run_point(
     *,
     codec: str,
     preset: str,
-    fps: float,
 ) -> dict[str, Any]:
-    """One operating point, both access-pattern controls, one PointStream run."""
-    del fps  # recorded by the caller; coded_roundtrip uses the request, not this
+    """One PointStream operating point. Anchors are not encoded here."""
     row: dict[str, Any] = {
         "name": point.name,
         "stage": point.stage,
@@ -108,36 +169,13 @@ def run_point(
             "motion_max_points": point.motion_max_points,
             "object_stream_on": point.object_stream_on,
             "background_method": point.background_method,
+            "residual_codec": codec,
+            "residual_preset": preset,
         },
     }
-    # Continuous = joint encode of the ordered scenes. Segmented = sum of
-    # independent per-scene encodes. Both from ladder_scenes.anchor_over_sequence.
-    request = EncodeRequest(
-        codec_name=codec,
-        rate_control=RateControl.QP,
-        rate=int(point.residual_qp or 45),
-        preset=preset,
-        pix_fmt="yuv420p",
-    )
-    request.validate()
     try:
-        anchor = anchor_over_sequence(clips, request)
-        row["continuous"] = {
-            "bytes": anchor["joint_bytes"],
-            "psnr_y_dB": anchor["psnr_y_dB"],
-            "seconds": anchor["seconds"],
-            "psnr_y_by_frame": anchor["psnr_y_by_frame"],
-        }
-        row["segmented"] = {
-            "bytes": anchor["separate_bytes"],
-            "joint_over_separate": anchor["joint_over_separate"],
-        }
-    except Exception as exc:  # noqa: BLE001
-        row["anchor_error"] = repr(exc)
-
-    try:
-        tuned = apply_point(base, point, codec=codec)
-        row["pointstream"] = pointstream_over_sequence(clips, tuned)
+        tuned = apply_point(base, point, codec=codec, preset=preset)
+        row["pointstream"] = pointstream_e1(clips, tuned)
         if not point.object_stream_on:
             row["pointstream"]["control"] = "object-stream-off"
     except Exception as exc:  # noqa: BLE001
@@ -145,20 +183,40 @@ def run_point(
     return row
 
 
+def _candidate_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    for row in rows:
+        payload = row.get("pointstream")
+        if not payload:
+            continue
+        out.append(
+            {
+                "name": row.get("name"),
+                "bytes": payload.get("bytes") or payload.get("coded_bytes"),
+                "usable": bool(payload.get("usable")),
+                "scores": payload.get("scores") or {},
+                "encode_seconds": payload.get("encode_seconds"),
+                "decode_seconds": payload.get("decode_seconds"),
+            }
+        )
+    return out
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--video", default="alcaraz_highlights")
-    parser.add_argument("--scenes", nargs="+", default=["scene_000", "scene_010"])
-    parser.add_argument("--frames", type=int, default=8)
+    parser.add_argument("--video", default=DEFAULT_VIDEO)
+    parser.add_argument("--scenes", nargs="+", default=list(DEFAULT_SCENES))
+    parser.add_argument("--frames", type=int, default=DEFAULT_SPAN_FRAMES)
     parser.add_argument("--codec", default="av1")
     parser.add_argument("--tier", default="balanced")
     parser.add_argument("--stage", default=None, help="run one named stage, or all")
     parser.add_argument("--fps", type=float, default=DECLARED_FPS)
+    parser.add_argument("--preset", default=None, help="override the slowest-preset rule")
     parser.add_argument("--out", default=None)
     parser.add_argument(
-        "--allow-short-scenes",
+        "--skip-compare",
         action="store_true",
-        help="run on current BP21 windows. That is diagnostic, not E1 evidence.",
+        help="run PointStream without loading the independent reference curves",
     )
     args = parser.parse_args(argv)
 
@@ -168,40 +226,28 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit(
             f"{PROBE_PATH} does not exist. Probe AV1/VVC floors before the sweep."
         )
-    if args.frames > 16 and not args.allow_short_scenes:
-        # Long scenes need the canonical canvas (B1). Refuse rather than hit
-        # the unequal-canvas failure and call it a PointStream result.
-        raise SystemExit(
-            "frames > 16 need BP44 canonical canvases. Pass --allow-short-scenes "
-            "only for a diagnostic on the 8/16-frame windows."
-        )
-    if not args.allow_short_scenes:
-        raise SystemExit(
-            "E1 is blocked on B1 and D1. For a diagnostic on existing 8-frame "
-            "clips pass --allow-short-scenes and say so in the report."
-        )
+
+    from src.runner.config_io import load_tier
 
     stages = [args.stage] if args.stage else list(stage_names())
-    clips = load_scene_sequence(args.video, list(args.scenes), n_frames=args.frames)
+    clips = load_e1_sequence(args.video, list(args.scenes), n_frames=args.frames)
     base = load_tier(args.tier)
-    preset = PRESETS[args.codec]
+    preset = primary_preset(args.codec, override=args.preset)
     rows: list[dict[str, Any]] = []
     category_notes: list[str] = []
 
     for stage in stages:
         points = points_for(stage)
         stage_rows: list[dict[str, Any]] = []
-        print(f"stage {stage} ({len(points)} points)", flush=True)
+        print(f"stage {stage} ({len(points)} points) preset {preset}", flush=True)
         for point in points:
-            row = run_point(
-                clips, base, point, codec=args.codec, preset=preset, fps=args.fps
-            )
+            row = run_point(clips, base, point, codec=args.codec, preset=preset)
             rows.append(row)
             stage_rows.append(row)
             ps = row.get("pointstream") or {}
             print(
-                f"  {point.name:<16} {ps.get('coded_bytes', '—')} B  "
-                f"{ps.get('psnr_y_dB', '—')}",
+                f"  {point.name:<16} {ps.get('coded_bytes', row.get('pointstream_error', '—'))} B  "
+                f"{(ps.get('scores') or {}).get('vmaf', '—')}",
                 flush=True,
             )
         key = intended_category(stage)
@@ -214,13 +260,27 @@ def main(argv: list[str] | None = None) -> int:
             category_notes.append(note)
             print(f"  ALARM {note}", flush=True)
 
+    comparisons: dict[str, Any] = {}
+    if not args.skip_compare:
+        ref_file = references_path(args.video, args.codec)
+        if not ref_file.is_file():
+            raise SystemExit(
+                f"{ref_file} does not exist. Encode the independent "
+                f"{args.codec} curve first: python -m experiments.tier.low_rate_references "
+                f"--video {args.video} --codec {args.codec}"
+            )
+        candidates = _candidate_rows(rows)
+        for pattern in ACCESS_PATTERNS:
+            comparisons[pattern] = compare_candidate_to_anchor(
+                candidates, load_reference_curve(ref_file, access_pattern=pattern)
+            )
+
     report = {
         "written": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "diagnostic": True,
         "e1_evidence": False,
         "reason_not_evidence": (
-            "E1 requires B1 canonical canvases and D1 long eligible scenes. "
-            "This run is a harness check or a short-scene diagnostic."
+            "E1 is diagnostic on two videos until the frozen rule passes E2 "
+            "on at least six independent videos. This file is the harness output."
         ),
         "video": args.video,
         "scenes": list(args.scenes),
@@ -229,12 +289,14 @@ def main(argv: list[str] | None = None) -> int:
         "codec": args.codec,
         "preset": preset,
         "generation": "off",
-        "access_patterns": ["continuous", "segmented"],
-        "headline_control": "undecided — follows the product claim, not this diagnostic",
+        "access_patterns": list(ACCESS_PATTERNS),
+        "headline_control": "undecided — follows the product claim after both curves exist",
+        "reference_file": None if args.skip_compare else str(references_path(args.video, args.codec)),
         "tried": [row["name"] for row in rows],
         "ledger_notes": category_notes,
         "bounds_file": str(BOUNDS_PATH),
         "probe_file": str(PROBE_PATH),
+        "comparisons": comparisons,
         "rows": rows,
     }
     dest = Path(args.out) if args.out else OUT_DIR / f"sweep-{args.video}-{args.codec}.json"
