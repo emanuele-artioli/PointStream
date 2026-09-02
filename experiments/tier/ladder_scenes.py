@@ -426,12 +426,16 @@ def main(argv: list[str] | None = None) -> int:
 
         # The plate knob differs by method, and using the wrong one freezes
         # the plate while the report still looks like a payload ladder.
-        plate_change = (
-            {"stream_crf": int(plate_knob)} if streamed
-            else {"jpeg_quality": int(plate_knob)}
+        # Written as two explicit calls rather than one `replace(**kwargs)`:
+        # a kwargs dict makes the field names invisible to the type checker,
+        # which is precisely the mistake that produced the frozen plate in §8.
+        plate_tuned = (
+            replace(paired.background, stream_crf=int(plate_knob))
+            if streamed
+            else replace(paired.background, jpeg_quality=int(plate_knob))
         )
         tuned = paired.with_(
-            background=replace(paired.background, **plate_change),
+            background=plate_tuned,
             residual=replace(paired.residual, rate=int(rate_value)),
         )
         try:

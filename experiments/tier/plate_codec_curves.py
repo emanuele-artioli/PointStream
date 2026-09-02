@@ -175,12 +175,12 @@ def measure_point(
     decode_seconds = time.time() - started
 
     reference = np.asarray(plate)
-    got = np.asarray(decoded)
+    returned = np.asarray(decoded)
     # A video sidecar may crop an odd dimension to even; score the region that
     # survives rather than failing on a shape both sides agree about otherwise.
-    height = min(int(reference.shape[0]), int(got.shape[0]))
-    width = min(int(reference.shape[1]), int(got.shape[1]))
-    ref, out = reference[:height, :width], got[:height, :width]
+    height = min(int(reference.shape[0]), int(returned.shape[0]))
+    width = min(int(reference.shape[1]), int(returned.shape[1]))
+    ref, out = reference[:height, :width], returned[:height, :width]
     return CurvePoint(
         codec=codec,
         knob=knob,
@@ -192,7 +192,7 @@ def measure_point(
         decode_seconds=decode_seconds,
         encode_samples=tuple(samples),
         container=container_kind(payload),
-        detail={"decoded_shape": [int(got.shape[0]), int(got.shape[1])]},
+        detail={"decoded_shape": [int(returned.shape[0]), int(returned.shape[1])]},
     )
 
 
