@@ -68,7 +68,7 @@ the index only.
 | `BP36-second-domain.md` | DAVIS and UVG — P0 item 6 | 9 |
 | `BP37-required-behaviour.md` | the gate `PLAN.md` §8 describes | 9 |
 | `BP38-paper-infrastructure.md` | figures, a DCVC-class anchor, reproducibility, related work | 9 |
-| `BP43-background-representation.md` ⭐ | a smaller plate in pixels, and whether it needs sending at all | 9 |
+| `BP43-background-representation.md` ⭐ | a smaller plate in pixels — the one plate lever never expressible in config | 9 |
 | `BP39-all-off-corner.md` | D5 — the lattice claim is a hardcoded branch | 10, after PR #45 |
 | `BP40-background-honesty.md` | the background component's three open faults | 10, after PR #45 |
 | `BP41-ablation-lattice.md` | P0 item 4 — the paper's central contribution | 10 |

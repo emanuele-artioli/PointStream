@@ -49,7 +49,7 @@ are the shape of this whole roadmap:
   │ BP36 second domain           │
   │ BP37 required-behaviour gate │
   │ BP38 paper infra + DCVC      │
-  │ BP43 background size    ⭐   │──────────► feeds BP31's plate levers
+  │ BP43 plate resolution   ⭐   │──────────► feeds BP31's plate levers
   └──────────────┬───────────────┘
                  │
   WAVE 10 — after PR #45 merges (file ownership, not results)
@@ -91,7 +91,7 @@ disjoint; none of these touch `src/runner/stages.py`, `src/components/background
 | **BP36** | `BP36-second-domain.md` | the general/DAVIS profile driven end to end — P0 item 6, and the most-requested reviewer item | a day plus data | `src/components/domain/**`, `outputs/bp36-general/**` |
 | **BP37** | `BP37-required-behaviour.md` | the gate `PLAN.md` §8 describes, against the list it actually names | half a day | `tests/invariants/**`, `PLAN.md` §8 |
 | **BP38** | `BP38-paper-infrastructure.md` | figures, a **DCVC-class anchor** (decided), reproducibility, related-work currency | a day + the anchor | the paper repo, `figures/`, `appendices/` |
-| **BP43** ⭐ | `BP43-background-representation.md` | making the plate **smaller in pixels**, and whether it needs sending at all | one sweep + one simulation | `src/components/background/sidecar.py`, `BackgroundConfig` |
+| **BP43** ⭐ | `BP43-background-representation.md` | making the plate **smaller in pixels** — never expressible, `BackgroundConfig` has no resolution field | one sweep | `src/components/background/sidecar.py`, `BackgroundConfig` |
 
 **BP32, BP33 and BP43 are marked ⭐ because they can change what BP31 spends its
 next campaign on.** Do them first and tell that session the answer; it is about to

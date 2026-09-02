@@ -84,39 +84,73 @@ or read the whole RD curve. The plate-bytes column is diagnostic, not the result
   0.35.** If it never improves, downscaling is not a lever on this content and
   that closes P2 item 15 with a real answer.
 
-## 3. Lever B — do not send the plate at all
+## 3. Lever B — send a coarse plate and let the residual refine it
 
-**The structural idea, and it has never been written down anywhere in this
-project.** The client already receives decoded frames. The plate is built by
-median-compositing registered frames. **So the client can build it too.**
+**A retraction first, because the original version of this section was wrong and
+the reason is worth keeping.** It proposed not sending the plate at all: *"the
+client already receives decoded frames, and the plate is a median composite of
+registered frames, so the client can build it too."*
 
-The paper already argues exactly this shape for the residual: *"the server runs
-the same reconstruction the client will, so it can measure and correct what the
-generative model gets wrong."* A client-side plate is the same principle applied
-one component over. The encoder knows precisely what the client will have, so it
-can build the identical plate from the identical inputs and code a residual
-against it.
+**There are no such frames.** In a PointStream scene the client's frames *are*
+the reconstruction — warp the plate, composite the foreground, add the residual.
+Building the plate from them requires the plate. The proposal was circular, and
+a version of it that were not circular would mean transmitting frames
+conventionally, which is the thing this codec exists not to do.
 
-The consequence is the largest single number in the ledger: **the plate stops
-being payload.** What is transmitted instead is the homographies (measured at
-576 B for eight frames — under 0.15% of the payload) plus whatever frames the
-client needs to bootstrap the composite.
+**The two things that do reach the client independently of the plate**, and what
+each is worth:
 
-**The obvious objection, and it is real:** during the bootstrap the client has
-seen few frames and its plate is poor, so early frames get a large residual. That
-makes it a *latency-versus-rate* trade rather than a free win, and it interacts
-directly with `plans/BP33-span-amortisation.md` — a longer span is exactly what
-makes a client-side composite good. It also has a low-delay cost that must be
-reported, because the paper's anchor comparison is constrained on that axis.
+- **Scenes routed to the conventional codec** by scene classification. Using one
+  of those as plate content for a neighbouring PointStream scene is already
+  measured and dead: `plans/BP24-findings.md` §17 puts two point-class plates
+  from the same match **13.75–15.10 dB** apart, and coding one against the other
+  costs **1.49–1.70x** the bytes at **13 dB lower** quality — dominated on both
+  axes, so no ladder is needed. The version of that idea that works is coding the
+  next plate as a **P-frame**, which is `panorama-stream` (§18, 0.646 over twelve
+  scenes) and is already the shipped path.
+- **The residual.** This is the one that survives, and it is a much smaller claim
+  than the retracted one.
 
-**Bound it before building anything.** On a static clip, a client-side plate
-built from the first *k* decoded frames should reach within **[0.5, 4.0] dB** of
-the transmitted plate by **k ∈ [4, 16]**. Measure that convergence curve first —
-it is a simulation over already-decoded frames, needs no new component, and it
-decides whether the idea is worth implementing at all.
+### What survives: the plate as a long-term reference
 
-**Do this measurement before the implementation.** If the convergence is slow or
-the plate never gets close, the idea dies for the cost of an afternoon.
+The residual is the only channel carrying true background detail that the plate
+did not already have. So a closed loop is available and is not circular:
+
+1. transmit a **coarse** plate — cheap;
+2. each frame's residual corrects what the coarse plate got wrong, which injects
+   real information;
+3. accumulate those corrected reconstructions into an **updated** plate;
+4. later frames warp from the better plate and need a smaller residual.
+
+This is a long-term reference picture, updated from the decoded output — the same
+mechanism a conventional codec uses, applied to the plate. The information comes
+from the residual, not from nowhere, so there is no free lunch: it is a **rate
+allocation** question. Is *coarse plate + larger early residual* cheaper than
+*fine plate + small residual throughout*, at matched delivered quality?
+
+**Which means it is not a separate lever — it is the coarse end of §2.** The
+resolution and quality sweep in Lever A already samples "cheap plate, residual
+does more work". **Run Lever A first.** Only if its coarse end is competitive is
+there anything for a refinement loop to improve, and the sweep will say so for
+free.
+
+**If Lever A says the coarse end is competitive**, bound the loop before building
+it: the refined plate should reach within **[0.5, 3.0] dB** of a
+transmitted-at-full-quality plate by frame **[8, 24]**, and total payload at
+matched quality should improve by **[5%, 30%]** over the best fixed-plate rung.
+No improvement means the residual is not carrying enough background information
+to refine anything, which would itself close the question.
+
+**The decoder-drift trap, which is what makes this real work rather than
+plumbing.** Encoder and client must build the *same* refined plate or they
+diverge, and the divergence compounds every frame. The encoder therefore has to
+run the client's loop on the client's decoded output, not on source frames —
+which is the architecture the paper already describes for the residual
+("the server runs the same reconstruction the client will"), and which
+`PLAN.md` §3's *quality is always measured* section says must be **verified by
+measurement, not asserted by construction**. Any implementation needs a
+bit-identity check between the two plates at every frame, and that check is the
+first thing to write.
 
 ## 4. Lever C — the `roi-video` sidecar, and why it is last
 
@@ -139,10 +173,11 @@ background change to be worth chasing.
 
 ## 5. Ordering, and why
 
-1. **Lever B's convergence measurement** — an afternoon, no new component, and it
-   is the only one that could remove the dominant cost entirely.
-2. **Lever A's resolution sweep** — one sweep, and it is the direct answer to the
-   question that prompted this brief.
+1. **Lever A's resolution sweep** — one sweep, the direct answer to "how small
+   can the background get", and it also decides whether Lever B has anything to
+   work with.
+2. **Lever B**, only if Lever A's coarse end is competitive. It is a rate
+   allocation question, not a way to stop paying for the plate.
 3. **Lever C** — only if the ledger says the residual is paying for background
    change.
 
@@ -150,7 +185,8 @@ background change to be worth chasing.
 
 - The resolution axis exists in `BackgroundConfig`, is driven (not read off), and
   has an RD curve at matched quality with encode and decode time beside it.
-- The client-side-plate convergence curve exists and the idea is either adopted
-  with a plan or declined with the number that declined it.
+- Lever B is either taken up with a bounded plan and an encoder/client
+  bit-identity check, or declined with Lever A's coarse-end numbers as the
+  reason.
 - The scoreboard in §1 has no "never measured" rows left, or each remaining one
   has a recorded reason.
