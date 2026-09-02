@@ -18,11 +18,20 @@ optional corrective residual; the client reconstructs frames generatively. The
 current cycle is a rewrite into a platform where every component is a config
 choice. Target: an ACM TOMM submission, **September 30**.
 
+**September 30 is a hard submission deadline.** Until a winning operating
+regime is established, optimize in this order: first beat AV1 and VVC on
+rate--quality in a named regime; always measure and report time, but do not make
+speed a gate on that search; then profile and optimize the frozen winning
+configuration. A slower rate--quality win is publishable only when the paper
+states the computation cost and does not claim real-time operation.
+
 ## Where things are
 
 | You need | Read |
 |---|---|
 | Status, phases, what to do next | `PLAN.md` |
+| Submission order and session routing | `plans/ROADMAP.md` |
+| Plain-language project terms | `plans/TERMINOLOGY.md` |
 | The spec for one workstream | `plans/<stream>.md` — read only yours |
 | What a component must satisfy | `src/contracts/` — the machine-checkable truth |
 | Why the design is what it is | the paper's System Design section |

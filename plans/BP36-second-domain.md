@@ -1,5 +1,10 @@
 # BP36 — The second domain, and a dataset a reviewer already knows
 
+**Gated (2026-09-02): do not start until Gate B in `plans/ROADMAP.md`.** The
+first domain must produce and confirm a credible winning regime before time is
+spent on a second domain. This brief remains the specification for that later
+work.
+
 **`PLAN.md` §7 P0 item 6, `HOLE(subsec:eval-general)`, and the first of the three
 items in `NEXT(paper-wide)`** — which records a second evaluation domain as *the
 most-requested item* a referee is likely to raise. Nothing has been run in either
@@ -7,14 +12,14 @@ domain.
 
 **Owns:** `src/components/domain/**`, `src/components/domain/datasets/*.yaml`,
 `outputs/bp36-general/**`, a new `datasets/skating.yaml`, `sections/evaluation.tex` §`subsec:eval-general`.
-**Does not own** `experiments/tier/**` or `src/runner/**` while PR #45 is open.
+**Does not own** `experiments/tier/**` or `src/runner/**` unless a later dispatch
+explicitly grants them.
 
 **Read first:** `AGENTS.md` · `PLAN.md` §7 P0 item 6 and §4 ·
 `sections/evaluation.tex` `GOAL/HOLE/NOTE(subsec:eval-general)` ·
 `src/components/domain/profiles.py` and `datasets/general.yaml`.
 
-**No result dependency.** Start now — the data preparation is the long pole and
-it is needed whatever BP31 finds.
+**Result dependency:** Gate B, a confirmed first-domain win.
 
 ---
 

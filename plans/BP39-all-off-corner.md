@@ -1,5 +1,9 @@
 # BP39 — The all-off corner must degrade by architecture, not by a branch
 
+**Preferred name:** *conventional fallback control*. “All-off corner” remains
+only where it names an existing configuration or quotation; see
+`plans/TERMINOLOGY.md`.
+
 **`plans/DEFERRED.md` D5, promoted.** It was deferred in August on the grounds
 that `BP10` would decide whether there is a paper at all and this only decides
 how clean it is. `BP10` is long settled and this is now load-bearing for the
@@ -9,8 +13,8 @@ abstract.
 passthrough shortcut only), `tests/pipeline/test_dag.py`,
 `src/contracts/lattice.py` (`is_source_passthrough`).
 
-**Blocked on PR #45 merging** — file ownership, not results. `src/runner/stages.py`
-is on that branch.
+**Scheduling:** PR #45 is merged. Dispatch only when `plans/ROADMAP.md` assigns
+the component-ablation workstream and file ownership is clear.
 
 **Read first:** `AGENTS.md` · `plans/DEFERRED.md` D5 in full · `PLAN.md` §3 ·
 `sections/system_design.tex` `CLAIM(subsec:lattice)` · the abstract.

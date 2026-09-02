@@ -1,298 +1,331 @@
-# ROADMAP — everything still standing between here and the TOMM submission
+# PointStream submission roadmap — hard deadline 30 September 2026
 
-**Written 2026-09-02.** This is the master index. `PLAN.md` says what the system
-is and what has been measured; this file says **what is left, in what order, and
-what each piece depends on**. A session picks one work item, reads its brief, and
-does not read the rest of the tree.
+**This is the authority on priority, dependencies, session assignment and
+submission scope.** `PLAN.md` is the chronological research record. A work
+session reads `AGENTS.md`, this file, and one named brief.
 
-`plans/README.md` classifies every brief as live / parked / historical. This file
-is the ordering and the dependency graph.
+Last replanned: **2 September 2026**, after BP31 and the 8/16-frame span result.
 
----
+## 1. Submission thesis and non-negotiable core
 
-## 0. The one paragraph a new session needs
+The paper keeps this core idea:
 
-PointStream is measured, end to end, against the codec it is built on, and **it
-loses**: BD-rate **+90.97%** against an av1 anchor at N=2 scenes with the
-cross-scene stream on (`plans/BP31-findings.md` §9), down from +109.72% without
-it — at **8 frames per scene**, and §0b below is why that qualifier now matters
-more than the number. `AGENTS.md` is explicit that a paper whose central result is "we lose
-everywhere" is not a submission, so **finding the regime where an object-centric
-codec wins is the work**, not a hoped-for outcome. Three things follow, and they
-are the shape of this whole roadmap:
+1. split a video into scenes;
+2. identify scenes with low background motion and separable foreground objects
+   from known classes;
+3. send a reusable background representation for an eligible scene or compatible
+   group of scenes;
+4. send each object's appearance rarely and its motion compactly;
+5. reconstruct those scenes at the receiver, with an optional correction signal;
+6. encode ineligible scenes conventionally and count the routing metadata.
 
-1. **One session is already on the winning-regime hunt** (BP31, worktree
-   `pointstream-w9-a`, PR #45). Nothing here duplicates it.
-2. **The gap between what the motivation measured and what the system delivers
-   is ~149 BD-rate points and has never been reconciled.** That reconciliation
-   (`BP32`) is arithmetic over data already on disk, and it is the cheapest
-   thing in this file that can redirect the whole project. **Do it first.**
-3. **Everything else divides cleanly** into work that is true whatever BP31
-   finds (waves 9 and 10 below) and work whose shape depends on it
-   (`plans/FORK-bp31.md`).
+Optional modules do not get protected from evidence. Generation, residuals,
+per-frame crops, background stitching, or any other module may be disabled or
+removed from the winning configuration when its quality gain does not earn its
+bytes. The scene router and fallback preserve the paper's hybrid construction.
 
----
+The architecture creates an opportunity to remove repeated pixels; it does
+**not** guarantee a bitrate win by construction. Background references, object
+appearance, correction data and metadata can cost more than the redundancy they
+replace. The paper earns the claim by measuring the regime where the opportunity
+becomes a win.
 
-## 0b. What the span run changed, 2026-09-02 — read this before picking an item
+## 2. Optimization order and evidence gates
 
-`plans/BP31-findings.md` §12 ran `BP33` before the extraction campaign. The
-mechanism held, **the brief's prediction did not**, and the run exposed something
-that reorders this roadmap.
+### Gate A — find a rate--quality win
 
-Span amortises the plate — and it amortises **the anchor's intra keyframe just as
-well**. Over a doubling the ratio moved 2.17x → 2.01x, about 7%, and the fit says
-it flattens near 1.9–2.0x from there. Both arms have a fixed per-scene cost; the
-brief modelled only one of them.
+First beat **both AV1 and VVC** on size at matched quality in a named eligible
+regime. Encode and decode time are measured and reported from the first run, but
+time is not a pass condition for Gate A.
 
-Separating fixed from marginal is what the two span points buy, and the anchor's
-marginal is a difference quotient, so it does not depend on its keyframe count:
+A Gate-A result is one of:
 
-| | fixed, amortised by span | **marginal, per frame** |
-|---|---:|---:|
-| av1 anchor | ~382,000 B (intra) | **4,757 B** |
-| PointStream | 768,277 B (plate) | **9,319 B** (residual + crops + metadata) |
+- negative BD-rate over a meaningful overlapping range on the predeclared
+  headline quality metric; or
+- strict dominance at the low-rate boundary: PointStream uses fewer bits than
+  the anchor's smallest decodable point while meeting or exceeding that point's
+  measured quality.
 
-> **PointStream's marginal cost is ~1.96x the anchor's.** Its per-frame payload
-> is about twice what av1 spends coding an entire inter frame — one that contains
-> the players PointStream is transmitting separately.
+One point at unmatched quality, a projected crossover, or a result on a metric
+chosen after seeing the curves does not pass.
 
-**"The plate is 88–91% of the payload" is a span-8 artifact.** At 8 frames the
-plate is 80% of it, at 16 it is 72%, and it keeps falling. Run at a span the
-cache already supports and the dominant cost is **the residual and the crops**.
+### Gate B — confirm the first-domain result
 
-**What this reorders.**
+Freeze the discovered content, rate and scene-length criteria before expanding
+the sample. Confirm on at least six independent source videos/matches from the
+tennis domain, reporting per-video results, mean, standard error, failures and
+the search that found the regime.
 
-- **Plate levers are worth less than `PLAN.md` §7 P0 item 8 assumes.** `BP43`'s
-  resolution sweep and `BP40`'s codec and canvas work all act on a term span is
-  driving toward irrelevance. Still worth doing — the plate is real at any finite
-  span — but they are no longer the item that decides the paper.
-- **`BP41` rises sharply.** The residual and appearance axes are now the ones on
-  the dominant cost, and the lattice is what prices them.
-- **One cheap run comes first, and it falsifies the above if it is wrong.** Span
-  24/32/48 under `panorama-full` needs **no component change** (each scene codes
-  its own plate, so the canvas-agreement blocker in `BP40` §3b does not apply)
-  and gives the third point the two-point fit needs. **And the non-plate split —
-  residual against crops against metadata, per frame** — because nobody can act
-  on a marginal cost quoted as one number.
+### Gate C — explain the win
 
-Two smaller results from the same run, both now folded into their briefs: canvas
-growth is **measured** at x1.038 worst case rather than extrapolated (`BP32`), and
-PointStream encodes at **x19.1–19.7** the anchor's wall clock (`BP34`).
+Run the **core component ablation matrix**: conventional fallback, background
+reuse only, +object appearance/motion, +correction, and +generation if generation
+has become useful. A component is justified only if the rate--quality curve
+improves. Full sixteen-axis enumeration is not required for submission.
 
----
+### Gate D — broaden the comparison
 
-## 1. The dependency graph
+Only after Gate B:
 
-```
-                    ┌─────────────────────────────────────────┐
-                    │ BP31 (RUNNING, another session, PR #45) │
-                    │ the paired ladder over N scenes         │
-                    └───────────────────┬─────────────────────┘
-                                        │ result
-  WAVE 9 — independent, start now       │
-  ┌──────────────────────────────┐      │
-  │ BP32 rate-budget ledger  ⭐  │──────┼──► feeds BP31's axis choice
-  │ BP33 span (8 vs 48 frames)⭐ │──────┘    (tell that session early)
-  │ BP34 encode/decode time      │
-  │ BP35 perceptual BD-rate      │──────────► feeds BP31's quality axis
-  │ BP36 second domain           │
-  │ BP37 required-behaviour gate │
-  │ BP38 paper infra + DCVC      │
-  │ BP43 plate resolution   ⭐   │──────────► feeds BP31's plate levers
-  └──────────────┬───────────────┘
-                 │
-  WAVE 10 — after PR #45 merges (file ownership, not results)
-  ┌──────────────▼───────────────┐
-  │ BP39 all-off corner (D5)     │
-  │ BP40 background honesty +    │
-  │      intra_qp + (a)/(b)      │
-  │ BP41 the ablation lattice    │
-  └──────────────┬───────────────┘
-                 │
-  WAVE 11 — shape decided by BP31 + BP32: plans/FORK-bp31.md
-  ┌──────────────▼───────────────┐
-  │ BP42 headline, conclusion,   │
-  │      abstract, title         │
-  └──────────────────────────────┘
-```
+- add DCVC-RT as the primary learned-codec baseline;
+- test one independent public domain/sequence with the same frozen criteria;
+- profile and optimize the frozen configuration's speed.
 
-**Read `plans/FORK-bp31.md` before planning wave 11.** It carries three
-pre-written branches — a regime is found, a boundary is found, nothing wins —
-with the paper each one produces. Writing them in advance is the point: it stops
-the configuration from being chosen after the numbers are seen and then
-presented as though it had been predicted, which `AGENTS.md` names as the one
-thing that would sink the paper faster than any negative result.
+DCVC-RT is selected because its official implementation provides checkpoints,
+actual bitstream writing, a wide rate range, YUV420 evaluation and encode/decode
+timing. DCVC-UF is a stretch baseline only if it drops into the same harness
+without delaying the paper.
 
----
+### Gate E — freeze evidence and write
 
-## 2. Wave 9 — start now, no result dependency
+The evidence freeze is **20 September**. Later runs may close an alarm or repair
+an invalid result; they do not open a new architecture campaign.
 
-Every item here is true whatever BP31 returns. Ownership is file-level and
-disjoint; none of these touch `src/runner/stages.py`, `src/components/background/**`,
-`experiments/tier/**` or `tests/runner/**`, which PR #45 holds.
+## 3. First search: the regime most likely to win
 
-| # | Brief | What it settles | Cost | Owns |
-|---|---|---|---|---|
-| **BP32** ⭐ | `BP32-rate-budget.md` | where the 149 BD-rate points between the measured headroom and the delivered system actually go | hours, mostly arithmetic | `experiments/budget/**`, `outputs/bp32-budget/**` |
-| **BP33** ⭐ | `BP33-span-amortisation.md` | whether clip length is the dominant lever — the ladder runs at 8 frames, the cache holds 48 | one sweep | `outputs/bp33-span/**`, brief only until #45 lands |
-| **BP34** | `BP34-operating-point.md` | encode/decode time, the operating-point table, and whether the title may keep "Live Video Streaming" | one measured pass | `experiments/timing/**`, `outputs/bp34-timing/**` |
-| **BP35** | `BP35-perceptual-bdrate.md` | BD-rate on VMAF and LPIPS, calibrated — the paper argues perceptually and the ladder is Y-PSNR | code + calibration | `src/components/metrics/**`, `tests/components/test_metrics*.py` |
-| **BP36** | `BP36-second-domain.md` | the general/DAVIS profile driven end to end — P0 item 6, and the most-requested reviewer item | a day plus data | `src/components/domain/**`, `outputs/bp36-general/**` |
-| **BP37** | `BP37-required-behaviour.md` | the gate `PLAN.md` §8 describes, against the list it actually names | half a day | `tests/invariants/**`, `PLAN.md` §8 |
-| **BP38** | `BP38-paper-infrastructure.md` | figures, a **DCVC-class anchor** (decided), reproducibility, related-work currency | a day + the anchor | the paper repo, `figures/`, `appendices/` |
-| **BP43** ⭐ | `BP43-background-representation.md` | making the plate **smaller in pixels** — never expressible, `BackgroundConfig` has no resolution field | one sweep | `src/components/background/sidecar.py`, `BackgroundConfig` |
+The first search is deliberately narrow:
 
-**BP32, BP33 and BP43 are marked ⭐ because they can change what BP31 spends its
-next campaign on.** Do them first and tell that session the answer; it is about to
-extract scene windows for a ten-scene, six-video ladder **at eight frames per
-scene**, and if span is the dominant term that campaign is being run at the
-wrong operating point.
+- **Content:** long, mostly static or smoothly panning broadcast-tennis scenes;
+  one stable camera context; small, well-separated players.
+- **Rate:** the ultra-low-rate range, below the current ~43 dB operating point.
+- **Duration:** 2, 4, 8 and 16 seconds (48, 96, 192, 384 frames at 24 fps),
+  extended to 32 seconds only when the pipeline remains stable.
+- **PointStream payload:** aggressively compressed background, one appearance
+  reference per track unless refresh is measured necessary, sparse motion,
+  correction off or coarse, generation off initially.
+- **Anchors:** the same source frames, resolution, frame rate, colour convention
+  and temporal extent, encoded jointly with AV1 and VVC.
 
-## 3. Wave 10 — after PR #45 merges
+Forty-three dB is a high-fidelity signal regime in which conventional codecs are
+strong and PointStream's structural overhead is exposed. The low-rate hypothesis
+is therefore credible. It is still only a hypothesis: AV1 and VVC have finite
+syntax/tool floors at fixed resolution and frame rate, but there is no universal
+minimum bitrate that PointStream automatically undercuts.
 
-Blocked on **file ownership, not on results**. Each of these edits a file the
-BP31 branch is holding.
+### 3.1 Quality axes
 
-| # | Brief | What it settles | Blocked by |
-|---|---|---|---|
-| **BP39** | `BP39-all-off-corner.md` | `DEFERRED.md` D5 — the all-off corner is a hardcoded branch, so the abstract's central lattice claim is delivered by a shortcut | `src/runner/stages.py` |
-| **BP40** | `BP40-background-honesty.md` | `BackgroundArtifact.codec` reports a sidecar a streamed run never used; `intra_qp` reaches nothing; levers (a) and (b) cannot compose | `src/components/background/**` |
-| **BP41** | `BP41-ablation-lattice.md` | `PLAN.md` §7 P0 item 4 — the core lattice, still un-run, and the paper's central contribution | the corrected ladder harness |
+Declare these before the first search run:
 
-## 4. Wave 11 — fork-dependent
+- **Primary:** full-frame VMAF, because the hypothesis concerns visible quality
+  under severe compression.
+- **Secondary:** Y-PSNR and MS-SSIM/SSIM, reported on every point.
+- **Diagnostics:** foreground-region VMAF/PSNR, background-region quality,
+  temporal quality by frame index, and object identity/pose checks.
 
-`plans/FORK-bp31.md`. `BP42` (headline claim, Conclusion, abstract, title) is
-written there three times over, once per branch.
+LPIPS is diagnostic until its lower-is-better direction is represented correctly
+in the curve code and its absolute scale has passed calibration. A foreground
+metric cannot silently replace full-frame quality after the search. If a
+salient-object quality thesis becomes necessary, its utility rule and background
+quality floor are written before that experiment.
 
-## 5. Parked, with the reason
+### 3.2 Codec-floor calibration
 
-Not dead, not scheduled. Each has a brief that still reads correctly; what
-changed is the priority, and the reason is recorded so nobody re-derives it.
+Before the system sweep, establish the usable range of the installed AV1 and VVC
+encoders:
 
-| Brief | Parked because |
-|---|---|
-| `BP19-conditioning-architecture.md` | every engine loses to pasting the keyframe (`PLAN.md` §2.10, §2.17), and the roster's own reading is that the value is not in the generator (`ENGINE-ROSTER.md`). A training campaign is the most expensive thing available and buys the least. Revisit only if `BP41` shows the appearance axis moving BD-rate. |
-| `BP28-offset-crossover.md` | the crossover it tests happens where both arms have degraded to "photo of a different player". Its useful half — keyframe interval as a **rate** lever — is folded into `BP41`'s temporal axis. |
-| `DEFERRED.md` D2 (SAM3) | needs a second conda env with newer torch; P1 item 10 only. |
-| `DEFERRED.md` D6 | two pre-rewrite Animate-Anyone tests fail only in the full suite. Re-check under `BP37`: the modules moved to `src/components/generation/`, so "they die with their modules" no longer applies. |
+1. resolve binary path and version;
+2. probe the documented/legal QP or quality range;
+3. verify every output is non-empty and decodable;
+4. check bitrate and each quality metric are sufficiently monotone;
+5. retain the lowest decodable point even when it falls below the BD-rate
+   overlap;
+6. use at least four useful points per curve and add points around a crossover.
 
----
+Do not downscale, drop frames or alter frame rate in the main comparison. Those
+are separate operating profiles and must be offered to both arms.
 
-## 6. What the paper is still missing, by marker
+### 3.3 A coherent PointStream rate sweep
 
-The camera-ready sweep must return only `CLAIM` lines. Today it returns these.
-Each row names the work item that clears it.
+One sweep setting must move every rate-bearing channel coherently:
 
-| Marker | Where | Cleared by |
+- background resolution and background codec quality;
+- appearance resolution, codec quality and refresh interval;
+- motion density/precision;
+- correction presence, resolution and codec quality;
+- unavoidable metadata.
+
+The current ladder sometimes moves the correction setting while freezing the
+largest background term. The new sweep asserts that the intended byte categories
+change monotonically or records why they do not.
+
+## 4. Long scenes and compatible background canvases
+
+The current failure is understood. Each scene builds a background panorama in
+its own local coordinate frame and chooses dimensions from that scene's camera
+motion. At 24 frames, the two tested scenes produce different image sizes.
+The AV1 background-sequence encoder requires every image in one sequence to have
+the same dimensions.
+
+Padding only to the same width and height is sufficient for the video encoder,
+but not necessarily optimal or geometrically correct. The implementation must
+also preserve the canvas origin and update every scene-to-canvas transform.
+
+### 4.1 Deadline implementation: offline canonical canvas
+
+For every group of compatible scenes:
+
+1. assign a **background-context ID** (same camera/view/venue background);
+2. precompute the union of scene homography bounds in a canonical coordinate
+   system;
+3. allocate one canonical canvas size and origin for the group;
+4. render or pad every scene background into that coordinate system;
+5. adjust reconstruction transforms for the shared origin;
+6. encode the resulting background images as one predictive sequence;
+7. reset with a new independently coded background when the context changes;
+8. measure padding bytes, prediction gain and reconstruction equality.
+
+The prepass sees future scenes, so this is an **offline or buffered** codec mode.
+It cannot support a “live” title. A causal extension may later use a fixed
+profile-sized canvas and reset when motion leaves it, but that is not on the
+September critical path.
+
+Tests must cover unequal local canvas sizes, static+panning scenes, transform
+adjustment, context reset, sender/receiver equality, causal payload accounting,
+and a control showing that shared-background coding changes bytes.
+
+### 4.2 Long-scene experiment
+
+After the fix, run 48/96/192/384 frames on at least:
+
+- a near-static eligible scene;
+- a smooth-pan eligible scene;
+- a deliberately ineligible high-motion scene that should route to fallback.
+
+Measure total and per-frame bytes for background, appearance, motion, correction,
+metadata and fallback. Fit fixed cost plus per-additional-frame cost only after
+at least three successful durations; call it the **per-additional-frame payload
+slope**, not a marginal estimate. Report uncertainty and do not infer an
+asymptote from the former two-point fit.
+
+## 5. Payload simplification order
+
+If the first low-rate/long-scene curve still loses, remove cost in this order,
+re-running a small diagnostic curve after each step:
+
+1. attribute every byte and eliminate duplicated accounting;
+2. turn off whole-frame correction and measure whether the quality loss earns
+   the saved bytes;
+3. stop sending repeated object crops; send one appearance reference plus sparse
+   refreshes only when measured necessary;
+4. reduce background spatial resolution and codec quality jointly;
+5. reduce appearance resolution/quality;
+6. reduce motion precision and sampling;
+7. simplify metadata and container overhead;
+8. revisit generation only when a model improves quality per transmitted byte
+   over the reference-image paste control.
+
+The lean candidate is expected to be background + one appearance reference +
+motion + optional sparse correction. The residual is standard terminology and
+remains optional; it is not assumed beneficial because one short-scene point was
+favorable.
+
+## 6. Decision dates and calendar
+
+| Date | Required outcome | If missed |
 |---|---|---|
-| `HOLE(sec:conclusion)` | `main.tex` | BP42 |
-| `HOLE(abstract)` | `main.tex` | BP42 (needs BP31's number) |
-| `NEXT(abstract)` — the title still promises live streaming | `main.tex` | **BP34** |
-| `NEXT(paper-wide)` — second domain, MOS study, demo video | `main.tex` | BP36 (domain); MOS is scoped out in `future_work`; demo video = BP38 |
-| `HOLE(sec:evaluation)` | `evaluation.tex` | BP31 + BP41 |
-| `HOLE(subsec:eval-ladder)` (partial) | `evaluation.tex` | BP31 |
-| `NEXT(subsec:eval-ladder)` — BD-rates describe the un-amortised system | `evaluation.tex` | BP31 |
-| `HOLE(subsec:eval-lattice)` | `evaluation.tex` | **BP41** |
-| `HOLE(subsec:eval-residual)` (partial) | `evaluation.tex` | BP41 |
-| `HOLE(subsec:eval-object)` | `evaluation.tex` | BP41 (as a **rate** claim, not an LPIPS one) |
-| `HOLE(subsec:eval-general)` | `evaluation.tex` | **BP36** |
-| `HOLE(subsec:eval-operating)` | `evaluation.tex` | **BP34** |
-| `HOLE(sec:system-design)` — designed and unproven | `system_design.tex` | BP39 (the lattice half), BP41 |
-| `NOTE(subsec:lattice)` — no component may be called justified without a BD-rate | `system_design.tex` | BP31, BP41 |
-| `HOLE(app:roi)` ×2 | `roi_verification.tex` | BP41's region arm, or scope out in `future_work` |
+| **2–3 Sep** | Branches reconciled; one roadmap; terminology; paper renders | Stop other work until repository state is trustworthy |
+| **4–6 Sep** | Codec-floor calibration, typed quality axes, payload ledger, canonical-canvas implementation | Use independent backgrounds for diagnostics, but do not publish a long-scene conclusion |
+| **7–9 Sep** | Low-rate × long-scene search on two diagnostic tennis videos | Invoke the lean-payload simplification order immediately |
+| **10 Sep** | Gate-A candidate or measured near-crossover | Escalate to the salient-object-quality thesis below; no generator campaign yet |
+| **11–14 Sep** | Gate B: first-domain confirmation on ≥6 videos; configuration frozen | Narrow the eligible regime rather than adding features |
+| **15–18 Sep** | Core ablation matrix, DCVC-RT, one second-domain check | Cut non-load-bearing component experiments and appendix material |
+| **19–20 Sep** | Final validated tables/figures; all result alarms closed; evidence freeze | Only correctness repairs after this point |
+| **21–24 Sep** | Full manuscript rewrite, artifact instructions, supplementary video | Freeze code and move all available effort to the paper |
+| **25 Sep** | Complete coauthor draft in exact ACM submission format | Remove whole secondary results, not prose fragments |
+| **26–27 Sep** | Scientific audit, page-budget pass, anonymous-package rehearsal | Scope claims down to evidence; no new claims |
+| **28 Sep** | Submission candidate frozen | 29–30 Sep are upload/metadata/emergency buffer |
+| **30 Sep** | Submit | Hard deadline |
 
-**Two gaps that no marker records yet**, both found on 2026-09-02 and both owned
-by BP38:
+### 6.1 Thesis fallback, without abandoning the core idea
 
-- **No learned/neural codec baseline exists anywhere** — not in `src/`, not in
-  `experiments/`, and the Related Work section's only learned-coding citation is
-  `lu2019dvc` (2019). A 2026 TOMM submission on generative coding will be asked
-  why there is no DCVC-class anchor. Either add one or state in the text why the
-  conventional ladder is the right comparison for this claim.
-- **`avg_vmaf_vs_bitrate.png`, `hls-vmaf.png`, `per_frame_vmaf.png`,
-  `cgan_performance.pdf`, `vmaf-lpips_vs_bitrate_dualrow.pdf`, `players.pdf` and
-  `PointStreamOverview.pdf` are unreferenced** and date from the ACM MM
-  submission whose numbers are retracted. Only `PS-overview.pdf` is `\includegraphics`'d.
+If full-frame VMAF/PSNR still has no crossover by 10 September, freeze a second
+question before measuring it:
 
----
+> At the same ultra-low bitrate and with a fixed minimum background-quality
+> floor, does the hybrid object-centric route preserve salient-object quality
+> better than AV1 and VVC?
 
-## 7. What a re-read of the existing work turned up, 2026-09-02
+This remains a rate--quality comparison and keeps scene routing, reusable
+backgrounds, appearance and motion. It changes “quality” from uniform pixel
+fidelity to a declared multimedia utility: full-frame quality, foreground
+quality and a background floor reported together. The paper must report that
+this thesis was activated after the full-frame search and must show both results.
 
-Five things that were already true, are already written down somewhere, and had
-not been acted on or connected. Each is assigned above; they are collected here
-because together they are the answer to "did we miss something".
+## 7. Workstreams, harness assignment and expected reports
 
-1. **Span.** Every ladder has run at 8 frames per scene; the cache holds 48; the
-   headroom the system is judged against was measured over those 48. Three
-   separate reports call 8 frames "the least favourable amortisation a fixed
-   plate cost can get" and none acted on it. → `BP33`.
-2. **The ledger has never been drawn.** Headroom says ~23% of av1's rate is
-   foreground and 34–69% of the background's is recoverable; the system delivers
-   +90.97%. Nobody has attributed the difference. → `BP32`.
-3. **The anchor runs at a speed preset.** SVT-AV1 preset 10, and it does *not*
-   cancel between the arms the way `DEFERRED.md` D-CODEC-PRESETS assumes,
-   because the anchor codes 100% of its pixels through that path and PointStream
-   codes only its residual through it. **This is an argument, not a measurement**
-   — nobody has run the anchor at another preset, so no number here may be
-   restated as a bound until someone does. Note also that the share it turns on
-   is span-dependent: PointStream's non-plate payload is ~9% at span 8 and ~28%
-   at span 16, so the argument's magnitude shrinks as span grows. `BP32` §3 owns
-   the two encodes that would settle it.
-4. **BD-rate is PSNR-only by construction.** `MIN_QUALITY_SPAN_DB = 3.0` is in
-   decibels — a sliver on a VMAF curve, impossible on an LPIPS one — and nothing
-   in the module records which direction quality runs, so an LPIPS BD-rate would
-   come back sign-inverted and monotone-looking. The perceptual axis is listed as
-   one of four ways to find a winning regime and it cannot currently be computed.
-   → `BP35`.
-5. **Local `pytest` and `mypy` could not start at all.** Both read config from
-   `pyproject.toml`; Python 3.10 has no `tomllib`; `tomli` was missing from the
-   env, so both died inside their own argument parsing with an error that looks
-   like nothing. CI was the only gate anyone had, and CI's ruff step was
-   *narrower* than the local one — it passed explicit paths, which overrides the
-   project's file set, and omitted `experiments/`. Both fixed 2026-09-02.
+High-level analysis, measurement design, architecture decisions, alarm
+adjudication and final scientific writing go to **Codex**, or to **Claude** if it
+becomes available. Routine implementation, bounded refactors, tests, extraction,
+batch execution and mechanical paper updates go to **Cursor** or **VS Code with
+Antigravity**. Long runs use detached shell jobs with hourly checkpoints.
 
-Two more, smaller, already assigned: `PLAN.md` §8 described the invariant suite
-as "a three-test stub" when it holds five modules and 1,145 passing lines
-(`BP37`), and `src/runner/stages.py:816` carries the same forbidden passthrough
-branch as `src/pipeline/reconstruction/reconstruct.py:96` with no test guarding
-it (`BP37` widens the guard, `BP39` fixes both).
+| ID | Workstream | Depends on | Preferred harness | Required report |
+|---|---|---|---|---|
+| S0 | Merge active work; archive/delete stale branches | — | Codex | branch audit, archive tags, PR/CI links, final worktree list |
+| S1 | Terminology and status reset | S0 | Codex | old→new term map; files changed; unresolved ambiguities |
+| M1 | Quality-axis typing and ultra-low anchor probe (`BP45`) | S0 | Cursor | tests; paths/versions; AV1/VVC usable ranges; curves; alarms |
+| B1 | Canonical background canvas and context resets (`BP44`) | S0 | Cursor, reviewed by Codex | design note; tests; byte/reconstruction control; PR |
+| M2 | Payload ledger and duration-slope analysis | M1, B1 | Antigravity/Cursor | per-category bytes; ≥3-duration fit; uncertainty; alarms |
+| D1 | Extract/validate long eligible tennis scenes (`BP46`) | S0 | Cursor | manifest, eligibility features, hashes, failures; no result claim |
+| E1 | First-domain low-rate search (`BP45`) | M1, B1, D1 | batch job; Codex adjudicates | preregistered bounds; all tried configs; rate/quality/time; decision |
+| E2 | Six-video first-domain confirmation | E1 | batch job; Codex adjudicates | frozen rule; per-video curves/spread; null; citability verdict |
+| A1 | Core component ablation matrix | E2 | Cursor + batch job | BD-rate contribution per component; time; interactions |
+| L1 | DCVC-RT baseline in isolated env | E2 | Cursor | upstream revision/checkpoints; bitstream validation; curves/time |
+| G1 | Second domain | E2 | Cursor + batch job | frozen criteria applied unchanged; successes/failures |
+| T1 | Profile and optimize frozen winner | E2 | Cursor | stage profile; before/after rate/quality/time; no claim drift |
+| P1 | Paper build, page metrics and figure skeleton | S0 | Antigravity | reproducible PDF command; page/float/word report; placeholder map |
+| P2 | Results and thesis rewrite | E2, A1 | Codex/Claude | marker sweep; CLAIM paths; title/abstract/conclusion; claim audit |
+| P3 | Reproducibility package and supplementary video | E2 | Cursor/Antigravity | clean-machine instructions; legal data statement; asset manifest |
+| P4 | Final scientific/submission audit | P2, P3 | Codex/Claude | page limit; citations; alarms; anonymization; upload checklist |
 
-**And one thing that is not a defect but is the largest single risk:** every
-number in this paper is measured on broadcast tennis this project selected,
-segmented and cached itself. A regime found only there will be read as a regime
-built rather than found. `/home/itec/emanuele/Datasets/UVG/1920x1080` holds
-`Jockey` and `ReadySteadyGo` — standard sequences, moving camera, small fast
-subject on a large predictable background, which is the claimed regime in a
-dataset the project did not curate. → `BP36`.
+No session receives more than one row. Each row gets its own branch and worktree.
+The complete report contract is in `plans/SESSION-REPORT.md`.
 
-## 8. Two standing rules added 2026-09-02
+## 8. Result integrity
 
-**Every result carries size, quality and speed.** Not two of them, and not speed
-in a limitations paragraph. `PLAN.md` §5 item 1 already asks for "rate, quality
-*and* encode time on the same axes"; `AGENTS.md` now makes it a property of every
-reported comparison. Wall clock is already recorded per run — the gap was only
-that it never reached the table beside the rate and the quality. Every brief here
-has it in its "done when".
+Every published result record includes:
 
-**Searching for the winning configuration is the method, not a compromise.** Run
-the axes, see the numbers, pick the regime where PointStream wins, and report the
-search. `AGENTS.md` was rewritten on 2026-09-02 to say this plainly, because the
-earlier wording read as though a configuration chosen after seeing data were
-suspect. It is not. The only obligation the search creates is to say which axes
-were tried and where the boundary is. Pre-registered bounds stay, for a different
-job: catching a broken measurement, not locking a choice.
+- git commit, exact command/configuration, input manifest and sample count;
+- encoder paths, versions, presets, colour format, resolution, frame rate;
+- rate, every declared quality axis, encode time and decode time;
+- per-video values, mean, standard error and curve-overlap range;
+- pre-run bounds, null controls, open alarms, closed alarms with reasons;
+- byte ledger by background, appearance, motion, correction, metadata/fallback;
+- a machine-readable citability verdict.
 
-## 9. Standing hazards this roadmap exists to keep visible
+The invariant suite must fail for a result marked citable while carrying an open
+alarm. Printing uncitable runs without asserting is a dashboard, not a gate.
 
-- **The asymmetry.** These checks get applied to disappointing results and
-  skipped on exciting ones. When the news is good, add a check rather than
-  stopping.
-- **Bound before believing, two-sided** where the bound is on the very quantity
-  the experiment exists to generalise past.
-- **Report the search.** A regime found by search is a finding when the search is
-  reported and the claim is scoped to it, and a fabrication when it is presented
-  as predicted.
-- **Per-video spread, not one averaged number.** BP30 drew two conclusions from
-  one video and both inverted at five.
-- **One PR per independently revertible change.** Over-splitting burns the
-  Copilot review budget; under-splitting keeps `main` stale.
+## 9. Paper and artifact scope
+
+- Remove “Live Video Streaming” unless a causal, measured profile exists.
+- Frame the primary system as offline or buffered when it uses a run-wide canvas.
+- Replace promises of generative quality with measured findings. Generation can
+  remain an optional architecture point and a negative result.
+- Replace “dataset will be released” with a legally conservative statement.
+  YouTube-derived video is not redistributed. Release code, configs, hashes,
+  annotations only when permitted, source identifiers/timestamps when allowed,
+  and rights-cleared or synthetic examples.
+- Use the ACM manuscript format and stay within TOMM's 23-page main limit plus
+  five appendix pages. Render continuously; do not postpone page counting.
+- **Measured 2 September:** the reproducible manuscript build is 30 pages.
+  Main text plus references end on page 21; appendices occupy pages 22–30.
+  The main has only two pages of room before results are completed, and the
+  appendices exceed their five-page allowance by four pages. Cut appendix
+  survey/history first and reserve main-body room for the result figures.
+- Main-body evidence needs at least: architecture, regime-selection diagram,
+  rate--quality curves, duration/amortization plot, payload breakdown, ablation
+  table, and rate/quality/time comparison.
+
+## 10. Deliberately parked until Gate B
+
+- training or tuning generative models;
+- broad second-domain work;
+- speed optimization;
+- the complete sixteen-axis experiment space;
+- causal/live background-canvas growth;
+- DCVC-UF in addition to DCVC-RT;
+- MOS/user study unless coauthors make it a submission requirement.
+
+These are not declared unimportant. They are parked because none can rescue the
+submission before the first-domain rate--quality question is answered.

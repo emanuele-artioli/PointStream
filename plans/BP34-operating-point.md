@@ -1,15 +1,21 @@
 # BP34 — Encode/decode time, the operating point, and whether the title may stay
 
+**Gate update (2026-09-02):** measure and report time on every comparison now,
+but defer a dedicated speed-optimization campaign until Gate B in
+`plans/ROADMAP.md` confirms a first-domain rate--quality win. Slow computation
+does not disqualify the first win; it does disqualify a live/real-time claim.
+
 **Owns:** `experiments/timing/**` (new), `outputs/bp34-timing/**`,
 `sections/evaluation.tex` §`subsec:eval-operating`, and the title decision in
-`main.tex`. **Does not own** `experiments/tier/**` or `src/runner/**` while
-PR #45 is open — drive the runner, do not edit it.
+`main.tex`. **Does not own** `experiments/tier/**` or `src/runner/**` unless a
+new brief explicitly assigns them — drive the runner, do not edit it.
 
 **Read first:** `AGENTS.md` · `PLAN.md` §2.16 and §7 P1 item 12 ·
 `sections/evaluation.tex` `HOLE(subsec:eval-operating)` and `NOTE(sec:evaluation)`
 item (a) · `main.tex` `NEXT(abstract)`.
 
-**No result dependency.** Run it whenever.
+**Split dependency.** Timing collection has no result dependency. Optimization
+and the final title decision follow Gate B.
 
 ---
 

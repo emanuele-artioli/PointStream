@@ -4,12 +4,10 @@
 `AGENTS.md` plus the one brief in `plans/` for your workstream — that is the
 whole context a session should need.*
 
-**For what is still left and in what order, read `plans/ROADMAP.md`.** This file
-is the record of what the system is and what has been measured; the roadmap is
-the dependency graph over the remaining work, and `plans/FORK-bp31.md` holds the
-three papers that follow from the three possible outcomes of the ladder now in
-flight — written before it reported, which is what makes scoping the headline
-claim to a regime a finding rather than a retrofit.
+**For what is still left and in what order, read `plans/ROADMAP.md`.** It is the
+deadline plan and the authority on priorities. This file is the chronological
+record of what the system is and what has been measured. Older status statements
+below are retained as history and do not override the current status table.
 
 ---
 
@@ -28,40 +26,48 @@ background method, residual, transport, metric, and the task domain itself — i
 config choice, and the only code a new component needs is the wrapper that
 satisfies its contract.
 
-Target: **ACM TOMM, September 30.**
+Target: **ACM TOMM, September 30. This is a hard deadline.**
 
 ## 2. Status
 
-| Phase | State | Next action |
+| Area | State on 2026-09-02 | Next decision |
 |---|---|---|
-| A — contracts and concepts | ✅ done | — |
-| B — components | ✅ **done** | Merged-ready on `phase-b/integrate` (still unmerged to main) |
-| **B′ — the engine roster** | BP12 ✅, BP25 ✅ | Re-ranked in clip mode on calibrated LPIPS (§2.10). IP-Adapter now has a trained appearance path (§2.17) and still loses to a paste. Quality flagship stays **unset**. |
-| C — pipeline and runner | ✅ **done** | `C1`/`C2`/`C3` merged. A tier config runs end to end and is scored (§2.16, BP23). |
-| D — experiments layer | 🟡 partly unblocked | `BP26` wired the six ablation axes (2026-08-26), so the lattice is now *measurable* but still un-run. Rate-based experiments still need a real encoder (`BP24`). |
-| E — experiments and paper | ⬜ | Ordered by §7 |
+| Contracts, components, runner | ✅ on `main` | Keep stable; change only for the winning-regime search |
+| Conventional codec measurement | ✅ real bitstreams and calibrated metrics | Extend AV1/VVC curves into the ultra-low-rate range |
+| First-domain system result | ⚠️ loses: +90.97% BD-rate vs AV1, one video, two scenes, 8 frames/scene | Search low rate, long eligible scenes, and a lean payload |
+| Background reuse across scenes | ⚠️ works through 16 frames; longer scenes reveal incompatible canvas sizes | Build one canonical background canvas per compatible scene group |
+| Generative reconstruction | ⚠️ no model beats the reference-image paste control | Park training until background and non-generative payload can win |
+| Component ablations | ⚠️ configurable but not yet run | Run a core component ablation matrix after a winning configuration is frozen |
+| Learned-codec baseline | ⬜ absent | Add DCVC-RT after the first-domain win is confirmed |
+| Second domain | ⬜ absent | Start only after the first-domain win is confirmed |
+| Paper | ⚠️ conceptual draft; evaluation incomplete; no conclusion | Evidence freeze by 20 September; submit by 30 September |
 
-**Code.** `src/contracts/` is complete and green. `src/components/` now covers all
-sixteen axes: ~8.6k lines of source, ~3.3k of tests, 52 registered backends of
-which 48 construct. 392 contract and component tests pass, plus 13 integration
-tests that drive real tools. `ruff` and `python -m src.contracts.layers` are
-clean. `mypy` is clean on `phase-d/cleanups` (was 66 in tests; D1 closed).
+**Current optimization order.** First find and confirm a size--quality win
+against AV1 and VVC. Encode and decode time stay in every report, but a slower
+win is sufficient for the first gate. Only then profile and optimize speed. The
+paper must call a slow configuration offline or compute-intensive; it may not
+call it live or real-time.
+
+**Code.** `src/contracts/`, the components, the end-to-end runner, real coded
+rates, and the paired multi-scene ladder are merged on `main`. Ordinary CI is
+green. The experimental evidence and the paper, rather than basic pipeline
+wiring, are now the critical path.
 
 All three Phase-B gates pass: `av1` + `yuv444p` raises `CodecConstraintError`
 rather than silently emitting yuv420p; every codec rung has a region arm or a
 recorded reason it cannot; `python -m src.components` lists every backend on
 every axis.
 
-**Quality measurement works.** This was the standing blocker and it is closed at
-the component level: VMAF runs through libvmaf (97.4 on identical frames, 28.9 on
-degraded), PSNR, SSIM and LPIPS all return real numbers, and FVMD correctly
-refuses a single frame. BD-rate with an overlap check is implemented in
-`src/components/metrics/bd_rate.py`. What is *not* yet true is §7 P0 item 1 — a
-tier config producing those numbers end to end — because there is no pipeline.
+**Quality measurement works, with one remaining experiment-layer repair.** VMAF,
+PSNR, SSIM and LPIPS have calibration checks, and BD-rate refuses inadequate
+curve overlap. The perceptual BD-rate path must still represent whether higher
+or lower metric values are better before LPIPS can support a claim.
 
-**Paper.** Introduction, Related Work, System Design, Future Work written.
-Evaluation is a skeleton of `GOAL`/`HOLE` markers waiting for results.
-Conclusion absent until there are results to conclude from.
+**Paper.** Introduction, Related Work, System Design and Future Work exist, but
+several visible claims describe intended rather than measured behavior. The
+evaluation is incomplete, the conclusion is absent, and the title's “Live Video
+Streaming” promise is incompatible with the measured runtime and with an
+offline canonical-canvas prepass. `plans/ROADMAP.md` owns the rewrite schedule.
 
 ### 2.1 Generation loaders — Wave 1 merged, numbers re-run on aligned pairs
 

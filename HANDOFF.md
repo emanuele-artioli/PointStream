@@ -1,93 +1,75 @@
-# PointStream — status and handoff, 2026-09-02
+# PointStream handoff — 2 September 2026
 
-Replaces the 2026-08-23 handoff, which described a project two waves back. The
-session start hook surfaces this file, so a stale one actively misleads.
+Target: **submit a defensible ACM TOMM manuscript by 30 September 2026. The date
+is hard because the author's contract ends then.**
 
-Target: **ACM TOMM, 30 September.** Twenty-eight days.
+## Read in this order
 
-## Read, in this order
+1. `AGENTS.md`
+2. `plans/ROADMAP.md`
+3. `plans/TERMINOLOGY.md`
+4. one assigned brief only
+5. `PLAN.md` only when historical evidence is needed
 
-1. `AGENTS.md` (project) and the host rules it imports.
-2. **`plans/ROADMAP.md`** — what is left, in what order, with the dependency
-   graph and file ownership.
-3. **`plans/FORK-bp31.md`** — the three papers, one per outcome of the run in
-   flight, written before it reported.
-4. `PLAN.md` for the system and the measurements; `plans/README.md` for the
-   brief index. Then **one** brief. Do not read the plan tree.
+Every dispatched task follows `plans/SESSION-REPORT.md`.
 
-## The situation in six sentences
+## Current state
 
-The platform is built, runs end to end, and is measured: sixteen component axes,
-a runner, region-scoped metrics with calibration invariants, and a paired
-rate-distortion ladder against conventional anchors. **PointStream loses to the
-codec it is built on** — BD-rate **+90.97%** against an av1 anchor at two scenes
-with the cross-scene background stream on, down from +116.8% with a single-frame
-plate. The cause is not the object stream: **the plate is 88–91% of the payload
-at every rung**, and PointStream's entire non-plate payload is under a third of
-the anchor's total rate. **No generative engine produces a usable player** —
-every one of eight loses to pasting the keyframe — so the shipped configuration
-is plate + warps + pasted crops + a corrective residual, and the residual is the
-one component with a measured favourable trade (+0.9% rate for +5.40 dB).
-`AGENTS.md` requires the paper's headline claim to land where PointStream wins,
-so **finding that regime is the work**, and one session is on it now. Everything
-else divides into work that is true whatever it finds and work whose shape
-depends on it.
+- The contracts, components, end-to-end runner and BP31 multi-scene experiment
+  are merged on `main`; PR #45 passed tests, lint and typing.
+- The best current system result is **+90.97% BD-rate against AV1** on one tennis
+  video, two scenes and eight frames per scene. PointStream is about 20× the
+  reference codec's end-to-end wall time in that run.
+- Increasing scene length from 8 to 16 frames improved the single-point
+  PointStream/AV1 byte ratio from 2.17× to 2.01×. This confirms amortization but
+  does not establish the long-run slope.
+- At 24 frames, independently built scene panoramas acquire different
+  dimensions. Predictive background-sequence coding requires equal dimensions.
+  The next implementation is an offline canonical background canvas per
+  compatible camera/background context.
+- The current ~43 dB tests are high quality. The first winning-regime search
+  moves to ultra-low bitrate and long eligible scenes.
+- No reconstruction model beats the reference-image paste control. Generation
+  training is parked until the background and lean non-generative payload can
+  win on rate--quality.
+- The second domain, learned-codec baseline and speed optimization begin only
+  after the first-domain rate--quality result is confirmed.
 
-## Who is doing what
+## Optimization order
 
-| | |
-|---|---|
-| **Parallel session** | BP31, worktree `pointstream-w9-a`, branch `wave9/bp31-ladder`, **PR #45 open**. Owns `src/runner/stages.py`, `src/components/background/**`, `experiments/tier/**`, `tests/runner/**`, `plans/BP31-*`. Next: extract more cached scene windows, then a ten-scene six-video ladder. |
-| **Anyone else** | wave 9 in `plans/ROADMAP.md` §2. File-disjoint from the above by construction. |
+1. Beat AV1 and VVC on size at matched quality in a named tennis regime.
+2. Confirm on at least six independent videos/matches.
+3. Explain it with a core component ablation matrix.
+4. Add DCVC-RT and one independent domain.
+5. Optimize speed on the frozen winning configuration.
 
-## The two things to do first, and why
+Time is measured and shown from step 1, but it is not a gate until step 5. A
+slow win must be framed as offline or compute-intensive, never live.
 
-Both are cheap, both are mostly arithmetic over data already on disk, and either
-can change what the expensive campaign should be spent on.
+## Immediate work
 
-- **`BP32` — the rate budget.** The motivation measured 22.9% ± 3.0% of av1's
-  bitrate in the foreground and 34–69% of the background's rate recoverable by a
-  plate. The system delivers +90.97%. Those are the same claim measured twice and
-  they are ~150 BD-rate points apart, and nobody has written down where the
-  difference goes.
-- **`BP33` — span.** Every ladder in this project has run at **eight frames per
-  scene**; the BP21 cache holds **forty-eight**, and `PLAN.md` §2.14's headroom
-  was measured over those forty-eight. The plate is paid once per scene whatever
-  the scene's length. Three separate reports already record this as "the least
-  favourable amortisation a fixed plate cost can get" and none acted on it.
+The first implementation wave is:
 
-**Tell the BP31 session the answer before its extraction campaign commits to a
-frames-per-scene value.**
+- **M1:** extend AV1/VVC to their lowest useful rate, fix metric-direction
+  typing, and calibrate the primary VMAF comparison;
+- **B1:** implement canonical background canvases and context resets;
+- **D1:** extract and validate 2/4/8/16-second eligible tennis scenes;
+- **M2:** produce an exact byte ledger and fit per-additional-frame cost from at
+  least three durations;
+- **P1:** restore reproducible manuscript rendering and keep a live page budget.
 
-## State of the tree
+Then run E1, the low-rate × duration search. See `plans/ROADMAP.md` for dates,
+dependencies, harness assignment and the required report from every session.
 
-- `main` is green; CI on the last five pushes succeeded. `ruff check` clean.
-- One PR open (#45). Three worktrees: `pointstream`, `pointstream-w9-a`, and a
-  Claude scratch worktree.
-- **Local `pytest` and `mypy` were unable to start** in the `pointstream` env —
-  both read config out of `pyproject.toml` and Python 3.10 has no `tomllib`, so a
-  missing `tomli` made them fail inside their own argument parsing. Fixed
-  2026-09-02: installed, and added to the `dev` extra.
-- **CI's ruff step omitted `experiments/`** (it passed explicit paths, which
-  *overrides* the project's file set rather than adding to it — the same trap
-  mypy hit on 2026-08-30). Fixed 2026-09-02: the step now passes no paths.
-- The `pointstream` env carries two invalid distributions in `site-packages`
-  (`-` and `-umpy`), residue of an interrupted numpy install. Harmless today.
-- Untracked cruft that a guard would not let this session delete:
-  `.pytest_cache`, `.ruff_cache`, the `__pycache__` tree, and an empty
-  `src/decoder/` holding only stale bytecode. All gitignored and regenerable.
+## Standing safeguards
 
-  ```bash
-  rm -rf src/decoder .pytest_cache .ruff_cache && find . -name __pycache__ -type d -not -path './.git/*' -prune -exec rm -rf {} +
-  ```
-
-## Standing hazards
-
-- **The asymmetry**: these checks get applied to disappointing results and
-  skipped on exciting ones. When the news is good, add a check.
-- **Bound before believing, two-sided**, written to
-  `outputs/<brief>/bounds-before-run.json` before the first encode.
-- **Per video with the spread.** BP30 drew two conclusions from one video and
-  both inverted at five.
-- **A flag existing is not a feature working.** Two config axes here reached
-  nothing at all and looked fine.
+- Write two-sided bounds and null controls before reading a result.
+- Every result reports rate, all declared quality axes, encode time and decode
+  time, even while only rate--quality gates the search.
+- The same source frames, resolution, frame rate and colour convention go to
+  PointStream, AV1 and VVC.
+- Report every searched configuration. A scoped win found by search is valid;
+  presenting it as predicted is not.
+- YouTube-derived source footage is not redistributed. The paper and artifact
+  must not promise a releasable dataset without a rights review.
+- The evidence freezes on 20 September.

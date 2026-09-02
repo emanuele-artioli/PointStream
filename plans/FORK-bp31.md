@@ -1,5 +1,9 @@
 # FORK — the three papers, written before the number that chooses between them
 
+**Status: historical decision record.** BP31 has reported and
+`plans/ROADMAP.md` now controls scheduling. Keep this file as the pre-result
+record; do not dispatch work from it.
+
 **Written 2026-09-02, before BP31's N-scene ladder reports** — not to lock the
 answer in advance, but so that whichever answer arrives, the paper it implies is
 already drafted and the remaining month goes into the work rather than into

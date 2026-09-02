@@ -1,7 +1,7 @@
 # BP37 — The required-behaviour suite, audited against the list that defines it
 
 **Owns:** `tests/invariants/**`, `PLAN.md` §8, `scripts/check_coverage_gate.py`.
-**Does not own** `tests/runner/**` while PR #45 is open.
+**Does not own** `tests/runner/**` unless a later dispatch explicitly grants it.
 
 **Read first:** `AGENTS.md` (never add a test to raise a coverage number) ·
 `PLAN.md` §8 in full · `plans/done/BP27-metric-invariants.md` ·
