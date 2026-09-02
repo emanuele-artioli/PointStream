@@ -46,9 +46,10 @@ are the shape of this whole roadmap:
   │ BP33 span (8 vs 48 frames)⭐ │──────┘    (tell that session early)
   │ BP34 encode/decode time      │
   │ BP35 perceptual BD-rate      │──────────► feeds BP31's quality axis
-  │ BP36 second domain (DAVIS)   │
+  │ BP36 second domain           │
   │ BP37 required-behaviour gate │
-  │ BP38 paper infrastructure    │
+  │ BP38 paper infra + DCVC      │
+  │ BP43 background size    ⭐   │──────────► feeds BP31's plate levers
   └──────────────┬───────────────┘
                  │
   WAVE 10 — after PR #45 merges (file ownership, not results)
@@ -89,10 +90,11 @@ disjoint; none of these touch `src/runner/stages.py`, `src/components/background
 | **BP35** | `BP35-perceptual-bdrate.md` | BD-rate on VMAF and LPIPS, calibrated — the paper argues perceptually and the ladder is Y-PSNR | code + calibration | `src/components/metrics/**`, `tests/components/test_metrics*.py` |
 | **BP36** | `BP36-second-domain.md` | the general/DAVIS profile driven end to end — P0 item 6, and the most-requested reviewer item | a day plus data | `src/components/domain/**`, `outputs/bp36-general/**` |
 | **BP37** | `BP37-required-behaviour.md` | the gate `PLAN.md` §8 describes, against the list it actually names | half a day | `tests/invariants/**`, `PLAN.md` §8 |
-| **BP38** | `BP38-paper-infrastructure.md` | figures, reproducibility appendix, related-work currency, stale-figure cull | a day | the paper repo, `figures/`, `appendices/` |
+| **BP38** | `BP38-paper-infrastructure.md` | figures, a **DCVC-class anchor** (decided), reproducibility, related-work currency | a day + the anchor | the paper repo, `figures/`, `appendices/` |
+| **BP43** ⭐ | `BP43-background-representation.md` | making the plate **smaller in pixels**, and whether it needs sending at all | one sweep + one simulation | `src/components/background/sidecar.py`, `BackgroundConfig` |
 
-**BP32 and BP33 are marked ⭐ because they can change what BP31 spends its next
-campaign on.** Do them first and tell that session the answer; it is about to
+**BP32, BP33 and BP43 are marked ⭐ because they can change what BP31 spends its
+next campaign on.** Do them first and tell that session the answer; it is about to
 extract scene windows for a ten-scene, six-video ladder **at eight frames per
 scene**, and if span is the dominant term that campaign is being run at the
 wrong operating point.
@@ -210,7 +212,24 @@ built rather than found. `/home/itec/emanuele/Datasets/UVG/1920x1080` holds
 subject on a large predictable background, which is the claimed regime in a
 dataset the project did not curate. → `BP36`.
 
-## 8. Standing hazards this roadmap exists to keep visible
+## 8. Two standing rules added 2026-09-02
+
+**Every result carries size, quality and speed.** Not two of them, and not speed
+in a limitations paragraph. `PLAN.md` §5 item 1 already asks for "rate, quality
+*and* encode time on the same axes"; `AGENTS.md` now makes it a property of every
+reported comparison. Wall clock is already recorded per run — the gap was only
+that it never reached the table beside the rate and the quality. Every brief here
+has it in its "done when".
+
+**Searching for the winning configuration is the method, not a compromise.** Run
+the axes, see the numbers, pick the regime where PointStream wins, and report the
+search. `AGENTS.md` was rewritten on 2026-09-02 to say this plainly, because the
+earlier wording read as though a configuration chosen after seeing data were
+suspect. It is not. The only obligation the search creates is to say which axes
+were tried and where the boundary is. Pre-registered bounds stay, for a different
+job: catching a broken measurement, not locking a choice.
+
+## 9. Standing hazards this roadmap exists to keep visible
 
 - **The asymmetry.** These checks get applied to disappointing results and
   skipped on exciting ones. When the news is good, add a check rather than

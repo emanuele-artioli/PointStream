@@ -1,20 +1,22 @@
 # FORK — the three papers, written before the number that chooses between them
 
-**Written 2026-09-02, before BP31's N-scene ladder reports.** That is the whole
-point of the document.
+**Written 2026-09-02, before BP31's N-scene ladder reports** — not to lock the
+answer in advance, but so that whichever answer arrives, the paper it implies is
+already drafted and the remaining month goes into the work rather than into
+deciding what the work was for.
 
-`AGENTS.md` permits scoping the headline claim to the regime where it holds, and
-forbids *"choosing the configuration after seeing the numbers and not saying
-so"*. The distinction between those is **when the decision rule was written**. So
-the rule is written here, now, with no result in hand: each branch names the
-condition that selects it, the paper it produces, and the work items that
-activate. When BP31 and `plans/BP32-rate-budget.md` report, the branch is read
-off rather than argued for.
+**Searching for the winning configuration is the method.** `AGENTS.md` says so
+directly: run the axes, see the numbers, pick the regime where PointStream wins,
+and report the search. A regime found by search and reported as found is a
+genuine finding. Nothing in this document restricts which configuration may be
+chosen — the thresholds below are **planning triggers**, saying which body of
+work each outcome makes worth doing, not gates a result must pass to be
+publishable.
 
-**If a later session changes a branch's condition, it must say so and why.**
-Editing this file after the numbers arrive is not forbidden — bounds get revised
-for reasons — but an unrecorded edit is the failure mode this document exists to
-prevent.
+So: revise a branch, move a threshold, or add a fourth branch whenever the data
+says to. The one thing to keep is the habit of writing down what the current
+reading is *before* the next run, because that is what makes the search
+reportable afterwards.
 
 ---
 
@@ -27,7 +29,10 @@ span (`plans/BP33-span-amortisation.md`).**
 
 Quoted on **all three quality axes** once `plans/BP35-perceptual-bdrate.md`
 lands, because "PointStream wins" that is true on VMAF and false on PSNR is a
-scoped result and must be stated as one, not chosen silently.
+scoped result and must be stated as one, not chosen silently. And quoted with
+**encode and decode time beside it every time**, per `AGENTS.md`: a win that
+costs 100x the anchor's encode time is a different result from one that does
+not, and a two-column table cannot tell them apart.
 
 Current value: **+90.97%**, N=2 scenes, 8 frames per scene, Y-PSNR, one video
 (`plans/BP31-findings.md` §9).
@@ -72,7 +77,8 @@ hardest here:
 - the decode names `-c:v` (a decode that does not re-encodes and caps quality);
 - the quality axis is not RGB-PSNR against a 4:2:0 codec;
 - the search that found the regime is reported in full, including the
-  configurations that lost;
+  configurations that lost — this is a requirement on the *writing*, not a
+  restriction on the choosing;
 - **the null control**: the same regime with the object stream off, so the win is
   attributed to the decomposition and not to the plate alone.
 

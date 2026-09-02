@@ -47,12 +47,21 @@ the loss. Scope the headline claim to the regime where it holds and state that
 boundary plainly; a claim that is true in a named regime is a result, and a
 claim that is true everywhere is usually a mistake.
 
-**What this does not license**, because both would sink the paper faster than
-any negative result. **Choosing the configuration after seeing the numbers and
-not saying so** — a regime found by search is a genuine finding when the search
-is reported and the claim is scoped to it, and a fabrication when it is
-presented as though it had been predicted. And **relaxing the checks once the
-news is good**, which is the asymmetry the bounds rule below exists to catch.
+**Searching for the winning configuration is the method, not a compromise.**
+Run the axes, see the numbers, and pick the regime where PointStream wins — that
+is how this kind of result is found, and there is nothing to apologise for in it.
+The only obligation the search creates is to **report it**: say which axes were
+tried, what each gave, and where the claim's boundary is. A regime found by
+search and reported as found is a genuine finding. The same regime presented as
+though it had been predicted is a fabrication, and that is the only version of
+this that is forbidden.
+
+Pre-registered bounds serve a different purpose and are not in tension with the
+above: they exist to catch a *broken measurement*, not to lock a configuration
+choice. Revise a bound whenever it turns out to have been wrong, and record why.
+
+**What is not licensed** is **relaxing the checks once the news is good**, which
+is the asymmetry the bounds rule below exists to catch.
 
 **Secondary results may be negative and should be reported as such.** "No engine
 beats a pasted keyframe" (`PLAN.md` §2.17) is a real contribution and stays.
@@ -79,6 +88,15 @@ that the output changed in the way the option claims.
 
 **Nothing in the pre-rewrite codebase is assumed correct.** Where something
 "exists", that is prior art to read, not a foundation to trust.
+
+**Every result carries all three dimensions: size, quality and speed.** Not two
+of them, and not speed relegated to a limitations paragraph. A configuration that
+is cheaper and better but ten times slower to encode is a different result from
+one that is cheaper, better and as fast, and a table that omits the third column
+cannot tell them apart. `PLAN.md` §5 item 1 already requires "rate, quality *and*
+encode time on the same axes"; this makes it a property of every reported
+comparison rather than of one experiment. Wall clock is already recorded per run
+— the gap is that it is not reported beside the rate and the quality.
 
 **Report what happened.** If a run failed, say so with the output. If a step was
 skipped, say that. Numbers without provenance are not results.

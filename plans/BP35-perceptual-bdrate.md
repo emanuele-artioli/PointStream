@@ -81,6 +81,42 @@ The span floors above are themselves predictions and need a basis:
   available check that a refactor of an instrument did not change the
   instrument, and per `AGENTS.md` it is how a fired alarm gets closed cheaply.
 
+## 2b. The second half of the blocker: the rungs sit where VMAF has no room
+
+Fixing the module is necessary and **not sufficient**, and this is the part that
+was missing from the first version of this brief.
+
+`PLAN.md` §2.16 measured the instruments on this content: **VMAF's ceiling here is
+97.54, not 100**, and it **floors at 0.00 for both severe blur and an unrelated
+clip** — nothing resolves below its floor. The BP23 `tier_quality` run scored
+**VMAF 97.4986**, which is the ceiling to three decimal places.
+
+Now look at where the ladders sample. `outputs/bp24-ladder/av1-payload-lowmotion.json`
+spans Y-PSNR **39.21 to 46.55 dB** for PointStream and 39.45 to 44.02 for the
+anchor. That is the high-fidelity end of 4K broadcast content, where VMAF is
+saturated. **So even with the module fixed, the existing rungs would produce a
+VMAF curve with almost no span, and the span floor would correctly refuse it.**
+
+**The consequence, and it converges with an axis already on the list.** To use a
+perceptual axis the ladder has to extend *downward* — more rungs, lower rates,
+into the regime where VMAF actually varies and where a generative reconstruction
+is supposed to have an advantage over a starved transform codec. That is the same
+move as the "rate regime" axis in `plans/prompts/next-session-bp31.md`, which
+`plans/BP29-low-rate-report.md` §2 looked at once without the plate levers on.
+
+So the sequence is: **fix the module, then check the span each metric actually
+gets from the current rungs, and extend the ladder downward until it clears the
+floor.** Report the span alongside the BD-rate every time — a perceptual BD-rate
+over a two-point VMAF range is the degenerate case `MIN_QUALITY_SPAN_DB` exists to
+reject, arriving through a different door.
+
+**LPIPS may behave better than VMAF here** because it does not saturate the same
+way, but it carries its own trap: `PLAN.md` §2.16 found **LPIPS's ordering
+inverted at 960x540 while holding at 4K**, so calibration anchors do not transfer
+across resolution. Every LPIPS number must state the resolution it was calibrated
+at, and `plans/BP43-background-representation.md`'s downscaling sweep is exactly a
+place where that could bite.
+
 ## 3. The result this enables, and how it must be reported
 
 Re-integrate the ladders that already exist on the new axes. Expect the sign to
@@ -88,7 +124,8 @@ be more favourable to PointStream on VMAF and LPIPS than on Y-PSNR, because that
 is the whole reason for doing it — **which is exactly why the result needs the
 extra check rather than the celebration.**
 
-- **Report all three axes for every curve, always.** Reporting only the axis that
+- **Report all three quality axes for every curve, always — and encode/decode
+  time beside them**, per `AGENTS.md`'s three-dimension rule. Reporting only the axis that
   flatters is the mistake `AGENTS.md` calls choosing the configuration after
   seeing the numbers. Three columns, one table, every time.
 - **A BD-rate that flips sign between PSNR and VMAF is a finding about the
