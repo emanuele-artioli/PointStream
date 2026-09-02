@@ -94,7 +94,10 @@ The first search is deliberately narrow:
   reference per track unless refresh is measured necessary, sparse motion,
   correction off or coarse, generation off initially.
 - **Anchors:** the same source frames, resolution, frame rate, colour convention
-  and temporal extent, encoded jointly with AV1 and VVC.
+  and temporal extent, encoded with AV1 and VVC using each installed encoder's
+  slowest valid preset or full reference configuration. If PointStream later
+  encodes faster, repeat with faster reference presets to map the
+  rate--quality--time tradeoff.
 
 Forty-three dB is a high-fidelity signal regime in which conventional codecs are
 strong and PointStream's structural overhead is exposed. The low-rate hypothesis
@@ -124,12 +127,22 @@ Before the system sweep, establish the usable range of the installed AV1 and VVC
 encoders:
 
 1. resolve binary path and version;
-2. probe the documented/legal QP or quality range;
-3. verify every output is non-empty and decodable;
-4. check bitrate and each quality metric are sufficiently monotone;
-5. retain the lowest decodable point even when it falls below the BD-rate
+2. enumerate and verify the available presets; use the slowest valid preset for
+   the primary comparison and record every tool/config choice;
+3. probe the documented/legal QP or quality range;
+4. verify every output is non-empty and decodable;
+5. check bitrate and each quality metric are sufficiently monotone;
+6. retain the lowest decodable point even when it falls below the BD-rate
    overlap;
-6. use at least four useful points per curve and add points around a crossover.
+7. use at least four useful points per curve and add points around a crossover.
+
+Run two temporal-access controls. The **segmented control** encodes every point
+scene independently and therefore pays an intra frame per segment. The
+**continuous control** gives AV1/VVC the same ordered eligible scenes and permits
+inter prediction across the same boundaries where PointStream reuses a
+background context. The headline comparison must use the control matching the
+claimed product; PointStream may not claim a saving created only by forcing the
+reference codec to reset more often than itself.
 
 Do not downscale, drop frames or alter frame rate in the main comparison. Those
 are separate operating profiles and must be offered to both arms.

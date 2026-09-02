@@ -29,11 +29,14 @@ Do not modify background geometry; BP44 owns it.
 2. Re-run identical, mild, severe and unrelated anchors for every headline
    metric.
 3. Resolve and record AV1/VVC binary paths, versions and presets.
-4. Probe each encoder's full legal quality range at fixed source resolution and
+4. Select each installed encoder's slowest valid preset or full reference
+   configuration for the primary comparison. Do not substitute a faster preset
+   to make runtime convenient.
+5. Probe each encoder's full legal quality range at fixed source resolution and
    frame rate.
-5. Reject empty, undecodable, wrong-size, wrong-frame-count or non-monotone
+6. Reject empty, undecodable, wrong-size, wrong-frame-count or non-monotone
    outputs.
-6. Record the smallest valid bitstream and its measured quality.
+7. Record the smallest valid bitstream and its measured quality.
 
 Primary quality is full-frame VMAF. Y-PSNR and SSIM/MS-SSIM are secondary.
 LPIPS remains diagnostic until its direction and scale are calibrated.
@@ -55,6 +58,19 @@ the intended rate-bearing categories move or explain why they do not.
 Run AV1 and VVC on the exact same frames, dimensions, frame rate and colour
 convention. They encode each whole sequence jointly. No frame dropping or
 downscaling is allowed in the main comparison.
+
+Run both access-pattern controls:
+
+- **segmented:** each point scene is a separate independently decodable segment
+  and each codec pays the required intra frame;
+- **continuous:** the same ordered eligible scenes are encoded together and all
+  codecs may reuse references across every boundary allowed to PointStream.
+
+The headline control follows the product claim. Report the other as an
+access/random-access tradeoff. Do not credit PointStream with avoiding repeated
+intra frames while denying AV1/VVC equivalent cross-boundary prediction. If
+PointStream is faster than the slowest-preset references, add faster reference
+presets after Gate A and report the three-way rate--quality--time frontier.
 
 ## Bounds and controls
 

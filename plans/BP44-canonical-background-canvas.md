@@ -31,6 +31,21 @@ The unit of reuse is a **background context**, normally one camera/view and
 venue. Do not predict backgrounds across unrelated cameras merely because their
 images have equal dimensions.
 
+Predictive background-sequence coding treats the first scene's decoded
+background reference image as an intra-coded reference. Later scene backgrounds
+may be inter-coded against the previous decoded background, so the background
+codec transmits its own prediction difference instead of another full
+background. This is not the same as sending only PointStream's per-frame
+correction signal for the first frames of the next scene: each scene still has a
+decoded background, object data and any configured correction signal.
+
+The canvas failure is a consequence of putting those scene backgrounds into one
+predictive video sequence: video frames in the sequence need common dimensions.
+It is not caused by keyframes themselves. The geometry also needs a common
+origin, because equal-size images with different local coordinate systems would
+decode successfully but reconstruct the players and background in the wrong
+places.
+
 Implement the offline path:
 
 1. collect each scene's homography bounds without encoding;
@@ -54,6 +69,8 @@ in this brief.
 - unrelated contexts force a new independently coded background;
 - padding is included in coded bytes;
 - changing predictive coding changes bytes against independent coding;
+- segmented and continuous AV1/VVC controls use the same reset boundaries as
+  the PointStream configuration they compare against;
 - prior 8/16-frame behavior remains valid.
 
 ## Diagnostic measurement
