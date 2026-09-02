@@ -15,6 +15,12 @@ Every dispatched task follows `plans/SESSION-REPORT.md`.
 
 ## Current state
 
+Integration update: PR #52 (`codex/bp44-bp46-integration`) consolidates the
+reference protocol and BP44–BP46, including their uncommitted repairs. Check
+`gh pr view 52` for merge/CI state. `plans/BP47-integration.md` is the current
+acceptance report; older implementation instructions below are superseded.
+Original worktrees are preserved and clean; ask before removing them.
+
 - The contracts, components, end-to-end runner and BP31 multi-scene experiment
   are merged on `main`; PR #45 passed tests, lint and typing.
 - The best current system result is **+90.97% BD-rate against AV1** on one tennis
@@ -25,8 +31,9 @@ Every dispatched task follows `plans/SESSION-REPORT.md`.
   does not establish the long-run slope.
 - At 24 frames, independently built scene panoramas acquire different
   dimensions. Predictive background-sequence coding requires equal dimensions.
-  The next implementation is an offline canonical background canvas per
-  compatible camera/background context.
+  BP44 now implements an offline canonical background canvas per compatible
+  context. Synthetic 48-frame static/pan and context-reset runner tests pass;
+  native-resolution E1 preflight remains to be run.
 - The current ~43 dB tests are high quality. The first winning-regime search
   moves to ultra-low bitrate and long eligible scenes.
 - No reconstruction model beats the reference-image paste control. Generation
@@ -48,7 +55,12 @@ slow win must be framed as offline or compute-intensive, never live.
 
 ## Immediate work
 
-The first implementation wave is:
+The first implementation wave below is historical; M1/B1 and diagnostic D1
+are integrated in PR #52. Confirmation D1 remains incomplete. Next is a bounded
+native-resolution E1 preflight, not a broad batch. See BP47 for exact validation,
+checkpoint identity rules and the report expected from Cursor.
+
+Original wave:
 
 - **M1:** extend AV1/VVC to their lowest useful rate, fix metric-direction
   typing, and calibrate the primary VMAF comparison;
