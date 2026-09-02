@@ -512,3 +512,39 @@ the reason recorded in the module.
 
 Nothing about `panorama-stream`, which never consults this sidecar (§1). This
 prices the plate codec for the `panorama-full` arm only.
+
+## 11. The third dimension: PointStream is ~20x the anchor's wall clock
+
+`AGENTS.md` now requires every result to carry size, quality **and** speed, and
+`PLAN.md` §5 item 1 had asked for it already. The wall clock was recorded per
+rung all along and simply never reached the table;
+`experiments/tier/ladder_scenes_compare.py` now prints it beside the BD-rate.
+
+| arm | BD-rate vs av1 | wall clock over the curve | vs anchor |
+|---|---:|---:|---:|
+| `panorama-full` | +109.72% | 2,443 s | **x19.1** |
+| `panorama-stream` | **+90.97%** | 2,686 s | **x19.7** |
+| the anchor itself | — | 128-136 s | x1 |
+
+**This makes the picture worse, and it is the honest picture.** PointStream at
+its best configuration here costs roughly **twice the rate and twenty times the
+encode time** of the codec it is built on. A table with two columns could not
+say that, which is exactly the rule's point: cheaper-and-better-but-ten-times-
+slower is a different result from cheaper-and-better-and-as-fast.
+
+**What each number covers**, because they are not the same quantity. The
+anchor's is one `coded_roundtrip` over the concatenated scenes — encode plus
+decode of the source. PointStream's is a whole `run()`: every encode-side stage,
+the residual's codec, and the client reconstruction. So this is *wall clock to
+produce the delivered clip on this host*, not encoder against encoder. The
+anchor's job really is smaller, and the ratio should be read with that in mind
+rather than as a codec speed comparison.
+
+**Confidence: an order of magnitude, not a measurement.** Single sample per rung
+on a shared host, where §10 measured a within-point spread on repeated 4K
+encodes *larger than the range across a whole knob sweep*. A 1.2x difference in
+this column means nothing. x19 means something.
+
+**Where it bites.** The cross-scene stream buys 19 BD-rate points (§9) and costs
+about 10% more wall clock (2,686 s against 2,443 s) — a good trade on its own
+terms. The x20 gap against the anchor is structural, not the stream's doing.

@@ -51,6 +51,50 @@ def _curve(points: list[tuple[int, float]], label: str) -> RDCurve:
     )
 
 
+def speed_column(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """The third dimension. `AGENTS.md`: every result carries size, quality AND speed.
+
+    A configuration that is cheaper and better but ten times slower to encode is
+    a different result from one that is cheaper, better and as fast, and a table
+    with two columns cannot tell them apart. Wall clock was already recorded per
+    rung and simply never reached the table.
+
+    **What each number covers, because they are not the same quantity.** The
+    anchor's is one `coded_roundtrip` over the concatenated scenes — encode plus
+    decode of the source. PointStream's is a whole `run()`: every stage on the
+    encode side, the residual's own codec, and the client reconstruction. So this
+    is "wall clock to produce the delivered clip on this host", not an
+    encoder-against-encoder time, and it flatters neither arm by accident: the
+    anchor's job really is smaller.
+
+    **Read it as an order of magnitude, not a measurement.** This host is shared;
+    `plans/BP31-findings.md` §10 measured a within-point spread on repeated 4K
+    encodes larger than the range across a whole knob sweep. These are single
+    samples per rung, so a 1.2x difference here means nothing and a 20x one means
+    something.
+    """
+    anchor = [float(r["anchor"].get("seconds") or 0.0) for r in rows]
+    stream = [float(r["pointstream"].get("seconds") or 0.0) for r in rows]
+    total_anchor, total_stream = sum(anchor), sum(stream)
+    return {
+        "anchor_seconds_total": round(total_anchor, 1),
+        "pointstream_seconds_total": round(total_stream, 1),
+        "anchor_seconds_per_rung": [round(x, 1) for x in anchor],
+        "pointstream_seconds_per_rung": [round(x, 1) for x in stream],
+        "pointstream_over_anchor": (
+            round(total_stream / total_anchor, 1) if total_anchor else None
+        ),
+        "covers": {
+            "anchor": "coded_roundtrip over the concatenated scenes (encode + decode)",
+            "pointstream": "the whole run(): every encode-side stage, the residual codec, and the client reconstruction",
+        },
+        "confidence": (
+            "single sample per rung on a shared host; read as an order of "
+            "magnitude, not a measurement (findings §10)"
+        ),
+    }
+
+
 def compare(report: dict[str, Any]) -> dict[str, Any]:
     rows = [row for row in report.get("rows", []) if row.get("pointstream") and row.get("anchor")]
     out: dict[str, Any] = {
@@ -77,6 +121,7 @@ def compare(report: dict[str, Any]) -> dict[str, Any]:
     anchor_points = [(int(r["anchor"]["joint_bytes"]), float(r["anchor"]["psnr_y_dB"])) for r in rows]
     out["pointstream_curve"] = stream_points
     out["anchor_curve"] = anchor_points
+    out["speed"] = speed_column(rows)
 
     try:
         bd_rate = compare_rd_curves(
@@ -125,6 +170,13 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  REFUSED: {refusal}")
         if "bd_rate_percent" in result:
             print(f"  BD-rate vs anchor: {result['bd_rate_percent']:+.2f}%")
+        speed = result.get("speed")
+        if speed:
+            print(
+                f"  speed: pointstream {speed['pointstream_seconds_total']}s vs anchor "
+                f"{speed['anchor_seconds_total']}s over the curve "
+                f"(x{speed['pointstream_over_anchor']}) — {speed['confidence']}"
+            )
         if "alarm" in result:
             print(f"  ! {result['alarm']}")
     return 0
