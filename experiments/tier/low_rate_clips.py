@@ -49,6 +49,12 @@ def load_e1_sequence(video: str, scenes: list[str], *, n_frames: int) -> list[An
             raise SystemExit(
                 f"{video}/{scene}: loaded {frames.shape[0]} frames, expected {n_frames}"
             )
+        cid = getattr(clip, "context_id", None)
+        if cid is None or str(cid).strip() == "":
+            raise SystemExit(
+                f"{video}/{scene}: long-scene clip has no context_id. "
+                "E1 cannot invent a canvas context."
+            )
         clips.append(clip)
     if len(clips) != len(scenes):
         raise SystemExit(

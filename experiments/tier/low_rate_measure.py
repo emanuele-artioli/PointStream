@@ -149,11 +149,25 @@ def timing_record(trip: TimedRoundtrip) -> dict[str, float]:
     }
 
 
+def pointstream_timing(run_seconds: float) -> dict[str, Any]:
+    """PointStream ``run()`` is encode plus reconstruction. Do not call that encode."""
+    return {
+        "run_seconds": round(float(run_seconds), 3),
+        "encode_seconds": None,
+        "decode_seconds": None,
+        "timing_note": (
+            "run_seconds is encode plus reconstruction. The runner does not "
+            "split those halves; encode_seconds is reserved for a codec encode."
+        ),
+    }
+
+
 __all__ = [
     "TIMING_KEYS",
     "last_minus_first",
     "late_frame_report",
     "per_frame_y_psnr",
+    "pointstream_timing",
     "primary_preset",
     "recorded_slowest_preset",
     "reference_request",

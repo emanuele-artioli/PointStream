@@ -1,10 +1,10 @@
 # BP45 M1 — session report
 
-**Outcome:** complete for M1 (quality-axis typing and ultra-low anchor probe). E1 not run. Gate A is not decided.
+**Outcome:** complete for M1 (quality-axis typing and ultra-low anchor probe). E1 harness and the five call-site integration fixes are in the worktree; the 4K encode wave was not run. Gate A is not decided.
 
-**Roadmap:** M1. E1 remains blocked on B1 (canonical canvas) and D1 (long eligible scenes).
+**Roadmap:** M1 done. E1 search still needs D1 on the tree and B1 (canonical canvas) before a long-scene PointStream curve is evidence. Merging B1 does not activate the canvas; the sweep must set it and pass `context_ids`.
 
-**Branch / worktree:** `cursor/m1-bp45` at `/home/itec/emanuele/pointstream/.claude/worktrees/bp45`, from `origin/main` (`ecebd9b`).
+**Branch / worktree:** `cursor/m1-bp45` at `/home/itec/emanuele/pointstream/.claude/worktrees/bp45`, from `origin/main` (`ecebd9b`). PR [#51](https://github.com/emanuele-artioli/PointStream/pull/51) (`7602197` M1, `ecaf8de` E1 harness; later integration uncommitted). CI green on the pushed commits.
 
 ## What landed
 
@@ -16,7 +16,15 @@ New harness (does not touch background geometry):
 - `experiments/tier/low_rate_bounds.py`
 - `experiments/tier/low_rate_plan.py` — 11 staged points, not a Cartesian product
 - `experiments/tier/low_rate_probe.py`
-- `experiments/tier/low_rate_sweep.py` — refuses E1 until B1/D1; `--allow-short-scenes` is diagnostic only
+- `experiments/tier/low_rate_measure.py` — split encode/decode timing, headline scores, recorded slowest preset
+- `experiments/tier/low_rate_clips.py` — BP46 long-scene loader adapter
+- `experiments/tier/low_rate_references.py` — independent AV1/VVC QP ladders
+- `experiments/tier/low_rate_sweep.py` — PointStream staged search against those curves, not residual-QP anchors
+- `experiments/tier/low_rate_canvas.py` — `canvas='canonical'` + `run(..., context_ids=)`; SystemExit if BP44 APIs are missing
+- `experiments/tier/low_rate_identity.py` — reference/sweep paths include video, scenes, duration; load checks that identity
+- `experiments/tier/low_rate_checkpoint.py` — per-point JSON under `*.points/`
+- `experiments/tier/low_rate_fallback.py` — same-QP `FallbackConfig` vs the reference codec
+- `experiments/tier/low_rate_smoke.py` — 2×64×64, not a 4K sweep
 
 ## Commands and tests
 
@@ -24,7 +32,7 @@ New harness (does not touch background geometry):
 conda run -n pointstream --no-capture-output python -m pytest \
   tests/contracts/test_metrics.py tests/components/test_bd_rate.py \
   tests/components/test_comparison.py tests/experiments/test_low_rate.py -q
-# 51 passed
+# 51 passed (M1); 65 passed after E1 integration
 
 ruff check <touched files>          # All checks passed
 mypy --config-file pyproject.toml <touched src/experiments>  # no issues, 8 files
@@ -46,7 +54,9 @@ python -m experiments.tier.low_rate_probe --frames 2 \
 # exit 0, 1499 s, 0 alarms
 ```
 
-The PointStream sweep was not launched. `python -m experiments.tier.low_rate_sweep` exits until B1/D1, unless `--allow-short-scenes` is passed and labelled diagnostic.
+The PointStream encode wave was not launched. The sweep now loads long scenes
+through D1 and compares against independent reference curves. Without
+`experiments.long_scenes` it SystemExits and names that dependency.
 
 ## Encoder identity
 
@@ -86,7 +96,7 @@ VMAF span: AV1 86.53–97.37 (10.8 points, just above the 10-point BD-rate floor
 
 Even at legal QP 63, AV1 on this 2-frame 4K clip stays at VMAF 86. That is still high-fidelity. VVC at the same QP reaches VMAF 10. The 2-frame AV1 “floor” is an intra-dominated clip, not the long-scene operating point E1 needs. Ultra-low-rate vs AV1 has to be measured on the long eligible scenes (D1), not on this probe’s two frames. The probe did its job: it established the legal range, the slowest presets, and that both encoders decode cleanly across that range.
 
-Time: AV1 ~16–19 s per point at preset 0. VVC `slower` grows from 8 s at QP 63 to **263 s** at QP 0. Decode time is inside those encode+decode totals; it is not split out on this probe.
+Time: AV1 ~16–19 s per point at preset 0. VVC `slower` grows from 8 s at QP 63 to **263 s** at QP 0. The M1 probe recorded encode+decode together. The E1 harness splits those on every later anchor point.
 
 ## Bounds and alarms
 
@@ -111,10 +121,41 @@ Not taken. No PointStream curve was encoded. A non-overlapping later curve must 
 - That `placebo`/`veryslow` VVC are missing from the standard rather than from this ffmpeg build
 - Speed ranking of AV1 vs VVC (shared host, single sample per QP)
 
+## E1 harness and integration (not a Gate-A run)
+
+Independent AV1/VVC curves walk `probe_qps` at the recorded slowest preset
+(`0` / `slower`), not `measure.PRESETS` and not the residual QP. Paths include
+scenes and duration; load checks that identity. Primary quality is VMAF;
+Y-PSNR and SSIM are secondary. Access patterns are continuous and segmented.
+Non-overlap uses `meets_or_beats_floor`. Default clip: 48 frames of
+`alcaraz_highlights` `scene_000`/`scene_028`.
+
+Call-site integration (closed 2026-09-02, not yet in the pushed PR):
+
+- **Canvas:** `apply_point` sets `background.canvas='canonical'`; `run` is
+  required to take `context_ids` and receives each clip's `context_id`.
+  Missing fields SystemExit. Merging BP44 is not enough by itself.
+- **Identity:** `references-{video}-{scenes}-n{frames}-{codec}.json`. Load
+  checks video, scenes, duration, fps and codec.
+- **Checkpoints:** one JSON per reference QP/pattern and per sweep point;
+  aggregate report rewritten after every point.
+- **Timing:** PointStream wall is `run_seconds`; `encode_seconds` is `None`.
+- **Fallback:** same-QP `FallbackConfig` vs the reference codec (not
+  object-stream-off). Bounds rate_rel 0.95–1.05, VMAF ±1.
+- **Smoke:** `python -m experiments.tier.low_rate_smoke`. Ran 2026-09-02:
+  AV1 fallback 137 B vs reference 137 B, `rate_rel=1.0`, `held=True`.
+
 ## Next
 
-1. B1 canonical canvas (BP44) and D1 long eligible scenes (BP46).
+1. Merge D1 (`experiments.long_scenes`) onto this tree, and B1 canonical canvas.
 2. Codex: confirm the bounds file and this 2-frame AV1-floor reading.
-3. Then E1: `python -m experiments.tier.low_rate_sweep` on the long scenes, same frames/rate/colour to both anchors, continuous and segmented controls, generation off, persist every tried point.
+3. Detached encode wave (hours–days at these presets):
+
+```
+python -m experiments.tier.low_rate_references \
+  --video alcaraz_highlights --scenes scene_000 scene_028 --frames 48
+python -m experiments.tier.low_rate_sweep \
+  --video alcaraz_highlights --scenes scene_000 scene_028 --frames 48
+```
 
 Reproduction: worktree `cursor/m1-bp45`; outputs under `/home/itec/emanuele/pointstream-data/outputs/bp45-low-rate/`.

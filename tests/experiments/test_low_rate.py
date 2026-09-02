@@ -223,6 +223,7 @@ def test_e1_sequence_calls_the_long_scene_loader(monkeypatch: pytest.MonkeyPatch
     class FakeClip:
         frames = _Shape()
         objects: tuple[object, ...] = ()
+        context_id = "alcaraz_highlights_main_court"
 
     def fake_load(video: str, scene: str, n_frames: int) -> FakeClip:
         seen.append((video, scene, n_frames))
@@ -251,6 +252,201 @@ def test_sweep_does_not_slave_anchors_to_residual_or_convenience_presets() -> No
     assert "from experiments.tier.ladder_scenes" not in sweep
     assert "from experiments.tier.clip" not in clips
     assert "from src.components.codec.measure import PRESETS" not in refs
+    assert "context_ids" in sweep
+    assert "canonical" in sweep
+    assert "run_seconds" in sweep
+    assert "encode_seconds is reserved" in (
+        Path(__file__).resolve().parents[2]
+        / "experiments"
+        / "tier"
+        / "low_rate_measure.py"
+    ).read_text(encoding="utf-8")
+
+
+def test_reference_path_includes_scenes_and_duration() -> None:
+    from experiments.tier.low_rate_identity import (
+        assert_same_input,
+        identity_slug,
+        input_identity,
+        references_path,
+    )
+
+    identity = input_identity(
+        video="alcaraz_highlights",
+        scenes=("scene_000", "scene_028"),
+        frames_per_scene=48,
+        codec="av1",
+    )
+    path = references_path(identity, root=Path("/tmp"))
+    assert "scene_000+scene_028" in path.name
+    assert "n48" in path.name
+    assert "av1" in path.name
+    assert identity_slug(identity) in path.name
+    other = dict(identity)
+    other["frames_per_scene"] = 96
+    with pytest.raises(SystemExit, match="frames_per_scene"):
+        assert_same_input(identity, other)
+    other = dict(identity)
+    other["scenes"] = ["scene_000"]
+    with pytest.raises(SystemExit, match="scenes"):
+        assert_same_input(identity, other)
+
+
+def test_load_reference_curve_refuses_a_duration_mismatch(tmp_path: Path) -> None:
+    from experiments.tier.low_rate_identity import input_identity
+    from experiments.tier.low_rate_references import load_reference_curve
+
+    written = input_identity(
+        video="alcaraz_highlights",
+        scenes=("scene_000", "scene_028"),
+        frames_per_scene=48,
+        codec="av1",
+    )
+    expected = dict(written)
+    expected["frames_per_scene"] = 96
+    payload = {
+        "input": written,
+        "curve": {"access_patterns": {"continuous": [{"bytes": 1, "usable": True}]}},
+    }
+    dest = tmp_path / "references.json"
+    dest.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(SystemExit, match="frames_per_scene"):
+        load_reference_curve(dest, access_pattern="continuous", expected=expected)
+
+
+def test_checkpoint_round_trips_and_skips_missing(tmp_path: Path) -> None:
+    from experiments.tier.low_rate_checkpoint import load_checkpoint, save_checkpoint
+
+    save_checkpoint(tmp_path, "bg-crf51", {"name": "bg-crf51", "bytes": 12})
+    loaded = load_checkpoint(tmp_path, "bg-crf51")
+    assert loaded is not None
+    assert loaded["bytes"] == 12
+    assert load_checkpoint(tmp_path, "absent") is None
+
+
+def test_pointstream_timing_does_not_call_the_wall_encode() -> None:
+    from experiments.tier.low_rate_measure import pointstream_timing
+
+    record = pointstream_timing(12.5)
+    assert record["run_seconds"] == 12.5
+    assert record["encode_seconds"] is None
+    assert record["decode_seconds"] is None
+    assert "run_seconds" in record["timing_note"]
+
+
+def test_missing_canvas_field_is_a_named_exit() -> None:
+    from dataclasses import dataclass
+
+    from experiments.tier.low_rate_canvas import with_canonical_background
+
+    @dataclass(frozen=True)
+    class NoCanvas:
+        method: str = "panorama-stream"
+        stream_codec: str = "av1"
+        stream_crf: int = 45
+        keyframe_interval: int = 0
+        reference_mode: str = "last"
+
+    with pytest.raises(SystemExit, match="canvas"):
+        with_canonical_background(
+            NoCanvas(),
+            method="panorama-stream",
+            stream_codec="av1",
+            stream_crf=45,
+            context_id="court",
+        )
+
+
+def test_canonical_canvas_and_context_ids_are_set() -> None:
+    from dataclasses import dataclass
+
+    from experiments.tier.low_rate_canvas import (
+        clip_context_ids,
+        require_run_accepts_context_ids,
+        with_canonical_background,
+    )
+
+    @dataclass(frozen=True)
+    class CanvasBg:
+        method: str = "panorama-stream"
+        stream_codec: str = "av1"
+        stream_crf: int = 38
+        keyframe_interval: int = 0
+        reference_mode: str = "last"
+        canvas: str = "independent"
+        context_id: str = ""
+
+    tuned = with_canonical_background(
+        CanvasBg(),
+        method="panorama-stream",
+        stream_codec="av1",
+        stream_crf=45,
+        context_id="alcaraz_highlights_main_court",
+    )
+    assert tuned.canvas == "canonical"
+    assert tuned.context_id == "alcaraz_highlights_main_court"
+
+    class Clip:
+        video = "alcaraz_highlights"
+        scene = "scene_000"
+        context_id = "alcaraz_highlights_main_court"
+
+    assert clip_context_ids([Clip(), Clip()]) == (
+        "alcaraz_highlights_main_court",
+        "alcaraz_highlights_main_court",
+    )
+
+    def stub_run(*, context_ids: tuple[str, ...] | None = None) -> None:
+        del context_ids
+
+    require_run_accepts_context_ids(stub_run)
+
+    def old_run() -> None:
+        return None
+
+    with pytest.raises(SystemExit, match="context_ids"):
+        require_run_accepts_context_ids(old_run)
+
+
+def test_clip_without_context_id_is_refused() -> None:
+    from experiments.tier.low_rate_canvas import clip_context_ids
+
+    class Clip:
+        video = "alcaraz_highlights"
+        scene = "scene_000"
+        context_id = ""
+
+    with pytest.raises(SystemExit, match="context_id"):
+        clip_context_ids([Clip()])
+
+
+def test_aligned_fallback_matches_the_reference_request() -> None:
+    from experiments.tier.low_rate_fallback import (
+        aligned_fallback_request,
+        evaluate_fallback_equivalence,
+    )
+    from src.contracts.config import FallbackConfig
+
+    default = FallbackConfig()
+    ref = reference_request("av1", 63, "0")
+    assert default.encode_request().rate != ref.rate
+    aligned = aligned_fallback_request(default, codec="av1", qp=63, preset="0")
+    assert aligned.codec_name == ref.codec_name
+    assert aligned.rate == ref.rate
+    assert aligned.preset == ref.preset
+    assert aligned.rate_control == ref.rate_control
+    held = evaluate_fallback_equivalence(
+        {"bytes": 1000, "scores": {"vmaf": 20.0}},
+        {"bytes": 1000, "scores": {"vmaf": 20.0}},
+    )
+    assert held["held"] is True
+    assert held["rate_rel"] == pytest.approx(1.0)
+    miss = evaluate_fallback_equivalence(
+        {"bytes": 2000, "scores": {"vmaf": 10.0}},
+        {"bytes": 1000, "scores": {"vmaf": 20.0}},
+    )
+    assert miss["held"] is False
+    assert miss["rate_ok"] is False
 
 
 def test_non_overlapping_vmaf_uses_the_floor_not_a_fake_bd_rate() -> None:

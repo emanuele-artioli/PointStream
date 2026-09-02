@@ -21,11 +21,18 @@ from typing import Any
 
 import numpy as np
 
+from experiments.tier.low_rate_checkpoint import load_checkpoint, save_checkpoint, write_json
 from experiments.tier.low_rate_clips import (
     DEFAULT_SCENES,
     DEFAULT_SPAN_FRAMES,
     DEFAULT_VIDEO,
     load_e1_sequence,
+)
+from experiments.tier.low_rate_identity import (
+    assert_same_input,
+    checkpoint_dir,
+    input_identity,
+    references_path,
 )
 from experiments.tier.low_rate_measure import (
     late_frame_report,
@@ -57,10 +64,6 @@ from src.contracts.metrics import metric as metric_spec
 
 
 ACCESS_PATTERNS: tuple[str, ...] = ("continuous", "segmented")
-
-
-def references_path(video: str, codec: str) -> Path:
-    return OUT_DIR / f"references-{video}-{codec}.json"
 
 
 def residual_qps_in_plan() -> frozenset[int]:
@@ -196,14 +199,29 @@ def encode_reference_curve(
     preset: str,
     qps: tuple[int, ...],
     fps: float,
+    checkpoint_root: Path | None = None,
 ) -> dict[str, Any]:
     curves: dict[str, list[dict[str, Any]]] = {name: [] for name in ACCESS_PATTERNS}
+    encoders = {
+        "continuous": encode_continuous,
+        "segmented": encode_segmented,
+    }
     for qp in qps:
         request = reference_request(codec, qp, preset)
-        print(f"  {codec} qp{qp} preset {preset} continuous", flush=True)
-        curves["continuous"].append(encode_continuous(clips, request, fps=fps))
-        print(f"  {codec} qp{qp} preset {preset} segmented", flush=True)
-        curves["segmented"].append(encode_segmented(clips, request, fps=fps))
+        for pattern, encode_fn in encoders.items():
+            name = f"{pattern}-qp{qp}"
+            existing = (
+                load_checkpoint(checkpoint_root, name) if checkpoint_root is not None else None
+            )
+            if existing is not None:
+                print(f"  resume {name}", flush=True)
+                curves[pattern].append(existing)
+                continue
+            print(f"  {codec} qp{qp} preset {preset} {pattern}", flush=True)
+            row = encode_fn(clips, request, fps=fps)
+            if checkpoint_root is not None:
+                save_checkpoint(checkpoint_root, name, row)
+            curves[pattern].append(row)
     return {
         "codec": codec,
         "preset": preset,
@@ -304,8 +322,21 @@ def compare_candidate_to_anchor(
     return report
 
 
-def load_reference_curve(path: Path, *, access_pattern: str) -> list[dict[str, Any]]:
+def load_reference_curve(
+    path: Path,
+    *,
+    access_pattern: str,
+    expected: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
     payload = json.loads(path.read_text(encoding="utf-8"))
+    if expected is not None:
+        found = payload.get("input")
+        if not isinstance(found, dict):
+            raise SystemExit(
+                f"{path} has no input identity. Re-run "
+                "python -m experiments.tier.low_rate_references."
+            )
+        assert_same_input(found, expected)
     try:
         return list(payload["curve"]["access_patterns"][access_pattern])
     except (KeyError, TypeError) as exc:
@@ -347,14 +378,29 @@ def main(argv: list[str] | None = None) -> int:
     failed = False
     codecs = [args.codec] if args.codec else list(args.codecs)
     for codec in codecs:
+        identity = input_identity(
+            video=args.video,
+            scenes=list(args.scenes),
+            frames_per_scene=args.frames,
+            codec=codec,
+            fps=args.fps,
+        )
+        dest = references_path(identity, root=dest_dir)
+        points_dir = checkpoint_dir(dest)
         preset = primary_preset(codec, override=args.preset)
         qps = reference_qps(codec)
-        print(f"{codec}: preset {preset}  qps {list(qps)}", flush=True)
+        print(f"{codec}: preset {preset}  qps {list(qps)}  {dest.name}", flush=True)
         curve = encode_reference_curve(
-            clips, codec=codec, preset=preset, qps=qps, fps=float(args.fps)
+            clips,
+            codec=codec,
+            preset=preset,
+            qps=qps,
+            fps=float(args.fps),
+            checkpoint_root=points_dir,
         )
         report = {
             "written": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "input": identity,
             "video": args.video,
             "scenes": list(args.scenes),
             "frames_per_scene": args.frames,
@@ -367,10 +413,10 @@ def main(argv: list[str] | None = None) -> int:
                 if args.preset is None
                 else f"OVERRIDDEN to {args.preset}"
             ),
+            "checkpoint_dir": str(points_dir),
             "curve": curve,
         }
-        dest = dest_dir / f"references-{args.video}-{codec}.json"
-        dest.write_text(json.dumps(report, indent=2, default=str) + "\n", encoding="utf-8")
+        write_json(dest, report)
         print(f"wrote {dest}", flush=True)
         n_bad = sum(
             1

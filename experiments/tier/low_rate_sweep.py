@@ -22,14 +22,28 @@ from typing import Any
 
 import numpy as np
 
+from experiments.tier.low_rate_canvas import (
+    clip_context_ids,
+    require_run_accepts_context_ids,
+    with_canonical_background,
+)
+from experiments.tier.low_rate_checkpoint import load_checkpoint, save_checkpoint, write_json
 from experiments.tier.low_rate_clips import (
     DEFAULT_SCENES,
     DEFAULT_SPAN_FRAMES,
     DEFAULT_VIDEO,
     load_e1_sequence,
 )
+from experiments.tier.low_rate_fallback import run_fallback_control
+from experiments.tier.low_rate_identity import (
+    checkpoint_dir,
+    input_identity,
+    references_path,
+    sweep_path,
+)
 from experiments.tier.low_rate_measure import (
     late_frame_report,
+    pointstream_timing,
     primary_preset,
     score_headlines,
 )
@@ -44,16 +58,20 @@ from experiments.tier.low_rate_references import (
     ACCESS_PATTERNS,
     compare_candidate_to_anchor,
     load_reference_curve,
-    references_path,
 )
-from experiments.tier.low_rate_validate import BOUNDS_PATH, DECLARED_FPS, OUT_DIR, PROBE_PATH
+from experiments.tier.low_rate_validate import BOUNDS_PATH, DECLARED_FPS, PROBE_PATH
 from src.contracts.codecs import RateControl
 from src.contracts.config import PointstreamConfig
 from src.pipeline.reconstruction.dispatch import GeneratorRef
 
 
 def apply_point(
-    base: PointstreamConfig, point: SweepPoint, *, codec: str, preset: str
+    base: PointstreamConfig,
+    point: SweepPoint,
+    *,
+    codec: str,
+    preset: str,
+    context_id: str,
 ) -> PointstreamConfig:
     residual = replace(
         base.residual,
@@ -62,13 +80,12 @@ def apply_point(
         rate_control=RateControl.QP,
         rate=int(point.residual_qp) if point.residual_qp is not None else 55,
     )
-    background = replace(
+    background = with_canonical_background(
         base.background,
         method=point.background_method,
         stream_codec="av1" if codec == "vvc" else codec,
         stream_crf=int(point.stream_crf),
-        keyframe_interval=0,
-        reference_mode="last",
+        context_id=context_id,
     )
     appearance = replace(
         base.appearance,
@@ -90,12 +107,21 @@ def apply_point(
             segmentation=False,
             rigid_objects=False,
         )
+    fallback = replace(
+        base.fallback,
+        codec=codec,
+        rate_control=RateControl.QP,
+        rate=int(point.residual_qp) if point.residual_qp is not None else 55,
+        preset=preset,
+        pix_fmt="yuv420p",
+    )
     return base.with_(
         residual=residual,
         background=background,
         appearance=appearance,
         motion=motion,
         lattice=lattice,
+        fallback=fallback,
     )
 
 
@@ -105,14 +131,15 @@ def _no_generator() -> GeneratorRef:
 
 def pointstream_e1(clips: list[Any], config: PointstreamConfig) -> dict[str, Any]:
     """One ``run()`` over the long scenes, scored on delivered frames."""
-    from src.runner import run
-
+    run = require_run_accepts_context_ids()
+    ids = clip_context_ids(clips)
     started = time.perf_counter()
     result = run(
         config,
         [np.asarray(clip.frames) for clip in clips],
         bind_generator_fn=_no_generator,
         objects=tuple(clip.objects for clip in clips),
+        context_ids=ids,
     )
     wall = time.perf_counter() - started
     source = np.concatenate([np.asarray(clip.frames) for clip in clips], axis=0)
@@ -139,12 +166,9 @@ def pointstream_e1(clips: list[Any], config: PointstreamConfig) -> dict[str, Any
         "background_share": round(panorama / total, 4) if total else None,
         "n_chunks": len(result.chunks),
         "n_frames": int(source.shape[0]),
-        "encode_seconds": round(wall, 3),
-        "decode_seconds": None,
-        "timing_note": (
-            "PointStream reconstruction lives inside run(); the runner does not "
-            "split encode vs decode. encode_seconds is the wall of that call."
-        ),
+        "context_ids": list(ids),
+        "canvas": getattr(config.background, "canvas", None),
+        **pointstream_timing(wall),
     }
 
 
@@ -174,7 +198,9 @@ def run_point(
         },
     }
     try:
-        tuned = apply_point(base, point, codec=codec, preset=preset)
+        tuned = apply_point(
+            base, point, codec=codec, preset=preset, context_id=clip_context_ids(clips)[0]
+        )
         row["pointstream"] = pointstream_e1(clips, tuned)
         if not point.object_stream_on:
             row["pointstream"]["control"] = "object-stream-off"
@@ -197,6 +223,7 @@ def _candidate_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "scores": payload.get("scores") or {},
                 "encode_seconds": payload.get("encode_seconds"),
                 "decode_seconds": payload.get("decode_seconds"),
+                "run_seconds": payload.get("run_seconds"),
             }
         )
     return out
@@ -218,6 +245,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="run PointStream without loading the independent reference curves",
     )
+    parser.add_argument(
+        "--skip-fallback",
+        action="store_true",
+        help="skip the conventional-fallback equivalence control",
+    )
     args = parser.parse_args(argv)
 
     if not BOUNDS_PATH.is_file():
@@ -228,20 +260,104 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     from src.runner.config_io import load_tier
+    from experiments.tier.low_rate_validate import probe_qps
+
+    identity = input_identity(
+        video=args.video,
+        scenes=list(args.scenes),
+        frames_per_scene=args.frames,
+        codec=args.codec,
+        fps=args.fps,
+    )
+    dest = Path(args.out) if args.out else sweep_path(identity)
+    points_dir = checkpoint_dir(dest)
 
     stages = [args.stage] if args.stage else list(stage_names())
     clips = load_e1_sequence(args.video, list(args.scenes), n_frames=args.frames)
+    context_ids = clip_context_ids(clips)
     base = load_tier(args.tier)
     preset = primary_preset(args.codec, override=args.preset)
     rows: list[dict[str, Any]] = []
     category_notes: list[str] = []
+    fallback_control: dict[str, Any] | None = None
+
+    def _report() -> dict[str, Any]:
+        return {
+            "written": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "e1_evidence": False,
+            "reason_not_evidence": (
+                "E1 is diagnostic on two videos until the frozen rule passes E2 "
+                "on at least six independent videos. This file is the harness output."
+            ),
+            "input": identity,
+            "context_ids": list(context_ids),
+            "canvas": "canonical",
+            "video": args.video,
+            "scenes": list(args.scenes),
+            "frames_per_scene": args.frames,
+            "fps": args.fps,
+            "codec": args.codec,
+            "preset": preset,
+            "generation": "off",
+            "access_patterns": list(ACCESS_PATTERNS),
+            "headline_control": "undecided — follows the product claim after both curves exist",
+            "reference_file": None if args.skip_compare else str(references_path(identity)),
+            "checkpoint_dir": str(points_dir),
+            "tried": [row["name"] for row in rows],
+            "ledger_notes": category_notes,
+            "bounds_file": str(BOUNDS_PATH),
+            "probe_file": str(PROBE_PATH),
+            "fallback_control": fallback_control,
+            "comparisons": comparisons,
+            "rows": rows,
+        }
+
+    comparisons: dict[str, Any] = {}
+
+    if not args.skip_fallback:
+        existing_fb = load_checkpoint(points_dir, "fallback-equivalence")
+        if existing_fb is not None:
+            fallback_control = existing_fb
+            print("resume fallback-equivalence", flush=True)
+        else:
+            bounds = json.loads(BOUNDS_PATH.read_text(encoding="utf-8"))
+            band = bounds["bounds"]["fallback_reproduces_reference"]
+            joined = np.concatenate([np.asarray(clip.frames) for clip in clips], axis=0)
+            fallback_control = run_fallback_control(
+                joined,
+                base.fallback,
+                codec=args.codec,
+                qp=int(probe_qps(args.codec)[0]),
+                preset=preset,
+                fps=float(args.fps),
+                rate_rel=(
+                    float(band["rate_rel"]["low"]),
+                    float(band["rate_rel"]["high"]),
+                ),
+                vmaf_abs=(
+                    float(band["vmaf_abs"]["low"]),
+                    float(band["vmaf_abs"]["high"]),
+                ),
+            )
+            save_checkpoint(points_dir, "fallback-equivalence", fallback_control)
+        if fallback_control and not (fallback_control.get("comparison") or {}).get("held"):
+            category_notes.append(
+                "conventional-fallback control did not reproduce the reference codec"
+            )
+        write_json(dest, _report())
 
     for stage in stages:
         points = points_for(stage)
         stage_rows: list[dict[str, Any]] = []
         print(f"stage {stage} ({len(points)} points) preset {preset}", flush=True)
         for point in points:
-            row = run_point(clips, base, point, codec=args.codec, preset=preset)
+            existing = load_checkpoint(points_dir, point.name)
+            if existing is not None:
+                row = existing
+                print(f"  resume {point.name}", flush=True)
+            else:
+                row = run_point(clips, base, point, codec=args.codec, preset=preset)
+                save_checkpoint(points_dir, point.name, row)
             rows.append(row)
             stage_rows.append(row)
             ps = row.get("pointstream") or {}
@@ -250,6 +366,7 @@ def main(argv: list[str] | None = None) -> int:
                 f"{(ps.get('scores') or {}).get('vmaf', '—')}",
                 flush=True,
             )
+            write_json(dest, _report())
         key = intended_category(stage)
         if stage != "controls" and not ledger_moved(stage_rows, key=key):
             note = (
@@ -260,48 +377,25 @@ def main(argv: list[str] | None = None) -> int:
             category_notes.append(note)
             print(f"  ALARM {note}", flush=True)
 
-    comparisons: dict[str, Any] = {}
     if not args.skip_compare:
-        ref_file = references_path(args.video, args.codec)
+        ref_file = references_path(identity)
         if not ref_file.is_file():
             raise SystemExit(
                 f"{ref_file} does not exist. Encode the independent "
                 f"{args.codec} curve first: python -m experiments.tier.low_rate_references "
-                f"--video {args.video} --codec {args.codec}"
+                f"--video {args.video} --scenes {' '.join(args.scenes)} "
+                f"--frames {args.frames} --codec {args.codec}"
             )
         candidates = _candidate_rows(rows)
         for pattern in ACCESS_PATTERNS:
             comparisons[pattern] = compare_candidate_to_anchor(
-                candidates, load_reference_curve(ref_file, access_pattern=pattern)
+                candidates,
+                load_reference_curve(
+                    ref_file, access_pattern=pattern, expected=identity
+                ),
             )
 
-    report = {
-        "written": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "e1_evidence": False,
-        "reason_not_evidence": (
-            "E1 is diagnostic on two videos until the frozen rule passes E2 "
-            "on at least six independent videos. This file is the harness output."
-        ),
-        "video": args.video,
-        "scenes": list(args.scenes),
-        "frames_per_scene": args.frames,
-        "fps": args.fps,
-        "codec": args.codec,
-        "preset": preset,
-        "generation": "off",
-        "access_patterns": list(ACCESS_PATTERNS),
-        "headline_control": "undecided — follows the product claim after both curves exist",
-        "reference_file": None if args.skip_compare else str(references_path(args.video, args.codec)),
-        "tried": [row["name"] for row in rows],
-        "ledger_notes": category_notes,
-        "bounds_file": str(BOUNDS_PATH),
-        "probe_file": str(PROBE_PATH),
-        "comparisons": comparisons,
-        "rows": rows,
-    }
-    dest = Path(args.out) if args.out else OUT_DIR / f"sweep-{args.video}-{args.codec}.json"
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    dest.write_text(json.dumps(report, indent=2, default=str) + "\n", encoding="utf-8")
+    write_json(dest, _report())
     print(f"wrote {dest}", flush=True)
     return 1 if category_notes else 0
 
