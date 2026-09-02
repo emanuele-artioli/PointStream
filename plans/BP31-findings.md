@@ -624,3 +624,81 @@ change: run the span ladder under `panorama-full`, where each scene codes its ow
 plate and no shape agreement is needed; or run `panorama-stream` at N=1, where
 there is no second scene to disagree with. Neither answers the combined question,
 and the combined question is the one that matters.
+
+## 12. Span works — and it collides with the cross-scene stream above 16 frames
+
+BP33's brief (`plans/BP33-span-amortisation.md`, written by a parallel session
+and reaching this one before the first span encode) is right that
+frames-per-scene is an unswept divisor on the dominant cost. Its bounds were
+adopted **verbatim** into `outputs/bp31-ladder/bounds-before-span-run.json` —
+bounds authored after hearing a prediction are not bounds. The axis needed no
+extraction at all: 48-frame clips load for both cached scenes with tracks intact
+and paste-back MAE 0.000.
+
+Span is the only axis moving; scene count is held at N=2, the value §9's BD-rate
+was taken at. Reference rung fixed at `stream_crf` 38 / residual qp 38.
+
+| span | anchor B/frame | PointStream B/frame | ratio | plate | bg share |
+|---:|---:|---:|---:|---:|---:|
+| 8 | 28,359 | 61,556 | 2.17x | 789,304 B | 0.801 |
+| 16 | 16,558 | 33,328 | **2.01x** | 768,277 B | 0.720 |
+| 24 | — | *failed* | — | — | — |
+| 32 | — | *failed* | — | — | — |
+
+**The mechanism is confirmed and the plate does not grow.** Doubling the span
+halved both arms' per-frame rate and narrowed the ratio 2.17x -> 2.01x. The
+plate went *down* 2.7% (789,304 -> 768,277 B) rather than up: on a near-static
+camera the canvas does not expand and the median converges better with more
+samples. Background share fell 0.801 -> 0.720, which is the amortisation
+reaching the ledger — the thing §6's share bound was too blunt to see at N=2.
+
+**Note the direction against BP33's own band.** Its plate-growth bound for the
+static clip is [1.00x, 1.60x], i.e. one-sided upward. Measured at 16 vs 8 frames
+the plate is **0.973x** — below the floor. That band is written for 48 vs 8 so
+it does not strictly apply yet, but the sign is already the other way, and the
+reason is worth keeping: the band assumed a longer span can only cost the plate
+more, and a temporal median gets *cleaner* with more samples.
+
+### The collision: `panorama-stream` needs one canvas and span gives it several
+
+Spans 24 and 32 did not produce a number. They raised:
+
+```
+scene 1 is (2172, 3881, 3), the stream is (2161, 3841, 3);
+inter prediction needs a fixed frame size
+```
+
+`build_plate` sizes each scene's canvas from that scene's own homographies, so
+**each scene's canvas grows by a different amount as the span lengthens**, and
+`panorama-stream` codes the scenes as one video, which requires a constant frame
+size. Measured on this pair:
+
+| span | scene_000 canvas | scene_010 canvas |
+|---:|---|---|
+| 8, 16 | 2161x3841 | 2161x3841 |
+| 24 | 2161x3841 | 2172x3881 |
+| 32 | 2161x3841 | 2189x3919 |
+
+scene_000's camera is near-static and its canvas never moves; scene_010's pans,
+and the divergence widens with span. Below 17 frames the two happen to coincide
+and the stream runs, which is why this never surfaced — **every ladder in this
+project has run at 8**.
+
+**So span and the cross-scene stream are not independently sweepable today.**
+BP33 §3.1 asks for spans {8, 16, 24, 32, 48} on both arms; above 16 that plan
+does not run against `panorama-stream` without a canvas fix. The two levers
+interact through a shared resource nobody had reason to think about, which is
+exactly the class of interaction its §5 warns of — arriving through the geometry
+rather than through the rate.
+
+**The fix is a component change and is not made here.** A common canvas across
+the scenes of one stream — sized from the union of their homographies, or fixed
+per run and padded to — is the obvious shape, and it has a real cost to price:
+padding every scene to the union wastes bits on scenes that did not need it, and
+the padding is a constant region a P-frame codes almost free, so the loss may be
+small. That is a measurement, not an assumption. Until then the streamed arm's
+span is capped at whatever keeps the canvases equal, which on this pair is 16.
+
+`panorama-full` has no such constraint — it codes each scene's plate
+independently — so the span axis is fully sweepable there and is the arm to
+sweep it on first.
