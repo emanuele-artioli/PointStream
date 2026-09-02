@@ -42,6 +42,15 @@ dev = [
   "pre-commit==4.1.0",
   "pytest==9.0.2",
   "ruff==0.11.2",
+  # pytest and mypy read their config out of this file, and on Python 3.10
+  # there is no `tomllib` in the stdlib -- so without `tomli` BOTH refuse to
+  # start, with a `ModuleNotFoundError` raised from inside their own argument
+  # parsing rather than anything that looks like a missing dependency. The
+  # `pointstream` env was in exactly that state until 2026-09-02, which meant
+  # no session could run a test locally and CI was the only gate anyone had.
+  # CI never saw it because `pip install -e ".[dev]"` on 3.10 pulled tomli in
+  # as a transitive dependency of something else there.
+  "tomli==2.4.1; python_version < '3.11'",
   "types-PyYAML==6.0.12.20260518",
 ]
 
