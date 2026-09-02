@@ -52,6 +52,7 @@ from src.contracts.lattice import (
 from src.contracts.config import PointstreamConfig, ResidualConfig
 from src.pipeline.dag.graph import StageCallable
 from src.pipeline.encoder.encoder import SOURCE
+from src.components.background.types import MODE_FULL, MODE_STREAM
 from src.pipeline.reconstruction.background import BackgroundModelView, BackgroundResolver
 from src.pipeline.reconstruction.clips import as_clip
 from src.pipeline.reconstruction.compositor import heuristic_mask
@@ -696,7 +697,24 @@ def make_background(
         return BackgroundModelView(
             plate=source[0] if decoded is None else decoded,
             homographies=artifact.homographies,
-            mode=artifact.mode,
+            # `view.mode` says how to *interpret the pixels*, which is not the
+            # same question as which strategy produced them. A `stream` scene
+            # decodes to a complete plate — `PanoramaStream.decode_payload`
+            # returns the transmitter's own reconstruction, not a difference
+            # image — so reconstruction must treat it exactly as `full`. Only
+            # `delta` means "add me to the previous plate".
+            #
+            # Passing `stream` straight through raised
+            # `background mode must be 'full', 'delta' or 'none'` on the second
+            # chunk of every multi-scene run, because `PanoramaStream.transmit`
+            # emits `full` for the keyframe and `stream` thereafter. A
+            # single-chunk run therefore passed and the amortisation the whole
+            # cross-scene stream exists for had never completed a real run.
+            #
+            # Mapped here rather than widened in the pipeline: that layer has no
+            # use for the distinction, and `SizesBytes` already carries the
+            # marginal-cost meaning from `artifact.mode`, which is untouched.
+            mode=MODE_FULL if artifact.mode == MODE_STREAM else artifact.mode,
             deferred_to_residual=artifact.deferred_to_residual,
             width=int(artifact.width or width),
             height=int(artifact.height or height),
