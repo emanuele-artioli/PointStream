@@ -1,120 +1,93 @@
-# PointStream — handoff, 2026-08-23 (evening)
+# PointStream — status and handoff, 2026-09-02
 
-You are picking up a rewrite of an object-centric semantic video codec, targeting
-**ACM TOMM, September 30**. Everything is merged to `main`. The suite is green:
-1050 passed, 3 xfailed, ruff and mypy clean, import direction clean.
+Replaces the 2026-08-23 handoff, which described a project two waves back. The
+session start hook surfaces this file, so a stale one actively misleads.
+
+Target: **ACM TOMM, 30 September.** Twenty-eight days.
 
 ## Read, in this order
 
 1. `AGENTS.md` (project) and the host rules it imports.
-2. `PLAN.md` — especially **§2.3 through §2.10**. §2.10 is the newest and
-   supersedes the engine readings in the others.
-3. `plans/README.md` — what is live, and what is void.
-4. Your one brief from `plans/`. Do not read the whole tree.
+2. **`plans/ROADMAP.md`** — what is left, in what order, with the dependency
+   graph and file ownership.
+3. **`plans/FORK-bp31.md`** — the three papers, one per outcome of the run in
+   flight, written before it reported.
+4. `PLAN.md` for the system and the measurements; `plans/README.md` for the
+   brief index. Then **one** brief. Do not read the plan tree.
 
-## The situation in five sentences
+## The situation in six sentences
 
-The component platform is built and works: 16 axes, a rebuilt probe set, a
-pipeline, a runner, region-scoped metrics, and now a probe harness that drives
-temporal models as clips and refuses to rank when its own control fails. **No
-generative engine produces a usable player, and this is now measured properly
-rather than suspected**: all eight lose to *pasting the keyframe* at 2.5σ–10.6σ,
-and the best of them is `upscale-refine`, which is not a generative model. The
-test that was supposed to decide whether any engine "uses appearance" has been
-withdrawn, because a pasted keyframe tops its scale with no network at all. The
-paper's central rate-distortion claim against the codec ladder **has still never
-been run in any configuration**.
+The platform is built, runs end to end, and is measured: sixteen component axes,
+a runner, region-scoped metrics with calibration invariants, and a paired
+rate-distortion ladder against conventional anchors. **PointStream loses to the
+codec it is built on** — BD-rate **+90.97%** against an av1 anchor at two scenes
+with the cross-scene background stream on, down from +116.8% with a single-frame
+plate. The cause is not the object stream: **the plate is 88–91% of the payload
+at every rung**, and PointStream's entire non-plate payload is under a third of
+the anchor's total rate. **No generative engine produces a usable player** —
+every one of eight loses to pasting the keyframe — so the shipped configuration
+is plate + warps + pasted crops + a corrective residual, and the residual is the
+one component with a measured favourable trade (+0.9% rate for +5.40 dB).
+`AGENTS.md` requires the paper's headline claim to land where PointStream wins,
+so **finding that regime is the work**, and one session is on it now. Everything
+else divides into work that is true whatever it finds and work whose shape
+depends on it.
 
-## What you must not trust
+## Who is doing what
 
-- **Every engine ranking taken before 2026-08-23.** Two of three metrics were
-  broken: LPIPS was an uncalibrated VGG feature distance that scored an unrelated
-  image at 0.083 and a good reconstruction at 0.085; VMAF had its ffmpeg inputs
-  crossed and scored blur above a perfect match. Both are fixed and both now have
-  calibration invariants.
-- **`plans/BP10-appearance-pathway.md` — void, and marked so in its own file.**
-  Its gate "≥ +3 dB = ReferenceNet works" certifies a paste, which scores
-  +4.45 dB. Any conclusion drawn from a cross-appearance delta alone is void with
-  it.
-- **Anything in `plans/done/` that ranked engines.** `BP5`'s roster verdict was
-  measured on self-reconstruction.
-- **PSNR as a ranking key for generative arms.** Usable range is ~11–21 dB with a
-  ~2 dB per-clip sd. Rank on calibrated LPIPS; keep PSNR reported alongside. On
-  this roster pix2pix is 2nd on PSNR and 7th on LPIPS — the orders genuinely
-  differ.
+| | |
+|---|---|
+| **Parallel session** | BP31, worktree `pointstream-w9-a`, branch `wave9/bp31-ladder`, **PR #45 open**. Owns `src/runner/stages.py`, `src/components/background/**`, `experiments/tier/**`, `tests/runner/**`, `plans/BP31-*`. Next: extract more cached scene windows, then a ten-scene six-video ladder. |
+| **Anyone else** | wave 9 in `plans/ROADMAP.md` §2. File-disjoint from the above by construction. |
 
-## Working rules that were learned expensively
+## The two things to do first, and why
 
-**Eight times now, something passed its tests while not doing its job** — ten
-generators registered that could not load weights; a probe verifier green while
-five clips had no pose data; a roster ranked on self-reconstruction; a temporal
-model run at T=1; a metric that could not tell a match from noise; a VMAF wiring
-where blur beat perfection; a training run with no stopping criterion; and a
-*control* that ranked four engines before anyone asked what an arm with no model
-scores on it.
+Both are cheap, both are mostly arithmetic over data already on disk, and either
+can change what the expensive campaign should be spent on.
 
-So:
+- **`BP32` — the rate budget.** The motivation measured 22.9% ± 3.0% of av1's
+  bitrate in the foreground and 34–69% of the background's rate recoverable by a
+  plate. The system delivers +90.97%. Those are the same claim measured twice and
+  they are ~150 BD-rate points apart, and nobody has written down where the
+  difference goes.
+- **`BP33` — span.** Every ladder in this project has run at **eight frames per
+  scene**; the BP21 cache holds **forty-eight**, and `PLAN.md` §2.14's headroom
+  was measured over those forty-eight. The plate is paid once per scene whatever
+  the scene's length. Three separate reports already record this as "the least
+  favourable amortisation a fixed plate cost can get" and none acted on it.
 
-- **Use the `verify-measurement` skill before reporting any measurement.**
-- **A control needs its own null.** When a control produces a ranking, run the
-  degenerate arm through it — the paste, the passthrough, the empty model —
-  *before* reading the ranking. That is the newest rule and it is the one that
-  caught the latest error.
-- **Write the bound down before the number, and the failure branch with it.**
-  BP12's cross-appearance prediction named what "the ControlNets come in above
-  AA" would mean. They did, and the pre-written branch is what stopped a wrong
-  claim.
-- **Quote the instrument's range beside the number.** "0.067" is meaningless.
-- **Use `src.components.metrics.comparison.compare_paired`** for any arm-vs-arm
-  claim, and `python -m experiments.probe.report <run-dir>` for a whole run.
-- **Check the invocation before blaming the model.**
-- **When the news is good, add a check rather than stopping.**
+**Tell the BP31 session the answer before its extraction campaign commits to a
+frames-per-scene value.**
 
-## Environment
+## State of the tree
 
-- `conda run -n pointstream --no-capture-output <cmd>`; imports absolute from the
-  repo root. Pass `python -u` for long detached runs — stdout block-buffering
-  delayed BP12's progress lines by minutes.
-- Packages go in `pyproject.toml` and then get installed — never ad-hoc, and
-  never a version bump on a pinned forked model.
-- Before merging: `ruff check`, `mypy --config-file pyproject.toml`, the tests
-  for what you touched, `python -m src.contracts.layers`.
-- Three known `xfail`s, each with a reason: `DEFERRED.md` D5 and D6.
-- The paper is a **separate git repo** at `67a9ea6275d3d9785ce57026/`. Commit
-  there when you change it. **It does not yet know about §2.10.**
+- `main` is green; CI on the last five pushes succeeded. `ruff check` clean.
+- One PR open (#45). Three worktrees: `pointstream`, `pointstream-w9-a`, and a
+  Claude scratch worktree.
+- **Local `pytest` and `mypy` were unable to start** in the `pointstream` env —
+  both read config out of `pyproject.toml` and Python 3.10 has no `tomllib`, so a
+  missing `tomli` made them fail inside their own argument parsing. Fixed
+  2026-09-02: installed, and added to the `dev` extra.
+- **CI's ruff step omitted `experiments/`** (it passed explicit paths, which
+  *overrides* the project's file set rather than adding to it — the same trap
+  mypy hit on 2026-08-30). Fixed 2026-09-02: the step now passes no paths.
+- The `pointstream` env carries two invalid distributions in `site-packages`
+  (`-` and `-umpy`), residue of an interrupted numpy install. Harmless today.
+- Untracked cruft that a guard would not let this session delete:
+  `.pytest_cache`, `.ruff_cache`, the `__pycache__` tree, and an empty
+  `src/decoder/` holding only stale bytecode. All gitignored and regenerable.
 
-## What to do next
+  ```bash
+  rm -rf src/decoder .pytest_cache .ruff_cache && find . -name __pycache__ -type d -not -path './.git/*' -prune -exec rm -rf {} +
+  ```
 
-**`plans/BP13-motivating-headroom.md` is the critical path.** Encode a clip
-normally, encode it again with the player regions flattened, difference the
-bitrates. That number bounds the entire paper: the players are 1.07% of a 4K
-frame each (§2.6), and if a conventional codec spends 3% of its bits on them
-there is no prize here regardless of how good a generator gets. Nothing in BP12
-changes this and BP12 makes it more urgent — we now know the generator side is
-not close, so the premise had better be worth the trouble.
+## Standing hazards
 
-Then, in order:
-
-- **`BP14`** before any training run. The last one burned 14 GPU hours on a
-  series flat from epoch 1.
-- **`BP15`** — retire ~15k lines of pre-rewrite code and its 433 tests.
-- **The paper.** §2.10 is not in it yet. The Evaluation skeleton's `GOAL`/`HOLE`
-  markers now have a real negative result to absorb, and `subsec:eval-operating`
-  can be filled: clip mode costs 6.2 GiB against 3.3 for a ControlNet, both at
-  ~1 s/frame.
-
-**The open architectural question is now differently shaped.** It is no longer
-"does ReferenceNet work" — nothing here can answer that. It is **"what
-measurement would tell us?"**, and the literature's answer is an identity metric
-(CSIM/ArcFace), which this project does not have. Adding Champ or MusePose before
-that exists buys two more arms that lose to a pasted keyframe. Build the
-instrument first; that is the lesson of the last three weeks in one sentence.
-
-## One thing to hold on to
-
-The negative results here are real, expensively earned, and now properly
-controlled. They belong in the paper as scoped findings — *these checkpoints, on
-this task, measured this way* — not as evidence that the architecture fails. The
-lattice, the residual and the background are independently verified. Do not let
-the generator result contaminate them, and do not soften it into "more tuning
-needed" either.
+- **The asymmetry**: these checks get applied to disappointing results and
+  skipped on exciting ones. When the news is good, add a check.
+- **Bound before believing, two-sided**, written to
+  `outputs/<brief>/bounds-before-run.json` before the first encode.
+- **Per video with the spread.** BP30 drew two conclusions from one video and
+  both inverted at five.
+- **A flag existing is not a feature working.** Two config axes here reached
+  nothing at all and looked fine.
