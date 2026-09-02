@@ -82,7 +82,7 @@ class MetricCost(int, Enum):
 
 @dataclass(frozen=True)
 class MetricSpec:
-    """One metric, described well enough to schedule, run and rank by.
+    """One metric, described well enough to schedule, run, rank and integrate by.
 
     Args:
         name: Config key. Matched exactly.
@@ -97,6 +97,9 @@ class MetricSpec:
         range: Reportable bounds as ``(low, high)``, or None where unbounded.
             Present so a result outside them is recognisable as an alarm rather
             than a finding.
+        min_curve_span: Absolute floor on the overlapping quality range before
+            a BD-rate is allowed, in this metric's own units. ``None`` means
+            this metric is not a BD-rate axis unless the caller states a floor.
         summary: One line, for listings.
     """
 
@@ -108,6 +111,7 @@ class MetricSpec:
     is_temporal: bool = False
     unit: str = ""
     range: tuple[float, float] | None = None
+    min_curve_span: float | None = None
     summary: str = ""
 
     @property
@@ -144,6 +148,44 @@ class MetricSpec:
         low, high = self.range
         return low <= value <= high
 
+    @property
+    def curve_quality_transform(self) -> str:
+        """How a raw score is mapped onto the higher-is-better axis BD-rate fits.
+
+        Rate is always ``log10``. Quality is ``identity`` when higher is better
+        and ``negate`` when lower is better, so LPIPS cannot silently invert
+        the sign of a quality gap.
+        """
+        return "identity" if self.higher_is_better else "negate"
+
+    @property
+    def curve_rate_transform(self) -> str:
+        """BD-rate always integrates against log-rate."""
+        return "log10"
+
+    def to_curve_quality(self, value: float) -> float:
+        """Map a native score onto the higher-is-better axis used by BD-rate."""
+        return float(value) if self.higher_is_better else -float(value)
+
+    def from_curve_quality(self, value: float) -> float:
+        """Inverse of ``to_curve_quality``, for reporting overlap in native units."""
+        return float(value) if self.higher_is_better else -float(value)
+
+    def describe_axis(self) -> str:
+        """Name, units, direction, range, curve transform and BD-rate span floor."""
+        bounds = "unbounded" if self.range is None else f"[{self.range[0]}, {self.range[1]}]"
+        unit = self.unit or "unitless"
+        span = (
+            f"{self.min_curve_span} {unit}"
+            if self.min_curve_span is not None
+            else "caller must state one"
+        )
+        return (
+            f"{self.name}: {unit}, {self.direction.value}, range {bounds}, "
+            f"curve quality={self.curve_quality_transform}, "
+            f"curve rate={self.curve_rate_transform}, min span {span}"
+        )
+
 
 # --------------------------------------------------------------------------
 # The registered metrics
@@ -156,6 +198,7 @@ PSNR = MetricSpec(
     cost=MetricCost.TRIVIAL,
     unit="dB",
     range=(0.0, 100.0),
+    min_curve_span=3.0,
     summary="Always on. The floor that makes every run report something.",
 )
 
@@ -165,6 +208,7 @@ SSIM = MetricSpec(
     direction=Direction.HIGHER_IS_BETTER,
     cost=MetricCost.MODERATE,
     range=(0.0, 1.0),
+    min_curve_span=0.05,
     summary="Structural similarity.",
 )
 
@@ -174,6 +218,7 @@ VMAF = MetricSpec(
     direction=Direction.HIGHER_IS_BETTER,
     cost=MetricCost.MODERATE,
     range=(0.0, 100.0),
+    min_curve_span=10.0,
     summary="The headline video-quality number, and what the codec ladder is compared in.",
 )
 
@@ -183,10 +228,13 @@ LPIPS = MetricSpec(
     direction=Direction.LOWER_IS_BETTER,
     cost=MetricCost.HEAVY,
     range=(0.0, 1.0),
+    min_curve_span=0.05,
     summary=(
         "Learned perceptual distance, for generated content where PSNR misleads. "
         "Present in the codebase already, but wired only into checkpoint "
-        "evaluation — never into pipeline evaluation."
+        "evaluation — never into pipeline evaluation. Diagnostic on a BD-rate "
+        "curve until its direction and scale have been calibrated at the "
+        "resolution under test."
     ),
 )
 
@@ -248,6 +296,13 @@ ALWAYS_ON: Final[frozenset[str]] = frozenset({PSNR.name})
 
 #: The development default: the floor and nothing else.
 DEFAULT_METRICS: Final[tuple[str, ...]] = (PSNR.name,)
+
+#: Axes a Gate-A rate--quality curve must report. Primary is VMAF; the rest
+#: ride along so a favourable axis cannot be chosen after seeing the numbers.
+HEADLINE_CURVE_METRICS: Final[tuple[str, ...]] = (VMAF.name, PSNR.name, SSIM.name)
+
+#: Allowed on a curve once calibrated at the working resolution; not a headline.
+DIAGNOSTIC_CURVE_METRICS: Final[tuple[str, ...]] = (LPIPS.name,)
 
 
 def metric(name: str) -> MetricSpec:
