@@ -94,6 +94,8 @@ class StageContext:
     appearance_encoder: Any = None
     motion_encoder: Any = None
     temporal_policy: Any = None
+    source_chunks: Sequence[np.ndarray] | None = None
+    context_ids: Sequence[str] | None = None
 
 
 def _subjects(bag: Mapping[str, Any]) -> tuple[ObjectRequest, ...]:
@@ -603,6 +605,29 @@ def _bound_background(ctx: StageContext) -> Any:
     return bind_background(ctx.config)
 
 
+def _resolved_context_ids(ctx: StageContext) -> tuple[str, ...]:
+    """Per-chunk background context ids, aligned with ``source_chunks``.
+
+    Empty config means one context for the whole run. A caller that already
+    knows the scene list (the paired ladder) passes the ids on ``StageContext``
+    so a replay does not share a canvas with the court it interrupts.
+    """
+    default = ctx.config.background.context_id or "run"
+    n_chunks = len(ctx.source_chunks) if ctx.source_chunks is not None else 0
+    if ctx.context_ids is not None:
+        ids = tuple(str(item) for item in ctx.context_ids)
+        if n_chunks and len(ids) != n_chunks:
+            raise ConfigValueError(
+                "runner.background.context_ids",
+                f"context_ids has {len(ids)} entries for {n_chunks} source chunks. "
+                "Pair by track position, one id per chunk.",
+            )
+        return ids
+    if n_chunks == 0:
+        return ()
+    return tuple(default for _ in range(n_chunks))
+
+
 def make_background(
     ctx: StageContext, *, span: int | None = None, register: bool = True
 ) -> StageCallable:
@@ -663,18 +688,32 @@ def make_background(
     #
     # One bound model is therefore one stream. Two runs must not share a stage.
     model = _bound_background(ctx)
+    ids = _resolved_context_ids(ctx)
+    if ctx.config.background.canvas == "canonical" and ctx.source_chunks:
+        # Offline: each context group sees its scenes before the first plate
+        # of that group is coded. Mixed ids must not share one union canvas.
+        model.prepare_contexts(ctx.source_chunks, ids, register=register)
+
+    chunk_index = 0
 
     def background_stage(bag: Mapping[str, Any]) -> BackgroundModelView:
-        from src.components.background.plate import build_plate
-
+        nonlocal chunk_index
         source = as_clip(bag[SOURCE], path=SOURCE)
         frame_count = int(source.shape[0])
         height, width = int(source.shape[1]), int(source.shape[2])
+        context_id = (
+            ids[chunk_index]
+            if chunk_index < len(ids)
+            else (ctx.config.background.context_id or None)
+        )
         if not model.sends_panorama:
             # Nothing is transmitted, so nothing is stitched. `build_plate` on
             # a plate that will not be sent would be minutes of 4K warping for
             # an empty payload.
-            artifact = model.transmit(np.asarray(source[0], dtype=np.uint8))
+            artifact = model.transmit(
+                np.asarray(source[0], dtype=np.uint8),
+                context_id=context_id,
+            )
         else:
             count = frame_count if span is None else min(span, frame_count)
             # A one-frame span has no second sample to fill a masked pixel
@@ -687,12 +726,17 @@ def make_background(
                 if count < 2
                 else _foreground_stack(bag, frame_count=count, height=height, width=width)
             )
-            plate, homographies = build_plate(
+            plate, homographies = model.stitch(
                 np.asarray(source[:count], dtype=np.uint8),
                 masks=masks,
                 register=register,
             )
-            artifact = model.transmit(plate, homographies=homographies)
+            artifact = model.transmit(
+                plate,
+                homographies=homographies,
+                context_id=context_id,
+            )
+        chunk_index += 1
         decoded = model.decode_payload(artifact)
         return BackgroundModelView(
             plate=source[0] if decoded is None else decoded,

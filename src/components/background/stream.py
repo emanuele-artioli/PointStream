@@ -69,6 +69,49 @@ REFERENCE_MODES: Final[tuple[str, ...]] = (
 KEYFRAME_NEVER: Final = 0
 
 
+def context_reset_indices(context_ids: Sequence[str]) -> tuple[int, ...]:
+    """Scene indices that start a new independently coded background.
+
+    The **continuous** AV1/VVC control must reset at exactly these indices —
+    the same boundaries where PointStream starts a new background context —
+    and nowhere else. The **segmented** control resets every scene, which is
+    ``tuple(range(n))``, and is a different product.
+    """
+    if not context_ids:
+        return ()
+    resets = [0]
+    previous = context_ids[0]
+    for index, current in enumerate(context_ids[1:], start=1):
+        if current != previous:
+            resets.append(index)
+            previous = current
+    return tuple(resets)
+
+
+def segmented_reset_indices(n_scenes: int) -> tuple[int, ...]:
+    """Every scene is an independent intra. Not the continuous control."""
+    if n_scenes < 0:
+        raise ValueError(f"n_scenes must be >= 0, got {n_scenes}")
+    return tuple(range(n_scenes))
+
+
+def scene_groups(context_ids: Sequence[str]) -> tuple[tuple[int, int], ...]:
+    """Half-open ``[start, end)`` ranges of consecutive scenes in one context.
+
+    The continuous AV1/VVC control encodes each range as one sequence.
+    The segmented control encodes ``(i, i+1)`` for every scene. Both lists
+    of start indices must match ``context_reset_indices`` /
+    ``segmented_reset_indices`` of the PointStream configuration they
+    compare against — otherwise the reference is resetting more often, or
+    less often, than the system under test.
+    """
+    resets = context_reset_indices(context_ids)
+    if not resets:
+        return ()
+    ends = (*resets[1:], len(context_ids))
+    return tuple((int(start), int(end)) for start, end in zip(resets, ends, strict=True))
+
+
 @dataclass(frozen=True)
 class StreamCodec:
     """One encoder, pinned to a low-delay configuration and a raw container.
@@ -422,6 +465,18 @@ class BackgroundStreamTransmitter:
     def reconstructions(self) -> tuple[np.ndarray, ...]:
         """What the encoder holds. Equal, frame for frame, to the client's."""
         return tuple(self._reconstructions)
+
+    def reset(self) -> None:
+        """Start a new independently coded background (a context boundary).
+
+        The next ``push`` is a keyframe. A later context may use a different
+        canvas size; that is not a shape error, because it is not the same
+        stream.
+        """
+        self._originals.clear()
+        self._chains.clear()
+        self._payloads.clear()
+        self._reconstructions.clear()
 
     def _forces_keyframe(self, index: int) -> bool:
         if index == 0:
