@@ -216,3 +216,10 @@ on `run(..., context_ids=)`; the ladder defaults both BP31 point scenes to
 Run the long-scene search at 48/96/192/384 with `canvas: canonical`. Do not
 call this configuration live. The late-span PSNR cliff on a pan is a plate
 quality issue, not a canvas one.
+
+### Commit and PR
+
+- `c3a52ea` — offline canonical canvas
+- `e375a70` — per-scene context IDs, ladder reset boundaries, panning probe
+- https://github.com/emanuele-artioli/PointStream/pull/50 — CI passed on both
+  commits
