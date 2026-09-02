@@ -130,6 +130,7 @@ def run(
     objects: Sequence[tuple[ObjectRequest, ...]] | None = None,
     components: Mapping[str, object] | None = None,
     builders: Mapping[str, Callable[..., Any]] | None = None,
+    context_ids: Sequence[str] | None = None,
 ) -> RunResult:
     """Encode, reconstruct, score, and account every chunk.
 
@@ -155,6 +156,10 @@ def run(
         builders: Optional per-axis factory ``(name, **kwargs) -> backend``.
             Changing a config name must change which factory argument is
             passed; that is the proof the name reaches the run.
+        context_ids: Per-chunk background context. Aligned with ``chunks``.
+            Scenes that share an id may share a canvas and a predictive stream;
+            a change is a new independently coded background. Default is the
+            config's ``background.context_id``, or ``"run"`` for every chunk.
     """
     if not chunks:
         raise ValueError("run needs at least one source chunk; a reconstruction of nothing cannot be scored.")
@@ -162,6 +167,11 @@ def run(
         raise ValueError(
             f"objects has {len(objects)} entries for {len(chunks)} chunks. "
             "Pair by track position, one tuple per chunk."
+        )
+    if context_ids is not None and len(context_ids) != len(chunks):
+        raise ValueError(
+            f"context_ids has {len(context_ids)} entries for {len(chunks)} chunks. "
+            "Pair by track position, one id per chunk."
         )
 
     validate(config)
@@ -194,6 +204,11 @@ def run(
         motion_encoder=bound.get("motion"),
         temporal_policy=bound.get("temporal"),
         source_chunks=prepared,
+        context_ids=(
+            tuple(str(item) for item in context_ids)
+            if context_ids is not None
+            else tuple((config.background.context_id or "run") for _ in prepared)
+        ),
     )
     roster = bind_backends(ctx, backends)
     conditioning = tuple(ref.requires) if ref is not None else ()

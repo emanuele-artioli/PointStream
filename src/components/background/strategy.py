@@ -15,6 +15,7 @@ Sidecar codec is an independent constructor argument, not a strategy name.
 from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
@@ -22,6 +23,7 @@ import numpy as np
 from src.components.background.delta import apply_delta, compute_delta
 from src.components.background.plate import CanonicalCanvas, build_plate, prepare_canonical_context
 from src.components.background.sidecar import SidecarCodec, build_sidecar, normalize_sidecar
+from src.components.background.stream import scene_groups
 from src.components.background.types import (
     MODE_DELTA,
     MODE_FULL,
@@ -195,6 +197,17 @@ class BackgroundModel:
         _ = (scenes, context_id, register)
         return None
 
+    def prepare_contexts(
+        self,
+        scenes: Sequence[np.ndarray],
+        context_ids: Sequence[str],
+        *,
+        register: bool = True,
+    ) -> CanonicalCanvas | None:
+        """One union canvas per consecutive run of the same context id."""
+        _ = (scenes, context_ids, register)
+        return None
+
     def decode_payload(self, artifact: BackgroundArtifact) -> np.ndarray | None:
         """Pixels the client reconstructs from ``artifact``.
 
@@ -231,6 +244,17 @@ class PanoramaFull(BackgroundModel):
 class PanoramaDelta(BackgroundModel):
     method = BACKGROUND_PANORAMA_DELTA
     sends_panorama = True
+
+
+@dataclass(frozen=True)
+class PreparedContext:
+    """One consecutive run of scenes that share a background context."""
+
+    start: int
+    end: int
+    context_id: str
+    canvas: CanonicalCanvas
+    alignments: tuple[np.ndarray, ...]
 
 
 class PanoramaStream(BackgroundModel):
@@ -300,6 +324,7 @@ class PanoramaStream(BackgroundModel):
         self._active_context: str | None = None
         self._canvas: CanonicalCanvas | None = None
         self._alignments: tuple[np.ndarray, ...] = ()
+        self._groups: tuple[PreparedContext, ...] = ()
         self._scene_index = 0
 
     def prepare_context(
@@ -312,16 +337,70 @@ class PanoramaStream(BackgroundModel):
         """Offline union of scene bounds. Must run before the first transmit.
 
         This sees every scene in the context, so it is a buffered codec mode.
+        One id for every scene — a mixed list belongs on ``prepare_contexts``.
         """
         active = context_id if context_id is not None else (self.context_id or "run")
-        canvas, alignments, _bounds = prepare_canonical_context(
-            scenes, context_id=active, register=register
+        canvas = self.prepare_contexts(
+            scenes,
+            tuple(active for _ in scenes),
+            register=register,
         )
-        self._canvas = canvas
-        self._alignments = alignments
-        self._scene_index = 0
-        self.context_id = active
+        if canvas is None:
+            raise ValueError("a background context needs at least one scene")
         return canvas
+
+    def prepare_contexts(
+        self,
+        scenes: Sequence[np.ndarray],
+        context_ids: Sequence[str],
+        *,
+        register: bool = True,
+    ) -> CanonicalCanvas | None:
+        """One canonical canvas per consecutive run of the same context id.
+
+        Mixing ids in one ``prepare_context`` used to union unrelated cameras
+        onto one canvas. A context change is a new independently coded
+        background, possibly a different size.
+        """
+        if len(scenes) != len(context_ids):
+            raise ValueError(
+                f"prepare_contexts got {len(scenes)} scenes and {len(context_ids)} "
+                "context ids; they must be aligned."
+            )
+        groups: list[PreparedContext] = []
+        for start, end in scene_groups(tuple(context_ids)):
+            cid = str(context_ids[start])
+            canvas, alignments, _bounds = prepare_canonical_context(
+                list(scenes[start:end]),
+                context_id=cid,
+                register=register,
+            )
+            groups.append(
+                PreparedContext(
+                    start=start,
+                    end=end,
+                    context_id=cid,
+                    canvas=canvas,
+                    alignments=alignments,
+                )
+            )
+        self._groups = tuple(groups)
+        self._scene_index = 0
+        if not groups:
+            self._canvas = None
+            self._alignments = ()
+            return None
+        first = groups[0]
+        self._canvas = first.canvas
+        self._alignments = first.alignments
+        self.context_id = first.context_id
+        return first.canvas
+
+    def _prepared_at(self, index: int) -> PreparedContext | None:
+        for group in self._groups:
+            if group.start <= index < group.end:
+                return group
+        return None
 
     def stitch(
         self,
@@ -330,17 +409,29 @@ class PanoramaStream(BackgroundModel):
         *,
         register: bool = True,
     ) -> tuple[np.ndarray, tuple[tuple[float, ...], ...]]:
+        group = self._prepared_at(self._scene_index)
+        if group is not None:
+            alignment = group.alignments[self._scene_index - group.start]
+            plate, homographies = build_plate(
+                frames,
+                masks=masks,
+                register=register,
+                canvas=group.canvas,
+                alignment=alignment,
+            )
+            self._scene_index += 1
+            return plate, homographies
         if self._canvas is None:
             return build_plate(frames, masks=masks, register=register)
-        alignment = None
+        fallback: np.ndarray | None = None
         if self._scene_index < len(self._alignments):
-            alignment = self._alignments[self._scene_index]
+            fallback = self._alignments[self._scene_index]
         plate, homographies = build_plate(
             frames,
             masks=masks,
             register=register,
             canvas=self._canvas,
-            alignment=alignment,
+            alignment=fallback,
         )
         self._scene_index += 1
         return plate, homographies
@@ -371,14 +462,17 @@ class PanoramaStream(BackgroundModel):
         sides start disagreeing about which picture was predicted from.
 
         A change of ``context_id`` resets the stream: the next plate is an
-        independently coded keyframe, possibly on a different canvas.
+        independently coded keyframe, possibly on a different canvas. Prepared
+        groups stay; the encoder is what restarts. Wiping the canvas here
+        used to drop a later context back onto a local size mid-run.
         """
         active = context_id if context_id is not None else self.context_id
         if self._active_context is not None and active != self._active_context:
             self._transmitter.reset()
-            self._canvas = None
-            self._alignments = ()
-            self._scene_index = 0
+            if not self._groups:
+                self._canvas = None
+                self._alignments = ()
+                self._scene_index = 0
         self._active_context = active
         array = np.asarray(plate, dtype=np.uint8)
         payload = self._transmitter.push(array)

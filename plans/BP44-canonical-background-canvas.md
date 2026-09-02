@@ -125,24 +125,31 @@ an independently coded keyframe, possibly on a different canvas.
 
 Needed for a real `run()` to see all scenes before the first encode:
 
-- `src/runner/stages.py` — `model.stitch` / `prepare_context` prepass
-- `src/runner/run.py` — pass sliced chunks on `StageContext.source_chunks`
+- `src/runner/stages.py` — `model.stitch` / `prepare_contexts` prepass, per-chunk ids
+- `src/runner/run.py` — `source_chunks` and `context_ids` on `StageContext`
+- `experiments/tier/ladder_scenes.py` — continuous/segmented encode the same
+  `scene_groups` / `segmented_reset_indices` as PointStream
 - `config/default.yaml` — `context-id`, `canvas`, and the stream fields the
   schema already had
 
-Not wired in this PR: `experiments/tier/ladder_scenes.py` still uses joint vs
-separate concatenation for the anchor. `context_reset_indices` /
-`segmented_reset_indices` in `stream.py` are the reset boundaries the
-continuous and segmented AV1/VVC controls must share; they are tested, not
-yet called from the ladder.
+Not wired in the first commit: `experiments/tier/ladder_scenes.py` still used joint vs
+separate concatenation for the anchor. **Wired in the follow-up:** per-chunk
+`context_ids` on `run()` / `StageContext`; `prepare_contexts` builds one canvas
+per consecutive id run; the ladder's continuous control encodes `scene_groups`
+and the segmented control encodes every scene. Same-id sequences make
+continuous equal joint; all-different ids make continuous equal segmented.
+PointStream keyframe indices match `context_reset_indices` of that list.
 
 ### Tests
 
 `conda run -n pointstream --no-capture-output python -m pytest` on the
-background plate, stream, strategy, config, panorama runner, and new
-`tests/components/background/test_canonical_canvas.py` files: 70 passed.
-`ruff check` on the touched files: clean. `mypy` on the touched files: clean.
-`python -m src.contracts.layers`: OK.
+background plate, stream, strategy, config, panorama runner, and
+`tests/components/background/test_canonical_canvas.py` files: 70 passed in
+the first commit. Follow-up: 22 passed on canonical-canvas + stream-stage +
+panorama runner (including mixed-id canvas and PointStream mode = continuous
+resets); 42 passed on stream / plate-registration / reconstruction
+background. `ruff check` on the touched files: clean. `mypy` on the touched
+files: clean. `python -m src.contracts.layers`: OK.
 
 ### Diagnostic (`outputs/bp44-canonical-canvas/`)
 
@@ -171,22 +178,41 @@ predictive/independent bytes (0.81–0.83, band 0.20–1.10).
 
 **`last_minus_first_psnr_dB` fired at all three durations.** The bound's basis
 was "a drop worse than 3 dB suggests the homography walked off the canvas."
-That attribution is wrong. The static scene is stable or slightly *up* (33.6 →
-34.7 dB at 48 frames). The panning scene drops 31 → 17 dB, and reconstruction
-MAE against the independent local plate on that scene is 0.19–0.23 — the two
-paths agree, so the drop is the panning plate versus source, not the origin
-shift. The band stays as a late-frame check; its cause is revised to "plate vs
-source on a pan," and a split against the independent path is the check that
-would catch a canvas walk-off.
+That attribution is wrong. Closed 2026-09-02 by an uncoded plate warp-back
+probe on `scene_010` at 24 frames (no AV1; bounds in
+`bounds-before-panning-alarm.json` before the measurement):
+
+| check | value | band | result |
+|---|---:|---|---|
+| canonical − independent last−first | −0.001 dB | [−1, 1] | hold |
+| last-frame coverage | 1.000 | [0.90, 1.00] | hold |
+| last-frame PAD_FILL fraction | ~0 | [0, 0.05] | hold |
+| independent first-frame PSNR | 31.0 dB | [25, 45] | hold |
+| last homography scale | 0.995 | [0.90, 1.10] | hold |
+| registered − unregistered last PSNR | +6.2 dB | [1, 40] | hold |
+
+Independent and canonical last−first are −7.388 dB and −7.389 dB. Coverage is
+the whole last frame; pad is one pixel in ~2.7 M. The homography is a pan
+(centre shift ≈ 34 px), not a zoom. Per-frame PSNR holds in the low 30s through
+frame 18, then cliffs: 27.6, 26.2, 25.1, 24.4, 23.6 dB. Unregistered last and
+span=1 (first frame as plate vs last source) both sit at ~17 dB — that is the
+pan itself, and registration still beats it.
+
+The original stream diagnostic's pan last-frame was 23.63 dB, not 17. The −3.86
+dB mean mixes a stable static scene with this pan. The band stays as a
+late-frame check; the canvas-walk-off cause is closed. A future stream run
+also records `canonical_minus_independent_last_first_dB`.
 
 ### Config
 
 `background.canvas`: `independent` (default, local canvases) or `canonical`
 (offline union). `background.context_id`: scenes that share it share a canvas
-and may be predicted across; a change forces a new keyframe.
+and may be predicted across; a change forces a new keyframe. Per-chunk ids go
+on `run(..., context_ids=)`; the ladder defaults both BP31 point scenes to
+`{video}-point`.
 
 ### Next
 
-Wire `context_reset_indices` into the paired ladder's continuous AV1/VVC
-control (M2 / E1). Then run the long-scene search at 48/96/192/384 with
-`canvas: canonical`. Do not call this configuration live.
+Run the long-scene search at 48/96/192/384 with `canvas: canonical`. Do not
+call this configuration live. The late-span PSNR cliff on a pan is a plate
+quality issue, not a canvas one.

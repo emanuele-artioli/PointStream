@@ -51,6 +51,7 @@ from __future__ import annotations
 import argparse
 import json
 import time
+from collections.abc import Sequence
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
@@ -59,6 +60,11 @@ import numpy as np
 
 from experiments.tier.clip import BP21_CLIPS, TierClip, load_tier_clip
 from experiments.tier.ladder import PAYLOAD_RUNGS, pooled_psnr
+from src.components.background.stream import (
+    context_reset_indices,
+    scene_groups,
+    segmented_reset_indices,
+)
 from src.components.codec.measure import PRESETS
 from src.contracts import domain as domains
 from src.contracts.codecs import EncodeRequest, RateControl
@@ -181,39 +187,98 @@ def _psnr_by_frame(reference: np.ndarray, candidate: np.ndarray) -> list[float]:
     return [round(pooled_psnr(ref[i], got[i], luma=True), 3) for i in range(count)]
 
 
-def anchor_over_sequence(clips: list[TierClip], request: EncodeRequest) -> dict[str, Any]:
+def context_ids_for_clips(clips: list[TierClip]) -> tuple[str, ...]:
+    """One background context per camera/venue, not per scene file.
+
+    Point-class scenes from one video share a canvas and may be predicted
+    across. A later replay cut is a different id, and that is a new keyframe.
+    Scene names are not ids: ``scene_000`` and ``scene_010`` are the same court.
+    """
+    return tuple(f"{clip.video}-point" for clip in clips)
+
+
+def _concat_clips(clips: list[TierClip]) -> np.ndarray:
+    return np.concatenate([np.asarray(clip.frames) for clip in clips], axis=0)
+
+
+def anchor_over_sequence(
+    clips: list[TierClip],
+    request: EncodeRequest,
+    *,
+    context_ids: Sequence[str] | None = None,
+) -> dict[str, Any]:
     """The anchor coding the N scenes as one sequence, and as N separate ones.
 
-    The joint encode is the arm. The separate total is the **control that proves
-    the fairness condition held**: a codec given the concatenation can predict
-    across the join, so joint must come in under separate. Equality means the
-    anchor was effectively run per-scene, and any PointStream gain measured
-    against it is an artefact.
+    The joint encode is the arm that asks whether the codec can predict across
+    a join at all. The **continuous** encode is the fair comparison: it resets
+    at exactly ``context_reset_indices`` of the PointStream configuration.
+    The **segmented** encode resets every scene. Same-id sequences make
+    continuous equal joint; all-different ids make continuous equal segmented.
+    Reporting only joint against a PointStream that resets at a replay would
+    hand the anchor a prediction PointStream is forbidden.
     """
     from src.components.codec.frames import even_size
     from src.components.codec.measure import coded_roundtrip
 
-    joined = np.concatenate([np.asarray(clip.frames) for clip in clips], axis=0)
+    ids = tuple(context_ids) if context_ids is not None else context_ids_for_clips(clips)
+    if len(ids) != len(clips):
+        raise ValueError(
+            f"context_ids has {len(ids)} entries for {len(clips)} clips. "
+            "Pair by track position, one id per scene."
+        )
+    groups = scene_groups(ids)
+    joined = _concat_clips(clips)
     started = time.time()
     joint_bytes, decoded = coded_roundtrip(joined, request=request)
     seconds = time.time() - started
 
     separate_bytes = 0
+    separate_parts: list[np.ndarray] = []
     for clip in clips:
-        part_bytes, _ = coded_roundtrip(np.asarray(clip.frames), request=request)
+        part_bytes, part_decoded = coded_roundtrip(np.asarray(clip.frames), request=request)
         separate_bytes += int(part_bytes)
+        separate_parts.append(part_decoded)
+    separate_decoded = np.concatenate(separate_parts, axis=0)
 
+    if groups == ((0, len(clips)),):
+        continuous_bytes = int(joint_bytes)
+        decoded_continuous = decoded
+    elif len(groups) == len(clips):
+        continuous_bytes = int(separate_bytes)
+        decoded_continuous = separate_decoded
+    else:
+        continuous_bytes = 0
+        parts: list[np.ndarray] = []
+        for start, end in groups:
+            part_bytes, part_decoded = coded_roundtrip(
+                _concat_clips(clips[start:end]), request=request
+            )
+            continuous_bytes += int(part_bytes)
+            parts.append(part_decoded)
+        decoded_continuous = np.concatenate(parts, axis=0)
+
+    segmented_bytes = int(separate_bytes)
     reference = even_size(joined)
     return {
         "psnr_y_by_frame": _psnr_by_frame(reference, decoded),
         "joint_bytes": int(joint_bytes),
         "separate_bytes": int(separate_bytes),
+        "continuous_bytes": int(continuous_bytes),
+        "segmented_bytes": segmented_bytes,
+        "context_ids": list(ids),
+        "continuous_resets": list(context_reset_indices(ids)),
+        "segmented_resets": list(segmented_reset_indices(len(clips))),
+        "continuous_groups": [list(group) for group in groups],
         # Below 1.0 means the anchor really did predict across the scene joins.
         "joint_over_separate": (
             round(float(joint_bytes) / separate_bytes, 4) if separate_bytes else None
         ),
+        "continuous_over_segmented": (
+            round(float(continuous_bytes) / segmented_bytes, 4) if segmented_bytes else None
+        ),
         "psnr_y_dB": pooled_psnr(reference, decoded, luma=True),
         "psnr_rgb_dB": pooled_psnr(reference, decoded),
+        "continuous_psnr_y_dB": pooled_psnr(reference, decoded_continuous, luma=True),
         "seconds": round(seconds, 1),
         "n_frames": int(joined.shape[0]),
         "extra_args": list(request.extra_args),
@@ -221,20 +286,26 @@ def anchor_over_sequence(clips: list[TierClip], request: EncodeRequest) -> dict[
 
 
 def pointstream_over_sequence(
-    clips: list[TierClip], config: PointstreamConfig
+    clips: list[TierClip],
+    config: PointstreamConfig,
+    *,
+    context_ids: Sequence[str] | None = None,
 ) -> dict[str, Any]:
     """PointStream over the N scenes as N chunks of one run.
 
     One `run()` call, so the background model is bound once and the stream
     carries each scene's reconstruction into the next. Two calls would be two
-    streams.
+    streams. ``context_ids`` are the same list the continuous AV1/VVC control
+    resets on — a mismatch here is the fairness condition quietly not holding.
     """
+    ids = tuple(context_ids) if context_ids is not None else context_ids_for_clips(clips)
     started = time.time()
     result = run(
         config,
         [np.asarray(clip.frames) for clip in clips],
         bind_generator_fn=_no_generator,
         objects=tuple(clip.objects for clip in clips),
+        context_ids=ids,
     )
     seconds = time.time() - started
     source = np.concatenate([np.asarray(clip.frames) for clip in clips], axis=0)
@@ -261,6 +332,8 @@ def pointstream_over_sequence(
         # is in the sum.
         "background_share": round(panorama / total, 4) if total else None,
         "n_chunks": len(result.chunks),
+        "context_ids": list(ids),
+        "continuous_resets": list(context_reset_indices(ids)),
         "precodec_vs_delivered_dB": pooled_psnr(
             np.asarray(result.frames), delivered, luma=True
         ),
@@ -285,6 +358,45 @@ def check_bounds(rows: list[dict[str, Any]]) -> list[str]:
                     "is not predicting across the scene joins, so it was effectively run "
                     "per-scene and any PointStream gain against it is an artefact of the "
                     "rig, not a result."
+                )
+            ids = anchor.get("context_ids") or []
+            stream_ids = stream.get("context_ids") or []
+            if ids and stream_ids and list(ids) != list(stream_ids):
+                alarms.append(
+                    f"{label}/{key}: anchor context_ids {ids} do not match PointStream "
+                    f"{stream_ids}. The continuous control is resetting on a different "
+                    "split than the system under test."
+                )
+            anchor_resets = anchor.get("continuous_resets")
+            stream_resets = stream.get("continuous_resets")
+            if (
+                anchor_resets is not None
+                and stream_resets is not None
+                and list(anchor_resets) != list(stream_resets)
+            ):
+                alarms.append(
+                    f"{label}/{key}: continuous resets {anchor_resets} do not match "
+                    f"PointStream {stream_resets}."
+                )
+            if (
+                ids
+                and len(set(ids)) == 1
+                and anchor.get("continuous_bytes") != anchor.get("joint_bytes")
+            ):
+                alarms.append(
+                    f"{label}/{key}: one context but continuous_bytes "
+                    f"({anchor.get('continuous_bytes')}) != joint_bytes "
+                    f"({anchor.get('joint_bytes')}). Same-id sequences are one concat."
+                )
+            if (
+                ids
+                and len(set(ids)) == len(ids)
+                and anchor.get("continuous_bytes") != anchor.get("segmented_bytes")
+            ):
+                alarms.append(
+                    f"{label}/{key}: every scene is its own context but continuous_bytes "
+                    f"({anchor.get('continuous_bytes')}) != segmented_bytes "
+                    f"({anchor.get('segmented_bytes')})."
                 )
 
         share = stream.get("background_share")
@@ -363,9 +475,11 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit(f"{BOUNDS_PATH} does not exist. Bounds go to disk before the first encode.")
 
     clips = load_scene_sequence(args.video, list(args.scenes), n_frames=args.frames)
+    ids = context_ids_for_clips(clips)
     print(
         f"{args.video}: {len(clips)} scenes x {args.frames} frames "
-        f"({clips[0].describe()['resolution']})",
+        f"({clips[0].describe()['resolution']}) context_ids={list(ids)} "
+        f"continuous_resets={list(context_reset_indices(ids))}",
         flush=True,
     )
 
@@ -429,10 +543,12 @@ def main(argv: list[str] | None = None) -> int:
             )
             arm_request.validate()
             try:
-                row[key] = anchor_over_sequence(clips, arm_request)
+                row[key] = anchor_over_sequence(clips, arm_request, context_ids=ids)
                 print(
                     f"  {key:<17} {label:<12} joint {row[key]['joint_bytes']:>10} B  "
                     f"sep {row[key]['separate_bytes']:>10} B  "
+                    f"cont {row[key]['continuous_bytes']:>10} B  "
+                    f"seg {row[key]['segmented_bytes']:>10} B  "
                     f"j/s {row[key]['joint_over_separate']}  "
                     f"{row[key]['psnr_y_dB']:6.2f} dB",
                     flush=True,
@@ -456,7 +572,7 @@ def main(argv: list[str] | None = None) -> int:
             residual=replace(paired.residual, rate=int(rate_value)),
         )
         try:
-            row["pointstream"] = pointstream_over_sequence(clips, tuned)
+            row["pointstream"] = pointstream_over_sequence(clips, tuned, context_ids=ids)
             print(
                 f"  stream  {label:<12} {row['pointstream']['coded_bytes']:>10} B  "
                 f"{row['pointstream']['psnr_y_dB']:6.2f} dB  "
@@ -485,6 +601,9 @@ def main(argv: list[str] | None = None) -> int:
             "keyframe_interval": paired.background.keyframe_interval,
             "reference_mode": paired.background.reference_mode,
         },
+        "context_ids": list(ids),
+        "continuous_resets": list(context_reset_indices(ids)),
+        "segmented_resets": list(segmented_reset_indices(len(clips))),
         "bounds_file": str(BOUNDS_PATH),
         "rows": rows,
         "alarms": alarms,
@@ -494,10 +613,13 @@ def main(argv: list[str] | None = None) -> int:
             "the way PointStream's background stream is, which on this host "
             "costs SvtAv1EncApp +38% — so it is the latency-matched question, "
             "not the fair-by-default one, and reporting it alone would hand "
-            "PointStream that 38%. Both are ONE encode over the concatenated "
-            "scenes; `separate_bytes` is the control proving the anchor "
-            "predicted across the joins. Quality is Y-PSNR on delivered_frames "
-            "for PointStream and on the decoder's output for the anchor. Few "
+            "PointStream that 38%. `joint_bytes` asks whether the codec can "
+            "predict across a join at all; `continuous_bytes` is the fair "
+            "comparison, resetting at the same context_ids as PointStream; "
+            "`segmented_bytes` is a fresh intra every scene. Same-id sequences "
+            "make continuous equal joint; all-different ids make continuous "
+            "equal segmented. Quality is Y-PSNR on delivered_frames for "
+            "PointStream and on the decoder's output for the anchor. Few "
             "scenes on one video is a configuration measurement, not a claim."
         ),
     }

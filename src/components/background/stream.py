@@ -95,6 +95,23 @@ def segmented_reset_indices(n_scenes: int) -> tuple[int, ...]:
     return tuple(range(n_scenes))
 
 
+def scene_groups(context_ids: Sequence[str]) -> tuple[tuple[int, int], ...]:
+    """Half-open ``[start, end)`` ranges of consecutive scenes in one context.
+
+    The continuous AV1/VVC control encodes each range as one sequence.
+    The segmented control encodes ``(i, i+1)`` for every scene. Both lists
+    of start indices must match ``context_reset_indices`` /
+    ``segmented_reset_indices`` of the PointStream configuration they
+    compare against — otherwise the reference is resetting more often, or
+    less often, than the system under test.
+    """
+    resets = context_reset_indices(context_ids)
+    if not resets:
+        return ()
+    ends = (*resets[1:], len(context_ids))
+    return tuple((int(start), int(end)) for start, end in zip(resets, ends, strict=True))
+
+
 @dataclass(frozen=True)
 class StreamCodec:
     """One encoder, pinned to a low-delay configuration and a raw container.

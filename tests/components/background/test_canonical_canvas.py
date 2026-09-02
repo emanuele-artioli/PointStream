@@ -13,6 +13,8 @@ RANSAC, and the 4K byte counts (that is the diagnostic in
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 
@@ -28,6 +30,7 @@ from src.components.background.stream import (
     BackgroundStreamReceiver,
     BackgroundStreamTransmitter,
     context_reset_indices,
+    scene_groups,
     segmented_reset_indices,
 )
 from src.contracts import config as cfg
@@ -157,6 +160,44 @@ class TestResetBoundaries:
 
     def test_empty_is_no_reset(self) -> None:
         assert context_reset_indices(()) == ()
+        assert scene_groups(()) == ()
+
+    def test_continuous_groups_are_the_spans_between_resets(self) -> None:
+        ids = ("court", "court", "replay")
+        assert scene_groups(ids) == ((0, 2), (2, 3))
+        assert scene_groups(("a", "a", "a")) == ((0, 3),)
+        assert scene_groups(("a", "b", "c")) == ((0, 1), (1, 2), (2, 3))
+        assert scene_groups(ids)[0][0] == context_reset_indices(ids)[0]
+        assert tuple(start for start, _end in scene_groups(ids)) == context_reset_indices(ids)
+
+    def test_ladder_calls_the_same_reset_helpers(self) -> None:
+        """The continuous control is not a second, invented split."""
+        root = Path(__file__).resolve().parents[3]
+        ladder = (root / "experiments" / "tier" / "ladder_scenes.py").read_text(
+            encoding="utf-8"
+        )
+        runner = (root / "src" / "runner" / "run.py").read_text(encoding="utf-8")
+        assert "scene_groups" in ladder
+        assert "context_reset_indices" in ladder
+        assert "segmented_reset_indices" in ladder
+        assert "context_ids" in runner
+
+
+def test_mixed_context_ids_do_not_share_a_union_canvas() -> None:
+    """A replay must not be painted onto the court's canonical canvas."""
+    static, panning = _court_pair()
+    replay = np.repeat(_texture(80, 96, seed=1)[None, ...], 4, axis=0)
+    model = bind_background(
+        cfg.load({"background": {"method": BACKGROUND_PANORAMA_STREAM, "canvas": "canonical"}})
+    )
+    model.prepare_contexts([static, panning, replay], ("court", "court", "replay"))
+    first, _ = model.stitch(static)
+    second, _ = model.stitch(panning)
+    third, _ = model.stitch(replay)
+    assert first.shape == second.shape
+    assert third.shape != first.shape
+    assert third.shape[0] == even_up(80)
+    assert third.shape[1] == even_up(96)
 
 
 def test_independent_coding_still_uses_a_local_canvas() -> None:
@@ -227,6 +268,30 @@ class TestCanonicalStream:
         assert second.mode == "stream"
         assert third.mode == "full"
         assert third.payload != second.payload
+
+    def test_pointstream_modes_match_continuous_reset_indices(self) -> None:
+        """full, stream, full for court, court, replay — the continuous split."""
+        ids = ("court", "court", "replay")
+        plate = _static()[0]
+        model = bind_background(
+            cfg.load({"background": {"method": BACKGROUND_PANORAMA_STREAM}})
+        )
+        modes = tuple(
+            model.transmit(plate, context_id=context_id).mode for context_id in ids
+        )
+        assert modes == ("full", "stream", "full")
+        full_at = tuple(index for index, mode in enumerate(modes) if mode == "full")
+        assert full_at == context_reset_indices(ids)
+        assert scene_groups(ids) == ((0, 2), (2, 3))
+        unique = ("a", "b", "c")
+        fresh = bind_background(
+            cfg.load({"background": {"method": BACKGROUND_PANORAMA_STREAM}})
+        )
+        all_intra = tuple(
+            fresh.transmit(plate, context_id=context_id).mode for context_id in unique
+        )
+        assert all_intra == ("full", "full", "full")
+        assert context_reset_indices(unique) == segmented_reset_indices(len(unique))
 
     def test_padding_is_included_in_coded_bytes(self) -> None:
         static, panning = _court_pair(step=6)
