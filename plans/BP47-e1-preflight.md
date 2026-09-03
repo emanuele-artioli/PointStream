@@ -1,6 +1,6 @@
 # BP47 E1 native-resolution preflight
 
-**Roadmap:** E1 preflight (not the broad search).  
+**Roadmap:** E1 preflight (not the broad search).
 **Outcome: complete.** One native 4K PointStream point passed with source identity and delivered-payload accounting. Gate A is still open. This is not E1 evidence.
 
 ## Setup

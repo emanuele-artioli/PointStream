@@ -7,7 +7,8 @@ not a codec comparison. Gate A remains open; no broad E1 run was launched.
 
 Based on Cursor's `e08641c` (single `--point`) and `fadf9f6` (scene recovery,
 progress, per-scene late-frame scores, corrected background-codec provenance).
-The follow-up starts at `a155df2` on `codex/recovery-safety`.
+The follow-up starts at `a155df2`, with regressions/fixes in `743b3cb`, on
+`codex/recovery-safety`. PR #53 is open; this report does not assert it is merged.
 
 - The public runner now rejects checkpoint reuse after a change to configuration,
   full source arrays, object inputs, context IDs, injected implementation identity,

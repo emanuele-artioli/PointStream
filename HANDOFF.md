@@ -23,8 +23,9 @@ Every dispatched task follows `plans/SESSION-REPORT.md`.
 PR #52 is merged: `origin/main` is `68a03dc` as last fetched on 3 September.
 Recovery work is on `codex/recovery-safety` in `/tmp/pointstream-recovery`, based
 on Cursor's `e08641c` and `fadf9f6`, followed by Codex's `a155df2` and the approved
-regressions. Check `gh pr list --head codex/recovery-safety` for the current PR
-and `gh pr checks <number>` before merge. Do not mistake local validation for
+regressions in `743b3cb`. The branch is pushed and PR #53 is open:
+https://github.com/emanuele-artioli/PointStream/pull/53 . Check `gh pr checks 53`
+before merge. Do not mistake local validation for
 completed GitHub checks. The recovery report records the test results and the
 known 80.33% coverage / 81% local-buffer discrepancy; the CI policy remains 77%.
 
@@ -82,8 +83,10 @@ slow win must be framed as offline or compute-intensive, never live.
 ## Running work and open decisions
 
 No experiment was launched by this recovery session. No owned local encode or
-test job remains at handoff; check `ps -u emanuele -o pid,etime,args` and the PR
-checks for current state. Other users' GPU jobs are not ours to stop.
+test job remains; GitHub PR checks are running as this document is committed.
+Check `ps -u emanuele -o pid,etime,args` and `gh pr checks 53` for current state.
+Other users' GPU jobs are not ours to stop. Copilot could not review PR #53
+because its review quota is exhausted; do not count that comment as approval.
 
 Can the native rerun keep every gap between durable checkpoints below one hour?
 If not, stop expansion and ask Codex to scope a smaller recoverable unit. A killed
