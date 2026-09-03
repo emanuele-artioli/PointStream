@@ -18,8 +18,10 @@ quality regression. The timing comparison now reads the top-level time field.
 
 Approved regression tests cover both provenance failures, interrupted expansion,
 control mismatch and clean completion. Targeted results: BP51 26 passed/1 skipped;
-BP52 43 passed; both targeted lint/type checks passed. CI and final merged
-checks are verified during integration. No native experiment was rerun.
+BP52 43 passed; both targeted lint/type checks passed. Both repair PRs passed CI
+and were merged (#57/#58, combined code bcb3a63). Combined local checks also
+passed: full ruff, full mypy (335 files), import direction and the three touched
+experiment suites (69 passed, 1 skipped). No native experiment was rerun.
 
 ## Evidence kept
 
@@ -33,7 +35,8 @@ The original PointStream wrapper log was lost because tee ran before its output
 directory existed; durable result JSONs remain. New launch instructions require
 creating logs first and preserving both process and logger exit status.
 
-Paper evidence notes record this scope, contamination and the missing separate
+Paper commit 10a4c35 is pushed to its independent main. Evidence notes record
+this scope, contamination and the missing separate
 encoder/client timing. Build remains 26 pages, body/references 1–21 and appendices
 22–26, with no unresolved citations. No headline win or BD-rate was added.
 
