@@ -9,6 +9,7 @@ nothing else.
 
 from __future__ import annotations
 
+import time
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
 from typing import Any, TypeAlias
@@ -66,16 +67,34 @@ class StageDAG:
         """Stage names in run order — the same tuple ``lattice.dag()`` returned."""
         return tuple(node.name for node in self.nodes)
 
-    def run(self, source: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    def run(
+        self,
+        source: Mapping[str, Any] | None = None,
+        *,
+        on_stage: Callable[[str, float], None] | None = None,
+        heartbeat_interval: float | None = None,
+    ) -> dict[str, Any]:
         """Execute every enabled stage once, in DAG order.
 
         ``source`` seeds the artifact bag (the runner puts the chunk here). Each
         stage's return value is stored under the stage name and under every
-        artifact that stage produces.
+        artifact that stage produces. ``on_stage`` receives ``(name, seconds)``
+        after each stage. ``heartbeat_interval`` prints a still-running line
+        while a stage is blocked; ``None`` keeps unit tests quiet.
         """
+        from src.pipeline.dag.heartbeat import Heartbeat
+
         bag: dict[str, Any] = dict(source or {})
         for node in self.nodes:
-            output = node.stage(bag)
+            started = time.perf_counter()
+            if heartbeat_interval is not None and heartbeat_interval > 0:
+                with Heartbeat(f"stage {node.name}", interval_s=heartbeat_interval):
+                    output = node.stage(bag)
+            else:
+                output = node.stage(bag)
+            elapsed = time.perf_counter() - started
+            if on_stage is not None:
+                on_stage(node.name, elapsed)
             bag[node.name] = output
             for artifact in node.produces:
                 bag[artifact] = output

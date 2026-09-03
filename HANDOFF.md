@@ -1,4 +1,9 @@
-# PointStream handoff — 2 September 2026
+# PointStream handoff — 3 September 2026
+
+Trigger: the user requested a clean session boundary after the recovery changes
+are ready to merge. This is that bounded engineering handoff, not a request to
+launch broad E1. Read `plans/BP48-recovery-validation.md` for the next gate and
+the exact report expected from Cursor.
 
 Target: **submit a defensible ACM TOMM manuscript by 30 September 2026. The date
 is hard because the author's contract ends then.**
@@ -15,11 +20,21 @@ Every dispatched task follows `plans/SESSION-REPORT.md`.
 
 ## Current state
 
-Integration update: PR #52 (`codex/bp44-bp46-integration`) consolidates the
-reference protocol and BP44–BP46, including their uncommitted repairs. Check
-`gh pr view 52` for merge/CI state. `plans/BP47-integration.md` is the current
-acceptance report; older implementation instructions below are superseded.
-Original worktrees are preserved and clean; ask before removing them.
+PR #52 is merged: `origin/main` is `68a03dc` as last fetched on 3 September.
+Recovery work is on `codex/recovery-safety` in `/tmp/pointstream-recovery`, based
+on Cursor's `e08641c` and `fadf9f6`, followed by Codex's `a155df2` and the approved
+regressions in `743b3cb`. The branch is pushed and PR #53 is open:
+https://github.com/emanuele-artioli/PointStream/pull/53 . Check `gh pr checks 53`
+before merge. Do not mistake local validation for
+completed GitHub checks. The recovery report records the test results and the
+known 80.33% coverage / 81% local-buffer discrepancy; the CI policy remains 77%.
+
+Preserved worktrees: primary `wave10/bp46-manifest` at `21c0681` has an unrelated
+edit to `experiments/long_scenes/extract.py`; do not overwrite it. BP44 is
+`cursor/bp44-canonical-canvas` at `02418fe`; BP45 is `cursor/m1-bp45` at `7b263f3`;
+Cursor's E1 worktree is `cursor/e1-native-preflight` at `fadf9f6`. Integration is
+`codex/bp44-bp46-integration` at `68a03dc` in `/tmp/pointstream-integration`.
+Ask before removing any worktree; remote branch deletion remains human-only.
 
 - The contracts, components, end-to-end runner and BP31 multi-scene experiment
   are merged on `main`; PR #45 passed tests, lint and typing.
@@ -33,7 +48,8 @@ Original worktrees are preserved and clean; ask before removing them.
   dimensions. Predictive background-sequence coding requires equal dimensions.
   BP44 now implements an offline canonical background canvas per compatible
   context. Synthetic 48-frame static/pan and context-reset runner tests pass;
-  native-resolution E1 preflight remains to be run.
+  native-resolution E1 preflight completed, but the repaired native checkpoint
+  budget and independent reference pilot still need verification.
 - The current ~43 dB tests are high quality. The first winning-regime search
   moves to ultra-low bitrate and long eligible scenes.
 - No reconstruction model beats the reference-image paste control. Generation
@@ -55,10 +71,47 @@ slow win must be framed as offline or compute-intensive, never live.
 
 ## Immediate work
 
-The first implementation wave below is historical; M1/B1 and diagnostic D1
-are integrated in PR #52. Confirmation D1 remains incomplete. Next is a bounded
-native-resolution E1 preflight, not a broad batch. See BP47 for exact validation,
-checkpoint identity rules and the report expected from Cursor.
+1. **Codex:** inspect current PR review and CI at the recovery branch's head;
+   merge when ready. Preserve Cursor's original commits/worktree.
+2. **Cursor:** execute the bounded native recovery-budget rerun specified in
+   BP48, using new output directories and the same BP47 decoded source hashes.
+3. **Cursor, only after that gate:** run one slowest-preset AV1/VVC runtime and
+   recovery pilot on those frames; report all three dimensions and failures.
+4. **Codex:** review before expanding to curves or broad E1. No win is yet
+   established; confirmation footage remains incomplete.
+
+## Running work and open decisions
+
+No experiment was launched by this recovery session. No owned local encode or
+test job remains; GitHub PR checks are running as this document is committed.
+Check `ps -u emanuele -o pid,etime,args` and `gh pr checks 53` for current state.
+Other users' GPU jobs are not ours to stop. Copilot could not review PR #53
+because its review quota is exhausted; do not count that comment as approval.
+
+Can the native rerun keep every gap between durable checkpoints below one hour?
+If not, stop expansion and ask Codex to scope a smaller recoverable unit. A killed
+codec process cannot resume mid-bitstream. A hard-killed attempt's time is only
+a lower bound and must not become a complete size/quality/time comparison.
+
+Does the pinned VVenC binary expose `placebo`, or only `slower`? Verify against
+the actual binary; record the slowest supported preset, never infer it from a
+generic preset list. Neither codec's reference curves have been run on these
+native inputs. Whether a winning regime exists remains an experimental question.
+
+## Landmarks and host details
+
+- `plans/BP48-recovery-validation.md`: validation commands and dispatch brief.
+- `plans/BP47-e1-preflight.md`: historical input/output provenance, not permission
+  for broad expansion.
+- `src/runner/recovery.py`, `chunk_checkpoint.py`, `run.py`: recovery contract.
+- `tests/runner/test_recovery.py`: approved interrupted-run regressions.
+- `experiments/tier/low_rate_sweep.py`: point selector and operational gate.
+- Set `PYTHONPATH` to the worktree, use conda `pointstream`, keep caches in `/tmp`.
+  Imports from outside a worktree otherwise resolve to the editable main tree.
+- This session needed escalated shell calls because the sandbox's `bwrap` binary
+  was missing. `gh` is restored at `/home/itec/emanuele/bin/gh`.
+
+## Historical first wave
 
 Original wave:
 
@@ -70,7 +123,7 @@ Original wave:
   least three durations;
 - **P1:** restore reproducible manuscript rendering and keep a live page budget.
 
-Then run E1, the low-rate × duration search. See `plans/ROADMAP.md` for dates,
+After the current gates, run E1, the low-rate × duration search. See `plans/ROADMAP.md` for dates,
 dependencies, harness assignment and the required report from every session.
 
 ## Standing safeguards

@@ -45,16 +45,20 @@ from experiments.tier.low_rate_identity import (
     sweep_path,
 )
 from experiments.tier.low_rate_measure import (
+    late_frame_bound_alarms,
+    late_frame_by_scene,
     late_frame_report,
     pointstream_timing,
     primary_preset,
     score_headlines,
+    stream_codec_provenance,
 )
 from experiments.tier.low_rate_plan import (
     SweepPoint,
     intended_category,
     ledger_moved,
     points_for,
+    select_work,
     stage_names,
 )
 from experiments.tier.low_rate_references import (
@@ -132,10 +136,20 @@ def _no_generator() -> GeneratorRef:
     raise AssertionError("generation is off in every low-rate config used here")
 
 
-def pointstream_e1(clips: list[Any], config: PointstreamConfig) -> dict[str, Any]:
+def pointstream_e1(
+    clips: list[Any],
+    config: PointstreamConfig,
+    *,
+    checkpoint_dir: Path | None = None,
+) -> dict[str, Any]:
     """One ``run()`` over the long scenes, scored on delivered frames."""
     run = require_run_accepts_context_ids()
     ids = clip_context_ids(clips)
+    shapes = [tuple(int(x) for x in np.asarray(clip.frames).shape) for clip in clips]
+    print(
+        f"pointstream_e1 start context_ids={list(ids)} shapes={shapes}",
+        flush=True,
+    )
     started = time.perf_counter()
     result = run(
         config,
@@ -143,6 +157,7 @@ def pointstream_e1(clips: list[Any], config: PointstreamConfig) -> dict[str, Any
         bind_generator_fn=_no_generator,
         objects=tuple(clip.objects for clip in clips),
         context_ids=ids,
+        checkpoint_dir=checkpoint_dir,
     )
     wall = time.perf_counter() - started
     source = np.concatenate([np.asarray(clip.frames) for clip in clips], axis=0)
@@ -153,13 +168,25 @@ def pointstream_e1(clips: list[Any], config: PointstreamConfig) -> dict[str, Any
     total = int(sizes.transport_total)
     panorama = int(sizes.panorama)
     scores = score_headlines(source, delivered)
-    late = late_frame_report(source, delivered)
+    per_scene = late_frame_by_scene(clips, source, delivered)
+    bounds = json.loads(BOUNDS_PATH.read_text(encoding="utf-8"))
+    late_alarms = late_frame_bound_alarms(per_scene, bounds)
     return {
         "coded_bytes": total,
         "bytes": total,
-        "usable": isinstance(scores.get("vmaf"), float) and bool(sizes.is_rate),
+        "usable": (isinstance(scores.get("vmaf"), float) and bool(sizes.is_rate)
+                   and result.timing.get("hourly_checkpoint_budget_met", True) is True),
         "scores": scores,
-        "late_frame": late,
+        "late_frame": {
+            "by_scene": per_scene,
+            "joined_across_scenes": late_frame_report(source, delivered),
+            "bound": bounds["bounds"]["late_frame_quality_change"],
+            "alarms": late_alarms,
+            "note": (
+                "The rot bound is last-minus-first *per scene*. "
+                "joined_across_scenes crosses a scene boundary and is diagnostic only."
+            ),
+        },
         "is_rate": bool(sizes.is_rate),
         "raw_parts": list(sizes.raw_parts),
         "parts": {
@@ -173,7 +200,23 @@ def pointstream_e1(clips: list[Any], config: PointstreamConfig) -> dict[str, Any
         "n_frames": int(source.shape[0]),
         "context_ids": list(ids),
         "canvas": getattr(config.background, "canvas", None),
+        "background_codec": stream_codec_provenance(
+            getattr(config.background, "stream_codec", "av1")
+        ),
+        "residual_codec": {
+            "role": "residual",
+            "enabled": bool(config.lattice.residual),
+            "codec": config.residual.codec,
+            "preset": config.residual.preset,
+        },
+        "stage_seconds": list(result.stage_seconds),
+        "invocation_phase_seconds": result.phase_seconds,
+        "recovery_alarm": (
+            None if result.timing.get("hourly_checkpoint_budget_met", True) is True
+            else "hourly checkpoint budget exceeded or unverified after interruption; do not expand batch"
+        ),
         **pointstream_timing(wall),
+        **result.timing,
     }
 
 
@@ -184,6 +227,7 @@ def run_point(
     *,
     codec: str,
     preset: str,
+    checkpoint_dir: Path | None = None,
 ) -> dict[str, Any]:
     """One PointStream operating point. Anchors are not encoded here."""
     row: dict[str, Any] = {
@@ -206,7 +250,9 @@ def run_point(
         tuned = apply_point(
             base, point, codec=codec, preset=preset, context_id=clip_context_ids(clips)[0]
         )
-        row["pointstream"] = pointstream_e1(clips, tuned)
+        row["pointstream"] = pointstream_e1(
+            clips, tuned, checkpoint_dir=checkpoint_dir
+        )
         if not point.object_stream_on:
             row["pointstream"]["control"] = "object-stream-off"
     except Exception as exc:  # noqa: BLE001
@@ -242,6 +288,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--codec", default="av1")
     parser.add_argument("--tier", default="balanced")
     parser.add_argument("--stage", default=None, help="run one named stage, or all")
+    parser.add_argument(
+        "--point",
+        default=None,
+        help="run one named operating point (native-resolution preflight)",
+    )
     parser.add_argument("--fps", type=float, default=DECLARED_FPS)
     parser.add_argument("--preset", default=None, help="override the slowest-preset rule")
     parser.add_argument("--out", default=None)
@@ -279,7 +330,10 @@ def main(argv: list[str] | None = None) -> int:
     dest = Path(args.out) if args.out else sweep_path(identity)
     points_dir = checkpoint_dir(dest)
 
-    stages = [args.stage] if args.stage else list(stage_names())
+    try:
+        work = select_work(stage=args.stage, point=args.point)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
     clips = load_e1_sequence(args.video, list(args.scenes), n_frames=args.frames)
     context_ids = clip_context_ids(clips)
     base = load_tier(args.tier)
@@ -319,6 +373,7 @@ def main(argv: list[str] | None = None) -> int:
             "headline_control": "undecided — follows the product claim after both curves exist",
             "reference_file": None if args.skip_compare else str(references_path(identity)),
             "checkpoint_dir": str(points_dir),
+            "preflight_point": args.point,
             "tried": [row["name"] for row in rows],
             "ledger_notes": category_notes,
             "bounds_file": str(BOUNDS_PATH),
@@ -363,8 +418,7 @@ def main(argv: list[str] | None = None) -> int:
             )
         write_json(dest, _report())
 
-    for stage in stages:
-        points = points_for(stage)
+    for stage, points in work:
         stage_rows: list[dict[str, Any]] = []
         print(f"stage {stage} ({len(points)} points) preset {preset}", flush=True)
         for point in points:
@@ -373,10 +427,21 @@ def main(argv: list[str] | None = None) -> int:
                 row = existing
                 print(f"  resume {point.name}", flush=True)
             else:
-                row = run_point(clips, base, point, codec=args.codec, preset=preset)
+                row = run_point(
+                    clips,
+                    base,
+                    point,
+                    codec=args.codec,
+                    preset=preset,
+                    checkpoint_dir=points_dir / f"{point.name}.run",
+                )
                 save_checkpoint(points_dir, point.name, row)
             rows.append(row)
             stage_rows.append(row)
+            alarms = ((row.get("pointstream") or {}).get("late_frame") or {}).get("alarms") or []
+            for alarm in alarms:
+                category_notes.append(f"{point.name}: {alarm}")
+                print(f"  ALARM {alarm}", flush=True)
             ps = row.get("pointstream") or {}
             print(
                 f"  {point.name:<16} {ps.get('coded_bytes', row.get('pointstream_error', '—'))} B  "
@@ -385,7 +450,12 @@ def main(argv: list[str] | None = None) -> int:
             )
             write_json(dest, _report())
         key = intended_category(stage)
-        if stage != "controls" and not ledger_moved(stage_rows, key=key):
+        # A one-point preflight cannot show a knob moving; skip that assertion.
+        if (
+            stage != "controls"
+            and len(stage_rows) > 1
+            and not ledger_moved(stage_rows, key=key)
+        ):
             note = (
                 f"stage {stage}: intended ledger key {key!r} did not move "
                 "across points. The knob is not reaching the payload, or the "

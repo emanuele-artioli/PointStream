@@ -6,9 +6,10 @@ session reads `AGENTS.md`, this file, and one named brief.
 
 Last replanned: **2 September 2026**, after BP31 and the 8/16-frame span result.
 
-Integration update: BP44–BP46 and their repairs are consolidated on
-`codex/bp44-bp46-integration`. See `BP47-integration.md` for validation and the
-remaining native-resolution preflight. No broad E1 wave has run; confirmation
+Integration update (3 September): BP44–BP46 reached `main` in PR #52. The native
+one-point preflight completed; it did not establish hourly recovery safety.
+See `BP48-recovery-validation.md` for recovery fixes, validation and the next
+native-budget / slowest-preset reference pilot gates. No broad E1 wave has run; confirmation
 inputs remain incomplete. Earlier workstream reports describe their own commits,
 not the current integration acceptance state.
 

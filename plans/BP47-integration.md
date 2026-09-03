@@ -10,7 +10,7 @@ only after the integration checks pass. No broad encode batch has been launched.
 - BP46: `21c0681`, including the previously uncommitted repairs and reports.
 - Reference protocol and roadmap: `a7e5a16`.
 
-These are merged on `codex/bp44-bp46-integration`. Original worktrees remain;
+These reached `main` in PR #52 (`68a03dc`). Original worktrees remain;
 ask the user before removing them. Remote branch deletion is human-only.
 
 ## Integration changes
@@ -57,16 +57,16 @@ lowered to accommodate these changes.
 
 ## Remaining gates / handoff
 
-Before a broad E1 batch: a native-resolution, two-scene, one-point PointStream
-preflight must pass with source identity and delivered-payload accounting.
-The synthetic geometry smoke is not a substitute for that preflight. Confirm
-the runner can checkpoint within the hourly budget at the chosen duration;
-per-point checkpoints cannot resume an interrupted encoder subprocess.
+Native-resolution two-scene one-point PointStream preflight: **passed** on
+`68a03dc`, report `plans/BP47-e1-preflight.md`. Source identity, delivered
+shape, ledger, VMAF/PSNR/SSIM, and checkpoint resume are recorded. One 48-frame
+4K point took 73 min of PointStream wall, so it does not fit the hourly
+subprocess budget; per-point checkpoints still cannot resume a killed encoder.
 
-Cursor E1 report must include exact commit/config/input identity, tools and
-presets, submitted/succeeded/failed counts, byte ledger, quality and runtime,
-controls, bounds/alarms and checkpoint resume evidence. Do not reuse an output
-directory after changing implementation or source frames. Gate A is still open.
+Recovery repairs and their approved interruption tests are tracked in
+`BP48-recovery-validation.md`. Native recovery-budget verification and the
+slowest-preset AV1/VVC pilot come before curves or a broad staged sweep. Use new
+output directories when implementation or source frames change. Gate A is open.
 
 Antigravity data follow-up remains separate: confirmation corpus incomplete.
 Keep historically used videos in diagnostics; audit independent match identities

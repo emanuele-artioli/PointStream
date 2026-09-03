@@ -6,7 +6,7 @@ No runner, no torch. Encoder binaries are used only by ``timed_roundtrip``.
 from __future__ import annotations
 
 import json
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -82,6 +82,76 @@ def late_frame_report(reference: np.ndarray, predicted: np.ndarray) -> dict[str,
     except (RuntimeError, FileNotFoundError) as exc:
         report["vmaf_error"] = str(exc)
     return report
+
+
+def late_frame_by_scene(
+    clips: Sequence[Any],
+    reference: np.ndarray,
+    predicted: np.ndarray,
+) -> list[dict[str, Any]]:
+    """Rot per scene. Last-minus-first across a scene join is not scene rot."""
+    offset = 0
+    reports: list[dict[str, Any]] = []
+    source = np.asarray(reference)
+    got = np.asarray(predicted)
+    for clip in clips:
+        n_frames = int(np.asarray(clip.frames).shape[0])
+        piece = late_frame_report(source[offset : offset + n_frames], got[offset : offset + n_frames])
+        piece["video"] = getattr(clip, "video", None)
+        piece["scene"] = getattr(clip, "scene", None)
+        piece["context_id"] = getattr(clip, "context_id", None)
+        piece["n_frames"] = n_frames
+        reports.append(piece)
+        offset += n_frames
+    if offset != int(source.shape[0]):
+        raise ValueError(
+            f"scene lengths sum to {offset} frames, source has {source.shape[0]}"
+        )
+    return reports
+
+
+def late_frame_bound_alarms(
+    per_scene: Sequence[Mapping[str, Any]],
+    bounds: Mapping[str, Any],
+) -> list[str]:
+    """Compare each scene's last-minus-first to ``late_frame_quality_change``."""
+    band = bounds["bounds"]["late_frame_quality_change"]
+    alarms: list[str] = []
+    for scene in per_scene:
+        label = f"{scene.get('video')}/{scene.get('scene')}"
+        vmaf = scene.get("vmaf_last_minus_first")
+        psnr = scene.get("psnr_y_last_minus_first")
+        if isinstance(vmaf, float):
+            low, high = float(band["vmaf"]["low"]), float(band["vmaf"]["high"])
+            if vmaf < low or vmaf > high:
+                alarms.append(
+                    f"{label} VMAF last-minus-first {vmaf:.3f} outside [{low}, {high}]"
+                )
+        if isinstance(psnr, float):
+            low, high = float(band["psnr_y_dB"]["low"]), float(band["psnr_y_dB"]["high"])
+            if psnr < low or psnr > high:
+                alarms.append(
+                    f"{label} Y-PSNR last-minus-first {psnr:.3f} dB outside [{low}, {high}]"
+                )
+    return alarms
+
+
+def stream_codec_provenance(codec: str = "av1") -> dict[str, Any]:
+    """The background-stream encoder, not the residual/reference SVT-AV1 preset."""
+    from src.components.background.stream import CODECS
+
+    spec = CODECS[codec]
+    return {
+        "role": "background_stream",
+        "name": spec.name,
+        "encoder": spec.encoder,
+        "container": spec.container,
+        "low_delay": list(spec.low_delay),
+        "note": (
+            "SVT-AV1 preset 0 is the independent AV1 reference and AV1 residual "
+            "configuration. panorama-stream does not use it."
+        ),
+    }
 
 
 def recorded_slowest_preset(codec: str, probe_path: Path | None = None) -> str:
@@ -165,6 +235,8 @@ def pointstream_timing(run_seconds: float) -> dict[str, Any]:
 __all__ = [
     "TIMING_KEYS",
     "last_minus_first",
+    "late_frame_bound_alarms",
+    "late_frame_by_scene",
     "late_frame_report",
     "per_frame_y_psnr",
     "pointstream_timing",
@@ -172,6 +244,7 @@ __all__ = [
     "recorded_slowest_preset",
     "reference_request",
     "score_headlines",
+    "stream_codec_provenance",
     "timed_roundtrip",
     "timing_record",
     "y_psnr",
