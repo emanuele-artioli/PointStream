@@ -346,17 +346,18 @@ def main(argv: list[str] | None = None) -> int:
     destination = Path(args.out_dir) if args.out_dir else ps_paths.outputs() / "bp53-background-scale"
     if "bp49" in str(destination) or "bp52" in str(destination):
         raise SystemExit("refusing to write into a BP49/BP52 output path")
+    destination.mkdir(parents=True, exist_ok=True)
     points_dir = destination / "points"
-    if (
-        destination.exists()
-        and any(destination.iterdir())
-        and not (points_dir / "identity.json").is_file()
-    ):
+    leftover = [
+        path
+        for path in destination.iterdir()
+        if path.name not in {"logs"}
+    ]
+    if leftover and not (points_dir / "identity.json").is_file():
         raise SystemExit(
             f"{destination} already contains an unverified output identity; "
             "choose a new documented suffix"
         )
-    destination.mkdir(parents=True, exist_ok=True)
     bounds_path = destination / "bounds-before-run.json"
     if bounds_path.exists():
         bounds = json.loads(bounds_path.read_text(encoding="utf-8"))
