@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import time
+from collections.abc import Mapping
 from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
@@ -182,6 +183,15 @@ def _bp52_crf51_payload() -> dict[str, Any] | None:
     return None
 
 
+def _as_int(mapping: Mapping[str, Any], key: str) -> int | None:
+    if key not in mapping:
+        return None
+    value = mapping[key]
+    if value is None:
+        return None
+    return int(value)
+
+
 def _control_alarms(payload: dict[str, Any] | None) -> list[str]:
     if not payload:
         return ["bg-scale1-crf51: missing PointStream result for the scale-1 control"]
@@ -211,23 +221,28 @@ def _control_alarms(payload: dict[str, Any] | None) -> list[str]:
         expected = old_scores.get(key)
         if not isinstance(got, (int, float)) or not isinstance(expected, (int, float)) or float(got) != float(expected):
             alarms.append(f"bg-scale1-crf51: {key}={got} does not reproduce BP52 {expected}")
-    if int(parts.get("panorama") or -1) != int(old_parts.get("panorama") or -2):
+    if _as_int(parts, "panorama") != _as_int(old_parts, "panorama"):
         alarms.append(
             f"bg-scale1-crf51: panorama={parts.get('panorama')} "
             f"does not reproduce BP52 {old_parts.get('panorama')}"
         )
-    if int(parts.get("actor_reference") or -1) != int(old_parts.get("actor_reference") or -2):
+    if _as_int(parts, "actor_reference") != _as_int(old_parts, "actor_reference"):
         alarms.append("bg-scale1-crf51: actor_reference does not reproduce BP52")
-    if int(parts.get("residual") or -1) != int(old_parts.get("residual") or 0):
-        alarms.append("bg-scale1-crf51: residual is not zero")
-    expected_meta = int(old_parts.get("metadata") or BP52_CRF51["metadata"]) + 2 * HEADER_BYTES
-    if int(parts.get("metadata") or -1) != expected_meta:
+    if _as_int(parts, "residual") != _as_int(old_parts, "residual"):
+        alarms.append(
+            f"bg-scale1-crf51: residual={parts.get('residual')} "
+            f"does not reproduce BP52 {old_parts.get('residual')}"
+        )
+    old_meta = _as_int(old_parts, "metadata")
+    expected_meta = None if old_meta is None else old_meta + 2 * HEADER_BYTES
+    if _as_int(parts, "metadata") != expected_meta:
         alarms.append(
             f"bg-scale1-crf51: metadata={parts.get('metadata')} != "
             f"BP52 metadata + 2*{HEADER_BYTES}={expected_meta}"
         )
-    expected_total = int(historical.get("coded_bytes") or BP52_CRF51["coded_bytes"]) + 2 * HEADER_BYTES
-    if int(payload.get("coded_bytes") or -1) != expected_total:
+    old_total = _as_int(historical, "coded_bytes")
+    expected_total = None if old_total is None else old_total + 2 * HEADER_BYTES
+    if _as_int(payload, "coded_bytes") != expected_total:
         alarms.append(
             f"bg-scale1-crf51: coded_bytes={payload.get('coded_bytes')} != "
             f"BP52 coded_bytes + 2*{HEADER_BYTES}={expected_total}"
