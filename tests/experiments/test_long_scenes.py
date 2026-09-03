@@ -22,14 +22,70 @@ from experiments.long_scenes.verify import ManifestValidationError, verify_manif
 
 def _build_valid_manifest() -> dict[str, Any]:
     conf_vids = [
+        "clean_match_1",
+        "clean_match_2",
+        "clean_match_3",
+        "clean_match_4",
+        "clean_match_5",
+        "clean_match_6",
+    ]
+    diag_vids = ["alcaraz_highlights", "federer_djokovic"]
+    dev_vids = [
         "alcaraz_perricard",
         "alcaraz_ruud",
         "djokovic_federer",
         "djokovic_zverev",
         "sinner_alcaraz",
-        "tournament_match_6",
     ]
-    diag_vids = ["alcaraz_highlights", "federer_djokovic"]
+
+    provenance_map: dict[str, dict[str, Any]] = {
+        "alcaraz_highlights": {
+            "video": "alcaraz_highlights",
+            "match_name": "Carlos Alcaraz Broadcast Highlights",
+            "event": "Multiple ATP Tournaments",
+            "event_status": "unresolved",
+            "source_type": "compilation_highlights",
+            "prior_use": ["Animate-Anyone fine-tuning (20 tracks)"],
+            "is_contaminated": True,
+            "confirmation_eligible": False,
+        },
+        "federer_djokovic": {
+            "video": "federer_djokovic",
+            "match_name": "Roger Federer vs. Novak Djokovic",
+            "event": "2015 Cincinnati Masters Final",
+            "event_status": "verified",
+            "source_type": "tournament_broadcast",
+            "prior_use": ["Animate-Anyone fine-tuning (20 tracks)"],
+            "is_contaminated": True,
+            "confirmation_eligible": False,
+        },
+    }
+
+    for i, vid in enumerate(conf_vids, start=1):
+        provenance_map[vid] = {
+            "video": vid,
+            "match_name": f"PlayerA_{i} vs. PlayerB_{i}",
+            "event": f"2025 Grand Slam Tournament {i} Final",
+            "event_status": "verified",
+            "source_type": "tournament_broadcast",
+            "prior_use": [],
+            "is_contaminated": False,
+            "contamination_reasons": [],
+            "confirmation_eligible": True,
+        }
+
+    for vid in dev_vids:
+        provenance_map[vid] = {
+            "video": vid,
+            "match_name": f"Dev {vid}",
+            "event": "Historical Tournament",
+            "event_status": "verified",
+            "source_type": "tournament_broadcast",
+            "prior_use": ["Prior experiments"],
+            "is_contaminated": True,
+            "contamination_reasons": ["Used in development"],
+            "confirmation_eligible": False,
+        }
 
     scenes: list[dict[str, Any]] = [
         # Diagnostic near-static
@@ -70,8 +126,8 @@ def _build_valid_manifest() -> dict[str, Any]:
                 "objects": {
                     "num_objects": 2,
                     "object_class": "player",
-                    "player_pixel_fraction": 0.008,
-                    "min_separation_px": 650.0,
+                    "player_pixel_fraction": 0.010,
+                    "min_separation_px": 800.0,
                     "has_occlusion": False,
                     "track_continuity": True,
                 },
@@ -234,9 +290,9 @@ def _build_valid_manifest() -> dict[str, Any]:
         {
             "video": "alcaraz_highlights",
             "scene": "scene_006",
-            "t_start": 100.0,
-            "t_end": 105.0,
-            "duration": 5.0,
+            "t_start": 25.0,
+            "t_end": 35.0,
+            "duration": 10.0,
             "cluster": "cluster_other",
             "context_id": "alcaraz_highlights_crowd_side",
             "role": "control_ineligible",
@@ -250,48 +306,48 @@ def _build_valid_manifest() -> dict[str, Any]:
                 "color_space": "bt709",
                 "color_primaries": "bt709",
                 "color_transfer": "bt709",
-                "sha256": "abc123mock",
+                "sha256": "ctrl123mock",
             },
             "eligibility": {
-                "duration_24fps_frames": 120,
+                "duration_24fps_frames": 240,
                 "camera_motion": {
-                    "consecutive_mad": 15.2,
-                    "vs_first_frame_mad": 35.0,
-                    "last_vs_first_mad": 40.0,
+                    "consecutive_mad": 4.5,
+                    "vs_first_frame_mad": 8.0,
+                    "last_vs_first_mad": 9.5,
                 },
                 "panorama": {
                     "canvas_width": 3840,
                     "canvas_height": 2160,
-                    "growth_factor": 3.5,
+                    "growth_factor": 1.00,
                     "registration_ok": False,
                 },
                 "objects": {
                     "num_objects": 0,
-                    "object_class": "player",
+                    "object_class": "other",
                     "player_pixel_fraction": 0.0,
                     "min_separation_px": 0.0,
                     "has_occlusion": False,
                     "track_continuity": False,
                 },
                 "paste_back": {
-                    "convention": "unknown",
-                    "opaque_mae": 999.0,
+                    "convention": "extract_24_frame_id",
+                    "opaque_mae": 0.0,
                     "threshold": 2.0,
                     "passes_threshold": False,
                 },
                 "route": "conventional_fallback",
-                "ineligibility_reasons": ["cluster_other is not point camera", "consecutive_mad > 10.0"],
+                "ineligibility_reasons": ["non_court_crowd_view"],
             },
             "intervals": {
                 str(span): {
                     "frame_count": span,
                     "start_frame": 0,
-                    "end_frame": min(120, span),
+                    "end_frame": span,
                     "status": "ineligible",
                     "frame_hashes": {},
                     "paste_back_mae": 999.0,
-                    "canvas_growth": 3.5,
-                    "failure_reasons": ["cluster_other is not point camera"],
+                    "canvas_growth": 0.0,
+                    "failure_reasons": ["non_court_crowd_view"],
                 }
                 for span in TARGET_SPANS
             },
@@ -373,7 +429,9 @@ def _build_valid_manifest() -> dict[str, Any]:
         "target_spans": list(TARGET_SPANS),
         "diagnostic_videos": diag_vids,
         "confirmation_videos": conf_vids,
+        "development_videos": dev_vids,
         "ineligible_controls": ["alcaraz_highlights/scene_006"],
+        "provenance": provenance_map,
         "summary": {
             "submitted_scenes": len(scenes),
             "pointstream_eligible_scenes": len(scenes) - 1,
@@ -393,13 +451,141 @@ def test_schema_constants() -> None:
     assert MAX_CONSECUTIVE_MAD == 10.0
 
 
-def test_manifest_verification_accepts_valid_manifest() -> None:
+def test_verify_synthetic_clean_confirmation_passes_strict() -> None:
     manifest = _build_valid_manifest()
-    res = verify_manifest(manifest)
+    res = verify_manifest(manifest, strict_confirmation=True)
     assert res["status"] == "VERIFIED_PASS"
     assert res["verdict"] == "diagnostic inputs and confirmation corpus fully verified"
     assert len(res["confirmation_videos"]) == 6
     assert len(res["diagnostic_videos"]) == 2
+
+
+@pytest.mark.parametrize("partition", ["diagnostic_videos", "development_videos"])
+def test_confirmation_rejects_same_match_under_another_filename(partition: str) -> None:
+    manifest = _build_valid_manifest()
+    candidate = manifest["confirmation_videos"][0]
+    used_video = manifest[partition][0]
+    used = manifest["provenance"][used_video]
+    clean = manifest["provenance"][candidate]
+    used["match_name"] = "  " + clean["match_name"].upper() + "  "
+    used["event"] = clean["event"].upper()
+    with pytest.raises(ManifestValidationError, match="repeats a development/diagnostic"):
+        verify_manifest(manifest, strict_confirmation=True)
+
+
+@pytest.mark.parametrize("field,value", [
+    ("is_contaminated", None), ("is_contaminated", "false"),
+    ("prior_use", None), ("prior_use", ""), ("prior_use", [None]),
+])
+def test_confirmation_requires_explicit_prior_use_audit(field: str, value: Any) -> None:
+    manifest = _build_valid_manifest()
+    candidate = manifest["confirmation_videos"][0]
+    provenance = manifest["provenance"][candidate]
+    if value is None:
+        provenance.pop(field)
+    else:
+        provenance[field] = value
+    with pytest.raises(ManifestValidationError, match="missing or malformed prior-use"):
+        verify_manifest(manifest, strict_confirmation=True)
+
+
+def test_verify_real_manifest_diagnostic_ready_confirmation_incomplete() -> None:
+    import json
+    from src.contracts import paths as ps_paths
+
+    manifest_path = ps_paths.repo_root() / "manifests" / "bp46_long_tennis_scenes.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+    res = verify_manifest(manifest, strict_confirmation=False)
+    assert res["status"] == "DIAGNOSTIC_READY_CONFIRMATION_INCOMPLETE"
+    assert res["diagnostic_status"] == "READY"
+    assert res["confirmation_status"] == "INCOMPLETE"
+    assert res["confirmation_videos"] == []
+    assert len(res["development_videos"]) == 5
+    assert len(res["diagnostic_videos"]) == 2
+    assert "0 of 6 independent confirmation matches accepted" in res["verdict"]
+
+
+def test_verify_real_manifest_strict_confirmation_fails() -> None:
+    import json
+    from src.contracts import paths as ps_paths
+
+    manifest_path = ps_paths.repo_root() / "manifests" / "bp46_long_tennis_scenes.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+    with pytest.raises(ManifestValidationError, match="confirmation corpus incomplete"):
+        verify_manifest(manifest, strict_confirmation=True)
+
+
+def test_provenance_audit_training_counts_exact() -> None:
+    import json
+    from src.contracts import paths as ps_paths
+
+    manifest_path = ps_paths.repo_root() / "manifests" / "bp46_long_tennis_scenes.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    prov = manifest.get("provenance", {})
+
+    expected_tracks = {
+        "alcaraz_highlights": 20,
+        "federer_djokovic": 20,
+        "djokovic_zverev": 16,
+        "alcaraz_perricard": 14,
+        "djokovic_federer": 20,
+        "sinner_alcaraz": 20,
+        "alcaraz_ruud": 4,
+    }
+    assert sum(expected_tracks.values()) == 114
+
+    for vid, exp_count in expected_tracks.items():
+        assert vid in prov, f"Missing provenance for {vid}"
+        entry = prov[vid]
+        prior = " ".join(entry.get("prior_use", []))
+        assert f"{exp_count} tracks" in prior, f"Expected {exp_count} tracks in prior_use for {vid}"
+        assert entry.get("is_contaminated") is True
+        assert entry.get("confirmation_eligible") is False
+
+
+def test_reject_contaminated_confirmation_candidate() -> None:
+    manifest = _build_valid_manifest()
+    # Mark clean_match_1 as contaminated
+    manifest["provenance"]["clean_match_1"]["is_contaminated"] = True
+    manifest["provenance"]["clean_match_1"]["prior_use"] = ["Used in prior training"]
+    res = verify_manifest(manifest)
+    assert res["status"] == "DIAGNOSTIC_READY_CONFIRMATION_INCOMPLETE"
+    assert "clean_match_1" not in res["confirmation_videos"]
+    assert any("contaminated" in d for d in res["confirmation_deficits"])
+
+
+def test_reject_unresolved_match_event() -> None:
+    manifest = _build_valid_manifest()
+    manifest["provenance"]["clean_match_1"]["event_status"] = "unresolved"
+    res = verify_manifest(manifest)
+    assert res["status"] == "DIAGNOSTIC_READY_CONFIRMATION_INCOMPLETE"
+    assert any("unresolved event status" in d for d in res["confirmation_deficits"])
+
+
+def test_reject_duplicate_match_confirmation() -> None:
+    manifest = _build_valid_manifest()
+    # Make clean_match_2 duplicate the match and event of clean_match_1
+    manifest["provenance"]["clean_match_2"]["match_name"] = manifest["provenance"]["clean_match_1"]["match_name"]
+    manifest["provenance"]["clean_match_2"]["event"] = manifest["provenance"]["clean_match_1"]["event"]
+    res = verify_manifest(manifest)
+    assert res["status"] == "DIAGNOSTIC_READY_CONFIRMATION_INCOMPLETE"
+    assert any("duplicate match" in d for d in res["confirmation_deficits"])
+
+
+def test_reject_practice_or_compilation_as_confirmation() -> None:
+    manifest = _build_valid_manifest()
+    manifest["provenance"]["clean_match_1"]["source_type"] = "practice_session"
+    res = verify_manifest(manifest)
+    assert any("must be tournament_broadcast" in d for d in res["confirmation_deficits"])
+
+
+def test_legacy_manifest_missing_provenance_rejected_in_strict() -> None:
+    manifest = _build_valid_manifest()
+    del manifest["provenance"]  # Legacy manifest lacking provenance block
+    with pytest.raises(ManifestValidationError, match="confirmation corpus incomplete"):
+        verify_manifest(manifest, strict_confirmation=True)
 
 
 def test_manifest_verification_rejects_missing_diagnostic() -> None:
@@ -412,7 +598,7 @@ def test_manifest_verification_rejects_missing_diagnostic() -> None:
 def test_manifest_verification_rejects_split_isolation_overlap() -> None:
     manifest = _build_valid_manifest()
     # Violate split isolation: put a confirmation video into diagnostic_videos
-    manifest["diagnostic_videos"].append("alcaraz_perricard")
+    manifest["diagnostic_videos"].append("clean_match_1")
     with pytest.raises(ManifestValidationError, match="split isolation violated"):
         verify_manifest(manifest)
 
@@ -457,14 +643,14 @@ def test_manifest_verification_rejects_wrong_span_frame_count() -> None:
 def test_manifest_verification_reports_diagnostic_ready_when_confirmation_incomplete() -> None:
     manifest = _build_valid_manifest()
     # Make one confirmation video ineligible at 384 frames
-    target_vid = "tournament_match_6"
+    target_vid = "clean_match_6"
     for s in manifest["scenes"]:
         if s["video"] == target_vid:
             s["intervals"]["384"]["status"] = "ineligible"
             s["intervals"]["384"]["failure_reasons"] = ["mock fail"]
     res = verify_manifest(manifest)
     assert res["status"] == "DIAGNOSTIC_READY_CONFIRMATION_INCOMPLETE"
-    assert res["verdict"] == "diagnostic inputs ready; confirmation corpus incomplete"
+    assert "confirmation corpus incomplete" in res["verdict"]
     assert res["diagnostic_status"] == "READY"
     assert res["confirmation_status"] == "INCOMPLETE"
     assert len(res["confirmation_deficits"]) > 0

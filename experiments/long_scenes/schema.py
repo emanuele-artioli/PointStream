@@ -112,6 +112,26 @@ class IntervalValidation:
 
 
 @dataclass(frozen=True)
+class VideoProvenance:
+    """Provenance and prior-use record for a source video asset."""
+
+    video: str
+    match_name: str
+    event: str
+    event_status: str
+    """'verified' if event/match is definitively verified; 'unresolved' otherwise."""
+    source_type: str
+    """'tournament_broadcast', 'compilation_highlights', or 'practice_session'."""
+    prior_use: list[str] = field(default_factory=list)
+    """List of prior uses across training, headroom, calibration, or ladder sweeps."""
+    is_contaminated: bool = False
+    """True if used in model training, headroom, tuning, calibration, or previous experiments."""
+    contamination_reasons: list[str] = field(default_factory=list)
+    confirmation_eligible: bool = False
+    """True only if untouched, genuinely independent tournament match with verified event."""
+
+
+@dataclass(frozen=True)
 class SceneRecord:
     """Machine-readable manifest entry for one candidate tennis scene."""
 
@@ -123,7 +143,7 @@ class SceneRecord:
     cluster: str
     context_id: str
     role: str
-    """'diagnostic_near_static', 'diagnostic_smooth_pan', 'confirmation', 'control_ineligible', or 'candidate'."""
+    """'diagnostic_near_static', 'diagnostic_smooth_pan', 'development_candidate', 'control_ineligible', 'confirmation', or 'candidate'."""
     source_metadata: SourceMetadata
     eligibility: EligibilityFeatures
     intervals: dict[str, IntervalValidation]
@@ -143,8 +163,11 @@ class ManifestPayload:
     diagnostic_videos: list[str]
     confirmation_videos: list[str]
     ineligible_controls: list[str]
-    summary: dict[str, Any]
-    scenes: list[dict[str, Any]]
+    development_videos: list[str] = field(default_factory=list)
+    provenance: dict[str, dict[str, Any]] = field(default_factory=dict)
+    summary: dict[str, Any] = field(default_factory=dict)
+    scenes: list[dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
