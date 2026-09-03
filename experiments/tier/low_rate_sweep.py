@@ -13,6 +13,7 @@ does not re-encode those anchors at the residual QP.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import time
 from dataclasses import replace
@@ -69,6 +70,7 @@ from experiments.tier.low_rate_references import (
 from experiments.tier.low_rate_validate import BOUNDS_PATH, DECLARED_FPS, PROBE_PATH
 from src.contracts.codecs import RateControl
 from src.contracts.config import PointstreamConfig
+from src.contracts.lattice import ART_BACKGROUND_MODEL
 from src.pipeline.reconstruction.dispatch import GeneratorRef
 
 
@@ -169,6 +171,25 @@ def pointstream_e1(
     panorama = int(sizes.panorama)
     scores = score_headlines(source, delivered)
     per_scene = late_frame_by_scene(clips, source, delivered)
+    background_payloads: list[dict[str, Any]] = []
+    for index, chunk in enumerate(result.chunks):
+        view = chunk.bag.get(ART_BACKGROUND_MODEL)
+        plate = getattr(view, "plate", None)
+        background_payloads.append(
+            {
+                "scene_index": index,
+                "mode": getattr(view, "mode", None),
+                "payload_bytes": getattr(view, "payload_bytes", None),
+                "decoded_plate_shape": (
+                    list(np.asarray(plate).shape) if plate is not None else None
+                ),
+                "decoded_plate_sha256": (
+                    hashlib.sha256(np.ascontiguousarray(plate).data).hexdigest()
+                    if plate is not None
+                    else None
+                ),
+            }
+        )
     bounds = json.loads(BOUNDS_PATH.read_text(encoding="utf-8"))
     late_alarms = late_frame_bound_alarms(per_scene, bounds)
     return {
@@ -195,6 +216,7 @@ def pointstream_e1(
             "actor_reference": int(sizes.actor_reference),
             "metadata": int(sizes.metadata),
         },
+        "background_payloads": background_payloads,
         "background_share": round(panorama / total, 4) if total else None,
         "n_chunks": len(result.chunks),
         "n_frames": int(source.shape[0]),

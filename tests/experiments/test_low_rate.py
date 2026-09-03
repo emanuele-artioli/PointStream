@@ -154,6 +154,22 @@ def test_named_point_is_the_unique_operating_point() -> None:
     assert point.name == "bg-crf51"
 
 
+def test_bp52_background_walk_has_only_the_requested_crfs() -> None:
+    from experiments.tier.bp52_background_search import POINT_NAMES
+
+    points = [named_point(name) for name in POINT_NAMES]
+    assert [point.stream_crf for point in points] == [51, 63, 57]
+    assert all(
+        point.residual_qp is None
+        and not point.residual_on
+        and point.appearance_jpeg_quality == 40
+        and point.appearance_downscale == 2
+        and point.motion_max_points == 16
+        and point.object_stream_on
+        for point in points
+    )
+
+
 def test_unknown_point_is_refused() -> None:
     with pytest.raises(ValueError, match="unknown point"):
         named_point("bg-crf99")
