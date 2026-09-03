@@ -12,7 +12,7 @@ The committed interval records remain unchanged. Historical output mirrors are
 not rewritten; use the current checkout's manifest for split decisions.
 
 **Branch**: `antigravity/bp51-confirmation-split`  
-**Reference Handoff**: [`plans/HANDOFF-BP51-confirmation-split.md`](file:///home/itec/emanuele/pointstream/plans/HANDOFF-BP51-confirmation-split.md)  
+**Historical dispatch**: [done/HANDOFF-BP51-confirmation-split.md](done/HANDOFF-BP51-confirmation-split.md)
 **Related Plans**: [`plans/BP46-long-tennis-scenes.md`](file:///home/itec/emanuele/pointstream/plans/BP46-long-tennis-scenes.md), [`plans/ROADMAP.md`](file:///home/itec/emanuele/pointstream/plans/ROADMAP.md)
 
 ---

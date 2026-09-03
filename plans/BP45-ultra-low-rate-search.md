@@ -1,8 +1,9 @@
 # BP45 — Ultra-low-rate AV1/VVC search
 
 **Current state (3 September):** M1 and the E1 harness are merged. Do not repeat
-their implementation. Broad E1 waits for `BP49-native-reference-pilot.md` and
-Codex review; the historic native preflight did not decide Gate A.
+their implementation. BP49 and BP52 diagnostics are complete. Next is the
+bounded BP53 background-scale test, then Codex review before broad E1; no
+size–quality win has been established.
 
 **Roadmap IDs:** M1 then E1  
 **Preferred harness:** Cursor implements and validates; a detached batch runs the

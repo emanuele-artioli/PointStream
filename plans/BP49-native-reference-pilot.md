@@ -1,6 +1,7 @@
 # BP49 — native recovery verification and reference pilot
 
-**Active. Owner:** Cursor executes; Codex reviews operational limits and evidence.
+**Completed historical brief/report.** BP52 followed this pilot; the next bounded
+dispatch is BP53. Do not relaunch the instructions below.
 Read `AGENTS.md`, `PLAN.md`, this brief and `done/BP47-e1-preflight.md`.
 Recovery is merged. Do not reimplement it or reuse pre-repair checkpoints.
 

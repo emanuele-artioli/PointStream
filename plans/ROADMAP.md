@@ -5,13 +5,16 @@ submission scope.** `PLAN.md` is the current summary; the chronological record
 is `done/RESEARCH-HISTORY.md`. A work
 session reads `AGENTS.md`, this file, and one named brief.
 
-Last reconciled: **3 September 2026**, after recovery and plan cleanup merged.
+Last reconciled: **3 September 2026**, BP51/BP52 review and repair integration.
 
-PR #52 integrated BP44–BP46, PR #53 merged repaired recovery, and PR #54 archived
-old plans. M1/B1 implementation is complete; D1 diagnostics are available but
-independent confirmation is incomplete. The native one-point preflight did not
-establish hourly recovery safety. **Next: `BP49-native-reference-pilot.md`, then
-Codex review before broader E1.** `PAPER-NEXT.md` is the current writing brief.
+PR #52 integrated BP44–BP46, #53 repaired recovery, #55 added reference pilot
+controls. BP49/BP52 passed the native checkpoint budget only on the short
+diagnostic pair. CRF-only search established no win. BP51 accepts zero untouched
+confirmation matches; all current sources have prior use. PRs #57/#58 include
+review repairs for fail-closed provenance and batch-stop behavior.
+**Next: BP53 background transport scale (Cursor), BP54 fresh source shortlist
+(Antigravity), then Codex review before expansion.** Separate PointStream
+encode/decode timing remains open. `PAPER-NEXT.md` is the writing brief.
 The workstream table below describes dependencies, not a claim that every row
 is still unimplemented. Archived reports are not current launch instructions.
 

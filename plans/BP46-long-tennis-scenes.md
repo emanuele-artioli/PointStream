@@ -4,7 +4,8 @@
 confirmation is incomplete. PR #52 contains the working extraction validation.
 An incomplete later deletion was archived at
 `archive/bp46-incomplete-extraction-2026-09-03`, not merged. The next execution
-gate is BP49, not an unrestricted E1 batch. Do not count this whole brief done.
+gate is BP53 after the completed BP49/BP52 diagnostics, not an unrestricted E1
+batch. BP54 owns the fresh-source shortlist. Do not count this whole brief done.
 
 **Roadmap ID:** D1  
 **Preferred harness:** Cursor or VS Code with Antigravity.  
