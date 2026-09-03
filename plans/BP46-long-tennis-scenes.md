@@ -73,9 +73,9 @@ All diagnostic deliverables specified in BP46 and ROADMAP.md D1 have been implem
    - **Diagnostic videos (2 videos, 16 scenes)**:
      - `alcaraz_highlights` (near-static: `scene_000`, `scene_028`, canvas growth 1.00x; smooth-pan: `scene_010`, `scene_018`, `scene_026`, canvas growth 1.04x–1.08x; control: `scene_006`).
      - `federer_djokovic` (smooth-pan: `scene_001`, `scene_003`, `scene_005`, `scene_007`, `scene_009`, `scene_011`, `scene_013`, `scene_015`, `scene_017`, `scene_019`).
-     - *Audit of previous use*: `federer_djokovic` was used throughout prior development and exploration (BP20, BP21, BP24, BP29, BP30, BP31, BP33) for tuning plate registration, panorama spans, and headroom ladders. Because it is contaminated by hyperparameter tuning, it belongs strictly in the diagnostic partition, satisfying the 2-video diagnostic requirement.
-   - **Confirmation videos (5 candidate tournament matches on host, 37 candidate scenes)**:
+   - **Confirmation candidates on host (5 candidate videos, 37 scenes)**:
      - `alcaraz_perricard`, `alcaraz_ruud`, `djokovic_federer`, `djokovic_zverev`, `sinner_alcaraz`.
+     - *Prior use note*: In the manifest schema, these are partitioned with `role: "confirmation"` isolated from diagnostic scenes (`set(diag).isdisjoint(set(conf))`). However, per the match-by-match audit below, all four tournament matches were previously used in BP21/BP24/BP30/BP31/AA, and `alcaraz_ruud` is an ineligible practice session. None are untouched; fresh matches remain required for genuine confirmation.
    - **Strict Isolation Invariant**: `set(diagnostic_videos).isdisjoint(set(confirmation_videos))` is strictly `True`. Every confirmation scene has `role: "confirmation"`, and no confirmation video appears in diagnostic or control partitions.
    - **Ineligible control (1 scene)**: `alcaraz_highlights/scene_006` (`cluster_other`, crowd view, routed to `conventional_fallback` with explicit reasons).
 3. **True Per-Interval Validation Engine**:
@@ -103,9 +103,18 @@ All diagnostic deliverables specified in BP46 and ROADMAP.md D1 have been implem
 
 ### Confirmation Deficits (Honestly Reported)
 1. Match count: host provides 5 candidate tournament matches (`alcaraz_perricard`, `alcaraz_ruud`, `djokovic_federer`, `djokovic_zverev`, `sinner_alcaraz`), whereas the plan specifies 6 independent confirmation matches.
-2. `alcaraz_ruud`: annotated tracks only track 1 player at a time (0 simultaneous overlap), failing 2-player eligibility across all spans.
+2. `alcaraz_ruud`: annotated tracks only track 1 player at a time (0 simultaneous overlap), failing 2-player eligibility across all spans. Moreover, this source is a practice session ("Alcaraz & Ruud Practice 2024"), not a competitive tournament match.
 3. 384-frame coverage: the report lists 3 confirmation matches (`djokovic_zverev`, `sinner_alcaraz`, and `djokovic_federer`); counts must be taken from the current manifest. `alcaraz_perricard` track length is 372 < 384 frames.
-*Missing confirmation footage need not block the diagnostic search.*
+4. **Prior-Use Contamination Audit (by Actual Match)**:
+   A strict confirmation set for E2 must consist of *untouched, genuinely independent* matches that were never part of system design, parameter tuning, or metric calibration. An audit of all candidate tournament videos on host reveals that **all candidate tournament matches were already used in prior experiments**:
+   - `sinner_alcaraz` (*Jannik Sinner vs. Carlos Alcaraz*): Used in BP21 headroom sweeps (`scene_001`, player area 0.0083), BP23 metric calibration anchors (`alcaraz_highlights/scene_000` vs `sinner_alcaraz/scene_001`), BP24/BP31 ladder sweeps, BP30 panorama tuning (53 scenes, rank agreement +0.41), and Animate-Anyone fine-tuning (`pointstream_aa_meta.json`, 16 tracks).
+   - `alcaraz_perricard` (*Carlos Alcaraz vs. Giovanni Mpetshi Perricard*, Beijing 2024): Used in BP21 headroom sweeps (`scene_002`, where its 3.27% player area fired the initial player-area bound), BP24/BP31 ladder sweeps, BP30 panorama registration (88 scenes), baseline triage probe set (`assets/probe_set/clips/alcaraz_perricard/scene_006/track_0196`), and Animate-Anyone fine-tuning (16 tracks).
+   - `djokovic_federer` (*Novak Djokovic vs. Roger Federer*, Wimbledon 2019 Final): Used in BP21 headroom sweeps (`scene_003`, where libvvenc empty-bitstream behaviour forced QP 31 substitution), BP24/BP31 ladder sweeps, BP30 panorama tuning (224 scenes, rank agreement +0.69), and Animate-Anyone fine-tuning (18 tracks).
+   - `djokovic_zverev` (*Novak Djokovic vs. Alexander Zverev*): Used in BP21 headroom sweeps (`scene_002`, where its 0.011 plate saving fired the 10× concentration floor bound), BP24/BP31 ladder sweeps, held-out probe set conflict (Research History §2.8), and Animate-Anyone fine-tuning (16 tracks).
+   - `alcaraz_ruud` (*Alcaraz & Ruud Practice 2024*): Practice drills rather than a match, lacks 2-player overlap, and was included in Animate-Anyone training (12 tracks).
+
+   **Conclusion**: There are currently **zero** untouched, independent confirmation matches on the host. All existing 4K footage belongs strictly to the **development/diagnostic** corpus. Acquiring genuinely independent confirmation footage for E2 Gate B requires ingesting fresh, unobserved tournament matches.
+*Missing confirmation footage need not block the diagnostic search (E1).*
 
 ### Verification Commands & Results
 - **Manifest invariant verification**:
