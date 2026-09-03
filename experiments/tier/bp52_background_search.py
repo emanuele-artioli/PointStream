@@ -17,6 +17,7 @@ from typing import Any
 import numpy as np
 
 from experiments.tier.calibrate import calibrate
+from experiments.long_scenes.loader import MANIFEST_PATH, get_long_scene_manifest
 from experiments.tier.low_rate_checkpoint import (
     completion_counts,
     fingerprint,
@@ -191,6 +192,25 @@ def _verify_input(clips: list[Any]) -> list[dict[str, Any]]:
                 f"the BP49 frame identity {expected_hash}"
             )
     return found
+
+
+def _manifest_snapshot(video: str, scenes: list[str]) -> dict[str, Any]:
+    manifest = get_long_scene_manifest()
+    selected = [
+        record
+        for record in manifest.get("scenes", [])
+        if record.get("video") == video and record.get("scene") in scenes
+    ]
+    if len(selected) != len(scenes):
+        raise SystemExit(
+            f"BP46 manifest at {MANIFEST_PATH} has {len(selected)} requested "
+            f"scene records, expected {len(scenes)}"
+        )
+    return {
+        "path": str(MANIFEST_PATH),
+        "selected_scene_records": selected,
+        "selected_scene_records_sha256": fingerprint(selected),
+    }
 
 
 def _point_bounds(name: str, bounds: dict[str, Any]) -> dict[str, list[float]]:
@@ -379,6 +399,7 @@ def main(argv: list[str] | None = None) -> int:
 
     clips = load_e1_sequence(args.video, list(args.scenes), n_frames=args.frames)
     source = _verify_input(clips)
+    manifest = _manifest_snapshot(args.video, list(args.scenes))
     from src.runner.config_io import load_tier
 
     base: PointstreamConfig = load_tier("balanced")
@@ -390,6 +411,7 @@ def main(argv: list[str] | None = None) -> int:
         "fps": DECLARED_FPS,
         "codec": "av1",
         "source": source,
+        "manifest": manifest,
         "preset": preset,
         "implementation": implementation_digest(),
         "points": list(POINT_NAMES),
