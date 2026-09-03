@@ -15,7 +15,7 @@
 - **Tools:** Background *stream* coding is ffmpeg ``libaom-av1`` with
   ``-cpu-used 8 -usage realtime -lag-in-frames 0 -bf 0`` (not SVT-AV1).
   Residual was **off**. `/opt/local/bin/SvtAv1EncApp` SVT-AV1 v1.8.0 preset `0`
-  is the independent AV1/VVC reference (and residual) configuration, unused on
+  is the independent AV1 reference (and AV1 residual) configuration, unused on
   this PointStream point. ffmpeg n7.1.1-56-gc2184b65d2 at `/opt/local/bin/ffmpeg`.
   CUDA hidden (`CUDA_VISIBLE_DEVICES=`); injected objects skip YOLO.
 - **Output:** `/home/itec/emanuele/pointstream-data/outputs/bp47-e1-preflight/`

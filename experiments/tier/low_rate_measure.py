@@ -148,7 +148,7 @@ def stream_codec_provenance(codec: str = "av1") -> dict[str, Any]:
         "container": spec.container,
         "low_delay": list(spec.low_delay),
         "note": (
-            "SVT-AV1 preset 0 is the independent AV1/VVC reference and residual "
+            "SVT-AV1 preset 0 is the independent AV1 reference and AV1 residual "
             "configuration. panorama-stream does not use it."
         ),
     }
