@@ -3,7 +3,7 @@
 **Parallel with `BP8`.** Small, and every future generation number depends on it.
 
 **Owns exclusively:** `experiments/probe/**`, `tests/components/test_probe*.py`.
-**Read first:** `PLAN.md` §2.6.
+**Read first:** `plans/done/RESEARCH-HISTORY.md` §2.6.
 
 ## The defect
 
@@ -27,7 +27,7 @@ axis (how far can one appearance carry?) and will become an experiment later.
 
 **Keep the static-copy baseline as a permanent arm.** Paste the keyframe forward,
 no model, score it exactly like an engine. It costs nothing, it is the floor any
-generator must beat, and it is what exposed `PLAN.md` §2.6. Measured today:
+generator must beat, and it is what exposed `plans/done/RESEARCH-HISTORY.md` §2.6. Measured today:
 **11.82 dB object-scoped, 8.90 dB frame** at offset 24 on the 12 probe clips.
 
 **Make it a gate, not a decoration.** An engine scoring at or below the
@@ -49,7 +49,7 @@ fire wrongly. Anchor them on the static-copy floor instead of on absolute dB.
 **One frame per clip is thin.** The current harness scores `frame_index=24` only.
 Take several offsets per clip so a single unlucky frame cannot decide an engine.
 
-**PSNR stays the triage metric** (`PLAN.md` §6.5). Do not add VMAF or LPIPS here.
+**PSNR stays the triage metric** (`plans/done/RESEARCH-HISTORY.md` §6.5). Do not add VMAF or LPIPS here.
 
 ## Done when
 

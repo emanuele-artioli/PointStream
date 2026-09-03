@@ -36,7 +36,7 @@ skipped:
   than as `None`.
 
 Two clips, chosen as the ends of the motion range in the eight cached BP21
-windows (`plans/BP24-findings.md` §11): `alcaraz_highlights/scene_000`
+windows (`plans/done/BP24-findings.md` §11): `alcaraz_highlights/scene_000`
 (inter-frame MAD 0.33) and `federer_djokovic/scene_003` (7.70). A *different*
 video spelled `djokovic_federer` exists in both trees and is not this one; the
 directory actually read is recorded in the output so the label is never the

@@ -1,6 +1,6 @@
 """Required behaviour for the cross-scene background stream.
 
-The property this file exists for is the one `plans/prompts/claude-bp30.md`
+The property this file exists for is the one `https://github.com/emanuele-artioli/PointStream/blob/ec581e9/plans/prompts/claude-bp30.md`
 names as the single place the work can go wrong quietly: **encoder-side and
 client-side reconstructions must be bit-identical across a multi-scene
 sequence.** A drifted reconstruction is still an image, so nothing else in the

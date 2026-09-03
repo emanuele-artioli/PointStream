@@ -6,7 +6,7 @@
 
 `BP12` retired the cross-appearance control as a test of whether an engine uses
 appearance: **a pasted keyframe tops that scale with no network at all**
-(`PLAN.md` §2.10). What is left is a gap, and every proposed next step falls into
+(`plans/done/RESEARCH-HISTORY.md` §2.10). What is left is a gap, and every proposed next step falls into
 it. Retraining, a new dataset, a new architecture — each would be evaluated with
 the same yardstick that cannot distinguish
 
@@ -111,14 +111,14 @@ in the same commit.
   or it is **rejected**, with that separation reported as the reason.
 - The colour-histogram companion is registered beside it.
 - DISTS's role is written down: final-results comparability, not identity.
-- `PLAN.md` §2.10's closing paragraph is updated to point at the instrument that
+- `plans/done/RESEARCH-HISTORY.md` §2.10's closing paragraph is updated to point at the instrument that
   now exists, or to record that ReID failed calibration on this content.
 
 ---
 
 ## Delivered — 2026-08-23
 
-Numbers and their reading are in `PLAN.md` §2.12;
+Numbers and their reading are in `plans/done/RESEARCH-HISTORY.md` §2.12;
 `outputs/bp18-reid-calibration.txt` is the record and
 `outputs/bp18-reid-bounds.txt` was written before any anchor was scored.
 

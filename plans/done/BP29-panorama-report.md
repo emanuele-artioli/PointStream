@@ -4,7 +4,7 @@
 `src/runner/stages.py` never called it. `background.method` therefore chose a
 *transmission strategy* over the **first source frame**, and a panorama's whole
 argument — amortising one background across the clip — had never been available
-(`plans/BP24-findings.md` §6 named this as the standing stub). `make_background`
+(`plans/done/BP24-findings.md` §6 named this as the standing stub). `make_background`
 now stitches the chunk.
 
 **What it is worth, in one line:** on a clip whose camera barely moves the trade

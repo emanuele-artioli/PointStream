@@ -1,14 +1,14 @@
 # BP31 findings
 
 Running notes for the paired-ladder-across-scenes work. Brief:
-`plans/BP31-paired-ladder-across-scenes.md`. Prompt:
-`plans/prompts/next-session-bp31.md`.
+`plans/done/BP31-paired-ladder-across-scenes.md`. Prompt:
+`https://github.com/emanuele-artioli/PointStream/blob/ec581e9/plans/prompts/next-session-bp31.md`.
 
 ---
 
 ## 1. Levers (a) and (b) cannot both be on: `panorama-stream` bypasses the sidecar
 
-**This retires the plan in the brief's §0 as written.** `plans/BP31-paired-ladder-across-scenes.md`
+**This retires the plan in the brief's §0 as written.** `plans/done/BP31-paired-ladder-across-scenes.md`
 §0 and the prompt's step 1 both assume a cheap plate-codec sweep decides which
 codec the ladder's PointStream arm uses, with the cross-scene stream on at the
 same time — "(a), (b) and (c) together, then re-run the paired ladder". That
@@ -74,7 +74,7 @@ gets a plausible yes.
 `BackgroundModel.__init__` never passes an intra QP and `build_sidecar` falls
 back to `DEFAULT_INTRA_QP = 45` on **every** runner path. `background.codec: av1`
 is therefore a single fixed operating point, not an axis — the same limitation
-`plans/BP29-plate-codec-report.md` §4 recorded for `roi-video`'s `crf`, now
+`plans/done/BP29-plate-codec-report.md` §4 recorded for `roi-video`'s `crf`, now
 confirmed for the intra sidecars as well. Lever (a) is not tunable end to end
 today, whichever method is selected.
 
@@ -141,7 +141,7 @@ this harness measures what BP30's did.
 **av1 at crf38 reads 0.646 against BP30's 0.492 ± 0.062 headline, and that is
 consistent rather than an alarm.** BP30's headline pools five videos;
 `alcaraz_highlights` was the *worst* of them, at 0.607 ± 0.015 over 16 scenes
-(`PLAN.md` §2.22). Twelve scenes amortise the opening keyframe over fewer
+(`plans/done/RESEARCH-HISTORY.md` §2.22). Twelve scenes amortise the opening keyframe over fewer
 successors than sixteen, so slightly above 0.607 on the same video is what the
 arithmetic predicts. Inside the pre-written band [0.25, 0.75].
 
@@ -264,7 +264,7 @@ the units of the complaint.
 fidelity.** Which is also why the table above settles nothing on its own: the two
 arms are 2.6 dB apart, so the stream is dearer *and* better and they are simply
 at different operating points. Comparing at a matched *knob* rather than matched
-fidelity is the error `plans/BP29-plate-codec-report.md` §3 was written about,
+fidelity is the error `plans/done/BP29-plate-codec-report.md` §3 was written about,
 and reading "the stream costs 1.39x" off that table would be committing it.
 
 So the comparison is being re-run as **two curves over the full payload ladder,
@@ -311,7 +311,7 @@ job — 4K decode plus paste-back verification per scene — and it is the first
 thing the next session should start, because everything else waits on it.
 
 Target N: ten scenes on each of six videos clears `presley`'s n>=6 bar that
-`plans/BP31-paired-ladder-across-scenes.md` §2 sets, which BP30 (five videos)
+`plans/done/BP31-paired-ladder-across-scenes.md` §2 sets, which BP30 (five videos)
 did not.
 
 **Two things deliberately not done.**
@@ -398,7 +398,7 @@ scene. §3 measures the underlying saving at 0.646 over twelve scenes on this
 same video, so the ladder number should improve with N, and the next session's
 first job is to make N large enough to say by how much.
 
-**What this is not.** It is not comparable to `PLAN.md` §2.20's +116.8%: that was
+**What this is not.** It is not comparable to `plans/done/RESEARCH-HISTORY.md` §2.20's +116.8%: that was
 one scene against a single-scene anchor, and this is two scenes against an
 anchor encoding both. The right reading is the *within-this-run* comparison,
 +109.72% against +90.97%, where everything except the background method is held
@@ -407,7 +407,7 @@ fixed. And two scenes of one video is a configuration measurement, not a claim �
 
 **PointStream still loses by a wide margin.** +90.97% means it costs roughly
 twice the anchor's rate at equal quality. Closing that is what the untried axes
-in `plans/prompts/next-session-bp31.md` are for, and the content axis is the
+in `https://github.com/emanuele-artioli/PointStream/blob/ec581e9/plans/prompts/next-session-bp31.md` are for, and the content axis is the
 first of them: this ran on `alcaraz_highlights`, which §2.20 chose as the most
 *static* of eight clips — the friendliest case for the anchor and the worst for
 an object-centric codec.
@@ -447,14 +447,14 @@ plate, each codec swept over its own knob.
 No cell is extrapolated; a target outside a codec's measured span is reported as
 such rather than fitted.
 
-**The lever is strongly quality-dependent, and `PLAN.md` §2.21 quotes it at the
+**The lever is strongly quality-dependent, and `plans/done/RESEARCH-HISTORY.md` §2.21 quotes it at the
 wrong end.** §2.21 claims "a factor of 3.6 to 4.1" for av1/vvc intra over JPEG on
 88-91% of the payload. That figure is reproduced here — at **38 dB**, where vvc
 is 5.3x cheaper. But the BP24 ladder's reference rung puts the plate near
 **43 dB**, and there both modern codecs come in at **x0.691 — a 1.45x saving, not
 3.6-4.1x**. The ratio falls monotonically as fidelity rises across the whole
 measured band, which is the same crossover shape
-`plans/BP29-plate-codec-report.md` §3 found between jpeg and x264 at ~40 dB.
+`plans/done/BP29-plate-codec-report.md` §3 found between jpeg and x264 at ~40 dB.
 
 So lever (a) is real and much smaller than the plan assumes: at the ladder's
 operating point it takes about **31% off the plate**, hence roughly **27% off the
@@ -516,7 +516,7 @@ prices the plate codec for the `panorama-full` arm only.
 ## 11. The third dimension: PointStream is ~20x the anchor's wall clock
 
 `AGENTS.md` now requires every result to carry size, quality **and** speed, and
-`PLAN.md` §5 item 1 had asked for it already. The wall clock was recorded per
+`plans/done/RESEARCH-HISTORY.md` §5 item 1 had asked for it already. The wall clock was recorded per
 rung all along and simply never reached the table;
 `experiments/tier/ladder_scenes_compare.py` now prints it beside the BD-rate.
 
@@ -634,4 +634,3 @@ change: run the span ladder under `panorama-full`, where each scene codes its ow
 plate and no shape agreement is needed; or run `panorama-stream` at N=1, where
 there is no second scene to disagree with. Neither answers the combined question,
 and the combined question is the one that matters.
-

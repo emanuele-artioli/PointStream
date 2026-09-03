@@ -24,7 +24,7 @@ generates a 96×128 court, and nothing under `experiments/headroom/` reads
   **larger** share of the bits that remain. AVC is therefore the *conservative*
   rung, and 12.2% may be a floor.
 
-**The Wave-3 fork was decided on that number and is withdrawn** (`PLAN.md`
+**The Wave-3 fork was decided on that number and is withdrawn** (`plans/done/RESEARCH-HISTORY.md`
 §2.13). Nothing about the project's direction should be settled until this
 brief reports.
 
@@ -99,7 +99,7 @@ Write per-codec bands before running, and record why any bound was wrong.
 
 ## Traps
 
-- **Matched quality, not matched size** (`PLAN.md` §5).
+- **Matched quality, not matched size** (`plans/done/RESEARCH-HISTORY.md` §5).
 - **A flag existing is not a feature working.** `DEFERRED.md` D3 records AVC
   `addroi` as a silent no-op under QP. This brief does not need ROI — it
   re-encodes modified pixels — but if you reach for an ROI map, drive it and
@@ -118,13 +118,13 @@ Write per-codec bands before running, and record why any bound was wrong.
 - The AV1 ≥ AVC prediction is checked and its outcome recorded either way.
 - `sections/problem.tex` carries the real numbers, the provisional paragraph is
   removed, and the `CLAIM` line names the new `outputs/` path.
-- `PLAN.md` §2.13's withdrawn fork is **re-decided** on these numbers.
+- `plans/done/RESEARCH-HISTORY.md` §2.13's withdrawn fork is **re-decided** on these numbers.
 
 ---
 
 ## Delivered — 2026-08-23
 
-**The premise holds, measured on real 4K.** Full numbers in `PLAN.md` §2.14;
+**The premise holds, measured on real 4K.** Full numbers in `plans/done/RESEARCH-HISTORY.md` §2.14;
 `outputs/bp20-headroom/`.
 
 Input, first line as the brief demanded: `alcaraz_highlights/scene_000` frames

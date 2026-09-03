@@ -1,7 +1,7 @@
 """Coded size of a pixel payload — the thing that makes a byte count a rate.
 
 `BP24`. Until this existed the runner's codec stage was an identity round-trip
-and every byte count it reported was raw pixels (`PLAN.md` §2.16). A raw count
+and every byte count it reported was raw pixels (`plans/done/RESEARCH-HISTORY.md` §2.16). A raw count
 is not a rate and must never be divided by the source size and called a
 compression ratio.
 
@@ -129,7 +129,7 @@ def coded_curve(
     different quality, so their bitrates are not comparable and a ratio between
     them means nothing. That confound is not hypothetical here — `BP21`'s VVC
     result collapsed on exactly it, and survived neither a common-QP nor a
-    common-PSNR reading (`PLAN.md` §2.14).
+    common-PSNR reading (`plans/done/RESEARCH-HISTORY.md` §2.14).
 
     The honest comparison integrates over the overlapping quality range, which
     is what `src.components.metrics.bd_rate` does — and it refuses to return a

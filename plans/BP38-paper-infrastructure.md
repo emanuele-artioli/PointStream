@@ -1,5 +1,9 @@
 # BP38 — Paper infrastructure: figures, baselines a referee expects, reproducibility
 
+Current status (2026-09-03): the separate `tex` conda environment builds the
+PDF. Follow `PAPER-NEXT.md` for remaining writing and page-budget work; do not
+repeat toolchain setup. Learned-codec comparison remains gated on first-domain evidence.
+
 **Gate update (2026-09-02):** build repair, claim cleanup, figure inventory and
 reproducibility packaging may proceed now. Add the DCVC-RT learned-video-codec
 baseline only after Gate B in `plans/ROADMAP.md`; DCVC-UF is a stretch goal.
@@ -105,7 +109,7 @@ arm is a positioning result.
   broadcast sport, on this hardware, expect **[−40%, +30%]** against the av1
   preset-10 anchor. A number far outside that is more likely a resolution or
   colour-space mismatch than a result — the same class of trap as
-  `plans/BP24-findings.md` §12 (RGB-PSNR against a 4:2:0 codec).
+  `plans/done/BP24-findings.md` §12 (RGB-PSNR against a 4:2:0 codec).
 
 ## C. Related work currency## C. Related work currency and the bound the introduction quotes
 
@@ -116,7 +120,7 @@ words that *"a PointStream BD-rate far beyond 74.5% on harder content"* would
 need explaining.
 
 PointStream currently measures **+90.97%** — the wrong sign, not a smaller
-saving. Whatever branch of `plans/FORK-bp31.md` the paper ends on, those two
+saving. Whatever branch of `plans/done/FORK-bp31.md` the paper ends on, those two
 notes need re-reading against the real number, and the comparison needs a
 sentence saying what is and is not comparable: Sparse2Dense codes talking-head
 video against VVC; this codes 4K broadcast sport against av1. Different content,

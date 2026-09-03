@@ -6,7 +6,7 @@ background registry keys on strategy (``background.method``); codec validity
 is checked here.
 
 **Why a modern intra codec belongs on this axis.** The plate is 88-91% of
-PointStream's payload at every rung of every sweep (`plans/BP24-findings.md`
+PointStream's payload at every rung of every sweep (`plans/done/BP24-findings.md`
 §13) and it was coded as a JPEG. Measured on one 4K plate at matched fidelity
 near 38 dB (`outputs/bp24-ladder/plate-probe.json`): JPEG 283,431 B, av1-intra
 79,726 B, vvc-intra 68,477 B — 3.6x to 4.1x on nearly all of the payload, for
@@ -20,7 +20,7 @@ something worth sweeping.
 **The codec is a parameter, never a constant.** `IntraCodecSidecar` takes its
 codec name from ``background.codec``. When the paired ladder uses this, the
 plate must sit on the *same codec as the anchor* in each pair, or the pairing
-discipline that makes a BD-rate readable breaks (`plans/BP24-findings.md` §1).
+discipline that makes a BD-rate readable breaks (`plans/done/BP24-findings.md` §1).
 Hardcoding av1 here would break it silently.
 """
 
@@ -331,7 +331,7 @@ class IntraCodecSidecar:
     Matroska, and `coded_roundtrip` spent a whole BP24 sweep handing back frames
     that had been through the rung's codec *and then* through x264, pinning every
     measured quality near x264's ceiling while the rate fell tenfold
-    (`plans/BP24-findings.md` §14).
+    (`plans/done/BP24-findings.md` §14).
 
     Reusing it rather than writing a shorter one is not fussiness. The first
     version of this class decoded the bitstream straight to a PNG, which is one

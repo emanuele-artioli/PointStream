@@ -97,7 +97,7 @@ BACKGROUND_PANORAMA_DELTA: Final = "panorama-delta"
 #:
 #: Named apart from `panorama-delta` on purpose. Both are "send less than a whole
 #: plate", but they are opposite mechanisms: `panorama-delta` subtracts pixels,
-#: which `plans/BP24-findings.md` §17 measured costing 1.49-1.70x *more* bytes at
+#: which `plans/done/BP24-findings.md` §17 measured costing 1.49-1.70x *more* bytes at
 #: ~13 dB lower quality across scenes; this hands the job to a codec's motion
 #: search, which §§18-19 measured saving 31-53%. One name for both would make the
 #: ablation unreadable.

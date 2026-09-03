@@ -1,9 +1,9 @@
 """Which `stream_codec` x `stream_crf` should the ladder's PointStream arm use?
 
 **Why this exists rather than the sweep the brief asked for.**
-`plans/BP31-paired-ladder-across-scenes.md` §0 asks for a `background.codec`
+`plans/done/BP31-paired-ladder-across-scenes.md` §0 asks for a `background.codec`
 sweep to decide which plate codec the ladder arm uses, with the cross-scene
-stream on at the same time. `plans/BP31-findings.md` §1 measured that this
+stream on at the same time. `plans/done/BP31-findings.md` §1 measured that this
 configuration does not exist: `PanoramaStream` never touches the still-image
 sidecar, so `background.codec` selects nothing under it and the plate goes
 through `BackgroundStreamTransmitter` at `stream_codec` / `stream_crf` instead.
@@ -21,12 +21,12 @@ rather than averaging it away.
 **Per codec, against itself, never ranked across codecs.** The low-delay flag
 sets differ per encoder (`libaom-av1 -usage realtime` against `libx265
 -preset veryfast`) and are not equal effort, so an ordering of the magnitudes
-would be measuring the flags (`plans/BP24-findings.md` §1). Each codec's number
+would be measuring the flags (`plans/done/BP24-findings.md` §1). Each codec's number
 is its own chain against its own intra baseline.
 
 **Scope, stated rather than implied.** These are point-class scene *frames*, not
 stitched panoramas and not player-masked plates — the same conservative choice
-BP30 made, so the ratio sits on the axis `PLAN.md` §2.22 already reports. A real
+BP30 made, so the ratio sits on the axis `plans/done/RESEARCH-HISTORY.md` §2.22 already reports. A real
 panorama has less moving content to mispredict, so this is the pessimistic case.
 One video is enough to choose an operating point and is **not** enough for a
 claim: BP30's per-video spread (0.294-0.624) is larger than every effect

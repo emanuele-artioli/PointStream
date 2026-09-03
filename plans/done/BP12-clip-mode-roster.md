@@ -2,7 +2,7 @@
 
 **The critical path. Supersedes `BP10` and takes priority over `BP11`.**
 
-**Read first:** `PLAN.md` §2.7 — Animate-Anyone was being driven at T=1.
+**Read first:** `plans/done/RESEARCH-HISTORY.md` §2.7 — Animate-Anyone was being driven at T=1.
 Clip mode is better. It is not a working engine.
 
 ## Why this is now the top item
@@ -39,7 +39,7 @@ that negative result **citable rather than embarrassing**.
 
 Every temporal engine gets `generate_sequence`; per-frame engines keep
 `generate`. Same clips, same seed, same offsets. Report **LPIPS as the ranking
-key and PSNR alongside** (`PLAN.md` §2.5: the subfield rejects PSNR for
+key and PSNR alongside** (`plans/done/RESEARCH-HISTORY.md` §2.5: the subfield rejects PSNR for
 generative coding, and our own Evaluation section says so).
 
 Include the **static-copy floor at each offset** — §2.5 has it: 21.5 dB at
@@ -53,7 +53,7 @@ ReferenceNet works**, ≈ +0.9 = generic leakage, ≈ 0 = wiring fault.
 
 ### 3. Use LPIPS as the ranking key — it is already cheap
 
-The published `lpips` package is **3.5 ms/frame** (`PLAN.md` §2.7). The 138 ms
+The published `lpips` package is **3.5 ms/frame** (`plans/done/RESEARCH-HISTORY.md` §2.7). The 138 ms
 CPU-VGG number was the fake backend; do not re-open it. Generation is
 **4–6 s per frame**, so LPIPS is a rounding error. VMAF and DISTS stay for
 final results only.
@@ -95,7 +95,7 @@ videos, so it is in-domain only whatever it scores.
 
 - The roster is re-ranked in clip mode with LPIPS as the key and PSNR beside it.
 - The cross-appearance control is re-run in clip mode and judged against bounds.
-- `PLAN.md` §6.2's roster is re-decided on that evidence.
+- `plans/done/RESEARCH-HISTORY.md` §6.2's roster is re-decided on that evidence.
 
 ---
 
@@ -109,7 +109,7 @@ per-control JSON), logs `outputs/bp12-clip-roster.log` and
 `outputs/bp12-cross-appearance.log`. **Not citable**: 12 clips, all from the
 five training-split videos.
 
-Full numbers and their reading are in `PLAN.md` §2.10; `§6.2` is re-decided on
+Full numbers and their reading are in `plans/done/RESEARCH-HISTORY.md` §2.10; `§6.2` is re-decided on
 them. This section says what was done and what it cost.
 
 ### 1. Roster re-run in clip mode — done
@@ -204,4 +204,4 @@ it — the paste, the passthrough, the empty model — before reading the rankin
 - [x] Roster re-ranked in clip mode, LPIPS key, PSNR beside it.
 - [x] Cross-appearance control re-run in clip mode and judged against BP10's
       bounds. **Judged, and the bounds failed the judging.**
-- [x] `PLAN.md` §6.2 re-decided on that evidence. Quality flagship stays unset.
+- [x] `plans/done/RESEARCH-HISTORY.md` §6.2 re-decided on that evidence. Quality flagship stays unset.

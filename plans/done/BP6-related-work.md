@@ -6,7 +6,7 @@ has zero file contention with any code stream and can run fully in parallel.
 **Owns exclusively:** `sections/related_work.tex`, `sections/introduction.tex`,
 `appendices/related_work_extended.tex`, `ref.bib`.
 **Read first:** that repo's own `AGENTS.md` — it is a **separate git repo** with
-its own rules and its own commits. Then `PLAN.md` §6.3.
+its own rules and its own commits. Then `plans/done/RESEARCH-HISTORY.md` §6.3.
 
 ## Why this is urgent rather than cosmetic
 

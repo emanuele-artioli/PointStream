@@ -19,7 +19,7 @@ because it could plausibly fail rather than to execute a line:
    ran.
 7. The quality curve is not flat. BP24 spent a sweep measuring frames that had
    been through the rung's codec *and then* through x264, because a decode
-   named no ``-c:v`` (`plans/BP24-findings.md` §14).
+   named no ``-c:v`` (`plans/done/BP24-findings.md` §14).
 8. **The plate decodes exactly as the anchor decodes.** This one caught a real
    defect: decoding the bitstream straight to a PNG is one conversion instead of
    two and was bit-identical on av1, but lost 0.57 dB on vvc, which is 10-bit.
@@ -129,7 +129,7 @@ class TestTheCodecIsSelectableAndComesFromConfig:
         """The whole point of the axis: it has to arrive from config, not a call site.
 
         ``background.codec`` accepted three values and reached nothing at all
-        until BP24 wired ``make_background`` (`plans/BP24-findings.md` §6), so
+        until BP24 wired ``make_background`` (`plans/done/BP24-findings.md` §6), so
         "the enum has a new member" is not evidence that anything is wired.
         """
         from src.components.background import REGISTRY as BACKGROUND

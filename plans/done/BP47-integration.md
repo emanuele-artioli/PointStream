@@ -1,5 +1,9 @@
 # BP47 — integrate BP44–BP46 before the low-rate search
 
+Archive status (2026-09-03): PRs #52/#53 are merged; old worktrees have been
+removed. Historical next-step instructions below are superseded by
+`../BP49-native-reference-pilot.md`. Native recovery timing still needs validation.
+
 Owner: Codex (cross-workstream integration). Routine E1 execution goes to Cursor
 only after the integration checks pass. No broad encode batch has been launched.
 
@@ -58,7 +62,7 @@ lowered to accommodate these changes.
 ## Remaining gates / handoff
 
 Native-resolution two-scene one-point PointStream preflight: **passed** on
-`68a03dc`, report `plans/BP47-e1-preflight.md`. Source identity, delivered
+`68a03dc`, report `plans/done/BP47-e1-preflight.md`. Source identity, delivered
 shape, ledger, VMAF/PSNR/SSIM, and checkpoint resume are recorded. One 48-frame
 4K point took 73 min of PointStream wall, so it does not fit the hourly
 subprocess budget; per-point checkpoints still cannot resume a killed encoder.

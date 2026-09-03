@@ -1,6 +1,6 @@
 """Is a plate cheaper sent as a delta against a previous scene's plate?
 
-`plans/BP24-findings.md` §17 closed this door on the wrong evidence. It measured
+`plans/done/BP24-findings.md` §17 closed this door on the wrong evidence. It measured
 whether two scenes' first frames are *the same* (they are not: 13.75 dB) and
 concluded that reuse is unavailable. But nobody proposed reusing them unchanged.
 The proposal was to send a **residual against the previous plate**, and a 13.75 dB

@@ -1,8 +1,8 @@
 # B'30 — The background as a stream, not a still per scene
 
 **Why this exists.** The plate is 88–91% of PointStream's payload
-(`plans/BP24-ladder-report.md`), and every scene currently pays for it from
-scratch. `plans/BP24-findings.md` §18 measured that coding the next plate as a
+(`plans/done/BP24-ladder-report.md`), and every scene currently pays for it from
+scratch. `plans/done/BP24-findings.md` §18 measured that coding the next plate as a
 **P-frame** against a previous one saves **31–53%** with av1 — where pixel
 subtraction had cost *more*, which is why §17 wrongly closed this door.
 
@@ -10,8 +10,8 @@ This brief is the design for doing it properly, because the idea has four
 independent parts that have to fit together and each of them can be got wrong
 quietly.
 
-**Read first:** `plans/BP24-findings.md` §§13, 16, 17, 18 ·
-`plans/BP29-plate-rate.md` §3b · `src/components/background/` ·
+**Read first:** `plans/done/BP24-findings.md` §§13, 16, 17, 18 ·
+`plans/done/BP29-plate-rate.md` §3b · `src/components/background/` ·
 `src/contracts/config.py` (`BackgroundConfig`).
 
 ---
@@ -50,7 +50,7 @@ only if the encoder is forbidden from looking ahead:
   `-usage realtime -lag-in-frames 0`, SVT-AV1 `--pred-struct 1 --lookahead 0`).
 
 **Findings §18's numbers were measured without that constraint. They have since
-been re-measured under it, and they survive** (`plans/BP24-findings.md` §19):
+been re-measured under it, and they survive** (`plans/done/BP24-findings.md` §19):
 av1's 0.671 and 0.470 ratios are unchanged **to the byte** with
 `-lag-in-frames 0`, because `-usage realtime` was already lookahead-free. So the
 31–53% is causal and the scheme is achievable live.

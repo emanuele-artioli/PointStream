@@ -1,11 +1,11 @@
 # B'26 — Make the config axes reach the run
 
-**Unblocks `PLAN.md` §7 P0 item 4**, the core ablation lattice. Right now an
+**Unblocks `plans/done/RESEARCH-HISTORY.md` §7 P0 item 4**, the core ablation lattice. Right now an
 ablation on detector, pose, appearance, motion or temporal policy would produce
 a table of identical numbers, because none of those names reach anything.
 
 **Owns:** `src/runner/routing.py`, `src/runner/stages.py`, `config/**`,
-`tests/runner/**`. **Read first:** `AGENTS.md`, `PLAN.md` §2.16 and §4,
+`tests/runner/**`. **Read first:** `AGENTS.md`, `plans/done/RESEARCH-HISTORY.md` §2.16 and §4,
 `outputs/bp23-tier/inert-config-fields.json`, `plans/done/BP23-first-tier-run.md`.
 
 **Does not own** `src/shared/**` or `src/decoder/**` (BP22 is deleting those) or
@@ -65,4 +65,4 @@ group.
 - All 27 fields are classified with evidence, and the ablation axes are wired.
 - Each wired axis has a test proving the name changes the result.
 - The report states which fields were removed and why.
-- `PLAN.md` §7 P0 item 4's blocker line is updated or removed.
+- `plans/done/RESEARCH-HISTORY.md` §7 P0 item 4's blocker line is updated or removed.

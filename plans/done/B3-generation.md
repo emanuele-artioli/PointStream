@@ -102,8 +102,8 @@ epochs), `seg-controlnet` (7), `ip-adapter-controlnet` (10), full
 `spade4tennis_lite_generator.pt`.
 
 This is the socket built with nothing plugged into it. Closing it is **Phase B′**
-— see `PLAN.md` §6, and the briefs that own the work:
-`plans/BP3-generator-loaders.md` (ControlNet family, pix2pix, SPADE, upscale) and
-`plans/BP4-flagship-candidates.md` (Animate-Anyone and modern candidates). Those
+— see `plans/done/RESEARCH-HISTORY.md` §6, and the briefs that own the work:
+`plans/done/BP3-generator-loaders.md` (ControlNet family, pix2pix, SPADE, upscale) and
+`plans/done/BP4-flagship-candidates.md` (Animate-Anyone and modern candidates). Those
 briefs, not this one, own it; this section exists so nobody re-reads B3 and
 concludes generation is finished.

@@ -6,7 +6,7 @@ PSNR is scoped by the letterboxed object mask when one exists. LPIPS cannot be
 computed over a mask — it is a patch metric — so it is scoped to the *bounding
 box of that mask*, and the box actually used travels with the score.
 
-**LPIPS is the ranking key** (`PLAN.md` §2.5: the subfield rejects PSNR for
+**LPIPS is the ranking key** (`plans/done/RESEARCH-HISTORY.md` §2.5: the subfield rejects PSNR for
 generatively reconstructed content, and the usable PSNR range on this task is
 ~11-21 dB against a ~2 dB per-clip sd). PSNR is reported alongside, never
 instead. The LPIPS backend here is the published ``lpips`` package with its

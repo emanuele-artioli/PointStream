@@ -1,11 +1,11 @@
 # BP31 — the paired ladder, over N scenes, with the anchor given the same footage
 
-**Why this exists.** `PLAN.md` §2.20 measured PointStream losing to every codec
+**Why this exists.** `plans/done/RESEARCH-HISTORY.md` §2.20 measured PointStream losing to every codec
 it is built on (BD-rate +116.8% against av1 at preset 10, worse elsewhere), and
 §2.20 named the cause: the plate is 88-91% of the payload and every scene paid
 for it from scratch. BP30 removed that: the background now amortises across
 scenes at **49.2% ± 6.2%** of coding every plate fresh, best case 29.4%
-(`plans/BP30-findings.md` §§22, 29), and it is wired into the runner as
+(`plans/done/BP30-findings.md` §§22, 29), and it is wired into the runner as
 `background.method: panorama-stream` (PR #41).
 
 This is the run that says whether that changed the answer.
@@ -13,7 +13,7 @@ This is the run that says whether that changed the answer.
 ## 0. Scope widened 2026-08-31: run every plate lever, not just this one
 
 This brief was written to price BP30's cross-scene stream. That scope is too
-narrow to be worth a 4K ladder run. `PLAN.md` §7 P0 item 8 names **three** plate
+narrow to be worth a 4K ladder run. `plans/done/RESEARCH-HISTORY.md` §7 P0 item 8 names **three** plate
 levers, and re-running the ladder with one of them on answers a smaller question
 than the one the paper needs.
 
@@ -25,7 +25,7 @@ than the one the paper needs.
 
 **(a) is genuinely unfinished and is the cheapest of the three.** `av1` and
 `vvc` intra sidecars were implemented (BP29 stream B, `sidecar.py`), but the
-plate-codec sweep that ran (`plans/BP29-plate-codec-report.md`) compared only
+plate-codec sweep that ran (`plans/done/BP29-plate-codec-report.md`) compared only
 `jpeg`, `roi-video` and `png` — the intra sidecars were added by a different
 stream and were never in it. That report's conclusion is also *not* the one
 §2.21 assumes: **at the rung the BP24 ladder uses, `jpeg` is the cheaper codec**,
@@ -44,8 +44,8 @@ av1-intra and vvc-intra at the ladder's rung, on the panorama plate rather than
 a source frame — decides which codec the ladder arm should use. Picking it by
 assumption is how the ladder gets run twice.
 
-**Read first:** `plans/BP30-findings.md` §§22-29 · `plans/BP30-background-stream.md`
-§5 (fairness) · `plans/BP24-ladder-report.md` · `plans/BP24-findings.md` §§1, 8,
+**Read first:** `plans/done/BP30-findings.md` §§22-29 · `plans/done/BP30-background-stream.md`
+§5 (fairness) · `plans/done/BP24-ladder-report.md` · `plans/done/BP24-findings.md` §§1, 8,
 12, 14.
 
 ---

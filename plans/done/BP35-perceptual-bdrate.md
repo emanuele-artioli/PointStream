@@ -3,7 +3,7 @@
 **The paper has argued perceptually since the first draft and every BD-rate in it
 is Y-PSNR.** PSNR is the metric that undersells exactly what an object-centric
 codec does — a plate that is subtly wrong everywhere and a player that is
-plausibly rather than identically reconstructed. `plans/prompts/next-session-bp31.md`
+plausibly rather than identically reconstructed. `https://github.com/emanuele-artioli/PointStream/blob/ec581e9/plans/prompts/next-session-bp31.md`
 lists "quality axis" as one of four untried axes for finding a regime where
 PointStream wins, and it is the only one of the four that costs no GPU time.
 
@@ -13,7 +13,7 @@ PointStream wins, and it is the only one of the four that costs no GPU time.
 capability; the BP31 session spends it.
 
 **Read first:** `AGENTS.md` (control the instrument, then the result) ·
-`PLAN.md` §2.7 and §6.5 · `plans/BP24-findings.md` §2 · `plans/BP27` ·
+`plans/done/RESEARCH-HISTORY.md` §2.7 and §6.5 · `plans/done/BP24-findings.md` §2 · `plans/BP27` ·
 `sections/evaluation.tex` `NOTE(sec:eval-instruments)` and
 `GOAL(subsec:eval-metrics)`.
 
@@ -86,7 +86,7 @@ The span floors above are themselves predictions and need a basis:
 Fixing the module is necessary and **not sufficient**, and this is the part that
 was missing from the first version of this brief.
 
-`PLAN.md` §2.16 measured the instruments on this content: **VMAF's ceiling here is
+`plans/done/RESEARCH-HISTORY.md` §2.16 measured the instruments on this content: **VMAF's ceiling here is
 97.54, not 100**, and it **floors at 0.00 for both severe blur and an unrelated
 clip** — nothing resolves below its floor. The BP23 `tier_quality` run scored
 **VMAF 97.4986**, which is the ceiling to three decimal places.
@@ -101,8 +101,8 @@ VMAF curve with almost no span, and the span floor would correctly refuse it.**
 perceptual axis the ladder has to extend *downward* — more rungs, lower rates,
 into the regime where VMAF actually varies and where a generative reconstruction
 is supposed to have an advantage over a starved transform codec. That is the same
-move as the "rate regime" axis in `plans/prompts/next-session-bp31.md`, which
-`plans/BP29-low-rate-report.md` §2 looked at once without the plate levers on.
+move as the "rate regime" axis in `https://github.com/emanuele-artioli/PointStream/blob/ec581e9/plans/prompts/next-session-bp31.md`, which
+`plans/done/BP29-low-rate-report.md` §2 looked at once without the plate levers on.
 
 So the sequence is: **fix the module, then check the span each metric actually
 gets from the current rungs, and extend the ladder downward until it clears the
@@ -111,7 +111,7 @@ over a two-point VMAF range is the degenerate case `MIN_QUALITY_SPAN_DB` exists 
 reject, arriving through a different door.
 
 **LPIPS may behave better than VMAF here** because it does not saturate the same
-way, but it carries its own trap: `PLAN.md` §2.16 found **LPIPS's ordering
+way, but it carries its own trap: `plans/done/RESEARCH-HISTORY.md` §2.16 found **LPIPS's ordering
 inverted at 960x540 while holding at 4K**, so calibration anchors do not transfer
 across resolution. Every LPIPS number must state the resolution it was calibrated
 at, and `plans/BP43-background-representation.md`'s downscaling sweep is exactly a
@@ -133,7 +133,7 @@ extra check rather than the celebration.**
   the perceptual metric is rewarding and check it on frames a human can look at.
   If VMAF prefers PointStream's output, put the frames in the paper and let the
   reader judge.
-- **VMAF had its inputs crossed until 2026-08-23** (`PLAN.md` §2.7). Anything
+- **VMAF had its inputs crossed until 2026-08-23** (`plans/done/RESEARCH-HISTORY.md` §2.7). Anything
   reading VMAF now inherits that history and must show its calibration.
 
 ## Done when

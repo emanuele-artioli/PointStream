@@ -684,7 +684,7 @@ def make_background(
     # Bound once, outside the per-chunk body, because the background model is
     # allowed to be **stateful across chunks**. `panorama-stream` carries the
     # previous scene's reconstruction so the next plate can be coded against it
-    # (`plans/BP30-findings.md` §§20-22); rebinding per chunk would hand it a
+    # (`plans/done/BP30-findings.md` §§20-22); rebinding per chunk would hand it a
     # fresh, empty stream every time and every scene would silently pay for a
     # full keyframe — the amortisation would be configured, reported, and absent.
     # The stateless strategies are unaffected: they keep no state to carry.

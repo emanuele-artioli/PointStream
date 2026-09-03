@@ -26,7 +26,7 @@ MIN_POINTS = 2
 #: encoder discards incompressible noise at every QP and PSNR saturates. Both
 #: curves were flat, so they overlapped almost completely — `overlap_fraction`
 #: came out at 1.0 and this function returned a confident-looking BD-rate of
-#: -0.88 over a range where nothing was resolved (`plans/BP24-findings.md` §2).
+#: -0.88 over a range where nothing was resolved (`plans/done/BP24-findings.md` §2).
 #:
 #: Three dB is a little over one QP step of separation on real content; the real
 #: four-frame curves that established the instrument in the same session spanned
@@ -176,7 +176,7 @@ def compare_rd_curves(
     Two guards, and they catch opposite failures. ``min_overlap_fraction`` is
     relative: it rejects curves that barely meet. ``min_quality_span`` is
     absolute: it rejects curves that meet everywhere but span nothing, which
-    the relative guard cannot see (`plans/BP24-findings.md` §2).
+    the relative guard cannot see (`plans/done/BP24-findings.md` §2).
 
     The span floor is a property of the metric. PSNR, VMAF, SSIM and LPIPS
     carry theirs on the spec. A metric with no floor still requires the

@@ -47,7 +47,7 @@ least six stages.
 on top of roughly twice its rate. The three-dimension rule earned itself in one
 run: a two-column table could not have said that.
 
-**Read it as an order of magnitude only.** `plans/BP31-findings.md` §10 measured
+**Read it as an order of magnitude only.** `plans/done/BP31-findings.md` §10 measured
 a within-point spread on repeated 4K encodes larger than a whole knob sweep's
 range, so a factor of 1.2 in that column means nothing. Which is exactly the
 argument for this brief: an order-of-magnitude figure with no stage breakdown

@@ -13,16 +13,16 @@ GPU time, so it goes second in its wave, behind whatever else can run free.
 
 | Gate | Brief | Why |
 |---|---|---|
-| ~~Headroom~~ | `BP20` | ✅ **PASSED 2026-08-23.** A player is ~1% of the pixels and **17–24%** of the bitrate on real 4K, a 15–47× concentration (`PLAN.md` §2.14). The premise holds; this brief is unblocked on that gate. |
+| ~~Headroom~~ | `BP20` | ✅ **PASSED 2026-08-23.** A player is ~1% of the pixels and **17–24%** of the bitrate on real 4K, a 15–47× concentration (`plans/done/RESEARCH-HISTORY.md` §2.14). The premise holds; this brief is unblocked on that gate. |
 | **Stop rule** | `BP14` | ✅ **LANDED 2026-08-24.** `TaskStopRule` observes coding-task LPIPS, never diffusion loss. CI `32747593873`. |
-| ~~Instrument~~ | `BP18` | ✅ **DONE 2026-08-23.** `reid` + `palette`, calibrated on ground-truth pairs at 17.1σ, with `IdentityScale` so a score is quoted between its measured anchors (`PLAN.md` §2.12). Use it. |
-| ~~Caption channel~~ | `BP17` | ✅ **DONE 2026-08-23, and the answer is nothing.** Switching it on moved three arms inside noise and pose-controlnet 1.5σ *worse* (`PLAN.md` §2.15). The text channel is not where the appearance problem lives — do not spend more on it. |
+| ~~Instrument~~ | `BP18` | ✅ **DONE 2026-08-23.** `reid` + `palette`, calibrated on ground-truth pairs at 17.1σ, with `IdentityScale` so a score is quoted between its measured anchors (`plans/done/RESEARCH-HISTORY.md` §2.12). Use it. |
+| ~~Caption channel~~ | `BP17` | ✅ **DONE 2026-08-23, and the answer is nothing.** Switching it on moved three arms inside noise and pose-controlnet 1.5σ *worse* (`plans/done/RESEARCH-HISTORY.md` §2.15). The text channel is not where the appearance problem lives — do not spend more on it. |
 
 ## Where the conditioning actually stands
 
 Not "the generators do not use appearance" — that is too coarse to plan from.
 Three channels are registered and all three are in a different state
-(`PLAN.md` §2.11):
+(`plans/done/RESEARCH-HISTORY.md` §2.11):
 
 | Channel | Registered as | State | What this brief owes it |
 |---|---|---|---|
@@ -232,4 +232,4 @@ TENNIS_SCALE). Inside the band. Epochs 2 and 3 are flat with epoch 1.
 **Clip-mean extra check** (n=12, after the item-level result looked good):
 beats stock 5.5σ; own vs shuffled appearance 3.8σ LPIPS / 3.6σ reid — **uses
 appearance**; loses to paste 4.1σ; vs unrelated 1.3σ — not a result. Details
-`outputs/bp25-ip-adapter/`, `PLAN.md` §2.17.
+`outputs/bp25-ip-adapter/`, `plans/done/RESEARCH-HISTORY.md` §2.17.

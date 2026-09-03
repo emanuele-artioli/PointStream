@@ -18,7 +18,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-# Roster floors from PLAN.md §2.10, 12 probe clips, offsets 1–8.
+# Roster floors from plans/done/RESEARCH-HISTORY.md §2.10, 12 probe clips, offsets 1–8.
 # A stop-eval on a *subset* must replace these with a measured floor written
 # to bounds.json before training starts. These are the fallback labels only.
 DEFAULT_FLOOR_PSNR = 13.51

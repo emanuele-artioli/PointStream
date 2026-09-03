@@ -38,7 +38,7 @@ class SizesBytes:
     Summing across chunks is therefore still correct, and is correct *because*
     chunk 0 is in the sum. Dropping it, or treating the mean per-chunk figure as
     the cost of a plate, would report an amortisation the run never achieved.
-    `plans/BP30-findings.md` §22 is the measurement this accounting has to carry.
+    `plans/done/BP30-findings.md` §22 is the measurement this accounting has to carry.
     """
 
     source: int
@@ -50,7 +50,7 @@ class SizesBytes:
     # Components still counted as raw array size rather than a coded bitstream.
     # A total mixing coded and raw parts is not a rate, and dividing it by the
     # source produces a number that looks like a compression ratio and is not
-    # (`PLAN.md` §3, BP24). Empty means every part was really coded.
+    # (`plans/done/RESEARCH-HISTORY.md` §3, BP24). Empty means every part was really coded.
     raw_parts: tuple[str, ...] = ()
 
     @property

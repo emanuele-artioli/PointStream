@@ -1,5 +1,11 @@
 # BP46 — Long eligible tennis-scene manifest
 
+**Current state (3 September):** diagnostic inputs are available; independent
+confirmation is incomplete. PR #52 contains the working extraction validation.
+An incomplete later deletion was archived at
+`archive/bp46-incomplete-extraction-2026-09-03`, not merged. The next execution
+gate is BP49, not an unrestricted E1 batch. Do not count this whole brief done.
+
 **Roadmap ID:** D1  
 **Preferred harness:** Cursor or VS Code with Antigravity.  
 **Outcome:** validated 2/4/8/16-second first-domain inputs for the low-rate search

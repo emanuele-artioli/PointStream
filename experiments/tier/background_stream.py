@@ -1,6 +1,6 @@
 """What does scene *n*'s background cost, given scenes 1..n-1?
 
-`plans/BP24-findings.md` §18 and §19 answered that for a *pair* of plates: av1
+`plans/done/BP24-findings.md` §18 and §19 answered that for a *pair* of plates: av1
 saves 31-53% coding the second as a P-frame against the first, and the saving
 is causal. This prices it over a **sequence**, which is the form the claim has
 to take before the paper can say the background amortises: the marginal cost per

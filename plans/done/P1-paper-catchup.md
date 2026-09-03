@@ -4,7 +4,7 @@
 (`67a9ea6275d3d9785ce57026/`), so it contends with no code stream.
 
 **Owns exclusively:** that repo. **Read first:** its own `AGENTS.md` — separate
-git repo, own rules, own commits — then `PLAN.md` §2.
+git repo, own rules, own commits — then `plans/done/RESEARCH-HISTORY.md` §2.
 
 ## Where the paper stands
 
@@ -17,7 +17,7 @@ headline result.
 
 ### 1. The generative engines do not use appearance — the big one
 
-`PLAN.md` §2.6. Measured on the coding task, 12 clips, seed 42:
+`plans/done/RESEARCH-HISTORY.md` §2.6. Measured on the coding task, 12 clips, seed 42:
 
 | Arm | Object PSNR |
 |---|---|
@@ -29,7 +29,7 @@ Cause: `scripts/train_controlnet.py` trains on condition + a fixed caption, with
 **no reference image**, so the checkpoints synthesise *a* player, never *this*
 player.
 
-This is what `PLAN.md` §7 P0 item 5 called *"a working generative engine, or an
+This is what `plans/done/RESEARCH-HISTORY.md` §7 P0 item 5 called *"a working generative engine, or an
 honest scoped negative result."* It is currently the second. Update
 `HOLE(sec:evaluation)`, which still says the blocker is that *"no generative
 engine has been selected on evidence... best probe scored 15.8 VMAF"* — that is
@@ -40,7 +40,7 @@ difference between a scoped negative result and a dead paper.
 ### 2. Quality is measured region-scoped
 
 The Evaluation section says nothing about it, and it is now architectural
-(`PLAN.md` §6.4): a frame-level score hides a broken object, so object generation
+(`plans/done/RESEARCH-HISTORY.md` §6.4): a frame-level score hides a broken object, so object generation
 is scored on the object and background on the background, with whole-frame
 reported alongside rather than instead. Add it to `subsec:eval-metrics`.
 
@@ -59,7 +59,7 @@ detail.
 
 ### 5. Animate-Anyone has seen the held-out videos
 
-`PLAN.md` §2.5: its fine-tuning set covers all 7 videos including both held-out
+`plans/done/RESEARCH-HISTORY.md` §2.5: its fine-tuning set covers all 7 videos including both held-out
 ones. Any AA number is in-domain. `subsec:eval-general` exists precisely to
 separate fine-tuned from pretrained, so this constraint must be stated there
 rather than discovered by a reviewer.

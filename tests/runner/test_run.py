@@ -249,7 +249,7 @@ def test_objects_misaligned_with_chunks_are_refused() -> None:
 # residual stage produced it*. Since BP24 codes that residual, the clip the
 # pipeline actually delivers is rebuilt from what the codec returned, and the
 # two arrays diverge by exactly the residual's coding loss. Pairing a coded rate
-# with `frames` is `plans/BP24-findings.md` §4 — two real numbers at two
+# with `frames` is `plans/done/BP24-findings.md` §4 — two real numbers at two
 # different operating points, and on a rate ladder the error would not look
 # like one, because sweeping the residual's rung is what makes them differ.
 # ---------------------------------------------------------------------------

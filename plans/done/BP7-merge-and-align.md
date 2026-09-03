@@ -6,11 +6,11 @@ shared registry, so two agents doing it at once would collide.
 
 **Owns:** the merge, `src/components/generation/__init__.py`,
 `experiments/probe_set/materialize.py`, `experiments/probe_set/verify.py`.
-**Read first:** `PLAN.md` §2.1 and §2.3.
+**Read first:** `plans/done/RESEARCH-HISTORY.md` §2.1 and §2.3.
 
 ## 1. Fix the pose alignment — do this before the merge, not after
 
-`PLAN.md` §2.3 has the evidence. In `assets/dataset`, a track's directories use
+`plans/done/RESEARCH-HISTORY.md` §2.3 has the evidence. In `assets/dataset`, a track's directories use
 **two different frame-naming conventions**:
 
 | Directory | Naming |
@@ -40,7 +40,7 @@ count as the crop.** That single assertion would have caught this.
 
 ## 2. Re-run BP3's five numbers on aligned pairs
 
-`PLAN.md` §2.1 records pose-ControlNet at 20.3 dB, "smeared but recognisable".
+`plans/done/RESEARCH-HISTORY.md` §2.1 records pose-ControlNet at 20.3 dB, "smeared but recognisable".
 That smearing is what misaligned conditioning looks like, so those numbers are
 suspect. Re-run all five comparison-backbone engines on the fixed probe set,
 same seed (42), same checkpoint epochs, and replace the table.
@@ -55,7 +55,7 @@ Merge `phase-bp/bp1`, `bp2`, `bp3`, `bp4` into `phase-b/integrate` (or a fresh
 `trajectory-controlnet`, `stable-animator`, and the Animate-Anyone summary
 update. BP3 and BP4 deliberately left
 `src/components/generation/__init__.py` alone and recorded the entries in
-`plans/README.md`; applying them earlier would have registered modules that were
+`plans/done/README.md`; applying them earlier would have registered modules that were
 not yet on the tree.
 
 The paper branch `phase-bp/bp6` merges separately, in its own repo.
@@ -88,6 +88,6 @@ regenerator. Either delete it or make it call the v2 path.
 - The verifier asserts conditioning frame counts match the crop, and fails on the
   current v2 tree before it passes on the fixed one.
 - All 12 clips have 48 colour frames **and** 48 skeleton frames.
-- BP3's five numbers are re-run on aligned pairs and `PLAN.md` §2.1 updated.
+- BP3's five numbers are re-run on aligned pairs and `plans/done/RESEARCH-HISTORY.md` §2.1 updated.
 - The four branches are merged and the registry entries applied in one edit.
 - `ruff`, `mypy`, tests, layer check pass.

@@ -1,90 +1,70 @@
 # PointStream
 
-An object-centric semantic video codec. Rather than transmitting compressed pixel
-residuals like H.264, HEVC or AV1, PointStream transmits semantic understanding —
-each salient object's appearance and motion, plus a background model and an
-optional corrective residual — and reconstructs frames generatively on the
-client. The trade is bandwidth for client-side compute.
+An object-centric hybrid video-codec research project targeting ACM TOMM by
+**30 September 2026**. Eligible scenes use reusable background information and
+object appearance/motion, with optional generation and corrective residuals;
+ineligible scenes use conventional coding. No confirmed rate–quality win has
+been established yet. The current search keeps generation off.
 
-The initial domain is **tennis**, chosen because the camera is largely static,
-the background is knowable, actors are few and occlusions are mild. The
-architecture is not tennis-specific: the task domain is a configuration.
+## Start here
 
-> **This README is deliberately minimal.** The system is mid-rewrite, and a
-> README describing an architecture that is being replaced is worse than a short
-> one. See `PLAN.md` for what the system is and where it stands, and the paper's
-> System Design section for why it is built this way. **TODO:** write this
-> properly once the rewrite lands and the pipeline is stable.
+- `PLAN.md`: concise current state and next task.
+- `HANDOFF.md`: next-session entry point and operational cautions.
+- `plans/ROADMAP.md`: submission gates, priorities and harness assignments.
+- `plans/README.md`: active/parked briefs; `plans/done/`: historical reports.
+- `AGENTS.md`: shared project instructions for coding agents.
 
-## Where things are
+## Repository layout
 
-| You want | Look at |
+| Path | Purpose |
 |---|---|
-| What the system is, status, what is next | `PLAN.md` |
-| Rules for working here (agents read this automatically) | `AGENTS.md` |
-| The spec for one workstream | `plans/` |
-| What a component must satisfy | `src/contracts/` |
-| The manuscript | `67a9ea6275d3d9785ce57026/` — a separate git repo |
+| `src/` | Codec components, contracts and runner |
+| `tests/` | Behaviour and regression tests |
+| `experiments/` | Tracked experiment drivers and analysis code |
+| `scripts/` | Setup, training, test-gate and reproducibility tools |
+| `config/`, `manifests/` | Configurations and input descriptions |
+| `outputs/` | Generated runs/logs under the data root; not source code |
+| `67a9ea6275d3d9785ce57026/` | Manuscript: a separate Overleaf-synced Git repo |
 
-## Prerequisites
+Keep `experiments/` and `outputs/` separate. The former reproduces a study; the
+latter contains its results. `DATA.md` explains `.ps-data-root` and external data
+storage. Do not merge large generated data into the tracked code tree. Source
+footage is YouTube-derived and is not promised for redistribution.
 
-System FFmpeg tools, with `libvmaf` enabled for VMAF evaluation:
+## Agents and tools
 
-```bash
-sudo apt-get update && sudo apt-get install -y ffmpeg
+Codex reads `AGENTS.md`; a project `.codex/` directory is optional and only
+needed for project-specific Codex settings. Shared instructions should not be
+duplicated there. `.cursor/rules/host.mdc` points Cursor to host instructions;
+`.github/` contains CI and Copilot instructions, not just editor settings.
+Claude uses `CLAUDE.md`. The old `.claude/` held temporary worktrees and was
+removed when those worktrees were retired; no replacement directory is needed.
+
+See the official documentation for
+[AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md) and
+[optional project configuration](https://learn.chatgpt.com/docs/config-file/config-basic).
+
+Codex/Claude handle high-level analysis and delicate integration. Cursor and
+VS Code with Antigravity handle bounded routine tasks. Each session receives
+one brief and returns the fields in `plans/SESSION-REPORT.md`.
+
+## Environment and checks
+
+Use the existing `pointstream` conda environment on this host. No sudo/apt and
+no ad-hoc installs into that pinned environment. Dependencies are declared in
+`pyproject.toml`; `environment.yaml` bootstraps GPU binaries. Set `PYTHONPATH`
+to the actual checkout and keep regenerable caches on local disk.
+
+```sh
+export PYTHONPATH="$PWD" PYTHONDONTWRITEBYTECODE=1
+export MYPY_CACHE_DIR=/tmp/mypy-pointstream RUFF_CACHE_DIR=/tmp/ruff-pointstream
+conda run -n pointstream --no-capture-output ruff check
+conda run -n pointstream --no-capture-output mypy --config-file pyproject.toml
+conda run -n pointstream --no-capture-output python -m src.contracts.layers
+conda run -n pointstream --no-capture-output pytest -o cache_dir=/tmp/pytest-pointstream
 ```
 
-To force non-default executable paths:
-
-```bash
-export FFMPEG_BIN=/opt/local/bin/ffmpeg
-export FFPROBE_BIN=/opt/local/bin/ffprobe
-```
-
-Encoders used by the codec ladder: `libx264` and `libvvenc` through ffmpeg,
-`kvazaar` and `SvtAv1EncApp` as standalone binaries. Region-of-interest control
-is only reachable through the standalone binaries, and requires SVT-AV1 1.8 or
-newer.
-
-## Environment
-
-`environment.yaml` is a GPU bootstrapper only — it fetches the heavy CUDA and
-PyTorch binaries that pip struggles with. Every other Python package is managed
-by `pyproject.toml`.
-
-```bash
-conda env create -f environment.yaml
-conda activate pointstream
-pip install -e .
-```
-
-## Model weights
-
-Weights live in `assets/weights/`, mostly as symlinks to a shared model store.
-Required for the default configuration: `yolo26n.pt`, `yolo26n-seg.pt`,
-`yolo26n-pose.pt`. Optional for backend comparisons: `sam3.pt`,
-`yoloe-26n-seg.pt` with `mobileclip2_b.ts`.
-
-If a symlink dangles, ultralytics silently downloads a replacement into the
-working directory rather than failing — so check that every weight a config names
-actually resolves.
-
-## Development
-
-```bash
-conda run -n pointstream python -m pytest tests/ -q
-conda run -n pointstream ruff check src tests scripts experiments
-conda run -n pointstream mypy --config-file pyproject.toml
-conda run -n pointstream python -m src.contracts.layers   # import direction
-```
-
-Pre-commit hooks: `pre-commit install`, then `pre-commit run --all-files`.
-
-## Containers and CI
-
-CPU and GPU images build from `Dockerfile.cpu` and `Dockerfile.gpu`; the GPU
-image needs the NVIDIA Container Toolkit. CI runs lint, typecheck and tests on
-every push and pull request; `release.yml` builds distributions on a `v*` tag.
-**CI on `main` is expected to be green. A red `main` blocks merging** — the next
-real regression is otherwise invisible. Weights are gitignored, so tests that
-need them are marked `integration` and are deselected on the runner.
+Use executable paths and versions recorded by the experiment protocol. The
+background stream, residual and independent reference may use different codec
+implementations/presets; do not conflate them. Build the paper from its own repo
+with `conda run -n tex --no-capture-output bash tools/build_pdf.sh`.

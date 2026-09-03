@@ -1,6 +1,6 @@
 """One background frame per scene, for a sequence long enough to amortise over.
 
-BP24's ladder measured two clips. `plans/prompts/claude-bp30.md` is explicit
+BP24's ladder measured two clips. `https://github.com/emanuele-artioli/PointStream/blob/ec581e9/plans/prompts/claude-bp30.md` is explicit
 that this does not meet the bar `presley` uses (n>=6 videos before a
 significance claim), and BP30 needs something worse than that: a *multi-scene*
 sequence, where the whole question is what scene *n* costs given scenes 1..n-1.

@@ -8,12 +8,12 @@ than rewritten here. Bounds authored after hearing a prediction are not bounds.
 **The claim being tested.** The plate is 88-91% of the payload and is paid once
 per scene *whatever the scene's length*, so frames-per-scene is a direct divisor
 on the dominant cost. Every ladder in this project has run at eight frames; the
-BP21 cache holds forty-eight, and `PLAN.md` §2.14's headroom was measured over
+BP21 cache holds forty-eight, and `plans/done/RESEARCH-HISTORY.md` §2.14's headroom was measured over
 those forty-eight. So the headroom was measured over 48 frames and the system
 scored over 8.
 
 **Span is the only thing that moves.** Scene count stays at N=2, the value
-`plans/BP31-findings.md` §9's BD-rate was taken at, so the numbers here are
+`plans/done/BP31-findings.md` §9's BD-rate was taken at, so the numbers here are
 directly comparable to it. BP33 §5: span and scene count are both amortisation
 axes on the same fixed cost, they interact, and one sweep run over both will not
 separate them. BP30 moved one lever on one video and had two conclusions invert
@@ -27,7 +27,7 @@ not. A mean scores that the same as a uniform reconstruction, and they are
 different products.
 
 **The anchor gets the same span**, encoded jointly, with the joint-versus-separate
-control from `plans/BP31-findings.md` §5 carried at every point. A longer span
+control from `plans/done/BP31-findings.md` §5 carried at every point. A longer span
 helps the anchor too — one intra keyframe amortising over more inter frames — and
 the whole question is which arm it helps more.
 

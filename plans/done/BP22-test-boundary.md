@@ -6,7 +6,7 @@ pre-rewrite tree are still imported by new code"* — is no longer true, and tha
 is why it stopped. Read BP15 for the history; take the numbers below as current.
 
 **Owns:** `src/decoder/**`, `src/shared/**`, the remaining 32 top-level
-`tests/test_*.py`. **Read first:** `AGENTS.md`, `PLAN.md` §2, `plans/BP15-test-cull.md`.
+`tests/test_*.py`. **Read first:** `AGENTS.md`, `plans/done/RESEARCH-HISTORY.md` §2, `plans/done/BP15-test-cull.md`.
 
 ## Where the cull actually got to
 
@@ -50,7 +50,7 @@ tree"; it is a mix. **Nothing else in this brief can proceed until that is
 resolved**, because "delete `src/shared`" and "keep the stop rule" cannot both
 be true.
 
-Pick one and record it in `PLAN.md` §3:
+Pick one and record it in `plans/done/RESEARCH-HISTORY.md` §3:
 
 - **(a) `src/shared/` becomes a real layer** with a contract and a place in
   `src.contracts.layers`, and the pre-rewrite files move *out* of it or die.

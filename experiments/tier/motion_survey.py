@@ -1,6 +1,6 @@
 """Which cached clip is high motion? Measure it; do not call one 'dynamic'.
 
-`plans/BP24-findings.md` §7 records both of BP24's headline ratios as the *easy*
+`plans/done/BP24-findings.md` §7 records both of BP24's headline ratios as the *easy*
 case — a residual that was 2.5% non-zero against a static plate — and says to
 re-measure on high motion. That instruction is only actionable if "high motion"
 is a number attached to a named clip rather than an impression of a sport.

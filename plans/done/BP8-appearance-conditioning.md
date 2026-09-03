@@ -1,14 +1,14 @@
 > **SUPERSEDED 2026-08-23 by `BP10-appearance-pathway.md`.** Its options were
 > tried in Wave 3. Option A (retrain with a reference) is measured, flat and
 > understood — do not repeat it. Options B and B2 were read against the
-> static-copy floor, which `PLAN.md` §2.4 shows answers a different question.
+> static-copy floor, which `plans/done/RESEARCH-HISTORY.md` §2.4 shows answers a different question.
 > Kept for the bounds discipline and the record of what was tried.
 
 # B′8 — Make the generator actually use appearance
 
-**The critical path. Everything in `PLAN.md` §7 P0 except item 1 is behind it.**
+**The critical path. Everything in `plans/done/RESEARCH-HISTORY.md` §7 P0 except item 1 is behind it.**
 
-**Read first:** `PLAN.md` §2.6 — the evidence that this is a training-design
+**Read first:** `plans/done/RESEARCH-HISTORY.md` §2.6 — the evidence that this is a training-design
 problem, not a tuning problem.
 
 ## The finding
@@ -29,7 +29,7 @@ they cannot reproduce *this* player. `ip-adapter-controlnet` is a segmentation
 ControlNet mislabelled (line 82).
 
 **No parameter search fixes this.** Tuning is ruled out on evidence, which
-removes the cheapest rung from `PLAN.md` §6.6's cost order.
+removes the cheapest rung from `plans/done/RESEARCH-HISTORY.md` §6.6's cost order.
 
 ## The options, cheapest first
 
@@ -72,10 +72,10 @@ It is hours of work and it may be the whole answer. A is days.
 
 A properly-wired IP-Adapter is the cheapest of these: the existing
 `ip-adapter-controlnet` checkpoint is a mislabelled segmentation ControlNet
-(`PLAN.md` §2.6), but the *architecture* accepts an image as appearance. Wiring
+(`plans/done/RESEARCH-HISTORY.md` §2.6), but the *architecture* accepts an image as appearance. Wiring
 a real IP-Adapter against the stock SD-1.5 backbone needs no retraining.
 
-StableAnimator remains licence-blocked on SVD-XT (`PLAN.md` §2.4).
+StableAnimator remains licence-blocked on SVD-XT (`plans/done/RESEARCH-HISTORY.md` §2.4).
 
 ### Option C — change what the paper claims is transmitted
 
@@ -119,4 +119,4 @@ all stand. The pipeline work is unaffected; only the roster claim is.
 
 - One engine beats the 11.82 dB static-copy floor on the coding task, or all
   options are tried and the negative result is written down with numbers.
-- `PLAN.md` §6.2 roster is re-decided on coding-task numbers.
+- `plans/done/RESEARCH-HISTORY.md` §6.2 roster is re-decided on coding-task numbers.

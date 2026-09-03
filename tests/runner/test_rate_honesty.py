@@ -1,6 +1,6 @@
 """A mixed coded/raw ledger must not present a compression ratio (BP24).
 
-`PLAN.md` §3: a path reports its ratio only when no component in it is still
+`plans/done/RESEARCH-HISTORY.md` §3: a path reports its ratio only when no component in it is still
 raw. A total that mixes a coded bitstream with an array size looks like a rate
 and is not — and a raw number is more dangerous once its neighbours are real,
 because the total stops being obviously wrong.

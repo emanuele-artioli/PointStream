@@ -26,7 +26,7 @@ into the pipeline path is this stream's most load-bearing task.
 **Rate-distortion comparison.** Implement **BD-rate** (Bjontegaard delta rate)
 and BD-PSNR/BD-VMAF over a pair of rate-distortion curves, plus the overlap
 range the integral is defined on. This is the currency every component ablation
-and every codec comparison is settled in (`PLAN.md` §5), so it belongs here
+and every codec comparison is settled in (`plans/done/RESEARCH-HISTORY.md` §5), so it belongs here
 rather than in an experiment script. Two configurations never land at the same
 bitrate or the same quality, so a point-to-point comparison compares nothing;
 the only exception is dominance, where one arm is better on both axes, and a
@@ -76,7 +76,7 @@ code:
 VMAF runs through real libvmaf. This closes the blocker that had stood since
 July, when no configuration produced a quality number at all.
 
-**BD-rate landed** in `bd_rate.py` with the pieces `PLAN.md` §5 requires:
+**BD-rate landed** in `bd_rate.py` with the pieces `plans/done/RESEARCH-HISTORY.md` §5 requires:
 `compare_rd_curves`, `RDCurve`, `OperatingPoint`, `MIN_OVERLAP_FRACTION`,
 `MIN_POINTS`, and an explicit `InsufficientOverlapError` — so a comparison over
 a sliver of shared quality raises rather than quietly returning a number.

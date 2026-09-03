@@ -6,7 +6,7 @@
 `src/components/generation/mofa.py`, any **new** engine wrapper it adds, and
 `tests/components/test_generation_flagship.py`.
 **Does not own** the ControlNet family — that is B′3's.
-**Read first:** `PLAN.md` §6.2 and §6.3.
+**Read first:** `plans/done/RESEARCH-HISTORY.md` §6.2 and §6.3.
 
 ## What this stream is for
 
@@ -31,7 +31,7 @@ are two reasons to doubt it:
 **First, make the incumbent evaluable.** Wire `animate_anyone.py` to its
 checkpoint and get a number. We cannot judge a replacement without a baseline,
 and `scripts/eval_checkpoint.py`'s `ARCH_CHOICES` still has no entry for it.
-A full retrain is explicitly *not* in scope (`PLAN.md` §7 P2 item 17).
+A full retrain is explicitly *not* in scope (`plans/done/RESEARCH-HISTORY.md` §7 P2 item 17).
 
 **Then, evaluate one modern candidate.** Surveyed 2026-08-22, in adoption-cost
 order:
@@ -70,7 +70,7 @@ decode one clip, `subsec:eval-operating` has to say so. Record peak memory and
 wall-clock per clip alongside quality, from the first run.
 
 **Do not let the flagship quietly become the comparison backbone.** They serve
-different questions (`PLAN.md` §6.2). If this engine also wins `eval-object`, the
+different questions (`plans/done/RESEARCH-HISTORY.md` §6.2). If this engine also wins `eval-object`, the
 roles collapse and the narrative gets simpler — but that is `BP5`'s call to make
 on evidence, not an assumption to build on.
 

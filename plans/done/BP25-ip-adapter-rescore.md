@@ -1,11 +1,11 @@
 # B'25 — Re-score IP-Adapter on an instrument that can rank models
 
-**Closed `PLAN.md` §7 P0 item 5 on 2026-08-26.** Honest scoped negative on a
+**Closed `plans/done/RESEARCH-HISTORY.md` §7 P0 item 5 on 2026-08-26.** Honest scoped negative on a
 working engine (still loses to a paste). The appearance path is real.
 
 **Owns:** `scripts/train_controlnet.py` (eval path only),
 `src/shared/training/task_eval.py`, `outputs/bp25-ip-adapter/**`,
-`plans/BP19-conditioning-architecture.md`.
+`plans/done/BP19-conditioning-architecture.md`.
 
 ## Result
 
@@ -31,7 +31,7 @@ Stale-checkpoint bug: mid-epoch evals now write
 `checkpoint-epoch-{N}-step-{S}` and always save before scoring.
 
 Uni-ControlNet remains last. Artifacts: `outputs/bp25-ip-adapter/`.
-`PLAN.md` §2.17.
+`plans/done/RESEARCH-HISTORY.md` §2.17.
 
 ## History — why the 2026-08-25 stop-eval was not a ranking
 

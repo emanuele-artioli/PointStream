@@ -5,7 +5,7 @@ appearance. That question is real but it is being asked inside a 10 dB band with
 2 dB noise, using a metric the subfield rejects for generative content, about a
 region that is 1% of the frame. Answer the bigger question first.
 
-**Read first:** `PLAN.md` §2.5 and §2.6.
+**Read first:** `plans/done/RESEARCH-HISTORY.md` §2.5 and §2.6.
 
 ## Step 1 — How much is the player region actually worth? (do this first)
 
@@ -32,11 +32,11 @@ possibly win on the object path is bounded by it.
   measured.
 
 **Do not skip the matched-quality part.** A flattened region also changes
-quality; comparing raw file sizes measures nothing (`PLAN.md` §5).
+quality; comparing raw file sizes measures nothing (`plans/done/RESEARCH-HISTORY.md` §5).
 
 ## Step 2 — Change the evaluation currency to what the field uses
 
-`PLAN.md` §2.5: generative face video coding states plainly that because these
+`plans/done/RESEARCH-HISTORY.md` §2.5: generative face video coding states plainly that because these
 methods do not optimise pixel distortion, *"PSNR and SSIM are not suitable"*.
 Sparse2Dense's headline 74.5% BD-rate is **DISTS**; LPIPS and FVD sit beside it.
 Our own Evaluation section says the same thing and we gated on PSNR anyway.
@@ -51,7 +51,7 @@ Our own Evaluation section says the same thing and we gated on PSNR anyway.
 
 ## Step 3 — Run the experiment the paper actually claims
 
-`PLAN.md` §7 P0 item 2 — PointStream against the codec ladder at matched rate,
+`plans/done/RESEARCH-HISTORY.md` §7 P0 item 2 — PointStream against the codec ladder at matched rate,
 frame level, with the residual — **has never been run**, in any configuration.
 Every measurement so far has been component triage.
 
@@ -76,7 +76,7 @@ removes a defect that contaminates every object-level number.
 both a large and a small number are useful — a small one redirects the paper
 early, which is worth more in August than a large one is.
 
-**Do not drop PSNR.** It stays always-on and always reported (`PLAN.md` §3). The
+**Do not drop PSNR.** It stays always-on and always reported (`plans/done/RESEARCH-HISTORY.md` §3). The
 change is that it stops being the *ranking key* for generative arms.
 
 **A metric change is not a way to make a bad result look good, and must not read

@@ -1,6 +1,6 @@
 """Code the next plate as a P-frame against the previous one, not as a subtraction.
 
-`plans/BP24-findings.md` §17 tested the wrong mechanism. It subtracted two plates
+`plans/done/BP24-findings.md` §17 tested the wrong mechanism. It subtracted two plates
 pixel by pixel and coded the difference, which is the worst available way to do
 this: subtraction destroys the spatial correlation a transform coder depends on,
 turning every misaligned edge into a double edge. Unsurprisingly the delta cost

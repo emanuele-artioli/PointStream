@@ -14,7 +14,7 @@ into the output. A paste maximises that by construction.
 So read a delta as *dependence*, never as *quality*, and always beside the arm's
 own score against the static-copy floor. The two say different things: an engine
 can depend heavily on the reference and still reconstruct the player badly, and
-on this probe set every engine does (``PLAN.md`` §2.10).
+on this probe set every engine does (``plans/done/RESEARCH-HISTORY.md`` §2.10).
 
 **The scale is measured, not assumed.** A pure paste scores ~0.285 LPIPS on this
 probe set, and that is the top of a *copying* axis. Without that anchor the

@@ -91,7 +91,7 @@ refactored.
 | 45 | 156,710 | **156,710** | 41.646 | **41.65** |
 | 55 | 85,995 | **85,995** | 39.448 | **39.45** |
 
-**No second encoder.** `plans/BP24-findings.md` §14: a decode naming no `-c:v`
+**No second encoder.** `plans/done/BP24-findings.md` §14: a decode naming no `-c:v`
 re-encodes through the muxer's default (libx264 for `.mkv`) and caps every
 returned quality — the pre-fix table for these same five rungs read 41.71,
 41.67, 41.43, 40.65, 38.94 dB, pinned near x264's own ceiling. This run returns
@@ -106,7 +106,7 @@ At the extended end the flat-quality signature is absent: every step moves both
 axes (§3).
 
 **Nothing was clamped, and that is a positive control rather than an
-inference.** `plans/BP24-findings.md` §15 warns that an out-of-range rung is
+inference.** `plans/done/BP24-findings.md` §15 warns that an out-of-range rung is
 caught only by the encoder refusing it, and that an encoder which *clamped*
 instead would produce "a rung that looks like a rung, at a quantizer nobody
 asked for". `QP_BOUNDS` in `src/components/codec/encode.py` is consulted only on
@@ -318,7 +318,7 @@ aimed at the wrong object; alarms phrased as ranges do not.**
 path, not in anything Stream C owns, and fixing it is out of scope here. It
 should be recorded against `coded_roundtrip`: the high-quality end of every
 paired ladder run so far is compressed against a 44.44 dB cap that applies to
-one arm only. `plans/BP24-findings.md` SS12 reached for a 4:2:0 explanation and
+one arm only. `plans/done/BP24-findings.md` SS12 reached for a 4:2:0 explanation and
 SS14 corrected it to the second encoder; the second encoder was real and is
 fixed, and **this is the 4:2:0 ceiling SS12 was groping for, still present and
 now measured** — visible only once the anchor is pushed fine enough to hit it,
@@ -395,6 +395,6 @@ worse plate is exactly the term it does not predict.
   videos.
 - Anything perceptual. Frame Y-PSNR is dominated by the background, which is
   99.4% of the pixels; PointStream's case has always been argued on the object
-  region, and `plans/BP29-plate-rate.md` §3 is where that claim belongs — with
+  region, and `plans/done/BP29-plate-rate.md` §3 is where that claim belongs — with
   its integrity conditions, which include declaring the metric *before* the run.
 - Anything about the **high**-rate end of this ladder without reading §6 first.

@@ -9,7 +9,7 @@ of them.
 meaningful between two curves that overlap in quality and that each vary with
 the knob being swept, so this checks before integrating:
 
-- the plate must move across rungs (`plans/BP31-findings.md` §8: a run whose
+- the plate must move across rungs (`plans/done/BP31-findings.md` §8: a run whose
   plate was byte-identical at all five rungs produced a smooth, monotone and
   entirely fictional curve);
 - both arms must be monotone in rate and quality;
@@ -68,7 +68,7 @@ def speed_column(rows: list[dict[str, Any]]) -> dict[str, Any]:
     anchor's job really is smaller.
 
     **Read it as an order of magnitude, not a measurement.** This host is shared;
-    `plans/BP31-findings.md` §10 measured a within-point spread on repeated 4K
+    `plans/done/BP31-findings.md` §10 measured a within-point spread on repeated 4K
     encodes larger than the range across a whole knob sweep. These are single
     samples per rung, so a 1.2x difference here means nothing and a 20x one means
     something.

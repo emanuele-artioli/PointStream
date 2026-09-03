@@ -28,7 +28,7 @@ loss is a well-known poor proxy for sample quality.
 
 Worse, in this specific run identity *could not* be learned at all: appearance
 entered through the control image, which the control branch cannot use for
-appearance (`PLAN.md` §2.3). The model was genuinely learning — just not the
+appearance (`plans/done/RESEARCH-HISTORY.md` §2.3). The model was genuinely learning — just not the
 thing we wanted. **A falling loss is not evidence that the thing you want is
 being learned.**
 
@@ -61,7 +61,7 @@ So: write the criterion, keep it small, and keep it task-facing.
 
 - Generate on the probe set at the **coding task** (appearance from a keyframe,
   conditioning from a later frame) — never self-reconstruction.
-- Score **region-scoped PSNR and calibrated LPIPS** (`PLAN.md` §2.7). Both are
+- Score **region-scoped PSNR and calibrated LPIPS** (`plans/done/RESEARCH-HISTORY.md` §2.7). Both are
   cheap: ~8 ms/frame against 4–6 s/frame of generation.
 - Compare against the **static-copy floor at the same offsets**, which is the
   arm every generative run must beat.

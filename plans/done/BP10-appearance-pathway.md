@@ -11,8 +11,8 @@
 > *dependence on the reference*, reported beside each arm's own score against
 > the static-copy floor, and withdrawn as a test of appearance use.
 >
-> See `PLAN.md` §2.10 and the *Delivered* section of
-> `plans/BP12-clip-mode-roster.md`. Separating "the output moved" from "the
+> See `plans/done/RESEARCH-HISTORY.md` §2.10 and the *Delivered* section of
+> `plans/done/BP12-clip-mode-roster.md`. Separating "the output moved" from "the
 > right person appeared" needs an identity metric (CSIM/ArcFace); this project
 > does not have one yet.
 
@@ -21,7 +21,7 @@
 **The critical path.** Replaces `BP8`, whose options are now spent or
 re-diagnosed.
 
-**Read first:** `PLAN.md` §2.3 and **§2.4** — §2.4 is the one that changes what
+**Read first:** `plans/done/RESEARCH-HISTORY.md` §2.3 and **§2.4** — §2.4 is the one that changes what
 this stream should do.
 
 ## Where we actually are
@@ -96,7 +96,7 @@ cross-appearance delta settles the second.
 **Report LPIPS alongside PSNR for every generative arm from now on.** PSNR
 structurally favours real-pixels-wrong-pose over synthetic-pixels-right-pose,
 which is exactly the comparison being made. This is a narrow exception to
-`PLAN.md` §6.5's PSNR-only triage rule, and it is why.
+`plans/done/RESEARCH-HISTORY.md` §6.5's PSNR-only triage rule, and it is why.
 
 **n=12 is thin.** Per-clip sd is ≈2 dB, so se ≈0.58 and a +1 dB effect is ~1.5σ.
 Use more clips or more offsets before any delta near 1 dB decides anything.
@@ -107,4 +107,4 @@ Use more clips or more offsets before any delta near 1 dB decides anything.
   bounds above.
 - Either one engine demonstrably uses appearance through a trained pathway, or
   all four options are spent and the negative result is written with numbers.
-- `PLAN.md` §6.2's roster is re-decided on that evidence.
+- `plans/done/RESEARCH-HISTORY.md` §6.2's roster is re-decided on that evidence.

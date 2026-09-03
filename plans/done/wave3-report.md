@@ -6,7 +6,7 @@ and report back. This is that report. Numbers are triage unless a `CLAIM` names
 an `outputs/` path in the paper repo. Nothing is merged to `main`. Nothing is
 pushed. GPUs are idle; the pose-ref train has exited.
 
-Read this, then `AGENTS.md`, then the living `PLAN.md` on the main checkout
+Read this, then `AGENTS.md`, then the living `plans/done/RESEARCH-HISTORY.md` on the main checkout
 (status table + §2.3 were updated in the working tree, **uncommitted**).
 
 ---
@@ -18,7 +18,7 @@ WAVE: 3
 DATE: 2026-08-23
 HOST: gpu6
 MAIN: /home/itec/emanuele/pointstream  branch=main  HEAD=7499faf  ahead_of_origin=10
-MAIN_UNCOMMITTED: PLAN.md plans/README.md plans/C3-runner.md plans/wave3-report.md
+MAIN_UNCOMMITTED: plans/done/RESEARCH-HISTORY.md plans/done/README.md plans/done/C3-runner.md plans/done/wave3-report.md
 MERGED_TO_MAIN: no
 PUSHED: no
 GPU_JOBS: none
@@ -26,7 +26,7 @@ QUALITY_FLAGSHIP: unset
 OPTION_A: failed
 OPTION_B_AA: failed  object_psnr=8.96  verdict=not_using_appearance
 OPTION_B2_IPADAPTER: failed  object_psnr=8.90  verdict=not_using_appearance
-STATIC_COPY_PUBLISHED: 11.82  # PLAN.md §2.3 shared-geometry paste, 12 clips seed 42
+STATIC_COPY_PUBLISHED: 11.82  # plans/done/RESEARCH-HISTORY.md §2.3 shared-geometry paste, 12 clips seed 42
 STATIC_COPY_LETTERBOX: 11.47  # BP8/BP9 independent 512 letterbox, same task
 SUCCESS_BAR_DB: 12.82  # 11.82 + 1; beating floor by <1 dB is not a result
 POSE_REF_EPOCH10: 11.18  verdict=not_using_appearance  series=11.11-11.33
@@ -50,10 +50,10 @@ yet record that retraining failed.
 
 | ID | Brief | Worktree | Branch | Tip | Verified |
 |---|---|---|---|---|---|
-| A | `plans/BP8-appearance-conditioning.md` | `/home/itec/emanuele/pointstream-wt/bp8` | `phase-bp/bp8` | `ace5cc5` | driven coding-task JSON + train exited |
-| B | `plans/BP9-probe-harness.md` | `/home/itec/emanuele/pointstream-wt/bp9` | `phase-bp/bp9` | `8ec61bb` | 16 harness tests re-run pass |
-| C | `plans/C3-runner.md` | `/home/itec/emanuele/pointstream-wt/c3` | `phase-c/c3` | `940a602` | 11 runner tests re-run pass |
-| D | `plans/P1-paper-catchup.md` | `/home/itec/emanuele/pointstream-wt/p1` | `phase-p/p1` (paper repo) | `dfe7b49` | grep: 11.82 dB only in `HOLE` comments |
+| A | `plans/done/BP8-appearance-conditioning.md` | `/home/itec/emanuele/pointstream-wt/bp8` | `phase-bp/bp8` | `ace5cc5` | driven coding-task JSON + train exited |
+| B | `plans/done/BP9-probe-harness.md` | `/home/itec/emanuele/pointstream-wt/bp9` | `phase-bp/bp9` | `8ec61bb` | 16 harness tests re-run pass |
+| C | `plans/done/C3-runner.md` | `/home/itec/emanuele/pointstream-wt/c3` | `phase-c/c3` | `940a602` | 11 runner tests re-run pass |
+| D | `plans/done/P1-paper-catchup.md` | `/home/itec/emanuele/pointstream-wt/p1` | `phase-p/p1` (paper repo) | `dfe7b49` | grep: 11.82 dB only in `HOLE` comments |
 
 Base for A/B: `phase-bp/integrate` `18bf21e`.
 C3 merge-base: C1 `8ce3450` + C2 `26533b0` then runner. Paper base: `f967e0c` (BP6 already merged there).
@@ -83,7 +83,7 @@ At or below the floor = **not using appearance**.
 | Arm | Object PSNR | vs letterbox floor 11.47 | Path under `pointstream-wt/bp8/outputs/` |
 |---|---|---|---|
 | static copy (this letterbox driver) | **11.47** | floor | `bp8-coding-task/` |
-| static copy (published, shared-geometry) | **11.82** | — | PLAN.md §2.3, not this driver |
+| static copy (published, shared-geometry) | **11.82** | — | plans/done/RESEARCH-HISTORY.md §2.3, not this driver |
 | Animate-Anyone 20 DDIM letterbox | **8.96** | −2.51 | `bp8-coding-task/animate-anyone-letterbox.json` |
 | AA stretch (diagnostic) | 7.57 | −4.39 | `bp8-coding-task-stretch/` |
 | real IP-Adapter + stock OpenPose | **8.90** | −2.56 | `bp8-coding-task-ipadapter/` |
@@ -137,7 +137,7 @@ and scoring reference from frame 0+offset. Offsets **8, 16, 24, 32**; headline
 
 Driven static copy: `pointstream-wt/bp9/outputs/bp9-static-copy/summary.json`
 seed 42, 12 clips, CPU. Headline offset 24: **11.47 dB** object, **13.68 dB**
-frame. Frame is higher than PLAN.md §2.3's 8.90 because this harness scores the
+frame. Frame is higher than plans/done/RESEARCH-HISTORY.md §2.3's 8.90 because this harness scores the
 512 letterboxed canvas. Object-scoped is the triage number.
 
 Bounds rewritten against the floor, written before generate. One per-clip
@@ -150,7 +150,7 @@ Tests: `tests/components/test_probe_harness.py` — 16 passed (re-run).
 
 ## C — C3 runner
 
-Brief: `plans/C3-runner.md` (copied to main checkout, uncommitted).
+Brief: `plans/done/C3-runner.md` (copied to main checkout, uncommitted).
 Code: `src/runner/**` on `phase-c/c3` `940a602`. One importable `run()`.
 Single-chunk is the same loop. Both quality views required:
 `QualityReport` (recon vs source) and DAG `ART_QUALITY` (delivered vs source).
@@ -220,9 +220,9 @@ failed — that landing is still owed, as `NOTE`/`HOLE` prose, not a table.
 
 ## Landmarks
 
-- This report: `plans/wave3-report.md`
-- Living briefs: `plans/README.md`
-- BP8 numbers also in worktree `pointstream-wt/bp8/PLAN.md` §2.6 / §6.2
+- This report: `plans/done/wave3-report.md`
+- Living briefs: `plans/done/README.md`
+- BP8 numbers also in worktree `pointstream-wt/bp8/plans/done/RESEARCH-HISTORY.md` §2.6 / §6.2
 - Probe: `pointstream-wt/bp9/experiments/probe/`
 - Runner: `pointstream-wt/c3/src/runner/run.py`
 - Paper: `pointstream-wt/p1/sections/evaluation.tex`

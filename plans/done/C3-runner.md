@@ -6,7 +6,7 @@ that may look up registries and bind named backends into that pipeline.
 **Owns exclusively:** `src/runner/**`, `tests/runner/**`.
 Not `src/pipeline/**` (C1/C2), not `experiments/**` (Phase D).
 **Read first:** this worktree's `src/pipeline/{dag,encoder,reconstruction,residual}/`,
-`src/contracts/lattice.py`, `src/contracts/config.py`, `PLAN.md` §3.
+`src/contracts/lattice.py`, `src/contracts/config.py`, `plans/done/RESEARCH-HISTORY.md` §3.
 
 ## What to build
 
@@ -34,7 +34,7 @@ check would read.
 **Quality on every path.** Object and background region scores when masks
 exist; whole-frame alongside, never instead. All-off and residual-only must
 run without constructing a generator. Generators currently lose to a static
-copy (`PLAN.md` §2.3); that does not block this stream and is not a reason to
+copy (`plans/done/RESEARCH-HISTORY.md` §2.3); that does not block this stream and is not a reason to
 wait on BP8.
 
 **Library.** `experiments/` will import this package (Phase D). No subprocess,
@@ -103,7 +103,7 @@ required stage; `reconstruct()` always scores. A result without a
 `SOURCE_PASSTHROUGH`. It is a corner, not a routing special case.
 
 **Filename-based frame pairing.** Resolve a frame by its position in the
-track (`PLAN.md` §2.2). Two naming conventions live in one track group.
+track (`plans/done/RESEARCH-HISTORY.md` §2.2). Two naming conventions live in one track group.
 
 **Re-running skipped stages.** C2 already measured that a disabled stage
 costs nothing at DAG level. Wrapping every backend "just in case" makes

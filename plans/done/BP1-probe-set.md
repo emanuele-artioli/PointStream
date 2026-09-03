@@ -5,13 +5,13 @@ other Wave-1 streams; start it immediately.
 
 **Owns exclusively:** `assets/probe_set/**` (regenerating it),
 `experiments/probe_set/**`, `tests/components/test_probe_set.py`.
-**Read first:** `PLAN.md` §2.3, which records exactly how it is broken.
+**Read first:** `plans/done/RESEARCH-HISTORY.md` §2.3, which records exactly how it is broken.
 
 ## The defect
 
 `assets/probe_set` was inherited from the pre-rewrite implementation and never
 checked. It is broken in two independent ways, and **using it naively yields
-silently wrong frames rather than an error** — see `PLAN.md` §2.3 for the
+silently wrong frames rather than an error** — see `plans/done/RESEARCH-HISTORY.md` §2.3 for the
 evidence.
 
 1. **Manifest and view disagree.** Zero of the 12 manifest-named tracks appear in

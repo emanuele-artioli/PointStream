@@ -20,8 +20,8 @@ lattice sweep has ever been run end to end.
 matrix at the wrong scene length multiplies the wrong number by every axis.
 
 **Read first:** `AGENTS.md` · `PLAN.md` §3 "the ablation lattice", §4, §5, §7 P0
-item 4 · `plans/wave5-report.md` (the pose-axis warning) ·
-`plans/BP26-config-plumbing.md` in `done/` · `plans/ENGINE-ROSTER.md`.
+item 4 · `plans/done/wave5-report.md` (the pose-axis warning) ·
+`plans/done/BP26-config-plumbing.md` in `done/` · `plans/ENGINE-ROSTER.md`.
 
 ---
 
@@ -51,7 +51,7 @@ project has twice found an axis that reached nothing.
 | appearance (paste / upscale-refine / an engine) | **paste wins.** Every engine loses to it at 2.5σ–10.6σ | this is `subsec:eval-object`, as a *rate* claim |
 | temporal policy / keyframe interval | unknown, and this is where `BP28`'s useful half lives | see §3 |
 | detector, segmenter | small on rate, possibly large on failure rate | report failures, not just BD-rate |
-| pose | **expect ~0 on PSNR** | `plans/wave5-report.md`: the pose axis moved keypoints without moving PSNR, so a lattice quoting only PSNR shows a row of zeros for pose. Quote all three axes (`BP35`) or the row is uninterpretable |
+| pose | **expect ~0 on PSNR** | `plans/done/wave5-report.md`: the pose axis moved keypoints without moving PSNR, so a lattice quoting only PSNR shows a row of zeros for pose. Quote all three axes (`BP35`) or the row is uninterpretable |
 
 ## 2. The object-representation comparison, reframed
 
@@ -75,7 +75,7 @@ cheap appearance channel plus a residual, not in the generator.
 
 ## 3. Temporal policy, absorbing what is useful from BP28
 
-`BP28-offset-crossover.md` asks whether a generative engine ever beats a paste at
+`done/BP28-offset-crossover.md` asks whether a generative engine ever beats a paste at
 long offsets. The answer it would get is "yes, where both are as good as a photo
 of a different player", which is not usable. **The useful half of the question is
 a rate question:** how often must appearance be re-sent, and what does each

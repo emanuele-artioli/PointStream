@@ -15,7 +15,7 @@ top-level `tests/test_*.py` files.
 | invariants | — | 12 |
 | | | **~1056** |
 
-`PLAN.md` §8 already anticipated this: *"The ~436 pre-rewrite tests are untouched
+`plans/done/RESEARCH-HISTORY.md` §8 already anticipated this: *"The ~436 pre-rewrite tests are untouched
 and test modules Phase B and C delete. They die with their modules; no separate
 culling is needed."* 433 is that number. **The plan was right; the deletion just
 has not happened**, because Phase C landed without removing what it replaced.

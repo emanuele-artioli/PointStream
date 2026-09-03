@@ -15,7 +15,7 @@ before this harness ran:
 
 * worst ~8 dB — the player has moved a lot, or the crop is small
 * best ~16 dB — near-static clips; a frozen pose would sit higher
-* PLAN.md §2.3 measured 11.82 object / 8.90 frame on an ad-hoc re-run
+* plans/done/RESEARCH-HISTORY.md §2.3 measured 11.82 object / 8.90 frame on an ad-hoc re-run
   (seed 42). That number is not this harness's result. It only sets the
   band. A result far outside 8–16 dB at offset 24 is an alarm: check that
   scoring uses the later frame, not the keyframe (identity against the
@@ -232,7 +232,7 @@ def judge_frame_gap(frame_psnr: float, object_psnr: float) -> BoundVerdict:
 # beside it. Lower is better and the scale is anchored, which is why an
 # absolute band is meaningful here where it was not for PSNR.
 #
-# Published calibration anchors for the wrapped ``lpips`` package (PLAN.md
+# Published calibration anchors for the wrapped ``lpips`` package (plans/done/RESEARCH-HISTORY.md
 # §2.7, asserted in tests/invariants/test_metric_calibration.py):
 #
 #     identical 0.000 | mild noise 0.250 | heavy blur 0.430 | unrelated 0.645
@@ -451,7 +451,7 @@ def judge_engine_lpips(
 # how much relative to a pure copy measured in the same run. Whether that
 # dependence is *useful* is a separate question, answered by the arm's own
 # quality score against the static-copy floor -- where every engine currently
-# loses (PLAN.md 2.10).
+# loses (plans/done/RESEARCH-HISTORY.md 2.10).
 #
 # A verdict therefore requires the copying anchor. Without it this returns
 # "unanchored" rather than a number dressed as a conclusion.

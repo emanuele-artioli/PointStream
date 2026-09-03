@@ -7,11 +7,11 @@ untested directions and one of them is structural.
 
 **Owns:** `src/components/background/sidecar.py`, `src/contracts/config.py`
 (`BackgroundConfig` only), `outputs/bp43-background/**`.
-**Blocked on PR #45 merging** for the component files; the resolution sweep in §2
-can be prototyped standalone before then.
+**Status 2026-09-03:** PR #45 is merged. These are optional representation
+experiments after BP49/BP45 identify the remaining cost; not current merge blockers.
 
-**Read first:** `AGENTS.md` · `plans/BP29-panorama-report.md` §§3, 4 ·
-`plans/BP29-plate-rate.md` · `plans/BP32-rate-budget.md` · `PLAN.md` §7 P0 item 8
+**Read first:** `AGENTS.md` · `plans/done/BP29-panorama-report.md` §§3, 4 ·
+`plans/done/BP29-plate-rate.md` · `plans/BP32-rate-budget.md` · `PLAN.md` §7 P0 item 8
 and P2 item 15.
 
 **Every arm reports size, quality *and* speed.** A plate that is cheaper and
@@ -54,7 +54,7 @@ measurements shrink the prize:
 - **The plate codec lever is smaller than `PLAN.md` §2.21 assumed.** At the
   ladder's operating point (~43 dB) av1 and vvc intra are **x0.691** against
   jpeg, not the 3.6–4.1x quoted from a single-point comparison at 38 dB
-  (`plans/BP31-findings.md` §10, which corrected §2.21 in place). So a resolution
+  (`plans/done/BP31-findings.md` §10, which corrected §2.21 in place). So a resolution
   lever multiplies against a base already ~31% smaller than the plan assumed.
 
 **This does not make the brief pointless** — the plate is a real cost at any
@@ -88,7 +88,7 @@ the encoder's plate build and the client's warp.
 
 **The measurement this must not get wrong.** Downscaling the plate makes the
 residual work harder, so **plate bytes alone will look like a triumph and mean
-nothing** — the same error `plans/BP29-plate-codec-report.md` §3 was written
+nothing** — the same error `plans/done/BP29-plate-codec-report.md` §3 was written
 about, at a different knob. Read **total payload at matched delivered quality**,
 or read the whole RD curve. The plate-bytes column is diagnostic, not the result.
 
@@ -123,7 +123,7 @@ each is worth:
 
 - **Scenes routed to the conventional codec** by scene classification. Using one
   of those as plate content for a neighbouring PointStream scene is already
-  measured and dead: `plans/BP24-findings.md` §17 puts two point-class plates
+  measured and dead: `plans/done/BP24-findings.md` §17 puts two point-class plates
   from the same match **13.75–15.10 dB** apart, and coding one against the other
   costs **1.49–1.70x** the bytes at **13 dB lower** quality — dominated on both
   axes, so no ladder is needed. The version of that idea that works is coding the
@@ -176,9 +176,9 @@ first thing to write.
 ## 4. Lever C — the `roi-video` sidecar, and why it is last
 
 `SIDECAR_ROI_VIDEO` is registered and has never been driven; `roi_crf` and
-`roi_preset` cannot be set from a config file (`plans/BP29-panorama-report.md`
+`roi_preset` cannot be set from a config file (`plans/done/BP29-panorama-report.md`
 §2). Coding a *single still plate* as a one-frame video is unlikely to beat the
-av1/vvc intra sidecars, which `plans/BP31-findings.md` §10 already prices at
+av1/vvc intra sidecars, which `plans/done/BP31-findings.md` §10 already prices at
 **x0.691** against jpeg at the ladder's rung.
 
 Its real use is different: **a plate that updates during a scene.** The crowd

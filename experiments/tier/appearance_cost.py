@@ -40,7 +40,7 @@ OUT = ps_paths.outputs() / "bp24-ladder" / "appearance-cost.json"
 def _crop(seed: int = 7, height: int = 192, width: int = 128) -> np.ndarray:
     """A compressible crop. Noise would be incompressible and prove nothing.
 
-    `plans/BP24-findings.md` §3: a noise anchor saturates every encoder at every
+    `plans/done/BP24-findings.md` §3: a noise anchor saturates every encoder at every
     quality, so a size that does not move would be uninformative rather than
     evidence.
     """

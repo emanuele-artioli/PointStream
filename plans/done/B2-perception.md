@@ -72,7 +72,7 @@ segmentation `yolo` / `sam3`, scene `hsv` / `routing`, tracking with recovery.
 **Two backends cannot construct, both honestly reported:**
 
 - **SAM3** — `ModuleNotFoundError: torch.nn.attention`. Torch 2.2.2 is too old.
-  This blocks `PLAN.md` §7 P1 item 10 (detector comparison including SAM3) and
+  This blocks `plans/done/RESEARCH-HISTORY.md` §7 P1 item 10 (detector comparison including SAM3) and
   the SAM3 segmenter with it. Needs a second conda env, which is a scoped
   decision, not a quick fix.
 - **RF-DETR** — needs `transformers>=5.1`, this env pins 4.46.3.

@@ -5,7 +5,7 @@ wrong question for one specific job, and `BP12` proved it expensively: the
 cross-appearance control was meant to say whether a generator uses the
 appearance it is given, and a pasted keyframe — no network at all — topped its
 scale, because pasting maximises how much of the reference survives into the
-output (``PLAN.md`` §2.10).
+output (``plans/done/RESEARCH-HISTORY.md`` §2.10).
 
 This asks a different question. A person re-identification embedding maps a
 **full-body crop** into a space where the same person in a different pose,

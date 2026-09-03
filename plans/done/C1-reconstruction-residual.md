@@ -6,7 +6,7 @@ does not depend on which generator wins the roster.
 **Owns exclusively:** `src/pipeline/reconstruction/**`,
 `src/pipeline/residual/**`, `tests/pipeline/test_reconstruction*.py`,
 `tests/pipeline/test_residual*.py`.
-**Read first:** `src/contracts/` (authoritative), `PLAN.md` §3 and §6.
+**Read first:** `src/contracts/` (authoritative), `plans/done/RESEARCH-HISTORY.md` §3 and §6.
 
 ## What is being replaced
 
@@ -28,13 +28,13 @@ dispatch through the registry (never by class identity or name matching), and
 the device/OOM fallback as an explicit policy rather than scattered `try`.
 
 **The residual coarseness spectrum, including absent.** This is a rate axis in
-its own right (`PLAN.md` §5, `subsec:eval-residual`): absent → progressively
+its own right (`plans/done/RESEARCH-HISTORY.md` §5, `subsec:eval-residual`): absent → progressively
 coarser → fine → lossless. The lossless setting is a ceiling calibration, not an
 operating point. The absent setting is the one that reports the unaided quality
 of the reconstruction itself, and it is measurable **before** any generator
 question is settled — which is why this stream can start now.
 
-**Bit-identity tests for deterministic stages.** `PLAN.md` §3 requires
+**Bit-identity tests for deterministic stages.** `plans/done/RESEARCH-HISTORY.md` §3 requires
 deterministic stages to be checked for bit-identity and generative stages to be
 measured for closeness. Deliver the former here.
 
@@ -54,11 +54,11 @@ assertion that they match.
 worth testing from the first commit rather than discovering at the end.
 
 **Quality is measured on every path.** There is no reconstruction path that skips
-evaluation — `PLAN.md` §3. Wire it in from the start; retrofitting it is how the
+evaluation — `plans/done/RESEARCH-HISTORY.md` §3. Wire it in from the start; retrofitting it is how the
 last iteration ended up with paths that reported nothing.
 
 **Use the region-scoped metrics from `BP2`.** A whole-frame score hides a broken
-object (`PLAN.md` §6.4). Background reconstruction is scored on the background
+object (`plans/done/RESEARCH-HISTORY.md` §6.4). Background reconstruction is scored on the background
 region, object reconstruction on the object.
 
 ## Done when

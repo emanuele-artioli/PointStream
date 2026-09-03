@@ -1,6 +1,11 @@
 # BP33 — Span: the amortisation axis nobody has swept
 
-> **RAN 2026-09-02** (BP31 session, `plans/BP31-findings.md` §12). The mechanism
+**Current scope (3 September):** the short-span observation below does not settle
+long-scene behaviour. Compatible canonical canvases now exist. Investigate
+longer durations only after BP49, and fit multiple durations rather than
+extrapolating the historical two-point estimate.
+
+> **RAN 2026-09-02** (BP31 session, `plans/done/BP31-findings.md` §12). The mechanism
 > is confirmed and **this brief's central expectation is wrong**. Read §6 below
 > before acting on anything above it: span amortises both arms almost equally,
 > so it narrows the gap by ~7% and then flattens. What it does do is expose the
@@ -19,9 +24,9 @@ session immediately, because it is about to commit an extraction campaign to a
 frames-per-scene value.
 
 **Read first:** `AGENTS.md` · `plans/BP32-rate-budget.md` ·
-`plans/BP29-panorama-report.md` §4 and its closing "the span is the untested
-axis" · `plans/BP24-ladder-report.md` (the payload tables) ·
-`plans/BP31-findings.md` §§8, 9 · `plans/DEFERRED.md` D-PANORAMA-REOPEN axis 3.
+`plans/done/BP29-panorama-report.md` §4 and its closing "the span is the untested
+axis" · `plans/done/BP24-ladder-report.md` (the payload tables) ·
+`plans/done/BP31-findings.md` §§8, 9 · `plans/DEFERRED.md` D-PANORAMA-REOPEN axis 3.
 
 ---
 
@@ -30,10 +35,10 @@ axis" · `plans/BP24-ladder-report.md` (the payload tables) ·
 It is written down in three places already, and it has been read as a caveat
 rather than as a lever every time:
 
-- `plans/BP24-ladder-report.md`: *"eight frames is the least favourable
+- `plans/done/BP24-ladder-report.md`: *"eight frames is the least favourable
   amortisation a fixed plate cost can get"*, listed alongside two other caveats
   and then not acted on.
-- `plans/BP29-panorama-report.md` §6: *"The span is the untested axis. Everything
+- `plans/done/BP29-panorama-report.md` §6: *"The span is the untested axis. Everything
   here is eight frames. The panorama's argument gets stronger with a longer span
   and the canvas grows with it; `make_background(span=...)` already takes the
   knob."*
@@ -52,7 +57,7 @@ project has published, and it is one flag away from being fixed.
 
 ## 1. The arithmetic, before any run
 
-From `plans/BP31-findings.md` §9 — `alcaraz_highlights`, N=2 scenes, 8 frames
+From `plans/done/BP31-findings.md` §9 — `alcaraz_highlights`, N=2 scenes, 8 frames
 each, `panorama-stream`, av1 preset 10:
 
 - plate 789,304 B; total 862,585 B; **non-plate 73,281 B over 16 frames =
@@ -61,7 +66,7 @@ each, `panorama-stream`, av1 preset 10:
 
 At 48 frames per scene the per-frame residual and homography cost should be
 roughly unchanged, while the plate is paid the same number of times. The plate
-does grow — the canvas follows the camera sweep — but `plans/BP29-panorama-report.md`
+does grow — the canvas follows the camera sweep — but `plans/done/BP29-panorama-report.md`
 §4 measures that growth at **1.0184x frame area over 8 frames on the moving
 clip** and **1.0007x on the static one**, against a `MAX_CANVAS_SCALE` of 4. Six
 times the span on a pan-tilt broadcast camera is a materially larger canvas, but
@@ -101,7 +106,7 @@ average away sensor noise, compression dither and transient content, so the plat
 gets *easier to code* as the span lengthens, and on a near-static camera that
 term dominates the growth term entirely.
 
-`plans/BP29-panorama-report.md` §4 had already measured that denoising term at
+`plans/done/BP29-panorama-report.md` §4 had already measured that denoising term at
 **16,032 B** against the extra-coverage term's 12,975 B on a moving clip at eight
 frames — the two nearly cancelled there, and nobody carried the arithmetic
 forward to what happens when the span grows. Both bands are now two-sided.
@@ -110,7 +115,7 @@ forward to what happens when the span grows. Both bands are now two-sided.
 is the result this project has been looking for, which is precisely why it gets
 the extra check rather than the celebration: `AGENTS.md`'s asymmetry rule applies
 at full force. Before reporting any win, confirm the joint/separate anchor
-control from `plans/BP31-findings.md` §5 still reads below 1.0, and that
+control from `plans/done/BP31-findings.md` §5 still reads below 1.0, and that
 `delivered_frames` — not `RunResult.frames` — is what quality was measured on.
 
 ## 3. What to run
@@ -137,7 +142,7 @@ One sweep, one long-lived process, detached.
 - **The frames-per-scene value for every ladder from here on**, including BP31's
   N-scene campaign. That campaign is the expensive one; this sweep is cheap and
   runs first.
-- **Whether span belongs in `plans/FORK-bp31.md`'s branch A as part of the named
+- **Whether span belongs in `plans/done/FORK-bp31.md`'s branch A as part of the named
   winning regime**, and if so, whether "a longer static shot" is a content
   requirement the paper must state as a boundary rather than a free choice.
 - Whether `PLAN.md` §7 P0 item 8's three plate levers should become four.
@@ -156,7 +161,7 @@ conclusions, and both inverted at five videos — the lesson taken from that was
 
 ## 6. What the run found — and where this brief was wrong
 
-`plans/BP31-findings.md` §12. Bounds adopted verbatim and pre-registered to
+`plans/done/BP31-findings.md` §12. Bounds adopted verbatim and pre-registered to
 `outputs/bp31-ladder/bounds-before-span-run.json` before the brief arrived.
 
 ### Held

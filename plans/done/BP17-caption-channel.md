@@ -35,7 +35,7 @@ currently no way to pass one.
 
 So: the ControlNets were trained with a text channel that describes the player's
 kit, and **every number this project has ever measured was taken with that
-channel disabled.** `PLAN.md` §2.3 quoted the fallback prompt as though it were
+channel disabled.** `plans/done/RESEARCH-HISTORY.md` §2.3 quoted the fallback prompt as though it were
 the only prompt, which is how this stayed hidden.
 
 **This is occurrence nine of the standing failure mode**: a pathway exists, is
@@ -113,7 +113,7 @@ caption run that also changes steps or strength measures nothing.
 - The probe records, per row, which prompt was used.
 - The four ControlNet arms are re-run captions-on and compared paired against
   `outputs/bp12-clip-roster/`, split by whether the caption names a colour.
-- `PLAN.md` §2.11 says what the channel is worth, including if the answer is
+- `plans/done/RESEARCH-HISTORY.md` §2.11 says what the channel is worth, including if the answer is
   "nothing measurable".
 
 ---
@@ -121,7 +121,7 @@ caption run that also changes steps or strength measures nothing.
 ## Delivered — 2026-08-23
 
 **The channel is reachable now, and it is worth nothing measurable.** Full
-numbers in `PLAN.md` §2.15; `outputs/bp17-caption/`.
+numbers in `plans/done/RESEARCH-HISTORY.md` §2.15; `outputs/bp17-caption/`.
 
 - `ConditioningBundle` carries an optional caption; the ControlNet resolves the
   track caption and falls back to the generic prompt; every row records

@@ -206,7 +206,7 @@ class BackgroundConfig:
     jpeg_quality: int = 50
 
     #: Which already-transmitted reconstruction a scene predicts from, under
-    #: `panorama-stream`. Measured over five videos (`plans/BP30-findings.md`
+    #: `panorama-stream`. Measured over five videos (`plans/done/BP30-findings.md`
     #: §29): `last` wins on all five, `best-scored` does not beat it (0.1 sigma)
     #: and costs an edge pass per candidate, and `first` is the worst of the
     #: three. `last` is the default because it is both the best and the free one.

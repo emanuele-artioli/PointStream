@@ -62,10 +62,10 @@ This is the half the current text drops entirely, and it is the half that covers
 
 ## Traps
 
-**Matched quality, not matched file size** (`PLAN.md` §5). Removing the players
+**Matched quality, not matched file size** (`plans/done/RESEARCH-HISTORY.md` §5). Removing the players
 changes quality as well as rate; comparing raw sizes measures nothing.
 
-**Report the region quality separately.** Per `PLAN.md` §6.4, and because the
+**Report the region quality separately.** Per `plans/done/RESEARCH-HISTORY.md` §6.4, and because the
 players are what a viewer watches: a frame-level number will barely move when the
 player region is destroyed, which is exactly why it cannot carry this argument
 alone.

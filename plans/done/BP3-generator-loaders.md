@@ -6,7 +6,7 @@ which is Wave 2 (`BP5`).
 **Owns exclusively:** `src/components/generation/controlnet.py`, `pix2pix.py`,
 `spade.py`, `upscale.py`, `_numpy.py`, and `tests/components/test_generation.py`.
 **Does not own** `animate_anyone.py` or `mofa.py` — those are B′4's.
-**Read first:** `src/contracts/conditioning.py`, `PLAN.md` §6.2.
+**Read first:** `src/contracts/conditioning.py`, `plans/done/RESEARCH-HISTORY.md` §6.2.
 
 ## The defect
 
@@ -22,7 +22,7 @@ declared temporal capability, pairing validation. Only the loaders are missing.
 
 ## What this stream is for
 
-This is the **comparison backbone** (`PLAN.md` §6.2) — the family that serves
+This is the **comparison backbone** (`plans/done/RESEARCH-HISTORY.md` §6.2) — the family that serves
 `subsec:eval-object`, where the paper promises the generative backbone is *held
 fixed across arms* while the conditioning signal changes. ControlNet on SD-1.5 is
 the only family that can honour that promise, which is why it gets its own
@@ -49,7 +49,7 @@ the *same* backbone the keypoint arm uses. This is what makes `eval-object`'s
 MOFA-Video — it is licence-blocked and routing around it is the better
 experiment (`plans/DEFERRED.md` D4).
 
-**Fix the duplicated pose-rescale block** that `plans/B3-generation.md` names:
+**Fix the duplicated pose-rescale block** that `plans/done/B3-generation.md` names:
 ~40 lines copy-pasted across four ControlNet classes and visibly wrong. It
 changes generated pixels, which is in scope — pre-rewrite generative results are
 superseded anyway.
@@ -68,7 +68,7 @@ broken path, not a weak model. A near-zero score is a bug report, not a finding.
 picking `checkpoint-epoch-10` because it sorts last is how an unreproducible
 number is born. Record the epoch with every result.
 
-**Fix the seed and record it.** Generation is statistical, and `PLAN.md` §3
+**Fix the seed and record it.** Generation is statistical, and `plans/done/RESEARCH-HISTORY.md` §3
 requires encoder-side and client-side reconstruction to be *measured* for
 closeness rather than assumed identical. That measurement is meaningless without
 a recorded seed.

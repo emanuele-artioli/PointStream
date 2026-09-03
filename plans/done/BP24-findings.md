@@ -153,7 +153,7 @@ quoting a background saving must say which of these it measured.
 > `build_plate` over the whole chunk, so `background.method` reaches the
 > stitcher and the view carries per-frame homographies. The estimator it found
 > there was undershooting a real pan by half; that is fixed too. Numbers and
-> the controls behind them: `plans/BP29-panorama-report.md`.
+> the controls behind them: `plans/done/BP29-panorama-report.md`.
 
 ## 7. Two measurements that are the easy case, not the typical one
 
@@ -319,7 +319,7 @@ and its quality moved 0.55 dB. The reason is in the ledger's own breakdown:
 
 **The plate is the payload.** On static content the residual is single-digit
 percent of what PointStream sends, so the residual's rung — the knob `BP24`
-built the rate axis around, and the knob `PLAN.md` §7 P0 item 3 names — cannot
+built the rate axis around, and the knob `plans/done/RESEARCH-HISTORY.md` §7 P0 item 3 names — cannot
 produce a rate-distortion curve on its own. Neither can the
 residual-coarseness ladder, which moves the same term.
 
@@ -593,7 +593,7 @@ material.
 §18's 31–53% was measured with the encoders' default configuration, which allows
 B-frames and lookahead. Both let frame *n*'s decisions depend on frame *n+1*, and
 a scheme that depends on the future is not one where each scene's payload is
-independent of every future scene. `plans/BP30-background-stream.md` §1 made
+independent of every future scene. `plans/done/BP30-background-stream.md` §1 made
 re-measuring under low delay the first alarm. Re-measured
 (`outputs/bp24-ladder/plate-lowdelay.json`, CRF 38):
 

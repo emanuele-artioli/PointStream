@@ -9,7 +9,7 @@ compatible scenes whose independently estimated panorama bounds differ.
 ## Read
 
 `AGENTS.md`, `plans/ROADMAP.md` §§4 and 8,
-`plans/TERMINOLOGY.md`, `plans/BP31-findings.md` §12,
+`plans/TERMINOLOGY.md`, `plans/done/BP31-findings.md` §12,
 `src/components/background/{plate,stream,strategy,types}.py`, and existing
 background stream tests. Do not read the full plan tree.
 

@@ -26,7 +26,7 @@ DEFAULT_OFFSETS = (8, 16, 24, 32)
 #: Clip mode drives a temporal model over a *contiguous* run of frames, because
 #: its motion module attends across adjacent timesteps. Sparse offsets like
 #: ``DEFAULT_OFFSETS`` are not a clip. Offsets 1..8 also span the regime where
-#: the static-copy floor moves most (21.5 dB down to 11.2 dB, PLAN.md §2.5),
+#: the static-copy floor moves most (21.5 dB down to 11.2 dB, plans/done/RESEARCH-HISTORY.md §2.5),
 #: which is where an engine has room to show a difference.
 CLIP_LENGTH = 8
 CLIP_MODE_OFFSETS = tuple(range(1, CLIP_LENGTH + 1))

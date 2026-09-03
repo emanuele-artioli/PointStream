@@ -10,7 +10,7 @@ Bounds were written before the first encode:
 
 **The plate here is the clip's first frame**, because that is what
 `make_background` transmits today — a single source frame, not a stitched
-panorama (`plans/BP24-findings.md` §6). `alcaraz_highlights/scene_000`,
+panorama (`plans/done/BP24-findings.md` §6). `alcaraz_highlights/scene_000`,
 frame 38, 3840x2160.
 
 **No BD-rate, and no paired ladder.** Four streams were moving the plate at
@@ -111,7 +111,7 @@ and ~47.5 dB RGB. Four of those five sit at or above the crossover, and the
 reference rung (jpeg75, 42.96 dB RGB / 45.44 dB Y) is above the roi-video
 route's ceiling entirely. **Swapping the plate to `roi-video` would not have
 made the ladder cheaper at its reference rung; it would have made it worse and
-capped its quality.** The lever from `plans/BP24-findings.md` §16 — a factor of
+capped its quality.** The lever from `plans/done/BP24-findings.md` §16 — a factor of
 2 to 4 — is an **av1/vvc-intra** result, and this stream does not reproduce it
 with x264: the shipped `roi-video` route is not a stand-in for that lever.
 

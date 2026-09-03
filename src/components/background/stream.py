@@ -1,8 +1,8 @@
 """The background as a stream across scenes, not a still re-sent per scene.
 
-`plans/BP24-findings.md` §18 measured that coding the next plate as a P-frame
+`plans/done/BP24-findings.md` §18 measured that coding the next plate as a P-frame
 against a previous one saves 31-53% with av1, and §19 showed the saving is
-**causal**: unchanged to the byte with `-lag-in-frames 0`. `plans/BP30-background-stream.md`
+**causal**: unchanged to the byte with `-lag-in-frames 0`. `plans/done/BP30-background-stream.md`
 is the design for spending that saving. This module is the transmitter.
 
 **The one thing that can go wrong quietly, and the property that stops it.**
@@ -52,7 +52,7 @@ import numpy as np
 
 from src.components.codec import tools
 
-#: Reference-selection modes, `plans/BP30-background-stream.md` §3.
+#: Reference-selection modes, `plans/done/BP30-background-stream.md` §3.
 REFERENCE_FIRST: Final = "first"
 REFERENCE_LAST: Final = "last"
 REFERENCE_BEST_SCORED: Final = "best-scored"

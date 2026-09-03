@@ -1,6 +1,6 @@
 """The background stage must carry its stream across chunks.
 
-`plans/BP30-findings.md` §§20-22 measured that coding each scene's plate against
+`plans/done/BP30-findings.md` §§20-22 measured that coding each scene's plate against
 the previous reconstruction costs about half of coding every plate fresh. That
 saving exists in the runner only if **one** background model survives the whole
 chunk loop. The stage used to bind a fresh model inside its per-chunk body,

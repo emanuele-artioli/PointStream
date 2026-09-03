@@ -3,7 +3,7 @@
 **Wave 1.** Independent of the other Wave-1 streams.
 
 **Owns exclusively:** `src/components/metrics/**`, `tests/components/test_metrics*.py`.
-**Read first:** `PLAN.md` §6.4 and §6.5.
+**Read first:** `plans/done/RESEARCH-HISTORY.md` §6.4 and §6.5.
 
 ## The defect
 
@@ -37,7 +37,7 @@ score *labelled as such*.
 
 ## Metric discipline, and why this stream enforces it
 
-Per `PLAN.md` §6.5:
+Per `plans/done/RESEARCH-HISTORY.md` §6.5:
 
 - **Triage and development: PSNR only.** Fast, always comparable, enough to
   answer "did this run and produce something plausible".
@@ -63,7 +63,7 @@ exists.
 **Do not resample the reference to match the prediction.** If shapes disagree
 that is a bug upstream, and silently resizing hides it.
 
-**The existing whole-frame behaviour is verified working** (`plans/B6-metrics.md`
+**The existing whole-frame behaviour is verified working** (`plans/done/B6-metrics.md`
 records the numbers). Do not regress it: PSNR `inf` on identical frames, VMAF
 97.4/28.9, SSIM 1.0/0.9885, LPIPS 0.0/0.00108, FVMD refusing `T=1`.
 

@@ -1,17 +1,19 @@
 # PointStream submission roadmap — hard deadline 30 September 2026
 
 **This is the authority on priority, dependencies, session assignment and
-submission scope.** `PLAN.md` is the chronological research record. A work
+submission scope.** `PLAN.md` is the current summary; the chronological record
+is `done/RESEARCH-HISTORY.md`. A work
 session reads `AGENTS.md`, this file, and one named brief.
 
-Last replanned: **2 September 2026**, after BP31 and the 8/16-frame span result.
+Last reconciled: **3 September 2026**, after recovery and plan cleanup merged.
 
-Integration update (3 September): BP44–BP46 reached `main` in PR #52. The native
-one-point preflight completed; it did not establish hourly recovery safety.
-See `BP48-recovery-validation.md` for recovery fixes, validation and the next
-native-budget / slowest-preset reference pilot gates. No broad E1 wave has run; confirmation
-inputs remain incomplete. Earlier workstream reports describe their own commits,
-not the current integration acceptance state.
+PR #52 integrated BP44–BP46, PR #53 merged repaired recovery, and PR #54 archived
+old plans. M1/B1 implementation is complete; D1 diagnostics are available but
+independent confirmation is incomplete. The native one-point preflight did not
+establish hourly recovery safety. **Next: `BP49-native-reference-pilot.md`, then
+Codex review before broader E1.** `PAPER-NEXT.md` is the current writing brief.
+The workstream table below describes dependencies, not a claim that every row
+is still unimplemented. Archived reports are not current launch instructions.
 
 ## 1. Submission thesis and non-negotiable core
 

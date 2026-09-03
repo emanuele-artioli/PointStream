@@ -4,8 +4,8 @@ Written 2026-08-26 after Cursor (C/D/E) and Antigravity (F) reported. Claude's
 own streams — **A (`BP24` encoder boundary)** and **B (`BP25` IP-Adapter
 re-score)** — have **not started**.
 
-Cursor's full report is appended to `plans/prompts/cursor-wave5.md`;
-Antigravity's to `plans/prompts/antigravity-wave5-paper.md`. This file records
+Cursor's full report is appended to `plans/done/wave5-cursor-report.md`;
+Antigravity's to `plans/done/wave5-antigravity-report.md`. This file records
 only what an orchestrator needs, plus **three things neither report caught**.
 
 ## Status
@@ -21,7 +21,7 @@ only what an orchestrator needs, plus **three things neither report caught**.
 
 **Headline results.** C took the pre-rewrite tests from **220 to 0**
 (+158 / −12147 across 75 files) after deciding `src/shared/` **stays condemned**
-(recorded at `PLAN.md` §3), and ported ten test files rather than dropping them.
+(recorded at `plans/done/RESEARCH-HISTORY.md` §3), and ported ten test files rather than dropping them.
 D classified all 27 inert fields — **25 genuinely unwired, 2 corner-inert** — and
 wired the six ablation axes, each with both numbers. E pinned four metric
 properties on **absolute scale, not ordering**, which is precisely the check that
@@ -74,13 +74,13 @@ future cross-resolution comparison go wrong.
 ## Merge order
 
 `merge-tree` against `7cf8e89`: **C ∩ E and D ∩ E are empty; C ∩ D conflict** on
-`PLAN.md` and `tests/runner/test_tier_end_to_end.py`.
+`plans/done/RESEARCH-HISTORY.md` and `tests/runner/test_tier_end_to_end.py`.
 
 1. **E** (#24) — independent. Merge as-is; its red is pre-existing.
-2. **C** (#25) — brings the `src/shared/` decision into `PLAN.md` §3 and the
+2. **C** (#25) — brings the `src/shared/` decision into `plans/done/RESEARCH-HISTORY.md` §3 and the
    libvmaf skip. Turns `main` green.
 3. **D** (#26) — **rebase onto C first.** Keep both libvmaf skips (same intent)
-   and D's new axis assertions; both `PLAN.md` edits must survive — C's §3
+   and D's new axis assertions; both `plans/done/RESEARCH-HISTORY.md` edits must survive — C's §3
    decision and D's §7 P0 item 4 rewrite.
 
 Do not merge D before C without rebasing.

@@ -1,12 +1,9 @@
-# Completed briefs — history, not instructions
+# Archived briefs — completed, superseded or parked
 
-**Nothing here is live work.** These are the briefs for streams that finished,
-kept because each ends with a *Delivered* section recording what actually landed,
-what was measured, and what was left outstanding. That is worth reading when you
-need to know *why* something is the way it is; it is not worth reading to decide
-what to do next.
-
-**For what to do next, read `../README.md` and `../../PLAN.md`.**
+This directory preserves evidence and decisions, not current dispatch instructions.
+Not every archived task finished: BP19 and BP28 are parked, and P1 is superseded
+by `../PAPER-NEXT.md`. Historical status paragraphs describe their original date.
+For current work, read `../README.md` and `../../PLAN.md`.
 
 | Brief | Stream | Landed |
 |---|---|---|
@@ -15,7 +12,7 @@ what to do next.
 | `BP2-region-metrics.md` | Region-scoped scoring | 2026-08-22 |
 | `BP3-generator-loaders.md` | ControlNet family, pix2pix, SPADE, upscale loaders | 2026-08-22 |
 | `BP4-flagship-candidates.md` | Animate-Anyone wired, StableAnimator wrapped | 2026-08-22 |
-| `BP5-roster-decision.md` | First roster probe — **its conclusion is superseded**, see `PLAN.md` §2.6 | 2026-08-22 |
+| `BP5-roster-decision.md` | First roster probe — **its conclusion is superseded**, see `plans/done/RESEARCH-HISTORY.md` §2.6 | 2026-08-22 |
 | `BP6-related-work.md` | Related work repaired; merged into the paper repo | 2026-08-22 |
 | `BP7-merge-and-align.md` | Pose alignment fix and the Wave-1 merge | 2026-08-22 |
 | `C1-reconstruction-residual.md` | Reconstruction and the residual spectrum | 2026-08-22 |
@@ -36,7 +33,7 @@ what to do next.
 `BP10-appearance-pathway.md` is **void**. Its bands classify a pasted keyframe as
 having a working ReferenceNet — a paste scores +4.45 dB and +0.285 LPIPS on that
 test, the top of the scale, with no network at all. Kept for the record of how
-the mistake was found. See `PLAN.md` §2.10.
+the mistake was found. See `plans/done/RESEARCH-HISTORY.md` §2.10.
 
 `BP13-motivating-headroom.md`'s design is sound and its *number* is not: it
 measured a 96×128 synthetic court. `BP20` replaced it on real 4K. The one thing
@@ -51,4 +48,4 @@ non-generative upscaler. Do not re-derive it.
 "ControlNet holds both quality slots" — on a probe that scored engines against
 their own conditioning image. On the real coding task those engines lose to a
 static copy. The brief is kept for its harness design and its bounds discipline;
-**its roster verdict is void.** See `PLAN.md` §2.6 and `../BP8-appearance-conditioning.md`.
+**its roster verdict is void.** See `plans/done/RESEARCH-HISTORY.md` §2.6 and `../BP8-appearance-conditioning.md`.

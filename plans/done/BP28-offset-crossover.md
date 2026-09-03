@@ -6,7 +6,7 @@ a paste, or it closes that direction with evidence.
 
 **Owns:** `scripts/bp25_rescore.py`, `outputs/bp28-offset/**`,
 `plans/ENGINE-ROSTER.md` (the offset section only).
-**Read first:** `AGENTS.md`, `plans/ENGINE-ROSTER.md`, `PLAN.md` §2.10 and
+**Read first:** `AGENTS.md`, `plans/ENGINE-ROSTER.md`, `plans/done/RESEARCH-HISTORY.md` §2.10 and
 §2.17, `plans/done/BP25-ip-adapter-rescore.md`.
 
 **Does not own** `src/runner/**`, `src/pipeline/**`, `src/contracts/lattice.py`,

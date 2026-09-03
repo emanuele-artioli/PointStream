@@ -1,13 +1,13 @@
 # B'24 — Put a real encoder in the codec stage
 
-**This is the single highest-value open item in the project.** `PLAN.md` §7 P0
+**This is the single highest-value open item in the project.** `plans/done/RESEARCH-HISTORY.md` §7 P0
 items **2, 3 and 4** are all stacked behind it: the codec ladder with region
 arms, the residual-coarseness curve, and the rate half of the ablation lattice.
 Half the remaining P0 list unblocks the moment this lands.
 
 **Owns:** `src/runner/stages.py` (codec stage), `src/pipeline/encoder/**`,
 `src/contracts/lattice.py`, `config/tier_*.yaml` codec keys, `experiments/tier/**`.
-**Read first:** `AGENTS.md`, `PLAN.md` §2.16 and §3, `plans/done/BP23-first-tier-run.md`,
+**Read first:** `AGENTS.md`, `plans/done/RESEARCH-HISTORY.md` §2.16 and §3, `plans/done/BP23-first-tier-run.md`,
 `plans/done/C3-runner.md`, `src/runner/stages.py:192` (`make_codec`).
 
 ## The problem, precisely
@@ -29,7 +29,7 @@ missing is the binding between the runner's codec stage and those components.
 
 ## What to do
 
-1. **Decide the boundary and write it into `PLAN.md` §3 before coding.** The
+1. **Decide the boundary and write it into `plans/done/RESEARCH-HISTORY.md` §3 before coding.** The
    question is what the codec stage receives and returns: coded bytes plus a
    decoded reconstruction, or a bitstream handle the transport stage owns. C3
    deliberately left this as identity; do not silently reverse that — state the
@@ -74,7 +74,7 @@ missing is the binding between the runner's codec stage and those components.
 ## Done when
 
 - The codec stage runs a real encoder, and the boundary contract is written in
-  `PLAN.md` §3.
+  `plans/done/RESEARCH-HISTORY.md` §3.
 - The BP23 ladder is re-run with coded bytes, alongside the pixel-payload figures.
 - `STAGE_CODEC.optional_inputs` declares `generated-frames`.
 - A required-behaviour test asserts a codec rung produces coded bytes smaller
@@ -91,7 +91,7 @@ gone.
 
 ### Done
 
-- **The boundary decision**, written into `PLAN.md` §3 before any code: the
+- **The boundary decision**, written into `plans/done/RESEARCH-HISTORY.md` §3 before any code: the
   codec stage codes the **transmitted payload**, not the delivered pixels.
 - **`STAGE_CODEC.optional_inputs` declares `generated-frames`**, so the DAG can
   no longer order the codec before the generator.
@@ -115,7 +115,7 @@ gone.
 
 1. ~~The `WireCost` honesty pass.~~ **Done 2026-08-28** — see below.
 2. **Re-run the BP23 ladder as curves**, not single-QP totals. Per the paired-arm
-   decision (`plans/BP24-findings.md` §1): for codec X, measure X coding the
+   decision (`plans/done/BP24-findings.md` §1): for codec X, measure X coding the
    source and PointStream using X, **same preset**, and take BD-rate between
    them. The preset cancels; do not rank the per-codec gains against each other.
    *The harness exists (`experiments/tier/ladder.py`, both sweeps) and the
@@ -127,7 +127,7 @@ gone.
 
 ### Read before trusting any number here
 
-`plans/BP24-findings.md` — seven findings, including the one that cost the most
+`plans/done/BP24-findings.md` — seven findings, including the one that cost the most
 time: counting coded bytes while reconstructing from the pre-codec array passes
 every test and produces a fictional RD point. Both headline ratios above were
 measured on the **easy case** and must be re-measured on high motion.
@@ -136,8 +136,8 @@ measured on the **easy case** and must be re-measured on high motion.
 
 ## Status — 2026-08-28, second session (`wave6/bp24-ladder`)
 
-Full report: **`plans/BP24-ladder-report.md`**. Findings added:
-`plans/BP24-findings.md` §§8-11.
+Full report: **`plans/done/BP24-ladder-report.md`**. Findings added:
+`plans/done/BP24-findings.md` §§8-11.
 
 ### Done
 
@@ -195,4 +195,4 @@ Full report: **`plans/BP24-ladder-report.md`**. Findings added:
   only by the encoder refusing it.
 
 Full detail, including scope and what the numbers do not say:
-`plans/BP24-ladder-report.md`.
+`plans/done/BP24-ladder-report.md`.

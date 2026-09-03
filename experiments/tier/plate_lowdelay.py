@@ -1,7 +1,7 @@
 """Does the 31-53% inter-frame saving survive a low-delay encoder?
 
-`plans/BP24-findings.md` §18 measured that coding the next plate as a P-frame
-against the previous saves 31-53% with av1. `plans/BP30-background-stream.md` §1
+`plans/done/BP24-findings.md` §18 measured that coding the next plate as a P-frame
+against the previous saves 31-53% with av1. `plans/done/BP30-background-stream.md` §1
 records why that number cannot be quoted yet: it was measured with the encoders'
 default configuration, which allows **B-frames and lookahead**, and both let
 frame *n*'s decisions depend on frame *n+1*.

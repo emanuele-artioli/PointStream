@@ -1,6 +1,6 @@
 """Two cheap questions about the plate, which is 88-91% of PointStream's rate.
 
-Both come out of `plans/BP24-ladder-report.md`, and both are asked before any
+Both come out of `plans/done/BP24-ladder-report.md`, and both are asked before any
 code is written for them, because either answer redirects the plate work.
 
 **1. Is JPEG the wrong codec for a 4K still?** At `jpeg:30` the plate cost

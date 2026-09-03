@@ -12,14 +12,14 @@ concentrated in one component and that component is a placeholder. The plate is
 is the most efficient thing in the system (0.9% of the payload for 5.40 dB).
 This brief is the hunt for a win, ordered by cost.
 
-**Read first:** `plans/BP24-ladder-report.md` · `plans/BP24-findings.md`
-§§6, 13, 16, 17 · `PLAN.md` §2.16 (metric calibration), §2.20.
+**Read first:** `plans/done/BP24-ladder-report.md` · `plans/done/BP24-findings.md`
+§§6, 13, 16, 17 · `plans/done/RESEARCH-HISTORY.md` §2.16 (metric calibration), §2.20.
 
 ---
 
 ## 1. Change the plate's codec. Cheapest, largest, already measured on the still
 
-`plans/BP24-findings.md` §16. On the same 4K still, at matched fidelity:
+`plans/done/BP24-findings.md` §16. On the same 4K still, at matched fidelity:
 
 | target | JPEG | av1 intra | vvc intra |
 |---|---:|---:|---:|
@@ -92,7 +92,7 @@ post-hoc:
 - **Report frame PSNR beside it every single time.** A table that shows only the
   favourable region is the failure mode; a table that shows both, and says which
   question each answers, is a finding.
-- **Calibrate the region metrics at the working resolution first.** `PLAN.md`
+- **Calibrate the region metrics at the working resolution first.** `plans/done/RESEARCH-HISTORY.md`
   §2.16: VMAF's ceiling on this content is 97.54 and it floors at 0.00 for both
   severe blur and an unrelated clip; LPIPS's ordering *inverted* at 960x540
   while holding at 4K. Anchors do not transfer across resolution.
@@ -125,7 +125,7 @@ before concluding anything.
 
 ## 3b. Code the plate sequence as a video — measured, and it pays
 
-**Retracts what §4 used to say.** `plans/BP24-findings.md` §18: coding plate B
+**Retracts what §4 used to say.** `plans/done/BP24-findings.md` §18: coding plate B
 as a **P-frame referencing plate A** — rather than subtracting them — saves
 **31–53%** with av1 between points of a match, against coding B fresh as intra.
 The control (two consecutive frames of one scene) comes in at 1.2–3.3%, so the
@@ -148,7 +148,7 @@ paired-arm discipline does not allow amortisation for one arm only.
 ## 4. What is closed, and what is emphatically not
 
 **The panorama is NOT closed.** Stitching a background across the frames of one
-point — `build_plate`, which exists and the runner does not call — is `PLAN.md`
+point — `build_plate`, which exists and the runner does not call — is `plans/done/RESEARCH-HISTORY.md`
 P0 item 8 and is the largest remaining lever. What follows closes something
 narrower and easily confused with it: reusing one plate across *different
 points*. Frames within a point are seconds apart and share lighting, crowd and
@@ -163,7 +163,7 @@ is not a statement about inter coding, which findings §18 measures at 31–53%
 cheaper than fresh. Kept because the mechanism it rules out is a natural thing
 to try again.
 
-Closed on three measurements, not one (`plans/BP24-findings.md` §17). All four
+Closed on three measurements, not one (`plans/done/BP24-findings.md` §17). All four
 scenes tested are
 labelled `cluster_point` in the dataset's own metadata, so this is the idea
 measured on exactly the content it was proposed for.

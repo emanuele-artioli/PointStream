@@ -2,13 +2,13 @@
 
 **Small, cheap, and disproportionately valuable.** Two metrics in this project
 were broken until 2026-08-23 and **every engine ranking taken before that date is
-void** (`PLAN.md` §2.7, §2.10). BP23 found two more instrument limits. They
+void** (`plans/done/RESEARCH-HISTORY.md` §2.7, §2.10). BP23 found two more instrument limits. They
 currently live in a JSON file and a session transcript. That is not where
 knowledge that invalidates rankings belongs.
 
 **Owns:** `tests/invariants/**`, `src/components/metrics/**` docstrings only.
 **Read first:** `AGENTS.md` ("control the instrument, then the result"),
-`PLAN.md` §2.7 and §2.16, `outputs/bp23-tier/metric-calibration.json`,
+`plans/done/RESEARCH-HISTORY.md` §2.7 and §2.16, `outputs/bp23-tier/metric-calibration.json`,
 `outputs/bp23-tier/metric-notes.md`.
 
 ## The two findings to pin

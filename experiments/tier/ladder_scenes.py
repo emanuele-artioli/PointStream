@@ -2,7 +2,7 @@
 
 `experiments/tier/ladder.py` runs one scene per arm. That is the wrong shape for
 the question BP31 asks, because PointStream's background now **amortises across
-scenes** (`PLAN.md` §2.22): a single-scene ladder charges the plate to one scene
+scenes** (`plans/done/RESEARCH-HISTORY.md` §2.22): a single-scene ladder charges the plate to one scene
 and measures the system at its least favourable amortisation. This module runs
 the sequence.
 
@@ -11,7 +11,7 @@ sequence can predict across a scene join, exactly as PointStream's background
 stream does. So the anchor here encodes the **concatenation** of the same N
 scenes in one pass, not N separate encodes summed. Running it per-scene and
 adding up would hand PointStream an amortisation the anchor was forbidden, which
-is the rig `plans/BP30-background-stream.md` §5 exists to prevent.
+is the rig `plans/done/BP30-background-stream.md` §5 exists to prevent.
 
 That is easy to get wrong silently, so this module measures it rather than
 promising it: every rung also encodes the same scenes **separately** and reports
@@ -20,7 +20,7 @@ are equal, the anchor is not predicting across the join and the comparison is
 rigged in PointStream's favour — that is a bound in
 `outputs/bp31-ladder/bounds-before-run.json`, and it is checked here.
 
-**One bound model is one stream** (`plans/BP30-findings.md`, and the guard in
+**One bound model is one stream** (`plans/done/BP30-findings.md`, and the guard in
 `tests/runner/test_background_stream_stage.py`). The runner binds the background
 model once per `run()` call and reuses it across chunks, which is what carries
 the previous scene's reconstruction forward. So one rung is one `run()` over N
@@ -30,7 +30,7 @@ reported in the ledger, and absent.
 
 **What each arm's quality is measured on.** The anchor's, on what the decoder
 returned. PointStream's, on `delivered_frames` — not `RunResult.frames`, which
-carries the residual before `residual.codec` ran on it (`plans/BP24-findings.md`
+carries the residual before `residual.codec` ran on it (`plans/done/BP24-findings.md`
 §8). One pooled-PSNR convention for both, imported from `ladder.py` rather than
 restated, because BP23 found two conventions inside one ladder disagreeing by
 0.65 dB.
@@ -77,7 +77,7 @@ from src.contracts import paths as ps_paths
 #: The payload rungs for a **streamed** background, as
 #: ``(stream_crf, residual rate)``. `PAYLOAD_RUNGS` pairs
 #: `background.jpeg_quality` with the residual's rate, and `jpeg_quality`
-#: reaches nothing under `panorama-stream` (`plans/BP31-findings.md` §1). Run
+#: reaches nothing under `panorama-stream` (`plans/done/BP31-findings.md` §1). Run
 #: with that table, the streamed arm's plate came back **789,304 B at all five
 #: rungs** — byte-identical — so the curve swept the residual against a frozen
 #: plate. That is the exact degenerate shape `PAYLOAD_RUNGS`'s own docstring was

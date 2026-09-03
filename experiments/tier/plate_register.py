@@ -1,6 +1,6 @@
 """Is the gap between two points' plates camera motion, or is it content?
 
-`plans/BP24-findings.md` §17 measured that two scenes' first frames differ by
+`plans/done/BP24-findings.md` §17 measured that two scenes' first frames differ by
 13.75 dB, and `plate_delta.py` measured that coding one as a delta against the
 other is dominated -- 1.5-1.7x the bytes for 13 dB less quality. Both scenes in
 each pair are labelled `cluster_point` in the dataset's own scene metadata, so

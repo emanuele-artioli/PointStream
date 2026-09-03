@@ -20,13 +20,13 @@ and decoded once per client, so the two costs sit on different sides of the
 system and must not be added into one number.
 
 **This is not a codec ranking**, and the report says so in its own body.
-Encoder presets are not equal effort across codecs (`plans/BP24-findings.md`
+Encoder presets are not equal effort across codecs (`plans/done/BP24-findings.md`
 §1), so these curves say what *this project's plate* costs under each encoder as
 configured — an engineering choice about our plate, not a statement that one
 codec beats another. Reporting encode time beside every size is what keeps that
 distinction visible rather than merely asserted.
 
-**Scope.** This prices the `panorama-full` arm only. `plans/BP31-findings.md` §1
+**Scope.** This prices the `panorama-full` arm only. `plans/done/BP31-findings.md` §1
 measured `background.codec` reaching nothing under `panorama-stream`, so nothing
 here chooses anything for the streamed arm.
 

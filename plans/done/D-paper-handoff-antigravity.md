@@ -1,7 +1,7 @@
 # Stream D — paper catch-up, for Antigravity
 
 **Wave 4, stream D.** Paper writing is offloaded to Antigravity by standing
-practice. This file is the delta to add on top of `plans/P1-paper-catchup.md`,
+practice. This file is the delta to add on top of `plans/done/P1-paper-catchup.md`,
 which is still accurate and still the main brief — read it first.
 
 **Owns exclusively:** the paper repo `67a9ea6275d3d9785ce57026/`. It is a
@@ -27,8 +27,8 @@ Measured at n=8:
 
 Both below the pre-registered threshold, neither above 2σ. **The paper may no
 longer claim that modern codecs leave object coding on the table**, and any
-sentence naming VVC as "the exception" is now wrong. `plans/README.md` item 0
-and `PLAN.md` §2.14 both still carry the old n=2 framing — treat those as stale
+sentence naming VVC as "the exception" is now wrong. `plans/done/README.md` item 0
+and `plans/done/RESEARCH-HISTORY.md` §2.14 both still carry the old n=2 framing — treat those as stale
 source text, not as evidence.
 
 What *does* survive: the **concentration** result. Players are ~1% of pixels and
@@ -49,7 +49,7 @@ not cheapen.
 **Do not cite "17%" as the opening argument without the standard error and those
 two clips.** The old n=2 figure quoted only the two highest-saving clips.
 
-Full write-up with every cell: `plans/BP21-headroom-widen.md`.
+Full write-up with every cell: `plans/done/BP21-headroom-widen.md`.
 
 ### 3. Background saving came in above its band
 
@@ -60,7 +60,7 @@ Report it as measured, with the band it exceeded.
 
 ### 4. The generator negative is unchanged, and one arm is still open
 
-Every engine in the roster loses to pasting the keyframe (`PLAN.md` §2.10). That
+Every engine in the roster loses to pasting the keyframe (`plans/done/RESEARCH-HISTORY.md` §2.10). That
 is still the honest scoped negative for §7 P0 item 5. **An IP-Adapter arm is
 training right now** (wave 4 stream A) and its bounds are pre-written; its
 declared ceiling is a *semantic* appearance match, not identity. Leave a

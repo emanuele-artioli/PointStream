@@ -28,10 +28,10 @@ reportable afterwards.
 
 **BD-rate of PointStream against an av1 anchor, both arms on the same footage,
 same low-delay treatment, reported per video with the spread, at the best
-configuration reachable by the axes in `plans/prompts/next-session-bp31.md` plus
+configuration reachable by the axes in `https://github.com/emanuele-artioli/PointStream/blob/ec581e9/plans/prompts/next-session-bp31.md` plus
 span (`plans/BP33-span-amortisation.md`).**
 
-Quoted on **all three quality axes** once `plans/BP35-perceptual-bdrate.md`
+Quoted on **all three quality axes** once `plans/done/BP35-perceptual-bdrate.md`
 lands, because "PointStream wins" that is true on VMAF and false on PSNR is a
 scoped result and must be stated as one, not chosen silently. And quoted with
 **encode and decode time beside it every time**, per `AGENTS.md`: a win that
@@ -39,7 +39,7 @@ costs 100x the anchor's encode time is a different result from one that does
 not, and a two-column table cannot tell them apart.
 
 Current value: **+90.97%**, N=2 scenes, 8 frames per scene, Y-PSNR, one video
-(`plans/BP31-findings.md` §9).
+(`plans/done/BP31-findings.md` §9).
 
 **Always state the span it was measured at.** §12 of the same findings shows the
 number moves with frames-per-scene and that both arms amortise, so a BD-rate
@@ -129,7 +129,7 @@ survives into this branch.
 
 ## Branch C — no regime wins on any tried axis
 
-**Condition.** The axes in `plans/prompts/next-session-bp31.md` (content, scene
+**Condition.** The axes in `https://github.com/emanuele-artioli/PointStream/blob/ec581e9/plans/prompts/next-session-bp31.md` (content, scene
 count, quality axis, rate regime) plus **span** are each tried far enough to say
 where the gap is smallest, and the best configuration anywhere is above **+20%**.
 
@@ -151,7 +151,7 @@ changes what the paper argues, and it must not be discovered at submission time.
   1. **The platform paper.** The lattice, the component catalogue, the measured
      per-component BD-rates, and the negative result stated plainly. The
      contribution is a way to ask the question, plus the first honest answers.
-  2. **The headroom paper.** `PLAN.md` §2.14 is a solid, self-contained, n=8
+  2. **The headroom paper.** `plans/done/RESEARCH-HISTORY.md` §2.14 is a solid, self-contained, n=8
      measurement: players are ~1% of the pixels and ~23% of the bitrate; a
      panorama saves 34–69% of the background's rate. That is a motivation
      section that stands on its own as a short paper about where the

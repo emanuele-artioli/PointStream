@@ -4,7 +4,7 @@
 array's `nbytes` does not change when the block gate zeroes a block, so a ledger
 reading `payload.byte_count` for a lossy residual reports the same payload for a
 coarse residual as for a fine one — and coarseness looks free. That is not a
-cosmetic difference: the residual-coarseness curve (`PLAN.md` §7 P0 item 3) is a
+cosmetic difference: the residual-coarseness curve (`plans/done/RESEARCH-HISTORY.md` §7 P0 item 3) is a
 plot of payload against quality, and a payload axis that does not move is a flat
 line through every rung.
 

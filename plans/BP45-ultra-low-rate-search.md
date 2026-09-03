@@ -1,5 +1,9 @@
 # BP45 — Ultra-low-rate AV1/VVC search
 
+**Current state (3 September):** M1 and the E1 harness are merged. Do not repeat
+their implementation. Broad E1 waits for `BP49-native-reference-pilot.md` and
+Codex review; the historic native preflight did not decide Gate A.
+
 **Roadmap IDs:** M1 then E1  
 **Preferred harness:** Cursor implements and validates; a detached batch runs the
 sweep; Codex/Claude approves bounds and interprets results.  
@@ -9,8 +13,8 @@ long-eligible-scene regime.
 ## Read
 
 `AGENTS.md`, `plans/ROADMAP.md` §§2–3 and 8,
-`plans/TERMINOLOGY.md`, `plans/BP31-findings.md`,
-`plans/BP35-perceptual-bdrate.md`, the codec contracts, and the current paired
+`plans/TERMINOLOGY.md`, `plans/done/BP31-findings.md`,
+`plans/done/BP35-perceptual-bdrate.md`, the codec contracts, and the current paired
 ladder. Do not read unrelated briefs.
 
 ## Owns
@@ -101,7 +105,7 @@ Follow `plans/SESSION-REPORT.md`. Include calibration, codec floors, every
 curve and overlap, size/quality/encode/decode time, byte ledgers, alarms, failed
 points, exact commands and the Gate-A decision.
 
-**Current integration status:** `BP47-integration.md` supersedes the "Next"
+**Current integration status:** `done/BP47-integration.md` supersedes the "Next"
 instructions and completion wording in the historical reports below.
 
 ## Delivered (M1, 2026-09-02)
@@ -112,7 +116,7 @@ probe are done. Gate A is not decided. E1's *encode wave* was not launched.
 **PR:** [#51](https://github.com/emanuele-artioli/PointStream/pull/51) on
 `cursor/m1-bp45` (`7602197` M1, `ecaf8de` E1 harness). CI green. Worktree:
 `/home/itec/emanuele/pointstream/.claude/worktrees/bp45`, from `origin/main`
-(`ecebd9b`). Named report: `plans/BP45-m1-report.md`.
+(`ecebd9b`). Named report: `plans/done/BP45-m1-report.md`.
 
 **Owns (landed):** metric direction/transform/span on `MetricSpec`;
 `compare_rd_curves` / `meets_or_beats_floor`; `experiments/tier/low_rate_*.py`;

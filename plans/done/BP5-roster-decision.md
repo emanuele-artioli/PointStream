@@ -5,12 +5,12 @@ earlier: it needs a trustworthy probe set (B′1), region-scoped scoring (B′2)
 engines that actually load (B′3, B′4).
 
 **Owns exclusively:** `experiments/probe/**`, `tests/invariants/**`, and the
-roster section of `PLAN.md` §6.2.
-**Read first:** `PLAN.md` §6.2–6.6, and the reports from all four Wave-1 streams.
+roster section of `plans/done/RESEARCH-HISTORY.md` §6.2.
+**Read first:** `plans/done/RESEARCH-HISTORY.md` §6.2–6.6, and the reports from all four Wave-1 streams.
 
 ## ⚠️ Do this first: the probe set is not fit to run on
 
-Verified 2026-08-22 (`PLAN.md` §2.3). **5 of the 12 v2 clips have 48 colour
+Verified 2026-08-22 (`plans/done/RESEARCH-HISTORY.md` §2.3). **5 of the 12 v2 clips have 48 colour
 frames and 0 skeleton frames.** The dataset names crop/canny/pose directories by
 *global source frame id* and `_skeleton` by *track-local index*;
 `experiments/probe_set/materialize.py` copies conditioning directories with the
@@ -37,7 +37,7 @@ colour frames only, which is exactly why this passed.
 ### 1. The probe harness
 
 Drive every wired engine over the rebuilt probe set. **Region-scoped PSNR only** —
-no VMAF, no LPIPS, no FVMD (`PLAN.md` §6.5). Record per engine, per clip:
+no VMAF, no LPIPS, no FVMD (`plans/done/RESEARCH-HISTORY.md` §6.5). Record per engine, per clip:
 
 - object-scoped PSNR, and whole-frame PSNR alongside it;
 - the seed, the checkpoint epoch, peak VRAM, wall-clock per clip;
@@ -49,19 +49,19 @@ frame, and how far apart are they?
 
 ### 2. Fix the roster in writing
 
-Update `PLAN.md` §6.2 with the decision and, for each engine, the reason it holds
+Update `plans/done/RESEARCH-HISTORY.md` §6.2 with the decision and, for each engine, the reason it holds
 its slot. Two questions to settle on evidence:
 
 - **Does Animate-Anyone keep the quality-flagship slot**, or does the modern
   candidate take it? Note it cannot carry the held-out arm at all — its
-  fine-tuning set contains both held-out videos (`PLAN.md` §2.5). Decide and
+  fine-tuning set contains both held-out videos (`plans/done/RESEARCH-HISTORY.md` §2.5). Decide and
   record which of the three options there applies.
 - **Do the two flagship roles collapse into one?** If the comparison backbone is
   also the best performer, say so and simplify the narrative.
 
 ### 3. The two invariants Phase B should have written
 
-`PLAN.md` §8 names a required-behaviour suite that is currently a three-test stub
+`plans/done/RESEARCH-HISTORY.md` §8 names a required-behaviour suite that is currently a three-test stub
 that skips. Two of its assertions are checkable now and belong here, because this
 is where weights start mattering:
 

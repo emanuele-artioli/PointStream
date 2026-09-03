@@ -1,12 +1,12 @@
 # B′23 — One tier config, end to end, producing real numbers
 
-**This is `PLAN.md` §7 P0 item 1**, the standing blocker. P0 items 2, 3 and 4 —
+**This is `plans/done/RESEARCH-HISTORY.md` §7 P0 item 1**, the standing blocker. P0 items 2, 3 and 4 —
 the codec ladder, the residual-coarseness curve, the ablation lattice — are all
 waiting on it. It is the highest-value unblocked item in the project.
 
 **Owns:** `src/runner/**`, `src/pipeline/**`, `config/tier_*.yaml`,
 `experiments/tier/**` (new), `tests/runner/**`, `tests/pipeline/**`.
-**Read first:** `AGENTS.md`, `PLAN.md` §3 and §7, `plans/C3-runner.md`,
+**Read first:** `AGENTS.md`, `plans/done/RESEARCH-HISTORY.md` §3 and §7, `plans/done/C3-runner.md`,
 `src/contracts/lattice.py`, `src/contracts/config.py`.
 
 **Does not own** `src/shared/**` or `src/decoder/**` — those are BP22's. Good
@@ -20,7 +20,7 @@ The parts exist and are individually green. `src/runner/` is 819 lines across
 `routing.py`, `stages.py`, `accounting.py`, `run.py` with 11 tests.
 `src/pipeline/` is 2016 lines with 110 tests. `config/` holds `default.yaml` and
 `tier_fast` / `tier_balanced` / `tier_quality`. Metrics compute real numbers
-(`PLAN.md` §2).
+(`plans/done/RESEARCH-HISTORY.md` §2).
 
 What has never happened is the three of them meeting: **no tier config has been
 driven through the runner to a scored reconstruction.** Until that runs, "the
@@ -42,7 +42,7 @@ platform works" is an assertion about unit tests.
 
 ## Bounds — write these to `outputs/bp23-tier/bounds-before-run.json` first
 
-The generator roster is a known negative (`PLAN.md` §2.10: every engine loses to
+The generator roster is a known negative (`plans/done/RESEARCH-HISTORY.md` §2.10: every engine loses to
 pasting the keyframe). **So do not expect good quality, and do not treat poor
 quality as a bug in this stream.** Expect roughly:
 
@@ -73,5 +73,5 @@ Write the actual numbers and reasoning before the first run, per `AGENTS.md`.
 - A required-behaviour test covers the end-to-end path.
 - The report says what had to be fixed to make it run, and how the three tiers
   differed.
-- `PLAN.md` §7 P0 item 1 is checked off, or the report says precisely what still
+- `plans/done/RESEARCH-HISTORY.md` §7 P0 item 1 is checked off, or the report says precisely what still
   blocks it.

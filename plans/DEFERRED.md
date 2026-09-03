@@ -155,7 +155,7 @@ isolation instead of deleting the tests.
 
 ---
 
-*(D7 moved to `plans/BP14-training-stop-rule.md` — it is scheduled work, not deferred.)*
+*(D7 moved to `plans/done/BP14-training-stop-rule.md` — it is scheduled work, not deferred.)*
 
 ---
 
@@ -170,7 +170,7 @@ codec.
 **Why it waits.** The paper compares **PointStream against a codec**, not codec
 against codec. Pairing both arms on one codec at one preset makes the preset
 cancel, so every number the submission needs is obtainable without settling
-this. See `plans/BP24-findings.md` §1.
+this. See `plans/done/BP24-findings.md` §1.
 
 **What it costs when it comes due.** Only if the paper ever wants a direct
 codec-vs-codec line, or wants to *rank* its per-codec gains against each other.
@@ -188,7 +188,7 @@ per-codec gains.
 **What.** Two distinct ideas got confused in one conversation, and only one of
 them is closed. Recorded here so the open one is not lost with the closed one.
 
-**Closed, on three measurements** (`plans/BP24-findings.md` §17): *sharing one
+**Closed, on three measurements** (`plans/done/BP24-findings.md` §17): *sharing one
 plate across the points of a match*. Labelled `cluster_point` scenes differ by
 13.75 and 15.10 dB; coding one as a delta against another costs 1.49–1.70x the
 bytes of coding it fresh and lands 13 dB lower, so the fresh arm dominates; and
@@ -231,7 +231,7 @@ for the operating point where it wins* is a separate, larger question than
 range is four encodes, clip length is a flag, content type is a dataset the
 project already has. Perhaps a day once the panorama lands.
 
-**Update 2026-08-29 — partly reopened.** `plans/BP24-findings.md` §18 measures
+**Update 2026-08-29 — partly reopened.** `plans/done/BP24-findings.md` §18 measures
 that coding the next plate as a **P-frame** against the previous one saves
 31–53% with av1, where pixel subtraction cost *more*. So the closed half of this
 entry is narrower than it was written: what is closed is subtraction, not

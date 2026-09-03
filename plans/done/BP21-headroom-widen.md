@@ -101,7 +101,7 @@ Re-derive from the real result, and write them down first:
 - AV1's background BD-rate is reported, or its absence explained.
 - The plate NaN is fixed, and any change to a `BP20` number is stated as a
   correction.
-- `PLAN.md` §2.14's numbers are superseded by these — report them; the plan
+- `plans/done/RESEARCH-HISTORY.md` §2.14's numbers are superseded by these — report them; the plan
   edit is made centrally.
 
 ## Delivered
@@ -124,7 +124,7 @@ n=8 clips, 6 matches (alcaraz_ruud has no 2–30 s point scene on disk, so it co
 
 ### What was deliberately not done
 
-- Did not touch `67a9ea6275d3d9785ce57026/` (`sections/problem.tex`), `PLAN.md` §2, `plans/README.md`, `src/components/metrics/**`, `src/decoder/**`, `src/shared/**`, `scripts/train_controlnet.py`.
+- Did not touch `67a9ea6275d3d9785ce57026/` (`sections/problem.tex`), `plans/done/RESEARCH-HISTORY.md` §2, `plans/done/README.md`, `src/components/metrics/**`, `src/decoder/**`, `src/shared/**`, `scripts/train_controlnet.py`.
 - Did not test third-party encoder binaries, libvvenc empty-bitstream behaviour, or a full 4K encode in CI.
 
 ### Paste-back
@@ -216,7 +216,7 @@ Flat still understates plate on every codec (AVC 0.109 vs 0.170). Instrument: PS
 
 **AV1 background** is no longer a missing cell. n=8, mean 0.780 ± 0.056, above the pre-written [0.25, 0.75] band. The bound was taken from BP20's 34–69% on two clips; a still plate against a 4K intercoded background can save more than that. Alarm, not retconned.
 
-`PLAN.md` §2.14 is **not** edited here. Report these numbers; the plan edit is made centrally.
+`plans/done/RESEARCH-HISTORY.md` §2.14 is **not** edited here. Report these numbers; the plan edit is made centrally.
 
 ### Tools (resolved by path+version)
 
@@ -238,7 +238,7 @@ PR https://github.com/emanuele-artioli/PointStream/pull/18
   QP 46 (141623 B). Rates were not monotonic; the check aborted. Six AVC clips
   were already checkpointed. Reuse now copies only a complete QP set; a partial
   arm is deleted and re-encoded together. The poisoned `scene_010` originals
-  were wiped and the ladder resumed. `PLAN.md` §2.14 is not edited here.
+  were wiped and the ladder resumed. `plans/done/RESEARCH-HISTORY.md` §2.14 is not edited here.
 
 ### Tests landed (approved bug-fix cases only)
 

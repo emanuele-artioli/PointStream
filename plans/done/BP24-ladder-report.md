@@ -1,10 +1,10 @@
 # BP24 — the paired ladder
 
-What this session set out to do (`plans/prompts/next-session.md`): the
-`WireCost` honesty pass, settle `actor_reference`, and run `PLAN.md` §7 P0
+What this session set out to do (`https://github.com/emanuele-artioli/PointStream/blob/ec581e9/plans/prompts/next-session.md`): the
+`WireCost` honesty pass, settle `actor_reference`, and run `plans/done/RESEARCH-HISTORY.md` §7 P0
 items 2 and 3 as paired BD-rate curves with their bounds written first.
 
-Read `plans/BP24-findings.md` before quoting any number here. Findings 8-14 were
+Read `plans/done/BP24-findings.md` before quoting any number here. Findings 8-14 were
 added by this session, and §14 corrects §12.
 
 ---
@@ -124,7 +124,7 @@ test.
 
 ## 4. The ladder
 
-Design, per `plans/BP24-findings.md` §1: for codec X, measure X coding the
+Design, per `plans/done/BP24-findings.md` §1: for codec X, measure X coding the
 source and PointStream using X for its coded components, **same preset, same
 rate control, same pixel format**, and take BD-rate between the two curves. Both
 arms are built from one `EncodeRequest` per rung, so "same preset" is enforced
@@ -366,7 +366,7 @@ codec on **both** arms at its own preset.
 | vvc | `faster` | **+378.1%** | 35.28–43.65 | 0.74 |
 
 > **These four numbers must not be ranked against each other.** The presets are
-> not equal effort across codecs (`plans/BP24-findings.md` §1), and ordering the
+> not equal effort across codecs (`plans/done/BP24-findings.md` §1), and ordering the
 > magnitudes would be measuring the presets rather than PointStream. Each number
 > is a gain against *that codec at that preset*, which is the claim shape the
 > paper needs and the only one this design supports.
@@ -413,7 +413,7 @@ rung is 38.0 dB, so there is no overlap and no BD-rate to report.
 So the component the architecture argues hardest for is the one earning its
 bytes, and the one standing in for itself is the one losing the comparison. The
 plate is the **first source frame**, JPEG-coded, not a stitched panorama
-(`plans/BP24-findings.md` §6). That was filed as a limitation of the background
+(`plans/done/BP24-findings.md` §6). That was filed as a limitation of the background
 work; it is in fact the single largest lever on PointStream's rate, and nothing
 in this ladder will move until it does.
 

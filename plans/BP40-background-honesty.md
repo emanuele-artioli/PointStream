@@ -2,14 +2,16 @@
 
 **Three findings the BP31 session deliberately left alone**, because folding them
 into a run would have meant changing the thing being measured while measuring it.
-They are recorded in `plans/BP31-findings.md` §§1 and 7 and they do not go away.
+They are recorded in `plans/done/BP31-findings.md` §§1 and 7 and they do not go away.
 
 **Owns:** `src/components/background/**`, `tests/components/test_background*.py`.
-**Blocked on PR #45 merging** — file ownership, not results.
+**Status 2026-09-03:** PR #45 and canonical-canvas integration are merged.
+This brief is a deferred audit of remaining knobs, not a merge blocker; compare
+each historical diagnosis with current code before implementing it. BP49 is next.
 
 **Read first:** `AGENTS.md` (a flag existing is not a feature working) ·
-`plans/BP31-findings.md` §§1, 7 · `plans/BP29-plate-codec-report.md` §4 ·
-`plans/BP30-background-stream.md` · `PLAN.md` §2.21.
+`plans/done/BP31-findings.md` §§1, 7 · `plans/done/BP29-plate-codec-report.md` §4 ·
+`plans/done/BP30-background-stream.md` · `PLAN.md` §2.21.
 
 ---
 
@@ -29,7 +31,7 @@ reading a ledger to check "did the intra sidecar arm run?" gets a plausible yes.
 
 **Fix:** the artifact reports what produced the bytes, or reports nothing. Add a
 test that drives both methods and asserts the reported codec matches the encoder
-that ran — the same shape of test as `plans/BP31-findings.md` §1's probe, which
+that ran — the same shape of test as `plans/done/BP31-findings.md` §1's probe, which
 found this by driving three codec values and getting byte-identical payloads.
 
 ## 2. `intra_qp` reaches nothing, so lever (a) is a point and not an axis
@@ -41,12 +43,12 @@ back to `DEFAULT_INTRA_QP = 45` on **every** runner path.
 
 `background.codec: av1` is therefore a single fixed operating point. The same
 limitation is recorded for `roi-video`'s `crf` in
-`plans/BP29-plate-codec-report.md` §4. `PLAN.md` §2.21 calls the plate codec
+`plans/done/BP29-plate-codec-report.md` §4. `PLAN.md` §2.21 calls the plate codec
 "lever (a)" and it is not currently a lever in the sense of something you can
 sweep.
 
 **Fix:** plumb it, and add the invariant that every knob a config accepts changes
-the bytes — driven, not read. `plans/BP31-findings.md` §1's probe table is the
+the bytes — driven, not read. `plans/done/BP31-findings.md` §1's probe table is the
 template: a null result (three codecs, identical payloads) is only readable
 beside a control where the same probe *does* separate them.
 
@@ -72,7 +74,7 @@ produces for free.
 
 ## 3b. A run-wide canvas — found 2026-09-02, and it gates the span axis
 
-`plans/BP31-findings.md` §12 hit this running the span sweep. Spans 24, 32 and 48
+`plans/done/BP31-findings.md` §12 hit this running the span sweep. Spans 24, 32 and 48
 refuse under `panorama-stream`:
 
 ```
@@ -114,7 +116,7 @@ from those numbers whether the combined question still justifies the change.
 
 ## 4. The bound this component keeps breaking
 
-`plans/BP31-findings.md` §6 is worth re-reading before writing any bound here:
+`plans/done/BP31-findings.md` §6 is worth re-reading before writing any bound here:
 the background's *share* of the payload is a saturating function of the plate's
 cost and **cannot detect a fix**, because the non-plate payload is ~9% on this
 content. The share was chosen because `PLAN.md` §2.20 stated the problem in those

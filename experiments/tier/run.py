@@ -190,7 +190,7 @@ def run_all_off(clip: TierClip) -> TierRun:
 def run_residual_absent(clip: TierClip) -> TierRun:
     """`tier_fast` with the residual switched off — the unaided reconstruction.
 
-    Named in the Phase C gate (`PLAN.md` §8): a residual-absent run has to
+    Named in the Phase C gate (`plans/done/RESEARCH-HISTORY.md` §8): a residual-absent run has to
     complete and report its measured quality drop, rather than the residual
     being a stage the pipeline cannot do without. It is also the honest floor
     for the tier ladder: everything the three tiers gain, they gain from here.

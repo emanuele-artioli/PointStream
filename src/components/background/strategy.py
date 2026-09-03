@@ -273,7 +273,7 @@ class PanoramaStream(BackgroundModel):
     88-91% of the payload: each scene paid for its plate from scratch. This one
     carries the previous **reconstruction** across scenes and codes the next
     plate against it. Measured over five videos, 16 scenes each
-    (`plans/BP30-findings.md` §29): 49.2% +- 6.2% of coding every plate fresh,
+    (`plans/done/BP30-findings.md` §29): 49.2% +- 6.2% of coding every plate fresh,
     best case 29.4%.
 
     **The reconstruction is never recomputed, only decoded**, which is what

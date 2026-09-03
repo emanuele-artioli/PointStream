@@ -1,10 +1,10 @@
 # BP30 — the background as a stream: what landed, and what to distrust
 
-Companion to `plans/BP30-background-stream.md` (the design) and
-`plans/BP24-findings.md` §§16-19 (what it was built on). Numbered to continue
+Companion to `plans/done/BP30-background-stream.md` (the design) and
+`plans/done/BP24-findings.md` §§16-19 (what it was built on). Numbered to continue
 that file's sequence so cross-references stay unambiguous.
 
-Run under `plans/prompts/claude-bp30.md`, whose scope excludes wiring anything
+Run under `https://github.com/emanuele-artioli/PointStream/blob/ec581e9/plans/prompts/claude-bp30.md`, whose scope excludes wiring anything
 into `make_background` (stream D's file this week), adding sidecar codecs
 (stream B's), and re-running the paired ladder. None of those were touched.
 

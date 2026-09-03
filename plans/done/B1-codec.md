@@ -56,7 +56,7 @@ moves quality, and already establishes that AV1's is precisely localized at
 matched QP. Extend it with `--match-bitrate` rather than writing a new harness.
 
 **Sweeps, not points.** Every arm this stream produces is walked across a rate
-ladder, because comparisons are settled by BD-rate over curves (`PLAN.md` §5).
+ladder, because comparisons are settled by BD-rate over curves (`plans/done/RESEARCH-HISTORY.md` §5).
 A harness that emits one point per configuration is emitting something
 uncomparable.
 

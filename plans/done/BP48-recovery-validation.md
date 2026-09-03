@@ -1,5 +1,9 @@
 # BP48 — recovery safety before the reference pilot
 
+Archive status (2026-09-03): PRs #52/#53 are merged; old worktrees have been
+removed. Historical next-step instructions below are superseded by
+`../BP49-native-reference-pilot.md`. Native recovery timing still needs validation.
+
 Owner: Codex. Date: 3 September 2026. This is an engineering acceptance report,
 not a codec comparison. Gate A remains open; no broad E1 run was launched.
 

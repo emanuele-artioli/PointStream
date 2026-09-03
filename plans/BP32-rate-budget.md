@@ -10,8 +10,8 @@ section of `PLAN.md` §5 that states the currency. **Does not own**
 holds those; report, do not edit.
 
 **Read first:** `AGENTS.md` · `PLAN.md` §§2.6, 2.14, 2.20, 2.21 ·
-`plans/BP24-ladder-report.md` (the payload tables) · `plans/BP31-findings.md`
-§§3, 9, 10 · `plans/BP29-panorama-report.md` §4.
+`plans/done/BP24-ladder-report.md` (the payload tables) · `plans/done/BP31-findings.md`
+§§3, 9, 10 · `plans/done/BP29-panorama-report.md` §4.
 
 ---
 
@@ -28,7 +28,7 @@ for AVC, HEVC and VVC; **not reported for AV1**, because the PSNR overlap
 between the arms was 0.46 and 0.20, below the 50% the BD-rate implementation
 requires.
 
-**What the system delivers** (`plans/BP24-ladder-report.md`, `BP31` §9, same
+**What the system delivers** (`plans/done/BP24-ladder-report.md`, `BP31` §9, same
 content family, 8-frame clips). BD-rate **+116.8%** against av1 with a
 single-frame plate; **+109.72%** with a real panorama at N=2; **+90.97%** with
 the cross-scene stream on.
@@ -51,7 +51,7 @@ a confident, plausible, wrong ceiling.
 point on the anchor curve — the natural one is av1 at the quality PointStream
 actually delivers — and account for every byte both arms spend to reach it. Then
 convert to a rate ratio once, at the end, and say what quality it is quoted at.
-That is the same discipline `plans/BP29-plate-codec-report.md` §3 was written
+That is the same discipline `plans/done/BP29-plate-codec-report.md` §3 was written
 about, applied one level up.
 
 ## 2. What to produce
@@ -83,7 +83,7 @@ PointStream's plate, the anchor's keyframe — and comparing one arm's marginal
 against the other's fixed-plus-marginal flatters PointStream by exactly the
 keyframe.
 
-`plans/BP31-findings.md` §12 makes the honest version measurable, because two
+`plans/done/BP31-findings.md` §12 makes the honest version measurable, because two
 span points separate fixed from marginal. The anchor's marginal is a difference
 quotient, so it does not depend on how many keyframes the joint encode used:
 
@@ -153,7 +153,7 @@ time, and the honest consequence has never been measured.
 
 **Two things sharpen the argument since it was written.** The share it turns on is
 span-dependent — PointStream's non-plate payload is ~9% of its own at span 8 and
-~28% at span 16 (`plans/BP31-findings.md` §12) — so the asymmetry shrinks as span
+~28% at span 16 (`plans/done/BP31-findings.md` §12) — so the asymmetry shrinks as span
 grows and must be quoted at a stated span. And it now cuts both ways on the
 *time* axis: PointStream already encodes at **x19.1–19.7** the anchor's wall
 clock, so moving the anchor to a slower preset narrows a gap the paper would
@@ -216,7 +216,7 @@ to explain.
 - **Not run a ladder.** Every number it needs either exists or is four encodes.
   If it starts encoding a ladder it has become BP31 and it is colliding.
 - **Not conclude the approach is dead.** A ledger says where bytes go; it does
-  not say whether a regime exists. That is `plans/FORK-bp31.md`'s question.
+  not say whether a regime exists. That is `plans/done/FORK-bp31.md`'s question.
 - **Not quietly become an optimisation.** Attribute first. Fixing a term before
   it is measured is how the project ends up with a lever it cannot price.
 
@@ -228,6 +228,6 @@ to explain.
 - av1's background headroom is measured and `PLAN.md` §2.14's table has no hole
   at the anchor codec.
 - The terms are **ranked by how many BD-rate points each is worth**, which is the
-  artefact BP31 and `plans/FORK-bp31.md` both need.
+  artefact BP31 and `plans/done/FORK-bp31.md` both need.
 - The result is told to the BP31 session **before** its extraction campaign
   commits to a frames-per-scene value.
