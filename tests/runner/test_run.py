@@ -315,9 +315,9 @@ def test_a_second_run_resumes_finished_chunks(tmp_path: Path) -> None:
     clock = _Count()
     clips = [_clip(40, frames=1), _clip(80, frames=1)]
     ckpt = tmp_path / "chunks"
-    run(_all_off(), clips, backends={STAGE_CODEC: clock}, checkpoint_dir=ckpt)
+    run(_all_off(), clips, backends={STAGE_CODEC: clock}, checkpoint_dir=ckpt, checkpoint_identity="count-v1")
     assert clock.calls == 2
-    run(_all_off(), clips, backends={STAGE_CODEC: clock}, checkpoint_dir=ckpt)
+    run(_all_off(), clips, backends={STAGE_CODEC: clock}, checkpoint_dir=ckpt, checkpoint_identity="count-v1")
     assert clock.calls == 2
     assert (ckpt / "chunk_00" / "done").is_file()
     assert (ckpt / "chunk_01" / "done").is_file()

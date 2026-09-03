@@ -218,8 +218,9 @@ def _run(
             config's ``background.context_id``, or ``"run"`` for every chunk.
         checkpoint_dir: When set, each finished chunk is written here and a
             later call with the same directory skips those chunks. Per-point
-            JSON cannot resume a killed encoder subprocess; this is the
-            hourly-budget path.
+            JSON cannot resume a killed encoder subprocess. The timing record
+            checks whether gaps between durable checkpoints stayed under an
+            hour; a single long stage can still exceed that budget.
         heartbeat_interval: Seconds between still-running lines inside a
             blocked stage. ``None`` disables the heartbeat.
     """

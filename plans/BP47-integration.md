@@ -10,7 +10,7 @@ only after the integration checks pass. No broad encode batch has been launched.
 - BP46: `21c0681`, including the previously uncommitted repairs and reports.
 - Reference protocol and roadmap: `a7e5a16`.
 
-These are merged on `codex/bp44-bp46-integration`. Original worktrees remain;
+These reached `main` in PR #52 (`68a03dc`). Original worktrees remain;
 ask the user before removing them. Remote branch deletion is human-only.
 
 ## Integration changes
@@ -63,9 +63,10 @@ shape, ledger, VMAF/PSNR/SSIM, and checkpoint resume are recorded. One 48-frame
 4K point took 73 min of PointStream wall, so it does not fit the hourly
 subprocess budget; per-point checkpoints still cannot resume a killed encoder.
 
-Broad E1 still needs the independent AV1/VVC 48-frame native curves, then the
-staged sweep. New output directory if implementation or source frames change.
-Gate A is still open.
+Recovery repairs and their approved interruption tests are tracked in
+`BP48-recovery-validation.md`. Native recovery-budget verification and the
+slowest-preset AV1/VVC pilot come before curves or a broad staged sweep. Use new
+output directories when implementation or source frames change. Gate A is open.
 
 Antigravity data follow-up remains separate: confirmation corpus incomplete.
 Keep historically used videos in diagnostics; audit independent match identities

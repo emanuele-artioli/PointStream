@@ -49,7 +49,9 @@ paper must call a slow configuration offline or compute-intensive; it may not
 call it live or real-time.
 
 **Integration status:** `plans/BP47-integration.md` tracks the consolidated
-BP44–BP46 branch and remaining checks. Gate A is not decided; no broad E1 batch
+BP44–BP46 merge (PR #52) and remaining checks. `plans/BP48-recovery-validation.md`
+tracks the recovery follow-up and native-budget / reference pilot gates.
+Gate A is not decided; no broad E1 batch
 has been launched. Confirmation data are incomplete, not fully verified.
 
 **Code.** `src/contracts/`, the components, the end-to-end runner, real coded

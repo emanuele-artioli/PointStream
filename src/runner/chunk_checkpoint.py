@@ -78,6 +78,10 @@ def verify_snapshot(directory: Path) -> None:
         hashes = json.loads((directory / "done").read_text())
         if not isinstance(hashes, dict) or not hashes:
             raise ValueError("legacy or empty commit record")
+        files = {str(path.relative_to(directory)) for path in directory.rglob("*")
+                 if path.is_file() and path != directory / "done"}
+        if set(hashes) != files:
+            raise ValueError("checkpoint file manifest does not match snapshot")
         for name, digest in hashes.items():
             path = directory / name
             if path.resolve().is_relative_to(directory.resolve()) is False:
@@ -274,6 +278,8 @@ def _load_arrays(directory: Path, state: dict[str, Any]) -> dict[str, Any]:
         else:
             payloads.append(bytes(item))
     transmitter["payloads"] = payloads
+    transmitter["originals"] = []
+    transmitter["reconstructions"] = []
     originals_path = directory / "originals.npy"
     reconstructions_path = directory / "reconstructions.npy"
     if originals_path.is_file():

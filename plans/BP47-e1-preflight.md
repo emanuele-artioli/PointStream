@@ -70,7 +70,10 @@ Accepting lost work on a mid-encode crash conflicted with the hourly-checkpoint
 rule. The runner now writes a durable checkpoint after each *chunk* (scene),
 prints stage timings, and emits a still-running line at least every ten minutes
 while a stage is blocked. A killed ffmpeg subprocess still cannot resume
-mid-bitstream. Re-run the same point to pick up finished scenes.
+mid-bitstream. These changes alone do not prove the hourly budget. The follow-up
+in `BP48-recovery-validation.md` saves preparation, verifies actual interrupted
+scene recovery, preserves quality and accumulates attempt time. A new native
+run must check its recorded maximum checkpoint gap before batch expansion.
 
 ## Commands
 
@@ -87,7 +90,7 @@ PYTHONPATH=$PWD PYTHONNOUSERSITE=1 CUDA_VISIBLE_DEVICES= \
 
 ## What this licenses
 
-The native two-scene 4K PointStream path delivers the right shape, hashes the source, writes a ledger that sums, scores usable VMAF/PSNR/SSIM, and resumes from a per-point checkpoint. The broad E1 batch may start from this commit and this output layout (new directory if implementation or frames change).
+The native two-scene 4K PointStream path delivers the right shape, hashes the source, writes a ledger that sums, scores usable VMAF/PSNR/SSIM, and resumes from a per-point checkpoint. This historical run does NOT authorize broad E1 expansion. First pass the native recovery-budget and slowest-preset reference pilot gates in `BP48-recovery-validation.md`, using new output directories.
 
 It does **not** license a PointStream vs AV1/VVC ranking, a Gate-A decision, or E1 evidence. Fallback-equivalence and both access-pattern reference curves were not run.
 
