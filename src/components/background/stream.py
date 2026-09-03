@@ -46,7 +46,7 @@ import tempfile
 from functools import lru_cache
 from dataclasses import dataclass, field, replace
 from pathlib import Path
-from typing import Final, Sequence
+from typing import Any, Final, Mapping, Sequence
 
 import numpy as np
 
@@ -543,6 +543,39 @@ class BackgroundStreamTransmitter:
             reference=reference,
             mode=self.mode,
         )
+
+    def export_state(self) -> dict[str, Any]:
+        """Enough to continue the stream after a crash without re-encoding."""
+        return {
+            "mode": self.mode,
+            "codec": self.codec,
+            "crf": int(self.crf),
+            "keyframe_interval": int(self.keyframe_interval),
+            "chains": [list(chain) for chain in self._chains],
+            "payloads": list(self._payloads),
+            "originals": [np.asarray(item) for item in self._originals],
+            "reconstructions": [np.asarray(item) for item in self._reconstructions],
+        }
+
+    def import_state(self, state: Mapping[str, Any]) -> None:
+        """Restore ``export_state``. Refuses a codec/mode mismatch."""
+        if str(state["mode"]) != self.mode or str(state["codec"]) != self.codec:
+            raise ValueError(
+                f"stream state is mode={state.get('mode')!r} codec={state.get('codec')!r}, "
+                f"transmitter is {self.mode!r} {self.codec!r}"
+            )
+        if int(state["crf"]) != int(self.crf):
+            raise ValueError("stream state crf does not match this transmitter")
+        self.reset()
+        self._chains = [tuple(int(i) for i in chain) for chain in state["chains"]]
+        self._payloads = [bytes(item) for item in state["payloads"]]
+        self._originals = [np.asarray(item, dtype=np.uint8) for item in state["originals"]]
+        self._reconstructions = [
+            np.asarray(item, dtype=np.uint8) for item in state["reconstructions"]
+        ]
+        n = len(self._payloads)
+        if not (len(self._chains) == len(self._originals) == len(self._reconstructions) == n):
+            raise ValueError("stream state lists have unequal length")
 
     def _assert_prefix_stable(self, chain: tuple[int, ...], payloads: list[bytes]) -> None:
         """Re-derived payloads for earlier scenes must match what was sent.

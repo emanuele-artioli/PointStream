@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 from experiments.tier.low_rate_bounds import bounds_document, write_bounds
@@ -166,6 +167,74 @@ def test_select_work_one_point_is_a_single_row() -> None:
 def test_select_work_rejects_a_point_from_the_wrong_stage() -> None:
     with pytest.raises(ValueError, match="belongs to stage"):
         select_work(stage="motion", point="bg-crf51")
+
+
+def test_late_frame_is_per_scene_not_across_the_join() -> None:
+    from types import SimpleNamespace
+
+    from experiments.tier.low_rate_measure import late_frame_by_scene, y_psnr
+
+    ref0 = np.full((2, 8, 8, 3), 100, dtype=np.uint8)
+    ref1 = np.full((2, 8, 8, 3), 100, dtype=np.uint8)
+    pred0 = np.stack(
+        [np.full((8, 8, 3), 90, dtype=np.uint8), np.full((8, 8, 3), 80, dtype=np.uint8)]
+    )
+    pred1 = np.stack(
+        [np.full((8, 8, 3), 70, dtype=np.uint8), np.full((8, 8, 3), 50, dtype=np.uint8)]
+    )
+    clips = [
+        SimpleNamespace(frames=ref0, video="v", scene="scene_a", context_id="c"),
+        SimpleNamespace(frames=ref1, video="v", scene="scene_b", context_id="c"),
+    ]
+    source = np.concatenate([ref0, ref1], axis=0)
+    pred = np.concatenate([pred0, pred1], axis=0)
+    reports = late_frame_by_scene(clips, source, pred)
+    assert reports[0]["scene"] == "scene_a"
+    assert reports[0]["psnr_y_last_minus_first"] == pytest.approx(
+        y_psnr(ref0[1], pred0[1]) - y_psnr(ref0[0], pred0[0])
+    )
+    assert reports[1]["psnr_y_last_minus_first"] == pytest.approx(
+        y_psnr(ref1[1], pred1[1]) - y_psnr(ref1[0], pred1[0])
+    )
+    joined = y_psnr(ref1[1], pred1[1]) - y_psnr(ref0[0], pred0[0])
+    assert reports[0]["psnr_y_last_minus_first"] != pytest.approx(joined)
+    assert reports[1]["psnr_y_last_minus_first"] != pytest.approx(joined)
+
+
+def test_late_frame_bound_reads_the_bp45_band() -> None:
+    from experiments.tier.low_rate_bounds import bounds_document
+    from experiments.tier.low_rate_measure import late_frame_bound_alarms
+
+    bounds = bounds_document()
+    held = late_frame_bound_alarms(
+        [{"video": "v", "scene": "s", "vmaf_last_minus_first": -12.0, "psnr_y_last_minus_first": -1.8}],
+        bounds,
+    )
+    assert held == []
+    alarms = late_frame_bound_alarms(
+        [{"video": "v", "scene": "s", "vmaf_last_minus_first": -40.0, "psnr_y_last_minus_first": -1.8}],
+        bounds,
+    )
+    assert any("VMAF" in item for item in alarms)
+
+
+def test_background_stream_provenance_is_libaom_not_svt() -> None:
+    from experiments.tier.low_rate_measure import stream_codec_provenance
+
+    spec = stream_codec_provenance("av1")
+    assert spec["encoder"] == "libaom-av1"
+    assert "-cpu-used" in spec["low_delay"]
+    assert "8" in spec["low_delay"]
+    assert "realtime" in spec["low_delay"]
+
+
+def test_chunk_checkpoint_refuses_a_gap(tmp_path: Path) -> None:
+    from src.runner.chunk_checkpoint import completed_indices
+
+    (tmp_path / "chunk_01").mkdir()
+    (tmp_path / "chunk_01" / "done").write_text("1\n")
+    with pytest.raises(SystemExit, match="gap"):
+        completed_indices(tmp_path)
 
 
 def _probe_file(path: Path, *, av1: str = "0", vvc: str = "slower") -> Path:

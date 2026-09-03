@@ -87,6 +87,14 @@ class BackgroundModel:
             return "none"
         return self._sidecar.codec_id
 
+    def export_stream_state(self) -> dict[str, Any] | None:
+        """None unless this model holds a cross-scene encoder."""
+        return None
+
+    def import_stream_state(self, state: dict[str, Any]) -> None:
+        if state:
+            raise ValueError(f"{self.method} has no stream state to restore")
+
     def transmit(
         self,
         plate: np.ndarray,
@@ -508,6 +516,18 @@ class PanoramaStream(BackgroundModel):
         previous_decoded: np.ndarray | None = None,
     ) -> np.ndarray | None:
         return self.decode_payload(artifact)
+
+    def export_stream_state(self) -> dict[str, Any] | None:
+        return {
+            "scene_index": int(self._scene_index),
+            "active_context": self._active_context,
+            "transmitter": self._transmitter.export_state(),
+        }
+
+    def import_stream_state(self, state: dict[str, Any]) -> None:
+        self._scene_index = int(state["scene_index"])
+        self._active_context = state.get("active_context")
+        self._transmitter.import_state(state["transmitter"])
 
 
 class BackgroundNone(BackgroundModel):

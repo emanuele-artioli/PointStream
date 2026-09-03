@@ -7,7 +7,7 @@ The all-off corner is not a special path — it is three nodes on the same DAG.
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
 from typing import Any
 
@@ -37,9 +37,17 @@ class Encoder:
     def stages(self) -> tuple[str, ...]:
         return self.dag.order
 
-    def encode(self, source: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    def encode(
+        self,
+        source: Mapping[str, Any] | None = None,
+        *,
+        on_stage: Callable[[str, float], None] | None = None,
+        heartbeat_interval: float | None = None,
+    ) -> dict[str, Any]:
         """Run every enabled stage once. Disabled stages are not in the graph."""
-        return self.dag.run(source)
+        return self.dag.run(
+            source, on_stage=on_stage, heartbeat_interval=heartbeat_interval
+        )
 
     @classmethod
     def build(

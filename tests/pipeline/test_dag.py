@@ -114,6 +114,19 @@ def test_pruning_detection_does_not_pay_the_detector() -> None:
     assert roster[STAGE_CODEC].calls == 1
 
 
+def test_on_stage_sees_every_enabled_stage_in_order() -> None:
+    lattice = StageLattice.all_off()
+    seen: list[str] = []
+
+    def _note(name: str, elapsed: float) -> None:
+        assert elapsed >= 0.0
+        seen.append(name)
+
+    dag = build_dag(lattice, full_roster())
+    dag.run({"source": "chunk"}, on_stage=_note)
+    assert seen == list(dag.order)
+
+
 @pytest.mark.xfail(
     strict=True,
     reason=(

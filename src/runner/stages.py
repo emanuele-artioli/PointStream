@@ -96,6 +96,8 @@ class StageContext:
     temporal_policy: Any = None
     source_chunks: Sequence[np.ndarray] | None = None
     context_ids: Sequence[str] | None = None
+    background_model: Any = None
+    background_chunk_index: int = 0
 
 
 def _subjects(bag: Mapping[str, Any]) -> tuple[ObjectRequest, ...]:
@@ -688,6 +690,7 @@ def make_background(
     #
     # One bound model is therefore one stream. Two runs must not share a stage.
     model = _bound_background(ctx)
+    ctx.background_model = model
     ids = _resolved_context_ids(ctx)
     if ctx.config.background.canvas == "canonical" and ctx.source_chunks:
         # Offline: each context group sees its scenes before the first plate
@@ -698,6 +701,7 @@ def make_background(
 
     def background_stage(bag: Mapping[str, Any]) -> BackgroundModelView:
         nonlocal chunk_index
+        chunk_index = ctx.background_chunk_index
         source = as_clip(bag[SOURCE], path=SOURCE)
         frame_count = int(source.shape[0])
         height, width = int(source.shape[1]), int(source.shape[2])
@@ -737,6 +741,7 @@ def make_background(
                 context_id=context_id,
             )
         chunk_index += 1
+        ctx.background_chunk_index = chunk_index
         decoded = model.decode_payload(artifact)
         return BackgroundModelView(
             plate=source[0] if decoded is None else decoded,

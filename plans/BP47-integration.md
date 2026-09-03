@@ -57,16 +57,15 @@ lowered to accommodate these changes.
 
 ## Remaining gates / handoff
 
-Before a broad E1 batch: a native-resolution, two-scene, one-point PointStream
-preflight must pass with source identity and delivered-payload accounting.
-The synthetic geometry smoke is not a substitute for that preflight. Confirm
-the runner can checkpoint within the hourly budget at the chosen duration;
-per-point checkpoints cannot resume an interrupted encoder subprocess.
+Native-resolution two-scene one-point PointStream preflight: **passed** on
+`68a03dc`, report `plans/BP47-e1-preflight.md`. Source identity, delivered
+shape, ledger, VMAF/PSNR/SSIM, and checkpoint resume are recorded. One 48-frame
+4K point took 73 min of PointStream wall, so it does not fit the hourly
+subprocess budget; per-point checkpoints still cannot resume a killed encoder.
 
-Cursor E1 report must include exact commit/config/input identity, tools and
-presets, submitted/succeeded/failed counts, byte ledger, quality and runtime,
-controls, bounds/alarms and checkpoint resume evidence. Do not reuse an output
-directory after changing implementation or source frames. Gate A is still open.
+Broad E1 still needs the independent AV1/VVC 48-frame native curves, then the
+staged sweep. New output directory if implementation or source frames change.
+Gate A is still open.
 
 Antigravity data follow-up remains separate: confirmation corpus incomplete.
 Keep historically used videos in diagnostics; audit independent match identities

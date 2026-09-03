@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -99,6 +100,7 @@ class RunResult:
     symmetry: Closeness
     chunks: tuple[ChunkResult, ...]
     lattice: StageLattice
+    stage_seconds: tuple[dict[str, float], ...] = ()
 
     @property
     def sizes_bytes(self) -> dict[str, int | float]:
@@ -131,6 +133,8 @@ def run(
     components: Mapping[str, object] | None = None,
     builders: Mapping[str, Callable[..., Any]] | None = None,
     context_ids: Sequence[str] | None = None,
+    checkpoint_dir: Path | str | None = None,
+    heartbeat_interval: float | None = 600.0,
 ) -> RunResult:
     """Encode, reconstruct, score, and account every chunk.
 
@@ -160,6 +164,12 @@ def run(
             Scenes that share an id may share a canvas and a predictive stream;
             a change is a new independently coded background. Default is the
             config's ``background.context_id``, or ``"run"`` for every chunk.
+        checkpoint_dir: When set, each finished chunk is written here and a
+            later call with the same directory skips those chunks. Per-point
+            JSON cannot resume a killed encoder subprocess; this is the
+            hourly-budget path.
+        heartbeat_interval: Seconds between still-running lines inside a
+            blocked stage. ``None`` disables the heartbeat.
     """
     if not chunks:
         raise ValueError("run needs at least one source chunk; a reconstruction of nothing cannot be scored.")
@@ -214,26 +224,68 @@ def run(
     conditioning = tuple(ref.requires) if ref is not None else ()
     encoder = Encoder.build(lattice, roster, conditioning=conditioning)
 
-    results: list[ChunkResult] = []
-    for index, source in enumerate(prepared):
-        chunk_objects = objects[index] if objects is not None else ()
-        bag = encoder.encode({SOURCE: source, OBJECTS: chunk_objects})
-        results.append(
-            _finish_chunk(
-                bag=bag,
-                source=source,
-                lattice=lattice,
-                generation_on=generation_on,
-                ref=ref,
-                scorer=scorer,
-                resolver=resolver,
-                seed=config.run.seed,
-                params=ctx.params,
-                objects=chunk_objects,
-            )
-        )
+    from src.runner.chunk_checkpoint import completed_indices, load_chunk, save_chunk
 
-    return _assemble(results, lattice=lattice, scorer=scorer)
+    results: list[ChunkResult] = []
+    all_stage_seconds: list[dict[str, float]] = []
+    ckpt = Path(checkpoint_dir) if checkpoint_dir is not None else None
+    done = completed_indices(ckpt) if ckpt is not None else ()
+    if ckpt is not None:
+        resume_root = ckpt
+        for index in done:
+            chunk, seconds, background_state, bg_index = load_chunk(resume_root, index)
+            results.append(chunk)
+            all_stage_seconds.append(seconds)
+            print(f"resume chunk {index} ({seconds})", flush=True)
+            if ctx.background_model is not None and background_state is not None:
+                ctx.background_model.import_stream_state(background_state)
+            ctx.background_chunk_index = bg_index
+
+    for index, source in enumerate(prepared):
+        if index in done:
+            continue
+        chunk_objects = objects[index] if objects is not None else ()
+        stage_seconds: dict[str, float] = {}
+
+        def _on_stage(name: str, elapsed: float, *, _index: int = index) -> None:
+            stage_seconds[name] = elapsed
+            print(f"chunk {_index} stage {name} {elapsed:.1f}s", flush=True)
+
+        bag = encoder.encode(
+            {SOURCE: source, OBJECTS: chunk_objects},
+            on_stage=_on_stage,
+            heartbeat_interval=heartbeat_interval,
+        )
+        chunk = _finish_chunk(
+            bag=bag,
+            source=source,
+            lattice=lattice,
+            generation_on=generation_on,
+            ref=ref,
+            scorer=scorer,
+            resolver=resolver,
+            seed=config.run.seed,
+            params=ctx.params,
+            objects=chunk_objects,
+        )
+        results.append(chunk)
+        all_stage_seconds.append(stage_seconds)
+        if ckpt is not None:
+            model = ctx.background_model
+            state = model.export_stream_state() if model is not None else None
+            save_chunk(
+                ckpt,
+                index,
+                chunk,
+                stage_seconds=stage_seconds,
+                background_state=state,
+                background_chunk_index=ctx.background_chunk_index,
+            )
+            print(f"checkpointed chunk {index}", flush=True)
+
+    return _assemble(
+        results, lattice=lattice, scorer=scorer, stage_seconds=tuple(all_stage_seconds)
+    )
 
 
 def _finish_chunk(
@@ -318,6 +370,7 @@ def _assemble(
     *,
     lattice: StageLattice,
     scorer: QualityEvaluator,
+    stage_seconds: tuple[dict[str, float], ...] = (),
 ) -> RunResult:
     frames = np.concatenate([item.frames for item in results], axis=0)
     if len(results) == 1:
@@ -357,6 +410,7 @@ def _assemble(
         symmetry=_combined_symmetry(results),
         chunks=tuple(results),
         lattice=lattice,
+        stage_seconds=stage_seconds,
     )
 
 

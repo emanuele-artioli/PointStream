@@ -45,10 +45,13 @@ from experiments.tier.low_rate_identity import (
     sweep_path,
 )
 from experiments.tier.low_rate_measure import (
+    late_frame_bound_alarms,
+    late_frame_by_scene,
     late_frame_report,
     pointstream_timing,
     primary_preset,
     score_headlines,
+    stream_codec_provenance,
 )
 from experiments.tier.low_rate_plan import (
     SweepPoint,
@@ -133,7 +136,12 @@ def _no_generator() -> GeneratorRef:
     raise AssertionError("generation is off in every low-rate config used here")
 
 
-def pointstream_e1(clips: list[Any], config: PointstreamConfig) -> dict[str, Any]:
+def pointstream_e1(
+    clips: list[Any],
+    config: PointstreamConfig,
+    *,
+    checkpoint_dir: Path | None = None,
+) -> dict[str, Any]:
     """One ``run()`` over the long scenes, scored on delivered frames."""
     run = require_run_accepts_context_ids()
     ids = clip_context_ids(clips)
@@ -149,6 +157,7 @@ def pointstream_e1(clips: list[Any], config: PointstreamConfig) -> dict[str, Any
         bind_generator_fn=_no_generator,
         objects=tuple(clip.objects for clip in clips),
         context_ids=ids,
+        checkpoint_dir=checkpoint_dir,
     )
     wall = time.perf_counter() - started
     source = np.concatenate([np.asarray(clip.frames) for clip in clips], axis=0)
@@ -159,13 +168,24 @@ def pointstream_e1(clips: list[Any], config: PointstreamConfig) -> dict[str, Any
     total = int(sizes.transport_total)
     panorama = int(sizes.panorama)
     scores = score_headlines(source, delivered)
-    late = late_frame_report(source, delivered)
+    per_scene = late_frame_by_scene(clips, source, delivered)
+    bounds = json.loads(BOUNDS_PATH.read_text(encoding="utf-8"))
+    late_alarms = late_frame_bound_alarms(per_scene, bounds)
     return {
         "coded_bytes": total,
         "bytes": total,
         "usable": isinstance(scores.get("vmaf"), float) and bool(sizes.is_rate),
         "scores": scores,
-        "late_frame": late,
+        "late_frame": {
+            "by_scene": per_scene,
+            "joined_across_scenes": late_frame_report(source, delivered),
+            "bound": bounds["bounds"]["late_frame_quality_change"],
+            "alarms": late_alarms,
+            "note": (
+                "The rot bound is last-minus-first *per scene*. "
+                "joined_across_scenes crosses a scene boundary and is diagnostic only."
+            ),
+        },
         "is_rate": bool(sizes.is_rate),
         "raw_parts": list(sizes.raw_parts),
         "parts": {
@@ -179,6 +199,16 @@ def pointstream_e1(clips: list[Any], config: PointstreamConfig) -> dict[str, Any
         "n_frames": int(source.shape[0]),
         "context_ids": list(ids),
         "canvas": getattr(config.background, "canvas", None),
+        "background_codec": stream_codec_provenance(
+            getattr(config.background, "stream_codec", "av1")
+        ),
+        "residual_codec": {
+            "role": "residual",
+            "enabled": bool(config.lattice.residual),
+            "codec": config.residual.codec,
+            "preset": config.residual.preset,
+        },
+        "stage_seconds": list(result.stage_seconds),
         **pointstream_timing(wall),
     }
 
@@ -190,6 +220,7 @@ def run_point(
     *,
     codec: str,
     preset: str,
+    checkpoint_dir: Path | None = None,
 ) -> dict[str, Any]:
     """One PointStream operating point. Anchors are not encoded here."""
     row: dict[str, Any] = {
@@ -212,7 +243,9 @@ def run_point(
         tuned = apply_point(
             base, point, codec=codec, preset=preset, context_id=clip_context_ids(clips)[0]
         )
-        row["pointstream"] = pointstream_e1(clips, tuned)
+        row["pointstream"] = pointstream_e1(
+            clips, tuned, checkpoint_dir=checkpoint_dir
+        )
         if not point.object_stream_on:
             row["pointstream"]["control"] = "object-stream-off"
     except Exception as exc:  # noqa: BLE001
@@ -387,10 +420,21 @@ def main(argv: list[str] | None = None) -> int:
                 row = existing
                 print(f"  resume {point.name}", flush=True)
             else:
-                row = run_point(clips, base, point, codec=args.codec, preset=preset)
+                row = run_point(
+                    clips,
+                    base,
+                    point,
+                    codec=args.codec,
+                    preset=preset,
+                    checkpoint_dir=points_dir / f"{point.name}.run",
+                )
                 save_checkpoint(points_dir, point.name, row)
             rows.append(row)
             stage_rows.append(row)
+            alarms = ((row.get("pointstream") or {}).get("late_frame") or {}).get("alarms") or []
+            for alarm in alarms:
+                category_notes.append(f"{point.name}: {alarm}")
+                print(f"  ALARM {alarm}", flush=True)
             ps = row.get("pointstream") or {}
             print(
                 f"  {point.name:<16} {ps.get('coded_bytes', row.get('pointstream_error', '—'))} B  "

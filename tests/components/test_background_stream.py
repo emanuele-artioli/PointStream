@@ -52,6 +52,32 @@ from src.components.background.stream import (
 HEIGHT, WIDTH = 96, 128
 
 
+def test_transmitter_state_roundtrip_does_not_need_ffmpeg() -> None:
+    original = np.zeros((4, 4, 3), dtype=np.uint8)
+    recon = np.full((4, 4, 3), 7, dtype=np.uint8)
+    tx = BackgroundStreamTransmitter(mode=REFERENCE_LAST, codec="av1", crf=51)
+    tx._originals = [original]
+    tx._reconstructions = [recon]
+    tx._payloads = [b"obu"]
+    tx._chains = [(0,)]
+    restored = BackgroundStreamTransmitter(mode=REFERENCE_LAST, codec="av1", crf=51)
+    restored.import_state(tx.export_state())
+    assert restored._payloads == [b"obu"]
+    assert restored._chains == [(0,)]
+    assert np.array_equal(restored._reconstructions[0], recon)
+
+
+def test_transmitter_refuses_a_codec_mismatch_on_restore() -> None:
+    tx = BackgroundStreamTransmitter(mode=REFERENCE_LAST, codec="av1", crf=51)
+    tx._payloads = [b"x"]
+    tx._chains = [(0,)]
+    tx._originals = [np.zeros((2, 2, 3), dtype=np.uint8)]
+    tx._reconstructions = [np.zeros((2, 2, 3), dtype=np.uint8)]
+    other = BackgroundStreamTransmitter(mode=REFERENCE_LAST, codec="hevc", crf=51)
+    with pytest.raises(ValueError, match="codec"):
+        other.import_state(tx.export_state())
+
+
 def _panning_scenes(count: int = 4, step: int = 4) -> list[np.ndarray]:
     """A background that pans, which is the case inter prediction is for.
 

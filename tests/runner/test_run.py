@@ -4,7 +4,7 @@ Behaviour the brief named. Plausible misuse is a missing quality record or
 a sizes ledger that does not add up — those are the silent wrong answers.
 """
 
-from __future__ import annotations
+from pathlib import Path
 
 import math
 
@@ -300,3 +300,24 @@ def test_delivered_frames_follows_the_codec_stage_not_the_residual() -> None:
         result.delivered_quality.whole_frame()
     )
     assert not math.isinf(result.delivered_quality.whole_frame())
+
+
+def test_a_second_run_resumes_finished_chunks(tmp_path: Path) -> None:
+    class _Count:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def __call__(self, bag):  # noqa: ANN001
+            self.calls += 1
+            frames = bag[SOURCE]
+            return {"frames": frames, "byte_count": int(np.asarray(frames).nbytes)}
+
+    clock = _Count()
+    clips = [_clip(40, frames=1), _clip(80, frames=1)]
+    ckpt = tmp_path / "chunks"
+    run(_all_off(), clips, backends={STAGE_CODEC: clock}, checkpoint_dir=ckpt)
+    assert clock.calls == 2
+    run(_all_off(), clips, backends={STAGE_CODEC: clock}, checkpoint_dir=ckpt)
+    assert clock.calls == 2
+    assert (ckpt / "chunk_00" / "done").is_file()
+    assert (ckpt / "chunk_01" / "done").is_file()
