@@ -15,7 +15,7 @@ This report stops the batch for Codex review. No downscaling, longer scene,
 full ladder, training, confirmation, paper edit, or extra VVC point was run.
 
 Implementation commits: `29b1c3d`, `128090c`.  
-PR: to be opened from `cursor/bp52-background-crf-search`.
+PR: [#58](https://github.com/emanuele-artioli/PointStream/pull/58).
 
 ## Scope and identity
 
