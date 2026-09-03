@@ -47,6 +47,9 @@ class BackgroundModelView:
     # transmission ran. ``None`` means nobody coded this plate, so a caller
     # must not present its pixel size as a transmitted cost (BP24).
     payload_bytes: int | None = None
+    # Length of the charged geometry header. Zero when the method does not
+    # send original/coded size metadata. Counted as metadata, not panorama.
+    geometry_header_bytes: int = 0
 
     def __post_init__(self) -> None:
         if self.mode not in {MODE_FULL, MODE_DELTA, MODE_NONE}:

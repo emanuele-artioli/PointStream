@@ -51,6 +51,9 @@ class BackgroundArtifact:
         chunk_id: Chunk this transmission is for.
         deferred_to_residual: True when no background model was sent, so
             the residual has to carry the background.
+        geometry_header: Charged original/coded size and restore policy.
+            Empty when the method does not scale transport. Counted as
+            metadata, never mixed into the codec payload.
     """
 
     method: str
@@ -64,6 +67,7 @@ class BackgroundArtifact:
     scene_id: str | None = None
     chunk_id: str = ""
     deferred_to_residual: bool = False
+    geometry_header: bytes = b""
 
     def cost(self) -> WireCost:
         """Measured sidecar bytes. Zero is a real measurement when off."""

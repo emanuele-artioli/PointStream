@@ -183,11 +183,12 @@ def pointstream_e1(
                 "decoded_plate_shape": (
                     list(np.asarray(plate).shape) if plate is not None else None
                 ),
-                "decoded_plate_sha256": (
+                    "decoded_plate_sha256": (
                     hashlib.sha256(np.ascontiguousarray(plate).data).hexdigest()
                     if plate is not None
                     else None
                 ),
+                "geometry_header_bytes": int(getattr(view, "geometry_header_bytes", 0) or 0),
             }
         )
     bounds = json.loads(BOUNDS_PATH.read_text(encoding="utf-8"))

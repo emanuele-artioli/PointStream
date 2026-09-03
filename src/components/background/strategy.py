@@ -14,6 +14,7 @@ Sidecar codec is an independent constructor argument, not a strategy name.
 
 from __future__ import annotations
 
+import time
 from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 from typing import Any
@@ -22,6 +23,13 @@ import numpy as np
 
 from src.components.background.delta import apply_delta, compute_delta
 from src.components.background.plate import CanonicalCanvas, build_plate, prepare_canonical_context
+from src.components.background.scale import (
+    TransportScaleError,
+    downsample_plate,
+    require_supported_scale,
+    restore_plate,
+    unpack_header,
+)
 from src.components.background.sidecar import SidecarCodec, build_sidecar, normalize_sidecar
 from src.components.background.stream import scene_groups
 from src.components.background.types import (
@@ -306,6 +314,7 @@ class PanoramaStream(BackgroundModel):
         stream_crf: int = 38,
         context_id: str = "",
         canvas: str = "independent",
+        transport_scale: float = 1.0,
     ) -> None:
         super().__init__(
             codec=codec,
@@ -315,12 +324,16 @@ class PanoramaStream(BackgroundModel):
             roi_preset=roi_preset,
             domain=domain,
         )
-        from src.components.background.stream import BackgroundStreamTransmitter
+        from src.components.background.stream import (
+            BackgroundStreamReceiver,
+            BackgroundStreamTransmitter,
+        )
 
         if canvas not in {"independent", "canonical"}:
             raise ValueError(
                 f"background.canvas must be 'independent' or 'canonical', got {canvas!r}"
             )
+        self.transport_scale = require_supported_scale(transport_scale)
         self.context_id = context_id
         self.canvas_mode = canvas
         self._transmitter = BackgroundStreamTransmitter(
@@ -329,11 +342,15 @@ class PanoramaStream(BackgroundModel):
             crf=stream_crf,
             keyframe_interval=keyframe_interval,
         )
+        self._receiver = BackgroundStreamReceiver(codec=stream_codec)
         self._active_context: str | None = None
         self._canvas: CanonicalCanvas | None = None
         self._alignments: tuple[np.ndarray, ...] = ()
         self._groups: tuple[PreparedContext, ...] = ()
         self._scene_index = 0
+        self.last_scene: Any = None
+        self._emitted: list[Any] = []
+        self.last_resample_seconds: dict[str, float] = {"downsample": 0.0, "upsample": 0.0}
 
     def prepare_context(
         self,
@@ -449,7 +466,8 @@ class PanoramaStream(BackgroundModel):
         spec = self._transmitter.spec
         return (
             f"{spec.name} low-delay crf{self._transmitter.crf} "
-            f"ref={self._transmitter.mode} k={self._transmitter.keyframe_interval}"
+            f"ref={self._transmitter.mode} k={self._transmitter.keyframe_interval} "
+            f"scale={self.transport_scale}"
         )
 
     def transmit(
@@ -477,13 +495,31 @@ class PanoramaStream(BackgroundModel):
         active = context_id if context_id is not None else self.context_id
         if self._active_context is not None and active != self._active_context:
             self._transmitter.reset()
+            self._receiver.reset()
+            self._emitted = []
+            self.last_scene = None
             if not self._groups:
                 self._canvas = None
                 self._alignments = ()
                 self._scene_index = 0
         self._active_context = active
         array = np.asarray(plate, dtype=np.uint8)
-        payload = self._transmitter.push(array)
+        started = time.perf_counter()
+        coded, header = downsample_plate(array, self.transport_scale)
+        self.last_resample_seconds["downsample"] = time.perf_counter() - started
+        payload = self._transmitter.push(coded)
+        self.last_scene = payload
+        self._emitted.append(payload)
+        client_coded = self._receiver.receive(
+            payload, height=header.coded_height, width=header.coded_width
+        )
+        encoder_coded = self._transmitter.reconstructions[-1]
+        if not np.array_equal(client_coded, encoder_coded):
+            raise TransportScaleError(
+                "encoder reconstruction and client decode of the same charged "
+                "payloads disagreed before restore"
+            )
+        packed = header.pack()
         return BackgroundArtifact(
             method=self.method,
             codec=self.codec_name,
@@ -498,17 +534,38 @@ class PanoramaStream(BackgroundModel):
             scene_id=scene_id,
             chunk_id=chunk_id,
             deferred_to_residual=False,
+            geometry_header=packed,
         )
 
     def decode_payload(self, artifact: BackgroundArtifact) -> np.ndarray | None:
-        """The plate the client holds after this scene.
+        """The plate exposed to warp: original canonical size.
 
-        Not a decode of ``artifact.payload`` on its own — a P-frame needs its
-        chain. This is the reconstruction the transmitter decoded from its own
-        output, which is bit-identical to what a client decoding the chain gets.
+        Stream history stays in coded coordinates. Restore uses the charged
+        geometry header, not encoder-only attributes.
         """
         reconstructions = self._transmitter.reconstructions
-        return reconstructions[-1] if reconstructions else None
+        if not reconstructions:
+            return None
+        header = unpack_header(artifact.geometry_header)
+        started = time.perf_counter()
+        restored = restore_plate(reconstructions[-1], header)
+        self.last_resample_seconds["upsample"] = time.perf_counter() - started
+        return restored
+
+    def client_plate(self, artifact: BackgroundArtifact) -> np.ndarray:
+        """Independent client restore: replay charged payloads into a fresh decoder."""
+        from src.components.background.stream import BackgroundStreamReceiver
+
+        header = unpack_header(artifact.geometry_header)
+        receiver = BackgroundStreamReceiver(codec=self._transmitter.codec)
+        decoded = None
+        for scene in self._emitted:
+            decoded = receiver.receive(
+                scene, height=header.coded_height, width=header.coded_width
+            )
+        if decoded is None:
+            raise TransportScaleError("client decoder received no payloads")
+        return restore_plate(decoded, header)
 
     def reconstruct(
         self,
@@ -523,6 +580,7 @@ class PanoramaStream(BackgroundModel):
             "active_context": self._active_context,
             "transmitter": self._transmitter.export_state(),
             "context_id": self.context_id,
+            "transport_scale": float(self.transport_scale),
             "canvas": asdict(self._canvas) if self._canvas is not None else None,
             "alignments": [item.tolist() for item in self._alignments],
             "groups": [
@@ -534,6 +592,12 @@ class PanoramaStream(BackgroundModel):
         }
 
     def import_stream_state(self, state: dict[str, Any]) -> None:
+        saved_scale = float(state.get("transport_scale", 1.0))
+        if saved_scale != float(self.transport_scale):
+            raise ValueError(
+                f"stream state transport_scale={saved_scale} does not match "
+                f"{self.transport_scale}; never mix scales in a reference chain"
+            )
         self._scene_index = int(state["scene_index"])
         self._active_context = state.get("active_context")
         self._transmitter.import_state(state["transmitter"])
@@ -546,6 +610,31 @@ class PanoramaStream(BackgroundModel):
                 canvas=CanonicalCanvas(**group["canvas"]),
                 alignments=tuple(np.asarray(item) for item in group["alignments"]),
             ) for group in state["groups"]
+        )
+        self._rebuild_emitted()
+
+    def _rebuild_emitted(self) -> None:
+        from src.components.background.stream import ScenePayload
+
+        exported = self._transmitter.export_state()
+        self._emitted = []
+        for index, (chain, blob) in enumerate(
+            zip(exported["chains"], exported["payloads"], strict=True)
+        ):
+            chain_t = tuple(int(item) for item in chain)
+            self._emitted.append(
+                ScenePayload(
+                    index=index,
+                    chain=chain_t,
+                    payload=bytes(blob),
+                    picture_type="I" if len(chain_t) == 1 else "P",
+                    reference=None if len(chain_t) == 1 else chain_t[-2],
+                    mode=self._transmitter.mode,
+                )
+            )
+        self.last_scene = self._emitted[-1] if self._emitted else None
+        self._receiver.import_payloads(
+            {scene.index: scene.payload for scene in self._emitted}
         )
 
 
@@ -578,6 +667,7 @@ def bind(config: PointstreamConfig, **overrides: Any) -> BackgroundModel:
                 "stream_crf": config.background.stream_crf,
                 "context_id": config.background.context_id,
                 "canvas": config.background.canvas,
+                "transport_scale": config.background.transport_scale,
             }
         )
     kwargs.update(overrides)

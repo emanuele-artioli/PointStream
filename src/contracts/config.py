@@ -238,6 +238,12 @@ class BackgroundConfig:
     #: not this mode.
     canvas: str = "independent"
 
+    #: Fraction of canonical plate size sent to the stream codec. ``1.0`` is
+    #: the unresampled path. ``0.5`` is the first reduced-transport experiment
+    #: and is only valid under ``panorama-stream``. Registration stays in the
+    #: original coordinates; the coded raster is restored before warping.
+    transport_scale: float = 1.0
+
 
 @dataclass(frozen=True)
 class GeneratorConfig:
@@ -508,6 +514,24 @@ def validate(config: PointstreamConfig) -> None:
                     "background.canvas",
                     f"{config.background.canvas!r} is not 'independent' or 'canonical'. "
                     "canonical is the offline union canvas; causal growth is not this field.",
+                )
+            )
+        scale = float(config.background.transport_scale)
+        if scale not in (1.0, 0.5):
+            note(
+                ConfigValueError(
+                    "background.transport_scale",
+                    f"{config.background.transport_scale!r} is not supported; "
+                    "this implementation allows only 1.0 and 0.5.",
+                )
+            )
+        elif scale != 1.0 and config.background.method != domains.BACKGROUND_PANORAMA_STREAM:
+            note(
+                ConfigValueError(
+                    "background.transport_scale",
+                    f"transport_scale={scale} is only implemented under "
+                    f"{domains.BACKGROUND_PANORAMA_STREAM!r}; got "
+                    f"{config.background.method!r}.",
                 )
             )
 
