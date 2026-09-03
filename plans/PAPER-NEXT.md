@@ -6,6 +6,13 @@ its `AGENTS.md` and marker convention. This supersedes the archived P1 dispatch.
 
 ## Evidence boundary
 
+BP51/BP52 review: all existing video sources have prior development/training
+use; zero independent confirmation matches are accepted. The short native
+CRF-only diagnostic has fresh controls and no recorded alarms, but no winning
+point. The current PDF is 26 pages (body/references 1–21, appendices 22–26).
+Do not re-run the completed appendix move. Separate PointStream encode/decode
+time from scoring before any final three-way comparison. See BP53/BP54 next.
+
 Canonical background contexts, explicit conventional fallback and repaired
 recovery are implemented. The native preflight is an engineering diagnostic,
 not E1 evidence. No confirmed modern same-frame AV1/VVC winning curve exists.

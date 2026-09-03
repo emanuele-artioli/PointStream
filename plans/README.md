@@ -2,13 +2,15 @@
 
 Start with `../PLAN.md`. `ROADMAP.md` controls priorities; read only the assigned
 brief. Archived reports describe what happened, not what to run next.
+The current dispatch entry point is `../HANDOFF-BP53-BP54.md`.
 
 ## Active
 
 | Brief | Current purpose | Harness |
 |---|---|---|
-| `BP49-native-reference-pilot.md` | Immediate native recovery-budget / reference pilot | Cursor; Codex review |
-| `BP45-ultra-low-rate-search.md` | M1 infrastructure done; E1 waits for BP49 | Cursor |
+| `BP53-background-transport-scale.md` | Next bounded half-resolution background implementation/diagnostic | Cursor; Codex review |
+| `BP54-fresh-confirmation-sources.md` | Fresh independent match/source shortlist | Antigravity |
+| `BP45-ultra-low-rate-search.md` | M1 done; staged search guided by BP52/BP53 | Cursor |
 | `BP46-long-tennis-scenes.md` | Diagnostics ready; confirmation incomplete | Antigravity |
 | `BP32-rate-budget.md`, `BP33-span-amortisation.md` | Byte costs and unresolved long-span scaling | Cursor; Codex interpretation |
 | `PAPER-NEXT.md` | Scope, provenance, page budget and final evidence | Antigravity; Codex review |
@@ -16,6 +18,8 @@ brief. Archived reports describe what happened, not what to run next.
 
 ## Later or parked
 
+- `BP55-timing-boundaries.md`: Codex-owned timing design; implement after BP53
+  review, before publication-ready three-way comparisons.
 - `BP34-operating-point.md`: optimize after a confirmed size–quality win.
 - `BP36-second-domain.md`: only after good first-domain results.
 - `BP38-paper-infrastructure.md`: remaining figures / learned-codec comparison;
@@ -30,6 +34,11 @@ brief. Archived reports describe what happened, not what to run next.
   from their historical priority language.
 
 ## History and shared guidance
+
+`BP49-native-reference-pilot.md`, `BP51-confirmation-audit.md` and
+`BP52-background-crf-search.md` are completed/reviewed reports, not new launch
+instructions. They remain at stable paths for provenance. The former
+`HANDOFF-BP51-*` and `HANDOFF-BP52-*` briefs are archived under `done/`.
 
 `done/` contains completed reports and explicitly superseded or parked briefs.
 It does not certify that every task in each document is finished. The old long

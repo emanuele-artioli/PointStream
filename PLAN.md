@@ -17,30 +17,36 @@ It offers a compression opportunity, not a guaranteed win by construction.
 
 | Area | Verified | Remaining |
 |---|---|---|
-| Integration | PR #52 integrated BP44–BP46; #53 added repaired recovery; #54 archived old plans | Keep one current main and clearly bounded sessions |
+| Integration | BP51/BP52 reviewed; confirmation and batch-stop repairs included in PRs #57/#58 | Keep one current main and clearly bounded sessions |
 | Background | Offline canonical canvas per compatible context, adjusted transforms and reference reuse | Long-scene rate–quality evidence; no causal canvas construction |
-| Recovery | Identity checks, durable preparation/scene snapshots, quality preservation and cumulative timing; interrupted-run tests pass | Native checkpoint-gap verification; no mid-codec resume |
-| References | Metric direction/span checks and low-rate machinery | Same-frame slowest-preset AV1/VVC pilot and curves |
+| Recovery | BP49/BP52 native short-pair checkpoint budget passed; batch stops on alarms/control mismatch | Longer-run budget still unverified; no mid-codec resume |
+| References | Same-frame AV1 QP63 and VVC QP63/51/39 diagnostic points; legal-neighbour QPs and resume | Frozen-regime curves; separate semantic encoder/client timing |
 | Fallback | Explicit conventional route with route-byte accounting | Automatic end-to-end mixed-scene scheduler is not validated |
-| Data | Diagnostic tennis inputs available | Confirmation corpus remains incomplete |
+| Data | All seven current videos are development/training-used; manifest accepts zero confirmation matches | Acquire at least six genuinely fresh audited matches |
 | Generators | No confirmed improvement over the pasted-reference control | Training parked until background and lean payload can win |
 | Evidence | No confirmed first-domain rate–quality win | Gate A, independent confirmation, core ablations, learned-codec comparison |
-| Paper | Separate Overleaf Git repo; PDF build works | Final curves, supported headline claim, conclusion and page-budget reduction |
+| Paper | Separate Overleaf repo; build and current 21+5-page budget checked; BP51/BP52 evidence notes | Final curves, supported headline claim, conclusion and rebalance as results land |
 
-The historical native preflight is not E1 evidence. Engineering smoke tests do
-not establish a codec win or compliance with the hourly native checkpoint budget.
+BP52's three CRF points have balanced coded ledgers, fresh metric controls and
+no recorded alarms. CRF51 reproduced BP49; coarser backgrounds saved bytes but
+lost quality, with no winning point established. This is one diagnostic scene
+pair, not confirmation. Separate semantic encode/decode time is still missing:
+runner wall time includes reconstruction and scoring. Historical outputs stay
+immutable; code changes require a new measurement identity/output directory.
 
 ## Next work
 
-1. **Cursor — `plans/BP49-native-reference-pilot.md`:** native `bg-crf51`
-   recovery-budget rerun, then a bounded slowest-preset AV1/VVC pilot on the
-   same decoded source hashes. Use new output directories.
-2. **Codex:** review the complete report and operational limits before broader E1.
-3. **Cursor — BP45:** staged low-rate/duration search after that approval.
-   BP32–33 investigate byte costs and long-span scaling; a short-span diagnostic
-   does not settle the long-scene hypothesis.
-4. **Antigravity — BP46:** audit and complete independent confirmation footage.
-   Historically used diagnostic videos are not held-out confirmation data.
+1. **Cursor — `plans/BP53-background-transport-scale.md`:** transport a
+   half-resolution background, restore the canonical size before warping,
+   verify geometry/recovery, then the explicitly bounded diagnostic batch.
+2. **Antigravity — `plans/BP54-fresh-confirmation-sources.md`:** verified fresh
+   match/source shortlist and acquisition plan; no downloads or annotation yet.
+3. **Codex:** review BP53 geometry, charged metadata and decoder symmetry;
+   approve any broader curve/longer-context search only after its report.
+   BP32–33 remain the cost/long-span follow-up, not disproved by this short pair.
+4. **Codex:** retain ownership of the timing contract: encoder computation,
+   client decode/reconstruction and evaluation scoring need separate clocks.
+   No speed claim or full publication-ready comparison until instrumented.
 5. **Antigravity — `plans/PAPER-NEXT.md`:** manuscript scope, provenance and
    page budget; **Codex** reviews delicate claims and negative findings.
 6. After a candidate win: freeze the regime, confirm it, then core ablations,
