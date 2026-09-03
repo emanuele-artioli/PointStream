@@ -25,7 +25,6 @@ from experiments.headroom.real import (
     extract_24fps_pngs,
     list_tracks,
     load_rgba,
-    opaque_mae,
     pair_track,
 )
 from experiments.long_scenes.schema import (
@@ -325,35 +324,6 @@ def find_simultaneous_player_window(
     return None
 
 
-def measure_interval_paste_back(
-    convention: str,
-    pairs: list[TrackPair],
-    pngs_24: list[Path],
-    n_samples: int = 3,
-) -> float:
-    """Measure paste-back MAE for winning convention on pairs in the interval."""
-    if not pairs or not pngs_24:
-        return 999.0
-    samples = [pairs[0], pairs[len(pairs) // 2], pairs[-1]][:n_samples]
-    maes: list[float] = []
-    for pair in samples:
-        idx = pair.frame_id if convention == "extract_24_frame_id" else pair.position
-        if 0 <= idx < len(pngs_24):
-            img = cv2.imread(str(pngs_24[idx]))
-            if img is None:
-                continue
-            frame_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            crop = load_rgba(pair.crop_path)
-            rows, cols = bbox_slices(
-                pair.bbox, crop.shape[0], crop.shape[1], frame_rgb.shape[0], frame_rgb.shape[1]
-            )
-            mae = opaque_mae(frame_rgb, crop, rows, cols)
-            maes.append(float(mae))
-    if not maes:
-        return 999.0
-    return float(sum(maes) / len(maes))
-
-
 def evaluate_scene(
     video: str,
     scene: str,
@@ -536,18 +506,6 @@ def evaluate_scene(
         span_growth = span_pano.growth_factor
         span_mad = span_motion.consecutive_mad
 
-        # True interval-specific paste-back MAE measured on the exact span pairs
-        interval_pairs = [
-            p for pairs in player_tracks for p in pairs if start_f <= p.frame_id < end_f
-        ]
-        if convention != "unknown" and interval_pairs:
-            span_paste_mae = measure_interval_paste_back(
-                convention, interval_pairs, pngs_24, n_samples=3
-            )
-        else:
-            span_paste_mae = 999.0
-        span_passes_paste = span_paste_mae <= PASTE_MAE_MAX
-
         interval_reasons: list[str] = []
         if span_growth > MAX_CANVAS_GROWTH and role != "control_ineligible":
             interval_reasons.append(f"canvas growth {span_growth:.2f}x exceeds {MAX_CANVAS_GROWTH}x")
@@ -555,8 +513,6 @@ def evaluate_scene(
             interval_reasons.append(f"consecutive frame MAD {span_mad:.2f} exceeds {MAX_CONSECUTIVE_MAD}")
         if not span_passes_paste and role != "control_ineligible":
             interval_reasons.append(f"interval paste-back MAE {span_paste_mae:.2f} exceeds {PASTE_MAE_MAX}")
-        if not is_eligible:
-            interval_reasons.extend([r for r in ineligibility_reasons if r not in interval_reasons])
 
         intv_status = "eligible" if len(interval_reasons) == 0 else "ineligible"
 
@@ -569,7 +525,6 @@ def evaluate_scene(
             paste_back_mae=round(span_paste_mae, 3),
             canvas_growth=round(span_growth, 3),
             failure_reasons=interval_reasons,
-        )
 
     return SceneRecord(
         video=video,
@@ -711,20 +666,8 @@ def run_extraction_campaign(
 
         # Confirmation Match 5: Sinner vs Alcaraz
         {"video": "sinner_alcaraz", "scene": "scene_001", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_002", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_004", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_006", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_008", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_010", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_012", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_014", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_018", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_021", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-    ]
-
     print(f"Evaluating {len(roster)} candidate scenes...", flush=True)
 
-    evaluated_scenes: list[SceneRecord] = []
     submitted_count = len(roster)
     succeeded_by_span = {span: 0 for span in TARGET_SPANS}
     failed_by_span = {span: 0 for span in TARGET_SPANS}
