@@ -9,7 +9,7 @@ need a change there, say so in your report rather than making it.
 - **`TERMINOLOGY.md`** — plain-language names used in new reports and the paper.
 - **`SESSION-REPORT.md`** — how to assign work to Codex/Claude,
   Cursor/Antigravity, and what a completed session must return.
-- **`FORK-bp31.md`** — historical pre-result decision record for BP31. It is
+- **`done/FORK-bp31.md`** — historical pre-result decision record for BP31. It is
   superseded for scheduling by `ROADMAP.md`.
 - **`DEFERRED.md`** — real work deliberately not now.
 
@@ -21,9 +21,9 @@ Four things are true and all of them are load-bearing.
 
 0. **PointStream currently loses to the codec it is built on.** BD-rate **+90.97%** against
    an av1 anchor at N=2 scenes with the cross-scene stream on
-   (`plans/BP31-findings.md` §9), from +116.8% with a single-frame plate
+   (`plans/done/BP31-findings.md` §9), from +116.8% with a single-frame plate
    (`PLAN.md` §2.20). `AGENTS.md` requires the headline claim to land where
-   PointStream wins, so **finding that regime is the work.** `FORK-bp31.md`
+   PointStream wins, so **finding that regime is the work.** `done/FORK-bp31.md`
    holds the pre-written decision rule.
 
 1. **The premise holds, but its codec-comparison leg does not** (`PLAN.md`
@@ -63,10 +63,10 @@ the index only.
 
 | Brief / roadmap ID | Owns | Order |
 |---|---|---|
-| `BP31-paired-ladder-across-scenes.md` + `BP31-findings.md` | completed multi-scene baseline and current negative result | done, PR #45 merged |
+| `done/BP31-paired-ladder-across-scenes.md` + `done/BP31-findings.md` | completed multi-scene baseline and current negative result | done, PR #45 merged |
 | M1/E1 / `BP45-ultra-low-rate-search.md` | metric direction, ultra-low AV1/VVC range and first search | first |
-| B1 / `BP44-canonical-background-canvas.md` | canonical background canvas and context resets | first |
-| D1 / `BP46-long-tennis-scenes.md` | long eligible first-domain inputs | first |
+| B1 / `done/BP44-canonical-background-canvas.md` | canonical background canvas and context resets | done, PR #52 merged |
+| D1 / `BP46-long-tennis-scenes.md` | long eligible first-domain inputs | first (D1 complete) |
 | M2 / `BP32-rate-budget.md` + `BP33-span-amortisation.md` | byte ledger and long-scene slope | after B1 |
 | E1 | first-domain low-rate × scene-length search | after M1/B1/D1 |
 | E2 | six-video confirmation | after a candidate win |
@@ -81,16 +81,14 @@ Not dead, not scheduled. `ROADMAP.md` §5 carries the reasons in full.
 
 | Brief | Parked because |
 |---|---|
-| `BP19-conditioning-architecture.md` | every engine loses to a paste; a training campaign costs the most and buys the least |
-| `BP28-offset-crossover.md` | its crossover happens where both arms are as good as a photo of the wrong player; its useful half is folded into `BP41`'s temporal axis |
+| `done/BP19-conditioning-architecture.md` | every engine loses to a paste; a training campaign costs the most and buys the least |
+| `done/BP28-offset-crossover.md` | its crossover happens where both arms are as good as a photo of the wrong player; its useful half is folded into `BP41`'s temporal axis |
 
 ## Historical
 
 `done/` holds finished briefs, each ending with a *Delivered* section — history,
-not instructions. `done/README.md` indexes them. `wave3-report.md`,
-`wave5-report.md` and the reports named `BP24-*`, `BP29-*`, `BP30-*` are records
-of completed work and are cited from `PLAN.md`; they stay where they are so the
-citations keep resolving.
+not instructions. `done/README.md` indexes them. Completed reports named `BP24-*`,
+`BP29-*`, `BP30-*`, `BP44-*`, `wave3-report.md`, `wave5-report.md` reside in `done/`.
 
 **`done/BP5-roster-decision.md`'s roster verdict is void** (measured on
 self-reconstruction), and so is anything in `done/` that ranked engines on LPIPS
