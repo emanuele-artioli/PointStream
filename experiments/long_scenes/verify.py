@@ -33,6 +33,19 @@ class ManifestValidationError(AssertionError):
     """Raised when any manifest invariant is violated."""
 
 
+def _match_identity(provenance: dict[str, Any]) -> tuple[str, str] | None:
+    """Compare audited match/event labels, ignoring case and whitespace.
+
+    This is not an event resolver: aliases and compilation match boundaries
+    still require the provenance audit before confirmation can be accepted.
+    """
+    values = [provenance.get(key) for key in ("match_name", "event")]
+    if not all(isinstance(value, str) and value.strip() for value in values):
+        return None
+    return (" ".join(str(values[0]).casefold().split()),
+            " ".join(str(values[1]).casefold().split()))
+
+
 def verify_manifest(
     manifest: dict[str, Any],
     *,
@@ -65,18 +78,35 @@ def verify_manifest(
 
     # Validate provenance and contamination for confirmation candidates
     clean_conf_vids: list[str] = []
-    seen_matches: dict[str, str] = {}
+    seen_matches: dict[tuple[str, str], str] = {}
+    # A second upload of a used match is not held out. Include every known
+    # development/diagnostic source and any other recorded prior use.
+    used_matches: dict[tuple[str, str], str] = {}
+    for video, prov in provenance_map.items():
+        if not isinstance(prov, dict):
+            continue
+        if video in diag_vids or video in dev_vids or prov.get("is_contaminated") or prov.get("prior_use"):
+            match = _match_identity(prov)
+            if match is not None:
+                used_matches[match] = video
 
     for cv in conf_vids:
         prov = provenance_map.get(cv)
-        if prov is None:
+        if not isinstance(prov, dict):
             confirmation_deficits.append(
                 f"confirmation candidate '{cv}': missing provenance metadata; cannot verify independence"
             )
             continue
 
-        is_contam = prov.get("is_contaminated", False)
-        prior_use = prov.get("prior_use") or []
+        is_contam = prov.get("is_contaminated")
+        prior_use = prov.get("prior_use")
+        if not isinstance(is_contam, bool) or not isinstance(prior_use, list) or not all(
+            isinstance(use, str) and use.strip() for use in prior_use
+        ):
+            confirmation_deficits.append(
+                f"confirmation candidate '{cv}': missing or malformed prior-use audit fields"
+            )
+            continue
         if is_contam or prior_use:
             confirmation_deficits.append(
                 f"confirmation candidate '{cv}' is contaminated by prior use: {prior_use}"
@@ -97,14 +127,23 @@ def verify_manifest(
             )
             continue
 
-        if not prov.get("confirmation_eligible", False):
+        if prov.get("confirmation_eligible") is not True:
             confirmation_deficits.append(
                 f"confirmation candidate '{cv}' is marked confirmation_eligible=False"
             )
             continue
 
         # Check for duplicate matches
-        match_id = f"{prov.get('match_name', '')}::{prov.get('event', '')}"
+        match_id = _match_identity(prov)
+        if match_id is None:
+            confirmation_deficits.append(f"confirmation candidate '{cv}': missing match identity")
+            continue
+        if match_id in used_matches:
+            confirmation_deficits.append(
+                f"confirmation candidate '{cv}' repeats a development/diagnostic or previously used "
+                f"match '{used_matches[match_id]}' ({match_id})"
+            )
+            continue
         if match_id in seen_matches:
             confirmation_deficits.append(
                 f"confirmation candidate '{cv}' is a duplicate match of '{seen_matches[match_id]}' ({match_id})"

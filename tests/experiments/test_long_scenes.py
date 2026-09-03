@@ -460,6 +460,35 @@ def test_verify_synthetic_clean_confirmation_passes_strict() -> None:
     assert len(res["diagnostic_videos"]) == 2
 
 
+@pytest.mark.parametrize("partition", ["diagnostic_videos", "development_videos"])
+def test_confirmation_rejects_same_match_under_another_filename(partition: str) -> None:
+    manifest = _build_valid_manifest()
+    candidate = manifest["confirmation_videos"][0]
+    used_video = manifest[partition][0]
+    used = manifest["provenance"][used_video]
+    clean = manifest["provenance"][candidate]
+    used["match_name"] = "  " + clean["match_name"].upper() + "  "
+    used["event"] = clean["event"].upper()
+    with pytest.raises(ManifestValidationError, match="repeats a development/diagnostic"):
+        verify_manifest(manifest, strict_confirmation=True)
+
+
+@pytest.mark.parametrize("field,value", [
+    ("is_contaminated", None), ("is_contaminated", "false"),
+    ("prior_use", None), ("prior_use", ""), ("prior_use", [None]),
+])
+def test_confirmation_requires_explicit_prior_use_audit(field: str, value: Any) -> None:
+    manifest = _build_valid_manifest()
+    candidate = manifest["confirmation_videos"][0]
+    provenance = manifest["provenance"][candidate]
+    if value is None:
+        provenance.pop(field)
+    else:
+        provenance[field] = value
+    with pytest.raises(ManifestValidationError, match="missing or malformed prior-use"):
+        verify_manifest(manifest, strict_confirmation=True)
+
+
 def test_verify_real_manifest_diagnostic_ready_confirmation_incomplete() -> None:
     import json
     from src.contracts import paths as ps_paths

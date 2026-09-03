@@ -2,6 +2,15 @@
 
 **Date**: 2026-09-03  
 **Status**: COMPLETE  
+Review repair: strict confirmation now rejects matching development/diagnostic
+events under different filenames and missing/malformed prior-use audit fields.
+Match labels are case/whitespace normalized; this is not automatic alias or
+compilation resolution. Acquisition still needs verified event identity.
+Targeted checks: 26 tests passed, 1 data-dependent test skipped; lint and mypy
+passed. Existing fixture confirms genuinely clean independent matches still pass.
+The committed interval records remain unchanged. Historical output mirrors are
+not rewritten; use the current checkout's manifest for split decisions.
+
 **Branch**: `antigravity/bp51-confirmation-split`  
 **Reference Handoff**: [`plans/HANDOFF-BP51-confirmation-split.md`](file:///home/itec/emanuele/pointstream/plans/HANDOFF-BP51-confirmation-split.md)  
 **Related Plans**: [`plans/BP46-long-tennis-scenes.md`](file:///home/itec/emanuele/pointstream/plans/BP46-long-tennis-scenes.md), [`plans/ROADMAP.md`](file:///home/itec/emanuele/pointstream/plans/ROADMAP.md)
@@ -158,7 +167,7 @@ conda run -n pointstream python -m src.contracts.layers
 To satisfy the E2 Gate B independent confirmation milestone, a fresh confirmation corpus must be ingested according to the following requirements:
 
 ### Ingestion Criteria:
-1. **Match Count**: At least **6 distinct, independent tournament matches** (no compilations, no practice sessions, no duplicate pairings).
+1. **Match Count**: At least **6 distinct, independent tournament matches** (no compilations, no practice sessions, no duplicate matches). The same players may meet in different events; repeated pairings are not automatically duplicate matches.
 2. **Untouched Provenance**: Must have **0 prior use** in Animate-Anyone fine-tuning, headroom sweeps, ladder parameter searches, metric calibration, or background panorama tuning (`is_contaminated=False`, `prior_use=[]`).
 3. **Verified Event Identity**: Exact tournament name, year, round, and player names verified against official ATP/WTA match records (`event_status="verified"`).
 4. **Broadcast Quality**: Native 4K UHD tournament broadcast camera footage with continuous court coverage (`source_type="tournament_broadcast"`).
