@@ -12,13 +12,7 @@
     "alcaraz_highlights",
     "federer_djokovic"
   ],
-  "confirmation_videos": [
-    "alcaraz_perricard",
-    "alcaraz_ruud",
-    "djokovic_federer",
-    "djokovic_zverev",
-    "sinner_alcaraz"
-  ],
+  "confirmation_videos": [],
   "ineligible_controls": [
     "alcaraz_highlights/scene_006"
   ],
@@ -701,7 +695,7 @@
       "duration": 14.414,
       "cluster": "cluster_point",
       "context_id": "alcaraz_perricard_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "alcaraz_perricard.mp4",
         "width": 3840,
@@ -814,7 +808,7 @@
       "duration": 11.662,
       "cluster": "cluster_point",
       "context_id": "alcaraz_perricard_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "alcaraz_perricard.mp4",
         "width": 3840,
@@ -921,7 +915,7 @@
       "duration": 17.868,
       "cluster": "cluster_point",
       "context_id": "alcaraz_perricard_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "alcaraz_perricard.mp4",
         "width": 3840,
@@ -1029,7 +1023,7 @@
       "duration": 30.28,
       "cluster": "cluster_point",
       "context_id": "alcaraz_perricard_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "alcaraz_perricard.mp4",
         "width": 3840,
@@ -1133,7 +1127,7 @@
       "duration": 44.061,
       "cluster": "cluster_point",
       "context_id": "alcaraz_perricard_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "alcaraz_perricard.mp4",
         "width": 3840,
@@ -1237,7 +1231,7 @@
       "duration": 21.538,
       "cluster": "cluster_point",
       "context_id": "alcaraz_perricard_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "alcaraz_perricard.mp4",
         "width": 3840,
@@ -1343,7 +1337,7 @@
       "duration": 5.722,
       "cluster": "cluster_point",
       "context_id": "alcaraz_perricard_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "alcaraz_perricard.mp4",
         "width": 3840,
@@ -1451,7 +1445,7 @@
       "duration": 202.702,
       "cluster": "cluster_point",
       "context_id": "alcaraz_ruud_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "alcaraz_ruud.mp4",
         "width": 3840,
@@ -1555,7 +1549,7 @@
       "duration": 120.637,
       "cluster": "cluster_point",
       "context_id": "alcaraz_ruud_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "alcaraz_ruud.mp4",
         "width": 3840,
@@ -1661,7 +1655,7 @@
       "duration": 26.24,
       "cluster": "cluster_point",
       "context_id": "djokovic_federer_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_federer.mp4",
         "width": 3840,
@@ -1775,7 +1769,7 @@
       "duration": 4.96,
       "cluster": "cluster_point",
       "context_id": "djokovic_federer_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_federer.mp4",
         "width": 3840,
@@ -1885,7 +1879,7 @@
       "duration": 7.68,
       "cluster": "cluster_point",
       "context_id": "djokovic_federer_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_federer.mp4",
         "width": 3840,
@@ -1993,7 +1987,7 @@
       "duration": 21.24,
       "cluster": "cluster_point",
       "context_id": "djokovic_federer_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_federer.mp4",
         "width": 3840,
@@ -2101,7 +2095,7 @@
       "duration": 7.96,
       "cluster": "cluster_point",
       "context_id": "djokovic_federer_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_federer.mp4",
         "width": 3840,
@@ -2208,7 +2202,7 @@
       "duration": 8.28,
       "cluster": "cluster_point",
       "context_id": "djokovic_federer_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_federer.mp4",
         "width": 3840,
@@ -2313,7 +2307,7 @@
       "duration": 26.48,
       "cluster": "cluster_point",
       "context_id": "djokovic_federer_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_federer.mp4",
         "width": 3840,
@@ -2423,7 +2417,7 @@
       "duration": 4.44,
       "cluster": "cluster_point",
       "context_id": "djokovic_federer_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_federer.mp4",
         "width": 3840,
@@ -2531,7 +2525,7 @@
       "duration": 18.76,
       "cluster": "cluster_point",
       "context_id": "djokovic_federer_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_federer.mp4",
         "width": 3840,
@@ -2637,7 +2631,7 @@
       "duration": 11.64,
       "cluster": "cluster_point",
       "context_id": "djokovic_federer_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_federer.mp4",
         "width": 3840,
@@ -2744,7 +2738,7 @@
       "duration": 66.267,
       "cluster": "cluster_point",
       "context_id": "djokovic_zverev_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_zverev.mp4",
         "width": 3840,
@@ -2848,7 +2842,7 @@
       "duration": 51.433,
       "cluster": "cluster_point",
       "context_id": "djokovic_zverev_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_zverev.mp4",
         "width": 3840,
@@ -2958,7 +2952,7 @@
       "duration": 6.8,
       "cluster": "cluster_point",
       "context_id": "djokovic_zverev_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_zverev.mp4",
         "width": 3840,
@@ -3066,7 +3060,7 @@
       "duration": 48.167,
       "cluster": "cluster_point",
       "context_id": "djokovic_zverev_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_zverev.mp4",
         "width": 3840,
@@ -3176,7 +3170,7 @@
       "duration": 41.0,
       "cluster": "cluster_point",
       "context_id": "djokovic_zverev_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_zverev.mp4",
         "width": 3840,
@@ -3282,7 +3276,7 @@
       "duration": 43.1,
       "cluster": "cluster_point",
       "context_id": "djokovic_zverev_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_zverev.mp4",
         "width": 3840,
@@ -3392,7 +3386,7 @@
       "duration": 27.4,
       "cluster": "cluster_point",
       "context_id": "djokovic_zverev_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_zverev.mp4",
         "width": 3840,
@@ -3502,7 +3496,7 @@
       "duration": 54.6,
       "cluster": "cluster_point",
       "context_id": "djokovic_zverev_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "djokovic_zverev.mp4",
         "width": 3840,
@@ -4682,7 +4676,7 @@
       "duration": 4.972,
       "cluster": "cluster_point",
       "context_id": "sinner_alcaraz_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "sinner_alcaraz.mp4",
         "width": 3840,
@@ -4788,7 +4782,7 @@
       "duration": 24.908,
       "cluster": "cluster_point",
       "context_id": "sinner_alcaraz_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "sinner_alcaraz.mp4",
         "width": 3840,
@@ -4898,7 +4892,7 @@
       "duration": 22.489,
       "cluster": "cluster_point",
       "context_id": "sinner_alcaraz_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "sinner_alcaraz.mp4",
         "width": 3840,
@@ -5006,7 +5000,7 @@
       "duration": 15.766,
       "cluster": "cluster_point",
       "context_id": "sinner_alcaraz_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "sinner_alcaraz.mp4",
         "width": 3840,
@@ -5113,7 +5107,7 @@
       "duration": 26.109,
       "cluster": "cluster_point",
       "context_id": "sinner_alcaraz_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "sinner_alcaraz.mp4",
         "width": 3840,
@@ -5223,7 +5217,7 @@
       "duration": 11.461,
       "cluster": "cluster_point",
       "context_id": "sinner_alcaraz_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "sinner_alcaraz.mp4",
         "width": 3840,
@@ -5332,7 +5326,7 @@
       "duration": 15.916,
       "cluster": "cluster_point",
       "context_id": "sinner_alcaraz_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "sinner_alcaraz.mp4",
         "width": 3840,
@@ -5437,7 +5431,7 @@
       "duration": 17.684,
       "cluster": "cluster_point",
       "context_id": "sinner_alcaraz_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "sinner_alcaraz.mp4",
         "width": 3840,
@@ -5545,7 +5539,7 @@
       "duration": 9.993,
       "cluster": "cluster_point",
       "context_id": "sinner_alcaraz_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "sinner_alcaraz.mp4",
         "width": 3840,
@@ -5654,7 +5648,7 @@
       "duration": 15.032,
       "cluster": "cluster_point",
       "context_id": "sinner_alcaraz_main_court",
-      "role": "confirmation",
+      "role": "development_candidate",
       "source_metadata": {
         "video_file": "sinner_alcaraz.mp4",
         "width": 3840,
@@ -5759,5 +5753,154 @@
         }
       }
     }
-  ]
+  ],
+  "development_videos": [
+    "alcaraz_perricard",
+    "alcaraz_ruud",
+    "djokovic_federer",
+    "djokovic_zverev",
+    "sinner_alcaraz"
+  ],
+  "provenance": {
+    "alcaraz_highlights": {
+      "video": "alcaraz_highlights",
+      "match_name": "Carlos Alcaraz Broadcast Highlights (Multiple Matches)",
+      "event": "Multiple ATP / Grand Slam tournaments (unresolved match boundaries)",
+      "event_status": "unresolved",
+      "source_type": "compilation_highlights",
+      "prior_use": [
+        "Animate-Anyone fine-tuning (20 tracks in assets/dataset/pointstream_aa_meta.json)",
+        "BP21 headroom sweeps (scene_000, scene_010)",
+        "BP23 metric calibration anchors (scene_000 identical/blur/unrelated)",
+        "BP24/BP31 ladder sweeps",
+        "BP30 panorama tuning",
+        "E1 diagnostic corpus (scene_000, scene_028, scene_010, scene_018, scene_026, control scene_006)"
+      ],
+      "is_contaminated": true,
+      "contamination_reasons": [
+        "Used in generative model fine-tuning (20 tracks)",
+        "Used in headroom, calibration, and ladder sweep experiments",
+        "Compilation footage containing multiple unresolved match boundaries"
+      ],
+      "confirmation_eligible": false
+    },
+    "federer_djokovic": {
+      "video": "federer_djokovic",
+      "match_name": "Roger Federer vs. Novak Djokovic",
+      "event": "2015 Western & Southern Open (Cincinnati Masters), Men's Singles Final",
+      "event_status": "verified",
+      "source_type": "tournament_broadcast",
+      "prior_use": [
+        "Animate-Anyone fine-tuning (20 tracks in assets/dataset/pointstream_aa_meta.json)",
+        "BP21 headroom sweeps (scene_001, scene_003)",
+        "BP24/BP31 ladder sweeps",
+        "BP30 panorama tuning (Cincinnati center court)",
+        "E1 diagnostic corpus (10 smooth-pan scenes)"
+      ],
+      "is_contaminated": true,
+      "contamination_reasons": [
+        "Used in generative model fine-tuning (20 tracks)",
+        "Used in headroom and ladder sweep experiments",
+        "Designated E1 diagnostic search video"
+      ],
+      "confirmation_eligible": false
+    },
+    "alcaraz_perricard": {
+      "video": "alcaraz_perricard",
+      "match_name": "Carlos Alcaraz vs. Giovanni Mpetshi Perricard",
+      "event": "2024 China Open (Beijing), Men's Singles Round of 32",
+      "event_status": "verified",
+      "source_type": "tournament_broadcast",
+      "prior_use": [
+        "Animate-Anyone fine-tuning (14 tracks in assets/dataset/pointstream_aa_meta.json)",
+        "BP21 headroom sweeps (scene_002, fired player-area upper bound at 3.27%)",
+        "BP24/BP31 ladder sweeps",
+        "BP30 panorama registration (88 scenes)",
+        "Baseline triage probe set (scene_006/track_0196)"
+      ],
+      "is_contaminated": true,
+      "contamination_reasons": [
+        "Used in generative model fine-tuning (14 tracks)",
+        "Used in headroom and ladder parameter tuning",
+        "Used in baseline triage probe set"
+      ],
+      "confirmation_eligible": false
+    },
+    "alcaraz_ruud": {
+      "video": "alcaraz_ruud",
+      "match_name": "Carlos Alcaraz & Casper Ruud Practice Session",
+      "event": "Practice session (2024)",
+      "event_status": "unresolved",
+      "source_type": "practice_session",
+      "prior_use": [
+        "Animate-Anyone fine-tuning (4 tracks in assets/dataset/pointstream_aa_meta.json)"
+      ],
+      "is_contaminated": true,
+      "contamination_reasons": [
+        "Used in generative model fine-tuning (4 tracks)",
+        "Non-competitive practice session with single-player tracking (0 simultaneous overlap)"
+      ],
+      "confirmation_eligible": false
+    },
+    "djokovic_federer": {
+      "video": "djokovic_federer",
+      "match_name": "Novak Djokovic vs. Roger Federer",
+      "event": "2019 Wimbledon Championships, Gentlemen's Singles Final",
+      "event_status": "verified",
+      "source_type": "tournament_broadcast",
+      "prior_use": [
+        "Animate-Anyone fine-tuning (20 tracks in assets/dataset/pointstream_aa_meta.json)",
+        "BP21 headroom sweeps (scene_003, forced libvvenc QP 31 substitution)",
+        "BP24/BP31 ladder sweeps",
+        "BP30 panorama tuning (224 scenes)"
+      ],
+      "is_contaminated": true,
+      "contamination_reasons": [
+        "Used in generative model fine-tuning (20 tracks)",
+        "Used in headroom sweeps and panorama tuning"
+      ],
+      "confirmation_eligible": false
+    },
+    "djokovic_zverev": {
+      "video": "djokovic_zverev",
+      "match_name": "Novak Djokovic vs. Alexander Zverev",
+      "event": "Unresolved tournament event (metadata does not distinguish ATP Finals / Olympics / Masters)",
+      "event_status": "unresolved",
+      "source_type": "tournament_broadcast",
+      "prior_use": [
+        "Animate-Anyone fine-tuning (16 tracks in assets/dataset/pointstream_aa_meta.json)",
+        "BP21 headroom sweeps (scene_002, fired 10x concentration floor bound)",
+        "BP24/BP31 ladder sweeps",
+        "Historical probe set conflict (Research History 2.8)"
+      ],
+      "is_contaminated": true,
+      "contamination_reasons": [
+        "Used in generative model fine-tuning (16 tracks)",
+        "Used in headroom and ladder sweeps",
+        "Ambiguous tournament/event identity"
+      ],
+      "confirmation_eligible": false
+    },
+    "sinner_alcaraz": {
+      "video": "sinner_alcaraz",
+      "match_name": "Jannik Sinner vs. Carlos Alcaraz",
+      "event": "Unresolved tournament event (metadata does not distinguish Beijing 2024 Final from Indian Wells / Miami)",
+      "event_status": "unresolved",
+      "source_type": "tournament_broadcast",
+      "prior_use": [
+        "Animate-Anyone fine-tuning (20 tracks in assets/dataset/pointstream_aa_meta.json)",
+        "BP21 headroom sweeps (scene_001)",
+        "BP23 metric calibration anchor (scene_001 vs alcaraz_highlights/scene_000)",
+        "BP24/BP31 ladder sweeps",
+        "BP30 panorama tuning (53 scenes, rank agreement +0.41)"
+      ],
+      "is_contaminated": true,
+      "contamination_reasons": [
+        "Used in generative model fine-tuning (20 tracks)",
+        "Used in headroom, metric calibration, and ladder sweeps",
+        "Ambiguous tournament/event identity"
+      ],
+      "confirmation_eligible": false
+    }
+  }
 }

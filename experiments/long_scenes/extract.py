@@ -50,6 +50,150 @@ BP21_CLIPS_ROOT = ps_paths.outputs() / "bp21-headroom" / "clips"
 RAW_4K_ROOT = ps_paths.assets() / "raw_4k"
 DATASET_ROOT = ps_paths.assets() / "dataset"
 
+PROVENANCE: dict[str, dict[str, Any]] = {
+    "alcaraz_highlights": {
+        "video": "alcaraz_highlights",
+        "match_name": "Carlos Alcaraz Broadcast Highlights (Multiple Matches)",
+        "event": "Multiple ATP / Grand Slam tournaments (unresolved match boundaries)",
+        "event_status": "unresolved",
+        "source_type": "compilation_highlights",
+        "prior_use": [
+            "Animate-Anyone fine-tuning (20 tracks in assets/dataset/pointstream_aa_meta.json)",
+            "BP21 headroom sweeps (scene_000, scene_010)",
+            "BP23 metric calibration anchors (scene_000 identical/blur/unrelated)",
+            "BP24/BP31 ladder sweeps",
+            "BP30 panorama tuning",
+            "E1 diagnostic corpus (scene_000, scene_028, scene_010, scene_018, scene_026, control scene_006)",
+        ],
+        "is_contaminated": True,
+        "contamination_reasons": [
+            "Used in generative model fine-tuning (20 tracks)",
+            "Used in headroom, calibration, and ladder sweep experiments",
+            "Compilation footage containing multiple unresolved match boundaries",
+        ],
+        "confirmation_eligible": False,
+    },
+    "federer_djokovic": {
+        "video": "federer_djokovic",
+        "match_name": "Roger Federer vs. Novak Djokovic",
+        "event": "2015 Western & Southern Open (Cincinnati Masters), Men's Singles Final",
+        "event_status": "verified",
+        "source_type": "tournament_broadcast",
+        "prior_use": [
+            "Animate-Anyone fine-tuning (20 tracks in assets/dataset/pointstream_aa_meta.json)",
+            "BP21 headroom sweeps (scene_001, scene_003)",
+            "BP24/BP31 ladder sweeps",
+            "BP30 panorama tuning (Cincinnati center court)",
+            "E1 diagnostic corpus (10 smooth-pan scenes)",
+        ],
+        "is_contaminated": True,
+        "contamination_reasons": [
+            "Used in generative model fine-tuning (20 tracks)",
+            "Used in headroom and ladder sweep experiments",
+            "Designated E1 diagnostic search video",
+        ],
+        "confirmation_eligible": False,
+    },
+    "alcaraz_perricard": {
+        "video": "alcaraz_perricard",
+        "match_name": "Carlos Alcaraz vs. Giovanni Mpetshi Perricard",
+        "event": "2024 China Open (Beijing), Men's Singles Round of 32",
+        "event_status": "verified",
+        "source_type": "tournament_broadcast",
+        "prior_use": [
+            "Animate-Anyone fine-tuning (14 tracks in assets/dataset/pointstream_aa_meta.json)",
+            "BP21 headroom sweeps (scene_002, fired player-area upper bound at 3.27%)",
+            "BP24/BP31 ladder sweeps",
+            "BP30 panorama registration (88 scenes)",
+            "Baseline triage probe set (scene_006/track_0196)",
+        ],
+        "is_contaminated": True,
+        "contamination_reasons": [
+            "Used in generative model fine-tuning (14 tracks)",
+            "Used in headroom and ladder parameter tuning",
+            "Used in baseline triage probe set",
+        ],
+        "confirmation_eligible": False,
+    },
+    "alcaraz_ruud": {
+        "video": "alcaraz_ruud",
+        "match_name": "Carlos Alcaraz & Casper Ruud Practice Session",
+        "event": "Practice session (2024)",
+        "event_status": "unresolved",
+        "source_type": "practice_session",
+        "prior_use": [
+            "Animate-Anyone fine-tuning (4 tracks in assets/dataset/pointstream_aa_meta.json)",
+        ],
+        "is_contaminated": True,
+        "contamination_reasons": [
+            "Used in generative model fine-tuning (4 tracks)",
+            "Non-competitive practice session with single-player tracking (0 simultaneous overlap)",
+        ],
+        "confirmation_eligible": False,
+    },
+    "djokovic_federer": {
+        "video": "djokovic_federer",
+        "match_name": "Novak Djokovic vs. Roger Federer",
+        "event": "2019 Wimbledon Championships, Gentlemen's Singles Final",
+        "event_status": "verified",
+        "source_type": "tournament_broadcast",
+        "prior_use": [
+            "Animate-Anyone fine-tuning (20 tracks in assets/dataset/pointstream_aa_meta.json)",
+            "BP21 headroom sweeps (scene_003, forced libvvenc QP 31 substitution)",
+            "BP24/BP31 ladder sweeps",
+            "BP30 panorama tuning (224 scenes)",
+        ],
+        "is_contaminated": True,
+        "contamination_reasons": [
+            "Used in generative model fine-tuning (20 tracks)",
+            "Used in headroom sweeps and panorama tuning",
+        ],
+        "confirmation_eligible": False,
+    },
+    "djokovic_zverev": {
+        "video": "djokovic_zverev",
+        "match_name": "Novak Djokovic vs. Alexander Zverev",
+        "event": "Unresolved tournament event (metadata does not distinguish ATP Finals / Olympics / Masters)",
+        "event_status": "unresolved",
+        "source_type": "tournament_broadcast",
+        "prior_use": [
+            "Animate-Anyone fine-tuning (16 tracks in assets/dataset/pointstream_aa_meta.json)",
+            "BP21 headroom sweeps (scene_002, fired 10x concentration floor bound)",
+            "BP24/BP31 ladder sweeps",
+            "Historical probe set conflict (Research History 2.8)",
+        ],
+        "is_contaminated": True,
+        "contamination_reasons": [
+            "Used in generative model fine-tuning (16 tracks)",
+            "Used in headroom and ladder sweeps",
+            "Ambiguous tournament/event identity",
+        ],
+        "confirmation_eligible": False,
+    },
+    "sinner_alcaraz": {
+        "video": "sinner_alcaraz",
+        "match_name": "Jannik Sinner vs. Carlos Alcaraz",
+        "event": "Unresolved tournament event (metadata does not distinguish Beijing 2024 Final from Indian Wells / Miami)",
+        "event_status": "unresolved",
+        "source_type": "tournament_broadcast",
+        "prior_use": [
+            "Animate-Anyone fine-tuning (20 tracks in assets/dataset/pointstream_aa_meta.json)",
+            "BP21 headroom sweeps (scene_001)",
+            "BP23 metric calibration anchor (scene_001 vs alcaraz_highlights/scene_000)",
+            "BP24/BP31 ladder sweeps",
+            "BP30 panorama tuning (53 scenes, rank agreement +0.41)",
+        ],
+        "is_contaminated": True,
+        "contamination_reasons": [
+            "Used in generative model fine-tuning (20 tracks)",
+            "Used in headroom, metric calibration, and ladder sweeps",
+            "Ambiguous tournament/event identity",
+        ],
+        "confirmation_eligible": False,
+    },
+}
+
+
 
 def _sha256_file(path: Path) -> str:
     h = hashlib.sha256()
@@ -648,8 +792,8 @@ def run_extraction_campaign(
     ffprobe = str(Path(ffmpeg).with_name("ffprobe"))
 
     # Roster of candidate scenes: strictly isolated splits
-    # Diagnostic videos (E1 search) - strictly from alcaraz_highlights
-    # Confirmation videos (E2 Gate B confirmation) - 6 independent tournament matches
+    # Diagnostic videos (E1 search) - strictly from alcaraz_highlights and federer_djokovic
+    # Development candidates (prior use in training/experiments) - strictly development_candidate role
     # Ineligible controls - high motion / crowd fallback
     roster: list[dict[str, Any]] = [
         # Diagnostic (E1 search): near-static and smooth-pan cases
@@ -662,40 +806,40 @@ def run_extraction_campaign(
         # Ineligible control (high motion / crowd / non-court camera)
         {"video": "alcaraz_highlights", "scene": "scene_006", "role": "control_ineligible", "context_id": "alcaraz_highlights_crowd_side"},
 
-        # Confirmation Match 1: Alcaraz vs Perricard
-        {"video": "alcaraz_perricard", "scene": "scene_002", "role": "confirmation", "context_id": "alcaraz_perricard_main_court"},
-        {"video": "alcaraz_perricard", "scene": "scene_003", "role": "confirmation", "context_id": "alcaraz_perricard_main_court"},
-        {"video": "alcaraz_perricard", "scene": "scene_004", "role": "confirmation", "context_id": "alcaraz_perricard_main_court"},
-        {"video": "alcaraz_perricard", "scene": "scene_005", "role": "confirmation", "context_id": "alcaraz_perricard_main_court"},
-        {"video": "alcaraz_perricard", "scene": "scene_006", "role": "confirmation", "context_id": "alcaraz_perricard_main_court"},
-        {"video": "alcaraz_perricard", "scene": "scene_007", "role": "confirmation", "context_id": "alcaraz_perricard_main_court"},
-        {"video": "alcaraz_perricard", "scene": "scene_010", "role": "confirmation", "context_id": "alcaraz_perricard_main_court"},
+        # Development Candidate 1: Alcaraz vs Perricard (contaminated: 14 AA tracks, BP21 headroom scene_002, BP30)
+        {"video": "alcaraz_perricard", "scene": "scene_002", "role": "development_candidate", "context_id": "alcaraz_perricard_main_court"},
+        {"video": "alcaraz_perricard", "scene": "scene_003", "role": "development_candidate", "context_id": "alcaraz_perricard_main_court"},
+        {"video": "alcaraz_perricard", "scene": "scene_004", "role": "development_candidate", "context_id": "alcaraz_perricard_main_court"},
+        {"video": "alcaraz_perricard", "scene": "scene_005", "role": "development_candidate", "context_id": "alcaraz_perricard_main_court"},
+        {"video": "alcaraz_perricard", "scene": "scene_006", "role": "development_candidate", "context_id": "alcaraz_perricard_main_court"},
+        {"video": "alcaraz_perricard", "scene": "scene_007", "role": "development_candidate", "context_id": "alcaraz_perricard_main_court"},
+        {"video": "alcaraz_perricard", "scene": "scene_010", "role": "development_candidate", "context_id": "alcaraz_perricard_main_court"},
 
-        # Confirmation Match 2: Alcaraz vs Ruud
-        {"video": "alcaraz_ruud", "scene": "scene_002", "role": "confirmation", "context_id": "alcaraz_ruud_main_court"},
-        {"video": "alcaraz_ruud", "scene": "scene_004", "role": "confirmation", "context_id": "alcaraz_ruud_main_court"},
+        # Development Candidate 2: Alcaraz vs Ruud (contaminated: 4 AA tracks, practice session)
+        {"video": "alcaraz_ruud", "scene": "scene_002", "role": "development_candidate", "context_id": "alcaraz_ruud_main_court"},
+        {"video": "alcaraz_ruud", "scene": "scene_004", "role": "development_candidate", "context_id": "alcaraz_ruud_main_court"},
 
-        # Confirmation Match 3: Djokovic vs Federer (Wimbledon 2019)
-        {"video": "djokovic_federer", "scene": "scene_003", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
-        {"video": "djokovic_federer", "scene": "scene_005", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
-        {"video": "djokovic_federer", "scene": "scene_007", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
-        {"video": "djokovic_federer", "scene": "scene_009", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
-        {"video": "djokovic_federer", "scene": "scene_011", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
-        {"video": "djokovic_federer", "scene": "scene_013", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
-        {"video": "djokovic_federer", "scene": "scene_015", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
-        {"video": "djokovic_federer", "scene": "scene_017", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
-        {"video": "djokovic_federer", "scene": "scene_020", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
-        {"video": "djokovic_federer", "scene": "scene_022", "role": "confirmation", "context_id": "djokovic_federer_main_court"},
+        # Development Candidate 3: Djokovic vs Federer (contaminated: 20 AA tracks, BP21 headroom scene_003, BP30)
+        {"video": "djokovic_federer", "scene": "scene_003", "role": "development_candidate", "context_id": "djokovic_federer_main_court"},
+        {"video": "djokovic_federer", "scene": "scene_005", "role": "development_candidate", "context_id": "djokovic_federer_main_court"},
+        {"video": "djokovic_federer", "scene": "scene_007", "role": "development_candidate", "context_id": "djokovic_federer_main_court"},
+        {"video": "djokovic_federer", "scene": "scene_009", "role": "development_candidate", "context_id": "djokovic_federer_main_court"},
+        {"video": "djokovic_federer", "scene": "scene_011", "role": "development_candidate", "context_id": "djokovic_federer_main_court"},
+        {"video": "djokovic_federer", "scene": "scene_013", "role": "development_candidate", "context_id": "djokovic_federer_main_court"},
+        {"video": "djokovic_federer", "scene": "scene_015", "role": "development_candidate", "context_id": "djokovic_federer_main_court"},
+        {"video": "djokovic_federer", "scene": "scene_017", "role": "development_candidate", "context_id": "djokovic_federer_main_court"},
+        {"video": "djokovic_federer", "scene": "scene_020", "role": "development_candidate", "context_id": "djokovic_federer_main_court"},
+        {"video": "djokovic_federer", "scene": "scene_022", "role": "development_candidate", "context_id": "djokovic_federer_main_court"},
 
-        # Confirmation Match 4: Djokovic vs Zverev
-        {"video": "djokovic_zverev", "scene": "scene_000", "role": "confirmation", "context_id": "djokovic_zverev_main_court"},
-        {"video": "djokovic_zverev", "scene": "scene_001", "role": "confirmation", "context_id": "djokovic_zverev_main_court"},
-        {"video": "djokovic_zverev", "scene": "scene_002", "role": "confirmation", "context_id": "djokovic_zverev_main_court"},
-        {"video": "djokovic_zverev", "scene": "scene_003", "role": "confirmation", "context_id": "djokovic_zverev_main_court"},
-        {"video": "djokovic_zverev", "scene": "scene_004", "role": "confirmation", "context_id": "djokovic_zverev_main_court"},
-        {"video": "djokovic_zverev", "scene": "scene_005", "role": "confirmation", "context_id": "djokovic_zverev_main_court"},
-        {"video": "djokovic_zverev", "scene": "scene_006", "role": "confirmation", "context_id": "djokovic_zverev_main_court"},
-        {"video": "djokovic_zverev", "scene": "scene_007", "role": "confirmation", "context_id": "djokovic_zverev_main_court"},
+        # Development Candidate 4: Djokovic vs Zverev (contaminated: 16 AA tracks, BP21 headroom scene_002, unresolved event)
+        {"video": "djokovic_zverev", "scene": "scene_000", "role": "development_candidate", "context_id": "djokovic_zverev_main_court"},
+        {"video": "djokovic_zverev", "scene": "scene_001", "role": "development_candidate", "context_id": "djokovic_zverev_main_court"},
+        {"video": "djokovic_zverev", "scene": "scene_002", "role": "development_candidate", "context_id": "djokovic_zverev_main_court"},
+        {"video": "djokovic_zverev", "scene": "scene_003", "role": "development_candidate", "context_id": "djokovic_zverev_main_court"},
+        {"video": "djokovic_zverev", "scene": "scene_004", "role": "development_candidate", "context_id": "djokovic_zverev_main_court"},
+        {"video": "djokovic_zverev", "scene": "scene_005", "role": "development_candidate", "context_id": "djokovic_zverev_main_court"},
+        {"video": "djokovic_zverev", "scene": "scene_006", "role": "development_candidate", "context_id": "djokovic_zverev_main_court"},
+        {"video": "djokovic_zverev", "scene": "scene_007", "role": "development_candidate", "context_id": "djokovic_zverev_main_court"},
 
         # Diagnostic Video 2: Federer vs Djokovic (Cincinnati 2015, smooth-pan search)
         {"video": "federer_djokovic", "scene": "scene_001", "role": "diagnostic_smooth_pan", "context_id": "federer_djokovic_main_court"},
@@ -709,17 +853,17 @@ def run_extraction_campaign(
         {"video": "federer_djokovic", "scene": "scene_017", "role": "diagnostic_smooth_pan", "context_id": "federer_djokovic_main_court"},
         {"video": "federer_djokovic", "scene": "scene_019", "role": "diagnostic_smooth_pan", "context_id": "federer_djokovic_main_court"},
 
-        # Confirmation Match 5: Sinner vs Alcaraz
-        {"video": "sinner_alcaraz", "scene": "scene_001", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_002", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_004", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_006", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_008", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_010", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_012", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_014", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_018", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
-        {"video": "sinner_alcaraz", "scene": "scene_021", "role": "confirmation", "context_id": "sinner_alcaraz_main_court"},
+        # Development Candidate 5: Sinner vs Alcaraz (contaminated: 20 AA tracks, BP21 headroom scene_001, unresolved event)
+        {"video": "sinner_alcaraz", "scene": "scene_001", "role": "development_candidate", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_002", "role": "development_candidate", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_004", "role": "development_candidate", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_006", "role": "development_candidate", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_008", "role": "development_candidate", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_010", "role": "development_candidate", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_012", "role": "development_candidate", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_014", "role": "development_candidate", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_018", "role": "development_candidate", "context_id": "sinner_alcaraz_main_court"},
+        {"video": "sinner_alcaraz", "scene": "scene_021", "role": "development_candidate", "context_id": "sinner_alcaraz_main_court"},
     ]
 
     print(f"Evaluating {len(roster)} candidate scenes...", flush=True)
@@ -798,6 +942,7 @@ def run_extraction_campaign(
     }
 
     diagnostic_vids = sorted(list(set(s.video for s in evaluated_scenes if "diagnostic" in s.role)))
+    development_vids = sorted(list(set(s.video for s in evaluated_scenes if s.role == "development_candidate")))
     confirmation_vids = sorted(list(set(s.video for s in evaluated_scenes if s.role == "confirmation")))
     controls = [f"{s.video}/{s.scene}" for s in evaluated_scenes if s.role == "control_ineligible"]
 
@@ -808,7 +953,9 @@ def run_extraction_campaign(
         "target_spans": list(TARGET_SPANS),
         "diagnostic_videos": diagnostic_vids,
         "confirmation_videos": confirmation_vids,
+        "development_videos": development_vids,
         "ineligible_controls": controls,
+        "provenance": PROVENANCE,
         "summary": summary,
         "scenes": [s.to_dict() for s in evaluated_scenes],
     }

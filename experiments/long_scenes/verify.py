@@ -58,17 +58,76 @@ def verify_manifest(
         violations.append(f"expected >= 2 diagnostic videos, got {len(diag_vids)}: {diag_vids}")
 
     conf_vids = manifest.get("confirmation_videos") or []
+    dev_vids = manifest.get("development_videos") or []
+    provenance_map = manifest.get("provenance") or {}
+
     confirmation_deficits: list[str] = []
-    if len(conf_vids) < 6:
+
+    # Validate provenance and contamination for confirmation candidates
+    clean_conf_vids: list[str] = []
+    seen_matches: dict[str, str] = {}
+
+    for cv in conf_vids:
+        prov = provenance_map.get(cv)
+        if prov is None:
+            confirmation_deficits.append(
+                f"confirmation candidate '{cv}': missing provenance metadata; cannot verify independence"
+            )
+            continue
+
+        is_contam = prov.get("is_contaminated", False)
+        prior_use = prov.get("prior_use") or []
+        if is_contam or prior_use:
+            confirmation_deficits.append(
+                f"confirmation candidate '{cv}' is contaminated by prior use: {prior_use}"
+            )
+            continue
+
+        evt_status = prov.get("event_status", "")
+        if evt_status != "verified":
+            confirmation_deficits.append(
+                f"confirmation candidate '{cv}' has unresolved event status: '{evt_status}'"
+            )
+            continue
+
+        src_type = prov.get("source_type", "")
+        if src_type != "tournament_broadcast":
+            confirmation_deficits.append(
+                f"confirmation candidate '{cv}' has invalid source_type '{src_type}' (must be tournament_broadcast)"
+            )
+            continue
+
+        if not prov.get("confirmation_eligible", False):
+            confirmation_deficits.append(
+                f"confirmation candidate '{cv}' is marked confirmation_eligible=False"
+            )
+            continue
+
+        # Check for duplicate matches
+        match_id = f"{prov.get('match_name', '')}::{prov.get('event', '')}"
+        if match_id in seen_matches:
+            confirmation_deficits.append(
+                f"confirmation candidate '{cv}' is a duplicate match of '{seen_matches[match_id]}' ({match_id})"
+            )
+            continue
+        seen_matches[match_id] = cv
+        clean_conf_vids.append(cv)
+
+    if len(clean_conf_vids) < 6:
         confirmation_deficits.append(
-            f"expected >= 6 independent confirmation matches, got {len(conf_vids)}: {conf_vids}"
+            f"expected >= 6 independent confirmation matches, got {len(clean_conf_vids)} accepted: {clean_conf_vids}"
         )
 
     diag_set = set(diag_vids)
     conf_set = set(conf_vids)
+    dev_set = set(dev_vids)
+
     if not diag_set.isdisjoint(conf_set):
         overlap = sorted(list(diag_set.intersection(conf_set)))
         violations.append(f"split isolation violated: diagnostic and confirmation overlap on {overlap}")
+    if not conf_set.isdisjoint(dev_set):
+        overlap = sorted(list(conf_set.intersection(dev_set)))
+        violations.append(f"split isolation violated: confirmation and development overlap on {overlap}")
 
     controls = manifest.get("ineligible_controls") or []
     if len(controls) < 1:
@@ -98,6 +157,8 @@ def verify_manifest(
             violations.append(f"{key}: confirmation video '{video}' has non-confirmation role '{role}'")
         if video in diag_set and role == "confirmation":
             violations.append(f"{key}: diagnostic video '{video}' has confirmation role '{role}'")
+        if video in dev_set and role == "confirmation":
+            violations.append(f"{key}: development video '{video}' has confirmation role '{role}'")
 
         if not ctx:
             violations.append(f"{key}: missing context_id")
@@ -194,19 +255,20 @@ def verify_manifest(
     if not has_control:
         violations.append("diagnostic videos do not include a designated ineligible control")
 
-    # Verify confirmation coverage across all confirmation matches for ALL target spans: 48, 96, 192, 384
-    for span in [48, 96, 192, 384]:
-        eligible_conf_by_vid: dict[str, int] = {v: 0 for v in conf_vids}
-        for s in scenes:
-            if s.get("video") in conf_set and s.get("role") == "confirmation":
-                intv = (s.get("intervals") or {}).get(str(span)) or {}
-                if intv.get("status") == "eligible":
-                    eligible_conf_by_vid[s.get("video")] += 1
-        missing_vids = [v for v, count in eligible_conf_by_vid.items() if count == 0]
-        if missing_vids:
-            confirmation_deficits.append(
-                f"confirmation coverage incomplete at span {span}: missing eligible scenes for {sorted(missing_vids)}"
-            )
+    # Verify confirmation coverage across clean confirmation matches for ALL target spans: 48, 96, 192, 384
+    if clean_conf_vids:
+        for span in TARGET_SPANS:
+            eligible_conf_by_vid: dict[str, int] = {v: 0 for v in clean_conf_vids}
+            for s in scenes:
+                if s.get("video") in clean_conf_vids and s.get("role") == "confirmation":
+                    intv = (s.get("intervals") or {}).get(str(span)) or {}
+                    if intv.get("status") == "eligible":
+                        eligible_conf_by_vid[s.get("video")] += 1
+            missing_vids = [v for v, count in eligible_conf_by_vid.items() if count == 0]
+            if missing_vids:
+                confirmation_deficits.append(
+                    f"confirmation coverage incomplete at span {span}: missing eligible scenes for {sorted(missing_vids)}"
+                )
 
     if violations:
         msg = f"{len(violations)} manifest invariant violation(s):\n" + "\n".join(f"  - {v}" for v in violations)
@@ -221,11 +283,11 @@ def verify_manifest(
 
     summary = manifest.get("summary", {})
     diag_ready = len(violations) == 0
-    conf_ready = len(confirmation_deficits) == 0
+    conf_ready = len(confirmation_deficits) == 0 and len(clean_conf_vids) >= 6
 
     if diag_ready and not conf_ready:
         status = "DIAGNOSTIC_READY_CONFIRMATION_INCOMPLETE"
-        verdict = "diagnostic inputs ready; confirmation corpus incomplete"
+        verdict = f"diagnostic inputs ready; confirmation corpus incomplete ({len(clean_conf_vids)} of 6 independent confirmation matches accepted)"
     else:
         status = "VERIFIED_PASS"
         verdict = "diagnostic inputs and confirmation corpus fully verified"
@@ -238,7 +300,8 @@ def verify_manifest(
         "schema": manifest.get("schema"),
         "num_scenes": len(scenes),
         "diagnostic_videos": diag_vids,
-        "confirmation_videos": conf_vids,
+        "confirmation_videos": clean_conf_vids,
+        "development_videos": dev_vids,
         "confirmation_deficits": confirmation_deficits,
         "ineligible_controls": controls,
         "summary": summary,
