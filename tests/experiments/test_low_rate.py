@@ -17,7 +17,15 @@ from experiments.tier.low_rate_measure import (
     reference_request,
     timing_record,
 )
-from experiments.tier.low_rate_plan import STAGES, all_points, ledger_moved, points_for, stage_names
+from experiments.tier.low_rate_plan import (
+    STAGES,
+    all_points,
+    ledger_moved,
+    named_point,
+    points_for,
+    select_work,
+    stage_names,
+)
 from experiments.tier.low_rate_references import (
     compare_candidate_to_anchor,
     reference_qps,
@@ -132,6 +140,32 @@ def test_ledger_moved_requires_more_than_one_byte_count() -> None:
     ]
     assert not ledger_moved(frozen, key="panorama")
     assert ledger_moved(frozen, key="residual")
+
+
+def test_named_point_is_the_unique_operating_point() -> None:
+    point = named_point("bg-crf51")
+    assert point.stage == "background"
+    assert point.stream_crf == 51
+    assert point.name == "bg-crf51"
+
+
+def test_unknown_point_is_refused() -> None:
+    with pytest.raises(ValueError, match="unknown point"):
+        named_point("bg-crf99")
+
+
+def test_select_work_one_point_is_a_single_row() -> None:
+    work = select_work(point="bg-crf51")
+    assert len(work) == 1
+    stage, points = work[0]
+    assert stage == "background"
+    assert len(points) == 1
+    assert points[0].name == "bg-crf51"
+
+
+def test_select_work_rejects_a_point_from_the_wrong_stage() -> None:
+    with pytest.raises(ValueError, match="belongs to stage"):
+        select_work(stage="motion", point="bg-crf51")
 
 
 def _probe_file(path: Path, *, av1: str = "0", vvc: str = "slower") -> Path:

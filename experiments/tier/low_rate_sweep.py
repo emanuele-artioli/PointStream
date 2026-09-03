@@ -55,6 +55,7 @@ from experiments.tier.low_rate_plan import (
     intended_category,
     ledger_moved,
     points_for,
+    select_work,
     stage_names,
 )
 from experiments.tier.low_rate_references import (
@@ -136,6 +137,11 @@ def pointstream_e1(clips: list[Any], config: PointstreamConfig) -> dict[str, Any
     """One ``run()`` over the long scenes, scored on delivered frames."""
     run = require_run_accepts_context_ids()
     ids = clip_context_ids(clips)
+    shapes = [tuple(int(x) for x in np.asarray(clip.frames).shape) for clip in clips]
+    print(
+        f"pointstream_e1 start context_ids={list(ids)} shapes={shapes}",
+        flush=True,
+    )
     started = time.perf_counter()
     result = run(
         config,
@@ -242,6 +248,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--codec", default="av1")
     parser.add_argument("--tier", default="balanced")
     parser.add_argument("--stage", default=None, help="run one named stage, or all")
+    parser.add_argument(
+        "--point",
+        default=None,
+        help="run one named operating point (native-resolution preflight)",
+    )
     parser.add_argument("--fps", type=float, default=DECLARED_FPS)
     parser.add_argument("--preset", default=None, help="override the slowest-preset rule")
     parser.add_argument("--out", default=None)
@@ -279,7 +290,10 @@ def main(argv: list[str] | None = None) -> int:
     dest = Path(args.out) if args.out else sweep_path(identity)
     points_dir = checkpoint_dir(dest)
 
-    stages = [args.stage] if args.stage else list(stage_names())
+    try:
+        work = select_work(stage=args.stage, point=args.point)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
     clips = load_e1_sequence(args.video, list(args.scenes), n_frames=args.frames)
     context_ids = clip_context_ids(clips)
     base = load_tier(args.tier)
@@ -319,6 +333,7 @@ def main(argv: list[str] | None = None) -> int:
             "headline_control": "undecided — follows the product claim after both curves exist",
             "reference_file": None if args.skip_compare else str(references_path(identity)),
             "checkpoint_dir": str(points_dir),
+            "preflight_point": args.point,
             "tried": [row["name"] for row in rows],
             "ledger_notes": category_notes,
             "bounds_file": str(BOUNDS_PATH),
@@ -363,8 +378,7 @@ def main(argv: list[str] | None = None) -> int:
             )
         write_json(dest, _report())
 
-    for stage in stages:
-        points = points_for(stage)
+    for stage, points in work:
         stage_rows: list[dict[str, Any]] = []
         print(f"stage {stage} ({len(points)} points) preset {preset}", flush=True)
         for point in points:
@@ -385,7 +399,12 @@ def main(argv: list[str] | None = None) -> int:
             )
             write_json(dest, _report())
         key = intended_category(stage)
-        if stage != "controls" and not ledger_moved(stage_rows, key=key):
+        # A one-point preflight cannot show a knob moving; skip that assertion.
+        if (
+            stage != "controls"
+            and len(stage_rows) > 1
+            and not ledger_moved(stage_rows, key=key)
+        ):
             note = (
                 f"stage {stage}: intended ledger key {key!r} did not move "
                 "across points. The knob is not reaching the payload, or the "
