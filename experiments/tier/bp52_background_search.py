@@ -222,6 +222,11 @@ def _point_alarms(name: str, row: dict[str, Any], bounds: dict[str, Any]) -> lis
     if not payload:
         return [f"{name}: point failed without a PointStream result"]
     alarms: list[str] = []
+    if payload.get("usable") is not True or payload.get("is_rate") is not True:
+        alarms.append(f"{name}: unusable or non-coded result")
+    parts = payload.get("parts") or {}
+    if not parts or sum(parts.values()) != payload.get("coded_bytes"):
+        alarms.append(f"{name}: byte ledger does not balance")
     if payload.get("n_frames") != 96:
         alarms.append(f"{name}: n_frames={payload.get('n_frames')} != 96")
     for key, expected in (("vmaf", "vmaf"), ("psnr_y", "psnr_y"), ("ssim", "ssim")):
@@ -262,20 +267,32 @@ def _bp49_comparison(row: dict[str, Any]) -> dict[str, Any]:
     fields = ("coded_bytes", "vmaf", "psnr_y", "ssim", "run_seconds")
     deltas: dict[str, float] = {}
     for field in fields:
-        old_value = old.get(field) if field == "coded_bytes" else (old.get("scores") or {}).get(field)
-        new_value = new.get(field) if field == "coded_bytes" else (new.get("scores") or {}).get(field)
+        old_value = old.get(field) if field in {"coded_bytes", "run_seconds"} else (old.get("scores") or {}).get(field)
+        new_value = new.get(field) if field in {"coded_bytes", "run_seconds"} else (new.get("scores") or {}).get(field)
         if isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
             deltas[field] = float(new_value) - float(old_value)
     return {
         "status": "available",
         "path": str(path),
-        "historical": {field: old.get(field) if field == "coded_bytes" else (old.get("scores") or {}).get(field)
+        "historical": {field: old.get(field) if field in {"coded_bytes", "run_seconds"} else (old.get("scores") or {}).get(field)
                        for field in fields},
-        "fresh": {field: new.get(field) if field == "coded_bytes" else (new.get("scores") or {}).get(field)
+        "fresh": {field: new.get(field) if field in {"coded_bytes", "run_seconds"} else (new.get("scores") or {}).get(field)
                   for field in fields},
         "delta_fresh_minus_historical": deltas,
         "note": "Any unexplained difference must be investigated before using CRF51 as a regression control.",
     }
+
+
+def _control_alarms(comparison: dict[str, Any]) -> list[str]:
+    """The fixed CRF51 control must reproduce size and quality, not host timing."""
+    if comparison.get("status") != "available":
+        return ["bg-crf51: historical regression control unavailable"]
+    deltas = comparison.get("delta_fresh_minus_historical") or {}
+    return [
+        f"bg-crf51: regression control mismatch or missing {field}"
+        for field in ("coded_bytes", "vmaf", "psnr_y", "ssim")
+        if deltas.get(field) != 0.0
+    ]
 
 
 def _background_effect(rows: list[dict[str, Any]]) -> dict[str, Any]:
@@ -464,17 +481,22 @@ def main(argv: list[str] | None = None) -> int:
         alarms.extend(_point_alarms(point_name, row, bounds))
         if point_name == "bg-crf51":
             row["bp49_comparison"] = _bp49_comparison(row)
+            alarms.extend(_control_alarms(row["bp49_comparison"]))
         background_effect = _background_effect(rows)
+        point_alarms = alarms + list(background_effect.get("alarms") or [])
         report = _report(
             identity=identity,
             bounds=bounds,
             controls=controls,
             rows=rows,
-            alarms=alarms + list(background_effect.get("alarms") or []),
+            alarms=point_alarms,
             destination=destination,
             points_dir=points_dir,
         )
         write_json(report_path, report)
+        if point_alarms:
+            print(f"stopping batch after {point_name}: {point_alarms}", flush=True)
+            return 1
         print(
             f"{point_name}: {row.get('pointstream', {}).get('coded_bytes', 'FAILED')} B",
             flush=True,

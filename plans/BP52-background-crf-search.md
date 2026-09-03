@@ -2,6 +2,14 @@
 
 ## Outcome
 
+Review repair (after measurement): the batch saves a partial report and stops
+before the next encode on any point alarm or CRF51 size/quality control mismatch.
+Missing control data also stops the batch. Host timing variation is not a quality
+regression; the comparison now reads run_seconds from the correct field.
+Targeted checks: 43 tests passed, lint and mypy passed. These are driver repairs,
+not a rerun: measured outputs and their original implementation remain unchanged.
+The new implementation requires a new output directory.
+
 **Complete.** The exact BP49 pair was rerun at native 3840×2160 with a fresh
 `bg-crf51` control, then `bg-crf63` and `bg-crf57`. All three PointStream
 points succeeded. The fresh CRF51 ledger and quality are byte/metric identical
