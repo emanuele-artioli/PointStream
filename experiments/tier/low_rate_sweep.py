@@ -174,7 +174,8 @@ def pointstream_e1(
     return {
         "coded_bytes": total,
         "bytes": total,
-        "usable": isinstance(scores.get("vmaf"), float) and bool(sizes.is_rate),
+        "usable": (isinstance(scores.get("vmaf"), float) and bool(sizes.is_rate)
+                   and result.timing.get("hourly_checkpoint_budget_met", True) is True),
         "scores": scores,
         "late_frame": {
             "by_scene": per_scene,
@@ -209,7 +210,13 @@ def pointstream_e1(
             "preset": config.residual.preset,
         },
         "stage_seconds": list(result.stage_seconds),
+        "invocation_phase_seconds": result.phase_seconds,
+        "recovery_alarm": (
+            None if result.timing.get("hourly_checkpoint_budget_met", True) is True
+            else "hourly checkpoint budget exceeded or unverified after interruption; do not expand batch"
+        ),
         **pointstream_timing(wall),
+        **result.timing,
     }
 
 

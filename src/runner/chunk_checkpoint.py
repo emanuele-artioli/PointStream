@@ -8,6 +8,10 @@ written here before the next one starts.
 from __future__ import annotations
 
 import json
+import hashlib
+import os
+import tempfile
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
@@ -16,7 +20,7 @@ import numpy as np
 from src.contracts.lattice import ART_DELIVERED, ART_QUALITY
 from src.pipeline.encoder.encoder import SOURCE
 from src.pipeline.reconstruction.device import DeviceDecision
-from src.pipeline.reconstruction.quality import Closeness, QualityReport
+from src.pipeline.reconstruction.quality import Closeness, QualityReport, RegionScore
 from src.pipeline.reconstruction.reconstruct import ReconstructionResult
 from src.runner.accounting import SizesBytes
 from src.runner.stages import _delivered_frames
@@ -34,17 +38,77 @@ def sizes_from_dict(data: dict[str, Any]) -> SizesBytes:
     )
 
 
-def _placeholder_quality() -> QualityReport:
+def quality_from_dict(data: dict[str, Any]) -> QualityReport:
     return QualityReport(
-        closeness=Closeness(
-            bit_identical=False,
-            mean_abs_diff=0.0,
-            max_abs_diff=0.0,
-            psnr=0.0,
-            within_atol=True,
-        ),
-        scoped=(),
+        closeness=Closeness(**data["closeness"]),
+        scoped=tuple(RegionScore(**item) for item in data["scoped"]),
+        enforced=tuple(data["enforced"]),
     )
+
+
+def publish(directory: Path, destination: Path) -> None:
+    """Flush and hash all files before atomically publishing the snapshot."""
+    hashes = {}
+    for path in sorted(directory.rglob("*")):
+        if path.is_file():
+            hashes[str(path.relative_to(directory))] = file_digest(path)
+            with path.open("rb") as handle:
+                os.fsync(handle.fileno())
+    with (directory / "done").open("w") as handle:
+        json.dump(hashes, handle, sort_keys=True)
+        handle.flush()
+        os.fsync(handle.fileno())
+    # Directory metadata must reach disk before the commit rename.
+    for path in [p for p in directory.rglob("*") if p.is_dir()] + [directory]:
+        fd = os.open(path, os.O_RDONLY)
+        try:
+            os.fsync(fd)
+        finally:
+            os.close(fd)
+    os.replace(directory, destination)
+    fd = os.open(destination.parent, os.O_RDONLY)
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
+def verify_snapshot(directory: Path) -> None:
+    try:
+        hashes = json.loads((directory / "done").read_text())
+        if not isinstance(hashes, dict) or not hashes:
+            raise ValueError("legacy or empty commit record")
+        for name, digest in hashes.items():
+            path = directory / name
+            if path.resolve().is_relative_to(directory.resolve()) is False:
+                raise ValueError("invalid checkpoint path")
+            if file_digest(path) != digest:
+                raise ValueError(f"checksum mismatch: {name}")
+    except (OSError, ValueError, TypeError) as exc:
+        raise ValueError(f"incomplete or corrupt checkpoint {directory}: {exc}") from exc
+
+
+def file_digest(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(4 * 1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def save_background(root: Path, state: dict[str, Any] | None) -> None:
+    pending = Path(tempfile.mkdtemp(prefix=".pending-", dir=root))
+    (pending / "meta.json").write_text(json.dumps(_jsonable_background(state)))
+    if state is not None:
+        _save_arrays(pending / "background", state)
+    publish(pending, root / "prepared")
+
+
+def load_background(root: Path) -> dict[str, Any] | None:
+    directory = root / "prepared"
+    verify_snapshot(directory)
+    state = json.loads((directory / "meta.json").read_text())
+    return _load_arrays(directory / "background", state) if state is not None else None
 
 
 def chunk_dir(root: Path, index: int) -> Path:
@@ -77,13 +141,19 @@ def save_chunk(
     background_chunk_index: int,
 ) -> Path:
     dest = chunk_dir(root, index)
-    dest.mkdir(parents=True, exist_ok=True)
+    root.mkdir(parents=True, exist_ok=True)
+    if dest.exists():
+        raise ValueError(f"refusing to overwrite checkpoint {dest}")
+    pending = Path(tempfile.mkdtemp(prefix=".pending-", dir=root))
+    target = dest
+    dest = pending
     source = np.asarray(chunk.bag[SOURCE])
     delivered = _delivered_frames(chunk.bag[ART_DELIVERED])
     np.save(dest / "source.npy", source)
     np.save(dest / "delivered.npy", delivered)
     np.save(dest / "frames.npy", np.asarray(chunk.frames))
     np.save(dest / "encoder_frames.npy", np.asarray(chunk.encoder_frames))
+    np.save(dest / "reconstruction.npy", np.asarray(chunk.reconstruction.frames))
     mask = chunk.reconstruction.object_mask
     if mask is not None:
         np.save(dest / "object_mask.npy", np.asarray(mask))
@@ -93,12 +163,18 @@ def save_chunk(
         "sizes": chunk.sizes.as_dict(),
         "background_chunk_index": background_chunk_index,
         "background_state": _jsonable_background(background_state),
+        "quality": asdict(chunk.quality),
+        "delivered_quality": asdict(chunk.delivered_quality),
+        "reconstruction_quality": asdict(chunk.reconstruction.quality),
+        "reconstruction_path": chunk.reconstruction.path,
+        "reconstruction_device": asdict(chunk.reconstruction.device),
+        "delivered_byte_count": int(chunk.bag[ART_DELIVERED].get("byte_count", chunk.sizes.transport_total)),
     }
     (dest / "meta.json").write_text(json.dumps(payload, indent=2, default=_json_default) + "\n")
     if background_state is not None:
         _save_arrays(dest / "background", background_state)
-    (dest / "done").write_text("1\n")
-    return dest
+    publish(pending, target)
+    return target
 
 
 def load_chunk(
@@ -106,6 +182,7 @@ def load_chunk(
 ) -> tuple[Any, dict[str, float], dict[str, Any] | None, int]:
     from src.runner.run import ChunkResult
     dest = chunk_dir(root, index)
+    verify_snapshot(dest)
     source = np.load(dest / "source.npy")
     delivered = np.load(dest / "delivered.npy")
     frames = np.load(dest / "frames.npy")
@@ -113,25 +190,26 @@ def load_chunk(
     mask_path = dest / "object_mask.npy"
     object_mask = np.load(mask_path) if mask_path.is_file() else None
     meta = json.loads((dest / "meta.json").read_text())
-    quality = _placeholder_quality()
+    quality = quality_from_dict(meta["quality"])
+    delivered_quality = quality_from_dict(meta["delivered_quality"])
     reconstruction = ReconstructionResult(
-        frames=frames,
-        quality=quality,
-        path="chunk-checkpoint",
-        device=DeviceDecision("cpu"),
+        frames=np.load(dest / "reconstruction.npy", allow_pickle=False),
+        quality=quality_from_dict(meta["reconstruction_quality"]),
+        path=meta["reconstruction_path"],
+        device=DeviceDecision(**meta["reconstruction_device"]),
         object_mask=object_mask,
     )
     bag = {
         SOURCE: source,
-        ART_DELIVERED: {"frames": delivered, "byte_count": int(delivered.nbytes)},
-        ART_QUALITY: quality,
+        ART_DELIVERED: {"frames": delivered, "byte_count": meta["delivered_byte_count"]},
+        ART_QUALITY: delivered_quality,
     }
     chunk = ChunkResult(
         frames=frames,
         encoder_frames=encoder_frames,
         reconstruction=reconstruction,
         quality=quality,
-        delivered_quality=quality,
+        delivered_quality=delivered_quality,
         sizes=sizes_from_dict(meta["sizes"]),
         symmetry=chunk_symmetry_from_arrays(encoder_frames, frames),
         bag=bag,

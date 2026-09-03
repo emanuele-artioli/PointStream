@@ -566,6 +566,8 @@ class BackgroundStreamTransmitter:
             )
         if int(state["crf"]) != int(self.crf):
             raise ValueError("stream state crf does not match this transmitter")
+        if int(state["keyframe_interval"]) != int(self.keyframe_interval):
+            raise ValueError("stream state keyframe interval does not match this transmitter")
         self.reset()
         self._chains = [tuple(int(i) for i in chain) for chain in state["chains"]]
         self._payloads = [bytes(item) for item in state["payloads"]]

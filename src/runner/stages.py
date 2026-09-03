@@ -98,6 +98,7 @@ class StageContext:
     context_ids: Sequence[str] | None = None
     background_model: Any = None
     background_chunk_index: int = 0
+    background_restore_state: dict[str, Any] | None = None
 
 
 def _subjects(bag: Mapping[str, Any]) -> tuple[ObjectRequest, ...]:
@@ -692,7 +693,9 @@ def make_background(
     model = _bound_background(ctx)
     ctx.background_model = model
     ids = _resolved_context_ids(ctx)
-    if ctx.config.background.canvas == "canonical" and ctx.source_chunks:
+    if ctx.background_restore_state is not None:
+        model.import_stream_state(ctx.background_restore_state)
+    elif ctx.config.background.canvas == "canonical" and ctx.source_chunks:
         # Offline: each context group sees its scenes before the first plate
         # of that group is coded. Mixed ids must not share one union canvas.
         model.prepare_contexts(ctx.source_chunks, ids, register=register)

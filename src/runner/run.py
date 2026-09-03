@@ -7,8 +7,9 @@ path and no flag that skips evaluation.
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 from pathlib import Path
+import time
 from typing import Any
 
 import numpy as np
@@ -101,6 +102,8 @@ class RunResult:
     chunks: tuple[ChunkResult, ...]
     lattice: StageLattice
     stage_seconds: tuple[dict[str, float], ...] = ()
+    timing: dict[str, Any] = field(default_factory=dict)
+    phase_seconds: dict[str, float] = field(default_factory=dict)
 
     @property
     def sizes_bytes(self) -> dict[str, int | float]:
@@ -125,6 +128,54 @@ def run(
     config: PointstreamConfig,
     chunks: Sequence[np.ndarray],
     *,
+    context_ids: Sequence[str] | None = None,
+    checkpoint_dir: Path | str | None = None,
+    heartbeat_interval: float | None = 600.0,
+    checkpoint_identity: str | None = None,
+    **kwargs: Any,
+) -> RunResult:
+    """Run with identity-checked recovery and whole-invocation progress.
+
+    Injected backends/evaluators must provide a stable checkpoint_identity
+    describing their implementation/configuration; opaque state is not guessed.
+    A hard-killed attempt makes cumulative time a labelled lower bound.
+    """
+    from src.pipeline.dag.heartbeat import Heartbeat
+    from src.runner.recovery import RecoverySession, runner_identity
+
+    started = time.monotonic()
+    session = None
+    with Heartbeat("runner (including preparation, recovery and scoring)", interval_s=heartbeat_interval):
+        if checkpoint_dir is not None:
+            injected = ("backends", "generator", "evaluator", "components", "builders")
+            if any(kwargs.get(key) is not None for key in injected) and not checkpoint_identity:
+                raise ValueError("injected implementations require checkpoint_identity")
+            if config.lattice.generation:
+                raise ValueError("generative RNG recovery is not supported; disable generation for checkpointed runs")
+            contexts = tuple(context_ids) if context_ids is not None else tuple(
+                config.background.context_id or "run" for _ in chunks
+            )
+            identity = runner_identity(config, chunks, kwargs.get("objects"), contexts, checkpoint_identity)
+            session = RecoverySession(Path(checkpoint_dir), identity, started_at=started)
+        try:
+            result = _run(config, chunks, context_ids=context_ids, checkpoint_dir=checkpoint_dir,
+                          heartbeat_interval=heartbeat_interval, recovery_session=session, **kwargs)
+        except BaseException:
+            if session is not None:
+                session.finish(success=False)
+            raise
+        elapsed = time.monotonic() - started
+        timing = session.finish(success=True) if session is not None else {
+            "invocation_seconds": elapsed, "run_seconds": elapsed, "timing_complete": True,
+            "run_seconds_lower_bound": elapsed, "attempts": 1,
+        }
+        return replace(result, timing=timing)
+
+
+def _run(
+    config: PointstreamConfig,
+    chunks: Sequence[np.ndarray],
+    *,
     backends: Mapping[str, StageCallable] | None = None,
     generator: GeneratorRef | None = None,
     bind_generator_fn: Callable[[], GeneratorRef] | None = None,
@@ -135,6 +186,7 @@ def run(
     context_ids: Sequence[str] | None = None,
     checkpoint_dir: Path | str | None = None,
     heartbeat_interval: float | None = 600.0,
+    recovery_session: Any = None,
 ) -> RunResult:
     """Encode, reconstruct, score, and account every chunk.
 
@@ -220,16 +272,17 @@ def run(
             else tuple((config.background.context_id or "run") for _ in prepared)
         ),
     )
-    roster = bind_backends(ctx, backends)
-    conditioning = tuple(ref.requires) if ref is not None else ()
-    encoder = Encoder.build(lattice, roster, conditioning=conditioning)
-
-    from src.runner.chunk_checkpoint import completed_indices, load_chunk, save_chunk
+    from src.runner.chunk_checkpoint import (
+        completed_indices, load_background, load_chunk, save_background, save_chunk,
+    )
 
     results: list[ChunkResult] = []
     all_stage_seconds: list[dict[str, float]] = []
     ckpt = Path(checkpoint_dir) if checkpoint_dir is not None else None
     done = completed_indices(ckpt) if ckpt is not None else ()
+    if len(done) > len(prepared):
+        raise ValueError("checkpoint has more scenes than this input")
+    restore_state = None
     if ckpt is not None:
         resume_root = ckpt
         for index in done:
@@ -237,9 +290,23 @@ def run(
             results.append(chunk)
             all_stage_seconds.append(seconds)
             print(f"resume chunk {index} ({seconds})", flush=True)
-            if ctx.background_model is not None and background_state is not None:
-                ctx.background_model.import_stream_state(background_state)
+            restore_state = background_state
             ctx.background_chunk_index = bg_index
+
+    if not done and ckpt is not None and (ckpt / "prepared").exists():
+        restore_state = load_background(ckpt)
+    ctx.background_restore_state = restore_state
+    preparation_started = time.monotonic()
+    roster = bind_backends(ctx, backends)
+    phase_seconds = {"preparation": time.monotonic() - preparation_started}
+    print(f"runner preparation {phase_seconds['preparation']:.1f}s", flush=True)
+    if ckpt is not None and not (ckpt / "prepared").exists():
+        model = ctx.background_model
+        save_background(ckpt, model.export_stream_state() if model is not None else None)
+        if recovery_session is not None:
+            recovery_session.checkpoint()
+    conditioning = tuple(ref.requires) if ref is not None else ()
+    encoder = Encoder.build(lattice, roster, conditioning=conditioning)
 
     for index, source in enumerate(prepared):
         if index in done:
@@ -256,6 +323,7 @@ def run(
             on_stage=_on_stage,
             heartbeat_interval=heartbeat_interval,
         )
+        finish_started = time.monotonic()
         chunk = _finish_chunk(
             bag=bag,
             source=source,
@@ -268,6 +336,8 @@ def run(
             params=ctx.params,
             objects=chunk_objects,
         )
+        stage_seconds["finish_chunk"] = time.monotonic() - finish_started
+        print(f"chunk {index} finish/scoring {stage_seconds['finish_chunk']:.1f}s", flush=True)
         results.append(chunk)
         all_stage_seconds.append(stage_seconds)
         if ckpt is not None:
@@ -282,10 +352,15 @@ def run(
                 background_chunk_index=ctx.background_chunk_index,
             )
             print(f"checkpointed chunk {index}", flush=True)
+            if recovery_session is not None:
+                recovery_session.checkpoint()
 
-    return _assemble(
+    assembly_started = time.monotonic()
+    result = _assemble(
         results, lattice=lattice, scorer=scorer, stage_seconds=tuple(all_stage_seconds)
     )
+    phase_seconds["assembly_scoring"] = time.monotonic() - assembly_started
+    return replace(result, phase_seconds=phase_seconds)
 
 
 def _finish_chunk(

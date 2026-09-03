@@ -15,7 +15,7 @@ Sidecar codec is an independent constructor argument, not a strategy name.
 from __future__ import annotations
 
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any
 
 import numpy as np
@@ -522,12 +522,31 @@ class PanoramaStream(BackgroundModel):
             "scene_index": int(self._scene_index),
             "active_context": self._active_context,
             "transmitter": self._transmitter.export_state(),
+            "context_id": self.context_id,
+            "canvas": asdict(self._canvas) if self._canvas is not None else None,
+            "alignments": [item.tolist() for item in self._alignments],
+            "groups": [
+                {"start": group.start, "end": group.end, "context_id": group.context_id,
+                 "canvas": asdict(group.canvas),
+                 "alignments": [item.tolist() for item in group.alignments]}
+                for group in self._groups
+            ],
         }
 
     def import_stream_state(self, state: dict[str, Any]) -> None:
         self._scene_index = int(state["scene_index"])
         self._active_context = state.get("active_context")
         self._transmitter.import_state(state["transmitter"])
+        self.context_id = state["context_id"]
+        self._canvas = CanonicalCanvas(**state["canvas"]) if state["canvas"] else None
+        self._alignments = tuple(np.asarray(item) for item in state["alignments"])
+        self._groups = tuple(
+            PreparedContext(
+                start=group["start"], end=group["end"], context_id=group["context_id"],
+                canvas=CanonicalCanvas(**group["canvas"]),
+                alignments=tuple(np.asarray(item) for item in group["alignments"]),
+            ) for group in state["groups"]
+        )
 
 
 class BackgroundNone(BackgroundModel):
