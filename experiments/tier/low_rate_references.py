@@ -3,7 +3,10 @@
 The reference QP walk is ``probe_qps``, not PointStream's residual knob. Each
 codec encodes the same frames, size, frame rate and colour, once as a joint
 continuous sequence and once as independently decodable segments. Generation
-is not involved.
+is not involved. ``--qp`` may name any legal codec QP, including neighbours
+off that sparse walk. Checkpoints are per access pattern and QP, so a later
+run can add QPs in the same directory when frames, preset and implementation
+are unchanged.
 
 Run::
 
@@ -15,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections.abc import Sequence
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -22,7 +26,7 @@ from typing import Any
 import numpy as np
 
 from experiments.tier.low_rate_checkpoint import load_checkpoint, save_checkpoint, write_json
-from experiments.tier.low_rate_checkpoint import guard_checkpoints, implementation_digest, source_identity
+from experiments.tier.low_rate_checkpoint import fingerprint, implementation_digest, source_identity
 from experiments.tier.low_rate_clips import (
     DEFAULT_SCENES,
     DEFAULT_SPAN_FRAMES,
@@ -50,6 +54,7 @@ from experiments.tier.low_rate_validate import (
     OUT_DIR,
     PRIMARY_ANCHORS,
     decode_rejections,
+    legal_qps,
     probe_qps,
 )
 from src.components.codec.frames import even_size
@@ -62,6 +67,7 @@ from src.components.metrics.bd_rate import (
 )
 from src.contracts.codecs import EncodeRequest
 from src.contracts.metrics import metric as metric_spec
+from src.pipeline.dag.heartbeat import Heartbeat
 
 
 ACCESS_PATTERNS: tuple[str, ...] = ("continuous", "segmented")
@@ -84,6 +90,71 @@ def reference_qps(codec: str) -> tuple[int, ...]:
             "correction knob."
         )
     return qps
+
+
+def selected_reference_qps(codec: str, requested: Sequence[int] | None) -> tuple[int, ...]:
+    """Sparse independent walk by default, or named legal codec QPs.
+
+    ``--qp`` may name neighbours that are not on the coarse walk so a crossover
+    can be refined. Values must sit in the codec's legal QP range. Residual
+    knobs are not a second namespace: a number is valid only as that codec QP.
+    """
+    if not requested:
+        return reference_qps(codec)
+    low, high = legal_qps(codec)
+    chosen: list[int] = []
+    seen: set[int] = set()
+    illegal: list[int] = []
+    for raw in requested:
+        qp = int(raw)
+        if qp < low or qp > high:
+            illegal.append(qp)
+            continue
+        if qp not in seen:
+            seen.add(qp)
+            chosen.append(qp)
+    if illegal:
+        raise SystemExit(
+            f"{codec} QP {illegal} is outside the legal range [{low}, {high}]. "
+            "Nearby refinement stays on the codec QP axis."
+        )
+    return tuple(chosen)
+
+
+def reference_checkpoint_identity(input_identity: dict[str, Any], preset: str) -> dict[str, Any]:
+    """Stable resume key. The QP list is not part of it.
+
+    Each finished point is ``{access}-qp{qp}.json``. Adding QPs reuses those
+    files. Changing frames, codec, preset or implementation still needs a new
+    directory. Older identity files that also stored ``qps`` are accepted when
+    everything else matches.
+    """
+    return {"input": input_identity, "preset": str(preset)}
+
+
+def _identity_without_qps(payload: object) -> dict[str, Any] | None:
+    if not isinstance(payload, dict):
+        return None
+    cleaned = {key: value for key, value in payload.items() if key != "qps"}
+    return cleaned if cleaned else None
+
+
+def guard_reference_checkpoints(directory: Path, identity: dict[str, Any]) -> None:
+    """Resume in place when only the requested QP set changed."""
+    path = directory / "identity.json"
+    expected = fingerprint(identity)
+    if path.is_file():
+        previous = json.loads(path.read_text(encoding="utf-8"))
+        if previous.get("fingerprint") == expected:
+            return
+        previous_identity = _identity_without_qps(previous.get("identity"))
+        if previous_identity is not None and fingerprint(previous_identity) == expected:
+            write_json(path, {"fingerprint": expected, "identity": identity})
+            return
+        raise SystemExit("checkpoint identity changed; use a new output directory")
+    if directory.exists() and any(directory.glob("*.json")):
+        raise SystemExit("unverified legacy checkpoints; use a new output directory")
+    write_json(path, {"fingerprint": expected, "identity": identity})
 
 
 def _joined_frames(clips: list[Any]) -> np.ndarray:
@@ -219,7 +290,8 @@ def encode_reference_curve(
                 curves[pattern].append(existing)
                 continue
             print(f"  {codec} qp{qp} preset {preset} {pattern}", flush=True)
-            row = encode_fn(clips, request, fps=fps)
+            with Heartbeat(f"{codec} qp{qp} preset {preset} {pattern}"):
+                row = encode_fn(clips, request, fps=fps)
             if checkpoint_root is not None:
                 save_checkpoint(checkpoint_root, name, row)
             curves[pattern].append(row)
@@ -359,6 +431,13 @@ def main(argv: list[str] | None = None) -> int:
         help="encode one codec; overrides --codecs when set",
     )
     parser.add_argument("--preset", default=None, help="override the slowest-preset rule")
+    parser.add_argument(
+        "--qp",
+        nargs="+",
+        type=int,
+        default=None,
+        help="encode these legal codec QPs (default: sparse independent walk)",
+    )
     parser.add_argument("--fps", type=float, default=DECLARED_FPS)
     parser.add_argument("--out-dir", default=None)
     args = parser.parse_args(argv)
@@ -391,11 +470,11 @@ def main(argv: list[str] | None = None) -> int:
         dest = references_path(identity, root=dest_dir)
         points_dir = checkpoint_dir(dest)
         preset = primary_preset(codec, override=args.preset)
-        qps = reference_qps(codec)
+        qps = selected_reference_qps(codec, args.qp)
         identity["source"] = source_identity(clips)
         identity["preset"] = preset
         identity["implementation"] = implementation_digest()
-        guard_checkpoints(points_dir, {"input": identity, "preset": preset, "qps": qps})
+        guard_reference_checkpoints(points_dir, reference_checkpoint_identity(identity, preset))
         print(f"{codec}: preset {preset}  qps {list(qps)}  {dest.name}", flush=True)
         curve = encode_reference_curve(
             clips,
@@ -419,6 +498,11 @@ def main(argv: list[str] | None = None) -> int:
                 "slowest valid preset from codec-floor.json"
                 if args.preset is None
                 else f"OVERRIDDEN to {args.preset}"
+            ),
+            "qp_policy": (
+                "legal codec QPs named on the command line; neighbours off the sparse walk are allowed"
+                if args.qp is not None
+                else "full independent reference walk"
             ),
             "checkpoint_dir": str(points_dir),
             "curve": curve,
