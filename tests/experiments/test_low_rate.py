@@ -9,6 +9,7 @@ import numpy as np
 import pytest
 
 from experiments.tier.low_rate_bounds import bounds_document, write_bounds
+from experiments.tier.low_rate_checkpoint import load_checkpoint, save_checkpoint, write_json
 from experiments.tier.low_rate_clips import load_e1_sequence
 from experiments.tier.low_rate_measure import (
     TIMING_KEYS,
@@ -29,8 +30,11 @@ from experiments.tier.low_rate_plan import (
 )
 from experiments.tier.low_rate_references import (
     compare_candidate_to_anchor,
+    guard_reference_checkpoints,
+    reference_checkpoint_identity,
     reference_qps,
     residual_qps_in_plan,
+    selected_reference_qps,
 )
 from experiments.tier.low_rate_validate import (
     decode_rejections,
@@ -285,6 +289,42 @@ def test_reference_qps_are_not_the_residual_knob() -> None:
     assert request.rate == 63
     assert request.preset == "0"
     assert 63 not in residual
+
+
+def test_selected_reference_qps_stay_on_the_independent_walk() -> None:
+    walk = reference_qps("av1")
+    assert selected_reference_qps("av1", None) == walk
+    assert selected_reference_qps("av1", [walk[0]]) == (walk[0],)
+    assert 62 not in walk
+    assert selected_reference_qps("av1", [63, 62, 63]) == (63, 62)
+    with pytest.raises(SystemExit, match="legal range"):
+        selected_reference_qps("av1", [0])
+    with pytest.raises(SystemExit, match="legal range"):
+        selected_reference_qps("av1", [999])
+
+
+def test_reference_checkpoints_reuse_when_only_qps_change(tmp_path: Path) -> None:
+    identity = reference_checkpoint_identity(
+        {"video": "alcaraz_highlights", "codec": "av1", "implementation": "v1"},
+        "0",
+    )
+    save_checkpoint(tmp_path, "continuous-qp63", {"bytes": 109198, "qp": 63})
+    write_json(
+        tmp_path / "identity.json",
+        {
+            "fingerprint": "stale-because-qps-were-in-the-key",
+            "identity": {**identity, "qps": [63]},
+        },
+    )
+    guard_reference_checkpoints(tmp_path, identity)
+    resumed = load_checkpoint(tmp_path, "continuous-qp63")
+    assert resumed is not None and resumed["bytes"] == 109198
+    guard_reference_checkpoints(tmp_path, identity)
+    with pytest.raises(SystemExit, match="identity changed"):
+        guard_reference_checkpoints(
+            tmp_path,
+            reference_checkpoint_identity(identity["input"], "10"),
+        )
 
 
 def test_timing_record_keeps_encode_and_decode_apart() -> None:
