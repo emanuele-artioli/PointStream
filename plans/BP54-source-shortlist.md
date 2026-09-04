@@ -138,7 +138,16 @@ To maintain rigorous research honesty, the following items are formally tagged a
   - Background canonical canvases & homographies: **~0.2 GB**.
   - Total storage budget for complete 6-match confirmation corpus: **$\le 100\text{ GB}$** (< 0.4% of available NFS capacity).
 
-### 5.2 Execution Schedule to 20 September Evidence Freeze (16 Days Remaining)
+### 5.2 Extraction & Two-Player Annotation Effort
+- **Object Detection & Silhouette Generation**:
+  - 2 foreground players tracked simultaneously across all spans.
+  - Automated tracking: ByteTrack / BoT-SORT on YOLOv8x / SAM masks.
+  - Invariant validation: paste-back MAE $\le 2.0$, canvas growth $\le 2.5\times$, consecutive MAD $\le 10.0$.
+- **Per-Match Yield Requirement**:
+  - Each match must provide **at least 1 validated scene** with continuous 2-player tracking across all 4 target spans (**48, 96, 192, and 384 frames** at 24 fps).
+  - Target extraction: 3–5 candidate scenes extracted per match to guarantee at least 1–2 scenes meet the strict 384-frame criteria.
+
+### 5.3 Execution Schedule to 20 September Evidence Freeze (16 Days Remaining)
 
 | Phase | Milestone / Task | Target Dates | Duration | Dependency / Gate |
 |---|---|---|:---:|---|
