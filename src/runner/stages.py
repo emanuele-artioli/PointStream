@@ -772,6 +772,8 @@ def make_background(
             height=int(artifact.height or height),
             scene_id=artifact.scene_id,
             payload_bytes=int(len(artifact.payload)),
+            geometry_header=bytes(artifact.geometry_header),
+            geometry_header_bytes=int(len(artifact.geometry_header)),
         )
 
     return background_stage
@@ -1090,12 +1092,16 @@ def ledger_from_bag(bag: Mapping[str, Any], source: np.ndarray) -> SizesBytes:
         # returns a bare descriptor still counts as raw.
         raw.append("actor_reference")
 
+    geometry_header_bytes = 0
+    if isinstance(view, BackgroundModelView):
+        geometry_header_bytes = int(view.charged_geometry_header_bytes())
+
     return sizes_bytes(
         source=int(clip.nbytes),
         residual=residual_bytes,
         panorama=panorama_bytes,
         actor_reference=actor_bytes,
-        metadata=metadata_bytes(bag),
+        metadata=metadata_bytes(bag) + geometry_header_bytes,
         raw_parts=tuple(raw),
     )
 

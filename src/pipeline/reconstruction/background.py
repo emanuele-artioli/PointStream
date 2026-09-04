@@ -47,6 +47,17 @@ class BackgroundModelView:
     # transmission ran. ``None`` means nobody coded this plate, so a caller
     # must not present its pixel size as a transmitted cost (BP24).
     payload_bytes: int | None = None
+    # Charged geometry header bytes, when the runner retained the sidecar.
+    # Accounting prefers ``len(geometry_header)`` over the length field.
+    geometry_header: bytes = b""
+    # Length of the charged geometry header. Used when only the length was
+    # recorded. Counted as metadata, not panorama.
+    geometry_header_bytes: int = 0
+
+    def charged_geometry_header_bytes(self) -> int:
+        if self.geometry_header:
+            return len(self.geometry_header)
+        return int(self.geometry_header_bytes)
 
     def __post_init__(self) -> None:
         if self.mode not in {MODE_FULL, MODE_DELTA, MODE_NONE}:

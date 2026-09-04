@@ -612,6 +612,16 @@ class BackgroundStreamReceiver:
         if self.codec not in CODECS:
             raise ValueError(f"unknown stream codec {self.codec!r}; known: {sorted(CODECS)}")
 
+    def reset(self) -> None:
+        """Drop received payloads. A context boundary starts a new decode chain."""
+        self._payloads.clear()
+        self._shape = None
+
+    def import_payloads(self, payloads: Mapping[int, bytes]) -> None:
+        """Restore previously received scene bytes without re-decoding them."""
+        self.reset()
+        self._payloads = {int(index): bytes(blob) for index, blob in payloads.items()}
+
     def receive(self, payload: ScenePayload, *, height: int, width: int) -> np.ndarray:
         """Accept one payload and return the plate the client now holds."""
         missing = [i for i in payload.chain[:-1] if i not in self._payloads]
