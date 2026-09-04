@@ -5,18 +5,21 @@ Behaviour
    pixels match; the geometry header is charged as metadata.
 2. Static and panning geometry stay in original canonical coordinates after a
    half-scale round trip (translated marker centroid, not merely equal shapes).
-3. A decoded half-scale chain restores identically on encoder and fresh-client
-   paths.
+3. A decoded half-scale chain restores from copied payload and header bytes,
+   including when encoder ScenePayload history is emptied.
 4. Odd sizes floor to a positive even coded raster; too-small rasters refuse.
-5. A context reset starts a new chain; a changed scale cannot resume a chain.
-6. Snapshot/restore is equivalent at the same scale.
+5. A context reset starts a new chain and sets the header keyframe flag.
+6. Snapshot/restore is equivalent at the same scale; client_plate after import
+   uses retained header bytes.
 7. Header bytes are counted once, as metadata, and are not mixed into the AV1
-   payload.
+   payload. Retained header bytes override a stale length field.
+8. v1 28-byte headers still unpack; the keyframe flag is v2-only.
 
 Plausible misuse
-8. Unsupported scales and non-stream methods with scale 0.5 are rejected.
+9. Unsupported scales and non-stream methods with scale 0.5 are rejected.
 
-Deliberately not tested: libaom fidelity, 4K rate, BD-rate, quarter-scale.
+Deliberately not tested: libaom fidelity, 4K rate, BD-rate, quarter-scale,
+re-encoding the native 4K batch.
 """
 
 from __future__ import annotations
@@ -26,9 +29,14 @@ import pytest
 
 from src.components.background.scale import (
     HEADER_BYTES,
+    VERSION_V1,
+    GeometryHeader,
+    TransmittedBackground,
     TransportScaleError,
     coded_dimensions,
+    decode_transmitted_stream,
     downsample_plate,
+    header_for,
     restore_plate,
     unpack_header,
 )
@@ -82,6 +90,38 @@ def test_scale_one_does_not_resample_and_charges_the_header() -> None:
     packed = header.pack()
     assert len(packed) == HEADER_BYTES
     assert unpack_header(packed) == header
+
+
+def test_v1_geometry_header_is_still_twenty_eight_bytes() -> None:
+    header = header_for(80, 64, 0.5, keyframe=True)
+    packed_v1 = GeometryHeader(
+        original_width=header.original_width,
+        original_height=header.original_height,
+        coded_width=header.coded_width,
+        coded_height=header.coded_height,
+        scale_num=header.scale_num,
+        scale_den=header.scale_den,
+        restore=header.restore,
+        version=VERSION_V1,
+        keyframe=True,
+    ).pack()
+    assert len(packed_v1) == HEADER_BYTES
+    recovered = unpack_header(packed_v1)
+    assert recovered.version == VERSION_V1
+    assert recovered.keyframe is False
+    assert recovered.coded_width == header.coded_width
+
+
+def test_view_charges_retained_header_bytes_not_a_stale_length() -> None:
+    from src.pipeline.reconstruction.background import BackgroundModelView
+
+    header = header_for(80, 64, 1.0).pack()
+    view = BackgroundModelView(
+        plate=np.zeros((64, 80, 3), dtype=np.uint8),
+        geometry_header=header,
+        geometry_header_bytes=0,
+    )
+    assert view.charged_geometry_header_bytes() == HEADER_BYTES
 
 
 def test_invalid_scales_and_method_combinations_are_rejected() -> None:
@@ -143,16 +183,30 @@ class TestScaledStreamCodec:
         model = _model(transport_scale=0.5)
         artifacts = [model.transmit(plate) for plate in plates]
         encoder = model.decode_payload(artifacts[-1])
+        poisoned = list(model._emitted)
+        model._emitted = []
         client = model.client_plate(artifacts[-1])
+        model._emitted = poisoned
         assert encoder is not None
         assert encoder.shape == plates[-1].shape
         assert np.array_equal(encoder, client)
+        packets = [
+            TransmittedBackground(
+                payload=bytes(item.payload),
+                geometry_header=bytes(item.geometry_header),
+            )
+            for item in artifacts
+        ]
+        standalone = decode_transmitted_stream(model._transmitter.codec, packets)
+        assert np.array_equal(encoder, standalone)
         header = unpack_header(artifacts[-1].geometry_header)
         assert header.scale == 0.5
+        assert header.keyframe is False
+        assert unpack_header(artifacts[0].geometry_header).keyframe is True
         coded = model._transmitter.reconstructions[-1]
         assert coded.shape == (header.coded_height, header.coded_width, 3)
 
-    def test_context_reset_does_not_mix_coded_history(self) -> None:
+    def test_context_reset_keyframe_flag_is_on_the_wire(self) -> None:
         first = _translated_plate()
         second = _translated_plate(dx=4, dy=0)
         third = np.zeros((64, 80, 3), dtype=np.uint8)
@@ -166,6 +220,9 @@ class TestScaledStreamCodec:
         assert c.mode == "full"
         assert unpack_header(c.geometry_header).original_width == 80
         assert unpack_header(a.geometry_header).original_width == 96
+        assert unpack_header(a.geometry_header).keyframe is True
+        assert unpack_header(b.geometry_header).keyframe is False
+        assert unpack_header(c.geometry_header).keyframe is True
 
     def test_geometry_header_is_metadata_not_codec_payload(self) -> None:
         from src.pipeline.reconstruction.background import BackgroundModelView
@@ -183,15 +240,16 @@ class TestScaledStreamCodec:
             width=artifact.width,
             height=artifact.height,
             payload_bytes=len(artifact.payload),
-            geometry_header_bytes=len(artifact.geometry_header),
+            geometry_header=bytes(artifact.geometry_header),
+            geometry_header_bytes=0,
         )
         # The header length is the exact charged delta; panorama is codec bytes only.
         assert view.payload_bytes == len(artifact.payload)
-        assert view.geometry_header_bytes == HEADER_BYTES
+        assert view.charged_geometry_header_bytes() == HEADER_BYTES
         ledger = sizes_bytes(
             source=int(plate.nbytes),
             panorama=int(view.payload_bytes or 0),
-            metadata=int(view.geometry_header_bytes),
+            metadata=int(view.charged_geometry_header_bytes()),
         )
         assert ledger.metadata == HEADER_BYTES
         assert ledger.panorama == len(artifact.payload)
@@ -207,6 +265,8 @@ class TestScaledStreamCodec:
         clone = _model(transport_scale=0.5)
         clone.import_stream_state(state)
         assert np.array_equal(clone.decode_payload(artifact), restored)
+        clone._emitted = []
+        assert np.array_equal(clone.client_plate(artifact), restored)
         other = _model(transport_scale=1.0)
         with pytest.raises(ValueError, match="transport_scale"):
             other.import_stream_state(state)

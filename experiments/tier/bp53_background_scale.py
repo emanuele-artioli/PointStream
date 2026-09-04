@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import time
 from collections.abc import Mapping
 from dataclasses import replace
 from datetime import datetime, timezone
@@ -44,6 +43,19 @@ from experiments.tier.low_rate_measure import primary_preset, stream_codec_prove
 from experiments.tier.low_rate_plan import named_point
 from experiments.tier.low_rate_sweep import apply_point, pointstream_e1
 from experiments.tier.low_rate_validate import DECLARED_FPS
+from experiments.tier.bp53_budget import (
+    HEARTBEAT_INTERVAL_S,
+    POINT_RESERVE_S,
+    AttemptSession,
+    budget_alarms,
+    finish_attempt,
+    load_budget,
+    longer_runs_cleared,
+    over_budget,
+    reconcile_checkpoints,
+    recover_interrupted,
+    remaining_seconds,
+)
 from src.components.background.scale import HEADER_BYTES
 from src.components.background.stream import ffmpeg_provenance
 from src.contracts import paths as ps_paths
@@ -69,8 +81,6 @@ BP52_FFMPEG = {
     "path": "/opt/local/bin/ffmpeg",
     "version_prefix": "ffmpeg version n7.1.1-56-gc2184b65d2",
 }
-WALL_BUDGET_S = 8 * 3600
-POINT_RESERVE_S = 3500
 
 
 def bounds_document() -> dict[str, Any]:
@@ -101,6 +111,7 @@ def bounds_document() -> dict[str, Any]:
             "residual": False,
             "point_count": 3,
             "checkpoint_gap_seconds_max": 3600.0,
+            "hourly_gap_clearance_seconds": 1.0,
             "geometry_header_bytes_per_scene": HEADER_BYTES,
         },
         "points": {
@@ -308,6 +319,7 @@ def _report(
     destination: Path,
     points_dir: Path,
     tools: dict[str, Any],
+    budget: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     return {
         "written": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -338,6 +350,7 @@ def _report(
         "points": rows,
         "completion": completion_counts(rows),
         "alarms": alarms,
+        "budget": budget,
         "reproduction": (
             "PYTHONPATH=/home/itec/emanuele/pointstream-bp53 "
             "PS_DATA_ROOT=/home/itec/emanuele/pointstream-data "
@@ -407,18 +420,34 @@ def main(argv: list[str] | None = None) -> int:
         "expected_sources": list(EXPECTED_SOURCE),
     }
     guard_checkpoints(points_dir, identity)
+    budget_path = destination / "budget.json"
+    recover_interrupted(budget_path, points_dir)
+    reconcile_checkpoints(budget_path, points_dir, [name for name, _, _ in POINT_SPECS])
     controls_path = destination / "metric-controls.json"
-    controls = (
-        json.loads(controls_path.read_text(encoding="utf-8"))
-        if controls_path.is_file()
-        else run_metric_controls(np.asarray(clips[0].frames[:2]), controls_path)
-    )
+    if controls_path.is_file():
+        controls = json.loads(controls_path.read_text(encoding="utf-8"))
+    else:
+        with AttemptSession(
+            budget_path,
+            "metric-controls",
+            kind="controls",
+            interval_s=HEARTBEAT_INTERVAL_S,
+        ) as session:
+            controls = run_metric_controls(
+                np.asarray(clips[0].frames[:2]), controls_path
+            )
+            control_wall = session.elapsed()
+        finish_attempt(
+            budget_path, "metric-controls", control_wall, kind="controls"
+        )
     report_path = destination / "background-scale.json"
     rows: list[dict[str, Any]] = []
     alarms = list(controls.get("alarms") or [])
-    started = time.monotonic()
-    if controls.get("valid") is not True:
-        report = _report(
+
+    def emit() -> dict[str, Any]:
+        snapshot = load_budget(budget_path)
+        alarms.extend(item for item in budget_alarms(snapshot) if item not in alarms)
+        document = _report(
             identity=identity,
             bounds=bounds,
             controls=controls,
@@ -427,26 +456,25 @@ def main(argv: list[str] | None = None) -> int:
             destination=destination,
             points_dir=points_dir,
             tools=tools,
+            budget=snapshot,
         )
-        write_json(report_path, report)
+        write_json(report_path, document)
+        return document
+
+    if controls.get("valid") is not True:
+        emit()
         return 1
 
     for name, scale, plan_name in POINT_SPECS:
-        remaining = WALL_BUDGET_S - (time.monotonic() - started)
+        budget = load_budget(budget_path)
+        remaining = remaining_seconds(budget)
         existing = load_checkpoint(points_dir, name)
-        if existing is None and remaining < POINT_RESERVE_S:
-            alarms.append(f"{name}: not started; remaining {remaining:.0f}s < {POINT_RESERVE_S}s")
-            report = _report(
-                identity=identity,
-                bounds=bounds,
-                controls=controls,
-                rows=rows,
-                alarms=alarms,
-                destination=destination,
-                points_dir=points_dir,
-                tools=tools,
+        if existing is None and (remaining < POINT_RESERVE_S or over_budget(budget)):
+            alarms.append(
+                f"{name}: not started; remaining {remaining:.0f}s "
+                f"(reserve {POINT_RESERVE_S}s, over_budget={over_budget(budget)})"
             )
-            write_json(report_path, report)
+            emit()
             return 1
         if existing is not None:
             row = existing
@@ -464,7 +492,6 @@ def main(argv: list[str] | None = None) -> int:
                 tuned,
                 background=replace(tuned.background, transport_scale=float(scale)),
             )
-            wall_started = time.perf_counter()
             row = {
                 "name": name,
                 "config": {
@@ -473,29 +500,37 @@ def main(argv: list[str] | None = None) -> int:
                     "background_method": point.background_method,
                 },
             }
-            try:
-                row["pointstream"] = pointstream_e1(
-                    clips, tuned, checkpoint_dir=points_dir / f"{name}.run"
-                )
-            except Exception as exc:  # noqa: BLE001
-                row["pointstream_error"] = repr(exc)
-            row["attempt_wall_seconds"] = round(time.perf_counter() - wall_started, 3)
+            with AttemptSession(
+                budget_path,
+                name,
+                kind="attempt",
+                interval_s=HEARTBEAT_INTERVAL_S,
+            ) as session:
+                try:
+                    row["pointstream"] = pointstream_e1(
+                        clips, tuned, checkpoint_dir=points_dir / f"{name}.run"
+                    )
+                except Exception as exc:  # noqa: BLE001
+                    row["pointstream_error"] = repr(exc)
+                row["attempt_wall_seconds"] = round(session.elapsed(), 3)
             save_checkpoint(points_dir, name, row)
+            finish_attempt(budget_path, name, float(row["attempt_wall_seconds"]))
         rows.append(row)
         alarms.extend(_point_alarms(name, row, bounds))
+        payload = row.get("pointstream") or {}
+        gap = payload.get("max_checkpoint_gap_seconds")
+        if isinstance(gap, (int, float)) and not longer_runs_cleared(float(gap)):
+            budget = load_budget(budget_path)
+            budget["longer_runs_operationally_cleared"] = False
+            budget["max_checkpoint_gap_seconds"] = float(gap)
+            budget["hourly_note"] = (
+                f"{name} max checkpoint gap {float(gap):.3f}s is within 1s "
+                "of the hourly limit; longer runs are not cleared"
+            )
+            write_json(budget_path, budget)
         if name == "bg-scale1-crf51":
             alarms.extend(_control_alarms(row.get("pointstream")))
-        report = _report(
-            identity=identity,
-            bounds=bounds,
-            controls=controls,
-            rows=rows,
-            alarms=alarms,
-            destination=destination,
-            points_dir=points_dir,
-            tools=tools,
-        )
-        write_json(report_path, report)
+        emit()
         if alarms:
             print(f"stopping batch after {name}: {alarms}", flush=True)
             return 1
@@ -504,20 +539,10 @@ def main(argv: list[str] | None = None) -> int:
             flush=True,
         )
 
-    final = _report(
-        identity=identity,
-        bounds=bounds,
-        controls=controls,
-        rows=rows,
-        alarms=alarms,
-        destination=destination,
-        points_dir=points_dir,
-        tools=tools,
-    )
-    write_json(report_path, final)
+    final = emit()
     print(f"wrote {report_path}", flush=True)
     counts = completion_counts(rows)
-    return 1 if alarms or counts["failed"] else 0
+    return 1 if alarms or counts["failed"] or final["outcome"] != "complete" else 0
 
 
 if __name__ == "__main__":

@@ -34,7 +34,13 @@ Measured implementation digest (after the control fix):
 Required behaviour was listed in the brief (scale-1 compatibility, invalid
 scales, geometry, encoder/client restore, even rounding, context reset,
 snapshot/changed-scale, byte accounting). Tests:
-`tests/components/background/test_transport_scale.py`.
+`tests/components/background/test_transport_scale.py` and
+`tests/experiments/test_bp53_budget.py`.
+
+The 2026-09-04 repair adds: restore from copied payload+header bytes (encoder
+`ScenePayload` history emptied), v1 28-byte unpack, retained header bytes on
+the reconstruction view, budget persistence across restart, and refusal to
+treat a 3599.72 s checkpoint gap as clearance for longer runs.
 
 Commands (worktree root, `conda run -n pointstream --no-capture-output`):
 
@@ -155,3 +161,53 @@ It does **not** license a winning regime, BD-rate, real-time/speed ranking,
 longer contexts, quarter-scale, or slower background presets. Next hypotheses
 remain those in the brief: longer contexts and more background encoder effort,
 tested separately after Codex review.
+
+## Validation incomplete (Codex 2026-09-04)
+
+The ledgers, metric controls, and scale-1.0 quality match still stand. The
+native 4K points were **not** re-encoded.
+
+### Checkpoint provenance
+
+The CRF51 control was encoded under commit `2872a5f` (log-dir guard). The
+driver was then changed in `2ed5c40` so residual `0` is not treated as
+missing. Resume reused that checkpoint. `src/` did not change between those
+commits; only `experiments/tier/bp53_background_scale.py` did.
+
+`points/identity.json` and the aggregate `input.implementation` field were
+rewritten to digest
+`9a7b2dbc8cfa2384e116296aca34ba7f2debf7de416545c9212c36df77124d39`
+(post-fix). That label is the **resume** digest, not the encode digest.
+Those JSON files were left as written; the crossing is recorded in
+`plans/BP53-measurement-provenance.md` and
+`outputs/bp53-background-scale/measurement-provenance.json`.
+
+The control-predicate change does not alter stream coding, so it does not by
+itself invalidate reconstructed pixels. It does mean the aggregate must not
+be read as “frozen under one digest before the first encode.”
+
+### Independent client
+
+The native run’s `client_plate()` replayed encoder `ScenePayload` objects.
+That is a second decode, not reconstruction from a standalone package. The
+repair stores copied payload bytes plus the 28-byte geometry header (v2
+keyframe flag in the existing flags field) and restores through
+`decode_transmitted_stream`. Native 4K packets were not recaptured.
+
+### Budget and hourly gaps
+
+Half-scale CRF51 `max_checkpoint_gap_seconds` = 3599.72. That is inside 1 s
+of the 3600 s hourly limit, so longer runs are **not** operationally cleared.
+
+The original batch clock started after controls and reset on process restart.
+The driver now writes an active-attempt record before expensive work, pulses
+elapsed time, and on restart keeps known consumed time. Time after the last
+heartbeat is flagged as an unknown crash interval, not treated as zero and
+not filled with idle. Point checkpoints and budget charges are reconciled
+once. A batch that finishes over the 8 h wall cannot emit `outcome:
+complete`.
+
+The historical file `outputs/bp53-background-scale/budget.json` is
+reconstructed from the three recorded attempt walls (14,381.304 s).
+Metric-control duration was not stored, so consumed seconds remain a lower
+bound. Native point JSONs and `background-scale.json` were not rewritten.

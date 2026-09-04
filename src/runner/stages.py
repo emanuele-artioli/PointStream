@@ -772,6 +772,7 @@ def make_background(
             height=int(artifact.height or height),
             scene_id=artifact.scene_id,
             payload_bytes=int(len(artifact.payload)),
+            geometry_header=bytes(artifact.geometry_header),
             geometry_header_bytes=int(len(artifact.geometry_header)),
         )
 
@@ -1093,7 +1094,7 @@ def ledger_from_bag(bag: Mapping[str, Any], source: np.ndarray) -> SizesBytes:
 
     geometry_header_bytes = 0
     if isinstance(view, BackgroundModelView):
-        geometry_header_bytes = int(view.geometry_header_bytes)
+        geometry_header_bytes = int(view.charged_geometry_header_bytes())
 
     return sizes_bytes(
         source=int(clip.nbytes),

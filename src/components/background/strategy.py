@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import time
 from collections.abc import Sequence
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from typing import Any
 
 import numpy as np
@@ -24,8 +24,11 @@ import numpy as np
 from src.components.background.delta import apply_delta, compute_delta
 from src.components.background.plate import CanonicalCanvas, build_plate, prepare_canonical_context
 from src.components.background.scale import (
+    TransmittedBackground,
     TransportScaleError,
+    decode_transmitted_stream,
     downsample_plate,
+    header_for,
     require_supported_scale,
     restore_plate,
     unpack_header,
@@ -350,6 +353,7 @@ class PanoramaStream(BackgroundModel):
         self._scene_index = 0
         self.last_scene: Any = None
         self._emitted: list[Any] = []
+        self._wire: list[TransmittedBackground] = []
         self.last_resample_seconds: dict[str, float] = {"downsample": 0.0, "upsample": 0.0}
 
     def prepare_context(
@@ -497,6 +501,7 @@ class PanoramaStream(BackgroundModel):
             self._transmitter.reset()
             self._receiver.reset()
             self._emitted = []
+            self._wire = []
             self.last_scene = None
             if not self._groups:
                 self._canvas = None
@@ -519,7 +524,14 @@ class PanoramaStream(BackgroundModel):
                 "encoder reconstruction and client decode of the same charged "
                 "payloads disagreed before restore"
             )
-        packed = header.pack()
+        wire_header = replace(header, keyframe=payload.is_keyframe)
+        packed = bytes(wire_header.pack())
+        self._wire.append(
+            TransmittedBackground(
+                payload=bytes(payload.payload),
+                geometry_header=packed,
+            )
+        )
         return BackgroundArtifact(
             method=self.method,
             codec=self.codec_name,
@@ -553,19 +565,27 @@ class PanoramaStream(BackgroundModel):
         return restored
 
     def client_plate(self, artifact: BackgroundArtifact) -> np.ndarray:
-        """Independent client restore: replay charged payloads into a fresh decoder."""
-        from src.components.background.stream import BackgroundStreamReceiver
+        """Restore from copied payload and charged header bytes only.
 
-        header = unpack_header(artifact.geometry_header)
-        receiver = BackgroundStreamReceiver(codec=self._transmitter.codec)
-        decoded = None
-        for scene in self._emitted:
-            decoded = receiver.receive(
-                scene, height=header.coded_height, width=header.coded_width
+        Encoder ``ScenePayload`` objects are not an input. The argument names
+        the last packet; the chain is the copied wire records, or that packet
+        alone when no history was retained.
+        """
+        packets = [
+            TransmittedBackground(
+                payload=bytes(item.payload),
+                geometry_header=bytes(item.geometry_header),
             )
-        if decoded is None:
-            raise TransportScaleError("client decoder received no payloads")
-        return restore_plate(decoded, header)
+            for item in self._wire
+        ]
+        if not packets:
+            packets = [
+                TransmittedBackground(
+                    payload=bytes(artifact.payload),
+                    geometry_header=bytes(artifact.geometry_header),
+                )
+            ]
+        return decode_transmitted_stream(self._transmitter.codec, packets)
 
     def reconstruct(
         self,
@@ -581,6 +601,7 @@ class PanoramaStream(BackgroundModel):
             "transmitter": self._transmitter.export_state(),
             "context_id": self.context_id,
             "transport_scale": float(self.transport_scale),
+            "geometry_headers": [item.geometry_header.hex() for item in self._wire],
             "canvas": asdict(self._canvas) if self._canvas is not None else None,
             "alignments": [item.tolist() for item in self._alignments],
             "groups": [
@@ -611,26 +632,48 @@ class PanoramaStream(BackgroundModel):
                 alignments=tuple(np.asarray(item) for item in group["alignments"]),
             ) for group in state["groups"]
         )
-        self._rebuild_emitted()
+        self._rebuild_emitted(state)
 
-    def _rebuild_emitted(self) -> None:
+    def _rebuild_emitted(self, state: dict[str, Any] | None = None) -> None:
         from src.components.background.stream import ScenePayload
 
         exported = self._transmitter.export_state()
         self._emitted = []
+        self._wire = []
+        orig_w = int(self._canvas.width) if self._canvas is not None else 0
+        orig_h = int(self._canvas.height) if self._canvas is not None else 0
+        saved_headers = [
+            bytes.fromhex(item)
+            for item in (state or {}).get("geometry_headers") or []
+        ]
         for index, (chain, blob) in enumerate(
             zip(exported["chains"], exported["payloads"], strict=True)
         ):
             chain_t = tuple(int(item) for item in chain)
+            payload = bytes(blob)
             self._emitted.append(
                 ScenePayload(
                     index=index,
                     chain=chain_t,
-                    payload=bytes(blob),
+                    payload=payload,
                     picture_type="I" if len(chain_t) == 1 else "P",
                     reference=None if len(chain_t) == 1 else chain_t[-2],
                     mode=self._transmitter.mode,
                 )
+            )
+            if index < len(saved_headers):
+                header_bytes = saved_headers[index]
+            elif orig_w >= 1 and orig_h >= 1:
+                header_bytes = header_for(
+                    orig_w,
+                    orig_h,
+                    self.transport_scale,
+                    keyframe=len(chain_t) == 1,
+                ).pack()
+            else:
+                header_bytes = b""
+            self._wire.append(
+                TransmittedBackground(payload=payload, geometry_header=header_bytes)
             )
         self.last_scene = self._emitted[-1] if self._emitted else None
         self._receiver.import_payloads(

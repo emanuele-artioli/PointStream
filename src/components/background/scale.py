@@ -10,17 +10,20 @@ from __future__ import annotations
 
 import math
 import struct
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 import numpy as np
 
 MAGIC: bytes = b"PSBG"
-VERSION: int = 1
+VERSION_V1: int = 1
+VERSION: int = 2
 RESTORE_NONE: int = 0
 RESTORE_LINEAR: int = 1
 RESTORE_NAMES: dict[int, str] = {RESTORE_NONE: "none", RESTORE_LINEAR: "linear"}
+FLAG_KEYFRAME: int = 1
 
-#: magic(4) version(u8) restore(u8) pad(u16) orig_w/h coded_w/h (u32) scale n/d (u16)
+#: magic(4) version(u8) restore(u8) flags(u16) orig_w/h coded_w/h (u32) scale n/d (u16)
 HEADER_STRUCT: struct.Struct = struct.Struct("<4sBBHIIIIHH")
 HEADER_BYTES: int = HEADER_STRUCT.size
 
@@ -77,6 +80,8 @@ class GeometryHeader:
     scale_num: int
     scale_den: int
     restore: int
+    version: int = VERSION
+    keyframe: bool = False
 
     @property
     def scale(self) -> float:
@@ -90,11 +95,12 @@ class GeometryHeader:
             raise TransportScaleError(f"unknown restore policy id {self.restore}") from exc
 
     def pack(self) -> bytes:
+        flags = FLAG_KEYFRAME if self.keyframe else 0
         return HEADER_STRUCT.pack(
             MAGIC,
-            VERSION,
+            int(self.version),
             self.restore,
-            0,
+            flags,
             self.original_width,
             self.original_height,
             self.coded_width,
@@ -104,7 +110,13 @@ class GeometryHeader:
         )
 
 
-def header_for(original_width: int, original_height: int, scale: float) -> GeometryHeader:
+def header_for(
+    original_width: int,
+    original_height: int,
+    scale: float,
+    *,
+    keyframe: bool = False,
+) -> GeometryHeader:
     scale = require_supported_scale(scale)
     coded_w, coded_h = coded_dimensions(original_width, original_height, scale)
     if scale == 1.0:
@@ -119,6 +131,8 @@ def header_for(original_width: int, original_height: int, scale: float) -> Geome
         scale_num=num,
         scale_den=den,
         restore=restore,
+        version=VERSION,
+        keyframe=bool(keyframe),
     )
 
 
@@ -128,12 +142,13 @@ def unpack_header(blob: bytes) -> GeometryHeader:
         raise TransportScaleError(
             f"geometry header is {len(packed)} bytes, expected {HEADER_BYTES}"
         )
-    magic, version, restore, _pad, orig_w, orig_h, coded_w, coded_h, num, den = (
+    magic, version, restore, flags, orig_w, orig_h, coded_w, coded_h, num, den = (
         HEADER_STRUCT.unpack(packed)
     )
-    if magic != MAGIC or int(version) != VERSION:
+    if magic != MAGIC or int(version) not in {VERSION_V1, VERSION}:
         raise TransportScaleError(
-            f"geometry header magic/version {magic!r}/{version} is not {MAGIC!r}/{VERSION}"
+            f"geometry header magic/version {magic!r}/{version} is not "
+            f"{MAGIC!r}/{VERSION_V1} or {VERSION}"
         )
     if int(den) < 1:
         raise TransportScaleError("geometry header scale denominator must be >= 1")
@@ -145,6 +160,8 @@ def unpack_header(blob: bytes) -> GeometryHeader:
         scale_num=int(num),
         scale_den=int(den),
         restore=int(restore),
+        version=int(version),
+        keyframe=bool(int(flags) & FLAG_KEYFRAME) if int(version) >= VERSION else False,
     )
     _ = header.restore_name
     expected = header_for(header.original_width, header.original_height, header.scale)
@@ -201,3 +218,63 @@ def restore_plate(coded: np.ndarray, header: GeometryHeader) -> np.ndarray:
         interpolation=cv2.INTER_LINEAR,
     )
     return np.ascontiguousarray(restored)
+
+
+@dataclass(frozen=True)
+class TransmittedBackground:
+    """One scene as it exists on the wire: codec bytes plus charged geometry."""
+
+    payload: bytes
+    geometry_header: bytes
+
+
+def decode_transmitted_stream(
+    codec: str, packets: Sequence[TransmittedBackground]
+) -> np.ndarray:
+    """Restore the last plate using only copied payload bytes and charged headers.
+
+    The caller must not pass encoder objects. This rebuilds last-mode chains from
+    keyframe flags, or from an empty history / coded-size change for v1 headers.
+    """
+    from src.components.background.stream import BackgroundStreamReceiver, ScenePayload
+
+    if not packets:
+        raise TransportScaleError("no transmitted background packets")
+    receiver = BackgroundStreamReceiver(codec=codec)
+    restored: np.ndarray | None = None
+    indices: list[int] = []
+    last_coded: tuple[int, int] | None = None
+    for packet in packets:
+        payload = bytes(packet.payload)
+        header = unpack_header(bytes(packet.geometry_header))
+        coded = (header.coded_width, header.coded_height)
+        keyframe = bool(header.keyframe) if header.version >= VERSION else False
+        if not indices:
+            keyframe = True
+        if last_coded is not None and coded != last_coded:
+            keyframe = True
+        if keyframe:
+            receiver.reset()
+            indices = []
+            index = 0
+            chain: tuple[int, ...] = (0,)
+        else:
+            index = indices[-1] + 1
+            chain = tuple(indices + [index])
+        indices.append(index)
+        last_coded = coded
+        scene = ScenePayload(
+            index=index,
+            chain=chain,
+            payload=payload,
+            picture_type="I" if keyframe else "P",
+            reference=None if len(chain) == 1 else chain[-2],
+            mode="last",
+        )
+        decoded = receiver.receive(
+            scene, height=header.coded_height, width=header.coded_width
+        )
+        restored = restore_plate(decoded, header)
+    if restored is None:
+        raise TransportScaleError("transmitted stream produced no plate")
+    return restored
