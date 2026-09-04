@@ -9,9 +9,13 @@ its `AGENTS.md` and marker convention. This supersedes the archived P1 dispatch.
 BP51/BP52 review: all existing video sources have prior development/training
 use; zero independent confirmation matches are accepted. The short native
 CRF-only diagnostic has fresh controls and no recorded alarms, but no winning
-point. The current PDF is 26 pages (body/references 1–21, appendices 22–26).
+point. After BP53 notes the PDF is 27 pages (body/references 1–22, appendices
+23–27), within the project's 23+5 budget.
+BP53 half-scale search also established no win. Its driver-identity crossing
+and incomplete historical total timing remain explicit; later client/budget
+repairs are not native reruns. BP54 is provisional triage. See BP56/BP57 next.
 Do not re-run the completed appendix move. Separate PointStream encode/decode
-time from scoring before any final three-way comparison. See BP53/BP54 next.
+time from scoring before any final three-way comparison.
 
 Canonical background contexts, explicit conventional fallback and repaired
 recovery are implemented. The native preflight is an engineering diagnostic,

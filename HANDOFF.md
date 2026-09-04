@@ -1,62 +1,46 @@
-# PointStream — next session
+# PointStream — BP56/BP57 handoff
 
-Trigger: the user requested a clean handoff after merging recovery and cleaning
-the repositories. Updated 3 September 2026. **Do not reopen PR #53 or #54.**
+Trigger: user requested the next tasks after BP53/BP54 review, merge and cleanup.
+This is a planned boundary, not an outage. Target TOMM submission is 30 September;
+evidence freezes 20 September. Read AGENTS.md, PLAN.md and one assigned brief.
 
-PointStream is an object-centric hybrid codec targeting ACM TOMM by the hard
-30 September deadline. First establish a size–quality win against AV1 and VVC;
-report time throughout. No win has yet been confirmed. Evidence freezes on
-20 September. Read `AGENTS.md`, `PLAN.md`, then the one assigned brief.
+## Verified state
 
-## Verified starting point
+PRs #60/#61 merged at f63019c; cleanup/dispatch documentation follows that base.
+No winning regime is established. BP53 control used an earlier driver identity;
+later client/budget tests were not native reruns. Historical total runtime is a
+lower bound. Longer native contexts remain uncleared. BP54 is a provisional
+shortlist with zero accepted confirmation matches.
 
-Code PR #52, #53 and #54 are merged; #54 reached main at `3ba0e0b`. All five
-auxiliary worktrees have been removed. Use `/home/itec/emanuele/pointstream`.
-Check `git status -sb`, `git log -1` and `git worktree list` before starting;
-the handoff-cleanup commits follow that integration base.
+The paper has independent Git history in 67a9ea6275d3d9785ce57026/. Its evaluation
+now records BP53's qualified negative and the unfulfilled timing/confirmation
+requirements. Check its own AGENTS.md before editing. Completed BP49/BP51–BP54
+reports are in plans/done/; old paths are redirects, not runnable instructions.
 
-The paper is a separate repository at `67a9ea6275d3d9785ce57026/`. Check its Git
-state separately. Paper cleanup `a0c2d93` is pushed to Overleaf `main`.
-Its PDF build uses the `tex` conda environment, not the pinned
-`pointstream` environment. Historical evidence is in `plans/done/`, including
-`plans/done/RESEARCH-HISTORY.md`; archived launch instructions are not current tasks.
+## Immediate tasks
 
-The incomplete extraction edit was archived at pushed tag
-`archive/bp46-incomplete-extraction-2026-09-03`, not merged. Do not cherry-pick it
-wholesale: it removes validation and has broken syntax. No source footage,
-dataset, or experiment result was deleted during cleanup.
+1. Cursor: execute plans/BP56-background-encoder-effort.md in a NEW worktree
+   from updated origin/main. First prove higher-effort prefix/client invariants;
+   only then run its bounded short-pair pilot. Return one PR and report.
+2. Antigravity: execute plans/BP57-confirmation-acquisition-pilot.md independently.
+   User approved the two named sources, <=45 minutes each and <=10 GB combined,
+   metadata/shot checks only. No annotation, training or confirmation encodes.
+3. Codex: review both reports before expansion. Retain BP55 timing design and
+   longer-context recovery review; do not overlap code edits with active BP56.
 
-## Immediate next task
+## Jobs and open questions
 
-**Cursor:** execute `plans/BP49-native-reference-pilot.md`. First verify native
-checkpoint gaps on the BP47 frames in a NEW output directory. Then, only after
-that operational gate, run the bounded slowest-preset AV1/VVC pilot on the same
-decoded frames. Return the complete report to Codex before curves or broad E1.
+No experiment was launched by this integration. Before allocating resources,
+check ps -u emanuele -o pid,etime,args and nvidia-smi. Do not kill unknown jobs.
+Old BP51–BP54 worktrees are retired; do not save stale editor buffers back into
+main. Their branch tips are preserved under archive/2026-09-04/ tags.
+Set PYTHONPATH to the actual checkout and keep caches on local disk.
 
-**Antigravity:** BP46 confirmation-footage work and `plans/PAPER-NEXT.md` can
-proceed separately. Do not alter an active experiment's implementation.
+Does higher background coding effort justify curves? Can the two source slices
+provide useful long shots? Reports decide; neither acquisition nor a shortlist
+means accepted confirmation. New authority is required beyond BP57's caps.
+Preserve native outputs. Never overwrite a checkpoint identity to resume after
+editing code, and never turn unknown crash time into zero.
 
-## Open decisions and limits
-
-- Can every native checkpoint gap stay below one hour? Scene checkpoints do not
-  resume a killed codec mid-bitstream. Escalate an oversized stage to Codex.
-- Does a winning rate–quality regime exist? The reference pilot and curves have
-  not answered that. Generation stays off during the initial search.
-- Which slowest preset does the pinned VVenC binary actually support? Record
-  executable path/version and driven preset, not a generic preset-list guess.
-- Is there enough independent eligible confirmation footage at the chosen
-  duration? The corpus remains incomplete.
-- The manuscript still needs final evidence, a conclusion and page-budget work;
-  clean handoff does not mean submission-ready evidence.
-
-## Jobs and operational details
-
-No experiment was launched by this cleanup session. Check
-`ps -u emanuele -o pid,etime,args` and GitHub CI before launching anything; do not
-stop another user's job. Set `PYTHONPATH` to the actual checkout and keep caches
-on local `/tmp`. `.ps-data-root` resolves assets/results outside the code tree.
-
-Landmarks: `PLAN.md`, `plans/ROADMAP.md`, `plans/SESSION-REPORT.md`,
-`plans/BP49-native-reference-pilot.md`, `plans/PAPER-NEXT.md`, `DATA.md`, and the
-paper's own `AGENTS.md`. Build/test details and remaining structural issues are
-in `plans/done/BP50-handoff-cleanup.md`.
+Landmarks: PLAN.md, plans/README.md, plans/SESSION-REPORT.md, DATA.md,
+plans/done/BP53-BP54-integration.md, plans/BP55-timing-boundaries.md.
