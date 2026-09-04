@@ -78,6 +78,8 @@ background:
   context-id: ''
   canvas: independent
   transport-scale: 1.0
+  stream-usage: realtime
+  stream-cpu-used: 8
 generator:
   backend: none
   variant: null

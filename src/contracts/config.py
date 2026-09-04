@@ -244,6 +244,15 @@ class BackgroundConfig:
     #: original coordinates; the coded raster is restored before warping.
     transport_scale: float = 1.0
 
+    #: libaom ``-usage``. ``realtime`` is the shipped default. ``good`` is the
+    #: bounded higher-effort candidate. Not an SVT-AV1 preset.
+    stream_usage: str = "realtime"
+
+    #: libaom ``-cpu-used``. ``8`` is the shipped realtime setting. ``4`` is
+    #: the bounded higher-effort candidate. Keep ``lag-in-frames`` and ``bf``
+    #: at zero regardless of this knob.
+    stream_cpu_used: int = 8
+
 
 @dataclass(frozen=True)
 class GeneratorConfig:
@@ -532,6 +541,39 @@ def validate(config: PointstreamConfig) -> None:
                     f"transport_scale={scale} is only implemented under "
                     f"{domains.BACKGROUND_PANORAMA_STREAM!r}; got "
                     f"{config.background.method!r}.",
+                )
+            )
+        usage = str(config.background.stream_usage)
+        cpu_used = config.background.stream_cpu_used
+        effort_changed = usage != "realtime" or int(cpu_used) != 8
+        if usage not in {"realtime", "good"}:
+            note(
+                ConfigValueError(
+                    "background.stream_usage",
+                    f"{usage!r} is not supported; allowed: realtime, good.",
+                )
+            )
+        if type(cpu_used) is not int or not 0 <= int(cpu_used) <= 8:
+            note(
+                ConfigValueError(
+                    "background.stream_cpu_used",
+                    f"{cpu_used!r} is not an integer in 0..8.",
+                )
+            )
+        elif effort_changed and config.background.method != domains.BACKGROUND_PANORAMA_STREAM:
+            note(
+                ConfigValueError(
+                    "background.stream_usage",
+                    "non-default stream effort is only implemented under "
+                    f"{domains.BACKGROUND_PANORAMA_STREAM!r}.",
+                )
+            )
+        elif effort_changed and config.background.stream_codec != "av1":
+            note(
+                ConfigValueError(
+                    "background.stream_codec",
+                    "non-default stream effort applies only to libaom-av1 "
+                    f"(stream_codec='av1'); got {config.background.stream_codec!r}.",
                 )
             )
 

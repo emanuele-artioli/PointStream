@@ -318,6 +318,8 @@ class PanoramaStream(BackgroundModel):
         context_id: str = "",
         canvas: str = "independent",
         transport_scale: float = 1.0,
+        stream_usage: str = "realtime",
+        stream_cpu_used: int = 8,
     ) -> None:
         super().__init__(
             codec=codec,
@@ -344,6 +346,8 @@ class PanoramaStream(BackgroundModel):
             codec=stream_codec,
             crf=stream_crf,
             keyframe_interval=keyframe_interval,
+            stream_usage=stream_usage,
+            stream_cpu_used=stream_cpu_used,
         )
         self._receiver = BackgroundStreamReceiver(codec=stream_codec)
         self._active_context: str | None = None
@@ -471,6 +475,8 @@ class PanoramaStream(BackgroundModel):
         return (
             f"{spec.name} low-delay crf{self._transmitter.crf} "
             f"ref={self._transmitter.mode} k={self._transmitter.keyframe_interval} "
+            f"usage={self._transmitter.stream_usage} "
+            f"cpu-used={self._transmitter.stream_cpu_used} "
             f"scale={self.transport_scale}"
         )
 
@@ -601,6 +607,8 @@ class PanoramaStream(BackgroundModel):
             "transmitter": self._transmitter.export_state(),
             "context_id": self.context_id,
             "transport_scale": float(self.transport_scale),
+            "stream_usage": self._transmitter.stream_usage,
+            "stream_cpu_used": int(self._transmitter.stream_cpu_used),
             "geometry_headers": [item.geometry_header.hex() for item in self._wire],
             "canvas": asdict(self._canvas) if self._canvas is not None else None,
             "alignments": [item.tolist() for item in self._alignments],
@@ -618,6 +626,16 @@ class PanoramaStream(BackgroundModel):
             raise ValueError(
                 f"stream state transport_scale={saved_scale} does not match "
                 f"{self.transport_scale}; never mix scales in a reference chain"
+            )
+        saved_usage = str(state.get("stream_usage", "realtime"))
+        saved_cpu = int(state.get("stream_cpu_used", 8))
+        if (
+            saved_usage != self._transmitter.stream_usage
+            or saved_cpu != int(self._transmitter.stream_cpu_used)
+        ):
+            raise ValueError(
+                "stream state encoder effort does not match this model "
+                f"(saved usage={saved_usage!r} cpu-used={saved_cpu})"
             )
         self._scene_index = int(state["scene_index"])
         self._active_context = state.get("active_context")
@@ -711,6 +729,8 @@ def bind(config: PointstreamConfig, **overrides: Any) -> BackgroundModel:
                 "context_id": config.background.context_id,
                 "canvas": config.background.canvas,
                 "transport_scale": config.background.transport_scale,
+                "stream_usage": config.background.stream_usage,
+                "stream_cpu_used": config.background.stream_cpu_used,
             }
         )
     kwargs.update(overrides)

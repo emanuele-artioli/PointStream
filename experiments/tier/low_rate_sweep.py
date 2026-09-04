@@ -224,7 +224,9 @@ def pointstream_e1(
         "context_ids": list(ids),
         "canvas": getattr(config.background, "canvas", None),
         "background_codec": stream_codec_provenance(
-            getattr(config.background, "stream_codec", "av1")
+            getattr(config.background, "stream_codec", "av1"),
+            usage=getattr(config.background, "stream_usage", None),
+            cpu_used=getattr(config.background, "stream_cpu_used", None),
         ),
         "residual_codec": {
             "role": "residual",

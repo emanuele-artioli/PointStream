@@ -43,10 +43,12 @@ from __future__ import annotations
 import json
 import subprocess
 import tempfile
+import time
+from contextlib import contextmanager
 from functools import lru_cache
 from dataclasses import dataclass, field, replace
 from pathlib import Path
-from typing import Any, Final, Mapping, Sequence
+from typing import Any, Final, Iterator, Mapping, Sequence
 
 import numpy as np
 
@@ -163,6 +165,81 @@ CODECS: Final[dict[str, StreamCodec]] = {
     ),
 }
 
+STREAM_USAGE_REALTIME: Final = "realtime"
+STREAM_USAGE_GOOD: Final = "good"
+SUPPORTED_STREAM_USAGES: Final[tuple[str, ...]] = (
+    STREAM_USAGE_REALTIME,
+    STREAM_USAGE_GOOD,
+)
+DEFAULT_STREAM_USAGE: Final = STREAM_USAGE_REALTIME
+DEFAULT_STREAM_CPU_USED: Final = 8
+CANDIDATE_STREAM_USAGE: Final = STREAM_USAGE_GOOD
+CANDIDATE_STREAM_CPU_USED: Final = 4
+
+_FFMPEG_TIMEOUT_S: float | None = None
+_LAST_ENCODE: dict[str, Any] = {}
+
+
+def av1_low_delay_flags(usage: str, cpu_used: int) -> tuple[str, ...]:
+    """libaom flags that keep rate control and causality, changing only effort."""
+    if usage not in SUPPORTED_STREAM_USAGES:
+        raise ValueError(
+            f"background stream usage {usage!r} is not supported; "
+            f"allowed: {list(SUPPORTED_STREAM_USAGES)}"
+        )
+    if type(cpu_used) is not int or not 0 <= cpu_used <= 8:
+        raise ValueError(
+            f"background stream cpu-used {cpu_used!r} is not an integer in 0..8"
+        )
+    return (
+        "-cpu-used",
+        str(cpu_used),
+        "-usage",
+        usage,
+        "-lag-in-frames",
+        "0",
+        "-bf",
+        "0",
+    )
+
+
+def resolve_stream_codec(
+    name: str,
+    *,
+    usage: str = DEFAULT_STREAM_USAGE,
+    cpu_used: int = DEFAULT_STREAM_CPU_USED,
+) -> StreamCodec:
+    """Return a codec spec without mutating ``CODECS``."""
+    if name not in CODECS:
+        raise ValueError(f"unknown stream codec {name!r}; known: {sorted(CODECS)}")
+    base = CODECS[name]
+    changed = usage != DEFAULT_STREAM_USAGE or cpu_used != DEFAULT_STREAM_CPU_USED
+    if base.encoder != "libaom-av1":
+        if changed:
+            raise ValueError(
+                "stream usage and cpu-used apply only to libaom-av1, "
+                f"not {base.encoder}"
+            )
+        return base
+    return replace(base, low_delay=av1_low_delay_flags(usage, cpu_used))
+
+
+@contextmanager
+def ffmpeg_timeout(seconds: float | None) -> Iterator[None]:
+    """Bound one encode/decode subprocess. ``None`` means no timeout."""
+    global _FFMPEG_TIMEOUT_S
+    previous = _FFMPEG_TIMEOUT_S
+    _FFMPEG_TIMEOUT_S = seconds
+    try:
+        yield
+    finally:
+        _FFMPEG_TIMEOUT_S = previous
+
+
+def last_encode_record() -> dict[str, Any]:
+    """The last background ffmpeg encode command and its packet sizes."""
+    return dict(_LAST_ENCODE)
+
 
 @lru_cache(maxsize=1)
 def _ffmpeg() -> tuple[str, str]:
@@ -277,22 +354,37 @@ def _encode_chain(
             clip.tobytes(),
         )
         stream = tmp / f"stream.{codec.container}"
-        _run(
-            [
-                ffmpeg_path, "-hide_banner", "-loglevel", "error", "-y", "-i", str(source),
-                "-c:v", codec.encoder, "-crf", str(crf), *codec.low_delay,
-                # One keyframe, at the head. The chain is the GOP; a keyframe
-                # inside it would make the payloads before it dead weight.
-                "-g", "1000000", "-f", codec.container, str(stream),
-            ],
-            None,
-        )
+        encode_argv = [
+            ffmpeg_path, "-hide_banner", "-loglevel", "error", "-y", "-i", str(source),
+            "-c:v", codec.encoder, "-crf", str(crf), *codec.low_delay,
+            # One keyframe, at the head. The chain is the GOP; a keyframe
+            # inside it would make the payloads before it dead weight.
+            "-g", "1000000", "-f", codec.container, str(stream),
+        ]
+        encode_started = time.perf_counter()
+        _run(encode_argv, None)
+        encode_seconds = time.perf_counter() - encode_started
         blob = stream.read_bytes()
         packets = _probe_packets(ffprobe, stream, codec.container)
+        decode_started = time.perf_counter()
         decoded = _decode(ffmpeg_path, stream, codec.container, count, height, width)
+        decode_seconds = time.perf_counter() - decode_started
 
     payloads = [blob[p.pos : p.pos + p.size] for p in packets]
     types = [p.picture_type for p in packets]
+    _LAST_ENCODE.clear()
+    _LAST_ENCODE.update(
+        {
+            "argv": list(encode_argv),
+            "encoder": codec.encoder,
+            "crf": int(crf),
+            "low_delay": list(codec.low_delay),
+            "payload_sizes": [len(item) for item in payloads],
+            "picture_types": list(types),
+            "encode_seconds": round(encode_seconds, 6),
+            "decode_seconds": round(decode_seconds, 6),
+        }
+    )
     if len(payloads) != count:
         raise StreamDrift(
             f"{codec.encoder} returned {len(payloads)} packets for {count} frames; "
@@ -374,7 +466,17 @@ def _decode(
 
 
 def _run(argv: list[str], stdin_bytes: bytes | None) -> bytes:
-    result = subprocess.run(argv, input=stdin_bytes, capture_output=True)
+    try:
+        result = subprocess.run(
+            argv,
+            input=stdin_bytes,
+            capture_output=True,
+            timeout=_FFMPEG_TIMEOUT_S,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError(
+            f"ffmpeg timed out after {_FFMPEG_TIMEOUT_S}s: {' '.join(argv[:16])}"
+        ) from exc
     if result.returncode != 0:
         detail = (result.stderr or b"").decode("utf-8", "replace").strip()
         raise RuntimeError(f"ffmpeg failed ({result.returncode}): {detail[:400]}")
@@ -404,7 +506,12 @@ class ChainEncode:
 
 
 def encode_chain(
-    frames: Sequence[np.ndarray], *, codec: str = "av1", crf: int = 38
+    frames: Sequence[np.ndarray],
+    *,
+    codec: str = "av1",
+    crf: int = 38,
+    usage: str = DEFAULT_STREAM_USAGE,
+    cpu_used: int = DEFAULT_STREAM_CPU_USED,
 ) -> ChainEncode:
     """Encode a chain of scenes as one low-delay sequence.
 
@@ -413,14 +520,85 @@ def encode_chain(
     the trial encode findings §18 and §19 used, so numbers built on this sit on
     the same axis as the 31-53% already recorded.
     """
-    if codec not in CODECS:
-        raise ValueError(f"unknown stream codec {codec!r}; known: {sorted(CODECS)}")
-    payloads, types, decoded = _encode_chain(frames, codec=CODECS[codec], crf=crf)
+    spec = resolve_stream_codec(codec, usage=usage, cpu_used=cpu_used)
+    payloads, types, decoded = _encode_chain(frames, codec=spec, crf=crf)
     return ChainEncode(
         payloads=tuple(payloads),
         picture_types=tuple(types),
         reconstructions=decoded,
     )
+
+
+def probe_stream_effort(
+    *,
+    usage: str,
+    cpu_used: int,
+    crf: int = 51,
+) -> dict[str, Any]:
+    """Drive the named libaom options on a tiny clip. Do not substitute a fallback."""
+    spec = resolve_stream_codec("av1", usage=usage, cpu_used=cpu_used)
+    plate = np.zeros((16, 16, 3), dtype=np.uint8)
+    plate[2:12, 2:12] = (40, 180, 90)
+    try:
+        payloads, types, decoded = _encode_chain([plate, plate], codec=spec, crf=crf)
+    except Exception as exc:  # noqa: BLE001
+        return {
+            "supported": False,
+            "error": repr(exc),
+            "encoder": spec.encoder,
+            "low_delay": list(spec.low_delay),
+            "ffmpeg": ffmpeg_provenance(),
+        }
+    record = last_encode_record()
+    argv = [str(item) for item in record.get("argv") or []]
+    return {
+        "supported": True,
+        "encoder": spec.encoder,
+        "low_delay": list(spec.low_delay),
+        "picture_types": types,
+        "payload_sizes": [len(item) for item in payloads],
+        "decoded_frames": int(decoded.shape[0]),
+        "command": argv,
+        "command_has_usage": "-usage" in argv and usage in argv,
+        "command_has_cpu_used": "-cpu-used" in argv and str(cpu_used) in argv,
+        "ffmpeg": ffmpeg_provenance(),
+        "encode_seconds": record.get("encode_seconds"),
+        "decode_seconds": record.get("decode_seconds"),
+    }
+
+
+def independent_prefix_payloads(
+    frames: Sequence[np.ndarray],
+    *,
+    usage: str,
+    cpu_used: int,
+    crf: int = 51,
+) -> dict[int, tuple[bytes, ...]]:
+    """Encode 2-, 3- and 4-frame prefixes independently, not by appending."""
+    arrays = [np.asarray(frame, dtype=np.uint8) for frame in frames]
+    if len(arrays) < 4:
+        raise ValueError("prefix proof needs at least four frames")
+    out: dict[int, tuple[bytes, ...]] = {}
+    for count in (2, 3, 4):
+        encoded = encode_chain(
+            arrays[:count], usage=usage, cpu_used=cpu_used, crf=crf
+        )
+        out[count] = encoded.payloads
+    return out
+
+
+def assert_independent_prefixes_stable(
+    payloads_by_len: Mapping[int, Sequence[bytes]],
+) -> None:
+    """Packets already emitted must not change when a longer clip is encoded."""
+    two = tuple(payloads_by_len[2])
+    three = tuple(payloads_by_len[3])
+    four = tuple(payloads_by_len[4])
+    if four[:2] != two or four[:3] != three or three[:2] != two:
+        raise StreamDrift(
+            "independent 2/3/4-frame encodes are not prefix-stable; "
+            "do not re-encode old bytes or switch protocol"
+        )
 
 
 @dataclass
@@ -437,29 +615,37 @@ class BackgroundStreamTransmitter:
             `never` column of the sweep -- no random access and no loss
             resilience, which brief §3 says is acceptable for a paper *as long
             as the paper says so*.
+        stream_usage / stream_cpu_used: libaom effort. Defaults match ``CODECS``.
     """
 
     mode: str = REFERENCE_LAST
     codec: str = "av1"
     crf: int = 38
     keyframe_interval: int = KEYFRAME_NEVER
+    stream_usage: str = DEFAULT_STREAM_USAGE
+    stream_cpu_used: int = DEFAULT_STREAM_CPU_USED
 
     _originals: list[np.ndarray] = field(default_factory=list, init=False)
     _chains: list[tuple[int, ...]] = field(default_factory=list, init=False)
     _payloads: list[bytes] = field(default_factory=list, init=False)
     _reconstructions: list[np.ndarray] = field(default_factory=list, init=False)
+    encode_seconds_total: float = field(default=0.0, init=False)
+    decode_seconds_total: float = field(default=0.0, init=False)
 
     def __post_init__(self) -> None:
         if self.mode not in REFERENCE_MODES:
             raise ValueError(f"unknown reference mode {self.mode!r}; known: {list(REFERENCE_MODES)}")
-        if self.codec not in CODECS:
-            raise ValueError(f"unknown stream codec {self.codec!r}; known: {sorted(CODECS)}")
+        resolve_stream_codec(
+            self.codec, usage=self.stream_usage, cpu_used=self.stream_cpu_used
+        )
         if self.keyframe_interval < 0:
             raise ValueError("keyframe_interval must be >= 0; 0 means never")
 
     @property
     def spec(self) -> StreamCodec:
-        return CODECS[self.codec]
+        return resolve_stream_codec(
+            self.codec, usage=self.stream_usage, cpu_used=self.stream_cpu_used
+        )
 
     @property
     def reconstructions(self) -> tuple[np.ndarray, ...]:
@@ -477,6 +663,8 @@ class BackgroundStreamTransmitter:
         self._chains.clear()
         self._payloads.clear()
         self._reconstructions.clear()
+        self.encode_seconds_total = 0.0
+        self.decode_seconds_total = 0.0
 
     def _forces_keyframe(self, index: int) -> bool:
         if index == 0:
@@ -526,6 +714,9 @@ class BackgroundStreamTransmitter:
         payloads, types, decoded = _encode_chain(
             [self._originals[i] for i in chain], codec=self.spec, crf=self.crf
         )
+        record = last_encode_record()
+        self.encode_seconds_total += float(record.get("encode_seconds") or 0.0)
+        self.decode_seconds_total += float(record.get("decode_seconds") or 0.0)
         self._assert_prefix_stable(chain, payloads)
         if "B" in types:
             raise StreamDrift(
@@ -551,6 +742,11 @@ class BackgroundStreamTransmitter:
             "codec": self.codec,
             "crf": int(self.crf),
             "keyframe_interval": int(self.keyframe_interval),
+            "stream_usage": self.stream_usage,
+            "stream_cpu_used": int(self.stream_cpu_used),
+            "low_delay": list(self.spec.low_delay),
+            "encode_seconds_total": float(self.encode_seconds_total),
+            "decode_seconds_total": float(self.decode_seconds_total),
             "chains": [list(chain) for chain in self._chains],
             "payloads": list(self._payloads),
             "originals": [np.asarray(item) for item in self._originals],
@@ -568,6 +764,14 @@ class BackgroundStreamTransmitter:
             raise ValueError("stream state crf does not match this transmitter")
         if int(state["keyframe_interval"]) != int(self.keyframe_interval):
             raise ValueError("stream state keyframe interval does not match this transmitter")
+        saved_usage = str(state.get("stream_usage", DEFAULT_STREAM_USAGE))
+        saved_cpu = int(state.get("stream_cpu_used", DEFAULT_STREAM_CPU_USED))
+        if saved_usage != self.stream_usage or saved_cpu != int(self.stream_cpu_used):
+            raise ValueError(
+                "stream state encoder effort does not match this transmitter "
+                f"(saved usage={saved_usage!r} cpu-used={saved_cpu}, "
+                f"live usage={self.stream_usage!r} cpu-used={self.stream_cpu_used})"
+            )
         self.reset()
         self._chains = [tuple(int(i) for i in chain) for chain in state["chains"]]
         self._payloads = [bytes(item) for item in state["payloads"]]
@@ -575,6 +779,8 @@ class BackgroundStreamTransmitter:
         self._reconstructions = [
             np.asarray(item, dtype=np.uint8) for item in state["reconstructions"]
         ]
+        self.encode_seconds_total = float(state.get("encode_seconds_total") or 0.0)
+        self.decode_seconds_total = float(state.get("decode_seconds_total") or 0.0)
         n = len(self._payloads)
         if not (len(self._chains) == len(self._originals) == len(self._reconstructions) == n):
             raise ValueError("stream state lists have unequal length")
@@ -649,6 +855,8 @@ def stream_linear(
     crf: int = 38,
     keyframe_interval: int = KEYFRAME_NEVER,
     mode: str = REFERENCE_LAST,
+    usage: str = DEFAULT_STREAM_USAGE,
+    cpu_used: int = DEFAULT_STREAM_CPU_USED,
 ) -> list[ScenePayload]:
     """Payloads for a whole sequence whose chains are linear, in one pass.
 
@@ -669,7 +877,7 @@ def stream_linear(
         raise ValueError(
             f"{mode!r} does not have linear chains; use BackgroundStreamTransmitter.push"
         )
-    spec = CODECS[codec]
+    spec = resolve_stream_codec(codec, usage=usage, cpu_used=cpu_used)
     arrays = [np.asarray(p, dtype=np.uint8) for p in plates]
     if len({a.shape for a in arrays}) > 1:
         raise ValueError("the stream needs one frame size (brief §2)")
