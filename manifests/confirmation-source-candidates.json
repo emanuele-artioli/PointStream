@@ -1,0 +1,851 @@
+{
+  "schema": "pointstream.confirmation_candidates.v1",
+  "doc_role": "shortlist_and_provenance_triage",
+  "status": "shortlist_prepared_pending_acquisition_and_audit",
+  "created_utc": "2026-09-03T21:05:00Z",
+  "updated_utc": "2026-09-04T07:45:00Z",
+  "auditor": "Antigravity",
+  "roadmap_milestone": "E2 Gate B (Independent Confirmation Corpus)",
+  "brief": "plans/BP54-fresh-confirmation-sources.md",
+  "disclaimer": "This document is a candidate shortlist and provenance triage, not a completed or certified provenance audit. Confirmation eligibility requires physical acquisition, container ffprobe verification, and visual shot-by-shot compilation de-duplication.",
+  "summary": {
+    "total_candidates": 10,
+    "primary_candidates_count": 6,
+    "alternative_candidates_count": 4,
+    "provisional_clean_candidates_count": 8,
+    "unresolved_compilation_risk_candidates_count": 2,
+    "definitively_contaminated_candidates_count": 0,
+    "accepted_confirmation_matches": [],
+    "source_urls_verified_live_count": 21,
+    "decoded_parameters_verified": false,
+    "target_spans_frames": [48, 96, 192, 384],
+    "target_fps": 24.0
+  },
+  "provenance_classification_rules": {
+    "provisional_clean": "Zero player overlap with alcaraz_highlights compilation; zero match/tournament overlap with all 7 host development/diagnostic assets; official tournament broadcast from verified organizer.",
+    "unresolved_compilation_risk": "Candidate features a player present in a host compilation (alcaraz_highlights). Absence of specific court types in diagnostic subsets and file mtimes do NOT clear the remaining scenes of the compilation. Full visual audit is required before candidate can be cleared.",
+    "contaminated": "Match definitively identified as having been used in Animate-Anyone training (114 tracks), headroom sweeps (BP21), metric calibration (BP23), ladder sweeps (BP24/31), or panorama tuning (BP30). Strictly prohibited."
+  },
+  "primary_candidates": [
+    {
+      "candidate_id": "conf_cand_01_sinner_medvedev_ao2024",
+      "provenance_classification": "provisional_clean",
+      "compilation_overlap_status": "none_detected",
+      "confirmation_eligible": false,
+      "confirmation_gate_status": "unacquired_pending_approval",
+      "match_identity": {
+        "match_name": "Jannik Sinner vs. Daniil Medvedev",
+        "event": "2024 Australian Open, Men's Singles Final",
+        "event_status": "verified",
+        "tournament": "Australian Open",
+        "year": 2024,
+        "category": "Grand Slam",
+        "surface": "outdoor_hard",
+        "venue": "Rod Laver Arena, Melbourne Park, Australia",
+        "round": "Final",
+        "match_date": "2024-01-28",
+        "official_score": "3-6, 3-6, 6-4, 6-4, 6-3 (Jannik Sinner def. Daniil Medvedev, 3h 44m)",
+        "official_event_sources": [
+          "https://www.atptour.com/en/scores/stats-centre/archive/2024/580/ms001",
+          "https://ausopen.com/articles/news/sinner-roars-back-claim-first-grand-slam-title"
+        ]
+      },
+      "source_video": {
+        "platform": "YouTube",
+        "primary_video_id": "qkNLSXDAZtQ",
+        "primary_url": "https://www.youtube.com/watch?v=qkNLSXDAZtQ",
+        "primary_title": "Jannik Sinner v Daniil Medvedev Full Match | Australian Open 2024 Final",
+        "uploader": "Australian Open",
+        "channel_id_or_handle": "@australianopen",
+        "oembed_verification": {
+          "status": "available_verified",
+          "checked_utc": "2026-09-04T07:27:50Z",
+          "corroborated_title": "Jannik Sinner v Daniil Medvedev Full Match | Australian Open 2024 Final",
+          "corroborated_author": "Australian Open",
+          "author_url": "https://www.youtube.com/@australianopen"
+        },
+        "claimed_duration_hms": "3:00:28 (claimed in metadata; unverified on decoded stream)",
+        "alternative_streams": [
+          {
+            "video_id": "b90INDbXX7Y",
+            "url": "https://www.youtube.com/watch?v=b90INDbXX7Y",
+            "title": "Jannik Sinner v Daniil Medvedev Extended Highlights | Australian Open 2024 Final",
+            "claimed_duration_hms": "8:06 (claimed in metadata; unverified on decoded stream)",
+            "oembed_status": "available_verified",
+            "corroborated_title": "Jannik Sinner v Daniil Medvedev Extended Highlights | Australian Open 2024 Final"
+          }
+        ],
+        "source_type": "tournament_broadcast",
+        "claimed_resolution": "1080p / 4K UHD stream (claimed in metadata; unverified on decoded stream)",
+        "claimed_fps": "50.0 fps (claimed in metadata; unverified on decoded stream)",
+        "verified_decoded_parameters": null,
+        "verification_disclaimer": "Exact decoded dimensions, pixel format (yuv420p), codec ID (av01/vp09/avc1), container duration, and SHA256 hashes are strictly UNVERIFIED pending download and ffprobe inspection."
+      },
+      "provenance_audit": {
+        "prior_use": [],
+        "is_contaminated": false,
+        "contamination_reasons": [],
+        "overlap_audit_references": [
+          "assets/dataset/pointstream_aa_meta.json (Daniil Medvedev has 0 tracks; Sinner tracks are from sinner_alcaraz [unresolved Beijing/US hard court])",
+          "experiments/headroom/real.py (0 mentions)",
+          "plans/done/BP21-headroom-widen.md (0 mentions)",
+          "plans/done/BP23-findings.md (0 mentions)",
+          "plans/done/BP24-findings.md (0 mentions)",
+          "plans/done/BP30-findings.md (0 mentions)"
+        ],
+        "overlap_uncertainties": [
+          "Sinner appears in host asset sinner_alcaraz, but opponent (Medvedev vs Alcaraz), tournament (AO 2024 vs Beijing/Indian Wells), surface, and court branding are distinct. Alcaraz compilation overlap is zero as Alcaraz does not play in this match."
+        ]
+      },
+      "camera_and_eligibility_assessment": {
+        "camera_angle": "elevated_baseline_broadcast",
+        "court_coverage": "uninterrupted_court_point_play (expected; unverified until shot extraction)",
+        "span_feasibility_16s_384frames": "high",
+        "feasibility_rationale": "Unverified match-report estimate based on official rally counts (e.g. 39-shot rally in Set 4). Unbroken 384-frame camera continuity requires verification on decoded frames.",
+        "risk_factors": [
+          "Broadcast camera cut-aways between points must be trimmed during scene segmentation."
+        ]
+      },
+      "rights_and_access": {
+        "license": "YouTube Standard License",
+        "research_use_only": true,
+        "redistribution_in_repo": false,
+        "access_restrictions": "Public YouTube upload; potential geoblocking."
+      }
+    },
+    {
+      "candidate_id": "conf_cand_02_zheng_sabalenka_ao2024",
+      "provenance_classification": "provisional_clean",
+      "compilation_overlap_status": "none_detected",
+      "confirmation_eligible": false,
+      "confirmation_gate_status": "unacquired_pending_approval",
+      "match_identity": {
+        "match_name": "Aryna Sabalenka vs. Qinwen Zheng",
+        "event": "2024 Australian Open, Women's Singles Final",
+        "event_status": "verified",
+        "tournament": "Australian Open",
+        "year": 2024,
+        "category": "Grand Slam",
+        "surface": "outdoor_hard",
+        "venue": "Rod Laver Arena, Melbourne Park, Australia",
+        "round": "Final",
+        "match_date": "2024-01-27",
+        "official_score": "6-3, 6-2 (Aryna Sabalenka def. Qinwen Zheng, 1h 16m)",
+        "official_event_sources": [
+          "https://www.wtatennis.com/tournament/901/australian-open/2024/scores/LS001",
+          "https://ausopen.com/articles/news/sabalenka-storms-second-australian-open-title"
+        ]
+      },
+      "source_video": {
+        "platform": "YouTube",
+        "primary_video_id": "8EShbWpBm_0",
+        "primary_url": "https://www.youtube.com/watch?v=8EShbWpBm_0",
+        "primary_title": "Qinwen Zheng v Aryna Sabalenka Full Match | Australian Open 2024 Final",
+        "uploader": "Australian Open",
+        "channel_id_or_handle": "@australianopen",
+        "oembed_verification": {
+          "status": "available_verified",
+          "checked_utc": "2026-09-04T07:27:50Z",
+          "corroborated_title": "Qinwen Zheng v Aryna Sabalenka Full Match | Australian Open 2024 Final",
+          "corroborated_author": "Australian Open",
+          "author_url": "https://www.youtube.com/@australianopen",
+          "correction_note": "Replaces previously proposed erroneous/unresolved URL F3QYc6W1k0k which returned HTTP 404."
+        },
+        "claimed_duration_hms": "1:43:22 (claimed in metadata; unverified on decoded stream)",
+        "alternative_streams": [
+          {
+            "video_id": "kLdkTzDbXVE",
+            "url": "https://www.youtube.com/watch?v=kLdkTzDbXVE",
+            "title": "Qinwen Zheng v Aryna Sabalenka Extended Highlights | Australian Open 2024 Final",
+            "claimed_duration_hms": "8:06 (claimed in metadata; unverified on decoded stream)",
+            "oembed_status": "available_verified",
+            "corroborated_title": "Qinwen Zheng v Aryna Sabalenka Extended Highlights | Australian Open 2024 Final"
+          },
+          {
+            "video_id": "yh8VupWjKO0",
+            "url": "https://www.youtube.com/watch?v=yh8VupWjKO0",
+            "title": "Qinwen Zheng v Aryna Sabalenka Condensed Match | Australian Open 2024 Final",
+            "claimed_duration_hms": "20:08 (claimed in metadata; unverified on decoded stream)",
+            "oembed_status": "available_verified",
+            "corroborated_title": "Qinwen Zheng v Aryna Sabalenka Condensed Match | Australian Open 2024 Final"
+          }
+        ],
+        "source_type": "tournament_broadcast",
+        "claimed_resolution": "1080p / 4K UHD stream (claimed in metadata; unverified on decoded stream)",
+        "claimed_fps": "50.0 fps (claimed in metadata; unverified on decoded stream)",
+        "verified_decoded_parameters": null,
+        "verification_disclaimer": "Exact decoded dimensions, pixel format, codec ID, container duration, and SHA256 hashes are strictly UNVERIFIED pending download and ffprobe inspection."
+      },
+      "provenance_audit": {
+        "prior_use": [],
+        "is_contaminated": false,
+        "contamination_reasons": [],
+        "overlap_audit_references": [
+          "assets/dataset/pointstream_aa_meta.json (0 tracks for Sabalenka, 0 tracks for Zheng)",
+          "Entire PointStream codebase and experiment reports (0 prior uses; all prior assets are ATP/practice)"
+        ],
+        "overlap_uncertainties": []
+      },
+      "camera_and_eligibility_assessment": {
+        "camera_angle": "elevated_baseline_broadcast",
+        "court_coverage": "uninterrupted_court_point_play (expected; unverified until shot extraction)",
+        "span_feasibility_16s_384frames": "medium_high",
+        "feasibility_rationale": "Aggressive ball striking with shorter average points; multiple extended baseline exchanges in Set 2 provide 384 continuous frames. Continuity unverified on raw frames.",
+        "risk_factors": [
+          "Need careful rally selection to ensure 384 continuous frames without quick cut to server."
+        ]
+      },
+      "rights_and_access": {
+        "license": "YouTube Standard License",
+        "research_use_only": true,
+        "redistribution_in_repo": false,
+        "access_restrictions": "Public YouTube upload; potential geoblocking."
+      }
+    },
+    {
+      "candidate_id": "conf_cand_03_gauff_sabalenka_usopen2023",
+      "provenance_classification": "provisional_clean",
+      "compilation_overlap_status": "none_detected",
+      "confirmation_eligible": false,
+      "confirmation_gate_status": "unacquired_pending_approval",
+      "match_identity": {
+        "match_name": "Coco Gauff vs. Aryna Sabalenka",
+        "event": "2023 US Open, Women's Singles Final",
+        "event_status": "verified",
+        "tournament": "US Open",
+        "year": 2023,
+        "category": "Grand Slam",
+        "surface": "outdoor_hard",
+        "venue": "Arthur Ashe Stadium, USTA Billie Jean King NTC, New York, USA",
+        "round": "Final",
+        "match_date": "2023-09-09",
+        "official_score": "2-6, 6-3, 6-2 (Coco Gauff def. Aryna Sabalenka, 2h 06m)",
+        "official_event_sources": [
+          "https://www.wtatennis.com/tournament/903/us-open/2023/scores/LS001",
+          "https://www.usopen.org/en_US/news/articles/2023-09-09/coco_gauff_rallies_past_aryna_sabalenka_to_win_2023_us_open_womens_singles_title.html"
+        ]
+      },
+      "source_video": {
+        "platform": "YouTube",
+        "primary_video_id": "PH6VpEfTMVQ",
+        "primary_url": "https://www.youtube.com/watch?v=PH6VpEfTMVQ",
+        "primary_title": "Coco Gauff vs. Aryna Sabalenka Full Match | 2023 US Open Final",
+        "uploader": "US Open Tennis Championships",
+        "channel_id_or_handle": "@usopen",
+        "oembed_verification": {
+          "status": "available_verified",
+          "checked_utc": "2026-09-04T07:27:50Z",
+          "corroborated_title": "Coco Gauff vs. Aryna Sabalenka Full Match | 2023 US Open Final",
+          "corroborated_author": "US Open Tennis Championships",
+          "author_url": "https://www.youtube.com/@usopen"
+        },
+        "claimed_duration_hms": "1:43:51 (claimed in metadata; unverified on decoded stream)",
+        "alternative_streams": [
+          {
+            "video_id": "XfsT9YHYVzk",
+            "url": "https://www.youtube.com/watch?v=XfsT9YHYVzk",
+            "title": "Coco Gauff vs. Aryna Sabalenka Extended Highlights | 2023 US Open Final",
+            "claimed_duration_hms": "18:07 (claimed in metadata; unverified on decoded stream)",
+            "oembed_status": "available_verified",
+            "corroborated_title": "Coco Gauff vs. Aryna Sabalenka Extended Highlights | 2023 US Open Final"
+          }
+        ],
+        "source_type": "tournament_broadcast",
+        "claimed_resolution": "1080p / 4K UHD stream (claimed in metadata; unverified on decoded stream)",
+        "claimed_fps": "60.0 fps (claimed in metadata; unverified on decoded stream)",
+        "verified_decoded_parameters": null,
+        "verification_disclaimer": "Exact decoded dimensions, pixel format, codec ID, container duration, and SHA256 hashes are strictly UNVERIFIED pending download and ffprobe inspection."
+      },
+      "provenance_audit": {
+        "prior_use": [],
+        "is_contaminated": false,
+        "contamination_reasons": [],
+        "overlap_audit_references": [
+          "assets/dataset/pointstream_aa_meta.json (0 tracks for Gauff, 0 tracks for Sabalenka)",
+          "Entire PointStream codebase and experiment records (0 prior uses)"
+        ],
+        "overlap_uncertainties": []
+      },
+      "camera_and_eligibility_assessment": {
+        "camera_angle": "elevated_baseline_broadcast",
+        "court_coverage": "uninterrupted_court_point_play (expected; unverified until shot extraction)",
+        "span_feasibility_16s_384frames": "high",
+        "feasibility_rationale": "Gauff defensive retrieving style extended rallies to 15-25 shots across sets 2 and 3. Continuity unverified on raw frames.",
+        "risk_factors": [
+          "Arthur Ashe late afternoon court shadows require mask threshold verification."
+        ]
+      },
+      "rights_and_access": {
+        "license": "YouTube Standard License",
+        "research_use_only": true,
+        "redistribution_in_repo": false,
+        "access_restrictions": "Public YouTube upload; potential geoblocking."
+      }
+    },
+    {
+      "candidate_id": "conf_cand_04_medvedev_djokovic_usopen2023",
+      "provenance_classification": "provisional_clean",
+      "compilation_overlap_status": "none_detected",
+      "confirmation_eligible": false,
+      "confirmation_gate_status": "unacquired_pending_approval",
+      "match_identity": {
+        "match_name": "Daniil Medvedev vs. Novak Djokovic",
+        "event": "2023 US Open, Men's Singles Final",
+        "event_status": "verified",
+        "tournament": "US Open",
+        "year": 2023,
+        "category": "Grand Slam",
+        "surface": "outdoor_hard",
+        "venue": "Arthur Ashe Stadium, USTA Billie Jean King NTC, New York, USA",
+        "round": "Final",
+        "match_date": "2023-09-10",
+        "official_score": "6-3, 7-6(5), 6-3 (Novak Djokovic def. Daniil Medvedev, 3h 17m)",
+        "official_event_sources": [
+          "https://www.atptour.com/en/scores/stats-centre/archive/2023/560/ms001",
+          "https://www.usopen.org/en_US/news/articles/2023-09-10/novak_djokovic_wins_24th_grand_slam_mens_singles_title_at_2023_us_open.html"
+        ]
+      },
+      "source_video": {
+        "platform": "YouTube",
+        "primary_video_id": "1R4qtc1H4wM",
+        "primary_url": "https://www.youtube.com/watch?v=1R4qtc1H4wM",
+        "primary_title": "Daniil Medvedev vs. Novak Djokovic Full Match | 2023 US Open Final",
+        "uploader": "US Open Tennis Championships",
+        "channel_id_or_handle": "@usopen",
+        "oembed_verification": {
+          "status": "available_verified",
+          "checked_utc": "2026-09-04T07:27:50Z",
+          "corroborated_title": "Daniil Medvedev vs. Novak Djokovic Full Match | 2023 US Open Final",
+          "corroborated_author": "US Open Tennis Championships",
+          "author_url": "https://www.youtube.com/@usopen"
+        },
+        "claimed_duration_hms": "2:36:49 (claimed in metadata; unverified on decoded stream)",
+        "alternative_streams": [
+          {
+            "video_id": "lGjvN4y5XFE",
+            "url": "https://www.youtube.com/watch?v=lGjvN4y5XFE",
+            "title": "Daniil Medvedev vs. Novak Djokovic Extended Highlights | 2023 US Open Final",
+            "claimed_duration_hms": "26:59 (claimed in metadata; unverified on decoded stream)",
+            "oembed_status": "available_verified",
+            "corroborated_title": "Daniil Medvedev vs. Novak Djokovic Extended Highlights | 2023 US Open Final"
+          }
+        ],
+        "source_type": "tournament_broadcast",
+        "claimed_resolution": "1080p / 4K UHD stream (claimed in metadata; unverified on decoded stream)",
+        "claimed_fps": "60.0 fps (claimed in metadata; unverified on decoded stream)",
+        "verified_decoded_parameters": null,
+        "verification_disclaimer": "Exact decoded dimensions, pixel format, codec ID, container duration, and SHA256 hashes are strictly UNVERIFIED pending download and ffprobe inspection."
+      },
+      "provenance_audit": {
+        "prior_use": [],
+        "is_contaminated": false,
+        "contamination_reasons": [],
+        "overlap_audit_references": [
+          "assets/dataset/pointstream_aa_meta.json (Djokovic tracks are from Wimbledon 2019 and Cincinnati 2015; Medvedev has 0 tracks)",
+          "Arthur Ashe Stadium 2023 has 0 prior uses in PointStream codebase."
+        ],
+        "overlap_uncertainties": [
+          "Djokovic is in host assets djokovic_federer and federer_djokovic, but US Open 2023 is a distinct event, year, venue, opponent, and court canvas."
+        ]
+      },
+      "camera_and_eligibility_assessment": {
+        "camera_angle": "elevated_baseline_broadcast",
+        "court_coverage": "uninterrupted_court_point_play (expected; unverified until shot extraction)",
+        "span_feasibility_16s_384frames": "very_high",
+        "feasibility_rationale": "Set 2 was a 104-minute war of attrition with numerous 25+ shot rallies (>20s). Camera continuity unverified on raw frames.",
+        "risk_factors": [
+          "Medvedev deep return positioning near baseline requires verification of bounding box tracking near canvas edge."
+        ]
+      },
+      "rights_and_access": {
+        "license": "YouTube Standard License",
+        "research_use_only": true,
+        "redistribution_in_repo": false,
+        "access_restrictions": "Public YouTube upload; potential geoblocking."
+      }
+    },
+    {
+      "candidate_id": "conf_cand_05_swiatek_sabalenka_madrid2024",
+      "provenance_classification": "provisional_clean",
+      "compilation_overlap_status": "none_detected",
+      "confirmation_eligible": false,
+      "confirmation_gate_status": "unacquired_pending_approval",
+      "match_identity": {
+        "match_name": "Iga Swiatek vs. Aryna Sabalenka",
+        "event": "2024 Mutua Madrid Open, Women's Singles Final",
+        "event_status": "verified",
+        "tournament": "Mutua Madrid Open",
+        "year": 2024,
+        "category": "WTA 1000",
+        "surface": "outdoor_red_clay",
+        "venue": "Manolo Santana Stadium, Caja Mágica, Madrid, Spain",
+        "round": "Final",
+        "match_date": "2024-05-04",
+        "official_score": "7-5, 4-6, 7-6(7) (Iga Swiatek def. Aryna Sabalenka, 3h 11m)",
+        "official_event_sources": [
+          "https://www.wtatennis.com/tournament/1038/madrid/2024/scores/LS001",
+          "https://www.wtatennis.com/news/3990666/swiatek-saves-championship-points-to-defeat-sabalenka-for-madrid-title"
+        ]
+      },
+      "source_video": {
+        "platform": "YouTube",
+        "primary_video_id": "n0MZNE_AIy4",
+        "primary_url": "https://www.youtube.com/watch?v=n0MZNE_AIy4",
+        "primary_title": "The Greatest Match of 2024!? 🤯 | 2024 Madrid Final | Iga Swiatek vs Aryna Sabalenka",
+        "uploader": "WTA",
+        "channel_id_or_handle": "@WTA",
+        "oembed_verification": {
+          "status": "available_verified",
+          "checked_utc": "2026-09-04T07:27:50Z",
+          "corroborated_title": "The Greatest Match of 2024!? 🤯 | 2024 Madrid Final | Iga Swiatek vs Aryna Sabalenka",
+          "corroborated_author": "WTA",
+          "author_url": "https://www.youtube.com/@WTA"
+        },
+        "claimed_duration_hms": "2:55:54 (claimed in metadata; unverified on decoded stream)",
+        "alternative_streams": [
+          {
+            "video_id": "gF8CwX8Hdkw",
+            "url": "https://www.youtube.com/watch?v=gF8CwX8Hdkw",
+            "title": "Iga Swiatek vs. Aryna Sabalenka | 2024 Madrid Final | WTA Match Highlights",
+            "claimed_duration_hms": "5:21 (claimed in metadata; unverified on decoded stream)",
+            "oembed_status": "available_verified",
+            "corroborated_title": "Iga Swiatek vs. Aryna Sabalenka | 2024 Madrid Final | WTA Match Highlights"
+          }
+        ],
+        "source_type": "tournament_broadcast",
+        "claimed_resolution": "1080p / 4K UHD stream (claimed in metadata; unverified on decoded stream)",
+        "claimed_fps": "50.0 fps (claimed in metadata; unverified on decoded stream)",
+        "verified_decoded_parameters": null,
+        "verification_disclaimer": "Exact decoded dimensions, pixel format, codec ID, container duration, and SHA256 hashes are strictly UNVERIFIED pending download and ffprobe inspection."
+      },
+      "provenance_audit": {
+        "prior_use": [],
+        "is_contaminated": false,
+        "contamination_reasons": [],
+        "overlap_audit_references": [
+          "assets/dataset/pointstream_aa_meta.json (0 tracks for Swiatek, 0 tracks for Sabalenka)",
+          "Entire PointStream codebase and experiment history (0 prior uses)"
+        ],
+        "overlap_uncertainties": []
+      },
+      "camera_and_eligibility_assessment": {
+        "camera_angle": "elevated_baseline_broadcast",
+        "court_coverage": "uninterrupted_court_point_play (expected; unverified until shot extraction)",
+        "span_feasibility_16s_384frames": "very_high",
+        "feasibility_rationale": "High-altitude red clay match lasting over 3 hours with extraordinary rally intensity. Third-set tiebreak contains multiple 18-24 shot exchanges. Continuity unverified on raw frames.",
+        "risk_factors": [
+          "Caja Mágica roof structure creates complex shadow boundaries under partial daylight."
+        ]
+      },
+      "rights_and_access": {
+        "license": "YouTube Standard License",
+        "research_use_only": true,
+        "redistribution_in_repo": false,
+        "access_restrictions": "Public YouTube upload; potential geoblocking."
+      }
+    },
+    {
+      "candidate_id": "conf_cand_06_djokovic_ruud_rg2023",
+      "provenance_classification": "provisional_clean",
+      "compilation_overlap_status": "none_detected",
+      "confirmation_eligible": false,
+      "confirmation_gate_status": "unacquired_pending_approval",
+      "match_identity": {
+        "match_name": "Novak Djokovic vs. Casper Ruud",
+        "event": "2023 Roland-Garros, Men's Singles Final",
+        "event_status": "verified",
+        "tournament": "Roland-Garros (French Open)",
+        "year": 2023,
+        "category": "Grand Slam",
+        "surface": "outdoor_red_clay",
+        "venue": "Court Philippe-Chatrier, Stade Roland Garros, Paris, France",
+        "round": "Final",
+        "match_date": "2023-06-11",
+        "official_score": "7-6(1), 6-3, 7-5 (Novak Djokovic def. Casper Ruud, 3h 13m)",
+        "official_event_sources": [
+          "https://www.atptour.com/en/scores/stats-centre/archive/2023/520/ms001",
+          "https://www.rolandgarros.com/en-us/article/djokovic-claims-historic-23rd-grand-slam-title"
+        ]
+      },
+      "source_video": {
+        "platform": "YouTube",
+        "primary_video_id": "nJXznKxFG8U",
+        "primary_url": "https://www.youtube.com/watch?v=nJXznKxFG8U",
+        "primary_title": "Djokovic vs Ruud 2023 Men's final Full Match | Roland-Garros",
+        "uploader": "Roland-Garros",
+        "channel_id_or_handle": "@rolandgarros",
+        "oembed_verification": {
+          "status": "available_verified",
+          "checked_utc": "2026-09-04T07:27:50Z",
+          "corroborated_title": "Djokovic vs Ruud 2023 Men's final Full Match | Roland-Garros",
+          "corroborated_author": "Roland-Garros",
+          "author_url": "https://www.youtube.com/@rolandgarros"
+        },
+        "claimed_duration_hms": "3:21:07 (claimed in metadata; unverified on decoded stream)",
+        "alternative_streams": [
+          {
+            "video_id": "hvl_iaK4ra8",
+            "url": "https://www.youtube.com/watch?v=hvl_iaK4ra8",
+            "title": "Novak makes it 23 🏆 Djokovic vs Ruud extended highlights | Roland-Garros 2023",
+            "claimed_duration_hms": "34:23 (claimed in metadata; unverified on decoded stream)",
+            "oembed_status": "available_verified",
+            "corroborated_title": "Novak makes it 23 🏆 Djokovic vs Ruud extended highlights | Roland-Garros 2023"
+          }
+        ],
+        "source_type": "tournament_broadcast",
+        "claimed_resolution": "1080p / 4K UHD stream (claimed in metadata; unverified on decoded stream)",
+        "claimed_fps": "50.0 fps (claimed in metadata; unverified on decoded stream)",
+        "verified_decoded_parameters": null,
+        "verification_disclaimer": "Exact decoded dimensions, pixel format, codec ID, container duration, and SHA256 hashes are strictly UNVERIFIED pending download and ffprobe inspection."
+      },
+      "provenance_audit": {
+        "prior_use": [],
+        "is_contaminated": false,
+        "contamination_reasons": [],
+        "overlap_audit_references": [
+          "assets/dataset/pointstream_aa_meta.json (Ruud appeared only in alcaraz_ruud practice session, zero tournament match tracks; Djokovic tracks are 2019/2015)",
+          "Roland-Garros 2023 has 0 prior uses in PointStream experiments; neither player is Carlos Alcaraz so compilation overlap with alcaraz_highlights is zero."
+        ],
+        "overlap_uncertainties": []
+      },
+      "camera_and_eligibility_assessment": {
+        "camera_angle": "elevated_baseline_broadcast",
+        "court_coverage": "uninterrupted_court_point_play (expected; unverified until shot extraction)",
+        "span_feasibility_16s_384frames": "very_high",
+        "feasibility_rationale": "Red clay baseline exchanges with Ruud heavy topspin and Djokovic sliding defense routinely exceeding 16s in Set 1. Continuity unverified on raw frames.",
+        "risk_factors": [
+          "Clay surface sliding marks alter background texture during rally; homography stability must be verified."
+        ]
+      },
+      "rights_and_access": {
+        "license": "YouTube Standard License",
+        "research_use_only": true,
+        "redistribution_in_repo": false,
+        "access_restrictions": "Public YouTube upload; potential geoblocking."
+      }
+    }
+  ],
+  "alternative_candidates": [
+    {
+      "candidate_id": "conf_alt_01_alcaraz_zverev_rg2024",
+      "provenance_classification": "unresolved_compilation_risk",
+      "compilation_overlap_status": "unresolved_compilation_risk",
+      "confirmation_eligible": false,
+      "confirmation_gate_status": "blocked_pending_compilation_audit",
+      "match_identity": {
+        "match_name": "Carlos Alcaraz vs. Alexander Zverev",
+        "event": "2024 Roland-Garros, Men's Singles Final",
+        "event_status": "verified",
+        "tournament": "Roland-Garros (French Open)",
+        "year": 2024,
+        "category": "Grand Slam",
+        "surface": "outdoor_red_clay",
+        "venue": "Court Philippe-Chatrier, Stade Roland Garros, Paris, France",
+        "round": "Final",
+        "match_date": "2024-06-09",
+        "official_score": "6-3, 2-6, 5-7, 6-1, 6-2 (Carlos Alcaraz def. Alexander Zverev, 4h 19m)",
+        "official_event_sources": [
+          "https://www.atptour.com/en/scores/stats-centre/archive/2024/520/ms001",
+          "https://www.rolandgarros.com/en-us/article/carlos-alcaraz-alexander-zverev-final-five-sets-title"
+        ]
+      },
+      "source_video": {
+        "platform": "YouTube",
+        "primary_video_id": "qorFNY2lSN8",
+        "primary_url": "https://www.youtube.com/watch?v=qorFNY2lSN8",
+        "primary_title": "Alcaraz vs Zverev 2024 Men's final Full Match | Roland-Garros",
+        "uploader": "Roland-Garros",
+        "channel_id_or_handle": "@rolandgarros",
+        "oembed_verification": {
+          "status": "available_verified",
+          "checked_utc": "2026-09-04T07:27:50Z",
+          "corroborated_title": "Alcaraz vs Zverev 2024 Men's final Full Match | Roland-Garros",
+          "corroborated_author": "Roland-Garros",
+          "author_url": "https://www.youtube.com/@rolandgarros"
+        },
+        "claimed_duration_hms": "4:23:50 (claimed in metadata; unverified on decoded stream)",
+        "alternative_streams": [
+          {
+            "video_id": "nwofBAmsDpE",
+            "url": "https://www.youtube.com/watch?v=nwofBAmsDpE",
+            "title": "A 5-set thriller for a first RG title ⚔️ Alcaraz vs Zverev extended highlights | Roland-Garros 2024",
+            "claimed_duration_hms": "41:47 (claimed in metadata; unverified on decoded stream)",
+            "oembed_status": "available_verified",
+            "corroborated_title": "A 5-set thriller for a first RG title ⚔️ Alcaraz vs Zverev extended highlights | Roland-Garros 2024"
+          }
+        ],
+        "source_type": "tournament_broadcast",
+        "claimed_resolution": "1080p / 4K UHD stream (claimed in metadata; unverified on decoded stream)",
+        "claimed_fps": "50.0 fps (claimed in metadata; unverified on decoded stream)",
+        "verified_decoded_parameters": null,
+        "verification_disclaimer": "Exact decoded dimensions, pixel format, codec ID, container duration, and SHA256 hashes are strictly UNVERIFIED pending download and ffprobe inspection."
+      },
+      "provenance_audit": {
+        "prior_use": [],
+        "is_contaminated": false,
+        "contamination_reasons": [],
+        "overlap_audit_references": [
+          "assets/dataset/alcaraz_highlights/scene_metadata.json (71 scenes total)",
+          "assets/dataset/pointstream_aa_meta.json (Both players exist in other video assets)"
+        ],
+        "overlap_uncertainties": [
+          "CRITICAL COMPILATION HAZARD: Carlos Alcaraz appears in host compilation alcaraz_highlights.mp4. The absence of red clay scenes among the 6 selected diagnostic scenes does NOT clear the remaining 65 scenes in alcaraz_highlights.mp4. Furthermore, the match took place on 9 June 2024, prior to the file creation date (12 June 2024). Overlap cannot be excluded without an exhaustive visual scene-by-scene audit. This candidate is BLOCKED from confirmation acceptance until compilation clearance is proven."
+        ]
+      },
+      "camera_and_eligibility_assessment": {
+        "camera_angle": "elevated_baseline_broadcast",
+        "court_coverage": "uninterrupted_court_point_play (expected; unverified until shot extraction)",
+        "span_feasibility_16s_384frames": "very_high",
+        "feasibility_rationale": "Red clay baseline rallies with heavy sliding and points routinely spanning 15 to 30 seconds. Continuity unverified on raw frames.",
+        "risk_factors": [
+          "Compilation contamination risk is a strict blocker under BP51."
+        ]
+      },
+      "rights_and_access": {
+        "license": "YouTube Standard License",
+        "research_use_only": true,
+        "redistribution_in_repo": false,
+        "access_restrictions": "Public YouTube upload; potential geoblocking."
+      }
+    },
+    {
+      "candidate_id": "conf_alt_02_alcaraz_djokovic_wimbledon2023",
+      "provenance_classification": "unresolved_compilation_risk",
+      "compilation_overlap_status": "unresolved_compilation_risk",
+      "confirmation_eligible": false,
+      "confirmation_gate_status": "blocked_pending_compilation_audit",
+      "match_identity": {
+        "match_name": "Carlos Alcaraz vs. Novak Djokovic",
+        "event": "2023 Wimbledon Championships, Gentlemen's Singles Final",
+        "event_status": "verified",
+        "tournament": "The Championships, Wimbledon",
+        "year": 2023,
+        "category": "Grand Slam",
+        "surface": "outdoor_grass",
+        "venue": "Centre Court, All England Lawn Tennis Club, London, UK",
+        "round": "Final",
+        "match_date": "2023-07-16",
+        "official_score": "1-6, 7-6(6), 6-1, 3-6, 6-4 (Carlos Alcaraz def. Novak Djokovic, 4h 42m)",
+        "official_event_sources": [
+          "https://www.atptour.com/en/scores/stats-centre/archive/2023/540/ms001",
+          "https://www.wimbledon.com/en_GB/news/articles/2023-07-16/alcaraz_beats_djokovic_in_five_sets_to_win_wimbledon_gentlemens_singles_title.html"
+        ]
+      },
+      "source_video": {
+        "platform": "YouTube",
+        "primary_video_id": "5uFAkizQNJI",
+        "primary_url": "https://www.youtube.com/watch?v=5uFAkizQNJI",
+        "primary_title": "A FINAL FOR THE AGES | Carlos Alcaraz vs Novak Djokovic Full Match | Wimbledon 2023",
+        "uploader": "Wimbledon",
+        "channel_id_or_handle": "@wimbledon",
+        "oembed_verification": {
+          "status": "available_verified",
+          "checked_utc": "2026-09-04T07:27:50Z",
+          "corroborated_title": "A FINAL FOR THE AGES | Carlos Alcaraz vs Novak Djokovic Full Match | Wimbledon 2023",
+          "corroborated_author": "Wimbledon",
+          "author_url": "https://www.youtube.com/@wimbledon"
+        },
+        "claimed_duration_hms": "4:03:01 (claimed in metadata; unverified on decoded stream)",
+        "alternative_streams": [
+          {
+            "video_id": "dvBr9Wr8BCY",
+            "url": "https://www.youtube.com/watch?v=dvBr9Wr8BCY",
+            "title": "Carlos Alcaraz vs Novak Djokovic: Extended Highlights | Wimbledon 2023 Final",
+            "claimed_duration_hms": "21:02 (claimed in metadata; unverified on decoded stream)",
+            "oembed_status": "available_verified",
+            "corroborated_title": "Carlos Alcaraz vs Novak Djokovic: Extended Highlights | Wimbledon 2023 Final"
+          }
+        ],
+        "source_type": "tournament_broadcast",
+        "claimed_resolution": "1080p / 4K UHD stream (claimed in metadata; unverified on decoded stream)",
+        "claimed_fps": "50.0 fps (claimed in metadata; unverified on decoded stream)",
+        "verified_decoded_parameters": null,
+        "verification_disclaimer": "Exact decoded dimensions, pixel format, codec ID, container duration, and SHA256 hashes are strictly UNVERIFIED pending download and ffprobe inspection."
+      },
+      "provenance_audit": {
+        "prior_use": [],
+        "is_contaminated": false,
+        "contamination_reasons": [],
+        "overlap_audit_references": [
+          "assets/dataset/pointstream_aa_meta.json (Host asset djokovic_federer is Wimbledon 2019, NOT 2023)"
+        ],
+        "overlap_uncertainties": [
+          "CRITICAL COMPILATION HAZARD: Carlos Alcaraz appears in host compilation alcaraz_highlights.mp4. Wimbledon 2023 was Alcaraz's most publicized Grand Slam victory of 2023 and is prime highlight compilation material. Without shot-by-shot auditing of all 71 scenes in alcaraz_highlights.mp4, overlap cannot be ruled out. This candidate is BLOCKED from confirmation acceptance until compilation clearance is proven."
+        ]
+      },
+      "camera_and_eligibility_assessment": {
+        "camera_angle": "elevated_baseline_broadcast",
+        "court_coverage": "uninterrupted_court_point_play (expected; unverified until shot extraction)",
+        "span_feasibility_16s_384frames": "high",
+        "feasibility_rationale": "26-minute 32-point game in Set 3 provided multiple rallies exceeding 16 seconds. Continuity unverified on raw frames.",
+        "risk_factors": [
+          "Compilation contamination risk is a strict blocker under BP51."
+        ]
+      },
+      "rights_and_access": {
+        "license": "YouTube Standard License",
+        "research_use_only": true,
+        "redistribution_in_repo": false,
+        "access_restrictions": "Public YouTube upload; potential geoblocking."
+      }
+    },
+    {
+      "candidate_id": "conf_alt_03_nadal_medvedev_ao2022",
+      "provenance_classification": "provisional_clean",
+      "compilation_overlap_status": "none_detected",
+      "confirmation_eligible": false,
+      "confirmation_gate_status": "unacquired_pending_approval",
+      "match_identity": {
+        "match_name": "Rafael Nadal vs. Daniil Medvedev",
+        "event": "2022 Australian Open, Men's Singles Final",
+        "event_status": "verified",
+        "tournament": "Australian Open",
+        "year": 2022,
+        "category": "Grand Slam",
+        "surface": "outdoor_hard",
+        "venue": "Rod Laver Arena, Melbourne Park, Australia",
+        "round": "Final",
+        "match_date": "2022-01-30",
+        "official_score": "2-6, 6-7(5), 6-4, 6-4, 7-5 (Rafael Nadal def. Daniil Medvedev, 5h 24m)",
+        "official_event_sources": [
+          "https://www.atptour.com/en/scores/stats-centre/archive/2022/580/ms001",
+          "https://ausopen.com/articles/news/nadal-wins-historic-21st-major-epic-ao-final"
+        ]
+      },
+      "source_video": {
+        "platform": "YouTube",
+        "primary_video_id": "6I06-ITW88k",
+        "primary_url": "https://www.youtube.com/watch?v=6I06-ITW88k",
+        "primary_title": "Rafael Nadal v Daniil Medvedev Full Match (Final) | Australian Open 2022",
+        "uploader": "Australian Open",
+        "channel_id_or_handle": "@australianopen",
+        "oembed_verification": {
+          "status": "available_verified",
+          "checked_utc": "2026-09-04T07:27:50Z",
+          "corroborated_title": "Rafael Nadal v Daniil Medvedev Full Match (Final) | Australian Open 2022",
+          "corroborated_author": "Australian Open",
+          "author_url": "https://www.youtube.com/@australianopen"
+        },
+        "claimed_duration_hms": "5:41:11 (claimed in metadata; unverified on decoded stream)",
+        "alternative_streams": [
+          {
+            "video_id": "v27M_RgrLzU",
+            "url": "https://www.youtube.com/watch?v=v27M_RgrLzU",
+            "title": "Rafael Nadal v Daniil Medvedev Extended Highlights (Final) | Australian Open 2022",
+            "claimed_duration_hms": "8:25 (claimed in metadata; unverified on decoded stream)",
+            "oembed_status": "available_verified",
+            "corroborated_title": "Rafael Nadal v Daniil Medvedev Extended Highlights (Final) | Australian Open 2022"
+          }
+        ],
+        "source_type": "tournament_broadcast",
+        "claimed_resolution": "1080p / 4K UHD stream (claimed in metadata; unverified on decoded stream)",
+        "claimed_fps": "50.0 fps (claimed in metadata; unverified on decoded stream)",
+        "verified_decoded_parameters": null,
+        "verification_disclaimer": "Exact decoded dimensions, pixel format, codec ID, container duration, and SHA256 hashes are strictly UNVERIFIED pending download and ffprobe inspection."
+      },
+      "provenance_audit": {
+        "prior_use": [],
+        "is_contaminated": false,
+        "contamination_reasons": [],
+        "overlap_audit_references": [
+          "assets/dataset/pointstream_aa_meta.json (0 tracks for Nadal, 0 tracks for Medvedev)",
+          "Entire PointStream codebase and experiment history (0 prior uses)"
+        ],
+        "overlap_uncertainties": []
+      },
+      "camera_and_eligibility_assessment": {
+        "camera_angle": "elevated_baseline_broadcast",
+        "court_coverage": "uninterrupted_court_point_play (expected; unverified until shot extraction)",
+        "span_feasibility_16s_384frames": "extremely_high",
+        "feasibility_rationale": "5-hour 24-minute physical marathon with extreme rally lengths; abundant candidates for 384 continuous frames. Continuity unverified on raw frames.",
+        "risk_factors": [
+          "Full match file is very large (~15-25 GB); acquisition should target specific set windows rather than entire 5.5h file."
+        ]
+      },
+      "rights_and_access": {
+        "license": "YouTube Standard License",
+        "research_use_only": true,
+        "redistribution_in_repo": false,
+        "access_restrictions": "Public YouTube upload; potential geoblocking."
+      }
+    },
+    {
+      "candidate_id": "conf_alt_04_tsitsipas_djokovic_ao2023",
+      "provenance_classification": "provisional_clean",
+      "compilation_overlap_status": "none_detected",
+      "confirmation_eligible": false,
+      "confirmation_gate_status": "unacquired_pending_approval",
+      "match_identity": {
+        "match_name": "Stefanos Tsitsipas vs. Novak Djokovic",
+        "event": "2023 Australian Open, Men's Singles Final",
+        "event_status": "verified",
+        "tournament": "Australian Open",
+        "year": 2023,
+        "category": "Grand Slam",
+        "surface": "outdoor_hard",
+        "venue": "Rod Laver Arena, Melbourne Park, Australia",
+        "round": "Final",
+        "match_date": "2023-01-29",
+        "official_score": "6-3, 7-6(4), 7-6(5) (Novak Djokovic def. Stefanos Tsitsipas, 2h 56m)",
+        "official_event_sources": [
+          "https://www.atptour.com/en/scores/stats-centre/archive/2023/580/ms001",
+          "https://ausopen.com/articles/news/djokovic-claims-10th-australian-open-crown"
+        ]
+      },
+      "source_video": {
+        "platform": "YouTube",
+        "primary_video_id": "FE2or3g488o",
+        "primary_url": "https://www.youtube.com/watch?v=FE2or3g488o",
+        "primary_title": "Stefanos Tsitsipas v Novak Djokovic Full Match | Australian Open 2023 Final",
+        "uploader": "Australian Open",
+        "channel_id_or_handle": "@australianopen",
+        "oembed_verification": {
+          "status": "available_verified",
+          "checked_utc": "2026-09-04T07:27:50Z",
+          "corroborated_title": "Stefanos Tsitsipas v Novak Djokovic Full Match | Australian Open 2023 Final",
+          "corroborated_author": "Australian Open",
+          "author_url": "https://www.youtube.com/@australianopen"
+        },
+        "claimed_duration_hms": "2:24:38 (claimed in metadata; unverified on decoded stream)",
+        "alternative_streams": [
+          {
+            "video_id": "N2Dtsx-6aDc",
+            "url": "https://www.youtube.com/watch?v=N2Dtsx-6aDc",
+            "title": "Stefanos Tsitsipas v Novak Djokovic Extended Highlights | Australian Open 2023 Final",
+            "claimed_duration_hms": "8:21 (claimed in metadata; unverified on decoded stream)",
+            "oembed_status": "available_verified",
+            "corroborated_title": "Stefanos Tsitsipas v Novak Djokovic Extended Highlights | Australian Open 2023 Final"
+          }
+        ],
+        "source_type": "tournament_broadcast",
+        "claimed_resolution": "1080p / 4K UHD stream (claimed in metadata; unverified on decoded stream)",
+        "claimed_fps": "50.0 fps (claimed in metadata; unverified on decoded stream)",
+        "verified_decoded_parameters": null,
+        "verification_disclaimer": "Exact decoded dimensions, pixel format, codec ID, container duration, and SHA256 hashes are strictly UNVERIFIED pending download and ffprobe inspection."
+      },
+      "provenance_audit": {
+        "prior_use": [],
+        "is_contaminated": false,
+        "contamination_reasons": [],
+        "overlap_audit_references": [
+          "assets/dataset/pointstream_aa_meta.json (Tsitsipas has 0 tracks; Djokovic tracks are from 2019/2015 assets)",
+          "Entire PointStream codebase (0 prior uses)"
+        ],
+        "overlap_uncertainties": []
+      },
+      "camera_and_eligibility_assessment": {
+        "camera_angle": "elevated_baseline_broadcast",
+        "court_coverage": "uninterrupted_court_point_play (expected; unverified until shot extraction)",
+        "span_feasibility_16s_384frames": "high",
+        "feasibility_rationale": "Sets 2 and 3 tiebreaks contain extensive cross-court baseline rallies exceeding 16 seconds. Continuity unverified on raw frames.",
+        "risk_factors": []
+      },
+      "rights_and_access": {
+        "license": "YouTube Standard License",
+        "research_use_only": true,
+        "redistribution_in_repo": false,
+        "access_restrictions": "Public YouTube upload; potential geoblocking."
+      }
+    }
+  ]
+}
