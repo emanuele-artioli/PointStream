@@ -1,6 +1,6 @@
 # PointStream — current plan
 
-Updated 3 September 2026. **ACM TOMM submission: 30 September, hard deadline.**
+Updated 4 September 2026. **ACM TOMM submission: 30 September, hard deadline.**
 Evidence freeze: 20 September. Read this, `AGENTS.md`, and one assigned brief.
 `plans/ROADMAP.md` defines the submission gates and ordering.
 
@@ -17,7 +17,7 @@ It offers a compression opportunity, not a guaranteed win by construction.
 
 | Area | Verified | Remaining |
 |---|---|---|
-| Integration | BP51/BP52 reviewed; confirmation and batch-stop repairs included in PRs #57/#58 | Keep one current main and clearly bounded sessions |
+| Integration | PRs #60/#61 merged at f63019c; BP53/BP54 reviewed | Retire old sessions; use current main |
 | Background | Offline canonical canvas per compatible context, adjusted transforms and reference reuse | Long-scene rate–quality evidence; no causal canvas construction |
 | Recovery | BP49/BP52 native short-pair checkpoint budget passed; batch stops on alarms/control mismatch | Longer-run budget still unverified; no mid-codec resume |
 | References | Same-frame AV1 QP63 and VVC QP63/51/39 diagnostic points; legal-neighbour QPs and resume | Frozen-regime curves; separate semantic encoder/client timing |
@@ -25,7 +25,7 @@ It offers a compression opportunity, not a guaranteed win by construction.
 | Data | All seven current videos are development/training-used; manifest accepts zero confirmation matches | Acquire at least six genuinely fresh audited matches |
 | Generators | No confirmed improvement over the pasted-reference control | Training parked until background and lean payload can win |
 | Evidence | No confirmed first-domain rate–quality win | Gate A, independent confirmation, core ablations, learned-codec comparison |
-| Paper | Separate Overleaf repo; build and current 21+5-page budget checked; BP51/BP52 evidence notes | Final curves, supported headline claim, conclusion and rebalance as results land |
+| Paper | Separate Overleaf repo; BP53 scoped negative and provenance added | Final curves, supported headline claim, timing and independent confirmation |
 
 BP52's three CRF points have balanced coded ledgers, fresh metric controls and
 no recorded alarms. CRF51 reproduced BP49; coarser backgrounds saved bytes but
@@ -34,15 +34,22 @@ pair, not confirmation. Separate semantic encode/decode time is still missing:
 runner wall time includes reconstruction and scoring. Historical outputs stay
 immutable; code changes require a new measurement identity/output directory.
 
+BP53 half-scale transport also established no win on this pair. Its control
+crossed a driver-only identity change; source code was unchanged. Later
+standalone-client and crash-budget repairs are not native reruns. Historical
+total time is a lower bound; longer runs are NOT cleared. BP54 is provisional
+triage: eight provisional candidates, two blocked Alcaraz matches and zero
+accepted confirmation. Full completed reports/briefs are in plans/done/;
+short redirects preserve old citations. HANDOFF.md is the current entry point.
+
 ## Next work
 
-1. **Cursor — `plans/BP53-background-transport-scale.md`:** transport a
-   half-resolution background, restore the canonical size before warping,
-   verify geometry/recovery, then the explicitly bounded diagnostic batch.
-2. **Antigravity — `plans/BP54-fresh-confirmation-sources.md`:** verified fresh
-   match/source shortlist and acquisition plan; no downloads or annotation yet.
-3. **Codex:** review BP53 geometry, charged metadata and decoder symmetry;
-   approve any broader curve/longer-context search only after its report.
+1. **Cursor — `plans/BP56-background-encoder-effort.md`:** prove prefix stability
+   for a higher-effort background setting, then the bounded short-pair pilot.
+2. **Antigravity — `plans/BP57-confirmation-acquisition-pilot.md`:** user approved
+   two sources, 45 minutes each and 10 GB total; metadata/shot checks only.
+   No annotation, training or confirmation encodes.
+3. **Codex:** review BP56/BP57 before broader curves or longer contexts.
    BP32–33 remain the cost/long-span follow-up, not disproved by this short pair.
 4. **Codex:** retain ownership of the timing contract: encoder computation,
    client decode/reconstruction and evaluation scoring need separate clocks.

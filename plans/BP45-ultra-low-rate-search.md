@@ -2,7 +2,7 @@
 
 **Current state (3 September):** M1 and the E1 harness are merged. Do not repeat
 their implementation. BP49 and BP52 diagnostics are complete. Next is the
-bounded BP53 background-scale test, then Codex review before broad E1; no
+bounded BP56 background-effort test after BP53, then Codex review before broad E1; no
 size–quality win has been established.
 
 **Roadmap IDs:** M1 then E1  

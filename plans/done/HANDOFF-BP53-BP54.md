@@ -1,5 +1,7 @@
 # Next bounded sessions: BP53 and BP54
 
+Archived 4 September 2026. Both tasks are merged; use root HANDOFF.md instead.
+
 Trigger: the user requested executable Cursor/Antigravity dispatches after
 reviewing and merging BP51/BP52. This is a planned task boundary, not an outage.
 
