@@ -601,6 +601,11 @@ class PanoramaStream(BackgroundModel):
         return self.decode_payload(artifact)
 
     def export_stream_state(self) -> dict[str, Any] | None:
+        """Checkpoint state for recovery. Omits live wall clocks.
+
+        ``last_resample_seconds`` and transmitter coding-time totals stay on
+        the live object and in encode records, not in this dict.
+        """
         return {
             "scene_index": int(self._scene_index),
             "active_context": self._active_context,

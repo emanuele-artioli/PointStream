@@ -237,7 +237,11 @@ def ffmpeg_timeout(seconds: float | None) -> Iterator[None]:
 
 
 def last_encode_record() -> dict[str, Any]:
-    """The last background ffmpeg encode command and its packet sizes."""
+    """Last background ffmpeg command, packet sizes, and encode/decode walls.
+
+    These timings are diagnostic. They are not part of checkpoint or recovery
+    state: wall clock is not a reconstruction input.
+    """
     return dict(_LAST_ENCODE)
 
 
@@ -629,8 +633,8 @@ class BackgroundStreamTransmitter:
     _chains: list[tuple[int, ...]] = field(default_factory=list, init=False)
     _payloads: list[bytes] = field(default_factory=list, init=False)
     _reconstructions: list[np.ndarray] = field(default_factory=list, init=False)
-    encode_seconds_total: float = field(default=0.0, init=False)
-    decode_seconds_total: float = field(default=0.0, init=False)
+    encode_seconds_total: float = field(default=0.0, init=False, repr=False, compare=False)
+    decode_seconds_total: float = field(default=0.0, init=False, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         if self.mode not in REFERENCE_MODES:
@@ -735,8 +739,24 @@ class BackgroundStreamTransmitter:
             mode=self.mode,
         )
 
+    def coding_seconds(self) -> dict[str, float]:
+        """Cumulative ffmpeg encode/decode walls on this live transmitter.
+
+        Report size/quality/time from here or ``last_encode_record``. Do not
+        put these numbers in ``export_state``: they change across identical
+        encodes and would make recovery state look different when it is not.
+        """
+        return {
+            "encode_seconds_total": float(self.encode_seconds_total),
+            "decode_seconds_total": float(self.decode_seconds_total),
+        }
+
     def export_state(self) -> dict[str, Any]:
-        """Enough to continue the stream after a crash without re-encoding."""
+        """Semantic stream state: enough to continue without re-encoding.
+
+        Wall-clock totals are omitted on purpose. Recovery must restore
+        payloads, chains and reconstructions, not diagnostic timers.
+        """
         return {
             "mode": self.mode,
             "codec": self.codec,
@@ -745,8 +765,6 @@ class BackgroundStreamTransmitter:
             "stream_usage": self.stream_usage,
             "stream_cpu_used": int(self.stream_cpu_used),
             "low_delay": list(self.spec.low_delay),
-            "encode_seconds_total": float(self.encode_seconds_total),
-            "decode_seconds_total": float(self.decode_seconds_total),
             "chains": [list(chain) for chain in self._chains],
             "payloads": list(self._payloads),
             "originals": [np.asarray(item) for item in self._originals],
@@ -754,7 +772,12 @@ class BackgroundStreamTransmitter:
         }
 
     def import_state(self, state: Mapping[str, Any]) -> None:
-        """Restore ``export_state``. Refuses a codec/mode mismatch."""
+        """Restore ``export_state``. Refuses a codec/mode mismatch.
+
+        Older checkpoints may still carry ``encode_seconds_total`` /
+        ``decode_seconds_total``. Those keys are ignored: they are not
+        reconstruction state.
+        """
         if str(state["mode"]) != self.mode or str(state["codec"]) != self.codec:
             raise ValueError(
                 f"stream state is mode={state.get('mode')!r} codec={state.get('codec')!r}, "
@@ -779,8 +802,6 @@ class BackgroundStreamTransmitter:
         self._reconstructions = [
             np.asarray(item, dtype=np.uint8) for item in state["reconstructions"]
         ]
-        self.encode_seconds_total = float(state.get("encode_seconds_total") or 0.0)
-        self.decode_seconds_total = float(state.get("decode_seconds_total") or 0.0)
         n = len(self._payloads)
         if not (len(self._chains) == len(self._originals) == len(self._reconstructions) == n):
             raise ValueError("stream state lists have unequal length")

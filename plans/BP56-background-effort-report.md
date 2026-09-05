@@ -48,7 +48,36 @@ and bytes; independent 2/3/4-frame prefixes; last-reference, same-size reset,
 byte-only client vs encoder reconstruction; legacy resume without effort keys;
 changed-option resume refused; non-av1 / non-stream effort refused.
 
-Commands (worktree root, `conda run -n pointstream --no-capture-output`):
+**PR #64 head `edf6965` failed CI tests.** GitHub Actions run
+`33953874295` (tests job) failed two recovery-equivalence cases:
+
+`tests/runner/test_recovery.py::test_interrupted_background_matches_uninterrupted_run`
+for both `("court", "court")` and `("court", "replay")`.
+
+The only differing keys in exported `background_state` were
+`transmitter.encode_seconds_total` and `transmitter.decode_seconds_total`.
+Payloads, chains, reconstructions, geometry, effort flags and quality matched.
+Those totals are ffmpeg wall clocks (`time.perf_counter`), so they are not
+stable across an uninterrupted run and a resumed run of the same bytes.
+
+Repair: keep accumulating those totals on the live transmitter
+(`coding_seconds()` / `last_encode_record()`) for size/quality/time reporting.
+Do not write them into `export_state` / checkpoint `background_state`, and
+ignore leftover keys on import. `last_resample_seconds` was already live-only.
+No other BP56 runtime field entered semantic checkpoints. Recovery-equivalence
+assertions were not weakened. Native BP56 points were not rerun; measured
+values below are unchanged.
+
+Verification after the repair (worktree root,
+`conda run -n pointstream --no-capture-output`):
+
+- `pytest tests/runner/test_recovery.py tests/components/background/test_encoder_effort.py tests/experiments/test_bp56_budget.py tests/contracts/test_config.py tests/components/background/test_transport_scale.py`: 58 passed, including both recovery-equivalence cases
+- `ruff check`: All checks passed
+- `mypy --config-file pyproject.toml`: Success, 343 source files
+- `python -m src.contracts.layers`: Import direction OK
+- full `pytest` (default markers): 1126 passed, 1 skipped, 95 deselected, 3 xfailed
+
+Earlier Gate 1 commands (implementation freeze `6ff9936`):
 
 - `ruff check` on touched files: passed
 - `mypy --config-file pyproject.toml` on touched files: passed
@@ -127,12 +156,12 @@ than 1 s, but the operational flag stays false as required).
 Unknown crash interval: false. Consumed seconds 12,303.3 of 28,800 (~3.4 h),
 not a lower bound. No restart.
 
-**Attempt-wall vs 1-hour encode cap.** Each native attempt wall was 4329.8 s,
-3975.7 s, 3947.2 s. Assembly/scoring was 1479.7 / 1310.2 / 1285.5 s of that.
-libaom subprocess timeout was `min(3600, remaining−900)` s; no ffmpeg timeout
-fired. Runner encode stages were minutes, not an hour. The one-hour cap was
-applied to the encoder subprocess, not to scoring. Full attempt walls still
-exceed 3600 s, as BP53 scoring already did. Longer runs are not cleared.
+**Every full native point attempt exceeded the nominal one-hour attempt
+limit.** Attempt walls were 4329.8 s, 3975.7 s and 3947.2 s. The bounded
+libaom subprocess did not: its timeout was `min(3600, remaining−900)` s and
+no ffmpeg timeout fired. Runner encode stages were minutes; assembly/scoring
+was 1479.7 / 1310.2 / 1285.5 s of each attempt. The one-hour cap was applied
+to the encoder subprocess, not to scoring. Longer runs are not cleared.
 
 ## Size, quality, time
 
