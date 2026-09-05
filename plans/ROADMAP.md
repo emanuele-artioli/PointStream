@@ -284,6 +284,65 @@ fidelity to a declared multimedia utility: full-frame quality, foreground
 quality and a background floor reported together. The paper must report that
 this thesis was activated after the full-frame search and must show both results.
 
+### 6.2 Transparent constraint-relaxation ladder
+
+If the primary claim still does not win, relax constraints in this order. Keep
+every earlier comparison in the paper, name the exact tier that wins, and state
+that each relaxation was chosen after observing the previous negative result.
+A narrower honest claim is acceptable; relabelling a weaker comparison as the
+original claim is not.
+
+1. **Narrow eligible content further.** Require longer stable-camera shots, a
+   known court view, small separated players, bounded pan, and enough repeated
+   background for fixed costs to amortise. Report acceptance rate and fallback
+   cost on the full video so this does not become invisible cherry-picking.
+2. **Change the operating profile symmetrically.** Test longer buffers, lower
+   resolution, lower frame rate or a lower quality range only when PointStream,
+   AV1 and VVC receive identical source frames and timing. The title and claim
+   name that profile; it is not a native-4K result.
+3. **Use the declared salient-object utility.** Compare foreground quality at
+   matched total rate with a fixed minimum background-quality floor, while also
+   reporting full-frame quality. This is the preferred thesis change if uniform
+   VMAF hides the benefit to small salient objects.
+4. **Relax anchor speed.** If PointStream loses to the slowest AV1/VVC presets,
+   compare against successively faster documented presets. A win licenses only
+   “beats AV1/VVC at preset X,” not “beats AV1/VVC.” Keep the slow-preset curves
+   as current-performance headroom and quantify the remaining gap. Because
+   PointStream may still be slower, do not describe this as a speed-matched
+   comparison unless measured wall time actually matches.
+5. **Add older conventional anchors.** HEVC, VP9, AVC or another reproducible
+   older codec may define a valid lower bar. A win against one is publishable as
+   a scoped systems result only if AV1 and VVC remain visible as stronger modern
+   anchors and the paper does not imply state-of-the-art compression.
+6. **Relax unseen-video confirmation.** The preferred split is at least seven
+   training videos and six untouched test videos. If model quality is inadequate
+   or acquisition is infeasible, train on the available videos and hold out new,
+   non-overlapping contiguous scenes or points from those same videos. Freeze the
+   split before training, prevent adjacent-frame leakage, keep the test scenes out
+   of tuning, and call the result **within-video held-out-scene evaluation**, not
+   unseen-video generalization. Report both this result and any smaller clean
+   video-level holdout.
+7. **Reduce confirmation breadth.** If six independent videos are infeasible,
+   report the available n, every per-video result, paired uncertainty and failure
+   rate. Fewer than eight items is underpowered and cannot license a broad
+   population claim, but may support a case-study claim.
+8. **Scope the system result to eligible scenes.** Demonstrate the codec win on
+   the route it was built for and separately measure how the conventional
+   fallback affects whole-program rate, quality and time at observed eligibility
+   rates. Do not claim the eligible-only curve as full-video performance.
+9. **Consider content-adaptive training only with transmitted cost.** Per-video
+   or per-venue adaptation is a separate codec profile. Count model updates or
+   state the number of videos/hours over which a fixed model is amortised; never
+   treat decoder side information as free.
+
+The following do not relax: identical decoded source input for all arms; real,
+decodable bitstreams; complete payload and model-update accounting; calibrated
+quality instruments and nulls; continuous/segmented anchor parity; reporting
+all attempted regimes; provenance and citability checks; and explicit disclosure
+of training overlap and post-hoc scope selection. No sequence of defensible
+relaxations can guarantee a win. If none wins, the paper must report the measured
+boundary or change its central claim rather than manufacture one.
+
 ## 7. Workstreams, harness assignment and expected reports
 
 High-level analysis, measurement design, architecture decisions, alarm

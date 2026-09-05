@@ -54,7 +54,10 @@ PointStream control on one development pair (377,360 vs 474,369 bytes; VMAF
 79.339 vs 77.417). Treat it as a Gate-A seed only: n=1 and no ranked current
 AV1/VVC curve. BP57 acquired two provisional fresh matches; their native
 1080p/720p resolution cannot confirm a 4K-specific claim. Full audit:
-`plans/SUBMISSION-READINESS-2026-09-05.md`.
+`plans/SUBMISSION-READINESS-2026-09-05.md`. The transparent fallback ladder in `plans/ROADMAP.md` §6.2 permits
+narrower content/operating profiles, faster or older named anchors, and a
+within-video held-out-scene split if needed, but requires the paper to retain
+the stronger negative comparisons and label the weaker claim exactly.
 
 ## Next work
 
