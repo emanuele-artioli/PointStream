@@ -240,7 +240,12 @@ def pointstream_e1(
             None if result.timing.get("hourly_checkpoint_budget_met", True) is True
             else "hourly checkpoint budget exceeded or unverified after interruption; do not expand batch"
         ),
-        **pointstream_timing(wall),
+        **pointstream_timing(
+            wall,
+            encoder_seconds=result.timing.get("encoder_seconds"),
+            client_seconds=result.timing.get("client_seconds"),
+            evaluation_seconds=result.timing.get("evaluation_seconds"),
+        ),
         **result.timing,
     }
 

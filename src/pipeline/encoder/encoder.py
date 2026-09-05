@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
+import time
 from typing import Any
 
 from src.contracts.config import LatticeConfig, PointstreamConfig
@@ -43,10 +44,16 @@ class Encoder:
         *,
         on_stage: Callable[[str, float], None] | None = None,
         heartbeat_interval: float | None = None,
+        clock: Callable[[], float] = time.perf_counter,
+        sync_fn: Callable[[], None] | None = None,
     ) -> dict[str, Any]:
         """Run every enabled stage once. Disabled stages are not in the graph."""
         return self.dag.run(
-            source, on_stage=on_stage, heartbeat_interval=heartbeat_interval
+            source,
+            on_stage=on_stage,
+            heartbeat_interval=heartbeat_interval,
+            clock=clock,
+            sync_fn=sync_fn,
         )
 
     @classmethod
