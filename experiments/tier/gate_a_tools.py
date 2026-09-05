@@ -15,6 +15,7 @@ Brief specifications:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import shutil
@@ -22,6 +23,9 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+import numpy as np
+from experiments.tier.low_rate_measure import reference_request, timed_roundtrip
 
 
 @dataclass(frozen=True)
@@ -63,7 +67,9 @@ def resolve_tool_specs() -> dict[str, dict[str, Any]]:
     svt_version = "unknown"
     if svt_available:
         try:
-            out = subprocess.check_output([svt_bin, "--version"], stderr=subprocess.STDOUT, text=True)
+            out = subprocess.check_output(
+                [svt_bin, "--version"], stderr=subprocess.STDOUT, text=True
+            )
             svt_version = out.strip().splitlines()[0]
         except Exception:
             pass
@@ -85,7 +91,9 @@ def resolve_tool_specs() -> dict[str, dict[str, Any]]:
     vvc_version = "unknown"
     if vvc_available:
         try:
-            out = subprocess.check_output([vvc_bin, "--version"], stderr=subprocess.STDOUT, text=True)
+            out = subprocess.check_output(
+                [vvc_bin, "--version"], stderr=subprocess.STDOUT, text=True
+            )
             vvc_version = out.strip().splitlines()[0]
         except Exception:
             pass
@@ -115,13 +123,27 @@ def probe_codec_floor(
     if spec is None or not spec.get("available", False):
         return {"codec": codec, "supported": False, "reason": "binary not found"}
 
-    # Return verified configuration
+    frames = np.zeros(test_frame_shape, dtype=np.uint8)
+    frames[..., 0] = np.arange(test_frame_shape[0], dtype=np.uint8)[:, None, None]
+    request = reference_request(codec, 63, str(spec["slowest_preset"]))
+    trip = timed_roundtrip(frames, request=request, fps=24.0)
+    if trip.size_bytes <= 0 or trip.frames.shape != frames.shape:
+        return {
+            "codec": codec,
+            "supported": False,
+            "reason": f"invalid probe output: {trip.size_bytes} bytes, {trip.frames.shape}",
+        }
+    binary = Path(str(trip.tool_path)).resolve()
     return {
         "codec": codec,
         "supported": True,
-        "binary": spec["binary"],
-        "version": spec["version"],
-        "slowest_preset": spec["slowest_preset"],
+        "binary": str(binary),
+        "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
+        "version": trip.tool_version,
+        "slowest_preset": trip.preset,
+        "probe_qp": trip.qp,
+        "probe_bytes": trip.size_bytes,
+        "decoded_shape": list(trip.frames.shape),
         "verified": True,
     }
 
@@ -129,12 +151,15 @@ def probe_codec_floor(
 def write_tool_identity(destination: Path) -> dict[str, Any]:
     """Write tool resolution record to disk."""
     destination.mkdir(parents=True, exist_ok=True)
-    specs = resolve_tool_specs()
+    specs = {codec: probe_codec_floor(codec) for codec in ("av1", "vvc")}
+    failed = [codec for codec, row in specs.items() if not row.get("supported")]
+    if failed:
+        raise SystemExit(f"Gate A codec-floor probe failed for {failed}")
     record = {
         "tools": specs,
         "notes": [
-            "AV1 slowest preset verified: SVT-AV1 preset 0",
-            "VVC slowest preset verified: vvencapp preset slower",
+            f"AV1 slowest preset driven: {specs['av1']['slowest_preset']}",
+            f"VVC slowest preset driven: {specs['vvc']['slowest_preset']}",
             "Anchors run continuous and segmented on identical source frames",
         ],
     }

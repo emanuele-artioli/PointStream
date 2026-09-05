@@ -16,14 +16,48 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 from typing import Any
+
 
 import numpy as np
 
 from experiments.tier.bp52_background_search import _manifest_snapshot
 from experiments.tier.low_rate_checkpoint import fingerprint, implementation_digest, source_identity
 from experiments.tier.low_rate_clips import load_e1_sequence
+
+MEASUREMENT_FILES = (
+    "experiments/tier/gate_a_long_context.py",
+    "experiments/tier/gate_a_identity.py",
+    "experiments/tier/gate_a_tools.py",
+    "experiments/tier/gate_a_controls.py",
+    "experiments/tier/low_rate_measure.py",
+    "src/components/codec/encode.py",
+    "src/components/codec/measure.py",
+)
+
+
+def _git_identity(root: Path) -> dict[str, Any]:
+    commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
+    dirty = subprocess.check_output(
+        ["git", "status", "--porcelain", "--untracked-files=all"], cwd=root, text=True
+    ).splitlines()
+    dirty_paths = sorted(
+        {line[3:] for line in dirty if len(line) > 3 and (root / line[3:]).is_file()}
+    )
+    return {
+        "commit": commit,
+        "dirty": bool(dirty),
+        "dirty_files": {
+            name: hashlib.sha256((root / name).read_bytes()).hexdigest() for name in dirty_paths
+        },
+        "measurement_files": {
+            name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+            for name in MEASUREMENT_FILES
+        },
+    }
+
 
 VIDEO = "alcaraz_highlights"
 SCENES = ("scene_000", "scene_028")
@@ -137,12 +171,18 @@ def build_gate_a_identity(
     sources = source_identity(clips)
     identity: dict[str, Any] = {
         "gate": "A",
+        "git": _git_identity(root),
+        "native_shape": list(NATIVE_SHAPE),
+        "dtype": "uint8",
+        "colour_policy": "RGB source -> yuv420p anchors -> RGB decode",
+        "eligibility": ["near-static", "smooth-pan", "same compatible court context"],
         "video": VIDEO,
         "scenes": list(SCENES),
         "frames_per_scene": n_frames,
         "fps": FPS,
         "context_id": CONTEXT_ID,
         "sources": sources,
+        "source_hash_policy": "sha256(contiguous uint8 RGB bytes); shape and dtype stored beside digest",
         "manifest_sha256": manifest["selected_scene_records_sha256"],
         "implementation_digest": impl_digest,
         "timing_boundaries": [

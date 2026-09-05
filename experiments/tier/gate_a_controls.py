@@ -107,6 +107,9 @@ def verify_conventional_fallback(
 def run_gate_a_controls(
     reference: np.ndarray,
     destination: Path,
+    *,
+    object_stream_off: dict[str, Any] | None = None,
+    fallback: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Execute all pre-run controls and return combined control record."""
     destination.mkdir(parents=True, exist_ok=True)
@@ -118,7 +121,22 @@ def run_gate_a_controls(
     combined = {
         "metric_anchors": anchors_result,
         "temporal_null": temporal_result,
-        "valid": True,
+        "object_stream_off": object_stream_off,
+        "conventional_fallback": fallback,
+        "valid": (
+            object_stream_off is not None
+            and object_stream_off.get("usable") is True
+            and fallback is not None
+            and fallback.get("passed") is True
+        ),
+        "pending": [
+            name
+            for name, value in (
+                ("object_stream_off", object_stream_off),
+                ("conventional_fallback", fallback),
+            )
+            if value is None
+        ],
     }
     (destination / "controls-summary.json").write_text(json.dumps(combined, indent=2) + "\n")
     return combined

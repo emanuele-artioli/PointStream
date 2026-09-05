@@ -46,7 +46,9 @@ class DeliberateEvaluator(NumpyPsnrEvaluator):
         self.clock = clock
         self.delay = delay
 
-    def evaluate(self, reference: np.ndarray, predicted: np.ndarray, **kwargs: Any) -> QualityReport:
+    def evaluate(
+        self, reference: np.ndarray, predicted: np.ndarray, **kwargs: Any
+    ) -> QualityReport:
         self.clock.advance(self.delay)
         return super().evaluate(reference, predicted, **kwargs)
 
@@ -146,7 +148,9 @@ def test_independent_client_reproduces_delivered_frames() -> None:
         from src.contracts.lattice import ART_BACKGROUND_MODEL, STAGE_BACKGROUND
         from src.runner.stages import _as_background, _delivered_frames
 
-        view = _as_background(chunk.bag.get(ART_BACKGROUND_MODEL) or chunk.bag.get(STAGE_BACKGROUND))
+        view = _as_background(
+            chunk.bag.get(ART_BACKGROUND_MODEL) or chunk.bag.get(STAGE_BACKGROUND)
+        )
         delivered_target = _delivered_frames(chunk.bag[ART_DELIVERED])
 
         recon = reconstruct_independent_client(
@@ -174,3 +178,38 @@ def test_gpu_sync_called_at_every_timed_boundary() -> None:
 
     # Must have synchronized multiple times (preparation, encoder stages, client phase, evaluation phase, assembly)
     assert len(sync_events) >= 5
+
+
+def test_serialized_client_boundary_carries_background_and_foreground() -> None:
+    from src.pipeline.reconstruction.background import BackgroundModelView
+    from src.runner.client import (
+        ClientPlacement,
+        reconstruct_serialized_client,
+        serialize_client_request,
+    )
+
+    background = BackgroundModelView(
+        plate=np.zeros((4, 4, 3), dtype=np.uint8),
+        homographies=((1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0),),
+        width=4,
+        height=4,
+        payload_bytes=7,
+    )
+    crop = np.full((2, 2, 3), 200, dtype=np.uint8)
+    payload = serialize_client_request(
+        background=background,
+        frame_count=1,
+        height=4,
+        width=4,
+        placements=(ClientPlacement(crop=crop, bbox=(1, 1, 3, 3)),),
+    )
+    assert isinstance(payload, bytes)
+    reconstructed = reconstruct_serialized_client(payload)
+    assert np.array_equal(reconstructed[0, 1:3, 1:3], crop)
+
+
+def test_serialized_client_rejects_live_object() -> None:
+    from src.runner.client import reconstruct_serialized_client
+
+    with pytest.raises(TypeError, match="must be bytes"):
+        reconstruct_serialized_client({})  # type: ignore[arg-type]
