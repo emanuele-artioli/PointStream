@@ -5,6 +5,11 @@ prefix semantics and evidence. Read AGENTS.md, PLAN.md, SESSION-REPORT.md,
 done/BP53-background-scale-report.md and done/BP53-measurement-provenance.md.
 Deadline 30 September; evidence freeze 20 September. No broader sweep authorized.
 
+## Delivered
+
+Measurement complete 4 September 2026. Report: `plans/BP56-background-effort-report.md`.
+Native outputs: `outputs/bp56-background-effort/`. Stopped before expansion.
+
 ## Question and scope
 
 Does spending more background encoder effort help the short-pair rate–quality

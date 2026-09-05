@@ -1,6 +1,6 @@
 # PointStream — current plan
 
-Updated 4 September 2026. **ACM TOMM submission: 30 September, hard deadline.**
+Updated 5 September 2026. **ACM TOMM submission: 30 September, hard deadline.**
 Evidence freeze: 20 September. Read this, `AGENTS.md`, and one assigned brief.
 `plans/ROADMAP.md` defines the submission gates and ordering.
 
@@ -42,10 +42,18 @@ triage: eight provisional candidates, two blocked Alcaraz matches and zero
 accepted confirmation. Full completed reports/briefs are in plans/done/;
 short redirects preserve old citations. HANDOFF.md is the current entry point.
 
+BP56 proved prefix-stable libaom good/cpu-used 4 and ran the three-point
+short-pair pilot. The realtime CRF51 control matched BP52/BP53. Same-CRF
+higher effort used more background bits and raised VMAF; CRF63 at that effort
+is smaller than the control. References were left unranked (metric-file
+provenance vs origin/main). Report: `plans/BP56-background-effort-report.md`.
+No expansion is authorized.
+
 ## Next work
 
-1. **Cursor — `plans/BP56-background-encoder-effort.md`:** prove prefix stability
-   for a higher-effort background setting, then the bounded short-pair pilot.
+1. **Codex — review `plans/BP56-background-effort-report.md`** before any
+   further background-effort curve. Longer context and quality allocation remain
+   open. Do not treat this pair as a win against AV1/VVC.
 2. **Antigravity — `plans/BP57-confirmation-acquisition-pilot.md`:** user approved
    two sources, 45 minutes each and 10 GB total; metadata/shot checks only.
    No annotation, training or confirmation encodes.

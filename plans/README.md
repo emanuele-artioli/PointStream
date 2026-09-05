@@ -8,7 +8,7 @@ The current dispatch entry point is `../HANDOFF.md`.
 
 | Brief | Current purpose | Harness |
 |---|---|---|
-| `BP56-background-encoder-effort.md` | Prefix-safe higher-effort background pilot | Cursor; Codex review |
+| `BP56-background-encoder-effort.md` | Measurement complete; report `BP56-background-effort-report.md`; Codex review | Cursor done; Codex review |
 | `BP57-confirmation-acquisition-pilot.md` | Approved two-source acquisition/shot pilot | Antigravity |
 | `BP45-ultra-low-rate-search.md` | M1 done; staged search guided by BP52/BP53 | Cursor |
 | `BP46-long-tennis-scenes.md` | Diagnostics ready; confirmation incomplete | Antigravity |

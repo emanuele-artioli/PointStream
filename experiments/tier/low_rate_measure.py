@@ -136,16 +136,29 @@ def late_frame_bound_alarms(
     return alarms
 
 
-def stream_codec_provenance(codec: str = "av1") -> dict[str, Any]:
+def stream_codec_provenance(
+    codec: str = "av1",
+    *,
+    usage: str | None = None,
+    cpu_used: int | None = None,
+) -> dict[str, Any]:
     """The background-stream encoder, not the residual/reference SVT-AV1 preset."""
-    from src.components.background.stream import CODECS
+    from src.components.background.stream import (
+        DEFAULT_STREAM_CPU_USED,
+        DEFAULT_STREAM_USAGE,
+        resolve_stream_codec,
+    )
 
-    spec = CODECS[codec]
+    resolved_usage = DEFAULT_STREAM_USAGE if usage is None else usage
+    resolved_cpu = DEFAULT_STREAM_CPU_USED if cpu_used is None else cpu_used
+    spec = resolve_stream_codec(codec, usage=resolved_usage, cpu_used=resolved_cpu)
     return {
         "role": "background_stream",
         "name": spec.name,
         "encoder": spec.encoder,
         "container": spec.container,
+        "usage": resolved_usage,
+        "cpu_used": resolved_cpu,
         "low_delay": list(spec.low_delay),
         "note": (
             "SVT-AV1 preset 0 is the independent AV1 reference and AV1 residual "
