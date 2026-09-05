@@ -6,6 +6,14 @@
   "auditor": "Antigravity",
   "roadmap_milestone": "E2 Gate B (Independent Confirmation Corpus)",
   "assigned_brief": "plans/BP57-confirmation-acquisition-pilot.md",
+  "totals": {
+    "submitted": 2,
+    "succeeded": 2,
+    "failed": 0,
+    "combined_downloaded_bytes": 735398842,
+    "retries": 0,
+    "alarms": []
+  },
   "authority_and_hard_limits": {
     "max_duration_per_source_minutes": 45,
     "max_combined_bytes_gb": 10.0,
@@ -21,7 +29,13 @@
     "no_confirmation_encodes": true,
     "no_active_manifest_modifications": true,
     "confirmation_eligible": false,
-    "disclaimer": "These are provisional candidate sources and candidate shot windows, not accepted confirmation matches. Acceptance into the confirmation corpus requires physical frame extraction, two-player tracking, and strict invariant validation."
+    "disclaimer": "These are provisional candidate sources and candidate shot windows, not accepted confirmation matches. Acceptance into the confirmation corpus requires physical frame extraction, two-player tracking, and strict invariant validation.",
+    "submitted": 2,
+    "succeeded": 2,
+    "failed": 0,
+    "retries": 0,
+    "alarms": [],
+    "native_resolution_scope": "The acquired sources decode at 1920x1080/25 fps and 1280x720/30000/1001 fps; they cannot independently confirm a native-4K-specific claim. Final eligibility depends on the frozen regime, prior-use audit, and later annotation checks."
   },
   "sources": [
     {
@@ -38,7 +52,7 @@
         "official_event_source": "https://www.wtatennis.com/tournament/901/australian-open/2024/scores/LS001"
       },
       "provenance_classification": "provisional_clean",
-      "compilation_overlap_status": "none_detected",
+      "compilation_overlap_status": "No identified match overlap with the known development assets, subject to the final prior-use audit.",
       "alcaraz_involvement": false,
       "development_asset_overlap": false,
       "video_metadata": {
@@ -88,11 +102,12 @@
         "color_primaries": "bt709",
         "color_transfer": "bt709",
         "color_range": "tv",
-        "bit_rate_bps": 1929321
+        "bit_rate_bps": 1929321,
+        "stream_summary": "1920x1080 at 25 fps constant (25/1)",
+        "native_resolution_note": "Decodes at 1920x1080/25 fps; cannot independently confirm a native-4K-specific claim. Final eligibility depends on the frozen regime, prior-use audit, and later annotation checks."
       },
       "shot_audit_summary": {
         "total_intervals_ge_2s": 172,
-        "clean_court_rallies": 77,
         "borderline_mixed": 40,
         "disqualified_non_court": 55,
         "counts_by_span_at_24fps": {
@@ -101,7 +116,41 @@
           "ge_4s_96frames": 62,
           "ge_2s_48frames": 77
         },
-        "top_clean_court_rallies": [
+        "court_like_candidate_intervals": 77,
+        "automatic_rally_candidates": 77,
+        "visually_verified_two_player_intervals": [
+          {
+            "shot_label": "Shot 057",
+            "interval_idx": 57,
+            "start_s": 685.2,
+            "end_s": 711.0,
+            "duration_s": 25.8,
+            "frames_native": 644,
+            "frames_at_24fps": 619,
+            "verification": "Visually verified two-player interval: continuous elevated baseline perspective of Rod Laver Arena; both Sabalenka and Zheng visible and actively exchanging baseline groundstrokes across all 16 contact sheet samples. Zero camera cuts or zooms."
+          },
+          {
+            "shot_label": "Shot 050",
+            "interval_idx": 50,
+            "start_s": 615.76,
+            "end_s": 637.36,
+            "duration_s": 21.6,
+            "frames_native": 540,
+            "frames_at_24fps": 518,
+            "verification": "Visually verified two-player interval: clean unbroken point play; Zheng serving, Sabalenka returning; both players tracked on court throughout."
+          },
+          {
+            "shot_label": "Shot 175",
+            "interval_idx": 175,
+            "start_s": 2289.84,
+            "end_s": 2313.16,
+            "duration_s": 23.32,
+            "frames_native": 582,
+            "frames_at_24fps": 559,
+            "verification": "Visually verified two-player interval: championship-game rally; two players visible, full court coverage."
+          }
+        ],
+        "top_automatic_rally_candidates": [
           {
             "interval_idx": 147,
             "start_s": 1972.16,
@@ -109,7 +158,7 @@
             "duration_s": 97.88,
             "frames_native": 2446,
             "frames_at_24fps": 2349,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.265,
             "avg_court_frac": 0.364,
             "spans_24fps_eligible": [
@@ -121,7 +170,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "uninspected_automatic_candidate"
           },
           {
             "interval_idx": 119,
@@ -130,7 +180,7 @@
             "duration_s": 50.64,
             "frames_native": 1265,
             "frames_at_24fps": 1215,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.373,
             "avg_court_frac": 0.644,
             "spans_24fps_eligible": [
@@ -142,7 +192,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "uninspected_automatic_candidate"
           },
           {
             "interval_idx": 107,
@@ -151,7 +202,7 @@
             "duration_s": 50.2,
             "frames_native": 1255,
             "frames_at_24fps": 1204,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.452,
             "avg_court_frac": 0.517,
             "spans_24fps_eligible": [
@@ -163,7 +214,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "uninspected_automatic_candidate"
           },
           {
             "interval_idx": 82,
@@ -172,7 +224,7 @@
             "duration_s": 41.4,
             "frames_native": 1034,
             "frames_at_24fps": 993,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.601,
             "avg_court_frac": 0.662,
             "spans_24fps_eligible": [
@@ -184,7 +236,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "uninspected_automatic_candidate"
           },
           {
             "interval_idx": 103,
@@ -193,7 +246,7 @@
             "duration_s": 34.24,
             "frames_native": 856,
             "frames_at_24fps": 821,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.769,
             "avg_court_frac": 0.84,
             "spans_24fps_eligible": [
@@ -205,7 +258,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "uninspected_automatic_candidate"
           },
           {
             "interval_idx": 19,
@@ -214,7 +268,7 @@
             "duration_s": 32.16,
             "frames_native": 803,
             "frames_at_24fps": 771,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.372,
             "avg_court_frac": 0.587,
             "spans_24fps_eligible": [
@@ -226,7 +280,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "uninspected_automatic_candidate"
           },
           {
             "interval_idx": 124,
@@ -235,7 +290,7 @@
             "duration_s": 30.12,
             "frames_native": 752,
             "frames_at_24fps": 722,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.343,
             "avg_court_frac": 0.574,
             "spans_24fps_eligible": [
@@ -247,7 +302,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "uninspected_automatic_candidate"
           },
           {
             "interval_idx": 109,
@@ -256,7 +312,7 @@
             "duration_s": 26.48,
             "frames_native": 662,
             "frames_at_24fps": 635,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.389,
             "avg_court_frac": 0.515,
             "spans_24fps_eligible": [
@@ -268,7 +324,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "uninspected_automatic_candidate"
           },
           {
             "interval_idx": 57,
@@ -277,7 +334,7 @@
             "duration_s": 25.8,
             "frames_native": 644,
             "frames_at_24fps": 619,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.778,
             "avg_court_frac": 0.789,
             "spans_24fps_eligible": [
@@ -289,7 +346,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "visually_verified_two_player_interval"
           },
           {
             "interval_idx": 175,
@@ -298,7 +356,7 @@
             "duration_s": 23.32,
             "frames_native": 582,
             "frames_at_24fps": 559,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.78,
             "avg_court_frac": 0.781,
             "spans_24fps_eligible": [
@@ -310,10 +368,12 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "visually_verified_two_player_interval"
           }
         ]
-      }
+      },
+      "overlap_status": "No identified match overlap with the known development assets, subject to the final prior-use audit."
     },
     {
       "source_id": "bp57_usopen2023_gauff_sabalenka",
@@ -329,7 +389,7 @@
         "official_event_source": "https://www.wtatennis.com/tournament/903/us-open/2023/scores/LS001"
       },
       "provenance_classification": "provisional_clean",
-      "compilation_overlap_status": "none_detected",
+      "compilation_overlap_status": "No identified match overlap with the known development assets, subject to the final prior-use audit.",
       "alcaraz_involvement": false,
       "development_asset_overlap": false,
       "video_metadata": {
@@ -379,11 +439,12 @@
         "color_primaries": "bt709",
         "color_transfer": "bt709",
         "color_range": "tv",
-        "bit_rate_bps": 651651
+        "bit_rate_bps": 651651,
+        "stream_summary": "1280x720 at 30000/1001 fps constant (~29.970 fps)",
+        "native_resolution_note": "Decodes at 1280x720/30000/1001 fps; cannot independently confirm a native-4K-specific claim. Final eligibility depends on the frozen regime, prior-use audit, and later annotation checks."
       },
       "shot_audit_summary": {
         "total_intervals_ge_2s": 203,
-        "clean_court_rallies": 148,
         "borderline_mixed": 22,
         "disqualified_non_court": 33,
         "counts_by_span_at_24fps": {
@@ -392,7 +453,51 @@
           "ge_4s_96frames": 125,
           "ge_2s_48frames": 148
         },
-        "top_clean_court_rallies": [
+        "court_like_candidate_intervals": 148,
+        "automatic_rally_candidates": 148,
+        "visually_verified_two_player_intervals": [
+          {
+            "shot_label": "Shot 109",
+            "interval_idx": 109,
+            "start_s": 955.25,
+            "end_s": 982.65,
+            "duration_s": 27.39,
+            "frames_native": 820,
+            "frames_at_24fps": 657,
+            "verification": "Visually verified two-player interval: unbroken elevated baseline camera on Arthur Ashe Stadium court; Gauff and Sabalenka engaging in extended 18+ stroke rally; both players visible on opposite baselines across all 16 sample frames. Zero cuts."
+          },
+          {
+            "shot_label": "Shot 031",
+            "interval_idx": 31,
+            "start_s": 221.72,
+            "end_s": 248.65,
+            "duration_s": 26.93,
+            "frames_native": 806,
+            "frames_at_24fps": 646,
+            "verification": "Visually verified two-player interval: Gauff serving to Sabalenka; long crosscourt rally; two players fully visible."
+          },
+          {
+            "shot_label": "Shot 171",
+            "interval_idx": 171,
+            "start_s": 1560.39,
+            "end_s": 1587.42,
+            "duration_s": 27.03,
+            "frames_native": 809,
+            "frames_at_24fps": 648,
+            "verification": "Visually verified two-player interval: high-intensity baseline exchange; zero director switches."
+          },
+          {
+            "shot_label": "Shot 202",
+            "interval_idx": 202,
+            "start_s": 1917.58,
+            "end_s": 1944.31,
+            "duration_s": 26.73,
+            "frames_native": 800,
+            "frames_at_24fps": 641,
+            "verification": "Visually verified two-player interval: set-clinching rally; clean baseline broadcast angle."
+          }
+        ],
+        "top_automatic_rally_candidates": [
           {
             "interval_idx": 198,
             "start_s": 1862.76,
@@ -400,7 +505,7 @@
             "duration_s": 32.1,
             "frames_native": 961,
             "frames_at_24fps": 770,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.838,
             "avg_court_frac": 0.841,
             "spans_24fps_eligible": [
@@ -412,7 +517,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "uninspected_automatic_candidate"
           },
           {
             "interval_idx": 109,
@@ -421,7 +527,7 @@
             "duration_s": 27.39,
             "frames_native": 820,
             "frames_at_24fps": 657,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.805,
             "avg_court_frac": 0.838,
             "spans_24fps_eligible": [
@@ -433,7 +539,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "visually_verified_two_player_interval"
           },
           {
             "interval_idx": 171,
@@ -442,7 +549,7 @@
             "duration_s": 27.03,
             "frames_native": 809,
             "frames_at_24fps": 648,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.832,
             "avg_court_frac": 0.834,
             "spans_24fps_eligible": [
@@ -454,7 +561,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "visually_verified_two_player_interval"
           },
           {
             "interval_idx": 31,
@@ -463,7 +571,7 @@
             "duration_s": 26.93,
             "frames_native": 806,
             "frames_at_24fps": 646,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.766,
             "avg_court_frac": 0.785,
             "spans_24fps_eligible": [
@@ -475,7 +583,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "visually_verified_two_player_interval"
           },
           {
             "interval_idx": 202,
@@ -484,7 +593,7 @@
             "duration_s": 26.73,
             "frames_native": 800,
             "frames_at_24fps": 641,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.702,
             "avg_court_frac": 0.739,
             "spans_24fps_eligible": [
@@ -496,7 +605,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "visually_verified_two_player_interval"
           },
           {
             "interval_idx": 210,
@@ -505,7 +615,7 @@
             "duration_s": 26.56,
             "frames_native": 795,
             "frames_at_24fps": 637,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.734,
             "avg_court_frac": 0.737,
             "spans_24fps_eligible": [
@@ -517,7 +627,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "uninspected_automatic_candidate"
           },
           {
             "interval_idx": 97,
@@ -526,7 +637,7 @@
             "duration_s": 26.39,
             "frames_native": 790,
             "frames_at_24fps": 633,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.859,
             "avg_court_frac": 0.861,
             "spans_24fps_eligible": [
@@ -538,7 +649,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "uninspected_automatic_candidate"
           },
           {
             "interval_idx": 186,
@@ -547,7 +659,7 @@
             "duration_s": 26.39,
             "frames_native": 790,
             "frames_at_24fps": 633,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.845,
             "avg_court_frac": 0.857,
             "spans_24fps_eligible": [
@@ -559,7 +671,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "uninspected_automatic_candidate"
           },
           {
             "interval_idx": 128,
@@ -568,7 +681,7 @@
             "duration_s": 26.09,
             "frames_native": 781,
             "frames_at_24fps": 626,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.429,
             "avg_court_frac": 0.553,
             "spans_24fps_eligible": [
@@ -580,7 +693,8 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "uninspected_automatic_candidate"
           },
           {
             "interval_idx": 36,
@@ -589,7 +703,7 @@
             "duration_s": 25.56,
             "frames_native": 765,
             "frames_at_24fps": 613,
-            "classification": "clean_court_rally",
+            "classification": "court_like_candidate_interval",
             "min_court_frac": 0.371,
             "avg_court_frac": 0.643,
             "spans_24fps_eligible": [
@@ -601,20 +715,22 @@
             "span_16s_eligible": true,
             "span_8s_eligible": true,
             "span_4s_eligible": true,
-            "span_2s_eligible": true
+            "span_2s_eligible": true,
+            "visual_inspection": "uninspected_automatic_candidate"
           }
         ]
-      }
+      },
+      "overlap_status": "No identified match overlap with the known development assets, subject to the final prior-use audit."
     }
   ],
   "proposed_next_steps": {
     "next_gate": "E2 Gate B Phase 2 (Dense 2-Player Extraction and Invariant Gating)",
     "action_items": [
-      "Select top 2 verified clean shots per source (e.g. AO 2024 shot 57 and shot 50; US Open 2023 shot 109 and shot 31).",
+      "Select top 2 visually verified two-player intervals per source (e.g. AO 2024 shot 57 and shot 50; US Open 2023 shot 109 and shot 31).",
       "Extract source frames at 24.0 fps working rate using ffmpeg.",
       "Execute ByteTrack / BoT-SORT on YOLOv8x / SAM masks for simultaneous 2-player silhouette segmentation across 48, 96, 192, and 384 frames.",
       "Verify strict invariants: paste-back MAE <= 2.0, canvas growth <= 2.5x, consecutive MAD <= 10.0.",
-      "Update confirmation manifest only after all verification gates pass."
+      "Update confirmation manifest only after all verification gates and annotation checks pass. Note that acquired sources decode at 1920x1080/25 fps and 1280x720/30000/1001 fps and cannot independently confirm a native-4K-specific claim."
     ],
     "estimated_compute_and_time": "Extraction and SAM tracking for 4 scenes (total 1,536 frames): ~15-25 minutes GPU wall clock.",
     "estimated_storage_cost": "Source frames + masks + canvas: ~2.5 GB per source (~5.0 GB total)."
