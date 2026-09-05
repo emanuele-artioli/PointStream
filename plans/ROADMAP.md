@@ -5,7 +5,7 @@ submission scope.** `PLAN.md` is the current summary; the chronological record
 is `done/RESEARCH-HISTORY.md`. A work
 session reads `AGENTS.md`, this file, and one named brief.
 
-Last reconciled: **4 September 2026**, BP53/BP54 review and repair integration.
+Last reconciled: **5 September 2026**, BP56/BP57 review and integration.
 
 PR #52 integrated BP44–BP46, #53 repaired recovery, #55 added reference pilot
 controls. BP49/BP52 passed the native checkpoint budget only on the short
@@ -15,9 +15,14 @@ review repairs for fail-closed provenance and batch-stop behavior.
 PRs #60/#61 merged. BP53 half-scale diagnostic established no win; its driver
 identity crossing and historical timing lower bound remain explicit. Later
 standalone-client/budget checks are not native reruns. Longer runs are uncleared.
-**Next: BP56 higher-effort background pilot (Cursor), BP57 approved two-source
-acquisition/shot pilot (Antigravity), then Codex review before expansion.** Separate PointStream
-encode/decode timing remains open. `PAPER-NEXT.md` is the writing brief.
+PRs #63/#64 merged at `60a18f7`. BP56 found one PointStream-internal dominant
+candidate on a single development pair; it is a search seed, not an anchor win.
+BP57 acquired two provisional fresh sources with seven visually checked long
+shots; neither source can confirm a 4K-specific claim. **Next: design and run a
+bounded Gate-A long-context/coherent-rate search with same-identity AV1/VVC
+curves, while preparing fresh-source eligibility for Gate B.** Separate
+PointStream encode/decode timing remains open. `PAPER-NEXT.md` is the writing
+brief; `SUBMISSION-READINESS-2026-09-05.md` is the current blocker audit.
 The workstream table below describes dependencies, not a claim that every row
 is still unimplemented. Archived reports are not current launch instructions.
 

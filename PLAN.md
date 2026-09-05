@@ -17,12 +17,12 @@ It offers a compression opportunity, not a guaranteed win by construction.
 
 | Area | Verified | Remaining |
 |---|---|---|
-| Integration | PRs #60/#61 merged at f63019c; BP53/BP54 reviewed | Retire old sessions; use current main |
+| Integration | PRs #63/#64 merged at 60a18f7; BP56/BP57 reviewed | Retire their worktrees/branches after user approval |
 | Background | Offline canonical canvas per compatible context, adjusted transforms and reference reuse | Long-scene rate–quality evidence; no causal canvas construction |
 | Recovery | BP49/BP52 native short-pair checkpoint budget passed; batch stops on alarms/control mismatch | Longer-run budget still unverified; no mid-codec resume |
 | References | Same-frame AV1 QP63 and VVC QP63/51/39 diagnostic points; legal-neighbour QPs and resume | Frozen-regime curves; separate semantic encoder/client timing |
 | Fallback | Explicit conventional route with route-byte accounting | Automatic end-to-end mixed-scene scheduler is not validated |
-| Data | All seven current videos are development/training-used; manifest accepts zero confirmation matches | Acquire at least six genuinely fresh audited matches |
+| Data | Two fresh provisional sources acquired; seven sampled long shots visually checked | Validate them and add enough independent matches for Gate B |
 | Generators | No confirmed improvement over the pasted-reference control | Training parked until background and lean payload can win |
 | Evidence | No confirmed first-domain rate–quality win | Gate A, independent confirmation, core ablations, learned-codec comparison |
 | Paper | Separate Overleaf repo; BP53 scoped negative and provenance added | Final curves, supported headline claim, timing and independent confirmation |
@@ -49,22 +49,25 @@ is smaller than the control. References were left unranked (metric-file
 provenance vs origin/main). Report: `plans/BP56-background-effort-report.md`.
 No expansion is authorized.
 
+BP56's `good/cpu-used=4/CRF63` point strictly dominates its realtime CRF51
+PointStream control on one development pair (377,360 vs 474,369 bytes; VMAF
+79.339 vs 77.417). Treat it as a Gate-A seed only: n=1 and no ranked current
+AV1/VVC curve. BP57 acquired two provisional fresh matches; their native
+1080p/720p resolution cannot confirm a 4K-specific claim. Full audit:
+`plans/SUBMISSION-READINESS-2026-09-05.md`.
+
 ## Next work
 
-1. **Codex — review `plans/BP56-background-effort-report.md`** before any
-   further background-effort curve. Longer context and quality allocation remain
-   open. Do not treat this pair as a win against AV1/VVC.
-2. **Antigravity — `plans/BP57-confirmation-acquisition-pilot.md`:** user approved
-   two sources, 45 minutes each and 10 GB total; metadata/shot checks only.
-   No annotation, training or confirmation encodes.
-3. **Codex:** review BP56/BP57 before broader curves or longer contexts.
-   BP32–33 remain the cost/long-span follow-up, not disproved by this short pair.
-4. **Codex:** retain ownership of the timing contract: encoder computation,
+1. **Codex:** design a bounded Gate-A long-context/coherent-rate experiment,
+   seeded by BP56 CRF63, with new same-identity slowest-preset AV1/VVC curves.
+2. **Codex:** retain ownership of the timing contract: encoder computation,
    client decode/reconstruction and evaluation scoring need separate clocks.
    No speed claim or full publication-ready comparison until instrumented.
-5. **Antigravity — `plans/PAPER-NEXT.md`:** manuscript scope, provenance and
+3. **Antigravity/Cursor:** after approval, validate and annotate BP57 candidate
+   shots; add enough independent matches for Gate B if the n>=6 rule remains.
+4. **Antigravity — `plans/PAPER-NEXT.md`:** manuscript scope, provenance and
    page budget; **Codex** reviews delicate claims and negative findings.
-6. After a candidate win: freeze the regime, confirm it, then core ablations,
+5. After a candidate win: freeze the regime, confirm it, then core ablations,
    a credible learned-video-codec comparison and an independent second domain.
 
 All sessions return `plans/SESSION-REPORT.md` fields. Codex (or Claude if used

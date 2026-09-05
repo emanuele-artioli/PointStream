@@ -15,6 +15,7 @@ The current dispatch entry point is `../HANDOFF.md`.
 | `BP32-rate-budget.md`, `BP33-span-amortisation.md` | Byte costs and unresolved long-span scaling | Cursor; Codex interpretation |
 | `PAPER-NEXT.md` | Scope, provenance, page budget and final evidence | Antigravity; Codex review |
 | `BP37-required-behaviour.md` | Remaining behaviour-suite audit, not coverage padding | Cursor |
+| `SUBMISSION-READINESS-2026-09-05.md` | Current evidence, blockers and deadline decisions | Codex |
 
 ## Later or parked
 

@@ -1,47 +1,73 @@
-# PointStream — after BP56 measurement
+# PointStream — Gate-A experiment handoff
 
-Trigger: BP56 native three-point batch finished (exit 0). Target TOMM
-submission is 30 September; evidence freeze 20 September. Read AGENTS.md,
-PLAN.md and one assigned brief.
+Trigger: BP56/BP57 review and integration formed a clean session boundary, and
+the user requested a fresh Codex session for the decisive next steps. The TOMM
+deadline is 30 September 2026; evidence freezes 20 September. There is no
+resource outage and no PointStream job is running.
 
-## Verified state
+## Overall task
 
-BP56 ran in `/home/itec/emanuele/pointstream-bp56` from `origin/main` `a59934a`,
-freeze `6ff9936`. Report: `plans/BP56-background-effort-report.md`. Native
-outputs stay in `outputs/bp56-background-effort/`; do not rewrite them.
-Prefix/client proofs held. Control matched BP52/BP53 CRF51. Higher effort at
-CRF51 spent more bits. No AV1/VVC ranking on this identity. Longer runs are
-not cleared. BP54 remains a provisional shortlist with zero accepted
-confirmation. No winning regime is established.
+PointStream is an offline/buffered object-centric hybrid video codec. The paper
+must find a named tennis regime where its rate--quality curve beats both AV1 and
+VVC, report computation time, confirm the frozen result independently, explain
+it with core ablations, and submit by 30 September. Read `AGENTS.md`, `PLAN.md`,
+`plans/SUBMISSION-READINESS-2026-09-05.md`, then `plans/ROADMAP.md`.
 
-The paper has independent Git history in 67a9ea6275d3d9785ce57026/. Its evaluation
-now records BP53's qualified negative and the unfulfilled timing/confirmation
-requirements. Check its own AGENTS.md before editing. Completed BP49/BP51–BP54
-reports are in plans/done/; old paths are redirects, not runnable instructions.
+## Current state, verified 5 September
 
-## Immediate tasks
+- Code repo: `/home/itec/emanuele/pointstream`, `main`; PRs #63/#64 merged at
+  `60a18f7`. This handoff/status audit is the only later local change until its
+  commit is recorded.
+- BP56: merged and CI-green at `ee17a8a`. Preserve
+  `outputs/bp56-background-effort/`. `good/cpu-used=4/CRF63` strictly dominates
+  the realtime CRF51 PointStream control on one development pair. No current
+  AV1/VVC ranking or generalized win is licensed.
+- BP57: merged and CI-green at `cdd3e95`. Two provisional external sources and
+  seven visually checked long shots exist. They are not accepted confirmation
+  data and cannot confirm a native-4K-specific claim.
+- Paper repo: `67a9ea6275d3d9785ce57026/`, independent `main` at `f3421c8`. The verified build has 27 pages total: 22 through references plus 5 appendix pages.
+- Merged worktrees remain at `/home/itec/emanuele/pointstream-bp56` and
+  `/home/itec/emanuele/pointstream-bp57`. Ask the user before removing them;
+  branch deletion is the user's operation.
 
-1. Codex: review plans/BP56-background-effort-report.md. No fourth point,
-   preset grid or longer native context from this result.
-2. Antigravity: execute plans/BP57-confirmation-acquisition-pilot.md independently.
-   User approved the two named sources, <=45 minutes each and <=10 GB combined,
-   metadata/shot checks only. No annotation, training or confirmation encodes.
-3. Codex: retain BP55 timing design and longer-context recovery review.
+## Running or queued
 
-## Jobs and open questions
+No experiment or download was launched. Before GPU work, check
+`ps -u emanuele -o pid,etime,args` and `nvidia-smi`; do not kill unknown jobs.
+BP56 full points took about 66--72 minutes, mostly because of scoring, so longer
+runs need a revised explicit budget.
 
-BP56 native job finished 2026-09-04T16:24:39Z. Before allocating resources,
-check ps -u emanuele -o pid,etime,args and nvidia-smi. Do not kill unknown jobs.
-Old BP51–BP54 worktrees are retired; do not save stale editor buffers back into
-main. Their branch tips are preserved under archive/2026-09-04/ tags.
-Set PYTHONPATH to the actual checkout and keep caches on local disk.
+## Open decisions
 
-Does higher background coding effort justify curves? BP56 says not from this
-short pair alone; Codex decides. Can the two source slices provide useful long
-shots? Reports decide; neither acquisition nor a shortlist means accepted
-confirmation. New authority is required beyond BP57's caps.
-Preserve native outputs. Never overwrite a checkpoint identity to resume after
-editing code, and never turn unknown crash time into zero.
+1. Can Gate A yield negative BD-rate or low-rate-boundary dominance against both
+   anchors by 10 September?
+2. Can semantic encode/decode timing be separated without changing coded output
+   or delaying Gate A?
+3. If full-frame VMAF remains negative, activate the already declared
+   salient-object-quality thesis after 10 September?
+4. Keep Gate B at at least six independent videos? If so, at least four more
+   fresh matches are needed beyond BP57.
 
-Landmarks: PLAN.md, plans/README.md, plans/SESSION-REPORT.md, DATA.md,
-plans/done/BP53-BP54-integration.md, plans/BP55-timing-boundaries.md.
+## Immediate next steps
+
+1. Verify repo states and rebuild the paper.
+2. Write one bounded Gate-A brief: freeze development hashes, 48/96/192/384-frame
+   contexts, coherent PointStream rate settings seeded by BP56 CRF63,
+   slowest-preset AV1/VVC segmented and continuous controls, metric bounds/nulls,
+   timing fields, checkpoints, stop rules and total budget.
+3. Review it at Codex level, then dispatch routine implementation/run work to
+   Cursor. Do not launch a broad grid first.
+4. Draft a separate BP57 extraction/annotation/eligibility brief and obtain
+   authority before GPU annotation or more acquisition.
+5. Adjudicate Gate A by 10 September. Pass: freeze and confirm. Fail: activate
+   the predeclared salient-object-quality thesis.
+
+## Landmarks
+
+- `PLAN.md`, `plans/SUBMISSION-READINESS-2026-09-05.md`
+- `plans/ROADMAP.md`, `plans/SESSION-REPORT.md`
+- `plans/BP56-background-effort-report.md`
+- `plans/BP57-acquisition-report.md`, `manifests/bp57-acquisition-pilot.json`
+- `plans/BP55-timing-boundaries.md`
+- `67a9ea6275d3d9785ce57026/AGENTS.md`
+- `67a9ea6275d3d9785ce57026/sections/evaluation.tex`
