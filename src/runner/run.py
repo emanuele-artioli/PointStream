@@ -18,6 +18,7 @@ from src.contracts.conditioning import GenerationParams
 from src.contracts.config import PointstreamConfig, validate
 from src.contracts.errors import ConfigValueError
 from src.contracts.lattice import (
+    ART_APPEARANCE_PAYLOAD,
     ART_BACKGROUND_MODEL,
     ART_DELIVERED,
     ART_QUALITY,
@@ -536,13 +537,11 @@ def _finish_chunk(
     residual = bag.get(ART_RESIDUAL_STREAM)
     residual_payload = residual.payload if isinstance(residual, ResidualResult) else None
 
-    # --- Client Phase: independent byte-only client reconstruction ---
-    if sync_fn is not None:
-        sync_fn()
-    client_start = clock()
-    if lattice.is_source_passthrough:
-        _ = source.copy()
-    else:
+    # Build the transport envelope on the encoder side. The measured client
+    # interval starts only once those bytes are ready to receive.
+    wire_request: bytes | None = None
+    placements: tuple[Any, ...] = ()
+    if not lattice.is_source_passthrough:
         from src.runner.client import (
             ClientPlacement,
             reconstruct_independent_client,
@@ -550,27 +549,54 @@ def _finish_chunk(
             serialize_client_request,
         )
 
+        appearance_by_id: dict[str, bytes] = {}
+        appearance_artifact = bag.get(ART_APPEARANCE_PAYLOAD)
+        if (
+            not generation_on
+            and isinstance(appearance_artifact, dict)
+            and appearance_artifact.get("representation") == "compressed-image"
+        ):
+            appearance_items = appearance_artifact.get("items", ())
+            appearance_by_id = {
+                str(appearance_item["object_id"]): bytes(appearance_item["payload"])
+                for appearance_item in appearance_items
+                if isinstance(appearance_item, dict)
+                and isinstance(
+                    appearance_item.get("payload"),
+                    (bytes, bytearray, memoryview),
+                )
+            }
+
+        if appearance_by_id:
+            import cv2
+
+            decoded_by_id: dict[str, np.ndarray] = {}
+            for object_id, encoded_crop in appearance_by_id.items():
+                decoded_crop = cv2.imdecode(
+                    np.frombuffer(encoded_crop, dtype=np.uint8),
+                    cv2.IMREAD_COLOR,
+                )
+                if decoded_crop is None:
+                    raise ValueError("JPEG appearance payload did not decode")
+                decoded_by_id[object_id] = np.asarray(decoded_crop, dtype=np.uint8)
+            client_objects = tuple(
+                replace(item, supplied_crop=decoded_by_id[item.object_id])
+                if item.object_id in decoded_by_id
+                else item
+                for item in client_objects
+            )
         placements = tuple(
             ClientPlacement(
                 crop=item.supplied_crop if item.supplied_crop is not None else item.appearance,
                 bbox=item.bbox,
+                encoded_crop=appearance_by_id.get(item.object_id),
                 frame_index=item.frame_index,
                 mask=item.mask,
                 object_id=item.object_id,
             )
             for item in client_objects
         )
-        if residual_payload is not None:
-            _ = reconstruct_independent_client(
-                background=view,
-                frame_count=int(source.shape[0]),
-                height=int(source.shape[1]),
-                width=int(source.shape[2]),
-                placements=placements,
-                residual_payload=residual_payload,
-                resolver=resolver,
-            )
-        else:
+        if residual_payload is None:
             wire_request = serialize_client_request(
                 background=view,
                 frame_count=int(source.shape[0]),
@@ -578,7 +604,27 @@ def _finish_chunk(
                 width=int(source.shape[2]),
                 placements=placements,
             )
-            _ = reconstruct_serialized_client(wire_request, resolver=resolver)
+
+    # --- Client Phase: bytes received through delivered frames ---
+    if sync_fn is not None:
+        sync_fn()
+    client_start = clock()
+    if lattice.is_source_passthrough:
+        _ = source.copy()
+    elif residual_payload is not None:
+        _ = reconstruct_independent_client(
+            background=view,
+            frame_count=int(source.shape[0]),
+            height=int(source.shape[1]),
+            width=int(source.shape[2]),
+            placements=placements,
+            residual_payload=residual_payload,
+            resolver=resolver,
+        )
+    else:
+        if wire_request is None:
+            raise RuntimeError("serialized client request was not prepared")
+        _ = reconstruct_serialized_client(wire_request, resolver=resolver)
     if sync_fn is not None:
         sync_fn()
     client_seconds = clock() - client_start

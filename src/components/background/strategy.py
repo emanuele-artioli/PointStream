@@ -98,6 +98,22 @@ class BackgroundModel:
             return "none"
         return self._sidecar.codec_id
 
+    def client_wire_packets(
+        self, artifact: BackgroundArtifact
+    ) -> tuple[TransmittedBackground, ...]:
+        """Wire packets needed to decode this artifact on an independent client."""
+        return (
+            TransmittedBackground(
+                payload=bytes(artifact.payload),
+                geometry_header=bytes(artifact.geometry_header),
+            ),
+        )
+
+    @property
+    def client_wire_codec(self) -> str | None:
+        """Temporal codec name when the packet needs stream-chain decoding."""
+        return None
+
     def export_stream_state(self) -> dict[str, Any] | None:
         """None unless this model holds a cross-scene encoder."""
         return None
@@ -570,6 +586,23 @@ class PanoramaStream(BackgroundModel):
         self.last_resample_seconds["upsample"] = time.perf_counter() - started
         return restored
 
+    def client_wire_packets(
+        self, artifact: BackgroundArtifact
+    ) -> tuple[TransmittedBackground, ...]:
+        """Packets from the active keyframe through ``artifact``."""
+        _ = artifact
+        return tuple(
+            TransmittedBackground(
+                payload=bytes(item.payload),
+                geometry_header=bytes(item.geometry_header),
+            )
+            for item in self._wire
+        )
+
+    @property
+    def client_wire_codec(self) -> str | None:
+        return str(self._transmitter.codec)
+
     def client_plate(self, artifact: BackgroundArtifact) -> np.ndarray:
         """Restore from copied payload and charged header bytes only.
 
@@ -618,9 +651,13 @@ class PanoramaStream(BackgroundModel):
             "canvas": asdict(self._canvas) if self._canvas is not None else None,
             "alignments": [item.tolist() for item in self._alignments],
             "groups": [
-                {"start": group.start, "end": group.end, "context_id": group.context_id,
-                 "canvas": asdict(group.canvas),
-                 "alignments": [item.tolist() for item in group.alignments]}
+                {
+                    "start": group.start,
+                    "end": group.end,
+                    "context_id": group.context_id,
+                    "canvas": asdict(group.canvas),
+                    "alignments": [item.tolist() for item in group.alignments],
+                }
                 for group in self._groups
             ],
         }
@@ -634,9 +671,8 @@ class PanoramaStream(BackgroundModel):
             )
         saved_usage = str(state.get("stream_usage", "realtime"))
         saved_cpu = int(state.get("stream_cpu_used", 8))
-        if (
-            saved_usage != self._transmitter.stream_usage
-            or saved_cpu != int(self._transmitter.stream_cpu_used)
+        if saved_usage != self._transmitter.stream_usage or saved_cpu != int(
+            self._transmitter.stream_cpu_used
         ):
             raise ValueError(
                 "stream state encoder effort does not match this model "
@@ -650,10 +686,13 @@ class PanoramaStream(BackgroundModel):
         self._alignments = tuple(np.asarray(item) for item in state["alignments"])
         self._groups = tuple(
             PreparedContext(
-                start=group["start"], end=group["end"], context_id=group["context_id"],
+                start=group["start"],
+                end=group["end"],
+                context_id=group["context_id"],
                 canvas=CanonicalCanvas(**group["canvas"]),
                 alignments=tuple(np.asarray(item) for item in group["alignments"]),
-            ) for group in state["groups"]
+            )
+            for group in state["groups"]
         )
         self._rebuild_emitted(state)
 
@@ -666,8 +705,7 @@ class PanoramaStream(BackgroundModel):
         orig_w = int(self._canvas.width) if self._canvas is not None else 0
         orig_h = int(self._canvas.height) if self._canvas is not None else 0
         saved_headers = [
-            bytes.fromhex(item)
-            for item in (state or {}).get("geometry_headers") or []
+            bytes.fromhex(item) for item in (state or {}).get("geometry_headers") or []
         ]
         for index, (chain, blob) in enumerate(
             zip(exported["chains"], exported["payloads"], strict=True)
@@ -695,13 +733,9 @@ class PanoramaStream(BackgroundModel):
                 ).pack()
             else:
                 header_bytes = b""
-            self._wire.append(
-                TransmittedBackground(payload=payload, geometry_header=header_bytes)
-            )
+            self._wire.append(TransmittedBackground(payload=payload, geometry_header=header_bytes))
         self.last_scene = self._emitted[-1] if self._emitted else None
-        self._receiver.import_payloads(
-            {scene.index: scene.payload for scene in self._emitted}
-        )
+        self._receiver.import_payloads({scene.index: scene.payload for scene in self._emitted})
 
 
 class BackgroundNone(BackgroundModel):

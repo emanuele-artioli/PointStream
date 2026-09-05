@@ -37,6 +37,7 @@ class ClientPlacement:
 
     crop: np.ndarray
     bbox: tuple[int, int, int, int]
+    encoded_crop: bytes | None = None
     frame_index: int = 0
     mask: np.ndarray | None = None
     object_id: str = "object"
@@ -128,9 +129,20 @@ def serialize_client_request(
     background_meta: dict[str, Any] | None = None
     if background is not None:
         plate_key = None
-        if background.plate is not None:
+        if background.plate is not None and background.wire_codec is None:
             plate_key = "background_plate"
             arrays[plate_key] = np.asarray(background.plate, dtype=np.uint8)
+        wire_payload_keys = []
+        wire_header_keys = []
+        for packet_index, packet in enumerate(background.wire_payloads):
+            payload_key = f"background_payload_{packet_index}"
+            header_key = f"background_header_{packet_index}"
+            arrays[payload_key] = np.frombuffer(packet, dtype=np.uint8)
+            arrays[header_key] = np.frombuffer(
+                background.wire_geometry_headers[packet_index], dtype=np.uint8
+            )
+            wire_payload_keys.append(payload_key)
+            wire_header_keys.append(header_key)
         background_meta = {
             "plate_key": plate_key,
             "homographies": background.homographies,
@@ -142,11 +154,20 @@ def serialize_client_request(
             "payload_bytes": background.payload_bytes,
             "geometry_header": background.geometry_header.hex(),
             "geometry_header_bytes": background.geometry_header_bytes,
+            "wire_payload_keys": wire_payload_keys,
+            "wire_header_keys": wire_header_keys,
+            "wire_codec": background.wire_codec,
+            "wire_codec_id": background.wire_codec_id,
         }
     placement_meta: list[dict[str, Any]] = []
     for index, placement in enumerate(placements):
         crop_key = f"crop_{index}"
-        arrays[crop_key] = np.asarray(placement.crop, dtype=np.uint8)
+        encoded_crop_key = None
+        if placement.encoded_crop is not None:
+            encoded_crop_key = f"encoded_crop_{index}"
+            arrays[encoded_crop_key] = np.frombuffer(placement.encoded_crop, dtype=np.uint8)
+        if placement.encoded_crop is None:
+            arrays[crop_key] = np.asarray(placement.crop, dtype=np.uint8)
         mask_key = None
         if placement.mask is not None:
             mask_key = f"mask_{index}"
@@ -154,6 +175,7 @@ def serialize_client_request(
         placement_meta.append(
             {
                 "crop_key": crop_key,
+                "encoded_crop_key": encoded_crop_key,
                 "mask_key": mask_key,
                 "bbox": placement.bbox,
                 "frame_index": placement.frame_index,
@@ -190,6 +212,25 @@ def reconstruct_serialized_client(
             plate = None
             if bg_meta["plate_key"] is not None:
                 plate = np.asarray(arrays[bg_meta["plate_key"]], dtype=np.uint8)
+            wire_codec = bg_meta.get("wire_codec")
+            if wire_codec is not None:
+                from src.components.background.scale import (
+                    TransmittedBackground,
+                    decode_transmitted_stream,
+                )
+
+                packets = tuple(
+                    TransmittedBackground(
+                        payload=np.asarray(arrays[payload_key], dtype=np.uint8).tobytes(),
+                        geometry_header=np.asarray(arrays[header_key], dtype=np.uint8).tobytes(),
+                    )
+                    for payload_key, header_key in zip(
+                        bg_meta["wire_payload_keys"],
+                        bg_meta["wire_header_keys"],
+                        strict=True,
+                    )
+                )
+                plate = decode_transmitted_stream(str(wire_codec), packets)
             background = BackgroundModelView(
                 plate=plate,
                 homographies=tuple(tuple(row) for row in bg_meta["homographies"]),
@@ -201,9 +242,24 @@ def reconstruct_serialized_client(
                 payload_bytes=bg_meta["payload_bytes"],
                 geometry_header=bytes.fromhex(bg_meta["geometry_header"]),
                 geometry_header_bytes=int(bg_meta["geometry_header_bytes"]),
+                wire_payloads=(),
+                wire_geometry_headers=(),
+                wire_codec=str(wire_codec) if wire_codec is not None else None,
+                wire_codec_id=bg_meta.get("wire_codec_id"),
             )
         placements = []
         for item in metadata["placements"]:
+            encoded_crop_key = item.get("encoded_crop_key")
+            if encoded_crop_key is not None:
+                import cv2
+
+                encoded = np.asarray(arrays[encoded_crop_key], dtype=np.uint8)
+                decoded_crop = cv2.imdecode(encoded, cv2.IMREAD_COLOR)
+                if decoded_crop is None:
+                    raise ValueError("JPEG appearance payload did not decode")
+                crop = np.asarray(decoded_crop, dtype=np.uint8)
+            else:
+                crop = np.asarray(arrays[item["crop_key"]], dtype=np.uint8)
             bbox = item["bbox"]
             if len(bbox) != 4:
                 raise ValueError("client placement bbox must have four coordinates")
@@ -212,7 +268,7 @@ def reconstruct_serialized_client(
                 mask = np.asarray(arrays[item["mask_key"]], dtype=np.uint8).astype(bool)
             placements.append(
                 ClientPlacement(
-                    crop=np.asarray(arrays[item["crop_key"]], dtype=np.uint8),
+                    crop=crop,
                     bbox=(int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])),
                     frame_index=int(item["frame_index"]),
                     mask=mask,

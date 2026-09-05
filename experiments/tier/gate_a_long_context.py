@@ -15,8 +15,10 @@ Use --dry-run for pipeline validation.
 from __future__ import annotations
 
 import argparse
+import atexit
 import os
 import time
+import threading
 from dataclasses import asdict, dataclass, replace
 import json
 from pathlib import Path
@@ -283,6 +285,8 @@ POOL_LIMITS = {
     "controls": 16.0 * 3600.0,
 }
 TOTAL_LIMIT_SECONDS = 120.0 * 3600.0
+ELAPSED_LIMIT_SECONDS = 96.0 * 3600.0
+HEARTBEAT_INTERVAL_SECONDS = 600.0
 
 
 def _budget_state(path: Path) -> dict[str, Any]:
@@ -290,10 +294,51 @@ def _budget_state(path: Path) -> dict[str, Any]:
         return json.loads(path.read_text(encoding="utf-8"))
     return {
         "total_limit_seconds": TOTAL_LIMIT_SECONDS,
+        "elapsed_limit_seconds": ELAPSED_LIMIT_SECONDS,
+        "native_started_unix": time.time(),
         "pool_limits_seconds": POOL_LIMITS,
         "pool_spent_seconds": {name: 0.0 for name in POOL_LIMITS},
         "events": [],
     }
+
+
+def _initialize_budget(path: Path) -> None:
+    if not path.is_file():
+        write_json(path, _budget_state(path))
+
+
+def _require_elapsed_budget(path: Path) -> None:
+    state = _budget_state(path)
+    elapsed = time.time() - float(state["native_started_unix"])
+    if elapsed >= float(state["elapsed_limit_seconds"]):
+        raise SystemExit("Gate A 96-hour elapsed wall budget exhausted")
+
+
+def _progress(path: Path, event: str, **fields: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    record = {"unix": time.time(), "event": event, **fields}
+    with path.open("a", encoding="utf-8") as stream:
+        stream.write(json.dumps(record, sort_keys=True) + "\n")
+        stream.flush()
+
+
+def _start_heartbeat(destination: Path) -> None:
+    log_path = destination / "heartbeat.jsonl"
+    stopped = threading.Event()
+
+    def beat() -> None:
+        while not stopped.wait(HEARTBEAT_INTERVAL_SECONDS):
+            _progress(log_path, "heartbeat")
+
+    _progress(log_path, "native-driver-start")
+    thread = threading.Thread(target=beat, name="gate-a-heartbeat", daemon=True)
+    thread.start()
+
+    def finish() -> None:
+        stopped.set()
+        _progress(log_path, "native-driver-stop")
+
+    atexit.register(finish)
 
 
 def _charge(path: Path, pool: str, name: str, seconds: float) -> None:
@@ -328,16 +373,61 @@ def _checkpointed(
     previous = load_checkpoint(points, name)
     if previous is not None:
         return previous
+    attempt_path = points / f"{name}.attempt.json"
+    attempt_state = (
+        json.loads(attempt_path.read_text(encoding="utf-8"))
+        if attempt_path.is_file()
+        else {"attempts": 0}
+    )
+    attempt_number = int(attempt_state.get("attempts", 0)) + 1
+    if attempt_number > 2:
+        raise SystemExit(f"Gate A {name} already used its one permitted retry")
+    write_json(
+        attempt_path,
+        {
+            "name": name,
+            "pool": pool,
+            "attempts": attempt_number,
+            "status": "running",
+            "started_unix": time.time(),
+        },
+    )
+    _require_elapsed_budget(budget_path)
+    _progress(points.parent / "heartbeat.jsonl", "operation-start", name=name, pool=pool)
     _require_budget_reserve(budget_path, pool)
     started = time.perf_counter()
     try:
         row = operation()
     except BaseException:
+        write_json(
+            attempt_path,
+            {
+                "name": name,
+                "pool": pool,
+                "attempts": attempt_number,
+                "status": "failed",
+                "elapsed_seconds": time.perf_counter() - started,
+                "charged": True,
+            },
+        )
+        _progress(points.parent / "heartbeat.jsonl", "operation-failed", name=name, pool=pool)
         _charge(budget_path, pool, f"{name}:failed", time.perf_counter() - started)
         raise
     elapsed = time.perf_counter() - started
     row["attempt_wall_seconds"] = elapsed
     save_checkpoint(points, name, row)
+    write_json(
+        attempt_path,
+        {
+            "name": name,
+            "pool": pool,
+            "attempts": attempt_number,
+            "status": "complete",
+            "elapsed_seconds": elapsed,
+            "charged": True,
+        },
+    )
+    _progress(points.parent / "heartbeat.jsonl", "operation-complete", name=name, pool=pool)
     _charge(budget_path, pool, name, elapsed)
     return row
 
@@ -412,6 +502,8 @@ def run_native_duration(destination: Path, n_frames: int) -> dict[str, Any]:
     destination.mkdir(parents=True, exist_ok=True)
     points = destination / "points"
     budget_path = destination / "budget.json"
+    _initialize_budget(budget_path)
+    _start_heartbeat(destination)
     tools = write_tool_identity(destination)
     identity = build_gate_a_identity(
         destination,
@@ -534,7 +626,7 @@ def run_native_duration(destination: Path, n_frames: int) -> dict[str, Any]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--frames", type=int, default=48, choices=[48, 96, 192])
+    parser.add_argument("--frames", type=int, default=48, choices=[48, 96, 192, 384])
     parser.add_argument("--out-dir", default=None)
     parser.add_argument("--dry-run", action="store_true", default=False)
     parser.add_argument("--native", action="store_true", default=False)

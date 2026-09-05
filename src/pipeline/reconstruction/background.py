@@ -53,6 +53,13 @@ class BackgroundModelView:
     # Length of the charged geometry header. Used when only the length was
     # recorded. Counted as metadata, not panorama.
     geometry_header_bytes: int = 0
+    # Raw transport retained for the independent client. A stream view carries
+    # packets from its current keyframe through this scene; a still sidecar
+    # carries one payload. Client timing decodes these bytes, never `plate`.
+    wire_payloads: tuple[bytes, ...] = ()
+    wire_geometry_headers: tuple[bytes, ...] = ()
+    wire_codec: str | None = None
+    wire_codec_id: str | None = None
 
     def charged_geometry_header_bytes(self) -> int:
         if self.geometry_header:
@@ -192,14 +199,18 @@ def _is_identity(matrix: np.ndarray) -> bool:
     return bool(np.allclose(matrix, np.eye(3), atol=1e-7))
 
 
-def _warp_one(plate: np.ndarray, frame_to_plate: np.ndarray, *, height: int, width: int) -> np.ndarray:
+def _warp_one(
+    plate: np.ndarray, frame_to_plate: np.ndarray, *, height: int, width: int
+) -> np.ndarray:
     plate_h, plate_w = plate.shape[:2]
     if _is_identity(frame_to_plate) and plate_h == height and plate_w == width:
         return np.asarray(plate, dtype=np.uint8).copy()
     try:
         inverse = np.linalg.inv(frame_to_plate)
     except np.linalg.LinAlgError as exc:
-        raise ValueError("homography is singular; cannot warp the plate back to the frame.") from exc
+        raise ValueError(
+            "homography is singular; cannot warp the plate back to the frame."
+        ) from exc
     return cv2.warpPerspective(
         plate,
         inverse,

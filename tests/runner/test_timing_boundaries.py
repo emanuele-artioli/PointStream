@@ -213,3 +213,47 @@ def test_serialized_client_rejects_live_object() -> None:
 
     with pytest.raises(TypeError, match="must be bytes"):
         reconstruct_serialized_client({})  # type: ignore[arg-type]
+
+
+def test_serialized_client_decodes_raw_background_stream(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The client must decode copied codec bytes instead of accepting encoder pixels."""
+    from src.components.background import scale
+    from src.pipeline.reconstruction.background import BackgroundModelView
+    from src.runner.client import reconstruct_serialized_client, serialize_client_request
+
+    decoded_plate = np.full((4, 4, 3), 17, dtype=np.uint8)
+    seen: dict[str, object] = {}
+
+    def fake_decode(codec: str, packets: object) -> np.ndarray:
+        packet_tuple = tuple(packets)  # type: ignore[arg-type]
+        seen["codec"] = codec
+        seen["payloads"] = tuple(packet.payload for packet in packet_tuple)
+        seen["headers"] = tuple(packet.geometry_header for packet in packet_tuple)
+        return decoded_plate
+
+    monkeypatch.setattr(scale, "decode_transmitted_stream", fake_decode)
+    background = BackgroundModelView(
+        plate=np.full((4, 4, 3), 255, dtype=np.uint8),
+        width=4,
+        height=4,
+        payload_bytes=2,
+        wire_payloads=(b"i", b"p"),
+        wire_geometry_headers=(b"h0", b"h1"),
+        wire_codec="av1",
+        wire_codec_id="av1 low-delay test",
+    )
+    payload = serialize_client_request(
+        background=background,
+        frame_count=1,
+        height=4,
+        width=4,
+    )
+
+    reconstructed = reconstruct_serialized_client(payload)
+
+    assert seen == {
+        "codec": "av1",
+        "payloads": (b"i", b"p"),
+        "headers": (b"h0", b"h1"),
+    }
+    assert np.array_equal(reconstructed[0], decoded_plate)
