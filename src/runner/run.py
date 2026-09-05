@@ -61,6 +61,52 @@ from src.runner.stages import (
 )
 
 
+def sync_gpu() -> None:
+    """Synchronize CUDA if torch is imported and CUDA is available.
+
+    Never imports torch if it has not been imported.
+    """
+    import sys
+
+    torch_mod = sys.modules.get("torch")
+    if torch_mod is not None:
+        try:
+            if torch_mod.cuda.is_available():
+                torch_mod.cuda.synchronize()
+        except Exception:
+            pass
+
+
+def get_gpu_info() -> str | None:
+    """Return primary CUDA device name if torch is loaded and CUDA is available."""
+    import sys
+
+    torch_mod = sys.modules.get("torch")
+    if torch_mod is not None:
+        try:
+            if torch_mod.cuda.is_available():
+                return str(torch_mod.cuda.get_device_name(0))
+        except Exception:
+            pass
+    return None
+
+
+def get_cpu_info() -> str:
+    """Return CPU processor or architecture description."""
+    import platform
+
+    proc = platform.processor()
+    return proc if proc else platform.machine()
+
+
+def get_peak_memory_bytes() -> int:
+    """Return peak memory in bytes for the calling process."""
+    import resource
+
+    # On Linux ru_maxrss is in KiB
+    return int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024)
+
+
 @dataclass(frozen=True)
 class ChunkResult:
     """One chunk after the single run path."""
@@ -77,6 +123,9 @@ class ChunkResult:
     sizes: SizesBytes
     symmetry: Closeness
     bag: dict[str, object]
+    encoder_seconds: float = 0.0
+    client_seconds: float = 0.0
+    evaluation_seconds: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -104,6 +153,9 @@ class RunResult:
     stage_seconds: tuple[dict[str, float], ...] = ()
     timing: dict[str, Any] = field(default_factory=dict)
     phase_seconds: dict[str, float] = field(default_factory=dict)
+    encoder_seconds: float = 0.0
+    client_seconds: float = 0.0
+    evaluation_seconds: float = 0.0
 
     @property
     def sizes_bytes(self) -> dict[str, int | float]:
@@ -132,6 +184,8 @@ def run(
     checkpoint_dir: Path | str | None = None,
     heartbeat_interval: float | None = 600.0,
     checkpoint_identity: str | None = None,
+    clock: Callable[[], float] = time.perf_counter,
+    sync_fn: Callable[[], None] | None = sync_gpu,
     **kwargs: Any,
 ) -> RunResult:
     """Run with identity-checked recovery and whole-invocation progress.
@@ -140,10 +194,11 @@ def run(
     describing their implementation/configuration; opaque state is not guessed.
     A hard-killed attempt makes cumulative time a labelled lower bound.
     """
+    import platform
     from src.pipeline.dag.heartbeat import Heartbeat
     from src.runner.recovery import RecoverySession, runner_identity
 
-    started = time.monotonic()
+    started = clock()
     session = None
     with Heartbeat("runner (including preparation, recovery and scoring)", interval_s=heartbeat_interval):
         if checkpoint_dir is not None:
@@ -156,19 +211,71 @@ def run(
                 config.background.context_id or "run" for _ in chunks
             )
             identity = runner_identity(config, chunks, kwargs.get("objects"), contexts, checkpoint_identity)
-            session = RecoverySession(Path(checkpoint_dir), identity, started_at=started)
+            session = RecoverySession(Path(checkpoint_dir), identity, started_at=started, clock=clock)
         try:
-            result = _run(config, chunks, context_ids=context_ids, checkpoint_dir=checkpoint_dir,
-                          heartbeat_interval=heartbeat_interval, recovery_session=session, **kwargs)
+            result = _run(
+                config,
+                chunks,
+                context_ids=context_ids,
+                checkpoint_dir=checkpoint_dir,
+                heartbeat_interval=heartbeat_interval,
+                recovery_session=session,
+                clock=clock,
+                sync_fn=sync_fn,
+                **kwargs,
+            )
         except BaseException:
             if session is not None:
                 session.finish(success=False)
             raise
-        elapsed = time.monotonic() - started
-        timing = session.finish(success=True) if session is not None else {
-            "invocation_seconds": elapsed, "run_seconds": elapsed, "timing_complete": True,
-            "run_seconds_lower_bound": elapsed, "attempts": 1,
-        }
+        elapsed = clock() - started
+
+        lost_work_lower_bound = 0.0
+        timing: dict[str, Any] = {}
+        if session is not None:
+            recovery_timing = session.finish(success=True)
+            lost_work_lower_bound = sum(
+                float(item["seconds"]) for item in session.attempts if item.get("status") == "interrupted"
+            )
+            timing.update(recovery_timing)
+        else:
+            timing = {
+                "invocation_seconds": elapsed,
+                "run_seconds": elapsed,
+                "timing_complete": True,
+                "run_seconds_lower_bound": elapsed,
+                "attempts": 1,
+            }
+
+        steady_state: dict[str, float] = {}
+        if len(result.chunks) > 1:
+            steady_state = {
+                "encoder_seconds": sum(c.encoder_seconds for c in result.chunks[1:]),
+                "client_seconds": sum(c.client_seconds for c in result.chunks[1:]),
+                "evaluation_seconds": sum(c.evaluation_seconds for c in result.chunks[1:]),
+            }
+        elif result.chunks:
+            steady_state = {
+                "encoder_seconds": result.chunks[0].encoder_seconds,
+                "client_seconds": result.chunks[0].client_seconds,
+                "evaluation_seconds": result.chunks[0].evaluation_seconds,
+            }
+
+        timing.update({
+            "encoder_seconds": result.encoder_seconds,
+            "client_seconds": result.client_seconds,
+            "evaluation_seconds": result.evaluation_seconds,
+            "cold_initialization": result.phase_seconds.get("cold_initialization", 0.0),
+            "preparation": result.phase_seconds.get("preparation", 0.0),
+            "steady_state": steady_state,
+            "attempt_wall": elapsed,
+            "checkpoint_io_seconds": result.phase_seconds.get("checkpoint_io", 0.0),
+            "recovery_lost_work_lower_bound": lost_work_lower_bound,
+            "host": platform.node(),
+            "gpu": get_gpu_info(),
+            "cpu": get_cpu_info(),
+            "peak_memory_bytes": get_peak_memory_bytes(),
+        })
         return replace(result, timing=timing)
 
 
@@ -187,43 +294,10 @@ def _run(
     checkpoint_dir: Path | str | None = None,
     heartbeat_interval: float | None = 600.0,
     recovery_session: Any = None,
+    clock: Callable[[], float] = time.perf_counter,
+    sync_fn: Callable[[], None] | None = sync_gpu,
 ) -> RunResult:
-    """Encode, reconstruct, score, and account every chunk.
-
-    Args:
-        config: The lattice corner and residual knobs. ``validate`` runs, but
-            this function does not call ``assert_coherent`` — C2 does that
-            inside ``Encoder.build`` once the generator's ``requires`` are
-            known.
-        chunks: Source clips, already arrays, in track order. A lone clip is
-            still this loop. Do not rebuild filenames.
-        backends: Optional roster overlay. Disabled-stage callables that sit
-            in this mapping must not be invoked.
-        generator: Injected ``GeneratorRef``. Ignored when generation is off.
-        bind_generator_fn: Constructs the ref only if generation is on and
-            ``generator`` was not passed. All-off must not call this.
-        evaluator: Injected scorer. Defaults to C1's numpy PSNR floor.
-        objects: Per-chunk ``ObjectRequest`` tuples, aligned with ``chunks``.
-        components: Optional already-built perception backends (``detector``,
-            ``pose``, ``segmenter``, ``appearance``, ``motion``, ``temporal``).
-            Tests use this so a name swap does not load YOLO. A real run leaves
-            it empty and routing builds from the config the first time a stage
-            needs the backend.
-        builders: Optional per-axis factory ``(name, **kwargs) -> backend``.
-            Changing a config name must change which factory argument is
-            passed; that is the proof the name reaches the run.
-        context_ids: Per-chunk background context. Aligned with ``chunks``.
-            Scenes that share an id may share a canvas and a predictive stream;
-            a change is a new independently coded background. Default is the
-            config's ``background.context_id``, or ``"run"`` for every chunk.
-        checkpoint_dir: When set, each finished chunk is written here and a
-            later call with the same directory skips those chunks. Per-point
-            JSON cannot resume a killed encoder subprocess. The timing record
-            checks whether gaps between durable checkpoints stayed under an
-            hour; a single long stage can still exceed that budget.
-        heartbeat_interval: Seconds between still-running lines inside a
-            blocked stage. ``None`` disables the heartbeat.
-    """
+    """Encode, reconstruct, score, and account every chunk."""
     if not chunks:
         raise ValueError("run needs at least one source chunk; a reconstruction of nothing cannot be scored.")
     if objects is not None and len(objects) != len(chunks):
@@ -237,6 +311,7 @@ def _run(
             "Pair by track position, one id per chunk."
         )
 
+    cold_init_start = clock()
     validate(config)
     lattice = config.stages
     generation_on = lattice.is_enabled(STAGE_GENERATION)
@@ -279,6 +354,7 @@ def _run(
 
     results: list[ChunkResult] = []
     all_stage_seconds: list[dict[str, float]] = []
+    checkpoint_io_seconds = 0.0
     ckpt = Path(checkpoint_dir) if checkpoint_dir is not None else None
     done = completed_indices(ckpt) if ckpt is not None else ()
     if len(done) > len(prepared):
@@ -287,7 +363,9 @@ def _run(
     if ckpt is not None:
         resume_root = ckpt
         for index in done:
+            t_io = clock()
             chunk, seconds, background_state, bg_index = load_chunk(resume_root, index)
+            checkpoint_io_seconds += clock() - t_io
             results.append(chunk)
             all_stage_seconds.append(seconds)
             print(f"resume chunk {index} ({seconds})", flush=True)
@@ -295,19 +373,32 @@ def _run(
             ctx.background_chunk_index = bg_index
 
     if not done and ckpt is not None and (ckpt / "prepared").exists():
+        t_io = clock()
         restore_state = load_background(ckpt)
+        checkpoint_io_seconds += clock() - t_io
     ctx.background_restore_state = restore_state
-    preparation_started = time.monotonic()
+
+    if sync_fn is not None:
+        sync_fn()
+    preparation_started = clock()
     roster = bind_backends(ctx, backends)
-    phase_seconds = {"preparation": time.monotonic() - preparation_started}
+    if sync_fn is not None:
+        sync_fn()
+    preparation_seconds = clock() - preparation_started
+    phase_seconds = {"preparation": preparation_seconds}
     print(f"runner preparation {phase_seconds['preparation']:.1f}s", flush=True)
+
     if ckpt is not None and not (ckpt / "prepared").exists():
+        t_io = clock()
         model = ctx.background_model
         save_background(ckpt, model.export_stream_state() if model is not None else None)
+        checkpoint_io_seconds += clock() - t_io
         if recovery_session is not None:
             recovery_session.checkpoint()
     conditioning = tuple(ref.requires) if ref is not None else ()
     encoder = Encoder.build(lattice, roster, conditioning=conditioning)
+    cold_init_seconds = clock() - cold_init_start
+    phase_seconds["cold_initialization"] = cold_init_seconds
 
     for index, source in enumerate(prepared):
         if index in done:
@@ -323,9 +414,15 @@ def _run(
             {SOURCE: source, OBJECTS: chunk_objects},
             on_stage=_on_stage,
             heartbeat_interval=heartbeat_interval,
+            clock=clock,
+            sync_fn=sync_fn,
         )
-        finish_started = time.monotonic()
-        chunk = _finish_chunk(
+
+        chunk_encoder_stages = [v for k, v in stage_seconds.items() if k != "metrics"]
+        chunk_encoder_seconds = sum(chunk_encoder_stages)
+        metrics_stage_seconds = stage_seconds.get("metrics", 0.0)
+
+        chunk, chunk_client_seconds, chunk_eval_extra = _finish_chunk(
             bag=bag,
             source=source,
             lattice=lattice,
@@ -336,12 +433,23 @@ def _run(
             seed=config.run.seed,
             params=ctx.params,
             objects=chunk_objects,
+            clock=clock,
+            sync_fn=sync_fn,
+            chunk_encoder_seconds=chunk_encoder_seconds,
         )
-        stage_seconds["finish_chunk"] = time.monotonic() - finish_started
+        chunk_eval_seconds = metrics_stage_seconds + chunk_eval_extra
+        chunk = replace(
+            chunk,
+            encoder_seconds=chunk_encoder_seconds,
+            client_seconds=chunk_client_seconds,
+            evaluation_seconds=chunk_eval_seconds,
+        )
+        stage_seconds["finish_chunk"] = chunk_client_seconds + chunk_eval_extra
         print(f"chunk {index} finish/scoring {stage_seconds['finish_chunk']:.1f}s", flush=True)
         results.append(chunk)
         all_stage_seconds.append(stage_seconds)
         if ckpt is not None:
+            t_io = clock()
             model = ctx.background_model
             state = model.export_stream_state() if model is not None else None
             save_chunk(
@@ -352,16 +460,31 @@ def _run(
                 background_state=state,
                 background_chunk_index=ctx.background_chunk_index,
             )
+            checkpoint_io_seconds += clock() - t_io
             print(f"checkpointed chunk {index}", flush=True)
             if recovery_session is not None:
                 recovery_session.checkpoint()
 
-    assembly_started = time.monotonic()
+    if sync_fn is not None:
+        sync_fn()
+    assembly_started = clock()
     result = _assemble(
-        results, lattice=lattice, scorer=scorer, stage_seconds=tuple(all_stage_seconds)
+        results,
+        lattice=lattice,
+        scorer=scorer,
+        stage_seconds=tuple(all_stage_seconds),
+        preparation_seconds=phase_seconds.get("preparation", 0.0),
     )
-    phase_seconds["assembly_scoring"] = time.monotonic() - assembly_started
-    return replace(result, phase_seconds=phase_seconds)
+    if sync_fn is not None:
+        sync_fn()
+    assembly_eval_seconds = clock() - assembly_started
+    phase_seconds["assembly_scoring"] = assembly_eval_seconds
+    phase_seconds["checkpoint_io"] = checkpoint_io_seconds
+    return replace(
+        result,
+        phase_seconds=phase_seconds,
+        evaluation_seconds=result.evaluation_seconds + assembly_eval_seconds,
+    )
 
 
 def _finish_chunk(
@@ -376,7 +499,10 @@ def _finish_chunk(
     seed: int,
     params: GenerationParams,
     objects: tuple[ObjectRequest, ...],
-) -> ChunkResult:
+    clock: Callable[[], float] = time.perf_counter,
+    sync_fn: Callable[[], None] | None = None,
+    chunk_encoder_seconds: float = 0.0,
+) -> tuple[ChunkResult, float, float]:
     delivered_quality = bag.get(ART_QUALITY)
     if not isinstance(delivered_quality, QualityReport):
         raise ConfigValueError(
@@ -387,6 +513,36 @@ def _finish_chunk(
 
     view = _as_background(bag.get(ART_BACKGROUND_MODEL) or bag.get(STAGE_BACKGROUND))
     client_objects = _subjects_for_reconstruct(bag) or objects
+    residual = bag.get(ART_RESIDUAL_STREAM)
+    residual_payload = residual.payload if isinstance(residual, ResidualResult) else None
+
+    # --- Client Phase: independent byte-only client reconstruction ---
+    if sync_fn is not None:
+        sync_fn()
+    client_start = clock()
+    if lattice.is_source_passthrough:
+        _ = source.copy()
+    else:
+        from src.runner.client import reconstruct_independent_client
+
+        _ = reconstruct_independent_client(
+            background=view,
+            frame_count=int(source.shape[0]),
+            height=int(source.shape[1]),
+            width=int(source.shape[2]),
+            placements=(),
+            residual_payload=residual_payload,
+            resolver=resolver,
+        )
+    if sync_fn is not None:
+        sync_fn()
+    client_seconds = clock() - client_start
+
+    # --- Evaluation Phase: reconstruct & metric evaluation ---
+    if sync_fn is not None:
+        sync_fn()
+    eval_start = clock()
+
     client = reconstruct(
         ReconstructionRequest(
             lattice=lattice,
@@ -406,7 +562,6 @@ def _finish_chunk(
             "reconstruct() returned no QualityReport. Every path must score.",
         )
 
-    residual = bag.get(ART_RESIDUAL_STREAM)
     if isinstance(residual, ResidualResult):
         frames = apply_residual(client.frames, residual.payload)
         encoder_frames = residual.reconstructed
@@ -414,15 +569,13 @@ def _finish_chunk(
         frames = client.frames
         encoder_frames = _encoder_frames(bag, client.frames)
 
-    # Both sides at the same point in the pipeline. `residual.reconstructed` is
-    # the encoder's own copy *after* the residual is applied, so it belongs
-    # against the client's clip after the residual, not against the client's
-    # unaided reconstruction. Comparing across that step measured the residual
-    # rather than the encoder/client gap, and reported a mismatch on every
-    # corner where the residual does anything at all.
     symmetry = measure_symmetry(encoder_frames, frames)
+    if sync_fn is not None:
+        sync_fn()
+    eval_seconds = clock() - eval_start
+
     sizes = ledger_from_bag(bag, source)
-    return ChunkResult(
+    chunk = ChunkResult(
         frames=frames,
         encoder_frames=encoder_frames,
         reconstruction=client,
@@ -431,7 +584,11 @@ def _finish_chunk(
         sizes=sizes,
         symmetry=symmetry,
         bag=bag,
+        encoder_seconds=chunk_encoder_seconds,
+        client_seconds=client_seconds,
+        evaluation_seconds=eval_seconds,
     )
+    return chunk, client_seconds, eval_seconds
 
 
 def _encoder_frames(bag: Mapping[str, object], fallback: np.ndarray) -> np.ndarray:
@@ -447,6 +604,7 @@ def _assemble(
     lattice: StageLattice,
     scorer: QualityEvaluator,
     stage_seconds: tuple[dict[str, float], ...] = (),
+    preparation_seconds: float = 0.0,
 ) -> RunResult:
     frames = np.concatenate([item.frames for item in results], axis=0)
     if len(results) == 1:
@@ -478,6 +636,9 @@ def _assemble(
             f"payload parts sum to {sizes.parts_sum} bytes, more than "
             f"transport_total {sizes.transport_total}. One ledger, and it must add up.",
         )
+    total_encoder_seconds = preparation_seconds + sum(item.encoder_seconds for item in results)
+    total_client_seconds = sum(item.client_seconds for item in results)
+    total_eval_seconds = sum(item.evaluation_seconds for item in results)
     return RunResult(
         frames=frames,
         quality=quality,
@@ -487,6 +648,9 @@ def _assemble(
         chunks=tuple(results),
         lattice=lattice,
         stage_seconds=stage_seconds,
+        encoder_seconds=total_encoder_seconds,
+        client_seconds=total_client_seconds,
+        evaluation_seconds=total_eval_seconds,
     )
 
 

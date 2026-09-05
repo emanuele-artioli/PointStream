@@ -232,17 +232,33 @@ def timing_record(trip: TimedRoundtrip) -> dict[str, float]:
     }
 
 
-def pointstream_timing(run_seconds: float) -> dict[str, Any]:
-    """PointStream ``run()`` is encode plus reconstruction. Do not call that encode."""
-    return {
+def pointstream_timing(
+    run_seconds: float,
+    *,
+    encoder_seconds: float | None = None,
+    client_seconds: float | None = None,
+    evaluation_seconds: float | None = None,
+) -> dict[str, Any]:
+    """PointStream timing with disjoint encoder, client, and evaluation clocks."""
+    record: dict[str, Any] = {
         "run_seconds": round(float(run_seconds), 3),
         "encode_seconds": None,
         "decode_seconds": None,
+        "encoder_seconds": round(float(encoder_seconds), 3) if encoder_seconds is not None else None,
+        "client_seconds": round(float(client_seconds), 3) if client_seconds is not None else None,
+        "evaluation_seconds": round(float(evaluation_seconds), 3) if evaluation_seconds is not None else None,
         "timing_note": (
             "run_seconds is encode plus reconstruction. The runner does not "
             "split those halves; encode_seconds is reserved for a codec encode."
         ),
     }
+    if encoder_seconds is not None and client_seconds is not None:
+        record["timing_note"] = (
+            "Disjoint boundaries: encoder_seconds (analysis to payload), "
+            "client_seconds (byte-only client decode to delivered frames), "
+            "evaluation_seconds (quality metrics and diagnostics)."
+        )
+    return record
 
 
 __all__ = [

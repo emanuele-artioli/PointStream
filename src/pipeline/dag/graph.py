@@ -73,6 +73,8 @@ class StageDAG:
         *,
         on_stage: Callable[[str, float], None] | None = None,
         heartbeat_interval: float | None = None,
+        clock: Callable[[], float] = time.perf_counter,
+        sync_fn: Callable[[], None] | None = None,
     ) -> dict[str, Any]:
         """Execute every enabled stage once, in DAG order.
 
@@ -86,13 +88,17 @@ class StageDAG:
 
         bag: dict[str, Any] = dict(source or {})
         for node in self.nodes:
-            started = time.perf_counter()
+            if sync_fn is not None:
+                sync_fn()
+            started = clock()
             if heartbeat_interval is not None and heartbeat_interval > 0:
                 with Heartbeat(f"stage {node.name}", interval_s=heartbeat_interval):
                     output = node.stage(bag)
             else:
                 output = node.stage(bag)
-            elapsed = time.perf_counter() - started
+            if sync_fn is not None:
+                sync_fn()
+            elapsed = clock() - started
             if on_stage is not None:
                 on_stage(node.name, elapsed)
             bag[node.name] = output

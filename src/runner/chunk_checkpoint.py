@@ -163,7 +163,6 @@ def save_chunk(
         np.save(dest / "object_mask.npy", np.asarray(mask))
     payload = {
         "index": index,
-        "stage_seconds": stage_seconds,
         "sizes": chunk.sizes.as_dict(),
         "background_chunk_index": background_chunk_index,
         "background_state": _jsonable_background(background_state),
@@ -175,6 +174,13 @@ def save_chunk(
         "delivered_byte_count": int(chunk.bag[ART_DELIVERED].get("byte_count", chunk.sizes.transport_total)),
     }
     (dest / "meta.json").write_text(json.dumps(payload, indent=2, default=_json_default) + "\n")
+    timing_payload = {
+        "stage_seconds": stage_seconds,
+        "encoder_seconds": getattr(chunk, "encoder_seconds", 0.0),
+        "client_seconds": getattr(chunk, "client_seconds", 0.0),
+        "evaluation_seconds": getattr(chunk, "evaluation_seconds", 0.0),
+    }
+    (dest / "timing.json").write_text(json.dumps(timing_payload, indent=2, default=_json_default) + "\n")
     if background_state is not None:
         _save_arrays(dest / "background", background_state)
     publish(pending, target)
@@ -194,6 +200,18 @@ def load_chunk(
     mask_path = dest / "object_mask.npy"
     object_mask = np.load(mask_path) if mask_path.is_file() else None
     meta = json.loads((dest / "meta.json").read_text())
+    timing_path = dest / "timing.json"
+    if timing_path.is_file():
+        timing_meta = json.loads(timing_path.read_text())
+        stage_seconds = dict(timing_meta.get("stage_seconds") or {})
+        enc_seconds = float(timing_meta.get("encoder_seconds", 0.0))
+        cli_seconds = float(timing_meta.get("client_seconds", 0.0))
+        eval_seconds = float(timing_meta.get("evaluation_seconds", 0.0))
+    else:
+        stage_seconds = dict(meta.get("stage_seconds") or {})
+        enc_seconds = 0.0
+        cli_seconds = 0.0
+        eval_seconds = 0.0
     quality = quality_from_dict(meta["quality"])
     delivered_quality = quality_from_dict(meta["delivered_quality"])
     reconstruction = ReconstructionResult(
@@ -217,11 +235,14 @@ def load_chunk(
         sizes=sizes_from_dict(meta["sizes"]),
         symmetry=chunk_symmetry_from_arrays(encoder_frames, frames),
         bag=bag,
+        encoder_seconds=enc_seconds,
+        client_seconds=cli_seconds,
+        evaluation_seconds=eval_seconds,
     )
     background = meta.get("background_state")
     if background is not None:
         background = _load_arrays(dest / "background", background)
-    return chunk, dict(meta.get("stage_seconds") or {}), background, int(
+    return chunk, stage_seconds, background, int(
         meta.get("background_chunk_index", index + 1)
     )
 
