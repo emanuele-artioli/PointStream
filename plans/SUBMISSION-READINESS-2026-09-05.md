@@ -8,18 +8,10 @@ page budget, but the central result does not yet exist: no verified PointStream
 rate--distortion curve beats both AV1 and VVC.
 
 The project is at the end of engineering preflight and the start of the decisive
-evidence search. The hard submission deadline is 30 September; evidence freezes
-20 September.
+evidence search. The hard submission deadline is 30 September.
 
 ## Established evidence
 
-- The configurable pipeline includes scene routing, canonical shared background,
-  foreground appearance/motion, optional correction, conventional fallback and
-  complete payload categories.
-- Compatible scenes share a canonical coordinate system; reconstruction uses
-  transmitted bytes, and context changes reset the chain.
-- Short native jobs checkpoint between scenes and fail closed on identity,
-  control and alarm mismatches. They cannot resume inside a killed codec process.
 - BP52 found no win from background CRF alone. BP53 found no win from half-scale
   background transport on its one diagnostic pair.
 - BP56 verified prefix-stable higher-effort libaom coding. On one development
@@ -28,8 +20,7 @@ evidence search. The hard submission deadline is 30 September; evidence freezes
   controls, byte ledgers and recovery checks passed. This is an internal n=1
   candidate-selection result, not an AV1/VVC win.
 - BP57 acquired two fresh provisional tennis sources within authority. Seven
-  sampled intervals are visually verified continuous two-player shots. Native
-  1080p and 720p sources cannot confirm a specifically native-4K claim.
+  sampled intervals are visually verified continuous two-player shots.
 - Generation has no demonstrated gain over the pasted-reference control and is
   correctly parked while background cost dominates.
 - The paper builds reproducibly and was last measured at 22 pages through
