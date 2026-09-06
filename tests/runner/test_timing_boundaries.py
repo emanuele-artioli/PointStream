@@ -12,12 +12,14 @@ Covers:
 from __future__ import annotations
 
 from dataclasses import replace
+from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
 import pytest
 
 from src.contracts.lattice import ART_DELIVERED
+from src.components.background.scale import TransmittedBackground
 from src.pipeline.reconstruction.quality import NumpyPsnrEvaluator, QualityReport
 from src.runner import run
 from src.runner.client import reconstruct_independent_client
@@ -224,8 +226,8 @@ def test_serialized_client_decodes_raw_background_stream(monkeypatch: pytest.Mon
     decoded_plate = np.full((4, 4, 3), 17, dtype=np.uint8)
     seen: dict[str, object] = {}
 
-    def fake_decode(codec: str, packets: object) -> np.ndarray:
-        packet_tuple = tuple(packets)  # type: ignore[arg-type]
+    def fake_decode(codec: str, packets: Sequence[TransmittedBackground]) -> np.ndarray:
+        packet_tuple = tuple(packets)
         seen["codec"] = codec
         seen["payloads"] = tuple(packet.payload for packet in packet_tuple)
         seen["headers"] = tuple(packet.geometry_header for packet in packet_tuple)
