@@ -18,6 +18,7 @@ from src.contracts.conditioning import GenerationParams
 from src.contracts.config import PointstreamConfig, validate
 from src.contracts.errors import ConfigValueError
 from src.contracts.lattice import (
+    ART_APPEARANCE_PAYLOAD,
     ART_BACKGROUND_MODEL,
     ART_DELIVERED,
     ART_QUALITY,
@@ -200,18 +201,28 @@ def run(
 
     started = clock()
     session = None
-    with Heartbeat("runner (including preparation, recovery and scoring)", interval_s=heartbeat_interval):
+    with Heartbeat(
+        "runner (including preparation, recovery and scoring)", interval_s=heartbeat_interval
+    ):
         if checkpoint_dir is not None:
             injected = ("backends", "generator", "evaluator", "components", "builders")
             if any(kwargs.get(key) is not None for key in injected) and not checkpoint_identity:
                 raise ValueError("injected implementations require checkpoint_identity")
             if config.lattice.generation:
-                raise ValueError("generative RNG recovery is not supported; disable generation for checkpointed runs")
-            contexts = tuple(context_ids) if context_ids is not None else tuple(
-                config.background.context_id or "run" for _ in chunks
+                raise ValueError(
+                    "generative RNG recovery is not supported; disable generation for checkpointed runs"
+                )
+            contexts = (
+                tuple(context_ids)
+                if context_ids is not None
+                else tuple(config.background.context_id or "run" for _ in chunks)
             )
-            identity = runner_identity(config, chunks, kwargs.get("objects"), contexts, checkpoint_identity)
-            session = RecoverySession(Path(checkpoint_dir), identity, started_at=started, clock=clock)
+            identity = runner_identity(
+                config, chunks, kwargs.get("objects"), contexts, checkpoint_identity
+            )
+            session = RecoverySession(
+                Path(checkpoint_dir), identity, started_at=started, clock=clock
+            )
         try:
             result = _run(
                 config,
@@ -235,7 +246,9 @@ def run(
         if session is not None:
             recovery_timing = session.finish(success=True)
             lost_work_lower_bound = sum(
-                float(item["seconds"]) for item in session.attempts if item.get("status") == "interrupted"
+                float(item["seconds"])
+                for item in session.attempts
+                if item.get("status") == "interrupted"
             )
             timing.update(recovery_timing)
         else:
@@ -261,21 +274,23 @@ def run(
                 "evaluation_seconds": result.chunks[0].evaluation_seconds,
             }
 
-        timing.update({
-            "encoder_seconds": result.encoder_seconds,
-            "client_seconds": result.client_seconds,
-            "evaluation_seconds": result.evaluation_seconds,
-            "cold_initialization": result.phase_seconds.get("cold_initialization", 0.0),
-            "preparation": result.phase_seconds.get("preparation", 0.0),
-            "steady_state": steady_state,
-            "attempt_wall": elapsed,
-            "checkpoint_io_seconds": result.phase_seconds.get("checkpoint_io", 0.0),
-            "recovery_lost_work_lower_bound": lost_work_lower_bound,
-            "host": platform.node(),
-            "gpu": get_gpu_info(),
-            "cpu": get_cpu_info(),
-            "peak_memory_bytes": get_peak_memory_bytes(),
-        })
+        timing.update(
+            {
+                "encoder_seconds": result.encoder_seconds,
+                "client_seconds": result.client_seconds,
+                "evaluation_seconds": result.evaluation_seconds,
+                "cold_initialization": result.phase_seconds.get("cold_initialization", 0.0),
+                "preparation": result.phase_seconds.get("preparation", 0.0),
+                "steady_state": steady_state,
+                "attempt_wall": elapsed,
+                "checkpoint_io_seconds": result.phase_seconds.get("checkpoint_io", 0.0),
+                "recovery_lost_work_lower_bound": lost_work_lower_bound,
+                "host": platform.node(),
+                "gpu": get_gpu_info(),
+                "cpu": get_cpu_info(),
+                "peak_memory_bytes": get_peak_memory_bytes(),
+            }
+        )
         return replace(result, timing=timing)
 
 
@@ -299,7 +314,9 @@ def _run(
 ) -> RunResult:
     """Encode, reconstruct, score, and account every chunk."""
     if not chunks:
-        raise ValueError("run needs at least one source chunk; a reconstruction of nothing cannot be scored.")
+        raise ValueError(
+            "run needs at least one source chunk; a reconstruction of nothing cannot be scored."
+        )
     if objects is not None and len(objects) != len(chunks):
         raise ValueError(
             f"objects has {len(objects)} entries for {len(chunks)} chunks. "
@@ -349,7 +366,11 @@ def _run(
         ),
     )
     from src.runner.chunk_checkpoint import (
-        completed_indices, load_background, load_chunk, save_background, save_chunk,
+        completed_indices,
+        load_background,
+        load_chunk,
+        save_background,
+        save_chunk,
     )
 
     results: list[ChunkResult] = []
@@ -516,24 +537,94 @@ def _finish_chunk(
     residual = bag.get(ART_RESIDUAL_STREAM)
     residual_payload = residual.payload if isinstance(residual, ResidualResult) else None
 
-    # --- Client Phase: independent byte-only client reconstruction ---
+    # Build the transport envelope on the encoder side. The measured client
+    # interval starts only once those bytes are ready to receive.
+    wire_request: bytes | None = None
+    placements: tuple[Any, ...] = ()
+    if not lattice.is_source_passthrough:
+        from src.runner.client import (
+            ClientPlacement,
+            reconstruct_independent_client,
+            reconstruct_serialized_client,
+            serialize_client_request,
+        )
+
+        appearance_by_id: dict[str, bytes] = {}
+        appearance_artifact = bag.get(ART_APPEARANCE_PAYLOAD)
+        if (
+            not generation_on
+            and isinstance(appearance_artifact, dict)
+            and appearance_artifact.get("representation") == "compressed-image"
+        ):
+            appearance_items = appearance_artifact.get("items", ())
+            appearance_by_id = {
+                str(appearance_item["object_id"]): bytes(appearance_item["payload"])
+                for appearance_item in appearance_items
+                if isinstance(appearance_item, dict)
+                and isinstance(
+                    appearance_item.get("payload"),
+                    (bytes, bytearray, memoryview),
+                )
+            }
+
+        if appearance_by_id:
+            import cv2
+
+            decoded_by_id: dict[str, np.ndarray] = {}
+            for object_id, encoded_crop in appearance_by_id.items():
+                decoded_crop = cv2.imdecode(
+                    np.frombuffer(encoded_crop, dtype=np.uint8),
+                    cv2.IMREAD_COLOR,
+                )
+                if decoded_crop is None:
+                    raise ValueError("JPEG appearance payload did not decode")
+                decoded_by_id[object_id] = np.asarray(decoded_crop, dtype=np.uint8)
+            client_objects = tuple(
+                replace(item, supplied_crop=decoded_by_id[item.object_id])
+                if item.object_id in decoded_by_id
+                else item
+                for item in client_objects
+            )
+        placements = tuple(
+            ClientPlacement(
+                crop=item.supplied_crop if item.supplied_crop is not None else item.appearance,
+                bbox=item.bbox,
+                encoded_crop=appearance_by_id.get(item.object_id),
+                frame_index=item.frame_index,
+                mask=item.mask,
+                object_id=item.object_id,
+            )
+            for item in client_objects
+        )
+        if residual_payload is None:
+            wire_request = serialize_client_request(
+                background=view,
+                frame_count=int(source.shape[0]),
+                height=int(source.shape[1]),
+                width=int(source.shape[2]),
+                placements=placements,
+            )
+
+    # --- Client Phase: bytes received through delivered frames ---
     if sync_fn is not None:
         sync_fn()
     client_start = clock()
     if lattice.is_source_passthrough:
         _ = source.copy()
-    else:
-        from src.runner.client import reconstruct_independent_client
-
+    elif residual_payload is not None:
         _ = reconstruct_independent_client(
             background=view,
             frame_count=int(source.shape[0]),
             height=int(source.shape[1]),
             width=int(source.shape[2]),
-            placements=(),
+            placements=placements,
             residual_payload=residual_payload,
             resolver=resolver,
         )
+    else:
+        if wire_request is None:
+            raise RuntimeError("serialized client request was not prepared")
+        _ = reconstruct_serialized_client(wire_request, resolver=resolver)
     if sync_fn is not None:
         sync_fn()
     client_seconds = clock() - client_start

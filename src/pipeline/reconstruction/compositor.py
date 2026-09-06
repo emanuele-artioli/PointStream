@@ -89,7 +89,10 @@ def composite_frame(
     if use_heuristic_mask or placement.mask is None:
         blend = np.ones((region_h, region_w), dtype=np.float32)
     else:
-        blend = _mask_for_bbox(placement.mask, placement.bbox, height, width)[y1:y2, x1:x2]
+        active_mask = np.asarray(placement.mask)
+        if active_mask.ndim == 3:
+            active_mask = active_mask[placement.frame_index]
+        blend = _mask_for_bbox(active_mask, placement.bbox, height, width)[y1:y2, x1:x2]
         blend = blend.astype(np.float32)
         if blend.max() > 1.0:
             blend = blend / 255.0

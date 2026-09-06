@@ -12,12 +12,14 @@ Covers:
 from __future__ import annotations
 
 from dataclasses import replace
+from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
 import pytest
 
 from src.contracts.lattice import ART_DELIVERED
+from src.components.background.scale import TransmittedBackground
 from src.pipeline.reconstruction.quality import NumpyPsnrEvaluator, QualityReport
 from src.runner import run
 from src.runner.client import reconstruct_independent_client
@@ -46,7 +48,9 @@ class DeliberateEvaluator(NumpyPsnrEvaluator):
         self.clock = clock
         self.delay = delay
 
-    def evaluate(self, reference: np.ndarray, predicted: np.ndarray, **kwargs: Any) -> QualityReport:
+    def evaluate(
+        self, reference: np.ndarray, predicted: np.ndarray, **kwargs: Any
+    ) -> QualityReport:
         self.clock.advance(self.delay)
         return super().evaluate(reference, predicted, **kwargs)
 
@@ -146,7 +150,9 @@ def test_independent_client_reproduces_delivered_frames() -> None:
         from src.contracts.lattice import ART_BACKGROUND_MODEL, STAGE_BACKGROUND
         from src.runner.stages import _as_background, _delivered_frames
 
-        view = _as_background(chunk.bag.get(ART_BACKGROUND_MODEL) or chunk.bag.get(STAGE_BACKGROUND))
+        view = _as_background(
+            chunk.bag.get(ART_BACKGROUND_MODEL) or chunk.bag.get(STAGE_BACKGROUND)
+        )
         delivered_target = _delivered_frames(chunk.bag[ART_DELIVERED])
 
         recon = reconstruct_independent_client(
@@ -174,3 +180,82 @@ def test_gpu_sync_called_at_every_timed_boundary() -> None:
 
     # Must have synchronized multiple times (preparation, encoder stages, client phase, evaluation phase, assembly)
     assert len(sync_events) >= 5
+
+
+def test_serialized_client_boundary_carries_background_and_foreground() -> None:
+    from src.pipeline.reconstruction.background import BackgroundModelView
+    from src.runner.client import (
+        ClientPlacement,
+        reconstruct_serialized_client,
+        serialize_client_request,
+    )
+
+    background = BackgroundModelView(
+        plate=np.zeros((4, 4, 3), dtype=np.uint8),
+        homographies=((1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0),),
+        width=4,
+        height=4,
+        payload_bytes=7,
+    )
+    crop = np.full((2, 2, 3), 200, dtype=np.uint8)
+    payload = serialize_client_request(
+        background=background,
+        frame_count=1,
+        height=4,
+        width=4,
+        placements=(ClientPlacement(crop=crop, bbox=(1, 1, 3, 3)),),
+    )
+    assert isinstance(payload, bytes)
+    reconstructed = reconstruct_serialized_client(payload)
+    assert np.array_equal(reconstructed[0, 1:3, 1:3], crop)
+
+
+def test_serialized_client_rejects_live_object() -> None:
+    from src.runner.client import reconstruct_serialized_client
+
+    with pytest.raises(TypeError, match="must be bytes"):
+        reconstruct_serialized_client({})  # type: ignore[arg-type]
+
+
+def test_serialized_client_decodes_raw_background_stream(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The client must decode copied codec bytes instead of accepting encoder pixels."""
+    from src.components.background import scale
+    from src.pipeline.reconstruction.background import BackgroundModelView
+    from src.runner.client import reconstruct_serialized_client, serialize_client_request
+
+    decoded_plate = np.full((4, 4, 3), 17, dtype=np.uint8)
+    seen: dict[str, object] = {}
+
+    def fake_decode(codec: str, packets: Sequence[TransmittedBackground]) -> np.ndarray:
+        packet_tuple = tuple(packets)
+        seen["codec"] = codec
+        seen["payloads"] = tuple(packet.payload for packet in packet_tuple)
+        seen["headers"] = tuple(packet.geometry_header for packet in packet_tuple)
+        return decoded_plate
+
+    monkeypatch.setattr(scale, "decode_transmitted_stream", fake_decode)
+    background = BackgroundModelView(
+        plate=np.full((4, 4, 3), 255, dtype=np.uint8),
+        width=4,
+        height=4,
+        payload_bytes=2,
+        wire_payloads=(b"i", b"p"),
+        wire_geometry_headers=(b"h0", b"h1"),
+        wire_codec="av1",
+        wire_codec_id="av1 low-delay test",
+    )
+    payload = serialize_client_request(
+        background=background,
+        frame_count=1,
+        height=4,
+        width=4,
+    )
+
+    reconstructed = reconstruct_serialized_client(payload)
+
+    assert seen == {
+        "codec": "av1",
+        "payloads": (b"i", b"p"),
+        "headers": (b"h0", b"h1"),
+    }
+    assert np.array_equal(reconstructed[0], decoded_plate)

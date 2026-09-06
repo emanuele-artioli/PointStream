@@ -11,6 +11,7 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+import os
 import shutil
 import subprocess
 import tempfile
@@ -84,7 +85,9 @@ def encode(
         * ``none`` — ignore ``roi`` and ``request.roi_map``.
     """
     request.validate()
-    arm = resolve_roi_arm(request.codec_name, roi_arm, has_map=roi is not None or request.is_roi_arm)
+    arm = resolve_roi_arm(
+        request.codec_name, roi_arm, has_map=roi is not None or request.is_roi_arm
+    )
     if arm == "native" and not codec(request.codec_name).supports_roi:
         raise CodecConstraintError(
             request.codec_name,
@@ -468,23 +471,22 @@ def _y4m_to_raw(source: Path, dest: Path, ffmpeg: ResolvedTool, *, pix_fmt: str)
     _run(argv, dest)
 
 
-def _run(
-    argv: list[str], dest: Path, *, attempts: int = 3
-) -> subprocess.CompletedProcess[str]:
+def _run(argv: list[str], dest: Path, *, attempts: int = 3) -> subprocess.CompletedProcess[str]:
     """Run ``argv``. Judge the file: Kvazaar can crash after a valid write,
     and libvvenc can exit 0 after a 0-byte 4K QP-48 bitstream."""
+    attempts = int(os.environ.get("PS_CODEC_MAX_ATTEMPTS", attempts))
+    timeout = float(os.environ.get("PS_CODEC_TIMEOUT_SECONDS", "0")) or None
     last: subprocess.CompletedProcess[str] | None = None
     for attempt in range(1, attempts + 1):
         if dest.exists() and dest.stat().st_size == 0:
             dest.unlink()
-        last = subprocess.run(argv, capture_output=True, text=True, check=False)
+        last = subprocess.run(argv, capture_output=True, text=True, check=False, timeout=timeout)
         if dest.exists() and dest.stat().st_size > 0:
             if attempt > 1:
                 print(f"encode retry {attempt}/{attempts} wrote {dest}", flush=True)
             return last
         print(
-            f"encode attempt {attempt}/{attempts} left empty {dest} "
-            f"(exit {last.returncode})",
+            f"encode attempt {attempt}/{attempts} left empty {dest} (exit {last.returncode})",
             flush=True,
         )
     detail = ((last.stderr or last.stdout or "") if last else "").strip()[-2000:]

@@ -15,6 +15,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
+import os
 import subprocess
 import tempfile
 import time
@@ -205,10 +206,24 @@ def timed_roundtrip(
         lossless = root / "payload.mkv"
         _run_ffmpeg(
             [
-                ffmpeg.path, "-hide_banner", "-loglevel", "error", "-y",
-                "-f", "rawvideo", "-pix_fmt", "rgb24",
-                "-s", f"{width}x{height}", "-framerate", str(fps),
-                "-i", "-", "-c:v", "ffv1", str(lossless),
+                ffmpeg.path,
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                "-y",
+                "-f",
+                "rawvideo",
+                "-pix_fmt",
+                "rgb24",
+                "-s",
+                f"{width}x{height}",
+                "-framerate",
+                str(fps),
+                "-i",
+                "-",
+                "-c:v",
+                "ffv1",
+                str(lossless),
             ],
             clip.tobytes(),
         )
@@ -219,8 +234,17 @@ def timed_roundtrip(
         decode(dest, back, request)
         raw = _run_ffmpeg(
             [
-                ffmpeg.path, "-hide_banner", "-loglevel", "error",
-                "-i", str(back), "-f", "rawvideo", "-pix_fmt", "rgb24", "-",
+                ffmpeg.path,
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                "-i",
+                str(back),
+                "-f",
+                "rawvideo",
+                "-pix_fmt",
+                "rgb24",
+                "-",
             ],
             None,
         )
@@ -268,7 +292,8 @@ def coded_roundtrip(
 
 
 def _run_ffmpeg(argv: list[str], stdin_bytes: bytes | None) -> bytes:
-    result = subprocess.run(argv, input=stdin_bytes, capture_output=True)
+    timeout = float(os.environ.get("PS_CODEC_TIMEOUT_SECONDS", "0")) or None
+    result = subprocess.run(argv, input=stdin_bytes, capture_output=True, timeout=timeout)
     if result.returncode != 0:
         detail = (result.stderr or b"").decode("utf-8", "replace").strip()
         raise RuntimeError(f"ffmpeg failed ({result.returncode}): {detail[:400]}")

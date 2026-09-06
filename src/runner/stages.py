@@ -360,13 +360,23 @@ def make_appearance(ctx: StageContext) -> StageCallable:
             if basis and basis not in bases:
                 bases.append(basis)
             items.append(
-                {"object_id": item.object_id, "byte_count": nbytes, "exact": item_exact}
+                {
+                    "object_id": item.object_id,
+                    "byte_count": nbytes,
+                    "exact": item_exact,
+                    "payload": bytes(encoded[1])
+                    if isinstance(encoded, tuple)
+                    and len(encoded) == 2
+                    and isinstance(encoded[1], (bytes, bytearray, memoryview))
+                    else None,
+                }
             )
         return {
             "byte_count": total,
             "items": tuple(items),
             "exact": exact,
             "basis": "; ".join(bases),
+            "representation": getattr(backend, "kind", None),
         }
 
     return appearance
@@ -470,9 +480,7 @@ def _motion_bytes(
         MOTION_SPARSE_TRAJECTORIES,
     )
 
-    pose_list = (
-        poses if isinstance(poses, Sequence) and not isinstance(poses, (str, bytes)) else ()
-    )
+    pose_list = poses if isinstance(poses, Sequence) and not isinstance(poses, (str, bytes)) else ()
     if kind == MOTION_KEYPOINTS:
         total = 0
         for pose in pose_list:
@@ -746,6 +754,7 @@ def make_background(
         chunk_index += 1
         ctx.background_chunk_index = chunk_index
         decoded = model.decode_payload(artifact)
+        client_packets = model.client_wire_packets(artifact)
         return BackgroundModelView(
             plate=source[0] if decoded is None else decoded,
             homographies=artifact.homographies,
@@ -774,6 +783,10 @@ def make_background(
             payload_bytes=int(len(artifact.payload)),
             geometry_header=bytes(artifact.geometry_header),
             geometry_header_bytes=int(len(artifact.geometry_header)),
+            wire_payloads=tuple(item.payload for item in client_packets),
+            wire_geometry_headers=tuple(item.geometry_header for item in client_packets),
+            wire_codec=model.client_wire_codec,
+            wire_codec_id=artifact.codec_id,
         )
 
     return background_stage
@@ -801,6 +814,44 @@ def make_generation(ctx: StageContext) -> StageCallable:
     return generation
 
 
+def _with_transmitted_appearance(
+    ctx: StageContext,
+    subjects: Sequence[ObjectRequest],
+    appearance_artifact: object,
+) -> tuple[ObjectRequest, ...]:
+    """Decode charged appearance bytes and use those pixels for reconstruction."""
+    if ctx.config.appearance.representation != "compressed-image":
+        return tuple(subjects)
+    if not isinstance(appearance_artifact, Mapping):
+        return tuple(subjects)
+    items = appearance_artifact.get("items")
+    if not isinstance(items, Sequence):
+        return tuple(subjects)
+    payloads = {
+        str(item["object_id"]): bytes(item["payload"])
+        for item in items
+        if isinstance(item, Mapping)
+        and isinstance(item.get("payload"), (bytes, bytearray, memoryview))
+    }
+    if not payloads:
+        return tuple(subjects)
+    from src.runner.routing import ensure_appearance
+
+    backend = ensure_appearance(ctx)
+    if backend is None or not callable(getattr(backend, "decode", None)):
+        raise ConfigValueError(
+            "runner.appearance",
+            "charged appearance payload has no client decoder",
+        )
+    decoded = {object_id: backend.decode(payload) for object_id, payload in payloads.items()}
+    return tuple(
+        replace(item, supplied_crop=np.asarray(decoded[item.object_id]))
+        if item.object_id in decoded
+        else item
+        for item in subjects
+    )
+
+
 def encoder_side(ctx: StageContext, bag: Mapping[str, Any]) -> Any:
     """The encoder's own copy of what the client will build.
 
@@ -811,6 +862,8 @@ def encoder_side(ctx: StageContext, bag: Mapping[str, Any]) -> Any:
     source = as_clip(bag[SOURCE], path=SOURCE)
     view = _as_background(bag.get(ART_BACKGROUND_MODEL) or bag.get(STAGE_BACKGROUND))
     objects = _with_supplied_crops(_subjects_for_reconstruct(bag), bag.get(ART_GENERATED_FRAMES))
+    if not ctx.lattice.is_enabled(STAGE_GENERATION):
+        objects = _with_transmitted_appearance(ctx, objects, bag.get(ART_APPEARANCE_PAYLOAD))
     return reconstruct(
         ReconstructionRequest(
             lattice=ctx.lattice,
@@ -909,9 +962,7 @@ def make_codec(ctx: StageContext) -> StageCallable:
     return codec
 
 
-def _coded_residual(
-    ctx: StageContext, residual: ResidualResult
-) -> tuple[np.ndarray, int] | None:
+def _coded_residual(ctx: StageContext, residual: ResidualResult) -> tuple[np.ndarray, int] | None:
     """Send the residual through `residual.codec` and rebuild from what returns.
 
     Returns ``(frames, coded_bytes)``, or ``None`` when no encoder could run —

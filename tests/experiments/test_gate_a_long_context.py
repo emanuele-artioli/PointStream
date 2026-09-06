@@ -69,30 +69,18 @@ def test_configure_rung_invariants() -> None:
         assert cfg.motion.max_points == rung.motion_max_points
 
 
-def test_bp56_seed_regression_and_bounds() -> None:
-    """Assert BP56 seed (C1) ledger targets and pre-registered bounds conformance."""
-    bp56_ledger = {
-        "panorama": 348504,
-        "actor_reference": 8599,
-        "metadata": 20257,
-        "residual": 0,
-        "fallback": 0,
-    }
-    total_bytes = 377360
-    assert sum(bp56_ledger.values()) == total_bytes
-
-    alarms = validate_ledger(bp56_ledger, total_bytes)
-    assert alarms == []
-
-    vmaf = 79.339
-    y_psnr = 33.259
-    ssim = 0.974
-    assert y_psnr > 30.0
-    assert ssim > 0.95
-
-    bounds_48 = get_pre_registered_bounds(48)["bounds"]["C1"]
-    assert bounds_48["bytes_min"] <= total_bytes <= bounds_48["bytes_max"]
-    assert bounds_48["vmaf_min"] <= vmaf <= bounds_48["vmaf_max"]
+def test_bp56_seed_configuration_is_driven_by_current_code() -> None:
+    """C1 is constructed by the current driver, not a hard-coded result row."""
+    base = load_tier("balanced")
+    c1 = configure_rung(base, RUNGS[1])
+    assert c1.background.stream_crf == 63
+    assert c1.background.stream_usage == "good"
+    assert c1.background.stream_cpu_used == 4
+    assert c1.appearance.jpeg_quality == 40
+    assert c1.appearance.downscale == 2
+    assert c1.motion.max_points == 16
+    assert c1.lattice.residual is False
+    assert c1.lattice.generation is False
 
 
 def test_validate_ledger_detects_imbalance() -> None:
@@ -145,16 +133,13 @@ def test_check_adjacent_rungs_monotonicity() -> None:
 
 
 def test_pre_registered_bounds_scaling() -> None:
-    """Verify pre-registered bounds scale with context duration."""
-    bounds_48 = get_pre_registered_bounds(48)["bounds"]
-    bounds_96 = get_pre_registered_bounds(96)["bounds"]
-
-    for rung in ("C0", "C1", "C2", "C3"):
-        assert bounds_96[rung]["bytes_min"] == bounds_48[rung]["bytes_min"] * 2
-        assert bounds_96[rung]["bytes_max"] == bounds_48[rung]["bytes_max"] * 2
-        # Quality scale does not scale with duration
-        assert bounds_96[rung]["vmaf_min"] == bounds_48[rung]["vmaf_min"]
-        assert bounds_96[rung]["vmaf_max"] == bounds_48[rung]["vmaf_max"]
+    """Raw-byte alarm ceiling follows the exact number of source frames."""
+    bounds_48 = get_pre_registered_bounds(48)
+    bounds_96 = get_pre_registered_bounds(96)
+    assert bounds_96["coded_bytes"]["high_inclusive"] - 1048576 == 2 * (
+        bounds_48["coded_bytes"]["high_inclusive"] - 1048576
+    )
+    assert bounds_96["quality"] == bounds_48["quality"]
 
 
 def test_conventional_fallback_control() -> None:
@@ -203,3 +188,82 @@ def test_temporal_null_control() -> None:
     assert res["frame_count"] == 4
     assert res["control"] == "temporal_null_shuffled_frames"
     assert "scores" in res
+
+
+def test_codec_floor_probe_executes_roundtrip(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
+    from types import SimpleNamespace
+    import experiments.tier.gate_a_tools as tools
+
+    binary = tmp_path / "encoder"
+    binary.write_bytes(b"real tool")
+    called = []
+
+    monkeypatch.setattr(
+        tools,
+        "resolve_tool_specs",
+        lambda: {"av1": {"available": True, "slowest_preset": "0"}},
+    )
+
+    def fake_roundtrip(frames, *, request, fps):
+        called.append((request.codec_name, request.preset, request.rate, fps))
+        return SimpleNamespace(
+            size_bytes=17,
+            frames=frames.copy(),
+            tool_path=str(binary),
+            tool_version="test-version",
+            preset=request.preset,
+            qp=request.rate,
+        )
+
+    monkeypatch.setattr(tools, "timed_roundtrip", fake_roundtrip)
+    result = tools.probe_codec_floor("av1")
+    assert called == [("av1", "0", 63, 24.0)]
+    assert result["verified"] is True
+    assert result["probe_bytes"] == 17
+    assert result["binary_sha256"]
+
+
+def test_frozen_bounds_match_gate_a_contract() -> None:
+    bounds = get_pre_registered_bounds(48)
+    assert bounds["bd_rate_vmaf_percent"] == [-90.0, 300.0]
+    assert bounds["late_frame_last_minus_first"]["vmaf"] == [-25.0, 8.0]
+    assert bounds["timing"]["ranked_encode_decode_must_be_non_null"] is True
+    assert bounds["curve"]["minimum_usable_points"] == 4
+    assert bounds["nonresumable_operation_timeout_seconds"] == 3300.0
+
+
+def test_dry_controls_cannot_claim_native_controls_valid(tmp_path, monkeypatch) -> None:
+    import experiments.tier.gate_a_controls as controls
+
+    monkeypatch.setattr(
+        controls, "verify_metric_anchors", lambda reference, destination: {"valid": True}
+    )
+    monkeypatch.setattr(controls, "run_temporal_null", lambda reference: {"scores": {}})
+    result = controls.run_gate_a_controls(np.zeros((2, 2, 2, 3), dtype=np.uint8), tmp_path)
+    assert result["valid"] is False
+    assert result["pending"] == ["object_stream_off", "conventional_fallback"]
+
+
+def test_budget_checkpoint_resume_does_not_rerun_operation(tmp_path) -> None:
+    from experiments.tier.gate_a_long_context import _checkpointed
+
+    points = tmp_path / "points"
+    budget = tmp_path / "budget.json"
+    calls = []
+
+    def operation():
+        calls.append("run")
+        return {"usable": True}
+
+    first = _checkpointed(points, budget, "C0", "pointstream", operation)
+    second = _checkpointed(points, budget, "C0", "pointstream", operation)
+    assert first["usable"] is True
+    assert second["usable"] is True
+    assert calls == ["run"]
+
+
+def test_native_mode_requires_explicit_authorization(tmp_path) -> None:
+    from experiments.tier.gate_a_long_context import main
+
+    with pytest.raises(SystemExit, match="requires --authorize-native"):
+        main(["--native", "--frames", "48", "--out-dir", str(tmp_path)])
