@@ -6,7 +6,7 @@
   "updated_utc": "2026-09-04T07:45:00Z",
   "auditor": "Antigravity",
   "roadmap_milestone": "E2 Gate B (Independent Confirmation Corpus)",
-  "brief": "plans/BP54-fresh-confirmation-sources.md",
+  "brief": "plans/done/BP54-fresh-confirmation-sources.md",
   "disclaimer": "This document is a candidate shortlist and provenance triage, not a completed or certified provenance audit. Confirmation eligibility requires physical acquisition, container ffprobe verification, and visual shot-by-shot compilation de-duplication.",
   "summary": {
     "total_candidates": 10,
