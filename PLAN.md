@@ -1,6 +1,6 @@
 # PointStream — current plan
 
-Updated 5 September 2026. **ACM TOMM submission: 30 September, hard deadline.**
+Updated 7 September 2026. **ACM TOMM submission: 30 September, hard deadline.**
 Evidence freeze: 20 September. Read this, `AGENTS.md`, and one assigned brief.
 `plans/ROADMAP.md` defines the submission gates and ordering.
 
@@ -17,61 +17,45 @@ It offers a compression opportunity, not a guaranteed win by construction.
 
 | Area | Verified | Remaining |
 |---|---|---|
-| Integration | PRs #63/#64 merged at 60a18f7; BP56/BP57 reviewed | Retire their worktrees/branches after user approval |
+| Integration | PRs #65/#66 merged at `606cf53`; Gate A preflight passed | Launch bounded 48-frame native run |
 | Background | Offline canonical canvas per compatible context, adjusted transforms and reference reuse | Long-scene rate–quality evidence; no causal canvas construction |
-| Recovery | BP49/BP52 native short-pair checkpoint budget passed; batch stops on alarms/control mismatch | Longer-run budget still unverified; no mid-codec resume |
-| References | Same-frame AV1 QP63 and VVC QP63/51/39 diagnostic points; legal-neighbour QPs and resume | Frozen-regime curves; separate semantic encoder/client timing |
-| Fallback | Explicit conventional route with route-byte accounting | Automatic end-to-end mixed-scene scheduler is not validated |
+| Recovery | Checkpoint budget, heartbeat, 55-min subprocess timeout and retry limits enforced | Longer-run budget verification; no mid-codec resume |
+| References | SVT-AV1 preset 0 and ffmpeg/libvvenc `slower` probe verified | Native curve generation under continuous and segmented access |
+| Fallback | Explicit conventional route with route-byte accounting | Gate 2 fallback control in native 48-frame run |
 | Data | Two fresh provisional sources acquired; seven sampled long shots visually checked | Validate them and add enough independent matches for Gate B |
 | Generators | No confirmed improvement over the pasted-reference control | Training parked until background and lean payload can win |
-| Evidence | No confirmed first-domain rate–quality win | Gate A, independent confirmation, core ablations, learned-codec comparison |
-| Paper | Separate Overleaf repo; BP53 scoped negative and provenance added | Final curves, supported headline claim, timing and independent confirmation |
+| Evidence | Gate A dry-run preflight complete (`identity: 9b63be50…`) | Gate A native run, confirmation, core ablations, DCVC-RT |
+| Paper | Separate Overleaf repo; 27 pages (22 main + 5 appendix), within budget | Final curves, supported headline claim, timing and confirmation |
 
-BP52's three CRF points have balanced coded ledgers, fresh metric controls and
-no recorded alarms. CRF51 reproduced BP49; coarser backgrounds saved bytes but
-lost quality, with no winning point established. This is one diagnostic scene
-pair, not confirmation. Separate semantic encode/decode time is still missing:
-runner wall time includes reconstruction and scoring. Historical outputs stay
-immutable; code changes require a new measurement identity/output directory.
+PR #65 and #66 merged at `606cf53`. Gate A implementation identity, disjoint timing
+boundaries (`encoder_seconds`, `client_seconds`, `evaluation_seconds`), tool floor
+probes (SVT-AV1 preset 0, libvvenc `slower`), rate ladder (C0–C3), and independent
+client-side raw stream decode are implemented and tested.
 
-BP53 half-scale transport also established no win on this pair. Its control
-crossed a driver-only identity change; source code was unchanged. Later
-standalone-client and crash-budget repairs are not native reruns. Historical
-total time is a lower bound; longer runs are NOT cleared. BP54 is provisional
-triage: eight provisional candidates, two blocked Alcaraz matches and zero
-accepted confirmation. Full completed reports/briefs are in plans/done/;
-short redirects preserve old citations. HANDOFF.md is the current entry point.
+The final permitted 48-frame preflight passed cleanly from commit `606cf53` with
+identity fingerprint `9b63be50…`. Source hashes for `alcaraz_highlights` (`scene_000`,
+`scene_028`) match. No native curve was encoded in the preflight; native controls
+(`object_stream_off`, `conventional_fallback`) remain pending in the bounded 48-frame run.
 
-BP56 proved prefix-stable libaom good/cpu-used 4 and ran the three-point
-short-pair pilot. The realtime CRF51 control matched BP52/BP53. Same-CRF
-higher effort used more background bits and raised VMAF; CRF63 at that effort
-is smaller than the control. References were left unranked (metric-file
-provenance vs origin/main). Report: `plans/BP56-background-effort-report.md`.
-No expansion is authorized.
-
-BP56's `good/cpu-used=4/CRF63` point strictly dominates its realtime CRF51
-PointStream control on one development pair (377,360 vs 474,369 bytes; VMAF
-79.339 vs 77.417). Treat it as a Gate-A seed only: n=1 and no ranked current
-AV1/VVC curve. BP57 acquired two provisional fresh matches; their native
-1080p/720p resolution cannot confirm a 4K-specific claim. Full audit:
-`plans/SUBMISSION-READINESS-2026-09-05.md`. The transparent fallback ladder in `plans/ROADMAP.md` §6.2 permits
-narrower content/operating profiles, faster or older named anchors, and a
-within-video held-out-scene split if needed, but requires the paper to retain
-the stronger negative comparisons and label the weaker claim exactly.
+Completed briefs and reports (BP32, BP33, BP38, BP39, BP40, BP43, BP45, BP49, BP51–BP57)
+are archived in `plans/done/`. The dispatch entry point for execution is
+`plans/DISPATCH-GATE-A-48FRAME-RUN.md`.
 
 ## Next work
 
-1. **Codex:** design a bounded Gate-A long-context/coherent-rate experiment,
-   seeded by BP56 CRF63, with new same-identity slowest-preset AV1/VVC curves.
-2. **Codex:** retain ownership of the timing contract: encoder computation,
-   client decode/reconstruction and evaluation scoring need separate clocks.
-   No speed claim or full publication-ready comparison until instrumented.
-3. **Antigravity/Cursor:** after approval, validate and annotate BP57 candidate
-   shots; add enough independent matches for Gate B if the n>=6 rule remains.
+1. **Dispatched session (`plans/DISPATCH-GATE-A-48FRAME-RUN.md`):** launch and
+   adjudicate the bounded 48-frame native run (`--frames 48 --native --authorize-native`)
+   with Gate 2 controls, native slowest-preset AV1/VVC curves, and PointStream rungs C0–C3.
+2. **Gate A duration progression (by 10 September):** if 48 frames demonstrates
+   favorable amortization and subprocess timeout projection holds (<55 min), advance
+   sequentially (96 -> 192 -> 384 frames) and fit payload slope. If no crossover by
+   10 September, activate the pre-registered salient-object fallback thesis.
+3. **Antigravity/Cursor:** validate and annotate BP57 candidate shots; acquire and
+   audit >=4 additional independent matches for Gate B confirmation (n>=6).
 4. **Antigravity — `plans/PAPER-NEXT.md`:** manuscript scope, provenance and
    page budget; **Codex** reviews delicate claims and negative findings.
-5. After a candidate win: freeze the regime, confirm it, then core ablations,
-   a credible learned-video-codec comparison and an independent second domain.
+5. After a candidate win: freeze the regime, confirm on Gate B, then run Gate C
+   core ablations, DCVC-RT baseline, and second domain before evidence freeze on 20 September.
 
 All sessions return `plans/SESSION-REPORT.md` fields. Codex (or Claude if used
 again) handles high-level analysis and delicate integration; Cursor and VS Code

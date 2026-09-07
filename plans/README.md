@@ -2,56 +2,42 @@
 
 Start with `../PLAN.md`. `ROADMAP.md` controls priorities; read only the assigned
 brief. Archived reports describe what happened, not what to run next.
-The current dispatch entry point is `../HANDOFF.md`.
+The current dispatch entry point is `DISPATCH-GATE-A-48FRAME-RUN.md`.
 
 ## Active
 
 | Brief | Current purpose | Harness |
 |---|---|---|
-| `BP56-background-encoder-effort.md` | Measurement complete; report `BP56-background-effort-report.md`; Codex review | Cursor done; Codex review |
-| `BP57-confirmation-acquisition-pilot.md` | Approved two-source acquisition/shot pilot | Antigravity |
-| `BP45-ultra-low-rate-search.md` | M1 done; staged search guided by BP52/BP53 | Cursor |
-| `BP46-long-tennis-scenes.md` | Diagnostics ready; confirmation incomplete | Antigravity |
-| `BP32-rate-budget.md`, `BP33-span-amortisation.md` | Byte costs and unresolved long-span scaling | Cursor; Codex interpretation |
+| `GATE-A-LONG-CONTEXT-2026-09-05.md` | Frozen Gate-A search brief: bounds, ladder, identity, timeout and stop rules | Authority / Codex |
+| `DISPATCH-GATE-A-48FRAME-RUN.md` | Dispatch prompt and run report for the bounded 48-frame native run | Dispatched session |
 | `PAPER-NEXT.md` | Scope, provenance, page budget and final evidence | Antigravity; Codex review |
-| `BP37-required-behaviour.md` | Remaining behaviour-suite audit, not coverage padding | Cursor |
-| `SUBMISSION-READINESS-2026-09-05.md` | Current evidence, blockers and deadline decisions | Codex |
+| `SUBMISSION-READINESS-2026-09-05.md` | Current evidence, blockers and deadline decisions | Authority / Codex |
+| `BP46-long-tennis-scenes.md` | Candidate long eligible scenes and manifest rules (D1) | Antigravity / Cursor |
 
-## Later or parked
+## Next gates (parked until Gate A/B win)
 
-- `BP55-timing-boundaries.md`: Codex-owned timing design; implement after BP53
-  review, before publication-ready three-way comparisons.
-- `BP34-operating-point.md`: optimize after a confirmed size–quality win.
-- `BP36-second-domain.md`: only after good first-domain results.
-- `BP38-paper-infrastructure.md`: remaining figures / learned-codec comparison;
-  PDF rendering already works.
-- `BP39-all-off-corner.md`: historical passthrough-refactor proposal. Explicit
-  fallback is implemented; automatic mixed-scene scheduling is not validated.
-- `BP40-background-honesty.md`, `BP43-background-representation.md`: select
-  refinements using current byte costs; their old PR-lock language is historical.
-- `BP41-ablation-lattice.md`: core component matrix after freezing the regime.
-- `done/BP19-conditioning-architecture.md`, `done/BP28-offset-crossover.md`:
-  archived proposals, **parked rather than completed**. Do not restart training
-  from their historical priority language.
+- `BP41-ablation-lattice.md`: core component ablation matrix after freezing the regime (Gate C).
+- `BP36-second-domain.md`: independent public sequence/domain evaluation (Gate D).
+- `BP34-operating-point.md`: profile and optimize speed of the frozen winner (Gate D).
+- `BP37-required-behaviour.md`: remaining behaviour-suite invariants audit.
 
-## History and shared guidance
+## History and archived work (`plans/done/`)
 
-BP49, BP51, BP52, BP53 and BP54 full briefs/reports moved to `done/`.
-Small redirects preserve old citations; they are not active instructions.
-BP54 completion means a shortlist, not accepted confirmation; BP53 includes
-a negative diagnostic and later engineering repairs, not a native rerun.
-See `done/BP53-BP54-integration.md`. The former
-`HANDOFF-BP51-*` and `HANDOFF-BP52-*` briefs are archived under `done/`.
+Completed reports, superseded briefs, and historical diagnostics live in `plans/done/`:
+- `BP56-background-encoder-effort.md`, `BP56-background-effort-report.md`: completed; PR #63 merged.
+- `BP57-confirmation-acquisition-pilot.md`, `BP57-acquisition-report.md`: completed; PR #64 merged.
+- `BP55-timing-boundaries.md`: implemented in PR #65/#66 (`encoder_seconds`, `client_seconds`, `evaluation_seconds`).
+- `BP45-ultra-low-rate-search.md`: superseded by `GATE-A-LONG-CONTEXT-2026-09-05.md`.
+- `BP38-paper-infrastructure.md`: superseded by `PAPER-NEXT.md`.
+- `BP39-all-off-corner.md`: implemented in PR #45 (conventional fallback control).
+- `BP32-rate-budget.md`, `BP33-span-amortisation.md`: historical payload and span diagnostics.
+- `BP40-background-honesty.md`, `BP43-background-representation.md`: background reporting and representation diagnostics.
+- Earlier briefs `BP49`, `BP51`, `BP52`, `BP53`, `BP54` and wave reports.
 
 `done/` contains completed reports and explicitly superseded or parked briefs.
 It does not certify that every task in each document is finished. The old long
-PLAN is `done/RESEARCH-HISTORY.md`. Its numbered-section citations remain
-historical references. Validity warnings and retractions continue to apply.
+PLAN is `done/RESEARCH-HISTORY.md`. Validity warnings and retractions continue to apply.
 
 `SESSION-REPORT.md` defines dispatch/report requirements. `TERMINOLOGY.md`
 defines plain names. `DEFERRED.md` records additional deferred work and closed
-findings. The old P1 brief is superseded for dispatch by `PAPER-NEXT.md`.
-
-Obsolete scratch prompts were removed in PR #54. Reports embedded in the two
-wave-5 prompts remain in `done/wave5-cursor-report.md` and
-`done/wave5-antigravity-report.md`; old dispatch text is historical, not active.
+findings. `ENGINE-ROSTER.md` records model/checkpoint status.
