@@ -1,6 +1,6 @@
 # Generation Area
 
-**Evidence Revision**: Reconciled through PR #28 (`c3d0b2e`) and PR #72.
+**Evidence Revision**: Reconciled through PR #28 (`66da545dcf`) and PR #72.
 **Owned Scope**: Generative backends (`src/components/generation/`), ControlNet, IP-Adapter, Animate-Anyone, SVD, generator dispatch.
 
 ---
@@ -21,8 +21,8 @@ Extensive empirical benchmarking across multiple generative models demonstrated 
 
 | Topic | PR / Commit | Decision & Status |
 |---|---|---|
-| Engine Roster | #20 (`34b5c77`), #27 (`9991275`), #28 (`c3d0b2e`) | Evaluated ControlNet, IP-Adapter, Animate-Anyone against pasted reference. |
-| Generator Interface | #28 (`c3d0b2e`) | Established `GeneratorRef` contract and disabled-by-default behavior. |
+| Engine Roster | #20 (`fd36b4b338`), #27 (`8d9a4b1669`), #28 (`66da545dcf`) | Evaluated ControlNet, IP-Adapter, Animate-Anyone against pasted reference. |
+| Generator Interface | #28 (`66da545dcf`) | Established `GeneratorRef` contract and disabled-by-default behavior. |
 | Negative Result | Paper & #28 | Formally documented as a paper finding: pasted reference keyframe is the gold standard for temporal video codec fidelity. |
 
 ---

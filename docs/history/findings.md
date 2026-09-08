@@ -48,7 +48,7 @@ This document records scientific invariants, retracted conclusions, and experime
 
 ## 7. Source Contamination & Confirmation Protocol
 - **Finding**: Broadcast tennis sequences used during early exploration were repeatedly observed during feature engineering and plate stitching tuning.
-- **Rule**: Final paper claims require Gate B frozen confirmation on six completely independent, unobserved source sequences without further tuning.
+- **Rule**: Cross-match generalization claims require the independent-match Gate B protocol. Within-source holdouts support a narrower claim; per-video fitting under a frozen encoding procedure is allowed with complete byte/time accounting. See [data protocol](../areas/data.md#4-confirmation-protocol).
 - **Provenance**: PR #56 (`09727a4`), PR #57 (`77f30ec`), PR #60 (`f6f4f72`).
 
 ---
@@ -62,7 +62,7 @@ This document records scientific invariants, retracted conclusions, and experime
 
 ## 9. Gate A 48-Frame Checkpoint Alarms (#69)
 - **Finding**: In the 48-frame native run (#69), PointStream failed to cross the AV1/VVC rate–distortion curve because:
-  1. `libaom` intra plate coding enforced an artificial bitfloor (~260 KB).
+  1. The tested `libaom` intra configuration produced a large plate; a codec-wide “artificial bitfloor” was not established.
   2. JPEG actor crops consumed 4–25 KB each.
   3. Short sequence duration (48 frames) provided insufficient amortization for 4K background plates.
 - **Usability Limit**: No BD-rate calculation is citable from the #69 configuration. Gate A remains open pending VVC/SVT background sidecars, WebP appearance crops, and extended amortization (96/192 frames).
