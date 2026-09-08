@@ -198,6 +198,7 @@ def ensure_appearance(ctx: StageContext) -> Any:
     if name == "compressed-image":
         kwargs["quality"] = config.appearance.jpeg_quality
         kwargs["downscale"] = config.appearance.downscale
+        kwargs["format"] = getattr(config.appearance, "format", "jpeg")
     ctx.appearance_encoder = _build(ctx, "appearance", name, **kwargs)
     return ctx.appearance_encoder
 

@@ -22,7 +22,7 @@ Submission Target: **ACM TOMM — 30 September 2026** (hard deadline). See [docs
 
 | Task ID | Worktree / Branch | Base Rev | Owner | Allowed Scope | Dependencies | Active PR |
 |---|---|---|---|---|---|---|
-| — | No active assignment recorded; PR #73 is merged. | — | — | — | — | — |
+| `OVERNIGHT-GATE-A` | `/tmp/pointstream-gate-a-overnight` / `antigravity/gate-a-overnight-2026-09-09` | `0c45b92` | Antigravity | `CODEC-ACT-01/02`, `DATA-ACT-01/04`, `EVAL-ACT-01/02/03/04` | PR #74 / `0c45b92` | Pending |
 
 ---
 

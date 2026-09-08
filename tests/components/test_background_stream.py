@@ -138,7 +138,7 @@ class TestConstruction:
         # elementary stream is the format. mkv would hide the framing in the
         # container and the client could not reassemble a chain.
         for name, spec in CODECS.items():
-            assert spec.container in {"obu", "hevc", "h264"}, name
+            assert spec.container in {"obu", "hevc", "h264", "vvc"}, name
 
 
 @pytest.mark.integration
@@ -311,3 +311,16 @@ class TestBatchPath:
     def test_the_batch_path_refuses_a_mode_whose_chains_are_not_linear(self) -> None:
         with pytest.raises(ValueError, match="linear chains"):
             stream_linear(_panning_scenes(2), mode=REFERENCE_BEST_SCORED)
+
+    @pytest.mark.parametrize("codec", ["svt-av1", "vvc"])
+    def test_svt_and_vvc_stream_linear(self, codec: str) -> None:
+        scenes = _panning_scenes(3)
+        batched = stream_linear(
+            scenes, codec=codec, crf=45, keyframe_interval=KEYFRAME_NEVER, mode=REFERENCE_LAST
+        )
+        assert len(batched) == 3
+        receiver = BackgroundStreamReceiver(codec=codec)
+        recons = [receiver.receive(p, height=HEIGHT, width=WIDTH) for p in batched]
+        for recon in recons:
+            assert recon.shape == (HEIGHT, WIDTH, 3)
+

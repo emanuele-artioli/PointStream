@@ -91,9 +91,11 @@ class AppearanceConfig:
     representation: str = "compressed-image"
     jpeg_quality: int = 90
     downscale: int = 1
+    format: str = "jpeg"
     """Both degradation knobs are here because they are not equivalent — one
     discards high-frequency detail, the other resolution — and which serves
-    generative reconstruction better is an open question worth sweeping."""
+    generative reconstruction better is an open question worth sweeping.
+    format selects 'jpeg' or 'webp' encoding."""
 
 
 @dataclass(frozen=True)
@@ -574,6 +576,16 @@ def validate(config: PointstreamConfig) -> None:
                     "background.stream_codec",
                     "non-default stream effort applies only to libaom-av1 "
                     f"(stream_codec='av1'); got {config.background.stream_codec!r}.",
+                )
+            )
+
+    if config.lattice.appearance:
+        fmt = config.appearance.format.lower()
+        if fmt not in ("jpeg", "jpg", "webp"):
+            note(
+                ConfigValueError(
+                    "appearance.format",
+                    f"{config.appearance.format!r} is not supported; allowed: 'jpeg', 'webp'.",
                 )
             )
 
