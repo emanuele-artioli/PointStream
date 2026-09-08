@@ -1,15 +1,15 @@
 """Required behaviour: a shipped tier config runs end to end and is scored.
 
-This is the gate for `plans/done/RESEARCH-HISTORY.md` §7 P0 item 1. It exists because the three parts
-— the config files, `src/runner`, and the metric set — were each green on their
-own for weeks while never having met. Unit tests on the parts cannot catch
-that; only driving a real file from `config/` can.
+This is the gate for `plans/done/RESEARCH-HISTORY.md` §7 P0 item 1 (see `docs/areas/evaluation.md`).
+It exists because the three parts — the config files, `src/runner`, and the metric set — were each
+green on their own for weeks while never having met. Unit tests on the parts cannot catch that;
+only driving a real file from `config/` can.
 
 What is deliberately *not* asserted here: that the numbers are good. Every
-generative engine on the roster loses to pasting the keyframe (`plans/done/RESEARCH-HISTORY.md` §2.10)
-and these tiers run with generation off, so a quality bar in this file would be
-a bar on the residual, not on the platform. The properties below are the ones
-whose failure means the platform is broken rather than the model being weak.
+generative engine on the roster loses to pasting the keyframe (`docs/history/findings.md` §2;
+historically `plans/done/RESEARCH-HISTORY.md` §2.10) and these tiers run with generation off,
+so a quality bar in this file would be a bar on the residual, not on the platform. The properties
+below are the ones whose failure means the platform is broken rather than the model being weak.
 
 The clip is synthetic and tiny on purpose: this is a path gate that has to run
 in CI, not a measurement. The measurement lives in `experiments/tier`, which

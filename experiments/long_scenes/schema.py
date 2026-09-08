@@ -2,7 +2,7 @@
 
 Defines the machine-readable contracts for scene eligibility features, source
 metadata, per-interval validation (48/96/192/384 frames), and the top-level
-manifest following plans/BP46-long-tennis-scenes.md and plans/SESSION-REPORT.md.
+manifest following docs/areas/data.md and docs/workflow/session/SKILL.md.
 """
 
 from __future__ import annotations
