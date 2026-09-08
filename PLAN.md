@@ -41,6 +41,13 @@ Completed briefs and reports (BP32, BP33, BP38, BP39, BP40, BP43, BP45, BP49, BP
 are archived in `plans/done/`. The dispatch entry point for execution is
 `plans/DISPATCH-GATE-A-48FRAME-RUN.md`.
 
+## Documentation migration
+
+[Documentation overhaul brief](plans/DOCUMENTATION-OVERHAUL.md): audited through
+PR #72, with a complete file inventory, verified PR index and current host timings.
+This is a pending documentation task; the historical experiment dispatch below
+must be reconciled against PR #69 before it is reused.
+
 ## Next work
 
 1. **Dispatched session (`plans/DISPATCH-GATE-A-48FRAME-RUN.md`):** launch and
