@@ -1,6 +1,6 @@
 # Infrastructure Area
 
-**Evidence Revision**: Reconciled through PR #68 (`fa00a12`) and PR #73.
+**Evidence Revision**: Reconciled through PR #68 (`956ad3c277`) and PR #73.
 **Owned Scope**: Environments, CI/GitHub Actions, worktree lifecycle, runner integration, local caches, hardware profiling.
 
 ---
@@ -35,8 +35,8 @@ PR #68 introduced `scripts/cleanup_merged_worktrees.sh`. The documentation audit
 
 | Topic | PR / Commit | Decision & Status |
 |---|---|---|
-| External data separation | #32 (`d436b02`), #35 (`6c4fa10`) | `paths.py` resolver routes data to `.ps-data-root`; zero symlinks in repo. |
-| Worktree recovery | #53 (`86653ef`) | Strict branch-and-worktree isolation protocol established. |
+| External data separation | #32 (`d436b02`), #35 (`420c3bec4a`) | `paths.py` resolver routes data to `.ps-data-root`; zero symlinks in repo. |
+| Worktree recovery | #53 (`ec581e957d`) | Strict branch-and-worktree isolation protocol established. |
 | CI automation | #23, #44 | Integrated `ruff`, `mypy`, layer boundaries, and synthetic tier tests. |
 | Host profiling | #73 | Measured process startup and import times; confirmed runner does not load Torch. |
 
@@ -52,4 +52,4 @@ PR #68 introduced `scripts/cleanup_merged_worktrees.sh`. The documentation audit
 
 ### PR #73 review follow-up (2026-09-08)
 
-Moved closeout procedures into the session skill and verification rationale into setup; corrected pytest cache configuration and the README output path that bypassed the data root. Repaired the audit brief recovery row, which stored a commit abbreviation instead of a blob hash. Reconciled stale assignment state and qualified unverified codec claims. Gate B now distinguishes per-video encoding from shared-model training and source generalization; the existing six-match validator remains authoritative. Validation: relative-link and recovery-blob audit, documented CLI inspection, skill frontmatter validation, and diff whitespace checks; CI results are recorded in the follow-up PR. Next infrastructure action remains `INFRA-ACT-01`; this documentation review does not repair or authorize the unsafe cleanup helper.
+Moved closeout procedures into the session skill and verification rationale into setup; corrected pytest cache configuration and the README output path that bypassed the data root. Replaced nonexistent area evidence commit hashes with verified PR merge references. Repaired the audit brief recovery row, which stored a commit abbreviation instead of a blob hash. Reconciled stale assignment state and qualified unverified codec claims. Gate B now distinguishes per-video encoding from shared-model training and source generalization; the existing six-match validator remains authoritative. Validation: relative-link and recovery-blob audit, documented CLI inspection, skill frontmatter validation, and diff whitespace checks; CI results are recorded in the follow-up PR. Next infrastructure action remains `INFRA-ACT-01`; this documentation review does not repair or authorize the unsafe cleanup helper.

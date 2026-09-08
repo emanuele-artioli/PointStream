@@ -1,6 +1,6 @@
 # Data Area
 
-**Evidence Revision**: Reconciled through PR #63 (`d26a27e`) and PR #72.
+**Evidence Revision**: Reconciled through PR #63 (`5ca87b2ee4`) and PR #72.
 **Owned Scope**: Data acquisition, manifest definitions, eligibility criteria, sequence splits, domain definitions.
 
 ---
@@ -21,10 +21,10 @@ PointStream processes video sequences that exhibit salient foreground objects mo
 
 | Topic | PR / Commit | Decision & Status |
 |---|---|---|
-| External data root | #32 (`d436b02`), #35 (`6c4fa10`) | Isolated `.ps-data-root` resolver; no symlinks in repo. |
-| Acquisition audit | #56 (`14fb05a`), #57 (`82c9bf3`) | Validated diagnostic corpus manifests and integrity hashes. |
-| Domain candidates | #60 (`e14ea9d`) | Screened secondary domain candidates for Gate D. |
-| Long sequences | #63 (`d26a27e`) | Characterized 96- and 192-frame tennis sequences for background amortization. |
+| External data root | #32 (`d436b02`), #35 (`420c3bec4a`) | Isolated `.ps-data-root` resolver; no symlinks in repo. |
+| Acquisition audit | #56 (`09727a4f16`), #57 (`77f30ecbe0`) | Validated diagnostic corpus manifests and integrity hashes. |
+| Domain candidates | #60 (`f6f4f72cd9`) | Screened secondary domain candidates for Gate D. |
+| Long sequences | #63 (`5ca87b2ee4`) | Characterized 96- and 192-frame tennis sequences for background amortization. |
 
 ---
 

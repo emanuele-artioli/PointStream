@@ -30,9 +30,9 @@ In the Gate A 48-frame native run (#69), PointStream payload was dominated by tw
 
 | Topic | PR / Commit | Decision & Status |
 |---|---|---|
-| Sidecar encoders | #36 (`6975dc9`) | Standalone AV1 and VVC intra sidecar encoders implemented. |
-| Background canvas | #45 (`fbb463d`), #50 (`32729a9`) | Canonical offline background stitched representation established. |
-| Fallback mechanism | #52 (`83a7587`) | Explicit conventional video fallback path added for ineligible segments. |
+| Sidecar encoders | #36 (`09c92880c4`) | Standalone AV1 and VVC intra sidecar encoders implemented. |
+| Background canvas | #45 (`ecebd9b97d`), #50 (`bb5d17445f`) | Canonical offline background stitched representation established. |
+| Fallback mechanism | #52 (`68a03dc542`) | Explicit conventional video fallback path added for ineligible segments. |
 | Native 48-frame run | #69 (`648325b`) | Measured whole-system rate/quality; identified background & appearance byte floor. |
 | Competitive regime | #70–#72 | Proposed VVC/SVT background sidecars and WebP/AVIF appearance crops. |
 

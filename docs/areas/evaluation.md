@@ -33,8 +33,8 @@ Evaluating over longer sequences (96 and 192 frames) is a core hypothesis for es
 
 | Topic | PR / Commit | Decision & Status |
 |---|---|---|
-| Synthetic Tier Tests | #23 (`d3d7890`) | Synthetic 3-frame tier path test established as CI regression gate. |
-| Ladder Plumbery | #65 (`6bdf2c3`), #66 (`9a1e0b5`) | Sweep infrastructure and anchor pairing harness created. |
+| Synthetic Tier Tests | #23 (`ca0f75af30`) | Synthetic 3-frame tier path test established as CI regression gate. |
+| Ladder Plumbery | #65 (`91b33e623f`), #66 (`606cf53893`) | Sweep infrastructure and anchor pairing harness created. |
 | 48-Frame Native Run | #69 (`648325b`) | Full-system baseline evaluated. Identified background/appearance bottlenecks. |
 | Fast Eval Strategy | #71, #72 | Two-tier protocol adopted; piped FFmpeg streaming proposed. |
 
