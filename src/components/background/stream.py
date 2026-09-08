@@ -137,31 +137,46 @@ class StreamCodec:
     encoder: str
     container: str
     low_delay: tuple[str, ...]
+    rate_flag: str = "-crf"
 
 
-#: av1 is the arm that matters: findings §19 measured its saving unchanged to
-#: the byte under low delay, because `-usage realtime` was already
-#: lookahead-free. x265 is kept as a contrast, not as an equal -- it saves 12%
-#: on one pair and loses 6% on the other, so the saving is a property of av1's
-#: inter tools rather than of inter coding.
+#: av1 is the baseline arm; vvc (libvvenc) and svt-av1 (libsvtav1) provide
+#: low-bitfloor modern alternatives. x265/x264 are kept as contrasts.
 CODECS: Final[dict[str, StreamCodec]] = {
     "av1": StreamCodec(
         name="av1",
         encoder="libaom-av1",
         container="obu",
         low_delay=("-cpu-used", "8", "-usage", "realtime", "-lag-in-frames", "0", "-bf", "0"),
+        rate_flag="-crf",
+    ),
+    "svt-av1": StreamCodec(
+        name="svt-av1",
+        encoder="libsvtav1",
+        container="obu",
+        low_delay=("-preset", "10", "-svtav1-params", "pred-struct=1:lookahead=0:tune=0"),
+        rate_flag="-qp",
+    ),
+    "vvc": StreamCodec(
+        name="vvc",
+        encoder="libvvenc",
+        container="vvc",
+        low_delay=("-preset", "faster", "-qpa", "0", "-period", "100000"),
+        rate_flag="-qp",
     ),
     "hevc": StreamCodec(
         name="hevc",
         encoder="libx265",
         container="hevc",
         low_delay=("-preset", "veryfast", "-bf", "0", "-x265-params", "log-level=none:bframes=0"),
+        rate_flag="-crf",
     ),
     "avc": StreamCodec(
         name="avc",
         encoder="libx264",
         container="h264",
         low_delay=("-preset", "veryfast", "-bf", "0", "-x264-params", "log-level=none:bframes=0"),
+        rate_flag="-crf",
     ),
 }
 
@@ -360,7 +375,7 @@ def _encode_chain(
         stream = tmp / f"stream.{codec.container}"
         encode_argv = [
             ffmpeg_path, "-hide_banner", "-loglevel", "error", "-y", "-i", str(source),
-            "-c:v", codec.encoder, "-crf", str(crf), *codec.low_delay,
+            "-c:v", codec.encoder, codec.rate_flag, str(crf), *codec.low_delay,
             # One keyframe, at the head. The chain is the GOP; a keyframe
             # inside it would make the payloads before it dead weight.
             "-g", "1000000", "-f", codec.container, str(stream),
@@ -423,22 +438,30 @@ def _probe_packets(ffprobe: str, path: Path, container: str) -> list[_Packet]:
         check=True, capture_output=True,
     )
     parsed = json.loads(result.stdout.decode("utf-8", "replace"))
-    # Asking for packets *and* frames makes ffprobe emit one interleaved
-    # `packets_and_frames` array rather than two lists. Reading it in order is
-    # what pairs a picture type with the byte range it came from; zipping two
-    # separate lists by position would silently mispair if either is short.
     entries = parsed.get("packets_and_frames")
-    if entries is None:
-        entries = parsed.get("packets", [])
-    rows: list[_Packet] = []
-    for entry in entries:
-        if entry.get("type") == "frame":
-            if rows:
-                rows[-1] = replace(rows[-1], picture_type=str(entry.get("pict_type", "?")))
-            continue
-        rows.append(
-            _Packet(pos=int(entry.get("pos", 0)), size=int(entry.get("size", 0)), picture_type="?")
-        )
+    if entries is not None:
+        raw_packets = [e for e in entries if e.get("type") == "packet" or "pos" in e]
+        raw_frames = [e for e in entries if e.get("type") == "frame" or "pict_type" in e]
+        rows: list[_Packet] = []
+        for i, p in enumerate(raw_packets):
+            ptype = "?"
+            if i < len(raw_frames):
+                ptype = str(raw_frames[i].get("pict_type", "?"))
+            if ptype == "?":
+                ptype = "I" if i == 0 else "P"
+            rows.append(_Packet(pos=int(p.get("pos", 0)), size=int(p.get("size", 0)), picture_type=ptype))
+        return rows
+
+    packets = parsed.get("packets", [])
+    frames = parsed.get("frames", [])
+    rows = []
+    for i, p in enumerate(packets):
+        ptype = "?"
+        if i < len(frames):
+            ptype = str(frames[i].get("pict_type", "?"))
+        if ptype == "?":
+            ptype = "I" if i == 0 else "P"
+        rows.append(_Packet(pos=int(p.get("pos", 0)), size=int(p.get("size", 0)), picture_type=ptype))
     return rows
 
 

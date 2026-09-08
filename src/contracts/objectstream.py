@@ -208,6 +208,7 @@ class CompressedImage:
     quality: int = 85
     downscale: float = 1.0
     measured_bytes: int | None = None
+    format: str = "jpeg"
 
     def __post_init__(self) -> None:
         if self.width <= 0 or self.height <= 0:
@@ -223,6 +224,9 @@ class CompressedImage:
             )
         if self.measured_bytes is not None and self.measured_bytes < 0:
             raise ValueError(f"CompressedImage measured_bytes must be >= 0, got {self.measured_bytes}.")
+        fmt = self.format.lower()
+        if fmt not in ("jpeg", "jpg", "webp"):
+            raise ValueError(f"CompressedImage format must be 'jpeg' or 'webp', got {self.format!r}.")
 
     @property
     def kind(self) -> str:
@@ -239,13 +243,14 @@ class CompressedImage:
     def cost(self) -> WireCost:
         sent_width, sent_height = self.transmitted_size
         pixels = sent_width * sent_height
+        fmt_name = "webp" if self.format.lower() == "webp" else "jpeg"
         if self.measured_bytes is None:
             return WireCost(
                 values=pixels * 3,
                 byte_count=None,
                 exact=False,
                 basis=(
-                    f"jpeg q{self.quality} at {sent_width}x{sent_height}; "
+                    f"{fmt_name} q{self.quality} at {sent_width}x{sent_height}; "
                     f"size is data-dependent and unmeasured"
                 ),
             )
@@ -253,7 +258,7 @@ class CompressedImage:
             values=pixels * 3,
             byte_count=self.measured_bytes,
             exact=True,
-            basis=f"jpeg q{self.quality} at {sent_width}x{sent_height}, measured",
+            basis=f"{fmt_name} q{self.quality} at {sent_width}x{sent_height}, measured",
         )
 
 
