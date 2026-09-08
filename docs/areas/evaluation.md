@@ -9,7 +9,7 @@
 
 The Gate A 48-frame native run (#69) completed the first full-system rate–distortion measurement on real tennis footage. While validating pipeline integrity, it confirmed that Gate A is **not passed yet** under the legacy configuration due to:
 1. High intra bitfloor in `libaom` background plate (~262 KB).
-2. Uncompressed JPEG foreground appearance crops (~4–25 KB per actor per keyframe).
+2. JPEG-compressed foreground appearance crops (~4–25 KB per actor per keyframe).
 3. Slow metric evaluation writing uncompressed PNGs to disk for VMAF computation.
 
 ### Two-Tier Metric Protocol (#72)
@@ -44,7 +44,7 @@ Evaluating over longer sequences (96 and 192 frames) is a core hypothesis for es
 
 | ID | Status | Dependencies | Source | Description & Acceptance Criteria |
 |---|---|---|---|---|
-| `EVAL-ACT-01` | Ready | None | #71, #72 | **Piped in-memory metric computation**: Replace `_write_png_clip` disk writes with direct stdin streaming (`-f rawvideo -pix_fmt rgb24 ...`) to `ffmpeg` and enable `n_threads=16` for `libvmaf`. Acceptance: Metric calculation time reduced by ≥5× without altering score values on reference clips. |
-| `EVAL-ACT-02` | Blocked | `CODEC-ACT-01`, `EVAL-ACT-01` | #72 | **Amortization & rate sweep (Tier 1 PSNR)**: Sweep QP ladders across 48, 96, and 192 frames with VVC/SVT background plate. Acceptance: Establish operating range where PointStream PSNR exceeds AV1/VVC anchors at matched bitrate. |
+| `EVAL-ACT-01` | Ready | None | #71, #72 | **Piped in-memory metric computation**: Replace `_write_png_clip` disk writes with direct stdin streaming (`-f rawvideo -pix_fmt rgb24 ...`) to `ffmpeg` and enable `n_threads=16` for `libvmaf`. Acceptance: Match reference-path scores within declared numerical tolerances on identical/mild/severe/unrelated controls; measure wall time and memory on the same host. A 5× speedup is a target, not an assumed result. This optimization must not block a working in-memory PSNR sweep. |
+| `EVAL-ACT-02` | Blocked | `CODEC-ACT-01`, `DATA-ACT-01` (PSNR path verified) | #72 | **Amortization & rate sweep (Tier 1 PSNR)**: Sweep QP ladders across 48, 96, and 192 frames with VVC/SVT background plate. Acceptance: Establish operating range where PointStream PSNR exceeds AV1/VVC anchors at matched bitrate. |
 | `EVAL-ACT-03` | Blocked | `EVAL-ACT-02` | #72 | **Tier 2 full-metric confirmation**: Run PSNR-Y, SSIM, VMAF, and LPIPS on the winning configuration from `EVAL-ACT-02`. Acceptance: Complete three-axis report (size, quality, speed) with two-sided pre-run bounds and null controls. |
 | `EVAL-ACT-04` | Ready (previously D-CODEC-PRESETS) | None | `plans/DEFERRED.md` | **Anchor preset standardization**: Document exact FFmpeg command lines, presets, and versions for AV1 (`libsvtav1`/`libaom`) and VVC (`libvvenc`). Acceptance: Explicit, reproducible anchor scripts checked into repository. |

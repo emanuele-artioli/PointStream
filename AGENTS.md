@@ -41,32 +41,10 @@ The paper lives in `67a9ea6275d3d9785ce57026/`, a **separate git repo** with its
 
 ---
 
-## Completion and Session Boundaries
+## Task Completion and Setup
 
-Before ending each response, check whether the requested issue is solved:
-- If solved: record the result and validation in a PR, update the owning area document's current state and next action, and consider whether this is a clean session boundary. Do not create a new standalone report file for a completed session.
-- If work remains: state the unresolved decision and produce a scoped continuation prompt when a handoff is useful. A prompt does not replace durable decisions or the area update.
-- Keep one PR per independently revertible change; do not open a PR per reply.
+For dispatch, completed work, or handoff, read and follow the [session workflow](docs/workflow/session/SKILL.md). It owns PR reporting, area updates, validation, and worktree retirement; ordinary replies do not require a closeout.
 
-### Worktree Cleanup
-Cleanup is an explicit check, not a blanket deletion instruction:
-- Confirm merge against fresh `origin/main`, clean status, and unique commits/diff.
-- Ask before removing any worktree that may host a paused session.
-- Never force removal (`--force`) or use `rm -rf` to bypass Git refusal.
-- Do not run `scripts/cleanup_merged_worktrees.sh` in its current form.
+Use [docs/setup.md](docs/setup.md) before environment setup or experiment runs, and its verification section before merging. Host-wide cache and import-order rules remain in the host rules above.
 
----
-
-## Environment and Verification
-
-- Data lives outside code; configure via `.ps-data-root` marker or `PS_DATA_ROOT` (see [docs/setup.md](docs/setup.md)). Never create `assets/` or `outputs/` symlinks inside the code repo. Open a single worktree in editors.
-- Keep regenerable caches (`.mypy_cache`, `.pytest_cache`, `.ruff_cache`) on host-local disk (e.g. `/tmp`), namespaced by checkout.
-- Put `import sqlite3` before `import torch` in all scripts.
-- Resolve external tools (`ffmpeg`, `vvencapp`) by path and version explicitly.
-- Before merging changes:
-  ```bash
-  ruff check .
-  mypy --config-file pyproject.toml
-  python -m src.contracts.layers
-  python -m pytest tests/runner/test_tier_end_to_end.py -q
-  ```
+Project constraints: data must stay outside the code tree (no `assets/` or `outputs/` symlinks); record the exact native encoder/decoder paths and versions with each run so comparisons are reproducible. Do not run `scripts/cleanup_merged_worktrees.sh` until `INFRA-ACT-01` is resolved: its deletion fallback can discard uncommitted work.

@@ -56,8 +56,10 @@ PointStream processes video scenes defined by input manifests:
 2. **Execute Tier Configurations**:
    Run the tier benchmark runner on a prepared scene:
    ```bash
-   python -m experiments.tier.run --tiers fast balanced quality --frames 8 --out outputs/report.json
+   python -m experiments.tier.run --tiers fast balanced quality --frames 8
    ```
+   The default report path follows the configured external data root. An explicit `--out` is used literally, so give an external absolute path.
+
    *Note*: The tier runner evaluates against reference clips defined in the data manifest. If external source video is not present, use the synthetic test suite above.
 
 ---

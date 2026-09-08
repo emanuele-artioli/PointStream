@@ -16,13 +16,13 @@ PointStream structures video coding into distinct semantic components:
 
 ### Empirical Benchmarks and Bottlenecks
 In the Gate A 48-frame native run (#69), PointStream payload was dominated by two elements:
-- **Background Plate Bitfloor**: `src/components/background/stream.py` hardcoded `StreamCodec` to `libaom-av1`. In `libaom-av1`, intra 4K frames encounter an artificial bitfloor refusing to quantize below ~260 KB (CRF 63 yielded 268,949 bytes).
+- **Background Plate Bitfloor**: `src/components/background/stream.py` hardcoded `StreamCodec` to `libaom-av1`. The archived #71/#72 probe reported 268,949 bytes at CRF 63 on one canvas/build. This is a configuration-specific observation, not proof of a universal AV1 floor; reproduce the command and reconstruction quality before attributing the cause.
   - Benchmarked alternatives on the same 4K canvas:
     - `libaom-av1 (CRF 63)`: 268,949 bytes (262.6 KB)
     - `SVT-AV1 (QP 63)`: 41,162 bytes (40.2 KB)
     - `VVC libvvenc slower (QP 63)`: 5,347 bytes (5.2 KB)
-    - `VVC libvvenc slower (QP 55)`: 14,336 bytes (14.0 KB)
-- **Actor Appearance Crops**: Currently uses baseline JPEG (`CompressedImageAppearance` in `src/components/appearance/compressed.py`), spending 4–25 KB per crop with ringing artifacts below quality 40. Native OpenCV WebP encoding (`cv2.imencode('.webp', crop, [cv2.IMWRITE_WEBP_QUALITY, q])`) achieves 35–50% bitrate reduction with improved edge preservation.
+    - `VVC libvvenc slower (QP 55)`: 14,313 bytes (about 14.0 KiB; archived #72 value)
+- **Actor Appearance Crops**: Currently uses baseline JPEG (`CompressedImageAppearance` in `src/components/appearance/compressed.py`), spending 4–25 KB per crop with ringing artifacts below quality 40. Native OpenCV WebP encoding is a candidate to benchmark. The proposed 35–50% reduction is unverified at matched quality on this corpus; it is not an established result.
 
 ---
 
@@ -42,7 +42,7 @@ In the Gate A 48-frame native run (#69), PointStream payload was dominated by tw
 
 | ID | Status | Dependencies | Source | Description & Acceptance Criteria |
 |---|---|---|---|---|
-| `CODEC-ACT-01` | Ready | None | #70, #71 | **Connect VVC intra / SVT-AV1 to background stream**: Update `src/components/background/stream.py` to route through `libvvenc` or SVT-AV1. Acceptance: 4K background plate encodes to <15 KB at acceptable PSNR; decodes cleanly in receiver pipeline. |
-| `CODEC-ACT-02` | Ready | None | #71, #72 | **Add WebP/AVIF appearance crops**: Add WebP/AVIF encoder in `src/components/appearance/compressed.py`. Acceptance: Crop byte size reduced by ≥30% at matched crop PSNR; no regression in client assembly. |
-| `CODEC-ACT-03` | Proposed | `CODEC-ACT-01`, `02` | #72 | **Payload ledger simplification**: Streamline byte allocation tracking across components. Acceptance: Every frame payload maps strictly to background, appearance, motion, or residual bytes without unallocated overhead. |
+| `CODEC-ACT-01` | Ready | None | #70, #71 | **Connect VVC intra / SVT-AV1 to background stream**: Update `src/components/background/stream.py` to route through `libvvenc` or SVT-AV1. Acceptance: Selected encoder demonstrably changes the bitstream, standalone receiver round trip succeeds, and plate plus full-system size/quality/time are compared at matched quality. <15 KB is a probe target, not a universal acceptance threshold. |
+| `CODEC-ACT-02` | Ready | None | #71, #72 | **Add WebP/AVIF appearance crops**: Add WebP/AVIF encoder in `src/components/appearance/compressed.py`. Acceptance: Matched-quality crop sweep and client round trip with size/quality/time reported; retain JPEG comparison. A ≥30% saving is a hypothesis, not a required outcome. |
+| `CODEC-ACT-03` | Proposed | `CODEC-ACT-01`, `02` | #72 | **Payload ledger simplification**: Streamline byte allocation tracking across components. Acceptance: All transmitted bytes reconcile to the serialized payload, including background, appearance, motion, residual, fallback, headers, and container/metadata overhead; do not hide overhead inside a component saving. |
 | `CODEC-ACT-04` | Previously deferred (D5) | None | `plans/DEFERRED.md` | **Coded fallback verification**: Verify behavior when semantic tracking fails. Acceptance: Clean switch to conventional intra/inter coding without crash or pipeline desynchronization. |
