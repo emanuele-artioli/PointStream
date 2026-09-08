@@ -8,7 +8,7 @@
 ## 1. Current State
 
 The Gate A 48-frame native run (#69) completed the first full-system rate–distortion measurement on real tennis footage. While validating pipeline integrity, it confirmed that Gate A is **not passed yet** under the legacy configuration due to:
-1. High intra bitfloor in `libaom` background plate (~262 KB).
+1. Large `libaom` background plate under the tested settings (archived probe; not a codec-wide lower bound).
 2. JPEG-compressed foreground appearance crops (~4–25 KB per actor per keyframe).
 3. Slow metric evaluation writing uncompressed PNGs to disk for VMAF computation.
 

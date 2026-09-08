@@ -51,9 +51,9 @@ Full evaluation requires native video encoders and filters:
   ```bash
   command -v vvencapp
   ```
-Record resolved executable paths, version/build output, presets, and full command lines for both encoder and decoder. FFmpeg filter availability alone does not establish VVC decoding support; verify a round trip on the actual build. Requirements depend on the selected experiment; synthetic checks do not require every native codec.
+- **OpenCV**: WebP appearance experiments need native WebP image encoding support (`cv2.IMWRITE_WEBP_QUALITY`).
 
-- **OpenCV**: Needs native WebP image encoding support (`cv2.IMWRITE_WEBP_QUALITY`).
+Record resolved executable paths, version/build output, presets, and full command lines for both encoder and decoder. FFmpeg filter availability alone does not establish VVC decoding support; verify a round trip on the actual build. Requirements depend on the selected experiment; synthetic checks do not require every native codec.
 
 ---
 

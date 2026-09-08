@@ -23,7 +23,7 @@ graph TD
   1. A reproducible advantage over the declared AV1 and VVC anchors over a measured overlapping rate/quality interval on a metric selected before the confirmation run. Declare anchor settings and uncertainty; no extrapolated BD-rate or isolated lucky-point victory.
   2. Operating regime fully characterized: content type, duration/amortization range, bitrate band, and component byte breakdown.
   3. Size, quality, and runtime measured and reported together; no speed omissions.
-- **Current Status**: Open. Diagnostic 48-frame native run (#69) completed; identified background bitfloor in `libaom` and JPEG crop overhead as key bottlenecks. Proposed lean background (VVC intra / SVT-AV1) and WebP/AVIF appearance crops in #70–#72.
+- **Current Status**: Open. Diagnostic 48-frame native run (#69) completed; identified a large background payload under the tested `libaom` settings and JPEG crop overhead. Proposed lean background (VVC intra / SVT-AV1) and WebP/AVIF appearance crops in #70–#72.
 
 Execution brief: [overnight Gate A prompt](workflow/session/overnight-gate-a.md).
 
