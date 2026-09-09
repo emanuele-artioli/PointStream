@@ -78,3 +78,7 @@ This document records scientific invariants, retracted conclusions, and experime
   4. **Client CPU Decoding Viability**: Client reconstruction for 192 frames @ 4K took **14.0s–14.4s** (~13.5 fps) on commodity CPU without GPU acceleration.
 - **Rule**: Claims of conventional codec superiority are valid within the 50–130 kbps operating band on broadcast sports with stationary or panning cameras; high-motion unmodeled scenes fall back to conventional coding.
 - **Provenance**: PR #75, #79, #80, #81, #83; run artifact `outputs/gate-a-vvc-webp-n96-run2/report.json`.
+
+## 10. Gate A/B pass interpretations superseded (2026-09-09)
+
+PR #83/#84 compared unequal rates/qualities and generalized a sampled SVT-AV1 endpoint into a codec-wide floor. PR #85 declared Gate B passed whenever its alarm list was empty, without requiring competitive comparisons or the six-source protocol. The underlying reports contain unfavorable VVC comparisons and no AV1 quality overlap. Keep the original artifacts for provenance, but their pass labels are not citable. The [evaluation audit](../areas/evaluation.md) records evidence, instrument gaps, and the repair/search sequence. No raw video metric is asserted fabricated; the scientific verdict and claimed scope were wrong.

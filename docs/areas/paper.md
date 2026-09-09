@@ -1,6 +1,6 @@
 # Paper Area
 
-**Evidence Revision**: Reconciled through paper commit `87d9e52` and code PR #72 (`bc09184`).
+**Evidence Revision**: Paper `55e4bc4`; code Gate A/B audit through PR #85, 2026-09-09.
 **Owned Scope**: Code-side evidence delivery (`outputs/`), publication tables/plots, coordination with manuscript repository (`67a9ea6275d3d9785ce57026/`).
 
 ---
@@ -16,11 +16,7 @@ The manuscript is maintained in a dedicated git repository at `67a9ea6275d3d9785
   - Main text + references: **23 pages maximum**.
   - Appendices: **5 pages maximum**.
   - Total allowed: **28 pages**.
-- **Manuscript Measurement (September 2026)**:
-  - Current build: **30 pages**.
-  - Main text: 21 pages (2 pages remaining for result figures and tables).
-  - Appendices: 9 pages (**4 pages over budget**).
-  - Action: Trim historical survey and background derivations in `appendices/` down to 5 pages.
+- **Latest validation (2026-09-09)**: paper commit `55e4bc4` builds successfully with the Gate A/B audit caveat. The previous 30-page/9-page-appendix status was stale; the current complete PDF has 27 pages. Recheck body and appendix boundaries before allocating final-result space.
 
 ### Headline Claim Governance
 - A submission must demonstrate where an object-centric semantic video codec wins over conventional baselines.
@@ -46,5 +42,7 @@ The manuscript is maintained in a dedicated git repository at `67a9ea6275d3d9785
 |---|---|---|---|---|
 | `PAPER-ACT-01` | Ready | `CODEC-ACT-01` | #70, #71 | **Background plate multi-codec appendix table**: Benchmark table comparing `libaom-av1`, `SVT-AV1`, and `VVC libvvenc` across QPs on the 4K canvas. Acceptance: LaTeX table and caption formatted for ACM TOMM appendix. |
 | `PAPER-ACT-02` | Ready | `CODEC-ACT-02` | #71, #72 | **Foreground crop codec appendix table**: Benchmark table comparing JPEG, WebP, and AVIF across quality levels for actor crops. Acceptance: Empirical size and crop PSNR table for appendix. |
-| `PAPER-ACT-03` | Ready | None | Manuscript budget | **Appendix budget reduction**: Condense `appendices/` in paper repository from 9 pages to ≤5 pages. Acceptance: Clean LaTeX compilation under 28 total pages. |
-| `PAPER-ACT-04` | Blocked | Gate A passed | Gate A | **Result figures integration**: Render rate–distortion curves and amortization plots into the 2 available main text pages. Acceptance: Vector figures embedded with exact run provenance cited in comments. |
+| `PAPER-ACT-03` | Ready | None | Manuscript budget | **Page-budget recheck**: Measure current body and appendix boundaries before final result integration; trim only if needed. The old 9-page appendix diagnosis is stale. Acceptance: body/references ≤23 pages and appendices ≤5 pages. |
+| `PAPER-ACT-04` | Blocked | Gate A passed | Gate A | **Result figures integration**: Render validated rate–distortion curves and amortization plots after rechecking available space. Acceptance: Vector figures embedded with exact run provenance cited in comments. |
+
+Gate A/B audit: `sections/evaluation.tex` now explicitly retains AV1/VVC, distinguishes native and planned resolution-adaptive comparisons, and states that the pilot pass claims do not establish competitive confirmation. No result HOLE was cleared. Next: `EVAL-ACT-06` integrity repair, then `EVAL-ACT-07` matched-rate/quality development search; integrate final results only after a valid frozen confirmation.

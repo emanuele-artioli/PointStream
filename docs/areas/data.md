@@ -50,4 +50,6 @@ Recommended path: use all seven already-exposed sources for Gate A development a
 
 Grouped outer cross-validation can use each source for training in other folds and testing once, with tuning confined to inner folds. It costs multiple fits and cannot erase prior manual design exposure to these seven videos; here it is a robustness analysis, not fresh confirmation.
 
-Next action `DATA-ACT-04` (Complete): audited candidate exposure and match identity, reserved source IDs and scene/time bounds in `manifests/gate_b_confirmation.json`, verified SHA256 integrity hashes, and launched Gate B confirmation under frozen procedure.
+Next action `DATA-ACT-04` (Partial; confirmation eligibility remains open): audited candidate exposure and match identity, reserved source IDs and scene/time bounds in `manifests/gate_b_confirmation.json`, verified SHA256 integrity hashes, and launched Gate B confirmation under frozen procedure.
+
+Audit 2026-09-09: PR #85 scored two sources, not the six independent matches required by the standing gate. It used 48 frames per source at 1080p/720p. These sources are now observed. Preserve their exposure history and label any score-driven redesign as development; do not reset them to untouched confirmation. Verify event identities, prior use, frame/shot bounds and full freeze identity for fresh sources before the next final test.

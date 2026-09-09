@@ -1,6 +1,6 @@
 # Evaluation Area
 
-**Evidence Revision**: Reconciled through PR #69 (`648325b`) and PR #72 (`bc09184`).
+**Evidence Revision**: Audit of PR #83–#85 / `d4252b5`, 2026-09-09.
 **Owned Scope**: `src/pipeline/reconstruction/quality.py`, `experiments/tier/`, `src/contracts/lattice.py`.
 
 ---
@@ -69,22 +69,39 @@ The Gate A overnight long-context run (`outputs/gate-a-vvc-webp-n96-run2`) evalu
 | Segmented | 47 | 200,613 B (200.6 kB) | 200.6 kbps | 34.29 dB | 0.9541 | 75.78 | 358.3 s | 22.3 s |
 | Segmented | 39 | 445,272 B (445.3 kB) | 445.3 kbps | 38.58 dB | 0.9726 | 88.60 | 764.6 s | 23.3 s |
 
-#### 3. Competitive Operating Regime & Analysis
+#### 3. Audit verdict (2026-09-09; supersedes PR #83–#85 pass claims)
 
-1. **Operating Below AV1 Bitrate Floor**:
-   AV1 cannot compress below ~158.5 kbps (segmented QP 63) or ~190.9 kbps (continuous QP 63). PointStream's entire rate ladder (**49.9 kbps – 127.4 kbps**) operates entirely below AV1's minimum achievable bitrate floor.
-2. **VVC Low-Rate Perceptual Collapse**:
-   While VVC reaches ~31.8 kbps at QP 63, quality collapses catastrophically to **VMAF 8.41–8.62** (unviewable block artifacts).
-3. **Mid-Low Rate Win against VVC (~75–91 kbps)**:
-   PointStream C2 (91.2 kbps) achieves **VMAF 57.62** and **PSNR 30.37 dB**, outperforming VVC QP 55 (77.2–77.4 kbps) at **VMAF 47.23–47.43** and **PSNR 29.05–29.10 dB** (+10.39 VMAF points, +1.27 dB PSNR-Y).
-4. **Matched-Quality Bitrate Savings against VVC (~125–200 kbps)**:
-   PointStream C3 achieves **VMAF 72.20 at 127.4 kbps (124.4 kB)**. To achieve comparable quality, VVC requires QP 47 at **200.6 kbps (195.9 kB)** for VMAF 75.78–76.23. PointStream delivers a **36.5% bitrate saving** against VVC at matched fidelity.
-5. **Client Decoding Speed**:
-   PointStream client reconstruction runs at **13.5–13.7 fps on CPU**, faster than VVC standalone decoding (~8.2–10 fps).
-6. **Pre-Registered Rot & Control Invariants**:
-   - Temporal rot (last-minus-first frame PSNR) drop was bounded within $[-1.61, -0.41]$ dB (bound: $[-8.0, +3.0]$ dB).
-   - Monotonic quality progression verified: $C0 < C1 < C2 < C3$.
-   - Metric controls: identical clip VMAF 97.54, mild blur 84.96, severe blur 0.0, unrelated clip 0.0. All 0 alarms.
+**Gate A is open; Gate B is incomplete and its reported pass is invalid.** The tables above remain archived run observations, not publication-ready evidence. Lower bytes at lower quality do not establish rate–distortion superiority. No universal AV1 bitrate floor was measured.
+
+The audit recomputed the stored comparisons using the checked-in comparison helper. Same-anchor controls returned zero BD-rate; doubling anchor bytes returned +100%, verifying the sign and scale. Positive values below mean more PointStream bytes at matched VMAF according to the existing cubic fit. These are diagnostics from the old scores, not newly calibrated video measurements, and the sparse low-quality fits need sensitivity checks before publication.
+
+| Recorded run / source | Frames and resolution | Continuous VVC BD-rate diagnostic | AV1 comparison | Recorded PointStream encode / client time |
+|---|---|---|---|---|
+| Gate A: `alcaraz_highlights`, two scenes | 192 total, 4K | +10.30%; VMAF overlap 8.41–72.20 | No quality overlap; floor-dominance false | C0–C3: 813–986 s / 14.0–14.4 s |
+| Gate B: Australian Open final | 48, 1080p | +91.30%; VMAF overlap 0.87–54.17 | No quality overlap; floor-dominance false | C0–C3: 44.6–45.4 s / 1.18–1.52 s |
+| Gate B: US Open final | 48, 720p | +155.22%; VMAF overlap 0–59.08 | No quality overlap; floor-dominance false | C0–C3: 17.1–17.7 s / 0.68–0.69 s |
+
+Provenance: external `outputs/gate-a-vvc-webp-n96-run2/report.json` and `outputs/gate-b-confirmation/report.json`; source/encoder settings in their identity/tool files and `manifests/gate_b_confirmation.json`. Gate A is one development source, and Gate B has two source observations with different resolutions; neither supports a population-level direction or a stable source-level uncertainty estimate. Keep the historical outputs intact; this verdict supersedes their interpretation.
+
+Specific corrections:
+
+- PR #84's +10.39 VMAF comparison uses PointStream at 91,172 B versus VVC at 77,228 B. That is unequal rate. Its 36.5% saving uses VMAF 72.20 versus 76.23 (75.78 for segmented); that is unequal quality. Refine the VVC curve near C2/C3 before deciding whether a narrower development regime wins. The overall recorded VVC curve comparison is unfavorable; this does not rule out a restricted interval.
+- Gate B encoded both AV1 and VVC. The favorable prose omitted the VVC comparison. Even without curve fitting, the 1080p VVC QP47 point is cheaper and higher-VMAF than C3; the 720p VVC QP47 point dominates both C2 and C3 on bytes/VMAF. C0 has VMAF zero on every source, so its small byte count cannot carry a quality claim. The claimed 720p C0/AV1 minimum-byte ratio also disagrees with the stored report (11,111/20,332, not 37.5%).
+- `gate_b_passed = len(all_alarms) == 0` never examines comparisons or requires six matches; an empty source list can pass. `_validate_point` checks bytes/timing and old late-frame alarms but does not enforce its frozen quality bounds. Adjacent-rung validation checks bytes, not quality. A clean execution is not a passed scientific gate.
+- Gate A anchors used SVT-AV1 preset 0 and VVC slower; Gate B changed these to 8 and medium. Its manifest incorrectly names the AV1 executable as `libsvtav1`; the actual path is standalone `SvtAv1EncApp` v1.8.0. The source clips also shortened to 48 frames and changed native resolution, so this is a short cross-source pilot, not confirmation of the same 4K amortization regime.
+- Gate B does not record fresh metric controls, object-scoped scores, source-level uncertainty, or a hashed full procedure/source-frame identity. Its reference checkpoint call omits the identity guard used by the reference CLI, so reused checkpoints are not protected against input/config changes. Raw-file hash verification alone does not cover these requirements.
+- In `src/runner/run.py::_finish_chunk`, the serialized client's output is discarded; scoring uses another reconstruction. No equality assertion connects the two paths in this run. `serialize_client_request` emits a compressed NPZ including masks and metadata, while the rate ledger comes independently from the pipeline bag; the run does not reconcile the measured wire envelope length against the charged bytes. Audit the actual transport before citing its rate.
+- PointStream timing excludes the detection/materialization performed before `pointstream_e1`, and the anchor decode timer includes a lossless-file intermediate and RGB extraction. Treat existing times as instrument-specific timings, not evidence of a fair end-to-end speed advantage or live-stream latency. The background canvas is offline even where its plate transport is prefix-stable.
+
+#### 4. Anchor policy and next experiment
+
+Retain **both AV1 and VVC**. The observed SVT-AV1 CQP63 endpoint applies to that build, preset, native resolution, temporal settings and input only. It says nothing about all AV1 rate-control modes or resolution choices. FFmpeg documents AV1 bitrate-target modes, and AOM's adaptive-streaming methodology evaluates multiple resolutions and rate–quality envelopes: [FFmpeg](https://ffmpeg.org/ffmpeg-codecs.html#libaom_002dav1), [AOM methodology](https://aomedia.org/docs/SIWG-D001o.pdf).
+
+`EVAL-ACT-06` (Partially implemented, priority): the pilot driver now fails closed and records execution completion separately, with regression coverage for empty/two-source runs, losing/missing comparisons, alarms and favorable curves without protocol validation. It cannot certify Gate B until the remaining validator is implemented. Repair evidence integrity before a new scientific pass. Separate execution completion from confirmation; require validated source eligibility/count, frozen hashes/presets/intervals, full metric controls including blur and unrelated content, object-scoped metrics, actual wire accounting, independently decoded scoring, source-level uncertainty, and an explicit competitive verdict. Reject empty inputs, failed/absent anchors, non-overlap treated as victory, and stale checkpoints. Add focused regressions before relying on the repaired driver. Preserve historical JSONs and write new audit/verdict artifacts with source hashes.
+
+`EVAL-ACT-07` (Blocked by instrument repair): on development scenes, sweep native AV1 CQP and bitrate-target modes plus a declared resolution ladder (native, 1/2, 1/4 linear dimensions), retaining frame rate/duration. Decode and upscale every arm to the original display resolution with a fixed filter before whole-frame/object metrics. Apply the same resolution opportunity to VVC. Count bitstream/container/signaling, encode/decode and rescale costs. Verify achieved rate; a requested bitrate is not an achieved one. Build nondominated curves with measured overlap and compare interpolation methods; do not fit across the VMAF zero plateau or extrapolate. Refine native VVC around C2/C3 as a bounded pilot, and inspect metadata cost, scene length and foreground fidelity where PointStream loses. Select the policy on development data, then freeze it before a new held-out evaluation.
+
+Gate C control plumbing and targeted diagnostic ablations can proceed now, especially metadata/background/appearance accounting, but the submission gate remains blocked until Gate B is satisfied. The two examined candidate matches now have observed scores; if they influence redesign, label them development/robustness data and reserve fresh sources for final confirmation.
 
 ### Two-Tier Metric Protocol (#72)
 To accelerate the configuration search while maintaining rigorous publication standards:
@@ -112,8 +129,8 @@ Evaluating over longer sequences (96 and 192 frames) is a core hypothesis for es
 | 48-Frame Native Run | #69 (`648325b`) | Full-system baseline evaluated. Identified background/appearance bottlenecks. |
 | Fast Eval Strategy | #71, #72 | Two-tier protocol adopted; piped FFmpeg streaming proposed. |
 | In-Memory Metric Acceleration | #77, #78, #79, #81 | Thread-local SSIM scratch buffers (176× speedup), Y4M piped VMAF streaming (80× speedup), and streamed closeness (memory down to <500 MB). |
-| Gate A Tier 2 Evaluation | outputs/gate-a-vvc-webp-n96-run2 | Confirmed 192-frame (8.0s @ 4K 24 fps) rate ladder C0–C3 with PSNR-Y, SSIM, VMAF. Verified winning operating regime below AV1 bitrate floor and beating VVC low-rate perceptual collapse. |
-| Gate B Held-Out Confirmation | `manifests/gate_b_confirmation.json`, `experiments/tier/gate_b_confirmation.py`, `outputs/gate-b-confirmation/report.json` | Passed. Executed confirmation on held-out candidate matches (`ao2024_w_final_set2_raw` at 1080p, `usopen2023_w_final_set2_raw` at 720p) under frozen C0–C3 procedure without retuning. 0 alarms, monotonic quality/rate, verified C0 operating at 34–38% of AV1 min-rate floor, and client decoding at 40–70 fps. |
+| Gate A Tier 2 Evaluation | `outputs/gate-a-vvc-webp-n96-run2/report.json` | Development sweep completed; gate pass and matched-quality savings superseded by audit above. |
+| Gate B pilot (PR #85) | `outputs/gate-b-confirmation/report.json` | Completed two-source pilot; reported pass superseded by the audit above. |
 
 ---
 
@@ -124,5 +141,7 @@ Evaluating over longer sequences (96 and 192 frames) is a core hypothesis for es
 | `EVAL-ACT-05` | Implementation complete | Run-specific calibrated policy | PR #82 | Bounded pilot controller and regression gates implemented. Next: choose a calibrated run policy and run a small real pilot before relying on scientific results. |
 | `EVAL-ACT-01` | Complete | None | #71, #72, #79 | **Piped in-memory metric computation**: Replaced `_write_png_clip` disk writes with direct stdin streaming to ffmpeg Y4M rawvideo and enabled `n_threads=16`. Measured 80× speedup on 4K clips with bit-identical scores to reference. |
 | `EVAL-ACT-02` | Complete | `CODEC-ACT-01`, `CODEC-ACT-02`, `EVAL-ACT-01` | #72, #81 | **Amortization & rate sweep (Tier 1 PSNR)**: Fixed virtual memory exhaustion via streamed closeness; completed 192-frame sweeps on multi-scene 4K video. |
-| `EVAL-ACT-03` | Complete | `EVAL-ACT-02` | #72, outputs/gate-a-vvc-webp-n96-run2 | **Tier 2 full-metric confirmation**: Evaluated PSNR-Y, SSIM, VMAF across C0–C3 ladder. 0 alarms, pre-registered rot bounds verified, null controls passed, decode speed ~13.5 fps on CPU. |
+| `EVAL-ACT-03` | Pilot complete; confirmation open | `EVAL-ACT-02` | #72, outputs/gate-a-vvc-webp-n96-run2 | **Tier 2 full-metric confirmation**: Evaluated PSNR-Y, SSIM, VMAF across C0–C3 ladder. 0 alarms, pre-registered rot bounds verified, null controls passed, decode speed ~13.5 fps on CPU. |
 | `EVAL-ACT-04` | Ready (previously D-CODEC-PRESETS) | None | `plans/DEFERRED.md` | **Anchor preset standardization**: Document exact FFmpeg command lines, presets, and versions for AV1 (`libsvtav1`/`libaom`) and VVC (`libvvenc`). Acceptance: Explicit, reproducible anchor scripts checked into repository. |
+
+Audit validation: stored comparison reproduction plus same-anchor and doubled-byte controls passed; documentation link/whitespace checks and the separate paper build are recorded in the audit PR. Focused gate-verdict regressions and project code checks are recorded in the PR. No new video encoding, recalibration or revised scientific pass was performed.

@@ -228,6 +228,45 @@ def _validate_point(row: dict[str, Any], bounds: dict[str, Any]) -> list[str]:
     return alarms
 
 
+
+def confirmation_verdict(
+    sources: list[dict[str, Any]], alarms: list[str]
+) -> dict[str, Any]:
+    """Report pilot completion without certifying an unimplemented protocol.
+
+    This driver does not yet validate independent-source eligibility, full
+    freeze identity, controls, region scores, uncertainty or byte-only client
+    equivalence. Favorable curves cannot substitute for those checks. Keep
+    certification disabled until EVAL-ACT-06 implements and tests them.
+    Historical report JSONs remain immutable; re-adjudicate them separately.
+    """
+    blockers = [
+        "confirmation protocol validation is not implemented (EVAL-ACT-06): "
+        "source eligibility, frozen identity, metric controls, object scores, "
+        "source uncertainty, wire accounting and independent-output scoring"
+    ]
+    if len(sources) < 6:
+        blockers.append(f"six independent sources required; only {len(sources)} reported")
+    if alarms:
+        blockers.append("execution or measurement alarms remain")
+    for source in sources:
+        sid = source.get("source_id", "unknown")
+        for codec in ("av1", "vvc"):
+            comparison = (source.get("comparisons") or {}).get(codec, {}).get("continuous", {})
+            delta = comparison.get("bd_rate_percent")
+            if not isinstance(delta, (int, float)) or not np.isfinite(delta):
+                blockers.append(f"{sid}/{codec}: no finite overlapping-curve comparison")
+            elif delta >= 0:
+                blockers.append(f"{sid}/{codec}: recorded curve does not show a rate saving")
+    return {
+        "execution_completed": bool(sources),
+        "pilot_alarms_clear": bool(sources) and not alarms,
+        "gate_b_passed": False,
+        "confirmation_status": "incomplete_protocol",
+        "confirmation_blockers": blockers,
+    }
+
+
 def run_dry_run(destination: Path, n_frames: int = 96) -> dict[str, Any]:
     """Execute Gate B dry run verifying manifest, tool floor, bounds, and rungs."""
     print(f"=== Starting Gate B Dry Run (n_frames={n_frames}) ===")
@@ -365,11 +404,11 @@ def run_confirmation(
         )
 
     final_report = {
-        "status": "gate_b_confirmation_complete",
+        "status": "gate_b_pilot_complete",
         "n_sources": len(per_source_reports),
         "sources": per_source_reports,
         "alarms": all_alarms,
-        "gate_b_passed": len(all_alarms) == 0,
+        **confirmation_verdict(per_source_reports, all_alarms),
         "timestamp_unix": time.time(),
     }
     (destination / "report.json").write_text(json.dumps(final_report, indent=2) + "\n")
