@@ -11,8 +11,7 @@ Locks down:
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, replace
-import math
+from dataclasses import dataclass, replace
 from typing import Any
 
 from src.contracts.config import PointstreamConfig

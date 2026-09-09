@@ -6,6 +6,7 @@ import sqlite3  # noqa: F401
 import json
 from pathlib import Path
 
+
 import pytest
 
 from experiments.tier.gate_b_confirmation import (
@@ -16,6 +17,12 @@ from experiments.tier.gate_b_confirmation import (
     verify_source_integrity,
 )
 from src.contracts import paths as ps_paths
+
+
+def _has_confirmation_raw_assets() -> bool:
+    manifest = load_confirmation_manifest(DEFAULT_MANIFEST)
+    data_root = ps_paths.data_root()
+    return all((data_root / s["raw_file_path"]).is_file() for s in manifest.get("sources", []))
 
 
 def test_gate_b_manifest_loads_and_validates() -> None:
@@ -34,6 +41,10 @@ def test_gate_b_manifest_loads_and_validates() -> None:
     assert len(manifest["procedure_freeze"]["rate_ladder"]) == 4
 
 
+@pytest.mark.skipif(
+    not _has_confirmation_raw_assets(),
+    reason="requires external confirmation raw video assets",
+)
 def test_gate_b_source_integrity() -> None:
     manifest = load_confirmation_manifest(DEFAULT_MANIFEST)
     paths = verify_source_integrity(manifest)
@@ -42,6 +53,10 @@ def test_gate_b_source_integrity() -> None:
         assert p.is_file()
 
 
+@pytest.mark.skipif(
+    not _has_confirmation_raw_assets(),
+    reason="requires external confirmation raw video assets",
+)
 def test_gate_b_dry_run(tmp_path: Path) -> None:
     summary = run_dry_run(tmp_path, n_frames=48)
     assert summary["status"] == "gate_b_dry_run_complete"

@@ -13,14 +13,10 @@ from __future__ import annotations
 
 import sqlite3  # noqa: F401
 import argparse
-import atexit
-from dataclasses import asdict, dataclass, replace
+from dataclasses import dataclass
 import hashlib
 import json
-import os
 from pathlib import Path
-import subprocess
-import threading
 import time
 from typing import Any
 
@@ -28,27 +24,17 @@ import cv2
 import numpy as np
 
 from experiments.headroom.real import extract_24fps_pngs
-from experiments.tier.gate_a_controls import run_gate_a_controls
 from experiments.tier.gate_a_tools import write_tool_identity
-from experiments.tier.low_rate_checkpoint import (
-    fingerprint,
-    load_checkpoint,
-    save_checkpoint,
-    write_json,
-)
-from experiments.tier.low_rate_fallback import run_fallback_control
 from experiments.tier.low_rate_references import compare_candidate_to_anchor, encode_reference_curve
 from experiments.tier.low_rate_sweep import pointstream_e1
 from src.components.codec.tools import resolve_ffmpeg
 from src.components.detection.yolo import YoloDetector
 from src.components.selection.heuristic import HeuristicSelector
 from src.contracts import paths as ps_paths
-from src.contracts.config import PointstreamConfig
 from src.contracts.frozen_procedure import (
     FROZEN_ANCHOR_PRESETS,
     FROZEN_ANCHOR_QPS,
     FROZEN_RUNGS,
-    FrozenRungSpec,
     check_adjacent_rungs,
     configure_frozen_rung,
     get_frozen_bounds,
@@ -125,7 +111,12 @@ def _fill_missing_track_frames(
             b_prev = np.array(t_dict[prev_t], dtype=float)
             b_next = np.array(t_dict[next_t], dtype=float)
             b_interp = (1.0 - alpha) * b_prev + alpha * b_next
-            b = tuple(int(round(x)) for x in b_interp)
+            b = (
+                int(round(b_interp[0])),
+                int(round(b_interp[1])),
+                int(round(b_interp[2])),
+                int(round(b_interp[3])),
+            )
         x1 = max(0, min(width - 1, b[0]))
         y1 = max(0, min(height - 1, b[1]))
         x2 = max(x1 + 1, min(width, b[2]))
@@ -288,7 +279,7 @@ def run_confirmation(
     destination.mkdir(parents=True, exist_ok=True)
     manifest = load_confirmation_manifest(manifest_path)
     source_paths = verify_source_integrity(manifest)
-    tools = write_tool_identity(destination)
+    write_tool_identity(destination)
     ffmpeg = resolve_ffmpeg().path
 
     points = destination / "points"
