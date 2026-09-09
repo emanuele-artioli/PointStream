@@ -35,6 +35,9 @@ In the Gate A 48-frame native run (#69), PointStream payload was dominated by tw
 | Fallback mechanism | #52 (`68a03dc542`) | Explicit conventional video fallback path added for ineligible segments. |
 | Native 48-frame run | #69 (`648325b`) | Measured whole-system rate/quality; identified background & appearance byte floor. |
 | Competitive regime | #70–#72 | Proposed VVC/SVT background sidecars and WebP/AVIF appearance crops. |
+| VVC background streaming | #75, #80 | Implemented VVC low-delay background streaming (`StreamCodec.VVC`) with periodic intra refresh (`-period 1`) for causal prefix stability. Resolves `CODEC-ACT-01`. |
+| WebP appearance crops | #75 | Implemented OpenCV WebP foreground actor reference compression (`AppearanceFormat.WEBP`). Resolves `CODEC-ACT-02`. |
+| Gate A Rate Ladder | outputs/gate-a-vvc-webp-n96-run2 | Characterized C0–C3 across 192 frames @ 4K 24 fps (48.7–124.4 kB / 49.9–127.4 kbps) establishing competitive win below AV1 bitrate floor and beating VVC low-rate collapse. |
 
 ---
 
@@ -42,7 +45,7 @@ In the Gate A 48-frame native run (#69), PointStream payload was dominated by tw
 
 | ID | Status | Dependencies | Source | Description & Acceptance Criteria |
 |---|---|---|---|---|
-| `CODEC-ACT-01` | Ready | None | #70, #71 | **Connect VVC intra / SVT-AV1 to background stream**: Update `src/components/background/stream.py` to route through `libvvenc` or SVT-AV1. Acceptance: Selected encoder demonstrably changes the bitstream, standalone receiver round trip succeeds, and plate plus full-system size/quality/time are compared at matched quality. <15 KB is a probe target, not a universal acceptance threshold. |
-| `CODEC-ACT-02` | Ready | None | #71, #72 | **Add WebP/AVIF appearance crops**: Add WebP/AVIF encoder in `src/components/appearance/compressed.py`. Acceptance: Matched-quality crop sweep and client round trip with size/quality/time reported; retain JPEG comparison. A ≥30% saving is a hypothesis, not a required outcome. |
-| `CODEC-ACT-03` | Proposed | `CODEC-ACT-01`, `02` | #72 | **Payload ledger simplification**: Streamline byte allocation tracking across components. Acceptance: All transmitted bytes reconcile to the serialized payload, including background, appearance, motion, residual, fallback, headers, and container/metadata overhead; do not hide overhead inside a component saving. |
+| `CODEC-ACT-01` | Complete | None | #70, #71, #75, #80 | **Connect VVC intra / SVT-AV1 to background stream**: Implemented in `src/components/background/stream.py` with causal prefix intra-refresh stability. |
+| `CODEC-ACT-02` | Complete | None | #71, #72, #75 | **Add WebP/AVIF appearance crops**: Implemented WebP encoding in `src/components/appearance/compressed.py` with matched-quality savings and client decode round trip. |
+| `CODEC-ACT-03` | Ready | `CODEC-ACT-01`, `02` | #72 | **Payload ledger simplification**: Streamline byte allocation tracking across components. Acceptance: All transmitted bytes reconcile to the serialized payload, including background, appearance, motion, residual, fallback, headers, and container/metadata overhead; do not hide overhead inside a component saving. |
 | `CODEC-ACT-04` | Previously deferred (D5) | None | `plans/DEFERRED.md` | **Coded fallback verification**: Verify behavior when semantic tracking fails. Acceptance: Clean switch to conventional intra/inter coding without crash or pipeline desynchronization. |

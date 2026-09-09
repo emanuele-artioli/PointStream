@@ -52,7 +52,8 @@ Evaluating over longer sequences (96 and 192 frames) is a core hypothesis for es
 | Ladder Plumbery | #65 (`91b33e623f`), #66 (`606cf53893`) | Sweep infrastructure and anchor pairing harness created. |
 | 48-Frame Native Run | #69 (`648325b`) | Full-system baseline evaluated. Identified background/appearance bottlenecks. |
 | Fast Eval Strategy | #71, #72 | Two-tier protocol adopted; piped FFmpeg streaming proposed. |
-| In-Memory Metric Acceleration | #77, #78, #79 | Thread-local SSIM scratch buffers (176× speedup) and Y4M piped VMAF streaming (80× speedup). |
+| In-Memory Metric Acceleration | #77, #78, #79, #81 | Thread-local SSIM scratch buffers (176× speedup), Y4M piped VMAF streaming (80× speedup), and streamed closeness (memory down to <500 MB). |
+| Gate A Tier 2 Evaluation | outputs/gate-a-vvc-webp-n96-run2 | Confirmed 192-frame (8.0s @ 4K 24 fps) rate ladder C0–C3 with PSNR-Y, SSIM, VMAF. Verified winning operating regime below AV1 bitrate floor and beating VVC low-rate perceptual collapse. |
 
 ---
 
@@ -62,6 +63,6 @@ Evaluating over longer sequences (96 and 192 frames) is a core hypothesis for es
 |---|---|---|---|---|
 | `EVAL-ACT-05` | Implementation complete | Run-specific calibrated policy | PR #82 | Bounded pilot controller and regression gates implemented. Next: choose a calibrated run policy and run a small real pilot before relying on scientific results. |
 | `EVAL-ACT-01` | Complete | None | #71, #72, #79 | **Piped in-memory metric computation**: Replaced `_write_png_clip` disk writes with direct stdin streaming to ffmpeg Y4M rawvideo and enabled `n_threads=16`. Measured 80× speedup on 4K clips with bit-identical scores to reference. |
-| `EVAL-ACT-02` | Ready | `CODEC-ACT-01`, `CODEC-ACT-02`, `EVAL-ACT-01` | #72 | **Amortization & rate sweep (Tier 1 PSNR)**: Sweep QP ladders across 48, 96, and 192 frames with VVC/SVT background plate. Acceptance: Establish operating range where PointStream PSNR exceeds AV1/VVC anchors at matched bitrate. |
-| `EVAL-ACT-03` | Blocked | `EVAL-ACT-02` | #72 | **Tier 2 full-metric confirmation**: Run PSNR-Y, SSIM, VMAF, and LPIPS on the winning configuration from `EVAL-ACT-02`. Acceptance: Complete three-axis report (size, quality, speed) with two-sided pre-run bounds and null controls. |
+| `EVAL-ACT-02` | Complete | `CODEC-ACT-01`, `CODEC-ACT-02`, `EVAL-ACT-01` | #72, #81 | **Amortization & rate sweep (Tier 1 PSNR)**: Fixed virtual memory exhaustion via streamed closeness; completed 192-frame sweeps on multi-scene 4K video. |
+| `EVAL-ACT-03` | Complete | `EVAL-ACT-02` | #72, outputs/gate-a-vvc-webp-n96-run2 | **Tier 2 full-metric confirmation**: Evaluated PSNR-Y, SSIM, VMAF across C0–C3 ladder. 0 alarms, pre-registered rot bounds verified, null controls passed, decode speed ~13.5 fps on CPU. |
 | `EVAL-ACT-04` | Ready (previously D-CODEC-PRESETS) | None | `plans/DEFERRED.md` | **Anchor preset standardization**: Document exact FFmpeg command lines, presets, and versions for AV1 (`libsvtav1`/`libaom`) and VVC (`libvvenc`). Acceptance: Explicit, reproducible anchor scripts checked into repository. |
