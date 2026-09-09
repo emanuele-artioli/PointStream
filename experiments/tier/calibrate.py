@@ -107,6 +107,140 @@ def calibrate(metrics: list[str], reference: np.ndarray) -> dict[str, Any]:
     }
 
 
+def synthetic_unrelated_clip(shape: tuple[int, ...]) -> np.ndarray:
+    """Generate a deterministic synthetic unrelated scene if broadcast clip is missing."""
+    T, H, W, C = shape
+    arr = np.zeros((T, H, W, C), dtype=np.uint8)
+    for t in range(T):
+        y, x = np.ogrid[:H, :W]
+        stripe = ((x // 32) + (y // 32) + t) % 2
+        arr[t, :, :, 0] = np.uint8(stripe * 220 + 20)
+        arr[t, :, :, 1] = np.uint8(((x // 16) % 2) * 180 + 30)
+        arr[t, :, :, 2] = np.uint8(((y // 16) % 2) * 200 + 40)
+    return arr
+
+
+def temporal_null_frames(reference: np.ndarray, seed: int = 42) -> np.ndarray:
+    """Permute frames along time axis to establish the temporal null floor."""
+    count = int(reference.shape[0])
+    if count < 2:
+        return reference.copy()
+    rng = np.random.default_rng(seed)
+    indices = rng.permutation(count)
+    if np.array_equal(indices, np.arange(count)):
+        indices[0], indices[1] = indices[1], indices[0]
+    return reference[indices].copy()
+
+
+def spatial_null_frames(reference: np.ndarray) -> np.ndarray:
+    """Constant uniform frame sequence establishing spatial floor."""
+    return np.full_like(reference, 128)
+
+
+def run_full_metric_calibration(
+    metrics: list[str],
+    reference: np.ndarray,
+    *,
+    unrelated: np.ndarray | None = None,
+) -> dict[str, Any]:
+    """Execute complete metric calibration fixture: anchors plus null controls."""
+    from src.runner.evaluation import ComponentMetricEvaluator
+    from src.contracts.metrics import metric as metric_spec
+
+    # Build anchors
+    mild_blur = np.stack([cv2.GaussianBlur(frame, (3, 3), 0.8) for frame in reference])
+    severe_blur = np.stack([cv2.GaussianBlur(frame, (21, 21), 9.0) for frame in reference])
+
+    # Add Gaussian noise anchors
+    rng = np.random.default_rng(42)
+    mild_noise = np.clip(reference.astype(float) + rng.normal(0, 5.0, reference.shape), 0, 255).astype(np.uint8)
+    severe_noise = np.clip(reference.astype(float) + rng.normal(0, 30.0, reference.shape), 0, 255).astype(np.uint8)
+
+    unrelated_clip = unrelated
+    if unrelated_clip is None:
+        unrelated_clip = _unrelated_frames(reference.shape)
+    if unrelated_clip is None:
+        unrelated_clip = synthetic_unrelated_clip(reference.shape)
+
+    anchor_table: dict[str, np.ndarray] = {
+        "identical": reference.copy(),
+        "mild-blur": mild_blur,
+        "severe-blur": severe_blur,
+        "mild-noise": mild_noise,
+        "severe-noise": severe_noise,
+        "unrelated-clip": unrelated_clip,
+    }
+
+    # Null controls
+    t_null = temporal_null_frames(reference)
+    s_null = spatial_null_frames(reference)
+    null_table = {
+        "temporal-null-shuffled": t_null,
+        "spatial-null-uniform": s_null,
+    }
+
+    evaluator = ComponentMetricEvaluator(metrics)
+    scores: dict[str, dict[str, float | str]] = {}
+    for name, cand in {**anchor_table, **null_table}.items():
+        report = evaluator.evaluate(reference, cand)
+        scores[name] = {
+            item.metric: ("inf" if np.isinf(item.value) else round(float(item.value), 4))
+            for item in report.scoped
+        }
+
+    # Check ordering across blur anchors
+    blur_order = ("identical", "mild-blur", "severe-blur", "unrelated-clip")
+    noise_order = ("identical", "mild-noise", "severe-noise", "unrelated-clip")
+    verdicts: dict[str, Any] = {}
+    alarms: list[str] = []
+
+    for metric in evaluator.metric_names:
+        spec = metric_spec(metric)
+        higher_is_better = spec.higher_is_better
+
+        blur_vals = [float("inf") if scores[name][metric] == "inf" else float(scores[name][metric]) for name in blur_order]
+        noise_vals = [float("inf") if scores[name][metric] == "inf" else float(scores[name][metric]) for name in noise_order]
+
+        expected_blur = list(reversed(sorted(blur_vals))) if higher_is_better else sorted(blur_vals)
+        expected_noise = list(reversed(sorted(noise_vals))) if higher_is_better else sorted(noise_vals)
+
+        blur_ok = blur_vals == expected_blur
+        noise_ok = noise_vals == expected_noise
+
+        if not blur_ok:
+            alarms.append(f"{metric}: blur ordering violated {blur_vals} != {expected_blur}")
+        if not noise_ok:
+            alarms.append(f"{metric}: noise ordering violated {noise_vals} != {expected_noise}")
+
+        # Absolute value checks
+        id_val = scores["identical"][metric]
+        unr_val = scores["unrelated-clip"][metric]
+        if metric == "vmaf":
+            if isinstance(id_val, (int, float)) and (id_val < 95.0 or id_val > 100.0):
+                alarms.append(f"VMAF identical score {id_val} outside [95.0, 100.0]")
+            if isinstance(unr_val, (int, float)) and (unr_val > 40.0):
+                alarms.append(f"VMAF unrelated score {unr_val} > 40.0")
+
+        verdicts[metric] = {
+            "blur_ordering_held": blur_ok,
+            "noise_ordering_held": noise_ok,
+            "by_anchor": {name: scores[name][metric] for name in anchor_table},
+            "null_controls": {name: scores[name][metric] for name in null_table},
+        }
+
+    return {
+        "valid": len(alarms) == 0,
+        "alarms": alarms,
+        "n_frames": int(reference.shape[0]),
+        "resolution": f"{reference.shape[2]}x{reference.shape[1]}",
+        "metrics": verdicts,
+        "how_to_read": (
+            "Quote the unrelated-clip and null-control values beside scores. "
+            "Runs not beating the unrelated anchor fail floor discrimination."
+        ),
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     import argparse
     import json
@@ -126,8 +260,18 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
-__all__ = ["ANCHOR_FRAMES", "anchors", "calibrate", "main"]
+__all__ = [
+    "ANCHOR_FRAMES",
+    "anchors",
+    "calibrate",
+    "main",
+    "run_full_metric_calibration",
+    "spatial_null_frames",
+    "synthetic_unrelated_clip",
+    "temporal_null_frames",
+]
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
