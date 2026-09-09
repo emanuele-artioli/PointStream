@@ -123,18 +123,43 @@ def closeness(
     atol: float = 1.0,
 ) -> Closeness:
     """Measure how close two clips are. Does not assert they match."""
-    ref = as_clip(reference, path="reference").astype(np.float64)
-    pred = as_clip(predicted, path="predicted").astype(np.float64)
-    require_same_shape(ref, pred, path="closeness")
-    delta = np.abs(ref - pred)
-    mean_abs = float(delta.mean())
-    max_abs = float(delta.max())
-    identical = bool(max_abs == 0.0)
+    ref_clip = as_clip(reference, path="reference")
+    pred_clip = as_clip(predicted, path="predicted")
+    require_same_shape(ref_clip, pred_clip, path="closeness")
+    n_frames = int(ref_clip.shape[0])
+    total_samples = ref_clip.size
+    if total_samples == 0:
+        return Closeness(
+            bit_identical=True,
+            mean_abs_diff=0.0,
+            max_abs_diff=0.0,
+            psnr=math.inf,
+            within_atol=True,
+            atol=atol,
+        )
+
+    total_abs = 0.0
+    max_abs = 0.0
+    total_se = 0.0
+    for i in range(n_frames):
+        r_f = ref_clip[i].astype(np.float64)
+        p_f = pred_clip[i].astype(np.float64)
+        delta = np.abs(r_f - p_f)
+        cur_max = float(delta.max())
+        if cur_max > max_abs:
+            max_abs = cur_max
+        total_abs += float(delta.sum())
+        diff = r_f - p_f
+        total_se += float(np.sum(diff * diff))
+
+    mean_abs = float(total_abs / total_samples)
+    mse = float(total_se / total_samples)
+    psnr_val = math.inf if mse == 0.0 else 10.0 * math.log10((_PEAK**2) / mse)
     return Closeness(
-        bit_identical=identical,
+        bit_identical=bool(max_abs == 0.0),
         mean_abs_diff=mean_abs,
         max_abs_diff=max_abs,
-        psnr=_psnr(ref, pred),
+        psnr=psnr_val,
         within_atol=bool(max_abs <= atol),
         atol=atol,
     )
