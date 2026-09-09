@@ -7,7 +7,7 @@
 
 ## 1. Current State
 
-### Quiet long-job monitoring
+### Quiet long-job monitoring (draft PR #82)
 
 `experiments/jobs/monitor.py` implements detached command supervision, ten-minute
 file logging, explicit work-progress tracking, quiet hours, one-shot/repeating

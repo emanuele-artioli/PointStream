@@ -22,7 +22,7 @@ Submission Target: **ACM TOMM — 30 September 2026** (hard deadline). See [docs
 
 | Task ID | Worktree / Branch | Base Rev | Owner | Allowed Scope | Dependencies | Active PR |
 |---|---|---|---|---|---|---|
-| `LONG-JOBS` | `/tmp/pointstream-long-jobs` (`codex/bounded-long-jobs`) | `74953ab` | Codex | `experiments/jobs/`, ladder adapters, workflow/area docs | New test-scope approval; no GPU launch | Draft pending |
+| `LONG-JOBS` | `/tmp/pointstream-long-jobs` (`codex/bounded-long-jobs`) | `74953ab` | Codex | `experiments/jobs/`, ladder adapters, workflow/area docs | New test-scope approval; no GPU launch | Draft PR #82 |
 | `DOCS-OVERHAUL` | `/tmp/pointstream-documentation-overhaul` (`codex/documentation-overhaul-plan`) | `91e2077` | Antigravity | `README.md`, `AGENTS.md`, `PLAN.md`, `docs/**` | PR #73 audit brief | PR #73 |
 
 ---

@@ -7,7 +7,7 @@
 
 ## 1. Current State
 
-### Bounded codec pilot controller
+### Bounded codec pilot controller (draft PR #82)
 
 `experiments/jobs/codec.py` adds pilot, longer-clip confirmation, and final stages
 around paired anchor/PointStream ladders. QP and joint JPEG/QP payload spacing can
