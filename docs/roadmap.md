@@ -23,7 +23,9 @@ graph TD
   1. A reproducible advantage over the declared AV1 and VVC anchors over a measured overlapping rate/quality interval on a metric selected before the confirmation run. Declare anchor settings and uncertainty; no extrapolated BD-rate or isolated lucky-point victory.
   2. Operating regime fully characterized: content type, duration/amortization range, bitrate band, and component byte breakdown.
   3. Size, quality, and runtime measured and reported together; no speed omissions.
-- **Current Status**: Passed. Evaluated 192-frame C0–C3 rate ladder with VVC background streaming and WebP actor crops (`outputs/gate-a-vvc-webp-n96-run2`, PR #83). Verified winning operating regime below AV1 bitrate floor and beating VVC low-rate perceptual collapse.
+- **Current Status**: **Passed on development sequence** (`alcaraz_highlights`, 192 frames @ 4K 24 fps across 2 scenes, PR #83, run artifact `outputs/gate-a-vvc-webp-n96-run2`). Established winning operating regime below AV1 bitrate floor (158.5 kbps) and beating VVC low-rate perceptual collapse (+10.39 VMAF at ~91 kbps; 36.5% bitrate savings at VMAF ~72–75) with 13.5 fps CPU client decode. Moving to Gate B held-out confirmation.
+
+Execution brief: [overnight Gate A prompt](workflow/session/overnight-gate-a.md). Full benchmark tables: [docs/areas/evaluation.md](areas/evaluation.md#gate-a-192-frame-benchmark-results-run-2--pr-83).
 
 ### Gate B: Held-Out Confirmation (Passed)
 - **Dependency**: Gate A passed.

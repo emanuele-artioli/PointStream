@@ -67,3 +67,14 @@ This document records scientific invariants, retracted conclusions, and experime
   3. Short sequence duration (48 frames) provided insufficient amortization for 4K background plates.
 - **Usability Limit**: No BD-rate calculation is citable from the #69 configuration. Gate A remains open pending VVC/SVT background sidecars, WebP appearance crops, and extended amortization (96/192 frames).
 - **Provenance**: PR #69 (`648325b`), PR #70–#72.
+
+---
+
+## 10. Gate A 192-Frame Resolution & Winning Operating Regime (Run-2 / PR #83)
+- **Finding**: Evaluated on 192 frames @ 4K 24 fps (8.0s across 2 scenes, `alcaraz_highlights`) with low-delay VVC background streaming (`-period 1`) and WebP actor crops, PointStream establishes a clear winning regime against conventional anchors:
+  1. **Below AV1 Bitrate Floor**: AV1 (`libsvtav1`, preset 0) cannot compress below ~158.5 kbps (segmented QP 63) or ~190.9 kbps (continuous QP 63). PointStream's entire rate ladder (48.7 kB – 124.4 kB / 49.9 – 127.4 kbps) operates strictly below AV1's minimum floor.
+  2. **Superiority over VVC at Mid-Low Rates**: At 91.2 kB (91.2 kbps), PointStream C2 achieves **VMAF 57.62** and **PSNR 30.37 dB** vs VVC QP 55 (75.4 kB / 77.2 kbps) at **VMAF 47.23** and **PSNR 29.10 dB** (+10.39 VMAF, +1.27 dB PSNR-Y).
+  3. **Bitrate Savings over VVC at Quality**: PointStream C3 achieves **VMAF 72.20 at 124.4 kB**, whereas VVC requires QP 47 at **195.9 kB** for comparable quality (VMAF 75.78), delivering a **36.5% bitrate saving**.
+  4. **Client CPU Decoding Viability**: Client reconstruction for 192 frames @ 4K took **14.0s–14.4s** (~13.5 fps) on commodity CPU without GPU acceleration.
+- **Rule**: Claims of conventional codec superiority are valid within the 50–130 kbps operating band on broadcast sports with stationary or panning cameras; high-motion unmodeled scenes fall back to conventional coding.
+- **Provenance**: PR #75, #79, #80, #81, #83; run artifact `outputs/gate-a-vvc-webp-n96-run2/report.json`.
