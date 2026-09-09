@@ -13,14 +13,20 @@ from typing import Any
 
 import pytest
 
+import sqlite3
+import numpy as np
+
 import scripts.train_campaign as train_campaign
 from scripts.train_campaign import (
     Variant,
+    build_eval_generator_ref,
     build_train_command,
     checkpoint_path_for_eval,
     default_variants,
+    evaluate_checkpoint,
     halved_batch_size,
     init_state,
+    is_valid_eval,
     load_state,
     main,
     promote_survivors,
@@ -226,3 +232,265 @@ def test_main_aborts_rung_without_ranking_when_a_variant_fails_training_twice(
     assert set(state["alive"]) == {"pix2pix", "spade4tennis_lite"}
     assert all(v == 0 for v in state["cumulative_epochs"].values())
     assert state["history"] == []  # never reached ranking
+
+
+# ---------------------------------------------------------------------------
+# Evaluator and generator readiness authorized tests
+# ---------------------------------------------------------------------------
+
+
+class MockSizes:
+    def __init__(self, residual: int = 42000, transport_total: int = 50000) -> None:
+        self.residual = residual
+        self.transport_total = transport_total
+
+
+class MockDeliveredQuality:
+    def __init__(self, scores: dict[str, float] | None = None) -> None:
+        self.scores = scores or {"psnr": 34.5, "ssim": 0.92, "vmaf": 88.0}
+
+    def whole_frame(self, metric: str) -> float:
+        return self.scores[metric]
+
+
+class MockRunResult:
+    def __init__(
+        self,
+        residual: int = 42000,
+        transport_total: int = 50000,
+        scores: dict[str, float] | None = None,
+    ) -> None:
+        self.delivered_frames = np.zeros((2, 512, 512, 3), dtype=np.uint8)
+        self.sizes = MockSizes(residual=residual, transport_total=transport_total)
+        self.delivered_quality = MockDeliveredQuality(scores)
+        self.encoder_seconds = 1.2
+        self.client_seconds = 0.8
+
+
+def test_checkpoint_and_config_identity_reaches_evaluation(tmp_path: Path) -> None:
+    ckpt_file = tmp_path / "model.pt"
+    ckpt_file.write_bytes(b"dummy_weights_data")
+    stat = ckpt_file.stat()
+    expected_id = f"model.pt:{stat.st_size}:{int(stat.st_mtime)}"
+
+    manifest = {
+        "probe_clips": [{"video": "v1", "scene": "s1", "track": "t1", "frame_ids": [0, 1]}],
+        "held_out_videos": ["v1"],
+    }
+
+    recorded_calls: list[dict[str, Any]] = []
+
+    def mock_runner(cfg: Any, sources: Any, generator: Any = None, objects: Any = None, context_ids: Any = None) -> Any:
+        recorded_calls.append({"cfg": cfg, "generator": generator, "context_ids": context_ids})
+        return MockRunResult(residual=12345, transport_total=20000, scores={"psnr": 35.0, "ssim": 0.95, "vmaf": 90.0})
+
+    result = evaluate_checkpoint(
+        checkpoint_path=ckpt_file,
+        arch="pix2pix",
+        manifest=manifest,
+        dataset_root=tmp_path,
+        runner_fn=mock_runner,
+    )
+
+    agg = result["aggregate"]
+    assert agg["checkpoint_identity"] == expected_id
+    assert agg["residual_bytes"] == 12345
+    assert agg["psnr_mean"] == 35.0
+    assert agg["success"] is True
+
+    assert len(recorded_calls) == 1
+    call = recorded_calls[0]
+    assert call["cfg"].generator.backend == "pix2pix"
+    assert call["generator"].backend.backend.checkpoint == str(ckpt_file)
+
+
+def test_missing_checkpoint_fails_explicitly(tmp_path: Path) -> None:
+    missing = tmp_path / "non_existent_checkpoint.pt"
+    with pytest.raises(FileNotFoundError, match="Checkpoint not found"):
+        evaluate_checkpoint(
+            checkpoint_path=missing,
+            arch="pix2pix",
+            manifest={},
+            dataset_root=tmp_path,
+        )
+
+
+def test_temporal_input_reaches_temporal_backend_as_sequence() -> None:
+    from src.components.generation.base import as_runner_ref
+    from src.contracts.capabilities import CAP_TEMPORAL_SEQUENCE
+    from src.contracts.conditioning import ConditioningBundle, GenerationParams
+    from src.pipeline.reconstruction.device import DevicePolicy
+    from src.pipeline.reconstruction.dispatch import dispatch
+
+    class MockTemporalBackend:
+        capabilities = frozenset({CAP_TEMPORAL_SEQUENCE})
+        required = ("appearance", "pose")
+
+        def __init__(self) -> None:
+            self.sequence_calls: list[list[Any]] = []
+            self.frame_calls: list[Any] = []
+
+        def generate(self, conditioning: Any, *, seed: int, device: Any, params: Any) -> np.ndarray:
+            self.frame_calls.append(conditioning)
+            return np.zeros((3, 64, 64), dtype=np.uint8)
+
+        def generate_sequence(self, conditioning: Any, *, seed: int, device: Any, params: Any) -> tuple[np.ndarray, ...]:
+            self.sequence_calls.append(list(conditioning))
+            return tuple(np.zeros((3, 64, 64), dtype=np.uint8) for _ in conditioning)
+
+    backend = MockTemporalBackend()
+    runner_ref = as_runner_ref(
+        backend,
+        name="test_temporal",
+        capabilities=frozenset({CAP_TEMPORAL_SEQUENCE}),
+        requires=frozenset({"appearance", "pose"}),
+    )
+
+    bundles = [
+        ConditioningBundle(
+            appearance=np.zeros((3, 64, 64), dtype=np.uint8),
+            pose=np.zeros((3, 64, 64), dtype=np.uint8),
+            frame_index=i,
+            object_id="p1",
+        )
+        for i in range(3)
+    ]
+
+    params = GenerationParams()
+    output, _ = dispatch(
+        generator=runner_ref,
+        bundles=bundles,
+        seed=42,
+        params=params,
+        policy=DevicePolicy(),
+    )
+
+    # Must be received as a full sequence call, not per-frame calls
+    assert len(backend.sequence_calls) == 1
+    assert len(backend.sequence_calls[0]) == 3
+    assert len(backend.frame_calls) == 0
+    assert len(output) == 3
+    assert output[0].shape == (64, 64, 3)
+
+
+def test_actual_selected_checkpoint_is_invoked(tmp_path: Path) -> None:
+    ckpt1 = tmp_path / "model1.pt"
+    ckpt1.write_bytes(b"checkpoint1_bytes")
+    ckpt2 = tmp_path / "model2.pt"
+    ckpt2.write_bytes(b"checkpoint2_bytes")
+
+    invoked_checkpoints: list[str | None] = []
+
+    def mock_runner(cfg: Any, sources: Any, generator: Any = None, objects: Any = None, context_ids: Any = None) -> Any:
+        backend_obj = generator.backend.backend
+        invoked_checkpoints.append(getattr(backend_obj, "checkpoint", None))
+        return MockRunResult()
+
+    manifest = {"probe_clips": [{"video": "v1", "scene": "s1", "track": "t1", "frame_ids": [0, 1]}]}
+
+    evaluate_checkpoint(
+        checkpoint_path=ckpt1,
+        arch="pix2pix",
+        manifest=manifest,
+        dataset_root=tmp_path,
+        runner_fn=mock_runner,
+    )
+    evaluate_checkpoint(
+        checkpoint_path=ckpt2,
+        arch="pix2pix",
+        manifest=manifest,
+        dataset_root=tmp_path,
+        runner_fn=mock_runner,
+    )
+
+    assert invoked_checkpoints == [str(ckpt1), str(ckpt2)]
+
+
+def test_evaluator_uses_held_out_development_scenes_and_current_runner_results(tmp_path: Path) -> None:
+    ckpt = tmp_path / "weights.pt"
+    ckpt.write_bytes(b"weights")
+
+    manifest = {
+        "held_out_videos": ["held_out_vid"],
+        "probe_clips": [
+            {"video": "training_vid", "scene": "s1", "track": "t1", "frame_ids": [0, 1]},
+            {"video": "held_out_vid", "scene": "s2", "track": "t2", "frame_ids": [0, 1]},
+        ],
+    }
+
+    evaluated_context_ids: list[str] = []
+
+    def mock_runner(cfg: Any, sources: Any, generator: Any = None, objects: Any = None, context_ids: Any = None) -> Any:
+        evaluated_context_ids.extend(context_ids)
+        return MockRunResult(
+            residual=33333,
+            transport_total=40000,
+            scores={"psnr": 38.2, "ssim": 0.96, "vmaf": 92.5},
+        )
+
+    res = evaluate_checkpoint(
+        checkpoint_path=ckpt,
+        arch="pix2pix",
+        manifest=manifest,
+        dataset_root=tmp_path,
+        held_out_only=True,
+        runner_fn=mock_runner,
+    )
+
+    # Verify only held-out scene was evaluated
+    assert evaluated_context_ids == ["held_out_vid/s2/t2"]
+
+    # Verify aggregate values come directly from runner results
+    assert res["aggregate"]["residual_bytes"] == 33333
+    assert res["aggregate"]["total_bytes"] == 40000
+    assert res["aggregate"]["psnr_mean"] == 38.2
+    assert res["aggregate"]["ssim_mean"] == 0.96
+    assert res["aggregate"]["vmaf_mean"] == 92.5
+
+
+def test_unsuccessful_evaluation_cannot_select_winning_checkpoint() -> None:
+    # Scenario 1: A failed variant with artificially small/0 bytes must not beat a valid variant
+    aggregate_results = {
+        "valid_candidate": {
+            "residual_bytes": 50000,
+            "total_bytes": 60000,
+            "psnr_mean": 30.0,
+            "success": True,
+        },
+        "crashed_variant": {
+            "residual_bytes": 0,
+            "total_bytes": 0,
+            "psnr_mean": None,
+            "success": False,
+        },
+        "error_variant": {
+            "residual_bytes": float("inf"),
+            "total_bytes": float("inf"),
+            "eval_failed": True,
+        },
+        "nan_variant": {
+            "residual_bytes": float("nan"),
+            "psnr_mean": float("nan"),
+            "success": True,
+        },
+    }
+
+    ranked, composite = rank_variants(aggregate_results)
+    # The valid candidate must be ranked #1
+    assert ranked[0] == "valid_candidate"
+
+    # All failed / invalid variants must be ranked after valid candidates
+    assert set(ranked[1:]) == {"crashed_variant", "error_variant", "nan_variant"}
+
+    # promote_survivors must only select the valid candidate
+    survivors = promote_survivors(ranked, aggregate_results)
+    assert survivors == ["valid_candidate"]
+
+    # Scenario 2: If all variants failed, promote_survivors returns empty list
+    failed_only = {
+        "failed_1": {"success": False, "residual_bytes": 10},
+        "failed_2": {"eval_failed": True, "residual_bytes": 20},
+    }
+    ranked_failed, _ = rank_variants(failed_only)
+    survivors_failed = promote_survivors(ranked_failed, failed_only)
+    assert survivors_failed == []
