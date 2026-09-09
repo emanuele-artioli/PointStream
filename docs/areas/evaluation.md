@@ -7,6 +7,21 @@
 
 ## 1. Current State
 
+### Bounded codec pilot controller (PR #82)
+
+`experiments/jobs/codec.py` adds pilot, longer-clip confirmation, and final stages
+around paired anchor/PointStream ladders. QP and joint JPEG/QP payload spacing can
+widen only inside an explicit policy. Worker timeouts, saved decisions and
+fail-closed evidence checks stop expensive stages when pilots are invalid or
+uninformative. Outputs remain exploratory and uncitable. Approved CPU regression
+tests cover bounded widening, real ladder argument/order integration, missing
+evidence, longer-clip rejection, spent budgets and interrupted resume. No GPU
+result is claimed.
+
+The [long-job protocol](../workflow/long-jobs.md) also records the proposed
+scene-sanity / same-video / cross-video / frozen-test training progression.
+The old training campaign evaluator remains retired and is not launch-ready.
+
 The Gate A 48-frame native run (#69) completed the first full-system rate–distortion measurement on real tennis footage. While validating pipeline integrity, it confirmed that Gate A is **not passed yet** under the legacy configuration due to:
 1. Large `libaom` background plate under the tested settings (archived probe; not a codec-wide lower bound).
 2. JPEG-compressed foreground appearance crops (~4–25 KB per actor per keyframe).
@@ -46,6 +61,7 @@ Evaluating over longer sequences (96 and 192 frames) is a core hypothesis for es
 
 | ID | Status | Dependencies | Source | Description & Acceptance Criteria |
 |---|---|---|---|---|
+| `EVAL-ACT-05` | Implementation complete | Run-specific calibrated policy | PR #82 | Bounded pilot controller and regression gates implemented. Next: choose a calibrated run policy and run a small real pilot before relying on scientific results. |
 | `EVAL-ACT-01` | Complete | None | #71, #72, #79 | **Piped in-memory metric computation**: Replaced `_write_png_clip` disk writes with direct stdin streaming to ffmpeg Y4M rawvideo and enabled `n_threads=16`. Measured 80× speedup on 4K clips with bit-identical scores to reference. |
 | `EVAL-ACT-02` | Complete | `CODEC-ACT-01`, `CODEC-ACT-02`, `EVAL-ACT-01` | #72, #81 | **Amortization & rate sweep (Tier 1 PSNR)**: Fixed virtual memory exhaustion via streamed closeness; completed 192-frame sweeps on multi-scene 4K video. |
 | `EVAL-ACT-03` | Complete | `EVAL-ACT-02` | #72, outputs/gate-a-vvc-webp-n96-run2 | **Tier 2 full-metric confirmation**: Evaluated PSNR-Y, SSIM, VMAF across C0–C3 ladder. 0 alarms, pre-registered rot bounds verified, null controls passed, decode speed ~13.5 fps on CPU. |

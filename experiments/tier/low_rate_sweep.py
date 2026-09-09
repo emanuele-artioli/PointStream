@@ -467,6 +467,8 @@ def main(argv: list[str] | None = None) -> int:
                 )
                 save_checkpoint(points_dir, point.name, row)
             rows.append(row)
+            from experiments.jobs.monitor import publish_progress
+            publish_progress(stage, len(rows))
             stage_rows.append(row)
             alarms = ((row.get("pointstream") or {}).get("late_frame") or {}).get("alarms") or []
             for alarm in alarms:

@@ -88,3 +88,5 @@ PointStream processes video scenes defined by input manifests:
     ├── history/            # Pull request index, findings/retraction log, retired docs
     └── workflow/           # Agent session dispatch and closeout workflows
 ```
+
+For overnight runs, use [script-based monitoring and bounded codec pilots](docs/workflow/long-jobs.md).

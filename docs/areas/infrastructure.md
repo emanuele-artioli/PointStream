@@ -7,6 +7,22 @@
 
 ## 1. Current State
 
+### Quiet long-job monitoring (PR #82)
+
+`experiments/jobs/monitor.py` implements detached command supervision, ten-minute
+file logging, explicit work-progress tracking, quiet hours, one-shot/repeating
+digests, and a durable event queue with a Codex CLI adapter. Due events are
+batched into one wakeup; unchanged health does not invoke the agent. Repeated
+publication of the same stage decision is deduplicated independently of timestamps.
+
+Validation: host `/usr/bin/true` launch reached complete; the installed Codex CLI
+accepted a self-addressed queue check. Ruff, full mypy, import-layer validation,
+and 91 selected tests (30 new monitoring/campaign cases plus 61 existing
+runner/low-rate/heartbeat cases) pass against main through #81 with a host-local
+Torch cache. The new job modules have 81% targeted statement coverage.
+Regression scope was approved; no GPU experiment was needed for these checks. No existing overnight job was reconfigured.
+See [the workflow](../workflow/long-jobs.md) for usage and delivery limitations.
+
 ### Environment & Startup Performance
 PointStream runs on a shared remote Linux GPU server with an NFS-backed home directory. On **gpu6** (commit `bc09184`, September 2026), process startup and import latency were measured under clean conditions (`PYTHONNOUSERSITE=1`, explicit `PYTHONPATH`):
 
@@ -46,6 +62,7 @@ PR #68 introduced `scripts/cleanup_merged_worktrees.sh`. The documentation audit
 
 | ID | Status | Dependencies | Source | Description & Acceptance Criteria |
 |---|---|---|---|---|
+| `INFRA-ACT-04` | Complete | None | PR #82 | Quiet monitor and approved scheduling/stall/restart/budget regression tests implemented. Use the workflow for new jobs; transport acceptance is verified, but automated idle wakeup timing is not a guaranteed service. |
 | `INFRA-ACT-01` | Ready | None | #68, #73 | **Repair worktree cleanup helper**: Refactor `scripts/cleanup_merged_worktrees.sh` to halt on any git refusal, verify clean working tree against `origin/main`, remove the `rm -rf` fallback, and drop remote pruning. Acceptance: Script refuses to delete unmerged or dirty worktrees and passes unit test. |
 | `INFRA-ACT-02` | Ready | None | Host rules | **Host-local cache enforcement**: Configure local caching (the checkout-specific cache paths in `docs/setup.md`) in CI and runner scripts. Acceptance: Zero mypy cache files written to NFS home. |
 | `INFRA-ACT-03` | Closed / Archived (D1/D6) | None | `plans/DEFERRED.md` | **Static typing and test pollution**: Mypy passes cleanly across all 350 source files; tests isolated from global environment. |

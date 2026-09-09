@@ -194,6 +194,8 @@ def _announce(rung: Rung, arm: str) -> Rung:
     progress line at least every ten minutes so a real hang is visible in
     minutes rather than hours; this is that line.
     """
+    from experiments.jobs.monitor import publish_progress
+    publish_progress(f"{arm}:{rung.rate_value}", 1)
     label = rung.detail.get("coarseness") or rung.detail.get("rung") or f"r={rung.rate_value}"
     print(
         f"  {arm:<7} {label:>9}  {rung.coded_bytes:>10} B  "
@@ -485,6 +487,7 @@ def pair_for_codec(
     codec_name: str,
     rungs: tuple[int, ...],
     sweep: str = "qp",
+    payload_rungs: tuple[tuple[int, int], ...] | None = None,
 ) -> dict[str, Any]:
     """One codec, both arms, same preset — and the BD-rate between them.
 
@@ -533,7 +536,7 @@ def pair_for_codec(
                 print(f"  stream  r={rate_value:>3}  FAILED {exc!r}", flush=True)
 
     if sweep == "payload":
-        for index, (jpeg_quality, rate_value) in enumerate(PAYLOAD_RUNGS):
+        for index, (jpeg_quality, rate_value) in enumerate(payload_rungs if payload_rungs is not None else PAYLOAD_RUNGS):
             try:
                 stream_rungs.append(
                     _announce(
@@ -542,7 +545,7 @@ def pair_for_codec(
                             paired,
                             jpeg_quality=jpeg_quality,
                             rate_value=rate_value,
-                            rank=len(PAYLOAD_RUNGS) - 1 - index,
+                            rank=index if payload_rungs is not None else len(PAYLOAD_RUNGS) - 1 - index,
                         ),
                         "stream",
                     )

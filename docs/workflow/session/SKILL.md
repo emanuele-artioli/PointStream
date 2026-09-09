@@ -29,6 +29,15 @@ When initiating or handing off a task:
 
 For a multi-hour Gate A assignment, use the [overnight dispatch](overnight-gate-a.md); it authorizes execution only when the user gives that prompt to an agent.
 
+### Long jobs
+
+Use [the long-job workflow](../long-jobs.md). Ask once for reporting cadence unless
+already supplied. Delegate health checks and ten-minute logging to the script;
+wake the agent only for requested digests or actionable events. Use bounded
+pilot/confirmation gates before expensive codec stages. Do not create a periodic
+agent polling loop. Training subset stages remain a protocol until its evaluator
+is restored.
+
 ### Mode B: Execute & Report
 When executing work and reporting results:
 - **For Documentation & Refactoring Tasks**:

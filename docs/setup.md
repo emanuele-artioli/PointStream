@@ -88,3 +88,8 @@ python -m pytest -o "cache_dir=$PS_CACHE_ROOT/pytest" tests/runner/test_tier_end
 ```
 
 These check lint, static types, dependency direction between layers, and synthetic pipeline integration respectively. They do not establish compression quality or prove a native codec works. Native codec changes also require an encode/decode round trip using the selected binaries. Inspect CI results before merging and report any local checks that could not run.
+
+## 5. Long jobs
+
+Use the [quiet monitoring and bounded adaptation workflow](workflow/long-jobs.md)
+for detached runs, report scheduling, codec pilot gates and training selection.
