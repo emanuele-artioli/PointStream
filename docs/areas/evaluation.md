@@ -7,6 +7,19 @@
 
 ## 1. Current State
 
+### Bounded codec pilot controller
+
+`experiments/jobs/codec.py` adds pilot, longer-clip confirmation, and final stages
+around paired anchor/PointStream ladders. QP and joint JPEG/QP payload spacing can
+widen only inside an explicit policy. Worker timeouts, saved decisions and
+fail-closed evidence checks stop expensive stages when pilots are invalid or
+uninformative. Outputs remain exploratory and uncitable. Implementation is
+pending new regression-test approval and CI; no GPU result is claimed.
+
+The [long-job protocol](../workflow/long-jobs.md) also records the proposed
+scene-sanity / same-video / cross-video / frozen-test training progression.
+The old training campaign evaluator remains retired and is not launch-ready.
+
 The Gate A 48-frame native run (#69) completed the first full-system rate–distortion measurement on real tennis footage. While validating pipeline integrity, it confirmed that Gate A is **not passed yet** under the legacy configuration due to:
 1. High intra bitfloor in `libaom` background plate (~262 KB).
 2. Uncompressed JPEG foreground appearance crops (~4–25 KB per actor per keyframe).
@@ -44,6 +57,7 @@ Evaluating over longer sequences (96 and 192 frames) is a core hypothesis for es
 
 | ID | Status | Dependencies | Source | Description & Acceptance Criteria |
 |---|---|---|---|---|
+| `EVAL-ACT-05` | In progress | Test-scope approval | Bounded pilot controller | Validate spacing, result identity, budget and promotion gates; then run a calibrated small real pilot under a separately chosen run policy. |
 | `EVAL-ACT-01` | Ready | None | #71, #72 | **Piped in-memory metric computation**: Replace `_write_png_clip` disk writes with direct stdin streaming (`-f rawvideo -pix_fmt rgb24 ...`) to `ffmpeg` and enable `n_threads=16` for `libvmaf`. Acceptance: Metric calculation time reduced by ≥5× without altering score values on reference clips. |
 | `EVAL-ACT-02` | Blocked | `CODEC-ACT-01`, `EVAL-ACT-01` | #72 | **Amortization & rate sweep (Tier 1 PSNR)**: Sweep QP ladders across 48, 96, and 192 frames with VVC/SVT background plate. Acceptance: Establish operating range where PointStream PSNR exceeds AV1/VVC anchors at matched bitrate. |
 | `EVAL-ACT-03` | Blocked | `EVAL-ACT-02` | #72 | **Tier 2 full-metric confirmation**: Run PSNR-Y, SSIM, VMAF, and LPIPS on the winning configuration from `EVAL-ACT-02`. Acceptance: Complete three-axis report (size, quality, speed) with two-sided pre-run bounds and null controls. |

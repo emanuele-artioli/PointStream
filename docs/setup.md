@@ -66,3 +66,8 @@ export RUFF_CACHE_DIR="/tmp/ruff-$(basename "$PWD")"
 ```
 
 Always import `sqlite3` before `torch` in scripts and modules to avoid dynamic linker CXXABI collisions.
+
+## Long jobs
+
+Use the [quiet monitoring and bounded adaptation workflow](workflow/long-jobs.md)
+for detached runs, report scheduling, codec pilot gates and training selection.
