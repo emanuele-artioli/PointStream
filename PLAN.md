@@ -9,8 +9,8 @@ Submission Target: **ACM TOMM — 30 September 2026** (hard deadline). See [docs
 
 | Area | Reconciled State to Carry Forward | Evidence Anchor / Next Action |
 |---|---|---|
-| [Codec](docs/areas/codec.md) | Offline canonical canvas and explicit fallback exist; lean background (VVC/SVT) & WebP appearance proposed | #36/#45/#50/#52 implementation; #64 seed; #70–#72 proposals; `CODEC-ACT-01` (connect VVC stream) |
-| [Evaluation](docs/areas/evaluation.md) | 48-frame diagnostic complete; Gate A not passed; fast two-tier eval (in-memory PSNR vs full VMAF) proposed | #65/#66 plumbing; #69 result; #72 fast-eval proposal; `EVAL-ACT-01` (piped VMAF), `EVAL-ACT-02` (rate sweep) |
+| [Codec](docs/areas/codec.md) | VVC low-delay background streaming and WebP appearance implemented; C0–C3 rate ladder proven | PR #75, #80 (`CODEC-ACT-01`, `02` completed); `CODEC-ACT-03` (payload ledger) |
+| [Evaluation](docs/areas/evaluation.md) | Gate A 192-frame evaluation complete; winning regime established below AV1 floor and beating VVC low-rate collapse | PR #79, #81, outputs/gate-a-vvc-webp-n96-run2; `EVAL-ACT-01/02/03` completed; `EVAL-ACT-04` (anchor presets) |
 | [Data](docs/areas/data.md) | Diagnostic corpus exists; fresh sources provisional; long 96/192-frame sequences characterized | #56/#57 audit, #60 shortlist, #63 acquisition; `DATA-ACT-01` (manifest packaging), `DATA-ACT-04` (reserve confirmation sources) |
 | [Generation](docs/areas/generation.md) | Optional; generation off in primary search; pasted-reference baseline beats generative engines | #20/#27/#28 engine roster; `GEN-ACT-01` (SAM3 evaluation, previously deferred D2) |
 | [Infrastructure](docs/areas/infrastructure.md) | External data isolated; gpu6 imports fast; cleanup helper flagged for unsafe `rm -rf` | #32/#35 data root, #53 recovery, #68 cleanup audit, #73 profiling; `INFRA-ACT-01` (repair cleanup script) |
@@ -22,7 +22,7 @@ Submission Target: **ACM TOMM — 30 September 2026** (hard deadline). See [docs
 
 | Task ID | Worktree / Branch | Base Rev | Owner | Allowed Scope | Dependencies | Active PR |
 |---|---|---|---|---|---|---|
-| `OVERNIGHT-GATE-A` | `/tmp/pointstream-gate-a-overnight` / `antigravity/gate-a-overnight-run-2` | `5848423` | Antigravity | `CODEC-ACT-01/02`, `DATA-ACT-01/04`, `EVAL-ACT-01/02/03/04` | PR #80 / `5848423` | Active |
+| `OVERNIGHT-GATE-A` | `/tmp/pointstream-gate-a-overnight` / `antigravity/gate-a-overnight-run-2` | `5848423` | Antigravity | `CODEC-ACT-01/02`, `DATA-ACT-01/04`, `EVAL-ACT-01/02/03/04` | PR #80 / `5848423` | Completed / Under PR |
 
 ---
 
