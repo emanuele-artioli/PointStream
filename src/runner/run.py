@@ -20,11 +20,13 @@ from src.contracts.errors import ConfigValueError
 from src.contracts.lattice import (
     ART_APPEARANCE_PAYLOAD,
     ART_BACKGROUND_MODEL,
+    ART_BITSTREAM,
     ART_DELIVERED,
     ART_QUALITY,
     ART_RESIDUAL_STREAM,
     STAGE_BACKGROUND,
     STAGE_GENERATION,
+    STAGE_SEGMENTATION,
     StageLattice,
 )
 from src.pipeline.dag.graph import StageCallable
@@ -40,11 +42,9 @@ from src.pipeline.reconstruction.quality import (
 )
 from src.pipeline.reconstruction.reconstruct import (
     ObjectRequest,
-    ReconstructionRequest,
     ReconstructionResult,
-    reconstruct,
 )
-from src.pipeline.residual.signal import ResidualResult, apply_residual
+from src.pipeline.residual.signal import ResidualResult
 from src.runner.accounting import SizesBytes
 from src.runner.routing import (
     bind_backends,
@@ -544,6 +544,7 @@ def _finish_chunk(
     # interval starts only once those bytes are ready to receive.
     wire_request: bytes | None = None
     placements: tuple[Any, ...] = ()
+    transmitted_residual: Any = None
     if not lattice.is_source_passthrough:
         from src.runner.client import (
             ClientPlacement,
@@ -599,69 +600,119 @@ def _finish_chunk(
             )
             for item in client_objects
         )
-        if residual_payload is None:
-            wire_request = serialize_client_request(
-                background=view,
-                frame_count=int(source.shape[0]),
-                height=int(source.shape[1]),
-                width=int(source.shape[2]),
-                placements=placements,
-            )
+        bitstream = bag.get(ART_BITSTREAM)
+        transmitted_residual = None
+        if isinstance(bitstream, Mapping):
+            transmitted_residual = bitstream.get("transmitted_residual")
+        elif isinstance(residual, ResidualResult):
+            transmitted_residual = residual.transmitted
+
+        if transmitted_residual is None and residual_payload is not None:
+            transmitted_residual = residual_payload
+
+        wire_request = serialize_client_request(
+            background=view,
+            frame_count=int(source.shape[0]),
+            height=int(source.shape[1]),
+            width=int(source.shape[2]),
+            placements=placements,
+            residual_payload=transmitted_residual,
+        )
+        bag["wire_request"] = wire_request
+        if transmitted_residual is not None:
+            bag["transmitted_residual"] = transmitted_residual
 
     # --- Client Phase: bytes received through delivered frames ---
     if sync_fn is not None:
         sync_fn()
     client_start = clock()
     if lattice.is_source_passthrough:
-        _ = source.copy()
-    elif residual_payload is not None:
-        _ = reconstruct_independent_client(
-            background=view,
-            frame_count=int(source.shape[0]),
-            height=int(source.shape[1]),
-            width=int(source.shape[2]),
-            placements=placements,
-            residual_payload=residual_payload,
-            resolver=resolver,
-        )
+        client_delivered_frames = source.copy()
+        client_base_frames = source.copy()
     else:
-        if wire_request is None:
-            raise RuntimeError("serialized client request was not prepared")
-        _ = reconstruct_serialized_client(wire_request, resolver=resolver)
+        if generation_on and ref is not None:
+            from src.runner.client import reconstruct_independent_client
+
+            client_delivered, client_base = reconstruct_independent_client(
+                background=view,
+                frame_count=int(source.shape[0]),
+                height=int(source.shape[1]),
+                width=int(source.shape[2]),
+                placements=placements,
+                residual_payload=transmitted_residual,
+                resolver=resolver,
+                return_base=True,
+                generator=ref,
+                objects=client_objects,
+                params=params,
+                seed=seed,
+            )
+        else:
+            if wire_request is None:
+                raise RuntimeError("serialized client request was not prepared")
+            client_delivered, client_base = reconstruct_serialized_client(
+                wire_request, resolver=resolver, return_base=True
+            )
+        client_delivered_frames = np.asarray(client_delivered, dtype=np.uint8)
+        client_base_frames = np.asarray(client_base, dtype=np.uint8)
     if sync_fn is not None:
         sync_fn()
     client_seconds = clock() - client_start
 
-    # --- Evaluation Phase: reconstruct & metric evaluation ---
+    # --- Evaluation Phase: metric evaluation of independently decoded frames ---
     if sync_fn is not None:
         sync_fn()
     eval_start = clock()
 
-    client = reconstruct(
-        ReconstructionRequest(
-            lattice=lattice,
-            source=source,
-            background=view,
-            objects=client_objects,
-            generator=ref if generation_on else None,
-            evaluator=scorer,
-            resolver=resolver,
-            seed=seed,
-            params=params,
+    delivered_art = bag.get(ART_DELIVERED)
+    if isinstance(delivered_art, Mapping) and delivered_art.get("fallback_reason"):
+        raise ConfigValueError(
+            "codec.fallback",
+            f"Source fallback cannot earn a valid quality score: {delivered_art['fallback_reason']}",
         )
+
+    use_heuristic = not lattice.is_enabled(STAGE_SEGMENTATION)
+    from src.pipeline.reconstruction.compositor import heuristic_mask
+    from src.pipeline.reconstruction.quality import union_object_mask
+
+    object_masks = []
+    for item in client_objects:
+        if use_heuristic or item.mask is None:
+            object_masks.append(
+                heuristic_mask(item.bbox, int(source.shape[1]), int(source.shape[2]))
+            )
+        else:
+            object_masks.append(np.asarray(item.mask, dtype=bool))
+    combined_mask = (
+        union_object_mask(
+            object_masks,
+            frames=int(source.shape[0]),
+            height=int(source.shape[1]),
+            width=int(source.shape[2]),
+        )
+        if object_masks
+        else None
     )
-    if client.quality is None:
+
+    reconstruction_quality = scorer.evaluate(source, client_base_frames, object_mask=combined_mask)
+    if reconstruction_quality is None:
         raise ConfigValueError(
             "runner.reconstruction",
             "reconstruct() returned no QualityReport. Every path must score.",
         )
 
-    if isinstance(residual, ResidualResult):
-        frames = apply_residual(client.frames, residual.payload)
-        encoder_frames = residual.reconstructed
-    else:
-        frames = client.frames
-        encoder_frames = _encoder_frames(bag, client.frames)
+    from src.pipeline.reconstruction.device import DeviceDecision
+
+    client = ReconstructionResult(
+        frames=as_clip(client_base_frames, path="client_base"),
+        quality=reconstruction_quality,
+        path="independent_client",
+        device=DeviceDecision("cpu"),
+        object_mask=combined_mask,
+    )
+
+    frames = client_delivered_frames
+    encoder_frames = _encoder_frames(bag, client_delivered_frames)
 
     symmetry = measure_symmetry(encoder_frames, frames)
     if sync_fn is not None:
@@ -669,6 +720,13 @@ def _finish_chunk(
     eval_seconds = clock() - eval_start
 
     sizes = ledger_from_bag(bag, source)
+    if transmitted_residual is not None and getattr(transmitted_residual, "is_coded", False):
+        wire_bytes = len(transmitted_residual.bitstream)
+        if wire_bytes != sizes.residual:
+            raise ValueError(
+                f"Residual wire byte mismatch: wire has {wire_bytes} bytes but ledger has {sizes.residual} bytes"
+            )
+
     chunk = ChunkResult(
         frames=frames,
         encoder_frames=encoder_frames,

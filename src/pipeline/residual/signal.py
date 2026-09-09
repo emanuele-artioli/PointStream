@@ -5,28 +5,31 @@ a stage off makes this signal *smaller*, the reconstruction is still carrying
 work that stage was supposed to stop doing.
 
 Lossless stores signed int16 so apply-after-compute is bit-identity with the
-source. Lossy biases into uint8 with a +128 offset (the representation a
-video codec actually encodes) and may drop low-activity blocks and downscale
-the background. Absent stores nothing: the reconstruction is unaided.
-
-This module does not invoke a codec. Byte counts here are the pixel payload
-handed to one — sparse (nonzero) counts for lossy, dense int16 for lossless —
-so a test can see absent vs lossless change the payload without standing up
-ffmpeg.
+source. Lossy biases into uint8 (clipped or full_range representation) and may
+drop low-activity blocks and downscale the background. Absent stores nothing:
+the reconstruction is unaided.
 """
 
 from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from typing import Any
 
-import cv2
 import numpy as np
 
 from src.contracts.config import ResidualConfig
 from src.contracts.lattice import STAGE_RESIDUAL, StageLattice
 from src.contracts.objectstream import WireCost
 from src.pipeline.reconstruction.clips import as_clip, require_same_shape
+from src.pipeline.residual.lossy import (
+    OFFSET,
+    block_activity_gate,
+    decode_lossy,
+    downscale_background,
+    encode_lossy,
+    subsample_chroma,
+)
 from src.pipeline.residual.spectrum import (
     Coarseness,
     ResidualPoint,
@@ -34,18 +37,14 @@ from src.pipeline.residual.spectrum import (
     point_for,
 )
 
-OFFSET = 128
-
 
 @dataclass(frozen=True)
 class ResidualPayload:
     """What the residual stage produced for one clip.
 
-    ``frames`` is None when absent. ``lossy_uint8`` is the +128 representation
-    a codec would encode; ``lossless_int16`` is the exact signed difference.
-    ``active_blocks`` and ``nonzero_bytes`` are the information content — a
-    dense array's ``nbytes`` does not shrink when blocks are zeroed, and
-    comparing that would make coarseness look free.
+    ``frames`` is None when absent. ``lossy_uint8`` is the representation a
+    codec would encode; ``lossless_int16`` is the exact signed difference.
+    ``active_blocks`` and ``nonzero_bytes`` are the information content.
     """
 
     variant: ResidualVariant
@@ -56,6 +55,9 @@ class ResidualPayload:
     active_blocks: int
     l1_energy: float
     cost: WireCost
+    mode: str = "clipped"
+    scale: float = 1.0
+    offset: float = 128.0
 
     @property
     def is_absent(self) -> bool:
@@ -69,6 +71,10 @@ class ResidualResult:
     payload: ResidualPayload
     reconstructed: np.ndarray
     """Reconstruction after adding the residual (absent → unchanged)."""
+    base: np.ndarray | None = None
+    """The server predictor P_s before residual was added."""
+    transmitted: Any = None
+    """The transmitted wire representation (e.g. TransmittedResidual) if coded."""
 
 
 def signed_residual(source: np.ndarray, reconstruction: np.ndarray) -> np.ndarray:
@@ -84,88 +90,10 @@ def l1_energy(residual: np.ndarray) -> float:
     return float(np.abs(residual).sum())
 
 
-def encode_lossy(signed: np.ndarray) -> np.ndarray:
-    """Bias into uint8. Differences outside [-128, 127] clip — that is lossy."""
-    return np.clip(signed.astype(np.int16) + OFFSET, 0, 255).astype(np.uint8)
-
-
-def decode_lossy(encoded: np.ndarray) -> np.ndarray:
-    return encoded.astype(np.int16) - OFFSET
-
-
 def apply_signed(reconstruction: np.ndarray, signed: np.ndarray) -> np.ndarray:
     recon = as_clip(reconstruction, path="reconstruction").astype(np.int16)
     require_same_shape(recon, signed, path="apply-residual")
     return np.clip(recon + signed, 0, 255).astype(np.uint8)
-
-
-def block_activity_gate(
-    residual: np.ndarray,
-    *,
-    block_size: int,
-    threshold: float,
-) -> np.ndarray:
-    """Zero blocks whose mean absolute residual is below ``threshold``.
-
-    Threshold is in pixel units: 2.0 drops blocks whose mean error is below
-    two grey levels. ``block_size <= 1`` or ``threshold <= 0`` is a no-op.
-    """
-    if block_size <= 1 or threshold <= 0.0:
-        return residual
-    if residual.ndim != 4:
-        raise ValueError(f"residual must be (T, H, W, C); got {residual.shape}.")
-    frames, height, width, channels = residual.shape
-    pad_h = (block_size - (height % block_size)) % block_size
-    pad_w = (block_size - (width % block_size)) % block_size
-    padded = np.pad(residual, ((0, 0), (0, pad_h), (0, pad_w), (0, 0)), mode="edge")
-    padded_h, padded_w = padded.shape[1], padded.shape[2]
-    n_h, n_w = padded_h // block_size, padded_w // block_size
-    blocks = padded.reshape(frames, n_h, block_size, n_w, block_size, channels)
-    activity = np.abs(blocks).mean(axis=(2, 4, 5))
-    keep = activity >= float(threshold)
-    mask = np.repeat(np.repeat(keep[:, :, None, :, None], block_size, axis=2), block_size, axis=4)
-    mask = mask.reshape(frames, padded_h, padded_w)
-    gated = padded * mask[..., None]
-    return gated[:, :height, :width, :]
-
-
-def downscale_background(
-    residual: np.ndarray,
-    actor_mask: np.ndarray | None,
-    *,
-    factor: int,
-) -> np.ndarray:
-    """Keep object residual at full resolution; coarsen the background.
-
-    ``factor <= 1`` is a no-op. A mask covering every pixel leaves the
-    residual untouched — there is no background to coarsen.
-    """
-    if factor <= 1:
-        return residual
-    if residual.ndim != 4:
-        raise ValueError(f"residual must be (T, H, W, C); got {residual.shape}.")
-    frames, height, width, _channels = residual.shape
-    if actor_mask is None:
-        object_pixels = np.zeros((frames, height, width), dtype=bool)
-    else:
-        object_pixels = _align_mask(actor_mask, frames, height, width)
-    if bool(np.all(object_pixels)):
-        return residual
-
-    down_h = max(1, int(math.ceil(height / float(factor))))
-    down_w = max(1, int(math.ceil(width / float(factor))))
-    coarsened = np.empty_like(residual)
-    for index in range(frames):
-        small = cv2.resize(
-            residual[index].astype(np.float32),
-            (down_w, down_h),
-            interpolation=cv2.INTER_AREA,
-        )
-        coarsened[index] = cv2.resize(
-            small, (width, height), interpolation=cv2.INTER_NEAREST
-        )
-    keep = object_pixels[..., None]
-    return np.where(keep, residual, coarsened)
 
 
 def compute_residual(
@@ -176,6 +104,7 @@ def compute_residual(
     residual: ResidualConfig | None = None,
     actor_mask: np.ndarray | None = None,
     coarseness: Coarseness | None = None,
+    representation: str | None = None,
 ) -> ResidualResult:
     """Build the residual payload and the clip after applying it.
 
@@ -205,34 +134,68 @@ def compute_residual(
                 basis="residual absent; unaided reconstruction",
             ),
         )
-        return ResidualResult(payload=empty, reconstructed=recon.copy())
+        return ResidualResult(payload=empty, reconstructed=recon.copy(), base=recon.copy())
 
     signed = signed_residual(src, recon)
     if point.variant is ResidualVariant.LOSSLESS:
         payload = _lossless_payload(signed, point)
         restored = apply_signed(recon, signed)
-        return ResidualResult(payload=payload, reconstructed=restored)
+        return ResidualResult(payload=payload, reconstructed=restored, base=recon.copy())
 
     cfg = point.config if point.config is not None else ResidualConfig()
+    mode = representation or getattr(cfg, "representation", "clipped")
+    subsample = getattr(cfg, "subsample_chroma", False)
+
     working = signed.astype(np.float32)
     working = block_activity_gate(
         working, block_size=cfg.block_size, threshold=cfg.block_threshold
     )
     working = downscale_background(working, actor_mask, factor=cfg.background_downscale)
-    encoded = encode_lossy(np.rint(working).astype(np.int16))
-    payload = _lossy_payload(encoded, working, point, cfg)
-    restored = apply_signed(recon, decode_lossy(encoded))
-    return ResidualResult(payload=payload, reconstructed=restored)
+    if subsample:
+        working = subsample_chroma(working)
+
+    encoded = encode_lossy(np.rint(working).astype(np.int16), mode=mode)
+    payload = _lossy_payload(encoded, working, point, cfg, mode=mode)
+    restored = apply_signed(recon, decode_lossy(encoded, mode=mode))
+    return ResidualResult(payload=payload, reconstructed=restored, base=recon.copy())
 
 
-def apply_residual(reconstruction: np.ndarray, payload: ResidualPayload) -> np.ndarray:
+def apply_residual(reconstruction: np.ndarray, payload: Any) -> np.ndarray:
     """Decoder-side: add the residual onto the reconstruction."""
     recon = as_clip(reconstruction, path="reconstruction")
-    if payload.is_absent or payload.frames is None:
+    if payload is None:
         return recon.copy()
-    if payload.variant is ResidualVariant.LOSSLESS:
-        return apply_signed(recon, payload.frames)
-    return apply_signed(recon, decode_lossy(payload.frames))
+
+    if isinstance(payload, np.ndarray):
+        if payload.dtype == np.int16:
+            return apply_signed(recon, payload)
+        return apply_signed(recon, decode_lossy(payload))
+
+    if getattr(payload, "is_absent", False):
+        return recon.copy()
+
+    # TransmittedResidual from bitstream or unencoded array
+    if hasattr(payload, "bitstream") and getattr(payload, "is_coded", False):
+        from src.pipeline.residual.codec import decode_residual_stream
+
+        signed_diff = decode_residual_stream(payload)
+        return apply_signed(recon, signed_diff)
+
+    if getattr(payload, "variant", None) is ResidualVariant.LOSSLESS:
+        if payload.frames is not None:
+            return apply_signed(recon, payload.frames)
+        return recon.copy()
+
+    frames = getattr(payload, "frames", None)
+    if frames is None:
+        frames = getattr(payload, "raw_frames", None)
+    if frames is None:
+        return recon.copy()
+
+    mode = getattr(payload, "mode", "clipped")
+    scale = getattr(payload, "scale", 1.0)
+    offset = getattr(payload, "offset", 128.0)
+    return apply_signed(recon, decode_lossy(frames, mode=mode, scale=scale, offset=offset))
 
 
 def _lossless_payload(signed: np.ndarray, point: ResidualPoint) -> ResidualPayload:
@@ -249,14 +212,12 @@ def _lossless_payload(signed: np.ndarray, point: ResidualPoint) -> ResidualPaylo
         cost=WireCost(
             values=int(stored.size),
             byte_count=int(stored.nbytes),
-            # Not a wire cost. This is the dense array a codec is supposed to
-            # run on next; nobody transmits signed int16 verbatim. Until
-            # `residual.codec` codes it, the size stands in for a number that
-            # does not exist yet, and `exact=False` stops the stand-in being
-            # summed into a total that calls itself a rate (BP24).
             exact=False,
             basis="lossless int16 residual, dense array — pre-codec, not a bitstream",
         ),
+        mode="raw_int16",
+        scale=1.0,
+        offset=0.0,
     )
 
 
@@ -265,6 +226,8 @@ def _lossy_payload(
     working: np.ndarray,
     point: ResidualPoint,
     config: ResidualConfig,
+    *,
+    mode: str = "clipped",
 ) -> ResidualPayload:
     nonzero = int(np.count_nonzero(encoded != OFFSET))
     block = max(1, config.block_size)
@@ -290,31 +253,13 @@ def _lossy_payload(
         cost=WireCost(
             values=nonzero,
             byte_count=nonzero,
-            # Also not a wire cost. Counting nonzero bytes is a better stand-in
-            # than the dense array — it at least moves when the block gate
-            # fires — but it is still the payload handed *to* a codec, not what
-            # the codec returned. The coded number comes from
-            # `src/runner/stages.py::_coded_residual`, which round-trips this
-            # payload through `residual.codec` (BP24).
             exact=False,
             basis=(
-                f"lossy uint8 residual, {nonzero} nonzero bytes, "
+                f"lossy uint8 residual ({mode}), {nonzero} nonzero bytes, "
                 f"{active} active blocks of {block} — pre-codec, not a bitstream"
             ),
         ),
+        mode=mode,
+        scale=1.0,
+        offset=float(OFFSET),
     )
-
-
-def _align_mask(mask: np.ndarray, frames: int, height: int, width: int) -> np.ndarray:
-    array = np.asarray(mask, dtype=bool)
-    if array.ndim == 2:
-        if array.shape != (height, width):
-            raise ValueError(
-                f"actor mask shape {array.shape} does not match frame {(height, width)}."
-            )
-        return np.broadcast_to(array, (frames, height, width))
-    if array.shape != (frames, height, width):
-        raise ValueError(
-            f"actor mask shape {array.shape} does not match clip {(frames, height, width)}."
-        )
-    return array

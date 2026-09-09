@@ -53,7 +53,12 @@ def reconstruct_independent_client(
     residual_payload: Any = None,
     resolver: BackgroundResolver | None = None,
     policy: DevicePolicy | None = None,
-) -> Clip:
+    return_base: bool = False,
+    generator: Any = None,
+    objects: Sequence[Any] | None = None,
+    params: Any = None,
+    seed: int = 1337,
+) -> Clip | tuple[Clip, Clip]:
     """Reconstruct full-resolution frames from transmitted payloads only.
 
     Args:
@@ -66,9 +71,15 @@ def reconstruct_independent_client(
         residual_payload: Transmitted residual payload (if residual is on).
         resolver: Optional background resolver instance.
         policy: Optional device policy.
+        return_base: If True, return (delivered_clip, base_clip).
+        generator: Optional client generator backend.
+        objects: Optional objects to generate when generation is enabled.
+        params: Optional generation params.
+        seed: Random seed for deterministic generation.
 
     Returns:
-        Delivered RGB frames of shape (frame_count, height, width, 3).
+        Delivered RGB frames of shape (frame_count, height, width, 3), or a
+        pair (delivered_clip, base_clip) when return_base is True.
     """
     active_policy = policy or DevicePolicy()
     active_resolver = resolver or BackgroundResolver()
@@ -86,8 +97,9 @@ def reconstruct_independent_client(
         )
 
     # 2. Foreground placement / compositing
+    pipeline_placements: list[Placement] = []
     if placements:
-        pipeline_placements = [
+        pipeline_placements.extend(
             Placement(
                 crop=p.crop,
                 bbox=p.bbox,
@@ -95,22 +107,52 @@ def reconstruct_independent_client(
                 mask=p.mask,
             )
             for p in placements
-        ]
-        frames = composite_clip(
+        )
+
+    if generator is not None and objects:
+        to_generate = [item for item in objects if getattr(item, "supplied_crop", None) is None]
+        if to_generate:
+            from src.pipeline.reconstruction.dispatch import dispatch
+            from src.pipeline.reconstruction.reconstruct import _bundle_for
+
+            bundles = tuple(_bundle_for(item) for item in to_generate)
+            crops, _ = dispatch(
+                generator,
+                bundles,
+                seed=seed,
+                params=params,
+                policy=active_policy,
+            )
+            for item, crop in zip(to_generate, crops, strict=True):
+                pipeline_placements.append(
+                    Placement(
+                        crop=crop,
+                        bbox=item.bbox,
+                        frame_index=item.frame_index,
+                        mask=item.mask,
+                    )
+                )
+
+    if pipeline_placements:
+        base_frames = composite_clip(
             bg_frames,
             tuple(pipeline_placements),
             use_heuristic_mask=True,
         )
     else:
-        frames = bg_frames
+        base_frames = as_clip(bg_frames, path="independent_client_base")
 
     # 3. Residual application (if transmitted)
+    delivered = base_frames.copy()
     if residual_payload is not None and not getattr(residual_payload, "is_absent", True):
         from src.pipeline.residual.signal import apply_residual
 
-        frames = apply_residual(frames, residual_payload)
+        delivered = apply_residual(delivered, residual_payload)
 
-    return as_clip(frames, path="independent_client_delivered")
+    delivered_clip = as_clip(delivered, path="independent_client_delivered")
+    if return_base:
+        return delivered_clip, as_clip(base_frames, path="independent_client_base")
+    return delivered_clip
 
 
 def serialize_client_request(
@@ -121,10 +163,9 @@ def serialize_client_request(
     width: int,
     placements: Sequence[ClientPlacement] = (),
     residual_payload: Any = None,
+    require_compressed: bool = False,
 ) -> bytes:
     """Serialize explicit client inputs without executable object payloads."""
-    if residual_payload is not None:
-        raise ValueError("serialized residual client payload is not implemented")
     arrays: dict[str, np.ndarray] = {}
     background_meta: dict[str, Any] | None = None
     if background is not None:
@@ -159,6 +200,7 @@ def serialize_client_request(
             "wire_codec": background.wire_codec,
             "wire_codec_id": background.wire_codec_id,
         }
+
     placement_meta: list[dict[str, Any]] = []
     for index, placement in enumerate(placements):
         crop_key = f"crop_{index}"
@@ -182,6 +224,75 @@ def serialize_client_request(
                 "object_id": placement.object_id,
             }
         )
+
+    # Residual payload serialization
+    residual_meta: dict[str, Any] = {"present": False, "is_coded": False, "byte_count": 0}
+    if residual_payload is not None and not getattr(residual_payload, "is_absent", False):
+        if hasattr(residual_payload, "bitstream") and getattr(residual_payload, "is_coded", False):
+            bitstream_bytes = residual_payload.bitstream
+            arrays["residual_bitstream"] = np.frombuffer(bitstream_bytes, dtype=np.uint8)
+            residual_meta = {
+                "present": True,
+                "is_coded": True,
+                "codec_name": str(residual_payload.codec_name),
+                "mode": str(residual_payload.mode),
+                "shape": list(residual_payload.shape),
+                "pix_fmt": str(residual_payload.pix_fmt),
+                "scale": float(residual_payload.scale),
+                "offset": float(residual_payload.offset),
+                "fps": float(residual_payload.fps),
+                "byte_count": len(bitstream_bytes),
+                "bitstream_key": "residual_bitstream",
+            }
+        elif isinstance(residual_payload, dict) and (
+            "bitstream" in residual_payload or "residual_stream" in residual_payload
+        ):
+            bitstream_bytes = bytes(
+                residual_payload.get("bitstream") or residual_payload.get("residual_stream")
+            )
+            arrays["residual_bitstream"] = np.frombuffer(bitstream_bytes, dtype=np.uint8)
+            residual_meta = {
+                "present": True,
+                "is_coded": True,
+                "codec_name": str(residual_payload.get("codec_name", "avc")),
+                "mode": str(residual_payload.get("mode", "clipped")),
+                "shape": list(residual_payload.get("shape", (frame_count, height, width, 3))),
+                "pix_fmt": str(residual_payload.get("pix_fmt", "yuv420p")),
+                "scale": float(residual_payload.get("scale", 1.0)),
+                "offset": float(residual_payload.get("offset", 128.0)),
+                "fps": float(residual_payload.get("fps", 25.0)),
+                "byte_count": len(bitstream_bytes),
+                "bitstream_key": "residual_bitstream",
+            }
+        else:
+            # Unencoded fallback array
+            if require_compressed:
+                raise ValueError(
+                    "Cannot serialize unencoded fallback residual array as compressed evidence"
+                )
+            raw = getattr(residual_payload, "raw_frames", None)
+            if raw is None:
+                raw = getattr(residual_payload, "frames", None)
+            if raw is None and isinstance(residual_payload, dict):
+                raw = residual_payload.get("frames")
+            if raw is None and isinstance(residual_payload, np.ndarray):
+                raw = residual_payload
+            if raw is None:
+                raise ValueError("Residual payload has no bitstream and no raw frames")
+            raw_arr = np.asarray(raw)
+            arrays["residual_raw"] = raw_arr
+            residual_meta = {
+                "present": True,
+                "is_coded": False,
+                "codec_name": "raw",
+                "mode": str(getattr(residual_payload, "mode", "clipped")),
+                "shape": list(raw_arr.shape),
+                "scale": float(getattr(residual_payload, "scale", 1.0)),
+                "offset": float(getattr(residual_payload, "offset", 128.0)),
+                "byte_count": int(raw_arr.nbytes),
+                "raw_key": "residual_raw",
+            }
+
     metadata = {
         "schema": 1,
         "frame_count": frame_count,
@@ -189,6 +300,7 @@ def serialize_client_request(
         "width": width,
         "background": background_meta,
         "placements": placement_meta,
+        "residual": residual_meta,
     }
     arrays["metadata"] = np.frombuffer(json.dumps(metadata).encode("utf-8"), dtype=np.uint8)
     stream = io.BytesIO()
@@ -197,8 +309,12 @@ def serialize_client_request(
 
 
 def reconstruct_serialized_client(
-    payload: bytes, *, resolver: BackgroundResolver | None = None
-) -> Clip:
+    payload: bytes,
+    *,
+    resolver: BackgroundResolver | None = None,
+    return_base: bool = False,
+    require_compressed: bool = False,
+) -> Clip | tuple[Clip, Clip]:
     """Reconstruct only from the validated NumPy/JSON client envelope."""
     if not isinstance(payload, bytes):
         raise TypeError("client payload must be bytes")
@@ -275,13 +391,58 @@ def reconstruct_serialized_client(
                     object_id=str(item["object_id"]),
                 )
             )
+
+        # Residual deserialization
+        res_meta = metadata.get("residual")
+        residual_payload = None
+        if res_meta and res_meta.get("present"):
+            if require_compressed and not res_meta.get("is_coded"):
+                raise ValueError(
+                    "Rejecting unencoded fallback residual array as compressed evidence"
+                )
+            from src.pipeline.residual.codec import TransmittedResidual
+
+            if res_meta.get("is_coded"):
+                bitstream_key = res_meta.get("bitstream_key", "residual_bitstream")
+                if bitstream_key not in arrays:
+                    raise ValueError(f"Missing residual bitstream key {bitstream_key!r} in payload")
+                bitstream_bytes = np.asarray(arrays[bitstream_key], dtype=np.uint8).tobytes()
+                residual_payload = TransmittedResidual(
+                    bitstream=bitstream_bytes,
+                    codec_name=res_meta["codec_name"],
+                    mode=res_meta.get("mode", "clipped"),
+                    shape=tuple(res_meta["shape"]),
+                    pix_fmt=res_meta.get("pix_fmt", "yuv420p"),
+                    scale=float(res_meta.get("scale", 1.0)),
+                    offset=float(res_meta.get("offset", 128.0)),
+                    fps=float(res_meta.get("fps", 25.0)),
+                    is_coded=True,
+                )
+            else:
+                raw_key = res_meta.get("raw_key", "residual_raw")
+                if raw_key not in arrays:
+                    raise ValueError(f"Missing residual raw key {raw_key!r} in payload")
+                raw_frames = np.asarray(arrays[raw_key])
+                residual_payload = TransmittedResidual(
+                    bitstream=b"",
+                    codec_name="raw",
+                    mode=res_meta.get("mode", "clipped"),
+                    shape=tuple(res_meta["shape"]),
+                    scale=float(res_meta.get("scale", 1.0)),
+                    offset=float(res_meta.get("offset", 128.0)),
+                    is_coded=False,
+                    raw_frames=raw_frames,
+                )
+
     return reconstruct_independent_client(
         background=background,
         frame_count=int(metadata["frame_count"]),
         height=int(metadata["height"]),
         width=int(metadata["width"]),
         placements=tuple(placements),
+        residual_payload=residual_payload,
         resolver=resolver,
+        return_base=return_base,
     )
 
 
