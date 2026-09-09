@@ -1,0 +1,55 @@
+{
+  "schema": "pointstream.development_recovery.v1",
+  "doc_role": "development_recovery_manifest",
+  "status": "active_development",
+  "created_utc": "2026-09-09T23:45:00Z",
+  "description": "Development recovery manifest using already exposed BP46 tennis sequences for overnight recovery experiments (residual fidelity, credible anchors, generator readiness). Held-out confirmation sources in manifests/gate_b_confirmation.json remain untouched.",
+  "scenes": [
+    {
+      "source_id": "alcaraz_highlights_scene_000",
+      "video": "alcaraz_highlights",
+      "scene": "scene_000",
+      "supported_spans": [48, 96, 192],
+      "width": 3840,
+      "height": 2160,
+      "fps": 24.0,
+      "role": "diagnostic_primary"
+    },
+    {
+      "source_id": "federer_djokovic_scene_007",
+      "video": "federer_djokovic",
+      "scene": "scene_007",
+      "supported_spans": [48, 96, 192],
+      "width": 3840,
+      "height": 2160,
+      "fps": 24.0,
+      "role": "diagnostic_secondary"
+    }
+  ],
+  "ladder_spec": {
+    "rungs": ["C0", "C1", "C2", "C3"],
+    "stream_codec": "vvc",
+    "appearance_format": "webp"
+  },
+  "anchors": {
+    "av1": {
+      "codec": "libsvtav1",
+      "app": "SvtAv1EncApp",
+      "preset": "8",
+      "qps": [63, 55, 47, 39]
+    },
+    "vvc": {
+      "codec": "libvvenc",
+      "app": "vvencapp",
+      "preset": "medium",
+      "qps": [63, 55, 47, 39]
+    }
+  },
+  "holdout_protection": {
+    "confirmation_manifest": "manifests/gate_b_confirmation.json",
+    "confirmation_sources_forbidden": [
+      "bp57_ao2024_sabalenka_zheng",
+      "bp57_usopen2023_gauff_sabalenka"
+    ]
+  }
+}
