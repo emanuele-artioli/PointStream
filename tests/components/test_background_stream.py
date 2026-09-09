@@ -138,7 +138,7 @@ class TestConstruction:
         # elementary stream is the format. mkv would hide the framing in the
         # container and the client could not reassemble a chain.
         for name, spec in CODECS.items():
-            assert spec.container in {"obu", "hevc", "h264"}, name
+            assert spec.container in {"obu", "hevc", "h264", "vvc"}, name
 
 
 @pytest.mark.integration
@@ -166,15 +166,17 @@ class TestCausalityAndIdentity:
                     f"{mode}: scene {payload.index} drifted between encoder and client"
                 )
 
-    def test_a_payload_is_never_revised_by_a_later_scene(self) -> None:
+    @pytest.mark.parametrize("codec", ["av1", "svt-av1", "vvc"])
+    def test_a_payload_is_never_revised_by_a_later_scene(self, codec: str) -> None:
         """Prefix stability, which is what makes each payload causal.
 
         If appending scene n+1 changed scene n's bytes, the encoder would have
         needed the future to emit scene n -- and this would be an offline
         archiver rather than a codec.
         """
-        scenes = _panning_scenes(4)
-        transmitter = BackgroundStreamTransmitter(mode=REFERENCE_LAST, codec="av1", crf=38)
+        scenes = _panning_scenes(3)
+        crf = 45 if codec != "av1" else 38
+        transmitter = BackgroundStreamTransmitter(mode=REFERENCE_LAST, codec=codec, crf=crf)
         emitted: list[bytes] = []
         for plate in scenes:
             emitted.append(transmitter.push(plate).payload)
@@ -182,7 +184,7 @@ class TestCausalityAndIdentity:
         # compares it against what was already sent, so reaching here at all
         # means every prefix survived. Assert the bytes too, so a future change
         # that removes that internal check still fails this test.
-        replay = BackgroundStreamTransmitter(mode=REFERENCE_LAST, codec="av1", crf=38)
+        replay = BackgroundStreamTransmitter(mode=REFERENCE_LAST, codec=codec, crf=crf)
         for offset, plate in enumerate(scenes):
             assert replay.push(plate).payload == emitted[offset]
 
@@ -311,3 +313,16 @@ class TestBatchPath:
     def test_the_batch_path_refuses_a_mode_whose_chains_are_not_linear(self) -> None:
         with pytest.raises(ValueError, match="linear chains"):
             stream_linear(_panning_scenes(2), mode=REFERENCE_BEST_SCORED)
+
+    @pytest.mark.parametrize("codec", ["svt-av1", "vvc"])
+    def test_svt_and_vvc_stream_linear(self, codec: str) -> None:
+        scenes = _panning_scenes(3)
+        batched = stream_linear(
+            scenes, codec=codec, crf=45, keyframe_interval=KEYFRAME_NEVER, mode=REFERENCE_LAST
+        )
+        assert len(batched) == 3
+        receiver = BackgroundStreamReceiver(codec=codec)
+        recons = [receiver.receive(p, height=HEIGHT, width=WIDTH) for p in batched]
+        for recon in recons:
+            assert recon.shape == (HEIGHT, WIDTH, 3)
+

@@ -103,3 +103,36 @@ def test_registry_names_match_the_capability_vocabulary():
     ):
         built = APPEARANCE.build(name)
         assert built.kind == name
+
+
+def test_webp_encoding_roundtrip():
+    # Use a smooth gradient without extreme 1-pixel checkerboard for L1 fidelity check
+    y, x = np.mgrid[0:64, 0:64]
+    crop = np.stack([(x * 4) % 256, (y * 4) % 256, ((x + y) * 2) % 256], axis=2).astype(np.uint8)
+    encoder = CompressedImageAppearance(format="webp", quality=80)
+    desc, payload = encoder.encode(crop)
+    assert desc.format == "webp"
+    assert desc.measured_bytes == len(payload)
+    assert "webp" in desc.cost().basis
+    decoded = encoder.decode(payload)
+    assert decoded.shape == crop.shape
+    # Lossy compression should be visually close (< 5.0 mean absolute error)
+    assert np.mean(np.abs(crop.astype(float) - decoded.astype(float))) < 5.0
+
+
+def test_format_selection_changes_bitstream():
+    crop = _ramp()
+    enc_jpg = CompressedImageAppearance(format="jpeg", quality=80)
+    enc_webp = CompressedImageAppearance(format="webp", quality=80)
+    _, payload_jpg = enc_jpg.encode(crop)
+    _, payload_webp = enc_webp.encode(crop)
+    assert payload_jpg != payload_webp
+    # WebP files start with RIFF header, JPEG with SOI marker 0xFFD8
+    assert payload_webp.startswith(b"RIFF")
+    assert payload_jpg.startswith(b"\xff\xd8")
+
+
+def test_invalid_format_raises_error():
+    with pytest.raises(ValueError, match="Unsupported appearance format"):
+        CompressedImageAppearance(format="bmp")
+

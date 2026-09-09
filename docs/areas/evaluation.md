@@ -7,22 +7,24 @@
 
 ## 1. Current State
 
-### Bounded codec pilot controller (draft PR #82)
+### Bounded codec pilot controller (PR #82)
 
 `experiments/jobs/codec.py` adds pilot, longer-clip confirmation, and final stages
 around paired anchor/PointStream ladders. QP and joint JPEG/QP payload spacing can
 widen only inside an explicit policy. Worker timeouts, saved decisions and
 fail-closed evidence checks stop expensive stages when pilots are invalid or
-uninformative. Outputs remain exploratory and uncitable. Implementation is
-pending new regression-test approval and CI; no GPU result is claimed.
+uninformative. Outputs remain exploratory and uncitable. Approved CPU regression
+tests cover bounded widening, real ladder argument/order integration, missing
+evidence, longer-clip rejection, spent budgets and interrupted resume. No GPU
+result is claimed.
 
 The [long-job protocol](../workflow/long-jobs.md) also records the proposed
 scene-sanity / same-video / cross-video / frozen-test training progression.
 The old training campaign evaluator remains retired and is not launch-ready.
 
 The Gate A 48-frame native run (#69) completed the first full-system rate–distortion measurement on real tennis footage. While validating pipeline integrity, it confirmed that Gate A is **not passed yet** under the legacy configuration due to:
-1. High intra bitfloor in `libaom` background plate (~262 KB).
-2. Uncompressed JPEG foreground appearance crops (~4–25 KB per actor per keyframe).
+1. Large `libaom` background plate under the tested settings (archived probe; not a codec-wide lower bound).
+2. JPEG-compressed foreground appearance crops (~4–25 KB per actor per keyframe).
 3. Slow metric evaluation writing uncompressed PNGs to disk for VMAF computation.
 
 ### Two-Tier Metric Protocol (#72)
@@ -46,10 +48,11 @@ Evaluating over longer sequences (96 and 192 frames) is a core hypothesis for es
 
 | Topic | PR / Commit | Decision & Status |
 |---|---|---|
-| Synthetic Tier Tests | #23 (`d3d7890`) | Synthetic 3-frame tier path test established as CI regression gate. |
-| Ladder Plumbery | #65 (`6bdf2c3`), #66 (`9a1e0b5`) | Sweep infrastructure and anchor pairing harness created. |
+| Synthetic Tier Tests | #23 (`ca0f75af30`) | Synthetic 3-frame tier path test established as CI regression gate. |
+| Ladder Plumbery | #65 (`91b33e623f`), #66 (`606cf53893`) | Sweep infrastructure and anchor pairing harness created. |
 | 48-Frame Native Run | #69 (`648325b`) | Full-system baseline evaluated. Identified background/appearance bottlenecks. |
 | Fast Eval Strategy | #71, #72 | Two-tier protocol adopted; piped FFmpeg streaming proposed. |
+| In-Memory Metric Acceleration | #77, #78, #79 | Thread-local SSIM scratch buffers (176× speedup) and Y4M piped VMAF streaming (80× speedup). |
 
 ---
 
@@ -57,8 +60,8 @@ Evaluating over longer sequences (96 and 192 frames) is a core hypothesis for es
 
 | ID | Status | Dependencies | Source | Description & Acceptance Criteria |
 |---|---|---|---|---|
-| `EVAL-ACT-05` | In progress | Test-scope approval | Bounded pilot controller | Validate spacing, result identity, budget and promotion gates; then run a calibrated small real pilot under a separately chosen run policy. |
-| `EVAL-ACT-01` | Ready | None | #71, #72 | **Piped in-memory metric computation**: Replace `_write_png_clip` disk writes with direct stdin streaming (`-f rawvideo -pix_fmt rgb24 ...`) to `ffmpeg` and enable `n_threads=16` for `libvmaf`. Acceptance: Metric calculation time reduced by ≥5× without altering score values on reference clips. |
-| `EVAL-ACT-02` | Blocked | `CODEC-ACT-01`, `EVAL-ACT-01` | #72 | **Amortization & rate sweep (Tier 1 PSNR)**: Sweep QP ladders across 48, 96, and 192 frames with VVC/SVT background plate. Acceptance: Establish operating range where PointStream PSNR exceeds AV1/VVC anchors at matched bitrate. |
+| `EVAL-ACT-05` | Implementation complete | Run-specific calibrated policy | PR #82 | Bounded pilot controller and regression gates implemented. Next: choose a calibrated run policy and run a small real pilot before relying on scientific results. |
+| `EVAL-ACT-01` | Complete | None | #71, #72, #79 | **Piped in-memory metric computation**: Replaced `_write_png_clip` disk writes with direct stdin streaming to ffmpeg Y4M rawvideo and enabled `n_threads=16`. Measured 80× speedup on 4K clips with bit-identical scores to reference. |
+| `EVAL-ACT-02` | Ready | `CODEC-ACT-01`, `CODEC-ACT-02`, `EVAL-ACT-01` | #72 | **Amortization & rate sweep (Tier 1 PSNR)**: Sweep QP ladders across 48, 96, and 192 frames with VVC/SVT background plate. Acceptance: Establish operating range where PointStream PSNR exceeds AV1/VVC anchors at matched bitrate. |
 | `EVAL-ACT-03` | Blocked | `EVAL-ACT-02` | #72 | **Tier 2 full-metric confirmation**: Run PSNR-Y, SSIM, VMAF, and LPIPS on the winning configuration from `EVAL-ACT-02`. Acceptance: Complete three-axis report (size, quality, speed) with two-sided pre-run bounds and null controls. |
 | `EVAL-ACT-04` | Ready (previously D-CODEC-PRESETS) | None | `plans/DEFERRED.md` | **Anchor preset standardization**: Document exact FFmpeg command lines, presets, and versions for AV1 (`libsvtav1`/`libaom`) and VVC (`libvvenc`). Acceptance: Explicit, reproducible anchor scripts checked into repository. |

@@ -50,28 +50,60 @@ def as_hwc(image: Any) -> np.ndarray:
 
 
 class CompressedImageAppearance:
-    """JPEG-encode a crop. Quality quantises; downscale drops resolution."""
+    """Encode a crop as JPEG or WebP. Quality quantises; downscale drops resolution."""
 
     kind = APPEARANCE_COMPRESSED_IMAGE
 
-    def __init__(self, quality: int = 90, downscale: int | float = 1) -> None:
+    def __init__(
+        self,
+        quality: int = 90,
+        downscale: int | float = 1,
+        format: str = "jpeg",
+    ) -> None:
         self.quality = quality
         self.downscale = resolve_downscale(downscale)
+        fmt = format.lower()
+        if fmt in ("jpg", "jpeg"):
+            self.format = "jpeg"
+        elif fmt == "webp":
+            self.format = "webp"
+        else:
+            raise ValueError(f"Unsupported appearance format: {format!r}. Supported: 'jpeg', 'webp'.")
 
-    def encode(self, image: Any, *, quality: int | None = None, downscale: int | float | None = None) -> tuple[CompressedImage, bytes]:
+    def encode(
+        self,
+        image: Any,
+        *,
+        quality: int | None = None,
+        downscale: int | float | None = None,
+        format: str | None = None,
+    ) -> tuple[CompressedImage, bytes]:
         if cv2 is None:
-            raise RuntimeError("opencv is required to JPEG-encode an appearance crop.")
+            raise RuntimeError("opencv is required to encode an appearance crop.")
         crop = as_hwc(image)
         src_h, src_w = crop.shape[:2]
         factor = self.downscale if downscale is None else resolve_downscale(downscale)
         q = self.quality if quality is None else int(quality)
+        fmt = (self.format if format is None else format).lower()
+        if fmt in ("jpg", "jpeg"):
+            fmt = "jpeg"
+        elif fmt == "webp":
+            fmt = "webp"
+        else:
+            raise ValueError(f"Unsupported appearance format: {format!r}.")
+
         sent_w = max(1, round(src_w * factor))
         sent_h = max(1, round(src_h * factor))
         if (sent_w, sent_h) != (src_w, src_h):
             crop = cv2.resize(crop, (sent_w, sent_h), interpolation=cv2.INTER_AREA)
-        ok, encoded = cv2.imencode(".jpg", crop, [int(cv2.IMWRITE_JPEG_QUALITY), q])
+
+        if fmt == "webp":
+            ok, encoded = cv2.imencode(".webp", crop, [int(cv2.IMWRITE_WEBP_QUALITY), q])
+        else:
+            ok, encoded = cv2.imencode(".jpg", crop, [int(cv2.IMWRITE_JPEG_QUALITY), q])
+
         if not ok:
-            raise RuntimeError("cv2.imencode failed to produce a JPEG appearance.")
+            raise RuntimeError(f"cv2.imencode failed to produce a {fmt.upper()} appearance.")
         payload = encoded.tobytes()
         descriptor = CompressedImage(
             width=src_w,
@@ -79,14 +111,15 @@ class CompressedImageAppearance:
             quality=q,
             downscale=factor,
             measured_bytes=len(payload),
+            format=fmt,
         )
         return descriptor, payload
 
     def decode(self, payload: bytes) -> np.ndarray:
         if cv2 is None:
-            raise RuntimeError("opencv is required to decode a JPEG appearance.")
+            raise RuntimeError("opencv is required to decode an appearance crop.")
         array = np.frombuffer(payload, dtype=np.uint8)
         image = cv2.imdecode(array, cv2.IMREAD_COLOR)
         if image is None:
-            raise ValueError("JPEG appearance payload did not decode.")
+            raise ValueError("Appearance payload did not decode.")
         return image

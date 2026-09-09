@@ -87,6 +87,26 @@ def test_ssim_of_uniform_patches_matches_the_closed_form() -> None:
     assert SsimMetric().score(ref, ref) == pytest.approx(1.0)
 
 
+def test_ssim_windowed_threading_and_buffers_match_serial(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Windowed multi-frame SSIM produces bit-identical scores regardless of thread count."""
+    rng = np.random.default_rng(42)
+    ref = rng.integers(0, 256, size=(16, 32, 32, 3), dtype=np.uint8)
+    pred = rng.integers(0, 256, size=(16, 32, 32, 3), dtype=np.uint8)
+
+    monkeypatch.setenv("SSIM_THREADS", "1")
+    serial_score = SsimMetric().score(ref, pred)
+
+    monkeypatch.setenv("SSIM_THREADS", "4")
+    threaded_score = SsimMetric().score(ref, pred)
+
+    assert np.isfinite(serial_score)
+    assert np.isfinite(threaded_score)
+    assert serial_score == pytest.approx(threaded_score, rel=1e-12)
+    assert SsimMetric().score(ref, ref) == pytest.approx(1.0, rel=1e-12)
+
+
+
+
 def test_every_tier_scores_a_synthetic_clip_on_the_pipeline_path() -> None:
     """LPIPS is scored here, on frames, not only inside checkpoint evaluation."""
     ref = _uniform_clip(120, frames=3)
@@ -262,3 +282,37 @@ def test_lpips_identical_frames_score_zero_through_the_injected_extractor() -> N
     metric = LpipsMetric(extractor=_mean_color_extractor)
     clip = _uniform_clip(8)
     assert metric.score(clip, clip) == pytest.approx(0.0, abs=1e-9)
+
+
+def test_to_clip_fast_path_avoids_copying_valid_clip() -> None:
+    from src.components.metrics.frames import to_clip
+
+    data = np.full((2, 16, 16, 3), 128.0, dtype=np.float64)
+    clip = to_clip(data)
+    assert clip is data
+
+    u8_data = np.full((2, 16, 16, 3), 128, dtype=np.uint8)
+    u8_clip = to_clip(u8_data)
+    assert u8_clip.dtype == np.float64
+    assert np.all(u8_clip == 128.0)
+
+
+def test_closeness_streaming_produces_identical_metrics() -> None:
+    from src.pipeline.reconstruction.quality import closeness
+
+    rng = np.random.default_rng(42)
+    ref = rng.integers(0, 256, size=(4, 32, 32, 3), dtype=np.uint8)
+    pred = np.clip(ref.astype(np.int16) + rng.integers(-5, 6, size=ref.shape), 0, 255).astype(np.uint8)
+
+    result = closeness(ref, pred)
+    ref_f = ref.astype(np.float64)
+    pred_f = pred.astype(np.float64)
+    expected_mean = float(np.abs(ref_f - pred_f).mean())
+    expected_max = float(np.abs(ref_f - pred_f).max())
+    expected_mse = float(np.mean((ref_f - pred_f) ** 2))
+    expected_psnr = 10.0 * np.log10((255.0**2) / expected_mse)
+
+    assert result.mean_abs_diff == pytest.approx(expected_mean, rel=1e-12)
+    assert result.max_abs_diff == pytest.approx(expected_max, rel=1e-12)
+    assert result.psnr == pytest.approx(expected_psnr, rel=1e-12)
+

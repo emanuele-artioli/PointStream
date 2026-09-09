@@ -28,15 +28,15 @@ def test_ladder_rungs_specification() -> None:
 
     # Background CRF is nonincreasing (higher fidelity)
     bg_crfs = [r.bg_crf for r in RUNGS]
-    assert bg_crfs == [63, 63, 57, 51]
+    assert bg_crfs == [63, 55, 48, 42]
 
-    # Appearance JPEG quality is nondecreasing
+    # Appearance quality is nondecreasing
     app_jpegs = [r.appearance_jpeg for r in RUNGS]
-    assert app_jpegs == [25, 40, 55, 70]
+    assert app_jpegs == [30, 45, 60, 75]
 
     # Appearance downscale is nonincreasing
     downscales = [r.appearance_downscale for r in RUNGS]
-    assert downscales == [4, 2, 2, 1]
+    assert downscales == [2, 1, 1, 1]
 
     # Motion trajectories are strictly increasing
     motion_pts = [r.motion_max_points for r in RUNGS]
@@ -56,16 +56,15 @@ def test_configure_rung_invariants() -> None:
 
         # Canonical background configuration
         assert cfg.background.method == "panorama-stream"
-        assert cfg.background.stream_codec == "av1"
+        assert cfg.background.stream_codec == rung.stream_codec
         assert cfg.background.stream_crf == rung.bg_crf
         assert cfg.background.transport_scale == 1.0
-        assert cfg.background.stream_usage == "good"
-        assert cfg.background.stream_cpu_used == 4
 
         # Foreground & motion
         assert cfg.appearance.representation == "compressed-image"
         assert cfg.appearance.jpeg_quality == rung.appearance_jpeg
         assert cfg.appearance.downscale == rung.appearance_downscale
+        assert cfg.appearance.format == rung.appearance_format
         assert cfg.motion.max_points == rung.motion_max_points
 
 
@@ -73,11 +72,11 @@ def test_bp56_seed_configuration_is_driven_by_current_code() -> None:
     """C1 is constructed by the current driver, not a hard-coded result row."""
     base = load_tier("balanced")
     c1 = configure_rung(base, RUNGS[1])
-    assert c1.background.stream_crf == 63
-    assert c1.background.stream_usage == "good"
-    assert c1.background.stream_cpu_used == 4
-    assert c1.appearance.jpeg_quality == 40
-    assert c1.appearance.downscale == 2
+    assert c1.background.stream_codec == "vvc"
+    assert c1.background.stream_crf == 55
+    assert c1.appearance.format == "webp"
+    assert c1.appearance.jpeg_quality == 45
+    assert c1.appearance.downscale == 1
     assert c1.motion.max_points == 16
     assert c1.lattice.residual is False
     assert c1.lattice.generation is False
