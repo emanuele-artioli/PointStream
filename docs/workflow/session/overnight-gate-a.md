@@ -1,3 +1,5 @@
+> Historical dispatch, superseded after the Gate A/B audit. Use [overnight recovery](overnight-recovery.md) for new work.
+
 # Overnight Gate A execution prompt
 
 Work autonomously for up to eight hours of wall time on PointStream. Implement and run experiments; do not stop after planning or after the first completed sweep. The priority is a credible competitive regime, followed by as much Gate B/C/D preparation or execution as the evidence and remaining time allow. A win is an objective, never a result to assume. No need to launch a new task or buy services.

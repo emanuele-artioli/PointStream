@@ -27,7 +27,7 @@ When initiating or handing off a task:
    - **Acceptance Criteria**: Concrete commands and verification gates (see [setup verification](../../setup.md#4-verification)).
    - **Bounds & Controls**: Pre-run bounds for experiment runs; null controls.
 
-For a multi-hour Gate A assignment, use the [overnight dispatch](overnight-gate-a.md); it authorizes execution only when the user gives that prompt to an agent.
+For multi-hour codec recovery, use the [overnight dispatch](overnight-recovery.md); it authorizes execution only when the user gives that prompt to an agent.
 
 ### Long jobs
 
