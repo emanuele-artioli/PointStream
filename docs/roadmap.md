@@ -17,17 +17,17 @@ graph TD
     GateD --> GateE["Gate E: Submission & Reproducibility"]
 ```
 
-### Gate A: Competitive Operating Regime (Passed)
+### Gate A: Competitive Operating Regime (Open after audit)
 - **Objective**: Establish at least one operating point (defined by scene domain, clip duration, bitrate, and quality metric) where PointStream strictly outperforms conventional codec baselines (AV1 / VVC).
 - **Pass Criteria**:
   1. A reproducible advantage over the declared AV1 and VVC anchors over a measured overlapping rate/quality interval on a metric selected before the confirmation run. Declare anchor settings and uncertainty; no extrapolated BD-rate or isolated lucky-point victory.
   2. Operating regime fully characterized: content type, duration/amortization range, bitrate band, and component byte breakdown.
   3. Size, quality, and runtime measured and reported together; no speed omissions.
-- **Current Status**: **Passed on development sequence** (`alcaraz_highlights`, 192 frames @ 4K 24 fps across 2 scenes, PR #83, run artifact `outputs/gate-a-vvc-webp-n96-run2`). Established winning operating regime below AV1 bitrate floor (158.5 kbps) and beating VVC low-rate perceptual collapse (+10.39 VMAF at ~91 kbps; 36.5% bitrate savings at VMAF ~72–75) with 13.5 fps CPU client decode. Moving to Gate B held-out confirmation.
+- **Current Status**: PR #83/#84 pass interpretation superseded on 2026-09-09. The stored VVC comparison is unfavorable overall; the AV1 curves have no quality overlap and fail floor dominance. C2/C3 warrant a narrower development sweep, not a declared win. See the [evaluation audit](areas/evaluation.md).
 
 Execution brief: [overnight Gate A prompt](workflow/session/overnight-gate-a.md). Full benchmark tables: [docs/areas/evaluation.md](areas/evaluation.md#gate-a-192-frame-benchmark-results-run-2--pr-83).
 
-### Gate B: Held-Out Confirmation (Passed)
+### Gate B: Held-Out Confirmation (Incomplete; pass retracted)
 - **Dependency**: Gate A passed.
 - **Objective**: Confirm the selected codec procedure on held-out content, with the claim scoped to the split. See [data protocol](areas/data.md#4-confirmation-protocol). This is not a mandatory seven-training-video/six-test-video allocation.
 - **Pass Criteria**:
@@ -35,9 +35,9 @@ Execution brief: [overnight Gate A prompt](workflow/session/overnight-gate-a.md)
   2. Freeze the codec selection procedure, rate ladder, metrics, eligibility rules, and adaptation budget before inspecting confirmation scores. Per-video encoding/fitting is allowed under that procedure, including on evaluated frames; charge all transmitted weights/side information and fitting time. No manual retuning based on test outcomes.
   3. Standalone client decoding verified end-to-end.
   4. Both whole-frame metrics and object-scoped metrics reported with source-level standard errors or confidence intervals and null controls; frames are not independent replicates.
-- **Current Status**: Passed. Evaluated frozen C0–C3 procedure without retuning across held-out broadcast matches (`bp57_ao2024_sabalenka_zheng` at 1080p and `bp57_usopen2023_gauff_sabalenka` at 720p). Monotonic rate/distortion verified, zero ledger/drift alarms, client reconstruction confirmed at 40–70 fps. Evidence: `manifests/gate_b_confirmation.json`, `experiments/tier/gate_b_confirmation.py`, and `outputs/gate-b-confirmation/report.json`.
+- **Current Status**: PR #85 completed only two 48-frame source pilots and its pass flag ignored competitive comparisons and protocol completion. Both VVC comparisons are unfavorable. Controls, independent-output scoring/wire accounting, source uncertainty, stable anchor policy and six-source eligibility remain unmet. Repair `EVAL-ACT-06`, search under `EVAL-ACT-07`, then freeze and confirm on reserved sources.
 
-### Gate C: Core Ablation Lattice (Active)
+### Gate C: Core Ablation Lattice (Preparation only)
 - **Dependency**: Gate B passed.
 - **Objective**: Establish the empirical contribution of every pipeline component.
 - **Pass Criteria**:
@@ -63,9 +63,13 @@ Execution brief: [overnight Gate A prompt](workflow/session/overnight-gate-a.md)
 
 ---
 
+Gate C preparation may proceed, but ablations do not substitute for the missing competitive result and held-out confirmation.
+
 ## 2. Operating Policies
 
 1. **Search is the method, not a compromise**: We actively search the configuration space to discover where an object-centric semantic codec wins over conventional block-based codecs. All explored axes and bounds are reported honestly.
 2. **Three-axis reporting**: Every published experiment must report size (bitrate/payload), quality (PSNR, SSIM, VMAF, LPIPS), and execution time (encode/decode).
 3. **Bound before believing**: Prior to reading results, establish two-sided plausible bounds. Values outside expected bounds trigger an alarm and require instrument verification before reporting.
 4. **Independent verification**: Exploratory results may be reported as exploratory. A generalization claim requires the corresponding held-out protocol; do not relabel known development footage as unseen. Gate order governs pass decisions; ablation plumbing, source preparation, baseline setup, and profiling may advance before earlier gates pass.
+
+5. **Anchor coverage**: Keep AV1 and VVC, with native-resolution reference curves and a separately labeled rate-control/resolution-adaptive comparison. A smallest sampled CQP endpoint is not a codec-wide bitrate floor. Score all rescaled decodes at the original display resolution and count rescaling time.

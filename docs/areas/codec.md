@@ -1,6 +1,6 @@
 # Codec Area
 
-**Evidence Revision**: Reconciled through PR #72 (`bc09184`) and PR #73.
+**Evidence Revision**: Implementations through PR #85; gate interpretations audited 2026-09-09.
 **Owned Scope**: `src/components/background/`, `src/components/appearance/`, `src/components/motion/`, `src/components/residual/`, `src/pipeline/codec/`.
 
 ---
@@ -22,7 +22,7 @@ In the Gate A 48-frame native run (#69), PointStream payload was dominated by tw
     - `SVT-AV1 (QP 63)`: 41,162 bytes (40.2 KB)
     - `VVC libvvenc slower (QP 63)`: 5,347 bytes (5.2 KB)
     - `VVC libvvenc slower (QP 55)`: 14,313 bytes (about 14.0 KiB; archived #72 value)
-- **Actor Appearance Crops**: Currently uses baseline JPEG (`CompressedImageAppearance` in `src/components/appearance/compressed.py`), spending 4–25 KB per crop with ringing artifacts below quality 40. Native OpenCV WebP encoding is a candidate to benchmark. The proposed 35–50% reduction is unverified at matched quality on this corpus; it is not an established result.
+- **Actor Appearance Crops**: The pre-#75 implementation used baseline JPEG (`CompressedImageAppearance` in `src/components/appearance/compressed.py`), spending 4–25 KB per crop with ringing artifacts below quality 40. WebP encoding was implemented in #75 and used by #83/#85; standalone matched-quality crop benchmarking remains needed. The proposed 35–50% reduction is unverified at matched quality on this corpus; it is not an established result.
 
 ---
 
@@ -37,9 +37,9 @@ In the Gate A 48-frame native run (#69), PointStream payload was dominated by tw
 | Competitive regime | #70–#72 | Proposed VVC/SVT background sidecars and WebP/AVIF appearance crops. |
 | VVC background streaming | #75, #80 | Implemented VVC low-delay background streaming (`StreamCodec.VVC`) with periodic intra refresh (`-period 1`) for causal prefix stability. Resolves `CODEC-ACT-01`. |
 | WebP appearance crops | #75 | Implemented OpenCV WebP foreground actor reference compression (`AppearanceFormat.WEBP`). Resolves `CODEC-ACT-02`. |
-| Gate A Rate Ladder | outputs/gate-a-vvc-webp-n96-run2 | Characterized C0–C3 across 192 frames @ 4K 24 fps (48.7–124.4 kB / 49.9–127.4 kbps) establishing competitive win below AV1 bitrate floor and beating VVC low-rate collapse. |
+| Gate A Rate Ladder | `outputs/gate-a-vvc-webp-n96-run2/report.json` | Completed development sweep; competitive pass superseded by 2026-09-09 evaluation audit. |
 | Gate B Procedure Freeze | `src/contracts/frozen_procedure.py` | Locked down C0–C3 rate ladder configuration, VVC low-delay background streaming with intra refresh (`-period 1`), WebP appearance crops, zero generation/residual lattice settings, and metric thresholds/bounds for confirmation. |
-| Gate B Held-Out Confirmation | `outputs/gate-b-confirmation/report.json` | Confirmed frozen procedure across held-out 1080p and 720p matches. Validated monotonic rate ladder (C0: 11.1–11.7 kB, C3: 22.4–27.7 kB), zero alarms, and real-time client reconstruction (40–70 fps). |
+| Gate B pilot | `outputs/gate-b-confirmation/report.json` | Execution completed, but competitive confirmation and fair speed claims are not established; see evaluation audit. |
 
 ---
 
