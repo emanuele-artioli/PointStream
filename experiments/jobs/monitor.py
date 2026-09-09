@@ -64,7 +64,8 @@ def due_events(state: dict[str, Any], policy: dict[str, Any], now: float) -> lis
     progress = state.get("progress") or {}
     decision = progress.get("decision")
     if decision and allow_event:
-        key = f"decision:{progress.get('updated')}"
+        identity = json.dumps([progress.get("stage"), decision], sort_keys=True)
+        key = "decision:" + uuid.uuid5(uuid.NAMESPACE_URL, identity).hex
         if key not in state["emitted"]:
             events.append(key)
     if status == "running" and now - state["last_progress"] >= policy["stall_seconds"]:

@@ -12,7 +12,8 @@
 `experiments/jobs/monitor.py` implements detached command supervision, ten-minute
 file logging, explicit work-progress tracking, quiet hours, one-shot/repeating
 digests, and a durable event queue with a Codex CLI adapter. Due events are
-batched into one wakeup; unchanged health does not invoke the agent.
+batched into one wakeup; unchanged health does not invoke the agent. Repeated
+publication of the same stage decision is deduplicated independently of timestamps.
 
 Validation: host `/usr/bin/true` launch reached complete; the installed Codex CLI
 accepted a self-addressed queue check. Ruff, full mypy, import-layer validation,

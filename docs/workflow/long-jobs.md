@@ -59,7 +59,9 @@ the execution host. It writes an acknowledgement only after successful queueing;
 this is transport acceptance, not proof that the agent read the message. Failed
 delivery stays on disk for retry. Delivery is at least once: a crash between
 queueing and acknowledgement can duplicate a message. Stable event IDs let the
-receiving task suppress duplicate reports. A digest should read current status
+receiving task suppress duplicate reports. Repeated publication of the same
+decision in a stage does not create another wakeup merely because its timestamp
+changed. A digest should read current status
 and new results, not reread the full log or restart ten-minute agent checks.
 
 `serve JOB_DIRECTORY` retries undelivered events after supervisor restart. It
