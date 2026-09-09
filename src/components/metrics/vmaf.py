@@ -62,11 +62,11 @@ def _libvmaf_on_clips(reference: np.ndarray, predicted: np.ndarray) -> float:
         )
     with tempfile.TemporaryDirectory(prefix="pointstream-vmaf-") as tmp:
         root = Path(tmp)
-        ref_dir = root / "ref"
-        pred_dir = root / "pred"
+        ref_path = root / "ref.y4m"
+        pred_path = root / "pred.y4m"
         log_path = root / "vmaf.json"
-        _write_png_clip(ref_dir, reference)
-        _write_png_clip(pred_dir, predicted)
+        _write_y4m_clip(ref_path, reference, ffmpeg)
+        _write_y4m_clip(pred_path, predicted, ffmpeg)
         # ffmpeg's libvmaf takes [distorted][reference], in that order. Input 0
         # here is the reference and input 1 the prediction, so the labels are
         # crossed deliberately. Passing them straight through scored a blurred
@@ -82,14 +82,10 @@ def _libvmaf_on_clips(reference: np.ndarray, predicted: np.ndarray) -> float:
             "-hide_banner",
             "-loglevel",
             "error",
-            "-framerate",
-            "30",
             "-i",
-            str(ref_dir / "frame_%06d.png"),
-            "-framerate",
-            "30",
+            str(ref_path),
             "-i",
-            str(pred_dir / "frame_%06d.png"),
+            str(pred_path),
             "-filter_complex",
             filter_complex,
             "-f",
@@ -103,16 +99,56 @@ def _libvmaf_on_clips(reference: np.ndarray, predicted: np.ndarray) -> float:
         return _read_vmaf_mean(log_path)
 
 
-def _write_png_clip(directory: Path, clip: np.ndarray) -> None:
-    import cv2
-
-    directory.mkdir(parents=True, exist_ok=True)
-    uint8 = np.clip(np.rint(to_clip(clip)), 0, 255).astype(np.uint8)
-    for index, frame in enumerate(uint8):
-        path = directory / f"frame_{index:06d}.png"
-        bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        if not cv2.imwrite(str(path), bgr):
-            raise RuntimeError(f"failed to write VMAF frame {path}")
+def _write_y4m_clip(path: Path, clip: np.ndarray, ffmpeg_bin: str) -> None:
+    clip_4d = to_clip(clip)
+    _, h, w, _ = clip_4d.shape
+    command = [
+        ffmpeg_bin,
+        "-y",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-f",
+        "rawvideo",
+        "-pix_fmt",
+        "rgb24",
+        "-s",
+        f"{w}x{h}",
+        "-r",
+        "24",
+        "-i",
+        "-",
+        "-pix_fmt",
+        "yuv420p",
+        str(path),
+    ]
+    process = subprocess.Popen(
+        command,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    stdin = process.stdin
+    assert stdin is not None
+    try:
+        for frame in clip_4d:
+            frame_u8 = np.clip(np.rint(frame), 0, 255).astype(np.uint8)
+            stdin.write(frame_u8.tobytes())
+        stdin.close()
+        process.stdin = None
+    except BrokenPipeError:
+        try:
+            stdin.close()
+        except Exception:
+            pass
+        process.stdin = None
+    except Exception:
+        process.kill()
+        process.wait()
+        raise
+    _, stderr = process.communicate()
+    if process.returncode != 0:
+        raise RuntimeError(f"ffmpeg Y4M conversion failed: {stderr.decode(errors='replace').strip()}")
 
 
 def _read_vmaf_mean(log_path: Path) -> float:
