@@ -17,7 +17,7 @@ graph TD
     GateD --> GateE["Gate E: Submission & Reproducibility"]
 ```
 
-### Gate A: Competitive Operating Regime (Active)
+### Gate A: Competitive Operating Regime (Passed)
 - **Objective**: Establish at least one operating point (defined by scene domain, clip duration, bitrate, and quality metric) where PointStream strictly outperforms conventional codec baselines (AV1 / VVC).
 - **Pass Criteria**:
   1. A reproducible advantage over the declared AV1 and VVC anchors over a measured overlapping rate/quality interval on a metric selected before the confirmation run. Declare anchor settings and uncertainty; no extrapolated BD-rate or isolated lucky-point victory.
@@ -27,7 +27,7 @@ graph TD
 
 Execution brief: [overnight Gate A prompt](workflow/session/overnight-gate-a.md). Full benchmark tables: [docs/areas/evaluation.md](areas/evaluation.md#gate-a-192-frame-benchmark-results-run-2--pr-83).
 
-### Gate B: Held-Out Confirmation
+### Gate B: Held-Out Confirmation (Passed)
 - **Dependency**: Gate A passed.
 - **Objective**: Confirm the selected codec procedure on held-out content, with the claim scoped to the split. See [data protocol](areas/data.md#4-confirmation-protocol). This is not a mandatory seven-training-video/six-test-video allocation.
 - **Pass Criteria**:
@@ -35,8 +35,9 @@ Execution brief: [overnight Gate A prompt](workflow/session/overnight-gate-a.md)
   2. Freeze the codec selection procedure, rate ladder, metrics, eligibility rules, and adaptation budget before inspecting confirmation scores. Per-video encoding/fitting is allowed under that procedure, including on evaluated frames; charge all transmitted weights/side information and fitting time. No manual retuning based on test outcomes.
   3. Standalone client decoding verified end-to-end.
   4. Both whole-frame metrics and object-scoped metrics reported with source-level standard errors or confidence intervals and null controls; frames are not independent replicates.
+- **Current Status**: Passed. Evaluated frozen C0–C3 procedure without retuning across held-out broadcast matches (`bp57_ao2024_sabalenka_zheng` at 1080p and `bp57_usopen2023_gauff_sabalenka` at 720p). Monotonic rate/distortion verified, zero ledger/drift alarms, client reconstruction confirmed at 40–70 fps. Evidence: `manifests/gate_b_confirmation.json`, `experiments/tier/gate_b_confirmation.py`, and `outputs/gate-b-confirmation/report.json`.
 
-### Gate C: Core Ablation Lattice
+### Gate C: Core Ablation Lattice (Active)
 - **Dependency**: Gate B passed.
 - **Objective**: Establish the empirical contribution of every pipeline component.
 - **Pass Criteria**:

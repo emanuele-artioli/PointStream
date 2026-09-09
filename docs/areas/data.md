@@ -50,4 +50,4 @@ Recommended path: use all seven already-exposed sources for Gate A development a
 
 Grouped outer cross-validation can use each source for training in other folds and testing once, with tuning confined to inner folds. It costs multiple fits and cannot erase prior manual design exposure to these seven videos; here it is a robustness analysis, not fresh confirmation.
 
-Next action `DATA-ACT-04` (Ready): audit candidate exposure and match identity, reserve source IDs and scene/time bounds before any score sweep, and record train/validation/test roles and exclusions in a versioned manifest. Do not launch confirmation until the selected procedure is frozen.
+Next action `DATA-ACT-04` (Complete): audited candidate exposure and match identity, reserved source IDs and scene/time bounds in `manifests/gate_b_confirmation.json`, verified SHA256 integrity hashes, and launched Gate B confirmation under frozen procedure.

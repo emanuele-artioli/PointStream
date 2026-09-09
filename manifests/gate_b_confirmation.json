@@ -1,0 +1,105 @@
+{
+  "schema": "pointstream.gate_b_confirmation.v1",
+  "doc_role": "gate_b_held_out_confirmation_manifest",
+  "status": "frozen_pending_confirmation_execution",
+  "created_utc": "2026-09-09T15:00:00Z",
+  "roadmap_gate": "Gate B (Held-Out Confirmation)",
+  "procedure_freeze": {
+    "module": "src.contracts.frozen_procedure",
+    "rate_ladder": [
+      {
+        "rung": "C0",
+        "bg_crf": 63,
+        "appearance_jpeg": 30,
+        "appearance_downscale": 2,
+        "motion_max_points": 8,
+        "stream_codec": "vvc",
+        "appearance_format": "webp"
+      },
+      {
+        "rung": "C1",
+        "bg_crf": 55,
+        "appearance_jpeg": 45,
+        "appearance_downscale": 1,
+        "motion_max_points": 16,
+        "stream_codec": "vvc",
+        "appearance_format": "webp"
+      },
+      {
+        "rung": "C2",
+        "bg_crf": 48,
+        "appearance_jpeg": 60,
+        "appearance_downscale": 1,
+        "motion_max_points": 24,
+        "stream_codec": "vvc",
+        "appearance_format": "webp"
+      },
+      {
+        "rung": "C3",
+        "bg_crf": 42,
+        "appearance_jpeg": 75,
+        "appearance_downscale": 1,
+        "motion_max_points": 32,
+        "stream_codec": "vvc",
+        "appearance_format": "webp"
+      }
+    ],
+    "lattice": {
+      "generation": false,
+      "residual": false,
+      "pose": false
+    },
+    "anchors": {
+      "av1": {
+        "codec": "libsvtav1",
+        "preset": "8",
+        "qps": [63, 55, 47, 39]
+      },
+      "vvc": {
+        "codec": "libvvenc",
+        "preset": "medium",
+        "qps": [63, 55, 47, 39]
+      }
+    }
+  },
+  "sources": [
+    {
+      "source_id": "bp57_ao2024_sabalenka_zheng",
+      "match_name": "Aryna Sabalenka vs. Qinwen Zheng",
+      "event": "2024 Australian Open, Women's Singles Final (Set 2)",
+      "raw_file_path": "assets/confirmation_raw/bp57/ao2024_w_final_set2_raw.mp4",
+      "sha256": "fc82b25f71b0972ecfbcb861e72185eb70a4cb3b636254d096d34c988a3b6b12",
+      "container_resolution": "1920x1080",
+      "container_fps": 25.0,
+      "target_fps": 24.0,
+      "selected_shot": {
+        "interval_idx": 3,
+        "start_s": 33.56,
+        "end_s": 51.6,
+        "duration_s": 18.04,
+        "classification": "clean_court_rally",
+        "scene_label": "ao2024_set2_shot003"
+      }
+    },
+    {
+      "source_id": "bp57_usopen2023_gauff_sabalenka",
+      "match_name": "Coco Gauff vs. Aryna Sabalenka",
+      "event": "2023 US Open, Women's Singles Final (Set 2)",
+      "raw_file_path": "assets/confirmation_raw/bp57/usopen2023_w_final_set2_raw.mp4",
+      "sha256": "a626689e284760a51f9249cca9d9811269a05b0e77a9b0e0623303e155a8d66f",
+      "container_resolution": "1280x720",
+      "container_fps": 29.97002997,
+      "target_fps": 24.0,
+      "selected_shot": {
+        "interval_idx": 109,
+        "start_s": 956.25,
+        "end_s": 982.65,
+        "duration_s": 26.4,
+        "classification": "clean_court_rally",
+        "scene_label": "usopen2023_set2_shot109",
+        "note": "start_s offset by +1.0s relative to raw cut boundary (955.25s) to bypass 0.6s broadcast graphics wipe transition and ensure clean court rally evaluation."
+      }
+    }
+  ],
+  "disclaimer": "Confirmation evaluates the held-out candidate matches available under assets/confirmation_raw/bp57/ without retuning. Sources decode at 1080p and 720p broadcast resolutions."
+}
