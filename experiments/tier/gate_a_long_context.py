@@ -59,40 +59,50 @@ class RungSpec:
     appearance_downscale: int
     motion_max_points: int
     summary: str
+    stream_codec: str = "vvc"
+    appearance_format: str = "webp"
 
 
 RUNGS: tuple[RungSpec, ...] = (
     RungSpec(
         name="C0",
         bg_crf=63,
-        appearance_jpeg=25,
-        appearance_downscale=4,
+        appearance_jpeg=30,
+        appearance_downscale=2,
         motion_max_points=8,
-        summary="Coarsest operating point; shared CRF 63 background, aggressive foreground subsampling",
+        summary="Coarsest operating point; shared VVC QP 63 background, WebP Q30 foreground",
+        stream_codec="vvc",
+        appearance_format="webp",
     ),
     RungSpec(
         name="C1",
-        bg_crf=63,
-        appearance_jpeg=40,
-        appearance_downscale=2,
+        bg_crf=55,
+        appearance_jpeg=45,
+        appearance_downscale=1,
         motion_max_points=16,
-        summary="BP56 seed settings; current bytes and quality must be measured",
+        summary="Intermediate low-rate point; VVC QP 55 background, WebP Q45 foreground",
+        stream_codec="vvc",
+        appearance_format="webp",
     ),
     RungSpec(
         name="C2",
-        bg_crf=57,
-        appearance_jpeg=55,
-        appearance_downscale=2,
+        bg_crf=48,
+        appearance_jpeg=60,
+        appearance_downscale=1,
         motion_max_points=24,
-        summary="Intermediate low-rate point; reduced background CRF 57, higher foreground fidelity",
+        summary="Target competitive point; VVC QP 48 background, WebP Q60 foreground",
+        stream_codec="vvc",
+        appearance_format="webp",
     ),
     RungSpec(
         name="C3",
-        bg_crf=51,
-        appearance_jpeg=70,
+        bg_crf=42,
+        appearance_jpeg=75,
         appearance_downscale=1,
         motion_max_points=32,
-        summary="Highest rate point; background CRF 51, full-resolution appearance, 32 trajectories",
+        summary="Highest rate point; VVC QP 42 background, WebP Q75 foreground",
+        stream_codec="vvc",
+        appearance_format="webp",
     ),
 )
 
@@ -142,21 +152,28 @@ def configure_rung(
     bg = with_canonical_background(
         base.background,
         method="panorama-stream",
-        stream_codec="av1",
+        stream_codec=rung.stream_codec,
         stream_crf=rung.bg_crf,
         context_id=context_id,
     )
-    bg = replace(
-        bg,
-        transport_scale=1.0,
-        stream_usage="good",
-        stream_cpu_used=4,
-    )
+    if rung.stream_codec == "av1":
+        bg = replace(
+            bg,
+            transport_scale=1.0,
+            stream_usage="good",
+            stream_cpu_used=4,
+        )
+    else:
+        bg = replace(
+            bg,
+            transport_scale=1.0,
+        )
     app = replace(
         base.appearance,
         representation="compressed-image",
         jpeg_quality=rung.appearance_jpeg,
         downscale=rung.appearance_downscale,
+        format=rung.appearance_format,
     )
     mot = replace(
         base.motion,
@@ -166,6 +183,7 @@ def configure_rung(
         base.lattice,
         generation=False,
         residual=False,
+        pose=False,
     )
     return replace(
         base,

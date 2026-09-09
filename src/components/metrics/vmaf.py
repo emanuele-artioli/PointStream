@@ -72,9 +72,10 @@ def _libvmaf_on_clips(reference: np.ndarray, predicted: np.ndarray) -> float:
         # crossed deliberately. Passing them straight through scored a blurred
         # clip at 100.0 against 97.4 for an identical one — see the calibration
         # test in tests/components/test_metrics_integration.py.
+        threads = int(os.environ.get("VMAF_THREADS", "16"))
         filter_complex = (
             f"[1:v]format=yuv420p[dist];[0:v]format=yuv420p[ref];"
-            f"[dist][ref]libvmaf=log_path={log_path}:log_fmt=json"
+            f"[dist][ref]libvmaf=log_path={log_path}:log_fmt=json:n_threads={threads}"
         )
         command = [
             ffmpeg,
