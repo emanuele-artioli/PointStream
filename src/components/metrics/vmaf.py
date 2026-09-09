@@ -100,7 +100,17 @@ def _libvmaf_on_clips(reference: np.ndarray, predicted: np.ndarray) -> float:
 
 
 def _write_y4m_clip(path: Path, clip: np.ndarray, ffmpeg_bin: str) -> None:
-    clip_4d = to_clip(clip)
+    if (
+        isinstance(clip, np.ndarray)
+        and clip.ndim == 4
+        and clip.shape[-1] == 3
+        and clip.dtype == np.uint8
+    ):
+        clip_4d = clip
+        is_uint8 = True
+    else:
+        clip_4d = to_clip(clip)
+        is_uint8 = False
     _, h, w, _ = clip_4d.shape
     command = [
         ffmpeg_bin,
@@ -132,8 +142,11 @@ def _write_y4m_clip(path: Path, clip: np.ndarray, ffmpeg_bin: str) -> None:
     assert stdin is not None
     try:
         for frame in clip_4d:
-            frame_u8 = np.clip(np.rint(frame), 0, 255).astype(np.uint8)
-            stdin.write(frame_u8.tobytes())
+            if is_uint8:
+                stdin.write(frame.tobytes())
+            else:
+                frame_u8 = np.clip(np.rint(frame), 0, 255).astype(np.uint8)
+                stdin.write(frame_u8.tobytes())
         stdin.close()
         process.stdin = None
     except BrokenPipeError:

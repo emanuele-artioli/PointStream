@@ -32,10 +32,23 @@ def to_clip(frames: np.ndarray) -> Clip:
     if array.shape[-1] != 3:
         raise ValueError(f"expected 1 or 3 channels, got shape {array.shape}")
 
-    values = array.astype(np.float64, copy=False)
+    if array.dtype == np.float64:
+        if array.size == 0:
+            return array
+        if array.max() <= 1.0:
+            array = array * 255.0
+            return np.clip(array, 0.0, 255.0, out=array if array.flags.writeable else None)
+        if array.min() >= 0.0 and array.max() <= 255.0:
+            return array
+        return np.clip(array, 0.0, 255.0, out=array if array.flags.writeable else None)
+
+    if array.dtype == np.uint8:
+        return array.astype(np.float64)
+
+    values = array.astype(np.float64)
     if np.issubdtype(array.dtype, np.floating) and (array.size == 0 or array.max() <= 1.0):
         values = values * 255.0
-    return np.clip(values, 0.0, 255.0)
+    return np.clip(values, 0.0, 255.0, out=values)
 
 
 def paired(reference: np.ndarray, predicted: np.ndarray) -> tuple[Clip, Clip]:

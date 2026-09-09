@@ -488,6 +488,9 @@ def _run(
 
     if sync_fn is not None:
         sync_fn()
+    import gc
+
+    gc.collect()
     assembly_started = clock()
     result = _assemble(
         results,
@@ -702,6 +705,9 @@ def _assemble(
         quality = results[0].quality
         delivered_quality = results[0].delivered_quality
     else:
+        import gc
+
+        gc.collect()
         sources = np.concatenate(
             [as_clip(np.asarray(item.bag[SOURCE]), path=SOURCE) for item in results],
             axis=0,
@@ -713,11 +719,15 @@ def _assemble(
             np.concatenate(present, axis=0) if present and len(present) == len(masks) else None
         )
         quality = scorer.evaluate(sources, recon, object_mask=object_mask)
+        del recon
+        gc.collect()
         delivered = np.concatenate(
             [_delivered_frames(item.bag[ART_DELIVERED]) for item in results],
             axis=0,
         )
         delivered_quality = scorer.evaluate(sources, delivered, object_mask=object_mask)
+        del delivered, sources
+        gc.collect()
     sizes = results[0].sizes
     for extra in results[1:]:
         sizes = sizes + extra.sizes
