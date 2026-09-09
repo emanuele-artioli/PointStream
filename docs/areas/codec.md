@@ -38,6 +38,8 @@ In the Gate A 48-frame native run (#69), PointStream payload was dominated by tw
 | VVC background streaming | #75, #80 | Implemented VVC low-delay background streaming (`StreamCodec.VVC`) with periodic intra refresh (`-period 1`) for causal prefix stability. Resolves `CODEC-ACT-01`. |
 | WebP appearance crops | #75 | Implemented OpenCV WebP foreground actor reference compression (`AppearanceFormat.WEBP`). Resolves `CODEC-ACT-02`. |
 | Gate A Rate Ladder | outputs/gate-a-vvc-webp-n96-run2 | Characterized C0–C3 across 192 frames @ 4K 24 fps (48.7–124.4 kB / 49.9–127.4 kbps) establishing competitive win below AV1 bitrate floor and beating VVC low-rate collapse. |
+| Gate B Procedure Freeze | `src/contracts/frozen_procedure.py` | Locked down C0–C3 rate ladder configuration, VVC low-delay background streaming with intra refresh (`-period 1`), WebP appearance crops, zero generation/residual lattice settings, and metric thresholds/bounds for confirmation. |
+| Gate B Held-Out Confirmation | `outputs/gate-b-confirmation/report.json` | Confirmed frozen procedure across held-out 1080p and 720p matches. Validated monotonic rate ladder (C0: 11.1–11.7 kB, C3: 22.4–27.7 kB), zero alarms, and real-time client reconstruction (40–70 fps). |
 
 ---
 

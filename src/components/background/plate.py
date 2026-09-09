@@ -81,11 +81,11 @@ class HomographyBounds:
 
     @property
     def local_width(self) -> int:
-        return max(1, int(np.ceil(self.max_xy[0] - self.min_xy[0])))
+        return even_up(max(1, int(np.ceil(self.max_xy[0] - self.min_xy[0]))))
 
     @property
     def local_height(self) -> int:
-        return max(1, int(np.ceil(self.max_xy[1] - self.min_xy[1])))
+        return even_up(max(1, int(np.ceil(self.max_xy[1] - self.min_xy[1]))))
 
     @property
     def local_area(self) -> int:

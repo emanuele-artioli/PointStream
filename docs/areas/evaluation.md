@@ -54,6 +54,7 @@ Evaluating over longer sequences (96 and 192 frames) is a core hypothesis for es
 | Fast Eval Strategy | #71, #72 | Two-tier protocol adopted; piped FFmpeg streaming proposed. |
 | In-Memory Metric Acceleration | #77, #78, #79, #81 | Thread-local SSIM scratch buffers (176× speedup), Y4M piped VMAF streaming (80× speedup), and streamed closeness (memory down to <500 MB). |
 | Gate A Tier 2 Evaluation | outputs/gate-a-vvc-webp-n96-run2 | Confirmed 192-frame (8.0s @ 4K 24 fps) rate ladder C0–C3 with PSNR-Y, SSIM, VMAF. Verified winning operating regime below AV1 bitrate floor and beating VVC low-rate perceptual collapse. |
+| Gate B Held-Out Confirmation | `manifests/gate_b_confirmation.json`, `experiments/tier/gate_b_confirmation.py`, `outputs/gate-b-confirmation/report.json` | Passed. Executed confirmation on held-out candidate matches (`ao2024_w_final_set2_raw` at 1080p, `usopen2023_w_final_set2_raw` at 720p) under frozen C0–C3 procedure without retuning. 0 alarms, monotonic quality/rate, verified C0 operating at 34–38% of AV1 min-rate floor, and client decoding at 40–70 fps. |
 
 ---
 
