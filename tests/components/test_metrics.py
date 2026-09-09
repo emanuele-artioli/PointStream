@@ -87,6 +87,23 @@ def test_ssim_of_uniform_patches_matches_the_closed_form() -> None:
     assert SsimMetric().score(ref, ref) == pytest.approx(1.0)
 
 
+def test_ssim_windowed_threading_and_buffers_match_serial(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Windowed multi-frame SSIM produces bit-identical scores regardless of thread count."""
+    rng = np.random.default_rng(42)
+    ref = rng.integers(0, 256, size=(4, 32, 32, 3), dtype=np.uint8)
+    pred = rng.integers(0, 256, size=(4, 32, 32, 3), dtype=np.uint8)
+
+    monkeypatch.setenv("SSIM_THREADS", "1")
+    serial_score = SsimMetric().score(ref, pred)
+
+    monkeypatch.setenv("SSIM_THREADS", "4")
+    threaded_score = SsimMetric().score(ref, pred)
+
+    assert serial_score == pytest.approx(threaded_score, rel=1e-12)
+    assert SsimMetric().score(ref, ref) == pytest.approx(1.0, rel=1e-12)
+
+
+
 def test_every_tier_scores_a_synthetic_clip_on_the_pipeline_path() -> None:
     """LPIPS is scored here, on frames, not only inside checkpoint evaluation."""
     ref = _uniform_clip(120, frames=3)
