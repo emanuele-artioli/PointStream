@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import threading
 from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
@@ -33,6 +34,23 @@ def _allocate_buffers(shape: tuple[int, int]) -> ScratchBuffers:
     return bufs
 
 
+class _ThreadBuffers(threading.local):
+    """Thread-local scratch buffers to ensure complete thread isolation."""
+
+    def __init__(self) -> None:
+        self.buffers: ScratchBuffers | None = None
+        self.shape: tuple[int, int] | None = None
+
+    def get(self, shape: tuple[int, int]) -> ScratchBuffers:
+        if self.buffers is None or self.shape != shape:
+            self.shape = shape
+            self.buffers = _allocate_buffers(shape)
+        return self.buffers
+
+
+_THREAD_BUFFERS = _ThreadBuffers()
+
+
 class SsimMetric:
     """Mean SSIM in ``[0, 1]``. Identical frames score 1."""
 
@@ -48,22 +66,19 @@ class SsimMetric:
         max_workers = env_workers if env_workers > 0 else min(8, n_frames, os.cpu_count() or 1)
 
         if not is_windowed or max_workers <= 1 or n_frames <= 1:
-            buffers = _allocate_buffers((h, w)) if is_windowed else None
+            buffers = _THREAD_BUFFERS.get((h, w)) if is_windowed else None
             values = [
                 _frame_ssim(ref[index], pred[index], buffers=buffers)
                 for index in range(n_frames)
             ]
             return float(sum(values) / len(values))
 
-        worker_buffers = [_allocate_buffers((h, w)) for _ in range(max_workers)]
+        def _worker_task(index: int) -> float:
+            buffers = _THREAD_BUFFERS.get((h, w))
+            return _frame_ssim(ref[index], pred[index], buffers=buffers)
 
-        def _worker_task(item: tuple[int, int]) -> float:
-            index, worker_id = item
-            return _frame_ssim(ref[index], pred[index], buffers=worker_buffers[worker_id])
-
-        tasks = [(idx, idx % max_workers) for idx in range(n_frames)]
         with ThreadPoolExecutor(max_workers=max_workers) as pool:
-            values = list(pool.map(_worker_task, tasks))
+            values = list(pool.map(_worker_task, range(n_frames)))
         return float(sum(values) / len(values))
 
     def score_masked(
