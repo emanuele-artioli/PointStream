@@ -10,7 +10,7 @@
 PointStream is architected so that generative synthesis is a modular, optional stage (`STAGE_GENERATION` in `src/contracts/lattice.py`).
 
 ### Key Empirical Finding
-Extensive empirical benchmarking across multiple generative models demonstrated that **no generative engine outperformed a simple pasted reference keyframe** on objective rate–distortion metrics (PSNR and SSIM):
+Earlier benchmark reports favored **pasted reference keyframes over the tested generative configurations** on objective fidelity metrics (PSNR and SSIM). These are scoped historical findings, not a validated comparison of every backend or a prediction about future training:
 - Generative models introduced spatial hallucination, boundary bleeding, and frame-to-frame temporal flicker.
 - In-domain fine-tuning improved perceived realism in isolated crops but degraded whole-frame fidelity compared to reference pasting.
 - **Operating Policy (revised 2026-09-09)**: The audited Gate A/B sweeps and shipped tiers configure generation OFF. Earlier comparisons favor pasted references in their tested settings; this does not establish that future trained generators cannot help. Permit bounded generator validation and training before a generation-free win. Select by whole-codec rate–distortion and runtime, including residual demand and transmitted model data, rather than crop realism alone.
