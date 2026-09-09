@@ -161,7 +161,7 @@ CODECS: Final[dict[str, StreamCodec]] = {
         name="vvc",
         encoder="libvvenc",
         container="vvc",
-        low_delay=("-preset", "faster", "-qpa", "0", "-period", "100000"),
+        low_delay=("-preset", "faster", "-qpa", "0", "-period", "1"),
         rate_flag="-qp",
     ),
     "hevc": StreamCodec(

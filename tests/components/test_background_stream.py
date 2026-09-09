@@ -166,15 +166,17 @@ class TestCausalityAndIdentity:
                     f"{mode}: scene {payload.index} drifted between encoder and client"
                 )
 
-    def test_a_payload_is_never_revised_by_a_later_scene(self) -> None:
+    @pytest.mark.parametrize("codec", ["av1", "svt-av1", "vvc"])
+    def test_a_payload_is_never_revised_by_a_later_scene(self, codec: str) -> None:
         """Prefix stability, which is what makes each payload causal.
 
         If appending scene n+1 changed scene n's bytes, the encoder would have
         needed the future to emit scene n -- and this would be an offline
         archiver rather than a codec.
         """
-        scenes = _panning_scenes(4)
-        transmitter = BackgroundStreamTransmitter(mode=REFERENCE_LAST, codec="av1", crf=38)
+        scenes = _panning_scenes(3)
+        crf = 45 if codec != "av1" else 38
+        transmitter = BackgroundStreamTransmitter(mode=REFERENCE_LAST, codec=codec, crf=crf)
         emitted: list[bytes] = []
         for plate in scenes:
             emitted.append(transmitter.push(plate).payload)
@@ -182,7 +184,7 @@ class TestCausalityAndIdentity:
         # compares it against what was already sent, so reaching here at all
         # means every prefix survived. Assert the bytes too, so a future change
         # that removes that internal check still fails this test.
-        replay = BackgroundStreamTransmitter(mode=REFERENCE_LAST, codec="av1", crf=38)
+        replay = BackgroundStreamTransmitter(mode=REFERENCE_LAST, codec=codec, crf=crf)
         for offset, plate in enumerate(scenes):
             assert replay.push(plate).payload == emitted[offset]
 
