@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 
 from src.contracts.conditioning import ConditioningBundle, Device, GenerationParams
@@ -102,10 +104,20 @@ def as_runner_ref(
     from src.contracts.capabilities import CAP_TEMPORAL_SEQUENCE
     from src.pipeline.reconstruction.dispatch import GeneratorRef
 
-    caps = set(capabilities or getattr(backend, "capabilities", frozenset()))
+    raw_caps: Any = (
+        capabilities
+        if capabilities is not None
+        else getattr(backend, "capabilities", frozenset())
+    )
+    caps: set[str] = set(raw_caps)
     if hasattr(backend, "generate_sequence"):
         caps.add(CAP_TEMPORAL_SEQUENCE)
-    reqs = frozenset(requires or getattr(backend, "required", ()))
+    raw_reqs: Any = (
+        requires
+        if requires is not None
+        else getattr(backend, "required", frozenset())
+    )
+    reqs: frozenset[str] = frozenset(raw_reqs)
     adapter = RunnerGeneratorAdapter(backend)
     return GeneratorRef(
         backend=adapter,

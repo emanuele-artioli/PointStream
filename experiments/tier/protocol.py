@@ -154,11 +154,13 @@ def capture_current_identity(
     for codec, info in tools.items():
         bin_path = Path(str(info.get("binary", "")))
         bin_sha = hashlib.sha256(bin_path.read_bytes()).hexdigest() if bin_path.is_file() else ""
+        manifest_preset = manifest_data.get("anchors", {}).get(codec, {}).get("preset")
         tools_clean[codec] = {
             "codec": codec,
             "binary": str(bin_path),
             "binary_sha256": bin_sha,
             "version": info.get("version"),
+            "preset": manifest_preset or ("8" if codec == "av1" else "medium"),
             "slowest_preset": info.get("slowest_preset"),
             "available": info.get("available", False),
         }
@@ -216,20 +218,30 @@ class ProtocolEvidence:
     source_uncertainty: dict[str, Any] = field(default_factory=dict)
 
     def validate(self) -> tuple[bool, list[str]]:
-        """Validate evidence fail-closed."""
+        """Validate evidence fail-closed. Status booleans without verified details are not proof."""
         blockers: list[str] = []
         if not self.client_output_scored:
             blockers.append("missing evidence of actual client-output scoring (stand-alone client decode)")
+        elif not self.client_scoring_details:
+            blockers.append("client-output scoring boolean without verified output artifacts is not proof")
         if not self.measured_wire_cost:
             blockers.append("missing evidence of measured full wire cost (wire envelope accounting)")
         if not self.wire_cost_reconciled:
             blockers.append("wire cost not reconciled with payload ledger")
+        elif not self.wire_cost_details:
+            blockers.append("wire cost reconciliation boolean without verified wire ledger details is not proof")
         if not self.calibrated_metrics:
             blockers.append("missing or failed metric calibration with known anchors (identical/mild/severe/unrelated)")
+        elif not self.metric_calibration_details:
+            blockers.append("metric calibration boolean without verified calibration artifact/details is not proof")
         if not self.calibrated_nulls:
             blockers.append("missing or failed null controls (shuffled-frame temporal null)")
+        elif not self.null_control_details:
+            blockers.append("null control boolean without verified null artifact/details is not proof")
         if not self.source_eligibility:
             blockers.append("source eligibility unverified")
+        elif not self.source_eligibility_details:
+            blockers.append("source eligibility boolean without verified details is not proof")
         if not self.source_uncertainty or not self.source_uncertainty.get("evaluated", False):
             blockers.append("missing source-level uncertainty quantification")
 
@@ -289,6 +301,36 @@ def calculate_source_uncertainty(
     return results
 
 
+def extract_match_identifier(source: dict[str, Any]) -> str:
+    """Extract independent match identifier from a source dict.
+
+    Scene IDs do NOT identify independent matches; multiple scenes from the same
+    match count once toward the independent match count.
+    """
+    # 1. Explicit match identifier fields
+    for key in ("match_name", "match_id", "match", "video"):
+        val = source.get(key)
+        if val and isinstance(val, str) and val.strip():
+            return val.strip()
+
+    # 2. Extract match from source_id by removing scene / shot suffixes
+    sid = source.get("source_id") or ""
+    if sid and isinstance(sid, str):
+        import re
+
+        s_clean = sid.strip()
+        # If source_id is strictly a scene/shot ID (e.g., 'scene_001', 'shot_03'),
+        # it does NOT identify an independent match!
+        if re.match(r"^(?:scene|shot)[-_0-9]+$", s_clean, flags=re.IGNORECASE):
+            return "__unspecified_scene__"
+        # If source_id is formatted like 'matchname_scene_001' or 'video_shot01'
+        match_part = re.split(r"[-_](?:scene|shot)[-_0-9]*", s_clean, flags=re.IGNORECASE)[0]
+        if match_part and not re.match(r"^(?:scene|shot)[-_0-9]*$", match_part, flags=re.IGNORECASE):
+            return match_part.strip()
+        return s_clean
+    return ""
+
+
 def evaluate_confirmation_protocol(
     sources: list[dict[str, Any]],
     alarms: list[str],
@@ -304,11 +346,13 @@ def evaluate_confirmation_protocol(
     Enforces:
     1. Rejection of empty inputs.
     2. Verification of source eligibility and independent-source count:
-       duplicate sources (same match_name or source_id) do not count as independent matches.
+       scene IDs do NOT identify independent matches; multiple scenes from the same
+       match count once toward the independent match count.
        Gate B confirmation requires >= 6 independent matches.
     3. Rejection of missing anchors (both AV1 and VVC required for every source).
     4. Rejection of unscorable / non-overlapping curves (no BD-rate extrapolation).
     5. Identity matching: config, tool builds/presets, manifest, model hashes.
+       Expected identity is strictly required for confirmation.
     6. Protocol evidence validation: client scoring, wire cost, calibrated metrics/nulls, uncertainty.
     7. Clear separation between pilot runs and confirmation:
        pilot completion CANNOT imply confirmation (`is_pilot=True` always sets `gate_b_passed=False`).
@@ -330,11 +374,18 @@ def evaluate_confirmation_protocol(
 
     # 2. Check independent source count & duplicate rejection
     unique_matches: set[str] = set()
+    has_unspecified_scene = False
     for s in sources:
-        # Match identifier: prefer match_name, fall back to source_id
-        match_id = s.get("match_name") or s.get("source_id") or ""
-        if match_id:
-            unique_matches.add(str(match_id))
+        match_id = extract_match_identifier(s)
+        if match_id == "__unspecified_scene__":
+            has_unspecified_scene = True
+        elif match_id:
+            unique_matches.add(match_id)
+
+    if has_unspecified_scene:
+        blockers.append(
+            "scene IDs do not identify independent matches; explicit match_name or match context is required"
+        )
 
     if len(unique_matches) < required_matches:
         blockers.append(
@@ -363,6 +414,12 @@ def evaluate_confirmation_protocol(
                 blockers.append(f"{sid}/{codec}: recorded curve does not show a rate saving (delta={delta:+.2f}%)")
 
     # 5. Check experiment identity
+    if not is_pilot:
+        if expected_identity is None or identity is None:
+            blockers.append(
+                "missing required experiment identity: expected_identity and actual identity must be provided for confirmation"
+            )
+
     if expected_identity is not None and identity is not None:
         actual_id = (
             identity
@@ -372,6 +429,8 @@ def evaluate_confirmation_protocol(
         matched, id_blockers = actual_id.verify_match(expected_identity)
         if not matched:
             blockers.extend([f"identity mismatch: {b}" for b in id_blockers])
+    elif expected_identity is not None and identity is None:
+        blockers.append("expected experiment identity provided but actual identity is missing")
 
     # 6. Check protocol evidence
     evidence_obj: ProtocolEvidence | None = None

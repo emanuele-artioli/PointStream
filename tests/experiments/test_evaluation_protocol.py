@@ -15,6 +15,7 @@ Tests:
 from __future__ import annotations
 
 import sqlite3  # noqa: F401
+from typing import Any
 from unittest.mock import patch
 
 import numpy as np
@@ -38,9 +39,11 @@ from experiments.tier.protocol import (
 from experiments.tier.resolution_adaptive import (
     compare_curves_no_extrapolation,
     encode_resolution_arm,
+    recompute_stored_bd_rate_arithmetic_check,
     rescale_frames,
     restore_to_display_grid,
 )
+from src.components.background.scale import HEADER_BYTES
 
 
 def _make_pilot_source(source_id: str, match_name: str, delta: float | None = -15.0) -> dict:
@@ -154,6 +157,36 @@ def test_duplicate_sources_cannot_satisfy_independent_count() -> None:
     assert any("only 1 unique independent match(es)" in b for b in verdict["confirmation_blockers"])
 
 
+def test_scenes_from_same_match_count_once() -> None:
+    # 6 scenes originating from only 2 distinct matches (3 scenes per match)
+    sources = [
+        {"source_id": "alcaraz_scene_000", "match_name": "Alcaraz vs Sinner", "comparisons": _make_pilot_source("s", "m")["comparisons"]},
+        {"source_id": "alcaraz_scene_001", "match_name": "Alcaraz vs Sinner", "comparisons": _make_pilot_source("s", "m")["comparisons"]},
+        {"source_id": "alcaraz_scene_002", "match_name": "Alcaraz vs Sinner", "comparisons": _make_pilot_source("s", "m")["comparisons"]},
+        {"source_id": "djokovic_scene_000", "match_name": "Djokovic vs Federer", "comparisons": _make_pilot_source("s", "m")["comparisons"]},
+        {"source_id": "djokovic_scene_001", "match_name": "Djokovic vs Federer", "comparisons": _make_pilot_source("s", "m")["comparisons"]},
+        {"source_id": "djokovic_scene_002", "match_name": "Djokovic vs Federer", "comparisons": _make_pilot_source("s", "m")["comparisons"]},
+    ]
+    evidence = _make_valid_evidence()
+    verdict = evaluate_confirmation_protocol(
+        sources, [], evidence=evidence, is_pilot=False, required_matches=6
+    )
+    assert verdict["gate_b_passed"] is False
+    assert verdict["n_unique_matches"] == 2
+    assert any("only 2 unique independent match(es)" in b for b in verdict["confirmation_blockers"])
+
+    # Raw scene IDs without match context are rejected and cannot masquerade as independent matches
+    bare_scene_sources = [
+        {"source_id": f"scene_{i:03d}", "comparisons": _make_pilot_source("s", "m")["comparisons"]}
+        for i in range(6)
+    ]
+    verdict_bare = evaluate_confirmation_protocol(
+        bare_scene_sources, [], evidence=evidence, is_pilot=False, required_matches=6
+    )
+    assert verdict_bare["gate_b_passed"] is False
+    assert any("scene IDs do not identify independent matches" in b for b in verdict_bare["confirmation_blockers"])
+
+
 def test_incomplete_sources_fail_closed() -> None:
     # Missing comparisons dictionary in source
     broken_source = {"source_id": "broken_source", "match_name": "match_broken"}
@@ -227,6 +260,29 @@ def test_mismatched_identity_fails() -> None:
     assert any("model yolo hash mismatch" in b for b in verdict_bad_model["confirmation_blockers"])
 
 
+def test_required_identity_absent_fails() -> None:
+    sources = [_make_pilot_source(f"src_{i}", f"match_{i}", -12.0) for i in range(6)]
+    evidence = _make_valid_evidence()
+
+    # Case A: Neither identity nor expected_identity provided
+    verdict_no_id = evaluate_confirmation_protocol(
+        sources, [], identity=None, expected_identity=None, evidence=evidence, is_pilot=False
+    )
+    assert verdict_no_id["gate_b_passed"] is False
+    assert any("missing required experiment identity" in b for b in verdict_no_id["confirmation_blockers"])
+
+    # Case B: expected_identity provided, but actual identity is missing
+    expected_id = ExperimentIdentity(
+        config_fingerprint="fp123",
+        manifest_sha256="sha123",
+    )
+    verdict_missing_actual = evaluate_confirmation_protocol(
+        sources, [], identity=None, expected_identity=expected_id, evidence=evidence, is_pilot=False
+    )
+    assert verdict_missing_actual["gate_b_passed"] is False
+    assert any("missing required experiment identity" in b or "actual identity is missing" in b for b in verdict_missing_actual["confirmation_blockers"])
+
+
 # ---------------------------------------------------------------------------
 # 4. No-overlap curves are unscorable (extrapolation prohibited)
 # ---------------------------------------------------------------------------
@@ -252,6 +308,23 @@ def test_no_overlap_curves_are_unscorable() -> None:
     assert comp["extrapolation_prohibited"] is True
     assert "no common quality support" in comp["reason"]
 
+    # Narrow overlap test: candidate in [30.0, 45.0], anchor in [43.0, 80.0]
+    # Overlap is [43.0, 45.0] (width 2.0), candidate span is 15.0 -> fraction 13.3% < 50%
+    cand_narrow = [
+        {"bytes": 10000, "scores": {"vmaf": 30.0}, "usable": True},
+        {"bytes": 20000, "scores": {"vmaf": 38.0}, "usable": True},
+        {"bytes": 30000, "scores": {"vmaf": 45.0}, "usable": True},
+    ]
+    anc_narrow = [
+        {"bytes": 50000, "scores": {"vmaf": 43.0}, "usable": True},
+        {"bytes": 80000, "scores": {"vmaf": 65.0}, "usable": True},
+        {"bytes": 120000, "scores": {"vmaf": 80.0}, "usable": True},
+    ]
+    comp_narrow = compare_curves_no_extrapolation(cand_narrow, anc_narrow, metric_name="vmaf")
+    assert comp_narrow["is_scorable"] is False
+    assert comp_narrow["bd_rate_percent"] is None
+    assert "need at least 50%" in str(comp_narrow["reason"])
+
     # Passing unscorable comparisons into confirmation protocol fails closed
     unscorable_source = {
         "source_id": "disjoint_source",
@@ -272,15 +345,15 @@ def test_no_overlap_curves_are_unscorable() -> None:
 
 
 def test_known_synthetic_curves_give_expected_comparison_sign() -> None:
-    anchor_rows = [
+    anchor_rows: list[dict[str, Any]] = [
         {"bytes": 100000, "scores": {"vmaf": 50.0}, "usable": True},
         {"bytes": 200000, "scores": {"vmaf": 65.0}, "usable": True},
         {"bytes": 400000, "scores": {"vmaf": 80.0}, "usable": True},
     ]
 
     # Candidate with 20% lower rate at same qualities
-    cand_cheaper = [
-        {"bytes": int(r["bytes"] * 0.80), "scores": dict(r["scores"]), "usable": True}
+    cand_cheaper: list[dict[str, Any]] = [
+        {"bytes": int(float(r["bytes"]) * 0.80), "scores": dict(r.get("scores", {})), "usable": True}
         for r in anchor_rows
     ]
     comp_cheaper = compare_curves_no_extrapolation(cand_cheaper, anchor_rows, metric_name="vmaf")
@@ -290,8 +363,8 @@ def test_known_synthetic_curves_give_expected_comparison_sign() -> None:
     assert -22.0 <= comp_cheaper["bd_rate_percent"] <= -18.0
 
     # Candidate with 25% higher rate at same qualities
-    cand_pricier = [
-        {"bytes": int(r["bytes"] * 1.25), "scores": dict(r["scores"]), "usable": True}
+    cand_pricier: list[dict[str, Any]] = [
+        {"bytes": int(float(r["bytes"]) * 1.25), "scores": dict(r.get("scores", {})), "usable": True}
         for r in anchor_rows
     ]
     comp_pricier = compare_curves_no_extrapolation(cand_pricier, anchor_rows, metric_name="vmaf")
@@ -300,9 +373,35 @@ def test_known_synthetic_curves_give_expected_comparison_sign() -> None:
     # Higher rate should be ~ +25%
     assert 22.0 <= comp_pricier["bd_rate_percent"] <= 28.0
 
+    # Candidate with 10% higher rate at same qualities
+    cand_10pct: list[dict[str, Any]] = [
+        {"bytes": int(float(r["bytes"]) * 1.10), "scores": dict(r.get("scores", {})), "usable": True}
+        for r in anchor_rows
+    ]
+    comp_10pct = compare_curves_no_extrapolation(cand_10pct, anchor_rows, metric_name="vmaf")
+    assert comp_10pct["is_scorable"] is True
+    assert comp_10pct["bd_rate_percent"] is not None
+    assert 9.0 <= comp_10pct["bd_rate_percent"] <= 11.0
+
+    # Arithmetic check of stored BD-rate
+    check_ok = recompute_stored_bd_rate_arithmetic_check(
+        cand_10pct, anchor_rows, comp_10pct["bd_rate_percent"], metric_name="vmaf"
+    )
+    assert check_ok["arithmetic_check_passed"] is True
+    assert check_ok["status"] == "arithmetic_check_verified"
+    assert check_ok["discrepancy"] is not None and check_ok["discrepancy"] < 0.001
+
+    # Discrepant stored BD-rate fails arithmetic check
+    check_bad = recompute_stored_bd_rate_arithmetic_check(
+        cand_10pct, anchor_rows, -15.0, metric_name="vmaf"
+    )
+    assert check_bad["arithmetic_check_passed"] is False
+    assert check_bad["status"] == "arithmetic_discrepancy_detected"
+
     # Identical curves: exactly 0% BD-rate
     comp_identical = compare_curves_no_extrapolation(anchor_rows, anchor_rows, metric_name="vmaf")
     assert comp_identical["is_scorable"] is True
+    assert comp_identical["bd_rate_percent"] is not None
     assert abs(comp_identical["bd_rate_percent"]) < 0.01
 
 
@@ -356,7 +455,10 @@ def test_rescaled_outputs_have_original_dimensions_and_timing_byte_treatment() -
             scale=0.5,
             fps=24.0,
         )
-        assert pt["bytes"] == 1500
+        assert pt["coded_bytes"] == 1500
+        assert pt["scaling_bytes"] == HEADER_BYTES
+        assert pt["bytes"] == 1500 + HEADER_BYTES
+        assert pt["bytes"] > mock_trip.size_bytes
         assert pt["scale"] == 0.5
         assert pt["scale_label"] == "res_50"
         assert pt["original_resolution"] == "64x64"
@@ -413,13 +515,20 @@ def test_metric_calibration_ordering_and_null_controls() -> None:
     s_null = spatial_null_frames(ref)
     assert s_null.shape == ref.shape
 
-    calib = run_full_metric_calibration(["psnr"], ref, unrelated=unrelated)
+    calib = run_full_metric_calibration(["psnr", "ssim"], ref, unrelated=unrelated)
     assert calib["valid"] is True
     assert len(calib["alarms"]) == 0
     psnr_data = calib["metrics"]["psnr"]
     assert psnr_data["blur_ordering_held"] is True
     assert psnr_data["noise_ordering_held"] is True
     assert psnr_data["by_anchor"]["identical"] == "inf"
+
+    ssim_data = calib["metrics"]["ssim"]
+    assert ssim_data["blur_ordering_held"] is True
+    assert ssim_data["noise_ordering_held"] is True
+    assert ssim_data["distortion_ordering_held"] is True
+    assert ssim_data["unrelated_ordering_held"] is True
+    assert float(ssim_data["by_anchor"]["identical"]) >= 0.999
 
 
 # ---------------------------------------------------------------------------

@@ -23,6 +23,7 @@ import cv2
 import numpy as np
 
 from experiments.tier.low_rate_measure import reference_request, score_headlines
+from src.components.background.scale import HEADER_BYTES
 from src.components.codec.frames import even_size
 from src.components.codec.measure import timed_roundtrip
 from src.components.metrics.bd_rate import (
@@ -140,6 +141,9 @@ def encode_resolution_arm(
     encoder_s = trip.encode_seconds + downscale_s
 
     scale_label = "native" if scale == 1.0 else f"res_{int(round(scale * 100))}"
+    scaling_bytes = HEADER_BYTES if scale < 1.0 else 0
+    coded_bytes = int(trip.size_bytes)
+    total_bytes = coded_bytes + scaling_bytes
 
     return {
         "codec": codec,
@@ -147,7 +151,9 @@ def encode_resolution_arm(
         "scale_label": scale_label,
         "qp": int(qp),
         "preset": preset,
-        "bytes": int(trip.size_bytes),
+        "bytes": total_bytes,
+        "coded_bytes": coded_bytes,
+        "scaling_bytes": scaling_bytes,
         "n_frames": T,
         "original_resolution": f"{orig_W}x{orig_H}",
         "coded_resolution": f"{scaled_W}x{scaled_H}",
@@ -285,6 +291,46 @@ def compare_curves_no_extrapolation(
     return report
 
 
+def recompute_stored_bd_rate_arithmetic_check(
+    candidate_rows: list[dict[str, Any]],
+    anchor_rows: list[dict[str, Any]],
+    stored_bd_rate: float,
+    *,
+    metric_name: str = "vmaf",
+    tolerance: float = 0.1,
+) -> dict[str, Any]:
+    """Recompute stored BD-rate as an arithmetic check only, not a newly valid experiment.
+
+    Historical reports remain immutable. This arithmetic check verifies whether
+    the stored value matches mathematical recomputation on the recorded points,
+    without certifying the underlying experiment as valid under modern protocol rules.
+    """
+    comp = compare_curves_no_extrapolation(candidate_rows, anchor_rows, metric_name=metric_name)
+    if not comp["is_scorable"] or comp["bd_rate_percent"] is None:
+        return {
+            "arithmetic_check_passed": False,
+            "stored_bd_rate": stored_bd_rate,
+            "recomputed_bd_rate": None,
+            "discrepancy": None,
+            "is_scorable": False,
+            "reason": comp.get("reason", "unscorable curve comparison"),
+            "status": "arithmetic_check_unscorable",
+        }
+    recomputed = float(comp["bd_rate_percent"])
+    diff = abs(recomputed - stored_bd_rate)
+    passed = diff <= tolerance
+    return {
+        "arithmetic_check_passed": passed,
+        "stored_bd_rate": stored_bd_rate,
+        "recomputed_bd_rate": recomputed,
+        "discrepancy": round(diff, 4),
+        "is_scorable": True,
+        "overlap_fraction": comp.get("overlap_fraction"),
+        "status": "arithmetic_check_verified" if passed else "arithmetic_discrepancy_detected",
+        "note": "Arithmetic check only; does not validate experiment protocol or gate passage.",
+    }
+
+
 @dataclass(frozen=True)
 class ResidualLadderRungSpec:
     """High-fidelity residual-on ladder rung coordinating with Worker A's interface."""
@@ -355,6 +401,7 @@ __all__ = [
     "compare_curves_no_extrapolation",
     "configure_high_fidelity_residual_rung",
     "encode_resolution_arm",
+    "recompute_stored_bd_rate_arithmetic_check",
     "rescale_frames",
     "restore_to_display_grid",
 ]
