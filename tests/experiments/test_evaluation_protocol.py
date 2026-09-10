@@ -21,8 +21,12 @@ from unittest.mock import patch
 import numpy as np
 
 from experiments.tier.calibrate import (
+    PROPOSED_SSIM_CALIBRATION_POLICY,
+    SSIM_UNRELATED_LEGACY_CEILING,
     run_full_metric_calibration,
     spatial_null_frames,
+    synthetic_court_like_clip,
+    synthetic_foreign_court_clip,
     synthetic_unrelated_clip,
     temporal_null_frames,
 )
@@ -529,6 +533,78 @@ def test_metric_calibration_ordering_and_null_controls() -> None:
     assert ssim_data["distortion_ordering_held"] is True
     assert ssim_data["unrelated_ordering_held"] is True
     assert float(ssim_data["by_anchor"]["identical"]) >= 0.999
+    assert "proposed_policy" in calib
+    assert calib["proposed_policy"]["name"] == PROPOSED_SSIM_CALIBRATION_POLICY["name"]
+    assert calib["reference_identity"]["frame_hashes"]
+    assert calib["unrelated_controls"]
+
+
+def test_ssim_partial_order_without_legacy_unrelated_ceiling() -> None:
+    """identity > mild > severe and mild > unrelated; do not require unrelated < 0.60.
+
+    Full-frame SSIM on structured tennis-like content can sit above the legacy
+    0.60 unrelated ceiling (Wave 2 observed 0.6702 on natural broadcasts). That
+    is a scale finding. Validity is the partial order. Gate B is unchanged.
+    """
+    ref = synthetic_court_like_clip((2, 96, 96, 3), seed=1)
+    unrelated = synthetic_foreign_court_clip((2, 96, 96, 3), seed=99)
+    extra = synthetic_foreign_court_clip((2, 96, 96, 3), seed=7)
+    calib = run_full_metric_calibration(
+        ["ssim"], ref, unrelated=unrelated, extra_unrelated=[extra]
+    )
+    ssim = calib["metrics"]["ssim"]
+    identical = float(ssim["by_anchor"]["identical"])
+    mild = float(ssim["by_anchor"]["mild-blur"])
+    severe = float(ssim["by_anchor"]["severe-blur"])
+    unr = float(ssim["by_anchor"]["unrelated-clip"])
+    extra_val = float(ssim["by_anchor"]["unrelated-extra-0"])
+    assert identical > mild > severe
+    assert mild > unr
+    assert identical > extra_val
+    assert unr > SSIM_UNRELATED_LEGACY_CEILING
+    assert ssim["distortion_ordering_held"] is True
+    assert ssim["unrelated_ordering_held"] is True
+    finding = next(item for item in calib["scale_findings"] if item["name"] == "legacy_unrelated_ceiling")
+    assert finding["ceiling"] == SSIM_UNRELATED_LEGACY_CEILING
+    assert finding["observed"] == unr
+    assert finding["held"] is False
+    assert not any("SSIM unrelated score" in alarm for alarm in calib["alarms"])
+    assert calib["valid"] is True
+    assert calib["proposed_policy"]["legacy_ssim_unrelated_ceiling"] == 0.60
+    assert "gate" in calib["proposed_policy"]["gate_b"].lower()
+
+
+def test_legacy_ssim_ceiling_finding_records_when_exceeded() -> None:
+    """If we kept 0.60 as a hard alarm it would fire on court-like controls.
+
+    The proposed policy records that breach as a scale finding instead of
+    invalidating calibration, and does not change Gate B.
+    """
+    ref = synthetic_court_like_clip((2, 96, 96, 3), seed=0)
+    unrelated = synthetic_foreign_court_clip((2, 96, 96, 3), seed=1)
+    calib = run_full_metric_calibration(["ssim"], ref, unrelated=unrelated)
+    unr = float(calib["metrics"]["ssim"]["by_anchor"]["unrelated-clip"])
+    finding = next(item for item in calib["scale_findings"] if item["name"] == "legacy_unrelated_ceiling")
+    assert unr > SSIM_UNRELATED_LEGACY_CEILING
+    assert finding["held"] is False
+    assert calib["valid"] is True
+    assert calib["alarms"] == []
+
+
+def test_temporal_null_high_ssim_is_not_an_alarm() -> None:
+    """SSIM is framewise; shuffled temporal order of similar frames scores high."""
+    ref = np.zeros((2, 64, 64, 3), dtype=np.uint8)
+    ref[0] = 180
+    ref[1] = 182
+    calib = run_full_metric_calibration(
+        ["ssim"], ref, unrelated=synthetic_unrelated_clip(ref.shape)
+    )
+    null_ssim = float(calib["metrics"]["ssim"]["null_controls"]["temporal-null-shuffled"])
+    assert null_ssim > 0.90
+    assert not any("temporal" in alarm.lower() for alarm in calib["alarms"])
+    finding = next(item for item in calib["scale_findings"] if item["name"] == "legacy_unrelated_ceiling")
+    assert finding["temporal_null_is_alarm"] is False
+    assert calib["valid"] is True
 
 
 # ---------------------------------------------------------------------------
