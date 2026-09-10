@@ -61,6 +61,22 @@ def config_identity_digest(payload: Mapping[str, Any]) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def _checkpoint_file(ref: Any, checkpoint: str | Path | None) -> Path | None:
+    """Weight file on the live ref, if any. Client reconstruct has the object, not the CLI path."""
+    candidates = [checkpoint, getattr(ref, "checkpoint", None)]
+    backend = getattr(ref, "backend", None)
+    if backend is not None:
+        candidates.append(getattr(backend, "checkpoint", None))
+        candidates.append(getattr(backend, "loaded_checkpoint", None))
+    for item in candidates:
+        if item is None or item == "":
+            continue
+        path = Path(str(item))
+        if path.is_file():
+            return path
+    return None
+
+
 def identity_from_ref(
     ref: Any,
     *,
@@ -71,11 +87,12 @@ def identity_from_ref(
     """Identity block stored in ``generator_meta``.
 
     Injected test backends have no weight file; their digest is
-    ``injected:<name>``.
+    ``injected:<name>``. A file-backed backend (pix2pix and friends) is
+    hashed from the weights on the object, not from a missing CLI path.
     """
     name = str(getattr(ref, "name", "injected"))
-    checkpoint_path = Path(checkpoint) if checkpoint else None
-    if checkpoint_path is not None and checkpoint_path.is_file():
+    checkpoint_path = _checkpoint_file(ref, checkpoint)
+    if checkpoint_path is not None:
         digest = sha256_file(checkpoint_path)
         checkpoint_id = f"{checkpoint_path.name}:{digest}"
     else:

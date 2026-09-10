@@ -406,6 +406,8 @@ def assess_generator_comparison(
     gen_invocations = 0
     gen_failures = 0
     for row in matrix:
+        if row.get("generation_on"):
+            gen_invocations += int(row.get("model_invocation_count") or 0)
         if row.get("failure"):
             if row.get("generation_on"):
                 gen_failures += 1
@@ -416,7 +418,6 @@ def assess_generator_comparison(
             if paste_hashes is None:
                 paste_hashes = list(row.get("delivered_frame_hashes") or [])
             continue
-        gen_invocations += int(row.get("model_invocation_count") or 0)
         if gen_hashes is None:
             gen_hashes = list(row.get("delivered_frame_hashes") or [])
 
