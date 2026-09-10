@@ -50,7 +50,7 @@ class FakeSizes:
         self.subledger = subledger
 
     def as_dict(self) -> dict[str, Any]:
-        payload = {
+        payload: dict[str, Any] = {
             "residual": self.residual,
             "panorama": self.panorama,
             "actor_reference": self.actor_reference,

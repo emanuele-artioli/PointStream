@@ -152,7 +152,8 @@ def test_serialize_declares_mask_wire_and_roundtrips() -> None:
     assert item["mask_wire"]["shape"] == [12, 16]
     assert item["mask_key"] == "mask_0"
     reconstructed = reconstruct_serialized_client(payload)
-    assert reconstructed.shape == (1, 12, 16, 3)
+    frames = np.asarray(reconstructed)
+    assert frames.shape == (1, 12, 16, 3)
 
 
 def test_transport_total_equals_serialized_length() -> None:

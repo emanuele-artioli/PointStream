@@ -250,10 +250,14 @@ def run_diagnostic_corner(
         )
         cfg = replace(cfg, residual=res_cfg)
 
+    execute: RunFn
     if run_fn is None:
-        from src.runner.run import run as run_fn
-    if score_fn is None:
-        score_fn = score_headlines
+        from src.runner.run import run as imported_run
+
+        execute = imported_run
+    else:
+        execute = run_fn
+    score: ScoreFn = score_fn if score_fn is not None else score_headlines
 
     report: dict[str, Any] = {
         "corner": corner_name,
@@ -307,18 +311,22 @@ def run_diagnostic_corner(
         return report
 
     if gen_on:
-        factory = generator_factory
-        if factory is None:
-            from scripts.train_campaign import build_eval_generator_ref as factory
+        make_generator: GeneratorFactory
+        if generator_factory is None:
+            from scripts.train_campaign import build_eval_generator_ref as imported_factory
+
+            make_generator = imported_factory
+        else:
+            make_generator = generator_factory
         try:
-            generator_ref = factory(
+            generator_ref = make_generator(
                 generator_arch,
                 Path(checkpoint_path) if checkpoint_path is not None else Path("."),
                 device=device,
                 seed=run_seed,
             )
         except TypeError:
-            generator_ref = factory(
+            generator_ref = make_generator(
                 generator_arch,
                 Path(checkpoint_path) if checkpoint_path is not None else Path("."),
             )
@@ -326,7 +334,7 @@ def run_diagnostic_corner(
 
     start_time = time.perf_counter()
     try:
-        result = run_fn(
+        result = execute(
             cfg,
             [source_frames],
             objects=(objects_for_run,),
@@ -335,7 +343,7 @@ def run_diagnostic_corner(
         )
         wall_seconds = time.perf_counter() - start_time
         delivered = np.asarray(result.delivered_frames)
-        scores = score_fn(source_frames, delivered)
+        scores = score(source_frames, delivered)
         parts = extract_size_parts(result.sizes)
         report.update(
             {

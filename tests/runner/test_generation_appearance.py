@@ -150,7 +150,9 @@ def test_appearance_plus_generation_is_not_a_paste() -> None:
     assert not bit_identical(generated.delivered_frames, pasted.delivered_frames)
     assert _frame_hash(generated.delivered_frames) != _frame_hash(pasted.delivered_frames)
 
-    wire_meta = _wire_metadata(generated.chunks[0].bag["wire_request"])
+    generated_wire = generated.chunks[0].bag["wire_request"]
+    assert isinstance(generated_wire, bytes)
+    wire_meta = _wire_metadata(generated_wire)
     assert wire_meta["generator"] is not None
     assert wire_meta["generator"]["checkpoint_sha256"] == "injected:paint"
     assert wire_meta["references"], "appearance bytes must still travel as conditioning"
@@ -241,7 +243,9 @@ def test_no_duplicate_paste_and_generate_placements() -> None:
         generator=_ref(),
         objects=((_object(),),),
     )
-    meta = _wire_metadata(result.chunks[0].bag["wire_request"])
+    wire = result.chunks[0].bag["wire_request"]
+    assert isinstance(wire, bytes)
+    meta = _wire_metadata(wire)
     keys = [(item["object_id"], item["frame_index"]) for item in meta["placements"]]
     assert keys == list(dict.fromkeys(keys))
     assert meta["placements"], "expected at least one placement"
@@ -250,7 +254,7 @@ def test_no_duplicate_paste_and_generate_placements() -> None:
     assert not any(item.get("encoded_crop_key") for item in meta["placements"])
 
     reconstructed = reconstruct_serialized_client(
-        result.chunks[0].bag["wire_request"],
+        wire,
         generator=_ref(),
     )
     assert reconstructed is not None

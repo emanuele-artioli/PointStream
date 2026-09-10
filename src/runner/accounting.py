@@ -9,7 +9,7 @@ the names the existing invariant check already reads: ``metadata``,
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -64,6 +64,19 @@ class MetadataSubledger:
             placement_headers=self.placement_headers + other.placement_headers,
             generator_metadata=self.generator_metadata + other.generator_metadata,
             envelope_overhead=self.envelope_overhead + other.envelope_overhead,
+        )
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any] | None) -> MetadataSubledger:
+        """Restore a subledger from ``SizesBytes.as_dict()`` (checkpoint resume)."""
+        if not data:
+            return cls()
+        return cls(
+            mask_payload=int(data.get("mask_payload", 0)),
+            pose_motion=int(data.get("pose_motion", 0)),
+            placement_headers=int(data.get("placement_headers", 0)),
+            generator_metadata=int(data.get("generator_metadata", 0)),
+            envelope_overhead=int(data.get("envelope_overhead", 0)),
         )
 
 
