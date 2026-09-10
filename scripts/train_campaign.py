@@ -335,7 +335,7 @@ def evaluate_checkpoint(
             cfg,
             [source_clip],
             generator=ref,
-            objects=((tuple(obj_requests),),),
+            objects=(tuple(obj_requests),),
             context_ids=(clip_key,),
         )
 

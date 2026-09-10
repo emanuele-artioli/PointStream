@@ -1,3 +1,4 @@
+import sqlite3  # noqa: F401
 """Spade4Tennis: Reference-SPADE Player+Racket Synthesis – Training Script.
 
 Architecture

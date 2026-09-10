@@ -1,3 +1,4 @@
+import sqlite3  # noqa: F401
 import os
 os.environ["NCCL_P2P_DISABLE"] = "1"
 os.environ["NCCL_IB_DISABLE"] = "1"
