@@ -28,6 +28,7 @@ Earlier benchmark reports favored **pasted reference keyframes over the tested g
 | Native Temporal Smoke Test | Overnight recovery (`ed1cb3c`) | Executed `scripts/smoke_generator.py` on GPU 1 with Animate-Anyone (`finetuned_tennis`). Confirmed non-regurgitation vs pasted reference (L1 diff 117.6), pose conditioning sensitivity (L1 diff 16.1), and fresh-process determinism. |
 | Evaluator Restoration | Overnight recovery (`ed1cb3c`) | Restored `evaluate_checkpoint` in `scripts/train_campaign.py` using `src.runner.run` to evaluate full reconstructed clips, transmitted wire ledger sizes, and encode/decode runtimes. |
 | Diagnostic Matrix & Residual Demand | `outputs/development-recovery/diagnostic_matrix.json` | Tested 2x2 Gen x Res lattice. Generative synthesis (`pix2pix`) yielded 42.54 dB PSNR-Y with 78.2 kB residual, requiring +1,647 B higher residual demand than pasted reference (42.69 dB with 76.6 kB residual), confirming the Residual Guarantee. |
+| Bounded Training Campaign Pilot | `outputs/development-recovery/campaign_pilot/campaign_state.json` | Completed 1-epoch pilot comparing `pix2pix` vs `spade4tennis_lite` across 12 probe clips. `pix2pix` strictly dominated across size, quality, and speed: 835 kB vs 984 kB total bytes (-148.6 kB residual demand), 34.55 dB vs 33.71 dB PSNR-Y, and 73.7 s vs 512.2 s client decode time (7.0x faster). `pix2pix` advanced to rung 1; `spade4tennis_lite` was pruned. |
 
 ---
 
