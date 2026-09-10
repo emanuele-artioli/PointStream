@@ -284,8 +284,11 @@ def extract_byte_subledger(sizes: Any) -> Any:
             loaded = sizes.as_dict()
         except Exception:
             loaded = None
-        if isinstance(loaded, dict) and "subledger" in loaded:
-            return loaded["subledger"]
+        if isinstance(loaded, dict):
+            if "metadata_subledger" in loaded:
+                return loaded["metadata_subledger"]
+            if "subledger" in loaded:
+                return loaded["subledger"]
     return None
 
 
