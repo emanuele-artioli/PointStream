@@ -207,6 +207,7 @@ def test_serialized_client_boundary_carries_background_and_foreground() -> None:
     )
     assert isinstance(payload, bytes)
     reconstructed = reconstruct_serialized_client(payload)
+    assert isinstance(reconstructed, np.ndarray)
     assert np.array_equal(reconstructed[0, 1:3, 1:3], crop)
 
 

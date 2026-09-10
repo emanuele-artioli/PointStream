@@ -2,6 +2,17 @@
 
 Preserves the actual encoded bitstream bytes, decoder settings, and allows
 source-free fresh-process client reconstruction and ledger reconciliation.
+
+Fidelity and representation declarations:
+- Quantization: Full-range [-255, 255] to uint8 mapping is not lossless;
+  compaction into 256 discrete levels introduces up to +/-1 grey level of
+  quantization error on uncompressed residuals before video encoding.
+- Chroma loss: Native video codecs (e.g. AVC/HEVC/AV1) compress in yuv420p
+  chroma subsampling by default, causing high-frequency color loss.
+- Gating and downscaling: Block activity gating and background decimation
+  drop high-frequency or background residual energy to conserve bitrate.
+- Determinism: Single-threaded and fixed preset invocation options ensure
+  deterministic client decoding across fresh process instances.
 """
 
 from __future__ import annotations
@@ -75,9 +86,12 @@ def encode_residual_to_bitstream(
         (transmitted_residual, decoded_frames)
     """
     clip = np.ascontiguousarray(np.asarray(frames, dtype=np.uint8))
-    if clip.ndim != 4 or clip.shape[3] != 3:
-        raise ValueError(f"expected (T,H,W,3) uint8, got {tuple(clip.shape)}")
-    orig_shape = tuple(clip.shape)
+    orig_shape: tuple[int, int, int, int] = (
+        int(clip.shape[0]),
+        int(clip.shape[1]),
+        int(clip.shape[2]),
+        int(clip.shape[3]),
+    )
     clip_even = even_size(clip)
     count, height, width, _ = clip_even.shape
     ffmpeg = tools.resolve_ffmpeg()
@@ -222,11 +236,11 @@ def decode_residual_stream(
             "-",
         ]
         try:
-            raw = _run_ffmpeg(raw_cmd, None)
+            raw_bytes = _run_ffmpeg(raw_cmd, None)
         except Exception as e:
             raise ValueError(f"Failed to decode residual bitstream: {e}") from e
 
-    decoded = np.frombuffer(raw, dtype=np.uint8)
+    decoded = np.frombuffer(raw_bytes, dtype=np.uint8)
     expected_even = count * even_h * even_w * 3
     if decoded.size < expected_even:
         # Check if decoded without padding

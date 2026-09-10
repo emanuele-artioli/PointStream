@@ -936,8 +936,15 @@ def make_codec(ctx: StageContext) -> StageCallable:
             fallback_transmitted = TransmittedResidual(
                 bitstream=b"",
                 codec_name="raw",
-                mode=getattr(residual.payload, "mode", "clipped"),
-                shape=tuple(residual.payload.frames.shape) if residual.payload.frames is not None else (0, 0, 0, 0),
+                mode=str(getattr(residual.payload, "mode", "clipped")),
+                shape=(
+                    int(residual.payload.frames.shape[0]),
+                    int(residual.payload.frames.shape[1]),
+                    int(residual.payload.frames.shape[2]),
+                    int(residual.payload.frames.shape[3]),
+                )
+                if residual.payload.frames is not None
+                else (0, 0, 0, 0),
                 scale=float(getattr(residual.payload, "scale", 1.0)),
                 offset=float(getattr(residual.payload, "offset", 128.0)),
                 is_coded=False,
@@ -1184,12 +1191,23 @@ def ledger_from_bag(bag: Mapping[str, Any], source: np.ndarray) -> SizesBytes:
     if isinstance(view, BackgroundModelView):
         geometry_header_bytes = int(view.charged_geometry_header_bytes())
 
+    wire_request = bag.get("wire_request")
+    if (
+        wire_request is not None
+        and not raw
+        and isinstance(wire_request, (bytes, bytearray, memoryview))
+    ):
+        wire_total = len(wire_request)
+        metadata = max(0, wire_total - (residual_bytes + panorama_bytes + actor_bytes))
+    else:
+        metadata = metadata_bytes(bag) + geometry_header_bytes
+
     return sizes_bytes(
         source=int(clip.nbytes),
         residual=residual_bytes,
         panorama=panorama_bytes,
         actor_reference=actor_bytes,
-        metadata=metadata_bytes(bag) + geometry_header_bytes,
+        metadata=metadata,
         raw_parts=tuple(raw),
     )
 
