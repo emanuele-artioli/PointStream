@@ -786,6 +786,7 @@ def make_background(
             wire_geometry_headers=tuple(item.geometry_header for item in client_packets),
             wire_codec=model.client_wire_codec,
             wire_codec_id=artifact.codec_id,
+            sidecar_codec=str(artifact.codec) if artifact.payload else None,
         )
 
     return background_stage

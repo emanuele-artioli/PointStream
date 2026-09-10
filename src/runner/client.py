@@ -196,17 +196,32 @@ def serialize_client_request(
     background_meta: dict[str, Any] | None = None
     if background is not None:
         plate_key = None
-        if background.plate is not None and background.wire_codec is None:
+        coded_packets = tuple(packet for packet in background.wire_payloads if packet)
+        # Coded packets are the wire. Do not also dump the decoded plate: that
+        # is one uncompressed 4K RGB image (~24.9 MB) and is what made the
+        # repaired diagnostic still sit at 25 MB after compact masks. A
+        # deferred residual background also must not ship encoder pixels.
+        if (
+            background.plate is not None
+            and not coded_packets
+            and not background.deferred_to_residual
+        ):
             plate_key = "background_plate"
             arrays[plate_key] = np.asarray(background.plate, dtype=np.uint8)
         wire_payload_keys = []
         wire_header_keys = []
+        headers = background.wire_geometry_headers
         for packet_index, packet in enumerate(background.wire_payloads):
+            if not packet:
+                continue
             payload_key = f"background_payload_{packet_index}"
             header_key = f"background_header_{packet_index}"
-            arrays[payload_key] = np.frombuffer(packet, dtype=np.uint8)
-            arrays[header_key] = np.frombuffer(
-                background.wire_geometry_headers[packet_index], dtype=np.uint8
+            header = headers[packet_index] if packet_index < len(headers) else b""
+            arrays[payload_key] = np.frombuffer(packet, dtype=np.uint8).copy()
+            arrays[header_key] = (
+                np.frombuffer(header, dtype=np.uint8).copy()
+                if header
+                else np.array([], dtype=np.uint8)
             )
             wire_payload_keys.append(payload_key)
             wire_header_keys.append(header_key)
@@ -225,6 +240,7 @@ def serialize_client_request(
             "wire_header_keys": wire_header_keys,
             "wire_codec": background.wire_codec,
             "wire_codec_id": background.wire_codec_id,
+            "sidecar_codec": background.sidecar_codec,
         }
 
     ref_meta: dict[str, Any] = {}
@@ -437,28 +453,37 @@ def reconstruct_serialized_client(
         bg_meta = metadata.get("background")
         background = None
         if bg_meta is not None:
-            plate = None
-            if bg_meta["plate_key"] is not None:
-                plate = np.asarray(arrays[bg_meta["plate_key"]], dtype=np.uint8)
-            wire_codec = bg_meta.get("wire_codec")
-            if wire_codec is not None:
-                from src.components.background.scale import (
-                    TransmittedBackground,
-                    decode_transmitted_stream,
-                )
+            from src.components.background.scale import (
+                TransmittedBackground,
+                decode_transmitted_stream,
+            )
+            from src.components.background.sidecar import build_sidecar
 
-                packets = tuple(
-                    TransmittedBackground(
-                        payload=np.asarray(arrays[payload_key], dtype=np.uint8).tobytes(),
-                        geometry_header=np.asarray(arrays[header_key], dtype=np.uint8).tobytes(),
-                    )
-                    for payload_key, header_key in zip(
-                        bg_meta["wire_payload_keys"],
-                        bg_meta["wire_header_keys"],
-                        strict=True,
-                    )
+            plate = None
+            if bg_meta.get("plate_key") is not None:
+                plate = np.asarray(arrays[bg_meta["plate_key"]], dtype=np.uint8)
+            packets = tuple(
+                TransmittedBackground(
+                    payload=np.asarray(arrays[payload_key], dtype=np.uint8).tobytes(),
+                    geometry_header=np.asarray(arrays[header_key], dtype=np.uint8).tobytes(),
                 )
+                for payload_key, header_key in zip(
+                    bg_meta.get("wire_payload_keys") or (),
+                    bg_meta.get("wire_header_keys") or (),
+                    strict=True,
+                )
+            )
+            packets = tuple(item for item in packets if item.payload)
+            wire_codec = bg_meta.get("wire_codec")
+            sidecar_codec = bg_meta.get("sidecar_codec")
+            if packets and wire_codec is not None:
                 plate = decode_transmitted_stream(str(wire_codec), packets)
+            elif packets:
+                if not sidecar_codec:
+                    raise ValueError(
+                        "background packets present but no sidecar codec on the envelope"
+                    )
+                plate = build_sidecar(str(sidecar_codec)).decode(packets[0].payload)
             background = BackgroundModelView(
                 plate=plate,
                 homographies=tuple(tuple(row) for row in bg_meta["homographies"]),
@@ -474,6 +499,7 @@ def reconstruct_serialized_client(
                 wire_geometry_headers=(),
                 wire_codec=str(wire_codec) if wire_codec is not None else None,
                 wire_codec_id=bg_meta.get("wire_codec_id"),
+                sidecar_codec=str(sidecar_codec) if sidecar_codec else None,
             )
 
         decoded_references: dict[str, np.ndarray] = {}
