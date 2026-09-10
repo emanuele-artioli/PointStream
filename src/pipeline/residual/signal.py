@@ -143,7 +143,7 @@ def compute_residual(
         return ResidualResult(payload=payload, reconstructed=restored, base=recon.copy())
 
     cfg = point.config if point.config is not None else ResidualConfig()
-    mode = representation or getattr(cfg, "representation", "clipped")
+    mode: str = str(representation or getattr(cfg, "representation", "clipped") or "clipped")
     subsample = getattr(cfg, "subsample_chroma", False)
 
     working = signed.astype(np.float32)
@@ -191,6 +191,9 @@ def apply_residual(reconstruction: np.ndarray, payload: Any) -> np.ndarray:
         frames = getattr(payload, "raw_frames", None)
     if frames is None:
         return recon.copy()
+
+    if frames.dtype == np.int16:
+        return apply_signed(recon, frames)
 
     mode = getattr(payload, "mode", "clipped")
     scale = getattr(payload, "scale", 1.0)

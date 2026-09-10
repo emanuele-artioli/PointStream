@@ -60,17 +60,22 @@ def main() -> None:
 
     chunk = result.chunks[0]
     wire_request = chunk.bag.get("wire_request")
-    assert wire_request is not None, "wire_request must be present in chunk bag"
+    assert isinstance(wire_request, bytes), "wire_request must be present in chunk bag as bytes"
 
     transmitted = chunk.bag.get("transmitted_residual")
-    assert transmitted is not None, "transmitted_residual must be present"
+    from src.pipeline.residual.codec import TransmittedResidual
+    assert isinstance(transmitted, TransmittedResidual), "transmitted_residual must be present"
 
     # Fresh standalone client reconstruction from wire bytes
     client_frames = reconstruct_serialized_client(wire_request)
+    assert isinstance(client_frames, np.ndarray), "client_frames must be ndarray"
 
     # Verification checks
     client_delivered_identical = bool(bit_identical(client_frames, result.frames))
-    ledger_reconciled = bool(chunk.sizes.residual == len(transmitted.bitstream))
+    ledger_reconciled = bool(
+        chunk.sizes.transport_total == len(wire_request)
+        and chunk.sizes.residual == len(transmitted.bitstream)
+    )
     psnr_delivered = float(result.delivered_quality.whole_frame())
     psnr_unaided = float(result.quality.whole_frame())
 

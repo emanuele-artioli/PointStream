@@ -26,6 +26,7 @@ from src.contracts.lattice import (
     ART_RESIDUAL_STREAM,
     STAGE_BACKGROUND,
     STAGE_GENERATION,
+    STAGE_RESIDUAL,
     STAGE_SEGMENTATION,
     StageLattice,
 )
@@ -548,7 +549,6 @@ def _finish_chunk(
     if not lattice.is_source_passthrough:
         from src.runner.client import (
             ClientPlacement,
-            reconstruct_independent_client,
             reconstruct_serialized_client,
             serialize_client_request,
         )
@@ -556,8 +556,7 @@ def _finish_chunk(
         appearance_by_id: dict[str, bytes] = {}
         appearance_artifact = bag.get(ART_APPEARANCE_PAYLOAD)
         if (
-            not generation_on
-            and isinstance(appearance_artifact, dict)
+            isinstance(appearance_artifact, dict)
             and appearance_artifact.get("representation") == "compressed-image"
         ):
             appearance_items = appearance_artifact.get("items", ())
@@ -571,10 +570,10 @@ def _finish_chunk(
                 )
             }
 
+        decoded_by_id: dict[str, np.ndarray] = {}
         if appearance_by_id:
             import cv2
 
-            decoded_by_id: dict[str, np.ndarray] = {}
             for object_id, encoded_crop in appearance_by_id.items():
                 decoded_crop = cv2.imdecode(
                     np.frombuffer(encoded_crop, dtype=np.uint8),
@@ -589,26 +588,87 @@ def _finish_chunk(
                 else item
                 for item in client_objects
             )
-        placements = tuple(
-            ClientPlacement(
-                crop=item.supplied_crop if item.supplied_crop is not None else item.appearance,
-                bbox=item.bbox,
-                encoded_crop=appearance_by_id.get(item.object_id),
-                frame_index=item.frame_index,
-                mask=item.mask,
-                object_id=item.object_id,
-            )
-            for item in client_objects
-        )
-        bitstream = bag.get(ART_BITSTREAM)
-        transmitted_residual = None
-        if isinstance(bitstream, Mapping):
-            transmitted_residual = bitstream.get("transmitted_residual")
-        elif isinstance(residual, ResidualResult):
-            transmitted_residual = residual.transmitted
 
-        if transmitted_residual is None and residual_payload is not None:
-            transmitted_residual = residual_payload
+        placements_list = []
+        for item in client_objects:
+            is_gen = bool(generation_on and ref is not None and getattr(item, "supplied_crop", None) is None)
+            crop_to_use = None
+            if not is_gen:
+                crop_to_use = item.supplied_crop if item.supplied_crop is not None else item.appearance
+
+            pose_arr = None
+            motion_arr = None
+            if item.conditioning is not None:
+                if item.conditioning.pose is not None:
+                    pose_arr = np.asarray(item.conditioning.pose, dtype=np.uint8)
+                if item.conditioning.motion_field is not None:
+                    motion_arr = np.asarray(item.conditioning.motion_field, dtype=np.float32)
+
+            placements_list.append(
+                ClientPlacement(
+                    crop=crop_to_use,
+                    bbox=item.bbox,
+                    encoded_crop=appearance_by_id.get(item.object_id),
+                    frame_index=item.frame_index,
+                    mask=item.mask,
+                    object_id=item.object_id,
+                    is_generated=is_gen,
+                    pose=pose_arr,
+                    motion_field=motion_arr,
+                )
+            )
+        placements = tuple(placements_list)
+
+        transmitted_residual = None
+        if lattice.is_enabled(STAGE_RESIDUAL):
+            bitstream = bag.get(ART_BITSTREAM)
+            if isinstance(bitstream, Mapping):
+                transmitted_residual = bitstream.get("transmitted_residual")
+                if transmitted_residual is None and "frames" in bitstream:
+                    from src.pipeline.residual.codec import TransmittedResidual
+
+                    codec_frames = np.asarray(bitstream["frames"], dtype=np.uint8)
+                    base = (
+                        residual.base
+                        if isinstance(residual, ResidualResult) and residual.base is not None
+                        else np.zeros_like(codec_frames)
+                    )
+                    diff = codec_frames.astype(np.int16) - base[: codec_frames.shape[0]].astype(
+                        np.int16
+                    )
+                    transmitted_residual = TransmittedResidual(
+                        bitstream=b"",
+                        codec_name="raw",
+                        shape=(
+                            int(diff.shape[0]),
+                            int(diff.shape[1]),
+                            int(diff.shape[2]),
+                            int(diff.shape[3]),
+                        ),
+                        is_coded=False,
+                        raw_frames=diff,
+                    )
+            elif isinstance(residual, ResidualResult):
+                transmitted_residual = residual.transmitted
+
+            if transmitted_residual is None and residual_payload is not None:
+                transmitted_residual = residual_payload
+
+        gen_meta = None
+        if generation_on and ref is not None:
+            gen_params_dict = {}
+            if params is not None:
+                for k in ("steps", "strength", "guidance_scale", "width", "height"):
+                    val = getattr(params, k, None)
+                    if val is not None:
+                        gen_params_dict[k] = val
+            gen_meta = {
+                "name": str(ref.name),
+                "seed": int(seed),
+                "params": gen_params_dict,
+                "capabilities": list(ref.capabilities),
+                "requires": list(ref.requires),
+            }
 
         wire_request = serialize_client_request(
             background=view,
@@ -617,6 +677,8 @@ def _finish_chunk(
             width=int(source.shape[2]),
             placements=placements,
             residual_payload=transmitted_residual,
+            references=appearance_by_id if appearance_by_id else None,
+            generator_meta=gen_meta,
         )
         bag["wire_request"] = wire_request
         if transmitted_residual is not None:
@@ -630,29 +692,15 @@ def _finish_chunk(
         client_delivered_frames = source.copy()
         client_base_frames = source.copy()
     else:
-        if generation_on and ref is not None:
-            from src.runner.client import reconstruct_independent_client
-
-            client_delivered, client_base = reconstruct_independent_client(
-                background=view,
-                frame_count=int(source.shape[0]),
-                height=int(source.shape[1]),
-                width=int(source.shape[2]),
-                placements=placements,
-                residual_payload=transmitted_residual,
-                resolver=resolver,
-                return_base=True,
-                generator=ref,
-                objects=client_objects,
-                params=params,
-                seed=seed,
-            )
-        else:
-            if wire_request is None:
-                raise RuntimeError("serialized client request was not prepared")
-            client_delivered, client_base = reconstruct_serialized_client(
-                wire_request, resolver=resolver, return_base=True
-            )
+        if wire_request is None:
+            raise RuntimeError("serialized client request was not prepared")
+        client_delivered, client_base = reconstruct_serialized_client(
+            wire_request,
+            resolver=resolver,
+            return_base=True,
+            generator=ref,
+            seed=seed,
+        )
         client_delivered_frames = np.asarray(client_delivered, dtype=np.uint8)
         client_base_frames = np.asarray(client_base, dtype=np.uint8)
     if sync_fn is not None:
@@ -711,8 +759,29 @@ def _finish_chunk(
         object_mask=combined_mask,
     )
 
-    frames = client_delivered_frames
-    encoder_frames = _encoder_frames(bag, client_delivered_frames)
+    if isinstance(residual, ResidualResult):
+        from src.pipeline.residual.signal import apply_residual
+
+        frames = apply_residual(client.frames, residual.payload)
+        encoder_frames = residual.reconstructed
+    else:
+        frames = client.frames
+        encoder_frames = _encoder_frames(bag, client.frames)
+
+    delivered_val = bag.get(ART_DELIVERED)
+    if isinstance(delivered_val, Mapping):
+        delivered_dict = dict(delivered_val)
+        delivered_dict["frames"] = client_delivered_frames
+        bag[ART_DELIVERED] = delivered_dict
+    else:
+        bag[ART_DELIVERED] = {"frames": client_delivered_frames}
+
+    delivered_quality = scorer.evaluate(source, client_delivered_frames, object_mask=combined_mask)
+    if delivered_quality is None:
+        raise ConfigValueError(
+            "runner.metrics",
+            "scorer.evaluate() returned no QualityReport for delivered frames. Every path must score.",
+        )
 
     symmetry = measure_symmetry(encoder_frames, frames)
     if sync_fn is not None:
@@ -725,6 +794,11 @@ def _finish_chunk(
         if wire_bytes != sizes.residual:
             raise ValueError(
                 f"Residual wire byte mismatch: wire has {wire_bytes} bytes but ledger has {sizes.residual} bytes"
+            )
+    if wire_request is not None and not sizes.raw_parts:
+        if len(wire_request) != sizes.transport_total:
+            raise ValueError(
+                f"Wire request byte mismatch: wire has {len(wire_request)} bytes but ledger has {sizes.transport_total} bytes"
             )
 
     chunk = ChunkResult(

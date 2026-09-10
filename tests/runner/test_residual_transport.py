@@ -14,6 +14,7 @@ Covers:
 
 from __future__ import annotations
 
+from typing import Any
 from unittest.mock import MagicMock
 
 import numpy as np
@@ -241,11 +242,12 @@ def test_fresh_process_source_free_decode_and_scored_output_identity() -> None:
     )
     result = run(config, [source])
     wire_bytes = result.chunks[0].bag.get("wire_request")
-    assert wire_bytes is not None
+    assert isinstance(wire_bytes, bytes)
     assert len(wire_bytes) > 0
 
     # Fresh standalone client execution
     client_frames = reconstruct_serialized_client(wire_bytes)
+    assert isinstance(client_frames, np.ndarray)
     assert client_frames.shape == source.shape
     assert bit_identical(client_frames, result.frames)
     assert result.delivered_quality is not None
@@ -276,10 +278,13 @@ def test_all_byte_ledger_reconciliation() -> None:
     chunk = result.chunks[0]
 
     transmitted = chunk.bag.get("transmitted_residual")
-    assert transmitted is not None
+    assert isinstance(transmitted, TransmittedResidual)
     assert transmitted.is_coded is True
     # Byte count in sizes ledger matches transmitted bitstream exact length
     assert chunk.sizes.residual == len(transmitted.bitstream)
+    wire_req = chunk.bag.get("wire_request")
+    assert isinstance(wire_req, bytes)
+    assert chunk.sizes.transport_total == len(wire_req)
 
     # Reject unencoded fallback array when require_compressed=True
     unencoded_transmitted = TransmittedResidual(
@@ -358,7 +363,7 @@ def test_corrupted_truncated_or_incompatible_payload_rejection() -> None:
     invalid_shape = TransmittedResidual(
         bitstream=b"12345678901234567890",
         codec_name="avc",
-        shape=(1, 32),
+        shape=(1, 32),  # type: ignore[arg-type]
         is_coded=True,
     )
     with pytest.raises(ValueError, match="Invalid transmitted residual shape"):
@@ -415,3 +420,192 @@ def test_generation_enabled_predictor_consistency() -> None:
     }
     with pytest.raises(ConfigValueError, match="Source fallback cannot earn a valid quality score"):
         metrics_fn(fallback_bag)
+
+
+# ---------------------------------------------------------------------------
+# 10. Client perturbation propagates to delivered frames and quality
+# ---------------------------------------------------------------------------
+
+
+def test_client_perturbation_propagates_to_delivered_frames_and_quality(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Delivered frames and delivered quality originate strictly from client reconstruction.
+
+    Perturbing client reconstructed frames directly alters RunResult.delivered_frames
+    and degrades delivered quality, proving delivered frames are not server bypasses.
+    """
+    source = _clip(100, frames=2, size=32)
+    config = PointstreamConfig(lattice=lattice_config_from(WHOLE_FRAME_RESIDUAL))
+
+    # Baseline run
+    baseline = run(config, [source])
+    assert baseline.delivered_quality is not None
+    base_psnr = baseline.delivered_quality.whole_frame()
+
+    # Monkeypatch reconstruct_serialized_client in src.runner.client
+    import src.runner.client as client_mod
+
+    original_reconstruct = client_mod.reconstruct_serialized_client
+
+    def perturbed_reconstruct(*args: Any, **kwargs: Any) -> Any:
+        res = original_reconstruct(*args, **kwargs)
+        if kwargs.get("return_base", False):
+            delivered, base = res
+            perturbed_delivered = np.asarray(delivered).copy()
+            perturbed_delivered[:, :10, :10] = 0
+            perturbed_base = np.asarray(base).copy()
+            perturbed_base[:, :10, :10] = 0
+            return perturbed_delivered, perturbed_base
+        else:
+            perturbed = np.asarray(res).copy()
+            perturbed[:, :10, :10] = 0
+            return perturbed
+
+    monkeypatch.setattr(client_mod, "reconstruct_serialized_client", perturbed_reconstruct)
+
+    perturbed_result = run(config, [source])
+    # Verify that RunResult.delivered_frames matches the perturbed client output
+    assert np.all(perturbed_result.delivered_frames[:, :10, :10] == 0)
+    # Verify that delivered quality degraded
+    assert perturbed_result.delivered_quality is not None
+    assert perturbed_result.delivered_quality.whole_frame() < base_psnr
+    # Verify delivered frames differ from server's pre-codec frames and baseline
+    assert not bit_identical(perturbed_result.delivered_frames, perturbed_result.frames)
+    assert not bit_identical(perturbed_result.delivered_frames, baseline.delivered_frames)
+
+
+# ---------------------------------------------------------------------------
+# 11. Mismatched seed and model rejection
+# ---------------------------------------------------------------------------
+
+
+def test_mismatched_seed_and_model_rejection() -> None:
+    """reconstruct_serialized_client rejects mismatched generator seeds and model names."""
+    wire = serialize_client_request(
+        background=None,
+        frame_count=2,
+        height=32,
+        width=32,
+        generator_meta={
+            "name": "model_alpha",
+            "seed": 12345,
+            "params": {},
+            "capabilities": [],
+            "requires": [],
+        },
+    )
+
+    class _DummyGen:
+        def generate(self, conditioning: Any, *, seed: int, device: Any, params: Any) -> np.ndarray:
+            return np.zeros((8, 8, 3), dtype=np.uint8)
+
+    ref_correct = GeneratorRef(backend=_DummyGen(), name="model_alpha")
+    ref_wrong = GeneratorRef(backend=_DummyGen(), name="model_beta")
+
+    # Mismatched model name
+    with pytest.raises(ValueError, match="Mismatched generator"):
+        reconstruct_serialized_client(wire, generator=ref_wrong, seed=12345)
+
+    # Mismatched seed
+    with pytest.raises(ValueError, match="Mismatched generation seed"):
+        reconstruct_serialized_client(wire, generator=ref_correct, seed=99999)
+
+
+# ---------------------------------------------------------------------------
+# 12. Multi-chunk delivered frames and quality coherence
+# ---------------------------------------------------------------------------
+
+
+def test_multi_chunk_delivered_frames_and_quality_coherence() -> None:
+    """Multi-chunk run aggregates client delivered frames and evaluates delivered_quality."""
+    t, h, w = 2, 32, 32
+    s1 = np.full((t, h, w, 3), 100, dtype=np.uint8)
+    s2 = np.full((t, h, w, 3), 150, dtype=np.uint8)
+
+    config = PointstreamConfig(lattice=lattice_config_from(SOURCE_PASSTHROUGH))
+    result = run(config, [s1, s2])
+
+    assert len(result.chunks) == 2
+    assert result.delivered_frames.shape == (2 * t, h, w, 3)
+    assert bit_identical(result.delivered_frames[:t], result.chunks[0].frames)
+    assert bit_identical(result.delivered_frames[t:], result.chunks[1].frames)
+    assert result.delivered_quality is not None
+    assert result.delivered_quality.whole_frame() > 40.0
+
+
+# ---------------------------------------------------------------------------
+# 13. Non-identical predictor detection
+# ---------------------------------------------------------------------------
+
+
+def test_non_identical_predictor_detection() -> None:
+    """Symmetry measurement detects non-identical server and client predictors."""
+
+    class _DivergentGen:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def generate(self, conditioning: Any, *, seed: int, device: Any, params: Any) -> np.ndarray:
+            self.calls += 1
+            # Return different pixels on first (server) vs second (client) call
+            return np.full((8, 8, 3), 50 if self.calls == 1 else 150, dtype=np.uint8)
+
+    ref = GeneratorRef(backend=_DivergentGen(), name="divergent")
+    config = PointstreamConfig(
+        lattice=lattice_config_from(
+            StageLattice.of(STAGE_DETECTION, STAGE_GENERATION, STAGE_RESIDUAL)
+        ),
+        generator=GeneratorConfig(backend="divergent"),
+        residual=ResidualConfig(codec="avc", rate_control=RateControl.LOSSLESS, rate=0),
+    )
+    source = _clip(0, frames=1, size=16)
+    result = run(
+        config,
+        [source],
+        generator=ref,
+        objects=((_object(size=8),),),
+    )
+    chunk = result.chunks[0]
+    # Server generated 50, client generated 150
+    assert not chunk.symmetry.bit_identical
+    assert chunk.symmetry.mean_abs_diff > 0
+
+
+# ---------------------------------------------------------------------------
+# 14. Fresh-process source-free decode with generation and residual
+# ---------------------------------------------------------------------------
+
+
+def test_fresh_process_source_free_decode_with_generation_and_residual() -> None:
+    """Client reconstructs with zero source access using generator and residual on wire."""
+
+    class _ConsistentGen:
+        def generate(self, conditioning: Any, *, seed: int, device: Any, params: Any) -> np.ndarray:
+            return np.full((8, 8, 3), 120, dtype=np.uint8)
+
+    ref = GeneratorRef(backend=_ConsistentGen(), name="consistent_gen")
+    config = PointstreamConfig(
+        lattice=lattice_config_from(
+            StageLattice.of(STAGE_DETECTION, STAGE_GENERATION, STAGE_RESIDUAL)
+        ),
+        generator=GeneratorConfig(backend="consistent_gen"),
+        residual=ResidualConfig(codec="avc", rate_control=RateControl.LOSSLESS, rate=0),
+    )
+    source = _clip(120, frames=1, size=16)
+    result = run(
+        config,
+        [source],
+        generator=ref,
+        objects=((_object(size=8),),),
+    )
+    wire = result.chunks[0].bag.get("wire_request")
+    assert isinstance(wire, bytes)
+
+    # Standalone reconstruction
+    client_frames = reconstruct_serialized_client(
+        wire,
+        generator=ref,
+    )
+    assert isinstance(client_frames, np.ndarray)
+    assert bit_identical(client_frames, result.frames)
