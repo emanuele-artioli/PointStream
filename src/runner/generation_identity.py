@@ -62,12 +62,20 @@ def config_identity_digest(payload: Mapping[str, Any]) -> str:
 
 
 def _checkpoint_file(ref: Any, checkpoint: str | Path | None) -> Path | None:
-    """Weight file on the live ref, if any. Client reconstruct has the object, not the CLI path."""
-    candidates = [checkpoint, getattr(ref, "checkpoint", None)]
-    backend = getattr(ref, "backend", None)
-    if backend is not None:
-        candidates.append(getattr(backend, "checkpoint", None))
-        candidates.append(getattr(backend, "loaded_checkpoint", None))
+    """Weight file on the live ref, walking nested ``.backend`` wrappers.
+
+    Encoder identity gets an explicit CLI path. Client reconstruct gets the same
+    object after ``as_runner_ref`` and the diagnostic call-counter wrap, neither
+    of which copies ``checkpoint`` onto the outer object.
+    """
+    candidates: list[Any] = [checkpoint]
+    seen: set[int] = set()
+    node: Any = ref
+    while node is not None and id(node) not in seen:
+        seen.add(id(node))
+        candidates.append(getattr(node, "checkpoint", None))
+        candidates.append(getattr(node, "loaded_checkpoint", None))
+        node = getattr(node, "backend", None)
     for item in candidates:
         if item is None or item == "":
             continue
