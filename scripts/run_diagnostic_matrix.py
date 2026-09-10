@@ -57,10 +57,10 @@ def run_diagnostic_corner(
     generator_checkpoint: Path | None = None,
     residual_qp: int = 38,
 ) -> dict[str, Any]:
-    print(f"\n=======================================================")
+    print("\n=======================================================")
     print(f"Running Diagnostic Corner: {corner_name}")
     print(f"Generation: {'ON (' + generator_arch + ')' if gen_on else 'OFF (Pasted-Reference)'} | Residual: {'ON (QP ' + str(residual_qp) + ')' if res_on else 'OFF'}")
-    print(f"=======================================================")
+    print("=======================================================")
 
     stages = [
         STAGE_BACKGROUND,
@@ -82,7 +82,8 @@ def run_diagnostic_corner(
 
     lattice = StageLattice.of(*stages)
 
-    from src.runner.routing import lattice_config_from; cfg = replace(base_config, lattice=lattice_config_from(lattice))
+    from src.runner.routing import lattice_config_from
+    cfg = replace(base_config, lattice=lattice_config_from(lattice))
 
     generator_ref = None
     if gen_on:
@@ -187,10 +188,16 @@ def run_diagnostic_corner(
         "delivered_shape": list(delivered.shape),
     }
 
+    timing_dict = report.get("timing")
+    client_sec = timing_dict.get("client_seconds") if isinstance(timing_dict, dict) else None
+
     print(f"Results for {corner_name}:")
     print(f"  Total Bytes: {report['coded_bytes']:,} B | Residual: {parts['residual']:,} B | Background: {parts['panorama']:,} B | Appearance: {parts['actor_reference']:,} B")
     print(f"  PSNR-Y: {scores['psnr_y']:.2f} dB | SSIM: {scores['ssim']:.4f} | VMAF: {scores['vmaf']:.2f}")
-    print(f"  Wall Time: {wall_seconds:.1f}s (Client Dec: {report['timing']['client_seconds']:.2f}s)")
+    if isinstance(client_sec, (int, float)):
+        print(f"  Wall Time: {wall_seconds:.1f}s (Client Dec: {client_sec:.2f}s)")
+    else:
+        print(f"  Wall Time: {wall_seconds:.1f}s")
     return report
 
 
@@ -202,6 +209,7 @@ def main() -> None:
     parser.add_argument("--generator", default="pix2pix", help="Generator arch for Gen-ON corners")
     parser.add_argument("--residual-qp", type=int, default=32, help="Residual QP for Res-ON corners")
     parser.add_argument("--output", type=Path, default=Path("/tmp/diagnostic_matrix_report.json"), help="Output JSON path")
+    parser.add_argument("--reuse-results", type=Path, default=None, help="Path to immutable results JSON to reuse matching corners from")
     args = parser.parse_args()
 
     # Load nearest valid interval (48 frames minimum in manifest)
@@ -235,35 +243,30 @@ def main() -> None:
         ("gen_on_res_on", True, True),
     ]
 
-    existing_by_corner = {
-        'gen_off_res_off': {
-            'corner': 'gen_off_res_off',
-            'generation_on': False,
-            'residual_on': False,
-            'generator_arch': 'none (pasted_reference_control)',
-            'residual_qp': None,
-            'coded_bytes': 481552,
-            'parts': {'residual': 0, 'panorama': 455607, 'actor_reference': 22542, 'metadata': 3403},
-            'scores': {'psnr_y': 34.53, 'ssim': 0.9851, 'vmaf': 90.76},
-            'timing': {'wall_seconds': 104.9, 'client_seconds': 1.20},
-        },
-        'gen_off_res_on': {
-            'corner': 'gen_off_res_on',
-            'generation_on': False,
-            'residual_on': True,
-            'generator_arch': 'none (pasted_reference_control)',
-            'residual_qp': args.residual_qp,
-            'coded_bytes': 558153,
-            'parts': {'residual': 76601, 'panorama': 455607, 'actor_reference': 22542, 'metadata': 3403},
-            'scores': {'psnr_y': 42.69, 'ssim': 0.9871, 'vmaf': 93.35},
-            'timing': {'wall_seconds': 129.9, 'client_seconds': 2.53},
-        }
-    }
+    reusable_by_corner: dict[str, dict[str, Any]] = {}
+    if args.reuse_results and args.reuse_results.is_file():
+        try:
+            prior_data = json.loads(args.reuse_results.read_text())
+            # Reuse only if complete configuration identity matches
+            if (
+                prior_data.get("video") == args.video
+                and prior_data.get("scene") == args.scene
+                and prior_data.get("frames") == args.frames
+                and prior_data.get("generator_tested") == args.generator
+                and prior_data.get("residual_qp") == args.residual_qp
+            ):
+                for corner_item in prior_data.get("matrix", []):
+                    c_name = corner_item.get("corner")
+                    if c_name:
+                        reusable_by_corner[c_name] = corner_item
+        except Exception:
+            pass
+
     results: list[dict[str, Any]] = []
     for name, g_on, r_on in corners:
-        if name in existing_by_corner:
-            print(f'Reusing verified result for {name}')
-            results.append(existing_by_corner[name])
+        if name in reusable_by_corner:
+            print(f"Reusing verified configuration-matched result for {name}")
+            results.append(reusable_by_corner[name])
             continue
         rep = run_diagnostic_corner(
             name,
@@ -282,6 +285,8 @@ def main() -> None:
         "scene": args.scene,
         "frames": args.frames,
         "generator_tested": args.generator,
+        "residual_qp": args.residual_qp,
+        "note": "Fixed residual QP is not matched final fidelity.",
         "timestamp_unix": time.time(),
         "matrix": results,
     }

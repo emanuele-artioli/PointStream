@@ -13,8 +13,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import os
-import sqlite3
+import sqlite3  # noqa: F401
 import sys
 import time
 from pathlib import Path
@@ -52,15 +51,17 @@ def load_real_conditioning(
     source_frames = []
     for i in range(num_frames):
         fid = f"frame_{i:06d}.png"
-        p_bgr = cv2.imread(str(skel_dir / fid))
+        p_path = skel_dir / fid
+        p_bgr = cv2.imread(str(p_path))
         if p_bgr is None:
-            p_bgr = np.zeros_like(ref_bgr)
+            raise FileNotFoundError(f"Could not read pose frame from {p_path}")
         pose_rgb = cv2.cvtColor(p_bgr, cv2.COLOR_BGR2RGB)
         pose_frames.append(pose_rgb)
 
-        s_bgr = cv2.imread(str(track_dir / fid))
+        s_path = track_dir / fid
+        s_bgr = cv2.imread(str(s_path))
         if s_bgr is None:
-            s_bgr = ref_bgr.copy()
+            raise FileNotFoundError(f"Could not read source frame from {s_path}")
         s_rgb = cv2.cvtColor(s_bgr, cv2.COLOR_BGR2RGB)
         source_frames.append(s_rgb)
 
@@ -99,6 +100,7 @@ def run_generator_inference(
     checkpoint: str | None = None,
 ) -> list[np.ndarray]:
     params = GenerationParams(width=width, height=height, steps=steps)
+    gen: Any
 
     if arch in ("animate-anyone", "animate_anyone"):
         from src.components.generation.animate_anyone import AnimateAnyoneGenerator
