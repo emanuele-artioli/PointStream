@@ -23,6 +23,7 @@ from typing import Any
 
 import numpy as np
 
+from experiments.jobs.monitor import publish_progress
 from experiments.tier.calibrate import run_full_metric_calibration
 from experiments.tier.gate_a_tools import write_tool_identity
 from experiments.tier.low_rate_clips import load_e1_sequence
@@ -32,6 +33,7 @@ from experiments.tier.protocol import (
 )
 from experiments.tier.resolution_adaptive import (
     HIGH_FIDELITY_RESIDUAL_RUNGS,
+    OVERLAP_RESIDUAL_RUNGS,
     build_nondominated_envelope,
     compare_curves_no_extrapolation,
     configure_high_fidelity_residual_rung,
@@ -73,7 +75,7 @@ def run_development_pilot(
     manifest_path: Path = DEFAULT_DEV_MANIFEST,
     n_frames: int = 48,
     scales: tuple[float, ...] = (1.0, 0.5, 0.25),
-    ladder_type: str = "frozen",  # "frozen" or "residual_high_fidelity"
+    ladder_type: str = "frozen",  # "frozen", "residual_high_fidelity", or "residual_overlap"
     dry_run: bool = False,
 ) -> dict[str, Any]:
     """Execute bounded development pilot with full identity and anchor coverage."""
@@ -151,6 +153,11 @@ def run_development_pilot(
                     )
                     scale_list.append(pt)
                     codec_points.append(pt)
+                    publish_progress(
+                        f"{sid}_{codec}_{scale_key}_qp{qp}",
+                        len(codec_points),
+                        decision="none",
+                    )
                 curves_by_scale[scale_key] = scale_list
 
             envelope = build_nondominated_envelope(codec_points)
@@ -188,9 +195,18 @@ def run_development_pilot(
                     all_alarms.extend(alarms)
                 ps_rows.append(row)
 
-        elif ladder_type == "residual_high_fidelity":
+        elif ladder_type in {"residual_high_fidelity", "residual_overlap"}:
             from experiments.tier.low_rate_sweep import pointstream_e1
-            for res_rung in HIGH_FIDELITY_RESIDUAL_RUNGS:
+
+            residual_rungs = (
+                OVERLAP_RESIDUAL_RUNGS
+                if ladder_type == "residual_overlap"
+                else HIGH_FIDELITY_RESIDUAL_RUNGS
+            )
+            for res_rung in residual_rungs:
+                print(
+                    f"  PointStream {res_rung.rung_id} residual_qp={res_rung.residual_qp}"
+                )
                 cfg = configure_high_fidelity_residual_rung(base, res_rung)
                 payload = pointstream_e1(seq_clips, cfg)
                 row = {
@@ -209,6 +225,7 @@ def run_development_pilot(
                     "late_frame": payload.get("late_frame"),
                 }
                 ps_rows.append(row)
+                publish_progress(f"{sid}_{res_rung.rung_id}", len(ps_rows), decision="none")
 
         # 2c. Comparisons against native and resolution-adaptive envelope
         comparisons: dict[str, Any] = {}
@@ -282,7 +299,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--ladder",
-        choices=["frozen", "residual_high_fidelity"],
+        choices=["frozen", "residual_high_fidelity", "residual_overlap"],
         default="frozen",
         help="Rate ladder type to evaluate",
     )
