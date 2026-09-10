@@ -12,7 +12,7 @@ import numpy as np
 import pytest
 
 from src.contracts.lattice import ART_APPEARANCE_PAYLOAD
-from src.runner.accounting import SizesBytes, sizes_bytes
+from src.runner.accounting import MetadataSubledger, SizesBytes, sizes_bytes
 from src.runner.stages import _actor_bytes_exact, _encoded_cost
 
 
@@ -62,6 +62,36 @@ def test_duplicate_raw_parts_are_recorded_once() -> None:
         source=10, raw_parts=("residual",)
     )
     assert total.raw_parts == ("residual",)
+
+
+def test_as_dict_exposes_metadata_subledger() -> None:
+    sub = MetadataSubledger(mask_payload=40, envelope_overhead=10)
+    ledger = sizes_bytes(source=100, metadata=50, subledger=sub)
+    out = ledger.as_dict()
+    assert out["metadata_subledger"]["mask_payload"] == 40
+    assert out["metadata_subledger"]["envelope_overhead"] == 10
+    assert sum(out["metadata_subledger"].values()) == ledger.metadata
+
+
+def test_summing_chunks_carries_the_metadata_subledger() -> None:
+    left = sizes_bytes(
+        source=10,
+        residual=1,
+        metadata=5,
+        subledger=MetadataSubledger(mask_payload=3, envelope_overhead=2),
+    )
+    right = sizes_bytes(
+        source=10,
+        residual=1,
+        metadata=7,
+        subledger=MetadataSubledger(pose_motion=4, placement_headers=3),
+    )
+    total = left + right
+    assert total.subledger.mask_payload == 3
+    assert total.subledger.pose_motion == 4
+    assert total.subledger.placement_headers == 3
+    assert total.subledger.envelope_overhead == 2
+    assert total.subledger.total == total.metadata
 
 
 # ---------------------------------------------------------------------------

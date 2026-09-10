@@ -10,7 +10,7 @@ the names the existing invariant check already reads: ``metadata``,
 from __future__ import annotations
 
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from src.contracts.objectstream import WireCost
@@ -20,6 +20,51 @@ from src.contracts.objectstream import WireCost
 SIZE_SUM_TOLERANCE = 0.02
 
 PARTS = ("metadata", "actor_reference", "residual", "panorama")
+
+
+@dataclass(frozen=True)
+class MetadataSubledger:
+    """Named breakdown of the envelope remainder that used to be opaque ``metadata``.
+
+    Residual, panorama, and actor-reference payloads are charged on those
+    fields of ``SizesBytes`` and must not appear here. ``total`` is the sum of
+    these parts and equals ``SizesBytes.metadata`` when the subledger is
+    attached from a serialized request.
+    """
+
+    mask_payload: int = 0
+    pose_motion: int = 0
+    placement_headers: int = 0
+    generator_metadata: int = 0
+    envelope_overhead: int = 0
+
+    @property
+    def total(self) -> int:
+        return (
+            self.mask_payload
+            + self.pose_motion
+            + self.placement_headers
+            + self.generator_metadata
+            + self.envelope_overhead
+        )
+
+    def as_dict(self) -> dict[str, int]:
+        return {
+            "mask_payload": self.mask_payload,
+            "pose_motion": self.pose_motion,
+            "placement_headers": self.placement_headers,
+            "generator_metadata": self.generator_metadata,
+            "envelope_overhead": self.envelope_overhead,
+        }
+
+    def __add__(self, other: MetadataSubledger) -> MetadataSubledger:
+        return MetadataSubledger(
+            mask_payload=self.mask_payload + other.mask_payload,
+            pose_motion=self.pose_motion + other.pose_motion,
+            placement_headers=self.placement_headers + other.placement_headers,
+            generator_metadata=self.generator_metadata + other.generator_metadata,
+            envelope_overhead=self.envelope_overhead + other.envelope_overhead,
+        )
 
 
 @dataclass(frozen=True)
@@ -52,6 +97,7 @@ class SizesBytes:
     # source produces a number that looks like a compression ratio and is not
     # (`plans/done/RESEARCH-HISTORY.md` §3, BP24). Empty means every part was really coded.
     raw_parts: tuple[str, ...] = ()
+    subledger: MetadataSubledger = field(default_factory=MetadataSubledger)
 
     @property
     def is_rate(self) -> bool:
@@ -78,6 +124,7 @@ class SizesBytes:
             "transport_total": self.transport_total,
             "transport_to_source_ratio": ratio,
             "is_rate": self.is_rate,
+            "metadata_subledger": self.subledger.as_dict(),
         }
         if self.raw_parts:
             out["raw_parts"] = list(self.raw_parts)
@@ -110,6 +157,7 @@ class SizesBytes:
             # A raw part anywhere makes the sum raw. Dropping it here would
             # launder an uncoded chunk into a total that claims to be a rate.
             raw_parts=tuple(dict.fromkeys(self.raw_parts + other.raw_parts)),
+            subledger=self.subledger + other.subledger,
         )
 
 
@@ -128,6 +176,7 @@ def sizes_bytes(
     actor_reference: int = 0,
     metadata: int = 0,
     raw_parts: Sequence[str] = (),
+    subledger: MetadataSubledger | None = None,
 ) -> SizesBytes:
     """Build one ledger. ``transport_total`` is the sum of transmitted parts.
 
@@ -152,4 +201,5 @@ def sizes_bytes(
         metadata=metadata,
         transport_total=transport_total,
         raw_parts=tuple(dict.fromkeys(raw_parts)),
+        subledger=subledger if subledger is not None else MetadataSubledger(),
     )
