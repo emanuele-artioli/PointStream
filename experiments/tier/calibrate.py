@@ -65,6 +65,7 @@ def anchors(reference: np.ndarray) -> dict[str, np.ndarray]:
 def calibrate(metrics: list[str], reference: np.ndarray) -> dict[str, Any]:
     """Score every anchor with `metrics`, and say whether the ordering held."""
     from src.runner.evaluation import ComponentMetricEvaluator
+    from src.contracts.metrics import metric as metric_spec
 
     evaluator = ComponentMetricEvaluator(metrics)
     table: dict[str, dict[str, float | str]] = {}
@@ -80,19 +81,31 @@ def calibrate(metrics: list[str], reference: np.ndarray) -> dict[str, Any]:
     order = [name for name in ("identical", "mild-blur", "severe-blur", "unrelated-clip") if name in table]
     verdicts: dict[str, Any] = {}
     for metric in evaluator.metric_names:
+        spec = metric_spec(metric)
+        higher_is_better = spec.higher_is_better
         values = [table[name][metric] for name in order]
-        numeric = [float("inf") if value == "inf" else float(value) for value in values]
         # Direction is a property of the metric contract, not a set of names
         # this file has to remember. Inferring it from the scores is how a
         # metric gets declared correct by the data it is supposed to judge.
-        from src.contracts.metrics import metric as metric_spec
+        val_id = float("inf") if table["identical"][metric] == "inf" else float(table["identical"][metric])
+        val_mild = float("inf") if table["mild-blur"][metric] == "inf" else float(table["mild-blur"][metric])
+        val_sev = float("inf") if table["severe-blur"][metric] == "inf" else float(table["severe-blur"][metric])
+        val_unr = (float("inf") if table["unrelated-clip"][metric] == "inf" else float(table["unrelated-clip"][metric])) if "unrelated-clip" in table else None
 
-        higher_is_better = metric_spec(metric).higher_is_better
-        expected = list(reversed(sorted(numeric))) if higher_is_better else sorted(numeric)
+        if higher_is_better:
+            dist_ok = (val_id >= val_mild >= val_sev)
+            unr_ok = (val_unr is None) or (val_id > val_unr and val_mild > val_unr)
+        else:
+            dist_ok = (val_id <= val_mild <= val_sev)
+            unr_ok = (val_unr is None) or (val_id < val_unr and val_mild < val_unr)
+
+        ordering_held = dist_ok and unr_ok
         verdicts[metric] = {
             "by_anchor": dict(zip(order, values, strict=True)),
             "direction": "higher-is-better" if higher_is_better else "lower-is-better",
-            "ordering_held": numeric == expected,
+            "ordering_held": ordering_held,
+            "distortion_ordering_held": dist_ok,
+            "unrelated_ordering_held": unr_ok,
         }
     return {
         "anchor_frames": int(reference.shape[0]),
@@ -188,9 +201,10 @@ def run_full_metric_calibration(
             for item in report.scoped
         }
 
-    # Check ordering across blur anchors
-    blur_order = ("identical", "mild-blur", "severe-blur", "unrelated-clip")
-    noise_order = ("identical", "mild-noise", "severe-noise", "unrelated-clip")
+    # Check partial ordering across blur and noise anchors:
+    # Check identity > mild > severe and mild > unrelated separately;
+    # do NOT force unrelated below every severe distortion (unrelated natural images can
+    # legitimately have higher structural SSIM than heavy gaussian noise; the ordering is partial).
     verdicts: dict[str, Any] = {}
     alarms: list[str] = []
 
@@ -198,32 +212,61 @@ def run_full_metric_calibration(
         spec = metric_spec(metric)
         higher_is_better = spec.higher_is_better
 
-        blur_vals = [float("inf") if scores[name][metric] == "inf" else float(scores[name][metric]) for name in blur_order]
-        noise_vals = [float("inf") if scores[name][metric] == "inf" else float(scores[name][metric]) for name in noise_order]
+        id_val = float("inf") if scores["identical"][metric] == "inf" else float(scores["identical"][metric])
+        mild_blur_val = float("inf") if scores["mild-blur"][metric] == "inf" else float(scores["mild-blur"][metric])
+        sev_blur_val = float("inf") if scores["severe-blur"][metric] == "inf" else float(scores["severe-blur"][metric])
+        mild_noise_val = float("inf") if scores["mild-noise"][metric] == "inf" else float(scores["mild-noise"][metric])
+        sev_noise_val = float("inf") if scores["severe-noise"][metric] == "inf" else float(scores["severe-noise"][metric])
+        unr_val = float("inf") if scores["unrelated-clip"][metric] == "inf" else float(scores["unrelated-clip"][metric])
 
-        expected_blur = list(reversed(sorted(blur_vals))) if higher_is_better else sorted(blur_vals)
-        expected_noise = list(reversed(sorted(noise_vals))) if higher_is_better else sorted(noise_vals)
+        # Partial ordering:
+        # 1. Distortion degradation: identical >= mild >= severe
+        # 2. Unrelated discrimination: identical > unrelated and mild > unrelated
+        if higher_is_better:
+            blur_dist_ok = (id_val >= mild_blur_val >= sev_blur_val)
+            blur_unr_ok = (id_val > unr_val and mild_blur_val > unr_val)
+            noise_dist_ok = (id_val >= mild_noise_val >= sev_noise_val)
+            noise_unr_ok = (id_val > unr_val and mild_noise_val > unr_val)
+        else:
+            blur_dist_ok = (id_val <= mild_blur_val <= sev_blur_val)
+            blur_unr_ok = (id_val < unr_val and mild_blur_val < unr_val)
+            noise_dist_ok = (id_val <= mild_noise_val <= sev_noise_val)
+            noise_unr_ok = (id_val < unr_val and mild_noise_val < unr_val)
 
-        blur_ok = blur_vals == expected_blur
-        noise_ok = noise_vals == expected_noise
+        blur_ok = blur_dist_ok and blur_unr_ok
+        noise_ok = noise_dist_ok and noise_unr_ok
 
-        if not blur_ok:
-            alarms.append(f"{metric}: blur ordering violated {blur_vals} != {expected_blur}")
-        if not noise_ok:
-            alarms.append(f"{metric}: noise ordering violated {noise_vals} != {expected_noise}")
+        if not blur_dist_ok:
+            alarms.append(f"{metric}: blur distortion ordering violated (identical={id_val}, mild={mild_blur_val}, severe={sev_blur_val})")
+        if not blur_unr_ok:
+            alarms.append(f"{metric}: mild blur failed to discriminate unrelated clip (mild={mild_blur_val}, unrelated={unr_val})")
+        if not noise_dist_ok:
+            alarms.append(f"{metric}: noise distortion ordering violated (identical={id_val}, mild={mild_noise_val}, severe={sev_noise_val})")
+        if not noise_unr_ok:
+            alarms.append(f"{metric}: mild noise failed to discriminate unrelated clip (mild={mild_noise_val}, unrelated={unr_val})")
 
         # Absolute value checks
-        id_val = scores["identical"][metric]
-        unr_val = scores["unrelated-clip"][metric]
         if metric == "vmaf":
-            if isinstance(id_val, (int, float)) and (id_val < 95.0 or id_val > 100.0):
+            if id_val < 95.0 or id_val > 100.0:
                 alarms.append(f"VMAF identical score {id_val} outside [95.0, 100.0]")
-            if isinstance(unr_val, (int, float)) and (unr_val > 40.0):
+            if unr_val > 40.0:
                 alarms.append(f"VMAF unrelated score {unr_val} > 40.0")
+        elif metric == "psnr":
+            if id_val != float("inf") and id_val < 80.0:
+                alarms.append(f"PSNR identical score {id_val} < 80.0 dB")
+            if unr_val > 35.0:
+                alarms.append(f"PSNR unrelated score {unr_val} > 35.0 dB (natural clip ceiling)")
+        elif metric == "ssim":
+            if id_val < 0.999:
+                alarms.append(f"SSIM identical score {id_val} < 0.999")
+            if unr_val > 0.60:
+                alarms.append(f"SSIM unrelated score {unr_val} > 0.60")
 
         verdicts[metric] = {
             "blur_ordering_held": blur_ok,
             "noise_ordering_held": noise_ok,
+            "distortion_ordering_held": blur_dist_ok and noise_dist_ok,
+            "unrelated_ordering_held": blur_unr_ok and noise_unr_ok,
             "by_anchor": {name: scores[name][metric] for name in anchor_table},
             "null_controls": {name: scores[name][metric] for name in null_table},
         }

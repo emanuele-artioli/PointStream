@@ -29,7 +29,10 @@ from src.contracts.capabilities import (
     motion,
 )
 from src.contracts.registry import BackendSpec, Registry
-from src.components.generation.base import RunnerGeneratorAdapter, as_runner_ref
+from src.components.generation.base import (
+    RunnerGeneratorAdapter as RunnerGeneratorAdapter,
+    as_runner_ref as as_runner_ref,
+)
 
 REGISTRY: Registry[object] = Registry("generator")
 
@@ -227,3 +230,12 @@ def validate(config: Any) -> None:
             "motion": MOTION,
         },
     )
+
+
+__all__ = [
+    "REGISTRY",
+    "RunnerGeneratorAdapter",
+    "as_runner_ref",
+    "validate",
+]
+

@@ -190,11 +190,11 @@ def run_development_pilot(
 
         elif ladder_type == "residual_high_fidelity":
             from experiments.tier.low_rate_sweep import pointstream_e1
-            for rung in HIGH_FIDELITY_RESIDUAL_RUNGS:
-                cfg = configure_high_fidelity_residual_rung(base, rung)
+            for res_rung in HIGH_FIDELITY_RESIDUAL_RUNGS:
+                cfg = configure_high_fidelity_residual_rung(base, res_rung)
                 payload = pointstream_e1(seq_clips, cfg)
                 row = {
-                    "name": rung.rung_id,
+                    "name": res_rung.rung_id,
                     "bytes": payload["coded_bytes"],
                     "scores": payload["scores"],
                     "parts": payload["parts"],
