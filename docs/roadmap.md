@@ -25,7 +25,7 @@ graph TD
   3. Size, quality, and runtime measured and reported together; no speed omissions.
 - **Current Status**: PR #83/#84 pass interpretation superseded on 2026-09-09. The stored VVC comparison is unfavorable overall; the AV1 curves have no quality overlap and fail floor dominance. C2/C3 warrant a narrower development sweep, not a declared win. See the [evaluation audit](areas/evaluation.md).
 
-Execution brief: [overnight recovery prompt](workflow/session/overnight-recovery.md). Full benchmark tables: [docs/areas/evaluation.md](areas/evaluation.md#gate-a-192-frame-benchmark-results-run-2--pr-83).
+Execution brief: [Antigravity repair and submission search](workflow/session/submission-search.md). Full benchmark tables: [docs/areas/evaluation.md](areas/evaluation.md#gate-a-192-frame-benchmark-results-run-2--pr-83).
 
 ### Gate B: Held-Out Confirmation (Incomplete; pass retracted)
 - **Dependency**: Gate A passed.
