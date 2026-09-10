@@ -136,6 +136,15 @@ def main() -> int:
     parser.add_argument("--json-out", type=str, default=None)
     args = parser.parse_args()
 
+    # A reversed one-frame sequence is identical to the original sequence, so
+    # it cannot exercise the conditioning-sensitivity control below.  The two
+    # U-Net backends also have eight stride-2 downsampling blocks and require
+    # at least a 256-pixel side.
+    if args.num_frames < 2:
+        parser.error("--num-frames must be at least 2 for the shuffled-conditioning control")
+    if args.arch in {"pix2pix", "spade4tennis"} and (args.width < 256 or args.height < 256):
+        parser.error(f"{args.arch} requires --width and --height of at least 256")
+
     device = args.device or ("cuda:0" if torch.cuda.is_available() else "cpu")
     dataset_root = paths.assets() / "dataset"
     print(f"--- Generator Inference Smoke Test: {args.arch} on {device} ---")

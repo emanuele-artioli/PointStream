@@ -25,7 +25,7 @@ Focused PR #88 residual, campaign and protocol tests passed locally (47 tests); 
 
 ### Repair update — 2026-09-10
 
-The recovery branch has now repaired the listed code paths and passed the complete test suite, lint, mypy, layer-direction check, dry-run preflight and native residual smoke test. Public delivered frames/quality are now client-originated; generation conditioning/reference data travel through the serialized envelope; the envelope, not only the residual stream, is reconciled to the ledger; probe-frame resolution fails closed; diagnostic controls execute from their declared configuration; protocol identity and independent-match grouping are required. These are implementation checks, **not new rate–distortion evidence**. Re-run development curves with the repaired instrumentation before updating any archived diagnostic interpretation or Gate A/B status.
+PR #88 merged as `2b7c2b0` after its complete test suite, coverage gate, lint and type checks passed. It repaired the listed code paths: public delivered frames/quality are client-originated; generation conditioning/reference data travel through the serialized envelope; the envelope, not only the residual stream, is reconciled to the ledger; probe-frame resolution fails closed; diagnostic controls execute from their declared configuration; protocol identity and independent-match grouping are required. These are implementation checks, **not new rate–distortion evidence**. Re-run development curves with the repaired instrumentation before updating any archived diagnostic interpretation or Gate A/B status. The 2026-09-10 recovery host exposed no CUDA device, so it could not launch the required generation/residual matrix or training search.
 
 ## 1. Current State
 
