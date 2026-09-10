@@ -46,3 +46,5 @@ The manuscript is maintained in a dedicated git repository at `67a9ea6275d3d9785
 | `PAPER-ACT-04` | Blocked | Gate A passed | Gate A | **Result figures integration**: Render validated rate–distortion curves and amortization plots after rechecking available space. Acceptance: Vector figures embedded with exact run provenance cited in comments. |
 
 Gate A/B audit: `sections/evaluation.tex` now explicitly retains AV1/VVC, distinguishes native and planned resolution-adaptive comparisons, and states that the pilot pass claims do not establish competitive confirmation. No result HOLE was cleared. Next: `EVAL-ACT-06` integrity repair, then `EVAL-ACT-07` matched-rate/quality development search; integrate final results only after a valid frozen confirmation.
+
+PR #88 audit (2026-09-10): no new result is ready for manuscript promotion. Its matrix controls and model ranking require reruns, and its codec comparisons remain uncertified. Keep existing result HOLEs; use the [submission dispatch](../workflow/session/submission-search.md) to obtain source-free, fully accounted and independently confirmed evidence before new quantitative claims.

@@ -5,6 +5,24 @@
 
 ---
 
+## PR #88 audit — 2026-09-10
+
+Reviewed open head `d1d24b7`; main was `6b04eae` (PR #89). PR #88 adds useful full-range residual and actual-stream plumbing, adaptive anchors and training interfaces, but is **not ready to merge or support model-selection claims**. Its CI run `34428171118` passes tests and fails lint/type checks. Use [the next Antigravity dispatch](../workflow/session/submission-search.md), which includes repair acceptance tests and a staged full-codec search.
+
+The stored `outputs/development-recovery/pilot-frozen/report.json` uses two 48-frame 4K development scenes, frozen C0–C3, generation/residual/pose OFF, VVC background and WebP appearance; anchor presets are SVT-AV1 8 and VVC medium. Arithmetic reproduction agrees with its **PointStream rate premiums**: adaptive AV1 +7.844% on Alcaraz only; native VVC +22.326% / +39.436%; adaptive VVC +46.530% / +79.764%. These are archived diagnostics, **not validated codec advantages/disadvantages for citation**. AV1's second adaptive comparison is unscorable at 48.1% quality-span overlap under the pre-existing 50% rule. Native AV1 is unscorable on both. A positive candidate premium is not the same percentage as the anchor's saving; the denominators differ. Different intervals also prevent comparing these percentages as one common operating point.
+
+Arithmetic controls reproduced 0% for identical curves and +10% for known 1.1x candidate rates. This checks integration/sign, not input validity. The saved report has `pilot_alarms_clear=false`, `identity_verified=false`, `evidence_verified=false`; exclude it from clean result tables. Its SSIM alarm comes from requiring unrelated content to be worse than severe noise, an unjustified total ordering. Repair that calibration rule and revalidate the instrument; do not simply waive the alarm.
+
+Blocking integration findings:
+
+- `RunResult.delivered_frames` still reads encoder `ART_DELIVERED`; `delivered_quality` is inherited from `ART_QUALITY`, and multichunk scoring also reads encoder artifacts. The new independently decoded frames are stored elsewhere. A controlled zero-output client audit changed `result.frames` but not public `delivered_frames`. Experiment drivers still score that public encoder output.
+- Generation-enabled runner decoding bypasses serialization and passes in-memory background, objects, generator and conditioning to the client. This is not proof of source-free wire decoding; serialize and charge the actual conditioning/reference data and verify both predictors.
+- The ledger only checks residual bitstream length, not the complete envelope. A tiny deterministic non-generative audit produced 1,219 serialized bytes against a ledger of 631, with `raw_parts=()`. It demonstrates missing reconciliation, not a real-video overhead estimate.
+- `scripts/run_diagnostic_matrix.py` unconditionally reuses two hardcoded no-generation controls for arbitrary scene/frame/rate arguments. Its matrix and the +1,647-byte residual-demand interpretation cannot establish a paired causal finding.
+- Protocol identity checks are conditional on an expected identity being supplied; source counting falls back to scene IDs. Complete per-run/per-rung provenance and independent match identity remain required. The report's fingerprint is captured from the base tier, before candidate rung replacement.
+
+Focused PR #88 residual, campaign and protocol tests passed locally (47 tests); they did not catch the controlled failures above. No new codec run or model training was launched by this audit. Preserve all original outputs; supersede their interpretations rather than rewriting reports. Generator-specific validity and next actions live in [generation](generation.md).
+
 ## 1. Current State
 
 ### Bounded codec pilot controller (PR #82)

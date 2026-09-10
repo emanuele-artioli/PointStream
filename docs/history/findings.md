@@ -82,3 +82,7 @@ This document records scientific invariants, retracted conclusions, and experime
 ## 10. Gate A/B pass interpretations superseded (2026-09-09)
 
 PR #83/#84 compared unequal rates/qualities and generalized a sampled SVT-AV1 endpoint into a codec-wide floor. PR #85 declared Gate B passed whenever its alarm list was empty, without requiring competitive comparisons or the six-source protocol. The underlying reports contain unfavorable VVC comparisons and no AV1 quality overlap. Keep the original artifacts for provenance, but their pass labels are not citable. The [evaluation audit](../areas/evaluation.md) records evidence, instrument gaps, and the repair/search sequence. No raw video metric is asserted fabricated; the scientific verdict and claimed scope were wrong.
+
+## PR #88: model ranking and residual matrix unverified (2026-09-10)
+
+Do not revive the one-epoch pix2pix-over-SPADE pruning decision or the hardcoded-control residual-demand conclusion as scientific findings. Missing-source substitution/frame-coordinate errors, crop versus full-frame scope, public encoder-output scoring and incomplete wire accounting require reruns. The stored BD arithmetic is reproducible but the experiment remains uncertified. Preserve outputs; see the [evaluation audit](../areas/evaluation.md#pr-88-audit--2026-09-10) and [generator audit](../areas/generation.md#pr-88-generator-audit--2026-09-10).

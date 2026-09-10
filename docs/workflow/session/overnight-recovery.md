@@ -1,3 +1,5 @@
+> Superseded for new work after PR #88: use [submission search](submission-search.md). This file records the original recovery assignment.
+
 # Overnight recovery: residual fidelity, credible evaluation, generator readiness
 
 Execute this assignment when the user supplies this file as a prompt. Budget: eight hours from launch, including validation and reporting. Parallel subagents in separate worktrees (or isolated workspaces) can be dispatched across harnesses (Antigravity with `invoke_subagent`, Cursor with `Task`, Claude Code with `Agent`, or Codex), provided they are configured to use weaker/cheaper models for subagent lanes (such as Gemini Flash/Flash-Lite on Antigravity, Composer on Cursor, Haiku/Sonnet on Claude) to conserve token budgets; a harness without subagent support or running sequentially can execute lanes A, B, then C in order. This is development work, not a Gate B confirmation campaign.
