@@ -458,6 +458,7 @@ def _run(
             clock=clock,
             sync_fn=sync_fn,
             chunk_encoder_seconds=chunk_encoder_seconds,
+            checkpoint=config.generator.checkpoint,
         )
         chunk_eval_seconds = metrics_stage_seconds + chunk_eval_extra
         chunk = replace(
@@ -527,6 +528,7 @@ def _finish_chunk(
     clock: Callable[[], float] = time.perf_counter,
     sync_fn: Callable[[], None] | None = None,
     chunk_encoder_seconds: float = 0.0,
+    checkpoint: str | Path | None = None,
 ) -> tuple[ChunkResult, float, float]:
     delivered_quality = bag.get(ART_QUALITY)
     if not isinstance(delivered_quality, QualityReport):
@@ -570,28 +572,30 @@ def _finish_chunk(
                 )
             }
 
-        decoded_by_id: dict[str, np.ndarray] = {}
         if appearance_by_id:
             import cv2
 
-            for object_id, encoded_crop in appearance_by_id.items():
+            for encoded_crop in appearance_by_id.values():
                 decoded_crop = cv2.imdecode(
                     np.frombuffer(encoded_crop, dtype=np.uint8),
                     cv2.IMREAD_COLOR,
                 )
                 if decoded_crop is None:
                     raise ValueError("JPEG appearance payload did not decode")
-                decoded_by_id[object_id] = np.asarray(decoded_crop, dtype=np.uint8)
-            client_objects = tuple(
-                replace(item, supplied_crop=decoded_by_id[item.object_id])
-                if item.object_id in decoded_by_id
-                else item
-                for item in client_objects
-            )
+            # Do not write decoded appearance into supplied_crop. That field is
+            # an encoder residual shortcut; generation intent on the wire is
+            # ClientPlacement.is_generated from STAGE_GENERATION, not "crop is
+            # empty". Appearance bytes still travel as references and condition
+            # the generator.
 
         placements_list = []
+        seen_keys: set[tuple[str, int]] = set()
         for item in client_objects:
-            is_gen = bool(generation_on and ref is not None and getattr(item, "supplied_crop", None) is None)
+            key = (str(item.object_id), int(item.frame_index))
+            if key in seen_keys:
+                continue
+            seen_keys.add(key)
+            is_gen = bool(generation_on and ref is not None)
             crop_to_use = None
             if not is_gen:
                 crop_to_use = item.supplied_crop if item.supplied_crop is not None else item.appearance
@@ -656,19 +660,14 @@ def _finish_chunk(
 
         gen_meta = None
         if generation_on and ref is not None:
-            gen_params_dict = {}
-            if params is not None:
-                for k in ("steps", "strength", "guidance_scale", "width", "height"):
-                    val = getattr(params, k, None)
-                    if val is not None:
-                        gen_params_dict[k] = val
-            gen_meta = {
-                "name": str(ref.name),
-                "seed": int(seed),
-                "params": gen_params_dict,
-                "capabilities": list(ref.capabilities),
-                "requires": list(ref.requires),
-            }
+            from src.runner.generation_identity import identity_from_ref, params_as_dict
+
+            gen_meta = identity_from_ref(
+                ref,
+                seed=seed,
+                params=params_as_dict(params),
+                checkpoint=checkpoint,
+            )
 
         wire_request = serialize_client_request(
             background=view,

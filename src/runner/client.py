@@ -411,6 +411,10 @@ def reconstruct_serialized_client(
         active_generator = generator
         active_seed = seed
         active_params = None
+        # WAVE1-A checkpoint identity
+        needs_generation = any(
+            bool(item.get("is_generated")) for item in metadata.get("placements") or ()
+        )
         if gen_meta is not None:
             if seed is not None and gen_meta.get("seed") is not None and seed != gen_meta["seed"]:
                 raise ValueError(
@@ -430,17 +434,13 @@ def reconstruct_serialized_client(
                     raise ValueError(
                         f"Mismatched generator model: requested {active_generator.name}, payload has {gen_meta['name']}"
                     )
-            if active_generator is None and gen_meta.get("name"):
-                from src.components.generation import REGISTRY
-                from src.contracts.conditioning import FrameGenerator
-                from src.pipeline.reconstruction.dispatch import from_spec
+            from src.runner.generation_identity import resolve_client_generator
 
-                gen_name = gen_meta["name"]
-                if REGISTRY.has(gen_name):
-                    spec = REGISTRY.spec(gen_name)
-                    backend = REGISTRY.build(gen_name)
-                    if isinstance(backend, FrameGenerator):
-                        active_generator = from_spec(spec, backend)
+            active_generator = resolve_client_generator(
+                gen_meta,
+                injected=active_generator,
+                require_identity=needs_generation,
+            )
 
         pipeline_placements = []
         to_generate_bundles = []
