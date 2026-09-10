@@ -29,7 +29,19 @@ PR #88 merged as `2b7c2b0` after its complete test suite, coverage gate, lint an
 
 ### Wave 2 GPU pilots — 2026-09-10 (gpu5, `6199d3e`)
 
-Launched under `jobs/wave2-diag-then-hf-20260910b` (exit 0). Pre-launch bounds: `outputs/development-recovery/wave2-prelaunch-bounds.json`. Diagnostic: `diagnostic-pix2pix-rq32.json`. Residual high-fidelity 48-frame pilot: `residual-high-fidelity/report.json`. **Not citable.** `gate_b_passed=false`, `pilot_alarms_clear=false`, `identity_verified=false`, `evidence_verified=false`. PSNR-Y / VMAF / per-rung wall time sat inside the pre-launch bands. BD-rate is unscorable on every arm (insufficient overlap or no common quality with AV1/VVC). One SSIM calibration alarm remains (`unrelated-clip` 0.6702 > 0.60); ordering identity > mild > severe still held. Every PointStream total is ~42–45 MB of which ~41.5 MB is labeled `metadata` — inside the 50/200 MB byte caps, but not a plausible codec payload next to Gate A C0 (~50 kB at 192 frames). Do not treat those totals as rate. Residual payload itself rose H0→H3 as QP fell. Gate A stays open; Gate B stays incomplete.
+Launched under `jobs/wave2-diag-then-hf-20260910b` (`status=complete`, `exit_code=0`). Artifacts (preserve; do not rewrite):
+
+- Diagnostic: `outputs/development-recovery/diagnostic-pix2pix-rq32.json` SHA-256 `fed400284d15189234712da73cbe60c2362ca638608646ceb204693e3597402d`
+- Residual high-fidelity: `outputs/development-recovery/residual-high-fidelity/report.json` SHA-256 `f306cdd46dc9ed7c855e543188e0d67d7f58790b69b87e3e808f6c8510fca860`
+- Pre-launch bounds: `outputs/development-recovery/wave2-prelaunch-bounds.json` SHA-256 `2f636fa700956917c5d7e5230d244e846401438c8177064d4afa8f1cd96eb024`
+
+**Not citable. This interpretation supersedes the first PR #92 reading.** `gate_b_passed=false`, `pilot_alarms_clear=false`, `identity_verified=false`, `evidence_verified=false`. Gate A remains open; Gate B remains incomplete.
+
+The equal generation-on and generation-off results do **not** show that pix2pix is equivalent to pasted reference. In `src/runner/run.py`, `_finish_chunk` decodes transmitted appearance into each object's `supplied_crop`, then sets `is_gen` only when `supplied_crop is None`. With appearance enabled, every would-be generated object is serialized as a pasted-reference placement, so the client generator receives no effective generated placement. Evidence that this path was a no-op: generation-off/residual-off and generation-on/residual-off reported identical PSNR, SSIM, and VMAF; generation-on added only ~180 bytes; client time was essentially unchanged. Encoder-side generation timing of 0.7–1.2 s does not prove generated pixels reached the client. The diagnostic reports also lacked sufficient generator provenance (checkpoint SHA, delivered-frame hashes, invocation counts, shuffled-conditioning control).
+
+The ~41.5 MB labeled `metadata` is explainable: `serialize_client_request` stores placement masks as full uint8 arrays and writes them with uncompressed `np.savez`. Several 4K masks account for nearly the entire envelope. The ledger balances, so this is a real transport inefficiency exposed by the repaired accounting, not a ledger mismatch. All Wave 2 PointStream totals (~42–45 MB) are dominated by that mask representation; anchors were below 1 MB. Do not treat those totals as a codec rate.
+
+The residual ladder moved residual bytes and quality monotonically, but cannot support codec comparison: Alcaraz PointStream VMAF ~94.77–96.33 and Federer/Djokovic ~87.24–91.18 versus sampled VVC maxima ~87.03 and ~83.76; AV1 overlap was too narrow; BD-rate remains unscorable. Calibration remained invalid because unrelated-content SSIM was 0.6702 against the preregistered 0.60 ceiling. Repair generation intent, compact masks, and provenance before any new GPU ranking.
 
 ## 1. Current State
 
