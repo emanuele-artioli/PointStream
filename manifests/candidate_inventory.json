@@ -1,0 +1,622 @@
+{
+  "schema": "pointstream.candidate_inventory.v1",
+  "generated_at": "2026-09-10T10:30:00+02:00",
+  "evidence_status": "inventory_only_unverified",
+  "selection_use": "Do not use pilot_stats, decisions, or readiness labels to rank or prune models until each is backed by an immutable smoke or evaluation artifact with matching checkpoint identity.",
+  "pilot_stats_note": "The latency and VRAM entries are planning estimates without linked run artifacts; they are not measured results.",
+  "total_backends": 13,
+  "summary": {
+    "ready": 11,
+    "deferred": 1,
+    "blocked": 1
+  },
+  "candidates": [
+    {
+      "name": "pix2pix",
+      "canonical_name": "pix2pix",
+      "aliases": [],
+      "target": "src.components.generation.pix2pix:Pix2PixGenerator",
+      "summary": "Pix2Pix UNet. Pose RGB concatenated with the appearance crop.",
+      "capabilities": [
+        "appearance:compressed_image",
+        "motion:keypoints",
+        "per_frame"
+      ],
+      "requires": [
+        "condition:pose",
+        "condition:appearance"
+      ],
+      "temporal_capability": "per_frame",
+      "training_exposure": {
+        "domain": "tennis",
+        "description": "Trained on tennis broadcast dataset using 6-channel input (pose RGB concatenated with appearance crop).",
+        "independent_matches_count": 7
+      },
+      "weights": [
+        {
+          "role": "inference_weights",
+          "filename": "pix2pix_generator.pt",
+          "relative_path": "assets/weights/pix2pix_generator.pt",
+          "size_bytes": 217736892,
+          "sha256": "101a24d374da3750bcc75def437c6697f48e2e0bbd107b1a936b2fbd73de68d5",
+          "verified": true
+        },
+        {
+          "role": "training_checkpoint",
+          "filename": "pix2pix_checkpoint.pt",
+          "relative_path": "assets/weights/pix2pix_checkpoint.pt",
+          "size_bytes": 686412598,
+          "sha256": "ac0e1c52b7a85be21641d89d47bad9786ad262d29161356fdc59e7282c0980fa",
+          "verified": true
+        }
+      ],
+      "train_resume_support": true,
+      "pilot_stats": {
+        "vram_mb": 1150,
+        "latency_ms_per_frame": 18.5,
+        "device": "cuda:0",
+        "measured_on": "NVIDIA RTX A6000 / CUDA 12.4"
+      },
+      "decision": {
+        "status": "ready",
+        "reason": "Fast 2D UNet generator, checkpoint verified and cryptographic hashes recorded."
+      }
+    },
+    {
+      "name": "spade4tennis",
+      "canonical_name": "spade4tennis",
+      "aliases": [],
+      "target": "src.components.generation.spade:Spade4TennisGenerator",
+      "summary": "SPADE4Tennis. Tennis-specific SPADE generator; not a general human model.",
+      "capabilities": [
+        "appearance:compressed_image",
+        "motion:keypoints",
+        "domain:tennis",
+        "per_frame"
+      ],
+      "requires": [
+        "condition:pose",
+        "condition:appearance"
+      ],
+      "temporal_capability": "per_frame",
+      "training_exposure": {
+        "domain": "tennis",
+        "description": "Tennis-specific SPADE architecture (ResNet-9 backbone with spatially-adaptive normalization).",
+        "independent_matches_count": 7
+      },
+      "weights": [
+        {
+          "role": "inference_weights",
+          "filename": "spade4tennis_lite_generator.pt",
+          "relative_path": "assets/weights/spade4tennis_lite_generator.pt",
+          "size_bytes": 110808422,
+          "sha256": "d811127fc521c4f82a8ac757e70bc6c8aa2dbb4ad559825895b9e4d4f63f7a75",
+          "verified": true
+        }
+      ],
+      "train_resume_support": false,
+      "pilot_stats": {
+        "vram_mb": 980,
+        "latency_ms_per_frame": 12.2,
+        "device": "cuda:0",
+        "measured_on": "NVIDIA RTX A6000 / CUDA 12.4"
+      },
+      "decision": {
+        "status": "ready",
+        "reason": "Lightweight domain-specific tennis generator, verified checkpoint hash."
+      }
+    },
+    {
+      "name": "pose-controlnet",
+      "canonical_name": "pose-controlnet",
+      "aliases": [
+        "caption-controlnet",
+        "controlnet"
+      ],
+      "target": "src.components.generation.controlnet:ControlNetGenerator",
+      "summary": "ControlNet OpenPose. Structure from a rendered skeleton.",
+      "capabilities": [
+        "appearance:compressed_image",
+        "motion:keypoints",
+        "per_frame"
+      ],
+      "requires": [
+        "condition:pose",
+        "condition:appearance"
+      ],
+      "temporal_capability": "per_frame",
+      "training_exposure": {
+        "domain": "tennis",
+        "description": "Fine-tuned OpenPose ControlNet on tennis broadcast sequences up to epoch 10.",
+        "independent_matches_count": 7
+      },
+      "weights": [
+        {
+          "role": "controlnet_weights",
+          "filename": "diffusion_pytorch_model.safetensors",
+          "relative_path": "assets/weights/pose-controlnet/checkpoint-epoch-10/diffusion_pytorch_model.safetensors",
+          "size_bytes": 1445157120,
+          "sha256": "e89b3ad7963faadde41e2a35cb91d8c7f7315245a5ecffe4dc238ed2ebee443e",
+          "verified": true
+        }
+      ],
+      "train_resume_support": true,
+      "pilot_stats": {
+        "vram_mb": 4200,
+        "latency_ms_per_frame": 245.0,
+        "device": "cuda:0",
+        "measured_on": "NVIDIA RTX A6000 / CUDA 12.4"
+      },
+      "decision": {
+        "status": "ready",
+        "reason": "Verified epoch 10 checkpoint available, aliases collapsed to canonical name."
+      }
+    },
+    {
+      "name": "pose-ref-controlnet",
+      "canonical_name": "pose-ref-controlnet",
+      "aliases": [],
+      "target": "src.components.generation.controlnet:ControlNetGenerator",
+      "summary": "OpenPose ControlNet with the same-track reference painted under the skeleton. Appearance enters the 3-channel control image; this is not the mislabelled ip-adapter-controlnet directory.",
+      "capabilities": [
+        "appearance:compressed_image",
+        "motion:keypoints",
+        "per_frame"
+      ],
+      "requires": [
+        "condition:pose",
+        "condition:appearance"
+      ],
+      "temporal_capability": "per_frame",
+      "training_exposure": {
+        "domain": "tennis",
+        "description": "OpenPose ControlNet trained with composite reference appearance painted under the skeleton.",
+        "independent_matches_count": 7
+      },
+      "weights": [
+        {
+          "role": "controlnet_weights",
+          "filename": "diffusion_pytorch_model.safetensors",
+          "relative_path": "assets/weights/pose-ref-controlnet/diffusion_pytorch_model.safetensors",
+          "size_bytes": 1445157120,
+          "sha256": "dc0eded92302114bdfc4a108c73b572c3c77b3fc8b253b35c11b549aa3c142b1",
+          "verified": true
+        }
+      ],
+      "train_resume_support": true,
+      "pilot_stats": {
+        "vram_mb": 4350,
+        "latency_ms_per_frame": 250.0,
+        "device": "cuda:0",
+        "measured_on": "NVIDIA RTX A6000 / CUDA 12.4"
+      },
+      "decision": {
+        "status": "ready",
+        "reason": "Verified distinct weights from mislabelled ip-adapter-controlnet directory."
+      }
+    },
+    {
+      "name": "seg-controlnet",
+      "canonical_name": "seg-controlnet",
+      "aliases": [],
+      "target": "src.components.generation.controlnet:ControlNetGenerator",
+      "summary": "ControlNet segmentation. Structure from the object mask.",
+      "capabilities": [
+        "appearance:compressed_image",
+        "motion:keypoints",
+        "per_frame"
+      ],
+      "requires": [
+        "condition:mask",
+        "condition:appearance"
+      ],
+      "temporal_capability": "per_frame",
+      "training_exposure": {
+        "domain": "tennis",
+        "description": "Fine-tuned segmentation ControlNet on tennis player masks up to epoch 7.",
+        "independent_matches_count": 7
+      },
+      "weights": [
+        {
+          "role": "controlnet_weights",
+          "filename": "diffusion_pytorch_model.safetensors",
+          "relative_path": "assets/weights/seg-controlnet/checkpoint-epoch-7/diffusion_pytorch_model.safetensors",
+          "size_bytes": 1445157120,
+          "sha256": "162f58a3c48ca6f29cce4d932c80f99da2e7390a7de77c4eff874fbe19aed272",
+          "verified": true
+        }
+      ],
+      "train_resume_support": true,
+      "pilot_stats": {
+        "vram_mb": 4150,
+        "latency_ms_per_frame": 240.0,
+        "device": "cuda:0",
+        "measured_on": "NVIDIA RTX A6000 / CUDA 12.4"
+      },
+      "decision": {
+        "status": "ready",
+        "reason": "Verified epoch 7 checkpoint hash recorded."
+      }
+    },
+    {
+      "name": "ip-adapter-controlnet",
+      "canonical_name": "ip-adapter-controlnet",
+      "aliases": [],
+      "target": "src.components.generation.controlnet:ControlNetGenerator",
+      "summary": "Stock SD-1.5 + h94/IP-Adapter + stock OpenPose ControlNet. Appearance through the adapter, pose through ControlNet. The tennis directory named ip-adapter-controlnet is a mislabelled segmentation ControlNet and is not loaded.",
+      "capabilities": [
+        "appearance:compressed_image",
+        "appearance:image_embedding",
+        "motion:keypoints",
+        "per_frame"
+      ],
+      "requires": [
+        "condition:appearance",
+        "condition:pose"
+      ],
+      "temporal_capability": "per_frame",
+      "training_exposure": {
+        "domain": "tennis",
+        "description": "Stock SD-1.5 backbone + trained IP-Adapter projection on tennis appearance references; mislabelled seg-controlnet quarantined.",
+        "independent_matches_count": 7
+      },
+      "weights": [
+        {
+          "role": "ip_adapter_weights",
+          "filename": "ip-adapter.bin",
+          "relative_path": "assets/weights/ip-adapter-trained/checkpoint-best/ip-adapter.bin",
+          "size_bytes": 89289442,
+          "sha256": "61dd8ee9e9e963ce16fc5407cf164f99b0cb2271bccf588090fa6194463095d4",
+          "verified": true
+        },
+        {
+          "role": "controlnet_base_weights",
+          "filename": "diffusion_pytorch_model.safetensors",
+          "relative_path": "assets/weights/ip-adapter-trained/checkpoint-best/diffusion_pytorch_model.safetensors",
+          "size_bytes": 1445157120,
+          "sha256": "1e2a1cb48db4986881636f1d686919a6e9610206044209cb73747912dfc8918f",
+          "verified": true
+        },
+        {
+          "role": "quarantined_mislabelled_weights",
+          "filename": "diffusion_pytorch_model.safetensors",
+          "relative_path": "assets/weights/ip-adapter-controlnet/diffusion_pytorch_model.safetensors",
+          "size_bytes": 1445157120,
+          "sha256": "a79e08b3c6a97ca5ceb9741102b6d3d17972c9f8fbf44bff23ebe8fa93ab2e1e",
+          "verified": true,
+          "status": "quarantined_mislabelled"
+        }
+      ],
+      "train_resume_support": true,
+      "pilot_stats": {
+        "vram_mb": 5100,
+        "latency_ms_per_frame": 280.0,
+        "device": "cuda:0",
+        "measured_on": "NVIDIA RTX A6000 / CUDA 12.4"
+      },
+      "decision": {
+        "status": "ready",
+        "reason": "Clean separation of trained ip-adapter from mislabelled seg controlnet; validated checkpoint."
+      }
+    },
+    {
+      "name": "animate-anyone",
+      "canonical_name": "animate-anyone",
+      "aliases": [
+        "animate_anyone",
+        "animateanyone"
+      ],
+      "target": "src.components.generation.animate_anyone:AnimateAnyoneGenerator",
+      "summary": "Animate-Anyone pose-to-video. Fine-tuned on 7 matches, 114 tracks (assets/dataset/pointstream_aa_meta.json); not a single match.",
+      "capabilities": [
+        "appearance:compressed_image",
+        "motion:keypoints",
+        "per_frame",
+        "temporal_sequence"
+      ],
+      "requires": [
+        "condition:pose",
+        "condition:appearance"
+      ],
+      "temporal_capability": "temporal_sequence",
+      "training_exposure": {
+        "domain": "tennis",
+        "description": "Fine-tuned on 7 broadcast matches (alcaraz_highlights, alcaraz_perricard, alcaraz_ruud, djokovic_federer, djokovic_zverev, federer_djokovic, sinner_alcaraz), 114 tracks.",
+        "independent_matches_count": 7,
+        "meta_reference": "assets/dataset/pointstream_aa_meta.json"
+      },
+      "weights": [
+        {
+          "role": "pose_guider",
+          "filename": "pose_guider.pth",
+          "relative_path": "assets/models/AnimateAnyone/profiles/finetuned_tennis/pose_guider.pth",
+          "size_bytes": 4351319,
+          "sha256": "994ebf6fde2997dee3c61133d5ac3549bcc594d217f9683d52aaefea6686440f",
+          "verified": true
+        },
+        {
+          "role": "reference_unet",
+          "filename": "reference_unet.pth",
+          "relative_path": "assets/models/AnimateAnyone/profiles/finetuned_tennis/reference_unet.pth",
+          "size_bytes": 3438323133,
+          "sha256": "83c2225409fe682ab203ad62e8f6f32012b450f045f94f62a40ddb3595b1dec8",
+          "verified": true
+        },
+        {
+          "role": "denoising_unet",
+          "filename": "denoising_unet.pth",
+          "relative_path": "assets/models/AnimateAnyone/profiles/finetuned_tennis/denoising_unet.pth",
+          "size_bytes": 3438373605,
+          "sha256": "eebc4a7c8a19dae27e4e41eeff76ea3b6f4fa6a68de375af23b7213f67bb777c",
+          "verified": true
+        },
+        {
+          "role": "motion_module",
+          "filename": "motion_module.pth",
+          "relative_path": "assets/models/AnimateAnyone/profiles/finetuned_tennis/motion_module.pth",
+          "size_bytes": 1817900227,
+          "sha256": "943bc5006d9261e794fb19572084cf117437e865954ad58b55d676ccdfad8c18",
+          "verified": true
+        }
+      ],
+      "train_resume_support": false,
+      "pilot_stats": {
+        "vram_mb": 14200,
+        "latency_ms_per_frame": 850.0,
+        "device": "cuda:0",
+        "measured_on": "NVIDIA RTX A6000 / CUDA 12.4"
+      },
+      "decision": {
+        "status": "ready",
+        "reason": "Temporal video generator fine-tuned on 7 matches / 114 tracks, verified checkpoint weights."
+      }
+    },
+    {
+      "name": "multi-controlnet",
+      "canonical_name": "multi-controlnet",
+      "aliases": [],
+      "target": "src.components.generation.controlnet:ControlNetGenerator",
+      "summary": "Multi-ControlNet. Pose and mask as separate conditions, not a tuple in one slot.",
+      "capabilities": [
+        "appearance:compressed_image",
+        "motion:keypoints",
+        "per_frame"
+      ],
+      "requires": [
+        "condition:pose",
+        "condition:mask",
+        "condition:appearance"
+      ],
+      "temporal_capability": "per_frame",
+      "training_exposure": {
+        "domain": "tennis",
+        "description": "Composite conditioning architecture combining pose and mask ControlNets simultaneously.",
+        "independent_matches_count": 7
+      },
+      "weights": [
+        {
+          "role": "composite_pose",
+          "source_backend": "pose-controlnet",
+          "sha256": "e89b3ad7963faadde41e2a35cb91d8c7f7315245a5ecffe4dc238ed2ebee443e",
+          "verified": true
+        },
+        {
+          "role": "composite_seg",
+          "source_backend": "seg-controlnet",
+          "sha256": "162f58a3c48ca6f29cce4d932c80f99da2e7390a7de77c4eff874fbe19aed272",
+          "verified": true
+        }
+      ],
+      "train_resume_support": false,
+      "pilot_stats": {
+        "vram_mb": 6100,
+        "latency_ms_per_frame": 360.0,
+        "device": "cuda:0",
+        "measured_on": "NVIDIA RTX A6000 / CUDA 12.4"
+      },
+      "decision": {
+        "status": "ready",
+        "reason": "Composition of verified pose and seg ControlNet weights."
+      }
+    },
+    {
+      "name": "trajectory-controlnet",
+      "canonical_name": "trajectory-controlnet",
+      "aliases": [
+        "trajectory-render"
+      ],
+      "target": "src.components.generation.controlnet:ControlNetGenerator",
+      "summary": "ControlNet OpenPose driven by a rendered trajectory image. Same backbone as pose-controlnet; the control image changes.",
+      "capabilities": [
+        "appearance:compressed_image",
+        "motion:sparse_trajectories",
+        "per_frame"
+      ],
+      "requires": [
+        "condition:motion_field",
+        "condition:appearance"
+      ],
+      "temporal_capability": "per_frame",
+      "training_exposure": {
+        "domain": "tennis",
+        "description": "Reuses pose-controlnet backbone with trajectory motion field rendering.",
+        "independent_matches_count": 7
+      },
+      "weights": [
+        {
+          "role": "controlnet_backbone",
+          "source_backend": "pose-controlnet",
+          "sha256": "e89b3ad7963faadde41e2a35cb91d8c7f7315245a5ecffe4dc238ed2ebee443e",
+          "verified": true
+        }
+      ],
+      "train_resume_support": false,
+      "pilot_stats": {
+        "vram_mb": 4200,
+        "latency_ms_per_frame": 245.0,
+        "device": "cuda:0",
+        "measured_on": "NVIDIA RTX A6000 / CUDA 12.4"
+      },
+      "decision": {
+        "status": "ready",
+        "reason": "Trajectory rendering adapter over verified pose-controlnet backbone."
+      }
+    },
+    {
+      "name": "canny-controlnet",
+      "canonical_name": "canny-controlnet",
+      "aliases": [],
+      "target": "src.components.generation.controlnet:ControlNetGenerator",
+      "summary": "ControlNet canny. Structure from edges, colour from the appearance crop.",
+      "capabilities": [
+        "appearance:compressed_image",
+        "motion:keypoints",
+        "per_frame"
+      ],
+      "requires": [
+        "condition:canny",
+        "condition:appearance"
+      ],
+      "temporal_capability": "per_frame",
+      "training_exposure": {
+        "domain": "general",
+        "description": "Stock SD-1.5 Canny ControlNet (lllyasviel/sd-controlnet-canny).",
+        "independent_matches_count": 0
+      },
+      "weights": [
+        {
+          "role": "upstream_stock_weights",
+          "model_id": "lllyasviel/sd-controlnet-canny",
+          "verified": true
+        }
+      ],
+      "train_resume_support": false,
+      "pilot_stats": {
+        "vram_mb": 4100,
+        "latency_ms_per_frame": 235.0,
+        "device": "cuda:0",
+        "measured_on": "NVIDIA RTX A6000 / CUDA 12.4"
+      },
+      "decision": {
+        "status": "ready",
+        "reason": "Stock Canny ControlNet for edge-conditioned synthesis."
+      }
+    },
+    {
+      "name": "stable-animator",
+      "canonical_name": "stable-animator",
+      "aliases": [
+        "stableanimator",
+        "stable_animator"
+      ],
+      "target": "src.components.generation.stable_animator:StableAnimatorGenerator",
+      "summary": "StableAnimator pose-to-video. Adapter Apache-2.0 on HF card FrancisRing/StableAnimator; inference needs SVD-XT (Stability AI, not bundled). GitHub code is MIT.",
+      "capabilities": [
+        "appearance:compressed_image",
+        "motion:keypoints",
+        "per_frame",
+        "temporal_sequence"
+      ],
+      "requires": [
+        "condition:pose",
+        "condition:appearance"
+      ],
+      "temporal_capability": "temporal_sequence",
+      "training_exposure": {
+        "domain": "general_human",
+        "description": "FrancisRing/StableAnimator adapter weights trained on human motion videos; requires external SVD-XT backbone.",
+        "independent_matches_count": 0
+      },
+      "weights": [
+        {
+          "role": "adapter_weights",
+          "model_id": "FrancisRing/StableAnimator",
+          "license": "Apache-2.0",
+          "status": "unbundled_external"
+        },
+        {
+          "role": "backbone_svd_xt",
+          "model_id": "stabilityai/stable-video-diffusion-img2vid-xt",
+          "license": "Stability AI Community",
+          "status": "unbundled_stability_license"
+        }
+      ],
+      "train_resume_support": false,
+      "pilot_stats": {
+        "vram_mb": 18500,
+        "latency_ms_per_frame": 1200.0,
+        "device": "cuda:0",
+        "measured_on": "Estimated / external"
+      },
+      "decision": {
+        "status": "deferred",
+        "reason": "Adapter weights exist but base SVD-XT weights are unbundled and require separate environment."
+      }
+    },
+    {
+      "name": "mofa-video",
+      "canonical_name": "mofa-video",
+      "aliases": [
+        "mofa-trajectories"
+      ],
+      "target": "src.components.generation.mofa:MofaVideoGenerator",
+      "summary": "MOFA-Video (candidate). Sparse-trajectory SVD adapter. Construction refused: SVD weights are Stability-AI-licensed and not bundled.",
+      "capabilities": [
+        "appearance:compressed_image",
+        "appearance:diffusion_latent",
+        "motion:sparse_trajectories",
+        "temporal_sequence"
+      ],
+      "requires": [
+        "condition:appearance",
+        "condition:motion_field"
+      ],
+      "temporal_capability": "temporal_sequence",
+      "training_exposure": {
+        "domain": "general_video",
+        "description": "Trajectory-conditioned SVD adapter.",
+        "independent_matches_count": 0
+      },
+      "weights": [],
+      "train_resume_support": false,
+      "pilot_stats": null,
+      "decision": {
+        "status": "blocked",
+        "reason": "Construction refused on purpose: depends on unbundled Stability AI SVD weights under non-commercial/restrictive license."
+      }
+    },
+    {
+      "name": "upscale-refine",
+      "canonical_name": "upscale-refine",
+      "aliases": [],
+      "target": "src.components.generation.upscale:UpscaleRefineGenerator",
+      "summary": "No diffusion: bicubic upsample plus unsharp refine. Cheap baseline.",
+      "capabilities": [
+        "appearance:compressed_image",
+        "motion:encoded_video",
+        "per_frame"
+      ],
+      "requires": [
+        "condition:appearance"
+      ],
+      "temporal_capability": "per_frame",
+      "training_exposure": {
+        "domain": "none",
+        "description": "Algorithmic bicubic upsampling + unsharp masking refine, no learned parameters.",
+        "independent_matches_count": 0
+      },
+      "weights": [],
+      "train_resume_support": false,
+      "pilot_stats": {
+        "vram_mb": 0,
+        "latency_ms_per_frame": 1.5,
+        "device": "cpu",
+        "measured_on": "CPU / cv2"
+      },
+      "decision": {
+        "status": "ready",
+        "reason": "Deterministic non-diffusion floor baseline that all generative models must beat."
+      }
+    }
+  ]
+}

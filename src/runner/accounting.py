@@ -58,6 +58,11 @@ class SizesBytes:
         """Whether ``transport_total`` may be compared against a codec at all."""
         return not self.raw_parts
 
+    @property
+    def total_bytes(self) -> int:
+        """Alias for transport_total to support ledger reconciliation interfaces."""
+        return self.transport_total
+
     def as_dict(self) -> dict[str, Any]:
         ratio: float | None = (
             float(self.transport_total) / float(self.source)

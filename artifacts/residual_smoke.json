@@ -1,0 +1,56 @@
+{
+  "timestamp": "2026-09-10 08:52:18 UTC",
+  "host": {
+    "node": "gpu5",
+    "machine": "x86_64",
+    "system": "Linux"
+  },
+  "codec": {
+    "name": "avc",
+    "tool_path": "/opt/local/bin/ffmpeg",
+    "tool_version": "ffmpeg version n7.1.1-56-gc2184b65d2 Copyright (c) 2000-2025 the FFmpeg developers",
+    "preset": "ultrafast",
+    "rate_control": "crf",
+    "qp_rate": 23,
+    "mode": "clipped"
+  },
+  "stream_accounting": {
+    "frame_shape": [
+      4,
+      64,
+      64,
+      3
+    ],
+    "bitstream_bytes": 1687,
+    "wire_request_bytes": 2597,
+    "ledger_residual_bytes": 1687,
+    "ledger_reconciled": true,
+    "sizes_is_rate": true
+  },
+  "timing_seconds": {
+    "total_wall": 0.35015222802758217,
+    "encoder_seconds": 0.2700298549607396,
+    "client_seconds": 0.05273311398923397,
+    "evaluation_seconds": 0.0023984541185200214,
+    "codec_encode_seconds": 0.01838127593509853,
+    "codec_decode_seconds": 0.06388380704447627
+  },
+  "fidelity": {
+    "client_identical_to_delivered": false,
+    "client_frames_shape": [
+      4,
+      64,
+      64,
+      3
+    ],
+    "psnr_unaided_db": 5.440730013633522,
+    "psnr_residual_delivered_db": 16.602111874310665,
+    "quality_gain_db": 11.161381860677142
+  },
+  "limitations": [
+    "Native codec invocation uses ffmpeg CLI subprocess rather than in-process C-API bindings.",
+    "Subsampled chroma (yuv420p) introduces high-frequency colour quantization relative to full RGB.",
+    "Full-range mapping provides <= 1 grey level precision across [-255, 255], while clipped mode bounds to [-128, 127]."
+  ],
+  "quality_ladder_sweep_command": "python -m src.runner.run --config config/tier_fast.yaml --set residual.codec=avc --set residual.block_size=1 --set residual.block_threshold=0.0 --set residual.background_downscale=1 --sweep residual.rate=18,23,28,33,38"
+}

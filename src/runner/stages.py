@@ -67,7 +67,6 @@ from src.pipeline.residual.signal import (
     ResidualResult,
     ResidualVariant,
     compute_residual,
-    decode_lossy,
 )
 from src.runner.accounting import SizesBytes, measured, sizes_bytes
 
@@ -923,13 +922,34 @@ def make_codec(ctx: StageContext) -> StageCallable:
         if isinstance(residual, ResidualResult) and not residual.payload.is_absent:
             coded = _coded_residual(ctx, residual)
             if coded is not None:
-                frames, coded_bytes = coded
+                frames, coded_bytes, bitstream_bytes, transmitted = coded
                 return {
                     "frames": frames,
                     "byte_count": coded_bytes,
                     "raw_byte_count": int(residual.payload.byte_count),
                     "residual_is_coded": True,
+                    "residual_stream": bitstream_bytes,
+                    "transmitted_residual": transmitted,
                 }
+            from src.pipeline.residual.codec import TransmittedResidual
+
+            fallback_transmitted = TransmittedResidual(
+                bitstream=b"",
+                codec_name="raw",
+                mode=str(getattr(residual.payload, "mode", "clipped")),
+                shape=(
+                    int(residual.payload.frames.shape[0]),
+                    int(residual.payload.frames.shape[1]),
+                    int(residual.payload.frames.shape[2]),
+                    int(residual.payload.frames.shape[3]),
+                )
+                if residual.payload.frames is not None
+                else (0, 0, 0, 0),
+                scale=float(getattr(residual.payload, "scale", 1.0)),
+                offset=float(getattr(residual.payload, "offset", 128.0)),
+                is_coded=False,
+                raw_frames=residual.payload.frames,
+            )
             return {
                 "frames": residual.reconstructed,
                 "byte_count": int(residual.payload.byte_count),
@@ -937,6 +957,7 @@ def make_codec(ctx: StageContext) -> StageCallable:
                 # The array's size, not a bitstream's. Nothing may divide this
                 # by the source and call the result a compression ratio.
                 "residual_is_coded": False,
+                "transmitted_residual": fallback_transmitted,
             }
         if ctx.lattice.is_source_passthrough:
             return {"frames": source, "byte_count": int(source.nbytes)}
@@ -962,37 +983,55 @@ def make_codec(ctx: StageContext) -> StageCallable:
     return codec
 
 
-def _coded_residual(ctx: StageContext, residual: ResidualResult) -> tuple[np.ndarray, int] | None:
+def _coded_residual(
+    ctx: StageContext, residual: ResidualResult
+) -> tuple[np.ndarray, int, bytes, Any] | None:
     """Send the residual through `residual.codec` and rebuild from what returns.
 
-    Returns ``(frames, coded_bytes)``, or ``None`` when no encoder could run —
-    in which case the caller must keep reporting the raw array size and say so.
+    Returns ``(frames, coded_bytes, bitstream_bytes, transmitted_residual)``, or
+    ``None`` when no encoder could run.
 
-    Both halves move together on purpose. `residual.reconstructed` was built
-    from the **pre-codec** residual, so reporting a coded size beside it would
-    put the rate and the quality at different operating points (BP24 finding 4).
-    The correction is exact rather than approximate: the delivered clip is
-    ``reconstructed - r + r_coded``, so the base reconstruction never has to be
-    recovered or recomputed.
+    Delivered frames are computed as apply_signed(P_s, after) using the true
+    server predictor P_s directly, avoiding subtraction from already-clipped sums.
     """
     payload = residual.payload
     if payload.frames is None or payload.variant is not ResidualVariant.LOSSY:
         return None
-    from src.components.codec.measure import coded_roundtrip
+    from src.pipeline.residual.codec import encode_residual_to_bitstream
+    from src.pipeline.residual.lossy import decode_lossy
+    from src.pipeline.residual.signal import apply_signed
+
+    mode = getattr(payload, "mode", "clipped")
+    scale = getattr(payload, "scale", 1.0)
+    offset = getattr(payload, "offset", 128.0)
 
     try:
-        coded_bytes, decoded = coded_roundtrip(
+        transmitted, decoded = encode_residual_to_bitstream(
             np.asarray(payload.frames, dtype=np.uint8),
             request=ctx.config.residual.encode_request(),
+            mode=mode,
+            scale=scale,
+            offset=offset,
         )
     except (FileNotFoundError, RuntimeError, ValueError):
         # No encoder on this host, or it refused this payload. Fall back to the
         # honest raw number rather than inventing a coded one.
         return None
-    before = decode_lossy(np.asarray(payload.frames, dtype=np.uint8))
-    after = decode_lossy(decoded[: before.shape[0]])
-    frames = np.asarray(residual.reconstructed).astype(np.int16) - before + after
-    return np.clip(frames, 0, 255).astype(np.uint8), int(coded_bytes)
+
+    # Base predictor P_s
+    if residual.base is not None:
+        base = residual.base
+    else:
+        before = decode_lossy(
+            np.asarray(payload.frames, dtype=np.uint8), mode=mode, scale=scale, offset=offset
+        )
+        base = np.clip(
+            np.asarray(residual.reconstructed).astype(np.int16) - before, 0, 255
+        ).astype(np.uint8)
+
+    after = decode_lossy(decoded[: base.shape[0]], mode=mode, scale=scale, offset=offset)
+    frames = apply_signed(base, after)
+    return frames, int(transmitted.byte_count), transmitted.bitstream, transmitted
 
 
 def _semantic_bytes(bag: Mapping[str, Any]) -> int:
@@ -1017,6 +1056,11 @@ def make_metrics(ctx: StageContext) -> StageCallable:
             raise ConfigValueError(
                 "runner.metrics",
                 "metrics ran without ART_DELIVERED. Transport must produce the payload.",
+            )
+        if isinstance(delivered, Mapping) and delivered.get("fallback_reason"):
+            raise ConfigValueError(
+                "codec.fallback",
+                f"Source fallback cannot earn a valid quality score: {delivered['fallback_reason']}",
             )
         return ctx.evaluator.evaluate(source, _delivered_frames(delivered))
 
@@ -1147,12 +1191,23 @@ def ledger_from_bag(bag: Mapping[str, Any], source: np.ndarray) -> SizesBytes:
     if isinstance(view, BackgroundModelView):
         geometry_header_bytes = int(view.charged_geometry_header_bytes())
 
+    wire_request = bag.get("wire_request")
+    if (
+        wire_request is not None
+        and not raw
+        and isinstance(wire_request, (bytes, bytearray, memoryview))
+    ):
+        wire_total = len(wire_request)
+        metadata = max(0, wire_total - (residual_bytes + panorama_bytes + actor_bytes))
+    else:
+        metadata = metadata_bytes(bag) + geometry_header_bytes
+
     return sizes_bytes(
         source=int(clip.nbytes),
         residual=residual_bytes,
         panorama=panorama_bytes,
         actor_reference=actor_bytes,
-        metadata=metadata_bytes(bag) + geometry_header_bytes,
+        metadata=metadata,
         raw_parts=tuple(raw),
     )
 

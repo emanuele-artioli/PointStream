@@ -40,6 +40,12 @@ from src.contracts.frozen_procedure import (
     get_frozen_bounds,
     validate_ledger,
 )
+from experiments.tier.protocol import (
+    ExperimentIdentity,
+    ProtocolEvidence,
+    capture_current_identity,
+    evaluate_confirmation_protocol,
+)
 from src.pipeline.reconstruction.reconstruct import ObjectRequest
 from src.runner.config_io import load_tier
 
@@ -230,41 +236,39 @@ def _validate_point(row: dict[str, Any], bounds: dict[str, Any]) -> list[str]:
 
 
 def confirmation_verdict(
-    sources: list[dict[str, Any]], alarms: list[str]
+    sources: list[dict[str, Any]],
+    alarms: list[str],
+    *,
+    identity: ExperimentIdentity | dict[str, Any] | None = None,
+    expected_identity: ExperimentIdentity | dict[str, Any] | None = None,
+    evidence: ProtocolEvidence | dict[str, Any] | None = None,
+    is_pilot: bool = True,
 ) -> dict[str, Any]:
     """Report pilot completion without certifying an unimplemented protocol.
 
-    This driver does not yet validate independent-source eligibility, full
-    freeze identity, controls, region scores, uncertainty or byte-only client
-    equivalence. Favorable curves cannot substitute for those checks. Keep
-    certification disabled until EVAL-ACT-06 implements and tests them.
+    This driver requires evidence of actual client-output scoring, full wire cost,
+    calibrated metrics/nulls, source eligibility (six independent matches required for Gate B),
+    source-level uncertainty, and full identity matching before any confirmation pass can be claimed.
+    Runs without full evidence remain development pilots and cannot claim confirmation.
     Historical report JSONs remain immutable; re-adjudicate them separately.
     """
-    blockers = [
-        "confirmation protocol validation is not implemented (EVAL-ACT-06): "
-        "source eligibility, frozen identity, metric controls, object scores, "
-        "source uncertainty, wire accounting and independent-output scoring"
-    ]
-    if len(sources) < 6:
-        blockers.append(f"six independent sources required; only {len(sources)} reported")
-    if alarms:
-        blockers.append("execution or measurement alarms remain")
-    for source in sources:
-        sid = source.get("source_id", "unknown")
-        for codec in ("av1", "vvc"):
-            comparison = (source.get("comparisons") or {}).get(codec, {}).get("continuous", {})
-            delta = comparison.get("bd_rate_percent")
-            if not isinstance(delta, (int, float)) or not np.isfinite(delta):
-                blockers.append(f"{sid}/{codec}: no finite overlapping-curve comparison")
-            elif delta >= 0:
-                blockers.append(f"{sid}/{codec}: recorded curve does not show a rate saving")
-    return {
-        "execution_completed": bool(sources),
-        "pilot_alarms_clear": bool(sources) and not alarms,
-        "gate_b_passed": False,
-        "confirmation_status": "incomplete_protocol",
-        "confirmation_blockers": blockers,
-    }
+    if not sources:
+        return {
+            "execution_completed": False,
+            "pilot_alarms_clear": False,
+            "gate_b_passed": False,
+            "confirmation_status": "incomplete_protocol",
+            "confirmation_blockers": ["six independent sources required; only 0 reported"],
+        }
+    return evaluate_confirmation_protocol(
+        sources,
+        alarms,
+        identity=identity,
+        expected_identity=expected_identity,
+        evidence=evidence,
+        is_pilot=is_pilot,
+        required_matches=6,
+    )
 
 
 def run_dry_run(destination: Path, n_frames: int = 96) -> dict[str, Any]:
@@ -279,6 +283,8 @@ def run_dry_run(destination: Path, n_frames: int = 96) -> dict[str, Any]:
     (destination / "bounds-before-run.json").write_text(json.dumps(bounds, indent=2) + "\n")
 
     base = load_tier("balanced")
+    identity = capture_current_identity(DEFAULT_MANIFEST, config=base)
+    (destination / "experiment-identity.json").write_text(json.dumps(identity.to_dict(), indent=2) + "\n")
     ladder_plan = []
     for rung in FROZEN_RUNGS:
         cfg = configure_frozen_rung(base, rung, context_id="dryrun_context")
@@ -300,6 +306,7 @@ def run_dry_run(destination: Path, n_frames: int = 96) -> dict[str, Any]:
         "n_frames": n_frames,
         "sources": list(source_paths.keys()),
         "tools_resolved": tools["tools"],
+        "identity": identity.to_dict(),
         "ladder_plan": ladder_plan,
         "bounds": bounds,
     }
@@ -319,6 +326,9 @@ def run_confirmation(
     manifest = load_confirmation_manifest(manifest_path)
     source_paths = verify_source_integrity(manifest)
     write_tool_identity(destination)
+    base = load_tier("balanced")
+    identity = capture_current_identity(manifest_path, config=base)
+    (destination / "experiment-identity.json").write_text(json.dumps(identity.to_dict(), indent=2) + "\n")
     ffmpeg = resolve_ffmpeg().path
 
     points = destination / "points"
@@ -408,7 +418,8 @@ def run_confirmation(
         "n_sources": len(per_source_reports),
         "sources": per_source_reports,
         "alarms": all_alarms,
-        **confirmation_verdict(per_source_reports, all_alarms),
+        "identity": identity.to_dict(),
+        **confirmation_verdict(per_source_reports, all_alarms, identity=identity),
         "timestamp_unix": time.time(),
     }
     (destination / "report.json").write_text(json.dumps(final_report, indent=2) + "\n")

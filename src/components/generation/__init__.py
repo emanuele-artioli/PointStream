@@ -33,6 +33,7 @@ from src.contracts.registry import BackendSpec, Registry
 REGISTRY: Registry[object] = Registry("generator")
 
 
+
 def _add(
     name: str,
     target: str,
@@ -225,3 +226,9 @@ def validate(config: Any) -> None:
             "motion": MOTION,
         },
     )
+
+
+__all__ = [
+    "REGISTRY",
+    "validate",
+]
