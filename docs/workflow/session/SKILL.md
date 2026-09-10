@@ -13,6 +13,15 @@ This skill standardizes task routing, execution reporting, and clean session bou
 
 Use the user's chosen harness and model. Otherwise select by task complexity and available resources; no harness has an exclusive scientific or implementation role. Ordinary edits need no dispatch ceremony.
 
+### Harness capabilities & parallel subagents
+Parallel workstreams and wave dispatches are supported across all coding harnesses on this host (not only Cursor):
+- **VS Code + Antigravity**: Dispatches parallel subagents via `invoke_subagent` with isolated workspaces (`Workspace: "branch"` or `"share"`). Configure subagents with weaker/lighter models (`Model: "flash_lite"` or `"flash"`) to conserve context and token budget, reserving `pro` or session inherit for deep architectural judgment.
+- **Cursor**: Dispatches parallel subagents via `Task` across worktrees. Configure subagents with weaker models (`composer-2.5`) for bounded tasks, reserving `grok-4.5` for complex reasoning.
+- **Claude Code**: Dispatches subagents via `Agent`/`Task`. Configure subagents with weaker models (`haiku` or `sonnet`) rather than expensive flagship models (`opus`).
+- **Codex**: Dispatches subagents and TOML roles under `[agents]`, configured with lighter/cheaper models.
+
+When dispatching multi-lane workstreams, any of these harnesses can run independent lanes concurrently using weaker-model subagents; sequential execution (running lanes in order within a single session) remains the standard fallback when subagents are not used.
+
 ## 2. Modes of Operation
 
 ### Mode A: Route & Dispatch
