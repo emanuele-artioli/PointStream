@@ -1,6 +1,9 @@
 {
   "schema": "pointstream.candidate_inventory.v1",
   "generated_at": "2026-09-10T10:30:00+02:00",
+  "evidence_status": "inventory_only_unverified",
+  "selection_use": "Do not use pilot_stats, decisions, or readiness labels to rank or prune models until each is backed by an immutable smoke or evaluation artifact with matching checkpoint identity.",
+  "pilot_stats_note": "The latency and VRAM entries are planning estimates without linked run artifacts; they are not measured results.",
   "total_backends": 13,
   "summary": {
     "ready": 11,

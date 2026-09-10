@@ -71,7 +71,13 @@ def main() -> None:
     assert isinstance(client_frames, np.ndarray), "client_frames must be ndarray"
 
     # Verification checks
-    client_delivered_identical = bool(bit_identical(client_frames, result.frames))
+    # ``RunResult.frames`` intentionally retains the pre-codec residual view
+    # for reconstruction diagnostics.  The serialised client must instead be
+    # identical to the delivered view, which is the array charged by the wire
+    # ledger and scored by ``delivered_quality``.
+    client_delivered_identical = bool(bit_identical(client_frames, result.delivered_frames))
+    if not client_delivered_identical:
+        raise RuntimeError("fresh serialized client output differs from delivered frames")
     ledger_reconciled = bool(
         chunk.sizes.transport_total == len(wire_request)
         and chunk.sizes.residual == len(transmitted.bitstream)

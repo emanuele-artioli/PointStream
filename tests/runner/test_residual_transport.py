@@ -249,7 +249,7 @@ def test_fresh_process_source_free_decode_and_scored_output_identity() -> None:
     client_frames = reconstruct_serialized_client(wire_bytes)
     assert isinstance(client_frames, np.ndarray)
     assert client_frames.shape == source.shape
-    assert bit_identical(client_frames, result.frames)
+    assert bit_identical(client_frames, result.delivered_frames)
     assert result.delivered_quality is not None
     assert result.delivered_quality.whole_frame() > 20.0
 
@@ -608,4 +608,4 @@ def test_fresh_process_source_free_decode_with_generation_and_residual() -> None
         generator=ref,
     )
     assert isinstance(client_frames, np.ndarray)
-    assert bit_identical(client_frames, result.frames)
+    assert bit_identical(client_frames, result.delivered_frames)

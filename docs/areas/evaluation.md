@@ -23,6 +23,10 @@ Blocking integration findings:
 
 Focused PR #88 residual, campaign and protocol tests passed locally (47 tests); they did not catch the controlled failures above. No new codec run or model training was launched by this audit. Preserve all original outputs; supersede their interpretations rather than rewriting reports. Generator-specific validity and next actions live in [generation](generation.md).
 
+### Repair update — 2026-09-10
+
+The recovery branch has now repaired the listed code paths and passed the complete test suite, lint, mypy, layer-direction check, dry-run preflight and native residual smoke test. Public delivered frames/quality are now client-originated; generation conditioning/reference data travel through the serialized envelope; the envelope, not only the residual stream, is reconciled to the ledger; probe-frame resolution fails closed; diagnostic controls execute from their declared configuration; protocol identity and independent-match grouping are required. These are implementation checks, **not new rate–distortion evidence**. Re-run development curves with the repaired instrumentation before updating any archived diagnostic interpretation or Gate A/B status.
+
 ## 1. Current State
 
 ### Bounded codec pilot controller (PR #82)

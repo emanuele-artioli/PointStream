@@ -322,7 +322,7 @@ def test_missing_checkpoint_fails_explicitly(tmp_path: Path) -> None:
 
 
 def test_temporal_input_reaches_temporal_backend_as_sequence() -> None:
-    from src.components.generation.base import as_runner_ref
+    from src.runner.generation import as_runner_ref
     from src.contracts.capabilities import CAP_TEMPORAL_SEQUENCE
     from src.contracts.conditioning import ConditioningBundle, GenerationParams
     from src.pipeline.reconstruction.device import DevicePolicy

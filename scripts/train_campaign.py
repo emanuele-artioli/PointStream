@@ -78,7 +78,7 @@ import cv2
 import numpy as np
 import torch
 
-from src.components.generation.base import as_runner_ref
+from src.runner.generation import as_runner_ref
 from src.components.generation._numpy import as_chw
 from src.contracts.conditioning import ConditioningBundle
 from src.contracts.config import (
