@@ -21,6 +21,10 @@ from experiments.tier.diagnostic_report import (
 from scripts.run_diagnostic_matrix import assemble_matrix_report, run_matrix
 from src.contracts.config import PointstreamConfig
 
+# The checkout that contains this test file. Do not pin a local worktree path;
+# CI has no /tmp/pointstream-wave1-c.
+_REPO = Path(__file__).resolve().parents[2]
+
 
 @dataclass(frozen=True)
 class FakeClip:
@@ -151,7 +155,7 @@ def test_reporter_includes_required_keys(tmp_path: Path) -> None:
         run_fn=_run_changing_pixels,
         score_fn=_score,
         generator_factory=_factory,
-        repo=Path("/tmp/pointstream-wave1-c"),
+        repo=_REPO,
     )
     for key in REQUIRED_REPORT_KEYS:
         assert key in report, f"missing report key {key}"
@@ -189,7 +193,7 @@ def test_missing_checkpoint_marks_comparison_invalid(tmp_path: Path) -> None:
         run_fn=_run_changing_pixels,
         score_fn=_score,
         generator_factory=_factory,
-        repo=Path("/tmp/pointstream-wave1-c"),
+        repo=_REPO,
     )
     assert report["checkpoint_sha256"] is None
     assert report["generator_comparison_valid"] is False
@@ -226,7 +230,7 @@ def test_noop_generator_marks_comparison_invalid(tmp_path: Path) -> None:
         run_fn=run_without_calling_generator,
         score_fn=_score,
         generator_factory=_factory,
-        repo=Path("/tmp/pointstream-wave1-c"),
+        repo=_REPO,
     )
     assert report["generator_comparison_valid"] is False
     reasons = " ".join(report["generator_comparison"]["reasons"])
@@ -249,7 +253,7 @@ def test_reuse_refuses_mismatched_identity(tmp_path: Path) -> None:
         run_fn=_run_changing_pixels,
         score_fn=_score,
         generator_factory=_factory,
-        repo=Path("/tmp/pointstream-wave1-c"),
+        repo=_REPO,
     )
     other_ckpt = tmp_path / "other.pt"
     other_ckpt.write_bytes(b"other-weights")
@@ -290,7 +294,7 @@ def test_reuse_refuses_mismatched_identity(tmp_path: Path) -> None:
         run_fn=counting_run,
         score_fn=_score,
         generator_factory=_factory,
-        repo=Path("/tmp/pointstream-wave1-c"),
+        repo=_REPO,
     )
     assert calls["n"] == len(second["matrix"])
     before_reuse = calls["n"]
@@ -307,7 +311,7 @@ def test_reuse_refuses_mismatched_identity(tmp_path: Path) -> None:
         run_fn=counting_run,
         score_fn=_score,
         generator_factory=_factory,
-        repo=Path("/tmp/pointstream-wave1-c"),
+        repo=_REPO,
     )
     assert matching["matrix"][0]["corner"] == first["matrix"][0]["corner"]
     assert calls["n"] == before_reuse
@@ -346,7 +350,7 @@ def test_assemble_report_lists_required_top_level_keys() -> None:
         checkpoint_sha256=None,
         device="cpu",
         shuffled_control=False,
-        repo=Path("/tmp/pointstream-wave1-c"),
+        repo=_REPO,
     )
     for key in REQUIRED_REPORT_KEYS:
         assert key in report
