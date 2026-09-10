@@ -7,21 +7,25 @@ entry), not by these tests.
 """
 from __future__ import annotations
 
+import hashlib
 import json
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
 import pytest
 
-import sqlite3
+import sqlite3  # noqa: F401
+import cv2
 import numpy as np
 
 import scripts.train_campaign as train_campaign
+from experiments.probe_set.materialize import sorted_frame_files, window_positions
 from scripts.train_campaign import (
     Variant,
-    build_eval_generator_ref,
     build_train_command,
     checkpoint_path_for_eval,
+    compute_checkpoint_sha256,
     default_variants,
     evaluate_checkpoint,
     halved_batch_size,
@@ -134,10 +138,10 @@ def test_verify_data_root_excludes_probe_set_detects_leak(tmp_path: Path) -> Non
     assert violations == ["video_a/scene_001/track_0001"]
 
 
-def test_rank_variants_prefers_higher_psnr_lower_fvd() -> None:
+def test_rank_variants_prefers_higher_psnr_lower_temporal_error() -> None:
     aggregate = {
-        "good": {"psnr_mean": 32.0, "ssim_mean": 0.9, "vmaf_mean": 80.0, "fvd": 1.0, "lpips_vgg_uncalibrated": 0.1},
-        "bad": {"psnr_mean": 20.0, "ssim_mean": 0.6, "vmaf_mean": 40.0, "fvd": 10.0, "lpips_vgg_uncalibrated": 0.5},
+        "good": {"psnr_mean": 32.0, "ssim_mean": 0.9, "vmaf_mean": 80.0, "temporal_error": 1.0, "lpips_vgg_uncalibrated": 0.1},
+        "bad": {"psnr_mean": 20.0, "ssim_mean": 0.6, "vmaf_mean": 40.0, "temporal_error": 10.0, "lpips_vgg_uncalibrated": 0.5},
     }
     ranked, composite = rank_variants(aggregate)
     assert ranked[0] == "good"
@@ -146,8 +150,8 @@ def test_rank_variants_prefers_higher_psnr_lower_fvd() -> None:
 
 def test_rank_variants_skips_metrics_reported_by_fewer_than_two() -> None:
     aggregate = {
-        "a": {"psnr_mean": 30.0, "ssim_mean": None, "vmaf_mean": None, "fvd": None, "lpips_vgg_uncalibrated": None},
-        "b": {"psnr_mean": 25.0, "ssim_mean": None, "vmaf_mean": None, "fvd": None, "lpips_vgg_uncalibrated": None},
+        "a": {"psnr_mean": 30.0, "ssim_mean": None, "vmaf_mean": None, "temporal_error": None, "lpips_vgg_uncalibrated": None},
+        "b": {"psnr_mean": 25.0, "ssim_mean": None, "vmaf_mean": None, "temporal_error": None, "lpips_vgg_uncalibrated": None},
     }
     ranked, composite = rank_variants(aggregate)
     assert ranked[0] == "a"  # only psnr_mean is usable, a > b
@@ -269,12 +273,13 @@ class MockRunResult:
 
 def test_checkpoint_and_config_identity_reaches_evaluation(tmp_path: Path) -> None:
     ckpt_file = tmp_path / "model.pt"
-    ckpt_file.write_bytes(b"dummy_weights_data")
-    stat = ckpt_file.stat()
-    expected_id = f"model.pt:{stat.st_size}:{int(stat.st_mtime)}"
+    content = b"dummy_weights_data"
+    ckpt_file.write_bytes(content)
+    expected_hash = hashlib.sha256(content).hexdigest()
+    expected_id = f"model.pt:{expected_hash}"
 
     manifest = {
-        "probe_clips": [{"video": "v1", "scene": "s1", "track": "t1", "frame_ids": [0, 1]}],
+        "probe_clips": [{"video": "v1", "scene": "s1", "track": "t1", "frame_ids": [0, 1], "is_synthetic_fixture": True}],
         "held_out_videos": ["v1"],
     }
 
@@ -289,6 +294,7 @@ def test_checkpoint_and_config_identity_reaches_evaluation(tmp_path: Path) -> No
         arch="pix2pix",
         manifest=manifest,
         dataset_root=tmp_path,
+        allow_synthetic=True,
         runner_fn=mock_runner,
     )
 
@@ -386,13 +392,17 @@ def test_actual_selected_checkpoint_is_invoked(tmp_path: Path) -> None:
         invoked_checkpoints.append(getattr(backend_obj, "checkpoint", None))
         return MockRunResult()
 
-    manifest = {"probe_clips": [{"video": "v1", "scene": "s1", "track": "t1", "frame_ids": [0, 1]}]}
+    manifest = {
+        "probe_clips": [{"video": "v1", "scene": "s1", "track": "t1", "frame_ids": [0, 1]}],
+        "held_out_videos": ["v1"],
+    }
 
     evaluate_checkpoint(
         checkpoint_path=ckpt1,
         arch="pix2pix",
         manifest=manifest,
         dataset_root=tmp_path,
+        allow_synthetic=True,
         runner_fn=mock_runner,
     )
     evaluate_checkpoint(
@@ -400,6 +410,7 @@ def test_actual_selected_checkpoint_is_invoked(tmp_path: Path) -> None:
         arch="pix2pix",
         manifest=manifest,
         dataset_root=tmp_path,
+        allow_synthetic=True,
         runner_fn=mock_runner,
     )
 
@@ -434,6 +445,7 @@ def test_evaluator_uses_held_out_development_scenes_and_current_runner_results(t
         manifest=manifest,
         dataset_root=tmp_path,
         held_out_only=True,
+        allow_synthetic=True,
         runner_fn=mock_runner,
     )
 
@@ -450,7 +462,7 @@ def test_evaluator_uses_held_out_development_scenes_and_current_runner_results(t
 
 def test_unsuccessful_evaluation_cannot_select_winning_checkpoint() -> None:
     # Scenario 1: A failed variant with artificially small/0 bytes must not beat a valid variant
-    aggregate_results = {
+    aggregate_results: dict[str, dict[str, Any]] = {
         "valid_candidate": {
             "residual_bytes": 50000,
             "total_bytes": 60000,
@@ -487,10 +499,305 @@ def test_unsuccessful_evaluation_cannot_select_winning_checkpoint() -> None:
     assert survivors == ["valid_candidate"]
 
     # Scenario 2: If all variants failed, promote_survivors returns empty list
-    failed_only = {
+    failed_only: dict[str, dict[str, Any]] = {
         "failed_1": {"success": False, "residual_bytes": 10},
         "failed_2": {"eval_failed": True, "residual_bytes": 20},
     }
     ranked_failed, _ = rank_variants(failed_only)
     survivors_failed = promote_survivors(ranked_failed, failed_only)
     assert survivors_failed == []
+
+
+def test_local_global_frame_coordinate_resolution(tmp_path: Path) -> None:
+    track_dir = tmp_path / "track_0001"
+    skel_dir = tmp_path / "track_0001_skeleton"
+    track_dir.mkdir()
+    skel_dir.mkdir()
+
+    global_fids = [223, 224, 225]
+    for idx, gfid in enumerate(global_fids):
+        (track_dir / f"frame_{gfid:06d}.png").write_bytes(b"dummy_crop")
+        (skel_dir / f"frame_{idx:06d}.png").write_bytes(b"dummy_skel")
+
+    crop_files = sorted_frame_files(track_dir)
+    skel_files = sorted_frame_files(skel_dir)
+
+    positions = window_positions(crop_files, tuple(global_fids))
+    assert positions == [0, 1, 2]
+    for idx, pos in enumerate(positions):
+        assert crop_files[pos].name == f"frame_{global_fids[idx]:06d}.png"
+        assert skel_files[pos].name == f"frame_{idx:06d}.png"
+
+
+def test_missing_source_or_pose_fails_loudly(tmp_path: Path) -> None:
+    ckpt = tmp_path / "weights.pt"
+    ckpt.write_bytes(b"weights")
+    manifest = {
+        "probe_clips": [{"video": "vid_missing", "scene": "s1", "track": "t1", "frame_ids": [0, 1]}],
+        "held_out_videos": ["vid_missing"],
+    }
+    with pytest.raises(FileNotFoundError):
+        evaluate_checkpoint(
+            checkpoint_path=ckpt,
+            arch="pix2pix",
+            manifest=manifest,
+            dataset_root=tmp_path,
+            allow_synthetic=False,
+        )
+
+
+def test_empty_split_and_wire_accounting_validation(tmp_path: Path) -> None:
+    ckpt = tmp_path / "weights.pt"
+    ckpt.write_bytes(b"weights")
+    manifest = {
+        "held_out_videos": ["different_video"],
+        "probe_clips": [{"video": "vid_train", "scene": "s1", "track": "t1", "frame_ids": [0, 1]}],
+    }
+    res = evaluate_checkpoint(
+        checkpoint_path=ckpt,
+        arch="pix2pix",
+        manifest=manifest,
+        dataset_root=tmp_path,
+        held_out_only=True,
+    )
+    agg = res["aggregate"]
+    assert agg["success"] is False
+    assert agg["eval_failed"] is True
+    assert agg["residual_bytes"] == float("inf")
+    assert not is_valid_eval(agg)
+
+    # Wire accounting violation: total_bytes < residual_bytes
+    invalid_wire = {
+        "residual_bytes": 50000,
+        "total_bytes": 40000,
+        "success": True,
+        "checkpoint_identity": "model.pt:1234",
+    }
+    assert not is_valid_eval(invalid_wire)
+
+    # Empty / non-positive per-clip count
+    invalid_clips = {
+        "residual_bytes": 50000,
+        "total_bytes": 60000,
+        "per_clip_count": 0,
+        "success": True,
+        "checkpoint_identity": "model.pt:1234",
+    }
+    assert not is_valid_eval(invalid_clips)
+
+
+def test_real_geometry_retained_in_evaluator(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("PS_DATA_ROOT", str(tmp_path))
+    dataset_root = tmp_path / "dataset"
+    video = "vid1"
+    scene = "scene1"
+    track = "track_0001"
+    track_dir = dataset_root / video / "segmentations" / scene / track
+    skel_dir = dataset_root / video / "segmentations" / scene / f"{track}_skeleton"
+    track_dir.mkdir(parents=True)
+    skel_dir.mkdir(parents=True)
+
+    extract_dir = tmp_path / "outputs" / "bp46-long-scenes" / "clips" / video / scene / "extract_24"
+    extract_dir.mkdir(parents=True)
+
+    full_frame = np.full((128, 128, 3), 150, dtype=np.uint8)
+    cv2.imwrite(str(extract_dir / "frame_000010.png"), full_frame)
+    cv2.imwrite(str(extract_dir / "frame_000011.png"), full_frame)
+
+    crop_rgba = np.full((32, 32, 4), 200, dtype=np.uint8)
+    crop_rgba[:, :, 3] = 255
+    cv2.imwrite(str(track_dir / "frame_000010.png"), crop_rgba)
+    cv2.imwrite(str(track_dir / "frame_000011.png"), crop_rgba)
+
+    skel_rgb = np.full((32, 32, 3), 50, dtype=np.uint8)
+    cv2.imwrite(str(skel_dir / "frame_000000.png"), skel_rgb)
+    cv2.imwrite(str(skel_dir / "frame_000001.png"), skel_rgb)
+
+    meta_file = dataset_root / video / "segmentations" / scene / f"{track}_metadata.json"
+    metadata = [
+        {"frame_id": 10, "bbox": [16, 20, 48, 52]},
+        {"frame_id": 11, "bbox": [18, 22, 50, 54]},
+    ]
+    meta_file.write_text(json.dumps(metadata))
+
+    captured_objects: list[Any] = []
+
+    def mock_runner(cfg: Any, sources: Any, generator: Any = None, objects: Any = None, context_ids: Any = None) -> Any:
+        captured_objects.append(objects)
+        return MockRunResult(residual=10000, transport_total=12000)
+
+    ckpt = tmp_path / "weights.pt"
+    ckpt.write_bytes(b"dummy")
+    manifest = {
+        "probe_clips": [{"video": video, "scene": scene, "track": track, "frame_ids": [10, 11]}],
+        "held_out_videos": [video],
+    }
+
+    evaluate_checkpoint(
+        checkpoint_path=ckpt,
+        arch="pix2pix",
+        manifest=manifest,
+        dataset_root=dataset_root,
+        eval_mode="whole_codec",
+        runner_fn=mock_runner,
+    )
+
+    assert len(captured_objects) == 1
+    objs = captured_objects[0][0]
+    assert len(objs) == 2
+    assert objs[0].bbox == (16, 20, 48, 52)
+    assert objs[1].bbox == (18, 22, 50, 54)
+    assert objs[0].mask.shape == (128, 128)
+
+
+def test_no_overlap_with_forbidden_confirmation_sources(tmp_path: Path) -> None:
+    leaked_dir = tmp_path / "forbidden_video" / "segmentations" / "scene_01" / "track_01"
+    leaked_dir.mkdir(parents=True)
+    manifest = {
+        "excluded_training_keys": ["forbidden_video/scene_01/track_01"],
+        "held_out_videos": ["forbidden_video"],
+    }
+    violations = verify_data_root_excludes_probe_set(tmp_path, manifest)
+    assert violations == ["forbidden_video/scene_01/track_01"]
+
+
+def test_checkpoint_sha256_device_seed_reach_inference(tmp_path: Path) -> None:
+    ckpt = tmp_path / "test_model.pt"
+    content = b"unique_checkpoint_payload_data"
+    ckpt.write_bytes(content)
+    expected_sha = hashlib.sha256(content).hexdigest()
+    assert compute_checkpoint_sha256(ckpt) == expected_sha
+
+    manifest = {
+        "probe_clips": [{"video": "v1", "scene": "s1", "track": "t1", "frame_ids": [0, 1]}],
+        "held_out_videos": ["v1"],
+    }
+    res = evaluate_checkpoint(
+        checkpoint_path=ckpt,
+        arch="pix2pix",
+        manifest=manifest,
+        dataset_root=tmp_path,
+        allow_synthetic=True,
+        device="cpu",
+        seed=1337,
+        runner_fn=lambda *a, **k: MockRunResult(),
+    )
+    agg = res["aggregate"]
+    assert agg["checkpoint_identity"] == f"test_model.pt:{expected_sha}"
+    assert agg["device"] == "cpu"
+    assert agg["seed"] == 1337
+
+
+def test_client_output_perturbation_changes_ranking() -> None:
+    unperturbed = {
+        "cand_a": {"residual_bytes": 10000, "total_bytes": 15000, "psnr_mean": 35.0, "success": True},
+        "cand_b": {"residual_bytes": 20000, "total_bytes": 25000, "psnr_mean": 34.0, "success": True},
+    }
+    ranked_clean, _ = rank_variants(unperturbed)
+    assert ranked_clean == ["cand_a", "cand_b"]
+
+    perturbed = {
+        "cand_a": {"residual_bytes": 30000, "total_bytes": 35000, "psnr_mean": 25.0, "success": True},
+        "cand_b": {"residual_bytes": 20000, "total_bytes": 25000, "psnr_mean": 34.0, "success": True},
+    }
+    ranked_perturbed, _ = rank_variants(perturbed)
+    assert ranked_perturbed == ["cand_b", "cand_a"]
+
+
+def test_configuration_matched_control_reuse_only() -> None:
+    existing_records = [
+        {
+            "video": "v1", "scene": "s1", "frames": 24, "generator": "pix2pix", "residual_qp": 28,
+            "metrics": {"residual_bytes": 1000},
+        }
+    ]
+    match = next(
+        (r for r in existing_records if (r["video"], r["scene"], r["frames"], r["generator"], r["residual_qp"]) == ("v1", "s1", 24, "pix2pix", 28)),
+        None,
+    )
+    assert match is not None
+
+    mismatch_qp = next(
+        (r for r in existing_records if (r["video"], r["scene"], r["frames"], r["generator"], r["residual_qp"]) == ("v1", "s1", 24, "pix2pix", 32)),
+        None,
+    )
+    assert mismatch_qp is None
+
+    mismatch_frames = next(
+        (r for r in existing_records if (r["video"], r["scene"], r["frames"], r["generator"], r["residual_qp"]) == ("v1", "s1", 48, "pix2pix", 28)),
+        None,
+    )
+    assert mismatch_frames is None
+
+
+def test_restore_spade_flag_restores_candidate(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    campaign_dir = tmp_path / "campaign"
+    campaign_dir.mkdir(parents=True)
+    state_file = campaign_dir / "campaign_state.json"
+    initial_state = {
+        "rung": 1,
+        "alive": ["pix2pix"],
+        "cumulative_epochs": {"pix2pix": 2, "spade4tennis_lite": 1},
+        "variants": {"pix2pix": asdict(Variant(name="pix2pix", arch="pix2pix", kind="pix2pix"))},
+        "history": [],
+    }
+    state_file.write_text(json.dumps(initial_state))
+    data_root = tmp_path / "data_root"
+    data_root.mkdir()
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(json.dumps({"excluded_training_keys": [], "probe_clips": []}))
+
+    monkeypatch.setattr(train_campaign, "run_training_subprocess", lambda *a, **k: 0)
+
+    exit_code = main([
+        "--campaign-dir", str(campaign_dir),
+        "--manifest", str(manifest_path),
+        "--data-root", str(data_root),
+        "--restore-spade",
+        "--dry-run",
+    ])
+    assert exit_code == 0
+    loaded = load_state(state_file)
+    assert "spade4tennis_lite" in loaded["alive"]
+
+
+def test_survivor_continuation_to_max_rungs(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    campaign_dir = tmp_path / "campaign"
+    campaign_dir.mkdir(parents=True)
+    state_file = campaign_dir / "campaign_state.json"
+    initial_state = {
+        "rung": 0,
+        "alive": ["pix2pix"],
+        "cumulative_epochs": {"pix2pix": 1},
+        "variants": {"pix2pix": asdict(Variant(name="pix2pix", arch="pix2pix", kind="pix2pix"))},
+        "history": [],
+    }
+    state_file.write_text(json.dumps(initial_state))
+    data_root = tmp_path / "data_root"
+    data_root.mkdir()
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(json.dumps({"excluded_training_keys": [], "probe_clips": []}))
+
+    monkeypatch.setattr(train_campaign, "run_training_subprocess", lambda *a, **k: 0)
+    monkeypatch.setattr(
+        train_campaign,
+        "eval_variant",
+        lambda *a, **k: {
+            "residual_bytes": 1000,
+            "total_bytes": 2000,
+            "success": True,
+            "checkpoint_identity": "pix2pix.pt:abc",
+        },
+    )
+
+    exit_code = main([
+        "--campaign-dir", str(campaign_dir),
+        "--manifest", str(manifest_path),
+        "--data-root", str(data_root),
+        "--no-restore-spade",
+        "--auto-continue",
+        "--max-rungs", "2",
+    ])
+    assert exit_code == 0
+    loaded = load_state(state_file)
+    assert loaded["rung"] == 2

@@ -58,9 +58,11 @@ Usage
         --eval-dataset-root assets/dataset \\
         --initial-epochs 1
 """
+
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import subprocess
@@ -68,10 +70,9 @@ import sys
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
-import sqlite3
-from collections.abc import Callable
+import sqlite3  # noqa: F401
 
 import cv2
 import numpy as np
@@ -109,26 +110,51 @@ def append_jsonl_log(log_path: Path, record: dict[str, Any]) -> None:
         handle.write(json.dumps(record, sort_keys=False) + "\n")
 
 
+def compute_checkpoint_sha256(ckpt_path: Path) -> str:
+    """Compute immutable SHA256 content hash of checkpoint file or directory."""
+    if ckpt_path.is_file():
+        h = hashlib.sha256()
+        with ckpt_path.open("rb") as f:
+            for chunk in iter(lambda: f.read(65536), b""):
+                h.update(chunk)
+        return h.hexdigest()
+    elif ckpt_path.is_dir():
+        h = hashlib.sha256()
+        for p in sorted(ckpt_path.rglob("*")):
+            if p.is_file():
+                h.update(p.relative_to(ckpt_path).as_posix().encode("utf-8"))
+                with p.open("rb") as f:
+                    for chunk in iter(lambda: f.read(65536), b""):
+                        h.update(chunk)
+        return h.hexdigest()
+    return "unknown"
+
+
 def build_eval_generator_ref(
     arch: str,
     checkpoint_path: Path,
     condition_type: str | None = None,
     arch_kwargs: dict[str, Any] | None = None,
+    device: str | None = None,
+    seed: int | None = None,
 ) -> Any:
     """Build a runner-compatible GeneratorRef for the given checkpoint."""
     from src.contracts.capabilities import CAP_TEMPORAL_SEQUENCE
 
-    extra = arch_kwargs or {}
+    extra = dict(arch_kwargs or {})
+    if device is not None and "device" not in extra:
+        extra["device"] = device
+
+    backend: Any
+    caps: frozenset[str] = frozenset()
+    reqs: frozenset[str] = frozenset({"pose", "appearance"})
+
     if arch == "pix2pix":
         from src.components.generation.pix2pix import Pix2PixGenerator
         backend = Pix2PixGenerator(checkpoint=str(checkpoint_path))
-        caps = frozenset()
-        reqs = frozenset({"pose", "appearance"})
     elif arch == "spade4tennis":
         from src.components.generation.spade import Spade4TennisGenerator
         backend = Spade4TennisGenerator(checkpoint=str(checkpoint_path))
-        caps = frozenset()
-        reqs = frozenset({"pose", "appearance"})
     elif arch in ("controlnet", "pose-controlnet"):
         from src.components.generation.controlnet import ControlNetGenerator
         backend = ControlNetGenerator(
@@ -136,13 +162,10 @@ def build_eval_generator_ref(
             checkpoint=str(checkpoint_path),
             **extra,
         )
-        caps = frozenset()
-        reqs = frozenset({"pose", "appearance"})
     elif arch in ("animate-anyone", "animate_anyone"):
         from src.components.generation.animate_anyone import AnimateAnyoneGenerator
         backend = AnimateAnyoneGenerator(checkpoint=str(checkpoint_path), **extra)
         caps = frozenset({CAP_TEMPORAL_SEQUENCE})
-        reqs = frozenset({"pose", "appearance"})
     else:
         raise ValueError(f"Unsupported generator architecture: {arch}")
 
@@ -166,6 +189,8 @@ def evaluate_checkpoint(
     fitted_weights_path: Path | str | None = None,
     max_clips: int | None = None,
     held_out_only: bool = True,
+    eval_mode: str = "whole_codec",
+    allow_synthetic: bool = False,
     runner_fn: Callable[..., Any] | None = None,
 ) -> dict[str, Any]:
     """Score checkpoint through the current runner (src.runner.run).
@@ -177,8 +202,14 @@ def evaluate_checkpoint(
     if not ckpt_file.exists():
         raise FileNotFoundError(f"Checkpoint not found at {ckpt_file}")
 
-    stat = ckpt_file.stat()
-    checkpoint_identity = f"{ckpt_file.name}:{stat.st_size}:{int(stat.st_mtime)}"
+    ckpt_sha = compute_checkpoint_sha256(ckpt_file)
+    checkpoint_identity = f"{ckpt_file.name}:{ckpt_sha}"
+
+    # Apply seeds
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+    np.random.seed(seed)
 
     # Count video-specific fitted weights if provided
     fitted_weight_bytes = 0
@@ -187,20 +218,23 @@ def evaluate_checkpoint(
         if fpath.exists():
             fitted_weight_bytes = fpath.stat().st_size
 
-    # Build generator ref
+    # Build generator ref with device and seed
+    eval_arch_kwargs = dict(arch_kwargs or {})
     ref = build_eval_generator_ref(
         arch=arch,
         checkpoint_path=ckpt_file,
         condition_type=condition_type,
-        arch_kwargs=arch_kwargs,
+        arch_kwargs=eval_arch_kwargs,
+        device=device,
+        seed=seed,
     )
 
     # Select held-out development scenes
     probe_clips = manifest.get("probe_clips", [])
-    if held_out_only and "held_out_videos" in manifest:
-        held_out_set = set(manifest["held_out_videos"])
-        candidate_clips = [c for c in probe_clips if c.get("video") in held_out_set]
-        clips = candidate_clips if candidate_clips else probe_clips
+    if held_out_only:
+        held_out_set = set(manifest.get("held_out_videos", []))
+        clips = [c for c in probe_clips if c.get("video") in held_out_set]
+        # Never fall back from an empty held-out selection to all probes!
     else:
         clips = probe_clips
 
@@ -208,22 +242,24 @@ def evaluate_checkpoint(
         clips = clips[:max_clips]
 
     if not clips:
-        # Minimal empty result if no clips available
+        # Empty clips must fail closed - cannot succeed or promote!
         return {
             "per_clip": [],
+            "source_grouping": {},
             "aggregate": {
-                "residual_bytes": 0,
-                "total_bytes": fitted_weight_bytes,
+                "residual_bytes": float("inf"),
+                "total_bytes": float("inf"),
                 "video_fitted_weight_bytes": fitted_weight_bytes,
                 "psnr_mean": None,
                 "ssim_mean": None,
                 "vmaf_mean": None,
-                "fvd": None,
                 "temporal_error": None,
                 "encoder_seconds": 0.0,
                 "client_seconds": 0.0,
                 "checkpoint_identity": checkpoint_identity,
-                "success": True,
+                "success": False,
+                "eval_failed": True,
+                "error": "empty_clip_selection",
             },
         }
 
@@ -260,77 +296,247 @@ def evaluate_checkpoint(
     per_clip_metrics: list[dict[str, Any]] = []
 
     for clip in clips:
-        track_dir = dataset_path / clip.get("video", "") / "segmentations" / clip.get("scene", "") / clip.get("track", "")
-        skel_dir = dataset_path / clip.get("video", "") / "segmentations" / clip.get("scene", "") / f"{clip.get('track', '')}_skeleton"
+        video = clip.get("video", "")
+        scene = clip.get("scene", "")
+        track = clip.get("track", "")
+        clip_key = clip.get("key", f"{video}/{scene}/{track}")
 
-        frame_ids = sorted(clip.get("frame_ids", [0, 1]))
-        source_frames_list = []
-        pose_frames_list = []
-        ref_frame = None
-
-        if track_dir.exists() and skel_dir.exists():
-            for fid in frame_ids:
-                fname = f"frame_{fid:06d}.png"
-                f_path = track_dir / fname
-                s_bgr = cv2.imread(str(f_path)) if f_path.exists() else None
-                if s_bgr is not None:
-                    s_rgb = cv2.cvtColor(s_bgr, cv2.COLOR_BGR2RGB)
-                else:
-                    s_rgb = np.full((img_size, img_size, 3), 128, dtype=np.uint8)
-
-                p_path = skel_dir / fname
-                p_bgr = cv2.imread(str(p_path)) if p_path.exists() else None
-                if p_bgr is not None:
-                    p_rgb = cv2.cvtColor(p_bgr, cv2.COLOR_BGR2RGB)
-                else:
-                    p_rgb = np.zeros_like(s_rgb)
-
-                if s_rgb.shape[:2] != (img_size, img_size):
-                    s_rgb = cv2.resize(s_rgb, (img_size, img_size))
-                    p_rgb = cv2.resize(p_rgb, (img_size, img_size))
-
-                source_frames_list.append(s_rgb)
-                pose_frames_list.append(p_rgb)
-                if ref_frame is None:
-                    ref_frame = s_rgb.copy()
-        else:
-            # Fallback for synthetic/unit-test fixtures
+        # Injected test fixture support
+        is_synthetic = clip.get("is_synthetic_fixture") or clip.get("synthetic") or (allow_synthetic and not (dataset_path / video).exists())
+        if is_synthetic:
+            frame_ids = sorted(clip.get("frame_ids", [0, 1]))
             n_frames = max(2, len(frame_ids))
             source_frames_list = [np.full((img_size, img_size, 3), 100 + i * 2, dtype=np.uint8) for i in range(n_frames)]
             pose_frames_list = [np.full((img_size, img_size, 3), 50, dtype=np.uint8) for _ in range(n_frames)]
-            ref_frame = source_frames_list[0].copy()
+            ref_frame: np.ndarray = source_frames_list[0].copy()
+            source_clip = np.stack(source_frames_list, axis=0)
+            t, h, w, _ = source_clip.shape
+            mask = np.ones((h, w), dtype=bool)
+            bbox = (0, 0, w, h)
+            obj_requests = []
+            for idx in range(t):
+                bundle = ConditioningBundle(
+                    appearance=as_chw(ref_frame),
+                    pose=as_chw(pose_frames_list[idx]),
+                    bbox=bbox,
+                    frame_index=idx,
+                    object_id=track or "player",
+                )
+                req = ObjectRequest(
+                    object_id=track or "player",
+                    appearance=ref_frame,
+                    bbox=bbox,
+                    mask=mask,
+                    frame_index=idx,
+                    conditioning=bundle,
+                )
+                obj_requests.append(req)
+        else:
+            # Real dataset loading: resolve candidate track directories
+            track_dir = None
+            skel_dir = None
+            if clip.get("path") and (dataset_path / clip["path"]).is_dir():
+                track_dir = dataset_path / clip["path"]
+                skel_dir = track_dir.with_name(f"{track_dir.name}_skeleton")
+            elif (dataset_path / video / "segmentations" / scene / track).is_dir():
+                track_dir = dataset_path / video / "segmentations" / scene / track
+                skel_dir = dataset_path / video / "segmentations" / scene / f"{track}_skeleton"
+            elif clip.get("source_track") and Path(clip["source_track"]).is_dir():
+                track_dir = Path(clip["source_track"])
+                skel_dir = track_dir.with_name(f"{track_dir.name}_skeleton")
+            else:
+                raise FileNotFoundError(
+                    f"Clip {clip_key}: neither {dataset_path / video / 'segmentations' / scene / track} "
+                    f"nor {clip.get('path')} could be found"
+                )
 
-        source_clip = np.stack(source_frames_list, axis=0)
-        t, h, w, _ = source_clip.shape
+            if not track_dir.is_dir():
+                raise FileNotFoundError(f"Missing crop directory: {track_dir} for clip {clip_key}")
+            if not skel_dir.is_dir():
+                raise FileNotFoundError(f"Missing skeleton directory: {skel_dir} for clip {clip_key}")
 
-        # Create objects for each frame in the chunk
-        obj_requests = []
-        mask = np.zeros((h, w), dtype=bool)
-        # Bounding box covering central region
-        y1, y2 = h // 4, 3 * h // 4
-        x1, x2 = w // 4, 3 * w // 4
-        mask[y1:y2, x1:x2] = True
-        bbox = (x1, y1, x2, y2)
+            frame_ids = list(sorted(clip.get("frame_ids", [])))
+            global_frame_ids = list(clip.get("global_frame_ids", []))
+            if not frame_ids and global_frame_ids:
+                frame_ids = list(range(len(global_frame_ids)))
+            elif not global_frame_ids and frame_ids:
+                global_frame_ids = list(frame_ids)
 
-        for idx in range(t):
-            bundle = ConditioningBundle(
-                appearance=as_chw(ref_frame),
-                pose=as_chw(pose_frames_list[idx]),
-                bbox=bbox,
-                frame_index=idx,
-                object_id=clip.get("track", "player"),
-            )
-            req = ObjectRequest(
-                object_id=clip.get("track", "player"),
-                appearance=ref_frame,
-                bbox=bbox,
-                mask=mask,
-                frame_index=idx,
-                conditioning=bundle,
-            )
-            obj_requests.append(req)
+            from experiments.probe_set.materialize import sorted_frame_files, window_positions
+            crop_files_all = sorted_frame_files(track_dir)
+            skel_files_all = sorted_frame_files(skel_dir)
 
-        clip_key = clip.get("key", f"{clip.get('video')}/{clip.get('scene')}/{clip.get('track')}")
+            if not crop_files_all:
+                raise FileNotFoundError(f"Crop directory {track_dir} contains no frame_*.png files")
+            if not skel_files_all:
+                raise FileNotFoundError(f"Skeleton directory {skel_dir} contains no frame_*.png files")
+
+            positions: list[int] = []
+            if global_frame_ids:
+                try:
+                    positions = window_positions(crop_files_all, tuple(global_frame_ids))
+                except Exception:
+                    try:
+                        positions = window_positions(crop_files_all, tuple(frame_ids))
+                    except Exception as exc:
+                        raise FileNotFoundError(
+                            f"Clip {clip_key}: frame resolution failed for global {global_frame_ids[:3]} and local {frame_ids[:3]}"
+                        ) from exc
+            else:
+                try:
+                    positions = window_positions(crop_files_all, tuple(frame_ids))
+                except Exception as exc:
+                    raise FileNotFoundError(f"Clip {clip_key}: frame resolution failed for {frame_ids[:3]}") from exc
+
+            crop_paths: list[Path] = []
+            skel_paths: list[Path] = []
+            for local_idx, pos in enumerate(positions):
+                if pos >= len(crop_files_all):
+                    raise FileNotFoundError(f"Clip {clip_key}: position {pos} out of range in {track_dir}")
+                crop_paths.append(crop_files_all[pos])
+
+                if len(skel_files_all) == len(crop_files_all):
+                    skel_paths.append(skel_files_all[pos])
+                elif pos < len(skel_files_all):
+                    skel_paths.append(skel_files_all[pos])
+                elif local_idx < len(skel_files_all):
+                    skel_paths.append(skel_files_all[local_idx])
+                else:
+                    raise FileNotFoundError(f"Clip {clip_key}: cannot pair skeleton for frame at position {pos}")
+
+            crops_rgb: list[np.ndarray] = []
+            poses_rgb: list[np.ndarray] = []
+            crops_rgba: list[np.ndarray] = []
+
+            for cp, sp in zip(crop_paths, skel_paths):
+                if not cp.is_file():
+                    raise FileNotFoundError(f"Missing crop file: {cp}")
+                if not sp.is_file():
+                    raise FileNotFoundError(f"Missing skeleton file: {sp}")
+
+                c_raw = cv2.imread(str(cp), cv2.IMREAD_UNCHANGED)
+                if c_raw is None:
+                    raise FileNotFoundError(f"Failed to read crop image {cp}")
+                p_raw = cv2.imread(str(sp))
+                if p_raw is None:
+                    raise FileNotFoundError(f"Failed to read pose image {sp}")
+
+                if c_raw.ndim == 3 and c_raw.shape[2] == 4:
+                    crops_rgba.append(c_raw)
+                    c_rgb = cv2.cvtColor(c_raw[:, :, :3], cv2.COLOR_BGR2RGB)
+                elif c_raw.ndim == 3:
+                    c_rgb = cv2.cvtColor(c_raw, cv2.COLOR_BGR2RGB)
+                    crops_rgba.append(np.dstack([c_raw, np.full(c_raw.shape[:2], 255, dtype=np.uint8)]))
+                else:
+                    raise ValueError(f"Invalid crop image format at {cp}")
+
+                p_rgb = cv2.cvtColor(p_raw, cv2.COLOR_BGR2RGB)
+                crops_rgb.append(c_rgb)
+                poses_rgb.append(p_rgb)
+
+            ref_crop: np.ndarray = crops_rgb[0]
+
+            from src.contracts import paths as ps_paths
+            bp46_dir = ps_paths.outputs() / "bp46-long-scenes" / "clips" / video / scene / "extract_24"
+            bp21_dir = ps_paths.outputs() / "bp21-headroom" / "clips" / video / scene / "extract_24"
+            extract_dir = bp46_dir if bp46_dir.is_dir() else (bp21_dir if bp21_dir.is_dir() else None)
+
+            meta_path = track_dir.parent / f"{track}_metadata.json"
+            metadata: list[dict[str, Any]] = []
+            if meta_path.is_file():
+                try:
+                    metadata = json.loads(meta_path.read_text())
+                except Exception:
+                    pass
+
+            meta_by_fid: dict[int, dict[str, Any]] = {}
+            if metadata and isinstance(metadata, list):
+                for entry in metadata:
+                    if isinstance(entry, dict) and "frame_id" in entry:
+                        meta_by_fid[entry["frame_id"]] = entry
+
+            use_full_frame = (eval_mode == "whole_codec") and (extract_dir is not None) and bool(meta_by_fid) and bool(global_frame_ids)
+
+            if use_full_frame and extract_dir is not None:
+                full_frames_list = []
+                obj_requests = []
+                t_count = len(crop_paths)
+
+                sample_full = cv2.imread(str(extract_dir / f"frame_{global_frame_ids[0]:06d}.png"))
+                if sample_full is None:
+                    raise FileNotFoundError(f"Missing extracted full frame for {global_frame_ids[0]}")
+                full_h, full_w = sample_full.shape[:2]
+
+                for idx in range(t_count):
+                    gid = global_frame_ids[idx]
+                    fpath = extract_dir / f"frame_{gid:06d}.png"
+                    if not fpath.is_file():
+                        raise FileNotFoundError(f"Missing full frame: {fpath}")
+                    fbgr = cv2.imread(str(fpath))
+                    if fbgr is None:
+                        raise FileNotFoundError(f"Failed to read full frame: {fpath}")
+                    frgb = cv2.cvtColor(fbgr, cv2.COLOR_BGR2RGB)
+                    full_frames_list.append(frgb)
+
+                    meta_entry = meta_by_fid.get(gid) or (metadata[positions[idx]] if positions[idx] < len(metadata) else None)
+                    if meta_entry is None or "bbox" not in meta_entry:
+                        raise ValueError(f"Missing bbox in metadata for frame {gid}")
+
+                    bbox_raw = meta_entry["bbox"]
+                    x1, y1, x2, y2 = (int(v) for v in bbox_raw)
+
+                    mask_full = np.zeros((full_h, full_w), dtype=bool)
+                    crop_a = crops_rgba[idx][:, :, 3] >= 128
+                    ch, cw = crop_a.shape[:2]
+                    clip_y2 = min(full_h, y1 + ch)
+                    clip_x2 = min(full_w, x1 + cw)
+                    mask_full[y1:clip_y2, x1:clip_x2] = crop_a[:(clip_y2 - y1), :(clip_x2 - x1)]
+
+                    bundle = ConditioningBundle(
+                        appearance=as_chw(ref_crop),
+                        pose=as_chw(poses_rgb[idx]),
+                        bbox=(x1, y1, x2, y2),
+                        frame_index=idx,
+                        object_id=track,
+                    )
+                    req = ObjectRequest(
+                        object_id=track,
+                        appearance=ref_crop,
+                        bbox=(x1, y1, x2, y2),
+                        mask=mask_full,
+                        frame_index=idx,
+                        conditioning=bundle,
+                    )
+                    obj_requests.append(req)
+
+                source_clip = np.stack(full_frames_list, axis=0)
+            else:
+                crops_resized = [cv2.resize(c, (img_size, img_size)) for c in crops_rgb]
+                poses_resized = [cv2.resize(p, (img_size, img_size)) for p in poses_rgb]
+                ref_resized: np.ndarray = crops_resized[0]
+                source_clip = np.stack(crops_resized, axis=0)
+                t, h, w, _ = source_clip.shape
+
+                obj_requests = []
+                for idx in range(t):
+                    crop_a = cv2.resize(crops_rgba[idx][:, :, 3], (img_size, img_size)) >= 128
+                    bundle = ConditioningBundle(
+                        appearance=as_chw(ref_resized),
+                        pose=as_chw(poses_resized[idx]),
+                        bbox=(0, 0, w, h),
+                        frame_index=idx,
+                        object_id=track,
+                    )
+                    req = ObjectRequest(
+                        object_id=track,
+                        appearance=ref_resized,
+                        bbox=(0, 0, w, h),
+                        mask=crop_a,
+                        frame_index=idx,
+                        conditioning=bundle,
+                    )
+                    obj_requests.append(req)
+
         run_res = runner(
             cfg,
             [source_clip],
@@ -358,8 +564,8 @@ def evaluate_checkpoint(
         except KeyError:
             pass
 
-        # Temporal error metric
-        if t > 1:
+        t_len = len(source_clip)
+        if t_len > 1:
             src_diff = np.mean(np.abs(source_clip[1:].astype(float) - source_clip[:-1].astype(float)))
             del_diff = np.mean(np.abs(delivered[1:].astype(float) - delivered[:-1].astype(float)))
             temporal_error = float(abs(src_diff - del_diff))
@@ -368,6 +574,9 @@ def evaluate_checkpoint(
 
         clip_record = {
             "clip_key": clip_key,
+            "video": video,
+            "scene": scene,
+            "track": track,
             "residual_bytes": int(run_res.sizes.residual),
             "transport_total": int(run_res.sizes.transport_total),
             "psnr": psnr_val,
@@ -379,7 +588,6 @@ def evaluate_checkpoint(
         }
         per_clip_metrics.append(clip_record)
 
-    # Compute aggregates across clips
     total_residual_bytes = sum(c["residual_bytes"] for c in per_clip_metrics)
     total_transport_bytes = sum(c["transport_total"] for c in per_clip_metrics) + fitted_weight_bytes
 
@@ -398,6 +606,23 @@ def evaluate_checkpoint(
     total_encoder_seconds = sum(c["encoder_seconds"] for c in per_clip_metrics)
     total_client_seconds = sum(c["client_seconds"] for c in per_clip_metrics)
 
+    by_source: dict[str, list[dict[str, Any]]] = {}
+    for c in per_clip_metrics:
+        vid = c.get("video", "unknown")
+        by_source.setdefault(vid, []).append(c)
+
+    source_grouping: dict[str, dict[str, Any]] = {}
+    for vid, clips_in_vid in by_source.items():
+        source_grouping[vid] = {
+            "num_clips": len(clips_in_vid),
+            "residual_bytes": sum(c["residual_bytes"] for c in clips_in_vid),
+            "total_bytes": sum(c["transport_total"] for c in clips_in_vid),
+            "psnr_mean": float(np.mean([c["psnr"] for c in clips_in_vid if c["psnr"] is not None])) if any(c["psnr"] is not None for c in clips_in_vid) else None,
+            "ssim_mean": float(np.mean([c["ssim"] for c in clips_in_vid if c["ssim"] is not None])) if any(c["ssim"] is not None for c in clips_in_vid) else None,
+            "vmaf_mean": float(np.mean([c["vmaf"] for c in clips_in_vid if c["vmaf"] is not None])) if any(c["vmaf"] is not None for c in clips_in_vid) else None,
+            "temporal_error": float(np.mean([c["temporal_error"] for c in clips_in_vid])),
+        }
+
     aggregate = {
         "residual_bytes": total_residual_bytes,
         "total_bytes": total_transport_bytes,
@@ -405,19 +630,21 @@ def evaluate_checkpoint(
         "psnr_mean": psnr_mean,
         "ssim_mean": ssim_mean,
         "vmaf_mean": vmaf_mean,
-        "fvd": temporal_error_mean,
         "temporal_error": temporal_error_mean,
         "lpips_vgg_uncalibrated": None,
         "encoder_seconds": total_encoder_seconds,
         "client_seconds": total_client_seconds,
         "checkpoint_identity": checkpoint_identity,
+        "device": device,
+        "seed": seed,
+        "per_clip_count": len(per_clip_metrics),
         "success": True,
     }
 
-    return {"per_clip": per_clip_metrics, "aggregate": aggregate}
+    return {"per_clip": per_clip_metrics, "source_grouping": source_grouping, "aggregate": aggregate}
 
 
-LOWER_IS_BETTER = {"fvd", "lpips_vgg_uncalibrated"}
+LOWER_IS_BETTER = {"temporal_error", "lpips_vgg_uncalibrated"}
 HIGHER_IS_BETTER = {"psnr_mean", "ssim_mean", "vmaf_mean"}
 RANKED_METRICS = tuple(sorted(HIGHER_IS_BETTER | LOWER_IS_BETTER))
 
@@ -567,7 +794,7 @@ def verify_data_root_excludes_probe_set(data_root: Path, manifest: dict) -> list
 
 
 def is_valid_eval(agg: dict[str, Any] | None) -> bool:
-    """Return True if an evaluation result is valid and finite."""
+    """Return True if an evaluation result is valid, finite, and well-accounted."""
     if not isinstance(agg, dict):
         return False
     if agg.get("success") is False:
@@ -576,6 +803,15 @@ def is_valid_eval(agg: dict[str, Any] | None) -> bool:
         return False
     if agg.get("status") in ("failed", "error"):
         return False
+    if agg.get("per_clip_count") is not None and agg["per_clip_count"] <= 0:
+        return False
+    if agg.get("total_bytes") is not None and agg.get("residual_bytes") is not None:
+        if agg["total_bytes"] < agg["residual_bytes"]:
+            return False
+    if "checkpoint_identity" in agg:
+        ckpt_id = agg["checkpoint_identity"]
+        if not ckpt_id or not isinstance(ckpt_id, str) or not ckpt_id.strip():
+            return False
     # Check numeric values for NaN or Inf
     for val in agg.values():
         if isinstance(val, (int, float)):
@@ -801,6 +1037,13 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--dry-run", action="store_true", help="Print training commands without executing them or scoring")
     parser.add_argument(
+        "--restore-spade",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Restore spade4tennis_lite to alive candidates if loading an existing campaign state "
+        "where it was prematurely pruned (default True).",
+    )
+    parser.add_argument(
         "--variants",
         type=str,
         default=None,
@@ -839,6 +1082,17 @@ def main(argv: list[str] | None = None) -> int:
 
     if state_path.exists():
         state = load_state(state_path)
+        if args.restore_spade:
+            if "spade4tennis_lite" not in state.get("alive", []):
+                all_variants = default_variants()
+                spade_variant = next((v for v in all_variants if v.name == "spade4tennis_lite"), None)
+                if spade_variant is not None:
+                    if "spade4tennis_lite" not in state.setdefault("variants", {}):
+                        state["variants"]["spade4tennis_lite"] = asdict(spade_variant)
+                    state.setdefault("cumulative_epochs", {}).setdefault("spade4tennis_lite", 0)
+                    state["alive"].append("spade4tennis_lite")
+                    print("Restored spade4tennis_lite to alive candidates in campaign state.")
+                    save_state(state_path, state)
     else:
         variants = default_variants()
         if args.variants:
@@ -855,7 +1109,10 @@ def main(argv: list[str] | None = None) -> int:
     repo_root = Path(__file__).resolve().parents[1]
 
     while True:
-        if len(state["alive"]) <= 1:
+        if not state["alive"]:
+            print("Campaign halted: no alive candidates remaining.")
+            break
+        if len(state["alive"]) == 1 and (args.max_rungs is None or state["rung"] >= args.max_rungs):
             print(f"Campaign converged: survivor = {state['alive']}")
             break
         if args.max_rungs is not None and state["rung"] >= args.max_rungs:
@@ -864,8 +1121,8 @@ def main(argv: list[str] | None = None) -> int:
 
         rung = state["rung"]
         # All alive variants share the same cumulative target by construction (see docstring step 5).
-        prev_cumulative = state["cumulative_epochs"][state["alive"][0]]
-        target_epochs = args.initial_epochs if rung == 0 else prev_cumulative * 2
+        prev_cumulative = max(state["cumulative_epochs"].get(name, 0) for name in state["alive"])
+        target_epochs = args.initial_epochs if (rung == 0 or prev_cumulative == 0) else prev_cumulative * 2
 
         aggregate_by_variant: dict[str, dict[str, Any]] = {}
         rung_train_failed = False

@@ -1,4 +1,3 @@
-import sqlite3  # noqa: F401
 """Spade4Tennis: Reference-SPADE Player+Racket Synthesis – Training Script.
 
 Architecture
@@ -13,28 +12,29 @@ Usage
     conda run -n pointstream python scripts/train_spade4tennis.py --model-size full --epochs 200 \\
         --pretrained-g assets/weights/spade4tennis_lite_generator.pt
 """
-import os
-os.environ["NCCL_P2P_DISABLE"] = "1"
-os.environ["NCCL_IB_DISABLE"] = "1"
-
+import sqlite3  # noqa: F401
 import argparse
 import logging
 import math
+import os
 
 import torch
+import torch.distributed as dist
+import torch.multiprocessing as mp
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-import torchvision.utils as vutils
+from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader
+from torch.utils.data.distributed import DistributedSampler
+import torchvision.utils as vutils
 from tqdm import tqdm
 
-import torch.distributed as dist
-import torch.multiprocessing as mp
-from torch.nn.parallel import DistributedDataParallel as DDP
-from torch.utils.data.distributed import DistributedSampler
-from src.shared.tennis_dataset import TennisSkeletonDataset
 from src.components.generation.spade4tennis_arch import SPADEResNet9Generator
+from src.shared.tennis_dataset import TennisSkeletonDataset
+
+os.environ["NCCL_P2P_DISABLE"] = "1"
+os.environ["NCCL_IB_DISABLE"] = "1"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
