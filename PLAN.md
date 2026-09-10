@@ -1,6 +1,6 @@
 # PointStream Area Index & Active Plan
 
-State reconciled through **main 221aa14 / PR #90; PR #88 recovery repairs integrated 2026-09-10 and awaiting CI**; evidence anchors are per row.
+State reconciled through **main 2b7c2b0 / PR #88 recovery merge, 2026-09-10**; evidence anchors are per row.
 Submission Target: **ACM TOMM — 30 September 2026** (hard deadline). See [docs/roadmap.md](docs/roadmap.md) for gate criteria.
 
 ---
@@ -22,7 +22,7 @@ Submission Target: **ACM TOMM — 30 September 2026** (hard deadline). See [docs
 
 | Task ID | Worktree / Branch | Base Rev | Owner | Allowed Scope | Dependencies | Active PR |
 |---|---|---|---|---|---|---|
-| `CODEC-ACT-05`, `EVAL-ACT-06`, `GEN-ACT-05` | PR #88 recovery branch | `221aa14` | Integrated; CI pending | Client wire/output, protocol, evaluator and campaign repairs | New development evidence | #88 |
+| `CODEC-ACT-05`, `EVAL-ACT-06`, `GEN-ACT-05` | `main` | `2b7c2b0` | Implementation integrated and CI validated | Client wire/output, protocol, evaluator and campaign repairs | GPU-backed development evidence | #88 |
 
 ---
 
@@ -30,4 +30,4 @@ Submission Target: **ACM TOMM — 30 September 2026** (hard deadline). See [docs
 
 Agents receive one assigned area from the table above. Read [AGENTS.md](AGENTS.md), this file, and your assigned area document. Detailed dispatch and closeout procedures are in [docs/workflow/session/SKILL.md](docs/workflow/session/SKILL.md).
 
-Next dispatch: [Antigravity repair and submission search](docs/workflow/session/submission-search.md). The repair phase is integrated but no new competitive comparison or training campaign has been run; do not rank models or change gate status until CI and the required development evidence pass.
+Next dispatch: [Antigravity repair and submission search](docs/workflow/session/submission-search.md). The repair phase is merged, but no new competitive comparison or training campaign has been run; do not rank models or change gate status until the required GPU-backed development evidence passes. On 2026-09-10 this checkout exposed no CUDA device, so the generation/residual diagnostic matrix and training ladder remain unlaunched.
