@@ -55,19 +55,21 @@ In the Gate A 48-frame native run (#69), PointStream payload was dominated by tw
 
 PR #88 recovery repairs now complete the current CODEC-ACT-05 implementation: actual residual streams/full-range mapping, client-originated delivered scoring, serialized generation conditioning/reference data and complete envelope reconciliation are covered by integration tests and a native residual smoke test. This validates transport plumbing, not high-fidelity rate–distortion performance; run the residual-on ladder through the repaired client before claiming a codec result. See [evaluation audit](evaluation.md#pr-88-audit--2026-09-10) and [next dispatch](../workflow/session/submission-search.md).
 
-## Background experiment priority — 2026-09-11
+## Background experiment priority & findings — 2026-09-11
 
-`CODEC-ACT-06` — Planned; depends on `EVAL-ACT-08` evidence triage. Follow
-[experiment design](../workflow/experiment-design.md#3-background-first-removal-and-representation-are-separate-axes).
-Inventory current mask-aware median/hole filling and serialized background
-strategies before implementing an optional removal/fill selector (off, local
-mean, current temporal fill, Telea, later neural) independently of representation
-(first-frame still, panorama with charged render mappings, per-frame background
-video). These are proposed axes, not newly implemented capabilities.
+`CODEC-ACT-06` — **Complete** (PR #96, `0bdf0ef`, artifacts under `outputs/development-recovery/wave2-background-probe/`).
+Evaluated three background representations on the 48-frame Federer sequence (`federer_djokovic/scene_007`, 48 frames @ 4K 24 fps) using a common foreground-removed frame stack (visible background preserved bit-identically, player mask filled via temporal composite plate, 0 uncovered holes):
 
-Acceptance: one bounded paired pilot identifies useful background rate/quality/
-computation choices and remaining total-codec headroom, or rejects the proposed
-mechanism with a next decision. Expected still/panorama/video ordering is tested,
-not enforced. Keep a no-overlay conventional anchor, overlay conflict control,
-and fixed foreground integration checks. Defer expensive filling and broad grids
-until observed errors justify them. No codec run or source change in this update.
+| Representation | QP | Payload (B) | Side Data (B) | Total (B) | PSNR-Y Vis (dB) | SSIM Vis | Enc Time (s) | Dec Time (s) |
+|---|---|---|---|---|---|---|---|---|
+| still_frame0 | 47 | 31,804 | 10 | 31,814 | 20.06 | 0.8158 | 2.05 | 4.18 |
+| registered_panorama | 47 | 30,626 | 1,742 | 32,368 | 26.22 | 0.9541 | 2.25 | 8.31 |
+| cleaned_video | 47 | 74,178 | 10 | 74,188 | 31.18 | 0.9824 | 6.97 | 7.00 |
+| still_frame0 | 32 | 126,184 | 10 | 126,194 | 20.02 | 0.8173 | 2.43 | 4.22 |
+| registered_panorama | 32 | 118,157 | 1,742 | 119,899 | 26.97 | 0.9643 | 2.61 | 8.02 |
+| cleaned_video | 32 | 364,212 | 10 | 364,222 | 38.98 | 0.9967 | 9.31 | 7.07 |
+
+- **Verdict: Hypothesis SUPPORTED.** Still frame 0 is fundamentally limited by uncompensated camera motion (~40 px pan), pinning visible PSNR at ~20 dB and SSIM at 0.817 regardless of rate.
+- **Registered panorama resolves this deficit efficiently**: Camera homographies gain +6.2 dB (QP 47) and +7.0 dB (QP 32), boosting SSIM to 0.954–0.964. Total package cost is 32.4 kB at QP 47 (saving 94% vs the legacy 529 kB plate).
+- **Cleaned video** reaches higher quality (+12 dB over panorama at QP 32), but incurs a 3.0x byte multiplier and 3.6x encode time.
+- **Wave 2 Decision**: Promote registered panorama with compact per-frame homographies into the production background strategy for Wave 2.

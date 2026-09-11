@@ -29,23 +29,18 @@ bound-alarm reconciliation. Clean execution does not make them citable. The
 stored bounds identify #93 `ba5a9a8`, generation off, 48 frames on each source.
 Do not delete or overwrite intermediate failed/repaired runs.
 
-PR #93 at `ba5a9a8` has green CI but is **held for correctness updates**.
-`EVAL-ACT-09` and `GEN-ACT-08` in the [parallel dispatch](../workflow/session/parallel-probes.md)
-cover unverified registry checkpoints, incomplete diagnostic reuse identity,
-failed paste-control acceptance and hardcoded/missing conditioning inputs.
-These findings do not automatically invalidate generation-off byte records;
-verify each reused artifact's actual inputs and complete configuration. They do
-block automatic reuse and new generator ranking. No new codec claim here.
+PR #93 merged (`4a55573`, repairs in `e9f781f`) after resolving all four blockers in `EVAL-ACT-09` and `GEN-ACT-08`:
+- Verified client generator checkpoint resolution against transmitted SHA-256 (`resolve_client_checkpoint`, fail-closed).
+- Config identity covers full effective state: device, background codec/quality, lattice stages, residual, generator, appearance, run/seed, masks, placements, conditioning digests, and dirty-worktree `diff_sha256`.
+- Declared control checks require control run success, non-empty paste hashes, and complete finite outputs.
+- Dynamic start frame resolution from clip metadata or manifest; strict rejection of missing/misaligned conditioning (no synthetic black skeleton fallback).
 
-`EVAL-ACT-08` — Ready for evidence triage, no run launched: verify the located
-repaired run/config/source identities and reuse its component ledger, saved
-decodes and timings. At locally matched quality against both anchors, calculate
-background/metadata headroom and foreground/correction burden. If unavailable,
-name the missing measurement and budget a minimal instrumentation task. Then
-write one bounded card for `CODEC-ACT-06`. Do not relax overlap floors or repeat
-a complete ladder merely to make a comparison scorable. Acceptance: an evidenced
-bottleneck or explicit missing evidence, a costed next decision, and preserved
-historical results. Gate A/B status and confirmation exposure rules stay intact.
+`EVAL-ACT-08` — **Complete** (PR #95, `697bc9f`, artifact `outputs/development-recovery/wave2-byte-diagnosis.json` SHA-256 `74120308fef2e036d66a68b587cd42b6cc1a57d9b3b19ade21dd32d26c1c1aa9`).
+- Verified disjoint ledger equality: $B + F + M + R + H = T$ strictly holds for all rungs ($H = 0$).
+- Proved hypothesis: At low rate (R63), fixed background $B$ (529,361 B, 75.6%) and metadata $M$ (70,609 B) consume 600 kB, exceeding the entire VVC anchor budget (130,906 B) by 4.0x and AV1 (110,842 B) by 5.4x. $A(q) - B - M - H$ is negative across all rungs.
+- Even with residual $R = 0$ at H3, PointStream's base floor (630 kB) exceeds the anchor's highest quality budget (377 kB).
+- Decision: Supported promoting background representation for Wave 2.
+
 
 ## PR #88 audit — 2026-09-10
 
