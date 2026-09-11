@@ -54,3 +54,16 @@ Animate-Anyone's smoke script exercises sequence inference and conditioning sens
 Repair update — 2026-09-10: coordinate resolution, missing-input rejection, whole-codec evaluation, SHA-256 checkpoint identity, matched configuration controls and the single-survivor campaign continuation have been integrated and tested. `manifests/candidate_inventory.json` is intentionally marked inventory-only: its readiness labels and runtime figures are not selection evidence without linked immutable artifacts. No candidate has been newly ranked or trained by the repaired path.
 
 Recovery closeout — 2026-09-10: PR #88 merged as `2b7c2b0` with CI passing. A three-frame CPU smoke of the immutable pix2pix checkpoint passed its non-source-fallback and shuffled-pose sensitivity controls. This only establishes basic backend readiness; it is neither a quality comparison nor a runtime result. The recovery host had no CUDA device, so the GPU-backed diagnostic matrix and staged training remain unlaunched.
+
+## Foreground experiment priority — 2026-09-11
+
+`GEN-ACT-07` — Planned; broad model search follows the component/headroom diagnosis
+in `EVAL-ACT-08` and `CODEC-ACT-06`, rather than a required generation-free win.
+Follow [resource-dependent frontiers](../workflow/experiment-design.md#4-foreground-models-test-resource-dependent-frontiers).
+Start from pasted-reference and ready-model controls, with small-model and
+diffusion advantages stated as falsifiable hypotheses under named client budgets.
+Charge conditioning, weights/updates and matched-quality correction; measure
+latency, throughput and peak memory. Preserve older trials without reusing their
+invalid rankings. SPADE/training remains off pending a newly scoped experiment
+card. Acceptance: a supported Pareto tradeoff or a bounded rejection/inconclusive
+result that determines the next experiment; no family-wide claims from one pilot.

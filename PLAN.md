@@ -30,4 +30,11 @@ Submission Target: **ACM TOMM — 30 September 2026** (hard deadline). See [docs
 
 Agents receive one assigned area from the table above. Read [AGENTS.md](AGENTS.md), this file, and your assigned area document. Detailed dispatch and closeout procedures are in [docs/workflow/session/SKILL.md](docs/workflow/session/SKILL.md).
 
-Next dispatch: [Antigravity repair and submission search](docs/workflow/session/submission-search.md). The repair phase is merged, but no new competitive comparison or training campaign has been run; do not rank models or change gate status until the required GPU-backed development evidence passes. On 2026-09-10 this checkout exposed no CUDA device, so the generation/residual diagnostic matrix and training ladder remain unlaunched.
+Next action: follow [hypothesis-driven experiment design](docs/workflow/experiment-design.md).
+`EVAL-ACT-08` / `CODEC-ACT-06`: identify the matched-quality byte deficit from
+existing repaired artifacts, then budget the smallest background representation
+probe. `GEN-ACT-07` follows measured foreground opportunity. No new experiment,
+training, gate pass or paper result is established by this documentation update.
+The [older repair/search dispatch](docs/workflow/session/submission-search.md)
+is historical context, not the default next job. Cursor's 2026-09-11 overlap
+summary is recorded with its verification limits in the evaluation area.

@@ -1,5 +1,10 @@
 # Antigravity dispatch: repair PR #88, then search the full codec
 
+> Superseded as the default next dispatch on 2026-09-11 by
+> [hypothesis-driven experiment design](../experiment-design.md). Repair status
+> below is historical. Reconcile current code and evidence before reusing any
+> section; this file does not authorize another automatic eight-hour search.
+
 Execute when the user gives this file as a prompt. Initial budget: eight wall-clock hours including validation, experiment time and reporting. Follow AGENTS.md, docs/setup.md, the session workflow, the Antigravity harness rules and docs/workflow/long-jobs.md. This dispatch supersedes overnight-recovery.md for new work after PR #88.
 
 ## Baseline and outcome
