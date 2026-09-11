@@ -22,11 +22,12 @@ from src.pipeline.encoder.encoder import SOURCE
 from src.pipeline.reconstruction.device import DeviceDecision
 from src.pipeline.reconstruction.quality import Closeness, QualityReport, RegionScore
 from src.pipeline.reconstruction.reconstruct import ReconstructionResult
-from src.runner.accounting import SizesBytes
+from src.runner.accounting import MetadataSubledger, SizesBytes
 from src.runner.stages import _delivered_frames
 
 
 def sizes_from_dict(data: dict[str, Any]) -> SizesBytes:
+    raw_subledger = data.get("metadata_subledger") or data.get("subledger")
     return SizesBytes(
         source=int(data["source"]),
         residual=int(data.get("residual", 0)),
@@ -35,6 +36,9 @@ def sizes_from_dict(data: dict[str, Any]) -> SizesBytes:
         metadata=int(data.get("metadata", 0)),
         transport_total=int(data["transport_total"]),
         raw_parts=tuple(str(item) for item in (data.get("raw_parts") or ())),
+        subledger=MetadataSubledger.from_dict(
+            raw_subledger if isinstance(raw_subledger, dict) else None
+        ),
     )
 
 

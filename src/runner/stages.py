@@ -68,7 +68,7 @@ from src.pipeline.residual.signal import (
     ResidualVariant,
     compute_residual,
 )
-from src.runner.accounting import SizesBytes, measured, sizes_bytes
+from src.runner.accounting import MetadataSubledger, SizesBytes, measured, sizes_bytes
 
 #: Objects the runner placed on the bag, before detection names them subjects.
 OBJECTS = "objects"
@@ -786,6 +786,7 @@ def make_background(
             wire_geometry_headers=tuple(item.geometry_header for item in client_packets),
             wire_codec=model.client_wire_codec,
             wire_codec_id=artifact.codec_id,
+            sidecar_codec=str(artifact.codec) if artifact.payload else None,
         )
 
     return background_stage
@@ -1192,6 +1193,7 @@ def ledger_from_bag(bag: Mapping[str, Any], source: np.ndarray) -> SizesBytes:
         geometry_header_bytes = int(view.charged_geometry_header_bytes())
 
     wire_request = bag.get("wire_request")
+    subledger = MetadataSubledger()
     if (
         wire_request is not None
         and not raw
@@ -1199,6 +1201,14 @@ def ledger_from_bag(bag: Mapping[str, Any], source: np.ndarray) -> SizesBytes:
     ):
         wire_total = len(wire_request)
         metadata = max(0, wire_total - (residual_bytes + panorama_bytes + actor_bytes))
+        from src.runner.client import account_serialized_request
+
+        subledger = account_serialized_request(
+            bytes(wire_request),
+            residual=residual_bytes,
+            panorama=panorama_bytes,
+            actor_reference=actor_bytes,
+        )
     else:
         metadata = metadata_bytes(bag) + geometry_header_bytes
 
@@ -1209,6 +1219,7 @@ def ledger_from_bag(bag: Mapping[str, Any], source: np.ndarray) -> SizesBytes:
         actor_reference=actor_bytes,
         metadata=metadata,
         raw_parts=tuple(raw),
+        subledger=subledger,
     )
 
 
