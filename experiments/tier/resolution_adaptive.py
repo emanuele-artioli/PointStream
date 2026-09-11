@@ -367,6 +367,28 @@ HIGH_FIDELITY_RESIDUAL_RUNGS: tuple[ResidualLadderRungSpec, ...] = (
     ),
 )
 
+# Coarser than H0 (QP 42). Invalid Wave 2 H0–H3 sat at VMAF 87–96 while native
+# VVC topped out near 87, so overlap needs PointStream residual down as well as
+# VVC/AV1 up.
+OVERLAP_RESIDUAL_RUNGS: tuple[ResidualLadderRungSpec, ...] = (
+    ResidualLadderRungSpec(
+        rung_id="R63",
+        residual_qp=63,
+        summary="Coarse residual; AV1 QP 63, 1:1 scale, zero gating",
+    ),
+    ResidualLadderRungSpec(
+        rung_id="R55",
+        residual_qp=55,
+        summary="Coarse residual; AV1 QP 55, 1:1 scale, zero gating",
+    ),
+    ResidualLadderRungSpec(
+        rung_id="R48",
+        residual_qp=48,
+        summary="Mid-coarse residual; AV1 QP 48, 1:1 scale, zero gating",
+    ),
+    *HIGH_FIDELITY_RESIDUAL_RUNGS,
+)
+
 
 def configure_high_fidelity_residual_rung(
     base: PointstreamConfig,
@@ -395,6 +417,7 @@ __all__ = [
     "DEFAULT_DISPLAY_INTERPOLATION",
     "DEFAULT_DOWNSCALE_INTERPOLATION",
     "HIGH_FIDELITY_RESIDUAL_RUNGS",
+    "OVERLAP_RESIDUAL_RUNGS",
     "RESOLUTION_SCALES",
     "ResidualLadderRungSpec",
     "build_nondominated_envelope",

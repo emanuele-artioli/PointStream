@@ -10,9 +10,10 @@ encoder-side objects.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 import io
 import json
-from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -25,6 +26,8 @@ from src.pipeline.reconstruction.background import (
 from src.pipeline.reconstruction.clips import Clip, as_clip
 from src.pipeline.reconstruction.compositor import Placement, composite_clip
 from src.pipeline.reconstruction.device import DevicePolicy
+from src.runner.accounting import MetadataSubledger
+from src.runner.mask_wire import SCHEMA_VERSION, decode_mask, encode_mask, wire_declaration
 
 
 @dataclass(frozen=True)
@@ -113,13 +116,31 @@ def reconstruct_independent_client(
             if not getattr(p, "is_generated", False) and p.crop is not None
         )
 
-    if generator is not None and objects:
-        to_generate = [item for item in objects if getattr(item, "supplied_crop", None) is None]
-        if to_generate:
+    if generator is not None:
+        generated_items: list[Any] = []
+        if placements:
+            generated_items.extend(p for p in placements if getattr(p, "is_generated", False))
+        if not generated_items and objects:
+            generated_items = [item for item in objects if getattr(item, "is_generated", False)]
+        if generated_items:
+            from src.contracts.conditioning import ConditioningBundle
             from src.pipeline.reconstruction.dispatch import dispatch
-            from src.pipeline.reconstruction.reconstruct import _bundle_for
+            from src.pipeline.reconstruction.reconstruct import ObjectRequest, _bundle_for
 
-            bundles = tuple(_bundle_for(item) for item in to_generate)
+            bundles = tuple(
+                _bundle_for(item)
+                if isinstance(item, ObjectRequest)
+                else ConditioningBundle(
+                    appearance=getattr(item, "crop", None),
+                    pose=getattr(item, "pose", None),
+                    mask=getattr(item, "mask", None),
+                    motion_field=getattr(item, "motion_field", None),
+                    bbox=item.bbox,
+                    frame_index=item.frame_index,
+                    object_id=getattr(item, "object_id", "object"),
+                )
+                for item in generated_items
+            )
             crops, _ = dispatch(
                 generator,
                 bundles,
@@ -127,7 +148,7 @@ def reconstruct_independent_client(
                 params=params,
                 policy=active_policy,
             )
-            for item, crop in zip(to_generate, crops, strict=True):
+            for item, crop in zip(generated_items, crops, strict=True):
                 pipeline_placements.append(
                     Placement(
                         crop=crop,
@@ -176,17 +197,32 @@ def serialize_client_request(
     background_meta: dict[str, Any] | None = None
     if background is not None:
         plate_key = None
-        if background.plate is not None and background.wire_codec is None:
+        coded_packets = tuple(packet for packet in background.wire_payloads if packet)
+        # Coded packets are the wire. Do not also dump the decoded plate: that
+        # is one uncompressed 4K RGB image (~24.9 MB) and is what made the
+        # repaired diagnostic still sit at 25 MB after compact masks. A
+        # deferred residual background also must not ship encoder pixels.
+        if (
+            background.plate is not None
+            and not coded_packets
+            and not background.deferred_to_residual
+        ):
             plate_key = "background_plate"
             arrays[plate_key] = np.asarray(background.plate, dtype=np.uint8)
         wire_payload_keys = []
         wire_header_keys = []
+        headers = background.wire_geometry_headers
         for packet_index, packet in enumerate(background.wire_payloads):
+            if not packet:
+                continue
             payload_key = f"background_payload_{packet_index}"
             header_key = f"background_header_{packet_index}"
-            arrays[payload_key] = np.frombuffer(packet, dtype=np.uint8)
-            arrays[header_key] = np.frombuffer(
-                background.wire_geometry_headers[packet_index], dtype=np.uint8
+            header = headers[packet_index] if packet_index < len(headers) else b""
+            arrays[payload_key] = np.frombuffer(packet, dtype=np.uint8).copy()
+            arrays[header_key] = (
+                np.frombuffer(header, dtype=np.uint8).copy()
+                if header
+                else np.array([], dtype=np.uint8)
             )
             wire_payload_keys.append(payload_key)
             wire_header_keys.append(header_key)
@@ -205,6 +241,7 @@ def serialize_client_request(
             "wire_header_keys": wire_header_keys,
             "wire_codec": background.wire_codec,
             "wire_codec_id": background.wire_codec_id,
+            "sidecar_codec": background.sidecar_codec,
         }
 
     ref_meta: dict[str, Any] = {}
@@ -221,9 +258,16 @@ def serialize_client_request(
         mask_key = None
         pose_key = None
         motion_key = None
+        mask_wire_meta = None
         if placement.mask is not None:
             mask_key = f"mask_{index}"
-            arrays[mask_key] = np.asarray(placement.mask, dtype=np.uint8)
+            mask_blob = encode_mask(placement.mask)
+            arrays[mask_key] = np.frombuffer(mask_blob, dtype=np.uint8).copy()
+            mask_wire_meta = {
+                **wire_declaration(),
+                "shape": [int(dim) for dim in np.asarray(placement.mask).shape],
+                "payload_bytes": len(mask_blob),
+            }
 
         if placement.is_generated:
             if placement.pose is not None:
@@ -245,6 +289,7 @@ def serialize_client_request(
                 "crop_key": crop_key,
                 "encoded_crop_key": encoded_crop_key,
                 "mask_key": mask_key,
+                "mask_wire": mask_wire_meta,
                 "pose_key": pose_key,
                 "motion_key": motion_key,
                 "bbox": [int(x) for x in placement.bbox],
@@ -323,6 +368,7 @@ def serialize_client_request(
 
     metadata = {
         "schema": 1,
+        "mask_wire": wire_declaration(),
         "frame_count": frame_count,
         "height": height,
         "width": width,
@@ -338,6 +384,54 @@ def serialize_client_request(
     return stream.getvalue()
 
 
+def account_serialized_request(
+    payload: bytes,
+    *,
+    residual: int = 0,
+    panorama: int = 0,
+    actor_reference: int = 0,
+) -> MetadataSubledger:
+    """Split the envelope remainder into named metadata parts.
+
+    Residual, panorama, and actor-reference charges are supplied by the caller
+    (the same numbers the ledger already uses) so they are not counted again
+    inside the subledger. ``subledger.total`` equals ``len(payload)`` minus
+    those three charges.
+    """
+    if not isinstance(payload, (bytes, bytearray, memoryview)):
+        raise TypeError("client payload must be bytes")
+    remainder = max(0, len(payload) - int(residual) - int(panorama) - int(actor_reference))
+    mask_payload = 0
+    pose_motion = 0
+    with np.load(io.BytesIO(payload), allow_pickle=False) as arrays:
+        metadata = json.loads(np.asarray(arrays["metadata"], dtype=np.uint8).tobytes())
+        for key in arrays.files:
+            if key.startswith("mask_"):
+                mask_payload += int(np.asarray(arrays[key]).nbytes)
+            elif key.startswith("pose_") or key.startswith("motion_"):
+                pose_motion += int(np.asarray(arrays[key]).nbytes)
+        placements = metadata.get("placements") or []
+        placement_headers = len(json.dumps(placements).encode("utf-8"))
+        generator = metadata.get("generator")
+        generator_metadata = (
+            len(json.dumps(generator).encode("utf-8")) if generator is not None else 0
+        )
+    named = mask_payload + pose_motion + placement_headers + generator_metadata
+    envelope_overhead = remainder - named
+    if envelope_overhead < 0:
+        raise ValueError(
+            "metadata subledger exceeds envelope remainder: "
+            f"named={named} remainder={remainder}"
+        )
+    return MetadataSubledger(
+        mask_payload=mask_payload,
+        pose_motion=pose_motion,
+        placement_headers=placement_headers,
+        generator_metadata=generator_metadata,
+        envelope_overhead=envelope_overhead,
+    )
+
+
 def reconstruct_serialized_client(
     payload: bytes,
     *,
@@ -346,6 +440,9 @@ def reconstruct_serialized_client(
     require_compressed: bool = False,
     generator: Any = None,
     seed: int | None = None,
+    checkpoint: str | Path | None = None,
+    checkpoint_dir: str | Path | None = None,
+    checkpoint_registry: Mapping[str, str | Path] | None = None,
 ) -> Clip | tuple[Clip, Clip]:
     """Reconstruct only from the validated NumPy/JSON client envelope."""
     if not isinstance(payload, (bytes, bytearray, memoryview)):
@@ -354,31 +451,43 @@ def reconstruct_serialized_client(
         metadata = json.loads(np.asarray(arrays["metadata"], dtype=np.uint8).tobytes())
         if metadata.get("schema") != 1:
             raise ValueError("unsupported client payload schema")
+        mask_decl = metadata.get("mask_wire")
+        if mask_decl is not None and int(mask_decl.get("schema_version", -1)) != SCHEMA_VERSION:
+            raise ValueError("unsupported mask wire schema")
         bg_meta = metadata.get("background")
         background = None
         if bg_meta is not None:
-            plate = None
-            if bg_meta["plate_key"] is not None:
-                plate = np.asarray(arrays[bg_meta["plate_key"]], dtype=np.uint8)
-            wire_codec = bg_meta.get("wire_codec")
-            if wire_codec is not None:
-                from src.components.background.scale import (
-                    TransmittedBackground,
-                    decode_transmitted_stream,
-                )
+            from src.components.background.scale import (
+                TransmittedBackground,
+                decode_transmitted_stream,
+            )
+            from src.components.background.sidecar import build_sidecar
 
-                packets = tuple(
-                    TransmittedBackground(
-                        payload=np.asarray(arrays[payload_key], dtype=np.uint8).tobytes(),
-                        geometry_header=np.asarray(arrays[header_key], dtype=np.uint8).tobytes(),
-                    )
-                    for payload_key, header_key in zip(
-                        bg_meta["wire_payload_keys"],
-                        bg_meta["wire_header_keys"],
-                        strict=True,
-                    )
+            plate = None
+            if bg_meta.get("plate_key") is not None:
+                plate = np.asarray(arrays[bg_meta["plate_key"]], dtype=np.uint8)
+            packets = tuple(
+                TransmittedBackground(
+                    payload=np.asarray(arrays[payload_key], dtype=np.uint8).tobytes(),
+                    geometry_header=np.asarray(arrays[header_key], dtype=np.uint8).tobytes(),
                 )
+                for payload_key, header_key in zip(
+                    bg_meta.get("wire_payload_keys") or (),
+                    bg_meta.get("wire_header_keys") or (),
+                    strict=True,
+                )
+            )
+            packets = tuple(item for item in packets if item.payload)
+            wire_codec = bg_meta.get("wire_codec")
+            sidecar_codec = bg_meta.get("sidecar_codec")
+            if packets and wire_codec is not None:
                 plate = decode_transmitted_stream(str(wire_codec), packets)
+            elif packets:
+                if not sidecar_codec:
+                    raise ValueError(
+                        "background packets present but no sidecar codec on the envelope"
+                    )
+                plate = build_sidecar(str(sidecar_codec)).decode(packets[0].payload)
             background = BackgroundModelView(
                 plate=plate,
                 homographies=tuple(tuple(row) for row in bg_meta["homographies"]),
@@ -394,6 +503,7 @@ def reconstruct_serialized_client(
                 wire_geometry_headers=(),
                 wire_codec=str(wire_codec) if wire_codec is not None else None,
                 wire_codec_id=bg_meta.get("wire_codec_id"),
+                sidecar_codec=str(sidecar_codec) if sidecar_codec else None,
             )
 
         decoded_references: dict[str, np.ndarray] = {}
@@ -411,6 +521,10 @@ def reconstruct_serialized_client(
         active_generator = generator
         active_seed = seed
         active_params = None
+        # WAVE1-A checkpoint identity
+        needs_generation = any(
+            bool(item.get("is_generated")) for item in metadata.get("placements") or ()
+        )
         if gen_meta is not None:
             if seed is not None and gen_meta.get("seed") is not None and seed != gen_meta["seed"]:
                 raise ValueError(
@@ -430,17 +544,16 @@ def reconstruct_serialized_client(
                     raise ValueError(
                         f"Mismatched generator model: requested {active_generator.name}, payload has {gen_meta['name']}"
                     )
-            if active_generator is None and gen_meta.get("name"):
-                from src.components.generation import REGISTRY
-                from src.contracts.conditioning import FrameGenerator
-                from src.pipeline.reconstruction.dispatch import from_spec
+            from src.runner.generation_identity import resolve_client_generator
 
-                gen_name = gen_meta["name"]
-                if REGISTRY.has(gen_name):
-                    spec = REGISTRY.spec(gen_name)
-                    backend = REGISTRY.build(gen_name)
-                    if isinstance(backend, FrameGenerator):
-                        active_generator = from_spec(spec, backend)
+            active_generator = resolve_client_generator(
+                gen_meta,
+                injected=active_generator,
+                require_identity=needs_generation,
+                checkpoint=checkpoint,
+                checkpoint_dir=checkpoint_dir,
+                checkpoint_registry=checkpoint_registry,
+            )
 
         pipeline_placements = []
         to_generate_bundles = []
@@ -452,7 +565,12 @@ def reconstruct_serialized_client(
             object_id = str(item["object_id"])
             mask = None
             if item.get("mask_key") and item["mask_key"] in arrays:
-                mask = np.asarray(arrays[item["mask_key"]], dtype=np.uint8).astype(bool)
+                mask_blob = np.asarray(arrays[item["mask_key"]], dtype=np.uint8).tobytes()
+                decoded_mask = decode_mask(mask_blob)
+                declared = (item.get("mask_wire") or {}).get("shape")
+                if declared is not None and list(decoded_mask.shape) != [int(dim) for dim in declared]:
+                    raise ValueError("mask shape does not match placement metadata")
+                mask = decoded_mask.astype(bool, copy=False)
 
             if item.get("is_generated", False):
                 pose = None
@@ -596,6 +714,7 @@ def reconstruct_serialized_client(
 
 __all__ = [
     "ClientPlacement",
+    "account_serialized_request",
     "reconstruct_serialized_client",
     "reconstruct_independent_client",
     "serialize_client_request",

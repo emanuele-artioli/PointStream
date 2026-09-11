@@ -53,6 +53,7 @@ class LongSceneClip:
     is_eligible: bool = True
     route: str = "pointstream"
     failure_reasons: tuple[str, ...] = ()
+    start_frame: int = 0
 
     def describe(self) -> dict[str, Any]:
         t, h, w, _ = self.frames.shape
@@ -213,4 +214,5 @@ def load_long_scene_clip(
         is_eligible=is_eligible,
         route=route,
         failure_reasons=tuple(fail_reasons),
+        start_frame=start_frame,
     )

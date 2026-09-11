@@ -254,9 +254,74 @@ def test_serialized_client_decodes_raw_background_stream(monkeypatch: pytest.Mon
 
     reconstructed = reconstruct_serialized_client(payload)
 
+    import io
+
+    with np.load(io.BytesIO(payload), allow_pickle=False) as arrays:
+        assert "background_plate" not in arrays.files
+        assert "background_payload_0" in arrays.files
     assert seen == {
         "codec": "av1",
         "payloads": (b"i", b"p"),
         "headers": (b"h0", b"h1"),
     }
     assert np.array_equal(reconstructed[0], decoded_plate)
+
+
+def test_serialized_client_decodes_still_sidecar_without_raw_plate() -> None:
+    """Still panorama must ship coded bytes, not the encoder's decoded plate."""
+    import io
+
+    from src.components.background.sidecar import JpegSidecar
+    from src.pipeline.reconstruction.background import BackgroundModelView
+    from src.runner.client import reconstruct_serialized_client, serialize_client_request
+
+    true_plate = np.full((512, 512, 3), 17, dtype=np.uint8)
+    encoder_plate = np.full((512, 512, 3), 255, dtype=np.uint8)
+    sidecar = JpegSidecar(quality=50)
+    coded = sidecar.encode(true_plate)
+    expected = sidecar.decode(coded)
+    background = BackgroundModelView(
+        plate=encoder_plate,
+        homographies=((1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0),),
+        width=512,
+        height=512,
+        payload_bytes=len(coded),
+        wire_payloads=(coded,),
+        wire_geometry_headers=(b"",),
+        sidecar_codec="jpeg",
+    )
+    payload = serialize_client_request(
+        background=background,
+        frame_count=1,
+        height=512,
+        width=512,
+    )
+    with np.load(io.BytesIO(payload), allow_pickle=False) as arrays:
+        assert "background_plate" not in arrays.files
+        assert "background_payload_0" in arrays.files
+        assert int(arrays["background_payload_0"].nbytes) == len(coded)
+    assert len(payload) < int(encoder_plate.nbytes) // 2
+    reconstructed = reconstruct_serialized_client(payload)
+    assert np.array_equal(reconstructed[0], expected)
+
+
+def test_serialized_client_rejects_still_packets_without_codec() -> None:
+    from src.pipeline.reconstruction.background import BackgroundModelView
+    from src.runner.client import reconstruct_serialized_client, serialize_client_request
+
+    background = BackgroundModelView(
+        plate=np.zeros((4, 4, 3), dtype=np.uint8),
+        width=4,
+        height=4,
+        payload_bytes=3,
+        wire_payloads=(b"abc",),
+        wire_geometry_headers=(b"",),
+    )
+    payload = serialize_client_request(
+        background=background,
+        frame_count=1,
+        height=4,
+        width=4,
+    )
+    with pytest.raises(ValueError, match="no sidecar codec"):
+        reconstruct_serialized_client(payload)

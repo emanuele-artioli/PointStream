@@ -1,0 +1,55 @@
+{
+  "schema": "pointstream.development_recovery.v1",
+  "doc_role": "wave2_overlap_ladder_manifest",
+  "status": "active_development",
+  "created_utc": "2026-09-10T17:25:00Z",
+  "description": "Wave 2 overlap ladder: same two development scenes as development_recovery.json, with VVC/AV1 QPs extended toward higher fidelity. Held-out confirmation sources remain untouched. Not Gate B.",
+  "scenes": [
+    {
+      "source_id": "alcaraz_highlights_scene_000",
+      "video": "alcaraz_highlights",
+      "scene": "scene_000",
+      "supported_spans": [16, 48, 96, 192],
+      "width": 3840,
+      "height": 2160,
+      "fps": 24.0,
+      "role": "diagnostic_primary"
+    },
+    {
+      "source_id": "federer_djokovic_scene_007",
+      "video": "federer_djokovic",
+      "scene": "scene_007",
+      "supported_spans": [16, 48, 96, 192],
+      "width": 3840,
+      "height": 2160,
+      "fps": 24.0,
+      "role": "diagnostic_secondary"
+    }
+  ],
+  "ladder_spec": {
+    "rungs": ["R63", "R55", "R48", "H0", "H1", "H2", "H3"],
+    "stream_codec": "vvc",
+    "appearance_format": "webp"
+  },
+  "anchors": {
+    "av1": {
+      "codec": "libsvtav1",
+      "app": "SvtAv1EncApp",
+      "preset": "8",
+      "qps": [63, 55, 47, 39, 35, 31, 27]
+    },
+    "vvc": {
+      "codec": "libvvenc",
+      "app": "vvencapp",
+      "preset": "medium",
+      "qps": [63, 55, 47, 39, 35, 31, 27]
+    }
+  },
+  "holdout_protection": {
+    "confirmation_manifest": "manifests/gate_b_confirmation.json",
+    "confirmation_sources_forbidden": [
+      "bp57_ao2024_sabalenka_zheng",
+      "bp57_usopen2023_gauff_sabalenka"
+    ]
+  }
+}

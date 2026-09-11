@@ -60,6 +60,9 @@ class BackgroundModelView:
     wire_geometry_headers: tuple[bytes, ...] = ()
     wire_codec: str | None = None
     wire_codec_id: str | None = None
+    #: Still-sidecar name (``jpeg``, ``png``, ``av1``, ``vvc``) when packets
+    #: are present but ``wire_codec`` is unset because this is not a stream.
+    sidecar_codec: str | None = None
 
     def charged_geometry_header_bytes(self) -> int:
         if self.geometry_header:
