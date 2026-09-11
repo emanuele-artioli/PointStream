@@ -5,6 +5,48 @@
 
 ---
 
+## Experiment policy update — 2026-09-11
+
+New probes follow [hypothesis-driven experiment design](../workflow/experiment-design.md).
+The next question is why total rate loses at matched final quality, with a
+component budget before another residual sweep. Existing audit/run history below
+is retained; historical next-action wording does not supersede this priority.
+
+The overlap artifacts have now been located under the external data root:
+`outputs/development-recovery/wave2-overlap-20260910/`. SHA-256 anchors:
+
+- `report.json`: `48cf7b20a1a29ac958a8eac3972b381f848439003f02d0b1222de8221f81643b`
+- `bounds.json`: `3b2bc898538be284a7b590e1792ac26ceb6c1dedd43452947f9df8efb17f45c1`
+- `experiment-identity.json`: `df3da27ab3fbdd7059a977eb0f17e980fec6b43069c988eeb40caf018413ca0d`
+- `tool-identity.json`: `83e2d5c2e28d94e0eadb9cc7be74db716662ecbf56b871c022a41c16429b5d65`
+
+This session checked artifact identities and status fields, not numerical
+comparisons: `gate_b_passed=false`, `pilot_alarms_clear=true`,
+`identity_verified=false`, `evidence_verified=false`. Cursor reports valid
+calibration, an unscorable Alcaraz span and a scorable losing Federer comparison;
+these remain development observations pending independent evidence checks and
+bound-alarm reconciliation. Clean execution does not make them citable. The
+stored bounds identify #93 `ba5a9a8`, generation off, 48 frames on each source.
+Do not delete or overwrite intermediate failed/repaired runs.
+
+PR #93 at `ba5a9a8` has green CI but is **held for correctness updates**.
+`EVAL-ACT-09` and `GEN-ACT-08` in the [parallel dispatch](../workflow/session/parallel-probes.md)
+cover unverified registry checkpoints, incomplete diagnostic reuse identity,
+failed paste-control acceptance and hardcoded/missing conditioning inputs.
+These findings do not automatically invalidate generation-off byte records;
+verify each reused artifact's actual inputs and complete configuration. They do
+block automatic reuse and new generator ranking. No new codec claim here.
+
+`EVAL-ACT-08` — Ready for evidence triage, no run launched: verify the located
+repaired run/config/source identities and reuse its component ledger, saved
+decodes and timings. At locally matched quality against both anchors, calculate
+background/metadata headroom and foreground/correction burden. If unavailable,
+name the missing measurement and budget a minimal instrumentation task. Then
+write one bounded card for `CODEC-ACT-06`. Do not relax overlap floors or repeat
+a complete ladder merely to make a comparison scorable. Acceptance: an evidenced
+bottleneck or explicit missing evidence, a costed next decision, and preserved
+historical results. Gate A/B status and confirmation exposure rules stay intact.
+
 ## PR #88 audit — 2026-09-10
 
 Reviewed open head `d1d24b7`; main was `6b04eae` (PR #89). PR #88 adds useful full-range residual and actual-stream plumbing, adaptive anchors and training interfaces, but is **not ready to merge or support model-selection claims**. Its CI run `34428171118` passes tests and fails lint/type checks. Use [the next Antigravity dispatch](../workflow/session/submission-search.md), which includes repair acceptance tests and a staged full-codec search.

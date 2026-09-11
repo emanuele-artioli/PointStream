@@ -36,7 +36,7 @@ When initiating or handing off a task:
    - **Acceptance Criteria**: Concrete commands and verification gates (see [setup verification](../../setup.md#4-verification)).
    - **Bounds & Controls**: Pre-run bounds for experiment runs; null controls.
 
-For multi-hour codec repair and model search, use the [submission dispatch](submission-search.md); it authorizes execution only when the user gives that prompt to an agent.
+For new research work, use [hypothesis-driven experiment design](../experiment-design.md): require a decision card, reuse existing evidence, and launch the smallest discriminating probe. The [older submission dispatch](submission-search.md) is historical repair context; do not automatically rerun its waves or budget.
 
 ### Long jobs
 

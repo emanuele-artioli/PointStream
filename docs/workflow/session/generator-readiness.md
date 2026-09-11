@@ -1,5 +1,9 @@
 # Worker C — identify and validate a useful generator
 
+> Historical repair brief. For new work use [parallel probes](parallel-probes.md).
+> Its retired-evaluator status and old training budget below are superseded;
+> they are not standing authorization to launch training.
+
 Assignment: GEN-ACT-04. Follow overnight-recovery.md. Own src/components/generation/, scripts/train_campaign.py and focused generator/training tests. Do not edit the runner owned by A or evaluator owned by B; agree interfaces through the coordinator.
 
 The audited Gate A/B runs use no generator. Registered backends and historical fine-tunes are candidates, not proof of readiness. Inventory actual available checkpoint paths/hashes, architecture, training provenance, licensing constraints already recorded, required conditioning and native temporal calling convention. Distinguish installed, loadable, successfully invoked and scientifically validated. Do not download large models or alter the pinned environment casually.
