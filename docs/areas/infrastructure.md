@@ -70,3 +70,29 @@ PR #68 introduced `scripts/cleanup_merged_worktrees.sh`. The documentation audit
 ### PR #73 review follow-up (2026-09-08)
 
 Moved closeout procedures into the session skill and verification rationale into setup; corrected pytest cache configuration and the README output path that bypassed the data root. Replaced nonexistent area evidence commit hashes with verified PR merge references. Repaired the audit brief recovery row, which stored a commit abbreviation instead of a blob hash. Reconciled stale assignment state and qualified unverified codec claims. Gate B now distinguishes per-video encoding from shared-model training and source generalization; the existing six-match validator remains authoritative. Validation: relative-link and recovery-blob audit, documented CLI inspection, skill frontmatter validation, and diff whitespace checks; CI results are recorded in the follow-up PR. Next infrastructure action remains `INFRA-ACT-01`; this documentation review does not repair or authorize the unsafe cleanup helper.
+
+### Worktree retirement — 2026-09-11
+
+User approved removal of six clean worktrees; removed without force or the unsafe
+helper. The following remote tags preserve their tips under `archive/20260911/`:
+
+| Removed worktree under `/tmp/` | Archive tag suffix | Preservation evidence |
+|---|---|---|
+| `pointstream-pr88-audit` | `pr-88` | `d1d24b7` ancestor of PR #88 integrated head |
+| `pointstream-probe-framework` | `codex/probe-framework` | Tree identical to merged `dc4a0cd` (#94) |
+| `pointstream-recovery` | `antigravity/overnight-recovery` | Tree identical to merged `2b7c2b0` (#88) |
+| `pointstream-submission-dispatch` | `pr-90` | Tree identical to merged `221aa14` (#90) |
+| `pointstream-worker-b` | `antigravity/recovery-worker-b-verdict` | `ea4fee8` ancestor of preserved #88 head |
+| `pointstream-worker-c` | `antigravity/recovery-worker-c-generator` | `1992878` ancestor of preserved #88 head |
+
+Tracked and untracked state was clean; ignored output directories contained no
+files. Cache directories were disposable. All local and remote branches remain.
+The larger local-branch deletion proposal was rejected by automatic approval
+review as beyond the six-worktree approval; it was not executed.
+
+Retain `/tmp/pointstream-worker-a`: `artifacts/residual_smoke.json` is modified.
+Retain `/tmp/pointstream-wave1-a`, `-b`, `-c` until #93 is repaired/integrated;
+their commits are ancestors of #93, but that PR is still open. Retain
+`/tmp/pointstream-pr92` as a possibly paused Cursor checkout; after #92 updates,
+fetch and reconcile it before resuming. No process observed in this sandbox
+proves another host/session idle. `INFRA-ACT-01` remains open.

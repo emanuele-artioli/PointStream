@@ -12,15 +12,32 @@ The next question is why total rate loses at matched final quality, with a
 component budget before another residual sweep. Existing audit/run history below
 is retained; historical next-action wording does not supersede this priority.
 
-Cursor's summary supplied by the user reports a clean overlap ladder, valid
-calibration, no Gate B pass, an unscorable Alcaraz span and a scorable but losing
-Federer comparison. Treat these as reported development findings: this session
-has not read the immutable overlap artifacts or independently reproduced the
-metrics or bound-alarm closures. PR #93 head `ba5a9a8` is open with green CI;
-its description covers Wave 1 repairs and explicitly excludes GPU pilots, so
-that PR description alone is not the overlap run's provenance.
+The overlap artifacts have now been located under the external data root:
+`outputs/development-recovery/wave2-overlap-20260910/`. SHA-256 anchors:
 
-`EVAL-ACT-08` — Ready for evidence triage, no run launched: locate the exact
+- `report.json`: `48cf7b20a1a29ac958a8eac3972b381f848439003f02d0b1222de8221f81643b`
+- `bounds.json`: `3b2bc898538be284a7b590e1792ac26ceb6c1dedd43452947f9df8efb17f45c1`
+- `experiment-identity.json`: `df3da27ab3fbdd7059a977eb0f17e980fec6b43069c988eeb40caf018413ca0d`
+- `tool-identity.json`: `83e2d5c2e28d94e0eadb9cc7be74db716662ecbf56b871c022a41c16429b5d65`
+
+This session checked artifact identities and status fields, not numerical
+comparisons: `gate_b_passed=false`, `pilot_alarms_clear=true`,
+`identity_verified=false`, `evidence_verified=false`. Cursor reports valid
+calibration, an unscorable Alcaraz span and a scorable losing Federer comparison;
+these remain development observations pending independent evidence checks and
+bound-alarm reconciliation. Clean execution does not make them citable. The
+stored bounds identify #93 `ba5a9a8`, generation off, 48 frames on each source.
+Do not delete or overwrite intermediate failed/repaired runs.
+
+PR #93 at `ba5a9a8` has green CI but is **held for correctness updates**.
+`EVAL-ACT-09` and `GEN-ACT-08` in the [parallel dispatch](../workflow/session/parallel-probes.md)
+cover unverified registry checkpoints, incomplete diagnostic reuse identity,
+failed paste-control acceptance and hardcoded/missing conditioning inputs.
+These findings do not automatically invalidate generation-off byte records;
+verify each reused artifact's actual inputs and complete configuration. They do
+block automatic reuse and new generator ranking. No new codec claim here.
+
+`EVAL-ACT-08` — Ready for evidence triage, no run launched: verify the located
 repaired run/config/source identities and reuse its component ledger, saved
 decodes and timings. At locally matched quality against both anchors, calculate
 background/metadata headroom and foreground/correction burden. If unavailable,
@@ -50,7 +67,23 @@ Focused PR #88 residual, campaign and protocol tests passed locally (47 tests); 
 
 ### Repair update — 2026-09-10
 
-PR #88 merged as `2b7c2b0` after its complete test suite, coverage gate, lint and type checks passed. It repaired the listed code paths: public delivered frames/quality are client-originated; generation conditioning/reference data travel through the serialized envelope; the envelope, not only the residual stream, is reconciled to the ledger; probe-frame resolution fails closed; diagnostic controls execute from their declared configuration; protocol identity and independent-match grouping are required. These are implementation checks, **not new rate–distortion evidence**. Re-run development curves with the repaired instrumentation before updating any archived diagnostic interpretation or Gate A/B status. The 2026-09-10 recovery host exposed no CUDA device, so it could not launch the required generation/residual matrix or training search.
+PR #88 merged as `2b7c2b0` after its complete test suite, coverage gate, lint and type checks passed. It repaired the listed code paths: public delivered frames/quality are client-originated; generation conditioning/reference data travel through the serialized envelope; the envelope, not only the residual stream, is reconciled to the ledger; probe-frame resolution fails closed; diagnostic controls execute from their declared configuration; protocol identity and independent-match grouping are required. These are implementation checks, **not new rate–distortion evidence**.
+
+### Wave 2 GPU pilots — 2026-09-10 (gpu5, `6199d3e`)
+
+Launched under `jobs/wave2-diag-then-hf-20260910b` (`status=complete`, `exit_code=0`). Artifacts (preserve; do not rewrite):
+
+- Diagnostic: `outputs/development-recovery/diagnostic-pix2pix-rq32.json` SHA-256 `fed400284d15189234712da73cbe60c2362ca638608646ceb204693e3597402d`
+- Residual high-fidelity: `outputs/development-recovery/residual-high-fidelity/report.json` SHA-256 `f306cdd46dc9ed7c855e543188e0d67d7f58790b69b87e3e808f6c8510fca860`
+- Pre-launch bounds: `outputs/development-recovery/wave2-prelaunch-bounds.json` SHA-256 `2f636fa700956917c5d7e5230d244e846401438c8177064d4afa8f1cd96eb024`
+
+**Not citable. This interpretation supersedes the first PR #92 reading.** `gate_b_passed=false`, `pilot_alarms_clear=false`, `identity_verified=false`, `evidence_verified=false`. Gate A remains open; Gate B remains incomplete.
+
+The equal generation-on and generation-off results do **not** show that pix2pix is equivalent to pasted reference. In `src/runner/run.py`, `_finish_chunk` decodes transmitted appearance into each object's `supplied_crop`, then sets `is_gen` only when `supplied_crop is None`. With appearance enabled, every would-be generated object is serialized as a pasted-reference placement, so the client generator receives no effective generated placement. Evidence that this path was a no-op: generation-off/residual-off and generation-on/residual-off reported identical PSNR, SSIM, and VMAF; generation-on added only ~180 bytes; client time was essentially unchanged. Encoder-side generation timing of 0.7–1.2 s does not prove generated pixels reached the client. The diagnostic reports also lacked sufficient generator provenance (checkpoint SHA, delivered-frame hashes, invocation counts, shuffled-conditioning control).
+
+The ~41.5 MB labeled `metadata` is explainable: `serialize_client_request` stores placement masks as full uint8 arrays and writes them with uncompressed `np.savez`. Several 4K masks account for nearly the entire envelope. The ledger balances, so this is a real transport inefficiency exposed by the repaired accounting, not a ledger mismatch. All Wave 2 PointStream totals (~42–45 MB) are dominated by that mask representation; anchors were below 1 MB. Do not treat those totals as a codec rate.
+
+The residual ladder moved residual bytes and quality monotonically, but cannot support codec comparison: Alcaraz PointStream VMAF ~94.77–96.33 and Federer/Djokovic ~87.24–91.18 versus sampled VVC maxima ~87.03 and ~83.76; AV1 overlap was too narrow; BD-rate remains unscorable. Calibration remained invalid because unrelated-content SSIM was 0.6702 against the preregistered 0.60 ceiling. Repair generation intent, compact masks, and provenance before any new GPU ranking.
 
 ## 1. Current State
 

@@ -53,7 +53,9 @@ Animate-Anyone's smoke script exercises sequence inference and conditioning sens
 
 Repair update — 2026-09-10: coordinate resolution, missing-input rejection, whole-codec evaluation, SHA-256 checkpoint identity, matched configuration controls and the single-survivor campaign continuation have been integrated and tested. `manifests/candidate_inventory.json` is intentionally marked inventory-only: its readiness labels and runtime figures are not selection evidence without linked immutable artifacts. No candidate has been newly ranked or trained by the repaired path.
 
-Recovery closeout — 2026-09-10: PR #88 merged as `2b7c2b0` with CI passing. A three-frame CPU smoke of the immutable pix2pix checkpoint passed its non-source-fallback and shuffled-pose sensitivity controls. This only establishes basic backend readiness; it is neither a quality comparison nor a runtime result. The recovery host had no CUDA device, so the GPU-backed diagnostic matrix and staged training remain unlaunched.
+Recovery closeout — 2026-09-10: PR #88 merged as `2b7c2b0` with CI passing. A three-frame CPU smoke of the immutable pix2pix checkpoint passed its non-source-fallback and shuffled-pose sensitivity controls. This only establishes basic backend readiness; it is neither a quality comparison nor a runtime result.
+
+GPU diagnostic matrix (gpu5, 16 frames, pix2pix, residual QP 32, artifact `diagnostic-pix2pix-rq32.json`): **invalid for generator comparison**. Generation-off and generation-on without residual produced identical PSNR/SSIM/VMAF because `_finish_chunk` converted appearance-conditioned objects into pasted-reference placements (`is_gen` inferred from empty `supplied_crop`). Generation-on added only ~180 bytes; client time was unchanged. Encoder-side generation timing of 0.7–1.2 s is not evidence that generated pixels reached the client. Residual-on still moved quality on the paste arm (~+8 dB PSNR-Y); that does not validate pix2pix. Reports lacked checkpoint SHA, delivered hashes, and a shuffled-conditioning control. Preserve the artifact; do not cite it as a model result. Staged training remains unlaunched until a repaired path shows generation changing delivered frames and residual demand.
 
 ## Foreground experiment priority — 2026-09-11
 
@@ -67,3 +69,10 @@ latency, throughput and peak memory. Preserve older trials without reusing their
 invalid rankings. SPADE/training remains off pending a newly scoped experiment
 card. Acceptance: a supported Pareto tradeoff or a bounded rejection/inconclusive
 result that determines the next experiment; no family-wide claims from one pilot.
+
+`GEN-ACT-08` — Ready, PR #93 merge blocker: a fresh registry-built client must
+resolve the transmitted checkpoint digest or reject before inference; do not
+silently load default weights. Add a checkpoint-A versus checkpoint-B regression
+and a valid fresh-process round trip without an injected encoder object. This is
+lane A in [parallel probes](../workflow/session/parallel-probes.md). Training and
+model comparisons remain gated on valid inputs, paste/null controls and identity.
