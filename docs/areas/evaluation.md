@@ -5,6 +5,31 @@
 
 ---
 
+## Experiment policy update — 2026-09-11
+
+New probes follow [hypothesis-driven experiment design](../workflow/experiment-design.md).
+The next question is why total rate loses at matched final quality, with a
+component budget before another residual sweep. Existing audit/run history below
+is retained; historical next-action wording does not supersede this priority.
+
+Cursor's summary supplied by the user reports a clean overlap ladder, valid
+calibration, no Gate B pass, an unscorable Alcaraz span and a scorable but losing
+Federer comparison. Treat these as reported development findings: this session
+has not read the immutable overlap artifacts or independently reproduced the
+metrics or bound-alarm closures. PR #93 head `ba5a9a8` is open with green CI;
+its description covers Wave 1 repairs and explicitly excludes GPU pilots, so
+that PR description alone is not the overlap run's provenance.
+
+`EVAL-ACT-08` — Ready for evidence triage, no run launched: locate the exact
+repaired run/config/source identities and reuse its component ledger, saved
+decodes and timings. At locally matched quality against both anchors, calculate
+background/metadata headroom and foreground/correction burden. If unavailable,
+name the missing measurement and budget a minimal instrumentation task. Then
+write one bounded card for `CODEC-ACT-06`. Do not relax overlap floors or repeat
+a complete ladder merely to make a comparison scorable. Acceptance: an evidenced
+bottleneck or explicit missing evidence, a costed next decision, and preserved
+historical results. Gate A/B status and confirmation exposure rules stay intact.
+
 ## PR #88 audit — 2026-09-10
 
 Reviewed open head `d1d24b7`; main was `6b04eae` (PR #89). PR #88 adds useful full-range residual and actual-stream plumbing, adaptive anchors and training interfaces, but is **not ready to merge or support model-selection claims**. Its CI run `34428171118` passes tests and fails lint/type checks. Use [the next Antigravity dispatch](../workflow/session/submission-search.md), which includes repair acceptance tests and a staged full-codec search.

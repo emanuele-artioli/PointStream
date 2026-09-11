@@ -54,3 +54,20 @@ In the Gate A 48-frame native run (#69), PointStream payload was dominated by tw
 | `CODEC-ACT-05` | Ready | Coordinate EVAL-ACT-06 | 2026-09-09 code audit | **Residual fidelity and transport**: Gate A/B explicitly disabled residuals; shipped tiers enable them. Serialized client residuals remain unsupported; lossy uint8 offset clips large signed differences. Preserve the actual coded stream, validate full-range correction and independent output scoring, and measure high-fidelity residual-on curves. See [worker brief](../workflow/session/repair-residual-transport.md). |
 
 PR #88 recovery repairs now complete the current CODEC-ACT-05 implementation: actual residual streams/full-range mapping, client-originated delivered scoring, serialized generation conditioning/reference data and complete envelope reconciliation are covered by integration tests and a native residual smoke test. This validates transport plumbing, not high-fidelity rate–distortion performance; run the residual-on ladder through the repaired client before claiming a codec result. See [evaluation audit](evaluation.md#pr-88-audit--2026-09-10) and [next dispatch](../workflow/session/submission-search.md).
+
+## Background experiment priority — 2026-09-11
+
+`CODEC-ACT-06` — Planned; depends on `EVAL-ACT-08` evidence triage. Follow
+[experiment design](../workflow/experiment-design.md#3-background-first-removal-and-representation-are-separate-axes).
+Inventory current mask-aware median/hole filling and serialized background
+strategies before implementing an optional removal/fill selector (off, local
+mean, current temporal fill, Telea, later neural) independently of representation
+(first-frame still, panorama with charged render mappings, per-frame background
+video). These are proposed axes, not newly implemented capabilities.
+
+Acceptance: one bounded paired pilot identifies useful background rate/quality/
+computation choices and remaining total-codec headroom, or rejects the proposed
+mechanism with a next decision. Expected still/panorama/video ordering is tested,
+not enforced. Keep a no-overlay conventional anchor, overlay conflict control,
+and fixed foreground integration checks. Defer expensive filling and broad grids
+until observed errors justify them. No codec run or source change in this update.
