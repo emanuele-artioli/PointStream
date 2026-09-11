@@ -202,6 +202,7 @@ def test_check_bounds_logic() -> None:
     assert "psnr_y_visible" in alarms_bad[0]
 
 
+@pytest.mark.integration
 def test_evaluate_representations_smoke(tmp_path: Path) -> None:
     """Smoke test running small encode/decode for the 3 representations."""
     frames, masks = _synthetic_clip(t=4, h=64, w=64)
