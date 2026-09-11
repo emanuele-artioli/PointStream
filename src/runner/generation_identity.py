@@ -146,7 +146,80 @@ def _assert_checkpoint_matches(injected: Any, gen_meta: Mapping[str, Any]) -> No
     )
 
 
-def _from_registry(name: str) -> Any:
+def resolve_client_checkpoint(
+    name: str,
+    gen_meta: Mapping[str, Any],
+    *,
+    checkpoint: str | Path | None = None,
+    checkpoint_dir: str | Path | None = None,
+    checkpoint_registry: Mapping[str, str | Path] | None = None,
+) -> Path | None:
+    """Resolve a client checkpoint path explicitly, without trusting encoder paths."""
+    from src.contracts import paths
+
+    target_sha = gen_meta.get("checkpoint_sha256")
+    target_id = gen_meta.get("checkpoint_id")
+
+    if checkpoint_registry is not None:
+        for key in (target_sha, target_id, name):
+            if key and key in checkpoint_registry:
+                candidate = Path(checkpoint_registry[key])
+                if candidate.is_file():
+                    return candidate
+
+    if checkpoint is not None:
+        candidate = Path(checkpoint)
+        if candidate.is_file():
+            return candidate
+
+    search_dirs: list[Path] = []
+    if checkpoint_dir is not None:
+        cdir = Path(checkpoint_dir)
+        if cdir.is_dir():
+            search_dirs.append(cdir)
+    try:
+        w_dir = paths.assets() / "weights"
+        if w_dir.is_dir() and w_dir not in search_dirs:
+            search_dirs.append(w_dir)
+    except Exception:
+        pass
+
+    candidate_names: list[str] = []
+    if target_id and ":" in str(target_id):
+        fname = str(target_id).split(":", 1)[0]
+        if fname and fname not in candidate_names:
+            candidate_names.append(fname)
+    default_names = {
+        "pix2pix": "pix2pix_generator.pt",
+        "spade4tennis": "spade4tennis_lite_generator.pt",
+    }
+    if name in default_names and default_names[name] not in candidate_names:
+        candidate_names.append(default_names[name])
+
+    for sdir in search_dirs:
+        for cname in candidate_names:
+            candidate = sdir / cname
+            if candidate.is_file():
+                if target_sha is not None and sha256_file(candidate) == target_sha:
+                    return candidate
+        if target_sha is not None and not target_sha.startswith("injected:"):
+            try:
+                for child in sdir.iterdir():
+                    if child.is_file() and sha256_file(child) == target_sha:
+                        return child
+            except OSError:
+                pass
+
+    for sdir in search_dirs:
+        for cname in candidate_names:
+            candidate = sdir / cname
+            if candidate.is_file():
+                return candidate
+
+    return None
+
+
+def _from_registry(name: str, checkpoint: Path | str | None = None) -> Any:
     from src.components.generation import REGISTRY
     from src.contracts.conditioning import FrameGenerator
     from src.pipeline.reconstruction.dispatch import from_spec
@@ -154,7 +227,13 @@ def _from_registry(name: str) -> Any:
     if not REGISTRY.has(name):
         return None
     spec = REGISTRY.spec(name)
-    backend = REGISTRY.build(name)
+    kwargs: dict[str, Any] = {}
+    if checkpoint is not None:
+        kwargs["checkpoint"] = str(checkpoint)
+    try:
+        backend = REGISTRY.build(name, **kwargs)
+    except TypeError:
+        backend = REGISTRY.build(name)
     if isinstance(backend, FrameGenerator):
         return from_spec(spec, backend)
     return None
@@ -165,6 +244,9 @@ def resolve_client_generator(
     *,
     injected: Any = None,
     require_identity: bool = False,
+    checkpoint: str | Path | None = None,
+    checkpoint_dir: str | Path | None = None,
+    checkpoint_registry: Mapping[str, str | Path] | None = None,
 ) -> Any:
     """Resolve the generator the client will run, or raise.
 
@@ -193,12 +275,12 @@ def resolve_client_generator(
             _assert_checkpoint_matches(injected, gen_meta)
         return injected
 
-    if not require_identity:
-        name = gen_meta.get("name")
-        return _from_registry(str(name)) if name else None
-
     name = gen_meta.get("name")
     digest = gen_meta.get("checkpoint_sha256")
+
+    if not require_identity and not digest:
+        return _from_registry(str(name)) if name else None
+
     if not name:
         raise ValueError("Payload requires generation but generator name is missing")
     if isinstance(digest, str) and digest.startswith("injected:"):
@@ -206,7 +288,28 @@ def resolve_client_generator(
             f"Cannot reconstruct injected generator {name!r}; "
             "the client was given no matching backend"
         )
-    resolved = _from_registry(str(name))
+
+    resolved_checkpoint = resolve_client_checkpoint(
+        str(name),
+        gen_meta,
+        checkpoint=checkpoint,
+        checkpoint_dir=checkpoint_dir,
+        checkpoint_registry=checkpoint_registry,
+    )
+    resolved = _from_registry(str(name), checkpoint=resolved_checkpoint)
     if resolved is None:
         raise ValueError(f"Unknown generator checkpoint identity: {digest}")
+
+    claimed = identity_from_ref(
+        resolved,
+        seed=int(gen_meta.get("seed") or 0),
+        params=gen_meta.get("params") or {},
+        checkpoint=resolved_checkpoint,
+    )
+    resolved_sha = claimed.get("checkpoint_sha256")
+    if resolved_sha != digest:
+        raise ValueError(
+            f"Mismatched checkpoint identity: requested {digest}, "
+            f"resolved {resolved_sha}"
+        )
     return resolved

@@ -10,9 +10,10 @@ encoder-side objects.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 import io
 import json
-from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -439,6 +440,9 @@ def reconstruct_serialized_client(
     require_compressed: bool = False,
     generator: Any = None,
     seed: int | None = None,
+    checkpoint: str | Path | None = None,
+    checkpoint_dir: str | Path | None = None,
+    checkpoint_registry: Mapping[str, str | Path] | None = None,
 ) -> Clip | tuple[Clip, Clip]:
     """Reconstruct only from the validated NumPy/JSON client envelope."""
     if not isinstance(payload, (bytes, bytearray, memoryview)):
@@ -546,6 +550,9 @@ def reconstruct_serialized_client(
                 gen_meta,
                 injected=active_generator,
                 require_identity=needs_generation,
+                checkpoint=checkpoint,
+                checkpoint_dir=checkpoint_dir,
+                checkpoint_registry=checkpoint_registry,
             )
 
         pipeline_placements = []

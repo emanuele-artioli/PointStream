@@ -107,6 +107,47 @@ def _build_lattice(*, gen_on: bool, res_on: bool) -> StageLattice:
     return StageLattice.of(*stages)
 
 
+def resolve_clip_start_frame(clip: Any, n_frames: int | None = None) -> int:
+    """Resolve the verified start_frame offset from clip or manifest.
+
+    Never infer or guess global frame IDs.
+    """
+    if hasattr(clip, "start_frame") and clip.start_frame is not None and clip.start_frame > 0:
+        return int(clip.start_frame)
+
+    video = getattr(clip, "video", None)
+    scene = getattr(clip, "scene", None)
+    if not video or not scene:
+        if hasattr(clip, "start_frame") and clip.start_frame is not None:
+            return int(clip.start_frame)
+        raise ValueError("Cannot resolve start_frame: clip is missing video/scene")
+
+    from experiments.long_scenes.loader import get_long_scene_manifest
+
+    try:
+        manifest = get_long_scene_manifest()
+        for s in manifest.get("scenes", []):
+            if s.get("video") == video and s.get("scene") == scene:
+                target_count = n_frames or getattr(clip, "n_frames", None) or len(getattr(clip, "frames", []))
+                intervals = s.get("intervals", {})
+                if str(target_count) in intervals:
+                    return int(intervals[str(target_count)].get("start_frame", 0))
+                for span in ("48", "96", "192", "384"):
+                    if span in intervals and "start_frame" in intervals[span]:
+                        return int(intervals[span]["start_frame"])
+    except Exception as exc:
+        raise RuntimeError(
+            f"Failed to resolve verified start_frame for {video}/{scene} from manifest: {exc}"
+        ) from exc
+
+    if hasattr(clip, "start_frame") and clip.start_frame is not None:
+        return int(clip.start_frame)
+
+    raise ValueError(
+        f"Cannot resolve verified source coordinates (start_frame) for {video}/{scene}"
+    )
+
+
 def _augment_objects_with_pose(clip: Any, *, shuffle: bool, seed: int) -> tuple[Any, ...]:
     from src.contracts.conditioning import ConditioningBundle
     import cv2
@@ -115,26 +156,32 @@ def _augment_objects_with_pose(clip: Any, *, shuffle: bool, seed: int) -> tuple[
     if not objects:
         return objects
 
+    start_frame = resolve_clip_start_frame(clip, n_frames=len(clip.frames))
     dataset_scene_dir = ps_paths.assets() / "dataset" / clip.video / "segmentations" / clip.scene
-    start_frame = 38
     poses: list[np.ndarray] = []
     augmented: list[Any] = []
     for obj in objects:
         obj_id = obj.object_id
         abs_frame = start_frame + obj.frame_index
         skel_dir = dataset_scene_dir / f"{obj_id}_skeleton"
-        skel_img = None
-        if skel_dir.is_dir():
-            pose_path = skel_dir / f"frame_{abs_frame:06d}.png"
-            if pose_path.is_file():
-                skel_bgr = cv2.imread(str(pose_path))
-                if skel_bgr is not None:
-                    skel_img = cv2.cvtColor(skel_bgr, cv2.COLOR_BGR2RGB)
+        if not skel_dir.is_dir():
+            raise FileNotFoundError(
+                f"Missing required pose conditioning skeleton directory for {clip.video}/{clip.scene} object {obj_id} at {skel_dir}"
+            )
+        pose_path = skel_dir / f"frame_{abs_frame:06d}.png"
+        if not pose_path.is_file():
+            raise FileNotFoundError(
+                f"Missing required pose conditioning skeleton for {clip.video}/{clip.scene} object {obj_id} frame {abs_frame} at {pose_path}"
+            )
+        skel_bgr = cv2.imread(str(pose_path))
+        if skel_bgr is None:
+            raise ValueError(f"Failed to load skeleton image at {pose_path}")
+        skel_img = cv2.cvtColor(skel_bgr, cv2.COLOR_BGR2RGB)
         height, width = obj.appearance.shape[:2]
-        if skel_img is None:
-            skel_img = np.zeros((height, width, 3), dtype=np.uint8)
-        elif skel_img.shape[:2] != (height, width):
-            skel_img = cv2.resize(skel_img, (width, height))
+        if skel_img.shape[:2] != (height, width):
+            raise ValueError(
+                f"Misaligned pose conditioning: skeleton shape {skel_img.shape[:2]} != appearance shape {(height, width)} for object {obj_id} frame {abs_frame}"
+            )
         poses.append(skel_img)
         bundle = ConditioningBundle(
             appearance=np.transpose(obj.appearance, (2, 0, 1)),
@@ -415,11 +462,13 @@ def assemble_matrix_report(
         context_id=getattr(clip, "context_id", None),
     )
     revision = git_revision(repo or ps_paths.repo_root())
+    clip_objects = getattr(clip, "objects", ())
+    resolved_cfg = resolved_configuration(base_config, device=device, objects=clip_objects)
     identity = build_run_identity(
         code_revision=revision,
         checkpoint_sha256=checkpoint_sha256,
         source_frame_hashes=list(manifest["frame_hashes"]),
-        config=resolved_configuration(base_config),
+        config=resolved_cfg,
         video=video,
         scene=scene,
         frames=frames,
@@ -461,7 +510,7 @@ def assemble_matrix_report(
         "model_invocation_count": invocation_total,
         "identity": identity,
         "source_manifest": manifest,
-        "resolved_configuration": resolved_configuration(base_config),
+        "resolved_configuration": resolved_cfg,
         "controls": controls,
         "generation_effect": effect,
         "generator_comparison_valid": bool(comparison["generator_comparison_valid"]),
@@ -491,6 +540,7 @@ def _slice_clip(clip_full: LongSceneClip, n_frames: int) -> LongSceneClip:
         is_eligible=clip_full.is_eligible,
         route=clip_full.route,
         failure_reasons=clip_full.failure_reasons,
+        start_frame=getattr(clip_full, "start_frame", 0),
     )
 
 
@@ -567,7 +617,11 @@ def run_matrix(
         code_revision=git_revision(repo or ps_paths.repo_root()),
         checkpoint_sha256=checkpoint_sha,
         source_frame_hashes=per_frame_sha256(np.asarray(clip.frames)),
-        config=resolved_configuration(base_config),
+        config=resolved_configuration(
+            base_config,
+            device=device,
+            objects=getattr(clip, "objects", ()),
+        ),
         video=clip.video,
         scene=clip.scene,
         frames=frames,

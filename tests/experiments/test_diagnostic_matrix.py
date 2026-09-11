@@ -3,23 +3,32 @@
 from __future__ import annotations
 
 import sqlite3  # noqa: F401
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import json
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
 import numpy as np
+import pytest
 
 from experiments.tier.diagnostic_report import (
     REQUIRED_CORNER_KEYS,
     REQUIRED_REPORT_KEYS,
     assess_generator_comparison,
+    build_run_identity,
     identity_matches,
+    resolved_configuration,
     reusable_corners,
 )
-from scripts.run_diagnostic_matrix import assemble_matrix_report, run_matrix
+from scripts.run_diagnostic_matrix import (
+    _augment_objects_with_pose,
+    assemble_matrix_report,
+    resolve_clip_start_frame,
+    run_matrix,
+)
 from src.contracts.config import PointstreamConfig
+from src.pipeline.reconstruction.reconstruct import ObjectRequest
 
 # The checkout that contains this test file. Do not pin a local worktree path;
 # CI has no /tmp/pointstream-wave1-c.
@@ -365,3 +374,178 @@ def test_assess_generator_comparison_requires_identity() -> None:
     )
     assert verdict["generator_comparison_valid"] is False
     assert "missing checkpoint SHA-256" in verdict["reasons"]
+
+
+def test_identity_independent_variations_cause_cache_miss() -> None:
+    clip = _clip()
+    cfg = PointstreamConfig()
+    repo_rev = {"commit": "commit123", "dirty": False, "diff_sha256": None}
+    base_identity = build_run_identity(
+        code_revision=repo_rev,
+        checkpoint_sha256="a" * 64,
+        source_frame_hashes=["hash1", "hash2"],
+        config=resolved_configuration(cfg, device="cpu", objects=clip.objects),
+        video=clip.video,
+        scene=clip.scene,
+        frames=2,
+        generator="pix2pix",
+        residual_qp=32,
+    )
+    prior = {
+        "identity": base_identity,
+        "matrix": [
+            {
+                "corner": "gen_off_res_off",
+                "generation_on": False,
+                "residual_on": False,
+                "shuffled_conditioning": False,
+                "delivered_frame_hashes": ["hash1", "hash2"],
+            }
+        ],
+    }
+
+    # 1. Identical complete identity reuses
+    assert identity_matches(base_identity, base_identity) is True
+    assert len(reusable_corners(prior, base_identity)) == 1
+
+    # 2. Background quality change causes cache miss
+    cfg_bg = replace(cfg, background=replace(cfg.background, jpeg_quality=95))
+    id_bg = dict(base_identity)
+    id_bg["config"] = resolved_configuration(cfg_bg, device="cpu", objects=clip.objects)
+    assert identity_matches(id_bg, base_identity) is False
+    assert reusable_corners(prior, id_bg) == {}
+
+    # 3. Device change causes cache miss
+    id_device = dict(base_identity)
+    id_device["config"] = resolved_configuration(cfg, device="cuda:0", objects=clip.objects)
+    assert identity_matches(id_device, base_identity) is False
+    assert reusable_corners(prior, id_device) == {}
+
+    # 4. Pose/mask change causes cache miss
+    obj_orig = ObjectRequest(
+        object_id="track_0001",
+        appearance=np.zeros((10, 10, 3), dtype=np.uint8),
+        bbox=(0, 0, 10, 10),
+        mask=np.zeros((2, 10, 10), dtype=bool),
+        frame_index=0,
+    )
+    obj_mod_mask = replace(obj_orig, mask=np.ones((2, 10, 10), dtype=bool))
+    id_orig_obj = dict(base_identity)
+    id_orig_obj["config"] = resolved_configuration(cfg, device="cpu", objects=(obj_orig,))
+    id_mod_mask = dict(base_identity)
+    id_mod_mask["config"] = resolved_configuration(cfg, device="cpu", objects=(obj_mod_mask,))
+    assert identity_matches(id_mod_mask, id_orig_obj) is False
+
+    # 5. Code changes cause cache miss
+    # a. Different commit
+    id_code_commit = dict(base_identity)
+    id_code_commit["code_revision"] = {"commit": "commit456", "dirty": False, "diff_sha256": None}
+    assert identity_matches(id_code_commit, base_identity) is False
+
+    # b. Dirty code without diff hash (unhashed dirty reuse refused)
+    id_code_dirty_unhashed = dict(base_identity)
+    id_code_dirty_unhashed["code_revision"] = {"commit": "commit123", "dirty": True, "diff_sha256": None}
+    assert identity_matches(id_code_dirty_unhashed, base_identity) is False
+
+    # c. Dirty code with differing diff hash
+    id_code_dirty1 = dict(base_identity)
+    id_code_dirty1["code_revision"] = {"commit": "commit123", "dirty": True, "diff_sha256": "1" * 64}
+    id_code_dirty2 = dict(base_identity)
+    id_code_dirty2["code_revision"] = {"commit": "commit123", "dirty": True, "diff_sha256": "2" * 64}
+    assert identity_matches(id_code_dirty1, id_code_dirty2) is False
+
+    # d. Dirty code with matching diff hash matches
+    assert identity_matches(id_code_dirty1, id_code_dirty1) is True
+
+
+def test_failed_paste_corners_with_successful_generation_invalidates_comparison() -> None:
+    matrix = [
+        {
+            "corner": "gen_off_res_off",
+            "generation_on": False,
+            "residual_on": False,
+            "shuffled_conditioning": False,
+            "delivered_frame_hashes": ["paste_hash1", "paste_hash2"],
+            "failure": {"type": "RuntimeError", "message": "paste failed"},
+            "model_invocation_count": 0,
+            "control": "pasted_reference",
+        },
+        {
+            "corner": "gen_off_res_on",
+            "generation_on": False,
+            "residual_on": True,
+            "shuffled_conditioning": False,
+            "delivered_frame_hashes": ["paste_hash1", "paste_hash2"],
+            "failure": None,
+            "model_invocation_count": 0,
+            "control": "pasted_reference",
+        },
+        {
+            "corner": "gen_on_res_off",
+            "generation_on": True,
+            "residual_on": False,
+            "shuffled_conditioning": False,
+            "delivered_frame_hashes": ["gen_hash1", "gen_hash2"],
+            "failure": None,
+            "model_invocation_count": 1,
+        },
+        {
+            "corner": "gen_on_res_on",
+            "generation_on": True,
+            "residual_on": True,
+            "shuffled_conditioning": False,
+            "delivered_frame_hashes": ["gen_hash1", "gen_hash2"],
+            "failure": None,
+            "model_invocation_count": 1,
+        },
+    ]
+    verdict = assess_generator_comparison(
+        checkpoint_sha256="a" * 64,
+        generator_backend="pix2pix",
+        matrix=matrix,
+    )
+    assert verdict["generator_comparison_valid"] is False
+    assert "paste control corner failed" in verdict["reasons"]
+
+
+def test_two_scenes_distinct_frame_offsets_and_absent_pose_rejection() -> None:
+    # Test two scenes with distinct frame offsets from manifest
+    clip_alcaraz = FakeClip(
+        video="alcaraz_highlights",
+        scene="scene_000",
+        context_id="ctx",
+        frames=np.zeros((48, 16, 16, 3), dtype=np.uint8),
+    )
+    offset_alcaraz = resolve_clip_start_frame(clip_alcaraz, n_frames=48)
+    assert offset_alcaraz == 38
+
+    clip_federer = FakeClip(
+        video="federer_djokovic",
+        scene="scene_007",
+        context_id="ctx",
+        frames=np.zeros((48, 16, 16, 3), dtype=np.uint8),
+    )
+    offset_federer = resolve_clip_start_frame(clip_federer, n_frames=48)
+    assert offset_federer == 68
+
+    assert offset_alcaraz != offset_federer
+
+    # Test absent pose: missing required conditioning fails closed (no synthetic fallback)
+    obj = ObjectRequest(
+        object_id="track_nonexistent_9999",
+        appearance=np.zeros((32, 32, 3), dtype=np.uint8),
+        bbox=(0, 0, 32, 32),
+        mask=np.zeros((2, 32, 32), dtype=bool),
+        frame_index=0,
+    )
+    clip_missing_pose = FakeClip(
+        video="alcaraz_highlights",
+        scene="scene_000",
+        context_id="ctx",
+        frames=np.zeros((2, 32, 32, 3), dtype=np.uint8),
+        objects=(obj,),
+    )
+    with pytest.raises(FileNotFoundError) as exc_info:
+        _augment_objects_with_pose(clip_missing_pose, shuffle=False, seed=42)
+    assert "Missing required pose conditioning skeleton" in str(exc_info.value)
+

@@ -109,7 +109,7 @@ def sha256_path(path: Path) -> str | None:
 
 
 def git_revision(repo: Path) -> dict[str, Any]:
-    """`git rev-parse HEAD` plus a dirty flag. Missing git is missing identity."""
+    """`git rev-parse HEAD` plus a dirty flag and diff hash. Missing git is missing identity."""
     try:
         commit = subprocess.check_output(
             ["git", "rev-parse", "HEAD"],
@@ -123,9 +123,18 @@ def git_revision(repo: Path) -> dict[str, Any]:
             text=True,
             stderr=subprocess.DEVNULL,
         )
-        return {"commit": commit, "dirty": bool(porcelain.strip())}
+        dirty = bool(porcelain.strip())
+        diff_sha256 = None
+        if dirty:
+            diff_bytes = subprocess.check_output(
+                ["git", "diff", "HEAD"],
+                cwd=repo,
+                stderr=subprocess.DEVNULL,
+            )
+            diff_sha256 = sha256_bytes(porcelain.encode("utf-8") + b"\n" + diff_bytes)
+        return {"commit": commit, "dirty": dirty, "diff_sha256": diff_sha256}
     except (OSError, subprocess.CalledProcessError) as exc:
-        return {"commit": None, "dirty": True, "error": str(exc)}
+        return {"commit": None, "dirty": True, "diff_sha256": None, "error": str(exc)}
 
 
 def jsonable(value: Any) -> Any:
@@ -151,8 +160,59 @@ def serialize_config(config: Any) -> dict[str, Any]:
     return jsonable(config) if config is not None else {}
 
 
-def resolved_configuration(config: Any) -> dict[str, Any]:
-    """Lattice stages, residual, generator backend, appearance, and seed."""
+def _summarize_objects(objects: Any) -> dict[str, Any]:
+    if not objects:
+        return {"placements": [], "masks": [], "conditioning": []}
+    placements_list: list[dict[str, Any]] = []
+    masks_list: list[str | None] = []
+    conditioning_list: list[dict[str, Any] | None] = []
+    for obj in objects:
+        placements_list.append({
+            "frame_index": getattr(obj, "frame_index", None),
+            "object_id": str(getattr(obj, "object_id", "")),
+            "bbox": list(getattr(obj, "bbox", ())),
+        })
+        mask = getattr(obj, "mask", None)
+        if mask is not None:
+            masks_list.append(sha256_bytes(np.ascontiguousarray(mask).tobytes()))
+        else:
+            masks_list.append(None)
+        bundle = getattr(obj, "conditioning", None)
+        if bundle is not None:
+            c_info: dict[str, Any] = {}
+            pose = getattr(bundle, "pose", None)
+            if pose is not None:
+                c_info["pose"] = sha256_bytes(np.ascontiguousarray(pose).tobytes())
+            app = getattr(bundle, "appearance", None)
+            if app is not None:
+                c_info["appearance"] = sha256_bytes(np.ascontiguousarray(app).tobytes())
+            m = getattr(bundle, "mask", None)
+            if m is not None:
+                c_info["mask"] = sha256_bytes(np.ascontiguousarray(m).tobytes())
+            conditioning_list.append(c_info)
+        else:
+            conditioning_list.append(None)
+    return {
+        "placements": placements_list,
+        "masks": masks_list,
+        "conditioning": conditioning_list,
+    }
+
+
+def resolved_configuration(
+    config: Any,
+    *,
+    device: str | None = None,
+    objects: Any = None,
+    placements: Any = None,
+    masks: Any = None,
+    conditioning: Any = None,
+) -> dict[str, Any]:
+    """Complete effective configuration identity covering:
+    device, background quality/codec, lattice stages, residual,
+    generator backend & parameters, appearance format/quality, run/seed,
+    masks, placements, and conditioning.
+    """
     lattice = getattr(config, "lattice", None)
     stages = getattr(config, "stages", None)
     enabled: list[str] = []
@@ -161,15 +221,33 @@ def resolved_configuration(config: Any) -> dict[str, Any]:
     generator = getattr(config, "generator", None)
     residual = getattr(config, "residual", None)
     appearance = getattr(config, "appearance", None)
+    background = getattr(config, "background", None)
     run_cfg = getattr(config, "run", None)
+
+    dev_str = str(device if device is not None else (getattr(config, "device", None) or "cpu"))
+
+    objs = objects if objects is not None else getattr(config, "objects", None)
+    obj_summary = _summarize_objects(objs)
+
+    resolved_placements = placements if placements is not None else obj_summary["placements"]
+    resolved_masks = masks if masks is not None else obj_summary["masks"]
+    resolved_conditioning = conditioning if conditioning is not None else obj_summary["conditioning"]
+
     return {
+        "device": dev_str,
         "lattice_stages": enabled,
         "lattice": jsonable(lattice),
         "residual": jsonable(residual),
         "generator_backend": getattr(generator, "backend", None),
         "generator": jsonable(generator),
+        "generator_parameters": inference_parameters(config),
         "appearance": jsonable(appearance),
+        "background": jsonable(background),
+        "run": jsonable(run_cfg),
         "seed": getattr(run_cfg, "seed", None),
+        "placements": resolved_placements,
+        "masks": resolved_masks,
+        "conditioning": resolved_conditioning,
     }
 
 
@@ -245,6 +323,13 @@ def identity_matches(current: dict[str, Any], prior: dict[str, Any] | None) -> b
         if key not in prior or key not in current:
             return False
         if current[key] != prior[key]:
+            return False
+    cur_rev = current.get("code_revision") or {}
+    pri_rev = prior.get("code_revision") or {}
+    if cur_rev.get("dirty") or pri_rev.get("dirty"):
+        if not cur_rev.get("diff_sha256") or not pri_rev.get("diff_sha256"):
+            return False
+        if cur_rev.get("diff_sha256") != pri_rev.get("diff_sha256"):
             return False
     for key in ("video", "scene", "frames", "generator", "residual_qp"):
         if key in current and current.get(key) != prior.get(key):
@@ -405,21 +490,45 @@ def assess_generator_comparison(
     gen_hashes: list[str] | None = None
     gen_invocations = 0
     gen_failures = 0
+    paste_failures = 0
+    incomplete_or_nonfinite = 0
+
     for row in matrix:
-        if row.get("generation_on"):
+        is_gen = bool(row.get("generation_on"))
+        if is_gen:
             gen_invocations += int(row.get("model_invocation_count") or 0)
+
+        hashes = row.get("delivered_frame_hashes")
+        if not hashes or not isinstance(hashes, list) or len(hashes) == 0:
+            incomplete_or_nonfinite += 1
+
+        metrics = row.get("metrics")
+        if isinstance(metrics, dict):
+            for val in metrics.values():
+                if isinstance(val, (int, float)) and (np.isnan(val) or np.isinf(val)):
+                    incomplete_or_nonfinite += 1
+
+        timing = row.get("timing")
+        if isinstance(timing, dict):
+            for val in timing.values():
+                if isinstance(val, (int, float)) and (np.isnan(val) or np.isinf(val)):
+                    incomplete_or_nonfinite += 1
+
         if row.get("failure"):
-            if row.get("generation_on"):
+            if is_gen:
                 gen_failures += 1
+            else:
+                paste_failures += 1
             continue
+
         if row.get("shuffled_conditioning"):
             continue
-        if not row.get("generation_on"):
-            if paste_hashes is None:
-                paste_hashes = list(row.get("delivered_frame_hashes") or [])
+        if not is_gen:
+            if paste_hashes is None and hashes:
+                paste_hashes = list(hashes)
             continue
-        if gen_hashes is None:
-            gen_hashes = list(row.get("delivered_frame_hashes") or [])
+        if gen_hashes is None and hashes:
+            gen_hashes = list(hashes)
 
     pixels_changed = (
         paste_hashes is not None
@@ -428,10 +537,18 @@ def assess_generator_comparison(
         and bool(paste_hashes)
         and bool(gen_hashes)
     )
+    if paste_failures:
+        reasons.append("paste control corner failed")
+    if paste_hashes is None or len(paste_hashes) == 0:
+        reasons.append("missing or empty paste control frame hashes")
     if gen_failures:
         reasons.append("generation corner failed")
+    if gen_hashes is None or len(gen_hashes) == 0:
+        reasons.append("missing or empty generator frame hashes")
     if gen_invocations <= 0:
         reasons.append("no-op generator (invocation count is 0)")
+    if incomplete_or_nonfinite > 0:
+        reasons.append("required outputs are not complete and finite")
     if paste_hashes is not None and gen_hashes is not None and not pixels_changed:
         reasons.append("generation did not change delivered pixels versus paste")
 
