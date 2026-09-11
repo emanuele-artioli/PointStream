@@ -11,6 +11,7 @@ The saved JSON records identity (revision, source hashes, config, checkpoint
 SHA), byte parts, timings, per-corner failures, and whether generation actually
 changed delivered pixels. Reuse of a prior corner requires that whole identity.
 """
+
 from __future__ import annotations
 
 import sqlite3  # noqa: F401
@@ -128,7 +129,9 @@ def resolve_clip_start_frame(clip: Any, n_frames: int | None = None) -> int:
         manifest = get_long_scene_manifest()
         for s in manifest.get("scenes", []):
             if s.get("video") == video and s.get("scene") == scene:
-                target_count = n_frames or getattr(clip, "n_frames", None) or len(getattr(clip, "frames", []))
+                target_count = (
+                    n_frames or getattr(clip, "n_frames", None) or len(getattr(clip, "frames", []))
+                )
                 intervals = s.get("intervals", {})
                 if str(target_count) in intervals:
                     return int(intervals[str(target_count)].get("start_frame", 0))
@@ -168,7 +171,18 @@ def _augment_objects_with_pose(clip: Any, *, shuffle: bool, seed: int) -> tuple[
             raise FileNotFoundError(
                 f"Missing required pose conditioning skeleton directory for {clip.video}/{clip.scene} object {obj_id} at {skel_dir}"
             )
-        pose_path = skel_dir / f"frame_{abs_frame:06d}.png"
+        pose_path = None
+        crop_dir = dataset_scene_dir / obj_id
+        if crop_dir.is_dir():
+            crop_files = sorted(crop_dir.glob("frame_*.png"))
+            crop_ids = [int(p.name[6:12]) for p in crop_files]
+            if abs_frame in crop_ids:
+                pos = crop_ids.index(abs_frame)
+                candidate_path = skel_dir / f"frame_{pos:06d}.png"
+                if candidate_path.is_file():
+                    pose_path = candidate_path
+        if pose_path is None:
+            pose_path = skel_dir / f"frame_{abs_frame:06d}.png"
         if not pose_path.is_file():
             raise FileNotFoundError(
                 f"Missing required pose conditioning skeleton for {clip.video}/{clip.scene} object {obj_id} frame {abs_frame} at {pose_path}"
@@ -322,7 +336,10 @@ def run_diagnostic_corner(
         "base_frame_hashes": base_hashes,
         "delivered_frame_hashes": [],
         "coded_bytes": None,
-        "parts": {key: 0 for key in ("residual", "panorama", "actor_reference", "metadata", "transport_total")},
+        "parts": {
+            key: 0
+            for key in ("residual", "panorama", "actor_reference", "metadata", "transport_total")
+        },
         "byte_subledger": None,
         "wire_reconciliation": {
             "wire_request_present": False,
@@ -486,9 +503,7 @@ def assemble_matrix_report(
         "pasted_reference": [
             row["corner"] for row in matrix if row.get("control") == "pasted_reference"
         ],
-        "no_generator": [
-            row["corner"] for row in matrix if not row.get("generation_on")
-        ],
+        "no_generator": [row["corner"] for row in matrix if not row.get("generation_on")],
         "shuffled_conditioning": [
             row["corner"] for row in matrix if row.get("shuffled_conditioning")
         ],
@@ -550,7 +565,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--video", default="alcaraz_highlights", help="Video name")
     parser.add_argument("--scene", default="scene_000", help="Scene name")
     parser.add_argument("--generator", default="pix2pix", help="Generator arch for Gen-ON corners")
-    parser.add_argument("--residual-qp", type=int, default=32, help="Residual QP for Res-ON corners")
+    parser.add_argument(
+        "--residual-qp", type=int, default=32, help="Residual QP for Res-ON corners"
+    )
     parser.add_argument(
         "--output",
         type=Path,
@@ -575,7 +592,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default=True,
         help="Run shuffled/foreign-pose generation null (default on)",
     )
-    parser.add_argument("--device", default=None, help="Inference device (recorded; default cpu/cuda)")
+    parser.add_argument(
+        "--device", default=None, help="Inference device (recorded; default cpu/cuda)"
+    )
     parser.add_argument("--seed", type=int, default=None, help="Override config seed")
     return parser
 

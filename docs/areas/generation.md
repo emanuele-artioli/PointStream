@@ -70,9 +70,13 @@ invalid rankings. SPADE/training remains off pending a newly scoped experiment
 card. Acceptance: a supported Pareto tradeoff or a bounded rejection/inconclusive
 result that determines the next experiment; no family-wide claims from one pilot.
 
-`GEN-ACT-08` — Ready, PR #93 merge blocker: a fresh registry-built client must
-resolve the transmitted checkpoint digest or reject before inference; do not
-silently load default weights. Add a checkpoint-A versus checkpoint-B regression
-and a valid fresh-process round trip without an injected encoder object. This is
-lane A in [parallel probes](../workflow/session/parallel-probes.md). Training and
-model comparisons remain gated on valid inputs, paste/null controls and identity.
+`GEN-ACT-08` — **Complete** (PR #93, `4a55573` / `e9f781f`). Enforced fail-closed client checkpoint resolution against transmitted SHA-256 digest (`resolve_client_checkpoint`), full effective configuration identity, declared control validation, and dynamic clip start frame resolution without synthetic fallback.
+
+`GEN-ACT-09` — **Complete** (Wave 2 Diagnostic Matrix, artifacts `outputs/development-recovery/diagnostic-pix2pix-alcaraz.json` SHA-256 `ccfaa34b8ceca48409839c3baefec20e91f87a0425aea6da2b7429c37ed2fa50` and `diagnostic-pix2pix-federer.json` SHA-256 `407148416bf1455ccfb68cc025a2ff31899689ebd0ffc722fd4f0dddc085af25`).
+- **Validity Criteria Met**: Generator comparison validity is strictly `true` for both development scenes; `delivered_pixels_changed` is `true`; `gen_on_vs_paste_hash_match` is `false`; `shuffled_conditioning_changed_pixels` is `true`; `wire_reconciliation` matched 100% of serialized bytes.
+- **Instrument Verification**: Resolved skeleton pose alignment by track position (matching crop global IDs to 0-based skeleton index), eliminating the previous indexing mismatch.
+- **Empirical Findings on pix2pix (16 frames @ 4K)**:
+  - *Alcaraz*: Pasted reference (`gen_off_res_off`) achieves 34.55 dB PSNR-Y / 90.81 VMAF for 523,610 B. pix2pix without residual (`gen_on_res_off`) yields 33.50 dB PSNR-Y (-1.05 dB) / 90.56 VMAF (-0.25) while costing 957,945 B (+434,335 B, primarily pose conditioning metadata). With residual (QP 32), pasted reference (`gen_off_res_on`) reaches 42.62 dB / 93.35 VMAF for 600,656 B, while pix2pix (`gen_on_res_on`) achieves 38.88 dB (-3.74 dB) / 93.16 VMAF for 1,035,763 B.
+  - *Federer*: Pasted reference (`gen_off_res_off`) achieves 30.46 dB PSNR-Y / 78.13 VMAF for 627,735 B. pix2pix without residual (`gen_on_res_off`) yields 29.82 dB (-0.64 dB) / 77.75 VMAF for 1,282,341 B (+654,606 B). With residual, pasted reference (`gen_off_res_on`) reaches 39.76 dB / 90.01 VMAF for 796,646 B, while pix2pix (`gen_on_res_on`) reaches 37.40 dB (-2.36 dB) / 89.50 VMAF for 1,451,803 B.
+- **Decision**: Verified that the client generator executes faithfully and alters reconstructed frames as conditioned, but pix2pix under current uncompressed pose conditioning degrades whole-codec rate–distortion against pasted reference. Generator remains OFF for the headline compression ladder.
+

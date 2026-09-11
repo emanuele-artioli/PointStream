@@ -42,6 +42,7 @@ class FakeClip:
     context_id: str
     frames: np.ndarray
     objects: tuple[Any, ...] = ()
+    start_frame: int | None = None
 
 
 class FakeSizes:
@@ -337,7 +338,13 @@ def test_assemble_report_lists_required_top_level_keys() -> None:
             "shuffled_conditioning": False,
             "delivered_frame_hashes": ["aa"],
             "base_frame_hashes": ["bb"],
-            "parts": {"residual": 0, "panorama": 1, "actor_reference": 1, "metadata": 1, "transport_total": 3},
+            "parts": {
+                "residual": 0,
+                "panorama": 1,
+                "actor_reference": 1,
+                "metadata": 1,
+                "transport_total": 3,
+            },
             "byte_subledger": None,
             "wire_reconciliation": {"verdict": "wire_request_absent"},
             "timing": {"encoder_seconds": 0.1, "client_seconds": 0.1, "evaluation_seconds": 0.1},
@@ -444,14 +451,26 @@ def test_identity_independent_variations_cause_cache_miss() -> None:
 
     # b. Dirty code without diff hash (unhashed dirty reuse refused)
     id_code_dirty_unhashed = dict(base_identity)
-    id_code_dirty_unhashed["code_revision"] = {"commit": "commit123", "dirty": True, "diff_sha256": None}
+    id_code_dirty_unhashed["code_revision"] = {
+        "commit": "commit123",
+        "dirty": True,
+        "diff_sha256": None,
+    }
     assert identity_matches(id_code_dirty_unhashed, base_identity) is False
 
     # c. Dirty code with differing diff hash
     id_code_dirty1 = dict(base_identity)
-    id_code_dirty1["code_revision"] = {"commit": "commit123", "dirty": True, "diff_sha256": "1" * 64}
+    id_code_dirty1["code_revision"] = {
+        "commit": "commit123",
+        "dirty": True,
+        "diff_sha256": "1" * 64,
+    }
     id_code_dirty2 = dict(base_identity)
-    id_code_dirty2["code_revision"] = {"commit": "commit123", "dirty": True, "diff_sha256": "2" * 64}
+    id_code_dirty2["code_revision"] = {
+        "commit": "commit123",
+        "dirty": True,
+        "diff_sha256": "2" * 64,
+    }
     assert identity_matches(id_code_dirty1, id_code_dirty2) is False
 
     # d. Dirty code with matching diff hash matches
@@ -549,3 +568,40 @@ def test_two_scenes_distinct_frame_offsets_and_absent_pose_rejection() -> None:
         _augment_objects_with_pose(clip_missing_pose, shuffle=False, seed=42)
     assert "Missing required pose conditioning skeleton" in str(exc_info.value)
 
+
+def test_augment_objects_with_pose_resolves_positionally(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import cv2
+
+    monkeypatch.setenv("PS_DATA_ROOT", str(tmp_path))
+    scene_dir = tmp_path / "assets" / "dataset" / "fake_video" / "segmentations" / "fake_scene"
+    crop_dir = scene_dir / "track_0001"
+    skel_dir = scene_dir / "track_0001_skeleton"
+    crop_dir.mkdir(parents=True)
+    skel_dir.mkdir(parents=True)
+
+    # Frame 29 is position 0
+    img = np.zeros((32, 24, 3), dtype=np.uint8)
+    cv2.imwrite(str(crop_dir / "frame_000029.png"), img)
+    cv2.imwrite(str(skel_dir / "frame_000000.png"), img)
+
+    obj = ObjectRequest(
+        object_id="track_0001",
+        appearance=np.zeros((32, 24, 3), dtype=np.uint8),
+        bbox=(0, 0, 32, 24),
+        mask=np.zeros((1, 32, 24), dtype=bool),
+        frame_index=0,
+    )
+    clip = FakeClip(
+        video="fake_video",
+        scene="fake_scene",
+        context_id="ctx",
+        frames=np.zeros((1, 32, 24, 3), dtype=np.uint8),
+        objects=(obj,),
+        start_frame=29,
+    )
+    augmented = _augment_objects_with_pose(clip, shuffle=False, seed=42)
+    assert len(augmented) == 1
+    assert augmented[0].conditioning is not None
+    assert augmented[0].conditioning.pose.shape == (3, 32, 24)

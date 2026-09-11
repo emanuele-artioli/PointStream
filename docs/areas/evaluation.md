@@ -40,7 +40,11 @@ PR #93 merged (`4a55573`, repairs in `e9f781f`) after resolving all four blocker
 - Proved hypothesis: At low rate (R63), fixed background $B$ (529,361 B, 75.6%) and metadata $M$ (70,609 B) consume 600 kB, exceeding the entire VVC anchor budget (130,906 B) by 4.0x and AV1 (110,842 B) by 5.4x. $A(q) - B - M - H$ is negative across all rungs.
 - Even with residual $R = 0$ at H3, PointStream's base floor (630 kB) exceeds the anchor's highest quality budget (377 kB).
 - Decision: Supported promoting background representation for Wave 2.
-
+`EVAL-ACT-10` — **Phase 1 Complete** (Wave 2 Diagnostic Matrix, artifacts `outputs/development-recovery/diagnostic-pix2pix-alcaraz.json` SHA-256 `ccfaa34b8ceca48409839c3baefec20e91f87a0425aea6da2b7429c37ed2fa50` and `diagnostic-pix2pix-federer.json` SHA-256 `407148416bf1455ccfb68cc025a2ff31899689ebd0ffc722fd4f0dddc085af25`).
+- Executed full 5-corner diagnostic matrix (gen off/on x residual off/on + shuffled conditioning null) on both development scenes (`alcaraz_highlights/scene_000` and `federer_djokovic/scene_007`, 16 frames @ 4K).
+- Fixed skeleton pose alignment across tracks with global crop IDs and 0-based skeleton sequences.
+- Results confirmed generator comparison validity (`true`), model invocations occurred on GPU 1, delivered pixels changed, and wire bytes reconciled 100% with no synthetic fallbacks.
+- Verified hypothesis: uncompressed pose conditioning overhead (+434–655 kB) and current pix2pix generation fidelity deficits (-0.6 to -1.0 dB PSNR-Y) increase rate without delivering quality gains; pasted reference remains the superior control for low-rate compression.
 
 ## PR #88 audit — 2026-09-10
 
