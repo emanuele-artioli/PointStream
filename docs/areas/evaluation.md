@@ -5,6 +5,19 @@
 
 ---
 
+## Current audit and handoff — 2026-09-12
+
+[Audit](../history/antigravity-audit-2026-09-12.md) supersedes the “all blockers
+resolved” and broad model-comparison claims below. #93/#95–#98 are merged; their
+saved observations remain intact. Background-ledger arithmetic is useful, but
+hardcoded verdicts, incomplete pose reuse identity, missing-result acceptance
+and checkpoint factory validation require follow-up (`EVAL-ACT-11`). The 16-frame
+matrix changes only frame 0 in generation-off/on and normal/shuffled comparisons;
+this is not validated full-sequence generation evidence. No fresh advantage or
+Gate A/B pass is established. Next: [evaluation handoff](../workflow/session/evaluation-handoff.md).
+
+The following 2026-09-11 entries are historical reports, qualified by this audit.
+
 ## Experiment policy update — 2026-09-11
 
 New probes follow [hypothesis-driven experiment design](../workflow/experiment-design.md).
@@ -37,7 +50,7 @@ PR #93 merged (`4a55573`, repairs in `e9f781f`) after resolving all four blocker
 
 `EVAL-ACT-08` — **Complete** (PR #95, `697bc9f`, artifact `outputs/development-recovery/wave2-byte-diagnosis.json` SHA-256 `74120308fef2e036d66a68b587cd42b6cc1a57d9b3b19ade21dd32d26c1c1aa9`).
 - Verified disjoint ledger equality: $B + F + M + R + H = T$ strictly holds for all rungs ($H = 0$).
-- Proved hypothesis: At low rate (R63), fixed background $B$ (529,361 B, 75.6%) and metadata $M$ (70,609 B) consume 600 kB, exceeding the entire VVC anchor budget (130,906 B) by 4.0x and AV1 (110,842 B) by 5.4x. $A(q) - B - M - H$ is negative across all rungs.
+- Proved hypothesis: At low rate (R63), fixed background $B$ (529,361 B, 75.6%) and metadata $M$ (70,609 B) consume 600 kB, exceeding the entire VVC anchor budget (130,906 B) by approximately 4.6x and AV1 (110,842 B) by 5.4x. $A(q) - B - M - H$ is negative across all rungs.
 - Even with residual $R = 0$ at H3, PointStream's base floor (630 kB) exceeds the anchor's highest quality budget (377 kB).
 - Decision: Supported promoting background representation for Wave 2.
 `EVAL-ACT-10` — **Phase 1 Complete** (Wave 2 Diagnostic Matrix, artifacts `outputs/development-recovery/diagnostic-pix2pix-alcaraz.json` SHA-256 `ccfaa34b8ceca48409839c3baefec20e91f87a0425aea6da2b7429c37ed2fa50` and `diagnostic-pix2pix-federer.json` SHA-256 `407148416bf1455ccfb68cc025a2ff31899689ebd0ffc722fd4f0dddc085af25`).

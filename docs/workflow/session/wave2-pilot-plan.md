@@ -1,5 +1,8 @@
 # Wave 2 development pilots (after Wave 1 gates)
 
+> Historical dispatch, superseded on 2026-09-12 by [evaluation handoff](evaluation-handoff.md).
+> Its GPU assignment and automatic matrix/ladder sequence are not current authorization.
+
 Do not launch until Wave 1 integration gates hold. GPU 1 on this host is assigned (`CUDA_VISIBLE_DEVICES=1`). GPU 0 hosts an unrelated process (`mitraba` `app.py` :7860, ~528 MiB) and must be left alone.
 
 Superseded Wave 2 artifacts remain at `outputs/development-recovery/`; write new outputs beside them, never overwrite.

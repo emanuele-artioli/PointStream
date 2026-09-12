@@ -96,3 +96,14 @@ their commits are ancestors of #93, but that PR is still open. Retain
 `/tmp/pointstream-pr92` as a possibly paused Cursor checkout; after #92 updates,
 fetch and reconcile it before resuming. No process observed in this sandbox
 proves another host/session idle. `INFRA-ACT-01` remains open.
+
+### Handoff cleanup — 2026-09-12
+
+With explicit user approval, retired all nine remaining stale worktrees and 32
+local non-main branches after remotely archiving every tip. Preserved the dirty
+worker-a residual-smoke artifact in archive-only commit `26a7555`; it is not new
+mainline evidence. Exact refs, preservation proofs and removed paths are in
+[cleanup inventory](../history/cleanup-2026-09-12.json). No remote branch, dataset,
+experiment artifact or paper file was deleted. Only main and the current handoff
+checkout remained immediately after this cleanup. Do not use the unsafe cleanup
+helper; `INFRA-ACT-01` is still open.

@@ -1,0 +1,299 @@
+{
+  "date": "2026-09-12",
+  "base_main": "4fa7cd3441d1d83e2b4b163f3171d8efd0a8eed5",
+  "authorization": "User explicitly approved archiving/removing the listed nine worktrees and 32 local branches, including preserving dirty smoke snapshot.",
+  "remote_branches_deleted": false,
+  "removed_worktrees": [
+    "/tmp/pointstream-background-probe",
+    "/tmp/pointstream-byte-diagnosis",
+    "/tmp/pointstream-pr92",
+    "/tmp/pointstream-pr92-reconcile",
+    "/tmp/pointstream-probe-validity",
+    "/tmp/pointstream-wave1-a",
+    "/tmp/pointstream-wave1-b",
+    "/tmp/pointstream-wave1-c",
+    "/tmp/pointstream-worker-a"
+  ],
+  "archived_branches": [
+    {
+      "branch": "antigravity/background-probe",
+      "head": "0bdf0efc96a760cb6cdb27652bd8a95fba2f44c3",
+      "archive_tag": "archive/20260912/antigravity/background-probe",
+      "exact_main_tree": "914acaae6ae10304a10b15bdfd8e4d3fc564341e",
+      "ancestor_of_integrated_tip": [
+        "0bdf0ef"
+      ]
+    },
+    {
+      "branch": "antigravity/byte-diagnosis",
+      "head": "697bc9fbfd6c71fd75cf8832b39f5cd2ebc93258",
+      "archive_tag": "archive/20260912/antigravity/byte-diagnosis",
+      "exact_main_tree": null,
+      "ancestor_of_integrated_tip": [
+        "697bc9f"
+      ]
+    },
+    {
+      "branch": "antigravity/document-gate-a-benchmark-tables",
+      "head": "68365b077f85d2b20d531417944c7e5be46c1c3c",
+      "archive_tag": "archive/20260912/antigravity/document-gate-a-benchmark-tables",
+      "exact_main_tree": "fcc76a831d6d8eb094113714769c49e156ab1dbb",
+      "ancestor_of_integrated_tip": []
+    },
+    {
+      "branch": "antigravity/gate-a-48frame-native-2026-09-07",
+      "head": "22922136944f9d0ef4331cadb5e1357ad24150a5",
+      "archive_tag": "archive/20260912/antigravity/gate-a-48frame-native-2026-09-07",
+      "exact_main_tree": "648325b11333c602e83944bd32dad48cac159cf4",
+      "ancestor_of_integrated_tip": []
+    },
+    {
+      "branch": "antigravity/gate-a-eval-threading-and-config",
+      "head": "ac085643fbaf212d1f9af03e9a9ba7adf8fecd13",
+      "archive_tag": "archive/20260912/antigravity/gate-a-eval-threading-and-config",
+      "exact_main_tree": "ac085643fbaf212d1f9af03e9a9ba7adf8fecd13",
+      "ancestor_of_integrated_tip": [
+        "51f2aaf",
+        "97a5d05",
+        "e9f781f",
+        "0bdf0ef",
+        "697bc9f"
+      ]
+    },
+    {
+      "branch": "antigravity/gate-a-overnight-2026-09-09",
+      "head": "5848423dc3b252169b9feaa184aa954a5978a451",
+      "archive_tag": "archive/20260912/antigravity/gate-a-overnight-2026-09-09",
+      "exact_main_tree": "5848423dc3b252169b9feaa184aa954a5978a451",
+      "ancestor_of_integrated_tip": [
+        "51f2aaf",
+        "97a5d05",
+        "e9f781f",
+        "0bdf0ef",
+        "697bc9f"
+      ]
+    },
+    {
+      "branch": "antigravity/gate-a-overnight-run-2",
+      "head": "c32ec05abb11f5956993c22c65cf48ee770f5076",
+      "archive_tag": "archive/20260912/antigravity/gate-a-overnight-run-2",
+      "exact_main_tree": "2574926bab97abc6f444135636a997930eaa69b2",
+      "ancestor_of_integrated_tip": []
+    },
+    {
+      "branch": "antigravity/overnight-recovery",
+      "head": "51f2aaff5931d2a71e9d0c9b610062679750ba49",
+      "archive_tag": "archive/20260912/antigravity/overnight-recovery",
+      "exact_main_tree": "2b7c2b019f18a16a793e677a58c00fc7d0a44d97",
+      "ancestor_of_integrated_tip": [
+        "51f2aaf"
+      ]
+    },
+    {
+      "branch": "antigravity/plan-competitive-regime-2026-09-08",
+      "head": "f2919285e5594cdc602ee09543cdfc2c604a4fa4",
+      "archive_tag": "archive/20260912/antigravity/plan-competitive-regime-2026-09-08",
+      "exact_main_tree": "1713883455b42df0600a6257810ff8d89179a7a6",
+      "ancestor_of_integrated_tip": []
+    },
+    {
+      "branch": "antigravity/probe-validity",
+      "head": "e9f781f1d49b1f72b036356123b1bb23fdb4fd45",
+      "archive_tag": "archive/20260912/antigravity/probe-validity",
+      "exact_main_tree": null,
+      "ancestor_of_integrated_tip": [
+        "e9f781f"
+      ]
+    },
+    {
+      "branch": "antigravity/recovery-worker-a-residual",
+      "head": "26a7555a39bce78ac8b3428313dff6557ab6aae6",
+      "archive_tag": "archive/20260912/antigravity/recovery-worker-a-residual",
+      "exact_main_tree": null,
+      "ancestor_of_integrated_tip": [
+        "51f2aaf"
+      ],
+      "pre_archive_head": "699d2da42492623580733a74b9245c8e584dd9be",
+      "archive_only_smoke_snapshot": true
+    },
+    {
+      "branch": "antigravity/recovery-worker-b-verdict",
+      "head": "ea4fee8652b059f681c9f61067c2771fad2b0c88",
+      "archive_tag": "archive/20260912/antigravity/recovery-worker-b-verdict",
+      "exact_main_tree": null,
+      "ancestor_of_integrated_tip": [
+        "51f2aaf"
+      ]
+    },
+    {
+      "branch": "antigravity/recovery-worker-c-generator",
+      "head": "19928789a22a994e4063890d43e3b4b596759f4c",
+      "archive_tag": "archive/20260912/antigravity/recovery-worker-c-generator",
+      "exact_main_tree": null,
+      "ancestor_of_integrated_tip": [
+        "51f2aaf"
+      ]
+    },
+    {
+      "branch": "antigravity/update-competitive-regime-plan-2026-09-08",
+      "head": "0a08a90958213ca94d0d96bfb1ddaebb6fcf0019",
+      "archive_tag": "archive/20260912/antigravity/update-competitive-regime-plan-2026-09-08",
+      "exact_main_tree": "3267a91861fbe5e99f50014d1655f1f04cf04b2c",
+      "ancestor_of_integrated_tip": []
+    },
+    {
+      "branch": "antigravity/wave1-closeout-wave2-dispatch",
+      "head": "41ba6008506468dd8ff3a0f26647f02095b9f358",
+      "archive_tag": "archive/20260912/antigravity/wave1-closeout-wave2-dispatch",
+      "exact_main_tree": "accfa15a1bd8e657090899a87a2ae665a2a4ea1d",
+      "ancestor_of_integrated_tip": []
+    },
+    {
+      "branch": "codex/bounded-long-jobs",
+      "head": "7849c94fdfb2518c9e9489033268b16692e81817",
+      "archive_tag": "archive/20260912/codex/bounded-long-jobs",
+      "exact_main_tree": "deceb8d7ea60bdf7f1e8bfc5b36741c3b5a10222",
+      "ancestor_of_integrated_tip": []
+    },
+    {
+      "branch": "codex/documentation-overhaul-plan",
+      "head": "1aa8a13dbedfab8b8bd558d2d2a29b6f4a406f23",
+      "archive_tag": "archive/20260912/codex/documentation-overhaul-plan",
+      "exact_main_tree": "1aa8a13dbedfab8b8bd558d2d2a29b6f4a406f23",
+      "ancestor_of_integrated_tip": [
+        "51f2aaf",
+        "97a5d05",
+        "e9f781f",
+        "0bdf0ef",
+        "697bc9f"
+      ]
+    },
+    {
+      "branch": "codex/gates-audit",
+      "head": "0c01ce6a3fc175b3725b34b312116e2daf655439",
+      "archive_tag": "archive/20260912/codex/gates-audit",
+      "exact_main_tree": "0c01ce6a3fc175b3725b34b312116e2daf655439",
+      "ancestor_of_integrated_tip": [
+        "51f2aaf",
+        "97a5d05",
+        "e9f781f",
+        "0bdf0ef",
+        "697bc9f"
+      ]
+    },
+    {
+      "branch": "codex/overnight-recovery",
+      "head": "dd003194327fbd966b356e6fd4aed3990bcf01eb",
+      "archive_tag": "archive/20260912/codex/overnight-recovery",
+      "exact_main_tree": "da27752af9ab84672241f6897784f4cf900f80c1",
+      "ancestor_of_integrated_tip": []
+    },
+    {
+      "branch": "codex/pr88-audit",
+      "head": "d1d24b7d091e4cb725cb5956863ba2bc1d54769e",
+      "archive_tag": "archive/20260912/codex/pr88-audit",
+      "exact_main_tree": null,
+      "ancestor_of_integrated_tip": [
+        "51f2aaf"
+      ]
+    },
+    {
+      "branch": "codex/pr92-reconcile",
+      "head": "97a5d05c1da15d3dc6397446bb1a19ca2b7e7110",
+      "archive_tag": "archive/20260912/codex/pr92-reconcile",
+      "exact_main_tree": "69c76131f8d3a7016680353ffbc8ff983fd4281f",
+      "ancestor_of_integrated_tip": [
+        "97a5d05"
+      ]
+    },
+    {
+      "branch": "codex/probe-framework",
+      "head": "cd0a3f3752b69b3581f694cea8df26166b1f2c01",
+      "archive_tag": "archive/20260912/codex/probe-framework",
+      "exact_main_tree": "dc4a0cd26c5a3cb26536be2071fa544d6765f602",
+      "ancestor_of_integrated_tip": []
+    },
+    {
+      "branch": "codex/submission-dispatch",
+      "head": "80c309f615a26b2011b964360119fbd0ae3e2d21",
+      "archive_tag": "archive/20260912/codex/submission-dispatch",
+      "exact_main_tree": "221aa14f552f633ae841fd2b1f2475b2fb82d656",
+      "ancestor_of_integrated_tip": []
+    },
+    {
+      "branch": "cursor/wave1-compact-masks",
+      "head": "d8cc9385dbc80180cd91282fffc282907e492805",
+      "archive_tag": "archive/20260912/cursor/wave1-compact-masks",
+      "exact_main_tree": null,
+      "ancestor_of_integrated_tip": [
+        "e9f781f"
+      ]
+    },
+    {
+      "branch": "cursor/wave1-diagnostic-provenance",
+      "head": "edd1315a952dd7b9d07761dfee9682fac0958f05",
+      "archive_tag": "archive/20260912/cursor/wave1-diagnostic-provenance",
+      "exact_main_tree": null,
+      "ancestor_of_integrated_tip": [
+        "e9f781f"
+      ]
+    },
+    {
+      "branch": "cursor/wave1-generated-client",
+      "head": "72fb258ecd77c461d2ca204e6978d3059af4da0c",
+      "archive_tag": "archive/20260912/cursor/wave1-generated-client",
+      "exact_main_tree": null,
+      "ancestor_of_integrated_tip": [
+        "e9f781f"
+      ]
+    },
+    {
+      "branch": "cursor/wave1-generation-transport-repair",
+      "head": "ba5a9a8d6bda8430603cf36f7e0764b5b1fcce0b",
+      "archive_tag": "archive/20260912/cursor/wave1-generation-transport-repair",
+      "exact_main_tree": null,
+      "ancestor_of_integrated_tip": [
+        "e9f781f"
+      ]
+    },
+    {
+      "branch": "cursor/wave2-gpu-pilot-status",
+      "head": "483a283dee82d271ea5a5bb85a489417162d16c3",
+      "archive_tag": "archive/20260912/cursor/wave2-gpu-pilot-status",
+      "exact_main_tree": null,
+      "ancestor_of_integrated_tip": [
+        "97a5d05"
+      ]
+    },
+    {
+      "branch": "docs/harness-subagent-capabilities",
+      "head": "4e5bceeec1337a62b0c6047d7fd6c085f7bd54ed",
+      "archive_tag": "archive/20260912/docs/harness-subagent-capabilities",
+      "exact_main_tree": "6b04eae59badd6272b82325f813545d376ea4f7b",
+      "ancestor_of_integrated_tip": []
+    },
+    {
+      "branch": "gate-a-plan-refinements",
+      "head": "6b6da1c076616d0453e99e734fd7b2dc72392e7e",
+      "archive_tag": "archive/20260912/gate-a-plan-refinements",
+      "exact_main_tree": "bc09184d8707529f924a41d0dccc2b6f20e88d3e",
+      "ancestor_of_integrated_tip": []
+    },
+    {
+      "branch": "pr-88",
+      "head": "d1d24b7d091e4cb725cb5956863ba2bc1d54769e",
+      "archive_tag": "archive/20260912/pr-88",
+      "exact_main_tree": null,
+      "ancestor_of_integrated_tip": [
+        "51f2aaf"
+      ]
+    },
+    {
+      "branch": "pr-90",
+      "head": "80c309f615a26b2011b964360119fbd0ae3e2d21",
+      "archive_tag": "archive/20260912/pr-90",
+      "exact_main_tree": "221aa14f552f633ae841fd2b1f2475b2fb82d656",
+      "ancestor_of_integrated_tip": []
+    }
+  ]
+}
