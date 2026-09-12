@@ -58,18 +58,22 @@ PR #88 recovery repairs now complete the current CODEC-ACT-05 implementation: ac
 ## Current background decision — 2026-09-12
 
 `CODEC-ACT-06` delivered a useful component prototype, not verified package
-transport or a 94% matched-quality saving. Its geometry is estimated in bytes
-while original float64 mappings drive rendering; source/cache identity and metric
-scope need attention. The old table below is retained as exploratory observations,
-including stage-only timings. `CODEC-ACT-07` remains open: test the user's still /
-panorama / cleaned-video and separate fill axes under one bounded card, then
-measure full-codec headroom before selecting a production representation. See
-[audit](../history/antigravity-audit-2026-09-12.md) and
-[handoff](../workflow/session/evaluation-handoff.md).
+transport or an established 94% matched-quality saving. Registered panorama is a
+promising candidate showing positive geometry compensation (+6–7 dB over unwarped still),
+not a selected winner: the 94% byte reduction compared a QP 47 background-only point
+against the legacy whole-codec background allocation under mismatched settings/presets
+and quality scopes. Furthermore, the visible-background PSNR plateaus at ~26–27 dB,
+leaving residual correction demand to be evaluated in production integration (`CODEC-ACT-07`).
+The prototype code has been hardened with float32 homography casting matching charged
+transport precision, binary side data round-trip serialization, and complete input/code
+identity hashing. `CODEC-ACT-07` remains open: test the user's still / panorama / cleaned-video
+and separate fill axes under one bounded card, then measure full-codec headroom before
+selecting a production representation. See [audit](../history/antigravity-audit-2026-09-12.md)
+and [handoff](../workflow/session/evaluation-handoff.md).
 
-## Background experiment priority & findings — 2026-09-11
+## Background experiment priority & findings — 2026-09-11 (Calibrated 2026-09-12)
 
-`CODEC-ACT-06` — **Complete** (PR #96, `0bdf0ef`, artifacts under `outputs/development-recovery/wave2-background-probe/`).
+`CODEC-ACT-06` — **Calibrated Prototype** (PR #96, `0bdf0ef`, updated under Lane 3 audit fixes).
 Evaluated three background representations on the 48-frame Federer sequence (`federer_djokovic/scene_007`, 48 frames @ 4K 24 fps) using a common foreground-removed frame stack (visible background preserved bit-identically, player mask filled via temporal composite plate, 0 uncovered holes):
 
 | Representation | QP | Payload (B) | Side Data (B) | Total (B) | PSNR-Y Vis (dB) | SSIM Vis | Enc Time (s) | Dec Time (s) |
@@ -81,7 +85,7 @@ Evaluated three background representations on the 48-frame Federer sequence (`fe
 | registered_panorama | 32 | 118,157 | 1,742 | 119,899 | 26.97 | 0.9643 | 2.61 | 8.02 |
 | cleaned_video | 32 | 364,212 | 10 | 364,222 | 38.98 | 0.9967 | 9.31 | 7.07 |
 
-- **Verdict: Hypothesis SUPPORTED.** Still frame 0 is fundamentally limited by uncompensated camera motion (~40 px pan), pinning visible PSNR at ~20 dB and SSIM at 0.817 regardless of rate.
-- **Registered panorama resolves this deficit efficiently**: Camera homographies gain +6.2 dB (QP 47) and +7.0 dB (QP 32), boosting SSIM to 0.954–0.964. Total package cost is 32.4 kB at QP 47 (saving 94% vs the legacy 529 kB plate).
+- **Verdict: Hypothesis SUPPORTED with calibration.** Still frame 0 is fundamentally limited by uncompensated camera motion (~40 px pan), pinning visible PSNR at ~20 dB and SSIM at 0.817 regardless of rate.
+- **Registered panorama provides positive geometry compensation**: Camera homographies gain +6.2 dB (QP 47) and +7.0 dB (QP 32), boosting SSIM to 0.954–0.964. However, it is a promising candidate, not an established winner: the 94% byte reduction compared against legacy whole-codec allocations under mismatched settings and was not at matched final quality. The visible PSNR plateau at ~26–27 dB leaves residual correction to be evaluated in full production integration (`CODEC-ACT-07`).
 - **Cleaned video** reaches higher quality (+12 dB over panorama at QP 32), but incurs a 3.0x byte multiplier and 3.6x encode time.
-- **Historical Wave 2 proposal (qualified by audit above)**: investigate panorama integration; selection requires actual wire and matched-final-quality evidence.
+- **Production path**: Investigate panorama and video under full-codec rate–distortion–computation integration in `CODEC-ACT-07`.

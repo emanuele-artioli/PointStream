@@ -23,13 +23,21 @@ import pytest
 
 from scripts.background_probe import (
     build_common_cleaned_stack,
+    build_probe_identity,
     charge_side_data,
     check_bounds,
+    compute_array_sha256,
     evaluate_cleaned_video,
     evaluate_registered_panorama,
     evaluate_still_frame0,
     masked_luma_psnr,
+    pack_panorama_side_data,
+    pack_side_data,
+    pack_still_or_video_side_data,
     uncompressed_sanity_check,
+    unpack_panorama_side_data,
+    unpack_side_data,
+    unpack_still_or_video_side_data,
     warp_plate_to_frame,
 )
 
@@ -224,7 +232,9 @@ def test_evaluate_representations_smoke(tmp_path: Path) -> None:
     )
     assert r2["representation"] == "registered_panorama"
     assert r2["encoded_payload_bytes"] > 0
-    assert r2["side_data_bytes"] == charge_side_data("registered_panorama", 4)["total_side_data_bytes"]
+    assert (
+        r2["side_data_bytes"] == charge_side_data("registered_panorama", 4)["total_side_data_bytes"]
+    )
     assert math.isfinite(r2["metrics"]["psnr_y_visible_dB"])
 
     # Rep 3: Video
@@ -234,3 +244,226 @@ def test_evaluate_representations_smoke(tmp_path: Path) -> None:
     assert r3["representation"] == "cleaned_video"
     assert r3["encoded_payload_bytes"] > 0
     assert math.isfinite(r3["metrics"]["psnr_y_visible_dB"])
+
+
+def test_warp_plate_to_frame_float32_casting() -> None:
+    """Verify that homographies are cast to float32 before warping."""
+    plate = np.arange(64 * 64 * 3, dtype=np.uint8).reshape(64, 64, 3)
+
+    # Construct a homography with subtle float64 precision differences
+    h64 = np.array(
+        [
+            [1.00000000001, 0.00000000002, 2.50000000003],
+            [0.00000000004, 1.00000000005, 1.25000000006],
+            [0.00000000001, 0.00000000002, 1.00000000000],
+        ],
+        dtype=np.float64,
+    )
+    h32 = h64.astype(np.float32)
+
+    warped_from_64 = warp_plate_to_frame(plate, h64, height=64, width=64)
+    warped_from_32 = warp_plate_to_frame(plate, h32, height=64, width=64)
+
+    # They must produce the exact same rendered pixels because float32 is enforced
+    np.testing.assert_array_equal(warped_from_64, warped_from_32)
+
+
+def test_panorama_side_data_binary_roundtrip() -> None:
+    """Verify packed binary homography side data serialization, precision, and error handling."""
+    n_frames = 8
+    rng = np.random.default_rng(123)
+    matrices = rng.standard_normal((n_frames, 3, 3)).astype(np.float32)
+    # Ensure non-singular
+    for i in range(n_frames):
+        matrices[i] += np.eye(3, dtype=np.float32)
+
+    plate_shape = (2160, 4000)
+    frame_shape = (2160, 3840)
+    fps = 24.0
+
+    payload = pack_panorama_side_data(
+        matrices, plate_shape=plate_shape, frame_shape=frame_shape, fps=fps
+    )
+    expected_len = 14 + n_frames * 9 * 4
+    assert len(payload) == expected_len
+
+    unpacked_h, unpacked_plate, unpacked_frame, unpacked_fps = unpack_panorama_side_data(payload)
+    assert unpacked_h.dtype == np.float32
+    assert unpacked_h.shape == (n_frames, 3, 3)
+    np.testing.assert_allclose(unpacked_h, matrices, atol=1e-7)
+    assert unpacked_plate == plate_shape
+    assert unpacked_frame == frame_shape
+    assert unpacked_fps == fps
+
+    # Test error cases
+    with pytest.raises(ValueError, match="Payload too short"):
+        unpack_panorama_side_data(b"too_short")
+
+    with pytest.raises(ValueError, match="Payload length mismatch"):
+        unpack_panorama_side_data(payload[:-4])
+
+
+def test_still_and_video_side_data_binary_roundtrip() -> None:
+    """Verify still/video side data binary roundtrip."""
+    frame_shape = (2160, 3840)
+    n_frames = 48
+    fps = 24.0
+
+    payload = pack_still_or_video_side_data(frame_shape, n_frames, fps=fps)
+    assert len(payload) == 10
+
+    unpacked_shape, unpacked_n, unpacked_fps = unpack_still_or_video_side_data(payload)
+    assert unpacked_shape == frame_shape
+    assert unpacked_n == n_frames
+    assert unpacked_fps == fps
+
+    with pytest.raises(ValueError, match="Payload length mismatch"):
+        unpack_still_or_video_side_data(payload + b"\x00")
+
+
+def test_unified_pack_unpack_side_data() -> None:
+    """Verify unified pack_side_data and unpack_side_data interfaces."""
+    # Rep 1: still
+    p1 = pack_side_data("still_frame0", n_frames=48)
+    assert len(p1) == 10
+    u1 = unpack_side_data("still_frame0", p1)
+    assert u1["n_frames"] == 48
+
+    # Rep 2: panorama
+    p2 = pack_side_data("registered_panorama", n_frames=48)
+    assert len(p2) == 1742
+    u2 = unpack_side_data("registered_panorama", p2)
+    assert u2["homographies"].shape == (48, 3, 3)
+
+    # Rep 3: video
+    p3 = pack_side_data("cleaned_video", n_frames=48)
+    assert len(p3) == 10
+    u3 = unpack_side_data("cleaned_video", p3)
+    assert u3["n_frames"] == 48
+
+
+def test_identity_and_cache_key_hashing() -> None:
+    """Verify that source frames, masks, and git diff affect probe identity and cache key."""
+    frames, masks = _synthetic_clip(t=4, h=64, w=64)
+
+    dummy_rev = {"commit": "abc1234", "dirty": False, "diff_sha256": None}
+    ident = build_probe_identity("video_a", "scene_1", frames, masks, code_revision=dummy_rev)
+
+    assert ident["frames_sha256"] == compute_array_sha256(frames)
+    assert ident["masks_sha256"] == compute_array_sha256(masks)
+    assert "frame_hashes" in ident
+    assert "mask_hashes" in ident
+    assert "code_revision" in ident
+    assert "cache_key" in ident
+    assert len(ident["frame_hashes"]) == 4
+    assert len(ident["mask_hashes"]) == 4
+
+    # Mutating a frame must change frames_sha256 and cache_key
+    frames_mut = frames.copy()
+    frames_mut[0, 0, 0, 0] = 200
+    ident_mut_f = build_probe_identity(
+        "video_a", "scene_1", frames_mut, masks, code_revision=dummy_rev
+    )
+    assert ident_mut_f["frames_sha256"] != ident["frames_sha256"]
+    assert ident_mut_f["cache_key"] != ident["cache_key"]
+
+    # Mutating a mask must change masks_sha256 and cache_key
+    masks_mut = masks.copy()
+    masks_mut[0, 0, 0] = not masks_mut[0, 0, 0]
+    ident_mut_m = build_probe_identity(
+        "video_a", "scene_1", frames, masks_mut, code_revision=dummy_rev
+    )
+    assert ident_mut_m["masks_sha256"] != ident["masks_sha256"]
+    assert ident_mut_m["cache_key"] != ident["cache_key"]
+
+    # Changing code revision must change cache_key
+    dirty_rev = {"commit": "abc1234", "dirty": True, "diff_sha256": "feedbeef"}
+    ident_mut_code = build_probe_identity(
+        "video_a", "scene_1", frames, masks, code_revision=dirty_rev
+    )
+    assert ident_mut_code["cache_key"] != ident["cache_key"]
+
+
+def test_build_common_cleaned_stack_cache_validation(tmp_path: Path) -> None:
+    """Verify that build_common_cleaned_stack checks identity on cached stacks and sets validity note."""
+    frames, masks = _synthetic_clip(t=4, h=64, w=64)
+    cache_file = tmp_path / "cache_with_id.npz"
+
+    dummy_rev = {"commit": "abc1234", "dirty": False, "diff_sha256": None}
+    ident = build_probe_identity("video_a", "scene_1", frames, masks, code_revision=dummy_rev)
+
+    cleaned, plate, homographies, stats = build_common_cleaned_stack(
+        frames, masks, register=True, cache_path=cache_file, identity=ident
+    )
+    assert stats["from_cache"] is False
+    assert "canvas_validity_note" in stats
+    assert (
+        "Validity mask covers valid composite canvas coordinates" in stats["canvas_validity_note"]
+    )
+
+    # Re-reading with matching identity succeeds from cache
+    _, _, _, stats_cached = build_common_cleaned_stack(
+        frames, masks, register=True, cache_path=cache_file, identity=ident
+    )
+    assert stats_cached["from_cache"] is True
+
+    # Re-reading with mismatched identity ignores cache and rebuilds
+    ident_mismatch = dict(ident)
+    ident_mismatch["frames_sha256"] = "mismatched_sha"
+    _, _, _, stats_rebuilt = build_common_cleaned_stack(
+        frames, masks, register=True, cache_path=cache_file, identity=ident_mismatch
+    )
+    assert stats_rebuilt["from_cache"] is False
+
+
+def test_preprocessing_timing_accounting(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Verify that evaluation points record preprocessing and total end-to-end timing."""
+    from scripts.background_probe import format_csv_table, format_markdown_table
+    from src.components.background.sidecar import IntraCodecSidecar
+
+    monkeypatch.setattr(IntraCodecSidecar, "probe_encoder", lambda self: ("/bin/true", "1.0"))
+    monkeypatch.setattr(IntraCodecSidecar, "encode", lambda self, img: b"\x00" * 64)
+    monkeypatch.setattr(
+        IntraCodecSidecar, "decode", lambda self, payload: np.zeros((64, 64, 3), dtype=np.uint8)
+    )
+
+    frames, masks = _synthetic_clip(t=4, h=64, w=64)
+    cleaned, plate, homographies, _ = build_common_cleaned_stack(frames, masks, register=True)
+
+    # Provide a non-zero preprocessing time
+    prep_time = 1.234
+    res_still = evaluate_still_frame0(
+        cleaned, frames, masks, qp=47, codec="vvc", preset="faster", preprocessing_seconds=prep_time
+    )
+    assert res_still["timing"]["preprocessing_seconds"] == 1.234
+    assert res_still["timing"]["total_end_to_end_seconds"] == round(
+        1.234
+        + res_still["timing"]["encode_seconds"]
+        + res_still["timing"]["decode_render_seconds"],
+        3,
+    )
+
+    res_pano = evaluate_registered_panorama(
+        plate,
+        homographies,
+        frames,
+        masks,
+        qp=47,
+        codec="vvc",
+        preset="faster",
+        preprocessing_seconds=prep_time,
+    )
+    assert res_pano["timing"]["preprocessing_seconds"] == 1.234
+    assert res_pano["timing"]["total_end_to_end_seconds"] == round(
+        1.234 + res_pano["timing"]["encode_seconds"] + res_pano["timing"]["decode_render_seconds"],
+        3,
+    )
+
+    # Verify tables include Prep (s) and Total (s)
+    md = format_markdown_table([res_still, res_pano])
+    assert "Prep (s)" in md
+    assert "Total (s)" in md
+
+    csv_out = format_csv_table([res_still, res_pano])
+    assert "preprocessing_seconds" in csv_out
+    assert "total_end_to_end_seconds" in csv_out
