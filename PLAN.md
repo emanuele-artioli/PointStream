@@ -1,6 +1,6 @@
 # PointStream Area Index & Active Plan
 
-State reconciled **2026-09-11**, main `914acaa` (after Wave 1 merge of PR #93, #95, #96); evidence anchors are per row.
+State audited **2026-09-12**, code main `4fa7cd3`; [audit](docs/history/antigravity-audit-2026-09-12.md) supersedes broad Wave 1/2 claims.
 Submission Target: **ACM TOMM — 30 September 2026** (hard deadline). See [docs/roadmap.md](docs/roadmap.md) for gate criteria.
 
 ---
@@ -9,10 +9,10 @@ Submission Target: **ACM TOMM — 30 September 2026** (hard deadline). See [docs
 
 | Area | Reconciled State to Carry Forward | Evidence Anchor / Next Action |
 |---|---|---|
-| [Codec](docs/areas/codec.md) | Wave 1 probe (`CODEC-ACT-06`) proved registered panorama overcomes still deficit (+7 dB) for 32–120 kB, saving 94% vs legacy plate | PR #96 (`0bdf0ef`); `outputs/development-recovery/wave2-background-probe/`; `CODEC-ACT-07` (production integration) |
-| [Evaluation](docs/areas/evaluation.md) | Client validity merged (#93); byte diagnosis merged (#95); Wave 2 diagnostic matrix passed across both scenes | `diagnostic-pix2pix-alcaraz.json`, `diagnostic-pix2pix-federer.json`; `EVAL-ACT-10` |
+| [Codec](docs/areas/codec.md) | Three-representation prototype is exploratory; actual geometry wire and matched-quality savings unverified | PR #96 (`0bdf0ef`); `outputs/development-recovery/wave2-background-probe/`; `CODEC-ACT-07` (production integration) |
+| [Evaluation](docs/areas/evaluation.md) | Useful ledger/prototypes retained; verdict, reuse and schema gaps remain after #98 | `diagnostic-pix2pix-alcaraz.json`, `diagnostic-pix2pix-federer.json`; `EVAL-ACT-10` |
 | [Data](docs/areas/data.md) | Two candidate matches evaluated; six-source confirmation unmet; preserve exposure history | `manifests/gate_b_confirmation.json`, `assets/confirmation_raw/bp57`; `DATA-ACT-04` |
-| [Generation](docs/areas/generation.md) | Fail-closed client identity and dynamic start frames enforced; Wave 2 diagnostic matrix verified pix2pix altered pixels and reconciled wire | `outputs/development-recovery/diagnostic-pix2pix-alcaraz.json`; `GEN-ACT-09` |
+| [Generation](docs/areas/generation.md) | Sparse first-frame generator effects; no general model ranking; checkpoint factory check remains incomplete | `outputs/development-recovery/diagnostic-pix2pix-alcaraz.json`; `GEN-ACT-09` |
 | [Infrastructure](docs/areas/infrastructure.md) | External data isolated; gpu6 imports fast; cleanup helper flagged for unsafe `rm -rf`; quiet job monitoring implemented (#82) | #32/#35 data root, #53 recovery, #68 cleanup audit, #73 profiling; `INFRA-ACT-01` (repair cleanup script) |
 | [Paper](docs/areas/paper.md) | Separate repo; audit caveat added and build validated; competitive result remains open | Paper `55e4bc4`; `PAPER-ACT-01` (plate table), `PAPER-ACT-02` (crop table), `PAPER-ACT-03` (recheck page budget) |
 
@@ -22,8 +22,8 @@ Submission Target: **ACM TOMM — 30 September 2026** (hard deadline). See [docs
 
 | Task ID | Worktree / Branch | Base Rev | Owner | Allowed Scope | Dependencies | Active PR |
 |---|---|---|---|---|---|---|
-| `CODEC-ACT-07` | Dedicated worktree from current main | `914acaa` | Coordinator | Production integration of compact registered panorama background strategy | Wave 1 complete | Wave 2 dispatch |
-| `EVAL-ACT-10` | Dedicated worktree from current main | `914acaa` | Coordinator | Wave 2 diagnostic matrix and overlap ladder execution on development scenes | `CODEC-ACT-07` | Wave 2 dispatch |
+| `EVAL-ACT-11` | Fresh worktree from current main | `4fa7cd3` | Next session, unassigned | Data-derived verdicts, actual conditioning identity, result schema, checkpoint factory validation | Scope repairs to next claim; no broad rerun | Handoff |
+| `CODEC-ACT-07` | Fresh worktree from current main | `4fa7cd3` | Next session, unassigned | Background removal/representation evaluation with actual geometry transport and total-codec headroom | One costed card; generation can remain off | Handoff |
 
 ---
 
@@ -31,11 +31,8 @@ Submission Target: **ACM TOMM — 30 September 2026** (hard deadline). See [docs
 
 Agents receive one assigned area from the table above. Read [AGENTS.md](AGENTS.md), this file, and your assigned area document. Detailed dispatch and closeout procedures are in [docs/workflow/session/SKILL.md](docs/workflow/session/SKILL.md).
 
-Wave 1 complete across all three lanes:
-- Lane A: Reconstructed client and diagnostic identity verified; PR #93 merged.
-- Lane B: Disjoint byte ledger reconciled; background rate floor isolated; PR #95 merged.
-- Lane C: Background representation probed; registered panorama promoted; PR #96 merged.
-
-Wave 2 dispatch: [Wave 2 pilot plan](docs/workflow/session/wave2-pilot-plan.md).
-GPU 1 (`CUDA_VISIBLE_DEVICES=1`) is assigned for Wave 2 pilots. GPU 0 is reserved.
-Follow the [hypothesis-driven policy](docs/workflow/experiment-design.md).
+Start with [the evaluation handoff](docs/workflow/session/evaluation-handoff.md).
+The user's background-first rate–distortion–computation plan is authoritative.
+Keep useful old evidence and implementations; do not replay the old Wave 2
+matrix, fixed GPU assignment or training schedule. Gate A remains open; Gate B
+incomplete. No experiment jobs were launched by the audit/cleanup session.

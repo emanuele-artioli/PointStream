@@ -5,6 +5,17 @@
 
 ---
 
+## Current audit — 2026-09-12
+
+Keep generation OFF as the current control policy, not an architecture ranking.
+[The audit](../history/antigravity-audit-2026-09-12.md) finds sparse first-frame
+changes, near-identical whole-frame null scores, unhashed loaded pose inputs and
+a reproduced checkpoint-factory verification gap. `GEN-ACT-08` is only partially
+resolved at integration boundaries; complete the relevant `EVAL-ACT-11` repairs
+before model comparison. The historical “strictly superior” / fully verified
+phrasing below is scoped to the tested sparse diagnostic and superseded as a
+general conclusion. Next session follows [the handoff](../workflow/session/evaluation-handoff.md).
+
 ## 1. Current State
 
 PointStream is architected so that generative synthesis is a modular, optional stage (`STAGE_GENERATION` in `src/contracts/lattice.py`).

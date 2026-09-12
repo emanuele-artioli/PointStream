@@ -55,6 +55,18 @@ In the Gate A 48-frame native run (#69), PointStream payload was dominated by tw
 
 PR #88 recovery repairs now complete the current CODEC-ACT-05 implementation: actual residual streams/full-range mapping, client-originated delivered scoring, serialized generation conditioning/reference data and complete envelope reconciliation are covered by integration tests and a native residual smoke test. This validates transport plumbing, not high-fidelity rate–distortion performance; run the residual-on ladder through the repaired client before claiming a codec result. See [evaluation audit](evaluation.md#pr-88-audit--2026-09-10) and [next dispatch](../workflow/session/submission-search.md).
 
+## Current background decision — 2026-09-12
+
+`CODEC-ACT-06` delivered a useful component prototype, not verified package
+transport or a 94% matched-quality saving. Its geometry is estimated in bytes
+while original float64 mappings drive rendering; source/cache identity and metric
+scope need attention. The old table below is retained as exploratory observations,
+including stage-only timings. `CODEC-ACT-07` remains open: test the user's still /
+panorama / cleaned-video and separate fill axes under one bounded card, then
+measure full-codec headroom before selecting a production representation. See
+[audit](../history/antigravity-audit-2026-09-12.md) and
+[handoff](../workflow/session/evaluation-handoff.md).
+
 ## Background experiment priority & findings — 2026-09-11
 
 `CODEC-ACT-06` — **Complete** (PR #96, `0bdf0ef`, artifacts under `outputs/development-recovery/wave2-background-probe/`).
@@ -72,4 +84,4 @@ Evaluated three background representations on the 48-frame Federer sequence (`fe
 - **Verdict: Hypothesis SUPPORTED.** Still frame 0 is fundamentally limited by uncompensated camera motion (~40 px pan), pinning visible PSNR at ~20 dB and SSIM at 0.817 regardless of rate.
 - **Registered panorama resolves this deficit efficiently**: Camera homographies gain +6.2 dB (QP 47) and +7.0 dB (QP 32), boosting SSIM to 0.954–0.964. Total package cost is 32.4 kB at QP 47 (saving 94% vs the legacy 529 kB plate).
 - **Cleaned video** reaches higher quality (+12 dB over panorama at QP 32), but incurs a 3.0x byte multiplier and 3.6x encode time.
-- **Wave 2 Decision**: Promote registered panorama with compact per-frame homographies into the production background strategy for Wave 2.
+- **Historical Wave 2 proposal (qualified by audit above)**: investigate panorama integration; selection requires actual wire and matched-final-quality evidence.
