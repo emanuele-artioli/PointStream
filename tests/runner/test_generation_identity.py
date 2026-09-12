@@ -5,6 +5,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 from pathlib import Path
 from typing import Any
+import pytest
 
 from src.pipeline.reconstruction import GeneratorRef
 from src.runner.generation_identity import (
@@ -48,7 +49,9 @@ def test_nested_adapter_and_counter_still_hash_the_weight_file(tmp_path: Path) -
     ref = GeneratorRef(backend=Counter(Adapter(pix)), name="pix2pix")
     encoded = identity_from_ref(ref, seed=1, params={}, checkpoint=weights)
     reconstructed = identity_from_ref(ref, seed=1, params={})
-    assert reconstructed["checkpoint_sha256"] == encoded["checkpoint_sha256"] == sha256_file(weights)
+    assert (
+        reconstructed["checkpoint_sha256"] == encoded["checkpoint_sha256"] == sha256_file(weights)
+    )
     resolve_client_generator(encoded, injected=ref, require_identity=True)
 
 
@@ -144,5 +147,38 @@ def test_valid_separate_process_client_without_injected_generator(tmp_path: Path
     )
     assert resolved_from_dir is not None
     assert resolved_from_dir.name == "pix2pix"
-    assert getattr(resolved_from_dir.backend, "checkpoint") == str(client_dir / "pix2pix_generator.pt")
+    assert getattr(resolved_from_dir.backend, "checkpoint") == str(
+        client_dir / "pix2pix_generator.pt"
+    )
 
+
+def test_resolve_client_generator_rejects_mismatched_backend_checkpoint(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A factory returning backend B when checkpoint A was requested must fail closed."""
+    weights_a = tmp_path / "weights_a.pt"
+    weights_b = tmp_path / "weights_b.pt"
+    weights_a.write_bytes(b"checkpoint-A-content-bytes")
+    weights_b.write_bytes(b"checkpoint-B-content-bytes")
+
+    ref_a = GeneratorRef(
+        backend=SimpleNamespace(checkpoint=str(weights_a)),
+        name="pix2pix",
+    )
+    ref_b = GeneratorRef(
+        backend=SimpleNamespace(checkpoint=str(weights_b)),
+        name="pix2pix",
+    )
+
+    meta = identity_from_ref(ref_a, seed=42, params={})
+    assert meta["checkpoint_sha256"] == sha256_file(weights_a)
+
+    monkeypatch.setattr(
+        "src.runner.generation_identity._from_registry",
+        lambda name, checkpoint=None: ref_b,
+    )
+
+    with pytest.raises(ValueError) as exc_info:
+        resolve_client_generator(meta, checkpoint=weights_a, require_identity=True)
+
+    assert "Mismatched checkpoint identity" in str(exc_info.value)

@@ -47,9 +47,29 @@ REQUIRED_CORNER_KEYS: tuple[str, ...] = (
     "parts",
     "byte_subledger",
     "wire_reconciliation",
+    "scores",
     "timing",
     "failure",
     "model_invocation_count",
+)
+
+REQUIRED_SCORE_KEYS: tuple[str, ...] = (
+    "psnr_y",
+    "ssim",
+    "vmaf",
+)
+
+REQUIRED_TIMING_KEYS: tuple[str, ...] = (
+    "encoder_seconds",
+    "client_seconds",
+    "evaluation_seconds",
+)
+
+REQUIRED_CORNERS: tuple[str, ...] = (
+    "gen_off_res_off",
+    "gen_off_res_on",
+    "gen_on_res_off",
+    "gen_on_res_on",
 )
 
 REQUIRED_IDENTITY_KEYS: tuple[str, ...] = (
@@ -167,11 +187,13 @@ def _summarize_objects(objects: Any) -> dict[str, Any]:
     masks_list: list[str | None] = []
     conditioning_list: list[dict[str, Any] | None] = []
     for obj in objects:
-        placements_list.append({
-            "frame_index": getattr(obj, "frame_index", None),
-            "object_id": str(getattr(obj, "object_id", "")),
-            "bbox": list(getattr(obj, "bbox", ())),
-        })
+        placements_list.append(
+            {
+                "frame_index": getattr(obj, "frame_index", None),
+                "object_id": str(getattr(obj, "object_id", "")),
+                "bbox": list(getattr(obj, "bbox", ())),
+            }
+        )
         mask = getattr(obj, "mask", None)
         if mask is not None:
             masks_list.append(sha256_bytes(np.ascontiguousarray(mask).tobytes()))
@@ -231,7 +253,9 @@ def resolved_configuration(
 
     resolved_placements = placements if placements is not None else obj_summary["placements"]
     resolved_masks = masks if masks is not None else obj_summary["masks"]
-    resolved_conditioning = conditioning if conditioning is not None else obj_summary["conditioning"]
+    resolved_conditioning = (
+        conditioning if conditioning is not None else obj_summary["conditioning"]
+    )
 
     return {
         "device": dev_str,
@@ -476,6 +500,7 @@ def assess_generator_comparison(
     checkpoint_sha256: str | None,
     generator_backend: str | None,
     matrix: list[dict[str, Any]],
+    expected_corners: tuple[str, ...] | list[str] | None = None,
 ) -> dict[str, Any]:
     """A generator result is only claimable with identity and a non-no-op model."""
     reasons: list[str] = []
@@ -486,6 +511,31 @@ def assess_generator_comparison(
     if backend in ("", "none", "none (pasted_reference_control)"):
         reasons.append("no generator backend")
 
+    if not matrix:
+        reasons.append("matrix is empty")
+        return {
+            "generator_comparison_valid": False,
+            "reasons": reasons,
+            "delivered_pixels_changed": False,
+            "model_invocation_count": 0,
+        }
+
+    expected_set: set[str]
+    if expected_corners is not None:
+        expected_set = set(expected_corners)
+    else:
+        expected_set = set(REQUIRED_CORNERS)
+        if any(
+            row.get("shuffled_conditioning") or row.get("corner") == "gen_on_shuffled_conditioning"
+            for row in matrix
+        ):
+            expected_set.add("gen_on_shuffled_conditioning")
+
+    present_corners = {row.get("corner") for row in matrix if row.get("corner")}
+    missing_corners = expected_set - present_corners
+    if missing_corners:
+        reasons.append(f"missing declared corners: {', '.join(sorted(missing_corners))}")
+
     paste_hashes: list[str] | None = None
     gen_hashes: list[str] | None = None
     gen_invocations = 0
@@ -494,6 +544,7 @@ def assess_generator_comparison(
     incomplete_or_nonfinite = 0
 
     for row in matrix:
+        corner_name = str(row.get("corner", "unknown"))
         is_gen = bool(row.get("generation_on"))
         if is_gen:
             gen_invocations += int(row.get("model_invocation_count") or 0)
@@ -501,25 +552,51 @@ def assess_generator_comparison(
         hashes = row.get("delivered_frame_hashes")
         if not hashes or not isinstance(hashes, list) or len(hashes) == 0:
             incomplete_or_nonfinite += 1
-
-        metrics = row.get("metrics")
-        if isinstance(metrics, dict):
-            for val in metrics.values():
-                if isinstance(val, (int, float)) and (np.isnan(val) or np.isinf(val)):
-                    incomplete_or_nonfinite += 1
-
-        timing = row.get("timing")
-        if isinstance(timing, dict):
-            for val in timing.values():
-                if isinstance(val, (int, float)) and (np.isnan(val) or np.isinf(val)):
-                    incomplete_or_nonfinite += 1
+            reasons.append(f"corner {corner_name} missing or empty delivered_frame_hashes")
 
         if row.get("failure"):
             if is_gen:
                 gen_failures += 1
             else:
                 paste_failures += 1
+            reasons.append(f"corner {corner_name} failed: {row.get('failure')}")
             continue
+
+        scores = row.get("scores")
+        if scores is None and "metrics" in row:
+            scores = row.get("metrics")
+        if not isinstance(scores, dict):
+            incomplete_or_nonfinite += 1
+            reasons.append(f"corner {corner_name} missing scores dict")
+        else:
+            for sk in REQUIRED_SCORE_KEYS:
+                if sk not in scores:
+                    incomplete_or_nonfinite += 1
+                    reasons.append(f"corner {corner_name} missing required score key {sk!r}")
+                else:
+                    val = scores[sk]
+                    if val is None or not isinstance(val, (int, float)) or not np.isfinite(val):
+                        incomplete_or_nonfinite += 1
+                        reasons.append(f"corner {corner_name} score {sk!r} is non-finite: {val}")
+
+        timing = row.get("timing")
+        if not isinstance(timing, dict):
+            incomplete_or_nonfinite += 1
+            reasons.append(f"corner {corner_name} missing timing dict")
+        else:
+            for tk in REQUIRED_TIMING_KEYS:
+                if tk not in timing:
+                    incomplete_or_nonfinite += 1
+                    reasons.append(f"corner {corner_name} missing required timing key {tk!r}")
+                else:
+                    val = timing[tk]
+                    if val is None or not isinstance(val, (int, float)) or not np.isfinite(val):
+                        incomplete_or_nonfinite += 1
+                        reasons.append(f"corner {corner_name} timing {tk!r} is non-finite: {val}")
+            for tk, val in timing.items():
+                if val is not None and (not isinstance(val, (int, float)) or not np.isfinite(val)):
+                    incomplete_or_nonfinite += 1
+                    reasons.append(f"corner {corner_name} timing {tk!r} is non-finite: {val}")
 
         if row.get("shuffled_conditioning"):
             continue
@@ -537,17 +614,22 @@ def assess_generator_comparison(
         and bool(paste_hashes)
         and bool(gen_hashes)
     )
-    if paste_failures:
+    if paste_failures and "paste control corner failed" not in reasons:
         reasons.append("paste control corner failed")
     if paste_hashes is None or len(paste_hashes) == 0:
-        reasons.append("missing or empty paste control frame hashes")
-    if gen_failures:
+        if "missing or empty paste control frame hashes" not in reasons:
+            reasons.append("missing or empty paste control frame hashes")
+    if gen_failures and "generation corner failed" not in reasons:
         reasons.append("generation corner failed")
     if gen_hashes is None or len(gen_hashes) == 0:
-        reasons.append("missing or empty generator frame hashes")
+        if "missing or empty generator frame hashes" not in reasons:
+            reasons.append("missing or empty generator frame hashes")
     if gen_invocations <= 0:
         reasons.append("no-op generator (invocation count is 0)")
-    if incomplete_or_nonfinite > 0:
+    if (
+        incomplete_or_nonfinite > 0
+        and "required outputs are not complete and finite" not in reasons
+    ):
         reasons.append("required outputs are not complete and finite")
     if paste_hashes is not None and gen_hashes is not None and not pixels_changed:
         reasons.append("generation did not change delivered pixels versus paste")
@@ -631,9 +713,10 @@ def _corner(
     for row in matrix:
         if row.get("shuffled_conditioning"):
             continue
-        if bool(row.get("generation_on")) == generation_on and bool(
-            row.get("residual_on")
-        ) == residual_on:
+        if (
+            bool(row.get("generation_on")) == generation_on
+            and bool(row.get("residual_on")) == residual_on
+        ):
             if row.get("failure"):
                 continue
             return row
@@ -655,9 +738,12 @@ def fingerprint_identity(identity: dict[str, Any]) -> str:
 
 
 __all__ = [
+    "REQUIRED_CORNERS",
     "REQUIRED_CORNER_KEYS",
     "REQUIRED_IDENTITY_KEYS",
     "REQUIRED_REPORT_KEYS",
+    "REQUIRED_SCORE_KEYS",
+    "REQUIRED_TIMING_KEYS",
     "SIZE_PART_KEYS",
     "actual_timing",
     "assess_generator_comparison",

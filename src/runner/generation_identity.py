@@ -61,25 +61,46 @@ def config_identity_digest(payload: Mapping[str, Any]) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
-def _checkpoint_file(ref: Any, checkpoint: str | Path | None) -> Path | None:
-    """Weight file on the live ref, walking nested ``.backend`` wrappers.
-
-    Encoder identity gets an explicit CLI path. Client reconstruct gets the same
-    object after ``as_runner_ref`` and the diagnostic call-counter wrap, neither
-    of which copies ``checkpoint`` onto the outer object.
-    """
-    candidates: list[Any] = [checkpoint]
+def _backend_checkpoint_file(ref: Any) -> Path | None:
     seen: set[int] = set()
     node: Any = ref
     while node is not None and id(node) not in seen:
         seen.add(id(node))
-        candidates.append(getattr(node, "checkpoint", None))
-        candidates.append(getattr(node, "loaded_checkpoint", None))
+        for attr in ("loaded_checkpoint", "checkpoint"):
+            val = getattr(node, attr, None)
+            if val is not None and val != "":
+                path = Path(str(val))
+                if path.is_file():
+                    return path
         node = getattr(node, "backend", None)
-    for item in candidates:
-        if item is None or item == "":
-            continue
-        path = Path(str(item))
+    return None
+
+
+def _backend_weight_digest(ref: Any) -> str | None:
+    seen: set[int] = set()
+    node: Any = ref
+    while node is not None and id(node) not in seen:
+        seen.add(id(node))
+        for attr in ("checkpoint_sha256", "weight_digest", "weight_hash"):
+            val = getattr(node, attr, None)
+            if val is not None and val != "":
+                return str(val)
+        node = getattr(node, "backend", None)
+    return None
+
+
+def _checkpoint_file(ref: Any, checkpoint: str | Path | None = None) -> Path | None:
+    """Weight file on the live ref, walking nested ``.backend`` wrappers.
+
+    The live backend's actual loaded checkpoint or checkpoint attribute takes
+    precedence. An explicit checkpoint parameter is only used as fallback if
+    the backend does not expose its own checkpoint.
+    """
+    ref_file = _backend_checkpoint_file(ref)
+    if ref_file is not None:
+        return ref_file
+    if checkpoint is not None and checkpoint != "":
+        path = Path(str(checkpoint))
         if path.is_file():
             return path
     return None
@@ -233,6 +254,8 @@ def _from_registry(name: str, checkpoint: Path | str | None = None) -> Any:
     try:
         backend = REGISTRY.build(name, **kwargs)
     except TypeError:
+        if checkpoint is not None:
+            raise ValueError(f"Generator {name!r} does not accept a checkpoint parameter")
         backend = REGISTRY.build(name)
     if isinstance(backend, FrameGenerator):
         return from_spec(spec, backend)
@@ -300,16 +323,37 @@ def resolve_client_generator(
     if resolved is None:
         raise ValueError(f"Unknown generator checkpoint identity: {digest}")
 
+    backend_ckpt = _backend_checkpoint_file(resolved)
+    backend_digest = _backend_weight_digest(resolved)
+    if backend_ckpt is not None:
+        actual_sha = sha256_file(backend_ckpt)
+        if actual_sha != digest:
+            raise ValueError(
+                f"Mismatched checkpoint identity: requested {digest}, "
+                f"backend loaded {actual_sha} from {backend_ckpt}"
+            )
+        if resolved_checkpoint is not None and sha256_file(backend_ckpt) != sha256_file(
+            Path(resolved_checkpoint)
+        ):
+            raise ValueError(
+                f"Resolved generator loaded checkpoint {backend_ckpt} "
+                f"does not match requested checkpoint {resolved_checkpoint}"
+            )
+    elif backend_digest is not None:
+        if backend_digest != digest:
+            raise ValueError(
+                f"Mismatched checkpoint digest: requested {digest}, backend has {backend_digest}"
+            )
+
     claimed = identity_from_ref(
         resolved,
         seed=int(gen_meta.get("seed") or 0),
         params=gen_meta.get("params") or {},
-        checkpoint=resolved_checkpoint,
+        checkpoint=resolved_checkpoint if backend_ckpt is None else None,
     )
     resolved_sha = claimed.get("checkpoint_sha256")
     if resolved_sha != digest:
         raise ValueError(
-            f"Mismatched checkpoint identity: requested {digest}, "
-            f"resolved {resolved_sha}"
+            f"Mismatched checkpoint identity: requested {digest}, resolved {resolved_sha}"
         )
     return resolved
