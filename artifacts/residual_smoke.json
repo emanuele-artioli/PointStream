@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-10 08:52:18 UTC",
+  "timestamp": "2026-09-10 14:42:47 UTC",
   "host": {
     "node": "gpu5",
     "machine": "x86_64",
@@ -22,21 +22,21 @@
       3
     ],
     "bitstream_bytes": 1687,
-    "wire_request_bytes": 2597,
+    "wire_request_bytes": 2771,
     "ledger_residual_bytes": 1687,
     "ledger_reconciled": true,
     "sizes_is_rate": true
   },
   "timing_seconds": {
-    "total_wall": 0.35015222802758217,
-    "encoder_seconds": 0.2700298549607396,
-    "client_seconds": 0.05273311398923397,
-    "evaluation_seconds": 0.0023984541185200214,
-    "codec_encode_seconds": 0.01838127593509853,
-    "codec_decode_seconds": 0.06388380704447627
+    "total_wall": 0.36209872690960765,
+    "encoder_seconds": 0.27497104182839394,
+    "client_seconds": 0.06164881004951894,
+    "evaluation_seconds": 0.002850042888894677,
+    "codec_encode_seconds": 0.01860426994971931,
+    "codec_decode_seconds": 0.0670495480298996
   },
   "fidelity": {
-    "client_identical_to_delivered": false,
+    "client_identical_to_delivered": true,
     "client_frames_shape": [
       4,
       64,
