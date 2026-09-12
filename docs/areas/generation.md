@@ -7,14 +7,17 @@
 
 ## Current audit — 2026-09-12
 
-Keep generation OFF as the current control policy, not an architecture ranking.
-[The audit](../history/antigravity-audit-2026-09-12.md) finds sparse first-frame
-changes, near-identical whole-frame null scores, unhashed loaded pose inputs and
-a reproduced checkpoint-factory verification gap. `GEN-ACT-08` is only partially
-resolved at integration boundaries; complete the relevant `EVAL-ACT-11` repairs
-before model comparison. The historical “strictly superior” / fully verified
-phrasing below is scoped to the tested sparse diagnostic and superseded as a
-general conclusion. Next session follows [the handoff](../workflow/session/evaluation-handoff.md).
+Keep generation OFF as the current conservative operational baseline, not an architecture ranking.
+[The audit](../history/antigravity-audit-2026-09-12.md) finds that the 16-frame diagnostic matrix
+tested sparse placements (frame index 0 only, per `load_long_scene_clip` which creates an
+`ObjectRequest` at first appearance per track). This proves pixel modification and conditioning
+sensitivity at injection, but is not full-sequence continuous pose tracking. Whole-frame null
+scores were almost unchanged across subsequent frames.
+Broad claims that pasted reference is a "strictly superior model" are retracted: pasted reference
+is retained as a conservative operational baseline (`generation-off`), while `pix2pix` and
+`spade4tennis` remain available for multi-frame evaluation rather than permanently discarded.
+`GEN-ACT-08` is only partially resolved at integration boundaries; complete the relevant `EVAL-ACT-11`
+repairs before model comparison. Next session follows [the handoff](../workflow/session/evaluation-handoff.md).
 
 ## 1. Current State
 
@@ -83,11 +86,11 @@ result that determines the next experiment; no family-wide claims from one pilot
 
 `GEN-ACT-08` — **Complete** (PR #93, `4a55573` / `e9f781f`). Enforced fail-closed client checkpoint resolution against transmitted SHA-256 digest (`resolve_client_checkpoint`), full effective configuration identity, declared control validation, and dynamic clip start frame resolution without synthetic fallback.
 
-`GEN-ACT-09` — **Complete** (Wave 2 Diagnostic Matrix, artifacts `outputs/development-recovery/diagnostic-pix2pix-alcaraz.json` SHA-256 `ccfaa34b8ceca48409839c3baefec20e91f87a0425aea6da2b7429c37ed2fa50` and `diagnostic-pix2pix-federer.json` SHA-256 `407148416bf1455ccfb68cc025a2ff31899689ebd0ffc722fd4f0dddc085af25`).
+`GEN-ACT-09` — **Complete with Scope Limitations** (Wave 2 Diagnostic Matrix, artifacts `outputs/development-recovery/diagnostic-pix2pix-alcaraz.json` SHA-256 `ccfaa34b8ceca48409839c3baefec20e91f87a0425aea6da2b7429c37ed2fa50` and `diagnostic-pix2pix-federer.json` SHA-256 `407148416bf1455ccfb68cc025a2ff31899689ebd0ffc722fd4f0dddc085af25`).
 - **Validity Criteria Met**: Generator comparison validity is strictly `true` for both development scenes; `delivered_pixels_changed` is `true`; `gen_on_vs_paste_hash_match` is `false`; `shuffled_conditioning_changed_pixels` is `true`; `wire_reconciliation` matched 100% of serialized bytes.
-- **Instrument Verification**: Resolved skeleton pose alignment by track position (matching crop global IDs to 0-based skeleton index), eliminating the previous indexing mismatch.
+- **Instrument Verification & Testing Scope**: Resolved skeleton pose alignment by track position (matching crop global IDs to 0-based skeleton index). However, per audit Finding 4, `load_long_scene_clip` creates one `ObjectRequest` at first appearance per track (frame 0 only). The test therefore exercised sparse first-frame placement rather than continuous 16-frame sequence tracking. Whole-frame null scores across the 16-frame span remained almost unchanged.
 - **Empirical Findings on pix2pix (16 frames @ 4K)**:
   - *Alcaraz*: Pasted reference (`gen_off_res_off`) achieves 34.55 dB PSNR-Y / 90.81 VMAF for 523,610 B. pix2pix without residual (`gen_on_res_off`) yields 33.50 dB PSNR-Y (-1.05 dB) / 90.56 VMAF (-0.25) while costing 957,945 B (+434,335 B, primarily pose conditioning metadata). With residual (QP 32), pasted reference (`gen_off_res_on`) reaches 42.62 dB / 93.35 VMAF for 600,656 B, while pix2pix (`gen_on_res_on`) achieves 38.88 dB (-3.74 dB) / 93.16 VMAF for 1,035,763 B.
   - *Federer*: Pasted reference (`gen_off_res_off`) achieves 30.46 dB PSNR-Y / 78.13 VMAF for 627,735 B. pix2pix without residual (`gen_on_res_off`) yields 29.82 dB (-0.64 dB) / 77.75 VMAF for 1,282,341 B (+654,606 B). With residual, pasted reference (`gen_off_res_on`) reaches 39.76 dB / 90.01 VMAF for 796,646 B, while pix2pix (`gen_on_res_on`) reaches 37.40 dB (-2.36 dB) / 89.50 VMAF for 1,451,803 B.
-- **Decision**: Verified that the client generator executes faithfully and alters reconstructed frames as conditioned, but pix2pix under current uncompressed pose conditioning degrades whole-codec rate–distortion against pasted reference. Generator remains OFF for the headline compression ladder.
+- **Decision & Calibration**: Confirmed that client generator executes faithfully and alters reconstructed pixels at injection as conditioned. However, in this sparse placement setting, uncompressed pose conditioning overhead degrades whole-codec rate–distortion against pasted reference. Broad claims that pasted reference is a "strictly superior model" are retracted; generation-off is retained as a conservative operational baseline while keeping `pix2pix` and `spade4tennis` available for multi-frame sequence evaluation.
 

@@ -282,9 +282,7 @@ def union_canvas(
     )
 
 
-def unaligned_canvas(
-    bounds: Sequence[HomographyBounds], *, context_id: str
-) -> CanonicalCanvas:
+def unaligned_canvas(bounds: Sequence[HomographyBounds], *, context_id: str) -> CanonicalCanvas:
     """Pad each local plate to max(width) x max(height), origin at each local min.
 
     Used when two scenes were declared the same context but their frame-0
@@ -371,7 +369,9 @@ def canvas_maps(
             else np.asarray(alignment, dtype=np.float64)
         )
         offset = _translation(-canvas.origin_xy[0], -canvas.origin_xy[1])
-        return [offset @ align @ np.asarray(matrix, dtype=np.float64) for matrix in bounds.homographies]
+        return [
+            offset @ align @ np.asarray(matrix, dtype=np.float64) for matrix in bounds.homographies
+        ]
     local_origin = _translation(-bounds.min_xy[0], -bounds.min_xy[1])
     return [local_origin @ np.asarray(matrix, dtype=np.float64) for matrix in bounds.homographies]
 
@@ -516,6 +516,14 @@ def build_plate(
             unaligned.
 
     Returns the uint8 BGR plate and the per-frame homographies as 9-tuples.
+
+    Note on canvas validity:
+        The validity mask and canvas bounds cover valid composite canvas
+        coordinates (geometric bounds of warped canvas), but do not certify
+        100% unoccluded background observation without holes. Pixels that
+        remain masked or unobserved across all frames undergo nearest-finite
+        fill or default padding, rather than verified ground-truth background
+        observations.
     """
     stack = _as_frames(frames)
     n_frames, height, width, _ = stack.shape
@@ -571,6 +579,9 @@ def _composite(
 ) -> tuple[np.ndarray, tuple[tuple[float, ...], ...]]:
     n_frames, height, width, _ = stack.shape
     masked_stack: list[np.ndarray] = []
+    # Note on ever_valid: tracks geometrically valid composite canvas coordinates,
+    # but does not certify 100% unoccluded background observation without holes;
+    # unobserved regions (e.g. all-masked columns) are resolved via _nearest_finite_fill.
     ever_valid = np.zeros((canvas_h, canvas_w), dtype=bool)
     valid_src = np.full((height, width), 255, dtype=np.uint8)
     for index in range(n_frames):
