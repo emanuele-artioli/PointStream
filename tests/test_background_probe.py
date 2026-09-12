@@ -416,8 +416,17 @@ def test_build_common_cleaned_stack_cache_validation(tmp_path: Path) -> None:
     assert stats_rebuilt["from_cache"] is False
 
 
-def test_preprocessing_timing_accounting() -> None:
+def test_preprocessing_timing_accounting(monkeypatch: pytest.MonkeyPatch) -> None:
     """Verify that evaluation points record preprocessing and total end-to-end timing."""
+    from scripts.background_probe import format_csv_table, format_markdown_table
+    from src.components.background.sidecar import IntraCodecSidecar
+
+    monkeypatch.setattr(IntraCodecSidecar, "probe_encoder", lambda self: ("/bin/true", "1.0"))
+    monkeypatch.setattr(IntraCodecSidecar, "encode", lambda self, img: b"\x00" * 64)
+    monkeypatch.setattr(
+        IntraCodecSidecar, "decode", lambda self, payload: np.zeros((64, 64, 3), dtype=np.uint8)
+    )
+
     frames, masks = _synthetic_clip(t=4, h=64, w=64)
     cleaned, plate, homographies, _ = build_common_cleaned_stack(frames, masks, register=True)
 
@@ -449,3 +458,12 @@ def test_preprocessing_timing_accounting() -> None:
         1.234 + res_pano["timing"]["encode_seconds"] + res_pano["timing"]["decode_render_seconds"],
         3,
     )
+
+    # Verify tables include Prep (s) and Total (s)
+    md = format_markdown_table([res_still, res_pano])
+    assert "Prep (s)" in md
+    assert "Total (s)" in md
+
+    csv_out = format_csv_table([res_still, res_pano])
+    assert "preprocessing_seconds" in csv_out
+    assert "total_end_to_end_seconds" in csv_out
