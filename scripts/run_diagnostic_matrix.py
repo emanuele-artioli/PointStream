@@ -159,6 +159,25 @@ def _augment_objects_with_pose(clip: Any, *, shuffle: bool, seed: int) -> tuple[
     if not objects:
         return objects
 
+    if all(getattr(obj, "conditioning", None) is not None for obj in objects):
+        if not shuffle:
+            return objects
+        existing_poses = [
+            np.transpose(getattr(obj.conditioning, "pose"), (1, 2, 0)) for obj in objects
+        ]
+        permuted_poses = _permute_or_foreign_poses(existing_poses, seed=seed)
+        shuffled_objs: list[Any] = []
+        for obj, pose_img in zip(objects, permuted_poses, strict=True):
+            bundle = obj.conditioning
+            assert bundle is not None
+            shuffled_objs.append(
+                replace(
+                    obj,
+                    conditioning=replace(bundle, pose=np.transpose(pose_img, (2, 0, 1))),
+                )
+            )
+        return tuple(shuffled_objs)
+
     start_frame = resolve_clip_start_frame(clip, n_frames=len(clip.frames))
     dataset_scene_dir = ps_paths.assets() / "dataset" / clip.video / "segmentations" / clip.scene
     poses: list[np.ndarray] = []
@@ -171,22 +190,30 @@ def _augment_objects_with_pose(clip: Any, *, shuffle: bool, seed: int) -> tuple[
             raise FileNotFoundError(
                 f"Missing required pose conditioning skeleton directory for {clip.video}/{clip.scene} object {obj_id} at {skel_dir}"
             )
-        pose_path = None
         crop_dir = dataset_scene_dir / obj_id
-        if crop_dir.is_dir():
+        if crop_dir.is_dir() and any(crop_dir.glob("frame_*.png")):
             crop_files = sorted(crop_dir.glob("frame_*.png"))
             crop_ids = [int(p.name[6:12]) for p in crop_files]
-            if abs_frame in crop_ids:
-                pos = crop_ids.index(abs_frame)
-                candidate_path = skel_dir / f"frame_{pos:06d}.png"
-                if candidate_path.is_file():
-                    pose_path = candidate_path
-        if pose_path is None:
+            if abs_frame not in crop_ids:
+                raise FileNotFoundError(
+                    f"Frame {abs_frame} not found in crop directory {crop_dir} "
+                    f"for {clip.video}/{clip.scene} object {obj_id}"
+                )
+            pos = crop_ids.index(abs_frame)
+            pose_path = skel_dir / f"frame_{pos:06d}.png"
+            if not pose_path.is_file():
+                raise FileNotFoundError(
+                    f"Missing required positional pose conditioning skeleton for "
+                    f"{clip.video}/{clip.scene} object {obj_id} frame {abs_frame} (pos {pos}) "
+                    f"at {pose_path}. Refusing unaligned global filename fallback."
+                )
+        else:
             pose_path = skel_dir / f"frame_{abs_frame:06d}.png"
-        if not pose_path.is_file():
-            raise FileNotFoundError(
-                f"Missing required pose conditioning skeleton for {clip.video}/{clip.scene} object {obj_id} frame {abs_frame} at {pose_path}"
-            )
+            if not pose_path.is_file():
+                raise FileNotFoundError(
+                    f"Missing required pose conditioning skeleton for {clip.video}/{clip.scene} "
+                    f"object {obj_id} frame {abs_frame} at {pose_path}"
+                )
         skel_bgr = cv2.imread(str(pose_path))
         if skel_bgr is None:
             raise ValueError(f"Failed to load skeleton image at {pose_path}")
@@ -470,6 +497,7 @@ def assemble_matrix_report(
     device: str,
     shuffled_control: bool,
     repo: Path | None = None,
+    augmented_objects: Any = None,
 ) -> dict[str, Any]:
     source_frames = np.asarray(clip.frames)
     manifest = source_manifest(
@@ -479,8 +507,18 @@ def assemble_matrix_report(
         context_id=getattr(clip, "context_id", None),
     )
     revision = git_revision(repo or ps_paths.repo_root())
-    clip_objects = getattr(clip, "objects", ())
-    resolved_cfg = resolved_configuration(base_config, device=device, objects=clip_objects)
+    if augmented_objects is None:
+        clip_objects = getattr(clip, "objects", ())
+        if clip_objects:
+            try:
+                augmented_objects = _augment_objects_with_pose(
+                    clip, shuffle=False, seed=int(base_config.run.seed)
+                )
+            except Exception:
+                augmented_objects = clip_objects
+        else:
+            augmented_objects = ()
+    resolved_cfg = resolved_configuration(base_config, device=device, objects=augmented_objects)
     identity = build_run_identity(
         code_revision=revision,
         checkpoint_sha256=checkpoint_sha256,
@@ -632,6 +670,16 @@ def run_matrix(
         except ValueError:
             checkpoint = None
     checkpoint_sha = sha256_path(checkpoint) if checkpoint is not None else None
+
+    augmented_objects = getattr(clip, "objects", ())
+    if augmented_objects:
+        try:
+            augmented_objects = _augment_objects_with_pose(
+                clip, shuffle=False, seed=int(base_config.run.seed)
+            )
+        except Exception:
+            augmented_objects = getattr(clip, "objects", ())
+
     identity = build_run_identity(
         code_revision=git_revision(repo or ps_paths.repo_root()),
         checkpoint_sha256=checkpoint_sha,
@@ -639,7 +687,7 @@ def run_matrix(
         config=resolved_configuration(
             base_config,
             device=device,
-            objects=getattr(clip, "objects", ()),
+            objects=augmented_objects,
         ),
         video=clip.video,
         scene=clip.scene,
@@ -705,6 +753,7 @@ def run_matrix(
         device=device,
         shuffled_control=shuffled_control,
         repo=repo,
+        augmented_objects=augmented_objects,
     )
 
 

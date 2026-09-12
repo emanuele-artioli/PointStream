@@ -605,3 +605,159 @@ def test_augment_objects_with_pose_resolves_positionally(
     assert len(augmented) == 1
     assert augmented[0].conditioning is not None
     assert augmented[0].conditioning.pose.shape == (3, 32, 24)
+
+
+def test_assess_generator_comparison_rejects_missing_scores_and_timing(tmp_path: Path) -> None:
+    """Take a valid matrix result, remove scores, metrics and timing, verify rejection."""
+    clip = _clip()
+    ckpt = tmp_path / "weights.pt"
+    ckpt.write_bytes(b"dummy-weights")
+    report = run_matrix(
+        clip,
+        PointstreamConfig(),
+        generator_arch="pix2pix",
+        residual_qp=32,
+        checkpoint=ckpt,
+        shuffled_control=True,
+        device="cpu",
+        frames=2,
+        run_fn=_run_changing_pixels,
+        score_fn=_score,
+        generator_factory=_factory,
+        repo=_REPO,
+    )
+    assert report["generator_comparison_valid"] is True
+    import copy
+
+    matrix = copy.deepcopy(report["matrix"])
+    for row in matrix:
+        row.pop("scores", None)
+        row.pop("metrics", None)
+        row.pop("timing", None)
+
+    verdict = assess_generator_comparison(
+        checkpoint_sha256=report["checkpoint_sha256"],
+        generator_backend=report["generator_backend"],
+        matrix=matrix,
+    )
+    assert verdict["generator_comparison_valid"] is False
+    assert any("missing scores dict" in r for r in verdict["reasons"])
+    assert any("missing timing dict" in r for r in verdict["reasons"])
+    assert "required outputs are not complete and finite" in verdict["reasons"]
+
+
+def test_pose_loading_fails_closed_without_unaligned_global_fallback(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """If crop_dir exists with global frame IDs, a missing positional skeleton fails closed
+    even if an unaligned global frame ID exists in the skeleton directory."""
+    import cv2
+
+    monkeypatch.setenv("PS_DATA_ROOT", str(tmp_path))
+    scene_dir = tmp_path / "assets" / "dataset" / "fake_video" / "segmentations" / "fake_scene"
+    crop_dir = scene_dir / "track_0001"
+    skel_dir = scene_dir / "track_0001_skeleton"
+    crop_dir.mkdir(parents=True)
+    skel_dir.mkdir(parents=True)
+
+    img = np.zeros((32, 24, 3), dtype=np.uint8)
+    cv2.imwrite(str(crop_dir / "frame_000029.png"), img)
+    cv2.imwrite(str(skel_dir / "frame_000029.png"), img)
+
+    obj = ObjectRequest(
+        object_id="track_0001",
+        appearance=np.zeros((32, 24, 3), dtype=np.uint8),
+        bbox=(0, 0, 32, 24),
+        mask=np.zeros((1, 32, 24), dtype=bool),
+        frame_index=0,
+    )
+    clip = FakeClip(
+        video="fake_video",
+        scene="fake_scene",
+        context_id="ctx",
+        frames=np.zeros((1, 32, 24, 3), dtype=np.uint8),
+        objects=(obj,),
+        start_frame=29,
+    )
+    with pytest.raises(FileNotFoundError) as exc_info:
+        _augment_objects_with_pose(clip, shuffle=False, seed=42)
+    assert "Missing required positional pose conditioning skeleton" in str(exc_info.value)
+    assert "Refusing unaligned global filename fallback" in str(exc_info.value)
+
+
+def test_pose_conditioning_identity_in_run_matrix(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """run_matrix must build identity from augmented objects with non-null ConditioningBundle digests,
+    and a changed skeleton file must change the identity."""
+    import cv2
+
+    monkeypatch.setenv("PS_DATA_ROOT", str(tmp_path))
+    scene_dir = tmp_path / "assets" / "dataset" / "fake_video" / "segmentations" / "fake_scene"
+    crop_dir = scene_dir / "track_0001"
+    skel_dir = scene_dir / "track_0001_skeleton"
+    crop_dir.mkdir(parents=True)
+    skel_dir.mkdir(parents=True)
+
+    img_v1 = np.full((32, 24, 3), 10, dtype=np.uint8)
+    cv2.imwrite(str(crop_dir / "frame_000000.png"), img_v1)
+    cv2.imwrite(str(skel_dir / "frame_000000.png"), img_v1)
+
+    obj = ObjectRequest(
+        object_id="track_0001",
+        appearance=np.zeros((32, 24, 3), dtype=np.uint8),
+        bbox=(0, 0, 32, 24),
+        mask=np.zeros((1, 32, 24), dtype=bool),
+        frame_index=0,
+    )
+    clip = FakeClip(
+        video="fake_video",
+        scene="fake_scene",
+        context_id="ctx",
+        frames=np.zeros((1, 32, 24, 3), dtype=np.uint8),
+        objects=(obj,),
+        start_frame=0,
+    )
+    ckpt = tmp_path / "weights.pt"
+    ckpt.write_bytes(b"dummy-weights")
+
+    report1 = run_matrix(
+        clip,
+        PointstreamConfig(),
+        generator_arch="pix2pix",
+        residual_qp=32,
+        checkpoint=ckpt,
+        shuffled_control=False,
+        device="cpu",
+        frames=1,
+        run_fn=_run_changing_pixels,
+        score_fn=_score,
+        generator_factory=_factory,
+        repo=_REPO,
+    )
+    cond1 = report1["identity"]["config"]["conditioning"]
+    assert cond1 is not None and len(cond1) == 1
+    assert cond1[0] is not None
+    assert "pose" in cond1[0] and cond1[0]["pose"] is not None
+    assert "appearance" in cond1[0] and cond1[0]["appearance"] is not None
+
+    img_v2 = np.full((32, 24, 3), 200, dtype=np.uint8)
+    cv2.imwrite(str(skel_dir / "frame_000000.png"), img_v2)
+
+    report2 = run_matrix(
+        clip,
+        PointstreamConfig(),
+        generator_arch="pix2pix",
+        residual_qp=32,
+        checkpoint=ckpt,
+        shuffled_control=False,
+        device="cpu",
+        frames=1,
+        run_fn=_run_changing_pixels,
+        score_fn=_score,
+        generator_factory=_factory,
+        repo=_REPO,
+    )
+    cond2 = report2["identity"]["config"]["conditioning"]
+    assert cond2[0]["pose"] != cond1[0]["pose"]
+    assert report1["identity"] != report2["identity"]
