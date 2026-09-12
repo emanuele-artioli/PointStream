@@ -16,6 +16,22 @@ matrix changes only frame 0 in generation-off/on and normal/shuffled comparisons
 this is not validated full-sequence generation evidence. No fresh advantage or
 Gate A/B pass is established. Next: [evaluation handoff](../workflow/session/evaluation-handoff.md).
 
+### Byte diagnosis and evaluation audit corrections (Finding 3 / Lane 2)
+
+Astra audit of 2026-09-12 identified four critical caveats in `scripts/byte_diagnosis.py` and evaluation accounting:
+
+1. **Bitrate calculation and frame-rate correction**:
+   Converting 11,028 bytes/frame to 88.2 kbps omitted video frame rate ($11,028 \times 8 / 1000$). At 24.0 fps, 11,028 bytes/frame corresponds to $11,028 \times 8 \times 24 = 2,117,376\text{ bps} \approx 2.12\text{ Mbps}$ ($2,117.4\text{ kbps}$), not 88.2 kbps. The calculation helper is updated to take `fps: float = 24.0` (default 24.0) and compute `bytes_per_frame * 8 * fps / 1000.0` (or `/ 1_000_000.0` for Mbps).
+
+2. **Disjoint ledger semantics ($H = 0$)**:
+   $H = 0$ in the disjoint arithmetic ledger ($B + F + M + R + H = T$) signifies zero unallocated arithmetic remainder across the declared component categories. It does **not** indicate zero physical container or envelope overhead: container framing, indexing, and serialization structures reside within $M$ (metadata).
+
+3. **Limits of background reduction**:
+   At the saved lowest Federer rung (R63), background $B$ is 529,361 B (75.6% of 700,102 B). However, setting background bytes completely to zero leaves $700,102 - 529,361 = 170,741\text{ B}$ ($F=30,196\text{ B}$ actor reference + $M=70,609\text{ B}$ metadata + $R=69,936\text{ B}$ residual). This non-background remainder alone exceeds the saved local AV1 estimate (110,842 B) and VVC estimate (130,906 B). Therefore, background work is relevant and necessary, but alone cannot be assumed sufficient to beat conventional anchors; concurrent reductions in metadata and residual demand are required.
+
+4. **Dynamic analysis and avoidance of canned conclusions**:
+   `scripts/byte_diagnosis.py` now strictly derives all hypothesis evaluations, promotion verdicts, runtime ranges, and speed ratios from input data dynamically. It avoids carrying fixed rules (such as "below ~50 kB at any quality") across different operating points or quality regimes.
+
 The following 2026-09-11 entries are historical reports, qualified by this audit.
 
 ## Experiment policy update — 2026-09-11
@@ -48,11 +64,12 @@ PR #93 merged (`4a55573`, repairs in `e9f781f`) after resolving all four blocker
 - Declared control checks require control run success, non-empty paste hashes, and complete finite outputs.
 - Dynamic start frame resolution from clip metadata or manifest; strict rejection of missing/misaligned conditioning (no synthetic black skeleton fallback).
 
-`EVAL-ACT-08` — **Complete** (PR #95, `697bc9f`, artifact `outputs/development-recovery/wave2-byte-diagnosis.json` SHA-256 `74120308fef2e036d66a68b587cd42b6cc1a57d9b3b19ade21dd32d26c1c1aa9`).
-- Verified disjoint ledger equality: $B + F + M + R + H = T$ strictly holds for all rungs ($H = 0$).
-- Proved hypothesis: At low rate (R63), fixed background $B$ (529,361 B, 75.6%) and metadata $M$ (70,609 B) consume 600 kB, exceeding the entire VVC anchor budget (130,906 B) by approximately 4.6x and AV1 (110,842 B) by 5.4x. $A(q) - B - M - H$ is negative across all rungs.
+`EVAL-ACT-08` — **Complete** (PR #95, `697bc9f`, artifact `outputs/development-recovery/wave2-byte-diagnosis.json` SHA-256 `74120308fef2e036d66a68b587cd42b6cc1a57d9b3b19ade21dd32d26c1c1aa9`; audited and repaired 2026-09-12).
+- Verified disjoint ledger equality: $B + F + M + R + H = T$ strictly holds for all rungs ($H = 0$, indicating zero unallocated arithmetic remainder; container/envelope overhead resides within $M$).
+- Proved hypothesis: At low rate (R63), fixed background $B$ (529,361 B, 75.6%, ~2.12 Mbps at 24 fps) and metadata $M$ (70,609 B) consume 600 kB, exceeding the entire VVC anchor budget (130,906 B) by approximately 4.6x and AV1 (110,842 B) by 5.4x. $A(q) - B - M - H$ is negative across all rungs.
 - Even with residual $R = 0$ at H3, PointStream's base floor (630 kB) exceeds the anchor's highest quality budget (377 kB).
-- Decision: Supported promoting background representation for Wave 2.
+- Background sufficiency limit: Setting $B = 0$ at R63 leaves 170,741 B, which still exceeds anchor budgets; background reduction is necessary but alone insufficient to beat anchors.
+- Decision: Supported promoting background representation for Wave 2, accompanied by dynamic evaluation without fixed byte thresholds.
 `EVAL-ACT-10` — **Phase 1 Complete** (Wave 2 Diagnostic Matrix, artifacts `outputs/development-recovery/diagnostic-pix2pix-alcaraz.json` SHA-256 `ccfaa34b8ceca48409839c3baefec20e91f87a0425aea6da2b7429c37ed2fa50` and `diagnostic-pix2pix-federer.json` SHA-256 `407148416bf1455ccfb68cc025a2ff31899689ebd0ffc722fd4f0dddc085af25`).
 - Executed full 5-corner diagnostic matrix (gen off/on x residual off/on + shuffled conditioning null) on both development scenes (`alcaraz_highlights/scene_000` and `federer_djokovic/scene_007`, 16 frames @ 4K).
 - Fixed skeleton pose alignment across tracks with global crop IDs and 0-based skeleton sequences.

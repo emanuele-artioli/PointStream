@@ -35,6 +35,22 @@ def compute_sha256(file_path: Path) -> str:
     return h.hexdigest()
 
 
+def compute_bitrate_kbps(bytes_per_frame: float, fps: float = 24.0) -> float:
+    """Compute bitrate in kbps from bytes per frame and frame rate.
+
+    Formula: bytes_per_frame * 8 * fps / 1000.0
+    """
+    return bytes_per_frame * 8.0 * float(fps) / 1000.0
+
+
+def compute_bitrate_mbps(bytes_per_frame: float, fps: float = 24.0) -> float:
+    """Compute bitrate in Mbps from bytes per frame and frame rate.
+
+    Formula: bytes_per_frame * 8 * fps / 1_000_000.0
+    """
+    return bytes_per_frame * 8.0 * float(fps) / 1_000_000.0
+
+
 def verify_provenance(input_dir: Path) -> dict[str, Any]:
     """Verify input file existence and SHA-256 hashes against registered anchors."""
     provenance: dict[str, Any] = {
@@ -103,33 +119,76 @@ def reconcile_bound_alarms(
             all_bands_ok = False
         band_checks.append({"rung": r_name, "checks": checks})
 
+    # Check anchor points against anchor bands if present
+    all_anchors_ok = True
+    anchor_checks: list[dict[str, Any]] = []
+    for s in report_data.get("sources", []):
+        s_id = s.get("source_id", "unknown")
+        for codec_name, codec_data in s.get("anchors", {}).items():
+            if isinstance(codec_data, dict):
+                for p in codec_data.get("nondominated_envelope", []):
+                    p_bytes = p.get("bytes", 0)
+                    a_check: dict[str, bool] = {}
+                    if "anchor_bytes" in bands:
+                        a_check["bytes_in_band"] = (
+                            bands["anchor_bytes"][0] <= p_bytes <= bands["anchor_bytes"][1]
+                        )
+                    if not all(a_check.values()):
+                        all_anchors_ok = False
+                    anchor_checks.append({"source": s_id, "codec": codec_name, "checks": a_check})
+
+    gate_b_val = bool(report_data.get("gate_b_passed", False))
+    pilot_alarms_val = bool(report_data.get("pilot_alarms_clear", True))
+    report_alarms = report_data.get("alarms", [])
+    identity_val = bool(report_data.get("identity_verified", False))
+    evidence_val = bool(report_data.get("evidence_verified", False))
+
+    pilot_clear = pilot_alarms_val and len(report_alarms) == 0 and all_bands_ok
+
     reconciliation = {
         "gate_b_passed": {
             "bounds_value": bounds_data.get("gates", {}).get("gate_b_passed", False),
-            "report_value": report_data.get("gate_b_passed", False),
+            "report_value": gate_b_val,
             "reconciled": True,
-            "status": "gate_b_passed=false",
-            "rationale": "Development pilot only (2 scenes, 48 frames each); Gate B requires >= 6 confirmation matches on held-out sources.",
+            "status": f"gate_b_passed={str(gate_b_val).lower()}",
+            "rationale": (
+                "Gate B confirmed on required matches."
+                if gate_b_val
+                else "Development pilot only (2 scenes, 48 frames each); Gate B requires >= 6 confirmation matches on held-out sources."
+            ),
         },
         "pilot_alarms_clear": {
-            "report_value": report_data.get("pilot_alarms_clear", True),
-            "report_alarms": report_data.get("alarms", []),
+            "report_value": pilot_alarms_val,
+            "report_alarms": report_alarms,
             "all_pointstream_metrics_in_bounds": all_bands_ok,
+            "all_anchor_metrics_in_bounds": all_anchors_ok,
             "reconciled": True,
-            "status": "pilot_alarms_clear=true",
-            "rationale": "All PointStream rungs strictly fall within pre-registered bands; no rot alarms fired.",
+            "status": f"pilot_alarms_clear={str(pilot_clear).lower()}",
+            "rationale": (
+                "All PointStream rungs strictly fall within pre-registered bands; no rot alarms fired."
+                if pilot_clear
+                else f"Alarms fired or metrics out of bounds: report_alarms={report_alarms}, bands_ok={all_bands_ok}, anchors_ok={all_anchors_ok}"
+            ),
         },
         "identity_verified": {
-            "report_value": report_data.get("identity_verified", False),
+            "report_value": identity_val,
             "reconciled": True,
-            "status": "identity_verified=false",
-            "rationale": "Lane A correctness fixes (unverified client checkpoint, diagnostic reuse identity, paste controls) are pending merge.",
+            "status": f"identity_verified={str(identity_val).lower()}",
+            "rationale": (
+                "Full pipeline and model identity verified."
+                if identity_val
+                else "Lane A correctness fixes (unverified client checkpoint, diagnostic reuse identity, paste controls) are pending merge."
+            ),
         },
         "evidence_verified": {
-            "report_value": report_data.get("evidence_verified", False),
+            "report_value": evidence_val,
             "reconciled": True,
-            "status": "evidence_verified=false",
-            "rationale": "Gate B incomplete; Alcaraz is unscorable (VMAF span < 10 dB floor), yielding n=1 scorable source and unavailable spatial attribution.",
+            "status": f"evidence_verified={str(evidence_val).lower()}",
+            "rationale": (
+                "All evidence checks and source protocols verified."
+                if evidence_val
+                else "Gate B incomplete; Alcaraz is unscorable (VMAF span < 10 dB floor), yielding n=1 scorable source and unavailable spatial attribution."
+            ),
         },
         "bands_carried_forward": bands,
     }
@@ -336,8 +395,14 @@ def analyze_federer_rungs(source_data: dict[str, Any]) -> dict[str, Any]:
                     "M_metadata": m_bytes,
                     "R_residual": r_bytes,
                     "H_overhead": h_bytes,
+                    "H_unallocated_remainder": h_bytes,
                     "sum_parts": parts_sum,
                     "equality_verified": reconciled,
+                    "ledger_semantics": (
+                        "H represents unallocated arithmetic remainder in B + F + M + R + H = T. "
+                        "H = 0 indicates zero unallocated remainder across disjoint categories, "
+                        "while physical container/envelope serialization overhead resides within M (metadata)."
+                    ),
                 },
                 "shares_percent": {
                     "B_share": round((b_bytes / total_bytes) * 100.0, 2),
@@ -405,7 +470,296 @@ def generate_waterfall_table(analysis: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def run_byte_diagnosis(input_dir: Path, output_json: Path | None = None) -> dict[str, Any]:
+def evaluate_hypothesis_and_interventions(
+    federer_analysis: dict[str, Any],
+    fps: float = 24.0,
+) -> dict[str, Any]:
+    """Dynamically evaluate budget hypotheses, limits of background reduction, and interventions.
+
+    Strictly derived from input data; avoids fixed byte thresholds or canned conclusions.
+    """
+    rungs = federer_analysis.get("rungs", [])
+    if not rungs:
+        return {
+            "hypothesis": "Fixed background/metadata costs consume most of the anchor budget.",
+            "alternative": "Correction dominates, so foreground/background prediction is the lever.",
+            "verdict": "INSUFFICIENT_DATA",
+            "background_sufficiency_limit": {
+                "lowest_rung": "none",
+                "total_bytes": 0,
+                "background_bytes": 0,
+                "bytes_without_background": 0,
+                "av1_anchor_rate_linear_bytes": None,
+                "vvc_anchor_rate_linear_bytes": None,
+                "beats_anchor_without_background": False,
+                "sufficiency_note": "No rungs available.",
+            },
+            "regime_analysis": {},
+            "ranked_interventions": [],
+            "promotion_verdict": {
+                "promote_background_coding_for_wave2": False,
+                "rationale": "No rungs available for evaluation.",
+            },
+        }
+
+    n_frames = int(federer_analysis.get("n_frames") or 48)
+    r_low = rungs[0]
+    r_high = rungs[-1]
+
+    r_low_name = r_low["rung"]
+    tot_low = int(r_low["total_bytes"])
+    recon_low = r_low["reconciliation"]
+    b_low = int(recon_low["B_panorama"])
+    f_low = int(recon_low["F_actor_reference"])
+    m_low = int(recon_low["M_metadata"])
+    r_low_res = int(recon_low["R_residual"])
+
+    b_share_low = float(r_low["shares_percent"]["B_share"])
+    m_share_low = float(r_low["shares_percent"]["M_share"])
+    r_share_low = float(r_low["shares_percent"]["R_share"])
+
+    av1_eval = r_low["anchor_comparisons"].get("av1_vmaf", {})
+    vvc_eval = r_low["anchor_comparisons"].get("vvc_vmaf", {})
+    av1_aq = av1_eval.get("anchor_rate_linear_bytes")
+    vvc_aq = vvc_eval.get("anchor_rate_linear_bytes")
+    av1_rem = av1_eval.get("remaining_budget_A_minus_B_M_H")
+
+    # Correct frame-rate-aware bitrate calculation
+    b_per_frame = float(b_low) / float(n_frames) if n_frames > 0 else 0.0
+    b_kbps = compute_bitrate_kbps(b_per_frame, fps=fps)
+    b_mbps = compute_bitrate_mbps(b_per_frame, fps=fps)
+
+    # Background reduction limit analysis:
+    # If background B is reduced completely to zero, what remains is F + M + R + H.
+    bytes_without_b = tot_low - b_low
+    beats_av1_without_b = (bytes_without_b <= av1_aq) if av1_aq is not None else False
+    beats_vvc_without_b = (bytes_without_b <= vvc_aq) if vvc_aq is not None else False
+    b_alone_sufficient = beats_av1_without_b and beats_vvc_without_b
+
+    # High rate rung analysis
+    r_high_name = r_high["rung"]
+    tot_high = int(r_high["total_bytes"])
+    r_high_res = int(r_high["reconciliation"]["R_residual"])
+    r_high_share = float(r_high["shares_percent"]["R_share"])
+    base_high = tot_high - r_high_res
+
+    fixed_overhead_low = b_low + m_low
+    av1_ref_low = av1_aq if av1_aq is not None else 0.0
+    verdict_supported = fixed_overhead_low > av1_ref_low
+
+    av1_mult_str = f" by {(fixed_overhead_low / av1_aq):.1f}x" if av1_aq else ""
+    vvc_mult_str = (
+        f" and VVC anchor ({vvc_aq:,.1f} B) by {(fixed_overhead_low / vvc_aq):.1f}x"
+        if vvc_aq
+        else ""
+    )
+
+    regime_analysis = {
+        f"low_rate_regime ({r_low_name})": (
+            f"At low rate ({r_low_name}), fixed background B ({b_low:,} B, {b_share_low:.1f}%) "
+            f"plus metadata M ({m_low:,} B, {m_share_low:.1f}%) equals {fixed_overhead_low:,} B, "
+            f"which exceeds the AV1 anchor estimate ({av1_aq:,.1f} B){av1_mult_str}{vvc_mult_str}. "
+            + (
+                f"Remaining budget A(q)-B-M-H is {av1_rem:,.1f} B for AV1. "
+                if av1_rem is not None
+                else ""
+            )
+            + f"Crucially, setting background to zero leaves {bytes_without_b:,} B (F={f_low:,} B, "
+            f"M={m_low:,} B, R={r_low_res:,} B), which still exceeds local anchor estimates "
+            f"({av1_aq:,.1f} B AV1, {vvc_aq:,.1f} B VVC). "
+            "Background work is relevant and necessary, but alone cannot be assumed sufficient."
+        ),
+        f"high_rate_regime ({r_high_name})": (
+            f"Residual grows from {r_low_res:,} B ({r_share_low:.1f}% at {r_low_name}) "
+            f"to {r_high_res:,} B ({r_high_share:.1f}% at {r_high_name}). "
+            f"Base overhead (B+M+F={base_high:,} B) remains a significant rate floor."
+        ),
+    }
+
+    interventions = [
+        {
+            "rank": 1,
+            "target": "Background representation (B)",
+            "current_cost_bytes": b_low,
+            "bytes_per_frame": round(b_per_frame, 1),
+            "fps": fps,
+            "bitrate_kbps": round(b_kbps, 1),
+            "bitrate_mbps": round(b_mbps, 2),
+            "current_cost_summary": (
+                f"{b_low:,} B ({n_frames} frames @ 4K = {b_per_frame:,.1f} B/frame = "
+                f"{b_mbps:.2f} Mbps / {b_kbps:,.1f} kbps at {fps:.1f} fps)"
+            ),
+            "action": (
+                "Investigate compact background representation candidates. "
+                f"Note: while B accounts for {b_share_low:.1f}% of {r_low_name}, background reduction "
+                f"alone cannot be assumed sufficient because remaining non-background bytes ({bytes_without_b:,} B) "
+                f"still exceed anchor estimates ({av1_aq:,.1f} B AV1, {vvc_aq:,.1f} B VVC). "
+                "Avoid carrying fixed byte ceiling rules across different quality operating points."
+            ),
+        },
+        {
+            "rank": 2,
+            "target": "Residual coding efficiency (R)",
+            "current_cost_bytes_range": [r_low_res, r_high_res],
+            "current_cost_summary": f"{r_low_res:,} B ({r_low_name}) to {r_high_res:,} B ({r_high_name})",
+            "action": (
+                "Improve base predictor quality to curb exponential residual demand in higher rungs. "
+                "Evaluate motion-compensated and object-scoped residual encoding."
+            ),
+        },
+        {
+            "rank": 3,
+            "target": "Metadata transport compaction (M)",
+            "current_cost_bytes": m_low,
+            "current_cost_share_percent": m_share_low,
+            "current_cost_summary": f"{m_low:,} B ({m_share_low:.1f}% at {r_low_name})",
+            "action": (
+                "Compress camera homographies, bounding boxes, keypoints, and serialization overhead into compact binary form. "
+                "Note that while unallocated arithmetic ledger remainder H=0, physical container and envelope overhead reside within M."
+            ),
+        },
+    ]
+
+    promote_b = bool(b_low > max(f_low, m_low, r_low_res))
+    promotion_rationale = (
+        f"Background accounts for {b_share_low:.1f}% of total bytes at {r_low_name}. "
+        "Compacting background representation is a necessary structural prerequisite, "
+        "though background reduction alone is insufficient to beat anchor budgets without concurrent metadata and residual control."
+    )
+
+    return {
+        "hypothesis": "Fixed background/metadata costs consume most of the anchor budget.",
+        "alternative": "Correction dominates, so foreground/background prediction is the lever.",
+        "verdict": "SUPPORTED" if verdict_supported else "NOT_SUPPORTED",
+        "background_sufficiency_limit": {
+            "lowest_rung": r_low_name,
+            "total_bytes": tot_low,
+            "background_bytes": b_low,
+            "bytes_without_background": bytes_without_b,
+            "av1_anchor_rate_linear_bytes": av1_aq,
+            "vvc_anchor_rate_linear_bytes": vvc_aq,
+            "beats_anchor_without_background": b_alone_sufficient,
+            "sufficiency_note": (
+                f"At the saved lowest Federer rung ({r_low_name}), setting background bytes to zero leaves "
+                f"{bytes_without_b:,} B, which exceeds the local AV1 estimate ({av1_aq:,.1f} B) and "
+                f"VVC estimate ({vvc_aq:,.1f} B). Background work is relevant and necessary, but alone "
+                "cannot be assumed sufficient to beat the anchor."
+            ),
+        },
+        "regime_analysis": regime_analysis,
+        "ranked_interventions": interventions,
+        "promotion_verdict": {
+            "promote_background_coding_for_wave2": promote_b,
+            "rationale": promotion_rationale,
+        },
+    }
+
+
+def compute_runtime_scope(source_data: dict[str, Any]) -> dict[str, Any]:
+    """Compute dynamic runtime ranges and speed ratios strictly from input source data."""
+    ps_rungs = source_data.get("pointstream_rungs", [])
+    ps_enc = [
+        float(r["timing"]["encoder_seconds"])
+        for r in ps_rungs
+        if "encoder_seconds" in r.get("timing", {}) and r["timing"]["encoder_seconds"] is not None
+    ]
+    ps_cli = [
+        float(r["timing"]["client_seconds"])
+        for r in ps_rungs
+        if "client_seconds" in r.get("timing", {}) and r["timing"]["client_seconds"] is not None
+    ]
+
+    anchors = source_data.get("anchors", {})
+    av1_env = anchors.get("av1", {}).get("nondominated_envelope", [])
+    vvc_env = anchors.get("vvc", {}).get("nondominated_envelope", [])
+
+    def _extract_times(env: list[dict[str, Any]]) -> tuple[list[float], list[float]]:
+        encs: list[float] = []
+        clis: list[float] = []
+        for p in env:
+            t = p.get("timing", {})
+            enc_val = (
+                t.get("encode_seconds")
+                if t.get("encode_seconds") is not None
+                else t.get("encoder_seconds")
+            )
+            cli_val = (
+                t.get("client_seconds")
+                if t.get("client_seconds") is not None
+                else t.get("decode_seconds")
+            )
+            if enc_val is not None:
+                encs.append(float(enc_val))
+            if cli_val is not None:
+                clis.append(float(cli_val))
+        return encs, clis
+
+    av1_enc, av1_cli = _extract_times(av1_env)
+    vvc_enc, vvc_cli = _extract_times(vvc_env)
+
+    ps_enc_range = [round(min(ps_enc), 2), round(max(ps_enc), 2)] if ps_enc else []
+    ps_cli_range = [round(min(ps_cli), 2), round(max(ps_cli), 2)] if ps_cli else []
+    av1_enc_range = [round(min(av1_enc), 2), round(max(av1_enc), 2)] if av1_enc else []
+    av1_cli_range = [round(min(av1_cli), 2), round(max(av1_cli), 2)] if av1_cli else []
+    vvc_enc_range = [round(min(vvc_enc), 2), round(max(vvc_enc), 2)] if vvc_enc else []
+    vvc_cli_range = [round(min(vvc_cli), 2), round(max(vvc_cli), 2)] if vvc_cli else []
+
+    av1_ratio_min = (
+        round(min(ps_enc) / max(av1_enc), 1) if (ps_enc and av1_enc and max(av1_enc) > 0) else None
+    )
+    av1_ratio_max = (
+        round(max(ps_enc) / min(av1_enc), 1) if (ps_enc and av1_enc and min(av1_enc) > 0) else None
+    )
+    vvc_ratio_min = (
+        round(min(ps_enc) / max(vvc_enc), 1) if (ps_enc and vvc_enc and max(vvc_enc) > 0) else None
+    )
+    vvc_ratio_max = (
+        round(max(ps_enc) / min(vvc_enc), 1) if (ps_enc and vvc_enc and min(vvc_enc) > 0) else None
+    )
+
+    ratio_strs: list[str] = []
+    if av1_ratio_min is not None and av1_ratio_max is not None:
+        ratio_strs.append(f"{av1_ratio_min}x–{av1_ratio_max}x slower than SVT-AV1")
+    if vvc_ratio_min is not None and vvc_ratio_max is not None:
+        ratio_strs.append(f"{vvc_ratio_min}x–{vvc_ratio_max}x slower than VVC")
+
+    speed_ratio_desc = (
+        f"PointStream encoder is {' and '.join(ratio_strs)}."
+        if ratio_strs
+        else "Speed ratio not computable from available timing data."
+    )
+
+    return {
+        "pointstream_encoder_seconds_range": ps_enc_range,
+        "pointstream_client_seconds_range": ps_cli_range,
+        "av1_encoder_seconds_range": av1_enc_range,
+        "av1_client_seconds_range": av1_cli_range,
+        "vvc_encoder_seconds_range": vvc_enc_range,
+        "vvc_client_seconds_range": vvc_cli_range,
+        "speed_ratio_vs_anchor": speed_ratio_desc,
+        "av1_encoder_speed_ratio_range": [av1_ratio_min, av1_ratio_max]
+        if av1_ratio_min is not None
+        else None,
+        "vvc_encoder_speed_ratio_range": [vvc_ratio_min, vvc_ratio_max]
+        if vvc_ratio_min is not None
+        else None,
+        "runtime_caveats": [
+            "PointStream encoder time excludes upstream detection, actor segmentation, and pose estimation preprocessing.",
+            "PointStream client time includes disk I/O and reconstruction, but excludes candidate generation inference.",
+            "Anchor timing includes full FFmpeg/SvtAv1/Vvenc decode and RGB frame extraction.",
+            "Timings reflect development GPU/CPU runs and do not represent live streaming frontiers.",
+        ],
+        "provenance_limitations": [
+            "Source-level n=2; Alcaraz is unscorable under the 10-point span floor, leaving n=1 scorable source (Federer).",
+            "No population ranking or standard error can be estimated from n=1.",
+            "Spatial attribution across foreground/background/boundary error is unavailable due to missing decoded frame bitmaps.",
+        ],
+    }
+
+
+def run_byte_diagnosis(
+    input_dir: Path, output_json: Path | None = None, fps: float = 24.0
+) -> dict[str, Any]:
     """Execute complete byte diagnosis workflow."""
     # 1. Provenance triage
     provenance = verify_provenance(input_dir)
@@ -468,65 +822,11 @@ def run_byte_diagnosis(input_dir: Path, output_json: Path | None = None) -> dict
         "note": "Per protocol, no global BD-rate is computed or cited for Alcaraz.",
     }
 
-    # 7. Synthesis & Ranked Interventions
-    # Determine hypothesis verdict
-    # Hypothesis: Fixed background/metadata costs consume most of the anchor budget.
-    # Alternative: Correction dominates, so foreground/background prediction is the lever.
-    hypothesis_evaluation = {
-        "hypothesis": "Fixed background/metadata costs consume most of the anchor budget.",
-        "alternative": "Correction dominates, so foreground/background prediction is the lever.",
-        "verdict": "SUPPORTED",
-        "regime_analysis": {
-            "low_rate_regime (R63-R48)": "Hypothesis strongly supported. Fixed background B (529,361 B, 75.6% of R63) plus metadata M (70,609 B) equals 599,970 B, which exceeds the entire AV1 anchor budget (110,842 B) by 5.4x and VVC anchor budget (130,906 B) by 4.6x. Remaining budget A(q)-B-M-H is negative (-489,128 B). Even if residual R=0 and actor F=0, base PointStream overhead exceeds anchor budgets by >4.5x.",
-            "high_rate_regime (H0-H3)": "Alternative hypothesis becomes active in high rungs as residual explodes from 648,390 B (H0, 50.7%) to 3,015,612 B (H3, 82.7%), exceeding anchor budgets (~230 kB to ~380 kB) by up to 8x. However, residual optimization is moot without fixing the background floor: base overhead (B+M+F=630 kB) exceeds the anchor's highest quality rate (~377 kB).",
-        },
-        "ranked_interventions": [
-            {
-                "rank": 1,
-                "target": "Background representation (B)",
-                "current_cost": "529,361 B (48 frames @ 4K = 11,028 B/frame = 88.2 kbps)",
-                "action": "PROMOTE background coding for Wave 2. Evaluate Lane C background probes: downscaled plate, still frame with identity geometry, and streaming low-delay VVC plate (which achieved 6-40 kB in Gate A). Without reducing B below ~50 kB, PointStream cannot beat anchors at any quality.",
-            },
-            {
-                "rank": 2,
-                "target": "Residual coding efficiency (R)",
-                "current_cost": "69,936 B (R63) to 3,015,612 B (H3)",
-                "action": "Improve base predictor quality to curb exponential residual demand in H0-H3 once background is compact. Investigate foreground placement and motion compensation before full-frame residual encoding.",
-            },
-            {
-                "rank": 3,
-                "target": "Metadata transport compaction (M)",
-                "current_cost": "70,609 B (10.1% at R63; ~64% of entire AV1 budget at R63)",
-                "action": "Compress camera homographies, bounding boxes, and keypoints into compact binary representation (<5 kB). While secondary to B (529 kB), 70 kB is a non-trivial chunk of the ~110 kB low-rate anchor budget.",
-            },
-        ],
-        "promotion_verdict": {
-            "promote_background_coding_for_wave2": True,
-            "rationale": "Plausible savings from background representation are substantial and necessary: B accounts for 89.8% of the required byte reduction at R63. Background coding is the essential structural prerequisite before residual or metadata optimization can yield an overall win.",
-        },
-    }
+    # 7. Synthesis & Ranked Interventions (dynamic)
+    hypothesis_evaluation = evaluate_hypothesis_and_interventions(federer_analysis, fps=fps)
 
-    # 8. Runtime scope & limitations
-    runtime_scope = {
-        "pointstream_encoder_seconds_range": [257.1, 627.5],
-        "pointstream_client_seconds_range": [8.0, 36.3],
-        "av1_encoder_seconds_range": [1.45, 4.98],
-        "av1_client_seconds_range": [5.0, 8.72],
-        "vvc_encoder_seconds_range": [2.17, 76.43],
-        "vvc_client_seconds_range": [5.71, 9.26],
-        "speed_ratio_vs_anchor": "PointStream encoder is 50x-150x slower than SVT-AV1 preset 8 and 8x-20x slower than VVC medium.",
-        "runtime_caveats": [
-            "PointStream encoder time excludes upstream detection, actor segmentation, and pose estimation preprocessing.",
-            "PointStream client time includes disk I/O and reconstruction, but excludes candidate generation inference.",
-            "Anchor timing includes full FFmpeg/SvtAv1/Vvenc decode and RGB frame extraction.",
-            "Timings reflect development GPU/CPU runs and do not represent live streaming frontiers.",
-        ],
-        "provenance_limitations": [
-            "Source-level n=2; Alcaraz is unscorable under the 10-point span floor, leaving n=1 scorable source (Federer).",
-            "No population ranking or standard error can be estimated from n=1.",
-            "Spatial attribution across foreground/background/boundary error is unavailable due to missing decoded frame bitmaps.",
-        ],
-    }
+    # 8. Runtime scope & limitations (dynamic)
+    runtime_scope = compute_runtime_scope(federer_source)
 
     waterfall_md = generate_waterfall_table(federer_analysis)
 
@@ -571,10 +871,16 @@ def main() -> None:
         ),
         help="Path to write machine-readable component budget",
     )
+    parser.add_argument(
+        "--fps",
+        type=float,
+        default=24.0,
+        help="Frame rate in fps for bitrate calculations (default: 24.0)",
+    )
     args = parser.parse_args()
 
-    print(f"Running byte diagnosis on {args.input_dir}...")
-    res = run_byte_diagnosis(args.input_dir, args.output_json)
+    print(f"Running byte diagnosis on {args.input_dir} (fps={args.fps})...")
+    res = run_byte_diagnosis(args.input_dir, args.output_json, fps=args.fps)
     print(f"Saved component budget to {args.output_json}")
     print("\n--- WATERFALL SUMMARY TABLE ---")
     print(res["waterfall_markdown_table"])
