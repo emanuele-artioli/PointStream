@@ -1,5 +1,13 @@
 # Generation Area
 
+## Current acquisition / integration review
+
+E02R `b7c4d16` has real full-trajectory execution and corrected initialization/
+intra-epoch writes, but required repeat/no-conditioning and actual trainer update
+resume remain unproved. E02S owns that bounded acceptance; Cursor owns adapters.
+Do not promote raw fixed-QP residual bytes into a matched-quality win. E05 remains
+unreleased, with deferred/offline model families preserved.
+
 ## Coordinator follow-up — E01/E02
 
 Coordinator review of #105 (`2f63ae1`): implementation partial; E05 not released.

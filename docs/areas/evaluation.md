@@ -1,5 +1,13 @@
 # Evaluation Area
 
+## Current acquisition / integration review
+
+E03A now gives Cursor sole ownership of result adapter and reader. #104 head
+`7e4da6e` CI passes, but default validated ingestion admits infinite quality,
+negative bytes and dict-valued failed controls in a reproduced case. Stored E02R
+record fails the current contract. Fix these boundaries, re-adapt existing output
+and prepare anchors; no broad new run required. See campaign current dispatch.
+
 ## Coordinator follow-up — E01/E02
 
 Coordinator review: E01 #104 (`b87daf51`) is not yet accepted. Inventory is
