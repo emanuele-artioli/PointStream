@@ -17,21 +17,21 @@ policy. The September 12 handoff/audit are historical context, not dispatches.
 | [Infrastructure](docs/areas/infrastructure.md) | Existing detached monitoring; verify host availability at each launch | Per-host CPU <=90% available; any free GPU; no cleanup helper |
 | [Paper](docs/areas/paper.md) | Separate repo; no new competitive evidence certified by repairs | E08 setup/structure early, final claims after accepted results |
 
-## Current assignments after coordinator review
+## Current assignments after acquisition / R0 / E02R review
 
-| Task | Owner | State | Scope |
-|---|---|---|---|
-| [E01R](docs/workflow/session/evaluation-campaign/tasks/01r-contract-and-acquisition.md) | Cursor | Ready | Correct claim ingestion in #104; acquire reserved trio without scoring |
-| [E02R](docs/workflow/session/evaluation-campaign/tasks/02r-readiness-evidence.md) | Antigravity | Ready | Real adapter/control integration, residual-off path, checkpoint/resume proof |
-| [R0](docs/workflow/session/evaluation-campaign/tasks/00-resource-claims.md) | Antigravity subagent | Ready, separate worktree | Atomic host/device and aggregate CPU claims before GPU probe |
+| Owner | Assignment | State |
+|---|---|---|
+| Cursor | [E03A](docs/workflow/session/evaluation-campaign/tasks/03a-contract-to-anchors.md) | Sole adapter/contract ownership; close integration and prepare anchors |
+| Antigravity subagent | [R0R](docs/workflow/session/evaluation-campaign/tasks/00r-claim-lifecycle.md) | Correct reproduced claim ownership/child-lifecycle defects |
+| Antigravity | [E02S](docs/workflow/session/evaluation-campaign/tasks/02s-training-and-controls.md) | Actual trainer resume and missing real controls; adapter handed to Cursor |
 
-E01 inventory/count target accepted in part; schema/evidence acceptance pending.
-E02 #105 merged and CI passed, but real neural readiness is not established.
-Three fresh confirmation matches accepted as a target/shortlist; acquired count
-remains zero. The two old scored matches stay exposed. See the campaign's
-coordinator decision and scoped corrections; do not repeat the entire audit.
-E03/E04 can prepare CPU inputs/tools, with measured probes after contract and
-resource acceptance. E05 remains gated on actual readiness. No experiment jobs
-launched by this coordinator review. Workers return here for the next assignment.
+Three reserved matches acquired; media/report/log hashes independently verified.
+Eligibility remains pending and no confirmation scoring reported. Cursor #104
+head `7e4da6e` passes CI but production evidence ingestion still needs fixes.
+R0 `d39893c` and E02R `b7c4d16` remain unmerged/unaccepted; no open PR for either
+at review time. Full-trajectory execution is supported, complete readiness is not.
 
-Gate A remains open and confirmation incomplete. Only coordinator edits this index.
+Do not repeat acquisition or the full five-corner diagnostic. E03/E04 CPU
+preparation proceeds; measured probes follow contract/resource acceptance here.
+E05 remains gated on actual neural learning/resume and controls. Gate A open,
+confirmation incomplete; no GPU jobs launched by this coordinator review.
