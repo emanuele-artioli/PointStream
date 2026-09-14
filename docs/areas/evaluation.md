@@ -15,6 +15,7 @@ is a diagnostic exclusion; sustained live for finalists is 30 s after startup
 plus four refresh cycles. Confirmation policy no longer falls back to the two
 exposed Gate B sources. E02 adapter dicts are mapped by
 `campaign_record_from_generation_adapter`; trajectory is not generalization.
+Reserved confirmation windows: acquired 3, eligible 0, unscored.
 
 ## Current campaign — 14 September 2026
 

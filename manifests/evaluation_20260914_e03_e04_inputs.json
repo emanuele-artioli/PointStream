@@ -12,6 +12,7 @@
     "contract_revision": "e01r-20260914",
     "example_records": "manifests/evaluation_20260914_result_contract.example.json",
     "e02_producer_examples": "manifests/evaluation_20260914_e02_producer.example.json",
+    "e01r_acquisition_pointer": "manifests/evaluation_20260914_e01r_acquisition.json",
     "protocol_module": "experiments.tier.protocol",
     "result_module": "experiments.tier.campaign_result",
     "required_matches_loader": "experiments.tier.source_count_policy.load_required_matches"

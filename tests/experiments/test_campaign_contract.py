@@ -272,6 +272,7 @@ def test_e03_e04_and_split_manifests_load() -> None:
         "evaluation_20260914_operating_points.json",
         "evaluation_20260914_result_contract.example.json",
         "evaluation_20260914_e02_producer.example.json",
+        "evaluation_20260914_e01r_acquisition.json",
     ):
         payload = json.loads((repo / "manifests" / name).read_text(encoding="utf-8"))
         assert "schema" in payload

@@ -99,7 +99,7 @@
       {"video": "alcaraz_perricard", "scene": "scene_003"}
     ],
     "match_grouping": "video_or_match_id; scenes from one match count once",
-    "replay_check": "Reject confirmation candidate IDs and the two exposed Gate B source_ids. alcaraz_highlights remains a compilation and development-only. Do not train on reserved confirmation files if they later appear on disk."
+    "replay_check": "Reject confirmation candidate IDs, files under assets/confirmation_raw/e01r/, and the two exposed Gate B source_ids. alcaraz_highlights remains a compilation and development-only."
   },
   "exposed_confirmation_not_holdout": {
     "role": "already_scored_restricted_confirmation",
@@ -124,16 +124,17 @@
     ]
   },
   "confirmation_reserved_unacquired": {
-    "role": "untouched_confirmation_pending_acquisition",
+    "role": "acquired_windows_pending_eligibility_and_freeze",
     "selected_count": 3,
-    "acquired_count": 0,
+    "acquired_count": 3,
     "eligible_count": 0,
-    "selection_basis": "Coordinator accepted three fresh independent matches as the prospective target and reserved these primary IDs. This is a target/shortlist, not acquisition, eligibility, or scientific confirmation.",
+    "selection_basis": "Coordinator accepted three fresh independent matches as the prospective target. Bounded 15-minute windows are on disk. Event identities, overlap, provenance and accessibility were recorded. This is not confirmation eligibility or a scientific freeze. No confirmation scores.",
     "candidates": [
       "conf_cand_01_sinner_medvedev_ao2024",
       "conf_cand_04_medvedev_djokovic_usopen2023",
       "conf_cand_05_swiatek_sabalenka_madrid2024"
     ],
+    "acquisition_pointer": "manifests/evaluation_20260914_e01r_acquisition.json",
     "alternates_if_rights_fail": [
       "conf_cand_06_djokovic_ruud_rg2023",
       "conf_alt_03_nadal_medvedev_ao2022"
@@ -143,7 +144,7 @@
       "conf_alt_02_alcaraz_djokovic_wimbledon2023"
     ],
     "do_not_substitute_exposed_gate_b": true,
-    "on_disk_fresh_untouched_count": 0
+    "on_disk_fresh_untouched_count": 3
   },
   "secondary_domain": {
     "status": "inventory_only_do_not_score",
