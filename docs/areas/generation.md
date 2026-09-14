@@ -1,5 +1,14 @@
 # Generation Area
 
+## Current campaign — 14 September 2026
+
+E02/E05 in the [campaign](../workflow/session/evaluation-campaign/plan.md) supersede
+older dispatch restrictions. PR #102 repairs the identified boundary paths;
+full-trajectory evaluation and training readiness still need verification.
+Low-resolution staged training can run alongside background work after evaluator
+and split readiness. At least one neural model must clear declared baselines;
+then prioritize writing and keep further improvements bounded.
+
 **Evidence Revision**: Reconciled through PR #28 (`66da545dcf`) and PR #72.
 **Owned Scope**: Generative backends (`src/components/generation/`), ControlNet, IP-Adapter, Animate-Anyone, SVD, generator dispatch.
 

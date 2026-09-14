@@ -36,12 +36,24 @@ When initiating or handing off a task:
    - **Acceptance Criteria**: Concrete commands and verification gates (see [setup verification](../../setup.md#4-verification)).
    - **Bounds & Controls**: Pre-run bounds for experiment runs; null controls.
 
-For new research work, use [hypothesis-driven experiment design](../experiment-design.md): require a decision card, reuse existing evidence, and launch the smallest discriminating probe. The [older submission dispatch](submission-search.md) is historical repair context; do not automatically rerun its waves or budget.
+For new research work, use [hypothesis-driven experiment design](../experiment-design.md).
+Before scheduling any new run, inspect existing result indexes, folder classifications,
+manifests, saved decodes and prior validity decisions. Record the exact question,
+matching artifact IDs, what can be reused/rescored, and the remaining evidence gap
+in the decision card. Check actual configs rather than filenames. Missing timing
+alone does not require repeating a rate/quality experiment: link statistically
+adequate representative timing for compatible workloads/hardware, or profile
+only the missing stratum. Never upgrade old evidence merely because code was
+repaired. Launch only the smallest probe that fills the documented gap. The
+[older submission dispatch](submission-search.md) is historical repair context;
+do not automatically rerun its waves or budget.
 
 ### Long jobs
 
-Use [the long-job workflow](../long-jobs.md). Ask once for reporting cadence unless
-already supplied. Delegate health checks and ten-minute logging to the script;
+Use [the long-job workflow](../long-jobs.md). Use an already supplied reporting
+cadence; otherwise ask once. The September evaluation campaign uses actionable
+events, without periodic chat digests. Delegate health checks and ten-minute
+logging to the script;
 wake the agent only for requested digests or actionable events. Use bounded
 pilot/confirmation gates before expensive codec stages. Do not create a periodic
 agent polling loop. Training subset stages remain a protocol until its evaluator

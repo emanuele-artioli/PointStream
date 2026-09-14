@@ -1,5 +1,14 @@
 # Evaluation Area
 
+## Current campaign — 14 September 2026
+
+E01/E03/E06 now follow the [campaign](../workflow/session/evaluation-campaign/plan.md).
+PR #100 repairs byte analysis and #102 repairs result/pose/checkpoint boundaries
+at code baseline `3810a56`; this advances EVAL-ACT-11 implementation, not old
+artifact validity or gate passage. Inventory eligibility by claim, reuse existing
+RD and statistically adequate compatible timing, and rerun only documented gaps.
+Older assignments/status below are historical where they conflict.
+
 **Evidence Revision**: Audit of PR #83–#85 / `d4252b5`, 2026-09-09.
 **Owned Scope**: `src/pipeline/reconstruction/quality.py`, `experiments/tier/`, `src/contracts/lattice.py`.
 

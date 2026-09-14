@@ -1,5 +1,14 @@
 # Data Area
 
+## Current campaign — 14 September 2026
+
+E01/E07 follow the [campaign](../workflow/session/evaluation-campaign/plan.md).
+The user permits fewer than six independent confirmation matches to meet the
+submission objective. Six remains preferred; select and record the largest
+feasible untouched set prospectively, with explicit small-sample limitations and
+matching manifest/verifier policy before scoring. Old source exposure remains.
+Secondary-domain evaluation stays required, after the tennis advantage.
+
 **Evidence Revision**: Reconciled through PR #63 (`5ca87b2ee4`) and PR #72.
 **Owned Scope**: Data acquisition, manifest definitions, eligibility criteria, sequence splits, domain definitions.
 
@@ -46,7 +55,10 @@ Distinguish three operations:
 - **Per-video encoding:** fitting a background or a video-specific model on the very frames being compressed is legitimate when it is part of the fixed encoding algorithm. Count transmitted parameters, references, metadata and adaptation time; a standalone decoder must not read source frames or untransmitted fitted state. Offline use of future frames must be declared and matched in comparisons. This is the setting used by [NeRV](https://proceedings.nips.cc/paper/2021/file/b44182379bf9fae976e6ae5996e13cd8-Paper.pdf).
 - **Generalization evaluation:** hold out at the level named by the claim. New matches require match-level separation. Disjoint scenes within every source can support a narrower “new scenes from known broadcasts” claim, but shared courts, players, lighting, and replay footage make them dependent. Use contiguous scene blocks, temporal gaps, replay/duplicate exclusion, separate validation and final test blocks, and source-level uncertainty. Do not retrospectively call already-inspected scenes untouched. Group separation follows the rationale in [grouped cross-validation](https://scikit-learn.org/stable/modules/cross_validation.html#cross-validation-iterators-for-grouped-data).
 
-Recommended path: use all seven already-exposed sources for Gate A development and any shared-model fitting; preserve the fresh match candidates for final confirmation. Audit their actual prior use before accepting them. Optional within-source holdouts are supplementary, with the narrower claim explicit. If fresh independent sources are unavailable, record the deficit rather than silently weakening Gate B. A revised gate needs an explicit protocol decision plus matching manifest/verifier changes before scoring.
+Recommended path: use all seven already-exposed sources for Gate A development and any shared-model fitting; preserve the fresh match candidates for final confirmation. Audit their actual prior use before accepting them. Optional within-source holdouts are supplementary, with the narrower claim explicit. The September 14 user decision permits a smaller fresh-match count. Record the
+selected count and uncertainty limitations prospectively and use matching
+manifest/verifier policy before scoring; if no fresh sources are available,
+report the deficit rather than relabel exposed content.
 
 Grouped outer cross-validation can use each source for training in other folds and testing once, with tuning confined to inner folds. It costs multiple fits and cannot erase prior manual design exposure to these seven videos; here it is a robustness analysis, not fresh confirmation.
 

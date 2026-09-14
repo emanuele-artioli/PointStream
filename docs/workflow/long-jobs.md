@@ -2,7 +2,11 @@
 
 ## Launch and reporting policy
 
-Ask once at launch for reporting preference unless it is already known. Reuse
+Use the September evaluation campaign
+[allocation and reporting policy](session/evaluation-campaign/plan.md#shared-servers-and-timing-evidence)
+for its jobs: opportunistic free GPUs, aggregate per-host CPU cap, bounded stages,
+and actionable-event reporting. For other jobs, ask once at launch for reporting
+preference unless it is already known. Reuse
 that answer for the job. The fallback is file logging plus actionable events;
 periodic chat reports require an explicit schedule. Ten-minute progress logging
 is independent of chat reporting and hourly checkpointing.

@@ -1,5 +1,15 @@
 # Paper Area
 
+## Current campaign — 14 September 2026
+
+E08 follows the [campaign](../workflow/session/evaluation-campaign/plan.md): setup,
+anchors, backgrounds/removal, foreground/training, residual, assembled codec and
+domain limits. Setup/structure and accepted component prose may proceed early;
+final advantage claims require confirmed evidence. Once a neural foreground
+model clears its baselines, prioritize writing over optional model improvements.
+Code-side figures use one eligible-result reader; manuscript remains a separate
+repo. The September 20 evidence freeze is provisional, submission September 30.
+
 **Evidence Revision**: Paper `55e4bc4`; code Gate A/B audit through PR #85, 2026-09-09.
 **Owned Scope**: Code-side evidence delivery (`outputs/`), publication tables/plots, coordination with manuscript repository (`67a9ea6275d3d9785ce57026/`).
 
