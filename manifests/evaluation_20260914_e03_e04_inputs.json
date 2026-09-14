@@ -1,0 +1,63 @@
+{
+  "schema": "pointstream.campaign_e03_e04_inputs.v1",
+  "doc_role": "e03_e04_input_manifest",
+  "campaign": "evaluation-20260914",
+  "status": "proposed_pending_e01_acceptance",
+  "contracts": {
+    "source_split": "manifests/evaluation_20260914_source_split.json",
+    "source_count_policy": "manifests/evaluation_20260914_source_count_policy.json",
+    "operating_points": "manifests/evaluation_20260914_operating_points.json",
+    "reuse_map": "manifests/evaluation_20260914_reuse_map.json",
+    "result_schema": "pointstream.campaign_result.v1",
+    "example_records": "manifests/evaluation_20260914_result_contract.example.json",
+    "protocol_module": "experiments.tier.protocol",
+    "result_module": "experiments.tier.campaign_result",
+    "required_matches_loader": "experiments.tier.source_count_policy.load_required_matches"
+  },
+  "e03": {
+    "task": "anchors_and_timing",
+    "first_batch": {
+      "sources": [
+        {"video": "alcaraz_highlights", "scene": "scene_000", "split": "development"},
+        {"video": "federer_djokovic", "scene": "scene_007", "split": "development"}
+      ],
+      "operating_point_id": "display_low",
+      "colour_path_id": "broadcast_yuv420",
+      "anchors": ["svt-av1-slowest-supported", "vvc-slowest-supported"],
+      "neural_anchor": "dcvc_uf_if_available_else_return_blocker"
+    },
+    "reuse": ["gate_a_vvc_webp_n96_run2", "wave2_overlap_20260910", "dev_recovery_pilot_frozen"],
+    "emit": "campaign_result.v1 rows with claim_eligibility.rd vs runtime split"
+  },
+  "e04": {
+    "task": "background_representation_and_removal",
+    "first_batch": {
+      "sources": [
+        {"video": "federer_djokovic", "scene": "scene_007", "camera_regime": "established_diagnostic"},
+        {"video": "alcaraz_highlights", "scene": "scene_010", "camera_regime": "hard_smooth_pan"}
+      ],
+      "operating_point_id": "display_low",
+      "representations": ["still", "panorama", "per_frame_video"],
+      "removal": ["off", "on_temporal_telea"],
+      "residual": false,
+      "foreground": "paste_fixed"
+    },
+    "reuse": ["wave2_background_probe as removal_on_only", "bp30_mode_comparison as plate_reference_policy_not_representation", "bp52_background_crf as rate_axis"],
+    "must_not": "relabel cleaned-stack probe as removal-off"
+  },
+  "e02_runner_interface": {
+    "do_not_edit_e02_files_from_e01": true,
+    "expected_fields_on_generation_rows": [
+      "artifact_id",
+      "source_ids",
+      "frame_ids",
+      "checkpoint_sha256",
+      "backend_identity",
+      "standalone_decode",
+      "wire_ledger",
+      "claim_eligibility",
+      "controls.normal_vs_shuffled_conditioning"
+    ],
+    "full_trajectory_claim": "generalization plus rd; 16-frame first-frame diagnostics remain ineligible"
+  }
+}

@@ -9,6 +9,15 @@ artifact validity or gate passage. Inventory eligibility by claim, reuse existin
 RD and statistically adequate compatible timing, and rerun only documented gaps.
 Older assignments/status below are historical where they conflict.
 
+**E01 protocol (proposed, pending coordinator acceptance).** Reuse map, source
+split, operating-point contract and `pointstream.campaign_result.v1` live under
+`manifests/evaluation_20260914_*.json`. Independent-match count is loaded from
+`experiments.tier.source_count_policy` (confirmation **3**, preferred 6, development
+pilot 2). Plot ingest is `experiments.tier.campaign_result.ingest_for_claim`.
+No historical artifacts were moved. The known background probe is removal-on
+(cleaned/filled stack with Telea holes). Gate B's two sources stay exposed, not
+untouched holdouts. Wait for coordinator acceptance before E03.
+
 **Evidence Revision**: Audit of PR #83–#85 / `d4252b5`, 2026-09-09.
 **Owned Scope**: `src/pipeline/reconstruction/quality.py`, `experiments/tier/`, `src/contracts/lattice.py`.
 

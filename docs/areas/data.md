@@ -9,6 +9,14 @@ feasible untouched set prospectively, with explicit small-sample limitations and
 matching manifest/verifier policy before scoring. Old source exposure remains.
 Secondary-domain evaluation stays required, after the tennis advantage.
 
+**E01 split (proposed).** Seven BP46 videos remain development. The two acquired
+Gate B matches are already scored and are not a holdout. Three unacquired primary
+candidates are reserved as the prospective confirmation set (`required_matches=3`,
+small-sample limits in `manifests/evaluation_20260914_source_count_policy.json`).
+On-disk untouched confirmation count is currently 0. Scene easy/hard splits use
+camera MAD, not quality scores. Occlusion is unused in BP46 (`has_occlusion` is
+false on all 53 scenes). Coordinator must accept the count before freeze.
+
 **Evidence Revision**: Reconciled through PR #63 (`5ca87b2ee4`) and PR #72.
 **Owned Scope**: Data acquisition, manifest definitions, eligibility criteria, sequence splits, domain definitions.
 

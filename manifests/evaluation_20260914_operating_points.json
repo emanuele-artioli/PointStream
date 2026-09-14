@@ -1,0 +1,99 @@
+{
+  "schema": "pointstream.campaign_operating_points.v1",
+  "doc_role": "operating_point_colour_restoration_live_contract",
+  "campaign": "evaluation-20260914",
+  "status": "proposed_pending_coordinator_acceptance",
+  "display_endpoints": {
+    "low": {
+      "id": "display_low",
+      "short_edge_px": 360,
+      "fps": 12.0,
+      "upsample": false,
+      "create_extra_source_frames": false,
+      "if_source_below_endpoint": "choose_a_genuinely_lower_supported_value_and_record_it",
+      "preserve_aspect_ratio": true,
+      "record_padding_alignment": true
+    },
+    "high": {
+      "id": "display_native",
+      "spatial": "native_source_resolution",
+      "fps": "native_source_fps",
+      "upsample": false,
+      "create_extra_source_frames": false
+    },
+    "finalist_corners": [
+      "low_spatial_native_fps",
+      "native_spatial_low_fps"
+    ]
+  },
+  "learning_crop": {
+    "id": "generator_crop_256",
+    "width": 256,
+    "height": 256,
+    "note": "Training and per-object generator inference crop. Distinct from displayed output resolution. Do not treat a 256 crop as a 360p or 4K codec operating point."
+  },
+  "colour_paths": {
+    "select_two_valid_paths": true,
+    "paths": [
+      {
+        "id": "broadcast_yuv420",
+        "pixel_format": "yuv420p",
+        "matrix": "bt709",
+        "primaries": "bt709",
+        "transfer": "bt709",
+        "range": "as_tagged_on_source",
+        "bit_depth": 8,
+        "note": "Matches BP46 source_metadata for the 4K tennis files."
+      },
+      {
+        "id": "high_fidelity_rgb",
+        "pixel_format": "rgb24",
+        "matrix": "identity_rgb",
+        "range": "full",
+        "bit_depth": 8,
+        "note": "Internal pipeline path. Do not silently equate with 4:2:0 reconstructions."
+      }
+    ],
+    "unsupported_recorded_not_reinterpreted": true
+  },
+  "restoration": {
+    "native_operating_point_quality": "report_separately",
+    "common_display": {
+      "spatial_filter": "lanczos",
+      "temporal_policy": "drop_or_hold_existing_source_timestamps_never_synthesize_frames",
+      "charge_rescaling_time_and_quality_loss": true
+    },
+    "no_cross_fps_bd_rate_on_different_frame_sets": true
+  },
+  "quality_policy": {
+    "frozen_on": "development_evidence_and_frozen_procedure_not_confirmation_winners",
+    "metric_priority": ["vmaf", "psnr_y", "ssim", "lpips"],
+    "tier1_search": ["psnr_y"],
+    "tier2_paper": ["psnr_y", "ssim", "vmaf", "lpips"],
+    "practical_quality_floor": {
+      "vmaf": 20.0,
+      "rationale": "Development Gate A/B audits recorded VMAF-zero rungs that cannot carry a quality claim. Floor excludes that plateau before winner selection. SSIM/PSNR must be finite."
+    },
+    "matched_comparison": "matched_rate_or_matched_quality_with_source_level_uncertainty"
+  },
+  "latency_policy": {
+    "application_ceiling_ms_after_startup": 250,
+    "definition": "working_target_not_universal",
+    "live": "causal_or_declared_bounded_lookahead_stable_queues_end_to_end_sender_latency_on_named_hardware",
+    "playback": "client_meets_source_cadence_including_decode_render_residual",
+    "report": ["warm_throughput", "p95_latency", "cold_startup_lookahead", "memory", "n", "uncertainty"]
+  },
+  "sustained_live_test": {
+    "required_for": "finalists_only",
+    "min_duration_seconds": 8.0,
+    "min_refresh_cycles": 4,
+    "must_exceed": ["startup", "temporal_context"],
+    "backlog_over_time": true,
+    "short_scene_probes_cannot_establish_sustained_live": true
+  },
+  "screening": {
+    "min_rate_points": 2,
+    "finalist_overlapping_rate_points": 4,
+    "first_probe_cap": {"configs": 6, "minutes_including_scoring": 30}
+  }
+}

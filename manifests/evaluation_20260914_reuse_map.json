@@ -1,0 +1,134 @@
+{
+  "schema": "pointstream.campaign_reuse_map.v1",
+  "doc_role": "question_to_artifact_reuse_map",
+  "campaign": "evaluation-20260914",
+  "status": "inventory_complete_no_archive_move",
+  "index_note": "No universal eligibility index exists. candidate_inventory.json is a backend roster. BP26 classification is config wiring. Existing folder classifications are used as pointers with claim-scoped flags.",
+  "bounds_before_metrics": {
+    "written_before_headline_scores": true,
+    "bands": {
+      "reuse_count": "Expect some RD rows reusable as development diagnostics and none automatically certified by later code repairs. Best: several claim-scoped reusable pointers. Worst: every historical report invalid for all claims.",
+      "removal_off_coverage": "Expect the known three-mode probe to be removal-on only. Best: reusable removal-on geometry. Worst: unusable even for removal-on.",
+      "confirmation_fresh_on_disk": "Expect 0 untouched confirmation files. Best: unused YouTube shortlist of four remaining primaries. Worst: no acquireable rights."
+    }
+  },
+  "questions": [
+    {
+      "question_id": "anchors_rd",
+      "question": "AV1 and VVC (and later a neural codec) rate-quality on shared source frames",
+      "artifacts": [
+        {
+          "artifact_id": "gate_a_vvc_webp_n96_run2",
+          "path": "outputs/gate-a-vvc-webp-n96-run2/report.json",
+          "sha256": "71d82a51c6bf831c6a336d12a2cb05b1496912caa17a702b9e490f28380d939a",
+          "decision": "reuse",
+          "incompatibility": "Development source only; audited as non-citable for Gate A pass. Timing is instrument-specific, not live latency."
+        },
+        {
+          "artifact_id": "dev_recovery_pilot_frozen",
+          "path": "outputs/development-recovery/pilot-frozen/report.json",
+          "sha256": "fc9b87a331db6044bc592b749fd037a0332d333b5fa1f53f2e556f49856298dd",
+          "decision": "reuse",
+          "incompatibility": "pilot_alarms_clear=false; identity/evidence unverified. Keep as RD diagnostic, exclude speed and confirmation."
+        },
+        {
+          "artifact_id": "wave2_overlap_20260910",
+          "path": "outputs/development-recovery/wave2-overlap-20260910/report.json",
+          "sha256": "48cf7b20a1a29ac958a8eac3972b381f848439003f02d0b1222de8221f81643b",
+          "decision": "reuse",
+          "incompatibility": "identity_verified=false; evidence_verified=false. Generation off, 48 frames. Usable as development RD if controls are rechecked, not as confirmation."
+        },
+        {
+          "artifact_id": "gate_b_confirmation_report",
+          "path": "outputs/gate-b-confirmation/report.json",
+          "sha256": "2ca12092f0e440ce19d8772b35739b004f4c57f187ca7860c1b8eb23b695ba2e",
+          "decision": "rescore_or_exclude_from_untouched",
+          "incompatibility": "Two already-scored sources at 1080p/720p, 48 frames, mixed presets vs Gate A. Not six matches. Not a holdout."
+        }
+      ]
+    },
+    {
+      "question_id": "background_removal_off",
+      "question": "Still / panorama / per-frame video with actor pixels left in the input stack",
+      "artifacts": [
+        {
+          "artifact_id": "wave2_background_probe",
+          "path": "outputs/development-recovery/wave2-background-probe/probe_report.json",
+          "sha256": "c12b490085cb197ddcb26eabbd36e4ded846446418fe7d15d47dacda7851f3b7",
+          "decision": "new_run_for_removal_off",
+          "incompatibility": "Script build_common_cleaned_stack always fills player masks from a temporal plate and Telea-inpaints remaining holes. Saved stats show inpaint_frames=0 but removal still ran. This is removal-on, not off. Representations are still_frame0 / registered_panorama / cleaned_video on the cleaned stack."
+        },
+        {
+          "artifact_id": "bp30_mode_comparison",
+          "path": "outputs/bp30-background/mode-comparison.json",
+          "sha256": "f75ea16514922ecbcdf72e67b675174f00edeb4e443cb35c8584e94b79108db7",
+          "decision": "reuse_with_caveat",
+          "incompatibility": "Modes are plate reference policies (best-scored vs first vs related), not still/panorama/cleaned-video representations and not a removal axis."
+        },
+        {
+          "artifact_id": "bp52_background_crf",
+          "path": "outputs/bp52-background-crf/background-search.json",
+          "sha256": "2e0ceb6d301a6ff4d05a5514e54372b72f8193414b37563f7794b85492547993",
+          "decision": "reuse",
+          "incompatibility": "CRF search on the BP49 pair, not a representation×removal matrix. May inform rate points after identity check. Code repairs after this run do not upgrade wire precision."
+        }
+      ]
+    },
+    {
+      "question_id": "background_removal_on",
+      "question": "Paired removal/fill against the same representations",
+      "artifacts": [
+        {
+          "artifact_id": "wave2_background_probe",
+          "path": "outputs/development-recovery/wave2-background-probe/probe_report.json",
+          "sha256": "c12b490085cb197ddcb26eabbd36e4ded846446418fe7d15d47dacda7851f3b7",
+          "decision": "reuse",
+          "incompatibility": "Single Federer scene, 48 frames, VVC faster, QPs 47 and 32. Reuse as removal-on screening only. Pairing with removal-off still needs a new run. #101 does not recertify this artifact's float64-vs-float32 geometry."
+        }
+      ]
+    },
+    {
+      "question_id": "generator_trajectories",
+      "question": "Full-sequence generation vs paste, residual off",
+      "artifacts": [
+        {
+          "artifact_id": "diagnostic_pix2pix_alcaraz",
+          "path": "outputs/development-recovery/diagnostic-pix2pix-alcaraz.json",
+          "sha256": "ccfaa34b8ceca48409839c3baefec20e91f87a0425aea6da2b7429c37ed2fa50",
+          "decision": "exclude_from_full_trajectory",
+          "incompatibility": "16-frame matrix; documented as first-frame placement exercise, not full visible-track trajectories. E02 must produce new full-trajectory evidence."
+        }
+      ]
+    },
+    {
+      "question_id": "residual",
+      "question": "Residual-on contribution with paste and generation controls",
+      "artifacts": [
+        {
+          "artifact_id": "wave2_overlap_20260910",
+          "path": "outputs/development-recovery/wave2-overlap-20260910/report.json",
+          "sha256": "48cf7b20a1a29ac958a8eac3972b381f848439003f02d0b1222de8221f81643b",
+          "decision": "repair_then_new_run",
+          "incompatibility": "Historical residual ladders predate transport repairs. Do not upgrade old residual streams to post-#88/#102 precision."
+        }
+      ]
+    },
+    {
+      "question_id": "timing",
+      "question": "Encode/client/live latency on named host strata",
+      "artifacts": [
+        {
+          "artifact_id": "gate_a_vvc_webp_n96_run2",
+          "path": "outputs/gate-a-vvc-webp-n96-run2/report.json",
+          "sha256": "71d82a51c6bf831c6a336d12a2cb05b1496912caa17a702b9e490f28380d939a",
+          "decision": "exclude_from_runtime_claim",
+          "incompatibility": "Encode timer omits detection/materialization; anchor decode includes lossless file I/O. Missing or unfair timing does not delete the RD rows."
+        }
+      ]
+    }
+  ],
+  "archive_policy": {
+    "moved": false,
+    "reason": "A filter over existing paths plus checksums is enough for plot discovery. No copies or deletions were made."
+  }
+}
