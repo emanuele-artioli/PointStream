@@ -22,6 +22,15 @@ launching. Fill every field; do not create a separate permanent session report.
 | Decision rule | What promotes, stops, or makes the result inconclusive; action for each outcome. |
 | Artifact and narrative | Exact output location, byte/error/time breakdown, plot intended, and sentence that confirmation or contradiction would justify. |
 
+Before every new experiment, inspect the existing index/classification and output
+folders, prior manifests and saved decodes. Record a coverage/reuse decision by
+source interval, transforms, component/removal settings, code/tool identity and
+claim scope. Reuse compatible evidence, rescore saved decodes or repair the
+specific missing measurement before scheduling fresh encodes/training. A folder
+name or a newer code fix does not certify old evidence. The September campaign
+may link representative timing with sample counts/uncertainty and compatible
+hardware/workload identity; a timing gap alone does not invalidate valid RD data.
+
 Default first probe: at most six new candidate configurations and 30 minutes of
 execution including scoring, with a ten-minute evidence/instrument triage first.
 These are planning caps, not claims about encoder speed. Estimate one case from
@@ -83,12 +92,13 @@ Proposed configurable axes (capabilities must be verified before use):
 | Representation | First-frame still with declared render/warp policy; registered panorama; foreground-removed per-frame video. |
 | Coding | Codec/quality, spatial scale, refresh interval; refine only promising combinations. |
 
-Start with a verified cheap removal policy held fixed across representations,
-and two coarse operating points per representation on one development scene.
+For the September 14 campaign, first reuse or measure removal OFF across all
+three representations at two coarse operating points on a development scene.
+Then compare paired removal-on methods at the same settings.
 Do not run the Cartesian product. Inspect a second, different camera-motion or
-occlusion regime before broad promotion. Then vary removal on the promising
-representation, retaining the no-removal and current-method controls. If an arm
-is missing, inventory the gap and implement only what the immediate card needs.
+occlusion regime before broad promotion. Then refine removal on promising
+representations while retaining paired no-removal and current-method controls
+across modes. If an arm is missing, inventory the gap and implement only what the immediate card needs.
 
 A conventional full video without an overlay is the anchor. The same decoded
 video plus the proposed overlay is a conflict control: inspect old actor
@@ -123,12 +133,13 @@ Verify its source, codec settings and attribution method before quoting it;
 foreground and background costs in an inter-coded stream need not be additive.
 It motivates a hypothesis, not a guaranteed budget recoverable by generation.
 
-After background headroom is understood, compare pasted references, a ready
-small model and a ready diffusion model under declared rate, client memory and
-latency budgets. Readiness work may proceed earlier; broad training should wait
-for a specific foreground error/correction burden worth reducing. SPADE and other
-training stay off until a new scoped card authorizes them. Existing invalid
-rankings do not justify exclusion.
+Low-resolution learning/readiness may proceed alongside background evaluation;
+whole-codec selection uses its fixed backgrounds. Compare pasted references, a
+ready small model and a ready diffusion model under declared rate, client memory
+and latency budgets. Broad training needs a specific foreground error/correction
+burden worth reducing. The September campaign authorizes readiness and staged
+training under its costed cards; shared training cannot start before a valid
+evaluator and split. Existing invalid rankings do not justify exclusion.
 
 Hypotheses: small models may offer useful low-rate quality on weak clients;
 diffusion may exchange greater computation for quality at higher resource

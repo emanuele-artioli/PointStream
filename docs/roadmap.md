@@ -3,7 +3,9 @@
 **Target Submission**: ACM TOMM — **30 September 2026** (hard deadline).
 **Evidence Freeze**: 20 September 2026 (provisional target; revisable by explicit decision).
 
-This document specifies the submission gates, dependencies, and pass criteria. Daily calendar rows are dropped in favour of dependency-driven gates.
+This document specifies the submission gates, dependencies, and pass criteria. Execution follows the [September campaign](workflow/session/evaluation-campaign/plan.md).
+Gate pass dependencies do not prevent parallel readiness, component work or
+writing setup. User decisions of September 14 supersede historical count rules.
 
 ---
 
@@ -31,11 +33,22 @@ Experiment policy: [hypothesis-driven probes](workflow/experiment-design.md). Fu
 - **Dependency**: Gate A passed.
 - **Objective**: Confirm the selected codec procedure on held-out content, with the claim scoped to the split. See [data protocol](areas/data.md#4-confirmation-protocol). This is not a mandatory seven-training-video/six-test-video allocation.
 - **Pass Criteria**:
-  1. Default: six independent matches reserved from development, following the existing manifest verifier. Six is a project target, not a statistical guarantee; report source-level uncertainty. A within-source scene holdout supports only a within-source claim and requires a prospective split/exposure audit; it does not satisfy the existing independent-match gate.
+  1. Prefer six independent matches reserved from development; a smaller count is
+     explicitly authorized by the user on September 14. Before test scores, freeze
+     the largest feasible untouched source set and count rationale in the manifest
+     and matching verifier policy (E01). Planning target three, two only with
+     explicit small-sample limitations; one is a case study. Report source-level
+     uncertainty and declare inconclusive if it cannot establish the advantage.
+     Within-source scene holdouts support narrower claims and do not become
+     independent matches. Never drop a source after seeing its scores.
   2. Freeze the codec selection procedure, rate ladder, metrics, eligibility rules, and adaptation budget before inspecting confirmation scores. Per-video encoding/fitting is allowed under that procedure, including on evaluated frames; charge all transmitted weights/side information and fitting time. No manual retuning based on test outcomes.
   3. Standalone client decoding verified end-to-end.
   4. Both whole-frame metrics and object-scoped metrics reported with source-level standard errors or confidence intervals and null controls; frames are not independent replicates.
-- **Current Status**: PR #85 completed only two 48-frame source pilots and its pass flag ignored competitive comparisons and protocol completion. Both VVC comparisons are unfavorable. Controls, independent-output scoring/wire accounting, source uncertainty, stable anchor policy and six-source eligibility remain unmet. Repair `EVAL-ACT-06`, search under `EVAL-ACT-07`, then freeze and confirm on reserved sources.
+- **Current Status**: PR #85's old pass is invalid and its two sources are now
+  exposed. Repairs #100–#102 do not certify those runs. E01 must freeze a fresh
+  split and matching source-count policy; E06 must establish the tennis advantage;
+  E07 must verify controls, standalone output/wire accounting, stable anchors and
+  source uncertainty under that frozen procedure.
 
 ### Gate C: Core Ablation Lattice (Preparation only)
 - **Dependency**: Gate B passed.
@@ -44,12 +57,19 @@ Experiment policy: [hypothesis-driven probes](workflow/experiment-design.md). Fu
   1. Isolated evaluations for: background-only, appearance-only, motion-only, residual absent, and generation absent.
   2. Verification that disabled stages consume zero bytes and execute zero calls.
   3. Report measured rate–quality ordering across tiers (fast, balanced, quality), including dominated points or reversals. Investigate configuration failures; monotonic quality is not a guaranteed property of a perceptual codec.
+  4. Required September 14 milestone: at least one neural foreground model clears
+     the declared reference baselines at comparable total rate and client budget,
+     with valid trajectory, fidelity and temporal controls plus uncertainty.
+     Preserve failed/deferred training campaigns; no guaranteed model ordering.
 
 ### Gate D: Learned Baselines, Second Domain, and Receiver Profiling
-- **Dependency**: Gate C passed.
+- **Dependency**: Gate C for final gate passage. Neural anchors/profiling start
+  earlier; secondary-domain experiments start after a measured tennis advantage.
 - **Objective**: Contextualize results against learned neural codecs, test domain generality, and benchmark client reconstruction time.
 - **Pass Criteria**:
-  1. Benchmark against a published neural video codec baseline in the identified regime.
+  1. Benchmark against a recent published neural video codec in the identified
+     regime. Claim SOTA only where comparisons with AV1, VVC and that neural
+     anchor support it; name implementations, settings and hardware.
   2. Evaluate on a secondary domain (e.g., surveillance or conferencing) to establish domain bounds.
   3. Profile client reconstruction speed (FPS, memory footprint, decode latency) on target hardware.
 
@@ -68,7 +88,11 @@ Gate C preparation may proceed, but ablations do not substitute for the missing 
 ## 2. Operating Policies
 
 1. **Search is the method, not a compromise**: We actively search the configuration space to discover where an object-centric semantic codec wins over conventional block-based codecs. All explored axes and bounds are reported honestly.
-2. **Three-axis reporting**: Every published experiment must report size (bitrate/payload), quality (PSNR, SSIM, VMAF, LPIPS), and execution time (encode/decode).
+2. **Three-axis reporting**: Every published comparison must report size, quality
+   and encoder/client time. Not every RD run requires new timing: statistically
+   adequate representative profiles may be reused for compatible workload and
+   hardware strata, with sample counts, uncertainty and evidence references.
+   Missing timing excludes a speed claim, not otherwise valid RD evidence.
 3. **Bound before believing**: Prior to reading results, establish two-sided plausible bounds. Values outside expected bounds trigger an alarm and require instrument verification before reporting.
 4. **Independent verification**: Exploratory results may be reported as exploratory. A generalization claim requires the corresponding held-out protocol; do not relabel known development footage as unseen. Gate order governs pass decisions; ablation plumbing, source preparation, baseline setup, and profiling may advance before earlier gates pass.
 
@@ -76,4 +100,10 @@ Gate C preparation may proceed, but ablations do not substitute for the missing 
 
 6. **Full-codec development**: Residual-free and generation-free sweeps are controls, not a required winning architecture. Restore standalone coded residual correction and search high-fidelity residual-on curves during Gate A. Permit bounded generator readiness/training before generator-free parity, with validated total rate–quality–runtime evaluation. Gate C formal ablations remain dependent on confirmation; component development does not.
 
-7. **Decision before sweep**: Follow the [experiment design policy](workflow/experiment-design.md). Diagnose component headroom before broad rate ladders or training; predeclare a bounded probe and its promote/stop decision. Expected architecture orderings are hypotheses, never acceptance requirements. Gate criteria above are unchanged.
+7. **Live and playback search**: Screen low/native resolution and fps, valid
+   colour paths and consequential interactions; refine the measured feasibility
+   boundary with one or two intermediate points. Register latency/quality floors,
+   count lookahead and startup, verify stable queues and report hardware-specific
+   uncertainty. Future-frame panoramas or fitting remain offline when applicable.
+
+8. **Decision before sweep**: Follow the [experiment design policy](workflow/experiment-design.md). Diagnose component headroom before broad rate ladders or training; predeclare a bounded probe and its promote/stop decision. Expected architecture orderings are hypotheses, never acceptance requirements.

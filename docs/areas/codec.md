@@ -1,5 +1,13 @@
 # Codec Area
 
+## Current campaign — 14 September 2026
+
+CODEC-ACT-07 continues as E04 in the [campaign](../workflow/session/evaluation-campaign/plan.md).
+PR #101 repairs probe transport/precision, but saved pre-repair artifacts do not
+automatically inherit those guarantees. The known three-mode probe uses temporal
+foreground removal plus Telea fill. Check older background runs before scheduling
+missing removal-OFF and paired removal-ON comparisons. No winner is certified.
+
 **Evidence Revision**: Implementations through PR #85; gate interpretations audited 2026-09-09.
 **Owned Scope**: `src/components/background/`, `src/components/appearance/`, `src/components/motion/`, `src/components/residual/`, `src/pipeline/codec/`.
 

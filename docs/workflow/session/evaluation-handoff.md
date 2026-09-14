@@ -1,5 +1,10 @@
 # Evaluation handoff — 2026-09-12
 
+Historical handoff. The user supplied the full evaluation plan after this file
+was written; PRs #100–#102 subsequently repaired audit findings. Active work
+follows the [September 14 campaign](evaluation-campaign/plan.md), not the
+first-decisions or training restrictions below. Preserve this file as history.
+
 **Trigger:** the user explicitly requested a clean project boundary and handoff
 to a new session to execute their evaluation plan. This is not a resource failure
 or an instruction to resume the old Wave 2 campaign. Read this file from current

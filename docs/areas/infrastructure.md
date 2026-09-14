@@ -1,5 +1,15 @@
 # Infrastructure Area
 
+## Current campaign — 14 September 2026
+
+The [campaign](../workflow/session/evaluation-campaign/plan.md) may use any GPU
+free at experiment launch across accessible servers. Recheck/claim resources;
+aggregate all campaign CPU/codec/BLAS threads per host under 90% of currently
+available cores, respecting affinity/quota and colleagues. Busy hosts defer or
+move unstarted shards; profile hardware strata separately. Existing monitor and
+checkpoint tooling should be reused. INFRA-ACT-01 is unresolved; cleanup helper
+remains prohibited. No fixed GPU reservation carries into this campaign.
+
 **Evidence Revision**: Reconciled through PR #68 (`956ad3c277`) and PR #73.
 **Owned Scope**: Environments, CI/GitHub Actions, worktree lifecycle, runner integration, local caches, hardware profiling.
 
