@@ -1,5 +1,11 @@
 # E02 — Generator Readiness & Candidate Roster Report
 
+> Coordinator qualification (14 September): this is the worker's historical
+> implementation report, not accepted neural readiness. E02R documents reproduced
+> adapter/control/checkpoint/residual defects and required real-backend evidence.
+> Its Ready labels, full-SPADE architecture and uncertainty claims must not
+> authorize E05. See [E02R](02r-readiness-evidence.md).
+
 **Task**: E02 Generator Readiness  
 **Area**: Generation (`docs/areas/generation.md`)  
 **Worktree**: `/tmp/pointstream-eval-e02`  
