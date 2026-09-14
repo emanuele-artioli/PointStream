@@ -264,6 +264,22 @@ def supervise(directory: Path) -> int:
 
                     child_env = build_child_env(claim_session, child_env)
 
+                if claim_session and claim_session.device_claim:
+                    from experiments.jobs.claims import DeviceBusyError, is_device_free, query_gpus
+
+                    claimed_uuid = claim_session.device_claim.device_uuid
+                    fresh = query_gpus()
+                    cand = next((d for d in fresh if d["uuid"] == claimed_uuid), None)
+                    if cand is None or not is_device_free(cand):
+                        from experiments.jobs.claims import release_session_claims
+
+                        release_session_claims(claim_session)
+                        claim_session = None
+                        err_msg = f"Device {claimed_uuid} became busy before launch"
+                        state.update(status="failed", error=err_msg)
+                        write_json(directory / "status.json", state)
+                        raise DeviceBusyError(err_msg)
+
                 with (directory / "command.log").open("a") as output:
                     child = subprocess.Popen(
                         request["command"],
@@ -274,7 +290,7 @@ def supervise(directory: Path) -> int:
                         env=child_env,
                     )
                 state["pid"] = child.pid
-            except OSError as exc:
+            except (OSError, DeviceBusyError) as exc:
                 if claim_session:
                     from experiments.jobs.claims import release_session_claims
 
@@ -319,11 +335,11 @@ def supervise(directory: Path) -> int:
                     return 0
                 time.sleep(10)
         finally:
+            if child is not None:
+                stop_child(child)
             if state["status"] == "running":
                 state["status"] = "interrupted"
                 write_json(directory / "status.json", state)
-            if child is not None:
-                stop_child(child)
             if claim_session is not None:
                 from experiments.jobs.claims import release_session_claims
 
@@ -376,6 +392,8 @@ def main() -> int:
         )
         write_json(directory / "policy.json", policy)
         return 0
+    if args.claim_gpu and args.cpu_threads is None:
+        parser.error("--cpu-threads is required when --claim-gpu is specified (all GPU jobs require explicit CPU allowance)")
     command = args.command[1:] if args.command[:1] == ["--"] else args.command
     if not command:
         parser.error("a command is required after --")

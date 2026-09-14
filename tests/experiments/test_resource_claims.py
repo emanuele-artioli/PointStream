@@ -17,7 +17,9 @@ from __future__ import annotations
 
 import sqlite3  # noqa: F401 -- host ABI ordering
 import concurrent.futures
+import os
 from pathlib import Path
+import subprocess
 import sys
 import time
 from typing import Any
@@ -29,16 +31,25 @@ from experiments.jobs.claims import (
     CPUOversubscriptionError,
     DeviceBusyError,
     DeviceClaimConflictError,
+    DeviceUnavailableError,
     InvalidTokenError,
     acquire_cpu_claim,
     acquire_device_claim,
+    atomic_dir_lock,
     build_child_env,
     claim_resources,
+    get_available_cores,
+    get_canonical_host,
+    get_cgroup_cpu_limit,
     get_claims_status,
+    is_claim_active,
     launch,
+    read_json_safe,
     release_cpu_claim,
     release_device_claim,
     run_supervised,
+    terminate_and_reap_process_group,
+    write_json_atomic,
 )
 
 
@@ -58,6 +69,37 @@ def mock_gpu(
         "memory_total_mb": total_mb,
         "active_pids": pids or [],
     }
+
+
+MOCK_TEST_DEVICES = [
+    mock_gpu("GPU-compete-uuid-001"),
+    mock_gpu("GPU-device-alpha", 0),
+    mock_gpu("GPU-device-beta", 1),
+    mock_gpu("GPU-owner-test"),
+    mock_gpu("GPU-busy-test"),
+    mock_gpu("GPU-fail-launch"),
+    mock_gpu("GPU-retained-test"),
+    mock_gpu("GPU-isolated-uuid-42"),
+    mock_gpu("GPU-dead-pid-test"),
+    mock_gpu("GPU-monitor-target"),
+    mock_gpu("GPU-ctx-test-99"),
+    mock_gpu("GPU-interrupted-child"),
+    mock_gpu("GPU-busy-pre-popen"),
+    mock_gpu("GPU-mandatory-cpu"),
+]
+
+
+@pytest.fixture(autouse=True)
+def mock_environment_gpus(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Provide mock GPU probe by default in CPU-only test environment."""
+    from experiments.jobs import claims
+
+    def query_with_fallback(probe_fn: Any = None) -> list[dict[str, Any]]:
+        if probe_fn is not None:
+            return probe_fn()
+        return list(MOCK_TEST_DEVICES)
+
+    monkeypatch.setattr(claims, "query_gpus", query_with_fallback)
 
 
 def test_competing_acquisition_one_winner(tmp_path: Path) -> None:
@@ -498,3 +540,360 @@ def test_claim_resources_context_manager(tmp_path: Path) -> None:
     assert len(status_after["devices"]) == 0
     for host_info in status_after["cpu_hosts"].values():
         assert len(host_info.get("allocations", {})) == 0
+
+
+def test_mutex_no_ttl_takeover_and_token_safe_release(tmp_path: Path) -> None:
+    """Blocker 1: Eliminate TTL-only takeover.
+
+    A held mutex aged past 30s cannot be stolen by another process while the owner is alive.
+    Verified liveness recovery only succeeds for confirmed dead local PIDs.
+    Non-owner release is rejected (token-safe release).
+    """
+    claims_dir = tmp_path / "claims"
+    lock_dir = claims_dir / "mutex_ttl_test.lock"
+
+    with atomic_dir_lock(lock_dir, timeout=1.0):
+        owner_file = lock_dir / "owner.json"
+        assert owner_file.exists()
+        owner_data = read_json_safe(owner_file)
+        assert owner_data["pid"] == os.getpid()
+
+        # Age the lock metadata to 45s (older than 30s)
+        aged_data = dict(owner_data)
+        aged_data["created_at"] = time.time() - 45.0
+        write_json_atomic(owner_file, aged_data)
+
+        # Another process attempt must timeout: NO TTL-only takeover while owner is alive!
+        with pytest.raises(TimeoutError, match="Failed to acquire atomic directory lock"):
+            with atomic_dir_lock(lock_dir, timeout=0.15, poll_interval=0.02):
+                pass
+
+        # Remote owner: even if aged 100 days, remote lock must NEVER be stolen
+        remote_data = dict(aged_data)
+        remote_data["host"] = "remote-cluster-node-99.domain"
+        remote_data["created_at"] = time.time() - 86400 * 100
+        write_json_atomic(owner_file, remote_data)
+
+        with pytest.raises(TimeoutError):
+            with atomic_dir_lock(lock_dir, timeout=0.15, poll_interval=0.02):
+                pass
+
+        # Restore original token and local host for token-safe exit
+        write_json_atomic(owner_file, owner_data)
+
+    # After exit, lock is cleanly released
+    assert not lock_dir.exists()
+
+    # Recovery with confirmed dead local PID:
+    lock_dir.mkdir(parents=True, exist_ok=True)
+    dead_pid = 4194300
+    write_json_atomic(
+        owner_file,
+        {
+            "token": "stale-dead-token",
+            "pid": dead_pid,
+            "host": get_canonical_host(),
+            "created_at": time.time() - 100.0,
+        },
+    )
+    # Acquisition must recover the abandoned lock from dead PID
+    with atomic_dir_lock(lock_dir, timeout=0.5):
+        new_meta = read_json_safe(owner_file)
+        assert new_meta["token"] != "stale-dead-token"
+        assert new_meta["pid"] == os.getpid()
+
+    assert not lock_dir.exists()
+
+
+def test_run_supervised_child_interruption_reaped_and_claims_handling(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Blocker 2: Interrupted run_supervised terminates and reaps process group before release.
+
+    If child death cannot be verified, claims are retained as unresolved.
+    """
+    claims_dir = tmp_path / "claims"
+    target_uuid = "GPU-interrupted-child"
+
+    # Case A: Interruption reaps process group and releases claims
+    child_marker = tmp_path / "child_running.txt"
+    script = (
+        "import time, sys\n"
+        f"open(r'{child_marker}', 'w').write('started')\n"
+        "time.sleep(30)\n"
+    )
+
+    child_pid_holder: list[int] = []
+    call_count = [0]
+    orig_wait = subprocess.Popen.wait
+
+    def mock_wait_interrupted(self: subprocess.Popen[Any], *args: Any, **kwargs: Any) -> Any:
+        call_count[0] += 1
+        if call_count[0] == 1:
+            child_pid_holder.append(self.pid)
+            for _ in range(50):
+                if child_marker.exists():
+                    break
+                time.sleep(0.05)
+            raise RuntimeError("Simulated user interrupt")
+        return orig_wait(self, *args, **kwargs)
+
+    monkeypatch.setattr(subprocess.Popen, "wait", mock_wait_interrupted)
+
+    with pytest.raises(RuntimeError, match="Simulated user interrupt"):
+        run_supervised(
+            [sys.executable, "-c", script],
+            gpu_uuid=target_uuid,
+            cpu_threads=2,
+            claims_dir=claims_dir,
+            available_cores=8,
+            probe_fn=lambda: [mock_gpu(target_uuid)],
+        )
+
+    # Verify child process was reaped and is dead
+    assert len(child_pid_holder) == 1
+    reaped_pid = child_pid_holder[0]
+    time.sleep(0.2)
+    try:
+        os.kill(reaped_pid, 0)
+        is_alive = True
+    except ProcessLookupError:
+        is_alive = False
+    assert not is_alive, f"Child PID {reaped_pid} survived interruption!"
+
+    # Verify claims were cleanly released
+    status = get_claims_status(claims_dir)
+    assert len(status["devices"]) == 0
+
+    # Case B: Unresolved retention when child death cannot be verified
+    from experiments.jobs import claims as claims_mod
+
+    orig_reap = claims_mod.terminate_and_reap_process_group
+
+    def mock_reap_failure(proc: Any, *args: Any, **kwargs: Any) -> bool:
+        return False  # Simulated failure to verify child death
+
+    monkeypatch.setattr(claims_mod, "terminate_and_reap_process_group", mock_reap_failure)
+
+    def mock_wait_raise(self: Any, *args: Any, **kwargs: Any) -> Any:
+        raise RuntimeError("Simulated interrupt failure")
+
+    monkeypatch.setattr(subprocess.Popen, "wait", mock_wait_raise)
+
+    with pytest.raises(RuntimeError, match="Simulated interrupt failure"):
+        run_supervised(
+            [sys.executable, "-c", "import time; time.sleep(5)"],
+            gpu_uuid=target_uuid,
+            cpu_threads=2,
+            claims_dir=claims_dir,
+            available_cores=8,
+            probe_fn=lambda: [mock_gpu(target_uuid)],
+        )
+
+    # When child death cannot be verified, claims must be RETAINED (not released)
+    retained_status = get_claims_status(claims_dir)
+    assert len(retained_status["devices"]) == 1, "Claims must be retained when child death cannot be verified!"
+    # Clean up retained claim manually for following tests
+    retained_token = retained_status["devices"][0]["token"]
+    release_device_claim(get_canonical_host(), target_uuid, retained_token, claims_dir)
+
+    # Restore patched functions before Case C
+    monkeypatch.setattr(claims_mod, "terminate_and_reap_process_group", orig_reap)
+    monkeypatch.setattr(subprocess.Popen, "wait", orig_wait)
+
+    # Case C: Direct terminate_and_reap_process_group verification
+    direct_proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(10)"], start_new_session=True)
+    assert terminate_and_reap_process_group(direct_proc, sigterm_timeout=1.0) is True
+    assert direct_proc.poll() is not None
+
+
+def test_is_claim_active_priority_over_status_file(tmp_path: Path) -> None:
+    """Blocker 3: is_claim_active must check process liveness before trusting status text.
+
+    A live local PID with interrupted or failed status text remains active.
+    Remote claims with terminal status return None (conservatively unverifiable).
+    """
+    job_dir = tmp_path / "job-status-test"
+    job_dir.mkdir(parents=True)
+
+    # Start a live background process
+    proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(10)"])
+    try:
+        # Write terminal status text: "interrupted"
+        status_file = job_dir / "status.json"
+        write_json_atomic(
+            status_file,
+            {
+                "status": "interrupted",
+                "pid": proc.pid,
+                "started": time.time(),
+            },
+        )
+
+        claim_data = {
+            "token": "live-proc-token",
+            "host": get_canonical_host(),
+            "pid": proc.pid,
+            "job_dir": str(job_dir),
+            "created_at": time.time(),
+        }
+
+        # Even though status is "interrupted", the local PID is STILL ALIVE.
+        # Claim must be reported as ACTIVE!
+        assert is_claim_active(claim_data) is True
+
+        # Write status "failed" while process still alive
+        write_json_atomic(
+            status_file,
+            {
+                "status": "failed",
+                "pid": proc.pid,
+                "started": time.time(),
+            },
+        )
+        assert is_claim_active(claim_data) is True
+
+    finally:
+        # Terminate process and verify it is dead
+        proc.terminate()
+        proc.wait(timeout=5)
+
+    # Now that the process is dead, is_claim_active returns False
+    assert is_claim_active(claim_data) is False
+
+    # Remote host claim: cannot verify remotely, returns None
+    remote_claim = dict(claim_data)
+    remote_claim["host"] = "other-host.domain"
+    assert is_claim_active(remote_claim) is None
+
+
+def test_occupancy_query_fail_closed_and_pre_popen_recheck(tmp_path: Path) -> None:
+    """Blocker 4: Missing UUID or failed query must fail closed / defer (raise DeviceUnavailableError).
+
+    Pre-Popen recheck under claim must abort if device becomes busy before launch.
+    """
+    claims_dir = tmp_path / "claims"
+
+    # 1. Missing UUID with empty query probe: MUST fail closed
+    with pytest.raises(DeviceUnavailableError, match="not found or probe failed"):
+        acquire_device_claim(
+            device_uuid="GPU-NOT-PRESENT",
+            claims_dir=claims_dir,
+            probe_fn=lambda: [],
+        )
+
+    # 2. Missing UUID with non-matching probe: MUST fail closed
+    with pytest.raises(DeviceUnavailableError, match="not found or probe failed"):
+        acquire_device_claim(
+            device_uuid="GPU-NOT-PRESENT",
+            claims_dir=claims_dir,
+            probe_fn=lambda: [mock_gpu("GPU-OTHER-123")],
+        )
+
+    # 3. auto_select with empty probe: MUST fail closed
+    with pytest.raises(DeviceUnavailableError, match="No GPU devices found or query failed"):
+        acquire_device_claim(
+            auto_select=True,
+            claims_dir=claims_dir,
+            probe_fn=lambda: [],
+        )
+
+    # 4. Pre-Popen recheck: device is free during acquisition, but busy immediately before Popen
+    target_uuid = "GPU-busy-pre-popen"
+    call_count = [0]
+
+    def mock_recheck_pre_popen(uuid: str, min_mem: float) -> bool:
+        call_count[0] += 1
+        # 1st call is during acquire_device_claim (returns True so acquire succeeds)
+        # 2nd call is immediately before Popen in launch (returns False)
+        return call_count[0] == 1
+
+    with pytest.raises(DeviceBusyError, match="became busy during pre-Popen recheck"):
+        launch(
+            [sys.executable, "-c", "import time; time.sleep(0.1)"],
+            gpu_uuid=target_uuid,
+            cpu_threads=2,
+            claims_dir=claims_dir,
+            available_cores=8,
+            probe_fn=lambda: [mock_gpu(target_uuid)],
+            recheck_fn=mock_recheck_pre_popen,
+        )
+
+    assert call_count[0] >= 1
+    # Both GPU and CPU claims must be cleaned up
+    status = get_claims_status(claims_dir)
+    assert len(status["devices"]) == 0
+    for host_info in status["cpu_hosts"].values():
+        assert len(host_info.get("allocations", {})) == 0
+
+
+def test_cpu_cgroup_quota_load_and_mandatory_allowance(tmp_path: Path) -> None:
+    """Blocker 5: Cgroup quota and system load are accounted for; explicit CPU allowance is mandatory."""
+    # 1. Test cgroup v2 parsing
+    cg2_dir = tmp_path / "cg2"
+    cg2_dir.mkdir(parents=True)
+    (cg2_dir / "cpu.max").write_text("200000 100000\n", encoding="utf-8")
+    assert get_cgroup_cpu_limit(cg2_dir) == 2.0
+
+    # 2. Test cgroup v1 parsing
+    cg1_dir = tmp_path / "cg1"
+    cg1_dir.mkdir(parents=True)
+    (cg1_dir / "cpu.cfs_quota_us").write_text("400000\n", encoding="utf-8")
+    (cg1_dir / "cpu.cfs_period_us").write_text("100000\n", encoding="utf-8")
+    assert get_cgroup_cpu_limit(cg1_dir) == 4.0
+
+    # 3. Test get_available_cores with cgroup limit
+    cores = get_available_cores(respect_cgroup=True, respect_load=False, cgroup_base=cg2_dir)
+    assert cores <= 2
+
+    # 4. Mandatory explicit per-job CPU allowance
+    claims_dir = tmp_path / "claims"
+    target_uuid = "GPU-mandatory-cpu"
+
+    # launch without cpu_threads must be rejected
+    with pytest.raises(ValueError, match="explicit positive cpu_threads allowance"):
+        launch(
+            [sys.executable, "-c", "pass"],
+            gpu_uuid=target_uuid,
+            cpu_threads=None,
+            claims_dir=claims_dir,
+            probe_fn=lambda: [mock_gpu(target_uuid)],
+        )
+
+    # run_supervised with cpu_threads=0 must be rejected
+    with pytest.raises(ValueError, match="explicit positive cpu_threads allowance"):
+        run_supervised(
+            [sys.executable, "-c", "pass"],
+            gpu_uuid=target_uuid,
+            cpu_threads=0,
+            claims_dir=claims_dir,
+            probe_fn=lambda: [mock_gpu(target_uuid)],
+        )
+
+    # claim_resources with cpu_threads=None must be rejected
+    with pytest.raises(ValueError, match="explicit positive cpu_threads allowance"):
+        with claim_resources(
+            gpu_uuid=target_uuid,
+            cpu_threads=None,
+            claims_dir=claims_dir,
+            probe_fn=lambda: [mock_gpu(target_uuid)],
+        ):
+            pass
+
+    # 5. Environment variables verified
+    with claim_resources(
+        gpu_uuid=target_uuid,
+        cpu_threads=4,
+        claims_dir=claims_dir,
+        available_cores=16,
+        probe_fn=lambda: [mock_gpu(target_uuid)],
+    ) as session:
+        env = build_child_env(session)
+        assert env["OMP_NUM_THREADS"] == "4"
+        assert env["MKL_NUM_THREADS"] == "4"
+        assert env["TORCH_NUM_THREADS"] == "4"
+        assert env["RAY_NUM_CPUS"] == "4"
+        assert env["POLARS_MAX_THREADS"] == "4"
+        assert env["PS_CPU_ALLOWANCE"] == "4"
+        assert env["PS_NUM_WORKERS"] == "4"
+

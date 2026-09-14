@@ -18,6 +18,7 @@ from pathlib import Path
 import platform
 import re
 import secrets
+import signal
 import socket
 import subprocess
 import time
@@ -63,6 +64,7 @@ class DeviceClaim:
     created_at: float
     job_id: str
     job_dir: str | None = None
+    proc_start_time: float | None = None
 
 
 @dataclass(frozen=True)
@@ -76,6 +78,7 @@ class CPUClaim:
     claimed_at: float
     job_id: str
     job_dir: str | None = None
+    proc_start_time: float | None = None
 
 
 @dataclass
@@ -139,18 +142,38 @@ def read_json_safe(path: Path, default: Any = None) -> Any:
         return default
 
 
-def is_pid_alive(pid: int) -> bool:
+def get_process_start_time(pid: int) -> float | None:
+    """Return process start time for local PID if available."""
+    if pid <= 0:
+        return None
+    try:
+        proc_stat = Path(f"/proc/{pid}")
+        if proc_stat.exists():
+            return proc_stat.stat().st_mtime
+    except (OSError, ValueError):
+        pass
+    return None
+
+
+def is_pid_alive(pid: int, expected_start_time: float | None = None) -> bool:
     """Check if process with given PID is alive on the local host."""
     if pid <= 0:
         return False
     try:
         os.kill(pid, 0)
-        return True
     except ProcessLookupError:
         return False
     except PermissionError:
         # Process exists and belongs to another user
         return True
+
+    if expected_start_time is not None:
+        cur_start = get_process_start_time(pid)
+        if cur_start is not None and abs(cur_start - expected_start_time) > 2.0:
+            # Process start time does not match: PID was recycled
+            return False
+
+    return True
 
 
 def is_claim_active(claim_data: dict[str, Any]) -> bool | None:
@@ -167,23 +190,45 @@ def is_claim_active(claim_data: dict[str, Any]) -> bool | None:
     pid = claim_data.get("pid")
     job_dir_str = claim_data.get("job_dir")
 
-    if job_dir_str:
-        job_dir = Path(job_dir_str)
-        status_file = job_dir / "status.json"
-        if status_file.exists():
-            status_data = read_json_safe(status_file)
-            if status_data and status_data.get("status") in {
-                "complete",
-                "failed",
-                "budget_exhausted",
-                "interrupted",
-            }:
-                return False
-
     current_host = get_canonical_host()
     if host == current_host:
+        # Check supervisor PID first
+        sup_start = claim_data.get("proc_start_time")
+        sup_alive = False
         if pid is not None:
-            return is_pid_alive(int(pid))
+            sup_alive = is_pid_alive(int(pid), sup_start)
+            if sup_alive:
+                return True
+
+        # Check child PID from status.json if available
+        child_alive = False
+        terminal_status = False
+        if job_dir_str:
+            job_dir = Path(job_dir_str)
+            status_file = job_dir / "status.json"
+            if status_file.exists():
+                status_data = read_json_safe(status_file, {})
+                child_pid = status_data.get("pid")
+                child_start = status_data.get("proc_start_time")
+                if child_pid is not None:
+                    child_alive = is_pid_alive(int(child_pid), child_start)
+                    if child_alive:
+                        # NEVER let status text alone release a live job if child PID is still alive!
+                        return True
+
+                if status_data.get("status") in {
+                    "complete",
+                    "failed",
+                    "budget_exhausted",
+                    "interrupted",
+                }:
+                    terminal_status = True
+
+        # If both local PIDs were checked and verified dead
+        if not sup_alive and not child_alive:
+            if terminal_status or pid is not None:
+                return False
+
         return False
 
     # Remote host: cannot verify PID locally. Return None so we never steal on TTL.
@@ -196,7 +241,6 @@ def atomic_dir_lock(
     *,
     timeout: float = 10.0,
     poll_interval: float = 0.05,
-    stale_timeout: float = 30.0,
 ) -> Iterator[None]:
     """Atomic cross-host mutex using directory creation on shared filesystem."""
     lock_dir.parent.mkdir(parents=True, exist_ok=True)
@@ -215,6 +259,7 @@ def atomic_dir_lock(
                     {
                         "token": my_token,
                         "pid": os.getpid(),
+                        "proc_start_time": get_process_start_time(os.getpid()),
                         "host": get_canonical_host(),
                         "created_at": time.time(),
                     },
@@ -227,37 +272,22 @@ def atomic_dir_lock(
                 raise
             break
         except FileExistsError:
-            # Check for stale lock holder on this host
+            # Check for stale lock holder on this host with verified dead PID
+            # Eliminate TTL-only takeover: only recover if owner host is local
+            # and PID is verified dead; on remote or unknown liveness, never steal.
             if lock_meta.exists():
                 meta = read_json_safe(lock_meta, {})
                 if meta:
                     mhost = meta.get("host")
                     mpid = meta.get("pid")
-                    created_at = meta.get("created_at", 0)
-                    if mhost == get_canonical_host() and mpid is not None and not is_pid_alive(int(mpid)):
+                    mstart = meta.get("proc_start_time")
+                    if mhost == get_canonical_host() and mpid is not None and not is_pid_alive(int(mpid), mstart):
                         try:
                             lock_meta.unlink(missing_ok=True)
                             lock_dir.rmdir()
                             continue
                         except OSError:
                             pass
-                    elif time.time() - created_at > stale_timeout:
-                        try:
-                            lock_meta.unlink(missing_ok=True)
-                            lock_dir.rmdir()
-                            continue
-                        except OSError:
-                            pass
-            elif lock_dir.exists():
-                try:
-                    if time.time() - lock_dir.stat().st_mtime > stale_timeout:
-                        try:
-                            lock_dir.rmdir()
-                            continue
-                        except OSError:
-                            pass
-                except OSError:
-                    pass
             time.sleep(poll_interval)
 
     if not acquired:
@@ -265,14 +295,18 @@ def atomic_dir_lock(
     try:
         yield
     finally:
-        try:
-            lock_meta.unlink(missing_ok=True)
-        except OSError:
-            pass
-        try:
-            lock_dir.rmdir()
-        except OSError:
-            pass
+        # Token-safe release: only remove if token matches our own token
+        if acquired:
+            meta = read_json_safe(lock_meta)
+            if meta and meta.get("token") == my_token:
+                try:
+                    lock_meta.unlink(missing_ok=True)
+                except OSError:
+                    pass
+                try:
+                    lock_dir.rmdir()
+                except OSError:
+                    pass
 
 
 def query_gpus(
@@ -390,16 +424,15 @@ def acquire_device_claim(
         if matched:
             candidate_devices = matched
         else:
-            # Device might exist on host even if query_gpus is mocked or minimal
-            candidate_devices = [{
-                "index": 0,
-                "uuid": device_uuid,
-                "name": "Target-GPU",
-                "memory_free_mb": min_free_memory_mb + 1000.0,
-                "memory_total_mb": min_free_memory_mb + 2000.0,
-                "active_pids": [],
-            }]
+            # Missing UUID or failed query must fail closed / defer, not be treated as free
+            raise DeviceUnavailableError(
+                f"Requested GPU device {device_uuid} not found or probe failed on {canonical_host}"
+            )
     elif auto_select:
+        if not all_devices:
+            raise DeviceUnavailableError(
+                f"No GPU devices found or query failed on {canonical_host}"
+            )
         # Pre-selection: inspect candidate devices
         for dev in all_devices:
             if is_device_free(dev, min_free_memory_mb=min_free_memory_mb):
@@ -443,18 +476,7 @@ def acquire_device_claim(
                     except OSError:
                         acquired = False
                 # If active is True or None (remote unverifiable), do not steal
-            elif lock_dir.exists():
-                # Directory without claim.json: check creation age
-                try:
-                    if time.time() - lock_dir.stat().st_mtime > 30.0:
-                        try:
-                            lock_dir.rmdir()
-                            lock_dir.mkdir(parents=True, exist_ok=False)
-                            acquired = True
-                        except OSError:
-                            acquired = False
-                except OSError:
-                    acquired = False
+            # On remote or unknown liveness, never steal on TTL alone
 
         if not acquired:
             if device_uuid is not None:
@@ -474,6 +496,7 @@ def acquire_device_claim(
             created_at=time.time(),
             job_id=job_id,
             job_dir=str(job_dir) if job_dir else None,
+            proc_start_time=get_process_start_time(os.getpid()),
         )
         write_json_atomic(claim_file, asdict(claim))
 
@@ -486,6 +509,9 @@ def acquire_device_claim(
             fresh_cand = next((d for d in fresh_devices if d["uuid"] == cand_uuid), None)
             if fresh_cand is not None:
                 is_still_free = is_device_free(fresh_cand, min_free_memory_mb=min_free_memory_mb)
+            else:
+                # Failed probe or missing candidate on recheck must fail closed
+                is_still_free = False
 
         if not is_still_free:
             # Defer / abort: release claim immediately; never kill or preempt external process
@@ -526,6 +552,10 @@ def release_device_claim(
                 f"(expected {owner_token}, received {token})"
             )
         claim_file.unlink(missing_ok=True)
+    else:
+        raise InvalidTokenError(
+            f"Release rejected for {device_uuid} on {host}: no claim file found"
+        )
 
     try:
         lock_dir.rmdir()
@@ -533,14 +563,75 @@ def release_device_claim(
         pass
 
 
-def get_available_cores() -> int:
-    """Return available CPU cores respecting process affinity and CPU quota."""
+def get_cgroup_cpu_limit(cgroup_base: Path | None = None) -> float | None:
+    """Return fractional CPU quota limit from cgroup v2 or v1 if active."""
+    base = cgroup_base or Path("/sys/fs/cgroup")
+    candidates: list[Path] = [base / "cpu.max"]
+    if cgroup_base is None and Path("/proc/self/cgroup").exists():
+        try:
+            for line in Path("/proc/self/cgroup").read_text(encoding="utf-8").splitlines():
+                parts = line.strip().split(":")
+                if len(parts) == 3:
+                    sub = parts[2].lstrip("/")
+                    if sub:
+                        candidates.append(base / sub / "cpu.max")
+                        candidates.append(base / "cpu" / sub / "cpu.cfs_quota_us")
+        except OSError:
+            pass
+    candidates.append(base / "cpu" / "cpu.cfs_quota_us")
+    candidates.append(base / "cpu.cfs_quota_us")
+
+    for cand in candidates:
+        if cand.name == "cpu.max" and cand.exists():
+            try:
+                parts = cand.read_text(encoding="utf-8").strip().split()
+                if len(parts) >= 2 and parts[0] != "max":
+                    quota = float(parts[0])
+                    period = float(parts[1])
+                    if quota > 0 and period > 0:
+                        return quota / period
+            except (OSError, ValueError):
+                pass
+        elif cand.name == "cpu.cfs_quota_us" and cand.exists():
+            try:
+                quota = float(cand.read_text(encoding="utf-8").strip())
+                period_file = cand.with_name("cpu.cfs_period_us")
+                period = float(period_file.read_text(encoding="utf-8").strip()) if period_file.exists() else 100000.0
+                if quota > 0 and period > 0:
+                    return quota / period
+            except (OSError, ValueError):
+                pass
+    return None
+
+
+def get_available_cores(
+    *,
+    respect_cgroup: bool = True,
+    respect_load: bool = True,
+    cgroup_base: Path | None = None,
+) -> int:
+    """Return available CPU cores respecting process affinity, cgroup quota, and load."""
     try:
         affinity = len(os.sched_getaffinity(0))
     except (AttributeError, OSError):
         affinity = os.cpu_count() or 1
     total = os.cpu_count() or 1
-    return max(1, min(affinity, total))
+    cores = max(1, min(affinity, total))
+
+    if respect_cgroup:
+        cgroup_limit = get_cgroup_cpu_limit(cgroup_base)
+        if cgroup_limit is not None and cgroup_limit > 0:
+            cores = min(cores, max(1, math.floor(cgroup_limit)))
+
+    if respect_load:
+        try:
+            load1 = os.getloadavg()[0]
+            if load1 > 0:
+                cores = max(1, math.floor(cores - load1))
+        except (AttributeError, OSError):
+            pass
+
+    return max(1, cores)
 
 
 def get_cpu_cap(available_cores: int | None = None) -> int:
@@ -609,6 +700,7 @@ def acquire_cpu_claim(
             claimed_at=time.time(),
             job_id=job_id,
             job_dir=str(job_dir) if job_dir else None,
+            proc_start_time=get_process_start_time(os.getpid()),
         )
         allocations[token] = asdict(claim)
         data["allocations"] = allocations
@@ -645,7 +737,14 @@ def build_child_env(
     claim_session: ClaimSession,
     base_env: dict[str, str] | None = None,
 ) -> dict[str, str]:
-    """Construct child environment hiding all unallocated GPUs and setting thread caps."""
+    """Construct child environment hiding all unallocated GPUs and setting thread caps.
+
+    Accounting Limits:
+    Environment variables (OMP_NUM_THREADS, TORCH_NUM_THREADS, etc.) are cooperative:
+    well-behaved runtimes and child processes will honor them. They cannot strictly
+    prevent arbitrary uncooperative C extensions or external binaries from spawning
+    extra threads without kernel-level cgroups or affinity constraints.
+    """
     env = dict(os.environ if base_env is None else base_env)
 
     if claim_session.device_claim is not None:
@@ -666,8 +765,40 @@ def build_child_env(
         env["VECLIB_MAXIMUM_THREADS"] = threads_str
         env["NUMEXPR_NUM_THREADS"] = threads_str
         env["TORCH_NUM_THREADS"] = threads_str
+        env["RAY_NUM_CPUS"] = threads_str
+        env["POLARS_MAX_THREADS"] = threads_str
+        env["PS_CPU_ALLOWANCE"] = threads_str
+        env["PS_NUM_WORKERS"] = threads_str
 
     return env
+
+
+def terminate_and_reap_process_group(
+    process: subprocess.Popen[Any],
+    *,
+    sigterm_timeout: float = 15.0,
+    sigkill_timeout: float = 5.0,
+) -> bool:
+    """Terminate and reap child process group. Return True if death verified."""
+    if process.poll() is not None:
+        return True
+    try:
+        os.killpg(process.pid, signal.SIGTERM)
+    except (ProcessLookupError, PermissionError):
+        pass
+    try:
+        process.wait(timeout=sigterm_timeout)
+        return True
+    except (subprocess.TimeoutExpired, TimeoutError):
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except (ProcessLookupError, PermissionError):
+            pass
+        try:
+            process.wait(timeout=sigkill_timeout)
+            return True
+        except (subprocess.TimeoutExpired, TimeoutError):
+            return process.poll() is not None
 
 
 def release_session_claims(session: ClaimSession) -> None:
@@ -714,6 +845,9 @@ def claim_resources(
     recheck_fn: Callable[[str, float], bool] | None = None,
 ) -> Iterator[ClaimSession]:
     """Context manager acquiring device and CPU claims and releasing them upon exit."""
+    if cpu_threads is None or cpu_threads <= 0:
+        raise ValueError("All campaign jobs (including GPU jobs) require an explicit positive cpu_threads allowance")
+
     claims_path = get_claims_dir(claims_dir)
     dev_claim: DeviceClaim | None = None
     cpu_claim: CPUClaim | None = None
@@ -730,17 +864,16 @@ def claim_resources(
                 probe_fn=probe_fn,
                 recheck_fn=recheck_fn,
             )
-        if cpu_threads is not None and cpu_threads > 0:
-            cpu_claim = acquire_cpu_claim(
-                threads=cpu_threads,
-                job_id=job_id,
-                job_dir=job_dir,
-                claims_dir=claims_path,
-                available_cores=available_cores,
-                cpu_cap=cpu_cap,
-            )
+        cpu_claim = acquire_cpu_claim(
+            threads=cpu_threads,
+            job_id=job_id,
+            job_dir=job_dir,
+            claims_dir=claims_path,
+            available_cores=available_cores,
+            cpu_cap=cpu_cap,
+        )
 
-        session_token = dev_claim.token if dev_claim else (cpu_claim.token if cpu_claim else "")
+        session_token = dev_claim.token if dev_claim else cpu_claim.token
         session = ClaimSession(
             token=session_token,
             device_claim=dev_claim,
@@ -790,6 +923,9 @@ def launch(
     recheck_fn: Callable[[str, float], bool] | None = None,
 ) -> tuple[subprocess.Popen[Any], ClaimSession]:
     """Launch a child process under verified resource claims. Clean up claims on launch failure."""
+    if cpu_threads is None or cpu_threads <= 0:
+        raise ValueError("All campaign jobs (including GPU jobs) require an explicit positive cpu_threads allowance")
+
     claims_path = get_claims_dir(claims_dir)
     dev_claim: DeviceClaim | None = None
     cpu_claim: CPUClaim | None = None
@@ -806,24 +942,23 @@ def launch(
                 probe_fn=probe_fn,
                 recheck_fn=recheck_fn,
             )
-        if cpu_threads is not None and cpu_threads > 0:
-            cpu_claim = acquire_cpu_claim(
-                threads=cpu_threads,
-                job_id=job_id,
-                job_dir=job_dir,
-                claims_dir=claims_path,
-                available_cores=available_cores,
-                cpu_cap=cpu_cap,
-            )
+        cpu_claim = acquire_cpu_claim(
+            threads=cpu_threads,
+            job_id=job_id,
+            job_dir=job_dir,
+            claims_dir=claims_path,
+            available_cores=available_cores,
+            cpu_cap=cpu_cap,
+        )
 
-        session_token = dev_claim.token if dev_claim else (cpu_claim.token if cpu_claim else "")
+        session_token = dev_claim.token if dev_claim else cpu_claim.token
         session = ClaimSession(
             token=session_token,
             device_claim=dev_claim,
             cpu_claim=cpu_claim,
             claims_dir=claims_path,
         )
-    except Exception:
+    except BaseException:
         if dev_claim is not None:
             try:
                 release_device_claim(dev_claim.host, dev_claim.device_uuid, dev_claim.token, claims_path)
@@ -833,6 +968,24 @@ def launch(
 
     # Build isolated environment
     child_env = build_child_env(session, env)
+
+    # RECHECK DEVICE OCCUPANCY UNDER CLAIM IMMEDIATELY BEFORE POPEN
+    if session.device_claim is not None:
+        claimed_uuid = session.device_claim.device_uuid
+        is_still_free = True
+        if recheck_fn is not None:
+            is_still_free = recheck_fn(claimed_uuid, min_free_memory_mb)
+        else:
+            fresh_devices = query_gpus(probe_fn)
+            fresh_cand = next((d for d in fresh_devices if d["uuid"] == claimed_uuid), None)
+            if fresh_cand is None or not is_device_free(fresh_cand, min_free_memory_mb=min_free_memory_mb):
+                is_still_free = False
+
+        if not is_still_free:
+            release_session_claims(session)
+            raise DeviceBusyError(
+                f"Device {claimed_uuid} on {session.device_claim.host} became busy during pre-Popen recheck"
+            )
 
     try:
         process = subprocess.Popen(
@@ -844,7 +997,7 @@ def launch(
             start_new_session=True,
         )
         return process, session
-    except Exception:
+    except BaseException:
         # Clean up claims immediately on launch failure
         release_session_claims(session)
         raise
@@ -885,9 +1038,20 @@ def run_supervised(
         recheck_fn=recheck_fn,
     )
     try:
-        return process.wait()
-    finally:
-        release_session_claims(session)
+        code = process.wait()
+    except BaseException:
+        # On interruption, terminate and reap owned process group before release
+        reaped = terminate_and_reap_process_group(process)
+        if reaped:
+            release_session_claims(session)
+        else:
+            # Retain claim as unresolved if child death cannot be verified
+            # rather than leaking a running rogue child with released claims
+            pass
+        raise
+
+    release_session_claims(session)
+    return code
 
 
 def get_claims_status(claims_dir: Path | str | None = None) -> dict[str, Any]:
@@ -928,7 +1092,7 @@ def main() -> int:
     launch_cmd = subparsers.add_parser("launch", help="Launch a command under resource claims")
     launch_cmd.add_argument("--gpu-uuid", help="Explicit GPU UUID to claim")
     launch_cmd.add_argument("--auto-gpu", action="store_true", help="Auto-claim first free GPU")
-    launch_cmd.add_argument("--cpu-threads", type=int, help="CPU threads to claim under host cap")
+    launch_cmd.add_argument("--cpu-threads", type=int, required=True, help="CPU threads to claim under host cap (required for all jobs)")
     launch_cmd.add_argument("--job-id", default="cli-job", help="Job identity for claims")
     launch_cmd.add_argument("--claims-dir", type=Path, help="Explicit claims directory")
     launch_cmd.add_argument("--command", nargs=argparse.REMAINDER, help="Command to execute")
