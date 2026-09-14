@@ -2,7 +2,8 @@
   "schema": "pointstream.campaign_source_split.v1",
   "doc_role": "development_validation_confirmation_split",
   "campaign": "evaluation-20260914",
-  "status": "proposed_pending_coordinator_acceptance",
+  "status": "accepted_target_pending_acquisition",
+  "contract_revision": "e01r-20260914",
   "source_count_policy": "manifests/evaluation_20260914_source_count_policy.json",
   "grouping": {
     "unit": "match",
@@ -85,11 +86,20 @@
   },
   "validation": {
     "role": "hyperparameters_and_rate_quality_choices",
-    "rule": "Use temporally gapped scenes inside development videos, never confirmation matches. Do not choose the winner from confirmation scores.",
+    "rule": "Use temporally gapped scenes inside development videos, never confirmation matches. Do not choose the winner from confirmation scores. Training selectors must exclude these blocks.",
     "preferred_blocks": [
       {"video": "djokovic_federer", "scene": "scene_009", "note": "easy-camera development scene unused by Gate A recovery pair"},
       {"video": "alcaraz_perricard", "scene": "scene_003", "note": "held inside development for hyperparameter checks"}
     ]
+  },
+  "training_selector": {
+    "exclude_splits": ["validation", "confirmation_reserved_unacquired", "exposed_confirmation_not_holdout"],
+    "exclude_scenes": [
+      {"video": "djokovic_federer", "scene": "scene_009"},
+      {"video": "alcaraz_perricard", "scene": "scene_003"}
+    ],
+    "match_grouping": "video_or_match_id; scenes from one match count once",
+    "replay_check": "Reject confirmation candidate IDs and the two exposed Gate B source_ids. alcaraz_highlights remains a compilation and development-only. Do not train on reserved confirmation files if they later appear on disk."
   },
   "exposed_confirmation_not_holdout": {
     "role": "already_scored_restricted_confirmation",
@@ -116,7 +126,9 @@
   "confirmation_reserved_unacquired": {
     "role": "untouched_confirmation_pending_acquisition",
     "selected_count": 3,
-    "selection_basis": "largest feasible unused primary shortlist without reading confirmation scores; three is the campaign planning target",
+    "acquired_count": 0,
+    "eligible_count": 0,
+    "selection_basis": "Coordinator accepted three fresh independent matches as the prospective target and reserved these primary IDs. This is a target/shortlist, not acquisition, eligibility, or scientific confirmation.",
     "candidates": [
       "conf_cand_01_sinner_medvedev_ao2024",
       "conf_cand_04_medvedev_djokovic_usopen2023",
@@ -130,6 +142,7 @@
       "conf_alt_01_alcaraz_zverev_rg2024",
       "conf_alt_02_alcaraz_djokovic_wimbledon2023"
     ],
+    "do_not_substitute_exposed_gate_b": true,
     "on_disk_fresh_untouched_count": 0
   },
   "secondary_domain": {

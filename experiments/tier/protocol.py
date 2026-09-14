@@ -27,6 +27,7 @@ from experiments.tier.source_count_policy import (
     Stage,
     confirmation_label,
     load_required_matches,
+    policy_identity,
 )
 
 
@@ -48,6 +49,7 @@ class ExperimentIdentity:
     model_hashes: dict[str, str] = field(default_factory=dict)
     metric_versions: dict[str, str] = field(default_factory=dict)
     runtime_policy: dict[str, Any] = field(default_factory=dict)
+    source_count_policy: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -61,6 +63,7 @@ class ExperimentIdentity:
             "model_hashes": self.model_hashes,
             "metric_versions": self.metric_versions,
             "runtime_policy": self.runtime_policy,
+            "source_count_policy": self.source_count_policy,
         }
 
     def fingerprint(self) -> str:
@@ -191,6 +194,7 @@ def capture_current_identity(
         model_hashes=model_hashes or {},
         metric_versions=capture_metric_versions(),
         runtime_policy=policy,
+        source_count_policy=policy_identity(),
     )
 
 

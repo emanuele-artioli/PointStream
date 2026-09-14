@@ -9,7 +9,9 @@
     "operating_points": "manifests/evaluation_20260914_operating_points.json",
     "reuse_map": "manifests/evaluation_20260914_reuse_map.json",
     "result_schema": "pointstream.campaign_result.v1",
+    "contract_revision": "e01r-20260914",
     "example_records": "manifests/evaluation_20260914_result_contract.example.json",
+    "e02_producer_examples": "manifests/evaluation_20260914_e02_producer.example.json",
     "protocol_module": "experiments.tier.protocol",
     "result_module": "experiments.tier.campaign_result",
     "required_matches_loader": "experiments.tier.source_count_policy.load_required_matches"
@@ -26,7 +28,7 @@
       "anchors": ["svt-av1-slowest-supported", "vvc-slowest-supported"],
       "neural_anchor": "dcvc_uf_if_available_else_return_blocker"
     },
-    "reuse": ["gate_a_vvc_webp_n96_run2", "wave2_overlap_20260910", "dev_recovery_pilot_frozen"],
+    "reuse": ["gate_a_vvc_webp_n96_run2 diagnostic_only", "wave2_overlap_20260910 diagnostic_only", "dev_recovery_pilot_frozen diagnostic_only"],
     "emit": "campaign_result.v1 rows with claim_eligibility.rd vs runtime split"
   },
   "e04": {
@@ -47,17 +49,33 @@
   },
   "e02_runner_interface": {
     "do_not_edit_e02_files_from_e01": true,
+    "contract_revision": "e01r-20260914",
+    "adapter": "experiments.tier.campaign_result.campaign_record_from_generation_adapter",
+    "validators": ["experiments.tier.campaign_result.validate_campaign_record", "experiments.tier.campaign_result.ingest_for_claim"],
     "expected_fields_on_generation_rows": [
+      "schema=pointstream.campaign_result.v1",
+      "contract_revision",
+      "record_class",
       "artifact_id",
+      "artifact_path",
+      "artifact_sha256",
+      "code_revision",
       "source_ids",
       "frame_ids",
-      "checkpoint_sha256",
-      "backend_identity",
-      "standalone_decode",
-      "wire_ledger",
-      "claim_eligibility",
-      "controls.normal_vs_shuffled_conditioning"
+      "checkpoint_identity",
+      "evidence.metrics",
+      "evidence.bytes",
+      "claim_eligibility.rd",
+      "claim_eligibility.runtime",
+      "claim_eligibility.trajectory",
+      "claim_eligibility.generalization",
+      "controls.standalone_decode",
+      "controls.metric_calibration",
+      "controls.wire_ledger",
+      "controls.conditioned_vs_shuffled"
     ],
-    "full_trajectory_claim": "generalization plus rd; 16-frame first-frame diagnostics remain ineligible"
+    "trajectory_claim": "claim_eligibility.trajectory with trajectory_coverage=full_visible_track; not generalization",
+    "generalization_claim": "independent_match_ids (>=2) and frozen_procedure; never inferred from full-trajectory or single-scene readiness",
+    "single_scene_readiness": "rd and optional trajectory only; must not require generalization=true"
   }
 }

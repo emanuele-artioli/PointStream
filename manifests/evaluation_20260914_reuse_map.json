@@ -21,22 +21,28 @@
           "artifact_id": "gate_a_vvc_webp_n96_run2",
           "path": "outputs/gate-a-vvc-webp-n96-run2/report.json",
           "sha256": "71d82a51c6bf831c6a336d12a2cb05b1496912caa17a702b9e490f28380d939a",
-          "decision": "reuse",
-          "incompatibility": "Development source only; audited as non-citable for Gate A pass. Timing is instrument-specific, not live latency."
+          "decision": "inventory_diagnostic_plot_only",
+          "evidence_class": "historical_observation",
+          "claim_eligibility": {"rd": false, "runtime": false, "rd_diagnostic": true},
+          "incompatibility": "Development source only; audited as non-citable for Gate A pass. Reconstruction/scoring path and ledger were not re-established as validated claim evidence in E01R. Timing is instrument-specific, not live latency."
         },
         {
           "artifact_id": "dev_recovery_pilot_frozen",
           "path": "outputs/development-recovery/pilot-frozen/report.json",
           "sha256": "fc9b87a331db6044bc592b749fd037a0332d333b5fa1f53f2e556f49856298dd",
-          "decision": "reuse",
-          "incompatibility": "pilot_alarms_clear=false; identity/evidence unverified. Keep as RD diagnostic, exclude speed and confirmation."
+          "decision": "inventory_diagnostic_plot_only",
+          "evidence_class": "historical_observation",
+          "claim_eligibility": {"rd": false, "runtime": false, "rd_diagnostic": true},
+          "incompatibility": "pilot_alarms_clear=false; identity_verified=false; evidence_verified=false; SSIM unrelated-content calibration invalid. Missing timing is not the only defect: reconstruction, calibration and ledger are unverified. Keep in inventory and labelled diagnostic plots; block from validated RD until those are established per metric/arm."
         },
         {
           "artifact_id": "wave2_overlap_20260910",
           "path": "outputs/development-recovery/wave2-overlap-20260910/report.json",
           "sha256": "48cf7b20a1a29ac958a8eac3972b381f848439003f02d0b1222de8221f81643b",
-          "decision": "reuse",
-          "incompatibility": "identity_verified=false; evidence_verified=false. Generation off, 48 frames. Usable as development RD if controls are rechecked, not as confirmation."
+          "decision": "inventory_diagnostic_plot_only",
+          "evidence_class": "historical_observation",
+          "claim_eligibility": {"rd": false, "runtime": false, "rd_diagnostic": true},
+          "incompatibility": "Chronology: this overlap run is after PR #88 (2b7c2b0), not a pre-transport ladder. Unresolved path is still identity_verified=false, evidence_verified=false, generation-off 48-frame development RD, and the appearance path that forces paste (is_gen only when supplied_crop is None). Usable as a labelled diagnostic, not validated RD or confirmation."
         },
         {
           "artifact_id": "gate_b_confirmation_report",
@@ -108,8 +114,9 @@
           "artifact_id": "wave2_overlap_20260910",
           "path": "outputs/development-recovery/wave2-overlap-20260910/report.json",
           "sha256": "48cf7b20a1a29ac958a8eac3972b381f848439003f02d0b1222de8221f81643b",
-          "decision": "repair_then_new_run",
-          "incompatibility": "Historical residual ladders predate transport repairs. Do not upgrade old residual streams to post-#88/#102 precision."
+          "decision": "inventory_then_new_run",
+          "evidence_class": "historical_observation",
+          "incompatibility": "Chronology: overlap is after #88. Do not treat this file as a pre-repair residual ladder. Unresolved path: post-#88 appearance still serializes pasted crops so generation-on is not a residual+generation comparison; identity_verified=false. Do not upgrade old residual streams to post-#102 precision without a new encode."
         }
       ]
     },

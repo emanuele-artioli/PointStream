@@ -56,14 +56,38 @@
     ],
     "unsupported_recorded_not_reinterpreted": true
   },
+  "timestamp_sampling": {
+    "policy": "deterministic_native_pts",
+    "method": "For target fps f, keep source frames whose PTS is nearest to t0 + k/f among existing source timestamps. Never interpolate or create source frames. Record source_frame_index and source_pts for every kept frame.",
+    "record": ["source_pts", "source_frame_index", "source_fps"]
+  },
+  "colour_missing_tags": {
+    "yuv_broadcast": {
+      "matrix": "assume_bt709_and_label_assumed",
+      "primaries": "assume_bt709_and_label_assumed",
+      "transfer": "assume_bt709_and_label_assumed",
+      "range": "assume_limited_and_label_assumed"
+    },
+    "rgb": {
+      "matrix": "identity_rgb",
+      "range": "assume_full_and_label_assumed"
+    },
+    "never_silently_reinterpret_incompatible_formats_as_equal": true
+  },
   "restoration": {
     "native_operating_point_quality": "report_separately",
     "common_display": {
       "spatial_filter": "lanczos",
-      "temporal_policy": "drop_or_hold_existing_source_timestamps_never_synthesize_frames",
+      "temporal_policy": "hold_last_decoded_output_to_source_timestamps_never_synthesize_frames",
       "charge_rescaling_time_and_quality_loss": true
     },
     "no_cross_fps_bd_rate_on_different_frame_sets": true
+  },
+  "common_timebase_scoring": {
+    "missing_output_frames": "hold_last_decoded_output_frame_and_label_hold",
+    "never_restore_from_untransmitted_source": true,
+    "reduced_fps_vs_reduced_reference": "allowed_only_when_scope_is_labeled_native_operating_point",
+    "common_display_comparison": "decode at arm fps, hold to source timestamps, score against source-timebase reference; do not secretly downsample the reference to match a reduced arm"
   },
   "quality_policy": {
     "frozen_on": "development_evidence_and_frozen_procedure_not_confirmation_winners",
@@ -71,8 +95,18 @@
     "tier1_search": ["psnr_y"],
     "tier2_paper": ["psnr_y", "ssim", "vmaf", "lpips"],
     "practical_quality_floor": {
+      "role": "diagnostic_exclusion",
       "vmaf": 20.0,
-      "rationale": "Development Gate A/B audits recorded VMAF-zero rungs that cannot carry a quality claim. Floor excludes that plateau before winner selection. SSIM/PSNR must be finite."
+      "rationale": "VMAF 20 only drops collapsed/zero-plateau rungs. It is not a practical quality floor."
+    },
+    "interpretable_quality_criterion": {
+      "status": "proposed_pending_development_anchor_inspection",
+      "does_not_block_exploratory_low_res_probes": true,
+      "rule": "Before final selection, freeze a development criterion: at the named operating point the candidate must beat the calibrated severe-degradation reconstruction on VMAF and PSNR-Y, remain worse than identical and better than unrelated, and pass a visual check of three development reconstructions (easy camera, pan, longest available clip). Measure those calibration anchors on alcaraz_highlights/scene_000 and federer_djokovic/scene_007 at display_low; quote those scores beside every published number. Do not treat VMAF 20 as that floor.",
+      "inspectable_reconstructions": [
+        "alcaraz_highlights/scene_000",
+        "federer_djokovic/scene_007"
+      ]
     },
     "matched_comparison": "matched_rate_or_matched_quality_with_source_level_uncertainty"
   },
@@ -85,11 +119,16 @@
   },
   "sustained_live_test": {
     "required_for": "finalists_only",
-    "min_duration_seconds": 8.0,
+    "smoke_check_seconds": 8.0,
+    "smoke_check_role": "live_startup_smoke_not_sustained_evidence",
+    "min_duration_seconds": 30.0,
+    "min_duration_scope": "after_startup",
     "min_refresh_cycles": 4,
     "must_exceed": ["startup", "temporal_context"],
     "backlog_over_time": true,
-    "short_scene_probes_cannot_establish_sustained_live": true
+    "latency_by_window": true,
+    "short_scene_probes_cannot_establish_sustained_live": true,
+    "if_source_too_short": "return_missing_test_do_not_declare_sustained_live"
   },
   "screening": {
     "min_rate_points": 2,

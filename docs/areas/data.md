@@ -4,9 +4,12 @@
 
 Coordinator accepts three fresh matches as the target and the proposed trio as
 an acquisition shortlist; none are acquired/confirmed eligible yet. E01R starts
-bounded acquisition now, without scoring. Remove any fallback treating the two
-exposed sources as fresh/restricted held-out confirmation. Actual source split
-and quality criterion remain subject to the evidence checks in E01R.
+bounded acquisition now, without scoring. The source-count policy no longer
+sets `fallback_if_unacquired.uses_exposed_sources`. Training selectors exclude
+validation blocks and reserved confirmation IDs. Proposed practical quality
+criterion uses calibrated development severe-degradation anchors, not VMAF 20
+as a floor. Actual acquired/eligible counts remain subject to the acquisition
+lane and coordinator freeze.
 
 ## Current campaign — 14 September 2026
 

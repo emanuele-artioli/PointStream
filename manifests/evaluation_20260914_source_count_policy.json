@@ -1,8 +1,10 @@
 {
   "schema": "pointstream.confirmation_source_count.v1",
   "doc_role": "campaign_source_count_policy",
+  "policy_id": "evaluation_20260914_source_count.e01r",
+  "contract_revision": "e01r-20260914",
   "campaign": "evaluation-20260914",
-  "status": "proposed_pending_coordinator_acceptance",
+  "status": "accepted_target_pending_acquisition",
   "preferred_matches": 6,
   "selection_without_test_scores": true,
   "notes": [
@@ -25,10 +27,11 @@
       "If acquisition of the three reserved matches fails, do not substitute the two scored Gate B sources as untouched confirmation."
     ],
     "fallback_if_unacquired": {
-      "required_matches": 2,
-      "label": "restricted_confirmation",
-      "uses_exposed_sources": true,
-      "not_untouched_holdout": true
+      "required_matches": null,
+      "label": "report_deficit_do_not_relabel_exposed",
+      "uses_exposed_sources": false,
+      "not_untouched_holdout": true,
+      "rule": "Acquisition failure needs a prospective unused substitute and an updated manifest. The two scored Gate B sources remain development or historical observations."
     }
   }
 }

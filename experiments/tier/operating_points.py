@@ -23,7 +23,18 @@ def load_operating_points(path: Path | None = None) -> dict[str, Any]:
         "quality_policy",
         "latency_policy",
         "sustained_live_test",
+        "timestamp_sampling",
+        "common_timebase_scoring",
     ):
         if key not in data:
             raise ValueError(f"operating-point contract missing {key}")
+    live = data["sustained_live_test"]
+    min_s = live.get("min_duration_seconds")
+    if not isinstance(min_s, (int, float)) or isinstance(min_s, bool) or min_s < 30:
+        raise ValueError("sustained_live_test.min_duration_seconds must be >= 30")
+    if live.get("smoke_check_seconds") is None:
+        raise ValueError("sustained_live_test.smoke_check_seconds is required")
+    floor = (data.get("quality_policy") or {}).get("practical_quality_floor")
+    if isinstance(floor, dict) and floor.get("vmaf") == 20.0 and floor.get("role") != "diagnostic_exclusion":
+        raise ValueError("VMAF 20 is a diagnostic exclusion, not a practical quality floor")
     return data
