@@ -17,8 +17,11 @@ import argparse
 import logging
 import math
 import os
+from pathlib import Path
 import time
+from typing import Any
 
+import numpy as np
 import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
@@ -38,6 +41,14 @@ os.environ["NCCL_P2P_DISABLE"] = "1"
 os.environ["NCCL_IB_DISABLE"] = "1"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+
+def save_checkpoint_atomic(state: dict[str, Any] | Any, target_path: str | Path) -> None:
+    path = Path(target_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_name(f"{path.name}.tmp.{os.getpid()}")
+    torch.save(state, tmp_path)
+    tmp_path.replace(path)
 
 
 # ---------------------------------------------------------------------------
@@ -249,14 +260,21 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
     if args.model_size == "lite":
         generator = SPADEResNet9Generator(in_nc=3, out_nc=3, ngf=64, n_blocks=9).to(device)
         num_D = 2
-    else:  # full – will use same ResNet9 + local enhancer in future
+    else:  # full – currently same ResNet9 with 3-scale discriminator (local enhancer is future work)
         generator = SPADEResNet9Generator(in_nc=3, out_nc=3, ngf=64, n_blocks=9).to(device)
         num_D = 3
 
     discriminator = MultiscaleDiscriminator(input_nc=6, ndf=64, n_layers=3, num_D=num_D).to(device)
 
-    # Optionally load pretrained generator (for progressive training)
+    # Base weight initialization first so pretrained weights are never overwritten
+    generator.apply(weights_init_normal)
+    discriminator.apply(weights_init_normal)
+
     start_epoch = 0
+    start_step = 0
+    ckpt = None
+
+    # Optionally load pretrained generator (for progressive training)
     if args.pretrained_g and os.path.exists(args.pretrained_g):
         if is_main:
             logging.info(f"Loading pretrained generator from {args.pretrained_g}")
@@ -269,10 +287,21 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
         ckpt = torch.load(args.checkpoint_path, map_location=device)
         generator.load_state_dict(ckpt["G"])
         discriminator.load_state_dict(ckpt["D"])
-        start_epoch = ckpt["epoch"] + 1
-    else:
-        generator.apply(weights_init_normal)
-        discriminator.apply(weights_init_normal)
+        saved_step = ckpt.get("step", -1)
+        total_steps = ckpt.get("total_steps_in_epoch", -1)
+        if saved_step >= 0 and total_steps > 0 and saved_step < total_steps - 1:
+            start_epoch = ckpt["epoch"]
+            start_step = saved_step + 1
+        else:
+            start_epoch = ckpt["epoch"] + 1
+            start_step = 0
+
+        if "rng_torch" in ckpt and ckpt["rng_torch"] is not None:
+            torch.set_rng_state(ckpt["rng_torch"])
+        if "rng_cuda" in ckpt and ckpt["rng_cuda"] is not None and torch.cuda.is_available():
+            torch.cuda.set_rng_state(ckpt["rng_cuda"])
+        if "rng_numpy" in ckpt and ckpt["rng_numpy"] is not None:
+            np.random.set_state(ckpt["rng_numpy"])
 
     # DDP wrapping
     if ngpus_per_node > 1:
@@ -283,9 +312,11 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
     optimizer_G = optim.Adam(generator.parameters(), lr=args.lr, betas=(args.b1, args.b2))
     optimizer_D = optim.Adam(discriminator.parameters(), lr=args.lr, betas=(args.b1, args.b2))
 
-    if args.resume and os.path.exists(args.checkpoint_path):
-        optimizer_G.load_state_dict(ckpt["opt_G"])
-        optimizer_D.load_state_dict(ckpt["opt_D"])
+    if ckpt is not None:
+        if "opt_G" in ckpt:
+            optimizer_G.load_state_dict(ckpt["opt_G"])
+        if "opt_D" in ckpt:
+            optimizer_D.load_state_dict(ckpt["opt_D"])
 
     # --- Losses ---
     vgg_weights: str | None = "assets/weights/vgg19-bn.pth"
@@ -352,6 +383,9 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
             iterator = enumerate(dataloader)
 
         for i, (skeleton, ref_img, real_img) in iterator:
+            if epoch == start_epoch and i < start_step:
+                continue
+
             skeleton = skeleton.to(device)  # Shape: [B, 3, H, W]
             ref_img = ref_img.to(device)    # Shape: [B, 3, H, W]
             real_img = real_img.to(device)  # Shape: [B, 3, H, W]
@@ -435,6 +469,31 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
                     logging.info(f"Progress heartbeat: epoch {epoch}/{args.epochs}, step {i}/{len(dataloader)}")
                     last_progress_time = now
 
+                # Intra-epoch hourly wall-clock checkpoint deadline check
+                if now - last_checkpoint_time >= 3600.0:
+                    g_mod = generator.module if ngpus_per_node > 1 else generator
+                    d_mod = discriminator.module if ngpus_per_node > 1 else discriminator
+                    save_checkpoint_atomic(g_mod.state_dict(), args.out_weights)
+                    rng_cuda = torch.cuda.get_rng_state() if torch.cuda.is_available() else None
+                    save_checkpoint_atomic({
+                        "epoch": epoch,
+                        "step": i,
+                        "total_steps_in_epoch": len(dataloader),
+                        "model_size": args.model_size,
+                        "G": g_mod.state_dict(),
+                        "D": d_mod.state_dict(),
+                        "opt_G": optimizer_G.state_dict(),
+                        "opt_D": optimizer_D.state_dict(),
+                        "rng_torch": torch.get_rng_state(),
+                        "rng_cuda": rng_cuda,
+                        "rng_numpy": np.random.get_state(),
+                        "timestamp_unix": now,
+                    }, args.checkpoint_path)
+                    last_checkpoint_time = now
+                    logging.info(f"Intra-epoch hourly checkpoint saved at epoch {epoch}, step {i}/{len(dataloader)}")
+
+        start_step = 0
+
         # --- End of epoch ---
         if is_main:
             # Save sample images
@@ -449,21 +508,28 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
                 g_mod = generator.module if ngpus_per_node > 1 else generator
                 d_mod = discriminator.module if ngpus_per_node > 1 else discriminator
 
-                torch.save(g_mod.state_dict(), args.out_weights)
-                torch.save({
+                save_checkpoint_atomic(g_mod.state_dict(), args.out_weights)
+                rng_cuda = torch.cuda.get_rng_state() if torch.cuda.is_available() else None
+                save_checkpoint_atomic({
                     "epoch": epoch,
+                    "step": len(dataloader) - 1,
+                    "total_steps_in_epoch": len(dataloader),
                     "model_size": args.model_size,
                     "G": g_mod.state_dict(),
                     "D": d_mod.state_dict(),
                     "opt_G": optimizer_G.state_dict(),
                     "opt_D": optimizer_D.state_dict(),
+                    "rng_torch": torch.get_rng_state(),
+                    "rng_cuda": rng_cuda,
+                    "rng_numpy": np.random.get_state(),
+                    "timestamp_unix": now,
                 }, args.checkpoint_path)
                 last_checkpoint_time = now
 
     # Final save
     if is_main:
         g_mod = generator.module if ngpus_per_node > 1 else generator
-        torch.save(g_mod.state_dict(), args.out_weights)
+        save_checkpoint_atomic(g_mod.state_dict(), args.out_weights)
         logging.info("Spade4Tennis training complete.")
 
     if ngpus_per_node > 1:
@@ -477,7 +543,7 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train Spade4Tennis for Pointstream GenAI Backend")
     parser.add_argument("--model-size", type=str, default="lite", choices=["lite", "full"],
-                        help="Model tier: lite (ResNet-9, fast) or full (with local enhancer)")
+                        help="Model tier: lite (ResNet-9, 2 discriminators) or full (ResNet-9, 3 discriminators; local enhancer is future work)")
     parser.add_argument("--data-root", type=str, default="assets/dataset", help="Dataset root path")
     parser.add_argument("--condition", type=str, default="pose_body",
                         choices=["pose_body", "pose_racket", "skeleton"],

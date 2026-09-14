@@ -265,31 +265,46 @@ def evaluate_checkpoint(
 
     runner = runner_fn if runner_fn is not None else run
     dataset_path = Path(dataset_root)
-    res_settings = residual_settings or {}
-    res_codec = res_settings.get("codec", "avc")
-    if res_codec in ("libx264", "x264"):
-        res_codec = "avc"
-
-    cfg = PointstreamConfig(
-        lattice=lattice_config_from(
-            StageLattice.of(
-                STAGE_DETECTION,
-                STAGE_APPEARANCE,
-                STAGE_POSE,
-                STAGE_GENERATION,
-                STAGE_RESIDUAL,
-                STAGE_METRICS,
-            )
-        ),
-        generator=GeneratorConfig(backend=arch),
-        residual=ResidualConfig(
+    res_settings = residual_settings
+    stages: tuple[str, ...]
+    if res_settings is not None:
+        residual_enabled = True
+        res_codec = res_settings.get("codec", "avc")
+        if res_codec in ("libx264", "x264"):
+            res_codec = "avc"
+        stages = (
+            STAGE_DETECTION,
+            STAGE_APPEARANCE,
+            STAGE_POSE,
+            STAGE_GENERATION,
+            STAGE_RESIDUAL,
+            STAGE_METRICS,
+        )
+        residual_cfg: Any = ResidualConfig(
             codec=res_codec,
             rate=res_settings.get("crf", 28),
             preset=str(res_settings.get("preset", "medium")),
             pix_fmt=str(res_settings.get("pix_fmt", "yuv420p")),
             block_size=int(res_settings.get("block_size", 8)),
             block_threshold=float(res_settings.get("block_threshold", 0.0)),
+        )
+    else:
+        residual_enabled = False
+        stages = (
+            STAGE_DETECTION,
+            STAGE_APPEARANCE,
+            STAGE_POSE,
+            STAGE_GENERATION,
+            STAGE_METRICS,
+        )
+        residual_cfg = None
+
+    cfg = PointstreamConfig(
+        lattice=lattice_config_from(
+            StageLattice.of(*stages)
         ),
+        generator=GeneratorConfig(backend=arch),
+        residual=residual_cfg,
         evaluation=EvaluationConfig(metrics=tuple(metrics)),
     )
 
@@ -545,7 +560,7 @@ def evaluate_checkpoint(
             context_ids=(clip_key,),
         )
 
-        delivered = run_res.delivered_frames
+        delivered = np.asarray(run_res.delivered_frames)
         psnr_val = None
         try:
             psnr_val = float(run_res.delivered_quality.whole_frame("psnr"))
@@ -572,12 +587,17 @@ def evaluate_checkpoint(
         else:
             temporal_error = 0.0
 
+        res_bytes = int(run_res.sizes.residual) if residual_enabled else 0
+        res_calls = 1 if (residual_enabled and res_bytes > 0) else 0
+
         clip_record = {
             "clip_key": clip_key,
             "video": video,
             "scene": scene,
             "track": track,
-            "residual_bytes": int(run_res.sizes.residual),
+            "residual_bytes": res_bytes,
+            "residual_calls": res_calls,
+            "residual_enabled": residual_enabled,
             "transport_total": int(run_res.sizes.transport_total),
             "psnr": psnr_val,
             "ssim": ssim_val,
@@ -624,7 +644,9 @@ def evaluate_checkpoint(
         }
 
     aggregate = {
-        "residual_bytes": total_residual_bytes,
+        "residual_enabled": residual_enabled,
+        "residual_bytes": total_residual_bytes if residual_enabled else 0,
+        "total_residual_calls": sum(c.get("residual_calls", 0) for c in per_clip_metrics),
         "total_bytes": total_transport_bytes,
         "video_fitted_weight_bytes": fitted_weight_bytes,
         "psnr_mean": psnr_mean,
@@ -866,8 +888,9 @@ def rank_variants(aggregate_by_variant: dict[str, dict[str, Any]]) -> tuple[list
         for v in valid_variants
         if aggregate_by_variant[v].get(PRIMARY_METRIC) is not None
     }
-    if not (payloads and len(payloads) == len(valid_variants)):
-        # Fall back to total_bytes if available
+    all_zero_residual = bool(payloads and all(payloads[v] == 0 for v in valid_variants))
+    if not (payloads and len(payloads) == len(valid_variants)) or all_zero_residual:
+        # Fall back to total_bytes for residual-off campaigns
         payloads = {
             v: aggregate_by_variant[v]["total_bytes"]
             for v in valid_variants
@@ -875,10 +898,27 @@ def rank_variants(aggregate_by_variant: dict[str, dict[str, Any]]) -> tuple[list
         }
 
     if payloads and len(payloads) == len(valid_variants):
-        # Fewest bytes wins; composite breaks exact ties only.
-        valid_ranked = sorted(valid_variants, key=lambda v: (payloads[v], -composite[v], v))
+        # Fewest wire bytes wins; objective quality breaks ties, composite reported for diagnostic.
+        valid_ranked = sorted(
+            valid_variants,
+            key=lambda v: (
+                payloads[v],
+                -float(aggregate_by_variant[v].get("psnr_mean") or 0.0),
+                -float(aggregate_by_variant[v].get("ssim_mean") or 0.0),
+                -composite.get(v, 0.0),
+                v,
+            ),
+        )
     else:
-        valid_ranked = sorted(valid_variants, key=lambda v: (-composite[v], v))
+        valid_ranked = sorted(
+            valid_variants,
+            key=lambda v: (
+                -float(aggregate_by_variant[v].get("psnr_mean") or 0.0),
+                -float(aggregate_by_variant[v].get("ssim_mean") or 0.0),
+                -composite.get(v, 0.0),
+                v,
+            ),
+        )
 
     invalid_ranked = sorted(invalid_variants, key=lambda v: (composite.get(v, -1.0), v))
     ranked = valid_ranked + invalid_ranked

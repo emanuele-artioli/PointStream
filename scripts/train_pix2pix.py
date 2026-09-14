@@ -2,8 +2,11 @@ import sqlite3  # noqa: F401
 import argparse
 import logging
 import os
+from pathlib import Path
 import time
+from typing import Any
 
+import numpy as np
 import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
@@ -128,6 +131,42 @@ def weights_init_normal(m):
         torch.nn.init.normal_(m.weight.data, 1.0, 0.02)
         torch.nn.init.constant_(m.bias.data, 0.0)
 
+def save_checkpoint_atomic(state: dict[str, Any] | Any, target_path: str | Path) -> None:
+    path = Path(target_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_name(f"{path.name}.tmp.{os.getpid()}")
+    torch.save(state, tmp_path)
+    tmp_path.replace(path)
+
+
+def build_checkpoint_state(
+    epoch: int,
+    step: int,
+    total_steps: int,
+    generator: nn.Module,
+    discriminator: nn.Module,
+    optimizer_G: optim.Optimizer,
+    optimizer_D: optim.Optimizer,
+    ngpus: int,
+) -> dict[str, Any]:
+    state_dict_G = generator.module.state_dict() if ngpus > 1 else generator.state_dict()
+    state_dict_D = discriminator.module.state_dict() if ngpus > 1 else discriminator.state_dict()
+    rng_cuda = torch.cuda.get_rng_state() if torch.cuda.is_available() else None
+    return {
+        "epoch": epoch,
+        "step": step,
+        "total_steps_in_epoch": total_steps,
+        "G": state_dict_G,
+        "D": state_dict_D,
+        "opt_G": optimizer_G.state_dict(),
+        "opt_D": optimizer_D.state_dict(),
+        "rng_torch": torch.get_rng_state(),
+        "rng_cuda": rng_cuda,
+        "rng_numpy": np.random.get_state(),
+        "timestamp_unix": time.time(),
+    }
+
+
 def main_worker(gpu, ngpus_per_node, args):
     is_main_process = (gpu == 0)
     
@@ -146,13 +185,29 @@ def main_worker(gpu, ngpus_per_node, args):
     discriminator = PatchGANDiscriminator().to(device)
 
     start_epoch = 0
+    start_step = 0
+    checkpoint = None
     if args.resume and os.path.exists(args.checkpoint_path):
         if is_main_process:
             logging.info(f"Resuming from checkpoint {args.checkpoint_path}")
         checkpoint = torch.load(args.checkpoint_path, map_location=device)
-        generator.load_state_dict(checkpoint['G'])
-        discriminator.load_state_dict(checkpoint['D'])
-        start_epoch = checkpoint['epoch'] + 1
+        generator.load_state_dict(checkpoint["G"])
+        discriminator.load_state_dict(checkpoint["D"])
+        saved_step = checkpoint.get("step", -1)
+        total_steps = checkpoint.get("total_steps_in_epoch", -1)
+        if saved_step >= 0 and total_steps > 0 and saved_step < total_steps - 1:
+            start_epoch = checkpoint["epoch"]
+            start_step = saved_step + 1
+        else:
+            start_epoch = checkpoint["epoch"] + 1
+            start_step = 0
+
+        if "rng_torch" in checkpoint and checkpoint["rng_torch"] is not None:
+            torch.set_rng_state(checkpoint["rng_torch"])
+        if "rng_cuda" in checkpoint and checkpoint["rng_cuda"] is not None and torch.cuda.is_available():
+            torch.cuda.set_rng_state(checkpoint["rng_cuda"])
+        if "rng_numpy" in checkpoint and checkpoint["rng_numpy"] is not None:
+            np.random.set_state(checkpoint["rng_numpy"])
     else:
         generator.apply(weights_init_normal)
         discriminator.apply(weights_init_normal)
@@ -165,9 +220,11 @@ def main_worker(gpu, ngpus_per_node, args):
     optimizer_G = optim.Adam(generator.parameters(), lr=args.lr, betas=(args.b1, args.b2))
     optimizer_D = optim.Adam(discriminator.parameters(), lr=args.lr, betas=(args.b1, args.b2))
 
-    if args.resume and os.path.exists(args.checkpoint_path):
-        optimizer_G.load_state_dict(checkpoint['opt_G'])
-        optimizer_D.load_state_dict(checkpoint['opt_D'])
+    if checkpoint is not None:
+        if "opt_G" in checkpoint:
+            optimizer_G.load_state_dict(checkpoint["opt_G"])
+        if "opt_D" in checkpoint:
+            optimizer_D.load_state_dict(checkpoint["opt_D"])
 
     criterion_GAN = nn.BCEWithLogitsLoss().to(device)
     criterion_pixelwise = nn.L1Loss().to(device)
@@ -216,6 +273,9 @@ def main_worker(gpu, ngpus_per_node, args):
             iterator = enumerate(dataloader)
 
         for i, (real_A, ref_img, real_B) in iterator:
+            if epoch == start_epoch and i < start_step:
+                continue
+
             real_A = real_A.to(device)
             ref_img = ref_img.to(device)
             real_B = real_B.to(device)
@@ -275,6 +335,26 @@ def main_worker(gpu, ngpus_per_node, args):
                     logging.info(f"Progress heartbeat: epoch {epoch}/{args.epochs}, step {i}/{len(dataloader)}")
                     last_progress_time = now
 
+                # Intra-epoch hourly wall-clock checkpoint deadline check
+                if now - last_checkpoint_time >= 3600.0:
+                    state_dict_G = generator.module.state_dict() if ngpus_per_node > 1 else generator.state_dict()
+                    save_checkpoint_atomic(state_dict_G, args.out_weights)
+                    ckpt_state = build_checkpoint_state(
+                        epoch=epoch,
+                        step=i,
+                        total_steps=len(dataloader),
+                        generator=generator,
+                        discriminator=discriminator,
+                        optimizer_G=optimizer_G,
+                        optimizer_D=optimizer_D,
+                        ngpus=ngpus_per_node,
+                    )
+                    save_checkpoint_atomic(ckpt_state, args.checkpoint_path)
+                    last_checkpoint_time = now
+                    logging.info(f"Intra-epoch hourly checkpoint saved at epoch {epoch}, step {i}/{len(dataloader)}")
+
+        start_step = 0
+
         if is_main_process:
             sample_img = torch.cat((real_A[:4], ref_img[:4], real_B[:4], fake_B[:4]), -1)
             vutils.save_image(sample_img, f"{args.sample_dir}/epoch_{epoch:03d}.png", nrow=4, normalize=True)
@@ -283,21 +363,23 @@ def main_worker(gpu, ngpus_per_node, args):
             # Hourly wall-clock checkpointing (or every 10 epochs or final epoch)
             if (epoch + 1) % 10 == 0 or (now - last_checkpoint_time >= 3600.0) or (epoch + 1 == args.epochs):
                 state_dict_G = generator.module.state_dict() if ngpus_per_node > 1 else generator.state_dict()
-                state_dict_D = discriminator.module.state_dict() if ngpus_per_node > 1 else discriminator.state_dict()
-                
-                torch.save(state_dict_G, args.out_weights)
-                torch.save({
-                    'epoch': epoch,
-                    'G': state_dict_G,
-                    'D': state_dict_D,
-                    'opt_G': optimizer_G.state_dict(),
-                    'opt_D': optimizer_D.state_dict(),
-                }, args.checkpoint_path)
+                save_checkpoint_atomic(state_dict_G, args.out_weights)
+                ckpt_state = build_checkpoint_state(
+                    epoch=epoch,
+                    step=len(dataloader) - 1,
+                    total_steps=len(dataloader),
+                    generator=generator,
+                    discriminator=discriminator,
+                    optimizer_G=optimizer_G,
+                    optimizer_D=optimizer_D,
+                    ngpus=ngpus_per_node,
+                )
+                save_checkpoint_atomic(ckpt_state, args.checkpoint_path)
                 last_checkpoint_time = now
 
     if is_main_process:
         state_dict_G = generator.module.state_dict() if ngpus_per_node > 1 else generator.state_dict()
-        torch.save(state_dict_G, args.out_weights)
+        save_checkpoint_atomic(state_dict_G, args.out_weights)
         logging.info("Training complete.")
 
 
