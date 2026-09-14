@@ -172,6 +172,9 @@ def build_eval_generator_ref(
     return as_runner_ref(backend, name=arch, capabilities=caps, requires=reqs)
 
 
+_DEFAULT_RESIDUAL_SETTINGS: Any = object()
+
+
 def evaluate_checkpoint(
     checkpoint_path: Path | str,
     arch: str,
@@ -185,7 +188,7 @@ def evaluate_checkpoint(
     condition_type: str | None = None,
     arch_kwargs: dict[str, Any] | None = None,
     seed: int = 0,
-    residual_settings: dict[str, Any] | None = None,
+    residual_settings: Any = _DEFAULT_RESIDUAL_SETTINGS,
     fitted_weights_path: Path | str | None = None,
     max_clips: int | None = None,
     held_out_only: bool = True,
@@ -265,9 +268,12 @@ def evaluate_checkpoint(
 
     runner = runner_fn if runner_fn is not None else run
     dataset_path = Path(dataset_root)
-    res_settings = residual_settings
+    if residual_settings is _DEFAULT_RESIDUAL_SETTINGS:
+        res_settings: dict[str, Any] | None = {}
+    else:
+        res_settings = residual_settings
     stages: tuple[str, ...]
-    if res_settings is not None:
+    if res_settings is not None and res_settings.get("enabled", True) is not False:
         residual_enabled = True
         res_codec = res_settings.get("codec", "avc")
         if res_codec in ("libx264", "x264"):
@@ -851,12 +857,13 @@ def extract_candidate_metrics(data: dict[str, Any]) -> dict[str, float | None]:
     """Extract comparable rate, fidelity, and resource metrics from candidate evaluation data."""
     total_bytes = data.get("total_bytes")
     residual_bytes = data.get("residual_bytes")
+    rate: float | None = None
     if total_bytes is not None and float(total_bytes) > 0:
         rate = float(total_bytes)
     elif residual_bytes is not None and float(residual_bytes) > 0:
         rate = float(residual_bytes)
-    else:
-        rate = float(total_bytes) if total_bytes is not None else None
+    elif total_bytes is not None:
+        rate = float(total_bytes)
 
     psnr = float(data["psnr_mean"]) if data.get("psnr_mean") is not None else None
     ssim = float(data["ssim_mean"]) if data.get("ssim_mean") is not None else None
