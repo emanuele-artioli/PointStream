@@ -17,6 +17,7 @@ import argparse
 import logging
 import math
 import os
+import time
 
 import torch
 import torch.distributed as dist
@@ -336,6 +337,9 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
             )
         return
 
+    last_checkpoint_time = time.time()
+    last_progress_time = time.time()
+
     # --- Training loop ---
     for epoch in range(start_epoch, args.epochs):
         if sampler is not None:
@@ -426,6 +430,10 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
                     "fm": f"{loss_fm.item():.3f}",
                     "l1": f"{loss_l1.item():.3f}",
                 })
+                now = time.time()
+                if now - last_progress_time >= 600.0:
+                    logging.info(f"Progress heartbeat: epoch {epoch}/{args.epochs}, step {i}/{len(dataloader)}")
+                    last_progress_time = now
 
         # --- End of epoch ---
         if is_main:
@@ -435,8 +443,9 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
             sample = torch.cat((skeleton[:4], ref_img[:4], real_img[:4], sample_fake), -1)
             vutils.save_image(sample, f"{args.sample_dir}/s4t_epoch_{epoch:03d}.png", nrow=4, normalize=True)
 
-            # Save checkpoints every 10 epochs
-            if (epoch + 1) % 10 == 0:
+            now = time.time()
+            # Hourly wall-clock checkpointing (or every 10 epochs or final epoch)
+            if (epoch + 1) % 10 == 0 or (now - last_checkpoint_time >= 3600.0) or (epoch + 1 == args.epochs):
                 g_mod = generator.module if ngpus_per_node > 1 else generator
                 d_mod = discriminator.module if ngpus_per_node > 1 else discriminator
 
@@ -449,6 +458,7 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
                     "opt_G": optimizer_G.state_dict(),
                     "opt_D": optimizer_D.state_dict(),
                 }, args.checkpoint_path)
+                last_checkpoint_time = now
 
     # Final save
     if is_main:

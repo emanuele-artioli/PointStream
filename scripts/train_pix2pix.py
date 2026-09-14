@@ -2,6 +2,7 @@ import sqlite3  # noqa: F401
 import argparse
 import logging
 import os
+import time
 
 import torch
 import torch.distributed as dist
@@ -201,6 +202,9 @@ def main_worker(gpu, ngpus_per_node, args):
             logging.error(f"Dataloader is empty! Dataset size ({len(dataset)}) is too small for batch size {batch_size} across {ngpus_per_node} GPUs with drop_last=True.")
         return
 
+    last_checkpoint_time = time.time()
+    last_progress_time = time.time()
+
     for epoch in range(start_epoch, args.epochs):
         if sampler is not None:
             sampler.set_epoch(epoch)
@@ -266,12 +270,18 @@ def main_worker(gpu, ngpus_per_node, args):
 
             if is_main_process:
                 pbar.set_postfix({"D_loss": f"{loss_D.item():.4f}", "G_loss": f"{loss_G.item():.4f}"})
+                now = time.time()
+                if now - last_progress_time >= 600.0:
+                    logging.info(f"Progress heartbeat: epoch {epoch}/{args.epochs}, step {i}/{len(dataloader)}")
+                    last_progress_time = now
 
         if is_main_process:
             sample_img = torch.cat((real_A[:4], ref_img[:4], real_B[:4], fake_B[:4]), -1)
             vutils.save_image(sample_img, f"{args.sample_dir}/epoch_{epoch:03d}.png", nrow=4, normalize=True)
 
-            if (epoch + 1) % 10 == 0:
+            now = time.time()
+            # Hourly wall-clock checkpointing (or every 10 epochs or final epoch)
+            if (epoch + 1) % 10 == 0 or (now - last_checkpoint_time >= 3600.0) or (epoch + 1 == args.epochs):
                 state_dict_G = generator.module.state_dict() if ngpus_per_node > 1 else generator.state_dict()
                 state_dict_D = discriminator.module.state_dict() if ngpus_per_node > 1 else discriminator.state_dict()
                 
@@ -283,6 +293,7 @@ def main_worker(gpu, ngpus_per_node, args):
                     'opt_G': optimizer_G.state_dict(),
                     'opt_D': optimizer_D.state_dict(),
                 }, args.checkpoint_path)
+                last_checkpoint_time = now
 
     if is_main_process:
         state_dict_G = generator.module.state_dict() if ngpus_per_node > 1 else generator.state_dict()

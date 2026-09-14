@@ -25,6 +25,34 @@ comparisons keep residual off; paste-plus-residual is explicitly a residual-on
 control in the residual section. Component and readiness work can run before a
 full-codec win. A losing or invalid run is a result to preserve, not a gate pass.
 
+## Coordinator review of E01/E02 — 14 September 2026
+
+Reviewed E01 PR #104 head `b87daf51` (open) and merged E02 #105 `2f63ae1`;
+both reported CI runs pass. **E01 contract acceptance and E02 neural readiness
+remain partial**, not a release for E05. CPU integration checks reproduced
+E01's missing-evidence RD admission, an unrun runtime example being admitted,
+E02's default-success controls, and incompatibility between the two schemas.
+No GPU workloads or new quality measurements were run by this review.
+
+Accepted decisions: target three fresh independent confirmation matches and
+reserve the proposed trio for acquisition now; no untouched media are on disk.
+Accept 360-short-edge/12 fps versus native and separate learning crops, with
+250 ms a working latency target. VMAF 20 is only a diagnostic cutoff pending an
+interpretable practical quality criterion; eight seconds is a live smoke check,
+with finalist sustained checks extended as specified in E01R.
+
+Next dispatches (supersede the initial Ready rows below):
+
+| Owner | Assignment | Parallel work | Release condition |
+|---|---|---|---|
+| Cursor | [E01R](tasks/01r-contract-and-acquisition.md) | Reserved-media acquisition plus contract repairs | Corrected claim eligibility and E02 adapter contract reviewed here |
+| Antigravity | [E02R](tasks/02r-readiness-evidence.md) | [R0 resource claims](tasks/00-resource-claims.md) in its own subagent/worktree | Real-backend controls, tiny learning/resume and residual-off evidence |
+
+E03/E04 CPU tool/input preparation can proceed, but measured batches use the
+accepted contract and tested claims. Do not launch E05 from the old readiness
+labels. Return here after the bounded correction; coordinator then releases the
+smallest anchor/background/foreground probes. No fresh confirmation scoring now.
+
 ## Dispatch and ownership
 
 Workers read root AGENTS.md/host rules, PLAN.md, this file, their single task,

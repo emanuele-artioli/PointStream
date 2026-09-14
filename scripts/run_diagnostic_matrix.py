@@ -219,10 +219,14 @@ def _augment_objects_with_pose(clip: Any, *, shuffle: bool, seed: int) -> tuple[
             raise ValueError(f"Failed to load skeleton image at {pose_path}")
         skel_img = cv2.cvtColor(skel_bgr, cv2.COLOR_BGR2RGB)
         height, width = obj.appearance.shape[:2]
-        if skel_img.shape[:2] != (height, width):
+        bbox_w = max(1, obj.bbox[2] - obj.bbox[0])
+        bbox_h = max(1, obj.bbox[3] - obj.bbox[1])
+        if skel_img.shape[:2] != (height, width) and skel_img.shape[:2] != (bbox_h, bbox_w):
             raise ValueError(
                 f"Misaligned pose conditioning: skeleton shape {skel_img.shape[:2]} != appearance shape {(height, width)} for object {obj_id} frame {abs_frame}"
             )
+        if skel_img.shape[:2] != (height, width):
+            skel_img = cv2.resize(skel_img, (width, height), interpolation=cv2.INTER_LINEAR)
         poses.append(skel_img)
         bundle = ConditioningBundle(
             appearance=np.transpose(obj.appearance, (2, 0, 1)),
@@ -634,6 +638,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--device", default=None, help="Inference device (recorded; default cpu/cuda)"
     )
     parser.add_argument("--seed", type=int, default=None, help="Override config seed")
+    parser.add_argument(
+        "--full-trajectory",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Load full visible-track trajectory over time (default on)",
+    )
     return parser
 
 
@@ -761,7 +771,9 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_arg_parser()
     args = parser.parse_args(argv)
     load_frames = max(48, args.frames)
-    clip_full = load_long_scene_clip(args.video, args.scene, n_frames=load_frames)
+    clip_full = load_long_scene_clip(
+        args.video, args.scene, n_frames=load_frames, full_trajectory=bool(args.full_trajectory)
+    )
     clip = _slice_clip(clip_full, args.frames) if args.frames < load_frames else clip_full
     base = load_tier("balanced")
     if args.seed is not None:

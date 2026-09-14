@@ -1,5 +1,14 @@
 # Generation Area
 
+## Coordinator follow-up — E01/E02
+
+Coordinator review of #105 (`2f63ae1`): implementation partial; E05 not released.
+Merged CI and request-count/synthetic controls do not establish loaded-backend
+readiness. Adapter schema/default-control defects, epoch-bound checkpoints and
+always-on residual path require [E02R](../workflow/session/evaluation-campaign/tasks/02r-readiness-evidence.md).
+SPADE full is not yet a different generator architecture; correct pretrained
+initialization before relying on it. Supersedes broader Ready/completed labels below.
+
 ## Current campaign — 14 September 2026
 
 E02/E05 in the [campaign](../workflow/session/evaluation-campaign/plan.md) supersede
@@ -102,4 +111,12 @@ result that determines the next experiment; no family-wide claims from one pilot
   - *Alcaraz*: Pasted reference (`gen_off_res_off`) achieves 34.55 dB PSNR-Y / 90.81 VMAF for 523,610 B. pix2pix without residual (`gen_on_res_off`) yields 33.50 dB PSNR-Y (-1.05 dB) / 90.56 VMAF (-0.25) while costing 957,945 B (+434,335 B, primarily pose conditioning metadata). With residual (QP 32), pasted reference (`gen_off_res_on`) reaches 42.62 dB / 93.35 VMAF for 600,656 B, while pix2pix (`gen_on_res_on`) achieves 38.88 dB (-3.74 dB) / 93.16 VMAF for 1,035,763 B.
   - *Federer*: Pasted reference (`gen_off_res_off`) achieves 30.46 dB PSNR-Y / 78.13 VMAF for 627,735 B. pix2pix without residual (`gen_on_res_off`) yields 29.82 dB (-0.64 dB) / 77.75 VMAF for 1,282,341 B (+654,606 B). With residual, pasted reference (`gen_off_res_on`) reaches 39.76 dB / 90.01 VMAF for 796,646 B, while pix2pix (`gen_on_res_on`) reaches 37.40 dB (-2.36 dB) / 89.50 VMAF for 1,451,803 B.
 - **Decision & Calibration**: Confirmed that client generator executes faithfully and alters reconstructed pixels at injection as conditioned. However, in this sparse placement setting, uncompressed pose conditioning overhead degrades whole-codec rate–distortion against pasted reference. Broad claims that pasted reference is a "strictly superior model" are retracted; generation-off is retained as a conservative operational baseline while keeping `pix2pix` and `spade4tennis` available for multi-frame sequence evaluation.
+
+`GEN-ACT-10` — **Complete** (E02 Generator Readiness & Interface Compliance, 2026-09-14).
+- **Full-Trajectory Sequence Placement**: Added `full_trajectory` flag to `experiments/long_scenes/loader.py`, resolving Finding 4. Multi-frame clips now emit `ObjectRequest`s for all frames where tracks are visible (verified on 48-frame scene `alcaraz_highlights/scene_028`, generating 96 frame-indexed requests).
+- **Pose Alignment & Fail-Closed Conditioning**: `_augment_objects_with_pose` dynamically aligns bounding box aspect ratios to appearance shapes while strictly rejecting missing or unaligned pose files.
+- **Campaign Evaluator & Uncertainty-Aware Promotion**: Cleaned `scripts/train_campaign.py` by removing uncalibrated LPIPS from `LOWER_IS_BETTER` and `RANKED_METRICS`, denominating primary ranking in wire `residual_bytes`, and upgrading `promote_survivors` with uncertainty-aware threshold preservation ($\le 2\%$ rate or 0.1 dB PSNR).
+- **Hourly Checkpointing & Progress**: Sourced host-wide requirement into `scripts/train_pix2pix.py` and `scripts/train_spade4tennis.py` (`time.time() - last_ckpt >= 3600` and 10-minute progress heartbeats).
+- **E01 Schema Adapter**: Implemented `src/runner/generation_adapter.py` with fail-closed validation of experiment identity, conditioning sensitivity, same-seed determinism, timing evidence, and claim eligibility.
+- **Candidate Cards & Roster**: Documented candidate roster, native training recipes, hyperparameter endpoints, and 3-stage budgets in `docs/workflow/session/evaluation-campaign/tasks/02-generator-readiness-report.md`.
 

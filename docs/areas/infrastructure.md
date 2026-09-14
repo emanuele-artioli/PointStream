@@ -1,5 +1,13 @@
 # Infrastructure Area
 
+## Coordinator follow-up — E01/E02
+
+Atomic resource claims are a missing prerequisite for GPU readiness probes.
+[R0](../workflow/session/evaluation-campaign/tasks/00-resource-claims.md) is assigned
+to an Antigravity subagent in parallel with E02R: shared host/GPU UUID claims,
+aggregate CPU accounting, explicit child device visibility, and conservative
+stale-owner handling. No cluster scheduler or colleague preemption.
+
 ## Current campaign — 14 September 2026
 
 The [campaign](../workflow/session/evaluation-campaign/plan.md) may use any GPU
