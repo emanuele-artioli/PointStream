@@ -5,11 +5,13 @@
 Coordinator accepts three fresh matches as the target. E01R acquired three
 bounded windows (no scores). Eligible confirmation count remains 0 pending
 event/overlap/freeze checks. Pointer:
-`manifests/evaluation_20260914_e01r_acquisition.json`. The source-count policy
-does not fall back to exposed Gate B sources. Training selectors exclude
-validation blocks and reserved confirmation IDs. Proposed practical quality
-criterion uses calibrated development severe-degradation anchors, not VMAF 20
-as a floor.
+`manifests/evaluation_20260914_e01r_acquisition.json`. Stream-copy windows
+begin on non-keyframes; I-frame preroll is in
+`manifests/evaluation_20260915_e03a_confirmation_timestamps.json`. The
+source-count policy does not fall back to exposed Gate B sources. Training
+selectors exclude validation blocks and reserved confirmation IDs. Proposed
+practical quality criterion uses calibrated development severe-degradation
+anchors, not VMAF 20 as a floor.
 
 ## Current campaign — 14 September 2026
 

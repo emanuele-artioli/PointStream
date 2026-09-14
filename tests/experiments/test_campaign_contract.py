@@ -213,7 +213,7 @@ def test_training_selector_excludes_validation_and_confirmation() -> None:
     assert reserved_why == "confirmation_or_exposed_holdout"
 
 
-def test_e02_adapter_output_requires_campaign_mapping() -> None:
+def test_e02_adapter_output_requires_campaign_mapping(tmp_path: Path) -> None:
     matrix_output = {
         "normal": {
             "elapsed_seconds": 1.5,
@@ -228,22 +228,25 @@ def test_e02_adapter_output_requires_campaign_mapping() -> None:
         "shuffled": {"frame_hashes": ["shuff1", "shuff2", "shuff3", "shuff4"]},
         "seed_repeat": {"frame_hashes": ["hash1", "hash2", "hash3", "hash4"]},
     }
+    artifact = tmp_path / "test_run_01.json"
+    artifact.write_text("{}", encoding="utf-8")
     adapted = adapt_diagnostic_matrix_result(
         matrix_output,
         run_id="test_run_01",
         backend_name="pix2pix",
         arch="pix2pix",
         checkpoint_sha256="abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+        artifact_path=artifact,
     )
     adapted["source_ids"] = ["federer_djokovic_scene_007"]
     adapted["frame_ids"] = {"start": 0, "count": 4, "fps": 12.0}
-    adapted["artifact_path"] = "outputs/evaluation-20260914/e02/test_run_01.json"
     adapted["code_revision"] = "2f63ae1"
     assert validate_campaign_record(adapted, purpose="structure")
     mapped = campaign_record_from_generation_adapter(adapted)
     assert mapped["contract_revision"] == CONTRACT_REVISION
     assert mapped["claim_eligibility"]["generalization"] is False
     assert mapped["claim_eligibility"]["trajectory"] is False
+    assert mapped["evidence"]["metrics"]["psnr_y"] == 32.5
     blockers = validate_campaign_record(mapped, purpose="structure")
     assert blockers == []
     validated = ingest_for_claim([mapped], "rd", purpose="validated")
@@ -273,6 +276,156 @@ def test_e03_e04_and_split_manifests_load() -> None:
         "evaluation_20260914_result_contract.example.json",
         "evaluation_20260914_e02_producer.example.json",
         "evaluation_20260914_e01r_acquisition.json",
+        "evaluation_20260915_e03a_contract_pin.json",
+        "evaluation_20260915_e03a_anchor_card.json",
+        "evaluation_20260915_e03a_confirmation_timestamps.json",
+        "evaluation_20260915_e03a_derived_diagnostic.json",
     ):
         payload = json.loads((repo / "manifests" / name).read_text(encoding="utf-8"))
         assert "schema" in payload
+
+
+def test_finite_number_rejects_infinity() -> None:
+    from experiments.tier.campaign_result import _finite_number
+
+    assert _finite_number(1.0) is True
+    assert _finite_number(float("inf")) is False
+    assert _finite_number(float("nan")) is False
+
+
+def test_validated_claim_rejects_failed_controls_and_invalid_values() -> None:
+    record = dict(load_example_records()[-1])
+    record["evidence"] = {
+        "metrics": {"psnr_y": float("inf"), "ssim": 0.91, "vmaf": None},
+        "bytes": {"total": -1},
+    }
+    record["claim_eligibility"] = dict(record["claim_eligibility"])
+    record["claim_eligibility"]["rd_arms"] = {
+        "psnr_y": True,
+        "ssim": True,
+        "vmaf": False,
+        "bytes": True,
+    }
+    record["controls"] = {
+        "standalone_decode": {"status": "failed"},
+        "metric_calibration": {"status": "failed"},
+        "wire_ledger": {"status": "failed"},
+    }
+    blockers = validate_campaign_record(record, purpose="validated")
+    assert any("byte" in item for item in blockers)
+    assert any("quality" in item or "psnr_y" in item for item in blockers)
+    assert any("ledger" in item for item in blockers)
+    assert any("calibration" in item for item in blockers)
+    assert any("decode" in item for item in blockers)
+    ingested = ingest_for_claim([record], "rd", purpose="validated")
+    assert ingested["n_kept"] == 0
+
+
+def test_partial_and_not_applicable_controls_are_not_verified() -> None:
+    record = dict(load_example_records()[-1])
+    record["controls"] = {
+        "standalone_decode": "partial",
+        "metric_calibration": "not_applicable",
+        "wire_ledger": "present",
+    }
+    blockers = validate_campaign_record(record, purpose="validated")
+    assert any("decode" in item for item in blockers)
+    assert any("calibration" in item for item in blockers)
+    assert any("ledger" in item for item in blockers)
+
+
+def test_runtime_does_not_require_quality_controls() -> None:
+    record = dict(load_example_records()[-1])
+    record["claim_eligibility"] = dict(record["claim_eligibility"])
+    record["claim_eligibility"]["rd"] = False
+    record["claim_eligibility"]["runtime"] = True
+    record["claim_eligibility"]["standalone_transport"] = False
+    record["claim_eligibility"]["exclusions"] = [
+        {"claim": "rd", "reason": "timing-only stratum"},
+        {"claim": "standalone_transport", "reason": "not a transport audit"},
+        {"claim": "trajectory", "reason": "not a generation trajectory"},
+        {"claim": "generalization", "reason": "single development source"},
+    ]
+    record["timing_evidence"] = {
+        "timing_evidence_id": "timing.gpu6.display_low.paste.n3",
+        "host": "gpu6",
+        "n_repeats": 3,
+        "measured_client_seconds": 1.25,
+    }
+    record["controls"] = {
+        "standalone_decode": "not_this_row",
+        "metric_calibration": "not_this_row",
+        "wire_ledger": "not_this_row",
+    }
+    blockers = validate_campaign_record(record, purpose="validated")
+    assert blockers == []
+    runtime = ingest_for_claim([record], "runtime", purpose="validated")
+    assert runtime["n_kept"] == 1
+    rd = ingest_for_claim([record], "rd", purpose="validated")
+    assert rd["n_kept"] == 0
+
+
+def test_producer_scores_timing_parts_map_into_campaign_record(tmp_path: Path) -> None:
+    payload = {
+        "run_id": "producer_nested_01",
+        "backend_name": "pix2pix",
+        "artifact_path": str(tmp_path / "diag.json"),
+        "code_revision": "deadbeef",
+        "source_ids": ["alcaraz_highlights_scene_028"],
+        "frame_ids": {"start": 0, "count": 16},
+        "scores": {"psnr_y": 28.3, "ssim": 0.97, "vmaf": 88.0},
+        "timing": {"client_seconds": 24.5, "encoder_seconds": 85.7},
+        "parts": {"residual": 110913, "transport_total": 7023087},
+        "coded_bytes": 7023087,
+        "delivered_shape": [16, 2160, 3840, 3],
+        "wire_reconciliation": {
+            "matched": True,
+            "verdict": "matched",
+            "wire_bytes": 7023087,
+            "transport_total": 7023087,
+        },
+        "checkpoint_identity": {
+            "checkpoint_id": "pix2pix:aa",
+            "checkpoint_sha256": "a" * 64,
+            "config_identity": "b" * 64,
+        },
+        "claim_eligibility": {"rd_claim": True, "speed_claim": False, "standalone_decode": False},
+        "controls": {"conditioned_vs_shuffled_tested": True},
+    }
+    (tmp_path / "diag.json").write_text("{}", encoding="utf-8")
+    mapped = campaign_record_from_generation_adapter(payload)
+    assert mapped["contract_revision"] == CONTRACT_REVISION
+    assert mapped["evidence"]["metrics"]["psnr_y"] == 28.3
+    assert mapped["evidence"]["bytes"]["total"] == 7023087
+    assert mapped["delivered_shape"] == [16, 2160, 3840, 3]
+    assert mapped["controls"]["wire_ledger"] == "reconciled"
+    assert mapped["controls"]["metric_calibration"] == "unverified"
+    assert mapped["controls"]["standalone_decode"] == "unverified"
+    assert mapped["record_class"] == "recoverable_evidence"
+    validated = ingest_for_claim([mapped], "rd", purpose="validated")
+    assert validated["n_kept"] == 0
+    diagnostic = ingest_for_claim([mapped], "rd", purpose="diagnostic")
+    assert diagnostic["n_kept"] == 1
+
+
+def test_artifact_sha256_uses_file_bytes_not_canonical_json(tmp_path: Path) -> None:
+    path = tmp_path / "artifact.json"
+    path.write_text('{"hello":"world"}\n', encoding="utf-8")
+    import hashlib
+
+    expected = hashlib.sha256(path.read_bytes()).hexdigest()
+    mapped = campaign_record_from_generation_adapter(
+        {
+            "run_id": "hash_probe",
+            "artifact_path": str(path),
+            "artifact_sha256": "c" * 64,
+            "code_revision": "abc",
+            "source_ids": ["src"],
+            "scores": {"psnr_y": 30.0},
+            "parts": {"transport_total": 100},
+            "checkpoint_identity": {"checkpoint_sha256": "d" * 64},
+        }
+    )
+    assert mapped["artifact_sha256"] == expected
+    assert mapped["artifact_sha256"] != "c" * 64
+    assert mapped["checkpoint_identity"]["checkpoint_sha256"] == "d" * 64

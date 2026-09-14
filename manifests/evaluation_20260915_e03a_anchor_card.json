@@ -1,0 +1,100 @@
+{
+  "schema": "pointstream.experiment_card.v1",
+  "doc_role": "e03a_smallest_low_resolution_paired_anchor_card",
+  "campaign": "evaluation-20260914",
+  "status": "prepared_not_launched",
+  "contract_revision": "e03a-20260915",
+  "release_gate": "Measured encodes wait for coordinator acceptance of this result boundary and tested R0 claims. Generation is not a prerequisite.",
+  "decision_and_hypothesis": "At display_low (360 short-edge, 12 fps, no extra source frames) on one development scene, slowest-preset AV1 and VVC two-point RD plus encode/decode time can be collected inside six settings and 30 minutes. Competing explanation: slowest presets at even 48 frames exceed the budget and need a costed extension before native endpoints.",
+  "evidence_reused": {
+    "reuse_map": "manifests/evaluation_20260914_reuse_map.json",
+    "anchors_rd": [
+      {
+        "artifact_id": "gate_a_vvc_webp_n96_run2",
+        "decision": "diagnostic_plot_only",
+        "why_not_this_card": "native 4K development RD, unverified reconstruction/ledger for validated claims"
+      },
+      {
+        "artifact_id": "dev_recovery_pilot_frozen",
+        "decision": "diagnostic_plot_only",
+        "why_not_this_card": "identity_verified=false; evidence_verified=false; SSIM ceiling alarm"
+      },
+      {
+        "artifact_id": "wave2_overlap_20260910",
+        "decision": "diagnostic_plot_only",
+        "why_not_this_card": "after #88; generation-off 48-frame 4K; not display_low"
+      }
+    ],
+    "gap": "No validated display_low paired AV1/VVC points on identical native-timestamp frames with decode and calibration controls."
+  },
+  "operating_regime": {
+    "video": "federer_djokovic",
+    "scene": "scene_007",
+    "split": "development",
+    "operating_point_id": "display_low",
+    "short_edge_px": 360,
+    "fps": 12.0,
+    "upsample": false,
+    "create_extra_source_frames": false,
+    "timestamp_policy": "nearest existing native PTS to t0+k/12; record source_frame_index and source_pts",
+    "frame_count": 48,
+    "colour_path_id": "broadcast_yuv420",
+    "pix_fmt": "yuv420p",
+    "matrix": "bt709",
+    "range": "as_tagged_on_source"
+  },
+  "source_transform": {
+    "status": "recipe_only_not_executed",
+    "spatial": "scale so short edge is 360, even dimensions, lanczos, preserve aspect, record padding",
+    "temporal": "select existing source frames; never interpolate",
+    "output_root": "outputs/evaluation-20260914/e03a/anchors/display_low_federer_scene007/"
+  },
+  "smallest_discriminating_probe": {
+    "settings": [
+      {"codec": "av1", "encoder": "SvtAv1EncApp", "path": "/opt/local/bin/SvtAv1EncApp", "version": "SVT-AV1 v1.8.0 (release)", "preset": "0", "qp": 63},
+      {"codec": "av1", "encoder": "SvtAv1EncApp", "path": "/opt/local/bin/SvtAv1EncApp", "version": "SVT-AV1 v1.8.0 (release)", "preset": "0", "qp": 47},
+      {"codec": "vvc", "encoder": "vvencapp", "path": "/opt/local/bin/vvencapp", "version": "vvencapp version 1.11.0", "preset": "slower", "qp": 63},
+      {"codec": "vvc", "encoder": "vvencapp", "path": "/opt/local/bin/vvencapp", "version": "vvencapp version 1.11.0", "preset": "slower", "qp": 47}
+    ],
+    "decoder": {
+      "ffmpeg": "/opt/local/bin/ffmpeg",
+      "version": "n7.1.1-56-gc2184b65d2",
+      "av1": "libaom-av1 or av1",
+      "vvc": "vvc"
+    },
+    "controls": [
+      "standalone_decode of charged bitstream to exact frame count and even 360-short-edge shape",
+      "inherit named metric-calibration artifact or run identical/mild/severe/unrelated on this path",
+      "wire bytes equal measured bitstream length"
+    ],
+    "n_settings": 4,
+    "control_budget_share": "at least one third of wall time for decode, calibration and scoring"
+  },
+  "tool_floor_probe": {
+    "av1": {"supported": true, "slowest_preset": "0", "probe_qp": 63, "probe_bytes": 107, "decoded_shape": [2, 64, 64, 3], "elapsed_s": 1.61},
+    "vvc": {"supported": true, "slowest_preset": "slower", "probe_qp": 63, "probe_bytes": 216, "decoded_shape": [2, 64, 64, 3], "elapsed_s": 0.86, "decode_tool": "ffmpeg"}
+  },
+  "bounds_and_instrument": {
+    "written_before_headline_scores": true,
+    "size_bytes": "Worst: both QPs near uncompressed 360p 48f (~3e7). Best: QP63 under 5e4 bytes with a valid decode.",
+    "psnr_y_db": "Worst: <15 (decode/colour mismatch). Best: >40 (mild QP on easy tennis).",
+    "encode_plus_decode_s": "Worst: >30 min total for four settings (then stop and cost an extension). Best: <10 min total.",
+    "null": "unrelated reconstruction must not outrank the decode on PSNR/SSIM/VMAF"
+  },
+  "budget": {
+    "max_new_configurations": 6,
+    "wall_minutes_including_scoring": 30,
+    "if_exceeded": "return a costed 24-frame or faster-preset diagnostic; do not silently drop slowest preset",
+    "full_scene_note": "federer scene_007 / alcaraz scene_000 full duration at 12 fps exceeds this first card; keep 48 frames until the 30-minute question is answered"
+  },
+  "decision_rule": {
+    "promote": "four usable overlapping points with controls, recorded binaries, and ingestable campaign_result.v1 rows",
+    "stop": "a slowest-preset encode cannot finish one QP inside 15 minutes: cost native vs faster-preset split",
+    "inconclusive": "decode shape/count mismatch or calibration alarm: do not plot RD"
+  },
+  "neural_anchor": {
+    "candidate": "DCVC-UF",
+    "status": "setup_may_proceed_separately",
+    "blocks_this_card": false
+  }
+}

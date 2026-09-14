@@ -1,6 +1,6 @@
 {
   "schema": "pointstream.campaign_result.v1",
-  "contract_revision": "e01r-20260914",
+  "contract_revision": "e03a-20260915",
   "doc_role": "example_records_for_validators_and_plot_ingest",
   "campaign": "evaluation-20260914",
   "commands": {
@@ -17,7 +17,7 @@
   "records": [
     {
       "schema": "pointstream.campaign_result.v1",
-      "contract_revision": "e01r-20260914",
+      "contract_revision": "e03a-20260915",
       "record_class": "historical_observation",
       "artifact_id": "example_rd_with_timing_but_runtime_excluded",
       "artifact_path": "outputs/gate-a-vvc-webp-n96-run2/report.json",
@@ -49,7 +49,7 @@
     },
     {
       "schema": "pointstream.campaign_result.v1",
-      "contract_revision": "e01r-20260914",
+      "contract_revision": "e03a-20260915",
       "record_class": "historical_observation",
       "artifact_id": "example_rd_missing_timing",
       "artifact_path": "outputs/development-recovery/pilot-frozen/report.json",
@@ -80,7 +80,7 @@
     },
     {
       "schema": "pointstream.campaign_result.v1",
-      "contract_revision": "e01r-20260914",
+      "contract_revision": "e03a-20260915",
       "record_class": "historical_observation",
       "artifact_id": "example_invalid_generation_for_trajectory",
       "artifact_path": "outputs/development-recovery/diagnostic-pix2pix-alcaraz.json",
@@ -112,7 +112,7 @@
     },
     {
       "schema": "pointstream.campaign_result.v1",
-      "contract_revision": "e01r-20260914",
+      "contract_revision": "e03a-20260915",
       "record_class": "pending_run",
       "artifact_id": "example_runtime_eligible_stratum",
       "artifact_path": "outputs/evaluation-20260914/e03/not-yet-run/timing.json",
@@ -152,12 +152,12 @@
     },
     {
       "schema": "pointstream.campaign_result.v1",
-      "contract_revision": "e01r-20260914",
+      "contract_revision": "e03a-20260915",
       "record_class": "validated_claim",
       "artifact_id": "example_validated_rd_without_timing",
       "artifact_path": "outputs/evaluation-20260914/e01r/synthetic-validated-rd.json",
       "artifact_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      "code_revision": "e01r-20260914",
+      "code_revision": "e03a-20260915",
       "source_ids": ["alcaraz_highlights_scene_000"],
       "frame_ids": {"start": 0, "count": 48, "fps": 12.0, "native_timestamps": [0.0, 0.0833]},
       "operating_point_id": "display_low",

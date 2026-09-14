@@ -1,0 +1,38 @@
+{
+  "schema": "pointstream.campaign_result_contract_pin.v1",
+  "doc_role": "e03a_contract_pin_for_antigravity",
+  "campaign": "evaluation-20260914",
+  "contract_revision": "e03a-20260915",
+  "result_schema": "pointstream.campaign_result.v1",
+  "owner": "cursor",
+  "adapter_owner": "cursor",
+  "branch": "codex/eval-e01",
+  "code_head": "7e4da6ecda16d93263f0e6c785a0213a9bb41ab6",
+  "modules": {
+    "experiments.tier.campaign_result": {
+      "path": "experiments/tier/campaign_result.py",
+      "sha256": "50ed219fb69c6e3289ec56998be42ccde3e525c3ef2614af7db987cfde9029a4"
+    },
+    "src.runner.generation_adapter": {
+      "path": "src/runner/generation_adapter.py",
+      "sha256": "73b0c1aa37bbf1689fc566c52b4948f55011e2bdb07b6ad2ba0aebcd56a933b5"
+    }
+  },
+  "examples": {
+    "result_contract": {
+      "path": "manifests/evaluation_20260914_result_contract.example.json",
+      "sha256": "b5d3b606b034c254f1e6f62a833c20385a19117bab23848f4335fdefdb675dbe"
+    },
+    "e02_producer": {
+      "path": "manifests/evaluation_20260914_e02_producer.example.json",
+      "sha256": "e02742fa492a52cdc4c3f9c92933017a742c12c248f806ae97e6c9fea2fa28c3"
+    }
+  },
+  "validators": [
+    "experiments.tier.campaign_result.validate_campaign_record",
+    "experiments.tier.campaign_result.ingest_for_claim"
+  ],
+  "mapper": "experiments.tier.campaign_result.campaign_record_from_generation_adapter",
+  "file_adapter": "src.runner.generation_adapter.adapt_diagnostic_matrix_file",
+  "note": "Runner stays producer-shaped (scores/timing/parts). Experiment layer emits campaign_result.v1. Do not import experiments from src.runner. Do not treat checkpoint SHA as artifact_sha256."
+}

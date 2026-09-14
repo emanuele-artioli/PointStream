@@ -1,6 +1,6 @@
 {
   "schema": "pointstream.campaign_result.v1",
-  "contract_revision": "e01r-20260914",
+  "contract_revision": "e03a-20260915",
   "doc_role": "e02_producer_shaped_campaign_records",
   "note": "E02 adapter output today uses rd_claim/speed_claim and is not this schema. Real E02 rows must pass through campaign_record_from_generation_adapter then validate_campaign_record and ingest_for_claim. Do not treat temporal_continuity as generalization. Single-scene readiness uses rd/trajectory, not generalization.",
   "commands": {
@@ -9,7 +9,7 @@
   "records": [
     {
       "schema": "pointstream.campaign_result.v1",
-      "contract_revision": "e01r-20260914",
+      "contract_revision": "e03a-20260915",
       "record_class": "recoverable_evidence",
       "artifact_id": "e02_producer_single_scene_rd",
       "artifact_path": "outputs/evaluation-20260914/e02/example-producer.json",

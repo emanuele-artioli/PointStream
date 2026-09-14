@@ -9,7 +9,7 @@
     "operating_points": "manifests/evaluation_20260914_operating_points.json",
     "reuse_map": "manifests/evaluation_20260914_reuse_map.json",
     "result_schema": "pointstream.campaign_result.v1",
-    "contract_revision": "e01r-20260914",
+    "contract_revision": "e03a-20260915",
     "example_records": "manifests/evaluation_20260914_result_contract.example.json",
     "e02_producer_examples": "manifests/evaluation_20260914_e02_producer.example.json",
     "e01r_acquisition_pointer": "manifests/evaluation_20260914_e01r_acquisition.json",
@@ -50,7 +50,7 @@
   },
   "e02_runner_interface": {
     "do_not_edit_e02_files_from_e01": true,
-    "contract_revision": "e01r-20260914",
+    "contract_revision": "e03a-20260915",
     "adapter": "experiments.tier.campaign_result.campaign_record_from_generation_adapter",
     "validators": ["experiments.tier.campaign_result.validate_campaign_record", "experiments.tier.campaign_result.ingest_for_claim"],
     "expected_fields_on_generation_rows": [

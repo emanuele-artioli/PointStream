@@ -7,15 +7,27 @@ useful, but claim ingestion admits missing/invalid evidence and an unrun timing
 example. E01R corrects eligibility while preserving RD-only evidence that is
 actually valid. See [next dispatch](../workflow/session/evaluation-campaign/tasks/01r-contract-and-acquisition.md).
 
-**E01R (in #104, pending coordinator acceptance).** Contract revision
-`e01r-20260914`. Production `ingest_for_claim` defaults to validated rows;
+**E03A (in #104, pending coordinator acceptance).** Cursor now owns
+`campaign_result.py` and `src/runner/generation_adapter.py`. Contract revision
+`e03a-20260915`. Validated ingest requires domain-valid finite values, positive
+bytes, and positive success evidence on decode/calibration/ledger; `inf`,
+negative rate, and `{status: failed}` / `partial` / `not_applicable` no longer
+certify RD. Adapter reads producer `scores`/`timing`/`parts` and hashes file
+bytes; checkpoint digest stays separate. Derived E02R diagnostic record:
+`outputs/evaluation-20260914/e03a/derived-from-e02r-diag/` (originals
+unchanged). Diagnostic RD kept; validated claims excluded. First low-res
+anchor card: `manifests/evaluation_20260915_e03a_anchor_card.json`. Pin:
+`manifests/evaluation_20260915_e03a_contract_pin.json`.
+
+**E01R (in #104, pending coordinator acceptance).** Production `ingest_for_claim` defaults to validated rows;
 historical observations stay in diagnostic ingest only. Cleared identities,
 `controls=None`, and unrun timing examples no longer certify claims. VMAF 20
 is a diagnostic exclusion; sustained live for finalists is 30 s after startup
 plus four refresh cycles. Confirmation policy no longer falls back to the two
-exposed Gate B sources. E02 adapter dicts are mapped by
-`campaign_record_from_generation_adapter`; trajectory is not generalization.
-Reserved confirmation windows: acquired 3, eligible 0, unscored.
+exposed Gate B sources. Trajectory is not generalization.
+Reserved confirmation windows: acquired 3, eligible 0, unscored. Stream-copy
+I-frame preroll is recorded in
+`manifests/evaluation_20260915_e03a_confirmation_timestamps.json`.
 
 ## Current campaign — 14 September 2026
 
@@ -26,16 +38,18 @@ artifact validity or gate passage. Inventory eligibility by claim, reuse existin
 RD and statistically adequate compatible timing, and rerun only documented gaps.
 Older assignments/status below are historical where they conflict.
 
-**E01 protocol (E01R, pending coordinator acceptance).** Reuse map, source
-split, operating-point contract and `pointstream.campaign_result.v1` live under
-`manifests/evaluation_20260914_*.json` at contract revision `e01r-20260914`.
+**E01 protocol (E01R/E03A, pending coordinator acceptance).** Reuse map, source
+split, operating-point contract live under `manifests/evaluation_20260914_*.json`.
+Result contract revision is `e03a-20260915` (`manifests/evaluation_20260915_e03a_contract_pin.json`).
 Independent-match count is loaded from
 `experiments.tier.source_count_policy` (confirmation **3**, preferred 6, development
 pilot 2). Plot ingest is `experiments.tier.campaign_result.ingest_for_claim`
 with `purpose='validated'` or `'diagnostic'`. Historical overlap after #88
 remains diagnostic, not validated RD. No historical artifacts were moved. The
 known background probe is removal-on. Gate B's two sources stay exposed, not
-untouched holdouts. Wait for coordinator acceptance before E03 measured batches.
+untouched holdouts. Wait for coordinator acceptance and tested R0 before E03
+measured batches. The prepared low-res card is
+`manifests/evaluation_20260915_e03a_anchor_card.json`.
 
 **Evidence Revision**: Audit of PR #83–#85 / `d4252b5`, 2026-09-09.
 **Owned Scope**: `src/pipeline/reconstruction/quality.py`, `experiments/tier/`, `src/contracts/lattice.py`.
