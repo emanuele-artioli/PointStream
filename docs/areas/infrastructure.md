@@ -2,11 +2,12 @@
 
 ## Current acquisition / integration review
 
-R0 `d39893c` is not accepted: CPU-only reproductions allow TTL takeover of a
-live mutex, claim release with a surviving child, inactive classification of a
-live interrupted owner and claiming an absent GPU. R0R repairs those specific
-paths and incomplete CPU accounting before any new GPU readiness workload.
-The worker's Complete label is not coordinator acceptance.
+R0R repairs the CPU-only blockers identified in R0 `d39893c`: eliminates TTL-only
+takeover on mutexes and claims, guarantees child process group termination and reaping
+prior to claim release (retaining claim if death unverified), checks local PID liveness
+and process start identity before status text, fails closed on absent or unqueried GPUs
+with pre-Popen rechecks, and accounts for cgroup quotas, load, and mandatory per-job CPU
+thread allowances. Verified by 17 CPU-only unit tests in `tests/experiments/test_resource_claims.py`.
 
 ## Coordinator follow-up — E01/E02
 
