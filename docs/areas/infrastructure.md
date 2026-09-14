@@ -2,11 +2,11 @@
 
 ## Coordinator follow-up — E01/E02
 
-Atomic resource claims are a missing prerequisite for GPU readiness probes.
-[R0](../workflow/session/evaluation-campaign/tasks/00-resource-claims.md) is assigned
-to an Antigravity subagent in parallel with E02R: shared host/GPU UUID claims,
-aggregate CPU accounting, explicit child device visibility, and conservative
-stale-owner handling. No cluster scheduler or colleague preemption.
+Atomic resource claims are completed under [R0](../workflow/session/evaluation-campaign/tasks/00-resource-claims.md):
+minimal atomic filesystem claims in `experiments/jobs/claims.py`, GPU UUID and canonical host keying,
+pre-launch recheck under claim (no preemption/killing), child device isolation (`CUDA_VISIBLE_DEVICES`),
+conservative stale-owner verification (never steal solely on TTL), aggregate per-host CPU cap
+(`floor(0.90 * available_cores)`), and seamless integration with `experiments/jobs/monitor.py`.
 
 ## Current campaign — 14 September 2026
 
@@ -18,12 +18,26 @@ move unstarted shards; profile hardware strata separately. Existing monitor and
 checkpoint tooling should be reused. INFRA-ACT-01 is unresolved; cleanup helper
 remains prohibited. No fixed GPU reservation carries into this campaign.
 
-**Evidence Revision**: Reconciled through PR #68 (`956ad3c277`) and PR #73.
+**Evidence Revision**: Reconciled through PR #68 (`956ad3c277`), PR #73, and R0 resource claims.
 **Owned Scope**: Environments, CI/GitHub Actions, worktree lifecycle, runner integration, local caches, hardware profiling.
 
 ---
 
 ## 1. Current State
+
+### Atomic cross-host resource claims (R0 — PR branch `codex/eval-r0`)
+
+`experiments/jobs/claims.py` implements minimal cross-host resource claims coordinating PointStream workers across shared GPU servers without cluster schedulers or colleague preemption:
+- **Shared jobs location**: Keyed under `PS_DATA_ROOT/jobs/claims` (`src.contracts.paths.data_root() / "jobs" / "claims"`) or explicit `PS_CLAIMS_DIR`.
+- **Atomic cross-host primitive**: Leverages POSIX atomic directory creation (`mkdir`) on shared filesystem for device claims and host CPU allocation mutex (`.lock`).
+- **Device keying**: Canonical hostname (`socket.getfqdn()` / `platform.node()`) and GPU UUID (`nvidia-smi --query-gpu=uuid`), not ordinal alone.
+- **Atomic acquire**: Exactly one process succeeds in acquiring a device claim directory; records ownership token, job ID, host, device UUID, process PID, and timestamp.
+- **Pre-selection and pre-launch recheck**: Inspects memory and running processes before selection and immediately rechecks under the claim prior to child launch. Defers/aborts on contention; never kills or preempts another user's work.
+- **Device isolation**: Hides unallocated GPUs from child via `CUDA_VISIBLE_DEVICES` (and sets `PS_CLAIMED_GPU_UUID`), preventing multi-GPU trainers from auto-spawning across unallocated devices.
+- **Token release & conservative stale owner handling**: Released strictly by the owning random token. Stale claims verify liveness via local PID check or shared-disk terminal job status (`status.json`). Stale remote claims without terminal status are never stolen solely on TTL.
+- **Aggregate CPU thread cap**: Enforces host ceiling at `floor(0.90 * available_cores)` across codec, BLAS, loader, and worker processes; sets `OMP_NUM_THREADS`, `MKL_NUM_THREADS`, `OPENBLAS_NUM_THREADS`, `TORCH_NUM_THREADS`, etc. in child environment. Refuses oversubscription atomically.
+- **Integration**: Integrated into `experiments.jobs.monitor` (`start --claim-gpu ... --cpu-threads ...` and `supervise` lifecycle), standalone context manager `claim_resources`, and CLI `python -m experiments.jobs.claims launch`.
+- **Validation**: 12 CPU-only unit tests in `tests/experiments/test_resource_claims.py` plus all 11 existing monitor tests pass. Real GPU query and auto-selection verified on gpu5 (RTX 6000 Ada).
 
 ### Quiet long-job monitoring (PR #82)
 
@@ -80,6 +94,7 @@ PR #68 introduced `scripts/cleanup_merged_worktrees.sh`. The documentation audit
 
 | ID | Status | Dependencies | Source | Description & Acceptance Criteria |
 |---|---|---|---|---|
+| `INFRA-ACT-05` | Complete | None | 00-resource-claims.md (R0) | **Atomic resource claims**: Implement minimal atomic cross-host GPU and CPU resource claims in `experiments/jobs/claims.py`, GPU UUID keying, pre-launch recheck, device isolation (`CUDA_VISIBLE_DEVICES`), conservative stale-owner handling, CPU thread cap (`floor(0.90 * available_cores)`), and monitor integration. Acceptance: 12 CPU-only unit tests pass; verified on host hardware. |
 | `INFRA-ACT-04` | Complete | None | PR #82 | Quiet monitor and approved scheduling/stall/restart/budget regression tests implemented. Use the workflow for new jobs; transport acceptance is verified, but automated idle wakeup timing is not a guaranteed service. |
 | `INFRA-ACT-01` | Ready | None | #68, #73 | **Repair worktree cleanup helper**: Refactor `scripts/cleanup_merged_worktrees.sh` to halt on any git refusal, verify clean working tree against `origin/main`, remove the `rm -rf` fallback, and drop remote pruning. Acceptance: Script refuses to delete unmerged or dirty worktrees and passes unit test. |
 | `INFRA-ACT-02` | Ready | None | Host rules | **Host-local cache enforcement**: Configure local caching (the checkout-specific cache paths in `docs/setup.md`) in CI and runner scripts. Acceptance: Zero mypy cache files written to NFS home. |

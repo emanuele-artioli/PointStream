@@ -189,6 +189,7 @@ def supervise(directory: Path) -> int:
     request = read_json(directory / "request.json")
     with (directory / "supervisor.lock").open("w") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        claim_session = None
         state = read_json(directory / "status.json")
         if state is not None:
             # Never replay a possibly-running command after supervisor loss.
@@ -204,7 +205,65 @@ def supervise(directory: Path) -> int:
             }
             write_json(directory / "status.json", state)
             child = None
+            claims_cfg = request.get("claims")
+            if claims_cfg:
+                from experiments.jobs.claims import (
+                    acquire_device_claim,
+                    acquire_cpu_claim,
+                    ClaimSession,
+                    get_claims_dir,
+                )
+
+                gpu_req = claims_cfg.get("gpu")
+                cpu_req = claims_cfg.get("cpu_threads")
+                claims_dir = claims_cfg.get("claims_dir")
+
+                dev_claim = None
+                if gpu_req:
+                    dev_claim = acquire_device_claim(
+                        device_uuid=None if gpu_req == "auto" else gpu_req,
+                        auto_select=(gpu_req == "auto"),
+                        claims_dir=claims_dir,
+                        job_id=directory.name,
+                        job_dir=directory,
+                    )
+                cpu_claim = None
+                if cpu_req:
+                    try:
+                        cpu_claim = acquire_cpu_claim(
+                            threads=int(cpu_req),
+                            job_id=directory.name,
+                            job_dir=directory,
+                            claims_dir=claims_dir,
+                        )
+                    except Exception:
+                        if dev_claim:
+                            from experiments.jobs.claims import release_device_claim
+
+                            release_device_claim(
+                                dev_claim.host, dev_claim.device_uuid, dev_claim.token, claims_dir
+                            )
+                        raise
+                token = dev_claim.token if dev_claim else (cpu_claim.token if cpu_claim else "")
+                claim_session = ClaimSession(
+                    token=token,
+                    device_claim=dev_claim,
+                    cpu_claim=cpu_claim,
+                    claims_dir=Path(claims_dir) if claims_dir else get_claims_dir(),
+                )
+                write_json(directory / "claim.json", claim_session.to_dict())
+
             try:
+                child_env = {
+                    **os.environ,
+                    "PS_JOB_DIR": str(directory),
+                    "PYTHONUNBUFFERED": "1",
+                }
+                if claim_session:
+                    from experiments.jobs.claims import build_child_env
+
+                    child_env = build_child_env(claim_session, child_env)
+
                 with (directory / "command.log").open("a") as output:
                     child = subprocess.Popen(
                         request["command"],
@@ -212,10 +271,15 @@ def supervise(directory: Path) -> int:
                         stdout=output,
                         stderr=subprocess.STDOUT,
                         start_new_session=True,
-                        env={**os.environ, "PS_JOB_DIR": str(directory), "PYTHONUNBUFFERED": "1"},
+                        env=child_env,
                     )
                 state["pid"] = child.pid
             except OSError as exc:
+                if claim_session:
+                    from experiments.jobs.claims import release_session_claims
+
+                    release_session_claims(claim_session)
+                    claim_session = None
                 state.update(status="failed", error=str(exc))
         last_log = 0.0
         try:
@@ -260,6 +324,10 @@ def supervise(directory: Path) -> int:
                 write_json(directory / "status.json", state)
             if child is not None:
                 stop_child(child)
+            if claim_session is not None:
+                from experiments.jobs.claims import release_session_claims
+
+                release_session_claims(claim_session)
 
 
 def positive(value: str) -> float:
@@ -280,6 +348,9 @@ def main() -> int:
     start.add_argument("--report-in-hours", type=positive)
     start.add_argument("--stall-minutes", type=positive, default=30)
     start.add_argument("--quiet-hours", type=positive)
+    start.add_argument("--claim-gpu", help="GPU UUID to claim, or 'auto' for first free device")
+    start.add_argument("--cpu-threads", type=int, help="CPU threads to allocate under host cap")
+    start.add_argument("--claims-dir", type=Path, help="Explicit claims directory")
     start.add_argument("--command", nargs=argparse.REMAINDER, required=True)
     schedule = commands.add_parser("schedule")
     schedule.add_argument("directory", type=Path)
@@ -310,16 +381,23 @@ def main() -> int:
         parser.error("a command is required after --")
     directory.mkdir(parents=True, exist_ok=False)
     (directory / "events").mkdir()
-    write_json(
-        directory / "request.json",
-        {
-            "command": command,
-            "cwd": os.getcwd(),
-            "budget_seconds": args.budget_hours * 3600,
-            "thread": args.thread,
-            "codex": args.codex,
-        },
-    )
+    request_data: dict[str, Any] = {
+        "command": command,
+        "cwd": os.getcwd(),
+        "budget_seconds": args.budget_hours * 3600,
+        "thread": args.thread,
+        "codex": args.codex,
+    }
+    claims_cfg: dict[str, Any] = {}
+    if args.claim_gpu:
+        claims_cfg["gpu"] = args.claim_gpu
+    if args.cpu_threads:
+        claims_cfg["cpu_threads"] = args.cpu_threads
+    if args.claims_dir:
+        claims_cfg["claims_dir"] = str(args.claims_dir)
+    if claims_cfg:
+        request_data["claims"] = claims_cfg
+    write_json(directory / "request.json", request_data)
     write_json(
         directory / "policy.json",
         {
