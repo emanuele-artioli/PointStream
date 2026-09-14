@@ -1,5 +1,12 @@
 # Evaluation Area
 
+## Coordinator follow-up — E01/E02
+
+Coordinator review: E01 #104 (`b87daf51`) is not yet accepted. Inventory is
+useful, but claim ingestion admits missing/invalid evidence and an unrun timing
+example. E01R corrects eligibility while preserving RD-only evidence that is
+actually valid. See [next dispatch](../workflow/session/evaluation-campaign/tasks/01r-contract-and-acquisition.md).
+
 ## Current campaign — 14 September 2026
 
 E01/E03/E06 now follow the [campaign](../workflow/session/evaluation-campaign/plan.md).

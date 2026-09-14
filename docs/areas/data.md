@@ -1,5 +1,13 @@
 # Data Area
 
+## Coordinator follow-up — E01/E02
+
+Coordinator accepts three fresh matches as the target and the proposed trio as
+an acquisition shortlist; none are acquired/confirmed eligible yet. E01R starts
+bounded acquisition now, without scoring. Remove any fallback treating the two
+exposed sources as fresh/restricted held-out confirmation. Actual source split
+and quality criterion remain subject to the evidence checks in E01R.
+
 ## Current campaign — 14 September 2026
 
 E01/E07 follow the [campaign](../workflow/session/evaluation-campaign/plan.md).

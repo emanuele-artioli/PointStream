@@ -1,5 +1,14 @@
 # Generation Area
 
+## Coordinator follow-up — E01/E02
+
+Coordinator review of #105 (`2f63ae1`): implementation partial; E05 not released.
+Merged CI and request-count/synthetic controls do not establish loaded-backend
+readiness. Adapter schema/default-control defects, epoch-bound checkpoints and
+always-on residual path require [E02R](../workflow/session/evaluation-campaign/tasks/02r-readiness-evidence.md).
+SPADE full is not yet a different generator architecture; correct pretrained
+initialization before relying on it. Supersedes broader Ready/completed labels below.
+
 ## Current campaign — 14 September 2026
 
 E02/E05 in the [campaign](../workflow/session/evaluation-campaign/plan.md) supersede
