@@ -200,14 +200,15 @@ def _row_scores(row: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _row_parts(row: Mapping[str, Any]) -> dict[str, Any]:
-    parts = row.get("parts") if isinstance(row.get("parts"), dict) else {}
+    raw_parts = row.get("parts")
+    parts: dict[str, Any] = dict(raw_parts) if isinstance(raw_parts, dict) else {}
     residual = _first_present(parts, "residual") if parts else row.get("residual_bytes")
     total = (
         _first_present(parts, "transport_total")
         if parts
         else _first_present(row, "coded_bytes", "total_bytes")
     )
-    return {"residual_bytes": residual, "total_bytes": total, "parts": dict(parts)}
+    return {"residual_bytes": residual, "total_bytes": total, "parts": parts}
 
 
 def _row_timing(row: Mapping[str, Any]) -> Any:
@@ -297,7 +298,8 @@ def adapt_diagnostic_matrix_result(
     paste_run = picked["paste"]
 
     ckpt_file = Path(str(checkpoint_path)) if checkpoint_path else None
-    identity = matrix_output.get("identity") if isinstance(matrix_output.get("identity"), dict) else {}
+    raw_identity = matrix_output.get("identity")
+    identity: dict[str, Any] = dict(raw_identity) if isinstance(raw_identity, dict) else {}
     sha = (
         checkpoint_sha256
         or identity.get("checkpoint_sha256")

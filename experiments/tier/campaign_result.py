@@ -217,10 +217,12 @@ def _evidence_bytes_total(record: Mapping[str, Any]) -> Any:
         bytes_block = evidence.get("bytes") or {}
         if isinstance(bytes_block, dict) and bytes_block.get("total") is not None:
             return bytes_block.get("total")
-    metrics = record.get("metrics") if isinstance(record.get("metrics"), dict) else {}
+    raw_metrics = record.get("metrics")
+    metrics: dict[str, Any] = dict(raw_metrics) if isinstance(raw_metrics, dict) else {}
     if metrics.get("total_bytes") is not None:
         return metrics.get("total_bytes")
-    parts = record.get("parts") if isinstance(record.get("parts"), dict) else {}
+    raw_parts = record.get("parts")
+    parts: dict[str, Any] = dict(raw_parts) if isinstance(raw_parts, dict) else {}
     if parts.get("transport_total") is not None:
         return parts.get("transport_total")
     return record.get("coded_bytes")
@@ -490,7 +492,8 @@ def _adapter_metrics(raw: Mapping[str, Any]) -> dict[str, Any]:
             metrics["ssim_mean"] = scores.get("ssim", scores.get("ssim_mean"))
         if metrics.get("vmaf_mean") is None:
             metrics["vmaf_mean"] = scores.get("vmaf", scores.get("vmaf_mean"))
-    parts = raw.get("parts") if isinstance(raw.get("parts"), dict) else {}
+    raw_parts = raw.get("parts")
+    parts: dict[str, Any] = dict(raw_parts) if isinstance(raw_parts, dict) else {}
     if metrics.get("total_bytes") is None:
         metrics["total_bytes"] = parts.get("transport_total", raw.get("coded_bytes"))
     if metrics.get("residual_bytes") is None:
@@ -614,7 +617,12 @@ def campaign_record_from_generation_adapter(raw: Mapping[str, Any]) -> dict[str,
         if isinstance(count, int) and count > 0:
             frame_ids["start"] = 0
             frame_ids["count"] = count
-        if _finite_number(fps) and float(fps) > 0:
+        if (
+            isinstance(fps, (int, float))
+            and not isinstance(fps, bool)
+            and math.isfinite(fps)
+            and float(fps) > 0
+        ):
             frame_ids["fps"] = float(fps)
 
     shape = raw.get("delivered_shape") or raw.get("operating_resolution")
