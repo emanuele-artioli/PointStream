@@ -235,6 +235,10 @@ def supervise(directory: Path) -> int:
                             job_id=directory.name,
                             job_dir=directory,
                             claims_dir=claims_dir,
+                            available_cores=(
+                                claims_cfg.get("available_cores") if isinstance(claims_cfg, dict) else None
+                            ),
+                            cpu_cap=claims_cfg.get("cpu_cap") if isinstance(claims_cfg, dict) else None,
                         )
                     except Exception:
                         if dev_claim:
