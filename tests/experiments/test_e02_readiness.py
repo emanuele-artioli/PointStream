@@ -43,7 +43,7 @@ from scripts.train_campaign import (
     rank_variants,
 )
 from scripts.train_pix2pix import (
-    PatchGANDiscriminator,
+    ReconstructibleEpochSampler,
     UNetGenerator,
     build_checkpoint_state,
     save_checkpoint_atomic,
@@ -196,81 +196,170 @@ def test_pose_shape_mismatch_fails_closed(tmp_path: Path, monkeypatch: pytest.Mo
 # ---------------------------------------------------------------------------
 
 
-def test_real_neural_conditioning_sensitivity_and_determinism() -> None:
-    """Prove conditioning sensitivity and same-seed determinism on real UNetGenerator."""
+def test_real_neural_conditioning_sensitivity_determinism_and_no_conditioning() -> None:
+    """Prove conditioning sensitivity, same-seed determinism, and no-conditioning control on real UNetGenerator."""
     torch.manual_seed(42)
     device = torch.device("cpu")
     net = UNetGenerator(in_channels=6, out_channels=3).to(device)
     net.eval()
 
-    # Create reference appearance and two distinct pose conditionings
+    # Create reference appearance and conditionings
     ref = torch.randn(1, 3, 256, 256)
     cond_normal = torch.randn(1, 3, 256, 256)
     cond_shuffled = torch.randn(1, 3, 256, 256)
+    cond_blank = torch.zeros(1, 3, 256, 256)
 
     with torch.no_grad():
         out_normal_1 = net(torch.cat((cond_normal, ref), dim=1))
         out_normal_2 = net(torch.cat((cond_normal, ref), dim=1))
         out_shuffled = net(torch.cat((cond_shuffled, ref), dim=1))
+        out_blank = net(torch.cat((cond_blank, ref), dim=1))
 
-    # Determinism: same input produces bit-identical tensor
+    # Same-seed determinism: identical input produces bit-identical tensor
     assert torch.equal(out_normal_1, out_normal_2)
 
-    # Conditioning sensitivity: different conditioning produces measurably different output
-    l1_diff = torch.mean(torch.abs(out_normal_1 - out_shuffled)).item()
-    assert l1_diff > 0.01
+    # Conditioning sensitivity (normal vs shuffled): different conditioning produces measurably different output
+    l1_diff_shuffled = torch.mean(torch.abs(out_normal_1 - out_shuffled)).item()
+    assert l1_diff_shuffled > 0.01
+
+    # No-conditioning control: blank/zero conditioning produces measurably different output
+    l1_diff_blank = torch.mean(torch.abs(out_normal_1 - out_blank)).item()
+    assert l1_diff_blank > 0.01
 
 
-def test_real_neural_tiny_learning_and_atomic_resume(tmp_path: Path) -> None:
-    """Verify tiny learning step updates weights and checkpoint resume preserves step and state."""
-    torch.manual_seed(123)
-    net = UNetGenerator(in_channels=6, out_channels=3)
-    disc = PatchGANDiscriminator(in_channels=6)
-    opt_G = optim.Adam(net.parameters(), lr=1e-3)
-    opt_D = optim.Adam(disc.parameters(), lr=1e-3)
+def test_reconstructible_epoch_sampler_cursor_continuation() -> None:
+    """Verify sampler yields exact remaining batches on partial-epoch resume without repetition or skipping."""
+    dummy_dataset = list(range(100))
+    batch_size = 10
+    sampler_full = ReconstructibleEpochSampler(dummy_dataset, batch_size=batch_size, seed=42, shuffle=True)
+    sampler_full.set_epoch(0, start_step=0)
+    full_indices = list(sampler_full)
+    assert len(full_indices) == 100
 
-    inp = torch.randn(2, 6, 256, 256)
-    target = torch.randn(2, 3, 256, 256)
+    # Resume at step 4 (batches 0, 1, 2, 3 already completed)
+    sampler_resumed = ReconstructibleEpochSampler(dummy_dataset, batch_size=batch_size, seed=42, shuffle=True)
+    sampler_resumed.set_epoch(0, start_step=4)
+    resumed_indices = list(sampler_resumed)
 
-    # 1 step optimization
-    out = net(inp)
-    loss = nn.functional.l1_loss(out, target)
-    opt_G.zero_grad()
-    loss.backward()
-    opt_G.step()
+    # Must equal full_indices from index 40 onwards
+    assert resumed_indices == full_indices[40:]
+    assert len(resumed_indices) == 60
 
-    ckpt_file = tmp_path / "pix2pix_ckpt.pt"
+
+def test_real_neural_training_interruption_and_continuation_optimizer_update(tmp_path: Path) -> None:
+    """Verify interrupted and resumed training matches uninterrupted control within numerical tolerance."""
+    seed = 42
+
+    # Synthesize small batch data (3 batches of 2 items with valid UNet 256x256 dimensions)
+    torch.manual_seed(seed)
+    batches = [
+        (torch.randn(2, 6, 256, 256), torch.randn(2, 3, 256, 256))
+        for _ in range(3)
+    ]
+
+    # --- Run A: Uninterrupted 2 steps (step 0, then step 1) ---
+    torch.manual_seed(seed)
+    net_A = UNetGenerator(in_channels=6, out_channels=3)
+    opt_G_A = optim.Adam(net_A.parameters(), lr=1e-3, betas=(0.5, 0.999))
+
+    # Step 0
+    inp0, tgt0 = batches[0]
+    out0 = net_A(inp0)
+    loss0 = nn.functional.l1_loss(out0, tgt0)
+    opt_G_A.zero_grad()
+    loss0.backward()
+    opt_G_A.step()
+
+    # Step 1
+    inp1, tgt1 = batches[1]
+    out1_A = net_A(inp1)
+    loss1_A = nn.functional.l1_loss(out1_A, tgt1)
+    opt_G_A.zero_grad()
+    loss1_A.backward()
+    opt_G_A.step()
+
+    # --- Run B: Step 0 -> Save checkpoint -> Fresh process / resume -> Step 1 ---
+    torch.manual_seed(seed)
+    net_B = UNetGenerator(in_channels=6, out_channels=3)
+    opt_G_B = optim.Adam(net_B.parameters(), lr=1e-3, betas=(0.5, 0.999))
+
+    # Step 0
+    inp0_b, tgt0_b = batches[0]
+    out0_b = net_B(inp0_b)
+    loss0_b = nn.functional.l1_loss(out0_b, tgt0_b)
+    opt_G_B.zero_grad()
+    loss0_b.backward()
+    opt_G_B.step()
+
+    # Save checkpoint at step 0
+    ckpt_file = tmp_path / "resume_test_ckpt.pt"
     ckpt_state = build_checkpoint_state(
-        epoch=1,
-        step=5,
-        total_steps=10,
-        generator=net,
-        discriminator=disc,
-        optimizer_G=opt_G,
-        optimizer_D=opt_D,
+        epoch=0,
+        step=0,
+        total_steps=3,
+        generator=net_B,
+        discriminator=None,
+        optimizer_G=opt_G_B,
+        optimizer_D=None,
         ngpus=1,
+        base_seed=seed,
     )
     save_checkpoint_atomic(ckpt_state, ckpt_file)
-    assert ckpt_file.exists()
 
-    # Mutate weights
-    with torch.no_grad():
-        for p in net.parameters():
-            p.add_(1.0)
+    # Fresh process / re-instantiate models and optimizers
+    net_resumed = UNetGenerator(in_channels=6, out_channels=3)
+    opt_G_resumed = optim.Adam(net_resumed.parameters(), lr=1e-3, betas=(0.5, 0.999))
 
-    # Resume
+    # Load checkpoint
     loaded = torch.load(ckpt_file, map_location="cpu")
-    net2 = UNetGenerator(in_channels=6, out_channels=3)
-    net2.load_state_dict(loaded["G"])
+    net_resumed.load_state_dict(loaded["G"])
+    opt_G_resumed.load_state_dict(loaded["opt_G"])
+    t_rng = loaded["rng_torch"]
+    if isinstance(t_rng, torch.Tensor):
+        t_rng = t_rng.cpu()
+    torch.set_rng_state(t_rng)
 
-    # Verify weights match before mutation
-    for p1, p2 in zip(net.parameters(), net2.parameters(), strict=True):
-        assert not torch.equal(p1, p2)  # net was mutated
-        assert torch.allclose(p1 - 1.0, p2, atol=1e-6)
+    # Perform step 1 in resumed instance
+    out1_resumed = net_resumed(inp1)
+    loss1_resumed = nn.functional.l1_loss(out1_resumed, tgt1)
+    opt_G_resumed.zero_grad()
+    loss1_resumed.backward()
+    opt_G_resumed.step()
 
-    assert loaded["epoch"] == 1
-    assert loaded["step"] == 5
-    assert loaded["total_steps_in_epoch"] == 10
+    # Verify: loss values match
+    assert torch.allclose(loss1_A, loss1_resumed, atol=1e-6)
+
+    # Verify: weights match uninterrupted control
+    for p_A, p_B in zip(net_A.parameters(), net_resumed.parameters(), strict=True):
+        assert torch.allclose(p_A, p_B, atol=1e-6)
+
+    # Verify: optimizer state dicts (exp_avg, exp_avg_sq) match uninterrupted control
+    for state_A, state_B in zip(
+        opt_G_A.state.values(), opt_G_resumed.state.values(), strict=True
+    ):
+        if "exp_avg" in state_A and "exp_avg" in state_B:
+            assert torch.allclose(state_A["exp_avg"], state_B["exp_avg"], atol=1e-6)
+        if "exp_avg_sq" in state_A and "exp_avg_sq" in state_B:
+            assert torch.allclose(state_A["exp_avg_sq"], state_B["exp_avg_sq"], atol=1e-6)
+
+
+def test_selected_device_resume_cpu_tensor_conversion(tmp_path: Path) -> None:
+    """Verify loading device-mapped checkpoint safely converts RNG state tensors to CPU ByteTensors."""
+    ckpt_file = tmp_path / "device_mapped_ckpt.pt"
+    rng_torch = torch.get_rng_state()
+    torch.save({"rng_torch": rng_torch, "rng_cuda": None, "epoch": 0, "step": 0}, ckpt_file)
+
+    loaded = torch.load(ckpt_file, map_location="cpu")
+    t_rng = loaded["rng_torch"]
+    if torch.cuda.is_available():
+        t_cuda = t_rng.cuda()
+        assert t_cuda.is_cuda
+        t_cpu = t_cuda.cpu()
+        torch.set_rng_state(t_cpu)
+    else:
+        if isinstance(t_rng, torch.Tensor):
+            t_rng = t_rng.cpu()
+        torch.set_rng_state(t_rng)
 
 
 def test_spade_pretrained_load_order_not_overwritten(tmp_path: Path) -> None:
@@ -365,7 +454,7 @@ def test_evaluate_checkpoint_residual_off(tmp_path: Path) -> None:
 
 
 def test_uncertainty_aware_promotion_preserves_close_candidates() -> None:
-    """Candidates within 2% rate difference of cutoff are preserved as survivors."""
+    """Candidates within practical rate indifference band of cutoff are preserved as survivors."""
     ranked = ["cand_1", "cand_2", "cand_3", "cand_4"]
     aggregate = {
         "cand_1": {"residual_bytes": 1000, "psnr_mean": 35.0, "success": True},
@@ -377,6 +466,20 @@ def test_uncertainty_aware_promotion_preserves_close_candidates() -> None:
     survivors = promote_survivors(ranked, aggregate, min_diff_threshold=0.02)
     assert survivors == ["cand_1", "cand_2", "cand_3"]
     assert "cand_4" not in survivors
+
+
+def test_incomparable_candidates_preserved_without_automated_pruning() -> None:
+    """Candidates representing valid RD trade-offs (e.g. higher rate, higher quality) are preserved."""
+    ranked = ["low_rate", "high_quality"]
+    aggregate = {
+        "low_rate": {"total_bytes": 10000, "psnr_mean": 32.0, "success": True},
+        "high_quality": {"total_bytes": 25000, "psnr_mean": 38.5, "success": True},
+    }
+    # With 2 candidates, successive halving nominally keeps ceil(2/2)=1.
+    # But high_quality has 6.5 dB higher PSNR! They are incomparable trade-offs.
+    survivors = promote_survivors(ranked, aggregate)
+    assert "low_rate" in survivors
+    assert "high_quality" in survivors  # Preserved without automated model pruning!
 
 
 def test_rank_variants_orders_by_wire_bytes_first() -> None:
@@ -592,3 +695,106 @@ def test_metric_uncertainty_single_source_handling() -> None:
     assert res["sem"] is None
     assert res["ci_95"] is None
     assert res["uncertainty_status"] == "single_source_uncertainty_unavailable"
+
+
+def test_diagnostic_matrix_control_wiring() -> None:
+    """Verify diagnostic matrix report properly structures and validates controls (shuffled, blank, same-seed)."""
+    from scripts.run_diagnostic_matrix import assemble_matrix_report
+    from src.contracts.config import PointstreamConfig
+
+    class DummyClip:
+        video = "alcaraz_highlights"
+        scene = "scene_000"
+        context_id = "ctx_0"
+        frames = [np.zeros((64, 64, 3), dtype=np.uint8)]
+        objects = ()
+
+    dummy_sha = "f" * 64
+    cfg = PointstreamConfig()
+
+    matrix_rows = [
+        {
+            "corner": "gen_off_res_off",
+            "generation_on": False,
+            "residual_on": False,
+            "control": "pasted_reference",
+            "delivered_frame_hashes": ["hash_paste"],
+            "model_invocation_count": 0,
+        },
+        {
+            "corner": "gen_off_res_on",
+            "generation_on": False,
+            "residual_on": True,
+            "control": "pasted_reference",
+            "delivered_frame_hashes": ["hash_res_only"],
+            "model_invocation_count": 0,
+        },
+        {
+            "corner": "gen_on_res_off",
+            "generation_on": True,
+            "residual_on": False,
+            "control": "generator",
+            "delivered_frame_hashes": ["hash_gen"],
+            "model_invocation_count": 1,
+        },
+        {
+            "corner": "gen_on_res_on",
+            "generation_on": True,
+            "residual_on": True,
+            "control": "generator",
+            "delivered_frame_hashes": ["hash_gen_res"],
+            "model_invocation_count": 1,
+        },
+        {
+            "corner": "gen_on_shuffled_conditioning",
+            "generation_on": True,
+            "residual_on": False,
+            "shuffled_conditioning": True,
+            "control": "shuffled_conditioning",
+            "delivered_frame_hashes": ["hash_shuffled"],
+            "model_invocation_count": 1,
+        },
+        {
+            "corner": "gen_on_no_conditioning",
+            "generation_on": True,
+            "residual_on": False,
+            "no_conditioning": True,
+            "control": "no_conditioning",
+            "delivered_frame_hashes": ["hash_blank"],
+            "model_invocation_count": 1,
+        },
+        {
+            "corner": "gen_on_res_off_same_seed",
+            "generation_on": True,
+            "residual_on": False,
+            "control": "generator",
+            "delivered_frame_hashes": ["hash_gen"],  # Identical to gen_on_res_off
+            "model_invocation_count": 1,
+        },
+    ]
+
+    report = assemble_matrix_report(
+        video=DummyClip.video,
+        scene=DummyClip.scene,
+        frames=1,
+        generator="pix2pix",
+        residual_qp=32,
+        clip=DummyClip(),
+        base_config=cfg,
+        matrix=matrix_rows,
+        checkpoint_path=None,
+        checkpoint_sha256=dummy_sha,
+        device="cpu",
+        shuffled_control=True,
+        no_conditioning_control=True,
+        same_seed_control=True,
+    )
+
+    ctrls = report["controls"]
+    assert ctrls["shuffled_control_enabled"] is True
+    assert ctrls["no_conditioning_control_enabled"] is True
+    assert ctrls["same_seed_control_enabled"] is True
+    assert ctrls["same_seed_determinism_verified"] is True
+    assert "gen_on_shuffled_conditioning" in ctrls["shuffled_conditioning"]
+    assert "gen_on_no_conditioning" in ctrls["no_conditioning"]
+

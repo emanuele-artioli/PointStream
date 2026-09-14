@@ -1,6 +1,7 @@
 import sqlite3  # noqa: F401
 import argparse
 import logging
+import math
 import os
 from pathlib import Path
 import time
@@ -13,8 +14,7 @@ import torch.multiprocessing as mp
 import torch.nn as nn
 import torch.optim as optim
 from torch.nn.parallel import DistributedDataParallel as DDP
-from torch.utils.data import DataLoader
-from torch.utils.data.distributed import DistributedSampler
+from torch.utils.data import DataLoader, Sampler
 import torchvision.utils as vutils
 from tqdm import tqdm
 
@@ -139,28 +139,105 @@ def save_checkpoint_atomic(state: dict[str, Any] | Any, target_path: str | Path)
     tmp_path.replace(path)
 
 
+class ReconstructibleEpochSampler(Sampler):
+    """Deterministic epoch-seeded sampler supporting partial-epoch cursor resumption."""
+
+    def __init__(
+        self,
+        data_source: Any,
+        batch_size: int,
+        seed: int = 42,
+        shuffle: bool = True,
+        drop_last: bool = True,
+        num_replicas: int = 1,
+        rank: int = 0,
+    ) -> None:
+        super().__init__(data_source)
+        self.data_source = data_source
+        self.batch_size = max(1, batch_size)
+        self.seed = seed
+        self.shuffle = shuffle
+        self.drop_last = drop_last
+        self.num_replicas = max(1, num_replicas)
+        self.rank = rank
+        self.epoch = 0
+        self.start_step = 0
+
+    def set_epoch(self, epoch: int, start_step: int = 0) -> None:
+        self.epoch = epoch
+        self.start_step = start_step
+
+    def __iter__(self):
+        n = len(self.data_source)
+        if self.shuffle:
+            g = torch.Generator()
+            g.manual_seed(self.seed + self.epoch)
+            indices = torch.randperm(n, generator=g).tolist()
+        else:
+            indices = list(range(n))
+
+        if self.num_replicas > 1:
+            total_size = (
+                (n // self.num_replicas) * self.num_replicas
+                if self.drop_last
+                else math.ceil(n / self.num_replicas) * self.num_replicas
+            )
+            indices = indices[:total_size]
+            indices = indices[self.rank : total_size : self.num_replicas]
+
+        n_batches = len(indices) // self.batch_size
+        if self.drop_last:
+            indices = indices[: n_batches * self.batch_size]
+
+        if self.start_step > 0:
+            start_idx = self.start_step * self.batch_size
+            indices = indices[start_idx:]
+
+        return iter(indices)
+
+    def __len__(self) -> int:
+        n = len(self.data_source)
+        if self.num_replicas > 1:
+            n = (
+                n // self.num_replicas
+                if self.drop_last
+                else math.ceil(n / self.num_replicas)
+            )
+        n_batches = n // self.batch_size
+        if self.start_step > 0:
+            return max(0, (n_batches - self.start_step) * self.batch_size)
+        return n_batches * self.batch_size if self.drop_last else n
+
+
 def build_checkpoint_state(
     epoch: int,
     step: int,
     total_steps: int,
     generator: nn.Module,
-    discriminator: nn.Module,
-    optimizer_G: optim.Optimizer,
-    optimizer_D: optim.Optimizer,
-    ngpus: int,
+    discriminator: nn.Module | None = None,
+    optimizer_G: optim.Optimizer | None = None,
+    optimizer_D: optim.Optimizer | None = None,
+    ngpus: int = 1,
+    base_seed: int = 42,
 ) -> dict[str, Any]:
-    state_dict_G = generator.module.state_dict() if ngpus > 1 else generator.state_dict()
-    state_dict_D = discriminator.module.state_dict() if ngpus > 1 else discriminator.state_dict()
-    rng_cuda = torch.cuda.get_rng_state() if torch.cuda.is_available() else None
+    state_dict_G = (
+        generator.module.state_dict() if ngpus > 1 else generator.state_dict()
+    ) if generator is not None else None
+    state_dict_D = (
+        discriminator.module.state_dict() if ngpus > 1 else discriminator.state_dict()
+    ) if discriminator is not None else None
+    rng_cuda = torch.cuda.get_rng_state().cpu() if torch.cuda.is_available() else None
+    rng_torch = torch.get_rng_state().cpu()
     return {
         "epoch": epoch,
         "step": step,
         "total_steps_in_epoch": total_steps,
+        "base_seed": base_seed,
         "G": state_dict_G,
         "D": state_dict_D,
-        "opt_G": optimizer_G.state_dict(),
-        "opt_D": optimizer_D.state_dict(),
-        "rng_torch": torch.get_rng_state(),
+        "opt_G": optimizer_G.state_dict() if optimizer_G is not None else None,
+        "opt_D": optimizer_D.state_dict() if optimizer_D is not None else None,
+        "rng_torch": rng_torch,
         "rng_cuda": rng_cuda,
         "rng_numpy": np.random.get_state(),
         "timestamp_unix": time.time(),
@@ -187,6 +264,7 @@ def main_worker(gpu, ngpus_per_node, args):
     start_epoch = 0
     start_step = 0
     checkpoint = None
+    base_seed = getattr(args, "seed", 42)
     if args.resume and os.path.exists(args.checkpoint_path):
         if is_main_process:
             logging.info(f"Resuming from checkpoint {args.checkpoint_path}")
@@ -195,6 +273,8 @@ def main_worker(gpu, ngpus_per_node, args):
         discriminator.load_state_dict(checkpoint["D"])
         saved_step = checkpoint.get("step", -1)
         total_steps = checkpoint.get("total_steps_in_epoch", -1)
+        if "base_seed" in checkpoint:
+            base_seed = int(checkpoint["base_seed"])
         if saved_step >= 0 and total_steps > 0 and saved_step < total_steps - 1:
             start_epoch = checkpoint["epoch"]
             start_step = saved_step + 1
@@ -202,10 +282,17 @@ def main_worker(gpu, ngpus_per_node, args):
             start_epoch = checkpoint["epoch"] + 1
             start_step = 0
 
+        # Selected-device resume requires CPU ByteTensors for torch and cuda RNG states
         if "rng_torch" in checkpoint and checkpoint["rng_torch"] is not None:
-            torch.set_rng_state(checkpoint["rng_torch"])
+            t_rng = checkpoint["rng_torch"]
+            if isinstance(t_rng, torch.Tensor):
+                t_rng = t_rng.cpu()
+            torch.set_rng_state(t_rng)
         if "rng_cuda" in checkpoint and checkpoint["rng_cuda"] is not None and torch.cuda.is_available():
-            torch.cuda.set_rng_state(checkpoint["rng_cuda"])
+            c_rng = checkpoint["rng_cuda"]
+            if isinstance(c_rng, torch.Tensor):
+                c_rng = c_rng.cpu()
+            torch.cuda.set_rng_state(c_rng)
         if "rng_numpy" in checkpoint and checkpoint["rng_numpy"] is not None:
             np.random.set_state(checkpoint["rng_numpy"])
     else:
@@ -232,49 +319,63 @@ def main_worker(gpu, ngpus_per_node, args):
     dataset = TennisSkeletonDataset(args.data_root, target_size=args.img_size, include_reference=True,
                                     condition=args.condition)
 
-    if ngpus_per_node > 1:
-        sampler = DistributedSampler(dataset)
-    else:
-        sampler = None
-
     # Resolve batch size, defaulting to 64 if 'auto' was passed to better utilize 48GB VRAM
     batch_size = 64 if str(args.batch_size).lower() == "auto" else int(args.batch_size)
+
+    sampler = ReconstructibleEpochSampler(
+        dataset,
+        batch_size=batch_size,
+        seed=base_seed,
+        shuffle=True,
+        drop_last=True,
+        num_replicas=ngpus_per_node,
+        rank=gpu,
+    )
 
     dataloader = DataLoader(
         dataset, 
         batch_size=batch_size, 
-        shuffle=(sampler is None), 
+        shuffle=False, 
         num_workers=args.num_workers,
         pin_memory=True,
-        drop_last=True,
+        drop_last=False,
         sampler=sampler,
         persistent_workers=(args.num_workers > 0)
     )
 
+    total_batches = len(dataset) // batch_size
+    if ngpus_per_node > 1:
+        total_batches = (len(dataset) // ngpus_per_node) // batch_size
+
     if is_main_process:
         logging.info(f"Starting training on {len(dataset)} images for {args.epochs} epochs with batch size {batch_size} (per GPU)")
 
-    if len(dataloader) == 0:
+    if total_batches == 0:
         if is_main_process:
             logging.error(f"Dataloader is empty! Dataset size ({len(dataset)}) is too small for batch size {batch_size} across {ngpus_per_node} GPUs with drop_last=True.")
         return
 
     last_checkpoint_time = time.time()
     last_progress_time = time.time()
+    ckpt_interval = getattr(args, "checkpoint_interval_sec", 3600.0)
 
     for epoch in range(start_epoch, args.epochs):
-        if sampler is not None:
-            sampler.set_epoch(epoch)
+        current_start_step = start_step if epoch == start_epoch else 0
+        sampler.set_epoch(epoch, start_step=current_start_step)
 
         if is_main_process:
-            pbar = tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Epoch {epoch}/{args.epochs}")
+            pbar = tqdm(
+                enumerate(dataloader),
+                total=len(dataloader),
+                initial=current_start_step,
+                desc=f"Epoch {epoch}/{args.epochs}",
+            )
             iterator = pbar
         else:
             iterator = enumerate(dataloader)
 
-        for i, (real_A, ref_img, real_B) in iterator:
-            if epoch == start_epoch and i < start_step:
-                continue
+        for batch_offset, (real_A, ref_img, real_B) in iterator:
+            i = current_start_step + batch_offset
 
             real_A = real_A.to(device)
             ref_img = ref_img.to(device)
@@ -332,26 +433,27 @@ def main_worker(gpu, ngpus_per_node, args):
                 pbar.set_postfix({"D_loss": f"{loss_D.item():.4f}", "G_loss": f"{loss_G.item():.4f}"})
                 now = time.time()
                 if now - last_progress_time >= 600.0:
-                    logging.info(f"Progress heartbeat: epoch {epoch}/{args.epochs}, step {i}/{len(dataloader)}")
+                    logging.info(f"Progress heartbeat: epoch {epoch}/{args.epochs}, step {i}/{total_batches}")
                     last_progress_time = now
 
-                # Intra-epoch hourly wall-clock checkpoint deadline check
-                if now - last_checkpoint_time >= 3600.0:
+                # Intra-epoch hourly/periodic wall-clock checkpoint deadline check
+                if now - last_checkpoint_time >= ckpt_interval:
                     state_dict_G = generator.module.state_dict() if ngpus_per_node > 1 else generator.state_dict()
                     save_checkpoint_atomic(state_dict_G, args.out_weights)
                     ckpt_state = build_checkpoint_state(
                         epoch=epoch,
                         step=i,
-                        total_steps=len(dataloader),
+                        total_steps=total_batches,
                         generator=generator,
                         discriminator=discriminator,
                         optimizer_G=optimizer_G,
                         optimizer_D=optimizer_D,
                         ngpus=ngpus_per_node,
+                        base_seed=base_seed,
                     )
                     save_checkpoint_atomic(ckpt_state, args.checkpoint_path)
                     last_checkpoint_time = now
-                    logging.info(f"Intra-epoch hourly checkpoint saved at epoch {epoch}, step {i}/{len(dataloader)}")
+                    logging.info(f"Intra-epoch checkpoint saved at epoch {epoch}, step {i}/{total_batches}")
 
         start_step = 0
 
@@ -360,19 +462,20 @@ def main_worker(gpu, ngpus_per_node, args):
             vutils.save_image(sample_img, f"{args.sample_dir}/epoch_{epoch:03d}.png", nrow=4, normalize=True)
 
             now = time.time()
-            # Hourly wall-clock checkpointing (or every 10 epochs or final epoch)
-            if (epoch + 1) % 10 == 0 or (now - last_checkpoint_time >= 3600.0) or (epoch + 1 == args.epochs):
+            # Wall-clock checkpointing (or every 10 epochs or final epoch)
+            if (epoch + 1) % 10 == 0 or (now - last_checkpoint_time >= ckpt_interval) or (epoch + 1 == args.epochs):
                 state_dict_G = generator.module.state_dict() if ngpus_per_node > 1 else generator.state_dict()
                 save_checkpoint_atomic(state_dict_G, args.out_weights)
                 ckpt_state = build_checkpoint_state(
                     epoch=epoch,
-                    step=len(dataloader) - 1,
-                    total_steps=len(dataloader),
+                    step=total_batches - 1,
+                    total_steps=total_batches,
                     generator=generator,
                     discriminator=discriminator,
                     optimizer_G=optimizer_G,
                     optimizer_D=optimizer_D,
                     ngpus=ngpus_per_node,
+                    base_seed=base_seed,
                 )
                 save_checkpoint_atomic(ckpt_state, args.checkpoint_path)
                 last_checkpoint_time = now
@@ -402,6 +505,9 @@ def main():
     parser.add_argument("--lambda-pixel", type=float, default=100)
     parser.add_argument("--out-weights", type=str, default="assets/weights/pix2pix_generator.pt")
     parser.add_argument("--checkpoint-path", type=str, default="assets/weights/pix2pix_checkpoint.pt")
+    parser.add_argument("--checkpoint-interval-sec", type=float, default=3600.0,
+                        help="Periodic checkpoint wall-clock interval in seconds (default: 3600.0)")
+    parser.add_argument("--seed", type=int, default=42, help="Base random seed for dataset and model (default: 42)")
     parser.add_argument("--sample-dir", type=str, default="assets/samples")
     parser.add_argument("--resume", action="store_true", help="Resume training from checkpoint")
     args = parser.parse_args()
