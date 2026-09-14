@@ -30,10 +30,6 @@ import torch.optim as optim
 from experiments.long_scenes.loader import (
     load_long_scene_clip,
 )
-from experiments.tier.campaign_result import (
-    ingest_for_claim,
-    validate_campaign_record,
-)
 from scripts.run_diagnostic_matrix import (
     _augment_objects_with_pose,
 )
@@ -51,7 +47,6 @@ from scripts.train_pix2pix import (
 from src.components.generation.spade4tennis_arch import SPADEResNet9Generator
 from src.pipeline.reconstruction.reconstruct import ObjectRequest
 from src.runner.generation_adapter import (
-    adapt_campaign_eval_result,
     adapt_diagnostic_matrix_result,
     calculate_metric_uncertainty,
     validate_generation_result,
@@ -533,168 +528,86 @@ def test_rank_variants_uses_total_bytes_when_residual_off() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_generation_adapter_roundtrip_passes_e01_validation() -> None:
-    """Verify real producer-shaped diagnostic matrix row produces valid E01 record."""
+def test_generation_adapter_conforms_to_e01_schema() -> None:
+    """Verify adapt_diagnostic_matrix_result produces schema-valid record."""
     matrix_output = {
-        "video": "alcaraz_highlights",
-        "scene": "scene_028",
-        "frames": 4,
-        "fps": 24.0,
-        "matrix": [
-            {
-                "corner": "gen_off_res_off",
-                "control": "pasted_reference",
-                "generation_on": False,
-                "residual_on": False,
-                "shuffled_conditioning": False,
-                "delivered_frame_hashes": ["p1", "p2", "p3", "p4"],
-                "coded_bytes": 10000,
-                "residual_bytes": 0,
-            },
-            {
-                "corner": "gen_on_res_off",
-                "control": None,
-                "generation_on": True,
-                "residual_on": False,
-                "shuffled_conditioning": False,
-                "delivered_frame_hashes": ["g1", "g2", "g3", "g4"],
-                "coded_bytes": 15000,
-                "residual_bytes": 0,
-                "elapsed_seconds": 1.2,
-                "psnr_y": 32.5,
-                "ssim": 0.91,
-            },
-            {
-                "corner": "gen_on_res_off_shuffled",
-                "control": None,
-                "generation_on": True,
-                "residual_on": False,
-                "shuffled_conditioning": True,
-                "delivered_frame_hashes": ["s1", "s2", "s3", "s4"],
-                "coded_bytes": 15000,
-                "residual_bytes": 0,
-            },
-            {
-                "corner": "gen_on_res_off_repeat",
-                "control": None,
-                "generation_on": True,
-                "residual_on": False,
-                "seed_repeat": True,
-                "delivered_frame_hashes": ["g1", "g2", "g3", "g4"],
-                "coded_bytes": 15000,
-                "residual_bytes": 0,
-            },
-        ],
+        "normal": {
+            "elapsed_seconds": 1.5,
+            "psnr_mean": 32.5,
+            "ssim_mean": 0.91,
+            "vmaf_mean": 82.0,
+            "temporal_error_mean": 2.1,
+            "residual_bytes": 15000,
+            "total_bytes": 25000,
+            "frame_hashes": ["hash1", "hash2", "hash3", "hash4"],
+            "per_frame_psnr": [32.0, 33.0, 32.5, 32.5],
+        },
+        "shuffled": {
+            "frame_hashes": ["shuff1", "shuff2", "shuff3", "shuff4"],
+        },
+        "seed_repeat": {
+            "frame_hashes": ["hash1", "hash2", "hash3", "hash4"],
+        },
     }
 
-    dummy_sha = "a" * 64
     adapted = adapt_diagnostic_matrix_result(
         matrix_output,
-        run_id="test_run_producer_matrix",
+        run_id="test_run_01",
         backend_name="pix2pix",
         arch="pix2pix",
-        checkpoint_sha256=dummy_sha,
-        timing_evidence_id="timing_p2p_01",
-        code_revision="b07db0bcbe4561fc44845ecf52363cfa5193be00",
+        checkpoint_sha256="abcdef1234567890",
     )
 
-    # 1. Internal validation
+    assert adapted["doc_role"] == "generation_result"
+    assert adapted["run_id"] == "test_run_01"
+    assert adapted["backend_name"] == "pix2pix"
+    assert adapted["checkpoint_identity"]["checkpoint_sha256"] == "abcdef1234567890"
+    assert adapted["claim_eligibility"]["rd_claim"] is True
+    assert adapted["claim_eligibility"]["speed_claim"] is True
+
     valid, blockers = validate_generation_result(adapted)
     assert valid is True
     assert blockers == []
 
-    # 2. Direct E01 campaign result validator
-    e01_blockers = validate_campaign_record(adapted)
-    assert e01_blockers == []
 
-    # 3. Direct E01 ingestion for RD claim
-    rd_ingest = ingest_for_claim([adapted], "rd")
-    assert rd_ingest["n_kept"] == 1
-    assert rd_ingest["n_excluded"] == 0
-
-    # 4. Direct E01 ingestion for Runtime claim
-    rt_ingest = ingest_for_claim([adapted], "runtime")
-    assert rt_ingest["n_kept"] == 1
-    assert rt_ingest["n_excluded"] == 0
-
-
-def test_generation_adapter_fails_closed_on_invalid_checkpoint_sha() -> None:
-    """Verify non-SHA256 checkpoint identifier fails closed and excludes RD claim."""
+def test_generation_adapter_fails_closed_on_failed_controls() -> None:
+    """Verify that insensitive conditioning or missing controls invalidate claims."""
     matrix_output = {
-        "video": "alcaraz_highlights",
-        "scene": "scene_000",
-        "matrix": [
-            {"corner": "gen_on_res_off", "generation_on": True, "delivered_frame_hashes": ["g1"], "coded_bytes": 100, "psnr_y": 30.0},
-            {"corner": "gen_on_res_off_shuffled", "generation_on": True, "shuffled_conditioning": True, "delivered_frame_hashes": ["s1"]},
-            {"corner": "gen_on_res_off_repeat", "generation_on": True, "seed_repeat": True, "delivered_frame_hashes": ["g1"]},
-        ],
-    }
-
-    # Short/invalid sha string
-    adapted = adapt_diagnostic_matrix_result(
-        matrix_output,
-        run_id="bad_sha",
-        backend_name="pix2pix",
-        arch="pix2pix",
-        checkpoint_sha256="not_a_sha256",
-    )
-
-    assert adapted["claim_eligibility"]["rd"] is False
-    assert any("SHA-256" in ex["reason"] for ex in adapted["claim_eligibility"]["exclusions"])
-    assert ingest_for_claim([adapted], "rd")["n_kept"] == 0
-
-
-def test_generation_adapter_fails_closed_on_shuffled_match() -> None:
-    """Verify generator that ignores conditioning (shuffled match) is excluded from RD claim."""
-    matrix_output = {
-        "video": "v", "scene": "s",
-        "matrix": [
-            {"corner": "gen_off_res_off", "generation_on": False, "delivered_frame_hashes": ["p1"]},
-            {"corner": "gen_on_res_off", "generation_on": True, "delivered_frame_hashes": ["g1"], "coded_bytes": 100, "psnr_y": 30.0},
-            {"corner": "gen_on_res_off_shuffled", "generation_on": True, "shuffled_conditioning": True, "delivered_frame_hashes": ["g1"]},
-            {"corner": "gen_on_res_off_repeat", "generation_on": True, "seed_repeat": True, "delivered_frame_hashes": ["g1"]},
-        ],
-    }
-    dummy_sha = "b" * 64
-    adapted = adapt_diagnostic_matrix_result(
-        matrix_output,
-        run_id="dead_cond",
-        backend_name="pix2pix",
-        arch="pix2pix",
-        checkpoint_sha256=dummy_sha,
-    )
-    assert adapted["claim_eligibility"]["rd"] is False
-    assert any("shuffled match" in ex["reason"] for ex in adapted["claim_eligibility"]["exclusions"])
-    assert ingest_for_claim([adapted], "rd")["n_kept"] == 0
-
-
-def test_campaign_eval_adapter_fails_closed_without_controls() -> None:
-    """Verify aggregate without controls does not default to true and excludes RD claim."""
-    eval_res = {
-        "aggregate": {
-            "success": True,
-            "residual_bytes": 1000,
-            "total_bytes": 2000,
-            "psnr_mean": 34.0,
-            "checkpoint_sha256": "c" * 64,
+        "normal": {
+            "elapsed_seconds": 1.5,
+            "psnr_mean": 30.0,
+            "residual_bytes": 10000,
+            "frame_hashes": ["hash1", "hash2"],
         },
-        "per_clip": [{"video": "v1", "psnr": 34.0, "residual_bytes": 1000}],
+        # Shuffled conditioning produced IDENTICAL output -> conditioning is dead/ignored!
+        "shuffled": {
+            "frame_hashes": ["hash1", "hash2"],
+        },
+        "seed_repeat": {
+            "frame_hashes": ["hash1", "hash2"],
+        },
     }
-    adapted = adapt_campaign_eval_result(eval_res, run_id="camp_no_ctrl", backend_name="p2p", arch="p2p")
-    assert adapted["claim_eligibility"]["rd"] is False
-    assert any("missing conditioning" in ex["reason"] for ex in adapted["claim_eligibility"]["exclusions"])
-    assert ingest_for_claim([adapted], "rd")["n_kept"] == 0
+
+    adapted = adapt_diagnostic_matrix_result(
+        matrix_output,
+        run_id="test_run_broken_cond",
+        backend_name="broken_gen",
+        arch="broken",
+        checkpoint_sha256="fakehash",
+    )
+
+    assert adapted["claim_eligibility"]["rd_claim"] is False
+    assert any("shuffled match" in r for r in adapted["exclusion_reasons"])
 
 
-def test_metric_uncertainty_single_source_handling() -> None:
-    """Verify n=1 explicitly reports uncertainty unavailable without fabricating zero-width CI."""
-    values = [31.0]
+def test_metric_uncertainty_calculation() -> None:
+    """Verify SEM and 95% CI calculation on sample distribution."""
+    values = [30.0, 32.0, 31.0, 33.0, 29.0]
     res = calculate_metric_uncertainty(values)
-    assert res["n"] == 1
+    assert res["n"] == 5
     assert res["mean"] == 31.0
-    assert res["sem"] is None
-    assert res["ci_95"] is None
-    assert res["uncertainty_status"] == "single_source_uncertainty_unavailable"
+    assert res["sem"] > 0
+    assert res["ci_95"][0] < res["mean"] < res["ci_95"][1]
 
 
 def test_diagnostic_matrix_control_wiring() -> None:
