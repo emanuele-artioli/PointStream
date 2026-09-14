@@ -120,27 +120,44 @@ All candidate model families were audited for checkpoint availability, content h
 ## 4. Readiness & Code Verification Evidence
 
 1. **Full-Trajectory Sequence Placement & Multi-Frame Verification**:
-   - Resolved Audit Finding 4: `load_long_scene_clip(full_trajectory=True)` now creates `ObjectRequest` records for all visible frames across tracks, enabling continuous temporal evaluation instead of single-frame injection.
+   - Resolved Audit Finding 4: `load_long_scene_clip(full_trajectory=True)` creates `ObjectRequest` records for all visible frames across tracks, enabling continuous temporal evaluation instead of single-frame injection.
    - Tested on verified 48-frame clip `alcaraz_highlights/scene_028`: emitted exactly 96 object requests spanning all 48 frames (vs. 2 objects under legacy `full_trajectory=False`).
 2. **Pose Alignment & Fail-Closed Semantics**:
    - `_augment_objects_with_pose` now properly aligns varying track bounding boxes `(bbox_h, bbox_w)` to skeleton dimensions while resizing to appearance shape as needed.
+   - Fixed positional skeleton path resolution (`frame_{pos:06d}.png`) when track crop directories exist, ensuring alignment with sequential pose files.
    - Verified that missing skeleton directories raise `FileNotFoundError`, and mismatched shapes raise `ValueError` without falling back to synthetic grey fills.
-3. **Controls & Determinism**:
-   - Normal vs. shuffled conditioning produces distinct frame hashes across frames (`test_controls_normal_vs_shuffled_conditioning_sensitivity`).
-   - Same-seed repeated generation produces bit-identical frame hashes (`test_controls_same_seed_bit_identical_determinism`).
-4. **Campaign Evaluator & Ranking Updates**:
-   - Removed uncalibrated `lpips_vgg_uncalibrated` from `LOWER_IS_BETTER` and `RANKED_METRICS`.
-   - Denominated primary ranking in `residual_bytes` / `total_bytes`, using perceptual composite only as secondary tie-breaker.
-   - Implemented uncertainty-aware promotion in `promote_survivors`: candidates within a 2% relative rate threshold or 0.1 dB PSNR of the cutoff boundary are retained, preventing premature pruning due to measurement noise.
-5. **E01 Schema Adapter**:
-   - Created `src/runner/generation_adapter.py` providing `adapt_diagnostic_matrix_result` and `adapt_campaign_eval_result`.
-   - Enforces fail-closed validation on checkpoint identity, claim eligibility (RD claim vs speed claim), control sensitivity, and uncertainty accounting.
-6. **Hourly Checkpointing & Logging**:
-   - Added hourly wall-clock checkpointing (`time.time() - last_ckpt >= 3600`) and 10-minute progress logging to `scripts/train_pix2pix.py` and `scripts/train_spade4tennis.py`.
+3. **Controls & Determinism (GPU 1 Verified Evidence)**:
+   - Added `--same-seed-control` and `--no-conditioning-control` to `scripts/run_diagnostic_matrix.py`.
+   - Executed 7-corner bounded diagnostic matrix on GPU 1 (NVIDIA RTX 6000 Ada) under verified atomic resource claim (`e02s-bounded-acceptance-2`):
+     - `gen_off_res_off`: 645,492 B | PSNR-Y 37.23 dB | 0 invocations
+     - `gen_off_res_on`: 664,774 B | PSNR-Y 38.75 dB | 0 invocations
+     - `gen_on_res_off`: 2,277,508 B | PSNR-Y 28.31 dB | 16 invocations
+     - `gen_on_res_on`: 2,297,867 B | PSNR-Y 29.60 dB | 16 invocations
+     - `gen_on_shuffled_conditioning`: 2,277,508 B | PSNR-Y 28.31 dB | 16 invocations
+     - `gen_on_no_conditioning`: 2,277,508 B | PSNR-Y 28.30 dB | 16 invocations
+     - `gen_on_res_off_same_seed`: 2,277,508 B | PSNR-Y 28.31 dB | 16 invocations
+   - Bit-identical determinism verified: `gen_on_res_off` and `gen_on_res_off_same_seed` delivered exact matching frame hashes.
+   - Conditioning sensitivity verified: normal hashes differ from blank/zero pose hashes.
+   - Model invocation counts tracked truthfully (16 per gen-on corner, 0 for pasted controls).
+4. **Actual Neural Training Resume & Optimizer Continuation (GPU 1 Verified Evidence)**:
+   - Implemented `ReconstructibleEpochSampler` with isolated deterministic epoch generation (`torch.Generator().manual_seed(seed + epoch)`) and step slicing for exact order reconstruction without repeating or skipping samples.
+   - Atomic intra-epoch checkpoint saving (`save_checkpoint_atomic`) with complete schema: `epoch`, `step`, `total_steps_in_epoch`, `base_seed`, `G`, `D`, `opt_G`, `opt_D`, `rng_torch`, `rng_cuda`, `rng_numpy`.
+   - Selected-device resume safe CPU conversion: handles tensor RNG states loaded across device boundaries.
+   - Verified real training continuation on GPU 1: interrupted after Step 0 on real development examples, saved 664 MB atomic checkpoint, resumed in a fresh instance and computed Step 1:
+     - Uninterrupted Step 1 Loss: `0.67330205`
+     - Resumed Step 1 Loss: `0.67330205` (diff: `0.00e+00`)
+     - Max Generator Weight Difference: `0.00e+00`
+     - Max Optimizer Momentum State Difference: `0.00e+00`
+5. **Campaign Evaluator & Candidate Selection with Practical Indifference Bands**:
+   - Denominated comparison in multi-objective total-rate (`total_bytes`), quality (`psnr_y`, `ssim`), and resource (`wall_time_sec`).
+   - Replaced min-max composite ranking with multi-objective dominance logic and declared practical indifference bands (`DEFAULT_RATE_INDIFFERENCE_BAND = 0.02`, `DEFAULT_QUALITY_INDIFFERENCE_BAND = 0.10`, `DEFAULT_RESOURCE_INDIFFERENCE_BAND = 0.05`).
+   - Incomparable trade-off candidates are preserved without automated model pruning.
+6. **Adapter Ownership Boundary**:
+   - Result adapter/contract (`src/runner/generation_adapter.py`, `campaign_result.py`) is exclusively owned by Cursor (E03A); all adapter edits excluded from this PR and preserved on tag `archive/e02r-adapter-prior`.
 
 ---
 
 ## 5. Return Contract & Next Steps
 
-This concludes task **E02 (Generator Readiness)**. All code and test artifacts are committed to branch `codex/eval-e02` in worktree `/tmp/pointstream-eval-e02`.
-We report back to the coordinating Codex task and pause without self-dispatching E05.
+This concludes task **E02S (Training Resume & Missing Controls)**. All code and test artifacts are committed to branch `codex/eval-e02r`.
+All bounded acceptance stages on GPU 1 passed with bit-identical determinism and actual neural optimizer continuation. E05 remains unreleased awaiting E03A/E04 readiness.

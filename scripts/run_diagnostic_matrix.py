@@ -222,16 +222,16 @@ def _augment_objects_with_pose(
                     f"{clip.video}/{clip.scene} object {obj_id} frame {abs_frame} (pos {pos}) "
                     f"at {pose_path}. Refusing unaligned global filename fallback."
                 )
-        skel_files = sorted(skel_dir.glob("frame_*.png"))
-        skel_ids = [int(p.name[6:12]) for p in skel_files]
-        if abs_frame not in skel_ids:
-            raise FileNotFoundError(
-                f"Skeleton frame {abs_frame} not found in {skel_dir} for {clip.video}/{clip.scene} object {obj_id}"
-            )
-        target_skel_path = skel_dir / f"frame_{abs_frame:06d}.png"
-        skel_bgr = cv2.imread(str(target_skel_path))
+        else:
+            pose_path = skel_dir / f"frame_{abs_frame:06d}.png"
+            if not pose_path.is_file():
+                raise FileNotFoundError(
+                    f"Missing required pose conditioning skeleton for {clip.video}/{clip.scene} "
+                    f"object {obj_id} frame {abs_frame} at {pose_path}"
+                )
+        skel_bgr = cv2.imread(str(pose_path))
         if skel_bgr is None:
-            raise FileNotFoundError(f"Failed to read skeleton image {target_skel_path}")
+            raise FileNotFoundError(f"Failed to read skeleton image {pose_path}")
         skel_img = cv2.cvtColor(skel_bgr, cv2.COLOR_BGR2RGB)
         height, width = obj.appearance.shape[:2]
         bbox_w = max(1, obj.bbox[2] - obj.bbox[0])

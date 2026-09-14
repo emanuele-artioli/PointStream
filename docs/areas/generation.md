@@ -2,11 +2,12 @@
 
 ## Current acquisition / integration review
 
-E02R `b7c4d16` has real full-trajectory execution and corrected initialization/
-intra-epoch writes, but required repeat/no-conditioning and actual trainer update
-resume remain unproved. E02S owns that bounded acceptance; Cursor owns adapters.
-Do not promote raw fixed-QP residual bytes into a matched-quality win. E05 remains
-unreleased, with deferred/offline model families preserved.
+E02S has completed bounded real acceptance on GPU 1 (RTX 6000 Ada) under verified
+atomic resource claim: intra-epoch atomic checkpoint saving and fresh-process resume
+achieved bit-identical optimizer update (`diff: 0.00e+00`), and a 7-corner diagnostic
+matrix verified bit-identical same-seed determinism and pose conditioning sensitivity.
+Cursor exclusively owns result adapters (E03A); adapter edits are excluded from this PR.
+E05 remains unreleased awaiting E03A/E04 completion; offline/deferred families remain preserved.
 
 ## Coordinator follow-up — E01/E02
 
