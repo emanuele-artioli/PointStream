@@ -1,5 +1,14 @@
 # Data Area
 
+## Current acquisition / integration review
+
+Acquisition accepted complete: three media files and report/log digests verified
+against Cursor #104 head `7e4da6e` acquisition pointers. All are 1080p, reserved,
+unscored and not yet confirmation-eligible. E03A checks actual local timestamp
+origin after stream-copy cuts, event overlap and score-free scene eligibility;
+no repeat downloads. Higher-resolution confirmation cannot be claimed from these
+assets. The older zero-acquired counts below are historical.
+
 ## Coordinator follow-up — E01/E02
 
 Coordinator accepts three fresh matches as the target and the proposed trio as
