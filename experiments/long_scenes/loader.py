@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+import cv2
 import numpy as np
 
 from experiments.headroom.real import (
@@ -90,6 +91,7 @@ def load_long_scene_clip(
     *,
     manifest_path: Path | None = None,
     allow_ineligible: bool = False,
+    full_trajectory: bool = False,
 ) -> LongSceneClip:
     """Load an exact n_frames clip for the given video and scene.
 
@@ -99,6 +101,8 @@ def load_long_scene_clip(
         n_frames: Exact duration in frames (48, 96, 192, or 384).
         manifest_path: Optional explicit manifest path.
         allow_ineligible: When True, allows loading ineligible scenes (e.g. for fallback testing).
+        full_trajectory: When True, creates an ObjectRequest for every visible frame of each track
+            instead of a single sparse first-appearance placement.
 
     Returns:
         LongSceneClip dataclass with exact duration frames and aligned objects.
@@ -172,7 +176,8 @@ def load_long_scene_clip(
         stack = np.zeros((actual_frames, height, width), dtype=bool)
         first_crop: np.ndarray | None = None
         first_bbox: tuple[int, int, int, int] | None = None
-        for pair in sorted(pairs, key=lambda p: p.frame_id):
+        sorted_pairs = sorted(pairs, key=lambda p: p.frame_id)
+        for pair in sorted_pairs:
             crop = load_rgba(pair.crop_path)
             rows, cols = bbox_slices(pair.bbox, crop.shape[0], crop.shape[1], height, width)
             slot = index_of[pair.frame_id]
@@ -184,15 +189,36 @@ def load_long_scene_clip(
         if first_crop is None or first_bbox is None:
             continue
         union_mask |= stack
-        objects.append(
-            ObjectRequest(
-                object_id=track_dir.name,
-                appearance=first_crop,
-                bbox=first_bbox,
-                mask=stack,
-                frame_index=int(min(index_of[p.frame_id] for p in pairs)),
+        if full_trajectory:
+            for pair in sorted_pairs:
+                crop = load_rgba(pair.crop_path)
+                rows, cols = bbox_slices(pair.bbox, crop.shape[0], crop.shape[1], height, width)
+                slot = index_of[pair.frame_id]
+                cur_bbox = (int(cols.start), int(rows.start), int(cols.stop), int(rows.stop))
+                cur_w = max(1, cur_bbox[2] - cur_bbox[0])
+                cur_h = max(1, cur_bbox[3] - cur_bbox[1])
+                app_crop = first_crop
+                if app_crop.shape[:2] != (cur_h, cur_w):
+                    app_crop = cv2.resize(first_crop, (cur_w, cur_h), interpolation=cv2.INTER_LINEAR)
+                objects.append(
+                    ObjectRequest(
+                        object_id=track_dir.name,
+                        appearance=app_crop,
+                        bbox=cur_bbox,
+                        mask=stack,
+                        frame_index=slot,
+                    )
+                )
+        else:
+            objects.append(
+                ObjectRequest(
+                    object_id=track_dir.name,
+                    appearance=first_crop,
+                    bbox=first_bbox,
+                    mask=stack,
+                    frame_index=int(min(index_of[p.frame_id] for p in pairs)),
+                )
             )
-        )
 
     if not objects and not allow_ineligible:
         raise LongSceneError(f"{video}/{scene}: no tracks overlap frames [{start_frame}:{end_frame}]")

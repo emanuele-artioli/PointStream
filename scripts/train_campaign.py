@@ -644,7 +644,7 @@ def evaluate_checkpoint(
     return {"per_clip": per_clip_metrics, "source_grouping": source_grouping, "aggregate": aggregate}
 
 
-LOWER_IS_BETTER = {"temporal_error", "lpips_vgg_uncalibrated"}
+LOWER_IS_BETTER = {"temporal_error"}
 HIGHER_IS_BETTER = {"psnr_mean", "ssim_mean", "vmaf_mean"}
 RANKED_METRICS = tuple(sorted(HIGHER_IS_BETTER | LOWER_IS_BETTER))
 
@@ -866,6 +866,14 @@ def rank_variants(aggregate_by_variant: dict[str, dict[str, Any]]) -> tuple[list
         for v in valid_variants
         if aggregate_by_variant[v].get(PRIMARY_METRIC) is not None
     }
+    if not (payloads and len(payloads) == len(valid_variants)):
+        # Fall back to total_bytes if available
+        payloads = {
+            v: aggregate_by_variant[v]["total_bytes"]
+            for v in valid_variants
+            if aggregate_by_variant[v].get("total_bytes") is not None
+        }
+
     if payloads and len(payloads) == len(valid_variants):
         # Fewest bytes wins; composite breaks exact ties only.
         valid_ranked = sorted(valid_variants, key=lambda v: (payloads[v], -composite[v], v))
@@ -880,18 +888,56 @@ def rank_variants(aggregate_by_variant: dict[str, dict[str, Any]]) -> tuple[list
 def promote_survivors(
     ranked: list[str],
     aggregate_by_variant: dict[str, dict[str, Any]] | None = None,
+    min_diff_threshold: float = 0.02,
 ) -> list[str]:
-    """Select survivors for the next rung (top half).
+    """Select survivors for the next rung.
 
     If aggregate_by_variant is provided, unsuccessful evaluations are never
-    promoted as survivors.
+    promoted as survivors. Furthermore, promotion is uncertainty-aware: candidates
+    falling immediately below the nominal successive-halving cutoff are preserved
+    if their performance is within min_diff_threshold (relative rate or ~0.1 dB PSNR)
+    of the boundary survivor, preventing arbitrary elimination due to noise.
     """
     if aggregate_by_variant is not None:
         valid_ranked = [v for v in ranked if is_valid_eval(aggregate_by_variant.get(v))]
         if not valid_ranked:
             return []
+        if len(valid_ranked) <= 1:
+            return valid_ranked
         keep = math.ceil(len(valid_ranked) / 2)
-        return valid_ranked[:keep]
+        survivors = list(valid_ranked[:keep])
+        cutoff_candidate = survivors[-1]
+        cutoff_data = aggregate_by_variant.get(cutoff_candidate, {})
+
+        for cand in valid_ranked[keep:]:
+            cand_data = aggregate_by_variant.get(cand, {})
+            bytes_key = (
+                PRIMARY_METRIC
+                if (cutoff_data.get(PRIMARY_METRIC) is not None and cand_data.get(PRIMARY_METRIC) is not None)
+                else (
+                    "total_bytes"
+                    if (cutoff_data.get("total_bytes") is not None and cand_data.get("total_bytes") is not None)
+                    else None
+                )
+            )
+            is_close = False
+            if bytes_key is not None:
+                c_bytes = float(cutoff_data[bytes_key])
+                cand_bytes = float(cand_data[bytes_key])
+                ref_bytes = max(abs(c_bytes), 1.0)
+                rel_diff = abs(cand_bytes - c_bytes) / ref_bytes
+                if rel_diff <= min_diff_threshold:
+                    is_close = True
+            elif cutoff_data.get("psnr_mean") is not None and cand_data.get("psnr_mean") is not None:
+                psnr_diff = abs(float(cutoff_data["psnr_mean"]) - float(cand_data["psnr_mean"]))
+                if psnr_diff <= 0.1:
+                    is_close = True
+
+            if is_close:
+                survivors.append(cand)
+            else:
+                break
+        return survivors
 
     if len(ranked) <= 1:
         return ranked
