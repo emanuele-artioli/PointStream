@@ -13,7 +13,8 @@ Verifies:
 from __future__ import annotations
 
 import sqlite3  # noqa: F401
-import hashlib
+from dataclasses import dataclass
+import os
 from pathlib import Path
 from typing import Any
 import cv2
@@ -21,7 +22,6 @@ import numpy as np
 import pytest
 
 from experiments.long_scenes.loader import (
-    LongSceneClip,
     load_long_scene_clip,
 )
 from experiments.tier.diagnostic_report import per_frame_sha256
@@ -34,12 +34,22 @@ from scripts.train_campaign import (
     promote_survivors,
     rank_variants,
 )
+from src.pipeline.reconstruction.reconstruct import ObjectRequest
 from src.runner.generation_adapter import (
-    adapt_campaign_eval_result,
     adapt_diagnostic_matrix_result,
     calculate_metric_uncertainty,
     validate_generation_result,
 )
+
+
+@dataclass
+class FakeClip:
+    video: str
+    scene: str
+    context_id: str
+    frames: np.ndarray
+    objects: tuple[Any, ...]
+    start_frame: int = 0
 
 
 # ---------------------------------------------------------------------------
@@ -47,6 +57,10 @@ from src.runner.generation_adapter import (
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.skipif(
+    os.environ.get("POINTSTREAM_DATA_TESTS") != "1",
+    reason="requires external YouTube-derived footage; set POINTSTREAM_DATA_TESTS=1",
+)
 def test_full_trajectory_multi_frame_placement() -> None:
     """Verify full_trajectory=True emits ObjectRequest for each visible frame."""
     # full_trajectory=False: exactly 1 object per track at first appearance (2 objects)
@@ -58,20 +72,6 @@ def test_full_trajectory_multi_frame_placement() -> None:
     assert len(clip_full.objects) == 96
     frame_indices = {obj.frame_index for obj in clip_full.objects}
     assert frame_indices == set(range(48))
-
-
-from dataclasses import dataclass
-from src.pipeline.reconstruction.reconstruct import ObjectRequest
-
-
-@dataclass
-class FakeClip:
-    video: str
-    scene: str
-    context_id: str
-    frames: np.ndarray
-    objects: tuple[Any, ...]
-    start_frame: int = 0
 
 
 def test_pose_alignment_with_varying_bbox_dimensions(

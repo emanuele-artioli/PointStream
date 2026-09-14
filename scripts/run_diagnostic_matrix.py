@@ -770,6 +770,7 @@ def run_matrix(
 def main(argv: list[str] | None = None) -> int:
     parser = build_arg_parser()
     args = parser.parse_args(argv)
+    load_frames = max(48, args.frames)
     clip_full = load_long_scene_clip(
         args.video, args.scene, n_frames=load_frames, full_trajectory=bool(args.full_trajectory)
     )

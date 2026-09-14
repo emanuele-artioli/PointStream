@@ -11,7 +11,6 @@ import sqlite3  # noqa: F401
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 import hashlib
-import json
 from pathlib import Path
 from typing import Any
 
@@ -261,8 +260,14 @@ def adapt_campaign_eval_result(
     ckpt_identity["config_identity"] = config_identity_digest(ckpt_identity)
 
     # Per-clip uncertainty
-    clip_psnrs = [c.get("psnr") for c in per_clip if isinstance(c, dict) and c.get("psnr") is not None]
-    clip_bytes = [c.get("residual_bytes") for c in per_clip if isinstance(c, dict) and c.get("residual_bytes") is not None]
+    clip_psnrs: list[float] = [
+        float(c["psnr"]) for c in per_clip if isinstance(c, dict) and c.get("psnr") is not None
+    ]
+    clip_bytes: list[float] = [
+        float(c["residual_bytes"])
+        for c in per_clip
+        if isinstance(c, dict) and c.get("residual_bytes") is not None
+    ]
 
     uncertainty = {
         "psnr": calculate_metric_uncertainty(clip_psnrs),
