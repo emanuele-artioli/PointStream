@@ -484,7 +484,7 @@ def test_monitor_supervise_integration(tmp_path: Path) -> None:
             "codex": "codex",
             "claims": {
                 "gpu": target_uuid,
-                "cpu_threads": 2,
+                "cpu_threads": 1,
                 "claims_dir": str(claims_dir),
             },
         },
@@ -501,7 +501,7 @@ def test_monitor_supervise_integration(tmp_path: Path) -> None:
 
     env_data = json.loads(output_file.read_text())
     assert env_data["CUDA"] == target_uuid
-    assert env_data["OMP"] == "2"
+    assert env_data["OMP"] == "1"
 
     # Verify claims were released after supervisor completion
     claims_status = get_claims_status(claims_dir)
