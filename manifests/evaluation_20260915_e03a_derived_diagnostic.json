@@ -1,0 +1,28 @@
+{
+  "schema": "pointstream.campaign_derived_record_pointer.v1",
+  "doc_role": "e03a_derived_campaign_record_from_immutable_e02r_diagnostic",
+  "campaign": "evaluation-20260914",
+  "contract_revision": "e03a-20260915",
+  "immutable_inputs": {
+    "diagnostic": {
+      "path": "outputs/evaluation-campaign/e02r/diagnostic_matrix_pix2pix_scene028.json",
+      "sha256": "cec034102a3e00c2073158807278312ea3f7ccf56221918331e86dc308af7426"
+    },
+    "old_campaign_result": {
+      "path": "outputs/evaluation-campaign/e02r/campaign_result_pix2pix_scene028.json",
+      "sha256": "296dc0c98dc441ab85676cf3d4950b58ff35b6e2ce61f3ae97c2e9db9151df84",
+      "note": "Left unchanged. Fails current contract (missing contract_revision/record_class/trajectory; invalid control statuses; dict code_revision; 1080p vs 4K; JSON-canonical artifact hash; flat metrics missing scores)."
+    }
+  },
+  "derived": {
+    "path": "outputs/evaluation-20260914/e03a/derived-from-e02r-diag/campaign_result_pix2pix_scene028.e03a.json",
+    "sha256": "6d21a16ab307295465804f0bb3c66b1c75f05d8eb1b281aa078d64cd2ea1f743",
+    "artifact_sha256_is_file_bytes_of_diagnostic": true,
+    "delivered_shape": [16, 2160, 3840, 3],
+    "record_class": "recoverable_evidence",
+    "ingest": {
+      "diagnostic": {"rd": "kept", "runtime": "excluded", "standalone_transport": "excluded", "trajectory": "excluded", "generalization": "excluded"},
+      "validated": {"all_claims": "excluded"}
+    }
+  }
+}

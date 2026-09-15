@@ -1,0 +1,52 @@
+{
+  "schema": "pointstream.campaign_source_timestamp_inspection.v1",
+  "doc_role": "e03a_confirmation_window_timestamps_not_eligibility",
+  "campaign": "evaluation-20260914",
+  "status": "inspected_not_eligible_unscored",
+  "contract_revision": "e01r-20260914",
+  "note": "Independent media hashes still match acquisition. Remaining eligibility is event/overlap and content-based scene bounds without codec scores. Stream-copy windows start on non-keyframes; record preroll to the first I-frame. Do not reacquire.",
+  "acquisition_pointer": "manifests/evaluation_20260914_e01r_acquisition.json",
+  "declared_source_interval_s": [3600, 4500],
+  "sources": [
+    {
+      "candidate_id": "conf_cand_01_sinner_medvedev_ao2024",
+      "path": "assets/confirmation_raw/e01r/conf_cand_01_sinner_medvedev_ao2024_qkNLSXDAZtQ_3600-4500.mp4",
+      "sha256": "c98e9823864b9397219a69ea74d892fb50533d89d010c0784d31ea6f624757da",
+      "container_start_s": 0.0,
+      "duration_s": 900.08,
+      "native_fps": 25.0,
+      "nb_frames": 22561,
+      "first_frame": {"pict_type": "B", "key_frame": false, "pkt_dts_time_s": 0.0},
+      "first_iframe": {"pict_type": "I", "key_frame": true, "pkt_dts_time_s": 1.2},
+      "keyframe_preroll_s": 1.2,
+      "confirmation_eligible": false
+    },
+    {
+      "candidate_id": "conf_cand_04_medvedev_djokovic_usopen2023",
+      "path": "assets/confirmation_raw/e01r/conf_cand_04_medvedev_djokovic_usopen2023_1R4qtc1H4wM_3600-4500.mp4",
+      "sha256": "95b69d8d5d1538c930d4bf41bf036a79af6ba43a0893e1bee02d33f5cf7f7091",
+      "container_start_s": 0.0,
+      "duration_s": 900.063,
+      "native_fps": 29.97,
+      "nb_frames": 27017,
+      "first_frame": {"pict_type": "B", "key_frame": false, "pkt_dts_time_s": 0.0},
+      "first_iframe": {"pict_type": "I", "key_frame": true, "pkt_dts_time_s": 1.468133},
+      "keyframe_preroll_s": 1.468133,
+      "confirmation_eligible": false
+    },
+    {
+      "candidate_id": "conf_cand_05_swiatek_sabalenka_madrid2024",
+      "path": "assets/confirmation_raw/e01r/conf_cand_05_swiatek_sabalenka_madrid2024_n0MZNE_AIy4_3600-4500.mp4",
+      "sha256": "63946c0e6e2c6876b58979e5ad3971b080392b70fad31cad5544829f764e2a67",
+      "container_start_s": 0.0,
+      "duration_s": 900.041016,
+      "native_fps": 24.0,
+      "nb_frames": 21672,
+      "first_frame": {"pict_type": "P", "key_frame": false, "pkt_dts_time_s": 0.0},
+      "first_iframe": {"pict_type": "I", "key_frame": true, "pkt_dts_time_s": 3.625},
+      "keyframe_preroll_s": 3.625,
+      "confirmation_eligible": false
+    }
+  ],
+  "counts": {"acquired": 3, "confirmation_eligible": 0, "scores_computed": false}
+}
