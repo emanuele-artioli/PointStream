@@ -46,6 +46,7 @@ from experiments.tier.protocol import (
     capture_current_identity,
     evaluate_confirmation_protocol,
 )
+from experiments.tier.source_count_policy import load_required_matches
 from src.pipeline.reconstruction.reconstruct import ObjectRequest
 from src.runner.config_io import load_tier
 
@@ -247,19 +248,11 @@ def confirmation_verdict(
     """Report pilot completion without certifying an unimplemented protocol.
 
     This driver requires evidence of actual client-output scoring, full wire cost,
-    calibrated metrics/nulls, source eligibility (six independent matches required for Gate B),
+    calibrated metrics/nulls, source eligibility (versioned independent-match policy),
     source-level uncertainty, and full identity matching before any confirmation pass can be claimed.
     Runs without full evidence remain development pilots and cannot claim confirmation.
     Historical report JSONs remain immutable; re-adjudicate them separately.
     """
-    if not sources:
-        return {
-            "execution_completed": False,
-            "pilot_alarms_clear": False,
-            "gate_b_passed": False,
-            "confirmation_status": "incomplete_protocol",
-            "confirmation_blockers": ["six independent sources required; only 0 reported"],
-        }
     return evaluate_confirmation_protocol(
         sources,
         alarms,
@@ -267,7 +260,7 @@ def confirmation_verdict(
         expected_identity=expected_identity,
         evidence=evidence,
         is_pilot=is_pilot,
-        required_matches=6,
+        required_matches=load_required_matches("confirmation"),
     )
 
 

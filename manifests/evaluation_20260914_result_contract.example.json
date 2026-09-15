@@ -1,0 +1,189 @@
+{
+  "schema": "pointstream.campaign_result.v1",
+  "contract_revision": "e03a-20260915",
+  "doc_role": "example_records_for_validators_and_plot_ingest",
+  "campaign": "evaluation-20260914",
+  "commands": {
+    "validate_examples": "python -c \"from experiments.tier.campaign_result import load_example_records, validate_campaign_record; recs=load_example_records(); assert not any(validate_campaign_record(r, purpose='structure') for r in recs)\"",
+    "ingest_rd_validated": "python -c \"from experiments.tier.campaign_result import load_example_records, ingest_for_claim; print(ingest_for_claim(load_example_records(), 'rd', purpose='validated'))\"",
+    "ingest_rd_diagnostic": "python -c \"from experiments.tier.campaign_result import load_example_records, ingest_for_claim; print(ingest_for_claim(load_example_records(), 'rd', purpose='diagnostic'))\"",
+    "required_matches": "python -c \"from experiments.tier.source_count_policy import load_required_matches; print(load_required_matches('confirmation'))\""
+  },
+  "minimal_controls": {
+    "standalone_decode": "Client reconstructs from the charged envelope only; store delivered-frame SHA-256.",
+    "metric_calibration": "identical / mild / severe / unrelated plus temporal null, using the current SSIM partial-order policy.",
+    "wire_ledger": "B+F+M+R+H=T and T equals measured envelope length."
+  },
+  "records": [
+    {
+      "schema": "pointstream.campaign_result.v1",
+      "contract_revision": "e03a-20260915",
+      "record_class": "historical_observation",
+      "artifact_id": "example_rd_with_timing_but_runtime_excluded",
+      "artifact_path": "outputs/gate-a-vvc-webp-n96-run2/report.json",
+      "artifact_sha256": "71d82a51c6bf831c6a336d12a2cb05b1496912caa17a702b9e490f28380d939a",
+      "code_revision": "historical_pre_3810a56",
+      "source_ids": ["alcaraz_highlights_scene_000"],
+      "frame_ids": {"start": 0, "count": 192, "fps": 24.0},
+      "operating_point_id": "display_native",
+      "claim_eligibility": {
+        "rd": true,
+        "runtime": false,
+        "standalone_transport": false,
+        "trajectory": false,
+        "generalization": false,
+        "rd_arms": {"psnr_y": false, "vmaf": false, "bytes": false},
+        "exclusions": [
+          {"claim": "runtime", "reason": "encode timer omits detection; anchor decode includes file I/O"},
+          {"claim": "standalone_transport", "reason": "scoring path not proven equal to serialized client output"},
+          {"claim": "trajectory", "reason": "not a generation trajectory"},
+          {"claim": "generalization", "reason": "single development source"}
+        ]
+      },
+      "timing_evidence": null,
+      "controls": {
+        "standalone_decode": "unverified_on_this_artifact",
+        "metric_calibration": "present_in_later_recovery_not_this_file",
+        "wire_ledger": "parts_recorded_reconciliation_audited_later"
+      }
+    },
+    {
+      "schema": "pointstream.campaign_result.v1",
+      "contract_revision": "e03a-20260915",
+      "record_class": "historical_observation",
+      "artifact_id": "example_rd_missing_timing",
+      "artifact_path": "outputs/development-recovery/pilot-frozen/report.json",
+      "artifact_sha256": "fc9b87a331db6044bc592b749fd037a0332d333b5fa1f53f2e556f49856298dd",
+      "code_revision": "historical",
+      "source_ids": ["alcaraz_highlights_scene_000", "federer_djokovic_scene_007"],
+      "frame_ids": {"count": 48, "fps": 24.0},
+      "operating_point_id": "display_native",
+      "claim_eligibility": {
+        "rd": true,
+        "runtime": false,
+        "standalone_transport": false,
+        "trajectory": false,
+        "generalization": false,
+        "exclusions": [
+          {"claim": "runtime", "reason": "timing missing or not a transferable host stratum"},
+          {"claim": "standalone_transport", "reason": "identity_verified=false"},
+          {"claim": "trajectory", "reason": "not a generation trajectory"},
+          {"claim": "generalization", "reason": "development_pilot"}
+        ]
+      },
+      "timing_evidence": null,
+      "controls": {
+        "standalone_decode": "unverified",
+        "metric_calibration": "recorded_but_legacy_ssim_ceiling_alarm",
+        "wire_ledger": "present"
+      }
+    },
+    {
+      "schema": "pointstream.campaign_result.v1",
+      "contract_revision": "e03a-20260915",
+      "record_class": "historical_observation",
+      "artifact_id": "example_invalid_generation_for_trajectory",
+      "artifact_path": "outputs/development-recovery/diagnostic-pix2pix-alcaraz.json",
+      "artifact_sha256": "ccfaa34b8ceca48409839c3baefec20e91f87a0425aea6da2b7429c37ed2fa50",
+      "code_revision": "pr98",
+      "source_ids": ["alcaraz_highlights_scene_000"],
+      "frame_ids": {"count": 16, "fps": 24.0},
+      "operating_point_id": "display_native",
+      "claim_eligibility": {
+        "rd": false,
+        "runtime": false,
+        "standalone_transport": false,
+        "trajectory": false,
+        "generalization": false,
+        "exclusions": [
+          {"claim": "rd", "reason": "16-frame first-frame matrix is not a codec RD ladder"},
+          {"claim": "runtime", "reason": "no transferable timing stratum"},
+          {"claim": "standalone_transport", "reason": "not a full-trajectory standalone decode"},
+          {"claim": "trajectory", "reason": "first-frame placements are not full_visible_track coverage"},
+          {"claim": "generalization", "reason": "single development source; trajectory is not generalization"}
+        ]
+      },
+      "timing_evidence": null,
+      "controls": {
+        "standalone_decode": "partial",
+        "metric_calibration": "not_applicable",
+        "wire_ledger": "matrix_local"
+      }
+    },
+    {
+      "schema": "pointstream.campaign_result.v1",
+      "contract_revision": "e03a-20260915",
+      "record_class": "pending_run",
+      "artifact_id": "example_runtime_eligible_stratum",
+      "artifact_path": "outputs/evaluation-20260914/e03/not-yet-run/timing.json",
+      "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "code_revision": "pending_e03",
+      "source_ids": ["alcaraz_highlights_scene_000"],
+      "frame_ids": {"count": 48, "fps": 12.0},
+      "operating_point_id": "display_low",
+      "claim_eligibility": {
+        "rd": false,
+        "runtime": true,
+        "standalone_transport": false,
+        "trajectory": false,
+        "generalization": false,
+        "exclusions": [
+          {"claim": "rd", "reason": "timing-only stratum; pair with an RD artifact rather than inventing quality"},
+          {"claim": "standalone_transport", "reason": "not a transport audit"},
+          {"claim": "trajectory", "reason": "not a generation trajectory"},
+          {"claim": "generalization", "reason": "single development source"}
+        ]
+      },
+      "timing_evidence": {
+        "timing_evidence_id": "timing.gpuX.display_low.paste.n3",
+        "host": "unassigned",
+        "device_uuid": null,
+        "n_repeats": 3,
+        "repeat_cap": 10,
+        "cold_warm": "warm_throughput_and_cold_startup_separate",
+        "sample_count": 3,
+        "exclusions": []
+      },
+      "controls": {
+        "standalone_decode": "not_this_row",
+        "metric_calibration": "not_this_row",
+        "wire_ledger": "not_this_row"
+      }
+    },
+    {
+      "schema": "pointstream.campaign_result.v1",
+      "contract_revision": "e03a-20260915",
+      "record_class": "validated_claim",
+      "artifact_id": "example_validated_rd_without_timing",
+      "artifact_path": "outputs/evaluation-20260914/e01r/synthetic-validated-rd.json",
+      "artifact_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "code_revision": "e03a-20260915",
+      "source_ids": ["alcaraz_highlights_scene_000"],
+      "frame_ids": {"start": 0, "count": 48, "fps": 12.0, "native_timestamps": [0.0, 0.0833]},
+      "operating_point_id": "display_low",
+      "claim_eligibility": {
+        "rd": true,
+        "runtime": false,
+        "standalone_transport": true,
+        "trajectory": false,
+        "generalization": false,
+        "rd_arms": {"psnr_y": true, "vmaf": false, "ssim": true, "bytes": true},
+        "exclusions": [
+          {"claim": "runtime", "reason": "no transferable timing stratum on this RD row"},
+          {"claim": "trajectory", "reason": "paste reconstruction, not full-track generation"},
+          {"claim": "generalization", "reason": "single development source"}
+        ]
+      },
+      "timing_evidence": null,
+      "controls": {
+        "standalone_decode": "verified",
+        "metric_calibration": "inherited_named_artifact",
+        "wire_ledger": "reconciled"
+      },
+      "evidence": {
+        "metrics": {"psnr_y": 32.1, "ssim": 0.91, "vmaf": null},
+        "bytes": {"total": 125000}
+      }
+    }
+  ]
+}

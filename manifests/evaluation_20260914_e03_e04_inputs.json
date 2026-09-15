@@ -1,0 +1,82 @@
+{
+  "schema": "pointstream.campaign_e03_e04_inputs.v1",
+  "doc_role": "e03_e04_input_manifest",
+  "campaign": "evaluation-20260914",
+  "status": "proposed_pending_e01_acceptance",
+  "contracts": {
+    "source_split": "manifests/evaluation_20260914_source_split.json",
+    "source_count_policy": "manifests/evaluation_20260914_source_count_policy.json",
+    "operating_points": "manifests/evaluation_20260914_operating_points.json",
+    "reuse_map": "manifests/evaluation_20260914_reuse_map.json",
+    "result_schema": "pointstream.campaign_result.v1",
+    "contract_revision": "e03a-20260915",
+    "example_records": "manifests/evaluation_20260914_result_contract.example.json",
+    "e02_producer_examples": "manifests/evaluation_20260914_e02_producer.example.json",
+    "e01r_acquisition_pointer": "manifests/evaluation_20260914_e01r_acquisition.json",
+    "protocol_module": "experiments.tier.protocol",
+    "result_module": "experiments.tier.campaign_result",
+    "required_matches_loader": "experiments.tier.source_count_policy.load_required_matches"
+  },
+  "e03": {
+    "task": "anchors_and_timing",
+    "first_batch": {
+      "sources": [
+        {"video": "alcaraz_highlights", "scene": "scene_000", "split": "development"},
+        {"video": "federer_djokovic", "scene": "scene_007", "split": "development"}
+      ],
+      "operating_point_id": "display_low",
+      "colour_path_id": "broadcast_yuv420",
+      "anchors": ["svt-av1-slowest-supported", "vvc-slowest-supported"],
+      "neural_anchor": "dcvc_uf_if_available_else_return_blocker"
+    },
+    "reuse": ["gate_a_vvc_webp_n96_run2 diagnostic_only", "wave2_overlap_20260910 diagnostic_only", "dev_recovery_pilot_frozen diagnostic_only"],
+    "emit": "campaign_result.v1 rows with claim_eligibility.rd vs runtime split"
+  },
+  "e04": {
+    "task": "background_representation_and_removal",
+    "first_batch": {
+      "sources": [
+        {"video": "federer_djokovic", "scene": "scene_007", "camera_regime": "established_diagnostic"},
+        {"video": "alcaraz_highlights", "scene": "scene_010", "camera_regime": "hard_smooth_pan"}
+      ],
+      "operating_point_id": "display_low",
+      "representations": ["still", "panorama", "per_frame_video"],
+      "removal": ["off", "on_temporal_telea"],
+      "residual": false,
+      "foreground": "paste_fixed"
+    },
+    "reuse": ["wave2_background_probe as removal_on_only", "bp30_mode_comparison as plate_reference_policy_not_representation", "bp52_background_crf as rate_axis"],
+    "must_not": "relabel cleaned-stack probe as removal-off"
+  },
+  "e02_runner_interface": {
+    "do_not_edit_e02_files_from_e01": true,
+    "contract_revision": "e03a-20260915",
+    "adapter": "experiments.tier.campaign_result.campaign_record_from_generation_adapter",
+    "validators": ["experiments.tier.campaign_result.validate_campaign_record", "experiments.tier.campaign_result.ingest_for_claim"],
+    "expected_fields_on_generation_rows": [
+      "schema=pointstream.campaign_result.v1",
+      "contract_revision",
+      "record_class",
+      "artifact_id",
+      "artifact_path",
+      "artifact_sha256",
+      "code_revision",
+      "source_ids",
+      "frame_ids",
+      "checkpoint_identity",
+      "evidence.metrics",
+      "evidence.bytes",
+      "claim_eligibility.rd",
+      "claim_eligibility.runtime",
+      "claim_eligibility.trajectory",
+      "claim_eligibility.generalization",
+      "controls.standalone_decode",
+      "controls.metric_calibration",
+      "controls.wire_ledger",
+      "controls.conditioned_vs_shuffled"
+    ],
+    "trajectory_claim": "claim_eligibility.trajectory with trajectory_coverage=full_visible_track; not generalization",
+    "generalization_claim": "independent_match_ids (>=2) and frozen_procedure; never inferred from full-trajectory or single-scene readiness",
+    "single_scene_readiness": "rd and optional trajectory only; must not require generalization=true"
+  }
+}

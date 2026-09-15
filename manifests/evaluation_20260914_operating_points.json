@@ -1,0 +1,138 @@
+{
+  "schema": "pointstream.campaign_operating_points.v1",
+  "doc_role": "operating_point_colour_restoration_live_contract",
+  "campaign": "evaluation-20260914",
+  "status": "proposed_pending_coordinator_acceptance",
+  "display_endpoints": {
+    "low": {
+      "id": "display_low",
+      "short_edge_px": 360,
+      "fps": 12.0,
+      "upsample": false,
+      "create_extra_source_frames": false,
+      "if_source_below_endpoint": "choose_a_genuinely_lower_supported_value_and_record_it",
+      "preserve_aspect_ratio": true,
+      "record_padding_alignment": true
+    },
+    "high": {
+      "id": "display_native",
+      "spatial": "native_source_resolution",
+      "fps": "native_source_fps",
+      "upsample": false,
+      "create_extra_source_frames": false
+    },
+    "finalist_corners": [
+      "low_spatial_native_fps",
+      "native_spatial_low_fps"
+    ]
+  },
+  "learning_crop": {
+    "id": "generator_crop_256",
+    "width": 256,
+    "height": 256,
+    "note": "Training and per-object generator inference crop. Distinct from displayed output resolution. Do not treat a 256 crop as a 360p or 4K codec operating point."
+  },
+  "colour_paths": {
+    "select_two_valid_paths": true,
+    "paths": [
+      {
+        "id": "broadcast_yuv420",
+        "pixel_format": "yuv420p",
+        "matrix": "bt709",
+        "primaries": "bt709",
+        "transfer": "bt709",
+        "range": "as_tagged_on_source",
+        "bit_depth": 8,
+        "note": "Matches BP46 source_metadata for the 4K tennis files."
+      },
+      {
+        "id": "high_fidelity_rgb",
+        "pixel_format": "rgb24",
+        "matrix": "identity_rgb",
+        "range": "full",
+        "bit_depth": 8,
+        "note": "Internal pipeline path. Do not silently equate with 4:2:0 reconstructions."
+      }
+    ],
+    "unsupported_recorded_not_reinterpreted": true
+  },
+  "timestamp_sampling": {
+    "policy": "deterministic_native_pts",
+    "method": "For target fps f, keep source frames whose PTS is nearest to t0 + k/f among existing source timestamps. Never interpolate or create source frames. Record source_frame_index and source_pts for every kept frame.",
+    "record": ["source_pts", "source_frame_index", "source_fps"]
+  },
+  "colour_missing_tags": {
+    "yuv_broadcast": {
+      "matrix": "assume_bt709_and_label_assumed",
+      "primaries": "assume_bt709_and_label_assumed",
+      "transfer": "assume_bt709_and_label_assumed",
+      "range": "assume_limited_and_label_assumed"
+    },
+    "rgb": {
+      "matrix": "identity_rgb",
+      "range": "assume_full_and_label_assumed"
+    },
+    "never_silently_reinterpret_incompatible_formats_as_equal": true
+  },
+  "restoration": {
+    "native_operating_point_quality": "report_separately",
+    "common_display": {
+      "spatial_filter": "lanczos",
+      "temporal_policy": "hold_last_decoded_output_to_source_timestamps_never_synthesize_frames",
+      "charge_rescaling_time_and_quality_loss": true
+    },
+    "no_cross_fps_bd_rate_on_different_frame_sets": true
+  },
+  "common_timebase_scoring": {
+    "missing_output_frames": "hold_last_decoded_output_frame_and_label_hold",
+    "never_restore_from_untransmitted_source": true,
+    "reduced_fps_vs_reduced_reference": "allowed_only_when_scope_is_labeled_native_operating_point",
+    "common_display_comparison": "decode at arm fps, hold to source timestamps, score against source-timebase reference; do not secretly downsample the reference to match a reduced arm"
+  },
+  "quality_policy": {
+    "frozen_on": "development_evidence_and_frozen_procedure_not_confirmation_winners",
+    "metric_priority": ["vmaf", "psnr_y", "ssim", "lpips"],
+    "tier1_search": ["psnr_y"],
+    "tier2_paper": ["psnr_y", "ssim", "vmaf", "lpips"],
+    "practical_quality_floor": {
+      "role": "diagnostic_exclusion",
+      "vmaf": 20.0,
+      "rationale": "VMAF 20 only drops collapsed/zero-plateau rungs. It is not a practical quality floor."
+    },
+    "interpretable_quality_criterion": {
+      "status": "proposed_pending_development_anchor_inspection",
+      "does_not_block_exploratory_low_res_probes": true,
+      "rule": "Before final selection, freeze a development criterion: at the named operating point the candidate must beat the calibrated severe-degradation reconstruction on VMAF and PSNR-Y, remain worse than identical and better than unrelated, and pass a visual check of three development reconstructions (easy camera, pan, longest available clip). Measure those calibration anchors on alcaraz_highlights/scene_000 and federer_djokovic/scene_007 at display_low; quote those scores beside every published number. Do not treat VMAF 20 as that floor.",
+      "inspectable_reconstructions": [
+        "alcaraz_highlights/scene_000",
+        "federer_djokovic/scene_007"
+      ]
+    },
+    "matched_comparison": "matched_rate_or_matched_quality_with_source_level_uncertainty"
+  },
+  "latency_policy": {
+    "application_ceiling_ms_after_startup": 250,
+    "definition": "working_target_not_universal",
+    "live": "causal_or_declared_bounded_lookahead_stable_queues_end_to_end_sender_latency_on_named_hardware",
+    "playback": "client_meets_source_cadence_including_decode_render_residual",
+    "report": ["warm_throughput", "p95_latency", "cold_startup_lookahead", "memory", "n", "uncertainty"]
+  },
+  "sustained_live_test": {
+    "required_for": "finalists_only",
+    "smoke_check_seconds": 8.0,
+    "smoke_check_role": "live_startup_smoke_not_sustained_evidence",
+    "min_duration_seconds": 30.0,
+    "min_duration_scope": "after_startup",
+    "min_refresh_cycles": 4,
+    "must_exceed": ["startup", "temporal_context"],
+    "backlog_over_time": true,
+    "latency_by_window": true,
+    "short_scene_probes_cannot_establish_sustained_live": true,
+    "if_source_too_short": "return_missing_test_do_not_declare_sustained_live"
+  },
+  "screening": {
+    "min_rate_points": 2,
+    "finalist_overlapping_rate_points": 4,
+    "first_probe_cap": {"configs": 6, "minutes_including_scoring": 30}
+  }
+}

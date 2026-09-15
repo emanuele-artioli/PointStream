@@ -1,0 +1,37 @@
+{
+  "schema": "pointstream.confirmation_source_count.v1",
+  "doc_role": "campaign_source_count_policy",
+  "policy_id": "evaluation_20260914_source_count.e01r",
+  "contract_revision": "e01r-20260914",
+  "campaign": "evaluation-20260914",
+  "status": "accepted_target_pending_acquisition",
+  "preferred_matches": 6,
+  "selection_without_test_scores": true,
+  "notes": [
+    "Six independent fresh matches remain preferred, not a fixed minimum.",
+    "Exact confirmation count is 3 pending acquisition of reserved unacquired matches.",
+    "Two already-scored Gate B sources are exposed; they cannot be relabelled untouched holdouts.",
+    "One source is a case study. Reducing count never converts exposed sources into held-out ones."
+  ],
+  "development_pilot": {
+    "required_matches": 2,
+    "label": "development_pilot",
+    "rationale": "Current recovery/diagnostic pair is two independent matches already used for design."
+  },
+  "confirmation": {
+    "required_matches": 3,
+    "label": "small_sample_confirmation",
+    "small_sample_limits": [
+      "n=3 cannot support a population-level tennis claim; report source-level intervals and treat superiority as provisional.",
+      "A 95% interval that includes zero is inconclusive, not a win.",
+      "If acquisition of the three reserved matches fails, do not substitute the two scored Gate B sources as untouched confirmation."
+    ],
+    "fallback_if_unacquired": {
+      "required_matches": null,
+      "label": "report_deficit_do_not_relabel_exposed",
+      "uses_exposed_sources": false,
+      "not_untouched_holdout": true,
+      "rule": "Acquisition failure needs a prospective unused substitute and an updated manifest. The two scored Gate B sources remain development or historical observations."
+    }
+  }
+}
