@@ -25,7 +25,35 @@ comparisons keep residual off; paste-plus-residual is explicitly a residual-on
 control in the residual section. Component and readiness work can run before a
 full-codec win. A losing or invalid run is a result to preserve, not a gate pass.
 
-## Current entry point — 15 September handoff
+## Current entry point — 15 September acceptance and bounded release
+
+Use the [next-stage assignments](tasks/20260915-next-stage.md). #104 is merged
+as `3896da6` and #108 as `30d0255`, both with green exact-head CI. The coordinator
+reviewed the actual #104/#108/#109 heads and repaired small #104/#108 acceptance
+gaps in their existing PRs. Result eligibility is claim-specific, module hashes
+are pinned, partial occupancy queries fail closed, and claims follow whole
+process groups. There is no 15-second ownership lease; that number is termination
+grace. Local-host resource operation is tested; cross-host contention is not.
+
+Release E03B (Cursor: four anchor settings) and E04A (Antigravity: six removal-OFF
+background settings), each 48 frames at 360-short-edge/12 fps and <=30 minutes
+including controls/scoring. Each has a separate two-hour preparation allowance.
+Use one verified host initially; independent work may queue under the shared
+CPU/GPU cap. Preserve historical artifacts and resolve source PTS before pairing.
+These are assignments, not launched jobs or new scientific results.
+
+#109 remains unaccepted: fresh-process trainer/DataLoader/RNG continuation is
+not established and selection can discard measured candidates in favor of
+incomplete rows. Request exact saved seven-corner/trainer artifact identities
+before rerunning anything. E05 and held-out scoring remain unreleased. Complete
+the reserved trio's eligibility without quality scores. All reports return to
+task `01a0a488-257a-7b93-ab8c-2ac2a590f29c` for the next decision.
+
+The September 20 freeze is at risk. At probe return, cost the remaining neural
+anchor, training, whole-codec and confirmation work; preserve September 30 and
+the agreed scientific goals unless the user changes them.
+
+## Historical entry point — 15 September handoff
 
 Read [handoff-20260915.md](handoff-20260915.md) before dispatching. Cursor #104
 `9d56303`, R0R #108 `287c2eb` and E02S #109 `013a4c8` are open with CI passing.
@@ -33,7 +61,7 @@ Their latest reported fixes await coordinator acceptance; the older review and
 dispatch sections below are history, not a finding that those heads still fail.
 No new worker assignment or experiment launch is issued by this handoff.
 
-## Current dispatch — acquisition accepted, integration still partial
+## Historical dispatch — acquisition accepted, integration still partial
 
 Reviewed Cursor `7e4da6e` (#104 CI green), R0 `d39893c` and E02R `b7c4d16`.
 Acquisition is complete: all three reserved media files and report/log hashes

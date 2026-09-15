@@ -1,5 +1,15 @@
 # Codec Area
 
+## Current assignment — 15 September 2026
+
+E04A / CODEC-ACT-07 is the independent Antigravity
+[removal-OFF background assignment](../workflow/session/evaluation-campaign/tasks/20260915-next-stage.md).
+Compare still/panorama/video at two QPs on the E03B-aligned 48-frame 360p/12 fps
+development window, at most six settings/30 minutes after bounded preparation.
+Reuse compatible artifacts and retain old removal-ON labels. Keep generation
+and residual OFF; verify no removal/fill calls and reconcile actual transport.
+#109 is not a prerequisite. No new measurement or winner is certified by dispatch.
+
 ## Current campaign — 14 September 2026
 
 CODEC-ACT-07 continues as E04 in the [campaign](../workflow/session/evaluation-campaign/plan.md).
