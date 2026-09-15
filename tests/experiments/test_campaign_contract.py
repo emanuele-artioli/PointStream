@@ -365,6 +365,120 @@ def test_runtime_does_not_require_quality_controls() -> None:
     assert rd["n_kept"] == 0
 
 
+@pytest.mark.parametrize("measured", [None, float("inf"), float("nan"), 0.0, -1.0])
+def test_runtime_rejects_missing_nonfinite_or_nonpositive_measurement(measured: object) -> None:
+    record = dict(load_example_records()[-1])
+    record["claim_eligibility"] = dict(record["claim_eligibility"])
+    record["claim_eligibility"].update(
+        {"rd": False, "runtime": True, "standalone_transport": False}
+    )
+    record["claim_eligibility"]["exclusions"] = [
+        {"claim": "rd", "reason": "timing-only stratum"},
+        {"claim": "standalone_transport", "reason": "not a transport audit"},
+        {"claim": "trajectory", "reason": "not a generation trajectory"},
+        {"claim": "generalization", "reason": "single development source"},
+    ]
+    record["timing_evidence"] = {
+        "timing_evidence_id": "timing.gpu5.display_low.n3",
+        "host": "gpu5",
+        "n_repeats": 3,
+        "measured_client_seconds": measured,
+    }
+    record["controls"] = {
+        "standalone_decode": "not_this_row",
+        "metric_calibration": "not_this_row",
+        "wire_ledger": "not_this_row",
+    }
+    blockers = validate_campaign_record(record, purpose="validated")
+    assert any("positive finite measured_client_seconds" in item for item in blockers)
+    assert ingest_for_claim([record], "runtime", purpose="validated")["n_kept"] == 0
+
+
+@pytest.mark.parametrize("case", ["missing", "unknown", "inconsistent_bytes"])
+def test_validated_rd_requires_explicit_consistent_known_arms(case: str) -> None:
+    record = dict(load_example_records()[-1])
+    record["claim_eligibility"] = dict(record["claim_eligibility"])
+    record["claim_eligibility"]["rd_arms"] = dict(
+        record["claim_eligibility"]["rd_arms"]
+    )
+    if case == "missing":
+        record["claim_eligibility"].pop("rd_arms")
+    elif case == "unknown":
+        record["evidence"] = {"metrics": {"latency": 1.0}, "bytes": {"total": 100}}
+        record["claim_eligibility"]["rd_arms"] = {"latency": True, "bytes": True}
+    else:
+        record["claim_eligibility"]["rd_arms"]["bytes"] = False
+    blockers = validate_campaign_record(record, purpose="validated")
+    assert blockers
+    assert ingest_for_claim([record], "rd", purpose="validated")["n_kept"] == 0
+
+
+def test_validated_rd_may_exclude_a_finite_uncalibrated_quality_arm() -> None:
+    record = dict(load_example_records()[-1])
+    record["claim_eligibility"] = dict(record["claim_eligibility"])
+    record["claim_eligibility"]["rd_arms"] = {
+        "psnr_y": True,
+        "ssim": False,
+        "vmaf": False,
+        "bytes": True,
+    }
+    record["evidence"] = {
+        "metrics": {"psnr_y": 32.1, "ssim": 0.91, "vmaf": 80.0},
+        "bytes": {"total": 125000},
+    }
+    assert validate_campaign_record(record, purpose="validated") == []
+    assert ingest_for_claim([record], "rd", purpose="validated")["n_kept"] == 1
+
+
+def test_standalone_transport_requires_positive_bytes_and_reconciled_ledger() -> None:
+    record = dict(load_example_records()[-1])
+    record["claim_eligibility"] = dict(record["claim_eligibility"])
+    record["claim_eligibility"].update({"rd": False, "standalone_transport": True})
+    record["claim_eligibility"]["exclusions"] = [
+        {"claim": "rd", "reason": "standalone-only evidence"},
+        {"claim": "runtime", "reason": "no timing stratum"},
+        {"claim": "trajectory", "reason": "not a generation trajectory"},
+        {"claim": "generalization", "reason": "single development source"},
+    ]
+    record["evidence"] = {"metrics": {}, "bytes": {"total": -1}}
+    record["controls"] = {
+        "standalone_decode": "verified",
+        "metric_calibration": "not_this_row",
+        "wire_ledger": "failed",
+    }
+    blockers = validate_campaign_record(record, purpose="validated")
+    assert any("ledger" in item for item in blockers)
+    assert any("positive finite transport bytes" in item for item in blockers)
+    result = ingest_for_claim([record], "standalone_transport", purpose="validated")
+    assert result["n_kept"] == 0
+
+
+def test_trajectory_requires_multiframe_conditioning_control() -> None:
+    record = dict(load_example_records()[-1])
+    record["claim_eligibility"] = dict(record["claim_eligibility"])
+    record["claim_eligibility"].update(
+        {"rd": False, "standalone_transport": False, "trajectory": True}
+    )
+    record["claim_eligibility"]["exclusions"] = [
+        {"claim": "rd", "reason": "trajectory-only evidence"},
+        {"claim": "runtime", "reason": "no timing stratum"},
+        {"claim": "standalone_transport", "reason": "not a transport audit"},
+        {"claim": "generalization", "reason": "single development source"},
+    ]
+    record["trajectory_coverage"] = "full_visible_track"
+    record["frame_ids"] = {"start": 0, "count": 1}
+    record["controls"] = {
+        "standalone_decode": "not_this_row",
+        "metric_calibration": "not_this_row",
+        "wire_ledger": "not_this_row",
+        "conditioned_vs_shuffled": "failed",
+    }
+    blockers = validate_campaign_record(record, purpose="validated")
+    assert any("at least two" in item for item in blockers)
+    assert any("conditioned-vs-shuffled" in item for item in blockers)
+    assert ingest_for_claim([record], "trajectory", purpose="validated")["n_kept"] == 0
+
+
 def test_producer_scores_timing_parts_map_into_campaign_record(tmp_path: Path) -> None:
     payload = {
         "run_id": "producer_nested_01",

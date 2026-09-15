@@ -1,6 +1,18 @@
 # Evaluation Area
 
-## Coordinator follow-up — E01/E02
+## Current acceptance completion — 15 September 2026
+
+PR #104 rejects invalid runtime evidence and requires explicit measured RD arms
+while retaining valid RD without timing. Standalone transport requires decode,
+positive bytes and ledger checks; trajectory claims require the conditioning
+control, not coverage alone. Producer same-seed corners are recognized. The pin
+identifies an exact code-bearing commit and module bytes. Existing diagnostic
+artifacts remain unchanged and excluded from unsupported validated claims.
+The E03 anchor card is prepared; its worker must preserve streams and resolve
+actual source PTS before measurement. Release follows coordinator/CI acceptance
+of #104 and #108; generator readiness is independent.
+
+## Historical coordinator follow-up — E01/E02
 
 Coordinator review: E01 #104 (`b87daf51`) is not yet accepted. Inventory is
 useful, but claim ingestion admits missing/invalid evidence and an unrun timing

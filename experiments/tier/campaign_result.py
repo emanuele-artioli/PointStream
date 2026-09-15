@@ -97,6 +97,7 @@ _SUCCESS_BY_CONTROL: Final[dict[str, frozenset[str]]] = {
 _SSIM_NAMES = frozenset({"ssim", "ssim_mean"})
 _VMAF_NAMES = frozenset({"vmaf", "vmaf_mean"})
 _PSNR_NAMES = frozenset({"psnr_y", "psnr_mean", "psnr"})
+_KNOWN_QUALITY_NAMES = _SSIM_NAMES | _VMAF_NAMES | _PSNR_NAMES
 
 Purpose = Literal["structure", "diagnostic", "validated"]
 
@@ -183,6 +184,17 @@ def _quality_ok(name: str, value: Any) -> bool:
     return True
 
 
+def _canonical_quality_name(name: str) -> str | None:
+    key = name.lower()
+    if key in _PSNR_NAMES:
+        return "psnr_y"
+    if key in _SSIM_NAMES:
+        return "ssim"
+    if key in _VMAF_NAMES:
+        return "vmaf"
+    return None
+
+
 def _code_revision_str(value: Any) -> str:
     if _nonempty_str(value):
         return str(value).strip()
@@ -233,13 +245,11 @@ def _rd_arms(record: Mapping[str, Any]) -> dict[str, bool]:
     metrics = _evidence_metrics(record)
     derived: dict[str, bool] = {}
     for name, raw in metrics.items():
-        derived[str(name)] = _quality_ok(str(name), raw)
+        key = str(name)
+        canonical = _canonical_quality_name(key)
+        if canonical is not None:
+            derived[canonical] = derived.get(canonical, False) or _quality_ok(key, raw)
     derived["bytes"] = _positive_rate(_evidence_bytes_total(record))
-    declared = (record.get("claim_eligibility") or {}).get("rd_arms")
-    if isinstance(declared, dict):
-        for name, flag in declared.items():
-            if flag is True and not derived.get(str(name)):
-                derived[str(name)] = False
     return derived
 
 
@@ -276,6 +286,12 @@ def _timing_verified(record: Mapping[str, Any]) -> list[str]:
     n_repeats = ref.get("n_repeats", ref.get("sample_count"))
     if isinstance(n_repeats, bool) or not isinstance(n_repeats, int) or n_repeats < 1:
         blockers.append("runtime eligibility requires a positive integer repeat count")
+    measured = ref.get("measured_client_seconds")
+    if not _positive_rate(measured):
+        blockers.append("runtime eligibility requires positive finite measured_client_seconds")
+    encoder = ref.get("encoder_seconds")
+    if encoder is not None and not _positive_rate(encoder):
+        blockers.append("runtime encoder_seconds, when present, must be positive and finite")
     return blockers
 
 
@@ -295,11 +311,40 @@ def _validated_rd_blockers(record: Mapping[str, Any]) -> list[str]:
     if not quality_arms:
         blockers.append("validated RD requires at least one domain-valid quality metric arm")
     declared = (record.get("claim_eligibility") or {}).get("rd_arms")
-    if isinstance(declared, dict):
-        for name, flag in declared.items():
-            if flag is True and not arms.get(str(name)):
+    if not isinstance(declared, dict):
+        blockers.append("validated RD requires an explicit rd_arms object")
+    else:
+        unknown = sorted(
+            str(name)
+            for name in declared
+            if _canonical_quality_name(str(name)) is None and name != "bytes"
+        )
+        if unknown:
+            blockers.append(f"validated RD rd_arms contains unknown metrics: {unknown}")
+        normalized_declared: dict[str, bool] = {}
+        for raw_name, flag in declared.items():
+            name = "bytes" if raw_name == "bytes" else _canonical_quality_name(str(raw_name))
+            if name is None:
+                continue
+            if not isinstance(flag, bool):
+                blockers.append(f"validated RD arm {raw_name} must be an explicit bool")
+                continue
+            if name in normalized_declared and normalized_declared[name] is not flag:
+                blockers.append(f"validated RD arm aliases for {name} disagree")
+            normalized_declared[name] = flag
+        if normalized_declared.get("bytes") is not True:
+            blockers.append("validated RD requires explicit rd_arms.bytes=true")
+        elif not arms.get("bytes"):
+            blockers.append("validated RD arm bytes=true lacks positive finite evidence")
+        quality_declared = [
+            name for name, flag in normalized_declared.items() if name != "bytes" and flag
+        ]
+        if not quality_declared:
+            blockers.append("validated RD requires at least one known quality arm=true")
+        for name in quality_declared:
+            if not arms.get(name):
                 blockers.append(
-                    f"validated RD arm {name} is declared eligible without a domain-valid value"
+                    f"validated RD arm {name}=true lacks matching domain-valid evidence"
                 )
     controls = record.get("controls") or {}
     if not isinstance(controls, dict):
@@ -321,13 +366,26 @@ def _validated_standalone_blockers(record: Mapping[str, Any]) -> list[str]:
         "standalone_decode",
     ):
         return ["standalone_transport requires verified standalone decode"]
-    return []
+    blockers: list[str] = []
+    if not _control_success(controls.get("wire_ledger"), "wire_ledger"):
+        blockers.append("standalone_transport requires a verified or reconciled wire ledger")
+    if not _positive_rate(_evidence_bytes_total(record)):
+        blockers.append("standalone_transport requires positive finite transport bytes")
+    return blockers
 
 
 def _validated_trajectory_blockers(record: Mapping[str, Any]) -> list[str]:
+    blockers: list[str] = []
     if record.get("trajectory_coverage") != "full_visible_track":
-        return ["trajectory claim requires trajectory_coverage=full_visible_track"]
-    return []
+        blockers.append("trajectory claim requires trajectory_coverage=full_visible_track")
+    frame_ids = record.get("frame_ids")
+    if not isinstance(frame_ids, dict) or not isinstance(frame_ids.get("count"), int) or frame_ids["count"] < 2:
+        blockers.append("trajectory claim requires at least two identified frames")
+    controls = record.get("controls") or {}
+    conditioned = controls.get("conditioned_vs_shuffled") if isinstance(controls, dict) else None
+    if _control_status(conditioned) != "verified":
+        blockers.append("trajectory claim requires a verified conditioned-vs-shuffled control")
+    return blockers
 
 
 def validate_campaign_record(
@@ -660,7 +718,17 @@ def campaign_record_from_generation_adapter(raw: Mapping[str, Any]) -> dict[str,
         and _finite_number(timing.get("measured_client_seconds"))
         and float(timing["measured_client_seconds"]) > 0
     )
-    trajectory_ok = raw.get("trajectory_coverage") == "full_visible_track"
+    conditioning_ok = bool(
+        controls_in.get("conditioned_vs_shuffled_tested")
+        and controls_in.get("conditioning_sensitive")
+    )
+    transport_ok = decode_ok and ledger_ok and _positive_rate(bytes_total)
+    trajectory_ok = (
+        raw.get("trajectory_coverage") == "full_visible_track"
+        and isinstance(frame_ids.get("count"), int)
+        and frame_ids["count"] >= 2
+        and conditioning_ok
+    )
     independent = raw.get("independent_match_ids")
     generalization_ok = (
         bool(raw.get("frozen_procedure")) and isinstance(independent, list) and len(independent) >= 2
@@ -690,11 +758,11 @@ def campaign_record_from_generation_adapter(raw: Mapping[str, Any]) -> dict[str,
         exclusions.append(
             {"claim": "runtime", "reason": "adapter timing is missing a named measured stratum"}
         )
-    if not decode_ok:
+    if not transport_ok:
         exclusions.append(
             {
                 "claim": "standalone_transport",
-                "reason": "standalone decode is not verified; hashes or scores are not proof",
+                "reason": "standalone decode, positive bytes and reconciled ledger are required",
             }
         )
     if not trajectory_ok:
@@ -735,7 +803,7 @@ def campaign_record_from_generation_adapter(raw: Mapping[str, Any]) -> dict[str,
         "claim_eligibility": {
             "rd": rd_measured,
             "runtime": runtime_ok,
-            "standalone_transport": decode_ok,
+            "standalone_transport": transport_ok,
             "trajectory": trajectory_ok,
             "generalization": generalization_ok,
             "rd_arms": {
@@ -758,7 +826,7 @@ def campaign_record_from_generation_adapter(raw: Mapping[str, Any]) -> dict[str,
             "metric_calibration": calib_status,
             "wire_ledger": ledger_status,
             "conditioned_vs_shuffled": (
-                "verified" if controls_in.get("conditioned_vs_shuffled_tested") else "unverified"
+                "verified" if conditioning_ok else "unverified"
             ),
         },
         "evidence": {

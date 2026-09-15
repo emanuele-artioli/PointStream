@@ -140,7 +140,11 @@ def _pick_matrix_runs(matrix_output: Mapping[str, Any]) -> dict[str, dict[str, A
             corner = str(row.get("corner", ""))
             is_gen = bool(row.get("generation_on", False))
             is_shuffled = bool(row.get("shuffled_conditioning", False))
-            is_repeat = bool(row.get("seed_repeat", False) or corner.endswith("_repeat"))
+            is_repeat = bool(
+                row.get("seed_repeat", False)
+                or corner.endswith("_repeat")
+                or corner.endswith("_same_seed")
+            )
             is_no_cond = bool(row.get("no_conditioning", False) or corner.endswith("_no_cond"))
             is_paste = bool(row.get("control") == "pasted_reference" or not is_gen)
             if is_paste and not paste_run:

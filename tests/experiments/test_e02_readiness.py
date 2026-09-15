@@ -417,6 +417,40 @@ def test_adapter_reads_nested_scores_timing_parts_and_shape() -> None:
     assert adapted["claim_eligibility"]["standalone_decode"] is False
 
 
+def test_adapter_recognizes_actual_same_seed_corner_name() -> None:
+    matrix_output = {
+        "matrix": [
+            {
+                "corner": "gen_on_res_off",
+                "generation_on": True,
+                "delivered_frame_hashes": ["g1", "g2"],
+                "scores": {"psnr_y": 28.3},
+                "parts": {"transport_total": 7000},
+            },
+            {
+                "corner": "gen_on_res_off_shuffled",
+                "generation_on": True,
+                "shuffled_conditioning": True,
+                "delivered_frame_hashes": ["s1", "s2"],
+            },
+            {
+                "corner": "gen_on_res_off_same_seed",
+                "generation_on": True,
+                "delivered_frame_hashes": ["g1", "g2"],
+            },
+        ]
+    }
+    adapted = adapt_diagnostic_matrix_result(
+        matrix_output,
+        run_id="actual_same_seed_name",
+        backend_name="pix2pix",
+        arch="pix2pix",
+        checkpoint_sha256="a" * 64,
+    )
+    assert adapted["controls"]["same_seed_determinism_tested"] is True
+    assert adapted["controls"]["same_seed_deterministic"] is True
+
+
 def test_metric_uncertainty_calculation() -> None:
     """Verify SEM and 95% CI calculation on sample distribution."""
     values = [30.0, 32.0, 31.0, 33.0, 29.0]
