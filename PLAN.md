@@ -24,8 +24,8 @@ policy. The September 12 handoff/audit are historical context, not dispatches.
 
 | Owner | PR / head | Verified state | Next action |
 |---|---|---|---|
-| Cursor | #104 | Contract/mapping/pin acceptance fixes reviewed | E03B: four anchor settings, 48 aligned frames, 360p/12 fps, <=30 minutes |
-| Antigravity resource/background lane | #108 | Whole-group lifecycle and explicit CPU allowance reviewed; no heartbeat-lease takeover | E04A: three removal-OFF representations, two QPs, <=30 minutes; local-host claims |
+| Cursor | #104 merged `3896da6` | Contract/mapping/pin accepted; CI green | E03B: four anchor settings, 48 aligned frames, 360p/12 fps, <=30 minutes |
+| Antigravity resource/background lane | #108 merged `30d0255` | Whole-group lifecycle and explicit CPU allowance accepted; CI green; no heartbeat lease | E04A: three removal-OFF representations, two QPs, <=30 minutes; local-host claims |
 | Antigravity generation lane | #109 `013a4c8` | Not accepted: actual CLI/RNG continuation and incomplete-evidence selection gaps | Supply exact saved artifact pointers; finish only the remaining acceptance cases |
 
 Three reserved matches acquired; media/report/log hashes independently verified.

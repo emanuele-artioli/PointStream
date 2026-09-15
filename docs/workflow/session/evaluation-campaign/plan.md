@@ -27,7 +27,8 @@ full-codec win. A losing or invalid run is a result to preserve, not a gate pass
 
 ## Current entry point — 15 September acceptance and bounded release
 
-Use the [next-stage assignments](tasks/20260915-next-stage.md). The coordinator
+Use the [next-stage assignments](tasks/20260915-next-stage.md). #104 is merged
+as `3896da6` and #108 as `30d0255`, both with green exact-head CI. The coordinator
 reviewed the actual #104/#108/#109 heads and repaired small #104/#108 acceptance
 gaps in their existing PRs. Result eligibility is claim-specific, module hashes
 are pinned, partial occupancy queries fail closed, and claims follow whole

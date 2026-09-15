@@ -8,6 +8,8 @@ older repair prompts only where stated below.
 Reviewed code heads: #104 `0bbf3fb66091b35cbb6642fe6667da6431e4a602` and
 #108 `af3e5dba78befd533962ff47ae63181a34753961`. Workers fetch main containing
 both accepted changes and this dispatch, then record that actual commit.
+Accepted main code baseline: `3896da6d69547b206a8455dae6a4b13f24cdc649`
+(#104, following #108 `30d02552e60e1d390c82f879ab99ae61ae55fd27`).
 The contract manifest's `code_head=d99d527183dea84e3db9b2923f4fc94d33957897`
 names the code-bearing commit; its subsequent pin commit only records those
 bytes. Verify the two module and two example digests before producing records.

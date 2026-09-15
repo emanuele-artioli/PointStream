@@ -10,7 +10,7 @@ identifies an exact code-bearing commit and module bytes. Existing diagnostic
 artifacts remain unchanged and excluded from unsupported validated claims.
 The [E03B assignment](../workflow/session/evaluation-campaign/tasks/20260915-next-stage.md)
 releases the bounded anchor preparation/probe independently of generator
-readiness once #104/#108 are merged with passing CI. Preserve streams and
+readiness: #104/#108 are merged with passing CI. Preserve streams and
 resolve actual source PTS before measurement. Four anchor settings are planned;
 none were launched by this coordinator. Reports return to the coordinating task.
 
