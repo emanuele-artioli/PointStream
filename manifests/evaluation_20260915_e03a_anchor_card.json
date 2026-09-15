@@ -53,6 +53,7 @@
   },
   "source_transform": {
     "status": "exact_existing_python_api_route_not_executed",
+    "execution_guard": "This is a preparation recipe, not launch-ready input provenance. The extraction helper checks cache length only and may overwrite historical cache files on fallback. Verify source/seek/filter identity and original source PTS before reuse; never invoke its fallback in BP46/BP21. If missing, use the existing extraction primitive in a new run directory for this four-second window, preserving all originals. Extracted target-grid indices are not native PTS.",
     "extract_callable": "experiments.long_scenes.extract.extract_or_reuse_24fps_frames",
     "extract_arguments": {
       "video": "federer_djokovic",
