@@ -5,6 +5,13 @@ Return to the Codex task **Coordinate submission evaluation**, task ID
 for accepted code revisions before starting. This assignment supersedes the
 older repair prompts only where stated below.
 
+Reviewed code heads: #104 `0bbf3fb66091b35cbb6642fe6667da6431e4a602` and
+#108 `af3e5dba78befd533962ff47ae63181a34753961`. Workers fetch main containing
+both accepted changes and this dispatch, then record that actual commit.
+The contract manifest's `code_head=d99d527183dea84e3db9b2923f4fc94d33957897`
+names the code-bearing commit; its subsequent pin commit only records those
+bytes. Verify the two module and two example digests before producing records.
+
 ## Cursor — E03B anchors and score-free confirmation eligibility
 
 Area/action: evaluation, E03. Continue from accepted #104 and #108

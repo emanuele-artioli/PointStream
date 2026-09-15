@@ -8,9 +8,11 @@ positive bytes and ledger checks; trajectory claims require the conditioning
 control, not coverage alone. Producer same-seed corners are recognized. The pin
 identifies an exact code-bearing commit and module bytes. Existing diagnostic
 artifacts remain unchanged and excluded from unsupported validated claims.
-The E03 anchor card is prepared; its worker must preserve streams and resolve
-actual source PTS before measurement. Release follows coordinator/CI acceptance
-of #104 and #108; generator readiness is independent.
+The [E03B assignment](../workflow/session/evaluation-campaign/tasks/20260915-next-stage.md)
+releases the bounded anchor preparation/probe independently of generator
+readiness once #104/#108 are merged with passing CI. Preserve streams and
+resolve actual source PTS before measurement. Four anchor settings are planned;
+none were launched by this coordinator. Reports return to the coordinating task.
 
 ## Historical acquisition / integration review
 
