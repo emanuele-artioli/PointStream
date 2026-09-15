@@ -1,6 +1,20 @@
 # Generation Area
 
-## Current acquisition / integration review
+## Current acceptance — 15 September 2026
+
+#109 `013a4c8` retains useful epoch sampling, RNG tensor restoration, explicit
+residual-OFF handling and extra control corners. E05 remains unreleased: its
+test does not exercise fresh-process CLI/DataLoader/discriminator continuation;
+Python reference-choice and iterator RNG are not restored deterministically.
+Selection ignores SSIM and treats missing quality/time as equal. Complete only
+these cases and supply exact host/path/command/digest pointers for the reported
+artifacts; do not repeat the historical matrix. See the
+[bounded assignment](../workflow/session/evaluation-campaign/tasks/20260915-next-stage.md).
+Cursor's adapter recognizes the producer same-seed corner after #104 integration.
+Full-trajectory execution is already verified, not proof of useful fidelity or
+generalization. E03/E04 proceed independently with generation OFF.
+
+## Historical acquisition / integration review
 
 E02R `b7c4d16` has real full-trajectory execution and corrected initialization/
 intra-epoch writes, but required repeat/no-conditioning and actual trainer update
@@ -127,4 +141,3 @@ result that determines the next experiment; no family-wide claims from one pilot
 - **Hourly Checkpointing & Progress**: Sourced host-wide requirement into `scripts/train_pix2pix.py` and `scripts/train_spade4tennis.py` (`time.time() - last_ckpt >= 3600` and 10-minute progress heartbeats).
 - **E01 Schema Adapter**: Implemented `src/runner/generation_adapter.py` with fail-closed validation of experiment identity, conditioning sensitivity, same-seed determinism, timing evidence, and claim eligibility.
 - **Candidate Cards & Roster**: Documented candidate roster, native training recipes, hyperparameter endpoints, and 3-stage budgets in `docs/workflow/session/evaluation-campaign/tasks/02-generator-readiness-report.md`.
-
