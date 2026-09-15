@@ -172,6 +172,9 @@ def build_eval_generator_ref(
     return as_runner_ref(backend, name=arch, capabilities=caps, requires=reqs)
 
 
+_DEFAULT_RESIDUAL_SETTINGS: Any = object()
+
+
 def evaluate_checkpoint(
     checkpoint_path: Path | str,
     arch: str,
@@ -185,7 +188,7 @@ def evaluate_checkpoint(
     condition_type: str | None = None,
     arch_kwargs: dict[str, Any] | None = None,
     seed: int = 0,
-    residual_settings: dict[str, Any] | None = None,
+    residual_settings: Any = _DEFAULT_RESIDUAL_SETTINGS,
     fitted_weights_path: Path | str | None = None,
     max_clips: int | None = None,
     held_out_only: bool = True,
@@ -265,31 +268,49 @@ def evaluate_checkpoint(
 
     runner = runner_fn if runner_fn is not None else run
     dataset_path = Path(dataset_root)
-    res_settings = residual_settings or {}
-    res_codec = res_settings.get("codec", "avc")
-    if res_codec in ("libx264", "x264"):
-        res_codec = "avc"
-
-    cfg = PointstreamConfig(
-        lattice=lattice_config_from(
-            StageLattice.of(
-                STAGE_DETECTION,
-                STAGE_APPEARANCE,
-                STAGE_POSE,
-                STAGE_GENERATION,
-                STAGE_RESIDUAL,
-                STAGE_METRICS,
-            )
-        ),
-        generator=GeneratorConfig(backend=arch),
-        residual=ResidualConfig(
+    if residual_settings is _DEFAULT_RESIDUAL_SETTINGS:
+        res_settings: dict[str, Any] | None = {}
+    else:
+        res_settings = residual_settings
+    stages: tuple[str, ...]
+    if res_settings is not None and res_settings.get("enabled", True) is not False:
+        residual_enabled = True
+        res_codec = res_settings.get("codec", "avc")
+        if res_codec in ("libx264", "x264"):
+            res_codec = "avc"
+        stages = (
+            STAGE_DETECTION,
+            STAGE_APPEARANCE,
+            STAGE_POSE,
+            STAGE_GENERATION,
+            STAGE_RESIDUAL,
+            STAGE_METRICS,
+        )
+        residual_cfg: Any = ResidualConfig(
             codec=res_codec,
             rate=res_settings.get("crf", 28),
             preset=str(res_settings.get("preset", "medium")),
             pix_fmt=str(res_settings.get("pix_fmt", "yuv420p")),
             block_size=int(res_settings.get("block_size", 8)),
             block_threshold=float(res_settings.get("block_threshold", 0.0)),
+        )
+    else:
+        residual_enabled = False
+        stages = (
+            STAGE_DETECTION,
+            STAGE_APPEARANCE,
+            STAGE_POSE,
+            STAGE_GENERATION,
+            STAGE_METRICS,
+        )
+        residual_cfg = None
+
+    cfg = PointstreamConfig(
+        lattice=lattice_config_from(
+            StageLattice.of(*stages)
         ),
+        generator=GeneratorConfig(backend=arch),
+        residual=residual_cfg,
         evaluation=EvaluationConfig(metrics=tuple(metrics)),
     )
 
@@ -545,7 +566,7 @@ def evaluate_checkpoint(
             context_ids=(clip_key,),
         )
 
-        delivered = run_res.delivered_frames
+        delivered = np.asarray(run_res.delivered_frames)
         psnr_val = None
         try:
             psnr_val = float(run_res.delivered_quality.whole_frame("psnr"))
@@ -572,12 +593,17 @@ def evaluate_checkpoint(
         else:
             temporal_error = 0.0
 
+        res_bytes = int(run_res.sizes.residual) if residual_enabled else 0
+        res_calls = 1 if (residual_enabled and res_bytes > 0) else 0
+
         clip_record = {
             "clip_key": clip_key,
             "video": video,
             "scene": scene,
             "track": track,
-            "residual_bytes": int(run_res.sizes.residual),
+            "residual_bytes": res_bytes,
+            "residual_calls": res_calls,
+            "residual_enabled": residual_enabled,
             "transport_total": int(run_res.sizes.transport_total),
             "psnr": psnr_val,
             "ssim": ssim_val,
@@ -624,7 +650,9 @@ def evaluate_checkpoint(
         }
 
     aggregate = {
-        "residual_bytes": total_residual_bytes,
+        "residual_enabled": residual_enabled,
+        "residual_bytes": total_residual_bytes if residual_enabled else 0,
+        "total_residual_calls": sum(c.get("residual_calls", 0) for c in per_clip_metrics),
         "total_bytes": total_transport_bytes,
         "video_fitted_weight_bytes": fitted_weight_bytes,
         "psnr_mean": psnr_mean,
@@ -820,20 +848,106 @@ def is_valid_eval(agg: dict[str, Any] | None) -> bool:
     return True
 
 
-def rank_variants(aggregate_by_variant: dict[str, dict[str, Any]]) -> tuple[list[str], dict[str, float]]:
-    """Rank candidates, primarily by residual bytes.
+DEFAULT_RATE_INDIFFERENCE_BAND: float = 0.02  # Practical indifference band: 2% total rate
+DEFAULT_QUALITY_INDIFFERENCE_BAND: float = 0.10  # Practical indifference band: 0.10 dB PSNR
+DEFAULT_RESOURCE_INDIFFERENCE_BAND: float = 0.05  # Practical indifference band: 5% client latency
 
-    `PRIMARY_METRIC` decides whenever every scored variant has it: fewest bytes
-    wins, because that is the quantity the Residual Guarantee is denominated in.
-    The perceptual composite is retained only as a fallback (for runs scored with
-    `--no-residual-bytes`) and as a diagnostic that explains *why* a variant won
-    -- it must never silently outvote the payload.
 
-    Failed evaluations (success=False, eval_failed=True, non-finite or missing
-    metrics) are strictly ordered after all successful variants and cannot win.
+def extract_candidate_metrics(data: dict[str, Any]) -> dict[str, float | None]:
+    """Extract comparable rate, fidelity, and resource metrics from candidate evaluation data."""
+    total_bytes = data.get("total_bytes")
+    residual_bytes = data.get("residual_bytes")
+    rate: float | None = None
+    if total_bytes is not None and float(total_bytes) > 0:
+        rate = float(total_bytes)
+    elif residual_bytes is not None and float(residual_bytes) > 0:
+        rate = float(residual_bytes)
+    elif total_bytes is not None:
+        rate = float(total_bytes)
 
-    Returns (ranked_names, composite_scores). The composite is always reported so
-    a bytes-win with poor perceptual scores is visible rather than hidden.
+    psnr = float(data["psnr_mean"]) if data.get("psnr_mean") is not None else None
+    ssim = float(data["ssim_mean"]) if data.get("ssim_mean") is not None else None
+    client_sec = (
+        float(data["measured_client_seconds"])
+        if data.get("measured_client_seconds") is not None
+        else (float(data["client_seconds"]) if data.get("client_seconds") is not None else None)
+    )
+    return {
+        "rate": rate,
+        "psnr": psnr,
+        "ssim": ssim,
+        "client_sec": client_sec,
+    }
+
+
+def compare_candidates(
+    cand_a: dict[str, Any],
+    cand_b: dict[str, Any],
+    *,
+    rate_band: float = DEFAULT_RATE_INDIFFERENCE_BAND,
+    quality_band: float = DEFAULT_QUALITY_INDIFFERENCE_BAND,
+    resource_band: float = DEFAULT_RESOURCE_INDIFFERENCE_BAND,
+) -> str:
+    """Compare two candidates across total-rate, quality, and resource budgets.
+
+    Returns:
+        'a_dominates': cand_a is strictly superior to cand_b outside indifference bands
+        'b_dominates': cand_b is strictly superior to cand_a outside indifference bands
+        'indifferent': both candidates are within practical indifference bands
+        'incomparable': trade-off exists (e.g. higher rate but higher quality, or slower client)
+    """
+    m_a = extract_candidate_metrics(cand_a)
+    m_b = extract_candidate_metrics(cand_b)
+
+    if m_a["rate"] is None or m_b["rate"] is None:
+        return "incomparable"
+
+    ref_rate = max(1.0, (m_a["rate"] + m_b["rate"]) / 2.0)
+    rate_rel_diff = (m_b["rate"] - m_a["rate"]) / ref_rate
+
+    psnr_diff = (m_a["psnr"] - m_b["psnr"]) if (m_a["psnr"] is not None and m_b["psnr"] is not None) else 0.0
+
+    client_rel_diff = 0.0
+    if m_a["client_sec"] is not None and m_b["client_sec"] is not None:
+        ref_sec = max(1e-4, (m_a["client_sec"] + m_b["client_sec"]) / 2.0)
+        client_rel_diff = (m_b["client_sec"] - m_a["client_sec"]) / ref_sec
+
+    eps = 1e-7
+    a_better_rate = rate_rel_diff > rate_band + eps
+    b_better_rate = rate_rel_diff < -(rate_band + eps)
+    a_better_quality = psnr_diff > quality_band + eps
+    b_better_quality = psnr_diff < -(quality_band + eps)
+    a_better_client = client_rel_diff > resource_band + eps
+    b_better_client = client_rel_diff < -(resource_band + eps)
+
+    a_strictly_better = bool(a_better_rate or a_better_quality or a_better_client)
+    b_strictly_better = bool(b_better_rate or b_better_quality or b_better_client)
+
+    if a_strictly_better and not b_strictly_better:
+        return "a_dominates"
+    elif b_strictly_better and not a_strictly_better:
+        return "b_dominates"
+    elif not a_strictly_better and not b_strictly_better:
+        return "indifferent"
+    else:
+        return "incomparable"
+
+
+def rank_variants(
+    aggregate_by_variant: dict[str, dict[str, Any]],
+    *,
+    rate_indifference_band: float = DEFAULT_RATE_INDIFFERENCE_BAND,
+    quality_indifference_band: float = DEFAULT_QUALITY_INDIFFERENCE_BAND,
+) -> tuple[list[str], dict[str, float]]:
+    """Rank candidates, primarily by total wire rate and objective fidelity.
+
+    Valid candidates are ordered by total-rate/quality trade-off:
+    - Lower total rate wins when quality is within practical indifference band.
+    - Higher quality wins when rate is within practical indifference band.
+    - Perceptual composite is reported as an explanatory diagnostic.
+    Failed evaluations are strictly ordered after all successful variants and cannot win.
+
+    Returns (ranked_names, composite_scores).
     """
     valid_variants = [v for v in aggregate_by_variant if is_valid_eval(aggregate_by_variant[v])]
     invalid_variants = [v for v in aggregate_by_variant if v not in valid_variants]
@@ -861,25 +975,17 @@ def rank_variants(aggregate_by_variant: dict[str, dict[str, Any]]) -> tuple[list
         for v, scores in normalized.items()
     }
 
-    payloads = {
-        v: aggregate_by_variant[v][PRIMARY_METRIC]
-        for v in valid_variants
-        if aggregate_by_variant[v].get(PRIMARY_METRIC) is not None
-    }
-    if not (payloads and len(payloads) == len(valid_variants)):
-        # Fall back to total_bytes if available
-        payloads = {
-            v: aggregate_by_variant[v]["total_bytes"]
-            for v in valid_variants
-            if aggregate_by_variant[v].get("total_bytes") is not None
-        }
+    metrics = {v: extract_candidate_metrics(aggregate_by_variant[v]) for v in valid_variants}
 
-    if payloads and len(payloads) == len(valid_variants):
-        # Fewest bytes wins; composite breaks exact ties only.
-        valid_ranked = sorted(valid_variants, key=lambda v: (payloads[v], -composite[v], v))
-    else:
-        valid_ranked = sorted(valid_variants, key=lambda v: (-composite[v], v))
+    def sort_key(v: str) -> tuple[Any, ...]:
+        m = metrics[v]
+        rate = m["rate"] if m["rate"] is not None else float("inf")
+        psnr = m["psnr"] if m["psnr"] is not None else 0.0
+        ssim = m["ssim"] if m["ssim"] is not None else 0.0
+        comp = composite.get(v, 0.0)
+        return (rate, -psnr, -ssim, -comp, v)
 
+    valid_ranked = sorted(valid_variants, key=sort_key)
     invalid_ranked = sorted(invalid_variants, key=lambda v: (composite.get(v, -1.0), v))
     ranked = valid_ranked + invalid_ranked
     return ranked, composite
@@ -888,15 +994,18 @@ def rank_variants(aggregate_by_variant: dict[str, dict[str, Any]]) -> tuple[list
 def promote_survivors(
     ranked: list[str],
     aggregate_by_variant: dict[str, dict[str, Any]] | None = None,
-    min_diff_threshold: float = 0.02,
+    min_diff_threshold: float = DEFAULT_RATE_INDIFFERENCE_BAND,
+    quality_indifference_band: float = DEFAULT_QUALITY_INDIFFERENCE_BAND,
+    resource_indifference_band: float = DEFAULT_RESOURCE_INDIFFERENCE_BAND,
 ) -> list[str]:
     """Select survivors for the next rung.
 
     If aggregate_by_variant is provided, unsuccessful evaluations are never
-    promoted as survivors. Furthermore, promotion is uncertainty-aware: candidates
-    falling immediately below the nominal successive-halving cutoff are preserved
-    if their performance is within min_diff_threshold (relative rate or ~0.1 dB PSNR)
-    of the boundary survivor, preventing arbitrary elimination due to noise.
+    promoted. Candidates below the nominal successive-halving cutoff are preserved
+    if:
+    1. They are within practical indifference bands of a survivor, OR
+    2. They are incomparable with survivors (representing distinct valid RD trade-offs).
+    Automated model pruning is disabled whenever candidates are incomparable.
     """
     if aggregate_by_variant is not None:
         valid_ranked = [v for v in ranked if is_valid_eval(aggregate_by_variant.get(v))]
@@ -906,37 +1015,25 @@ def promote_survivors(
             return valid_ranked
         keep = math.ceil(len(valid_ranked) / 2)
         survivors = list(valid_ranked[:keep])
-        cutoff_candidate = survivors[-1]
-        cutoff_data = aggregate_by_variant.get(cutoff_candidate, {})
 
         for cand in valid_ranked[keep:]:
-            cand_data = aggregate_by_variant.get(cand, {})
-            bytes_key = (
-                PRIMARY_METRIC
-                if (cutoff_data.get(PRIMARY_METRIC) is not None and cand_data.get(PRIMARY_METRIC) is not None)
-                else (
-                    "total_bytes"
-                    if (cutoff_data.get("total_bytes") is not None and cand_data.get("total_bytes") is not None)
-                    else None
+            cand_data = aggregate_by_variant[cand]
+            should_preserve = False
+            for s in survivors:
+                s_data = aggregate_by_variant[s]
+                relation = compare_candidates(
+                    cand_data,
+                    s_data,
+                    rate_band=min_diff_threshold,
+                    quality_band=quality_indifference_band,
+                    resource_band=resource_indifference_band,
                 )
-            )
-            is_close = False
-            if bytes_key is not None:
-                c_bytes = float(cutoff_data[bytes_key])
-                cand_bytes = float(cand_data[bytes_key])
-                ref_bytes = max(abs(c_bytes), 1.0)
-                rel_diff = abs(cand_bytes - c_bytes) / ref_bytes
-                if rel_diff <= min_diff_threshold:
-                    is_close = True
-            elif cutoff_data.get("psnr_mean") is not None and cand_data.get("psnr_mean") is not None:
-                psnr_diff = abs(float(cutoff_data["psnr_mean"]) - float(cand_data["psnr_mean"]))
-                if psnr_diff <= 0.1:
-                    is_close = True
-
-            if is_close:
+                if relation in ("indifferent", "incomparable", "a_dominates"):
+                    should_preserve = True
+                    break
+            if should_preserve:
                 survivors.append(cand)
-            else:
-                break
+
         return survivors
 
     if len(ranked) <= 1:
