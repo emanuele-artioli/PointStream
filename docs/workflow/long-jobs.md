@@ -28,9 +28,16 @@ For example, substitute an actual job directory and owning Codex task ID:
 python -m experiments.jobs.monitor start /absolute/data/jobs/ladder-001 \
   --budget-hours 12 --thread TASK_ID \
   --report-in-hours 8 --quiet-hours 8 \
+  --cpu-threads 8 --claim-gpu GPU-UUID \
+  --claims-dir /absolute/data/jobs/claims \
   --command python -m experiments.jobs.codec run \
   /absolute/data/policies/ladder.json /absolute/data/campaigns/ladder-001
 ```
+
+`--cpu-threads` is required for every monitored command, including CPU-only
+jobs. Omit `--claim-gpu` only for a CPU-only job. The thread-related environment
+variables are cooperative limits; they do not constrain an arbitrary external
+binary that ignores them.
 
 The launcher detaches the supervisor. A sandbox that kills descendants when a
 shell call ends requires an authorized host launch; `setsid` alone cannot defeat
