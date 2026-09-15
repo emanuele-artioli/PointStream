@@ -1,6 +1,9 @@
 # PointStream Area Index & Active Plan
 
-Current coordination: **14 September 2026**, code baseline `2f63ae1` (#105); E01 #104 remains open.
+Current coordination: **15 September 2026**; shared main before handoff docs `83c75ed`.
+Start with the [coordinator handoff](docs/workflow/session/evaluation-campaign/handoff-20260915.md).
+Latest worker reports await acceptance; prior reproduced defects are not assumed
+to persist in their new heads.
 Submission **30 September**; provisional evidence freeze **20 September**.
 The [evaluation campaign](docs/workflow/session/evaluation-campaign/plan.md) is the
 authoritative plan incorporating the user's full evaluation design and resource
@@ -17,21 +20,21 @@ policy. The September 12 handoff/audit are historical context, not dispatches.
 | [Infrastructure](docs/areas/infrastructure.md) | Existing detached monitoring; verify host availability at each launch | Per-host CPU <=90% available; any free GPU; no cleanup helper |
 | [Paper](docs/areas/paper.md) | Separate repo; no new competitive evidence certified by repairs | E08 setup/structure early, final claims after accepted results |
 
-## Current assignments after acquisition / R0 / E02R review
+## Current boundary — handoff for acceptance review
 
-| Owner | Assignment | State |
-|---|---|---|
-| Cursor | [E03A](docs/workflow/session/evaluation-campaign/tasks/03a-contract-to-anchors.md) | Sole adapter/contract ownership; close integration and prepare anchors |
-| Antigravity subagent | [R0R](docs/workflow/session/evaluation-campaign/tasks/00r-claim-lifecycle.md) | Correct reproduced claim ownership/child-lifecycle defects |
-| Antigravity | [E02S](docs/workflow/session/evaluation-campaign/tasks/02s-training-and-controls.md) | Actual trainer resume and missing real controls; adapter handed to Cursor |
+| Owner | PR / head | Verified state | Next action |
+|---|---|---|---|
+| Cursor | #104 `9d56303` | Open; CI green | Accept E03A contract/mapping/pin, then release prepared anchor card |
+| Antigravity resource lane | #108 `287c2eb` | Open; CI green | Verify actual claim lifecycle, resolve lease-versus-liveness report discrepancy |
+| Antigravity generation lane | #109 `013a4c8` | Open; CI green | Verify reported trainer continuation and seven-corner control evidence |
 
 Three reserved matches acquired; media/report/log hashes independently verified.
-Eligibility remains pending and no confirmation scoring reported. Cursor #104
-head `7e4da6e` passes CI but production evidence ingestion still needs fixes.
-R0 `d39893c` and E02R `b7c4d16` remain unmerged/unaccepted; no open PR for either
-at review time. Full-trajectory execution is supported, complete readiness is not.
+Eligibility remains pending and no confirmation scoring reported. Full-trajectory
+execution verified earlier; latest claimed controls/resume fixes need review.
+No new experiments or code merges in handoff preparation. E05 remains unreleased.
 
-Do not repeat acquisition or the full five-corner diagnostic. E03/E04 CPU
-preparation proceeds; measured probes follow contract/resource acceptance here.
-E05 remains gated on actual neural learning/resume and controls. Gate A open,
-confirmation incomplete; no GPU jobs launched by this coordinator review.
+Next session reviews these revisions, merges acceptable work, then releases
+bounded E03/E04 independently of any remaining E05 readiness issue. Do not repeat
+acquisition or the full old matrix. Gate A open; confirmation incomplete; paper
+unchanged. The handoff records exact worktrees, missing evidence pointers and
+resource-visibility limits. Keep active decisions on shared main.
