@@ -7,15 +7,15 @@
   "owner": "cursor",
   "adapter_owner": "cursor",
   "branch": "codex/eval-e01",
-  "code_head": "7e4da6ecda16d93263f0e6c785a0213a9bb41ab6",
+  "code_head": "d99d527183dea84e3db9b2923f4fc94d33957897",
   "modules": {
     "experiments.tier.campaign_result": {
       "path": "experiments/tier/campaign_result.py",
-      "sha256": "669d10028401272d8b32912c7e0c915e703a1b48cd5f83b463b17e12fc743049"
+      "sha256": "05662ce434f650561b854ea3f305a6def6c098dcd8701ee4c7c89757283b0da1"
     },
     "src.runner.generation_adapter": {
       "path": "src/runner/generation_adapter.py",
-      "sha256": "47db3b6d0591e76a127bae5b3cdd7f2b0050d09c336488aff78debde8673c81e"
+      "sha256": "3e7c8de023a027805cc6610d3c2a4183ca3a0b1011152b3bb6ab01ab37be5775"
     }
   },
   "examples": {
