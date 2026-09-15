@@ -25,6 +25,41 @@ comparisons keep residual off; paste-plus-residual is explicitly a residual-on
 control in the residual section. Component and readiness work can run before a
 full-codec win. A losing or invalid run is a result to preserve, not a gate pass.
 
+## Current entry point — 15 September handoff
+
+Read [handoff-20260915.md](handoff-20260915.md) before dispatching. Cursor #104
+`9d56303`, R0R #108 `287c2eb` and E02S #109 `013a4c8` are open with CI passing.
+Their latest reported fixes await coordinator acceptance; the older review and
+dispatch sections below are history, not a finding that those heads still fail.
+No new worker assignment or experiment launch is issued by this handoff.
+
+## Current dispatch — acquisition accepted, integration still partial
+
+Reviewed Cursor `7e4da6e` (#104 CI green), R0 `d39893c` and E02R `b7c4d16`.
+Acquisition is complete: all three reserved media files and report/log hashes
+independently match the checked-in pointers. Keep `confirmation_eligible=false`
+and `scores_computed=false`; event/timestamp/scene eligibility remains pending.
+No additional download requested. All three are 1080p: higher-resolution
+confirmation needs new evidence or a claim restricted to the available resolution.
+
+The real E02R probe does cover all 16 frames. Its hashes match, but the saved
+adapter result fails the current E01R schema and has incorrect internal artifact
+hash/shape mapping. Same-seed/no-conditioning and actual trainer continuation are
+not established. R0 has reproduced live-lock takeover and release-before-child-exit
+failures. Neither R0 nor E02R is accepted for campaign launch; no code merge yet.
+
+| Owner | Next bounded assignment | Parallel progress |
+|---|---|---|
+| Cursor | [E03A](tasks/03a-contract-to-anchors.md): own unified adapter/reader; fix current ingestion and re-adapt saved probe | Anchor CPU setup, prospective source eligibility |
+| Antigravity subagent | [R0R](tasks/00r-claim-lifecycle.md): ownership and child lifecycle | CPU-only race/failure tests |
+| Antigravity | [E02S](tasks/02s-training-and-controls.md): actual trainer continuation and missing controls | E04 background code/input preparation can use an isolated subagent if capacity permits |
+
+This assigns one owner to the adapter/contract instead of two incompatible
+implementations. Do not rerun the full five-corner matrix. Return the exact
+integration/regression evidence here; then release bounded E03/E04 probes
+independently of generator campaign readiness. E05 and confirmation scoring stay
+unreleased. No GPU jobs launched by this coordinator review.
+
 ## Coordinator review of E01/E02 — 14 September 2026
 
 Reviewed E01 PR #104 head `b87daf51` (open) and merged E02 #105 `2f63ae1`;
