@@ -103,7 +103,7 @@ def test_empty_confirmation_cannot_pass() -> None:
     assert verdict["gate_b_passed"] is False
     assert verdict["execution_completed"] is False
     assert verdict["pilot_alarms_clear"] is False
-    assert any("only 0" in reason for reason in verdict["confirmation_blockers"])
+    assert any("0 provided" in reason or "only 0" in reason for reason in verdict["confirmation_blockers"])
 
 
 def test_two_source_pilot_is_not_six_source_confirmation() -> None:

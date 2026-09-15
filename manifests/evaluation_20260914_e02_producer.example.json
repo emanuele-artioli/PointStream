@@ -1,0 +1,53 @@
+{
+  "schema": "pointstream.campaign_result.v1",
+  "contract_revision": "e03a-20260915",
+  "doc_role": "e02_producer_shaped_campaign_records",
+  "note": "E02 adapter output today uses rd_claim/speed_claim and is not this schema. Real E02 rows must pass through campaign_record_from_generation_adapter then validate_campaign_record and ingest_for_claim. Do not treat temporal_continuity as generalization. Single-scene readiness uses rd/trajectory, not generalization.",
+  "commands": {
+    "adapt_and_validate": "python -c \"from src.runner.generation_adapter import adapt_diagnostic_matrix_result; from experiments.tier.campaign_result import campaign_record_from_generation_adapter, validate_campaign_record, ingest_for_claim; print('see tests')\""
+  },
+  "records": [
+    {
+      "schema": "pointstream.campaign_result.v1",
+      "contract_revision": "e03a-20260915",
+      "record_class": "recoverable_evidence",
+      "artifact_id": "e02_producer_single_scene_rd",
+      "artifact_path": "outputs/evaluation-20260914/e02/example-producer.json",
+      "artifact_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "code_revision": "2f63ae1",
+      "source_ids": ["federer_djokovic_scene_007"],
+      "frame_ids": {"start": 0, "count": 48, "fps": 12.0},
+      "operating_point_id": "display_low",
+      "independent_match_ids": [],
+      "frozen_procedure": false,
+      "trajectory_coverage": "unspecified",
+      "claim_eligibility": {
+        "rd": true,
+        "runtime": false,
+        "standalone_transport": false,
+        "trajectory": false,
+        "generalization": false,
+        "rd_arms": {"psnr_y": true, "ssim": true, "vmaf": true, "bytes": true},
+        "exclusions": [
+          {"claim": "runtime", "reason": "no named host timing stratum yet"},
+          {"claim": "standalone_transport", "reason": "envelope not reconciled on this producer example"},
+          {"claim": "trajectory", "reason": "48-frame scene probe is not full_visible_track until E02R says so"},
+          {"claim": "generalization", "reason": "single development scene; independent frozen sources required"}
+        ]
+      },
+      "timing_evidence": null,
+      "controls": {
+        "standalone_decode": "unverified",
+        "metric_calibration": "unverified",
+        "wire_ledger": "unverified",
+        "conditioned_vs_shuffled": "verified"
+      },
+      "evidence": {
+        "metrics": {"psnr_y": 32.5, "ssim": 0.91, "vmaf": 82.0},
+        "bytes": {"total": 25000, "residual": 15000}
+      },
+      "producer": "e02_generation_adapter",
+      "backend_name": "pix2pix"
+    }
+  ]
+}

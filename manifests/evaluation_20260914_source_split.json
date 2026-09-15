@@ -1,0 +1,153 @@
+{
+  "schema": "pointstream.campaign_source_split.v1",
+  "doc_role": "development_validation_confirmation_split",
+  "campaign": "evaluation-20260914",
+  "status": "accepted_target_pending_acquisition",
+  "contract_revision": "e01r-20260914",
+  "source_count_policy": "manifests/evaluation_20260914_source_count_policy.json",
+  "grouping": {
+    "unit": "match",
+    "scene_ids_are_not_matches": true,
+    "replay_excerpt_rule": "Group by video/match_id. alcaraz_highlights is a multi-match compilation and stays development-only. federer_djokovic and djokovic_federer are distinct matches."
+  },
+  "development": {
+    "role": "shared_model_training_and_codec_selection",
+    "videos": [
+      {
+        "video": "alcaraz_highlights",
+        "match_identity": "Carlos Alcaraz broadcast highlights (multiple matches)",
+        "contaminated": true,
+        "resolution": "3840x2160",
+        "source_fps": 59.9401,
+        "working_fps": 24.0,
+        "scenes": [
+          {"scene": "scene_000", "camera_regime": "easy_near_static", "consecutive_mad": 0.295, "t_start": 0.0, "t_end": 18.068056, "prior_use": "gate_a_and_recovery_primary"},
+          {"scene": "scene_010", "camera_regime": "hard_smooth_pan", "consecutive_mad": 3.264, "t_start": 50.366989, "t_end": 60.894167, "prior_use": "bp46_inventory_only"}
+        ]
+      },
+      {
+        "video": "federer_djokovic",
+        "match_identity": "Federer vs Djokovic, 2015 Cincinnati Masters Final",
+        "contaminated": true,
+        "resolution": "3840x2160",
+        "source_fps": 59.9401,
+        "working_fps": 24.0,
+        "scenes": [
+          {"scene": "scene_007", "camera_regime": "diagnostic_established", "prior_use": "recovery_and_background_probe"},
+          {"scene": "scene_003", "camera_regime": "hard_smooth_pan", "consecutive_mad": 4.19, "t_start": 54.220833, "t_end": 58.6586, "prior_use": "bp46_inventory_only"}
+        ]
+      },
+      {
+        "video": "alcaraz_perricard",
+        "match_identity": "Alcaraz vs Mpetshi Perricard, 2024 China Open R32",
+        "contaminated": true,
+        "scenes": [
+          {"scene": "scene_003", "camera_regime": "easier_relative", "consecutive_mad": 2.007},
+          {"scene": "scene_007", "camera_regime": "hard_pan", "consecutive_mad": 9.07}
+        ]
+      },
+      {
+        "video": "djokovic_federer",
+        "match_identity": "Djokovic vs Federer, 2019 Wimbledon Final",
+        "contaminated": true,
+        "source_fps": 50.0,
+        "scenes": [
+          {"scene": "scene_009", "camera_regime": "easy", "consecutive_mad": 0.465},
+          {"scene": "scene_003", "camera_regime": "hard_pan", "consecutive_mad": 6.728}
+        ]
+      },
+      {
+        "video": "djokovic_zverev",
+        "match_identity": "Djokovic vs Zverev (event unresolved)",
+        "contaminated": true,
+        "scenes": [
+          {"scene": "scene_003", "camera_regime": "easier_relative", "consecutive_mad": 2.303},
+          {"scene": "scene_006", "camera_regime": "hard_pan", "consecutive_mad": 6.388}
+        ]
+      },
+      {
+        "video": "sinner_alcaraz",
+        "match_identity": "Sinner vs Alcaraz (event unresolved)",
+        "contaminated": true,
+        "scenes": [
+          {"scene": "scene_021", "camera_regime": "easy", "consecutive_mad": 0.461},
+          {"scene": "scene_004", "camera_regime": "harder_relative", "consecutive_mad": 1.168}
+        ]
+      },
+      {
+        "video": "alcaraz_ruud",
+        "match_identity": "Alcaraz and Ruud practice 2024",
+        "contaminated": true,
+        "pointstream_eligible_scenes": 0,
+        "use": "do_not_select_for_codec_scenes_until_route_is_pointstream"
+      }
+    ],
+    "occlusion_note": "All 53 BP46 scenes record has_occlusion=false; occlusion is not a usable split in this corpus. Use camera MAD and duration instead."
+  },
+  "validation": {
+    "role": "hyperparameters_and_rate_quality_choices",
+    "rule": "Use temporally gapped scenes inside development videos, never confirmation matches. Do not choose the winner from confirmation scores. Training selectors must exclude these blocks.",
+    "preferred_blocks": [
+      {"video": "djokovic_federer", "scene": "scene_009", "note": "easy-camera development scene unused by Gate A recovery pair"},
+      {"video": "alcaraz_perricard", "scene": "scene_003", "note": "held inside development for hyperparameter checks"}
+    ]
+  },
+  "training_selector": {
+    "exclude_splits": ["validation", "confirmation_reserved_unacquired", "exposed_confirmation_not_holdout"],
+    "exclude_scenes": [
+      {"video": "djokovic_federer", "scene": "scene_009"},
+      {"video": "alcaraz_perricard", "scene": "scene_003"}
+    ],
+    "match_grouping": "video_or_match_id; scenes from one match count once",
+    "replay_check": "Reject confirmation candidate IDs, files under assets/confirmation_raw/e01r/, and the two exposed Gate B source_ids. alcaraz_highlights remains a compilation and development-only."
+  },
+  "exposed_confirmation_not_holdout": {
+    "role": "already_scored_restricted_confirmation",
+    "manifest": "manifests/gate_b_confirmation.json",
+    "sources": [
+      {
+        "source_id": "bp57_ao2024_sabalenka_zheng",
+        "candidate_id": "conf_cand_02_zheng_sabalenka_ao2024",
+        "match_name": "Aryna Sabalenka vs. Qinwen Zheng",
+        "container_resolution": "1920x1080",
+        "container_fps": 25.0,
+        "exposure": "scored_under_pr85_gate_b_pilot"
+      },
+      {
+        "source_id": "bp57_usopen2023_gauff_sabalenka",
+        "candidate_id": "conf_cand_03_gauff_sabalenka_usopen2023",
+        "match_name": "Coco Gauff vs. Aryna Sabalenka",
+        "container_resolution": "1280x720",
+        "container_fps": 29.97002997,
+        "exposure": "scored_under_pr85_gate_b_pilot"
+      }
+    ]
+  },
+  "confirmation_reserved_unacquired": {
+    "role": "acquired_windows_pending_eligibility_and_freeze",
+    "selected_count": 3,
+    "acquired_count": 3,
+    "eligible_count": 0,
+    "selection_basis": "Coordinator accepted three fresh independent matches as the prospective target. Bounded 15-minute windows are on disk. Event identities, overlap, provenance and accessibility were recorded. This is not confirmation eligibility or a scientific freeze. No confirmation scores.",
+    "candidates": [
+      "conf_cand_01_sinner_medvedev_ao2024",
+      "conf_cand_04_medvedev_djokovic_usopen2023",
+      "conf_cand_05_swiatek_sabalenka_madrid2024"
+    ],
+    "acquisition_pointer": "manifests/evaluation_20260914_e01r_acquisition.json",
+    "alternates_if_rights_fail": [
+      "conf_cand_06_djokovic_ruud_rg2023",
+      "conf_alt_03_nadal_medvedev_ao2022"
+    ],
+    "excluded_from_this_freeze": [
+      "conf_alt_01_alcaraz_zverev_rg2024",
+      "conf_alt_02_alcaraz_djokovic_wimbledon2023"
+    ],
+    "do_not_substitute_exposed_gate_b": true,
+    "on_disk_fresh_untouched_count": 3
+  },
+  "secondary_domain": {
+    "status": "inventory_only_do_not_score",
+    "note": "DAVIS people clips exist outside pointstream-data; no tennis confirmation role. Score only after a tennis advantage is frozen."
+  }
+}
