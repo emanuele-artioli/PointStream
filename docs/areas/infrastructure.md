@@ -7,7 +7,9 @@ takeover on mutexes and claims, guarantees child process group termination and r
 prior to claim release (retaining claim if death unverified), checks local PID liveness
 and process start identity before status text, fails closed on absent or unqueried GPUs
 with pre-Popen rechecks, and accounts for cgroup quotas, load, and mandatory per-job CPU
-thread allowances. Verified by 17 CPU-only unit tests in `tests/experiments/test_resource_claims.py`.
+thread allowances. Cross-host NFS contention and lifecycle behavior have not yet been
+tested by two real hosts, so multi-host deployment remains disabled; run monitored jobs
+on one verified host until that check is recorded.
 
 ## Coordinator follow-up — E01/E02
 
@@ -36,7 +38,7 @@ remains prohibited. No fixed GPU reservation carries into this campaign.
 
 ### Atomic cross-host resource claims (R0 / R0R — PR branch `codex/eval-r0`)
 
-`experiments/jobs/claims.py` implements minimal cross-host resource claims coordinating PointStream workers across shared GPU servers without cluster schedulers or colleague preemption:
+`experiments/jobs/claims.py` implements filesystem resource claims for PointStream workers without cluster schedulers or colleague preemption. Single-host behavior is tested; cross-host deployment remains disabled pending a two-host NFS contention/lifecycle check:
 - **Shared jobs location**: Keyed under `PS_DATA_ROOT/jobs/claims` (`src.contracts.paths.data_root() / "jobs" / "claims"`) or explicit `PS_CLAIMS_DIR`.
 - **Atomic cross-host primitive**: Leverages POSIX atomic directory creation (`mkdir`) on shared filesystem for device claims and host CPU allocation mutex (`.lock`).
 - **Device keying**: Canonical hostname (`socket.getfqdn()` / `platform.node()`) and GPU UUID (`nvidia-smi --query-gpu=uuid`), not ordinal alone.
@@ -46,9 +48,9 @@ remains prohibited. No fixed GPU reservation carries into this campaign.
 - **Token release & conservative stale owner handling (R0R)**: Released strictly by the owning random token. Eliminated TTL-only takeover in `atomic_dir_lock` and device claims. Stale claims verify liveness strictly via local PID liveness and process start time identity (detecting recycled PIDs). Stale remote claims or unverifiable local liveness are never stolen.
 - **Child process group lifecycle & Interruption (R0R)**: `run_supervised` creates a new process session (`start_new_session=True`), catching all exceptions/interrupts and executing `terminate_and_reap_process_group` (SIGTERM -> timeout -> SIGKILL -> reap) before releasing claims. If child death cannot be verified, claims are retained as unresolved.
 - **Claim activity vs status ordering (R0R)**: `is_claim_active` checks local PID liveness before trusting terminal status text; `monitor.py` stops and reaps child process groups before writing terminal status.
-- **Aggregate CPU thread cap & Cgroup accounting (R0R)**: Enforces host ceiling at `floor(0.90 * available_cores)` across codec, BLAS, loader, and worker processes; `get_available_cores()` accounts for cgroup v1/v2 quota and system load. Sets `OMP_NUM_THREADS`, `MKL_NUM_THREADS`, `OPENBLAS_NUM_THREADS`, `TORCH_NUM_THREADS`, `RAY_NUM_CPUS`, `POLARS_MAX_THREADS`, `PS_CPU_ALLOWANCE`, etc. in child environment. Explicit `cpu_threads` is mandatory for all monitored jobs. Refuses oversubscription atomically.
+- **Aggregate CPU allowance & Cgroup accounting (R0R)**: Refuses declared allocations above `floor(0.90 * available_cores)`; `get_available_cores()` accounts for cgroup v1/v2 quota and system load. Sets `OMP_NUM_THREADS`, `MKL_NUM_THREADS`, `OPENBLAS_NUM_THREADS`, `TORCH_NUM_THREADS`, `RAY_NUM_CPUS`, `POLARS_MAX_THREADS`, `PS_CPU_ALLOWANCE`, etc. in the child environment. These are cooperative limits and cannot enforce a cap on arbitrary children that ignore them. Explicit positive `cpu_threads` is mandatory for all monitored jobs.
 - **Integration**: Integrated into `experiments.jobs.monitor` (`start --claim-gpu ... --cpu-threads ...` and `supervise` lifecycle), standalone context manager `claim_resources`, and CLI `python -m experiments.jobs.claims launch`.
-- **Validation**: 17 CPU-only unit tests in `tests/experiments/test_resource_claims.py` plus all 11 existing monitor tests pass. Real GPU query and auto-selection verified on gpu5 (RTX 6000 Ada).
+- **Validation**: CPU-only focused tests cover local claim and monitor behavior. Real GPU query and auto-selection were checked on gpu5 (RTX 6000 Ada). No two-host contention/lifecycle result is recorded, so this is not yet evidence for cross-host deployment.
 
 ### Quiet long-job monitoring (PR #82)
 
@@ -105,7 +107,7 @@ PR #68 introduced `scripts/cleanup_merged_worktrees.sh`. The documentation audit
 
 | ID | Status | Dependencies | Source | Description & Acceptance Criteria |
 |---|---|---|---|---|
-| `INFRA-ACT-05` | Complete | None | 00-resource-claims.md (R0) | **Atomic resource claims**: Implement minimal atomic cross-host GPU and CPU resource claims in `experiments/jobs/claims.py`, GPU UUID keying, pre-launch recheck, device isolation (`CUDA_VISIBLE_DEVICES`), conservative stale-owner handling, CPU thread cap (`floor(0.90 * available_cores)`), child process group lifecycle, and monitor integration. Acceptance: 17 CPU-only unit tests pass; verified on host hardware. |
+| `INFRA-ACT-05` | Local-ready / cross-host disabled | Two-host NFS check | 00-resource-claims.md (R0) | **Atomic resource claims**: local claim ownership, GPU UUID keying, pre-launch recheck, device isolation, conservative stale-owner handling, declared CPU allowance, child process-group lifecycle, and monitor integration are implemented. Acceptance still requires two real hosts contending through the shared claim path and lifecycle verification before enabling multi-host deployment. |
 | `INFRA-ACT-04` | Complete | None | PR #82 | Quiet monitor and approved scheduling/stall/restart/budget regression tests implemented. Use the workflow for new jobs; transport acceptance is verified, but automated idle wakeup timing is not a guaranteed service. |
 | `INFRA-ACT-01` | Ready | None | #68, #73 | **Repair worktree cleanup helper**: Refactor `scripts/cleanup_merged_worktrees.sh` to halt on any git refusal, verify clean working tree against `origin/main`, remove the `rm -rf` fallback, and drop remote pruning. Acceptance: Script refuses to delete unmerged or dirty worktrees and passes unit test. |
 | `INFRA-ACT-02` | Ready | None | Host rules | **Host-local cache enforcement**: Configure local caching (the checkout-specific cache paths in `docs/setup.md`) in CI and runner scripts. Acceptance: Zero mypy cache files written to NFS home. |

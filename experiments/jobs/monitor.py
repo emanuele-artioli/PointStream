@@ -164,21 +164,10 @@ def tick(directory: Path, state: dict[str, Any], now: float) -> None:
     write_json(directory / "status.json", state)
 
 
-def stop_child(child: subprocess.Popen[Any]) -> None:
-    if child.poll() is None:
-        try:
-            os.killpg(child.pid, signal.SIGTERM)
-        except ProcessLookupError:
-            child.wait()
-            return
-        try:
-            child.wait(timeout=15)
-        except subprocess.TimeoutExpired:
-            try:
-                os.killpg(child.pid, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
-            child.wait()
+def stop_child(child: subprocess.Popen[Any]) -> bool:
+    from experiments.jobs.claims import terminate_and_reap_process_group
+
+    return terminate_and_reap_process_group(child)
 
 
 def supervise(directory: Path) -> int:
@@ -206,6 +195,14 @@ def supervise(directory: Path) -> int:
             write_json(directory / "status.json", state)
             child = None
             claims_cfg = request.get("claims")
+            cpu_req = claims_cfg.get("cpu_threads") if isinstance(claims_cfg, dict) else None
+            if not isinstance(cpu_req, int) or isinstance(cpu_req, bool) or cpu_req <= 0:
+                state.update(
+                    status="failed",
+                    error="all monitored jobs require an explicit positive cpu_threads allowance",
+                )
+                write_json(directory / "status.json", state)
+                return 1
             if claims_cfg:
                 from experiments.jobs.claims import (
                     acquire_device_claim,
@@ -215,7 +212,6 @@ def supervise(directory: Path) -> int:
                 )
 
                 gpu_req = claims_cfg.get("gpu")
-                cpu_req = claims_cfg.get("cpu_threads")
                 claims_dir = claims_cfg.get("claims_dir")
 
                 dev_claim = None
@@ -293,9 +289,20 @@ def supervise(directory: Path) -> int:
                         start_new_session=True,
                         env=child_env,
                     )
-                state["pid"] = child.pid
-            except (OSError, DeviceBusyError) as exc:
-                if claim_session:
+                from experiments.jobs.claims import get_process_start_time, record_child_identity
+
+                state.update(
+                    pid=child.pid,
+                    proc_start_time=get_process_start_time(child.pid),
+                    process_group_id=child.pid,
+                )
+                if claim_session is not None:
+                    identity = record_child_identity(claim_session, child)
+                    write_json(directory / "claim.json", {**claim_session.to_dict(), **identity})
+                write_json(directory / "status.json", state)
+            except Exception as exc:
+                child_stopped = child is None or stop_child(child)
+                if claim_session and child_stopped:
                     from experiments.jobs.claims import release_session_claims
 
                     release_session_claims(claim_session)
@@ -308,7 +315,8 @@ def supervise(directory: Path) -> int:
                 if child is not None and state["status"] == "running":
                     code = child.poll()
                     if code is not None:
-                        state.update(status="complete" if code == 0 else "failed", exit_code=code)
+                        stopped = stop_child(child)
+                        state.update(status="complete" if code == 0 and stopped else "failed", exit_code=code)
                     elif now - state["started"] >= request["budget_seconds"]:
                         stop_child(child)
                         state["status"] = "budget_exhausted"
@@ -339,12 +347,11 @@ def supervise(directory: Path) -> int:
                     return 0
                 time.sleep(10)
         finally:
-            if child is not None:
-                stop_child(child)
+            child_stopped = child is None or stop_child(child)
             if state["status"] == "running":
                 state["status"] = "interrupted"
                 write_json(directory / "status.json", state)
-            if claim_session is not None:
+            if claim_session is not None and child_stopped:
                 from experiments.jobs.claims import release_session_claims
 
                 release_session_claims(claim_session)
@@ -369,7 +376,12 @@ def main() -> int:
     start.add_argument("--stall-minutes", type=positive, default=30)
     start.add_argument("--quiet-hours", type=positive)
     start.add_argument("--claim-gpu", help="GPU UUID to claim, or 'auto' for first free device")
-    start.add_argument("--cpu-threads", type=int, help="CPU threads to allocate under host cap")
+    start.add_argument(
+        "--cpu-threads",
+        type=int,
+        required=True,
+        help="Positive CPU threads to allocate under host cap (required for every monitored job)",
+    )
     start.add_argument("--claims-dir", type=Path, help="Explicit claims directory")
     start.add_argument("--command", nargs=argparse.REMAINDER, required=True)
     schedule = commands.add_parser("schedule")
@@ -396,8 +408,8 @@ def main() -> int:
         )
         write_json(directory / "policy.json", policy)
         return 0
-    if args.claim_gpu and args.cpu_threads is None:
-        parser.error("--cpu-threads is required when --claim-gpu is specified (all GPU jobs require explicit CPU allowance)")
+    if args.cpu_threads <= 0:
+        parser.error("--cpu-threads must be positive")
     command = args.command[1:] if args.command[:1] == ["--"] else args.command
     if not command:
         parser.error("a command is required after --")

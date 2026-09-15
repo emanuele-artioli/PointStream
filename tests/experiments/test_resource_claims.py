@@ -19,6 +19,7 @@ import sqlite3  # noqa: F401 -- host ABI ordering
 import concurrent.futures
 import os
 from pathlib import Path
+import signal
 import subprocess
 import sys
 import time
@@ -45,6 +46,7 @@ from experiments.jobs.claims import (
     is_claim_active,
     launch,
     read_json_safe,
+    query_gpus,
     release_cpu_claim,
     release_device_claim,
     run_supervised,
@@ -250,6 +252,13 @@ def test_retained_claims_while_child_runs(tmp_path: Path) -> None:
 
     # While child is running, competing acquire must fail
     assert proc.poll() is None
+    status = get_claims_status(claims_dir)
+    assert status["devices"][0]["child_pid"] == proc.pid
+    assert status["devices"][0]["child_proc_start_time"] is not None
+    assert status["devices"][0]["process_group_id"] == proc.pid
+    cpu_allocation = next(iter(next(iter(status["cpu_hosts"].values()))["allocations"].values()))
+    assert cpu_allocation["child_pid"] == proc.pid
+    assert cpu_allocation["process_group_id"] == proc.pid
     with pytest.raises(DeviceClaimConflictError):
         acquire_device_claim(
             device_uuid=target_uuid,
@@ -495,6 +504,13 @@ def test_monitor_supervise_integration(tmp_path: Path) -> None:
     # Verify status.json shows complete
     status = monitor.read_json(job_dir / "status.json")
     assert status["status"] == "complete"
+    assert status["pid"] > 0
+    assert status["proc_start_time"] is not None
+    assert status["process_group_id"] == status["pid"]
+    persisted_claim = monitor.read_json(job_dir / "claim.json")
+    assert persisted_claim["child_pid"] == status["pid"]
+    assert persisted_claim["child_proc_start_time"] == status["proc_start_time"]
+    assert persisted_claim["process_group_id"] == status["pid"]
 
     # Verify child saw isolated CUDA_VISIBLE_DEVICES and thread cap
     import json
@@ -766,6 +782,17 @@ def test_is_claim_active_priority_over_status_file(tmp_path: Path) -> None:
     remote_claim["host"] = "other-host.domain"
     assert is_claim_active(remote_claim) is None
 
+    # A dead local supervisor with a non-terminal job and no persisted child
+    # identity is unresolved, not reclaimable.
+    write_json_atomic(job_dir / "status.json", {"status": "running"})
+    unknown_child_claim = {
+        "token": "unknown-child-token",
+        "host": get_canonical_host(),
+        "pid": 4194300,
+        "job_dir": str(job_dir),
+    }
+    assert is_claim_active(unknown_child_claim) is None
+
 
 def test_occupancy_query_fail_closed_and_pre_popen_recheck(tmp_path: Path) -> None:
     """Blocker 4: Missing UUID or failed query must fail closed / defer (raise DeviceUnavailableError).
@@ -825,6 +852,83 @@ def test_occupancy_query_fail_closed_and_pre_popen_recheck(tmp_path: Path) -> No
     assert len(status["devices"]) == 0
     for host_info in status["cpu_hosts"].values():
         assert len(host_info.get("allocations", {})) == 0
+
+
+def test_partial_gpu_occupancy_query_failure_is_not_free(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """GPU properties alone must not mask a failed compute-process query."""
+    from experiments.jobs import claims as claims_mod
+
+    def partial_query(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        if "--query-gpu=index,uuid,name,memory.free,memory.total" in command:
+            return subprocess.CompletedProcess(
+                command,
+                0,
+                stdout="0, GPU-partial-query, Test GPU, 12000, 16000\n",
+                stderr="",
+            )
+        raise subprocess.TimeoutExpired(command, 10)
+
+    monkeypatch.setattr(claims_mod, "query_gpus", query_gpus)
+    monkeypatch.setattr(claims_mod.subprocess, "run", partial_query)
+
+    assert query_gpus() == []
+    with pytest.raises(DeviceUnavailableError, match="not found or probe failed"):
+        acquire_device_claim(
+            device_uuid="GPU-partial-query",
+            claims_dir=tmp_path / "claims",
+        )
+
+
+def test_normal_leader_exit_reaps_term_ignoring_descendant_before_release(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Normal leader exit must not release claims while its process group survives."""
+    from experiments.jobs import claims as claims_mod
+
+    claims_dir = tmp_path / "claims"
+    descendant_pid_file = tmp_path / "descendant.pid"
+    child_code = (
+        "import os, signal, time\n"
+        "signal.signal(signal.SIGTERM, signal.SIG_IGN)\n"
+        f"open(r'{descendant_pid_file}', 'w').write(str(os.getpid()))\n"
+        "time.sleep(30)\n"
+    )
+    leader_code = (
+        "import subprocess, sys, time\n"
+        f"subprocess.Popen([sys.executable, '-c', {child_code!r}])\n"
+        f"marker = r'{descendant_pid_file}'\n"
+        "\nfor _ in range(100):\n"
+        "    if __import__('os').path.exists(marker): break\n"
+        "    time.sleep(0.01)\n"
+    )
+
+    original_reap = claims_mod.terminate_and_reap_process_group
+    original_killpg = claims_mod.os.killpg
+    sent_signals: list[signal.Signals] = []
+
+    def fast_reap(process: subprocess.Popen[Any]) -> bool:
+        return original_reap(process, sigterm_timeout=0.2, sigkill_timeout=2.0)
+
+    def recording_killpg(pgid: int, sig: signal.Signals) -> None:
+        sent_signals.append(sig)
+        original_killpg(pgid, sig)
+
+    monkeypatch.setattr(claims_mod, "terminate_and_reap_process_group", fast_reap)
+    monkeypatch.setattr(claims_mod.os, "killpg", recording_killpg)
+
+    assert run_supervised(
+        [sys.executable, "-c", leader_code],
+        cpu_threads=1,
+        claims_dir=claims_dir,
+        available_cores=4,
+    ) == 0
+    assert signal.SIGTERM in sent_signals
+    assert signal.SIGKILL in sent_signals
+    assert descendant_pid_file.exists()
+    status = get_claims_status(claims_dir)
+    assert all(not host["allocations"] for host in status["cpu_hosts"].values())
 
 
 def test_cpu_cgroup_quota_load_and_mandatory_allowance(tmp_path: Path) -> None:
@@ -896,4 +1000,3 @@ def test_cpu_cgroup_quota_load_and_mandatory_allowance(tmp_path: Path) -> None:
         assert env["POLARS_MAX_THREADS"] == "4"
         assert env["PS_CPU_ALLOWANCE"] == "4"
         assert env["PS_NUM_WORKERS"] == "4"
-
