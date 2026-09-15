@@ -31,6 +31,7 @@ from experiments.tier.protocol import (
     capture_current_identity,
     evaluate_confirmation_protocol,
 )
+from experiments.tier.source_count_policy import load_required_matches
 from experiments.tier.resolution_adaptive import (
     HIGH_FIDELITY_RESIDUAL_RUNGS,
     OVERLAP_RESIDUAL_RUNGS,
@@ -260,7 +261,7 @@ def run_development_pilot(
         all_alarms,
         identity=identity,
         is_pilot=True,
-        required_matches=6,
+        required_matches=load_required_matches("development_pilot"),
     )
 
     final_report = {

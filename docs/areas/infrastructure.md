@@ -1,13 +1,5 @@
 # Infrastructure Area
 
-## Current acquisition / integration review
-
-R0 `d39893c` is not accepted: CPU-only reproductions allow TTL takeover of a
-live mutex, claim release with a surviving child, inactive classification of a
-live interrupted owner and claiming an absent GPU. R0R repairs those specific
-paths and incomplete CPU accounting before any new GPU readiness workload.
-The worker's Complete label is not coordinator acceptance.
-
 ## Coordinator follow-up — E01/E02
 
 Atomic resource claims are a missing prerequisite for GPU readiness probes.

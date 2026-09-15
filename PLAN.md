@@ -1,9 +1,6 @@
 # PointStream Area Index & Active Plan
 
-Current coordination: **15 September 2026**; shared main before handoff docs `83c75ed`.
-Start with the [coordinator handoff](docs/workflow/session/evaluation-campaign/handoff-20260915.md).
-Latest worker reports await acceptance; prior reproduced defects are not assumed
-to persist in their new heads.
+Current coordination: **14 September 2026**, code baseline `2f63ae1` (#105); E01 #104 remains open.
 Submission **30 September**; provisional evidence freeze **20 September**.
 The [evaluation campaign](docs/workflow/session/evaluation-campaign/plan.md) is the
 authoritative plan incorporating the user's full evaluation design and resource
@@ -20,21 +17,21 @@ policy. The September 12 handoff/audit are historical context, not dispatches.
 | [Infrastructure](docs/areas/infrastructure.md) | Existing detached monitoring; verify host availability at each launch | Per-host CPU <=90% available; any free GPU; no cleanup helper |
 | [Paper](docs/areas/paper.md) | Separate repo; no new competitive evidence certified by repairs | E08 setup/structure early, final claims after accepted results |
 
-## Current boundary — handoff for acceptance review
+## Current assignments after coordinator review
 
-| Owner | PR / head | Verified state | Next action |
+| Task | Owner | State | Scope |
 |---|---|---|---|
-| Cursor | #104 `9d56303` | Open; CI green | Accept E03A contract/mapping/pin, then release prepared anchor card |
-| Antigravity resource lane | #108 `287c2eb` | Open; CI green | Verify actual claim lifecycle, resolve lease-versus-liveness report discrepancy |
-| Antigravity generation lane | #109 `013a4c8` | Open; CI green | Verify reported trainer continuation and seven-corner control evidence |
+| [E01R](docs/workflow/session/evaluation-campaign/tasks/01r-contract-and-acquisition.md) | Cursor | Ready | Correct claim ingestion in #104; acquire reserved trio without scoring |
+| [E02R](docs/workflow/session/evaluation-campaign/tasks/02r-readiness-evidence.md) | Antigravity | Ready | Real adapter/control integration, residual-off path, checkpoint/resume proof |
+| [R0](docs/workflow/session/evaluation-campaign/tasks/00-resource-claims.md) | Antigravity subagent | Ready, separate worktree | Atomic host/device and aggregate CPU claims before GPU probe |
 
-Three reserved matches acquired; media/report/log hashes independently verified.
-Eligibility remains pending and no confirmation scoring reported. Full-trajectory
-execution verified earlier; latest claimed controls/resume fixes need review.
-No new experiments or code merges in handoff preparation. E05 remains unreleased.
+E01 inventory/count target accepted in part; schema/evidence acceptance pending.
+E02 #105 merged and CI passed, but real neural readiness is not established.
+Three fresh confirmation matches accepted as a target/shortlist; acquired count
+remains zero. The two old scored matches stay exposed. See the campaign's
+coordinator decision and scoped corrections; do not repeat the entire audit.
+E03/E04 can prepare CPU inputs/tools, with measured probes after contract and
+resource acceptance. E05 remains gated on actual readiness. No experiment jobs
+launched by this coordinator review. Workers return here for the next assignment.
 
-Next session reviews these revisions, merges acceptable work, then releases
-bounded E03/E04 independently of any remaining E05 readiness issue. Do not repeat
-acquisition or the full old matrix. Gate A open; confirmation incomplete; paper
-unchanged. The handoff records exact worktrees, missing evidence pointers and
-resource-visibility limits. Keep active decisions on shared main.
+Gate A remains open and confirmation incomplete. Only coordinator edits this index.
