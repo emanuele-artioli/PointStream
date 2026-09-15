@@ -1,21 +1,17 @@
 # Data Area
 
-## Current acquisition / integration review
-
-Acquisition accepted complete: three media files and report/log digests verified
-against Cursor #104 head `7e4da6e` acquisition pointers. All are 1080p, reserved,
-unscored and not yet confirmation-eligible. E03A checks actual local timestamp
-origin after stream-copy cuts, event overlap and score-free scene eligibility;
-no repeat downloads. Higher-resolution confirmation cannot be claimed from these
-assets. The older zero-acquired counts below are historical.
-
 ## Coordinator follow-up — E01/E02
 
-Coordinator accepts three fresh matches as the target and the proposed trio as
-an acquisition shortlist; none are acquired/confirmed eligible yet. E01R starts
-bounded acquisition now, without scoring. Remove any fallback treating the two
-exposed sources as fresh/restricted held-out confirmation. Actual source split
-and quality criterion remain subject to the evidence checks in E01R.
+Coordinator accepts three fresh matches as the target. E01R acquired three
+bounded windows (no scores). Eligible confirmation count remains 0 pending
+event/overlap/freeze checks. Pointer:
+`manifests/evaluation_20260914_e01r_acquisition.json`. Stream-copy windows
+begin on non-keyframes; I-frame preroll is in
+`manifests/evaluation_20260915_e03a_confirmation_timestamps.json`. The
+source-count policy does not fall back to exposed Gate B sources. Training
+selectors exclude validation blocks and reserved confirmation IDs. Proposed
+practical quality criterion uses calibrated development severe-degradation
+anchors, not VMAF 20 as a floor.
 
 ## Current campaign — 14 September 2026
 
@@ -25,6 +21,14 @@ submission objective. Six remains preferred; select and record the largest
 feasible untouched set prospectively, with explicit small-sample limitations and
 matching manifest/verifier policy before scoring. Old source exposure remains.
 Secondary-domain evaluation stays required, after the tennis advantage.
+
+**E01 split (E01R).** Seven BP46 videos remain development. The two Gate B
+matches are already scored and are not a holdout. Three reserved matches now
+have unscored 15-minute windows on disk (`acquired=3`, `eligible=0`).
+`required_matches=3` with small-sample limits in
+`manifests/evaluation_20260914_source_count_policy.json`. Scene easy/hard splits
+use camera MAD, not quality scores. Coordinator must still freeze eligibility
+before any confirmation scoring.
 
 **Evidence Revision**: Reconciled through PR #63 (`5ca87b2ee4`) and PR #72.
 **Owned Scope**: Data acquisition, manifest definitions, eligibility criteria, sequence splits, domain definitions.

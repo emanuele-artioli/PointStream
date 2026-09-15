@@ -5,8 +5,8 @@ Implements EVAL-ACT-06 protocol validator:
   vvencapp 1.11.0), model hashes, manifest digest, metric versions, and runtime policy.
 - Fail-closed protocol enforcement: requires evidence of actual client-output scoring,
   measured full wire cost, calibrated metrics/nulls, source eligibility, and uncertainty.
-- Rejection of empty inputs, missing anchors, incomplete/duplicate sources (six independent
-  matches required for Gate B, non-overlap curves unscorable).
+- Rejection of empty inputs, missing anchors, incomplete/duplicate sources (independent
+  match count from the versioned source-count policy, non-overlap curves unscorable).
 - Explicit pilot vs confirmation labeling: pilot completion cannot imply confirmation.
 """
 
@@ -23,6 +23,12 @@ from typing import Any
 import numpy as np
 
 from experiments.tier.gate_a_tools import resolve_tool_specs
+from experiments.tier.source_count_policy import (
+    Stage,
+    confirmation_label,
+    load_required_matches,
+    policy_identity,
+)
 
 
 @dataclass(frozen=True)
@@ -43,6 +49,7 @@ class ExperimentIdentity:
     model_hashes: dict[str, str] = field(default_factory=dict)
     metric_versions: dict[str, str] = field(default_factory=dict)
     runtime_policy: dict[str, Any] = field(default_factory=dict)
+    source_count_policy: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -56,6 +63,7 @@ class ExperimentIdentity:
             "model_hashes": self.model_hashes,
             "metric_versions": self.metric_versions,
             "runtime_policy": self.runtime_policy,
+            "source_count_policy": self.source_count_policy,
         }
 
     def fingerprint(self) -> str:
@@ -186,6 +194,7 @@ def capture_current_identity(
         model_hashes=model_hashes or {},
         metric_versions=capture_metric_versions(),
         runtime_policy=policy,
+        source_count_policy=policy_identity(),
     )
 
 
@@ -200,7 +209,7 @@ class ProtocolEvidence:
     - calibrated_metrics: proof that metric anchors (identical, mild, severe, unrelated) were evaluated
       and passed ordering and scale checks
     - calibrated_nulls: proof that temporal/spatial null controls were evaluated
-    - source_eligibility: proof that sources are eligible (minimum 6 independent matches for Gate B)
+    - source_eligibility: proof that sources meet the versioned independent-match policy
     - source_uncertainty: proof that source-level uncertainty was evaluated across independent sources
     """
 
@@ -339,7 +348,7 @@ def evaluate_confirmation_protocol(
     expected_identity: ExperimentIdentity | dict[str, Any] | None = None,
     evidence: ProtocolEvidence | dict[str, Any] | None = None,
     is_pilot: bool = True,
-    required_matches: int = 6,
+    required_matches: int | None = None,
 ) -> dict[str, Any]:
     """Comprehensive, fail-closed evaluation protocol for Gate B and development pilots.
 
@@ -348,7 +357,7 @@ def evaluate_confirmation_protocol(
     2. Verification of source eligibility and independent-source count:
        scene IDs do NOT identify independent matches; multiple scenes from the same
        match count once toward the independent match count.
-       Gate B confirmation requires >= 6 independent matches.
+       Gate B confirmation uses load_required_matches("confirmation").
     3. Rejection of missing anchors (both AV1 and VVC required for every source).
     4. Rejection of unscorable / non-overlapping curves (no BD-rate extrapolation).
     5. Identity matching: config, tool builds/presets, manifest, model hashes.
@@ -358,6 +367,9 @@ def evaluate_confirmation_protocol(
        pilot completion CANNOT imply confirmation (`is_pilot=True` always sets `gate_b_passed=False`).
     """
     blockers: list[str] = []
+    if required_matches is None:
+        stage: Stage = "development_pilot" if is_pilot else "confirmation"
+        required_matches = load_required_matches(stage)
 
     # 1. Reject empty inputs
     if not sources:
@@ -370,6 +382,8 @@ def evaluate_confirmation_protocol(
             "confirmation_blockers": blockers,
             "n_sources": 0,
             "n_unique_matches": 0,
+            "required_matches": required_matches,
+            "source_count_label": confirmation_label(required_matches),
         }
 
     # 2. Check independent source count & duplicate rejection
@@ -477,4 +491,6 @@ def evaluate_confirmation_protocol(
         "source_uncertainty": uncertainty,
         "identity_verified": (expected_identity is not None and identity is not None and len([b for b in blockers if "identity" in b]) == 0),
         "evidence_verified": (evidence_obj is not None and len([b for b in blockers if "evidence" in b or "missing" in b]) == 0),
+        "required_matches": required_matches,
+        "source_count_label": confirmation_label(required_matches),
     }
