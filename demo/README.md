@@ -48,10 +48,29 @@ demo/
 │   ├── run_comparison.py          # End-to-end benchmark comparing PointStream vs AV1
 │   └── plot_rd_curves.py          # Generates Pareto Rate-Distortion and Teleop utility curves
 └── pitch/
-    ├── figure_ai_pitch_draft.md   # Complete email pitch draft for Sam Baker & Max Berman
-    ├── side_by_side_video.py      # Stitches 3-panel split video (Reference vs AV1 vs PointStream)
-    └── interactive_report.html    # Interactive HTML demo visualizer
+    ├── figure_ai_pitch_draft.md   # Email pitch draft
+    ├── side_by_side_video.py      # Stitches 3-panel video (Reference vs AV1 vs PointStream)
+    ├── interactive_demo.html      # Inspector page (source; do not copy by hand)
+    ├── interactive_report.html    # Static report page (source)
+    └── publish_site.py            # Builds the public folder from JSON + HTML + media
 ```
+
+### Where numbers and the website live
+
+There are **not** two competing result dumps. They have different jobs:
+
+| Path | What it is |
+| --- | --- |
+| `demo/outputs/results/comparison_results.json` | **Source of truth for numbers.** The rest of `results/` is local scratch (decoded clips, etc.) and is gitignored. |
+| `demo/pitch/*.html` | **Source of truth for the demo pages.** Edit here. |
+| `demo/outputs/pitch/*.mp4` and `keypoints_*.json` | **Source of truth for media** (too heavy to rebuild on GitHub Actions). |
+| `demo/outputs/pitch/*.html` and `*.png` | **Generated** by `publish_site.py`. Do not edit. Gitignored. |
+
+```bash
+PYTHONPATH=. python demo/pitch/publish_site.py
+```
+
+A push to `main` that touches any of those inputs deploys to [emanueleartioli.com/pointstream](https://emanueleartioli.com/pointstream/).
 
 ---
 
@@ -89,10 +108,7 @@ PYTHONPATH=. /home/itec/emanuele/.conda/envs/pointstream/bin/python demo/pitch/s
 ```
 
 ### 5. Review Deliverables for Figure.ai
-- **Email Draft**: [demo/pitch/figure_ai_pitch_draft.md](file:///home/itec/emanuele/pointstream/demo/pitch/figure_ai_pitch_draft.md)
-- **Interactive Report**: [demo/pitch/interactive_report.html](file:///home/itec/emanuele/pointstream/demo/pitch/interactive_report.html)
-- **Benchmark Results JSON**: `demo/outputs/results/comparison_results.json`
-- **Side-by-Side Video**: `demo/outputs/pitch/side_by_side_demo_clip_02_factory001_worker001_00002.mp4`
-
-Live copy of `demo/outputs/pitch` (auto-deploys from `main`): [emanueleartioli.com/pointstream](https://emanueleartioli.com/pointstream/)
-
+- **Benchmark JSON (numbers)**: `demo/outputs/results/comparison_results.json`
+- **Demo pages (markup)**: `demo/pitch/interactive_demo.html`, `demo/pitch/interactive_report.html`
+- **Stacked videos (media)**: `demo/outputs/pitch/side_by_side_demo_*.mp4`
+- **Live site**: [emanueleartioli.com/pointstream](https://emanueleartioli.com/pointstream/) — assembled by `demo/pitch/publish_site.py` on each `main` push
