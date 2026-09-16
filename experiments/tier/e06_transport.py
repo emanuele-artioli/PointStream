@@ -217,9 +217,9 @@ def reconcile_ledger(
     }
 
 
-def reconstruct_standalone(payload: bytes) -> np.ndarray:
+def reconstruct_standalone(payload: bytes, timings: dict[str, float] | None = None) -> np.ndarray:
     frames = np.asarray(
-        reconstruct_serialized_client(payload, require_compressed=True),
+        reconstruct_serialized_client(payload, require_compressed=True, timings=timings),
         dtype=np.uint8,
     )
     if frames.ndim != 4 or frames.shape[-1] != 3:

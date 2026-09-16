@@ -704,6 +704,27 @@ def campaign_record_from_generation_adapter(raw: Mapping[str, Any]) -> dict[str,
     decode_ok = _control_success(decode_status, "standalone_decode")
     calib_ok = _control_success(calib_status, "metric_calibration")
     ledger_ok = _control_success(ledger_status, "wire_ledger")
+    blank_tested = bool(controls_in.get("no_conditioning_tested"))
+    generation_on = bool(raw.get("generation_on", raw.get("backend_name")))
+    model_free = bool(raw.get("model_free"))
+    raw_deployment = raw.get("deployment")
+    deployment: dict[str, Any] = dict(raw_deployment) if isinstance(raw_deployment, dict) else {}
+    if model_free:
+        deployment_ok = True
+        blank_ok = True
+    else:
+        mode = str(deployment.get("mode") or "")
+        if mode == "shared":
+            deployment_ok = bool(deployment.get("receiver_availability")) and bool(
+                deployment.get("amortization_policy")
+            ) and deployment.get("storage_bytes") is not None
+        elif mode == "per_video":
+            charged = deployment.get("charged_bytes", deployment.get("storage_bytes"))
+            deployment_ok = _positive_rate(charged)
+        else:
+            deployment_ok = False
+        blank_ok = (not generation_on) or blank_tested
+    rd_ok = bool(rd_measured and decode_ok and calib_ok and ledger_ok and deployment_ok and blank_ok)
 
     n_repeats = timing.get("n_repeats", timing.get("sample_count"))
     host = timing.get("host") or timing.get("profiling_strata")
@@ -740,6 +761,17 @@ def campaign_record_from_generation_adapter(raw: Mapping[str, Any]) -> dict[str,
             exclusions.append({"claim": "rd", "reason": reason})
         elif isinstance(reason, dict) and reason.get("claim") and reason.get("reason"):
             exclusions.append({"claim": str(reason["claim"]), "reason": str(reason["reason"])})
+    if not deployment_ok:
+        exclusions.append(
+            {
+                "claim": "rd",
+                "reason": "undeclared model deployment cost; checkpoint digest is not delivered weights",
+            }
+        )
+    if not blank_ok:
+        exclusions.append(
+            {"claim": "rd", "reason": "missing blank/no-conditioning control"}
+        )
     if rd_measured and not (decode_ok and calib_ok and ledger_ok):
         exclusions.append(
             {
@@ -801,7 +833,7 @@ def campaign_record_from_generation_adapter(raw: Mapping[str, Any]) -> dict[str,
         "trajectory_coverage": raw.get("trajectory_coverage") or "unspecified",
         "delivered_shape": shape,
         "claim_eligibility": {
-            "rd": rd_measured,
+            "rd": rd_ok,
             "runtime": runtime_ok,
             "standalone_transport": transport_ok,
             "trajectory": trajectory_ok,

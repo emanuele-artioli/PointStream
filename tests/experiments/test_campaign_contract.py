@@ -252,7 +252,8 @@ def test_e02_adapter_output_requires_campaign_mapping(tmp_path: Path) -> None:
     validated = ingest_for_claim([mapped], "rd", purpose="validated")
     assert validated["n_kept"] == 0
     diagnostic = ingest_for_claim([mapped], "rd", purpose="diagnostic")
-    assert diagnostic["n_kept"] == 1
+    assert diagnostic["n_kept"] == 0
+    assert mapped["claim_eligibility"]["rd"] is False
 
 
 def test_producer_examples_and_identity_pin_policy() -> None:
@@ -521,7 +522,8 @@ def test_producer_scores_timing_parts_map_into_campaign_record(tmp_path: Path) -
     validated = ingest_for_claim([mapped], "rd", purpose="validated")
     assert validated["n_kept"] == 0
     diagnostic = ingest_for_claim([mapped], "rd", purpose="diagnostic")
-    assert diagnostic["n_kept"] == 1
+    assert diagnostic["n_kept"] == 0
+    assert mapped["claim_eligibility"]["rd"] is False
 
 
 def test_artifact_sha256_uses_file_bytes_not_canonical_json(tmp_path: Path) -> None:

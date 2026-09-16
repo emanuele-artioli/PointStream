@@ -4,10 +4,11 @@
 
 E06/#121 is merged (`c656ee6`, launch `def647a`). Four saved transport reports,
 ledgers and hashes match; accept stopping this configuration as a codec win search.
-No broad win/BD-rate follows. Separate client timing is absent. Next work is
-lossless packaging and client profiling on saved payloads, plus claim eligibility
-that respects missing calibration/control/deployment evidence. No native re-encodes.
-Follow [the reuse assignments](../workflow/session/evaluation-campaign/tasks/20260916-return-audit-and-reuse.md).
+No broad win/BD-rate follows. Derived lossless packing and client deserialize/decode/render
+timing live under `outputs/evaluation-20260914/e06/audit-20260916-lossless-pack/`.
+Claim eligibility now fails closed on missing calibration, blank controls, undeclared
+deployment cost, and combined encoder+score seconds. Follow
+[the reuse assignments](../workflow/session/evaluation-campaign/tasks/20260916-return-audit-and-reuse.md).
 
 
 ## Historical conditional release — 16 September 2026

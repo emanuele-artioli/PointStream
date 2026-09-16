@@ -208,3 +208,93 @@ def test_residual_on_changes_pixels_and_r_positive() -> None:
     standalone = reconstruct_standalone(payload)
     np.testing.assert_array_equal(on_pixels, standalone)
     assert not np.array_equal(on_pixels, off)
+
+
+def test_compact_pack_matches_pixels_and_keeps_native_stored() -> None:
+    from experiments.tier.e06_pack import pack_lossless_compact, zip_inventory
+
+    frames, masks = _toy()
+    view, _b = _jpeg_background(frames)
+    payload = serialize_setting(
+        background=view,
+        frames=frames,
+        masks=masks,
+        predictor=PREDICTOR_PER_FRAME,
+        residual=None,
+    )
+    compact = pack_lossless_compact(payload)
+    inventory = zip_inventory(compact)
+    assert inventory["transport_total"] == len(compact)
+    assert inventory["stored_native_bytes"] > 0
+    original = reconstruct_standalone(payload)
+    packed = reconstruct_standalone(compact)
+    np.testing.assert_array_equal(original, packed)
+    timings: dict[str, float] = {}
+    timed = reconstruct_standalone(compact, timings=timings)
+    np.testing.assert_array_equal(original, timed)
+    assert "deserialize_s" in timings
+    assert "composite_render_s" in timings
+
+
+def test_derive_claim_eligibility_does_not_upgrade_missing_controls() -> None:
+    from src.runner.generation_adapter import derive_claim_eligibility
+
+    flags, reasons = derive_claim_eligibility(
+        metrics={"total_bytes": 1000, "psnr_mean": 24.0},
+        controls={
+            "conditioned_vs_shuffled_tested": True,
+            "conditioning_sensitive": True,
+            "same_seed_determinism_tested": True,
+            "same_seed_deterministic": True,
+        },
+        timing_evidence={"measured_client_seconds": 1.2, "profiling_strata": "gpu5"},
+        generation_on=True,
+        model_free=False,
+    )
+    assert flags["rd_claim"] is False
+    assert flags["speed_claim"] is False
+    assert any("calibration" in item for item in reasons)
+    assert any("deployment" in item for item in reasons)
+    assert any("blank" in item for item in reasons)
+
+    complete, _ = derive_claim_eligibility(
+        metrics={"total_bytes": 1000, "psnr_mean": 24.0},
+        controls={
+            "metric_calibration": "inherited_named_artifact",
+            "no_conditioning_tested": True,
+            "conditioned_vs_shuffled_tested": True,
+            "conditioning_sensitive": True,
+            "same_seed_determinism_tested": True,
+            "same_seed_deterministic": True,
+        },
+        timing_evidence={
+            "measured_client_seconds": 1.2,
+            "profiling_strata": "gpu5",
+            "n_repeats": 3,
+            "stages": {"deserialize_s": 0.01},
+        },
+        deployment={"mode": "per_video", "charged_bytes": 217736406},
+        generation_on=True,
+        model_free=False,
+    )
+    assert complete["rd_claim"] is True
+    assert complete["speed_claim"] is True
+
+    rd_only, speed_reasons = derive_claim_eligibility(
+        metrics={"total_bytes": 1000, "psnr_mean": 24.0},
+        controls={
+            "metric_calibration": "verified",
+            "no_conditioning_tested": True,
+            "conditioned_vs_shuffled_tested": True,
+            "conditioning_sensitive": True,
+            "same_seed_determinism_tested": True,
+            "same_seed_deterministic": True,
+        },
+        timing_evidence={},
+        deployment={"mode": "per_video", "charged_bytes": 10},
+        generation_on=True,
+        model_free=False,
+    )
+    assert rd_only["rd_claim"] is True
+    assert rd_only["speed_claim"] is False
+    assert any("stratum" in item for item in speed_reasons)
