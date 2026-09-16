@@ -31,6 +31,7 @@ import os
 from pathlib import Path
 import struct
 import subprocess
+import tempfile
 import time
 from typing import Any, Final
 
@@ -40,9 +41,11 @@ import numpy as np
 from experiments.long_scenes.loader import load_long_scene_clip
 from src.components.background.plate import build_plate
 from src.components.background.sidecar import IntraCodecSidecar
+from src.components.codec import tools as codec_tools
 from src.components.codec.frames import rgb_to_luma
 from src.components.codec.measure import timed_roundtrip
-from src.components.metrics.ssim import SsimMetric, masked_ssim
+from src.components.metrics.frames import paired
+from src.components.metrics.ssim import SsimMetric
 from src.contracts import paths as ps_paths
 from src.contracts.codecs import EncodeRequest, RateControl
 
@@ -463,6 +466,49 @@ def masked_luma_psnr(
     return 10.0 * float(np.log10((255.0**2) / mse))
 
 
+def _global_ssim(reference: np.ndarray, predicted: np.ndarray, c1: float, c2: float) -> float:
+    mu_x = float(reference.mean())
+    mu_y = float(predicted.mean())
+    var_x = float(reference.var())
+    var_y = float(predicted.var())
+    cov = float(((reference - mu_x) * (predicted - mu_y)).mean())
+    numerator = (2.0 * mu_x * mu_y + c1) * (2.0 * cov + c2)
+    denominator = (mu_x**2 + mu_y**2 + c1) * (var_x + var_y + c2)
+    return numerator / denominator
+
+
+def safe_masked_ssim(
+    reference: np.ndarray,
+    predicted: np.ndarray,
+    mask: np.ndarray,
+) -> float:
+    """Compute global masked SSIM safely, returning float('nan') on empty masks without warnings."""
+    ref, pred = paired(reference, predicted)
+    selected = np.asarray(mask, dtype=bool)
+    if selected.ndim == 2:
+        selected = np.broadcast_to(selected, (ref.shape[0], *selected.shape))
+    if selected.shape != ref.shape[:3]:
+        raise ValueError(f"mask shape {selected.shape} does not match clip {ref.shape[:3]}")
+
+    c1 = (0.01 * 255.0) ** 2
+    c2 = (0.03 * 255.0) ** 2
+
+    values: list[float] = []
+    for idx in range(ref.shape[0]):
+        m = selected[idx]
+        if np.count_nonzero(m) == 0:
+            continue
+        channels = [
+            _global_ssim(ref[idx, :, :, ch][m], pred[idx, :, :, ch][m], c1, c2)
+            for ch in range(ref.shape[-1])
+        ]
+        values.append(float(sum(channels) / len(channels)))
+
+    if not values:
+        return float("nan")
+    return float(sum(values) / len(values))
+
+
 def compute_metrics(
     reference_rgb: np.ndarray,
     predicted_rgb: np.ndarray,
@@ -471,7 +517,7 @@ def compute_metrics(
     """Compute PSNR-Y and SSIM on visible background (~mask) and full frame."""
     visible_mask = ~masks
     psnr_y_visible = masked_luma_psnr(reference_rgb, predicted_rgb, visible_mask)
-    ssim_visible = masked_ssim(reference_rgb, predicted_rgb, visible_mask)
+    ssim_visible = safe_masked_ssim(reference_rgb, predicted_rgb, visible_mask)
 
     # Full frame diagnostics
     ref_y = rgb_to_luma(reference_rgb)
@@ -641,6 +687,232 @@ def unpack_side_data(
             "fps": fps,
         }
     raise ValueError(f"Unknown representation {rep_name}")
+
+
+def decode_standalone_representation(
+    bitstream_path: Path,
+    side_data_path: Path,
+    codec: str = "vvc",
+) -> tuple[np.ndarray, dict[str, Any]]:
+    """Decode background representation using strictly bitstream and serialized side data.
+
+    The client has NO access to original geometry or frame count; all dimensions,
+    frame counts, fps, and homographies must be unpacked from side_data_path.
+
+    Returns:
+        (rendered_frames, timing_metadata)
+        where rendered_frames is uint8 RGB of shape (n_frames, height, width, 3).
+    """
+    bitstream_path = Path(bitstream_path)
+    side_data_path = Path(side_data_path)
+    if not bitstream_path.is_file():
+        raise FileNotFoundError(f"Bitstream file not found: {bitstream_path}")
+    if not side_data_path.is_file():
+        raise FileNotFoundError(f"Side data file not found: {side_data_path}")
+
+    side_bytes = side_data_path.read_bytes()
+    ffmpeg = codec_tools.resolve_ffmpeg()
+
+    # Case A: 10-byte side data (still_frame0 or cleaned_video)
+    if len(side_bytes) == 10:
+        (frame_h, frame_w), n_frames, fps = unpack_still_or_video_side_data(side_bytes)
+        single_frame_bytes = frame_h * frame_w * 3
+        expected_video_bytes = n_frames * single_frame_bytes
+
+        # Decode via anchor decode path: lossless ffv1 intermediate at yuv420p
+        with tempfile.TemporaryDirectory(prefix="ps_standalone_dec_") as tmp_dir:
+            lossless_mkv = Path(tmp_dir) / "decoded.mkv"
+            t0_dec = time.perf_counter()
+            dec_cmd = [
+                ffmpeg.path,
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                "-y",
+                "-i",
+                str(bitstream_path),
+                "-pix_fmt",
+                "yuv420p",
+                "-c:v",
+                "ffv1",
+                str(lossless_mkv),
+            ]
+            sub = subprocess.run(dec_cmd, capture_output=True)
+            if sub.returncode != 0:
+                raise RuntimeError(
+                    f"Standalone decode failed ({sub.returncode}): {sub.stderr.decode('utf-8', 'replace')}"
+                )
+            t_decode = time.perf_counter() - t0_dec
+
+            raw_cmd = [
+                ffmpeg.path,
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                "-i",
+                str(lossless_mkv),
+                "-f",
+                "rawvideo",
+                "-pix_fmt",
+                "rgb24",
+                "-",
+            ]
+            raw_sub = subprocess.run(raw_cmd, capture_output=True)
+            if raw_sub.returncode != 0:
+                raise RuntimeError(
+                    f"Raw dump failed ({raw_sub.returncode}): {raw_sub.stderr.decode('utf-8', 'replace')}"
+                )
+            raw_bytes = raw_sub.stdout
+
+        # Distinguish still (single frame) from video (n_frames)
+        if len(raw_bytes) == single_frame_bytes:
+            # Still frame 0
+            t0_render = time.perf_counter()
+            frame0 = np.frombuffer(raw_bytes, dtype=np.uint8).reshape(frame_h, frame_w, 3)
+            rendered = np.broadcast_to(
+                frame0[np.newaxis, :, :, :], (n_frames, frame_h, frame_w, 3)
+            ).copy()
+            t_render = time.perf_counter() - t0_render
+            meta = {
+                "representation": "still_frame0",
+                "decoded_frames": 1,
+                "target_frames": n_frames,
+                "frame_shape": (frame_h, frame_w),
+                "fps": fps,
+                "decode_seconds": round(t_decode, 4),
+                "render_seconds": round(t_render, 4),
+                "total_client_seconds": round(t_decode + t_render, 4),
+                "rejected": False,
+            }
+            return rendered, meta
+
+        if len(raw_bytes) == expected_video_bytes:
+            # Video stream exactly matched
+            t0_render = time.perf_counter()
+            rendered = np.frombuffer(raw_bytes, dtype=np.uint8).reshape(n_frames, frame_h, frame_w, 3)
+            t_render = time.perf_counter() - t0_render
+            meta = {
+                "representation": "cleaned_video",
+                "decoded_frames": n_frames,
+                "target_frames": n_frames,
+                "frame_shape": (frame_h, frame_w),
+                "fps": fps,
+                "decode_seconds": round(t_decode, 4),
+                "render_seconds": round(t_render, 4),
+                "total_client_seconds": round(t_decode + t_render, 4),
+                "rejected": False,
+            }
+            return rendered, meta
+
+        if len(raw_bytes) < expected_video_bytes:
+            frames_decoded = len(raw_bytes) / single_frame_bytes
+            raise ValueError(
+                f"Truncated video stream in {bitstream_path.name}: decoded {len(raw_bytes)} bytes "
+                f"({frames_decoded:.2f} frames), expected {expected_video_bytes} bytes ({n_frames} frames). "
+                "Silent padding rejected."
+            )
+
+        if len(raw_bytes) > expected_video_bytes:
+            frames_decoded = len(raw_bytes) / single_frame_bytes
+            raise ValueError(
+                f"Extra frames in video stream in {bitstream_path.name}: decoded {len(raw_bytes)} bytes "
+                f"({frames_decoded:.2f} frames), expected {expected_video_bytes} bytes ({n_frames} frames). "
+                "Silent clipping rejected."
+            )
+
+    # Case B: Registered panorama side data (14 + 36 * N bytes)
+    if len(side_bytes) >= 14 and (len(side_bytes) - 14) % 36 == 0:
+        homographies, plate_shape, frame_shape, fps = unpack_panorama_side_data(side_bytes)
+        plate_h, plate_w = plate_shape
+        frame_h, frame_w = frame_shape
+        n_frames = len(homographies)
+
+        with tempfile.TemporaryDirectory(prefix="ps_standalone_dec_") as tmp_dir:
+            lossless_mkv = Path(tmp_dir) / "decoded.mkv"
+            t0_dec = time.perf_counter()
+            dec_cmd = [
+                ffmpeg.path,
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                "-y",
+                "-i",
+                str(bitstream_path),
+                "-pix_fmt",
+                "yuv420p",
+                "-c:v",
+                "ffv1",
+                str(lossless_mkv),
+            ]
+            sub = subprocess.run(dec_cmd, capture_output=True)
+            if sub.returncode != 0:
+                raise RuntimeError(
+                    f"Standalone plate decode failed ({sub.returncode}): {sub.stderr.decode('utf-8', 'replace')}"
+                )
+            t_decode = time.perf_counter() - t0_dec
+
+            raw_cmd = [
+                ffmpeg.path,
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                "-i",
+                str(lossless_mkv),
+                "-frames:v",
+                "1",
+                "-f",
+                "rawvideo",
+                "-pix_fmt",
+                "rgb24",
+                "-",
+            ]
+            raw_sub = subprocess.run(raw_cmd, capture_output=True)
+            if raw_sub.returncode != 0:
+                raise RuntimeError(
+                    f"Raw plate dump failed ({raw_sub.returncode}): {raw_sub.stderr.decode('utf-8', 'replace')}"
+                )
+            raw_bytes = raw_sub.stdout
+
+        expected_plate_bytes = plate_h * plate_w * 3
+        even_plate_h = plate_h - (plate_h % 2)
+        even_plate_w = plate_w - (plate_w % 2)
+        even_plate_bytes = even_plate_h * even_plate_w * 3
+
+        if len(raw_bytes) == expected_plate_bytes:
+            plate_rgb = np.frombuffer(raw_bytes, dtype=np.uint8).reshape(plate_h, plate_w, 3)
+        elif len(raw_bytes) == even_plate_bytes:
+            plate_rgb = np.frombuffer(raw_bytes, dtype=np.uint8).reshape(even_plate_h, even_plate_w, 3)
+        else:
+            raise ValueError(
+                f"Plate byte count mismatch in {bitstream_path.name}: got {len(raw_bytes)} bytes, "
+                f"expected {expected_plate_bytes} bytes for {plate_w}x{plate_h}"
+            )
+
+        t0_render = time.perf_counter()
+        rendered = np.stack(
+            [
+                warp_plate_to_frame(plate_rgb, homographies[t], height=frame_h, width=frame_w)
+                for t in range(n_frames)
+            ],
+            axis=0,
+        )
+        t_render = time.perf_counter() - t0_render
+
+        meta = {
+            "representation": "registered_panorama",
+            "decoded_frames": n_frames,
+            "target_frames": n_frames,
+            "plate_shape": (plate_h, plate_w),
+            "frame_shape": (frame_h, frame_w),
+            "fps": fps,
+            "decode_seconds": round(t_decode, 4),
+            "render_seconds": round(t_render, 4),
+            "total_client_seconds": round(t_decode + t_render, 4),
+            "rejected": False,
+        }
+        return rendered, meta
+
+    raise ValueError(f"Unrecognized side data format in {side_data_path.name}: length {len(side_bytes)} bytes")
 
 
 def charge_side_data(
