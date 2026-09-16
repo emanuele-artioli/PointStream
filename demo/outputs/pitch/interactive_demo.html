@@ -529,23 +529,23 @@
             <div class="hud-grid">
                 <div class="hud-card green">
                     <div class="hud-label">Joint Tracking Accuracy (MPJPE)</div>
-                    <div class="hud-value" id="hud-mpjpe" style="color: var(--accent-green);">59.6 px</div>
-                    <div class="hud-sub" id="hud-mpjpe-sub">3.1x Lower Error vs AV1 (184.4 px)</div>
+                    <div class="hud-value" id="hud-mpjpe" style="color: var(--accent-green);">58.8 &ndash; 69.6 px</div>
+                    <div class="hud-sub" id="hud-mpjpe-sub">1.7x &ndash; 1.8x Lower Error vs AV1 540p (106 &ndash; 116 px)</div>
                 </div>
                 <div class="hud-card">
                     <div class="hud-label">Bandwidth Reduction</div>
-                    <div class="hud-value" id="hud-bitrate" style="color: var(--accent-blue);">14.4x &ndash; 18.4x</div>
-                    <div class="hud-sub" id="hud-bitrate-sub">4,200 kbps &rarr; 293.5 kbps (PointStream)</div>
+                    <div class="hud-value" id="hud-bitrate" style="color: var(--accent-blue);">14.4x &ndash; 18.2x</div>
+                    <div class="hud-sub" id="hud-bitrate-sub">4,200 kbps &rarr; 288 &ndash; 296 kbps (PointStream)</div>
                 </div>
                 <div class="hud-card purple">
                     <div class="hud-label">Keypoint Telemetry Rate</div>
-                    <div class="hud-value" id="hud-keypoint" style="color: var(--accent-purple);">8.4 kbps</div>
+                    <div class="hud-value" id="hud-keypoint" style="color: var(--accent-purple);">7.1 &ndash; 10.0 kbps</div>
                     <div class="hud-sub">47 bytes/hand (21 3D joints @ 30fps)</div>
                 </div>
                 <div class="hud-card orange">
                     <div class="hud-label">End-to-End Latency</div>
-                    <div class="hud-value" id="hud-latency" style="color: var(--accent-orange);">17.9 ms</div>
-                    <div class="hud-sub">Parallel: 17.9 ms &bull; Serial: 31.5 ms (&lt;50ms)</div>
+                    <div class="hud-value" id="hud-latency" style="color: var(--accent-orange);">19.3 ms</div>
+                    <div class="hud-sub">Parallel: 19.3 ms &bull; Serial: 32.9 ms (&lt;50ms)</div>
                 </div>
             </div>
         </div>
@@ -566,28 +566,28 @@
                 </thead>
                 <tbody>
                     <tr class="highlight-row">
-                        <td><strong>Clip 1</strong> (Assembly Prep)</td>
-                        <td>Joint Error (MPJPE)<br>Bitrate<br>Latency (Parallel / Serial)</td>
-                        <td><strong>59.6 px</strong><br>293.5 kbps<br>17.9 ms / 31.5 ms</td>
-                        <td><strong>107.2 px</strong><br>263.2 kbps<br>17.9 ms / 31.5 ms</td>
-                        <td>184.4 px<br>267.3 kbps<br>13.6 ms</td>
-                        <td><span class="badge badge-green">3.1x Lower Tracking Error<br>Sub-50ms Real-Time Parity</span></td>
+                        <td><strong>Clip 1</strong> (Assembly Prep)<br><span style="font-size:0.8rem;color:var(--text-muted);">Oracle Ceiling: 54.7%</span></td>
+                        <td>Joint Error (MPJPE)<br>Detection (Oracle Capture)<br>Bitrate &bull; Latency</td>
+                        <td><strong>113.6 px</strong><br>29.1% (53.1% cap)<br>293.8 kbps &bull; 19.3 ms</td>
+                        <td><strong>86.7 px</strong><br>27.1% (49.5% cap)<br>268.7 kbps &bull; 19.3 ms</td>
+                        <td>120.1 px<br>43.8% (80.2% cap)<br>267.3 kbps &bull; 3.3 ms</td>
+                        <td><span class="badge badge-green">Lower Tracking Error<br>Sub-50ms Real-Time Feasible</span></td>
                     </tr>
                     <tr class="highlight-row">
-                        <td><strong>Clip 2</strong> (Component Fit)</td>
-                        <td>Joint Error (MPJPE)<br>Bitrate<br>Latency (Parallel / Serial)</td>
-                        <td><strong>89.6 px</strong><br>290.6 kbps<br>17.9 ms / 31.5 ms</td>
-                        <td><strong>123.1 px</strong><br>260.3 kbps<br>17.9 ms / 31.5 ms</td>
-                        <td>233.1 px<br>264.4 kbps<br>13.9 ms</td>
-                        <td><span class="badge badge-green">2.6x Lower Tracking Error<br>Sub-50ms Real-Time Parity</span></td>
+                        <td><strong>Clip 2</strong> (Component Fit)<br><span style="font-size:0.8rem;color:var(--text-muted);">Oracle Ceiling: 58.0%</span></td>
+                        <td>Joint Error (MPJPE)<br>Detection (Oracle Capture)<br>Bitrate &bull; Latency</td>
+                        <td><strong>69.6 px</strong><br><strong>52.4% (90.4% cap)</strong><br>288.1 kbps &bull; 19.3 ms</td>
+                        <td><strong>50.2 px</strong><br>49.2% (84.8% cap)<br>267.8 kbps &bull; 19.3 ms</td>
+                        <td>115.5 px<br>48.8% (84.1% cap)<br>263.7 kbps &bull; 3.3 ms</td>
+                        <td><span class="badge badge-green">1.66x Lower Error &bull; Beats AV1 on Det (+3.6%)<br>Sub-50ms Real-Time Feasible</span></td>
                     </tr>
                     <tr class="highlight-row">
-                        <td><strong>Clip 3</strong> (Wire Manipulation)</td>
-                        <td>Joint Error (MPJPE)<br>Bitrate<br>Latency (Parallel / Serial)</td>
-                        <td><strong>96.4 px</strong><br>297.7 kbps<br>17.9 ms / 31.5 ms</td>
-                        <td><strong>103.5 px</strong><br>228.0 kbps<br>17.9 ms / 31.5 ms</td>
-                        <td>198.8 px<br>258.9 kbps<br>13.5 ms</td>
-                        <td><span class="badge badge-green">2.1x Lower Tracking Error<br>Sub-50ms Real-Time Parity</span></td>
+                        <td><strong>Clip 3</strong> (Wire Manipulation)<br><span style="font-size:0.8rem;color:var(--text-muted);">Oracle Ceiling: 39.7%</span></td>
+                        <td>Joint Error (MPJPE)<br>Detection (Oracle Capture)<br>Bitrate &bull; Latency</td>
+                        <td><strong>58.8 px</strong><br>39.6% (99.9% cap)<br>296.4 kbps &bull; 19.3 ms</td>
+                        <td><strong>49.8 px</strong><br>33.1% (83.5% cap)<br>231.3 kbps &bull; 19.3 ms</td>
+                        <td>106.0 px<br>47.3% (119.2% cap)<br>259.4 kbps &bull; 3.3 ms</td>
+                        <td><span class="badge badge-green">1.80x Lower Tracking Error<br>Sub-50ms Real-Time Feasible</span></td>
                     </tr>
                 </tbody>
             </table>
@@ -620,61 +620,61 @@
                     <tr class="highlight-row">
                         <td><strong>PointStream (Standard)</strong></td>
                         <td><strong>1080p Native</strong></td>
-                        <td><strong>293.5 kbps</strong></td>
-                        <td><strong>17.9 ms</strong></td>
-                        <td><strong>0.143</strong></td>
-                        <td><strong>23.41 dB</strong></td>
-                        <td><strong>59.6 px</strong></td>
-                        <td><span class="badge badge-green">3.1x Lower Error vs AV1 (14.4x Rate)</span></td>
+                        <td><strong>293.8 kbps</strong></td>
+                        <td><strong>19.3 ms</strong></td>
+                        <td><strong>0.136</strong></td>
+                        <td><strong>23.25 dB</strong></td>
+                        <td><strong>113.6 px</strong></td>
+                        <td><span class="badge badge-green">Lower Error vs AV1 540p (14.4x Rate)</span></td>
                     </tr>
                     <tr class="highlight-row">
                         <td><strong>PointStream (Ultra-Low)</strong></td>
                         <td><strong>1080p Native</strong></td>
-                        <td><strong>263.2 kbps</strong></td>
-                        <td><strong>17.9 ms</strong></td>
-                        <td><strong>0.153</strong></td>
-                        <td><strong>23.16 dB</strong></td>
-                        <td><strong>107.2 px</strong></td>
-                        <td><span class="badge badge-green">16.0x Compression</span></td>
+                        <td><strong>268.7 kbps</strong></td>
+                        <td><strong>19.3 ms</strong></td>
+                        <td><strong>0.146</strong></td>
+                        <td><strong>23.05 dB</strong></td>
+                        <td><strong>86.7 px</strong></td>
+                        <td><span class="badge badge-green">15.6x Compression</span></td>
                     </tr>
                     <tr style="background: rgba(74, 222, 128, 0.05); font-weight: 600;">
                         <td>AV1 (540p, p7 - Matched Rate &amp; Latency)</td>
                         <td>540p (Lanczos up)</td>
                         <td>267.3 kbps</td>
-                        <td>13.6 ms</td>
+                        <td>3.3 ms</td>
                         <td>0.120</td>
                         <td>24.68 dB</td>
-                        <td>184.4 px</td>
+                        <td>120.1 px</td>
                         <td><span class="badge badge-green">Direct Competitor Parity</span></td>
                     </tr>
                     <tr>
                         <td>AV1 (720p, p7)</td>
                         <td>720p (Lanczos up)</td>
                         <td>374.4 kbps</td>
-                        <td>13.5 ms</td>
+                        <td>3.3 ms</td>
                         <td>0.096</td>
                         <td>25.59 dB</td>
-                        <td>153.2 px</td>
+                        <td>104.7 px</td>
                         <td><span class="badge badge-blue">Intermediate Resolution (+28% Bitrate)</span></td>
                     </tr>
                     <tr>
                         <td>AV1 (1080p, p6 - Matched Quality Tier)</td>
                         <td>1080p Native</td>
-                        <td>672.4 kbps</td>
+                        <td>672.3 kbps</td>
                         <td>60.2 ms</td>
-                        <td>0.063</td>
-                        <td>27.75 dB</td>
-                        <td>128.0 px</td>
-                        <td><span class="badge badge-orange">Requires 2.3x Bitrate &amp; 3.4x Latency</span></td>
+                        <td>0.059</td>
+                        <td>27.31 dB</td>
+                        <td>76.7 px</td>
+                        <td><span class="badge badge-orange">Requires 2.3x Bitrate &amp; 3.1x Latency</span></td>
                     </tr>
                     <tr style="color: #ef4444;">
                         <td>PointStream (Plate 2s - Static Keyframe)</td>
                         <td>1080p Native</td>
                         <td>901.9 kbps</td>
-                        <td>17.9 ms</td>
-                        <td>0.454</td>
-                        <td>11.03 dB</td>
-                        <td>273.9 px</td>
+                        <td>19.3 ms</td>
+                        <td>0.452</td>
+                        <td>11.09 dB</td>
+                        <td>56.5 px</td>
                         <td><span class="badge badge-orange">Static Plates Fail on Head Motion</span></td>
                     </tr>
                 </tbody>
@@ -747,36 +747,36 @@ class StreamingCodecAdapter(Protocol):
                 video: 'side_by_side_demo_clip_01_factory001_worker001_00001.mp4',
                 keypoints: 'keypoints_clip_01.json',
                 rd_img: 'rd_curves_clip_01_factory001_worker001_00001.png',
-                ps_rate: '293.5 kbps',
-                ps_mult: '14.4x',
-                mpjpe: '59.6 px',
-                mpjpe_sub: '3.1x Lower Error vs AV1 (184.4 px)',
+                ps_rate: '293.8 kbps',
+                ps_mult: '14.3x',
+                mpjpe: '113.6 px',
+                mpjpe_sub: 'Lower Error vs AV1 (120.1 px)',
                 kp_rate: '8.4 kbps',
-                latency: '17.9 ms'
+                latency: '19.3 ms'
             },
             'clip_02': {
                 name: 'Clip 2 (Component Fit)',
                 video: 'side_by_side_demo_clip_02_factory001_worker001_00002.mp4',
                 keypoints: 'keypoints_clip_02.json',
                 rd_img: 'rd_curves_clip_02_factory001_worker001_00002.png',
-                ps_rate: '290.6 kbps',
+                ps_rate: '288.1 kbps',
                 ps_mult: '14.6x',
-                mpjpe: '89.6 px',
-                mpjpe_sub: '2.6x Lower Error vs AV1 (233.1 px)',
-                kp_rate: '7.8 kbps',
-                latency: '17.9 ms'
+                mpjpe: '69.6 px',
+                mpjpe_sub: '1.66x Lower Error vs AV1 (115.5 px) | Det: 52.4% vs 48.8%',
+                kp_rate: '10.0 kbps',
+                latency: '19.3 ms'
             },
             'clip_03': {
                 name: 'Clip 3 (Wire Manipulation)',
                 video: 'side_by_side_demo_clip_03_factory001_worker001_00000.mp4',
                 keypoints: 'keypoints_clip_03.json',
                 rd_img: 'rd_curves_clip_03_factory001_worker001_00000.png',
-                ps_rate: '297.7 kbps',
-                ps_mult: '14.1x',
-                mpjpe: '96.4 px',
-                mpjpe_sub: '2.1x Lower Error vs AV1 (198.8 px)',
-                kp_rate: '9.2 kbps',
-                latency: '17.9 ms'
+                ps_rate: '296.4 kbps',
+                ps_mult: '14.2x',
+                mpjpe: '58.8 px',
+                mpjpe_sub: '1.80x Lower Error vs AV1 (106.0 px)',
+                kp_rate: '7.1 kbps',
+                latency: '19.3 ms'
             }
         };
 

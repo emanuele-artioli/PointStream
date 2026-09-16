@@ -164,12 +164,14 @@ def process_clip(
                 ps_kbps = ps_info.get("bitrate_kbps", 290.0)
                 ps_det = ps_info.get("teleop_utility", {}).get("detection_rate", 0.0) * 100.0
                 ps_err = ps_info.get("teleop_utility", {}).get("mpjpe_pixels", 0.0)
-                stats["ps_label"] = f"3. POINTSTREAM (Matched Rate: {ps_kbps:.0f} kbps | Latency: 22.8 ms (sub-50ms) | Detection: {ps_det:.1f}%)"
+                ps_lat = results_data.get("latency_profile", {}).get("parallel_end_to_end_latency_ms", 19.3)
+                stats["ps_label"] = f"3. POINTSTREAM (Rate: {ps_kbps:.0f} kbps | Latency: {ps_lat:.1f} ms | Det: {ps_det:.1f}% | Joint Err: {ps_err:.0f}px)"
                 for arm in c.get("av1_arms", []):
                     if arm.get("video_path") and Path(arm["video_path"]).name == av1_mp4.name:
                         a_kbps = arm.get("actual_kbps", 267.0)
                         a_det = arm.get("teleop_utility", {}).get("detection_rate", 0.0) * 100.0
-                        stats["av1_label"] = f"2. AV1 540p p7 (Matched Rate: {a_kbps:.0f} kbps | Latency: 13.6 ms | Detection: {a_det:.1f}%)"
+                        a_err = arm.get("teleop_utility", {}).get("mpjpe_pixels", 0.0)
+                        stats["av1_label"] = f"2. AV1 540p p7 (Matched Rate: {a_kbps:.0f} kbps | Latency: 13.6 ms | Det: {a_det:.1f}% | Joint Err: {a_err:.0f}px)"
                         break
                 break
 
