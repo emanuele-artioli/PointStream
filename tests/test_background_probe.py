@@ -89,12 +89,14 @@ def test_build_common_cleaned_stack_invariants(tmp_path: Path) -> None:
     cache_file = tmp_path / "cache_cleaned.npz"
 
     cleaned, plate, homographies, stats = build_common_cleaned_stack(
-        frames, masks, register=True, cache_path=cache_file
+        frames, masks, removal="on", register=True, cache_path=cache_file
     )
 
     assert cleaned.shape == frames.shape
     assert len(homographies) == len(frames)
     assert not np.isnan(cleaned).any()
+    assert stats["removal_mode"] == "on"
+    assert stats["actor_pixels_untouched"] is False
 
     # Invariant: Unmasked background pixels MUST be bit-identical to source frames
     for t in range(len(frames)):
@@ -111,9 +113,51 @@ def test_build_common_cleaned_stack_invariants(tmp_path: Path) -> None:
     # Test loading from cache
     assert cache_file.is_file()
     c_cached, p_cached, h_cached, s_cached = build_common_cleaned_stack(
-        frames, masks, register=True, cache_path=cache_file
+        frames, masks, removal="on", register=True, cache_path=cache_file
     )
     assert s_cached["from_cache"] is True
+    np.testing.assert_array_equal(cleaned, c_cached)
+    np.testing.assert_array_equal(plate, p_cached)
+
+
+def test_build_common_cleaned_stack_removal_off_invariants(tmp_path: Path) -> None:
+    """Verify removal-off invariants: untouched actor pixels and zero removal calls."""
+    frames, masks = _synthetic_clip(t=4, h=64, w=64)
+    cache_file = tmp_path / "cache_removal_off.npz"
+
+    cleaned, plate, homographies, stats = build_common_cleaned_stack(
+        frames, masks, removal="off", register=True, cache_path=cache_file
+    )
+
+    assert cleaned.shape == frames.shape
+    assert len(homographies) == len(frames)
+    assert not np.isnan(cleaned).any()
+
+    # Invariants for removal-OFF:
+    # 1. Actor pixels are strictly untouched (bit-identical)
+    assert stats["actor_pixels_untouched"] is True
+    np.testing.assert_array_equal(cleaned, frames)
+    for t in range(len(frames)):
+        m = masks[t]
+        np.testing.assert_array_equal(cleaned[t][m], frames[t][m])
+
+    # 2. Zero removal or inpainting calls
+    assert stats["optional_removal_calls"] == 0
+    assert stats["total_inpaint_holes"] == 0
+    assert stats["inpaint_frames"] == 0
+    assert stats["removal_mode"] == "off"
+
+    # 3. Inherent panorama suppression recorded
+    assert "inherent_panorama_suppression" in stats
+    assert "mean_luma_mad_vs_player" in stats["inherent_panorama_suppression"]
+
+    # Test loading from cache
+    assert cache_file.is_file()
+    c_cached, p_cached, h_cached, s_cached = build_common_cleaned_stack(
+        frames, masks, removal="off", register=True, cache_path=cache_file
+    )
+    assert s_cached["from_cache"] is True
+    assert s_cached["removal_mode"] == "off"
     np.testing.assert_array_equal(cleaned, c_cached)
     np.testing.assert_array_equal(plate, p_cached)
 
@@ -390,10 +434,10 @@ def test_build_common_cleaned_stack_cache_validation(tmp_path: Path) -> None:
     cache_file = tmp_path / "cache_with_id.npz"
 
     dummy_rev = {"commit": "abc1234", "dirty": False, "diff_sha256": None}
-    ident = build_probe_identity("video_a", "scene_1", frames, masks, code_revision=dummy_rev)
+    ident = build_probe_identity("video_a", "scene_1", frames, masks, code_revision=dummy_rev, removal="on")
 
     cleaned, plate, homographies, stats = build_common_cleaned_stack(
-        frames, masks, register=True, cache_path=cache_file, identity=ident
+        frames, masks, removal="on", register=True, cache_path=cache_file, identity=ident
     )
     assert stats["from_cache"] is False
     assert "canvas_validity_note" in stats
@@ -403,7 +447,7 @@ def test_build_common_cleaned_stack_cache_validation(tmp_path: Path) -> None:
 
     # Re-reading with matching identity succeeds from cache
     _, _, _, stats_cached = build_common_cleaned_stack(
-        frames, masks, register=True, cache_path=cache_file, identity=ident
+        frames, masks, removal="on", register=True, cache_path=cache_file, identity=ident
     )
     assert stats_cached["from_cache"] is True
 
@@ -411,7 +455,7 @@ def test_build_common_cleaned_stack_cache_validation(tmp_path: Path) -> None:
     ident_mismatch = dict(ident)
     ident_mismatch["frames_sha256"] = "mismatched_sha"
     _, _, _, stats_rebuilt = build_common_cleaned_stack(
-        frames, masks, register=True, cache_path=cache_file, identity=ident_mismatch
+        frames, masks, removal="on", register=True, cache_path=cache_file, identity=ident_mismatch
     )
     assert stats_rebuilt["from_cache"] is False
 

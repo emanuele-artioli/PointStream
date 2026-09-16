@@ -130,6 +130,7 @@ def build_probe_identity(
     frames: np.ndarray,
     masks: np.ndarray,
     code_revision: dict[str, Any] | None = None,
+    removal: str = "off",
 ) -> dict[str, Any]:
     """Build exact identity covering source-frame hashes, mask hashes, and code revision."""
     if code_revision is None:
@@ -147,6 +148,7 @@ def build_probe_identity(
         "n_frames": len(frames),
         "frames_sha256": frames_sha256,
         "masks_sha256": masks_sha256,
+        "removal": removal,
         "commit": code_revision.get("commit"),
         "dirty": code_revision.get("dirty"),
         "diff_sha256": code_revision.get("diff_sha256"),
@@ -155,12 +157,13 @@ def build_probe_identity(
         json.dumps(key_dict, sort_keys=True).encode("utf-8")
     ).hexdigest()[:16]
 
-    cache_key = f"{video}_{scene}_{len(frames)}_{identity_digest}"
+    cache_key = f"{video}_{scene}_{len(frames)}_{removal}_{identity_digest}"
 
     return {
         "video": video,
         "scene": scene,
         "n_frames": len(frames),
+        "removal": removal,
         "frames_sha256": frames_sha256,
         "masks_sha256": masks_sha256,
         "frame_hashes": frame_hashes,
@@ -219,21 +222,28 @@ def build_common_cleaned_stack(
     frames: np.ndarray,
     masks: np.ndarray,
     *,
+    removal: str = "off",
     register: bool = True,
     cache_path: Path | None = None,
     identity: dict[str, Any] | None = None,
 ) -> tuple[np.ndarray, np.ndarray, tuple[tuple[float, ...], ...], dict[str, Any]]:
-    """Build the common foreground-removed frame stack.
+    """Build the common background frame stack.
 
-    Rules:
-    - Preserve each original frame's visible, unmasked background pixels (~mask).
-    - Inside player masks, fill ONLY with observed temporal background warped back.
-    - Explicitly fill any still-uncovered holes with Telea inpainting.
-    - Hold that stack/fill fixed across all representations.
+    Removal-OFF rules:
+    - Actor pixels are strictly untouched in the input stack (bit-identical).
+    - Zero optional removal/fill calls (0 inpaint holes, 0 inpaint frames).
+    - Panorama plate is built with masks=None (temporal median naturally attenuates moving players).
+    - Inherent panorama actor suppression is quantified and recorded separately.
+
+    Removal-ON rules (legacy screening):
+    - Preserve visible, unmasked background pixels (~mask).
+    - Inside player masks, fill with observed temporal background warped back.
+    - Explicitly fill remaining holes with Telea inpainting.
 
     Args:
         frames: (T, H, W, 3) uint8 RGB array.
         masks: (T, H, W) bool array (True where player/foreground is).
+        removal: 'off' (default for E04A) or 'on' (legacy temporal fill + inpainting).
         register: Whether to register camera motion for the composite plate.
         cache_path: Optional path to save/load cached result.
         identity: Optional identity dictionary with source hashes and code revision for cache validation.
@@ -246,7 +256,11 @@ def build_common_cleaned_stack(
         stats = json.loads(str(data["stats"]))
         cached_id = stats.get("identity")
         use_cache = True
-        if identity is not None:
+        if cached_id is not None and cached_id.get("removal") != removal:
+            use_cache = False
+        elif stats.get("removal_mode") != removal:
+            use_cache = False
+        if identity is not None and use_cache:
             if cached_id is None:
                 use_cache = False
             else:
@@ -274,12 +288,70 @@ def build_common_cleaned_stack(
     t_start = time.perf_counter()
     n_frames, height, width, channels = frames.shape
 
-    # 1. Build composite plate and estimate homographies
+    if removal == "off":
+        cleaned_stack = frames.copy()
+        # Invariant check: actor pixels in input stack MUST be strictly unchanged
+        if np.any(masks) and not np.array_equal(cleaned_stack[masks], frames[masks]):
+            raise RuntimeError("Actor pixels were modified in removal-off input stack!")
+
+        # Panorama plate is built without actor exclusion masks (masks=None)
+        plate, homographies = build_plate(frames, masks=None, register=register)
+        plate_h, plate_w = plate.shape[:2]
+
+        # Quantify inherent panorama suppression: compare warped plate vs actor pixels in raw frames
+        inherent_suppression_mad: list[float] = []
+        for t in range(n_frames):
+            h_matrix = np.asarray(homographies[t], dtype=np.float32).reshape(3, 3)
+            warped_bg = warp_plate_to_frame(plate, h_matrix, height=height, width=width)
+            m = masks[t]
+            if np.any(m):
+                player_luma = rgb_to_luma(frames[t])[m].astype(np.float64)
+                plate_luma = rgb_to_luma(warped_bg)[m].astype(np.float64)
+                inherent_suppression_mad.append(float(np.mean(np.abs(player_luma - plate_luma))))
+
+        build_time = time.perf_counter() - t_start
+        stats = {
+            "build_seconds": round(build_time, 3),
+            "plate_resolution": f"{plate_w}x{plate_h}",
+            "frame_resolution": f"{width}x{height}",
+            "n_frames": n_frames,
+            "player_pixel_fraction": float(masks.mean()),
+            "total_inpaint_holes": 0,
+            "inpaint_frames": 0,
+            "optional_removal_calls": 0,
+            "removal_mode": "off",
+            "actor_pixels_untouched": True,
+            "inherent_panorama_suppression": {
+                "mean_luma_mad_vs_player": round(float(np.mean(inherent_suppression_mad)), 3) if inherent_suppression_mad else 0.0,
+                "note": (
+                    "Transient moving actors are suppressed inherently by temporal median "
+                    "aggregation without explicit mask removal or hole filling."
+                ),
+            },
+            "canvas_validity_note": (
+                "Removal-off plate built with masks=None; transient actors suppressed inherently by median aggregation."
+            ),
+            "from_cache": False,
+        }
+        if identity is not None:
+            stats["identity"] = identity
+
+        if cache_path is not None:
+            cache_path.parent.mkdir(parents=True, exist_ok=True)
+            np.savez_compressed(
+                str(cache_path),
+                cleaned_frames=cleaned_stack,
+                plate=plate,
+                homographies=np.array([list(h) for h in homographies], dtype=np.float32),
+                stats=json.dumps(stats),
+            )
+
+        return cleaned_stack, plate, homographies, stats
+
+    # Legacy removal-ON path
     plate, homographies = build_plate(frames, masks=masks, register=register)
     plate_h, plate_w = plate.shape[:2]
 
-    # Valid canvas coverage template: covers geometrically valid composite canvas coordinates,
-    # but does not certify 100% unoccluded background observation without holes.
     valid_plate_mask = np.full((plate_h, plate_w), 255, dtype=np.uint8)
 
     cleaned_stack = np.empty_like(frames)
@@ -308,10 +380,8 @@ def build_common_cleaned_stack(
         n_uncovered = int(uncovered_in_mask.sum())
 
         cleaned = orig.copy()
-        # Inside player mask: fill ONLY with observed temporal background warped back
         cleaned[m] = warped_bg[m]
 
-        # Explicitly inpaint any still-uncovered holes in player mask
         if n_uncovered > 0:
             total_inpaint_holes += n_uncovered
             inpaint_frames += 1
@@ -337,6 +407,9 @@ def build_common_cleaned_stack(
         "player_pixel_fraction": float(masks.mean()),
         "total_inpaint_holes": total_inpaint_holes,
         "inpaint_frames": inpaint_frames,
+        "optional_removal_calls": 1,
+        "removal_mode": "on",
+        "actor_pixels_untouched": False,
         "canvas_validity_note": (
             "Validity mask covers valid composite canvas coordinates, but does not certify "
             "100% unoccluded background observation without holes."
