@@ -102,6 +102,8 @@ def probe_native_frames(
             if value not in {None, "", "N/A"}:
                 pts_raw = value
                 break
+        if pts_raw is None:
+            continue
         try:
             pts = float(pts_raw)
         except (TypeError, ValueError):

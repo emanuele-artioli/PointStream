@@ -53,9 +53,14 @@ BOUNDS: dict[str, Any] = {
         "basis": "Unrelated natural tennis can sit near 0.2; identity is 1.0.",
     },
     "vmaf": {
-        "low": 5.0,
+        "low": 0.0,
         "high": 100.0,
-        "basis": "Unrelated structured content is the null; identity near 100.",
+        "basis": (
+            "libvmaf floors at 0 on this 360p grid: calibration severe-blur "
+            "and spatial-null are 0.0; unrelated-clip is 1.38. Identity ~98. "
+            "The pre-score band used low=5; that bound is revised after the "
+            "VVC QP63 alarm matched the calibrated floor, not a wiring fault."
+        ),
     },
     "encode_seconds": {
         "low": 0.2,

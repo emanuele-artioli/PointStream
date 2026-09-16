@@ -3,16 +3,38 @@
 ## E03B — 16 September 2026
 
 Worktree `/home/itec/emanuele/worktrees/pointstream-e03b-20260916` on
-`codex/e03b-20260916` at main descendant `8eb045a5974796ccadf26c9351b2f1a8343564e1`.
-Contract pin module/example digests still match. Persistent bitstream wrapper:
+`codex/e03b-20260916`. Code head at probe:
+`df9f945785b6dcd2cb7d6c5619b4b496da76ec23` (ancestor of required `8eb045a`;
+fast-forwarded through `origin/main` `c476840`). PR #114. Contract pin still
+matches. Persistent wrapper:
 `experiments.tier.e03b_persist.persistent_timed_roundtrip`. Native PTS recipe
-(shared with E04A): `manifests/evaluation_20260916_e03b_source_recipe.json` and
+(shared with E04A): run dir
 `outputs/evaluation-20260914/e03b/run-20260916-federer007/`. Prepared stack
 SHA-256 `1f02475a5bbc3d94e4bae2e904dc29c3af3082be0c0c160e027b706a6950f6f8`
-matches E04A's 360p/12 fps pixels; native timestamps are packet DTS seconds,
-not 24 fps grid indices. BP46/BP21 extract caches were not overwritten. Four
-AV1/VVC display_low settings remain the measured probe. Campaign reader and
-generation adapter are unchanged (still Cursor-owned).
+matches E04A 360p/12 fps pixels; native timestamps are packet DTS seconds, not
+24 fps grid indices. BP46/BP21 extract caches were not overwritten.
+
+Four charged settings finished on gpu6 in 92 s encode wall (plus 2.1 s
+calibration). Job `jobs/e03b-20260916-federer007` exit 0. All four rows ingest
+as validated RD with standalone decode and reconciled ledgers. AV1 used
+`SvtAv1EncApp` v1.8.0 preset 0; VVC used the accepted `encode()` path
+(`ffmpeg` n7.1.1 `libvvenc` slower, `-qpa 0`), not the card's `vvencapp`
+identity string. Same-QP quality ranges do not overlap (AV1 PSNR 27.4–33.0 dB
+vs VVC 17.9–24.6 dB). Do not compute BD-rate. One interior QP between 47 and
+63 cannot create overlap; skip it. Size-adjacent pair already exists: AV1 QP63
+19 116 B / 27.4 dB vs VVC QP47 21 288 B / 24.6 dB. One-scene diagnostic only;
+not a confirmed advantage. Pair E04A on this PTS recipe. Do not wait for #109.
+
+VMAF 0.0 on VVC QP63 fired the pre-score band [5, 100]. Calibration on this
+grid already floors at 0 (severe-blur and spatial-null); unrelated-clip VMAF
+is 1.38; VVC QP63 PSNR 17.93 dB sits next to severe-blur 17.73 dB. Alarm
+closed as bound-too-tight, not a broken metric path. Quote VMAF beside those
+anchors. `n=1` scene, single-run timing, not a repeated speed claim.
+
+Confirmation eligibility unchanged: acquired=3, confirmation_eligible=3,
+`scores_computed=false`. All 1080p; cannot confirm native 4K. Coordinator
+still must freeze scenes before any confirmation scoring. Campaign reader and
+generation adapter remain Cursor-owned.
 
 ## Current acceptance completion — 15 September 2026
 
