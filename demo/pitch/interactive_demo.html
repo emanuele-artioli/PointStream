@@ -474,16 +474,14 @@
                 <div class="control-group">
                     <span class="control-label">Left Stream:</span>
                     <select id="select-left" class="dropdown" onchange="updateStreamSelection()">
-                        <option value="ps_std" selected>PointStream Standard (270–276 kbps)</option>
-                        <option value="ps_low">PointStream Extreme Starve (70–86 kbps)</option>
+                        <option value="ps_starve" selected>PointStream Extreme Starve (70–86 kbps)</option>
                         <option value="ref">Reference Ground Truth (4,200 kbps)</option>
                     </select>
 
                     <span class="control-label">Right Stream:</span>
                     <select id="select-right" class="dropdown" onchange="updateStreamSelection()">
-                        <option value="av1_540" selected>AV1 540p p7 (Matched Rate: 259–267 kbps)</option>
+                        <option value="av1_240" selected>AV1 240p p7 (Starved: 62–78 kbps)</option>
                         <option value="ref">Reference Ground Truth (4,200 kbps)</option>
-                        <option value="ps_std">PointStream Standard (270–276 kbps)</option>
                     </select>
                 </div>
 
@@ -503,8 +501,8 @@
             <!-- Canvas Stage Area -->
             <div class="stage-container" id="stage-box">
                 <canvas id="stage-canvas" width="1920" height="1080"></canvas>
-                <div class="stage-badge badge-left" id="badge-left-label">◄ PointStream (276 kbps)</div>
-                <div class="stage-badge badge-right" id="badge-right-label">AV1 540p p7 (267 kbps) ►</div>
+                <div class="stage-badge badge-left" id="badge-left-label">◄ PointStream Extreme Starve (70–86 kbps)</div>
+                <div class="stage-badge badge-right" id="badge-right-label">AV1 240p p7 (62–78 kbps) ►</div>
                 <div class="curtain-handle" id="curtain-line">
                     <div class="curtain-center-pill">⮜ ⮞</div>
                 </div>
@@ -824,10 +822,9 @@ class StreamingCodecAdapter(Protocol):
 
         // Y offsets in the 1920x3240 source video
         const STREAM_Y = {
-            'ref': 0,        // Reference 1080p
-            'av1_540': 1080, // AV1 540p upscaled
-            'ps_std': 2160,  // PointStream Standard 1080p
-            'ps_low': 2160   // PointStream (mapped)
+            'ref': 0,
+            'av1_240': 1080,
+            'ps_starve': 2160
         };
 
         // Initialize Clip
@@ -896,8 +893,8 @@ class StreamingCodecAdapter(Protocol):
             const leftVal = document.getElementById('select-left').value;
             const rightVal = document.getElementById('select-right').value;
 
-            const leftNames = { 'ps_std': 'PointStream Standard (270–276 kbps)', 'ps_low': 'PointStream Extreme Starve (70–86 kbps)', 'ref': 'Reference Ground Truth' };
-            const rightNames = { 'av1_540': 'AV1 540p p7 (Matched Rate: 259–267 kbps)', 'ref': 'Reference Ground Truth', 'ps_std': 'PointStream Standard' };
+            const leftNames = { 'ps_starve': 'PointStream Extreme Starve (70–86 kbps)', 'ref': 'Reference Ground Truth' };
+            const rightNames = { 'av1_240': 'AV1 240p p7 (Starved: 62–78 kbps)', 'ref': 'Reference Ground Truth' };
 
             document.getElementById('badge-left-label').textContent = '◄ ' + (leftNames[leftVal] || leftVal);
             document.getElementById('badge-right-label').textContent = (rightNames[rightVal] || rightVal) + ' ►';
@@ -1096,10 +1093,10 @@ class StreamingCodecAdapter(Protocol):
 
                 ctx.fillStyle = '#4ade80';
                 ctx.font = 'bold 18px sans-serif';
-                ctx.fillText('PointStream (276k std): Sharp Joint Articulation', 40, h - 32);
+                ctx.fillText('PointStream Extreme Starve: Joints Held at 70–86 kbps', 40, h - 32);
 
                 ctx.fillStyle = '#fb923c';
-                ctx.fillText('AV1 540p (267k): Finger Tearing & Motion Blur Smear', halfW + 40, h - 32);
+                ctx.fillText('AV1 240p starved: Finger Tearing & Motion Blur Smear', halfW + 40, h - 32);
 
                 if (document.getElementById('toggle-skeleton').checked) {
                     drawSkeletonZoomed(ctx, 0, 0, halfW, h, srcX, srcY, cropSize);

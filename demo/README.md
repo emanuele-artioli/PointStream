@@ -104,7 +104,7 @@ PYTHONPATH=. /home/itec/emanuele/.conda/envs/pointstream/bin/python demo/experim
 PYTHONPATH=. /home/itec/emanuele/.conda/envs/pointstream/bin/python demo/experiments/plot_rd_curves.py
 
 # Create 3-panel split video with real-time HUD and zoomed hand inset
-PYTHONPATH=. /home/itec/emanuele/.conda/envs/pointstream/bin/python demo/pitch/side_by_side_video.py
+PYTHONPATH=. /home/itec/emanuele/.conda/envs/pointstream/bin/python demo/pitch/side_by_side_video.py --all-clips
 ```
 
 ### 5. Review Deliverables for Figure.ai
