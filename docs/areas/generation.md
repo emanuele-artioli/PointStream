@@ -1,6 +1,22 @@
 # Generation Area
 
-## Current acceptance — 15 September 2026
+## Current review — 16 September 2026
+
+#109 at `c9c4ded` has green CI, an actual fresh-CLI continuation regression,
+restored Python RNG and isolated DataLoader RNG. Supplied diagnostic/adapter
+artifact hashes match. These are advances over the prior review.
+
+Acceptance remains open for two reproduced cases: deterministic references use
+`colors[idx % len(colors)]`, feeding every first-track target as its own
+reference; and a cheaper NaN-PSNR candidate can dominate a measured candidate.
+Correct the reference policy to match receiver availability and reject invalid
+evidence before promotion. The fresh CLI test is CPU-only and uses tolerance;
+do not label it bit-identical CUDA continuation without that evidence. Reconcile
+the report's bands with code. Repeat only the tiny continuation check after the
+reference fix, preserving old checkpoints/diagnostics. E05 and confirmation
+scoring remain unreleased. Follow the [focused assignment](../workflow/session/evaluation-campaign/tasks/20260916-probe-review.md).
+
+## Historical acceptance — 15 September 2026
 
 #109 `013a4c8` retains useful epoch sampling, RNG tensor restoration, explicit
 residual-OFF handling and extra control corners. E05 remains unreleased: its
