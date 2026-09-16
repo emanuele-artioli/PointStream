@@ -29,7 +29,6 @@ def generate_plots(json_path: Path = DEFAULT_JSON, out_dir: Path = DEFAULT_OUT_D
 
     plot_paths = []
 
-    # Iterate over each clip and plot RD curves
     for clip in clips:
         clip_name = clip["clip_name"]
         ps = clip["pointstream"]
@@ -38,111 +37,88 @@ def generate_plots(json_path: Path = DEFAULT_JSON, out_dir: Path = DEFAULT_OUT_D
         fig, axs = plt.subplots(2, 2, figsize=(14, 10))
         fig.suptitle(f"PointStream vs AV1: Rate-Distortion-Utility ({clip_name})", fontsize=15, fontweight="bold")
 
-        # Separate AV1 arms by tier
+        # Filter AV1 arms by category
+        av1_starved = sorted([a for a in av1_arms if a.get("scale") in ["320:180", "426:240", "640:360"]], key=lambda x: x["actual_kbps"])
         av1_540p = sorted([a for a in av1_arms if a.get("scale") == "960:540"], key=lambda x: x["actual_kbps"])
         av1_720p = sorted([a for a in av1_arms if a.get("scale") == "1280:720"], key=lambda x: x["actual_kbps"])
         av1_1080p = sorted([a for a in av1_arms if a.get("scale") is None and not a.get("deblocked", False)], key=lambda x: x["actual_kbps"])
         av1_deb = sorted([a for a in av1_arms if a.get("deblocked", False)], key=lambda x: x["actual_kbps"])
 
-        # 1. Bitrate vs Hand-ROI PSNR
-        ax = axs[0, 0]
-        # Plot PointStream variants
+        # PointStream variants sorted by bitrate (excluding plate for the curve)
         ps_variants = clip.get("pointstream_variants", [ps])
-        ps_markers = {
-            "PointStream (Standard, 250k bg)": ("blue", "*", 220),
-            "PointStream (Ultra-Low, 90k bg)": ("darkgoldenrod", "P", 180),
-            "PointStream (Plate 2s)": ("darkorange", "D", 140),
-            "PointStream": ("blue", "*", 220),
-        }
+        ps_ladder = sorted([v for v in ps_variants if "Plate" not in v.get("name", "")], key=lambda x: x["bitrate_kbps"])
+        ps_plate = [v for v in ps_variants if "Plate" in v.get("name", "")]
 
-        # 1. Bitrate vs Hand-ROI PSNR
-        ax = axs[0, 0]
-        if av1_540p:
-            ax.plot([a["actual_kbps"] for a in av1_540p], [a["metrics"]["hand_roi_psnr_dB"] for a in av1_540p], "g-^", label="AV1 (540p, p7)", linewidth=1.8, markersize=7)
-        if av1_720p:
-            ax.plot([a["actual_kbps"] for a in av1_720p], [a["metrics"]["hand_roi_psnr_dB"] for a in av1_720p], "m-v", label="AV1 (720p, p7)", linewidth=1.8, markersize=7)
-        if av1_1080p:
-            ax.plot([a["actual_kbps"] for a in av1_1080p], [a["metrics"]["hand_roi_psnr_dB"] for a in av1_1080p], "r-o", label="AV1 (1080p, p6)", linewidth=1.8, markersize=7)
-        if av1_deb:
-            ax.plot([a["actual_kbps"] for a in av1_deb], [a["metrics"]["hand_roi_psnr_dB"] for a in av1_deb], "c--s", label="AV1 (1080p Deblocked)", linewidth=1.2)
+        # Plotting helper
+        def plot_arm_curves(ax, key_fn, y_label, title, higher_is_better=True):
+            if av1_starved:
+                ax.plot([a["actual_kbps"] for a in av1_starved], [key_fn(a) for a in av1_starved], "k--x", label="AV1 Starved (180p/240p/360p)", linewidth=1.5, markersize=6)
+            if av1_540p:
+                ax.plot([a["actual_kbps"] for a in av1_540p], [key_fn(a) for a in av1_540p], "g-^", label="AV1 (540p, p7)", linewidth=1.8, markersize=7)
+            if av1_720p:
+                ax.plot([a["actual_kbps"] for a in av1_720p], [key_fn(a) for a in av1_720p], "m-v", label="AV1 (720p, p7)", linewidth=1.8, markersize=7)
+            if av1_1080p:
+                ax.plot([a["actual_kbps"] for a in av1_1080p], [key_fn(a) for a in av1_1080p], "r-o", label="AV1 (1080p, p6/p10)", linewidth=1.8, markersize=7)
+            if av1_deb:
+                ax.plot([a["actual_kbps"] for a in av1_deb], [key_fn(a) for a in av1_deb], "c--s", label="AV1 (1080p Deblocked)", linewidth=1.2)
 
-        for p_arm in ps_variants:
-            p_name = p_arm.get("name", "PointStream")
-            color, marker, s = ps_markers.get(p_name, ("blue", "*", 180))
-            ax.scatter([p_arm["bitrate_kbps"]], [p_arm["metrics"]["hand_roi_psnr_dB"]], color=color, s=s, zorder=6, label=f"{p_name} ({p_arm['bitrate_kbps']}k)", marker=marker)
+            # PointStream Ladder curve
+            if ps_ladder:
+                ax.plot([p["bitrate_kbps"] for p in ps_ladder], [key_fn(p) for p in ps_ladder], "b-o", linewidth=2.5, markersize=8, label="PointStream Ladder", zorder=6)
+                # Scatter individual rungs with names
+                for p in ps_ladder:
+                    ax.scatter([p["bitrate_kbps"]], [key_fn(p)], color="blue", s=100, zorder=7)
 
-        ax.set_xlabel("Total Bitrate (kbps)", fontsize=11)
-        ax.set_ylabel("Hand-ROI PSNR (dB) [Higher is better]", fontsize=11)
-        ax.set_title("Hand Interaction ROI Quality", fontsize=12, fontweight="bold")
-        ax.grid(True, linestyle="--", alpha=0.6)
-        ax.legend(fontsize=8)
+            if ps_plate:
+                for p in ps_plate:
+                    ax.scatter([p["bitrate_kbps"]], [key_fn(p)], color="darkorange", marker="D", s=120, zorder=6, label="PointStream (Plate 2s)")
 
-        # 2. Bitrate vs LPIPS
-        ax = axs[0, 1]
-        if av1_540p:
-            ax.plot([a["actual_kbps"] for a in av1_540p], [a["metrics"]["lpips"] for a in av1_540p], "g-^", label="AV1 (540p, p7)", linewidth=1.8, markersize=7)
-        if av1_720p:
-            ax.plot([a["actual_kbps"] for a in av1_720p], [a["metrics"]["lpips"] for a in av1_720p], "m-v", label="AV1 (720p, p7)", linewidth=1.8, markersize=7)
-        if av1_1080p:
-            ax.plot([a["actual_kbps"] for a in av1_1080p], [a["metrics"]["lpips"] for a in av1_1080p], "r-o", label="AV1 (1080p, p6)", linewidth=1.8, markersize=7)
-        if av1_deb:
-            ax.plot([a["actual_kbps"] for a in av1_deb], [a["metrics"]["lpips"] for a in av1_deb], "c--s", label="AV1 (1080p Deblocked)", linewidth=1.2)
+            ax.set_xlabel("Total Bitrate (kbps)", fontsize=11)
+            ax.set_ylabel(y_label, fontsize=11)
+            ax.set_title(title, fontsize=12, fontweight="bold")
+            ax.grid(True, linestyle="--", alpha=0.6)
+            ax.legend(fontsize=7, loc="lower right" if higher_is_better else "upper right")
 
-        for p_arm in ps_variants:
-            p_name = p_arm.get("name", "PointStream")
-            color, marker, s = ps_markers.get(p_name, ("blue", "*", 180))
-            ax.scatter([p_arm["bitrate_kbps"]], [p_arm["metrics"]["lpips"]], color=color, s=s, zorder=6, label=f"{p_name}", marker=marker)
+        # 1. Hand-ROI PSNR
+        plot_arm_curves(
+            axs[0, 0],
+            key_fn=lambda x: x["metrics"]["hand_roi_psnr_dB"],
+            y_label="Hand-ROI PSNR (dB) [Higher is better]",
+            title="Hand Interaction ROI Quality",
+            higher_is_better=True,
+        )
 
-        ax.set_xlabel("Total Bitrate (kbps)", fontsize=11)
-        ax.set_ylabel("LPIPS Perceptual Distance [Lower is better]", fontsize=11)
-        ax.set_title("Perceptual Distortion (LPIPS)", fontsize=12, fontweight="bold")
-        ax.grid(True, linestyle="--", alpha=0.6)
-        ax.legend(fontsize=8)
+        # 2. LPIPS
+        plot_arm_curves(
+            axs[0, 1],
+            key_fn=lambda x: x["metrics"]["lpips"],
+            y_label="LPIPS Perceptual Distance [Lower is better]",
+            title="Perceptual Distortion (LPIPS)",
+            higher_is_better=False,
+        )
 
-        # 3. Bitrate vs Hand Detection Rate
+        # 3. Detection Rate
         ax = axs[1, 0]
-        if av1_540p:
-            ax.plot([a["actual_kbps"] for a in av1_540p], [a["teleop_utility"]["detection_rate"] * 100 for a in av1_540p], "g-^", label="AV1 (540p, p7)", linewidth=1.8, markersize=7)
-        if av1_720p:
-            ax.plot([a["actual_kbps"] for a in av1_720p], [a["teleop_utility"]["detection_rate"] * 100 for a in av1_720p], "m-v", label="AV1 (720p, p7)", linewidth=1.8, markersize=7)
-        if av1_1080p:
-            ax.plot([a["actual_kbps"] for a in av1_1080p], [a["teleop_utility"]["detection_rate"] * 100 for a in av1_1080p], "r-o", label="AV1 (1080p, p6)", linewidth=1.8, markersize=7)
-        if av1_deb:
-            ax.plot([a["actual_kbps"] for a in av1_deb], [a["teleop_utility"]["detection_rate"] * 100 for a in av1_deb], "c--s", label="AV1 (1080p Deblocked)", linewidth=1.2)
-
-        for p_arm in ps_variants:
-            p_name = p_arm.get("name", "PointStream")
-            color, marker, s = ps_markers.get(p_name, ("blue", "*", 180))
-            ax.scatter([p_arm["bitrate_kbps"]], [p_arm["teleop_utility"]["detection_rate"] * 100], color=color, s=s, zorder=6, label=f"{p_name}", marker=marker)
-
-        ax.set_xlabel("Total Bitrate (kbps)", fontsize=11)
-        ax.set_ylabel("Hand Detection Success Rate (%)", fontsize=11)
-        ax.set_title("Teleop Utility: Hand Tracking Detection Rate", fontsize=12, fontweight="bold")
+        plot_arm_curves(
+            ax,
+            key_fn=lambda x: x["teleop_utility"]["detection_rate"] * 100,
+            y_label="Hand Detection Success Rate (%)",
+            title="Teleop Utility: Hand Tracking Detection Rate",
+            higher_is_better=True,
+        )
+        ceiling = clip.get("reference_oracle", {}).get("detection_ceiling", 0.6) * 100
+        ax.axhline(ceiling, color="gray", linestyle=":", linewidth=1.5, label=f"Oracle Ceiling ({ceiling:.1f}%)")
         ax.set_ylim(0, 105)
-        ax.grid(True, linestyle="--", alpha=0.6)
-        ax.legend(fontsize=8)
+        ax.legend(fontsize=7, loc="lower right")
 
-        # 4. Bitrate vs MPJPE
-        ax = axs[1, 1]
-        if av1_540p:
-            ax.plot([a["actual_kbps"] for a in av1_540p], [a["teleop_utility"]["mpjpe_pixels"] for a in av1_540p], "g-^", label="AV1 (540p, p7)", linewidth=1.8, markersize=7)
-        if av1_720p:
-            ax.plot([a["actual_kbps"] for a in av1_720p], [a["teleop_utility"]["mpjpe_pixels"] for a in av1_720p], "m-v", label="AV1 (720p, p7)", linewidth=1.8, markersize=7)
-        if av1_1080p:
-            ax.plot([a["actual_kbps"] for a in av1_1080p], [a["teleop_utility"]["mpjpe_pixels"] for a in av1_1080p], "r-o", label="AV1 (1080p, p6)", linewidth=1.8, markersize=7)
-        if av1_deb:
-            ax.plot([a["actual_kbps"] for a in av1_deb], [a["teleop_utility"]["mpjpe_pixels"] for a in av1_deb], "c--s", label="AV1 (1080p Deblocked)", linewidth=1.2)
-
-        for p_arm in ps_variants:
-            p_name = p_arm.get("name", "PointStream")
-            color, marker, s = ps_markers.get(p_name, ("blue", "*", 180))
-            ax.scatter([p_arm["bitrate_kbps"]], [p_arm["teleop_utility"]["mpjpe_pixels"]], color=color, s=s, zorder=6, label=f"{p_name}", marker=marker)
-
-        ax.set_xlabel("Total Bitrate (kbps)", fontsize=11)
-        ax.set_ylabel("Mean Joint Position Error (pixels) [Lower is better]", fontsize=11)
-        ax.set_title("Teleop Utility: Hand Joint Error (MPJPE)", fontsize=12, fontweight="bold")
-        ax.grid(True, linestyle="--", alpha=0.6)
-        ax.legend(fontsize=8)
+        # 4. MPJPE
+        plot_arm_curves(
+            axs[1, 1],
+            key_fn=lambda x: x["teleop_utility"]["mpjpe_pixels"],
+            y_label="Mean Joint Position Error (pixels) [Lower is better]",
+            title="Teleop Utility: Hand Joint Error (MPJPE)",
+            higher_is_better=False,
+        )
 
         plt.tight_layout()
         out_png = out_dir / f"rd_curves_{clip_name}.png"
@@ -172,8 +148,8 @@ def generate_plots(json_path: Path = DEFAULT_JSON, out_dir: Path = DEFAULT_OUT_D
             lat.get("decode_keypoint_unpack_ms", 0.02),
             lat.get("decode_generator_inference_ms", lat.get("decode_unet_inference_ms", 7.6)),
             lat.get("decode_compositing_ms", 0.06),
-            lat.get("parallel_end_to_end_latency_ms", lat.get("end_to_end_latency_ms", 22.8)),
-            lat.get("serial_end_to_end_latency_ms", 36.4),
+            lat.get("parallel_end_to_end_latency_ms", lat.get("end_to_end_latency_ms", 18.36)),
+            lat.get("serial_end_to_end_latency_ms", 31.96),
         ]
         colors = ["#2b5c8f", "#3e82c5", "#5dade2", "#e67e22", "#d35400", "#e74c3c", "#27ae60", "#229954"]
         bars = ax.bar(stages, values, color=colors, width=0.55)
@@ -213,4 +189,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

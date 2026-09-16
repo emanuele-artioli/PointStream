@@ -28,8 +28,8 @@
     "original_bounds_not_rewritten": true,
     "launch_requires_merged_decode_gate": true
   },
-  "decision_and_hypothesis": "On the saved display_low Federer scene 007 stack, with generation off and a reused E04A panorama-QP47 background, residual-on should raise whole-frame PSNR versus the paired residual-off predictor (paste or warped-reference) by at least 0.5 dB while charging T = B+F+M+R+H. Competing explanations: residual is a no-op on these predictors; F+M already exhaust A(q) so residual cannot win on total rate; warped-reference is equivalent to paste because bbox resize of one crop matches per-frame crops on this window.",
-  "question": "Does residual pay for itself on standalone paste and warped-reference controls at this operating point, versus saved AV1/VVC anchors, without a neural predictor?",
+    "decision_and_hypothesis": "On the saved display_low Federer scene 007 stack, with generation off and a reused E04A panorama-QP47 background, residual-on should raise whole-frame PSNR versus the paired residual-off predictor (per_frame_crop or bbox_resized_first_reference) by at least 0.5 dB while charging T = B+F+M+R+H. Competing explanations: residual is a no-op on these predictors; F+M already exhaust A(q) so residual cannot win on total rate; bbox resize of one crop matches per-frame crops on this window. These names are not optical flow, per-object pose warp, or the E05 first-reference paste control.",
+    "question": "Does residual pay for itself on standalone per-frame-crop and bbox-resized-first-reference controls at this operating point, versus saved AV1/VVC anchors, without a neural predictor?",
   "evidence_reused": {
     "prepared_rgb": {
       "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03b/run-20260916-federer007/prepared_rgb.npy",
@@ -74,14 +74,14 @@
   },
   "smallest_discriminating_probe": {
     "predictors": {
-      "paste": "Per occupied frame, WebP-code that frame's bbox crop and composite it (existing compositor).",
-      "warped_reference": "WebP-code one reference crop (first occupied frame) and composite it into every later bbox by resize; charge one F payload plus per-frame masks/bboxes."
+      "per_frame_crop": "Per occupied frame, WebP-code that frame's bbox crop and composite it. Former informal name paste; not E05 first-reference paste.",
+      "bbox_resized_first_reference": "WebP-code one reference crop (first occupied frame) and composite it into every later union bbox by resize; charge one F payload plus per-frame masks/bboxes. Former informal name warped-reference; not optical flow or pose warp."
     },
     "settings": [
-      {"id": "paste_residual_off", "predictor": "paste", "residual": "off"},
-      {"id": "paste_residual_on", "predictor": "paste", "residual": "on", "residual_rung": "medium", "residual_codec": "av1", "residual_rate": 45, "block_size": 8, "block_threshold": 4.0, "background_downscale": 2},
-      {"id": "warp_residual_off", "predictor": "warped_reference", "residual": "off"},
-      {"id": "warp_residual_on", "predictor": "warped_reference", "residual": "on", "residual_rung": "medium", "residual_codec": "av1", "residual_rate": 45, "block_size": 8, "block_threshold": 4.0, "background_downscale": 2}
+      {"id": "per_frame_crop_residual_off", "predictor": "per_frame_crop", "residual": "off"},
+      {"id": "per_frame_crop_residual_on", "predictor": "per_frame_crop", "residual": "on", "residual_rung": "medium", "residual_codec": "av1", "residual_rate": 45, "block_size": 8, "block_threshold": 4.0, "background_downscale": 2},
+      {"id": "bbox_resized_first_reference_residual_off", "predictor": "bbox_resized_first_reference", "residual": "off"},
+      {"id": "bbox_resized_first_reference_residual_on", "predictor": "bbox_resized_first_reference", "residual": "on", "residual_rung": "medium", "residual_codec": "av1", "residual_rate": 45, "block_size": 8, "block_threshold": 4.0, "background_downscale": 2}
     ],
     "n_new_encodes": 4,
     "n_new_conventional_encodes": 0,
@@ -93,7 +93,7 @@
     "pose": "Charge pose_motion when keypoints are serialized. This first card records pose_present=false if the E04A union-mask path has no skeleton payload; do not invent pose bytes.",
     "controls": [
       "reuse hash of prepared stack and pinned B bitstream before any encode",
-      "paste vs warped: warped uses exactly one appearance payload",
+      "paste vs bbox-resized first reference: the latter uses exactly one appearance payload",
       "residual-off R=0",
       "ordinary vs standalone pixels equal",
       "calibrate on the saved E03B grid (do not rescore confirmation sources)",
@@ -137,19 +137,17 @@
     "confirmation_scoring": false,
     "new_encodes_authorized_now": false
   },
-  "implementation_gaps_before_launch": [
-    "Merge or cherry-pick #117 fail-closed RGB24 decode into the launch branch.",
-    "Standalone client must ingest the saved E04A panorama bitstream and side data as B without a second background encode.",
-    "Rebuild E04A union masks and refuse to proceed unless SHA-256 a65f1697… matches.",
-    "Serialize compact masks (PSM1); do not ship uncompressed uint8 stacks as rate."
-  ],
-  "artifact_and_narrative": {
-    "output_root": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-paste-warp",
-    "check_command": "python -m experiments.tier.e06_probe --check-reuse",
-    "launch_command": "not authorized",
-    "plot": "T versus whole-frame PSNR-Y for four PointStream points and four reused anchors; residual-off/on joined per predictor; encode/client seconds beside each point.",
-    "supported_sentence": "Residual-on improved paste (or warp) by >=0.5 dB at measured extra R bytes on this development window.",
-    "contradicted_sentence": "Residual-on did not improve the unaided reconstruction, or F+M already exceeded A(q).",
-    "scope": "One 4 s development scene at 360p/12 fps. Not a Gate A/B pass."
-  }
+    "implementation_gaps_before_launch": [
+      "Serialized transport, T=B+F+M+R+H ledger, honest predictor names, standalone/ordinary pixel equality, and immutable reuse hashes must pass CI on this revision.",
+      "Launch only after this revision is merged with green CI. No conventional or background re-encodes."
+    ],
+    "artifact_and_narrative": {
+      "output_root": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox",
+      "check_command": "python -m experiments.tier.e06_probe --check-reuse",
+      "launch_command": "python -m experiments.tier.e06_probe --launch",
+      "plot": "T versus whole-frame PSNR-Y for four PointStream points and four reused anchors; residual-off/on joined per predictor; encode/client seconds beside each point.",
+      "supported_sentence": "Residual-on improved per_frame_crop (or bbox_resized_first_reference) by >=0.5 dB at measured extra R bytes on this development window.",
+      "contradicted_sentence": "Residual-on did not improve the unaided reconstruction, or F+M already exceeded A(q).",
+      "scope": "One 4 s development scene at 360p/12 fps. Not a Gate A/B pass."
+    }
 }

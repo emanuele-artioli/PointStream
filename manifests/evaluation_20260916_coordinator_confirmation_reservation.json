@@ -1,0 +1,1155 @@
+{
+  "schema": "pointstream.confirmation_reservation.v1",
+  "campaign": "evaluation-20260914",
+  "reservation_id": "evaluation_20260916_coordinator_source_reservation",
+  "recorded_at_utc": "2026-09-16T13:07:07.558857+00:00",
+  "status": "source_set_reserved_execution_unreleased",
+  "source_set_reserved": true,
+  "source_count": 3,
+  "required_matches": 3,
+  "preferred_matches": 6,
+  "selection_without_test_scores": true,
+  "scores_computed": false,
+  "scoring_authorized": false,
+  "execution_procedure_frozen": false,
+  "claim_restrictions": [
+    "1080p acquired sources cannot confirm native 4K claims",
+    "n=3 independent matches; scenes/frames are not independent matches",
+    "same tournament-year overlap recorded; exact-match separation does not prove absence of replay/duplicate footage",
+    "no source may be dropped or substituted after observing its codec scores"
+  ],
+  "evidence": [
+    {
+      "path": "manifests/evaluation_20260916_e03b_confirmation_eligibility.json",
+      "sha256": "32b4d2a5d5dad1cc1d603d5122a033332b00ec75cfc89ba632acbecad14a63aa"
+    },
+    {
+      "path": "$PS_DATA_ROOT/outputs/evaluation-20260914/e03b/run-20260916-federer007/confirmation_eligibility.json",
+      "sha256": "88680b175b5c313dfe9e9e0e5e518b911816050acaad17b5445efa772f86a6ff"
+    },
+    {
+      "path": "manifests/evaluation_20260914_source_count_policy.json",
+      "sha256": "631499dd606a8ca8530272154479acd8e273b7e55e2401d5132f8fbe88f7a681"
+    }
+  ],
+  "integrity_verified": [
+    {
+      "candidate_id": "conf_cand_01_sinner_medvedev_ao2024",
+      "sha256": "c98e9823864b9397219a69ea74d892fb50533d89d010c0784d31ea6f624757da",
+      "hash_match": true,
+      "bytes": 213723603
+    },
+    {
+      "candidate_id": "conf_cand_04_medvedev_djokovic_usopen2023",
+      "sha256": "95b69d8d5d1538c930d4bf41bf036a79af6ba43a0893e1bee02d33f5cf7f7091",
+      "hash_match": true,
+      "bytes": 344828454
+    },
+    {
+      "candidate_id": "conf_cand_05_swiatek_sabalenka_madrid2024",
+      "sha256": "63946c0e6e2c6876b58979e5ad3971b080392b70fad31cad5544829f764e2a67",
+      "hash_match": true,
+      "bytes": 304200163
+    }
+  ],
+  "exposure_audit": {
+    "status": "not_certified",
+    "note": "Existing development_provenance_unused field is assigned provenance_contaminated; candidate_id.startswith(unused) check does not audit this reserved trio. Preserve old evidence; do not infer unused status from that field."
+  },
+  "remaining_release_requirements": [
+    "complete score-free exposure/replay/duplicate audit",
+    "resolve first decodable frame and exact PTS mapping for each selected window",
+    "pin selected full-codec procedure, rate ladder, metrics, eligibility policy, adaptation/installation budgets and source-count verifier",
+    "register source-level uncertainty/effect rule and missing/failure handling",
+    "coordinator Gate A acceptance and explicit confirmation execution release"
+  ],
+  "sources": [
+    {
+      "candidate_id": "conf_cand_01_sinner_medvedev_ao2024",
+      "media_path": "$PS_DATA_ROOT/assets/confirmation_raw/e01r/conf_cand_01_sinner_medvedev_ao2024_qkNLSXDAZtQ_3600-4500.mp4",
+      "media_sha256": "c98e9823864b9397219a69ea74d892fb50533d89d010c0784d31ea6f624757da",
+      "bytes": 213723603,
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "native_fps": 25.0,
+      "event_identity": {
+        "event": "2024 Australian Open, Men's Singles Final",
+        "tournament": "Australian Open",
+        "year": 2024,
+        "match_name": "Jannik Sinner vs. Daniil Medvedev",
+        "exact_match_overlap": false,
+        "tournament_or_token_hits": [
+          {
+            "against": "bp57_ao2024_sabalenka_zheng",
+            "reasons": "exposed_gate_b_same_tournament_year"
+          }
+        ],
+        "independent_match": true
+      },
+      "timestamp_origin": {
+        "container_start_s": 0.0,
+        "first_frame": {
+          "pict_type": "B",
+          "key_frame": false,
+          "pkt_dts_time_s": 0.0
+        },
+        "first_iframe": {
+          "pict_type": "I",
+          "key_frame": true,
+          "pkt_dts_time_s": 1.2
+        },
+        "keyframe_preroll_s": 1.2
+      },
+      "reserved_scene_bounds": [
+        {
+          "t_start_s": 0.0,
+          "t_end_s": 17.0,
+          "duration_s": 17.0,
+          "mean_consecutive_mad": 5.8357
+        },
+        {
+          "t_start_s": 17.0,
+          "t_end_s": 35.0,
+          "duration_s": 18.0,
+          "mean_consecutive_mad": 27.0864
+        },
+        {
+          "t_start_s": 35.0,
+          "t_end_s": 52.5,
+          "duration_s": 17.5,
+          "mean_consecutive_mad": 14.5986
+        },
+        {
+          "t_start_s": 52.5,
+          "t_end_s": 68.5,
+          "duration_s": 16.0,
+          "mean_consecutive_mad": 33.3709
+        },
+        {
+          "t_start_s": 68.5,
+          "t_end_s": 74.5,
+          "duration_s": 6.0,
+          "mean_consecutive_mad": 26.3663
+        },
+        {
+          "t_start_s": 78.0,
+          "t_end_s": 97.0,
+          "duration_s": 19.0,
+          "mean_consecutive_mad": 30.3138
+        },
+        {
+          "t_start_s": 97.5,
+          "t_end_s": 120.0,
+          "duration_s": 22.5,
+          "mean_consecutive_mad": 11.3219
+        },
+        {
+          "t_start_s": 120.0,
+          "t_end_s": 127.0,
+          "duration_s": 7.0,
+          "mean_consecutive_mad": 26.9245
+        },
+        {
+          "t_start_s": 127.0,
+          "t_end_s": 131.0,
+          "duration_s": 4.0,
+          "mean_consecutive_mad": 18.7932
+        },
+        {
+          "t_start_s": 133.0,
+          "t_end_s": 150.0,
+          "duration_s": 17.0,
+          "mean_consecutive_mad": 9.5425
+        },
+        {
+          "t_start_s": 150.0,
+          "t_end_s": 157.5,
+          "duration_s": 7.5,
+          "mean_consecutive_mad": 30.8743
+        },
+        {
+          "t_start_s": 158.0,
+          "t_end_s": 165.5,
+          "duration_s": 7.5,
+          "mean_consecutive_mad": 1.3294
+        },
+        {
+          "t_start_s": 165.5,
+          "t_end_s": 171.0,
+          "duration_s": 5.5,
+          "mean_consecutive_mad": 29.6374
+        },
+        {
+          "t_start_s": 174.5,
+          "t_end_s": 191.5,
+          "duration_s": 17.0,
+          "mean_consecutive_mad": 28.8506
+        },
+        {
+          "t_start_s": 191.5,
+          "t_end_s": 202.0,
+          "duration_s": 10.5,
+          "mean_consecutive_mad": 3.6342
+        },
+        {
+          "t_start_s": 202.0,
+          "t_end_s": 254.5,
+          "duration_s": 52.5,
+          "mean_consecutive_mad": 14.3442
+        },
+        {
+          "t_start_s": 257.5,
+          "t_end_s": 270.5,
+          "duration_s": 13.0,
+          "mean_consecutive_mad": 28.5221
+        },
+        {
+          "t_start_s": 277.0,
+          "t_end_s": 298.5,
+          "duration_s": 21.5,
+          "mean_consecutive_mad": 28.2675
+        },
+        {
+          "t_start_s": 298.5,
+          "t_end_s": 311.0,
+          "duration_s": 12.5,
+          "mean_consecutive_mad": 4.2227
+        },
+        {
+          "t_start_s": 311.0,
+          "t_end_s": 346.5,
+          "duration_s": 35.5,
+          "mean_consecutive_mad": 12.4319
+        },
+        {
+          "t_start_s": 346.5,
+          "t_end_s": 356.5,
+          "duration_s": 10.0,
+          "mean_consecutive_mad": 19.3223
+        },
+        {
+          "t_start_s": 359.0,
+          "t_end_s": 398.5,
+          "duration_s": 39.5,
+          "mean_consecutive_mad": 12.6398
+        },
+        {
+          "t_start_s": 406.5,
+          "t_end_s": 414.5,
+          "duration_s": 8.0,
+          "mean_consecutive_mad": 18.6452
+        },
+        {
+          "t_start_s": 419.0,
+          "t_end_s": 430.0,
+          "duration_s": 11.0,
+          "mean_consecutive_mad": 14.084
+        },
+        {
+          "t_start_s": 430.0,
+          "t_end_s": 436.0,
+          "duration_s": 6.0,
+          "mean_consecutive_mad": 10.1642
+        },
+        {
+          "t_start_s": 440.0,
+          "t_end_s": 466.0,
+          "duration_s": 26.0,
+          "mean_consecutive_mad": 24.3044
+        },
+        {
+          "t_start_s": 466.0,
+          "t_end_s": 485.0,
+          "duration_s": 19.0,
+          "mean_consecutive_mad": 5.6316
+        },
+        {
+          "t_start_s": 488.0,
+          "t_end_s": 492.5,
+          "duration_s": 4.5,
+          "mean_consecutive_mad": 39.1567
+        },
+        {
+          "t_start_s": 492.5,
+          "t_end_s": 513.5,
+          "duration_s": 21.0,
+          "mean_consecutive_mad": 24.0721
+        },
+        {
+          "t_start_s": 513.5,
+          "t_end_s": 522.5,
+          "duration_s": 9.0,
+          "mean_consecutive_mad": 26.503
+        },
+        {
+          "t_start_s": 522.5,
+          "t_end_s": 531.0,
+          "duration_s": 8.5,
+          "mean_consecutive_mad": 22.488
+        },
+        {
+          "t_start_s": 531.0,
+          "t_end_s": 535.5,
+          "duration_s": 4.5,
+          "mean_consecutive_mad": 24.0555
+        },
+        {
+          "t_start_s": 535.5,
+          "t_end_s": 583.0,
+          "duration_s": 47.5,
+          "mean_consecutive_mad": 19.0021
+        },
+        {
+          "t_start_s": 583.0,
+          "t_end_s": 590.0,
+          "duration_s": 7.0,
+          "mean_consecutive_mad": 18.1588
+        },
+        {
+          "t_start_s": 595.0,
+          "t_end_s": 610.0,
+          "duration_s": 15.0,
+          "mean_consecutive_mad": 20.6953
+        },
+        {
+          "t_start_s": 610.0,
+          "t_end_s": 622.5,
+          "duration_s": 12.5,
+          "mean_consecutive_mad": 6.0062
+        },
+        {
+          "t_start_s": 632.0,
+          "t_end_s": 638.0,
+          "duration_s": 6.0,
+          "mean_consecutive_mad": 17.9054
+        },
+        {
+          "t_start_s": 638.0,
+          "t_end_s": 660.0,
+          "duration_s": 22.0,
+          "mean_consecutive_mad": 5.0254
+        },
+        {
+          "t_start_s": 661.5,
+          "t_end_s": 669.5,
+          "duration_s": 8.0,
+          "mean_consecutive_mad": 27.469
+        },
+        {
+          "t_start_s": 673.5,
+          "t_end_s": 679.5,
+          "duration_s": 6.0,
+          "mean_consecutive_mad": 36.0854
+        },
+        {
+          "t_start_s": 679.5,
+          "t_end_s": 706.5,
+          "duration_s": 27.0,
+          "mean_consecutive_mad": 6.3962
+        },
+        {
+          "t_start_s": 708.5,
+          "t_end_s": 716.0,
+          "duration_s": 7.5,
+          "mean_consecutive_mad": 24.5973
+        },
+        {
+          "t_start_s": 719.5,
+          "t_end_s": 731.5,
+          "duration_s": 12.0,
+          "mean_consecutive_mad": 35.9552
+        },
+        {
+          "t_start_s": 735.0,
+          "t_end_s": 740.5,
+          "duration_s": 5.5,
+          "mean_consecutive_mad": 39.6062
+        },
+        {
+          "t_start_s": 740.5,
+          "t_end_s": 749.5,
+          "duration_s": 9.0,
+          "mean_consecutive_mad": 16.8076
+        },
+        {
+          "t_start_s": 762.5,
+          "t_end_s": 767.0,
+          "duration_s": 4.5,
+          "mean_consecutive_mad": 16.6004
+        },
+        {
+          "t_start_s": 767.0,
+          "t_end_s": 779.5,
+          "duration_s": 12.5,
+          "mean_consecutive_mad": 8.4056
+        },
+        {
+          "t_start_s": 783.0,
+          "t_end_s": 792.0,
+          "duration_s": 9.0,
+          "mean_consecutive_mad": 20.8292
+        },
+        {
+          "t_start_s": 795.0,
+          "t_end_s": 807.0,
+          "duration_s": 12.0,
+          "mean_consecutive_mad": 17.9966
+        },
+        {
+          "t_start_s": 811.0,
+          "t_end_s": 830.0,
+          "duration_s": 19.0,
+          "mean_consecutive_mad": 22.7296
+        },
+        {
+          "t_start_s": 830.0,
+          "t_end_s": 834.0,
+          "duration_s": 4.0,
+          "mean_consecutive_mad": 43.9504
+        },
+        {
+          "t_start_s": 834.5,
+          "t_end_s": 847.0,
+          "duration_s": 12.5,
+          "mean_consecutive_mad": 1.1077
+        },
+        {
+          "t_start_s": 848.5,
+          "t_end_s": 853.5,
+          "duration_s": 5.0,
+          "mean_consecutive_mad": 31.0688
+        },
+        {
+          "t_start_s": 853.5,
+          "t_end_s": 865.5,
+          "duration_s": 12.0,
+          "mean_consecutive_mad": 37.9665
+        },
+        {
+          "t_start_s": 865.5,
+          "t_end_s": 871.5,
+          "duration_s": 6.0,
+          "mean_consecutive_mad": 7.677
+        },
+        {
+          "t_start_s": 871.5,
+          "t_end_s": 876.0,
+          "duration_s": 4.5,
+          "mean_consecutive_mad": 1.5559
+        },
+        {
+          "t_start_s": 883.5,
+          "t_end_s": 900.0,
+          "duration_s": 16.5,
+          "mean_consecutive_mad": 4.6882
+        }
+      ],
+      "scene_count": 57,
+      "scores_computed": false,
+      "allowed_use": [
+        "integrity verification",
+        "score-free shot/timestamp/duplicate audit"
+      ],
+      "forbidden_use": [
+        "shared model training",
+        "development tuning",
+        "codec scoring before execution release"
+      ]
+    },
+    {
+      "candidate_id": "conf_cand_04_medvedev_djokovic_usopen2023",
+      "media_path": "$PS_DATA_ROOT/assets/confirmation_raw/e01r/conf_cand_04_medvedev_djokovic_usopen2023_1R4qtc1H4wM_3600-4500.mp4",
+      "media_sha256": "95b69d8d5d1538c930d4bf41bf036a79af6ba43a0893e1bee02d33f5cf7f7091",
+      "bytes": 344828454,
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "native_fps": 29.97,
+      "event_identity": {
+        "event": "2023 US Open, Men's Singles Final",
+        "tournament": "US Open",
+        "year": 2023,
+        "match_name": "Daniil Medvedev vs. Novak Djokovic",
+        "exact_match_overlap": false,
+        "tournament_or_token_hits": [
+          {
+            "against": "bp57_usopen2023_gauff_sabalenka",
+            "reasons": "exposed_gate_b_same_tournament_year"
+          }
+        ],
+        "independent_match": true
+      },
+      "timestamp_origin": {
+        "container_start_s": 0.0,
+        "first_frame": {
+          "pict_type": "B",
+          "key_frame": false,
+          "pkt_dts_time_s": 0.0
+        },
+        "first_iframe": {
+          "pict_type": "I",
+          "key_frame": true,
+          "pkt_dts_time_s": 1.468133
+        },
+        "keyframe_preroll_s": 1.468133
+      },
+      "reserved_scene_bounds": [
+        {
+          "t_start_s": 1.5,
+          "t_end_s": 9.0,
+          "duration_s": 7.5,
+          "mean_consecutive_mad": 4.0849
+        },
+        {
+          "t_start_s": 9.0,
+          "t_end_s": 19.0,
+          "duration_s": 10.0,
+          "mean_consecutive_mad": 7.6977
+        },
+        {
+          "t_start_s": 19.0,
+          "t_end_s": 23.5,
+          "duration_s": 4.5,
+          "mean_consecutive_mad": 18.7669
+        },
+        {
+          "t_start_s": 23.5,
+          "t_end_s": 39.5,
+          "duration_s": 16.0,
+          "mean_consecutive_mad": 5.0957
+        },
+        {
+          "t_start_s": 42.5,
+          "t_end_s": 51.5,
+          "duration_s": 9.0,
+          "mean_consecutive_mad": 14.778
+        },
+        {
+          "t_start_s": 51.5,
+          "t_end_s": 55.5,
+          "duration_s": 4.0,
+          "mean_consecutive_mad": 12.1947
+        },
+        {
+          "t_start_s": 55.5,
+          "t_end_s": 61.0,
+          "duration_s": 5.5,
+          "mean_consecutive_mad": 1.6615
+        },
+        {
+          "t_start_s": 61.0,
+          "t_end_s": 69.5,
+          "duration_s": 8.5,
+          "mean_consecutive_mad": 18.299
+        },
+        {
+          "t_start_s": 69.5,
+          "t_end_s": 77.5,
+          "duration_s": 8.0,
+          "mean_consecutive_mad": 2.8212
+        },
+        {
+          "t_start_s": 86.5,
+          "t_end_s": 98.5,
+          "duration_s": 12.0,
+          "mean_consecutive_mad": 1.8647
+        },
+        {
+          "t_start_s": 100.5,
+          "t_end_s": 105.5,
+          "duration_s": 5.0,
+          "mean_consecutive_mad": 16.7112
+        },
+        {
+          "t_start_s": 105.5,
+          "t_end_s": 140.0,
+          "duration_s": 34.5,
+          "mean_consecutive_mad": 3.8538
+        },
+        {
+          "t_start_s": 151.5,
+          "t_end_s": 156.5,
+          "duration_s": 5.0,
+          "mean_consecutive_mad": 28.8621
+        },
+        {
+          "t_start_s": 167.5,
+          "t_end_s": 177.0,
+          "duration_s": 9.5,
+          "mean_consecutive_mad": 2.879
+        },
+        {
+          "t_start_s": 184.0,
+          "t_end_s": 192.5,
+          "duration_s": 8.5,
+          "mean_consecutive_mad": 6.6879
+        },
+        {
+          "t_start_s": 192.5,
+          "t_end_s": 197.0,
+          "duration_s": 4.5,
+          "mean_consecutive_mad": 25.4016
+        },
+        {
+          "t_start_s": 197.0,
+          "t_end_s": 201.0,
+          "duration_s": 4.0,
+          "mean_consecutive_mad": 4.0571
+        },
+        {
+          "t_start_s": 201.0,
+          "t_end_s": 205.0,
+          "duration_s": 4.0,
+          "mean_consecutive_mad": 2.6913
+        },
+        {
+          "t_start_s": 210.5,
+          "t_end_s": 228.5,
+          "duration_s": 18.0,
+          "mean_consecutive_mad": 22.0761
+        },
+        {
+          "t_start_s": 231.5,
+          "t_end_s": 262.0,
+          "duration_s": 30.5,
+          "mean_consecutive_mad": 1.7416
+        },
+        {
+          "t_start_s": 269.0,
+          "t_end_s": 277.0,
+          "duration_s": 8.0,
+          "mean_consecutive_mad": 23.1343
+        },
+        {
+          "t_start_s": 281.5,
+          "t_end_s": 300.5,
+          "duration_s": 19.0,
+          "mean_consecutive_mad": 1.2365
+        },
+        {
+          "t_start_s": 312.5,
+          "t_end_s": 318.5,
+          "duration_s": 6.0,
+          "mean_consecutive_mad": 20.8421
+        },
+        {
+          "t_start_s": 319.0,
+          "t_end_s": 325.5,
+          "duration_s": 6.5,
+          "mean_consecutive_mad": 1.6869
+        },
+        {
+          "t_start_s": 325.5,
+          "t_end_s": 333.0,
+          "duration_s": 7.5,
+          "mean_consecutive_mad": 19.9555
+        },
+        {
+          "t_start_s": 333.0,
+          "t_end_s": 339.0,
+          "duration_s": 6.0,
+          "mean_consecutive_mad": 24.7127
+        },
+        {
+          "t_start_s": 339.0,
+          "t_end_s": 355.0,
+          "duration_s": 16.0,
+          "mean_consecutive_mad": 1.2429
+        },
+        {
+          "t_start_s": 359.5,
+          "t_end_s": 365.0,
+          "duration_s": 5.5,
+          "mean_consecutive_mad": 14.5287
+        },
+        {
+          "t_start_s": 365.0,
+          "t_end_s": 384.0,
+          "duration_s": 19.0,
+          "mean_consecutive_mad": 1.1722
+        },
+        {
+          "t_start_s": 384.0,
+          "t_end_s": 388.5,
+          "duration_s": 4.5,
+          "mean_consecutive_mad": 18.4177
+        },
+        {
+          "t_start_s": 388.5,
+          "t_end_s": 394.5,
+          "duration_s": 6.0,
+          "mean_consecutive_mad": 30.7001
+        },
+        {
+          "t_start_s": 395.0,
+          "t_end_s": 413.0,
+          "duration_s": 18.0,
+          "mean_consecutive_mad": 1.2066
+        },
+        {
+          "t_start_s": 413.0,
+          "t_end_s": 417.0,
+          "duration_s": 4.0,
+          "mean_consecutive_mad": 13.8566
+        },
+        {
+          "t_start_s": 438.0,
+          "t_end_s": 466.0,
+          "duration_s": 28.0,
+          "mean_consecutive_mad": 2.2624
+        },
+        {
+          "t_start_s": 468.0,
+          "t_end_s": 472.0,
+          "duration_s": 4.0,
+          "mean_consecutive_mad": 23.2004
+        },
+        {
+          "t_start_s": 472.0,
+          "t_end_s": 476.0,
+          "duration_s": 4.0,
+          "mean_consecutive_mad": 29.4969
+        },
+        {
+          "t_start_s": 476.0,
+          "t_end_s": 480.5,
+          "duration_s": 4.5,
+          "mean_consecutive_mad": 35.6829
+        },
+        {
+          "t_start_s": 480.5,
+          "t_end_s": 486.0,
+          "duration_s": 5.5,
+          "mean_consecutive_mad": 29.2067
+        },
+        {
+          "t_start_s": 490.5,
+          "t_end_s": 494.5,
+          "duration_s": 4.0,
+          "mean_consecutive_mad": 27.61
+        },
+        {
+          "t_start_s": 494.5,
+          "t_end_s": 501.0,
+          "duration_s": 6.5,
+          "mean_consecutive_mad": 1.3299
+        },
+        {
+          "t_start_s": 509.0,
+          "t_end_s": 515.5,
+          "duration_s": 6.5,
+          "mean_consecutive_mad": 23.4814
+        },
+        {
+          "t_start_s": 515.5,
+          "t_end_s": 519.5,
+          "duration_s": 4.0,
+          "mean_consecutive_mad": 25.7172
+        },
+        {
+          "t_start_s": 519.5,
+          "t_end_s": 554.0,
+          "duration_s": 34.5,
+          "mean_consecutive_mad": 1.2115
+        },
+        {
+          "t_start_s": 557.5,
+          "t_end_s": 563.0,
+          "duration_s": 5.5,
+          "mean_consecutive_mad": 22.6378
+        },
+        {
+          "t_start_s": 563.5,
+          "t_end_s": 578.5,
+          "duration_s": 15.0,
+          "mean_consecutive_mad": 20.809
+        },
+        {
+          "t_start_s": 584.5,
+          "t_end_s": 589.5,
+          "duration_s": 5.0,
+          "mean_consecutive_mad": 13.2194
+        },
+        {
+          "t_start_s": 589.5,
+          "t_end_s": 606.5,
+          "duration_s": 17.0,
+          "mean_consecutive_mad": 1.0456
+        },
+        {
+          "t_start_s": 611.5,
+          "t_end_s": 619.5,
+          "duration_s": 8.0,
+          "mean_consecutive_mad": 8.7079
+        },
+        {
+          "t_start_s": 619.5,
+          "t_end_s": 678.5,
+          "duration_s": 59.0,
+          "mean_consecutive_mad": 1.8069
+        },
+        {
+          "t_start_s": 678.5,
+          "t_end_s": 682.5,
+          "duration_s": 4.0,
+          "mean_consecutive_mad": 14.2686
+        },
+        {
+          "t_start_s": 693.0,
+          "t_end_s": 697.5,
+          "duration_s": 4.5,
+          "mean_consecutive_mad": 4.6245
+        },
+        {
+          "t_start_s": 704.5,
+          "t_end_s": 717.0,
+          "duration_s": 12.5,
+          "mean_consecutive_mad": 21.1464
+        },
+        {
+          "t_start_s": 717.5,
+          "t_end_s": 722.0,
+          "duration_s": 4.5,
+          "mean_consecutive_mad": 8.8405
+        },
+        {
+          "t_start_s": 722.5,
+          "t_end_s": 727.5,
+          "duration_s": 5.0,
+          "mean_consecutive_mad": 30.2832
+        },
+        {
+          "t_start_s": 731.5,
+          "t_end_s": 749.0,
+          "duration_s": 17.5,
+          "mean_consecutive_mad": 3.3543
+        },
+        {
+          "t_start_s": 755.0,
+          "t_end_s": 762.5,
+          "duration_s": 7.5,
+          "mean_consecutive_mad": 23.8996
+        },
+        {
+          "t_start_s": 762.5,
+          "t_end_s": 770.0,
+          "duration_s": 7.5,
+          "mean_consecutive_mad": 28.0959
+        },
+        {
+          "t_start_s": 771.5,
+          "t_end_s": 778.0,
+          "duration_s": 6.5,
+          "mean_consecutive_mad": 27.8137
+        },
+        {
+          "t_start_s": 786.5,
+          "t_end_s": 798.0,
+          "duration_s": 11.5,
+          "mean_consecutive_mad": 2.4337
+        },
+        {
+          "t_start_s": 814.0,
+          "t_end_s": 818.5,
+          "duration_s": 4.5,
+          "mean_consecutive_mad": 1.8184
+        },
+        {
+          "t_start_s": 821.5,
+          "t_end_s": 827.5,
+          "duration_s": 6.0,
+          "mean_consecutive_mad": 5.6395
+        },
+        {
+          "t_start_s": 827.5,
+          "t_end_s": 833.5,
+          "duration_s": 6.0,
+          "mean_consecutive_mad": 20.1241
+        },
+        {
+          "t_start_s": 833.5,
+          "t_end_s": 840.0,
+          "duration_s": 6.5,
+          "mean_consecutive_mad": 1.272
+        },
+        {
+          "t_start_s": 843.0,
+          "t_end_s": 855.5,
+          "duration_s": 12.5,
+          "mean_consecutive_mad": 19.3901
+        },
+        {
+          "t_start_s": 855.5,
+          "t_end_s": 860.5,
+          "duration_s": 5.0,
+          "mean_consecutive_mad": 10.8386
+        },
+        {
+          "t_start_s": 860.5,
+          "t_end_s": 867.5,
+          "duration_s": 7.0,
+          "mean_consecutive_mad": 1.2331
+        },
+        {
+          "t_start_s": 867.5,
+          "t_end_s": 871.5,
+          "duration_s": 4.0,
+          "mean_consecutive_mad": 29.4293
+        },
+        {
+          "t_start_s": 871.5,
+          "t_end_s": 879.5,
+          "duration_s": 8.0,
+          "mean_consecutive_mad": 15.5474
+        },
+        {
+          "t_start_s": 879.5,
+          "t_end_s": 891.5,
+          "duration_s": 12.0,
+          "mean_consecutive_mad": 11.9986
+        },
+        {
+          "t_start_s": 891.5,
+          "t_end_s": 898.0,
+          "duration_s": 6.5,
+          "mean_consecutive_mad": 1.1109
+        }
+      ],
+      "scene_count": 70,
+      "scores_computed": false,
+      "allowed_use": [
+        "integrity verification",
+        "score-free shot/timestamp/duplicate audit"
+      ],
+      "forbidden_use": [
+        "shared model training",
+        "development tuning",
+        "codec scoring before execution release"
+      ]
+    },
+    {
+      "candidate_id": "conf_cand_05_swiatek_sabalenka_madrid2024",
+      "media_path": "$PS_DATA_ROOT/assets/confirmation_raw/e01r/conf_cand_05_swiatek_sabalenka_madrid2024_n0MZNE_AIy4_3600-4500.mp4",
+      "media_sha256": "63946c0e6e2c6876b58979e5ad3971b080392b70fad31cad5544829f764e2a67",
+      "bytes": 304200163,
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "native_fps": 24.0,
+      "event_identity": {
+        "event": "2024 Mutua Madrid Open, Women's Singles Final",
+        "tournament": "Mutua Madrid Open",
+        "year": 2024,
+        "match_name": "Iga Swiatek vs. Aryna Sabalenka",
+        "exact_match_overlap": false,
+        "tournament_or_token_hits": [],
+        "independent_match": true
+      },
+      "timestamp_origin": {
+        "container_start_s": 0.0,
+        "first_frame": {
+          "pict_type": "P",
+          "key_frame": false,
+          "pkt_dts_time_s": 0.0
+        },
+        "first_iframe": {
+          "pict_type": "I",
+          "key_frame": true,
+          "pkt_dts_time_s": 3.625
+        },
+        "keyframe_preroll_s": 3.625
+      },
+      "reserved_scene_bounds": [
+        {
+          "t_start_s": 0.0,
+          "t_end_s": 77.0,
+          "duration_s": 77.0,
+          "mean_consecutive_mad": 12.6948
+        },
+        {
+          "t_start_s": 77.0,
+          "t_end_s": 183.0,
+          "duration_s": 106.0,
+          "mean_consecutive_mad": 18.7574
+        },
+        {
+          "t_start_s": 183.5,
+          "t_end_s": 199.5,
+          "duration_s": 16.0,
+          "mean_consecutive_mad": 27.5183
+        },
+        {
+          "t_start_s": 200.0,
+          "t_end_s": 233.5,
+          "duration_s": 33.5,
+          "mean_consecutive_mad": 23.5751
+        },
+        {
+          "t_start_s": 233.5,
+          "t_end_s": 290.0,
+          "duration_s": 56.5,
+          "mean_consecutive_mad": 14.6431
+        },
+        {
+          "t_start_s": 292.0,
+          "t_end_s": 316.0,
+          "duration_s": 24.0,
+          "mean_consecutive_mad": 21.5521
+        },
+        {
+          "t_start_s": 316.5,
+          "t_end_s": 324.5,
+          "duration_s": 8.0,
+          "mean_consecutive_mad": 36.6011
+        },
+        {
+          "t_start_s": 325.0,
+          "t_end_s": 338.5,
+          "duration_s": 13.5,
+          "mean_consecutive_mad": 6.6491
+        },
+        {
+          "t_start_s": 338.5,
+          "t_end_s": 344.0,
+          "duration_s": 5.5,
+          "mean_consecutive_mad": 23.7483
+        },
+        {
+          "t_start_s": 344.0,
+          "t_end_s": 355.0,
+          "duration_s": 11.0,
+          "mean_consecutive_mad": 12.6605
+        },
+        {
+          "t_start_s": 356.0,
+          "t_end_s": 382.5,
+          "duration_s": 26.5,
+          "mean_consecutive_mad": 19.3698
+        },
+        {
+          "t_start_s": 382.5,
+          "t_end_s": 412.5,
+          "duration_s": 30.0,
+          "mean_consecutive_mad": 18.9577
+        },
+        {
+          "t_start_s": 414.0,
+          "t_end_s": 419.5,
+          "duration_s": 5.5,
+          "mean_consecutive_mad": 27.3053
+        },
+        {
+          "t_start_s": 419.5,
+          "t_end_s": 426.0,
+          "duration_s": 6.5,
+          "mean_consecutive_mad": 47.2623
+        },
+        {
+          "t_start_s": 426.5,
+          "t_end_s": 440.5,
+          "duration_s": 14.0,
+          "mean_consecutive_mad": 15.6473
+        },
+        {
+          "t_start_s": 440.5,
+          "t_end_s": 447.5,
+          "duration_s": 7.0,
+          "mean_consecutive_mad": 26.7686
+        },
+        {
+          "t_start_s": 447.5,
+          "t_end_s": 519.0,
+          "duration_s": 71.5,
+          "mean_consecutive_mad": 20.6177
+        },
+        {
+          "t_start_s": 519.0,
+          "t_end_s": 621.5,
+          "duration_s": 102.5,
+          "mean_consecutive_mad": 19.2792
+        },
+        {
+          "t_start_s": 621.5,
+          "t_end_s": 675.0,
+          "duration_s": 53.5,
+          "mean_consecutive_mad": 17.9289
+        },
+        {
+          "t_start_s": 675.5,
+          "t_end_s": 696.0,
+          "duration_s": 20.5,
+          "mean_consecutive_mad": 32.1245
+        },
+        {
+          "t_start_s": 696.5,
+          "t_end_s": 734.0,
+          "duration_s": 37.5,
+          "mean_consecutive_mad": 17.4795
+        },
+        {
+          "t_start_s": 734.0,
+          "t_end_s": 770.5,
+          "duration_s": 36.5,
+          "mean_consecutive_mad": 14.0492
+        },
+        {
+          "t_start_s": 770.5,
+          "t_end_s": 785.5,
+          "duration_s": 15.0,
+          "mean_consecutive_mad": 33.7548
+        },
+        {
+          "t_start_s": 786.0,
+          "t_end_s": 810.0,
+          "duration_s": 24.0,
+          "mean_consecutive_mad": 1.3551
+        },
+        {
+          "t_start_s": 810.0,
+          "t_end_s": 819.0,
+          "duration_s": 9.0,
+          "mean_consecutive_mad": 45.5003
+        },
+        {
+          "t_start_s": 819.5,
+          "t_end_s": 840.0,
+          "duration_s": 20.5,
+          "mean_consecutive_mad": 34.163
+        },
+        {
+          "t_start_s": 840.5,
+          "t_end_s": 857.5,
+          "duration_s": 17.0,
+          "mean_consecutive_mad": 17.0961
+        },
+        {
+          "t_start_s": 857.5,
+          "t_end_s": 869.0,
+          "duration_s": 11.5,
+          "mean_consecutive_mad": 34.9711
+        },
+        {
+          "t_start_s": 869.5,
+          "t_end_s": 900.0,
+          "duration_s": 30.5,
+          "mean_consecutive_mad": 18.5533
+        }
+      ],
+      "scene_count": 29,
+      "scores_computed": false,
+      "allowed_use": [
+        "integrity verification",
+        "score-free shot/timestamp/duplicate audit"
+      ],
+      "forbidden_use": [
+        "shared model training",
+        "development tuning",
+        "codec scoring before execution release"
+      ]
+    }
+  ]
+}

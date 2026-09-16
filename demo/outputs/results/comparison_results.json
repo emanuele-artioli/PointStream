@@ -1,19 +1,22 @@
 {
-  "timestamp": "2026-09-16 11:29:06",
+  "timestamp": "2026-09-16 14:50:20",
   "hardware": "NVIDIA RTX 6000 Ada Generation",
+  "shared_anchor_bytes": 14120,
+  "shared_anchor_kbps": 3.77,
+  "total_session_sec": 30.0,
   "latency_profile": {
-    "encode_pose_extraction_ms": 16.34,
+    "encode_pose_extraction_ms": 15.39,
     "encode_keypoint_pack_ms": 0.0,
     "encode_background_svtav1_ms": 13.6,
-    "parallel_encode_latency_ms": 16.34,
-    "serial_encode_latency_ms": 29.94,
+    "parallel_encode_latency_ms": 15.39,
+    "serial_encode_latency_ms": 28.99,
     "decode_keypoint_unpack_ms": 0.0,
-    "decode_generator_inference_ms": 2.94,
+    "decode_generator_inference_ms": 2.95,
     "decode_compositing_ms": 0.01,
     "total_decode_latency_ms": 2.96,
-    "parallel_end_to_end_latency_ms": 19.3,
-    "serial_end_to_end_latency_ms": 32.9,
-    "end_to_end_latency_ms": 19.3,
+    "parallel_end_to_end_latency_ms": 18.36,
+    "serial_end_to_end_latency_ms": 31.96,
+    "end_to_end_latency_ms": 18.36,
     "teleop_feasible_sub_50ms": true
   },
   "clips": [
@@ -30,104 +33,257 @@
         "detection_ceiling": 0.547
       },
       "pointstream": {
-        "name": "PointStream (Standard, 250k bg)",
-        "total_bytes": 367206,
-        "bitrate_kbps": 293.8,
-        "background_kbps": 262.3,
+        "name": "PS Standard (540p bg, 250k)",
+        "total_bytes": 354695,
+        "bitrate_kbps": 276.2,
+        "background_kbps": 264.1,
         "keypoint_kbps": 8.4,
-        "anchor_kbps": 23.1,
+        "anchor_kbps": 3.8,
         "metrics": {
-          "psnr_dB": 23.2523641744491,
-          "ssim": 0.7945142278154106,
-          "lpips": 0.13624660740296046,
-          "dists": 0.1075455904006958,
-          "hand_roi_psnr_dB": 14.871102309901172,
-          "hand_roi_ssim": 0.5572158938310292
+          "psnr_dB": 23.398069970070765,
+          "ssim": 0.7981076236228402,
+          "lpips": 0.1291520064199964,
+          "dists": 0.10302104612191518,
+          "hand_roi_psnr_dB": 14.88443369296955,
+          "hand_roi_ssim": 0.5582842855582973
         },
         "teleop_utility": {
-          "detection_rate": 0.29064039408866993,
-          "oracle_capture_ratio": 0.29064039408866993,
-          "mpjpe_pixels": 113.5594715187232,
-          "mean_confidence": 0.9039734632281934,
-          "handedness_agreement": 0.5932203389830508
+          "detection_rate": 0.28078817733990147,
+          "oracle_capture_ratio": 0.28078817733990147,
+          "mpjpe_pixels": 112.7586020315399,
+          "mean_confidence": 0.9086678038563645,
+          "handedness_agreement": 0.5964912280701754
         },
-        "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/pointstream_reconstructed.mp4"
+        "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/ps_rec_ps_standard.mp4"
       },
       "pointstream_variants": [
         {
-          "name": "PointStream (Standard, 250k bg)",
-          "total_bytes": 367206,
-          "bitrate_kbps": 293.8,
-          "background_kbps": 262.3,
+          "name": "PS Extreme Starve (240p bg, 30k)",
+          "total_bytes": 116730,
+          "bitrate_kbps": 85.9,
+          "background_kbps": 73.7,
           "keypoint_kbps": 8.4,
-          "anchor_kbps": 23.1,
+          "anchor_kbps": 3.8,
           "metrics": {
-            "psnr_dB": 23.2523641744491,
-            "ssim": 0.7945142278154106,
-            "lpips": 0.13624660740296046,
-            "dists": 0.1075455904006958,
-            "hand_roi_psnr_dB": 14.871102309901172,
-            "hand_roi_ssim": 0.5572158938310292
+            "psnr_dB": 20.789842228441557,
+            "ssim": 0.7179761591101368,
+            "lpips": 0.31363296290238696,
+            "dists": 0.18943793773651124,
+            "hand_roi_psnr_dB": 14.732340717833852,
+            "hand_roi_ssim": 0.5450170554641708
+          },
+          "teleop_utility": {
+            "detection_rate": 0.30049261083743845,
+            "oracle_capture_ratio": 0.30049261083743845,
+            "mpjpe_pixels": 108.37255214553012,
+            "mean_confidence": 0.8931887120497032,
+            "handedness_agreement": 0.639344262295082
+          },
+          "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/ps_rec_ps_extreme_starve.mp4"
+        },
+        {
+          "name": "PS Heavy Starve (360p bg, 70k)",
+          "total_bytes": 189675,
+          "bitrate_kbps": 144.2,
+          "background_kbps": 132.1,
+          "keypoint_kbps": 8.4,
+          "anchor_kbps": 3.8,
+          "metrics": {
+            "psnr_dB": 21.94312559342396,
+            "ssim": 0.7533051696385796,
+            "lpips": 0.2073248264193535,
+            "dists": 0.1436317882935206,
+            "hand_roi_psnr_dB": 14.807596329012961,
+            "hand_roi_ssim": 0.5505823327560779
+          },
+          "teleop_utility": {
+            "detection_rate": 0.28078817733990147,
+            "oracle_capture_ratio": 0.28078817733990147,
+            "mpjpe_pixels": 110.68733400270507,
+            "mean_confidence": 0.8781645256176329,
+            "handedness_agreement": 0.5614035087719298
+          },
+          "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/ps_rec_ps_heavy_starve.mp4"
+        },
+        {
+          "name": "PS Low Teleop (540p bg, 140k)",
+          "total_bytes": 323054,
+          "bitrate_kbps": 250.9,
+          "background_kbps": 238.8,
+          "keypoint_kbps": 8.4,
+          "anchor_kbps": 3.8,
+          "metrics": {
+            "psnr_dB": 23.16901953583074,
+            "ssim": 0.7908391937182,
+            "lpips": 0.1386481384932995,
+            "dists": 0.10769658545653026,
+            "hand_roi_psnr_dB": 14.87626668130211,
+            "hand_roi_ssim": 0.5569631864026937
           },
           "teleop_utility": {
             "detection_rate": 0.29064039408866993,
             "oracle_capture_ratio": 0.29064039408866993,
-            "mpjpe_pixels": 113.5594715187232,
-            "mean_confidence": 0.9039734632281934,
-            "handedness_agreement": 0.5932203389830508
+            "mpjpe_pixels": 80.6889842224459,
+            "mean_confidence": 0.9011811351372023,
+            "handedness_agreement": 0.6610169491525424
           },
-          "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/pointstream_reconstructed.mp4"
+          "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/ps_rec_ps_low_teleop.mp4"
         },
         {
-          "name": "PointStream (Ultra-Low, 90k bg)",
-          "total_bytes": 335850,
-          "bitrate_kbps": 268.7,
-          "background_kbps": 237.3,
+          "name": "PS Standard (540p bg, 250k)",
+          "total_bytes": 354695,
+          "bitrate_kbps": 276.2,
+          "background_kbps": 264.1,
           "keypoint_kbps": 8.4,
-          "anchor_kbps": 23.1,
+          "anchor_kbps": 3.8,
           "metrics": {
-            "psnr_dB": 23.04825223099805,
-            "ssim": 0.7879082497194181,
-            "lpips": 0.14631754537423453,
-            "dists": 0.1125519496202469,
-            "hand_roi_psnr_dB": 14.868604707544772,
-            "hand_roi_ssim": 0.5563426587089414
+            "psnr_dB": 23.398069970070765,
+            "ssim": 0.7981076236228402,
+            "lpips": 0.1291520064199964,
+            "dists": 0.10302104612191518,
+            "hand_roi_psnr_dB": 14.88443369296955,
+            "hand_roi_ssim": 0.5582842855582973
           },
           "teleop_utility": {
-            "detection_rate": 0.270935960591133,
-            "oracle_capture_ratio": 0.270935960591133,
-            "mpjpe_pixels": 86.70608738019153,
-            "mean_confidence": 0.9004638314247131,
-            "handedness_agreement": 0.6363636363636364
+            "detection_rate": 0.28078817733990147,
+            "oracle_capture_ratio": 0.28078817733990147,
+            "mpjpe_pixels": 112.7586020315399,
+            "mean_confidence": 0.9086678038563645,
+            "handedness_agreement": 0.5964912280701754
           },
-          "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/pointstream_reconstructed_low.mp4"
+          "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/ps_rec_ps_standard.mp4"
+        },
+        {
+          "name": "PS Standard 1080p (native bg, 300k)",
+          "total_bytes": 860218,
+          "bitrate_kbps": 680.6,
+          "background_kbps": 668.5,
+          "keypoint_kbps": 8.4,
+          "anchor_kbps": 3.8,
+          "metrics": {
+            "psnr_dB": 24.802946754895263,
+            "ssim": 0.8362959718212981,
+            "lpips": 0.07457441166664164,
+            "dists": 0.07269043882687887,
+            "hand_roi_psnr_dB": 14.944061412607772,
+            "hand_roi_ssim": 0.5670607217946899
+          },
+          "teleop_utility": {
+            "detection_rate": 0.3448275862068966,
+            "oracle_capture_ratio": 0.3448275862068966,
+            "mpjpe_pixels": 100.26892325352034,
+            "mean_confidence": 0.8696550709860665,
+            "handedness_agreement": 0.6714285714285714
+          },
+          "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/ps_rec_ps_standard_1080p.mp4"
         },
         {
           "name": "PointStream (Plate 2s)",
-          "total_bytes": 1127404,
-          "bitrate_kbps": 901.9,
+          "total_bytes": 1112679,
+          "bitrate_kbps": 882.6,
           "background_kbps": 870.5,
           "keypoint_kbps": 8.4,
-          "anchor_kbps": 23.1,
+          "anchor_kbps": 3.8,
           "metrics": {
-            "psnr_dB": 11.09231873565689,
-            "ssim": 0.4367431450935692,
-            "lpips": 0.45187983912881463,
-            "dists": 0.18722252388795216,
-            "hand_roi_psnr_dB": 13.200333383904145,
-            "hand_roi_ssim": 0.492672640468389
+            "psnr_dB": 11.092342760018234,
+            "ssim": 0.4367444206686354,
+            "lpips": 0.4518778480729088,
+            "dists": 0.18721783777077994,
+            "hand_roi_psnr_dB": 13.202476976752031,
+            "hand_roi_ssim": 0.4927029012276163
           },
           "teleop_utility": {
             "detection_rate": 0.07881773399014778,
             "oracle_capture_ratio": 0.07881773399014778,
-            "mpjpe_pixels": 56.47111197336642,
-            "mean_confidence": 0.879893098026514,
-            "handedness_agreement": 0.375
+            "mpjpe_pixels": 54.42355215175918,
+            "mean_confidence": 0.8707360588014126,
+            "handedness_agreement": 0.25
           },
           "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/pointstream_reconstructed_plate.mp4"
         }
       ],
       "av1_arms": [
+        {
+          "name": "AV1 180p (25k, p7 - Starved Floor)",
+          "target_kbps": 25,
+          "actual_kbps": 52.4,
+          "scale": "320:180",
+          "preset": 7,
+          "ms_per_frame": 31.22,
+          "encode_fps": 32.0,
+          "size_bytes": 65476,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 20.613391037214868,
+            "ssim": 0.7140721961986897,
+            "lpips": 0.39216112822294236,
+            "dists": 0.21332986374696095,
+            "hand_roi_psnr_dB": 18.95533760329758,
+            "hand_roi_ssim": 0.6938055892102571
+          },
+          "teleop_utility": {
+            "detection_rate": 0.21674876847290642,
+            "oracle_capture_ratio": 0.21674876847290642,
+            "mpjpe_pixels": 158.48921616611293,
+            "mean_confidence": 0.8206470988013528,
+            "handedness_agreement": 0.5909090909090909
+          },
+          "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/av1_ladder/av1_320x180_p7_25k_reference_trimmed.mp4"
+        },
+        {
+          "name": "AV1 240p (40k, p7 - Starved)",
+          "target_kbps": 40,
+          "actual_kbps": 77.8,
+          "scale": "426:240",
+          "preset": 7,
+          "ms_per_frame": 10.48,
+          "encode_fps": 95.4,
+          "size_bytes": 97213,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 21.546986208374992,
+            "ssim": 0.7362438269094319,
+            "lpips": 0.2953051078816255,
+            "dists": 0.17906267921129862,
+            "hand_roi_psnr_dB": 20.00473350414428,
+            "hand_roi_ssim": 0.7189714403071005
+          },
+          "teleop_utility": {
+            "detection_rate": 0.32019704433497537,
+            "oracle_capture_ratio": 0.32019704433497537,
+            "mpjpe_pixels": 105.26906355293023,
+            "mean_confidence": 0.9036934458292447,
+            "handedness_agreement": 0.6153846153846154
+          },
+          "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/av1_ladder/av1_426x240_p7_40k_reference_trimmed.mp4"
+        },
+        {
+          "name": "AV1 360p (80k, p7 - Heavy Starve)",
+          "target_kbps": 80,
+          "actual_kbps": 137.0,
+          "scale": "640:360",
+          "preset": 7,
+          "ms_per_frame": 9.94,
+          "encode_fps": 100.6,
+          "size_bytes": 171287,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 22.926278742909965,
+            "ssim": 0.7723182917590918,
+            "lpips": 0.1944431879123052,
+            "dists": 0.13465982298056284,
+            "hand_roi_psnr_dB": 21.34949162206877,
+            "hand_roi_ssim": 0.7501755220076506
+          },
+          "teleop_utility": {
+            "detection_rate": 0.3842364532019704,
+            "oracle_capture_ratio": 0.3842364532019704,
+            "mpjpe_pixels": 102.89877013730974,
+            "mean_confidence": 0.8308477653906896,
+            "handedness_agreement": 0.7564102564102564
+          },
+          "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/av1_ladder/av1_640x360_p7_80k_reference_trimmed.mp4"
+        },
         {
           "name": "AV1 540p (90k, p7 - Ultra-Low)",
           "target_kbps": 90,
@@ -156,6 +312,33 @@
           "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/av1_ladder/av1_960x540_p7_90k_reference_trimmed.mp4"
         },
         {
+          "name": "AV1 540p (140k, p7 - Low)",
+          "target_kbps": 140,
+          "actual_kbps": 249.2,
+          "scale": "960:540",
+          "preset": 7,
+          "ms_per_frame": 13.28,
+          "encode_fps": 75.3,
+          "size_bytes": 311537,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 24.46542072471447,
+            "ssim": 0.8123928758152118,
+            "lpips": 0.1257740427305301,
+            "dists": 0.10009264628092449,
+            "hand_roi_psnr_dB": 22.852648859400862,
+            "hand_roi_ssim": 0.7872804922182743
+          },
+          "teleop_utility": {
+            "detection_rate": 0.47783251231527096,
+            "oracle_capture_ratio": 0.47783251231527096,
+            "mpjpe_pixels": 82.71223820831327,
+            "mean_confidence": 0.9272039354461985,
+            "handedness_agreement": 0.7422680412371134
+          },
+          "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/av1_ladder/av1_960x540_p7_140k_reference_trimmed.mp4"
+        },
+        {
           "name": "AV1 540p (180k, p7)",
           "target_kbps": 180,
           "actual_kbps": 249.4,
@@ -181,6 +364,33 @@
             "handedness_agreement": 0.7439024390243902
           },
           "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/av1_ladder/av1_960x540_p7_180k_reference_trimmed.mp4"
+        },
+        {
+          "name": "AV1 540p (220k, p7 - Matched Teleop)",
+          "target_kbps": 220,
+          "actual_kbps": 251.7,
+          "scale": "960:540",
+          "preset": 7,
+          "ms_per_frame": 12.21,
+          "encode_fps": 81.9,
+          "size_bytes": 314648,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 24.501917415528897,
+            "ssim": 0.8131944628745921,
+            "lpips": 0.12514334917068481,
+            "dists": 0.09915742337703705,
+            "hand_roi_psnr_dB": 22.869938885528928,
+            "hand_roi_ssim": 0.7881736842171572
+          },
+          "teleop_utility": {
+            "detection_rate": 0.4039408866995074,
+            "oracle_capture_ratio": 0.4039408866995074,
+            "mpjpe_pixels": 91.25519247190357,
+            "mean_confidence": 0.9235867000207668,
+            "handedness_agreement": 0.8048780487804879
+          },
+          "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/av1_ladder/av1_960x540_p7_220k_reference_trimmed.mp4"
         },
         {
           "name": "AV1 540p (250k, p7 - Matched Rate & Latency)",
@@ -264,6 +474,33 @@
           "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/av1_ladder/av1_1080p_p6_200k_reference_trimmed.mp4"
         },
         {
+          "name": "AV1 1080p (350k, p10 - Standard)",
+          "target_kbps": 350,
+          "actual_kbps": 679.9,
+          "scale": null,
+          "preset": 10,
+          "ms_per_frame": 16.08,
+          "encode_fps": 62.2,
+          "size_bytes": 849838,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 26.668929597607335,
+            "ssim": 0.8561545658587232,
+            "lpips": 0.06660080683728059,
+            "dists": 0.06605501194794973,
+            "hand_roi_psnr_dB": 25.05215208009273,
+            "hand_roi_ssim": 0.8287516156810928
+          },
+          "teleop_utility": {
+            "detection_rate": 0.6847290640394089,
+            "oracle_capture_ratio": 0.6847290640394089,
+            "mpjpe_pixels": 82.66086753971857,
+            "mean_confidence": 0.909713275569806,
+            "handedness_agreement": 0.7050359712230215
+          },
+          "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/av1_ladder/av1_1080p_p10_350k_reference_trimmed.mp4"
+        },
+        {
           "name": "AV1 1080p (500k, p6 - Matched Quality)",
           "target_kbps": 500,
           "actual_kbps": 672.3,
@@ -344,7 +581,8 @@
           },
           "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/av1_ladder/av1_1080p_p6_deb_350k_reference_trimmed.mp4"
         }
-      ]
+      ],
+      "per_clip_anchor_bytes": 12606
     },
     {
       "clip_id": 1,
@@ -359,104 +597,257 @@
         "detection_ceiling": 0.58
       },
       "pointstream": {
-        "name": "PointStream (Standard, 250k bg)",
-        "total_bytes": 360175,
-        "bitrate_kbps": 288.1,
-        "background_kbps": 258.1,
+        "name": "PS Standard (540p bg, 250k)",
+        "total_bytes": 347419,
+        "bitrate_kbps": 270.4,
+        "background_kbps": 256.6,
         "keypoint_kbps": 10.0,
-        "anchor_kbps": 20.0,
+        "anchor_kbps": 3.8,
         "metrics": {
-          "psnr_dB": 23.146247230576094,
-          "ssim": 0.7876441422921788,
-          "lpips": 0.13311294049024583,
-          "dists": 0.10632812718550365,
-          "hand_roi_psnr_dB": 16.713477119013252,
-          "hand_roi_ssim": 0.6059995656807099
+          "psnr_dB": 23.288989763043546,
+          "ssim": 0.7920549297908686,
+          "lpips": 0.1270041561871767,
+          "dists": 0.10239065011342366,
+          "hand_roi_psnr_dB": 16.727629354857193,
+          "hand_roi_ssim": 0.60759624199453
         },
         "teleop_utility": {
-          "detection_rate": 0.5241935483870968,
-          "oracle_capture_ratio": 0.5241935483870968,
-          "mpjpe_pixels": 69.638722316784,
-          "mean_confidence": 0.8959348806968102,
-          "handedness_agreement": 0.8846153846153846
+          "detection_rate": 0.4838709677419355,
+          "oracle_capture_ratio": 0.4838709677419355,
+          "mpjpe_pixels": 74.53405937695217,
+          "mean_confidence": 0.8855072612563769,
+          "handedness_agreement": 0.8333333333333334
         },
-        "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/pointstream_reconstructed.mp4"
+        "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/ps_rec_ps_standard.mp4"
       },
       "pointstream_variants": [
         {
-          "name": "PointStream (Standard, 250k bg)",
-          "total_bytes": 360175,
-          "bitrate_kbps": 288.1,
-          "background_kbps": 258.1,
+          "name": "PS Extreme Starve (240p bg, 30k)",
+          "total_bytes": 115314,
+          "bitrate_kbps": 84.7,
+          "background_kbps": 70.9,
           "keypoint_kbps": 10.0,
-          "anchor_kbps": 20.0,
+          "anchor_kbps": 3.8,
           "metrics": {
-            "psnr_dB": 23.146247230576094,
-            "ssim": 0.7876441422921788,
-            "lpips": 0.13311294049024583,
-            "dists": 0.10632812718550365,
-            "hand_roi_psnr_dB": 16.713477119013252,
-            "hand_roi_ssim": 0.6059995656807099
+            "psnr_dB": 20.604527613319608,
+            "ssim": 0.704040051057323,
+            "lpips": 0.3133296172817548,
+            "dists": 0.1891521898905436,
+            "hand_roi_psnr_dB": 16.47063770447275,
+            "hand_roi_ssim": 0.5898227174146635
           },
           "teleop_utility": {
-            "detection_rate": 0.5241935483870968,
-            "oracle_capture_ratio": 0.5241935483870968,
-            "mpjpe_pixels": 69.638722316784,
-            "mean_confidence": 0.8959348806968102,
-            "handedness_agreement": 0.8846153846153846
+            "detection_rate": 0.47580645161290325,
+            "oracle_capture_ratio": 0.47580645161290325,
+            "mpjpe_pixels": 75.50458389004795,
+            "mean_confidence": 0.8838341246216984,
+            "handedness_agreement": 0.864406779661017
           },
-          "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/pointstream_reconstructed.mp4"
+          "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/ps_rec_ps_extreme_starve.mp4"
         },
         {
-          "name": "PointStream (Ultra-Low, 90k bg)",
-          "total_bytes": 334808,
-          "bitrate_kbps": 267.8,
-          "background_kbps": 237.8,
+          "name": "PS Heavy Starve (360p bg, 70k)",
+          "total_bytes": 190008,
+          "bitrate_kbps": 144.5,
+          "background_kbps": 130.7,
           "keypoint_kbps": 10.0,
-          "anchor_kbps": 20.0,
+          "anchor_kbps": 3.8,
           "metrics": {
-            "psnr_dB": 22.976509580723185,
-            "ssim": 0.7806095705647357,
-            "lpips": 0.13976579460004965,
-            "dists": 0.11088428656260173,
-            "hand_roi_psnr_dB": 16.697891857873195,
-            "hand_roi_ssim": 0.6045484967495782
+            "psnr_dB": 21.82310372315734,
+            "ssim": 0.7424349458217844,
+            "lpips": 0.1996673223376274,
+            "dists": 0.14227357606093088,
+            "hand_roi_psnr_dB": 16.590354849257317,
+            "hand_roi_ssim": 0.5966857666816964
           },
           "teleop_utility": {
-            "detection_rate": 0.49193548387096775,
-            "oracle_capture_ratio": 0.49193548387096775,
-            "mpjpe_pixels": 50.22316090070901,
-            "mean_confidence": 0.8821218824777447,
-            "handedness_agreement": 0.8360655737704918
+            "detection_rate": 0.5080645161290323,
+            "oracle_capture_ratio": 0.5080645161290323,
+            "mpjpe_pixels": 65.77810779159424,
+            "mean_confidence": 0.8812692524894835,
+            "handedness_agreement": 0.8253968253968254
           },
-          "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/pointstream_reconstructed_low.mp4"
+          "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/ps_rec_ps_heavy_starve.mp4"
+        },
+        {
+          "name": "PS Low Teleop (540p bg, 140k)",
+          "total_bytes": 326216,
+          "bitrate_kbps": 253.4,
+          "background_kbps": 239.6,
+          "keypoint_kbps": 10.0,
+          "anchor_kbps": 3.8,
+          "metrics": {
+            "psnr_dB": 23.136444878050828,
+            "ssim": 0.7853689328629417,
+            "lpips": 0.13166935165723165,
+            "dists": 0.1063668700059255,
+            "hand_roi_psnr_dB": 16.71124670690069,
+            "hand_roi_ssim": 0.6059580861138173
+          },
+          "teleop_utility": {
+            "detection_rate": 0.4596774193548387,
+            "oracle_capture_ratio": 0.4596774193548387,
+            "mpjpe_pixels": 73.79124060169245,
+            "mean_confidence": 0.8824589053789774,
+            "handedness_agreement": 0.8421052631578947
+          },
+          "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/ps_rec_ps_low_teleop.mp4"
+        },
+        {
+          "name": "PS Standard (540p bg, 250k)",
+          "total_bytes": 347419,
+          "bitrate_kbps": 270.4,
+          "background_kbps": 256.6,
+          "keypoint_kbps": 10.0,
+          "anchor_kbps": 3.8,
+          "metrics": {
+            "psnr_dB": 23.288989763043546,
+            "ssim": 0.7920549297908686,
+            "lpips": 0.1270041561871767,
+            "dists": 0.10239065011342366,
+            "hand_roi_psnr_dB": 16.727629354857193,
+            "hand_roi_ssim": 0.60759624199453
+          },
+          "teleop_utility": {
+            "detection_rate": 0.4838709677419355,
+            "oracle_capture_ratio": 0.4838709677419355,
+            "mpjpe_pixels": 74.53405937695217,
+            "mean_confidence": 0.8855072612563769,
+            "handedness_agreement": 0.8333333333333334
+          },
+          "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/ps_rec_ps_standard.mp4"
+        },
+        {
+          "name": "PS Standard 1080p (native bg, 300k)",
+          "total_bytes": 851113,
+          "bitrate_kbps": 673.4,
+          "background_kbps": 659.5,
+          "keypoint_kbps": 10.0,
+          "anchor_kbps": 3.8,
+          "metrics": {
+            "psnr_dB": 24.759635117308385,
+            "ssim": 0.8330496663907667,
+            "lpips": 0.07168137717992068,
+            "dists": 0.0727107169230779,
+            "hand_roi_psnr_dB": 16.826581914812365,
+            "hand_roi_ssim": 0.6179581067748746
+          },
+          "teleop_utility": {
+            "detection_rate": 0.5604838709677419,
+            "oracle_capture_ratio": 0.5604838709677419,
+            "mpjpe_pixels": 62.97577448423168,
+            "mean_confidence": 0.8828667256471922,
+            "handedness_agreement": 0.8920863309352518
+          },
+          "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/ps_rec_ps_standard_1080p.mp4"
         },
         {
           "name": "PointStream (Plate 2s)",
-          "total_bytes": 1040608,
-          "bitrate_kbps": 832.5,
+          "total_bytes": 1029679,
+          "bitrate_kbps": 816.2,
           "background_kbps": 802.4,
           "keypoint_kbps": 10.0,
-          "anchor_kbps": 20.0,
+          "anchor_kbps": 3.8,
           "metrics": {
-            "psnr_dB": 11.321914346077731,
-            "ssim": 0.4556063895823987,
-            "lpips": 0.42303371624244995,
-            "dists": 0.17546352744102478,
-            "hand_roi_psnr_dB": 14.526368986940435,
-            "hand_roi_ssim": 0.5377186938940837
+            "psnr_dB": 11.321844637872124,
+            "ssim": 0.45560409227989673,
+            "lpips": 0.4230310574779287,
+            "dists": 0.17547329982121784,
+            "hand_roi_psnr_dB": 14.524041079258971,
+            "hand_roi_ssim": 0.5376776423588114
           },
           "teleop_utility": {
-            "detection_rate": 0.2620967741935484,
-            "oracle_capture_ratio": 0.2620967741935484,
-            "mpjpe_pixels": 143.09895464442917,
-            "mean_confidence": 0.9243449018551753,
-            "handedness_agreement": 0.5846153846153846
+            "detection_rate": 0.2903225806451613,
+            "oracle_capture_ratio": 0.2903225806451613,
+            "mpjpe_pixels": 139.17528922387797,
+            "mean_confidence": 0.9195038129885992,
+            "handedness_agreement": 0.5972222222222222
           },
           "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/pointstream_reconstructed_plate.mp4"
         }
       ],
       "av1_arms": [
+        {
+          "name": "AV1 180p (25k, p7 - Starved Floor)",
+          "target_kbps": 25,
+          "actual_kbps": 50.8,
+          "scale": "320:180",
+          "preset": 7,
+          "ms_per_frame": 19.84,
+          "encode_fps": 50.4,
+          "size_bytes": 63544,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 20.383086130217404,
+            "ssim": 0.7000660287829883,
+            "lpips": 0.3937038673957189,
+            "dists": 0.2117527828613917,
+            "hand_roi_psnr_dB": 18.692894186139917,
+            "hand_roi_ssim": 0.6769866619312125
+          },
+          "teleop_utility": {
+            "detection_rate": 0.21774193548387097,
+            "oracle_capture_ratio": 0.21774193548387097,
+            "mpjpe_pixels": 105.85458082495755,
+            "mean_confidence": 0.8451748578636734,
+            "handedness_agreement": 0.7777777777777778
+          },
+          "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/av1_ladder/av1_320x180_p7_25k_reference_trimmed.mp4"
+        },
+        {
+          "name": "AV1 240p (40k, p7 - Starved)",
+          "target_kbps": 40,
+          "actual_kbps": 75.8,
+          "scale": "426:240",
+          "preset": 7,
+          "ms_per_frame": 9.18,
+          "encode_fps": 108.9,
+          "size_bytes": 94756,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 21.297624344052807,
+            "ssim": 0.7228564570645336,
+            "lpips": 0.2921704864998658,
+            "dists": 0.17629198690255482,
+            "hand_roi_psnr_dB": 19.630530641314554,
+            "hand_roi_ssim": 0.7002270201018841
+          },
+          "teleop_utility": {
+            "detection_rate": 0.3911290322580645,
+            "oracle_capture_ratio": 0.3911290322580645,
+            "mpjpe_pixels": 78.58770562380992,
+            "mean_confidence": 0.8726747183455634,
+            "handedness_agreement": 0.9072164948453608
+          },
+          "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/av1_ladder/av1_426x240_p7_40k_reference_trimmed.mp4"
+        },
+        {
+          "name": "AV1 360p (80k, p7 - Heavy Starve)",
+          "target_kbps": 80,
+          "actual_kbps": 135.3,
+          "scale": "640:360",
+          "preset": 7,
+          "ms_per_frame": 11.48,
+          "encode_fps": 87.1,
+          "size_bytes": 169113,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 22.689886884397932,
+            "ssim": 0.7623135453431963,
+            "lpips": 0.1856975392997265,
+            "dists": 0.13165853122870128,
+            "hand_roi_psnr_dB": 20.96153415288476,
+            "hand_roi_ssim": 0.735557825303872
+          },
+          "teleop_utility": {
+            "detection_rate": 0.5362903225806451,
+            "oracle_capture_ratio": 0.5362903225806451,
+            "mpjpe_pixels": 79.85183738696006,
+            "mean_confidence": 0.8910768439895228,
+            "handedness_agreement": 0.8646616541353384
+          },
+          "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/av1_ladder/av1_640x360_p7_80k_reference_trimmed.mp4"
+        },
         {
           "name": "AV1 540p (90k, p7 - Ultra-Low)",
           "target_kbps": 90,
@@ -485,6 +876,33 @@
           "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/av1_ladder/av1_960x540_p7_90k_reference_trimmed.mp4"
         },
         {
+          "name": "AV1 540p (140k, p7 - Low)",
+          "target_kbps": 140,
+          "actual_kbps": 247.9,
+          "scale": "960:540",
+          "preset": 7,
+          "ms_per_frame": 12.05,
+          "encode_fps": 83.0,
+          "size_bytes": 309897,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 24.294688724712756,
+            "ssim": 0.8072340954984427,
+            "lpips": 0.12070068458716075,
+            "dists": 0.09783557633558909,
+            "hand_roi_psnr_dB": 22.564931825141517,
+            "hand_roi_ssim": 0.778980540314938
+          },
+          "teleop_utility": {
+            "detection_rate": 0.5282258064516129,
+            "oracle_capture_ratio": 0.5282258064516129,
+            "mpjpe_pixels": 70.23866127066817,
+            "mean_confidence": 0.893360162964304,
+            "handedness_agreement": 0.8473282442748091
+          },
+          "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/av1_ladder/av1_960x540_p7_140k_reference_trimmed.mp4"
+        },
+        {
           "name": "AV1 540p (180k, p7)",
           "target_kbps": 180,
           "actual_kbps": 249.6,
@@ -510,6 +928,33 @@
             "handedness_agreement": 0.8487394957983193
           },
           "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/av1_ladder/av1_960x540_p7_180k_reference_trimmed.mp4"
+        },
+        {
+          "name": "AV1 540p (220k, p7 - Matched Teleop)",
+          "target_kbps": 220,
+          "actual_kbps": 251.1,
+          "scale": "960:540",
+          "preset": 7,
+          "ms_per_frame": 12.67,
+          "encode_fps": 78.9,
+          "size_bytes": 313824,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 24.342946228588122,
+            "ssim": 0.8085673045859691,
+            "lpips": 0.11932878822088241,
+            "dists": 0.097112997174263,
+            "hand_roi_psnr_dB": 22.642607849599152,
+            "hand_roi_ssim": 0.7816369488861126
+          },
+          "teleop_utility": {
+            "detection_rate": 0.625,
+            "oracle_capture_ratio": 0.625,
+            "mpjpe_pixels": 83.04248486363991,
+            "mean_confidence": 0.8807749471356792,
+            "handedness_agreement": 0.8129032258064516
+          },
+          "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/av1_ladder/av1_960x540_p7_220k_reference_trimmed.mp4"
         },
         {
           "name": "AV1 540p (250k, p7 - Matched Rate & Latency)",
@@ -593,6 +1038,33 @@
           "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/av1_ladder/av1_1080p_p6_200k_reference_trimmed.mp4"
         },
         {
+          "name": "AV1 1080p (350k, p10 - Standard)",
+          "target_kbps": 350,
+          "actual_kbps": 670.2,
+          "scale": null,
+          "preset": 10,
+          "ms_per_frame": 38.25,
+          "encode_fps": 26.1,
+          "size_bytes": 837734,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 26.523974219209332,
+            "ssim": 0.8540468841095393,
+            "lpips": 0.06322896803108355,
+            "dists": 0.06476044893264771,
+            "hand_roi_psnr_dB": 24.88267253279321,
+            "hand_roi_ssim": 0.8276674451489692
+          },
+          "teleop_utility": {
+            "detection_rate": 0.7016129032258065,
+            "oracle_capture_ratio": 0.7016129032258065,
+            "mpjpe_pixels": 52.70388113277432,
+            "mean_confidence": 0.8738476226384613,
+            "handedness_agreement": 0.896551724137931
+          },
+          "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/av1_ladder/av1_1080p_p10_350k_reference_trimmed.mp4"
+        },
+        {
           "name": "AV1 1080p (500k, p6 - Matched Quality)",
           "target_kbps": 500,
           "actual_kbps": 672.0,
@@ -673,7 +1145,8 @@
           },
           "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/av1_ladder/av1_1080p_p6_deb_350k_reference_trimmed.mp4"
         }
-      ]
+      ],
+      "per_clip_anchor_bytes": 9396
     },
     {
       "clip_id": 2,
@@ -688,104 +1161,257 @@
         "detection_ceiling": 0.397
       },
       "pointstream": {
-        "name": "PointStream (Standard, 250k bg)",
-        "total_bytes": 370543,
-        "bitrate_kbps": 296.4,
-        "background_kbps": 261.2,
+        "name": "PS Standard (540p bg, 250k)",
+        "total_bytes": 348728,
+        "bitrate_kbps": 271.5,
+        "background_kbps": 260.6,
         "keypoint_kbps": 7.1,
-        "anchor_kbps": 28.1,
+        "anchor_kbps": 3.8,
         "metrics": {
-          "psnr_dB": 24.218350599321504,
-          "ssim": 0.8157943588623263,
-          "lpips": 0.13023038610816,
-          "dists": 0.11877118031183878,
-          "hand_roi_psnr_dB": 18.386021845313664,
-          "hand_roi_ssim": 0.6641605820071245
+          "psnr_dB": 24.382514552270745,
+          "ssim": 0.8202521926710331,
+          "lpips": 0.12435197378198305,
+          "dists": 0.11426402767499289,
+          "hand_roi_psnr_dB": 18.401810268485104,
+          "hand_roi_ssim": 0.6652305260271537
         },
         "teleop_utility": {
-          "detection_rate": 0.39644970414201186,
-          "oracle_capture_ratio": 0.39644970414201186,
-          "mpjpe_pixels": 58.815932872635656,
-          "mean_confidence": 0.9028315606401928,
-          "handedness_agreement": 0.8507462686567164
+          "detection_rate": 0.38461538461538464,
+          "oracle_capture_ratio": 0.38461538461538464,
+          "mpjpe_pixels": 60.26350998864892,
+          "mean_confidence": 0.8995335817337036,
+          "handedness_agreement": 0.8461538461538461
         },
-        "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/pointstream_reconstructed.mp4"
+        "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/ps_rec_ps_standard.mp4"
       },
       "pointstream_variants": [
         {
-          "name": "PointStream (Standard, 250k bg)",
-          "total_bytes": 370543,
-          "bitrate_kbps": 296.4,
-          "background_kbps": 261.2,
+          "name": "PS Extreme Starve (240p bg, 30k)",
+          "total_bytes": 96692,
+          "bitrate_kbps": 69.8,
+          "background_kbps": 59.0,
           "keypoint_kbps": 7.1,
-          "anchor_kbps": 28.1,
+          "anchor_kbps": 3.8,
           "metrics": {
-            "psnr_dB": 24.218350599321504,
-            "ssim": 0.8157943588623263,
-            "lpips": 0.13023038610816,
-            "dists": 0.11877118031183878,
-            "hand_roi_psnr_dB": 18.386021845313664,
-            "hand_roi_ssim": 0.6641605820071245
+            "psnr_dB": 21.481494976399052,
+            "ssim": 0.7343307623034036,
+            "lpips": 0.3330528817574183,
+            "dists": 0.21407115558783213,
+            "hand_roi_psnr_dB": 18.1250139633099,
+            "hand_roi_ssim": 0.6510248925114177
           },
           "teleop_utility": {
-            "detection_rate": 0.39644970414201186,
-            "oracle_capture_ratio": 0.39644970414201186,
-            "mpjpe_pixels": 58.815932872635656,
-            "mean_confidence": 0.9028315606401928,
-            "handedness_agreement": 0.8507462686567164
+            "detection_rate": 0.35502958579881655,
+            "oracle_capture_ratio": 0.35502958579881655,
+            "mpjpe_pixels": 43.844461314280395,
+            "mean_confidence": 0.8681161145369212,
+            "handedness_agreement": 0.8833333333333333
           },
-          "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/pointstream_reconstructed.mp4"
+          "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/ps_rec_ps_extreme_starve.mp4"
         },
         {
-          "name": "PointStream (Ultra-Low, 90k bg)",
-          "total_bytes": 289118,
-          "bitrate_kbps": 231.3,
-          "background_kbps": 196.1,
+          "name": "PS Heavy Starve (360p bg, 70k)",
+          "total_bytes": 154463,
+          "bitrate_kbps": 116.0,
+          "background_kbps": 105.2,
           "keypoint_kbps": 7.1,
-          "anchor_kbps": 28.1,
+          "anchor_kbps": 3.8,
           "metrics": {
-            "psnr_dB": 23.697868239019552,
-            "ssim": 0.7984760783916455,
-            "lpips": 0.15521089904010296,
-            "dists": 0.1324241284529368,
-            "hand_roi_psnr_dB": 18.342813070666097,
-            "hand_roi_ssim": 0.6607958023338462
+            "psnr_dB": 22.573511760306296,
+            "ssim": 0.7644037964295677,
+            "lpips": 0.2226400412619114,
+            "dists": 0.16804743727048238,
+            "hand_roi_psnr_dB": 18.239162315508516,
+            "hand_roi_ssim": 0.6556635269336899
           },
           "teleop_utility": {
-            "detection_rate": 0.33136094674556216,
-            "oracle_capture_ratio": 0.33136094674556216,
-            "mpjpe_pixels": 49.78707846740791,
-            "mean_confidence": 0.8740694203547069,
-            "handedness_agreement": 0.9285714285714286
+            "detection_rate": 0.34911242603550297,
+            "oracle_capture_ratio": 0.34911242603550297,
+            "mpjpe_pixels": 63.07359900173584,
+            "mean_confidence": 0.9218439106213845,
+            "handedness_agreement": 0.864406779661017
           },
-          "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/pointstream_reconstructed_low.mp4"
+          "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/ps_rec_ps_heavy_starve.mp4"
+        },
+        {
+          "name": "PS Low Teleop (540p bg, 140k)",
+          "total_bytes": 269023,
+          "bitrate_kbps": 207.7,
+          "background_kbps": 196.8,
+          "keypoint_kbps": 7.1,
+          "anchor_kbps": 3.8,
+          "metrics": {
+            "psnr_dB": 23.831020414763273,
+            "ssim": 0.8021474395141933,
+            "lpips": 0.14803760963181656,
+            "dists": 0.1277083851893743,
+            "hand_roi_psnr_dB": 18.354024626675084,
+            "hand_roi_ssim": 0.6616821272376321
+          },
+          "teleop_utility": {
+            "detection_rate": 0.41420118343195267,
+            "oracle_capture_ratio": 0.41420118343195267,
+            "mpjpe_pixels": 61.22502727578666,
+            "mean_confidence": 0.896813348361424,
+            "handedness_agreement": 0.8428571428571429
+          },
+          "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/ps_rec_ps_low_teleop.mp4"
+        },
+        {
+          "name": "PS Standard (540p bg, 250k)",
+          "total_bytes": 348728,
+          "bitrate_kbps": 271.5,
+          "background_kbps": 260.6,
+          "keypoint_kbps": 7.1,
+          "anchor_kbps": 3.8,
+          "metrics": {
+            "psnr_dB": 24.382514552270745,
+            "ssim": 0.8202521926710331,
+            "lpips": 0.12435197378198305,
+            "dists": 0.11426402767499289,
+            "hand_roi_psnr_dB": 18.401810268485104,
+            "hand_roi_ssim": 0.6652305260271537
+          },
+          "teleop_utility": {
+            "detection_rate": 0.38461538461538464,
+            "oracle_capture_ratio": 0.38461538461538464,
+            "mpjpe_pixels": 60.26350998864892,
+            "mean_confidence": 0.8995335817337036,
+            "handedness_agreement": 0.8461538461538461
+          },
+          "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/ps_rec_ps_standard.mp4"
+        },
+        {
+          "name": "PS Standard 1080p (native bg, 300k)",
+          "total_bytes": 729523,
+          "bitrate_kbps": 576.1,
+          "background_kbps": 565.2,
+          "keypoint_kbps": 7.1,
+          "anchor_kbps": 3.8,
+          "metrics": {
+            "psnr_dB": 25.543000035016895,
+            "ssim": 0.8491086842227269,
+            "lpips": 0.08270348402361075,
+            "dists": 0.08959769050280253,
+            "hand_roi_psnr_dB": 18.46320602418894,
+            "hand_roi_ssim": 0.6694041978984085
+          },
+          "teleop_utility": {
+            "detection_rate": 0.40236686390532544,
+            "oracle_capture_ratio": 0.40236686390532544,
+            "mpjpe_pixels": 55.79819402536849,
+            "mean_confidence": 0.8987965443555046,
+            "handedness_agreement": 0.8529411764705882
+          },
+          "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/ps_rec_ps_standard_1080p.mp4"
         },
         {
           "name": "PointStream (Plate 2s)",
-          "total_bytes": 1023127,
-          "bitrate_kbps": 818.5,
+          "total_bytes": 1002109,
+          "bitrate_kbps": 794.2,
           "background_kbps": 783.3,
           "keypoint_kbps": 7.1,
-          "anchor_kbps": 28.1,
+          "anchor_kbps": 3.8,
           "metrics": {
-            "psnr_dB": 11.535813954164265,
-            "ssim": 0.4686963409007291,
-            "lpips": 0.4813378760032356,
-            "dists": 0.21429730196793875,
-            "hand_roi_psnr_dB": 15.392199510719445,
-            "hand_roi_ssim": 0.5919947018949006
+            "psnr_dB": 11.535820681376487,
+            "ssim": 0.4686979900590004,
+            "lpips": 0.48134031567101676,
+            "dists": 0.21428778489430744,
+            "hand_roi_psnr_dB": 15.390519679997738,
+            "hand_roi_ssim": 0.5920690718453795
           },
           "teleop_utility": {
-            "detection_rate": 0.22485207100591717,
-            "oracle_capture_ratio": 0.22485207100591717,
-            "mpjpe_pixels": 71.1812959467649,
-            "mean_confidence": 0.8920023347202101,
-            "handedness_agreement": 0.7894736842105263
+            "detection_rate": 0.23076923076923078,
+            "oracle_capture_ratio": 0.23076923076923078,
+            "mpjpe_pixels": 76.40226231983907,
+            "mean_confidence": 0.9288665453592936,
+            "handedness_agreement": 0.8717948717948718
           },
           "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/pointstream_reconstructed_plate.mp4"
         }
       ],
       "av1_arms": [
+        {
+          "name": "AV1 180p (25k, p7 - Starved Floor)",
+          "target_kbps": 25,
+          "actual_kbps": 41.7,
+          "scale": "320:180",
+          "preset": 7,
+          "ms_per_frame": 17.06,
+          "encode_fps": 58.6,
+          "size_bytes": 52102,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 21.33257651525193,
+            "ssim": 0.7317463142398417,
+            "lpips": 0.4133323359489441,
+            "dists": 0.23061334053675334,
+            "hand_roi_psnr_dB": 20.83830698069831,
+            "hand_roi_ssim": 0.7516898747998413
+          },
+          "teleop_utility": {
+            "detection_rate": 0.20118343195266272,
+            "oracle_capture_ratio": 0.20118343195266272,
+            "mpjpe_pixels": 70.89057519630035,
+            "mean_confidence": 0.8852193338029525,
+            "handedness_agreement": 0.8529411764705882
+          },
+          "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/av1_ladder/av1_320x180_p7_25k_reference_trimmed.mp4"
+        },
+        {
+          "name": "AV1 240p (40k, p7 - Starved)",
+          "target_kbps": 40,
+          "actual_kbps": 61.9,
+          "scale": "426:240",
+          "preset": 7,
+          "ms_per_frame": 11.39,
+          "encode_fps": 87.8,
+          "size_bytes": 77351,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 22.214248080641095,
+            "ssim": 0.7494106547823096,
+            "lpips": 0.3131174320479234,
+            "dists": 0.19505492508411407,
+            "hand_roi_psnr_dB": 21.846016895461826,
+            "hand_roi_ssim": 0.7672301942752501
+          },
+          "teleop_utility": {
+            "detection_rate": 0.23668639053254437,
+            "oracle_capture_ratio": 0.23668639053254437,
+            "mpjpe_pixels": 99.33881803056093,
+            "mean_confidence": 0.9192148745059967,
+            "handedness_agreement": 0.725
+          },
+          "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/av1_ladder/av1_426x240_p7_40k_reference_trimmed.mp4"
+        },
+        {
+          "name": "AV1 360p (80k, p7 - Heavy Starve)",
+          "target_kbps": 80,
+          "actual_kbps": 110.0,
+          "scale": "640:360",
+          "preset": 7,
+          "ms_per_frame": 11.89,
+          "encode_fps": 84.1,
+          "size_bytes": 137447,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 23.506235560108987,
+            "ssim": 0.7808815845218532,
+            "lpips": 0.21012176816662154,
+            "dists": 0.1530488129456838,
+            "hand_roi_psnr_dB": 23.137213146254762,
+            "hand_roi_ssim": 0.7913495873774484
+          },
+          "teleop_utility": {
+            "detection_rate": 0.5266272189349113,
+            "oracle_capture_ratio": 0.5266272189349113,
+            "mpjpe_pixels": 113.01435061497693,
+            "mean_confidence": 0.8453744100720695,
+            "handedness_agreement": 0.7752808988764045
+          },
+          "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/av1_ladder/av1_640x360_p7_80k_reference_trimmed.mp4"
+        },
         {
           "name": "AV1 540p (90k, p7 - Ultra-Low)",
           "target_kbps": 90,
@@ -814,6 +1440,33 @@
           "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/av1_ladder/av1_960x540_p7_90k_reference_trimmed.mp4"
         },
         {
+          "name": "AV1 540p (140k, p7 - Low)",
+          "target_kbps": 140,
+          "actual_kbps": 203.6,
+          "scale": "960:540",
+          "preset": 7,
+          "ms_per_frame": 10.93,
+          "encode_fps": 91.5,
+          "size_bytes": 254561,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 25.015901848370003,
+            "ssim": 0.8190802928736237,
+            "lpips": 0.1392207443465789,
+            "dists": 0.11621604283650716,
+            "hand_roi_psnr_dB": 24.443924978834406,
+            "hand_roi_ssim": 0.8141596492440649
+          },
+          "teleop_utility": {
+            "detection_rate": 0.3727810650887574,
+            "oracle_capture_ratio": 0.3727810650887574,
+            "mpjpe_pixels": 81.42904035709498,
+            "mean_confidence": 0.9235781071678041,
+            "handedness_agreement": 0.746031746031746
+          },
+          "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/av1_ladder/av1_960x540_p7_140k_reference_trimmed.mp4"
+        },
+        {
           "name": "AV1 540p (180k, p7)",
           "target_kbps": 180,
           "actual_kbps": 203.6,
@@ -839,6 +1492,33 @@
             "handedness_agreement": 0.746031746031746
           },
           "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/av1_ladder/av1_960x540_p7_180k_reference_trimmed.mp4"
+        },
+        {
+          "name": "AV1 540p (220k, p7 - Matched Teleop)",
+          "target_kbps": 220,
+          "actual_kbps": 229.0,
+          "scale": "960:540",
+          "preset": 7,
+          "ms_per_frame": 10.69,
+          "encode_fps": 93.6,
+          "size_bytes": 286289,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 25.364210807653595,
+            "ssim": 0.8289162608232193,
+            "lpips": 0.12728498262663682,
+            "dists": 0.10887199660142263,
+            "hand_roi_psnr_dB": 24.975010611420426,
+            "hand_roi_ssim": 0.8289613722048003
+          },
+          "teleop_utility": {
+            "detection_rate": 0.5680473372781065,
+            "oracle_capture_ratio": 0.5680473372781065,
+            "mpjpe_pixels": 93.23743297799875,
+            "mean_confidence": 0.894156084706386,
+            "handedness_agreement": 0.7604166666666666
+          },
+          "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/av1_ladder/av1_960x540_p7_220k_reference_trimmed.mp4"
         },
         {
           "name": "AV1 540p (250k, p7 - Matched Rate & Latency)",
@@ -922,6 +1602,33 @@
           "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/av1_ladder/av1_1080p_p6_200k_reference_trimmed.mp4"
         },
         {
+          "name": "AV1 1080p (350k, p10 - Standard)",
+          "target_kbps": 350,
+          "actual_kbps": 572.6,
+          "scale": null,
+          "preset": 10,
+          "ms_per_frame": 18.51,
+          "encode_fps": 54.0,
+          "size_bytes": 715747,
+          "deblocked": false,
+          "metrics": {
+            "psnr_dB": 27.23066457584101,
+            "ssim": 0.8636242998928223,
+            "lpips": 0.07627220658274989,
+            "dists": 0.07888697981834411,
+            "hand_roi_psnr_dB": 26.431365937296828,
+            "hand_roi_ssim": 0.8467840408115421
+          },
+          "teleop_utility": {
+            "detection_rate": 0.5502958579881657,
+            "oracle_capture_ratio": 0.5502958579881657,
+            "mpjpe_pixels": 91.33498419186398,
+            "mean_confidence": 0.9096373742626559,
+            "handedness_agreement": 0.7741935483870968
+          },
+          "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/av1_ladder/av1_1080p_p10_350k_reference_trimmed.mp4"
+        },
+        {
           "name": "AV1 1080p (500k, p6 - Matched Quality)",
           "target_kbps": 500,
           "actual_kbps": 563.3,
@@ -1002,7 +1709,8 @@
           },
           "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/av1_ladder/av1_1080p_p6_deb_350k_reference_trimmed.mp4"
         }
-      ]
+      ],
+      "per_clip_anchor_bytes": 15248
     }
   ]
 }
