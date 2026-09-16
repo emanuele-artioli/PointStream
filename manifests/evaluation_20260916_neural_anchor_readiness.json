@@ -39,7 +39,16 @@
     "local_upstream_checkpoint_directory": "empty",
     "official_primary_link_http_status": 403,
     "model_file_sha256": null,
-    "note": "Official folder link redirects then returns HTTP403 in shell. No checkpoint downloaded or authenticated."
+    "note": "Official UF, RT and all-model backup folder links all return HTTP403 in shell. No checkpoint downloaded or authenticated.",
+    "official_link_recheck": {
+      "checked_utc": "2026-09-16T20:52:54.546492+00:00",
+      "request": "redirect-following HEAD; no model bytes downloaded",
+      "http_status": {
+        "DCVC-UF_primary": 403,
+        "DCVC-RT_primary": 403,
+        "upstream_all_models_backup": 403
+      }
+    }
   },
   "compatibility_blockers": [
     "DCVC-UF test_video.py contains Python3.12 f-string syntax rejected by current interpreter",
@@ -98,5 +107,13 @@
     "HT model frame_delay is eight; driver excludes first four chunks (32 frames) from timing. Record cold and steady timing separately; 48 frames leave only 16 frames after warmup.",
     "Upstream combined runner reopens source frames during decoding for scoring. A separate fresh-process decode-only wrapper with source access removed is still required for standalone certification.",
     "Official PNGReader supports im00001.png sequence; prepared export conforms."
-  ]
+  ],
+  "fallback_documented_stack": {
+    "model": "DCVC-RT",
+    "python": "3.12",
+    "pytorch_tested": "2.6",
+    "cuda_documented": "12.6",
+    "source": "pinned DCVC-family/DCVC-RT/README.md",
+    "cuda_kernel_fallback": "upstream documents PyTorch fallback; entropy bitstream extension still required"
+  }
 }

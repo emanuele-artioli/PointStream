@@ -158,6 +158,9 @@ visual audit and scoped disposition; no new win or second-camera claim implied.
 The manuscript's local evidence-status commit is `18d4778`; rendered text and
 HOLEs are unchanged. Its Overleaf push awaits explicit approval after automatic
 review rejected sensitive egress. Paper remains 28 pages with no spare budget.
+Official UF, RT and all-model backup weight folder links were rechecked: all
+return HTTP403 in shell. No checkpoint is available; RT also documents a separate
+Python3.12/PyTorch2.6/CUDA12.6 stack, so it is not a drop-in fallback.
 Codex owns neural-anchor installation/weights/round-trip readiness and the exposure/
 PTS audit, while these workers finish evidence reuse. A recent neural anchor,
 valid foreground baseline clearance, a credible development regime, frozen
