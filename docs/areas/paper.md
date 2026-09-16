@@ -10,7 +10,7 @@ Updated paper renders successfully to 28 pages: body/references end on page 23,
 appendices occupy pages 24–28. No page slack remains. Approximate prose counts
 put method near 40% and evaluation near 30%; final result panels must replace
 material rather than simply extend it. Existing overfull-box warnings remain.
-Final paper commit will be recorded after committing. Neural-anchor readiness and source reservation are prepared
+Paper commit `7a0476e` is pushed to Overleaf main (parent `55e4bc4`). Neural-anchor readiness and source reservation are prepared
 in the evaluation/data areas; execution remains unreleased.
 
 
