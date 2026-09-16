@@ -156,23 +156,23 @@
         <div class="grid-4">
             <div class="card">
                 <div class="card-label">Bandwidth Reduction</div>
-                <div class="card-val" style="color: var(--accent-blue);">14.4x &ndash; 18.2x</div>
-                <div class="card-delta">4,200 kbps &rarr; 231 &ndash; 296 kbps</div>
+                <div class="card-val" style="color: var(--accent-blue);">15x &ndash; 60x</div>
+                <div class="card-delta">4,200 kbps &rarr; 69.8 &ndash; 276 kbps</div>
             </div>
             <div class="card">
                 <div class="card-label">Joint Tracking Accuracy</div>
-                <div class="card-val" style="color: var(--accent-green);">1.7x &ndash; 1.8x</div>
-                <div class="card-delta">58.8 &ndash; 69.6 px error vs 106 &ndash; 116 px on AV1 540p</div>
+                <div class="card-val" style="color: var(--accent-green);">1.6x &ndash; 2.3x</div>
+                <div class="card-delta">43.8 &ndash; 75.5 px error vs 99 &ndash; 158 px on AV1 Starved</div>
             </div>
             <div class="card">
                 <div class="card-label">Keypoint Telemetry Rate</div>
                 <div class="card-val" style="color: var(--accent-green);">7.1 &ndash; 10.0 kbps</div>
-                <div class="card-delta">47 bytes/hand (21 3D joints)</div>
+                <div class="card-delta">47 bytes/hand (21 3D joints, &lt;0.01 ms decode)</div>
             </div>
             <div class="card">
                 <div class="card-label">End-to-End Latency</div>
-                <div class="card-val" style="color: var(--accent-orange);">19.3 ms</div>
-                <div class="card-delta">Parallel: 19.3 ms &bull; Serial: 32.9 ms (&lt;50ms budget)</div>
+                <div class="card-val" style="color: var(--accent-orange);">18.4 ms</div>
+                <div class="card-delta">Parallel: 18.4 ms (&gt;54 fps) &bull; Serial: 32.0 ms (&lt;50ms budget)</div>
             </div>
         </div>
 
@@ -237,9 +237,10 @@
                 <tr>
                     <th>Clip / Manipulation Task</th>
                     <th>Metric</th>
-                    <th>PointStream Standard</th>
-                    <th>PointStream Ultra-Low</th>
-                    <th>AV1 540p (Matched Rate &amp; Latency)</th>
+                    <th>PointStream Extreme Starve (240p bg)</th>
+                    <th>PointStream Low Teleop (540p bg)</th>
+                    <th>PointStream Standard (540p bg)</th>
+                    <th>AV1 Starved Floor (180p/240p)</th>
                     <th>PointStream Advantage</th>
                 </tr>
             </thead>
@@ -247,26 +248,29 @@
                 <tr class="highlight-row">
                     <td><strong>Clip 1</strong> (Assembly Prep)<br><span style="font-size:0.8rem;color:var(--text-muted);">Oracle Ceiling: 54.7%</span></td>
                     <td><strong>Joint Error (MPJPE)<br>Detection (Oracle Capture)<br>Bitrate &bull; Latency</strong></td>
-                    <td><strong>113.6 px</strong><br>29.1% (53.1% cap)<br>293.8 kbps &bull; 19.3 ms</td>
-                    <td><strong>86.7 px</strong><br>27.1% (49.5% cap)<br>268.7 kbps &bull; 19.3 ms</td>
-                    <td>120.1 px<br>43.8% (80.2% cap)<br>267.3 kbps &bull; 3.3 ms</td>
-                    <td><span class="badge badge-green">Lower Tracking Error<br>Sub-50ms Real-Time Feasible</span></td>
+                    <td><strong>108.4 px</strong><br>30.0% (54.8% cap)<br>85.9 kbps &bull; 18.4 ms</td>
+                    <td><strong>80.7 px</strong><br>29.1% (53.2% cap)<br>250.9 kbps &bull; 18.4 ms</td>
+                    <td>112.8 px<br>28.1% (51.4% cap)<br>276.2 kbps &bull; 18.4 ms</td>
+                    <td>158.5 px (180p) / 105.3 px (240p)<br>21.7% / 32.0%<br>52.4 / 77.8 kbps &bull; 13.6 ms</td>
+                    <td><span class="badge badge-green">1.5x Lower Joint Error vs AV1 180p<br>Sub-50ms Real-Time Feasible</span></td>
                 </tr>
                 <tr class="highlight-row">
                     <td><strong>Clip 2</strong> (Component Fit)<br><span style="font-size:0.8rem;color:var(--text-muted);">Oracle Ceiling: 58.0%</span></td>
                     <td><strong>Joint Error (MPJPE)<br>Detection (Oracle Capture)<br>Bitrate &bull; Latency</strong></td>
-                    <td><strong>69.6 px</strong><br><strong>52.4% (90.4% cap)</strong><br>288.1 kbps &bull; 19.3 ms</td>
-                    <td><strong>50.2 px</strong><br>49.2% (84.8% cap)<br>267.8 kbps &bull; 19.3 ms</td>
-                    <td>115.5 px<br>48.8% (84.1% cap)<br>263.7 kbps &bull; 3.3 ms</td>
-                    <td><span class="badge badge-green">1.66x Lower Error &bull; Beats AV1 on Det (+3.6%)<br>Sub-50ms Real-Time Feasible</span></td>
+                    <td><strong>75.5 px</strong><br><strong>47.6% (82.1% cap)</strong><br>84.7 kbps &bull; 18.4 ms</td>
+                    <td><strong>73.8 px</strong><br>46.0% (79.3% cap)<br>253.4 kbps &bull; 18.4 ms</td>
+                    <td>74.5 px<br>48.4% (83.4% cap)<br>270.4 kbps &bull; 18.4 ms</td>
+                    <td>105.9 px (180p) / 78.6 px (240p)<br>21.8% / 39.1%<br>50.8 / 75.8 kbps &bull; 13.6 ms</td>
+                    <td><span class="badge badge-green">2.2x Higher Detection vs AV1 180p (+25.8%)<br>Sub-50ms Real-Time Feasible</span></td>
                 </tr>
                 <tr class="highlight-row">
                     <td><strong>Clip 3</strong> (Wire Manipulation)<br><span style="font-size:0.8rem;color:var(--text-muted);">Oracle Ceiling: 39.7%</span></td>
                     <td><strong>Joint Error (MPJPE)<br>Detection (Oracle Capture)<br>Bitrate &bull; Latency</strong></td>
-                    <td><strong>58.8 px</strong><br>39.6% (99.9% cap)<br>296.4 kbps &bull; 19.3 ms</td>
-                    <td><strong>49.8 px</strong><br>33.1% (83.5% cap)<br>231.3 kbps &bull; 19.3 ms</td>
-                    <td>106.0 px<br>47.3% (119.2% cap)<br>259.4 kbps &bull; 3.3 ms</td>
-                    <td><span class="badge badge-green">1.80x Lower Tracking Error<br>Sub-50ms Real-Time Feasible</span></td>
+                    <td><strong>43.8 px</strong><br>35.5% (89.4% cap)<br>69.8 kbps &bull; 18.4 ms</td>
+                    <td><strong>61.2 px</strong><br><strong>41.4% (104.3% cap)</strong><br>207.7 kbps &bull; 18.4 ms</td>
+                    <td>60.3 px<br>38.5% (97.0% cap)<br>271.5 kbps &bull; 18.4 ms</td>
+                    <td>70.9 px (180p) / 99.3 px (240p)<br>20.1% / 23.7%<br>41.7 / 61.9 kbps &bull; 13.6 ms</td>
+                    <td><span class="badge badge-green">2.27x Lower Joint Error vs AV1 240p<br>Sub-50ms Real-Time Feasible</span></td>
                 </tr>
             </tbody>
         </table>

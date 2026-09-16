@@ -137,6 +137,8 @@ def process_clip(
     clip_dir = results_dir / clip_name
     ref_mp4 = clip_dir / "reference_trimmed.mp4"
     ps_mp4 = clip_dir / "pointstream_reconstructed.mp4"
+    if not ps_mp4.exists():
+        ps_mp4 = clip_dir / "ps_rec_ps_standard.mp4"
 
     if av1_path and av1_path.exists():
         av1_mp4 = av1_path

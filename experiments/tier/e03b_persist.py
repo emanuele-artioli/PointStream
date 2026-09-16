@@ -37,6 +37,10 @@ def sha256_bytes(payload: bytes) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
+class DecodeCountError(ValueError):
+    """Raised when a decode is empty, partial, short, extra, or the wrong size."""
+
+
 @dataclass(frozen=True)
 class PersistentRoundtrip:
     """One charged encode/decode whose artifacts remain on disk."""
@@ -50,6 +54,8 @@ class PersistentRoundtrip:
     standalone_decode_path: Path
     standalone_shape: tuple[int, ...]
     ledger_matched: bool
+    decode_geometry: dict[str, Any]
+    standalone_pixels_match: bool
 
 
 def _run_ffmpeg(argv: list[str], stdin_bytes: bytes | None) -> bytes:
@@ -61,7 +67,70 @@ def _run_ffmpeg(argv: list[str], stdin_bytes: bytes | None) -> bytes:
     return result.stdout
 
 
-def _rgb_dump(ffmpeg_path: str, video_path: Path, height: int, width: int, count: int) -> np.ndarray:
+def probe_video_geometry(ffprobe: str, video_path: Path) -> tuple[int, int]:
+    payload = json.loads(
+        subprocess.check_output(
+            [
+                ffprobe,
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                "-select_streams",
+                "v:0",
+                "-show_entries",
+                "stream=width,height",
+                "-of",
+                "json",
+                str(video_path),
+            ],
+            text=True,
+        )
+    )
+    streams = payload.get("streams") or []
+    if not streams:
+        raise DecodeCountError(f"{video_path}: no video stream")
+    width = int(streams[0]["width"])
+    height = int(streams[0]["height"])
+    if width < 1 or height < 1:
+        raise DecodeCountError(f"{video_path}: invalid geometry {width}x{height}")
+    return width, height
+
+
+def frames_from_rgb24(
+    raw: bytes,
+    *,
+    width: int,
+    height: int,
+    expected_count: int,
+    source: str,
+) -> np.ndarray:
+    """Reshape raw RGB24 only when the byte length is an exact expected frame count."""
+    if width < 1 or height < 1:
+        raise DecodeCountError(f"{source}: invalid geometry {width}x{height}")
+    frame_bytes = int(height) * int(width) * 3
+    if not raw:
+        raise DecodeCountError(f"{source}: empty decode")
+    if len(raw) % frame_bytes != 0:
+        raise DecodeCountError(
+            f"{source}: partial frame ({len(raw)} bytes, frame is {frame_bytes} bytes)"
+        )
+    count = len(raw) // frame_bytes
+    if count != int(expected_count):
+        raise DecodeCountError(f"{source}: decoded {count} frames, expected {expected_count}")
+    return np.frombuffer(raw, dtype=np.uint8).reshape(count, height, width, 3).copy()
+
+
+def dump_decoded_rgb(
+    ffmpeg_path: str,
+    video_path: Path,
+    *,
+    expected_width: int,
+    expected_height: int,
+    expected_count: int,
+) -> tuple[np.ndarray, dict[str, Any]]:
+    """Dump RGB24 using the container's own width/height; never pad or trim."""
+    ffprobe = str(Path(ffmpeg_path).with_name("ffprobe"))
+    actual_width, actual_height = probe_video_geometry(ffprobe, video_path)
     raw = _run_ffmpeg(
         [
             ffmpeg_path,
@@ -78,13 +147,36 @@ def _rgb_dump(ffmpeg_path: str, video_path: Path, height: int, width: int, count
         ],
         None,
     )
-    decoded = np.frombuffer(raw, dtype=np.uint8)
-    usable = (decoded.size // (height * width * 3)) * height * width * 3
-    decoded = decoded[:usable].reshape(-1, height, width, 3)
-    if decoded.shape[0] < count:
-        pad = np.repeat(decoded[-1:], count - decoded.shape[0], axis=0)
-        decoded = np.concatenate([decoded, pad], axis=0)
-    return decoded[:count]
+    if (actual_width, actual_height) != (int(expected_width), int(expected_height)):
+        raise DecodeCountError(
+            f"{video_path}: decoded {actual_width}x{actual_height}, "
+            f"expected {expected_width}x{expected_height}"
+        )
+    frames = frames_from_rgb24(
+        raw,
+        width=actual_width,
+        height=actual_height,
+        expected_count=expected_count,
+        source=str(video_path),
+    )
+    geometry = {
+        "width": actual_width,
+        "height": actual_height,
+        "count": int(frames.shape[0]),
+        "sha256": sha256_bytes(frames.tobytes()),
+    }
+    return frames, geometry
+
+
+def _rgb_dump(ffmpeg_path: str, video_path: Path, height: int, width: int, count: int) -> np.ndarray:
+    frames, _geometry = dump_decoded_rgb(
+        ffmpeg_path,
+        video_path,
+        expected_width=width,
+        expected_height=height,
+        expected_count=count,
+    )
+    return frames
 
 
 def _record_to_dict(record: EncodeRecord) -> dict[str, Any]:
@@ -150,6 +242,14 @@ def persistent_timed_roundtrip(
     standalone = work_dir / "decoded_standalone.mkv"
     decode(dest, standalone, request)
     standalone_frames = _rgb_dump(ffmpeg.path, standalone, height, width, count)
+    if not np.array_equal(decoded, standalone_frames):
+        raise DecodeCountError(f"{dest}: ordinary and standalone decodes differ")
+    decode_geometry = {
+        "width": int(decoded.shape[2]),
+        "height": int(decoded.shape[1]),
+        "count": int(decoded.shape[0]),
+        "sha256": sha256_bytes(np.ascontiguousarray(decoded).tobytes()),
+    }
 
     decoded_npy = work_dir / "decoded_rgb.npy"
     np.save(decoded_npy, decoded)
@@ -181,4 +281,6 @@ def persistent_timed_roundtrip(
         standalone_decode_path=standalone,
         standalone_shape=tuple(int(item) for item in standalone_frames.shape),
         ledger_matched=ledger_matched,
+        decode_geometry=decode_geometry,
+        standalone_pixels_match=True,
     )
