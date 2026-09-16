@@ -92,5 +92,11 @@
     "archive_sha256": "95b28b8935611301e9e09ce8942b8dd9ab8622d3324443d83ca8a0edf907e631",
     "input_verification": "$PS_DATA_ROOT/outputs/evaluation-20260914/e03-neural/prepared-rgb/input_export_verification.json",
     "input_verification_sha256": "ab233e8187d99a600c58064b445a1dc0705f03ff5ef533661d6de632d6ebfe74"
-  }
+  },
+  "upstream_driver_caveats": [
+    "test_video.py labels kbps using assumed 30fps; campaign input is 12fps. Compute wire bitrate independently from actual bytes and 4s display duration.",
+    "HT model frame_delay is eight; driver excludes first four chunks (32 frames) from timing. Record cold and steady timing separately; 48 frames leave only 16 frames after warmup.",
+    "Upstream combined runner reopens source frames during decoding for scoring. A separate fresh-process decode-only wrapper with source access removed is still required for standalone certification.",
+    "Official PNGReader supports im00001.png sequence; prepared export conforms."
+  ]
 }
