@@ -86,3 +86,18 @@ PR #83/#84 compared unequal rates/qualities and generalized a sampled SVT-AV1 en
 ## PR #88: model ranking and residual matrix unverified (2026-09-10)
 
 Do not revive the one-epoch pix2pix-over-SPADE pruning decision or the hardcoded-control residual-demand conclusion as scientific findings. Missing-source substitution/frame-coordinate errors, crop versus full-frame scope, public encoder-output scoring and incomplete wire accounting require reruns. The stored BD arithmetic is reproducible but the experiment remains uncertified. Preserve outputs; see the [evaluation audit](../areas/evaluation.md#pr-88-audit--2026-09-10) and [generator audit](../areas/generation.md#pr-88-generator-audit--2026-09-10).
+
+## September16 pilot return boundaries
+
+E06's saved whole-codec configuration is not competitive; residual effect does
+not certify rate advantage. Source artifact: evaluation-20260914/e06/
+run-20260916-federer007-perframe-bbox/probe_report.json, SHA-256
+52c0179c724469e56a1dedeafd8695536b44623cd0a63c48bf8128a49f8b5e33.
+Missing separate client timing and lossless packing remain reuse work.
+
+E05's complete-controls and fitted-model-cost claims are unverified: blank
+conditioning was false and the checkpoint deployment policy was undeclared.
+Keep its no-promotion decision; do not generalize to a neural family ranking.
+E04B's registration/parallax/noise floor is an untested hypothesis with two open
+ghost-MAD alarms. Zero holes did not test Telea. Preserve both attempts and
+record exact retry/source provenance. See the current campaign return brief.

@@ -38,16 +38,15 @@ comparisons keep residual off; paste-plus-residual is explicitly a residual-on
 control in the residual section. Component and readiness work can run before a
 full-codec win. A losing or invalid run is a result to preserve, not a gate pass.
 
-## Current entry point — 16 September conditional pilot release
+## Current entry point — 16 September pilot return audit
 
-Follow [the accepted repair and conditional pilots](tasks/20260916-bounded-pilot-release.md).
-#117 is merged as `015c971`. #118 `e73c8ba`, #119 `745271f`, #121 `bc1a144`
-have green CI but need listed execution gates corrected and merged before launch.
-Workers may then execute without another card-only return: E05 <=1 aggregate
-GPU-hour, E06 four points <=30 minutes, paired removal two points <=30 CPU
-minutes. Preparation <=2 active hours per lane. Zero conventional/removal-OFF
-re-encodes. No confirmation scoring; reserved sources remain untouched. Source
-PTS, neural anchor, confirmed tennis advantage and second domain remain open.
+Follow [the return audit and reuse assignments](tasks/20260916-return-audit-and-reuse.md).
+#121 E06 ran and this configuration is stopped as a codec win search. #125 E05
+ran but its blank-control flag, object/calibration evidence and model costs need
+completion. E04B code is local and its alarms/retry provenance remain open.
+Release only packing/timing/control/alarm work on saved data: zero new native
+encodes or training; E05 GPU diagnostics only within verified remaining original
+one-hour budget. Confirmation remains quarantined, score-free and unauthorized.
 
 ## Historical entry point — 15 September acceptance and bounded release
 

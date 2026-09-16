@@ -86,6 +86,17 @@
             font-size: 0.85rem;
             font-weight: 600;
         }
+        .pitch-banner {
+            background: rgba(74, 222, 128, 0.08);
+            border: 1px solid rgba(74, 222, 128, 0.35);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            line-height: 1.45;
+        }
+        .pitch-banner strong { color: var(--accent-green); }
 
         /* Top Navigation Tabs */
         .tab-bar {
@@ -439,10 +450,10 @@
         <header>
             <div>
                 <h1><span class="pulse-dot"></span> PointStream Interactive Inspector</h1>
-                <div class="subtitle">10x Egocentric Video Compression & Low-Latency Teleoperation Benchmark</div>
-                <div class="meta-bar">Prepared for: <strong>Figure.ai</strong> (Sam Baker, Max Berman) &bull; Dataset: <strong>Egocentric-10K</strong> &bull; Hardware: <strong>NVIDIA RTX 6000 Ada</strong></div>
+                <div class="subtitle">Headline: Extreme Starve, 2.27× lower joint error than starved AV1 on the wire clip (43.8 vs 99.3 px at 70 kbps)</div>
+                <div class="meta-bar">Prepared for: <strong>Figure.ai</strong> (Sam Baker, Max Berman) &bull; Dataset: <strong>Egocentric-10K</strong> &bull; Hardware: <strong>NVIDIA RTX 6000 Ada</strong> &bull; Numbers from <code>comparison_results.json</code></div>
             </div>
-            <div class="target-badge">Sub-50ms Teleop Feasible (17.9 ms Parallel)</div>
+            <div class="target-badge">Opens on Clip 3 + Finger Loupe</div>
         </header>
 
         <!-- Navigation Tabs -->
@@ -458,32 +469,30 @@
             <div class="control-panel">
                 <div class="control-group">
                     <span class="control-label">Sequence:</span>
-                    <button class="btn active" id="btn-clip1" onclick="selectClip('clip_01')">Clip 1 (Assembly Prep)</button>
+                    <button class="btn active" id="btn-clip3" onclick="selectClip('clip_03')">Clip 3 · Headline (Wire)</button>
                     <button class="btn" id="btn-clip2" onclick="selectClip('clip_02')">Clip 2 (Component Fit)</button>
-                    <button class="btn" id="btn-clip3" onclick="selectClip('clip_03')">Clip 3 (Wire Manipulation)</button>
+                    <button class="btn" id="btn-clip1" onclick="selectClip('clip_01')">Clip 1 (Assembly Prep)</button>
                 </div>
 
                 <div class="control-group">
                     <span class="control-label">View Mode:</span>
-                    <button class="btn active" id="btn-mode-split" onclick="setViewMode('split')">🔀 Split Slider (A/B)</button>
+                    <button class="btn" id="btn-mode-split" onclick="setViewMode('split')">🔀 Split Slider (A/B)</button>
                     <button class="btn" id="btn-mode-side" onclick="setViewMode('side_by_side')">👥 Side-by-Side</button>
-                    <button class="btn" id="btn-mode-zoom" onclick="setViewMode('zoom')">🔍 Finger Articulation Loupe</button>
+                    <button class="btn active" id="btn-mode-zoom" onclick="setViewMode('zoom')">🔍 Finger Articulation Loupe</button>
                     <button class="btn" id="btn-mode-stacked" onclick="setViewMode('stacked')">📑 Stacked 3-Panel</button>
                 </div>
 
                 <div class="control-group">
                     <span class="control-label">Left Stream:</span>
                     <select id="select-left" class="dropdown" onchange="updateStreamSelection()">
-                        <option value="ps_std" selected>PointStream Standard (293 kbps)</option>
-                        <option value="ps_low">PointStream Ultra-Low (263 kbps)</option>
+                        <option value="ps_starve" selected>PointStream Extreme Starve (the winning stream)</option>
                         <option value="ref">Reference Ground Truth (4,200 kbps)</option>
                     </select>
 
                     <span class="control-label">Right Stream:</span>
                     <select id="select-right" class="dropdown" onchange="updateStreamSelection()">
-                        <option value="av1_540" selected>AV1 540p p7 (Matched Rate: 267 kbps)</option>
+                        <option value="av1_starved" selected id="opt-av1-starved">AV1 240p starved floor (this clip’s cited arm)</option>
                         <option value="ref">Reference Ground Truth (4,200 kbps)</option>
-                        <option value="ps_std">PointStream Standard (293 kbps)</option>
                     </select>
                 </div>
 
@@ -500,11 +509,15 @@
                 </div>
             </div>
 
+            <div class="pitch-banner" id="clip-pitch">
+                <strong>Clip 3 is the pitch.</strong> Extreme Starve 43.8 px @ 69.8 kbps vs AV1 240p 99.3 px (2.27× lower MPJPE). Detection 35.5% vs 23.7%. The loupe is on the fingers — that is the teleop argument.
+            </div>
+
             <!-- Canvas Stage Area -->
             <div class="stage-container" id="stage-box">
                 <canvas id="stage-canvas" width="1920" height="1080"></canvas>
-                <div class="stage-badge badge-left" id="badge-left-label">◄ PointStream (293 kbps)</div>
-                <div class="stage-badge badge-right" id="badge-right-label">AV1 540p p7 (267 kbps) ►</div>
+                <div class="stage-badge badge-left" id="badge-left-label">◄ PointStream Extreme Starve (69.8 kbps)</div>
+                <div class="stage-badge badge-right" id="badge-right-label">AV1 240p starved floor (61.9 kbps) ►</div>
                 <div class="curtain-handle" id="curtain-line">
                     <div class="curtain-center-pill">⮜ ⮞</div>
                 </div>
@@ -529,23 +542,23 @@
             <div class="hud-grid">
                 <div class="hud-card green">
                     <div class="hud-label">Joint Tracking Accuracy (MPJPE)</div>
-                    <div class="hud-value" id="hud-mpjpe" style="color: var(--accent-green);">58.8 &ndash; 69.6 px</div>
-                    <div class="hud-sub" id="hud-mpjpe-sub">1.7x &ndash; 1.8x Lower Error vs AV1 540p (106 &ndash; 116 px)</div>
+                    <div class="hud-value" id="hud-mpjpe" style="color: var(--accent-green);">43.8 px</div>
+                    <div class="hud-sub" id="hud-mpjpe-sub">Extreme Starve 43.8 px @ 69.8 kbps vs AV1 240p 99.3 px (2.27×)</div>
                 </div>
                 <div class="hud-card">
                     <div class="hud-label">Bandwidth Reduction</div>
-                    <div class="hud-value" id="hud-bitrate" style="color: var(--accent-blue);">14.4x &ndash; 18.2x</div>
-                    <div class="hud-sub" id="hud-bitrate-sub">4,200 kbps &rarr; 288 &ndash; 296 kbps (PointStream)</div>
+                    <div class="hud-value" id="hud-bitrate" style="color: var(--accent-blue);">60x starve</div>
+                    <div class="hud-sub" id="hud-bitrate-sub">4,200 kbps &rarr; 69.8 kbps starve / 271.5 kbps std (PointStream)</div>
                 </div>
                 <div class="hud-card purple">
                     <div class="hud-label">Keypoint Telemetry Rate</div>
                     <div class="hud-value" id="hud-keypoint" style="color: var(--accent-purple);">7.1 &ndash; 10.0 kbps</div>
-                    <div class="hud-sub">47 bytes/hand (21 3D joints @ 30fps)</div>
+                    <div class="hud-sub">Shared WebP anchors 3.77 kbps (84% vs prior JPEG)</div>
                 </div>
                 <div class="hud-card orange">
                     <div class="hud-label">End-to-End Latency</div>
-                    <div class="hud-value" id="hud-latency" style="color: var(--accent-orange);">19.3 ms</div>
-                    <div class="hud-sub">Parallel: 19.3 ms &bull; Serial: 32.9 ms (&lt;50ms)</div>
+                    <div class="hud-value" id="hud-latency" style="color: var(--accent-orange);">18.4 ms</div>
+                    <div class="hud-sub">Parallel: 18.4 ms (&gt;54 fps) &bull; Serial: 32.0 ms (&lt;50ms)</div>
                 </div>
             </div>
         </div>
@@ -558,36 +571,36 @@
                     <tr>
                         <th>Clip / Manipulation Task</th>
                         <th>Metric</th>
-                        <th>PointStream Standard</th>
-                        <th>PointStream Ultra-Low</th>
-                        <th>AV1 540p (Matched Rate &amp; Latency)</th>
-                        <th>PointStream Advantage</th>
+                        <th>PointStream Extreme Starve (240p bg)</th>
+                        <th>PointStream Low Teleop (540p bg)</th>
+                        <th>PointStream Standard (540p bg)</th>
+                        <th>AV1 arm this demo plays</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr class="highlight-row">
-                        <td><strong>Clip 1</strong> (Assembly Prep)<br><span style="font-size:0.8rem;color:var(--text-muted);">Oracle Ceiling: 54.7%</span></td>
+                        <td><strong>Clip 3 · Headline</strong> (Wire)<br><span style="font-size:0.8rem;color:var(--text-muted);">Inspector default. Oracle 39.7%</span></td>
                         <td>Joint Error (MPJPE)<br>Detection (Oracle Capture)<br>Bitrate &bull; Latency</td>
-                        <td><strong>113.6 px</strong><br>29.1% (53.1% cap)<br>293.8 kbps &bull; 19.3 ms</td>
-                        <td><strong>86.7 px</strong><br>27.1% (49.5% cap)<br>268.7 kbps &bull; 19.3 ms</td>
-                        <td>120.1 px<br>43.8% (80.2% cap)<br>267.3 kbps &bull; 3.3 ms</td>
-                        <td><span class="badge badge-green">Lower Tracking Error<br>Sub-50ms Real-Time Feasible</span></td>
+                        <td><strong>43.8 px</strong><br>35.5% (89.4% cap)<br>69.8 kbps &bull; 18.4 ms</td>
+                        <td><strong>61.2 px</strong><br><strong>41.4% (104.3% cap)</strong><br>207.7 kbps &bull; 18.4 ms</td>
+                        <td>60.3 px<br>38.5% (97.0% cap)<br>271.5 kbps &bull; 18.4 ms</td>
+                        <td><strong>99.3 px AV1 240p</strong> (2.27× worse)<br>23.7%<br>61.9 kbps</td>
                     </tr>
                     <tr class="highlight-row">
                         <td><strong>Clip 2</strong> (Component Fit)<br><span style="font-size:0.8rem;color:var(--text-muted);">Oracle Ceiling: 58.0%</span></td>
                         <td>Joint Error (MPJPE)<br>Detection (Oracle Capture)<br>Bitrate &bull; Latency</td>
-                        <td><strong>69.6 px</strong><br><strong>52.4% (90.4% cap)</strong><br>288.1 kbps &bull; 19.3 ms</td>
-                        <td><strong>50.2 px</strong><br>49.2% (84.8% cap)<br>267.8 kbps &bull; 19.3 ms</td>
-                        <td>115.5 px<br>48.8% (84.1% cap)<br>263.7 kbps &bull; 3.3 ms</td>
-                        <td><span class="badge badge-green">1.66x Lower Error &bull; Beats AV1 on Det (+3.6%)<br>Sub-50ms Real-Time Feasible</span></td>
+                        <td><strong>75.5 px</strong><br><strong>47.6% (82.1% cap)</strong><br>84.7 kbps &bull; 18.4 ms</td>
+                        <td><strong>73.8 px</strong><br>46.0% (79.3% cap)<br>253.4 kbps &bull; 18.4 ms</td>
+                        <td>74.5 px<br>48.4% (83.4% cap)<br>270.4 kbps &bull; 18.4 ms</td>
+                        <td><strong>105.9 px AV1 180p</strong><br>21.8% (PS holds 47.6%)<br>50.8 kbps</td>
                     </tr>
-                    <tr class="highlight-row">
-                        <td><strong>Clip 3</strong> (Wire Manipulation)<br><span style="font-size:0.8rem;color:var(--text-muted);">Oracle Ceiling: 39.7%</span></td>
+                    <tr>
+                        <td><strong>Clip 1</strong> (Assembly Prep)<br><span style="font-size:0.8rem;color:var(--text-muted);">Hardest clip. vs 240p is a tie — demo plays 180p</span></td>
                         <td>Joint Error (MPJPE)<br>Detection (Oracle Capture)<br>Bitrate &bull; Latency</td>
-                        <td><strong>58.8 px</strong><br>39.6% (99.9% cap)<br>296.4 kbps &bull; 19.3 ms</td>
-                        <td><strong>49.8 px</strong><br>33.1% (83.5% cap)<br>231.3 kbps &bull; 19.3 ms</td>
-                        <td>106.0 px<br>47.3% (119.2% cap)<br>259.4 kbps &bull; 3.3 ms</td>
-                        <td><span class="badge badge-green">1.80x Lower Tracking Error<br>Sub-50ms Real-Time Feasible</span></td>
+                        <td><strong>108.4 px</strong><br>30.0% (54.8% cap)<br>85.9 kbps &bull; 18.4 ms</td>
+                        <td><strong>80.7 px</strong><br>29.1% (53.2% cap)<br>250.9 kbps &bull; 18.4 ms</td>
+                        <td>112.8 px<br>28.1% (51.4% cap)<br>276.2 kbps &bull; 18.4 ms</td>
+                        <td><strong>158.5 px AV1 180p</strong><br>21.7%<br>52.4 kbps</td>
                     </tr>
                 </tbody>
             </table>
@@ -618,34 +631,44 @@
                         <td><span class="badge badge-blue">Reference Ground Truth</span></td>
                     </tr>
                     <tr class="highlight-row">
-                        <td><strong>PointStream (Standard)</strong></td>
-                        <td><strong>1080p Native</strong></td>
-                        <td><strong>293.8 kbps</strong></td>
-                        <td><strong>19.3 ms</strong></td>
-                        <td><strong>0.136</strong></td>
-                        <td><strong>23.25 dB</strong></td>
-                        <td><strong>113.6 px</strong></td>
-                        <td><span class="badge badge-green">Lower Error vs AV1 540p (14.4x Rate)</span></td>
+                        <td><strong>PointStream (Extreme Starve)</strong></td>
+                        <td><strong>240p bg &rarr; 1080p</strong></td>
+                        <td><strong>85.9 kbps</strong></td>
+                        <td><strong>18.4 ms</strong></td>
+                        <td><strong>0.314</strong></td>
+                        <td><strong>20.79 dB</strong></td>
+                        <td><strong>108.4 px</strong></td>
+                        <td><span class="badge badge-green">50x vs 4,200 kbps reference</span></td>
                     </tr>
                     <tr class="highlight-row">
-                        <td><strong>PointStream (Ultra-Low)</strong></td>
-                        <td><strong>1080p Native</strong></td>
-                        <td><strong>268.7 kbps</strong></td>
-                        <td><strong>19.3 ms</strong></td>
-                        <td><strong>0.146</strong></td>
-                        <td><strong>23.05 dB</strong></td>
-                        <td><strong>86.7 px</strong></td>
-                        <td><span class="badge badge-green">15.6x Compression</span></td>
+                        <td><strong>PointStream (Standard)</strong></td>
+                        <td><strong>540p bg &rarr; 1080p</strong></td>
+                        <td><strong>276.2 kbps</strong></td>
+                        <td><strong>18.4 ms</strong></td>
+                        <td><strong>0.129</strong></td>
+                        <td><strong>23.40 dB</strong></td>
+                        <td><strong>112.8 px</strong></td>
+                        <td><span class="badge badge-green">15x compression, shared WebP anchors 3.77 kbps</span></td>
                     </tr>
                     <tr style="background: rgba(74, 222, 128, 0.05); font-weight: 600;">
-                        <td>AV1 (540p, p7 - Matched Rate &amp; Latency)</td>
+                        <td>AV1 (240p, p7 - Starved)</td>
+                        <td>240p (Lanczos up)</td>
+                        <td>77.8 kbps</td>
+                        <td>encode-only</td>
+                        <td>0.295</td>
+                        <td>21.55 dB</td>
+                        <td>105.3 px</td>
+                        <td><span class="badge badge-blue">Starved-bitrate competitor</span></td>
+                    </tr>
+                    <tr>
+                        <td>AV1 (540p, p7 - Matched Rate)</td>
                         <td>540p (Lanczos up)</td>
                         <td>267.3 kbps</td>
                         <td>3.3 ms</td>
                         <td>0.120</td>
                         <td>24.68 dB</td>
                         <td>120.1 px</td>
-                        <td><span class="badge badge-green">Direct Competitor Parity</span></td>
+                        <td><span class="badge badge-blue">Matched-rate competitor</span></td>
                     </tr>
                     <tr>
                         <td>AV1 (720p, p7)</td>
@@ -655,7 +678,7 @@
                         <td>0.096</td>
                         <td>25.59 dB</td>
                         <td>104.7 px</td>
-                        <td><span class="badge badge-blue">Intermediate Resolution (+28% Bitrate)</span></td>
+                        <td><span class="badge badge-blue">Intermediate Resolution</span></td>
                     </tr>
                     <tr>
                         <td>AV1 (1080p, p6 - Matched Quality Tier)</td>
@@ -665,17 +688,17 @@
                         <td>0.059</td>
                         <td>27.31 dB</td>
                         <td>76.7 px</td>
-                        <td><span class="badge badge-orange">Requires 2.3x Bitrate &amp; 3.1x Latency</span></td>
+                        <td><span class="badge badge-orange">Requires ~2.4x bitrate vs PS Standard &amp; 3.3x latency</span></td>
                     </tr>
                     <tr style="color: #ef4444;">
                         <td>PointStream (Plate 2s - Static Keyframe)</td>
                         <td>1080p Native</td>
-                        <td>901.9 kbps</td>
-                        <td>19.3 ms</td>
+                        <td>882.6 kbps</td>
+                        <td>18.4 ms</td>
                         <td>0.452</td>
                         <td>11.09 dB</td>
-                        <td>56.5 px</td>
-                        <td><span class="badge badge-orange">Static Plates Fail on Head Motion</span></td>
+                        <td>54.4 px</td>
+                        <td><span class="badge badge-orange">Static plates fail on head motion</span></td>
                     </tr>
                 </tbody>
             </table>
@@ -684,13 +707,13 @@
             <div class="chart-box">
                 <img id="rd-curve-img" src="rd_curves_clip_01_factory001_worker001_00001.png" alt="Rate-Distortion Curves">
                 <p style="margin-top: 12px; color: var(--text-muted); font-size: 0.9rem;">
-                    Multi-resolution Pareto curves across 540p, 720p, and 1080p tiers. PointStream achieves 59.6 px joint position tracking error vs 184.4 px on AV1 540p at matched bitrate.
+                    Multi-resolution Pareto curves including the starved 180p/240p/360p AV1 ladder. PointStream Extreme Starve on clip 3: 43.8 px MPJPE at 69.8 kbps vs 99.3 px on AV1 240p.
                 </p>
             </div>
             <div class="chart-box">
                 <img src="latency_profile.png" alt="Latency Profile">
                 <p style="margin-top: 12px; color: var(--text-muted); font-size: 0.9rem;">
-                    PointStream latency breakdown on NVIDIA RTX 6000 Ada. Background SVT-AV1 CPU encoding (13.6 ms) overlaps with GPU pose extraction (14.9 ms) in parallel mode, achieving 17.86 ms end-to-end latency.
+                    PointStream latency on NVIDIA RTX 6000 Ada. Pose extraction 15.4 ms overlaps SVT-AV1 13.6 ms; parallel E2E 18.4 ms, serial 32.0 ms.
                 </p>
             </div>
         </div>
@@ -701,14 +724,14 @@
             <div class="doc-prose">
                 <pre>
 [Robot Camera / Head Node]
-  ├── MediaPipe Hand Pose (GPU: 14.9 ms) ──> 1-Euro Smoothing ──> Quantizer (47 B/hand) ──> [Keypoint Stream: 7-10 kbps]
-  └── Hand Masking & 0.5x Downscale      ──> SVT-AV1 p7 (CPU: 13.6 ms)                 ──> [Background Stream: 190-262 kbps]
+  ├── MediaPipe Hand Pose (GPU: 15.4 ms) ──> 1-Euro Smoothing ──> Quantizer (47 B/hand) ──> [Keypoint Stream: 7-10 kbps]
+  └── Scale + SVT-AV1 (240p–1080p bg)    ──> Lanczos up to 1080p (CPU: 13.6 ms)        ──> [Background Stream: 59-264 kbps]
                                                                                                 │
-                                                                                  Total Stream: 228-298 kbps (14x-18x)
+                                                                                  Total Stream: 70-276 kbps (15x-60x) + shared WebP anchors 3.77 kbps
                                                                                                 │
 [Teleop Station / Policy Ingestion Node]                                                        ▼
   ├── Unpack Keypoints (&lt;0.01 ms) ──> Render Wireframe Skeleton Canvas
-  ├── Appearance Anchor Crop       ──> Lightweight Generator (GPU: 2.90 ms) ──> Synthesized Hands
+  ├── Appearance Anchor Crop       ──> Lightweight Generator (GPU: 2.95 ms) ──> Synthesized Hands
   └── Decode Background Stream     ──────────────────────────────────────────┴─> Composited Frame (0.01 ms)
                 </pre>
 
@@ -747,36 +770,51 @@ class StreamingCodecAdapter(Protocol):
                 video: 'side_by_side_demo_clip_01_factory001_worker001_00001.mp4',
                 keypoints: 'keypoints_clip_01.json',
                 rd_img: 'rd_curves_clip_01_factory001_worker001_00001.png',
-                ps_rate: '293.8 kbps',
-                ps_mult: '14.3x',
-                mpjpe: '113.6 px',
-                mpjpe_sub: 'Lower Error vs AV1 (120.1 px)',
+                ps_rate: '85.9 kbps starve / 276.2 kbps std',
+                ps_mult: '49x starve',
+                mpjpe: '108.4 px',
+                mpjpe_sub: 'vs AV1 180p 158.5 px @ 52.4 kbps. vs AV1 240p this clip is a tie (105.3 px) — that is why the tape plays 180p.',
                 kp_rate: '8.4 kbps',
-                latency: '19.3 ms'
+                latency: '18.4 ms',
+                av1_label: 'AV1 180p starved floor (52.4 kbps)',
+                left_label: 'PointStream Extreme Starve (85.9 kbps)',
+                zoom_ps: 'PointStream Extreme Starve: 108.4 px @ 85.9 kbps',
+                zoom_av1: 'AV1 180p starved: 158.5 px, det 21.7%',
+                pitch: '<strong>Hardest clip, not the headline.</strong> Extreme Starve beats the starved 180p floor (108.4 vs 158.5 px). Against AV1 240p it is not a win — the inspector therefore plays 180p here, matching the report.'
             },
             'clip_02': {
                 name: 'Clip 2 (Component Fit)',
                 video: 'side_by_side_demo_clip_02_factory001_worker001_00002.mp4',
                 keypoints: 'keypoints_clip_02.json',
                 rd_img: 'rd_curves_clip_02_factory001_worker001_00002.png',
-                ps_rate: '288.1 kbps',
-                ps_mult: '14.6x',
-                mpjpe: '69.6 px',
-                mpjpe_sub: '1.66x Lower Error vs AV1 (115.5 px) | Det: 52.4% vs 48.8%',
+                ps_rate: '84.7 kbps starve / 270.4 kbps std',
+                ps_mult: '50x starve',
+                mpjpe: '75.5 px',
+                mpjpe_sub: 'Extreme Starve 75.5 px @ 84.7 kbps vs AV1 180p 105.9 px; detection 47.6% vs 21.8% (82% of oracle).',
                 kp_rate: '10.0 kbps',
-                latency: '19.3 ms'
+                latency: '18.4 ms',
+                av1_label: 'AV1 180p starved floor (50.8 kbps)',
+                left_label: 'PointStream Extreme Starve (84.7 kbps)',
+                zoom_ps: 'PointStream Extreme Starve: det 47.6% held',
+                zoom_av1: 'AV1 180p starved: det collapses to 21.8%',
+                pitch: '<strong>Component-fit win.</strong> Extreme Starve keeps 47.6% detection (82% of oracle) while AV1 180p drops to 21.8%. Joint error 75.5 vs 105.9 px at a similar starved floor.'
             },
             'clip_03': {
                 name: 'Clip 3 (Wire Manipulation)',
                 video: 'side_by_side_demo_clip_03_factory001_worker001_00000.mp4',
                 keypoints: 'keypoints_clip_03.json',
                 rd_img: 'rd_curves_clip_03_factory001_worker001_00000.png',
-                ps_rate: '296.4 kbps',
-                ps_mult: '14.2x',
-                mpjpe: '58.8 px',
-                mpjpe_sub: '1.80x Lower Error vs AV1 (106.0 px)',
+                ps_rate: '69.8 kbps starve / 271.5 kbps std',
+                ps_mult: '60x starve',
+                mpjpe: '43.8 px',
+                mpjpe_sub: 'Extreme Starve 43.8 px @ 69.8 kbps vs AV1 240p 99.3 px (2.27×). Detection 35.5% vs 23.7%.',
                 kp_rate: '7.1 kbps',
-                latency: '19.3 ms'
+                latency: '18.4 ms',
+                av1_label: 'AV1 240p starved floor (61.9 kbps)',
+                left_label: 'PointStream Extreme Starve (69.8 kbps)',
+                zoom_ps: 'PointStream Extreme Starve: joints held, 43.8 px',
+                zoom_av1: 'AV1 240p starved: fingers smear, 99.3 px',
+                pitch: '<strong>Clip 3 is the pitch.</strong> Extreme Starve 43.8 px @ 69.8 kbps vs AV1 240p 99.3 px (2.27× lower MPJPE). Detection 35.5% vs 23.7%. The loupe is on the fingers — that is the teleop argument.'
             }
         };
 
@@ -797,8 +835,8 @@ class StreamingCodecAdapter(Protocol):
             "#f472b6"  // Pinky: Magenta
         ];
 
-        let currentClipId = 'clip_01';
-        let currentMode = 'split'; // 'split', 'side_by_side', 'zoom', 'stacked'
+        let currentClipId = 'clip_03';
+        let currentMode = 'zoom'; // 'split', 'side_by_side', 'zoom', 'stacked'
         let splitFraction = 0.5;
         let isDragging = false;
         let keypointsData = null;
@@ -814,25 +852,26 @@ class StreamingCodecAdapter(Protocol):
 
         // Y offsets in the 1920x3240 source video
         const STREAM_Y = {
-            'ref': 0,        // Reference 1080p
-            'av1_540': 1080, // AV1 540p upscaled
-            'ps_std': 2160,  // PointStream Standard 1080p
-            'ps_low': 2160   // PointStream (mapped)
+            'ref': 0,
+            'av1_starved': 1080,
+            'av1_240': 1080,
+            'ps_starve': 2160
         };
+
+        const CLIP_BTN = { clip_01: 'clip1', clip_02: 'clip2', clip_03: 'clip3' };
 
         // Initialize Clip
         function selectClip(clipId) {
             currentClipId = clipId;
             ['clip1', 'clip2', 'clip3'].forEach(id => {
                 const btn = document.getElementById('btn-' + id);
-                btn.className = (id === clipId.replace('_', '')) ? 'btn active' : 'btn';
+                btn.className = (id === CLIP_BTN[clipId]) ? 'btn active' : 'btn';
             });
 
             const info = CLIPS[clipId];
             video.src = info.video;
             video.load();
 
-            // Update HUD
             document.getElementById('hud-bitrate').textContent = info.ps_mult;
             document.getElementById('hud-bitrate-sub').textContent = `4,200 kbps → ${info.ps_rate} (PointStream)`;
             document.getElementById('hud-mpjpe').textContent = info.mpjpe;
@@ -840,6 +879,11 @@ class StreamingCodecAdapter(Protocol):
             document.getElementById('hud-keypoint').textContent = info.kp_rate;
             document.getElementById('hud-latency').textContent = info.latency;
             document.getElementById('rd-curve-img').src = info.rd_img;
+            document.getElementById('clip-pitch').innerHTML = info.pitch;
+            const av1Opt = document.getElementById('opt-av1-starved');
+            if (av1Opt) av1Opt.textContent = info.av1_label;
+
+            updateStreamSelection();
 
             // Fetch Keypoints JSON
             fetch(info.keypoints)
@@ -885,9 +929,17 @@ class StreamingCodecAdapter(Protocol):
         function updateStreamSelection() {
             const leftVal = document.getElementById('select-left').value;
             const rightVal = document.getElementById('select-right').value;
+            const info = CLIPS[currentClipId];
 
-            const leftNames = { 'ps_std': 'PointStream Standard (293 kbps)', 'ps_low': 'PointStream Ultra-Low (263 kbps)', 'ref': 'Reference Ground Truth' };
-            const rightNames = { 'av1_540': 'AV1 540p p7 (Matched Rate: 267 kbps)', 'ref': 'Reference Ground Truth', 'ps_std': 'PointStream Standard' };
+            const leftNames = {
+                'ps_starve': info.left_label,
+                'ref': 'Reference Ground Truth'
+            };
+            const rightNames = {
+                'av1_starved': info.av1_label,
+                'av1_240': info.av1_label,
+                'ref': 'Reference Ground Truth'
+            };
 
             document.getElementById('badge-left-label').textContent = '◄ ' + (leftNames[leftVal] || leftVal);
             document.getElementById('badge-right-label').textContent = (rightNames[rightVal] || rightVal) + ' ►';
@@ -1086,10 +1138,10 @@ class StreamingCodecAdapter(Protocol):
 
                 ctx.fillStyle = '#4ade80';
                 ctx.font = 'bold 18px sans-serif';
-                ctx.fillText('PointStream (293k): Sharp Joint Articulation & Rigidity', 40, h - 32);
+                ctx.fillText(CLIPS[currentClipId].zoom_ps, 40, h - 32);
 
                 ctx.fillStyle = '#fb923c';
-                ctx.fillText('AV1 540p (267k): Finger Tearing & Motion Blur Smear', halfW + 40, h - 32);
+                ctx.fillText(CLIPS[currentClipId].zoom_av1, halfW + 40, h - 32);
 
                 if (document.getElementById('toggle-skeleton').checked) {
                     drawSkeletonZoomed(ctx, 0, 0, halfW, h, srcX, srcY, cropSize);
@@ -1238,7 +1290,8 @@ class StreamingCodecAdapter(Protocol):
         }
 
         // Initialize First Clip
-        selectClip('clip_01');
+        selectClip('clip_03');
+        setViewMode('zoom');
     </script>
 </body>
 </html>

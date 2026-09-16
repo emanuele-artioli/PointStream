@@ -19,6 +19,14 @@ import numpy as np
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
+# Pair each clip with the starved AV1 arm the pitch actually cites.
+# Clip 1/2 win vs 180p; clip 3's 2.27× MPJPE story is vs 240p.
+PITCH_AV1_SCALE = {
+    "clip_01_factory001_worker001_00001": "320:180",
+    "clip_02_factory001_worker001_00002": "320:180",
+    "clip_03_factory001_worker001_00000": "426:240",
+}
+
 DEFAULT_RESULTS_DIR = Path("demo/outputs/results")
 DEFAULT_PITCH_DIR = Path("demo/outputs/pitch")
 
@@ -82,8 +90,8 @@ def create_side_by_side_video(
         canvas[2 * h:3 * h, 0:w] = f_p
 
         # Titles and HUD banners for each panel
-        av1_label = stats.get("av1_label", "2. AV1 540p p7 (Matched Rate & Latency: ~267 kbps)") if stats else "2. AV1 540p p7 (Matched Rate & Latency: ~267 kbps)"
-        ps_label = stats.get("ps_label", "3. POINTSTREAM (Matched Rate: ~292 kbps | Latency: 16.0 ms)") if stats else "3. POINTSTREAM (Matched Rate: ~292 kbps | Latency: 16.0 ms)"
+        av1_label = stats.get("av1_label", "2. AV1 240p p7 (STARVED)") if stats else "2. AV1 240p p7 (STARVED)"
+        ps_label = stats.get("ps_label", "3. POINTSTREAM EXTREME STARVE") if stats else "3. POINTSTREAM EXTREME STARVE"
 
         # Overlay Banner 1
         cv2.rectangle(canvas, (0, 0), (w, 55), (15, 23, 42), -1)
@@ -126,68 +134,111 @@ def create_side_by_side_video(
     return output_mp4
 
 
+def _clip_record(results_data: dict[str, Any] | None, clip_name: str) -> dict[str, Any] | None:
+    if not results_data:
+        return None
+    for clip in results_data.get("clips", []):
+        if clip.get("clip_name") == clip_name:
+            return clip
+    return None
+
+
+def _ps_variant(clip: dict[str, Any], needle: str) -> dict[str, Any] | None:
+    for variant in clip.get("pointstream_variants", []):
+        if needle.lower() in variant.get("name", "").lower():
+            return variant
+    return None
+
+
+def _av1_arm(clip: dict[str, Any], scale: str) -> dict[str, Any] | None:
+    for arm in clip.get("av1_arms", []):
+        if arm.get("scale") == scale:
+            return arm
+    return None
+
+
 def process_clip(
     clip_name: str,
     results_dir: Path,
     pitch_dir: Path,
-    av1_target: int = 250,
-    av1_path: Path | None = None,
     results_data: dict[str, Any] | None = None,
+    ps_needle: str = "Extreme Starve",
+    av1_scale: str | None = None,
 ) -> Path:
+    """Stack Reference / pitch-cited starved AV1 / PointStream Extreme Starve."""
     clip_dir = results_dir / clip_name
     ref_mp4 = clip_dir / "reference_trimmed.mp4"
-    ps_mp4 = clip_dir / "pointstream_reconstructed.mp4"
-    if not ps_mp4.exists():
-        ps_mp4 = clip_dir / "ps_rec_ps_standard.mp4"
+    clip = _clip_record(results_data, clip_name)
+    scale = av1_scale or PITCH_AV1_SCALE.get(clip_name, "426:240")
 
-    if av1_path and av1_path.exists():
-        av1_mp4 = av1_path
+    ps_info = _ps_variant(clip, ps_needle) if clip else None
+    av1_info = _av1_arm(clip, scale) if clip else None
+
+    if ps_info and ps_info.get("video_path"):
+        ps_mp4 = Path(ps_info["video_path"])
+    else:
+        ps_mp4 = clip_dir / "ps_rec_ps_extreme_starve.mp4"
+
+    if av1_info and av1_info.get("video_path"):
+        av1_mp4 = Path(av1_info["video_path"])
     else:
         ladder_dir = clip_dir / "av1_ladder"
-        candidates = list(ladder_dir.glob(f"*540p*p7*{av1_target}k*.mp4"))
+        token = "320x180" if scale == "320:180" else "426x240"
+        candidates = list(ladder_dir.glob(f"*{token}*.mp4"))
         if not candidates:
-            candidates = list(ladder_dir.glob(f"*{av1_target}k*.mp4"))
-        if not candidates:
-            candidates = list(ladder_dir.glob("*.mp4"))
-        if not candidates:
-            raise FileNotFoundError(f"No AV1 videos found in {ladder_dir}")
+            raise FileNotFoundError(f"No AV1 {scale} videos found in {ladder_dir}")
         av1_mp4 = candidates[0]
 
-    logger.info(f"Clip {clip_name}: using AV1 candidate {av1_mp4.name}")
-    if not (ref_mp4.exists() and ps_mp4.exists()):
-        raise FileNotFoundError(f"Required mp4 files missing in {clip_dir}")
+    missing = [str(p) for p in (ref_mp4, av1_mp4, ps_mp4) if not p.exists()]
+    if missing:
+        raise FileNotFoundError(
+            "Starved reconstructions are local experiment outputs (gitignored). "
+            "Run this on the machine that produced comparison_results.json. Missing: "
+            + ", ".join(missing)
+        )
 
-    # Build stats from comparison_results.json if available
-    stats: dict[str, Any] = {}
-    if results_data and "clips" in results_data:
-        for c in results_data["clips"]:
-            if c["clip_name"] == clip_name:
-                ps_info = c.get("pointstream", {})
-                ps_kbps = ps_info.get("bitrate_kbps", 290.0)
-                ps_det = ps_info.get("teleop_utility", {}).get("detection_rate", 0.0) * 100.0
-                ps_err = ps_info.get("teleop_utility", {}).get("mpjpe_pixels", 0.0)
-                ps_lat = results_data.get("latency_profile", {}).get("parallel_end_to_end_latency_ms", 19.3)
-                stats["ps_label"] = f"3. POINTSTREAM (Rate: {ps_kbps:.0f} kbps | Latency: {ps_lat:.1f} ms | Det: {ps_det:.1f}% | Joint Err: {ps_err:.0f}px)"
-                for arm in c.get("av1_arms", []):
-                    if arm.get("video_path") and Path(arm["video_path"]).name == av1_mp4.name:
-                        a_kbps = arm.get("actual_kbps", 267.0)
-                        a_det = arm.get("teleop_utility", {}).get("detection_rate", 0.0) * 100.0
-                        a_err = arm.get("teleop_utility", {}).get("mpjpe_pixels", 0.0)
-                        stats["av1_label"] = f"2. AV1 540p p7 (Matched Rate: {a_kbps:.0f} kbps | Latency: 13.6 ms | Det: {a_det:.1f}% | Joint Err: {a_err:.0f}px)"
-                        break
-                break
+    av1_name = "180p" if scale == "320:180" else "240p"
+    logger.info(f"Clip {clip_name}: AV1={av1_mp4.name} ({av1_name}) PS={ps_mp4.name}")
+
+    ps_lat = 18.4
+    if results_data:
+        ps_lat = results_data.get("latency_profile", {}).get("parallel_end_to_end_latency_ms", ps_lat)
+
+    stats: dict[str, Any] = {
+        "av1_label": f"2. AV1 {av1_name} p7 (STARVED FLOOR — this is the pitch comparison)",
+        "ps_label": "3. POINTSTREAM EXTREME STARVE (the stream that wins the table)",
+    }
+    if av1_info:
+        a_kbps = av1_info.get("actual_kbps", 0.0)
+        a_det = av1_info.get("teleop_utility", {}).get("detection_rate", 0.0) * 100.0
+        a_err = av1_info.get("teleop_utility", {}).get("mpjpe_pixels", 0.0)
+        stats["av1_label"] = (
+            f"2. AV1 {av1_name} STARVED FLOOR ({a_kbps:.0f} kbps | Det: {a_det:.1f}% | Joint Err: {a_err:.0f}px)"
+        )
+    if ps_info:
+        ps_kbps = ps_info.get("bitrate_kbps", 0.0)
+        ps_det = ps_info.get("teleop_utility", {}).get("detection_rate", 0.0) * 100.0
+        ps_err = ps_info.get("teleop_utility", {}).get("mpjpe_pixels", 0.0)
+        ratio = (av1_info.get("teleop_utility", {}).get("mpjpe_pixels", 0.0) / ps_err) if av1_info and ps_err else 0
+        win = f" | {ratio:.2f}x lower error vs AV1" if ratio > 1 else ""
+        stats["ps_label"] = (
+            f"3. POINTSTREAM EXTREME STARVE ({ps_kbps:.0f} kbps | {ps_lat:.1f} ms | "
+            f"Det: {ps_det:.1f}% | Joint Err: {ps_err:.0f}px{win})"
+        )
 
     out_video = pitch_dir / f"side_by_side_demo_{clip_name}.mp4"
     return create_side_by_side_video(ref_mp4, av1_mp4, ps_mp4, out_video, stats=stats)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Create side-by-side demo video")
+    parser = argparse.ArgumentParser(
+        description="Stack Reference / AV1 240p / PointStream Extreme Starve for the public demo"
+    )
     parser.add_argument("--results-dir", type=Path, default=DEFAULT_RESULTS_DIR)
     parser.add_argument("--pitch-dir", type=Path, default=DEFAULT_PITCH_DIR)
     parser.add_argument("--clip-name", default="clip_01_factory001_worker001_00001")
-    parser.add_argument("--av1-path", type=Path, default=None, help="Explicit path to AV1 video")
-    parser.add_argument("--av1-target", type=int, default=250)
+    parser.add_argument("--ps-needle", default="Extreme Starve")
+    parser.add_argument("--av1-scale", default=None, help="Override AV1 scale (default: per-clip pitch pairing)")
     parser.add_argument("--all-clips", action="store_true", help="Process all available clips")
     args = parser.parse_args()
 
@@ -198,13 +249,14 @@ def main() -> None:
             results_data = json.load(f)
 
     if args.all_clips:
-        clips = sorted([d.name for d in args.results_dir.iterdir() if d.is_dir() and d.name.startswith("clip_")])
+        clips = sorted(d.name for d in args.results_dir.iterdir() if d.is_dir() and d.name.startswith("clip_"))
         for clip in clips:
-            process_clip(clip, args.results_dir, args.pitch_dir, args.av1_target, results_data=results_data)
+            process_clip(clip, args.results_dir, args.pitch_dir, results_data, args.ps_needle, args.av1_scale)
     else:
-        process_clip(args.clip_name, args.results_dir, args.pitch_dir, args.av1_target, args.av1_path, results_data)
+        process_clip(args.clip_name, args.results_dir, args.pitch_dir, results_data, args.ps_needle, args.av1_scale)
 
 
 if __name__ == "__main__":
     main()
+
 

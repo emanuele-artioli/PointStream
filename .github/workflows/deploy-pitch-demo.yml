@@ -9,6 +9,9 @@ on:
       - main
     paths:
       - "demo/outputs/pitch/**"
+      - "demo/outputs/results/comparison_results.json"
+      - "demo/pitch/**"
+      - "demo/experiments/plot_rd_curves.py"
       - ".github/workflows/deploy-pitch-demo.yml"
   workflow_dispatch:
 
@@ -31,6 +34,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install plot dependencies
+        run: pip install matplotlib
+
+      - name: Assemble public demo from comparison_results.json
+        run: PYTHONPATH=. python demo/pitch/publish_site.py
 
       - name: Disable Jekyll
         run: touch demo/outputs/pitch/.nojekyll

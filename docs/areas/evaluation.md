@@ -1,6 +1,16 @@
 # Evaluation Area
 
-## Conditional pilot acceptance — 16 September 2026
+## Pilot return audit — 16 September 2026
+
+E06/#121 is merged (`c656ee6`, launch `def647a`). Four saved transport reports,
+ledgers and hashes match; accept stopping this configuration as a codec win search.
+No broad win/BD-rate follows. Separate client timing is absent. Next work is
+lossless packaging and client profiling on saved payloads, plus claim eligibility
+that respects missing calibration/control/deployment evidence. No native re-encodes.
+Follow [the reuse assignments](../workflow/session/evaluation-campaign/tasks/20260916-return-audit-and-reuse.md).
+
+
+## Historical conditional release — 16 September 2026
 
 #117 at `d700a93` is accepted and merged as `015c971`, with green exact-head CI.
 The decode repair preserves saved artifacts; native-seek pixel provenance remains

@@ -87,7 +87,7 @@ Evaluated on 3 distinct assembly operations from **Egocentric-10K** (300 frames 
 
 ### Demo Assets & Verification
 
-1. **Vertically Stacked 3-Panel Videos (`1920 × 3240`)**: Native 1080p panels for Reference, Matched AV1 (540p p7), and PointStream in `demo/outputs/pitch/side_by_side_demo_*.mp4`.
+1. **Vertically Stacked 3-Panel Videos (`1920 × 3240`)**: Native 1080p panels for Reference, starved AV1 240p, and PointStream Extreme Starve in `demo/outputs/pitch/side_by_side_demo_*.mp4`.
 2. **Interactive HTML Dashboard**: With Pareto RD curves, latency breakdown, and video players in `demo/outputs/pitch/index.html`.
 3. **Self-Contained Reproducible Codebase**: Available under `demo/`.
 
