@@ -1,6 +1,22 @@
 # Evaluation Area
 
-## Current acceptance completion — 15 September 2026
+## Current review — 16 September 2026
+
+#114 at `c1c68ec` has green CI and reusable four-setting artifacts. Coordinator
+checks matched all stream hashes/byte counts and independently counted 48 frames
+in each ordinary and standalone decoded container. The wrapper nevertheless
+pads/trims raw output before validating shape; a two-frame reproducer became
+48 frames. Keep the PR open for a strict decode/reuse gate repair. Do not rerun
+the four encodes. Native PTS needs pixel-provenance verification, and score-free
+eligibility is not permission to score confirmation.
+
+The saved E03B VMAF alarm has supporting same-grid severe-blur calibration at the
+floor; retain original bounds and write a separate disposition. Scope the result
+to one development scene and single-run timing. E04A background-region metrics
+and background-only bytes cannot be compared directly to whole-frame anchors.
+Follow the [review and focused assignments](../workflow/session/evaluation-campaign/tasks/20260916-probe-review.md).
+
+## Historical acceptance completion — 15 September 2026
 
 PR #104 rejects invalid runtime evidence and requires explicit measured RD arms
 while retaining valid RD without timing. Standalone transport requires decode,

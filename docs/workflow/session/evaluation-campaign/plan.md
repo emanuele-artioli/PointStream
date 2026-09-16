@@ -25,7 +25,25 @@ comparisons keep residual off; paste-plus-residual is explicitly a residual-on
 control in the residual section. Component and readiness work can run before a
 full-codec win. A losing or invalid run is a result to preserve, not a gate pass.
 
-## Current entry point — 15 September acceptance and bounded release
+## Current entry point — 16 September probe return
+
+Use the [focused review and assignments](tasks/20260916-probe-review.md).
+E03B's four and E04A's six saved encodes exist with matching stream hashes;
+E03B decoded-container counts independently match the 48-frame request. #114
+`c1c68ec` and #109 `c9c4ded` have green CI, but remain unaccepted for the
+specific reproduced decode-padding, target-reference and NaN-selection gaps.
+#113 is merged at `c476840`; its broad panorama recommendation is not certified.
+Complete common-scope calibration/transport/rescoring on existing artifacts.
+
+The correction wave has zero new candidate encodes. E05 and confirmation scoring
+remain unreleased; source eligibility is reported score-free but not yet accepted
+or frozen by the coordinator. Reports return to **Clean project state and dispatch**,
+`01a0a923-4c5e-71c3-8993-5c68f2a76bb4`. Six active preparation hours across
+three workers and one hour of bounded execution are caps for the correction wave;
+remaining neural-anchor/training/full-codec/confirmation costs are unestablished.
+Keep the September 20 freeze risk and September 30/scientific requirements.
+
+## Historical entry point — 15 September acceptance and bounded release
 
 Use the [next-stage assignments](tasks/20260915-next-stage.md). #104 is merged
 as `3896da6` and #108 as `30d0255`, both with green exact-head CI. The coordinator
