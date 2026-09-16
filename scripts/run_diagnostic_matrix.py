@@ -151,7 +151,9 @@ def resolve_clip_start_frame(clip: Any, n_frames: int | None = None) -> int:
     )
 
 
-def _augment_objects_with_pose(clip: Any, *, shuffle: bool, seed: int) -> tuple[Any, ...]:
+def _augment_objects_with_pose(
+    clip: Any, *, shuffle: bool = False, no_conditioning: bool = False, seed: int = 42
+) -> tuple[Any, ...]:
     from src.contracts.conditioning import ConditioningBundle
     import cv2
 
@@ -160,6 +162,19 @@ def _augment_objects_with_pose(clip: Any, *, shuffle: bool, seed: int) -> tuple[
         return objects
 
     if all(getattr(obj, "conditioning", None) is not None for obj in objects):
+        if no_conditioning:
+            no_cond_objs: list[Any] = []
+            for obj in objects:
+                bundle = obj.conditioning
+                assert bundle is not None
+                zero_pose = np.zeros_like(getattr(bundle, "pose"))
+                no_cond_objs.append(
+                    replace(
+                        obj,
+                        conditioning=replace(bundle, pose=zero_pose),
+                    )
+                )
+            return tuple(no_cond_objs)
         if not shuffle:
             return objects
         existing_poses = [
@@ -216,7 +231,7 @@ def _augment_objects_with_pose(clip: Any, *, shuffle: bool, seed: int) -> tuple[
                 )
         skel_bgr = cv2.imread(str(pose_path))
         if skel_bgr is None:
-            raise ValueError(f"Failed to load skeleton image at {pose_path}")
+            raise FileNotFoundError(f"Failed to read skeleton image {pose_path}")
         skel_img = cv2.cvtColor(skel_bgr, cv2.COLOR_BGR2RGB)
         height, width = obj.appearance.shape[:2]
         bbox_w = max(1, obj.bbox[2] - obj.bbox[0])
@@ -237,6 +252,14 @@ def _augment_objects_with_pose(clip: Any, *, shuffle: bool, seed: int) -> tuple[
             object_id=obj.object_id,
         )
         augmented.append(replace(obj, conditioning=bundle))
+
+    if no_conditioning:
+        out_no_cond: list[Any] = []
+        for obj in augmented:
+            b = obj.conditioning
+            assert b is not None
+            out_no_cond.append(replace(obj, conditioning=replace(b, pose=np.zeros_like(b.pose))))
+        return tuple(out_no_cond)
 
     if not shuffle:
         return tuple(augmented)
@@ -283,6 +306,7 @@ def run_diagnostic_corner(
     generator_checkpoint: Path | None = None,
     residual_qp: int = 38,
     shuffle_conditioning: bool = False,
+    no_conditioning: bool = False,
     seed: int | None = None,
     device: str = "cpu",
     run_fn: RunFn | None = None,
@@ -296,6 +320,8 @@ def run_diagnostic_corner(
         gen_label = "ON (" + generator_arch + ")"
         if shuffle_conditioning:
             gen_label += ", shuffled conditioning"
+        elif no_conditioning:
+            gen_label += ", blank/no conditioning"
     print(
         f"Generation: {gen_label} | Residual: "
         f"{'ON (QP ' + str(residual_qp) + ')' if res_on else 'OFF'}"
@@ -329,7 +355,7 @@ def run_diagnostic_corner(
         )
         checkpoint_sha = sha256_path(checkpoint_path)
         objects_for_run = _augment_objects_with_pose(
-            clip, shuffle=shuffle_conditioning, seed=run_seed
+            clip, shuffle=shuffle_conditioning, no_conditioning=no_conditioning, seed=run_seed
         )
 
     if res_on:
@@ -356,6 +382,7 @@ def run_diagnostic_corner(
         "generation_on": gen_on,
         "residual_on": res_on,
         "shuffled_conditioning": bool(shuffle_conditioning),
+        "no_conditioning": bool(no_conditioning),
         "generator_arch": generator_arch if gen_on else "none (pasted_reference_control)",
         "residual_qp": residual_qp if res_on else None,
         "checkpoint_path": str(checkpoint_path) if checkpoint_path is not None else None,
@@ -390,9 +417,13 @@ def run_diagnostic_corner(
         "model_invocation_count": 0,
         "failure": None,
         "control": (
-            "shuffled_conditioning"
-            if shuffle_conditioning
-            else ("pasted_reference" if not gen_on else "generator")
+            "no_conditioning"
+            if no_conditioning
+            else (
+                "shuffled_conditioning"
+                if shuffle_conditioning
+                else ("pasted_reference" if not gen_on else "generator")
+            )
         ),
     }
 
@@ -499,7 +530,9 @@ def assemble_matrix_report(
     checkpoint_path: Path | None,
     checkpoint_sha256: str | None,
     device: str,
-    shuffled_control: bool,
+    shuffled_control: bool = True,
+    no_conditioning_control: bool = False,
+    same_seed_control: bool = False,
     repo: Path | None = None,
     augmented_objects: Any = None,
 ) -> dict[str, Any]:
@@ -541,6 +574,19 @@ def assemble_matrix_report(
         matrix=matrix,
     )
     invocation_total = sum(int(row.get("model_invocation_count") or 0) for row in matrix)
+
+    same_seed_matched: bool | None = None
+    if same_seed_control:
+        base_corner = next((r for r in matrix if r.get("corner") == "gen_on_res_off"), None)
+        repeat_corner = next(
+            (r for r in matrix if r.get("corner") == "gen_on_res_off_same_seed"), None
+        )
+        if base_corner and repeat_corner:
+            same_seed_matched = (
+                base_corner.get("delivered_frame_hashes")
+                == repeat_corner.get("delivered_frame_hashes")
+            )
+
     controls = {
         "pasted_reference": [
             row["corner"] for row in matrix if row.get("control") == "pasted_reference"
@@ -550,6 +596,12 @@ def assemble_matrix_report(
             row["corner"] for row in matrix if row.get("shuffled_conditioning")
         ],
         "shuffled_control_enabled": bool(shuffled_control),
+        "no_conditioning": [
+            row["corner"] for row in matrix if row.get("no_conditioning")
+        ],
+        "no_conditioning_control_enabled": bool(no_conditioning_control),
+        "same_seed_control_enabled": bool(same_seed_control),
+        "same_seed_determinism_verified": same_seed_matched,
     }
     summary = {
         "doc_role": "diagnostic_matrix_report",
@@ -635,6 +687,18 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="Run shuffled/foreign-pose generation null (default on)",
     )
     parser.add_argument(
+        "--no-conditioning-control",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Run blank/zero-pose generation null (default off)",
+    )
+    parser.add_argument(
+        "--same-seed-control",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Run same-seed repeat determinism check (default off)",
+    )
+    parser.add_argument(
         "--device", default=None, help="Inference device (recorded; default cpu/cuda)"
     )
     parser.add_argument("--seed", type=int, default=None, help="Override config seed")
@@ -666,6 +730,8 @@ def run_matrix(
     residual_qp: int,
     checkpoint: Path | None,
     shuffled_control: bool,
+    no_conditioning_control: bool = False,
+    same_seed_control: bool = False,
     device: str,
     frames: int,
     reuse_path: Path | None = None,
@@ -715,18 +781,78 @@ def run_matrix(
             prior = None
     reusable = reusable_corners(prior, identity)
 
-    corners: list[tuple[str, bool, bool, bool]] = [
-        ("gen_off_res_off", False, False, False),
-        ("gen_off_res_on", False, True, False),
-        ("gen_on_res_off", True, False, False),
-        ("gen_on_res_on", True, True, False),
+    corners: list[dict[str, Any]] = [
+        {
+            "name": "gen_off_res_off",
+            "gen_on": False,
+            "res_on": False,
+            "shuffled": False,
+            "no_cond": False,
+            "seed": base_config.run.seed,
+        },
+        {
+            "name": "gen_off_res_on",
+            "gen_on": False,
+            "res_on": True,
+            "shuffled": False,
+            "no_cond": False,
+            "seed": base_config.run.seed,
+        },
+        {
+            "name": "gen_on_res_off",
+            "gen_on": True,
+            "res_on": False,
+            "shuffled": False,
+            "no_cond": False,
+            "seed": base_config.run.seed,
+        },
+        {
+            "name": "gen_on_res_on",
+            "gen_on": True,
+            "res_on": True,
+            "shuffled": False,
+            "no_cond": False,
+            "seed": base_config.run.seed,
+        },
     ]
     if shuffled_control:
-        corners.append(("gen_on_shuffled_conditioning", True, False, True))
+        corners.append(
+            {
+                "name": "gen_on_shuffled_conditioning",
+                "gen_on": True,
+                "res_on": False,
+                "shuffled": True,
+                "no_cond": False,
+                "seed": base_config.run.seed,
+            }
+        )
+    if no_conditioning_control:
+        corners.append(
+            {
+                "name": "gen_on_no_conditioning",
+                "gen_on": True,
+                "res_on": False,
+                "shuffled": False,
+                "no_cond": True,
+                "seed": base_config.run.seed,
+            }
+        )
+    if same_seed_control:
+        corners.append(
+            {
+                "name": "gen_on_res_off_same_seed",
+                "gen_on": True,
+                "res_on": False,
+                "shuffled": False,
+                "no_cond": False,
+                "seed": base_config.run.seed,
+            }
+        )
 
     results: list[dict[str, Any]] = []
-    for name, gen_on, res_on, shuffled in corners:
-        if name in reusable:
+    for c in corners:
+        name = c["name"]
+        if name in reusable and name != "gen_on_res_off_same_seed":
             print(f"Reusing identity-matched result for {name}")
             results.append(reusable[name])
             continue
@@ -735,13 +861,14 @@ def run_matrix(
                 name,
                 clip,
                 base_config,
-                gen_on=gen_on,
-                res_on=res_on,
+                gen_on=c["gen_on"],
+                res_on=c["res_on"],
                 generator_arch=generator_arch,
                 generator_checkpoint=checkpoint,
                 residual_qp=residual_qp,
-                shuffle_conditioning=shuffled,
-                seed=base_config.run.seed,
+                shuffle_conditioning=c["shuffled"],
+                no_conditioning=c["no_cond"],
+                seed=c["seed"],
                 device=device,
                 run_fn=run_fn,
                 score_fn=score_fn,
@@ -762,6 +889,8 @@ def run_matrix(
         checkpoint_sha256=checkpoint_sha,
         device=device,
         shuffled_control=shuffled_control,
+        no_conditioning_control=no_conditioning_control,
+        same_seed_control=same_seed_control,
         repo=repo,
         augmented_objects=augmented_objects,
     )
@@ -786,6 +915,8 @@ def main(argv: list[str] | None = None) -> int:
         residual_qp=args.residual_qp,
         checkpoint=args.checkpoint,
         shuffled_control=bool(args.shuffled_control),
+        no_conditioning_control=bool(args.no_conditioning_control),
+        same_seed_control=bool(args.same_seed_control),
         device=device,
         frames=args.frames,
         reuse_path=args.reuse_results,

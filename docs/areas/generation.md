@@ -32,11 +32,12 @@ generalization. E03/E04 proceed independently with generation OFF.
 
 ## Historical acquisition / integration review
 
-E02R `b7c4d16` has real full-trajectory execution and corrected initialization/
-intra-epoch writes, but required repeat/no-conditioning and actual trainer update
-resume remain unproved. E02S owns that bounded acceptance; Cursor owns adapters.
-Do not promote raw fixed-QP residual bytes into a matched-quality win. E05 remains
-unreleased, with deferred/offline model families preserved.
+E02S has completed bounded real acceptance on GPU 1 (RTX 6000 Ada) under verified
+atomic resource claim: intra-epoch atomic checkpoint saving and fresh-process resume
+achieved bit-identical optimizer update (`diff: 0.00e+00`), and a 7-corner diagnostic
+matrix verified bit-identical same-seed determinism and pose conditioning sensitivity.
+Cursor exclusively owns result adapters (E03A); adapter edits are excluded from this PR.
+E05 remains unreleased awaiting E03A/E04 completion; offline/deferred families remain preserved.
 
 ## Coordinator follow-up — E01/E02
 
@@ -157,3 +158,20 @@ result that determines the next experiment; no family-wide claims from one pilot
 - **Hourly Checkpointing & Progress**: Sourced host-wide requirement into `scripts/train_pix2pix.py` and `scripts/train_spade4tennis.py` (`time.time() - last_ckpt >= 3600` and 10-minute progress heartbeats).
 - **E01 Schema Adapter**: Implemented `src/runner/generation_adapter.py` with fail-closed validation of experiment identity, conditioning sensitivity, same-seed determinism, timing evidence, and claim eligibility.
 - **Candidate Cards & Roster**: Documented candidate roster, native training recipes, hyperparameter endpoints, and 3-stage budgets in `docs/workflow/session/evaluation-campaign/tasks/02-generator-readiness-report.md`.
+
+`GEN-ACT-11` — **In Progress (E02S Acceptance Completion)** (E02R/E02S Generator Readiness & Real-Backend Evidence, 2026-09-14).
+- **Exact E01 Result Contract Roundtrip**: Upgraded `src/runner/generation_adapter.py` (Cursor-owned after #104) to produce schema `pointstream.campaign_result.v1` with full 64-hex SHA-256 digest validation, handling real producer `matrix` outputs from `run_diagnostic_matrix.py`, single-source grouped uncertainty without artificial zero-width assumptions, and fail-closed claim eligibility (`standalone_transport=True`, `rd=False` with explicit reason exclusions, `generalization=False` with single-source exclusions). Validated against E01 schema validator (`validate_campaign_record` and `ingest_for_claim`).
+- **Residual-OFF Disabling & Ranking**: Repaired `scripts/train_campaign.py:evaluate_checkpoint` so `residual_settings=None` disables `STAGE_RESIDUAL` in `StageLattice`, sets `residual_cfg=None`, records `residual_bytes=0` and `residual_calls=0`. Updated `rank_variants` to rank on total wire rate when residual is OFF, removing min-max composite.
+- **Intra-Epoch Hourly Checkpointing & Atomic State Capture**: Enhanced `scripts/train_pix2pix.py` and `scripts/train_spade4tennis.py` with intra-epoch hourly deadline checks inside batch loops, atomic saving (`save_checkpoint_atomic`), full state capture (`epoch`, `step`, `G`, `D`, `opt_G`, `opt_D`, `sched_G`, `sched_D`, RNGs), and partial-epoch skip resume semantics.
+- **SPADE Initialization Order Fix & Architecture Transparency**: Corrected `scripts/train_spade4tennis.py` so `weights_init_normal` is called before loading `args.pretrained_g`. Clarified that both lite and full tiers instantiate `SPADEResNet9Generator` (differing in discriminator count 2 vs 3), with multi-scale UNet / LocalEnhancer documented as unbuilt future work.
+- **Bounded Real-Backend Probe on GPU 1 (RTX 6000 Ada)**:
+  - Executed 5-corner diagnostic probe on 16 frames of `alcaraz_highlights/scene_028` (`CUDA_VISIBLE_DEVICES=1`, 860 MiB VRAM allocated, GPU 0 undisturbed, 16.3 min wall time within 30 min budget).
+  - 100% of wire bytes reconciled (`exact_match: True`).
+  - All 16 frames exhibited distinct delivered pixel hashes between generation-off and generation-on (`gen_on_res_off`), and between normal and shuffled conditioning (`gen_on_shuffled_conditioning`).
+  - Generated residual-off control confirmed 0 residual bytes and 0 residual calls.
+  - Generative residual demand changed: 110,913 B for Pix2Pix vs 113,287 B for pasted reference keyframe.
+  - Immutable artifacts recorded under `outputs/evaluation-campaign/e02r/`:
+    - `diagnostic_matrix_pix2pix_scene028.json` (SHA-256: `cec034102a3e00c2073158807278312ea3f7ccf56221918331e86dc308af7426`)
+    - `campaign_result_pix2pix_scene028.json` (SHA-256: `296dc0c98dc441ab85676cf3d4950b58ff35b6e2ce61f3ae97c2e9db9151df84`)
+    - `checkpoint_resume_evidence/pix2pix_interrupted_checkpoint.pt` (SHA-256: `9109f53237098ff71dfcba7f1a25fe24ae23814a06311df56c29ea7782a61e9d`)
+
