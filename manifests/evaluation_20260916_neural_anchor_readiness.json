@@ -51,9 +51,8 @@
     }
   },
   "compatibility_blockers": [
-    "DCVC-UF test_video.py contains Python3.12 f-string syntax rejected by current interpreter",
-    "no isolated compatible environment/native extensions built",
-    "checkpoint file identity unresolved"
+    "UF compatible Torch/CUDA environment and CUDA extension still required",
+    "checkpoint file identity unresolved; official links return HTTP403"
   ],
   "fallback": {
     "model": "DCVC-RT",
@@ -61,7 +60,7 @@
     "source_subdirectory": "DCVC-family/DCVC-RT",
     "documented_cuda": "12.6",
     "color_path": "official README recommends YUV420; conversion must be recorded and shared reference identity verified",
-    "status": "source inspected; not installed, no coded roundtrip",
+    "status": "RT CPU entropy extension built; synthetic fresh-process roundtrip verified; no neural video roundtrip",
     "reason": "less demanding documented CUDA stack; does not bypass weight/GPU/native entropy requirements"
   },
   "input": {
@@ -115,5 +114,21 @@
     "cuda_documented": "12.6",
     "source": "pinned DCVC-family/DCVC-RT/README.md",
     "cuda_kernel_fallback": "upstream documents PyTorch fallback; entropy bitstream extension still required"
+  },
+  "native_entropy_preflight": {
+    "python": "3.12.14",
+    "compiler": "g++11.4.0",
+    "numpy": "2.5.3",
+    "pybind11": "3.1.0",
+    "upstream_subdirectory": "DCVC-family/DCVC-RT",
+    "native_extension_sha256": "3cc818ca05f91030d6d82bef3fd88c6a6145d87402a264a9b793caf91b3333aa",
+    "build_command": "python setup.py build_ext --inplace in upstream src/cpp; unchanged source",
+    "synthetic_symbols": 384,
+    "stream_bytes": 100,
+    "stream_sha256": "f5460f783460484b7c87156048e7494b0ca8e1bf1de1335e6db2f73b9f13d058",
+    "fresh_process_symbol_equality": true,
+    "gpu_jobs": 0,
+    "weights_downloaded": false,
+    "qualification": "CPU entropy toolchain only; not neural video evaluation. Isolated temporary Python environment; PointStream environment unchanged."
   }
 }
