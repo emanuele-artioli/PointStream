@@ -5,7 +5,7 @@ from __future__ import annotations
 import cv2
 import numpy as np
 
-from demo.pipeline.hand_keypoints import FrameHandPose, SingleHand
+from demo.pipeline.hand_keypoints import SingleHand
 
 
 def letterbox_crop(

@@ -19,7 +19,6 @@ from torch.utils.data import Dataset
 from demo.pipeline.foreground_segmenter import letterbox_crop
 from demo.pipeline.hand_keypoints import (
     FrameHandPose,
-    extract_video_hand_poses,
     render_skeleton_on_canvas,
 )
 

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import sqlite3  # noqa: F401
-from typing import Any
 
 import torch
 import torch.nn as nn

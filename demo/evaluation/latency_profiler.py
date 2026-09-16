@@ -12,14 +12,11 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-import cv2
 import numpy as np
 import torch
 
-from demo.models.unet_generator import HandPix2PixUNet
-from demo.pipeline.background_codec import BackgroundCodec
-from demo.pipeline.foreground_segmenter import letterbox_crop, unletterbox_crop
-from demo.pipeline.hand_keypoints import HandPoseEstimator, render_skeleton_on_canvas
+from demo.pipeline.foreground_segmenter import unletterbox_crop
+from demo.pipeline.hand_keypoints import HandPoseEstimator
 from demo.pipeline.keypoint_compressor import KeypointCompressor
 
 
@@ -58,7 +55,7 @@ def profile_pipeline_latency(
     # 3. Measure Decoder: Keypoint unpack
     t0 = time.perf_counter()
     for _ in range(n_runs):
-        unpacked_hands = KeypointCompressor.decompress_frame(compressed_bytes, w, h)
+        _ = KeypointCompressor.decompress_frame(compressed_bytes, w, h)
     t_unpack_ms = ((time.perf_counter() - t0) / n_runs) * 1000.0
 
     # 4. Measure Generator Inference

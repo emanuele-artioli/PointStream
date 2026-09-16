@@ -3,11 +3,9 @@
 from __future__ import annotations
 
 import sqlite3  # noqa: F401
-import dataclasses
 from dataclasses import dataclass
 import json
 from pathlib import Path
-from typing import Any
 
 import cv2
 import mediapipe as mp

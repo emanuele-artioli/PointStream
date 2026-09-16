@@ -6,8 +6,6 @@ import sqlite3  # noqa: F401
 import argparse
 import json
 import logging
-import os
-import shutil
 import sys
 import time
 from pathlib import Path
@@ -363,9 +361,9 @@ def main() -> None:
     all_clip_results = []
     for idx, item in enumerate(manifest[:3]):
         clip_path = Path(item["path"])
-        logger.info(f"\n==========================================")
+        logger.info("\n==========================================")
         logger.info(f"BENCHMARKING CLIP {idx + 1}/3: {clip_path.name}")
-        logger.info(f"==========================================")
+        logger.info("==========================================")
         res = run_single_clip_comparison(
             clip_path=clip_path,
             clip_id=idx,

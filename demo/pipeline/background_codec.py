@@ -2,13 +2,9 @@
 
 from __future__ import annotations
 
-import os
-import shutil
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
-from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:

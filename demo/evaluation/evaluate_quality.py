@@ -3,13 +3,9 @@
 from __future__ import annotations
 
 import sqlite3  # noqa: F401
-import argparse
-import json
-import logging
 import math
 import sys
 from pathlib import Path
-from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
