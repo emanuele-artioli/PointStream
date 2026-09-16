@@ -67,7 +67,8 @@
     "nominal_fps": 12,
     "native_pts_verified": false,
     "export_config": "manifests/evaluation_20260916_dcvc_uf_rgb_config.json",
-    "export_status": "48 PNGs exported; each decoded pixel-equal to prepared RGB"
+    "export_status": "48 PNGs exported; each decoded pixel-equal to prepared RGB",
+    "export_config_note": "Repository config is a portable template. Resolve root_path to the actual data root before calling upstream; upstream does not expand shell variables in JSON."
   },
   "budget_card": {
     "status": "proposed_unmeasured_not_execution_release",
