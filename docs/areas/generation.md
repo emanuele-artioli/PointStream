@@ -1,6 +1,17 @@
 # Generation Area
 
-## Conditional pilot acceptance — 16 September 2026
+## Pilot return audit — 16 September 2026
+
+#118 and #125 are merged; the bounded E05 pix2pix pilot executed, but its
+complete-control claim is not accepted. Blank conditioning is absent because its
+CLI flag always resolves false; object/temporal/calibration evidence and wire-alarm
+closure remain open. The 217,736,406-byte fitted checkpoint has no declared
+receiver/deployment-cost policy. Keep no Stage2 promotion, preserve the family,
+and complete only saved-checkpoint evidence within the original remaining budget.
+Follow [the reuse assignments](../workflow/session/evaluation-campaign/tasks/20260916-return-audit-and-reuse.md).
+
+
+## Historical conditional release — 16 September 2026
 
 #118 at `e73c8ba` has green CI. Corrected first-reference/domain handling and
 exact tested G/D/Adam-moment CPU CLI continuation are advances; no CUDA identity

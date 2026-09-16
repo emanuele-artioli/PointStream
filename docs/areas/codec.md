@@ -1,6 +1,17 @@
 # Codec Area
 
-## Conditional pilot acceptance — 16 September 2026
+## Pilot return audit — 16 September 2026
+
+#119 is merged as `aefdeb2`. The E04B source is committed locally at `d30e59f`
+but not merged to shared main. R2 has two unresolved ghost-MAD alarms and dirty
+run-code provenance; two directories contain ON streams and retry/copy history
+needs reconciliation. Missing boundary MAD defaults are not measured zero errors.
+The error-floor explanation is a hypothesis. Close alarms/provenance by reuse;
+no further candidate encodes or second-camera probe is released.
+Follow [the reuse assignments](../workflow/session/evaluation-campaign/tasks/20260916-return-audit-and-reuse.md).
+
+
+## Historical conditional release — 16 September 2026
 
 #119 at `745271f` has green CI but is not accepted as calibrated evidence:
 main continues after calibration failure and always labels derived calibration
