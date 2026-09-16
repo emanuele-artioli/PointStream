@@ -1,6 +1,9 @@
 # PointStream Area Index & Active Plan
 
-Current coordination: **14 September 2026**, code baseline `2f63ae1` (#105); E01 #104 remains open.
+Current coordination: **15 September 2026**.
+Start with the [bounded next-stage assignments](docs/workflow/session/evaluation-campaign/tasks/20260915-next-stage.md).
+The handoff and older reviews are historical context. Current decisions below
+reflect the latest code and focused acceptance regressions.
 Submission **30 September**; provisional evidence freeze **20 September**.
 The [evaluation campaign](docs/workflow/session/evaluation-campaign/plan.md) is the
 authoritative plan incorporating the user's full evaluation design and resource
@@ -12,26 +15,27 @@ policy. The September 12 handoff/audit are historical context, not dispatches.
 |---|---|---|
 | [Evaluation](docs/areas/evaluation.md) | #100/#102 repair accounting and validation paths; saved results still need claim-specific reuse checks | E01 evidence/protocol, E03 anchors, E06 system |
 | [Codec](docs/areas/codec.md) | #101 repairs probe transport/precision; known three-mode artifact uses removal ON, not requested OFF | E04 background coverage and paired removal |
-| [Generation](docs/areas/generation.md) | #102 boundary repairs merged; sparse diagnostic is not full-trajectory evidence | E02 readiness, E05 staged training; one baseline-clearing model required |
+| [Generation](docs/areas/generation.md) | Full-trajectory execution verified; #109 actual trainer continuation and candidate selection still incomplete | E02S bounded completion; E05 unreleased; one baseline-clearing model required |
 | [Data](docs/areas/data.md) | Preserve exposure history; six fresh matches preferred but lower prospective count permitted | E01 split/protocol, E07 confirmation and second domain after tennis win |
 | [Infrastructure](docs/areas/infrastructure.md) | Existing detached monitoring; verify host availability at each launch | Per-host CPU <=90% available; any free GPU; no cleanup helper |
 | [Paper](docs/areas/paper.md) | Separate repo; no new competitive evidence certified by repairs | E08 setup/structure early, final claims after accepted results |
 
-## Current assignments after acquisition / R0 / E02R review
+## Current boundary — independent experiment release
 
-| Owner | Assignment | State |
-|---|---|---|
-| Cursor | [E03A](docs/workflow/session/evaluation-campaign/tasks/03a-contract-to-anchors.md) | Sole adapter/contract ownership; close integration and prepare anchors |
-| Antigravity subagent | [R0R](docs/workflow/session/evaluation-campaign/tasks/00r-claim-lifecycle.md) | Correct reproduced claim ownership/child-lifecycle defects |
-| Antigravity | [E02S](docs/workflow/session/evaluation-campaign/tasks/02s-training-and-controls.md) | Actual trainer resume and missing real controls; adapter handed to Cursor |
+| Owner | PR / head | Verified state | Next action |
+|---|---|---|---|
+| Cursor | #104 merged `3896da6` | Contract/mapping/pin accepted; CI green | E03B: four anchor settings, 48 aligned frames, 360p/12 fps, <=30 minutes |
+| Antigravity resource/background lane | #108 merged `30d0255` | Whole-group lifecycle and explicit CPU allowance accepted; CI green; no heartbeat lease | E04A: three removal-OFF representations, two QPs, <=30 minutes; local-host claims |
+| Antigravity generation lane | #109 `013a4c8` | Not accepted: actual CLI/RNG continuation and incomplete-evidence selection gaps | Supply exact saved artifact pointers; finish only the remaining acceptance cases |
 
 Three reserved matches acquired; media/report/log hashes independently verified.
-Eligibility remains pending and no confirmation scoring reported. Cursor #104
-head `7e4da6e` passes CI but production evidence ingestion still needs fixes.
-R0 `d39893c` and E02R `b7c4d16` remain unmerged/unaccepted; no open PR for either
-at review time. Full-trajectory execution is supported, complete readiness is not.
+Eligibility remains pending and confirmation scores stay untouched. E05 remains
+unreleased. Cross-host contention/takeover is unverified; use one tested host
+and queue independent lanes if their combined resource allowance is unavailable.
 
-Do not repeat acquisition or the full five-corner diagnostic. E03/E04 CPU
-preparation proceeds; measured probes follow contract/resource acceptance here.
-E05 remains gated on actual neural learning/resume and controls. Gate A open,
-confirmation incomplete; no GPU jobs launched by this coordinator review.
+E03B/E04A are separate assignments, not evidence that runs have launched. Worker
+reports return to **Coordinate submission evaluation**, task
+`01a0a488-257a-7b93-ab8c-2ac2a590f29c`. Do not repeat acquisition or the old matrix.
+Gate A is open and the paper is unchanged. Cost the remaining critical path at
+the next probe return: the September 20 freeze is at risk; September 30 and the
+neural-winner/secondary-domain requirements are unchanged.

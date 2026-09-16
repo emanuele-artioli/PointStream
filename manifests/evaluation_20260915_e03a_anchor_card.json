@@ -1,0 +1,158 @@
+{
+  "schema": "pointstream.experiment_card.v1",
+  "doc_role": "e03a_smallest_low_resolution_paired_anchor_card",
+  "campaign": "evaluation-20260914",
+  "status": "prepared_not_launched",
+  "contract_revision": "e03a-20260915",
+  "release_gate": "Measured encodes wait for coordinator acceptance of this result boundary and tested R0 claims. Generation is not a prerequisite.",
+  "decision_and_hypothesis": "At display_low (360 short-edge, 12 fps, no extra source frames) on one development scene, slowest-preset AV1 and VVC two-point RD plus encode/decode time can be collected inside six settings and 30 minutes. Competing explanation: slowest presets at even 48 frames exceed the budget and need a costed extension before native endpoints.",
+  "evidence_reused": {
+    "reuse_map": "manifests/evaluation_20260914_reuse_map.json",
+    "anchors_rd": [
+      {
+        "artifact_id": "gate_a_vvc_webp_n96_run2",
+        "decision": "diagnostic_plot_only",
+        "why_not_this_card": "native 4K development RD, unverified reconstruction/ledger for validated claims"
+      },
+      {
+        "artifact_id": "dev_recovery_pilot_frozen",
+        "decision": "diagnostic_plot_only",
+        "why_not_this_card": "identity_verified=false; evidence_verified=false; SSIM ceiling alarm"
+      },
+      {
+        "artifact_id": "wave2_overlap_20260910",
+        "decision": "diagnostic_plot_only",
+        "why_not_this_card": "after #88; generation-off 48-frame 4K; not display_low"
+      }
+    ],
+    "gap": "No validated display_low paired AV1/VVC points on identical native-timestamp frames with decode and calibration controls."
+  },
+  "operating_regime": {
+    "video": "federer_djokovic",
+    "scene": "scene_007",
+    "split": "development",
+    "raw_input": {
+      "path": "/home/itec/emanuele/pointstream-data/assets/raw_4k/federer_djokovic.mp4",
+      "sha256": "9d43bcbba3179c320dbdf5d19d1cf49edeb721fe51c9b8a68facf73ef8a81292",
+      "bp46_first_megabyte_sha256": "eff85ffb73cd980e97d20a3cbb939bfd748d74a6974a995dbb956a72947e0c65",
+      "bytes": 966688892,
+      "t_start_s": 80.7807,
+      "scene_manifest": "manifests/bp46_long_tennis_scenes.json"
+    },
+    "operating_point_id": "display_low",
+    "short_edge_px": 360,
+    "fps": 12.0,
+    "upsample": false,
+    "create_extra_source_frames": false,
+    "timestamp_policy": "Use experiments.long_scenes.extract.extract_or_reuse_24fps_frames at t_start=80.7807, then take zero-based extracted-frame positions 0,2,...,94. This is the existing non-interpolating 24 fps extraction route followed by deterministic decimation to 12 fps; record extracted_frame_index and target_time_s=t_start+index/24. Do not label these as native source PTS.",
+    "frame_count": 48,
+    "colour_path_id": "broadcast_yuv420",
+    "pix_fmt": "yuv420p",
+    "matrix": "bt709",
+    "range": "as_tagged_on_source"
+  },
+  "source_transform": {
+    "status": "exact_existing_python_api_route_not_executed",
+    "execution_guard": "This is a preparation recipe, not launch-ready input provenance. The extraction helper checks cache length only and may overwrite historical cache files on fallback. Verify source/seek/filter identity and original source PTS before reuse; never invoke its fallback in BP46/BP21. If missing, use the existing extraction primitive in a new run directory for this four-second window, preserving all originals. Extracted target-grid indices are not native PTS.",
+    "extract_callable": "experiments.long_scenes.extract.extract_or_reuse_24fps_frames",
+    "extract_arguments": {
+      "video": "federer_djokovic",
+      "scene": "scene_007",
+      "video_path": "/home/itec/emanuele/pointstream-data/assets/raw_4k/federer_djokovic.mp4",
+      "t_start": 80.7807,
+      "duration": 4.0,
+      "max_track_fid": 0,
+      "ffmpeg": "/opt/local/bin/ffmpeg"
+    },
+    "existing_cache": "/home/itec/emanuele/pointstream-data/outputs/bp46-long-scenes/clips/federer_djokovic/scene_007/extract_24",
+    "reuse_boundary": "Reuse the scene extraction files, not the old BP46 eligible interval [68,164). This card selects extraction positions [0,96) then decimates; it is a distinct scene-start anchor input and must receive its own stack hash. E04 pairing must use this same selected-position list and aligned masks.",
+    "temporal": {
+      "input_positions": "0..95 from the sorted extraction result",
+      "selected_positions": "range(0,96,2)",
+      "selected_count": 48,
+      "interpolation": false
+    },
+    "spatial_callable": "experiments.tier.resolution_adaptive.rescale_frames",
+    "spatial_arguments": {
+      "scale": 0.16666666666666666,
+      "interpolation": "cv2.INTER_LANCZOS4"
+    },
+    "expected_shape": [48, 360, 640, 3],
+    "output_root": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03a/anchors/display_low_federer_scene007/",
+    "required_pre_encode_record": [
+      "raw input sha256 and bytes",
+      "48 extracted_frame_index and target_time_s pairs",
+      "prepared RGB stack sha256",
+      "prepared shape exactly [48,360,640,3]"
+    ]
+  },
+  "smallest_discriminating_probe": {
+    "settings": [
+      {"codec": "av1", "encoder": "SvtAv1EncApp", "path": "/opt/local/bin/SvtAv1EncApp", "version": "SVT-AV1 v1.8.0 (release)", "preset": "0", "qp": 63},
+      {"codec": "av1", "encoder": "SvtAv1EncApp", "path": "/opt/local/bin/SvtAv1EncApp", "version": "SVT-AV1 v1.8.0 (release)", "preset": "0", "qp": 47},
+      {"codec": "vvc", "encoder": "vvencapp", "path": "/opt/local/bin/vvencapp", "version": "vvencapp version 1.11.0", "preset": "slower", "qp": 63},
+      {"codec": "vvc", "encoder": "vvencapp", "path": "/opt/local/bin/vvencapp", "version": "vvencapp version 1.11.0", "preset": "slower", "qp": 47}
+    ],
+    "decoder": {
+      "ffmpeg": "/opt/local/bin/ffmpeg",
+      "version": "n7.1.1-56-gc2184b65d2",
+      "av1": "libaom-av1 or av1",
+      "vvc": "vvc"
+    },
+    "existing_encoding_route": {
+      "request_callable": "experiments.tier.low_rate_measure.reference_request(codec, qp, preset)",
+      "roundtrip_callable": "src.components.codec.measure.timed_roundtrip(prepared_frames, request=request, fps=12.0, work_dir=output_root)",
+      "score_callable": "experiments.tier.low_rate_measure.score_headlines(prepared_frames, decoded_frames)",
+      "decode_rejection_callable": "experiments.tier.low_rate_validate.decode_rejections",
+      "warning": "timed_roundtrip deletes its temporary charged bitstream. Before launch, the dispatched worker must add only a bounded persistent wrapper around the same src.components.codec.encode.encode/decode path so each charged bitstream, decoded output, EncodeRecord.command, and byte length survive. Do not invent native codec flags or launch through a second encoder path."
+    },
+    "controls": [
+      "standalone_decode of charged bitstream to exact frame count and even 360-short-edge shape",
+      "run the fixed display_low calibration choice below before reading anchor scores",
+      "wire bytes equal measured bitstream length"
+    ],
+    "n_settings": 4,
+    "control_budget_share": "at least one third of wall time for decode, calibration and scoring"
+  },
+  "metric_calibration": {
+    "choice": "run_new_same_grid_controls",
+    "callable": "experiments.tier.calibrate.run_full_metric_calibration",
+    "metrics": ["psnr", "ssim", "vmaf"],
+    "reference": "first two prepared 360p Federer frames",
+    "unrelated": {
+      "loader": "experiments.tier.clip.load_tier_clip(video='sinner_alcaraz', scene='scene_001', n_frames=2)",
+      "transform": "experiments.tier.resolution_adaptive.rescale_frames(scale=1/6, interpolation=cv2.INTER_LANCZOS4)",
+      "reason": "caller-supplied natural tennis control on the same 360p grid; do not use the synthetic fallback"
+    },
+    "output": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03a/anchors/display_low_federer_scene007/metric-calibration.json",
+    "pass": "all requested metrics report distortion_ordering_held and unrelated_ordering_held; quote unrelated values beside results",
+    "on_failure": "stop before reading or plotting anchor scores"
+  },
+  "tool_floor_probe": {
+    "av1": {"supported": true, "slowest_preset": "0", "probe_qp": 63, "probe_bytes": 107, "decoded_shape": [2, 64, 64, 3], "elapsed_s": 1.61},
+    "vvc": {"supported": true, "slowest_preset": "slower", "probe_qp": 63, "probe_bytes": 216, "decoded_shape": [2, 64, 64, 3], "elapsed_s": 0.86, "decode_tool": "ffmpeg"}
+  },
+  "bounds_and_instrument": {
+    "written_before_headline_scores": true,
+    "size_bytes": "Worst: both QPs near uncompressed 360p 48f (~3e7). Best: QP63 under 5e4 bytes with a valid decode.",
+    "psnr_y_db": "Worst: <15 (decode/colour mismatch). Best: >40 (mild QP on easy tennis).",
+    "encode_plus_decode_s": "Worst: >30 min total for four settings (then stop and cost an extension). Best: <10 min total.",
+    "null": "unrelated reconstruction must not outrank the decode on PSNR/SSIM/VMAF"
+  },
+  "budget": {
+    "max_new_configurations": 6,
+    "wall_minutes_including_scoring": 30,
+    "if_exceeded": "return a costed 24-frame or faster-preset diagnostic; do not silently drop slowest preset",
+    "full_scene_note": "federer scene_007 / alcaraz scene_000 full duration at 12 fps exceeds this first card; keep 48 frames until the 30-minute question is answered"
+  },
+  "decision_rule": {
+    "promote": "four usable overlapping points with controls, recorded binaries, and ingestable campaign_result.v1 rows",
+    "stop": "a slowest-preset encode cannot finish one QP inside 15 minutes: cost native vs faster-preset split",
+    "inconclusive": "decode shape/count mismatch or calibration alarm: do not plot RD"
+  },
+  "neural_anchor": {
+    "candidate": "DCVC-UF",
+    "status": "setup_may_proceed_separately",
+    "blocks_this_card": false
+  }
+}

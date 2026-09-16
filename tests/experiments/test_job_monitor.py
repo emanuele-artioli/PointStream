@@ -162,6 +162,7 @@ def test_supervisor_enforces_budget_without_agent(
             "budget_seconds": 5,
             "thread": None,
             "codex": "codex",
+            "claims": {"cpu_threads": 1, "claims_dir": str(tmp_path / "claims")},
         },
     )
     now = [0.0]
@@ -170,10 +171,66 @@ def test_supervisor_enforces_budget_without_agent(
     monkeypatch.setattr(monitor.time, "time", lambda: now[0])
     monkeypatch.setattr(monitor.time, "sleep", lambda seconds: now.__setitem__(0, now[0] + seconds))
     monkeypatch.setattr(monitor.subprocess, "Popen", lambda *a, **kw: child)
-    monkeypatch.setattr(monitor, "stop_child", lambda proc: stopped.append(proc))
+    def stop(proc: Any) -> bool:
+        stopped.append(proc)
+        return True
+
+    monkeypatch.setattr(monitor, "stop_child", stop)
     assert monitor.supervise(tmp_path) == 0
     assert stopped and stopped[0] is child
     assert monitor.read_json(tmp_path / "status.json")["status"] == "budget_exhausted"
+
+
+@pytest.mark.parametrize("stopped", [False, True])
+def test_spawned_child_identity_write_failure_retains_claim_until_group_stops(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, stopped: bool
+) -> None:
+    from experiments.jobs import claims
+
+    setup_job(tmp_path)
+    claims_dir = tmp_path / "claims"
+    monitor.write_json(tmp_path / "request.json", {
+        "command": ["synthetic-worker"], "cwd": str(tmp_path),
+        "budget_seconds": 5, "thread": None, "codex": "codex",
+        "claims": {"cpu_threads": 1, "claims_dir": str(claims_dir), "available_cores": 4},
+    })
+    child = SimpleNamespace(pid=123, poll=lambda: None)
+    monkeypatch.setattr(monitor.subprocess, "Popen", lambda *a, **kw: child)
+    monkeypatch.setattr(monitor, "stop_child", lambda proc: stopped)
+
+    def failed_identity(*args: Any) -> Any:
+        raise OSError("identity write failed")
+
+    monkeypatch.setattr(claims, "record_child_identity", failed_identity)
+    assert monitor.supervise(tmp_path) == 0
+    assert monitor.read_json(tmp_path / "status.json")["status"] == "failed"
+    allocations = claims.get_claims_status(claims_dir)["cpu_hosts"]
+    assert any(host["allocations"] for host in allocations.values()) is not stopped
+
+
+@pytest.mark.parametrize("cpu_args", [[], ["--cpu-threads", "0"], ["--cpu-threads", "-1"]])
+def test_start_cli_requires_positive_cpu_allowance(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, cpu_args: list[str]
+) -> None:
+    job_dir = tmp_path / ("job-" + (cpu_args[-1] if cpu_args else "missing"))
+    monkeypatch.setattr(
+        monitor.sys,
+        "argv",
+        [
+            "monitor",
+            "start",
+            str(job_dir),
+            "--budget-hours",
+            "1",
+            *cpu_args,
+            "--command",
+            "/usr/bin/true",
+        ],
+    )
+    with pytest.raises(SystemExit) as exc_info:
+        monitor.main()
+    assert exc_info.value.code == 2
+    assert not job_dir.exists()
 
 
 def test_schedule_cli_changes_deadline_without_restarting_job(

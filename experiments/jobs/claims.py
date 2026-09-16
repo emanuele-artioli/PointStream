@@ -65,6 +65,9 @@ class DeviceClaim:
     job_id: str
     job_dir: str | None = None
     proc_start_time: float | None = None
+    child_pid: int | None = None
+    child_proc_start_time: float | None = None
+    process_group_id: int | None = None
 
 
 @dataclass(frozen=True)
@@ -79,6 +82,9 @@ class CPUClaim:
     job_id: str
     job_dir: str | None = None
     proc_start_time: float | None = None
+    child_pid: int | None = None
+    child_proc_start_time: float | None = None
+    process_group_id: int | None = None
 
 
 @dataclass
@@ -176,6 +182,67 @@ def is_pid_alive(pid: int, expected_start_time: float | None = None) -> bool:
     return True
 
 
+def is_process_group_active(pgid: int) -> bool | None:
+    """Return whether a process group has executable members.
+
+    ``None`` means the group exists but member state could not be verified, so
+    callers must retain its claim. Zombie-only groups are inactive.
+    """
+    if pgid <= 0:
+        return False
+    try:
+        os.killpg(pgid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return None
+
+    found_member = False
+    unknown_member = False
+    proc_root = Path("/proc")
+    if not proc_root.is_dir():
+        return None
+    try:
+        entries = list(proc_root.iterdir())
+    except OSError:
+        return None
+    for entry in entries:
+        if not entry.name.isdigit():
+            continue
+        pid = int(entry.name)
+        try:
+            candidate_pgid = os.getpgid(pid)
+        except ProcessLookupError:
+            continue
+        except PermissionError:
+            unknown_member = True
+            continue
+        if candidate_pgid != pgid:
+            continue
+        found_member = True
+        try:
+            stat = (entry / "stat").read_text(encoding="utf-8")
+            tail = stat[stat.rfind(")") + 2 :].split()
+            if not tail or tail[0] != "Z":
+                return True
+        except OSError:
+            unknown_member = True
+
+    if unknown_member:
+        return None
+    if found_member:
+        return False
+    # The group may have vanished during the scan. Confirm that rather than
+    # treating a missing/unreadable member list as dead.
+    try:
+        os.killpg(pgid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return None
+    return None
+
+
 def is_claim_active(claim_data: dict[str, Any]) -> bool | None:
     """Determine whether a claim is active.
 
@@ -200,21 +267,24 @@ def is_claim_active(claim_data: dict[str, Any]) -> bool | None:
             if sup_alive:
                 return True
 
-        # Check child PID from status.json if available
-        child_alive = False
+        # Prefer child identity persisted directly in the claim. Monitor status is
+        # the compatibility fallback for claims created before child attachment.
+        child_pid = claim_data.get("child_pid")
+        child_start = claim_data.get("child_proc_start_time")
+        process_group_id = claim_data.get("process_group_id")
+        child_identity_known = child_pid is not None
         terminal_status = False
         if job_dir_str:
             job_dir = Path(job_dir_str)
             status_file = job_dir / "status.json"
             if status_file.exists():
                 status_data = read_json_safe(status_file, {})
-                child_pid = status_data.get("pid")
-                child_start = status_data.get("proc_start_time")
-                if child_pid is not None:
-                    child_alive = is_pid_alive(int(child_pid), child_start)
-                    if child_alive:
-                        # NEVER let status text alone release a live job if child PID is still alive!
-                        return True
+                if child_pid is None:
+                    child_pid = status_data.get("pid")
+                    child_start = status_data.get("proc_start_time")
+                    child_identity_known = child_pid is not None
+                if process_group_id is None:
+                    process_group_id = status_data.get("process_group_id")
 
                 if status_data.get("status") in {
                     "complete",
@@ -224,11 +294,25 @@ def is_claim_active(claim_data: dict[str, Any]) -> bool | None:
                 }:
                     terminal_status = True
 
-        # If both local PIDs were checked and verified dead
-        if not sup_alive and not child_alive:
-            if terminal_status or pid is not None:
-                return False
+        if child_pid is not None and is_pid_alive(int(child_pid), child_start):
+            # NEVER let status text alone release a live job if child PID is still alive.
+            return True
 
+        if process_group_id is not None:
+            group_active = is_process_group_active(int(process_group_id))
+            if group_active is not False:
+                return group_active
+
+        if sup_alive:
+            return True
+
+        if job_dir_str and not child_identity_known and not terminal_status:
+            # A dead supervisor plus a non-terminal job without child identity is
+            # unresolved. Retain the claim rather than assuming no orphan exists.
+            return None
+
+        # Supervisor and any known child are verified dead, or launch reached a
+        # terminal state before a child identity was recorded.
         return False
 
     # Remote host: cannot verify PID locally. Return None so we never steal on TTL.
@@ -377,7 +461,9 @@ def query_gpus(
                 except ValueError:
                     continue
     except (subprocess.SubprocessError, FileNotFoundError, OSError):
-        pass
+        # GPU properties without process occupancy are not enough to establish
+        # that a device is free. Fail the complete probe closed.
+        return []
 
     return list(devices.values())
 
@@ -779,26 +865,83 @@ def terminate_and_reap_process_group(
     sigterm_timeout: float = 15.0,
     sigkill_timeout: float = 5.0,
 ) -> bool:
-    """Terminate and reap child process group. Return True if death verified."""
-    if process.poll() is not None:
+    """Terminate and reap the whole owned process group, not only its leader."""
+    pgid = process.pid
+    if pgid <= 0 or pgid == os.getpgrp():
+        return False
+
+    def group_has_live_members() -> bool:
+        """Return whether PGID contains a non-zombie process."""
+        return is_process_group_active(pgid) is not False
+
+    def wait_for_group_exit(timeout: float) -> bool:
+        deadline = time.monotonic() + timeout
+        while True:
+            process.poll()  # reap the direct child when it exits
+            if not group_has_live_members():
+                return True
+            if time.monotonic() >= deadline:
+                return False
+            time.sleep(0.05)
+
+    if not group_has_live_members():
+        process.poll()
         return True
     try:
-        os.killpg(process.pid, signal.SIGTERM)
-    except (ProcessLookupError, PermissionError):
-        pass
-    try:
-        process.wait(timeout=sigterm_timeout)
+        os.killpg(pgid, signal.SIGTERM)
+    except ProcessLookupError:
+        process.poll()
+        return not group_has_live_members()
+    except PermissionError:
+        return False
+    if wait_for_group_exit(sigterm_timeout):
         return True
-    except (subprocess.TimeoutExpired, TimeoutError):
-        try:
-            os.killpg(process.pid, signal.SIGKILL)
-        except (ProcessLookupError, PermissionError):
-            pass
-        try:
-            process.wait(timeout=sigkill_timeout)
-            return True
-        except (subprocess.TimeoutExpired, TimeoutError):
-            return process.poll() is not None
+    try:
+        os.killpg(pgid, signal.SIGKILL)
+    except ProcessLookupError:
+        process.poll()
+        return not group_has_live_members()
+    except PermissionError:
+        return False
+    return wait_for_group_exit(sigkill_timeout)
+
+
+def record_child_identity(session: ClaimSession, process: subprocess.Popen[Any]) -> dict[str, Any]:
+    """Persist child PID, start identity, and owned process group in every claim."""
+    identity = {
+        "child_pid": process.pid,
+        "child_proc_start_time": get_process_start_time(process.pid),
+        "process_group_id": process.pid,
+    }
+
+    if session.device_claim is not None:
+        claim = session.device_claim
+        claim_file = (
+            session.claims_dir
+            / "devices"
+            / f"{claim.host}_{sanitize_uuid(claim.device_uuid)}"
+            / "claim.json"
+        )
+        data = read_json_safe(claim_file, {})
+        if data.get("token") != claim.token:
+            raise InvalidTokenError("Cannot attach child identity to a device claim not owned by this session")
+        data.update(identity)
+        write_json_atomic(claim_file, data)
+
+    if session.cpu_claim is not None:
+        cpu_claim = session.cpu_claim
+        alloc_file = session.claims_dir / "cpu" / f"{cpu_claim.host}.json"
+        mutex_dir = session.claims_dir / "cpu" / f"{cpu_claim.host}.lock"
+        with atomic_dir_lock(mutex_dir):
+            data = read_json_safe(alloc_file, {})
+            allocations = data.get("allocations", {})
+            allocation = allocations.get(cpu_claim.token)
+            if allocation is None:
+                raise InvalidTokenError("Cannot attach child identity to a CPU claim not owned by this session")
+            allocation.update(identity)
+            write_json_atomic(alloc_file, data)
+
+    return identity
 
 
 def release_session_claims(session: ClaimSession) -> None:
@@ -996,10 +1139,16 @@ def launch(
             stderr=stderr,
             start_new_session=True,
         )
+        record_child_identity(session, process)
         return process, session
     except BaseException:
-        # Clean up claims immediately on launch failure
-        release_session_claims(session)
+        # If Popen succeeded but identity persistence failed, stop the owned group
+        # before deciding whether its claims can be released.
+        if "process" in locals():
+            if terminate_and_reap_process_group(process):
+                release_session_claims(session)
+        else:
+            release_session_claims(session)
         raise
 
 
@@ -1050,6 +1199,10 @@ def run_supervised(
             pass
         raise
 
+    # A leader can exit while descendants remain in its process group. Verify the
+    # complete group is gone before releasing on the normal path as well.
+    if not terminate_and_reap_process_group(process):
+        raise ResourceClaimError("Child leader exited but owned process group remains; claims retained")
     release_session_claims(session)
     return code
 

@@ -600,6 +600,85 @@ def test_generation_adapter_fails_closed_on_failed_controls() -> None:
     assert any("shuffled match" in r for r in adapted["exclusion_reasons"])
 
 
+def test_adapter_reads_nested_scores_timing_parts_and_shape() -> None:
+    matrix_output = {
+        "video": "alcaraz_highlights",
+        "scene": "scene_028",
+        "frames": 16,
+        "matrix": [
+            {
+                "corner": "gen_on_res_off",
+                "generation_on": True,
+                "shuffled_conditioning": False,
+                "delivered_frame_hashes": ["g1", "g2"],
+                "delivered_shape": [16, 2160, 3840, 3],
+                "scores": {"psnr_y": 28.3, "ssim": 0.97, "vmaf": 88.0},
+                "timing": {"client_seconds": 24.5, "encoder_seconds": 85.0},
+                "parts": {"residual": 1100, "transport_total": 7000},
+                "coded_bytes": 7000,
+            },
+            {
+                "corner": "gen_on_shuffled_conditioning",
+                "generation_on": True,
+                "shuffled_conditioning": True,
+                "delivered_frame_hashes": ["s1", "s2"],
+            },
+            {
+                "corner": "gen_on_repeat",
+                "generation_on": True,
+                "seed_repeat": True,
+                "delivered_frame_hashes": ["g1", "g2"],
+            },
+        ],
+    }
+    adapted = adapt_diagnostic_matrix_result(
+        matrix_output,
+        run_id="nested_row",
+        backend_name="pix2pix",
+        arch="pix2pix",
+        checkpoint_sha256="a" * 64,
+    )
+    assert adapted["metrics"]["psnr_mean"] == 28.3
+    assert adapted["metrics"]["total_bytes"] == 7000
+    assert adapted["timing_evidence"]["measured_client_seconds"] == 24.5
+    assert adapted["operating_resolution"] == (2160, 3840)
+    assert adapted["claim_eligibility"]["standalone_decode"] is False
+
+
+def test_adapter_recognizes_actual_same_seed_corner_name() -> None:
+    matrix_output = {
+        "matrix": [
+            {
+                "corner": "gen_on_res_off",
+                "generation_on": True,
+                "delivered_frame_hashes": ["g1", "g2"],
+                "scores": {"psnr_y": 28.3},
+                "parts": {"transport_total": 7000},
+            },
+            {
+                "corner": "gen_on_res_off_shuffled",
+                "generation_on": True,
+                "shuffled_conditioning": True,
+                "delivered_frame_hashes": ["s1", "s2"],
+            },
+            {
+                "corner": "gen_on_res_off_same_seed",
+                "generation_on": True,
+                "delivered_frame_hashes": ["g1", "g2"],
+            },
+        ]
+    }
+    adapted = adapt_diagnostic_matrix_result(
+        matrix_output,
+        run_id="actual_same_seed_name",
+        backend_name="pix2pix",
+        arch="pix2pix",
+        checkpoint_sha256="a" * 64,
+    )
+    assert adapted["controls"]["same_seed_determinism_tested"] is True
+    assert adapted["controls"]["same_seed_deterministic"] is True
+
+
 def test_metric_uncertainty_calculation() -> None:
     """Verify SEM and 95% CI calculation on sample distribution."""
     values = [30.0, 32.0, 31.0, 33.0, 29.0]

@@ -1,6 +1,20 @@
 # Generation Area
 
-## Current acquisition / integration review
+## Current acceptance — 15 September 2026
+
+#109 `013a4c8` retains useful epoch sampling, RNG tensor restoration, explicit
+residual-OFF handling and extra control corners. E05 remains unreleased: its
+test does not exercise fresh-process CLI/DataLoader/discriminator continuation;
+Python reference-choice and iterator RNG are not restored deterministically.
+Selection ignores SSIM and treats missing quality/time as equal. Complete only
+these cases and supply exact host/path/command/digest pointers for the reported
+artifacts; do not repeat the historical matrix. See the
+[bounded assignment](../workflow/session/evaluation-campaign/tasks/20260915-next-stage.md).
+Cursor's adapter recognizes the producer same-seed corner after #104 integration.
+Full-trajectory execution is already verified, not proof of useful fidelity or
+generalization. E03/E04 proceed independently with generation OFF.
+
+## Historical acquisition / integration review
 
 E02S has completed bounded real acceptance on GPU 1 (RTX 6000 Ada) under verified
 atomic resource claim: intra-epoch atomic checkpoint saving and fresh-process resume
@@ -121,10 +135,16 @@ result that determines the next experiment; no family-wide claims from one pilot
   - *Federer*: Pasted reference (`gen_off_res_off`) achieves 30.46 dB PSNR-Y / 78.13 VMAF for 627,735 B. pix2pix without residual (`gen_on_res_off`) yields 29.82 dB (-0.64 dB) / 77.75 VMAF for 1,282,341 B (+654,606 B). With residual, pasted reference (`gen_off_res_on`) reaches 39.76 dB / 90.01 VMAF for 796,646 B, while pix2pix (`gen_on_res_on`) reaches 37.40 dB (-2.36 dB) / 89.50 VMAF for 1,451,803 B.
 - **Decision & Calibration**: Confirmed that client generator executes faithfully and alters reconstructed pixels at injection as conditioned. However, in this sparse placement setting, uncompressed pose conditioning overhead degrades whole-codec rate–distortion against pasted reference. Broad claims that pasted reference is a "strictly superior model" are retracted; generation-off is retained as a conservative operational baseline while keeping `pix2pix` and `spade4tennis` available for multi-frame sequence evaluation.
 
-`GEN-ACT-10` — **Superseded by E02R** (E02 Generator Readiness & Interface Compliance, 2026-09-14). Historical worker report; all readiness claims and candidate cards superseded by `GEN-ACT-11` and `docs/workflow/session/evaluation-campaign/tasks/02r-readiness-evidence.md`.
+`GEN-ACT-10` — **Complete** (E02 Generator Readiness & Interface Compliance, 2026-09-14).
+- **Full-Trajectory Sequence Placement**: Added `full_trajectory` flag to `experiments/long_scenes/loader.py`, resolving Finding 4. Multi-frame clips now emit `ObjectRequest`s for all frames where tracks are visible (verified on 48-frame scene `alcaraz_highlights/scene_028`, generating 96 frame-indexed requests).
+- **Pose Alignment & Fail-Closed Conditioning**: `_augment_objects_with_pose` dynamically aligns bounding box aspect ratios to appearance shapes while strictly rejecting missing or unaligned pose files.
+- **Campaign Evaluator & Uncertainty-Aware Promotion**: Cleaned `scripts/train_campaign.py` by removing uncalibrated LPIPS from `LOWER_IS_BETTER` and `RANKED_METRICS`, denominating primary ranking in wire `residual_bytes`, and upgrading `promote_survivors` with uncertainty-aware threshold preservation ($\le 2\%$ rate or 0.1 dB PSNR).
+- **Hourly Checkpointing & Progress**: Sourced host-wide requirement into `scripts/train_pix2pix.py` and `scripts/train_spade4tennis.py` (`time.time() - last_ckpt >= 3600` and 10-minute progress heartbeats).
+- **E01 Schema Adapter**: Implemented `src/runner/generation_adapter.py` with fail-closed validation of experiment identity, conditioning sensitivity, same-seed determinism, timing evidence, and claim eligibility.
+- **Candidate Cards & Roster**: Documented candidate roster, native training recipes, hyperparameter endpoints, and 3-stage budgets in `docs/workflow/session/evaluation-campaign/tasks/02-generator-readiness-report.md`.
 
-`GEN-ACT-11` — **Complete** (E02R Generator Readiness & Real-Backend Evidence, 2026-09-14).
-- **Exact E01 Result Contract Roundtrip**: Upgraded `src/runner/generation_adapter.py` to produce schema `pointstream.campaign_result.v1` with full 64-hex SHA-256 digest validation, handling real producer `matrix` outputs from `run_diagnostic_matrix.py`, single-source grouped uncertainty without artificial zero-width assumptions, and fail-closed claim eligibility (`standalone_transport=True`, `rd=False` with explicit reason exclusions, `generalization=False` with single-source exclusions). Validated against E01 schema validator (`validate_campaign_record` and `ingest_for_claim`).
+`GEN-ACT-11` — **In Progress (E02S Acceptance Completion)** (E02R/E02S Generator Readiness & Real-Backend Evidence, 2026-09-14).
+- **Exact E01 Result Contract Roundtrip**: Upgraded `src/runner/generation_adapter.py` (Cursor-owned after #104) to produce schema `pointstream.campaign_result.v1` with full 64-hex SHA-256 digest validation, handling real producer `matrix` outputs from `run_diagnostic_matrix.py`, single-source grouped uncertainty without artificial zero-width assumptions, and fail-closed claim eligibility (`standalone_transport=True`, `rd=False` with explicit reason exclusions, `generalization=False` with single-source exclusions). Validated against E01 schema validator (`validate_campaign_record` and `ingest_for_claim`).
 - **Residual-OFF Disabling & Ranking**: Repaired `scripts/train_campaign.py:evaluate_checkpoint` so `residual_settings=None` disables `STAGE_RESIDUAL` in `StageLattice`, sets `residual_cfg=None`, records `residual_bytes=0` and `residual_calls=0`. Updated `rank_variants` to rank on total wire rate when residual is OFF, removing min-max composite.
 - **Intra-Epoch Hourly Checkpointing & Atomic State Capture**: Enhanced `scripts/train_pix2pix.py` and `scripts/train_spade4tennis.py` with intra-epoch hourly deadline checks inside batch loops, atomic saving (`save_checkpoint_atomic`), full state capture (`epoch`, `step`, `G`, `D`, `opt_G`, `opt_D`, `sched_G`, `sched_D`, RNGs), and partial-epoch skip resume semantics.
 - **SPADE Initialization Order Fix & Architecture Transparency**: Corrected `scripts/train_spade4tennis.py` so `weights_init_normal` is called before loading `args.pretrained_g`. Clarified that both lite and full tiers instantiate `SPADEResNet9Generator` (differing in discriminator count 2 vs 3), with multi-scale UNet / LocalEnhancer documented as unbuilt future work.
@@ -137,6 +157,5 @@ result that determines the next experiment; no family-wide claims from one pilot
   - Immutable artifacts recorded under `outputs/evaluation-campaign/e02r/`:
     - `diagnostic_matrix_pix2pix_scene028.json` (SHA-256: `cec034102a3e00c2073158807278312ea3f7ccf56221918331e86dc308af7426`)
     - `campaign_result_pix2pix_scene028.json` (SHA-256: `296dc0c98dc441ab85676cf3d4950b58ff35b6e2ce61f3ae97c2e9db9151df84`)
-    - `checkpoint_resume_evidence/pix2pix_interrupted_checkpoint.pt`
-
+    - `checkpoint_resume_evidence/pix2pix_interrupted_checkpoint.pt` (SHA-256: `9109f53237098ff71dfcba7f1a25fe24ae23814a06311df56c29ea7782a61e9d`)
 
