@@ -9,6 +9,16 @@ The [evaluation campaign](docs/workflow/session/evaluation-campaign/plan.md) is 
 authoritative plan incorporating the user's full evaluation design and resource
 policy. The September 12 handoff/audit are historical context, not dispatches.
 
+## Coordinator parallel readiness — 16 September 2026
+
+Neural-anchor code/input are pinned in the evaluation area; weights and a
+compatible isolated environment remain unresolved. The data area pins the
+three-source score-free reservation, with exposure/PTS audit and execution
+freeze still open. Paper setup `7a0476e` is pushed to Overleaf and builds to
+23 body/reference pages plus five appendix pages. No E05, neural rate ladder
+or confirmation scoring is released by this preparation. Await the latest
+Cursor/Antigravity reports here for acceptance and the next bounded release.
+
 ## Areas
 
 | Area | Current state | Next campaign work |

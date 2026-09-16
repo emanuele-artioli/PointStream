@@ -1,5 +1,21 @@
 # Data Area
 
+## Coordinator source reservation — 16 September 2026
+
+[The reservation manifest](../../manifests/evaluation_20260916_coordinator_confirmation_reservation.json)
+pins all three acquired media hashes and all existing score-free scene bounds.
+Independent hashing matched acquisition. This reserves the source set; it does
+not freeze the still-unselected codec procedure or authorize scoring. Native 4K
+claims are excluded; uncertainty must use three matches, not scenes or frames.
+
+The old `development_provenance_unused` field does not establish exposure: code
+assigns a contamination variable and its candidate-ID predicate does not audit
+these IDs. Exposure/replay checks and exact decodable PTS remain open. Preserve
+the original eligibility evidence. Final execution must pin metrics, rate
+ladder, codec/adaptation/install budgets, source-count verifier and failure rules
+after development acceptance. No confirmation quality scores were computed.
+
+
 ## E03B score-free confirmation eligibility — 16 September 2026
 
 Reserved trio hashes still match acquisition. Timestamp origin remains the E03A

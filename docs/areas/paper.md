@@ -1,5 +1,19 @@
 # Paper Area
 
+## Coordinator setup preparation — 16 September 2026
+
+Paper baseline `55e4bc4` renders to 27 pages. Separate paper branch
+`codex/campaign-setup-20260916` adds receiver reference-policy requirements, data
+separation, full-wire accounting, common-grid scoring and immutable reproduction
+records. Result HOLEs remain open; no new quantitative result is promoted.
+Updated paper renders successfully to 28 pages: body/references end on page 23,
+appendices occupy pages 24–28. No page slack remains. Approximate prose counts
+put method near 40% and evaluation near 30%; final result panels must replace
+material rather than simply extend it. Existing overfull-box warnings remain.
+Final paper commit will be recorded after committing. Neural-anchor readiness and source reservation are prepared
+in the evaluation/data areas; execution remains unreleased.
+
+
 ## Current campaign — 14 September 2026
 
 E08 follows the [campaign](../workflow/session/evaluation-campaign/plan.md): setup,
