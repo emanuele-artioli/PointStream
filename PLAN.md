@@ -16,14 +16,14 @@ compatible isolated environment remain unresolved. The data area pins the
 three-source score-free reservation, with exposure/PTS audit and execution
 freeze still open. Paper setup `7a0476e` is pushed to Overleaf and builds to
 23 body/reference pages plus five appendix pages. No E05, neural rate ladder
-or confirmation scoring is released by this preparation. The latest reports are reviewed below; only the conditional pilots in the
-current brief are released.
+or confirmation scoring is released by this preparation. The latest reports
+are reviewed below; only the conditional pilots in the current brief are released.
 
 ## Areas
 
 | Area | Current state | Next campaign work |
 |---|---|---|
-| [Evaluation](docs/areas/evaluation.md) | #114 merged; decode/reuse gate repair on saved E03B artifacts | E01 protocol; no new E03B encodes |
+| [Evaluation](docs/areas/evaluation.md) | #117 strict decode/reuse repair merged; native PTS remains open | E01 protocol, E06 conditional pilot; no E03B re-encodes |
 | [Codec](docs/areas/codec.md) | #119 calibration propagation/provenance still open; conditional paired removal | E04 background coverage and paired removal |
 | [Generation](docs/areas/generation.md) | #118 corrected reference/domain/CPU continuation; executable pilot gates open | E02S acceptance fixes; conditional E05 pilot; one baseline-clearing model required |
 | [Data](docs/areas/data.md) | Preserve exposure history; six fresh matches preferred but lower prospective count permitted | E01 split/protocol, E07 confirmation and second domain after tennis win |
