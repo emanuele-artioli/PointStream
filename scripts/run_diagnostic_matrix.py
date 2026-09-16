@@ -634,28 +634,35 @@ def assemble_matrix_report(
     return summary
 
 
-def _slice_clip(clip_full: LongSceneClip, n_frames: int) -> LongSceneClip:
-    if n_frames >= clip_full.n_frames:
+def _slice_clip(clip_full: LongSceneClip, n_frames: int, start_frame: int = 0) -> LongSceneClip:
+    if start_frame == 0 and n_frames >= clip_full.n_frames:
         return clip_full
+    end_frame = min(clip_full.n_frames, start_frame + n_frames)
+    actual_count = max(0, end_frame - start_frame)
+    sliced_objects = []
+    for obj in clip_full.objects:
+        if start_frame <= obj.frame_index < end_frame:
+            sliced_objects.append(replace(obj, frame_index=obj.frame_index - start_frame))
     return LongSceneClip(
         video=clip_full.video,
         scene=clip_full.scene,
         context_id=clip_full.context_id,
-        n_frames=n_frames,
-        frames=clip_full.frames[:n_frames],
-        masks=clip_full.masks[:n_frames],
-        objects=tuple(obj for obj in clip_full.objects if obj.frame_index < n_frames),
+        n_frames=actual_count,
+        frames=clip_full.frames[start_frame:end_frame],
+        masks=clip_full.masks[start_frame:end_frame],
+        objects=tuple(sliced_objects),
         paste_back_mae=clip_full.paste_back_mae,
         is_eligible=clip_full.is_eligible,
         route=clip_full.route,
         failure_reasons=clip_full.failure_reasons,
-        start_frame=getattr(clip_full, "start_frame", 0),
+        start_frame=getattr(clip_full, "start_frame", 0) + start_frame,
     )
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run 2x2 Generation x Residual Diagnostic Matrix")
     parser.add_argument("--frames", type=int, default=16, help="Frame count (default: 16)")
+    parser.add_argument("--start-frame", type=int, default=0, help="Start frame offset within scene (default: 0)")
     parser.add_argument("--video", default="alcaraz_highlights", help="Video name")
     parser.add_argument("--scene", default="scene_000", help="Scene name")
     parser.add_argument("--generator", default="pix2pix", help="Generator arch for Gen-ON corners")
@@ -899,11 +906,16 @@ def run_matrix(
 def main(argv: list[str] | None = None) -> int:
     parser = build_arg_parser()
     args = parser.parse_args(argv)
-    load_frames = max(48, args.frames)
+    start_frame = max(0, getattr(args, "start_frame", 0))
+    load_frames = max(48, start_frame + args.frames)
     clip_full = load_long_scene_clip(
         args.video, args.scene, n_frames=load_frames, full_trajectory=bool(args.full_trajectory)
     )
-    clip = _slice_clip(clip_full, args.frames) if args.frames < load_frames else clip_full
+    clip = (
+        _slice_clip(clip_full, args.frames, start_frame=start_frame)
+        if (start_frame > 0 or args.frames < load_frames)
+        else clip_full
+    )
     base = load_tier("balanced")
     if args.seed is not None:
         base = replace(base, run=replace(base.run, seed=args.seed))
