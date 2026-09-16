@@ -1,0 +1,155 @@
+{
+  "schema": "pointstream.experiment_card.v1",
+  "doc_role": "e06_smallest_full_codec_development_probe",
+  "campaign": "evaluation-20260914",
+  "status": "prepared_not_launched",
+  "task": "E06",
+  "owner": "Cursor",
+  "worktree": "/home/itec/emanuele/worktrees/pointstream-e06-20260916",
+  "branch": "codex/e06-20260916",
+  "return_to": {
+    "task": "Clean project state and dispatch",
+    "id": "01a0a923-4c5e-71c3-8993-5c68f2a76bb4"
+  },
+  "pr117_disposition": {
+    "url": "https://github.com/emanuele-artioli/PointStream/pull/117",
+    "head": "d700a93d10927a7b782f06e52ae19fa7299cbfdf",
+    "role": "decode_and_verification_repair",
+    "accepted_as": "Fail-closed RGB24 count; ordinary vs standalone pixels; run-dir immutability; decode-only verification of four saved streams.",
+    "not_accepted_as": "New RD evidence, BD-rate, or confirmation scoring authorization.",
+    "native_pts_limitation_retained": {
+      "original_mapping_preserved": true,
+      "png_vs_native_seek_equal": "1/48 (frame 0)",
+      "remaining_unequal": 47,
+      "cause": "24 fps extract vs native seek; nearest packet-DTS is not pixel provenance.",
+      "derived_mapping_sha256": "b8488198d94eccca77043e80708f7c7dd2be5ded3552d66948016ad3c74a25f2"
+    },
+    "vmaf0_disposition_sha256": "dac6f556f440a0b6842d399c66e49869797c8527295e506abf1a66a7a039c4c7",
+    "original_bounds_not_rewritten": true,
+    "launch_requires_merged_decode_gate": true
+  },
+  "decision_and_hypothesis": "On the saved display_low Federer scene 007 stack, with generation off and a reused E04A panorama-QP47 background, residual-on should raise whole-frame PSNR versus the paired residual-off predictor (paste or warped-reference) by at least 0.5 dB while charging T = B+F+M+R+H. Competing explanations: residual is a no-op on these predictors; F+M already exhaust A(q) so residual cannot win on total rate; warped-reference is equivalent to paste because bbox resize of one crop matches per-frame crops on this window.",
+  "question": "Does residual pay for itself on standalone paste and warped-reference controls at this operating point, versus saved AV1/VVC anchors, without a neural predictor?",
+  "evidence_reused": {
+    "prepared_rgb": {
+      "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03b/run-20260916-federer007/prepared_rgb.npy",
+      "sha256": "1f02475a5bbc3d94e4bae2e904dc29c3af3082be0c0c160e027b706a6950f6f8",
+      "shape": [48, 360, 640, 3],
+      "decision": "reuse_bytes"
+    },
+    "e03b_anchors": {
+      "run_dir": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03b/run-20260916-federer007",
+      "report_sha256": "62ac0b15228001f7598958d501df133003d8c6faea0b5b6947670a3839fc45f7",
+      "bounds_sha256": "77c30b5b2d81da8bd8abe50e41150571db9d7615bcbdf3ee0657f1cbdb5c2d9a",
+      "decision": "reuse_four_streams_no_reencode",
+      "same_qp_ranges_overlap": false,
+      "bd_rate": "forbidden"
+    },
+    "e04a_background": {
+      "run_dir": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-federer007",
+      "report_sha256": "e65ec04dedda40cdc472ace90fcce31e26b10218c15060097c6ca39f5010251d",
+      "pinned_arm": "registered_panorama qp47",
+      "bitstream": "bitstreams/registered_panorama_qp47.vvc",
+      "bitstream_sha256": "31937000b96293420e741283985452233f896075748e657dff142304322947a6",
+      "background_only_bytes": 4554,
+      "decision": "reuse_as_B_not_as_whole_codec",
+      "why_this_arm": "Only saved removal-off arm with vis PSNR above 21 dB and B+side under 5 kB. Not a panorama winner claim."
+    },
+    "e04a_masks_sha256": "a65f16975d5cf8ded6ab64642324971030a30a051180410de381f3021e82d45c",
+    "gap": "No charged full-wire paste or warped-reference rows exist on this stack. E04A omits F. Wave-2 residual ladders are 4K, generation-intent broken, and uncompressed-mask dominated."
+  },
+  "operating_regime": {
+    "video": "federer_djokovic",
+    "scene": "scene_007",
+    "split": "development",
+    "operating_point_id": "display_low",
+    "frame_count": 48,
+    "fps": 12.0,
+    "shape": [48, 360, 640, 3],
+    "t_start_s": 80.7807,
+    "native_pts_policy": "Keep the E03B mapping. Do not relabel 24 fps extract indices as native frames.",
+    "generation": "off",
+    "confirmation_scoring": false,
+    "host_preference": "one tested host; CPU claim <=90%"
+  },
+  "smallest_discriminating_probe": {
+    "predictors": {
+      "paste": "Per occupied frame, WebP-code that frame's bbox crop and composite it (existing compositor).",
+      "warped_reference": "WebP-code one reference crop (first occupied frame) and composite it into every later bbox by resize; charge one F payload plus per-frame masks/bboxes."
+    },
+    "settings": [
+      {"id": "paste_residual_off", "predictor": "paste", "residual": "off"},
+      {"id": "paste_residual_on", "predictor": "paste", "residual": "on", "residual_rung": "medium", "residual_codec": "av1", "residual_rate": 45, "block_size": 8, "block_threshold": 4.0, "background_downscale": 2},
+      {"id": "warp_residual_off", "predictor": "warped_reference", "residual": "off"},
+      {"id": "warp_residual_on", "predictor": "warped_reference", "residual": "on", "residual_rung": "medium", "residual_codec": "av1", "residual_rate": 45, "block_size": 8, "block_threshold": 4.0, "background_downscale": 2}
+    ],
+    "n_new_encodes": 4,
+    "n_new_conventional_encodes": 0,
+    "n_new_background_encodes": 0,
+    "appearance": {"format": "webp", "quality": 50, "downscale": 1},
+    "background_fixed": "E04A registered_panorama VVC qp47 bitstream plus its serialized homographies",
+    "standalone": "Client reconstructs from serialized B, F, masks/pose/headers, residual stream, and container. No source pixels. Fail closed on short/partial/extra RGB dumps once #117 is merged.",
+    "ledger": "T = B + F + M + R + H with each byte once. B=panorama, F=actor_reference, M=mask_payload+pose_motion+placement_headers+envelope, R=residual, H=container remainder inside transport_total. Residual-off requires R=0 and zero residual codec calls. Reject raw_parts as a rate.",
+    "pose": "Charge pose_motion when keypoints are serialized. This first card records pose_present=false if the E04A union-mask path has no skeleton payload; do not invent pose bytes.",
+    "controls": [
+      "reuse hash of prepared stack and pinned B bitstream before any encode",
+      "paste vs warped: warped uses exactly one appearance payload",
+      "residual-off R=0",
+      "ordinary vs standalone pixels equal",
+      "calibrate on the saved E03B grid (do not rescore confirmation sources)",
+      "quote VMAF beside identical 97.93 / unrelated 1.38 / severe-blur 0.0"
+    ]
+  },
+  "quality_floors": {
+    "written_before_headline_scores": true,
+    "whole_frame_psnr_y_db": {"low": 15.0, "high": 50.0, "cite_floor": "severe-blur on this grid 17.73 dB; VVC QP63 17.93 dB"},
+    "ssim": {"low": 0.15, "high": 1.0},
+    "vmaf": {"low": 0.0, "high": 100.0, "note": "Include 0; E03B [5,100] was too tight on this grid."},
+    "matched_quality_for_A_q": "Use E03B AV1 QP63 (19116 B, 27.4 dB) and VVC QP47 (21288 B, 24.6 dB) as the rate neighbours. Do not BD-rate. A point is only compared to an anchor within 0.5 dB PSNR-Y.",
+    "component_reject": "If residual-off T - R already exceeds A(q) at every overlapping q, residual cannot win that q even if free."
+  },
+  "bounds_and_instrument": {
+    "written_before_headline_scores": true,
+    "size_bytes_T": {"low": 1000, "high": 33177600, "basis": "Uncompressed 360p 48f 4:2:0 plus container slack; tool-floor >1 kB."},
+    "psnr_y_db": {"low": 15.0, "high": 50.0, "basis": "Colour/decode mismatch below 15; mild residual ceiling below 50."},
+    "encode_plus_decode_s_per_setting": {"low": 0.2, "high": 420.0, "basis": "E03B four conventional encodes 92 s; E04A background arms seconds. Stop if one setting exceeds 7 minutes."},
+    "residual_off_R_bytes": {"low": 0, "high": 0},
+    "null": "unrelated reconstruction must not outrank the decode on PSNR/SSIM/VMAF"
+  },
+  "decision_rule": {
+    "promote": "On at least one predictor, residual-on PSNR-Y is >= residual-off + 0.5 dB, R>0, ledger reconciles, standalone pixels match, and T is reported with all parts. Then cost a two-QP residual refinement only if that arm also sits within 0.5 dB of an E03B neighbour.",
+    "stop": "Residual-on quality <= residual-off (ineffective option); raw_parts nonempty; decode-count failure; prepared/B hash mismatch; overwrite of a completed run dir.",
+    "inconclusive": "No 0.5 dB overlap with any saved E03B point: report T and quality, do not BD-rate, do not claim a codec win.",
+    "do_not": [
+      "score confirmation sources",
+      "launch E05 or neural paste-vs-generator",
+      "re-encode E03B/E04A streams",
+      "rewrite original bounds.json",
+      "treat background-only bytes as T"
+    ]
+  },
+  "budget": {
+    "max_new_configurations": 4,
+    "wall_minutes_including_scoring": 30,
+    "control_budget_share": "at least one third for decode, calibration reuse, scoring, ledger",
+    "estimated_from_prior": "E03B 92 s encode wall for four conventional settings; E04A six background arms minutes. Four 360p PointStream residual/appearance encodes expected well under 15 minutes; return if one setting exceeds 7 minutes.",
+    "if_exceeded": "Stop after the first predictor pair that finishes; do not add residual QPs.",
+    "confirmation_scoring": false,
+    "new_encodes_authorized_now": false
+  },
+  "implementation_gaps_before_launch": [
+    "Merge or cherry-pick #117 fail-closed RGB24 decode into the launch branch.",
+    "Standalone client must ingest the saved E04A panorama bitstream and side data as B without a second background encode.",
+    "Rebuild E04A union masks and refuse to proceed unless SHA-256 a65f1697… matches.",
+    "Serialize compact masks (PSM1); do not ship uncompressed uint8 stacks as rate."
+  ],
+  "artifact_and_narrative": {
+    "output_root": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-paste-warp",
+    "check_command": "python -m experiments.tier.e06_probe --check-reuse",
+    "launch_command": "not authorized",
+    "plot": "T versus whole-frame PSNR-Y for four PointStream points and four reused anchors; residual-off/on joined per predictor; encode/client seconds beside each point.",
+    "supported_sentence": "Residual-on improved paste (or warp) by >=0.5 dB at measured extra R bytes on this development window.",
+    "contradicted_sentence": "Residual-on did not improve the unaided reconstruction, or F+M already exceeded A(q).",
+    "scope": "One 4 s development scene at 360p/12 fps. Not a Gate A/B pass."
+  }
+}

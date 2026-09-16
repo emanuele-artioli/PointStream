@@ -1,13 +1,30 @@
 # Evaluation Area
 
-## Current review — 16 September 2026
+## Current review — 16 September 2026 E06 card
+
+#117 (`d700a93`) is a decode/verification repair on saved E03B artifacts, not
+new RD. Retain the native-PTS limit: 1/48 selected PNGs match a native seek
+(frame 0); the other 47 differ (24 fps extract vs seek). Original
+`probe_report`/`bounds.json` hashes unchanged. VMAF 0 stays a separate
+disposition. Confirmation scoring stays unauthorized.
+
+The smallest E06 full-codec development probe is prepared, not launched:
+`manifests/evaluation_20260916_e06_probe_card.json`. Reuse the E03B prepared
+stack `1f02475a…` and the four conventional streams. Pin E04A
+`registered_panorama` QP47 as charged **B** only (not a whole-codec row). Four
+new settings: paste/warped-reference × residual off/on. Generation off. Charge
+F, masks/pose headers, B, R, and container. Quality floors and promote/stop
+rules are in the card. `python -m experiments.tier.e06_probe --check-reuse`
+verifies hashes. `--launch` is refused until coordinator acceptance.
+
+## Historical review — 16 September 2026 E03B/E04A
 
 #114 at `c1c68ec` has green CI and reusable four-setting artifacts. Coordinator
 checks matched all stream hashes/byte counts and independently counted 48 frames
 in each ordinary and standalone decoded container. The wrapper nevertheless
 pads/trims raw output before validating shape; a two-frame reproducer became
-48 frames. The decode/reuse gate remains a follow-up on the landed code. Do not
-rerun the four encodes. Native PTS needs pixel-provenance verification, and
+48 frames. Follow-up #117 closes that gate on a later head. Do not
+rerun the four encodes. Native PTS pixel-provenance remains limited, and
 score-free eligibility is not permission to score confirmation.
 
 The saved E03B VMAF alarm has supporting same-grid severe-blur calibration at the
