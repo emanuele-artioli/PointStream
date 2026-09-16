@@ -1,5 +1,18 @@
 # Evaluation campaign — 14 September 2026
 
+## Coordinator parallel preparation — 16 September 2026
+
+Codex owns this preparation while the latest Cursor/Antigravity lanes run.
+The [source reservation](../../../../manifests/evaluation_20260916_coordinator_confirmation_reservation.json)
+pins three acquired matches and their score-free scenes; exposure and exact PTS
+audit remain open. The [neural-anchor card](../../../../manifests/evaluation_20260916_neural_anchor_readiness.json)
+pins official source/config and documents weights/environment blockers. Paper
+setup builds to 28 pages (23 body/references + 5 appendix), with results still
+pending. No neural rate ladder, E05 or confirmation scoring is released here.
+Worker reports return to Clean project state and dispatch,
+`01a0a923-4c5e-71c3-8993-5c68f2a76bb4`.
+
+
 Authoritative user decisions: 12–14 September in the coordinating Codex task.
 This plan supersedes the dispatch instructions in the September 12 handoff and
 older submission-search waves. Historical evidence remains immutable.

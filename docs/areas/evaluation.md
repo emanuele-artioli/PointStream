@@ -1,5 +1,17 @@
 # Evaluation Area
 
+## Coordinator readiness — 16 September 2026
+
+Neural anchor source and paper are pinned in
+[the readiness record](../../manifests/evaluation_20260916_neural_anchor_readiness.json).
+DCVC-UF is not yet installed or round-trip verified: the official weight link
+returns HTTP 403, the current Python interpreter rejects upstream syntax, and
+a separate compatible environment/native extensions remain required. GPUs are
+accessible outside the sandbox. No neural RD result or SOTA claim is available.
+The RGB input config uses the exact E03B prepared stack; its native-PTS gap
+remains explicit. The budget card is proposed, not an execution release.
+
+
 ## Current review — 16 September 2026
 
 #114 at `c1c68ec` has green CI and reusable four-setting artifacts. Coordinator

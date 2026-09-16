@@ -1,0 +1,95 @@
+{
+  "schema": "pointstream.neural_anchor_readiness.v1",
+  "campaign": "evaluation-20260914",
+  "status": "prepared_not_roundtrip_verified",
+  "upstream_repository": "https://github.com/microsoft/DCVC",
+  "upstream_commit": "cbdae87a5445114cdc7f48816da63ea80bdeac40",
+  "paper": "https://arxiv.org/abs/2606.04410v1",
+  "preferred_model": "DCVC-UF HT-S offline; LD separately for low-delay",
+  "source_file_hashes": {
+    "README.md": "05cbef14954e37882c28c0299693962c0edf4f2cc7a28f53ca99d010e2989b40",
+    "test_video.py": "6597af5cb9a86b6be1d8d3ed8534b88e45c9ef882cc2de14d11ed07dee892d7b",
+    "requirements.txt": "20b530952891b70f6ed1dc96bc63b5c90a5066e4b6696ce00d12b221eae6e758",
+    "src/utils/stream_helper.py": "2d470e3692209be0301b5da48c33c9b7a372be865ccb458d4a5358c7bc55fac4"
+  },
+  "upstream_documented_stack": {
+    "python": "3.12",
+    "torch_tested": "2.9.1",
+    "cuda_tested": "13.0",
+    "cutlass_tag": "v4.4.1",
+    "extensions": [
+      "MLCodec_extensions_cpp",
+      "inference_extensions_cuda"
+    ]
+  },
+  "observed_host": {
+    "name": "gpu5",
+    "gpus": [
+      "RTX 6000 Ada",
+      "RTX 6000 Ada"
+    ],
+    "gpu_access": "verified outside sandbox",
+    "pointstream_python": "3.10.20",
+    "pointstream_torch": "2.2.2+cu121",
+    "torch_cuda": "12.1",
+    "cuda_available": true,
+    "nvcc_on_path": false
+  },
+  "checkpoint_status": {
+    "local_upstream_checkpoint_directory": "empty",
+    "official_primary_link_http_status": 403,
+    "model_file_sha256": null,
+    "note": "Official folder link redirects then returns HTTP403 in shell. No checkpoint downloaded or authenticated."
+  },
+  "compatibility_blockers": [
+    "DCVC-UF test_video.py contains Python3.12 f-string syntax rejected by current interpreter",
+    "no isolated compatible environment/native extensions built",
+    "checkpoint file identity unresolved"
+  ],
+  "fallback": {
+    "model": "DCVC-RT",
+    "paper": "https://arxiv.org/abs/2502.20762v2",
+    "source_subdirectory": "DCVC-family/DCVC-RT",
+    "documented_cuda": "12.6",
+    "color_path": "official README recommends YUV420; conversion must be recorded and shared reference identity verified",
+    "status": "source inspected; not installed, no coded roundtrip",
+    "reason": "less demanding documented CUDA stack; does not bypass weight/GPU/native entropy requirements"
+  },
+  "input": {
+    "prepared_path": "$PS_DATA_ROOT/outputs/evaluation-20260914/e03b/run-20260916-federer007/prepared_rgb.npy",
+    "array_sha256": "1f02475a5bbc3d94e4bae2e904dc29c3af3082be0c0c160e027b706a6950f6f8",
+    "shape": [
+      48,
+      360,
+      640,
+      3
+    ],
+    "nominal_fps": 12,
+    "native_pts_verified": false,
+    "export_config": "manifests/evaluation_20260916_dcvc_uf_rgb_config.json",
+    "export_status": "48 PNGs exported; each decoded pixel-equal to prepared RGB"
+  },
+  "budget_card": {
+    "status": "proposed_unmeasured_not_execution_release",
+    "environment_and_weights_active_preparation_hours_cap": 2,
+    "synthetic_native_entropy_roundtrip_wall_minutes_cap": 15,
+    "matched48frame_one_qp_wall_minutes_cap": 15,
+    "gpu_hours_cap": 0.5,
+    "rate_ladder_encodes_released": 0,
+    "stop": "If weights or native compatibility unresolved, return exact blocker; no retraining or multi-rate sweep"
+  },
+  "acceptance": [
+    "pin downloaded image/video weight hashes and installation assumptions",
+    "use separate environment; never mutate PointStream env",
+    "verify entropy-coded bitstream bytes and independently decoded output in fresh process with source access removed",
+    "score calibrated common display/timebase inputs; count startup, chunk lookahead and sender/client time",
+    "register bounds before scores and return measured pilot cost before ladder release"
+  ],
+  "prepared_artifacts": {
+    "commit": "cbdae87a5445114cdc7f48816da63ea80bdeac40",
+    "archive": "$PS_DATA_ROOT/outputs/evaluation-20260914/e03-neural/dcvc-uf-cbdae87a-source.tar",
+    "archive_sha256": "95b28b8935611301e9e09ce8942b8dd9ab8622d3324443d83ca8a0edf907e631",
+    "input_verification": "$PS_DATA_ROOT/outputs/evaluation-20260914/e03-neural/prepared-rgb/input_export_verification.json",
+    "input_verification_sha256": "ab233e8187d99a600c58064b445a1dc0705f03ff5ef533661d6de632d6ebfe74"
+  }
+}
