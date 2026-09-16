@@ -73,7 +73,9 @@ def test_decode_standalone_missing_files(tmp_path: Path) -> None:
 
 def test_decode_standalone_saved_e04a_artifacts() -> None:
     """Verify standalone decode on actual saved E04A bitstreams and side data."""
-    bs_dir = Path("/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-federer007/bitstreams")
+    bs_dir = Path(
+        "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-federer007/bitstreams"
+    )
     if not bs_dir.is_dir():
         pytest.skip("Saved E04A bitstream directory not present on host")
 
@@ -129,3 +131,45 @@ def test_scorer_calibration_identity_and_null_controls() -> None:
     assert res["null_controls"]["empty_mask_nan_held"] is True
 
 
+def test_runner_refuses_existing_nonempty_directory(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Runner must refuse to write to an existing non-empty directory."""
+    from scripts.e04a_evidence_completion import main
+
+    nonempty_dir = tmp_path / "existing_run"
+    nonempty_dir.mkdir(parents=True, exist_ok=True)
+    (nonempty_dir / "old_artifact.txt").write_text("prior output")
+
+    monkeypatch.setattr("sys.argv", ["runner", "--output-dir", str(nonempty_dir)])
+    with pytest.raises(FileExistsError, match="Refusing to write to existing non-empty directory"):
+        main()
+
+
+def test_runner_aborts_on_calibration_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Runner must abort immediately with RuntimeError if scorer calibration fails."""
+    from scripts import e04a_evidence_completion
+
+    run_dir = tmp_path / "fresh_run"
+
+    # Mock inputs so test does not require full dataset
+    dummy_frames = np.zeros((2, 360, 640, 3), dtype=np.uint8)
+    dummy_masks = np.zeros((2, 360, 640), dtype=bool)
+    dummy_meta = {"common_preparation_seconds": 0.1}
+
+    monkeypatch.setattr(
+        e04a_evidence_completion,
+        "load_360p_input_data",
+        lambda: (dummy_frames, dummy_masks, dummy_masks, [], dummy_meta),
+    )
+    monkeypatch.setattr(
+        e04a_evidence_completion,
+        "run_scorer_calibration",
+        lambda f, m, b: {"valid": False, "alarms": ["Forced synthetic calibration failure"]},
+    )
+    monkeypatch.setattr("sys.argv", ["runner", "--output-dir", str(run_dir)])
+
+    with pytest.raises(RuntimeError, match="Scorer calibration failed with 1 alarms"):
+        e04a_evidence_completion.main()

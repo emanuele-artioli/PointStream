@@ -140,11 +140,15 @@ def create_synthetic_unrelated_anchor(height: int = 360, width: int = 640) -> np
                 img[y : y + block_size, x : x + block_size, 1] = 220
                 img[y : y + block_size, x : x + block_size, 2] = 220
     gradient = np.linspace(0, 35, width, dtype=np.uint8)
-    img[:, :, 0] = np.clip(img[:, :, 0].astype(int) + gradient[np.newaxis, :], 0, 255).astype(np.uint8)
+    img[:, :, 0] = np.clip(img[:, :, 0].astype(int) + gradient[np.newaxis, :], 0, 255).astype(
+        np.uint8
+    )
     return img
 
 
-def load_360p_input_data() -> tuple[np.ndarray, np.ndarray, np.ndarray, list[dict[str, Any]], dict[str, Any]]:
+def load_360p_input_data() -> tuple[
+    np.ndarray, np.ndarray, np.ndarray, list[dict[str, Any]], dict[str, Any]
+]:
     """Load Federer scene 007 360p frames, player masks, boundary masks, and tracks."""
     extract_dir = ps_paths.outputs() / "bp46-long-scenes" / "clips" / VIDEO / SCENE / "extract_24"
     if not extract_dir.is_dir():
@@ -165,9 +169,7 @@ def load_360p_input_data() -> tuple[np.ndarray, np.ndarray, np.ndarray, list[dic
     load_s = time.perf_counter() - t0
 
     scale = float(SHORT_EDGE) / min(frames_4k.shape[1], frames_4k.shape[2])
-    frames_360, rescale_s = rescale_frames(
-        frames_4k, scale=scale, interpolation=cv2.INTER_LANCZOS4
-    )
+    frames_360, rescale_s = rescale_frames(frames_4k, scale=scale, interpolation=cv2.INTER_LANCZOS4)
 
     height, width = frames_360.shape[1], frames_360.shape[2]
     spatial_scale = width / float(frames_4k.shape[2])
@@ -388,21 +390,17 @@ def run_scorer_calibration(
             }
 
         # Check orderings
-        blur_order = (
-            float(r_dict["mild_blur"]["ssim"]) > float(r_dict["severe_blur"]["ssim"])
-            and (
-                float(r_dict["mild_blur"]["psnr_y_dB"]) > float(r_dict["severe_blur"]["psnr_y_dB"])
-                if r_dict["severe_blur"]["psnr_y_dB"] != "inf"
-                else False
-            )
+        blur_order = float(r_dict["mild_blur"]["ssim"]) > float(r_dict["severe_blur"]["ssim"]) and (
+            float(r_dict["mild_blur"]["psnr_y_dB"]) > float(r_dict["severe_blur"]["psnr_y_dB"])
+            if r_dict["severe_blur"]["psnr_y_dB"] != "inf"
+            else False
         )
-        noise_order = (
-            float(r_dict["mild_noise"]["ssim"]) > float(r_dict["severe_noise"]["ssim"])
-            and (
-                float(r_dict["mild_noise"]["psnr_y_dB"]) > float(r_dict["severe_noise"]["psnr_y_dB"])
-                if r_dict["severe_noise"]["psnr_y_dB"] != "inf"
-                else False
-            )
+        noise_order = float(r_dict["mild_noise"]["ssim"]) > float(
+            r_dict["severe_noise"]["ssim"]
+        ) and (
+            float(r_dict["mild_noise"]["psnr_y_dB"]) > float(r_dict["severe_noise"]["psnr_y_dB"])
+            if r_dict["severe_noise"]["psnr_y_dB"] != "inf"
+            else False
         )
         unrelated_order = (
             float(r_dict["mild_blur"]["ssim"]) > float(r_dict["unrelated"]["ssim"])
@@ -442,16 +440,22 @@ def run_scorer_calibration(
         }
 
     full_blur_held = bool(
-        float(full_dict["mild_blur"]["windowed_ssim"]) > float(full_dict["severe_blur"]["windowed_ssim"])
-        and float(full_dict["mild_blur"]["psnr_y_dB"]) > float(full_dict["severe_blur"]["psnr_y_dB"])
+        float(full_dict["mild_blur"]["windowed_ssim"])
+        > float(full_dict["severe_blur"]["windowed_ssim"])
+        and float(full_dict["mild_blur"]["psnr_y_dB"])
+        > float(full_dict["severe_blur"]["psnr_y_dB"])
     )
     full_noise_held = bool(
-        float(full_dict["mild_noise"]["windowed_ssim"]) > float(full_dict["severe_noise"]["windowed_ssim"])
-        and float(full_dict["mild_noise"]["psnr_y_dB"]) > float(full_dict["severe_noise"]["psnr_y_dB"])
+        float(full_dict["mild_noise"]["windowed_ssim"])
+        > float(full_dict["severe_noise"]["windowed_ssim"])
+        and float(full_dict["mild_noise"]["psnr_y_dB"])
+        > float(full_dict["severe_noise"]["psnr_y_dB"])
     )
     full_unrelated_held = bool(
-        float(full_dict["mild_blur"]["windowed_ssim"]) > float(full_dict["unrelated"]["windowed_ssim"])
-        and float(full_dict["mild_noise"]["windowed_ssim"]) > float(full_dict["unrelated"]["windowed_ssim"])
+        float(full_dict["mild_blur"]["windowed_ssim"])
+        > float(full_dict["unrelated"]["windowed_ssim"])
+        and float(full_dict["mild_noise"]["windowed_ssim"])
+        > float(full_dict["unrelated"]["windowed_ssim"])
         and float(full_dict["mild_blur"]["psnr_y_dB"]) > float(full_dict["unrelated"]["psnr_y_dB"])
         and float(full_dict["mild_noise"]["psnr_y_dB"]) > float(full_dict["unrelated"]["psnr_y_dB"])
     )
@@ -469,7 +473,10 @@ def run_scorer_calibration(
 
     # 3. Identity checks across all scopes
     identity_checks: dict[str, Any] = {}
-    for scope_name, s_data in [("visible", calib_results["regions"]["visible"]), ("full_frame", full_dict)]:
+    for scope_name, s_data in [
+        ("visible", calib_results["regions"]["visible"]),
+        ("full_frame", full_dict),
+    ]:
         id_entry = s_data["identity"]
         id_psnr = id_entry["psnr_y_dB"]
         id_ssim = id_entry.get("ssim") or id_entry.get("windowed_ssim")
@@ -483,7 +490,9 @@ def run_scorer_calibration(
         if not psnr_ok:
             calib_results["alarms"].append(f"Identity PSNR not infinite in {scope_name}: {id_psnr}")
         if not ssim_ok:
-            calib_results["alarms"].append(f"Identity SSIM not in [0.999, 1.0] in {scope_name}: {id_ssim}")
+            calib_results["alarms"].append(
+                f"Identity SSIM not in [0.999, 1.0] in {scope_name}: {id_ssim}"
+            )
     calib_results["identity_checks"] = identity_checks
 
     # 4. Null controls: empty mask behavior and unrelated anchor floor
@@ -567,7 +576,9 @@ def rescore_e03b_anchors(
     campaign_rows_by_arm: dict[str, Any] = {}
     if rows_path.is_file():
         for r in json.loads(rows_path.read_text(encoding="utf-8")):
-            arm_key = r.get("artifact_id", "").replace("e03b_", "").replace("_display_low_federer007", "")
+            arm_key = (
+                r.get("artifact_id", "").replace("e03b_", "").replace("_display_low_federer007", "")
+            )
             campaign_rows_by_arm[arm_key] = r
 
     target_arms = ["vvc_qp63", "vvc_qp47", "av1_qp63", "av1_qp47"]
@@ -585,13 +596,19 @@ def rescore_e03b_anchors(
             raise FileNotFoundError(f"Missing E03B decoded array: {dec_arr_path}")
 
         dec_rgb = np.load(dec_arr_path)
-        assert dec_rgb.shape == frames_360.shape, f"Shape mismatch: {dec_rgb.shape} vs {frames_360.shape}"
+        assert dec_rgb.shape == frames_360.shape, (
+            f"Shape mismatch: {dec_rgb.shape} vs {frames_360.shape}"
+        )
 
         # Load provenance from campaign row or fallback to local row
         crow = campaign_rows_by_arm.get(arm_name)
         if not crow:
             local_row_path = arm_dir / "campaign_row.json"
-            crow = json.loads(local_row_path.read_text(encoding="utf-8")) if local_row_path.is_file() else {}
+            crow = (
+                json.loads(local_row_path.read_text(encoding="utf-8"))
+                if local_row_path.is_file()
+                else {}
+            )
 
         timing_ev = crow.get("timing_evidence", {})
         bytes_ev = crow.get("evidence", {}).get("bytes", {})
@@ -613,7 +630,9 @@ def rescore_e03b_anchors(
         ref_y = rgb_to_luma(frames_360)
         dec_y = rgb_to_luma(dec_rgb)
         mse_full = float(np.mean((ref_y.astype(float) - dec_y.astype(float)) ** 2))
-        full_psnr = float("inf") if mse_full == 0.0 else 10.0 * float(np.log10((255.0**2) / mse_full))
+        full_psnr = (
+            float("inf") if mse_full == 0.0 else 10.0 * float(np.log10((255.0**2) / mse_full))
+        )
         full_windowed_ssim = ssim_metric.score(frames_360, dec_rgb)
 
         # 2. Masked scopes
@@ -685,12 +704,15 @@ def main() -> None:
     args = parser.parse_args()
 
     default_out = (
-        ps_paths.outputs()
-        / "evaluation-20260914"
-        / "e04a"
-        / "run-20260916-evidence-completion"
+        ps_paths.outputs() / "evaluation-20260914" / "e04a" / "run-20260916-evidence-completion-r2"
     )
     out_dir = (args.output_dir or default_out).resolve()
+    if out_dir.exists() and any(out_dir.iterdir()):
+        raise FileExistsError(
+            f"Refusing to write to existing non-empty directory: {out_dir}. "
+            "Per evaluation protocol, evidence directories must not be overwritten. "
+            "Specify a new revision directory."
+        )
     out_dir.mkdir(parents=True, exist_ok=True)
 
     print("=== PointStream E04A Evidence Completion & Comparison (CODEC-ACT-07) ===")
@@ -719,11 +741,20 @@ def main() -> None:
         (out_dir / "scorer_calibration.json").write_text(
             json.dumps(calib_data, indent=2), encoding="utf-8"
         )
-        print(f"Scorer calibration valid: {calib_data['valid']} (Alarms: {len(calib_data['alarms'])})")
+        print(
+            f"Scorer calibration valid: {calib_data['valid']} (Alarms: {len(calib_data['alarms'])})"
+        )
+        if not calib_data["valid"]:
+            raise RuntimeError(
+                f"Scorer calibration failed with {len(calib_data['alarms'])} alarms: {calib_data['alarms']}. "
+                "Halting execution to block uncalibrated dependent scoring and validated claims."
+            )
 
         # Step 3: Standalone decode validation on all 6 saved E04A bitstreams
         print("\n--- Validating Standalone Decodes from Bitstream + Side Data ---")
-        e04a_saved_dir = ps_paths.outputs() / "evaluation-20260914" / "e04a" / "run-20260916-federer007"
+        e04a_saved_dir = (
+            ps_paths.outputs() / "evaluation-20260914" / "e04a" / "run-20260916-federer007"
+        )
         bs_dir = e04a_saved_dir / "bitstreams"
         dec_dir = e04a_saved_dir / "decodes"
 
@@ -747,12 +778,26 @@ def main() -> None:
                 h, pshape, fshape, _ = unpack_panorama_side_data(side_bytes)
                 from scripts.background_probe import warp_plate_to_frame
 
-                saved_frame0 = warp_plate_to_frame(saved_plate, h[0], height=fshape[0], width=fshape[1])
+                saved_frame0 = warp_plate_to_frame(
+                    saved_plate, h[0], height=fshape[0], width=fshape[1]
+                )
                 max_diff = int(np.max(np.abs(rendered[0].astype(int) - saved_frame0.astype(int))))
             elif "cleaned_video" in rep_key:
                 ffmpeg = codec_tools.resolve_ffmpeg()
                 raw_saved = subprocess.run(
-                    [ffmpeg.path, "-hide_banner", "-loglevel", "error", "-i", str(dec_dir / f"{rep_key}.mkv"), "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+                    [
+                        ffmpeg.path,
+                        "-hide_banner",
+                        "-loglevel",
+                        "error",
+                        "-i",
+                        str(dec_dir / f"{rep_key}.mkv"),
+                        "-f",
+                        "rawvideo",
+                        "-pix_fmt",
+                        "rgb24",
+                        "-",
+                    ],
                     capture_output=True,
                 ).stdout
                 saved_frames = np.frombuffer(raw_saved, dtype=np.uint8).reshape(48, 360, 640, 3)
@@ -765,7 +810,9 @@ def main() -> None:
             dec_meta["max_diff_vs_saved_decode"] = max_diff
             dec_meta["bit_identical_parity"] = max_diff == 0
             decode_validations.append(dec_meta)
-            print(f"  {rep_key}: decoded {dec_meta['decoded_frames']} frames in {dec_meta['decode_seconds']}s (max diff vs saved: {max_diff})")
+            print(
+                f"  {rep_key}: decoded {dec_meta['decoded_frames']} frames in {dec_meta['decode_seconds']}s (max diff vs saved: {max_diff})"
+            )
 
         (out_dir / "standalone_decode_report.json").write_text(
             json.dumps({"validations": decode_validations}, indent=2), encoding="utf-8"
@@ -774,7 +821,9 @@ def main() -> None:
         # Step 4: Measure missing timing strata (compositing time)
         print("\n--- Measuring Missing Timing Strata ---")
         _, comp_time_s = composite_fixed_foreground(frames_360, track_records, masks_360)
-        print(f"Foreground compositing time (48 frames): {comp_time_s:.4f}s ({comp_time_s/48*1000:.2f}ms/frame)")
+        print(
+            f"Foreground compositing time (48 frames): {comp_time_s:.4f}s ({comp_time_s / 48 * 1000:.2f}ms/frame)"
+        )
 
         # Step 5: Rescore saved E03B decodes
         print("\n--- Rescoring Saved E03B Decodes Through Matched Scopes ---")
@@ -818,7 +867,9 @@ def main() -> None:
             old_timing = old_pt.get("timing", {})
             enc_s = old_timing.get("encode_seconds")
             if enc_s is None:
-                raise ValueError(f"Missing provenanced encode_seconds for {rep_key} in {old_report_path}")
+                raise ValueError(
+                    f"Missing provenanced encode_seconds for {rep_key} in {old_report_path}"
+                )
 
             dec_s = v["decode_seconds"]
             render_s = v["render_seconds"]
@@ -847,7 +898,9 @@ def main() -> None:
                     "psnr_y_visible_dB": old_metrics.get("no_overlay", {}).get("psnr_y_visible_dB"),
                     "ssim_visible_masked": old_metrics.get("no_overlay", {}).get("ssim_visible"),
                     "ssim_full_windowed": old_metrics.get("no_overlay", {}).get("ssim_full"),
-                    "psnr_y_composed_dB": old_metrics.get("fixed_overlay", {}).get("psnr_y_composed_dB"),
+                    "psnr_y_composed_dB": old_metrics.get("fixed_overlay", {}).get(
+                        "psnr_y_composed_dB"
+                    ),
                     "ssim_composed": old_metrics.get("fixed_overlay", {}).get("ssim_composed"),
                     "ghosting_mad": old_metrics.get("no_overlay", {}).get("ghosting_luma_mad"),
                     "sender_arm_seconds": sender_arm_s,
@@ -878,9 +931,15 @@ def main() -> None:
                     "psnr_y_composed_dB": m["whole_frame"]["psnr_y_dB"],
                     "ssim_composed": m["whole_frame"]["windowed_ssim"],
                     "ghosting_mad": m["ghosting_luma_mad"],
-                    "sender_arm_seconds": round(float(t["encode_seconds"]), 3) if t["encode_seconds"] else None,
-                    "client_bg_seconds": round(float(t["client_seconds"]), 3) if t["client_seconds"] else None,
-                    "client_total_seconds": round(float(t["client_seconds"]), 3) if t["client_seconds"] else None,
+                    "sender_arm_seconds": round(float(t["encode_seconds"]), 3)
+                    if t["encode_seconds"]
+                    else None,
+                    "client_bg_seconds": round(float(t["client_seconds"]), 3)
+                    if t["client_seconds"]
+                    else None,
+                    "client_total_seconds": round(float(t["client_seconds"]), 3)
+                    if t["client_seconds"]
+                    else None,
                     "lookahead_frames": t["lookahead_frames"],
                     "host_provenance": r_pt["host_provenance"],
                 }
@@ -907,7 +966,9 @@ def main() -> None:
             "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
         ]
         for r in comparison_rows:
-            lh_str = str(r['lookahead_frames']) if r['lookahead_frames'] is not None else "unmeasured"
+            lh_str = (
+                str(r["lookahead_frames"]) if r["lookahead_frames"] is not None else "unmeasured"
+            )
             md_lines.append(
                 f"| {r['system']} | {r['representation_arm']} | {r['codec']} | {r['rate_scope']} | "
                 f"{r['payload_bytes']:,} | {r['side_data_bytes']:,} | {r['total_bytes']:,} | "
@@ -918,6 +979,28 @@ def main() -> None:
         (out_dir / "comparison_table.md").write_text("\n".join(md_lines), encoding="utf-8")
 
         # Step 8: Document one-scene conditional observation & costed proposal
+        # Derive reused OFF-arm entries directly from canonical probe report
+        reused_arms_canonical = []
+        for p in old_report.get("screening_points", []):
+            rep = p["representation"]
+            qp = p["qp"]
+            bytes_total = p["total_package_bytes"]
+            vis_psnr = p["metrics"]["no_overlay"]["psnr_y_visible_dB"]
+            ghost_mad = p["metrics"]["no_overlay"]["ghosting_luma_mad"]
+            bs_sha = p.get("bitstream_sha256", "unknown")[:8]
+            arm_entry = {
+                "arm": f"{rep}_qp{qp}_removal_off",
+                "representation": rep,
+                "qp": qp,
+                "removal": "off",
+                "total_bytes": bytes_total,
+                "psnr_y_visible_dB": vis_psnr,
+                "ghosting_mad": ghost_mad,
+                "bitstream_sha256_prefix": bs_sha,
+                "summary": f"{rep}_qp{qp}_removal_off ({bytes_total:,} B, vis PSNR {vis_psnr:.2f} dB, ghost MAD {ghost_mad:.2f}, sha {bs_sha})",
+            }
+            reused_arms_canonical.append(arm_entry)
+
         evidence_summary = {
             "task_id": TASK_ID,
             "campaign_action": "E04A",
@@ -945,28 +1028,30 @@ def main() -> None:
                 ),
             ],
             "smallest_costed_next_probe_proposal": {
-                "name": "E04B_paired_removal_probe",
+                "name": "E04B_same_camera_paired_removal_probe",
                 "named_uncertainty": (
                     "Does explicit foreground removal and hole filling (removal=ON with temporal median mask "
                     "exclusion + Telea fill) causally eliminate residual ghosting (MAD 6.70–9.16) on registered "
                     "panorama, or does removal-OFF with inherent median aggregation already achieve the achievable "
                     "ghosting suppression without inpainting blur and boundary artifacts?"
                 ),
+                "canonical_source": {
+                    "report_path": str(old_report_path),
+                    "report_sha256": hashlib.sha256(old_report_path.read_bytes()).hexdigest(),
+                    "source_scene": f"{VIDEO}/{SCENE}",
+                    "n_frames": N_FRAMES,
+                    "fps": WORKING_FPS,
+                    "resolution": f"{TARGET_WIDTH}x{TARGET_HEIGHT}",
+                },
                 "reused_evidence": {
-                    "scope": "federer_djokovic/scene_007 (48 frames @ 12 fps, 360p)",
-                    "reused_runs": 6,
-                    "reused_arms": [
-                        "still_frame0_qp47_removal_off (3,983 B, vis PSNR 17.67 dB, ghost MAD 20.33)",
-                        "still_frame0_qp32_removal_off (13,115 B, vis PSNR 17.58 dB, ghost MAD 28.55)",
-                        "registered_panorama_qp47_removal_off (4,554 B, vis PSNR 21.16 dB, ghost MAD 9.16)",
-                        "registered_panorama_qp32_removal_off (18,926 B, vis PSNR 23.21 dB, ghost MAD 6.70)",
-                        "cleaned_video_qp47_removal_off (11,047 B, vis PSNR 23.77 dB, ghost MAD 4.14)",
-                        "cleaned_video_qp32_removal_off (68,524 B, vis PSNR 29.83 dB, ghost MAD 0.88)",
-                    ],
+                    "scope": f"{VIDEO}/{SCENE} ({N_FRAMES} frames @ {WORKING_FPS} fps, 360p)",
+                    "reused_runs": len(reused_arms_canonical),
+                    "reused_arms": [a["summary"] for a in reused_arms_canonical],
+                    "reused_arms_detail": reused_arms_canonical,
                 },
                 "minimal_probe": {
                     "description": "Smallest discriminative probe testing removal=ON on candidate registered_panorama",
-                    "scene": "federer_djokovic/scene_007",
+                    "scene": f"{VIDEO}/{SCENE}",
                     "representation": "registered_panorama",
                     "removal": "on",
                     "qps": [47, 32],
@@ -974,12 +1059,6 @@ def main() -> None:
                     "hardware_requirement": "CPU only (16 cores under claim), zero GPU requirement",
                     "estimated_runtime_seconds": 15,
                     "estimated_storage_bytes": 50000,
-                },
-                "optional_4arm_variant": {
-                    "description": "Paired removal=ON probe on both still_frame0 and registered_panorama",
-                    "new_encodes": 4,
-                    "estimated_runtime_seconds": 30,
-                    "estimated_storage_bytes": 100000,
                 },
                 "decision_rules": {
                     "promote_rule": (
@@ -997,12 +1076,17 @@ def main() -> None:
                         "requiring manual masking adjustments."
                     ),
                 },
-                "status": "awaiting_review",
+                "status": "authorized_by_coordinator",
             },
         }
 
         (out_dir / "evidence_completion_report.json").write_text(
             json.dumps(evidence_summary, indent=2), encoding="utf-8"
+        )
+        # Write both canonical same-camera paired proposal and legacy path for backward compatibility
+        (out_dir / "same_camera_paired_proposal.json").write_text(
+            json.dumps(evidence_summary["smallest_costed_next_probe_proposal"], indent=2),
+            encoding="utf-8",
         )
         (out_dir / "second_camera_proposal.json").write_text(
             json.dumps(evidence_summary["smallest_costed_next_probe_proposal"], indent=2),
@@ -1039,8 +1123,14 @@ def main() -> None:
                     "trajectory": False,
                     "generalization": False,
                     "exclusions": [
-                        {"claim": "trajectory", "reason": "background representation probe, not generative model trajectory"},
-                        {"claim": "generalization", "reason": "single development scene (Federer scene 007)"},
+                        {
+                            "claim": "trajectory",
+                            "reason": "background representation probe, not generative model trajectory",
+                        },
+                        {
+                            "claim": "generalization",
+                            "reason": "single development scene (Federer scene 007)",
+                        },
                     ],
                 },
                 "evidence": {
