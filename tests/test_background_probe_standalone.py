@@ -150,6 +150,8 @@ def test_runner_aborts_on_calibration_failure(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Runner must abort immediately with RuntimeError if scorer calibration fails."""
+    from contextlib import contextmanager
+    from types import SimpleNamespace
     from scripts import e04a_evidence_completion
 
     run_dir = tmp_path / "fresh_run"
@@ -159,6 +161,11 @@ def test_runner_aborts_on_calibration_failure(
     dummy_masks = np.zeros((2, 360, 640), dtype=bool)
     dummy_meta = {"common_preparation_seconds": 0.1}
 
+    @contextmanager
+    def mock_claim(**kwargs):  # type: ignore[no-untyped-def]
+        yield SimpleNamespace(token="test_token_1234")
+
+    monkeypatch.setattr(e04a_evidence_completion, "claim_resources", mock_claim)
     monkeypatch.setattr(
         e04a_evidence_completion,
         "load_360p_input_data",
@@ -169,7 +176,7 @@ def test_runner_aborts_on_calibration_failure(
         "run_scorer_calibration",
         lambda f, m, b: {"valid": False, "alarms": ["Forced synthetic calibration failure"]},
     )
-    monkeypatch.setattr("sys.argv", ["runner", "--output-dir", str(run_dir)])
+    monkeypatch.setattr("sys.argv", ["runner", "--output-dir", str(run_dir), "--cpu-threads", "1"])
 
     with pytest.raises(RuntimeError, match="Scorer calibration failed with 1 alarms"):
         e04a_evidence_completion.main()
