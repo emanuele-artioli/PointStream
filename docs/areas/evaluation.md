@@ -6,15 +6,48 @@
 checks matched all stream hashes/byte counts and independently counted 48 frames
 in each ordinary and standalone decoded container. The wrapper nevertheless
 pads/trims raw output before validating shape; a two-frame reproducer became
-48 frames. Keep the PR open for a strict decode/reuse gate repair. Do not rerun
-the four encodes. Native PTS needs pixel-provenance verification, and score-free
-eligibility is not permission to score confirmation.
+48 frames. The decode/reuse gate remains a follow-up on the landed code. Do not
+rerun the four encodes. Native PTS needs pixel-provenance verification, and
+score-free eligibility is not permission to score confirmation.
 
 The saved E03B VMAF alarm has supporting same-grid severe-blur calibration at the
 floor; retain original bounds and write a separate disposition. Scope the result
 to one development scene and single-run timing. E04A background-region metrics
 and background-only bytes cannot be compared directly to whole-frame anchors.
 Follow the [review and focused assignments](../workflow/session/evaluation-campaign/tasks/20260916-probe-review.md).
+
+## E03B probe record — 16 September 2026
+
+Worktree `/home/itec/emanuele/worktrees/pointstream-e03b-20260916` on
+`codex/e03b-20260916`. Code head at probe:
+`df9f945785b6dcd2cb7d6c5619b4b496da76ec23`. Persistent wrapper:
+`experiments.tier.e03b_persist.persistent_timed_roundtrip`. Native PTS recipe
+(shared with E04A): run dir
+`outputs/evaluation-20260914/e03b/run-20260916-federer007/`. Prepared stack
+SHA-256 `1f02475a5bbc3d94e4bae2e904dc29c3af3082be0c0c160e027b706a6950f6f8`
+matches E04A 360p/12 fps pixels; native timestamps are packet DTS seconds, not
+24 fps grid indices. BP46/BP21 extract caches were not overwritten.
+
+Four charged settings finished on gpu6 in 92 s encode wall (plus 2.1 s
+calibration). Job `jobs/e03b-20260916-federer007` exit 0. All four rows ingest
+as validated RD with standalone decode and reconciled ledgers. AV1 used
+`SvtAv1EncApp` v1.8.0 preset 0; VVC used the accepted `encode()` path
+(`ffmpeg` n7.1.1 `libvvenc` slower, `-qpa 0`), not the card's `vvencapp`
+identity string. Same-QP quality ranges do not overlap (AV1 PSNR 27.4–33.0 dB
+vs VVC 17.9–24.6 dB). Do not compute BD-rate. One interior QP between 47 and
+63 cannot create overlap; skip it. Size-adjacent pair already exists: AV1 QP63
+19 116 B / 27.4 dB vs VVC QP47 21 288 B / 24.6 dB. One-scene diagnostic only;
+not a confirmed advantage.
+
+VMAF 0.0 on VVC QP63 fired the pre-score band [5, 100]. Calibration on this
+grid already floors at 0 (severe-blur and spatial-null); unrelated-clip VMAF
+is 1.38; VVC QP63 PSNR 17.93 dB sits next to severe-blur 17.73 dB. Alarm
+closed as bound-too-tight, not a broken metric path. Quote VMAF beside those
+anchors. `n=1` scene, single-run timing, not a repeated speed claim.
+
+Confirmation eligibility unchanged: acquired=3, confirmation_eligible=3,
+`scores_computed=false`. All 1080p; cannot confirm native 4K. Coordinator
+still must freeze scenes before any confirmation scoring.
 
 ## Historical acceptance completion — 15 September 2026
 

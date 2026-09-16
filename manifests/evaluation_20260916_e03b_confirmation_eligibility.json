@@ -1,0 +1,174 @@
+{
+  "schema": "pointstream.campaign_confirmation_eligibility.v1",
+  "doc_role": "e03b_score_free_reserved_source_eligibility",
+  "campaign": "evaluation-20260914",
+  "contract_revision": "e01r-20260914",
+  "acquisition_pointer": "manifests/evaluation_20260914_e01r_acquisition.json",
+  "timestamp_pointer": "manifests/evaluation_20260915_e03a_confirmation_timestamps.json",
+  "counts": {
+    "acquired": 3,
+    "confirmation_eligible": 3,
+    "scores_computed": false
+  },
+  "claim_restriction": "All three acquired windows are 1080p; they cannot confirm a native 4K claim.",
+  "method": {
+    "quality_scores": false,
+    "scene_detector": "consecutive_mad_on_2fps_160x90_thumbnails",
+    "min_scene_s": 4.0,
+    "overlap_rule": "exact match_name overlap fails; tournament token hits are recorded, not automatic failure"
+  },
+  "sources": [
+    {
+      "candidate_id": "conf_cand_01_sinner_medvedev_ao2024",
+      "path": "/home/itec/emanuele/pointstream-data/assets/confirmation_raw/e01r/conf_cand_01_sinner_medvedev_ao2024_qkNLSXDAZtQ_3600-4500.mp4",
+      "acquisition_sha256": "c98e9823864b9397219a69ea74d892fb50533d89d010c0784d31ea6f624757da",
+      "on_disk_sha256": "c98e9823864b9397219a69ea74d892fb50533d89d010c0784d31ea6f624757da",
+      "hash_match": true,
+      "bytes": 213723603,
+      "width": 1920,
+      "height": 1080,
+      "fps": 25.0,
+      "native_4k": false,
+      "cannot_confirm_native_4k_claim": true,
+      "timestamp_origin": {
+        "container_start_s": 0.0,
+        "first_frame": {
+          "pict_type": "B",
+          "key_frame": false,
+          "pkt_dts_time_s": 0.0
+        },
+        "first_iframe": {
+          "pict_type": "I",
+          "key_frame": true,
+          "pkt_dts_time_s": 1.2
+        },
+        "keyframe_preroll_s": 1.2
+      },
+      "event_overlap": {
+        "event": "2024 Australian Open, Men's Singles Final",
+        "tournament": "Australian Open",
+        "year": 2024,
+        "match_name": "Jannik Sinner vs. Daniil Medvedev",
+        "exact_match_overlap": false,
+        "tournament_or_token_hits": [
+          {
+            "against": "bp57_ao2024_sabalenka_zheng",
+            "reasons": "exposed_gate_b_same_tournament_year"
+          }
+        ],
+        "independent_match": true
+      },
+      "n_content_scenes": 57,
+      "confirmation_eligible": true,
+      "eligibility_blockers": [],
+      "scores_computed": false,
+      "development_provenance_unused": false,
+      "frozen_scene_bounds_path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03b/run-20260916-federer007/confirmation_eligibility.json",
+      "frozen_scene_bounds_n": 57,
+      "frozen_scene_bounds_span_s": [
+        0.0,
+        900.0
+      ]
+    },
+    {
+      "candidate_id": "conf_cand_04_medvedev_djokovic_usopen2023",
+      "path": "/home/itec/emanuele/pointstream-data/assets/confirmation_raw/e01r/conf_cand_04_medvedev_djokovic_usopen2023_1R4qtc1H4wM_3600-4500.mp4",
+      "acquisition_sha256": "95b69d8d5d1538c930d4bf41bf036a79af6ba43a0893e1bee02d33f5cf7f7091",
+      "on_disk_sha256": "95b69d8d5d1538c930d4bf41bf036a79af6ba43a0893e1bee02d33f5cf7f7091",
+      "hash_match": true,
+      "bytes": 344828454,
+      "width": 1920,
+      "height": 1080,
+      "fps": 29.97,
+      "native_4k": false,
+      "cannot_confirm_native_4k_claim": true,
+      "timestamp_origin": {
+        "container_start_s": 0.0,
+        "first_frame": {
+          "pict_type": "B",
+          "key_frame": false,
+          "pkt_dts_time_s": 0.0
+        },
+        "first_iframe": {
+          "pict_type": "I",
+          "key_frame": true,
+          "pkt_dts_time_s": 1.468133
+        },
+        "keyframe_preroll_s": 1.468133
+      },
+      "event_overlap": {
+        "event": "2023 US Open, Men's Singles Final",
+        "tournament": "US Open",
+        "year": 2023,
+        "match_name": "Daniil Medvedev vs. Novak Djokovic",
+        "exact_match_overlap": false,
+        "tournament_or_token_hits": [
+          {
+            "against": "bp57_usopen2023_gauff_sabalenka",
+            "reasons": "exposed_gate_b_same_tournament_year"
+          }
+        ],
+        "independent_match": true
+      },
+      "n_content_scenes": 70,
+      "confirmation_eligible": true,
+      "eligibility_blockers": [],
+      "scores_computed": false,
+      "development_provenance_unused": false,
+      "frozen_scene_bounds_path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03b/run-20260916-federer007/confirmation_eligibility.json",
+      "frozen_scene_bounds_n": 70,
+      "frozen_scene_bounds_span_s": [
+        1.5,
+        898.0
+      ]
+    },
+    {
+      "candidate_id": "conf_cand_05_swiatek_sabalenka_madrid2024",
+      "path": "/home/itec/emanuele/pointstream-data/assets/confirmation_raw/e01r/conf_cand_05_swiatek_sabalenka_madrid2024_n0MZNE_AIy4_3600-4500.mp4",
+      "acquisition_sha256": "63946c0e6e2c6876b58979e5ad3971b080392b70fad31cad5544829f764e2a67",
+      "on_disk_sha256": "63946c0e6e2c6876b58979e5ad3971b080392b70fad31cad5544829f764e2a67",
+      "hash_match": true,
+      "bytes": 304200163,
+      "width": 1920,
+      "height": 1080,
+      "fps": 24.0,
+      "native_4k": false,
+      "cannot_confirm_native_4k_claim": true,
+      "timestamp_origin": {
+        "container_start_s": 0.0,
+        "first_frame": {
+          "pict_type": "P",
+          "key_frame": false,
+          "pkt_dts_time_s": 0.0
+        },
+        "first_iframe": {
+          "pict_type": "I",
+          "key_frame": true,
+          "pkt_dts_time_s": 3.625
+        },
+        "keyframe_preroll_s": 3.625
+      },
+      "event_overlap": {
+        "event": "2024 Mutua Madrid Open, Women's Singles Final",
+        "tournament": "Mutua Madrid Open",
+        "year": 2024,
+        "match_name": "Iga Swiatek vs. Aryna Sabalenka",
+        "exact_match_overlap": false,
+        "tournament_or_token_hits": [],
+        "independent_match": true
+      },
+      "n_content_scenes": 29,
+      "confirmation_eligible": true,
+      "eligibility_blockers": [],
+      "scores_computed": false,
+      "development_provenance_unused": false,
+      "frozen_scene_bounds_path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03b/run-20260916-federer007/confirmation_eligibility.json",
+      "frozen_scene_bounds_n": 29,
+      "frozen_scene_bounds_span_s": [
+        0.0,
+        900.0
+      ]
+    }
+  ],
+  "full_report": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03b/run-20260916-federer007/confirmation_eligibility.json"
+}
