@@ -3,10 +3,14 @@
 Directory layout uses two naming conventions in one track group — pair by
 position in the sorted frame lists, never by reconstructing a filename.
 """
+from __future__ import annotations
+
 import os
 import random
 import glob
+import sqlite3  # noqa: F401
 from pathlib import Path
+from typing import Any
 from PIL import Image
 
 import torch
@@ -52,7 +56,7 @@ class TennisSkeletonDataset(Dataset):
         "skeleton": "_skeleton",
     }
 
-    REFERENCE_MODES = ("deterministic", "first", "random")
+    REFERENCE_MODES = ("first", "keyframe", "offset", "random", "deterministic")
 
     def __init__(
         self,
@@ -61,7 +65,9 @@ class TennisSkeletonDataset(Dataset):
         transform=None,
         include_reference: bool = False,
         condition: str = "pose_body",
-        reference_mode: str = "deterministic",
+        reference_mode: str = "first",
+        keyframe_interval: int = 16,
+        reference_offset: int = 1,
     ):
         self.root_dir = Path(root_dir)
         self.target_size = target_size
@@ -78,9 +84,12 @@ class TennisSkeletonDataset(Dataset):
                 f"Unknown reference_mode {reference_mode!r}; expected one of {sorted(self.REFERENCE_MODES)}"
             )
         self.reference_mode = reference_mode
+        self.keyframe_interval = max(1, keyframe_interval)
+        self.reference_offset = max(1, reference_offset)
 
         # Items are tuples of (color_path, condition_path, track_id)
         self.items: list[tuple[Path, Path, str]] = []
+        self.item_track_indices: list[int] = []
 
         # Map track_id to a list of valid color paths in that track (for reference frame sampling)
         self.track_to_colors: dict[str, list[Path]] = {}
@@ -126,6 +135,7 @@ class TennisSkeletonDataset(Dataset):
                 color_path = color_frames[i]
                 skel_path = skel_frames[i]
                 self.items.append((color_path, skel_path, unique_track_id))
+                self.item_track_indices.append(i)
                 self.track_to_colors[unique_track_id].append(color_path)
 
         # Base transform for converting to tensor and resizing
@@ -149,19 +159,51 @@ class TennisSkeletonDataset(Dataset):
         tensor = self.base_transform(img)
         return tensor
 
-    def _select_reference_path(self, track_id: str, idx: int) -> Path:
+    def _select_reference_path(
+        self,
+        track_id: str,
+        track_pos: int = 0,
+        item_idx: int = 0,
+    ) -> Path:
         colors = self.track_to_colors[track_id]
         if not colors:
             raise RuntimeError(f"No color frames available for track {track_id!r}")
         if self.reference_mode == "first":
             return colors[0]
+        elif self.reference_mode == "keyframe":
+            ref_idx = (track_pos // self.keyframe_interval) * self.keyframe_interval
+            ref_idx = min(ref_idx, len(colors) - 1)
+            return colors[ref_idx]
+        elif self.reference_mode == "offset":
+            ref_idx = max(0, track_pos - self.reference_offset)
+            ref_idx = min(ref_idx, len(colors) - 1)
+            return colors[ref_idx]
         elif self.reference_mode == "deterministic":
-            return colors[idx % len(colors)]
+            # Stable first reference policy matching transmitted keyframe availability;
+            # replaces the historical target-copy shortcut (colors[idx % len(colors)]).
+            return colors[0]
         else:  # "random"
             return random.choice(colors)
 
+    def get_reference_info(self, idx: int) -> dict[str, Any]:
+        """Inspect and record source and selected reference paths and IDs for sample idx."""
+        color_path, skel_path, track_id = self.items[idx]
+        track_pos = self.item_track_indices[idx] if idx < len(self.item_track_indices) else 0
+        ref_color_path = self._select_reference_path(track_id, track_pos=track_pos, item_idx=idx)
+        return {
+            "track_id": track_id,
+            "track_pos": track_pos,
+            "source_path": color_path,
+            "reference_path": ref_color_path,
+            "source_id": color_path.name,
+            "reference_id": ref_color_path.name,
+            "is_target_match": bool(color_path == ref_color_path),
+            "reference_mode": self.reference_mode,
+        }
+
     def __getitem__(self, idx: int):
         color_path, skeleton_path, track_id = self.items[idx]
+        track_pos = self.item_track_indices[idx] if idx < len(self.item_track_indices) else 0
 
         color_tensor = self._process_image(color_path)
         skeleton_tensor = self._process_image(skeleton_path)
@@ -171,7 +213,7 @@ class TennisSkeletonDataset(Dataset):
         if self.transform:
             # We stack them to ensure same random transforms (like flipping) are applied to all
             if self.include_reference:
-                ref_color_path = self._select_reference_path(track_id, idx)
+                ref_color_path = self._select_reference_path(track_id, track_pos=track_pos, item_idx=idx)
                 ref_tensor = self._process_image(ref_color_path)
                 
                 stacked = torch.cat([skeleton_tensor, ref_tensor, color_tensor], dim=0) # [9, H, W]
@@ -186,7 +228,7 @@ class TennisSkeletonDataset(Dataset):
                 color_tensor = stacked[3:6]
         else:
             if self.include_reference:
-                ref_color_path = self._select_reference_path(track_id, idx)
+                ref_color_path = self._select_reference_path(track_id, track_pos=track_pos, item_idx=idx)
                 ref_tensor = self._process_image(ref_color_path)
 
         # Normalize to [-1, 1]

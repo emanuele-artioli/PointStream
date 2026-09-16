@@ -220,6 +220,8 @@ def build_checkpoint_state(
     optimizer_D: optim.Optimizer | None = None,
     ngpus: int = 1,
     base_seed: int = 42,
+    reference_mode: str = "first",
+    used_reference_shortcut: bool = False,
 ) -> dict[str, Any]:
     state_dict_G = (
         generator.module.state_dict() if ngpus > 1 else generator.state_dict()
@@ -242,6 +244,8 @@ def build_checkpoint_state(
         "rng_cuda": rng_cuda,
         "rng_numpy": np.random.get_state(),
         "rng_python": random.getstate(),
+        "reference_mode": reference_mode,
+        "used_reference_shortcut": used_reference_shortcut,
         "timestamp_unix": time.time(),
     }
 
@@ -308,7 +312,19 @@ def main_worker(gpu, ngpus_per_node, args):
             np.random.set_state(checkpoint["rng_numpy"])
         if "rng_python" in checkpoint and checkpoint["rng_python"] is not None:
             random.setstate(checkpoint["rng_python"])
+
+        saved_ref_mode = checkpoint.get("reference_mode")
+        used_shortcut = checkpoint.get("used_reference_shortcut", False)
+        if used_shortcut or saved_ref_mode == "deterministic" or saved_ref_mode is None:
+            used_shortcut = True
+            logging.warning(
+                "Checkpoint was trained using historical target-copy reference shortcut; "
+                "flag preserved (used_reference_shortcut=True) without discarding model family."
+            )
+        else:
+            used_shortcut = False
     else:
+        used_shortcut = False
         generator.apply(weights_init_normal)
         discriminator.apply(weights_init_normal)
 
@@ -329,13 +345,17 @@ def main_worker(gpu, ngpus_per_node, args):
     criterion_GAN = nn.BCEWithLogitsLoss().to(device)
     criterion_pixelwise = nn.L1Loss().to(device)
 
-    ref_mode = getattr(args, "reference_mode", "deterministic")
+    ref_mode = getattr(args, "reference_mode", "first")
+    keyframe_interval = getattr(args, "keyframe_interval", 16)
+    reference_offset = getattr(args, "reference_offset", 1)
     dataset = TennisSkeletonDataset(
         args.data_root,
         target_size=args.img_size,
         include_reference=True,
         condition=args.condition,
         reference_mode=ref_mode,
+        keyframe_interval=keyframe_interval,
+        reference_offset=reference_offset,
     )
 
     if args.resume and getattr(args, "num_workers", 0) > 0:
@@ -491,6 +511,8 @@ def main_worker(gpu, ngpus_per_node, args):
                         optimizer_D=optimizer_D,
                         ngpus=ngpus_per_node,
                         base_seed=base_seed,
+                        reference_mode=ref_mode,
+                        used_reference_shortcut=used_shortcut,
                     )
                     save_checkpoint_atomic(ckpt_state, args.checkpoint_path)
                     last_checkpoint_time = now
@@ -527,6 +549,8 @@ def main_worker(gpu, ngpus_per_node, args):
                     optimizer_D=optimizer_D,
                     ngpus=ngpus_per_node,
                     base_seed=base_seed,
+                    reference_mode=ref_mode,
+                    used_reference_shortcut=used_shortcut,
                 )
                 save_checkpoint_atomic(ckpt_state, args.checkpoint_path)
                 last_checkpoint_time = now
@@ -561,9 +585,13 @@ def main():
     parser.add_argument("--seed", type=int, default=42, help="Base random seed (default: 42)")
     parser.add_argument("--sample-dir", type=str, default="assets/samples")
     parser.add_argument("--resume", action="store_true", help="Resume training from checkpoint")
-    parser.add_argument("--reference-mode", type=str, default="deterministic",
-                        choices=["deterministic", "first", "random"],
-                        help="Reference selection mode for TennisSkeletonDataset (default: deterministic)")
+    parser.add_argument("--reference-mode", type=str, default="first",
+                        choices=["first", "keyframe", "offset", "random", "deterministic"],
+                        help="Reference selection mode for TennisSkeletonDataset (default: first)")
+    parser.add_argument("--keyframe-interval", type=int, default=16,
+                        help="Keyframe interval for keyframe reference mode (default: 16)")
+    parser.add_argument("--reference-offset", type=int, default=1,
+                        help="Fixed frame offset for offset reference mode (default: 1)")
     parser.add_argument("--max-steps-per-epoch", type=int, default=None,
                         help="Optional cap on steps per epoch for fast integration tests")
     args = parser.parse_args()

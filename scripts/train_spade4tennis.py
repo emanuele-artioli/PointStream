@@ -394,6 +394,19 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
         if "rng_python" in ckpt and ckpt["rng_python"] is not None:
             random.setstate(ckpt["rng_python"])
 
+        saved_ref_mode = ckpt.get("reference_mode")
+        used_shortcut = ckpt.get("used_reference_shortcut", False)
+        if used_shortcut or saved_ref_mode == "deterministic" or saved_ref_mode is None:
+            used_shortcut = True
+            logging.warning(
+                "Checkpoint was trained using historical target-copy reference shortcut; "
+                "flag preserved (used_reference_shortcut=True) without discarding model family."
+            )
+        else:
+            used_shortcut = False
+    else:
+        used_shortcut = False
+
     # DDP wrapping
     if ngpus_per_node > 1:
         generator = DDP(generator, device_ids=[gpu])  # type: ignore[assignment]
@@ -416,13 +429,17 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
     vgg_loss = VGG19PerceptualLoss(weights_path=vgg_weights).to(device)
 
     # --- Data ---
-    ref_mode = getattr(args, "reference_mode", "deterministic")
+    ref_mode = getattr(args, "reference_mode", "first")
+    keyframe_interval = getattr(args, "keyframe_interval", 16)
+    reference_offset = getattr(args, "reference_offset", 1)
     dataset = TennisSkeletonDataset(
         root_dir=args.data_root,
         target_size=args.img_size,
         include_reference=True,
         condition=args.condition,
         reference_mode=ref_mode,
+        keyframe_interval=keyframe_interval,
+        reference_offset=reference_offset,
     )
 
     if args.resume and getattr(args, "num_workers", 0) > 0:
@@ -616,6 +633,8 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
                         "rng_cuda": rng_cuda,
                         "rng_numpy": np.random.get_state(),
                         "rng_python": random.getstate(),
+                        "reference_mode": ref_mode,
+                        "used_reference_shortcut": used_shortcut,
                         "timestamp_unix": now,
                     }, args.checkpoint_path)
                     last_checkpoint_time = now
@@ -663,6 +682,8 @@ def main_worker(gpu: int, ngpus_per_node: int, args: argparse.Namespace) -> None
                     "rng_cuda": rng_cuda,
                     "rng_numpy": np.random.get_state(),
                     "rng_python": random.getstate(),
+                    "reference_mode": ref_mode,
+                    "used_reference_shortcut": used_shortcut,
                     "timestamp_unix": now,
                 }, args.checkpoint_path)
                 last_checkpoint_time = now
@@ -721,9 +742,13 @@ def main() -> None:
                         help="Path to pretrained generator (for progressive training)")
     parser.add_argument("--resume", action="store_true",
                         help="Resume training from checkpoint")
-    parser.add_argument("--reference-mode", type=str, default="deterministic",
-                        choices=["deterministic", "first", "random"],
-                        help="Reference selection mode for TennisSkeletonDataset (default: deterministic)")
+    parser.add_argument("--reference-mode", type=str, default="first",
+                        choices=["first", "keyframe", "offset", "random", "deterministic"],
+                        help="Reference selection mode for TennisSkeletonDataset (default: first)")
+    parser.add_argument("--keyframe-interval", type=int, default=16,
+                        help="Keyframe interval for keyframe reference mode (default: 16)")
+    parser.add_argument("--reference-offset", type=int, default=1,
+                        help="Fixed frame offset for offset reference mode (default: 1)")
     parser.add_argument("--max-steps-per-epoch", type=int, default=None,
                         help="Optional cap on steps per epoch for fast integration tests")
     args = parser.parse_args()

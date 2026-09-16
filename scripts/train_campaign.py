@@ -822,7 +822,17 @@ def verify_data_root_excludes_probe_set(data_root: Path, manifest: dict) -> list
 
 
 def is_valid_eval(agg: dict[str, Any] | None) -> bool:
-    """Return True if an evaluation result is valid, finite, and well-accounted."""
+    """Return True if an evaluation result is valid, finite, well-accounted, and domain-valid.
+
+    Rejects evaluations with:
+    - success is False, eval_failed is True, or status is 'failed'/'error'
+    - non-positive per_clip_count
+    - total_bytes < residual_bytes (wire accounting violation)
+    - missing or empty checkpoint_identity (when field is present)
+    - NaN or negative infinity in any numeric field (nested dicts/lists included)
+    - domain-invalid extracted metrics (negative rate, negative latency, SSIM outside [-1, 1],
+      negative PSNR). Note: +inf is accepted for PSNR under legitimate identity-score semantics (MSE=0).
+    """
     if not isinstance(agg, dict):
         return False
     if agg.get("success") is False:
@@ -838,23 +848,42 @@ def is_valid_eval(agg: dict[str, Any] | None) -> bool:
             return False
     if "checkpoint_identity" in agg:
         ckpt_id = agg["checkpoint_identity"]
-        if not ckpt_id or not isinstance(ckpt_id, str) or not ckpt_id.strip():
+        if not ckpt_id:
             return False
-    # Check numeric values for NaN or Inf
-    for val in agg.values():
+        if isinstance(ckpt_id, str) and not ckpt_id.strip():
+            return False
+
+    def _is_numeric_valid(val: Any) -> bool:
         if isinstance(val, (int, float)):
-            if math.isnan(val) or math.isinf(val):
+            if math.isnan(val):
                 return False
+            # Reject negative infinity; positive infinity accepted for identity PSNR
+            if math.isinf(val) and val < 0:
+                return False
+        elif isinstance(val, dict):
+            return all(_is_numeric_valid(v) for v in val.values())
+        elif isinstance(val, (list, tuple)):
+            return all(_is_numeric_valid(v) for v in val)
+        return True
+
+    if not _is_numeric_valid(agg):
+        return False
+
+    # Domain constraints on extracted metrics if present
+    extracted = extract_candidate_metrics(agg)
+    if extracted.get("has_invalid_domain"):
+        return False
+
     return True
 
 
-DEFAULT_RATE_INDIFFERENCE_BAND: float = 0.02  # Practical indifference band: 2% total rate
+DEFAULT_RATE_INDIFFERENCE_BAND: float = 0.02  # Practical indifference band: 2% relative total rate
 DEFAULT_QUALITY_INDIFFERENCE_BAND: float = 0.10  # Practical indifference band: 0.10 dB PSNR
 DEFAULT_SSIM_INDIFFERENCE_BAND: float = 0.005  # Practical indifference band: 0.005 SSIM
-DEFAULT_RESOURCE_INDIFFERENCE_BAND: float = 0.05  # Practical indifference band: 5% client latency
+DEFAULT_RESOURCE_INDIFFERENCE_BAND: float = 0.05  # Practical indifference band: 5% relative client latency
 
 
-def extract_candidate_metrics(data: dict[str, Any]) -> dict[str, float | None]:
+def extract_candidate_metrics(data: dict[str, Any]) -> dict[str, Any]:
     """Extract comparable rate, fidelity, and resource metrics from candidate evaluation data."""
     raw_metrics = data.get("metrics")
     metrics_dict: dict[str, Any] = raw_metrics if isinstance(raw_metrics, dict) else {}
@@ -868,32 +897,66 @@ def extract_candidate_metrics(data: dict[str, Any]) -> dict[str, float | None]:
     else:
         timing_dict = {}
 
+    has_invalid_domain = False
+
     total_bytes = data.get("total_bytes") if data.get("total_bytes") is not None else metrics_dict.get("total_bytes")
     residual_bytes = data.get("residual_bytes") if data.get("residual_bytes") is not None else metrics_dict.get("residual_bytes")
     if total_bytes is None and data.get("coded_bytes") is not None:
         total_bytes = data.get("coded_bytes")
 
     rate: float | None = None
-    if total_bytes is not None and float(total_bytes) > 0:
-        rate = float(total_bytes)
-    elif residual_bytes is not None and float(residual_bytes) > 0:
-        rate = float(residual_bytes)
-    elif total_bytes is not None:
-        rate = float(total_bytes)
+    if total_bytes is not None:
+        try:
+            val = float(total_bytes)
+            if math.isnan(val) or val < 0 or math.isinf(val):
+                has_invalid_domain = True
+            elif val > 0:
+                rate = val
+        except (ValueError, TypeError):
+            has_invalid_domain = True
+    elif residual_bytes is not None:
+        try:
+            val = float(residual_bytes)
+            if math.isnan(val) or val < 0 or math.isinf(val):
+                has_invalid_domain = True
+            elif val > 0:
+                rate = val
+        except (ValueError, TypeError):
+            has_invalid_domain = True
 
     psnr_raw = data.get("psnr_mean") if data.get("psnr_mean") is not None else metrics_dict.get("psnr_mean")
     if psnr_raw is None:
         raw_scores = data.get("scores")
         scores_dict: dict[str, Any] = raw_scores if isinstance(raw_scores, dict) else {}
         psnr_raw = data.get("psnr_y") if data.get("psnr_y") is not None else scores_dict.get("psnr_y")
-    psnr = float(psnr_raw) if psnr_raw is not None else None
+
+    psnr: float | None = None
+    if psnr_raw is not None:
+        try:
+            val = float(psnr_raw)
+            if math.isnan(val) or val < 0 or (math.isinf(val) and val < 0):
+                has_invalid_domain = True
+            else:
+                psnr = val
+        except (ValueError, TypeError):
+            has_invalid_domain = True
 
     ssim_raw = data.get("ssim_mean") if data.get("ssim_mean") is not None else metrics_dict.get("ssim_mean")
     if ssim_raw is None:
         raw_scores = data.get("scores")
         scores_dict = raw_scores if isinstance(raw_scores, dict) else {}
         ssim_raw = data.get("ssim") if data.get("ssim") is not None else scores_dict.get("ssim")
-    ssim = float(ssim_raw) if ssim_raw is not None else None
+
+    ssim: float | None = None
+    if ssim_raw is not None:
+        try:
+            val = float(ssim_raw)
+            if math.isnan(val) or math.isinf(val) or val < -1.0 or val > 1.0:
+                has_invalid_domain = True
+            else:
+                ssim = val
+        except (ValueError, TypeError):
+            has_invalid_domain = True
 
     client_sec_raw = (
         data.get("measured_client_seconds")
@@ -908,13 +971,23 @@ def extract_candidate_metrics(data: dict[str, Any]) -> dict[str, float | None]:
             )
         )
     )
-    client_sec = float(client_sec_raw) if client_sec_raw is not None else None
+    client_sec: float | None = None
+    if client_sec_raw is not None:
+        try:
+            val = float(client_sec_raw)
+            if math.isnan(val) or val < 0 or math.isinf(val):
+                has_invalid_domain = True
+            else:
+                client_sec = val
+        except (ValueError, TypeError):
+            has_invalid_domain = True
 
     return {
         "rate": rate,
         "psnr": psnr,
         "ssim": ssim,
         "client_sec": client_sec,
+        "has_invalid_domain": has_invalid_domain,
     }
 
 
@@ -929,14 +1002,23 @@ def compare_candidates(
 ) -> str:
     """Compare two candidates across total-rate, quality (PSNR & SSIM), and resource budgets.
 
+    Declared practical indifference bands:
+    - Rate: 2% relative total rate (DEFAULT_RATE_INDIFFERENCE_BAND = 0.02)
+    - Quality (PSNR): 0.10 dB PSNR (DEFAULT_QUALITY_INDIFFERENCE_BAND = 0.10)
+    - Quality (SSIM): 0.005 SSIM (DEFAULT_SSIM_INDIFFERENCE_BAND = 0.005)
+    - Resource: 5% relative client time (DEFAULT_RESOURCE_INDIFFERENCE_BAND = 0.05)
+
     Returns:
         'a_dominates': cand_a is strictly superior to cand_b outside indifference bands
         'b_dominates': cand_b is strictly superior to cand_a outside indifference bands
         'indifferent': both candidates are within practical indifference bands on all dimensions
-        'incomparable': trade-off exists or evidence is missing/incomparable
+        'incomparable': trade-off exists, invalid measurement fields present, or evidence is missing/incomparable
     """
     m_a = extract_candidate_metrics(cand_a)
     m_b = extract_candidate_metrics(cand_b)
+
+    if m_a.get("has_invalid_domain") or m_b.get("has_invalid_domain"):
+        return "incomparable"
 
     rate_a = m_a["rate"]
     rate_b = m_b["rate"]
@@ -974,9 +1056,19 @@ def compare_candidates(
     a_better_psnr = False
     b_better_psnr = False
     if psnr_a is not None and psnr_b is not None:
-        psnr_diff = psnr_a - psnr_b
-        a_better_psnr = psnr_diff > quality_band + eps
-        b_better_psnr = psnr_diff < -(quality_band + eps)
+        if math.isinf(psnr_a) and math.isinf(psnr_b):
+            a_better_psnr = False
+            b_better_psnr = False
+        elif math.isinf(psnr_a):
+            a_better_psnr = True
+            b_better_psnr = False
+        elif math.isinf(psnr_b):
+            a_better_psnr = False
+            b_better_psnr = True
+        else:
+            psnr_diff = psnr_a - psnr_b
+            a_better_psnr = psnr_diff > quality_band + eps
+            b_better_psnr = psnr_diff < -(quality_band + eps)
 
     a_better_ssim = False
     b_better_ssim = False
@@ -1056,7 +1148,8 @@ def rank_variants(
         psnr = m["psnr"] if m["psnr"] is not None else 0.0
         ssim = m["ssim"] if m["ssim"] is not None else 0.0
         comp = composite.get(v, 0.0)
-        return (rate, -psnr, -ssim, -comp, v)
+        has_quality = (m["psnr"] is not None or m["ssim"] is not None)
+        return (not has_quality, rate, -psnr, -ssim, -comp, v)
 
     valid_ranked = sorted(valid_variants, key=sort_key)
     invalid_ranked = sorted(invalid_variants, key=lambda v: (composite.get(v, -1.0), v))
