@@ -1043,23 +1043,23 @@ def test_fresh_process_trainer_cli_continuation(tmp_path: Path) -> None:
     assert ckpt_B2.get("reference_mode") == "first"
     assert ckpt_B2.get("used_reference_shortcut") is False
 
-    # Compare G weights
+    # Compare G weights (exact bitwise equality on single-worker CPU)
     max_g_diff = 0.0
     for k in ckpt_A["G"]:
         diff = (ckpt_A["G"][k] - ckpt_B2["G"][k]).abs().max().item()
         if diff > max_g_diff:
             max_g_diff = diff
-        assert torch.allclose(ckpt_A["G"][k], ckpt_B2["G"][k], atol=1e-5), f"G weight mismatch at {k}: diff={diff}"
-    assert max_g_diff <= 1e-5, f"Max G diff exceeded tolerance: {max_g_diff}"
+        assert torch.equal(ckpt_A["G"][k], ckpt_B2["G"][k]), f"G weight mismatch at {k}: diff={diff}"
+    assert max_g_diff == 0.0, f"Max G diff exceeded exact equality: {max_g_diff}"
 
-    # Compare D weights
+    # Compare D weights (exact bitwise equality on single-worker CPU)
     max_d_diff = 0.0
     for k in ckpt_A["D"]:
         diff = (ckpt_A["D"][k] - ckpt_B2["D"][k]).abs().max().item()
         if diff > max_d_diff:
             max_d_diff = diff
-        assert torch.allclose(ckpt_A["D"][k], ckpt_B2["D"][k], atol=1e-5), f"D weight mismatch at {k}: diff={diff}"
-    assert max_d_diff <= 1e-5, f"Max D diff exceeded tolerance: {max_d_diff}"
+        assert torch.equal(ckpt_A["D"][k], ckpt_B2["D"][k]), f"D weight mismatch at {k}: diff={diff}"
+    assert max_d_diff == 0.0, f"Max D diff exceeded exact equality: {max_d_diff}"
 
     assert ckpt_A["opt_G"] is not None and ckpt_B2["opt_G"] is not None
     assert ckpt_A["opt_D"] is not None and ckpt_B2["opt_D"] is not None
@@ -1067,12 +1067,12 @@ def test_fresh_process_trainer_cli_continuation(tmp_path: Path) -> None:
     for s_a, s_b in zip(ckpt_A["opt_G"]["state"].values(), ckpt_B2["opt_G"]["state"].values()):
         for p in ("exp_avg", "exp_avg_sq"):
             if p in s_a:
-                assert torch.allclose(s_a[p], s_b[p], atol=1e-5)
+                assert torch.equal(s_a[p], s_b[p])
 
     for s_a, s_b in zip(ckpt_A["opt_D"]["state"].values(), ckpt_B2["opt_D"]["state"].values()):
         for p in ("exp_avg", "exp_avg_sq"):
             if p in s_a:
-                assert torch.allclose(s_a[p], s_b[p], atol=1e-5)
+                assert torch.equal(s_a[p], s_b[p])
 
     # Compare RNG states
     assert torch.equal(ckpt_A["rng_torch"], ckpt_B2["rng_torch"]), "Torch RNG state mismatch between uninterrupted and resumed"
