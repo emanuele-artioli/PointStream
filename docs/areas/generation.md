@@ -194,4 +194,27 @@ result that determines the next experiment; no family-wide claims from one pilot
 - **Bounded Continuation Verification**: Executed two-step fresh-process CLI continuation check in `test_fresh_process_trainer_cli_continuation` under `--reference-mode first` on single worker CPU execution (`CUDA_VISIBLE_DEVICES=""`, `--num-workers 0`), verifying exact bitwise equality (`torch.equal`, `diff: 0.00e+00`) across generator weights, discriminator weights, optimizer moments (`exp_avg`, `exp_avg_sq`), and RNG states (torch, numpy, python). Bounded strictly to CPU execution without claiming unmeasured CUDA bit-identity.
 - **E05 Stage 1 Executable Card & Pilot Release Authorization**: Updated `docs/workflow/session/evaluation-campaign/tasks/05-decision-card.md` per `20260916-bounded-pilot-release.md`. Enforces materialized bounded development view on `alcaraz_highlights/scene_028` (32 items train, 32 items disjoint validation, batch 1, workers 0, shared reference $t=0$), actual diagnostic CLI commands (`--start-frame`), checked adapter helper (`scripts/adapt_generation_result.py`), corrected split labels (`federer007` is development, confirmation reserved in manifest), justified bounds, and an aggregate $\le 1.0$ GPU-hour deadline around the entire process group. Authorized for pilot execution upon merge with green CI.
 
+`GEN-ACT-13` — **Complete** (E05 Stage 1 pix2pix Pilot Execution & Bounded Rejection, 2026-09-16).
+- **Execution Budget & Strata**: Executed on GPU 0 (`RTX 6000 Ada Generation`, PID claim 8 CPU threads). Phase 1A tiny-scene pilot training completed in 4.9 min (20 epochs on 32 items, 2 tracks $\times$ 16 frames, batch 1, lr 0.0002, seed 42). Phase 1B diagnostic matrix completed 6 corners across disjoint frames 16..31 in 19.5 min. Total wall time ~24.4 min, well under the 60 min (1.0 GPU-hour) cap.
+- **Controls & Numerical Integrity**:
+  - `same_seed_determinism_verified: true`: Delivered frame hashes bitwise identical between `gen_on_res_off` and `gen_on_res_off_same_seed`.
+  - `shuffled_conditioning_changed_pixels: true`: Conditioning sensitivity confirmed (PSNR drops from 31.98 dB to 31.75 dB under permuted pose skeletons).
+  - `delivered_pixels_changed: true` and `gen_on_vs_paste_hash_match: false`: Delivered frames differ from pasted reference.
+  - Zero NaN / negative scores; 100% wire byte reconciliation. Invocations recorded: 256.
+- **Empirical Results (Disjoint Window Frames 16..31, 16 frames @ 4K)**:
+  - *Baseline (Pasted Reference, Res-OFF)*: 999,967 B, PSNR-Y 33.94 dB, SSIM 0.9826, VMAF 90.70, client decode 1.30s (81.3 ms/frame).
+  - *Baseline (Pasted Reference, Res-ON QP 32)*: 1,089,698 B (89,286 B residual), PSNR-Y 41.80 dB, SSIM 0.9840, VMAF 92.92, client decode 3.87s.
+  - *pix2pix Candidate (Res-OFF)*: 6,671,957 B (+5.67 MB, 6.16 MB uncompressed pose metadata stream), PSNR-Y 31.98 dB (-1.96 dB vs baseline), SSIM 0.9812 (-0.0014), VMAF 90.73 (+0.03), client decode 7.03s (439.4 ms/frame, 5.4x slower).
+  - *pix2pix Candidate (Res-ON QP 32)*: 6,763,694 B (91,292 B residual), PSNR-Y 40.51 dB (-1.29 dB vs baseline), SSIM 0.9834, VMAF 92.68, client decode 9.39s.
+- **Promotion Decision**: **REJECTED (Failed Stage 2 Promotion)**.
+  - Pareto criterion violated: pix2pix achieves lower quality (-1.96 dB PSNR) at much higher total wire rate (6.67 MB vs 1.00 MB).
+  - Client latency budget violated: 7.03s vs 1.30s baseline (540% of baseline latency, exceeding the 105% threshold).
+  - Stage 2 release remains closed; confirmation sources remain strictly quarantined.
+- **Immutable Artifacts**:
+  - `generator_pix2pix.pt`: SHA-256 `9d925e1a9bf73270724665f190c4429c054e73f2ee33f0e0ef9ceaebf0d4f7ae`
+  - `checkpoint_pix2pix.pt`: SHA-256 `576dd7179e680ffac5210553c6321310a0ee09713ef6c0df2e026fb8d884ec34`
+  - `diagnostic_matrix.json`: SHA-256 `1baa1dda6e32c35e7c9c22bcb171181db342a8d93ad6e36de1d82d2522aaf0ed`
+  - `campaign_result.json`: SHA-256 `f56e5cb2a8c0239b4f3ecc007d164a403cb7512d8a6bd4ed1e625afdf7c8a425`
+
+
 

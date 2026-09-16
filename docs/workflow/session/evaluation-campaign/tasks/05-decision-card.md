@@ -196,4 +196,6 @@ python scripts/adapt_generation_result.py \
 - **Dataset Subset View**: MATERIALIZED and TESTED.
 - **CLI Commands**: TESTED against real parsers and APIs.
 - **Split Labels**: CORRECTED (`federer007` is development; confirmation quarantined).
-- **Execution**: AUTHORIZED under aggregate $\le 1.0$ GPU-hour cap upon merge with green CI.
+- **Execution**: COMPLETED (2026-09-16). Total compute time ~24.4 min on GPU 0 RTX 6000 Ada (Phase 1A training: 4.9 min, Phase 1B diagnostics: 19.5 min), strictly within the 1.0 GPU-hour deadline.
+- **Pilot Outcome**: REJECTED (Failed Stage 2 Promotion). pix2pix on disjoint development frames 16..31 failed both Pareto rate-distortion (-1.96 dB PSNR at 6.67 MB wire bytes vs 33.94 dB at 1.00 MB baseline) and client decode latency (7.03s vs 1.30s baseline). Stage 2 remains unreleased; confirmation sources remain quarantined.
+
