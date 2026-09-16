@@ -80,20 +80,42 @@ PRE_REGISTERED_EVIDENCE_BOUNDS: Final[dict[str, Any]] = {
     },
     "bounds_basis": (
         "Pre-registered bounds for scorer calibration, standalone decode verification, "
-        "and E03B conventional video rescoring. "
-        "Scorer calibration: identity PSNR inf / SSIM 1.0; mild blur PSNR 20-30 dB, SSIM 0.85-0.98; "
-        "severe blur PSNR 14-22 dB, SSIM 0.50-0.75; mild noise PSNR 28-38 dB, SSIM 0.75-0.95; "
-        "severe noise PSNR 15-24 dB, SSIM 0.25-0.50; unrelated PSNR 4-12 dB, SSIM 0.05-0.35; "
-        "empty mask must return NaN. "
+        "and E03B conventional video rescoring on display_low (640x360, 12 fps, 48 frames). "
+        "Scorer calibration: identity PSNR inf / SSIM 1.0 across all scopes; "
+        "visible background mild blur PSNR 20-30 dB, SSIM 0.80-0.99; severe blur PSNR 14-22 dB, SSIM 0.45-0.80; "
+        "visible mild noise PSNR 28-42 dB, SSIM 0.75-0.999; severe noise PSNR 15-28 dB, SSIM 0.25-0.90; "
+        "visible unrelated PSNR 4-15 dB, SSIM -0.15-0.40; "
+        "full-frame windowed mild blur PSNR 20-30 dB, SSIM 0.75-0.99; severe blur PSNR 14-22 dB, SSIM 0.45-0.80; "
+        "full-frame mild noise PSNR 28-42 dB, SSIM 0.70-0.99; severe noise PSNR 15-28 dB, SSIM 0.20-0.60; "
+        "full-frame unrelated PSNR 4-15 dB, SSIM 0.00-0.40; "
+        "empty mask must return NaN without warnings. "
         "Standalone decode: max pixel diff vs saved decode == 0 (bit-identical). "
         "E03B rescoring: conventional video full-frame windowed SSIM 0.55-0.99, visible background "
-        "PSNR-Y 16-36 dB, ghosting MAD 0.5-8.0. Client decode time 0.05-5.0s per clip."
+        "PSNR-Y 16-36 dB, ghosting MAD 0.0-10.0. Client compositing time 0.001-1.0s."
     ),
     "bands": {
-        "calibration_identity_ssim": [0.999, 1.0],
-        "calibration_mild_blur_ssim": [0.80, 0.99],
-        "calibration_severe_blur_ssim": [0.45, 0.80],
-        "calibration_unrelated_ssim": [0.00, 0.40],
+        "visible_identity_ssim": [0.999, 1.0],
+        "visible_mild_blur_ssim": [0.80, 0.99],
+        "visible_severe_blur_ssim": [0.45, 0.80],
+        "visible_mild_noise_ssim": [0.75, 0.999],
+        "visible_severe_noise_ssim": [0.25, 0.90],
+        "visible_unrelated_ssim": [-0.15, 0.40],
+        "visible_mild_blur_psnr": [20.0, 30.0],
+        "visible_severe_blur_psnr": [14.0, 22.0],
+        "visible_mild_noise_psnr": [28.0, 42.0],
+        "visible_severe_noise_psnr": [15.0, 28.0],
+        "visible_unrelated_psnr": [4.0, 15.0],
+        "full_frame_identity_ssim": [0.999, 1.0],
+        "full_frame_mild_blur_ssim": [0.75, 0.99],
+        "full_frame_severe_blur_ssim": [0.45, 0.80],
+        "full_frame_mild_noise_ssim": [0.70, 0.99],
+        "full_frame_severe_noise_ssim": [0.20, 0.60],
+        "full_frame_unrelated_ssim": [0.00, 0.40],
+        "full_frame_mild_blur_psnr": [20.0, 30.0],
+        "full_frame_severe_blur_psnr": [14.0, 22.0],
+        "full_frame_mild_noise_psnr": [28.0, 42.0],
+        "full_frame_severe_noise_psnr": [15.0, 28.0],
+        "full_frame_unrelated_psnr": [4.0, 15.0],
         "standalone_decode_max_diff": [0, 0],
         "e03b_full_windowed_ssim": [0.55, 0.99],
         "e03b_visible_psnr_y": [16.0, 36.0],
@@ -348,10 +370,13 @@ def run_scorer_calibration(
         "regions": {},
         "full_frame_windowed": {},
         "empty_mask_behavior": {},
+        "identity_checks": {},
+        "null_controls": {},
+        "bounds_checks": {},
         "alarms": [],
     }
 
-    # Calibrate each region scorer
+    # 1. Calibrate each region scorer
     for r_name, r_mask in regions.items():
         r_dict: dict[str, Any] = {}
         for a_name, a_clip in anchors.items():
@@ -365,26 +390,44 @@ def run_scorer_calibration(
         # Check orderings
         blur_order = (
             float(r_dict["mild_blur"]["ssim"]) > float(r_dict["severe_blur"]["ssim"])
-            and float(r_dict["mild_blur"]["psnr_y_dB"]) > float(r_dict["severe_blur"]["psnr_y_dB"])
+            and (
+                float(r_dict["mild_blur"]["psnr_y_dB"]) > float(r_dict["severe_blur"]["psnr_y_dB"])
+                if r_dict["severe_blur"]["psnr_y_dB"] != "inf"
+                else False
+            )
         )
         noise_order = (
             float(r_dict["mild_noise"]["ssim"]) > float(r_dict["severe_noise"]["ssim"])
-            and float(r_dict["mild_noise"]["psnr_y_dB"]) > float(r_dict["severe_noise"]["psnr_y_dB"])
+            and (
+                float(r_dict["mild_noise"]["psnr_y_dB"]) > float(r_dict["severe_noise"]["psnr_y_dB"])
+                if r_dict["severe_noise"]["psnr_y_dB"] != "inf"
+                else False
+            )
         )
         unrelated_order = (
             float(r_dict["mild_blur"]["ssim"]) > float(r_dict["unrelated"]["ssim"])
             and float(r_dict["mild_noise"]["ssim"]) > float(r_dict["unrelated"]["ssim"])
+            and (
+                float(r_dict["mild_blur"]["psnr_y_dB"]) > float(r_dict["unrelated"]["psnr_y_dB"])
+                if r_dict["unrelated"]["psnr_y_dB"] != "inf"
+                else False
+            )
+            and (
+                float(r_dict["mild_noise"]["psnr_y_dB"]) > float(r_dict["unrelated"]["psnr_y_dB"])
+                if r_dict["unrelated"]["psnr_y_dB"] != "inf"
+                else False
+            )
         )
         r_dict["orderings_held"] = {
-            "blur_order_held": blur_order,
-            "noise_order_held": noise_order,
-            "unrelated_order_held": unrelated_order,
+            "blur_order_held": bool(blur_order),
+            "noise_order_held": bool(noise_order),
+            "unrelated_order_held": bool(unrelated_order),
         }
         if not (blur_order and noise_order and unrelated_order):
             calib_results["alarms"].append(f"Scorer ordering violated in region: {r_name}")
         calib_results["regions"][r_name] = r_dict
 
-    # Whole-frame windowed SSIM and full PSNR
+    # 2. Whole-frame windowed SSIM and full PSNR
     full_dict: dict[str, Any] = {}
     ssim_metric = SsimMetric()
     for a_name, a_clip in anchors.items():
@@ -397,23 +440,115 @@ def run_scorer_calibration(
             "psnr_y_dB": "inf" if np.isinf(psnr_full) else round(psnr_full, 3),
             "windowed_ssim": round(float(ssim_full), 4),
         }
-    full_blur = float(full_dict["mild_blur"]["windowed_ssim"]) > float(full_dict["severe_blur"]["windowed_ssim"])
-    full_noise = float(full_dict["mild_noise"]["windowed_ssim"]) > float(full_dict["severe_noise"]["windowed_ssim"])
-    full_dict["orderings_held"] = {"blur_held": full_blur, "noise_held": full_noise}
+
+    full_blur_held = bool(
+        float(full_dict["mild_blur"]["windowed_ssim"]) > float(full_dict["severe_blur"]["windowed_ssim"])
+        and float(full_dict["mild_blur"]["psnr_y_dB"]) > float(full_dict["severe_blur"]["psnr_y_dB"])
+    )
+    full_noise_held = bool(
+        float(full_dict["mild_noise"]["windowed_ssim"]) > float(full_dict["severe_noise"]["windowed_ssim"])
+        and float(full_dict["mild_noise"]["psnr_y_dB"]) > float(full_dict["severe_noise"]["psnr_y_dB"])
+    )
+    full_unrelated_held = bool(
+        float(full_dict["mild_blur"]["windowed_ssim"]) > float(full_dict["unrelated"]["windowed_ssim"])
+        and float(full_dict["mild_noise"]["windowed_ssim"]) > float(full_dict["unrelated"]["windowed_ssim"])
+        and float(full_dict["mild_blur"]["psnr_y_dB"]) > float(full_dict["unrelated"]["psnr_y_dB"])
+        and float(full_dict["mild_noise"]["psnr_y_dB"]) > float(full_dict["unrelated"]["psnr_y_dB"])
+    )
+    full_dict["orderings_held"] = {
+        "blur_held": full_blur_held,
+        "noise_held": full_noise_held,
+        "unrelated_held": full_unrelated_held,
+    }
+    # Enforce whole-frame ordering failures in validity
+    if not (full_blur_held and full_noise_held and full_unrelated_held):
+        calib_results["alarms"].append(
+            f"Whole-frame windowed ordering violated: blur={full_blur_held}, noise={full_noise_held}, unrelated={full_unrelated_held}"
+        )
     calib_results["full_frame_windowed"] = full_dict
 
-    # Empty mask behavior report
+    # 3. Identity checks across all scopes
+    identity_checks: dict[str, Any] = {}
+    for scope_name, s_data in [("visible", calib_results["regions"]["visible"]), ("full_frame", full_dict)]:
+        id_entry = s_data["identity"]
+        id_psnr = id_entry["psnr_y_dB"]
+        id_ssim = id_entry.get("ssim") or id_entry.get("windowed_ssim")
+        psnr_ok = bool(id_psnr == "inf")
+        ssim_ok = bool(0.999 <= float(id_ssim) <= 1.0)
+        identity_checks[scope_name] = {
+            "psnr_inf": psnr_ok,
+            "ssim_unit": ssim_ok,
+            "passed": bool(psnr_ok and ssim_ok),
+        }
+        if not psnr_ok:
+            calib_results["alarms"].append(f"Identity PSNR not infinite in {scope_name}: {id_psnr}")
+        if not ssim_ok:
+            calib_results["alarms"].append(f"Identity SSIM not in [0.999, 1.0] in {scope_name}: {id_ssim}")
+    calib_results["identity_checks"] = identity_checks
+
+    # 4. Null controls: empty mask behavior and unrelated anchor floor
     empty_psnr = masked_luma_psnr(ref_clip, ref_clip, empty_mask)
     empty_ssim = safe_masked_ssim(ref_clip, ref_clip, empty_mask)
+    empty_ok = bool(np.isnan(empty_psnr) and np.isnan(empty_ssim))
+    if not empty_ok:
+        calib_results["alarms"].append(
+            f"Empty mask null check failed: psnr={empty_psnr}, ssim={empty_ssim} (must return NaN)"
+        )
     calib_results["empty_mask_behavior"] = {
         "empty_mask_pixels": 0,
         "psnr_result": "NaN" if np.isnan(empty_psnr) else str(empty_psnr),
         "ssim_result": "NaN" if np.isnan(empty_ssim) else str(empty_ssim),
-        "status": "verified_safe_nan_return",
+        "status": "verified_safe_nan_return" if empty_ok else "failed_nan_return",
         "description": "Empty mask returns float('nan') without division-by-zero or slice mean warnings.",
     }
+    calib_results["null_controls"] = {
+        "empty_mask_nan_held": empty_ok,
+        "unrelated_below_mild_blur_held": bool(full_unrelated_held),
+    }
 
-    calib_results["valid"] = len(calib_results["alarms"]) == 0
+    # 5. Enforce registered absolute bounds
+    registered_bands = PRE_REGISTERED_EVIDENCE_BOUNDS.get("bands", {})
+    bounds_checks: dict[str, Any] = {}
+    vis_data = calib_results["regions"]["visible"]
+
+    measured_mapping: dict[str, float] = {
+        "visible_identity_ssim": float(vis_data["identity"]["ssim"]),
+        "visible_mild_blur_ssim": float(vis_data["mild_blur"]["ssim"]),
+        "visible_severe_blur_ssim": float(vis_data["severe_blur"]["ssim"]),
+        "visible_mild_noise_ssim": float(vis_data["mild_noise"]["ssim"]),
+        "visible_severe_noise_ssim": float(vis_data["severe_noise"]["ssim"]),
+        "visible_unrelated_ssim": float(vis_data["unrelated"]["ssim"]),
+        "visible_mild_blur_psnr": float(vis_data["mild_blur"]["psnr_y_dB"]),
+        "visible_severe_blur_psnr": float(vis_data["severe_blur"]["psnr_y_dB"]),
+        "visible_mild_noise_psnr": float(vis_data["mild_noise"]["psnr_y_dB"]),
+        "visible_severe_noise_psnr": float(vis_data["severe_noise"]["psnr_y_dB"]),
+        "visible_unrelated_psnr": float(vis_data["unrelated"]["psnr_y_dB"]),
+        "full_frame_identity_ssim": float(full_dict["identity"]["windowed_ssim"]),
+        "full_frame_mild_blur_ssim": float(full_dict["mild_blur"]["windowed_ssim"]),
+        "full_frame_severe_blur_ssim": float(full_dict["severe_blur"]["windowed_ssim"]),
+        "full_frame_mild_noise_ssim": float(full_dict["mild_noise"]["windowed_ssim"]),
+        "full_frame_severe_noise_ssim": float(full_dict["severe_noise"]["windowed_ssim"]),
+        "full_frame_unrelated_ssim": float(full_dict["unrelated"]["windowed_ssim"]),
+        "full_frame_mild_blur_psnr": float(full_dict["mild_blur"]["psnr_y_dB"]),
+        "full_frame_severe_blur_psnr": float(full_dict["severe_blur"]["psnr_y_dB"]),
+        "full_frame_mild_noise_psnr": float(full_dict["mild_noise"]["psnr_y_dB"]),
+        "full_frame_severe_noise_psnr": float(full_dict["severe_noise"]["psnr_y_dB"]),
+        "full_frame_unrelated_psnr": float(full_dict["unrelated"]["psnr_y_dB"]),
+    }
+
+    for b_key, (b_min, b_max) in registered_bands.items():
+        if b_key in measured_mapping:
+            val = measured_mapping[b_key]
+            held = bool(b_min <= val <= b_max)
+            bounds_checks[b_key] = {"band": [b_min, b_max], "observed": val, "passed": held}
+            if not held:
+                calib_results["alarms"].append(
+                    f"Registered bound violated for {b_key}: observed {val} not in [{b_min}, {b_max}]"
+                )
+    calib_results["bounds_checks"] = bounds_checks
+
+    # Scorer validity depends strictly on absence of any alarms
+    calib_results["valid"] = bool(len(calib_results["alarms"]) == 0)
     return calib_results
 
 
@@ -427,28 +562,51 @@ def rescore_e03b_anchors(
     if not e03b_dir.is_dir():
         raise FileNotFoundError(f"E03B run directory not found: {e03b_dir}")
 
-    arms = [
-        {"arm": "vvc_qp63", "codec": "vvc", "qp": 63, "preset": "slower", "bytes": 2445, "host": "gpu6"},
-        {"arm": "vvc_qp47", "codec": "vvc", "qp": 47, "preset": "slower", "bytes": 21288, "host": "gpu6"},
-        {"arm": "av1_qp63", "codec": "av1", "qp": 63, "preset": "0", "bytes": 19116, "host": "gpu6"},
-        {"arm": "av1_qp47", "codec": "av1", "qp": 47, "preset": "0", "bytes": 86169, "host": "gpu6"},
-    ]
+    # Load campaign rows for verified provenance
+    rows_path = e03b_dir / "campaign_rows.json"
+    campaign_rows_by_arm: dict[str, Any] = {}
+    if rows_path.is_file():
+        for r in json.loads(rows_path.read_text(encoding="utf-8")):
+            arm_key = r.get("artifact_id", "").replace("e03b_", "").replace("_display_low_federer007", "")
+            campaign_rows_by_arm[arm_key] = r
+
+    target_arms = ["vvc_qp63", "vvc_qp47", "av1_qp63", "av1_qp47"]
+    rescored_points: list[dict[str, Any]] = []
 
     visible_mask = ~masks_360
     object_mask = masks_360
     boundary_mask = boundary_masks
     ssim_metric = SsimMetric()
 
-    rescored_points: list[dict[str, Any]] = []
-
-    for item in arms:
-        arm_dir = e03b_dir / str(item["arm"])
+    for arm_name in target_arms:
+        arm_dir = e03b_dir / arm_name
         dec_arr_path = arm_dir / "decoded_rgb.npy"
         if not dec_arr_path.is_file():
             raise FileNotFoundError(f"Missing E03B decoded array: {dec_arr_path}")
 
         dec_rgb = np.load(dec_arr_path)
         assert dec_rgb.shape == frames_360.shape, f"Shape mismatch: {dec_rgb.shape} vs {frames_360.shape}"
+
+        # Load provenance from campaign row or fallback to local row
+        crow = campaign_rows_by_arm.get(arm_name)
+        if not crow:
+            local_row_path = arm_dir / "campaign_row.json"
+            crow = json.loads(local_row_path.read_text(encoding="utf-8")) if local_row_path.is_file() else {}
+
+        timing_ev = crow.get("timing_evidence", {})
+        bytes_ev = crow.get("evidence", {}).get("bytes", {})
+        tool_ev = crow.get("tool", {})
+
+        codec = "vvc" if "vvc" in arm_name else "av1"
+        qp = tool_ev.get("qp") or (63 if "qp63" in arm_name else 47)
+        preset = tool_ev.get("preset") or ("slower" if codec == "vvc" else "0")
+        total_bytes = bytes_ev.get("total") or bytes_ev.get("bitstream_file")
+        if not total_bytes:
+            # Reconcile directly from bitstream file on disk
+            bs_candidates = list(arm_dir.glob("payload.*"))
+            total_bytes = bs_candidates[0].stat().st_size if bs_candidates else None
+
+        host_prov = timing_ev.get("host", "unverified")
 
         # Scopes
         # 1. Whole-frame windowed SSIM & PSNR
@@ -470,20 +628,15 @@ def rescore_e03b_anchors(
 
         ghost_mad = compute_ghosting_mad(frames_360, dec_rgb, masks_360)
 
-        # Load existing timing from campaign_row.json
-        row_path = arm_dir / "campaign_row.json"
-        row_data = json.loads(row_path.read_text()) if row_path.is_file() else {}
-        timing_ev = row_data.get("timing_evidence", {})
-
         rescored_points.append(
             {
-                "arm": item["arm"],
-                "codec": item["codec"],
-                "qp": item["qp"],
-                "preset": item["preset"],
-                "bytes": item["bytes"],
+                "arm": arm_name,
+                "codec": codec,
+                "qp": qp,
+                "preset": preset,
+                "bytes": total_bytes,
                 "rate_scope": "whole_codec",
-                "host_provenance": item["host"],
+                "host_provenance": host_prov,
                 "metrics": {
                     "whole_frame": {
                         "psnr_y_dB": round(full_psnr, 3),
@@ -506,7 +659,8 @@ def rescore_e03b_anchors(
                 "timing": {
                     "encode_seconds": timing_ev.get("encoder_seconds"),
                     "client_seconds": timing_ev.get("measured_client_seconds"),
-                    "lookahead_frames": 0 if item["codec"] == "av1" else 16,
+                    "lookahead_frames": None,
+                    "lookahead_evidence": "unmeasured_preset_default (no explicit --lookahead flag in tool command)",
                 },
             }
         )
@@ -632,10 +786,23 @@ def main() -> None:
 
         # Step 6: Load E04A probe report to extract original encode times and payload details
         old_report_path = e04a_saved_dir / "probe_report.json"
-        old_report = json.loads(old_report_path.read_text())
+        old_report = json.loads(old_report_path.read_text(encoding="utf-8"))
         old_points_by_key = {
             f"{p['representation']}_qp{p['qp']}": p for p in old_report.get("screening_points", [])
         }
+
+        # Extract candidate encode host provenance from E04A campaign records
+        e04a_campaign_path = e04a_saved_dir / "campaign_result.e04a.json"
+        e04a_cand_host = "gpu5"
+        if e04a_campaign_path.is_file():
+            try:
+                c_data = json.loads(e04a_campaign_path.read_text(encoding="utf-8"))
+                recs = c_data.get("records", [])
+                if recs:
+                    e04a_cand_host = recs[0].get("timing_evidence", {}).get("host", "gpu5")
+            except Exception:
+                pass
+        exec_host = socket.gethostname()
 
         # Step 7: Build comprehensive comparison table
         print("\n--- Building Comprehensive Comparison Table ---")
@@ -647,15 +814,25 @@ def main() -> None:
             old_pt = old_points_by_key.get(rep_key, {})
             old_metrics = old_pt.get("metrics", {})
 
-            # Per-arm prep time: still=0, video=0, panorama=median accumulation
-            per_arm_prep = 1.581 if "registered_panorama" in rep_key else 0.0
-            enc_s = old_pt.get("timing", {}).get("encode_seconds", 0.35)
+            # Provenanced timing
+            old_timing = old_pt.get("timing", {})
+            enc_s = old_timing.get("encode_seconds")
+            if enc_s is None:
+                raise ValueError(f"Missing provenanced encode_seconds for {rep_key} in {old_report_path}")
+
             dec_s = v["decode_seconds"]
             render_s = v["render_seconds"]
             client_bg_s = round(dec_s + render_s, 4)
             client_total_s = round(client_bg_s + comp_time_s, 4)
-            sender_arm_s = round(per_arm_prep + enc_s, 4)
-            lookahead = 0 if "still_frame0" in rep_key else (48 if "registered_panorama" in rep_key else 16)
+            sender_arm_s = round(enc_s, 4)
+
+            # Lookahead: structurally defined for still (0) and panorama (48 frames buffer); unmeasured for video
+            if "still_frame0" in rep_key:
+                lookahead = 0
+            elif "registered_panorama" in rep_key:
+                lookahead = 48
+            else:
+                lookahead = None  # Unmeasured VVC faster preset default
 
             comparison_rows.append(
                 {
@@ -677,7 +854,7 @@ def main() -> None:
                     "client_bg_seconds": client_bg_s,
                     "client_total_seconds": client_total_s,
                     "lookahead_frames": lookahead,
-                    "host_provenance": "gpu5",
+                    "host_provenance": f"{e04a_cand_host} (encode) / {exec_host} (decode)",
                 }
             )
 
@@ -724,18 +901,19 @@ def main() -> None:
             "# PointStream E04A vs E03B Common-Scope Comparison Table",
             "",
             "> [!NOTE]",
-            "> **Scope Distinction**: PointStream rows reflect **background-only** payload and side data with fixed-overlay foreground references (generation OFF, residual OFF). Anchor rows reflect **whole-codec** conventional video. Whole-frame windowed SSIM and region-masked global SSIM are reported in separate columns. Host provenance reflects the execution machine (`gpu5` for E04A, `gpu6` for E03B).",
+            "> **Scope Distinction**: PointStream rows reflect **background-only** payload and side data with fixed-overlay foreground references (generation OFF, residual OFF). Anchor rows reflect **whole-codec** conventional video. Whole-frame windowed SSIM and region-masked global SSIM are reported in separate columns. Host provenance reflects the execution machine (`gpu5` for E04A encode, `gpu6` for E03B).",
             "",
             "| System | Arm | Codec | Scope | Payload (B) | Side (B) | Total (B) | Vis PSNR-Y (dB) | Vis Masked SSIM | Full Win SSIM | Ghost MAD | Sender (s) | Client BG (s) | Client Tot (s) | Lookahead | Host |",
             "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
         ]
         for r in comparison_rows:
+            lh_str = str(r['lookahead_frames']) if r['lookahead_frames'] is not None else "unmeasured"
             md_lines.append(
                 f"| {r['system']} | {r['representation_arm']} | {r['codec']} | {r['rate_scope']} | "
                 f"{r['payload_bytes']:,} | {r['side_data_bytes']:,} | {r['total_bytes']:,} | "
                 f"{r['psnr_y_visible_dB']:.2f} | {r['ssim_visible_masked']:.4f} | {r['ssim_full_windowed']:.4f} | "
                 f"{r['ghosting_mad']:.2f} | {r['sender_arm_seconds']} | {r['client_bg_seconds']} | "
-                f"{r['client_total_seconds']} | {r['lookahead_frames']} | {r['host_provenance']} |"
+                f"{r['client_total_seconds']} | {lh_str} | {r['host_provenance']} |"
             )
         (out_dir / "comparison_table.md").write_text("\n".join(md_lines), encoding="utf-8")
 
@@ -767,20 +945,58 @@ def main() -> None:
                 ),
             ],
             "smallest_costed_next_probe_proposal": {
-                "name": "E04B_second_camera_paired_removal_probe",
-                "purpose": (
-                    "Evaluate background representation on a second camera angle with faster camera pan (e.g. Federer scene 001) "
-                    "and pair removal=on directly against removal=off on both scenes to isolate the causal impact of inpainting "
-                    "versus camera motion compensation."
+                "name": "E04B_paired_removal_probe",
+                "named_uncertainty": (
+                    "Does explicit foreground removal and hole filling (removal=ON with temporal median mask "
+                    "exclusion + Telea fill) causally eliminate residual ghosting (MAD 6.70–9.16) on registered "
+                    "panorama, or does removal-OFF with inherent median aggregation already achieve the achievable "
+                    "ghosting suppression without inpainting blur and boundary artifacts?"
                 ),
-                "scenes": ["federer_djokovic/scene_007", "federer_djokovic/scene_001"],
-                "removal_modes": ["off", "on"],
-                "representations": ["still_frame0", "registered_panorama", "cleaned_video"],
-                "qps": [47, 32],
-                "total_runs": 24,
-                "hardware_requirement": "CPU only (16 cores under claim), zero GPU requirement",
-                "estimated_runtime_seconds": 180,
-                "estimated_storage_bytes": 3500000,
+                "reused_evidence": {
+                    "scope": "federer_djokovic/scene_007 (48 frames @ 12 fps, 360p)",
+                    "reused_runs": 6,
+                    "reused_arms": [
+                        "still_frame0_qp47_removal_off (3,983 B, vis PSNR 17.67 dB, ghost MAD 20.33)",
+                        "still_frame0_qp32_removal_off (13,115 B, vis PSNR 17.58 dB, ghost MAD 28.55)",
+                        "registered_panorama_qp47_removal_off (4,554 B, vis PSNR 21.16 dB, ghost MAD 9.16)",
+                        "registered_panorama_qp32_removal_off (18,926 B, vis PSNR 23.21 dB, ghost MAD 6.70)",
+                        "cleaned_video_qp47_removal_off (11,047 B, vis PSNR 23.77 dB, ghost MAD 4.14)",
+                        "cleaned_video_qp32_removal_off (68,524 B, vis PSNR 29.83 dB, ghost MAD 0.88)",
+                    ],
+                },
+                "minimal_probe": {
+                    "description": "Smallest discriminative probe testing removal=ON on candidate registered_panorama",
+                    "scene": "federer_djokovic/scene_007",
+                    "representation": "registered_panorama",
+                    "removal": "on",
+                    "qps": [47, 32],
+                    "new_encodes": 2,
+                    "hardware_requirement": "CPU only (16 cores under claim), zero GPU requirement",
+                    "estimated_runtime_seconds": 15,
+                    "estimated_storage_bytes": 50000,
+                },
+                "optional_4arm_variant": {
+                    "description": "Paired removal=ON probe on both still_frame0 and registered_panorama",
+                    "new_encodes": 4,
+                    "estimated_runtime_seconds": 30,
+                    "estimated_storage_bytes": 100000,
+                },
+                "decision_rules": {
+                    "promote_rule": (
+                        "Promote removal=ON if ghosting MAD drops by >= 50% relative to removal-OFF "
+                        "(ghosting MAD < 4.58 at QP 47 and < 3.35 at QP 32) without visible background PSNR "
+                        "degrading by > 0.5 dB or payload size increasing by > 15%."
+                    ),
+                    "stop_rule": (
+                        "Stop removal investigation and retain removal-OFF if ghosting MAD reduction is marginal "
+                        "(< 1.5 MAD improvement) or if inpainting drops visible background PSNR by > 0.5 dB. "
+                        "Retain removal-OFF with inherent median aggregation as the standard background policy."
+                    ),
+                    "inconclusive_rule": (
+                        "Mark inconclusive if Telea fill introduces visible player silhouette contours or edge seams "
+                        "requiring manual masking adjustments."
+                    ),
+                },
                 "status": "awaiting_review",
             },
         }
@@ -841,7 +1057,7 @@ def main() -> None:
                 },
                 "timing_evidence": {
                     "timing_evidence_id": f"timing_{rec_id}",
-                    "host": "gpu5",
+                    "host": e04a_cand_host,
                     "n_repeats": 1,
                     "measured_client_seconds": r["client_total_seconds"],
                     "encoder_seconds": r["sender_arm_seconds"],

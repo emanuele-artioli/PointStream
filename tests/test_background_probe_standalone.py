@@ -86,3 +86,46 @@ def test_decode_standalone_saved_e04a_artifacts() -> None:
         assert meta["rejected"] is False
         assert meta["total_client_seconds"] > 0
 
+
+def test_scorer_calibration_whole_frame_ordering_failure(monkeypatch: pytest.MonkeyPatch) -> None:
+    """When whole-frame ordering fails, run_scorer_calibration must log alarms and mark valid=False."""
+    from scripts.e04a_evidence_completion import run_scorer_calibration
+    from src.components.metrics.ssim import SsimMetric
+
+    rng = np.random.default_rng(101)
+    frames = rng.integers(30, 220, size=(2, 360, 640, 3), dtype=np.uint8)
+    masks = np.zeros((2, 360, 640), dtype=bool)
+    masks[:, 50:150, 50:150] = True
+    boundary = np.zeros_like(masks)
+
+    # Invert score behavior so severe blur gets higher score than mild blur
+    orig_score = SsimMetric.score
+
+    def inverted_score(self: SsimMetric, ref: np.ndarray, pred: np.ndarray) -> float:
+        val = orig_score(self, ref, pred)
+        # Flip severe blur to 0.99 and mild blur to 0.10 to force ordering failure
+        return 0.10 if val > 0.50 else 0.99
+
+    monkeypatch.setattr(SsimMetric, "score", inverted_score)
+    res = run_scorer_calibration(frames, masks, boundary)
+    assert res["valid"] is False
+    assert any("Whole-frame windowed ordering violated" in a for a in res["alarms"])
+
+
+def test_scorer_calibration_identity_and_null_controls() -> None:
+    """Calibration must verify identity unit SSIM and empty-mask safe NaN behavior."""
+    from scripts.e04a_evidence_completion import run_scorer_calibration
+
+    rng = np.random.default_rng(202)
+    frames = rng.integers(20, 240, size=(2, 360, 640, 3), dtype=np.uint8)
+    masks = np.zeros((2, 360, 640), dtype=bool)
+    masks[:, 100:200, 100:200] = True
+    boundary = np.zeros_like(masks)
+
+    res = run_scorer_calibration(frames, masks, boundary)
+    assert res["identity_checks"]["visible"]["passed"] is True
+    assert res["identity_checks"]["full_frame"]["passed"] is True
+    assert res["empty_mask_behavior"]["status"] == "verified_safe_nan_return"
+    assert res["null_controls"]["empty_mask_nan_held"] is True
+
+
