@@ -27,6 +27,10 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+import random
+import subprocess
+import sys
+
 from experiments.long_scenes.loader import (
     load_long_scene_clip,
 )
@@ -34,6 +38,7 @@ from scripts.run_diagnostic_matrix import (
     _augment_objects_with_pose,
 )
 from scripts.train_campaign import (
+    compare_candidates,
     evaluate_checkpoint,
     promote_survivors,
     rank_variants,
@@ -44,6 +49,7 @@ from scripts.train_pix2pix import (
     build_checkpoint_state,
     save_checkpoint_atomic,
 )
+from src.shared.tennis_dataset import TennisSkeletonDataset
 from src.components.generation.spade4tennis_arch import SPADEResNet9Generator
 from src.pipeline.reconstruction.reconstruct import ObjectRequest
 from src.runner.generation_adapter import (
@@ -789,4 +795,393 @@ def test_diagnostic_matrix_control_wiring() -> None:
     assert ctrls["same_seed_determinism_verified"] is True
     assert "gen_on_shuffled_conditioning" in ctrls["shuffled_conditioning"]
     assert "gen_on_no_conditioning" in ctrls["no_conditioning"]
+
+
+# ---------------------------------------------------------------------------
+# 10. E02S Reference Selection, Fresh-Process CLI Continuation & Evaluation
+# ---------------------------------------------------------------------------
+
+
+def test_tennis_dataset_deterministic_reference_selection(tmp_path: Path) -> None:
+    """Verify reference_mode in TennisSkeletonDataset.
+
+    1. 'deterministic' selects reference frame derived from sample index (idx % num_colors),
+       remaining bit-identical across arbitrary changes to global Python RNG state.
+    2. 'first' always selects the first color frame (colors[0]).
+    """
+    track_dir = tmp_path / "v1" / "segmentations" / "scene_01" / "track_01"
+    skel_dir = tmp_path / "v1" / "segmentations" / "scene_01" / "track_01_pose_body"
+    track_dir.mkdir(parents=True)
+    skel_dir.mkdir(parents=True)
+
+    num_frames = 5
+    for i in range(num_frames):
+        c_img = np.full((64, 64, 3), (i + 1) * 40, dtype=np.uint8)
+        s_img = np.full((64, 64, 3), 100, dtype=np.uint8)
+        cv2.imwrite(str(track_dir / f"frame_{i:06d}.png"), c_img)
+        cv2.imwrite(str(skel_dir / f"frame_{i:06d}.png"), s_img)
+
+    ds_det = TennisSkeletonDataset(
+        root_dir=tmp_path,
+        condition="pose_body",
+        include_reference=True,
+        reference_mode="deterministic",
+        target_size=64,
+    )
+    assert len(ds_det) == num_frames
+
+    random.seed(12345)
+    samples_seed1 = [ds_det[i] for i in range(num_frames)]
+    random.seed(98765)
+    samples_seed2 = [ds_det[i] for i in range(num_frames)]
+
+    for i in range(num_frames):
+        skel1, ref1, col1 = samples_seed1[i]
+        skel2, ref2, col2 = samples_seed2[i]
+        assert torch.equal(ref1, ref2), f"Deterministic reference selection altered by random seed at idx {i}"
+        assert torch.equal(ref1, col1)
+
+    ds_first = TennisSkeletonDataset(
+        root_dir=tmp_path,
+        condition="pose_body",
+        include_reference=True,
+        reference_mode="first",
+        target_size=64,
+    )
+    first_ref = ds_first[0][1]
+    for i in range(num_frames):
+        _, ref_i, _ = ds_first[i]
+        assert torch.equal(ref_i, first_ref)
+
+
+def test_fresh_process_trainer_cli_continuation(tmp_path: Path) -> None:
+    """Verify fresh-process CLI training interruption and resumption matches uninterrupted run."""
+    track = tmp_path / "video1" / "segmentations" / "scene_001" / "track_001"
+    skel = tmp_path / "video1" / "segmentations" / "scene_001" / "track_001_pose_body"
+    track.mkdir(parents=True)
+    skel.mkdir(parents=True)
+    for i in range(4):
+        img = np.full((256, 256, 3), i * 50, dtype=np.uint8)
+        cv2.imwrite(str(track / f"frame_{i:06d}.png"), img)
+        cv2.imwrite(str(skel / f"frame_{i:06d}.png"), img)
+
+    env = dict(os.environ, CUDA_VISIBLE_DEVICES="", PYTHONPATH=".")
+
+    # Run A: uninterrupted 2 steps (step 0 and 1)
+    cmd_A = [
+        sys.executable,
+        "scripts/train_pix2pix.py",
+        "--data-root",
+        str(tmp_path),
+        "--condition",
+        "pose_body",
+        "--epochs",
+        "1",
+        "--batch-size",
+        "1",
+        "--img-size",
+        "256",
+        "--num-workers",
+        "0",
+        "--reference-mode",
+        "deterministic",
+        "--seed",
+        "42",
+        "--max-steps-per-epoch",
+        "2",
+        "--checkpoint-interval-sec",
+        "0.0",
+        "--out-weights",
+        str(tmp_path / "out_A.pt"),
+        "--checkpoint-path",
+        str(tmp_path / "ckpt_A.pt"),
+        "--sample-dir",
+        str(tmp_path / "samples_A"),
+    ]
+    res_A = subprocess.run(cmd_A, env=env, capture_output=True, text=True)
+    assert res_A.returncode == 0, f"Run A failed: {res_A.stderr}"
+
+    # Run B1: 1 step (step 0, saves checkpoint)
+    cmd_B1 = [
+        sys.executable,
+        "scripts/train_pix2pix.py",
+        "--data-root",
+        str(tmp_path),
+        "--condition",
+        "pose_body",
+        "--epochs",
+        "1",
+        "--batch-size",
+        "1",
+        "--img-size",
+        "256",
+        "--num-workers",
+        "0",
+        "--reference-mode",
+        "deterministic",
+        "--seed",
+        "42",
+        "--max-steps-per-epoch",
+        "1",
+        "--checkpoint-interval-sec",
+        "0.0",
+        "--out-weights",
+        str(tmp_path / "out_B.pt"),
+        "--checkpoint-path",
+        str(tmp_path / "ckpt_B.pt"),
+        "--sample-dir",
+        str(tmp_path / "samples_B"),
+    ]
+    res_B1 = subprocess.run(cmd_B1, env=env, capture_output=True, text=True)
+    assert res_B1.returncode == 0, f"Run B1 failed: {res_B1.stderr}"
+
+    # Run B2: resume from step 0 and execute step 1
+    cmd_B2 = [
+        sys.executable,
+        "scripts/train_pix2pix.py",
+        "--data-root",
+        str(tmp_path),
+        "--condition",
+        "pose_body",
+        "--epochs",
+        "1",
+        "--batch-size",
+        "1",
+        "--img-size",
+        "256",
+        "--num-workers",
+        "0",
+        "--reference-mode",
+        "deterministic",
+        "--seed",
+        "42",
+        "--resume",
+        "--max-steps-per-epoch",
+        "2",
+        "--checkpoint-interval-sec",
+        "0.0",
+        "--out-weights",
+        str(tmp_path / "out_B.pt"),
+        "--checkpoint-path",
+        str(tmp_path / "ckpt_B.pt"),
+        "--sample-dir",
+        str(tmp_path / "samples_B"),
+    ]
+    res_B2 = subprocess.run(cmd_B2, env=env, capture_output=True, text=True)
+    assert res_B2.returncode == 0, f"Run B2 failed: {res_B2.stderr}"
+
+    ckpt_A = torch.load(tmp_path / "ckpt_A.pt", map_location="cpu")
+    ckpt_B2 = torch.load(tmp_path / "ckpt_B.pt", map_location="cpu")
+
+    for k in ckpt_A["G"]:
+        assert torch.allclose(ckpt_A["G"][k], ckpt_B2["G"][k], atol=1e-5), f"G weight mismatch at {k}"
+
+    for k in ckpt_A["D"]:
+        assert torch.allclose(ckpt_A["D"][k], ckpt_B2["D"][k], atol=1e-5), f"D weight mismatch at {k}"
+
+    assert ckpt_A["opt_G"] is not None and ckpt_B2["opt_G"] is not None
+    assert ckpt_A["opt_D"] is not None and ckpt_B2["opt_D"] is not None
+
+    for s_a, s_b in zip(ckpt_A["opt_G"]["state"].values(), ckpt_B2["opt_G"]["state"].values()):
+        for p in ("exp_avg", "exp_avg_sq"):
+            if p in s_a:
+                assert torch.allclose(s_a[p], s_b[p], atol=1e-5)
+
+    for s_a, s_b in zip(ckpt_A["opt_D"]["state"].values(), ckpt_B2["opt_D"]["state"].values()):
+        for p in ("exp_avg", "exp_avg_sq"):
+            if p in s_a:
+                assert torch.allclose(s_a[p], s_b[p], atol=1e-5)
+
+
+def test_candidate_selection_producer_fields_and_indifference_bands() -> None:
+    """Verify compare_candidates parses producer fields and handles indifference bands correctly."""
+    cand_base = {
+        "metrics": {"total_bytes": 10000, "psnr_mean": 30.0, "ssim_mean": 0.95},
+        "timing_evidence": {"measured_client_seconds": 1.0},
+    }
+    cand_higher_rate = {
+        "metrics": {"total_bytes": 12000, "psnr_mean": 30.0, "ssim_mean": 0.95},
+        "timing_evidence": {"measured_client_seconds": 1.0},
+    }
+    assert compare_candidates(cand_base, cand_higher_rate) == "a_dominates"
+    assert compare_candidates(cand_higher_rate, cand_base) == "b_dominates"
+
+    cand_close = {
+        "metrics": {"total_bytes": 10040, "psnr_mean": 30.05, "ssim_mean": 0.951},
+        "timing_evidence": {"measured_client_seconds": 1.01},
+    }
+    assert compare_candidates(cand_base, cand_close) == "indifferent"
+
+    cand_tradeoff = {
+        "metrics": {"total_bytes": 12000, "psnr_mean": 32.0, "ssim_mean": 0.97},
+        "timing_evidence": {"measured_client_seconds": 1.0},
+    }
+    assert compare_candidates(cand_base, cand_tradeoff) == "incomparable"
+
+
+def test_missing_evidence_cannot_dominate_measured_candidate() -> None:
+    """Verify missing or asymmetric quality/rate evidence returns 'incomparable' and never dominance."""
+    measured_cand = {
+        "metrics": {"total_bytes": 10000, "psnr_mean": 30.0, "ssim_mean": 0.95},
+        "timing_evidence": {"measured_client_seconds": 1.0},
+    }
+    unmeasured_cand = {
+        "metrics": {"total_bytes": 5000},
+        "timing_evidence": {"measured_client_seconds": 0.5},
+    }
+    assert compare_candidates(unmeasured_cand, measured_cand) == "incomparable"
+    assert compare_candidates(measured_cand, unmeasured_cand) == "incomparable"
+
+    unmeasured_cand2 = {
+        "metrics": {"total_bytes": 6000},
+    }
+    assert compare_candidates(unmeasured_cand, unmeasured_cand2) == "incomparable"
+
+
+def test_promote_survivors_preserves_incomparable_tradeoffs() -> None:
+    """Verify promote_survivors preserves candidates with valid trade-offs instead of pruning."""
+    aggregates = {
+        "survivor_low_rate": {
+            "metrics": {"total_bytes": 5000, "psnr_mean": 28.0, "ssim_mean": 0.90},
+            "timing_evidence": {"measured_client_seconds": 1.0},
+            "run_completed": True,
+        },
+        "tradeoff_high_quality": {
+            "metrics": {"total_bytes": 12000, "psnr_mean": 34.0, "ssim_mean": 0.98},
+            "timing_evidence": {"measured_client_seconds": 1.2},
+            "run_completed": True,
+        },
+    }
+    survivors = promote_survivors(["survivor_low_rate", "tradeoff_high_quality"], aggregates)
+    assert "tradeoff_high_quality" in survivors
+    assert "survivor_low_rate" in survivors
+
+
+def test_adapter_handles_actual_producer_control_rows() -> None:
+    """Feed actual 7-corner producer matrix through adapt_diagnostic_matrix_result and check controls."""
+    seven_corner_matrix = {
+        "video": "alcaraz_highlights",
+        "scene": "scene_028",
+        "frames": 16,
+        "matrix": [
+            {
+                "corner": "gen_off_res_off",
+                "generation_on": False,
+                "residual_on": False,
+                "control": "pasted_reference",
+                "delivered_frame_hashes": ["h_paste"],
+                "model_invocation_count": 0,
+            },
+            {
+                "corner": "gen_off_res_on",
+                "generation_on": False,
+                "residual_on": True,
+                "control": "pasted_reference",
+                "delivered_frame_hashes": ["h_res_only"],
+                "model_invocation_count": 0,
+            },
+            {
+                "corner": "gen_on_res_off",
+                "generation_on": True,
+                "residual_on": False,
+                "control": "generator",
+                "delivered_frame_hashes": ["h_gen_1", "h_gen_2"],
+                "delivered_shape": [16, 2160, 3840, 3],
+                "model_invocation_count": 1,
+                "scores": {"psnr_y": 28.3, "ssim": 0.97, "vmaf": 88.0},
+                "timing": {"client_seconds": 24.5, "encoder_seconds": 85.0},
+                "parts": {"residual": 0, "transport_total": 7000},
+                "coded_bytes": 7000,
+            },
+            {
+                "corner": "gen_on_res_on",
+                "generation_on": True,
+                "residual_on": True,
+                "control": "generator",
+                "delivered_frame_hashes": ["h_gen_res"],
+                "model_invocation_count": 1,
+            },
+            {
+                "corner": "gen_on_shuffled_conditioning",
+                "generation_on": True,
+                "residual_on": False,
+                "shuffled_conditioning": True,
+                "control": "shuffled_conditioning",
+                "delivered_frame_hashes": ["h_shuffled_1", "h_shuffled_2"],
+                "model_invocation_count": 1,
+            },
+            {
+                "corner": "gen_on_no_conditioning",
+                "generation_on": True,
+                "residual_on": False,
+                "no_conditioning": True,
+                "control": "no_conditioning",
+                "delivered_frame_hashes": ["h_blank_1", "h_blank_2"],
+                "model_invocation_count": 1,
+            },
+            {
+                "corner": "gen_on_res_off_same_seed",
+                "generation_on": True,
+                "residual_on": False,
+                "control": "generator",
+                "delivered_frame_hashes": ["h_gen_1", "h_gen_2"],
+                "model_invocation_count": 1,
+            },
+        ],
+    }
+    adapted = adapt_diagnostic_matrix_result(
+        seven_corner_matrix,
+        run_id="run_e02s_test",
+        backend_name="pix2pix",
+        arch="pix2pix",
+        checkpoint_sha256="0" * 64,
+    )
+    assert adapted["controls"]["same_seed_determinism_tested"] is True
+    assert adapted["controls"]["same_seed_deterministic"] is True
+    assert adapted["controls"]["conditioned_vs_shuffled_tested"] is True
+    assert adapted["controls"]["conditioning_sensitive"] is True
+    assert adapted["metrics"]["total_bytes"] == 7000
+    assert adapted["metrics"]["psnr_mean"] == 28.3
+    assert adapted["metrics"]["ssim_mean"] == 0.97
+    assert adapted["timing_evidence"]["measured_client_seconds"] == 24.5
+    valid, reasons = validate_generation_result(adapted)
+    assert valid, f"Validation failed: {reasons}"
+
+
+def test_unsupported_worker_mode_warning(caplog: pytest.LogCaptureFixture) -> None:
+    """Verify warning is emitted when num_workers > 0 with resume."""
+    import argparse
+    import logging
+    from unittest.mock import patch
+
+    mock_args = argparse.Namespace(
+        resume=True,
+        checkpoint_path="/nonexistent/path/ckpt.pt",
+        num_workers=4,
+        seed=42,
+        lr=0.0002,
+        b1=0.5,
+        b2=0.999,
+        data_root=".",
+        img_size=256,
+        condition="pose_body",
+        reference_mode="deterministic",
+        batch_size=1,
+        checkpoint_interval_sec=3600.0,
+        epochs=1,
+        max_steps_per_epoch=None,
+    )
+
+    with caplog.at_level(logging.WARNING):
+        from scripts.train_pix2pix import main_worker
+        with patch("scripts.train_pix2pix.torch.cuda.is_available", return_value=False):
+            with patch("scripts.train_pix2pix.TennisSkeletonDataset"):
+                with patch("scripts.train_pix2pix.DataLoader", side_effect=RuntimeError("stop_early")):
+                    try:
+                        main_worker(0, 1, mock_args)
+                    except Exception:
+                        pass
+
+    assert any("Worker mode notice: num_workers=4 > 0" in record.message for record in caplog.records)
+
 

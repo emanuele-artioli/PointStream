@@ -850,13 +850,29 @@ def is_valid_eval(agg: dict[str, Any] | None) -> bool:
 
 DEFAULT_RATE_INDIFFERENCE_BAND: float = 0.02  # Practical indifference band: 2% total rate
 DEFAULT_QUALITY_INDIFFERENCE_BAND: float = 0.10  # Practical indifference band: 0.10 dB PSNR
+DEFAULT_SSIM_INDIFFERENCE_BAND: float = 0.005  # Practical indifference band: 0.005 SSIM
 DEFAULT_RESOURCE_INDIFFERENCE_BAND: float = 0.05  # Practical indifference band: 5% client latency
 
 
 def extract_candidate_metrics(data: dict[str, Any]) -> dict[str, float | None]:
     """Extract comparable rate, fidelity, and resource metrics from candidate evaluation data."""
-    total_bytes = data.get("total_bytes")
-    residual_bytes = data.get("residual_bytes")
+    raw_metrics = data.get("metrics")
+    metrics_dict: dict[str, Any] = raw_metrics if isinstance(raw_metrics, dict) else {}
+    raw_timing = data.get("timing_evidence")
+    raw_timing_legacy = data.get("timing")
+    timing_dict: dict[str, Any]
+    if isinstance(raw_timing, dict):
+        timing_dict = raw_timing
+    elif isinstance(raw_timing_legacy, dict):
+        timing_dict = raw_timing_legacy
+    else:
+        timing_dict = {}
+
+    total_bytes = data.get("total_bytes") if data.get("total_bytes") is not None else metrics_dict.get("total_bytes")
+    residual_bytes = data.get("residual_bytes") if data.get("residual_bytes") is not None else metrics_dict.get("residual_bytes")
+    if total_bytes is None and data.get("coded_bytes") is not None:
+        total_bytes = data.get("coded_bytes")
+
     rate: float | None = None
     if total_bytes is not None and float(total_bytes) > 0:
         rate = float(total_bytes)
@@ -865,13 +881,35 @@ def extract_candidate_metrics(data: dict[str, Any]) -> dict[str, float | None]:
     elif total_bytes is not None:
         rate = float(total_bytes)
 
-    psnr = float(data["psnr_mean"]) if data.get("psnr_mean") is not None else None
-    ssim = float(data["ssim_mean"]) if data.get("ssim_mean") is not None else None
-    client_sec = (
-        float(data["measured_client_seconds"])
+    psnr_raw = data.get("psnr_mean") if data.get("psnr_mean") is not None else metrics_dict.get("psnr_mean")
+    if psnr_raw is None:
+        raw_scores = data.get("scores")
+        scores_dict: dict[str, Any] = raw_scores if isinstance(raw_scores, dict) else {}
+        psnr_raw = data.get("psnr_y") if data.get("psnr_y") is not None else scores_dict.get("psnr_y")
+    psnr = float(psnr_raw) if psnr_raw is not None else None
+
+    ssim_raw = data.get("ssim_mean") if data.get("ssim_mean") is not None else metrics_dict.get("ssim_mean")
+    if ssim_raw is None:
+        raw_scores = data.get("scores")
+        scores_dict = raw_scores if isinstance(raw_scores, dict) else {}
+        ssim_raw = data.get("ssim") if data.get("ssim") is not None else scores_dict.get("ssim")
+    ssim = float(ssim_raw) if ssim_raw is not None else None
+
+    client_sec_raw = (
+        data.get("measured_client_seconds")
         if data.get("measured_client_seconds") is not None
-        else (float(data["client_seconds"]) if data.get("client_seconds") is not None else None)
+        else (
+            timing_dict.get("measured_client_seconds")
+            if timing_dict.get("measured_client_seconds") is not None
+            else (
+                data.get("client_seconds")
+                if data.get("client_seconds") is not None
+                else timing_dict.get("client_seconds")
+            )
+        )
     )
+    client_sec = float(client_sec_raw) if client_sec_raw is not None else None
+
     return {
         "rate": rate,
         "psnr": psnr,
@@ -886,48 +924,83 @@ def compare_candidates(
     *,
     rate_band: float = DEFAULT_RATE_INDIFFERENCE_BAND,
     quality_band: float = DEFAULT_QUALITY_INDIFFERENCE_BAND,
+    ssim_band: float = DEFAULT_SSIM_INDIFFERENCE_BAND,
     resource_band: float = DEFAULT_RESOURCE_INDIFFERENCE_BAND,
 ) -> str:
-    """Compare two candidates across total-rate, quality, and resource budgets.
+    """Compare two candidates across total-rate, quality (PSNR & SSIM), and resource budgets.
 
     Returns:
         'a_dominates': cand_a is strictly superior to cand_b outside indifference bands
         'b_dominates': cand_b is strictly superior to cand_a outside indifference bands
-        'indifferent': both candidates are within practical indifference bands
-        'incomparable': trade-off exists (e.g. higher rate but higher quality, or slower client)
+        'indifferent': both candidates are within practical indifference bands on all dimensions
+        'incomparable': trade-off exists or evidence is missing/incomparable
     """
     m_a = extract_candidate_metrics(cand_a)
     m_b = extract_candidate_metrics(cand_b)
 
-    if m_a["rate"] is None or m_b["rate"] is None:
+    rate_a = m_a["rate"]
+    rate_b = m_b["rate"]
+    if rate_a is None or rate_b is None:
         return "incomparable"
 
-    ref_rate = max(1.0, (m_a["rate"] + m_b["rate"]) / 2.0)
-    rate_rel_diff = (m_b["rate"] - m_a["rate"]) / ref_rate
+    psnr_a = m_a["psnr"]
+    psnr_b = m_b["psnr"]
+    ssim_a = m_a["ssim"]
+    ssim_b = m_b["ssim"]
+    client_a = m_a["client_sec"]
+    client_b = m_b["client_sec"]
 
-    psnr_diff = (m_a["psnr"] - m_b["psnr"]) if (m_a["psnr"] is not None and m_b["psnr"] is not None) else 0.0
+    # Missing evidence rule: an incomplete candidate without quality or client latency
+    # CANNOT dominate, nor be dominated by, a measured candidate.
+    # If one has quality/resource evidence and the other is missing it, they are incomparable.
+    if (psnr_a is not None) != (psnr_b is not None):
+        return "incomparable"
+    if (ssim_a is not None) != (ssim_b is not None):
+        return "incomparable"
+    if (client_a is not None) != (client_b is not None):
+        return "incomparable"
 
-    client_rel_diff = 0.0
-    if m_a["client_sec"] is not None and m_b["client_sec"] is not None:
-        ref_sec = max(1e-4, (m_a["client_sec"] + m_b["client_sec"]) / 2.0)
-        client_rel_diff = (m_b["client_sec"] - m_a["client_sec"]) / ref_sec
+    # If BOTH candidates are completely missing objective quality, rate-distortion dominance cannot be claimed
+    if psnr_a is None and ssim_a is None:
+        return "incomparable"
+
+    ref_rate = max(1.0, (rate_a + rate_b) / 2.0)
+    rate_rel_diff = (rate_b - rate_a) / ref_rate
 
     eps = 1e-7
     a_better_rate = rate_rel_diff > rate_band + eps
     b_better_rate = rate_rel_diff < -(rate_band + eps)
-    a_better_quality = psnr_diff > quality_band + eps
-    b_better_quality = psnr_diff < -(quality_band + eps)
-    a_better_client = client_rel_diff > resource_band + eps
-    b_better_client = client_rel_diff < -(resource_band + eps)
 
-    a_strictly_better = bool(a_better_rate or a_better_quality or a_better_client)
-    b_strictly_better = bool(b_better_rate or b_better_quality or b_better_client)
+    a_better_psnr = False
+    b_better_psnr = False
+    if psnr_a is not None and psnr_b is not None:
+        psnr_diff = psnr_a - psnr_b
+        a_better_psnr = psnr_diff > quality_band + eps
+        b_better_psnr = psnr_diff < -(quality_band + eps)
 
-    if a_strictly_better and not b_strictly_better:
+    a_better_ssim = False
+    b_better_ssim = False
+    if ssim_a is not None and ssim_b is not None:
+        ssim_diff = ssim_a - ssim_b
+        a_better_ssim = ssim_diff > ssim_band + eps
+        b_better_ssim = ssim_diff < -(ssim_band + eps)
+
+    a_better_client = False
+    b_better_client = False
+    if client_a is not None and client_b is not None:
+        ref_sec = max(1e-4, (client_a + client_b) / 2.0)
+        client_rel_diff = (client_b - client_a) / ref_sec
+        a_better_client = client_rel_diff > resource_band + eps
+        b_better_client = client_rel_diff < -(resource_band + eps)
+
+    a_wins_any = bool(a_better_rate or a_better_psnr or a_better_ssim or a_better_client)
+    b_wins_any = bool(b_better_rate or b_better_psnr or b_better_ssim or b_better_client)
+
+    if a_wins_any and not b_wins_any:
         return "a_dominates"
-    elif b_strictly_better and not a_strictly_better:
+    elif b_wins_any and not a_wins_any:
         return "b_dominates"
-    elif not a_strictly_better and not b_strictly_better:
+    elif not a_wins_any and not b_wins_any:
         return "indifferent"
     else:
         return "incomparable"
@@ -996,6 +1069,7 @@ def promote_survivors(
     aggregate_by_variant: dict[str, dict[str, Any]] | None = None,
     min_diff_threshold: float = DEFAULT_RATE_INDIFFERENCE_BAND,
     quality_indifference_band: float = DEFAULT_QUALITY_INDIFFERENCE_BAND,
+    ssim_indifference_band: float = DEFAULT_SSIM_INDIFFERENCE_BAND,
     resource_indifference_band: float = DEFAULT_RESOURCE_INDIFFERENCE_BAND,
 ) -> list[str]:
     """Select survivors for the next rung.
@@ -1026,6 +1100,7 @@ def promote_survivors(
                     s_data,
                     rate_band=min_diff_threshold,
                     quality_band=quality_indifference_band,
+                    ssim_band=ssim_indifference_band,
                     resource_band=resource_indifference_band,
                 )
                 if relation in ("indifferent", "incomparable", "a_dominates"):

@@ -4,6 +4,7 @@ import logging
 import math
 import os
 from pathlib import Path
+import random
 import time
 from typing import Any
 
@@ -240,6 +241,7 @@ def build_checkpoint_state(
         "rng_torch": rng_torch,
         "rng_cuda": rng_cuda,
         "rng_numpy": np.random.get_state(),
+        "rng_python": random.getstate(),
         "timestamp_unix": time.time(),
     }
 
@@ -255,8 +257,18 @@ def main_worker(gpu, ngpus_per_node, args):
             rank=gpu
         )
     
-    torch.cuda.set_device(gpu)
-    device = torch.device(f"cuda:{gpu}")
+    if torch.cuda.is_available():
+        torch.cuda.set_device(gpu)
+        device = torch.device(f"cuda:{gpu}")
+    else:
+        device = torch.device("cpu")
+
+    base_seed = getattr(args, "seed", 42)
+    torch.manual_seed(base_seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(base_seed)
+    np.random.seed(base_seed)
+    random.seed(base_seed)
 
     generator = UNetGenerator().to(device)
     discriminator = PatchGANDiscriminator().to(device)
@@ -264,7 +276,6 @@ def main_worker(gpu, ngpus_per_node, args):
     start_epoch = 0
     start_step = 0
     checkpoint = None
-    base_seed = getattr(args, "seed", 42)
     if args.resume and os.path.exists(args.checkpoint_path):
         if is_main_process:
             logging.info(f"Resuming from checkpoint {args.checkpoint_path}")
@@ -295,6 +306,8 @@ def main_worker(gpu, ngpus_per_node, args):
             torch.cuda.set_rng_state(c_rng)
         if "rng_numpy" in checkpoint and checkpoint["rng_numpy"] is not None:
             np.random.set_state(checkpoint["rng_numpy"])
+        if "rng_python" in checkpoint and checkpoint["rng_python"] is not None:
+            random.setstate(checkpoint["rng_python"])
     else:
         generator.apply(weights_init_normal)
         discriminator.apply(weights_init_normal)
@@ -316,8 +329,22 @@ def main_worker(gpu, ngpus_per_node, args):
     criterion_GAN = nn.BCEWithLogitsLoss().to(device)
     criterion_pixelwise = nn.L1Loss().to(device)
 
-    dataset = TennisSkeletonDataset(args.data_root, target_size=args.img_size, include_reference=True,
-                                    condition=args.condition)
+    ref_mode = getattr(args, "reference_mode", "deterministic")
+    dataset = TennisSkeletonDataset(
+        args.data_root,
+        target_size=args.img_size,
+        include_reference=True,
+        condition=args.condition,
+        reference_mode=ref_mode,
+    )
+
+    if args.resume and getattr(args, "num_workers", 0) > 0:
+        logging.warning(
+            "Worker mode notice: num_workers=%d > 0 requested with resume. "
+            "Multi-process async worker DataLoader prefetching cannot guarantee per-worker RNG restoration across process restarts. "
+            "Constrain to num_workers=0 for verified bit-identical fresh-process continuation.",
+            args.num_workers,
+        )
 
     # Resolve batch size, defaulting to 64 if 'auto' was passed to better utilize 48GB VRAM
     batch_size = 64 if str(args.batch_size).lower() == "auto" else int(args.batch_size)
@@ -332,14 +359,18 @@ def main_worker(gpu, ngpus_per_node, args):
         rank=gpu,
     )
 
+    dl_gen = torch.Generator()
+    dl_gen.manual_seed(base_seed + start_epoch)
+
     dataloader = DataLoader(
         dataset, 
         batch_size=batch_size, 
         shuffle=False, 
         num_workers=args.num_workers,
-        pin_memory=True,
+        pin_memory=(torch.cuda.is_available() and device.type == "cuda"),
         drop_last=False,
         sampler=sampler,
+        generator=dl_gen,
         persistent_workers=(args.num_workers > 0)
     )
 
@@ -374,8 +405,13 @@ def main_worker(gpu, ngpus_per_node, args):
         else:
             iterator = enumerate(dataloader)
 
+        max_steps = getattr(args, "max_steps_per_epoch", None)
+        last_step_executed = None
         for batch_offset, (real_A, ref_img, real_B) in iterator:
             i = current_start_step + batch_offset
+            if max_steps is not None and i >= max_steps:
+                break
+            last_step_executed = i
 
             real_A = real_A.to(device)
             ref_img = ref_img.to(device)
@@ -429,6 +465,11 @@ def main_worker(gpu, ngpus_per_node, args):
             loss_G.backward()
             optimizer_G.step()
 
+            last_real_A = real_A
+            last_ref_img = ref_img
+            last_real_B = real_B
+            last_fake_B = fake_B
+
             if is_main_process:
                 pbar.set_postfix({"D_loss": f"{loss_D.item():.4f}", "G_loss": f"{loss_G.item():.4f}"})
                 now = time.time()
@@ -457,18 +498,28 @@ def main_worker(gpu, ngpus_per_node, args):
 
         start_step = 0
 
-        if is_main_process:
-            sample_img = torch.cat((real_A[:4], ref_img[:4], real_B[:4], fake_B[:4]), -1)
+        if is_main_process and "last_fake_B" in locals():
+            sample_img = torch.cat(
+                (
+                    last_real_A[:4].detach().cpu(),
+                    last_ref_img[:4].detach().cpu(),
+                    last_real_B[:4].detach().cpu(),
+                    last_fake_B[:4].detach().cpu(),
+                ),
+                -1,
+            )
             vutils.save_image(sample_img, f"{args.sample_dir}/epoch_{epoch:03d}.png", nrow=4, normalize=True)
 
             now = time.time()
+            epoch_completed = (last_step_executed is not None and last_step_executed == total_batches - 1)
+            step_to_save = (total_batches - 1) if epoch_completed else (last_step_executed if last_step_executed is not None else 0)
             # Wall-clock checkpointing (or every 10 epochs or final epoch)
             if (epoch + 1) % 10 == 0 or (now - last_checkpoint_time >= ckpt_interval) or (epoch + 1 == args.epochs):
                 state_dict_G = generator.module.state_dict() if ngpus_per_node > 1 else generator.state_dict()
                 save_checkpoint_atomic(state_dict_G, args.out_weights)
                 ckpt_state = build_checkpoint_state(
                     epoch=epoch,
-                    step=total_batches - 1,
+                    step=step_to_save,
                     total_steps=total_batches,
                     generator=generator,
                     discriminator=discriminator,
@@ -507,9 +558,14 @@ def main():
     parser.add_argument("--checkpoint-path", type=str, default="assets/weights/pix2pix_checkpoint.pt")
     parser.add_argument("--checkpoint-interval-sec", type=float, default=3600.0,
                         help="Periodic checkpoint wall-clock interval in seconds (default: 3600.0)")
-    parser.add_argument("--seed", type=int, default=42, help="Base random seed for dataset and model (default: 42)")
+    parser.add_argument("--seed", type=int, default=42, help="Base random seed (default: 42)")
     parser.add_argument("--sample-dir", type=str, default="assets/samples")
     parser.add_argument("--resume", action="store_true", help="Resume training from checkpoint")
+    parser.add_argument("--reference-mode", type=str, default="deterministic",
+                        choices=["deterministic", "first", "random"],
+                        help="Reference selection mode for TennisSkeletonDataset (default: deterministic)")
+    parser.add_argument("--max-steps-per-epoch", type=int, default=None,
+                        help="Optional cap on steps per epoch for fast integration tests")
     args = parser.parse_args()
 
     os.makedirs(os.path.dirname(args.out_weights), exist_ok=True)
