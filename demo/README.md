@@ -94,3 +94,5 @@ PYTHONPATH=. /home/itec/emanuele/.conda/envs/pointstream/bin/python demo/pitch/s
 - **Benchmark Results JSON**: `demo/outputs/results/comparison_results.json`
 - **Side-by-Side Video**: `demo/outputs/pitch/side_by_side_demo_clip_02_factory001_worker001_00002.mp4`
 
+Live copy of `demo/outputs/pitch` (auto-deploys from `main`): [emanueleartioli.com/pointstream](https://emanueleartioli.com/pointstream/)
+
