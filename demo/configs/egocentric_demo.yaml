@@ -1,0 +1,27 @@
+dataset:
+  repo_id: "builddotai/Egocentric-10K"
+  tar_filename: "factory_001/workers/worker_001/factory001_worker001_part00.tar"
+  raw_dir: "/home/itec/emanuele/Datasets/Egocentric-10K/raw"
+  curated_dir: "/home/itec/emanuele/Datasets/Egocentric-10K/curated"
+  same_worker_only: true
+  min_hand_confidence: 0.6
+
+overfit_model:
+  device: "cuda:1"
+  batch_size: 8
+  epochs: 40
+  learning_rate: 0.0002
+  image_size: 256
+  checkpoint_path: "demo/outputs/models/overfit_generator.pt"
+
+evaluation:
+  target_compression_ratio: 10
+  av1_encoder: "libsvtav1"
+  bitrate_ladder_kbps: [200, 350, 500, 800, 1500, 3000]
+  metrics: ["psnr", "ssim", "lpips", "dists", "vmaf", "hand_mpjpe", "hand_detection_rate"]
+  enable_deblocking_ablation: true
+
+output:
+  results_dir: "demo/outputs/results"
+  pitch_dir: "demo/outputs/pitch"
+

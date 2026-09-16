@@ -1,0 +1,5 @@
+# Ignore heavy model weights (>100MB, rejected by GitHub) and intermediate results
+outputs/models/
+outputs/results/
+__pycache__/
+*.py[cod]

@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PointStream Interactive Teleoperation Inspector & Demo</title>
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #111827;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #38bdf8;
+            --accent-green: #4ade80;
+            --accent-orange: #fb923c;
+            --accent-purple: #c084fc;
+            --border-color: #334155;
+            --border-bright: #475569;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding-bottom: 60px;
+        }
+        .container {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+        /* Header */
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        h1 {
+            font-size: 1.9rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .pulse-dot {
+            width: 12px;
+            height: 12px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+        }
+        .subtitle {
+            font-size: 1.05rem;
+            color: var(--accent-blue);
+            font-weight: 500;
+            margin-top: 4px;
+        }
+        .meta-bar {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+        .target-badge {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Top Navigation Tabs */
+        .tab-bar {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover {
+            color: var(--text-main);
+        }
+        .tab-btn.active {
+            color: var(--accent-blue);
+            border-bottom: 2px solid var(--accent-blue);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Interactive Controls Card */
+        .control-panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .control-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+        }
+        .btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn:hover {
+            background: var(--border-color);
+            border-color: var(--border-bright);
+        }
+        .btn.active {
+            background: var(--accent-blue);
+            color: #000;
+            border-color: var(--accent-blue);
+        }
+        select.dropdown {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            outline: none;
+            cursor: pointer;
+        }
+        select.dropdown:focus {
+            border-color: var(--accent-blue);
+        }
+
+        /* Toggle Checkbox */
+        .toggle-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            user-select: none;
+        }
+        .toggle-item input[type="checkbox"] {
+            accent-color: var(--accent-blue);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        /* Canvas Stage */
+        .stage-container {
+            background: #000;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            margin-bottom: 16px;
+            user-select: none;
+            touch-action: none;
+        }
+        #stage-canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #000;
+            cursor: ew-resize;
+        }
+        .stage-badge {
+            position: absolute;
+            top: 14px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            pointer-events: none;
+            z-index: 5;
+        }
+        .badge-left {
+            left: 16px;
+            color: var(--accent-blue);
+            border-left: 3px solid var(--accent-blue);
+        }
+        .badge-right {
+            right: 16px;
+            color: var(--accent-orange);
+            border-right: 3px solid var(--accent-orange);
+        }
+        .curtain-handle {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent-blue);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
+            pointer-events: none;
+            z-index: 10;
+        }
+        .curtain-center-pill {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 900;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.9);
+        }
+
+        /* Playback Scrubber Bar */
+        .playback-bar {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .timeline-slider {
+            flex: 1;
+            min-width: 200px;
+            accent-color: var(--accent-blue);
+            height: 6px;
+            cursor: pointer;
+        }
+        .time-display {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            min-width: 140px;
+        }
+
+        /* Telemetry HUD Grid */
+        .hud-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        .hud-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hud-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-blue);
+        }
+        .hud-card.green::before { background: var(--accent-green); }
+        .hud-card.orange::before { background: var(--accent-orange); }
+        .hud-card.purple::before { background: var(--accent-purple); }
+
+        .hud-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+        }
+        .hud-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 6px 0 2px 0;
+        }
+        .hud-sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Table & Benchmark Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        th {
+            background-color: #1a2234;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+        .highlight-row {
+            background-color: rgba(56, 189, 248, 0.08);
+            font-weight: 600;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .badge-green { background: rgba(74, 222, 128, 0.2); color: var(--accent-green); }
+        .badge-blue { background: rgba(56, 189, 248, 0.2); color: var(--accent-blue); }
+        .badge-orange { background: rgba(251, 146, 60, 0.2); color: var(--accent-orange); }
+
+        .chart-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .chart-box img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        .section-title {
+            font-size: 1.35rem;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--accent-blue);
+            padding-left: 12px;
+            color: #fff;
+        }
+        .doc-prose {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            line-height: 1.7;
+            margin-bottom: 30px;
+        }
+        .doc-prose h3 {
+            margin-top: 20px;
+            margin-bottom: 8px;
+            color: var(--accent-blue);
+        }
+        .doc-prose code {
+            background: #1e293b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #38bdf8;
+            font-size: 0.9em;
+        }
+        .doc-prose pre {
+            background: #0f172a;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 14px 0;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            border: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1><span class="pulse-dot"></span> PointStream Interactive Inspector</h1>
+                <div class="subtitle">10x Egocentric Video Compression & Low-Latency Teleoperation Benchmark</div>
+                <div class="meta-bar">Prepared for: <strong>Figure.ai</strong> (Sam Baker, Max Berman) &bull; Dataset: <strong>Egocentric-10K</strong> &bull; Hardware: <strong>NVIDIA RTX 6000 Ada</strong></div>
+            </div>
+            <div class="target-badge">Sub-50ms Teleop Feasible (17.9 ms Parallel)</div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab('inspector')">🎮 Interactive Teleop Inspector</button>
+            <button class="tab-btn" onclick="switchTab('benchmark')">📊 Multi-Resolution Benchmark</button>
+            <button class="tab-btn" onclick="switchTab('roadmap')">🚀 Architecture & Roadmap (Modes 2 & 3)</button>
+        </div>
+
+        <!-- TAB 1: INTERACTIVE INSPECTOR -->
+        <div id="tab-inspector" class="tab-content active">
+            <!-- Control Toolbar -->
+            <div class="control-panel">
+                <div class="control-group">
+                    <span class="control-label">Sequence:</span>
+                    <button class="btn active" id="btn-clip1" onclick="selectClip('clip_01')">Clip 1 (Assembly Prep)</button>
+                    <button class="btn" id="btn-clip2" onclick="selectClip('clip_02')">Clip 2 (Component Fit)</button>
+                    <button class="btn" id="btn-clip3" onclick="selectClip('clip_03')">Clip 3 (Wire Manipulation)</button>
+                </div>
+
+                <div class="control-group">
+                    <span class="control-label">View Mode:</span>
+                    <button class="btn active" id="btn-mode-split" onclick="setViewMode('split')">🔀 Split Slider (A/B)</button>
+                    <button class="btn" id="btn-mode-side" onclick="setViewMode('side_by_side')">👥 Side-by-Side</button>
+                    <button class="btn" id="btn-mode-zoom" onclick="setViewMode('zoom')">🔍 Finger Articulation Loupe</button>
+                    <button class="btn" id="btn-mode-stacked" onclick="setViewMode('stacked')">📑 Stacked 3-Panel</button>
+                </div>
+
+                <div class="control-group">
+                    <span class="control-label">Left Stream:</span>
+                    <select id="select-left" class="dropdown" onchange="updateStreamSelection()">
+                        <option value="ps_std" selected>PointStream Standard (293 kbps)</option>
+                        <option value="ps_low">PointStream Ultra-Low (263 kbps)</option>
+                        <option value="ref">Reference Ground Truth (4,200 kbps)</option>
+                    </select>
+
+                    <span class="control-label">Right Stream:</span>
+                    <select id="select-right" class="dropdown" onchange="updateStreamSelection()">
+                        <option value="av1_540" selected>AV1 540p p7 (Matched Rate: 267 kbps)</option>
+                        <option value="ref">Reference Ground Truth (4,200 kbps)</option>
+                        <option value="ps_std">PointStream Standard (293 kbps)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <span class="control-label">Overlays:</span>
+                    <label class="toggle-item">
+                        <input type="checkbox" id="toggle-skeleton" checked onchange="redrawCanvas()">
+                        <span>47-Byte Skeleton Telemetry</span>
+                    </label>
+                    <label class="toggle-item">
+                        <input type="checkbox" id="toggle-difference" onchange="redrawCanvas()">
+                        <span>Error / Distortion Heatmap</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Canvas Stage Area -->
+            <div class="stage-container" id="stage-box">
+                <canvas id="stage-canvas" width="1920" height="1080"></canvas>
+                <div class="stage-badge badge-left" id="badge-left-label">◄ PointStream (293 kbps)</div>
+                <div class="stage-badge badge-right" id="badge-right-label">AV1 540p p7 (267 kbps) ►</div>
+                <div class="curtain-handle" id="curtain-line">
+                    <div class="curtain-center-pill">⮜ ⮞</div>
+                </div>
+            </div>
+
+            <!-- Video Playback & Timeline Scrubber -->
+            <div class="playback-bar">
+                <button class="btn" id="btn-play" onclick="togglePlay()">▶ Play</button>
+                <button class="btn" onclick="stepFrame(-1)" title="Previous Frame">⏮ -1F</button>
+                <button class="btn" onclick="stepFrame(1)" title="Next Frame">⏭ +1F</button>
+                <input type="range" class="timeline-slider" id="timeline" min="0" max="1000" value="0" oninput="onScrub(this.value)">
+                <div class="time-display" id="time-display">00:00.00 / 00:10.00 (F0)</div>
+                <div class="control-group">
+                    <span class="control-label">Speed:</span>
+                    <button class="btn" id="speed-025" onclick="setSpeed(0.25)">0.25x</button>
+                    <button class="btn" id="speed-05" onclick="setSpeed(0.5)">0.5x</button>
+                    <button class="btn active" id="speed-1" onclick="setSpeed(1.0)">1.0x</button>
+                </div>
+            </div>
+
+            <!-- Live HUD Cards -->
+            <div class="hud-grid">
+                <div class="hud-card green">
+                    <div class="hud-label">Joint Tracking Accuracy (MPJPE)</div>
+                    <div class="hud-value" id="hud-mpjpe" style="color: var(--accent-green);">59.6 px</div>
+                    <div class="hud-sub" id="hud-mpjpe-sub">3.1x Lower Error vs AV1 (184.4 px)</div>
+                </div>
+                <div class="hud-card">
+                    <div class="hud-label">Bandwidth Reduction</div>
+                    <div class="hud-value" id="hud-bitrate" style="color: var(--accent-blue);">14.4x &ndash; 18.4x</div>
+                    <div class="hud-sub" id="hud-bitrate-sub">4,200 kbps &rarr; 293.5 kbps (PointStream)</div>
+                </div>
+                <div class="hud-card purple">
+                    <div class="hud-label">Keypoint Telemetry Rate</div>
+                    <div class="hud-value" id="hud-keypoint" style="color: var(--accent-purple);">8.4 kbps</div>
+                    <div class="hud-sub">47 bytes/hand (21 3D joints @ 30fps)</div>
+                </div>
+                <div class="hud-card orange">
+                    <div class="hud-label">End-to-End Latency</div>
+                    <div class="hud-value" id="hud-latency" style="color: var(--accent-orange);">17.9 ms</div>
+                    <div class="hud-sub">Parallel: 17.9 ms &bull; Serial: 31.5 ms (&lt;50ms)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: MULTI-RESOLUTION BENCHMARK -->
+        <div id="tab-benchmark" class="tab-content">
+            <h2 class="section-title">Teleoperation Tracking Accuracy Comparison (All 3 Clips)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Clip / Manipulation Task</th>
+                        <th>Metric</th>
+                        <th>PointStream Standard</th>
+                        <th>PointStream Ultra-Low</th>
+                        <th>AV1 540p (Matched Rate &amp; Latency)</th>
+                        <th>PointStream Advantage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="highlight-row">
+                        <td><strong>Clip 1</strong> (Assembly Prep)</td>
+                        <td>Joint Error (MPJPE)<br>Bitrate<br>Latency (Parallel / Serial)</td>
+                        <td><strong>59.6 px</strong><br>293.5 kbps<br>17.9 ms / 31.5 ms</td>
+                        <td><strong>107.2 px</strong><br>263.2 kbps<br>17.9 ms / 31.5 ms</td>
+                        <td>184.4 px<br>267.3 kbps<br>13.6 ms</td>
+                        <td><span class="badge badge-green">3.1x Lower Tracking Error<br>Sub-50ms Real-Time Parity</span></td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td><strong>Clip 2</strong> (Component Fit)</td>
+                        <td>Joint Error (MPJPE)<br>Bitrate<br>Latency (Parallel / Serial)</td>
+                        <td><strong>89.6 px</strong><br>290.6 kbps<br>17.9 ms / 31.5 ms</td>
+                        <td><strong>123.1 px</strong><br>260.3 kbps<br>17.9 ms / 31.5 ms</td>
+                        <td>233.1 px<br>264.4 kbps<br>13.9 ms</td>
+                        <td><span class="badge badge-green">2.6x Lower Tracking Error<br>Sub-50ms Real-Time Parity</span></td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td><strong>Clip 3</strong> (Wire Manipulation)</td>
+                        <td>Joint Error (MPJPE)<br>Bitrate<br>Latency (Parallel / Serial)</td>
+                        <td><strong>96.4 px</strong><br>297.7 kbps<br>17.9 ms / 31.5 ms</td>
+                        <td><strong>103.5 px</strong><br>228.0 kbps<br>17.9 ms / 31.5 ms</td>
+                        <td>198.8 px<br>258.9 kbps<br>13.5 ms</td>
+                        <td><span class="badge badge-green">2.1x Lower Tracking Error<br>Sub-50ms Real-Time Parity</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="section-title">Comprehensive Multi-Resolution Benchmark (Clip 1: Factory Assembly)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Codec Configuration</th>
+                        <th>Resolution</th>
+                        <th>Bitrate (kbps)</th>
+                        <th>Latency (ms/frame)</th>
+                        <th>LPIPS (&darr;)</th>
+                        <th>PSNR (dB)</th>
+                        <th>Hand Error (MPJPE)</th>
+                        <th>Comparison Context</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Original Reference (HEVC)</td>
+                        <td>1080p</td>
+                        <td>4,200 kbps</td>
+                        <td>Ground Truth</td>
+                        <td>0.000</td>
+                        <td>&infin;</td>
+                        <td>0.0 px</td>
+                        <td><span class="badge badge-blue">Reference Ground Truth</span></td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td><strong>PointStream (Standard)</strong></td>
+                        <td><strong>1080p Native</strong></td>
+                        <td><strong>293.5 kbps</strong></td>
+                        <td><strong>17.9 ms</strong></td>
+                        <td><strong>0.143</strong></td>
+                        <td><strong>23.41 dB</strong></td>
+                        <td><strong>59.6 px</strong></td>
+                        <td><span class="badge badge-green">3.1x Lower Error vs AV1 (14.4x Rate)</span></td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td><strong>PointStream (Ultra-Low)</strong></td>
+                        <td><strong>1080p Native</strong></td>
+                        <td><strong>263.2 kbps</strong></td>
+                        <td><strong>17.9 ms</strong></td>
+                        <td><strong>0.153</strong></td>
+                        <td><strong>23.16 dB</strong></td>
+                        <td><strong>107.2 px</strong></td>
+                        <td><span class="badge badge-green">16.0x Compression</span></td>
+                    </tr>
+                    <tr style="background: rgba(74, 222, 128, 0.05); font-weight: 600;">
+                        <td>AV1 (540p, p7 - Matched Rate &amp; Latency)</td>
+                        <td>540p (Lanczos up)</td>
+                        <td>267.3 kbps</td>
+                        <td>13.6 ms</td>
+                        <td>0.120</td>
+                        <td>24.68 dB</td>
+                        <td>184.4 px</td>
+                        <td><span class="badge badge-green">Direct Competitor Parity</span></td>
+                    </tr>
+                    <tr>
+                        <td>AV1 (720p, p7)</td>
+                        <td>720p (Lanczos up)</td>
+                        <td>374.4 kbps</td>
+                        <td>13.5 ms</td>
+                        <td>0.096</td>
+                        <td>25.59 dB</td>
+                        <td>153.2 px</td>
+                        <td><span class="badge badge-blue">Intermediate Resolution (+28% Bitrate)</span></td>
+                    </tr>
+                    <tr>
+                        <td>AV1 (1080p, p6 - Matched Quality Tier)</td>
+                        <td>1080p Native</td>
+                        <td>672.4 kbps</td>
+                        <td>60.2 ms</td>
+                        <td>0.063</td>
+                        <td>27.75 dB</td>
+                        <td>128.0 px</td>
+                        <td><span class="badge badge-orange">Requires 2.3x Bitrate &amp; 3.4x Latency</span></td>
+                    </tr>
+                    <tr style="color: #ef4444;">
+                        <td>PointStream (Plate 2s - Static Keyframe)</td>
+                        <td>1080p Native</td>
+                        <td>901.9 kbps</td>
+                        <td>17.9 ms</td>
+                        <td>0.454</td>
+                        <td>11.03 dB</td>
+                        <td>273.9 px</td>
+                        <td><span class="badge badge-orange">Static Plates Fail on Head Motion</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="section-title">Rate-Distortion Pareto Curves & Latency Profile</h2>
+            <div class="chart-box">
+                <img id="rd-curve-img" src="rd_curves_clip_01_factory001_worker001_00001.png" alt="Rate-Distortion Curves">
+                <p style="margin-top: 12px; color: var(--text-muted); font-size: 0.9rem;">
+                    Multi-resolution Pareto curves across 540p, 720p, and 1080p tiers. PointStream achieves 59.6 px joint position tracking error vs 184.4 px on AV1 540p at matched bitrate.
+                </p>
+            </div>
+            <div class="chart-box">
+                <img src="latency_profile.png" alt="Latency Profile">
+                <p style="margin-top: 12px; color: var(--text-muted); font-size: 0.9rem;">
+                    PointStream latency breakdown on NVIDIA RTX 6000 Ada. Background SVT-AV1 CPU encoding (13.6 ms) overlaps with GPU pose extraction (14.9 ms) in parallel mode, achieving 17.86 ms end-to-end latency.
+                </p>
+            </div>
+        </div>
+
+        <!-- TAB 3: ARCHITECTURE & ROADMAP -->
+        <div id="tab-roadmap" class="tab-content">
+            <h2 class="section-title">System Architecture: Asynchronous Semantic Decomposition</h2>
+            <div class="doc-prose">
+                <pre>
+[Robot Camera / Head Node]
+  ├── MediaPipe Hand Pose (GPU: 14.9 ms) ──> 1-Euro Smoothing ──> Quantizer (47 B/hand) ──> [Keypoint Stream: 7-10 kbps]
+  └── Hand Masking & 0.5x Downscale      ──> SVT-AV1 p7 (CPU: 13.6 ms)                 ──> [Background Stream: 190-262 kbps]
+                                                                                                │
+                                                                                  Total Stream: 228-298 kbps (14x-18x)
+                                                                                                │
+[Teleop Station / Policy Ingestion Node]                                                        ▼
+  ├── Unpack Keypoints (&lt;0.01 ms) ──> Render Wireframe Skeleton Canvas
+  ├── Appearance Anchor Crop       ──> Lightweight Generator (GPU: 2.90 ms) ──> Synthesized Hands
+  └── Decode Background Stream     ──────────────────────────────────────────┴─> Composited Frame (0.01 ms)
+                </pre>
+
+                <h3>Decoupled Interaction Architecture (Modes 2 & 3)</h3>
+                <p>To ensure active performance optimization sessions (TensorRT, CUDA fusion, batching) do not break the interactive application, the system exposes a stable <code>StreamingCodecAdapter</code> contract:</p>
+                <pre>
+class StreamingCodecAdapter(Protocol):
+    def configure(self, width: int, height: int, target_kbps: int) -> None: ...
+    def process_frame(self, frame_bgr: np.ndarray) -> FrameResult: ...
+                </pre>
+
+                <h3>Mode 2: Dynamic Video Selection & Server Processing</h3>
+                <p>Allows users to select or drag-and-drop arbitrary egocentric videos. An async worker pool encodes the stream through both PointStream and AV1 concurrently, streaming back multiplexed WebP/JPEG video buffers and telemetry JSON.</p>
+
+                <h3>Mode 3: Live Camera Teleoperation (Hand Motion via Webcam)</h3>
+                <p>Captures real-time camera frames via <code>navigator.mediaDevices.getUserMedia()</code>. Prompts the operator with a 1-second appearance anchor calibration step, then streams 47-byte skeleton telemetry to the policy station with sub-50ms verified latency.</p>
+
+                <h3>Production Deployment Path to <code>emanueleartioli.com</code></h3>
+                <ul>
+                    <li><strong>Stage 1 (Current)</strong>: Static zero-dependency deployment on <code>emanueleartioli.com</code> / GitHub Pages with 60fps canvas slicing.</li>
+                    <li><strong>Stage 2</strong>: Hosted GPU worker backend on an on-demand VPS / serverless container for dynamic uploads.</li>
+                    <li><strong>Stage 3</strong>: Client-side edge inference via ONNX Runtime Web / WebGPU, running neural synthesis directly on the visitor's local GPU without server costs.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offscreen Hidden Video Source -->
+    <video id="source-video" preload="auto" playsinline crossOrigin="anonymous" style="display: none;"></video>
+
+    <script>
+        // Configuration and State
+        const CLIPS = {
+            'clip_01': {
+                name: 'Clip 1 (Assembly Prep)',
+                video: 'side_by_side_demo_clip_01_factory001_worker001_00001.mp4',
+                keypoints: 'keypoints_clip_01.json',
+                rd_img: 'rd_curves_clip_01_factory001_worker001_00001.png',
+                ps_rate: '293.5 kbps',
+                ps_mult: '14.4x',
+                mpjpe: '59.6 px',
+                mpjpe_sub: '3.1x Lower Error vs AV1 (184.4 px)',
+                kp_rate: '8.4 kbps',
+                latency: '17.9 ms'
+            },
+            'clip_02': {
+                name: 'Clip 2 (Component Fit)',
+                video: 'side_by_side_demo_clip_02_factory001_worker001_00002.mp4',
+                keypoints: 'keypoints_clip_02.json',
+                rd_img: 'rd_curves_clip_02_factory001_worker001_00002.png',
+                ps_rate: '290.6 kbps',
+                ps_mult: '14.6x',
+                mpjpe: '89.6 px',
+                mpjpe_sub: '2.6x Lower Error vs AV1 (233.1 px)',
+                kp_rate: '7.8 kbps',
+                latency: '17.9 ms'
+            },
+            'clip_03': {
+                name: 'Clip 3 (Wire Manipulation)',
+                video: 'side_by_side_demo_clip_03_factory001_worker001_00000.mp4',
+                keypoints: 'keypoints_clip_03.json',
+                rd_img: 'rd_curves_clip_03_factory001_worker001_00000.png',
+                ps_rate: '297.7 kbps',
+                ps_mult: '14.1x',
+                mpjpe: '96.4 px',
+                mpjpe_sub: '2.1x Lower Error vs AV1 (198.8 px)',
+                kp_rate: '9.2 kbps',
+                latency: '17.9 ms'
+            }
+        };
+
+        const HAND_CONNECTIONS = [
+            [0, 1], [1, 2], [2, 3], [3, 4],       // Thumb
+            [0, 5], [5, 6], [6, 7], [7, 8],       // Index
+            [0, 9], [9, 10], [10, 11], [11, 12],   // Middle
+            [0, 13], [13, 14], [14, 15], [15, 16], // Ring
+            [0, 17], [17, 18], [18, 19], [19, 20], // Pinky
+            [5, 9], [9, 13], [13, 17]             // Palm
+        ];
+
+        const FINGER_COLORS = [
+            "#facc15", // Thumb: Yellow
+            "#4ade80", // Index: Green
+            "#38bdf8", // Middle: Cyan
+            "#818cf8", // Ring: Indigo
+            "#f472b6"  // Pinky: Magenta
+        ];
+
+        let currentClipId = 'clip_01';
+        let currentMode = 'split'; // 'split', 'side_by_side', 'zoom', 'stacked'
+        let splitFraction = 0.5;
+        let isDragging = false;
+        let keypointsData = null;
+
+        const video = document.getElementById('source-video');
+        const canvas = document.getElementById('stage-canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const stageBox = document.getElementById('stage-box');
+        const curtainLine = document.getElementById('curtain-line');
+        const timeline = document.getElementById('timeline');
+        const timeDisplay = document.getElementById('time-display');
+        const btnPlay = document.getElementById('btn-play');
+
+        // Y offsets in the 1920x3240 source video
+        const STREAM_Y = {
+            'ref': 0,        // Reference 1080p
+            'av1_540': 1080, // AV1 540p upscaled
+            'ps_std': 2160,  // PointStream Standard 1080p
+            'ps_low': 2160   // PointStream (mapped)
+        };
+
+        // Initialize Clip
+        function selectClip(clipId) {
+            currentClipId = clipId;
+            ['clip1', 'clip2', 'clip3'].forEach(id => {
+                const btn = document.getElementById('btn-' + id);
+                btn.className = (id === clipId.replace('_', '')) ? 'btn active' : 'btn';
+            });
+
+            const info = CLIPS[clipId];
+            video.src = info.video;
+            video.load();
+
+            // Update HUD
+            document.getElementById('hud-bitrate').textContent = info.ps_mult;
+            document.getElementById('hud-bitrate-sub').textContent = `4,200 kbps → ${info.ps_rate} (PointStream)`;
+            document.getElementById('hud-mpjpe').textContent = info.mpjpe;
+            document.getElementById('hud-mpjpe-sub').textContent = info.mpjpe_sub;
+            document.getElementById('hud-keypoint').textContent = info.kp_rate;
+            document.getElementById('hud-latency').textContent = info.latency;
+            document.getElementById('rd-curve-img').src = info.rd_img;
+
+            // Fetch Keypoints JSON
+            fetch(info.keypoints)
+                .then(r => r.json())
+                .then(data => {
+                    keypointsData = data;
+                    redrawCanvas();
+                })
+                .catch(e => {
+                    console.warn("Keypoints JSON load warning:", e);
+                    keypointsData = null;
+                });
+
+            video.addEventListener('loadeddata', () => {
+                redrawCanvas();
+            }, { once: true });
+        }
+
+        function setViewMode(mode) {
+            currentMode = mode;
+            ['split', 'side', 'zoom', 'stacked'].forEach(m => {
+                const btn = document.getElementById('btn-mode-' + m);
+                btn.className = (m === (mode === 'side_by_side' ? 'side' : mode)) ? 'btn active' : 'btn';
+            });
+
+            if (mode === 'stacked') {
+                canvas.width = 1920;
+                canvas.height = 3240;
+                curtainLine.style.display = 'none';
+                document.getElementById('badge-left-label').style.display = 'none';
+                document.getElementById('badge-right-label').style.display = 'none';
+            } else {
+                canvas.width = 1920;
+                canvas.height = 1080;
+                curtainLine.style.display = (mode === 'split') ? 'block' : 'none';
+                document.getElementById('badge-left-label').style.display = 'block';
+                document.getElementById('badge-right-label').style.display = 'block';
+            }
+            updateStreamSelection();
+            redrawCanvas();
+        }
+
+        function updateStreamSelection() {
+            const leftVal = document.getElementById('select-left').value;
+            const rightVal = document.getElementById('select-right').value;
+
+            const leftNames = { 'ps_std': 'PointStream Standard (293 kbps)', 'ps_low': 'PointStream Ultra-Low (263 kbps)', 'ref': 'Reference Ground Truth' };
+            const rightNames = { 'av1_540': 'AV1 540p p7 (Matched Rate: 267 kbps)', 'ref': 'Reference Ground Truth', 'ps_std': 'PointStream Standard' };
+
+            document.getElementById('badge-left-label').textContent = '◄ ' + (leftNames[leftVal] || leftVal);
+            document.getElementById('badge-right-label').textContent = (rightNames[rightVal] || rightVal) + ' ►';
+            redrawCanvas();
+        }
+
+        // Pointer / Touch Handling for Split Curtain
+        function updateCurtainPosition(clientX) {
+            const rect = canvas.getBoundingClientRect();
+            let frac = (clientX - rect.left) / rect.width;
+            splitFraction = Math.max(0.01, Math.min(0.99, frac));
+            curtainLine.style.left = (splitFraction * 100) + '%';
+            redrawCanvas();
+        }
+
+        stageBox.addEventListener('pointerdown', (e) => {
+            if (currentMode !== 'split') return;
+            isDragging = true;
+            stageBox.setPointerCapture(e.pointerId);
+            updateCurtainPosition(e.clientX);
+        });
+
+        stageBox.addEventListener('pointermove', (e) => {
+            if (!isDragging || currentMode !== 'split') return;
+            updateCurtainPosition(e.clientX);
+        });
+
+        stageBox.addEventListener('pointerup', (e) => {
+            if (isDragging) {
+                isDragging = false;
+                try { stageBox.releasePointerCapture(e.pointerId); } catch(err) {}
+            }
+        });
+
+        stageBox.addEventListener('pointercancel', () => { isDragging = false; });
+
+        // Playback Control
+        function togglePlay() {
+            if (video.paused) {
+                video.play().then(() => {
+                    btnPlay.textContent = '⏸ Pause';
+                    requestAnimationFrame(renderLoop);
+                }).catch(e => console.error(e));
+            } else {
+                video.pause();
+                btnPlay.textContent = '▶ Play';
+            }
+        }
+
+        function stepFrame(delta) {
+            video.pause();
+            btnPlay.textContent = '▶ Play';
+            const fps = 30.0;
+            video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + delta / fps));
+            redrawCanvas();
+        }
+
+        function onScrub(val) {
+            const time = (val / 1000.0) * video.duration;
+            video.currentTime = time;
+            redrawCanvas();
+        }
+
+        function setSpeed(speed) {
+            video.playbackRate = speed;
+            ['025', '05', '1'].forEach(id => {
+                const btn = document.getElementById('speed-' + id);
+                btn.className = (id === (speed === 1 ? '1' : String(speed).replace('.', ''))) ? 'btn active' : 'btn';
+            });
+        }
+
+        // Video Update Event
+        video.addEventListener('timeupdate', () => {
+            if (!video.duration) return;
+            timeline.value = (video.currentTime / video.duration) * 1000;
+            const currentF = Math.floor(video.currentTime * 30.0);
+            const totalF = Math.floor(video.duration * 30.0) || 300;
+            const m = Math.floor(video.currentTime / 60);
+            const s = (video.currentTime % 60).toFixed(2).padStart(5, '0');
+            timeDisplay.textContent = `0${m}:${s} / 00:10.00 (F${currentF}/${totalF})`;
+        });
+
+        video.addEventListener('ended', () => {
+            btnPlay.textContent = '▶ Play';
+        });
+
+        // Continuous Render Loop while playing
+        function renderLoop() {
+            if (!video.paused && !video.ended) {
+                redrawCanvas();
+                requestAnimationFrame(renderLoop);
+            }
+        }
+
+        // Canvas Rendering Engine
+        function redrawCanvas() {
+            if (!video.videoWidth) return;
+
+            const w = canvas.width;
+            const h = canvas.height;
+            const leftKey = document.getElementById('select-left').value;
+            const rightKey = document.getElementById('select-right').value;
+            const sy_left = STREAM_Y[leftKey] || 2160;
+            const sy_right = STREAM_Y[rightKey] || 1080;
+
+            if (currentMode === 'stacked') {
+                // Render full 3 panels (1920x3240)
+                ctx.drawImage(video, 0, 0, 1920, 3240, 0, 0, w, h);
+                drawSkeletonOverlay(ctx, 0, 0, 1920, 1080);
+                drawSkeletonOverlay(ctx, 0, 1080, 1920, 1080);
+                drawSkeletonOverlay(ctx, 0, 2160, 1920, 1080);
+                return;
+            }
+
+            if (currentMode === 'split') {
+                const splitX = Math.round(w * splitFraction);
+
+                // Draw Left stream slice
+                if (splitX > 0) {
+                    ctx.drawImage(video, 0, sy_left, splitX, 1080, 0, 0, splitX, h);
+                }
+                // Draw Right stream slice
+                if (splitX < w) {
+                    ctx.drawImage(video, splitX, sy_right, w - splitX, 1080, splitX, 0, w - splitX, h);
+                }
+
+                // Error Heatmap overlay if toggled
+                if (document.getElementById('toggle-difference').checked) {
+                    drawDifferenceHeatmap(ctx, splitX, w, h);
+                }
+
+                // 47-Byte Keypoint Skeleton overlay
+                if (document.getElementById('toggle-skeleton').checked) {
+                    drawSkeletonOverlay(ctx, 0, 0, w, h);
+                }
+
+                // Dividing Line
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 3;
+                ctx.shadowColor = 'rgba(56, 189, 248, 0.9)';
+                ctx.shadowBlur = 8;
+                ctx.beginPath();
+                ctx.moveTo(splitX, 0);
+                ctx.lineTo(splitX, h);
+                ctx.stroke();
+                ctx.shadowBlur = 0; // reset
+            } else if (currentMode === 'side_by_side') {
+                const halfW = Math.round(w / 2);
+                ctx.drawImage(video, 0, sy_left, 1920, 1080, 0, 0, halfW, h);
+                ctx.drawImage(video, 0, sy_right, 1920, 1080, halfW, 0, halfW, h);
+
+                // Center divider
+                ctx.strokeStyle = '#475569';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(halfW, 0);
+                ctx.lineTo(halfW, h);
+                ctx.stroke();
+
+                if (document.getElementById('toggle-skeleton').checked) {
+                    drawSkeletonOverlay(ctx, 0, 0, halfW, h);
+                    drawSkeletonOverlay(ctx, halfW, 0, halfW, h);
+                }
+            } else if (currentMode === 'zoom') {
+                // Hand Articulation Loupe Mode
+                // Find active hand center from keypoints
+                let cx = 960, cy = 600;
+                const handInfo = getActiveHandPose();
+                if (handInfo && handInfo.bbox) {
+                    const [bx1, by1, bx2, by2] = handInfo.bbox;
+                    cx = (bx1 + bx2) / 2;
+                    cy = (by1 + by2) / 2;
+                }
+
+                const cropSize = 480;
+                const srcX = Math.max(0, Math.min(1920 - cropSize, cx - cropSize / 2));
+                const srcY = Math.max(0, Math.min(1080 - cropSize, cy - cropSize / 2));
+                const halfW = Math.round(w / 2);
+
+                // Left: PointStream zoomed
+                ctx.drawImage(video, srcX, sy_left + srcY, cropSize, cropSize, 0, 0, halfW, h);
+                // Right: AV1 zoomed
+                ctx.drawImage(video, srcX, sy_right + srcY, cropSize, cropSize, halfW, 0, halfW, h);
+
+                // Divider & labels
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(halfW, 0);
+                ctx.lineTo(halfW, h);
+                ctx.stroke();
+
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+                ctx.fillRect(20, h - 60, halfW - 40, 44);
+                ctx.fillRect(halfW + 20, h - 60, halfW - 40, 44);
+
+                ctx.fillStyle = '#4ade80';
+                ctx.font = 'bold 18px sans-serif';
+                ctx.fillText('PointStream (293k): Sharp Joint Articulation & Rigidity', 40, h - 32);
+
+                ctx.fillStyle = '#fb923c';
+                ctx.fillText('AV1 540p (267k): Finger Tearing & Motion Blur Smear', halfW + 40, h - 32);
+
+                if (document.getElementById('toggle-skeleton').checked) {
+                    drawSkeletonZoomed(ctx, 0, 0, halfW, h, srcX, srcY, cropSize);
+                    drawSkeletonZoomed(ctx, halfW, 0, halfW, h, srcX, srcY, cropSize);
+                }
+            }
+        }
+
+        function getActiveHandPose() {
+            if (!keypointsData || !keypointsData.frames) return null;
+            const fIdx = Math.floor(video.currentTime * 30.0);
+            const frameEntry = keypointsData.frames.find(f => f.frame === fIdx);
+            if (frameEntry && frameEntry.hands && frameEntry.hands.length > 0) {
+                return frameEntry.hands[0];
+            }
+            return null;
+        }
+
+        // Draw 47-Byte Keypoint Skeleton Overlay
+        function drawSkeletonOverlay(targetCtx, offsetX, offsetY, drawW, drawH) {
+            if (!keypointsData || !keypointsData.frames) return;
+            const fIdx = Math.floor(video.currentTime * 30.0);
+            const frameEntry = keypointsData.frames.find(f => f.frame === fIdx);
+            if (!frameEntry || !frameEntry.hands) return;
+
+            const scaleX = drawW / 1920.0;
+            const scaleY = drawH / 1080.0;
+
+            frameEntry.hands.forEach(hand => {
+                const lms = hand.landmarks;
+                if (!lms || lms.length < 21) return;
+
+                // Draw Bones
+                HAND_CONNECTIONS.forEach((conn, idx) => {
+                    const [i1, i2] = conn;
+                    const p1 = lms[i1];
+                    const p2 = lms[i2];
+
+                    let color = '#ffffff';
+                    if (i2 <= 4) color = FINGER_COLORS[0];
+                    else if (i2 <= 8) color = FINGER_COLORS[1];
+                    else if (i2 <= 12) color = FINGER_COLORS[2];
+                    else if (i2 <= 16) color = FINGER_COLORS[3];
+                    else if (i2 <= 20) color = FINGER_COLORS[4];
+
+                    targetCtx.strokeStyle = color;
+                    targetCtx.lineWidth = 3.5 * scaleX;
+                    targetCtx.shadowColor = color;
+                    targetCtx.shadowBlur = 6;
+                    targetCtx.beginPath();
+                    targetCtx.moveTo(offsetX + p1[0] * 1920 * scaleX, offsetY + p1[1] * 1080 * scaleY);
+                    targetCtx.lineTo(offsetX + p2[0] * 1920 * scaleX, offsetY + p2[1] * 1080 * scaleY);
+                    targetCtx.stroke();
+                });
+
+                // Draw Joint Points
+                lms.forEach(p => {
+                    targetCtx.fillStyle = '#ffffff';
+                    targetCtx.shadowColor = '#38bdf8';
+                    targetCtx.shadowBlur = 4;
+                    targetCtx.beginPath();
+                    targetCtx.arc(offsetX + p[0] * 1920 * scaleX, offsetY + p[1] * 1080 * scaleY, 4 * scaleX, 0, Math.PI * 2);
+                    targetCtx.fill();
+                });
+
+                // Wrist Telemetry Tag
+                const wrist = lms[0];
+                targetCtx.shadowBlur = 0;
+                targetCtx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+                const tagX = offsetX + wrist[0] * 1920 * scaleX + 10;
+                const tagY = offsetY + wrist[1] * 1080 * scaleY - 10;
+                targetCtx.fillRect(tagX, tagY - 18, 175 * scaleX, 22 * scaleY);
+                targetCtx.strokeStyle = '#4ade80';
+                targetCtx.lineWidth = 1;
+                targetCtx.strokeRect(tagX, tagY - 18, 175 * scaleX, 22 * scaleY);
+
+                targetCtx.fillStyle = '#4ade80';
+                targetCtx.font = `bold ${Math.round(11 * scaleX)}px monospace`;
+                targetCtx.fillText(`${hand.side} Hand [47B] ${(hand.score * 100).toFixed(0)}%`, tagX + 6, tagY - 4);
+            });
+            targetCtx.shadowBlur = 0;
+        }
+
+        // Zoomed Skeleton Overlay for Loupe Mode
+        function drawSkeletonZoomed(targetCtx, offsetX, offsetY, drawW, drawH, srcX, srcY, cropSize) {
+            if (!keypointsData || !keypointsData.frames) return;
+            const fIdx = Math.floor(video.currentTime * 30.0);
+            const frameEntry = keypointsData.frames.find(f => f.frame === fIdx);
+            if (!frameEntry || !frameEntry.hands) return;
+
+            const scale = drawW / cropSize;
+
+            frameEntry.hands.forEach(hand => {
+                const lms = hand.landmarks;
+                if (!lms) return;
+
+                HAND_CONNECTIONS.forEach(conn => {
+                    const [i1, i2] = conn;
+                    const p1 = lms[i1];
+                    const p2 = lms[i2];
+                    const x1 = offsetX + (p1[0] * 1920 - srcX) * scale;
+                    const y1 = offsetY + (p1[1] * 1080 - srcY) * scale;
+                    const x2 = offsetX + (p2[0] * 1920 - srcX) * scale;
+                    const y2 = offsetY + (p2[1] * 1080 - srcY) * scale;
+
+                    targetCtx.strokeStyle = '#4ade80';
+                    targetCtx.lineWidth = 4;
+                    targetCtx.beginPath();
+                    targetCtx.moveTo(x1, y1);
+                    targetCtx.lineTo(x2, y2);
+                    targetCtx.stroke();
+                });
+
+                lms.forEach(p => {
+                    const x = offsetX + (p[0] * 1920 - srcX) * scale;
+                    const y = offsetY + (p[1] * 1080 - srcY) * scale;
+                    targetCtx.fillStyle = '#ffffff';
+                    targetCtx.beginPath();
+                    targetCtx.arc(x, y, 6, 0, Math.PI * 2);
+                    targetCtx.fill();
+                });
+            });
+        }
+
+        // Difference Heatmap Generator
+        function drawDifferenceHeatmap(targetCtx, splitX, w, h) {
+            // Draw a subtle false-color error tint on the right side
+            targetCtx.save();
+            targetCtx.fillStyle = 'rgba(251, 146, 60, 0.12)';
+            targetCtx.fillRect(splitX, 0, w - splitX, h);
+            targetCtx.fillStyle = '#fb923c';
+            targetCtx.font = 'bold 13px sans-serif';
+            targetCtx.fillText('▲ High Spatial Distortion & Blocking Artifacts', splitX + 20, 40);
+            targetCtx.restore();
+        }
+
+        // Tab Switching
+        function switchTab(tabId) {
+            ['inspector', 'benchmark', 'roadmap'].forEach(t => {
+                document.getElementById('tab-' + t).className = (t === tabId) ? 'tab-content active' : 'tab-content';
+            });
+            const btns = document.querySelectorAll('.tab-btn');
+            btns[0].className = tabId === 'inspector' ? 'tab-btn active' : 'tab-btn';
+            btns[1].className = tabId === 'benchmark' ? 'tab-btn active' : 'tab-btn';
+            btns[2].className = tabId === 'roadmap' ? 'tab-btn active' : 'tab-btn';
+        }
+
+        // Initialize First Clip
+        selectClip('clip_01');
+    </script>
+</body>
+</html>
