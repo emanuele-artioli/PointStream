@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 import zipfile
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -122,7 +122,7 @@ def test_uncoded_residual_is_rejected() -> None:
         codec_name="raw",
         is_coded=False,
         raw_frames=np.zeros_like(frames),
-        shape=tuple(frames.shape),
+        shape=(int(frames.shape[0]), int(frames.shape[1]), int(frames.shape[2]), int(frames.shape[3])),
     )
     with pytest.raises(ValueError, match="unencoded fallback"):
         serialize_setting(

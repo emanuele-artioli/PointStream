@@ -463,6 +463,11 @@ def run_probe(run_dir: Path) -> dict[str, Any]:
         "reuse": reuse,
         "calibration_path": str(calib_path),
         "calibration_sha256": sha256_path(calib_path),
+        "calibration": {
+            "identical_vmaf": calibration.get("identical_vmaf"),
+            "unrelated_vmaf": calibration.get("unrelated_vmaf"),
+            "severe_blur_vmaf": calibration.get("severe_blur_vmaf"),
+        },
         "confirmation_scoring_authorized": False,
         "development_source": "federer_djokovic/scene_007",
         "n": 1,

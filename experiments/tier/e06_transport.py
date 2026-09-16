@@ -95,12 +95,12 @@ def client_placements(
     name = require_predictor(predictor)
     occupied = occupied_boxes(frames, masks)
     if name == PREDICTOR_PER_FRAME:
-        placements = []
+        items: list[ClientPlacement] = []
         appearance_bytes = 0
         for index, bbox, crop in occupied:
             payload = encode_appearance(crop, quality=quality)
             appearance_bytes += len(payload)
-            placements.append(
+            items.append(
                 ClientPlacement(
                     encoded_crop=payload,
                     bbox=bbox,
@@ -110,9 +110,9 @@ def client_placements(
                     is_generated=False,
                 )
             )
-        return tuple(placements), {}, appearance_bytes
+        return tuple(items), {}, appearance_bytes
     reference = encode_appearance(occupied[0][2], quality=quality)
-    placements = tuple(
+    bbox_items = tuple(
         ClientPlacement(
             bbox=bbox,
             mask=np.asarray(masks[index], dtype=bool),
@@ -122,7 +122,7 @@ def client_placements(
         )
         for index, bbox, _crop in occupied
     )
-    return placements, {"union": reference}, len(reference)
+    return bbox_items, {"union": reference}, len(reference)
 
 
 def background_view(
