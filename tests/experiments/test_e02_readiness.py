@@ -1439,3 +1439,167 @@ def test_unsupported_worker_mode_warning(caplog: pytest.LogCaptureFixture) -> No
     assert any("Worker mode notice: num_workers=4 > 0" in record.message for record in caplog.records)
 
 
+def test_tennis_dataset_subset_filtering(tmp_path: Path) -> None:
+    """Verify TennisSkeletonDataset subset filtering by video, scene, track, and frame window."""
+    import numpy as np
+    import cv2
+    from src.shared.tennis_dataset import TennisSkeletonDataset
+
+    # Build mock scenes: scene_001 with 2 tracks, scene_002 with 1 track
+    for sc in ("scene_001", "scene_002"):
+        for tr in ("track_001", "track_002") if sc == "scene_001" else ("track_001",):
+            td = tmp_path / "vid1" / "segmentations" / sc / tr
+            sd = tmp_path / "vid1" / "segmentations" / sc / f"{tr}_pose_body"
+            td.mkdir(parents=True)
+            sd.mkdir(parents=True)
+            for i in range(10):
+                img = np.full((64, 64, 3), i * 20, dtype=np.uint8)
+                cv2.imwrite(str(td / f"frame_{i:06d}.png"), img)
+                cv2.imwrite(str(sd / f"frame_{i:06d}.png"), img)
+
+    # Filter by scene and frame window (frames 2..6 -> 4 frames per track)
+    ds_subset = TennisSkeletonDataset(
+        tmp_path,
+        target_size=64,
+        include_reference=True,
+        reference_mode="first",
+        scene_filter="scene_001",
+        frame_start=2,
+        max_frames=4,
+    )
+    # 2 tracks * 4 frames = 8 items
+    assert len(ds_subset) == 8
+    assert all("scene_001" in item[2] for item in ds_subset.items)
+    # Check that item track indices are 2, 3, 4, 5 for each track
+    assert ds_subset.item_track_indices == [2, 3, 4, 5, 2, 3, 4, 5]
+    # Check that reference frame is frame 0 (first reference) and distinct from target (frames 2..5)
+    for idx in range(len(ds_subset)):
+        ref_info = ds_subset.get_reference_info(idx)
+        assert ref_info["is_target_match"] is False
+        assert "frame_000000.png" in str(ref_info["reference_path"])
+
+
+def test_diagnostic_matrix_start_frame_slicing() -> None:
+    """Verify _slice_clip with start_frame offset correctly adjusts frames, masks, and object indices."""
+    import numpy as np
+    from experiments.long_scenes.loader import LongSceneClip
+    from src.pipeline.reconstruction.reconstruct import ObjectRequest
+    from scripts.run_diagnostic_matrix import _slice_clip
+
+    frames = np.zeros((48, 100, 100, 3), dtype=np.uint8)
+    masks = np.zeros((48, 100, 100), dtype=bool)
+    app = np.zeros((32, 32, 3), dtype=np.uint8)
+    objs = (
+        ObjectRequest(object_id="tr1", appearance=app, bbox=(10, 10, 20, 20), frame_index=5),
+        ObjectRequest(object_id="tr1", appearance=app, bbox=(10, 10, 20, 20), frame_index=16),
+        ObjectRequest(object_id="tr1", appearance=app, bbox=(10, 10, 20, 20), frame_index=25),
+        ObjectRequest(object_id="tr1", appearance=app, bbox=(10, 10, 20, 20), frame_index=40),
+    )
+    full_clip = LongSceneClip(
+        video="vid",
+        scene="sc",
+        context_id="ctx",
+        n_frames=48,
+        frames=frames,
+        masks=masks,
+        objects=objs,
+        paste_back_mae=0.01,
+        start_frame=0,
+    )
+
+    # Slice disjoint window: start_frame=16, frames=16 (covers frames 16..31)
+    sliced = _slice_clip(full_clip, n_frames=16, start_frame=16)
+    assert sliced.n_frames == 16
+    assert sliced.frames.shape[0] == 16
+    assert sliced.start_frame == 16
+    # Objects at frame 16 (offset 0) and 25 (offset 9) should be included with adjusted frame_index
+    assert len(sliced.objects) == 2
+    assert sliced.objects[0].frame_index == 0  # was 16 - 16
+    assert sliced.objects[1].frame_index == 9  # was 25 - 16
+
+
+def test_adapt_generation_result_cli(tmp_path: Path) -> None:
+    """Verify scripts/adapt_generation_result.py CLI helper properly adapts matrix JSON to campaign result."""
+    import json
+    import subprocess
+    import sys
+    from src.contracts import paths as ps_paths
+
+    cand_paths = [
+        ps_paths.outputs() / "evaluation-campaign" / "e02r" / "diagnostic_matrix_pix2pix_scene028.json",
+        Path("/home/itec/emanuele/pointstream-data/outputs/evaluation-campaign/e02r/diagnostic_matrix_pix2pix_scene028.json"),
+    ]
+    matrix_file = None
+    for p in cand_paths:
+        if p.exists():
+            matrix_file = p
+            break
+
+    if matrix_file is None:
+        # Fallback: create mock matrix payload for CI
+        matrix_file = tmp_path / "mock_matrix.json"
+        mock_matrix = {
+            "identity": {
+                "checkpoint_sha256": "0" * 64,
+                "code_revision": "test_rev",
+            },
+            "runs": [
+                {
+                    "name": "gen_on_res_off",
+                    "scores": {"psnr_y": 30.0, "ssim": 0.9},
+                    "parts": {"transport_total": 5000, "residual": 0},
+                    "timing": {"client_seconds": 1.0},
+                    "delivered_hashes": ["hash1", "hash2"],
+                },
+                {
+                    "name": "gen_on_shuffled_conditioning",
+                    "scores": {"psnr_y": 25.0, "ssim": 0.8},
+                    "parts": {"transport_total": 5000, "residual": 0},
+                    "timing": {"client_seconds": 1.0},
+                    "delivered_hashes": ["hash_shuf1", "hash_shuf2"],
+                },
+                {
+                    "name": "gen_on_res_off_same_seed",
+                    "scores": {"psnr_y": 30.0, "ssim": 0.9},
+                    "parts": {"transport_total": 5000, "residual": 0},
+                    "timing": {"client_seconds": 1.0},
+                    "delivered_hashes": ["hash1", "hash2"],
+                },
+            ],
+            "aggregate": {
+                "psnr_mean": 30.0,
+                "ssim_mean": 0.9,
+                "total_bytes": 5000,
+                "residual_bytes": 0,
+                "client_seconds": 1.0,
+            },
+            "per_clip": [{"clip_id": "clip_01", "psnr_y": 30.0, "ssim": 0.9}],
+        }
+        matrix_file.write_text(json.dumps(mock_matrix), encoding="utf-8")
+
+    out_record = tmp_path / "adapted_result.json"
+    cmd = [
+        sys.executable,
+        "scripts/adapt_generation_result.py",
+        "--input-matrix",
+        str(matrix_file),
+        "--output-record",
+        str(out_record),
+        "--run-id",
+        "smoke_test_run",
+        "--backend-name",
+        "pix2pix",
+    ]
+    res = subprocess.run(cmd, capture_output=True, text=True)
+    assert res.returncode == 0, f"Adapter CLI failed: {res.stderr}"
+    assert out_record.exists()
+
+    payload = json.loads(out_record.read_text(encoding="utf-8"))
+    assert payload["run_id"] == "smoke_test_run"
+    assert payload["backend_name"] == "pix2pix"
+    assert "metrics" in payload
+    assert "controls" in payload
+    assert payload["controls"]["conditioned_vs_shuffled_tested"] is True
+
+
+

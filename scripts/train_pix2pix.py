@@ -356,6 +356,11 @@ def main_worker(gpu, ngpus_per_node, args):
         reference_mode=ref_mode,
         keyframe_interval=keyframe_interval,
         reference_offset=reference_offset,
+        video_filter=getattr(args, "video_filter", None),
+        scene_filter=getattr(args, "scene_filter", None),
+        track_filter=getattr(args, "track_filter", None),
+        frame_start=getattr(args, "frame_start", 0),
+        max_frames=getattr(args, "frame_count", None),
     )
 
     if args.resume and getattr(args, "num_workers", 0) > 0:
@@ -374,7 +379,7 @@ def main_worker(gpu, ngpus_per_node, args):
         batch_size=batch_size,
         seed=base_seed,
         shuffle=True,
-        drop_last=True,
+        drop_last=(len(dataset) >= batch_size),
         num_replicas=ngpus_per_node,
         rank=gpu,
     )
@@ -594,6 +599,16 @@ def main():
                         help="Fixed frame offset for offset reference mode (default: 1)")
     parser.add_argument("--max-steps-per-epoch", type=int, default=None,
                         help="Optional cap on steps per epoch for fast integration tests")
+    parser.add_argument("--video-filter", type=str, default=None,
+                        help="Video name filter for bounded dataset subset (e.g. alcaraz_highlights)")
+    parser.add_argument("--scene-filter", type=str, default=None,
+                        help="Scene name filter for bounded dataset subset (e.g. scene_028)")
+    parser.add_argument("--track-filter", type=str, default=None,
+                        help="Track name filter for bounded dataset subset (e.g. track_0002)")
+    parser.add_argument("--frame-start", type=int, default=0,
+                        help="Start frame index within track (default: 0)")
+    parser.add_argument("--frame-count", type=int, default=None,
+                        help="Number of frames to include from frame-start (default: None for all)")
     args = parser.parse_args()
 
     os.makedirs(os.path.dirname(args.out_weights), exist_ok=True)

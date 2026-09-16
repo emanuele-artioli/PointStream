@@ -68,6 +68,12 @@ class TennisSkeletonDataset(Dataset):
         reference_mode: str = "first",
         keyframe_interval: int = 16,
         reference_offset: int = 1,
+        video_filter: str | None = None,
+        scene_filter: str | None = None,
+        track_filter: str | None = None,
+        frame_start: int = 0,
+        max_frames: int | None = None,
+        frame_indices: list[int] | None = None,
     ):
         self.root_dir = Path(root_dir)
         self.target_size = target_size
@@ -86,6 +92,12 @@ class TennisSkeletonDataset(Dataset):
         self.reference_mode = reference_mode
         self.keyframe_interval = max(1, keyframe_interval)
         self.reference_offset = max(1, reference_offset)
+        self.video_filter = video_filter
+        self.scene_filter = scene_filter
+        self.track_filter = track_filter
+        self.frame_start = max(0, frame_start)
+        self.max_frames = max_frames
+        self.frame_indices = frame_indices
 
         # Items are tuples of (color_path, condition_path, track_id)
         self.items: list[tuple[Path, Path, str]] = []
@@ -117,6 +129,14 @@ class TennisSkeletonDataset(Dataset):
             video_name = parts[-4]
             scene_name = parts[-2]
             track_name = parts[-1]
+
+            if self.video_filter and video_name != self.video_filter:
+                continue
+            if self.scene_filter and scene_name != self.scene_filter:
+                continue
+            if self.track_filter and track_name != self.track_filter:
+                continue
+
             unique_track_id = f"{video_name}_{scene_name}_{track_name}"
             
             color_frames = sorted(track_dir.glob("frame_*.png"))
@@ -127,16 +147,22 @@ class TennisSkeletonDataset(Dataset):
                 continue
                 
             if unique_track_id not in self.track_to_colors:
-                self.track_to_colors[unique_track_id] = []
+                self.track_to_colors[unique_track_id] = list(color_frames)
                 
             # Pair them sequentially by order, accommodating missing frames at the tail if extractor stopped early
             min_len = min(len(color_frames), len(skel_frames))
-            for i in range(min_len):
+            if self.frame_indices is not None:
+                selected_indices = [idx for idx in self.frame_indices if 0 <= idx < min_len]
+            else:
+                start = self.frame_start
+                end = min(min_len, start + self.max_frames) if self.max_frames is not None else min_len
+                selected_indices = list(range(start, end))
+
+            for i in selected_indices:
                 color_path = color_frames[i]
                 skel_path = skel_frames[i]
                 self.items.append((color_path, skel_path, unique_track_id))
                 self.item_track_indices.append(i)
-                self.track_to_colors[unique_track_id].append(color_path)
 
         # Base transform for converting to tensor and resizing
         self.base_transform = transforms.Compose([

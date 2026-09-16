@@ -1,18 +1,18 @@
 # E05 Stage 1 Executable Card & Baseline Decision: Foreground Generation Candidates
 
 **Date**: 2026-09-16  
-**Status**: RELEASE-READY FOR STAGE 1 PILOT (Specification complete; authorized under 1.0 GPU-hour cap; not launched yet)  
+**Status**: AUTHORIZED PILOT RELEASE (Execution authorized under 2026-09-16 bounded-pilot-release brief; aggregate $\le 1.0$ GPU-hour cap)  
 **Author**: Antigravity (Pair Programming Session)  
-**Task Reference**: [05-foreground.md](05-foreground.md) / [20260916-probe-review.md](20260916-probe-review.md) / [02s-training-and-controls.md](02s-training-and-controls.md)
+**Task Reference**: [20260916-bounded-pilot-release.md](20260916-bounded-pilot-release.md) / [05-foreground.md](05-foreground.md) / [02s-training-and-controls.md](02s-training-and-controls.md)
 
 ---
 
-## 1. Executive Summary & Release Status
+## 1. Executive Summary & Authorization Status
 
-This card defines the executable Stage 1 pilot protocol for foreground generation candidate families (`pix2pix`, `spade4tennis`, and baseline reference models).
+This card defines the corrected, executable Stage 1 pilot protocol for foreground generation candidate families (`pix2pix`, `spade4tennis`, and baseline reference models).
 
-### Circularity Resolution
-Previous draft criteria required running a pilot training run *before* releasing the Stage 1 specification. That circular gate is resolved: this document establishes the frozen, executable Stage 1 specification, pre-registered bounds, controls, charged accounting ledger, and promotion criteria. Stage 1 is **RELEASE-READY FOR PILOT EXECUTION** under an aggregate 1.0 GPU-hour cap. No training runs are launched in this specification session.
+### Release Authorization & Scope
+Per the coordinator brief (`20260916-bounded-pilot-release.md`), conditional pilot execution is **AUTHORIZED** upon passing explicit preparation gates and landing a green merged revision. No training or confirmation scoring was executed prior to gate passage. Execution is constrained to **ONE aggregate GPU-hour total** encompassing training, diagnostics, validation, and any ambiguity extension.
 
 ---
 
@@ -38,163 +38,162 @@ The protocol builds on existing, immutable acceptance and diagnostic artifacts u
 3. **Checkpoint Continuation Evidence**:
    - Path: `outputs/evaluation-campaign/e02r/checkpoint_resume_evidence/pix2pix_interrupted_checkpoint.pt`
    - SHA-256: `9109f53237098ff71dfcba7f1a25fe24ae23814a06311df56c29ea7782a61e9d`
-   - Verified Scope: Tested via `test_fresh_process_trainer_cli_continuation` under single-worker CPU execution (`CUDA_VISIBLE_DEVICES=""`, `--num-workers 0`, `--reference-mode first`).
-   - Verified Numerical Exactness: Proved exact bitwise equality (`torch.equal`, `max_diff == 0.0`) for generator weights (G), discriminator weights (D), Adam optimizer moment buffers (`exp_avg`, `exp_avg_sq`), and RNG states (torch, numpy, python) across fresh-process resume. Scope is strictly bounded to CPU single-worker execution; no CUDA bit-identity is claimed without GPU continuation evidence.
+   - Scope & Verification: Tested in `test_fresh_process_trainer_cli_continuation` under single-worker CPU execution (`CUDA_VISIBLE_DEVICES=""`, `--num-workers 0`, `--reference-mode first`). Proved exact bitwise equality (`torch.equal`, `diff: 0.00e+00`) across generator weights, discriminator weights, optimizer moments (`exp_avg`, `exp_avg_sq`), and RNG states (torch, numpy, python). Bounded strictly to CPU execution without claiming unmeasured CUDA bit-identity.
 
 ---
 
-## 3. Corrected Protocol Foundations
+## 3. Split Labels & Materialized Development View
 
-The Stage 1 pilot enforces the protocol repairs implemented in E02S:
+### 3.1 Split Classification & Quarantine
+- **Development Pool**: `alcaraz_highlights/scene_028` and `federer007` (Federer/Djokovic scene 007) are **exposed development data**, never confirmation data.
+- **Confirmation Reservation**: All confirmation sources (`conf_cand_01_sinner_medvedev_ao2024`, `conf_cand_04_medvedev_djokovic_usopen2023`, `conf_cand_05_swiatek_sabalenka_madrid2024`) are **strictly quarantined** under `manifests/evaluation_20260916_coordinator_confirmation_reservation.json`. Zero pilot steps, parameter searches, or test runs touch confirmation sources.
 
-1. **Corrected First-Reference Policy**:
-   - Explicit reference selection via `--reference-mode first` in `TennisSkeletonDataset` (`src/shared/tennis_dataset.py`).
-   - The reference appearance for each object track is anchored to its initial appearance ($t=0$, `colors[0]`).
-   - For all frames $t > 0$, `ref != target` is guaranteed, preventing the network from exploiting the historical target-copy shortcut (`target == ref`).
-   - Target match is legitimately allowed only at frame $t = 0$.
-   - Any legacy checkpoint trained under the uncorrected shortcut is flagged with `used_reference_shortcut = True` and disqualified from candidate promotion.
+### 3.2 Materialized Development Subset (`alcaraz_highlights/scene_028`)
+The pilot enforces bounded subset selection directly in `TennisSkeletonDataset` via `--video-filter`, `--scene-filter`, `--frame-start`, and `--frame-count`:
 
-2. **Invalid Candidate Handling & Reconciled Indifference Bands**:
-   - In `scripts/train_campaign.py`, candidate evaluation rejects missing, `NaN`, or domain-invalid values (`psnr < 0`, `ssim < -1` or `> 1`), marking them incomparable.
-   - Incomplete or invalid candidate records can never dominate valid measured candidates.
-   - Reconciled indifference bands:
-     - Total wire rate: $\le 2.0\%$
-     - PSNR: $\le 0.10$ dB
-     - SSIM: $\le 0.005$
-     - Client latency: $\le 5.0\%$ relative
+- **Active Tracks**:
+  1. `alcaraz_highlights_scene_028_track_0002` (player foreground)
+  2. `alcaraz_highlights_scene_028_track_0004` (player foreground)
+- **Phase 1A: Tiny-Scene Training Set** (`frame_start=0, frame_count=16`):
+  - Total items: 32 (16 frames per track, indices $t \in [0, 16)$).
+  - Reference policy: `--reference-mode first` selects track start ($t=0$, `colors[0]`).
+  - Target match: Legitimate match occurs only at $t=0$ (2 items); $ref \neq target$ for all remaining 30 items.
+- **Phase 1B: Disjoint Development Validation Set** (`frame_start=16, frame_count=16`):
+  - Total items: 32 (16 frames per track, indices $t \in [16, 32)$).
+  - Shared first reference: Anchored to $t=0$ (`colors[0]`).
+  - Target match: Zero target matches ($ref \neq target$ for all 32 items). Strictly disjoint target frames from training set.
 
 ---
 
 ## 4. Stage 1 Pilot Execution Protocol
 
-### 4.1 Resource Budget & Execution Limits
-- **Aggregate GPU Cap**: Hard aggregate cap of **1.0 GPU-hour total wall-clock time** across all Stage 1 pilot training and diagnostic runs combined.
-- **Hardware Isolation**: Single GPU device allocation (e.g. `CUDA_VISIBLE_DEVICES=1` on RTX 6000 Ada); GPU 0 remains undisturbed.
-- **Checkpointing Cadence**: Mandatory intra-epoch hourly checkpointing (`--checkpoint-interval-sec 3600.0`) with atomic file writes (`save_checkpoint_atomic`).
-- **Heartbeat Cadence**: Progress logging heartbeat at least every 10 minutes (`now - last_progress_time >= 600.0`).
-- **Process Timeout**: Training command wrapped in a hard timeout (`timeout 3600`) to guarantee adherence to the 1 GPU-hour cap.
+### 4.1 Process-Group Deadline & Resource Budget
+- **Aggregate GPU Cap**: Hard aggregate cap of **$\le 1.0$ GPU-hour total wall-clock time** (3,600 s) across the entire process group (training, diagnostics, validation, adaptation, and any extension).
+- **Time Allocation**: Training capped at $\le 40$ minutes; at least one-third ($\ge 20$ minutes) reserved for diagnostics and evaluation.
+- **Ambiguity Extension**: A targeted learning-rate refinement extension ($\le 0.5$ hour) must fit entirely within the 1.0 GPU-hour total, never exceeding it.
+- **Hardware Isolation**: Single GPU device allocation (`CUDA_VISIBLE_DEVICES=1` on RTX 6000 Ada); GPU 0 remains undisturbed.
+- **Execution Config**: Batch size 1, num_workers 0, seed 42.
+- **Heartbeat & Checkpoints**: 10-minute progress heartbeat; intra-epoch hourly checkpoint deadline with atomic file replacement (`save_checkpoint_atomic`).
 
-### 4.2 Phase 1A: Tiny-Scene Learnability Check
-Before conducting broader validation, the candidate model must demonstrate basic learnability on a tiny development sequence:
-- **Clip**: 16–32 consecutive frames from development scene `alcaraz_highlights/scene_028` (crop size $256 \times 256$, single worker/batch).
-- **Reference Mode**: `--reference-mode first`.
-- **Learnability Gate**:
-  - Generator loss ($L_{\text{GAN}} + \lambda L_1$) and discriminator loss ($L_D$) must train stably across steps.
-  - Gradients must propagate without numerical divergence (`NaN` or `Inf`).
-  - Output samples (`assets/samples/epoch_*.png`) must show meaningful appearance transfer conditioned on target pose rather than mode collapse or complete blanking.
-
-### 4.3 Phase 1B: Disjoint Development Validation
-Following the tiny-scene learnability check:
-- **Evaluation Split**: Evaluated on disjoint development data strictly held out from the Phase 1A training frames (e.g. frames 32–47 of `alcaraz_highlights/scene_028` or disjoint development scene `scene_001` from the development pool).
-- **Preserved Confirmation Sources**: Confirmation test scenes (e.g. `federer007` and held-out evaluation test splits) remain **strictly quarantined**. Zero pilot steps, parameter tuning, or exploratory evaluations touch confirmation data.
-
-### 4.4 Baseline Controls
-The candidate generative model (`gen_on_res_off`) must be compared against standard reference baselines on the identical disjoint development sequence:
-1. **Control A (Pasted Reference Baseline)**:
+### 4.2 Baseline Controls
+The candidate generative model (`gen_on_res_off`) is evaluated against two explicit reference baselines on identical disjoint development frames:
+1. **Control A (Pasted First-Reference Baseline)**:
    - Keyframe pasted reference (`gen_off_res_off`), transmitting reference frame 0 and placing it directly into target bounding boxes.
    - Secondary matched residual-on point (`gen_off_res_on` vs `gen_on_res_on` at QP 32) for codec context.
 2. **Control B (Supported Warped Reference Baseline)**:
-   - Warped reference baseline, where reference keyframe 0 is warped via optical flow or affine transformation to match target pose/bbox geometry prior to placement.
-3. **Diagnostic Diagnostic Matrix Controls**:
-   - Same-seed determinism: two independent forward passes with the same seed must produce bit-identical outputs.
-   - Pose conditioning sensitivity: delivered pixel hashes must differ between normal and shuffled pose conditioning.
-   - Blank conditioning control: delivered pixel hashes must differ between normal pose and zeroed/blank conditioning.
-   - Residual-off control: when residual is disabled, residual bytes and calls must strictly equal 0.
+   - Supported optical-flow / affine warped reference baseline (`bbox_resized_first_reference` or flow-warped), with any unavailable baseline exposed explicitly.
+3. **Diagnostic Matrix Controls**:
+   - Same-seed determinism: Bit-identical outputs for identical seeds (`--same-seed-control`).
+   - Pose conditioning sensitivity: Delivered pixel hashes differ between conditioned and shuffled pose (`--shuffled-control`).
+   - Blank conditioning control: Delivered pixel hashes differ from blank pose (`--no-conditioning-control`).
+   - Residual-off control: Zero residual bytes and zero residual calls when residual is OFF.
 
-### 4.5 Charged Total Wire Accounting
-Comparisons are evaluated on **whole-codec charged rate**, not isolated crop payloads:
-$$B_{\text{total}} = B_{\text{bg\_plate}} + B_{\text{bg\_stream}} + B_{\text{fg\_ref}} + B_{\text{pose\_motion}} + B_{\text{masks}} + B_{\text{weights\_adapter}} + B_{\text{residual}}$$
-- Background plate and stream must be explicitly costed.
-- Foreground reference keyframe transmission must be costed.
-- Pose/motion metadata and segmentation mask metadata must be fully charged to the bitstream.
-- Per-video or per-sequence model weights/adapters (if transmitted) must be charged.
-- Wire byte reconciliation (`exact_match: True`) is mandatory.
+### 4.3 Charged Total Wire Accounting
+Evaluations enforce whole-codec wire accounting, rejecting crop-only or residual-only shortcuts:
+$$B_{\text{total}} = B_{\text{bg\_plate}} + B_{\text{bg\_stream}} + B_{\text{fg\_ref}} + B_{\text{pose\_motion}} + B_{\text{masks}} + B_{\text{weights\_adapter}} + B_{\text{headers}} + B_{\text{residual}}$$
+- Background plate and stream fully costed.
+- Foreground keyframe transmission fully costed.
+- Pose/motion metadata, bounding boxes, and segmentation masks charged to wire.
+- Per-sequence or shared adapter/model overhead costed.
+- Full wire byte reconciliation (`exact_match: True`) required; missing total rate remains incomparable.
 
-### 4.6 3D Metric Reporting
+### 4.4 3D Metric Reporting
 Every evaluation must report all three core dimensions:
-1. **Rate**: Total charged wire bytes and bits-per-pixel (bpp).
-2. **Quality**: Objective fidelity measured as PSNR-Y (dB), whole-frame windowed SSIM, and VMAF.
-3. **Speed**: Measured client decode and inference latency (seconds per frame and fps) on a standardized client hardware stratum.
-*No candidate may be promoted on rate or quality alone without reported client latency.*
+1. **Rate**: Total charged wire bytes, bits-per-pixel (bpp), and component subledger.
+2. **Quality**: Objective fidelity measured as PSNR-Y (dB), whole-frame windowed SSIM, and object-region appearance/temporal fidelity.
+3. **Speed**: Measured client decode and inference latency (seconds per frame and fps) on standardized target hardware stratum (`shared_gpu_server`).
 
 ---
 
-## 5. Explicit Promotion & Baseline-Clearing Criteria
+## 5. Justified Bounds & Promotion Criteria
 
-### 5.1 Pre-Registered Two-Sided Bounds
-Prior to analyzing pilot results, measured metrics must fall within the pre-registered plausible bounds:
-- **PSNR-Y**: $[25.0\text{ dB}, 45.0\text{ dB}]$ (Values $< 25.0$ dB indicate generator collapse; values $> 45.0$ dB on lossy video indicate instrument corruption).
-- **SSIM**: $[0.70, 0.98]$ (Values $< 0.70$ indicate severe distortion; values $> 0.98$ indicate target leakage).
-- **Wire Rate Ratio**: $[0.80, 1.50]$ relative to pasted reference baseline.
-- **Client Inference Latency**: $[10\text{ ms}, 250\text{ ms}]$ per frame.
+### 5.1 Justified Two-Sided Bounds
+Derived from historical outcomes (where early training/untrained generators exhibit blur and low fidelity around 20–35 dB, and pasted reference keyframe achieves ~34.5 dB on `scene_028`):
+- **PSNR-Y**: $[18.0\text{ dB}, 42.0\text{ dB}]$ (Values $< 18.0$ dB indicate complete generator divergence; values $> 42.0$ dB on lossy video indicate instrument leakage).
+- **SSIM**: $[0.50, 0.96]$ (Values $< 0.50$ indicate severe structural artifacts; values $> 0.96$ indicate target leakage).
+- **Total Wire Bytes**: $[400\text{ KB}, 1500\text{ KB}]$ for 16 frames (including background, foreground reference, pose metadata, and container headers).
+- **Client Latency**: $[10\text{ ms}, 250\text{ ms}]$ per frame.
 
-Any measurement outside these intervals constitutes an **alarm** requiring instrument and data pipeline auditing before reporting.
+Any result outside these intervals triggers an immediate **alarm** requiring data and pipeline investigation.
 
-### 5.2 Baseline-Clearing Promotion Rules
-A candidate model is **promoted to Stage 2** if and only if it satisfies all of the following conditions on the disjoint development evaluation:
-1. **Fidelity / Rate Pareto Advantage**:
-   - Achieves lower total charged wire rate at matched or superior quality (PSNR $\ge \text{baseline} - 0.10$ dB and SSIM $\ge \text{baseline} - 0.005$), OR
-   - Achieves superior quality (PSNR $> \text{baseline} + 0.10$ dB or SSIM $> \text{baseline} + 0.005$) at matched wire rate ($\text{rate} \le \text{baseline} \times 1.02$).
+### 5.2 Promotion Decision Rule (Uncertainty-Aware)
+A candidate model is promoted to Stage 2 if and only if on the disjoint development evaluation:
+1. **Pareto Advantage**:
+   - Total wire rate is lower at matched or better quality (PSNR $\ge \text{baseline} - 0.10$ dB and SSIM $\ge \text{baseline} - 0.005$), OR
+   - Quality is improved on one axis without degrading the other outside its indifference band (PSNR $> \text{baseline} + 0.10$ dB with SSIM $\ge \text{baseline} - 0.005$, or vice versa) at matched wire rate ($\le +2\%$).
 2. **Client Latency Budget**:
    - Measured client latency does not exceed the declared client budget ($\le 105\%$ of baseline latency target).
-3. **Passed Controls**:
+3. **Controls Passed**:
    - Passes same-seed determinism, conditioning sensitivity, blank conditioning, and residual-off verification.
 4. **Valid Evaluation**:
-   - Zero `NaN` values, no domain-invalid numbers, and full byte reconciliation.
-
-### 5.3 Ambiguity Extension Policy
-If a candidate demonstrates consistent loss reduction and passes all controls but finishes within the indifference bands of the baseline (neither strictly clearing nor failing):
-- It is granted a single bounded **ambiguity extension of $\le 0.5$ GPU-hour** for targeted learning-rate refinement before final disposition.
-- If it still fails to clear the baseline after the extension, it is formally classified as **failed under recorded budget** or **deferred**.
+   - Zero `NaN`, zero negative PSNR, and full byte reconciliation.
 
 ---
 
-## 6. Concrete Executable Run Commands
+## 6. Actual Executable Run Commands
 
-When dispatched by the coordinator, the pilot execution will run the following concrete commands:
+When dispatched, pilot execution uses the tested and verified CLI tools:
 
 ```bash
 # 1. Environment & GPU Isolation (GPU 1)
 export CUDA_VISIBLE_DEVICES=1
 export PYTHONPATH="."
 export PYTHONNOUSERSITE=1
+export DATA_ROOT="/home/itec/emanuele/pointstream-data/assets/dataset"
+export OUT_DIR="/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e05/stage1_pilot"
+mkdir -p "$OUT_DIR/samples" "$OUT_DIR/matrix"
 
-# 2. Phase 1A: Tiny-Scene Pilot Training (1 GPU-hour cap with 10-min heartbeat)
-timeout 3600 python scripts/train_pix2pix.py \
-  --data-root "$PS_DATA_ROOT/dataset" \
+# 2. Phase 1A: Tiny-Scene Pilot Training (Bounded Subset: 16 frames, batch 1, workers 0)
+timeout 2400 python scripts/train_pix2pix.py \
+  --data-root "$DATA_ROOT" \
   --condition pose_body \
   --reference-mode first \
+  --video-filter alcaraz_highlights \
+  --scene-filter scene_028 \
+  --frame-start 0 \
+  --frame-count 16 \
   --epochs 20 \
-  --batch-size 4 \
+  --batch-size 1 \
+  --num-workers 0 \
   --img-size 256 \
   --lr 0.0002 \
   --seed 42 \
   --checkpoint-interval-sec 3600.0 \
-  --out-weights "$PS_DATA_ROOT/outputs/evaluation-20260914/e05/stage1_pilot/generator_pix2pix.pt" \
-  --checkpoint-path "$PS_DATA_ROOT/outputs/evaluation-20260914/e05/stage1_pilot/checkpoint_pix2pix.pt" \
-  --sample-dir "$PS_DATA_ROOT/outputs/evaluation-20260914/e05/stage1_pilot/samples"
+  --out-weights "$OUT_DIR/generator_pix2pix.pt" \
+  --checkpoint-path "$OUT_DIR/checkpoint_pix2pix.pt" \
+  --sample-dir "$OUT_DIR/samples"
 
-# 3. Diagnostic Matrix & Controls Verification on Disjoint Development Frames
-python scripts/run_diagnostic_matrix.py \
-  --weights "$PS_DATA_ROOT/outputs/evaluation-20260914/e05/stage1_pilot/generator_pix2pix.pt" \
-  --scene-path "$PS_DATA_ROOT/dataset/alcaraz_highlights/scene_028" \
-  --output-dir "$PS_DATA_ROOT/outputs/evaluation-20260914/e05/stage1_pilot/matrix" \
-  --reference-mode first \
+# 3. Phase 1B: Diagnostic Matrix on Disjoint Development Window (Frames 16..31)
+timeout 1200 python scripts/run_diagnostic_matrix.py \
+  --video alcaraz_highlights \
+  --scene scene_028 \
+  --frames 16 \
+  --start-frame 16 \
+  --generator pix2pix \
+  --checkpoint "$OUT_DIR/generator_pix2pix.pt" \
+  --output "$OUT_DIR/matrix/diagnostic_matrix.json" \
+  --shuffled-control \
+  --no-conditioning-control \
+  --same-seed-control \
+  --device "cuda:0" \
   --full-trajectory \
   --seed 42
 
-# 4. Result Ingestion & Schema Validation
-python -m src.runner.generation_adapter \
-  --input-matrix "$PS_DATA_ROOT/outputs/evaluation-20260914/e05/stage1_pilot/matrix/diagnostic_matrix.json" \
-  --output-record "$PS_DATA_ROOT/outputs/evaluation-20260914/e05/stage1_pilot/campaign_result.json"
+# 4. Result Ingestion & Schema Validation via Checked Adapter Helper
+python scripts/adapt_generation_result.py \
+  --input-matrix "$OUT_DIR/matrix/diagnostic_matrix.json" \
+  --output-record "$OUT_DIR/campaign_result.json" \
+  --run-id "e05_stage1_pilot_scene028" \
+  --backend-name "pix2pix" \
+  --checkpoint "$OUT_DIR/generator_pix2pix.pt"
 ```
 
 ---
 
 ## 7. Status & Dispatch Handoff
 
-- **Stage 1 Specification**: COMPLETE and VERIFIED.
-- **Circular Gate**: REMOVED.
-- **Confirmation Sources**: QUARANTINED and PRESERVED.
-- **Execution Status**: PENDING COORDINATOR RELEASE / DISPATCH.
-- **Immediate Action**: Return to coordinator for pilot release; **do not launch yet**.
+- **Preparation Gates**: SATISFIED and VERIFIED.
+- **Dataset Subset View**: MATERIALIZED and TESTED.
+- **CLI Commands**: TESTED against real parsers and APIs.
+- **Split Labels**: CORRECTED (`federer007` is development; confirmation quarantined).
+- **Execution**: AUTHORIZED under aggregate $\le 1.0$ GPU-hour cap upon merge with green CI.
