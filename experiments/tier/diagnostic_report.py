@@ -339,22 +339,33 @@ def build_run_identity(
     }
 
 
-def identity_matches(current: dict[str, Any], prior: dict[str, Any] | None) -> bool:
+def identity_matches(
+    current: dict[str, Any],
+    prior: dict[str, Any] | None,
+    *,
+    allow_revision_drift: bool = False,
+) -> bool:
     """Reuse requires complete identity, including checkpoint SHA and revision."""
     if not prior:
         return False
-    for key in REQUIRED_IDENTITY_KEYS:
+    keys_to_check = (
+        [k for k in REQUIRED_IDENTITY_KEYS if k != "code_revision"]
+        if allow_revision_drift
+        else REQUIRED_IDENTITY_KEYS
+    )
+    for key in keys_to_check:
         if key not in prior or key not in current:
             return False
         if current[key] != prior[key]:
             return False
-    cur_rev = current.get("code_revision") or {}
-    pri_rev = prior.get("code_revision") or {}
-    if cur_rev.get("dirty") or pri_rev.get("dirty"):
-        if not cur_rev.get("diff_sha256") or not pri_rev.get("diff_sha256"):
-            return False
-        if cur_rev.get("diff_sha256") != pri_rev.get("diff_sha256"):
-            return False
+    if not allow_revision_drift:
+        cur_rev = current.get("code_revision") or {}
+        pri_rev = prior.get("code_revision") or {}
+        if cur_rev.get("dirty") or pri_rev.get("dirty"):
+            if not cur_rev.get("diff_sha256") or not pri_rev.get("diff_sha256"):
+                return False
+            if cur_rev.get("diff_sha256") != pri_rev.get("diff_sha256"):
+                return False
     for key in ("video", "scene", "frames", "generator", "residual_qp"):
         if key in current and current.get(key) != prior.get(key):
             return False
@@ -690,11 +701,15 @@ def generation_effect(matrix: list[dict[str, Any]]) -> dict[str, Any]:
 def reusable_corners(
     prior: dict[str, Any] | None,
     current_identity: dict[str, Any],
+    *,
+    allow_revision_drift: bool = False,
 ) -> dict[str, dict[str, Any]]:
     if not prior:
         return {}
     prior_identity = prior.get("identity")
-    if not identity_matches(current_identity, prior_identity):
+    if not identity_matches(
+        current_identity, prior_identity, allow_revision_drift=allow_revision_drift
+    ):
         return {}
     found: dict[str, dict[str, Any]] = {}
     for row in prior.get("matrix") or []:
