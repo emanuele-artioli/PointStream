@@ -1,5 +1,6 @@
 # Ignore heavy model weights (>100MB, rejected by GitHub) and intermediate results
 outputs/models/
-outputs/results/
+outputs/results/*
+!outputs/results/comparison_results.json
 __pycache__/
 *.py[cod]
