@@ -41,6 +41,14 @@ PointStream strictly avoids pixel-domain blurring. Instead, rate allocation acro
 - In HEVC (Kvazaar): `--roi` specifies signed 8-bit CTU offsets.
 - Under uniform downscaling (540p), SVT-AV1's rate controller already allocates bits appropriately across high-frequency and low-frequency blocks. Removing the pixel blur restores natural wrist contours with zero metric penalty.
 
+### Diagnostic Gate on Forearm/Wrist Extension (Empirical Negative Finding):
+To test whether extending the hand crop along the forearm vector could help MediaPipe Palm Detector anchor on anatomical context, an isolated A/B evaluation on Clip 1 compared three variants (`eval_wrist_extension.py`):
+1. *Baseline (Tight BBox, 8% feather)*: **28.1% Detection Rate**, **105.6 px MPJPE**, **23.38 dB PSNR**, **0.1297 LPIPS**.
+2. *Wrist Extension +15% (10% feather)*: **21.2% Detection Rate** ($-6.9\%$), **112.0 px MPJPE** ($+6.4\text{ px}$), **23.08 dB PSNR**.
+3. *Wrist Extension +25% (12% feather)*: **17.2% Detection Rate** ($-10.9\%$), **145.1 px MPJPE** ($+39.5\text{ px}$), **22.89 dB PSNR**.
+
+**Verdict**: The production gate failed. Extending the bounding box along the wrist severely degrades palm detection because the neural generator (trained on centered, aspect-preserved hand crops) hallucinates distorted forearm textures when conditioned on extended canvases. The standard tight bounding box with 8% outer feathering remains the optimal configuration.
+
 ---
 
 ## 3. The Survivorship Bias Trap in Teleoperation Metrics
@@ -101,4 +109,42 @@ For robotic fleet deployment (e.g. Figure.ai humanoid robots), PointStream provi
    - Replace 2D single-thickness OpenCV lines with depth-scaled joint radii to eliminate finger occlusion ambiguity.
 3. **Sobel/Laplacian Edge Loss**:
    - Add a high-frequency gradient loss during overfitting to sharpen nail and knuckle crease definition.
+
+---
+
+## 6. Shared Worker Identity & Generic Foundation Hand Models
+
+### The Cross-Scene Amortization Insight:
+In manufacturing, teleoperation, or warehouse deployments, the same human teleoperator or worker operates across multiple tasks and video sessions.
+- In the Egocentric-10K benchmark, all three curated clips feature the same worker (`factory001_worker001`).
+- Transmitting appearance anchors per clip repeatedly wastes bandwidth on static worker identity.
+- Using WebP compression (~3.5 KB total for both hands) amortized over a 30-second multi-scene sequence drops the appearance anchor rate from **~24 kbps to ~0.93–1.0 kbps**:
+  $$\frac{3.5\text{ KB} \times 8}{30.0\text{ seconds}} \approx 0.93\text{ kbps}$$
+  For long-running teleoperation shifts (e.g. 1 hour), the amortized transmission rate is functionally **0.008 kbps (zero overhead)**.
+
+### Vision: Generic Foundation Hand Model:
+Rather than transmitting explicit RGB appearance crops:
+1. **Zero-Anchor Teleoperation**: A generic foundation model pre-trained on diverse human hands (varying skin tones, glove types, wristbands, nail morphology) can synthesize photorealistic hands conditioned entirely on pose skeletons and a compact latent appearance embedding $\mathbf{z} \in \mathbb{R}^{32}$ (<64 bytes).
+2. **Session Handshake**: The worker's latent appearance vector is transmitted once during session initiation handshake (0 bytes during active streaming).
+3. **Bilateral Hand Symmetry**: A human's left and right hands share skin texture, nail shape, and glove appearance. Instead of transmitting two separate appearance crops (left and right), an encoder can send one dorsal view and one palmar view, combining and horizontally mirroring them at the client side. This halves anchor storage requirements.
+
+---
+
+## 7. Telemetry Channel vs. Video Stream Architecture
+
+In robotics teleoperation (e.g. Figure.ai humanoid fleets), video display and motion control serve two fundamentally different consumers with conflicting constraints:
+
+| Stream Component | Consumer | Transport Protocol | Bandwidth | Latency Budget | Error Tolerance |
+|---|---|---|---|---|---|
+| **Pose Telemetry** | Robot Policy (ACT, Diffusion Policy) | Low-overhead UDP / ROS2 / ZeroMQ | **8.4 kbps** | < 5 ms | Zero geometric drift / drop |
+| **Background Video** | Human Teleoperator Headset / Monitor | WebRTC (SRTP/RTP) | **40–300 kbps** | < 50 ms | Tolerates perceptual compression |
+| **Synthesized Hands** | Human Teleoperator Visual Feedback | Client-side GPU Shader / Neural Net | **0 kbps** (local) | < 3 ms | High visual acuity on manipulators |
+
+### Stream Separation Principle:
+- Conventional video streaming mixes hand pixels with background pixels over a single WebRTC channel. If network bandwidth fluctuates, the video codec introduces macroblocking, blurring, or dropped frames, causing receiver-side pose estimators to fail and freezing the robot.
+- PointStream decouples telemetry from visual video:
+  1. The **8.4 kbps telemetry channel** is transmitted with maximum QoS priority (high DSCP marking, forward error correction) directly to the robot joint controller, guaranteeing 100% control availability even under 99% packet loss on the video channel.
+  2. The **video channel** can starve down to 30 kbps (180p/240p) or freeze completely without interrupting the robot's physical manipulation loop.
+  3. The teleoperator display synthesizes crisp 1080p hands over whatever background frames arrive, providing immediate tactile and visual confidence.
+
 
