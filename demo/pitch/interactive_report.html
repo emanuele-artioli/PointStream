@@ -179,15 +179,15 @@
         <h2 class="section-title">Side-by-Side Demonstration Video (Native 1080p Stacked Panels)</h2>
         <div class="chart-box">
             <div style="margin-bottom: 16px;">
-                <button onclick="switchClip('clip_01')" id="btn-clip1" style="background: var(--accent-blue); color: #000; font-weight: bold; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-right: 8px;">Clip 1 (Assembly Prep)</button>
+                <button onclick="switchClip('clip_03')" id="btn-clip3" style="background: var(--accent-blue); color: #000; font-weight: bold; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-right: 8px;">Clip 3 · Headline (Wire)</button>
                 <button onclick="switchClip('clip_02')" id="btn-clip2" style="background: var(--bg-secondary); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-right: 8px;">Clip 2 (Component Fit)</button>
-                <button onclick="switchClip('clip_03')" id="btn-clip3" style="background: var(--bg-secondary); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 6px; cursor: pointer;">Clip 3 (Wire Manipulation)</button>
+                <button onclick="switchClip('clip_01')" id="btn-clip1" style="background: var(--bg-secondary); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 6px; cursor: pointer;">Clip 1 (Assembly Prep)</button>
             </div>
-            <video id="demo-video" controls style="width: 100%; border-radius: 8px; max-height: 600px; background: #000;" src="side_by_side_demo_clip_01_factory001_worker001_00001.mp4">
+            <video id="demo-video" controls style="width: 100%; border-radius: 8px; max-height: 600px; background: #000;" src="side_by_side_demo_clip_03_factory001_worker001_00000.mp4">
                 Your browser does not support HTML5 video.
             </video>
             <p id="demo-caption" style="margin-top: 12px; color: var(--text-muted); font-size: 0.9rem;">
-                Vertically stacked 3-panel demonstration: (1) Reference HEVC (1080p native @ 4,200 kbps) &bull; (2) Starved AV1 240p p7 (62–78 kbps) &bull; (3) PointStream Extreme Starve (70–86 kbps, 18.4 ms). Each panel is native 1080p.
+                Headline tape: (1) Reference 1080p @ 4,200 kbps &bull; (2) AV1 240p starved floor @ 61.9 kbps (99.3 px) &bull; (3) PointStream Extreme Starve @ 69.8 kbps (43.8 px, 2.27× lower MPJPE). Clips 1–2 pair Extreme Starve with AV1 180p, the floor the report cites.
             </p>
         </div>
 
@@ -197,14 +197,21 @@
                 'clip_02': 'side_by_side_demo_clip_02_factory001_worker001_00002.mp4',
                 'clip_03': 'side_by_side_demo_clip_03_factory001_worker001_00000.mp4'
             };
+            const captionMap = {
+                'clip_01': 'Clip 1 vs the report’s 180p floor: Extreme Starve 108.4 px @ 85.9 kbps vs AV1 180p 158.5 px. vs AV1 240p this clip is a tie — that arm is not on this tape.',
+                'clip_02': 'Clip 2 vs AV1 180p: Extreme Starve 75.5 px / 47.6% det @ 84.7 kbps vs AV1 50.8 kbps / 21.8% det / 105.9 px.',
+                'clip_03': 'Headline: Extreme Starve 43.8 px @ 69.8 kbps vs AV1 240p 99.3 px (2.27×). Detection 35.5% vs 23.7%.'
+            };
+            const btnMap = { clip_01: 'clip1', clip_02: 'clip2', clip_03: 'clip3' };
             function switchClip(clipKey) {
                 const vid = document.getElementById('demo-video');
                 vid.src = videoMap[clipKey];
                 vid.load();
                 vid.play().catch(e => {});
+                document.getElementById('demo-caption').textContent = captionMap[clipKey];
                 ['clip1', 'clip2', 'clip3'].forEach(id => {
                     const btn = document.getElementById('btn-' + id);
-                    if ('btn-' + id === 'btn-' + clipKey.replace('_', '')) {
+                    if (id === btnMap[clipKey]) {
                         btn.style.background = 'var(--accent-blue)';
                         btn.style.color = '#000';
                         btn.style.fontWeight = 'bold';
