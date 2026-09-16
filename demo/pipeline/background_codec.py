@@ -27,12 +27,14 @@ class BackgroundCodec:
         preset: int = 7,
         encoder: str = "libsvtav1",
         mask_hands: bool = False,
+        scale_resolution: tuple[int, int] | None = None,
     ) -> None:
         self.downscale_factor = downscale_factor
         self.target_bitrate_kbps = target_bitrate_kbps
         self.preset = preset
         self.encoder = encoder
         self.mask_hands = mask_hands
+        self.scale_resolution = scale_resolution
 
     def prepare_background_video(
         self,
@@ -53,9 +55,12 @@ class BackgroundCodec:
         w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-        bg_w = int(round(w * self.downscale_factor))
-        bg_h = int(round(h * self.downscale_factor))
-        # Ensure dimensions are even
+        if self.scale_resolution is not None:
+            bg_w, bg_h = self.scale_resolution
+        else:
+            bg_w = int(round(w * self.downscale_factor))
+            bg_h = int(round(h * self.downscale_factor))
+        # Ensure dimensions are even (required by video codecs)
         bg_w = bg_w if bg_w % 2 == 0 else bg_w + 1
         bg_h = bg_h if bg_h % 2 == 0 else bg_h + 1
 
@@ -113,7 +118,18 @@ class BackgroundCodec:
         target_w: int,
         target_h: int,
     ) -> list[np.ndarray]:
-        return read_video_frames_robust(encoded_mp4, target_w=target_w, target_h=target_h)
+        """Decodes and upscales background frames to native resolution (Lanczos).
+
+        Regardless of the encoding resolution (180p–1080p), decoded frames are
+        always returned at (target_w × target_h) so that neural hand compositing
+        operates at full 1080p spatial resolution.
+        """
+        return read_video_frames_robust(
+            encoded_mp4,
+            target_w=target_w,
+            target_h=target_h,
+            upsample_interpolation=cv2.INTER_LANCZOS4,
+        )
 
 
 def read_video_frames_robust(
@@ -121,6 +137,7 @@ def read_video_frames_robust(
     target_w: int | None = None,
     target_h: int | None = None,
     max_frames: int | None = None,
+    upsample_interpolation: int = cv2.INTER_LINEAR,
 ) -> list[np.ndarray]:
     """Decodes video frames using cv2 with an automatic fallback to ffmpeg rawvideo pipe for AV1."""
     cap = cv2.VideoCapture(str(video_path))
@@ -129,7 +146,7 @@ def read_video_frames_robust(
         ret, test_f = cap.read()
         if ret and test_f is not None:
             if target_w and target_h and (test_f.shape[1] != target_w or test_f.shape[0] != target_h):
-                test_f = cv2.resize(test_f, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
+                test_f = cv2.resize(test_f, (target_w, target_h), interpolation=upsample_interpolation)
             frames.append(test_f)
             while cap.isOpened():
                 if max_frames and len(frames) >= max_frames:
@@ -138,7 +155,7 @@ def read_video_frames_robust(
                 if not ret or frame is None:
                     break
                 if target_w and target_h and (frame.shape[1] != target_w or frame.shape[0] != target_h):
-                    frame = cv2.resize(frame, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
+                    frame = cv2.resize(frame, (target_w, target_h), interpolation=upsample_interpolation)
                 frames.append(frame)
             cap.release()
             if len(frames) > 0:
@@ -173,7 +190,7 @@ def read_video_frames_robust(
     decoded: list[np.ndarray] = []
     for f in arr:
         if target_w and target_h and (orig_w != target_w or orig_h != target_h):
-            f = cv2.resize(f, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
+            f = cv2.resize(f, (target_w, target_h), interpolation=upsample_interpolation)
         decoded.append(f)
     return decoded
 

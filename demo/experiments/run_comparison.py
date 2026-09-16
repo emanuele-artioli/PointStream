@@ -45,6 +45,16 @@ DEFAULT_CURATED_DIR = Path("/home/itec/emanuele/Datasets/Egocentric-10K/curated"
 DEFAULT_OUTPUT_DIR = Path("demo/outputs/results")
 DEFAULT_CHECKPOINT = Path("demo/outputs/models/overfit_generator.pt")
 
+# PointStream multi-tier background ladder.
+# Each tier: (label, scale_resolution or None for native 1080p, target_bg_kbps, SVT-AV1 preset)
+POINTSTREAM_TIERS = [
+    ("PS Extreme Starve (240p bg, 30k)", (426, 240), 30, 7),
+    ("PS Heavy Starve (360p bg, 70k)", (640, 360), 70, 7),
+    ("PS Low Teleop (540p bg, 140k)", (960, 540), 140, 7),
+    ("PS Standard (540p bg, 250k)", (960, 540), 250, 7),
+    ("PS Standard 1080p (native bg, 300k)", None, 300, 10),
+]
+
 
 def reconstruct_pointstream_video(
     ref_frames: list[np.ndarray],
@@ -129,8 +139,15 @@ def run_single_clip_comparison(
     evaluator: QualityEvaluator,
     device: torch.device,
     n_frames: int = 300,
-    target_bg_kbps: int = 250,
+    total_session_sec: float = 30.0,
+    shared_anchor_bytes: int = 0,
 ) -> dict[str, Any]:
+    """Benchmark a single clip across the full PointStream and AV1 ladders.
+
+    Args:
+        total_session_sec: Total duration across all clips (for shared anchor amortization).
+        shared_anchor_bytes: Total WebP anchor bytes shared across all clips (same worker).
+    """
     clip_stem = clip_path.stem
     clip_out_dir = output_dir / clip_stem
     clip_out_dir.mkdir(parents=True, exist_ok=True)
@@ -167,146 +184,147 @@ def run_single_clip_comparison(
     keypoint_bytes = sum(len(pkt) for pkt in keypoint_packets)
     keypoint_kbps = (keypoint_bytes * 8) / (duration_sec * 1000.0)
 
-    # 4. Background encode & decode (Standard 250k bg, preset 7)
-    logger.info(f"[{clip_stem}] Encoding standard background stream (target {target_bg_kbps} kbps, preset 7)...")
-    bg_codec = BackgroundCodec(downscale_factor=0.5, target_bitrate_kbps=target_bg_kbps, preset=7)
-    bg_encoded_mp4 = clip_out_dir / "pointstream_background.mp4"
-    _, bg_bytes = bg_codec.prepare_background_video(
-        ref_trimmed_mp4, poses, bg_encoded_mp4, max_frames=n_frames
+    # 4. Extract appearance anchors (WebP-compressed, shared across clips)
+    _, clip_anchors, clip_anchor_bytes = build_curated_samples(
+        ref_trimmed_mp4, poses, image_size=256, max_frames=n_frames, clip_id=clip_id,
     )
-    bg_frames = bg_codec.decode_background_frames(bg_encoded_mp4, w, h)
-    bg_kbps = (bg_bytes * 8) / (duration_sec * 1000.0)
+    per_clip_anchor_bytes = sum(clip_anchor_bytes.values())
 
-    # 4b. Background encode & decode (Ultra-low 90k bg, preset 7)
-    logger.info(f"[{clip_stem}] Encoding ultra-low background stream (target 90 kbps, preset 7)...")
-    bg_codec_low = BackgroundCodec(downscale_factor=0.5, target_bitrate_kbps=90, preset=7)
-    bg_encoded_low_mp4 = clip_out_dir / "pointstream_bg_90k.mp4"
-    _, bg_bytes_low = bg_codec_low.prepare_background_video(
-        ref_trimmed_mp4, poses, bg_encoded_low_mp4, max_frames=n_frames
-    )
-    bg_frames_low = bg_codec_low.decode_background_frames(bg_encoded_low_mp4, w, h)
-    bg_low_kbps = (bg_bytes_low * 8) / (duration_sec * 1000.0)
+    # Anchor cost is amortized across the full session (shared worker identity).
+    anchor_kbps_amortized = (shared_anchor_bytes * 8) / (total_session_sec * 1000.0)
 
-    # 4c. Periodic Infilled Keyframe Plate (every 60 frames = 2 seconds)
+    # ====================================================================
+    # 5. PointStream Multi-Tier Ladder
+    # ====================================================================
+    pointstream_variants: list[dict[str, Any]] = []
+
+    for tier_name, scale_res, bg_target_kbps, preset in POINTSTREAM_TIERS:
+        tag = tier_name.split("(")[0].strip().lower().replace(" ", "_")
+        bg_mp4 = clip_out_dir / f"ps_bg_{tag}.mp4"
+
+        logger.info(f"[{clip_stem}] Encoding PointStream background: {tier_name}...")
+
+        if scale_res is not None:
+            bg_codec = BackgroundCodec(
+                scale_resolution=scale_res,
+                target_bitrate_kbps=bg_target_kbps,
+                preset=preset,
+            )
+        else:
+            # Native 1080p — no downscaling
+            bg_codec = BackgroundCodec(
+                downscale_factor=1.0,
+                target_bitrate_kbps=bg_target_kbps,
+                preset=preset,
+            )
+
+        _, bg_bytes = bg_codec.prepare_background_video(
+            ref_trimmed_mp4, poses, bg_mp4, max_frames=n_frames,
+        )
+        bg_frames = bg_codec.decode_background_frames(bg_mp4, w, h)
+        bg_kbps = (bg_bytes * 8) / (duration_sec * 1000.0)
+
+        # Verify all background frames are at native resolution for compositing
+        assert bg_frames[0].shape[:2] == (h, w), (
+            f"Background frame shape {bg_frames[0].shape[:2]} != native ({h}, {w})"
+        )
+
+        # Reconstruct
+        ps_rec_mp4 = clip_out_dir / f"ps_rec_{tag}.mp4"
+        logger.info(f"[{clip_stem}] Synthesizing {tier_name} frames...")
+        _, _ = reconstruct_pointstream_video(
+            ref_frames, poses, model, clip_anchors, bg_frames,
+            ps_rec_mp4, device, fps=fps, image_size=256,
+        )
+
+        total_bytes = bg_bytes + keypoint_bytes + shared_anchor_bytes
+        total_kbps = bg_kbps + keypoint_kbps + anchor_kbps_amortized
+
+        ps_rec_frames = read_video_frames_robust(ps_rec_mp4, max_frames=n_frames)
+        ps_quality = evaluator.evaluate_frames(ref_frames, ps_rec_frames, poses=poses)
+        ps_teleop = evaluate_teleop_utility(poses, ps_rec_mp4, max_frames=n_frames)
+
+        record: dict[str, Any] = {
+            "name": tier_name,
+            "total_bytes": total_bytes,
+            "bitrate_kbps": round(total_kbps, 1),
+            "background_kbps": round(bg_kbps, 1),
+            "keypoint_kbps": round(keypoint_kbps, 1),
+            "anchor_kbps": round(anchor_kbps_amortized, 1),
+            "metrics": ps_quality,
+            "teleop_utility": ps_teleop,
+            "video_path": str(ps_rec_mp4),
+        }
+        pointstream_variants.append(record)
+
+    # 6. Periodic Infilled Keyframe Plate (every 60 frames = 2 seconds)
     logger.info(f"[{clip_stem}] Encoding periodic background keyframe plates (every 2s)...")
     plate_codec = BackgroundPlateCodec(plate_interval_frames=60, quality=75)
     plate_dir = clip_out_dir / "pointstream_plates"
     plate_paths, plate_bytes = plate_codec.prepare_background_plates(
-        ref_trimmed_mp4, poses, plate_dir, max_frames=n_frames
+        ref_trimmed_mp4, poses, plate_dir, max_frames=n_frames,
     )
     bg_frames_plate = plate_codec.decode_background_frames(plate_paths, len(ref_frames), w, h)
     plate_kbps = (plate_bytes * 8) / (duration_sec * 1000.0)
 
-    # 5. Extract appearance anchors for this clip
-    _, clip_anchors = build_curated_samples(ref_trimmed_mp4, poses, image_size=256, max_frames=n_frames, clip_id=clip_id)
-    anchor_bytes = sum(cv2.imencode(".jpg", anchor)[1].nbytes for anchor in clip_anchors.values())
-    anchor_kbps = (anchor_bytes * 8) / (duration_sec * 1000.0)
-
-    # 6. Reconstruct PointStream Video (Standard)
-    ps_rec_mp4 = clip_out_dir / "pointstream_reconstructed.mp4"
-    logger.info(f"[{clip_stem}] Synthesizing PointStream (Standard) frames from keypoints...")
-    _, _ = reconstruct_pointstream_video(
-        ref_frames, poses, model, clip_anchors, bg_frames, ps_rec_mp4, device, fps=fps, image_size=256
-    )
-    total_ps_bytes = bg_bytes + keypoint_bytes + anchor_bytes
-    total_ps_kbps = (total_ps_bytes * 8) / (duration_sec * 1000.0)
-    ps_rec_frames = read_video_frames_robust(ps_rec_mp4, max_frames=n_frames)
-    ps_quality = evaluator.evaluate_frames(ref_frames, ps_rec_frames, poses=poses)
-    ps_teleop = evaluate_teleop_utility(poses, ps_rec_mp4, max_frames=n_frames)
-
-    pointstream_record = {
-        "name": "PointStream (Standard, 250k bg)",
-        "total_bytes": total_ps_bytes,
-        "bitrate_kbps": round(total_ps_kbps, 1),
-        "background_kbps": round(bg_kbps, 1),
-        "keypoint_kbps": round(keypoint_kbps, 1),
-        "anchor_kbps": round(anchor_kbps, 1),
-        "metrics": ps_quality,
-        "teleop_utility": ps_teleop,
-        "video_path": str(ps_rec_mp4),
-    }
-
-    # 6b. Reconstruct PointStream Video (Ultra-Low Rate)
-    ps_rec_low_mp4 = clip_out_dir / "pointstream_reconstructed_low.mp4"
-    logger.info(f"[{clip_stem}] Synthesizing PointStream (Ultra-Low) frames from keypoints...")
-    _, _ = reconstruct_pointstream_video(
-        ref_frames, poses, model, clip_anchors, bg_frames_low, ps_rec_low_mp4, device, fps=fps, image_size=256
-    )
-    total_ps_low_bytes = bg_bytes_low + keypoint_bytes + anchor_bytes
-    total_ps_low_kbps = (total_ps_low_bytes * 8) / (duration_sec * 1000.0)
-    ps_rec_low_frames = read_video_frames_robust(ps_rec_low_mp4, max_frames=n_frames)
-    ps_quality_low = evaluator.evaluate_frames(ref_frames, ps_rec_low_frames, poses=poses)
-    ps_teleop_low = evaluate_teleop_utility(poses, ps_rec_low_mp4, max_frames=n_frames)
-
-    pointstream_low_record = {
-        "name": "PointStream (Ultra-Low, 90k bg)",
-        "total_bytes": total_ps_low_bytes,
-        "bitrate_kbps": round(total_ps_low_kbps, 1),
-        "background_kbps": round(bg_low_kbps, 1),
-        "keypoint_kbps": round(keypoint_kbps, 1),
-        "anchor_kbps": round(anchor_kbps, 1),
-        "metrics": ps_quality_low,
-        "teleop_utility": ps_teleop_low,
-        "video_path": str(ps_rec_low_mp4),
-    }
-
-    # 6c. Reconstruct PointStream Video (Periodic Plate)
     ps_rec_plate_mp4 = clip_out_dir / "pointstream_reconstructed_plate.mp4"
     logger.info(f"[{clip_stem}] Synthesizing PointStream (Plate 2s) frames from keypoints...")
     _, _ = reconstruct_pointstream_video(
-        ref_frames, poses, model, clip_anchors, bg_frames_plate, ps_rec_plate_mp4, device, fps=fps, image_size=256
+        ref_frames, poses, model, clip_anchors, bg_frames_plate,
+        ps_rec_plate_mp4, device, fps=fps, image_size=256,
     )
-    total_ps_plate_bytes = plate_bytes + keypoint_bytes + anchor_bytes
-    total_ps_plate_kbps = (total_ps_plate_bytes * 8) / (duration_sec * 1000.0)
+    total_ps_plate_bytes = plate_bytes + keypoint_bytes + shared_anchor_bytes
+    total_ps_plate_kbps = plate_kbps + keypoint_kbps + anchor_kbps_amortized
     ps_rec_plate_frames = read_video_frames_robust(ps_rec_plate_mp4, max_frames=n_frames)
     ps_quality_plate = evaluator.evaluate_frames(ref_frames, ps_rec_plate_frames, poses=poses)
     ps_teleop_plate = evaluate_teleop_utility(poses, ps_rec_plate_mp4, max_frames=n_frames)
 
-    pointstream_plate_record = {
+    pointstream_variants.append({
         "name": "PointStream (Plate 2s)",
         "total_bytes": total_ps_plate_bytes,
         "bitrate_kbps": round(total_ps_plate_kbps, 1),
         "background_kbps": round(plate_kbps, 1),
         "keypoint_kbps": round(keypoint_kbps, 1),
-        "anchor_kbps": round(anchor_kbps, 1),
+        "anchor_kbps": round(anchor_kbps_amortized, 1),
         "metrics": ps_quality_plate,
         "teleop_utility": ps_teleop_plate,
         "video_path": str(ps_rec_plate_mp4),
-    }
+    })
 
-    # 8. Encode Fair AV1 Ladder (spanning 540p, 720p, and 1080p tiers)
+    # 7. Encode Fair AV1 Ladder (spanning 180p–1080p)
     logger.info(f"[{clip_stem}] Running fair AV1 comparison ladder...")
     ladder_dir = clip_out_dir / "av1_ladder"
     av1_results = encode_ladder(ref_trimmed_mp4, ladder_dir, max_frames=n_frames)
 
     # Evaluate AV1 streams
-    evaluated_av1 = []
+    evaluated_av1: list[dict[str, Any]] = []
     for item in av1_results:
         av1_vid = Path(item["output_path"])
         av1_frames = read_video_frames_robust(av1_vid, max_frames=n_frames)
 
         av1_qual = evaluator.evaluate_frames(ref_frames, av1_frames, poses=poses)
         av1_tel = evaluate_teleop_utility(poses, av1_vid, max_frames=n_frames)
-        evaluated_av1.append(
-            {
-                "name": item["name"],
-                "target_kbps": item["bitrate_target_kbps"],
-                "actual_kbps": round(item["actual_bitrate_kbps"], 1),
-                "scale": item.get("scale"),
-                "preset": item.get("preset"),
-                "ms_per_frame": item.get("ms_per_frame"),
-                "encode_fps": item.get("encode_fps"),
-                "size_bytes": item["size_bytes"],
-                "deblocked": item["deblocked"],
-                "metrics": av1_qual,
-                "teleop_utility": av1_tel,
-                "video_path": str(av1_vid),
-            }
-        )
+        evaluated_av1.append({
+            "name": item["name"],
+            "target_kbps": item["bitrate_target_kbps"],
+            "actual_kbps": round(item["actual_bitrate_kbps"], 1),
+            "scale": item.get("scale"),
+            "preset": item.get("preset"),
+            "ms_per_frame": item.get("ms_per_frame"),
+            "encode_fps": item.get("encode_fps"),
+            "size_bytes": item["size_bytes"],
+            "deblocked": item["deblocked"],
+            "metrics": av1_qual,
+            "teleop_utility": av1_tel,
+            "video_path": str(av1_vid),
+        })
 
     ref_total_hands = sum(len(p.hands) for p in poses)
     ref_frames_with_hands = sum(1 for p in poses if len(p.hands) > 0)
     ref_detection_ceiling = float(ref_frames_with_hands / max(1, len(ref_frames)))
+
+    # The "primary" pointstream record is the Standard 540p variant (backward compat)
+    primary_ps = pointstream_variants[3] if len(pointstream_variants) > 3 else pointstream_variants[0]
 
     return {
         "clip_id": clip_id,
@@ -320,9 +338,10 @@ def run_single_clip_comparison(
             "total_frames": len(ref_frames),
             "detection_ceiling": round(ref_detection_ceiling, 3),
         },
-        "pointstream": pointstream_record,
-        "pointstream_variants": [pointstream_record, pointstream_low_record, pointstream_plate_record],
+        "pointstream": primary_ps,
+        "pointstream_variants": pointstream_variants,
         "av1_arms": evaluated_av1,
+        "per_clip_anchor_bytes": per_clip_anchor_bytes,
     }
 
 
@@ -358,9 +377,40 @@ def main() -> None:
 
     evaluator = QualityEvaluator(device_str=args.device)
 
+    # --- Two-pass approach for shared anchor amortization ---
+    # Pass 1: Extract anchor bytes from each clip (lightweight — just pose extraction + anchor selection).
+    # Pass 2: Run the full benchmark with the total shared anchor bytes.
+    clip_paths = [Path(item["path"]) for item in manifest[:3]]
+    clip_durations: list[float] = []
+    per_clip_anchor_bytes_list: list[int] = []
+
+    logger.info("Pass 1: Pre-extracting shared worker anchor bytes across all clips...")
+    for idx, clip_path in enumerate(clip_paths):
+        cap = cv2.VideoCapture(str(clip_path))
+        fps_val = float(cap.get(cv2.CAP_PROP_FPS)) or 30.0
+        n_total = min(int(cap.get(cv2.CAP_PROP_FRAME_COUNT)), args.frames)
+        cap.release()
+        clip_durations.append(n_total / fps_val)
+
+        poses = extract_video_hand_poses(clip_path, max_frames=args.frames)
+        _, _, anchor_bytes_dict = build_curated_samples(
+            clip_path, poses, image_size=256, max_frames=args.frames, clip_id=idx,
+        )
+        per_clip_anchor_bytes_list.append(sum(anchor_bytes_dict.values()))
+
+    # Same worker across all 3 clips: take the max anchor set (superset of sides).
+    # In practice all clips have both hands, so this is the same as any single clip.
+    shared_anchor_bytes = max(per_clip_anchor_bytes_list) if per_clip_anchor_bytes_list else 0
+    total_session_sec = sum(clip_durations) if clip_durations else 30.0
+    anchor_kbps = (shared_anchor_bytes * 8) / (total_session_sec * 1000.0)
+    logger.info(
+        f"Shared WebP anchor: {shared_anchor_bytes} bytes, "
+        f"amortized over {total_session_sec:.1f}s = {anchor_kbps:.2f} kbps"
+    )
+
+    # Pass 2: Full benchmark
     all_clip_results = []
-    for idx, item in enumerate(manifest[:3]):
-        clip_path = Path(item["path"])
+    for idx, clip_path in enumerate(clip_paths):
         logger.info("\n==========================================")
         logger.info(f"BENCHMARKING CLIP {idx + 1}/3: {clip_path.name}")
         logger.info("==========================================")
@@ -373,6 +423,8 @@ def main() -> None:
             evaluator=evaluator,
             device=device,
             n_frames=args.frames,
+            total_session_sec=total_session_sec,
+            shared_anchor_bytes=shared_anchor_bytes,
         )
         all_clip_results.append(res)
 
@@ -384,6 +436,9 @@ def main() -> None:
     final_payload = {
         "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
         "hardware": torch.cuda.get_device_name(device) if device.type == "cuda" else "CPU",
+        "shared_anchor_bytes": shared_anchor_bytes,
+        "shared_anchor_kbps": round(anchor_kbps, 2),
+        "total_session_sec": round(total_session_sec, 1),
         "latency_profile": latency_profile,
         "clips": all_clip_results,
     }
@@ -396,4 +451,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
