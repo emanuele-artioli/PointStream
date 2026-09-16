@@ -1,5 +1,17 @@
 # Evaluation Area
 
+## Conditional pilot acceptance — 16 September 2026
+
+#117 at `d700a93` is accepted and merged as `015c971`, with green exact-head CI.
+The decode repair preserves saved artifacts; native-seek pixel provenance remains
+unresolved for 47/48 frames, so no native-PTS certification follows. #121 at
+`bc1a144` is a green preparatory card, not an executable or fully serialized
+codec yet. The current brief releases its repairs followed conditionally by four
+E06 settings, <=30 minutes total. No anchor/background re-encodes or confirmation
+scores. Predictor names and charged headers must reflect actual implementations.
+Follow [the current launch gates](../workflow/session/evaluation-campaign/tasks/20260916-bounded-pilot-release.md).
+
+
 ## Coordinator readiness — 16 September 2026
 
 Neural anchor source and paper are pinned in
@@ -12,7 +24,7 @@ The RGB input config uses the exact E03B prepared stack; its native-PTS gap
 remains explicit. The budget card is proposed, not an execution release.
 
 
-## Current review — 16 September 2026
+## Historical review — 16 September 2026
 
 #114 merged as `9c6609f`. Follow-up on `codex/e03b-20260916` repairs the decode
 gate: empty, partial, short and extra RGB24 dumps fail before reshape or pad.
@@ -30,7 +42,7 @@ standalone RGB dumps match. Original `probe_report` SHA-256
 `77c30b5b2d81da8bd8abe50e41150571db9d7615bcbdf3ee0657f1cbdb5c2d9a` unchanged.
 Native PTS mapping is preserved; 1/48 selected PNGs match a native seek at the
 mapped PTS (first frame). The other 47 differ (mean abs ~2). That remaining
-uncertainty is the 24 fps extract vs native seek, recorded in
+uncertainty concerns extract-grid versus native-seek provenance, recorded in
 `derived_native_mapping.json`. Verification JSON SHA-256
 `2df757a43970c28083c24b8930ac8dd860a9acba356d706800cb5707429192f6`. Score-free
 eligibility is not permission to score.

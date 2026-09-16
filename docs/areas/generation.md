@@ -1,6 +1,18 @@
 # Generation Area
 
-## Current review — 16 September 2026
+## Conditional pilot acceptance — 16 September 2026
+
+#118 at `e73c8ba` has green CI. Corrected first-reference/domain handling and
+exact tested G/D/Adam-moment CPU CLI continuation are advances; no CUDA identity
+claim is accepted. The card still lacks a real tiny subset, valid evaluator/API
+commands and an aggregate deadline. The current brief authorizes these fixes
+then a conditional E05 pilot within one total GPU-hour, including diagnostics
+and ambiguity extension. Federer scene 007 is development; the reserved trio is
+quarantined. #118 is not accepted as an executable release at its reviewed head.
+Follow [the current launch gates](../workflow/session/evaluation-campaign/tasks/20260916-bounded-pilot-release.md).
+
+
+## Historical review — 16 September 2026
 
 #109 at `c9c4ded` has green CI, an actual fresh-CLI continuation regression,
 restored Python RNG and isolated DataLoader RNG. Supplied diagnostic/adapter
