@@ -1,12 +1,26 @@
 # Evaluation Area
 
-## E03B — 16 September 2026
+## Current review — 16 September 2026
+
+#114 at `c1c68ec` has green CI and reusable four-setting artifacts. Coordinator
+checks matched all stream hashes/byte counts and independently counted 48 frames
+in each ordinary and standalone decoded container. The wrapper nevertheless
+pads/trims raw output before validating shape; a two-frame reproducer became
+48 frames. The decode/reuse gate remains a follow-up on the landed code. Do not
+rerun the four encodes. Native PTS needs pixel-provenance verification, and
+score-free eligibility is not permission to score confirmation.
+
+The saved E03B VMAF alarm has supporting same-grid severe-blur calibration at the
+floor; retain original bounds and write a separate disposition. Scope the result
+to one development scene and single-run timing. E04A background-region metrics
+and background-only bytes cannot be compared directly to whole-frame anchors.
+Follow the [review and focused assignments](../workflow/session/evaluation-campaign/tasks/20260916-probe-review.md).
+
+## E03B probe record — 16 September 2026
 
 Worktree `/home/itec/emanuele/worktrees/pointstream-e03b-20260916` on
 `codex/e03b-20260916`. Code head at probe:
-`df9f945785b6dcd2cb7d6c5619b4b496da76ec23` (ancestor of required `8eb045a`;
-fast-forwarded through `origin/main` `c476840`). PR #114. Contract pin still
-matches. Persistent wrapper:
+`df9f945785b6dcd2cb7d6c5619b4b496da76ec23`. Persistent wrapper:
 `experiments.tier.e03b_persist.persistent_timed_roundtrip`. Native PTS recipe
 (shared with E04A): run dir
 `outputs/evaluation-20260914/e03b/run-20260916-federer007/`. Prepared stack
@@ -23,7 +37,7 @@ identity string. Same-QP quality ranges do not overlap (AV1 PSNR 27.4–33.0 dB
 vs VVC 17.9–24.6 dB). Do not compute BD-rate. One interior QP between 47 and
 63 cannot create overlap; skip it. Size-adjacent pair already exists: AV1 QP63
 19 116 B / 27.4 dB vs VVC QP47 21 288 B / 24.6 dB. One-scene diagnostic only;
-not a confirmed advantage. Pair E04A on this PTS recipe. Do not wait for #109.
+not a confirmed advantage.
 
 VMAF 0.0 on VVC QP63 fired the pre-score band [5, 100]. Calibration on this
 grid already floors at 0 (severe-blur and spatial-null); unrelated-clip VMAF
@@ -33,10 +47,9 @@ anchors. `n=1` scene, single-run timing, not a repeated speed claim.
 
 Confirmation eligibility unchanged: acquired=3, confirmation_eligible=3,
 `scores_computed=false`. All 1080p; cannot confirm native 4K. Coordinator
-still must freeze scenes before any confirmation scoring. Campaign reader and
-generation adapter remain Cursor-owned.
+still must freeze scenes before any confirmation scoring.
 
-## Current acceptance completion — 15 September 2026
+## Historical acceptance completion — 15 September 2026
 
 PR #104 rejects invalid runtime evidence and requires explicit measured RD arms
 while retaining valid RD without timing. Standalone transport requires decode,

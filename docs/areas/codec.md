@@ -1,6 +1,22 @@
 # Codec Area
 
-## Current assignment — 15 September 2026
+## Current review — 16 September 2026
+
+#113 merged as `c476840`. E04A's six removal-OFF bitstream hashes match the saved
+report, whose prepared RGB identity agrees with E03B. Treat this as a reusable
+background component diagnostic. The general low-rate panorama recommendation
+and claim of eliminated ghosting are not accepted from one scene.
+
+Complete actual region-scorer calibration (masked global SSIM differs from the
+calibrated whole-frame windowed path), standalone decoding from serialized side
+data, truthful metric/byte/timing scope, and common-scope rescoring of saved
+anchor decodes. Fixed-overlay foreground costs are not in the background ledger.
+The new video helper also pads short decodes and must fail closed. Preserve all
+old artifacts; the [next assignment](../workflow/session/evaluation-campaign/tasks/20260916-probe-review.md)
+authorizes decode/rescoring and missing timing only, with no new candidate encodes.
+A contrasting camera scene and paired removal remain subsequent costed work.
+
+## Historical assignment — 15 September 2026
 
 E04A / CODEC-ACT-07 is the independent Antigravity
 [removal-OFF background assignment](../workflow/session/evaluation-campaign/tasks/20260915-next-stage.md).
