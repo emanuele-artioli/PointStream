@@ -71,7 +71,7 @@ def build_curated_samples(
     image_size: int = 256,
     max_frames: int | None = None,
     clip_id: int = 0,
-) -> tuple[list[dict[str, Any]], dict[str, np.ndarray]]:
+) -> tuple[list[dict[str, Any]], dict[str, np.ndarray], dict[str, int]]:
     """Extracts paired hand crops across video frames and identifies appearance anchors."""
     cap = cv2.VideoCapture(str(video_path))
     frame_idx = 0
@@ -88,6 +88,7 @@ def build_curated_samples(
     cap.release()
 
     appearance_anchors: dict[str, np.ndarray] = {}
+    anchor_bytes: dict[str, int] = {}  # compressed WebP payload size per side
     samples: list[dict[str, Any]] = []
 
     # First pass: find best appearance anchor per hand side (highest confidence)
@@ -99,6 +100,14 @@ def build_curated_samples(
             side = hand.handedness
             if side not in appearance_anchors or hand.confidence > 0.85:
                 crop, _ = letterbox_crop(frame, hand.bbox, target_size=image_size)
+                # Encode via WebP and decode back so training uses the exact
+                # compressed representation that would be transmitted over the wire.
+                ok, webp_buf = cv2.imencode(
+                    ".webp", crop, [cv2.IMWRITE_WEBP_QUALITY, 90]
+                )
+                if ok:
+                    anchor_bytes[side] = len(webp_buf)
+                    crop = cv2.imdecode(webp_buf, cv2.IMREAD_COLOR)
                 appearance_anchors[side] = crop
 
     # Fallback if hand never reached high confidence
@@ -110,6 +119,12 @@ def build_curated_samples(
             side = hand.handedness
             if side not in appearance_anchors:
                 crop, _ = letterbox_crop(frame, hand.bbox, target_size=image_size)
+                ok, webp_buf = cv2.imencode(
+                    ".webp", crop, [cv2.IMWRITE_WEBP_QUALITY, 90]
+                )
+                if ok:
+                    anchor_bytes[side] = len(webp_buf)
+                    crop = cv2.imdecode(webp_buf, cv2.IMREAD_COLOR)
                 appearance_anchors[side] = crop
 
     # Second pass: build training pairs
@@ -146,4 +161,4 @@ def build_curated_samples(
                 }
             )
 
-    return samples, appearance_anchors
+    return samples, appearance_anchors, anchor_bytes

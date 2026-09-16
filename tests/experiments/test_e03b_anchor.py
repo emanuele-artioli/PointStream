@@ -150,6 +150,7 @@ def test_campaign_row_from_e03b_shape_validates() -> None:
             "ffmpeg_sha256": "ef" * 32,
         }
         standalone_shape = (48, 360, 640, 3)
+        standalone_pixels_match = True
 
     row = build_campaign_row(
         setting={"codec": "av1", "qp": 63, "preset": "0"},
@@ -166,3 +167,120 @@ def test_campaign_row_from_e03b_shape_validates() -> None:
     assert validate_campaign_record(row, purpose="validated") == []
     ingested = ingest_for_claim([row], "rd", purpose="validated")
     assert ingested["n_kept"] == 1
+
+
+def test_short_rgb24_decode_is_rejected_not_padded() -> None:
+    from experiments.tier.e03b_persist import DecodeCountError, frames_from_rgb24
+
+    raw = bytes(2 * 8 * 8 * 3)
+    with pytest.raises(DecodeCountError, match="decoded 2 frames, expected 48"):
+        frames_from_rgb24(raw, width=8, height=8, expected_count=48, source="repro")
+
+
+def test_empty_and_partial_rgb24_decodes_are_rejected() -> None:
+    from experiments.tier.e03b_persist import DecodeCountError, frames_from_rgb24
+
+    with pytest.raises(DecodeCountError, match="empty decode"):
+        frames_from_rgb24(b"", width=8, height=8, expected_count=2, source="empty")
+    with pytest.raises(DecodeCountError, match="partial frame"):
+        frames_from_rgb24(b"\x00\x01", width=8, height=8, expected_count=1, source="partial")
+    extra = bytes(3 * 8 * 8 * 3)
+    with pytest.raises(DecodeCountError, match="decoded 3 frames, expected 2"):
+        frames_from_rgb24(extra, width=8, height=8, expected_count=2, source="extra")
+
+
+def test_exact_rgb24_count_reshapes() -> None:
+    from experiments.tier.e03b_persist import frames_from_rgb24
+
+    raw = bytes(i % 256 for i in range(2 * 8 * 8 * 3))
+    frames = frames_from_rgb24(raw, width=8, height=8, expected_count=2, source="ok")
+    assert frames.shape == (2, 8, 8, 3)
+
+
+def test_refuse_overwrite_on_existing_probe_report(tmp_path: Path) -> None:
+    from experiments.tier.e03b_run import refuse_overwrite
+
+    (tmp_path / "probe_report.json").write_text("{}", encoding="utf-8")
+    with pytest.raises(FileExistsError, match="refusing to overwrite"):
+        refuse_overwrite(tmp_path)
+
+
+def test_prepared_reuse_rejects_hash_mismatch(tmp_path: Path) -> None:
+    from experiments.tier.e03b_run import load_prepared_reuse
+    from experiments.tier.e03b_source import EXPECTED_SHAPE, stack_sha256
+
+    frames = np.zeros(EXPECTED_SHAPE, dtype=np.uint8)
+    np.save(tmp_path / "prepared_rgb.npy", frames)
+    recipe = {
+        "prepared_sha256": "0" * 64,
+        "extraction": {"interpolation": False, "selected_positions": list(range(0, 96, 2))},
+    }
+    (tmp_path / "source_recipe.json").write_text(json.dumps(recipe), encoding="utf-8")
+    with pytest.raises(ValueError, match="prepared SHA-256"):
+        load_prepared_reuse(tmp_path)
+    assert stack_sha256(frames) != recipe["prepared_sha256"]
+
+
+def test_materialize_refuses_existing_prepared(tmp_path: Path) -> None:
+    (tmp_path / "source_recipe.json").write_text("{}", encoding="utf-8")
+    with pytest.raises(FileExistsError, match="refusing to overwrite prepared source"):
+        materialize_display_low(video_path=tmp_path / "missing.mp4", run_dir=tmp_path)
+
+
+def test_mismatched_standalone_pixels_fail_closed(tmp_path: Path) -> None:
+    from experiments.tier.e03b_persist import DecodeCountError
+
+    frames = np.zeros((2, 8, 8, 3), dtype=np.uint8)
+    encoder = tmp_path / "SvtAv1EncApp"
+    ffmpeg = tmp_path / "ffmpeg"
+    encoder.write_bytes(b"encoder-bin")
+    ffmpeg.write_bytes(b"ffmpeg-bin")
+    payload = b"charged-bitstream-bytes"
+    calls = {"n": 0}
+
+    def fake_encode(source, dest, request, **kwargs):
+        dest.write_bytes(payload)
+        return EncodeRecord(
+            codec_name=request.codec_name,
+            output=dest,
+            size_bytes=len(payload),
+            encode_seconds=0.2,
+            tool_path=str(encoder),
+            tool_version="SVT-AV1 v1.8.0 (release)",
+            command=(str(encoder), "--qp", "63"),
+            rate_control="qp",
+            rate=request.rate,
+            preset=request.preset,
+            pix_fmt="yuv420p",
+            roi_arm=None,
+            ffmpeg_path=str(ffmpeg),
+            ffmpeg_version="n7.1.1",
+        )
+
+    def fake_decode(bitstream, dest, request, **kwargs):
+        dest.write_bytes(b"decoded-container")
+
+    def fake_rgb(_ffmpeg_path: str, _video_path: Path, height: int, width: int, count: int) -> np.ndarray:
+        calls["n"] += 1
+        out = np.zeros((count, height, width, 3), dtype=np.uint8)
+        if calls["n"] == 2:
+            out[...] = 9
+        return out
+
+    request = EncodeRequest(
+        codec_name="av1",
+        rate_control=RateControl.QP,
+        rate=63,
+        preset="0",
+        pix_fmt="yuv420p",
+    )
+    with (
+        patch("experiments.tier.e03b_persist.encode", fake_encode),
+        patch("experiments.tier.e03b_persist.decode", fake_decode),
+        patch("experiments.tier.e03b_persist._rgb_dump", fake_rgb),
+        patch("experiments.tier.e03b_persist._run_ffmpeg", lambda argv, stdin: b""),
+        patch("experiments.tier.e03b_persist.tools.resolve_ffmpeg") as resolve,
+    ):
+        resolve.return_value.path = str(ffmpeg)
+        with pytest.raises(DecodeCountError, match="ordinary and standalone"):
+            persistent_timed_roundtrip(frames, request=request, fps=12.0, work_dir=tmp_path / "persist")

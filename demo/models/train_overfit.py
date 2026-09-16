@@ -60,7 +60,7 @@ def train(
         clip_path = Path(item["path"])
         logger.info(f"Extracting poses and building samples for Clip {clip_idx + 1}: {clip_path.name} ({frames_per_clip} frames)...")
         poses = extract_video_hand_poses(clip_path, max_frames=frames_per_clip)
-        samples, anchors = build_curated_samples(
+        samples, anchors, _anchor_bytes = build_curated_samples(
             clip_path,
             poses,
             image_size=256,

@@ -1,0 +1,18 @@
+{
+  "root_path": "$PS_DATA_ROOT/outputs/evaluation-20260914/e03-neural/prepared-rgb",
+  "test_classes": {
+    "E03B_development": {
+      "test": 1,
+      "base_path": ".",
+      "src_type": "png",
+      "sequences": {
+        "federer007_display_low": {
+          "width": 640,
+          "height": 360,
+          "frames": 48,
+          "intra_period": -1
+        }
+      }
+    }
+  }
+}

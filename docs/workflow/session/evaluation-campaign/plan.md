@@ -1,5 +1,18 @@
 # Evaluation campaign — 14 September 2026
 
+## Coordinator parallel preparation — 16 September 2026
+
+Codex owns this preparation while the latest Cursor/Antigravity lanes run.
+The [source reservation](../../../../manifests/evaluation_20260916_coordinator_confirmation_reservation.json)
+pins three acquired matches and their score-free scenes; exposure and exact PTS
+audit remain open. The [neural-anchor card](../../../../manifests/evaluation_20260916_neural_anchor_readiness.json)
+pins official source/config and documents weights/environment blockers. Paper
+setup builds to 28 pages (23 body/references + 5 appendix), with results still
+pending. No neural rate ladder, E05 or confirmation scoring is released here.
+Worker reports return to Clean project state and dispatch,
+`01a0a923-4c5e-71c3-8993-5c68f2a76bb4`.
+
+
 Authoritative user decisions: 12–14 September in the coordinating Codex task.
 This plan supersedes the dispatch instructions in the September 12 handoff and
 older submission-search waves. Historical evidence remains immutable.
@@ -25,23 +38,16 @@ comparisons keep residual off; paste-plus-residual is explicitly a residual-on
 control in the residual section. Component and readiness work can run before a
 full-codec win. A losing or invalid run is a result to preserve, not a gate pass.
 
-## Current entry point — 16 September probe return
+## Current entry point — 16 September conditional pilot release
 
-Use the [focused review and assignments](tasks/20260916-probe-review.md).
-E03B's four and E04A's six saved encodes exist with matching stream hashes;
-E03B decoded-container counts independently match the 48-frame request. #114
-`c1c68ec` and #109 `c9c4ded` have green CI, but remain unaccepted for the
-specific reproduced decode-padding, target-reference and NaN-selection gaps.
-#113 is merged at `c476840`; its broad panorama recommendation is not certified.
-Complete common-scope calibration/transport/rescoring on existing artifacts.
-
-The correction wave has zero new candidate encodes. E05 and confirmation scoring
-remain unreleased; source eligibility is reported score-free but not yet accepted
-or frozen by the coordinator. Reports return to **Clean project state and dispatch**,
-`01a0a923-4c5e-71c3-8993-5c68f2a76bb4`. Six active preparation hours across
-three workers and one hour of bounded execution are caps for the correction wave;
-remaining neural-anchor/training/full-codec/confirmation costs are unestablished.
-Keep the September 20 freeze risk and September 30/scientific requirements.
+Follow [the accepted repair and conditional pilots](tasks/20260916-bounded-pilot-release.md).
+#117 is merged as `015c971`. #118 `e73c8ba`, #119 `745271f`, #121 `bc1a144`
+have green CI but need listed execution gates corrected and merged before launch.
+Workers may then execute without another card-only return: E05 <=1 aggregate
+GPU-hour, E06 four points <=30 minutes, paired removal two points <=30 CPU
+minutes. Preparation <=2 active hours per lane. Zero conventional/removal-OFF
+re-encodes. No confirmation scoring; reserved sources remain untouched. Source
+PTS, neural anchor, confirmed tennis advantage and second domain remain open.
 
 ## Historical entry point — 15 September acceptance and bounded release
 

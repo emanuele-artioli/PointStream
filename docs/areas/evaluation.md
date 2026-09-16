@@ -1,20 +1,51 @@
 # Evaluation Area
 
-## Current review — 16 September 2026
+## Conditional pilot acceptance — 16 September 2026
 
-#114 at `c1c68ec` has green CI and reusable four-setting artifacts. Coordinator
-checks matched all stream hashes/byte counts and independently counted 48 frames
-in each ordinary and standalone decoded container. The wrapper nevertheless
-pads/trims raw output before validating shape; a two-frame reproducer became
-48 frames. The decode/reuse gate remains a follow-up on the landed code. Do not
-rerun the four encodes. Native PTS needs pixel-provenance verification, and
-score-free eligibility is not permission to score confirmation.
+#117 at `d700a93` is accepted and merged as `015c971`, with green exact-head CI.
+The decode repair preserves saved artifacts; native-seek pixel provenance remains
+unresolved for 47/48 frames, so no native-PTS certification follows. #121 at
+`bc1a144` is a green preparatory card, not an executable or fully serialized
+codec yet. The current brief releases its repairs followed conditionally by four
+E06 settings, <=30 minutes total. No anchor/background re-encodes or confirmation
+scores. Predictor names and charged headers must reflect actual implementations.
+Follow [the current launch gates](../workflow/session/evaluation-campaign/tasks/20260916-bounded-pilot-release.md).
 
-The saved E03B VMAF alarm has supporting same-grid severe-blur calibration at the
-floor; retain original bounds and write a separate disposition. Scope the result
-to one development scene and single-run timing. E04A background-region metrics
-and background-only bytes cannot be compared directly to whole-frame anchors.
-Follow the [review and focused assignments](../workflow/session/evaluation-campaign/tasks/20260916-probe-review.md).
+
+## Coordinator readiness — 16 September 2026
+
+Neural anchor source and paper are pinned in
+[the readiness record](../../manifests/evaluation_20260916_neural_anchor_readiness.json).
+DCVC-UF is not yet installed or round-trip verified: the official weight link
+returns HTTP 403, the current Python interpreter rejects upstream syntax, and
+a separate compatible environment/native extensions remain required. GPUs are
+accessible outside the sandbox. No neural RD result or SOTA claim is available.
+The RGB input config uses the exact E03B prepared stack; its native-PTS gap
+remains explicit. The budget card is proposed, not an execution release.
+
+
+## Historical review — 16 September 2026
+
+#114 merged as `9c6609f`. Follow-up on `codex/e03b-20260916` repairs the decode
+gate: empty, partial, short and extra RGB24 dumps fail before reshape or pad.
+Ordinary vs standalone pixels must match. Completed run directories refuse
+overwrite; prepared reuse checks stack SHA-256 and seek/filter identity.
+Verification records go in a new directory; the four charged encodes are not
+repeated. `df9f945` descends from required baseline `8eb045a`. Score-free
+eligibility is not authorization to score confirmation.
+Verification (decode-only, no new encodes):
+`outputs/evaluation-20260914/e03b/verify-20260916-acceptance/`. Four bitstream
+hashes match campaign rows; eight containers are 48×640×360; ordinary and
+standalone RGB dumps match. Original `probe_report` SHA-256
+`62ac0b15228001f7598958d501df133003d8c6faea0b5b6947670a3839fc45f7` and
+`bounds.json` SHA-256
+`77c30b5b2d81da8bd8abe50e41150571db9d7615bcbdf3ee0657f1cbdb5c2d9a` unchanged.
+Native PTS mapping is preserved; 1/48 selected PNGs match a native seek at the
+mapped PTS (first frame). The other 47 differ (mean abs ~2). That remaining
+uncertainty concerns extract-grid versus native-seek provenance, recorded in
+`derived_native_mapping.json`. Verification JSON SHA-256
+`2df757a43970c28083c24b8930ac8dd860a9acba356d706800cb5707429192f6`. Score-free
+eligibility is not permission to score.
 
 ## E03B probe record — 16 September 2026
 

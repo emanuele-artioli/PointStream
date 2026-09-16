@@ -12,11 +12,21 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 DEFAULT_LADDER_CONFIGS = [
+    # --- Starved / extreme tiers (matched to PointStream starved floor) ---
+    {"name": "AV1 180p (25k, p7 - Starved Floor)", "scale": "320:180", "preset": 7, "kbps": 25, "deblocked": False},
+    {"name": "AV1 240p (40k, p7 - Starved)", "scale": "426:240", "preset": 7, "kbps": 40, "deblocked": False},
+    {"name": "AV1 360p (80k, p7 - Heavy Starve)", "scale": "640:360", "preset": 7, "kbps": 80, "deblocked": False},
+    # --- Low / teleop tiers ---
     {"name": "AV1 540p (90k, p7 - Ultra-Low)", "scale": "960:540", "preset": 7, "kbps": 90, "deblocked": False},
+    {"name": "AV1 540p (140k, p7 - Low)", "scale": "960:540", "preset": 7, "kbps": 140, "deblocked": False},
     {"name": "AV1 540p (180k, p7)", "scale": "960:540", "preset": 7, "kbps": 180, "deblocked": False},
+    {"name": "AV1 540p (220k, p7 - Matched Teleop)", "scale": "960:540", "preset": 7, "kbps": 220, "deblocked": False},
     {"name": "AV1 540p (250k, p7 - Matched Rate & Latency)", "scale": "960:540", "preset": 7, "kbps": 250, "deblocked": False},
+    # --- Medium / high tiers ---
     {"name": "AV1 720p (300k, p7)", "scale": "1280:720", "preset": 7, "kbps": 300, "deblocked": False},
+    # --- Native 1080p tiers ---
     {"name": "AV1 1080p (200k, p6 - Floor)", "scale": None, "preset": 6, "kbps": 200, "deblocked": False},
+    {"name": "AV1 1080p (350k, p10 - Standard)", "scale": None, "preset": 10, "kbps": 350, "deblocked": False},
     {"name": "AV1 1080p (500k, p6 - Matched Quality)", "scale": None, "preset": 6, "kbps": 500, "deblocked": False},
     {"name": "AV1 1080p (1500k, p6 - Anchor)", "scale": None, "preset": 6, "kbps": 1500, "deblocked": False},
     {"name": "AV1 1080p (350k, p6 - Deblocked)", "scale": None, "preset": 6, "kbps": 350, "deblocked": True},

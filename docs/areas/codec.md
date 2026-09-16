@@ -1,6 +1,19 @@
 # Codec Area
 
-## Current review — 16 September 2026
+## Conditional pilot acceptance — 16 September 2026
+
+#119 at `745271f` has green CI but is not accepted as calibrated evidence:
+main continues after calibration failure and always labels derived calibration
+verified, while its output directory allows overwrite. The revised proposal also
+mixes four OFF-arm entries inconsistent with the canonical saved report.
+The current brief releases those fixes, then conditionally exactly two scene007
+panorama removal-ON points at QP47/32 within 30 CPU minutes. Reuse original OFF
+streams. This is a same-camera diagnostic, not second-camera evidence or proof
+of eliminated ghosting.
+Follow [the current launch gates](../workflow/session/evaluation-campaign/tasks/20260916-bounded-pilot-release.md).
+
+
+## Historical review — 16 September 2026
 
 #113 merged as `c476840`. E04A's six removal-OFF bitstream hashes match the saved
 report, whose prepared RGB identity agrees with E03B. Treat this as a reusable

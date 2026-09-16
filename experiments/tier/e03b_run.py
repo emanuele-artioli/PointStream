@@ -19,7 +19,7 @@ from experiments.tier.campaign_result import ingest_for_claim, validate_campaign
 from experiments.tier.clip import ClipUnusable, load_tier_clip
 from experiments.tier.e03b_confirmation import evaluate_reserved_sources, write_eligibility
 from experiments.tier.e03b_persist import persistent_timed_roundtrip
-from experiments.tier.e03b_source import EXPECTED_SHAPE, materialize_display_low
+from experiments.tier.e03b_source import EXPECTED_SHAPE, materialize_display_low, stack_sha256
 from experiments.tier.low_rate_measure import reference_request, score_headlines
 from experiments.tier.low_rate_validate import decode_rejections
 from experiments.tier.resolution_adaptive import rescale_frames
@@ -83,6 +83,60 @@ BOUNDS: dict[str, Any] = {
         "basis": "Card cap is 30 minutes including decode, calibration and scoring.",
     },
 }
+
+
+PROTECTED_RUN_FILES = (
+    "bounds.json",
+    "probe_report.json",
+    "campaign_rows.json",
+    "metric-calibration.json",
+)
+PROTECTED_STREAM_GLOBS = ("*/payload.ivf", "*/payload.vvc", "*/decoded.mkv", "*/decoded_standalone.mkv")
+
+
+def existing_protected_paths(run_dir: Path) -> list[Path]:
+    run_dir = Path(run_dir)
+    found = [run_dir / name for name in PROTECTED_RUN_FILES if (run_dir / name).is_file()]
+    for pattern in PROTECTED_STREAM_GLOBS:
+        found.extend(sorted(run_dir.glob(pattern)))
+    return found
+
+
+def refuse_overwrite(run_dir: Path) -> None:
+    """A completed or partial probe directory is immutable."""
+    found = existing_protected_paths(run_dir)
+    if found:
+        preview = ", ".join(str(path.relative_to(run_dir)) for path in found[:8])
+        raise FileExistsError(
+            f"refusing to overwrite E03B artifacts in {run_dir}: {preview}. "
+            "Verify in a new directory; do not re-encode."
+        )
+
+
+def load_prepared_reuse(run_dir: Path) -> tuple[dict[str, Any], np.ndarray]:
+    """Reuse prepared RGB only when recipe hash and source identity match the array."""
+    recipe_path = run_dir / "source_recipe.json"
+    prepared_path = run_dir / "prepared_rgb.npy"
+    if recipe_path.is_file() ^ prepared_path.is_file():
+        raise FileExistsError(
+            f"partial source artifacts in {run_dir}; refusing to complete them in place"
+        )
+    if not recipe_path.is_file():
+        raise FileNotFoundError(f"no prepared source in {run_dir}")
+    recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+    frames = np.load(prepared_path)
+    if tuple(frames.shape) != EXPECTED_SHAPE:
+        raise ValueError(f"prepared shape {frames.shape} != {EXPECTED_SHAPE}")
+    digest = stack_sha256(frames)
+    expected = str(recipe.get("prepared_sha256") or "")
+    if digest != expected:
+        raise ValueError(f"prepared SHA-256 {digest} != recipe {expected}")
+    identity = recipe.get("extraction") or {}
+    if identity.get("interpolation") is not False:
+        raise ValueError("prepared reuse requires interpolation=false in the recipe")
+    if list(identity.get("selected_positions") or []) != list(range(0, 96, 2)):
+        raise ValueError("prepared reuse requires selected_positions range(0,96,2)")
+    return recipe, frames
 
 
 def _write(path: Path, payload: Any) -> None:
@@ -216,6 +270,7 @@ def build_campaign_row(
 
 def run_probe(run_dir: Path, card_path: Path) -> dict[str, Any]:
     run_dir.mkdir(parents=True, exist_ok=True)
+    refuse_overwrite(run_dir)
     bounds_path = run_dir / "bounds.json"
     _write(bounds_path, BOUNDS)
     publish_progress("bounds_written", 0)
@@ -223,9 +278,8 @@ def run_probe(run_dir: Path, card_path: Path) -> dict[str, Any]:
     host = socket.gethostname()
     prepared_npy = run_dir / "prepared_rgb.npy"
     recipe_path = run_dir / "source_recipe.json"
-    if prepared_npy.is_file() and recipe_path.is_file():
-        recipe_payload = json.loads(recipe_path.read_text(encoding="utf-8"))
-        frames = np.load(prepared_npy)
+    if prepared_npy.is_file() or recipe_path.is_file():
+        recipe_payload, frames = load_prepared_reuse(run_dir)
         publish_progress("source_reused", 1)
     else:
         raw = Path(card["operating_regime"]["raw_input"]["path"])
@@ -281,7 +335,11 @@ def run_probe(run_dir: Path, card_path: Path) -> dict[str, Any]:
             source_shape=EXPECTED_SHAPE,
             decoded_shape=tuple(persist.trip.frames.shape),
         )
-        decode_ok = not decode_reasons and tuple(persist.standalone_shape) == tuple(persist.trip.frames.shape)
+        decode_ok = (
+            not decode_reasons
+            and tuple(persist.standalone_shape) == tuple(persist.trip.frames.shape)
+            and persist.standalone_pixels_match
+        )
         score_started = time.perf_counter()
         scores = score_headlines(frames, persist.trip.frames)
         score_s = time.perf_counter() - score_started
@@ -384,11 +442,15 @@ def main() -> int:
     args = parser.parse_args()
     args.run_dir.mkdir(parents=True, exist_ok=True)
     if args.confirmation_only:
+        dest = args.run_dir / "confirmation_eligibility.json"
+        if dest.is_file():
+            raise FileExistsError(f"refusing to overwrite {dest}")
         report = evaluate_reserved_sources()
-        write_eligibility(report, args.run_dir / "confirmation_eligibility.json")
+        write_eligibility(report, dest)
         print(json.dumps(report["counts"]))
         return 0
     if args.prepare_source:
+        refuse_overwrite(args.run_dir.resolve())
         card = json.loads(args.card.read_text(encoding="utf-8"))
         raw = Path(card["operating_regime"]["raw_input"]["path"])
         built = materialize_display_low(video_path=raw, run_dir=args.run_dir.resolve())
