@@ -1,7 +1,7 @@
 # PointStream Area Index & Active Plan
 
 Current coordination: **16 September 2026**.
-Start with the [bounded next-stage assignments](docs/workflow/session/evaluation-campaign/tasks/20260916-probe-review.md).
+Start with the [bounded next-stage assignments](docs/workflow/session/evaluation-campaign/tasks/20260916-bounded-pilot-release.md).
 The handoff and older reviews are historical context. Current decisions below
 reflect the latest code and focused acceptance regressions.
 Submission **30 September**; provisional evidence freeze **20 September**.
@@ -16,39 +16,38 @@ compatible isolated environment remain unresolved. The data area pins the
 three-source score-free reservation, with exposure/PTS audit and execution
 freeze still open. Paper setup `7a0476e` is pushed to Overleaf and builds to
 23 body/reference pages plus five appendix pages. No E05, neural rate ladder
-or confirmation scoring is released by this preparation. Await the latest
-Cursor/Antigravity reports here for acceptance and the next bounded release.
+or confirmation scoring is released by this preparation. The latest reports are reviewed below; only the conditional pilots in the
+current brief are released.
 
 ## Areas
 
 | Area | Current state | Next campaign work |
 |---|---|---|
 | [Evaluation](docs/areas/evaluation.md) | #114 merged; decode/reuse gate repair on saved E03B artifacts | E01 protocol; no new E03B encodes |
-| [Codec](docs/areas/codec.md) | #113 removal-OFF probe exists; common-scope scoring/transport evidence pending | E04 background coverage and paired removal |
-| [Generation](docs/areas/generation.md) | #109 fresh CLI regression exists; deterministic target-copy and NaN selection reproduced | E02S bounded completion; E05 unreleased; one baseline-clearing model required |
+| [Codec](docs/areas/codec.md) | #119 calibration propagation/provenance still open; conditional paired removal | E04 background coverage and paired removal |
+| [Generation](docs/areas/generation.md) | #118 corrected reference/domain/CPU continuation; executable pilot gates open | E02S acceptance fixes; conditional E05 pilot; one baseline-clearing model required |
 | [Data](docs/areas/data.md) | Preserve exposure history; six fresh matches preferred but lower prospective count permitted | E01 split/protocol, E07 confirmation and second domain after tennis win |
 | [Infrastructure](docs/areas/infrastructure.md) | Existing detached monitoring; verify host availability at each launch | Per-host CPU <=90% available; any free GPU; no cleanup helper |
 | [Paper](docs/areas/paper.md) | Separate repo; no new competitive evidence certified by repairs | E08 setup/structure early, final claims after accepted results |
 
-## Current boundary — probe return and focused correction
+## Current boundary — conditional pilots
 
-| Owner | PR / reviewed head | Verified state | Next action |
-|---|---|---|---|
-| Cursor | #114 merged `9c6609f`; follow-up `codex/e03b-20260916` | Saved four streams/eight containers reused; pad/trim decode gate closed in code | Pause: verification hashes and remaining PNG-vs-native pixel uncertainty |
-| Antigravity background | #113 merged `c476840` | Six stream hashes match; removal-OFF diagnostic uses same prepared stack; broad winner recommendation not accepted | Calibrate actual region metrics, standalone side-data decode, common-scope rescore; no new encodes |
-| Antigravity generation | #109 `c9c4ded` | CI green; actual fresh-CLI regression and artifact pointers supplied; target-as-reference shortcut and NaN dominance reproduced | Correct reference policy and invalid-evidence promotion; tiny continuation verification |
+#117 is accepted and merged as `015c971`; the strict decode gate is on main.
+#118 `e73c8ba`, #119 `745271f` and #121 `bc1a144` have green CI but still need
+specific launch-gate repairs. The current brief authorizes those repairs and
+conditional E05/E06/two-point paired-removal pilots without another card-only
+return. E05 is capped at one aggregate GPU-hour, E06 and paired removal at
+30 minutes each; preparation at two active hours per lane. No runs launched by
+this coordinator. Confirmation remains quarantined and unreleased.
 
-E03B/E04A have run; do not repeat their four/six encodes. Confirmation eligibility
-is reported score-free in #114 and awaits coordinator acceptance/freeze. E05 and
-confirmation scoring remain unreleased. One-scene diagnostics do not establish
-an architecture winner or a speed ranking. Same-QP AV1/VVC quality ranges do not
-overlap; do not compute BD-rate. Cross-host contention/takeover remains
-unverified; use accepted local-host claims and queue if capacity is unavailable.
+| Owner | Next action |
+|---|---|
+| Cursor E06 | Serialize complete transport, verify strict decode/ledger, label actual predictors; then four settings |
+| Antigravity foreground | Correct executable subset/evaluator/deadline policy in #118; then one bounded E05 tiny-fit pilot |
+| Antigravity background | Fail closed on calibration, preserve artifacts, repair canonical OFF-arm provenance; then two panorama removal-ON points |
 
-Follow the [review and worker prompts](docs/workflow/session/evaluation-campaign/tasks/20260916-probe-review.md).
-Reports return to **Clean project state and dispatch**, task
-`01a0a923-4c5e-71c3-8993-5c68f2a76bb4`. The correction wave permits six active
-preparation hours across three workers, one hour of bounded execution across
-Antigravity lanes, and zero new candidate encodes. Remaining neural/full-codec/
-confirmation cost is not yet established. The 20 September freeze is at risk;
-30 September and the neural-winner/secondary-domain requirements are unchanged.
+Follow [the acceptance gates and dispatch](docs/workflow/session/evaluation-campaign/tasks/20260916-bounded-pilot-release.md).
+Reports return to **Clean project state and dispatch**,
+`01a0a923-4c5e-71c3-8993-5c68f2a76bb4`. Preserve paused worker worktrees.
+The September 20 freeze remains at risk; a neural anchor, confirmed tennis win,
+neural foreground baseline clearance and second domain are still submission gaps.
