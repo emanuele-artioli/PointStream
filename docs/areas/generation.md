@@ -221,11 +221,27 @@ result that determines the next experiment; no family-wide claims from one pilot
   - Pareto criterion violated: pix2pix achieves lower quality (-1.96 dB PSNR) at much higher total wire rate (6.67 MB vs 1.00 MB).
   - Client latency budget violated: 7.03s vs 1.30s baseline (540% of baseline latency, exceeding the 105% threshold).
   - Stage 2 release remains closed; confirmation sources remain strictly quarantined.
-- **Immutable Artifacts**:
+- **Return Audit & Evidence Completion (2026-09-16)**:
+  - *Flag Semantics Fixed*: Corrected BooleanOptionalAction pitfall in `scripts/run_diagnostic_matrix.py` by introducing positive flags `--blank-conditioning-control` and `--blank-control`, preserving supported legacy aliases (`--no-conditioning-control`), adding `--allow-revision-drift`, and adding automated tests in `tests/experiments/test_diagnostic_matrix.py` (all 16 tests passing).
+  - *Corrective GPU Execution*: Reused the 5 identity-matched corners from the preserved report (`gen_off_res_off`, `gen_off_res_on`, `gen_on_res_off`, `gen_on_res_on`, `gen_on_shuffled_conditioning`) and executed only the missing blank control corner (`gen_on_no_conditioning`) and same-seed repeat check (`gen_on_res_off_same_seed`) in 6.1 min wall time. Total cumulative GPU time across all attempts: 30.5 min, strictly within the 1.0 GPU-hour cap (29.5 min remaining).
+  - *Calibrated 7-Corner Outcomes*:
+    - Matched pose (`gen_on_res_off`): 31.98 dB PSNR-Y, 0.9812 SSIM, 90.73 VMAF.
+    - Shuffled pose (`gen_on_shuffled_conditioning`): 31.75 dB PSNR-Y, 0.9812 SSIM, 90.72 VMAF.
+    - Blank pose (`gen_on_no_conditioning`): 30.99 dB PSNR-Y, 0.9811 SSIM, 90.71 VMAF.
+    - Demonstrates monotonic pose sensitivity (matched > shuffled > blank), confirming active conditioning, while neither configuration beats pasted-reference baseline (33.94 dB).
+  - *Deployment Accounting & Claim Eligibility*:
+    - Per-video fitted weights: 217,736,406 bytes (~208 MB) not amortized across frames; if charged, wire rate expands to ~214 MB.
+    - Shared model regime: model is overfitted to `scene_028` without multi-domain evidence.
+    - Adapted completed record explicitly marks `rd_claim=false` and `speed_claim=false` with audited exclusion reasons.
+  - *Scoped Learnability Verdict*: Tiny-fit learnability is verified (training loss ~90 down to ~4.5, stable PatchGAN discriminator, samples saved), but no-promotion verdict is upheld. pix2pix and SPADE model families remain preserved as viable architectures for future training regimens.
+- **Preserved & Completed Artifacts**:
   - `generator_pix2pix.pt`: SHA-256 `9d925e1a9bf73270724665f190c4429c054e73f2ee33f0e0ef9ceaebf0d4f7ae`
   - `checkpoint_pix2pix.pt`: SHA-256 `576dd7179e680ffac5210553c6321310a0ee09713ef6c0df2e026fb8d884ec34`
-  - `diagnostic_matrix.json`: SHA-256 `1baa1dda6e32c35e7c9c22bcb171181db342a8d93ad6e36de1d82d2522aaf0ed`
-  - `campaign_result.json`: SHA-256 `f56e5cb2a8c0239b4f3ecc007d164a403cb7512d8a6bd4ed1e625afdf7c8a425`
+  - `diagnostic_matrix.json` (original 6-corner): SHA-256 `1baa1dda6e32c35e7c9c22bcb171181db342a8d93ad6e36de1d82d2522aaf0ed`
+  - `campaign_result.json` (original adapted): SHA-256 `f56e5cb2a8c0239b4f3ecc007d164a403cb7512d8a6bd4ed1e625afdf7c8a425`
+  - `diagnostic_matrix_completed.json` (completed 7-corner): SHA-256 `a0dbf42dc1052cd0ea461f7d4c75086cf1a798636a8f3152d40658afd4d0f8df`
+  - `campaign_result_completed.json` (completed adapted): SHA-256 `99e019e0f544ac4064ca4fee0e8e7b5f02821cc2486cbf03c646f262bdfa34fa`
+
 
 
 
