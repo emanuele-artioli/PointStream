@@ -4,12 +4,13 @@
 
 #117 at `d700a93` is accepted and merged as `015c971`, with green exact-head CI.
 The decode repair preserves saved artifacts; native-seek pixel provenance remains
-unresolved for 47/48 frames, so no native-PTS certification follows. #121 at
-`bc1a144` is a green preparatory card, not an executable or fully serialized
-codec yet. The current brief releases its repairs followed conditionally by four
-E06 settings, <=30 minutes total. No anchor/background re-encodes or confirmation
-scores. Predictor names and charged headers must reflect actual implementations.
-Follow [the current launch gates](../workflow/session/evaluation-campaign/tasks/20260916-bounded-pilot-release.md).
+unresolved for 47/48 frames, so no native-PTS certification follows. #121 continues
+on `codex/e06-20260916` after `a28c98f`: serialized transport, complete
+`T=B+F+M+R+H` reconciliation, and honest predictor names
+(`per_frame_crop`, `bbox_resized_first_reference`). Four E06 settings launch only
+after this revision is merged with green CI. No anchor/background re-encodes or
+confirmation scores. Follow
+[the current launch gates](../workflow/session/evaluation-campaign/tasks/20260916-bounded-pilot-release.md).
 
 
 ## Coordinator readiness — 16 September 2026

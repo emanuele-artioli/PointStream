@@ -606,6 +606,8 @@ def reconstruct_serialized_client(
                     crop = np.asarray(decoded_crop, dtype=np.uint8)
                 elif item.get("crop_key") and item["crop_key"] in arrays:
                     crop = np.asarray(arrays[item["crop_key"]], dtype=np.uint8)
+                elif object_id in decoded_references:
+                    crop = decoded_references[object_id]
 
                 if crop is not None:
                     pipeline_placements.append(
@@ -653,7 +655,7 @@ def reconstruct_serialized_client(
             base_frames = composite_clip(
                 bg_frames,
                 tuple(pipeline_placements),
-                use_heuristic_mask=True,
+                use_heuristic_mask=all(item.mask is None for item in pipeline_placements),
             )
         else:
             base_frames = as_clip(bg_frames, path="independent_client_base")
