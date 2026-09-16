@@ -280,6 +280,8 @@ def test_e03_e04_and_split_manifests_load() -> None:
         "evaluation_20260915_e03a_anchor_card.json",
         "evaluation_20260915_e03a_confirmation_timestamps.json",
         "evaluation_20260915_e03a_derived_diagnostic.json",
+        "evaluation_20260916_e03b_source_recipe.json",
+        "evaluation_20260916_e03b_confirmation_eligibility.json",
     ):
         payload = json.loads((repo / "manifests" / name).read_text(encoding="utf-8"))
         assert "schema" in payload

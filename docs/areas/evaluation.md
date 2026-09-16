@@ -1,5 +1,19 @@
 # Evaluation Area
 
+## E03B — 16 September 2026
+
+Worktree `/home/itec/emanuele/worktrees/pointstream-e03b-20260916` on
+`codex/e03b-20260916` at main descendant `8eb045a5974796ccadf26c9351b2f1a8343564e1`.
+Contract pin module/example digests still match. Persistent bitstream wrapper:
+`experiments.tier.e03b_persist.persistent_timed_roundtrip`. Native PTS recipe
+(shared with E04A): `manifests/evaluation_20260916_e03b_source_recipe.json` and
+`outputs/evaluation-20260914/e03b/run-20260916-federer007/`. Prepared stack
+SHA-256 `1f02475a5bbc3d94e4bae2e904dc29c3af3082be0c0c160e027b706a6950f6f8`
+matches E04A's 360p/12 fps pixels; native timestamps are packet DTS seconds,
+not 24 fps grid indices. BP46/BP21 extract caches were not overwritten. Four
+AV1/VVC display_low settings remain the measured probe. Campaign reader and
+generation adapter are unchanged (still Cursor-owned).
+
 ## Current acceptance completion — 15 September 2026
 
 PR #104 rejects invalid runtime evidence and requires explicit measured RD arms

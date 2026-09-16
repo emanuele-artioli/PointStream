@@ -1,10 +1,21 @@
 # Data Area
 
+## E03B score-free confirmation eligibility — 16 September 2026
+
+Reserved trio hashes still match acquisition. Timestamp origin remains the E03A
+stream-copy preroll record. Content scenes were frozen from 2 fps thumbnail MAD
+without codec scores (`scores_computed=false`). Pointer:
+`manifests/evaluation_20260916_e03b_confirmation_eligibility.json` with full
+bounds in `outputs/evaluation-20260914/e03b/run-20260916-federer007/confirmation_eligibility.json`.
+All three windows are 1080p and cannot confirm a native 4K claim. AO 2024 and
+US Open 2023 share a tournament-year with already-scored Gate B matches (different
+matches). Coordinator freeze is still required before any confirmation scoring.
+
 ## Current acquisition / integration review
 
 Acquisition accepted complete: three media files and report/log digests verified
 against Cursor #104 head `7e4da6e` acquisition pointers. All are 1080p, reserved,
-unscored and not yet confirmation-eligible. E03A checks actual local timestamp
+and now have score-free scene/overlap records; codec scores stay untouched. E03A checks actual local timestamp
 origin after stream-copy cuts, event overlap and score-free scene eligibility;
 no repeat downloads. Higher-resolution confirmation cannot be claimed from these
 assets. The older zero-acquired counts below are historical.
