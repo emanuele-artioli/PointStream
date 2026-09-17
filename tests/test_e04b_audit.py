@@ -43,13 +43,16 @@ def test_compute_ghost_and_boundary_metrics_with_distortion() -> None:
     metrics = compute_ghost_and_boundary_metrics(ref_rgb, pred_rgb, masks, bnd_masks)
 
     # Luma of (110, 110, 110) - (100, 100, 100) is 10.0
+    assert metrics["ghosting_luma_mad"] is not None
+    assert metrics["boundary_luma_mad"] is not None
+    assert metrics["boundary_psnr_y_dB"] is not None
     assert abs(metrics["ghosting_luma_mad"] - 10.0) < 0.2
     assert abs(metrics["boundary_luma_mad"] - 10.0) < 0.2
     assert metrics["boundary_psnr_y_dB"] > 0.0
 
 
 def test_compute_ghost_and_boundary_metrics_empty_masks() -> None:
-    """When masks are empty, defaults to 0.0 without errors."""
+    """When masks are empty, returns None (unavailable) without errors."""
     t, h, w = 2, 32, 32
     ref_rgb = np.full((t, h, w, 3), 100, dtype=np.uint8)
     pred_rgb = np.full((t, h, w, 3), 100, dtype=np.uint8)
@@ -57,5 +60,8 @@ def test_compute_ghost_and_boundary_metrics_empty_masks() -> None:
 
     metrics = compute_ghost_and_boundary_metrics(ref_rgb, pred_rgb, empty_masks, empty_masks)
 
-    assert metrics["ghosting_luma_mad"] == 0.0
-    assert metrics["boundary_luma_mad"] == 0.0
+    assert metrics["ghosting_luma_mad"] is None
+    assert metrics["boundary_luma_mad"] is None
+    assert metrics["boundary_psnr_y_dB"] is None
+    assert metrics["boundary_ssim"] is None
+
