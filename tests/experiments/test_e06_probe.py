@@ -208,3 +208,192 @@ def test_residual_on_changes_pixels_and_r_positive() -> None:
     standalone = reconstruct_standalone(payload)
     np.testing.assert_array_equal(on_pixels, standalone)
     assert not np.array_equal(on_pixels, off)
+
+
+def test_compact_pack_matches_pixels_and_keeps_native_stored() -> None:
+    from experiments.tier.e06_pack import pack_lossless_compact, zip_inventory
+
+    frames, masks = _toy()
+    view, _b = _jpeg_background(frames)
+    payload = serialize_setting(
+        background=view,
+        frames=frames,
+        masks=masks,
+        predictor=PREDICTOR_PER_FRAME,
+        residual=None,
+    )
+    compact = pack_lossless_compact(payload)
+    inventory = zip_inventory(compact)
+    assert inventory["transport_total"] == len(compact)
+    assert inventory["stored_native_bytes"] > 0
+    original = reconstruct_standalone(payload)
+    packed = reconstruct_standalone(compact)
+    np.testing.assert_array_equal(original, packed)
+    timings: dict[str, float] = {}
+    timed = reconstruct_standalone(compact, timings=timings)
+    np.testing.assert_array_equal(original, timed)
+    assert "deserialize_s" in timings
+    assert "composite_render_s" in timings
+
+
+def test_derive_claim_eligibility_does_not_upgrade_missing_controls() -> None:
+    from src.runner.generation_adapter import derive_claim_eligibility
+
+    flags, reasons = derive_claim_eligibility(
+        metrics={"total_bytes": 1000, "psnr_mean": 24.0},
+        controls={
+            "conditioned_vs_shuffled_tested": True,
+            "conditioning_sensitive": True,
+            "same_seed_determinism_tested": True,
+            "same_seed_deterministic": True,
+        },
+        timing_evidence={"measured_client_seconds": 1.2, "profiling_strata": "gpu5"},
+        generation_on=True,
+        model_free=False,
+    )
+    assert flags["rd_claim"] is False
+    assert flags["speed_claim"] is False
+    assert any("calibration" in item for item in reasons)
+    assert any("deployment" in item for item in reasons)
+    assert any("blank" in item for item in reasons)
+
+    complete, _ = derive_claim_eligibility(
+        metrics={"total_bytes": 1000, "psnr_mean": 24.0},
+        controls={
+            "metric_calibration": "inherited_named_artifact",
+            "no_conditioning_tested": True,
+            "conditioned_vs_shuffled_tested": True,
+            "conditioning_sensitive": True,
+            "same_seed_determinism_tested": True,
+            "same_seed_deterministic": True,
+        },
+        timing_evidence={
+            "measured_client_seconds": 1.2,
+            "profiling_strata": "gpu5",
+            "n_repeats": 3,
+            "repeat_seconds": [1.1, 1.2, 1.3],
+            "stages": {"deserialize_s": {"n": 3, "mean": 0.01}},
+        },
+        deployment={"mode": "per_video", "charged_bytes": 400},
+        generation_on=True,
+        model_free=False,
+    )
+    assert complete["rd_claim"] is True
+    assert complete["speed_claim"] is True
+
+    charged_over_wire, charge_reasons = derive_claim_eligibility(
+        metrics={"total_bytes": 7000, "psnr_mean": 24.0},
+        controls={
+            "metric_calibration": "inherited_named_artifact",
+            "no_conditioning_tested": True,
+            "conditioned_vs_shuffled_tested": True,
+            "conditioning_sensitive": True,
+            "same_seed_determinism_tested": True,
+            "same_seed_deterministic": True,
+        },
+        timing_evidence={
+            "measured_client_seconds": 1.2,
+            "profiling_strata": "gpu5",
+            "n_repeats": 3,
+            "repeat_seconds": [1.1, 1.2, 1.3],
+            "stages": {"deserialize_s": {"n": 3, "mean": 0.01}},
+        },
+        deployment={"mode": "per_video", "charged_bytes": 217736406},
+        generation_on=True,
+        model_free=False,
+    )
+    assert charged_over_wire["rd_claim"] is False
+    assert charged_over_wire["speed_claim"] is True
+    assert any("exceed" in item for item in charge_reasons)
+
+    inf_quality, inf_reasons = derive_claim_eligibility(
+        metrics={"total_bytes": 1000, "psnr_mean": float("inf"), "ssim_mean": 0.9},
+        controls={
+            "metric_calibration": "verified",
+            "no_conditioning_tested": True,
+            "conditioned_vs_shuffled_tested": True,
+            "conditioning_sensitive": True,
+            "same_seed_determinism_tested": True,
+            "same_seed_deterministic": True,
+        },
+        timing_evidence={
+            "measured_client_seconds": 1.2,
+            "profiling_strata": "gpu5",
+            "n_repeats": 3,
+            "repeat_seconds": [1.1, 1.2, 1.3],
+        },
+        deployment={"mode": "per_video", "charged_bytes": 10},
+        generation_on=True,
+        model_free=False,
+    )
+    assert inf_quality["rd_claim"] is False
+    assert inf_quality["speed_claim"] is True
+    assert any("invalid" in item or "domain" in item for item in inf_reasons)
+
+    once, once_reasons = derive_claim_eligibility(
+        metrics={"total_bytes": 1000, "psnr_mean": 24.0},
+        controls={
+            "metric_calibration": "verified",
+            "no_conditioning_tested": True,
+            "conditioned_vs_shuffled_tested": True,
+            "conditioning_sensitive": True,
+            "same_seed_determinism_tested": True,
+            "same_seed_deterministic": True,
+        },
+        timing_evidence={
+            "measured_client_seconds": 1.2,
+            "profiling_strata": "gpu5",
+            "n_repeats": 1,
+            "repeat_seconds": [1.2],
+            "stages": {"deserialize_s": {"n": 1, "mean": 0.01}},
+        },
+        deployment={"mode": "per_video", "charged_bytes": 10},
+        generation_on=True,
+        model_free=False,
+    )
+    assert once["rd_claim"] is True
+    assert once["speed_claim"] is False
+    assert any("two repeats" in item for item in once_reasons)
+
+    rd_only, speed_reasons = derive_claim_eligibility(
+        metrics={"total_bytes": 1000, "psnr_mean": 24.0},
+        controls={
+            "metric_calibration": "verified",
+            "no_conditioning_tested": True,
+            "conditioned_vs_shuffled_tested": True,
+            "conditioning_sensitive": True,
+            "same_seed_determinism_tested": True,
+            "same_seed_deterministic": True,
+        },
+        timing_evidence={},
+        deployment={"mode": "per_video", "charged_bytes": 10},
+        generation_on=True,
+        model_free=False,
+    )
+    assert rd_only["rd_claim"] is True
+    assert rd_only["speed_claim"] is False
+    assert any("stratum" in item for item in speed_reasons)
+
+
+def test_client_timing_to_evidence_requires_repeat_list() -> None:
+    from experiments.tier.e06_pack_audit import client_timing_to_evidence
+    from src.runner.generation_adapter import repeated_client_timing_ok
+
+    evidence = client_timing_to_evidence(
+        {
+            "repeats": 3,
+            "repeat_seconds": [0.31, 0.34, 0.36],
+            "total_s": {"n": 3, "mean": 0.336, "std": 0.025},
+            "stages": {"deserialize_s": {"n": 3, "mean": 0.006, "std": 0.001}},
+        },
+        setting_id="bbox_resized_first_reference_residual_off",
+        host="gpu5",
+    )
+    assert evidence["n_repeats"] == 3
+    assert evidence["repeat_seconds"] == [0.31, 0.34, 0.36]
+    assert evidence["stages"]["deserialize_s"]["n"] == 3
+    assert repeated_client_timing_ok(evidence) is True
+    copied_mean = dict(evidence)
+    copied_mean.pop("repeat_seconds")
+    copied_mean["stages"] = {"deserialize_s": 0.006}
+    assert repeated_client_timing_ok(copied_mean) is False

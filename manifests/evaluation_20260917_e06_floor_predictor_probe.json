@@ -1,0 +1,167 @@
+{
+  "schema": "pointstream.experiment_card.v1",
+  "doc_role": "e06_mask_placement_framing_floor_and_predictor_probe",
+  "campaign": "evaluation-20260914",
+  "status": "proposed_not_authorized",
+  "task": "E06",
+  "owner": "Cursor",
+  "date": "2026-09-17",
+  "new_encodes_authorized_now": false,
+  "training_authorized_now": false,
+  "confirmation_scoring": false,
+  "parent_evidence": {
+    "e06_probe_report_sha256": "52c0179c724469e56a1dedeafd8695536b44623cd0a63c48bf8128a49f8b5e33",
+    "e06_bounds_sha256": "0c88b4a360220d452faa540f1ea499a403fdba86990c859466b2a685aceb2230",
+    "e06_rows_sha256": "7bab384fee466c580256f8b9ce14a6409888fadbf97e1c397a9b83dda6ce3c68",
+    "compact_audit_dir": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/audit-20260916-lossless-pack",
+    "cheapest_compact": {
+      "id": "bbox_resized_first_reference_residual_off",
+      "T_bytes": 30297,
+      "stored_native_bytes": 3328,
+      "compressed_auxiliary_bytes": 21815,
+      "zip_framing_bytes": 5154,
+      "psnr_y": 20.68009843377257,
+      "ssim": 0.6718674538160093,
+      "vmaf": 18.181666
+    },
+    "original_bbox_off_parts": {
+      "panorama_B": 4554,
+      "actor_reference_F": 260,
+      "residual_R": 0,
+      "mask_payload": 67278,
+      "placement_headers": 19982,
+      "envelope_overhead": 25787
+    },
+    "anchors_A_q": {
+      "av1_qp63": {"bytes": 19116, "psnr_y": 27.4},
+      "vvc_qp47": {"bytes": 21288, "psnr_y": 24.6}
+    },
+    "residual_on_note": "Paired residual-on reached ~24.15 dB at +72–78 kB R; that arm cannot cross A(q) on this stack."
+  },
+  "decision_and_hypothesis": "The compact bbox residual-off point is above both saved anchors because auxiliary masks/placement/zip (~27 kB) plus native B+F (~3.3 kB) already exceed A(q), while the predictor sits ~4 dB below VVC QP47. Hypothesis: temporally keyed RLE masks plus delta placement can drop M+H enough that T < 21288, and a still-model-free affine or two-reference predictor can recover ≥0.5 dB toward 24.6 dB without residual. Competing explanations: zip framing, not mask pixels, is the floor; metadata.npy duplicates the mask arrays so RLE of npy files does not change T; the quality gap is the reused plate/B rather than F; union-mask multi-player geometry makes affine warp a no-op versus bbox resize; only residual can buy the missing 4 dB, and residual already costs more than A(q).",
+  "question": "Can a mask/placement/framing change plus a still-honest residual-off predictor put T below the saved VVC QP47 budget at quality within 0.5 dB of 24.6 dB on this development window?",
+  "how_candidate_could_cross_A_q": {
+    "budget_identity": "A(q)-B-M-H is the remaining room for F+R. With B≈4554 B and A(VVC QP47)=21288 B, M+H must fall below ~16700 B before F+R can be non-negative and still under the anchor. Compact aux+zip is currently 26969 B, so about 10 kB must leave the envelope even if F stays 260 B.",
+    "rate_path": "If keyed XOR/RLE masks plus delta int16 placement plus thinner zip members cut aux+framing from 26969 B to ≤12000 B while reusing stored native B+F (3328 B), T would land near 15 kB, under both 21288 B and 19116 B.",
+    "quality_path": "Rate under A(q) is not a win at 20.7 dB. Affine-from-first-ref or first+last WebP interpolation must reach ≥24.1 dB (within 0.5 dB of VVC 24.6) without residual. Residual previously bought +3.45 dB for 72 kB and cannot be the first tool on this point.",
+    "not_a_win_unless": "T below the overlapping neighbour and whole-frame PSNR-Y within 0.5 dB of that neighbour, with reconciled T=B+F+M+R+H and standalone pixels."
+  },
+  "evidence_reused": {
+    "prepared_rgb_sha256": "1f02475a5bbc3d94e4bae2e904dc29c3af3082be0c0c160e027b706a6950f6f8",
+    "e04a_panorama_qp47_sha256": "31937000b96293420e741283985452233f896075748e657dff142304322947a6",
+    "compact_bbox_off_transport": "reuse bytes; do not re-encode B or the 260 B first-reference WebP unless a setting explicitly adds a second reference",
+    "gap": "Lossless whole-envelope deflate already ran. It does not test a different mask codec, temporal mask keys, placement delta coding, or a stronger residual-off predictor. Do not treat the 217 MB E05 checkpoint as a free F payload."
+  },
+  "operating_regime": {
+    "video": "federer_djokovic",
+    "scene": "scene_007",
+    "split": "development",
+    "operating_point_id": "display_low",
+    "frame_count": 48,
+    "fps": 12.0,
+    "shape": [48, 360, 640, 3],
+    "generation": "off",
+    "residual": "off_for_all_six",
+    "native_pts_policy": "Keep the E03B mapping. Do not relabel extract indices as native frames."
+  },
+  "smallest_discriminating_probe": {
+    "n_settings": 6,
+    "one_changed_axis_rule": "Settings 2–4 change only the mask/placement/framing representation against setting 1. Settings 5–6 change only the residual-off predictor against setting 1, holding the current compact mask/header path.",
+    "settings": [
+      {
+        "id": "control_bbox_compact_residual_off",
+        "axis": "control",
+        "action": "reuse_saved_compact",
+        "predictor": "bbox_resized_first_reference",
+        "residual": "off"
+      },
+      {
+        "id": "mask_rle_per_frame",
+        "axis": "floor",
+        "action": "repack_only",
+        "change": "Replace 48 uncompressed mask members with per-frame binary RLE; keep predictor and F/B bytes.",
+        "expected": "T drops if npy/zip storage, not occupancy, dominates; pixels identical."
+      },
+      {
+        "id": "mask_keyframe_xor_every_4",
+        "axis": "floor",
+        "action": "repack_only",
+        "change": "Keyframe mask every 4 frames plus XOR-delta RLE; client reconstructs 48 masks.",
+        "expected": "Largest plausible M cut if temporal mask redundancy is real."
+      },
+      {
+        "id": "placement_delta_int16_thin_envelope",
+        "axis": "floor",
+        "action": "repack_only",
+        "change": "Delta-code bboxes/homographies as int16 and stop shipping a duplicated metadata.npy that recites masks.",
+        "expected": "Separates header/zip from mask-pixel cost. If T barely moves, zip/metadata was the floor."
+      },
+      {
+        "id": "predictor_affine_first_ref",
+        "axis": "predictor",
+        "action": "new_client_warp_no_new_F_encode",
+        "change": "Same single first-reference WebP; place with a 2D affine estimated from mask moments/bbox, not bbox resize. Still not optical flow or pose.",
+        "expected": "PSNR-Y +≥0.5 dB vs control if resize-into-union-bbox is the quality leak."
+      },
+      {
+        "id": "predictor_first_last_ref_interp",
+        "axis": "predictor",
+        "action": "one_extra_webp_crop_only",
+        "change": "Charge a second last-occupied-frame crop (same WebP recipe as F) and linearly interpolate placement between first and last. Residual off. Not a neural predictor.",
+        "expected": "Tests whether one extra F payload can buy the missing 4 dB cheaper than residual."
+      }
+    ]
+  },
+  "controls": [
+    "Reuse prepared RGB and panorama-QP47 hashes before any pack.",
+    "Residual-off and R=0 on every setting; do not reopen the 72 kB residual arm.",
+    "Lossless floor arms: standalone pixels equal the control decode.",
+    "Predictor arms: ordinary vs standalone pixels equal; quote whole-frame PSNR/SSIM/VMAF beside identical 97.93 / unrelated 1.38 / severe-blur 0.0 VMAF.",
+    "Ledger T=B+F+M+R+H on the compact file length; native payloads stored as-is; do not manufacture H as T minus logical arrays.",
+    "Unrelated reconstruction must not outrank the decode.",
+    "Client timing n_repeats≥2 with repeat_seconds; missing speed does not drop a valid RD row.",
+    "No confirmation sources, no BD-rate, no conventional/background re-encodes, no training."
+  ],
+  "competing_explanations": [
+    "Zip framing (~5 kB) plus duplicated metadata.npy, not mask occupancy, is the remaining floor.",
+    "Union masks cover two players; affine-from-one-crop cannot match per-player geometry.",
+    "Background plate error, not F, sets the 20.7 dB ceiling.",
+    "Only block residual can reach ~24.1 dB, and its byte cost already exceeds A(q).",
+    "Keyframe-every-4 masks change pixels (not lossless) and fail the floor parity control."
+  ],
+  "bounds_and_instrument": {
+    "written_before_headline_scores": true,
+    "T_bytes": {"low": 2500, "high": 30297, "basis": "Cannot exceed current compact control; tool floor above empty zip."},
+    "psnr_y_db": {"low": 18.0, "high": 28.0, "basis": "Control 20.7 dB; do not expect AV1 27.4 from warp alone; below 18 is a decode/composite alarm."},
+    "client_s": {"low": 0.05, "high": 60.0, "basis": "Saved compact client 0.34–0.56 s n=3 on gpu5."},
+    "floor_pixel_mismatch": {"low": 0, "high": 0}
+  },
+  "budget": {
+    "max_new_configurations": 6,
+    "wall_minutes_including_scoring": 15,
+    "gpu_hours": 0,
+    "native_video_reencodes": 0,
+    "estimated_from_prior": "Compact client 0.34–0.56 s × 3 repeats × 6 settings plus RLE/XOR CPU and at most one extra 360p WebP crop. Implementation of RLE/XOR/affine is a separate bounded coding task, not hidden inside this 15 min run cap.",
+    "control_budget_share": "At least one third for reuse hashes, pixel parity, ledger, calibration inheritance, timing repeats.",
+    "if_exceeded": "Stop after the floor trio (settings 1–4) and do not start predictor encodes.",
+    "launch": "not now; card only"
+  },
+  "decision_rule": {
+    "stop": "Best lossless floor T still ≥ 21288 B, or predictor arms gain <0.5 dB PSNR-Y versus control, or a floor arm changes pixels, or residual is reintroduced, or hashes miss.",
+    "promote": "At least one setting has T < 21288 B and PSNR-Y within 0.5 dB of VVC QP47 24.6 dB (or T < 19116 B within 0.5 dB of AV1 QP63 27.4 dB), ledger reconciles, and client repeats are genuine. Then cost a single residual QP on that floor/predictor only.",
+    "inconclusive": "T falls under A(q) but quality stays ~20.7 dB, or quality rises without a T cut: report both axes, do not claim a codec win, do not BD-rate.",
+    "do_not": [
+      "score confirmation sources",
+      "re-encode E03B/E04A streams",
+      "train or attach the 217 MB checkpoint",
+      "treat whole-envelope deflate as this probe",
+      "upgrade n_repeats=1 or inf PSNR into a claim"
+    ]
+  },
+  "artifact_and_narrative": {
+    "output_root": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/probe-20260917-floor-predictor-not-run",
+    "supported_sentence": "On this development window, keyed/RLE masks and a still-model-free warp put compact T below the saved VVC QP47 budget at matched quality without residual.",
+    "contradicted_sentence": "After charging a thinner M+H and a stronger residual-off predictor, either T stayed above A(q) or quality stayed ~4 dB short, so this configuration still cannot win at comparable quality.",
+    "scope": "One 4 s development scene at 360p/12 fps. Not a Gate A/B pass."
+  }
+}

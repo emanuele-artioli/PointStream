@@ -1,13 +1,29 @@
 # Evaluation Area
 
+## Claim-eligibility acceptance and floor/predictor card — 17 September 2026
+
+#128 now fails closed unless client timing has at least two reconstructions
+(`repeat_seconds` or per-stage `n` matching `n_repeats≥2`), every present
+PSNR/SSIM/VMAF value is finite and in domain, and per-video fitted
+`charged_bytes` sit inside claimed `total_bytes`. Missing speed still leaves
+a valid RD row eligible. The saved compact bbox residual-off point remains
+30297 B at 20.7 dB, above VVC QP47 21288 B / 24.6 dB, so this full-codec
+configuration stays stopped as a win search. The next discriminating step is
+the unlaunched card
+[evaluation_20260917_e06_floor_predictor_probe.json](../../manifests/evaluation_20260917_e06_floor_predictor_probe.json):
+six residual-off settings on mask/placement/framing versus predictor quality,
+no encodes or training in this session.
+
+
 ## Pilot return audit — 16 September 2026
 
 E06/#121 is merged (`c656ee6`, launch `def647a`). Four saved transport reports,
 ledgers and hashes match; accept stopping this configuration as a codec win search.
-No broad win/BD-rate follows. Separate client timing is absent. Next work is
-lossless packaging and client profiling on saved payloads, plus claim eligibility
-that respects missing calibration/control/deployment evidence. No native re-encodes.
-Follow [the reuse assignments](../workflow/session/evaluation-campaign/tasks/20260916-return-audit-and-reuse.md).
+No broad win/BD-rate follows. Derived lossless packing and client deserialize/decode/render
+timing live under `outputs/evaluation-20260914/e06/audit-20260916-lossless-pack/`.
+Claim eligibility now fails closed on missing calibration, blank controls, undeclared
+deployment cost, and combined encoder+score seconds. Follow
+[the reuse assignments](../workflow/session/evaluation-campaign/tasks/20260916-return-audit-and-reuse.md).
 
 
 ## Historical conditional release — 16 September 2026

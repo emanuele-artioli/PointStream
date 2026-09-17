@@ -569,8 +569,8 @@ def test_generation_adapter_conforms_to_e01_schema() -> None:
     assert adapted["run_id"] == "test_run_01"
     assert adapted["backend_name"] == "pix2pix"
     assert adapted["checkpoint_identity"]["checkpoint_sha256"] == "abcdef1234567890"
-    assert adapted["claim_eligibility"]["rd_claim"] is True
-    assert adapted["claim_eligibility"]["speed_claim"] is True
+    assert adapted["claim_eligibility"]["rd_claim"] is False
+    assert adapted["claim_eligibility"]["speed_claim"] is False
 
     valid, blockers = validate_generation_result(adapted)
     assert valid is True
@@ -604,7 +604,7 @@ def test_generation_adapter_fails_closed_on_failed_controls() -> None:
     )
 
     assert adapted["claim_eligibility"]["rd_claim"] is False
-    assert any("shuffled match" in r for r in adapted["exclusion_reasons"])
+    assert any("shuffled" in r for r in adapted["exclusion_reasons"])
 
 
 def test_adapter_reads_nested_scores_timing_parts_and_shape() -> None:

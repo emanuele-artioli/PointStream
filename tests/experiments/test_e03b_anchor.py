@@ -167,6 +167,8 @@ def test_campaign_row_from_e03b_shape_validates() -> None:
     assert validate_campaign_record(row, purpose="validated") == []
     ingested = ingest_for_claim([row], "rd", purpose="validated")
     assert ingested["n_kept"] == 1
+    assert row["claim_eligibility"]["runtime"] is False
+    assert ingest_for_claim([row], "runtime", purpose="validated")["n_kept"] == 0
 
 
 def test_short_rgb24_decode_is_rejected_not_padded() -> None:
