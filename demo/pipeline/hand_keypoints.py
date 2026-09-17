@@ -7,8 +7,6 @@ from dataclasses import dataclass
 import json
 from pathlib import Path
 
-import cv2
-import mediapipe as mp
 import numpy as np
 
 # 21 Hand Landmarks defined by MediaPipe
@@ -139,15 +137,21 @@ class HandPoseEstimator:
         max_num_hands: int = 2,
         min_detection_confidence: float = 0.5,
         min_tracking_confidence: float = 0.5,
+        model_complexity: int = 1,
     ) -> None:
+        import mediapipe as mp
+
         self.mp_hands = mp.solutions.hands.Hands(
             static_image_mode=static_image_mode,
             max_num_hands=max_num_hands,
+            model_complexity=model_complexity,
             min_detection_confidence=min_detection_confidence,
             min_tracking_confidence=min_tracking_confidence,
         )
 
     def process_frame(self, frame_bgr: np.ndarray, frame_idx: int = 0) -> FrameHandPose:
+        import cv2
+
         h, w = frame_bgr.shape[:2]
         rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
         results = self.mp_hands.process(rgb)
@@ -206,6 +210,8 @@ def render_skeleton_on_canvas(
 
     If crop_bbox is specified ([x1, y1, x2, y2]), coordinates are mapped to the crop.
     """
+    import cv2
+
     canvas = np.zeros((height, width, 3), dtype=np.uint8)
 
     for hand in frame_pose.hands:
@@ -249,6 +255,7 @@ def extract_video_hand_poses(
     fps: float = 30.0,
 ) -> list[FrameHandPose]:
     from demo.pipeline.background_codec import read_video_frames_robust
+    import cv2
 
     frames = read_video_frames_robust(video_path, max_frames=max_frames)
     estimator = HandPoseEstimator()

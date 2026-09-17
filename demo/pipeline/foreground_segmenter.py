@@ -80,8 +80,8 @@ def create_box_feather_mask(crop_h: int, crop_w: int, margin_fraction: float = 0
     """
     m_h = np.ones(crop_h, dtype=np.float32)
     m_w = np.ones(crop_w, dtype=np.float32)
-    margin_h = max(2, int(crop_h * margin_fraction))
-    margin_w = max(2, int(crop_w * margin_fraction))
+    margin_h = max(1, min(crop_h // 3, int(crop_h * margin_fraction) or 1))
+    margin_w = max(1, min(crop_w // 3, int(crop_w * margin_fraction) or 1))
 
     m_h[:margin_h] = np.linspace(0.0, 1.0, margin_h)
     m_h[-margin_h:] = np.linspace(1.0, 0.0, margin_h)

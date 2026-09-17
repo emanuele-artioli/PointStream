@@ -114,7 +114,7 @@ def reconstruct_pointstream_video(
             x2 = max(x1 + 1, min(w, x2))
             y2 = max(y1 + 1, min(h, y2))
             crop_h, crop_w = y2 - y1, x2 - x1
-            if crop_h > 0 and crop_w > 0:
+            if crop_h >= 8 and crop_w >= 8:
                 fitted_hand = cv2.resize(restored_crop, (crop_w, crop_h), interpolation=cv2.INTER_LINEAR)
                 alpha = create_box_feather_mask(crop_h, crop_w, margin_fraction=0.08)
 
