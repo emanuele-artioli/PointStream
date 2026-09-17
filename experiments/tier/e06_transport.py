@@ -218,8 +218,11 @@ def reconcile_ledger(
 
 
 def reconstruct_standalone(payload: bytes, timings: dict[str, float] | None = None) -> np.ndarray:
+    from experiments.tier.e06_floor import unpack_timed
+
+    envelope = unpack_timed(payload, timings)
     frames = np.asarray(
-        reconstruct_serialized_client(payload, require_compressed=True, timings=timings),
+        reconstruct_serialized_client(envelope, require_compressed=True, timings=timings),
         dtype=np.uint8,
     )
     if frames.ndim != 4 or frames.shape[-1] != 3:

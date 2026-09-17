@@ -1,5 +1,31 @@
 # Evaluation Area
 
+## E06 lossless floor arms — 17 September 2026
+
+#128 is merged. Floor-only probe on the saved bbox residual-off compact
+(`f5e7160…`, pixels `5f2047d…`). Packing succeeded on all four arms
+(exact parent pixels, standalone unpack, physical `T=B+F+M+R+H`, client
+`n_repeats=2`). Predictor quality was **not** rescored; inherited
+20.68 dB / 0.672 SSIM / 18.18 VMAF. No affine/interpolation, confirmation,
+GPU, training, or native re-encodes.
+
+| Setting | Packing | T (B) | vs VVC 21288 |
+|---|---|---|---|
+| control compact | pass | 30297 | above |
+| per-frame mask RLE | pass | 17581 | below |
+| XOR key every 4 | pass | 22055 | above |
+| thin placement/metadata | pass | 28125 | above |
+
+Lowest T is under both saved anchors, but quality remains ~4 dB below VVC
+QP47 24.6 dB, so this is not a codec win. XOR lost to intra RLE on this
+stack. Thin metadata saved ~2 kB; zip/JSON was not the 10 kB floor.
+Artifacts: `outputs/evaluation-20260914/e06/probe-20260917-floor-arms/`
+(`floor_report.json` SHA-256
+`0bd1e7cb0797ecda7b9174b6ea294cb91d0a72294d92e53e76fb581dd31c4026`).
+Wall 13.5 s on gpu5. `code_head` in that JSON is parent `6b150f3`; the
+packer lands in this PR. Next: decide whether to run the residual-off
+predictor arms now that rate headroom exists.
+
 ## Claim-eligibility acceptance and floor/predictor card — 17 September 2026
 
 #128 now fails closed unless client timing has at least two reconstructions
