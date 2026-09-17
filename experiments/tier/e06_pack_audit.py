@@ -10,7 +10,7 @@ import socket
 import statistics
 import subprocess
 import time
-from typing import Any
+from typing import Any, Mapping
 
 import numpy as np
 
@@ -140,9 +140,40 @@ def profile_client(payload: bytes, *, warmup: int = 1, repeats: int = 3) -> dict
     return {
         "warmup": warmup,
         "repeats": repeats,
+        "repeat_seconds": [round(item, 6) for item in totals],
         "total_s": _mean_std(totals),
         "stages": {name: _mean_std(vals) for name, vals in stages.items()},
         "frames": last,
+    }
+
+
+def client_timing_to_evidence(
+    profile: Mapping[str, Any],
+    *,
+    setting_id: str,
+    host: str,
+) -> dict[str, Any]:
+    """Named client stratum with actual repeat seconds, not a copied mean."""
+    stages_in = profile.get("stages") or {}
+    stages: dict[str, Any] = {}
+    if isinstance(stages_in, dict):
+        for name, vals in stages_in.items():
+            if isinstance(vals, dict):
+                stages[str(name)] = {
+                    "mean": vals.get("mean"),
+                    "std": vals.get("std"),
+                    "n": vals.get("n"),
+                }
+    repeats = profile.get("repeat_seconds") or []
+    total = profile.get("total_s") or {}
+    return {
+        "timing_evidence_id": f"e06-client-{setting_id}",
+        "host": host,
+        "profiling_strata": host,
+        "n_repeats": int(profile.get("repeats") or 0),
+        "repeat_seconds": [float(item) for item in repeats],
+        "measured_client_seconds": total.get("mean"),
+        "stages": stages,
     }
 
 
@@ -203,14 +234,11 @@ def run_audit(out_dir: Path) -> dict[str, Any]:
         compact_path.write_bytes(compact)
         pixel_digest = pixel_sha256(baseline_frames)
         parent_parts = original["parts"]
-        timing_evidence = {
-            "timing_evidence_id": f"e06-client-{setting_id}",
-            "host": socket.gethostname(),
-            "profiling_strata": socket.gethostname(),
-            "n_repeats": int(profile["repeats"]),
-            "measured_client_seconds": mean_t,
-            "stages": {name: vals["mean"] for name, vals in profile["stages"].items()},
-        }
+        timing_evidence = client_timing_to_evidence(
+            profile,
+            setting_id=setting_id,
+            host=socket.gethostname(),
+        )
         controls = {
             "metric_calibration": "inherited_named_artifact",
             "metric_calibration_verified": True,

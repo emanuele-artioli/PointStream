@@ -1,5 +1,20 @@
 # Evaluation Area
 
+## Claim-eligibility acceptance and floor/predictor card — 17 September 2026
+
+#128 now fails closed unless client timing has at least two reconstructions
+(`repeat_seconds` or per-stage `n` matching `n_repeats≥2`), every present
+PSNR/SSIM/VMAF value is finite and in domain, and per-video fitted
+`charged_bytes` sit inside claimed `total_bytes`. Missing speed still leaves
+a valid RD row eligible. The saved compact bbox residual-off point remains
+30297 B at 20.7 dB, above VVC QP47 21288 B / 24.6 dB, so this full-codec
+configuration stays stopped as a win search. The next discriminating step is
+the unlaunched card
+[evaluation_20260917_e06_floor_predictor_probe.json](../../manifests/evaluation_20260917_e06_floor_predictor_probe.json):
+six residual-off settings on mask/placement/framing versus predictor quality,
+no encodes or training in this session.
+
+
 ## Pilot return audit — 16 September 2026
 
 E06/#121 is merged (`c656ee6`, launch `def647a`). Four saved transport reports,

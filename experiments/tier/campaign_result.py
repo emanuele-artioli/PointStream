@@ -18,6 +18,11 @@ import re
 from pathlib import Path
 from typing import Any, Final, Iterable, Literal, Mapping
 
+from src.runner.generation_adapter import (
+    fitted_model_charged_on_wire,
+    repeated_client_timing_ok,
+)
+
 CLAIM_SCOPES: Final[tuple[str, ...]] = (
     "rd",
     "runtime",
@@ -284,8 +289,12 @@ def _timing_verified(record: Mapping[str, Any]) -> list[str]:
     if "not-yet-run" in path:
         blockers.append("runtime eligibility rejects unrun artifact paths")
     n_repeats = ref.get("n_repeats", ref.get("sample_count"))
-    if isinstance(n_repeats, bool) or not isinstance(n_repeats, int) or n_repeats < 1:
-        blockers.append("runtime eligibility requires a positive integer repeat count")
+    if isinstance(n_repeats, bool) or not isinstance(n_repeats, int) or n_repeats < 2:
+        blockers.append("runtime eligibility requires at least two timed client reconstructions")
+    elif not repeated_client_timing_ok(ref):
+        blockers.append(
+            "runtime eligibility requires repeat_seconds or per-stage n matching n_repeats>=2"
+        )
     measured = ref.get("measured_client_seconds")
     if not _positive_rate(measured):
         blockers.append("runtime eligibility requires positive finite measured_client_seconds")
@@ -692,9 +701,15 @@ def campaign_record_from_generation_adapter(raw: Mapping[str, Any]) -> dict[str,
     psnr = metrics.get("psnr_mean")
     ssim = metrics.get("ssim_mean")
     vmaf = metrics.get("vmaf_mean")
-    rd_measured = _positive_rate(bytes_total) and (
-        _quality_ok("psnr_y", psnr) or _quality_ok("ssim", ssim) or _quality_ok("vmaf", vmaf)
-    )
+    quality_flags: list[bool] = []
+    if psnr is not None:
+        quality_flags.append(_quality_ok("psnr_y", psnr))
+    if ssim is not None:
+        quality_flags.append(_quality_ok("ssim", ssim))
+    if vmaf is not None:
+        quality_flags.append(_quality_ok("vmaf", vmaf))
+    quality_ok = bool(quality_flags) and all(quality_flags)
+    rd_measured = _positive_rate(bytes_total) and quality_ok
 
     decode_status = _map_campaign_control(controls_in.get("standalone_decode"), "standalone_decode")
     calib_status = _map_campaign_control(
@@ -709,20 +724,12 @@ def campaign_record_from_generation_adapter(raw: Mapping[str, Any]) -> dict[str,
     model_free = bool(raw.get("model_free"))
     raw_deployment = raw.get("deployment")
     deployment: dict[str, Any] = dict(raw_deployment) if isinstance(raw_deployment, dict) else {}
+    deployment_ok, deploy_reason = fitted_model_charged_on_wire(
+        metrics, deployment, model_free=model_free
+    )
     if model_free:
-        deployment_ok = True
         blank_ok = True
     else:
-        mode = str(deployment.get("mode") or "")
-        if mode == "shared":
-            deployment_ok = bool(deployment.get("receiver_availability")) and bool(
-                deployment.get("amortization_policy")
-            ) and deployment.get("storage_bytes") is not None
-        elif mode == "per_video":
-            charged = deployment.get("charged_bytes", deployment.get("storage_bytes"))
-            deployment_ok = _positive_rate(charged)
-        else:
-            deployment_ok = False
         blank_ok = (not generation_on) or blank_tested
     rd_ok = bool(rd_measured and decode_ok and calib_ok and ledger_ok and deployment_ok and blank_ok)
 
@@ -735,7 +742,8 @@ def campaign_record_from_generation_adapter(raw: Mapping[str, Any]) -> dict[str,
         and "not-yet-run" not in str(timing.get("timing_evidence_id"))
         and isinstance(n_repeats, int)
         and not isinstance(n_repeats, bool)
-        and n_repeats >= 1
+        and n_repeats >= 2
+        and repeated_client_timing_ok(timing)
         and _finite_number(timing.get("measured_client_seconds"))
         and float(timing["measured_client_seconds"]) > 0
     )
@@ -765,7 +773,8 @@ def campaign_record_from_generation_adapter(raw: Mapping[str, Any]) -> dict[str,
         exclusions.append(
             {
                 "claim": "rd",
-                "reason": "undeclared model deployment cost; checkpoint digest is not delivered weights",
+                "reason": deploy_reason
+                or "undeclared model deployment cost; checkpoint digest is not delivered weights",
             }
         )
     if not blank_ok:

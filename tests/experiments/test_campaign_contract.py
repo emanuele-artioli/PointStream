@@ -353,7 +353,9 @@ def test_runtime_does_not_require_quality_controls() -> None:
         "timing_evidence_id": "timing.gpu6.display_low.paste.n3",
         "host": "gpu6",
         "n_repeats": 3,
+        "repeat_seconds": [1.20, 1.25, 1.30],
         "measured_client_seconds": 1.25,
+        "stages": {"deserialize_s": {"n": 3, "mean": 0.04}},
     }
     record["controls"] = {
         "standalone_decode": "not_this_row",
@@ -385,7 +387,9 @@ def test_runtime_rejects_missing_nonfinite_or_nonpositive_measurement(measured: 
         "timing_evidence_id": "timing.gpu5.display_low.n3",
         "host": "gpu5",
         "n_repeats": 3,
+        "repeat_seconds": [1.2, 1.3, 1.4],
         "measured_client_seconds": measured,
+        "stages": {"deserialize_s": {"n": 3, "mean": 0.04}},
     }
     record["controls"] = {
         "standalone_decode": "not_this_row",
@@ -394,6 +398,36 @@ def test_runtime_rejects_missing_nonfinite_or_nonpositive_measurement(measured: 
     }
     blockers = validate_campaign_record(record, purpose="validated")
     assert any("positive finite measured_client_seconds" in item for item in blockers)
+    assert ingest_for_claim([record], "runtime", purpose="validated")["n_kept"] == 0
+
+
+def test_runtime_rejects_declared_single_repeat() -> None:
+    record = dict(load_example_records()[-1])
+    record["claim_eligibility"] = dict(record["claim_eligibility"])
+    record["claim_eligibility"].update(
+        {"rd": False, "runtime": True, "standalone_transport": False}
+    )
+    record["claim_eligibility"]["exclusions"] = [
+        {"claim": "rd", "reason": "timing-only stratum"},
+        {"claim": "standalone_transport", "reason": "not a transport audit"},
+        {"claim": "trajectory", "reason": "not a generation trajectory"},
+        {"claim": "generalization", "reason": "single development source"},
+    ]
+    record["timing_evidence"] = {
+        "timing_evidence_id": "timing.gpu5.display_low.n1",
+        "host": "gpu5",
+        "n_repeats": 1,
+        "repeat_seconds": [1.25],
+        "measured_client_seconds": 1.25,
+        "stages": {"deserialize_s": {"n": 1, "mean": 0.04}},
+    }
+    record["controls"] = {
+        "standalone_decode": "not_this_row",
+        "metric_calibration": "not_this_row",
+        "wire_ledger": "not_this_row",
+    }
+    blockers = validate_campaign_record(record, purpose="validated")
+    assert any("at least two timed" in item for item in blockers)
     assert ingest_for_claim([record], "runtime", purpose="validated")["n_kept"] == 0
 
 

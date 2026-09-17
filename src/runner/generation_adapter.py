@@ -12,6 +12,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 import hashlib
 import json
+import math
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -110,6 +111,8 @@ def validate_generation_result(record: dict[str, Any] | GenerationResultRecord) 
             blockers.append("rd_claim requires measured wire rate (residual_bytes or total_bytes)")
         if metrics.get("psnr_mean") is None and metrics.get("ssim_mean") is None:
             blockers.append("rd_claim requires measured objective quality (psnr_mean or ssim_mean)")
+        if eligibility.get("rd_claim", False) and not _quality_evidence_ok(metrics):
+            blockers.append("rd_claim rejects non-finite or out-of-domain quality values")
         if not (
             controls.get("metric_calibration_verified")
             or controls.get("metric_calibration") in {"verified", "inherited_named_artifact", "inherited"}
@@ -120,18 +123,114 @@ def validate_generation_result(record: dict[str, Any] | GenerationResultRecord) 
         deployment = data.get("deployment") or {}
         if not data.get("model_free") and not deployment.get("mode"):
             blockers.append("rd_claim requires a declared model deployment cost policy")
+        charged_ok, charged_reason = fitted_model_charged_on_wire(
+            metrics, deployment if isinstance(deployment, dict) else {}, model_free=bool(data.get("model_free"))
+        )
+        if eligibility.get("rd_claim", False) and not charged_ok:
+            blockers.append(charged_reason or "rd_claim requires fitted-model bytes on the claimed wire")
 
     if eligibility.get("speed_claim", False):
         if not timing.get("profiling_strata") or not timing.get("measured_client_seconds"):
             blockers.append("speed_claim requires host profiling strata and measured timing evidence")
-        if not timing.get("stages") or not timing.get("n_repeats"):
-            blockers.append("speed_claim requires repeated client deserialize/decode/render stages")
+        if not repeated_client_timing_ok(timing):
+            blockers.append("speed_claim requires at least two timed client reconstructions")
 
     return len(blockers) == 0, blockers
 
 
 def _positive_number(value: Any) -> bool:
-    return isinstance(value, (int, float)) and not isinstance(value, bool) and value > 0
+    return (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(value)
+        and value > 0
+    )
+
+
+def _quality_evidence_ok(metrics: Mapping[str, Any]) -> bool:
+    flags: list[bool] = []
+    for key in ("psnr_mean", "ssim_mean", "vmaf_mean"):
+        if key not in metrics or metrics.get(key) is None:
+            continue
+        flags.append(_domain_quality(key, metrics.get(key)))
+    return bool(flags) and all(flags)
+
+
+def _domain_quality(name: str, value: Any) -> bool:
+    if not (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(value)
+    ):
+        return False
+    number = float(value)
+    key = name.lower()
+    if "ssim" in key:
+        return 0.0 <= number <= 1.0
+    if "vmaf" in key:
+        return 0.0 <= number <= 100.0
+    if "psnr" in key:
+        return number > 0.0
+    return True
+
+
+def repeated_client_timing_ok(timing_evidence: Mapping[str, Any]) -> bool:
+    """True only when at least two actual timed client reconstructions exist.
+
+    A declared ``n_repeats`` of 1, a copied scalar, or encoder+score seconds
+    without a repeat list or per-stage ``n>=2`` is not a speed claim.
+    """
+    n_repeats = timing_evidence.get("n_repeats", timing_evidence.get("sample_count"))
+    if isinstance(n_repeats, bool) or not isinstance(n_repeats, int) or n_repeats < 2:
+        return False
+    repeats = timing_evidence.get("repeat_seconds")
+    if isinstance(repeats, list) and len(repeats) >= 2:
+        if len(repeats) != n_repeats:
+            return False
+        return all(_positive_number(item) for item in repeats)
+    stages = timing_evidence.get("stages")
+    if not isinstance(stages, dict) or not stages:
+        return False
+    counts: list[int] = []
+    for value in stages.values():
+        if isinstance(value, dict) and isinstance(value.get("n"), int) and not isinstance(value.get("n"), bool):
+            counts.append(int(value["n"]))
+    return bool(counts) and min(counts) >= 2 and min(counts) == n_repeats
+
+
+def fitted_model_charged_on_wire(
+    metrics: Mapping[str, Any],
+    deployment: Mapping[str, Any] | None,
+    *,
+    model_free: bool,
+) -> tuple[bool, str | None]:
+    """Per-video fitted weights must appear inside the claimed total wire cost."""
+    if model_free:
+        return True, None
+    dep = dict(deployment or {})
+    mode = str(dep.get("mode") or "")
+    total = metrics.get("total_bytes")
+    if mode == "shared":
+        if not (
+            dep.get("receiver_availability")
+            and dep.get("amortization_policy")
+            and dep.get("storage_bytes") is not None
+        ):
+            return False, "shared-model deployment needs availability, amortization and storage_bytes"
+        return True, None
+    if mode == "per_video":
+        charged = dep.get("charged_bytes", dep.get("storage_bytes"))
+        if not _positive_number(charged):
+            return False, "per-video fitted weights have no positive charged_bytes"
+        if not _positive_number(total):
+            return False, "fitted-model charge needs a positive total_bytes that includes the weights"
+        if float(total) < float(charged):
+            return False, (
+                f"fitted-model charged_bytes {int(charged)} exceed claimed total_bytes "
+                f"{int(total)}; weights are not on the wire"
+            )
+        return True, None
+    return False, "undeclared model deployment cost; checkpoint digest is not delivered weights"
 
 
 def derive_claim_eligibility(
@@ -151,10 +250,10 @@ def derive_claim_eligibility(
     not delivered weights.
     """
     exclusions: list[str] = []
-    has_rate = metrics.get("residual_bytes") is not None or metrics.get("total_bytes") is not None
-    has_quality = any(
-        metrics.get(key) is not None for key in ("psnr_mean", "ssim_mean", "vmaf_mean")
+    has_rate = _positive_number(metrics.get("total_bytes")) or _positive_number(
+        metrics.get("residual_bytes")
     )
+    has_quality = _quality_evidence_ok(metrics)
     calib = bool(
         controls.get("metric_calibration_verified")
         or controls.get("metric_calibration")
@@ -169,29 +268,16 @@ def derive_claim_eligibility(
         bool(controls.get("same_seed_determinism_tested"))
         and bool(controls.get("same_seed_deterministic"))
     )
-    if model_free:
-        deployment_ok = True
-    else:
-        dep = dict(deployment or {})
-        mode = str(dep.get("mode") or "")
-        if mode == "shared":
-            deployment_ok = bool(dep.get("receiver_availability")) and bool(
-                dep.get("amortization_policy")
-            ) and dep.get("storage_bytes") is not None
-        elif mode == "per_video":
-            charged = dep.get("charged_bytes", dep.get("storage_bytes"))
-            deployment_ok = _positive_number(charged)
-        else:
-            deployment_ok = False
-        if not deployment_ok:
-            exclusions.append(
-                "undeclared model deployment cost; checkpoint digest is not delivered weights"
-            )
+    deployment_ok, deploy_reason = fitted_model_charged_on_wire(
+        metrics, deployment, model_free=model_free
+    )
+    if not deployment_ok and deploy_reason:
+        exclusions.append(deploy_reason)
 
     if not has_rate:
         exclusions.append("missing measured wire byte payload")
     if not has_quality:
-        exclusions.append("missing measured objective quality")
+        exclusions.append("missing or invalid objective quality (non-finite or out of domain)")
     if not calib:
         exclusions.append("missing campaign metric calibration evidence")
     if generation_on and not shuffled_ok:
@@ -208,26 +294,20 @@ def derive_claim_eligibility(
         and shuffled_ok
         and blank_ok
         and seed_ok
-        and (model_free or deployment_ok)
+        and deployment_ok
     )
 
-    n_repeats = timing_evidence.get("n_repeats", timing_evidence.get("sample_count"))
     strata = timing_evidence.get("profiling_strata") or timing_evidence.get("host")
     client_s = timing_evidence.get("measured_client_seconds")
-    stages = timing_evidence.get("stages")
     speed_claim = bool(
         _positive_number(client_s)
-        and isinstance(n_repeats, int)
-        and not isinstance(n_repeats, bool)
-        and n_repeats >= 1
+        and repeated_client_timing_ok(timing_evidence)
         and isinstance(strata, str)
         and strata not in {"", "unassigned"}
-        and isinstance(stages, dict)
-        and stages
     )
     if not speed_claim:
         exclusions.append(
-            "missing named client deserialize/decode/render stratum with repeats"
+            "missing named client deserialize/decode/render stratum with at least two repeats"
         )
 
     return (
