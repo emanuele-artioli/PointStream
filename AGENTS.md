@@ -48,3 +48,30 @@ For dispatch, completed work, or handoff, read and follow the [session workflow]
 Use [docs/setup.md](docs/setup.md) before environment setup or experiment runs, and its verification section before merging. Host-wide cache and import-order rules remain in the host rules above.
 
 Project constraints: data must stay outside the code tree (no `assets/` or `outputs/` symlinks); record the exact native encoder/decoder paths and versions with each run so comparisons are reproducible. Do not run `scripts/cleanup_merged_worktrees.sh` until `INFRA-ACT-01` is resolved: its deletion fallback can discard uncommitted work.
+
+## Subagents
+
+The parent coordinator delegates bounded parallel lanes by default. It keeps
+integration, shared-contract changes, and the hardest scientific or
+architectural judgment. It does not use demo trial profiles for codec,
+evaluation, paper, GPU, or shared-contract work.
+
+Escalate only after a predeclared acceptance check fails, and record that
+failure. Start a **fresh** child on the next rung; do not resume a cheaper
+child to change model. Verify the runtime model (and, on Codex, effort and
+permission metadata) before accepting a child result.
+
+**Codex** — profiles in `.codex/config.toml`, cost-first:
+`budget_default` (Luna/medium) → `balanced_retry` (Terra/medium) →
+`expert_retry` (Sol/medium). Pass both model and `reasoning_effort`.
+
+**Cursor** — profiles in `.cursor/agents/`, cost-first (two rungs; there is
+no Terra equivalent): `budget-default` (Composer 2.5) → `expert-retry`
+(Grok 4.6 low). Spawn by `subagent_type` and omit `model` so the profile
+frontmatter applies. Cursor has no separate effort field; Grok effort is
+the slug (`cursor-grok-4.6-low`). If the Task schema rejects non-fast
+Composer, `composer-2.5-fast` still counts as the Composer rung, not an
+escalation.
+
+For eligible real demo tasks, follow the automatic two-day, 24-card randomized
+trial in [subagent-ladder-trial.md](docs/workflow/session/subagent-ladder-trial.md).
