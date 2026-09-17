@@ -155,9 +155,9 @@ visual audit and scoped disposition; no new win or second-camera claim implied.
 
 ## Coordinator remaining submission work
 
-The manuscript's local evidence-status commit is `18d4778`; rendered text and
-HOLEs are unchanged. Its Overleaf push awaits explicit approval after automatic
-review rejected sensitive egress. Paper remains 28 pages with no spare budget.
+The manuscript's evidence-status commit is `18d4778`; rendered text and
+HOLEs are unchanged. The authorized push is complete and Overleaf main verified
+at that commit. Paper remains 28 pages with no spare budget.
 Official UF, RT and all-model backup weight folder links were rechecked: all
 return HTTP403 in shell. No checkpoint is available; RT also documents a separate
 Python3.12/PyTorch2.6/CUDA12.6 stack, so it is not a drop-in fallback.
@@ -166,3 +166,12 @@ PTS audit, while these workers finish evidence reuse. A recent neural anchor,
 valid foreground baseline clearance, a credible development regime, frozen
 confirmation and the required second domain remain submission gaps. September20
 is a scope/date checkpoint; these negative/incomplete returns do not pass it.
+
+Coordinator update: RT CPU entropy extension builds in isolated Python3.12 and
+round-trips 384 synthetic symbols in fresh processes (100 bytes). No neural video
+encode/decode or weights; downloads remain blocked. The
+[readiness audit](../../../../../manifests/evaluation_20260916_coordinator_readiness_audit.json)
+records intact media hashes for three reserved sources and no source-bound codec
+score flags in 1390 retained text records under its binding heuristic. All 156
+reserved bounds were checked against packet keyframe start. Decoded-frame preroll,
+manual replay/duplicates and selection freeze remain open; scoring unauthorized.

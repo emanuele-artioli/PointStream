@@ -694,16 +694,36 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="Run shuffled/foreign-pose generation null (default on)",
     )
     parser.add_argument(
-        "--no-conditioning-control",
+        "--blank-conditioning-control",
+        "--blank-control",
         action=argparse.BooleanOptionalAction,
+        dest="no_conditioning_control",
         default=False,
         help="Run blank/zero-pose generation null (default off)",
+    )
+    parser.add_argument(
+        "--no-conditioning-control",
+        action="store_true",
+        dest="no_conditioning_control",
+        help="Legacy alias to enable blank/zero-pose generation null",
+    )
+    parser.add_argument(
+        "--no-no-conditioning-control",
+        action="store_true",
+        dest="no_conditioning_control",
+        help=argparse.SUPPRESS,
     )
     parser.add_argument(
         "--same-seed-control",
         action=argparse.BooleanOptionalAction,
         default=False,
         help="Run same-seed repeat determinism check (default off)",
+    )
+    parser.add_argument(
+        "--allow-revision-drift",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Allow reusing corners when git code revision drifts but config/checkpoint match",
     )
     parser.add_argument(
         "--device", default=None, help="Inference device (recorded; default cpu/cuda)"
@@ -739,6 +759,7 @@ def run_matrix(
     shuffled_control: bool,
     no_conditioning_control: bool = False,
     same_seed_control: bool = False,
+    allow_revision_drift: bool = False,
     device: str,
     frames: int,
     reuse_path: Path | None = None,
@@ -786,7 +807,7 @@ def run_matrix(
         except Exception as exc:
             print(f"Reuse file unreadable ({type(exc).__name__}: {exc}); running all corners")
             prior = None
-    reusable = reusable_corners(prior, identity)
+    reusable = reusable_corners(prior, identity, allow_revision_drift=allow_revision_drift)
 
     corners: list[dict[str, Any]] = [
         {
@@ -929,6 +950,7 @@ def main(argv: list[str] | None = None) -> int:
         shuffled_control=bool(args.shuffled_control),
         no_conditioning_control=bool(args.no_conditioning_control),
         same_seed_control=bool(args.same_seed_control),
+        allow_revision_drift=bool(args.allow_revision_drift),
         device=device,
         frames=args.frames,
         reuse_path=args.reuse_results,

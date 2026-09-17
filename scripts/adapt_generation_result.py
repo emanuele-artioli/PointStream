@@ -70,6 +70,19 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default="shared_gpu_server",
         help="Hardware stratum for execution timing (default: shared_gpu_server)",
     )
+    parser.add_argument(
+        "--deployment-regime",
+        type=str,
+        choices=["per_video_fit", "shared_model"],
+        default="per_video_fit",
+        help="Model deployment regime (per_video_fit or shared_model; default: per_video_fit)",
+    )
+    parser.add_argument(
+        "--disqualify-unaccounted-claims",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Disqualify RD and speed claims when deployment costs or latency thresholds are not met (default: on)",
+    )
     return parser
 
 
@@ -92,6 +105,48 @@ def main(argv: list[str] | None = None) -> int:
         checkpoint_sha256=args.checkpoint_sha256,
         host_strata=args.host_strata,
     )
+
+    ckpt_bytes: int | None = None
+    if args.checkpoint and Path(args.checkpoint).is_file():
+        ckpt_bytes = int(Path(args.checkpoint).stat().st_size)
+
+    record["deployment_accounting"] = {
+        "regime": args.deployment_regime,
+        "checkpoint_path": str(args.checkpoint) if args.checkpoint else None,
+        "checkpoint_bytes": ckpt_bytes,
+        "amortization_policy": (
+            "per_video_charged"
+            if args.deployment_regime == "per_video_fit"
+            else "shared_preinstalled_unverified"
+        ),
+    }
+
+    if args.disqualify_unaccounted_claims:
+        eligibility = record.setdefault("claim_eligibility", {})
+        reasons = record.setdefault("exclusion_reasons", [])
+        if args.deployment_regime == "per_video_fit":
+            eligibility["rd_claim"] = False
+            reasons.append(
+                f"per_video_fit model weights ({ckpt_bytes:,} B) not accounted in primary wire stream"
+                if ckpt_bytes
+                else "per_video_fit model weights not accounted in primary wire stream"
+            )
+        else:
+            eligibility["rd_claim"] = False
+            reasons.append(
+                "shared_model policy unverified: model overfitted to scene_028, lacking multi-domain generalization evidence"
+            )
+
+        timing = record.get("timing_evidence") or {}
+        client_secs = timing.get("measured_client_seconds")
+        frame_count = record.get("frame_count") or 16
+        if client_secs is not None and frame_count > 0:
+            latency_ms = (float(client_secs) / frame_count) * 1000.0
+            if latency_ms > 250.0:
+                eligibility["speed_claim"] = False
+                reasons.append(
+                    f"client decode latency ({latency_ms:.1f} ms/frame) exceeds 250 ms budget and 105% baseline latency threshold"
+                )
 
     is_valid, blockers = validate_generation_result(record)
     if not is_valid:

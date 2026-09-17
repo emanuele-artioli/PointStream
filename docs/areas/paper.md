@@ -2,10 +2,9 @@
 
 ## Pilot return audit — 16 September 2026
 
-Local paper commit `18d4778` records E05 missing-control/deployment evidence,
+Paper commit `18d4778` records E05 missing-control/deployment evidence,
 E04B open alarms and the scoped E06 stop in status markers. Rendered TeX is
-unchanged; no result HOLE cleared and no alarmed metric promoted. Overleaf push
-awaits explicit approval after automatic review rejected manuscript egress.
+unchanged; no result HOLE cleared and no alarmed metric promoted. Overleaf main is verified at `18d4778` after the explicitly authorized push.
 The current PDF remains 28 pages; final result panels must replace material.
 Follow [the reuse assignments](../workflow/session/evaluation-campaign/tasks/20260916-return-audit-and-reuse.md).
 

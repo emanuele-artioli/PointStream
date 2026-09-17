@@ -30,10 +30,16 @@ Neural anchor source and paper are pinned in
 [the readiness record](../../manifests/evaluation_20260916_neural_anchor_readiness.json).
 DCVC-UF is not yet installed or round-trip verified: the official weight link
 returns HTTP 403, the current Python interpreter rejects upstream syntax, and
-a separate compatible environment/native extensions remain required. GPUs are
+UF-compatible Torch/CUDA extensions remain required. A separate Python3.12 RT
+CPU entropy extension builds and passes a fresh-process synthetic symbol
+roundtrip; no weights, neural video roundtrip or benchmark is available. GPUs are
 accessible outside the sandbox. No neural RD result or SOTA claim is available.
 The RGB input config uses the exact E03B prepared stack; its native-PTS gap
-remains explicit. The budget card is proposed, not an execution release.
+remains explicit. No rate ladder is released. The [coordinator audit](../../manifests/evaluation_20260916_coordinator_readiness_audit.json)
+records intact hashes for three reserved media and 1390 retained text records
+without source-bound codec-score flags under its binding heuristic. Deleted or
+unrecorded use is outside its scope; replay/duplicate review, decoded-frame
+preroll and protocol freeze remain open. Confirmation scoring stays unauthorized.
 
 
 ## Historical review — 16 September 2026

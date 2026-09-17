@@ -196,6 +196,9 @@ python scripts/adapt_generation_result.py \
 - **Dataset Subset View**: MATERIALIZED and TESTED.
 - **CLI Commands**: TESTED against real parsers and APIs.
 - **Split Labels**: CORRECTED (`federer007` is development; confirmation quarantined).
-- **Execution**: COMPLETED (2026-09-16). Total compute time ~24.4 min on GPU 0 RTX 6000 Ada (Phase 1A training: 4.9 min, Phase 1B diagnostics: 19.5 min), strictly within the 1.0 GPU-hour deadline.
+- **Execution**: COMPLETED (2026-09-16). Phase 1A training: 4.9 min; Phase 1B diagnostics (6 corners): 19.5 min; Phase 1B corrective completion (blank control + same-seed): 6.1 min. Total cumulative GPU time ~30.5 min on GPU 0 RTX 6000 Ada, strictly within the 1.0 GPU-hour deadline (29.5 min remaining).
+- **Control Evidence**: All controls verified (same-seed bitwise identity, conditioning sensitivity, non-trivial generation, and blank/zero pose calibration: matched 31.98 dB > shuffled 31.75 dB > blank 30.99 dB).
+- **Deployment Accounting**: Per-video fitted weights (217.7 MB) not amortized across frames; if charged, wire rate expands to ~214 MB. Shared model unverified across domains. Claims `rd_claim=false` and `speed_claim=false` recorded.
 - **Pilot Outcome**: REJECTED (Failed Stage 2 Promotion). pix2pix on disjoint development frames 16..31 failed both Pareto rate-distortion (-1.96 dB PSNR at 6.67 MB wire bytes vs 33.94 dB at 1.00 MB baseline) and client decode latency (7.03s vs 1.30s baseline). Stage 2 remains unreleased; confirmation sources remain quarantined.
+
 
