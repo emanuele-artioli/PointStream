@@ -203,7 +203,7 @@ def build_campaign_row(
         "operating_point_id": "display_low",
         "claim_eligibility": {
             "rd": True,
-            "runtime": True,
+            "runtime": False,
             "standalone_transport": True,
             "trajectory": False,
             "generalization": False,
@@ -214,6 +214,10 @@ def build_campaign_row(
                 "bytes": True,
             },
             "exclusions": [
+                {
+                    "claim": "runtime",
+                    "reason": "single encode/decode/score pass is not two timed client reconstructions",
+                },
                 {
                     "claim": "trajectory",
                     "reason": "conventional anchor decode, not a generation trajectory",

@@ -198,6 +198,15 @@ def repeated_client_timing_ok(timing_evidence: Mapping[str, Any]) -> bool:
     return bool(counts) and min(counts) >= 2 and min(counts) == n_repeats
 
 
+def _as_positive_float(value: Any) -> float | None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    number = float(value)
+    if not math.isfinite(number) or number <= 0.0:
+        return None
+    return number
+
+
 def fitted_model_charged_on_wire(
     metrics: Mapping[str, Any],
     deployment: Mapping[str, Any] | None,
@@ -219,15 +228,16 @@ def fitted_model_charged_on_wire(
             return False, "shared-model deployment needs availability, amortization and storage_bytes"
         return True, None
     if mode == "per_video":
-        charged = dep.get("charged_bytes", dep.get("storage_bytes"))
-        if not _positive_number(charged):
+        charged_n = _as_positive_float(dep.get("charged_bytes", dep.get("storage_bytes")))
+        total_n = _as_positive_float(total)
+        if charged_n is None:
             return False, "per-video fitted weights have no positive charged_bytes"
-        if not _positive_number(total):
+        if total_n is None:
             return False, "fitted-model charge needs a positive total_bytes that includes the weights"
-        if float(total) < float(charged):
+        if total_n < charged_n:
             return False, (
-                f"fitted-model charged_bytes {int(charged)} exceed claimed total_bytes "
-                f"{int(total)}; weights are not on the wire"
+                f"fitted-model charged_bytes {int(charged_n)} exceed claimed total_bytes "
+                f"{int(total_n)}; weights are not on the wire"
             )
         return True, None
     return False, "undeclared model deployment cost; checkpoint digest is not delivered weights"
