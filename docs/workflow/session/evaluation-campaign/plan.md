@@ -38,15 +38,16 @@ comparisons keep residual off; paste-plus-residual is explicitly a residual-on
 control in the residual section. Component and readiness work can run before a
 full-codec win. A losing or invalid run is a result to preserve, not a gate pass.
 
-## Current entry point — 16 September pilot return audit
+## Current entry point — 17 September strategy checkpoint
 
-Follow [the return audit and reuse assignments](tasks/20260916-return-audit-and-reuse.md).
-#121 E06 ran and this configuration is stopped as a codec win search. #125 E05
-ran but its blank-control flag, object/calibration evidence and model costs need
-completion. E04B code is local and its alarms/retry provenance remain open.
-Release only packing/timing/control/alarm work on saved data: zero new native
-encodes or training; E05 GPU diagnostics only within verified remaining original
-one-hour budget. Confirmation remains quarantined, score-free and unauthorized.
+Follow [the component checkpoint and bounded preparation](tasks/20260917-strategy-roadblock.md).
+E06 lossless compaction still does not clear saved anchors. E05 blank/repeat
+controls are completed in merged #129; this fitted checkpoint is not promoted.
+E04B decomposition supports retaining removal-OFF provisionally on this scene,
+but #127 reporting/provenance/policy corrections remain. #128 eligibility needs
+narrow correction. No new execution is released: next system/foreground work
+returns costed mechanism-driven alternatives. September17's missing baseline-
+clearing generator is an explicit roadblock. Confirmation remains unauthorized.
 
 ## Historical entry point — 15 September acceptance and bounded release
 
