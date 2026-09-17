@@ -38,16 +38,18 @@ comparisons keep residual off; paste-plus-residual is explicitly a residual-on
 control in the residual section. Component and readiness work can run before a
 full-codec win. A losing or invalid run is a result to preserve, not a gate pass.
 
-## Current entry point — 17 September strategy checkpoint
+## Current entry point — 17 September returned audits accepted
 
-Follow [the component checkpoint and bounded preparation](tasks/20260917-strategy-roadblock.md).
-E06 lossless compaction still does not clear saved anchors. E05 blank/repeat
-controls are completed in merged #129; this fitted checkpoint is not promoted.
-E04B decomposition supports retaining removal-OFF provisionally on this scene,
-but #127 reporting/provenance/policy corrections remain. #128 eligibility needs
-narrow correction. No new execution is released: next system/foreground work
-returns costed mechanism-driven alternatives. September17's missing baseline-
-clearing generator is an explicit roadblock. Confirmation remains unauthorized.
+#127 and #128 are merged with exact-head green CI (`d39164e`, `a2d8d18`);
+#131 lands the component checkpoint (`3b13049`). Keep their scoped non-promotion
+and stop verdicts. The [strategy checkpoint](tasks/20260917-strategy-roadblock.md)
+is the review history; its pending-PR correction tasks are now complete.
+Current release is only E06 lossless auxiliary packing on saved inputs: <=2 active
+implementation hours and <=15 CPU minutes including parity, ledger and repeated
+client validation; no GPU/training/native video re-encodes. Pixel-changing
+predictors remain unreleased. Foreground cards must pin actual code/weights/API
+and derived wire accounting before execution. No confirmation scoring or
+second-domain scoring. The September17 generator roadblock remains.
 
 ## Historical entry point — 15 September acceptance and bounded release
 
