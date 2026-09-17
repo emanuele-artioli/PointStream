@@ -173,11 +173,18 @@ def extract_rtm_wholebody_hands(video_path: Path, max_frames: int | None = None)
     return poses
 
 
+def extract_hamer(video_path: Path, max_frames: int | None = None) -> list[FrameHandPose]:
+    from demo.evaluation.hamer_backend import extract_hamer as _extract
+
+    return _extract(video_path, max_frames=max_frames)
+
+
 BACKENDS: dict[str, PoseExtractor] = {
     "mp_live": extract_mediapipe_live,
     "mp_offline_gt": extract_mediapipe_offline_gt,
     "rtm_hand": extract_rtm_hand,
     "rtm_wholebody": extract_rtm_wholebody_hands,
+    "hamer": extract_hamer,
 }
 
 

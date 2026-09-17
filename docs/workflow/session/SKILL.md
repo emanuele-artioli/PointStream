@@ -18,7 +18,7 @@ Parallel workstreams and wave dispatches are supported across all coding harness
 - **VS Code + Antigravity**: Dispatches parallel subagents via `invoke_subagent` with isolated workspaces (`Workspace: "branch"` or `"share"`). Configure subagents with weaker/lighter models (`Model: "flash_lite"` or `"flash"`) to conserve context and token budget, reserving `pro` or session inherit for deep architectural judgment.
 - **Cursor**: Dispatches parallel subagents via `Task` across worktrees. Configure subagents with weaker models (`composer-2.5`) for bounded tasks, reserving `grok-4.5` for complex reasoning.
 - **Claude Code**: Dispatches subagents via `Agent`/`Task`. Configure subagents with weaker models (`haiku` or `sonnet`) rather than expensive flagship models (`opus`).
-- **Codex**: Dispatches subagents and TOML roles under `[agents]`, configured with lighter/cheaper models.
+- **Codex**: Use the project profiles in `.codex/config.toml`. PointStream work uses the cost-first escalation `budget_default` (Luna/medium) → `balanced_retry` (Terra/medium) → `expert_retry` (Sol/medium); advance only after a declared acceptance check fails. The picker-style profiles are reserved for the [demo trial](subagent-ladder-trial.md).
 
 When dispatching multi-lane workstreams, any of these harnesses can run independent lanes concurrently using weaker-model subagents; sequential execution (running lanes in order within a single session) remains the standard fallback when subagents are not used.
 

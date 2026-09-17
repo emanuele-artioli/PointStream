@@ -48,3 +48,20 @@ For dispatch, completed work, or handoff, read and follow the [session workflow]
 Use [docs/setup.md](docs/setup.md) before environment setup or experiment runs, and its verification section before merging. Host-wide cache and import-order rules remain in the host rules above.
 
 Project constraints: data must stay outside the code tree (no `assets/` or `outputs/` symlinks); record the exact native encoder/decoder paths and versions with each run so comparisons are reproducible. Do not run `scripts/cleanup_merged_worktrees.sh` until `INFRA-ACT-01` is resolved: its deletion fallback can discard uncommitted work.
+
+## Codex subagents
+
+PointStream uses fresh children with the cost-first ladder in `.codex/config.toml`:
+`budget_default` (Luna/medium), then `balanced_retry` (Terra/medium), then
+`expert_retry` (Sol/medium). Escalate only after the predeclared acceptance
+check fails, and record the concrete failure. Pass both model and
+`reasoning_effort`; verify runtime model, effort and permission metadata before
+accepting a child result.
+
+An Astra coordinator delegates bounded parallel lanes by default, retaining
+integration, shared-contract changes and the hardest scientific or architectural
+judgment. It does not use the demo trial profiles for codec, evaluation, paper,
+GPU or shared-contract work.
+
+For eligible real demo tasks, follow the automatic two-day, 24-card randomized
+trial in [subagent-ladder-trial.md](docs/workflow/session/subagent-ladder-trial.md).
