@@ -85,7 +85,7 @@ def extract_hamer(video_path: Path, max_frames: int | None = None) -> list[Frame
             box_size = batch["box_size"].float()
             img_size = batch["img_size"].float()
             scaled_focal_length = model_cfg.EXTRA.FOCAL_LENGTH / model_cfg.MODEL.IMAGE_SIZE * img_size.max()
-            pred_cam_t_full = cam_crop_to_full(pred_cam, box_center, box_size, img_size, scaled_focal_length)
+            _ = cam_crop_to_full(pred_cam, box_center, box_size, img_size, scaled_focal_length)
             kps = out["pred_keypoints_2d"].detach().cpu().numpy()
             rights = batch["right"].detach().cpu().numpy()
             for i in range(kps.shape[0]):
