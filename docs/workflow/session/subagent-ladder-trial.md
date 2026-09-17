@@ -26,6 +26,11 @@ Cursor (two rungs; Grok effort is the model slug):
 1. `trial-a-start`: Grok 4.6 low
 2. `trial-a-retry`: Grok 4.6 high
 
+Antigravity (two rungs):
+
+1. `trial-a-start`: Gemini 3.8 Flash / low
+2. `trial-a-retry`: Gemini 3.8 Flash / high
+
 ### Arm B — cost-first
 
 Codex (three rungs):
@@ -38,6 +43,11 @@ Cursor (two rungs):
 
 1. `budget-default`: Composer 2.5
 2. `expert-retry`: Grok 4.6 low
+
+Antigravity (two rungs):
+
+1. `budget-default`: Gemini 3.8 Flash / low
+2. `expert-retry`: Gemini 3.8 Flash / high
 
 ## Automatic session procedure
 
@@ -58,8 +68,9 @@ When a session receives an eligible demo task with a concrete acceptance check:
 
 The coordinator must verify child runtime metadata. On Codex: model, effort,
 and permission mode. On Cursor: the model actually used (Composer vs
-`cursor-grok-4.6-low` / `-high`); there is no separate effort field. A missing
-or mismatched field invalidates that attempt.
+`cursor-grok-4.6-low` / `-high`); there is no separate effort field. On
+Antigravity: model (Flash) and effort tier (low vs high). A missing or
+mismatched field invalidates that attempt.
 
 ## Card record
 

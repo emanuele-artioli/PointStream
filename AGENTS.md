@@ -73,5 +73,11 @@ the slug (`cursor-grok-4.6-low`). If the Task schema rejects non-fast
 Composer, `composer-2.5-fast` still counts as the Composer rung, not an
 escalation.
 
+**Antigravity** — profiles in `.agents/agents/`, cost-first (two rungs):
+`budget-default` (Gemini 3.8 Flash / low effort) → `expert-retry`
+(Gemini 3.8 Flash / high effort). Spawn by `TypeName` (or pass `Model: "flash"`
+with `effort: low` by default, escalating to `high` on retry). Verify runtime
+model (Flash) and effort metadata before accepting a child result.
+
 For eligible real demo tasks, follow the automatic two-day, 24-card randomized
 trial in [subagent-ladder-trial.md](docs/workflow/session/subagent-ladder-trial.md).
