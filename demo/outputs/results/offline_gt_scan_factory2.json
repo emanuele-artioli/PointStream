@@ -1,0 +1,37 @@
+{
+  "gt_backend": "rtm_hand",
+  "eval_backend": "rtm_hand",
+  "clips": [
+    {
+      "clip_name": "clip_04_factory002_worker001_00000",
+      "path": "/home/itec/emanuele/Datasets/Egocentric-10K/curated_expand/clip_04_factory002_worker001_00000.mp4",
+      "control_ps_wire": {
+        "detection_rate": 0.5066666666666667,
+        "oracle_capture_ratio": 0.5066666666666667,
+        "mpjpe_pixels": 146.89417451046603,
+        "mean_confidence": 0.9133858267716534,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.06641604010025062,
+        "pck50_all_gt": 0.03365079365079365,
+        "gt_hands": 75.0,
+        "pred_hands": 55.0,
+        "matched_hands": 38.0
+      },
+      "control_av1_240p": {
+        "detection_rate": 0.22666666666666666,
+        "oracle_capture_ratio": 0.22666666666666666,
+        "mpjpe_pixels": 110.74458861205673,
+        "mean_confidence": 0.3595108495039098,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.5126050420168067,
+        "pck50_all_gt": 0.11619047619047619,
+        "gt_hands": 75.0,
+        "pred_hands": 41.0,
+        "matched_hands": 17.0
+      },
+      "ps_wins_det": true,
+      "ps_wins_pck": false,
+      "ps_wins_mpjpe": false
+    }
+  ]
+}

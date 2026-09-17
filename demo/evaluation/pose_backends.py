@@ -116,10 +116,68 @@ def extract_rtm_hand(video_path: Path, max_frames: int | None = None) -> list[Fr
     return poses
 
 
+def extract_rtm_wholebody_hands(video_path: Path, max_frames: int | None = None) -> list[FrameHandPose]:
+    """Second independent judge: RTMPose whole-body, last 42 COCO-WholeBody hand joints."""
+    global _RTM_WB
+    try:
+        from rtmlib import Wholebody
+    except ImportError as exc:
+        raise RuntimeError("rtmlib is not installed. pip install rtmlib") from exc
+
+    from demo.pipeline.background_codec import read_video_frames_robust
+
+    if "_RTM_WB" not in globals() or globals().get("_RTM_WB") is None:
+        device = "cuda" if _cuda_onnx_ok() else "cpu"
+        globals()["_RTM_WB"] = Wholebody(mode="lightweight", to_openpose=False, backend="onnxruntime", device=device)
+    model = globals()["_RTM_WB"]
+    frames = read_video_frames_robust(video_path, max_frames=max_frames)
+    poses: list[FrameHandPose] = []
+    for idx, frame in enumerate(frames):
+        if (frame.shape[1], frame.shape[0]) != (1920, 1080):
+            frame = cv2.resize(frame, (1920, 1080), interpolation=cv2.INTER_LANCZOS4)
+        kpts, scores = model(frame)
+        hands: list[SingleHand] = []
+        if kpts is None:
+            poses.append(FrameHandPose(frame_idx=idx, hands=[]))
+            continue
+        kpts = np.asarray(kpts)
+        scores = np.asarray(scores) if scores is not None else None
+        if kpts.ndim == 3:
+            kpts = kpts[0]
+            if scores is not None and scores.ndim == 2:
+                scores = scores[0]
+        if kpts.shape[0] < 133:
+            poses.append(FrameHandPose(frame_idx=idx, hands=[]))
+            continue
+        for side, sl in (("Left", slice(91, 112)), ("Right", slice(112, 133))):
+            pts = kpts[sl]
+            sc = scores[sl] if scores is not None and len(scores) >= 133 else np.ones(21)
+            conf = float(np.mean(sc[:21]))
+            if conf < 0.3:
+                continue
+            xs, ys = pts[:21, 0], pts[:21, 1]
+            if float(np.max(xs) - np.min(xs)) < 8:
+                continue
+            pad_x = (float(xs.max()) - float(xs.min())) * 0.25
+            pad_y = (float(ys.max()) - float(ys.min())) * 0.25
+            x1 = int(max(0, xs.min() - pad_x))
+            y1 = int(max(0, ys.min() - pad_y))
+            x2 = int(min(1920, xs.max() + pad_x))
+            y2 = int(min(1080, ys.max() + pad_y))
+            lms_px = [[float(p[0]), float(p[1])] for p in pts[:21]]
+            lms_nm = [[p[0] / 1920.0, p[1] / 1080.0, 0.0] for p in lms_px]
+            hands.append(SingleHand(side, conf, [x1, y1, x2, y2], lms_nm, lms_px))
+        poses.append(FrameHandPose(frame_idx=idx, hands=hands))
+        if idx % 50 == 0:
+            logger.info("%s wholebody frame %s/%s hands=%s", video_path.name, idx, len(frames), len(hands))
+    return poses
+
+
 BACKENDS: dict[str, PoseExtractor] = {
     "mp_live": extract_mediapipe_live,
     "mp_offline_gt": extract_mediapipe_offline_gt,
     "rtm_hand": extract_rtm_hand,
+    "rtm_wholebody": extract_rtm_wholebody_hands,
 }
 
 

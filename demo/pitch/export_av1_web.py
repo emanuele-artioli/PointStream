@@ -14,6 +14,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 CLIPS = {
+    "clip_01_factory001_worker001_00001": "clip_01",
     "clip_02_factory001_worker001_00002": "clip_02",
     "clip_03_factory001_worker001_00000": "clip_03",
 }

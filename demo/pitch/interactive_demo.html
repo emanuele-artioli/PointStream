@@ -471,6 +471,7 @@
                     <span class="control-label">Sequence:</span>
                     <button class="btn active" id="btn-clip3" onclick="selectClip('clip_03')">Clip 3 (Wire Manipulation)</button>
                     <button class="btn" id="btn-clip2" onclick="selectClip('clip_02')">Clip 2 (Component Fit)</button>
+                    <button class="btn" id="btn-clip1" onclick="selectClip('clip_01')">Clip 1 (Assembly Prep)</button>
                 </div>
 
                 <div class="control-group">
@@ -569,13 +570,13 @@
             <div class="hud-grid">
                 <div class="hud-card green" id="hud-card-error">
                     <div class="hud-label" id="hud-mpjpe-label">Joint error vs this AV1</div>
-                    <div class="hud-value" id="hud-mpjpe" style="color: var(--accent-green);">2.27×</div>
-                    <div class="hud-sub" id="hud-mpjpe-sub">43.8 px vs 99.3 px</div>
+                    <div class="hud-value" id="hud-mpjpe" style="color: var(--accent-green);">1.03×</div>
+                    <div class="hud-sub" id="hud-mpjpe-sub">124.6 px vs 128.1 px</div>
                 </div>
                 <div class="hud-card" id="hud-card-det">
                     <div class="hud-label" id="hud-det-label">Hands recovered vs ground truth</div>
-                    <div class="hud-value" id="hud-bitrate" style="color: var(--accent-blue);">35.5%</div>
-                    <div class="hud-sub" id="hud-bitrate-sub">35.5% of MediaPipe hands on the 1080p reference (GT)</div>
+                    <div class="hud-value" id="hud-bitrate" style="color: var(--accent-blue);">30.8%</div>
+                    <div class="hud-sub" id="hud-bitrate-sub">30.8% of RTMPose GT hands vs 27.8% on AV1 240p</div>
                 </div>
                 <div class="hud-card purple" id="hud-card-rate">
                     <div class="hud-label">Bitrate</div>
@@ -592,8 +593,8 @@
 
         <!-- TAB 2: MULTI-RESOLUTION BENCHMARK -->
         <div id="tab-benchmark" class="tab-content">
-            <h2 class="section-title">Teleoperation tracking (mean of the two demo clips)</h2>
-            <p style="color:var(--text-muted);margin:-12px 0 16px;font-size:0.9rem;">One number per cell. Detection is the share of ground-truth hands recovered (MediaPipe on the reference). Clip 1 is omitted: Extreme Starve does not beat AV1 240p there.</p>
+            <h2 class="section-title">Teleoperation tracking (mean of all three demo clips)</h2>
+            <p style="color:var(--text-muted);margin:-12px 0 16px;font-size:0.9rem;">RTMPose-L on the 1080p reference is GT. The same model is run on each reconstruction. Detection is GT-hand recall; unmatched GT hands count as PCK misses. MediaPipe-on-pixels is no longer the judge.</p>
             <table>
                 <thead>
                     <tr>
@@ -611,41 +612,41 @@
                 <tbody>
                     <tr class="highlight-row">
                         <td>Joint error MPJPE (px, ↓)</td>
-                        <td><strong>59.7</strong></td>
-                        <td>89.0</td>
-                        <td><strong>64.4</strong></td>
-                        <td>96.4</td>
-                        <td><strong>67.4</strong></td>
-                        <td>110.8</td>
-                        <td>59.4</td>
-                        <td>78.2</td>
+                        <td><strong>109.5</strong></td>
+                        <td>120.4</td>
+                        <td><strong>85.2</strong></td>
+                        <td>105.7</td>
+                        <td><strong>77.2</strong></td>
+                        <td>88.7</td>
+                        <td>66.4</td>
+                        <td>65.8</td>
                     </tr>
                     <tr>
                         <td>Hands recovered vs GT (%, ↑)</td>
-                        <td><strong>41.5</strong></td>
-                        <td>31.4</td>
-                        <td>42.9</td>
-                        <td>53.1</td>
-                        <td>43.4</td>
-                        <td>48.1</td>
-                        <td>48.1</td>
-                        <td>75.0</td>
+                        <td><strong>53.3</strong></td>
+                        <td>49.1</td>
+                        <td>54.0</td>
+                        <td>59.3</td>
+                        <td>64.3</td>
+                        <td>66.4</td>
+                        <td>68.3</td>
+                        <td>73.6</td>
                     </tr>
                     <tr>
                         <td>Bitrate (kbps)</td>
-                        <td>77.2</td>
-                        <td>68.8</td>
-                        <td>130.2</td>
-                        <td>122.7</td>
-                        <td>270.9</td>
-                        <td>261.5</td>
-                        <td>624.8</td>
-                        <td>617.6</td>
+                        <td>80.1</td>
+                        <td>71.8</td>
+                        <td>134.9</td>
+                        <td>127.4</td>
+                        <td>272.7</td>
+                        <td>263.5</td>
+                        <td>643.4</td>
+                        <td>635.9</td>
                     </tr>
                 </tbody>
             </table>
 
-            <h2 class="section-title">Rate–quality ladder (same two-clip mean)</h2>
+            <h2 class="section-title">Rate–quality ladder (same three-clip mean)</h2>
             <table>
                 <thead>
                     <tr>
@@ -673,92 +674,92 @@
                     <tr class="highlight-row">
                         <td><strong>PointStream</strong></td>
                         <td>240p bg</td>
-                        <td>77.2</td>
+                        <td>80.1</td>
                         <td>18.4</td>
-                        <td>0.323</td>
-                        <td>21.04</td>
-                        <td><strong>59.7</strong></td>
-                        <td><strong>41.5</strong></td>
+                        <td>0.320</td>
+                        <td>20.96</td>
+                        <td><strong>109.5</strong></td>
+                        <td><strong>53.3</strong></td>
                     </tr>
                     <tr>
                         <td>AV1 p7</td>
                         <td>180p</td>
-                        <td>46.2</td>
+                        <td>48.3</td>
                         <td>18.4</td>
-                        <td>0.404</td>
-                        <td>20.86</td>
-                        <td>88.4</td>
-                        <td>20.9</td>
+                        <td>0.400</td>
+                        <td>20.78</td>
+                        <td>—</td>
+                        <td>—</td>
                     </tr>
                     <tr>
                         <td>AV1 p7</td>
                         <td>240p</td>
-                        <td>68.8</td>
+                        <td>71.8</td>
                         <td>10.3</td>
-                        <td>0.303</td>
-                        <td>21.76</td>
-                        <td>89.0</td>
-                        <td>31.4</td>
+                        <td>0.300</td>
+                        <td>21.69</td>
+                        <td>120.4</td>
+                        <td>49.1</td>
                     </tr>
                     <tr class="highlight-row">
                         <td><strong>PointStream</strong></td>
                         <td>360p bg</td>
-                        <td>130.2</td>
+                        <td>134.9</td>
                         <td>18.4</td>
-                        <td>0.211</td>
-                        <td>22.20</td>
-                        <td><strong>64.4</strong></td>
-                        <td>42.9</td>
+                        <td>0.210</td>
+                        <td>22.11</td>
+                        <td><strong>85.2</strong></td>
+                        <td>54.0</td>
                     </tr>
                     <tr>
                         <td>AV1 p7</td>
                         <td>360p</td>
-                        <td>122.7</td>
+                        <td>127.4</td>
                         <td>11.7</td>
-                        <td>0.198</td>
-                        <td>23.10</td>
-                        <td>96.4</td>
-                        <td>53.1</td>
+                        <td>0.197</td>
+                        <td>23.04</td>
+                        <td>105.7</td>
+                        <td>59.3</td>
                     </tr>
                     <tr class="highlight-row">
                         <td><strong>PointStream</strong></td>
                         <td>540p bg</td>
-                        <td>270.9</td>
+                        <td>272.7</td>
                         <td>18.4</td>
-                        <td>0.126</td>
-                        <td>23.84</td>
-                        <td><strong>67.4</strong></td>
-                        <td>43.4</td>
+                        <td>0.127</td>
+                        <td>23.69</td>
+                        <td><strong>77.2</strong></td>
+                        <td>64.3</td>
                     </tr>
                     <tr>
                         <td>AV1 p7</td>
                         <td>540p</td>
-                        <td>261.5</td>
+                        <td>263.5</td>
                         <td>3.3</td>
-                        <td>0.117</td>
-                        <td>25.09</td>
-                        <td>110.8</td>
-                        <td>48.1</td>
+                        <td>0.118</td>
+                        <td>24.95</td>
+                        <td>88.7</td>
+                        <td>66.4</td>
                     </tr>
                     <tr>
                         <td>PointStream</td>
                         <td>1080p bg</td>
-                        <td>624.8</td>
+                        <td>643.4</td>
                         <td>18.4</td>
-                        <td>0.077</td>
-                        <td>25.15</td>
-                        <td>59.4</td>
-                        <td>48.1</td>
+                        <td>0.076</td>
+                        <td>25.04</td>
+                        <td>66.4</td>
+                        <td>68.3</td>
                     </tr>
                     <tr>
                         <td>AV1 p6</td>
                         <td>1080p</td>
-                        <td>617.6</td>
+                        <td>635.9</td>
                         <td>3.3</td>
-                        <td>0.062</td>
-                        <td>27.53</td>
-                        <td>78.2</td>
-                        <td>75.0</td>
+                        <td>0.061</td>
+                        <td>27.46</td>
+                        <td>65.8</td>
+                        <td>73.6</td>
                     </tr>
                 </tbody>
             </table>
@@ -767,7 +768,7 @@
             <div class="chart-box">
                 <img id="rd-curve-img" src="rd_curves_clip_03_factory001_worker001_00000.png" alt="Rate-Distortion Curves">
                 <p style="margin-top: 12px; color: var(--text-muted); font-size: 0.9rem;">
-                    Pareto curves for the clip on screen. Default Clip 3: PointStream 240p 43.8 px at 70 kbps vs AV1 240p 99.3 px.
+                    Pareto curves for the clip on screen. Default Clip 3 under RTMPose GT: PS 240p recovers 30.8% of GT hands vs AV1 27.8%; PCK-all 15.0% vs 11.1%.
                 </p>
             </div>
             <div class="chart-box">
@@ -827,22 +828,41 @@ class StreamingCodecAdapter(Protocol):
     <script>
         // Configuration and State
         const CLIPS = {
+            'clip_01': {
+                name: 'Clip 1 (Assembly Prep)',
+                keypoints: 'keypoints_clip_01.json',
+                rd_img: 'rd_curves_clip_01_factory001_worker001_00001.png',
+                streams: {
+                    ps_starve: { kind: 'ps', res: '240p', kbps: 85.9, mpjpe: 120.5, det: 66.0, kp: 8.4 },
+                    ps_heavy:  { kind: 'ps', res: '360p', kbps: 144.2, mpjpe: 91.5, det: 67.6, kp: 8.4 },
+                    ps_low:    { kind: 'ps', res: '540p', kbps: 250.9, mpjpe: 84.7, det: 68.8, kp: 8.4 },
+                    ps_std:    { kind: 'ps', res: '540p', kbps: 276.2, mpjpe: 92.3, det: 66.4, kp: 8.4 },
+                    ps_1080:   { kind: 'ps', res: '1080p', kbps: 680.6, mpjpe: 87.9, det: 71.9, kp: 8.4 },
+                    av1_180:   { kind: 'av1', res: '180p', kbps: 52.4, mpjpe: 158.5, det: 21.7, kp: 0 },
+                    av1_240:   { kind: 'av1', res: '240p', kbps: 77.8, mpjpe: 117.4, det: 59.8, kp: 0 },
+                    av1_360:   { kind: 'av1', res: '360p', kbps: 137.0, mpjpe: 127.6, det: 70.7, kp: 0 },
+                    av1_540:   { kind: 'av1', res: '540p', kbps: 267.3, mpjpe: 103.8, det: 67.2, kp: 0 },
+                    av1_720:   { kind: 'av1', res: '720p', kbps: 374.4, mpjpe: 104.7, det: 55.7, kp: 0 },
+                    av1_1080:  { kind: 'av1', res: '1080p', kbps: 672.3, mpjpe: 81.5, det: 75.0, kp: 0 },
+                    ref:       { kind: 'ref', res: '1080p', kbps: 4200, mpjpe: null, det: 100, kp: 0 }
+                }
+            },
             'clip_02': {
                 name: 'Clip 2 (Component Fit)',
                 keypoints: 'keypoints_clip_02.json',
                 rd_img: 'rd_curves_clip_02_factory001_worker001_00002.png',
                 streams: {
-                    ps_starve: { kind: 'ps', res: '240p', kbps: 84.7, mpjpe: 75.5, det: 47.6, kp: 10.0 },
-                    ps_heavy:  { kind: 'ps', res: '360p', kbps: 144.5, mpjpe: 65.8, det: 50.8, kp: 10.0 },
-                    ps_low:    { kind: 'ps', res: '540p', kbps: 253.4, mpjpe: 73.8, det: 46.0, kp: 10.0 },
-                    ps_std:    { kind: 'ps', res: '540p', kbps: 270.4, mpjpe: 74.5, det: 48.4, kp: 10.0 },
-                    ps_1080:   { kind: 'ps', res: '1080p', kbps: 673.4, mpjpe: 63.0, det: 56.0, kp: 10.0 },
+                    ps_starve: { kind: 'ps', res: '240p', kbps: 84.7, mpjpe: 83.3, det: 63.2, kp: 10.0 },
+                    ps_heavy:  { kind: 'ps', res: '360p', kbps: 144.5, mpjpe: 87.2, det: 63.2, kp: 10.0 },
+                    ps_low:    { kind: 'ps', res: '540p', kbps: 253.4, mpjpe: 67.8, det: 60.7, kp: 10.0 },
+                    ps_std:    { kind: 'ps', res: '540p', kbps: 270.4, mpjpe: 68.0, det: 60.7, kp: 10.0 },
+                    ps_1080:   { kind: 'ps', res: '1080p', kbps: 673.4, mpjpe: 59.3, det: 66.5, kp: 10.0 },
                     av1_180:   { kind: 'av1', res: '180p', kbps: 50.8, mpjpe: 105.9, det: 21.8, kp: 0 },
-                    av1_240:   { kind: 'av1', res: '240p', kbps: 75.8, mpjpe: 78.6, det: 39.1, kp: 0 },
-                    av1_360:   { kind: 'av1', res: '360p', kbps: 135.3, mpjpe: 79.9, det: 53.6, kp: 0 },
-                    av1_540:   { kind: 'av1', res: '540p', kbps: 263.7, mpjpe: 115.5, det: 48.8, kp: 0 },
+                    av1_240:   { kind: 'av1', res: '240p', kbps: 75.8, mpjpe: 115.5, det: 59.9, kp: 0 },
+                    av1_360:   { kind: 'av1', res: '360p', kbps: 135.3, mpjpe: 99.0, det: 65.4, kp: 0 },
+                    av1_540:   { kind: 'av1', res: '540p', kbps: 263.7, mpjpe: 89.2, det: 68.0, kp: 0 },
                     av1_720:   { kind: 'av1', res: '720p', kbps: 374.5, mpjpe: 63.5, det: 69.4, kp: 0 },
-                    av1_1080:  { kind: 'av1', res: '1080p', kbps: 672.0, mpjpe: 75.0, det: 77.8, kp: 0 },
+                    av1_1080:  { kind: 'av1', res: '1080p', kbps: 672.0, mpjpe: 66.6, det: 76.8, kp: 0 },
                     ref:       { kind: 'ref', res: '1080p', kbps: 4200, mpjpe: null, det: 100, kp: 0 }
                 }
             },
@@ -851,17 +871,17 @@ class StreamingCodecAdapter(Protocol):
                 keypoints: 'keypoints_clip_03.json',
                 rd_img: 'rd_curves_clip_03_factory001_worker001_00000.png',
                 streams: {
-                    ps_starve: { kind: 'ps', res: '240p', kbps: 69.8, mpjpe: 43.8, det: 35.5, kp: 7.1 },
-                    ps_heavy:  { kind: 'ps', res: '360p', kbps: 116.0, mpjpe: 63.1, det: 34.9, kp: 7.1 },
-                    ps_low:    { kind: 'ps', res: '540p', kbps: 207.7, mpjpe: 61.2, det: 41.4, kp: 7.1 },
-                    ps_std:    { kind: 'ps', res: '540p', kbps: 271.5, mpjpe: 60.3, det: 38.5, kp: 7.1 },
-                    ps_1080:   { kind: 'ps', res: '1080p', kbps: 576.1, mpjpe: 55.8, det: 40.2, kp: 7.1 },
+                    ps_starve: { kind: 'ps', res: '240p', kbps: 69.8, mpjpe: 124.6, det: 30.8, kp: 7.1 },
+                    ps_heavy:  { kind: 'ps', res: '360p', kbps: 116.0, mpjpe: 77.0, det: 31.2, kp: 7.1 },
+                    ps_low:    { kind: 'ps', res: '540p', kbps: 207.7, mpjpe: 73.3, det: 55.9, kp: 7.1 },
+                    ps_std:    { kind: 'ps', res: '540p', kbps: 271.5, mpjpe: 71.3, det: 65.8, kp: 7.1 },
+                    ps_1080:   { kind: 'ps', res: '1080p', kbps: 576.1, mpjpe: 52.0, det: 66.5, kp: 7.1 },
                     av1_180:   { kind: 'av1', res: '180p', kbps: 41.7, mpjpe: 70.9, det: 20.1, kp: 0 },
-                    av1_240:   { kind: 'av1', res: '240p', kbps: 61.9, mpjpe: 99.3, det: 23.7, kp: 0 },
-                    av1_360:   { kind: 'av1', res: '360p', kbps: 110.0, mpjpe: 113.0, det: 52.7, kp: 0 },
-                    av1_540:   { kind: 'av1', res: '540p', kbps: 259.4, mpjpe: 106.0, det: 47.3, kp: 0 },
+                    av1_240:   { kind: 'av1', res: '240p', kbps: 61.9, mpjpe: 128.1, det: 27.8, kp: 0 },
+                    av1_360:   { kind: 'av1', res: '360p', kbps: 110.0, mpjpe: 90.6, det: 41.8, kp: 0 },
+                    av1_540:   { kind: 'av1', res: '540p', kbps: 259.4, mpjpe: 73.2, det: 63.9, kp: 0 },
                     av1_720:   { kind: 'av1', res: '720p', kbps: 324.3, mpjpe: 81.7, det: 47.3, kp: 0 },
-                    av1_1080:  { kind: 'av1', res: '1080p', kbps: 563.3, mpjpe: 81.4, det: 72.2, kp: 0 },
+                    av1_1080:  { kind: 'av1', res: '1080p', kbps: 563.3, mpjpe: 49.3, det: 68.8, kp: 0 },
                     ref:       { kind: 'ref', res: '1080p', kbps: 4200, mpjpe: null, det: 100, kp: 0 }
                 }
             }
@@ -910,7 +930,7 @@ class StreamingCodecAdapter(Protocol):
         const timeDisplay = document.getElementById('time-display');
         const btnPlay = document.getElementById('btn-play');
 
-        const CLIP_BTN = { clip_02: 'clip2', clip_03: 'clip3' };
+        const CLIP_BTN = { clip_01: 'clip1', clip_02: 'clip2', clip_03: 'clip3' };
 
         function streamFile(clipId, key) {
             return 'web_' + clipId + '_' + key + '.mp4';
@@ -1045,7 +1065,7 @@ class StreamingCodecAdapter(Protocol):
 
         function selectClip(clipId) {
             currentClipId = clipId;
-            ['clip2', 'clip3'].forEach(id => {
+            ['clip1', 'clip2', 'clip3'].forEach(id => {
                 const btn = document.getElementById('btn-' + id);
                 btn.className = (id === CLIP_BTN[clipId]) ? 'btn active' : 'btn';
             });
