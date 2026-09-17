@@ -1,5 +1,13 @@
 # Codec Area
 
+> **CURRENT — 17 September decision wave.** The
+> [decision card](../workflow/session/evaluation-campaign/tasks/20260917-submission-decision-wave.md)
+> permits only saved-array background/headroom work and verified ROI/metric
+> preparation until a conditional screen is released. E04B's removal-ON ghost
+> error is a pipeline observation, not a geometric lower bound; Telea's
+> zero-hole path is unexercised. The following sections are **HISTORICAL
+> evidence**, not current launch directives; #127 is complete.
+
 ## Pilot return audit — 16 September 2026
 
 #119 is merged as `aefdeb2`. The E04B source is committed locally at `d30e59f`

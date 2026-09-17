@@ -1,5 +1,10 @@
 # Component strategy checkpoint — 17 September 2026
 
+> **HISTORICAL.** Superseded for launch purposes by the
+> [17 September submission decision wave](20260917-submission-decision-wave.md).
+> Its recorded evidence remains immutable; do not use this brief to re-release
+> repairs, encodes, or confirmation scoring.
+
 Return to Clean project state and dispatch, `01a0a923-4c5e-71c3-8993-5c68f2a76bb4`.
 The campaign strategy and submission requirements are unchanged. Components and
 controls precede assembly; a credible development advantage precedes frozen

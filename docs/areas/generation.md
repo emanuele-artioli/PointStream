@@ -1,5 +1,14 @@
 # Generation Area
 
+> **CURRENT — 17 September decision wave.** Follow the
+> [decision card](../workflow/session/evaluation-campaign/tasks/20260917-submission-decision-wave.md).
+> The E05 pix2pix checkpoint is rejected (paste 33.94 dB/~1 MB/1.30 s versus
+> generation 31.98 dB/6.67 MB/7.03 s); its 217,736,406-B fitted weights are a
+> deployment obligation. Preserve the family, verify provenance/receiver path,
+> and use only the bounded existing-inference card: no salvage or training grid.
+> The sections below are **HISTORICAL evidence**, not launch authority; #129 is
+> complete.
+
 ## Pilot return audit — 16 September 2026
 
 #118 and #125 are merged; the bounded E05 pix2pix pilot executed, but its
@@ -241,7 +250,6 @@ result that determines the next experiment; no family-wide claims from one pilot
   - `campaign_result.json` (original adapted): SHA-256 `f56e5cb2a8c0239b4f3ecc007d164a403cb7512d8a6bd4ed1e625afdf7c8a425`
   - `diagnostic_matrix_completed.json` (completed 7-corner): SHA-256 `a0dbf42dc1052cd0ea461f7d4c75086cf1a798636a8f3152d40658afd4d0f8df`
   - `campaign_result_completed.json` (completed adapted): SHA-256 `99e019e0f544ac4064ca4fee0e8e7b5f02821cc2486cbf03c646f262bdfa34fa`
-
 
 
 

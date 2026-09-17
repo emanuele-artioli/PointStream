@@ -1,109 +1,94 @@
-# PointStream Roadmap and Submission Gates
+# PointStream roadmap and claim gates
 
-**Target Submission**: ACM TOMM — **30 September 2026** (hard deadline).
-**Evidence Freeze**: 20 September 2026 (provisional target; revisable by explicit decision).
+Submission target: **30 September 2026**. The **20 September** checkpoint makes
+an evidence, claim, and schedule decision; it may recommend a claim/date
+revision if no credible replicated development candidate exists. It does not
+force confirmation or make 30 September a guarantee.
 
-This document specifies the submission gates, dependencies, and pass criteria. Execution follows the [September campaign](workflow/session/evaluation-campaign/plan.md).
-Gate pass dependencies do not prevent parallel readiness, component work or
-writing setup. User decisions of September 14 supersede historical count rules.
-
----
-
-## 1. Submission Gates
+Execution is in the [submission decision wave](workflow/session/evaluation-campaign/tasks/20260917-submission-decision-wave.md). Historical campaign text does not authorize work.
 
 ```mermaid
-graph TD
-    GateA["Gate A: Competitive Operating Regime"] --> GateB["Gate B: Held-Out Confirmation"]
-    GateB --> GateC["Gate C: Core Ablation Lattice"]
-    GateC --> GateD["Gate D: Baseline / Domain / Profiling"]
-    GateD --> GateE["Gate E: Submission & Reproducibility"]
+graph LR
+  D[Bounded diagnostics and preparation] --> S[Development decision screen]
+  S --> M[20 Sep claim/domain decision]
+  M -->|credible candidate and frozen procedure| C[Confirmation and essential ablations]
+  M -->|no-go or blocker| R[Explicit claim/date revision]
+  C --> P[Paper and reproducibility]
 ```
 
-### Gate A: Competitive Operating Regime (Open after audit)
-- **Objective**: Establish at least one operating point (defined by scene domain, clip duration, bitrate, and quality metric) where PointStream strictly outperforms conventional codec baselines (AV1 / VVC).
-- **Pass Criteria**:
-  1. A reproducible advantage over the declared AV1 and VVC anchors over a measured overlapping rate/quality interval on a metric selected before the confirmation run. Declare anchor settings and uncertainty; no extrapolated BD-rate or isolated lucky-point victory.
-  2. Operating regime fully characterized: content type, duration/amortization range, bitrate band, and component byte breakdown.
-  3. Size, quality, and runtime measured and reported together; no speed omissions.
-- **Current Status**: PR #83/#84 pass interpretation superseded on 2026-09-09. The stored VVC comparison is unfavorable overall; the AV1 curves have no quality overlap and fail floor dominance. C2/C3 warrant a narrower development sweep, not a declared win. See the [evaluation audit](areas/evaluation.md).
+## Gate A — competitive operating regime
 
-Experiment policy: [hypothesis-driven probes](workflow/experiment-design.md). Full benchmark tables: [docs/areas/evaluation.md](areas/evaluation.md#gate-a-192-frame-benchmark-results-run-2--pr-83).
+**Pass:** on predeclared development sources, a complete PointStream system has
+matched achieved rate or an overlapping-quality advantage over uniform AV1 and
+VVC that exceeds the predeclared meaningful effect and source uncertainty.
+Identify content, duration/amortization, bitrate, metrics, component bytes,
+encoder/client runtime, and all deployment assumptions. A single scene/point,
+nonoverlapping curves, or rate-only saving does not pass.
 
-### Gate B: Held-Out Confirmation (Incomplete; pass retracted)
-- **Dependency**: Gate A passed.
-- **Objective**: Confirm the selected codec procedure on held-out content, with the claim scoped to the split. See [data protocol](areas/data.md#4-confirmation-protocol). This is not a mandatory seven-training-video/six-test-video allocation.
-- **Pass Criteria**:
-  1. Prefer six independent matches reserved from development; a smaller count is
-     explicitly authorized by the user on September 14. Before test scores, freeze
-     the largest feasible untouched source set and count rationale in the manifest
-     and matching verifier policy (E01). Planning target three, two only with
-     explicit small-sample limitations; one is a case study. Report source-level
-     uncertainty and declare inconclusive if it cannot establish the advantage.
-     Within-source scene holdouts support narrower claims and do not become
-     independent matches. Never drop a source after seeing its scores.
-  2. Freeze the codec selection procedure, rate ladder, metrics, eligibility rules, and adaptation budget before inspecting confirmation scores. Per-video encoding/fitting is allowed under that procedure, including on evaluated frames; charge all transmitted weights/side information and fitting time. No manual retuning based on test outcomes.
-  3. Standalone client decoding verified end-to-end.
-  4. Both whole-frame metrics and object-scoped metrics reported with source-level standard errors or confidence intervals and null controls; frames are not independent replicates.
-- **Current Status**: PR #85's old pass is invalid and its two sources are now
-  exposed. Repairs #100–#102 do not certify those runs. E01 must freeze a fresh
-  split and matching source-count policy; E06 must establish the tennis advantage;
-  E07 must verify controls, standalone output/wire accounting, stable anchors and
-  source uncertainty under that frozen procedure.
+**Current:** open. E06 reaches 17,581 B versus saved VVC 21,288 B, but inherits
+20.68 dB versus 24.6 dB; it is not a win. A residual near 72–78 kB previously
+bought about 3.4 dB and does not pay at this budget. The perfect-FG diagnostic
+is limited to its masks/predictor/scorer and is not an architecture limit.
 
-### Gate C: Core Ablation Lattice (Preparation only)
-- **Dependency**: Gate B passed.
-- **Objective**: Establish the empirical contribution of every pipeline component.
-- **Pass Criteria**:
-  1. Isolated evaluations for: background-only, appearance-only, motion-only, residual absent, and generation absent.
-  2. Verification that disabled stages consume zero bytes and execute zero calls.
-  3. Report measured rate–quality ordering across tiers (fast, balanced, quality), including dominated points or reversals. Investigate configuration failures; monotonic quality is not a guaranteed property of a perceptual codec.
-  4. Required September 14 milestone: at least one neural foreground model clears
-     the declared reference baselines at comparable total rate and client budget,
-     with valid trajectory, fidelity and temporal controls plus uncertainty.
-     Preserve failed/deferred training campaigns; no guaranteed model ordering.
+## Gate B — frozen confirmation
 
-### Gate D: Learned Baselines, Second Domain, and Receiver Profiling
-- **Dependency**: Gate C for final gate passage. Neural anchors/profiling start
-  earlier; secondary-domain experiments start after a measured tennis advantage.
-- **Objective**: Contextualize results against learned neural codecs, test domain generality, and benchmark client reconstruction time.
-- **Pass Criteria**:
-  1. Benchmark against a recent published neural video codec in the identified
-     regime. Claim SOTA only where comparisons with AV1, VVC and that neural
-     anchor support it; name implementations, settings and hardware.
-  2. Evaluate on a secondary domain (e.g., surveillance or conferencing) to establish domain bounds.
-  3. Profile client reconstruction speed (FPS, memory footprint, decode latency) on target hardware.
+**Entry:** Gate A candidate, source audit, fixed source IDs/hash grid, metrics,
+rate targets, adaptation/deployment policy, and standalone decode/ledger pass.
+**Pass:** retain all eligible sources, report full-frame and calibrated regional
+metrics with source-level uncertainty and null controls, and reproduce the
+scoped development advantage. The current three 1080p reservations are not yet
+released: exposure, replay and PTS audits are unfinished; source counts are not
+frame counts. Confirmation cannot support an unmeasured native-4K claim.
 
-### Gate E: Camera-Ready Submission Package
-- **Dependency**: Gates A–D passed.
-- **Objective**: Produce the final manuscript and reproducible artifact bundle.
-- **Pass Criteria**:
-  1. Manuscript within ACM TOMM budget (23 pages main text + 5 pages appendix).
-  2. Complete run provenance: Git commit SHAs, config manifests, encoder builds/presets, and seed lists for all numbers.
-  3. Reproducibility script capable of rebuilding tables and figures from immutable output JSONs.
+Prefer six independent untouched sources. The authorized planning target is
+three; two requires explicit small-sample limits and one is a case study. Never
+drop a source after seeing scores. Freeze selection, rate ladder, metrics,
+eligibility, and adaptation before scores. Per-video fitting is allowed when it
+is part of that procedure, but charge its parameters, side information, and
+fitting time. Frame observations are not independent: report source-level n and
+uncertainty.
 
----
+## Gate C — essential component evidence
 
-Gate C preparation may proceed, but ablations do not substitute for the missing competitive result and held-out confirmation.
+After a candidate is selected, measure only essential ablations: background,
+appearance/motion, residual, and generation where applicable. Disabled stages
+must have zero calls and bytes. `T=B+F+M+R+H+declared deployment` and runtime
+are required. Component probes diagnose mechanisms; they do not substitute for
+the complete-system comparison.
 
-## 2. Operating Policies
+## Gate D — learned anchor, second domain, receiver
 
-1. **Search is the method, not a compromise**: We actively search the configuration space to discover where an object-centric semantic codec wins over conventional block-based codecs. All explored axes and bounds are reported honestly.
-2. **Three-axis reporting**: Every published comparison must report size, quality
-   and encoder/client time. Not every RD run requires new timing: statistically
-   adequate representative profiles may be reused for compatible workload and
-   hardware strata, with sample counts, uncertainty and evidence references.
-   Missing timing excludes a speed claim, not otherwise valid RD evidence.
-3. **Bound before believing**: Prior to reading results, establish two-sided plausible bounds. Values outside expected bounds trigger an alarm and require instrument verification before reporting.
-4. **Independent verification**: Exploratory results may be reported as exploratory. A generalization claim requires the corresponding held-out protocol; do not relabel known development footage as unseen. Gate order governs pass decisions; ablation plumbing, source preparation, baseline setup, and profiling may advance before earlier gates pass.
+The neural anchor must return an actual encode and standalone decode with exact
+weights SHA, configuration, binary/version, decoded-frame hashes, bytes, and
+timing; otherwise it is a visible submission blocker for a SOTA claim. The
+bounded DCVC session is not a broad ladder. Evaluate the chosen procedure on a
+second domain only after the development decision, and report client latency,
+throughput, memory, and declared offline/lookahead conditions.
 
-5. **Anchor coverage**: Keep AV1 and VVC, with native-resolution reference curves and a separately labeled rate-control/resolution-adaptive comparison. A smallest sampled CQP endpoint is not a codec-wide bitrate floor. Score all rescaled decodes at the original display resolution and count rescaling time.
+## Gate E — paper and reproducibility
 
-6. **Full-codec development**: Residual-free and generation-free sweeps are controls, not a required winning architecture. Restore standalone coded residual correction and search high-fidelity residual-on curves during Gate A. Permit bounded generator readiness/training before generator-free parity, with validated total rate–quality–runtime evaluation. Gate C formal ablations remain dependent on confirmation; component development does not.
+Only accepted evidence may clear paper placeholders. The paper is at its
+28-page verified budget, so panels replace material. Preserve immutable run
+records, commands, inputs, binaries, configs, seeds, artifact hashes, ledgers,
+and table/figure reconstruction.
 
-7. **Live and playback search**: Screen low/native resolution and fps, valid
-   colour paths and consequential interactions; refine the measured feasibility
-   boundary with one or two intermediate points. Register latency/quality floors,
-   count lookahead and startup, verify stable queues and report hardware-specific
-   uncertainty. Future-frame panoramas or fitting remain offline when applicable.
+## Operating policies
 
-8. **Decision before sweep**: Follow the [experiment design policy](workflow/experiment-design.md). Diagnose component headroom before broad rate ladders or training; predeclare a bounded probe and its promote/stop decision. Expected architecture orderings are hypotheses, never acceptance requirements.
+1. Write two-sided size, quality, and time bounds and their rationale before
+   reading each result. An out-of-bound result is an instrument alarm.
+2. Calibrate metrics with identical, mild, severe, and unrelated controls at
+   the exact scored scope. Do not black-mask whole-frame LPIPS/VMAF.
+3. Fairness requires equal container, pixels, frame count, timebase, no
+   shared source/display/timebase and accounting policy, no uncharged
+   masks/lookahead/aspect/fps, and physical native files including each format's
+   overhead. PointStream variants use the same accounting policy; native codec
+   containers need not be identical.
+4. A semantic ROI encoder requires an observed ROI effect and null control;
+   x265 AQ is not semantic ROI. Native ROI maps are encoder-only and client
+   masks must be charged.
+5. Valid RD evidence may remain valid when timing is missing, but cannot support
+   a speed claim. Report cold startup, steady-state throughput, lookahead, and
+   source-level timing uncertainty whenever receiver performance is claimed.
+6. The original tennis-primary, neural-foreground-winner, and second-domain
+   contract remains pending an explicit 20 September revision; an exploratory
+   ego screen does not waive it.

@@ -1,5 +1,13 @@
 # Data Area
 
+> **CURRENT — 17 September decision wave.** The three 1080p reservations remain
+> **not released** pending exposure, replay, and PTS audit; source count is not
+> frame count, and scene 007 is development. Follow the score-free audit and
+> content-property development-window selection in the
+> [decision card](../workflow/session/evaluation-campaign/tasks/20260917-submission-decision-wave.md).
+> Ego candidates are not frozen confirmation data and filenames do not prove
+> holdout/training status. The following sections are **HISTORICAL evidence**.
+
 ## Coordinator source reservation — 16 September 2026
 
 [The reservation manifest](../../manifests/evaluation_20260916_coordinator_confirmation_reservation.json)

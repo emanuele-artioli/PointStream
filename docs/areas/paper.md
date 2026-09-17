@@ -1,5 +1,11 @@
 # Paper Area
 
+> **CURRENT — 17 September decision wave.** No manuscript change or claim
+> promotion is released by this documentation update. The verified 28-page
+> paper has no slack; accepted result panels must replace material. Follow the
+> [decision card](../workflow/session/evaluation-campaign/tasks/20260917-submission-decision-wave.md)
+> and wait for accepted evidence. The sections below are **HISTORICAL evidence**.
+
 ## Pilot return audit — 16 September 2026
 
 Paper commit `18d4778` records E05 missing-control/deployment evidence,

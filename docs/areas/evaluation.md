@@ -1,5 +1,13 @@
 # Evaluation Area
 
+> **CURRENT — 17 September decision wave.** Follow the
+> [authoritative card](../workflow/session/evaluation-campaign/tasks/20260917-submission-decision-wave.md).
+> E06's 17,581-B physical floor inherits 20.68 dB and is not a win against
+> VVC's 21,288 B/24.6 dB. Run only saved-array headroom/metric preparation,
+> neural-anchor readiness, source audit, and ROI/domain preparation within the
+> card's bounds. The sections below are **HISTORICAL evidence**, not launch
+> authority; #128 and #132 repairs are complete.
+
 ## E06 lossless floor arms — 17 September 2026
 
 #128 is merged. Floor-only probe on the saved bbox residual-off compact
