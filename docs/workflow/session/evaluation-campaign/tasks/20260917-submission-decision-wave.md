@@ -27,6 +27,7 @@ do not authorize launches. Do not redo merged #127/#128/#129/#132 repairs.
 | E05 | Paste 33.94 dB, ~1 MB, 1.30 s; generator 31.98 dB, 6.67 MB, 7.03 s on 16 native 4K frames. Fitted weights are 217,736,406 B. | Reject this checkpoint; preserve family, do not salvage or grid-train. |
 | GenStream | PR #1 is open and green (head `2e7f7e4b3522308fb52690a17d2d9c4330e8b578`, CI `35270622033`); CPU receiver supports reference/pose affine only and has no neural benchmark. | Optional reusable infrastructure, never the research gate or reason to defer neural anchor. |
 | Completed repairs | PR #132 merged as `5482370`; PRs #127/#128/#129 are also merged. | Do not reassign repairs as current work. |
+| Input provenance | Native PNG seeking matches only 1/48 frames. | Use the same prepared E03B stack across arms; make no native timestamp claim. |
 | Data | Three 1080p reservations need exposure/replay/PTS audit; development scene 007 is not confirmation. Ego candidates exist but are not frozen confirmation data. | Audit before scores; select development windows from source properties, not score. |
 
 ## Phase 0 — release now, in parallel
@@ -113,7 +114,7 @@ Inputs are saved Presley controls and source-audit selections. Write a new
 record under $PS_DATA_ROOT/outputs/evaluation-20260917/submission-decision-wave/d-roi-metric-domain/run-UTC-slug/.
 
 **Owner area:** evaluation + codec + data. Reuse
-`src/presley/encode_utils.py` helpers `scores_to_qp_offsets`,
+`/home/itec/emanuele/presley/src/presley/encode_utils.py` helpers `scores_to_qp_offsets`,
 `encode_with_roi_kvazaar`, and `encode_with_roi_svtav1`; do not build a blank ROI library. Use
 fixed QP/CRF where VBR can ignore ROI. Return actual ROI/null effect, final
 QP/CRF, binary version, timing, standalone frame count, coverage, calibrated

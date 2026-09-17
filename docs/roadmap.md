@@ -78,11 +78,10 @@ and table/figure reconstruction.
    reading each result. An out-of-bound result is an instrument alarm.
 2. Calibrate metrics with identical, mild, severe, and unrelated controls at
    the exact scored scope. Do not black-mask whole-frame LPIPS/VMAF.
-3. Fairness requires equal container, pixels, frame count, timebase, no
-   shared source/display/timebase and accounting policy, no uncharged
-   masks/lookahead/aspect/fps, and physical native files including each format's
-   overhead. PointStream variants use the same accounting policy; native codec
-   containers need not be identical.
+3. Fairness requires a shared source, display grid, timebase, and accounting
+   policy, with no uncharged masks, lookahead, aspect, or fps changes. Native
+   formats may differ; charge each physical file and its format overhead.
+   PointStream variants use a consistent container/accounting policy.
 4. A semantic ROI encoder requires an observed ROI effect and null control;
    x265 AQ is not semantic ROI. Native ROI maps are encoder-only and client
    masks must be charged.
