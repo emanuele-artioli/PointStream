@@ -66,9 +66,10 @@ class BackgroundCodec:
 
         output_mp4.parent.mkdir(parents=True, exist_ok=True)
         tmp_raw = output_mp4.with_suffix(".raw.mp4")
+        fourcc = getattr(cv2, "VideoWriter_fourcc")(*"mp4v")
         writer = cv2.VideoWriter(
             str(tmp_raw),
-            cv2.VideoWriter_fourcc(*"mp4v"),
+            fourcc,
             fps,
             (bg_w, bg_h),
         )
@@ -180,7 +181,11 @@ def read_video_frames_robust(
     cmd.extend(["-f", "rawvideo", "-pix_fmt", "bgr24", "-"])
 
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    raw_bytes = p.stdout.read()
+    stdout = p.stdout
+    if stdout is None:
+        p.wait()
+        return []
+    raw_bytes = stdout.read()
     p.wait()
 
     if not raw_bytes:
