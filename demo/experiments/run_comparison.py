@@ -23,6 +23,7 @@ from demo.evaluation.encode_av1_ladder import encode_ladder
 from demo.evaluation.evaluate_quality import QualityEvaluator
 from demo.evaluation.evaluate_robotics_teleop import evaluate_teleop_utility
 from demo.evaluation.latency_profiler import profile_pipeline_latency
+from demo.evaluation.pose_backends import BACKENDS
 from demo.models.dataset import build_curated_samples, to_torch_tensor
 from demo.models.unet_generator import HandPix2PixUNet, HandSPADEUNet
 from demo.pipeline.background_codec import (
@@ -141,6 +142,7 @@ def run_single_clip_comparison(
     n_frames: int = 300,
     total_session_sec: float = 30.0,
     shared_anchor_bytes: int = 0,
+    pose_backend: str = "mp_live",
 ) -> dict[str, Any]:
     """Benchmark a single clip across the full PointStream and AV1 ladders.
 
@@ -176,8 +178,9 @@ def run_single_clip_comparison(
     writer.release()
 
     # 2. Extract hand poses
-    logger.info(f"[{clip_stem}] Extracting reference hand poses...")
-    poses = extract_video_hand_poses(ref_trimmed_mp4, max_frames=n_frames)
+    logger.info(f"[{clip_stem}] Extracting reference hand poses ({pose_backend})...")
+    extractor = BACKENDS.get(pose_backend, extract_video_hand_poses)
+    poses = extractor(ref_trimmed_mp4, n_frames)
 
     # 3. Compress keypoints
     keypoint_packets = [KeypointCompressor.compress_frame(p, w, h) for p in poses]
@@ -352,6 +355,7 @@ def main() -> None:
     parser.add_argument("--checkpoint", type=Path, default=DEFAULT_CHECKPOINT)
     parser.add_argument("--frames", type=int, default=300, help="Frames per clip to benchmark")
     parser.add_argument("--device", default="cuda:1")
+    parser.add_argument("--pose-backend", default="mp_live", choices=list(BACKENDS))
     args = parser.parse_args()
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -392,7 +396,7 @@ def main() -> None:
         cap.release()
         clip_durations.append(n_total / fps_val)
 
-        poses = extract_video_hand_poses(clip_path, max_frames=args.frames)
+        poses = BACKENDS.get(args.pose_backend, extract_video_hand_poses)(clip_path, args.frames)
         _, _, anchor_bytes_dict = build_curated_samples(
             clip_path, poses, image_size=256, max_frames=args.frames, clip_id=idx,
         )
@@ -425,6 +429,7 @@ def main() -> None:
             n_frames=args.frames,
             total_session_sec=total_session_sec,
             shared_anchor_bytes=shared_anchor_bytes,
+            pose_backend=args.pose_backend,
         )
         all_clip_results.append(res)
 

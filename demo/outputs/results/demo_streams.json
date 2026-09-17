@@ -1,0 +1,310 @@
+{
+  "clips": {
+    "clip_01": {
+      "name": "clip_01",
+      "clip_path": "/home/itec/emanuele/Datasets/Egocentric-10K/curated/clip_01_factory035_close_hands.mp4",
+      "streams": {
+        "ps_starve": {
+          "kind": "ps",
+          "res": "240p",
+          "kbps": 67.0,
+          "mpjpe": 54.1,
+          "det": 53.2,
+          "kp": 22.4
+        },
+        "ps_heavy": {
+          "kind": "ps",
+          "res": "360p",
+          "kbps": 102.3,
+          "mpjpe": 54.4,
+          "det": 53.4,
+          "kp": 22.4
+        },
+        "ps_low": {
+          "kind": "ps",
+          "res": "540p",
+          "kbps": 173.9,
+          "mpjpe": 52.8,
+          "det": 53.9,
+          "kp": 22.4
+        },
+        "ps_std": {
+          "kind": "ps",
+          "res": "540p",
+          "kbps": 286.9,
+          "mpjpe": 53.5,
+          "det": 53.7,
+          "kp": 22.4
+        },
+        "ps_1080": {
+          "kind": "ps",
+          "res": "1080p",
+          "kbps": 379.6,
+          "mpjpe": 58.5,
+          "det": 51.4,
+          "kp": 22.4
+        },
+        "av1_180": {
+          "kind": "av1",
+          "res": "180p",
+          "kbps": 33.6,
+          "mpjpe": 59.0,
+          "det": 41.6,
+          "kp": 0
+        },
+        "av1_240": {
+          "kind": "av1",
+          "res": "240p",
+          "kbps": 48.6,
+          "mpjpe": 49.5,
+          "det": 61.2,
+          "kp": 0
+        },
+        "av1_360": {
+          "kind": "av1",
+          "res": "360p",
+          "kbps": 88.4,
+          "mpjpe": 43.4,
+          "det": 75.7,
+          "kp": 0
+        },
+        "av1_540": {
+          "kind": "av1",
+          "res": "540p",
+          "kbps": 264.1,
+          "mpjpe": 29.9,
+          "det": 89.4,
+          "kp": 0
+        },
+        "av1_720": {
+          "kind": "av1",
+          "res": "720p",
+          "kbps": 314.4,
+          "mpjpe": 29.7,
+          "det": 92.0,
+          "kp": 0
+        },
+        "av1_1080": {
+          "kind": "av1",
+          "res": "1080p",
+          "kbps": 524.6,
+          "mpjpe": 25.8,
+          "det": 92.0,
+          "kp": 0
+        },
+        "ref": {
+          "kind": "ref",
+          "res": "1080p",
+          "kbps": 4200,
+          "mpjpe": null,
+          "det": 100,
+          "kp": 0
+        }
+      }
+    },
+    "clip_02": {
+      "name": "clip_02",
+      "clip_path": "/home/itec/emanuele/Datasets/Egocentric-10K/curated/clip_02_factory001_starve_win.mp4",
+      "streams": {
+        "ps_starve": {
+          "kind": "ps",
+          "res": "240p",
+          "kbps": 70.6,
+          "mpjpe": 94.3,
+          "det": 39.3,
+          "kp": 10.4
+        },
+        "ps_heavy": {
+          "kind": "ps",
+          "res": "360p",
+          "kbps": 113.7,
+          "mpjpe": 77.7,
+          "det": 49.8,
+          "kp": 10.4
+        },
+        "ps_low": {
+          "kind": "ps",
+          "res": "540p",
+          "kbps": 207.3,
+          "mpjpe": 79.5,
+          "det": 53.7,
+          "kp": 10.4
+        },
+        "ps_std": {
+          "kind": "ps",
+          "res": "540p",
+          "kbps": 270.7,
+          "mpjpe": 76.1,
+          "det": 47.1,
+          "kp": 10.4
+        },
+        "ps_1080": {
+          "kind": "ps",
+          "res": "1080p",
+          "kbps": 523.1,
+          "mpjpe": 96.7,
+          "det": 58.4,
+          "kp": 10.4
+        },
+        "av1_180": {
+          "kind": "av1",
+          "res": "180p",
+          "kbps": 42.8,
+          "mpjpe": 92.6,
+          "det": 36.6,
+          "kp": 0
+        },
+        "av1_240": {
+          "kind": "av1",
+          "res": "240p",
+          "kbps": 62.3,
+          "mpjpe": 91.8,
+          "det": 35.4,
+          "kp": 0
+        },
+        "av1_360": {
+          "kind": "av1",
+          "res": "360p",
+          "kbps": 106.0,
+          "mpjpe": 103.8,
+          "det": 35.4,
+          "kp": 0
+        },
+        "av1_540": {
+          "kind": "av1",
+          "res": "540p",
+          "kbps": 260.7,
+          "mpjpe": 93.3,
+          "det": 48.2,
+          "kp": 0
+        },
+        "av1_720": {
+          "kind": "av1",
+          "res": "720p",
+          "kbps": 312.4,
+          "mpjpe": 88.0,
+          "det": 45.9,
+          "kp": 0
+        },
+        "av1_1080": {
+          "kind": "av1",
+          "res": "1080p",
+          "kbps": 546.5,
+          "mpjpe": 76.3,
+          "det": 56.4,
+          "kp": 0
+        },
+        "ref": {
+          "kind": "ref",
+          "res": "1080p",
+          "kbps": 4200,
+          "mpjpe": null,
+          "det": 100,
+          "kp": 0
+        }
+      }
+    },
+    "clip_03": {
+      "name": "clip_03",
+      "clip_path": "/home/itec/emanuele/Datasets/Egocentric-10K/curated/clip_03_factory001_high_det.mp4",
+      "streams": {
+        "ps_starve": {
+          "kind": "ps",
+          "res": "240p",
+          "kbps": 74.8,
+          "mpjpe": 84.1,
+          "det": 58.4,
+          "kp": 10.3
+        },
+        "ps_heavy": {
+          "kind": "ps",
+          "res": "360p",
+          "kbps": 124.1,
+          "mpjpe": 65.4,
+          "det": 56.8,
+          "kp": 10.3
+        },
+        "ps_low": {
+          "kind": "ps",
+          "res": "540p",
+          "kbps": 230.2,
+          "mpjpe": 66.5,
+          "det": 56.8,
+          "kp": 10.3
+        },
+        "ps_std": {
+          "kind": "ps",
+          "res": "540p",
+          "kbps": 269.1,
+          "mpjpe": 64.2,
+          "det": 58.4,
+          "kp": 10.3
+        },
+        "ps_1080": {
+          "kind": "ps",
+          "res": "1080p",
+          "kbps": 597.5,
+          "mpjpe": 67.7,
+          "det": 60.7,
+          "kp": 10.3
+        },
+        "av1_180": {
+          "kind": "av1",
+          "res": "180p",
+          "kbps": 45.9,
+          "mpjpe": 92.6,
+          "det": 59.1,
+          "kp": 0
+        },
+        "av1_240": {
+          "kind": "av1",
+          "res": "240p",
+          "kbps": 68.2,
+          "mpjpe": 102.0,
+          "det": 58.8,
+          "kp": 0
+        },
+        "av1_360": {
+          "kind": "av1",
+          "res": "360p",
+          "kbps": 119.5,
+          "mpjpe": 75.3,
+          "det": 59.9,
+          "kp": 0
+        },
+        "av1_540": {
+          "kind": "av1",
+          "res": "540p",
+          "kbps": 251.9,
+          "mpjpe": 65.1,
+          "det": 60.7,
+          "kp": 0
+        },
+        "av1_720": {
+          "kind": "av1",
+          "res": "720p",
+          "kbps": 340.7,
+          "mpjpe": 62.1,
+          "det": 66.5,
+          "kp": 0
+        },
+        "av1_1080": {
+          "kind": "av1",
+          "res": "1080p",
+          "kbps": 639.2,
+          "mpjpe": 44.2,
+          "det": 69.6,
+          "kp": 0
+        },
+        "ref": {
+          "kind": "ref",
+          "res": "1080p",
+          "kbps": 4200,
+          "mpjpe": null,
+          "det": 100,
+          "kp": 0
+        }
+      }
+    }
+  }
+}

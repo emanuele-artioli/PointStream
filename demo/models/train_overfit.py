@@ -19,6 +19,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
+from demo.evaluation.pose_backends import BACKENDS
 from demo.models.dataset import EgocentricHandDataset, build_curated_samples
 from demo.models.unet_generator import HandPix2PixUNet, HandSPADEUNet
 from demo.pipeline.hand_keypoints import extract_video_hand_poses
@@ -40,6 +41,7 @@ def train(
     device_str: str = "cuda:1",
     model_type: str = "spade",
     smoke: bool = False,
+    pose_backend: str = "mp_live",
 ) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
     manifest_path = curated_dir / "manifest.json"
@@ -59,7 +61,9 @@ def train(
     for clip_idx, item in enumerate(manifest[:3]):
         clip_path = Path(item["path"])
         logger.info(f"Extracting poses and building samples for Clip {clip_idx + 1}: {clip_path.name} ({frames_per_clip} frames)...")
-        poses = extract_video_hand_poses(clip_path, max_frames=frames_per_clip)
+        extractor = BACKENDS.get(pose_backend, extract_video_hand_poses)
+        logger.info("Pose backend for training: %s", pose_backend)
+        poses = extractor(clip_path, frames_per_clip)
         samples, anchors, _anchor_bytes = build_curated_samples(
             clip_path,
             poses,
@@ -150,6 +154,7 @@ def train(
             "epochs": epochs,
             "final_loss": avg_loss,
             "image_size": 256,
+            "pose_backend": pose_backend,
             "anchors": {
                 str(k): {side: anchor.tolist() for side, anchor in v.items()}
                 for k, v in all_anchors.items()
@@ -167,6 +172,7 @@ def train(
                 "epochs": epochs,
                 "final_loss": avg_loss,
                 "image_size": 256,
+                "pose_backend": pose_backend,
                 "anchors": {
                     str(k): {side: anchor.tolist() for side, anchor in v.items()}
                     for k, v in all_anchors.items()
@@ -189,6 +195,7 @@ def main() -> None:
     parser.add_argument("--model-type", choices=["spade", "unet"], default="spade")
     parser.add_argument("--device", default="cuda:1")
     parser.add_argument("--smoke", action="store_true", help="Run 1-epoch smoke test")
+    parser.add_argument("--pose-backend", default="rtm_hand", choices=list(BACKENDS))
     args = parser.parse_args()
 
     train(
@@ -201,6 +208,7 @@ def main() -> None:
         device_str=args.device,
         model_type=args.model_type,
         smoke=args.smoke,
+        pose_backend=args.pose_backend,
     )
 
 
