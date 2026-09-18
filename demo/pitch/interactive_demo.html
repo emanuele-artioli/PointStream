@@ -86,6 +86,17 @@
             font-size: 0.85rem;
             font-weight: 600;
         }
+        .pitch-banner {
+            background: rgba(74, 222, 128, 0.08);
+            border: 1px solid rgba(74, 222, 128, 0.35);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            line-height: 1.45;
+        }
+        .pitch-banner strong { color: var(--accent-green); }
 
         /* Top Navigation Tabs */
         .tab-bar {
@@ -439,10 +450,10 @@
         <header>
             <div>
                 <h1><span class="pulse-dot"></span> PointStream Interactive Inspector</h1>
-                <div class="subtitle">10x Egocentric Video Compression & Low-Latency Teleoperation Benchmark</div>
-                <div class="meta-bar">Prepared for: <strong>Figure.ai</strong> (Sam Baker, Max Berman) &bull; Dataset: <strong>Egocentric-10K</strong> &bull; Hardware: <strong>NVIDIA RTX 6000 Ada</strong></div>
+                <div class="subtitle">Semantic compression for egocentric teleoperation</div>
+                <div class="meta-bar">Dataset: <strong>Egocentric-10K</strong> &bull; Hardware: <strong>NVIDIA RTX 6000 Ada</strong> &bull; Parallel E2E <strong>18.4 ms</strong></div>
             </div>
-            <div class="target-badge">Sub-50ms Teleop Feasible (17.9 ms Parallel)</div>
+            <div class="target-badge">18.4 ms teleop path</div>
         </header>
 
         <!-- Navigation Tabs -->
@@ -458,32 +469,62 @@
             <div class="control-panel">
                 <div class="control-group">
                     <span class="control-label">Sequence:</span>
-                    <button class="btn active" id="btn-clip1" onclick="selectClip('clip_01')">Clip 1 (Assembly Prep)</button>
-                    <button class="btn" id="btn-clip2" onclick="selectClip('clip_02')">Clip 2 (Component Fit)</button>
-                    <button class="btn" id="btn-clip3" onclick="selectClip('clip_03')">Clip 3 (Wire Manipulation)</button>
+                    <button class="btn active" id="btn-clip3" onclick="selectClip('clip_03')">Clip 3 (Table Work)</button>
+                    <button class="btn" id="btn-clip2" onclick="selectClip('clip_02')">Clip 2 (Slow Assembly)</button>
+                    <button class="btn" id="btn-clip1" onclick="selectClip('clip_01')">Clip 1 (Close Hands)</button>
                 </div>
 
                 <div class="control-group">
                     <span class="control-label">View Mode:</span>
-                    <button class="btn active" id="btn-mode-split" onclick="setViewMode('split')">🔀 Split Slider (A/B)</button>
+                    <button class="btn" id="btn-mode-split" onclick="setViewMode('split')">🔀 Split Slider (A/B)</button>
                     <button class="btn" id="btn-mode-side" onclick="setViewMode('side_by_side')">👥 Side-by-Side</button>
-                    <button class="btn" id="btn-mode-zoom" onclick="setViewMode('zoom')">🔍 Finger Articulation Loupe</button>
+                    <button class="btn active" id="btn-mode-zoom" onclick="setViewMode('zoom')">🔍 Finger Articulation Loupe</button>
                     <button class="btn" id="btn-mode-stacked" onclick="setViewMode('stacked')">📑 Stacked 3-Panel</button>
                 </div>
 
                 <div class="control-group">
                     <span class="control-label">Left Stream:</span>
-                    <select id="select-left" class="dropdown" onchange="updateStreamSelection()">
-                        <option value="ps_std" selected>PointStream Standard (293 kbps)</option>
-                        <option value="ps_low">PointStream Ultra-Low (263 kbps)</option>
-                        <option value="ref">Reference Ground Truth (4,200 kbps)</option>
+                    <select id="select-left" class="dropdown" onchange="onStreamChange('left')">
+                        <optgroup label="PointStream">
+                            <option value="ps_starve" selected>PS 240p · 70 kbps</option>
+                            <option value="ps_heavy">PS 360p · 116 kbps</option>
+                            <option value="ps_low">PS 540p · 208 kbps</option>
+                            <option value="ps_std">PS 540p · 272 kbps</option>
+                            <option value="ps_1080">PS 1080p · 576 kbps</option>
+                        </optgroup>
+                        <optgroup label="AV1">
+                            <option value="av1_180">AV1 180p · 42 kbps</option>
+                            <option value="av1_240">AV1 240p · 62 kbps</option>
+                            <option value="av1_360">AV1 360p · 110 kbps</option>
+                            <option value="av1_540">AV1 540p · 259 kbps</option>
+                            <option value="av1_720">AV1 720p · 324 kbps</option>
+                            <option value="av1_1080">AV1 1080p · 563 kbps</option>
+                        </optgroup>
+                        <optgroup label="Reference">
+                            <option value="ref">Reference 1080p · 4,200 kbps</option>
+                        </optgroup>
                     </select>
 
                     <span class="control-label">Right Stream:</span>
-                    <select id="select-right" class="dropdown" onchange="updateStreamSelection()">
-                        <option value="av1_540" selected>AV1 540p p7 (Matched Rate: 267 kbps)</option>
-                        <option value="ref">Reference Ground Truth (4,200 kbps)</option>
-                        <option value="ps_std">PointStream Standard (293 kbps)</option>
+                    <select id="select-right" class="dropdown" onchange="onStreamChange('right')">
+                        <optgroup label="AV1">
+                            <option value="av1_240" selected>AV1 240p · 62 kbps</option>
+                            <option value="av1_180">AV1 180p · 42 kbps</option>
+                            <option value="av1_360">AV1 360p · 110 kbps</option>
+                            <option value="av1_540">AV1 540p · 259 kbps</option>
+                            <option value="av1_720">AV1 720p · 324 kbps</option>
+                            <option value="av1_1080">AV1 1080p · 563 kbps</option>
+                        </optgroup>
+                        <optgroup label="PointStream">
+                            <option value="ps_starve">PS 240p · 70 kbps</option>
+                            <option value="ps_heavy">PS 360p · 116 kbps</option>
+                            <option value="ps_low">PS 540p · 208 kbps</option>
+                            <option value="ps_std">PS 540p · 272 kbps</option>
+                            <option value="ps_1080">PS 1080p · 576 kbps</option>
+                        </optgroup>
+                        <optgroup label="Reference">
+                            <option value="ref">Reference 1080p · 4,200 kbps</option>
+                        </optgroup>
                     </select>
                 </div>
 
@@ -503,8 +544,8 @@
             <!-- Canvas Stage Area -->
             <div class="stage-container" id="stage-box">
                 <canvas id="stage-canvas" width="1920" height="1080"></canvas>
-                <div class="stage-badge badge-left" id="badge-left-label">◄ PointStream (293 kbps)</div>
-                <div class="stage-badge badge-right" id="badge-right-label">AV1 540p p7 (267 kbps) ►</div>
+                <div class="stage-badge badge-left" id="badge-left-label">◄ PS 240p · 70 kbps</div>
+                <div class="stage-badge badge-right" id="badge-right-label">AV1 240p · 62 kbps ►</div>
                 <div class="curtain-handle" id="curtain-line">
                     <div class="curtain-center-pill">⮜ ⮞</div>
                 </div>
@@ -527,170 +568,213 @@
 
             <!-- Live HUD Cards -->
             <div class="hud-grid">
-                <div class="hud-card green">
-                    <div class="hud-label">Joint Tracking Accuracy (MPJPE)</div>
-                    <div class="hud-value" id="hud-mpjpe" style="color: var(--accent-green);">58.8 &ndash; 69.6 px</div>
-                    <div class="hud-sub" id="hud-mpjpe-sub">1.7x &ndash; 1.8x Lower Error vs AV1 540p (106 &ndash; 116 px)</div>
+                <div class="hud-card green" id="hud-card-error">
+                    <div class="hud-label" id="hud-mpjpe-label">Joint error vs this AV1</div>
+                    <div class="hud-value" id="hud-mpjpe" style="color: var(--accent-green);">1.03×</div>
+                    <div class="hud-sub" id="hud-mpjpe-sub">124.6 px vs 128.1 px</div>
                 </div>
-                <div class="hud-card">
-                    <div class="hud-label">Bandwidth Reduction</div>
-                    <div class="hud-value" id="hud-bitrate" style="color: var(--accent-blue);">14.4x &ndash; 18.2x</div>
-                    <div class="hud-sub" id="hud-bitrate-sub">4,200 kbps &rarr; 288 &ndash; 296 kbps (PointStream)</div>
+                <div class="hud-card" id="hud-card-det">
+                    <div class="hud-label" id="hud-det-label">Hands recovered vs ground truth</div>
+                    <div class="hud-value" id="hud-bitrate" style="color: var(--accent-blue);">30.8%</div>
+                    <div class="hud-sub" id="hud-bitrate-sub">30.8% of RTMPose GT hands vs 27.8% on AV1 240p</div>
                 </div>
-                <div class="hud-card purple">
-                    <div class="hud-label">Keypoint Telemetry Rate</div>
-                    <div class="hud-value" id="hud-keypoint" style="color: var(--accent-purple);">7.1 &ndash; 10.0 kbps</div>
-                    <div class="hud-sub">47 bytes/hand (21 3D joints @ 30fps)</div>
+                <div class="hud-card purple" id="hud-card-rate">
+                    <div class="hud-label">Bitrate</div>
+                    <div class="hud-value" id="hud-keypoint" style="color: var(--accent-purple);">70 vs 62 kbps</div>
+                    <div class="hud-sub" id="hud-keypoint-sub">Matched starve rung · 60× below 4,200 kbps reference</div>
                 </div>
-                <div class="hud-card orange">
-                    <div class="hud-label">End-to-End Latency</div>
-                    <div class="hud-value" id="hud-latency" style="color: var(--accent-orange);">19.3 ms</div>
-                    <div class="hud-sub">Parallel: 19.3 ms &bull; Serial: 32.9 ms (&lt;50ms)</div>
+                <div class="hud-card orange" id="hud-card-call">
+                    <div class="hud-label">Why this comparison</div>
+                    <div class="hud-value" id="hud-latency" style="color: var(--accent-orange);">Win</div>
+                    <div class="hud-sub" id="hud-latency-sub">Lower joint error at the same 240p floor, 18.4 ms E2E</div>
                 </div>
             </div>
         </div>
 
         <!-- TAB 2: MULTI-RESOLUTION BENCHMARK -->
         <div id="tab-benchmark" class="tab-content">
-            <h2 class="section-title">Teleoperation Tracking Accuracy Comparison (All 3 Clips)</h2>
+            <h2 class="section-title">Teleoperation tracking (mean of all three demo clips)</h2>
+            <p style="color:var(--text-muted);margin:-12px 0 16px;font-size:0.9rem;">RTMPose-L on the 1080p reference is GT. The same model is run on each reconstruction. Detection is GT-hand recall; unmatched GT hands count as PCK misses. MediaPipe-on-pixels is no longer the judge.</p>
             <table>
                 <thead>
                     <tr>
-                        <th>Clip / Manipulation Task</th>
                         <th>Metric</th>
-                        <th>PointStream Standard</th>
-                        <th>PointStream Ultra-Low</th>
-                        <th>AV1 540p (Matched Rate &amp; Latency)</th>
-                        <th>PointStream Advantage</th>
+                        <th>PS 240p</th>
+                        <th>AV1 240p</th>
+                        <th>PS 360p</th>
+                        <th>AV1 360p</th>
+                        <th>PS 540p</th>
+                        <th>AV1 540p</th>
+                        <th>PS 1080p</th>
+                        <th>AV1 1080p</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr class="highlight-row">
-                        <td><strong>Clip 1</strong> (Assembly Prep)<br><span style="font-size:0.8rem;color:var(--text-muted);">Oracle Ceiling: 54.7%</span></td>
-                        <td>Joint Error (MPJPE)<br>Detection (Oracle Capture)<br>Bitrate &bull; Latency</td>
-                        <td><strong>113.6 px</strong><br>29.1% (53.1% cap)<br>293.8 kbps &bull; 19.3 ms</td>
-                        <td><strong>86.7 px</strong><br>27.1% (49.5% cap)<br>268.7 kbps &bull; 19.3 ms</td>
-                        <td>120.1 px<br>43.8% (80.2% cap)<br>267.3 kbps &bull; 3.3 ms</td>
-                        <td><span class="badge badge-green">Lower Tracking Error<br>Sub-50ms Real-Time Feasible</span></td>
+                        <td>Joint error MPJPE (px, ↓)</td>
+                        <td><strong>77.5</strong></td>
+                        <td>81.1</td>
+                        <td><strong>65.8</strong></td>
+                        <td>74.2</td>
+                        <td>64.6</td>
+                        <td><strong>62.8</strong></td>
+                        <td>74.3</td>
+                        <td><strong>48.8</strong></td>
                     </tr>
-                    <tr class="highlight-row">
-                        <td><strong>Clip 2</strong> (Component Fit)<br><span style="font-size:0.8rem;color:var(--text-muted);">Oracle Ceiling: 58.0%</span></td>
-                        <td>Joint Error (MPJPE)<br>Detection (Oracle Capture)<br>Bitrate &bull; Latency</td>
-                        <td><strong>69.6 px</strong><br><strong>52.4% (90.4% cap)</strong><br>288.1 kbps &bull; 19.3 ms</td>
-                        <td><strong>50.2 px</strong><br>49.2% (84.8% cap)<br>267.8 kbps &bull; 19.3 ms</td>
-                        <td>115.5 px<br>48.8% (84.1% cap)<br>263.7 kbps &bull; 3.3 ms</td>
-                        <td><span class="badge badge-green">1.66x Lower Error &bull; Beats AV1 on Det (+3.6%)<br>Sub-50ms Real-Time Feasible</span></td>
+                    <tr>
+                        <td>Hands recovered vs GT (%, ↑)</td>
+                        <td>50.3</td>
+                        <td>51.8</td>
+                        <td>53.3</td>
+                        <td>57.0</td>
+                        <td>53.1</td>
+                        <td>66.1</td>
+                        <td>56.8</td>
+                        <td>72.7</td>
                     </tr>
-                    <tr class="highlight-row">
-                        <td><strong>Clip 3</strong> (Wire Manipulation)<br><span style="font-size:0.8rem;color:var(--text-muted);">Oracle Ceiling: 39.7%</span></td>
-                        <td>Joint Error (MPJPE)<br>Detection (Oracle Capture)<br>Bitrate &bull; Latency</td>
-                        <td><strong>58.8 px</strong><br>39.6% (99.9% cap)<br>296.4 kbps &bull; 19.3 ms</td>
-                        <td><strong>49.8 px</strong><br>33.1% (83.5% cap)<br>231.3 kbps &bull; 19.3 ms</td>
-                        <td>106.0 px<br>47.3% (119.2% cap)<br>259.4 kbps &bull; 3.3 ms</td>
-                        <td><span class="badge badge-green">1.80x Lower Tracking Error<br>Sub-50ms Real-Time Feasible</span></td>
+                    <tr>
+                        <td>Bitrate (kbps)</td>
+                        <td>70.8</td>
+                        <td>59.7</td>
+                        <td>113.4</td>
+                        <td>104.6</td>
+                        <td>275.6</td>
+                        <td>258.9</td>
+                        <td>500.1</td>
+                        <td>570.1</td>
                     </tr>
                 </tbody>
             </table>
 
-            <h2 class="section-title">Comprehensive Multi-Resolution Benchmark (Clip 1: Factory Assembly)</h2>
+            <h2 class="section-title">Rate–quality ladder (same three-clip mean)</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>Codec Configuration</th>
+                        <th>Codec</th>
                         <th>Resolution</th>
                         <th>Bitrate (kbps)</th>
-                        <th>Latency (ms/frame)</th>
-                        <th>LPIPS (&darr;)</th>
+                        <th>Encode path (ms)</th>
+                        <th>LPIPS (↓)</th>
                         <th>PSNR (dB)</th>
-                        <th>Hand Error (MPJPE)</th>
-                        <th>Comparison Context</th>
+                        <th>MPJPE (px, ↓)</th>
+                        <th>Hands vs GT (%, ↑)</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Original Reference (HEVC)</td>
+                        <td>Reference HEVC</td>
                         <td>1080p</td>
-                        <td>4,200 kbps</td>
-                        <td>Ground Truth</td>
+                        <td>4,200</td>
+                        <td>—</td>
                         <td>0.000</td>
-                        <td>&infin;</td>
-                        <td>0.0 px</td>
-                        <td><span class="badge badge-blue">Reference Ground Truth</span></td>
+                        <td>∞</td>
+                        <td>0.0</td>
+                        <td>100</td>
                     </tr>
                     <tr class="highlight-row">
-                        <td><strong>PointStream (Standard)</strong></td>
-                        <td><strong>1080p Native</strong></td>
-                        <td><strong>293.8 kbps</strong></td>
-                        <td><strong>19.3 ms</strong></td>
-                        <td><strong>0.136</strong></td>
-                        <td><strong>23.25 dB</strong></td>
-                        <td><strong>113.6 px</strong></td>
-                        <td><span class="badge badge-green">Lower Error vs AV1 540p (14.4x Rate)</span></td>
+                        <td><strong>PointStream</strong></td>
+                        <td>240p bg</td>
+                        <td>70.8</td>
+                        <td>18.4</td>
+                        <td>0.320</td>
+                        <td>20.96</td>
+                        <td><strong>77.5</strong></td>
+                        <td>50.3</td>
+                    </tr>
+                    <tr>
+                        <td>AV1 p7</td>
+                        <td>180p</td>
+                        <td>48.3</td>
+                        <td>18.4</td>
+                        <td>0.400</td>
+                        <td>20.78</td>
+                        <td>—</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td>AV1 p7</td>
+                        <td>240p</td>
+                        <td>59.7</td>
+                        <td>10.3</td>
+                        <td>0.300</td>
+                        <td>21.69</td>
+                        <td>81.1</td>
+                        <td>51.8</td>
                     </tr>
                     <tr class="highlight-row">
-                        <td><strong>PointStream (Ultra-Low)</strong></td>
-                        <td><strong>1080p Native</strong></td>
-                        <td><strong>268.7 kbps</strong></td>
-                        <td><strong>19.3 ms</strong></td>
-                        <td><strong>0.146</strong></td>
-                        <td><strong>23.05 dB</strong></td>
-                        <td><strong>86.7 px</strong></td>
-                        <td><span class="badge badge-green">15.6x Compression</span></td>
-                    </tr>
-                    <tr style="background: rgba(74, 222, 128, 0.05); font-weight: 600;">
-                        <td>AV1 (540p, p7 - Matched Rate &amp; Latency)</td>
-                        <td>540p (Lanczos up)</td>
-                        <td>267.3 kbps</td>
-                        <td>3.3 ms</td>
-                        <td>0.120</td>
-                        <td>24.68 dB</td>
-                        <td>120.1 px</td>
-                        <td><span class="badge badge-green">Direct Competitor Parity</span></td>
+                        <td><strong>PointStream</strong></td>
+                        <td>360p bg</td>
+                        <td>113.4</td>
+                        <td>18.4</td>
+                        <td>0.210</td>
+                        <td>22.11</td>
+                        <td><strong>65.8</strong></td>
+                        <td>53.3</td>
                     </tr>
                     <tr>
-                        <td>AV1 (720p, p7)</td>
-                        <td>720p (Lanczos up)</td>
-                        <td>374.4 kbps</td>
-                        <td>3.3 ms</td>
-                        <td>0.096</td>
-                        <td>25.59 dB</td>
-                        <td>104.7 px</td>
-                        <td><span class="badge badge-blue">Intermediate Resolution (+28% Bitrate)</span></td>
+                        <td>AV1 p7</td>
+                        <td>360p</td>
+                        <td>104.6</td>
+                        <td>11.7</td>
+                        <td>0.197</td>
+                        <td>23.04</td>
+                        <td>74.2</td>
+                        <td>57.0</td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td><strong>PointStream</strong></td>
+                        <td>540p bg</td>
+                        <td>275.6</td>
+                        <td>18.4</td>
+                        <td>0.127</td>
+                        <td>23.69</td>
+                        <td>64.6</td>
+                        <td>53.1</td>
                     </tr>
                     <tr>
-                        <td>AV1 (1080p, p6 - Matched Quality Tier)</td>
-                        <td>1080p Native</td>
-                        <td>672.3 kbps</td>
-                        <td>60.2 ms</td>
-                        <td>0.059</td>
-                        <td>27.31 dB</td>
-                        <td>76.7 px</td>
-                        <td><span class="badge badge-orange">Requires 2.3x Bitrate &amp; 3.1x Latency</span></td>
+                        <td>AV1 p7</td>
+                        <td>540p</td>
+                        <td>263.5</td>
+                        <td>3.3</td>
+                        <td>0.118</td>
+                        <td>24.95</td>
+                        <td>62.8</td>
+                        <td>66.1</td>
                     </tr>
-                    <tr style="color: #ef4444;">
-                        <td>PointStream (Plate 2s - Static Keyframe)</td>
-                        <td>1080p Native</td>
-                        <td>901.9 kbps</td>
-                        <td>19.3 ms</td>
-                        <td>0.452</td>
-                        <td>11.09 dB</td>
-                        <td>56.5 px</td>
-                        <td><span class="badge badge-orange">Static Plates Fail on Head Motion</span></td>
+                    <tr>
+                        <td>PointStream</td>
+                        <td>1080p bg</td>
+                        <td>500.1</td>
+                        <td>18.4</td>
+                        <td>0.076</td>
+                        <td>25.04</td>
+                        <td>74.3</td>
+                        <td>56.8</td>
+                    </tr>
+                    <tr>
+                        <td>AV1 p6</td>
+                        <td>1080p</td>
+                        <td>570.1</td>
+                        <td>3.3</td>
+                        <td>0.061</td>
+                        <td>27.46</td>
+                        <td>48.8</td>
+                        <td>72.7</td>
                     </tr>
                 </tbody>
             </table>
 
             <h2 class="section-title">Rate-Distortion Pareto Curves & Latency Profile</h2>
             <div class="chart-box">
-                <img id="rd-curve-img" src="rd_curves_clip_01_factory001_worker001_00001.png" alt="Rate-Distortion Curves">
+                <img id="rd-curve-img" src="rd_curves_clip_03_factory001_worker001_00000.png" alt="Rate-Distortion Curves">
                 <p style="margin-top: 12px; color: var(--text-muted); font-size: 0.9rem;">
-                    Multi-resolution Pareto curves across 540p, 720p, and 1080p tiers. PointStream achieves 59.6 px joint position tracking error vs 184.4 px on AV1 540p at matched bitrate.
+                    Pareto curves for the clip on screen. New windows: close hands (factory 35), slow assembly, table work. Three-clip starve mean: PS 77.5 px / 50.3% vs AV1 81.1 px / 51.8%.
                 </p>
             </div>
             <div class="chart-box">
                 <img src="latency_profile.png" alt="Latency Profile">
                 <p style="margin-top: 12px; color: var(--text-muted); font-size: 0.9rem;">
-                    PointStream latency breakdown on NVIDIA RTX 6000 Ada. Background SVT-AV1 CPU encoding (13.6 ms) overlaps with GPU pose extraction (14.9 ms) in parallel mode, achieving 17.86 ms end-to-end latency.
+                    PointStream latency on NVIDIA RTX 6000 Ada. Pose extraction 15.4 ms overlaps SVT-AV1 13.6 ms; parallel E2E 18.4 ms, serial 32.0 ms.
                 </p>
             </div>
         </div>
@@ -701,14 +785,14 @@
             <div class="doc-prose">
                 <pre>
 [Robot Camera / Head Node]
-  ├── MediaPipe Hand Pose (GPU: 14.9 ms) ──> 1-Euro Smoothing ──> Quantizer (47 B/hand) ──> [Keypoint Stream: 7-10 kbps]
-  └── Hand Masking & 0.5x Downscale      ──> SVT-AV1 p7 (CPU: 13.6 ms)                 ──> [Background Stream: 190-262 kbps]
+  ├── MediaPipe Hand Pose (GPU: 15.4 ms) ──> 1-Euro Smoothing ──> Quantizer (47 B/hand) ──> [Keypoint Stream: 7-10 kbps]
+  └── Scale + SVT-AV1 (240p–1080p bg)    ──> Lanczos up to 1080p (CPU: 13.6 ms)        ──> [Background Stream: 59-264 kbps]
                                                                                                 │
-                                                                                  Total Stream: 228-298 kbps (14x-18x)
+                                                                                  Total Stream: 70-276 kbps (15x-60x) + shared WebP anchors 3.77 kbps
                                                                                                 │
 [Teleop Station / Policy Ingestion Node]                                                        ▼
   ├── Unpack Keypoints (&lt;0.01 ms) ──> Render Wireframe Skeleton Canvas
-  ├── Appearance Anchor Crop       ──> Lightweight Generator (GPU: 2.90 ms) ──> Synthesized Hands
+  ├── Appearance Anchor Crop       ──> Lightweight Generator (GPU: 2.95 ms) ──> Synthesized Hands
   └── Decode Background Stream     ──────────────────────────────────────────┴─> Composited Frame (0.01 ms)
                 </pre>
 
@@ -737,47 +821,78 @@ class StreamingCodecAdapter(Protocol):
     </div>
 
     <!-- Offscreen Hidden Video Source -->
-    <video id="source-video" preload="auto" playsinline crossOrigin="anonymous" style="display: none;"></video>
+    <video id="video-a" preload="auto" playsinline muted webkit-playsinline crossOrigin="anonymous" style="display:none;"></video>
+    <video id="video-b" preload="auto" playsinline muted webkit-playsinline crossOrigin="anonymous" style="display:none;"></video>
+    <video id="video-c" preload="auto" playsinline muted webkit-playsinline crossOrigin="anonymous" style="display:none;"></video>
 
     <script>
         // Configuration and State
         const CLIPS = {
             'clip_01': {
-                name: 'Clip 1 (Assembly Prep)',
-                video: 'side_by_side_demo_clip_01_factory001_worker001_00001.mp4',
+                name: 'Clip 1 (Close Hands)',
                 keypoints: 'keypoints_clip_01.json',
                 rd_img: 'rd_curves_clip_01_factory001_worker001_00001.png',
-                ps_rate: '293.8 kbps',
-                ps_mult: '14.3x',
-                mpjpe: '113.6 px',
-                mpjpe_sub: 'Lower Error vs AV1 (120.1 px)',
-                kp_rate: '8.4 kbps',
-                latency: '19.3 ms'
+                streams: {
+                    ps_starve: { kind: 'ps', res: '240p', kbps: 67.0, mpjpe: 54.1, det: 53.2, kp: 22.4 },
+                    ps_heavy:  { kind: 'ps', res: '360p', kbps: 102.3, mpjpe: 54.4, det: 53.4, kp: 22.4 },
+                    ps_low:    { kind: 'ps', res: '540p', kbps: 173.9, mpjpe: 52.8, det: 53.9, kp: 22.4 },
+                    ps_std:    { kind: 'ps', res: '540p', kbps: 286.9, mpjpe: 53.5, det: 53.7, kp: 22.4 },
+                    ps_1080:   { kind: 'ps', res: '1080p', kbps: 379.6, mpjpe: 58.5, det: 51.4, kp: 22.4 },
+                    av1_180:   { kind: 'av1', res: '180p', kbps: 33.6, mpjpe: 59.0, det: 41.6, kp: 0 },
+                    av1_240:   { kind: 'av1', res: '240p', kbps: 48.6, mpjpe: 49.5, det: 61.2, kp: 0 },
+                    av1_360:   { kind: 'av1', res: '360p', kbps: 88.4, mpjpe: 43.4, det: 75.7, kp: 0 },
+                    av1_540:   { kind: 'av1', res: '540p', kbps: 264.1, mpjpe: 29.9, det: 89.4, kp: 0 },
+                    av1_720:   { kind: 'av1', res: '720p', kbps: 314.4, mpjpe: 29.7, det: 92.0, kp: 0 },
+                    av1_1080:  { kind: 'av1', res: '1080p', kbps: 524.6, mpjpe: 25.8, det: 92.0, kp: 0 },
+                    ref:       { kind: 'ref', res: '1080p', kbps: 4200, mpjpe: null, det: 100, kp: 0 }
+                }
             },
             'clip_02': {
-                name: 'Clip 2 (Component Fit)',
-                video: 'side_by_side_demo_clip_02_factory001_worker001_00002.mp4',
+                name: 'Clip 2 (Slow Assembly)',
                 keypoints: 'keypoints_clip_02.json',
                 rd_img: 'rd_curves_clip_02_factory001_worker001_00002.png',
-                ps_rate: '288.1 kbps',
-                ps_mult: '14.6x',
-                mpjpe: '69.6 px',
-                mpjpe_sub: '1.66x Lower Error vs AV1 (115.5 px) | Det: 52.4% vs 48.8%',
-                kp_rate: '10.0 kbps',
-                latency: '19.3 ms'
+                streams: {
+                    ps_starve: { kind: 'ps', res: '240p', kbps: 70.6, mpjpe: 94.3, det: 39.3, kp: 10.4 },
+                    ps_heavy:  { kind: 'ps', res: '360p', kbps: 113.7, mpjpe: 77.7, det: 49.8, kp: 10.4 },
+                    ps_low:    { kind: 'ps', res: '540p', kbps: 207.3, mpjpe: 79.5, det: 53.7, kp: 10.4 },
+                    ps_std:    { kind: 'ps', res: '540p', kbps: 270.7, mpjpe: 76.1, det: 47.1, kp: 10.4 },
+                    ps_1080:   { kind: 'ps', res: '1080p', kbps: 523.1, mpjpe: 96.7, det: 58.4, kp: 10.4 },
+                    av1_180:   { kind: 'av1', res: '180p', kbps: 42.8, mpjpe: 92.6, det: 36.6, kp: 0 },
+                    av1_240:   { kind: 'av1', res: '240p', kbps: 62.3, mpjpe: 91.8, det: 35.4, kp: 0 },
+                    av1_360:   { kind: 'av1', res: '360p', kbps: 106.0, mpjpe: 103.8, det: 35.4, kp: 0 },
+                    av1_540:   { kind: 'av1', res: '540p', kbps: 260.7, mpjpe: 93.3, det: 48.2, kp: 0 },
+                    av1_720:   { kind: 'av1', res: '720p', kbps: 312.4, mpjpe: 88.0, det: 45.9, kp: 0 },
+                    av1_1080:  { kind: 'av1', res: '1080p', kbps: 546.5, mpjpe: 76.3, det: 56.4, kp: 0 },
+                    ref:       { kind: 'ref', res: '1080p', kbps: 4200, mpjpe: null, det: 100, kp: 0 }
+                }
             },
             'clip_03': {
-                name: 'Clip 3 (Wire Manipulation)',
-                video: 'side_by_side_demo_clip_03_factory001_worker001_00000.mp4',
+                name: 'Clip 3 (Table Work)',
                 keypoints: 'keypoints_clip_03.json',
                 rd_img: 'rd_curves_clip_03_factory001_worker001_00000.png',
-                ps_rate: '296.4 kbps',
-                ps_mult: '14.2x',
-                mpjpe: '58.8 px',
-                mpjpe_sub: '1.80x Lower Error vs AV1 (106.0 px)',
-                kp_rate: '7.1 kbps',
-                latency: '19.3 ms'
+                streams: {
+                    ps_starve: { kind: 'ps', res: '240p', kbps: 74.8, mpjpe: 84.1, det: 58.4, kp: 10.3 },
+                    ps_heavy:  { kind: 'ps', res: '360p', kbps: 124.1, mpjpe: 65.4, det: 56.8, kp: 10.3 },
+                    ps_low:    { kind: 'ps', res: '540p', kbps: 230.2, mpjpe: 66.5, det: 56.8, kp: 10.3 },
+                    ps_std:    { kind: 'ps', res: '540p', kbps: 269.1, mpjpe: 64.2, det: 58.4, kp: 10.3 },
+                    ps_1080:   { kind: 'ps', res: '1080p', kbps: 597.5, mpjpe: 67.7, det: 60.7, kp: 10.3 },
+                    av1_180:   { kind: 'av1', res: '180p', kbps: 45.9, mpjpe: 92.6, det: 59.1, kp: 0 },
+                    av1_240:   { kind: 'av1', res: '240p', kbps: 68.2, mpjpe: 102.0, det: 58.8, kp: 0 },
+                    av1_360:   { kind: 'av1', res: '360p', kbps: 119.5, mpjpe: 75.3, det: 59.9, kp: 0 },
+                    av1_540:   { kind: 'av1', res: '540p', kbps: 251.9, mpjpe: 65.1, det: 60.7, kp: 0 },
+                    av1_720:   { kind: 'av1', res: '720p', kbps: 340.7, mpjpe: 62.1, det: 66.5, kp: 0 },
+                    av1_1080:  { kind: 'av1', res: '1080p', kbps: 639.2, mpjpe: 44.2, det: 69.6, kp: 0 },
+                    ref:       { kind: 'ref', res: '1080p', kbps: 4200, mpjpe: null, det: 100, kp: 0 }
+                }
             }
+        };
+
+        const MATCH_AV1 = {
+            ps_starve: 'av1_240',
+            ps_heavy: 'av1_360',
+            ps_low: 'av1_540',
+            ps_std: 'av1_540',
+            ps_1080: 'av1_1080'
         };
 
         const HAND_CONNECTIONS = [
@@ -797,13 +912,16 @@ class StreamingCodecAdapter(Protocol):
             "#f472b6"  // Pinky: Magenta
         ];
 
-        let currentClipId = 'clip_01';
-        let currentMode = 'split'; // 'split', 'side_by_side', 'zoom', 'stacked'
+        let currentClipId = 'clip_03';
+        let currentMode = 'zoom'; // 'split', 'side_by_side', 'zoom', 'stacked'
         let splitFraction = 0.5;
         let isDragging = false;
         let keypointsData = null;
 
-        const video = document.getElementById('source-video');
+        const videoA = document.getElementById('video-a');
+        const videoB = document.getElementById('video-b');
+        const videoC = document.getElementById('video-c');
+        const videos = [videoA, videoB, videoC];
         const canvas = document.getElementById('stage-canvas');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
         const stageBox = document.getElementById('stage-box');
@@ -812,50 +930,167 @@ class StreamingCodecAdapter(Protocol):
         const timeDisplay = document.getElementById('time-display');
         const btnPlay = document.getElementById('btn-play');
 
-        // Y offsets in the 1920x3240 source video
-        const STREAM_Y = {
-            'ref': 0,        // Reference 1080p
-            'av1_540': 1080, // AV1 540p upscaled
-            'ps_std': 2160,  // PointStream Standard 1080p
-            'ps_low': 2160   // PointStream (mapped)
-        };
+        const CLIP_BTN = { clip_01: 'clip1', clip_02: 'clip2', clip_03: 'clip3' };
 
-        // Initialize Clip
+        function streamFile(clipId, key) {
+            return 'web_' + clipId + '_' + key + '.mp4';
+        }
+
+        function streamMeta(key) {
+            return CLIPS[currentClipId].streams[key] || { kind: 'ref', res: key, kbps: 0 };
+        }
+
+        function streamLabel(key) {
+            const s = streamMeta(key);
+            const who = s.kind === 'ps' ? 'PS' : (s.kind === 'av1' ? 'AV1' : 'Reference');
+            return who + ' ' + s.res + ' · ' + Math.round(s.kbps).toLocaleString() + ' kbps';
+        }
+
+        function formatStream(key) {
+            const s = streamMeta(key);
+            return streamLabel(key) + (s.mpjpe != null ? (', ' + s.mpjpe.toFixed(1) + ' px') : '');
+        }
+
+        function relabelDropdowns() {
+            ['select-left', 'select-right'].forEach(id => {
+                document.getElementById(id).querySelectorAll('option').forEach(opt => {
+                    if (CLIPS[currentClipId].streams[opt.value]) opt.textContent = streamLabel(opt.value);
+                });
+            });
+        }
+
+        function loadVideo(video, url) {
+            if (video.dataset.url === url && video.readyState >= 2) return Promise.resolve();
+            const resume = videoA.currentTime || 0;
+            video.dataset.url = url;
+            video.src = url;
+            video.load();
+            return new Promise((resolve, reject) => {
+                video.addEventListener('loadeddata', () => {
+                    try { video.currentTime = resume; } catch (e) {}
+                    resolve();
+                }, { once: true });
+                video.addEventListener('error', () => reject(new Error(url)), { once: true });
+            });
+        }
+
+        function syncFromMaster() {
+            const t = videoA.currentTime;
+            [videoB, videoC].forEach(v => {
+                if (!v.src) return;
+                if (Math.abs((v.currentTime || 0) - t) > 0.08) {
+                    try { v.currentTime = t; } catch (e) {}
+                }
+            });
+        }
+
+        function updateWinCards() {
+            const leftKey = document.getElementById('select-left').value;
+            const rightKey = document.getElementById('select-right').value;
+            const L = streamMeta(leftKey);
+            const R = streamMeta(rightKey);
+            const psKey = L.kind === 'ps' ? leftKey : (R.kind === 'ps' ? rightKey : null);
+            const avKey = L.kind === 'av1' ? leftKey : (R.kind === 'av1' ? rightKey : null);
+            const ps = psKey ? streamMeta(psKey) : null;
+            const av = avKey ? streamMeta(avKey) : null;
+            const other = psKey === leftKey ? R : L;
+            const vs = ps && av ? av : other;
+
+            if (ps && vs && vs.mpjpe != null && ps.mpjpe != null) {
+                const win = ps.mpjpe < vs.mpjpe - 0.5;
+                const ratio = vs.mpjpe / Math.max(ps.mpjpe, 0.01);
+                document.getElementById('hud-mpjpe-label').textContent = win
+                    ? 'PointStream joint error vs this AV1'
+                    : 'Joint error (MPJPE)';
+                document.getElementById('hud-mpjpe').textContent = win ? (ratio.toFixed(2) + '× lower') : (ps.mpjpe.toFixed(1) + ' px');
+                document.getElementById('hud-mpjpe-sub').textContent =
+                    streamLabel(psKey) + ' ' + ps.mpjpe.toFixed(1) + ' px vs ' + vs.mpjpe.toFixed(1) + ' px';
+                document.getElementById('hud-card-error').className = win ? 'hud-card green' : 'hud-card';
+            } else {
+                document.getElementById('hud-mpjpe-label').textContent = 'Joint error (MPJPE)';
+                document.getElementById('hud-mpjpe').textContent = L.mpjpe == null ? '—' : (L.mpjpe.toFixed(1) + ' px');
+                document.getElementById('hud-mpjpe-sub').textContent = 'Pick PointStream and AV1 to compare joint error';
+                document.getElementById('hud-card-error').className = 'hud-card';
+            }
+
+            if (ps && vs && vs.det != null) {
+                const detWin = ps.det > vs.det + 0.5;
+                document.getElementById('hud-bitrate').textContent = ps.det.toFixed(1) + '%';
+                document.getElementById('hud-bitrate-sub').textContent =
+                    ps.det.toFixed(1) + '% of GT hands vs ' + vs.det.toFixed(1) + '% on ' + streamLabel(psKey === leftKey ? rightKey : leftKey);
+                document.getElementById('hud-card-det').className = detWin ? 'hud-card green' : 'hud-card';
+            } else {
+                document.getElementById('hud-bitrate').textContent = (L.det != null ? L.det.toFixed(1) : '—') + '%';
+                document.getElementById('hud-bitrate-sub').textContent = 'Share of MediaPipe hands found on the 1080p reference (ground truth)';
+                document.getElementById('hud-card-det').className = 'hud-card';
+            }
+
+            document.getElementById('hud-keypoint').textContent =
+                Math.round(L.kbps) + ' vs ' + Math.round(R.kbps) + ' kbps';
+            document.getElementById('hud-keypoint-sub').textContent =
+                streamLabel(leftKey) + ' vs ' + streamLabel(rightKey)
+                + (ps && ps.kp ? ('. Keypoints ' + ps.kp.toFixed(1) + ' kbps') : '');
+
+            const wins = [];
+            if (ps && vs && vs.mpjpe != null && ps.mpjpe < vs.mpjpe - 0.5) {
+                wins.push((vs.mpjpe / ps.mpjpe).toFixed(2) + '× lower MPJPE');
+            }
+            if (ps && vs && vs.det != null && ps.det > vs.det + 0.5) {
+                wins.push((ps.det - vs.det).toFixed(0) + ' pp more GT hands');
+            }
+            if (ps && av && ps.kbps <= av.kbps * 1.25) {
+                wins.push('matched bitrate');
+            }
+            document.getElementById('hud-latency').textContent = wins.length ? 'PS win' : (ps && av ? 'AV1 wins detection' : '18.4 ms');
+            document.getElementById('hud-latency-sub').textContent = wins.length
+                ? (CLIPS[currentClipId].name + ': ' + wins.join(' · ') + '. E2E 18.4 ms.')
+                : (ps && av && vs && vs.det > ps.det
+                    ? ('On this rung AV1 recovers more GT hands (' + vs.det.toFixed(1) + '% vs ' + ps.det.toFixed(1) + '%). Joint error still favors PS when MPJPE is lower.')
+                    : 'PointStream parallel encode+decode 18.4 ms (serial 32.0 ms).');
+            document.getElementById('hud-card-call').className = wins.length ? 'hud-card orange' : 'hud-card';
+        }
+
+        function loadCurrentStreams() {
+            const leftKey = document.getElementById('select-left').value;
+            const rightKey = document.getElementById('select-right').value;
+            return Promise.all([
+                loadVideo(videoA, streamFile(currentClipId, leftKey)),
+                loadVideo(videoB, streamFile(currentClipId, rightKey)),
+                loadVideo(videoC, streamFile(currentClipId, 'ref')),
+            ]).then(() => {
+                syncFromMaster();
+                redrawCanvas();
+            }).catch(err => console.error(err));
+        }
+
         function selectClip(clipId) {
             currentClipId = clipId;
             ['clip1', 'clip2', 'clip3'].forEach(id => {
                 const btn = document.getElementById('btn-' + id);
-                btn.className = (id === clipId.replace('_', '')) ? 'btn active' : 'btn';
+                btn.className = (id === CLIP_BTN[clipId]) ? 'btn active' : 'btn';
             });
-
             const info = CLIPS[clipId];
-            video.src = info.video;
-            video.load();
-
-            // Update HUD
-            document.getElementById('hud-bitrate').textContent = info.ps_mult;
-            document.getElementById('hud-bitrate-sub').textContent = `4,200 kbps → ${info.ps_rate} (PointStream)`;
-            document.getElementById('hud-mpjpe').textContent = info.mpjpe;
-            document.getElementById('hud-mpjpe-sub').textContent = info.mpjpe_sub;
-            document.getElementById('hud-keypoint').textContent = info.kp_rate;
-            document.getElementById('hud-latency').textContent = info.latency;
             document.getElementById('rd-curve-img').src = info.rd_img;
-
-            // Fetch Keypoints JSON
+            relabelDropdowns();
+            updateWinCards();
+            updateStreamSelection();
+            loadCurrentStreams();
             fetch(info.keypoints)
                 .then(r => r.json())
-                .then(data => {
-                    keypointsData = data;
-                    redrawCanvas();
-                })
-                .catch(e => {
-                    console.warn("Keypoints JSON load warning:", e);
-                    keypointsData = null;
-                });
+                .then(data => { keypointsData = data; redrawCanvas(); })
+                .catch(e => { console.warn("Keypoints JSON load warning:", e); keypointsData = null; });
+        }
 
-            video.addEventListener('loadeddata', () => {
-                redrawCanvas();
-            }, { once: true });
+        function onStreamChange(which) {
+            if (which === 'left') {
+                const leftKey = document.getElementById('select-left').value;
+                if (MATCH_AV1[leftKey]) {
+                    document.getElementById('select-right').value = MATCH_AV1[leftKey];
+                }
+            }
+            updateWinCards();
+            updateStreamSelection();
+            loadCurrentStreams();
         }
 
         function setViewMode(mode) {
@@ -885,12 +1120,8 @@ class StreamingCodecAdapter(Protocol):
         function updateStreamSelection() {
             const leftVal = document.getElementById('select-left').value;
             const rightVal = document.getElementById('select-right').value;
-
-            const leftNames = { 'ps_std': 'PointStream Standard (293 kbps)', 'ps_low': 'PointStream Ultra-Low (263 kbps)', 'ref': 'Reference Ground Truth' };
-            const rightNames = { 'av1_540': 'AV1 540p p7 (Matched Rate: 267 kbps)', 'ref': 'Reference Ground Truth', 'ps_std': 'PointStream Standard' };
-
-            document.getElementById('badge-left-label').textContent = '◄ ' + (leftNames[leftVal] || leftVal);
-            document.getElementById('badge-right-label').textContent = (rightNames[rightVal] || rightVal) + ' ►';
+            document.getElementById('badge-left-label').textContent = '◄ ' + formatStream(leftVal);
+            document.getElementById('badge-right-label').textContent = formatStream(rightVal) + ' ►';
             redrawCanvas();
         }
 
@@ -926,57 +1157,56 @@ class StreamingCodecAdapter(Protocol):
 
         // Playback Control
         function togglePlay() {
-            if (video.paused) {
-                video.play().then(() => {
+            if (videoA.paused) {
+                Promise.all(videos.map(v => v.play().catch(() => {}))).then(() => {
                     btnPlay.textContent = '⏸ Pause';
                     requestAnimationFrame(renderLoop);
-                }).catch(e => console.error(e));
+                });
             } else {
-                video.pause();
+                videos.forEach(v => v.pause());
                 btnPlay.textContent = '▶ Play';
             }
         }
 
         function stepFrame(delta) {
-            video.pause();
+            videos.forEach(v => v.pause());
             btnPlay.textContent = '▶ Play';
-            const fps = 30.0;
-            video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + delta / fps));
+            const next = Math.max(0, Math.min(videoA.duration || 10, videoA.currentTime + delta / 30.0));
+            videos.forEach(v => { try { v.currentTime = next; } catch (e) {} });
             redrawCanvas();
         }
 
         function onScrub(val) {
-            const time = (val / 1000.0) * video.duration;
-            video.currentTime = time;
+            const time = (val / 1000.0) * (videoA.duration || 0);
+            videos.forEach(v => { try { v.currentTime = time; } catch (e) {} });
             redrawCanvas();
         }
 
         function setSpeed(speed) {
-            video.playbackRate = speed;
+            videos.forEach(v => { v.playbackRate = speed; });
             ['025', '05', '1'].forEach(id => {
                 const btn = document.getElementById('speed-' + id);
                 btn.className = (id === (speed === 1 ? '1' : String(speed).replace('.', ''))) ? 'btn active' : 'btn';
             });
         }
 
-        // Video Update Event
-        video.addEventListener('timeupdate', () => {
-            if (!video.duration) return;
-            timeline.value = (video.currentTime / video.duration) * 1000;
-            const currentF = Math.floor(video.currentTime * 30.0);
-            const totalF = Math.floor(video.duration * 30.0) || 300;
-            const m = Math.floor(video.currentTime / 60);
-            const s = (video.currentTime % 60).toFixed(2).padStart(5, '0');
+        videoA.addEventListener('timeupdate', () => {
+            if (!videoA.duration) return;
+            syncFromMaster();
+            timeline.value = (videoA.currentTime / videoA.duration) * 1000;
+            const currentF = Math.floor(videoA.currentTime * 30.0);
+            const totalF = Math.floor(videoA.duration * 30.0) || 300;
+            const m = Math.floor(videoA.currentTime / 60);
+            const s = (videoA.currentTime % 60).toFixed(2).padStart(5, '0');
             timeDisplay.textContent = `0${m}:${s} / 00:10.00 (F${currentF}/${totalF})`;
         });
 
-        video.addEventListener('ended', () => {
+        videoA.addEventListener('ended', () => {
             btnPlay.textContent = '▶ Play';
         });
 
-        // Continuous Render Loop while playing
         function renderLoop() {
-            if (!video.paused && !video.ended) {
+            if (!videoA.paused && !videoA.ended) {
                 redrawCanvas();
                 requestAnimationFrame(renderLoop);
             }
@@ -984,47 +1214,38 @@ class StreamingCodecAdapter(Protocol):
 
         // Canvas Rendering Engine
         function redrawCanvas() {
-            if (!video.videoWidth) return;
+            if (!videoA.videoWidth || !videoB.videoWidth) return;
 
             const w = canvas.width;
             const h = canvas.height;
             const leftKey = document.getElementById('select-left').value;
             const rightKey = document.getElementById('select-right').value;
-            const sy_left = STREAM_Y[leftKey] || 2160;
-            const sy_right = STREAM_Y[rightKey] || 1080;
 
             if (currentMode === 'stacked') {
-                // Render full 3 panels (1920x3240)
-                ctx.drawImage(video, 0, 0, 1920, 3240, 0, 0, w, h);
-                drawSkeletonOverlay(ctx, 0, 0, 1920, 1080);
-                drawSkeletonOverlay(ctx, 0, 1080, 1920, 1080);
-                drawSkeletonOverlay(ctx, 0, 2160, 1920, 1080);
+                const row = Math.round(h / 3);
+                ctx.drawImage(videoC.videoWidth ? videoC : videoA, 0, 0, 1920, 1080, 0, 0, w, row);
+                ctx.drawImage(videoB, 0, 0, 1920, 1080, 0, row, w, row);
+                ctx.drawImage(videoA, 0, 0, 1920, 1080, 0, row * 2, w, row);
+                drawSkeletonOverlay(ctx, 0, 0, w, row);
+                drawSkeletonOverlay(ctx, 0, row, w, row);
+                drawSkeletonOverlay(ctx, 0, row * 2, w, row);
                 return;
             }
 
             if (currentMode === 'split') {
                 const splitX = Math.round(w * splitFraction);
-
-                // Draw Left stream slice
                 if (splitX > 0) {
-                    ctx.drawImage(video, 0, sy_left, splitX, 1080, 0, 0, splitX, h);
+                    ctx.drawImage(videoA, 0, 0, Math.round(1920 * splitFraction), 1080, 0, 0, splitX, h);
                 }
-                // Draw Right stream slice
                 if (splitX < w) {
-                    ctx.drawImage(video, splitX, sy_right, w - splitX, 1080, splitX, 0, w - splitX, h);
+                    ctx.drawImage(videoB, Math.round(1920 * splitFraction), 0, 1920 - Math.round(1920 * splitFraction), 1080, splitX, 0, w - splitX, h);
                 }
-
-                // Error Heatmap overlay if toggled
                 if (document.getElementById('toggle-difference').checked) {
                     drawDifferenceHeatmap(ctx, splitX, w, h);
                 }
-
-                // 47-Byte Keypoint Skeleton overlay
                 if (document.getElementById('toggle-skeleton').checked) {
                     drawSkeletonOverlay(ctx, 0, 0, w, h);
                 }
-
-                // Dividing Line
                 ctx.strokeStyle = '#38bdf8';
                 ctx.lineWidth = 3;
                 ctx.shadowColor = 'rgba(56, 189, 248, 0.9)';
@@ -1033,27 +1254,25 @@ class StreamingCodecAdapter(Protocol):
                 ctx.moveTo(splitX, 0);
                 ctx.lineTo(splitX, h);
                 ctx.stroke();
-                ctx.shadowBlur = 0; // reset
+                ctx.shadowBlur = 0;
             } else if (currentMode === 'side_by_side') {
                 const halfW = Math.round(w / 2);
-                ctx.drawImage(video, 0, sy_left, 1920, 1080, 0, 0, halfW, h);
-                ctx.drawImage(video, 0, sy_right, 1920, 1080, halfW, 0, halfW, h);
-
-                // Center divider
+                ctx.drawImage(videoA, 0, 0, 1920, 1080, 0, 0, halfW, h);
+                ctx.drawImage(videoB, 0, 0, 1920, 1080, halfW, 0, halfW, h);
+                if (document.getElementById('toggle-difference').checked) {
+                    drawDifferenceHeatmap(ctx, halfW, w, h);
+                }
                 ctx.strokeStyle = '#475569';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
                 ctx.moveTo(halfW, 0);
                 ctx.lineTo(halfW, h);
                 ctx.stroke();
-
                 if (document.getElementById('toggle-skeleton').checked) {
                     drawSkeletonOverlay(ctx, 0, 0, halfW, h);
                     drawSkeletonOverlay(ctx, halfW, 0, halfW, h);
                 }
             } else if (currentMode === 'zoom') {
-                // Hand Articulation Loupe Mode
-                // Find active hand center from keypoints
                 let cx = 960, cy = 600;
                 const handInfo = getActiveHandPose();
                 if (handInfo && handInfo.bbox) {
@@ -1061,36 +1280,29 @@ class StreamingCodecAdapter(Protocol):
                     cx = (bx1 + bx2) / 2;
                     cy = (by1 + by2) / 2;
                 }
-
                 const cropSize = 480;
                 const srcX = Math.max(0, Math.min(1920 - cropSize, cx - cropSize / 2));
                 const srcY = Math.max(0, Math.min(1080 - cropSize, cy - cropSize / 2));
                 const halfW = Math.round(w / 2);
-
-                // Left: PointStream zoomed
-                ctx.drawImage(video, srcX, sy_left + srcY, cropSize, cropSize, 0, 0, halfW, h);
-                // Right: AV1 zoomed
-                ctx.drawImage(video, srcX, sy_right + srcY, cropSize, cropSize, halfW, 0, halfW, h);
-
-                // Divider & labels
+                ctx.drawImage(videoA, srcX, srcY, cropSize, cropSize, 0, 0, halfW, h);
+                ctx.drawImage(videoB, srcX, srcY, cropSize, cropSize, halfW, 0, halfW, h);
+                if (document.getElementById('toggle-difference').checked) {
+                    drawDifferenceHeatmap(ctx, halfW, w, h, srcX, srcY, cropSize);
+                }
                 ctx.strokeStyle = '#38bdf8';
                 ctx.lineWidth = 3;
                 ctx.beginPath();
                 ctx.moveTo(halfW, 0);
                 ctx.lineTo(halfW, h);
                 ctx.stroke();
-
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
                 ctx.fillRect(20, h - 60, halfW - 40, 44);
                 ctx.fillRect(halfW + 20, h - 60, halfW - 40, 44);
-
                 ctx.fillStyle = '#4ade80';
                 ctx.font = 'bold 18px sans-serif';
-                ctx.fillText('PointStream (293k): Sharp Joint Articulation & Rigidity', 40, h - 32);
-
+                ctx.fillText(formatStream(leftKey), 40, h - 32);
                 ctx.fillStyle = '#fb923c';
-                ctx.fillText('AV1 540p (267k): Finger Tearing & Motion Blur Smear', halfW + 40, h - 32);
-
+                ctx.fillText(formatStream(rightKey), halfW + 40, h - 32);
                 if (document.getElementById('toggle-skeleton').checked) {
                     drawSkeletonZoomed(ctx, 0, 0, halfW, h, srcX, srcY, cropSize);
                     drawSkeletonZoomed(ctx, halfW, 0, halfW, h, srcX, srcY, cropSize);
@@ -1100,7 +1312,7 @@ class StreamingCodecAdapter(Protocol):
 
         function getActiveHandPose() {
             if (!keypointsData || !keypointsData.frames) return null;
-            const fIdx = Math.floor(video.currentTime * 30.0);
+            const fIdx = Math.floor(videoA.currentTime * 30.0);
             const frameEntry = keypointsData.frames.find(f => f.frame === fIdx);
             if (frameEntry && frameEntry.hands && frameEntry.hands.length > 0) {
                 return frameEntry.hands[0];
@@ -1111,7 +1323,7 @@ class StreamingCodecAdapter(Protocol):
         // Draw 47-Byte Keypoint Skeleton Overlay
         function drawSkeletonOverlay(targetCtx, offsetX, offsetY, drawW, drawH) {
             if (!keypointsData || !keypointsData.frames) return;
-            const fIdx = Math.floor(video.currentTime * 30.0);
+            const fIdx = Math.floor(videoA.currentTime * 30.0);
             const frameEntry = keypointsData.frames.find(f => f.frame === fIdx);
             if (!frameEntry || !frameEntry.hands) return;
 
@@ -1176,7 +1388,7 @@ class StreamingCodecAdapter(Protocol):
         // Zoomed Skeleton Overlay for Loupe Mode
         function drawSkeletonZoomed(targetCtx, offsetX, offsetY, drawW, drawH, srcX, srcY, cropSize) {
             if (!keypointsData || !keypointsData.frames) return;
-            const fIdx = Math.floor(video.currentTime * 30.0);
+            const fIdx = Math.floor(videoA.currentTime * 30.0);
             const frameEntry = keypointsData.frames.find(f => f.frame === fIdx);
             if (!frameEntry || !frameEntry.hands) return;
 
@@ -1214,16 +1426,79 @@ class StreamingCodecAdapter(Protocol):
             });
         }
 
-        // Difference Heatmap Generator
-        function drawDifferenceHeatmap(targetCtx, splitX, w, h) {
-            // Draw a subtle false-color error tint on the right side
-            targetCtx.save();
-            targetCtx.fillStyle = 'rgba(251, 146, 60, 0.12)';
-            targetCtx.fillRect(splitX, 0, w - splitX, h);
-            targetCtx.fillStyle = '#fb923c';
-            targetCtx.font = 'bold 13px sans-serif';
-            targetCtx.fillText('▲ High Spatial Distortion & Blocking Artifacts', splitX + 20, 40);
-            targetCtx.restore();
+        const HEAT_W = 480;
+        const HEAT_H = 270;
+        const heatSrc = document.createElement('canvas');
+        const heatRef = document.createElement('canvas');
+        const heatLeft = document.createElement('canvas');
+        const heatRight = document.createElement('canvas');
+        [heatSrc, heatRef, heatLeft, heatRight].forEach(c => { c.width = HEAT_W; c.height = HEAT_H; });
+        const heatSrcCtx = heatSrc.getContext('2d', { willReadFrequently: true });
+        const heatRefCtx = heatRef.getContext('2d', { willReadFrequently: true });
+        const heatLeftCtx = heatLeft.getContext('2d');
+        const heatRightCtx = heatRight.getContext('2d');
+
+        function pixelErrorOverlay(srcVideo, destCanvas, destCtx, cropX, cropY, cropSize) {
+            if (!videoC.videoWidth || !srcVideo.videoWidth) return null;
+            heatRefCtx.drawImage(videoC, 0, 0, HEAT_W, HEAT_H);
+            heatSrcCtx.drawImage(srcVideo, 0, 0, HEAT_W, HEAT_H);
+            const ref = heatRefCtx.getImageData(0, 0, HEAT_W, HEAT_H);
+            const src = heatSrcCtx.getImageData(0, 0, HEAT_W, HEAT_H);
+            const out = destCtx.createImageData(HEAT_W, HEAT_H);
+            const rd = ref.data, sd = src.data, od = out.data;
+            for (let i = 0; i < sd.length; i += 4) {
+                const mag = (Math.abs(sd[i] - rd[i]) + Math.abs(sd[i + 1] - rd[i + 1]) + Math.abs(sd[i + 2] - rd[i + 2])) / 3;
+                const t = Math.min(1, Math.max(0, (mag - 8) / 70));
+                od[i] = Math.min(255, 40 + t * 255);
+                od[i + 1] = Math.min(255, t * t * 80);
+                od[i + 2] = Math.min(255, (1 - t) * 30);
+                od[i + 3] = t > 0.04 ? Math.round(40 + t * 200) : 0;
+            }
+            destCtx.putImageData(out, 0, 0);
+            if (cropSize) {
+                const sx = cropX * HEAT_W / 1920;
+                const sy = cropY * HEAT_H / 1080;
+                const sw = cropSize * HEAT_W / 1920;
+                const sh = cropSize * HEAT_H / 1080;
+                heatRefCtx.clearRect(0, 0, HEAT_W, HEAT_H);
+                heatRefCtx.drawImage(destCanvas, sx, sy, sw, sh, 0, 0, HEAT_W, HEAT_H);
+                destCtx.clearRect(0, 0, HEAT_W, HEAT_H);
+                destCtx.drawImage(heatRef, 0, 0);
+            }
+            return destCanvas;
+        }
+
+        function drawDifferenceHeatmap(targetCtx, splitX, w, h, cropX, cropY, cropSize) {
+            try {
+                const leftMap = pixelErrorOverlay(videoA, heatLeft, heatLeftCtx, cropX, cropY, cropSize);
+                const rightMap = pixelErrorOverlay(videoB, heatRight, heatRightCtx, cropX, cropY, cropSize);
+                if (!leftMap || !rightMap) return;
+                targetCtx.save();
+                if (splitX > 0) {
+                    targetCtx.save();
+                    targetCtx.beginPath();
+                    targetCtx.rect(0, 0, splitX, h);
+                    targetCtx.clip();
+                    targetCtx.drawImage(leftMap, 0, 0, w, h);
+                    targetCtx.restore();
+                }
+                if (splitX < w) {
+                    targetCtx.save();
+                    targetCtx.beginPath();
+                    targetCtx.rect(splitX, 0, w - splitX, h);
+                    targetCtx.clip();
+                    targetCtx.drawImage(rightMap, 0, 0, w, h);
+                    targetCtx.restore();
+                }
+                targetCtx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+                targetCtx.fillRect(16, 12, 430, 28);
+                targetCtx.fillStyle = '#fb923c';
+                targetCtx.font = 'bold 13px sans-serif';
+                targetCtx.fillText('Heatmap: |codec − 1080p reference|  (hotter = more pixel error)', 24, 32);
+                targetCtx.restore();
+            } catch (err) {
+                console.warn('Heatmap unavailable (canvas tainted):', err);
+            }
         }
 
         // Tab Switching
@@ -1238,7 +1513,8 @@ class StreamingCodecAdapter(Protocol):
         }
 
         // Initialize First Clip
-        selectClip('clip_01');
+        selectClip('clip_03');
+        setViewMode('zoom');
     </script>
 </body>
 </html>
