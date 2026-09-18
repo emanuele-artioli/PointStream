@@ -15,15 +15,39 @@ sample.
 
 ### Arm A — picker-style
 
+Codex (three rungs):
+
 1. `trial_a_start`: Terra / low
 2. `trial_a_retry_1`: Sol / low
 3. `trial_a_retry_2`: Sol / medium
 
+Cursor (two rungs; Grok effort is the model slug):
+
+1. `trial-a-start`: Grok 4.6 low
+2. `trial-a-retry`: Grok 4.6 high
+
+Antigravity (two rungs):
+
+1. `trial-a-start`: Gemini 3.8 Flash / low
+2. `trial-a-retry`: Gemini 3.8 Flash / high
+
 ### Arm B — cost-first
+
+Codex (three rungs):
 
 1. `budget_default`: Luna / medium
 2. `balanced_retry`: Terra / medium
 3. `expert_retry`: Sol / medium
+
+Cursor (two rungs):
+
+1. `budget-default`: Composer 2.5
+2. `expert-retry`: Grok 4.6 low
+
+Antigravity (two rungs):
+
+1. `budget-default`: Gemini 3.8 Flash / low
+2. `expert-retry`: Gemini 3.8 Flash / high
 
 ## Automatic session procedure
 
@@ -42,8 +66,11 @@ When a session receives an eligible demo task with a concrete acceptance check:
 5. Add the final result before closing the session. The coordinator integrates
    successful work and reports the record path.
 
-The coordinator must verify child runtime metadata: model, effort, and
-permission mode. A missing or mismatched field invalidates that attempt.
+The coordinator must verify child runtime metadata. On Codex: model, effort,
+and permission mode. On Cursor: the model actually used (Composer vs
+`cursor-grok-4.6-low` / `-high`); there is no separate effort field. On
+Antigravity: model (Flash) and effort tier (low vs high). A missing or
+mismatched field invalidates that attempt.
 
 ## Card record
 
@@ -57,7 +84,7 @@ shared ledger.
 - Demo task and allowed files: <actual task>
 - Acceptance check: `<command>` or <objective review condition>
 - Arm / allocation: A|B / <count-based or tie draw>
-- Attempts: <profile, model, effort, pass/fail, elapsed time for each>
+- Attempts: <profile, model, effort or slug, pass/fail, elapsed time for each>
 - Final result: pass | fail | invalid
 - Coordinator integration time: <minutes>
 - Evidence: <commit, command output, or review notes>

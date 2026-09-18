@@ -49,19 +49,35 @@ Use [docs/setup.md](docs/setup.md) before environment setup or experiment runs, 
 
 Project constraints: data must stay outside the code tree (no `assets/` or `outputs/` symlinks); record the exact native encoder/decoder paths and versions with each run so comparisons are reproducible. Do not run `scripts/cleanup_merged_worktrees.sh` until `INFRA-ACT-01` is resolved: its deletion fallback can discard uncommitted work.
 
-## Codex subagents
+## Subagents
 
-PointStream uses fresh children with the cost-first ladder in `.codex/config.toml`:
-`budget_default` (Luna/medium), then `balanced_retry` (Terra/medium), then
-`expert_retry` (Sol/medium). Escalate only after the predeclared acceptance
-check fails, and record the concrete failure. Pass both model and
-`reasoning_effort`; verify runtime model, effort and permission metadata before
-accepting a child result.
+The parent coordinator delegates bounded parallel lanes by default. It keeps
+integration, shared-contract changes, and the hardest scientific or
+architectural judgment. It does not use demo trial profiles for codec,
+evaluation, paper, GPU, or shared-contract work.
 
-An Astra coordinator delegates bounded parallel lanes by default, retaining
-integration, shared-contract changes and the hardest scientific or architectural
-judgment. It does not use the demo trial profiles for codec, evaluation, paper,
-GPU or shared-contract work.
+Escalate only after a predeclared acceptance check fails, and record that
+failure. Start a **fresh** child on the next rung; do not resume a cheaper
+child to change model. Verify the runtime model (and, on Codex, effort and
+permission metadata) before accepting a child result.
+
+**Codex** — profiles in `.codex/config.toml`, cost-first:
+`budget_default` (Luna/medium) → `balanced_retry` (Terra/medium) →
+`expert_retry` (Sol/medium). Pass both model and `reasoning_effort`.
+
+**Cursor** — profiles in `.cursor/agents/`, cost-first (two rungs; there is
+no Terra equivalent): `budget-default` (Composer 2.5) → `expert-retry`
+(Grok 4.6 low). Spawn by `subagent_type` and omit `model` so the profile
+frontmatter applies. Cursor has no separate effort field; Grok effort is
+the slug (`cursor-grok-4.6-low`). If the Task schema rejects non-fast
+Composer, `composer-2.5-fast` still counts as the Composer rung, not an
+escalation.
+
+**Antigravity** — profiles in `.agents/agents/`, cost-first (two rungs):
+`budget-default` (Gemini 3.8 Flash / low effort) → `expert-retry`
+(Gemini 3.8 Flash / high effort). Spawn by `TypeName` (or pass `Model: "flash"`
+with `effort: low` by default, escalating to `high` on retry). Verify runtime
+model (Flash) and effort metadata before accepting a child result.
 
 For eligible real demo tasks, follow the automatic two-day, 24-card randomized
 trial in [subagent-ladder-trial.md](docs/workflow/session/subagent-ladder-trial.md).
