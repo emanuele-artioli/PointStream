@@ -1,20 +1,110 @@
 # Evaluation Area
 
-## Current review — 16 September 2026
+## E06 lossless floor arms — 17 September 2026
 
-#114 at `c1c68ec` has green CI and reusable four-setting artifacts. Coordinator
-checks matched all stream hashes/byte counts and independently counted 48 frames
-in each ordinary and standalone decoded container. The wrapper nevertheless
-pads/trims raw output before validating shape; a two-frame reproducer became
-48 frames. The decode/reuse gate remains a follow-up on the landed code. Do not
-rerun the four encodes. Native PTS needs pixel-provenance verification, and
-score-free eligibility is not permission to score confirmation.
+#128 is merged. Floor-only probe on the saved bbox residual-off compact
+(`f5e7160…`, pixels `5f2047d…`). Packing succeeded on all four arms
+(exact parent pixels, standalone unpack, physical `T=B+F+M+R+H`, client
+`n_repeats=2`). Predictor quality was **not** rescored; inherited
+20.68 dB / 0.672 SSIM / 18.18 VMAF. No affine/interpolation, confirmation,
+GPU, training, or native re-encodes.
 
-The saved E03B VMAF alarm has supporting same-grid severe-blur calibration at the
-floor; retain original bounds and write a separate disposition. Scope the result
-to one development scene and single-run timing. E04A background-region metrics
-and background-only bytes cannot be compared directly to whole-frame anchors.
-Follow the [review and focused assignments](../workflow/session/evaluation-campaign/tasks/20260916-probe-review.md).
+| Setting | Packing | T (B) | vs VVC 21288 |
+|---|---|---|---|
+| control compact | pass | 30297 | above |
+| per-frame mask RLE | pass | 17581 | below |
+| XOR key every 4 | pass | 22055 | above |
+| thin placement/metadata | pass | 28125 | above |
+
+Lowest T is under both saved anchors, but quality remains ~4 dB below VVC
+QP47 24.6 dB, so this is not a codec win. XOR lost to intra RLE on this
+stack. Thin metadata saved ~2 kB; zip/JSON was not the 10 kB floor.
+Artifacts: `outputs/evaluation-20260914/e06/probe-20260917-floor-arms/`
+(`floor_report.json` SHA-256
+`0bd1e7cb0797ecda7b9174b6ea294cb91d0a72294d92e53e76fb581dd31c4026`).
+Wall 13.5 s on gpu5. `code_head` in that JSON is parent `6b150f3`; the
+packer lands in this PR. Next: decide whether to run the residual-off
+predictor arms now that rate headroom exists.
+
+## Claim-eligibility acceptance and floor/predictor card — 17 September 2026
+
+#128 now fails closed unless client timing has at least two reconstructions
+(`repeat_seconds` or per-stage `n` matching `n_repeats≥2`), every present
+PSNR/SSIM/VMAF value is finite and in domain, and per-video fitted
+`charged_bytes` sit inside claimed `total_bytes`. Missing speed still leaves
+a valid RD row eligible. The saved compact bbox residual-off point remains
+30297 B at 20.7 dB, above VVC QP47 21288 B / 24.6 dB, so this full-codec
+configuration stays stopped as a win search. The next discriminating step is
+the unlaunched card
+[evaluation_20260917_e06_floor_predictor_probe.json](../../manifests/evaluation_20260917_e06_floor_predictor_probe.json):
+six residual-off settings on mask/placement/framing versus predictor quality,
+no encodes or training in this session.
+
+
+## Pilot return audit — 16 September 2026
+
+E06/#121 is merged (`c656ee6`, launch `def647a`). Four saved transport reports,
+ledgers and hashes match; accept stopping this configuration as a codec win search.
+No broad win/BD-rate follows. Derived lossless packing and client deserialize/decode/render
+timing live under `outputs/evaluation-20260914/e06/audit-20260916-lossless-pack/`.
+Claim eligibility now fails closed on missing calibration, blank controls, undeclared
+deployment cost, and combined encoder+score seconds. Follow
+[the reuse assignments](../workflow/session/evaluation-campaign/tasks/20260916-return-audit-and-reuse.md).
+
+
+## Historical conditional release — 16 September 2026
+
+#117 at `d700a93` is accepted and merged as `015c971`, with green exact-head CI.
+The decode repair preserves saved artifacts; native-seek pixel provenance remains
+unresolved for 47/48 frames, so no native-PTS certification follows. #121 continues
+on `codex/e06-20260916` after `a28c98f`: serialized transport, complete
+`T=B+F+M+R+H` reconciliation, and honest predictor names
+(`per_frame_crop`, `bbox_resized_first_reference`). Four E06 settings launch only
+after this revision is merged with green CI. No anchor/background re-encodes or
+confirmation scores. Follow
+[the current launch gates](../workflow/session/evaluation-campaign/tasks/20260916-bounded-pilot-release.md).
+
+
+## Coordinator readiness — 16 September 2026
+
+Neural anchor source and paper are pinned in
+[the readiness record](../../manifests/evaluation_20260916_neural_anchor_readiness.json).
+DCVC-UF is not yet installed or round-trip verified: the official weight link
+returns HTTP 403, the current Python interpreter rejects upstream syntax, and
+UF-compatible Torch/CUDA extensions remain required. A separate Python3.12 RT
+CPU entropy extension builds and passes a fresh-process synthetic symbol
+roundtrip; no weights, neural video roundtrip or benchmark is available. GPUs are
+accessible outside the sandbox. No neural RD result or SOTA claim is available.
+The RGB input config uses the exact E03B prepared stack; its native-PTS gap
+remains explicit. No rate ladder is released. The [coordinator audit](../../manifests/evaluation_20260916_coordinator_readiness_audit.json)
+records intact hashes for three reserved media and 1390 retained text records
+without source-bound codec-score flags under its binding heuristic. Deleted or
+unrecorded use is outside its scope; replay/duplicate review, decoded-frame
+preroll and protocol freeze remain open. Confirmation scoring stays unauthorized.
+
+
+## Historical review — 16 September 2026
+
+#114 merged as `9c6609f`. Follow-up on `codex/e03b-20260916` repairs the decode
+gate: empty, partial, short and extra RGB24 dumps fail before reshape or pad.
+Ordinary vs standalone pixels must match. Completed run directories refuse
+overwrite; prepared reuse checks stack SHA-256 and seek/filter identity.
+Verification records go in a new directory; the four charged encodes are not
+repeated. `df9f945` descends from required baseline `8eb045a`. Score-free
+eligibility is not authorization to score confirmation.
+Verification (decode-only, no new encodes):
+`outputs/evaluation-20260914/e03b/verify-20260916-acceptance/`. Four bitstream
+hashes match campaign rows; eight containers are 48×640×360; ordinary and
+standalone RGB dumps match. Original `probe_report` SHA-256
+`62ac0b15228001f7598958d501df133003d8c6faea0b5b6947670a3839fc45f7` and
+`bounds.json` SHA-256
+`77c30b5b2d81da8bd8abe50e41150571db9d7615bcbdf3ee0657f1cbdb5c2d9a` unchanged.
+Native PTS mapping is preserved; 1/48 selected PNGs match a native seek at the
+mapped PTS (first frame). The other 47 differ (mean abs ~2). That remaining
+uncertainty concerns extract-grid versus native-seek provenance, recorded in
+`derived_native_mapping.json`. Verification JSON SHA-256
+`2df757a43970c28083c24b8930ac8dd860a9acba356d706800cb5707429192f6`. Score-free
+eligibility is not permission to score.
 
 ## E03B probe record — 16 September 2026
 

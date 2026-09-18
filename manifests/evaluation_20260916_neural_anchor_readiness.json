@@ -1,0 +1,134 @@
+{
+  "schema": "pointstream.neural_anchor_readiness.v1",
+  "campaign": "evaluation-20260914",
+  "status": "prepared_not_roundtrip_verified",
+  "upstream_repository": "https://github.com/microsoft/DCVC",
+  "upstream_commit": "cbdae87a5445114cdc7f48816da63ea80bdeac40",
+  "paper": "https://arxiv.org/abs/2606.04410v1",
+  "preferred_model": "DCVC-UF HT-S offline; LD separately for low-delay",
+  "source_file_hashes": {
+    "README.md": "05cbef14954e37882c28c0299693962c0edf4f2cc7a28f53ca99d010e2989b40",
+    "test_video.py": "6597af5cb9a86b6be1d8d3ed8534b88e45c9ef882cc2de14d11ed07dee892d7b",
+    "requirements.txt": "20b530952891b70f6ed1dc96bc63b5c90a5066e4b6696ce00d12b221eae6e758",
+    "src/utils/stream_helper.py": "2d470e3692209be0301b5da48c33c9b7a372be865ccb458d4a5358c7bc55fac4"
+  },
+  "upstream_documented_stack": {
+    "python": "3.12",
+    "torch_tested": "2.9.1",
+    "cuda_tested": "13.0",
+    "cutlass_tag": "v4.4.1",
+    "extensions": [
+      "MLCodec_extensions_cpp",
+      "inference_extensions_cuda"
+    ]
+  },
+  "observed_host": {
+    "name": "gpu5",
+    "gpus": [
+      "RTX 6000 Ada",
+      "RTX 6000 Ada"
+    ],
+    "gpu_access": "verified outside sandbox",
+    "pointstream_python": "3.10.20",
+    "pointstream_torch": "2.2.2+cu121",
+    "torch_cuda": "12.1",
+    "cuda_available": true,
+    "nvcc_on_path": false
+  },
+  "checkpoint_status": {
+    "local_upstream_checkpoint_directory": "empty",
+    "official_primary_link_http_status": 403,
+    "model_file_sha256": null,
+    "note": "Official UF, RT and all-model backup folder links all return HTTP403 in shell. No checkpoint downloaded or authenticated.",
+    "official_link_recheck": {
+      "checked_utc": "2026-09-16T20:52:54.546492+00:00",
+      "request": "redirect-following HEAD; no model bytes downloaded",
+      "http_status": {
+        "DCVC-UF_primary": 403,
+        "DCVC-RT_primary": 403,
+        "upstream_all_models_backup": 403
+      }
+    }
+  },
+  "compatibility_blockers": [
+    "UF compatible Torch/CUDA environment and CUDA extension still required",
+    "checkpoint file identity unresolved; official links return HTTP403"
+  ],
+  "fallback": {
+    "model": "DCVC-RT",
+    "paper": "https://arxiv.org/abs/2502.20762v2",
+    "source_subdirectory": "DCVC-family/DCVC-RT",
+    "documented_cuda": "12.6",
+    "color_path": "official README recommends YUV420; conversion must be recorded and shared reference identity verified",
+    "status": "RT CPU entropy extension built; synthetic fresh-process roundtrip verified; no neural video roundtrip",
+    "reason": "less demanding documented CUDA stack; does not bypass weight/GPU/native entropy requirements"
+  },
+  "input": {
+    "prepared_path": "$PS_DATA_ROOT/outputs/evaluation-20260914/e03b/run-20260916-federer007/prepared_rgb.npy",
+    "array_sha256": "1f02475a5bbc3d94e4bae2e904dc29c3af3082be0c0c160e027b706a6950f6f8",
+    "shape": [
+      48,
+      360,
+      640,
+      3
+    ],
+    "nominal_fps": 12,
+    "native_pts_verified": false,
+    "export_config": "manifests/evaluation_20260916_dcvc_uf_rgb_config.json",
+    "export_status": "48 PNGs exported; each decoded pixel-equal to prepared RGB",
+    "export_config_note": "Repository config is a portable template. Resolve root_path to the actual data root before calling upstream; upstream does not expand shell variables in JSON."
+  },
+  "budget_card": {
+    "status": "proposed_unmeasured_not_execution_release",
+    "environment_and_weights_active_preparation_hours_cap": 2,
+    "synthetic_native_entropy_roundtrip_wall_minutes_cap": 15,
+    "matched48frame_one_qp_wall_minutes_cap": 15,
+    "gpu_hours_cap": 0.5,
+    "rate_ladder_encodes_released": 0,
+    "stop": "If weights or native compatibility unresolved, return exact blocker; no retraining or multi-rate sweep"
+  },
+  "acceptance": [
+    "pin downloaded image/video weight hashes and installation assumptions",
+    "use separate environment; never mutate PointStream env",
+    "verify entropy-coded bitstream bytes and independently decoded output in fresh process with source access removed",
+    "score calibrated common display/timebase inputs; count startup, chunk lookahead and sender/client time",
+    "register bounds before scores and return measured pilot cost before ladder release"
+  ],
+  "prepared_artifacts": {
+    "commit": "cbdae87a5445114cdc7f48816da63ea80bdeac40",
+    "archive": "$PS_DATA_ROOT/outputs/evaluation-20260914/e03-neural/dcvc-uf-cbdae87a-source.tar",
+    "archive_sha256": "95b28b8935611301e9e09ce8942b8dd9ab8622d3324443d83ca8a0edf907e631",
+    "input_verification": "$PS_DATA_ROOT/outputs/evaluation-20260914/e03-neural/prepared-rgb/input_export_verification.json",
+    "input_verification_sha256": "ab233e8187d99a600c58064b445a1dc0705f03ff5ef533661d6de632d6ebfe74"
+  },
+  "upstream_driver_caveats": [
+    "test_video.py labels kbps using assumed 30fps; campaign input is 12fps. Compute wire bitrate independently from actual bytes and 4s display duration.",
+    "HT model frame_delay is eight; driver excludes first four chunks (32 frames) from timing. Record cold and steady timing separately; 48 frames leave only 16 frames after warmup.",
+    "Upstream combined runner reopens source frames during decoding for scoring. A separate fresh-process decode-only wrapper with source access removed is still required for standalone certification.",
+    "Official PNGReader supports im00001.png sequence; prepared export conforms."
+  ],
+  "fallback_documented_stack": {
+    "model": "DCVC-RT",
+    "python": "3.12",
+    "pytorch_tested": "2.6",
+    "cuda_documented": "12.6",
+    "source": "pinned DCVC-family/DCVC-RT/README.md",
+    "cuda_kernel_fallback": "upstream documents PyTorch fallback; entropy bitstream extension still required"
+  },
+  "native_entropy_preflight": {
+    "python": "3.12.14",
+    "compiler": "g++11.4.0",
+    "numpy": "2.5.3",
+    "pybind11": "3.1.0",
+    "upstream_subdirectory": "DCVC-family/DCVC-RT",
+    "native_extension_sha256": "3cc818ca05f91030d6d82bef3fd88c6a6145d87402a264a9b793caf91b3333aa",
+    "build_command": "python setup.py build_ext --inplace in upstream src/cpp; unchanged source",
+    "synthetic_symbols": 384,
+    "stream_bytes": 100,
+    "stream_sha256": "f5460f783460484b7c87156048e7494b0ca8e1bf1de1335e6db2f73b9f13d058",
+    "fresh_process_symbol_equality": true,
+    "gpu_jobs": 0,
+    "weights_downloaded": false,
+    "qualification": "CPU entropy toolchain only; not neural video evaluation. Isolated temporary Python environment; PointStream environment unchanged."
+  }
+}

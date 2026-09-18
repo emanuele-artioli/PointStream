@@ -1,6 +1,29 @@
 # Generation Area
 
-## Current review — 16 September 2026
+## Pilot return audit — 16 September 2026
+
+#118 and #125 are merged; the bounded E05 pix2pix pilot executed, but its
+complete-control claim is not accepted. Blank conditioning is absent because its
+CLI flag always resolves false; object/temporal/calibration evidence and wire-alarm
+closure remain open. The 217,736,406-byte fitted checkpoint has no declared
+receiver/deployment-cost policy. Keep no Stage2 promotion, preserve the family,
+and complete only saved-checkpoint evidence within the original remaining budget.
+Follow [the reuse assignments](../workflow/session/evaluation-campaign/tasks/20260916-return-audit-and-reuse.md).
+
+
+## Historical conditional release — 16 September 2026
+
+#118 at `e73c8ba` has green CI. Corrected first-reference/domain handling and
+exact tested G/D/Adam-moment CPU CLI continuation are advances; no CUDA identity
+claim is accepted. The card still lacks a real tiny subset, valid evaluator/API
+commands and an aggregate deadline. The current brief authorizes these fixes
+then a conditional E05 pilot within one total GPU-hour, including diagnostics
+and ambiguity extension. Federer scene 007 is development; the reserved trio is
+quarantined. #118 is not accepted as an executable release at its reviewed head.
+Follow [the current launch gates](../workflow/session/evaluation-campaign/tasks/20260916-bounded-pilot-release.md).
+
+
+## Historical review — 16 September 2026
 
 #109 at `c9c4ded` has green CI, an actual fresh-CLI continuation regression,
 restored Python RNG and isolated DataLoader RNG. Supplied diagnostic/adapter
@@ -159,7 +182,7 @@ result that determines the next experiment; no family-wide claims from one pilot
 - **E01 Schema Adapter**: Implemented `src/runner/generation_adapter.py` with fail-closed validation of experiment identity, conditioning sensitivity, same-seed determinism, timing evidence, and claim eligibility.
 - **Candidate Cards & Roster**: Documented candidate roster, native training recipes, hyperparameter endpoints, and 3-stage budgets in `docs/workflow/session/evaluation-campaign/tasks/02-generator-readiness-report.md`.
 
-`GEN-ACT-11` — **In Progress (E02S Acceptance Completion)** (E02R/E02S Generator Readiness & Real-Backend Evidence, 2026-09-14).
+`GEN-ACT-11` — **Complete** (E02R Generator Readiness & Real-Backend Evidence, 2026-09-14).
 - **Exact E01 Result Contract Roundtrip**: Upgraded `src/runner/generation_adapter.py` (Cursor-owned after #104) to produce schema `pointstream.campaign_result.v1` with full 64-hex SHA-256 digest validation, handling real producer `matrix` outputs from `run_diagnostic_matrix.py`, single-source grouped uncertainty without artificial zero-width assumptions, and fail-closed claim eligibility (`standalone_transport=True`, `rd=False` with explicit reason exclusions, `generalization=False` with single-source exclusions). Validated against E01 schema validator (`validate_campaign_record` and `ingest_for_claim`).
 - **Residual-OFF Disabling & Ranking**: Repaired `scripts/train_campaign.py:evaluate_checkpoint` so `residual_settings=None` disables `STAGE_RESIDUAL` in `StageLattice`, sets `residual_cfg=None`, records `residual_bytes=0` and `residual_calls=0`. Updated `rank_variants` to rank on total wire rate when residual is OFF, removing min-max composite.
 - **Intra-Epoch Hourly Checkpointing & Atomic State Capture**: Enhanced `scripts/train_pix2pix.py` and `scripts/train_spade4tennis.py` with intra-epoch hourly deadline checks inside batch loops, atomic saving (`save_checkpoint_atomic`), full state capture (`epoch`, `step`, `G`, `D`, `opt_G`, `opt_D`, `sched_G`, `sched_D`, RNGs), and partial-epoch skip resume semantics.
@@ -174,4 +197,51 @@ result that determines the next experiment; no family-wide claims from one pilot
     - `diagnostic_matrix_pix2pix_scene028.json` (SHA-256: `cec034102a3e00c2073158807278312ea3f7ccf56221918331e86dc308af7426`)
     - `campaign_result_pix2pix_scene028.json` (SHA-256: `296dc0c98dc441ab85676cf3d4950b58ff35b6e2ce61f3ae97c2e9db9151df84`)
     - `checkpoint_resume_evidence/pix2pix_interrupted_checkpoint.pt` (SHA-256: `9109f53237098ff71dfcba7f1a25fe24ae23814a06311df56c29ea7782a61e9d`)
+
+`GEN-ACT-12` — **Complete** (E02S Reference Policy & Invalid-Candidate Handling Correction, 2026-09-16).
+- **Reference Policy Correction**: In `src/shared/tennis_dataset.py`, replaced the deterministic target-copy shortcut (`target == ref` for all items) with an explicit, stable reference policy (`REFERENCE_MODES = ("first", "keyframe", "offset", "random", "deterministic")`). Default mode `"first"` anchors references to the start of each track (`colors[0]`), ensuring `ref != target` for all frames $t > 0$ while legitimately allowing target match only on frame 0. Added per-item `item_track_indices` and `get_reference_info(idx)`.
+- **Legacy Checkpoint Shortcut Flagging**: In `scripts/train_pix2pix.py` and `scripts/train_spade4tennis.py`, added `reference_mode` and `used_reference_shortcut: bool` to saved state. On resume, detected legacy and shortcut checkpoints and logged warnings while flagging `used_reference_shortcut = True`, preserving model families without discarding. Added CLI options `--reference-mode`, `--keyframe-interval`, and `--reference-offset`.
+- **Invalid Candidate Handling & Uncertainty Reconciled**: In `scripts/train_campaign.py`, enhanced `is_valid_eval`, `extract_candidate_metrics`, and `compare_candidates` to reject `NaN` and domain-invalid values (`psnr < 0`, `ssim < -1` or `> 1`), marking candidates incomparable. Preserved identity score semantics (+inf PSNR, 1.0 SSIM). Fixed candidate ranking sort key so measured quality candidates rank ahead of unmeasured candidates. Reconciled documented indifference bands with actual values: 2% rate, 0.10 dB PSNR, 0.005 SSIM, 5% relative client time.
+- **Bounded Continuation Verification**: Executed two-step fresh-process CLI continuation check in `test_fresh_process_trainer_cli_continuation` under `--reference-mode first` on single worker CPU execution (`CUDA_VISIBLE_DEVICES=""`, `--num-workers 0`), verifying exact bitwise equality (`torch.equal`, `diff: 0.00e+00`) across generator weights, discriminator weights, optimizer moments (`exp_avg`, `exp_avg_sq`), and RNG states (torch, numpy, python). Bounded strictly to CPU execution without claiming unmeasured CUDA bit-identity.
+- **E05 Stage 1 Executable Card & Pilot Release Authorization**: Updated `docs/workflow/session/evaluation-campaign/tasks/05-decision-card.md` per `20260916-bounded-pilot-release.md`. Enforces materialized bounded development view on `alcaraz_highlights/scene_028` (32 items train, 32 items disjoint validation, batch 1, workers 0, shared reference $t=0$), actual diagnostic CLI commands (`--start-frame`), checked adapter helper (`scripts/adapt_generation_result.py`), corrected split labels (`federer007` is development, confirmation reserved in manifest), justified bounds, and an aggregate $\le 1.0$ GPU-hour deadline around the entire process group. Authorized for pilot execution upon merge with green CI.
+
+`GEN-ACT-13` — **Complete** (E05 Stage 1 pix2pix Pilot Execution & Bounded Rejection, 2026-09-16).
+- **Execution Budget & Strata**: Executed on GPU 0 (`RTX 6000 Ada Generation`, PID claim 8 CPU threads). Phase 1A tiny-scene pilot training completed in 4.9 min (20 epochs on 32 items, 2 tracks $\times$ 16 frames, batch 1, lr 0.0002, seed 42). Phase 1B diagnostic matrix completed 6 corners across disjoint frames 16..31 in 19.5 min. Total wall time ~24.4 min, well under the 60 min (1.0 GPU-hour) cap.
+- **Controls & Numerical Integrity**:
+  - `same_seed_determinism_verified: true`: Delivered frame hashes bitwise identical between `gen_on_res_off` and `gen_on_res_off_same_seed`.
+  - `shuffled_conditioning_changed_pixels: true`: Conditioning sensitivity confirmed (PSNR drops from 31.98 dB to 31.75 dB under permuted pose skeletons).
+  - `delivered_pixels_changed: true` and `gen_on_vs_paste_hash_match: false`: Delivered frames differ from pasted reference.
+  - Zero NaN / negative scores; 100% wire byte reconciliation. Invocations recorded: 256.
+- **Empirical Results (Disjoint Window Frames 16..31, 16 frames @ 4K)**:
+  - *Baseline (Pasted Reference, Res-OFF)*: 999,967 B, PSNR-Y 33.94 dB, SSIM 0.9826, VMAF 90.70, client decode 1.30s (81.3 ms/frame).
+  - *Baseline (Pasted Reference, Res-ON QP 32)*: 1,089,698 B (89,286 B residual), PSNR-Y 41.80 dB, SSIM 0.9840, VMAF 92.92, client decode 3.87s.
+  - *pix2pix Candidate (Res-OFF)*: 6,671,957 B (+5.67 MB, 6.16 MB uncompressed pose metadata stream), PSNR-Y 31.98 dB (-1.96 dB vs baseline), SSIM 0.9812 (-0.0014), VMAF 90.73 (+0.03), client decode 7.03s (439.4 ms/frame, 5.4x slower).
+  - *pix2pix Candidate (Res-ON QP 32)*: 6,763,694 B (91,292 B residual), PSNR-Y 40.51 dB (-1.29 dB vs baseline), SSIM 0.9834, VMAF 92.68, client decode 9.39s.
+- **Promotion Decision**: **REJECTED (Failed Stage 2 Promotion)**.
+  - Pareto criterion violated: pix2pix achieves lower quality (-1.96 dB PSNR) at much higher total wire rate (6.67 MB vs 1.00 MB).
+  - Client latency budget violated: 7.03s vs 1.30s baseline (540% of baseline latency, exceeding the 105% threshold).
+  - Stage 2 release remains closed; confirmation sources remain strictly quarantined.
+- **Return Audit & Evidence Completion (2026-09-16)**:
+  - *Flag Semantics Fixed*: Corrected BooleanOptionalAction pitfall in `scripts/run_diagnostic_matrix.py` by introducing positive flags `--blank-conditioning-control` and `--blank-control`, preserving supported legacy aliases (`--no-conditioning-control`), adding `--allow-revision-drift`, and adding automated tests in `tests/experiments/test_diagnostic_matrix.py` (all 16 tests passing).
+  - *Corrective GPU Execution*: Reused the 5 identity-matched corners from the preserved report (`gen_off_res_off`, `gen_off_res_on`, `gen_on_res_off`, `gen_on_res_on`, `gen_on_shuffled_conditioning`) and executed only the missing blank control corner (`gen_on_no_conditioning`) and same-seed repeat check (`gen_on_res_off_same_seed`) in 6.1 min wall time. Total cumulative GPU time across all attempts: 30.5 min, strictly within the 1.0 GPU-hour cap (29.5 min remaining).
+  - *Calibrated 7-Corner Outcomes*:
+    - Matched pose (`gen_on_res_off`): 31.98 dB PSNR-Y, 0.9812 SSIM, 90.73 VMAF.
+    - Shuffled pose (`gen_on_shuffled_conditioning`): 31.75 dB PSNR-Y, 0.9812 SSIM, 90.72 VMAF.
+    - Blank pose (`gen_on_no_conditioning`): 30.99 dB PSNR-Y, 0.9811 SSIM, 90.71 VMAF.
+    - Demonstrates monotonic pose sensitivity (matched > shuffled > blank), confirming active conditioning, while neither configuration beats pasted-reference baseline (33.94 dB).
+  - *Deployment Accounting & Claim Eligibility*:
+    - Per-video fitted weights: 217,736,406 bytes (~208 MB) not amortized across frames; if charged, wire rate expands to ~214 MB.
+    - Shared model regime: model is overfitted to `scene_028` without multi-domain evidence.
+    - Adapted completed record explicitly marks `rd_claim=false` and `speed_claim=false` with audited exclusion reasons.
+  - *Scoped Learnability Verdict*: Tiny-fit learnability is verified (training loss ~90 down to ~4.5, stable PatchGAN discriminator, samples saved), but no-promotion verdict is upheld. pix2pix and SPADE model families remain preserved as viable architectures for future training regimens.
+- **Preserved & Completed Artifacts**:
+  - `generator_pix2pix.pt`: SHA-256 `9d925e1a9bf73270724665f190c4429c054e73f2ee33f0e0ef9ceaebf0d4f7ae`
+  - `checkpoint_pix2pix.pt`: SHA-256 `576dd7179e680ffac5210553c6321310a0ee09713ef6c0df2e026fb8d884ec34`
+  - `diagnostic_matrix.json` (original 6-corner): SHA-256 `1baa1dda6e32c35e7c9c22bcb171181db342a8d93ad6e36de1d82d2522aaf0ed`
+  - `campaign_result.json` (original adapted): SHA-256 `f56e5cb2a8c0239b4f3ecc007d164a403cb7512d8a6bd4ed1e625afdf7c8a425`
+  - `diagnostic_matrix_completed.json` (completed 7-corner): SHA-256 `a0dbf42dc1052cd0ea461f7d4c75086cf1a798636a8f3152d40658afd4d0f8df`
+  - `campaign_result_completed.json` (completed adapted): SHA-256 `99e019e0f544ac4064ca4fee0e8e7b5f02821cc2486cbf03c646f262bdfa34fa`
+
+
+
 

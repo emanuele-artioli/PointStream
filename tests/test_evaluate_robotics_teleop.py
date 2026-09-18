@@ -11,8 +11,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from demo.evaluation.evaluate_robotics_teleop import score_pose_tracks
-from demo.pipeline.hand_keypoints import FrameHandPose, SingleHand
+from demo.evaluation.evaluate_robotics_teleop import score_pose_tracks  # noqa: E402
+from demo.pipeline.hand_keypoints import FrameHandPose, SingleHand  # noqa: E402
 
 
 def _hand(x: float, y: float, jitter: float = 0.0) -> SingleHand:

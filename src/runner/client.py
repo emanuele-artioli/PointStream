@@ -14,6 +14,7 @@ from dataclasses import dataclass
 import io
 import json
 from pathlib import Path
+import time
 from typing import Any
 
 import numpy as np
@@ -432,6 +433,12 @@ def account_serialized_request(
     )
 
 
+def _mark(timings: dict[str, float] | None, name: str, started: float) -> None:
+    if timings is None:
+        return
+    timings[name] = float(timings.get(name, 0.0)) + (time.perf_counter() - started)
+
+
 def reconstruct_serialized_client(
     payload: bytes,
     *,
@@ -443,11 +450,15 @@ def reconstruct_serialized_client(
     checkpoint: str | Path | None = None,
     checkpoint_dir: str | Path | None = None,
     checkpoint_registry: Mapping[str, str | Path] | None = None,
+    timings: dict[str, float] | None = None,
 ) -> Clip | tuple[Clip, Clip]:
     """Reconstruct only from the validated NumPy/JSON client envelope."""
     if not isinstance(payload, (bytes, bytearray, memoryview)):
         raise TypeError("client payload must be bytes")
-    with np.load(io.BytesIO(payload), allow_pickle=False) as arrays:
+    started = time.perf_counter()
+    with np.load(io.BytesIO(payload), allow_pickle=False) as handle:
+        arrays = {key: np.asarray(handle[key]) for key in handle.files}
+        _mark(timings, "deserialize_s", started)
         metadata = json.loads(np.asarray(arrays["metadata"], dtype=np.uint8).tobytes())
         if metadata.get("schema") != 1:
             raise ValueError("unsupported client payload schema")
@@ -480,6 +491,7 @@ def reconstruct_serialized_client(
             packets = tuple(item for item in packets if item.payload)
             wire_codec = bg_meta.get("wire_codec")
             sidecar_codec = bg_meta.get("sidecar_codec")
+            bg_started = time.perf_counter()
             if packets and wire_codec is not None:
                 plate = decode_transmitted_stream(str(wire_codec), packets)
             elif packets:
@@ -488,6 +500,14 @@ def reconstruct_serialized_client(
                         "background packets present but no sidecar codec on the envelope"
                     )
                 plate = build_sidecar(str(sidecar_codec)).decode(packets[0].payload)
+            _mark(timings, "background_decode_s", bg_started)
+            header_hex = bg_meta.get("geometry_header") or ""
+            if header_hex:
+                geometry_header = bytes.fromhex(header_hex)
+            elif packets:
+                geometry_header = packets[0].geometry_header
+            else:
+                geometry_header = b""
             background = BackgroundModelView(
                 plate=plate,
                 homographies=tuple(tuple(row) for row in bg_meta["homographies"]),
@@ -497,7 +517,7 @@ def reconstruct_serialized_client(
                 width=int(bg_meta["width"]),
                 height=int(bg_meta["height"]),
                 payload_bytes=bg_meta["payload_bytes"],
-                geometry_header=bytes.fromhex(bg_meta["geometry_header"]),
+                geometry_header=geometry_header,
                 geometry_header_bytes=int(bg_meta["geometry_header_bytes"]),
                 wire_payloads=(),
                 wire_geometry_headers=(),
@@ -509,6 +529,7 @@ def reconstruct_serialized_client(
         decoded_references: dict[str, np.ndarray] = {}
         ref_meta = metadata.get("references") or {}
         import cv2
+        appear_started = time.perf_counter()
         for obj_id, info in ref_meta.items():
             key = info.get("key")
             if key and key in arrays:
@@ -606,11 +627,15 @@ def reconstruct_serialized_client(
                     crop = np.asarray(decoded_crop, dtype=np.uint8)
                 elif item.get("crop_key") and item["crop_key"] in arrays:
                     crop = np.asarray(arrays[item["crop_key"]], dtype=np.uint8)
+                elif object_id in decoded_references:
+                    crop = decoded_references[object_id]
 
                 if crop is not None:
                     pipeline_placements.append(
                         Placement(crop=crop, bbox=bbox, frame_index=frame_index, mask=mask)
                     )
+
+        _mark(timings, "appearance_decode_s", appear_started)
 
         if to_generate_bundles:
             if active_generator is None:
@@ -635,6 +660,7 @@ def reconstruct_serialized_client(
 
         active_policy = DevicePolicy()
         active_resolver = resolver or BackgroundResolver()
+        warp_started = time.perf_counter()
         if background is None or background.mode == MODE_NONE or background.deferred_to_residual:
             bg_frames = np.zeros(
                 (int(metadata["frame_count"]), int(metadata["height"]), int(metadata["width"]), 3),
@@ -648,15 +674,18 @@ def reconstruct_serialized_client(
                 width=int(metadata["width"]),
                 policy=active_policy,
             )
+        _mark(timings, "background_render_s", warp_started)
 
+        render_started = time.perf_counter()
         if pipeline_placements:
             base_frames = composite_clip(
                 bg_frames,
                 tuple(pipeline_placements),
-                use_heuristic_mask=True,
+                use_heuristic_mask=all(item.mask is None for item in pipeline_placements),
             )
         else:
             base_frames = as_clip(bg_frames, path="independent_client_base")
+        _mark(timings, "composite_render_s", render_started)
 
         # Residual deserialization
         res_meta = metadata.get("residual")
@@ -701,10 +730,12 @@ def reconstruct_serialized_client(
                 )
 
         delivered = base_frames.copy()
+        residual_started = time.perf_counter()
         if residual_payload is not None and not getattr(residual_payload, "is_absent", True):
             from src.pipeline.residual.signal import apply_residual
 
             delivered = apply_residual(delivered, residual_payload)
+        _mark(timings, "residual_apply_s", residual_started)
 
         delivered_clip = as_clip(delivered, path="independent_client_delivered")
         if return_base:

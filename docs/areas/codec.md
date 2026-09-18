@@ -1,20 +1,46 @@
 # Codec Area
 
-## Current review — 16 September 2026
+## Pilot return audit — 16 September 2026
+
+#119 is merged as `aefdeb2`. The E04B source is committed locally at `d30e59f`
+but not merged to shared main. R2 has two unresolved ghost-MAD alarms and dirty
+run-code provenance; two directories contain ON streams and retry/copy history
+needs reconciliation. Missing boundary MAD defaults are not measured zero errors.
+The error-floor explanation is a hypothesis. Close alarms/provenance by reuse;
+no further candidate encodes or second-camera probe is released.
+Follow [the reuse assignments](../workflow/session/evaluation-campaign/tasks/20260916-return-audit-and-reuse.md).
+
+
+## Historical conditional release — 16 September 2026
+
+#119 at `745271f` has green CI but is not accepted as calibrated evidence:
+main continues after calibration failure and always labels derived calibration
+verified, while its output directory allows overwrite. The revised proposal also
+mixes four OFF-arm entries inconsistent with the canonical saved report.
+The current brief releases those fixes, then conditionally exactly two scene007
+panorama removal-ON points at QP47/32 within 30 CPU minutes. Reuse original OFF
+streams. This is a same-camera diagnostic, not second-camera evidence or proof
+of eliminated ghosting.
+Follow [the current launch gates](../workflow/session/evaluation-campaign/tasks/20260916-bounded-pilot-release.md).
+
+
+## Historical review — 16 September 2026
 
 #113 merged as `c476840`. E04A's six removal-OFF bitstream hashes match the saved
 report, whose prepared RGB identity agrees with E03B. Treat this as a reusable
 background component diagnostic. The general low-rate panorama recommendation
 and claim of eliminated ghosting are not accepted from one scene.
 
-Complete actual region-scorer calibration (masked global SSIM differs from the
-calibrated whole-frame windowed path), standalone decoding from serialized side
-data, truthful metric/byte/timing scope, and common-scope rescoring of saved
-anchor decodes. Fixed-overlay foreground costs are not in the background ledger.
-The new video helper also pads short decodes and must fail closed. Preserve all
-old artifacts; the [next assignment](../workflow/session/evaluation-campaign/tasks/20260916-probe-review.md)
-authorizes decode/rescoring and missing timing only, with no new candidate encodes.
-A contrasting camera scene and paired removal remain subsequent costed work.
+### Evidence completion and common-scope comparison (CODEC-ACT-07)
+
+Completed evidence repair and common-scope rescoring under strict zero-new-candidate-encode budget:
+1. **Scorer calibration**: Enforces registered numerical bounds, identity checks (`PSNR=inf`, `SSIM in [0.999, 1.0]`), null controls (safe `NaN` on empty mask without warnings, unrelated structured anchor floor), and whole-frame windowed orderings across blur, noise, and unrelated content (`scorer_calibration.json`). All checks hold (0 alarms, `valid=true`).
+2. **Standalone client decoding**: Decoded all 6 saved E04A bitstreams strictly from bitstream bytes and packed side data (`.bin`) with zero geometry inputs available (`standalone_decode_report.json`). Bit-identical parity (`max diff = 0`) verified across all 6 settings. Rejection of truncated and extra video frames without silent padding/clipping verified and covered by unit tests in `tests/test_background_probe_standalone.py`.
+3. **Common-scope comparison**: Rescored saved E03B conventional video decodes (VVC and AV1 at QP 47 and 63) across matched visible, object, boundary, and full-frame windowed scopes (`comparison_table.md`, `e03b_rescored.json`). Distinctly separates background-only rate scope from whole-codec conventional scope, and windowed whole-frame SSIM from global masked SSIM.
+4. **Timing strata, host provenance & lookahead**: Replaced hardcoded metadata with verified provenance. Candidate encode host: `gpu5` for E04A, `gpu6` for E03B. Measured foreground compositing stratum (0.0463 s for 48 frames, 0.97 ms/frame). Unmeasured lookahead for conventional presets and cleaned video is explicitly labeled as `unmeasured` missing evidence rather than assumed as 0 or 16.
+5. **One-scene conditional observation**: Replaced broad Pareto claims with conditioned observations. On Federer scene 007, registered panorama provides camera motion compensation (ghost MAD 6.70–9.16 vs 20.33–28.55 on still frame 0, visible PSNR +4.0 to +5.6 dB), but still frame 0 remains a valid ultralow-rate point (3,983 B vs 4,554 B at QP 47). Ghost-region error remains nonzero across all arms.
+6. **Reduced E04B probe proposal**: Replaces Cartesian sweep with minimal discriminative probe resolving the named uncertainty (*causal impact of foreground removal on registered panorama plate quality and ghosting*). Reuses all 6 existing scene 007 removal-OFF points and executes only 2 missing candidate arms (`registered_panorama` removal=ON at QP 47 and 32, ~15s CPU, ~50 KB storage; `second_camera_proposal.json`), bounded by explicit promote/stop rules.
+
 
 ## Historical assignment — 15 September 2026
 

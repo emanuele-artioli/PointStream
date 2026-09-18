@@ -24,6 +24,7 @@ from experiments.tier.diagnostic_report import (
 from scripts.run_diagnostic_matrix import (
     _augment_objects_with_pose,
     assemble_matrix_report,
+    build_arg_parser,
     resolve_clip_start_frame,
     run_matrix,
 )
@@ -761,3 +762,94 @@ def test_pose_conditioning_identity_in_run_matrix(
     cond2 = report2["identity"]["config"]["conditioning"]
     assert cond2[0]["pose"] != cond1[0]["pose"]
     assert report1["identity"] != report2["identity"]
+
+
+def test_blank_control_parser_flags() -> None:
+    parser = build_arg_parser()
+    # Default is False
+    args_default = parser.parse_args(["--video", "v", "--scene", "s"])
+    assert args_default.no_conditioning_control is False
+    assert args_default.allow_revision_drift is False
+
+    # Positive flags enable
+    assert parser.parse_args(["--video", "v", "--scene", "s", "--blank-conditioning-control"]).no_conditioning_control is True
+    assert parser.parse_args(["--video", "v", "--scene", "s", "--blank-control"]).no_conditioning_control is True
+
+    # Negative flags disable
+    assert parser.parse_args(["--video", "v", "--scene", "s", "--no-blank-control"]).no_conditioning_control is False
+    assert parser.parse_args(["--video", "v", "--scene", "s", "--no-blank-conditioning-control"]).no_conditioning_control is False
+
+    # Legacy aliases enable
+    assert parser.parse_args(["--video", "v", "--scene", "s", "--no-conditioning-control"]).no_conditioning_control is True
+    assert parser.parse_args(["--video", "v", "--scene", "s", "--no-no-conditioning-control"]).no_conditioning_control is True
+
+    # Revision drift flag
+    assert parser.parse_args(["--video", "v", "--scene", "s", "--allow-revision-drift"]).allow_revision_drift is True
+
+
+def test_reusable_corners_allow_revision_drift(tmp_path: Path) -> None:
+    ckpt = tmp_path / "model.pt"
+    ckpt.write_bytes(b"model-weights")
+    clip = FakeClip(
+        video="alcaraz_highlights",
+        scene="scene_000",
+        frames=np.zeros((2, 256, 256, 3), dtype=np.uint8),
+        context_id="ctx",
+    )
+    first = run_matrix(
+        clip,
+        PointstreamConfig(),
+        generator_arch="pix2pix",
+        residual_qp=32,
+        checkpoint=ckpt,
+        shuffled_control=False,
+        device="cpu",
+        frames=2,
+        run_fn=_run_changing_pixels,
+        score_fn=_score,
+        generator_factory=_factory,
+        repo=_REPO,
+    )
+    current_identity = dict(first["identity"])
+    current_identity["code_revision"] = {"commit": "other_commit", "dirty": False, "diff_sha256": None}
+
+    # Strict check rejects
+    assert reusable_corners(first, current_identity, allow_revision_drift=False) == {}
+    # allow_revision_drift accepts matching corners
+    reused = reusable_corners(first, current_identity, allow_revision_drift=True)
+    assert "gen_off_res_off" in reused
+    assert "gen_on_res_off" in reused
+
+
+def test_run_matrix_with_blank_conditioning_control(tmp_path: Path) -> None:
+    ckpt = tmp_path / "model.pt"
+    ckpt.write_bytes(b"model-weights")
+    clip = FakeClip(
+        video="alcaraz_highlights",
+        scene="scene_000",
+        frames=np.zeros((2, 256, 256, 3), dtype=np.uint8),
+        context_id="ctx",
+    )
+    report = run_matrix(
+        clip,
+        PointstreamConfig(),
+        generator_arch="pix2pix",
+        residual_qp=32,
+        checkpoint=ckpt,
+        shuffled_control=True,
+        no_conditioning_control=True,
+        same_seed_control=True,
+        device="cpu",
+        frames=2,
+        run_fn=_run_changing_pixels,
+        score_fn=_score,
+        generator_factory=_factory,
+        repo=_REPO,
+    )
+    corners = [r["corner"] for r in report["matrix"]]
+    assert "gen_on_no_conditioning" in corners
+    assert "gen_on_shuffled_conditioning" in corners
+    assert "gen_on_res_off_same_seed" in corners
+    assert report["controls"]["no_conditioning"] == ["gen_on_no_conditioning"]
+    assert report["controls"]["no_conditioning_control_enabled"] is True
+

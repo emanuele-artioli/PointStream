@@ -1,0 +1,44 @@
+{
+  "schema": "pointstream.coordinator_readiness_audit.v1",
+  "paper_overleaf_main": "18d47787957a6dedfa60ddfdd30fb6672e3d3911",
+  "paper_push_verified": true,
+  "confirmation_status": "retained_scope_audited_unreleased",
+  "scoring_authorized": false,
+  "scores_computed": false,
+  "audit_receipt": "$PS_DATA_ROOT/outputs/evaluation-20260914/coordinator/run-20260916-confirmation-audit/audit.json",
+  "audit_receipt_sha256": "2e165db4618553f7d61d45c3b2cdd4c632e1f1bbedfa2bdb91a07ac2fa678d59",
+  "text_records_checked": 1390,
+  "reference_records": 18,
+  "source_bound_codec_metric_flags": 0,
+  "media_checks": [
+    {
+      "candidate_id": "conf_cand_01_sinner_medvedev_ao2024",
+      "reserved_scene_bounds_checked": 57,
+      "bounds_starting_before_first_key_packet": 0,
+      "first_key_packet_pts_s": -2.4,
+      "media_integrity_matches_reservation": true
+    },
+    {
+      "candidate_id": "conf_cand_04_medvedev_djokovic_usopen2023",
+      "reserved_scene_bounds_checked": 70,
+      "bounds_starting_before_first_key_packet": 0,
+      "first_key_packet_pts_s": -1.434767,
+      "media_integrity_matches_reservation": true
+    },
+    {
+      "candidate_id": "conf_cand_05_swiatek_sabalenka_madrid2024",
+      "reserved_scene_bounds_checked": 29,
+      "bounds_starting_before_first_key_packet": 0,
+      "first_key_packet_pts_s": -2.958333,
+      "media_integrity_matches_reservation": true
+    }
+  ],
+  "receipt_correction": "Original receipt scene_indices_starting_before_first_key_packet used absent scenes key. This derived record checks actual reserved_scene_bounds (156 total); original retained unchanged.",
+  "qualification": "Retained text scan uses source-binding heuristic; cannot certify deleted/unrecorded use. Negative key packets and positive first decoded I-frame timestamps are different quantities; packet availability does not prove frame decodability.",
+  "remaining_requirements": [
+    "manual replay/duplicate footage audit against development sources",
+    "decoded-frame exact PTS/pixel provenance and preroll policy",
+    "final codec/candidate/analysis procedure freeze",
+    "1080p-only claim scope; n=3 independent matches, not156 independent scenes"
+  ]
+}

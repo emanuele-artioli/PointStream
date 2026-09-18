@@ -150,7 +150,7 @@
         <header>
             <h1>PointStream: Egocentric Video Compression Demo</h1>
             <div class="subtitle">10x Rate Reduction for Low-Latency Teleoperation & Robotic Fleet Storage</div>
-            <div class="meta-bar">Prepared for: <strong>Figure.ai</strong> (Sam Baker, Max Berman) &bull; Dataset: <strong>Egocentric-10K</strong> &bull; Hardware: <strong>NVIDIA RTX 6000 Ada</strong></div>
+            <div class="meta-bar">Dataset: <strong>Egocentric-10K</strong> &bull; Hardware: <strong>NVIDIA RTX 6000 Ada</strong> &bull; Parallel E2E <strong>18.4 ms</strong></div>
         </header>
 
         <div class="grid-4">
@@ -179,32 +179,36 @@
         <h2 class="section-title">Side-by-Side Demonstration Video (Native 1080p Stacked Panels)</h2>
         <div class="chart-box">
             <div style="margin-bottom: 16px;">
-                <button onclick="switchClip('clip_01')" id="btn-clip1" style="background: var(--accent-blue); color: #000; font-weight: bold; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-right: 8px;">Clip 1 (Assembly Prep)</button>
+                <button onclick="switchClip('clip_03')" id="btn-clip3" style="background: var(--accent-blue); color: #000; font-weight: bold; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-right: 8px;">Clip 3 (Wire Manipulation)</button>
                 <button onclick="switchClip('clip_02')" id="btn-clip2" style="background: var(--bg-secondary); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-right: 8px;">Clip 2 (Component Fit)</button>
-                <button onclick="switchClip('clip_03')" id="btn-clip3" style="background: var(--bg-secondary); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 6px; cursor: pointer;">Clip 3 (Wire Manipulation)</button>
             </div>
-            <video id="demo-video" controls style="width: 100%; border-radius: 8px; max-height: 600px; background: #000;" src="side_by_side_demo_clip_01_factory001_worker001_00001.mp4">
+            <video id="demo-video" controls style="width: 100%; border-radius: 8px; max-height: 600px; background: #000;" src="side_by_side_demo_clip_03_factory001_worker001_00000.mp4">
                 Your browser does not support HTML5 video.
             </video>
             <p id="demo-caption" style="margin-top: 12px; color: var(--text-muted); font-size: 0.9rem;">
-                Vertically stacked 3-panel demonstration: (1) Reference HEVC (1080p native @ 4,200 kbps) &bull; (2) Matched-rate AV1 540p p7 (~260 kbps, 3.3 ms) &bull; (3) PointStream (~290 kbps, 19.3 ms). Each panel retains its full native 1080p resolution and aspect ratio.
+                Clip 3: PointStream 240p 43.8 px at 69.8 kbps vs AV1 240p 99.3 px (2.27× lower MPJPE). Hands vs GT: 35.5% vs 23.7%.
             </p>
         </div>
 
         <script>
             const videoMap = {
-                'clip_01': 'side_by_side_demo_clip_01_factory001_worker001_00001.mp4',
                 'clip_02': 'side_by_side_demo_clip_02_factory001_worker001_00002.mp4',
                 'clip_03': 'side_by_side_demo_clip_03_factory001_worker001_00000.mp4'
             };
+            const captionMap = {
+                'clip_02': 'Clip 2: PointStream 240p 75.5 px / 47.6% of GT hands at 84.7 kbps vs AV1 240p 78.6 px / 39.1%.',
+                'clip_03': 'Clip 3: PointStream 240p 43.8 px at 69.8 kbps vs AV1 240p 99.3 px (2.27× lower MPJPE). Hands vs GT: 35.5% vs 23.7%.'
+            };
+            const btnMap = { clip_02: 'clip2', clip_03: 'clip3' };
             function switchClip(clipKey) {
                 const vid = document.getElementById('demo-video');
                 vid.src = videoMap[clipKey];
                 vid.load();
                 vid.play().catch(e => {});
-                ['clip1', 'clip2', 'clip3'].forEach(id => {
+                document.getElementById('demo-caption').textContent = captionMap[clipKey];
+                ['clip2', 'clip3'].forEach(id => {
                     const btn = document.getElementById('btn-' + id);
-                    if ('btn-' + id === 'btn-' + clipKey.replace('_', '')) {
+                    if (id === btnMap[clipKey]) {
                         btn.style.background = 'var(--accent-blue)';
                         btn.style.color = '#000';
                         btn.style.fontWeight = 'bold';
@@ -220,14 +224,14 @@
         <h2 class="section-title">Codec Architecture: Asynchronous Semantic Decomposition</h2>
         <div class="diagram-box">
 [Robot Camera / Head Node]
-  ├── MediaPipe Hand Pose (GPU: 16.3 ms) ──> 1-Euro Smoothing ──> Quantizer (47 B/hand) ──> [Keypoint Stream: 7-10 kbps]
-  └── 0.5x Downscale                     ──> SVT-AV1 p7 (CPU: 13.6 ms)                 ──> [Background Stream: 231-262 kbps]
+  ├── MediaPipe Hand Pose (GPU: 15.4 ms) ──> 1-Euro Smoothing ──> Quantizer (47 B/hand) ──> [Keypoint Stream: 7-10 kbps]
+  └── Scale + SVT-AV1 (240p–1080p bg)    ──> Lanczos up to 1080p (CPU: 13.6 ms)        ──> [Background Stream: 59-264 kbps]
                                                                                                 │
-                                                                                 Total Stream: 231-296 kbps (14x-18x)
+                                                                                 Total Stream: 70-276 kbps (15x-60x) + shared WebP anchors 3.77 kbps
                                                                                                 │
 [Teleop Station / Policy Ingestion Node]                                                        ▼
   ├── Unpack Keypoints (&lt;0.01 ms) ──> Render Wireframe Skeleton Canvas
-  ├── Appearance Anchor Crop       ──> Lightweight Generator (GPU: 2.94 ms) ──> Synthesized Hands
+  ├── Appearance Anchor Crop       ──> Lightweight Generator (GPU: 2.95 ms) ──> Synthesized Hands
   └── Decode Background Stream     ──────────────────────────────────────────┴─> Composited Frame (0.01 ms)
         </div>
 
@@ -301,24 +305,24 @@
                     <td><span class="badge badge-blue">Reference Ground Truth</span></td>
                 </tr>
                 <tr class="highlight-row">
-                    <td><strong>PointStream (Standard)</strong></td>
-                    <td><strong>1080p Native</strong></td>
-                    <td><strong>293.8 kbps</strong></td>
-                    <td><strong>19.3 ms</strong></td>
-                    <td><strong>0.136</strong></td>
-                    <td><strong>23.25 dB</strong></td>
-                    <td><strong>113.6 px</strong></td>
-                    <td><span class="badge badge-green">Lower Error vs AV1 540p (14.4x Rate)</span></td>
+                    <td><strong>PointStream (Extreme Starve)</strong></td>
+                    <td><strong>240p bg &rarr; 1080p</strong></td>
+                    <td><strong>85.9 kbps</strong></td>
+                    <td><strong>18.4 ms</strong></td>
+                    <td><strong>0.314</strong></td>
+                    <td><strong>20.79 dB</strong></td>
+                    <td><strong>108.4 px</strong></td>
+                    <td><span class="badge badge-green">50x vs 4,200 kbps reference</span></td>
                 </tr>
                 <tr class="highlight-row">
-                    <td><strong>PointStream (Ultra-Low)</strong></td>
-                    <td><strong>1080p Native</strong></td>
-                    <td><strong>268.7 kbps</strong></td>
-                    <td><strong>19.3 ms</strong></td>
-                    <td><strong>0.146</strong></td>
-                    <td><strong>23.05 dB</strong></td>
-                    <td><strong>86.7 px</strong></td>
-                    <td><span class="badge badge-green">15.6x Compression</span></td>
+                    <td><strong>PointStream (Standard)</strong></td>
+                    <td><strong>540p bg &rarr; 1080p</strong></td>
+                    <td><strong>276.2 kbps</strong></td>
+                    <td><strong>18.4 ms</strong></td>
+                    <td><strong>0.129</strong></td>
+                    <td><strong>23.40 dB</strong></td>
+                    <td><strong>112.8 px</strong></td>
+                    <td><span class="badge badge-green">15x; shared WebP anchors 3.77 kbps</span></td>
                 </tr>
                 <tr style="background: rgba(74, 222, 128, 0.05); font-weight: 600;">
                     <td>AV1 (540p, p7 - Matched Rate &amp; Latency)</td>
@@ -353,8 +357,8 @@
                 <tr style="color: #ef4444;">
                     <td>PointStream (Plate 2s - Static Keyframe)</td>
                     <td>1080p Native</td>
-                    <td>901.9 kbps</td>
-                    <td>19.3 ms</td>
+                    <td>882.6 kbps</td>
+                    <td>18.4 ms</td>
                     <td>0.452</td>
                     <td>11.09 dB</td>
                     <td>56.5 px</td>
@@ -371,11 +375,11 @@
             </p>
         </div>
 
-        <h2 class="section-title">Latency Breakdown (19.3 ms Parallel / 32.9 ms Serial)</h2>
+        <h2 class="section-title">Latency Breakdown (18.4 ms Parallel / 32.0 ms Serial)</h2>
         <div class="chart-box">
             <img src="latency_profile.png" alt="Latency Profile">
             <p style="margin-top: 12px; color: var(--text-muted); font-size: 0.9rem;">
-                PointStream latency breakdown on NVIDIA RTX 6000 Ada. Background SVT-AV1 CPU encoding (13.6 ms) overlaps with GPU pose extraction (16.3 ms) in parallel mode, resulting in 19.3 ms end-to-end latency.
+                PointStream latency breakdown on NVIDIA RTX 6000 Ada. Pose extraction 15.4 ms overlaps SVT-AV1 13.6 ms; parallel E2E 18.4 ms, serial 32.0 ms.
             </p>
         </div>
 
@@ -383,7 +387,7 @@
         <div class="card" style="margin-bottom: 40px;">
             <p><strong>1. Why AV1 Needs 2.3x Higher Bitrate and 60ms Latency:</strong> To match PointStream's joint accuracy, AV1 must encode at native 1080p (672 kbps), requiring 2.3x higher network bandwidth and 60.2 ms encode latency, which breaks real-time 50 ms teleoperation constraints.</p>
             <p><strong>2. Static Keyframe Plates vs Continuous Motion Compensation:</strong> Transmitting an infilled keyframe plate every 2 seconds was empirically evaluated. Because egocentric cameras move continuously with worker head motion, static plates result in 11.1–11.5 dB PSNR and 0.42–0.48 LPIPS. In contrast, continuous SVT-AV1 inter-frame coding leverages motion vectors to preserve background fidelity (23.1–24.2 dB PSNR) at one-third the bitrate.</p>
-            <p><strong>3. Transparent Bitrate &amp; Latency Accounting:</strong> PointStream's ~290 kbps budget explicitly accounts for all three streams: background (258–262 kbps), appearance anchors (20–28 kbps amortized), and 3D keypoints (7.1–10.0 kbps). Latency includes background CPU encoding (13.6 ms) in both parallel (19.3 ms) and serial (32.9 ms) operating modes.</p>
+            <p><strong>3. Transparent Bitrate &amp; Latency Accounting:</strong> PointStream's 70–276 kbps budget accounts for background (59–264 kbps), shared WebP appearance anchors (3.77 kbps, 84% below the prior JPEG overhead), and 3D keypoints (7.1–10.0 kbps). Parallel E2E is 18.4 ms; serial is 32.0 ms.</p>
         </div>
     </div>
 </body>

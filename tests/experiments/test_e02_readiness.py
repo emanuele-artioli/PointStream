@@ -40,6 +40,7 @@ from scripts.run_diagnostic_matrix import (
 from scripts.train_campaign import (
     compare_candidates,
     evaluate_checkpoint,
+    is_valid_eval,
     promote_survivors,
     rank_variants,
 )
@@ -568,8 +569,8 @@ def test_generation_adapter_conforms_to_e01_schema() -> None:
     assert adapted["run_id"] == "test_run_01"
     assert adapted["backend_name"] == "pix2pix"
     assert adapted["checkpoint_identity"]["checkpoint_sha256"] == "abcdef1234567890"
-    assert adapted["claim_eligibility"]["rd_claim"] is True
-    assert adapted["claim_eligibility"]["speed_claim"] is True
+    assert adapted["claim_eligibility"]["rd_claim"] is False
+    assert adapted["claim_eligibility"]["speed_claim"] is False
 
     valid, blockers = validate_generation_result(adapted)
     assert valid is True
@@ -603,7 +604,7 @@ def test_generation_adapter_fails_closed_on_failed_controls() -> None:
     )
 
     assert adapted["claim_eligibility"]["rd_claim"] is False
-    assert any("shuffled match" in r for r in adapted["exclusion_reasons"])
+    assert any("shuffled" in r for r in adapted["exclusion_reasons"])
 
 
 def test_adapter_reads_nested_scores_timing_parts_and_shape() -> None:
@@ -803,44 +804,38 @@ def test_diagnostic_matrix_control_wiring() -> None:
 
 
 def test_tennis_dataset_deterministic_reference_selection(tmp_path: Path) -> None:
-    """Verify reference_mode in TennisSkeletonDataset.
+    """Verify reference policies in TennisSkeletonDataset.
 
-    1. 'deterministic' selects reference frame derived from sample index (idx % num_colors),
-       remaining bit-identical across arbitrary changes to global Python RNG state.
-    2. 'first' always selects the first color frame (colors[0]).
+    1. 'first' always selects the first color frame of the track (colors[0]).
+       For frame 0, target == reference (legitimate anchor match).
+       For subsequent frames (track_pos > 0), reference != target (no target-copy shortcut).
+    2. 'keyframe' selects periodic keyframe references.
+    3. 'offset' selects fixed-offset reference frames.
+    4. Selected source/reference IDs are invariant across global Python RNG mutations.
     """
-    track_dir = tmp_path / "v1" / "segmentations" / "scene_01" / "track_01"
-    skel_dir = tmp_path / "v1" / "segmentations" / "scene_01" / "track_01_pose_body"
-    track_dir.mkdir(parents=True)
-    skel_dir.mkdir(parents=True)
-
-    num_frames = 5
-    for i in range(num_frames):
-        c_img = np.full((64, 64, 3), (i + 1) * 40, dtype=np.uint8)
+    # Track 1: 5 frames
+    track1 = tmp_path / "v1" / "segmentations" / "scene_01" / "track_01"
+    skel1 = tmp_path / "v1" / "segmentations" / "scene_01" / "track_01_pose_body"
+    track1.mkdir(parents=True)
+    skel1.mkdir(parents=True)
+    for i in range(5):
+        c_img = np.full((64, 64, 3), (i + 1) * 30, dtype=np.uint8)
         s_img = np.full((64, 64, 3), 100, dtype=np.uint8)
-        cv2.imwrite(str(track_dir / f"frame_{i:06d}.png"), c_img)
-        cv2.imwrite(str(skel_dir / f"frame_{i:06d}.png"), s_img)
+        cv2.imwrite(str(track1 / f"frame_{i:06d}.png"), c_img)
+        cv2.imwrite(str(skel1 / f"frame_{i:06d}.png"), s_img)
 
-    ds_det = TennisSkeletonDataset(
-        root_dir=tmp_path,
-        condition="pose_body",
-        include_reference=True,
-        reference_mode="deterministic",
-        target_size=64,
-    )
-    assert len(ds_det) == num_frames
+    # Track 2: 3 frames
+    track2 = tmp_path / "v1" / "segmentations" / "scene_01" / "track_02"
+    skel2 = tmp_path / "v1" / "segmentations" / "scene_01" / "track_02_pose_body"
+    track2.mkdir(parents=True)
+    skel2.mkdir(parents=True)
+    for i in range(3):
+        c_img = np.full((64, 64, 3), (i + 1) * 60, dtype=np.uint8)
+        s_img = np.full((64, 64, 3), 150, dtype=np.uint8)
+        cv2.imwrite(str(track2 / f"frame_{i:06d}.png"), c_img)
+        cv2.imwrite(str(skel2 / f"frame_{i:06d}.png"), s_img)
 
-    random.seed(12345)
-    samples_seed1 = [ds_det[i] for i in range(num_frames)]
-    random.seed(98765)
-    samples_seed2 = [ds_det[i] for i in range(num_frames)]
-
-    for i in range(num_frames):
-        skel1, ref1, col1 = samples_seed1[i]
-        skel2, ref2, col2 = samples_seed2[i]
-        assert torch.equal(ref1, ref2), f"Deterministic reference selection altered by random seed at idx {i}"
-        assert torch.equal(ref1, col1)
-
+    # Policy 1: 'first' (stable default)
     ds_first = TennisSkeletonDataset(
         root_dir=tmp_path,
         condition="pose_body",
@@ -848,10 +843,81 @@ def test_tennis_dataset_deterministic_reference_selection(tmp_path: Path) -> Non
         reference_mode="first",
         target_size=64,
     )
-    first_ref = ds_first[0][1]
-    for i in range(num_frames):
-        _, ref_i, _ = ds_first[i]
-        assert torch.equal(ref_i, first_ref)
+    assert len(ds_first) == 8  # 5 + 3 frames
+
+    # Verify Track 1 (indices 0..4)
+    info_t1_f0 = ds_first.get_reference_info(0)
+    assert info_t1_f0["source_id"] == "frame_000000.png"
+    assert info_t1_f0["reference_id"] == "frame_000000.png"
+    assert info_t1_f0["is_target_match"] is True  # Anchor frame matches target
+
+    for idx in range(1, 5):
+        info = ds_first.get_reference_info(idx)
+        assert info["source_id"] == f"frame_{idx:06d}.png"
+        assert info["reference_id"] == "frame_000000.png"
+        assert info["is_target_match"] is False  # Subsequent frames must NOT match target
+
+    # Verify Track 2 (indices 5..7)
+    info_t2_f0 = ds_first.get_reference_info(5)
+    assert info_t2_f0["track_pos"] == 0
+    assert info_t2_f0["source_id"] == "frame_000000.png"
+    assert info_t2_f0["reference_id"] == "frame_000000.png"
+    assert info_t2_f0["is_target_match"] is True
+
+    info_t2_f1 = ds_first.get_reference_info(6)
+    assert info_t2_f1["track_pos"] == 1
+    assert info_t2_f1["source_id"] == "frame_000001.png"
+    assert info_t2_f1["reference_id"] == "frame_000000.png"
+    assert info_t2_f1["is_target_match"] is False
+
+    # Invariance across global Python RNG state
+    random.seed(12345)
+    samples_s1 = [ds_first[i] for i in range(len(ds_first))]
+    random.seed(99999)
+    samples_s2 = [ds_first[i] for i in range(len(ds_first))]
+    for i in range(len(ds_first)):
+        assert torch.equal(samples_s1[i][1], samples_s2[i][1]), f"Reference altered by RNG at idx {i}"
+
+    # Policy 2: 'keyframe' (interval=2)
+    ds_kf = TennisSkeletonDataset(
+        root_dir=tmp_path,
+        condition="pose_body",
+        include_reference=True,
+        reference_mode="keyframe",
+        keyframe_interval=2,
+        target_size=64,
+    )
+    assert ds_kf.get_reference_info(0)["reference_id"] == "frame_000000.png"
+    assert ds_kf.get_reference_info(1)["reference_id"] == "frame_000000.png"
+    assert ds_kf.get_reference_info(2)["reference_id"] == "frame_000002.png"
+    assert ds_kf.get_reference_info(3)["reference_id"] == "frame_000002.png"
+    assert ds_kf.get_reference_info(4)["reference_id"] == "frame_000004.png"
+
+    # Policy 3: 'offset' (offset=1)
+    ds_off = TennisSkeletonDataset(
+        root_dir=tmp_path,
+        condition="pose_body",
+        include_reference=True,
+        reference_mode="offset",
+        reference_offset=1,
+        target_size=64,
+    )
+    assert ds_off.get_reference_info(0)["reference_id"] == "frame_000000.png"
+    assert ds_off.get_reference_info(1)["reference_id"] == "frame_000000.png"
+    assert ds_off.get_reference_info(2)["reference_id"] == "frame_000001.png"
+    assert ds_off.get_reference_info(3)["reference_id"] == "frame_000002.png"
+    assert ds_off.get_reference_info(4)["reference_id"] == "frame_000003.png"
+
+    # Backward compatibility: 'deterministic' aliases to 'first'
+    ds_det = TennisSkeletonDataset(
+        root_dir=tmp_path,
+        condition="pose_body",
+        include_reference=True,
+        reference_mode="deterministic",
+        target_size=64,
+    )
+    assert ds_det.get_reference_info(1)["reference_id"] == "frame_000000.png"
+    assert ds_det.get_reference_info(1)["is_target_match"] is False
 
 
 def test_fresh_process_trainer_cli_continuation(tmp_path: Path) -> None:
@@ -884,7 +950,7 @@ def test_fresh_process_trainer_cli_continuation(tmp_path: Path) -> None:
         "--num-workers",
         "0",
         "--reference-mode",
-        "deterministic",
+        "first",
         "--seed",
         "42",
         "--max-steps-per-epoch",
@@ -918,7 +984,7 @@ def test_fresh_process_trainer_cli_continuation(tmp_path: Path) -> None:
         "--num-workers",
         "0",
         "--reference-mode",
-        "deterministic",
+        "first",
         "--seed",
         "42",
         "--max-steps-per-epoch",
@@ -952,7 +1018,7 @@ def test_fresh_process_trainer_cli_continuation(tmp_path: Path) -> None:
         "--num-workers",
         "0",
         "--reference-mode",
-        "deterministic",
+        "first",
         "--seed",
         "42",
         "--resume",
@@ -973,11 +1039,27 @@ def test_fresh_process_trainer_cli_continuation(tmp_path: Path) -> None:
     ckpt_A = torch.load(tmp_path / "ckpt_A.pt", map_location="cpu")
     ckpt_B2 = torch.load(tmp_path / "ckpt_B.pt", map_location="cpu")
 
-    for k in ckpt_A["G"]:
-        assert torch.allclose(ckpt_A["G"][k], ckpt_B2["G"][k], atol=1e-5), f"G weight mismatch at {k}"
+    # Verify metadata and reference policy flags
+    assert ckpt_B2.get("reference_mode") == "first"
+    assert ckpt_B2.get("used_reference_shortcut") is False
 
+    # Compare G weights (exact bitwise equality on single-worker CPU)
+    max_g_diff = 0.0
+    for k in ckpt_A["G"]:
+        diff = (ckpt_A["G"][k] - ckpt_B2["G"][k]).abs().max().item()
+        if diff > max_g_diff:
+            max_g_diff = diff
+        assert torch.equal(ckpt_A["G"][k], ckpt_B2["G"][k]), f"G weight mismatch at {k}: diff={diff}"
+    assert max_g_diff == 0.0, f"Max G diff exceeded exact equality: {max_g_diff}"
+
+    # Compare D weights (exact bitwise equality on single-worker CPU)
+    max_d_diff = 0.0
     for k in ckpt_A["D"]:
-        assert torch.allclose(ckpt_A["D"][k], ckpt_B2["D"][k], atol=1e-5), f"D weight mismatch at {k}"
+        diff = (ckpt_A["D"][k] - ckpt_B2["D"][k]).abs().max().item()
+        if diff > max_d_diff:
+            max_d_diff = diff
+        assert torch.equal(ckpt_A["D"][k], ckpt_B2["D"][k]), f"D weight mismatch at {k}: diff={diff}"
+    assert max_d_diff == 0.0, f"Max D diff exceeded exact equality: {max_d_diff}"
 
     assert ckpt_A["opt_G"] is not None and ckpt_B2["opt_G"] is not None
     assert ckpt_A["opt_D"] is not None and ckpt_B2["opt_D"] is not None
@@ -985,12 +1067,17 @@ def test_fresh_process_trainer_cli_continuation(tmp_path: Path) -> None:
     for s_a, s_b in zip(ckpt_A["opt_G"]["state"].values(), ckpt_B2["opt_G"]["state"].values()):
         for p in ("exp_avg", "exp_avg_sq"):
             if p in s_a:
-                assert torch.allclose(s_a[p], s_b[p], atol=1e-5)
+                assert torch.equal(s_a[p], s_b[p])
 
     for s_a, s_b in zip(ckpt_A["opt_D"]["state"].values(), ckpt_B2["opt_D"]["state"].values()):
         for p in ("exp_avg", "exp_avg_sq"):
             if p in s_a:
-                assert torch.allclose(s_a[p], s_b[p], atol=1e-5)
+                assert torch.equal(s_a[p], s_b[p])
+
+    # Compare RNG states
+    assert torch.equal(ckpt_A["rng_torch"], ckpt_B2["rng_torch"]), "Torch RNG state mismatch between uninterrupted and resumed"
+    assert ckpt_A["rng_numpy"][1].tolist() == ckpt_B2["rng_numpy"][1].tolist(), "Numpy RNG state mismatch"
+    assert ckpt_A["rng_python"] == ckpt_B2["rng_python"], "Python RNG state mismatch"
 
 
 def test_candidate_selection_producer_fields_and_indifference_bands() -> None:
@@ -1055,6 +1142,173 @@ def test_promote_survivors_preserves_incomparable_tradeoffs() -> None:
     survivors = promote_survivors(["survivor_low_rate", "tradeoff_high_quality"], aggregates)
     assert "tradeoff_high_quality" in survivors
     assert "survivor_low_rate" in survivors
+
+
+def test_candidate_selection_nan_and_domain_incomparability() -> None:
+    """Verify NaN and domain-invalid measurement fields return 'incomparable', fail validation, and never dominate."""
+    cand_valid = {
+        "metrics": {"total_bytes": 2000, "psnr_mean": 30.0, "ssim_mean": 0.90},
+        "timing_evidence": {"measured_client_seconds": 1.0},
+    }
+    # Bug scenario: cheaper candidate with NaN PSNR must NOT dominate valid candidate
+    cand_nan_psnr = {
+        "metrics": {"total_bytes": 1000, "psnr_mean": float("nan"), "ssim_mean": 0.90},
+        "timing_evidence": {"measured_client_seconds": 1.0},
+    }
+    assert compare_candidates(cand_nan_psnr, cand_valid) == "incomparable"
+    assert compare_candidates(cand_valid, cand_nan_psnr) == "incomparable"
+    assert is_valid_eval(cand_nan_psnr) is False
+    assert is_valid_eval(cand_valid) is True
+
+    # Domain-invalid: negative rate
+    cand_neg_rate = {
+        "metrics": {"total_bytes": -500, "psnr_mean": 30.0, "ssim_mean": 0.90},
+        "timing_evidence": {"measured_client_seconds": 1.0},
+    }
+    assert compare_candidates(cand_neg_rate, cand_valid) == "incomparable"
+    assert is_valid_eval(cand_neg_rate) is False
+
+    # Domain-invalid: SSIM > 1.0
+    cand_invalid_ssim = {
+        "metrics": {"total_bytes": 1000, "psnr_mean": 30.0, "ssim_mean": 1.5},
+        "timing_evidence": {"measured_client_seconds": 1.0},
+    }
+    assert compare_candidates(cand_invalid_ssim, cand_valid) == "incomparable"
+    assert is_valid_eval(cand_invalid_ssim) is False
+
+    # Domain-invalid: negative client time
+    cand_neg_time = {
+        "metrics": {"total_bytes": 1000, "psnr_mean": 30.0, "ssim_mean": 0.90},
+        "timing_evidence": {"measured_client_seconds": -0.5},
+    }
+    assert compare_candidates(cand_neg_time, cand_valid) == "incomparable"
+    assert is_valid_eval(cand_neg_time) is False
+
+    # Legitimate identity-score semantics: perfect PSNR (+inf) and SSIM (1.0)
+    cand_identity = {
+        "metrics": {"total_bytes": 2000, "psnr_mean": float("inf"), "ssim_mean": 1.0},
+        "timing_evidence": {"measured_client_seconds": 1.0},
+    }
+    assert is_valid_eval(cand_identity) is True
+    assert compare_candidates(cand_identity, cand_valid) == "a_dominates"
+    assert compare_candidates(cand_valid, cand_identity) == "b_dominates"
+    assert compare_candidates(cand_identity, cand_identity) == "indifferent"
+
+
+def test_actual_producer_shaped_rows_promotion() -> None:
+    """Test actual producer-shaped rows (schema pointstream.campaign_result.v1) through promotion."""
+    aggregate_by_variant = {
+        "row_valid_low_rate": {
+            "schema": "pointstream.campaign_result.v1",
+            "artifact_id": "row_valid_low_rate",
+            "metrics": {"total_bytes": 2000, "psnr_mean": 28.0, "ssim_mean": 0.90},
+            "timing_evidence": {"measured_client_seconds": 1.0},
+            "success": True,
+        },
+        "row_valid_high_qual": {
+            "schema": "pointstream.campaign_result.v1",
+            "artifact_id": "row_valid_high_qual",
+            "metrics": {"total_bytes": 5000, "psnr_mean": 35.0, "ssim_mean": 0.98},
+            "timing_evidence": {"measured_client_seconds": 1.2},
+            "success": True,
+        },
+        "row_nan_psnr": {
+            "schema": "pointstream.campaign_result.v1",
+            "artifact_id": "row_nan_psnr",
+            "metrics": {"total_bytes": 1000, "psnr_mean": float("nan"), "ssim_mean": 0.90},
+            "timing_evidence": {"measured_client_seconds": 1.0},
+            "success": True,
+        },
+        "row_invalid_ssim": {
+            "schema": "pointstream.campaign_result.v1",
+            "artifact_id": "row_invalid_ssim",
+            "metrics": {"total_bytes": 1000, "psnr_mean": 30.0, "ssim_mean": 1.5},
+            "timing_evidence": {"measured_client_seconds": 1.0},
+            "success": True,
+        },
+        "row_missing_quality": {
+            "schema": "pointstream.campaign_result.v1",
+            "artifact_id": "row_missing_quality",
+            "metrics": {"total_bytes": 1500, "psnr_mean": None, "ssim_mean": None},
+            "timing_evidence": {"measured_client_seconds": None},
+            "success": True,
+        },
+    }
+
+    ranked, composite = rank_variants(aggregate_by_variant)
+    # Valid variants must be ranked ahead of invalid variants
+    assert ranked[:2] == ["row_valid_low_rate", "row_valid_high_qual"]
+    assert "row_nan_psnr" in ranked[2:]
+    assert "row_invalid_ssim" in ranked[2:]
+
+    survivors = promote_survivors(ranked, aggregate_by_variant)
+    # Valid trade-off variants survive; invalid candidates are rejected and never eliminate valid candidates
+    assert "row_valid_low_rate" in survivors
+    assert "row_valid_high_qual" in survivors
+    assert "row_nan_psnr" not in survivors
+    assert "row_invalid_ssim" not in survivors
+
+
+def test_checkpoint_reference_shortcut_flagging(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
+    """Verify legacy checkpoints trained with shortcut are flagged with used_reference_shortcut=True without discarding."""
+    import logging
+    from unittest.mock import patch
+    import argparse
+
+    ckpt_path = tmp_path / "legacy_ckpt.pt"
+    # Historical checkpoint schema without used_reference_shortcut and with reference_mode='deterministic'
+    legacy_ckpt = {
+        "epoch": 1,
+        "step": 0,
+        "total_steps_in_epoch": 2,
+        "base_seed": 42,
+        "G": {},
+        "D": {},
+        "reference_mode": "deterministic",
+    }
+    torch.save(legacy_ckpt, ckpt_path)
+
+    mock_args = argparse.Namespace(
+        resume=True,
+        checkpoint_path=str(ckpt_path),
+        num_workers=0,
+        seed=42,
+        lr=0.0002,
+        b1=0.5,
+        b2=0.999,
+        data_root=str(tmp_path),
+        img_size=256,
+        condition="pose_body",
+        reference_mode="first",
+        keyframe_interval=16,
+        reference_offset=1,
+        batch_size=1,
+        checkpoint_interval_sec=3600.0,
+        epochs=1,
+        max_steps_per_epoch=None,
+        out_weights=str(tmp_path / "out.pt"),
+        sample_dir=str(tmp_path / "samples"),
+    )
+
+    with caplog.at_level(logging.WARNING):
+        from scripts.train_pix2pix import main_worker
+        with patch("scripts.train_pix2pix.torch.cuda.is_available", return_value=False):
+            with patch("scripts.train_pix2pix.UNetGenerator") as mock_G, patch("scripts.train_pix2pix.PatchGANDiscriminator") as mock_D:
+                param_g = torch.nn.Parameter(torch.zeros(1))
+                param_d = torch.nn.Parameter(torch.zeros(1))
+                mock_G.return_value.parameters.return_value = [param_g]
+                mock_D.return_value.parameters.return_value = [param_d]
+                mock_G.return_value.to.return_value = mock_G.return_value
+                mock_D.return_value.to.return_value = mock_D.return_value
+                with patch("scripts.train_pix2pix.TennisSkeletonDataset"):
+                    with patch("scripts.train_pix2pix.DataLoader", side_effect=RuntimeError("halt_after_init")):
+                        try:
+                            main_worker(0, 1, mock_args)
+                        except RuntimeError as ex:
+                            if str(ex) != "halt_after_init":
+                                raise
+
+    assert any("Checkpoint was trained using historical target-copy reference shortcut" in record.message for record in caplog.records)
 
 
 def test_adapter_handles_actual_producer_control_rows() -> None:
@@ -1183,5 +1437,179 @@ def test_unsupported_worker_mode_warning(caplog: pytest.LogCaptureFixture) -> No
                         pass
 
     assert any("Worker mode notice: num_workers=4 > 0" in record.message for record in caplog.records)
+
+
+def test_tennis_dataset_subset_filtering(tmp_path: Path) -> None:
+    """Verify TennisSkeletonDataset subset filtering by video, scene, track, and frame window."""
+    import numpy as np
+    import cv2
+    from src.shared.tennis_dataset import TennisSkeletonDataset
+
+    # Build mock scenes: scene_001 with 2 tracks, scene_002 with 1 track
+    for sc in ("scene_001", "scene_002"):
+        for tr in ("track_001", "track_002") if sc == "scene_001" else ("track_001",):
+            td = tmp_path / "vid1" / "segmentations" / sc / tr
+            sd = tmp_path / "vid1" / "segmentations" / sc / f"{tr}_pose_body"
+            td.mkdir(parents=True)
+            sd.mkdir(parents=True)
+            for i in range(10):
+                img = np.full((64, 64, 3), i * 20, dtype=np.uint8)
+                cv2.imwrite(str(td / f"frame_{i:06d}.png"), img)
+                cv2.imwrite(str(sd / f"frame_{i:06d}.png"), img)
+
+    # Filter by scene and frame window (frames 2..6 -> 4 frames per track)
+    ds_subset = TennisSkeletonDataset(
+        tmp_path,
+        target_size=64,
+        include_reference=True,
+        reference_mode="first",
+        scene_filter="scene_001",
+        frame_start=2,
+        max_frames=4,
+    )
+    # 2 tracks * 4 frames = 8 items
+    assert len(ds_subset) == 8
+    assert all("scene_001" in item[2] for item in ds_subset.items)
+    # Check that item track indices are 2, 3, 4, 5 for each track
+    assert ds_subset.item_track_indices == [2, 3, 4, 5, 2, 3, 4, 5]
+    # Check that reference frame is frame 0 (first reference) and distinct from target (frames 2..5)
+    for idx in range(len(ds_subset)):
+        ref_info = ds_subset.get_reference_info(idx)
+        assert ref_info["is_target_match"] is False
+        assert "frame_000000.png" in str(ref_info["reference_path"])
+
+
+def test_diagnostic_matrix_start_frame_slicing() -> None:
+    """Verify _slice_clip with start_frame offset correctly adjusts frames, masks, and object indices."""
+    import numpy as np
+    from experiments.long_scenes.loader import LongSceneClip
+    from src.pipeline.reconstruction.reconstruct import ObjectRequest
+    from scripts.run_diagnostic_matrix import _slice_clip
+
+    frames = np.zeros((48, 100, 100, 3), dtype=np.uint8)
+    masks = np.zeros((48, 100, 100), dtype=bool)
+    app = np.zeros((32, 32, 3), dtype=np.uint8)
+    objs = (
+        ObjectRequest(object_id="tr1", appearance=app, bbox=(10, 10, 20, 20), frame_index=5),
+        ObjectRequest(object_id="tr1", appearance=app, bbox=(10, 10, 20, 20), frame_index=16),
+        ObjectRequest(object_id="tr1", appearance=app, bbox=(10, 10, 20, 20), frame_index=25),
+        ObjectRequest(object_id="tr1", appearance=app, bbox=(10, 10, 20, 20), frame_index=40),
+    )
+    full_clip = LongSceneClip(
+        video="vid",
+        scene="sc",
+        context_id="ctx",
+        n_frames=48,
+        frames=frames,
+        masks=masks,
+        objects=objs,
+        paste_back_mae=0.01,
+        start_frame=0,
+    )
+
+    # Slice disjoint window: start_frame=16, frames=16 (covers frames 16..31)
+    sliced = _slice_clip(full_clip, n_frames=16, start_frame=16)
+    assert sliced.n_frames == 16
+    assert sliced.frames.shape[0] == 16
+    assert sliced.start_frame == 16
+    # Objects at frame 16 (offset 0) and 25 (offset 9) should be included with adjusted frame_index
+    assert len(sliced.objects) == 2
+    assert sliced.objects[0].frame_index == 0  # was 16 - 16
+    assert sliced.objects[1].frame_index == 9  # was 25 - 16
+
+
+def test_adapt_generation_result_cli(tmp_path: Path) -> None:
+    """Verify scripts/adapt_generation_result.py CLI helper properly adapts matrix JSON to campaign result."""
+    import json
+    import subprocess
+    import sys
+    from src.contracts import paths as ps_paths
+
+    cand_paths = [
+        ps_paths.outputs() / "evaluation-campaign" / "e02r" / "diagnostic_matrix_pix2pix_scene028.json",
+        Path("/home/itec/emanuele/pointstream-data/outputs/evaluation-campaign/e02r/diagnostic_matrix_pix2pix_scene028.json"),
+    ]
+    matrix_file = None
+    for p in cand_paths:
+        if p.exists():
+            matrix_file = p
+            break
+
+    if matrix_file is None:
+        # Fallback: create mock matrix payload for CI
+        matrix_file = tmp_path / "mock_matrix.json"
+        mock_matrix = {
+            "identity": {
+                "checkpoint_sha256": "0" * 64,
+                "code_revision": "test_rev",
+            },
+            "matrix": [
+                {
+                    "corner": "gen_on_res_off",
+                    "generation_on": True,
+                    "residual_on": False,
+                    "shuffled_conditioning": False,
+                    "scores": {"psnr_y": 30.0, "ssim": 0.9},
+                    "parts": {"transport_total": 5000, "residual": 0},
+                    "timing": {"client_seconds": 1.0},
+                    "delivered_frame_hashes": ["hash1", "hash2"],
+                },
+                {
+                    "corner": "gen_on_shuffled_conditioning",
+                    "generation_on": True,
+                    "residual_on": False,
+                    "shuffled_conditioning": True,
+                    "scores": {"psnr_y": 25.0, "ssim": 0.8},
+                    "parts": {"transport_total": 5000, "residual": 0},
+                    "timing": {"client_seconds": 1.0},
+                    "delivered_frame_hashes": ["hash_shuf1", "hash_shuf2"],
+                },
+                {
+                    "corner": "gen_on_res_off_same_seed",
+                    "generation_on": True,
+                    "residual_on": False,
+                    "shuffled_conditioning": False,
+                    "seed_repeat": True,
+                    "scores": {"psnr_y": 30.0, "ssim": 0.9},
+                    "parts": {"transport_total": 5000, "residual": 0},
+                    "timing": {"client_seconds": 1.0},
+                    "delivered_frame_hashes": ["hash1", "hash2"],
+                },
+            ],
+            "aggregate": {
+                "psnr_mean": 30.0,
+                "ssim_mean": 0.9,
+                "total_bytes": 5000,
+                "residual_bytes": 0,
+                "client_seconds": 1.0,
+            },
+            "per_clip": [{"clip_id": "clip_01", "psnr_y": 30.0, "ssim": 0.9}],
+        }
+        matrix_file.write_text(json.dumps(mock_matrix), encoding="utf-8")
+
+    out_record = tmp_path / "adapted_result.json"
+    cmd = [
+        sys.executable,
+        "scripts/adapt_generation_result.py",
+        "--input-matrix",
+        str(matrix_file),
+        "--output-record",
+        str(out_record),
+        "--run-id",
+        "smoke_test_run",
+        "--backend-name",
+        "pix2pix",
+    ]
+    res = subprocess.run(cmd, capture_output=True, text=True)
+    assert res.returncode == 0, f"Adapter CLI failed: {res.stderr}"
+    assert out_record.exists()
+
+    payload = json.loads(out_record.read_text(encoding="utf-8"))
+    assert payload["run_id"] == "smoke_test_run"
+    assert payload["backend_name"] == "pix2pix"
+    assert "metrics" in payload
+    assert "controls" in payload
+    assert payload["controls"]["conditioned_vs_shuffled_tested"] is True
+
 
 

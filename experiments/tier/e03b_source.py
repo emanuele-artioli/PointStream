@@ -157,6 +157,10 @@ def materialize_display_low(
 ) -> SourceRecipe:
     """Extract a fresh 24 fps window, decimate to 12 fps, rescale to 360-short-edge."""
     run_dir = Path(run_dir)
+    if (run_dir / "source_recipe.json").is_file() or (run_dir / "prepared_rgb.npy").is_file():
+        raise FileExistsError(
+            f"refusing to overwrite prepared source in {run_dir}; verify in a new directory"
+        )
     extract_dir = run_dir / "extract_24"
     _assert_new_extract_dir(extract_dir)
     extract_dir.mkdir(parents=True, exist_ok=True)
