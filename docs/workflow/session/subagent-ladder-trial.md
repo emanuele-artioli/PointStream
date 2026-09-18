@@ -7,19 +7,17 @@ generated benchmark outputs, merges, or shared contracts.
 
 ## Goal and duration
 
-Compare two escalation ladders for the next 24 completed eligible demo cards.
+Compare two Codex coordinator architectures for the next 24 completed eligible demo cards. The randomized arm decides only the Codex setup; Cursor and Antigravity retain their own documented profiles and are not part of this comparison.
 Review after two days if at least 20 cards completed; otherwise report the
 sample as insufficient and continue until 20 cards arise naturally. Stop early
 only if an arm causes material damage. Never invent work merely to fill the
 sample.
 
-### Arm A — picker-style
+### Arm A — Astra-led delegation
 
-Codex (three rungs):
-
-1. `trial_a_start`: Terra / low
-2. `trial_a_retry_1`: Sol / low
-3. `trial_a_retry_2`: Sol / medium
+Start the Codex parent on Astra/medium. It may delegate independent bounded
+lanes through `luna_medium`, escalate a failed lane to `terra_medium`, then to
+`sol_medium`. The parent still integrates results.
 
 Cursor (two rungs; Grok effort is the model slug):
 
@@ -31,13 +29,12 @@ Antigravity (two rungs):
 1. `trial-a-start`: Gemini 3.8 Flash / low
 2. `trial-a-retry`: Gemini 3.8 Flash / high
 
-### Arm B — cost-first
+### Arm B — Terra-led selective review
 
-Codex (three rungs):
-
-1. `budget_default`: Luna / medium
-2. `balanced_retry`: Terra / medium
-3. `expert_retry`: Sol / medium
+Start the Codex parent on Terra/medium and have it execute the card directly.
+Open a fresh `sol_medium` child only for a targeted review or repair after the
+predeclared check fails. A `luna_medium` child is allowed only for an
+independent, tightly specified auxiliary lane that replaces parent work.
 
 Cursor (two rungs):
 
@@ -58,11 +55,13 @@ When a session receives an eligible demo task with a concrete acceptance check:
 2. Count completed records by arm. Choose the arm with fewer completions. If
    tied, draw A or B with `shuf -n 1 -e A B` and record the draw. Do not change
    the selected arm after seeing its result.
-3. State the task, allowed files, acceptance check, arm, and first profile in
-   the record. Dispatch a fresh child with that profile.
+3. State the task, allowed files, acceptance check, arm, and parent model in
+   the record. For arm A, dispatch fresh children only for lanes that are
+   independently bounded. For arm B, the Terra parent executes directly.
 4. Accept a result only when its predeclared check passes. On failure, record
-   the failure and escalate once within the selected arm only if the retry is
-   safe and the same task remains well-scoped. Otherwise mark the card failed.
+   the failure. Arm A may use its next rung; arm B may request a focused
+   `sol_medium` review or repair if the retry is safe. Otherwise mark the card
+   failed.
 5. Add the final result before closing the session. The coordinator integrates
    successful work and reports the record path.
 
@@ -84,6 +83,7 @@ shared ledger.
 - Demo task and allowed files: <actual task>
 - Acceptance check: `<command>` or <objective review condition>
 - Arm / allocation: A|B / <count-based or tie draw>
+- Parent model / effort: <actual runtime values>
 - Attempts: <profile, model, effort or slug, pass/fail, elapsed time for each>
 - Final result: pass | fail | invalid
 - Coordinator integration time: <minutes>
@@ -91,7 +91,8 @@ shared ledger.
 - Escalation reason: <none or concrete failed check>
 ```
 
-At the end, compare final pass rate, elapsed time, escalation rate, and total
-model usage or cost where the harness exposes it. Include coordinator review
-time. Keep the cost-first ladder for PointStream only when it preserves final
-acceptance and does not create unacceptable integration cost.
+At the end, compare final pass rate, elapsed time, child-attempt count, total
+model usage or cost where the harness exposes it, and coordinator review time.
+Also record any quota/reset interruption. Use Terra-led selective review for
+PointStream only if it preserves final acceptance while reducing total usage or
+quota interruptions.

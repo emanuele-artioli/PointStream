@@ -51,19 +51,21 @@ Project constraints: data must stay outside the code tree (no `assets/` or `outp
 
 ## Subagents
 
-The parent coordinator delegates bounded parallel lanes by default. It keeps
-integration, shared-contract changes, and the hardest scientific or
-architectural judgment. It does not use demo trial profiles for codec,
-evaluation, paper, GPU, or shared-contract work.
+Delegate only independent bounded lanes when delegation replaces enough parent
+work to justify a second context. The parent keeps integration, shared-contract
+changes, and the hardest scientific or architectural judgment. It does not use
+demo trial profiles for codec, evaluation, paper, GPU, or shared-contract work.
 
 Escalate only after a predeclared acceptance check fails, and record that
 failure. Start a **fresh** child on the next rung; do not resume a cheaper
 child to change model. Verify the runtime model (and, on Codex, effort and
 permission metadata) before accepting a child result.
 
-**Codex** — profiles in `.codex/config.toml`, cost-first:
-`budget_default` (Luna/medium) → `balanced_retry` (Terra/medium) →
-`expert_retry` (Sol/medium). Pass both model and `reasoning_effort`.
+**Codex** — start ordinary PointStream sessions on Terra/medium. Use
+`luna_medium` only for an independent, tightly specified auxiliary lane;
+use `sol_medium` only for a targeted review or repair after a failed check.
+Use Astra for an occasional milestone plan that leaves a compact durable brief,
+not as the routine coordinator. Pass both model and `reasoning_effort`.
 
 **Cursor** — profiles in `.cursor/agents/`, cost-first (two rungs; there is
 no Terra equivalent): `budget-default` (Composer 2.5) → `expert-retry`

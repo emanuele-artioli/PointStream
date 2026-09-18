@@ -5,32 +5,17 @@
 hide_spawn_agent_metadata = false
 tool_namespace = "agents"
 
-[agents.budget_default]
-description = "Cost-first default for bounded work"
+[agents.luna_medium]
+description = "Cost-sensitive bounded auxiliary work"
 model = "gpt-5.6-luna"
 model_reasoning_effort = "medium"
 
-[agents.balanced_retry]
-description = "Escalation after a bounded default attempt fails acceptance"
+[agents.terra_medium]
+description = "Balanced implementation, integration, and coordination work"
 model = "gpt-5.6-terra"
 model_reasoning_effort = "medium"
 
-[agents.expert_retry]
-description = "Final escalation for a bounded task that still fails acceptance"
-model = "gpt-5.6-sol"
-model_reasoning_effort = "medium"
-
-[agents.trial_a_start]
-description = "Demo trial A first attempt"
-model = "gpt-5.6-terra"
-model_reasoning_effort = "low"
-
-[agents.trial_a_retry_1]
-description = "Demo trial A first escalation"
-model = "gpt-5.6-sol"
-model_reasoning_effort = "low"
-
-[agents.trial_a_retry_2]
-description = "Demo trial A final escalation"
+[agents.sol_medium]
+description = "Targeted repair or review after a declared acceptance failure"
 model = "gpt-5.6-sol"
 model_reasoning_effort = "medium"
