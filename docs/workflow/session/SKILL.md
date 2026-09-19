@@ -5,35 +5,18 @@ description: Route a PointStream task, prepare a scoped dispatch, or report/clos
 
 # PointStream Session Workflow
 
-This skill standardizes task routing, execution reporting, and clean session boundaries across all AI coding assistants (Codex, Claude, Cursor, and VS Code + Antigravity).
+This skill holds what is specific to PointStream: area routing, evidence reuse,
+and the reporting a codec result must carry. The host `session` skill holds
+everything that is not project-specific.
 
 ---
 
-## 1. Routing
-
-Use the user's chosen harness and model. Otherwise select by task complexity and available resources; no harness has an exclusive scientific or implementation role. Ordinary edits need no dispatch ceremony.
-
-### Harness capabilities & parallel subagents
-Parallel workstreams and wave dispatches are supported across all coding harnesses on this host (not only Cursor):
-- **VS Code + Antigravity**: Dispatches parallel subagents via `invoke_subagent`
-  with isolated workspaces (`Workspace: "branch"` or `"share"`). PointStream
-  work uses `.agents/agents/`: `budget-default` (Gemini 3.8 Flash / medium)
-  then `expert-retry` (Flash / high) after `STUCK` or a failed check. The
-  parent keeps integration and hard judgment.
-- **Cursor**: Dispatches parallel subagents via `Task`. PointStream work uses
-  `.cursor/agents/`: `budget-default` (Grok 4.6 medium) then `expert-retry`
-  (Grok 4.6 high). Spawn by `subagent_type` and omit `model`. Trial profiles
-  stay in [subagent-ladder-trial.md](subagent-ladder-trial.md).
-- **Claude Code**: Dispatches subagents via `Agent`/`Task` with `opus`.
-- **Codex**: `.codex/config.toml` `budget_default` (Luna extra-high) then
-  `expert_retry` (Astra low) after stuck/failed check. Trial profiles remain
-  trial-only.
-
-When dispatching multi-lane workstreams, any of these harnesses can run independent lanes concurrently using weaker-model subagents; sequential execution (running lanes in order within a single session) remains the standard fallback when subagents are not used.
-
-## 2. Modes of Operation
+## 1. Modes of Operation
 
 ### Mode A: Route & Dispatch
+
+Dispatch and report contracts: host `session` skill.
+
 When initiating or handing off a task:
 1. **Extract Outcome**: Identify the requested goal, explicit constraints, and potential ambiguity.
 2. **Consult Area Context**: Read [PLAN.md](../../../PLAN.md) and the single relevant area document in `docs/areas/`.
@@ -83,9 +66,7 @@ When executing work and reporting results:
 
 ### Mode C: Close & Continue
 When completing a session:
-1. **Record Result**: For completed repository work, commit onto the task branch, push, and open/update a PR with findings and validation. Keep one PR per independently revertible change, not per reply. Follow existing user authorization and any explicitly invoked closeout skill.
-2. **Update Area State**: Update the owning area document in `docs/areas/` with current status and mark action completed/advanced.
-3. **Check CI**: Watch GitHub Actions run via `gh run watch <id>` and inspect `gh run view <id> --log-failed` if failures occur.
-4. **Clean Boundary**:
+1. **Update Area State**: Update the owning area document in `docs/areas/` with current status and mark action completed/advanced.
+2. **Clean Boundary**:
    - If work is finished: fetch fresh `origin/main`, verify merge ancestry plus unique commits/diff and clean tracked/untracked status before considering retirement. Ask before removing a worktree that may host a paused session. Never force removal or bypass Git refusal with `rm -rf`. Do not run `scripts/cleanup_merged_worktrees.sh` (`INFRA-ACT-01`). Host `git-clean-merged-worktrees` is allowed only on merged, clean trees.
    - If work remains: provide a concise continuation prompt in the chat response. State the unresolved decision and resume command. Do not create a standalone completed-session report or permanent root handoff document; keep decisions in the area and details in the PR.
