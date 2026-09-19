@@ -47,7 +47,7 @@ For dispatch, completed work, or handoff, read and follow the [session workflow]
 
 Use [docs/setup.md](docs/setup.md) before environment setup or experiment runs, and its verification section before merging. Host-wide cache and import-order rules remain in the host rules above.
 
-Project constraints: data must stay outside the code tree (no `assets/` or `outputs/` symlinks); record the exact native encoder/decoder paths and versions with each run so comparisons are reproducible. Do not run `scripts/cleanup_merged_worktrees.sh` until `INFRA-ACT-01` is resolved: its deletion fallback can discard uncommitted work.
+Project constraints: data must stay outside the code tree (no `assets/` or `outputs/` symlinks); record the exact native encoder/decoder paths and versions with each run so comparisons are reproducible. Do not run `scripts/cleanup_merged_worktrees.sh` (`INFRA-ACT-01`: its `rm -rf` fallback can discard uncommitted work). Merged-and-clean worktrees: host `git-clean-merged-worktrees` only.
 
 ## Subagents
 
@@ -56,28 +56,34 @@ integration, shared-contract changes, and the hardest scientific or
 architectural judgment. It does not use demo trial profiles for codec,
 evaluation, paper, GPU, or shared-contract work.
 
-Escalate only after a predeclared acceptance check fails, and record that
-failure. Start a **fresh** child on the next rung; do not resume a cheaper
-child to change model. Verify the runtime model (and, on Codex, effort and
-permission metadata) before accepting a child result.
+Children get a goal, allowed paths, and a success check they can run alone.
+They return a short report. If they are out of ideas they return
+`STUCK: out of ideas.` plus what they tried. Escalate on a **fresh** child;
+do not resume to change model. Verify the runtime model (and, on Codex,
+effort and permission metadata) before accepting a child result.
 
-**Codex** — profiles in `.codex/config.toml`, cost-first:
-`budget_default` (Luna/medium) → `balanced_retry` (Terra/medium) →
-`expert_retry` (Sol/medium). Pass both model and `reasoning_effort`.
+**Codex** — profiles in `.codex/config.toml`: `budget_default` (Luna /
+extra-high) for ordinary children; `expert_retry` (Astra / low) only after
+`STUCK` or a failed check. Trial `trial_a_*` profiles stay trial-only.
+Pass both model and `reasoning_effort`.
 
-**Cursor** — profiles in `.cursor/agents/`, cost-first (two rungs; there is
-no Terra equivalent): `budget-default` (Composer 2.5) → `expert-retry`
-(Grok 4.6 low). Spawn by `subagent_type` and omit `model` so the profile
-frontmatter applies. Cursor has no separate effort field; Grok effort is
-the slug (`cursor-grok-4.6-low`). If the Task schema rejects non-fast
-Composer, `composer-2.5-fast` still counts as the Composer rung, not an
-escalation.
+**Cursor** — profiles in `.cursor/agents/`: `budget-default` (Grok 4.6
+medium) then `expert-retry` (Grok 4.6 high) after stuck/failed check.
+Spawn by `subagent_type` and omit `model`. Grok effort is the slug
+(`cursor-grok-4.6-medium` / `-high`).
 
-**Antigravity** — profiles in `.agents/agents/`, cost-first (two rungs):
-`budget-default` (Gemini 3.8 Flash / low effort) → `expert-retry`
-(Gemini 3.8 Flash / high effort). Spawn by `TypeName` (or pass `Model: "flash"`
-with `effort: low` by default, escalating to `high` on retry). Verify runtime
-model (Flash) and effort metadata before accepting a child result.
+**Antigravity** — profiles in `.agents/agents/`: `budget-default` (Gemini
+3.8 Flash / medium) then `expert-retry` (Flash / high). Spawn by
+`TypeName`. There is no 3.8 Pro.
+
+**Claude** — `Agent` children use Opus medium. Do not pick Sonnet.
+
+Host slug map: `/home/itec/emanuele/.agent-rules/effort-models.json` and
+skill `model-routing`. Do not run `scripts/cleanup_merged_worktrees.sh`.
+Merged-and-clean linked worktrees: host `git-clean-merged-worktrees`
+(refuses dirty trees). Ask before removing a worktree that might be a
+paused session. `INFRA-ACT-01` still applies to any script that can
+discard uncommitted work.
 
 For eligible real demo tasks, follow the automatic two-day, 24-card randomized
 trial in [subagent-ladder-trial.md](docs/workflow/session/subagent-ladder-trial.md).

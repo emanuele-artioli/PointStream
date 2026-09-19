@@ -15,10 +15,19 @@ Use the user's chosen harness and model. Otherwise select by task complexity and
 
 ### Harness capabilities & parallel subagents
 Parallel workstreams and wave dispatches are supported across all coding harnesses on this host (not only Cursor):
-- **VS Code + Antigravity**: Dispatches parallel subagents via `invoke_subagent` with isolated workspaces (`Workspace: "branch"` or `"share"`). PointStream work uses the cost-first profiles in `.agents/agents/`: `budget-default` (Gemini 3.8 Flash / low effort) then, only after a declared acceptance check fails, `expert-retry` (Gemini 3.8 Flash / high effort). The parent keeps integration and hard judgment.
-- **Cursor**: Dispatches parallel subagents via `Task`. PointStream work uses the cost-first profiles in `.cursor/agents/`: `budget-default` (Composer 2.5) then, only after a declared acceptance check fails, `expert-retry` (Grok 4.6 low). Spawn by `subagent_type` and omit `model` so frontmatter applies. The picker-style trial profiles are reserved for the [demo trial](subagent-ladder-trial.md). The parent keeps integration and hard judgment.
-- **Claude Code**: Dispatches subagents via `Agent`/`Task`. Configure subagents with weaker models (`haiku` or `sonnet`) rather than expensive flagship models (`opus`).
-- **Codex**: Use the project profiles in `.codex/config.toml`. PointStream work uses the cost-first escalation `budget_default` (Luna/medium) → `balanced_retry` (Terra/medium) → `expert_retry` (Sol/medium); advance only after a declared acceptance check fails. The picker-style profiles are reserved for the [demo trial](subagent-ladder-trial.md).
+- **VS Code + Antigravity**: Dispatches parallel subagents via `invoke_subagent`
+  with isolated workspaces (`Workspace: "branch"` or `"share"`). PointStream
+  work uses `.agents/agents/`: `budget-default` (Gemini 3.8 Flash / medium)
+  then `expert-retry` (Flash / high) after `STUCK` or a failed check. The
+  parent keeps integration and hard judgment.
+- **Cursor**: Dispatches parallel subagents via `Task`. PointStream work uses
+  `.cursor/agents/`: `budget-default` (Grok 4.6 medium) then `expert-retry`
+  (Grok 4.6 high). Spawn by `subagent_type` and omit `model`. Trial profiles
+  stay in [subagent-ladder-trial.md](subagent-ladder-trial.md).
+- **Claude Code**: Dispatches subagents via `Agent`/`Task` with `opus`.
+- **Codex**: `.codex/config.toml` `budget_default` (Luna extra-high) then
+  `expert_retry` (Astra low) after stuck/failed check. Trial profiles remain
+  trial-only.
 
 When dispatching multi-lane workstreams, any of these harnesses can run independent lanes concurrently using weaker-model subagents; sequential execution (running lanes in order within a single session) remains the standard fallback when subagents are not used.
 
@@ -78,5 +87,5 @@ When completing a session:
 2. **Update Area State**: Update the owning area document in `docs/areas/` with current status and mark action completed/advanced.
 3. **Check CI**: Watch GitHub Actions run via `gh run watch <id>` and inspect `gh run view <id> --log-failed` if failures occur.
 4. **Clean Boundary**:
-   - If work is finished: fetch fresh `origin/main`, verify merge ancestry plus unique commits/diff and clean tracked/untracked status before considering retirement. Ask before removing a worktree that may host a paused session. Never force removal or bypass Git refusal with `rm -rf`. The cleanup helper remains prohibited until `INFRA-ACT-01` is resolved.
+   - If work is finished: fetch fresh `origin/main`, verify merge ancestry plus unique commits/diff and clean tracked/untracked status before considering retirement. Ask before removing a worktree that may host a paused session. Never force removal or bypass Git refusal with `rm -rf`. Do not run `scripts/cleanup_merged_worktrees.sh` (`INFRA-ACT-01`). Host `git-clean-merged-worktrees` is allowed only on merged, clean trees.
    - If work remains: provide a concise continuation prompt in the chat response. State the unresolved decision and resume command. Do not create a standalone completed-session report or permanent root handoff document; keep decisions in the area and details in the PR.
