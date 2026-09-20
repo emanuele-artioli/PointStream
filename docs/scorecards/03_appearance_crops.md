@@ -48,3 +48,4 @@
   - WebP pasted-reference remains the conservative frozen baseline.
   - Any new generative model must beat WebP pasted-reference at matched wire rate ($F + M \le 12\text{ kB}$).
 - **Next Action**: Maintain generation-OFF as operational default; evaluate compact pose conditioning before any new generative training.
+

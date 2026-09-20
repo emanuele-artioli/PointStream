@@ -49,3 +49,4 @@
   - Background module is verified structurally unable to beat VVC at 48 frames due to fixed plate overhead.
   - At 192 frames, `registered_panorama` is competitive and Oracle shows a clear win window.
 - **Next Action**: Lock background evaluation to the $\ge 192$-frame horizon for competitive claims; maintain 48-frame runs strictly as fast diagnostics.
+

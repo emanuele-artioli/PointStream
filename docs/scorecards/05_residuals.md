@@ -47,3 +47,4 @@
   - If $\Delta \text{Quality} / \Delta \text{Rate}$ of the residual stream is worse than encoding the uncompressed difference with VVC: **RETIRE** or **FREEZE OFF** for low-rate rungs.
   - Residuals pull their weight only when base composite reaches $\ge 30\text{ dB}$ PSNR.
 - **Next Action**: Keep residual OFF ($R=0$) for C0–C3 low-rate confirmation ladders; evaluate residual exclusively on high-fidelity tiers.
+

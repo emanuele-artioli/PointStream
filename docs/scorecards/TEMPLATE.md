@@ -55,3 +55,4 @@ Measurements at fixed rest-of-pipeline against paired VVC/AV1 conventional ancho
   - If $\text{Current} \approx \text{Oracle}$ (within 5% rate/quality): **SATISFIED_FREEZE**. Stop spending compute and agent effort.
   - If All-Oracle still loses to Anchor: Decomposition failure at this horizon.
 - **Next Action**: [Concrete 1-sentence next action for this module's owner]
+
