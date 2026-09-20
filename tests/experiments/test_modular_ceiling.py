@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-import pytest
 
 from experiments.modular.eval_segmentation_impact import run_segmentation_impact_eval
 from experiments.modular.oracle_ceiling import DEFAULT_MANIFEST, run_ceiling_analysis

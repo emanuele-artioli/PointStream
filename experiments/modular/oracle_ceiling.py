@@ -18,10 +18,7 @@ import argparse
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
-import sys
 from typing import Any
-
-import numpy as np
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_MANIFEST = REPO_ROOT / "manifests" / "modular_oracle_ceiling.json"
@@ -65,6 +62,15 @@ def run_ceiling_analysis(
     with open(manifest_path, encoding="utf-8") as f:
         manifest = json.load(f)
 
+    # Read canonical scene identities from manifest
+    short_scene = manifest["sources"][0]["scene"]
+    short_video = manifest["sources"][0]["video"]
+    short_scene_id = f"{short_video}/{short_scene}"
+
+    long_scene = manifest["sources"][1]["scene"]
+    long_video = manifest["sources"][1]["video"]
+    long_scene_id = f"{long_video}/{long_scene}"
+
     results: list[dict[str, Any]] = []
 
     # Calibrated empirical benchmarks from E03B, E04A/B, E06, and Gate A Run-2
@@ -101,7 +107,7 @@ def run_ceiling_analysis(
     short_result = HorizonResult(
         horizon_id="short_48f",
         n_frames=48,
-        scene="federer_djokovic/scene_007",
+        scene=short_scene_id,
         total_bytes_null=t_short_null,
         total_bytes_current=t_short_curr,
         total_bytes_oracle=t_short_orac,
@@ -157,7 +163,7 @@ def run_ceiling_analysis(
     long_result = HorizonResult(
         horizon_id="long_192f",
         n_frames=192,
-        scene="alcaraz_highlights/scene_000",
+        scene=long_scene_id,
         total_bytes_null=t_long_null,
         total_bytes_current=t_long_curr,
         total_bytes_oracle=t_long_orac,

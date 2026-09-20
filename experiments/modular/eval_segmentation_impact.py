@@ -167,33 +167,35 @@ def run_segmentation_impact_eval(
         null_masks[t, y1:y2, x1:x2] = True
 
     # 2. Current masks (YOLO simulation: reasonable body, slightly loose with edge bleed)
-    current_masks = np.zeros((n_frames, h, w), dtype=bool)
+    current_masks_u8 = np.zeros((n_frames, h, w), dtype=np.uint8)
     for t, (x1, y1, x2, y2) in enumerate(bboxes):
         # Ellipse body with 4px halo
         cv2.ellipse(
-            current_masks[t].view(np.uint8),
+            current_masks_u8[t],
             ((x1 + x2) // 2, (y1 + y2) // 2),
             (24, 44),
-            0,
-            0,
-            360,
-            1,
+            0.0,
+            0.0,
+            360.0,
+            (1.0,),
             -1,
         )
+    current_masks = current_masks_u8 > 0
 
     # 3. Oracle masks (SAM 3.1 simulation: tight contour, exact actor boundaries)
-    oracle_masks = np.zeros((n_frames, h, w), dtype=bool)
+    oracle_masks_u8 = np.zeros((n_frames, h, w), dtype=np.uint8)
     for t, (x1, y1, x2, y2) in enumerate(bboxes):
         cv2.ellipse(
-            oracle_masks[t].view(np.uint8),
+            oracle_masks_u8[t],
             ((x1 + x2) // 2, (y1 + y2) // 2),
             (18, 38),
-            0,
-            0,
-            360,
-            1,
+            0.0,
+            0.0,
+            360.0,
+            (1.0,),
             -1,
         )
+    oracle_masks = oracle_masks_u8 > 0
 
     masks_dict = {
         "null_bbox": null_masks,
