@@ -30,6 +30,16 @@ are reviewed below; only the evidence reuse tasks in the current brief are relea
 | [Infrastructure](docs/areas/infrastructure.md) | Existing detached monitoring; verify host availability at each launch | Per-host CPU <=90% available; any free GPU; no cleanup helper |
 | [Paper](docs/areas/paper.md) | Separate repo; no new competitive evidence certified by repairs | E08 setup/structure early, final claims after accepted results |
 
+## Module Scorecards & Operational Headroom
+
+| Module | Owner Lane | Verdict | Short Headroom (48f) | Long Headroom (192f) | Next Action |
+|---|---|---|---|---|---|
+| [01 Segmentation](docs/scorecards/01_segmentation.md) | Antigravity FG | ACTIVE_SEARCH | Ghost MAD -6.0 | $\Delta F \approx -12\text{ kB}$ | Evaluate SAM 3.1 downstream impact |
+| [02 Background](docs/scorecards/02_background.md) | Antigravity BG | ACTIVE_SEARCH | Loss (floor 32 kB > VVC 21 kB) | +1.3 dB over VVC | Lock evaluation to $\ge 192$f horizon |
+| [03 Appearance Crops](docs/scorecards/03_appearance_crops.md) | Antigravity FG | ACTIVE_SEARCH | +6.3 dB (with GT crops) | +5.1 dB (with GT crops) | Keep Gen-OFF baseline; test compact pose |
+| [04 Motion & Metadata](docs/scorecards/04_motion_metadata.md) | Cursor | ACTIVE_SEARCH | -14.3 kB (RLE vs Oracle) | -29.8 kB | Delta-coded wire predictor card |
+| [05 Residuals](docs/scorecards/05_residuals.md) | Codex / Codec | ACTIVE_SEARCH | Lose vs VVC (under 100 kbps) | Marginal | Freeze OFF ($R=0$) for C0–C3 low rates |
+
 ## Current boundary — component strategy checkpoint
 
 E06 compact transport and client timing support stopping this tested codec
