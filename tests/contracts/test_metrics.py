@@ -104,6 +104,8 @@ def test_the_tiers_are_the_ones_the_plan_specifies() -> None:
         "lpips",
         "reid",
         "palette",
+        "pose_oks",
+        "sam_iou",
     }
     assert {spec.name for spec in by_tier(MetricTier.TEMPORAL)} == {"fvmd"}
     # FVMD rather than FVD: the reviewer question is about temporal coherence

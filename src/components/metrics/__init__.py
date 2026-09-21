@@ -13,7 +13,17 @@ from src.components.metrics.evaluator import (
     triage,
 )
 from src.components.metrics.region import MIN_REGION_PIXELS, Region, RegionKind, RegionRole
-from src.contracts.metrics import FVMD, LPIPS, PALETTE, PSNR, REID, SSIM, VMAF
+from src.contracts.metrics import (
+    FVMD,
+    LPIPS,
+    PALETTE,
+    POSE_OKS,
+    PSNR,
+    REID,
+    SAM_IOU,
+    SSIM,
+    VMAF,
+)
 from src.contracts.registry import BackendSpec, Registry
 
 REGISTRY: Registry[object] = Registry("metric")
@@ -72,6 +82,22 @@ REGISTRY.register(
         target="src.components.metrics.fvmd:FvmdMetric",
         capabilities=frozenset({"sequence", "reference", "temporal-sequence"}),
         summary=FVMD.summary,
+    )
+)
+REGISTRY.register(
+    BackendSpec(
+        name=POSE_OKS.name,
+        target="src.components.metrics.pose:PoseMetric",
+        capabilities=frozenset({"frame", "reference", "pose"}),
+        summary=POSE_OKS.summary,
+    )
+)
+REGISTRY.register(
+    BackendSpec(
+        name=SAM_IOU.name,
+        target="src.components.metrics.semantic_mask:SamIouMetric",
+        capabilities=frozenset({"frame", "reference", "mask"}),
+        summary=SAM_IOU.summary,
     )
 )
 
