@@ -1,0 +1,154 @@
+{
+  "schema": "pointstream.modular_rate_ladder.v1",
+  "doc_role": "modular_rate_ladder_experiment_manifest",
+  "created": "2026-09-21",
+  "campaign": "evaluation-20260914",
+  "evaluation_scope": {
+    "fps": 24.0,
+    "resolution": "3840x2160",
+    "colour": "yuv420p",
+    "saliency_weights": {
+      "foreground": 0.70,
+      "background": 0.30
+    }
+  },
+  "sources": [
+    {
+      "video": "federer_djokovic",
+      "scene": "scene_007",
+      "camera_regime": "diagnostic_established_pan",
+      "consecutive_mad": 2.14
+    },
+    {
+      "video": "alcaraz_highlights",
+      "scene": "scene_000",
+      "camera_regime": "easy_near_static",
+      "consecutive_mad": 0.295
+    }
+  ],
+  "horizons": [
+    {
+      "id": "short",
+      "n_frames": 48,
+      "duration_sec": 2.0,
+      "purpose": "fast_diagnostic_check"
+    },
+    {
+      "id": "long",
+      "n_frames": 192,
+      "duration_sec": 8.0,
+      "purpose": "amortization_and_competitive_claim"
+    }
+  ],
+  "rungs": [
+    {
+      "id": "C0_compact_baseline",
+      "description": "Presley Compact Plate (1080p, QP51) + E06 Motion Wire + Single Actor Crop",
+      "components": {
+        "background": {
+          "mode": "presley_compact",
+          "scale": 0.5,
+          "filter": "bilateral",
+          "quality": 35
+        },
+        "appearance": {
+          "mode": "single_crop",
+          "max_wire_bytes": 3500
+        },
+        "metadata": {
+          "mode": "e06_rle_thin_placement"
+        },
+        "residual": {
+          "mode": "none"
+        }
+      }
+    },
+    {
+      "id": "C1_adaptive_keyframes",
+      "description": "C0 + Adaptive Keyframe WebP Crops (OKS >= 0.80, wire <= 12 kB)",
+      "components": {
+        "background": {
+          "mode": "presley_compact",
+          "scale": 0.5,
+          "filter": "bilateral",
+          "quality": 35
+        },
+        "appearance": {
+          "mode": "adaptive_keyframe",
+          "max_wire_bytes": 12000,
+          "oks_threshold": 0.80
+        },
+        "metadata": {
+          "mode": "e06_rle_thin_placement"
+        },
+        "residual": {
+          "mode": "none"
+        }
+      }
+    },
+    {
+      "id": "C2_steered_actor_residual",
+      "description": "C1 + Cropped Actor Residual (wire <= 4.5 kB)",
+      "components": {
+        "background": {
+          "mode": "presley_compact",
+          "scale": 0.5,
+          "filter": "bilateral",
+          "quality": 35
+        },
+        "appearance": {
+          "mode": "adaptive_keyframe",
+          "max_wire_bytes": 12000,
+          "oks_threshold": 0.80
+        },
+        "metadata": {
+          "mode": "e06_rle_thin_placement"
+        },
+        "residual": {
+          "mode": "cropped_actor",
+          "max_wire_bytes": 4500,
+          "codec": "webp",
+          "quality": 75
+        }
+      }
+    },
+    {
+      "id": "C3_bandlimited_bg_residual",
+      "description": "C2 + Band-Limited Background Residual Target",
+      "components": {
+        "background": {
+          "mode": "presley_compact",
+          "scale": 0.5,
+          "filter": "bilateral",
+          "quality": 35
+        },
+        "appearance": {
+          "mode": "adaptive_keyframe",
+          "max_wire_bytes": 12000,
+          "oks_threshold": 0.80
+        },
+        "metadata": {
+          "mode": "e06_rle_thin_placement"
+        },
+        "residual": {
+          "mode": "actor_plus_bandlimited_bg",
+          "max_wire_bytes": 19000,
+          "bg_downscale": 0.5
+        }
+      }
+    }
+  ],
+  "anchors": {
+    "vvc": {
+      "encoder": "ffmpeg_libvvenc",
+      "preset": "slower",
+      "qps": [51, 47, 42, 37]
+    },
+    "svt_av1": {
+      "encoder": "SvtAv1EncApp",
+      "preset": 0,
+      "qps": [62, 54, 46, 38]
+    }
+  },
+  "output_dir": "outputs/modular/rate_ladder"
+}
