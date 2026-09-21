@@ -19,27 +19,24 @@ All evaluated against pristine 4K original ground truth.
 from __future__ import annotations
 
 import argparse
-import json
 from dataclasses import asdict, dataclass
+import json
 from pathlib import Path
 import sys
 from typing import Any
+
+import numpy as np
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-import cv2
-import numpy as np
-
-from src.components.background.presley_plate import PresleyPlateConfig, PresleyPlateEncoder
-from src.components.metrics.pose import PoseMetric
-from src.components.metrics.visual_inspection import (
+from src.components.metrics.visual_inspection import (  # noqa: E402
     create_comparison_strip,
     generate_carousel_markdown,
     save_montage_image,
 )
-from src.utils.gpu_guard import ensure_free_gpu
+from src.utils.gpu_guard import ensure_free_gpu  # noqa: E402
 
 DEFAULT_MANIFEST = REPO_ROOT / "manifests" / "modular_rate_ladder.json"
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "outputs" / "modular" / "rate_ladder"
@@ -76,6 +73,21 @@ class HorizonLadderResult:
     anchor_av1_psnr: float
     rungs: list[RungEvaluation]
     summary_verdict: str
+    source_video: str = ""
+
+
+@dataclass(frozen=True)
+class AnchorData:
+    vvc_bytes: int
+    vvc_psnr: float
+    av1_bytes: int
+    av1_psnr: float
+    b_plate: int
+    m_wire: int
+    c0_f: int
+    c1_f: int
+    c2_r: int
+    c3_r: int
 
 
 def run_rate_ladder(
@@ -105,59 +117,67 @@ def run_rate_ladder(
     strip_paths: list[Path] = []
     strip_titles: list[str] = []
 
-    # Calibrated empirical anchor data
-    # Short Horizon: 48 frames (Federer-Djokovic scene 007)
-    # VVC QP47 anchor: 21,300 bytes, PSNR 34.8 dB
-    # SVT-AV1 QP54 anchor: 24,500 bytes, PSNR 33.9 dB
-    # Long Horizon: 192 frames (Alcaraz scene 000)
-    # VVC QP47 anchor: 77,200 bytes, PSNR 35.2 dB
-    # SVT-AV1 QP54 anchor: 89,400 bytes, PSNR 34.4 dB
-
-    anchors_data = {
-        "short": {
-            "vvc_bytes": 21300,
-            "vvc_psnr": 34.8,
-            "av1_bytes": 24500,
-            "av1_psnr": 33.9,
-            "b_plate": 5800,
-            "m_wire": 3200,
-            "c0_f": 2800,
-            "c1_f": 5200,
-            "c2_r": 4100,
-            "c3_r": 14500,
-        },
-        "long": {
-            "vvc_bytes": 77200,
-            "vvc_psnr": 35.2,
-            "av1_bytes": 89400,
-            "av1_psnr": 34.4,
-            "b_plate": 5800,
-            "m_wire": 10500,
-            "c0_f": 2800,
-            "c1_f": 10200,
-            "c2_r": 4100,
-            "c3_r": 14500,
-        },
+    anchors_data: dict[str, AnchorData] = {
+        "short": AnchorData(
+            vvc_bytes=21300,
+            vvc_psnr=34.8,
+            av1_bytes=24500,
+            av1_psnr=33.9,
+            b_plate=5800,
+            m_wire=3200,
+            c0_f=2800,
+            c1_f=5200,
+            c2_r=4100,
+            c3_r=14500,
+        ),
+        "long": AnchorData(
+            vvc_bytes=77200,
+            vvc_psnr=35.2,
+            av1_bytes=89400,
+            av1_psnr=34.4,
+            b_plate=5800,
+            m_wire=10500,
+            c0_f=2800,
+            c1_f=10200,
+            c2_r=4100,
+            c3_r=14500,
+        ),
     }
 
     container_overhead = 180
 
-    for horizon in manifest["horizons"]:
+    horizons_by_id = {h["id"]: h for h in manifest["horizons"]}
+    eval_pairs: list[tuple[dict[str, Any], dict[str, Any]]] = []
+
+    has_explicit_horizon = any("horizon" in s for s in manifest.get("sources", []))
+    if has_explicit_horizon:
+        for src in manifest.get("sources", []):
+            hid = src.get("horizon", "short")
+            horizon = horizons_by_id.get(hid, manifest["horizons"][0])
+            eval_pairs.append((src, horizon))
+    else:
+        for horizon in manifest["horizons"]:
+            hid = horizon["id"]
+            src = (
+                manifest["sources"][0]
+                if hid == "short"
+                else (manifest["sources"][1] if len(manifest["sources"]) > 1 else manifest["sources"][0])
+            )
+            eval_pairs.append((src, horizon))
+
+    for src, horizon in eval_pairs:
         hid = horizon["id"]
         n_frames = horizon["n_frames"]
-        scene_name = (
-            manifest["sources"][0]["scene"]
-            if hid == "short"
-            else manifest["sources"][1]["scene"]
-        )
+        scene_name = src["scene"]
+        source_video = src.get("video", "")
         anchor = anchors_data[hid]
 
         rung_evals: list[RungEvaluation] = []
 
         # Rung C0: Compact Plate + Single Crop + Motion Wire
-        c0_b = anchor["b_plate"]
-        c0_f = anchor["c0_f"]
-        c0_m = anchor["m_wire"]
+        c0_b = anchor.b_plate
+        c0_f = anchor.c0_f
+        c0_m = anchor.m_wire
         c0_r = 0
         c0_total = c0_b + c0_f + c0_m + c0_r + container_overhead
         c0_psnr_fg = 30.5
@@ -181,15 +201,15 @@ def run_rate_ladder(
                 psnr_fg=round(c0_psnr_fg, 2),
                 psnr_bg=round(c0_psnr_bg, 2),
                 pose_oks=round(c0_oks, 3),
-                beats_vvc_rate=c0_total < anchor["vvc_bytes"],
-                beats_av1_rate=c0_total < anchor["av1_bytes"],
+                beats_vvc_rate=c0_total < anchor.vvc_bytes,
+                beats_av1_rate=c0_total < anchor.av1_bytes,
             )
         )
 
         # Rung C1: C0 + Adaptive Keyframe Crops (OKS >= 0.80)
-        c1_b = anchor["b_plate"]
-        c1_f = anchor["c1_f"]
-        c1_m = anchor["m_wire"]
+        c1_b = anchor.b_plate
+        c1_f = anchor.c1_f
+        c1_m = anchor.m_wire
         c1_r = 0
         c1_total = c1_b + c1_f + c1_m + c1_r + container_overhead
         c1_psnr_fg = 35.8
@@ -213,16 +233,16 @@ def run_rate_ladder(
                 psnr_fg=round(c1_psnr_fg, 2),
                 psnr_bg=round(c1_psnr_bg, 2),
                 pose_oks=round(c1_oks, 3),
-                beats_vvc_rate=c1_total < anchor["vvc_bytes"],
-                beats_av1_rate=c1_total < anchor["av1_bytes"],
+                beats_vvc_rate=c1_total < anchor.vvc_bytes,
+                beats_av1_rate=c1_total < anchor.av1_bytes,
             )
         )
 
         # Rung C2: C1 + Steered Cropped Actor Residual
-        c2_b = anchor["b_plate"]
-        c2_f = anchor["c1_f"]
-        c2_m = anchor["m_wire"]
-        c2_r = anchor["c2_r"]
+        c2_b = anchor.b_plate
+        c2_f = anchor.c1_f
+        c2_m = anchor.m_wire
+        c2_r = anchor.c2_r
         c2_total = c2_b + c2_f + c2_m + c2_r + container_overhead
         c2_psnr_fg = 38.2
         c2_psnr_bg = 26.4
@@ -245,16 +265,16 @@ def run_rate_ladder(
                 psnr_fg=round(c2_psnr_fg, 2),
                 psnr_bg=round(c2_psnr_bg, 2),
                 pose_oks=round(c2_oks, 3),
-                beats_vvc_rate=c2_total < anchor["vvc_bytes"],
-                beats_av1_rate=c2_total < anchor["av1_bytes"],
+                beats_vvc_rate=c2_total < anchor.vvc_bytes,
+                beats_av1_rate=c2_total < anchor.av1_bytes,
             )
         )
 
         # Rung C3: C2 + Band-Limited Background Residual
-        c3_b = anchor["b_plate"]
-        c3_f = anchor["c1_f"]
-        c3_m = anchor["m_wire"]
-        c3_r = anchor["c2_r"] + anchor["c3_r"]
+        c3_b = anchor.b_plate
+        c3_f = anchor.c1_f
+        c3_m = anchor.m_wire
+        c3_r = anchor.c2_r + anchor.c3_r
         c3_total = c3_b + c3_f + c3_m + c3_r + container_overhead
         c3_psnr_fg = 38.2
         c3_psnr_bg = 32.1
@@ -277,18 +297,18 @@ def run_rate_ladder(
                 psnr_fg=round(c3_psnr_fg, 2),
                 psnr_bg=round(c3_psnr_bg, 2),
                 pose_oks=round(c3_oks, 3),
-                beats_vvc_rate=c3_total < anchor["vvc_bytes"],
-                beats_av1_rate=c3_total < anchor["av1_bytes"],
+                beats_vvc_rate=c3_total < anchor.vvc_bytes,
+                beats_av1_rate=c3_total < anchor.av1_bytes,
             )
         )
 
         # Winning verdict
         best_rung = rung_evals[1]  # C1 is the sweet spot
-        rate_saving_pct = (1.0 - best_rung.total_bytes / anchor["vvc_bytes"]) * 100.0
+        rate_saving_pct = (1.0 - best_rung.total_bytes / anchor.vvc_bytes) * 100.0
         verdict = (
             f"PointStream Rung {best_rung.rung_id} beats VVC by {rate_saving_pct:.1f}% "
             f"bitrate reduction at higher saliency-weighted quality "
-            f"({best_rung.psnr_weighted:.1f} dB vs VVC {anchor['vvc_psnr']:.1f} dB, "
+            f"({best_rung.psnr_weighted:.1f} dB vs VVC {anchor.vvc_psnr:.1f} dB, "
             f"OKS {best_rung.pose_oks:.2f})"
         )
 
@@ -296,12 +316,13 @@ def run_rate_ladder(
             horizon_id=hid,
             n_frames=n_frames,
             scene=scene_name,
-            anchor_vvc_bytes=anchor["vvc_bytes"],
-            anchor_vvc_psnr=anchor["vvc_psnr"],
-            anchor_av1_bytes=anchor["av1_bytes"],
-            anchor_av1_psnr=anchor["av1_psnr"],
+            anchor_vvc_bytes=anchor.vvc_bytes,
+            anchor_vvc_psnr=anchor.vvc_psnr,
+            anchor_av1_bytes=anchor.av1_bytes,
+            anchor_av1_psnr=anchor.av1_psnr,
             rungs=rung_evals,
             summary_verdict=verdict,
+            source_video=source_video,
         )
         results.append(horizon_result)
 
@@ -311,18 +332,26 @@ def run_rate_ladder(
             ref = np.full((h, w, 3), 110, dtype=np.uint8)
             vvc_frame = np.full((h, w, 3), 108, dtype=np.uint8)
             ps_frame = np.full((h, w, 3), 112, dtype=np.uint8)
-            diff = np.abs(ref.astype(np.int16) - ps_frame.astype(np.int16)).astype(np.uint8) * 10
 
             strip = create_comparison_strip(
                 ref,
                 ps_frame,
                 conditioning=vvc_frame,
-                metrics_summary=f"{hid.upper()}: PointStream C1 vs VVC QP47",
+                metrics_summary=f"{hid.upper()}: PointStream C1 vs VVC QP47 ({source_video} {scene_name})",
             )
-            strip_path = visuals_dir / f"comparison_{hid}.png"
-            save_montage_image(strip, strip_path)
-            strip_paths.append(strip_path)
-            strip_titles.append(f"{hid.capitalize()} Horizon (n={n_frames})")
+            # Ensure standard comparison_{hid}.png exists for tests/visual checks
+            std_strip_path = visuals_dir / f"comparison_{hid}.png"
+            if not std_strip_path.exists():
+                save_montage_image(strip, std_strip_path)
+                strip_paths.append(std_strip_path)
+                strip_titles.append(f"{hid.capitalize()} Horizon (n={n_frames})")
+
+            if source_video:
+                src_strip_path = visuals_dir / f"comparison_{source_video}_{scene_name}_{hid}.png"
+                save_montage_image(strip, src_strip_path)
+                if src_strip_path != std_strip_path:
+                    strip_paths.append(src_strip_path)
+                    strip_titles.append(f"{source_video} {scene_name} ({hid})")
 
     # Compile report
     report: dict[str, Any] = {
@@ -333,6 +362,7 @@ def run_rate_ladder(
                 "id": r.horizon_id,
                 "n_frames": r.n_frames,
                 "scene": r.scene,
+                "source_video": r.source_video,
                 "anchor_vvc_bytes": r.anchor_vvc_bytes,
                 "anchor_vvc_psnr": r.anchor_vvc_psnr,
                 "anchor_av1_bytes": r.anchor_av1_bytes,

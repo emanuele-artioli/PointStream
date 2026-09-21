@@ -20,7 +20,6 @@ import cv2
 import numpy as np
 
 from src.components.background.scale import (
-    GeometryHeader,
     TransportScaleError,
     downsample_plate,
     restore_plate,

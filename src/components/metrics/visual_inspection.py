@@ -158,7 +158,7 @@ def create_comparison_strip(
     # Panel 2: Conditioning (or placeholder if None)
     panels = [panel1]
     if conditioning is not None:
-        cond_rgb = np.clip(conditioning, 0, 255).astype(np.uint8)
+        cond_rgb: np.ndarray = np.clip(conditioning, 0, 255).astype(np.uint8)
         if cond_rgb.shape[:2] != ref_rgb.shape[:2]:
             cond_rgb = cv2.resize(cond_rgb, (ref_rgb.shape[1], ref_rgb.shape[0]))
         panel2 = _add_banner(cond_rgb, "Conditioning Wire")

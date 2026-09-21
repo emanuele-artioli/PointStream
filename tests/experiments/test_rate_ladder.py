@@ -86,3 +86,36 @@ def test_missing_manifest_raises_file_not_found():
             dry_run=True,
             enforce_gpu=False,
         )
+
+
+def test_rate_ladder_multi_source_confirmation_manifest():
+    manifest_path = Path(__file__).resolve().parents[2] / "manifests" / "gate_b_modular_confirmation.json"
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        out_dir = Path(tmp_dir) / "output"
+        visuals_dir = Path(tmp_dir) / "visuals"
+
+        report = run_rate_ladder(
+            manifest_path=manifest_path,
+            output_dir=out_dir,
+            visuals_dir=visuals_dir,
+            dry_run=True,
+            generate_visuals=True,
+            enforce_gpu=False,
+        )
+
+        assert "horizons" in report
+        # All 6 independent sources evaluated
+        assert len(report["horizons"]) == 6
+
+        # Check that each evaluated source has a valid summary verdict and beats VVC on C1
+        for res in report["horizons"]:
+            c1 = next(r for r in res["rungs"] if r["rung_id"] == "C1_adaptive_keyframes")
+            assert c1["beats_vvc_rate"]
+            assert c1["pose_oks"] >= 0.90
+            assert res["source_video"] != ""
+
+        # Check visual strips generated
+        assert (visuals_dir / "comparison_short.png").exists()
+        assert (visuals_dir / "comparison_long.png").exists()
+        assert (visuals_dir / "carousel.md").exists()
+

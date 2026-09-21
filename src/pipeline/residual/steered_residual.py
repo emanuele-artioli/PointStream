@@ -195,7 +195,7 @@ class CroppedActorResidualEncoder:
         return CroppedResidualPayload(
             payload=encoded.tobytes(),
             bbox=bbox,
-            original_shape=target_frame.shape,
+            original_shape=(int(target_frame.shape[0]), int(target_frame.shape[1]), int(target_frame.shape[2])),
             codec=self.codec,
             quality=self.quality,
             mode=self.mode,

@@ -16,7 +16,7 @@ from typing import Any, Callable
 import numpy as np
 
 from src.components.detection.weights import resolve_weight
-from src.components.metrics.frames import paired, to_clip
+from src.components.metrics.frames import paired
 
 #: Standard COCO-17 keypoint standard deviations (sigmas) for OKS calculation.
 COCO_17_SIGMAS: np.ndarray = np.array(
