@@ -285,9 +285,38 @@ FVMD = MetricSpec(
     ),
 )
 
+POSE_OKS = MetricSpec(
+    name="pose_oks",
+    tier=MetricTier.PERCEPTUAL,
+    direction=Direction.HIGHER_IS_BETTER,
+    cost=MetricCost.HEAVY,
+    range=(0.0, 1.0),
+    min_curve_span=0.05,
+    summary=(
+        "Object Keypoint Similarity (OKS) on human subjects using a large YOLO "
+        "pose estimator. Measures anatomical fidelity and joint alignment "
+        "between predicted and reference persons without relying on pixel distance."
+    ),
+)
+
+SAM_IOU = MetricSpec(
+    name="sam_iou",
+    tier=MetricTier.PERCEPTUAL,
+    direction=Direction.HIGHER_IS_BETTER,
+    cost=MetricCost.HEAVY,
+    range=(0.0, 1.0),
+    min_curve_span=0.05,
+    summary=(
+        "Silhouette mask Intersection-over-Union against SAM 3.1 (or high-capacity "
+        "oracle segmentation). Measures boundary integrity, preventing ghosting, "
+        "torn limbs, or background leakage from passing unnoticed."
+    ),
+)
+
 #: Every metric, by config name.
 METRICS: Final[Mapping[str, MetricSpec]] = {
-    spec.name: spec for spec in (PSNR, SSIM, VMAF, LPIPS, REID, PALETTE, FVMD)
+    spec.name: spec
+    for spec in (PSNR, SSIM, VMAF, LPIPS, REID, PALETTE, FVMD, POSE_OKS, SAM_IOU)
 }
 
 #: Metrics no configuration may switch off. One entry today, and the reason
