@@ -15,7 +15,7 @@ from src.components.metrics.semantic_mask import (
 
 def _circle_mask(size: int = 100, radius: int = 25) -> np.ndarray:
     mask = np.zeros((size, size), dtype=bool)
-    cv2.circle(mask.view(np.uint8), (size // 2, size // 2), radius, 1, -1)
+    cv2.circle(mask.view(np.uint8), (size // 2, size // 2), radius, (1,), -1)
     return mask
 
 
