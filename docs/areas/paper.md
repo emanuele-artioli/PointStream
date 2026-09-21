@@ -1,5 +1,13 @@
 # Paper Area
 
+## Modular rate ladder victory integration and visual strip — 21 September 2026
+
+Paper commit `fc65fb8` (pushed to Overleaf `origin/main`).
+1. **Section 4.2 (`subsec:eval-ladder`) Updated**: Obsolete 8-frame failure text replaced with verified modular rate ladder victory numbers (Presley plate $B=5.8\text{ kB}$, steered cropped actor residual $R=4.1\text{ kB}$, Rung C1 winning against VVC QP47 by 65.4% at 192f and 32.5% at 48f).
+2. **Table & Strip Integrated**: Table `tab:modular-rate-ladder` and Figure `fig:modular-strip` (`figures/modular_rate_ladder_strip.png`) embedded.
+3. **Markers Cleared & Pinned**: Cleared `% HOLE(subsec:eval-ladder)`; pinned `% CLAIM(subsec:eval-ladder): src=outputs/modular/rate_ladder/results.json commit=7966827 date=2026-09-21`.
+4. **Strict Budget Adherence**: Compiled PDF strictly adheres to the 28-page ACM TOMM limit (**exactly 28 pages**: 23 pages body/references + 5 pages appendix).
+
 ## Pilot return audit — 16 September 2026
 
 Paper commit `18d4778` records E05 missing-control/deployment evidence,

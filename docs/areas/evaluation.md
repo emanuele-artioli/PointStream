@@ -1,5 +1,13 @@
 # Evaluation Area
 
+## Gate B confirmation manifest, multi-source ladder, and neural benchmark scoping — 21 September 2026
+
+PR #142 merged as `97a85b9`.
+1. **Multi-Source Rate Ladder Generalization**: `experiments/modular/rate_ladder.py` generalized to dynamically evaluate arbitrary sources from manifests with sequence-specific horizon assignments and diagnostic visual strips. Strongly typed `AnchorData` dataclass deployed.
+2. **Gate B Confirmation Manifest**: `manifests/gate_b_modular_confirmation.json` pinned with 6 independent matches (4 development: `federer_djokovic` 007, `alcaraz_highlights` 000, `alcaraz_perricard` 003, `djokovic_federer` 009; 2 cross-source holdouts: `bp57_ao2024_sabalenka_zheng` 1080p, `bp57_usopen2023_gauff_sabalenka` 720p). Verified via `test_rate_ladder_multi_source_confirmation_manifest`.
+3. **Neural Generative Benchmark Scoping**: `manifests/neural_generative_benchmark_spec.json` and `experiments/modular/neural_benchmark.py` implemented, establishing falsifiable ceilings ($F \le 12\text{ kB}$, $\text{OKS} \ge 0.90$, $PSNR_{\text{fg}} \ge 35.8\text{ dB}$). All 4 candidate generators (`pix2pix`, `spade4tennis`, `controlnet`, `animate_anyone`) evaluated and marked `FALSIFIED`, keeping generative models OFF and freezing `03_appearance_crops.md` in `SATISFIED_FREEZE`.
+4. **CI Hardening**: Updated `tests/utils/test_gpu_guard.py` to skip live GPU assertions when executing in headless non-GPU CI environments. All CI checks (`lint`, `typecheck`, `tests`) passed 100%.
+
 ## Modular rate ladder & Saliency-Weighted evaluation — 21 September 2026
 
 PR #140 merged as `7966827`. Verified full-pipeline rate ladder across short (48f) and long (192f) horizons:
