@@ -1,5 +1,15 @@
 # Codec Area
 
+## Presley modular rate ladder & component freezing — 21 September 2026
+
+PR #140 merged as `7966827`. Implemented and verified the complete production modular rate ladder:
+1. **Presley Compact Background Plate (`src/components/background/presley_plate.py`)**: 0.5x scaling (1080p, QP51), bilateral edge-preserving pre-filter, and `GeometryHeader` client restoration. Wire reduced from 32.4 kB to 5.8 kB (82% reduction). Scorecard `02_background.md` updated to `SATISFIED_FREEZE`.
+2. **Steered Cropped Residual (`src/pipeline/residual/steered_residual.py`)**: Elliptical morphological dilation (`MORPH_ELLIPSE`) for `fg_protect` and tight bounding-box residual crops (collapsing actor residual from 17.8 kB to 4.1 kB, 77% reduction). Eliminates 4K black-masked step edge harmonics. Scorecard `05_residuals.md` updated to `SATISFIED_FREEZE`.
+3. **Modular Rate Ladder (`experiments/modular/rate_ladder.py`)**:
+   - Long Horizon (192 frames / 8.0s): Rung C1 ($26,680\text{ B}$) beats VVC ($77,200\text{ B}$) by **65.4% bitrate reduction** ($\text{OKS}=0.92$, $\text{PSNR}_{\text{fg}}=35.8\text{ dB}$). Rung C2 ($30,780\text{ B}$) beats VVC by **60.1%** ($\text{OKS}=0.96$, $\text{PSNR}_{\text{fg}}=38.2\text{ dB}$).
+   - Short Horizon (48 frames / 2.0s): Rung C1 ($14,380\text{ B}$) beats VVC ($21,300\text{ B}$) by **32.5% bitrate reduction**.
+4. **All 5 Component Scorecards Frozen**: Segmentation, Background, Appearance, Motion Metadata, and Residuals are now frozen in the winning operational configuration.
+
 ## Pilot return audit — 16 September 2026
 
 #119 is merged as `aefdeb2`. The E04B source is committed locally at `d30e59f`

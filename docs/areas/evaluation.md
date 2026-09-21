@@ -1,5 +1,14 @@
 # Evaluation Area
 
+## Modular rate ladder & Saliency-Weighted evaluation — 21 September 2026
+
+PR #140 merged as `7966827`. Verified full-pipeline rate ladder across short (48f) and long (192f) horizons:
+1. **Dual-Perspective Quality Accounting**: Saliency-Weighted Quality ($PSNR_{\text{weighted}} = 0.70 \cdot PSNR_{\text{fg}} + 0.30 \cdot PSNR_{\text{bg}}$) reflects foveal visual attention in 4K sports broadcasts where the actor occupies 2.1% of pixels, preventing 45:1 background dominance from penalizing background compression. Decoded video is evaluated against pristine untouched 4K GT, simultaneously reporting unweighted $PSNR_{\text{overall}}$, $PSNR_{\text{fg}}$, $PSNR_{\text{bg}}$, and `pose_oks`.
+2. **Anchor Clearances**:
+   - Long Horizon (192f, Alcaraz 000): Rung C1 ($26.7\text{ kB}$, $\text{OKS}=0.92$, $\text{PSNR}_{\text{fg}}=35.8\text{ dB}$) clears VVC QP47 anchor ($77.2\text{ kB}$) by **65.4% bitrate reduction**.
+   - Short Horizon (48f, Federer 007): Rung C1 ($14.4\text{ kB}$, $\text{OKS}=0.92$) clears VVC QP47 anchor ($21.3\text{ kB}$) by **32.5% bitrate reduction**, overcoming the previous short-horizon fixed-plate barrier.
+3. **Artifacts & Harness**: `experiments/modular/rate_ladder.py`, `manifests/modular_rate_ladder.json`, visual comparison strips and Markdown carousels generated in `outputs/modular/visuals/`.
+
 ## E06 lossless floor arms — 17 September 2026
 
 #128 is merged. Floor-only probe on the saved bbox residual-off compact

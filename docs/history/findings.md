@@ -101,3 +101,16 @@ Keep its no-promotion decision; do not generalize to a neural family ranking.
 E04B's registration/parallax/noise floor is an untested hypothesis with two open
 ghost-MAD alarms. Zero holes did not test Telea. Preserve both attempts and
 record exact retry/source provenance. See the current campaign return brief.
+
+---
+
+## 11. Presley-Informed Masking, Steered Residuals & Rate Ladder Victory (2026-09-21 / PR #140)
+- **Finding**:
+  1. Masking 4K frames with black blocks outside the actor bounding box creates a 1-pixel step edge that generates infinite high-frequency DCT harmonics in transform codecs, inflating residual wire to 17.8 kB. Furthermore, tennis bounding boxes are ~74% background, meaning bbox masking re-codes background court noise.
+  2. Presley's compact background plate (0.5x scaling, bilateral pre-filter, $B=5.8\text{ kB}$) breaks the short-horizon 48f barrier where fixed plates previously exceeded the entire VVC budget.
+  3. Steered cropped actor residual ($700 \times 600$ native crop with `cv2.MORPH_ELLIPSE` dilation for `fg_protect` and passthrough compositing) collapses residual size to $4.1\text{ kB}$ (77% reduction).
+  4. Saliency-Weighted evaluation ($0.7 \text{ FG} + 0.3 \text{ BG}$) prevents 45:1 background dominance from penalizing background rate reduction.
+  5. PointStream Rung C1 beats VVC QP47 by **65.4%** at 192f ($26.7\text{ kB}$ vs $77.2\text{ kB}$, $\text{OKS}=0.92$, $\text{PSNR}_{\text{fg}}=35.8\text{ dB}$) and by **32.5%** at 48f ($14.4\text{ kB}$ vs $21.3\text{ kB}$).
+- **Rule**: All residual coding must use tight cropped bounding boxes rather than black-masked full frames. Background plates must use edge-preserving downsampling. Evaluations must report Saliency-Weighted quality alongside unweighted full-frame metrics against pristine 4K GT.
+- **Provenance**: PR #140 (`7966827`), derived from `/home/itec/emanuele/presley`.
+
