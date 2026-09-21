@@ -51,3 +51,41 @@ def test_segmentation_impact_eval_runs_cleanly(tmp_path: Path) -> None:
     assert "crop_bytes_saved" in report["headroom"]
     assert "ghost_mad_reduction" in report["headroom"]
     assert report["verdict"] in {"ACTIVE_SEARCH", "SATISFIED_FREEZE"}
+
+
+def test_oracle_ceiling_generate_visuals(tmp_path: Path) -> None:
+    visuals_dir = tmp_path / "visuals"
+    report = run_ceiling_analysis(
+        manifest_path=DEFAULT_MANIFEST,
+        dry_run=True,
+        generate_visuals=True,
+        visuals_dir=visuals_dir,
+    )
+    assert visuals_dir.exists()
+    carousel_md = visuals_dir / "carousel.md"
+    assert carousel_md.exists()
+    carousel_content = carousel_md.read_text(encoding="utf-8")
+    assert "````carousel" in carousel_content
+    assert "<!-- slide -->" in carousel_content
+
+    horizons = report["horizons"]
+    assert len(horizons) == 2
+    for h in horizons:
+        scene_slug = h["scene"].replace("/", "_")
+        assert "arms" in h
+        for arm_name in ("null", "current", "oracle"):
+            assert arm_name in h["arms"]
+            arm_data = h["arms"][arm_name]
+            assert "pose_oks" in arm_data
+            assert 0.0 <= arm_data["pose_oks"] <= 1.0
+
+            strip_file = visuals_dir / f"{scene_slug}_{arm_name}_strip.png"
+            assert strip_file.exists()
+            assert strip_file.stat().st_size > 0
+            assert str(strip_file.resolve()) in carousel_content
+
+    # Check anatomical fidelity progression across arms: oracle >= current > null
+    for h in horizons:
+        arms = h["arms"]
+        assert arms["oracle"]["pose_oks"] >= arms["current"]["pose_oks"]
+        assert arms["current"]["pose_oks"] > arms["null"]["pose_oks"]
