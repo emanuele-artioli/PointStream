@@ -2,7 +2,6 @@
 
 from pathlib import Path
 import tempfile
-import pytest
 
 from experiments.modular.neural_benchmark import (
     evaluate_candidate,

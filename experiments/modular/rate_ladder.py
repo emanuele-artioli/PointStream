@@ -19,27 +19,24 @@ All evaluated against pristine 4K original ground truth.
 from __future__ import annotations
 
 import argparse
-import json
 from dataclasses import asdict, dataclass
+import json
 from pathlib import Path
 import sys
 from typing import Any
+
+import numpy as np
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-import cv2
-import numpy as np
-
-from src.components.background.presley_plate import PresleyPlateConfig, PresleyPlateEncoder
-from src.components.metrics.pose import PoseMetric
-from src.components.metrics.visual_inspection import (
+from src.components.metrics.visual_inspection import (  # noqa: E402
     create_comparison_strip,
     generate_carousel_markdown,
     save_montage_image,
 )
-from src.utils.gpu_guard import ensure_free_gpu
+from src.utils.gpu_guard import ensure_free_gpu  # noqa: E402
 
 DEFAULT_MANIFEST = REPO_ROOT / "manifests" / "modular_rate_ladder.json"
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "outputs" / "modular" / "rate_ladder"
@@ -329,7 +326,6 @@ def run_rate_ladder(
             ref = np.full((h, w, 3), 110, dtype=np.uint8)
             vvc_frame = np.full((h, w, 3), 108, dtype=np.uint8)
             ps_frame = np.full((h, w, 3), 112, dtype=np.uint8)
-            diff = np.abs(ref.astype(np.int16) - ps_frame.astype(np.int16)).astype(np.uint8) * 10
 
             strip = create_comparison_strip(
                 ref,

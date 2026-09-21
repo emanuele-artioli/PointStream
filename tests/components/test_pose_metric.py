@@ -7,7 +7,6 @@ import pytest
 
 from src.components.metrics import REGISTRY
 from src.components.metrics.pose import (
-    COCO_17_SIGMAS,
     PoseMetric,
     compute_oks,
 )
