@@ -35,10 +35,10 @@ are reviewed below; only the evidence reuse tasks in the current brief are relea
 | Module | Owner Lane | Verdict | Short Headroom (48f) | Long Headroom (192f) | Next Action |
 |---|---|---|---|---|---|
 | [01 Segmentation](docs/scorecards/01_segmentation.md) | Antigravity FG | SATISFIED_FREEZE | $\Delta F = -1.1\text{ kB}$ (10%) | $\Delta F \approx -4\text{ kB}$ | Freeze YOLO; SAM 3.1 below 15% threshold |
-| [02 Background](docs/scorecards/02_background.md) | Antigravity BG | ACTIVE_SEARCH | Loss (floor 32 kB > VVC 21 kB) | +1.3 dB over VVC | Lock evaluation to $\ge 192$f horizon |
-| [03 Appearance Crops](docs/scorecards/03_appearance_crops.md) | Antigravity FG | ACTIVE_SEARCH | +6.3 dB (with GT crops) | +5.1 dB (with GT crops) | Keep Gen-OFF baseline; test compact pose |
+| [02 Background](docs/scorecards/02_background.md) | Antigravity BG | SATISFIED_FREEZE | $B=5.8\text{ kB}$ (-32.5% vs VVC) | $B=5.8\text{ kB}$ (-65.4% vs VVC) | Freeze Presley compact plate (1080p, QP51, bilateral) |
+| [03 Appearance Crops](docs/scorecards/03_appearance_crops.md) | Antigravity FG | SATISFIED_FREEZE | $F=5.2\text{ kB}$ ($\text{OKS}=0.92$) | $F=10.2\text{ kB}$ ($\text{OKS}=0.92$) | Freeze AdaptiveKeyframeSelector (WebP, $F \le 12\text{ kB}$) |
 | [04 Motion & Metadata](docs/scorecards/04_motion_metadata.md) | Cursor / Antigravity | SATISFIED_FREEZE | $T=17.6\text{ kB} < \text{VVC}$; pred $\le +0.12\text{ dB}$ | -29.8 kB | Freeze E06 per-frame RLE wire packing |
-| [05 Residuals](docs/scorecards/05_residuals.md) | Codex / Codec | ACTIVE_SEARCH | Lose vs VVC (under 100 kbps) | Marginal | Freeze OFF ($R=0$) for C0–C3 low rates |
+| [05 Residuals](docs/scorecards/05_residuals.md) | Codex / Codec | SATISFIED_FREEZE | $R=4.1\text{ kB}$ (-13.2% vs VVC) | $R=4.1\text{ kB}$ (-60.1% vs VVC) | Freeze Steered Cropped Residual ($R \le 4.5\text{ kB}$) |
 
 ## Current boundary — component strategy checkpoint
 
