@@ -13,6 +13,18 @@ from src.contracts.capabilities import (
     appearance,
 )
 from src.contracts.registry import BackendSpec, Registry
+from src.components.appearance.adaptive_keyframe import (
+    AdaptiveCropConfig,
+    AdaptiveKeyframeResult,
+    AdaptiveKeyframeSelector,
+)
+
+__all__ = [
+    "AdaptiveCropConfig",
+    "AdaptiveKeyframeResult",
+    "AdaptiveKeyframeSelector",
+    "REGISTRY",
+]
 
 REGISTRY: Registry[object] = Registry("appearance")
 
