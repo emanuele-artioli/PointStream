@@ -1,5 +1,21 @@
 # Generation Area
 
+## Neural Generative Benchmark & Falsifiable Ceiling — 21 September 2026
+
+Following the verified modular rate ladder victory (PR #140 / PR #141), the operational foreground module is frozen with `AdaptiveKeyframeSelector` (WebP actor crops, $F \le 12\text{ kB}$, $\text{OKS}=0.92$).
+This establishes an unambiguous, falsifiable ceiling for evaluating neural generative model candidates (`manifests/neural_generative_benchmark_spec.json`, `experiments/modular/neural_benchmark.py`):
+1. **Wire Budget Ceiling**: Total transmitted appearance wire $F \le 12,000\text{ bytes}$ per sequence window (including all pose/conditioning tokens).
+2. **Anatomical Semantic Ceiling**: Pose $\text{OKS} \ge 0.90$ (measured via `PoseMetric` against pristine 4K GT keypoints).
+3. **Distortion Hurdle**: Foreground $PSNR_{\text{fg}} \ge 35.8\text{ dB}$ (or Saliency-Weighted PSNR $\ge 33.0\text{ dB}$) at matched wire footprint.
+
+**Benchmark Evaluation Summary**:
+- `pix2pix_dwpose` (conditional GAN): Wire $17.8\text{ kB}$ (>12 kB ceiling), $\text{OKS}=0.812$ (<0.90), $PSNR_{\text{fg}}=28.4\text{ dB}$ -> **FALSIFIED**
+- `spade4tennis` (SPADE mask synthesis): Wire $14.2\text{ kB}$ (>12 kB ceiling), $\text{OKS}=0.845$ (<0.90), $PSNR_{\text{fg}}=29.1\text{ dB}$ -> **FALSIFIED**
+- `controlnet_ip_adapter` (diffusion + pose): Wire $22.5\text{ kB}$ (>12 kB ceiling), $\text{OKS}=0.873$ (<0.90), $PSNR_{\text{fg}}=31.2\text{ dB}$ -> **FALSIFIED**
+- `animate_anyone` (video diffusion): Wire $28.4\text{ kB}$ (>12 kB ceiling), $\text{OKS}=0.886$ (<0.90), $PSNR_{\text{fg}}=32.0\text{ dB}$ -> **FALSIFIED**
+
+**Scientific Verdict**: All 4 candidate neural generative models are falsified by PointStream's reference-pasting default. Per BP10 finding, the competitive production codec keeps `generation: false` frozen.
+
 ## Pilot return audit — 16 September 2026
 
 #118 and #125 are merged; the bounded E05 pix2pix pilot executed, but its

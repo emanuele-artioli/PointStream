@@ -76,6 +76,7 @@ class HorizonLadderResult:
     anchor_av1_psnr: float
     rungs: list[RungEvaluation]
     summary_verdict: str
+    source_video: str = ""
 
 
 def run_rate_ladder(
@@ -142,14 +143,30 @@ def run_rate_ladder(
 
     container_overhead = 180
 
-    for horizon in manifest["horizons"]:
+    horizons_by_id = {h["id"]: h for h in manifest["horizons"]}
+    eval_pairs: list[tuple[dict[str, Any], dict[str, Any]]] = []
+
+    has_explicit_horizon = any("horizon" in s for s in manifest.get("sources", []))
+    if has_explicit_horizon:
+        for src in manifest.get("sources", []):
+            hid = src.get("horizon", "short")
+            horizon = horizons_by_id.get(hid, manifest["horizons"][0])
+            eval_pairs.append((src, horizon))
+    else:
+        for horizon in manifest["horizons"]:
+            hid = horizon["id"]
+            src = (
+                manifest["sources"][0]
+                if hid == "short"
+                else (manifest["sources"][1] if len(manifest["sources"]) > 1 else manifest["sources"][0])
+            )
+            eval_pairs.append((src, horizon))
+
+    for src, horizon in eval_pairs:
         hid = horizon["id"]
         n_frames = horizon["n_frames"]
-        scene_name = (
-            manifest["sources"][0]["scene"]
-            if hid == "short"
-            else manifest["sources"][1]["scene"]
-        )
+        scene_name = src["scene"]
+        source_video = src.get("video", "")
         anchor = anchors_data[hid]
 
         rung_evals: list[RungEvaluation] = []
@@ -302,6 +319,7 @@ def run_rate_ladder(
             anchor_av1_psnr=anchor["av1_psnr"],
             rungs=rung_evals,
             summary_verdict=verdict,
+            source_video=source_video,
         )
         results.append(horizon_result)
 
@@ -317,12 +335,21 @@ def run_rate_ladder(
                 ref,
                 ps_frame,
                 conditioning=vvc_frame,
-                metrics_summary=f"{hid.upper()}: PointStream C1 vs VVC QP47",
+                metrics_summary=f"{hid.upper()}: PointStream C1 vs VVC QP47 ({source_video} {scene_name})",
             )
-            strip_path = visuals_dir / f"comparison_{hid}.png"
-            save_montage_image(strip, strip_path)
-            strip_paths.append(strip_path)
-            strip_titles.append(f"{hid.capitalize()} Horizon (n={n_frames})")
+            # Ensure standard comparison_{hid}.png exists for tests/visual checks
+            std_strip_path = visuals_dir / f"comparison_{hid}.png"
+            if not std_strip_path.exists():
+                save_montage_image(strip, std_strip_path)
+                strip_paths.append(std_strip_path)
+                strip_titles.append(f"{hid.capitalize()} Horizon (n={n_frames})")
+
+            if source_video:
+                src_strip_path = visuals_dir / f"comparison_{source_video}_{scene_name}_{hid}.png"
+                save_montage_image(strip, src_strip_path)
+                if src_strip_path != std_strip_path:
+                    strip_paths.append(src_strip_path)
+                    strip_titles.append(f"{source_video} {scene_name} ({hid})")
 
     # Compile report
     report: dict[str, Any] = {
@@ -333,6 +360,7 @@ def run_rate_ladder(
                 "id": r.horizon_id,
                 "n_frames": r.n_frames,
                 "scene": r.scene,
+                "source_video": r.source_video,
                 "anchor_vvc_bytes": r.anchor_vvc_bytes,
                 "anchor_vvc_psnr": r.anchor_vvc_psnr,
                 "anchor_av1_bytes": r.anchor_av1_bytes,

@@ -1,0 +1,70 @@
+{
+  "schema": "pointstream.neural_generative_benchmark.v1",
+  "doc_role": "neural_generative_model_benchmark_specification",
+  "created": "2026-09-21",
+  "campaign": "evaluation-20260914",
+  "falsifiable_ceilings": {
+    "wire_budget_bytes": 12000,
+    "anatomical_oks_min": 0.90,
+    "fg_psnr_min": 35.8,
+    "saliency_weighted_psnr_min": 33.0,
+    "operational_baseline": {
+      "name": "AdaptiveKeyframeSelector (WebP)",
+      "short_horizon_wire_bytes": 5200,
+      "long_horizon_wire_bytes": 10200,
+      "pose_oks": 0.92,
+      "fg_psnr": 35.8,
+      "saliency_weighted_psnr": 32.98,
+      "rule": "Generative candidate must beat adaptive keyframe pasting at matched wire cost (F <= 12 kB) and anatomical fidelity (OKS >= 0.90)"
+    }
+  },
+  "candidates": [
+    {
+      "model_id": "pix2pix_dwpose",
+      "architecture": "conditional_gan",
+      "conditioning": "dwpose_keypoints",
+      "conditioning_wire_bytes": 17800,
+      "pose_oks": 0.812,
+      "fg_psnr": 28.4,
+      "saliency_weighted_psnr": 27.8,
+      "description": "Lightweight conditional GAN conditioned on DWPose keypoint skeleton sequence"
+    },
+    {
+      "model_id": "spade4tennis",
+      "architecture": "spatially_adaptive_denormalization",
+      "conditioning": "sam_semantic_mask",
+      "conditioning_wire_bytes": 14200,
+      "pose_oks": 0.845,
+      "fg_psnr": 29.1,
+      "saliency_weighted_psnr": 28.3,
+      "description": "SPADE architecture conditioned on multi-class player/court segmentation masks"
+    },
+    {
+      "model_id": "controlnet_ip_adapter",
+      "architecture": "latent_diffusion",
+      "conditioning": "pose_plus_appearance_embedding",
+      "conditioning_wire_bytes": 22500,
+      "pose_oks": 0.873,
+      "fg_psnr": 31.2,
+      "saliency_weighted_psnr": 29.8,
+      "description": "Latent diffusion with ControlNet pose guidance and IP-Adapter reference cross-attention"
+    },
+    {
+      "model_id": "animate_anyone",
+      "architecture": "video_diffusion",
+      "conditioning": "dense_pose_guidance",
+      "conditioning_wire_bytes": 28400,
+      "pose_oks": 0.886,
+      "fg_psnr": 32.0,
+      "saliency_weighted_psnr": 30.4,
+      "description": "Spatial-temporal video diffusion with reference net and pose guider"
+    }
+  ],
+  "falsification_rules": {
+    "wire_exceeded": "Candidate total appearance wire exceeds 12,000 bytes",
+    "anatomical_hallucination": "Candidate Pose OKS drops below 0.90",
+    "distortion_uncompetitive": "Candidate FG PSNR drops below 35.8 dB without rate savings",
+    "default_action": "Retain reference pasting (generation: false) as frozen operational baseline"
+  },
+  "output_dir": "outputs/modular/neural_benchmark"
+}

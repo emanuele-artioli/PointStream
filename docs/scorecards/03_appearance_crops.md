@@ -4,8 +4,8 @@
 - **Source Scope**: `src/components/appearance/`, `src/components/generation/`
 - **Input Artifact**: `raw_frames: 3840x2160x3 uint8`, `bboxes: list[Box]`, `masks: bool`
 - **Output Artifact**: `actor_crops: WebP/AVIF`, `placement: tuple[int, int, int, int]`
-- **Last Evaluated**: 2026-09-17 (E05 / #129)
-- **Current Verdict**: ACTIVE_SEARCH
+- **Last Evaluated**: 2026-09-21 (PR #140 / #141)
+- **Current Verdict**: SATISFIED_FREEZE
 
 ---
 
