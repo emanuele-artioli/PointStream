@@ -3,9 +3,9 @@
 - **Owner Lane**: Antigravity Background
 - **Source Scope**: `src/components/background/`
 - **Input Artifact**: `raw_frames: 3840x2160x3 uint8`, `masks: bool (N, H, W)`
-- **Output Artifact**: `canvas: VVC/WebP`, `homographies: float32 (N, 3, 3)`
-- **Last Evaluated**: 2026-09-21 (Presley Compact Plate)
-- **Current Verdict**: SATISFIED_FREEZE
+- **Output Artifact**: `canvas: WebP q40`, `homographies: float32 (N, 3, 3)`
+- **Last Evaluated**: 2026-09-23 (four background arms, federer scene 007, 48 frames)
+- **Current Verdict**: ACTIVE_SEARCH
 
 ---
 
@@ -14,7 +14,7 @@
 | Arm | Implementation | Rationale |
 |---|---|---|
 | **Null** | `still_frame0` | Single unwarped keyframe (frame 0); fails on camera pans |
-| **Current** | `presley_compact` (1080p QP51, bilateral pre-filter) | Presley-style 0.5x downsampled plate with edge-preserving pre-filter + GeometryHeader |
+| **Current** | WebP q40 plate, registration off | Current PointStream choice; full-resolution VVC intra replacement is deferred. |
 | **Oracle** | Ideal clean-court canvas / `cleaned_video` | Perfect dynamic background without occlusion artifacts, encoded at highest quality |
 
 ---
@@ -23,29 +23,33 @@
 
 ### Short Horizon (48 frames @ 24 fps, `federer_djokovic/scene_007`)
 
-| Arm | Module Bytes ($B$) | Total Codec Bytes ($T$) | PSNR-Y Vis (dB) | SSIM Vis | VVC Anchor Total | Delta vs Anchor |
+| Arm | Module Bytes ($B$) | Total Codec Bytes ($T$) | Overall PSNR | FG / BG PSNR | VVC anchor QP 46 | Delta vs anchor |
 |---|---|---|---|---|---|---|
-| **Null** (`still_frame0` QP47) | 31,814 B | ~60 kB | 20.06 dB | 0.8158 | 21,288 B (24.6 dB) | +39 kB / -4.5 dB (LOSE) |
-| **Current** (`presley_compact` QP51) | 5,800 B | 14,380 B | 26.40 dB | 0.9420 | 21,288 B (24.6 dB) | -6.9 kB (-32.5% WIN) |
-| **Oracle** (`cleaned_video` QP47) | 74,188 B | ~104 kB | 31.18 dB | 0.9824 | 21,288 B (24.6 dB) | +83 kB / +6.6 dB (LOSE on rate) |
+| **Before** (WebP q40 plate + WebP crops) | 129,452 B | 528,958 B | 20.51 dB | 35.59 / 20.50 dB | 112,295 B (31.26 dB) | larger, and 10.8 dB lower overall |
+| **Current** (WebP q40 plate + AV1 crops) | 129,452 B | 466,166 B | 20.51 dB | 36.70 / 20.50 dB | 112,295 B (31.26 dB) | 62,792 B smaller from crop codec; plate quality unchanged |
 
-- **Short Horizon Diagnosis**: Presley's 0.5x compact plate ($5.8\text{ kB}$) breaks the previous short-horizon barrier, allowing PointStream to beat VVC by 32.5% at 48 frames.
+- **Short Horizon Diagnosis**: The current PointStream plate remains WebP q40. Background PSNR stays at 20.5 dB because registration is off while the camera moves. The full-resolution sweep found a VVC intra point, but replacing this plate is deferred. The 32.5% win in the old table was the constant-table runner and is withdrawn.
 
-### Long Horizon (192 frames @ 24 fps, `alcaraz_highlights/scene_000` / Gate A)
+Registration with the current WebP q40 plate raises BG PSNR from 20.50 to
+23.85 dB, but charges 166,680 B for the plate plus 1,728 B for float32
+homographies. The deferred VVC QP 32 control is 119,558 B plus the same maps
+at 23.88 dB BG. Neither registered static arm clears the VVC video anchor.
 
-| Arm | Module Bytes ($B$) | Amortized Bytes/frame | PSNR-Y Vis (dB) | SSIM Vis | VVC Anchor Total | Delta vs Anchor |
-|---|---|---|---|---|---|---|
-| **Null** (`still_frame0` C0) | 6,034 B | 31.4 B/f | 23.4 dB | 0.833 | 31,746 B (24.5 dB) | -25 kB / -1.1 dB |
-| **Current** (`presley_compact` C1) | 5,800 B | 30.2 B/f | 26.4 dB | 0.942 | 77,228 B (29.1 dB) | -50.5 kB (-65.4% WIN) |
-| **Oracle** (`clean_canvas_vvc` C2) | 40,397 B | 210.4 B/f | 30.4 dB | 0.936 | 77,228 B (29.1 dB) | -37 kB / +1.3 dB (WIN) |
+The warp-residual probe then coded that registered plate as VVC intra QP 40:
+58,814 B, plus 1,728 B of maps. Background PSNR of the warped plate alone is
+23.62 dB at 62,900 B total with one crop. Adding the warp-error residual
+(107,005 B, QP 46) raises background to 29.56 dB at 169,905 B total. That is
+under the old unregistered residual and still short of the anchor on both
+bytes and background PSNR.
 
-- **Long Horizon Diagnosis**: The compact plate achieves $30.2\text{ B/f}$ amortized rate, delivering a massive 65.4% bitrate advantage over conventional VVC inter-coding while preserving sharp lines via bilateral pre-filtering.
+### Long Horizon (192 frames, `alcaraz_highlights/scene_000`)
+
+Not remeasured after the codec change. The 65.4% row in the previous revision of this scorecard was the constant table. The earlier measured WebP run, before this codec change, had C0 at 148,060 B with foreground PSNR 13.3 dB, which beat VVC on rate and was not a usable point.
 
 ---
 
 ## 3. Decision Rule & Next Action
 
 - **Criteria**:
-  - Module wire budget $B \le 6.0\text{ kB}$ verified on 4K tennis.
-  - Saliency-weighted PSNR preserved without edge seam artifacts.
-- **Next Action**: **SATISFIED_FREEZE**: Freeze `src/components/background/presley_plate.py` as the standard background baseline for rate ladder evaluations.
+  - A plate win requires both fewer bytes than the anchor and background PSNR that is not stuck near 20 dB on a moving camera.
+- **Next Action**: See the [background campaign](../workflow/session/evaluation-campaign/20260923-background-campaign.md). Perricard scene 002, inpainted VVC QP 46, is 86,894 B versus a 104,482 B source, court matched, 17,588 B left. Alcaraz scene 000’s panorama leaves 40,501 B at 1.5 dB under the source court. Federer scene 007’s inpainted video leaves 4,103 B. Production plate remains WebP q40 until a later step replaces it.

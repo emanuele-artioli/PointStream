@@ -4,8 +4,8 @@
 - **Source Scope**: `src/runner/mask_wire.py`, `src/components/motion/`, `src/components/transport/`
 - **Input Artifact**: `trajectories: list[Trajectory]`, `bboxes: list[Box]`, `masks: bool`
 - **Output Artifact**: `wire_metadata_payload: bytes` ($M$)
-- **Last Evaluated**: 2026-09-20
-- **Current Verdict**: SATISFIED_FREEZE
+- **Last Evaluated**: 2026-09-22 (motion-only appearance control)
+- **Current Verdict**: ACTIVE_SEARCH
 
 ---
 
@@ -14,7 +14,7 @@
 | Arm | Implementation | Rationale |
 |---|---|---|
 | **Null** | Uncompressed raw structures (`np.savez` / JSON) | Baseline from Wave 2 pilot: 41.5 MB mask arrays, or 70.6 kB in legacy C0 |
-| **Current** | E06 Lossless packed wire (mask RLE + thin placement) | Shipped operational transport: 17,581 B on 48f Federer 007 |
+| **Current** | Measured bbox/keypoint motion controls | 376 B for bbox motion or 4,794 B for 47 COCO-17 keypoint frames; current C1 crop metadata is 960 B |
 | **Oracle** | Keyframe delta-coded trajectories + entropy-coded RLE masks | Theoretical lower bound: $\le 3\text{ kB}$ total metadata over 48f ($\le 6\text{ kB}$ over 192f) |
 
 ---
@@ -30,7 +30,11 @@
 | **Oracle** (Delta + Entropy wire) | ~3,200 B | ~15,900 B | 20.68 dB | Transparent lossless packing |
 
 - **Predictor Headroom Finding**: Evaluated whether non-neural predictors (affine warp, first+last interpolation) can bridge the gap to VVC QP47 (24.6 dB). Even 48 ground-truth WebP crops per frame (`per_frame_crop_residual_off`) only reach **20.80 dB (+0.12 dB)**. Model-free predictor refinement is **disqualified** from attempting to bridge the 3.8 dB deficit.
-- **Metadata Rate Finding**: E06 RLE/thin-metadata dropped metadata overhead from 70 kB to 17.5 kB, clearing the wire floor goal.
+- **Metadata Rate Finding**: The old E06 17,581 B result is not the current
+  measured ladder's motion arm. The new single-crop control charges 376 B for
+  bbox motion and 4,794 B for COCO-17 keypoints. The keypoint backend found
+  all 48 frames and all 17 joints, but its classical reconstruction remains
+  low quality; a generator has not been measured.
 
 ### Long Horizon (192 frames @ 24 fps, `alcaraz_highlights/scene_000`)
 
@@ -45,8 +49,9 @@
 ## 3. Decision Rule & Next Action
 
 - **Criteria**:
-  - Metadata lossless packing is verified at 17,581 B on 48f and ~40 kB on 192f.
+  - Motion payload bytes are charged exactly; no keypoint or bbox bytes are free.
   - Predictor refinement headroom is bounded at $+0.12\text{ dB}$; the deficit to VVC is in background plate fidelity ($B$), not actor placement.
-  - Verdict: **SATISFIED_FREEZE**.
-- **Next Action**: Freeze E06 per-frame RLE wire packing as the standard transport for all candidate configurations.
+  - Verdict: **ACTIVE_SEARCH**.
+- **Next Action**: Keep E06 as a legacy transport record and compare it with
+  the new single-appearance motion arm before promoting a motion default.
 

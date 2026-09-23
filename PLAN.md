@@ -1,13 +1,39 @@
 # PointStream Area Index & Active Plan
 
-Current coordination: **17 September 2026**.
-Start with the [bounded next-stage assignments](docs/workflow/session/evaluation-campaign/tasks/20260917-strategy-roadblock.md).
-The handoff and older reviews are historical context. Current decisions below
-reflect the latest code and focused acceptance regressions.
-Submission **30 September**; provisional evidence freeze **20 September**.
-The [evaluation campaign](docs/workflow/session/evaluation-campaign/plan.md) is the
-authoritative plan incorporating the user's full evaluation design and resource
-policy. The September 12 handoff/audit are historical context, not dispatches.
+Current coordination: **23 September 2026**.
+Start with the [23 September development campaign](docs/workflow/session/evaluation-campaign/20260923-development-campaign.md).
+The September 17 roadblock, the 20 September evidence freeze, and the older
+handoffs are historical. Submission **30 September**. Evidence freeze
+**29 September**. Held-out confirmation is skipped. The decision metric is
+weighted PSNR (`0.7` foreground + `0.3` background). A claimable point is at
+least the anchor's weighted PSNR and no more bytes.
+
+## Active measured follow-up
+
+The previous modular victory was a constant table, not an encode. The current
+work is a sequential 48-frame Federer measurement on real frames, with the
+192-frame window held until the controls are correct.
+
+1. **Background codec:** keep the current PointStream plate on WebP for now;
+   record the full-resolution intra-codec replacement as deferred work. The
+   old Presley contract is not a PointStream acceptance criterion.
+2. **VVC failure mode:** reproduce the empty-file/exit-0 behavior, compare the
+   FFmpeg `libvvenc` wrapper with the installed `vvencapp`, and make measured
+   runs reject or recover from empty output while recording the actual binary.
+3. **Appearance transport:** retain the per-frame crop as a control, then
+   measure one initial appearance plus bbox motion and one initial appearance
+   plus COCO-17 keypoint motion. Charge every motion byte. Do not claim a
+   generative win until a generator reconstructs this arm and is scored on the
+   same weighted ledger.
+4. **Quality policy:** score PointStream and both native anchors with
+   foreground/background PSNR and `0.7 FG + 0.3 BG` weighted PSNR. Rate-only
+   wins remain insufficient when the quality arm is unusable.
+5. **Registration diagnostic:** compare the unregistered plate control with a
+   registered plate reconstructed through the transmitted camera maps. Record
+   map bytes and the quality/rate tradeoff before changing the production
+   default.
+6. **Documentation:** update the area notes and scorecards from measured JSON
+   only; keep all 65.4% / 32.5% / 66.7% claims withdrawn.
 
 ## Coordinator parallel readiness — 16 September 2026
 
@@ -35,10 +61,10 @@ are reviewed below; only the evidence reuse tasks in the current brief are relea
 | Module | Owner Lane | Verdict | Short Headroom (48f) | Long Headroom (192f) | Next Action |
 |---|---|---|---|---|---|
 | [01 Segmentation](docs/scorecards/01_segmentation.md) | Antigravity FG | SATISFIED_FREEZE | $\Delta F = -1.1\text{ kB}$ (10%) | $\Delta F \approx -4\text{ kB}$ | Freeze YOLO; SAM 3.1 below 15% threshold |
-| [02 Background](docs/scorecards/02_background.md) | Antigravity BG | SATISFIED_FREEZE | $B=5.8\text{ kB}$ (-32.5% vs VVC) | $B=5.8\text{ kB}$ (-65.4% vs VVC) | Freeze Presley compact plate (1080p, QP51, bilateral) |
-| [03 Appearance Crops](docs/scorecards/03_appearance_crops.md) | Antigravity FG | SATISFIED_FREEZE | $F=5.2\text{ kB}$ ($\text{OKS}=0.92$) | $F=10.2\text{ kB}$ ($\text{OKS}=0.92$) | Freeze AdaptiveKeyframeSelector (WebP, $F \le 12\text{ kB}$) |
+| [02 Background](docs/scorecards/02_background.md) | PointStream codec | ACTIVE_SEARCH | Registered VVC QP 40 plate 58,814 B; warp residual QP 46 is 107 kB at BG 29.56 dB | not remeasured | Matched-QP residual fell only ~29 kB; foreground still blocks a weighted win |
+| [03 Appearance Crops](docs/scorecards/03_appearance_crops.md) | PointStream foreground | ACTIVE_SEARCH | 12 kB budget, 6 crops, FG 17.70 dB | not remeasured | Budget raised FG +3.4 dB and left 42 frames suppressed |
 | [04 Motion & Metadata](docs/scorecards/04_motion_metadata.md) | Cursor / Antigravity | SATISFIED_FREEZE | $T=17.6\text{ kB} < \text{VVC}$; pred $\le +0.12\text{ dB}$ | -29.8 kB | Freeze E06 per-frame RLE wire packing |
-| [05 Residuals](docs/scorecards/05_residuals.md) | Codex / Codec | SATISFIED_FREEZE | $R=4.1\text{ kB}$ (-13.2% vs VVC) | $R=4.1\text{ kB}$ (-60.1% vs VVC) | Freeze Steered Cropped Residual ($R \le 4.5\text{ kB}$) |
+| [05 Residuals](docs/scorecards/05_residuals.md) | PointStream codec | ACTIVE_SEARCH | Warp-error BG residual 107,005 B at QP 46; weighted 21.26 dB with the 12 kB crop budget | not remeasured | Next residual is the player error on a plate-inpainted anchor encode, not another still-plate QP |
 
 ## Current boundary — component strategy checkpoint
 

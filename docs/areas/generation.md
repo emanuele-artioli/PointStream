@@ -1,20 +1,45 @@
 # Generation Area
 
+## Development training is authorized — 23 September 2026
+
+The [23 September campaign](../workflow/session/evaluation-campaign/20260923-development-campaign.md)
+trains a tennis foreground model even when a paste-and-residual point already
+fits under the anchor, because the point of the model is a smaller residual.
+One family at a time, overnight, conditioned on one appearance crop and
+COCO-17 keypoints. Weights are pre-shared and are not charged in the bitstream.
+Inference is deterministic. Before the first training command, log
+`residual_clip_fraction` on the foreground residual of the paste baseline.
+A clip fraction above 0.05 means a finer quantizer is the wrong next spend.
+If no family beats the warp by 2 dB foreground after the nights allocated in
+that campaign, the result is that current generators are not yet good enough,
+and that sentence is allowed in the paper.
+
 ## Neural Generative Benchmark & Falsifiable Ceiling — 21 September 2026
 
-Following the verified modular rate ladder victory (PR #140 / PR #141), the operational foreground module is frozen with `AdaptiveKeyframeSelector` (WebP actor crops, $F \le 12\text{ kB}$, $\text{OKS}=0.92$).
-This establishes an unambiguous, falsifiable ceiling for evaluating neural generative model candidates (`manifests/neural_generative_benchmark_spec.json`, `experiments/modular/neural_benchmark.py`):
+The 21 September ladder victory is withdrawn: it was a constant byte table.
+The current measured design sends one appearance followed by motion in a
+separate control: COCO-17 keypoints cost 102 B/frame, but a classical affine
+warp of one crop reaches only 15.33 dB foreground PSNR and 16.88 dB weighted
+PSNR on the 48-frame window. A 12 kB appearance budget on the registered VVC
+plate admitted six AV1 crops and reached 17.70 dB foreground, with 42 frames
+left on the warp. No generator has been evaluated on that wire. Off-the-shelf
+generators in the manuscript lose to a static copy of the keyframe on player
+LPIPS. A server residual can raise a generated player toward the ground truth
+only to the extent the residual is cheaper than coding the player inside the
+anchor; that residual rate has not been measured for a warp or for a generator.
+The falsifiable ceilings below are therefore a proposal, not a result:
+
 1. **Wire Budget Ceiling**: Total transmitted appearance wire $F \le 12,000\text{ bytes}$ per sequence window (including all pose/conditioning tokens).
 2. **Anatomical Semantic Ceiling**: Pose $\text{OKS} \ge 0.90$ (measured via `PoseMetric` against pristine 4K GT keypoints).
 3. **Distortion Hurdle**: Foreground $PSNR_{\text{fg}} \ge 35.8\text{ dB}$ (or Saliency-Weighted PSNR $\ge 33.0\text{ dB}$) at matched wire footprint.
 
-**Benchmark Evaluation Summary**:
-- `pix2pix_dwpose` (conditional GAN): Wire $17.8\text{ kB}$ (>12 kB ceiling), $\text{OKS}=0.812$ (<0.90), $PSNR_{\text{fg}}=28.4\text{ dB}$ -> **FALSIFIED**
-- `spade4tennis` (SPADE mask synthesis): Wire $14.2\text{ kB}$ (>12 kB ceiling), $\text{OKS}=0.845$ (<0.90), $PSNR_{\text{fg}}=29.1\text{ dB}$ -> **FALSIFIED**
-- `controlnet_ip_adapter` (diffusion + pose): Wire $22.5\text{ kB}$ (>12 kB ceiling), $\text{OKS}=0.873$ (<0.90), $PSNR_{\text{fg}}=31.2\text{ dB}$ -> **FALSIFIED**
-- `animate_anyone` (video diffusion): Wire $28.4\text{ kB}$ (>12 kB ceiling), $\text{OKS}=0.886$ (<0.90), $PSNR_{\text{fg}}=32.0\text{ dB}$ -> **FALSIFIED**
+The prior candidate values in `manifests/neural_generative_benchmark_spec.json`
+are archived diagnostics only. They were evaluated against the withdrawn
+constant table, not this single-crop/keypoint wire arm, so no neural model has
+yet been falsified or accepted for the current PointStream design.
 
-**Scientific Verdict**: All 4 candidate neural generative models are falsified by PointStream's reference-pasting default. Per BP10 finding, the competitive production codec keeps `generation: false` frozen.
+Report:
+`/home/itec/emanuele/pointstream-data/outputs/modular/appearance-motion/federer007.json`.
 
 ## Pilot return audit — 16 September 2026
 

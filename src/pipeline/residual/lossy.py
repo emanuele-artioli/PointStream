@@ -19,6 +19,40 @@ OFFSET = 128
 ResidualMode = Literal["clipped", "full_range", "raw_int16"]
 
 
+def residual_clip_fraction(
+    signed: np.ndarray,
+    mask: np.ndarray,
+    *,
+    offset: float = float(OFFSET),
+) -> float:
+    """Fraction of foreground pixels that saturate in clipped ``uint8`` coding.
+
+    A pixel saturates when ``offset + difference`` falls outside ``[0, 255]``
+    on any channel. With the default offset of 128 that is a difference outside
+    ``[-128, 127]``. ``mask`` is True on the foreground and may be one frame
+    or a clip. An empty foreground raises ValueError.
+
+    A caller relies on a difference of 127 scoring 0 and a difference of 128
+    scoring the fraction of masked pixels that hold it.
+    """
+    error = np.asarray(signed)
+    selected = np.asarray(mask, dtype=bool)
+    if error.ndim == 3:
+        error = error[..., None]
+    if error.ndim != 4:
+        raise ValueError(f"signed residual must be (T, H, W) or (T, H, W, C), got {error.shape}")
+    if selected.shape != error.shape[:3]:
+        raise ValueError(f"mask shape {selected.shape} does not match residual {error.shape[:3]}")
+    count = int(selected.sum())
+    if count == 0:
+        raise ValueError("foreground mask is empty")
+    low = -float(offset)
+    high = 255.0 - float(offset)
+    saturated = (error < low) | (error > high)
+    pixel = np.any(saturated, axis=-1) & selected
+    return float(pixel.sum()) / float(count)
+
+
 def encode_lossy(
     signed: np.ndarray,
     *,

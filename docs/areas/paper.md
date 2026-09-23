@@ -1,5 +1,24 @@
 # Paper Area
 
+## Constant-table ladder numbers are not a result — 22 September 2026
+
+The 65.4% / 32.5% sentences in the abstract, introduction, and evaluation
+section cite the modular rate ladder. That runner wrote a fixed byte table
+and grey strips. `fc65fb8` on the paper remote still contains those sentences.
+They are not certified. The 48-frame federer window has since been encoded.
+With the current WebP plate, C1 is 466,166 B at 20.51 dB overall and
+31.84 dB weighted, against VVC QP 46 at 112,295 B, 31.26 dB overall, and
+24.59 dB weighted. The unified VVC residual reaches 31.32 dB overall and
+33.21 dB weighted at 759,913 B. It beats the anchor on weighted quality but
+not rate. The registered VVC-intra plate plus warp-error residual
+(`warp-residual/federer007.json`) also has no Pareto win: the best weighted
+score on that arm is 21.76 dB at 337,258 B. The manuscript's 14.2%–18.3%
+foreground headroom is a different measurement: a conventional re-encode of
+plate-inpainted frames, on eight scenes that do not include this window. Do
+not cite the ladder as that saving, and do not put a victory sentence back. Numbers:
+`outputs/modular/measured-tennis-codec/current-short.json` and
+`docs/areas/evaluation.md`.
+
 ## Modular rate ladder victory integration and visual strip — 21 September 2026
 
 Paper commit `fc65fb8` (pushed to Overleaf `origin/main`).

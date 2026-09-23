@@ -1,0 +1,27 @@
+{
+  "schema": "pointstream.modular_rate_ladder.v2",
+  "evaluation_scope": {
+    "saliency_weights": {
+      "foreground": 0.7,
+      "background": 0.3
+    }
+  },
+  "sources": [
+    {
+      "horizon": "short",
+      "n_frames": 48,
+      "video": "federer_djokovic",
+      "scene": "scene_007",
+      "frames_dir": "/home/itec/emanuele/pointstream-data/outputs/bp46-long-scenes/clips/federer_djokovic/scene_007/window_48",
+      "mask_path": "/home/itec/emanuele/pointstream-data/outputs/bp46-long-scenes/clips/federer_djokovic/scene_007/masks_48.npz"
+    },
+    {
+      "horizon": "long",
+      "n_frames": 192,
+      "video": "alcaraz_highlights",
+      "scene": "scene_000",
+      "frames_dir": "/home/itec/emanuele/pointstream-data/outputs/bp46-long-scenes/clips/alcaraz_highlights/scene_000/window_192",
+      "mask_path": "/home/itec/emanuele/pointstream-data/outputs/bp46-long-scenes/clips/alcaraz_highlights/scene_000/masks_192.npz"
+    }
+  ]
+}

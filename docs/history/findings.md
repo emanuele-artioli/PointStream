@@ -113,4 +113,54 @@ record exact retry/source provenance. See the current campaign return brief.
   5. PointStream Rung C1 beats VVC QP47 by **65.4%** at 192f ($26.7\text{ kB}$ vs $77.2\text{ kB}$, $\text{OKS}=0.92$, $\text{PSNR}_{\text{fg}}=35.8\text{ dB}$) and by **32.5%** at 48f ($14.4\text{ kB}$ vs $21.3\text{ kB}$).
 - **Rule**: All residual coding must use tight cropped bounding boxes rather than black-masked full frames. Background plates must use edge-preserving downsampling. Evaluations must report Saliency-Weighted quality alongside unweighted full-frame metrics against pristine 4K GT.
 - **Provenance**: PR #140 (`7966827`), derived from `/home/itec/emanuele/presley`.
+- **Withdrawn 22 September 2026**: items 2, 3, and 5 cite the constant-table runner, not an encode. The measured 48-frame federer ledger is in `docs/areas/evaluation.md`. C1 does not beat VVC. The 65.4% and 32.5% figures are not a result.
+
+## 12. Measured codecs, motion transport, and weighted quality (2026-09-22)
+- **Finding**: On the measured 48-frame Federer window, the current WebP plate
+  plus AV1 intra crops gives C1 = 466,166 B, 36.70 dB foreground, and
+  31.84 dB weighted PSNR. VVC QP 46 is 112,295 B and 24.59 dB weighted.
+  C1 wins the weighted-quality arm but not the rate arm.
+- **Finding**: Replacing per-frame residual stills with one VVC medium QP 40
+  error video gives C2 = 759,913 B and 33.21 dB weighted; the residual is
+  293,747 B. The foreground-only ablation is 5,249 B, so residual rate is
+  primarily background correction.
+- **Finding**: FFmpeg/libvvenc 1.11.0 reproducibly exits 0 with zero bytes on
+  the saved residual at QP 32, 36, and 40, while direct vvencapp emits valid
+  streams. Empty files are invalid measurements; the modular runner rejects
+  them and records the direct fallback.
+- **Finding**: One AV1 crop plus COCO-17 keypoint motion costs 136,228 B total
+  and reaches 15.33 dB foreground / 16.88 dB weighted with a classical affine
+  warp. This is a motion control, not a generator result.
+
+## 13. Registered plate plus warp-error residual does not dominate (2026-09-22)
+- **Finding**: On the 48-frame Federer window, a registered plate coded as VVC
+  intra QP 40 is 58,814 B plus 1,728 B of homographies. The background residual
+  of the warped plate is 107,005 B at VVC medium QP 46 (background 29.56 dB)
+  and 264,267 B at QP 40 (background 31.25 dB). The unregistered background
+  residual at QP 40 was 293,597 B, so registration saved about 29 kB at that
+  QP. With a 12 kB
+  appearance budget (six crops, 42 suppressed) the total is 179,996 B and
+  weighted PSNR is 21.26 dB. No arm Pareto-dominates VVC QP 46 or AV1 QP 54.
+  The QP curve and the 192-frame window were not run, because weighted PSNR
+  stayed below 24.59 dB.
+- **Rule**: A smaller plate-plus-residual is not a win while foreground PSNR
+  stays near 18 dB. Do not spend another residual QP sweep on this window
+  until the foreground moves.
+- **Provenance**: `outputs/modular/warp-residual/federer007.json`.
+
+## 14. The one-fifth headroom is not the still-plate ladder (2026-09-22)
+- **Finding**: The manuscript's 14.2%–18.3% foreground saving is a conventional
+  re-encode of plate-inpainted frames at the anchor QP, on eight 48-frame
+  scenes that do not include Federer scene 007. Flat and median fills saved
+  less. This session's ladder instead sent a still plate, crops or a warp, and
+  a residual of the plate error. That path has no Pareto win against VVC QP 46
+  or AV1 QP 54. The inpainted-video saving has not been remeasured as a budget
+  for appearance, motion, and a foreground residual.
+- **Rule**: Do not treat the headroom percentage as bits already saved by the
+  still-plate ladder. The 23 September campaign is authorized to train anyway:
+  a closer player is there to shrink the residual, and a failure is reported
+  as the generators not yet being good enough. Log the clipped-residual
+  fraction before each training run. Shared weights stay out of the bitstream.
+- **Provenance**: `67a9ea6275d3d9785ce57026/appendices/headroom_measurement.tex`;
+  `docs/areas/evaluation.md`.
 

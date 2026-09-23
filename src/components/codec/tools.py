@@ -18,11 +18,13 @@ from typing import Final
 ENV_FFMPEG: Final = "FFMPEG_BIN"
 ENV_KVAZAAR: Final = "KVAZAAR_BIN"
 ENV_SVTAV1: Final = "SVTAV1_BIN"
+ENV_VVENC: Final = "VVENC_BIN"
 
 _DEFAULT_NAMES: Final[dict[str, str]] = {
     ENV_FFMPEG: "ffmpeg",
     ENV_KVAZAAR: "kvazaar",
     ENV_SVTAV1: "SvtAv1EncApp",
+    ENV_VVENC: "vvencapp",
 }
 
 
@@ -71,6 +73,11 @@ def resolve_tool(env_var: str, binary_name: str | None = None) -> ResolvedTool:
 def resolve_ffmpeg() -> ResolvedTool:
     """The ffmpeg used for conversion, muxing, and the ffmpeg-driven rungs."""
     return resolve_tool(ENV_FFMPEG, "ffmpeg")
+
+
+def resolve_vvenc() -> ResolvedTool:
+    """Resolve the standalone vvencapp binary, when a direct VVC path is needed."""
+    return resolve_tool(ENV_VVENC, "vvencapp")
 
 
 def resolve_encoder(codec_name: str) -> ResolvedTool:

@@ -1,5 +1,397 @@
 # Evaluation Area
 
+## Image-codec probe — 22 September 2026
+
+Decision: which OpenCV still-image codec, JPEG or WebP, is used for the plate,
+the foreground crop, and the background residual. Hypothesis: WebP is smaller
+at matched PSNR on all three because it handles edges and flat regions better.
+Competing explanation: JPEG wins on the smooth plate or on the offset residual,
+so one codec for every part would raise the rate of the signal it loses.
+
+Evidence reused: none. The measured ladder's JPEG residual was the `JpegSidecar`
+helper, not a comparison. Saved VVC plate sweeps are a different codec class
+and are not reused as an image-codec ranking.
+
+Regime: first 4 frames of `bp46-long-scenes` `federer_djokovic/scene_007`
+`window_48` with `masks_48.npz`, 3840×2160. CPU only.
+
+Probe: one axis, codec × quality {40, 60, 80} on three signals (plate at
+half resolution, foreground crop, full-frame offset residual). Six qualities,
+three signals.
+
+Bounds: a useful gap is at least 10% fewer bytes at PSNR within 0.5 dB of the
+other codec's nearest point. Below that the result is inconclusive and the
+current per-signal choice stays.
+
+Budget: one shot, under 15 minutes. No native video encodes in this probe.
+
+Decision rule: if one codec Pareto-dominates the other on all three signals,
+use it for plate, crop, and residual in the measured ladder. If the winners
+split, keep the winner on each signal. Anchors stay VVC and SVT-AV1. Historical
+E06 JPEG fixtures stay, because they are records of a past encode, not the
+ladder's current choice.
+
+JPEG vs WebP, on the first grid plus WebP q90/q95: WebP Pareto-dominates JPEG
+on the half-resolution plate, the crop, and the still residual. That is not
+the decision. PNG, AV1 intra, and VVC intra were added
+(`experiments/modular/image_codec_intra_probe.py`), and the plate was repeated
+at full 3840×2160.
+
+Full-resolution plate (4-frame `build_plate`, registration off): WebP q40 is
+171,882 B at 37.57 dB; VVC intra QP 32 is 125,020 B at 39.09 dB; AV1 intra
+QP 50 is 136,185 B at 38.78 dB; AV1 intra QP 42 is 209,799 B at 41.04 dB.
+VVC intra QP 32 is smaller and higher PSNR than WebP q40 and than AV1 QP 50.
+AV1 QP 42 still reaches a higher PSNR at more bytes, so the high-PSNR end is
+not VVC-only. PointStream keeps WebP q40 for now; the VVC plate replacement is
+deferred until the background model is revisited.
+
+Crops, native bbox: AV1 intra QP 42 is 1,965 B at 37.98 dB, against WebP q80
+at 2,518 B and 38.86 dB and VVC intra QP 32 at 1,370 B and 36.44 dB. No codec
+covers every crop point. The ladder sends crops as AV1 intra QP 42. The
+PointStream background-model WebP replacement is deferred: the present plate
+path remains WebP until the full-resolution background sweep is resumed.
+The old Presley project's 6 kB contract is not a PointStream decision rule.
+JPEG sidecar tests are unchanged.
+
+Report: `/home/itec/emanuele/pointstream-data/outputs/image-codec-probe/federer007.json`.
+
+## Video-codec probe and unified residual — 22 September 2026
+
+Same 48-frame federer window. Source sweep reuses the measured VVC QP 46 and
+AV1 QP 54 bitstreams and adds the other QPs. Residual is the C1 error, offset
+by 128, as one inter-coded video. libvvenc preset `faster` writes an empty
+residual bitstream and exits 0; preset `medium` emits a file. Source anchors
+stay on preset `faster`. Report:
+`/home/itec/emanuele/pointstream-data/outputs/video-codec-probe/federer007.json`.
+
+Source, preset `faster` for VVC and SVT-AV1 preset 10:
+
+| Codec | QP | Bytes | Overall PSNR |
+|---|---|---|---|
+| VVC | 46 | 112,295 | 31.26 dB |
+| VVC | 40 | 208,958 | 34.22 dB |
+| VVC | 36 | 317,868 | 36.08 dB |
+| VVC | 32 | 503,960 | 38.04 dB |
+| AV1 | 54 | 316,061 | 36.21 dB |
+| AV1 | 50 | 423,449 | 37.38 dB |
+| AV1 | 46 | 572,146 | 38.53 dB |
+
+AV1 QP 54 dominates VVC QP 36 (fewer bytes and higher PSNR). VVC QP 40 and
+QP 46 are the low-rate end, and no AV1 point undercuts them. There is no
+single source winner. Both anchors stay.
+
+C1 error video. Corrected PSNR is the C1 frame plus the decoded residual,
+scored against the source:
+
+| Codec | Preset | QP | Residual bytes | Corrected PSNR |
+|---|---|---|---|---|
+| VVC | medium | 46 | 125,325 | 28.96 dB |
+| VVC | medium | 40 | 279,514 | 31.24 dB |
+| VVC | medium | 32 | 780,463 | 33.59 dB |
+| AV1 | 10 | 54 | 581,561 | 32.25 dB |
+| AV1 | 10 | 50 | 788,026 | 32.94 dB |
+| AV1 | 10 | 46 | 1,066,031 | 33.58 dB |
+
+VVC medium QP 32 dominates AV1 QP 46 and QP 50. AV1 QP 54 stays on the
+frontier between VVC QP 40 and VVC QP 32. The ladder sends the residual as
+VVC preset medium QP 40, the point that matches the short VVC anchor's
+31.3 dB at 279,514 B. The foreground-only and background-only videos are
+the mask ablation, encoded the same way.
+
+### VVC empty-output diagnostic
+
+On the saved 48-frame C1 error video, FFmpeg `libvvenc` 1.11.0 returned
+success with zero bytes at QP 32, 36, and 40, while direct `vvencapp` 1.11.0
+encoded 837,802 B, 508,359 B, and 305,682 B respectively. At QP 44 and 46
+both paths produced non-empty streams of approximately 180 kB and 137 kB.
+This is a wrapper/path defect or incompatibility, not evidence that VVC cannot
+encode the residual. Empty output is now rejected and the measured modular
+path falls back to `vvencapp`, recording its path and version.
+Diagnostic report:
+`/home/itec/emanuele/pointstream-data/outputs/video-codec-probe/federer007/vvc-wrapper-probe.json`.
+
+## Measured ladder after the codec change — 48-frame federer scene 007
+
+`measure_rungs` on the same window. Plate WebP q40, crops AV1 intra QP 42,
+residual VVC medium QP 40. Registration off. Report:
+`/home/itec/emanuele/pointstream-data/outputs/modular/measured-tennis-codec/short.json`.
+The WebP column is the earlier measured run
+(`outputs/modular/measured-tennis/results.json`), not the constant table.
+
+| Rung | Earlier WebP stills | Current WebP plate + AV1 crops + VVC video | Overall PSNR | Against VVC QP 46 (112,295 B, 31.26 dB) |
+|---|---|---|---|---|
+| C0 | 131,634 B, FG 14.3 dB | 131,476 B (plate 129,452, crop 2,004) | 20.42 dB, FG 14.31 dB | larger, FG unusable |
+| C1 | 528,958 B, FG 35.6 dB, overall 20.5 dB | 466,166 B (plate 129,452, crops 335,754) | 20.51 dB, FG 36.70 dB | larger, weighted quality 31.84 dB > 24.59 dB |
+| C2 actor stills | 930,936 B, residual 401,018 B, overall 20.6 dB | unified video 759,913 B, residual 293,747 B | 31.32 dB, FG 34.03 dB, BG 31.32 dB | weighted quality 33.21 dB, about 6.8× the bytes |
+| C3 background stills | 14,624,684 B, residual 14,094,766 B, overall 33.4 dB | background-only video 759,763 B, residual 293,597 B | 31.33 dB, FG 36.70 dB, BG 31.32 dB | about 48× fewer residual bytes |
+| foreground-only video | (was inside C2) | 471,415 B, residual 5,249 B | 20.51 dB, FG 36.81 dB | +0.11 dB FG over C1 |
+
+C0 is under every anchor's byte count and is not a quality win. C1's rate
+failure is the crop stream: 48 keyframes, 335,754 B, still larger than the
+whole VVC anchor. The short-window quality failure is the unregistered plate
+(background 20.50 dB). The unified residual fixes that background and is
+about 48× smaller than the per-frame WebP background residual, at about 2 dB
+lower overall PSNR than that WebP rung. It does not beat the anchor on rate. The
+foreground-only ablation shows the actor residual is not where the bytes go.
+
+### Weighted baseline comparison
+
+The anchor is now scored with the same mask and `0.7 FG + 0.3 BG` rule:
+
+| Arm | Bytes | Overall | FG | BG | Weighted |
+|---|---:|---:|---:|---:|---:|
+| VVC QP 46 | 112,295 B | 31.26 dB | 21.69 dB | 31.36 dB | 24.59 dB |
+| AV1 QP 54 | 316,061 B | 36.21 dB | 27.40 dB | 36.29 dB | 30.07 dB |
+| PointStream C1 | 466,166 B | 20.51 dB | 36.70 dB | 20.50 dB | 31.84 dB |
+| PointStream C2 unified | 759,913 B | 31.32 dB | 34.03 dB | 31.32 dB | 33.21 dB |
+
+C1 is higher than both anchors on weighted quality, but loses on rate to both.
+This is the relevant interpretation of the user-facing metric; the old
+overall-PSNR-only wording understated C1's foreground advantage. C0's rate
+flag remains unusable because its foreground PSNR is 14.35 dB.
+
+### Registration control
+
+“Unregistered” means the plate was built with identity maps and pasted at the
+same pixel coordinates in every frame. The camera pan moves the court under
+that fixed plate. It does not mean that a still background image is inherently
+10 dB worse than a video codec. The registered control reconstructs through
+the measured homographies and charges 9 float32 values per frame:
+
+| Plate arm | Plate bytes | Map bytes | Total | BG PSNR | Weighted |
+|---|---:|---:|---:|---:|---:|
+| Unregistered WebP q40 (current) | 129,452 B | 0 B | 129,452 B | 20.50 dB | 15.68 dB |
+| Registered WebP q40 (current control) | 166,680 B | 1,728 B | 168,408 B | 23.85 dB | 16.68 dB |
+| Unregistered VVC QP 32 (deferred) | 86,842 B | 0 B | 86,842 B | 20.47 dB | 15.71 dB |
+| Registered VVC QP 32 (deferred) | 119,558 B | 1,728 B | 121,286 B | 23.88 dB | 16.73 dB |
+| VVC QP 46 video anchor | 112,295 B | inter motion in codec | 112,295 B | 31.36 dB | 24.59 dB |
+
+For the current WebP plate, registration buys 3.35 dB in the background but
+raises the plate-plus-map cost from 129,452 B to 168,408 B. That is already
+larger than the anchor and remains below its quality. The deferred VVC plate
+control was 121,286 B total and 23.88 dB BG, so it does not change the
+conclusion. The counterintuitive result is therefore explained by motion
+compensation and temporal prediction in the video anchor, not by a static image
+codec being expected to represent the whole moving scene at the same rate.
+Report:
+`/home/itec/emanuele/pointstream-data/outputs/modular/background-registration/federer007.json`.
+
+### Appearance motion-only control
+
+The measured ladder's per-frame crops were a control, not the intended
+PointStream design. A new probe sends one AV1 intra QP 42 crop and then either
+8 B/frame bbox motion or 102 B/frame COCO-17 float16 keypoints. The pose
+backend found all 48 frames and all 17 joints:
+
+| Arm | Appearance | Motion | Total | FG PSNR | Weighted |
+|---|---:|---:|---:|---:|---:|
+| Per-frame crop control | 335,754 B | 0 B | 466,166 B | 36.70 dB | 31.84 dB |
+| One crop + bbox motion | 1,962 B | 376 B | 131,810 B | 14.34 dB | 16.19 dB |
+| One crop + keypoint motion | 1,962 B | 4,794 B | 136,228 B | 15.33 dB | 16.88 dB |
+
+The classical affine warp is intentionally a control: one appearance cannot
+invent changed limb appearance or clothing detail. Keypoints were therefore
+measured, but no generator has yet been scored on this wire arm. A generative
+model would need to raise the single-crop arm above the anchor's weighted
+quality while retaining roughly 136 kB total wire; the previous neural
+benchmark did not test this arm and remains withdrawn with the constant table.
+Report:
+`/home/itec/emanuele/pointstream-data/outputs/modular/appearance-motion/federer007.json`.
+
+## Warp-residual probe — 22 September 2026
+
+Decision: does a registered plate plus a background residual of the warp error
+beat a conventional anchor on an overlapping weighted-PSNR interval, and does a
+12 kB appearance budget on top of bbox motion make the foreground usable?
+
+Hypothesis: the 294 kB background residual is the camera pan. Coding the plate
+with VVC intra QP 40, charging float32 homographies, and residual-coding only
+the background error of the warped plate should land plate + maps + residual
+under 200 kB if the homography absorbs the pan. Competing explanation: the
+homography is too coarse, and the residual stays near 300 kB.
+
+Foreground hypothesis: new AV1 crops, admitted only when the warped paste's
+foreground MSE exceeds 50 and the appearance payload would stay within 12 kB,
+raise foreground PSNR above the single-crop 14 dB arm. Competing explanation:
+five extra crops still cannot track a non-rigid player, and foreground stays
+near 14 dB.
+
+Evidence reused: federer scene 007 `window_48` and masks; weighted anchors VVC
+QP 46 (112,295 B, 24.59 dB) and AV1 QP 54 (316,061 B, 30.07 dB) from
+`measured-tennis-codec/current-short.json`. The 192-frame Alcaraz window runs
+only if a 48-frame point is at or under an anchor's byte count and at or above
+that anchor's weighted PSNR.
+
+Regime: 48 frames, 3840×2160, development clip. Metric 0.7 FG + 0.3 BG.
+A win is Pareto dominance on bytes and weighted PSNR against a measured anchor:
+fewer or equal bytes and higher or equal weighted PSNR, with at least one
+strict. No interpolated BD-rate.
+
+Probe: `experiments/modular/warp_residual_probe.py`. Plate VVC intra QP 40.
+Background residual VVC medium QP 46 and QP 40. One AV1 intra QP 42 crop plus
+int16 boxes. Budgeted keyframes use the same crop codec. The curve (WebP q40
+plate crossed with residual QP 32/40/46, plus VVC-plate residual QP 32) runs
+only when plate + maps + the cheaper residual is under 200 kB and that arm's
+weighted PSNR reaches the VVC anchor.
+
+Bounds: a useful residual drop is under 200 kB for plate + maps + residual.
+A useful foreground move is at least +3 dB over the single-crop warp.
+Budget: step 1 is two residual encodes; step 2 at most six further encodes;
+the long window is one configuration. Stop the curve and the long window when
+the 48-frame total cannot cross an anchor.
+
+Decision rule: dominance against either anchor promotes that point. A residual
+still near 300 kB stops the QP curve and points at registration error. Motion
+and homography packing waits until a point is within 5 kB of an anchor.
+
+Report:
+`/home/itec/emanuele/pointstream-data/outputs/modular/warp-residual/federer007.json`.
+
+Measured on federer scene 007, 48 frames. The registered plate is 2190×3914.
+VVC intra QP 40 codes it in 58,814 B. Homographies are 1,728 B. One AV1 crop
+plus bbox motion is 1,962 + 20 + 376 B. The background residual of the warped
+plate is 107,005 B at VVC medium QP 46 and 264,267 B at QP 40.
+
+| Arm | Total | FG | BG | Weighted | Pareto vs VVC / AV1 |
+|---|---:|---:|---:|---:|---|
+| Plate + one crop, no residual | 62,900 B | 14.34 dB | 23.62 dB | 17.13 dB | no / no |
+| + BG residual QP 46 | 169,905 B | 14.34 dB | 29.56 dB | 18.91 dB | no / no |
+| + BG residual QP 40 | 327,167 B | 14.34 dB | 31.25 dB | 19.42 dB | no / no |
+| 12 kB keyframe budget, no residual | 72,991 B | 17.70 dB | 23.62 dB | 19.48 dB | no / no |
+| Budget + BG residual QP 46 | 179,996 B | 17.70 dB | 29.56 dB | 21.26 dB | no / no |
+| Budget + BG residual QP 40 | 337,258 B | 17.70 dB | 31.25 dB | 21.76 dB | no / no |
+
+Plate + maps + the cheaper residual is 167,547 B, under the 200 kB byte gate.
+Weighted PSNR stays below the VVC anchor's 24.59 dB, so the QP curve was not
+run and the 192-frame window was not run. No point is within 5 kB of an
+anchor, so motion and homography packing was not applied.
+
+The paste covers every foreground pixel (`covered_fraction` 1.0). The
+foreground gap is the crop disagreeing with the player, not an unpainted
+silhouette. The 12 kB budget admitted six crops (frames 0–4 and 7) and
+suppressed 42. Foreground moved from 14.34 dB to 17.70 dB. Reaching the VVC
+anchor's 24.59 dB weighted score from 17.70 dB foreground would require about
+40.7 dB of background. The QP 40 residual already spends 264 kB to reach
+31.25 dB of background, so a finer residual curve cannot cross that anchor
+while the foreground stays here.
+
+No arm Pareto-dominates VVC QP 46 (112,295 B, 24.59 dB weighted) or AV1 QP 54
+(316,061 B, 30.07 dB weighted). Smaller arms are worse on weighted PSNR.
+Higher-quality earlier arms (C1 at 466,166 B / 31.84 dB weighted, C2 at
+759,913 B / 33.21 dB weighted) are larger than both anchors.
+
+## Development campaign — 23 September 2026
+
+The still-plate ladder above is not the next experiment. The authorized plan
+is [the 23 September campaign](../workflow/session/evaluation-campaign/20260923-development-campaign.md):
+four background arms (frame 0, best unwarped frame, panorama, inpainted video),
+then a crop-and-keypoint foreground, then overnight training, then a rate-capped
+residual. Decision metric is weighted PSNR. A claimable point matches or beats
+the anchor's weighted PSNR at no more bytes. Held-out confirmation is skipped.
+
+The background record is
+[the background campaign](../workflow/session/evaluation-campaign/20260923-background-campaign.md).
+On a large player (Perricard scene 002, 3.0% of the frame) the inpainted video
+at QP 46 leaves 17,588 B with the court matched. On a medium, nearly still
+clip (Alcaraz scene 000, 0.51%) the panorama leaves 40,501 B and needs about
+0.65 dB more foreground than the anchor. On a small panning clip (Federer
+scene 007, 0.29%) the inpainted video leaves 4,103 B. None of these rows is a
+claim: the players are removed.
+
+## What this session measured, and what it is not — 22 September 2026
+
+The paper's motivating headroom study
+(`67a9ea6275d3d9785ce57026/sections/problem.tex`, appendix
+`app:headroom`, `outputs/bp21-headroom/report.json`, 25 August 2026) is a
+different experiment from this ladder.
+
+That study kept a conventional encoder. It removed players by painting a
+background plate into their silhouettes, then re-encoded the filled frames at
+the same QP ladder as the untouched video. Across eight other 48-frame 4K
+scenes the mean BD-rate saving was 14.2% ± 2.6% for VVC, 15.4% ± 2.8% for AV1,
+18.3% ± 3.4% for HEVC, and 17.0% ± 3.1% for AVC. The range is a seventh to a
+fifth, not a fixed fifth: Alcaraz scene 000 saved 26.4%, and a small player
+with a fast camera saved about 1%. Plate inpainting beat flat fill and median
+fill on every codec, because a flat hole adds edges the transform coder spends
+bits on. Federer scene 007, the window measured in this session, was not one
+of those eight scenes. A separate claim in the same table, that one JPEG
+panorama plus homographies saves 64–78% of the background bitrate, is the
+claim this session failed to turn into a full-codec win.
+
+This session's ladder does not run that removal. It replaces the video with a
+still plate, then tries to buy the court back. In order:
+
+- Still-image sweep. WebP beats JPEG on the plate, the crop, and a still
+  residual. VVC intra QP 32 is smaller and cleaner than WebP q40 on the full
+  plate; the ladder still sends WebP q40. Crops are AV1 intra QP 42. The old
+  Presley 6 kB plate budget is not a PointStream rule.
+- Source-video sweep, 48 frames. No single winner. VVC QP 46 is 112,295 B at
+  31.26 dB overall (weighted 24.59). AV1 QP 54 is 316,061 B at 36.21 dB
+  overall (weighted 30.07). Both anchors stay.
+- Unified residual. One VVC video of the C1 error replaces per-frame still
+  residuals. Foreground-only residual is 5,249 B and +0.11 dB foreground.
+  Background-only residual is 293,597 B and is where the bytes and the
+  background quality go. Full-frame residual spends the same bytes and lowers
+  foreground from 36.70 dB to 34.03 dB.
+- `libvvenc` preset `faster` can exit 0 with an empty residual file. Direct
+  `vvencapp` 1.11.0 encodes the same frames. The ladder falls back and records
+  the binary.
+- Motion wire. "8 B/frame, 131,810 B total" is one WebP plate (129,452 B), one
+  AV1 crop (1,962 B), 20 B of metadata, and 47 × 8 B of boxes. Frame 0 is the
+  crop, so the motion term is not 48 frames. COCO-17 float16 is the same sum
+  with 47 × 102 B of keypoints, total 136,228 B. Totals are complete
+  bitstreams, not a running sum of earlier arms.
+- Classical warp. One crop plus boxes reaches 14.34 dB foreground. One crop
+  plus keypoints reaches 15.33 dB. The pose model found all 48 frames. This is
+  not a generator result.
+- Registration. Plate-plus-map means the still plus one 3×3 float32 homography
+  per frame (1,728 B on 48 frames), not camera intrinsics. WebP q40 registered
+  is 168,408 B at 23.85 dB background. The production ladder does not send the
+  maps; it pastes an unregistered plate, which is why background stays near
+  20.5 dB while the camera pans. Compressing the maps can save at most 1,728 B.
+- Warp-error residual. VVC intra QP 40 of the registered plate is 58,814 B.
+  The residual of the warped court is 107,005 B at QP 46 (background 29.56 dB)
+  and 264,267 B at QP 40 (background 31.25 dB). At QP 40 that is about 29 kB
+  under the unregistered background residual. A 12 kB appearance budget
+  admitted six crops and raised foreground from 14.34 dB to 17.70 dB, with 42
+  frames suppressed. No Pareto win. The curve, the 192-frame re-encode, and
+  motion/homography packing were not run.
+- Long window. The 192-frame ledger is the older WebP-still run. C0 is already
+  one crop (148,060 B) and pastes that crop through the frame-0 silhouette on
+  every frame. Later masks have median intersection-over-union 0 with frame 0,
+  which is why foreground is 13.26 dB. C1 is a crop every frame (2.88 MB).
+  That window was not re-encoded with the current codecs or with motion.
+
+The operating point that matches the paper's one-fifth sentence is still
+open on this clip: encode the plate-inpainted frames with the same VVC and
+AV1 settings as the anchor, charge that bitstream as background, and spend
+only the measured saving on appearance, motion, and a foreground residual.
+Flat placeholders are the fill the headroom study already found to be worse.
+
+## Measured tennis windows — 22 September 2026
+
+Command: `python experiments/modular/rate_ladder.py --manifest manifests/measured_tennis_windows.json --measure-anchors --generate-visuals`, from `feat/measured-rate-ladder`. Wall clock 71 minutes. Frames are the bp46 24 fps windows, masks `masks_48.npz` / `masks_192.npz`. Plate registration is off. This is the earlier WebP-still baseline, before the current codec and unified-residual probe. Anchors are VVC QP 46 (`ffmpeg/libvvenc`, with empty-output guard) and SVT-AV1 QP 54. `pose_oks` is null. Report: `/home/itec/emanuele/pointstream-data/outputs/modular/measured-tennis/results.json`.
+
+| Window | VVC | AV1 | C1 | C1 vs VVC |
+|---|---|---|---|---|
+| federer scene 007, 48 frames | 112,295 B, 31.3 dB overall | 316,061 B, 36.2 dB | 528,958 B, FG 35.6 dB, overall 20.5 dB | larger, not a rate win |
+| alcaraz scene 000, 192 frames | 258,024 B, 33.9 dB overall | 382,825 B, 38.9 dB | 2,883,316 B, FG 35.3 dB, overall 35.8 dB | larger, not a rate win |
+
+C0 on the long window is 148,060 B and its rate flag against VVC is true. Foreground PSNR on that rung is 13.3 dB. These rows do not replace the withdrawn 65.4% / 32.5% sentences.
+
+## Measured ladder replaces the constant table — 22 September 2026
+
+`experiments/modular/rate_ladder.py` no longer emits a bitrate, a PSNR, or a
+comparison strip from a constant table. `run_rate_ladder` encodes the frames
+and mask named by each manifest source (`frames_dir`, `mask_path`) through
+`experiments/modular/measured_ladder.py` and writes schema
+`pointstream.modular_rate_ladder.v2` with `measurement: encoded`.
+`beats_vvc_rate` is true only when `--measure-anchors` produced a VVC
+bitstream and the rung is strictly smaller. The 65.4% and 32.5% figures
+recorded below, and the grey strips in `outputs/modular/visuals/`, are that
+retired constant table. The encoded 48-frame federer result is the section
+above this one.
+
 ## Gate B confirmation manifest, multi-source ladder, and neural benchmark scoping — 21 September 2026
 
 PR #142 merged as `97a85b9`.

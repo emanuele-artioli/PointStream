@@ -1,6 +1,31 @@
 # Codec Area
 
-## Presley modular rate ladder & component freezing — 21 September 2026
+## Still-image and residual codec decision — 22 September 2026
+
+The measured ladder keeps the PointStream plate on WebP q40 for now; the
+full-resolution VVC intra plate result is a deferred background-model step.
+Crops are AV1 intra QP 42. The C1 error is one VVC video, preset `medium`,
+QP 40. Preset `faster` can exit 0 with an empty residual bitstream through
+the FFmpeg wrapper; the direct `vvencapp` path is the measured fallback.
+Source anchors stay VVC preset `faster` and SVT-AV1 preset 10: the source
+sweep does not have a single winner. Detail and the 48-frame before/after
+table are in `docs/areas/evaluation.md`. The 65.4% / 32.5% sentences below
+are the withdrawn constant table.
+
+The background representation this ladder measured is a still plate, optionally
+warped by homographies, plus a residual of whatever the still got wrong. That
+is not the headroom protocol. The headroom protocol keeps the conventional
+encoder and only inpaints the players. On eight other scenes that saved a mean
+14.2% of the VVC rate at matched QP. A flat or median hole saved less, because
+the edge costs bits. The still-plate path in this session did not reproduce
+the paper's separate 64–78% panorama saving as a full-codec win. The background
+comparison is measured in
+[the background campaign](../workflow/session/evaluation-campaign/20260923-background-campaign.md).
+`still_frame0` stays the control. The inpainted video wins the court. The
+panorama is the setup on the small and medium clips, where that video leaves
+under 8 kB.
+
+## Historical Presley modular rate ladder — not current PointStream evidence — 21 September 2026
 
 PR #140 merged as `7966827`. Implemented and verified the complete production modular rate ladder:
 1. **Presley Compact Background Plate (`src/components/background/presley_plate.py`)**: 0.5x scaling (1080p, QP51), bilateral edge-preserving pre-filter, and `GeometryHeader` client restoration. Wire reduced from 32.4 kB to 5.8 kB (82% reduction). Scorecard `02_background.md` updated to `SATISFIED_FREEZE`.

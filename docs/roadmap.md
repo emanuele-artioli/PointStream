@@ -1,11 +1,18 @@
 # PointStream Roadmap and Submission Gates
 
 **Target Submission**: ACM TOMM — **30 September 2026** (hard deadline).
-**Evidence Freeze**: 20 September 2026 (provisional target; revisable by explicit decision).
+**Evidence Freeze**: 29 September 2026. Moved from 20 September by decision on
+23 September. Development measurements through 29 September are authorized.
+Held-out confirmation is skipped. A second domain runs only after a claimable
+tennis point. The plan is
+[the 23 September campaign](workflow/session/evaluation-campaign/20260923-development-campaign.md).
 
-This document specifies the submission gates, dependencies, and pass criteria. Execution follows the [September campaign](workflow/session/evaluation-campaign/plan.md).
-Gate pass dependencies do not prevent parallel readiness, component work or
-writing setup. User decisions of September 14 supersede historical count rules.
+This document specifies the submission gates, dependencies, and pass criteria.
+Through 30 September, execution follows the 23 September campaign linked above.
+The [September campaign](workflow/session/evaluation-campaign/plan.md) remains
+the historical gate design. Gate pass dependencies do not prevent parallel
+readiness, component work, or writing setup. User decisions of 14 September
+and 23 September supersede historical count rules and the 20 September freeze.
 
 ---
 
@@ -25,11 +32,21 @@ graph TD
   1. A reproducible advantage over the declared AV1 and VVC anchors over a measured overlapping rate/quality interval on a metric selected before the confirmation run. Declare anchor settings and uncertainty; no extrapolated BD-rate or isolated lucky-point victory.
   2. Operating regime fully characterized: content type, duration/amortization range, bitrate band, and component byte breakdown.
   3. Size, quality, and runtime measured and reported together; no speed omissions.
-- **Current Status**: PR #83/#84 pass interpretation superseded on 2026-09-09. The stored VVC comparison is unfavorable overall; the AV1 curves have no quality overlap and fail floor dominance. C2/C3 warrant a narrower development sweep, not a declared win. See the [evaluation audit](areas/evaluation.md).
+- **Current Status**: The 23 September decision metric is weighted PSNR
+  (`0.7` foreground + `0.3` background). A claimable development point is
+  weighted PSNR at least the anchor's, at no more bytes. The stored VVC
+  comparison remains unfavorable overall, and no such point has been measured
+  yet. See the [23 September campaign](workflow/session/evaluation-campaign/20260923-development-campaign.md).
 
 Experiment policy: [hypothesis-driven probes](workflow/experiment-design.md). Full benchmark tables: [docs/areas/evaluation.md](areas/evaluation.md#gate-a-192-frame-benchmark-results-run-2--pr-83).
 
-### Gate B: Held-Out Confirmation (Incomplete; pass retracted)
+### Gate B: Held-Out Confirmation (Skipped for this submission)
+
+The 23 September decision skips held-out confirmation for the 30 September
+submission. A tennis result is a development operating point. The pass
+criteria below stay the rule if confirmation is ever resumed.
+
+### Gate B historical criteria (pass retracted)
 - **Dependency**: Gate A passed.
 - **Objective**: Confirm the selected codec procedure on held-out content, with the claim scoped to the split. See [data protocol](areas/data.md#4-confirmation-protocol). This is not a mandatory seven-training-video/six-test-video allocation.
 - **Pass Criteria**:
