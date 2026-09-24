@@ -1,6 +1,6 @@
 # PointStream Area Index & Active Plan
 
-Current coordination: **23 September 2026**.
+Current coordination: **24 September 2026**.
 Start with the [23 September development campaign](docs/workflow/session/evaluation-campaign/20260923-development-campaign.md).
 The September 17 roadblock, the 20 September evidence freeze, and the older
 handoffs are historical. Submission **30 September**. Evidence freeze
@@ -8,11 +8,21 @@ handoffs are historical. Submission **30 September**. Evidence freeze
 weighted PSNR (`0.7` foreground + `0.3` background). A claimable point is at
 least the anchor's weighted PSNR and no more bytes.
 
-## Active measured follow-up
+The [single foreground campaign record](docs/workflow/session/evaluation-campaign/20260924-foreground-campaign.md)
+contains the union-crop diagnostic, corrected separate-object retest,
+Pix2Pix exact-video diagnostic, and Animate Anyone/Alcaraz continuation.
+No tested 48-frame point is claimable. The best capped Alcaraz continuation
+scores 21.30 dB weighted against 25.37 dB source; temporal object video
+clears picture quality but exceeds rate by at least 128,046 B. The next
+bounded work is predictive same-player appearance refresh, charged temporal
+object masks, and matched-wire fast-model screens. Independent AV1 intra
+refreshes and the installed Animate Anyone checkpoint are measured controls.
 
-The previous modular victory was a constant table, not an encode. The current
-work is a sequential 48-frame Federer measurement on real frames, with the
-192-frame window held until the controls are correct.
+## Prior measured follow-up — historical
+
+The previous modular victory was a constant table, not an encode. This older
+sequential Federer checklist led to the completed background and foreground
+records linked above. The 192-frame window remains out of scope.
 
 1. **Background codec:** keep the current PointStream plate on WebP for now;
    record the full-resolution intra-codec replacement as deferred work. The

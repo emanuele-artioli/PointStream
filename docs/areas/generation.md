@@ -1,5 +1,24 @@
 # Generation Area
 
+## Foreground campaign state — 24 September 2026
+
+The [consolidated foreground campaign](../workflow/session/evaluation-campaign/20260924-foreground-campaign.md)
+holds all measured rows, exact wire/timing provenance, failed axes, and the
+next experiment policy. The first union-crop probe is diagnostic only. The
+corrected two-object bbox, affine, and articulated retest reaches at best
+21.16 dB weighted on Alcaraz against 25.37 dB source, and 19.93 dB on
+Federer against 24.59 dB source; Perricard's minimum two-crop wire is over
+its cap. The 2,000-epoch Pix2Pix exact-video fit uses the pose signal, but
+its 208 MiB clip-specific weights and raw-input score are not a codec point.
+On the 16-frame charged wire, the installed tennis Animate Anyone scores
+12.26 dB FG against 16.30 dB articulated paste; even a target-alpha oracle
+scores 10.19 dB FG. The best capped Alcaraz continuation is 21.30 dB
+weighted against 25.37 dB. Temporally coded object color plus alpha reaches
+29.13–31.03 dB weighted at 193,195 B or more, far over the 65,149 B cap.
+No foreground point is claimable. Next test predictive same-player refresh,
+decoder-derived versus transmitted temporal silhouettes, and existing fast
+models on the same charged wire before further training.
+
 ## Development training is authorized — 23 September 2026
 
 The [23 September campaign](../workflow/session/evaluation-campaign/20260923-development-campaign.md)
@@ -282,7 +301,3 @@ result that determines the next experiment; no family-wide claims from one pilot
   - `campaign_result.json` (original adapted): SHA-256 `f56e5cb2a8c0239b4f3ecc007d164a403cb7512d8a6bd4ed1e625afdf7c8a425`
   - `diagnostic_matrix_completed.json` (completed 7-corner): SHA-256 `a0dbf42dc1052cd0ea461f7d4c75086cf1a798636a8f3152d40658afd4d0f8df`
   - `campaign_result_completed.json` (completed adapted): SHA-256 `99e019e0f544ac4064ca4fee0e8e7b5f02821cc2486cbf03c646f262bdfa34fa`
-
-
-
-
