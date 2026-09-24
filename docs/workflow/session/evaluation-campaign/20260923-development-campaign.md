@@ -59,6 +59,22 @@ the source and leave about 40 kB.
 
 ## Step 2 — Foreground base, before training
 
+The [consolidated foreground campaign](20260924-foreground-campaign.md)
+contains the first union-crop diagnostic, corrected separate-object retest,
+Pix2Pix exact-video training diagnostic, and the 24 September continuation.
+The corrected 48-frame retest completed all three clips. Alcaraz and
+Federer fit bytes but peak at 21.16 versus 25.37 dB and 19.93 versus
+24.59 dB weighted; Perricard's required two-object residual-off wire is
+over cap. The best capped Alcaraz continuation is 21.298 versus 25.366 dB;
+the temporal object-video arm clears picture quality but starts at
+193,195 B versus 65,149 B. The existing tennis Animate Anyone loses
+4.037 dB foreground to articulated paste on the same 16-frame wire.
+No result is claimable. The next protocol in that record tests predictive
+same-player appearance refresh, transmitted temporal silhouettes and
+decoder-derived output masks, then screens fast models on a matched wire.
+The original Step 2 and Step 3 instructions below document the 23 September
+plan; the consolidated record owns the next foreground experiment policy.
+
 On the chosen background, composite one AV1 intra QP 42 crop through bbox
 motion, and a second arm through COCO-17 keypoints. These numbers already
 exist on the unregistered WebP plate; recompute them on the chosen background
@@ -87,6 +103,15 @@ Branches:
   and pick the next-cheapest arm.
 
 ## Step 3 — Training
+
+The 23–24 September launch record is in the
+[consolidated foreground campaign](20260924-foreground-campaign.md).
+Pix2Pix completed its exact-video 2,000-epoch fit. Correct-pose object-pixel
+PSNR on raw training crops was 21.45 dB versus 10.01 dB under a shuffled
+pose. This is evidence of conditioning use, but the content-specific
+checkpoint and raw dataset inputs make it a learnability diagnostic, not a
+whole-codec point. The planned general-model wire-conditioned evaluation
+has not yet been run.
 
 The foreground model is the contribution we still have to try. It runs even
 when Step 2 already fits, because a closer player makes the residual smaller.

@@ -1,5 +1,47 @@
 # Generation Area
 
+## SAM3.1 conditioning adapters — 2026-09-27
+
+`src/components/perception/model_adapters.py` now emits an AnimateAnyone
+OpenPose-18 RGB condition, SPADE player/racket/joint conditions, and ControlNet
+RGB plus named player-mask, racket-mask, racket-axis, and racket-width channels.
+The shared crop transform handles aspect-preserving resize and reversible
+coordinate mapping. Hull fallback or missing racket geometry is typed and
+excluded from cross-conditioned adapters. Existing SPADE/ControlNet checkpoint
+compatibility remains unverified; racket-aware training is required. MTTF remains
+unintegrated because this repository has no MTTF implementation or conditioning
+interface to verify.
+
+The SAM3.1 pilot derived pose and racket geometry from retained unquantized
+observations. Its measured client payload did not transmit either one, so these
+training conditions are not yet identical to client-decoded conditions. DWPose
+inference fell back to ONNX Runtime CPU because its CUDA provider could not load
+`libcudnn.so.9`; the audit used no DWPose CUDA memory. Racket and joint samples
+with unresolved visual failures were quarantined in the versioned review record.
+No eligible split was regenerated, no model was trained or smoke-loaded, and the
+active training manifest was not changed. Generation readiness and dataset
+promotion remain blocked on a transport representation for pose/geometry, a
+regenerated split, and successful player/racket/joint training-loading smokes.
+
+## Foreground campaign state — 24 September 2026
+
+The [consolidated foreground campaign](../workflow/session/evaluation-campaign/20260924-foreground-campaign.md)
+holds all measured rows, exact wire/timing provenance, failed axes, and the
+next experiment policy. The first union-crop probe is diagnostic only. The
+corrected two-object bbox, affine, and articulated retest reaches at best
+21.16 dB weighted on Alcaraz against 25.37 dB source, and 19.93 dB on
+Federer against 24.59 dB source; Perricard's minimum two-crop wire is over
+its cap. The 2,000-epoch Pix2Pix exact-video fit uses the pose signal, but
+its 208 MiB clip-specific weights and raw-input score are not a codec point.
+On the 16-frame charged wire, the installed tennis Animate Anyone scores
+12.26 dB FG against 16.30 dB articulated paste; even a target-alpha oracle
+scores 10.19 dB FG. The best capped Alcaraz continuation is 21.30 dB
+weighted against 25.37 dB. Temporally coded object color plus alpha reaches
+29.13–31.03 dB weighted at 193,195 B or more, far over the 65,149 B cap.
+No foreground point is claimable. Next test predictive same-player refresh,
+decoder-derived versus transmitted temporal silhouettes, and existing fast
+models on the same charged wire before further training.
+
 ## Development training is authorized — 23 September 2026
 
 The [23 September campaign](../workflow/session/evaluation-campaign/20260923-development-campaign.md)
@@ -40,29 +82,6 @@ yet been falsified or accepted for the current PointStream design.
 
 Report:
 `/home/itec/emanuele/pointstream-data/outputs/modular/appearance-motion/federer007.json`.
-## SAM3.1 conditioning adapters — 2026-09-27
-
-`src/components/perception/model_adapters.py` now emits an AnimateAnyone
-OpenPose-18 RGB condition, SPADE player/racket/joint conditions, and ControlNet
-RGB plus named player-mask, racket-mask, racket-axis, and racket-width channels.
-The shared crop transform handles aspect-preserving resize and reversible
-coordinate mapping. Hull fallback or missing racket geometry is typed and
-excluded from cross-conditioned adapters. Existing SPADE/ControlNet checkpoint
-compatibility remains unverified; racket-aware training is required. MTTF remains
-unintegrated because this repository has no MTTF implementation or conditioning
-interface to verify.
-
-The SAM3.1 pilot derived pose and racket geometry from retained unquantized
-observations. Its measured client payload did not transmit either one, so these
-training conditions are not yet identical to client-decoded conditions. DWPose
-inference fell back to ONNX Runtime CPU because its CUDA provider could not load
-`libcudnn.so.9`; the audit used no DWPose CUDA memory. Racket and joint samples
-with unresolved visual failures were quarantined in the versioned review record.
-No eligible split was regenerated, no model was trained or smoke-loaded, and the
-active training manifest was not changed. Generation readiness and dataset
-promotion remain blocked on a transport representation for pose/geometry, a
-regenerated split, and successful player/racket/joint training-loading smokes.
-
 ## Pilot return audit — 16 September 2026
 
 #118 and #125 are merged; the bounded E05 pix2pix pilot executed, but its
@@ -304,6 +323,3 @@ result that determines the next experiment; no family-wide claims from one pilot
   - `campaign_result.json` (original adapted): SHA-256 `f56e5cb2a8c0239b4f3ecc007d164a403cb7512d8a6bd4ed1e625afdf7c8a425`
   - `diagnostic_matrix_completed.json` (completed 7-corner): SHA-256 `a0dbf42dc1052cd0ea461f7d4c75086cf1a798636a8f3152d40658afd4d0f8df`
   - `campaign_result_completed.json` (completed adapted): SHA-256 `99e019e0f544ac4064ca4fee0e8e7b5f02821cc2486cbf03c646f262bdfa34fa`
-
-
-
