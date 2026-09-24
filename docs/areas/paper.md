@@ -1,5 +1,14 @@
 # Paper Area
 
+## Research thesis and possible claim regime — 24 September 2026
+
+The [semantic codec thesis](../strategy/semantic-codec-thesis.md) collects the
+Presley → GenStream → PointStream rationale, measured September limitations,
+prior work on composite references, and a conditional ultra-low-rate,
+court-preserving claim to test. It is a strategy note, not manuscript text or a
+new result. The active weighted-PSNR gate and withdrawn ladder claims remain
+unchanged until a separately recorded protocol and evidence decision.
+
 ## Constant-table ladder numbers are not a result — 22 September 2026
 
 The 65.4% / 32.5% sentences in the abstract, introduction, and evaluation

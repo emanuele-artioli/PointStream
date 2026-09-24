@@ -1,5 +1,9 @@
 # PointStream Area Index & Active Plan
 
+Research thesis, evidence boundaries, and proposed next tests:
+[semantic codec thesis](docs/strategy/semantic-codec-thesis.md). This working
+note does not change the active evaluation gate below.
+
 Current coordination: **23 September 2026**.
 Start with the [23 September development campaign](docs/workflow/session/evaluation-campaign/20260923-development-campaign.md).
 The September 17 roadblock, the 20 September evidence freeze, and the older
