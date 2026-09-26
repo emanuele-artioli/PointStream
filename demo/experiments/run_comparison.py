@@ -100,16 +100,21 @@ def reconstruct_pointstream_video(
             with torch.no_grad():
                 pred = model(inp)
 
-            # Convert prediction [1, 3, H, W] in [-1, 1] to uint8 BGR
-            pred_np = pred.squeeze(0).permute(1, 2, 0).cpu().numpy()
+            rgb = pred[:, :3]
+            pred_np = rgb.squeeze(0).permute(1, 2, 0).cpu().numpy()
             pred_uint8 = np.clip((pred_np + 1.0) * 127.5, 0, 255).astype(np.uint8)
             pred_bgr = cv2.cvtColor(pred_uint8, cv2.COLOR_RGB2BGR)
+            alpha_canvas = None
+            if pred.shape[1] == 4:
+                alpha_canvas = np.clip(pred[0, 3].detach().cpu().numpy() * 255.0, 0, 255).astype(np.uint8)
 
-            # Composite back into the decoded background
             _, meta = letterbox_crop(ref_frames[idx], hand.bbox, target_size=image_size)
             restored_crop, (x1, y1, x2, y2) = unletterbox_crop(pred_bgr, meta, w, h)
+            restored_alpha = None
+            if alpha_canvas is not None:
+                alpha_bgr = cv2.cvtColor(alpha_canvas, cv2.COLOR_GRAY2BGR)
+                restored_alpha, _ = unletterbox_crop(alpha_bgr, meta, w, h)
 
-            # Alpha blend using box-margin feathering (preserves wrist context, removes square borders)
             x1 = max(0, min(w - 1, x1))
             y1 = max(0, min(h - 1, y1))
             x2 = max(x1 + 1, min(w, x2))
@@ -117,7 +122,11 @@ def reconstruct_pointstream_video(
             crop_h, crop_w = y2 - y1, x2 - x1
             if crop_h >= 8 and crop_w >= 8:
                 fitted_hand = cv2.resize(restored_crop, (crop_w, crop_h), interpolation=cv2.INTER_LINEAR)
-                alpha = create_box_feather_mask(crop_h, crop_w, margin_fraction=0.08)
+                if restored_alpha is not None:
+                    fitted_alpha = cv2.resize(restored_alpha[:, :, 0], (crop_w, crop_h), interpolation=cv2.INTER_LINEAR)
+                    alpha = (fitted_alpha.astype(np.float32) / 255.0)[:, :, None]
+                else:
+                    alpha = create_box_feather_mask(crop_h, crop_w, margin_fraction=0.08)
 
                 bg_roi = bg[y1:y2, x1:x2].astype(np.float32)
                 hand_roi = fitted_hand.astype(np.float32)
@@ -369,12 +378,13 @@ def main() -> None:
     state_dict = ckpt["model_state_dict"]
     model_type = ckpt.get("model_type", "spade" if "enc1.0.weight" in state_dict else "unet")
 
+    out_channels = int(ckpt.get("out_channels") or 3)
     if model_type == "spade" or "enc1.0.weight" in state_dict:
-        model = HandSPADEUNet(in_channels=6, out_channels=3).to(device)
-        logger.info("Instantiated HandSPADEUNet generator.")
+        model = HandSPADEUNet(in_channels=6, out_channels=out_channels).to(device)
+        logger.info("Instantiated HandSPADEUNet generator (%d ch).", out_channels)
     else:
-        model = HandPix2PixUNet(in_channels=6, out_channels=3).to(device)
-        logger.info("Instantiated HandPix2PixUNet generator.")
+        model = HandPix2PixUNet(in_channels=6, out_channels=out_channels).to(device)
+        logger.info("Instantiated HandPix2PixUNet generator (%d ch).", out_channels)
 
     model.load_state_dict(state_dict)
     model.eval()

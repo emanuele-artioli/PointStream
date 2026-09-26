@@ -350,6 +350,103 @@
             font-size: 0.8rem;
             color: var(--text-muted);
         }
+        .maps-empty {
+            background: var(--bg-secondary);
+            border: 1px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 28px 24px;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+        .maps-empty code {
+            color: var(--accent-blue);
+            font-size: 0.85rem;
+        }
+        .map-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .overlay-toggles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+        .map-sides {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 24px;
+            width: 100%;
+        }
+        .map-side-label {
+            display: block;
+            margin-bottom: 6px;
+        }
+        @media (max-width: 820px) {
+            .map-sides { grid-template-columns: 1fr; }
+        }
+        .maps-caption {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin: -8px 0 16px;
+        }
+        .skipped-list {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: -12px;
+            margin-bottom: 24px;
+        }
+            background: #000;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        .maps-player video,
+        .maps-player img,
+        .maps-player canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 640px;
+            object-fit: contain;
+            background: #000;
+        }
+        .maps-player video[hidden],
+        .maps-player img[hidden],
+        .maps-player canvas[hidden] {
+            display: none !important;
+        }
+        .maps-caption {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin: -4px 0 16px;
+        }
+        .offline-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(251, 146, 60, 0.15);
+            border: 1px solid var(--accent-orange);
+            color: var(--accent-orange);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        .offline-badge[hidden] {
+            display: none !important;
+        }
+        .skipped-list {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 12px;
+        }
 
         /* Table & Benchmark Styling */
         table {
@@ -458,9 +555,9 @@
 
         <!-- Navigation Tabs -->
         <div class="tab-bar">
-            <button class="tab-btn active" onclick="switchTab('inspector')">🎮 Interactive Teleop Inspector</button>
-            <button class="tab-btn" onclick="switchTab('benchmark')">📊 Multi-Resolution Benchmark</button>
-            <button class="tab-btn" onclick="switchTab('roadmap')">🚀 Architecture & Roadmap (Modes 2 & 3)</button>
+            <button class="tab-btn active" data-tab="inspector" onclick="switchTab('inspector')">🎮 Interactive Teleop Inspector</button>
+            <button class="tab-btn" data-tab="benchmark" onclick="switchTab('benchmark')">📊 Multi-Resolution Benchmark</button>
+            <button class="tab-btn" data-tab="roadmap" onclick="switchTab('roadmap')">🚀 Architecture & Roadmap (Modes 2 & 3)</button>
         </div>
 
         <!-- TAB 1: INTERACTIVE INSPECTOR -->
@@ -479,12 +576,14 @@
                     <button class="btn" id="btn-mode-split" onclick="setViewMode('split')">🔀 Split Slider (A/B)</button>
                     <button class="btn" id="btn-mode-side" onclick="setViewMode('side_by_side')">👥 Side-by-Side</button>
                     <button class="btn active" id="btn-mode-zoom" onclick="setViewMode('zoom')">🔍 Finger Articulation Loupe</button>
-                    <button class="btn" id="btn-mode-stacked" onclick="setViewMode('stacked')">📑 Stacked 3-Panel</button>
                 </div>
 
                 <div class="control-group">
                     <span class="control-label">Left Stream:</span>
                     <select id="select-left" class="dropdown" onchange="onStreamChange('left')">
+                        <optgroup label="Canvas">
+                            <option value="empty">Empty · maps only</option>
+                        </optgroup>
                         <optgroup label="PointStream">
                             <option value="ps_starve" selected>PS 240p · 70 kbps</option>
                             <option value="ps_heavy">PS 360p · 116 kbps</option>
@@ -494,7 +593,7 @@
                         </optgroup>
                         <optgroup label="AV1">
                             <option value="av1_180">AV1 180p · 42 kbps</option>
-                            <option value="av1_240">AV1 240p · 62 kbps</option>
+                            <option value="av1_240">AV1 240p · CRF 35</option>
                             <option value="av1_360">AV1 360p · 110 kbps</option>
                             <option value="av1_540">AV1 540p · 259 kbps</option>
                             <option value="av1_720">AV1 720p · 324 kbps</option>
@@ -507,8 +606,11 @@
 
                     <span class="control-label">Right Stream:</span>
                     <select id="select-right" class="dropdown" onchange="onStreamChange('right')">
+                        <optgroup label="Canvas">
+                            <option value="empty">Empty · maps only</option>
+                        </optgroup>
                         <optgroup label="AV1">
-                            <option value="av1_240" selected>AV1 240p · 62 kbps</option>
+                            <option value="av1_240" selected>AV1 240p · CRF 35</option>
                             <option value="av1_180">AV1 180p · 42 kbps</option>
                             <option value="av1_360">AV1 360p · 110 kbps</option>
                             <option value="av1_540">AV1 540p · 259 kbps</option>
@@ -528,16 +630,28 @@
                     </select>
                 </div>
 
-                <div class="control-group">
-                    <span class="control-label">Overlays:</span>
-                    <label class="toggle-item">
-                        <input type="checkbox" id="toggle-skeleton" checked onchange="redrawCanvas()">
-                        <span>47-Byte Skeleton Telemetry</span>
-                    </label>
-                    <label class="toggle-item">
-                        <input type="checkbox" id="toggle-difference" onchange="redrawCanvas()">
-                        <span>Error / Distortion Heatmap</span>
-                    </label>
+                <div class="control-group" style="align-items: flex-start;">
+                    <div class="map-sides">
+                        <div>
+                            <span class="control-label map-side-label">Left maps:</span>
+                            <div class="overlay-toggles" id="maps-left">
+                                <label class="toggle-item">
+                                    <input type="checkbox" data-side="left" data-map="heatmap" onchange="onOverlayToggle()">
+                                    <span>Error / Distortion Heatmap</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="control-label map-side-label">Right maps:</span>
+                            <div class="overlay-toggles" id="maps-right">
+                                <label class="toggle-item">
+                                    <input type="checkbox" data-side="right" data-map="heatmap" onchange="onOverlayToggle()">
+                                    <span>Error / Distortion Heatmap</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="offline-badge" id="maps-offline-badge" hidden>Offline · extract p50 &gt; 50 ms</span>
                 </div>
             </div>
 
@@ -566,29 +680,8 @@
                 </div>
             </div>
 
-            <!-- Live HUD Cards -->
-            <div class="hud-grid">
-                <div class="hud-card green" id="hud-card-error">
-                    <div class="hud-label" id="hud-mpjpe-label">Joint error vs this AV1</div>
-                    <div class="hud-value" id="hud-mpjpe" style="color: var(--accent-green);">1.03×</div>
-                    <div class="hud-sub" id="hud-mpjpe-sub">124.6 px vs 128.1 px</div>
-                </div>
-                <div class="hud-card" id="hud-card-det">
-                    <div class="hud-label" id="hud-det-label">Hands recovered vs ground truth</div>
-                    <div class="hud-value" id="hud-bitrate" style="color: var(--accent-blue);">30.8%</div>
-                    <div class="hud-sub" id="hud-bitrate-sub">30.8% of RTMPose GT hands vs 27.8% on AV1 240p</div>
-                </div>
-                <div class="hud-card purple" id="hud-card-rate">
-                    <div class="hud-label">Bitrate</div>
-                    <div class="hud-value" id="hud-keypoint" style="color: var(--accent-purple);">70 vs 62 kbps</div>
-                    <div class="hud-sub" id="hud-keypoint-sub">Matched starve rung · 60× below 4,200 kbps reference</div>
-                </div>
-                <div class="hud-card orange" id="hud-card-call">
-                    <div class="hud-label">Why this comparison</div>
-                    <div class="hud-value" id="hud-latency" style="color: var(--accent-orange);">Win</div>
-                    <div class="hud-sub" id="hud-latency-sub">Lower joint error at the same 240p floor, 18.4 ms E2E</div>
-                </div>
-            </div>
+            <div class="maps-empty" id="maps-empty" hidden></div>
+            <div class="skipped-list" id="maps-skipped"></div>
         </div>
 
         <!-- TAB 2: MULTI-RESOLUTION BENCHMARK -->
@@ -768,7 +861,7 @@
             <div class="chart-box">
                 <img id="rd-curve-img" src="rd_curves_clip_03_factory001_worker001_00000.png" alt="Rate-Distortion Curves">
                 <p style="margin-top: 12px; color: var(--text-muted); font-size: 0.9rem;">
-                    Pareto curves for the clip on screen. New windows: close hands (factory 35), slow assembly, table work. Three-clip starve mean: PS 77.5 px / 50.3% vs AV1 81.1 px / 51.8%.
+                    Pareto curves for the clip on screen. New windows: close hands (factory 35), slow assembly, table work. Three-clip starve mean: PS 89.1 px / 49.5% vs AV1 81.1 px / 51.8%.
                 </p>
             </div>
             <div class="chart-box">
@@ -830,58 +923,58 @@ class StreamingCodecAdapter(Protocol):
         const CLIPS = {
             'clip_01': {
                 name: 'Clip 1 (Close Hands)',
-                keypoints: 'keypoints_clip_01.json',
-                rd_img: 'rd_curves_clip_01_factory001_worker001_00001.png',
+                keypoints: 'keypoints_clip_01.json?v=sides1',
+                rd_img: 'rd_curves_clip_01_factory001_worker001_00001.png?v=sides1',
                 streams: {
-                    ps_starve: { kind: 'ps', res: '240p', kbps: 67.0, mpjpe: 54.1, det: 53.2, kp: 22.4 },
-                    ps_heavy:  { kind: 'ps', res: '360p', kbps: 102.3, mpjpe: 54.4, det: 53.4, kp: 22.4 },
-                    ps_low:    { kind: 'ps', res: '540p', kbps: 173.9, mpjpe: 52.8, det: 53.9, kp: 22.4 },
-                    ps_std:    { kind: 'ps', res: '540p', kbps: 286.9, mpjpe: 53.5, det: 53.7, kp: 22.4 },
-                    ps_1080:   { kind: 'ps', res: '1080p', kbps: 379.6, mpjpe: 58.5, det: 51.4, kp: 22.4 },
-                    av1_180:   { kind: 'av1', res: '180p', kbps: 33.6, mpjpe: 59.0, det: 41.6, kp: 0 },
-                    av1_240:   { kind: 'av1', res: '240p', kbps: 48.6, mpjpe: 49.5, det: 61.2, kp: 0 },
-                    av1_360:   { kind: 'av1', res: '360p', kbps: 88.4, mpjpe: 43.4, det: 75.7, kp: 0 },
-                    av1_540:   { kind: 'av1', res: '540p', kbps: 264.1, mpjpe: 29.9, det: 89.4, kp: 0 },
-                    av1_720:   { kind: 'av1', res: '720p', kbps: 314.4, mpjpe: 29.7, det: 92.0, kp: 0 },
-                    av1_1080:  { kind: 'av1', res: '1080p', kbps: 524.6, mpjpe: 25.8, det: 92.0, kp: 0 },
+                    ps_starve: { kind: 'ps', res: '240p', kbps: 56.1, mpjpe: 65.6, det: 55.4, kp: 11.6 },
+                    ps_heavy:  { kind: 'ps', res: '360p', kbps: 91.3, mpjpe: 66.0, det: 58.8, kp: 11.6 },
+                    ps_low:    { kind: 'ps', res: '540p', kbps: 163.1, mpjpe: 65.7, det: 61.1, kp: 11.6 },
+                    ps_std:    { kind: 'ps', res: '540p', kbps: 276.0, mpjpe: 60.0, det: 62.3, kp: 11.6 },
+                    ps_1080:   { kind: 'ps', res: '1080p', kbps: 368.8, mpjpe: 72.3, det: 55.4, kp: 11.6 },
+                    av1_180:   { kind: 'av1', res: '180p', kbps: 34.3, mpjpe: 59.0, det: 41.6, kp: 0 },
+                    av1_240:   { kind: 'av1', res: '240p', kbps: 49.1, mpjpe: 49.5, det: 61.2, kp: 0 },
+                    av1_360:   { kind: 'av1', res: '360p', kbps: 83.1, mpjpe: 43.4, det: 75.7, kp: 0 },
+                    av1_540:   { kind: 'av1', res: '540p', kbps: 141.4, mpjpe: 29.9, det: 89.4, kp: 0 },
+                    av1_720:   { kind: 'av1', res: '720p', kbps: 204.3, mpjpe: 29.7, det: 92.0, kp: 0 },
+                    av1_1080:  { kind: 'av1', res: '1080p', kbps: 358.1, mpjpe: 25.8, det: 92.0, kp: 0 },
                     ref:       { kind: 'ref', res: '1080p', kbps: 4200, mpjpe: null, det: 100, kp: 0 }
                 }
             },
             'clip_02': {
                 name: 'Clip 2 (Slow Assembly)',
-                keypoints: 'keypoints_clip_02.json',
-                rd_img: 'rd_curves_clip_02_factory001_worker001_00002.png',
+                keypoints: 'keypoints_clip_02.json?v=sides1',
+                rd_img: 'rd_curves_clip_02_factory001_worker001_00002.png?v=sides1',
                 streams: {
-                    ps_starve: { kind: 'ps', res: '240p', kbps: 70.6, mpjpe: 94.3, det: 39.3, kp: 10.4 },
-                    ps_heavy:  { kind: 'ps', res: '360p', kbps: 113.7, mpjpe: 77.7, det: 49.8, kp: 10.4 },
-                    ps_low:    { kind: 'ps', res: '540p', kbps: 207.3, mpjpe: 79.5, det: 53.7, kp: 10.4 },
-                    ps_std:    { kind: 'ps', res: '540p', kbps: 270.7, mpjpe: 76.1, det: 47.1, kp: 10.4 },
-                    ps_1080:   { kind: 'ps', res: '1080p', kbps: 523.1, mpjpe: 96.7, det: 58.4, kp: 10.4 },
-                    av1_180:   { kind: 'av1', res: '180p', kbps: 42.8, mpjpe: 92.6, det: 36.6, kp: 0 },
-                    av1_240:   { kind: 'av1', res: '240p', kbps: 62.3, mpjpe: 91.8, det: 35.4, kp: 0 },
-                    av1_360:   { kind: 'av1', res: '360p', kbps: 106.0, mpjpe: 103.8, det: 35.4, kp: 0 },
-                    av1_540:   { kind: 'av1', res: '540p', kbps: 260.7, mpjpe: 93.3, det: 48.2, kp: 0 },
-                    av1_720:   { kind: 'av1', res: '720p', kbps: 312.4, mpjpe: 88.0, det: 45.9, kp: 0 },
-                    av1_1080:  { kind: 'av1', res: '1080p', kbps: 546.5, mpjpe: 76.3, det: 56.4, kp: 0 },
+                    ps_starve: { kind: 'ps', res: '240p', kbps: 66.2, mpjpe: 110.0, det: 35.3, kp: 5.9 },
+                    ps_heavy:  { kind: 'ps', res: '360p', kbps: 109.3, mpjpe: 77.8, det: 46.5, kp: 5.9 },
+                    ps_low:    { kind: 'ps', res: '540p', kbps: 203.8, mpjpe: 93.2, det: 47.7, kp: 5.9 },
+                    ps_std:    { kind: 'ps', res: '540p', kbps: 267.0, mpjpe: 87.3, det: 51.9, kp: 5.9 },
+                    ps_1080:   { kind: 'ps', res: '1080p', kbps: 518.7, mpjpe: 71.7, det: 58.1, kp: 5.9 },
+                    av1_180:   { kind: 'av1', res: '180p', kbps: 45.6, mpjpe: 92.6, det: 36.6, kp: 0 },
+                    av1_240:   { kind: 'av1', res: '240p', kbps: 66.3, mpjpe: 91.8, det: 35.4, kp: 0 },
+                    av1_360:   { kind: 'av1', res: '360p', kbps: 112.7, mpjpe: 103.8, det: 35.4, kp: 0 },
+                    av1_540:   { kind: 'av1', res: '540p', kbps: 199.2, mpjpe: 93.3, det: 48.2, kp: 0 },
+                    av1_720:   { kind: 'av1', res: '720p', kbps: 293.0, mpjpe: 88.0, det: 45.9, kp: 0 },
+                    av1_1080:  { kind: 'av1', res: '1080p', kbps: 516.3, mpjpe: 76.3, det: 56.4, kp: 0 },
                     ref:       { kind: 'ref', res: '1080p', kbps: 4200, mpjpe: null, det: 100, kp: 0 }
                 }
             },
             'clip_03': {
                 name: 'Clip 3 (Table Work)',
-                keypoints: 'keypoints_clip_03.json',
-                rd_img: 'rd_curves_clip_03_factory001_worker001_00000.png',
+                keypoints: 'keypoints_clip_03.json?v=sides1',
+                rd_img: 'rd_curves_clip_03_factory001_worker001_00000.png?v=sides1',
                 streams: {
-                    ps_starve: { kind: 'ps', res: '240p', kbps: 74.8, mpjpe: 84.1, det: 58.4, kp: 10.3 },
-                    ps_heavy:  { kind: 'ps', res: '360p', kbps: 124.1, mpjpe: 65.4, det: 56.8, kp: 10.3 },
-                    ps_low:    { kind: 'ps', res: '540p', kbps: 230.2, mpjpe: 66.5, det: 56.8, kp: 10.3 },
-                    ps_std:    { kind: 'ps', res: '540p', kbps: 269.1, mpjpe: 64.2, det: 58.4, kp: 10.3 },
-                    ps_1080:   { kind: 'ps', res: '1080p', kbps: 597.5, mpjpe: 67.7, det: 60.7, kp: 10.3 },
-                    av1_180:   { kind: 'av1', res: '180p', kbps: 45.9, mpjpe: 92.6, det: 59.1, kp: 0 },
-                    av1_240:   { kind: 'av1', res: '240p', kbps: 68.2, mpjpe: 102.0, det: 58.8, kp: 0 },
-                    av1_360:   { kind: 'av1', res: '360p', kbps: 119.5, mpjpe: 75.3, det: 59.9, kp: 0 },
-                    av1_540:   { kind: 'av1', res: '540p', kbps: 251.9, mpjpe: 65.1, det: 60.7, kp: 0 },
-                    av1_720:   { kind: 'av1', res: '720p', kbps: 340.7, mpjpe: 62.1, det: 66.5, kp: 0 },
-                    av1_1080:  { kind: 'av1', res: '1080p', kbps: 639.2, mpjpe: 44.2, det: 69.6, kp: 0 },
+                    ps_starve: { kind: 'ps', res: '240p', kbps: 75.2, mpjpe: 91.6, det: 57.8, kp: 10.8 },
+                    ps_heavy:  { kind: 'ps', res: '360p', kbps: 124.6, mpjpe: 84.7, det: 54.3, kp: 10.8 },
+                    ps_low:    { kind: 'ps', res: '540p', kbps: 230.7, mpjpe: 64.7, det: 53.9, kp: 10.8 },
+                    ps_std:    { kind: 'ps', res: '540p', kbps: 268.9, mpjpe: 62.2, det: 56.6, kp: 10.8 },
+                    ps_1080:   { kind: 'ps', res: '1080p', kbps: 597.9, mpjpe: 54.1, det: 52.3, kp: 10.8 },
+                    av1_180:   { kind: 'av1', res: '180p', kbps: 51.4, mpjpe: 92.6, det: 59.1, kp: 0 },
+                    av1_240:   { kind: 'av1', res: '240p', kbps: 76.6, mpjpe: 102.0, det: 58.8, kp: 0 },
+                    av1_360:   { kind: 'av1', res: '360p', kbps: 135.1, mpjpe: 75.3, det: 59.9, kp: 0 },
+                    av1_540:   { kind: 'av1', res: '540p', kbps: 239.2, mpjpe: 65.1, det: 60.7, kp: 0 },
+                    av1_720:   { kind: 'av1', res: '720p', kbps: 351.2, mpjpe: 62.1, det: 66.5, kp: 0 },
+                    av1_1080:  { kind: 'av1', res: '1080p', kbps: 609.9, mpjpe: 44.2, det: 69.6, kp: 0 },
                     ref:       { kind: 'ref', res: '1080p', kbps: 4200, mpjpe: null, det: 100, kp: 0 }
                 }
             }
@@ -913,10 +1006,11 @@ class StreamingCodecAdapter(Protocol):
         ];
 
         let currentClipId = 'clip_03';
-        let currentMode = 'zoom'; // 'split', 'side_by_side', 'zoom', 'stacked'
+        let currentMode = 'zoom'; // 'split', 'side_by_side', 'zoom'
         let splitFraction = 0.5;
         let isDragging = false;
         let keypointsData = null;
+        let overlayFrames = {};
 
         const videoA = document.getElementById('video-a');
         const videoB = document.getElementById('video-b');
@@ -933,35 +1027,73 @@ class StreamingCodecAdapter(Protocol):
         const CLIP_BTN = { clip_01: 'clip1', clip_02: 'clip2', clip_03: 'clip3' };
 
         function streamFile(clipId, key) {
-            return 'web_' + clipId + '_' + key + '.mp4';
+            const token = String(key).indexOf('ps_') === 0 ? 'matte1' : 'crf63';
+            return 'web_' + clipId + '_' + key + '.mp4?v=' + token;
+        }
+
+        function isEmptyStream(key) {
+            return key === 'empty';
         }
 
         function streamMeta(key) {
+            if (isEmptyStream(key)) return { kind: 'empty', res: '', kbps: 0 };
             return CLIPS[currentClipId].streams[key] || { kind: 'ref', res: key, kbps: 0 };
         }
 
         function streamLabel(key) {
+            if (isEmptyStream(key)) return 'Empty · maps only';
             const s = streamMeta(key);
             const who = s.kind === 'ps' ? 'PS' : (s.kind === 'av1' ? 'AV1' : 'Reference');
             return who + ' ' + s.res + ' · ' + Math.round(s.kbps).toLocaleString() + ' kbps';
         }
 
+        // Published teleop path, not a per-rung remeasure.
+        const STREAM_LATENCY_MS = { ps: 18.4, av1: 13.6 };
+
         function formatStream(key) {
             const s = streamMeta(key);
-            return streamLabel(key) + (s.mpjpe != null ? (', ' + s.mpjpe.toFixed(1) + ' px') : '');
+            let text = streamLabel(key);
+            if (s.mpjpe != null) text += ', ' + s.mpjpe.toFixed(1) + ' px';
+            if (STREAM_LATENCY_MS[s.kind] != null) text += ', ' + STREAM_LATENCY_MS[s.kind].toFixed(1) + ' ms';
+            return text;
         }
 
         function relabelDropdowns() {
             ['select-left', 'select-right'].forEach(id => {
                 document.getElementById(id).querySelectorAll('option').forEach(opt => {
-                    if (CLIPS[currentClipId].streams[opt.value]) opt.textContent = streamLabel(opt.value);
+                    if (opt.value === 'empty') {
+                        opt.textContent = 'Empty · maps only';
+                    } else if (CLIPS[currentClipId].streams[opt.value]) {
+                        opt.textContent = streamLabel(opt.value);
+                    }
                 });
             });
         }
 
+        function overlayVideoEls() {
+            return Object.values(overlayFrames).map(p => p && p.video).filter(Boolean);
+        }
+
+        function clock() {
+            if (videoC.readyState >= 2 && videoC.duration) return videoC;
+            if (videoA.readyState >= 2 && videoA.duration) return videoA;
+            if (videoB.readyState >= 2 && videoB.duration) return videoB;
+            return videoC;
+        }
+
+        function allSyncVideos() {
+            return [videoA, videoB, videoC, ...overlayVideoEls()];
+        }
+
         function loadVideo(video, url) {
+            if (!url) {
+                video.removeAttribute('src');
+                video.dataset.url = '';
+                try { video.load(); } catch (e) {}
+                return Promise.resolve();
+            }
             if (video.dataset.url === url && video.readyState >= 2) return Promise.resolve();
-            const resume = videoA.currentTime || 0;
+            const resume = clock().currentTime || 0;
             video.dataset.url = url;
             video.src = url;
             video.load();
@@ -975,90 +1107,26 @@ class StreamingCodecAdapter(Protocol):
         }
 
         function syncFromMaster() {
-            const t = videoA.currentTime;
-            [videoB, videoC].forEach(v => {
-                if (!v.src) return;
+            const master = clock();
+            const t = master.currentTime || 0;
+            allSyncVideos().forEach(v => {
+                if (!v || v === master || !v.src) return;
                 if (Math.abs((v.currentTime || 0) - t) > 0.08) {
                     try { v.currentTime = t; } catch (e) {}
                 }
             });
         }
 
-        function updateWinCards() {
-            const leftKey = document.getElementById('select-left').value;
-            const rightKey = document.getElementById('select-right').value;
-            const L = streamMeta(leftKey);
-            const R = streamMeta(rightKey);
-            const psKey = L.kind === 'ps' ? leftKey : (R.kind === 'ps' ? rightKey : null);
-            const avKey = L.kind === 'av1' ? leftKey : (R.kind === 'av1' ? rightKey : null);
-            const ps = psKey ? streamMeta(psKey) : null;
-            const av = avKey ? streamMeta(avKey) : null;
-            const other = psKey === leftKey ? R : L;
-            const vs = ps && av ? av : other;
-
-            if (ps && vs && vs.mpjpe != null && ps.mpjpe != null) {
-                const win = ps.mpjpe < vs.mpjpe - 0.5;
-                const ratio = vs.mpjpe / Math.max(ps.mpjpe, 0.01);
-                document.getElementById('hud-mpjpe-label').textContent = win
-                    ? 'PointStream joint error vs this AV1'
-                    : 'Joint error (MPJPE)';
-                document.getElementById('hud-mpjpe').textContent = win ? (ratio.toFixed(2) + '× lower') : (ps.mpjpe.toFixed(1) + ' px');
-                document.getElementById('hud-mpjpe-sub').textContent =
-                    streamLabel(psKey) + ' ' + ps.mpjpe.toFixed(1) + ' px vs ' + vs.mpjpe.toFixed(1) + ' px';
-                document.getElementById('hud-card-error').className = win ? 'hud-card green' : 'hud-card';
-            } else {
-                document.getElementById('hud-mpjpe-label').textContent = 'Joint error (MPJPE)';
-                document.getElementById('hud-mpjpe').textContent = L.mpjpe == null ? '—' : (L.mpjpe.toFixed(1) + ' px');
-                document.getElementById('hud-mpjpe-sub').textContent = 'Pick PointStream and AV1 to compare joint error';
-                document.getElementById('hud-card-error').className = 'hud-card';
-            }
-
-            if (ps && vs && vs.det != null) {
-                const detWin = ps.det > vs.det + 0.5;
-                document.getElementById('hud-bitrate').textContent = ps.det.toFixed(1) + '%';
-                document.getElementById('hud-bitrate-sub').textContent =
-                    ps.det.toFixed(1) + '% of GT hands vs ' + vs.det.toFixed(1) + '% on ' + streamLabel(psKey === leftKey ? rightKey : leftKey);
-                document.getElementById('hud-card-det').className = detWin ? 'hud-card green' : 'hud-card';
-            } else {
-                document.getElementById('hud-bitrate').textContent = (L.det != null ? L.det.toFixed(1) : '—') + '%';
-                document.getElementById('hud-bitrate-sub').textContent = 'Share of MediaPipe hands found on the 1080p reference (ground truth)';
-                document.getElementById('hud-card-det').className = 'hud-card';
-            }
-
-            document.getElementById('hud-keypoint').textContent =
-                Math.round(L.kbps) + ' vs ' + Math.round(R.kbps) + ' kbps';
-            document.getElementById('hud-keypoint-sub').textContent =
-                streamLabel(leftKey) + ' vs ' + streamLabel(rightKey)
-                + (ps && ps.kp ? ('. Keypoints ' + ps.kp.toFixed(1) + ' kbps') : '');
-
-            const wins = [];
-            if (ps && vs && vs.mpjpe != null && ps.mpjpe < vs.mpjpe - 0.5) {
-                wins.push((vs.mpjpe / ps.mpjpe).toFixed(2) + '× lower MPJPE');
-            }
-            if (ps && vs && vs.det != null && ps.det > vs.det + 0.5) {
-                wins.push((ps.det - vs.det).toFixed(0) + ' pp more GT hands');
-            }
-            if (ps && av && ps.kbps <= av.kbps * 1.25) {
-                wins.push('matched bitrate');
-            }
-            document.getElementById('hud-latency').textContent = wins.length ? 'PS win' : (ps && av ? 'AV1 wins detection' : '18.4 ms');
-            document.getElementById('hud-latency-sub').textContent = wins.length
-                ? (CLIPS[currentClipId].name + ': ' + wins.join(' · ') + '. E2E 18.4 ms.')
-                : (ps && av && vs && vs.det > ps.det
-                    ? ('On this rung AV1 recovers more GT hands (' + vs.det.toFixed(1) + '% vs ' + ps.det.toFixed(1) + '%). Joint error still favors PS when MPJPE is lower.')
-                    : 'PointStream parallel encode+decode 18.4 ms (serial 32.0 ms).');
-            document.getElementById('hud-card-call').className = wins.length ? 'hud-card orange' : 'hud-card';
-        }
-
         function loadCurrentStreams() {
             const leftKey = document.getElementById('select-left').value;
             const rightKey = document.getElementById('select-right').value;
             return Promise.all([
-                loadVideo(videoA, streamFile(currentClipId, leftKey)),
-                loadVideo(videoB, streamFile(currentClipId, rightKey)),
+                isEmptyStream(leftKey) ? loadVideo(videoA, '') : loadVideo(videoA, streamFile(currentClipId, leftKey)),
+                isEmptyStream(rightKey) ? loadVideo(videoB, '') : loadVideo(videoB, streamFile(currentClipId, rightKey)),
                 loadVideo(videoC, streamFile(currentClipId, 'ref')),
             ]).then(() => {
                 syncFromMaster();
+                updateBundleHud();
                 redrawCanvas();
             }).catch(err => console.error(err));
         }
@@ -1072,47 +1140,40 @@ class StreamingCodecAdapter(Protocol):
             const info = CLIPS[clipId];
             document.getElementById('rd-curve-img').src = info.rd_img;
             relabelDropdowns();
-            updateWinCards();
+            updateBundleHud();
             updateStreamSelection();
             loadCurrentStreams();
             fetch(info.keypoints)
                 .then(r => r.json())
                 .then(data => { keypointsData = data; redrawCanvas(); })
                 .catch(e => { console.warn("Keypoints JSON load warning:", e); keypointsData = null; });
+            mapsClipId = clipId;
+            if (mapsIndex) renderMapsOverlays();
         }
 
         function onStreamChange(which) {
             if (which === 'left') {
                 const leftKey = document.getElementById('select-left').value;
-                if (MATCH_AV1[leftKey]) {
+                if (!isEmptyStream(leftKey) && MATCH_AV1[leftKey]) {
                     document.getElementById('select-right').value = MATCH_AV1[leftKey];
                 }
             }
-            updateWinCards();
+            updateBundleHud();
             updateStreamSelection();
             loadCurrentStreams();
         }
 
         function setViewMode(mode) {
             currentMode = mode;
-            ['split', 'side', 'zoom', 'stacked'].forEach(m => {
+            ['split', 'side', 'zoom'].forEach(m => {
                 const btn = document.getElementById('btn-mode-' + m);
                 btn.className = (m === (mode === 'side_by_side' ? 'side' : mode)) ? 'btn active' : 'btn';
             });
-
-            if (mode === 'stacked') {
-                canvas.width = 1920;
-                canvas.height = 3240;
-                curtainLine.style.display = 'none';
-                document.getElementById('badge-left-label').style.display = 'none';
-                document.getElementById('badge-right-label').style.display = 'none';
-            } else {
-                canvas.width = 1920;
-                canvas.height = 1080;
-                curtainLine.style.display = (mode === 'split') ? 'block' : 'none';
-                document.getElementById('badge-left-label').style.display = 'block';
-                document.getElementById('badge-right-label').style.display = 'block';
-            }
+            canvas.width = 1920;
+            canvas.height = 1080;
+            curtainLine.style.display = (mode === 'split') ? 'block' : 'none';
+            document.getElementById('badge-left-label').style.display = 'block';
+            document.getElementById('badge-right-label').style.display = 'block';
             updateStreamSelection();
             redrawCanvas();
         }
@@ -1157,95 +1218,233 @@ class StreamingCodecAdapter(Protocol):
 
         // Playback Control
         function togglePlay() {
-            if (videoA.paused) {
-                Promise.all(videos.map(v => v.play().catch(() => {}))).then(() => {
+            const master = clock();
+            if (master.paused) {
+                Promise.all(allSyncVideos().map(v => v.src ? v.play().catch(() => {}) : Promise.resolve())).then(() => {
                     btnPlay.textContent = '⏸ Pause';
                     requestAnimationFrame(renderLoop);
                 });
             } else {
-                videos.forEach(v => v.pause());
+                allSyncVideos().forEach(v => { try { v.pause(); } catch (e) {} });
                 btnPlay.textContent = '▶ Play';
             }
         }
 
         function stepFrame(delta) {
-            videos.forEach(v => v.pause());
+            allSyncVideos().forEach(v => { try { v.pause(); } catch (e) {} });
             btnPlay.textContent = '▶ Play';
-            const next = Math.max(0, Math.min(videoA.duration || 10, videoA.currentTime + delta / 30.0));
-            videos.forEach(v => { try { v.currentTime = next; } catch (e) {} });
+            const master = clock();
+            const next = Math.max(0, Math.min(master.duration || 10, (master.currentTime || 0) + delta / 30.0));
+            allSyncVideos().forEach(v => { try { v.currentTime = next; } catch (e) {} });
             redrawCanvas();
         }
 
         function onScrub(val) {
-            const time = (val / 1000.0) * (videoA.duration || 0);
-            videos.forEach(v => { try { v.currentTime = time; } catch (e) {} });
+            const master = clock();
+            const time = (val / 1000.0) * (master.duration || 0);
+            allSyncVideos().forEach(v => { try { v.currentTime = time; } catch (e) {} });
             redrawCanvas();
         }
 
         function setSpeed(speed) {
-            videos.forEach(v => { v.playbackRate = speed; });
+            allSyncVideos().forEach(v => { v.playbackRate = speed; });
             ['025', '05', '1'].forEach(id => {
                 const btn = document.getElementById('speed-' + id);
                 btn.className = (id === (speed === 1 ? '1' : String(speed).replace('.', ''))) ? 'btn active' : 'btn';
             });
         }
 
-        videoA.addEventListener('timeupdate', () => {
-            if (!videoA.duration) return;
+        function onClockTick() {
+            const master = clock();
+            if (!master.duration) return;
             syncFromMaster();
-            timeline.value = (videoA.currentTime / videoA.duration) * 1000;
-            const currentF = Math.floor(videoA.currentTime * 30.0);
-            const totalF = Math.floor(videoA.duration * 30.0) || 300;
-            const m = Math.floor(videoA.currentTime / 60);
-            const s = (videoA.currentTime % 60).toFixed(2).padStart(5, '0');
+            timeline.value = (master.currentTime / master.duration) * 1000;
+            const currentF = Math.floor(master.currentTime * 30.0);
+            const totalF = Math.floor(master.duration * 30.0) || 300;
+            const m = Math.floor(master.currentTime / 60);
+            const s = (master.currentTime % 60).toFixed(2).padStart(5, '0');
             timeDisplay.textContent = `0${m}:${s} / 00:10.00 (F${currentF}/${totalF})`;
-        });
+        }
 
-        videoA.addEventListener('ended', () => {
+        videoC.addEventListener('timeupdate', onClockTick);
+        videoA.addEventListener('timeupdate', onClockTick);
+
+        videoC.addEventListener('ended', () => {
             btnPlay.textContent = '▶ Play';
+        });
+        videoA.addEventListener('ended', () => {
+            if (clock() === videoA) btnPlay.textContent = '▶ Play';
         });
 
         function renderLoop() {
-            if (!videoA.paused && !videoA.ended) {
+            const master = clock();
+            if (!master.paused && !master.ended) {
                 redrawCanvas();
                 requestAnimationFrame(renderLoop);
             }
         }
 
+        function overlayFrameIndex() {
+            return Math.max(0, Math.floor((clock().currentTime || 0) * 30.0));
+        }
+
+        function heatmapOn(side) {
+            const el = document.querySelector('#maps-' + side + ' input[data-map="heatmap"]');
+            return Boolean(el && el.checked);
+        }
+
+        function enabledOverlayEntries(side) {
+            const boxes = document.querySelectorAll('#maps-' + side + ' input[type=checkbox]:checked');
+            const out = [];
+            boxes.forEach(box => {
+                const entry = overlayByMap(box.dataset.map);
+                if (entry) out.push(entry);
+            });
+            return out;
+        }
+
+        function overlayByMap(mapId) {
+            const entries = mapsEntriesForClip(mapsClipId || currentClipId);
+            return entries.find(e => e.map === mapId) || null;
+        }
+
+        function overlayMediaSize(media) {
+            return {
+                w: media.videoWidth || media.naturalWidth || 0,
+                h: media.videoHeight || media.naturalHeight || 0,
+            };
+        }
+
+        const maskScratch = document.createElement('canvas');
+        const maskScratchCtx = maskScratch.getContext('2d', { willReadFrequently: true });
+
+        function drawOverlayMedia(targetCtx, media, dx, dy, dw, dh, srcX, srcY, srcW, srcH, keyBlack) {
+            const size = overlayMediaSize(media);
+            if (!size.w || !size.h) return;
+            if (!keyBlack) {
+                if (srcW && srcH) {
+                    const sx = size.w / 1920.0;
+                    const sy = size.h / 1080.0;
+                    targetCtx.drawImage(
+                        media,
+                        srcX * sx, srcY * sy, srcW * sx, srcH * sy,
+                        dx, dy, dw, dh
+                    );
+                } else {
+                    targetCtx.drawImage(media, dx, dy, dw, dh);
+                }
+                return;
+            }
+            const dwI = Math.max(1, Math.round(dw));
+            const dhI = Math.max(1, Math.round(dh));
+            if (maskScratch.width !== dwI || maskScratch.height !== dhI) {
+                maskScratch.width = dwI;
+                maskScratch.height = dhI;
+            }
+            maskScratchCtx.clearRect(0, 0, dwI, dhI);
+            if (srcW && srcH) {
+                const sx = size.w / 1920.0;
+                const sy = size.h / 1080.0;
+                maskScratchCtx.drawImage(
+                    media,
+                    srcX * sx, srcY * sy, srcW * sx, srcH * sy,
+                    0, 0, dwI, dhI
+                );
+            } else {
+                maskScratchCtx.drawImage(media, 0, 0, dwI, dhI);
+            }
+            const img = maskScratchCtx.getImageData(0, 0, dwI, dhI);
+            const px = img.data;
+            for (let i = 0; i < px.length; i += 4) {
+                if (px[i] < 18 && px[i + 1] < 18 && px[i + 2] < 18) px[i + 3] = 0;
+            }
+            maskScratchCtx.putImageData(img, 0, 0);
+            targetCtx.drawImage(maskScratch, dx, dy, dw, dh);
+        }
+
+        function drawMapOverlays(targetCtx, dx, dy, dw, dh, side, srcX, srcY, srcW, srcH) {
+            const idx = overlayFrameIndex();
+            enabledOverlayEntries(side).forEach(entry => {
+                const n = Number(entry.n_frames) || 0;
+                if (n && idx >= n) return;
+                const pack = overlayFrames[entry.map];
+                if (!pack) return;
+                if (pack.video) {
+                    const v = pack.video;
+                    if (v.readyState < 2) return;
+                    drawOverlayMedia(targetCtx, v, dx, dy, dw, dh, srcX, srcY, srcW, srcH, entry.overlay_key === 'black');
+                    return;
+                }
+                if (!pack.frames || idx >= pack.frames.length) return;
+                const im = pack.frames[idx];
+                if (!im || !im.complete || !im.naturalWidth) return;
+                drawOverlayMedia(targetCtx, im, dx, dy, dw, dh, srcX, srcY, srcW, srcH, entry.overlay_key === 'black');
+            });
+        }
+
+        function frameSrc(video, x, y, w, h) {
+            const vw = video.videoWidth || 1920;
+            const vh = video.videoHeight || 1080;
+            return [x * vw / 1920, y * vh / 1080, w * vw / 1920, h * vh / 1080];
+        }
+
+        function drawStream(video, empty, dx, dy, dw, dh, srcX, srcY, srcW, srcH) {
+            if (empty) {
+                ctx.fillStyle = '#05070d';
+                ctx.fillRect(dx, dy, dw, dh);
+                return;
+            }
+            if (!video || !video.videoWidth) {
+                ctx.fillStyle = '#05070d';
+                ctx.fillRect(dx, dy, dw, dh);
+                return;
+            }
+            if (srcW && srcH) {
+                const r = frameSrc(video, srcX, srcY, srcW, srcH);
+                ctx.drawImage(video, r[0], r[1], r[2], r[3], dx, dy, dw, dh);
+            } else {
+                ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, dx, dy, dw, dh);
+            }
+        }
+
         // Canvas Rendering Engine
         function redrawCanvas() {
-            if (!videoA.videoWidth || !videoB.videoWidth) return;
+            if (!clock().videoWidth && !videoA.videoWidth && !videoB.videoWidth) return;
 
             const w = canvas.width;
             const h = canvas.height;
             const leftKey = document.getElementById('select-left').value;
             const rightKey = document.getElementById('select-right').value;
-
-            if (currentMode === 'stacked') {
-                const row = Math.round(h / 3);
-                ctx.drawImage(videoC.videoWidth ? videoC : videoA, 0, 0, 1920, 1080, 0, 0, w, row);
-                ctx.drawImage(videoB, 0, 0, 1920, 1080, 0, row, w, row);
-                ctx.drawImage(videoA, 0, 0, 1920, 1080, 0, row * 2, w, row);
-                drawSkeletonOverlay(ctx, 0, 0, w, row);
-                drawSkeletonOverlay(ctx, 0, row, w, row);
-                drawSkeletonOverlay(ctx, 0, row * 2, w, row);
-                return;
-            }
+            const leftEmpty = isEmptyStream(leftKey);
+            const rightEmpty = isEmptyStream(rightKey);
 
             if (currentMode === 'split') {
                 const splitX = Math.round(w * splitFraction);
                 if (splitX > 0) {
-                    ctx.drawImage(videoA, 0, 0, Math.round(1920 * splitFraction), 1080, 0, 0, splitX, h);
+                    if (leftEmpty) {
+                        drawStream(videoA, true, 0, 0, splitX, h);
+                    } else {
+                        const leftCrop = frameSrc(videoA, 0, 0, Math.round(1920 * splitFraction), 1080);
+                        ctx.drawImage(videoA, leftCrop[0], leftCrop[1], leftCrop[2], leftCrop[3], 0, 0, splitX, h);
+                    }
                 }
                 if (splitX < w) {
-                    ctx.drawImage(videoB, Math.round(1920 * splitFraction), 0, 1920 - Math.round(1920 * splitFraction), 1080, splitX, 0, w - splitX, h);
+                    if (rightEmpty) {
+                        drawStream(videoB, true, splitX, 0, w - splitX, h);
+                    } else {
+                        const rightX = Math.round(1920 * splitFraction);
+                        const rightCrop = frameSrc(videoB, rightX, 0, 1920 - rightX, 1080);
+                        ctx.drawImage(videoB, rightCrop[0], rightCrop[1], rightCrop[2], rightCrop[3], splitX, 0, w - splitX, h);
+                    }
                 }
-                if (document.getElementById('toggle-difference').checked) {
-                    drawDifferenceHeatmap(ctx, splitX, w, h);
+                const srcSplit = Math.round(1920 * splitFraction);
+                if (splitX > 0) {
+                    drawMapOverlays(ctx, 0, 0, splitX, h, 'left', 0, 0, srcSplit, 1080);
                 }
-                if (document.getElementById('toggle-skeleton').checked) {
-                    drawSkeletonOverlay(ctx, 0, 0, w, h);
+                if (splitX < w) {
+                    drawMapOverlays(ctx, splitX, 0, w - splitX, h, 'right', srcSplit, 0, 1920 - srcSplit, 1080);
                 }
+                if (heatmapOn('left') || heatmapOn('right')) drawDifferenceHeatmap(ctx, splitX, w, h);
                 ctx.strokeStyle = '#38bdf8';
                 ctx.lineWidth = 3;
                 ctx.shadowColor = 'rgba(56, 189, 248, 0.9)';
@@ -1257,21 +1456,17 @@ class StreamingCodecAdapter(Protocol):
                 ctx.shadowBlur = 0;
             } else if (currentMode === 'side_by_side') {
                 const halfW = Math.round(w / 2);
-                ctx.drawImage(videoA, 0, 0, 1920, 1080, 0, 0, halfW, h);
-                ctx.drawImage(videoB, 0, 0, 1920, 1080, halfW, 0, halfW, h);
-                if (document.getElementById('toggle-difference').checked) {
-                    drawDifferenceHeatmap(ctx, halfW, w, h);
-                }
+                drawStream(videoA, leftEmpty, 0, 0, halfW, h);
+                drawStream(videoB, rightEmpty, halfW, 0, halfW, h);
+                drawMapOverlays(ctx, 0, 0, halfW, h, 'left');
+                drawMapOverlays(ctx, halfW, 0, halfW, h, 'right');
+                if (heatmapOn('left') || heatmapOn('right')) drawDifferenceHeatmap(ctx, halfW, w, h);
                 ctx.strokeStyle = '#475569';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
                 ctx.moveTo(halfW, 0);
                 ctx.lineTo(halfW, h);
                 ctx.stroke();
-                if (document.getElementById('toggle-skeleton').checked) {
-                    drawSkeletonOverlay(ctx, 0, 0, halfW, h);
-                    drawSkeletonOverlay(ctx, halfW, 0, halfW, h);
-                }
             } else if (currentMode === 'zoom') {
                 let cx = 960, cy = 600;
                 const handInfo = getActiveHandPose();
@@ -1284,11 +1479,11 @@ class StreamingCodecAdapter(Protocol):
                 const srcX = Math.max(0, Math.min(1920 - cropSize, cx - cropSize / 2));
                 const srcY = Math.max(0, Math.min(1080 - cropSize, cy - cropSize / 2));
                 const halfW = Math.round(w / 2);
-                ctx.drawImage(videoA, srcX, srcY, cropSize, cropSize, 0, 0, halfW, h);
-                ctx.drawImage(videoB, srcX, srcY, cropSize, cropSize, halfW, 0, halfW, h);
-                if (document.getElementById('toggle-difference').checked) {
-                    drawDifferenceHeatmap(ctx, halfW, w, h, srcX, srcY, cropSize);
-                }
+                drawStream(videoA, leftEmpty, 0, 0, halfW, h, srcX, srcY, cropSize, cropSize);
+                drawStream(videoB, rightEmpty, halfW, 0, halfW, h, srcX, srcY, cropSize, cropSize);
+                drawMapOverlays(ctx, 0, 0, halfW, h, 'left', srcX, srcY, cropSize, cropSize);
+                drawMapOverlays(ctx, halfW, 0, halfW, h, 'right', srcX, srcY, cropSize, cropSize);
+                if (heatmapOn('left') || heatmapOn('right')) drawDifferenceHeatmap(ctx, halfW, w, h, srcX, srcY, cropSize);
                 ctx.strokeStyle = '#38bdf8';
                 ctx.lineWidth = 3;
                 ctx.beginPath();
@@ -1303,16 +1498,12 @@ class StreamingCodecAdapter(Protocol):
                 ctx.fillText(formatStream(leftKey), 40, h - 32);
                 ctx.fillStyle = '#fb923c';
                 ctx.fillText(formatStream(rightKey), halfW + 40, h - 32);
-                if (document.getElementById('toggle-skeleton').checked) {
-                    drawSkeletonZoomed(ctx, 0, 0, halfW, h, srcX, srcY, cropSize);
-                    drawSkeletonZoomed(ctx, halfW, 0, halfW, h, srcX, srcY, cropSize);
-                }
             }
         }
 
         function getActiveHandPose() {
             if (!keypointsData || !keypointsData.frames) return null;
-            const fIdx = Math.floor(videoA.currentTime * 30.0);
+            const fIdx = Math.floor((clock().currentTime || 0) * 30.0);
             const frameEntry = keypointsData.frames.find(f => f.frame === fIdx);
             if (frameEntry && frameEntry.hands && frameEntry.hands.length > 0) {
                 return frameEntry.hands[0];
@@ -1439,7 +1630,7 @@ class StreamingCodecAdapter(Protocol):
         const heatRightCtx = heatRight.getContext('2d');
 
         function pixelErrorOverlay(srcVideo, destCanvas, destCtx, cropX, cropY, cropSize) {
-            if (!videoC.videoWidth || !srcVideo.videoWidth) return null;
+            if (!videoC.videoWidth || !srcVideo || !srcVideo.videoWidth) return null;
             heatRefCtx.drawImage(videoC, 0, 0, HEAT_W, HEAT_H);
             heatSrcCtx.drawImage(srcVideo, 0, 0, HEAT_W, HEAT_H);
             const ref = heatRefCtx.getImageData(0, 0, HEAT_W, HEAT_H);
@@ -1470,11 +1661,13 @@ class StreamingCodecAdapter(Protocol):
 
         function drawDifferenceHeatmap(targetCtx, splitX, w, h, cropX, cropY, cropSize) {
             try {
-                const leftMap = pixelErrorOverlay(videoA, heatLeft, heatLeftCtx, cropX, cropY, cropSize);
-                const rightMap = pixelErrorOverlay(videoB, heatRight, heatRightCtx, cropX, cropY, cropSize);
-                if (!leftMap || !rightMap) return;
+                const leftKey = document.getElementById('select-left').value;
+                const rightKey = document.getElementById('select-right').value;
+                const leftMap = (!heatmapOn('left') || isEmptyStream(leftKey)) ? null : pixelErrorOverlay(videoA, heatLeft, heatLeftCtx, cropX, cropY, cropSize);
+                const rightMap = (!heatmapOn('right') || isEmptyStream(rightKey)) ? null : pixelErrorOverlay(videoB, heatRight, heatRightCtx, cropX, cropY, cropSize);
+                if (!leftMap && !rightMap) return;
                 targetCtx.save();
-                if (splitX > 0) {
+                if (leftMap && splitX > 0) {
                     targetCtx.save();
                     targetCtx.beginPath();
                     targetCtx.rect(0, 0, splitX, h);
@@ -1482,7 +1675,7 @@ class StreamingCodecAdapter(Protocol):
                     targetCtx.drawImage(leftMap, 0, 0, w, h);
                     targetCtx.restore();
                 }
-                if (splitX < w) {
+                if (rightMap && splitX < w) {
                     targetCtx.save();
                     targetCtx.beginPath();
                     targetCtx.rect(splitX, 0, w - splitX, h);
@@ -1503,18 +1696,222 @@ class StreamingCodecAdapter(Protocol):
 
         // Tab Switching
         function switchTab(tabId) {
-            ['inspector', 'benchmark', 'roadmap'].forEach(t => {
-                document.getElementById('tab-' + t).className = (t === tabId) ? 'tab-content active' : 'tab-content';
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.className = el.id === 'tab-' + tabId ? 'tab-content active' : 'tab-content';
             });
-            const btns = document.querySelectorAll('.tab-btn');
-            btns[0].className = tabId === 'inspector' ? 'tab-btn active' : 'tab-btn';
-            btns[1].className = tabId === 'benchmark' ? 'tab-btn active' : 'tab-btn';
-            btns[2].className = tabId === 'roadmap' ? 'tab-btn active' : 'tab-btn';
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = btn.dataset.tab === tabId ? 'tab-btn active' : 'tab-btn';
+            });
+            if (tabId === 'inspector') loadMapsIndex();
+        }
+
+        const MAPS_INDEX_CANDIDATES = ['maps/index.json', '../outputs/maps/index.json'];
+        let mapsIndex = null;
+        let mapsIndexBase = 'maps/';
+        let mapsClipId = null;
+        let mapsMapId = null;
+        let mapsIndexPromise = null;
+
+        function mapsSrc(rel) {
+            if (!rel) return '';
+            if (/^https?:/.test(rel)) return rel;
+            let url = mapsIndexBase + rel.replace(/^\/+/, '');
+            if (/\.webm$/i.test(url)) url += '?v=poseada';
+            if (/\.mp4$/i.test(url)) url += '?v=segav1';
+            return url;
+        }
+
+        async function fetchMapsIndex() {
+            let lastErr = null;
+            for (const url of MAPS_INDEX_CANDIDATES) {
+                try {
+                    const res = await fetch(url);
+                    if (!res.ok) continue;
+                    mapsIndexBase = url.replace(/index\.json(\?.*)?$/, '');
+                    return await res.json();
+                } catch (err) {
+                    lastErr = err;
+                }
+            }
+            throw lastErr || new Error('maps/index.json not found');
+        }
+
+        function loadMapsIndex() {
+            if (mapsIndexPromise) return mapsIndexPromise;
+            mapsIndexPromise = fetchMapsIndex()
+                .then(data => {
+                    mapsIndex = data;
+                    mapsClipId = currentClipId;
+                    renderMapsOverlays();
+                })
+                .catch(() => {
+                    mapsIndex = null;
+                    document.getElementById('maps-empty').hidden = false;
+                    document.getElementById('maps-empty').innerHTML =
+                        'No map gallery yet. From the PointStream repo run ' +
+                        '<code>PYTHONPATH=. python demo/experiments/run_maps.py --clips demo/outputs/pitch --maps canny,depth,yoloe,dino,pose</code>' +
+                        ' then <code>python demo/pitch/publish_site.py</code>. HUD numbers come from sidecar payload_kbps, never the preview files.';
+                });
+            return mapsIndexPromise;
+        }
+
+        function mapsEntriesForClip(clipId) {
+            if (!mapsIndex) return [];
+            return (mapsIndex.entries || []).filter(e => e.clip === clipId && e.status === 'ok');
+        }
+
+        function isCannyMap(mapId) {
+            return String(mapId || '').startsWith('canny');
+        }
+
+        function sortedMapEntries(entries) {
+            const cannyOrder = ["canny_180", "canny", "canny_360", "canny_540", "canny_720", "canny_1080"];
+            return entries.slice().sort((a, b) => {
+                const ac = isCannyMap(a.map) ? 0 : 1;
+                const bc = isCannyMap(b.map) ? 0 : 1;
+                if (ac !== bc) return ac - bc;
+                if (ac === 0) return cannyOrder.indexOf(a.map) - cannyOrder.indexOf(b.map);
+                return String(a.label || a.map).localeCompare(String(b.label || b.map));
+            });
+        }
+
+        function checkedMaps(side) {
+            const ids = new Set();
+            document.querySelectorAll('#maps-' + side + ' input[type=checkbox]:checked').forEach(box => {
+                if (box.dataset.map) ids.add(box.dataset.map);
+            });
+            return ids;
+        }
+
+        function fillMapSide(side, entries, keep) {
+            const host = document.getElementById('maps-' + side);
+            host.querySelectorAll('label.map-dyn').forEach(node => node.remove());
+            sortedMapEntries(entries).forEach(entry => {
+                const label = document.createElement('label');
+                label.className = 'toggle-item map-dyn';
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.dataset.side = side;
+                input.dataset.map = entry.map;
+                input.checked = keep.has(entry.map);
+                input.onchange = () => onOverlayToggle();
+                const span = document.createElement('span');
+                const kbps = Number(entry.payload_kbps);
+                const ms = Number(entry.extract_ms_p50);
+                let name = entry.label || entry.map;
+                if (Number.isFinite(kbps)) name += ' · ' + fmtKbps(kbps);
+                if (Number.isFinite(ms) && ms > 0) name += ' · ' + ms.toFixed(1) + ' ms';
+                span.textContent = name;
+                label.appendChild(input);
+                label.appendChild(span);
+                host.appendChild(label);
+            });
+        }
+
+        function renderMapsOverlays() {
+            if (!mapsIndex) return;
+            mapsClipId = currentClipId;
+            const entries = mapsEntriesForClip(mapsClipId);
+            const keepLeft = checkedMaps('left');
+            const keepRight = checkedMaps('right');
+            if (!entries.length) {
+                document.getElementById('maps-empty').hidden = false;
+                document.getElementById('maps-empty').textContent = 'No succeeded maps on this clip.';
+                fillMapSide('left', [], keepLeft);
+                fillMapSide('right', [], keepRight);
+                updateBundleHud();
+                return;
+            }
+            document.getElementById('maps-empty').hidden = true;
+            fillMapSide('left', entries, keepLeft);
+            fillMapSide('right', entries, keepRight);
+            const skipped = (mapsIndex.skipped || []).filter(row => row.clip === mapsClipId);
+            document.getElementById('maps-skipped').textContent = skipped.length
+                ? ('Skipped: ' + skipped.map(s => s.map).join(', ') + ' (missing local weights, not counted).')
+                : '';
+            updateBundleHud();
+            preloadOverlayFrames(entries);
+        }
+
+        function onOverlayToggle() {
+            updateBundleHud();
+            redrawCanvas();
+        }
+
+        function overlayUrl(entry) {
+            const url = entry.overlay_url || '';
+            if (url && /\.(webm|mp4)$/i.test(url)) return url;
+            const preview = entry.preview_url || '';
+            if (preview && /\.webm$/i.test(preview)) return preview;
+            return '';
+        }
+
+        function preloadOverlayFrames(entries) {
+            overlayFrames = {};
+            const t = clock().currentTime || 0;
+            entries.forEach(entry => {
+                const videoUrl = overlayUrl(entry);
+                if (videoUrl) {
+                    const v = document.createElement('video');
+                    v.muted = true;
+                    v.playsInline = true;
+                    v.preload = 'auto';
+                    v.crossOrigin = 'anonymous';
+                    v.src = mapsSrc(videoUrl);
+                    v.addEventListener('loadeddata', () => {
+                        try { v.currentTime = clock().currentTime || 0; } catch (e) {}
+                        if (!clock().paused) v.play().catch(() => {});
+                        redrawCanvas();
+                    }, { once: true });
+                    overlayFrames[entry.map] = { entry, video: v, frames: [] };
+                    return;
+                }
+                const urls = mapsFrameUrls(entry);
+                const frames = urls.map(u => {
+                    const im = new Image();
+                    im.decoding = 'async';
+                    im.onload = () => redrawCanvas();
+                    im.src = u;
+                    return im;
+                });
+                overlayFrames[entry.map] = { entry, frames };
+            });
+        }
+
+        function fmtMs(v) {
+            if (v == null || Number.isNaN(Number(v))) return '—';
+            return Number(v).toFixed(1) + ' ms';
+        }
+
+        function fmtKbps(v) {
+            if (v == null || !Number.isFinite(Number(v))) return '—';
+            const n = Number(v);
+            return (Math.abs(n) >= 1000 ? n.toFixed(0) : n.toFixed(1)) + ' kbps';
+        }
+
+        function mapsFrameUrls(entry) {
+            const dir = (entry.preview_dir || '').replace(/\/+$/, '');
+            const n = Number(entry.n_frames) || 0;
+            if (!dir || n < 1) return [];
+            const urls = [];
+            for (let i = 0; i < n; i++) {
+                urls.push(mapsSrc(dir + '/' + String(i).padStart(6, '0') + '.png'));
+            }
+            return urls;
+        }
+
+        function updateBundleHud() {
+            const offline = ['left', 'right'].some(side =>
+                enabledOverlayEntries(side).some(entry => Number(entry.extract_ms_p50) > 50)
+            );
+            const badge = document.getElementById('maps-offline-badge');
+            if (badge) badge.hidden = !offline;
         }
 
         // Initialize First Clip
         selectClip('clip_03');
         setViewMode('zoom');
+        loadMapsIndex();
     </script>
 </body>
 </html>

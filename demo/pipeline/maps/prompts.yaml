@@ -1,0 +1,33 @@
+# Role names stay hand / tool / workbench so the overlay colors stay stable.
+# The text each model hears is per clip, chosen from a 1080p caption sweep.
+classes:
+  - hand
+  - tool
+  - workbench
+prompts:
+  yoloe:
+    clip_01:
+      hand: person
+      tool: weighing scale
+      workbench: desk
+    clip_02:
+      hand: person
+      tool: weighing scale
+      workbench: machine
+    clip_03:
+      hand: person
+      tool: weighing scale
+      workbench: machine
+  sam:
+    clip_01:
+      hand: hand
+      tool: scale
+      workbench: table
+    clip_02:
+      hand: person
+      tool: metal part
+      workbench: machine
+    clip_03:
+      hand: person
+      tool: metal part
+      workbench: machine

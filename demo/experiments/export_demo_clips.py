@@ -24,6 +24,7 @@ from demo.evaluation.evaluate_robotics_teleop import score_pose_tracks
 from demo.evaluation.pose_backends import BACKENDS
 from demo.experiments.run_comparison import POINTSTREAM_TIERS, reconstruct_pointstream_video
 from demo.models.dataset import build_curated_samples
+from demo.models.matte import dwb2_roundtrip, read_hand_alphas, union_hand_alphas
 from demo.models.unet_generator import HandPix2PixUNet, HandSPADEUNet
 from demo.pipeline.background_codec import BackgroundCodec, read_video_frames_robust
 from demo.pipeline.hand_keypoints import serialize_poses_to_json
@@ -47,10 +48,11 @@ PS_KEYS = ["ps_starve", "ps_heavy", "ps_low", "ps_std", "ps_1080"]
 def _load_model(ckpt_path: Path, device: torch.device):
     ckpt = torch.load(ckpt_path, map_location=device)
     state = ckpt["model_state_dict"]
+    out_channels = int(ckpt.get("out_channels") or 3)
     if ckpt.get("model_type") == "spade" or "enc1.0.weight" in state:
-        model = HandSPADEUNet(in_channels=6, out_channels=3).to(device)
+        model = HandSPADEUNet(in_channels=6, out_channels=out_channels).to(device)
     else:
-        model = HandPix2PixUNet(in_channels=6, out_channels=3).to(device)
+        model = HandPix2PixUNet(in_channels=6, out_channels=out_channels).to(device)
     model.load_state_dict(state)
     model.eval()
     return model, ckpt
@@ -60,10 +62,24 @@ def _ffmpeg() -> str:
     return os.environ.get("FFMPEG", "/opt/local/bin/ffmpeg")
 
 
-def process_clip(clip_path: Path, short: str, work: Path, pitch: Path, model, device, frames: int) -> dict:
+def process_clip(
+    clip_path: Path,
+    short: str,
+    work: Path,
+    pitch: Path,
+    model,
+    device,
+    frames: int,
+    *,
+    mask_video: Path | None = None,
+    fallback_mask: Path | None = None,
+    pose_backend: str = "dwpose_hands",
+    skip_av1: bool = False,
+) -> dict:
     work.mkdir(parents=True, exist_ok=True)
     pitch.mkdir(parents=True, exist_ok=True)
-    extractor = BACKENDS["rtm_hand"]
+    judge = BACKENDS["rtm_hand"]
+    driver = BACKENDS[pose_backend]
     ref_frames = read_video_frames_robust(clip_path, max_frames=frames)
     h, w = ref_frames[0].shape[:2]
     fps = 30.0
@@ -73,12 +89,21 @@ def process_clip(clip_path: Path, short: str, work: Path, pitch: Path, model, de
     for f in ref_frames:
         writer.write(f)
     writer.release()
-    poses = extractor(ref_mp4, frames)
-    gt = poses
-    packets = [KeypointCompressor.compress_frame(p, w, h) for p in poses]
-    kp_bytes = sum(len(p) for p in packets)
+    driven = driver(ref_mp4, frames)
+    poses, kp_bytes = dwb2_roundtrip(driven, w, h) if pose_backend == "dwpose_hands" else (driven, 0)
+    if kp_bytes == 0:
+        packets = [KeypointCompressor.compress_frame(p, w, h) for p in poses]
+        kp_bytes = sum(len(p) for p in packets)
     kp_kbps = (kp_bytes * 8) / (duration * 1000.0)
-    _, anchors, _ = build_curated_samples(ref_mp4, poses, image_size=256, max_frames=frames, clip_id=0)
+    frame_alphas = None
+    if mask_video is not None:
+        frame_alphas = read_hand_alphas(mask_video, w, h, frames)
+        if fallback_mask is not None:
+            frame_alphas = union_hand_alphas(frame_alphas, read_hand_alphas(fallback_mask, w, h, frames))
+    _, anchors, _ = build_curated_samples(
+        ref_mp4, poses, image_size=256, max_frames=frames, clip_id=0, frame_alphas=frame_alphas
+    )
+    gt = judge(ref_mp4, frames)
     streams = {}
     for (tier_name, scale_res, bg_kbps, preset), key in zip(POINTSTREAM_TIERS, PS_KEYS):
         tag = tier_name.split("(")[0].strip().lower().replace(" ", "_")
@@ -91,7 +116,7 @@ def process_clip(clip_path: Path, short: str, work: Path, pitch: Path, model, de
         bg_frames = codec.decode_background_frames(bg_mp4, w, h)
         ps_mp4 = work / f"ps_rec_{tag}.mp4"
         reconstruct_pointstream_video(ref_frames, poses, model, anchors, bg_frames, ps_mp4, device, fps=fps)
-        pred = extractor(ps_mp4, frames)
+        pred = judge(ps_mp4, frames)
         scored = score_pose_tracks(gt, pred)
         total_kbps = (bg_bytes * 8) / (duration * 1000.0) + kp_kbps
         streams[key] = {
@@ -103,10 +128,12 @@ def process_clip(clip_path: Path, short: str, work: Path, pitch: Path, model, de
             "kp": round(kp_kbps, 1),
         }
         web_transcode(ps_mp4, pitch / f"web_{short}_{key}.mp4", _ffmpeg())
+    if skip_av1:
+        return {"name": short, "clip_path": str(clip_path), "streams": streams, "kp_bytes": kp_bytes}
     for key, (scale, kbps) in AV1_EXPORTS.items():
         av_mp4 = work / f"{key}.mp4"
         encode_av1(ref_mp4, av_mp4, target_bitrate_kbps=kbps, max_frames=frames, scale=scale, preset=7)
-        pred = extractor(av_mp4, frames)
+        pred = judge(av_mp4, frames)
         scored = score_pose_tracks(gt, pred)
         actual = (av_mp4.stat().st_size * 8) / (duration * 1000.0)
         streams[key] = {
@@ -133,15 +160,33 @@ def main() -> None:
     parser.add_argument("--out", type=Path, default=Path("demo/outputs/results/demo_streams.json"))
     parser.add_argument("--frames", type=int, default=300)
     parser.add_argument("--device", default="cuda:0")
+    parser.add_argument("--mask-videos", nargs=3, type=Path, default=None)
+    parser.add_argument("--fallback-masks", nargs=3, type=Path, default=None)
+    parser.add_argument("--pose-backend", default="dwpose_hands")
+    parser.add_argument("--skip-av1", action="store_true")
     args = parser.parse_args()
     device = torch.device(args.device if torch.cuda.is_available() else "cpu")
     model, _ = _load_model(args.checkpoint, device)
     manifest = json.loads((args.curated_dir / "manifest.json").read_text())
     report = {"clips": {}}
     shorts = ["clip_01", "clip_02", "clip_03"]
-    for item, short in zip(manifest[:3], shorts):
+    masks = list(args.mask_videos or [None, None, None])
+    fallbacks = list(args.fallback_masks or [None, None, None])
+    for item, short, mask, fallback in zip(manifest[:3], shorts, masks, fallbacks):
         logger.info("demo rebuild %s", item["filename"])
-        report["clips"][short] = process_clip(Path(item["path"]), short, args.work / short, args.pitch, model, device, args.frames)
+        report["clips"][short] = process_clip(
+            Path(item["path"]),
+            short,
+            args.work / short,
+            args.pitch,
+            model,
+            device,
+            args.frames,
+            mask_video=mask,
+            fallback_mask=fallback,
+            pose_backend=args.pose_backend,
+            skip_av1=args.skip_av1,
+        )
     args.out.write_text(json.dumps(report, indent=2))
     logger.info("wrote %s", args.out)
 

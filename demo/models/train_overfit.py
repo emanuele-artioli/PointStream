@@ -14,6 +14,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+import cv2
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -21,6 +23,7 @@ from torch.utils.data import DataLoader
 
 from demo.evaluation.pose_backends import BACKENDS
 from demo.models.dataset import EgocentricHandDataset, build_curated_samples
+from demo.models.matte import dwb2_roundtrip, read_hand_alphas, union_hand_alphas
 from demo.models.unet_generator import HandPix2PixUNet, HandSPADEUNet
 from demo.pipeline.hand_keypoints import extract_video_hand_poses
 
@@ -42,6 +45,9 @@ def train(
     model_type: str = "spade",
     smoke: bool = False,
     pose_backend: str = "mp_live",
+    mask_videos: list[Path] | None = None,
+    fallback_masks: list[Path] | None = None,
+    dwb2: bool = False,
 ) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
     manifest_path = curated_dir / "manifest.json"
@@ -64,12 +70,28 @@ def train(
         extractor = BACKENDS.get(pose_backend, extract_video_hand_poses)
         logger.info("Pose backend for training: %s", pose_backend)
         poses = extractor(clip_path, frames_per_clip)
+        probe = cv2.VideoCapture(str(clip_path))
+        width = int(probe.get(cv2.CAP_PROP_FRAME_WIDTH)) or 1920
+        height = int(probe.get(cv2.CAP_PROP_FRAME_HEIGHT)) or 1080
+        probe.release()
+        frame_alphas = None
+        if mask_videos is not None:
+            frame_alphas = read_hand_alphas(mask_videos[clip_idx], width, height, frames_per_clip)
+            if fallback_masks is not None:
+                other = read_hand_alphas(fallback_masks[clip_idx], width, height, frames_per_clip)
+                frame_alphas = union_hand_alphas(frame_alphas, other)
+            covered = sum(1 for mask in frame_alphas if int(np.count_nonzero(mask)) > 200)
+            logger.info("Hand matte frames for clip %s: %d (%d with a hand)", clip_idx + 1, len(frame_alphas), covered)
+        if dwb2:
+            poses, payload_bytes = dwb2_roundtrip(poses, width, height)
+            logger.info("DWB2 roundtrip clip %s: %d bytes", clip_idx + 1, payload_bytes)
         samples, anchors, _anchor_bytes = build_curated_samples(
             clip_path,
             poses,
             image_size=256,
             max_frames=frames_per_clip,
             clip_id=clip_idx,
+            frame_alphas=frame_alphas,
         )
         logger.info(f"  Extracted {len(samples)} valid hand crop samples.")
         all_samples.extend(samples)
@@ -88,12 +110,13 @@ def train(
     dataset = EgocentricHandDataset(all_samples, image_size=256)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=2, drop_last=False)
 
+    out_channels = 4 if mask_videos else 3
     if model_type == "spade":
-        model = HandSPADEUNet(in_channels=6, out_channels=3).to(device)
-        logger.info("Initialized HandSPADEUNet with SPADE modulation blocks.")
+        model = HandSPADEUNet(in_channels=6, out_channels=out_channels).to(device)
+        logger.info("Initialized HandSPADEUNet (%d output channels).", out_channels)
     else:
-        model = HandPix2PixUNet(in_channels=6, out_channels=3).to(device)
-        logger.info("Initialized baseline HandPix2PixUNet.")
+        model = HandPix2PixUNet(in_channels=6, out_channels=out_channels).to(device)
+        logger.info("Initialized baseline HandPix2PixUNet (%d output channels).", out_channels)
 
     optimizer = optim.AdamW(model.parameters(), lr=lr, betas=(0.5, 0.999), weight_decay=1e-4)
     criterion_l1 = nn.L1Loss()
@@ -126,12 +149,21 @@ def train(
             optimizer.zero_grad()
             with torch.cuda.amp.autocast(enabled=(device.type == "cuda")):
                 outputs = model(inputs)
-                loss_l1 = criterion_l1(outputs, targets)
-                if criterion_lpips is not None:
-                    loss_lpips = criterion_lpips(outputs, targets).mean()
-                    loss = loss_l1 + 0.8 * loss_lpips
+                if targets.shape[1] == 4:
+                    pred_a = outputs[:, 3:4]
+                    shown = outputs[:, :3] * pred_a + (-1.0) * (1.0 - pred_a)
+                    tgt_rgb = targets[:, :3]
+                    loss_l1 = criterion_l1(shown, tgt_rgb)
+                    loss_alpha = criterion_l1(pred_a, targets[:, 3:4])
+                    loss = loss_l1 + loss_alpha
+                    if criterion_lpips is not None:
+                        loss = loss + 0.8 * criterion_lpips(shown, tgt_rgb).mean()
                 else:
-                    loss = loss_l1
+                    loss_l1 = criterion_l1(outputs, targets)
+                    if criterion_lpips is not None:
+                        loss = loss_l1 + 0.8 * criterion_lpips(outputs, targets).mean()
+                    else:
+                        loss = loss_l1
 
             scaler.scale(loss).backward()
             scaler.step(optimizer)
@@ -154,6 +186,7 @@ def train(
             "epochs": epochs,
             "final_loss": avg_loss,
             "image_size": 256,
+            "out_channels": out_channels,
             "pose_backend": pose_backend,
             "anchors": {
                 str(k): {side: anchor.tolist() for side, anchor in v.items()}
@@ -172,6 +205,7 @@ def train(
                 "epochs": epochs,
                 "final_loss": avg_loss,
                 "image_size": 256,
+                "out_channels": out_channels,
                 "pose_backend": pose_backend,
                 "anchors": {
                     str(k): {side: anchor.tolist() for side, anchor in v.items()}
@@ -196,6 +230,9 @@ def main() -> None:
     parser.add_argument("--device", default="cuda:1")
     parser.add_argument("--smoke", action="store_true", help="Run 1-epoch smoke test")
     parser.add_argument("--pose-backend", default="rtm_hand", choices=list(BACKENDS))
+    parser.add_argument("--mask-videos", nargs=3, type=Path, default=None, help="SAM hand-color videos, one per clip")
+    parser.add_argument("--fallback-masks", nargs=3, type=Path, default=None, help="YOLOE hand-color videos, unioned with SAM")
+    parser.add_argument("--dwb2", action="store_true", help="Train on DWB2-reconstructed landmarks")
     args = parser.parse_args()
 
     train(
@@ -209,6 +246,9 @@ def main() -> None:
         model_type=args.model_type,
         smoke=args.smoke,
         pose_backend=args.pose_backend,
+        mask_videos=args.mask_videos,
+        fallback_masks=args.fallback_masks,
+        dwb2=args.dwb2,
     )
 
 

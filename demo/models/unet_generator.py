@@ -186,10 +186,15 @@ class HandSPADEUNet(nn.Module):
         self.up_conv5 = nn.ConvTranspose2d(ngf, ngf // 2, 4, stride=2, padding=1, bias=False)  # 128 -> 256
         self.dec_block5 = SPADEResBlock(ngf // 2, ngf // 2, cond_nc=3)
 
-        self.final = nn.Sequential(
-            nn.Conv2d(ngf // 2, out_channels, 3, padding=1),
-            nn.Tanh(),
-        )
+        self.out_channels = out_channels
+        if out_channels == 4:
+            # RGB is tanh, alpha is sigmoid. One conv, split in forward.
+            self.final = nn.Conv2d(ngf // 2, 4, 3, padding=1)
+        else:
+            self.final = nn.Sequential(
+                nn.Conv2d(ngf // 2, out_channels, 3, padding=1),
+                nn.Tanh(),
+            )
 
     def forward(self, appearance_and_pose: torch.Tensor, skeleton_cond: torch.Tensor | None = None) -> torch.Tensor:
         if skeleton_cond is not None:
@@ -229,6 +234,11 @@ class HandSPADEUNet(nn.Module):
         u5 = self.up_conv5(d4)
         d5 = self.dec_block5(u5, skel)
 
-        return self.final(d5)
+        raw = self.final(d5)
+        if self.out_channels == 4:
+            rgb = torch.tanh(raw[:, :3])
+            alpha = torch.sigmoid(raw[:, 3:4])
+            return torch.cat((rgb, alpha), dim=1)
+        return raw
 
 
