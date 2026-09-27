@@ -572,89 +572,54 @@
                 </div>
 
                 <div class="control-group">
-                    <span class="control-label">View Mode:</span>
-                    <button class="btn" id="btn-mode-split" onclick="setViewMode('split')">🔀 Split Slider (A/B)</button>
-                    <button class="btn" id="btn-mode-side" onclick="setViewMode('side_by_side')">👥 Side-by-Side</button>
-                    <button class="btn active" id="btn-mode-zoom" onclick="setViewMode('zoom')">🔍 Finger Articulation Loupe</button>
-                </div>
-
-                <div class="control-group">
-                    <span class="control-label">Left Stream:</span>
-                    <select id="select-left" class="dropdown" onchange="onStreamChange('left')">
-                        <optgroup label="Canvas">
-                            <option value="empty">Empty · maps only</option>
-                        </optgroup>
-                        <optgroup label="PointStream">
-                            <option value="ps_180">PS 180p · 52 kbps</option>
-                            <option value="ps_starve" selected>PS 240p · 70 kbps</option>
-                            <option value="ps_heavy">PS 360p · 116 kbps</option>
-                            <option value="ps_low">PS 540p · 208 kbps</option>
-                            <option value="ps_720">PS 720p · 292 kbps</option>
-                            <option value="ps_1080">PS 1080p · 576 kbps</option>
-                        </optgroup>
-                        <optgroup label="AV1">
-                            <option value="av1_180">AV1 180p · 42 kbps</option>
-                            <option value="av1_240">AV1 240p · CRF 35</option>
-                            <option value="av1_360">AV1 360p · 110 kbps</option>
-                            <option value="av1_540">AV1 540p · 259 kbps</option>
-                            <option value="av1_720">AV1 720p · 324 kbps</option>
-                            <option value="av1_1080">AV1 1080p · 563 kbps</option>
-                        </optgroup>
-                        <optgroup label="Reference">
-                            <option value="ref">Reference 1080p · 4,200 kbps</option>
-                        </optgroup>
+                    <span class="control-label">Left:</span>
+                    <select id="kind-left" class="dropdown" onchange="onHalfChange('left')">
+                        <option value="ps" selected>PointStream</option>
+                        <option value="av1">AV1</option>
+                        <option value="empty">Empty</option>
                     </select>
-
-                    <span class="control-label">Right Stream:</span>
-                    <select id="select-right" class="dropdown" onchange="onStreamChange('right')">
-                        <optgroup label="Canvas">
-                            <option value="empty">Empty · maps only</option>
-                        </optgroup>
-                        <optgroup label="AV1">
-                            <option value="av1_180">AV1 180p · 42 kbps</option>
-                            <option value="av1_240" selected>AV1 240p · CRF 35</option>
-                            <option value="av1_360">AV1 360p · 110 kbps</option>
-                            <option value="av1_540">AV1 540p · 259 kbps</option>
-                            <option value="av1_720">AV1 720p · 324 kbps</option>
-                            <option value="av1_1080">AV1 1080p · 563 kbps</option>
-                        </optgroup>
-                        <optgroup label="PointStream">
-                            <option value="ps_180">PS 180p · 52 kbps</option>
-                            <option value="ps_starve">PS 240p · 70 kbps</option>
-                            <option value="ps_heavy">PS 360p · 116 kbps</option>
-                            <option value="ps_low">PS 540p · 208 kbps</option>
-                            <option value="ps_720">PS 720p · 292 kbps</option>
-                            <option value="ps_1080">PS 1080p · 576 kbps</option>
-                        </optgroup>
-                        <optgroup label="Reference">
-                            <option value="ref">Reference 1080p · 4,200 kbps</option>
-                        </optgroup>
+                    <select id="mask-left" class="dropdown" onchange="onHalfChange('left')">
+                        <option value="" selected>No mask</option>
+                        <option value="canny">Canny</option>
+                        <option value="dino">DINOv3</option>
+                        <option value="dwpose">DW-Pose</option>
+                        <option value="sam31">SAM 3.1</option>
+                        <option value="yoloe">YOLOE</option>
                     </select>
-                </div>
-
-                <div class="control-group" style="align-items: flex-start;">
-                    <div class="map-sides">
-                        <div>
-                            <span class="control-label map-side-label">Left maps:</span>
-                            <div class="overlay-toggles" id="maps-left">
-                                <label class="toggle-item">
-                                    <input type="checkbox" data-side="left" data-map="heatmap" onchange="onOverlayToggle()">
-                                    <span>Error / Distortion Heatmap</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div>
-                            <span class="control-label map-side-label">Right maps:</span>
-                            <div class="overlay-toggles" id="maps-right">
-                                <label class="toggle-item">
-                                    <input type="checkbox" data-side="right" data-map="heatmap" onchange="onOverlayToggle()">
-                                    <span>Error / Distortion Heatmap</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
+                    <select id="res-left" class="dropdown" onchange="onHalfChange('left')">
+                        <option value="180">180p</option>
+                        <option value="240" selected>240p</option>
+                        <option value="360">360p</option>
+                        <option value="540">540p</option>
+                        <option value="720">720p</option>
+                        <option value="1080">1080p</option>
+                    </select>
+                    <span class="control-label">Right:</span>
+                    <select id="kind-right" class="dropdown" onchange="onHalfChange('right')">
+                        <option value="av1" selected>AV1</option>
+                        <option value="ps">PointStream</option>
+                        <option value="empty">Empty</option>
+                    </select>
+                    <select id="mask-right" class="dropdown" onchange="onHalfChange('right')">
+                        <option value="" selected>No mask</option>
+                        <option value="canny">Canny</option>
+                        <option value="dino">DINOv3</option>
+                        <option value="dwpose">DW-Pose</option>
+                        <option value="sam31">SAM 3.1</option>
+                        <option value="yoloe">YOLOE</option>
+                    </select>
+                    <select id="res-right" class="dropdown" onchange="onHalfChange('right')">
+                        <option value="180">180p</option>
+                        <option value="240" selected>240p</option>
+                        <option value="360">360p</option>
+                        <option value="540">540p</option>
+                        <option value="720">720p</option>
+                        <option value="1080">1080p</option>
+                    </select>
                     <span class="offline-badge" id="maps-offline-badge" hidden>Offline · extract p50 &gt; 50 ms</span>
                 </div>
+                <div id="maps-left" hidden></div>
+                <div id="maps-right" hidden></div>
             </div>
 
             <!-- Canvas Stage Area -->
@@ -1012,7 +977,7 @@ class StreamingCodecAdapter(Protocol):
         ];
 
         let currentClipId = 'clip_03';
-        let currentMode = 'zoom'; // 'split', 'side_by_side', 'zoom'
+        let currentMode = 'split';
         let splitFraction = 0.5;
         let isDragging = false;
         let keypointsData = null;
@@ -1055,6 +1020,43 @@ class StreamingCodecAdapter(Protocol):
 
         // Published teleop path, not a per-rung remeasure.
         const STREAM_LATENCY_MS = { ps: 18.4, av1: 13.6 };
+        const PS_BY_RES = { '180': 'ps_180', '240': 'ps_starve', '360': 'ps_heavy', '540': 'ps_low', '720': 'ps_720', '1080': 'ps_1080' };
+        const AV1_BY_RES = { '180': 'av1_180', '240': 'av1_240', '360': 'av1_360', '540': 'av1_540', '720': 'av1_720', '1080': 'av1_1080' };
+        const MASK_LABEL = { canny: 'Canny', dino: 'DINOv3', dwpose: 'DW-Pose', sam31: 'SAM 3.1', yoloe: 'YOLOE' };
+        const MASK_IDS = {
+            canny: ['canny'],
+            dino: ['dino', 'dinov3'],
+            dwpose: ['dwpose_hands', 'dwpose', 'dwpose_body'],
+            sam31: ['sam31', 'sam3.1'],
+            yoloe: ['yoloe_masks', 'yoloe']
+        };
+
+        function halfKind(side) { return document.getElementById('kind-' + side).value; }
+        function halfMask(side) { return document.getElementById('mask-' + side).value; }
+        function halfRes(side) { return document.getElementById('res-' + side).value; }
+
+        function codecKey(side) {
+            const kind = halfKind(side);
+            const res = halfRes(side);
+            if (kind === 'empty') return 'empty';
+            return (kind === 'ps' ? PS_BY_RES : AV1_BY_RES)[res];
+        }
+
+        function mapMatches(entry, family, res) {
+            const id = String(entry.map || '');
+            const height = String(res);
+            const tagged = id.endsWith('_' + height) || id.includes('_' + height + '_') || id.includes(height + 'p');
+            const bare = (MASK_IDS[family] || []).indexOf(id) >= 0;
+            if (tagged && (id.startsWith(family) || bare || id.indexOf(family) >= 0)) return true;
+            return bare && height === '1080';
+        }
+
+        function selectedMapEntry(side) {
+            const family = halfMask(side);
+            if (!family) return null;
+            const entries = mapsEntriesForClip(mapsClipId || currentClipId);
+            return entries.find(e => mapMatches(e, family, halfRes(side))) || null;
+        }
 
         function formatStream(key) {
             const s = streamMeta(key);
@@ -1064,17 +1066,7 @@ class StreamingCodecAdapter(Protocol):
             return text;
         }
 
-        function relabelDropdowns() {
-            ['select-left', 'select-right'].forEach(id => {
-                document.getElementById(id).querySelectorAll('option').forEach(opt => {
-                    if (opt.value === 'empty') {
-                        opt.textContent = 'Empty · maps only';
-                    } else if (CLIPS[currentClipId].streams[opt.value]) {
-                        opt.textContent = streamLabel(opt.value);
-                    }
-                });
-            });
-        }
+        function relabelDropdowns() {}
 
         function overlayVideoEls() {
             return Object.values(overlayFrames).map(p => p && p.video).filter(Boolean);
@@ -1124,11 +1116,11 @@ class StreamingCodecAdapter(Protocol):
         }
 
         function loadCurrentStreams() {
-            const leftKey = document.getElementById('select-left').value;
-            const rightKey = document.getElementById('select-right').value;
+            const leftKey = codecKey('left');
+            const rightKey = codecKey('right');
             return Promise.all([
-                isEmptyStream(leftKey) ? loadVideo(videoA, '') : loadVideo(videoA, streamFile(currentClipId, leftKey)),
-                isEmptyStream(rightKey) ? loadVideo(videoB, '') : loadVideo(videoB, streamFile(currentClipId, rightKey)),
+                isEmptyStream(leftKey) || selectedMapEntry('left') ? loadVideo(videoA, '') : loadVideo(videoA, streamFile(currentClipId, leftKey)),
+                isEmptyStream(rightKey) || selectedMapEntry('right') ? loadVideo(videoB, '') : loadVideo(videoB, streamFile(currentClipId, rightKey)),
                 loadVideo(videoC, streamFile(currentClipId, 'ref')),
             ]).then(() => {
                 syncFromMaster();
@@ -1157,38 +1149,42 @@ class StreamingCodecAdapter(Protocol):
             if (mapsIndex) renderMapsOverlays();
         }
 
-        function onStreamChange(which) {
-            if (which === 'left') {
-                const leftKey = document.getElementById('select-left').value;
-                if (!isEmptyStream(leftKey) && MATCH_AV1[leftKey]) {
-                    document.getElementById('select-right').value = MATCH_AV1[leftKey];
-                }
+        function legendText(side) {
+            const res = halfRes(side) + 'p';
+            const entry = selectedMapEntry(side);
+            if (halfMask(side)) {
+                const name = (MASK_LABEL[halfMask(side)] || halfMask(side)) + ' ' + res;
+                if (!entry) return name + ' · not in gallery';
+                let text = name;
+                if (Number.isFinite(Number(entry.payload_kbps))) text += ' · ' + fmtKbps(entry.payload_kbps);
+                if (Number.isFinite(Number(entry.extract_ms_p50))) text += ', ' + fmtMs(entry.extract_ms_p50);
+                return text;
             }
+            const key = codecKey(side);
+            if (isEmptyStream(key)) return 'Empty';
+            const s = streamMeta(key);
+            let text = streamLabel(key);
+            if (STREAM_LATENCY_MS[s.kind] != null) text += ', ' + STREAM_LATENCY_MS[s.kind].toFixed(1) + ' ms';
+            return text;
+        }
+
+        function onHalfChange() {
             updateBundleHud();
             updateStreamSelection();
+            if (mapsIndex) preloadOverlayFrames(mapsEntriesForClip(currentClipId).filter(e =>
+                (selectedMapEntry('left') && e.map === selectedMapEntry('left').map) ||
+                (selectedMapEntry('right') && e.map === selectedMapEntry('right').map)
+            ));
             loadCurrentStreams();
         }
 
-        function setViewMode(mode) {
-            currentMode = mode;
-            ['split', 'side', 'zoom'].forEach(m => {
-                const btn = document.getElementById('btn-mode-' + m);
-                btn.className = (m === (mode === 'side_by_side' ? 'side' : mode)) ? 'btn active' : 'btn';
-            });
-            canvas.width = 1920;
-            canvas.height = 1080;
-            curtainLine.style.display = (mode === 'split') ? 'block' : 'none';
-            document.getElementById('badge-left-label').style.display = 'block';
-            document.getElementById('badge-right-label').style.display = 'block';
-            updateStreamSelection();
-            redrawCanvas();
-        }
-
         function updateStreamSelection() {
-            const leftVal = document.getElementById('select-left').value;
-            const rightVal = document.getElementById('select-right').value;
-            document.getElementById('badge-left-label').textContent = '◄ ' + formatStream(leftVal);
-            document.getElementById('badge-right-label').textContent = formatStream(rightVal) + ' ►';
+            document.getElementById('badge-left-label').textContent = '◄ ' + legendText('left');
+            document.getElementById('badge-right-label').textContent = legendText('right') + ' ►';
+            const leftBar = document.getElementById('hud-left');
+            const rightBar = document.getElementById('hud-right');
+            if (leftBar) leftBar.textContent = legendText('left');
+            if (rightBar) rightBar.textContent = legendText('right');
             redrawCanvas();
         }
 
@@ -1294,19 +1290,11 @@ class StreamingCodecAdapter(Protocol):
             return Math.max(0, Math.floor((clock().currentTime || 0) * 30.0));
         }
 
-        function heatmapOn(side) {
-            const el = document.querySelector('#maps-' + side + ' input[data-map="heatmap"]');
-            return Boolean(el && el.checked);
-        }
+        function heatmapOn() { return false; }
 
         function enabledOverlayEntries(side) {
-            const boxes = document.querySelectorAll('#maps-' + side + ' input[type=checkbox]:checked');
-            const out = [];
-            boxes.forEach(box => {
-                const entry = overlayByMap(box.dataset.map);
-                if (entry) out.push(entry);
-            });
-            return out;
+            const entry = selectedMapEntry(side);
+            return entry ? [entry] : [];
         }
 
         function overlayByMap(mapId) {
@@ -1415,12 +1403,10 @@ class StreamingCodecAdapter(Protocol):
 
         // Canvas Rendering Engine
         function redrawCanvas() {
-            if (!clock().videoWidth && !videoA.videoWidth && !videoB.videoWidth) return;
-
             const w = canvas.width;
             const h = canvas.height;
-            const leftKey = document.getElementById('select-left').value;
-            const rightKey = document.getElementById('select-right').value;
+            const leftKey = codecKey('left');
+            const rightKey = codecKey('right');
             const leftEmpty = isEmptyStream(leftKey);
             const rightEmpty = isEmptyStream(rightKey);
 
@@ -1501,9 +1487,9 @@ class StreamingCodecAdapter(Protocol):
                 ctx.fillRect(halfW + 20, h - 60, halfW - 40, 44);
                 ctx.fillStyle = '#4ade80';
                 ctx.font = 'bold 18px sans-serif';
-                ctx.fillText(formatStream(leftKey), 40, h - 32);
+                ctx.fillText(legendText('left'), 40, h - 32);
                 ctx.fillStyle = '#fb923c';
-                ctx.fillText(formatStream(rightKey), halfW + 40, h - 32);
+                ctx.fillText(legendText('right'), halfW + 40, h - 32);
             }
         }
 
@@ -1667,8 +1653,8 @@ class StreamingCodecAdapter(Protocol):
 
         function drawDifferenceHeatmap(targetCtx, splitX, w, h, cropX, cropY, cropSize) {
             try {
-                const leftKey = document.getElementById('select-left').value;
-                const rightKey = document.getElementById('select-right').value;
+                const leftKey = codecKey('left');
+                const rightKey = codecKey('right');
                 const leftMap = (!heatmapOn('left') || isEmptyStream(leftKey)) ? null : pixelErrorOverlay(videoA, heatLeft, heatLeftCtx, cropX, cropY, cropSize);
                 const rightMap = (!heatmapOn('right') || isEmptyStream(rightKey)) ? null : pixelErrorOverlay(videoB, heatRight, heatRightCtx, cropX, cropY, cropSize);
                 if (!leftMap && !rightMap) return;
@@ -1915,8 +1901,9 @@ class StreamingCodecAdapter(Protocol):
         }
 
         // Initialize First Clip
+        currentMode = 'split';
+        curtainLine.style.display = 'block';
         selectClip('clip_03');
-        setViewMode('zoom');
         loadMapsIndex();
     </script>
 </body>
