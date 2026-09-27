@@ -8,7 +8,6 @@ import importlib.metadata
 import json
 from typing import Any
 
-import cv2
 import numpy as np
 
 from src.components.detection.geometry import Box
