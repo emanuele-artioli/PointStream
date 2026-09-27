@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import hashlib
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -86,7 +87,7 @@ def test_catalog_frames_are_selected_by_zero_based_position_and_hash_anchors(tmp
         "mid": hashlib.sha256(catalog_interval_paths[24].read_bytes()).hexdigest(),
         "last": hashlib.sha256(catalog_interval_paths[-1].read_bytes()).hexdigest(),
     }
-    scene = {
+    scene: dict[str, Any] = {
         "source_id": "test-scene",
         "catalog_interval": {"start_frame": 1, "end_frame": 49, "frame_hashes": hashes},
     }

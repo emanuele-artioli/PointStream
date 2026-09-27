@@ -1,3 +1,4 @@
+# ruff: noqa: E402 - sys.path bootstrap must run before src/experiments imports.
 """Measure the current PointStream 48-frame ladder and weighted anchors."""
 
 from __future__ import annotations

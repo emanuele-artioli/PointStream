@@ -1,3 +1,4 @@
+# ruff: noqa: E402 - sys.path bootstrap must run before src/experiments imports.
 """Measure one appearance plus motion against the per-frame crop control.
 
 The control sends a new AV1 intra crop whenever the measured C1 policy fires.

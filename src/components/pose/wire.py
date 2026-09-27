@@ -129,6 +129,8 @@ def apply_projection(pose: Pose, projection: Projection) -> Pose:
     source = pose.values
     source_present = pose.present
     source_visibility = pose.visibility
+    if source is None or source_present is None or source_visibility is None:
+        raise ValueError("pose projection requires values, presence, and visibility")
 
     for target_idx, source_idx in projection.direct.items():
         if source_present[source_idx]:

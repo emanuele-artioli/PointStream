@@ -1,3 +1,4 @@
+# ruff: noqa: E402 - sys.path bootstrap must run before src/experiments imports.
 """QP sweep of VVC against AV1 on the source and on the C1 error video.
 
 The two source points already measured (VVC QP 46, AV1 QP 54) are reused when
@@ -10,6 +11,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import sys
+from typing import Any
 
 REPO = Path(__file__).resolve().parents[2]
 if str(REPO) not in sys.path:
@@ -119,7 +121,7 @@ def _save(report: dict) -> None:
 
 def main() -> None:
     _record_image_decision()
-    report = {"source": str(FRAMES), "n_frames": N_FRAMES, "rows": []}
+    report: dict[str, Any] = {"source": str(FRAMES), "n_frames": N_FRAMES, "rows": []}
     if OUT.is_file():
         previous = json.loads(OUT.read_text())
         # A previous run may contain error rows from the FFmpeg/libvvenc

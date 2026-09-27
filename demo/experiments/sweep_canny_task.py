@@ -171,7 +171,6 @@ def choose_winner(per_clip: dict[str, list[dict]]) -> tuple[dict, list[dict]]:
         baselines[clip] = base
     by_key: dict[tuple, dict] = {}
     for clip in clips:
-        floor = baselines[clip]["recall"] * RECALL_FLOOR_RATIO
         for row in per_clip[clip]:
             key = _key(row)
             slot = by_key.setdefault(key, {"clips": {}})

@@ -124,6 +124,12 @@ class Sam31SequenceSegmenter:
             self._verify_artifacts()
             self.predictor = self._load_predictor(builder)
 
+    def _require_predictor(self) -> Any:
+        predictor = self.predictor
+        if predictor is None:
+            raise RuntimeError("SAM3.1 predictor is not loaded")
+        return predictor
+
     def _verify_artifacts(self) -> None:
         if self.checkpoint_path is None or not self.checkpoint_path.is_file():
             raise FileNotFoundError(
@@ -248,7 +254,7 @@ class Sam31SequenceSegmenter:
         if frame_width <= 0 or frame_height <= 0:
             raise ValueError("SAM3.1 session dimensions must be positive")
         self.provenance(policy)
-        response = self.predictor.handle_request(
+        response = self._require_predictor().handle_request(
             {"type": "start_session", "resource_path": str(resource_path)}
         )
         session_id = str(response["session_id"])
@@ -315,7 +321,7 @@ class Sam31SequenceSegmenter:
             ]
             request["point_labels"] = list(point_labels or [1] * len(points))
             request["obj_id"] = tracker_id
-        response = self.predictor.handle_request(request)
+        response = self._require_predictor().handle_request(request)
         masks = _unpack_outputs(response.get("outputs", {}), session.frame_height, session.frame_width)
         observations: list[MaskObservation] = []
         if not masks:
@@ -375,7 +381,7 @@ class Sam31SequenceSegmenter:
         if start_frame_index is not None:
             request["start_frame_index"] = int(start_frame_index)
         responses: dict[tuple[int, int], tuple[np.ndarray, float | None]] = {}
-        for response in self.predictor.handle_stream_request(request):
+        for response in self._require_predictor().handle_stream_request(request):
             frame_index = int(response["frame_index"])
             for tracker_id, mask, score in _unpack_outputs(
                 response.get("outputs", {}), session.frame_height, session.frame_width
@@ -389,10 +395,10 @@ class Sam31SequenceSegmenter:
         records: list[MaskObservation] = []
         for frame_index in frame_indices:
             for object_id in sorted(session.expected_objects):
-                tracker_id = session.object_to_tracker.get(object_id)
+                object_tracker = session.object_to_tracker.get(object_id)
                 result = (
-                    responses.get((frame_index, tracker_id))
-                    if tracker_id is not None
+                    responses.get((frame_index, object_tracker))
+                    if object_tracker is not None
                     else None
                 )
                 records.append(
@@ -418,7 +424,7 @@ class Sam31SequenceSegmenter:
         session = self.sessions.pop((role, key), None)
         if session is None:
             return
-        self.predictor.handle_request({"type": "close_session", "session_id": session.session_id})
+        self._require_predictor().handle_request({"type": "close_session", "session_id": session.session_id})
 
     def segment(self, frame: np.ndarray, detection: Detection) -> np.ndarray | None:
         """Causal single-frame adapter for PointStream's registry segmenter API."""
@@ -498,7 +504,7 @@ def _unpack_outputs(
             f"SAM3.1 returned {len(ids)} tracker IDs for {len(masks_array)} masks"
         )
     scores = outputs.get("out_probs")
-    if hasattr(scores, "detach"):
+    if scores is not None and hasattr(scores, "detach"):
         scores = scores.detach().cpu().numpy()
     scores_array = np.asarray(scores).reshape(-1) if scores is not None else np.array([])
     result: list[tuple[int, np.ndarray, float | None]] = []

@@ -202,7 +202,7 @@ def _moving_frames(n: int, *, hands: int = 1, face: bool = False, body: bool = F
             y1 = 300 + (i % 3)
             x2 = x1 + 140
             y2 = y1 + 160
-            landmarks = [[x1 + 4 + (k % 5) + shift, y1 + 6 + k] for k in range(21)]
+            landmarks = [[float(x1 + 4 + (k % 5) + shift), float(y1 + 6 + k)] for k in range(21)]
             hand_inst.append(
                 SingleHand(
                     handedness="Right" if h == 0 else "Left",

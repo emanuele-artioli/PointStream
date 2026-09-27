@@ -1,3 +1,4 @@
+# ruff: noqa: E402 - sys.path bootstrap must run before src/experiments imports.
 """Add PNG, AV1 intra, and VVC intra to the JPEG/WebP still-image probe."""
 
 from __future__ import annotations
@@ -10,8 +11,6 @@ import traceback
 REPO = Path(__file__).resolve().parents[2]
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
-
-import numpy as np
 
 from experiments.modular.image_codec_probe import _psnr, _signals
 from src.components.background.sidecar import build_sidecar

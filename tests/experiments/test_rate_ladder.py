@@ -71,7 +71,21 @@ def test_missing_frames_dir_raises_before_results_json() -> None:
         assert not (out_dir / "results.json").exists()
 
 
+def _skip_without_encoders() -> None:
+    from src.components.codec.tools import resolve_tool
+
+    missing = []
+    for env_name, binary in (("SVTAV1_BIN", "SvtAv1EncApp"), ("VVENC_BIN", "vvencapp")):
+        try:
+            resolve_tool(env_name, binary)
+        except FileNotFoundError:
+            missing.append(binary)
+    if missing:
+        pytest.skip("encode tools not on PATH: " + ", ".join(missing))
+
+
 def test_two_sources_encoded_report_no_constant_beats() -> None:
+    _skip_without_encoders()
     with tempfile.TemporaryDirectory() as tmp_dir:
         root = Path(tmp_dir)
         out_dir = root / "output"
@@ -132,6 +146,7 @@ def test_two_sources_encoded_report_no_constant_beats() -> None:
 
 
 def test_generate_visuals_writes_non_flat_strip() -> None:
+    _skip_without_encoders()
     with tempfile.TemporaryDirectory() as tmp_dir:
         root = Path(tmp_dir)
         out_dir = root / "output"

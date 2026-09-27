@@ -1,13 +1,20 @@
 from __future__ import annotations
 
 from types import SimpleNamespace
+from typing import cast
 
 import numpy as np
 
 from src.contracts.lattice import ART_MASKS
 from src.pipeline.encoder.encoder import SOURCE
 from src.pipeline.reconstruction.reconstruct import ObjectRequest
-from src.runner.stages import _frame_mask, _subjects_for_reconstruct, make_pose, make_segmentation
+from src.runner.stages import (
+    StageContext,
+    _frame_mask,
+    _subjects_for_reconstruct,
+    make_pose,
+    make_segmentation,
+)
 
 
 class _FrameSegmenter:
@@ -42,7 +49,7 @@ def test_segmenter_keeps_each_frame_mask_in_a_track_aligned_stack() -> None:
     frames = np.zeros((2, 6, 8, 3), dtype=np.uint8)
     frames[1] = 1
     objects = _objects(2)
-    result = make_segmentation(SimpleNamespace(segmenter=_FrameSegmenter()))(
+    result = make_segmentation(cast(StageContext, SimpleNamespace(segmenter=_FrameSegmenter())))(
         {SOURCE: frames, "detection": objects}
     )
     assert result["player"].shape == (2, 6, 8)
@@ -54,6 +61,7 @@ def test_segmenter_keeps_each_frame_mask_in_a_track_aligned_stack() -> None:
         {SOURCE: frames, "detection": objects, ART_MASKS: result}
     )
     assert len(resolved) == 2
+    assert resolved[0].mask is not None and resolved[1].mask is not None
     np.testing.assert_array_equal(resolved[0].mask, result["player"][0])
     np.testing.assert_array_equal(resolved[1].mask, result["player"][1])
 
@@ -73,7 +81,7 @@ def test_pose_estimator_receives_the_matching_frame_segmentation_mask() -> None:
     masks[0, 1, 2] = 1
     masks[1, 4, 6] = 1
     estimator = _PoseEstimator()
-    make_pose(SimpleNamespace(pose_estimator=estimator))(
+    make_pose(cast(StageContext, SimpleNamespace(pose_estimator=estimator)))(
         {SOURCE: frames, "detection": objects, ART_MASKS: {"player": masks}}
     )
     np.testing.assert_array_equal(estimator.masks[0], masks[0])

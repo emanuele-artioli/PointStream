@@ -33,6 +33,7 @@ def test_dwpose_uses_crop_coordinates_and_preserves_joint_visibility() -> None:
     pose = estimator.estimate(frame, detection, mask=mask)
     assert pose is not None
     assert pose.schema == COCO_WHOLEBODY_133
+    assert pose.visibility is not None
     np.testing.assert_allclose(pose.values[10], [10.0, 9.0, 0.8])
     assert pose.visibility[10] == 2
     assert pose.visibility[9] == 1

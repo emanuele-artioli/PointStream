@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 import pytest
 
@@ -46,7 +48,7 @@ def test_missing_observation_is_a_full_identity_record() -> None:
 
 
 def test_observed_mask_must_be_binary_and_frame_sized() -> None:
-    base = dict(
+    base: dict[str, Any] = dict(
         source_id="source-01",
         frame_index=0,
         pts=Pts(0, 1, 30),

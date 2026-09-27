@@ -85,13 +85,10 @@ def test_rle_stream_roundtrip_two_instances() -> None:
     a[1:4, 2:6] = 1
     b = np.zeros((h, w), dtype=np.uint8)
     b[8:14, 10:18] = 1
-    rec = frame_record(
-        0,
-        [
-            instance_record(a, class_id=0, class_name="hand"),
-            instance_record(b, class_id=4, class_name="tool"),
-        ],
-    )
+    hand = instance_record(a, class_id=0, class_name="hand")
+    tool = instance_record(b, class_id=4, class_name="tool")
+    assert hand is not None and tool is not None
+    rec = frame_record(0, [hand, tool])
     blob, codec = pack_rle_stream([rec], height=h, width=w, fps=10.0, classes=["hand", "tool"])
     doc = unpack_rle_stream(blob)
     assert len(doc["frames"][0]["instances"]) == 2
@@ -341,6 +338,7 @@ def test_live_yoloe_weights_are_local_files_not_hub_ids() -> None:
     path = MODELS["yoloe26_seg"]
     if path is None:
         pytest.skip("MODELS['yoloe26_seg'] missing — do not auto-download")
+    assert path is not None
     assert path.is_file()
     assert path.suffix == ".pt"
     assert "yoloe-26" in path.name
@@ -352,9 +350,11 @@ def test_live_sam3_weights_are_local_files() -> None:
     path = MODELS["sam3"]
     if path is None:
         pytest.skip("MODELS['sam3'] missing — do not auto-download")
+    assert path is not None
     assert path.is_file()
     assert path.name == "sam3.pt"
-    assert MODELS["sam31"] is None or MODELS["sam31"].name == "sam3.1_multiplex.pt"
+    sam31 = MODELS["sam31"]
+    assert sam31 is None or sam31.name == "sam3.1_multiplex.pt"
 
 
 @pytest.mark.integration
@@ -362,6 +362,7 @@ def test_live_yoloe_require_does_not_use_a_hub_id() -> None:
     path = MODELS["yoloe26_seg"]
     if path is None:
         pytest.skip("MODELS['yoloe26_seg'] missing — do not auto-download")
+    assert path is not None
     from demo.pipeline.maps.model_paths import require
 
     resolved = require("yoloe26_seg")

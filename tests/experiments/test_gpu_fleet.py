@@ -218,7 +218,15 @@ def test_snapshot_contains_only_selected_tracked_edits_and_explicit_untracked_fi
 
 def tarfile_open(path: Path) -> dict[str, bytes]:
     with tarfile.open(path, "r") as tar:
-        return {member.name: tar.extractfile(member).read() for member in tar.getmembers() if member.isfile()}
+        files: dict[str, bytes] = {}
+        for member in tar.getmembers():
+            if not member.isfile():
+                continue
+            extracted = tar.extractfile(member)
+            if extracted is None:
+                continue
+            files[member.name] = extracted.read()
+        return files
 
 
 def test_remote_launcher_python_is_well_formed_and_uses_the_existing_supervisor() -> None:

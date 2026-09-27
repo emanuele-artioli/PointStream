@@ -1,3 +1,4 @@
+# ruff: noqa: E402 - sys.path bootstrap must run before src/experiments imports.
 """VVC residual points at preset medium.
 
 libvvenc preset ``faster`` writes an empty bitstream for the 48-frame C1

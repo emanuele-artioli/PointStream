@@ -229,7 +229,11 @@ def test_cancel_file_stops_owned_process_group_and_releases_cpu_claim(
     child = SimpleNamespace(pid=123, poll=lambda: None)
     stopped: list[Any] = []
     monkeypatch.setattr(monitor.subprocess, "Popen", lambda *args, **kwargs: child)
-    monkeypatch.setattr(monitor, "stop_child", lambda process: stopped.append(process) or True)
+    def _stop(process: object) -> bool:
+        stopped.append(process)
+        return True
+
+    monkeypatch.setattr(monitor, "stop_child", _stop)
 
     assert monitor.supervise(tmp_path) == 0
     assert stopped and all(process is child for process in stopped)

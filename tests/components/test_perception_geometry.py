@@ -91,6 +91,7 @@ def test_offline_and_runtime_conditioning_use_identical_reversible_views() -> No
     )
     np.testing.assert_array_equal(runtime.appearance, offline.appearance)
     np.testing.assert_array_equal(runtime.mask, offline.mask)
+    assert runtime.pose is not None and offline.pose is not None
     np.testing.assert_array_equal(runtime.pose, offline.pose)
     assert runtime.appearance_transform.to_record() == offline.appearance_transform.to_record()
     assert runtime.pose_transform.to_record() == pose_transform.to_record()

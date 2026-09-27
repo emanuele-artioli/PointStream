@@ -20,14 +20,19 @@ import shutil
 import subprocess
 import sys
 import time
-from typing import Any
+from typing import Any, cast
+
+from src.components.segmentation.sam31 import Policy, Role
 
 import numpy as np
 
 try:
     import cv2
 except ImportError:  # SAM worker uses PIL; the parent audit uses OpenCV.
-    cv2 = None
+    cv2 = cast(Any, None)
+
+ROLES: tuple[Role, Role] = ("player", "racket")
+OFFLINE_POLICY: Policy = "offline_bidirectional"
 
 PILOT_SCHEMA = "pointstream.sam31-pilot.v1"
 OBSERVATION_SCHEMA = "pointstream.observation.v1"
@@ -506,6 +511,10 @@ def _native_codec_inventory() -> dict[str, Any]:
     return result
 
 
+def _xyxy(box: tuple[int, int, int, int]) -> tuple[float, float, float, float]:
+    return (float(box[0]), float(box[1]), float(box[2]), float(box[3]))
+
+
 def _mask_bbox(mask: np.ndarray) -> tuple[int, int, int, int] | None:
     ys, xs = np.nonzero(mask)
     if xs.size == 0:
@@ -565,7 +574,7 @@ def _sam_worker(config_path: Path) -> int:
         prob_threshold=float(config["prob_threshold"]),
     )
     model_load_seconds = time.perf_counter() - started
-    policy = "offline_bidirectional"
+    policy = OFFLINE_POLICY
     provenance = segmenter.provenance(policy)
     width, height = int(config["frame_width"]), int(config["frame_height"])
     outputs: dict[str, dict[tuple[int, str], Any]] = {"player": {}, "racket": {}}
@@ -573,7 +582,7 @@ def _sam_worker(config_path: Path) -> int:
     retry_records: list[dict[str, Any]] = []
     total_started = time.perf_counter()
     try:
-        for role in ("player", "racket"):
+        for role in ROLES:
             segmenter.start_session(
                 role,
                 frame_dir,
@@ -615,7 +624,8 @@ def _sam_worker(config_path: Path) -> int:
                 }
             )
 
-        for role, records in outputs.items():
+        for role_name, records in outputs.items():
+            role = cast(Role, role_name)
             by_object: dict[str, list[Any]] = defaultdict(list)
             for item in records.values():
                 by_object[item.object_id].append(item)
@@ -708,12 +718,12 @@ def _sam_worker(config_path: Path) -> int:
                     finally:
                         segmenter.close_session(role, session_key=retry_key)
     finally:
-        for role, session_key in list(segmenter.sessions):
-            segmenter.close_session(role, session_key=session_key)
+        for session_role, session_key in list(segmenter.sessions):
+            segmenter.close_session(session_role, session_key=session_key)
 
     masks: dict[str, np.ndarray] = {}
     serialized: list[dict[str, Any]] = []
-    for role, role_records in outputs.items():
+    for role_name, role_records in outputs.items():
         for (frame_index, object_id), item in sorted(role_records.items()):
             mask_key = None
             if item.mask is not None:
@@ -721,7 +731,7 @@ def _sam_worker(config_path: Path) -> int:
                 masks[mask_key] = np.asarray(item.mask, dtype=np.uint8)
             serialized.append(
                 {
-                    "role": role,
+                    "role": role_name,
                     "frame_index": int(frame_index),
                     "object_id": object_id,
                     "tracker_id": item.tracker_id,
@@ -808,7 +818,7 @@ def _sequence_perception(
     from src.runner.perception import render_runtime_conditioning_view
 
     count, height, width, _ = frames.shape
-    policy = "offline_bidirectional"
+    policy = OFFLINE_POLICY
     sam_provenance = sam_result["provenance"]
     player_provenance = pose_estimator.provenance(policy=policy)
     outputs = sam_result["outputs"]
@@ -889,7 +899,7 @@ def _sequence_perception(
                     object_id=object_id,
                     object_class="racket",
                     frame_index=frame_index,
-                    bbox=tuple(float(value) for value in bbox),
+                    bbox=_xyxy(bbox),
                     mask=item.mask,
                 )
             )
@@ -919,7 +929,7 @@ def _sequence_perception(
             "player": [],
             "racket": [],
         }
-        for role in ("player", "racket"):
+        for role in ROLES:
             for object_id in object_ids_by_role[role]:
                 expected[role] += 1
                 item = outputs[role].get((frame_index, object_id))
@@ -939,19 +949,19 @@ def _sequence_perception(
                     if current_tracker is not None:
                         previous_tracker[(role, object_id)] = current_tracker
 
-                linked = associated_rackets.get((frame_index, object_id)) if role == "racket" else None
+                linked_racket = associated_rackets.get((frame_index, object_id)) if role == "racket" else None
                 reason = "mask_unavailable" if item is None or item.mask is None else None
                 view_transform = None
                 if item is not None and item.mask is not None:
-                    _crop, _crop_mask, transform = render_object_view(
-                        frames[frame_index],
-                        np.asarray(item.mask),
-                        tuple(float(value) for value in _mask_bbox(item.mask)),
-                    )
-                    view_transform = transform.to_record()
-                    box = _mask_bbox(item.mask)
-                    if box is not None:
-                        x0, y0, x1, y1 = box
+                    view_box = _mask_bbox(np.asarray(item.mask))
+                    if view_box is not None:
+                        _crop, _crop_mask, transform = render_object_view(
+                            frames[frame_index],
+                            np.asarray(item.mask),
+                            _xyxy(view_box),
+                        )
+                        view_transform = transform.to_record()
+                        x0, y0, x1, y1 = view_box
                         probes = np.asarray(
                             [[x0, y0], [x1, y0], [x1, y1], [x0, y1]],
                             dtype=np.float64,
@@ -962,9 +972,9 @@ def _sequence_perception(
                         coordinate_errors.extend(
                             np.linalg.norm(returned - probes, axis=1).tolist()
                         )
-                if role == "racket" and linked is not None:
-                    associated_player_id = linked.associated_player_id
-                    associated_wrist = linked.associated_wrist
+                if role == "racket" and linked_racket is not None:
+                    associated_player_id = linked_racket.associated_player_id
+                    associated_wrist = linked_racket.associated_wrist
                 else:
                     associated_player_id = None
                     associated_wrist = None
@@ -986,11 +996,14 @@ def _sequence_perception(
                         associated_player_id=associated_player_id,
                         associated_wrist=associated_wrist,
                     )
-                    key = f"m{len(masks):06d}"
-                    masks[key] = observation.mask
+                    mask_key = f"m{len(masks):06d}"
+                    observed_mask = observation.mask
+                    if observed_mask is None:
+                        raise RuntimeError("observed record is missing its mask")
+                    masks[mask_key] = observed_mask
                     raw_record = observation.to_record()
-                    raw_record["mask_key"] = key
-                    raw_record["mask_sha256"] = _sha256_array(observation.mask)
+                    raw_record["mask_key"] = mask_key
+                    raw_record["mask_sha256"] = _sha256_array(observed_mask)
                     record = {**raw_record, "tracker_id": item.tracker_id}
                 else:
                     observation = Observation.missing(
@@ -1042,7 +1055,7 @@ def _sequence_perception(
                 "failed": not player_masks or not racket_masks,
             }
         )
-        for role in ("player", "racket"):
+        for role in ROLES:
             color = (35, 220, 70) if role == "player" else (240, 130, 35)
             for object_id, mask, bbox, item in frame_records[role]:
                 pose_data = next(
@@ -1258,7 +1271,7 @@ def _encode_client_payload(
         if bbox is None:
             continue
         appearance, _condition_mask, _transform = render_object_view(
-            frames[frame_index], mask, tuple(float(value) for value in bbox)
+            frames[frame_index], mask, _xyxy(bbox)
         )
         objects.append(
             ObjectRequest(
@@ -1299,7 +1312,10 @@ def _encode_client_payload(
         sync_fn=None,
     )
     chunk = runner_output.chunks[0]
-    payload = bytes(chunk.bag["wire_request"])
+    raw_payload = chunk.bag["wire_request"]
+    if not isinstance(raw_payload, (bytes, bytearray)):
+        raise TypeError("wire_request payload must be bytes")
+    payload = bytes(raw_payload)
     payload_path = output_dir / "pointstream-client-payload.npz"
     payload_path.write_bytes(payload)
     decoded_path = output_dir / "fresh-process-decoded.npy"
@@ -1495,7 +1511,7 @@ def _save_view_manifest(scene: dict[str, Any], result: dict[str, Any], output_di
             "model_adapter_schema": adapters.schema,
             "model_adapter_paths": adapter_paths,
             "model_adapter_sha256": {
-                name: _sha256(path) for name, path in adapter_paths.items()
+                name: _sha256(Path(path)) for name, path in adapter_paths.items()
             },
             "adapter_eligible_for_cross_training": adapters.eligible_for_cross_training,
             "adapter_exclusion_reason": adapters.exclusion_reason,

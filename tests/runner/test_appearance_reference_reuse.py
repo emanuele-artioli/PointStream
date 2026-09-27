@@ -53,6 +53,7 @@ def test_track_appearance_is_serialized_once_and_reused_by_frame_placements() ->
         sync_fn=None,
     )
     payload = result.chunks[0].bag["wire_request"]
+    assert isinstance(payload, (bytes, bytearray))
     with np.load(io.BytesIO(payload), allow_pickle=False) as arrays:
         metadata = json.loads(np.asarray(arrays["metadata"], dtype=np.uint8).tobytes())
         assert list(metadata["references"]) == ["player-1"]

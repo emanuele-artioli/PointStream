@@ -57,6 +57,7 @@ def test_sam31_scales_box_prompt_to_relative_coordinates() -> None:
     assert "points" not in request
     assert request["rel_coordinates"] is True
     assert masks[0].object_id == "racket-1"
+    assert masks[0].mask is not None
     assert masks[0].mask.shape == (40, 60)
     segmenter.close_session("racket")
 
@@ -180,7 +181,7 @@ def test_verified_predictor_session_initializer_signature_is_compatible() -> Non
             self._all_inference_states = {}
             self.async_loading_frames = False
 
-        def start_session(self, resource_path):
+        def start_session(self, resource_path, session_id=None):
             raise AssertionError("compatibility initializer did not replace legacy method")
 
     predictor = _LegacyPredictor()

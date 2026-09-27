@@ -1,3 +1,4 @@
+# ruff: noqa: E402 - sys.path bootstrap must run before src/experiments imports.
 """Measure the static-plate registration control on the real 48-frame window.
 
 The modular ladder deliberately used ``register=False``. This probe keeps that

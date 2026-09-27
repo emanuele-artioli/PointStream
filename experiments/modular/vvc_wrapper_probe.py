@@ -1,3 +1,4 @@
+# ruff: noqa: E402 - sys.path bootstrap must run before src/experiments imports.
 """Reproduce FFmpeg/libvvenc empty outputs against direct vvencapp.
 
 This is a diagnostic for the installed tools, not a new rate point. The input

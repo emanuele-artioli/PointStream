@@ -1,3 +1,4 @@
+# ruff: noqa: E402 - sys.path bootstrap must run before src/experiments imports.
 """Registered plate, warp-error residual, and a budgeted appearance arm.
 
 Step 1 codes a registered plate as VVC intra QP 40, charges one float32
@@ -31,8 +32,6 @@ from experiments.modular.appearance_motion_probe import (
 from experiments.modular.background_registration_probe import _reconstruct
 from experiments.modular.image_codec_probe import FRAMES, MASKS
 from experiments.modular.measured_ladder import (
-    CROP_CODEC,
-    CROP_QP,
     RESIDUAL_CODEC,
     RESIDUAL_PRESET,
     _encode_appearance_crop,
@@ -596,7 +595,7 @@ def _curve_rows(
     """At most the remaining curve encodes: WebP plate and residual QP 32."""
     height, width = int(frames_rgb.shape[1]), int(frames_rgb.shape[2])
     rows: list[dict[str, Any]] = []
-    plates = {
+    plates: dict[tuple[str, int], tuple[int, np.ndarray | None]] = {
         ("vvc", 40): (vvc_plate_bytes, None),
     }
     print("encoding WebP q40 registered plate for the curve", flush=True)

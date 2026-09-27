@@ -89,6 +89,12 @@ warn_return_any = false
 check_untyped_defs = false
 no_implicit_optional = true
 
+# The gate is src/tests/scripts/experiments. Tests import the demo package;
+# those modules are not part of the gate, so their errors must not fail it.
+[[tool.mypy.overrides]]
+module = ["demo", "demo.*"]
+follow_imports = "silent"
+
 [tool.coverage.run]
 source = ["src", "scripts"]
 

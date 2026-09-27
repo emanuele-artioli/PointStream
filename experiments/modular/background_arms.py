@@ -1,3 +1,4 @@
+# ruff: noqa: E402 - sys.path bootstrap must run before src/experiments imports.
 """Step 1 of the 23 September campaign: four background arms.
 
 The 11 September probe is not reused. Its mask came from the long-scene
@@ -136,17 +137,29 @@ def _row(
     return row
 
 
+def _as_int(value: object) -> int:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise TypeError(f"expected a number, got {type(value).__name__}")
+    return int(value)
+
+
+def _as_float(value: object) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise TypeError(f"expected a number, got {type(value).__name__}")
+    return float(value)
+
+
 def choose_background(rows: list[dict[str, object]], anchor_bytes: int) -> dict[str, object]:
     """Highest background PSNR among arms strictly under ``anchor_bytes``."""
-    eligible = [row for row in rows if int(row["total_bytes"]) < anchor_bytes]
+    eligible = [row for row in rows if _as_int(row["total_bytes"]) < anchor_bytes]
     if not eligible:
         return {
             "fits": False,
             "foreground_budget_bytes": 0,
             "reason": "no arm is under the anchor",
         }
-    chosen = max(eligible, key=lambda row: float(row["psnr_bg"] or 0.0))
-    budget = anchor_bytes - int(chosen["total_bytes"])
+    chosen = max(eligible, key=lambda row: _as_float(row["psnr_bg"] or 0.0))
+    budget = anchor_bytes - _as_int(chosen["total_bytes"])
     return {
         "fits": budget >= 8_000,
         "representation": chosen["representation"],

@@ -21,7 +21,8 @@ from demo.pipeline.maps.contract import OverlayPayloadError, payload_kbps
 def _write_clip(path: Path, n: int = 4, fps: float = 10.0) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     h, w = 48, 64
-    writer = cv2.VideoWriter(str(path), cv2.VideoWriter_fourcc(*"mp4v"), fps, (w, h))
+    fourcc = getattr(cv2, "VideoWriter_fourcc")(*"mp4v")
+    writer = cv2.VideoWriter(str(path), fourcc, fps, (w, h))
     assert writer.isOpened(), f"failed to open VideoWriter for {path}"
     for i in range(n):
         frame = np.zeros((h, w, 3), dtype=np.uint8)

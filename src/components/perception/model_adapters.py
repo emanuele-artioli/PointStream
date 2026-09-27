@@ -71,8 +71,11 @@ def render_model_adapter_views(
     has_cross = shape_kind == "racket_cross_v1" and len(shape_points) == 4
     if has_cross:
         points = np.rint(transform.source_to_canvas(np.asarray(shape_points))).astype(int)
-        cv2.line(axis, tuple(points[0]), tuple(points[1]), 255, 2, cv2.LINE_AA)
-        cv2.line(width, tuple(points[2]), tuple(points[3]), 255, 2, cv2.LINE_AA)
+        def _point(row: np.ndarray) -> tuple[int, int]:
+            return (int(row[0]), int(row[1]))
+
+        cv2.line(axis, _point(points[0]), _point(points[1]), 255, 2, cv2.LINE_AA)
+        cv2.line(width, _point(points[2]), _point(points[3]), 255, 2, cv2.LINE_AA)
 
     # Channels remain separate for new model heads. Existing 3-channel
     # checkpoints cannot consume them without a compatible adapter/training.

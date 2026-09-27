@@ -65,6 +65,7 @@ def test_absent_source_joints_stay_absent_on_the_wire_not_zero_filled_as_present
     wire = to_wire(from_coco17(values), OPENPOSE_18)
     nose = OPENPOSE_18.index_of["nose"]
     assert not wire.present[nose]
+    assert wire.visibility is not None
     assert wire.values[nose, 2] == 0.0
     assert wire.visibility[nose] == 0
 
@@ -73,9 +74,11 @@ def test_pose_visibility_preserves_confidence_bands_through_projection() -> None
     values = _coco17()
     values[5, 2] = 0.2
     pose = from_coco17(values)
+    assert pose.visibility is not None
     assert pose.visibility[5] == 1
     assert pose.visibility[6] == 2
     wire = to_wire(pose, "openpose-18")
+    assert wire.visibility is not None
     assert wire.visibility[OPENPOSE_18.index_of["left_shoulder"]] == 1
     assert wire.visibility[OPENPOSE_18.index_of["neck"]] == 1
 

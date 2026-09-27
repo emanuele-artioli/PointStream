@@ -1,3 +1,4 @@
+# ruff: noqa: E402 - sys.path bootstrap must run before src/experiments imports.
 """Background campaign encodes.
 
 Four representations against a same-pipeline VVC source, with encode and
@@ -13,6 +14,7 @@ import resource
 import sys
 import tempfile
 import time
+from typing import Mapping
 
 REPO = Path(__file__).resolve().parents[2]
 if str(REPO) not in sys.path:
@@ -21,6 +23,8 @@ if str(REPO) not in sys.path:
 import numpy as np
 
 from experiments.modular.background_arms import (
+    _as_float,
+    _as_int,
     _intra_still,
     _render_panorama,
     _repeat,
@@ -30,7 +34,6 @@ from experiments.modular.background_arms import (
 from experiments.modular.measured_ladder import (
     _as_clip_rgb,
     _direct_vvc_encode,
-    _rgb_to_bgr,
     _rgb_to_yuv420,
     _yuv420_to_rgb,
     load_sequence,
@@ -81,13 +84,13 @@ def choose_setup(
         for row in rows
         if row.get("representation") != "source"
         and row.get("psnr_bg") is not None
-        and anchor_bytes - int(row["total_bytes"]) >= MIN_BUDGET
+        and anchor_bytes - _as_int(row["total_bytes"]) >= MIN_BUDGET
     ]
     if not eligible:
         return {"fits": False, "reason": "no arm leaves 8 kB", "pipeline_setup": False}
-    chosen = min(eligible, key=lambda row: required_foreground(weighted_anchor, float(row["psnr_bg"])))
-    required = required_foreground(weighted_anchor, float(chosen["psnr_bg"]))
-    budget = anchor_bytes - int(chosen["total_bytes"])
+    chosen = min(eligible, key=lambda row: required_foreground(weighted_anchor, _as_float(row["psnr_bg"])))
+    required = required_foreground(weighted_anchor, _as_float(chosen["psnr_bg"]))
+    budget = anchor_bytes - _as_int(chosen["total_bytes"])
     gap = required - float(anchor_fg)
     return {
         "fits": True,
@@ -116,7 +119,7 @@ def long_window_gate(setup: dict[str, object]) -> bool:
     gap = setup.get("required_fg_minus_anchor_fg")
     if gap is None:
         return False
-    return int(setup["foreground_budget_bytes"]) >= MIN_BUDGET and float(gap) <= 6.0
+    return _as_int(setup["foreground_budget_bytes"]) >= MIN_BUDGET and _as_float(gap) <= 6.0
 
 
 def _fps(n_frames: int, seconds: float) -> float | None:
@@ -199,7 +202,7 @@ def _load_or_build(
     cache: Path,
     frames_rgb: np.ndarray,
     mask: np.ndarray,
-) -> tuple[np.ndarray, np.ndarray, tuple, int, float, float]:
+) -> tuple[np.ndarray, np.ndarray, tuple[np.ndarray, ...], int, float, float]:
     if cache.is_file():
         data = np.load(cache)
         homographies = tuple(np.asarray(row, dtype=np.float64) for row in data["homographies"])
@@ -214,12 +217,13 @@ def _load_or_build(
         )
     print("building plate-inpainted stack", flush=True)
     started = time.perf_counter()
-    cleaned, plate, homographies, _prep = build_common_cleaned_stack(
+    cleaned, plate, raw_homographies, _prep = build_common_cleaned_stack(
         frames_rgb,
         mask,
         removal="on",
         register=True,
     )
+    homographies = tuple(np.asarray(row, dtype=np.float64) for row in raw_homographies)
     build_s = time.perf_counter() - started
     best_index, best_mse = select_best_background_frame(frames_rgb, mask)
     cache.parent.mkdir(parents=True, exist_ok=True)
@@ -250,7 +254,7 @@ def _arm_row(
     tool_path: str,
     tool_version: str,
     plate_s: float,
-    extra: dict[str, object],
+    extra: Mapping[str, object],
 ) -> dict[str, object]:
     row: dict[str, object] = {
         "representation": name,
@@ -272,11 +276,11 @@ def _arm_row(
 
 
 def _attach_clocks(rows: list[dict[str, object]], n_frames: int) -> None:
-    sources = {int(row["qp"]): row for row in rows if row["representation"] == "source"}
+    sources = {_as_int(row["qp"]): row for row in rows if row["representation"] == "source"}
     for row in rows:
-        encode_s = float(row["encode_seconds"])
-        decode_s = float(row["decode_seconds"])
-        plate_s = float(row["plate_build_seconds"])
+        encode_s = _as_float(row["encode_seconds"])
+        decode_s = _as_float(row["decode_seconds"])
+        plate_s = _as_float(row["plate_build_seconds"])
         row["encode_fps"] = _fps(n_frames, encode_s)
         row["decode_fps"] = _fps(n_frames, decode_s)
         sender = encode_s if row["representation"] == "source" else plate_s + encode_s
@@ -284,11 +288,11 @@ def _attach_clocks(rows: list[dict[str, object]], n_frames: int) -> None:
         row["client_seconds"] = round(decode_s, 3)
         row["sender_fps"] = _fps(n_frames, sender)
         row["client_fps"] = _fps(n_frames, decode_s)
-        source = sources.get(int(row["qp"]))
+        source = sources.get(_as_int(row["qp"]))
         if source is None or row["representation"] == "source":
             continue
-        source_encode = float(source["encode_seconds"])
-        source_decode = float(source["decode_seconds"])
+        source_encode = _as_float(source["encode_seconds"])
+        source_decode = _as_float(source["decode_seconds"])
         row["encode_fps_ratio_vs_source"] = (source_encode / encode_s) if encode_s > 0 else None
         row["decode_fps_ratio_vs_source"] = (source_decode / decode_s) if decode_s > 0 else None
         row["sender_fps_ratio_vs_source"] = (source_encode / sender) if sender > 0 else None
@@ -297,16 +301,16 @@ def _attach_clocks(rows: list[dict[str, object]], n_frames: int) -> None:
 def _choices_for_qp(
     rows: list[dict[str, object]],
     qp: int,
-    anchor: dict[str, object],
+    anchor: Mapping[str, object],
 ) -> dict[str, object]:
-    same = [row for row in rows if int(row["qp"]) == qp and row["representation"] != "source"]
-    anchor_bytes = int(anchor["bytes"])
+    same = [row for row in rows if _as_int(row["qp"]) == qp and row["representation"] != "source"]
+    anchor_bytes = _as_int(anchor["bytes"])
     quality = choose_background(same, anchor_bytes)
-    setup = choose_setup(same, anchor_bytes, float(anchor["psnr_weighted"]), float(anchor["psnr_fg"]))
+    setup = choose_setup(same, anchor_bytes, _as_float(anchor["psnr_weighted"]), _as_float(anchor["psnr_fg"]))
     wins = []
     for row in same:
-        budget = anchor_bytes - int(row["total_bytes"])
-        if background_rate_win(float(row["psnr_bg"]), float(anchor["psnr_bg"]), budget):
+        budget = anchor_bytes - _as_int(row["total_bytes"])
+        if background_rate_win(_as_float(row["psnr_bg"]), _as_float(anchor["psnr_bg"]), budget):
             wins.append(
                 {
                     "representation": row["representation"],
@@ -321,7 +325,7 @@ def _choices_for_qp(
 
 def _source_anchor(row: dict[str, object]) -> dict[str, object]:
     return {
-        "bytes": int(row["total_bytes"]),
+        "bytes": _as_int(row["total_bytes"]),
         "psnr_fg": row["psnr_fg"],
         "psnr_bg": row["psnr_bg"],
         "psnr_weighted": row["psnr_weighted"],
@@ -424,7 +428,7 @@ def run_clip(
             if name == "cleaned_video":
                 payload, decoded, enc_s, dec_s, path, version = _timed_vvc(cleaned, qp)
                 side = len(still_side)
-                extra = {}
+                extra: dict[str, object] = {}
             elif name == "registered_panorama":
                 payload, decoded_plate, path, version, enc_s, dec_s = _intra_still(plate, qp)
                 started = time.perf_counter()
@@ -459,10 +463,10 @@ def run_clip(
             _write(out_path, document)
 
     _attach_clocks(rows, n_frames)
-    anchors = {f"vvc_qp{int(row['qp'])}": _source_anchor(row) for row in rows if row["representation"] == "source"}
+    anchors = {f"vvc_qp{_as_int(row['qp'])}": _source_anchor(row) for row in rows if row["representation"] == "source"}
     document["anchors"] = anchors
     document["choices"] = {
-        name: _choices_for_qp(rows, int(name.removeprefix("vvc_qp")), anchor)
+        name: _choices_for_qp(rows, _as_int(name.removeprefix("vvc_qp")), anchor)
         for name, anchor in anchors.items()
     }
     if clip_id == "federer007" and PART1.is_file():
@@ -472,9 +476,9 @@ def run_clip(
         # Coarser new rows are also eligible against the fixed campaign anchor.
         document["against_campaign_vvc_qp46_all_qps"] = choose_setup(
             combined,
-            int(CAMPAIGN_VVC_QP46["bytes"]),
-            float(CAMPAIGN_VVC_QP46["psnr_weighted"]),
-            float(CAMPAIGN_VVC_QP46["psnr_fg"]),
+            _as_int(CAMPAIGN_VVC_QP46["bytes"]),
+            _as_float(CAMPAIGN_VVC_QP46["psnr_weighted"]),
+            _as_float(CAMPAIGN_VVC_QP46["psnr_fg"]),
         )
     document["wall_seconds"] = round(time.perf_counter() - wall, 3)
     _write(out_path, document)
@@ -486,7 +490,10 @@ def run_clip(
 def _summary(documents: list[dict[str, object]]) -> dict[str, object]:
     choices = []
     for document in documents:
-        for name, choice in document.get("choices", {}).items():
+        choices_doc = document.get("choices", {})
+        if not isinstance(choices_doc, dict):
+            continue
+        for name, choice in choices_doc.items():
             setup = choice["setup"]
             choices.append(
                 {

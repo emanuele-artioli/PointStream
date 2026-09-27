@@ -61,7 +61,21 @@ def test_beats_comparison() -> None:
     assert beats(100, 99) is False
 
 
+def _skip_without_encoders() -> None:
+    from src.components.codec.tools import resolve_tool
+
+    missing = []
+    for env_name, binary in (("SVTAV1_BIN", "SvtAv1EncApp"), ("VVENC_BIN", "vvencapp")):
+        try:
+            resolve_tool(env_name, binary)
+        except FileNotFoundError:
+            missing.append(binary)
+    if missing:
+        pytest.skip("encode tools not on PATH: " + ", ".join(missing))
+
+
 def test_measure_rungs_four_rungs_and_byte_sum() -> None:
+    _skip_without_encoders()
     frames, mask = _moving_block_clip()
     rungs = measure_rungs(frames, mask)
     expected_ids = [
@@ -103,6 +117,7 @@ def test_measure_rungs_four_rungs_and_byte_sum() -> None:
 
 
 def test_different_fg_colour_changes_c0_appearance_pair() -> None:
+    _skip_without_encoders()
     frames_a, mask_a = _moving_block_clip(fg_color=(20, 180, 20))
     frames_b, mask_b = _moving_block_clip(fg_color=(20, 20, 180))
     c0_a = measure_rungs(frames_a, mask_a)[0]
@@ -113,6 +128,7 @@ def test_different_fg_colour_changes_c0_appearance_pair() -> None:
 
 
 def test_write_comparison_strip_png_not_constant() -> None:
+    _skip_without_encoders()
     frames, mask = _moving_block_clip()
     rungs = measure_rungs(frames, mask)
     with tempfile.TemporaryDirectory() as tmp:
