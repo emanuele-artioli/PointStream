@@ -40,6 +40,28 @@ yet been falsified or accepted for the current PointStream design.
 
 Report:
 `/home/itec/emanuele/pointstream-data/outputs/modular/appearance-motion/federer007.json`.
+## SAM3.1 conditioning adapters — 2026-09-27
+
+`src/components/perception/model_adapters.py` now emits an AnimateAnyone
+OpenPose-18 RGB condition, SPADE player/racket/joint conditions, and ControlNet
+RGB plus named player-mask, racket-mask, racket-axis, and racket-width channels.
+The shared crop transform handles aspect-preserving resize and reversible
+coordinate mapping. Hull fallback or missing racket geometry is typed and
+excluded from cross-conditioned adapters. Existing SPADE/ControlNet checkpoint
+compatibility remains unverified; racket-aware training is required. MTTF remains
+unintegrated because this repository has no MTTF implementation or conditioning
+interface to verify.
+
+The SAM3.1 pilot derived pose and racket geometry from retained unquantized
+observations. Its measured client payload did not transmit either one, so these
+training conditions are not yet identical to client-decoded conditions. DWPose
+inference fell back to ONNX Runtime CPU because its CUDA provider could not load
+`libcudnn.so.9`; the audit used no DWPose CUDA memory. Racket and joint samples
+with unresolved visual failures were quarantined in the versioned review record.
+No eligible split was regenerated, no model was trained or smoke-loaded, and the
+active training manifest was not changed. Generation readiness and dataset
+promotion remain blocked on a transport representation for pose/geometry, a
+regenerated split, and successful player/racket/joint training-loading smokes.
 
 ## Pilot return audit — 16 September 2026
 
@@ -282,7 +304,6 @@ result that determines the next experiment; no family-wide claims from one pilot
   - `campaign_result.json` (original adapted): SHA-256 `f56e5cb2a8c0239b4f3ecc007d164a403cb7512d8a6bd4ed1e625afdf7c8a425`
   - `diagnostic_matrix_completed.json` (completed 7-corner): SHA-256 `a0dbf42dc1052cd0ea461f7d4c75086cf1a798636a8f3152d40658afd4d0f8df`
   - `campaign_result_completed.json` (completed adapted): SHA-256 `99e019e0f544ac4064ca4fee0e8e7b5f02821cc2486cbf03c646f262bdfa34fa`
-
 
 
 

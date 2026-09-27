@@ -36,6 +36,8 @@ class ObservedObject:
     bbox: tuple[float, float, float, float] | None = None
     mask: object | None = None
     keypoints: object | None = None
+    associated_player_id: str | None = None
+    associated_wrist: str | None = None
 
 
 @dataclass(frozen=True)
@@ -59,6 +61,10 @@ class RigidShape:
     points: tuple[tuple[float, float], ...]
     wrist_anchor: tuple[float, float] | None = None
     radius: float | None = None
+    associated_player_id: str | None = None
+    associated_wrist: str | None = None
+    endpoint_order: str | None = None
+    fallback_reason: str | None = None
 
     def to_record(self) -> dict[str, object]:
         record: dict[str, object] = {
@@ -70,6 +76,14 @@ class RigidShape:
         }
         if self.wrist_anchor is not None:
             record["wrist_anchor"] = list(self.wrist_anchor)
+        if self.associated_player_id is not None:
+            record["associated_player_id"] = self.associated_player_id
+        if self.associated_wrist is not None:
+            record["associated_wrist"] = self.associated_wrist
+        if self.endpoint_order is not None:
+            record["endpoint_order"] = self.endpoint_order
+        if self.fallback_reason is not None:
+            record["fallback_reason"] = self.fallback_reason
         if self.radius is not None:
             record["radius"] = self.radius
         return record

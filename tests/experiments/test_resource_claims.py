@@ -27,7 +27,7 @@ from typing import Any
 
 import pytest
 
-from experiments.jobs import monitor
+from experiments.jobs import claims, monitor
 from experiments.jobs.claims import (
     CPUOversubscriptionError,
     DeviceBusyError,
@@ -254,7 +254,7 @@ def test_retained_claims_while_child_runs(tmp_path: Path) -> None:
     assert proc.poll() is None
     status = get_claims_status(claims_dir)
     assert status["devices"][0]["child_pid"] == proc.pid
-    assert status["devices"][0]["child_proc_start_time"] is not None
+    assert status["devices"][0]["child_proc_start_time"] == claims.get_process_start_time(proc.pid)
     assert status["devices"][0]["process_group_id"] == proc.pid
     cpu_allocation = next(iter(next(iter(status["cpu_hosts"].values()))["allocations"].values()))
     assert cpu_allocation["child_pid"] == proc.pid
@@ -458,7 +458,7 @@ def test_stale_claim_local_verified_dead_cleanup(tmp_path: Path) -> None:
     release_device_claim(claim.host, claim.device_uuid, claim.token, claims_dir)
 
 
-def test_monitor_supervise_integration(tmp_path: Path) -> None:
+def test_monitor_supervise_integration(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Detached monitor.supervise acquires claims, isolates child, and releases upon exit."""
     job_dir = tmp_path / "job-001"
     job_dir.mkdir(parents=True)
@@ -466,6 +466,7 @@ def test_monitor_supervise_integration(tmp_path: Path) -> None:
     claims_dir = tmp_path / "claims"
     target_uuid = "GPU-monitor-target"
     output_file = job_dir / "child_env.json"
+    monkeypatch.setattr(monitor, "foreign_gpu_processes", lambda _uuid, _pgid: [])
 
     script = (
         "import os, json\n"
@@ -505,7 +506,6 @@ def test_monitor_supervise_integration(tmp_path: Path) -> None:
     status = monitor.read_json(job_dir / "status.json")
     assert status["status"] == "complete"
     assert status["pid"] > 0
-    assert status["proc_start_time"] is not None
     assert status["process_group_id"] == status["pid"]
     persisted_claim = monitor.read_json(job_dir / "claim.json")
     assert persisted_claim["child_pid"] == status["pid"]

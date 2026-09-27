@@ -48,6 +48,7 @@ class ClientPlacement:
     is_generated: bool = False
     pose: np.ndarray | None = None
     motion_field: np.ndarray | None = None
+    object_class: str | None = None
 
 
 def reconstruct_independent_client(
@@ -112,6 +113,8 @@ def reconstruct_independent_client(
                 bbox=p.bbox,
                 frame_index=p.frame_index,
                 mask=p.mask,
+                object_id=getattr(p, "object_id", "object"),
+                object_class=getattr(p, "object_class", None),
             )
             for p in placements
             if not getattr(p, "is_generated", False) and p.crop is not None
@@ -125,8 +128,8 @@ def reconstruct_independent_client(
             generated_items = [item for item in objects if getattr(item, "is_generated", False)]
         if generated_items:
             from src.contracts.conditioning import ConditioningBundle
-            from src.pipeline.reconstruction.dispatch import dispatch
             from src.pipeline.reconstruction.reconstruct import ObjectRequest, _bundle_for
+            from src.runner.generation import dispatch_by_object_identity
 
             bundles = tuple(
                 _bundle_for(item)
@@ -139,10 +142,11 @@ def reconstruct_independent_client(
                     bbox=item.bbox,
                     frame_index=item.frame_index,
                     object_id=getattr(item, "object_id", "object"),
+                    object_class=getattr(item, "object_class", None),
                 )
                 for item in generated_items
             )
-            crops, _ = dispatch(
+            crops, _ = dispatch_by_object_identity(
                 generator,
                 bundles,
                 seed=seed,
@@ -156,6 +160,8 @@ def reconstruct_independent_client(
                         bbox=item.bbox,
                         frame_index=item.frame_index,
                         mask=item.mask,
+                        object_id=getattr(item, "object_id", "object"),
+                        object_class=getattr(item, "object_class", None),
                     )
                 )
 
@@ -297,6 +303,7 @@ def serialize_client_request(
                 "frame_index": int(placement.frame_index),
                 "object_id": str(placement.object_id),
                 "is_generated": bool(placement.is_generated),
+                **({"object_class": placement.object_class} if placement.object_class else {}),
             }
         )
 
@@ -611,10 +618,17 @@ def reconstruct_serialized_client(
                     bbox=bbox,
                     frame_index=frame_index,
                     object_id=object_id,
+                    object_class=item.get("object_class"),
                 )
                 to_generate_bundles.append(bundle)
                 to_generate_placements.append(
-                    {"bbox": bbox, "frame_index": frame_index, "mask": mask, "object_id": object_id}
+                    {
+                        "bbox": bbox,
+                        "frame_index": frame_index,
+                        "mask": mask,
+                        "object_id": object_id,
+                        "object_class": item.get("object_class"),
+                    }
                 )
             else:
                 crop = None
@@ -632,7 +646,14 @@ def reconstruct_serialized_client(
 
                 if crop is not None:
                     pipeline_placements.append(
-                        Placement(crop=crop, bbox=bbox, frame_index=frame_index, mask=mask)
+                        Placement(
+                            crop=crop,
+                            bbox=bbox,
+                            frame_index=frame_index,
+                            mask=mask,
+                            object_id=object_id,
+                            object_class=item.get("object_class"),
+                        )
                     )
 
         _mark(timings, "appearance_decode_s", appear_started)
@@ -640,8 +661,8 @@ def reconstruct_serialized_client(
         if to_generate_bundles:
             if active_generator is None:
                 raise ValueError("Payload requires generation but no generator backend is available")
-            from src.pipeline.reconstruction.dispatch import dispatch
-            crops, _ = dispatch(
+            from src.runner.generation import dispatch_by_object_identity
+            crops, _ = dispatch_by_object_identity(
                 active_generator,
                 tuple(to_generate_bundles),
                 seed=active_seed or 1337,
@@ -655,6 +676,8 @@ def reconstruct_serialized_client(
                         bbox=info["bbox"],
                         frame_index=info["frame_index"],
                         mask=info["mask"],
+                        object_id=info["object_id"],
+                        object_class=info["object_class"],
                     )
                 )
 

@@ -138,8 +138,14 @@ def _as_detection(item: ObjectRequest) -> Any:
     from src.components.detection.types import Detection
 
     x1, y1, x2, y2 = item.bbox
+    class_name = item.object_class
+    if not class_name:
+        lowered = item.object_id.casefold()
+        class_name = "tennis racket" if "racket" in lowered else (
+            "sports ball" if "ball" in lowered else "person"
+        )
     return Detection(
-        class_name="person",
+        class_name=class_name,
         bbox=Box(float(x1), float(y1), float(x2), float(y2)),
         track_id=item.object_id,
     )
@@ -168,6 +174,7 @@ def _object_from_detection(
         bbox=(x1, y1, x2, y2),
         mask=mask,
         frame_index=frame_index,
+        object_class=str(detection.class_name),
     )
 
 
@@ -175,6 +182,9 @@ def _frame_mask(
     crop_mask: np.ndarray, bbox: tuple[int, int, int, int], *, height: int, width: int
 ) -> np.ndarray:
     """Paste a crop-local mask into a frame-sized boolean array."""
+    array = np.asarray(crop_mask)
+    if array.shape == (height, width):
+        return array.astype(bool, copy=False)
     x1, y1, x2, y2 = (int(v) for v in bbox)
     x1 = max(0, min(width, x1))
     y1 = max(0, min(height, y1))
@@ -184,7 +194,6 @@ def _frame_mask(
     full = np.zeros((height, width), dtype=bool)
     if region_h < 1 or region_w < 1:
         return full
-    array = np.asarray(crop_mask)
     if array.shape != (region_h, region_w):
         import cv2
 
@@ -226,7 +235,14 @@ def _subjects_for_reconstruct(bag: Mapping[str, Any]) -> tuple[ObjectRequest, ..
             updated.append(item)
             continue
         array = np.asarray(mask)
-        if array.shape != (height, width):
+        if array.ndim == 3 and array.shape[1:] == (height, width):
+            if not 0 <= item.frame_index < array.shape[0]:
+                raise ValueError(
+                    f"segmentation mask stack for {item.object_id!r} has no frame "
+                    f"{item.frame_index}"
+                )
+            array = array[item.frame_index]
+        elif array.shape != (height, width):
             array = _frame_mask(array, item.bbox, height=height, width=width)
         updated.append(replace(item, mask=array))
     return tuple(updated)
@@ -283,20 +299,39 @@ def make_pose(ctx: StageContext) -> StageCallable:
         if estimator is None or not subjects or _injected_objects(bag):
             return ()
         source = as_clip(bag[SOURCE], path=SOURCE)
+        masks = bag.get(ART_MASKS)
         poses: list[Any] = []
         for item in subjects:
             if not _perception_on(bag, item.object_id, item.frame_index):
                 poses.append(None)
                 continue
             frame = source[min(item.frame_index, int(source.shape[0]) - 1)]
-            poses.append(estimator.estimate(frame, _as_detection(item)))
+            mask = masks.get(item.object_id) if isinstance(masks, Mapping) else None
+            if mask is not None:
+                mask = np.asarray(mask)
+                if mask.ndim == 3 and mask.shape[1:] == frame.shape[:2]:
+                    mask = mask[item.frame_index]
+                elif mask.shape != frame.shape[:2]:
+                    mask = _frame_mask(
+                        mask,
+                        item.bbox,
+                        height=int(frame.shape[0]),
+                        width=int(frame.shape[1]),
+                    )
+            import inspect
+
+            estimate = estimator.estimate
+            if "mask" in inspect.signature(estimate).parameters:
+                poses.append(estimate(frame, _as_detection(item), mask=mask))
+            else:
+                poses.append(estimate(frame, _as_detection(item)))
         return tuple(poses)
 
     return pose
 
 
 def make_segmentation(ctx: StageContext) -> StageCallable:
-    """Named segmenter. Returns a map of object_id → frame-sized mask."""
+    """Named segmenter. Returns object_id → (T, H, W) full-frame masks."""
 
     def segmentation(bag: Mapping[str, Any]) -> dict[str, np.ndarray]:
         from src.runner.routing import ensure_segmenter
@@ -306,6 +341,7 @@ def make_segmentation(ctx: StageContext) -> StageCallable:
         if segmenter is None or not subjects:
             return {}
         source = as_clip(bag[SOURCE], path=SOURCE)
+        height, width = int(source.shape[1]), int(source.shape[2])
         masks: dict[str, np.ndarray] = {}
         for item in subjects:
             if not _perception_on(bag, item.object_id, item.frame_index):
@@ -313,11 +349,13 @@ def make_segmentation(ctx: StageContext) -> StageCallable:
             frame = source[min(item.frame_index, int(source.shape[0]) - 1)]
             mask = segmenter.segment(frame, _as_detection(item))
             if mask is not None:
-                masks[item.object_id] = _frame_mask(
-                    np.asarray(mask),
-                    item.bbox,
-                    height=int(source.shape[1]),
-                    width=int(source.shape[2]),
+                candidate = np.asarray(mask)
+                stack = masks.setdefault(
+                    item.object_id,
+                    np.zeros((int(source.shape[0]), height, width), dtype=bool),
+                )
+                stack[item.frame_index] = _frame_mask(
+                    candidate, item.bbox, height=height, width=width
                 )
         return masks
 
@@ -1105,6 +1143,7 @@ def _bundle_for(item: ObjectRequest) -> ConditioningBundle:
         bbox=item.bbox,
         frame_index=item.frame_index,
         object_id=item.object_id,
+        object_class=item.object_class,
     )
 
 

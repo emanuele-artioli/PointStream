@@ -255,6 +255,7 @@ class ConditioningBundle:
         frame_index: Index within the clip, for logging and for temporal
             backends that need to know where in a window they are.
         object_id: Stable identity of the object across frames.
+        object_class: Semantic class identity (player, racket, ball, ...).
         caption: Optional per-track text prompt. ControlNets were trained with
             these; inference used to ignore them. Empty/None means the
             backend's generic fallback.
@@ -270,6 +271,7 @@ class ConditioningBundle:
     frame_index: int | None = None
     object_id: str | None = None
     caption: str | None = None
+    object_class: str | None = None
 
     def __post_init__(self) -> None:
         if self.bbox is not None:

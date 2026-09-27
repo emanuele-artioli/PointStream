@@ -11,7 +11,7 @@ skips evaluation.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 import numpy as np
 
@@ -30,7 +30,7 @@ from src.pipeline.reconstruction.background import (
 from src.pipeline.reconstruction.clips import Clip, as_clip
 from src.pipeline.reconstruction.compositor import Placement, composite_clip, heuristic_mask
 from src.pipeline.reconstruction.device import DeviceDecision, DevicePolicy
-from src.pipeline.reconstruction.dispatch import GeneratorRef, dispatch
+from src.pipeline.reconstruction.dispatch import GeneratorRef
 from src.pipeline.reconstruction.quality import (
     NumpyPsnrEvaluator,
     QualityEvaluator,
@@ -57,6 +57,7 @@ class ObjectRequest:
     supplied_crop: np.ndarray | None = None
     """When set, skip generation for this object and composite these pixels.
     Rigid shapes and already-decoded appearance crops use this."""
+    object_class: str | None = None
 
 
 @dataclass(frozen=True)
@@ -138,13 +139,22 @@ def reconstruct(request: ReconstructionRequest) -> ReconstructionResult:
                 "The runner binds the registry; reconstruction does not look backends up.",
             )
         bundles = tuple(_bundle_for(item) for item in to_generate)
-        crops, gen_decision = dispatch(
+        from src.runner.generation import dispatch_by_object_identity
+
+        crops, decisions = dispatch_by_object_identity(
             request.generator,
             bundles,
             seed=request.seed,
             params=request.params,
             policy=policy,
         )
+        if decisions:
+            devices = {decision.device for decision in decisions}
+            if len(devices) > 1:
+                raise RuntimeError(
+                    f"object-grouped generation used inconsistent devices: {sorted(devices)}"
+                )
+            gen_decision = decisions[0]
         for item, crop in zip(to_generate, crops, strict=True):
             placements.append(_placement(item, crop))
     elif generation_on and not to_generate and not supplied:
@@ -185,13 +195,19 @@ def reconstruct(request: ReconstructionRequest) -> ReconstructionResult:
 
 def _bundle_for(item: ObjectRequest) -> ConditioningBundle:
     if item.conditioning is not None:
-        return item.conditioning
+        return replace(
+            item.conditioning,
+            object_id=item.object_id,
+            frame_index=item.frame_index,
+            object_class=item.object_class or item.conditioning.object_class,
+        )
     return ConditioningBundle(
         appearance=item.appearance,
         mask=item.mask,
         bbox=item.bbox,
         frame_index=item.frame_index,
         object_id=item.object_id,
+        object_class=item.object_class,
     )
 
 
@@ -202,6 +218,7 @@ def _placement(item: ObjectRequest, crop: np.ndarray) -> Placement:
         mask=item.mask,
         object_id=item.object_id,
         frame_index=item.frame_index,
+        object_class=item.object_class,
     )
 
 

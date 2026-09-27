@@ -47,13 +47,14 @@ DEFAULT_OUTPUT_DIR = Path("demo/outputs/results")
 DEFAULT_CHECKPOINT = Path("demo/outputs/models/overfit_generator.pt")
 
 # PointStream multi-tier background ladder.
-# Each tier: (label, scale_resolution or None for native 1080p, target_bg_kbps, SVT-AV1 preset)
+# Each tier: (label, scale_resolution or None for native 1080p, unused_kbps, SVT-AV1 preset).
+# Background rate is CRF 63 / preset 7 via BackgroundCodec — the kbps slot is legacy.
 POINTSTREAM_TIERS = [
-    ("PS Extreme Starve (240p bg, 30k)", (426, 240), 30, 7),
-    ("PS Heavy Starve (360p bg, 70k)", (640, 360), 70, 7),
-    ("PS Low Teleop (540p bg, 140k)", (960, 540), 140, 7),
-    ("PS Standard (540p bg, 250k)", (960, 540), 250, 7),
-    ("PS Standard 1080p (native bg, 300k)", None, 300, 10),
+    ("PS Extreme Starve (240p bg, CRF63)", (426, 240), 0, 7),
+    ("PS Heavy Starve (360p bg, CRF63)", (640, 360), 0, 7),
+    ("PS Low Teleop (540p bg, CRF63)", (960, 540), 0, 7),
+    ("PS Standard (540p bg, CRF63)", (960, 540), 0, 7),
+    ("PS Standard 1080p (native bg, CRF63)", None, 0, 7),
 ]
 
 
@@ -100,9 +101,10 @@ def reconstruct_pointstream_video(
             with torch.no_grad():
                 pred = model(inp)
 
-            rgb = pred[:, :3]
-            pred_np = rgb.squeeze(0).permute(1, 2, 0).cpu().numpy()
-            pred_uint8 = np.clip((pred_np + 1.0) * 127.5, 0, 255).astype(np.uint8)
+            pred_np = pred.squeeze(0).permute(1, 2, 0).cpu().numpy()
+            has_alpha = pred_np.shape[2] >= 4
+            rgb_np = pred_np[:, :, :3]
+            pred_uint8 = np.clip((rgb_np + 1.0) * 127.5, 0, 255).astype(np.uint8)
             pred_bgr = cv2.cvtColor(pred_uint8, cv2.COLOR_RGB2BGR)
             alpha_canvas = None
             if pred.shape[1] == 4:
@@ -122,9 +124,14 @@ def reconstruct_pointstream_video(
             crop_h, crop_w = y2 - y1, x2 - x1
             if crop_h >= 8 and crop_w >= 8:
                 fitted_hand = cv2.resize(restored_crop, (crop_w, crop_h), interpolation=cv2.INTER_LINEAR)
-                if restored_alpha is not None:
-                    fitted_alpha = cv2.resize(restored_alpha[:, :, 0], (crop_w, crop_h), interpolation=cv2.INTER_LINEAR)
-                    alpha = (fitted_alpha.astype(np.float32) / 255.0)[:, :, None]
+                if has_alpha:
+                    from demo.models.matte import steep_alpha
+
+                    # Predicted alpha is sigmoid [0,1]. Steep gamma, not a 0.5 hard cut.
+                    a_crop = pred_np[:, :, 3]
+                    a_crop = steep_alpha(a_crop)
+                    a_full = cv2.resize(a_crop, (crop_w, crop_h), interpolation=cv2.INTER_LINEAR)
+                    alpha = a_full[:, :, None].astype(np.float32)
                 else:
                     alpha = create_box_feather_mask(crop_h, crop_w, margin_fraction=0.08)
 

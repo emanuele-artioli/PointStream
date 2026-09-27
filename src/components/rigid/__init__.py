@@ -21,7 +21,14 @@ REGISTRY.register(
     BackendSpec(
         name="racket-hull",
         target="src.components.rigid.strategy:RacketHull",
-        summary="Racket only: convex hull anchored to a player wrist.",
+        summary="Racket only: observed convex hull with a separate wrist association.",
+    )
+)
+REGISTRY.register(
+    BackendSpec(
+        name="racket-cross",
+        target="src.components.rigid.strategy:RacketCross",
+        summary="Racket only: wrist, tip, and continuous-polygon width cross.",
     )
 )
 REGISTRY.register(

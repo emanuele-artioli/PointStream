@@ -5,6 +5,11 @@
 **Author**: Antigravity (Pair Programming Session)  
 **Task Reference**: [20260916-bounded-pilot-release.md](20260916-bounded-pilot-release.md) / [05-foreground.md](05-foreground.md) / [02s-training-and-controls.md](02s-training-and-controls.md)
 
+> Historical pilot card. Its 16 September authorization is not a current release.
+> The fixed-GPU command examples below are superseded by the local fleet
+> dispatcher in `docs/workflow/long-jobs.md`; no campaign stage is released by
+> the 26 September infrastructure pilot.
+
 ---
 
 ## 1. Executive Summary & Authorization Status
@@ -130,9 +135,11 @@ A candidate model is promoted to Stage 2 if and only if on the disjoint developm
 
 ---
 
-## 6. Actual Executable Run Commands
+## 6. Historical fixed-host command examples
 
-When dispatched, pilot execution uses the tested and verified CLI tools:
+These commands document the prior workflow and must not be used for new runs.
+If this scientific stage is released again, dispatch it from the Mac using the
+current long-job workflow and preserve the stage's accepted inputs and controls.
 
 ```bash
 # 1. Environment & GPU Isolation (GPU 1)
@@ -200,5 +207,4 @@ python scripts/adapt_generation_result.py \
 - **Control Evidence**: All controls verified (same-seed bitwise identity, conditioning sensitivity, non-trivial generation, and blank/zero pose calibration: matched 31.98 dB > shuffled 31.75 dB > blank 30.99 dB).
 - **Deployment Accounting**: Per-video fitted weights (217.7 MB) not amortized across frames; if charged, wire rate expands to ~214 MB. Shared model unverified across domains. Claims `rd_claim=false` and `speed_claim=false` recorded.
 - **Pilot Outcome**: REJECTED (Failed Stage 2 Promotion). pix2pix on disjoint development frames 16..31 failed both Pareto rate-distortion (-1.96 dB PSNR at 6.67 MB wire bytes vs 33.94 dB at 1.00 MB baseline) and client decode latency (7.03s vs 1.30s baseline). Stage 2 remains unreleased; confirmation sources remain quarantined.
-
 

@@ -1,85 +1,54 @@
-# Long jobs: quiet monitoring and bounded adaptation
+# Long jobs: local dispatch and bounded research
 
-## Launch and reporting policy
+## Dispatch from the Mac
 
-Use the September evaluation campaign
-[allocation and reporting policy](session/evaluation-campaign/plan.md#shared-servers-and-timing-evidence)
-for its jobs: opportunistic free GPUs, aggregate per-host CPU cap, bounded stages,
-and actionable-event reporting. For other jobs, ask once at launch for reporting
-preference unless it is already known. Reuse
-that answer for the job. The fallback is file logging plus actionable events;
-periodic chat reports require an explicit schedule. Ten-minute progress logging
-is independent of chat reporting and hourly checkpointing.
-
-Use `experiments.jobs.monitor`, a Python supervisor with no model calls in its
-health loop. It writes `command.log`, timestamped `progress.log`, atomic
-`status.json`, and durable `events/*.json`. A quiet heartbeat is not evidence of
-work: only an explicit progress update changes `last_progress`. An uninstrumented
-job therefore gets a suspected-stall event after the configured interval, not a
-claim that it hung. The monitor checks child exit and a wall-time budget (ten-second polling plus delivery/termination grace);
-it does not infer GPU health from utilization. The budget applies to the whole
-command, not each subprocess or GPU separately.
-
-Run from one checkout with its pinned Python environment activated. Put durable
-job records under the configured external data root, outside the code tree.
-For example, substitute an actual job directory and owning Codex task ID:
+Use `experiments.jobs.fleet` for each remote CUDA request. The local coordinator
+inspects all selected hosts, rejects incomplete probes, estimates job resources,
+selects a compatible idle GPU, snapshots the code, and launches the existing
+remote supervisor. There is no persistent queue and no remote Codex event
+delivery dependency.
 
 ```bash
-python -m experiments.jobs.monitor start /absolute/data/jobs/ladder-001 \
-  --budget-hours 12 --thread TASK_ID \
-  --report-in-hours 8 --quiet-hours 8 \
-  --cpu-threads 8 --claim-gpu GPU-UUID \
-  --claims-dir /absolute/data/jobs/claims \
-  --command python -m experiments.jobs.codec run \
-  /absolute/data/policies/ladder.json /absolute/data/campaigns/ladder-001
+python -m experiments.jobs.fleet inspect --hosts gpu1 gpu2 gpu3 gpu4 gpu5 gpu6
+python -m experiments.jobs.fleet launch --hosts gpu5 gpu6 \
+  --gpu-memory-mib 12000 --cpu-threads 8 --budget-hours 2 \
+  --require-path /home/itec/emanuele/pointstream-data/assets/dataset/alcaraz_highlights/segmentations/scene_000 \
+  --require-path /home/itec/emanuele/pointstream-data/outputs/bp21-headroom/clips/alcaraz_highlights/scene_000/window \
+  -- /home/itec/emanuele/.conda/envs/pointstream/bin/python -c \
+  'import os; from experiments.tier.run import main; raise SystemExit(main(["--tiers", "fast", "--frames", "8", "--out", os.path.join(os.environ["PS_JOB_DIR"], "report.json")]))'
 ```
 
-`--cpu-threads` is required for every monitored command, including CPU-only
-jobs. Omit `--claim-gpu` only for a CPU-only job. The thread-related environment
-variables are cooperative limits; they do not constrain an arbitrary external
-binary that ignores them.
+Admission requires no GPU compute process, at most 256 MiB memory use, at most
+5% utilization, enough free memory for the declared estimate plus 4 GiB, and
+CPU headroom for the requested threads. The monitor claims by canonical host
+and GPU UUID and repeats the occupancy/memory check immediately before launch.
+Pass only compatible servers with `--hosts`; the dispatcher cannot infer
+application-specific GPU requirements from an arbitrary command. Do not infer
+availability from utilization or scheduler state. Hardware ordering
+(Ada, A6000, RTX 8000, GV100) is a fallback heuristic until comparable workload
+timings exist. When they do, pass `--prefer-gpu-name SUBSTRING` once per model
+family in measured performance order; the selected order is recorded in the
+manifest. The present pilot has no comparable cross-model timing.
 
-The launcher detaches the supervisor. A sandbox that kills descendants when a
-shell call ends requires an authorized host launch; `setsid` alone cannot defeat
-sandbox lifecycle cleanup. Inspect `supervisor.log` and `status.json` once after
-launch. Do not leave an agent polling them. Use `--codex /absolute/path/to/codex`
-when Codex is not on the supervisor's PATH. Omitting `--thread` writes events to
-files without attempting to wake an agent.
+The default snapshot is clean `HEAD`. Explicitly add only intended changes with
+`--include-change PATH` and new files with `--include-untracked PATH`. The local
+manifest records code and patch checksums, command, runtime environment, GPU,
+and remote run directory. Jobs use the shared external data root and unique
+remote run directories; they never overwrite a working checkout.
 
-Change cadence without restarting the command:
+The remote supervisor survives SSH disconnection and laptop sleep. Inspect a
+job with `python -m experiments.jobs.fleet status JOB_ID`; stop it with
+`python -m experiments.jobs.fleet cancel JOB_ID`. Retrieve result files from the
+reported remote directory with `scp`. The supervisor never silently replays or
+migrates a running job. If an outside GPU process appears, it stops only its own
+affected child, preserves artifacts, and marks timing contaminated. Claims
+coordinate participating PointStream jobs but cannot stop other users allocating
+a GPU later; free memory also cannot guarantee that an oversized job avoids OOM.
 
-```bash
-# One digest eight hours from now, then ask again; silence includes completion.
-python -m experiments.jobs.monitor schedule /absolute/data/jobs/ladder-001 \
-  --report-in-hours 8 --quiet-hours 8
-# Hourly reports while the job runs.
-python -m experiments.jobs.monitor schedule /absolute/data/jobs/ladder-001 --every-hours 1
-# Stop periodic reports; retain actionable events.
-python -m experiments.jobs.monitor schedule /absolute/data/jobs/ladder-001
-```
-
-Deadlines are persisted UTC Unix timestamps. Quiet hours defer actionable events
-as well as routine reports; `schedule --urgent-during-quiet` opts into immediate
-event delivery. No answer to a one-shot digest means no recurring reports.
-Completion ends the supervisor after pending delivery and any requested first
-digest. To report on an already-finished job later, read its saved status.
-
-The Codex adapter calls the installed `codex queue --thread ... --message ...`
-only for due events. It needs an available app server and authenticated CLI on
-the execution host. It writes an acknowledgement only after successful queueing;
-this is transport acceptance, not proof that the agent read the message. Failed
-delivery stays on disk for retry. Delivery is at least once: a crash between
-queueing and acknowledgement can duplicate a message. Stable event IDs let the
-receiving task suppress duplicate reports. Repeated publication of the same
-decision in a stage does not create another wakeup merely because its timestamp
-changed. A digest should read current status
-and new results, not reread the full log or restart ten-minute agent checks.
-
-`serve JOB_DIRECTORY` retries undelivered events after supervisor restart. It
-never relaunches a command recorded as running: its exit status is then unknown,
-so it reports interruption for inspection. It does not adopt or kill a process
-by an unverified saved PID. The monitor does not manufacture training checkpoints;
-the launched trainer must still provide and verify hourly checkpoint/resume.
+Use the lower-level `experiments.jobs.monitor` directly only for CPU-only local
+work or existing integration tests. Its remote supervisor writes `command.log`,
+`status.json`, and durable state in the job directory. Trainers remain
+responsible for their own checkpoints and verified resume behavior.
 
 ## Bounded paired codec ladders
 

@@ -1,8 +1,12 @@
-> Superseded for new work after PR #88: use [submission search](submission-search.md). This file records the original recovery assignment.
+> Historical recovery assignment, retired 26 September 2026. Its harness, budget,
+> authorization, reporting and fixed-host instructions are no longer current.
+> New execution uses root `AGENTS.md`, `docs/setup.md` and `docs/workflow/long-jobs.md`.
 
 # Overnight recovery: residual fidelity, credible evaluation, generator readiness
 
-Execute this assignment when the user supplies this file as a prompt. Budget: eight hours from launch, including validation and reporting. Parallel subagents in separate worktrees (or isolated workspaces) can be dispatched across harnesses (Antigravity with `invoke_subagent`, Cursor with `Task`, Claude Code with `Agent`, or Codex), provided they are configured to use weaker/cheaper models for subagent lanes (such as Gemini Flash/Flash-Lite on Antigravity, Composer on Cursor, Haiku/Sonnet on Claude) to conserve token budgets; a harness without subagent support or running sequentially can execute lanes A, B, then C in order. This is development work, not a Gate B confirmation campaign.
+The following records the original eight-hour recovery assignment and its
+authorization context. It is preserved for historical evidence only and does
+not authorize execution under the current workflow.
 
 ## Starting point and authority
 

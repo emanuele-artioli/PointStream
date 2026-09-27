@@ -1,4 +1,5 @@
-> Historical dispatch, superseded after the Gate A/B audit. Use [overnight recovery](overnight-recovery.md) for new work.
+> Historical dispatch, superseded after the Gate A/B audit and retired on
+> 26 September 2026. The host and harness instructions below are not current.
 
 # Overnight Gate A execution prompt
 

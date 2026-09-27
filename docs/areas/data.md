@@ -1,5 +1,68 @@
 # Data Area
 
+## Unified SAM3.1 observation pilot — 2026-09-27
+
+Implemented the shared observation path in `src/contracts/observation.py` and
+`src/components/perception/`, registered DWPose beside YOLO, integrated the
+SAM3.1 multiplex backend, and added the frozen 3-scene × 16-frame development
+selection in [`manifests/sam31_pilot_v1.json`](../../manifests/sam31_pilot_v1.json).
+Dataset preparation writes source/frame/object identities, typed racket geometry,
+transforms, model-specific views, and artifact digests outside the code tree.
+Runtime and offline tracking policies stay distinct.
+
+The completed bounded audit is job `20260927T100838Z-ad9440f9` under
+`/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-05`.
+It used SAM3.1 source revision `2345a4ad109ac29c569da749c91d84f10dc08c40`,
+checkpoint SHA-256 `0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6`,
+and gpu5 RTX 6000 Ada UUID `GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162`. The code
+snapshot records HEAD `768945c55e6a5a33d817be1e150824344d909db2`, selected tracked
+patch digest `d7dd6782a75adddc3b70704038c979682acf85c6b9824824cb9d4e09a8253373`,
+and snapshot SHA-256 `83eed424b2d7d512019793b9cc067278e28c96c9fc4c3f50ba98534c6028d7c8`.
+The dispatch logs and `audit.json` are the record for the exact command, full
+source identities, environment, and timings. SAM3.1 peaked at 17,200,521,728
+allocated and 21,864,906,752 reserved bytes.
+
+The audit emitted 317 view records and hashed 3,045 unique sample files. Player
+coverage was 192/192 observations. Racket coverage was 63/96; the panning scene
+had 0/16 racket masks, and the small-object scene had 32/48. Visual review found
+unresolved racket failures in all three scenes. The explicit decisions in
+[`manifests/sam31_pilot_visual_review_v1.json`](../../manifests/sam31_pilot_visual_review_v1.json)
+mark every racket-only and joint view ineligible; player views remain available
+as development samples. The completed external run's per-scene counts and
+artifacts are in `audit.json`, `dataset_manifest.json`, and `views.jsonl`.
+
+The review overlay has not yet been written into the external run: fleet rejected
+the bounded finalization launch during host/path revalidation, including a DNS
+resolution failure, so no remote files changed. The checked-in review decisions
+and tested finalizer are ready to apply when a compatible host is reachable. The
+current external manifest remains inactive and predates those sample-level
+quarantine annotations. This pilot is from exposed development
+material, does not regenerate eligible train/validation splits, and its client
+payload did not carry pose or racket geometry. Therefore the exported training
+conditioning is not yet proven identical to decoded client conditioning, and no
+training entrypoint has been redirected. The reserved confirmation sources were
+excluded. Run the audit through the fleet after inspecting all six hosts; keep
+its output under `PS_DATA_ROOT` and finalize sample hashes and visual quarantine
+with:
+
+```bash
+python -m experiments.jobs.fleet inspect --hosts gpu1 gpu2 gpu3 gpu4 gpu5 gpu6
+python -m experiments.jobs.fleet launch \
+  --gpu-memory-mib 128 --cpu-threads 1 --budget-hours 0.05 \
+  --require-path /home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-05/audit.json \
+  --require-command /home/itec/emanuele/.conda/envs/pointstream/bin/python \
+  --include-untracked scripts/finalize_sam31_manifest.py \
+  --include-untracked manifests/sam31_pilot_visual_review_v1.json \
+  -- \
+  /home/itec/emanuele/.conda/envs/pointstream/bin/python scripts/finalize_sam31_manifest.py \
+  --run-dir /home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-05 \
+  --visual-review manifests/sam31_pilot_visual_review_v1.json
+```
+
+After revalidation succeeds, this is a bounded CPU finalization step; it does not
+rerun inference or make the manifest active. See the codec and generation area
+notes for transport scope and backend limitations.
+
 ## Coordinator source reservation — 16 September 2026
 
 [The reservation manifest](../../manifests/evaluation_20260916_coordinator_confirmation_reservation.json)

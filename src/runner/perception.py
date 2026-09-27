@@ -74,12 +74,34 @@ def subjects_from_bag(bag: Mapping[str, Any]) -> tuple[ObjectRequest, ...]:
 
 def as_detection(item: ObjectRequest) -> Detection:
     x1, y1, x2, y2 = item.bbox
-    class_name = "sports ball" if "ball" in item.object_id else "person"
+    class_name = item.object_class or _legacy_object_class(item.object_id)
     return Detection(
         class_name=class_name,
         bbox=Box(float(x1), float(y1), float(x2), float(y2)),
         track_id=item.object_id,
     )
+
+
+def _legacy_object_class(object_id: str) -> str:
+    """Read old identity-only records through an explicit compatibility rule."""
+    lowered = object_id.casefold()
+    if "racket" in lowered:
+        return "tennis racket"
+    if "ball" in lowered:
+        return "sports ball"
+    return "person"
+
+
+def render_runtime_conditioning_view(*args: Any, **kwargs: Any) -> Any:
+    """Render the canonical appearance/mask/pose view used by runtime callers.
+
+    Kept as a lazy runner adapter so the offline audit and runtime integration
+    both call the same reversible component transform without importing image
+    libraries during a config-only import.
+    """
+    from src.components.perception.conditioning import render_conditioning_view
+
+    return render_conditioning_view(*args, **kwargs)
 
 
 def filter_selected(
@@ -146,6 +168,7 @@ __all__ = [
     "filter_selected",
     "metadata_bytes",
     "object_tuple",
+    "render_runtime_conditioning_view",
     "schedule_bytes",
     "subjects_from_bag",
 ]

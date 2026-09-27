@@ -181,6 +181,103 @@ def test_supervisor_enforces_budget_without_agent(
     assert monitor.read_json(tmp_path / "status.json")["status"] == "budget_exhausted"
 
 
+def test_gpu_occupancy_check_ignores_owned_processes_and_reports_foreign_ones(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        monitor.subprocess,
+        "run",
+        lambda *args, **kwargs: SimpleNamespace(
+            stdout="GPU-ours, 11\nGPU-ours, 22\nGPU-other, 33\n"
+        ),
+    )
+    groups = {11: 100, 22: 200, 33: 300}
+    monkeypatch.setattr(monitor.os, "getpgid", lambda pid: groups[pid])
+    assert monitor.foreign_gpu_processes("GPU-ours", 100) == [22]
+
+
+def test_gpu_occupancy_query_failure_is_not_treated_as_free(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def failed_query(*args: Any, **kwargs: Any) -> Any:
+        raise monitor.subprocess.CalledProcessError(1, "nvidia-smi")
+
+    monkeypatch.setattr(monitor.subprocess, "run", failed_query)
+    assert monitor.foreign_gpu_processes("GPU-ours", 100) is None
+
+
+def test_cancel_file_stops_owned_process_group_and_releases_cpu_claim(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from experiments.jobs import claims
+
+    setup_job(tmp_path)
+    (tmp_path / "events").mkdir()
+    (tmp_path / "cancel.json").write_text('{"requested": true}')
+    claims_dir = tmp_path / "claims"
+    monitor.write_json(
+        tmp_path / "request.json",
+        {
+            "command": ["synthetic-worker"],
+            "cwd": str(tmp_path),
+            "budget_seconds": 60,
+            "thread": None,
+            "codex": "codex",
+            "claims": {"cpu_threads": 1, "claims_dir": str(claims_dir), "available_cores": 4},
+        },
+    )
+    child = SimpleNamespace(pid=123, poll=lambda: None)
+    stopped: list[Any] = []
+    monkeypatch.setattr(monitor.subprocess, "Popen", lambda *args, **kwargs: child)
+    monkeypatch.setattr(monitor, "stop_child", lambda process: stopped.append(process) or True)
+
+    assert monitor.supervise(tmp_path) == 0
+    assert stopped and all(process is child for process in stopped)
+    assert monitor.read_json(tmp_path / "status.json")["status"] == "cancelled"
+    assert not any(
+        item["allocations"] for item in claims.get_claims_status(claims_dir)["cpu_hosts"].values()
+    )
+
+
+def test_gpu_claim_race_is_reported_as_launch_failure_without_starting_child(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from experiments.jobs import claims
+
+    setup_job(tmp_path)
+    (tmp_path / "events").mkdir()
+    claims_dir = tmp_path / "claims"
+    monitor.write_json(
+        tmp_path / "request.json",
+        {
+            "command": ["synthetic-worker"],
+            "cwd": str(tmp_path),
+            "budget_seconds": 60,
+            "thread": None,
+            "codex": "codex",
+            "claims": {
+                "gpu": "GPU-busy",
+                "min_free_memory_mb": 16000,
+                "cpu_threads": 1,
+                "claims_dir": str(claims_dir),
+            },
+        },
+    )
+
+    def busy_device(**kwargs: Any) -> Any:
+        raise claims.DeviceBusyError("GPU was taken between inspection and claim")
+
+    def unexpected_child(*args: Any, **kwargs: Any) -> Any:
+        pytest.fail("a child must not start after GPU claim failure")
+
+    monkeypatch.setattr(claims, "acquire_device_claim", busy_device)
+    monkeypatch.setattr(monitor.subprocess, "Popen", unexpected_child)
+    assert monitor.supervise(tmp_path) == 1
+    status = monitor.read_json(tmp_path / "status.json")
+    assert status["status"] == "failed"
+    assert "GPU claim failed" in status["error"]
+
+
 @pytest.mark.parametrize("stopped", [False, True])
 def test_spawned_child_identity_write_failure_retains_claim_until_group_stops(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, stopped: bool

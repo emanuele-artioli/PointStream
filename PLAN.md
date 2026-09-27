@@ -57,7 +57,7 @@ are reviewed below; only the evidence reuse tasks in the current brief are relea
 | [Codec](docs/areas/codec.md) | #127 saved-data decomposition returned; narrow audit corrections open | E04 background coverage and paired removal |
 | [Generation](docs/areas/generation.md) | #129 merged; blank completed, fitted checkpoint not promoted | E05 saved-checkpoint evidence; Stage2 unreleased |
 | [Data](docs/areas/data.md) | Preserve exposure history; six fresh matches preferred but lower prospective count permitted | E01 split/protocol, E07 confirmation and second domain after tennis win |
-| [Infrastructure](docs/areas/infrastructure.md) | Existing detached monitoring; verify host availability at each launch | Per-host CPU <=90% available; any free GPU; no cleanup helper |
+| [Infrastructure](docs/areas/infrastructure.md) | Local fleet dispatcher pilot passed on gpu5/gpu6; no persistent queue | Inspect every candidate, claim/recheck one compatible GPU per job, record immutable snapshot provenance; no cleanup helper |
 | [Paper](docs/areas/paper.md) | Separate repo; no new competitive evidence certified by repairs | E08 setup/structure early, final claims after accepted results |
 
 ## Module Scorecards & Operational Headroom
@@ -93,8 +93,8 @@ not another unbounded evidence-repair cycle or execution sweep.
 | Codex | Neural weights/whole-model readiness, confirmation provenance and paper integration |
 
 Follow [the checkpoint and paste-ready task scopes](docs/workflow/session/evaluation-campaign/tasks/20260917-strategy-roadblock.md).
-Reports return to Clean project state and dispatch,
-`01a0a923-4c5e-71c3-8993-5c68f2a76bb4`. Preserve paused worker worktrees.
+The older Clean project state and dispatch task ID,
+`01a0a923-4c5e-71c3-8993-5c68f2a76bb4`, is historical routing only. Preserve paused worker worktrees.
 Confirmation scoring remains unauthorized. September20 is at risk; neural anchor,
 valid neural baseline clearance, confirmed tennis win and second domain remain
 submission requirements. No scope/date change or final procedure freeze.

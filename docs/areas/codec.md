@@ -34,6 +34,25 @@ PR #140 merged as `7966827`. Implemented and verified the complete production mo
    - Long Horizon (192 frames / 8.0s): Rung C1 ($26,680\text{ B}$) beats VVC ($77,200\text{ B}$) by **65.4% bitrate reduction** ($\text{OKS}=0.92$, $\text{PSNR}_{\text{fg}}=35.8\text{ dB}$). Rung C2 ($30,780\text{ B}$) beats VVC by **60.1%** ($\text{OKS}=0.96$, $\text{PSNR}_{\text{fg}}=38.2\text{ dB}$).
    - Short Horizon (48 frames / 2.0s): Rung C1 ($14,380\text{ B}$) beats VVC ($21,300\text{ B}$) by **32.5% bitrate reduction**.
 4. **All 5 Component Scorecards Frozen**: Segmentation, Background, Appearance, Motion Metadata, and Residuals are now frozen in the winning operational configuration.
+## SAM3.1 pilot transport scope — 2026-09-27
+
+The 16-frame-per-scene audit completed a fresh-process PointStream decode with
+no source paths available to the decoder. It measured JPEG appearance references,
+bbox metadata, and exact PSM1 mask roundtrip (zero bbox-coordinate error). It did
+not exercise pose/motion payloads, background or residual video coding, generation,
+or a native video codec. Do not describe this as a full codec run or an end-to-end
+quality result.
+
+Measured semantic payload sizes were 649,798 B for
+`alcaraz_highlights_scene_000`, 1,175,424 B for
+`alcaraz_highlights_scene_010`, and 3,202,610 B for
+`alcaraz_perricard_scene_007`. Full-frame reconstruction scored 6.04–7.82 dB PSNR
+and 0.0044–0.0069 SSIM because no background was reconstructed; these numbers
+measure an intentionally incomplete reconstruction and are not codec quality
+evidence. The pan scene's absent racket masks and visually false racket masks in
+the other scenes also make the mask roundtrip a serialization check, not a
+segmentation-accuracy result. See the external run's `audit.json` for per-scene
+measurements and the data-area note for the immutable run identity.
 
 ## Pilot return audit — 16 September 2026
 

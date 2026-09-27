@@ -23,6 +23,16 @@ REGISTRY.register(
 )
 REGISTRY.register(
     BackendSpec(
+        name="sam31",
+        target="src.components.segmentation.sam31:Sam31SequenceSegmenter",
+        aliases=("sam3.1", "sam3.1-multiplex"),
+        capabilities=frozenset({CAP_INSTANCE_MASKS}),
+        defaults={"model_name": "sam3.1_multiplex.pt"},
+        summary="SAM3.1 multiplex video segmentation with causal runtime policy.",
+    )
+)
+REGISTRY.register(
+    BackendSpec(
         name="sam3",
         target="src.components.segmentation.sam3:Sam3Segmenter",
         capabilities=frozenset({CAP_INSTANCE_MASKS}),
