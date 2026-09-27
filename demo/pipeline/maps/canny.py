@@ -2,9 +2,8 @@
 
 Canny runs on luma (OpenCV Rec.601 gray). The gallery writes one recipe at
 the AV1 ladder resolutions (180 / 240 / 360 / 540 / 720 / 1080): thresholds
-100/200, pre-blur 0.8, Canny after area-downscale, then keep pixels within
-2px of the YOLOE contour and the DW-Pose strokes. The default ``canny`` rung
-is 240p.
+40/100, pre-blur 2.0, Canny after area-downscale, then a 3-frame median so a
+one-frame speck does not survive. The default ``canny`` rung is 240p.
 
 Native payload (``payload.bin``)
 --------------------------------
@@ -62,11 +61,10 @@ else:
 HYSTERESIS_PAIRS: tuple[tuple[int, int], ...] = ((50, 150), (100, 200), (150, 250))
 DEFAULT_LO, DEFAULT_HI = HYSTERESIS_PAIRS[0]
 
-# One recipe, three resolutions. Thresholds 100/200, pre-blur 0.8, Canny on
-# the downscaled luma, then keep pixels within GATE_RADIUS of the YOLOE
-# contour and DW-Pose strokes. That is the map that stays under AV1 CRF 63.
-TUNED_LO, TUNED_HI = 100, 200
-TUNED_BLUR = 0.8
+# Denser and steadier than 100/200 with blur 0.8: weaker hysteresis, more
+# pre-blur, Canny on the downscaled luma, then a 3-frame median.
+TUNED_LO, TUNED_HI = 40, 100
+TUNED_BLUR = 2.0
 GATE_RADIUS = 2
 CANNY_RUNGS: tuple[tuple[str, int, int, int, float, bool], ...] = (
     ("canny_180", 180, TUNED_LO, TUNED_HI, TUNED_BLUR, True),
@@ -115,6 +113,19 @@ def frame_to_luma(frame: np.ndarray) -> np.ndarray:
     if channels == 4:
         return cv2.cvtColor(arr, cv2.COLOR_BGRA2GRAY)
     raise ValueError(f"unsupported channel count {channels}")
+
+
+def stabilize_masks(masks: Sequence[np.ndarray]) -> list[np.ndarray]:
+    """3-frame median. An edge pixel must appear in at least two of three frames."""
+    planes = [(np.asarray(mask) > 0).astype(np.uint8) for mask in masks]
+    if len(planes) < 3:
+        return planes
+    stable: list[np.ndarray] = []
+    for index, plane in enumerate(planes):
+        window = planes[max(0, index - 1) : index + 2]
+        stack = np.stack(window, axis=0)
+        stable.append((np.median(stack, axis=0) >= 0.5).astype(np.uint8))
+    return stable
 
 
 def extract_canny_frame(frame: np.ndarray, lo: int = DEFAULT_LO, hi: int = DEFAULT_HI) -> np.ndarray:
@@ -460,6 +471,7 @@ def write_canny_map(
     filled_masks: Sequence[np.ndarray] | None = None,
     stroke_masks: Sequence[np.ndarray] | None = None,
     gate_radius: int = GATE_RADIUS,
+    stabilize: bool = False,
 ) -> MapStream:
     """Extract, pack, preview, and write sidecar for an in-memory clip."""
     if not frames:
@@ -492,6 +504,9 @@ def write_canny_map(
     else:
         masks_full = extract_canny_frames(frames, lo=lo, hi=hi)
         masks = [resize_binary_mask(mask, pack_h, pack_w) for mask in masks_full]
+    if stabilize:
+        masks = stabilize_masks(masks)
+        masks_full = masks
     if filled_masks is not None or stroke_masks is not None:
         if filled_masks is None or stroke_masks is None:
             raise ValueError("task gate needs both filled masks and pose strokes")
@@ -624,6 +639,7 @@ def write_canny_ladder(
                 stroke_masks=stroke_masks,
                 gate_radius=gate_radius,
                 preview_height=preview_height,
+                stabilize=True,
             )
         )
     return streams

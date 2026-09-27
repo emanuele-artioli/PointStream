@@ -57,6 +57,18 @@ def test_extract_is_not_rgb_overlay() -> None:
     assert mask.shape == (32, 40)
 
 
+def test_stabilize_drops_one_frame_speck() -> None:
+    from demo.pipeline.maps.canny import stabilize_masks
+
+    base = np.zeros((8, 8), dtype=np.uint8)
+    base[2:6, 2] = 1
+    speck = base.copy()
+    speck[0, 0] = 1
+    stable = stabilize_masks([base, speck, base])
+    assert int(stable[1][0, 0]) == 0
+    assert int(stable[1][2, 2]) == 1
+
+
 def test_higher_hysteresis_drops_weak_edges() -> None:
     weak = _box_frames(n=1, contrast=40)[0]
     low = extract_canny_frame(weak, lo=50, hi=150)

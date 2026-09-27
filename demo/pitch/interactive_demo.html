@@ -1708,7 +1708,7 @@ class StreamingCodecAdapter(Protocol):
             if (!rel) return '';
             if (/^https?:/.test(rel)) return rel;
             let url = mapsIndexBase + rel.replace(/^\/+/, '');
-            if (/\.webm$/i.test(url)) url += '?v=poseada';
+            if (/\.webm$/i.test(url)) url += '?v=canny40';
             if (/\.mp4$/i.test(url)) url += '?v=segav1';
             return url;
         }
