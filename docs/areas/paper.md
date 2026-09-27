@@ -87,10 +87,10 @@ The manuscript is maintained in a dedicated git repository at `67a9ea6275d3d9785
   - Total allowed: **28 pages**.
 - **Latest validation (2026-09-09)**: paper commit `55e4bc4` builds successfully with the Gate A/B audit caveat. The previous 30-page/9-page-appendix status was stale; the current complete PDF has 27 pages. Recheck body and appendix boundaries before allocating final-result space.
 
-### Headline Claim Governance
-- A submission must demonstrate where an object-centric semantic video codec wins over conventional baselines.
-- The headline claim must land in the regime where PointStream strictly wins; if no winning regime is established, that is surfaced early rather than papering over a loss.
-- Secondary findings (such as generative engines failing to beat pasted references on PSNR) are documented transparently as empirical contributions.
+### Evidence and Claim Scope
+- Report the configuration search transparently, including attempted axes, negative results, and the boundary of the supported claim.
+- Scope each claim to accepted evidence and its tested regime. Do not imply an advantage where the measured results do not support one.
+- Infrastructure smoke runs validate execution only; they do not become codec evidence without the relevant scientific protocol and review.
 
 ---
 

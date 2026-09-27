@@ -1,32 +1,38 @@
-"""Pluggable backends. One subpackage per axis, each with its own Registry.
+"""Pluggable backends, loaded from cheap registry exports on demand.
 
-Importing this package must stay cheap: registry tables hold import strings, not
-classes. Heavy backends load only when ``Registry.build`` is called.
-
-Per-axis packages are owned by Phase B workstreams. This module only re-exports
-their ``REGISTRY`` objects so one command can list every backend. Do not add
-implementations here.
+The registry package must remain importable in dataset-specific environments
+that do not install every model's optional dependencies. Accessing a named
+registry imports only that axis; :func:`all_registries` explicitly loads them
+all for the CLI and full application.
 """
 
 from __future__ import annotations
 
-from src.components.appearance import REGISTRY as APPEARANCE
-from src.components.background import REGISTRY as BACKGROUND
-from src.components.codec import REGISTRY as CODECS
-from src.components.detection import REGISTRY as DETECTORS
-from src.components.domain import REGISTRY as DOMAINS
-from src.components.generation import REGISTRY as GENERATORS
-from src.components.metrics import REGISTRY as METRICS
-from src.components.motion import REGISTRY as MOTION
-from src.components.pose import REGISTRY as POSE
-from src.components.rigid import REGISTRY as RIGID
-from src.components.scene import REGISTRY as SCENE
-from src.components.segmentation import REGISTRY as SEGMENTERS
-from src.components.selection import REGISTRY as SELECTION
-from src.components.temporal import REGISTRY as TEMPORAL
-from src.components.tracking import REGISTRY as TRACKING
-from src.components.transport import REGISTRY as TRANSPORT
-from src.contracts.registry import Registry
+from importlib import import_module
+import sys
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.contracts.registry import Registry
+
+_REGISTRY_MODULES = {
+    "APPEARANCE": ("appearance", "appearance"),
+    "BACKGROUND": ("background", "background"),
+    "CODECS": ("codec", "codec"),
+    "DETECTORS": ("detection", "detector"),
+    "DOMAINS": ("domain", "domain"),
+    "GENERATORS": ("generation", "generation"),
+    "METRICS": ("metrics", "metric"),
+    "MOTION": ("motion", "motion"),
+    "POSE": ("pose", "pose"),
+    "RIGID": ("rigid", "rigid"),
+    "SCENE": ("scene", "scene"),
+    "SEGMENTERS": ("segmentation", "segmenter"),
+    "SELECTION": ("selection", "selection"),
+    "TEMPORAL": ("temporal", "temporal"),
+    "TRACKING": ("tracking", "tracking"),
+    "TRANSPORT": ("transport", "transport"),
+}
 
 __all__ = [
     "APPEARANCE",
@@ -51,45 +57,41 @@ __all__ = [
 ]
 
 
-def all_registries() -> dict[str, Registry[object]]:
-    """Every axis registry, keyed by the axis name used in error messages."""
+def __getattr__(name: str) -> object:
+    target = _REGISTRY_MODULES.get(name)
+    if target is None:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    module_name, _ = target
+    value = getattr(import_module(f"src.components.{module_name}"), "REGISTRY")
+    globals()[name] = value
+    return value
+
+
+def __dir__() -> list[str]:
+    return sorted(set(globals()) | set(__all__))
+
+
+def all_registries() -> dict[str, "Registry[object]"]:
+    """Load each axis registry, keyed by the name used in error messages."""
     return {
-        "appearance": APPEARANCE,
-        "background": BACKGROUND,
-        "codec": CODECS,
-        "detector": DETECTORS,
-        "domain": DOMAINS,
-        "generator": GENERATORS,
-        "metric": METRICS,
-        "motion": MOTION,
-        "pose": POSE,
-        "rigid": RIGID,
-        "scene": SCENE,
-        "segmenter": SEGMENTERS,
-        "selection": SELECTION,
-        "temporal": TEMPORAL,
-        "tracking": TRACKING,
-        "transport": TRANSPORT,
+        axis: getattr(sys.modules[__name__], exported)
+        for exported, (_, axis) in _REGISTRY_MODULES.items()
     }
 
 
 def describe_all() -> str:
-    """Readable table of every registered backend on every axis."""
+    """Readable table of every backend on every axis."""
     return "\n\n".join(registry.describe() for registry in all_registries().values())
 
 
 def validate_config(config: object) -> None:
-    """Run the third validation pass against every axis registry.
-
-    This is the join point for Phase B: each stream populated its own table,
-    and a config is only fully wired once every named backend exists here.
-    """
+    """Validate a config against all loaded registries."""
     from src.contracts.config import PointstreamConfig, validate_backends
 
     if not isinstance(config, PointstreamConfig):
         raise TypeError(f"expected PointstreamConfig, got {type(config).__name__}")
     validate_backends(
         config,
-        generators=GENERATORS,
+        generators=getattr(sys.modules[__name__], "GENERATORS"),
         registries=all_registries(),
     )

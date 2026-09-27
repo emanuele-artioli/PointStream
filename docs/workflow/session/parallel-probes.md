@@ -1,9 +1,13 @@
 # Parallel probes after the overlap ladder — 2026-09-11
 
+> Historical proposal, retired 26 September 2026. Harness-specific dispatch
+> and reporting instructions below are not current. Any newly released run must
+> use the local fleet workflow in `docs/workflow/long-jobs.md`.
+
 Prepared for the user's request to clean up and dispatch efficient experiments to
 Cursor or Antigravity. No jobs are launched by this document update. Give the
-whole file plus the chosen lane to a worker; execution of that lane is authorized
-when the user dispatches it. All scientific outputs are development-only.
+whole file plus the chosen lane to a worker; this former dispatch instruction is
+preserved as history. All scientific outputs described here were development-only.
 
 ## Shared contract and state
 

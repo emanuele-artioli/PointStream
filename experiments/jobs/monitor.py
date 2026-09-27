@@ -51,13 +51,54 @@ def publish_progress(stage: str, completed: int, *, decision: str | None = None)
         )
 
 
+def foreign_gpu_processes(device_uuid: str, own_process_group: int) -> list[int] | None:
+    """Return processes using a claimed GPU outside this job's process group.
+
+    ``None`` means the occupancy query failed, which is treated as unsafe by the
+    supervisor. A result list is only an observation: external users are never
+    signalled or stopped.
+    """
+    try:
+        result = subprocess.run(
+            [
+                "nvidia-smi",
+                "--query-compute-apps=gpu_uuid,pid",
+                "--format=csv,noheader,nounits",
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=10,
+        )
+    except (subprocess.SubprocessError, FileNotFoundError, OSError):
+        return None
+    foreign: set[int] = set()
+    for line in result.stdout.splitlines():
+        fields = [part.strip() for part in line.split(",")]
+        if len(fields) < 2 or fields[0] != device_uuid:
+            continue
+        try:
+            pid = int(fields[1])
+        except ValueError:
+            return None
+        try:
+            process_group = os.getpgid(pid)
+        except ProcessLookupError:
+            continue
+        except OSError:
+            return None
+        if process_group != own_process_group:
+            foreign.add(pid)
+    return sorted(foreign)
+
+
 def due_events(state: dict[str, Any], policy: dict[str, Any], now: float) -> list[str]:
     """Edge-triggered health/decision events plus explicit report deadlines."""
     events = []
     status = state["status"]
     quiet = now < policy.get("quiet_until", 0)
     allow_event = not quiet or policy.get("urgent_during_quiet", False)
-    if status in {"failed", "complete", "budget_exhausted", "interrupted"}:
+    if status in {"failed", "complete", "budget_exhausted", "interrupted", "cancelled", "contended"}:
         key = f"terminal:{status}"
         if key not in state["emitted"] and allow_event:
             events.append(key)
@@ -216,13 +257,20 @@ def supervise(directory: Path) -> int:
 
                 dev_claim = None
                 if gpu_req:
-                    dev_claim = acquire_device_claim(
-                        device_uuid=None if gpu_req == "auto" else gpu_req,
-                        auto_select=(gpu_req == "auto"),
-                        claims_dir=claims_dir,
-                        job_id=directory.name,
-                        job_dir=directory,
-                    )
+                    gpu_memory_floor = float(claims_cfg.get("min_free_memory_mb", 4000.0))
+                    try:
+                        dev_claim = acquire_device_claim(
+                            device_uuid=None if gpu_req == "auto" else gpu_req,
+                            auto_select=(gpu_req == "auto"),
+                            claims_dir=claims_dir,
+                            job_id=directory.name,
+                            job_dir=directory,
+                            min_free_memory_mb=gpu_memory_floor,
+                        )
+                    except Exception as exc:
+                        state.update(status="failed", error=f"GPU claim failed: {exc}")
+                        write_json(directory / "status.json", state)
+                        return 1
                 cpu_claim = None
                 if cpu_req:
                     try:
@@ -270,7 +318,9 @@ def supervise(directory: Path) -> int:
                     claimed_uuid = claim_session.device_claim.device_uuid
                     fresh = query_gpus()
                     cand = next((d for d in fresh if d["uuid"] == claimed_uuid), None)
-                    if cand is None or not is_device_free(cand):
+                    if cand is None or not is_device_free(
+                        cand, min_free_memory_mb=float(claims_cfg.get("min_free_memory_mb", 4000.0))
+                    ):
                         from experiments.jobs.claims import release_session_claims
 
                         release_session_claims(claim_session)
@@ -313,13 +363,39 @@ def supervise(directory: Path) -> int:
             while True:
                 now = time.time()
                 if child is not None and state["status"] == "running":
-                    code = child.poll()
-                    if code is not None:
+                    if (directory / "cancel.json").exists():
                         stopped = stop_child(child)
-                        state.update(status="complete" if code == 0 and stopped else "failed", exit_code=code)
-                    elif now - state["started"] >= request["budget_seconds"]:
-                        stop_child(child)
-                        state["status"] = "budget_exhausted"
+                        state.update(
+                            status="cancelled" if stopped else "failed",
+                            cancellation_requested=True,
+                        )
+                    elif claim_session and claim_session.device_claim:
+                        foreign = foreign_gpu_processes(
+                            claim_session.device_claim.device_uuid, child.pid
+                        )
+                        if foreign is None:
+                            stopped = stop_child(child)
+                            state.update(
+                                status="failed",
+                                error="GPU process occupancy could not be verified during the run",
+                                timing_contaminated=True,
+                            )
+                        elif foreign:
+                            stopped = stop_child(child)
+                            state.update(
+                                status="contended" if stopped else "failed",
+                                error="A process outside this job began using its claimed GPU",
+                                foreign_gpu_pids=foreign,
+                                timing_contaminated=True,
+                            )
+                    if state["status"] == "running":
+                        code = child.poll()
+                        if code is not None:
+                            stopped = stop_child(child)
+                            state.update(status="complete" if code == 0 and stopped else "failed", exit_code=code)
+                        elif now - state["started"] >= request["budget_seconds"]:
+                            stop_child(child)
+                            state["status"] = "budget_exhausted"
                 tick(directory, state, now)
                 if now - last_log >= 600:
                     with (directory / "progress.log").open("a") as log:
@@ -376,6 +452,7 @@ def main() -> int:
     start.add_argument("--stall-minutes", type=positive, default=30)
     start.add_argument("--quiet-hours", type=positive)
     start.add_argument("--claim-gpu", help="GPU UUID to claim, or 'auto' for first free device")
+    start.add_argument("--min-free-gpu-memory-mib", type=positive, default=4000.0)
     start.add_argument(
         "--cpu-threads",
         type=int,
@@ -425,6 +502,7 @@ def main() -> int:
     claims_cfg: dict[str, Any] = {}
     if args.claim_gpu:
         claims_cfg["gpu"] = args.claim_gpu
+        claims_cfg["min_free_memory_mb"] = args.min_free_gpu_memory_mib
     if args.cpu_threads:
         claims_cfg["cpu_threads"] = args.cpu_threads
     if args.claims_dir:

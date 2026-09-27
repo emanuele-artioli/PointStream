@@ -1,68 +1,61 @@
-# PointStream Setup and Environment Guide
+# Setup and execution
 
-This guide describes how to configure external data storage, local caching, and dependencies for PointStream.
+PointStream has a local coordinator and remote Linux compute hosts. Keep the checkout and agent work on the Mac; dispatch CUDA workloads to whichever GPU server passes the current admission checks. SSH aliases `gpu1` through `gpu6` and the pinned server environment are already provisioned.
 
----
+## Data and environment
 
-## 1. External Data Storage (`PS_DATA_ROOT`)
+Datasets and run outputs live outside the Git tree on the shared data filesystem. The GPU hosts use `/home/itec/emanuele/pointstream-data`; the dispatcher sets `PS_DATA_ROOT` in every remote job. Do not add `assets/` or `outputs/` symlinks to the repository. The Python path resolver accepts `PS_DATA_ROOT`, a checkout-local `.ps-data-root` marker, or the historical repository-root fallback; remote runs always use the explicit shared root.
 
-PointStream datasets (`assets/`) and run outputs (`outputs/`) hold hundreds of thousands of files. To prevent editor/indexer traversal of large data trees on network filesystems (NFS), **data lives outside the tracked code repository**.
+The GPU hosts provide `/home/itec/emanuele/.conda/envs/pointstream` and native tools such as FFmpeg and `vvencapp`. Do not mutate that pinned environment with ad-hoc package installs. Inspect and record the exact executable paths and versions needed by an experiment; an FFmpeg build string alone does not prove VVC decoding is available.
 
-### Precedence Resolution
-The runtime path resolver (`src/contracts/paths.py`) resolves `assets/` and `outputs/` using this strict precedence:
+The local dispatcher uses the Python standard library and SSH. Project tests can run locally with the project dependencies from `pyproject.toml`. Local CUDA is not required.
 
-1. **Environment Variable**: `PS_DATA_ROOT` (if set and non-empty).
-2. **Marker File**: `.ps-data-root` at the repository root. A plain-text, one-line file containing the absolute path to the data root (unquoted). This marker is gitignored and stays local to each checkout or worktree.
-3. **Fallback**: The repository root itself (historical default).
+## Inspect and launch remote work
 
-### Inspecting Paths
-Verify your active data paths with:
+From the repository root, inspect current host and GPU state:
+
 ```bash
-python -c "from src.contracts.paths import describe; print(describe())"
+python -m experiments.jobs.fleet inspect --hosts gpu1 gpu2 gpu3 gpu4 gpu5 gpu6
 ```
 
-### Setting up a Worktree Marker
-When creating a new Git worktree, link it to the shared host data directory by creating a `.ps-data-root` file:
+The probe checks reachability, GPU UUIDs, compute-process lists, memory, utilization, CPU headroom, the shared data root, the pinned Python environment, and native tool versions. A failed or malformed response makes that host unavailable. The default admission limits require no compute process, at most 256 MiB used, at most 5% utilization, free memory of the requested estimate plus a 4 GiB margin, and CPU headroom for the full declared thread allowance. Slurm state and GPU utilization alone do not establish GPU availability.
+
+For experiment-specific binaries, pass `--require-command NAME` (a PATH command such as `ffmpeg`) or an absolute executable path. The dispatcher checks each reachable candidate before selection and rechecks the chosen host before starting the child.
+
+Launch a bounded job to one or more candidate hosts:
+
 ```bash
-echo "/path/to/shared/pointstream-data" > .ps-data-root
+python -m experiments.jobs.fleet launch --hosts gpu5 gpu6 \
+  --gpu-memory-mib 12000 --cpu-threads 8 --budget-hours 2 \
+  --require-path /home/itec/emanuele/pointstream-data/assets/dataset/alcaraz_highlights/segmentations/scene_000 \
+  --require-path /home/itec/emanuele/pointstream-data/outputs/bp21-headroom/clips/alcaraz_highlights/scene_000/window \
+  -- /home/itec/emanuele/.conda/envs/pointstream/bin/python -c \
+  'import os; from experiments.tier.run import main; raise SystemExit(main(["--tiers", "fast", "--frames", "8", "--out", os.path.join(os.environ["PS_JOB_DIR"], "report.json")]))'
 ```
-> [!WARNING]
-> Never create symlinks named `assets` or `outputs` inside the repository tree. File indexers and editors will follow them, defeating the isolation.
 
----
+`--gpu-memory-mib` is the workload's estimated peak device memory, not a reservation size. Default to one GPU and declare CPU threads honestly. Use `--hosts` to restrict candidates to servers with hardware compatible with the experiment; the fleet cannot infer application-specific GPU constraints from an arbitrary command. The fallback device order is Ada, A6000, RTX 8000, then GV100. When comparable workload timings exist, pass `--prefer-gpu-name SUBSTRING` once per GPU family in measured performance order; the manifest records that preference. The current pilot has no comparable cross-model timing, so use the fallback unless new evidence is available.
 
-## 2. Dependencies and Tooling
+The remote job runs from a unique snapshot directory. A clean `HEAD` snapshot is the default; only pass `--include-change PATH` for an intended tracked edit and `--include-untracked PATH` for an intended new file. The manifest records included checksums and excluded dirty paths. Never assume an active checkout on a GPU host matches the Mac revision.
 
-### Conda Environment
-PointStream runs under a pinned Conda environment (typically Python 3.10):
+The monitor detaches on the server and owns the child process group, GPU/CPU claims, durable log, and status. An SSH disconnect or laptop sleep does not stop the run. Use the returned job ID to retrieve status or request cancellation:
+
 ```bash
-conda env create -f environment.yaml
-conda activate pointstream
+python -m experiments.jobs.fleet status JOB_ID
+python -m experiments.jobs.fleet cancel JOB_ID
 ```
-*Note for shared server installations*: Do not run arbitrary `pip install` commands that can mutate pinned dependencies.
 
-### Native Codec Binaries
-Full evaluation requires native video encoders and filters:
-- **FFmpeg**: Compiled with `libvmaf`, `libsvtav1`, and `libaom`. Check with:
-  ```bash
-  ffmpeg -hide_banner -filters | grep libvmaf
-  ```
-- **VVC Intra**: `vvencapp` / `libvvenc` for VVC background plate encoding:
-  ```bash
-  command -v vvencapp
-  ```
-- **OpenCV**: WebP appearance experiments need native WebP image encoding support (`cv2.IMWRITE_WEBP_QUALITY`).
+The local manifest reports the host and remote `run_dir`. Retrieve result files from that directory with `scp`; keep the copy outside the Git tree. Remote jobs are never silently replayed or moved to another host. If foreign GPU use appears after launch, the supervisor stops only its own child, preserves its files, and marks timing contaminated.
 
-Record resolved executable paths, version/build output, presets, and full command lines for both encoder and decoder. FFmpeg filter availability alone does not establish VVC decoding support; verify a round trip on the actual build. Requirements depend on the selected experiment; synthetic checks do not require every native codec.
+## Reproducibility and operational limits
 
----
+Record the input manifest/revision and identities, exact command, local Git `HEAD`, selected patch checksum, runtime environment, GPU UUID, and native encoder/decoder paths and versions. Infrastructure probes and short smoke runs validate execution only; they do not create paper evidence.
 
-## 3. Host-Local Caches
+Atomic shared-filesystem claims coordinate participating PointStream jobs and recheck immediately before child launch. Other users are not prevented from allocating a GPU later. A free GPU and the dispatcher’s memory check cannot guarantee that a workload will fit; choose the estimate from a representative peak and preserve an OOM margin.
 
-On distributed or NFS filesystems, serial file opens for caches impose high latency taxes. Keep all regenerable caches on local host disks (such as `/tmp` or `/var/tmp`), namespaced by checkout:
+The host bootstrap keeps Codex application state, editor servers, and regenerable Python caches on each host's local disk while home is shared over NFS. Keep those runtime directories and cache settings when changing agent instructions. In standalone shells, checkout-specific cache paths can be set as follows:
 
 ```bash
-PS_CACHE_ROOT="/tmp/pointstream-cache-$USER/$(pwd -P | sha256sum | cut -c1-16)"
+PS_CACHE_ROOT="/tmp/pointstream-cache-$(pwd -P | shasum | cut -c1-16)"
 mkdir -p "$PS_CACHE_ROOT"
 export MYPY_CACHE_DIR="$PS_CACHE_ROOT/mypy"
 export RUFF_CACHE_DIR="$PS_CACHE_ROOT/ruff"
@@ -70,26 +63,14 @@ export PYTHONPYCACHEPREFIX="$PS_CACHE_ROOT/pycache"
 python -m pytest -o "cache_dir=$PS_CACHE_ROOT/pytest" tests/runner/test_tier_end_to_end.py -q
 ```
 
-Pytest uses the `cache_dir` configuration option; `PYTEST_CACHE_DIR` is not a pytest setting. Pass `-o` on each invocation. The full checkout path hash prevents cache collisions between worktrees with identical basenames. See [pytest configuration](https://docs.pytest.org/en/stable/reference/reference.html#confval-cache_dir).
+Import `sqlite3` before `torch` in entry points that load Torch on the Linux GPU hosts; this is a host ABI workaround, not a blanket import for unrelated modules.
 
-On this host, import `sqlite3` before `torch` at the package entry point (or in standalone scripts importing Torch). This loads the compatible C++ runtime before Torch pins an older one, avoiding the documented `CXXABI_1.3.15` failure. It is a host workaround, not a reason to add unused imports to every module. The host rules own this requirement.
+## Verification
 
-## 4. Verification
-
-For documentation-only changes, check relative links, referenced commands against their implementation, retired-file recovery entries when changed, and `git diff --check`. CI still runs its configured checks; there is no need to run GPU experiments for prose edits.
-
-For code, configuration, dependency, or executable example changes, run relevant behavior tests and these project checks before merging, in the pinned environment with the cache setup above:
+For the dispatcher and job monitor, run the focused claim, fleet, and monitor tests from the Mac checkout:
 
 ```bash
-ruff check .
-mypy --config-file pyproject.toml
-python -m src.contracts.layers
-python -m pytest -o "cache_dir=$PS_CACHE_ROOT/pytest" tests/runner/test_tier_end_to_end.py -q
+python -m pytest -q tests/experiments/test_resource_claims.py tests/experiments/test_gpu_fleet.py tests/experiments/test_job_monitor.py
 ```
 
-These check lint, static types, dependency direction between layers, and synthetic pipeline integration respectively. They do not establish compression quality or prove a native codec works. Native codec changes also require an encode/decode round trip using the selected binaries. Inspect CI results before merging and report any local checks that could not run.
-
-## 5. Long jobs
-
-Use the [quiet monitoring and bounded adaptation workflow](workflow/long-jobs.md)
-for detached runs, report scheduling, codec pilot gates and training selection.
+Run Ruff 0.11.2 from the pinned server environment against changed Python files. Use the project's applicable CI, static-type, layer, and synthetic-pipeline checks before merging code changes. Documentation-only changes need link and command review plus `git diff --check`; they do not need a GPU run.

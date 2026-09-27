@@ -82,7 +82,7 @@ class TestTennisBackendIsRegistered:
         assert built.name == "tennis"
 
     def test_class_strategies_are_switchable(self) -> None:
-        for name in ("racket-hull", "ball-difference", "ball-segmentation", "none"):
+        for name in ("racket-hull", "racket-cross", "ball-difference", "ball-segmentation", "none"):
             assert name in RIGID
             RIGID.build(name)
 
@@ -129,7 +129,7 @@ class TestRigidOffChangesThePayload:
 
 
 class TestRacketIsAHullNotAPose:
-    def test_hull_is_anchored_to_the_player_wrist(self) -> None:
+    def test_hull_preserves_observed_mask_and_records_wrist_separately(self) -> None:
         wrist = (20.0, 34.0)
         payload = _backend("racket-hull").extract(
             [_racket_object()],
@@ -143,11 +143,66 @@ class TestRacketIsAHullNotAPose:
         assert shape.wrist_anchor is not None
         assert abs(shape.wrist_anchor[0] - wrist[0]) < 1e-6
         assert abs(shape.wrist_anchor[1] - wrist[1]) < 1e-6
-        handle = min(
-            shape.points, key=lambda point: (point[0] - wrist[0]) ** 2 + (point[1] - wrist[1]) ** 2
+        assert min(x for x, _ in shape.points) == 10
+        assert max(x for x, _ in shape.points) == 29
+        assert min(y for _, y in shape.points) == 8
+        assert max(y for _, y in shape.points) == 31
+        assert shape.associated_player_id == "player_0"
+        assert shape.associated_wrist == "right_wrist"
+
+    def test_cross_intersects_continuous_polygon_and_orders_width_endpoints(self) -> None:
+        from src.components.rigid.racket import extract_racket_cross
+
+        result = extract_racket_cross(_racket_object(), [_player_pose(0, (20.0, 30.0))])
+        assert result is not None
+        assert result.kind == "racket_cross_v1"
+        assert len(result.points) == 4
+        assert result.points[0] == (20.0, 30.0)
+        assert result.endpoint_order == "directed_axis_perpendicular_negative_then_positive"
+        assert result.associated_player_id == "player_0"
+
+    def test_polygon_width_is_independent_of_contour_vertex_sampling(self) -> None:
+        from src.components.rigid.racket import _line_polygon_intersections
+
+        polygon = np.asarray([[0.0, 0.0], [8.0, 0.0], [8.0, 20.0], [0.0, 20.0]])
+        dense = np.asarray(
+            [[0.0, 0.0], [2.0, 0.0], [4.0, 0.0], [8.0, 0.0], [8.0, 20.0], [0.0, 20.0]]
         )
-        assert abs(handle[0] - wrist[0]) < 1e-5
-        assert abs(handle[1] - wrist[1]) < 1e-5
+        center = np.array([4.0, 10.0])
+        direction = np.array([1.0, 0.0])
+        ordinary = _line_polygon_intersections(polygon, center, direction)
+        expanded = _line_polygon_intersections(dense, center, direction)
+        assert sorted(tuple(point) for point in ordinary) == sorted(tuple(point) for point in expanded)
+
+    def test_cross_endpoints_are_stable_across_mask_boundary_sampling(self) -> None:
+        from src.components.rigid.racket import extract_racket_cross
+
+        plain = _racket_object()
+        dense_mask = np.zeros_like(_racket_mask())
+        dense_mask[8:32, 16:24] = 255
+        dense_mask[8:16, 10:30] = 255
+        dense_mask[9:15, 11:29] = 255
+        dense = ObservedObject(
+            object_id=plain.object_id,
+            object_class=plain.object_class,
+            frame_index=plain.frame_index,
+            bbox=plain.bbox,
+            mask=dense_mask,
+        )
+        pose = [_player_pose(0, (20.0, 34.0))]
+        first = extract_racket_cross(plain, pose)
+        second = extract_racket_cross(dense, pose)
+        assert first is not None and second is not None
+        assert first.kind == second.kind == "racket_cross_v1"
+        np.testing.assert_allclose(first.points, second.points, atol=1.0)
+
+    def test_missing_wrist_produces_a_separately_typed_hull_fallback(self) -> None:
+        from src.components.rigid.racket import extract_racket_cross
+
+        result = extract_racket_cross(_racket_object(), [])
+        assert result is not None
+        assert result.kind == "hull_fallback_v1"
+        assert result.fallback_reason == "missing_visible_wrist"
 
     def test_keypoints_on_a_racket_are_rejected(self) -> None:
         with pytest.raises(ConfigValueError, match="no skeleton"):

@@ -9,16 +9,15 @@ PointStream is an object-centric semantic video codec where every component is a
 
 ## Supported Setup
 
-- **Operating System**: Linux (tested on Ubuntu 22.04 LTS).
-- **Compute**: NVIDIA GPU with CUDA support for neural perception and metric models.
-- **Python**: 3.10.
-- **System Tools**: FFmpeg (with `libvmaf`, `libsvtav1`, and `libaom` support), `vvencapp` (for VVC intra background encoding).
+- **Coordinator**: Work from the Mac checkout with Python and SSH access to `gpu1`–`gpu6`. Local CUDA is not required.
+- **Compute**: The dispatch tool selects an available Linux GPU server for each CUDA job. The servers use PointStream's pinned Python environment and native codec tools.
+- **Data**: Datasets and experiment outputs stay on the shared external data root, never inside this checkout.
 
 ---
 
 ## Installation
 
-Clone the repository and create the Conda environment:
+Clone the repository on the coordinator. The fleet dispatcher uses Python's standard library; project tests use the dependencies in `pyproject.toml`. CUDA, PyTorch, FFmpeg, and codec binaries are provided by the pinned environment on the GPU servers.
 
 ```bash
 git clone https://github.com/emanuele-artioli/PointStream.git
@@ -45,29 +44,26 @@ This test constructs a small synthetic clip, drives each shipped tier configurat
 
 ## Real-Data Workflow
 
-PointStream processes video scenes defined by input manifests:
+Read [the setup guide](docs/setup.md), inspect the fleet, and launch a bounded job from the Mac. For example, use the pinned remote Python and write the result under the unique remote job directory:
 
-1. **Configure External Data Root**:
-   PointStream datasets live outside the git tree to maintain index performance. Specify your data directory via [docs/setup.md](docs/setup.md):
-   ```bash
-   echo "/path/to/pointstream-data" > .ps-data-root
-   ```
+```bash
+python -m experiments.jobs.fleet inspect --hosts gpu1 gpu2 gpu3 gpu4 gpu5 gpu6
+python -m experiments.jobs.fleet launch --hosts gpu5 gpu6 \
+  --gpu-memory-mib 12000 --cpu-threads 8 --budget-hours 2 \
+  --require-path /home/itec/emanuele/pointstream-data/assets/dataset/alcaraz_highlights/segmentations/scene_000 \
+  --require-path /home/itec/emanuele/pointstream-data/outputs/bp21-headroom/clips/alcaraz_highlights/scene_000/window \
+  -- /home/itec/emanuele/.conda/envs/pointstream/bin/python -c \
+  'import os; from experiments.tier.run import main; raise SystemExit(main(["--tiers", "fast", "--frames", "8", "--out", os.path.join(os.environ["PS_JOB_DIR"], "report.json")]))'
+```
 
-2. **Execute Tier Configurations**:
-   Run the tier benchmark runner on a prepared scene:
-   ```bash
-   python -m experiments.tier.run --tiers fast balanced quality --frames 8
-   ```
-   The default report path follows the configured external data root. An explicit `--out` is used literally, so give an external absolute path.
-
-   *Note*: The tier runner evaluates against reference clips defined in the data manifest. If external source video is not present, use the synthetic test suite above.
+The command snapshots `HEAD`; pass `--include-change PATH` or `--include-untracked PATH` only for source files that belong in the experiment. Use the returned job ID with `fleet status` or `fleet cancel`. The local coordinator can retrieve result files from the reported remote run directory with `scp`. Details and limits are in [docs/workflow/long-jobs.md](docs/workflow/long-jobs.md).
 
 ---
 
 ## Output Locations
 
-- **Run Artifacts & Metrics**: Written to `outputs/` (or `$PS_DATA_ROOT/outputs/`). Results include full-frame and object-scoped PSNR, SSIM, VMAF, payload byte ledgers, and timing profiles.
-- **Logs**: Execution logs are output to stdout or saved alongside run JSON manifests.
+- **Run Artifacts & Metrics**: Remotely supervised job files are stored under `$PS_DATA_ROOT/jobs/fleet/runs/<job-id>/`; datasets and older experiment outputs remain under the external data root.
+- **Logs**: Each remote run keeps `command.log`, `status.json`, monitor state, the dispatch manifest, and outputs alongside the run record. A compact manifest is also stored on the coordinator.
 
 ---
 
@@ -82,11 +78,11 @@ PointStream processes video scenes defined by input manifests:
 ├── experiments/            # Benchmark scripts, ladders, and probe harnesses
 ├── tests/                  # Unit tests and end-to-end pipeline verification
 └── docs/                   # Architecture, area documents, roadmap, and history
-    ├── setup.md            # Data root and environment configuration
+    ├── setup.md            # Local coordination, remote fleet, and data setup
     ├── roadmap.md          # Submission gates A through E
     ├── areas/              # Current state and next actions by functional area
     ├── history/            # Pull request index, findings/retraction log, retired docs
-    └── workflow/           # Agent session dispatch and closeout workflows
+    └── workflow/           # Experiment procedures and long-job dispatch
 ```
 
 For overnight runs, use [script-based monitoring and bounded codec pilots](docs/workflow/long-jobs.md).

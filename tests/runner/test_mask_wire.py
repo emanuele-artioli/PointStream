@@ -156,6 +156,32 @@ def test_serialize_declares_mask_wire_and_roundtrips() -> None:
     assert frames.shape == (1, 12, 16, 3)
 
 
+def test_object_class_survives_serialized_client_transport() -> None:
+    mask = np.zeros((12, 16), dtype=np.uint8)
+    mask[2:9, 3:10] = 1
+    payload = serialize_client_request(
+        background=None,
+        frame_count=1,
+        height=12,
+        width=16,
+        placements=(
+            ClientPlacement(
+                crop=np.full((7, 7, 3), 80, dtype=np.uint8),
+                bbox=(3, 2, 10, 9),
+                frame_index=0,
+                mask=mask,
+                object_id="player-1-racket-0",
+                object_class="racket",
+            ),
+        ),
+    )
+    with np.load(io.BytesIO(payload), allow_pickle=False) as arrays:
+        metadata = json.loads(np.asarray(arrays["metadata"], dtype=np.uint8).tobytes())
+    assert metadata["placements"][0]["object_class"] == "racket"
+    reconstructed = reconstruct_serialized_client(payload)
+    assert np.asarray(reconstructed).shape == (1, 12, 16, 3)
+
+
 def test_transport_total_equals_serialized_length() -> None:
     mask = np.zeros((24, 32), dtype=np.uint8)
     mask[4:12, 6:18] = 1

@@ -203,7 +203,7 @@ _CATALOGUE: Final[tuple[StageSpec, ...]] = (
         when_off="no keypoints; motion representation must be trajectories or video",
         produces=frozenset({ART_KEYPOINTS}),
         consumes=frozenset({ART_SUBJECTS}),
-        optional_inputs=frozenset({ART_SCHEDULE}),
+        optional_inputs=frozenset({ART_SCHEDULE, ART_MASKS}),
         variants=("dwpose", "yolo-pose", "none"),
         summary="Estimate skeletons for classes that have one.",
     ),

@@ -1,5 +1,18 @@
 # Evaluation campaign — 14 September 2026
 
+## Execution update — local coordination, 26 September 2026
+
+The scientific design and current release gate below remain unchanged. For any
+future released run, coordinate from the Mac checkout and launch through
+[`docs/workflow/long-jobs.md`](../../long-jobs.md). That dispatcher inspects all
+candidate hosts, claims and rechecks a compatible GPU, snapshots explicitly
+selected code, and leaves supervision on the remote host. Direct-host commands,
+fixed-GPU examples, old hook/reporting requirements, and advice to open Codex on
+a GPU server are historical and are not current launch instructions. The old
+fixed task-ID return routes and report-back ceremony are retained as history,
+not requirements for current harnesses. No campaign stage is released by this
+infrastructure update.
+
 ## Coordinator parallel preparation — 16 September 2026
 
 Codex owns this preparation while the latest Cursor/Antigravity lanes run.
@@ -9,7 +22,7 @@ audit remain open. The [neural-anchor card](../../../../manifests/evaluation_202
 pins official source/config and documents weights/environment blockers. Paper
 setup builds to 28 pages (23 body/references + 5 appendix), with results still
 pending. No neural rate ladder, E05 or confirmation scoring is released here.
-Worker reports return to Clean project state and dispatch,
+Historical report destination: Clean project state and dispatch,
 `01a0a923-4c5e-71c3-8993-5c68f2a76bb4`.
 
 
@@ -142,11 +155,11 @@ smallest anchor/background/foreground probes. No fresh confirmation scoring now.
 
 ## Dispatch and ownership
 
-Workers read root AGENTS.md/host rules, PLAN.md, this file, their single task,
-the named area, and session/setup/experiment-design guidance. Do not load every
-historical brief. Each task starts in its own worktree and branch
-`codex/eval-<task-id>`; choose a host-accessible path outside the main checkout,
-record it in the return report, and pin inputs. No shared HEAD or output paths.
+Workers read root AGENTS.md, PLAN.md, this file, their single task, the named
+area, setup and experiment-design guidance. Do not load every historical brief.
+Keep code coordination and worktrees on the Mac; use a scoped branch/worktree
+when an assignment needs isolation and record its starting revision. No shared
+HEAD or output paths.
 Only the coordinator edits PLAN.md, roadmap, this plan, and cross-area status.
 Workers own the files listed in their task and their area update. Request a
 scope handoff here before touching another active lane's files.
@@ -232,15 +245,13 @@ advantage, return a detailed roadblock immediately. Do not wait for freeze.
 
 ## Shared servers and timing evidence
 
-At each launch discover accessible hosts from existing setup/SSH configuration;
-verify access and actual free resources, rather than assuming gpu5/gpu6 are idle.
-Use any free GPU, bind its UUID/device explicitly, and record host/hardware,
-software, free-memory check and start time. Before E02's first GPU probe, verify an existing atomic host/device claim path;
-if absent, return that narrow prerequisite for coordinator assignment while
-metadata and CPU implementation work continue. E03 is not permission to leave
-earlier probes uncoordinated. Shared job claims prevent our workers
-from choosing the same GPU; recheck immediately before launch because colleagues
-do not participate in our claims. Never kill or preempt another user's work.
+For each released launch, run the fleet inspection from the Mac and fail closed
+on unreachable or incomplete probes. Require an empty GPU process list, memory
+within the documented idle baseline, adequate free memory for the estimate plus
+reserve, CPU headroom, required software and available inputs. The two-host
+claim path has passed its shared-filesystem contention and lifecycle check; the
+dispatcher claims by host and UUID and rechecks before launch. Other users do
+not participate in those claims, so never kill or preempt their work.
 
 Across all campaign processes on each host, cap CPU workers plus codec/BLAS/data
 loader threads at floor(0.90 × currently available CPU cores), further limited by
@@ -251,10 +262,12 @@ scheduler. Busy host: move an unstarted shard to a compatible host or leave it
 pending. Resume compatible checkpointed work without duplicates; never merge
 incompatible host-local timings. Validate host-local envs/caches/binaries first.
 
-Use detached monitoring, ten-minute file progress and hourly wall-clock
-checkpoints with verified resume. Report completion, failure, material progress
-milestones and required decisions here; stay quiet while state is unchanged.
-The campaign uses actionable-event reporting, with no recurring agent polling.
+Use the remote detached supervisor and durable logs so SSH loss or laptop sleep
+does not stop work. Retrieve status and results explicitly from the local
+coordinator; do not depend on remote Codex to deliver events. Preserve each run
+and mark timing contaminated if outside GPU work appears. Do not automatically
+replay or migrate a running job. Scientific checkpoint and resume requirements
+remain those of the owning protocol.
 
 Not every quality/rate run needs a new timing measurement. Reuse valid timing by
 explicit evidence ID and workload/hardware stratum (resolution, fps, object count,

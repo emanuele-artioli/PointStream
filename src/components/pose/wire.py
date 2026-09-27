@@ -36,12 +36,19 @@ class Pose:
     schema: KeypointSchema
     values: np.ndarray
     present: np.ndarray
+    visibility: np.ndarray | None = None
 
     def __post_init__(self) -> None:
         values = np.asarray(self.values, dtype=np.float32)
         present = np.asarray(self.present, dtype=bool)
+        visibility = self.visibility
+        if visibility is None:
+            visibility = np.where(present, 2, 0).astype(np.uint8)
+        else:
+            visibility = np.asarray(visibility, dtype=np.uint8)
         object.__setattr__(self, "values", values)
         object.__setattr__(self, "present", present)
+        object.__setattr__(self, "visibility", visibility)
         n = len(self.schema)
         if values.shape != (n, 3):
             raise ValueError(
@@ -53,6 +60,13 @@ class Pose:
                 f"Pose under {self.schema.name!r} needs present shape {(n,)}, "
                 f"got {tuple(present.shape)}."
             )
+        if visibility.shape != (n,) or not np.all(np.isin(visibility, (0, 1, 2))):
+            raise ValueError(
+                f"Pose under {self.schema.name!r} needs visibility shape {(n,)} "
+                "with values 0 (unavailable), 1 (low-confidence/occluded), or 2 (visible)."
+            )
+        if not np.array_equal(present, visibility > 0):
+            raise ValueError("present must agree with visibility > 0")
 
 
 def to_canonical(values: np.ndarray, source: KeypointSchema | str) -> Pose:
@@ -71,7 +85,17 @@ def to_canonical(values: np.ndarray, source: KeypointSchema | str) -> Pose:
             f"got {array.shape[0]}."
         )
     source_present = array[:, 2] > ABSENT_CONFIDENCE
-    source_pose = Pose(schema=source_schema, values=array[:, :3], present=source_present)
+    source_visibility = np.where(
+        source_present,
+        np.where(array[:, 2] >= 0.5, 2, 1),
+        0,
+    ).astype(np.uint8)
+    source_pose = Pose(
+        schema=source_schema,
+        values=array[:, :3],
+        present=source_present,
+        visibility=source_visibility,
+    )
     return apply_projection(source_pose, project(source_schema, CANONICAL_HUMAN))
 
 
@@ -101,13 +125,16 @@ def apply_projection(pose: Pose, projection: Projection) -> Pose:
     n = len(projection.target)
     values = np.zeros((n, 3), dtype=np.float32)
     present = np.zeros(n, dtype=bool)
+    visibility = np.zeros(n, dtype=np.uint8)
     source = pose.values
     source_present = pose.present
+    source_visibility = pose.visibility
 
     for target_idx, source_idx in projection.direct.items():
         if source_present[source_idx]:
             values[target_idx] = source[source_idx]
             present[target_idx] = True
+            visibility[target_idx] = source_visibility[source_idx]
 
     for target_idx, parents in projection.derived.items():
         if all(source_present[parent] for parent in parents):
@@ -115,8 +142,14 @@ def apply_projection(pose: Pose, projection: Projection) -> Pose:
             conf = float(source[list(parents), 2].min())
             values[target_idx] = np.array([xy[0], xy[1], conf], dtype=np.float32)
             present[target_idx] = True
+            visibility[target_idx] = min(source_visibility[parent] for parent in parents)
 
-    return Pose(schema=projection.target, values=values, present=present)
+    return Pose(
+        schema=projection.target,
+        values=values,
+        present=present,
+        visibility=visibility,
+    )
 
 
 def from_coco17(values: np.ndarray) -> Pose:

@@ -18,23 +18,26 @@ from demo.pipeline.hand_keypoints import FrameHandPose
 
 
 class BackgroundCodec:
-    """Encodes the infilled/downscaled background stream using SVT-AV1 at ultra-low bitrates."""
+    """Encodes the downscaled background with the shared SVT-AV1 CRF 63 recipe."""
 
     def __init__(
         self,
         downscale_factor: float = 0.5,
-        target_bitrate_kbps: int = 250,
+        target_bitrate_kbps: int | None = None,
         preset: int = 7,
         encoder: str = "libsvtav1",
         mask_hands: bool = False,
         scale_resolution: tuple[int, int] | None = None,
+        crf: int = 63,
     ) -> None:
         self.downscale_factor = downscale_factor
+        # Kept for call-site compatibility; unused. Rate is CRF, not a bitrate cap.
         self.target_bitrate_kbps = target_bitrate_kbps
         self.preset = preset
         self.encoder = encoder
         self.mask_hands = mask_hands
         self.scale_resolution = scale_resolution
+        self.crf = crf
 
     def prepare_background_video(
         self,
@@ -92,23 +95,19 @@ class BackgroundCodec:
         cap.release()
         writer.release()
 
-        # Encode with SVT-AV1 / ffmpeg with explicit preset
-        cmd = [
-            "ffmpeg",
-            "-y",
-            "-i", str(tmp_raw),
-            "-c:v", self.encoder,
-            "-b:v", f"{self.target_bitrate_kbps}k",
-            "-preset", str(self.preset),
-            "-pix_fmt", "yuv420p",
-            str(output_mp4),
-        ]
-        res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        import os
+
+        from demo.pipeline.maps.av1_crf import encode_av1_crf
+
+        # CRF ladder rung matching the downscaled size (no -b:v).
+        scale = f"{bg_w}:{bg_h}"
+        ffmpeg = os.environ.get("FFMPEG", "ffmpeg")
+        encode_av1_crf(tmp_raw, output_mp4, scale=scale, ffmpeg=ffmpeg)
         if tmp_raw.exists():
             tmp_raw.unlink()
 
         if not output_mp4.exists():
-            raise RuntimeError(f"FFmpeg encoding failed: {res.stderr.decode('utf-8', errors='ignore')}")
+            raise RuntimeError(f"FFmpeg AV1 CRF encode failed for {output_mp4}")
 
         file_size = output_mp4.stat().st_size
         return output_mp4, file_size

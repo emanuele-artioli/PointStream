@@ -40,6 +40,7 @@ class Placement:
     mask: np.ndarray | None = None
     object_id: str = "object"
     frame_index: int = 0
+    object_class: str | None = None
 
     def __post_init__(self) -> None:
         x1, y1, x2, y2 = self.bbox

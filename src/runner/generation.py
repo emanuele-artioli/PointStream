@@ -15,6 +15,8 @@ from src.components.generation._numpy import as_hwc
 from src.contracts.capabilities import CAP_TEMPORAL_SEQUENCE
 from src.contracts.conditioning import ConditioningBundle, Device, GenerationParams
 from src.pipeline.reconstruction.dispatch import GeneratorRef
+from src.pipeline.reconstruction.dispatch import dispatch
+from src.pipeline.reconstruction.device import DeviceDecision, DevicePolicy
 
 
 class RunnerGeneratorAdapter:
@@ -75,3 +77,60 @@ def as_runner_ref(
         requires=frozenset(raw_requires),
         name=name,
     )
+
+
+def dispatch_by_object_identity(
+    generator: GeneratorRef,
+    bundles: tuple[ConditioningBundle, ...] | list[ConditioningBundle],
+    *,
+    seed: int,
+    params: GenerationParams | None = None,
+    policy: DevicePolicy | None = None,
+) -> tuple[tuple[np.ndarray, ...], tuple[DeviceDecision, ...]]:
+    """Dispatch temporal bundles as separate stable-object sequences.
+
+    A sequence generator must never receive frames from different players in a
+    single appearance timeline. Per-frame generators retain their efficient
+    batched path because their outputs have no cross-frame state.
+    """
+    if not bundles:
+        return (), ()
+    if not generator.supports_sequence():
+        crops, decision = dispatch(
+            generator, bundles, seed=seed, params=params, policy=policy
+        )
+        return crops, (decision,)
+    groups: dict[str, list[int]] = {}
+    for index, bundle in enumerate(bundles):
+        if not bundle.object_id:
+            raise ValueError(
+                "temporal generation requires an explicit object_id for every bundle"
+            )
+        groups.setdefault(bundle.object_id, []).append(index)
+    ordered: list[np.ndarray | None] = [None] * len(bundles)
+    decisions: list[DeviceDecision] = []
+    for object_id, indices in groups.items():
+        indices.sort(
+            key=lambda index: (
+                bundles[index].frame_index if bundles[index].frame_index is not None else index,
+                index,
+            )
+        )
+        sequence = tuple(bundles[index] for index in indices)
+        crops, decision = dispatch(
+            generator, sequence, seed=seed, params=params, policy=policy
+        )
+        if len(crops) != len(indices):
+            raise ValueError(
+                f"temporal generator returned {len(crops)} crops for object {object_id!r} "
+                f"with {len(indices)} requested frames"
+            )
+        decisions.append(decision)
+        for index, crop in zip(indices, crops, strict=True):
+            ordered[index] = crop
+    if any(crop is None for crop in ordered):
+        raise RuntimeError("object-grouped generation left an output placement unfilled")
+    return tuple(crop for crop in ordered if crop is not None), tuple(decisions)
+
+
+__all__ = ["RunnerGeneratorAdapter", "as_runner_ref", "dispatch_by_object_identity"]

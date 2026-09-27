@@ -1,6 +1,7 @@
 # Worker C — identify and validate a useful generator
 
-> Historical repair brief. For new work use [parallel probes](parallel-probes.md).
+> Historical repair brief. For new work use current `PLAN.md`, the named area,
+> and the local-dispatch workflow.
 > Its retired-evaluator status and old training budget below are superseded;
 > they are not standing authorization to launch training.
 

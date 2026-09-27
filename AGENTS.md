@@ -1,39 +1,29 @@
-# POINTSTREAM — Rules of Engagement
+# PointStream
 
-PointStream is an object-centric semantic video codec where every component is a config choice. The encoder transmits each salient object's appearance and motion plus a reusable background model and an optional corrective residual; the client reconstructs frames generatively or from references. Target: an ACM TOMM submission, **30 September 2026**.
+PointStream is an object-centric semantic video codec. The target is an ACM TOMM submission on **30 September 2026**. Report searches transparently, including negative results, and scope claims to evidence that supports them.
 
-## Host Rules
+## Work and execution
 
-This file is the single source of truth for this project's agent rules. Host-wide rules are not copied here; they live in one file on this machine, and each harness loads its own mechanics from alongside it:
+- Edit, coordinate, and inspect from the Mac checkout. Dispatch CUDA work per request with `python -m experiments.jobs.fleet`; do not start new Codex sessions on GPU hosts.
+- Run `python -m experiments.jobs.fleet inspect --hosts gpu1 gpu2 gpu3 gpu4 gpu5 gpu6` before choosing a host. Failed or incomplete probes are unavailable. Launch only onto a GPU with no compute processes, memory use at or below the inspected idle baseline (default 256 MiB), utilization at or below 5%, enough free memory for the estimate plus 4 GiB, and sufficient aggregate CPU headroom.
+- `fleet launch` rechecks and claims the chosen GPU by host and UUID immediately before launch. It isolates the child with `CUDA_VISIBLE_DEVICES`, records a remote supervisor and durable logs, and returns a job ID for `fleet status` or `fleet cancel`. Jobs are detached; do not rely on an SSH connection or remote Codex session to keep them alive or deliver events. Do not automatically replay or migrate a running job.
+- A clean `HEAD` snapshot is the default. Add only intended tracked edits with `--include-change PATH` and intended new files with `--include-untracked PATH`; never dispatch the whole dirty checkout implicitly. Keep inputs and outputs under the external data root, outside this repository.
+- Cooperative claims prevent collisions among participating PointStream jobs. They cannot stop another user starting work later, and free memory cannot guarantee an oversized workload will avoid OOM. If the supervisor detects outside GPU use, it stops only its own affected job, preserves files, and marks timing contaminated.
+- Hardware ordering (Ada, A6000, RTX 8000, GV100) is only a fallback heuristic. Prefer compatible hardware and measured performance for comparable workloads.
 
-@/home/itec/emanuele/.agent-rules/AGENTS.md
+## Reproducibility and checks
 
-The paper lives in `67a9ea6275d3d9785ce57026/`, a **separate git repo** with its own `AGENTS.md`. Commit there when you change manuscript text.
+Keep datasets and outputs outside the code tree; do not add `assets/` or `outputs/` symlinks. Preserve the exact code revision and selected patch checksums, input identity, command, GPU UUID, environment, and native encoder/decoder paths and versions with every run. Infrastructure smoke runs are not paper evidence.
 
-## Where Things Are
+Run focused tests for the changed behavior. For this dispatcher and monitor, use:
 
-| Need | Read | Write / Update |
-|---|---|---|
-| Current assignment | [PLAN.md](PLAN.md) and one linked area | That area's state/actions; [PLAN.md](PLAN.md) only if summary changes |
-| Gate dependency | [docs/roadmap.md](docs/roadmap.md) | [docs/roadmap.md](docs/roadmap.md) only when dependency or pass criteria changes |
-| Prior decision / failure | Area evidence links, history indexes, PR discussion | PR for session detail; [docs/history/findings.md](docs/history/findings.md) for validity |
-| Component behavior | `src/contracts/` and relevant code/tests | Code/contracts/tests in the owned scope |
-| Human setup / run | [docs/setup.md](docs/setup.md); [README.md](README.md) for user flow | [README.md](README.md) / [docs/setup.md](docs/setup.md) alongside behavior changes |
-| Research evidence | Area protocol and immutable outputs | Run records; area verdict; PR provenance |
-| Paper claim | [docs/areas/paper.md](docs/areas/paper.md) and paper `AGENTS.md` | Separate paper commit; evidence references back in paper area |
-| Dispatch / report / closeout | [docs/workflow/session/SKILL.md](docs/workflow/session/SKILL.md) | Prompt in response; PR report; durable area update |
+```bash
+python -m pytest -q tests/experiments/test_resource_claims.py tests/experiments/test_gpu_fleet.py tests/experiments/test_job_monitor.py
+```
 
-## Rules That Code Cannot Enforce
 
-- **The paper's headline claims must land where PointStream wins.** A codec paper whose central result is "we lose to the anchor everywhere" is not a submission. Finding and naming the regime where an object-centric codec beats conventional coding is part of the work. Scope headline claims to the regime where they hold.
-- **Searching for the winning configuration is the method, not a compromise.** Run the axes, observe the numbers, and locate where PointStream wins. The obligation is to report the search transparently: say which axes were tried, what each gave, and where the claim boundary lies.
+Do not run `scripts/cleanup_merged_worktrees.sh`; its `rm -rf` fallback can discard uncommitted work. Preserve paused or user-owned worktrees.
 
-## Task Completion and Setup
+## Paper repository
 
-For dispatch, completed work, or handoff, read and follow the [session workflow](docs/workflow/session/SKILL.md). It owns PR reporting, area updates, validation, and worktree retirement; ordinary replies do not require a closeout.
-
-Use [docs/setup.md](docs/setup.md) before environment setup or experiment runs, and its verification section before merging. Host-wide cache and import-order rules remain in the host rules above.
-
-Subagents: the host `session` skill and the shared agents (`implementer`, `paper-editor`, `gpu-job-runner`, ...) apply; this project adds none.
-
-Project constraints: data must stay outside the code tree (no `assets/` or `outputs/` symlinks); record the exact native encoder/decoder paths and versions with each run so comparisons are reproducible. Do not run `scripts/cleanup_merged_worktrees.sh` (`INFRA-ACT-01`: its `rm -rf` fallback can discard uncommitted work). Merged-and-clean worktrees: host `git-clean-merged-worktrees` only; ask before removing a worktree that might be a paused session.
+The manuscript is in the sibling repository [`../67a9ea6275d3d9785ce57026/`](../67a9ea6275d3d9785ce57026/), with its own `AGENTS.md`. Make and commit manuscript edits there; keep this repository's evidence references current.

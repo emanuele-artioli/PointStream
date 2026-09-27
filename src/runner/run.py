@@ -598,7 +598,16 @@ def _finish_chunk(
             is_gen = bool(generation_on and ref is not None)
             crop_to_use = None
             if not is_gen:
-                crop_to_use = item.supplied_crop if item.supplied_crop is not None else item.appearance
+                # Compressed-image appearance is already present once in the
+                # object-keyed references table below. Repeating the same
+                # encoded crop for every frame of a track inflates transport
+                # bytes and defeats reference reuse.
+                if item.object_id not in appearance_by_id:
+                    crop_to_use = (
+                        item.supplied_crop
+                        if item.supplied_crop is not None
+                        else item.appearance
+                    )
 
             pose_arr = None
             motion_arr = None
@@ -612,13 +621,14 @@ def _finish_chunk(
                 ClientPlacement(
                     crop=crop_to_use,
                     bbox=item.bbox,
-                    encoded_crop=appearance_by_id.get(item.object_id),
+                    encoded_crop=None,
                     frame_index=item.frame_index,
                     mask=item.mask,
                     object_id=item.object_id,
                     is_generated=is_gen,
                     pose=pose_arr,
                     motion_field=motion_arr,
+                    object_class=item.object_class,
                 )
             )
         placements = tuple(placements_list)

@@ -16,7 +16,7 @@ from typing import Any
 import numpy as np
 
 from src.components.rigid.ball import extract_ball_difference, extract_ball_segmentation
-from src.components.rigid.racket import extract_racket, reject_keypoints
+from src.components.rigid.racket import extract_racket, extract_racket_cross, reject_keypoints
 from src.components.rigid.types import (
     ObservedObject,
     PlayerPose,
@@ -28,12 +28,13 @@ from src.contracts.config import PointstreamConfig
 from src.contracts.errors import ConfigValueError
 
 RACKET_HULL = "hull"
+RACKET_CROSS = "cross"
 RACKET_NONE = "none"
 BALL_DIFFERENCE = "difference"
 BALL_SEGMENTATION = "segmentation"
 BALL_NONE = "none"
 
-ALL_RACKET = frozenset({RACKET_HULL, RACKET_NONE})
+ALL_RACKET = frozenset({RACKET_HULL, RACKET_CROSS, RACKET_NONE})
 ALL_BALL = frozenset({BALL_DIFFERENCE, BALL_SEGMENTATION, BALL_NONE})
 TENNIS_RIGID_CLASSES = frozenset({"racket", "ball"})
 
@@ -91,11 +92,15 @@ class TennisRigid:
                 reject_keypoints(obj)
 
         shapes: list[RigidShape] = []
-        if self.racket == RACKET_HULL:
+        if self.racket in {RACKET_HULL, RACKET_CROSS}:
             for obj in objects:
                 if obj.object_class != "racket":
                     continue
-                shape = extract_racket(obj, player_poses)
+                shape = (
+                    extract_racket_cross(obj, player_poses)
+                    if self.racket == RACKET_CROSS
+                    else extract_racket(obj, player_poses)
+                )
                 if shape is not None:
                     shapes.append(shape)
 
@@ -137,6 +142,13 @@ class RacketHull(TennisRigid):
 
     def __init__(self) -> None:
         super().__init__(racket=RACKET_HULL, ball=BALL_NONE)
+
+
+class RacketCross(TennisRigid):
+    name = "racket-cross"
+
+    def __init__(self) -> None:
+        super().__init__(racket=RACKET_CROSS, ball=BALL_NONE)
 
 
 class BallDifference(TennisRigid):

@@ -19,3 +19,12 @@ REGISTRY.register(
         summary="YOLO26 pose; emits COCO-17, stored as canonical WholeBody-133.",
     )
 )
+REGISTRY.register(
+    BackendSpec(
+        name="dwpose",
+        target="src.components.pose.dwpose:DWPoseEstimator",
+        aliases=("dwpose-wholebody",),
+        defaults={"model_name": "dw-ll_ucoco_384.onnx", "det_model_name": "yolox_l.onnx"},
+        summary="DWPose WholeBody-133 ONNX estimator; confidence and missing joints are explicit.",
+    )
+)

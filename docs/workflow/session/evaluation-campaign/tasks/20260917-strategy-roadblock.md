@@ -35,7 +35,7 @@ resolution/fps, colour, rate, reference cadence and duration mechanisms.
 
 Each worker: at most two active preparation hours, no new native candidate
 encodes, GPU runs, training, confirmation scoring or second-domain scoring.
-Read root/host rules, this brief, the campaign plan and the named owning area.
+Read root `AGENTS.md`, this brief, the campaign plan and the named owning area.
 Keep existing branch/worktree; preserve immutable artifacts and paused trees.
 Code fixes need relevant behavior checks and green CI at the returned head.
 Return a paste-ready report and pause; no automatic next-stage launch.

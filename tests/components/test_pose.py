@@ -26,6 +26,7 @@ def _coco17(conf: float = 0.9) -> np.ndarray:
 def test_pose_backend_is_registered_as_yolo() -> None:
     assert POSE.spec("yolo").name == "yolo"
     assert POSE.spec("yolo-pose").name == "yolo"
+    assert POSE.spec("dwpose").name == "dwpose"
 
 
 def test_unknown_pose_name_suggests_yolo() -> None:
@@ -65,6 +66,18 @@ def test_absent_source_joints_stay_absent_on_the_wire_not_zero_filled_as_present
     nose = OPENPOSE_18.index_of["nose"]
     assert not wire.present[nose]
     assert wire.values[nose, 2] == 0.0
+    assert wire.visibility[nose] == 0
+
+
+def test_pose_visibility_preserves_confidence_bands_through_projection() -> None:
+    values = _coco17()
+    values[5, 2] = 0.2
+    pose = from_coco17(values)
+    assert pose.visibility[5] == 1
+    assert pose.visibility[6] == 2
+    wire = to_wire(pose, "openpose-18")
+    assert wire.visibility[OPENPOSE_18.index_of["left_shoulder"]] == 1
+    assert wire.visibility[OPENPOSE_18.index_of["neck"]] == 1
 
 
 def test_yolo_pose_estimator_projects_mocked_coco17_onto_the_wire() -> None:

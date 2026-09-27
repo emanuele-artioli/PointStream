@@ -1,72 +1,130 @@
 # Infrastructure Area
 
-## Current acquisition / integration review
+## Local coordinator / remote GPU pilot — 26 September 2026
 
-R0R repairs the CPU-only blockers identified in R0 `d39893c`: eliminates TTL-only
-takeover on mutexes and claims, guarantees child process group termination and reaping
-prior to claim release (retaining claim if death unverified), checks local PID liveness
-and process start identity before status text, fails closed on absent or unqueried GPUs
-with pre-Popen rechecks, and accounts for cgroup quotas, load, and mandatory per-job CPU
-thread allowances. Cross-host NFS contention and lifecycle behavior have not yet been
-tested by two real hosts, so multi-host deployment remains disabled; run monitored jobs
-on one verified host until that check is recorded.
+Codex now coordinates from the Mac; jobs execute from immutable, uniquely named
+snapshots on whichever compatible GPU host is clear at launch. The bounded pilot
+passed on gpu5 and gpu6. `experiments/jobs/fleet.py` inspects the fleet, launches
+snapshots, and retrieves status or cancellation state; `experiments/jobs/monitor.py`
+retains supervision, GPU claims, device isolation, and conservative child cleanup.
+There is no persistent queue, automatic migration, or Codex event-delivery dependency.
+
+Admission fails closed on incomplete probes and requires no GPU processes, device
+memory within the configured idle baseline, enough free memory for the declared peak
+plus reserve, CPU headroom, required software, and available inputs. Every candidate
+host is probed before selection; the selected GPU is claimed by canonical host and
+UUID and rechecked just before launch. Independent jobs can run concurrently on
+separate claimed devices under the aggregate host CPU limit. The default is one GPU
+per job. Claims coordinate PointStream jobs but cannot reserve a device against other
+users or guarantee an arbitrary job will avoid OOM. Contention stops only the affected
+PointStream child, preserves outputs, and marks timing contaminated; jobs are not
+replayed or migrated automatically.
+
+No comparable cross-model workload timings are recorded yet. The default selector
+uses the fallback order RTX 6000 Ada, A6000, RTX 8000, then GV100; future comparable
+timings can be supplied with ordered `--prefer-gpu-name` values and are recorded in
+the launch manifest. `gpu4` was observed with about 46 GiB in use per GPU despite 0% utilization;
+Slurm reported it idle but uses `task/none`, so scheduler state is not treated as
+exclusive access.
+
+### Pilot evidence
+
+- Concurrent acquisition on the shared NFS claim path serialized gpu5/gpu6 correctly;
+  ownership, release and interruption paths were exercised.
+- Two simultaneous synthetic CUDA probes ran on separate RTX 6000 Ada hosts with
+  `CUDA_VISIBLE_DEVICES` set to each claimed UUID. A deliberate foreign test process
+  on gpu5 caused only that probe to stop and become `contended`; gpu6 completed.
+- A follow-up run verified exact filtered snapshot SHA-256 identity, separate output
+  directories, status retrieval after launch, and cancellation of only the requested
+  child. Both hosts returned to baseline after the probes.
+- Detached job `20260926T221103Z-a19f2af8` verified SSH-loss recovery: the local
+  launcher returned, a fresh status request found the 64 MiB CUDA allocation still
+  running, and a later reconnect reported exit 0. The retrieved log confirmed the
+  CUDA allocation; gpu5 returned to 1 MiB baseline use with no compute process or
+  PointStream claim. Required executable checks now accept both PATH names and
+  absolute paths and fail closed on incomplete responses.
+- Bounded smoke job `20260926T212943Z-970d4e98` completed on gpu6 using cached
+  `alcaraz_highlights/scene_000` inputs. Pasteback MAE was 0.0, all-off was bit-identical,
+  residual-absent took 47.19 s, and the fast tier took 28.71 s. This validates the
+  runner against real inputs; that tier path did not use CUDA and is not paper evidence.
+- Focused tests: 54 pass across resource claims, fleet dispatch and job monitoring.
+  Ruff 0.11.2 and Python compilation passed in the pinned remote environment.
+
+### Installed agent configuration cleanup
+
+The six host-local Codex homes no longer contain custom instruction files, hook
+links, generated model roles or rule ladders. Shared Claude/Cursor/Gemini imports,
+hooks and generated role/skill links were disconnected after backup to
+`~/.pointstream-agent-backup/2026-09-26`. Official plugins, built-in skills,
+credentials, preferences, session databases and host-local application state
+remain. The NFS/editor/cache bootstrap now lives at
+`~/.pointstream-runtime/bootstrap-hostlocal.sh`; fresh login-shell checks passed
+on all six hosts, and `codex --version` passed in a new gpu5 login shell.
+
+No running app process was stopped. The original `.agent-rules` checkout remains
+at its original path without source edits so already-running hooks can finish;
+global instructions and hook configurations no longer point to it for new
+sessions. The GitHub configuration repository was not committed to or pushed.
+
+**Remaining limit:** launch-time checks and cooperative claims cannot prevent a
+non-participating user from allocating a GPU later. The monitor detects changed
+occupancy, terminates only its own child, and preserves a contaminated run record.
+The two-host claim test and bounded smoke are complete; this does not certify every
+workload's memory requirement or make scheduler reports authoritative.
 
 ## Coordinator follow-up — E01/E02
 
-Atomic resource claims are completed under [R0](../workflow/session/evaluation-campaign/tasks/00-resource-claims.md):
-minimal atomic filesystem claims in `experiments/jobs/claims.py`, GPU UUID and canonical host keying,
-pre-launch recheck under claim (no preemption/killing), child device isolation (`CUDA_VISIBLE_DEVICES`),
-conservative stale-owner verification (never steal solely on TTL), aggregate per-host CPU cap
-(`floor(0.90 * available_cores)`), and seamless integration with `experiments/jobs/monitor.py`.
+Atomic resource claims are implemented in `experiments/jobs/claims.py` and reused by
+the dispatcher and monitor: UUID and canonical hostname keying, pre-launch recheck,
+child device isolation, conservative stale-owner verification, aggregate per-host CPU
+limits, and process-group supervision. The shared NFS concurrent-acquisition and
+interruption tests passed on gpu5/gpu6 as recorded above.
 
-## Current campaign — 14 September 2026
+## Current execution policy
 
-The [campaign](../workflow/session/evaluation-campaign/plan.md) may use any GPU
-free at experiment launch across accessible servers. Recheck/claim resources;
-aggregate all campaign CPU/codec/BLAS threads per host under 90% of currently
-available cores, respecting affinity/quota and colleagues. Busy hosts defer or
-move unstarted shards; profile hardware strata separately. Existing monitor and
-checkpoint tooling should be reused. INFRA-ACT-01 is unresolved; cleanup helper
-remains prohibited. No fixed GPU reservation carries into this campaign.
+Inspect all reachable candidates for each request. Unreachable or malformed host
+probes are unavailable. Use existing pinned environments and external datasets; never
+modify or overwrite a working remote checkout. Snapshot the selected local revision
+and only explicitly selected changes to a unique remote run directory, recording code
+hash, environment, command, GPU UUID and native codec versions. Keep detached logs and
+supervision remote so SSH loss or laptop sleep does not stop a job. Retrieve status and
+results locally. Preserve scientific protocols and evidence classifications; the
+infrastructure smoke above is not a result for the manuscript.
 
-**Evidence Revision**: Reconciled through PR #68 (`956ad3c277`), PR #73, and R0 resource claims.
+The unsafe `scripts/cleanup_merged_worktrees.sh` remains prohibited (`INFRA-ACT-01`);
+never bypass Git's refusal or remove a potentially paused worktree. Historical
+campaign plans below describe their original setup and are not the current dispatch
+interface.
+
+**Evidence Revision**: Local dispatcher pilot, 26 September 2026; resource claims from R0/R0R.
 **Owned Scope**: Environments, CI/GitHub Actions, worktree lifecycle, runner integration, local caches, hardware profiling.
 
 ---
 
 ## 1. Current State
 
-### Atomic cross-host resource claims (R0 / R0R — PR branch `codex/eval-r0`)
+### Atomic cross-host resource claims (R0 / R0R)
 
-`experiments/jobs/claims.py` implements filesystem resource claims for PointStream workers without cluster schedulers or colleague preemption. Single-host behavior is tested; cross-host deployment remains disabled pending a two-host NFS contention/lifecycle check:
-- **Shared jobs location**: Keyed under `PS_DATA_ROOT/jobs/claims` (`src.contracts.paths.data_root() / "jobs" / "claims"`) or explicit `PS_CLAIMS_DIR`.
-- **Atomic cross-host primitive**: Leverages POSIX atomic directory creation (`mkdir`) on shared filesystem for device claims and host CPU allocation mutex (`.lock`).
-- **Device keying**: Canonical hostname (`socket.getfqdn()` / `platform.node()`) and GPU UUID (`nvidia-smi --query-gpu=uuid`), not ordinal alone.
-- **Atomic acquire**: Exactly one process succeeds in acquiring a device claim directory; records ownership token, job ID, host, device UUID, process PID, and timestamp. Missing device UUID or failed occupancy query fails closed (`DeviceUnavailableError`).
-- **Pre-selection and pre-launch recheck**: Inspects memory and running processes before selection and immediately rechecks under the claim prior to child launch (pre-Popen). Defers/aborts on contention; never kills or preempts another user's work.
-- **Device isolation**: Hides unallocated GPUs from child via `CUDA_VISIBLE_DEVICES` (and sets `PS_CLAIMED_GPU_UUID`), preventing multi-GPU trainers from auto-spawning across unallocated devices.
-- **Token release & conservative stale owner handling (R0R)**: Released strictly by the owning random token. Eliminated TTL-only takeover in `atomic_dir_lock` and device claims. Stale claims verify liveness strictly via local PID liveness and process start time identity (detecting recycled PIDs). Stale remote claims or unverifiable local liveness are never stolen.
-- **Child process group lifecycle & Interruption (R0R)**: `run_supervised` creates a new process session (`start_new_session=True`), catching all exceptions/interrupts and executing `terminate_and_reap_process_group` (SIGTERM -> timeout -> SIGKILL -> reap) before releasing claims. If child death cannot be verified, claims are retained as unresolved.
-- **Claim activity vs status ordering (R0R)**: `is_claim_active` checks local PID liveness before trusting terminal status text; `monitor.py` stops and reaps child process groups before writing terminal status.
-- **Aggregate CPU allowance & Cgroup accounting (R0R)**: Refuses declared allocations above `floor(0.90 * available_cores)`; `get_available_cores()` accounts for cgroup v1/v2 quota and system load. Sets `OMP_NUM_THREADS`, `MKL_NUM_THREADS`, `OPENBLAS_NUM_THREADS`, `TORCH_NUM_THREADS`, `RAY_NUM_CPUS`, `POLARS_MAX_THREADS`, `PS_CPU_ALLOWANCE`, etc. in the child environment. These are cooperative limits and cannot enforce a cap on arbitrary children that ignore them. Explicit positive `cpu_threads` is mandatory for all monitored jobs.
-- **Integration**: Integrated into `experiments.jobs.monitor` (`start --claim-gpu ... --cpu-threads ...` and `supervise` lifecycle), standalone context manager `claim_resources`, and CLI `python -m experiments.jobs.claims launch`.
-- **Validation**: CPU-only focused tests cover local claim and monitor behavior. Real GPU query and auto-selection were checked on gpu5 (RTX 6000 Ada). No two-host contention/lifecycle result is recorded, so this is not yet evidence for cross-host deployment.
+`experiments/jobs/claims.py` implements filesystem resource claims for PointStream
+workers without cluster schedulers or colleague preemption. The two-host NFS
+contention and interruption check is now recorded above. Claims are cooperative and
+never preempt another user's work:
+- **Shared jobs location**: Keyed under `PS_DATA_ROOT/jobs/claims` or explicit `PS_CLAIMS_DIR`.
+- **Atomic cross-host primitive**: POSIX atomic directory creation (`mkdir`) on the shared filesystem for device claims and host CPU allocation locks.
+- **Device keying**: Canonical hostname and GPU UUID, not ordinal alone.
+- **Pre-selection and pre-launch recheck**: Inspects memory and processes before selection and again under claim immediately before child launch.
+- **Device isolation**: Hides unallocated GPUs from the child using `CUDA_VISIBLE_DEVICES` and `PS_CLAIMED_GPU_UUID`.
+- **Conservative stale-owner handling**: Releases only by owning token; never steals a remote or unverifiable stale claim.
+- **Child lifecycle**: Terminates and reaps the process group before releasing claims; retains claims if child death cannot be verified.
+- **CPU allowance**: Refuses declarations above 90% of available cores and applies cooperative thread environment limits.
+- **Validation**: The two-host acquisition, ownership, release/interruption, isolation, cancellation and contention paths passed in the pilot above. Focused tests pass; see `tests/experiments/`.
 
-### Quiet long-job monitoring (PR #82)
+### Quiet long-job monitoring (historical transport)
 
-`experiments/jobs/monitor.py` implements detached command supervision, ten-minute
-file logging, explicit work-progress tracking, quiet hours, one-shot/repeating
-digests, and a durable event queue with a Codex CLI adapter. Due events are
-batched into one wakeup; unchanged health does not invoke the agent. Repeated
-publication of the same stage decision is deduplicated independently of timestamps.
-
-Validation: host `/usr/bin/true` launch reached complete; the installed Codex CLI
-accepted a self-addressed queue check. Ruff, full mypy, import-layer validation,
-and 91 selected tests (30 new monitoring/campaign cases plus 61 existing
-runner/low-rate/heartbeat cases) pass against main through #81 with a host-local
-Torch cache. The new job modules have 81% targeted statement coverage.
-Regression scope was approved; no GPU experiment was needed for these checks. No existing overnight job was reconfigured.
-See [the workflow](../workflow/long-jobs.md) for usage and delivery limitations.
+`experiments/jobs/monitor.py` can supervise detached jobs, retain durable logs and
+publish event records. The previous Codex CLI wakeup adapter is historical and is not
+used by local dispatch: local tasks retrieve remote status explicitly. See the current
+[long-job workflow](../workflow/long-jobs.md) for launch and retrieval.
 
 ### Environment & Startup Performance
 PointStream runs on a shared remote Linux GPU server with an NFS-backed home directory. On **gpu6** (commit `bc09184`, September 2026), process startup and import latency were measured under clean conditions (`PYTHONNOUSERSITE=1`, explicit `PYTHONPATH`):
@@ -107,7 +165,7 @@ PR #68 introduced `scripts/cleanup_merged_worktrees.sh`. The documentation audit
 
 | ID | Status | Dependencies | Source | Description & Acceptance Criteria |
 |---|---|---|---|---|
-| `INFRA-ACT-05` | Local-ready / cross-host disabled | Two-host NFS check | 00-resource-claims.md (R0) | **Atomic resource claims**: local claim ownership, GPU UUID keying, pre-launch recheck, device isolation, conservative stale-owner handling, declared CPU allowance, child process-group lifecycle, and monitor integration are implemented. Acceptance still requires two real hosts contending through the shared claim path and lifecycle verification before enabling multi-host deployment. |
+| `INFRA-ACT-05` | Complete for cooperative PointStream jobs | Pilot evidence above | R0/R0R and 2026-09-26 pilot | **Atomic resource claims and local fleet dispatch**: two-host contention, lifecycle, CUDA isolation, remote supervision, status retrieval and bounded real-input smoke passed. Other-user allocations remain outside cooperative claim control. |
 | `INFRA-ACT-04` | Complete | None | PR #82 | Quiet monitor and approved scheduling/stall/restart/budget regression tests implemented. Use the workflow for new jobs; transport acceptance is verified, but automated idle wakeup timing is not a guaranteed service. |
 | `INFRA-ACT-01` | Ready | None | #68, #73 | **Repair worktree cleanup helper**: Refactor `scripts/cleanup_merged_worktrees.sh` to halt on any git refusal, verify clean working tree against `origin/main`, remove the `rm -rf` fallback, and drop remote pruning. Acceptance: Script refuses to delete unmerged or dirty worktrees and passes unit test. |
 | `INFRA-ACT-02` | Ready | None | Host rules | **Host-local cache enforcement**: Configure local caching (the checkout-specific cache paths in `docs/setup.md`) in CI and runner scripts. Acceptance: Zero mypy cache files written to NFS home. |
