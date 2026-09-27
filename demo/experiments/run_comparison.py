@@ -49,11 +49,13 @@ DEFAULT_CHECKPOINT = Path("demo/outputs/models/overfit_generator.pt")
 # PointStream multi-tier background ladder.
 # Each tier: (label, scale_resolution or None for native 1080p, unused_kbps, SVT-AV1 preset).
 # Background rate is CRF 63 / preset 7 via BackgroundCodec — the kbps slot is legacy.
+# Same height ladder as AV1_LADDER. One rung per height; rate is CRF 63.
 POINTSTREAM_TIERS = [
+    ("PS Floor (180p bg, CRF63)", (320, 180), 0, 7),
     ("PS Extreme Starve (240p bg, CRF63)", (426, 240), 0, 7),
     ("PS Heavy Starve (360p bg, CRF63)", (640, 360), 0, 7),
     ("PS Low Teleop (540p bg, CRF63)", (960, 540), 0, 7),
-    ("PS Standard (540p bg, CRF63)", (960, 540), 0, 7),
+    ("PS Mid (720p bg, CRF63)", (1280, 720), 0, 7),
     ("PS Standard 1080p (native bg, CRF63)", None, 0, 7),
 ]
 

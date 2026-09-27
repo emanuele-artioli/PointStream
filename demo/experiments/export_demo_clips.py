@@ -46,7 +46,7 @@ AV1_KEYS = {
     "720p": "av1_720",
     "1080p": "av1_1080",
 }
-PS_KEYS = ["ps_starve", "ps_heavy", "ps_low", "ps_std", "ps_1080"]
+PS_KEYS = ["ps_180", "ps_starve", "ps_heavy", "ps_low", "ps_720", "ps_1080"]
 
 
 def _load_model(ckpt_path: Path, device: torch.device):
@@ -78,6 +78,7 @@ def process_clip(
     mask_video: Path | None = None,
     pose_backend: str = "dwpose_hands",
     skip_av1: bool = False,
+    only: list[str] | None = None,
     background_mp4s: dict[str, Path] | None = None,
     baseline_hand: dict[str, float] | None = None,
 ) -> dict:
@@ -107,8 +108,13 @@ def process_clip(
         ref_mp4, poses, image_size=256, max_frames=frames, clip_id=0, frame_alphas=frame_alphas
     )
     gt = judge(ref_mp4, frames)
+    only_keys: set[str] | None = None
+    if only is not None:
+        only_keys = set(only)
     streams = {}
     for (tier_name, scale_res, _bg_kbps, preset), key in zip(POINTSTREAM_TIERS, PS_KEYS):
+        if only_keys is not None and key not in only_keys:
+            continue
         tag = tier_name.split("(")[0].strip().lower().replace(" ", "_")
         bg_mp4 = work / f"ps_bg_{tag}.mp4"
         if background_mp4s and key in background_mp4s:
@@ -129,7 +135,7 @@ def process_clip(
         pred = judge(ps_mp4, frames)
         scored = score_pose_tracks(gt, pred)
         total_kbps = (bg_bytes * 8) / (duration * 1000.0) + kp_kbps
-        res_label = {0: "240p", 1: "360p", 2: "540p", 3: "540p", 4: "1080p"}[PS_KEYS.index(key)]
+        res_label = "1080p" if scale_res is None else f"{scale_res[1]}p"
         streams[key] = {
             "kind": "ps",
             "res": res_label,
@@ -190,6 +196,11 @@ def main() -> None:
     parser.add_argument("--mask-video", type=Path, default=None, help="SAM mask for clip 1")
     parser.add_argument("--pose-backend", default="dwpose_hands")
     parser.add_argument("--skip-av1", action="store_true")
+    parser.add_argument(
+        "--only-keys",
+        default="",
+        help="Comma-separated PS keys to encode (default: full ladder)",
+    )
     parser.add_argument("--clip-only", type=str, default=None, help="e.g. clip_01")
     parser.add_argument("--bg-dir", type=Path, default=None, help="Optional winning background encodes per PS key")
     parser.add_argument(
@@ -202,6 +213,10 @@ def main() -> None:
     device = torch.device(args.device if torch.cuda.is_available() else "cpu")
     model, _ = _load_model(args.checkpoint, device)
     manifest = json.loads((args.curated_dir / "manifest.json").read_text())
+    only = [k for k in args.only_keys.split(",") if k] or None
+    unknown = set(only or []) - set(PS_KEYS)
+    if unknown:
+        raise SystemExit(f"unknown PS keys: {sorted(unknown)}")
     baseline_hand = None
     if args.baseline_hand is not None:
         baseline_hand = json.loads(args.baseline_hand.read_text())
@@ -225,7 +240,8 @@ def main() -> None:
             args.frames,
             mask_video=mask,
             pose_backend=args.pose_backend,
-            skip_av1=args.skip_av1,
+            skip_av1=args.skip_av1 or only is not None,
+            only=only,
             background_mp4s=background_mp4s,
             baseline_hand=baseline_hand,
         )

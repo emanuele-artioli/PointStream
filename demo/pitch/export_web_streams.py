@@ -41,10 +41,11 @@ CLIP_SHORT = {
 }
 
 PS_KEYS = [
+    ("ps_180", "Floor", "ps_rec_ps_floor.mp4"),
     ("ps_starve", "Extreme Starve", "ps_rec_ps_extreme_starve.mp4"),
     ("ps_heavy", "Heavy Starve", "ps_rec_ps_heavy_starve.mp4"),
     ("ps_low", "Low Teleop", "ps_rec_ps_low_teleop.mp4"),
-    ("ps_std", "PS Standard", "ps_rec_ps_standard.mp4"),
+    ("ps_720", "Mid", "ps_rec_ps_mid.mp4"),
     ("ps_1080", "Standard 1080p", "ps_rec_ps_standard_1080p.mp4"),
 ]
 

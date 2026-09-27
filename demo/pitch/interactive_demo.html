@@ -585,10 +585,11 @@
                             <option value="empty">Empty · maps only</option>
                         </optgroup>
                         <optgroup label="PointStream">
+                            <option value="ps_180">PS 180p · 52 kbps</option>
                             <option value="ps_starve" selected>PS 240p · 70 kbps</option>
                             <option value="ps_heavy">PS 360p · 116 kbps</option>
                             <option value="ps_low">PS 540p · 208 kbps</option>
-                            <option value="ps_std">PS 540p · 272 kbps</option>
+                            <option value="ps_720">PS 720p · 292 kbps</option>
                             <option value="ps_1080">PS 1080p · 576 kbps</option>
                         </optgroup>
                         <optgroup label="AV1">
@@ -610,18 +611,19 @@
                             <option value="empty">Empty · maps only</option>
                         </optgroup>
                         <optgroup label="AV1">
-                            <option value="av1_240" selected>AV1 240p · CRF 35</option>
                             <option value="av1_180">AV1 180p · 42 kbps</option>
+                            <option value="av1_240" selected>AV1 240p · CRF 35</option>
                             <option value="av1_360">AV1 360p · 110 kbps</option>
                             <option value="av1_540">AV1 540p · 259 kbps</option>
                             <option value="av1_720">AV1 720p · 324 kbps</option>
                             <option value="av1_1080">AV1 1080p · 563 kbps</option>
                         </optgroup>
                         <optgroup label="PointStream">
+                            <option value="ps_180">PS 180p · 52 kbps</option>
                             <option value="ps_starve">PS 240p · 70 kbps</option>
                             <option value="ps_heavy">PS 360p · 116 kbps</option>
                             <option value="ps_low">PS 540p · 208 kbps</option>
-                            <option value="ps_std">PS 540p · 272 kbps</option>
+                            <option value="ps_720">PS 720p · 292 kbps</option>
                             <option value="ps_1080">PS 1080p · 576 kbps</option>
                         </optgroup>
                         <optgroup label="Reference">
@@ -926,10 +928,11 @@ class StreamingCodecAdapter(Protocol):
                 keypoints: 'keypoints_clip_01.json?v=sides1',
                 rd_img: 'rd_curves_clip_01_factory001_worker001_00001.png?v=sides1',
                 streams: {
+                    ps_180:    { kind: 'ps', res: '180p', kbps: 46.5, mpjpe: 93.0, det: 28.9, kp: 12.8 },
                     ps_starve: { kind: 'ps', res: '240p', kbps: 56.1, mpjpe: 65.6, det: 55.4, kp: 11.6 },
                     ps_heavy:  { kind: 'ps', res: '360p', kbps: 91.3, mpjpe: 66.0, det: 58.8, kp: 11.6 },
                     ps_low:    { kind: 'ps', res: '540p', kbps: 163.1, mpjpe: 65.7, det: 61.1, kp: 11.6 },
-                    ps_std:    { kind: 'ps', res: '540p', kbps: 276.0, mpjpe: 60.0, det: 62.3, kp: 11.6 },
+                    ps_720:    { kind: 'ps', res: '720p', kbps: 216.1, mpjpe: 93.3, det: 33.1, kp: 12.8 },
                     ps_1080:   { kind: 'ps', res: '1080p', kbps: 368.8, mpjpe: 72.3, det: 55.4, kp: 11.6 },
                     av1_180:   { kind: 'av1', res: '180p', kbps: 34.3, mpjpe: 59.0, det: 41.6, kp: 0 },
                     av1_240:   { kind: 'av1', res: '240p', kbps: 49.1, mpjpe: 49.5, det: 61.2, kp: 0 },
@@ -945,10 +948,11 @@ class StreamingCodecAdapter(Protocol):
                 keypoints: 'keypoints_clip_02.json?v=sides1',
                 rd_img: 'rd_curves_clip_02_factory001_worker001_00002.png?v=sides1',
                 streams: {
+                    ps_180:    { kind: 'ps', res: '180p', kbps: 50.1, mpjpe: 100.5, det: 32.2, kp: 6.1 },
                     ps_starve: { kind: 'ps', res: '240p', kbps: 66.2, mpjpe: 110.0, det: 35.3, kp: 5.9 },
                     ps_heavy:  { kind: 'ps', res: '360p', kbps: 109.3, mpjpe: 77.8, det: 46.5, kp: 5.9 },
                     ps_low:    { kind: 'ps', res: '540p', kbps: 203.8, mpjpe: 93.2, det: 47.7, kp: 5.9 },
-                    ps_std:    { kind: 'ps', res: '540p', kbps: 267.0, mpjpe: 87.3, det: 51.9, kp: 5.9 },
+                    ps_720:    { kind: 'ps', res: '720p', kbps: 305.0, mpjpe: 100.9, det: 54.3, kp: 6.1 },
                     ps_1080:   { kind: 'ps', res: '1080p', kbps: 518.7, mpjpe: 71.7, det: 58.1, kp: 5.9 },
                     av1_180:   { kind: 'av1', res: '180p', kbps: 45.6, mpjpe: 92.6, det: 36.6, kp: 0 },
                     av1_240:   { kind: 'av1', res: '240p', kbps: 66.3, mpjpe: 91.8, det: 35.4, kp: 0 },
@@ -964,10 +968,11 @@ class StreamingCodecAdapter(Protocol):
                 keypoints: 'keypoints_clip_03.json?v=sides1',
                 rd_img: 'rd_curves_clip_03_factory001_worker001_00000.png?v=sides1',
                 streams: {
+                    ps_180:    { kind: 'ps', res: '180p', kbps: 60.5, mpjpe: 90.1, det: 54.3, kp: 11.4 },
                     ps_starve: { kind: 'ps', res: '240p', kbps: 75.2, mpjpe: 91.6, det: 57.8, kp: 10.8 },
                     ps_heavy:  { kind: 'ps', res: '360p', kbps: 124.6, mpjpe: 84.7, det: 54.3, kp: 10.8 },
                     ps_low:    { kind: 'ps', res: '540p', kbps: 230.7, mpjpe: 64.7, det: 53.9, kp: 10.8 },
-                    ps_std:    { kind: 'ps', res: '540p', kbps: 268.9, mpjpe: 62.2, det: 56.6, kp: 10.8 },
+                    ps_720:    { kind: 'ps', res: '720p', kbps: 354.8, mpjpe: 83.2, det: 56.2, kp: 11.4 },
                     ps_1080:   { kind: 'ps', res: '1080p', kbps: 597.9, mpjpe: 54.1, det: 52.3, kp: 10.8 },
                     av1_180:   { kind: 'av1', res: '180p', kbps: 51.4, mpjpe: 92.6, det: 59.1, kp: 0 },
                     av1_240:   { kind: 'av1', res: '240p', kbps: 76.6, mpjpe: 102.0, det: 58.8, kp: 0 },
@@ -981,10 +986,11 @@ class StreamingCodecAdapter(Protocol):
         };
 
         const MATCH_AV1 = {
+            ps_180: 'av1_180',
             ps_starve: 'av1_240',
             ps_heavy: 'av1_360',
             ps_low: 'av1_540',
-            ps_std: 'av1_540',
+            ps_720: 'av1_720',
             ps_1080: 'av1_1080'
         };
 
