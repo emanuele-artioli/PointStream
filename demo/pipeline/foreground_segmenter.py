@@ -12,6 +12,7 @@ def letterbox_crop(
     image: np.ndarray,
     bbox: list[int],
     target_size: int = 256,
+    interpolation: int = cv2.INTER_AREA,
 ) -> tuple[np.ndarray, dict[str, float]]:
     """Crops the bbox from image and letterboxes/resizes it to (target_size, target_size).
 
@@ -30,7 +31,7 @@ def letterbox_crop(
     scale = float(target_size) / max(cw, ch)
     new_w = max(1, min(target_size, int(round(cw * scale))))
     new_h = max(1, min(target_size, int(round(ch * scale))))
-    resized = cv2.resize(crop, (new_w, new_h), interpolation=cv2.INTER_AREA)
+    resized = cv2.resize(crop, (new_w, new_h), interpolation=interpolation)
 
     canvas = np.zeros((target_size, target_size, 3), dtype=np.uint8)
     pad_x = (target_size - new_w) // 2
