@@ -26,7 +26,7 @@ dependencies = [
   "mlflow==2.14.3",
   "controlnet-aux==0.0.9",
   "decord==0.6.0",
-  "onnxruntime-gpu==1.16.3",
+  "onnxruntime-gpu==1.23.2",
   "mediapipe==0.10.5",
   "pytorchvideo==0.1.5",
   "fvcore==0.1.5.post20221221",
