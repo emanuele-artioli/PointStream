@@ -16,7 +16,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-from demo.models.matte import letterbox_alpha, matte_bgr
+from demo.models.matte import letterbox_alpha, matte_bgr, soft_edge_alpha
 from demo.pipeline.foreground_segmenter import letterbox_crop
 from demo.pipeline.hand_keypoints import (
     FrameHandPose,
@@ -165,7 +165,8 @@ def build_curated_samples(
                 "bbox": hand.bbox,
             }
             if alpha is not None:
-                sample["target_alpha"] = (alpha > 127).astype(np.float32)
+                # 1–2 px falloff centered on the SAM contour.
+                sample["target_alpha"] = soft_edge_alpha(alpha)
             samples.append(sample)
 
     return samples, appearance_anchors, anchor_bytes
