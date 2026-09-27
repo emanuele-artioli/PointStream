@@ -841,7 +841,7 @@ def _sequence_perception(
             )
             if pose is None:
                 continue
-            player_pose = PlayerPose(
+            PlayerPose(
                 object_id=object_id,
                 frame_index=frame_index,
                 keypoints=pose.values,
@@ -1840,7 +1840,7 @@ def run_audit(args: argparse.Namespace, *, repo_root: Path) -> dict[str, Any]:
             }
         )
 
-    contacts = _write_contact_and_preview(scene_rows, run_dir)
+    _write_contact_and_preview(scene_rows, run_dir)
     with (run_dir / "observations.jsonl").open("w", encoding="utf-8") as stream:
         stream.write("\n".join(observation_lines) + "\n")
     with (run_dir / "poses.jsonl").open("w", encoding="utf-8") as stream:
