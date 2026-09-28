@@ -12,7 +12,9 @@ PointStream is an object-centric semantic video codec. The target is an ACM TOMM
 - Cooperative claims prevent collisions among participating PointStream jobs. They cannot stop another user starting work later, and free memory cannot guarantee an oversized workload will avoid OOM. If the supervisor detects outside GPU use, it stops only its own affected job, preserves files, and marks timing contaminated.
 - Hardware ordering (Ada, A6000, RTX 8000, GV100) is only a fallback heuristic. Prefer compatible hardware and measured performance for comparable workloads.
 
+## Branches and review
 
+Do this work on a scoped branch, not directly on `main`. Commit a coherent change when it is in a state worth keeping, and push that branch. Do not leave finished work only in the local checkout. When focused tests cover the behavior, suggest a pull request and wait for the user to ask before opening it.
 
 ## Reproducibility and checks
 
