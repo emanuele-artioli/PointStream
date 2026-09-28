@@ -1,88 +1,39 @@
 # PointStream
 
-PointStream is an object-centric semantic video codec where every component is a config choice. The encoder transmits each salient object's appearance and motion plus a reusable background model and an optional corrective residual; the client reconstructs video frames generatively or through composited references, with an explicit coded fallback when semantic models fail.
+PointStream is an object-centric semantic video codec. It represents video using background data, object appearance and motion, optional neural synthesis, and corrective residuals. **Broadcast tennis is the primary research setting; the egocentric demo is secondary.**
 
-> [!NOTE]
-> **Research Status**: PointStream is research software under active development. A confirmed rate–distortion win over conventional codecs (AV1 / VVC) is not yet established at the current evidence revision. The primary configuration search keeps generative synthesis off and evaluates semantic decomposition and background amortization.
+No confirmed end-to-end rate–quality advantage is established by the audited evidence. The current research compares PointStream with reproducible generative codecs as well as AV1/VVC, testing perceptual quality, preservation of tennis action, complete transmitted rate, and client computation. Candidate contributions remain hypotheses.
 
----
+## Research documentation
 
-## Supported Setup
+Start with the [documentation index](docs/README.md). Its paper-shaped chapters cover the problem, related work and replication priorities, motivation, method, implementation, evaluation, experiment cards, and historical evidence. [PLAN.md](PLAN.md) routes to the current next steps; it is not a second campaign log.
 
-- **Coordinator**: Work from the Mac checkout with Python and SSH access to `gpu1`–`gpu6`. Local CUDA is not required.
-- **Compute**: The dispatch tool selects an available Linux GPU server for each CUDA job. The servers use PointStream's pinned Python environment and native codec tools.
-- **Data**: Datasets and experiment outputs stay on the shared external data root, never inside this checkout.
+The manuscript lives in the sibling repository `../67a9ea6275d3d9785ce57026/`, under its own instructions. Documentation drafts do not certify manuscript claims or experimental results.
 
----
+## Working with the code
 
-## Installation
+Use the Mac checkout for development and coordination. Follow [setup](docs/setup.md) for the pinned environment, external data root, native codec tools, and fleet admission rules. Dispatch CUDA through `python -m experiments.jobs.fleet`; inspect all six hosts before choosing one. Every extended experiment requires a passing bounded smoke through the same entry point. [Long-job operation](docs/workflow/long-jobs.md) describes detached supervision and provenance.
 
-Clone the repository on the coordinator. The fleet dispatcher uses Python's standard library; project tests use the dependencies in `pyproject.toml`. CUDA, PyTorch, FFmpeg, and codec binaries are provided by the pinned environment on the GPU servers.
+Dependencies are specified in `pyproject.toml` and `environment.yaml`. In an environment with project dependencies, a synthetic integration check is:
 
 ```bash
-git clone https://github.com/emanuele-artioli/PointStream.git
-cd PointStream
-conda env create -f environment.yaml
-conda activate pointstream
+python -m pytest -q tests/runner/test_tier_end_to_end.py
 ```
 
-Dependencies and package standards are defined in `pyproject.toml` and `environment.yaml`.
+Synthetic tests establish software behavior, not research performance. The [experiment plan](docs/research/07-experiment-plan.md) lists focused tests and qualification gates before model comparisons.
 
----
+## Repository map
 
-## Quick Start (Synthetic Test)
+| Path | Purpose |
+|---|---|
+| `src/contracts/` | Configuration, observation, schema and component contracts |
+| `src/components/` | Background, appearance, perception, motion and generation implementations |
+| `src/runner/` | Stage execution, persisted client payload, accounting and delivered-frame scoring |
+| `src/pipeline/` | Reconstruction, residual transport and metrics |
+| `experiments/` | Dataset/evaluation protocols, probes, native ladders and fleet dispatch |
+| `manifests/` | Versioned source selections, review and provenance records |
+| `tests/` | Focused contracts and integration checks |
+| `demo/` | Secondary demonstration and development tools |
+| `docs/research/` | Current research narrative, evaluation protocol and experiment plan |
 
-To verify that the configuration lattice, runner pipeline, and metric interfaces work without requiring large video datasets, run the synthetic tier end-to-end suite:
-
-```bash
-python -m pytest tests/runner/test_tier_end_to_end.py -q
-```
-
-This test constructs a small synthetic clip, drives each shipped tier configuration (`fast`, `balanced`, `quality`) through `src.runner.run`, verifies that disabled stages execute zero calls, and checks output score emission. If `ffmpeg` lacks `libvmaf`, VMAF-specific assertions are cleanly skipped.
-
----
-
-## Real-Data Workflow
-
-Read [the setup guide](docs/setup.md), inspect the fleet, and launch a bounded job from the Mac. For example, use the pinned remote Python and write the result under the unique remote job directory:
-
-```bash
-python -m experiments.jobs.fleet inspect --hosts gpu1 gpu2 gpu3 gpu4 gpu5 gpu6
-python -m experiments.jobs.fleet launch --hosts gpu5 gpu6 \
-  --gpu-memory-mib 12000 --cpu-threads 8 --budget-hours 2 \
-  --require-path /home/itec/emanuele/pointstream-data/assets/dataset/alcaraz_highlights/segmentations/scene_000 \
-  --require-path /home/itec/emanuele/pointstream-data/outputs/bp21-headroom/clips/alcaraz_highlights/scene_000/window \
-  -- /home/itec/emanuele/.conda/envs/pointstream/bin/python -c \
-  'import os; from experiments.tier.run import main; raise SystemExit(main(["--tiers", "fast", "--frames", "8", "--out", os.path.join(os.environ["PS_JOB_DIR"], "report.json")]))'
-```
-
-The command snapshots `HEAD`; pass `--include-change PATH` or `--include-untracked PATH` only for source files that belong in the experiment. Use the returned job ID with `fleet status` or `fleet cancel`. The local coordinator can retrieve result files from the reported remote run directory with `scp`. Details and limits are in [docs/workflow/long-jobs.md](docs/workflow/long-jobs.md).
-
----
-
-## Output Locations
-
-- **Run Artifacts & Metrics**: Remotely supervised job files are stored under `$PS_DATA_ROOT/jobs/fleet/runs/<job-id>/`; datasets and older experiment outputs remain under the external data root.
-- **Logs**: Each remote run keeps `command.log`, `status.json`, monitor state, the dispatch manifest, and outputs alongside the run record. A compact manifest is also stored on the coordinator.
-
----
-
-## Repository Structure
-
-```text
-├── src/
-│   ├── contracts/          # Machine-checkable interfaces and configuration schemas
-│   ├── components/         # Background, appearance, motion, residual, and generation modules
-│   └── pipeline/           # Reconstruction, codec, and quality evaluation engines
-├── config/                 # Shipped tier definitions (tier_fast.yaml, tier_balanced.yaml, tier_quality.yaml)
-├── experiments/            # Benchmark scripts, ladders, and probe harnesses
-├── tests/                  # Unit tests and end-to-end pipeline verification
-└── docs/                   # Architecture, area documents, roadmap, and history
-    ├── setup.md            # Local coordination, remote fleet, and data setup
-    ├── roadmap.md          # Submission gates A through E
-    ├── areas/              # Current state and next actions by functional area
-    ├── history/            # Pull request index, findings/retraction log, retired docs
-    └── workflow/           # Experiment procedures and long-job dispatch
-```
-
-For overnight runs, use [script-based monitoring and bounded codec pilots](docs/workflow/long-jobs.md).
+Keep datasets, weights and new run outputs outside the code tree. Do not introduce `assets/` or `outputs/` symlinks. Preserve unrelated work and use the repository [AGENTS.md](AGENTS.md) for branch, dispatch, review and reproducibility requirements.

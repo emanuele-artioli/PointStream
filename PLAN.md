@@ -1,110 +1,13 @@
-# PointStream Area Index & Active Plan
+# PointStream current plan
 
-Research thesis, evidence boundaries, and proposed next tests:
-[semantic codec thesis](docs/strategy/semantic-codec-thesis.md). This working
-note does not change the active evaluation gate below.
+Updated 28 September 2026. Primary domain: broadcast tennis. Target submission: ACM TOMM, 30 September 2026. The deadline does not relax evidence requirements.
 
-Current coordination: **24 September 2026**.
-Start with the [24 September foreground campaign](docs/workflow/session/evaluation-campaign/20260924-foreground-campaign.md).
-The September 17 roadblock, the 20 September evidence freeze, and the older
-handoffs are historical. Submission **30 September**. Evidence freeze
-**29 September**. Held-out confirmation is skipped. The decision metric is
-weighted PSNR (`0.7` foreground + `0.3` background). A claimable point is at
-least the anchor's weighted PSNR and no more bytes.
+The authoritative research plan is now [docs/research/07-experiment-plan.md](docs/research/07-experiment-plan.md), governed by [the prospective evaluation protocol](docs/research/06-evaluation.md). Start with the [documentation index](docs/README.md).
 
-The [single foreground campaign record](docs/workflow/session/evaluation-campaign/20260924-foreground-campaign.md)
-contains the union-crop diagnostic, corrected separate-object retest,
-Pix2Pix exact-video diagnostic, and Animate Anyone/Alcaraz continuation.
-No tested 48-frame point is claimable. The best capped Alcaraz continuation
-scores 21.30 dB weighted against 25.37 dB source; temporal object video
-clears picture quality but exceeds rate by at least 128,046 B. The next
-bounded work is predictive same-player appearance refresh, charged temporal
-object masks, and matched-wire fast-model screens. Independent AV1 intra
-refreshes and the installed Animate Anyone checkpoint are measured controls.
+The next stage is bounded qualification: intake and verify saved artifacts/source exposure (E00), qualify metrics (E01), close dataset/client conditioning gaps (E02), smoke selected official baselines (E03), and verify PointStream's real generation-on receiver path (E04). These precede broad sweeps, training, and confirmation. No experiment was launched by the documentation rebuild.
 
-## Prior measured follow-up — historical
+MTTF, GLC-video, and GVC-RT are the first replication candidates; S²VC is a heavier optional arm. Keep AV1/VVC and one qualified DCVC variant as anchors. Availability in a public repository is not a successful local replication. [Related work](docs/research/02-related-work.md) records source links, reported baselines/results, and replication caveats.
 
-The previous modular victory was a constant table, not an encode. This older
-sequential Federer checklist led to the completed background and foreground
-records linked above. The 192-frame window remains out of scope.
+The audited record contains no confirmed complete-codec win. Historical weighted-PSNR gates, exposed sources, failed controls, and retractions remain in [the evidence ledger](docs/research/08-evidence-ledger.md). Older instructions to skip confirmation or keep generation off do not govern this prospective plan; the generation-off runner remains a useful control.
 
-1. **Background codec:** keep the current PointStream plate on WebP for now;
-   record the full-resolution intra-codec replacement as deferred work. The
-   old Presley contract is not a PointStream acceptance criterion.
-2. **VVC failure mode:** reproduce the empty-file/exit-0 behavior, compare the
-   FFmpeg `libvvenc` wrapper with the installed `vvencapp`, and make measured
-   runs reject or recover from empty output while recording the actual binary.
-3. **Appearance transport:** retain the per-frame crop as a control, then
-   measure one initial appearance plus bbox motion and one initial appearance
-   plus COCO-17 keypoint motion. Charge every motion byte. Do not claim a
-   generative win until a generator reconstructs this arm and is scored on the
-   same weighted ledger.
-4. **Quality policy:** score PointStream and both native anchors with
-   foreground/background PSNR and `0.7 FG + 0.3 BG` weighted PSNR. Rate-only
-   wins remain insufficient when the quality arm is unusable.
-5. **Registration diagnostic:** compare the unregistered plate control with a
-   registered plate reconstructed through the transmitted camera maps. Record
-   map bytes and the quality/rate tradeoff before changing the production
-   default.
-6. **Documentation:** update the area notes and scorecards from measured JSON
-   only; keep all 65.4% / 32.5% / 66.7% claims withdrawn.
-
-## Coordinator parallel readiness — 16 September 2026
-
-Neural-anchor code/input are pinned in the evaluation area; weights and UF-compatible Torch/CUDA remain unresolved. RT CPU entropy preflight
-passes; there is no neural video benchmark. The data area pins the
-three-source score-free reservation, with exposure/PTS audit and execution
-freeze still open. Paper setup `7a0476e` is pushed to Overleaf and builds to
-23 body/reference pages plus five appendix pages. No E05, neural rate ladder
-or confirmation scoring is released by this preparation. The latest reports
-are reviewed below; only the evidence reuse tasks in the current brief are released.
-
-## Areas
-
-| Area | Current state | Next campaign work |
-|---|---|---|
-| [Evaluation](docs/areas/evaluation.md) | #128 compaction/client audit returned; tested configuration stopped | E06 reuse/claim audit; no native re-encodes |
-| [Codec](docs/areas/codec.md) | #127 saved-data decomposition returned; narrow audit corrections open | E04 background coverage and paired removal |
-| [Generation](docs/areas/generation.md) | #129 merged; blank completed, fitted checkpoint not promoted | E05 saved-checkpoint evidence; Stage2 unreleased |
-| [Data](docs/areas/data.md) | Preserve exposure history; six fresh matches preferred but lower prospective count permitted | E01 split/protocol, E07 confirmation and second domain after tennis win |
-| [Infrastructure](docs/areas/infrastructure.md) | Local fleet dispatcher pilot passed on gpu5/gpu6; no persistent queue | Inspect every candidate, claim/recheck one compatible GPU per job, record immutable snapshot provenance; no cleanup helper |
-| [Paper](docs/areas/paper.md) | Separate repo; no new competitive evidence certified by repairs | E08 setup/structure early, final claims after accepted results |
-
-## Module Scorecards & Operational Headroom
-
-| Module | Owner Lane | Verdict | Short Headroom (48f) | Long Headroom (192f) | Next Action |
-|---|---|---|---|---|---|
-| [01 Segmentation](docs/scorecards/01_segmentation.md) | Antigravity FG | SATISFIED_FREEZE | $\Delta F = -1.1\text{ kB}$ (10%) | $\Delta F \approx -4\text{ kB}$ | Freeze YOLO; SAM 3.1 below 15% threshold |
-| [02 Background](docs/scorecards/02_background.md) | PointStream codec | ACTIVE_SEARCH | Registered VVC QP 40 plate 58,814 B; warp residual QP 46 is 107 kB at BG 29.56 dB | not remeasured | Matched-QP residual fell only ~29 kB; foreground still blocks a weighted win |
-| [03 Appearance Crops](docs/scorecards/03_appearance_crops.md) | PointStream foreground | ACTIVE_SEARCH | 12 kB budget, 6 crops, FG 17.70 dB | not remeasured | Budget raised FG +3.4 dB and left 42 frames suppressed |
-| [04 Motion & Metadata](docs/scorecards/04_motion_metadata.md) | Cursor / Antigravity | SATISFIED_FREEZE | $T=17.6\text{ kB} < \text{VVC}$; pred $\le +0.12\text{ dB}$ | -29.8 kB | Freeze E06 per-frame RLE wire packing |
-| [05 Residuals](docs/scorecards/05_residuals.md) | PointStream codec | ACTIVE_SEARCH | Warp-error BG residual 107,005 B at QP 46; weighted 21.26 dB with the 12 kB crop budget | not remeasured | Next residual is the player error on a plate-inpainted anchor encode, not another still-plate QP |
-
-## Current boundary — component strategy checkpoint
-
-E06 compact transport and client timing support stopping this tested codec
-configuration; #128 remains under narrow eligibility review. E05/#129 merged
-`7b771f0` completes blank/repeat controls and supports no Stage2 promotion for
-this fitted checkpoint; complete calibration/generalization remain unaccepted.
-E04B/#127 supplies saved-data decomposition but reporting/provenance and empty-
-mask/policy interpretation need narrow correction. Retain removal-OFF provisionally
-on this scene; no Telea capability or global geometric bound is established.
-
-The component strategy remains in force. Search coverage is still narrow and
-September17 has no valid baseline-clearing generator: an explicit roadblock.
-Next work is costed mechanism-driven cards and narrow PR acceptance corrections,
-not another unbounded evidence-repair cycle or execution sweep.
-
-| Owner | Next action |
-|---|---|
-| Cursor | #128 eligibility correction; costed physical-wire/predictor headroom card |
-| Antigravity foreground | Preserve checkpoint stop; two costed baseline-clearing alternatives, no training |
-| Antigravity background | #127 derived provenance, empty-mask and scoped policy correction; no encodes |
-| Codex | Neural weights/whole-model readiness, confirmation provenance and paper integration |
-
-Follow [the checkpoint and paste-ready task scopes](docs/workflow/session/evaluation-campaign/tasks/20260917-strategy-roadblock.md).
-The older Clean project state and dispatch task ID,
-`01a0a923-4c5e-71c3-8993-5c68f2a76bb4`, is historical routing only. Preserve paused worker worktrees.
-Confirmation scoring remains unauthorized. September20 is at risk; neural anchor,
-valid neural baseline clearance, confirmed tennis win and second domain remain
-submission requirements. No scope/date change or final procedure freeze.
+[Setup](docs/setup.md), [experiment design](docs/workflow/experiment-design.md), and [long jobs](docs/workflow/long-jobs.md) remain operational references. All retired plans, areas and scorecards can be recovered exactly from [the retirement map](docs/history/documentation-rebuild-20260928.tsv). Legacy `BP*` section references in script comments describe historical provenance; they are not current execution instructions.
