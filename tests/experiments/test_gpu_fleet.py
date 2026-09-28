@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 import subprocess
 import tarfile
@@ -216,6 +217,35 @@ def test_snapshot_contains_only_selected_tracked_edits_and_explicit_untracked_fi
         base_archive.unlink(missing_ok=True)
 
 
+def test_snapshot_transfer_and_extraction_allow_slow_shared_storage(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    source = tmp_path / "snapshot.tar"
+    source.write_bytes(b"snapshot")
+    digest = hashlib.sha256(source.read_bytes()).hexdigest()
+    ssh_calls: list[tuple[list[str], float]] = []
+    upload_calls: list[dict[str, Any]] = []
+
+    def fake_ssh(host: str, command: list[str], *, timeout: float = 30) -> SimpleNamespace:
+        ssh_calls.append((command, timeout))
+        stdout = f"{digest} archive.tar\n" if command[0] == "sha256sum" else ""
+        return SimpleNamespace(returncode=0, stdout=stdout, stderr="")
+
+    def fake_run(*args: Any, **kwargs: Any) -> SimpleNamespace:
+        upload_calls.append(kwargs)
+        return SimpleNamespace(returncode=0, stderr=b"")
+
+    monkeypatch.setattr(fleet, "_ssh", fake_ssh)
+    monkeypatch.setattr(fleet.subprocess, "run", fake_run)
+
+    fleet._send_snapshot("gpu6", source, "/data/snapshots/job", digest)
+
+    assert upload_calls[0]["timeout"] == fleet.SNAPSHOT_TRANSFER_TIMEOUT_SECONDS
+    extract_command, extract_timeout = ssh_calls[1]
+    assert extract_command[0] == "tar"
+    assert extract_timeout == fleet.SNAPSHOT_TRANSFER_TIMEOUT_SECONDS
+
+
 def tarfile_open(path: Path) -> dict[str, bytes]:
     with tarfile.open(path, "r") as tar:
         files: dict[str, bytes] = {}
@@ -255,3 +285,5 @@ def test_remote_launcher_python_is_well_formed_and_uses_the_existing_supervisor(
     compile(tokens[3], "remote fleet launcher", "exec")
     assert "experiments.jobs.monitor" in tokens[3]
     assert "--claim-gpu" in tokens[3]
+    assert "monotonic()+60" in tokens[3]
+    assert "within 60 seconds" in tokens[3]

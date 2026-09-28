@@ -29,6 +29,7 @@ DEFAULT_IDLE_MEMORY_MIB = 256
 DEFAULT_MEMORY_MARGIN_MIB = 4096
 DEFAULT_IDLE_UTILIZATION_PCT = 5
 DEFAULT_STATE_DIR = Path.home() / ".pointstream" / "fleet" / "jobs"
+SNAPSHOT_TRANSFER_TIMEOUT_SECONDS = 300
 DEVICE_RANK = ("RTX 6000 Ada", "RTX A6000", "RTX 8000", "GV100")
 SNAPSHOT_EXCLUDED_PATHS = ("demo/outputs",)
 JOB_ID_RE = re.compile(r"^[0-9]{8}T[0-9]{6}Z-[0-9a-f]{8}$")
@@ -383,7 +384,7 @@ def _send_snapshot(host: str, source: Path, target: str, expected_sha256: str) -
             ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8", host, shlex.join(["bash", "-lc", receive])],
             stdin=stream,
             capture_output=True,
-            timeout=180,
+            timeout=SNAPSHOT_TRANSFER_TIMEOUT_SECONDS,
             check=False,
         )
     if proc.returncode:
@@ -391,7 +392,11 @@ def _send_snapshot(host: str, source: Path, target: str, expected_sha256: str) -
     checksum = _ssh(host, ["sha256sum", "--", remote_tar])
     if checksum.returncode or checksum.stdout.split(maxsplit=1)[0] != expected_sha256:
         raise FleetError(f"{host}: transferred snapshot checksum does not match the local archive")
-    extract = _ssh(host, ["tar", "-xf", remote_tar, "-C", target], timeout=180)
+    extract = _ssh(
+        host,
+        ["tar", "-xf", remote_tar, "-C", target],
+        timeout=SNAPSHOT_TRANSFER_TIMEOUT_SECONDS,
+    )
     if extract.returncode:
         raise FleetError(f"{host}: snapshot extraction failed: {extract.stderr.strip()}")
     remove_archive = _ssh(host, ["/usr/bin/python3", "-c", "import pathlib,sys; pathlib.Path(sys.argv[1]).unlink()", remote_tar])
@@ -607,7 +612,7 @@ p=subprocess.run(cmd,cwd=source,env=env,capture_output=True,text=True,timeout=60
 if p.returncode: raise SystemExit(p.stderr or p.stdout or "PointStream monitor refused launch")
 try: pid=int(p.stdout.strip().split("supervisor=")[1].split()[0])
 except (ValueError,IndexError): pid=None
-deadline=__import__("time").monotonic()+15
+deadline=__import__("time").monotonic()+60
 status_path=run/"status.json"
 while __import__("time").monotonic()<deadline:
  try: state=json.loads(status_path.read_text())
@@ -615,7 +620,7 @@ while __import__("time").monotonic()<deadline:
  if state.get("pid"): break
  if state.get("status") not in (None,"running"): raise SystemExit("supervisor rejected launch before child start: "+json.dumps(state))
  __import__("time").sleep(.1)
-if not state.get("pid"): raise SystemExit("supervisor did not confirm child launch within 15 seconds")
+if not state.get("pid"): raise SystemExit("supervisor did not confirm child launch within 60 seconds")
 (run/"dispatch.json").write_text((source/"dispatch.json").read_text())
 print(json.dumps({"supervisor_pid":pid,"monitor_output":p.stdout.strip()}))'''
     payload["python"] = remote_python
