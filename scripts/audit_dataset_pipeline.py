@@ -1830,7 +1830,7 @@ def _write_contact_and_preview(
         height, width = preview_frames[0].shape[:2]
         writer = cv2.VideoWriter(
             str(preview_path),
-            cv2.VideoWriter_fourcc(*"mp4v"),
+            cast(Any, cv2).VideoWriter_fourcc(*"mp4v"),
             4.0,
             (width, height),
         )
@@ -1975,7 +1975,7 @@ def _read_existing_track_metadata(dataset_root: Path) -> tuple[list[dict[str, An
                     bbox = row.get("bbox")
                     if not isinstance(bbox, (list, tuple)) or len(bbox) != 4:
                         raise ValueError(f"{metadata_path} row {position} has no xyxy bbox")
-                    box = tuple(int(value) for value in bbox)
+                    box = (int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3]))
                     if box[2] <= box[0] or box[3] <= box[1]:
                         raise ValueError(f"{metadata_path} row {position} has an empty player bbox")
                     if frame_id < 0 or frame_id in seen_ids:
@@ -2157,13 +2157,14 @@ def _verify_previous_scene_alignment(
                 crop_rgba = np.dstack((rgb, np.where(np.any(rgb > 8, axis=2), 255, 0).astype(np.uint8)))
             else:
                 raise ValueError(f"old crop is not RGB(A): {track['crop_paths'][position]}")
-            mae = _crop_frame_alignment(frame_rgb, crop_rgba, tuple(int(v) for v in row["bbox"]))
+            bbox = row["bbox"]
+            mae = _crop_frame_alignment(frame_rgb, crop_rgba, (int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])))
             if mae > maximum_mae:
                 raise ValueError(
                     f"{scene['source_id']}/{track['object_id']} frame {frame_id}: "
                     f"old crop/source MAE {mae:.3f} exceeds {maximum_mae:.3f}"
                 )
-            frame_shape = tuple(int(value) for value in frame_rgb.shape[:2])
+            frame_shape = (int(frame_rgb.shape[0]), int(frame_rgb.shape[1]))
             checks.append(
                 {
                     "video": scene["video"], "scene": scene["scene"],
@@ -2251,7 +2252,7 @@ def _build_quality_chunks(
                     continue
                 target_frames[local_frame]["player"].append(track_id)
                 player_box = _clip_prompt_box(
-                    tuple(int(value) for value in row["bbox"]), width, height
+                    (int(row["bbox"][0]), int(row["bbox"][1]), int(row["bbox"][2]), int(row["bbox"][3])), width, height
                 )
                 if player_box is not None:
                     frame_prompts[local_frame]["player"].append(
@@ -2449,10 +2450,10 @@ def _validated_quality_chunk_summary(
     for row in rows:
         if not isinstance(row, dict):
             raise ValueError(f"completed SAM3.1 chunk {metadata_path} has a malformed output row")
-        key = (str(row.get("role")), int(row.get("frame_index", -1)), str(row.get("object_id")))
-        if key in observed_rows:
-            raise ValueError(f"completed SAM3.1 chunk {metadata_path} repeats output {key}")
-        observed_rows.add(key)
+        output_key = (str(row.get("role")), int(row.get("frame_index", -1)), str(row.get("object_id")))
+        if output_key in observed_rows:
+            raise ValueError(f"completed SAM3.1 chunk {metadata_path} repeats output {output_key}")
+        observed_rows.add(output_key)
         mask_value = row.get("mask_path")
         if mask_value:
             mask_path = Path(mask_value).resolve()
@@ -2577,20 +2578,20 @@ def _sam_quality_dataset_worker(config_path: Path, *, resume: bool = False) -> i
                         )
                         for item in prompt_rows:
                             outputs[role][(item.frame_index, item.object_id)] = item
-                        target = next((item for item in prompt_rows if item.object_id == seed["object_id"]), None)
+                        matched_prompt = next((item for item in prompt_rows if item.object_id == seed["object_id"]), None)
                         tracking_points, tracking_labels, negative_point, tracking_point_source = (
-                            _tracking_refinement_points(seed, target, scale_x=scale_x, scale_y=scale_y)
+                            _tracking_refinement_points(seed, matched_prompt, scale_x=scale_x, scale_y=scale_y)
                         )
                         tracking_point = tracking_points[0] if tracking_points else None
                         tracking_rows: tuple[Any, ...] = ()
-                        if tracking_points:
+                        if tracking_points and matched_prompt is not None and matched_prompt.tracker_id is not None:
                             tracking_rows = segmenter.add_prompt(
                                 role,
                                 frame_index=int(seed["frame_index"]),
                                 object_id=str(seed["object_id"]),
                                 points=tracking_points,
                                 point_labels=tracking_labels,
-                                tracker_id=int(target.tracker_id),
+                                tracker_id=int(matched_prompt.tracker_id),
                                 session_key=session_key,
                             )
                             for item in tracking_rows:
@@ -2603,8 +2604,8 @@ def _sam_quality_dataset_worker(config_path: Path, *, resume: bool = False) -> i
                                 "role": role, "object_id": seed["object_id"],
                                 "source_frame_id": seed["source_frame_id"],
                                 "frame_index": seed["frame_index"], "bbox_xyxy": seed["bbox"],
-                                "returned_status": target.status.value if target else "missing",
-                                "sam_score": target.score if target else None,
+                                "returned_status": matched_prompt.status.value if matched_prompt else "missing",
+                                "sam_score": matched_prompt.score if matched_prompt else None,
                                 "tracking_point_xy": list(tracking_point) if tracking_point is not None else None,
                                 "tracking_point_source": tracking_point_source,
                                 "negative_drift_point_xy": list(negative_point) if negative_point is not None else None,
@@ -2617,7 +2618,7 @@ def _sam_quality_dataset_worker(config_path: Path, *, resume: bool = False) -> i
                     segmenter.close_session(role, session_key=session_key)
 
             rows: list[dict[str, Any]] = []
-            suppressed_extra_masks = Counter()
+            suppressed_extra_masks: Counter[str] = Counter()
             for local_frame, role_targets in sorted(chunk["target_frames"].items(), key=lambda item: int(item[0])):
                 frame_index = int(local_frame)
                 for role in ROLES:
@@ -2625,8 +2626,8 @@ def _sam_quality_dataset_worker(config_path: Path, *, resume: bool = False) -> i
                     known = {object_id for frame, object_id in outputs[role] if frame == frame_index}
                     suppressed_extra_masks[role] += len(known - set(object_ids))
                     for object_id in object_ids:
-                        item = outputs[role].get((frame_index, object_id))
-                        if item is None:
+                        observation = outputs[role].get((frame_index, object_id))
+                        if observation is None:
                             rows.append(
                                 {
                                     "role": role, "frame_index": frame_index, "object_id": object_id,
@@ -2636,13 +2637,13 @@ def _sam_quality_dataset_worker(config_path: Path, *, resume: bool = False) -> i
                                 }
                             )
                             continue
-                        mask = np.asarray(item.mask) if item.mask is not None else None
+                        mask = np.asarray(observation.mask) if observation.mask is not None else None
                         if mask is not None and mask.shape != (source_height, source_width):
                             mask = _resize_mask_nearest(mask, source_width, source_height)
                         bbox = _mask_bbox(mask) if mask is not None else None
                         mask_path = None
                         mask_hash = None
-                        if bbox is not None:
+                        if bbox is not None and mask is not None:
                             x0, y0, x1, y1 = bbox
                             relative = Path(f"{role}_{hashlib.sha1(object_id.encode()).hexdigest()[:12]}_{frame_index:06d}.png")
                             target_path = mask_dir / relative
@@ -2652,9 +2653,9 @@ def _sam_quality_dataset_worker(config_path: Path, *, resume: bool = False) -> i
                         rows.append(
                             {
                                 "role": role, "frame_index": frame_index, "object_id": object_id,
-                                "tracker_id": item.tracker_id, "score": item.score,
-                                "status": item.status.value if bbox is not None else "missing",
-                                "reason": item.reason if bbox is not None else (item.reason or "sam_returned_empty_mask"),
+                                "tracker_id": observation.tracker_id, "score": observation.score,
+                                "status": observation.status.value if bbox is not None else "missing",
+                                "reason": observation.reason if bbox is not None else (observation.reason or "sam_returned_empty_mask"),
                                 "mask_path": mask_path, "mask_sha256": mask_hash,
                                 "bbox_xyxy": list(bbox) if bbox else None,
                             }
@@ -3337,14 +3338,20 @@ def build_existing_quality_dataset(args: argparse.Namespace, *, repo_root: Path)
                         rejected_by_class[role] += 1
                     audit_stream.write(json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n")
                 target_local = sorted(int(value) for value in chunk["target_frames"])
-                best_local = max(
-                    target_local,
-                    key=lambda frame_index: (
-                        sum(1 for view in chunk_result["views"] if view["frame_index"] == frame_index and view["role"] == "racket" and view.get("quality_eligible")),
-                        sum(1 for view in chunk_result["views"] if view["frame_index"] == frame_index and view["role"] == "racket"),
-                        sum(1 for view in chunk_result["views"] if view["frame_index"] == frame_index and view["role"] == "player" and view.get("quality_eligible")),
-                    ),
-                )
+                if not target_local:
+                    raise ValueError(f"{scene['source_id']}: quality chunk has no target frames")
+                chunk_views = chunk_result["views"]
+                best_local = target_local[0]
+                best_score = None
+                for frame_index in target_local:
+                    frame_views = [view for view in chunk_views if view["frame_index"] == frame_index]
+                    score = (
+                        sum(1 for view in frame_views if view["role"] == "racket" and view.get("quality_eligible")),
+                        sum(1 for view in frame_views if view["role"] == "racket"),
+                        sum(1 for view in frame_views if view["role"] == "player" and view.get("quality_eligible")),
+                    )
+                    if best_score is None or score > best_score:
+                        best_local, best_score = frame_index, score
                 review_path = shard_dir / "review" / scene["video"] / scene["scene"] / f"chunk_{int(chunk['frame_start']):06d}.jpg"
                 review_row = _quality_review_row(frames[best_local], chunk_result, best_local, review_path)
                 review_row["chunk_start"] = int(chunk["frame_start"])
