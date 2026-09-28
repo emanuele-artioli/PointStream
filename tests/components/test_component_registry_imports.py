@@ -21,7 +21,7 @@ def test_explicit_registry_aggregation_still_loads_all_axes() -> None:
 from src.components import all_registries
 registries = all_registries()
 assert set(registries) == {
-    'appearance', 'background', 'codec', 'detector', 'domain', 'generation',
+    'appearance', 'background', 'codec', 'detector', 'domain', 'generator',
     'metric', 'motion', 'pose', 'rigid', 'scene', 'segmenter', 'selection',
     'temporal', 'tracking', 'transport'
 }

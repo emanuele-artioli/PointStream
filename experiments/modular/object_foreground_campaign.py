@@ -229,7 +229,7 @@ def warp_articulated(
         patch = cv2.warpAffine(crop_bgr, matrix, (x1-x0, y1-y0), flags=cv2.INTER_LINEAR)
         matte = cv2.warpAffine(alpha.astype(np.uint8), matrix, (x1-x0, y1-y0), flags=cv2.INTER_NEAREST)
         triangle = np.zeros((y1-y0, x1-x0), dtype=np.uint8)
-        cv2.fillConvexPoly(cast(Any, triangle), np.rint(local_target).astype(np.int32), 1)
+        cast(Any, cv2).fillConvexPoly(triangle, np.rint(local_target).astype(np.int32), 1)
         update = (triangle > 0) & (matte > 0)
         pixels[y0:y1, x0:x1][update] = patch[update]
         cover[y0:y1, x0:x1][triangle > 0] = matte[triangle > 0].astype(bool)
