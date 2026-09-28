@@ -9,6 +9,7 @@ to forward-only propagation.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from functools import wraps
 import hashlib
 import inspect
 import json
@@ -43,6 +44,35 @@ DEFAULT_CONFIG = {
     "async_loading_frames": False,
     "default_output_prob_thresh": 0.35,
 }
+
+
+def _configure_sdpa_backend(torch_module: Any) -> str:
+    """Allow PyTorch's efficient/math SDPA kernels when Flash Attention is unsupported."""
+    if not torch_module.cuda.is_available():
+        return "native_sdpa"
+    capability = torch_module.cuda.get_device_capability()
+    if capability[0] >= 8:
+        return "native_flash"
+
+    attention = torch_module.nn.attention
+    original = attention.sdpa_kernel
+    if getattr(original, "_pointstream_sdpa_fallback", False):
+        return "efficient_then_math_fallback"
+    backends = attention.SDPBackend
+
+    @wraps(original)
+    def compatible_sdpa_kernel(selected: Any, set_priority: bool = False) -> Any:
+        selected_items = list(selected) if isinstance(selected, (list, tuple)) else [selected]
+        if selected_items == [backends.FLASH_ATTENTION]:
+            return original(
+                [backends.EFFICIENT_ATTENTION, backends.MATH],
+                set_priority=True,
+            )
+        return original(selected, set_priority=set_priority)
+
+    compatible_sdpa_kernel._pointstream_sdpa_fallback = True  # type: ignore[attr-defined]
+    attention.sdpa_kernel = compatible_sdpa_kernel
+    return "efficient_then_math_fallback"
 
 
 @dataclass(frozen=True)
@@ -120,6 +150,7 @@ class Sam31SequenceSegmenter:
         self.predictor = predictor
         self.model_revision: str | None = None
         self.checkpoint_hash: str | None = None
+        self.sdpa_backend_policy = "native_sdpa"
         if self.predictor is None:
             self._verify_artifacts()
             self.predictor = self._load_predictor(builder)
@@ -187,6 +218,9 @@ class Sam31SequenceSegmenter:
             if source not in sys.path:
                 sys.path.insert(0, source)
         if builder is None:
+            import torch
+
+            self.sdpa_backend_policy = _configure_sdpa_backend(torch)
             try:
                 from sam3.model_builder import build_sam3_multiplex_video_predictor
             except ImportError as exc:
@@ -225,6 +259,10 @@ class Sam31SequenceSegmenter:
             "multiplex_count": self.multiplex_count,
             **self.model_options,
         }
+        # Preserve the existing native-kernel identity on supported GPUs. The
+        # fallback is provenance-relevant only where it changes execution.
+        if self.sdpa_backend_policy == "efficient_then_math_fallback":
+            config["sdpa_backend_policy"] = self.sdpa_backend_policy
         config_hash = hashlib.sha256(
             json.dumps(config, sort_keys=True, separators=(",", ":")).encode("utf-8")
         ).hexdigest()
@@ -405,7 +443,7 @@ class Sam31SequenceSegmenter:
                     MaskObservation(
                         role,
                         object_id,
-                        tracker_id,
+                        object_tracker,
                         int(frame_index),
                         result[0] if result is not None else None,
                         result[1] if result is not None else None,

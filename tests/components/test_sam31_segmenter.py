@@ -148,6 +148,21 @@ def test_sam31_prompt_and_propagation_preserve_missing_objects_and_frames() -> N
     assert all(item.mask is None and item.status.value == "missing" for item in propagated)
 
 
+def test_sam31_propagation_preserves_the_tracker_id_for_each_object() -> None:
+    predictor = _FakePredictor()
+    segmenter = Sam31SequenceSegmenter(predictor=predictor)
+    segmenter.start_session("racket", "/frames", frame_width=60, frame_height=40, policy="offline_causal")
+    segmenter.add_prompt("racket", frame_index=0, object_id="racket-1", text="tennis racket")
+
+    propagated = segmenter.propagate(
+        "racket", policy="offline_causal", direction="forward", frame_count=1
+    )
+
+    assert len(propagated) == 1
+    assert propagated[0].object_id == "racket-1"
+    assert propagated[0].tracker_id == 8
+
+
 def test_runtime_segment_adapter_uses_a_causal_prompt_and_skips_other_classes() -> None:
     predictor = _FakePredictor()
     segmenter = Sam31SequenceSegmenter(predictor=predictor)
@@ -195,3 +210,52 @@ def test_verified_predictor_session_initializer_signature_is_compatible() -> Non
     assert predictor._all_inference_states["fixed"]["state"] == {
         "resource_path": "/external/frames"
     }
+
+
+def test_older_cuda_uses_efficient_then_math_sdpa_fallback() -> None:
+    from types import SimpleNamespace
+
+    from src.components.segmentation.sam31 import _configure_sdpa_backend
+
+    calls: list[tuple[object, bool]] = []
+
+    class Backends:
+        FLASH_ATTENTION = object()
+        EFFICIENT_ATTENTION = object()
+        MATH = object()
+
+    def sdpa_kernel(selected: object, set_priority: bool = False) -> tuple[object, bool]:
+        calls.append((selected, set_priority))
+        return selected, set_priority
+
+    attention = SimpleNamespace(SDPBackend=Backends, sdpa_kernel=sdpa_kernel)
+    torch_module = SimpleNamespace(
+        cuda=SimpleNamespace(is_available=lambda: True, get_device_capability=lambda: (7, 5)),
+        nn=SimpleNamespace(attention=attention),
+    )
+
+    assert _configure_sdpa_backend(torch_module) == "efficient_then_math_fallback"
+    assert attention.sdpa_kernel.__wrapped__ is sdpa_kernel
+    result = attention.sdpa_kernel(Backends.FLASH_ATTENTION)
+
+    expected = [Backends.EFFICIENT_ATTENTION, Backends.MATH]
+    assert calls == [(expected, True)]
+    assert result == (expected, True)
+
+
+def test_ampere_or_newer_keeps_native_flash_sdpa() -> None:
+    from types import SimpleNamespace
+
+    from src.components.segmentation.sam31 import _configure_sdpa_backend
+
+    def original(selected: object, set_priority: bool = False) -> tuple[object, bool]:
+        return selected, set_priority
+
+    attention = SimpleNamespace(SDPBackend=object(), sdpa_kernel=original)
+    torch_module = SimpleNamespace(
+        cuda=SimpleNamespace(is_available=lambda: True, get_device_capability=lambda: (8, 6)),
+        nn=SimpleNamespace(attention=attention),
+    )
+
+    assert _configure_sdpa_backend(torch_module) == "native_flash"
+    assert attention.sdpa_kernel is original
