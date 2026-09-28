@@ -15,6 +15,8 @@ This documentation replaces the dated area notes, scorecards, and overlapping ca
 | [7. Experiment plan](research/07-experiment-plan.md) | Bounded ordered cards E00–E12, prerequisites, commands, artifacts and stop rules |
 | [8. Evidence ledger](research/08-evidence-ledger.md) | Recovered chat, audited source revisions, measured failures, unverified candidates and retractions |
 
+[Baseline intake supplement](research/09-baseline-intake.md) pins candidate revisions and records source-level stream, metric, checkpoint and GPU-isolation issues before E03.
+
 ## Authority and readiness
 
 Chapter 6 defines prospective evaluation; Chapter 7 defines the next bounded work. Chapter 8 preserves historical conclusions under their original protocols. Changing the future metric cannot turn a historical failure into a success. Code presence, public checkpoint links, successful infrastructure tests, and validated research results are distinct evidence levels.

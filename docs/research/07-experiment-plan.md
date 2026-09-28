@@ -73,6 +73,10 @@ E10 cannot be replaced by more exposed development clips. Before any optional
 new architecture, exhaust the costed simple controls and identify what measured
 gap the architecture addresses.
 
+## Baseline intake findings
+
+[The source-level intake supplement](09-baseline-intake.md) supplies entry points and required patches. GVC-RT is the first physical-stream candidate; MTTF needs reference accounting and receiver isolation. GLC remains useful for estimated-rate inference, but its inspected test path does not persist a coded stream. It cannot enter the complete-wire panel until that gap is closed.
+
 ## CPU verification commands
 
 Run in the project environment, from repository root. These are focused
