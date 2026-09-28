@@ -1042,13 +1042,19 @@ class StreamingCodecAdapter(Protocol):
             return (kind === 'ps' ? PS_BY_RES : AV1_BY_RES)[res];
         }
 
+        const BARE_MASK_HEIGHT = { canny: '240' };
+        // One keypoint payload. The preview is not a per-rung encode.
+        const RESOLUTION_FREE = { dwpose: 'dwpose' };
+
         function mapMatches(entry, family, res) {
             const id = String(entry.map || '');
+            const shared = RESOLUTION_FREE[family];
+            if (shared) return id === shared;
             const height = String(res);
             const tagged = id.endsWith('_' + height) || id.includes('_' + height + '_') || id.includes(height + 'p');
             const bare = (MASK_IDS[family] || []).indexOf(id) >= 0;
-            if (tagged && (id.startsWith(family) || bare || id.indexOf(family) >= 0)) return true;
-            return bare && height === '1080';
+            if (tagged && (id.indexOf(family) >= 0 || bare)) return true;
+            return bare && height === (BARE_MASK_HEIGHT[family] || '1080');
         }
 
         function selectedMapEntry(side) {
@@ -1119,8 +1125,8 @@ class StreamingCodecAdapter(Protocol):
             const leftKey = codecKey('left');
             const rightKey = codecKey('right');
             return Promise.all([
-                isEmptyStream(leftKey) || selectedMapEntry('left') ? loadVideo(videoA, '') : loadVideo(videoA, streamFile(currentClipId, leftKey)),
-                isEmptyStream(rightKey) || selectedMapEntry('right') ? loadVideo(videoB, '') : loadVideo(videoB, streamFile(currentClipId, rightKey)),
+                isEmptyStream(leftKey) ? loadVideo(videoA, '') : loadVideo(videoA, streamFile(currentClipId, leftKey)),
+                isEmptyStream(rightKey) ? loadVideo(videoB, '') : loadVideo(videoB, streamFile(currentClipId, rightKey)),
                 loadVideo(videoC, streamFile(currentClipId, 'ref')),
             ]).then(() => {
                 syncFromMaster();
@@ -1366,13 +1372,13 @@ class StreamingCodecAdapter(Protocol):
                 if (pack.video) {
                     const v = pack.video;
                     if (v.readyState < 2) return;
-                    drawOverlayMedia(targetCtx, v, dx, dy, dw, dh, srcX, srcY, srcW, srcH, entry.overlay_key === 'black');
+                    drawOverlayMedia(targetCtx, v, dx, dy, dw, dh, srcX, srcY, srcW, srcH, entry.overlay_key === 'black' || String(entry.map || '').indexOf('dwpose') === 0);
                     return;
                 }
                 if (!pack.frames || idx >= pack.frames.length) return;
                 const im = pack.frames[idx];
                 if (!im || !im.complete || !im.naturalWidth) return;
-                drawOverlayMedia(targetCtx, im, dx, dy, dw, dh, srcX, srcY, srcW, srcH, entry.overlay_key === 'black');
+                drawOverlayMedia(targetCtx, im, dx, dy, dw, dh, srcX, srcY, srcW, srcH, entry.overlay_key === 'black' || String(entry.map || '').indexOf('dwpose') === 0);
             });
         }
 
@@ -1708,8 +1714,8 @@ class StreamingCodecAdapter(Protocol):
             if (!rel) return '';
             if (/^https?:/.test(rel)) return rel;
             let url = mapsIndexBase + rel.replace(/^\/+/, '');
-            if (/\.webm$/i.test(url)) url += '?v=canny40';
-            if (/\.mp4$/i.test(url)) url += '?v=segav1';
+            if (/\.webm$/i.test(url)) url += '?v=poseego2';
+            if (/\.mp4$/i.test(url)) url += '?v=cannyav1';
             return url;
         }
 
