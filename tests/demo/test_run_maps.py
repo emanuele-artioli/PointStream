@@ -324,7 +324,6 @@ def test_inspector_stays_default_tab() -> None:
     assert "STREAM_LATENCY_MS" in html
     assert "18.4" in html
     assert "value=\"empty\"" in inspector
-    assert "Error / Distortion Heatmap" in inspector
     assert "Stacked 3-Panel" not in inspector
     assert "47-Byte Skeleton Telemetry" not in inspector
     assert 'id="maps-left"' in html

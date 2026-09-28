@@ -197,7 +197,15 @@ def _score_frames(source: np.ndarray, mask: np.ndarray, frames: list[np.ndarray]
         score_regions(source[t:t + 1], frame[None], mask[t:t + 1], fg_weight=0.7, bg_weight=0.3)
         for t, frame in enumerate(frames)
     ]
-    overall, fg, bg = (float(np.mean([float(row[c]) for row in scores])) for c in range(3))
+    means = []
+    for column in range(3):
+        finite: list[float] = []
+        for row in scores:
+            value = row[column]
+            if value is not None:
+                finite.append(float(value))
+        means.append(float(np.mean(finite)) if finite else float("inf"))
+    overall, fg, bg = means
     return {"overall": overall, "foreground": fg, "background": bg, "weighted": 0.7 * fg + 0.3 * bg}
 
 

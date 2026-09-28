@@ -17,6 +17,7 @@ import sqlite3  # noqa: F401  # load host C++ runtime before pose backend import
 import struct
 import sys
 import time
+from typing import Any
 import zlib
 
 REPO = Path(__file__).resolve().parents[2]
@@ -65,7 +66,13 @@ def _scores(source: np.ndarray, delivered: np.ndarray, mask: np.ndarray) -> dict
     ]
     means = []
     for column in range(3):
-        finite = [float(row[column]) for row in values if np.isfinite(row[column])]
+        finite: list[float] = []
+        for row in values:
+            value = row[column]
+            if value is not None:
+                number = float(value)
+                if np.isfinite(number):
+                    finite.append(number)
         means.append(float(np.mean(finite)) if finite else float("inf"))
     overall, fg, bg = means
     weighted = 0.7 * fg + 0.3 * bg if np.isfinite(fg) and np.isfinite(bg) else None
@@ -152,10 +159,10 @@ def _row(
     decode_s: float,
     render_s: float,
     plate_s: float,
-    source_row: dict,
+    source_row: dict[str, Any],
     fg_qp: int | None = None,
     bg_qp: int | None = None,
-) -> dict:
+) -> dict[str, Any]:
     total = B + F + M + R + H
     scores = _scores(source, delivered, mask)
     weighted = scores["weighted"]
@@ -182,7 +189,7 @@ def _row(
     }
 
 
-def run(clip_id: str) -> dict:
+def run(clip_id: str) -> dict[str, Any]:
     relative, source_json, representation, expected = CLIPS[clip_id]
     row_file = OUT_DIR / source_json
     background_doc = json.loads(row_file.read_text())
@@ -242,7 +249,7 @@ def run(clip_id: str) -> dict:
     poses, pose_info = _extract_keypoints(_rgb_to_bgr(source), boxes)
     pose_wire, decoded_poses = _pose_wire(poses)
     pose_encode_s = time.perf_counter() - pose_started
-    meta = {
+    meta: dict[str, Any] = {
         "clip_id": clip_id,
         "source": str(directory / "window_48"),
         "mask": str(directory / "masks_48.npz"),

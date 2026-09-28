@@ -277,7 +277,8 @@ def filter_racket_candidates(
     for key, item in candidates.items():
         frame_index, object_id = key
         reasons: list[str] = []
-        geometry = mask_geometry(getattr(item, "mask", None)) if getattr(item, "mask", None) is not None else None
+        racket_mask_raw = getattr(item, "mask", None)
+        geometry = mask_geometry(racket_mask_raw) if racket_mask_raw is not None else None
         if geometry is None:
             reasons.append("racket_mask_missing_or_empty")
         association = associations.get(key)
@@ -285,7 +286,8 @@ def filter_racket_candidates(
         if player_id is None or not player_decisions.get((frame_index, player_id), QualityDecision(False, 0, (), {})).eligible:
             reasons.append("no_retained_player_wrist_association")
         player_item = players.get((frame_index, player_id)) if player_id is not None else None
-        player_geometry = mask_geometry(player_item.mask) if player_item is not None and player_item.mask is not None else None
+        player_mask_raw = getattr(player_item, "mask", None) if player_item is not None else None
+        player_geometry = mask_geometry(player_mask_raw) if player_mask_raw is not None else None
         raw_score = getattr(item, "score", None)
         confidence = float(raw_score) if raw_score is not None else 0.0
         if raw_score is None:
@@ -297,11 +299,14 @@ def filter_racket_candidates(
         player_overlap_ratio = 0.0
         aspect_score = 0.0
         fill_score = 0.0
-        if geometry is not None and player_geometry is not None:
+        if (
+            geometry is not None and player_geometry is not None
+            and racket_mask_raw is not None and player_mask_raw is not None
+        ):
             ratio = geometry["area_px"] / max(1.0, player_geometry["area_px"])
             extent_ratio = geometry["bbox_diagonal_px"] / max(1.0, player_geometry["bbox_diagonal_px"])
-            racket_mask = np.asarray(item.mask) != 0
-            player_mask = np.asarray(player_item.mask) != 0
+            racket_mask = np.asarray(racket_mask_raw) != 0
+            player_mask = np.asarray(player_mask_raw) != 0
             if racket_mask.shape != player_mask.shape:
                 reasons.append("racket_player_mask_shape_mismatch")
             else:

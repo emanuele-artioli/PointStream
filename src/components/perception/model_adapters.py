@@ -8,7 +8,7 @@ SPADE/ControlNet checkpoints must be trained and validated against these maps.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 
 import cv2
 import numpy as np
@@ -74,8 +74,8 @@ def render_model_adapter_views(
         def _point(row: np.ndarray) -> tuple[int, int]:
             return (int(row[0]), int(row[1]))
 
-        cv2.line(axis, _point(points[0]), _point(points[1]), 255, 2, cv2.LINE_AA)
-        cv2.line(width, _point(points[2]), _point(points[3]), 255, 2, cv2.LINE_AA)
+        cv2.line(cast(Any, axis), _point(points[0]), _point(points[1]), 255, 2, cv2.LINE_AA)
+        cv2.line(cast(Any, width), _point(points[2]), _point(points[3]), 255, 2, cv2.LINE_AA)
 
     # Channels remain separate for new model heads. Existing 3-channel
     # checkpoints cannot consume them without a compatible adapter/training.

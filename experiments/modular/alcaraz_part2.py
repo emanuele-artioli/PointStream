@@ -11,6 +11,7 @@ import sqlite3  # noqa: F401  # host C++ runtime before optional pose imports
 import struct
 import sys
 import time
+from typing import Any, Protocol
 import zlib
 
 REPO = Path(__file__).resolve().parents[2]
@@ -81,10 +82,16 @@ def _silhouette_wire(mask: np.ndarray, box: tuple[int, int, int, int], frame: in
     return wire, restored
 
 
-def _encode_references(source: np.ndarray, tracks: list[np.ndarray], interval: int, sidecar: IntraCodecSidecar) -> tuple[list[dict], dict]:
+class Sidecar(Protocol):
+    def encode(self, frames: np.ndarray) -> bytes: ...
+
+    def decode(self, wire: bytes) -> np.ndarray: ...
+
+
+def _encode_references(source: np.ndarray, tracks: list[np.ndarray], interval: int, sidecar: Sidecar) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Code each player's own QP42 references, alphas, boxes, and presence."""
     times: dict[str, float | int] = {'prepare': 0.0, 'encode': 0.0, 'decode': 0.0, 'F': 0, 'M': 0, 'H': 1}
-    objects = []
+    objects: list[dict[str, Any]] = []
     for obj_id, track in enumerate(tracks):
         start = time.perf_counter()
         boxes, presence, _ = _boxes(track)
@@ -127,7 +134,7 @@ def _encode_references(source: np.ndarray, tracks: list[np.ndarray], interval: i
     return objects, times
 
 
-def _render(background: np.ndarray, objects: list[dict], *,
+def _render(background: np.ndarray, objects: list[dict[str, Any]], *,
             silhouettes: list[list[np.ndarray | None]] | None = None,
             oracle_tracks: list[np.ndarray] | None = None,
             current_source: np.ndarray | None = None) -> tuple[np.ndarray, float]:
@@ -176,7 +183,7 @@ def _render(background: np.ndarray, objects: list[dict], *,
     return out, time.perf_counter() - started
 
 
-def _encode_silhouettes(tracks: list[np.ndarray], objects: list[dict]) -> tuple[list[list[np.ndarray | None]], int, float, float]:
+def _encode_silhouettes(tracks: list[np.ndarray], objects: list[dict[str, Any]]) -> tuple[list[list[np.ndarray | None]], int, float, float]:
     decoded = []
     nbytes = 0
     encode_s = decode_s = 0.0
@@ -201,14 +208,14 @@ def _encode_silhouettes(tracks: list[np.ndarray], objects: list[dict]) -> tuple[
     return decoded, nbytes, encode_s, decode_s
 
 
-def _summary(objects: list[dict]) -> list[dict]:
+def _summary(objects: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [{'index': obj['index'], 'visible_frames': int(obj['presence'].sum()),
              'bbox_bytes': obj['bbox_bytes'], 'presence_bytes': obj['presence_bytes'],
              'references': [{k: ref[k] for k in ('frame', 'crop_bytes', 'alpha_bytes', 'index_bytes')}
                             for ref in obj['refs']]} for obj in objects]
 
 
-def _oracle_scores(source: np.ndarray, delivered: np.ndarray, mask: np.ndarray) -> dict:
+def _oracle_scores(source: np.ndarray, delivered: np.ndarray, mask: np.ndarray) -> dict[str, Any]:
     scores = _scores(source, delivered, mask)
     # A current-frame source crop can match all player pixels exactly. The
     # resulting infinite foreground PSNR is an oracle bound, not a claim row;
@@ -216,7 +223,7 @@ def _oracle_scores(source: np.ndarray, delivered: np.ndarray, mask: np.ndarray) 
     return {key: value if value is None or np.isfinite(value) else None for key, value in scores.items()}
 
 
-def _check_actual_row(row: dict) -> None:
+def _check_actual_row(row: dict[str, Any]) -> None:
     if row['total_bytes'] != sum(int(row[key]) for key in ('B', 'F', 'M', 'R', 'H')):
         raise RuntimeError('wire components do not sum to row total')
     weighted = row['scores']['weighted']
@@ -224,7 +231,7 @@ def _check_actual_row(row: dict) -> None:
         raise RuntimeError('actual bitstream has nonfinite weighted PSNR')
 
 
-def run_alcaraz_ladder(out_dir: Path = OUT) -> dict[str, object]:
+def run_alcaraz_ladder(out_dir: Path = OUT) -> dict[str, Any]:
     """Measure mask/current-appearance oracles and actual charged ladders.
 
     The loader rejects a moved 24,648 B background. Target masks enter only
@@ -247,7 +254,7 @@ def run_alcaraz_ladder(out_dir: Path = OUT) -> dict[str, object]:
     sidecar = IntraCodecSidecar('av1', qp=42)
     crop_path, crop_version = sidecar.probe_encoder()
     decoder = codec_tools.resolve_ffmpeg()
-    result: dict[str, object] = {
+    result: dict[str, Any] = {
         'clip_id': 'alcaraz000', 'frames': N_FRAMES, 'source_anchor': fixed.anchor,
         'background': fixed.background, 'plate_seconds': fixed.plate_seconds,
         'tracking_seconds': tracking_s,
@@ -262,10 +269,10 @@ def run_alcaraz_ladder(out_dir: Path = OUT) -> dict[str, object]:
         ledger.write_text(json.dumps(result, indent=2) + '\n')
 
     save()
-    best = None
-    best_objects = None
-    candidate_rows: dict[str, dict] = {}
-    candidate_objects: dict[str, list[dict]] = {}
+    best: dict[str, Any] | None = None
+    best_objects: list[dict[str, Any]] | None = None
+    candidate_rows: dict[str, dict[str, Any]] = {}
+    candidate_objects: dict[str, list[dict[str, Any]]] = {}
     for label, interval in SCHEDULES:
         print(f'alcaraz000: {label} per-object references', flush=True)
         objects, times = _encode_references(source, tracks, interval, sidecar)
@@ -322,7 +329,7 @@ def run_alcaraz_ladder(out_dir: Path = OUT) -> dict[str, object]:
         'format': 'per-object/frame uint16 frame,height,width + zlib9 packed ROI bits',
     }
     save()
-    chosen_silhouettes = None
+    chosen_silhouettes: list[list[np.ndarray | None]] | None = None
     chosen_silhouette_enc = chosen_silhouette_dec = 0.0
     for label, fits in feasible.items():
         if not fits:
@@ -350,14 +357,15 @@ def run_alcaraz_ladder(out_dir: Path = OUT) -> dict[str, object]:
     result['best_residual_off_arm'] = best['arm']
     save()
 
+    assert best_objects is not None
     base, render_s = _render(fixed.background_rgb, best_objects, silhouettes=chosen_silhouettes)
     fraction = residual_clip_fraction(source.astype(np.int16) - base.astype(np.int16), mask)
     result['best_residual_clip_fraction'] = fraction
     if fraction > 0.05:
         result['residual_policy'] = 'coarse QP54/62 only; clip fraction exceeds 0.05'
     save()
-    signals = {}
-    preps = {}
+    signals: dict[str, dict[int, tuple[int, np.ndarray, float, float]]] = {}
+    preps: dict[str, float] = {}
     for region, region_mask in (('fg', mask), ('bg', ~mask)):
         start = time.perf_counter()
         signal = _residual_signal(source, base, region_mask)

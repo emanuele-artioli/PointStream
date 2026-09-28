@@ -17,6 +17,7 @@ import sqlite3  # noqa: F401  # host C++ runtime before Torch pose import
 import sys
 import tempfile
 import time
+from typing import Any, cast
 
 import numpy as np
 
@@ -91,7 +92,7 @@ def split_object_tracks(mask: np.ndarray, *, min_area: int = 100) -> list[np.nda
             used_j.add(j)
             primary_area[j] = int(stats[c, cv2.CC_STAT_AREA])
             tracks[j][t] = labels == c
-            last[j] = (t, centers[c].copy(), tuple(int(v) for v in stats[c, :4]))
+            last[j] = (t, centers[c].copy(), (int(stats[c, 0]), int(stats[c, 1]), int(stats[c, 2]), int(stats[c, 3])))
         # Detached limbs and racquet pixels are part of their player, not new
         # objects. Assign only components close to a recently observed box.
         for c in components:
@@ -119,7 +120,7 @@ def split_object_tracks(mask: np.ndarray, *, min_area: int = 100) -> list[np.nda
             items: list[np.ndarray | None] = [None] * len(pixels)
             items[t] = labels == c
             tracks.append(items)
-            last.append((t, centers[c].copy(), tuple(int(v) for v in stats[c, :4])))
+            last.append((t, centers[c].copy(), (int(stats[c, 0]), int(stats[c, 1]), int(stats[c, 2]), int(stats[c, 3]))))
             first.append((t, float(centers[c, 0])))
     if not tracks:
         raise ValueError("mask has no qualifying object")
@@ -228,7 +229,7 @@ def warp_articulated(
         patch = cv2.warpAffine(crop_bgr, matrix, (x1-x0, y1-y0), flags=cv2.INTER_LINEAR)
         matte = cv2.warpAffine(alpha.astype(np.uint8), matrix, (x1-x0, y1-y0), flags=cv2.INTER_NEAREST)
         triangle = np.zeros((y1-y0, x1-x0), dtype=np.uint8)
-        cv2.fillConvexPoly(triangle, np.rint(local_target).astype(np.int32), 1)
+        cv2.fillConvexPoly(cast(Any, triangle), np.rint(local_target).astype(np.int32), 1)
         update = (triangle > 0) & (matte > 0)
         pixels[y0:y1, x0:x1][update] = patch[update]
         cover[y0:y1, x0:x1][triangle > 0] = matte[triangle > 0].astype(bool)
@@ -265,7 +266,7 @@ def _direct_timed_vvc(frames_rgb: np.ndarray, qp: int) -> tuple[bytes, np.ndarra
     return payload, rgb, encode_s, decode_s, path, version
 
 
-def _render_objects(background: np.ndarray, objects: list[dict], arm: str) -> tuple[np.ndarray, float]:
+def _render_objects(background: np.ndarray, objects: list[dict[str, Any]], arm: str) -> tuple[np.ndarray, float]:
     result = background.copy()
     height, width = result.shape[1:3]
     start = time.perf_counter()
@@ -293,7 +294,7 @@ def _render_objects(background: np.ndarray, objects: list[dict], arm: str) -> tu
     return result, time.perf_counter() - start
 
 
-def run_clip(clip_id: str, *, out_dir: Path = OUT, residuals: bool = True) -> dict[str, object]:
+def run_clip(clip_id: str, *, out_dir: Path = OUT, residuals: bool = True) -> dict[str, Any]:
     """Measure separate-object bbox, global-pose, and articulated-pose arms.
 
     Load only the fixed 48-frame cached backgrounds; byte-check each new QP
@@ -327,10 +328,10 @@ def run_clip(clip_id: str, *, out_dir: Path = OUT, residuals: bool = True) -> di
     else:
         payload, decoded_plate, bg_path, bg_version, bg_enc, bg_dec = _intra_still(cache["plate"], 46)
         homographies = tuple(np.asarray(h, dtype=np.float64) for h in cache["homographies"])
-        side = pack_panorama_side_data(homographies, plate_shape=tuple(int(x) for x in cache["plate"].shape[:2]), frame_shape=tuple(int(x) for x in source.shape[1:3]), fps=25.0)
+        side = pack_panorama_side_data(homographies, plate_shape=(int(cache["plate"].shape[0]), int(cache["plate"].shape[1])), frame_shape=(int(source.shape[1]), int(source.shape[2])), fps=25.0)
         bg_side = len(side)
         started = time.perf_counter()
-        background = _render_panorama(decoded_plate, side, N_FRAMES, tuple(int(x) for x in source.shape[1:3]))
+        background = _render_panorama(decoded_plate, side, N_FRAMES, (int(source.shape[1]), int(source.shape[2])))
         bg_render = time.perf_counter() - started
     B = len(payload) + bg_side
     if B != expected or B != int(prior_bg["total_bytes"]):
@@ -346,7 +347,7 @@ def run_clip(clip_id: str, *, out_dir: Path = OUT, residuals: bool = True) -> di
     started = time.perf_counter()
     track_masks = split_object_tracks(mask)
     tracking_s = time.perf_counter() - started
-    objects: list[dict] = []
+    objects: list[dict[str, Any]] = []
     sidecar = IntraCodecSidecar("av1", qp=42)
     crop_path, crop_version = sidecar.probe_encoder()
     crop_enc = crop_dec = 0.0
@@ -381,7 +382,7 @@ def run_clip(clip_id: str, *, out_dir: Path = OUT, residuals: bool = True) -> di
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / f"{clip_id}.json"
-    result: dict[str, object] = {
+    result: dict[str, Any] = {
         "clip_id": clip_id,
         "source": str(directory / "window_48"), "mask": str(directory / "masks_48.npz"),
         "background_cache": str(cache_file), "background_row": str(row_file),
@@ -407,7 +408,7 @@ def run_clip(clip_id: str, *, out_dir: Path = OUT, residuals: bool = True) -> di
                     _rgb_to_bgr(source[visible_indices]),
                     [item["boxes"][int(i)] for i in visible_indices],
                 )
-                poses = [None] * N_FRAMES
+                poses: list[np.ndarray | None] = [None] * N_FRAMES
                 for i, pose in zip(visible_indices, visible_poses, strict=True):
                     poses[int(i)] = pose
                 pose_info["timeline_frames"] = N_FRAMES

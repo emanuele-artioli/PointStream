@@ -21,7 +21,7 @@ _REGISTRY_MODULES = {
     "CODECS": ("codec", "codec"),
     "DETECTORS": ("detection", "detector"),
     "DOMAINS": ("domain", "domain"),
-    "GENERATORS": ("generation", "generator"),
+    "GENERATORS": ("generation", "generation"),
     "METRICS": ("metrics", "metric"),
     "MOTION": ("motion", "motion"),
     "POSE": ("pose", "pose"),

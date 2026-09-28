@@ -8,6 +8,7 @@ from pathlib import Path
 import sqlite3  # noqa: F401  # host C++ runtime before pose backend imports Torch
 import sys
 import time
+from typing import Any
 import traceback
 
 REPO = Path(__file__).resolve().parents[2]
@@ -21,7 +22,7 @@ from experiments.modular.object_foreground_campaign import OUT, run_clip  # noqa
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     summary_path = OUT / "batch-summary.json"
-    summary: dict[str, object] = {
+    summary: dict[str, Any] = {
         "kind": "three independent 48-frame foreground bitstreams",
         "clips": {},
         "started_unix": time.time(),

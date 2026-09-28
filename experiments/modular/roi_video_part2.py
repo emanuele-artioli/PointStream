@@ -10,6 +10,7 @@ import sqlite3  # noqa: F401  # load host C++ runtime before optional pose backe
 import sys
 import tempfile
 import time
+from typing import Any
 
 REPO = Path(__file__).resolve().parents[2]
 if str(REPO) not in sys.path:
@@ -34,14 +35,14 @@ COLOR_QPS = (42, 50)
 ALPHA_QPS = (32, 42)
 
 
-def _build_object_inputs(source: np.ndarray, tracks: list[np.ndarray]) -> tuple[list[dict], float]:
+def _build_object_inputs(source: np.ndarray, tracks: list[np.ndarray]) -> tuple[list[dict[str, Any]], float]:
     """Place each visible player in its own fixed, mask-gated RGB canvas."""
     if source.ndim != 4 or source.shape[0] != N_FRAMES or source.shape[-1] != 3:
         raise ValueError('source must be a 48-frame RGB clip')
     if len(tracks) != 2:
         raise ValueError('Alcaraz requires two independent object tracks')
     started = time.perf_counter()
-    objects = []
+    objects: list[dict[str, Any]] = []
     for object_index, track in enumerate(tracks):
         if track.shape != source.shape[:3] or track.dtype != np.bool_:
             raise ValueError('object track shape or dtype differs from source')
@@ -67,7 +68,7 @@ def _build_object_inputs(source: np.ndarray, tracks: list[np.ndarray]) -> tuple[
     return objects, time.perf_counter()-started
 
 
-def _av1_roundtrip(frames_rgb: np.ndarray, qp: int, wire_path: Path) -> dict:
+def _av1_roundtrip(frames_rgb: np.ndarray, qp: int, wire_path: Path) -> dict[str, Any]:
     """Run preset-10 AV1 through the measured RGB/YUV420/RGB path."""
     frames = np.asarray(frames_rgb)
     if frames.ndim != 4 or frames.shape[0] != N_FRAMES or frames.shape[-1] != 3 or frames.dtype != np.uint8:
@@ -110,7 +111,7 @@ def _av1_roundtrip(frames_rgb: np.ndarray, qp: int, wire_path: Path) -> dict:
             'decoder_version': tools['ffmpeg_version']}
 
 
-def _composite(background_rgb: np.ndarray, objects: list[dict],
+def _composite(background_rgb: np.ndarray, objects: list[dict[str, Any]],
                color_decodes: list[np.ndarray], alpha_decodes: list[np.ndarray]) -> tuple[np.ndarray, float]:
     """Paste decoded object videos using only decoded alpha and wire motion."""
     if len(objects) != len(color_decodes) or len(objects) != len(alpha_decodes):
@@ -139,7 +140,7 @@ def _composite(background_rgb: np.ndarray, objects: list[dict],
     return out, time.perf_counter()-started
 
 
-def _row_checked(*args: object, **kwargs: object) -> dict:
+def _row_checked(*args: Any, **kwargs: Any) -> dict[str, Any]:
     row = _row(*args, **kwargs)
     if row['total_bytes'] != sum(int(row[key]) for key in ('B', 'F', 'M', 'R', 'H')):
         raise RuntimeError('component bytes do not sum to total')
@@ -149,7 +150,7 @@ def _row_checked(*args: object, **kwargs: object) -> dict:
     return row
 
 
-def run_roi_video(out_dir: Path = OUT) -> dict[str, object]:
+def run_roi_video(out_dir: Path = OUT) -> dict[str, Any]:
     """Measure two separate temporal color and alpha bitstreams per QP pair."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -164,7 +165,7 @@ def run_roi_video(out_dir: Path = OUT) -> dict[str, object]:
     B = int(fixed.background['total_bytes'])
     M = sum(obj['bbox_bytes'] + obj['presence_bytes'] for obj in objects)
     H_header = 1  # transmitted object count; AV1 streams contain canvas dimensions
-    result = {'clip_id': 'alcaraz000', 'arm': 'separate_temporal_object_video', 'frames': N_FRAMES,
+    result: dict[str, Any] = {'clip_id': 'alcaraz000', 'arm': 'separate_temporal_object_video', 'frames': N_FRAMES,
               'source_anchor': fixed.anchor, 'background': fixed.background,
               'offline_plate_seconds': fixed.plate_seconds,
               'tracking_seconds': tracking_s, 'object_video_prepare_seconds': prep_s,
@@ -179,8 +180,8 @@ def run_roi_video(out_dir: Path = OUT) -> dict[str, object]:
         ledger.write_text(json.dumps(result, indent=2) + '\n')
 
     save()
-    color: dict[tuple[int, int], dict] = {}
-    alpha: dict[tuple[int, int], dict] = {}
+    color: dict[tuple[int, int], dict[str, Any]] = {}
+    alpha: dict[tuple[int, int], dict[str, Any]] = {}
     for obj in objects:
         j = int(obj['index'])
         for qp in COLOR_QPS:

@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from typing import Any
 import sys
 import time
 
@@ -49,8 +50,8 @@ class FixedAlcaraz:
     source_rgb: np.ndarray
     mask: np.ndarray
     background_rgb: np.ndarray
-    anchor: dict[str, object]
-    background: dict[str, object]
+    anchor: dict[str, Any]
+    background: dict[str, Any]
     plate_seconds: float
 
 
@@ -114,10 +115,10 @@ def load_fixed_alcaraz(out_dir: Path) -> FixedAlcaraz:
         plate = cache["plate"]
         homographies = cache["homographies"]
         plate_seconds = float(cache["build_seconds"])
-    frame_shape = tuple(int(v) for v in source_rgb.shape[1:3])
+    frame_shape = (int(source_rgb.shape[1]), int(source_rgb.shape[2]))
     side = pack_panorama_side_data(
         homographies,
-        plate_shape=tuple(int(v) for v in plate.shape[:2]),
+        plate_shape=(int(plate.shape[0]), int(plate.shape[1])),
         frame_shape=frame_shape,
         fps=25.0,
     )
