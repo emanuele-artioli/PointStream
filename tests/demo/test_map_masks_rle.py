@@ -26,7 +26,10 @@ from demo.pipeline.maps.sam31_masks import (
 )
 from demo.pipeline.maps.yoloe_masks import (
     YOLOE_INSTALL_HINT,
+    HandTrackFilter,
+    class_masks_from_result,
     instances_from_result,
+    largest_foreground_component,
     load_boxes_from,
     load_classes,
     main as yoloe_main,
@@ -248,6 +251,70 @@ def test_boxes_from_yoloe_dir(tmp_path: Path) -> None:
     boxes = load_boxes_from(tmp_path)
     assert boxes[0][0]["class_name"] == "hand"
     assert boxes[0][0]["xyxy"] == [3.0, 2.0, 12.0, 8.0]
+
+
+def test_largest_foreground_component_drops_islands() -> None:
+    mask = np.zeros((20, 24), dtype=bool)
+    mask[2:12, 3:14] = True
+    mask[16:18, 18:21] = True
+    kept = largest_foreground_component(mask)
+    assert int(kept.sum()) == 10 * 11
+    assert not kept[16:18, 18:21].any()
+
+
+def test_class_masks_keep_largest_component_per_detection() -> None:
+    mask = np.zeros((20, 24), dtype=np.float32)
+    mask[2:12, 3:14] = 1.0
+    mask[16:18, 18:21] = 1.0
+    result = SimpleNamespace(
+        masks=SimpleNamespace(data=mask[None, ...]),
+        boxes=SimpleNamespace(cls=np.asarray([0.0])),
+    )
+    painted = class_masks_from_result(result, 20, 24, {0: "hand"})["hand"]
+    assert int(painted.sum()) == 10 * 11
+    assert not painted[16:18, 18:21].any()
+
+
+def _hand_result(masks: list[np.ndarray], ids: list[float] | None) -> SimpleNamespace:
+    data = np.stack([mask.astype(np.float32) for mask in masks])
+    boxes = SimpleNamespace(cls=np.zeros(len(masks)))
+    if ids is not None:
+        boxes.id = np.asarray(ids, dtype=np.float32)
+    return SimpleNamespace(masks=SimpleNamespace(data=data), boxes=boxes)
+
+
+def test_track_filter_waits_for_five_hits_and_drops_small_masks() -> None:
+    hand = np.zeros((20, 20), dtype=np.float32)
+    hand[2:12, 2:12] = 1.0
+    fold = np.zeros((20, 20), dtype=np.float32)
+    fold[15:18, 15:18] = 1.0
+    filt = HandTrackFilter()
+    for _ in range(4):
+        painted = filt.class_masks(_hand_result([hand], [7]), 20, 20, {0: "hand"})["hand"]
+        assert int(painted.sum()) == 0
+    both = filt.class_masks(_hand_result([hand, fold], [7, 9]), 20, 20, {0: "hand"})["hand"]
+    assert int(both.sum()) == 100
+    for _ in range(4):
+        filt.class_masks(_hand_result([fold], [9]), 20, 20, {0: "hand"})
+    kept = filt.class_masks(_hand_result([hand, fold], [7, 9]), 20, 20, {0: "hand"})["hand"]
+    assert int(kept.sum()) == 100
+
+
+def test_track_filter_holds_a_confirmed_mask_for_eight_missing_frames() -> None:
+    hand = np.zeros((20, 20), dtype=np.float32)
+    hand[2:12, 2:12] = 1.0
+    empty = SimpleNamespace(
+        masks=SimpleNamespace(data=np.zeros((0, 20, 20), dtype=np.float32)),
+        boxes=SimpleNamespace(cls=np.zeros((0,)), id=np.zeros((0,))),
+    )
+    filt = HandTrackFilter()
+    for _ in range(5):
+        filt.class_masks(_hand_result([hand], [7]), 20, 20, {0: "hand"})
+    for _ in range(8):
+        painted = filt.class_masks(empty, 20, 20, {0: "hand"})["hand"]
+        assert int(painted.sum()) == 100
+    dropped = filt.class_masks(empty, 20, 20, {0: "hand"})["hand"]
+    assert int(dropped.sum()) == 0
 
 
 def test_instances_from_result_duck_type() -> None:

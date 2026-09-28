@@ -157,6 +157,25 @@ def _resize_mask(mask: np.ndarray, height: int, width: int) -> np.ndarray:
     return cv2.resize(mask.astype(np.float32), (width, height), interpolation=cv2.INTER_NEAREST)
 
 
+def largest_foreground_component(binary: np.ndarray) -> np.ndarray:
+    """Keep the largest 8-connected foreground region inside one detection mask.
+
+    YOLOE-seg crops each mask to its box and still leaves small islands beside
+    the hand. Those islands are separate components, not part of the hand.
+    """
+    mask = np.asarray(binary, dtype=bool)
+    if not mask.any():
+        return mask
+    count, labels, stats, _centroids = cv2.connectedComponentsWithStats(
+        mask.astype(np.uint8),
+        connectivity=8,
+    )
+    if count <= 2:
+        return mask
+    largest = 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))
+    return labels == largest
+
+
 def instances_from_result(
     result: Any,
     height: int,
@@ -187,7 +206,7 @@ def instances_from_result(
     result_names = getattr(result, "names", None) or names
     out: list[dict[str, Any]] = []
     for i in range(n):
-        binary = (_resize_mask(array[i], height, width) > 0.5).astype(np.uint8)
+        binary = largest_foreground_component(_resize_mask(array[i], height, width) > 0.5).astype(np.uint8)
         if not binary.any():
             continue
         class_id = int(cls[i]) if i < cls.shape[0] else 0
@@ -475,8 +494,23 @@ def _enable_cuda_fast_math() -> None:
 # Long side of a 1920x1080 frame. 1280 letterboxes that frame to 1280x720.
 # yoloe-26x on the RTX 6000 Ada was already compute-bound at 640 and 1280.
 YOLOE_IMGSZ = 1920
-YOLOE_CONF = 0.10
+# Passed into track() so boxes under the old 0.10 cutoff are still returned.
+# ByteTrack does not keep an id on this footage: the hand moves too far between
+# frames for its association, so HandTrackFilter matches masks itself.
+# A new track still needs YOLOE_NEW_TRACK_CONF. A weaker box may only extend one.
+YOLOE_TRACK_CONF = 0.03
+YOLOE_NEW_TRACK_CONF = 0.10
+YOLOE_MATCH_IOU = 0.05
+YOLOE_CONF = YOLOE_TRACK_CONF
 YOLOE_WEIGHTS_KEY = "yoloe26_seg_x"
+# A clothing fold is often one frame and much smaller than the hand beside it.
+# Paint a track only after it has appeared this many times, then drop masks
+# below this fraction of the largest mask of the same class in that frame.
+# A confirmed track that disappears is repeated for YOLOE_HOLD_FRAMES.
+YOLOE_MIN_TRACK_HITS = 5
+YOLOE_MIN_AREA_RATIO = 1 / 3
+YOLOE_HOLD_FRAMES = 8
+YOLOE_TRACKER = Path(__file__).with_name("yoloe_bytetrack.yaml")
 
 
 def load_yoloe_model(class_texts: Sequence[str]) -> tuple[Any, Path, dict[str, str]]:
@@ -576,8 +610,148 @@ def class_masks_from_result(
                 (width, height),
                 interpolation=cv2.INTER_NEAREST,
             ) > 0
-        masks[name] |= binary
+        masks[name] |= largest_foreground_component(binary)
     return masks
+
+
+def _mask_iou(left: np.ndarray, right: np.ndarray) -> float:
+    union = int(np.logical_or(left, right).sum())
+    if union == 0:
+        return 0.0
+    return int(np.logical_and(left, right).sum()) / union
+
+
+def detection_masks(
+    result: Any,
+    height: int,
+    width: int,
+    names: dict[int, str],
+) -> list[tuple[str, np.ndarray, float]]:
+    """One largest-component mask per detection, with its confidence."""
+    if result is None or getattr(result, "masks", None) is None or getattr(result, "boxes", None) is None:
+        return []
+    data = _as_numpy(result.masks.data)
+    clss = _as_numpy(result.boxes.cls).astype(int).reshape(-1)
+    if data.size == 0:
+        return []
+    if data.ndim == 2:
+        data = data[None, ...]
+    conf = _as_numpy(getattr(result.boxes, "conf", None))
+    if conf is None or np.asarray(conf).size == 0:
+        conf = np.ones(data.shape[0], dtype=np.float32)
+    else:
+        conf = np.asarray(conf).reshape(-1)
+    found: list[tuple[str, np.ndarray, float]] = []
+    for index, mask in enumerate(data):
+        name = names.get(int(clss[index])) if index < clss.shape[0] else None
+        if name is None:
+            continue
+        binary = np.asarray(mask) > 0.5
+        if binary.shape != (height, width):
+            binary = cv2.resize(
+                binary.astype(np.uint8),
+                (width, height),
+                interpolation=cv2.INTER_NEAREST,
+            ) > 0
+        binary = largest_foreground_component(binary)
+        if not binary.any():
+            continue
+        score = float(conf[index]) if index < conf.shape[0] else 1.0
+        found.append((name, binary, score))
+    return found
+
+
+class _MaskTrack:
+    def __init__(self, name: str, mask: np.ndarray) -> None:
+        self.name = name
+        self.mask = mask
+        self.hits = 1
+        self.missing = 0
+        self.matched = True
+
+
+class HandTrackFilter:
+    """Match hand masks across frames, then paint the stable ones.
+
+    A detection at or above ``new_track_conf`` can start a track. A weaker box
+    can only extend a track it overlaps. Painting waits for ``min_hits``. A
+    track that then disappears is repeated for ``hold_frames``.
+    """
+
+    def __init__(
+        self,
+        min_hits: int = YOLOE_MIN_TRACK_HITS,
+        min_area_ratio: float = YOLOE_MIN_AREA_RATIO,
+        hold_frames: int = YOLOE_HOLD_FRAMES,
+        new_track_conf: float = YOLOE_NEW_TRACK_CONF,
+        match_iou: float = YOLOE_MATCH_IOU,
+    ) -> None:
+        self.min_hits = min_hits
+        self.min_area_ratio = min_area_ratio
+        self.hold_frames = hold_frames
+        self.new_track_conf = new_track_conf
+        self.match_iou = match_iou
+        self.tracks: list[_MaskTrack] = []
+
+    def class_masks(
+        self,
+        result: Any,
+        height: int,
+        width: int,
+        names: dict[int, str],
+    ) -> dict[str, np.ndarray]:
+        for track in self.tracks:
+            track.matched = False
+        detections = detection_masks(result, height, width, names)
+        order = sorted(
+            (
+                (_mask_iou(mask, track.mask), det_index, track_index)
+                for det_index, (_name, mask, _score) in enumerate(detections)
+                for track_index, track in enumerate(self.tracks)
+                if _name == track.name
+            ),
+            reverse=True,
+        )
+        used_dets: set[int] = set()
+        used_tracks: set[int] = set()
+        for iou, det_index, track_index in order:
+            if iou < self.match_iou or det_index in used_dets or track_index in used_tracks:
+                continue
+            name, mask, _score = detections[det_index]
+            track = self.tracks[track_index]
+            track.mask = mask
+            track.hits += 1
+            track.missing = 0
+            track.matched = True
+            track.name = name
+            used_dets.add(det_index)
+            used_tracks.add(track_index)
+        for det_index, (name, mask, score) in enumerate(detections):
+            if det_index in used_dets or score < self.new_track_conf:
+                continue
+            self.tracks.append(_MaskTrack(name, mask))
+        out = {name: np.zeros((height, width), dtype=bool) for name in names.values()}
+        pending: list[tuple[str, np.ndarray]] = []
+        for track in self.tracks:
+            if not track.matched:
+                track.missing += 1
+            if track.hits < self.min_hits:
+                continue
+            if track.missing == 0 or track.missing <= self.hold_frames:
+                pending.append((track.name, track.mask))
+        by_name: dict[str, list[np.ndarray]] = {}
+        for name, mask in pending:
+            by_name.setdefault(name, []).append(mask)
+        for name, masks in by_name.items():
+            if name not in out:
+                continue
+            largest = max(int(mask.sum()) for mask in masks)
+            floor = largest * self.min_area_ratio
+            for mask in masks:
+                if int(mask.sum()) >= floor:
+                    out[name] |= mask
+        self.tracks = [track for track in self.tracks if track.missing <= self.hold_frames]
+        return out
 
 
 def run_yoloe_clip(
@@ -627,6 +801,7 @@ def run_yoloe_clip(
     step_ms: list[float] = []
     n_frames = 0
     n_nonempty = 0
+    track_filter = HandTrackFilter()
     try:
         import torch
     except Exception:
@@ -642,7 +817,8 @@ def run_yoloe_clip(
             device=device,
             half=True,
             imgsz=YOLOE_IMGSZ,
-            conf=YOLOE_CONF,
+            conf=YOLOE_TRACK_CONF,
+            tracker=str(YOLOE_TRACKER),
         ):
             if torch is not None and torch.cuda.is_available():
                 torch.cuda.synchronize()
@@ -655,7 +831,7 @@ def run_yoloe_clip(
             frame_h = int(orig[0]) if orig is not None else height
             frame_w = int(orig[1]) if orig is not None else width
             painted = paint_class_masks(
-                class_masks_from_result(result, frame_h, frame_w, names),
+                track_filter.class_masks(result, frame_h, frame_w, names),
                 frame_h,
                 frame_w,
             )
@@ -687,7 +863,10 @@ def run_yoloe_clip(
         "class_prompts": role_prompts,
         "track": True,
         "imgsz": YOLOE_IMGSZ,
-        "conf": YOLOE_CONF,
+        "conf": YOLOE_TRACK_CONF,
+        "min_track_hits": YOLOE_MIN_TRACK_HITS,
+        "min_area_ratio": YOLOE_MIN_AREA_RATIO,
+        "hold_frames": YOLOE_HOLD_FRAMES,
         "half": True,
         "model_load_s": round(model_load_s, 3),
         "latency_excludes_load": True,

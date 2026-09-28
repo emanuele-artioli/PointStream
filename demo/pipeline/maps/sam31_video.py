@@ -203,6 +203,7 @@ def _worker(argv: list[str]) -> int:
     parser.add_argument("--timing", type=Path, required=True)
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--prompts", type=Path, required=True)
+    parser.add_argument("--png-dir", type=Path, default=None)
     args = parser.parse_args(argv)
     role_prompts = json.loads(args.prompts.read_text())
     prob_thresh = float(os.environ.get("SAM_PROB_THRESH", SAM_PROB_THRESH))
@@ -348,9 +349,13 @@ def _worker(argv: list[str]) -> int:
                 plane[mask.astype(bool)] = code
     step_ms = frame_ms
 
-    proc = pipe_bgr_av1(width, height, fps, args.out)
-    assert proc.stdin is not None
     n_nonempty = 0
+    proc = None
+    if args.png_dir is None:
+        proc = pipe_bgr_av1(width, height, fps, args.out)
+        assert proc.stdin is not None
+    else:
+        args.png_dir.mkdir(parents=True, exist_ok=True)
     try:
         for index in range(n_frames):
             plane = labels[index]
@@ -362,14 +367,19 @@ def _worker(argv: list[str]) -> int:
                     painted[binary] = CLASS_COLORS_BGR[name]
             if int(painted.max()) > 0:
                 n_nonempty += 1
-            proc.stdin.write(painted.tobytes())
+            if proc is not None:
+                proc.stdin.write(painted.tobytes())
+            else:
+                # The SAM environment has PIL and not cv2. PNG is stored RGB.
+                Image.fromarray(painted[:, :, ::-1]).save(args.png_dir / f"{index:06d}.png")
     finally:
-        proc.stdin.close()
-        stderr = proc.stderr.read() if proc.stderr is not None else b""
-        code = proc.wait()
-        if code != 0:
-            tail = stderr.decode("utf-8", errors="replace")[-2000:]
-            raise RuntimeError(f"SAM mask AV1 encode failed ({code}): {tail}")
+        if proc is not None:
+            proc.stdin.close()
+            stderr = proc.stderr.read() if proc.stderr is not None else b""
+            code = proc.wait()
+            if code != 0:
+                tail = stderr.decode("utf-8", errors="replace")[-2000:]
+                raise RuntimeError(f"SAM mask AV1 encode failed ({code}): {tail}")
 
     args.timing.write_text(json.dumps({
         "n_frames": n_frames,
