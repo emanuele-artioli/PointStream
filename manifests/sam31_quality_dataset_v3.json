@@ -1,0 +1,58 @@
+{
+  "schema": "pointstream.sam31-existing-training-set.v1",
+  "version": "sam31-quality-existing-training-v3-point-guided",
+  "source_dataset": "assets/dataset",
+  "split": "development_exposed_existing_train",
+  "chunk_size_frames": 48,
+  "working_fps": 24,
+  "selection_policy": {
+    "scope": "every non-empty legacy player track in every scene under the existing training dataset",
+    "player_prompts": "role text tennis player plus legacy full-frame xyxy player bboxes from per-track metadata",
+    "racket_prompts": "role text tennis racket plus legacy racket_bbox_crop translated to full-frame xyxy, refined by the mean of the four legacy racket_mask_points as a positive click",
+    "racket_drift_correction": "when the SAM mask center falls outside the legacy racket box and is separated from the guided positive click, add a negative click at the drifting mask center",
+    "frame_positions": "all distinct frame_id values present in legacy per-track metadata",
+    "sequence_partition": "48-frame chunks on the source frame grid; prompts use the nearest legacy annotation to each chunk midpoint",
+    "unprompted_full_frame_text_search": false,
+    "source_alignment": "compare opaque legacy crop pixels against the source frame at the stored player bbox; fail if mean absolute RGB error exceeds 2.0"
+  },
+  "sam_inference": {
+    "max_input_side_px": 1920,
+    "resize_method": "lanczos",
+    "restore_masks_to_source_grid": "nearest",
+    "source_frame_grid_unchanged": true
+  },
+  "quality_policy": {
+    "precision_over_recall": true,
+    "max_players_per_frame": 2,
+    "player_track_min_score": 0.58,
+    "player_min_sam_confidence": 0.4,
+    "player_min_pose_support": 0.08,
+    "player_mask_area_fraction_range": [0.000015, 0.2],
+    "player_mask_bbox_height_fraction_min": 0.012,
+    "player_mask_aspect_ratio_max": 5.0,
+    "player_mask_fill_ratio_min": 0.035,
+    "player_selection_motion_signal": "rank valid tracks using camera-compensated centroid motion, pose support, SAM confidence, shape and persistence",
+    "racket_track_min_score": 0.68,
+    "racket_min_sam_confidence": 0.5,
+    "racket_area_must_be_less_than_player_area_fraction": 0.85,
+    "racket_bbox_diagonal_must_not_exceed_player_bbox_diagonal_fraction": 1.0,
+    "racket_player_mask_overlap_fraction_max": 0.9,
+    "racket_requires_retained_player_wrist_association": true,
+    "racket_requires_at_least_two_accepted_observations_per_track": true,
+    "racket_aspect_ratio_range": [1.0, 6.0],
+    "racket_mask_fill_ratio_min": 0.035,
+    "racket_mask_area_px_min": 4,
+    "uncertain_observations": "record in quality audit and exclude from training export"
+  },
+  "training_export": {
+    "root_directory": "train_dataset",
+    "loader": "src.shared.tennis_dataset.TennisSkeletonDataset",
+    "condition_directories": ["pose_body", "pose_racket"],
+    "accepted_masks": "lossless PNG sidecars under segmentation_masks; sample records link each accepted mask and checksum",
+    "active_manifest_updated": false
+  },
+  "promotion": {
+    "eligible": false,
+    "reason": "SAM3.1 pseudo-labels with conservative automatic gates still require visual/manual review before promotion"
+  }
+}

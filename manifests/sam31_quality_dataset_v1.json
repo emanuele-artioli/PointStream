@@ -1,0 +1,317 @@
+{
+  "frame_count_per_scene": 48,
+  "promotion": {
+    "eligible": false,
+    "reason": "development data only; labels are SAM3.1 pseudo-labels with heuristic admission gates"
+  },
+  "quality_policy": {
+    "max_players_per_frame": 2,
+    "player_track_min_score": 0.58,
+    "precision_over_recall": true,
+    "racket_area_must_be_less_than_player_area_fraction": 0.85,
+    "racket_bbox_diagonal_must_not_exceed_player_bbox_diagonal": true,
+    "racket_requires_retained_player_wrist_association": true,
+    "racket_track_min_score": 0.68,
+    "uncertain_observations": "retained in audit records and excluded from training views"
+  },
+  "reserved_sources_excluded": true,
+  "scenes": [
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 0,
+      "scene": "scene_002",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "alcaraz_perricard_scene_002",
+      "video": "alcaraz_perricard",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 86,
+      "scene": "scene_003",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "alcaraz_perricard_scene_003",
+      "video": "alcaraz_perricard",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 58,
+      "scene": "scene_004",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "alcaraz_perricard_scene_004",
+      "video": "alcaraz_perricard",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 361,
+      "scene": "scene_007",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "alcaraz_perricard_scene_007",
+      "video": "alcaraz_perricard",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 62,
+      "scene": "scene_010",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "alcaraz_perricard_scene_010",
+      "video": "alcaraz_perricard",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 222,
+      "scene": "scene_003",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "djokovic_federer_scene_003",
+      "video": "djokovic_federer",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 0,
+      "scene": "scene_005",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "djokovic_federer_scene_005",
+      "video": "djokovic_federer",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 37,
+      "scene": "scene_007",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "djokovic_federer_scene_007",
+      "video": "djokovic_federer",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 166,
+      "scene": "scene_009",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "djokovic_federer_scene_009",
+      "video": "djokovic_federer",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 42,
+      "scene": "scene_011",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "djokovic_federer_scene_011",
+      "video": "djokovic_federer",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 85,
+      "scene": "scene_013",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "djokovic_federer_scene_013",
+      "video": "djokovic_federer",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 239,
+      "scene": "scene_015",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "djokovic_federer_scene_015",
+      "video": "djokovic_federer",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 17,
+      "scene": "scene_017",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "djokovic_federer_scene_017",
+      "video": "djokovic_federer",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 126,
+      "scene": "scene_020",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "djokovic_federer_scene_020",
+      "video": "djokovic_federer",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 79,
+      "scene": "scene_022",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "djokovic_federer_scene_022",
+      "video": "djokovic_federer",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 0,
+      "scene": "scene_001",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "djokovic_zverev_scene_001",
+      "video": "djokovic_zverev",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 0,
+      "scene": "scene_002",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "djokovic_zverev_scene_002",
+      "video": "djokovic_zverev",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 365,
+      "scene": "scene_003",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "djokovic_zverev_scene_003",
+      "video": "djokovic_zverev",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 514,
+      "scene": "scene_004",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "djokovic_zverev_scene_004",
+      "video": "djokovic_zverev",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 170,
+      "scene": "scene_005",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "djokovic_zverev_scene_005",
+      "video": "djokovic_zverev",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 0,
+      "scene": "scene_006",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "djokovic_zverev_scene_006",
+      "video": "djokovic_zverev",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 112,
+      "scene": "scene_002",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "sinner_alcaraz_scene_002",
+      "video": "sinner_alcaraz",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 139,
+      "scene": "scene_004",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "sinner_alcaraz_scene_004",
+      "video": "sinner_alcaraz",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 228,
+      "scene": "scene_006",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "sinner_alcaraz_scene_006",
+      "video": "sinner_alcaraz",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 0,
+      "scene": "scene_008",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "sinner_alcaraz_scene_008",
+      "video": "sinner_alcaraz",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 0,
+      "scene": "scene_010",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "sinner_alcaraz_scene_010",
+      "video": "sinner_alcaraz",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 103,
+      "scene": "scene_014",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "sinner_alcaraz_scene_014",
+      "video": "sinner_alcaraz",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 0,
+      "scene": "scene_018",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "sinner_alcaraz_scene_018",
+      "video": "sinner_alcaraz",
+      "working_fps": 24
+    },
+    {
+      "frame_count": 48,
+      "frame_directory": "extract_24",
+      "frame_start": 0,
+      "scene": "scene_021",
+      "selection_basis": "eligible 48-frame BP46 development_candidate interval",
+      "source_id": "sinner_alcaraz_scene_021",
+      "video": "sinner_alcaraz",
+      "working_fps": 24
+    }
+  ],
+  "schema": "pointstream.sam31-quality-dataset.v1",
+  "scope": "all eligible 48-frame BP46 development_candidate scenes",
+  "source_scene_manifest": "manifests/bp46_long_tennis_scenes.json",
+  "source_scene_manifest_sha256": "0c79f427dae89a753abd488112d66b0756ceba7189ec2b7a65f9afd2b8fb8d23",
+  "split": "development_exposed_bp46",
+  "version": "sam31-clean-development-v1",
+  "working_fps": 24
+}
