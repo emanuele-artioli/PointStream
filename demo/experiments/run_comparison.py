@@ -160,7 +160,7 @@ def run_single_clip_comparison(
     n_frames: int = 300,
     total_session_sec: float = 30.0,
     shared_anchor_bytes: int = 0,
-    pose_backend: str = "mp_live",
+    pose_backend: str = "rtm_hand",
 ) -> dict[str, Any]:
     """Benchmark a single clip across the full PointStream and AV1 ladders.
 
@@ -373,7 +373,7 @@ def main() -> None:
     parser.add_argument("--checkpoint", type=Path, default=DEFAULT_CHECKPOINT)
     parser.add_argument("--frames", type=int, default=300, help="Frames per clip to benchmark")
     parser.add_argument("--device", default="cuda:1")
-    parser.add_argument("--pose-backend", default="mp_live", choices=list(BACKENDS))
+    parser.add_argument("--pose-backend", default="rtm_hand", choices=list(BACKENDS))
     args = parser.parse_args()
 
     args.output_dir.mkdir(parents=True, exist_ok=True)

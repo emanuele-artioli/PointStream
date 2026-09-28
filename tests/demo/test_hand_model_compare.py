@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from demo.experiments.compare_hand_models_clip1 import (
+from demo.experiments.archive.compare_hand_models_clip1 import (
     fit_joints_to_bbox,
     network_to_frame,
     openpose_from_mano,

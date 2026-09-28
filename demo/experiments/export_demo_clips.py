@@ -76,7 +76,7 @@ def process_clip(
     frames: int,
     *,
     mask_video: Path | None = None,
-    pose_backend: str = "dwpose_hands",
+    pose_backend: str = "rtm_hand",
     skip_av1: bool = False,
     only: list[str] | None = None,
     background_mp4s: dict[str, Path] | None = None,
@@ -194,7 +194,7 @@ def main() -> None:
     parser.add_argument("--frames", type=int, default=300)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--mask-video", type=Path, default=None, help="SAM mask for clip 1")
-    parser.add_argument("--pose-backend", default="dwpose_hands")
+    parser.add_argument("--pose-backend", default="rtm_hand")
     parser.add_argument("--skip-av1", action="store_true")
     parser.add_argument(
         "--only-keys",

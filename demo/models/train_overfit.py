@@ -45,7 +45,7 @@ def train(
     device_str: str = "cuda:0",
     model_type: str = "spade",
     smoke: bool = False,
-    pose_backend: str = "dwpose_hands",
+    pose_backend: str = "rtm_hand",
     mask_video: Path | None = None,
     dwb2: bool = True,
     clip_indices: list[int] | None = None,
@@ -308,7 +308,7 @@ def main() -> None:
     parser.add_argument("--model-type", choices=["spade", "unet"], default="spade")
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--smoke", action="store_true", help="Run 1-epoch smoke test")
-    parser.add_argument("--pose-backend", default="dwpose_hands", choices=list(BACKENDS))
+    parser.add_argument("--pose-backend", default="rtm_hand", choices=list(BACKENDS))
     parser.add_argument("--mask-video", type=Path, default=None, help="SAM hand-color video for clip 1")
     parser.add_argument("--dwb2", action="store_true", default=True)
     parser.add_argument("--no-dwb2", action="store_true")
