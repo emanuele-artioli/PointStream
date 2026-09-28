@@ -33,6 +33,7 @@ from demo.pipeline.maps.dwpose import (
     instance_from_part,
     main as dwpose_main,
     pack_combined_payload,
+    gate_egocentric,
     pack_frame_parts,
     read_packet_stream,
     write_packet_stream,
@@ -182,6 +183,42 @@ def test_pack_frame_parts_three_magics() -> None:
     assert len(face_inst) == 1 and len(face_inst[0].landmarks_pixel) == 68
     assert len(body_inst) == 1 and len(body_inst[0].landmarks_pixel) == 17
     assert instance_from_part(frame.people[0].face, 1920, 1080) is not None
+
+
+def _frame(people: list[WholeBodyPerson], idx: int = 0) -> FrameWholeBody:
+    return FrameWholeBody(frame_idx=idx, people=people, width=1920, height=1080)
+
+
+def test_egocentric_gate_drops_face_and_keeps_two_hands() -> None:
+    extra = _person()
+    extra.keypoints = extra.keypoints.copy()
+    extra.keypoints[91:112, 0] += 800
+    extra.keypoints[91:112, 2] = 0.5
+    frames = [_frame([_person(), extra], i) for i in range(3)]
+    gated = gate_egocentric(frames)
+    assert gated[0].people == []
+    kept = gated[2].people[0]
+    assert float(kept.face[:, 2].max()) == 0.0
+    assert float(kept.left_hand[:, 2].max()) > 0.9
+    assert float(kept.right_hand[:, 2].max()) > 0.9
+    assert float(kept.left_hand[:, 0].min()) < 200
+
+
+def test_egocentric_gate_ignores_one_frame_hands_and_holds_gaps() -> None:
+    present = [_frame([_person()], i) for i in range(4)]
+    gap = [_frame([], i) for i in range(2)]
+    stray = _person()
+    stray.keypoints = stray.keypoints.copy()
+    stray.keypoints[:, 2] = 0
+    stray.keypoints[91:112] = _person().keypoints[91:112]
+    stray.keypoints[91:112, 0] += 900
+    stray.keypoints[91:112, 1] += 400
+    frames = present + gap + [_frame([stray], 6)]
+    gated = gate_egocentric(frames)
+    assert gated[0].people == []
+    assert gated[2].people and float(gated[2].people[0].left_hand[:, 2].max()) > 0
+    assert gated[5].people and float(gated[5].people[0].left_hand[:, 0].min()) < 200
+    assert gated[6].people == [] or float(gated[6].people[0].left_hand[:, 0].min()) < 200
 
 
 def test_packet_stream_roundtrip(tmp_path: Path) -> None:

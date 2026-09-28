@@ -19,6 +19,7 @@ import numpy as np
 
 from demo.evaluation.pose_backends import (
     FrameWholeBody,
+    WholeBodyPerson,
     dwpose_ort_device,
     extract_dwpose_wholebody,
     wholebody_to_frame_hands,
@@ -384,6 +385,96 @@ def _write_map_sidecar(
     return stream
 
 
+def _hand_box(part: np.ndarray) -> list[float] | None:
+    vis = part[:, 2] >= 0.4
+    if int(np.count_nonzero(vis)) < 8:
+        return None
+    pts = part[vis, :2]
+    span_x = float(pts[:, 0].max() - pts[:, 0].min())
+    span_y = float(pts[:, 1].max() - pts[:, 1].min())
+    if span_x < 16 and span_y < 16:
+        return None
+    return [float(pts[:, 0].min()), float(pts[:, 1].min()), float(pts[:, 0].max()), float(pts[:, 1].max())]
+
+
+def _same_hand(box: list[float], previous: list[float] | None, width: int, height: int) -> bool:
+    if previous is None:
+        return False
+    ix1, iy1 = max(box[0], previous[0]), max(box[1], previous[1])
+    ix2, iy2 = min(box[2], previous[2]), min(box[3], previous[3])
+    inter = max(0.0, ix2 - ix1) * max(0.0, iy2 - iy1)
+    area_a = max(1.0, (box[2] - box[0]) * (box[3] - box[1]))
+    area_b = max(1.0, (previous[2] - previous[0]) * (previous[3] - previous[1]))
+    if inter / (area_a + area_b - inter) >= 0.1:
+        return True
+    cx, cy = (box[0] + box[2]) / 2, (box[1] + box[3]) / 2
+    px, py = (previous[0] + previous[2]) / 2, (previous[1] + previous[3]) / 2
+    return (cx - px) ** 2 + (cy - py) ** 2 <= (0.18 * max(width, height)) ** 2
+
+
+def gate_egocentric(frames: list[FrameWholeBody], *, confirm: int = 2, hold: int = 4) -> list[FrameWholeBody]:
+    """Egocentric DW-Pose: no face, at most one left and one right hand.
+
+    A hand that appears for a single frame stays hidden. A hand that drops out
+    for a few frames keeps its last pose so the overlay does not flicker.
+    """
+    tracks = {
+        "left": {"hits": 0, "misses": 0, "shown": False, "part": None, "box": None, "body": None},
+        "right": {"hits": 0, "misses": 0, "shown": False, "part": None, "box": None, "body": None},
+    }
+    gated: list[FrameWholeBody] = []
+    for frame in frames:
+        best: dict[str, tuple[float, np.ndarray, np.ndarray]] = {}
+        for person in frame.people:
+            for side, part in (("left", person.left_hand), ("right", person.right_hand)):
+                box = _hand_box(np.asarray(part))
+                if box is None:
+                    continue
+                conf = float(np.mean(np.asarray(part)[:, 2]))
+                current = best.get(side)
+                if current is None or conf > current[0]:
+                    best[side] = (conf, np.array(part, copy=True), np.array(person.body, copy=True))
+        keypoints = np.zeros((133, 3), dtype=np.float32)
+        for side, sl in (("left", slice(91, 112)), ("right", slice(112, 133))):
+            track = tracks[side]
+            detected = best.get(side)
+            if detected is not None and (track["shown"] is False or _same_hand(list(_hand_box(detected[1]) or []), track["box"], frame.width, frame.height) or track["box"] is None):
+                box = _hand_box(detected[1])
+                linked = track["box"] is None or _same_hand(box or [], track["box"], frame.width, frame.height)
+                track["hits"] = track["hits"] + 1 if linked else 1
+                track["misses"] = 0
+                track["part"] = detected[1]
+                track["body"] = detected[2]
+                track["box"] = box
+                if track["hits"] >= confirm or track["shown"]:
+                    track["shown"] = True
+                    keypoints[sl] = detected[1]
+                    keypoints[:17] = detected[2]
+                continue
+            if track["shown"] and track["part"] is not None and track["misses"] < hold:
+                track["misses"] += 1
+                track["hits"] = 0
+                keypoints[sl] = track["part"]
+                if track["body"] is not None:
+                    keypoints[:17] = track["body"]
+                continue
+            track["hits"] = 0
+            track["misses"] = 0
+            track["shown"] = False
+            track["part"] = None
+            track["box"] = None
+            track["body"] = None
+        gated.append(
+            FrameWholeBody(
+                frame_idx=frame.frame_idx,
+                people=[WholeBodyPerson(keypoints=keypoints)] if float(keypoints[:, 2].max()) > 0 else [],
+                width=frame.width,
+                height=frame.height,
+            )
+        )
+    return gated
+
+
 def pack_frame_parts(
     frame: FrameWholeBody,
 ) -> tuple[bytes, bytes, bytes, FrameHandPose, list[LandmarkInstance], list[LandmarkInstance]]:
@@ -426,7 +517,7 @@ def run_dwpose(clip: Path, out_dir: Path, max_frames: int | None) -> list[MapStr
     if not frames_bgr:
         raise RuntimeError(f"no frames decoded from {clip}")
     fps = _clip_fps(clip)
-    wb_frames = extract_dwpose_wholebody(clip, max_frames=max_frames)
+    wb_frames = gate_egocentric(extract_dwpose_wholebody(clip, max_frames=max_frames))
     n = min(len(wb_frames), len(frames_bgr))
     wb_frames = wb_frames[:n]
     duration_s = n / fps
@@ -501,7 +592,8 @@ def run_dwpose(clip: Path, out_dir: Path, max_frames: int | None) -> list[MapStr
                 "topology": "coco_wb_133",
                 "magic": "DWB2",
                 "coding": "box-u8 exp-golomb delta; absent parts omitted",
-                "smooth": "one_euro",
+                "smooth": "one_euro+egocentric_gate",
+                "egocentric": "no face; one left and one right hand; 2-frame confirm; 4-frame hold",
                 "ort_device": dwpose_ort_device(),
                 "parts": ["hands", "face", "body"],
                 "n_kpts_hands": 21,
