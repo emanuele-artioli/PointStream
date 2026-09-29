@@ -204,8 +204,12 @@ def _worker(argv: list[str]) -> int:
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--prompts", type=Path, required=True)
     parser.add_argument("--png-dir", type=Path, default=None)
+    parser.add_argument("--concepts", default="", help="Comma-separated subset of hand,tool,workbench")
     args = parser.parse_args(argv)
     role_prompts = json.loads(args.prompts.read_text())
+    if args.concepts.strip():
+        allowed = {item.strip() for item in args.concepts.split(",") if item.strip()}
+        PAINT_ORDER = tuple(name for name in PAINT_ORDER if name in allowed)
     prob_thresh = float(os.environ.get("SAM_PROB_THRESH", SAM_PROB_THRESH))
 
     frame_paths = sorted(args.frames.glob("*.jpg"))
