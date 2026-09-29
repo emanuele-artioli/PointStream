@@ -1,4 +1,7 @@
-"""Compare hand models on clip 1 as encoders and as judges of each other.
+"""Archived clip-1 comparison of DW-Pose, RTMPose, HaMeR, DeltaDorsal, and HOPformer.
+
+Hand RTMPose stayed the encoder and the judge. This script stays so those models
+can be rerun for paper ablations. It is not on the encode path.
 
 Eight frames. Each model emits 21 image-plane joints. The encoder measure is the
 shipped keypoint packet plus, for MANO models, a quantized pose packet. The judge
@@ -20,7 +23,7 @@ from pathlib import Path
 
 import numpy as np
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
@@ -125,10 +128,15 @@ def encoder_report(poses: list[FrameHandPose]) -> dict[str, float]:
     }
 
 
+def _tool(name: str) -> str:
+    candidate = Path("/opt/local/bin") / name
+    return str(candidate) if candidate.is_file() else name
+
+
 def sample_clip(source: Path, dest: Path, count: int) -> None:
     probe = subprocess.run(
         [
-            "ffprobe", "-v", "error", "-select_streams", "v:0",
+            _tool("ffprobe"), "-v", "error", "-select_streams", "v:0",
             "-show_entries", "stream=nb_frames,r_frame_rate,duration",
             "-of", "json", str(source),
         ],
@@ -149,7 +157,7 @@ def sample_clip(source: Path, dest: Path, count: int) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(
         [
-            "ffmpeg", "-y", "-i", str(source), "-vf", f"select='{select}'",
+            _tool("ffmpeg"), "-y", "-i", str(source), "-vf", f"select='{select}'",
             "-vsync", "vfr", str(dest),
         ],
         check=True, capture_output=True,
@@ -239,6 +247,11 @@ def load_hopformer(device: str):
                 raise RuntimeError("EPIC object meshes are not used for the hand comparison")
 
         epic_objects.ObjectTensorsEPIC = _DummyObjects
+        for key in list(sys.modules):
+            if key == "src" or key.startswith("src."):
+                origin = getattr(sys.modules[key], "__file__", "") or ""
+                if "HOPformer" not in origin:
+                    del sys.modules[key]
         import src.models.wilor as wilor_pkg
         import src.models.wilor.models as wilor_models
         import src.models.wilor.models.wilor as wilor_mod
@@ -489,6 +502,9 @@ def main() -> None:
     sample_clip(args.video, sampled, args.frames)
     frames = read_frames(sampled)
 
+    hamer_root = Path("/home/itec/emanuele/Datasets/HaMeR/Hand-Texture-Module")
+    if str(hamer_root) not in sys.path:
+        sys.path.insert(0, str(hamer_root))
     from demo.evaluation.pose_backends import extract_dwpose_hands, extract_rtm_hand, extract_rtm_wholebody_hands
     from demo.evaluation.hamer_backend import extract_hamer
 
@@ -496,7 +512,12 @@ def main() -> None:
     dwpose = extract_dwpose_hands(sampled)
     rtm = extract_rtm_hand(sampled)
     boxes = extract_rtm_wholebody_hands(sampled)
-    hamer = extract_hamer(sampled)
+    previous = os.getcwd()
+    os.chdir(hamer_root)
+    try:
+        hamer = extract_hamer(sampled)
+    finally:
+        os.chdir(previous)
 
     logger.info("running DeltaDorsal")
     delta_bundle = load_deltadorsal(device)

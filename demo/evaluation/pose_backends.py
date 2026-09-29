@@ -1,4 +1,8 @@
-"""Offline and live hand-pose backends used as GT or reconstruction evaluators."""
+"""Offline and live hand-pose backends used as GT or reconstruction evaluators.
+
+``rtm_hand`` is the encoder and the judge. DW-Pose, HaMeR, MediaPipe, and RTM
+whole-body stay registered so ablations can still call them.
+"""
 
 from __future__ import annotations
 
