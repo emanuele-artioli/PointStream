@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 INDEX_SCHEMA = "pointstream.maps.index.v1"
 DEFAULT_CLIPS = REPO_ROOT / "demo" / "outputs" / "pitch"
 DEFAULT_OUT = REPO_ROOT / "demo" / "outputs" / "maps"
-DEFAULT_MAPS = ("canny", "depth", "yoloe", "dino", "pose")
+DEFAULT_MAPS = ("depth", "yoloe", "dino", "sam31")
 VIDEO_SUFFIXES = {".mp4", ".avi", ".mov", ".mkv", ".webm"}
 SKIP_JSON_NAMES = {"skipped.json", "index.json", "classes.yaml", "bakeoff_pose.json"}
 

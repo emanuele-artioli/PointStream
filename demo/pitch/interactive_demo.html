@@ -580,9 +580,8 @@
                     </select>
                     <select id="mask-left" class="dropdown" onchange="onHalfChange('left')">
                         <option value="" selected>No mask</option>
-                        <option value="canny">Canny</option>
                         <option value="dino">DINOv3</option>
-                        <option value="dwpose">DW-Pose</option>
+                        <option value="rtmpose">RTMPose-m</option>
                         <option value="sam31">SAM 3.1</option>
                         <option value="yoloe">YOLOE</option>
                     </select>
@@ -602,9 +601,8 @@
                     </select>
                     <select id="mask-right" class="dropdown" onchange="onHalfChange('right')">
                         <option value="" selected>No mask</option>
-                        <option value="canny">Canny</option>
                         <option value="dino">DINOv3</option>
-                        <option value="dwpose">DW-Pose</option>
+                        <option value="rtmpose">RTMPose-m</option>
                         <option value="sam31">SAM 3.1</option>
                         <option value="yoloe">YOLOE</option>
                     </select>
@@ -1020,13 +1018,14 @@ class StreamingCodecAdapter(Protocol):
 
         // Published teleop path, not a per-rung remeasure.
         const STREAM_LATENCY_MS = { ps: 18.4, av1: 13.6 };
+        // 48-frame screen of the shipped videos. Pose is RTMPose-m on pictures encoded before that switch.
+        window.STREAM_ALIGN = {"clip_01": {"av1_180": {"lpips": 0.7435, "seg_iou": 0.1062, "pose_pck": 0.0}, "av1_240": {"lpips": 0.7313, "seg_iou": 0.2739, "pose_pck": 0.0}, "av1_360": {"lpips": 0.733, "seg_iou": 0.1793, "pose_pck": 0.0}, "av1_540": {"lpips": 0.7352, "seg_iou": 0.0961, "pose_pck": 0.0}, "av1_720": {"lpips": 0.7372, "seg_iou": 0.0763, "pose_pck": 0.0}, "av1_1080": {"lpips": 0.7359, "seg_iou": 0.0358, "pose_pck": 0.0}, "ps_starve": {"lpips": 0.7274, "seg_iou": 0.3456, "pose_pck": 0.0079}, "ps_heavy": {"lpips": 0.7284, "seg_iou": 0.3589, "pose_pck": 0.0129}, "ps_low": {"lpips": 0.7278, "seg_iou": 0.3585, "pose_pck": 0.0}, "ps_1080": {"lpips": 0.729, "seg_iou": 0.2408, "pose_pck": 0.0}, "ps_180": {"lpips": 0.7431, "seg_iou": 0.4834, "pose_pck": 0.0099}, "ps_720": {"lpips": 0.7267, "seg_iou": 0.4334, "pose_pck": 0.0159}}, "clip_02": {"av1_180": {"lpips": 0.7861, "seg_iou": 0.4794, "pose_pck": 0.1416}, "av1_240": {"lpips": 0.7553, "seg_iou": 0.3756, "pose_pck": 0.1197}, "av1_360": {"lpips": 0.7053, "seg_iou": 0.3555, "pose_pck": 0.0708}, "av1_540": {"lpips": 0.6712, "seg_iou": 0.5018, "pose_pck": 0.1634}, "av1_720": {"lpips": 0.6584, "seg_iou": 0.3958, "pose_pck": 0.1197}, "av1_1080": {"lpips": 0.6378, "seg_iou": 0.3388, "pose_pck": 0.1506}, "ps_starve": {"lpips": 0.7507, "seg_iou": 0.4207, "pose_pck": 0.1236}, "ps_heavy": {"lpips": 0.7072, "seg_iou": 0.3333, "pose_pck": 0.1763}, "ps_low": {"lpips": 0.6626, "seg_iou": 0.5, "pose_pck": 0.1506}, "ps_1080": {"lpips": 0.6378, "seg_iou": 0.3778, "pose_pck": 0.2329}, "ps_180": {"lpips": 0.7763, "seg_iou": 0.4233, "pose_pck": 0.13}, "ps_720": {"lpips": 0.6499, "seg_iou": 0.4391, "pose_pck": 0.1506}}, "clip_03": {"av1_180": {"lpips": 0.7585, "seg_iou": 0.4795, "pose_pck": 0.1171}, "av1_240": {"lpips": 0.7302, "seg_iou": 0.4167, "pose_pck": 0.2609}, "av1_360": {"lpips": 0.6996, "seg_iou": 0.7083, "pose_pck": 0.2044}, "av1_540": {"lpips": 0.6729, "seg_iou": 0.6678, "pose_pck": 0.2331}, "av1_720": {"lpips": 0.6707, "seg_iou": 0.7083, "pose_pck": 0.248}, "av1_1080": {"lpips": 0.6604, "seg_iou": 0.8542, "pose_pck": 0.2907}, "ps_starve": {"lpips": 0.7375, "seg_iou": 0.7708, "pose_pck": 0.3621}, "ps_heavy": {"lpips": 0.7057, "seg_iou": 0.7917, "pose_pck": 0.3819}, "ps_low": {"lpips": 0.6764, "seg_iou": 0.8125, "pose_pck": 0.3294}, "ps_1080": {"lpips": 0.6613, "seg_iou": 0.8333, "pose_pck": 0.3611}, "ps_180": {"lpips": 0.7514, "seg_iou": 0.6462, "pose_pck": 0.2222}, "ps_720": {"lpips": 0.6692, "seg_iou": 0.7102, "pose_pck": 0.3085}}};
         const PS_BY_RES = { '180': 'ps_180', '240': 'ps_starve', '360': 'ps_heavy', '540': 'ps_low', '720': 'ps_720', '1080': 'ps_1080' };
         const AV1_BY_RES = { '180': 'av1_180', '240': 'av1_240', '360': 'av1_360', '540': 'av1_540', '720': 'av1_720', '1080': 'av1_1080' };
-        const MASK_LABEL = { canny: 'Canny', dino: 'DINOv3', dwpose: 'DW-Pose', sam31: 'SAM 3.1', yoloe: 'YOLOE' };
+        const MASK_LABEL = { dino: 'DINOv3', rtmpose: 'RTMPose-m', sam31: 'SAM 3.1', yoloe: 'YOLOE' };
         const MASK_IDS = {
-            canny: ['canny'],
             dino: ['dino', 'dinov3'],
-            dwpose: ['dwpose_hands', 'dwpose', 'dwpose_body'],
+            rtmpose: ['rtmpose', 'rtm_hand'],
             sam31: ['sam31', 'sam3.1'],
             yoloe: ['yoloe_masks', 'yoloe']
         };
@@ -1042,9 +1041,9 @@ class StreamingCodecAdapter(Protocol):
             return (kind === 'ps' ? PS_BY_RES : AV1_BY_RES)[res];
         }
 
-        const BARE_MASK_HEIGHT = { canny: '240' };
+        const BARE_MASK_HEIGHT = {};
         // One keypoint payload. The preview is not a per-rung encode.
-        const RESOLUTION_FREE = { dwpose: 'dwpose' };
+        const RESOLUTION_FREE = { rtmpose: 'rtmpose' };
 
         function mapMatches(entry, family, res) {
             const id = String(entry.map || '');
@@ -1057,11 +1056,26 @@ class StreamingCodecAdapter(Protocol):
             return bare && height === (BARE_MASK_HEIGHT[family] || '1080');
         }
 
+        // 48-frame RTMPose-m hand packet from the mask screen. One payload, every rung.
+        const RTM_PACKET_KBPS = { clip_01: 12.0, clip_02: 9.4, clip_03: 12.0 };
+
         function selectedMapEntry(side) {
             const family = halfMask(side);
             if (!family) return null;
             const entries = mapsEntriesForClip(mapsClipId || currentClipId);
-            return entries.find(e => mapMatches(e, family, halfRes(side))) || null;
+            const found = entries.find(e => mapMatches(e, family, halfRes(side))) || null;
+            if (found) return found;
+            if (family === 'rtmpose') {
+                return {
+                    map: 'rtmpose',
+                    clip: currentClipId,
+                    label: 'RTMPose-m',
+                    payload_kbps: RTM_PACKET_KBPS[currentClipId],
+                    status: 'ok',
+                    overlay_key: 'skeleton'
+                };
+            }
+            return null;
         }
 
         function formatStream(key) {
@@ -1171,6 +1185,12 @@ class StreamingCodecAdapter(Protocol):
             const s = streamMeta(key);
             let text = streamLabel(key);
             if (STREAM_LATENCY_MS[s.kind] != null) text += ', ' + STREAM_LATENCY_MS[s.kind].toFixed(1) + ' ms';
+            const align = (window.STREAM_ALIGN && window.STREAM_ALIGN[currentClipId] && window.STREAM_ALIGN[currentClipId][key]) || null;
+            if (align) {
+                if (align.lpips != null) text += ' · LPIPS ' + Number(align.lpips).toFixed(3);
+                if (align.seg_iou != null) text += ' · seg ' + Math.round(align.seg_iou * 100) + '%';
+                if (align.pose_pck != null) text += ' · pose ' + Math.round(align.pose_pck * 100) + '%';
+            }
             return text;
         }
 
@@ -1365,6 +1385,10 @@ class StreamingCodecAdapter(Protocol):
         function drawMapOverlays(targetCtx, dx, dy, dw, dh, side, srcX, srcY, srcW, srcH) {
             const idx = overlayFrameIndex();
             enabledOverlayEntries(side).forEach(entry => {
+                if (entry.map === 'rtmpose' || entry.overlay_key === 'skeleton') {
+                    drawSkeletonOverlay(targetCtx, dx, dy, dw, dh, srcX, srcY, srcW, srcH);
+                    return;
+                }
                 const n = Number(entry.n_frames) || 0;
                 if (n && idx >= n) return;
                 const pack = overlayFrames[entry.map];
@@ -1499,27 +1523,40 @@ class StreamingCodecAdapter(Protocol):
             }
         }
 
-        function getActiveHandPose() {
-            if (!keypointsData || !keypointsData.frames) return null;
-            const fIdx = Math.floor((clock().currentTime || 0) * 30.0);
-            const frameEntry = keypointsData.frames.find(f => f.frame === fIdx);
-            if (frameEntry && frameEntry.hands && frameEntry.hands.length > 0) {
-                return frameEntry.hands[0];
-            }
-            return null;
+        function poseFrameList() {
+            if (!keypointsData) return [];
+            if (Array.isArray(keypointsData)) return keypointsData;
+            return keypointsData.frames || [];
         }
 
-        // Draw 47-Byte Keypoint Skeleton Overlay
-        function drawSkeletonOverlay(targetCtx, offsetX, offsetY, drawW, drawH) {
-            if (!keypointsData || !keypointsData.frames) return;
-            const fIdx = Math.floor(videoA.currentTime * 30.0);
-            const frameEntry = keypointsData.frames.find(f => f.frame === fIdx);
-            if (!frameEntry || !frameEntry.hands) return;
+        function handsAtFrame(frameIdx) {
+            const frames = poseFrameList();
+            if (!frames.length) return [];
+            const entry = frames.find(f => (f.frame != null ? f.frame : f.frame_idx) === frameIdx) || frames[frameIdx] || null;
+            if (!entry || !entry.hands) return [];
+            return entry.hands.map(hand => ({
+                landmarks: hand.landmarks || hand.landmarks_norm,
+                side: hand.side || hand.handedness || 'Hand',
+                score: hand.score != null ? hand.score : hand.confidence
+            })).filter(hand => hand.landmarks && hand.landmarks.length >= 21);
+        }
 
-            const scaleX = drawW / 1920.0;
-            const scaleY = drawH / 1080.0;
+        function getActiveHandPose() {
+            const hands = handsAtFrame(Math.floor((clock().currentTime || 0) * 30.0));
+            return hands.length ? hands[0] : null;
+        }
 
-            frameEntry.hands.forEach(hand => {
+        // Draw the RTMPose-m hand packet. Landmarks are normalized to the 1920x1080 frame.
+        function drawSkeletonOverlay(targetCtx, offsetX, offsetY, drawW, drawH, srcX, srcY, srcW, srcH) {
+            const hands = handsAtFrame(Math.floor((clock().currentTime || 0) * 30.0));
+            if (!hands.length) return;
+            const cropped = srcW && srcH;
+            const scaleX = cropped ? drawW / srcW : drawW / 1920.0;
+            const scaleY = cropped ? drawH / srcH : drawH / 1080.0;
+            const originX = cropped ? srcX : 0;
+            const originY = cropped ? srcY : 0;
+
+            hands.forEach(hand => {
                 const lms = hand.landmarks;
                 if (!lms || lms.length < 21) return;
 
@@ -1541,8 +1578,8 @@ class StreamingCodecAdapter(Protocol):
                     targetCtx.shadowColor = color;
                     targetCtx.shadowBlur = 6;
                     targetCtx.beginPath();
-                    targetCtx.moveTo(offsetX + p1[0] * 1920 * scaleX, offsetY + p1[1] * 1080 * scaleY);
-                    targetCtx.lineTo(offsetX + p2[0] * 1920 * scaleX, offsetY + p2[1] * 1080 * scaleY);
+                    targetCtx.moveTo(offsetX + (p1[0] * 1920 - originX) * scaleX, offsetY + (p1[1] * 1080 - originY) * scaleY);
+                    targetCtx.lineTo(offsetX + (p2[0] * 1920 - originX) * scaleX, offsetY + (p2[1] * 1080 - originY) * scaleY);
                     targetCtx.stroke();
                 });
 
@@ -1552,7 +1589,7 @@ class StreamingCodecAdapter(Protocol):
                     targetCtx.shadowColor = '#38bdf8';
                     targetCtx.shadowBlur = 4;
                     targetCtx.beginPath();
-                    targetCtx.arc(offsetX + p[0] * 1920 * scaleX, offsetY + p[1] * 1080 * scaleY, 4 * scaleX, 0, Math.PI * 2);
+                    targetCtx.arc(offsetX + (p[0] * 1920 - originX) * scaleX, offsetY + (p[1] * 1080 - originY) * scaleY, 4 * Math.max(scaleX, 0.4), 0, Math.PI * 2);
                     targetCtx.fill();
                 });
 
@@ -1560,8 +1597,8 @@ class StreamingCodecAdapter(Protocol):
                 const wrist = lms[0];
                 targetCtx.shadowBlur = 0;
                 targetCtx.fillStyle = 'rgba(15, 23, 42, 0.9)';
-                const tagX = offsetX + wrist[0] * 1920 * scaleX + 10;
-                const tagY = offsetY + wrist[1] * 1080 * scaleY - 10;
+                const tagX = offsetX + (wrist[0] * 1920 - originX) * scaleX + 10;
+                const tagY = offsetY + (wrist[1] * 1080 - originY) * scaleY - 10;
                 targetCtx.fillRect(tagX, tagY - 18, 175 * scaleX, 22 * scaleY);
                 targetCtx.strokeStyle = '#4ade80';
                 targetCtx.lineWidth = 1;
@@ -1569,7 +1606,7 @@ class StreamingCodecAdapter(Protocol):
 
                 targetCtx.fillStyle = '#4ade80';
                 targetCtx.font = `bold ${Math.round(11 * scaleX)}px monospace`;
-                targetCtx.fillText(`${hand.side} Hand [47B] ${(hand.score * 100).toFixed(0)}%`, tagX + 6, tagY - 4);
+                targetCtx.fillText(`RTMPose-m ${(hand.score * 100).toFixed(0)}%`, tagX + 6, tagY - 4);
             });
             targetCtx.shadowBlur = 0;
         }
@@ -1747,7 +1784,7 @@ class StreamingCodecAdapter(Protocol):
                     document.getElementById('maps-empty').hidden = false;
                     document.getElementById('maps-empty').innerHTML =
                         'No map gallery yet. From the PointStream repo run ' +
-                        '<code>PYTHONPATH=. python demo/experiments/run_maps.py --clips demo/outputs/pitch --maps canny,depth,yoloe,dino,pose</code>' +
+                        '<code>PYTHONPATH=. python demo/experiments/run_maps.py --clips demo/outputs/pitch --maps depth,yoloe,dino,sam31</code>' +
                         ' then <code>python demo/pitch/publish_site.py</code>. HUD numbers come from sidecar payload_kbps, never the preview files.';
                 });
             return mapsIndexPromise;
