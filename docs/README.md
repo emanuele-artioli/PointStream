@@ -25,6 +25,8 @@ The documentation prepares staged validation. Selected real models, complete per
 
 Use [setup](setup.md), [experiment design](workflow/experiment-design.md), and [long jobs](workflow/long-jobs.md) for operations. The [repository instructions](../AGENTS.md) govern work. Manuscript changes belong in the sibling paper repository, which has its own instructions; the audited local paper revision is not assumed to match the latest Overleaf state.
 
+The [preparation audit](research/10-preparation-audit.md) maps the requested deliverables to evidence and records local test outcomes and remaining execution prerequisites.
+
 ## Historical recovery
 
 The [28 September retirement map](history/documentation-rebuild-20260928.tsv) preserves each removed file's Git blob and immutable recovery URL. It covers the previous root README/PLAN as well. [Earlier retirement records](history/retired-documents.tsv) and the [September cleanup inventory](history/cleanup-2026-09-12.json) are retained for recovery, not as current instructions. Quantitative campaign details and their original record links are consolidated in Chapter 8. No runtime code, dataset or run output is removed by this documentation replacement.

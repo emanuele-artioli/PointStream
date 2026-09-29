@@ -86,9 +86,25 @@ for a prose-only edit; run them when its behavior/environment is changed.
 ```bash
 python -m pytest -q tests/contracts/test_observation.py tests/components/test_perception_geometry.py tests/components/test_perception_association.py tests/components/test_dwpose_estimator.py tests/experiments/test_audit_dataset_pipeline.py tests/experiments/test_finalize_sam31_manifest.py
 python -m pytest -q tests/runner/test_rate_honesty.py tests/runner/test_accounting_information_content.py tests/runner/test_residual_transport.py tests/runner/test_mask_wire.py tests/runner/test_generation_identity_grouping.py tests/runner/test_generation_appearance.py
-python -m pytest -q tests/components/test_bd_rate.py tests/components/test_metrics_integration.py tests/components/test_metrics_region.py tests/invariants/test_metric_calibration.py tests/experiments/test_evaluation_protocol.py
+python -m pytest -q tests/components/test_bd_rate.py tests/components/test_metrics_integration.py tests/components/test_metrics_region.py tests/experiments/test_evaluation_protocol.py
 python -m pytest -q tests/experiments/test_resource_claims.py tests/experiments/test_gpu_fleet.py tests/experiments/test_job_monitor.py
 ```
+
+`pytest.ini` excludes `integration`, `slow`, and `invariants` by default. The
+commands above exercise the default contract suite; they do **not** qualify real
+models or calibrated metrics. After E00 makes the required external anchors and
+metric weights available, select calibration explicitly and report every skip:
+
+```bash
+python -m pytest --override-ini='addopts=' -q -rs tests/invariants/test_metric_calibration.py
+```
+
+Before any native-codec test, execute the selected binary's version command.
+File existence is insufficient: a binary can fail at dynamic-library loading.
+Use the supported `FFMPEG_BIN` override for a verified executable; record its
+path, version and SHA256. Do not replace missing codec behavior with a passing
+raw-data fallback. The [preparation audit](10-preparation-audit.md) records the
+local check and its limits.
 
 Add behavior tests for missing source-free generative decoding, DISTS direction
 and crop rules, annotation geometry/nulls, complete baseline-byte accounting,
