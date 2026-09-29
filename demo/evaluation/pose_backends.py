@@ -98,6 +98,21 @@ def extract_mediapipe_offline_gt(video_path: Path, max_frames: int | None = None
     )
 
 
+# Wider than half the frame and shorter than 7.5% of its height: the bottom-edge
+# false positive, not a hand. Fractions of the frame, so the rule is resolution-free.
+HAND_MAX_WIDTH_FRAC = 0.5
+HAND_MIN_HEIGHT_FRAC = 0.075
+
+
+def is_border_strip(xs, ys, *, frame_w: float, frame_h: float) -> bool:
+    """True when the landmark span is a wide, short strip across the frame."""
+    if frame_w <= 0 or frame_h <= 0 or len(xs) == 0 or len(ys) == 0:
+        return False
+    width = (float(max(xs)) - float(min(xs))) / float(frame_w)
+    height = (float(max(ys)) - float(min(ys))) / float(frame_h)
+    return width > HAND_MAX_WIDTH_FRAC and height < HAND_MIN_HEIGHT_FRAC
+
+
 _RTM_HAND = None
 
 
@@ -140,6 +155,8 @@ def extract_rtm_hand(video_path: Path, max_frames: int | None = None) -> list[Fr
                 continue
             xs = pts[:21, 0]
             ys = pts[:21, 1]
+            if is_border_strip(xs, ys, frame_w=frame.shape[1], frame_h=frame.shape[0]):
+                continue
             pad_x = (float(xs.max()) - float(xs.min())) * 0.25
             pad_y = (float(ys.max()) - float(ys.min())) * 0.25
             x1 = int(max(0, xs.min() - pad_x))

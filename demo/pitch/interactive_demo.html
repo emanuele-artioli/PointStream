@@ -1058,6 +1058,8 @@ class StreamingCodecAdapter(Protocol):
 
         // 48-frame RTMPose-m hand packet from the mask screen. One payload, every rung.
         const RTM_PACKET_KBPS = { clip_01: 12.0, clip_02: 9.4, clip_03: 12.0 };
+        // Published Ada pose-extraction p50 from the latency caption. One payload, every rung.
+        const RTM_EXTRACT_MS = 15.4;
 
         function selectedMapEntry(side) {
             const family = halfMask(side);
@@ -1071,6 +1073,7 @@ class StreamingCodecAdapter(Protocol):
                     clip: currentClipId,
                     label: 'RTMPose-m',
                     payload_kbps: RTM_PACKET_KBPS[currentClipId],
+                    extract_ms_p50: RTM_EXTRACT_MS,
                     status: 'ok',
                     overlay_key: 'skeleton'
                 };
@@ -1538,7 +1541,17 @@ class StreamingCodecAdapter(Protocol):
                 landmarks: hand.landmarks || hand.landmarks_norm,
                 side: hand.side || hand.handedness || 'Hand',
                 score: hand.score != null ? hand.score : hand.confidence
-            })).filter(hand => hand.landmarks && hand.landmarks.length >= 21);
+            })).filter(hand => {
+                const lms = hand.landmarks;
+                if (!lms || lms.length < 21) return false;
+                let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+                lms.forEach(p => {
+                    minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]);
+                    minY = Math.min(minY, p[1]); maxY = Math.max(maxY, p[1]);
+                });
+                // Same rule as is_border_strip: wider than half the frame, shorter than 7.5% of its height.
+                return !((maxX - minX) > 0.5 && (maxY - minY) < 0.075);
+            });
         }
 
         function getActiveHandPose() {
