@@ -12,3 +12,5 @@ Read one level at a time:
 [Evidence method](METHOD.md) defines classifications and promotion requirements. [External retention and verification instructions](RECOVERY.md) records where recovered histories, source snapshots and selected raw reports are preserved outside this repository. [Historical Gate A curves](figures/gate-a-stored-curves.png) and their separately labelled CPU analyses preserve the original scores and verdicts.
 
 This pass changes documentation only. Original repositories, active Cursor work, datasets, checkpoints and experimental outputs remain the sources. No GPU reruns, training, manuscript integration or new broad literature survey is included.
+
+Subsequent work: [empirical manuscript integration](MANUSCRIPT_INTEGRATION.md) records the published working-paper revision, evidence mapping, validation and remaining qualification experiments. It does not alter the historical scope of the recovery pass above.
