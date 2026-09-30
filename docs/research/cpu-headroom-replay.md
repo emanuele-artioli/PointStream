@@ -63,7 +63,7 @@ No automatic migration or replay of interrupted work.
 Entry point:
 
 ```sh
-python -m experiments.headroom.cpu_replay --data-root EXTERNAL_ROOT \
+python experiments/headroom/cpu_replay.py --data-root EXTERNAL_ROOT \
   --out UNIQUE_NEW_DIRECTORY --code-revision CLEAN_COMMIT --smoke
 ```
 
