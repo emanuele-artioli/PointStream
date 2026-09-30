@@ -1,0 +1,261 @@
+[
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": ".gitignore",
+    "blob": "a721b8449f021b66d7c3067af8cf336a9ed45366",
+    "disposition": "irrelevant",
+    "reason": "Formatting/build support or documented symlink; no scientific outcome."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "AGENTS.md",
+    "blob": "e7d2ca5c626d9dcf386cbbcfa08bfbf551ef20e6",
+    "disposition": "pending verification",
+    "reason": "Current-tree inventoried source; individual review coverage assigned in commit cards."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "CLAUDE.md",
+    "blob": "47dc3e3d863cfb5727b87d785d09abf9743c0a72",
+    "disposition": "irrelevant",
+    "reason": "Formatting/build support or documented symlink; no scientific outcome."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "appendices/README.md",
+    "blob": "dca34b0a64c2d4e50780cceaa2f330176ce17b0a",
+    "disposition": "pending verification",
+    "reason": "Current-tree inventoried source; individual review coverage assigned in commit cards."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "appendices/evaluation_notes.tex",
+    "blob": "2d49d136a33d1231c8f5fab7c833cf375563198c",
+    "disposition": "analyzed",
+    "reason": "Scientific source reviewed through changed-source extraction and lead cross-checks; cited external run artifacts not recertified."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "appendices/headroom_measurement.tex",
+    "blob": "e86b190b9dd7c48b9e2e7da056e8a4c72f19b2b5",
+    "disposition": "analyzed",
+    "reason": "Scientific source reviewed through changed-source extraction and lead cross-checks; cited external run artifacts not recertified."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "appendices/roi_verification.tex",
+    "blob": "8500d06990f004332f7bbda33e638a78902dc406",
+    "disposition": "analyzed",
+    "reason": "Scientific source reviewed through changed-source extraction and lead cross-checks; cited external run artifacts not recertified."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "archive/ACM-Reference-Format.bst",
+    "blob": "a6e3d907aff065614fe0cd34b3b75899102bad43",
+    "disposition": "irrelevant",
+    "reason": "Formatting/build support or documented symlink; no scientific outcome."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "archive/acm.bst",
+    "blob": "5e52a0d63828e95b0196700991f374ff057d6fc7",
+    "disposition": "irrelevant",
+    "reason": "Formatting/build support or documented symlink; no scientific outcome."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "archive/figures/PointStreamOverview.pdf",
+    "blob": "e10a047c00aeda77400a3c26d6aaa78e98c834c2",
+    "disposition": "duplicate",
+    "reason": "Archived historical figure retained; retirement records establish not included in TOMM draft. Visual/numerical content not recertified."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "archive/figures/README.md",
+    "blob": "795ccbae6d263defc3193f889d4ba64b450e7bf7",
+    "disposition": "pending verification",
+    "reason": "Current-tree inventoried source; individual review coverage assigned in commit cards."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "archive/figures/avg_vmaf_vs_bitrate.png",
+    "blob": "8456edcf6638065a2d54d3af99d6705acdcabc33",
+    "disposition": "duplicate",
+    "reason": "Archived historical figure retained; retirement records establish not included in TOMM draft. Visual/numerical content not recertified."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "archive/figures/cgan_performance.pdf",
+    "blob": "12f1b451543c182ddbed578a77490f41259bc1f1",
+    "disposition": "duplicate",
+    "reason": "Archived historical figure retained; retirement records establish not included in TOMM draft. Visual/numerical content not recertified."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "archive/figures/hls-vmaf.png",
+    "blob": "5d4054c76aefcb509ecee204dbcbb19748e67659",
+    "disposition": "duplicate",
+    "reason": "Archived historical figure retained; retirement records establish not included in TOMM draft. Visual/numerical content not recertified."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "archive/figures/per_frame_vmaf.png",
+    "blob": "645d508ea66f369b21a70f8728a4d277f454214f",
+    "disposition": "duplicate",
+    "reason": "Archived historical figure retained; retirement records establish not included in TOMM draft. Visual/numerical content not recertified."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "archive/figures/players.pdf",
+    "blob": "a2fb8ff236993b511689bc8ca7abf0b0afc28352",
+    "disposition": "duplicate",
+    "reason": "Archived historical figure retained; retirement records establish not included in TOMM draft. Visual/numerical content not recertified."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "archive/figures/vmaf-lpips_vs_bitrate_dualrow.pdf",
+    "blob": "b864267e3709c4e80510788db846e49debb30560",
+    "disposition": "duplicate",
+    "reason": "Archived historical figure retained; retirement records establish not included in TOMM draft. Visual/numerical content not recertified."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "archive/main.tex",
+    "blob": "149efcf6673f8615fc932a5d8dd0d6cec4a96b6e",
+    "disposition": "pending verification",
+    "reason": "Current-tree inventoried source; individual review coverage assigned in commit cards."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "archive/main_for_MM.tex",
+    "blob": "759859265de5ac386458ac149e09722dcb3f1ece",
+    "disposition": "pending verification",
+    "reason": "Current-tree inventoried source; individual review coverage assigned in commit cards."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "archive/main_old.tex",
+    "blob": "d9e085b6f6ae20cba0b573ed75300cd38a17938e",
+    "disposition": "pending verification",
+    "reason": "Current-tree inventoried source; individual review coverage assigned in commit cards."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "archive/reviewers_comments.md",
+    "blob": "e139a08cf9d3c9ec3c41ab5b844aae014ed5caeb",
+    "disposition": "pending verification",
+    "reason": "Current-tree inventoried source; individual review coverage assigned in commit cards."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "archive/usenix2019_v3.sty",
+    "blob": "46acf9d2df563680adf02adc192ce0e1ae184918",
+    "disposition": "irrelevant",
+    "reason": "Formatting/build support or documented symlink; no scientific outcome."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "companion/README.md",
+    "blob": "97a421ed5a23dcad5fd425c03cfc35a5f1b2a712",
+    "disposition": "pending verification",
+    "reason": "Current-tree inventoried source; individual review coverage assigned in commit cards."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "companion/extended_related_work.tex",
+    "blob": "5d0246bbb208ab351d17017d2cd58bcf494edaee",
+    "disposition": "pending verification",
+    "reason": "Current-tree inventoried source; individual review coverage assigned in commit cards."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "figures/PS-overview.pdf",
+    "blob": "a7378657b740c74a2442a19377c7d9cacf53429b",
+    "disposition": "pending verification",
+    "reason": "Current-tree inventoried source; individual review coverage assigned in commit cards."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "figures/modular_rate_ladder_strip.png",
+    "blob": "2383ae3d3a692a76938d1ad6f0f05c5e979b4a90",
+    "disposition": "pending verification",
+    "reason": "Current-tree inventoried source; individual review coverage assigned in commit cards."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "main.tex",
+    "blob": "71d506c67298d08ae728e17e42d97d7a3d86061c",
+    "disposition": "analyzed",
+    "reason": "Scientific source reviewed through changed-source extraction and lead cross-checks; cited external run artifacts not recertified."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "ref.bib",
+    "blob": "93fef7abf0b96973a0e9f59612248268c2bcb882",
+    "disposition": "pending verification",
+    "reason": "Current-tree inventoried source; individual review coverage assigned in commit cards."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "reviews.md",
+    "blob": "debe8b3f1101bacbfd91bf813942eeb6ded0a483",
+    "disposition": "pending verification",
+    "reason": "Current-tree inventoried source; individual review coverage assigned in commit cards."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "sections/README.md",
+    "blob": "d71d486376f010cb7b2710508390c6d4b4f721b1",
+    "disposition": "pending verification",
+    "reason": "Current-tree inventoried source; individual review coverage assigned in commit cards."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "sections/evaluation.tex",
+    "blob": "bda29cd82f789bd16092849c4d9fc89a8bb099ee",
+    "disposition": "analyzed",
+    "reason": "Scientific source reviewed through changed-source extraction and lead cross-checks; cited external run artifacts not recertified."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "sections/future_work.tex",
+    "blob": "abe0f607fec4b1a047f76ae614dd8c06437c7e4b",
+    "disposition": "analyzed",
+    "reason": "Scientific source reviewed through changed-source extraction and lead cross-checks; cited external run artifacts not recertified."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "sections/introduction.tex",
+    "blob": "a26dbd9ed9c55ed55215f8557f0e940d2a0de877",
+    "disposition": "analyzed",
+    "reason": "Scientific source reviewed through changed-source extraction and lead cross-checks; cited external run artifacts not recertified."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "sections/problem.tex",
+    "blob": "fb0480ea11681644a98def4312e199905b650d2e",
+    "disposition": "analyzed",
+    "reason": "Scientific source reviewed through changed-source extraction and lead cross-checks; cited external run artifacts not recertified."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "sections/related_work.tex",
+    "blob": "1d7d60f505b334abc29138c2adafcb79dd1fd88b",
+    "disposition": "analyzed",
+    "reason": "Scientific source reviewed through changed-source extraction and lead cross-checks; cited external run artifacts not recertified."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "sections/system_design.tex",
+    "blob": "288b9ff093ee1fd725870c03863e200bead2ec55",
+    "disposition": "analyzed",
+    "reason": "Scientific source reviewed through changed-source extraction and lead cross-checks; cited external run artifacts not recertified."
+  },
+  {
+    "revision": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+    "path": "tools/build_pdf.sh",
+    "blob": "bc078693ecd0d5e5548169478c5e5bf1014d0b0b",
+    "disposition": "pending verification",
+    "reason": "Current-tree inventoried source; individual review coverage assigned in commit cards."
+  }
+]

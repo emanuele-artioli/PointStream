@@ -1,0 +1,73 @@
+{
+  "collected_at": "2026-09-30T19:08:50.946611+00:00",
+  "code": {
+    "union_commits": 1165,
+    "current_public_reachable": 1147,
+    "recovered_only": 18,
+    "pr_heads": 149,
+    "current_public_heads": 9,
+    "current_public_tags": 111,
+    "recovered_tags": 120,
+    "limit": "Grouped behavior and net-PR review; individual intermediate deltas explicitly pending."
+  },
+  "manuscript": {
+    "union_commits": 63,
+    "mac_reachable": 34,
+    "overleaf_reachable": 60,
+    "copies_reconciled_without_modification": true
+  },
+  "demo": {
+    "analytical_initial_files": 133,
+    "analytical_addendum_files": 9,
+    "late_pending_scripts": 3,
+    "closeout_unchanged": 141,
+    "closeout_changed": 1,
+    "current_findings_reference": "pinned initial/addendum hashes"
+  },
+  "server_experiments": {
+    "output_families": 179,
+    "complete_recursive_metadata": 169,
+    "pruned_recursive_metadata": 10,
+    "physical_report_captures": 297,
+    "unique_report_contents": 284,
+    "fleet_dispatch_packets": 153,
+    "literal_output_family_joins": 51,
+    "legacy_timestamp_summaries": 52,
+    "timestamps_without_summary": 47,
+    "family_disposition_counts": {
+      "selected report content indexed; scientific interpretation pending except linked code/domain cards": 83,
+      "metadata only; scientific pending": 81,
+      "campaign subset substantively reviewed; other artifacts remain scientific pending": 14,
+      "E04/E05/E06 targeted campaign reports directly reviewed; all other artifacts remain scientific pending": 1
+    },
+    "limit": "Metadata completeness does not establish scientific qualification; unreviewed content remains pending."
+  },
+  "sessions": {
+    "active_inventory_dispositions": 50,
+    "archived_inventory_dispositions": 27,
+    "selected_relevant_archived_chats": 11,
+    "selected_archived_pages": 14,
+    "selected_archived_returned_turns": 81,
+    "selected_archived_terminal": true,
+    "mandatory_core_chat_turns": 24,
+    "mandatory_core_chat_pages": 3,
+    "mandatory_sam_chat_turns": 1,
+    "adjacent_genstream_turns": 5,
+    "limit": "Available API items only, empty items/possible long-text truncation explicit; unrelated and hidden reasoning excluded."
+  },
+  "external_retention": {
+    "git_bundles": 2,
+    "selected_source_members": 775,
+    "selected_sources_sha_verified_from_archive": 775,
+    "archive_location": "local outside repository; histories on shared GPU server"
+  },
+  "remaining_coverage_gaps": [
+    "GPU4 measurement lock",
+    "Unretained deleted refs and garbage-collected objects",
+    "Pruned media/cache and bounded deep dataset/vendor/archive traversals",
+    "47 timestamp runs without summaries",
+    "Unreviewed per-file/intermediate commit content",
+    "Missing fresh-client, full-envelope, held-out/exposure and metric qualification where recorded",
+    "Three demo sources added after analytical cutoff pending verification"
+  ]
+}

@@ -1,0 +1,3802 @@
+{
+  "physical_captures": 297,
+  "unique_contents": 284,
+  "by_sha256": [
+    {
+      "sha256": "0073d2d1edf09fcaa80431839b0b54e1d5e010f30b46ad256d7812e99edef2ed",
+      "captures": [
+        {
+          "bytes": 2717,
+          "family": "20260707_132621_666693",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260707_132621_666693/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260707_132621_666693/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "0073d2d1edf09fcaa80431839b0b54e1d5e010f30b46ad256d7812e99edef2ed"
+        }
+      ]
+    },
+    {
+      "sha256": "00e09ccf938b89254478df25672176acfbab7d17cc17f86c66063e026a241917",
+      "captures": [
+        {
+          "bytes": 17801,
+          "family": "bp19-multi-controlnet-missing-dir",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp19-multi-controlnet-missing-dir/summary.json",
+          "retained": "workers/server/outputs/selected_reports/bp19-multi-controlnet-missing-dir/summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "00e09ccf938b89254478df25672176acfbab7d17cc17f86c66063e026a241917"
+        }
+      ]
+    },
+    {
+      "sha256": "011e336d5a73f0969b36c209a67024ee74142baa46e43a881efd537272649099",
+      "captures": [
+        {
+          "bytes": 2671,
+          "family": "20260709_221319_778070",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260709_221319_778070/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260709_221319_778070/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "011e336d5a73f0969b36c209a67024ee74142baa46e43a881efd537272649099"
+        }
+      ]
+    },
+    {
+      "sha256": "02e05cf57b3d335d25f31125f770db3c1300bc4e24a449380d3648d1b16db906",
+      "captures": [
+        {
+          "bytes": 2787,
+          "family": "20260710_204642_966849",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_204642_966849/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_204642_966849/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "02e05cf57b3d335d25f31125f770db3c1300bc4e24a449380d3648d1b16db906"
+        }
+      ]
+    },
+    {
+      "sha256": "036f33d00b9348ea68a034e76be7ba071f12c032d3bd77b1ce3b7641827cdf81",
+      "captures": [
+        {
+          "bytes": 748,
+          "family": "hnerv_wrc_phase1",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/hnerv_wrc_phase1/budget_1.8M/20260713_125941/report.md",
+          "retained": "workers/server/outputs/selected_reports/hnerv_wrc_phase1/budget_1.8M/20260713_125941/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "036f33d00b9348ea68a034e76be7ba071f12c032d3bd77b1ce3b7641827cdf81"
+        }
+      ]
+    },
+    {
+      "sha256": "07044f86c13c6a4cd5a57f781269e7fb02e19586b7098f3058b5f20e704098d2",
+      "captures": [
+        {
+          "bytes": 1311,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/pilot-frozen/experiment-identity.json",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/pilot-frozen/experiment-identity.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "07044f86c13c6a4cd5a57f781269e7fb02e19586b7098f3058b5f20e704098d2"
+        }
+      ]
+    },
+    {
+      "sha256": "079fa517eaf8915b6a279e9d960b48f3187cd69621c6b1ae87b359b7be70d9c0",
+      "captures": [
+        {
+          "bytes": 2790,
+          "family": "20260710_144136_542639",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_144136_542639/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_144136_542639/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "079fa517eaf8915b6a279e9d960b48f3187cd69621c6b1ae87b359b7be70d9c0"
+        }
+      ]
+    },
+    {
+      "sha256": "094b8d4fee32d47a8791510683f973f3d1df6bb35d93a138aa2e479c9c8469bc",
+      "captures": [
+        {
+          "bytes": 16916,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-02/preflight.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-02/preflight.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "094b8d4fee32d47a8791510683f973f3d1df6bb35d93a138aa2e479c9c8469bc"
+        }
+      ]
+    },
+    {
+      "sha256": "0964c6b97d210d353d8eac1740008beb86c5ad6b07fa295155feefb387b53277",
+      "captures": [
+        {
+          "bytes": 5502,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-03/alcaraz_perricard_scene_007/sam31_worker_config.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-03/alcaraz_perricard_scene_007/sam31_worker_config.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "0964c6b97d210d353d8eac1740008beb86c5ad6b07fa295155feefb387b53277"
+        }
+      ]
+    },
+    {
+      "sha256": "0bd1e7cb0797ecda7b9174b6ea294cb91d0a72294d92e53e76fb581dd31c4026",
+      "captures": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/probe-20260917-floor-arms/floor_report.json",
+          "family": "evaluation-20260914",
+          "retained": "records/experiments/saved-reports/outputs/evaluation-20260914/e06/probe-20260917-floor-arms/floor_report.json",
+          "sha256": "0bd1e7cb0797ecda7b9174b6ea294cb91d0a72294d92e53e76fb581dd31c4026",
+          "bytes": 38201,
+          "scope": "exact targeted original report; direct modern campaign card"
+        }
+      ]
+    },
+    {
+      "sha256": "0c88b4a360220d452faa540f1ea499a403fdba86990c859466b2a685aceb2230",
+      "captures": [
+        {
+          "bytes": 847,
+          "family": "evaluation-20260914",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "0c88b4a360220d452faa540f1ea499a403fdba86990c859466b2a685aceb2230"
+        }
+      ]
+    },
+    {
+      "sha256": "0d004b5de0502737a0990a68be121789f5d1b978d5ac8d9ccc76e19df41c0f00",
+      "captures": [
+        {
+          "bytes": 2766,
+          "family": "journal-20260924",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260924/je03/anchor-readiness.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260924/je03/anchor-readiness.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "0d004b5de0502737a0990a68be121789f5d1b978d5ac8d9ccc76e19df41c0f00"
+        }
+      ]
+    },
+    {
+      "sha256": "0e03e6f585ab57cdff4a81b252ee9b90c54b31e8d1300e227785dba317b7831d",
+      "captures": [
+        {
+          "bytes": 2759,
+          "family": "20260710_073413_862055",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_073413_862055/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_073413_862055/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "0e03e6f585ab57cdff4a81b252ee9b90c54b31e8d1300e227785dba317b7831d"
+        }
+      ]
+    },
+    {
+      "sha256": "0e8da39205fba0ad03542e185f3c9d802d5c1777231932aaf1e1ba343bb9369b",
+      "captures": [
+        {
+          "bytes": 1635,
+          "family": "20260611_063408_954108",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_063408_954108/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260611_063408_954108/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "0e8da39205fba0ad03542e185f3c9d802d5c1777231932aaf1e1ba343bb9369b"
+        }
+      ]
+    },
+    {
+      "sha256": "0e9dbc6bdd51b4bf7e792b75c637d56084dc51aa03e1cb8b4917303196b89b75",
+      "captures": [
+        {
+          "bytes": 252,
+          "family": "external-neural-bg-jobs",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/jobs/neural-bg/scale-smokes/report.json",
+          "retained": "records/experiments/saved-reports/jobs/neural-bg/scale-smokes/report.json",
+          "scope": "exact targeted report read",
+          "sha256": "0e9dbc6bdd51b4bf7e792b75c637d56084dc51aa03e1cb8b4917303196b89b75"
+        }
+      ]
+    },
+    {
+      "sha256": "0ed34720ce4eab4003b70217e15b34fb33051a6ab3e0cf12964496b8091fc4ea",
+      "captures": [
+        {
+          "bytes": 2103,
+          "family": "bp24-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp24-ladder/appearance-cost.json",
+          "retained": "records/experiments/saved-reports/outputs/bp24-ladder/appearance-cost.json",
+          "scope": "exact targeted report read",
+          "sha256": "0ed34720ce4eab4003b70217e15b34fb33051a6ab3e0cf12964496b8091fc4ea"
+        }
+      ]
+    },
+    {
+      "sha256": "0fd4c97d2727d03256db85a533e697a95c6edced1d2cf99994aadae13ce80322",
+      "captures": [
+        {
+          "bytes": 2891,
+          "family": "20260711_230408_402989",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260711_230408_402989/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260711_230408_402989/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "0fd4c97d2727d03256db85a533e697a95c6edced1d2cf99994aadae13ce80322"
+        }
+      ]
+    },
+    {
+      "sha256": "0ffe64eeb391e51328374107eea97c9c85cbc7d7312442d6b9e8eb6b4ac092a7",
+      "captures": [
+        {
+          "bytes": 2526,
+          "family": "bp24-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp24-ladder/rgb-axis-saturation.json",
+          "retained": "records/experiments/saved-reports/outputs/bp24-ladder/rgb-axis-saturation.json",
+          "scope": "exact targeted report read",
+          "sha256": "0ffe64eeb391e51328374107eea97c9c85cbc7d7312442d6b9e8eb6b4ac092a7"
+        }
+      ]
+    },
+    {
+      "sha256": "1060bc291ebf4960b23c1be1ae21363b0d2ac20e21ad914e17aaab00f68bc944",
+      "captures": [
+        {
+          "bytes": 2756,
+          "family": "20260710_080529_146352",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_080529_146352/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_080529_146352/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "1060bc291ebf4960b23c1be1ae21363b0d2ac20e21ad914e17aaab00f68bc944"
+        }
+      ]
+    },
+    {
+      "sha256": "114c387eb7af49eb9c2e1719ff5754a478163a7ec10cf92a7fac182a1ec9da1c",
+      "captures": [
+        {
+          "bytes": 2724,
+          "family": "20260708_100043_225774",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260708_100043_225774/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260708_100043_225774/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "114c387eb7af49eb9c2e1719ff5754a478163a7ec10cf92a7fac182a1ec9da1c"
+        }
+      ]
+    },
+    {
+      "sha256": "12f12e3203909c9c9d8ae5165326b79d8f5499a2d1139e6addffb4574936589d",
+      "captures": [
+        {
+          "bytes": 2789,
+          "family": "20260710_154141_878240",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_154141_878240/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_154141_878240/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "12f12e3203909c9c9d8ae5165326b79d8f5499a2d1139e6addffb4574936589d"
+        }
+      ]
+    },
+    {
+      "sha256": "1374a8ab1e36408bde757665312344aa13e52d3871877d11dbbc672b2a42b0b4",
+      "captures": [
+        {
+          "bytes": 2370,
+          "family": "20260611_071446_695013",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_071446_695013/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260611_071446_695013/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "1374a8ab1e36408bde757665312344aa13e52d3871877d11dbbc672b2a42b0b4"
+        }
+      ]
+    },
+    {
+      "sha256": "13ffd74852fd5c5703414a663c6d86dddc1d1d6059e0f88f380b744cc4d1f743",
+      "captures": [
+        {
+          "bytes": 17808,
+          "family": "bp31-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/plate-codec-curves-alcaraz_highlights.json",
+          "retained": "records/experiments/saved-reports/outputs/bp31-ladder/plate-codec-curves-alcaraz_highlights.json",
+          "scope": "exact targeted report read",
+          "sha256": "13ffd74852fd5c5703414a663c6d86dddc1d1d6059e0f88f380b744cc4d1f743"
+        }
+      ]
+    },
+    {
+      "sha256": "14bcda336b414c67798f4f0990b25c1f18294dbb85265898d8806b6d33d5cb2e",
+      "captures": [
+        {
+          "bytes": 1276,
+          "family": "bp23-tier",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp23-tier/metric-calibration.json",
+          "retained": "workers/server/outputs/selected_reports/bp23-tier/metric-calibration.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "14bcda336b414c67798f4f0990b25c1f18294dbb85265898d8806b6d33d5cb2e"
+        },
+        {
+          "bytes": 1276,
+          "family": "bp45-low-rate",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp45-low-rate/metric-calibration.json",
+          "retained": "workers/server/outputs/selected_reports/bp45-low-rate/metric-calibration.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "14bcda336b414c67798f4f0990b25c1f18294dbb85265898d8806b6d33d5cb2e"
+        }
+      ]
+    },
+    {
+      "sha256": "15015f0ef3c284601872e4e5fd2485df3e4bd179fb1c0e347cb15581b0324cde",
+      "captures": [
+        {
+          "bytes": 2808,
+          "family": "20260709_150929_285546",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260709_150929_285546/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260709_150929_285546/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "15015f0ef3c284601872e4e5fd2485df3e4bd179fb1c0e347cb15581b0324cde"
+        }
+      ]
+    },
+    {
+      "sha256": "15ce8df830709883143e786eb14cc78f660aa737b9f6325ad633af5267adbbbf",
+      "captures": [
+        {
+          "bytes": 4067,
+          "family": "evaluation-20260914",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-federer007/metric-calibration.json",
+          "retained": "workers/server/outputs/selected_reports/evaluation-20260914/e04a/run-20260916-federer007/metric-calibration.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "15ce8df830709883143e786eb14cc78f660aa737b9f6325ad633af5267adbbbf"
+        }
+      ]
+    },
+    {
+      "sha256": "16d958ddd58236ff919a2102f01b4590ad35f94f8deec5ac21586bad1cfbba83",
+      "captures": [
+        {
+          "bytes": 26686,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-05/alcaraz_highlights_scene_010/sam31_result.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-05/alcaraz_highlights_scene_010/sam31_result.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "16d958ddd58236ff919a2102f01b4590ad35f94f8deec5ac21586bad1cfbba83"
+        }
+      ]
+    },
+    {
+      "sha256": "17601956de01627dc04eda41903a41f8a6873a018ea5da72329fac5f5a99407a",
+      "captures": [
+        {
+          "bytes": 2701,
+          "family": "20260708_173710_383144",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260708_173710_383144/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260708_173710_383144/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "17601956de01627dc04eda41903a41f8a6873a018ea5da72329fac5f5a99407a"
+        }
+      ]
+    },
+    {
+      "sha256": "17c648e19a4d2c3dd44355dab9f27d46e411f1e1ae44887dc3fbcf4674c6ae88",
+      "captures": [
+        {
+          "bytes": 909,
+          "family": "hnerv_wrc_phase1",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/hnerv_wrc_phase1/budget_0.9M/20260713_123308/report.json",
+          "retained": "workers/server/outputs/selected_reports/hnerv_wrc_phase1/budget_0.9M/20260713_123308/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "17c648e19a4d2c3dd44355dab9f27d46e411f1e1ae44887dc3fbcf4674c6ae88"
+        }
+      ]
+    },
+    {
+      "sha256": "18b27dd827d383b89a1c305a72559a1c71236c9729bb3c17d5de9696bf07ac91",
+      "captures": [
+        {
+          "bytes": 8552,
+          "family": "journal-20260926",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260926/sam31-racket-prompt-smoke16-run1/result.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260926/sam31-racket-prompt-smoke16-run1/result.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "18b27dd827d383b89a1c305a72559a1c71236c9729bb3c17d5de9696bf07ac91"
+        }
+      ]
+    },
+    {
+      "sha256": "19152f1337eb7eb492048114118e90c5f59a90dcc9f720348b5f0c1f0e2c11f2",
+      "captures": [
+        {
+          "bytes": 9079,
+          "family": "bp24-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp24-ladder/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp24-ladder/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "19152f1337eb7eb492048114118e90c5f59a90dcc9f720348b5f0c1f0e2c11f2"
+        },
+        {
+          "bytes": 9079,
+          "family": "bp24-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp24-ladder/bounds-before-run.json",
+          "retained": "records/experiments/saved-reports/outputs/bp24-ladder/bounds-before-run.json",
+          "scope": "exact targeted report read",
+          "sha256": "19152f1337eb7eb492048114118e90c5f59a90dcc9f720348b5f0c1f0e2c11f2"
+        }
+      ]
+    },
+    {
+      "sha256": "19eb433feeaf175b03ac999c7249c0ece50f584cb2ff0e832c5b8e3803fbf748",
+      "captures": [
+        {
+          "bytes": 803,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/example-panorama-quality_20260710_093837/report.md",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/example-panorama-quality_20260710_093837/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "19eb433feeaf175b03ac999c7249c0ece50f584cb2ff0e832c5b8e3803fbf748"
+        }
+      ]
+    },
+    {
+      "sha256": "1baa1dda6e32c35e7c9c22bcb171181db342a8d93ad6e36de1d82d2522aaf0ed",
+      "captures": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e05/stage1_pilot/matrix/diagnostic_matrix.json",
+          "family": "evaluation-20260914",
+          "retained": "records/experiments/saved-reports/outputs/evaluation-20260914/e05/stage1_pilot/matrix/diagnostic_matrix.json",
+          "sha256": "1baa1dda6e32c35e7c9c22bcb171181db342a8d93ad6e36de1d82d2522aaf0ed",
+          "bytes": 85630,
+          "scope": "exact targeted original report; direct modern campaign card"
+        }
+      ]
+    },
+    {
+      "sha256": "1be824ccbb0ab19845e02d6fdaddb0f7dae357b0a24eab9196dc7eedf72c0353",
+      "captures": [
+        {
+          "bytes": 1062,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-dynamic-thresholding_20260711_001729/report.md",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-dynamic-thresholding_20260711_001729/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "1be824ccbb0ab19845e02d6fdaddb0f7dae357b0a24eab9196dc7eedf72c0353"
+        }
+      ]
+    },
+    {
+      "sha256": "1c857ebb6fe6518fb2fd81ba9151370cea9fff8f7f9c2d0124ab43793778388d",
+      "captures": [
+        {
+          "bytes": 748,
+          "family": "hnerv_wrc_phase1",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/hnerv_wrc_phase1/budget_3.5M/20260713_133215/report.md",
+          "retained": "workers/server/outputs/selected_reports/hnerv_wrc_phase1/budget_3.5M/20260713_133215/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "1c857ebb6fe6518fb2fd81ba9151370cea9fff8f7f9c2d0124ab43793778388d"
+        }
+      ]
+    },
+    {
+      "sha256": "1cac287bc1bd84b3d6db650234068748c576a4aef0e9e27eb47b766f60895249",
+      "captures": [
+        {
+          "bytes": 1279,
+          "family": "journal-20260924",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260924/je10/alcaraz000-je10-winning-result.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260924/je10/alcaraz000-je10-winning-result.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "1cac287bc1bd84b3d6db650234068748c576a4aef0e9e27eb47b766f60895249"
+        },
+        {
+          "bytes": 1279,
+          "family": "journal-20260924",
+          "original": "coordinator capture; canonical original in coordinator-arithmetic.json",
+          "retained": "workers/coordinator/je10-result.json",
+          "scope": "coordinator saved report arithmetic; campaign audit",
+          "sha256": "1cac287bc1bd84b3d6db650234068748c576a4aef0e9e27eb47b766f60895249"
+        }
+      ]
+    },
+    {
+      "sha256": "1f67a4d3f97a3bc5dc68a7b40216947b57f316e37d970281f37cb55e47b8de8f",
+      "captures": [
+        {
+          "bytes": 1838,
+          "family": "evaluation-20260914",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-federer007/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/evaluation-20260914/e04a/run-20260916-federer007/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "1f67a4d3f97a3bc5dc68a7b40216947b57f316e37d970281f37cb55e47b8de8f"
+        }
+      ]
+    },
+    {
+      "sha256": "1fb3647c873ea5fddeff70534656bbf5f3961f56d454966bb067fcfd1fda1ce9",
+      "captures": [
+        {
+          "bytes": 1773,
+          "family": "journal-20260924",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260924/je07/je07-appearance-silhouette-evaluation.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260924/je07/je07-appearance-silhouette-evaluation.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "1fb3647c873ea5fddeff70534656bbf5f3961f56d454966bb067fcfd1fda1ce9"
+        }
+      ]
+    },
+    {
+      "sha256": "2009ece832c7da8303529bef5390dadaf22551bef228194fec62ab0d825b158a",
+      "captures": [
+        {
+          "bytes": 2584,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/wave2-platefix-20260910/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/wave2-platefix-20260910/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "2009ece832c7da8303529bef5390dadaf22551bef228194fec62ab0d825b158a"
+        },
+        {
+          "bytes": 2584,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/wave2-repaired-20260910/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/wave2-repaired-20260910/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "2009ece832c7da8303529bef5390dadaf22551bef228194fec62ab0d825b158a"
+        },
+        {
+          "bytes": 2584,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/wave2-repaired-20260910b/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/wave2-repaired-20260910b/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "2009ece832c7da8303529bef5390dadaf22551bef228194fec62ab0d825b158a"
+        },
+        {
+          "bytes": 2584,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/wave2-repaired-20260910c/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/wave2-repaired-20260910c/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "2009ece832c7da8303529bef5390dadaf22551bef228194fec62ab0d825b158a"
+        }
+      ]
+    },
+    {
+      "sha256": "23d3901df5093938e535754662cce59ffae0d9a4fef03e766d62410de7418a52",
+      "captures": [
+        {
+          "bytes": 51268,
+          "family": "bp12-clip-roster",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp12-clip-roster/summary.json",
+          "retained": "workers/server/outputs/selected_reports/bp12-clip-roster/summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "23d3901df5093938e535754662cce59ffae0d9a4fef03e766d62410de7418a52"
+        }
+      ]
+    },
+    {
+      "sha256": "24c77612fe84709af1271f68c8ca45e239736c767c46f4c9df273d85066147ea",
+      "captures": [
+        {
+          "bytes": 2698,
+          "family": "20260708_132647_263803",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260708_132647_263803/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260708_132647_263803/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "24c77612fe84709af1271f68c8ca45e239736c767c46f4c9df273d85066147ea"
+        }
+      ]
+    },
+    {
+      "sha256": "2542188c77c99770119b624dbe707881c1667e90fdef6d07e9c4cbf1ff466b28",
+      "captures": [
+        {
+          "bytes": 2721,
+          "family": "bp31-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/ladder-scenes-VALIDATION.json",
+          "retained": "records/experiments/saved-reports/outputs/bp31-ladder/ladder-scenes-VALIDATION.json",
+          "scope": "exact targeted report read",
+          "sha256": "2542188c77c99770119b624dbe707881c1667e90fdef6d07e9c4cbf1ff466b28"
+        }
+      ]
+    },
+    {
+      "sha256": "2767d9593424e6a9b53b7bc2269c2a5b1ff1f7c686e1561d553ea5339f7e9d3b",
+      "captures": [
+        {
+          "bytes": 1327,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/wave2-background-probe/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/wave2-background-probe/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "2767d9593424e6a9b53b7bc2269c2a5b1ff1f7c686e1561d553ea5339f7e9d3b"
+        }
+      ]
+    },
+    {
+      "sha256": "29720f907b57f41b2d159e6a3dd9332e87ee0680a8467c59957b01cdd402de59",
+      "captures": [
+        {
+          "bytes": 911,
+          "family": "hnerv_wrc_phase1",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/hnerv_wrc_phase1/budget_0.4M/20260713_121150/report.json",
+          "retained": "workers/server/outputs/selected_reports/hnerv_wrc_phase1/budget_0.4M/20260713_121150/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "29720f907b57f41b2d159e6a3dd9332e87ee0680a8467c59957b01cdd402de59"
+        }
+      ]
+    },
+    {
+      "sha256": "2a378f1e1d30d9cdff572058130a3b5eca744d81d17c608920ea6d31bf2cd6d5",
+      "captures": [
+        {
+          "bytes": 812,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-racket-heuristics_20260710_153843/report.md",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-racket-heuristics_20260710_153843/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "2a378f1e1d30d9cdff572058130a3b5eca744d81d17c608920ea6d31bf2cd6d5"
+        }
+      ]
+    },
+    {
+      "sha256": "2a8ce8f0c577c38b87ee9922c797f5872e6900b25815bfbb4a6890efe9178aee",
+      "captures": [
+        {
+          "bytes": 3342,
+          "family": "20260611_070339_787671",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_070339_787671/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260611_070339_787671/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "2a8ce8f0c577c38b87ee9922c797f5872e6900b25815bfbb4a6890efe9178aee"
+        }
+      ]
+    },
+    {
+      "sha256": "2af214a20ee48b0b20a5738a7bbc9b628c512082c78e10b4d620cd095cffbef7",
+      "captures": [
+        {
+          "bytes": 2780,
+          "family": "20260710_231604_564889",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_231604_564889/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_231604_564889/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "2af214a20ee48b0b20a5738a7bbc9b628c512082c78e10b4d620cd095cffbef7"
+        }
+      ]
+    },
+    {
+      "sha256": "2bff5db47f7e0455f92b5f83d027bb3ca0057cb64e648796ca13bc068fa9a020",
+      "captures": [
+        {
+          "bytes": 3559,
+          "family": "codec_baselines",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/codec_baselines/20260710_222256/report.json",
+          "retained": "workers/server/outputs/selected_reports/codec_baselines/20260710_222256/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "2bff5db47f7e0455f92b5f83d027bb3ca0057cb64e648796ca13bc068fa9a020"
+        }
+      ]
+    },
+    {
+      "sha256": "2ca12092f0e440ce19d8772b35739b004f4c57f187ca7860c1b8eb23b695ba2e",
+      "captures": [
+        {
+          "bytes": 153419,
+          "family": "gate-b-confirmation",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/gate-b-confirmation/report.json",
+          "retained": "records/experiments/saved-reports/outputs/gate-b-confirmation/report.json",
+          "scope": "exact targeted report read",
+          "sha256": "2ca12092f0e440ce19d8772b35739b004f4c57f187ca7860c1b8eb23b695ba2e"
+        }
+      ]
+    },
+    {
+      "sha256": "2d5188b1c28b4df9de7402a98879c1efa8fbda2a85e7ace8bc8f6462bbea48f2",
+      "captures": [
+        {
+          "bytes": 7811,
+          "family": "bp24-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp24-ladder/av1-coarseness-highmotion.json",
+          "retained": "records/experiments/saved-reports/outputs/bp24-ladder/av1-coarseness-highmotion.json",
+          "scope": "exact targeted report read",
+          "sha256": "2d5188b1c28b4df9de7402a98879c1efa8fbda2a85e7ace8bc8f6462bbea48f2"
+        }
+      ]
+    },
+    {
+      "sha256": "2e19983da69acb0cc2ae2dd13a1a65c1dafd853fa938879f913da90737843b49",
+      "captures": [
+        {
+          "bytes": 855,
+          "family": "bp19-conditioning",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp19-conditioning/ip-adapter-smoke/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/bp19-conditioning/ip-adapter-smoke/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "2e19983da69acb0cc2ae2dd13a1a65c1dafd853fa938879f913da90737843b49"
+        }
+      ]
+    },
+    {
+      "sha256": "2f636fa700956917c5d7e5230d244e846401438c8177064d4afa8f1cd96eb024",
+      "captures": [
+        {
+          "bytes": 2477,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/wave2-prelaunch-bounds.json",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/wave2-prelaunch-bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "2f636fa700956917c5d7e5230d244e846401438c8177064d4afa8f1cd96eb024"
+        }
+      ]
+    },
+    {
+      "sha256": "2f65a79ee40cfcb9a36f0e8a3b7ec7444e31799ddfa4f1f639902a7edff647be",
+      "captures": [
+        {
+          "bytes": 23814,
+          "family": "journal-20260926",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260926/sam31-racket-prompt-smoke16-run1/sam31_smoke_runner.py",
+          "retained": "workers/server/outputs/selected_reports/journal-20260926/sam31-racket-prompt-smoke16-run1/sam31_smoke_runner.py",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "2f65a79ee40cfcb9a36f0e8a3b7ec7444e31799ddfa4f1f639902a7edff647be"
+        }
+      ]
+    },
+    {
+      "sha256": "3191148721c4f31c8237371b5ebc7abea627458bb1d69864671a234d431a0c21",
+      "captures": [
+        {
+          "bytes": 5731,
+          "family": "bp31-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/ladder-curve-panorama-stream.json",
+          "retained": "records/experiments/saved-reports/outputs/bp31-ladder/ladder-curve-panorama-stream.json",
+          "scope": "exact targeted report read",
+          "sha256": "3191148721c4f31c8237371b5ebc7abea627458bb1d69864671a234d431a0c21"
+        }
+      ]
+    },
+    {
+      "sha256": "34e34b1e0cbbe49ac2bc811d4e26a13982270e2acc55b651fe7084bebd7859ee",
+      "captures": [
+        {
+          "bytes": 10814,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/mask-screen/yolo26n-seg-alcaraz000-window48/preregistered-protocol.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/mask-screen/yolo26n-seg-alcaraz000-window48/preregistered-protocol.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "34e34b1e0cbbe49ac2bc811d4e26a13982270e2acc55b651fe7084bebd7859ee"
+        }
+      ]
+    },
+    {
+      "sha256": "352f7e3017cace4f6d07787d4e34b76fc70a777a2577155a69a19195e52689f2",
+      "captures": [
+        {
+          "bytes": 476,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run3/request.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run3/request.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "352f7e3017cace4f6d07787d4e34b76fc70a777a2577155a69a19195e52689f2"
+        }
+      ]
+    },
+    {
+      "sha256": "356bf484d639496d9fc56200311d2f86ea743794a47919a4b7e1e0607b547b8f",
+      "captures": [
+        {
+          "bytes": 2593,
+          "family": "20260710_074235_874342",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_074235_874342/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_074235_874342/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "356bf484d639496d9fc56200311d2f86ea743794a47919a4b7e1e0607b547b8f"
+        }
+      ]
+    },
+    {
+      "sha256": "35b0cb5e9422230822fece8de646724c9696f00ab3cc78bce8ae4b7c06019d69",
+      "captures": [
+        {
+          "bytes": 1174,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-racket-heuristics_20260710_141407/manifest.json",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-racket-heuristics_20260710_141407/manifest.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "35b0cb5e9422230822fece8de646724c9696f00ab3cc78bce8ae4b7c06019d69"
+        }
+      ]
+    },
+    {
+      "sha256": "365be0f58ff8cfaed97da2b7ccd73f23628ae68a16bedb5dfe49bf0df291b542",
+      "captures": [
+        {
+          "bytes": 29814,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-03/alcaraz_highlights_scene_000/sam31_result.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-03/alcaraz_highlights_scene_000/sam31_result.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "365be0f58ff8cfaed97da2b7ccd73f23628ae68a16bedb5dfe49bf0df291b542"
+        }
+      ]
+    },
+    {
+      "sha256": "379f4b0f352e98e5d6ae2f1cd109c1b629257cc7714b760ca15e416c9dec2b81",
+      "captures": [
+        {
+          "bytes": 1598,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-panorama-quality_20260710_164128/manifest.json",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-panorama-quality_20260710_164128/manifest.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "379f4b0f352e98e5d6ae2f1cd109c1b629257cc7714b760ca15e416c9dec2b81"
+        }
+      ]
+    },
+    {
+      "sha256": "391e3d587d63e185046b107ca63c7ca155147e3ae3b3c70c99247d16a2c41e1e",
+      "captures": [
+        {
+          "bytes": 2692,
+          "family": "20260611_074846_407715",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_074846_407715/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260611_074846_407715/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "391e3d587d63e185046b107ca63c7ca155147e3ae3b3c70c99247d16a2c41e1e"
+        }
+      ]
+    },
+    {
+      "sha256": "399a912034916276d85f540e9c4b6aaa9be96ec1ade7fab2840a2f93aca1ab54",
+      "captures": [
+        {
+          "bytes": 1668,
+          "family": "evaluation-20260914",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04b/run-20260916-paired-removal/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/evaluation-20260914/e04b/run-20260916-paired-removal/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "399a912034916276d85f540e9c4b6aaa9be96ec1ade7fab2840a2f93aca1ab54"
+        }
+      ]
+    },
+    {
+      "sha256": "3a44f684109b63d9e7efe312b61b563fcac06cfdc19ea5e87ce09d191188f68f",
+      "captures": [
+        {
+          "bytes": 2886,
+          "family": "20260712_002806_564661",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260712_002806_564661/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260712_002806_564661/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "3a44f684109b63d9e7efe312b61b563fcac06cfdc19ea5e87ce09d191188f68f"
+        }
+      ]
+    },
+    {
+      "sha256": "3a940513d1c808673b675620a05f529b938a393b4e765c2af3d2a379ab9f6644",
+      "captures": [
+        {
+          "bytes": 744,
+          "family": "gate-a-long-context-n48",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/gate-a-long-context-n48/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/gate-a-long-context-n48/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "3a940513d1c808673b675620a05f529b938a393b4e765c2af3d2a379ab9f6644"
+        }
+      ]
+    },
+    {
+      "sha256": "3aa8829d902d8c15683cb25ef59a6023436822fabb8fde026584bcc3690b3c7a",
+      "captures": [
+        {
+          "bytes": 2050,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-dynamic-thresholding_20260711_001729/manifest.json",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-dynamic-thresholding_20260711_001729/manifest.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "3aa8829d902d8c15683cb25ef59a6023436822fabb8fde026584bcc3690b3c7a"
+        }
+      ]
+    },
+    {
+      "sha256": "3aea56e907409e64ddea365f49cfb83dd90c42e0ae4c4538f2adec5c82c58044",
+      "captures": [
+        {
+          "bytes": 1305,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/example-panorama-quality_20260710_093837/report.json",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/example-panorama-quality_20260710_093837/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "3aea56e907409e64ddea365f49cfb83dd90c42e0ae4c4538f2adec5c82c58044"
+        }
+      ]
+    },
+    {
+      "sha256": "3b2bc898538be284a7b590e1792ac26ceb6c1dedd43452947f9df8efb17f45c1",
+      "captures": [
+        {
+          "bytes": 2291,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/wave2-overlap-20260910/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/wave2-overlap-20260910/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "3b2bc898538be284a7b590e1792ac26ceb6c1dedd43452947f9df8efb17f45c1"
+        }
+      ]
+    },
+    {
+      "sha256": "3bdc692c4c60c211fc95fa86ee621d932a66236639ddfae7beff4eeb90df5b4a",
+      "captures": [
+        {
+          "bytes": 247,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run2/status.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run2/status.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "3bdc692c4c60c211fc95fa86ee621d932a66236639ddfae7beff4eeb90df5b4a"
+        }
+      ]
+    },
+    {
+      "sha256": "3cb8357737be1919727abf08d4bdb75768491fb04bb06273da915e282419e314",
+      "captures": [
+        {
+          "bytes": 7740,
+          "family": "bp24-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp24-ladder/av1-payload-lowmotion.json",
+          "retained": "records/experiments/saved-reports/outputs/bp24-ladder/av1-payload-lowmotion.json",
+          "scope": "exact targeted report read",
+          "sha256": "3cb8357737be1919727abf08d4bdb75768491fb04bb06273da915e282419e314"
+        }
+      ]
+    },
+    {
+      "sha256": "3dfa958df5a6af38df0b49b341bada884071805b276bae32cc1c99a46e7db4fe",
+      "captures": [
+        {
+          "bytes": 39147,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-03/alcaraz_perricard_scene_007/sam31_result.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-03/alcaraz_perricard_scene_007/sam31_result.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "3dfa958df5a6af38df0b49b341bada884071805b276bae32cc1c99a46e7db4fe"
+        }
+      ]
+    },
+    {
+      "sha256": "3f92b06a68b554156e4f894e5fc16198d380bef9096400ccfce37eb2f7e8c1d6",
+      "captures": [
+        {
+          "bytes": 1793,
+          "family": "bp52-background-crf",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp52-background-crf/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp52-background-crf/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "3f92b06a68b554156e4f894e5fc16198d380bef9096400ccfce37eb2f7e8c1d6"
+        }
+      ]
+    },
+    {
+      "sha256": "3f9e090707e4072dd20d205f89934710a40d3651b7fdc158a9c3ef3dc87dbb70",
+      "captures": [
+        {
+          "bytes": 1306,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-racket-heuristics_20260710_153843/report.json",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-racket-heuristics_20260710_153843/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "3f9e090707e4072dd20d205f89934710a40d3651b7fdc158a9c3ef3dc87dbb70"
+        }
+      ]
+    },
+    {
+      "sha256": "40fa5a8bd96b306950ae4fd853ed060715619f9d41f841929ac3fce1831d965d",
+      "captures": [
+        {
+          "bytes": 2439,
+          "family": "bp24-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp24-ladder/plate-delta.json",
+          "retained": "records/experiments/saved-reports/outputs/bp24-ladder/plate-delta.json",
+          "scope": "exact targeted report read",
+          "sha256": "40fa5a8bd96b306950ae4fd853ed060715619f9d41f841929ac3fce1831d965d"
+        }
+      ]
+    },
+    {
+      "sha256": "424ce3d6e3f63bd3b83c8ac2dc9a2072e95074fbe4a5131b52abca04692368b0",
+      "captures": [
+        {
+          "bytes": 249,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run3/status.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run3/status.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "424ce3d6e3f63bd3b83c8ac2dc9a2072e95074fbe4a5131b52abca04692368b0"
+        }
+      ]
+    },
+    {
+      "sha256": "44f981f512f666fc42791363d8140bee3bad5e53b33896141f723774ff624933",
+      "captures": [
+        {
+          "bytes": 2602,
+          "family": "20260710_073844_816285",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_073844_816285/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_073844_816285/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "44f981f512f666fc42791363d8140bee3bad5e53b33896141f723774ff624933"
+        }
+      ]
+    },
+    {
+      "sha256": "48033616a6f5eb80ea8c7dc4a1c09edcdcf27082c84560a5a299b06adfc68dc4",
+      "captures": [
+        {
+          "bytes": 743,
+          "family": "hnerv_wrc_phase1",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/hnerv_wrc_phase1/budget_0.4M/20260713_123309/report.md",
+          "retained": "workers/server/outputs/selected_reports/hnerv_wrc_phase1/budget_0.4M/20260713_123309/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "48033616a6f5eb80ea8c7dc4a1c09edcdcf27082c84560a5a299b06adfc68dc4"
+        }
+      ]
+    },
+    {
+      "sha256": "48385fa7cd72a919c0225a15ffd43c03ead40287db9fab4da0e6050b9454073b",
+      "captures": [
+        {
+          "bytes": 8160,
+          "family": "bp23-tier",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp23-tier/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp23-tier/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "48385fa7cd72a919c0225a15ffd43c03ead40287db9fab4da0e6050b9454073b"
+        }
+      ]
+    },
+    {
+      "sha256": "49c4cdaec54b5bc33daa8e179663f8772f0b9c2cda12d234d13773b377646b59",
+      "captures": [
+        {
+          "bytes": 1222,
+          "family": "bp31-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/smoke-panorama-plate.json",
+          "retained": "records/experiments/saved-reports/outputs/bp31-ladder/smoke-panorama-plate.json",
+          "scope": "exact targeted report read",
+          "sha256": "49c4cdaec54b5bc33daa8e179663f8772f0b9c2cda12d234d13773b377646b59"
+        }
+      ]
+    },
+    {
+      "sha256": "4cb36c156758ba8476dbe88675f8e065b515aed51ad24f77460ea72f07ff24fc",
+      "captures": [
+        {
+          "bytes": 2632,
+          "family": "20260710_121416_601979",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_121416_601979/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_121416_601979/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "4cb36c156758ba8476dbe88675f8e065b515aed51ad24f77460ea72f07ff24fc"
+        }
+      ]
+    },
+    {
+      "sha256": "4cd4916f09e880810ddc76b3ec0811804efe6bc658422c26ce59e3d9a7a45994",
+      "captures": [
+        {
+          "bytes": 1889,
+          "family": "bp56-background-effort",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp56-background-effort/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp56-background-effort/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "4cd4916f09e880810ddc76b3ec0811804efe6bc658422c26ce59e3d9a7a45994"
+        }
+      ]
+    },
+    {
+      "sha256": "4eaaf653629e274e440b1ae8d01c21e2892d8f78d46256dfd1fa8e8a834fe596",
+      "captures": [
+        {
+          "bytes": 2615,
+          "family": "20260611_072500_651949",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_072500_651949/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260611_072500_651949/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "4eaaf653629e274e440b1ae8d01c21e2892d8f78d46256dfd1fa8e8a834fe596"
+        }
+      ]
+    },
+    {
+      "sha256": "504fdf0fe53141ea55808ffaea88d66d47f204983f36235050d13b6cdb60bc93",
+      "captures": [
+        {
+          "bytes": 5904,
+          "family": "bp29-plate-codec",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp29-plate-codec/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp29-plate-codec/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "504fdf0fe53141ea55808ffaea88d66d47f204983f36235050d13b6cdb60bc93"
+        }
+      ]
+    },
+    {
+      "sha256": "5193c617a2916de2990ef8bf340f5d75ef1f27505402f260d0fac14c03d3219c",
+      "captures": [
+        {
+          "bytes": 1296,
+          "family": "journal-20260924",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260924/je12/causal-ablations.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260924/je12/causal-ablations.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "5193c617a2916de2990ef8bf340f5d75ef1f27505402f260d0fac14c03d3219c"
+        }
+      ]
+    },
+    {
+      "sha256": "52c0179c724469e56a1dedeafd8695536b44623cd0a63c48bf8128a49f8b5e33",
+      "captures": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/probe_report.json",
+          "family": "evaluation-20260914",
+          "retained": "records/experiments/saved-reports/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/probe_report.json",
+          "sha256": "52c0179c724469e56a1dedeafd8695536b44623cd0a63c48bf8128a49f8b5e33",
+          "bytes": 6813,
+          "scope": "exact targeted original report; direct modern campaign card"
+        }
+      ]
+    },
+    {
+      "sha256": "558e5d6a34d02237d979bfd3b2a1f4d128db922d76d535015da4379fb03a6354",
+      "captures": [
+        {
+          "bytes": 20907,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/mask-screen/sinner-alcaraz002-yolo26x-cpu-retry1/screen-ledger.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/mask-screen/sinner-alcaraz002-yolo26x-cpu-retry1/screen-ledger.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "558e5d6a34d02237d979bfd3b2a1f4d128db922d76d535015da4379fb03a6354"
+        }
+      ]
+    },
+    {
+      "sha256": "560bf31beaa3694a92f9561632556f12dcc02f2474186276a732692ae4601ca8",
+      "captures": [
+        {
+          "bytes": 1668,
+          "family": "evaluation-20260914",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/evaluation-20260914/e04b/run-20260916-paired-removal-r2/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "560bf31beaa3694a92f9561632556f12dcc02f2474186276a732692ae4601ca8"
+        }
+      ]
+    },
+    {
+      "sha256": "5620d995a1dddcb01858d48668d74a634e5ad2e19cd9fec8a7b4cf9419a88c91",
+      "captures": [
+        {
+          "bytes": 143,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run3/policy.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run3/policy.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "5620d995a1dddcb01858d48668d74a634e5ad2e19cd9fec8a7b4cf9419a88c91"
+        }
+      ]
+    },
+    {
+      "sha256": "56fe7c89e155a01e87ceda011dd1e894cf48bf1d19bc921fcdb52c02cc018005",
+      "captures": [
+        {
+          "bytes": 7681,
+          "family": "journal-20260926",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260926/sam31-racket-prompt-smoke16-run1/run-manifest.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260926/sam31-racket-prompt-smoke16-run1/run-manifest.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "56fe7c89e155a01e87ceda011dd1e894cf48bf1d19bc921fcdb52c02cc018005"
+        }
+      ]
+    },
+    {
+      "sha256": "575e9bdcb733db0481017919fde2da70ccd958c86dfbc0013e49bf538add0bfb",
+      "captures": [
+        {
+          "bytes": 2722,
+          "family": "20260702_123203_610276",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260702_123203_610276/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260702_123203_610276/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "575e9bdcb733db0481017919fde2da70ccd958c86dfbc0013e49bf538add0bfb"
+        }
+      ]
+    },
+    {
+      "sha256": "59b0182735913ced60655d09d867e1d0eceeb8cd714a71422c6967dc42d1ca96",
+      "captures": [
+        {
+          "bytes": 962,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-panorama-quality_20260710_164128/report.md",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-panorama-quality_20260710_164128/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "59b0182735913ced60655d09d867e1d0eceeb8cd714a71422c6967dc42d1ca96"
+        }
+      ]
+    },
+    {
+      "sha256": "5bf63bc0349bd01c99270e717c0ec1f04f695214cb7fc58259aa3c0e8114e8d3",
+      "captures": [
+        {
+          "bytes": 893,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run2/failure.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run2/failure.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "5bf63bc0349bd01c99270e717c0ec1f04f695214cb7fc58259aa3c0e8114e8d3"
+        }
+      ]
+    },
+    {
+      "sha256": "5df3e553f1ef94383c70f93a49b3704179e673bf5480b2acd996335f50ac2aed",
+      "captures": [
+        {
+          "bytes": 5190,
+          "family": "bp24-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp24-ladder/plate-lowdelay.json",
+          "retained": "records/experiments/saved-reports/outputs/bp24-ladder/plate-lowdelay.json",
+          "scope": "exact targeted report read",
+          "sha256": "5df3e553f1ef94383c70f93a49b3704179e673bf5480b2acd996335f50ac2aed"
+        }
+      ]
+    },
+    {
+      "sha256": "5e2c59612f88275c55ce59428fe0c58704fecf76faad137daf019cd66084ce95",
+      "captures": [
+        {
+          "bytes": 7968,
+          "family": "hnerv_baseline_high_cap",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/hnerv_baseline_high_cap/20260712_182723/progress.jsonl",
+          "retained": "records/experiments/saved-reports/outputs/hnerv_baseline_high_cap/20260712_182723/progress.jsonl",
+          "scope": "exact targeted report read",
+          "sha256": "5e2c59612f88275c55ce59428fe0c58704fecf76faad137daf019cd66084ce95"
+        }
+      ]
+    },
+    {
+      "sha256": "5e837003d53cd62f4c15a09ef86d1226aca919a5c9fc89e42ee14795cc639df1",
+      "captures": [
+        {
+          "bytes": 1144,
+          "family": "gate-a-vvc-webp-n96",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/gate-a-vvc-webp-n96/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/gate-a-vvc-webp-n96/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "5e837003d53cd62f4c15a09ef86d1226aca919a5c9fc89e42ee14795cc639df1"
+        },
+        {
+          "bytes": 1144,
+          "family": "gate-a-vvc-webp-n96-dryrun",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/gate-a-vvc-webp-n96-dryrun/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/gate-a-vvc-webp-n96-dryrun/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "5e837003d53cd62f4c15a09ef86d1226aca919a5c9fc89e42ee14795cc639df1"
+        },
+        {
+          "bytes": 1144,
+          "family": "gate-a-vvc-webp-n96-run2",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/gate-a-vvc-webp-n96-run2/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/gate-a-vvc-webp-n96-run2/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "5e837003d53cd62f4c15a09ef86d1226aca919a5c9fc89e42ee14795cc639df1"
+        }
+      ]
+    },
+    {
+      "sha256": "5f250ac6a17bdb54b08473384b5fe2612c70e4564b5046abc58b01c3d4694b0b",
+      "captures": [
+        {
+          "bytes": 2789,
+          "family": "20260710_214746_004819",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_214746_004819/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_214746_004819/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "5f250ac6a17bdb54b08473384b5fe2612c70e4564b5046abc58b01c3d4694b0b"
+        }
+      ]
+    },
+    {
+      "sha256": "5f323fd480fe7a287c09470d71901cef6f51c345ffcb502faf1240a7ec5f3a06",
+      "captures": [
+        {
+          "bytes": 1850,
+          "family": "bp24-encoder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp24-encoder/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp24-encoder/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "5f323fd480fe7a287c09470d71901cef6f51c345ffcb502faf1240a7ec5f3a06"
+        }
+      ]
+    },
+    {
+      "sha256": "5ffcc8a3cdce368cdd9b1f76c8cadcec4ac565098de2536ca26e098ddfe43372",
+      "captures": [
+        {
+          "bytes": 2688,
+          "family": "20260611_074329_655909",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_074329_655909/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260611_074329_655909/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "5ffcc8a3cdce368cdd9b1f76c8cadcec4ac565098de2536ca26e098ddfe43372"
+        }
+      ]
+    },
+    {
+      "sha256": "632128e2f520ba48ca5d7a2628f70d87e9f7a5b599761ba30295f3e41210398e",
+      "captures": [
+        {
+          "bytes": 1143,
+          "family": "gate-a-vvc-webp-n48",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/gate-a-vvc-webp-n48/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/gate-a-vvc-webp-n48/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "632128e2f520ba48ca5d7a2628f70d87e9f7a5b599761ba30295f3e41210398e"
+        }
+      ]
+    },
+    {
+      "sha256": "6330309adea31cc4315f9ea1e9625da30c9f73b5981695a190f254a6bffe1745",
+      "captures": [
+        {
+          "bytes": 1775,
+          "family": "bp53-background-scale",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp53-background-scale/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp53-background-scale/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "6330309adea31cc4315f9ea1e9625da30c9f73b5981695a190f254a6bffe1745"
+        }
+      ]
+    },
+    {
+      "sha256": "650f6a400e87fbd85d4abbd462fd36dae773053ee6c9f4c2b21ec3bdaf5573f4",
+      "captures": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/e04b_paired_removal_report.json",
+          "family": "evaluation-20260914",
+          "retained": "records/experiments/saved-reports/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/e04b_paired_removal_report.json",
+          "sha256": "650f6a400e87fbd85d4abbd462fd36dae773053ee6c9f4c2b21ec3bdaf5573f4",
+          "bytes": 10183,
+          "scope": "exact targeted original report; direct modern campaign card"
+        }
+      ]
+    },
+    {
+      "sha256": "659b50338e50fd98ae57c12ce296388c834bfbdb8cc7afb315262392a484f151",
+      "captures": [
+        {
+          "bytes": 7346,
+          "family": "journal-20260924",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260924/je05/federer007-decomposition.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260924/je05/federer007-decomposition.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "659b50338e50fd98ae57c12ce296388c834bfbdb8cc7afb315262392a484f151"
+        }
+      ]
+    },
+    {
+      "sha256": "664bc28b475925e7c78ce8fffec1fabc74b7f76b3285aaafa312eb16d766daaa",
+      "captures": [
+        {
+          "bytes": 2205,
+          "family": "bp31-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/ladder-scenes-CONTROL-full.json",
+          "retained": "records/experiments/saved-reports/outputs/bp31-ladder/ladder-scenes-CONTROL-full.json",
+          "scope": "exact targeted report read",
+          "sha256": "664bc28b475925e7c78ce8fffec1fabc74b7f76b3285aaafa312eb16d766daaa"
+        }
+      ]
+    },
+    {
+      "sha256": "67cb1885fd7921f2ef45f3acaffb38061fc87306b3349303c652eaa00129146f",
+      "captures": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/standalone_decode_report.json",
+          "family": "evaluation-20260914",
+          "retained": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/standalone_decode_report.json",
+          "sha256": "67cb1885fd7921f2ef45f3acaffb38061fc87306b3349303c652eaa00129146f",
+          "bytes": 3689,
+          "scope": "exact targeted original report; direct modern campaign card"
+        }
+      ]
+    },
+    {
+      "sha256": "68ebab1816298eb6a00946817c3690a07854a5df486da2e3dabb2129bea6a871",
+      "captures": [
+        {
+          "bytes": 481,
+          "family": "modular",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/modular/object-foreground-campaign/job/status.json",
+          "retained": "workers/server/outputs/selected_reports/modular/object-foreground-campaign/job/status.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "68ebab1816298eb6a00946817c3690a07854a5df486da2e3dabb2129bea6a871"
+        }
+      ]
+    },
+    {
+      "sha256": "696ba30046c2f7e600a001c47ad4aefc2cca14e9c90eb2e9f65fb5c315688cbe",
+      "captures": [
+        {
+          "bytes": 7145,
+          "family": "codec_baselines",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/codec_baselines/20260710_224721/report.json",
+          "retained": "workers/server/outputs/selected_reports/codec_baselines/20260710_224721/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "696ba30046c2f7e600a001c47ad4aefc2cca14e9c90eb2e9f65fb5c315688cbe"
+        }
+      ]
+    },
+    {
+      "sha256": "6b40ed1ee6cf2ab7849ff3d8dbd8196416edc26f46531d4be3f0f88fc17a1c4d",
+      "captures": [
+        {
+          "bytes": 752,
+          "family": "hnerv_vod_sweep_short",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/hnerv_vod_sweep_short/20260712_234755/report.md",
+          "retained": "workers/server/outputs/selected_reports/hnerv_vod_sweep_short/20260712_234755/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "6b40ed1ee6cf2ab7849ff3d8dbd8196416edc26f46531d4be3f0f88fc17a1c4d"
+        }
+      ]
+    },
+    {
+      "sha256": "6d011ea5d0da5d8ed6831d9f5ffc124f3c592712a5fc87409b666086d585e925",
+      "captures": [
+        {
+          "bytes": 2050,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-dynamic-thresholding_20260710_221518/manifest.json",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-dynamic-thresholding_20260710_221518/manifest.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "6d011ea5d0da5d8ed6831d9f5ffc124f3c592712a5fc87409b666086d585e925"
+        }
+      ]
+    },
+    {
+      "sha256": "6d475c728d950703aa10635b7e5fa785d52c8a50a203791341e5a8a87d78b68d",
+      "captures": [
+        {
+          "bytes": 1085,
+          "family": "external-neural-bg-jobs",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/jobs/neural-bg/budget-smokes/report.json",
+          "retained": "records/experiments/saved-reports/jobs/neural-bg/budget-smokes/report.json",
+          "scope": "exact targeted report read",
+          "sha256": "6d475c728d950703aa10635b7e5fa785d52c8a50a203791341e5a8a87d78b68d"
+        }
+      ]
+    },
+    {
+      "sha256": "6d8e54a4eb2a7246a6d358af20d9ac6e9ada38c700e256311e4785af1387e0f9",
+      "captures": [
+        {
+          "bytes": 6659,
+          "family": "bp26-config",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp26-config/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp26-config/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "6d8e54a4eb2a7246a6d358af20d9ac6e9ada38c700e256311e4785af1387e0f9"
+        }
+      ]
+    },
+    {
+      "sha256": "6e90572f3b4a0e6edd46c8f07609b4461be594d82846a25d41f5ffc3b194bcfb",
+      "captures": [
+        {
+          "bytes": 913,
+          "family": "hnerv_wrc_phase1",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/hnerv_wrc_phase1/budget_1.8M/20260713_125941/report.json",
+          "retained": "workers/server/outputs/selected_reports/hnerv_wrc_phase1/budget_1.8M/20260713_125941/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "6e90572f3b4a0e6edd46c8f07609b4461be594d82846a25d41f5ffc3b194bcfb"
+        }
+      ]
+    },
+    {
+      "sha256": "6eb2b8df41dae26ecef0c26b079aea6416f66889d4656295eb02df5cee53ab6c",
+      "captures": [
+        {
+          "bytes": 624,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/wave2-background-probe/summary_table.csv",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/wave2-background-probe/summary_table.csv",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "6eb2b8df41dae26ecef0c26b079aea6416f66889d4656295eb02df5cee53ab6c"
+        }
+      ]
+    },
+    {
+      "sha256": "6eba4f1d11ef3f6e90d92f6b94c2e045f42fce8d369910f702381e4c05112373",
+      "captures": [
+        {
+          "bytes": 1442,
+          "family": "codec_baselines",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/codec_baselines/20260710_224721/report.md",
+          "retained": "workers/server/outputs/selected_reports/codec_baselines/20260710_224721/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "6eba4f1d11ef3f6e90d92f6b94c2e045f42fce8d369910f702381e4c05112373"
+        }
+      ]
+    },
+    {
+      "sha256": "710b796319687fbb7f6ff0e2c827283f37413cec5cd0c386004be3db975b89df",
+      "captures": [
+        {
+          "bytes": 2600,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-dynamic-thresholding_20260710_221518/report.json",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-dynamic-thresholding_20260710_221518/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "710b796319687fbb7f6ff0e2c827283f37413cec5cd0c386004be3db975b89df"
+        }
+      ]
+    },
+    {
+      "sha256": "71d82a51c6bf831c6a336d12a2cb05b1496912caa17a702b9e490f28380d939a",
+      "captures": [
+        {
+          "bytes": 231232,
+          "family": "gate-a-vvc-webp-n96-run2",
+          "original": "coordinator capture; canonical original in coordinator-arithmetic.json",
+          "retained": "workers/coordinator/gate-a-report.json",
+          "scope": "coordinator saved report arithmetic; campaign audit",
+          "sha256": "71d82a51c6bf831c6a336d12a2cb05b1496912caa17a702b9e490f28380d939a"
+        }
+      ]
+    },
+    {
+      "sha256": "720bc79c27f5647e9d0212af0f24926513c919a3c429dbc8aa3422b889978892",
+      "captures": [
+        {
+          "bytes": 5362,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-03/alcaraz_highlights_scene_000/sam31_worker_config.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-03/alcaraz_highlights_scene_000/sam31_worker_config.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "720bc79c27f5647e9d0212af0f24926513c919a3c429dbc8aa3422b889978892"
+        }
+      ]
+    },
+    {
+      "sha256": "730a83ecd371d54e9a183611da28fa753253cbe77b70427386486a1b9469bb6f",
+      "captures": [
+        {
+          "bytes": 911,
+          "family": "hnerv_wrc_phase1",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/hnerv_wrc_phase1/budget_0.4M/20260713_123309/report.json",
+          "retained": "workers/server/outputs/selected_reports/hnerv_wrc_phase1/budget_0.4M/20260713_123309/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "730a83ecd371d54e9a183611da28fa753253cbe77b70427386486a1b9469bb6f"
+        }
+      ]
+    },
+    {
+      "sha256": "73f6e7c0329cb6a7c7ac02e54c0842817897375c94e01d78bf85bdb14c1ef678",
+      "captures": [
+        {
+          "bytes": 2787,
+          "family": "20260611_073539_382810",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_073539_382810/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260611_073539_382810/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "73f6e7c0329cb6a7c7ac02e54c0842817897375c94e01d78bf85bdb14c1ef678"
+        }
+      ]
+    },
+    {
+      "sha256": "7482620874c26be655fc58a51a13f7b54fe16ba639e986a6269224a3c25fc571",
+      "captures": [
+        {
+          "bytes": 2765,
+          "family": "bp47-e1-preflight",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp47-e1-preflight/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp47-e1-preflight/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "7482620874c26be655fc58a51a13f7b54fe16ba639e986a6269224a3c25fc571"
+        }
+      ]
+    },
+    {
+      "sha256": "75409038915143c531bb972e1dc0262e3a7bcbd84275c23fee19f307b3fcc6b0",
+      "captures": [
+        {
+          "bytes": 3527,
+          "family": "codec_baselines",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/codec_baselines/20260710_164414/report.json",
+          "retained": "workers/server/outputs/selected_reports/codec_baselines/20260710_164414/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "75409038915143c531bb972e1dc0262e3a7bcbd84275c23fee19f307b3fcc6b0"
+        }
+      ]
+    },
+    {
+      "sha256": "75d55c6e32fb057a88ca8b318f5efcd0d04e230257e5b795529eae33b59bdbdb",
+      "captures": [
+        {
+          "bytes": 2717,
+          "family": "20260706_155406_352230",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260706_155406_352230/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260706_155406_352230/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "75d55c6e32fb057a88ca8b318f5efcd0d04e230257e5b795529eae33b59bdbdb"
+        }
+      ]
+    },
+    {
+      "sha256": "75f996ad09420c359e5e15d8723408a3abbe194dadbfa7f82905c4cd6604ac80",
+      "captures": [
+        {
+          "bytes": 6986,
+          "family": "bp29-panorama",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp29-panorama/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp29-panorama/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "75f996ad09420c359e5e15d8723408a3abbe194dadbfa7f82905c4cd6604ac80"
+        }
+      ]
+    },
+    {
+      "sha256": "76dc09bd0789dd7d2bd2dd35e279ba04ab80caaf7d647fdd507aa6d21329b18a",
+      "captures": [
+        {
+          "bytes": 8371,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/wave2-overlap-20260910/metric-calibration.json",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/wave2-overlap-20260910/metric-calibration.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "76dc09bd0789dd7d2bd2dd35e279ba04ab80caaf7d647fdd507aa6d21329b18a"
+        }
+      ]
+    },
+    {
+      "sha256": "777825fd6d2eb7a3b4d00811b5f045444742fb7dcfc2230cc7ef21ab4a9a78f4",
+      "captures": [
+        {
+          "bytes": 5502,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-05/alcaraz_perricard_scene_007/sam31_worker_config.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-05/alcaraz_perricard_scene_007/sam31_worker_config.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "777825fd6d2eb7a3b4d00811b5f045444742fb7dcfc2230cc7ef21ab4a9a78f4"
+        }
+      ]
+    },
+    {
+      "sha256": "77c30b5b2d81da8bd8abe50e41150571db9d7615bcbdf3ee0657f1cbdb5c2d9a",
+      "captures": [
+        {
+          "bytes": 1334,
+          "family": "evaluation-20260914",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03b/run-20260916-federer007/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/evaluation-20260914/e03b/run-20260916-federer007/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "77c30b5b2d81da8bd8abe50e41150571db9d7615bcbdf3ee0657f1cbdb5c2d9a"
+        }
+      ]
+    },
+    {
+      "sha256": "77e8162918aea4c7d6e25859b343ec337aefaf427864c55a50fe52b2315b7e8b",
+      "captures": [
+        {
+          "bytes": 1646,
+          "family": "bp17-caption",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp17-caption/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/bp17-caption/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "77e8162918aea4c7d6e25859b343ec337aefaf427864c55a50fe52b2315b7e8b"
+        }
+      ]
+    },
+    {
+      "sha256": "7826e5ab75dcca0c281a122308f7a2d97a7c0c20a1209440163e73991614607d",
+      "captures": [
+        {
+          "bytes": 143,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run2/policy.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run2/policy.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "7826e5ab75dcca0c281a122308f7a2d97a7c0c20a1209440163e73991614607d"
+        }
+      ]
+    },
+    {
+      "sha256": "78be4dc4188c47d4cdc84b6e0f3dbbdb9e949ff93495b50a4d82361904f0d91e",
+      "captures": [
+        {
+          "bytes": 9998,
+          "family": "bp29-low-rate",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp29-low-rate/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp29-low-rate/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "78be4dc4188c47d4cdc84b6e0f3dbbdb9e949ff93495b50a4d82361904f0d91e"
+        }
+      ]
+    },
+    {
+      "sha256": "78d7fb14daf59277a348e74c690b48013e81a8e8d4b1e9a0077fb61a5463092f",
+      "captures": [
+        {
+          "bytes": 246,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run1/status.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run1/status.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "78d7fb14daf59277a348e74c690b48013e81a8e8d4b1e9a0077fb61a5463092f"
+        }
+      ]
+    },
+    {
+      "sha256": "79ba3744aa89d63a0e4cf8454e5dc10f1547aff39dbccd1ea2d65a6f63f43696",
+      "captures": [
+        {
+          "bytes": 4557,
+          "family": "evaluation-20260914",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03b/run-20260916-federer007/metric-calibration.json",
+          "retained": "workers/server/outputs/selected_reports/evaluation-20260914/e03b/run-20260916-federer007/metric-calibration.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "79ba3744aa89d63a0e4cf8454e5dc10f1547aff39dbccd1ea2d65a6f63f43696"
+        }
+      ]
+    },
+    {
+      "sha256": "7adb7516c54c4803b557b52e4a80bf06b826c5cf282cce8360ad003ef800c5e5",
+      "captures": [
+        {
+          "bytes": 454,
+          "family": "evaluation-20260914",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/audit-20260916-lossless-pack/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/evaluation-20260914/e06/audit-20260916-lossless-pack/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "7adb7516c54c4803b557b52e4a80bf06b826c5cf282cce8360ad003ef800c5e5"
+        }
+      ]
+    },
+    {
+      "sha256": "7db484978d05db7487e13d410d10c5e973c52b732b59464bde6caef459473e46",
+      "captures": [
+        {
+          "bytes": 10903,
+          "family": "bp31-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/stream-codec-sweep-alcaraz_highlights.json",
+          "retained": "records/experiments/saved-reports/outputs/bp31-ladder/stream-codec-sweep-alcaraz_highlights.json",
+          "scope": "exact targeted report read",
+          "sha256": "7db484978d05db7487e13d410d10c5e973c52b732b59464bde6caef459473e46"
+        }
+      ]
+    },
+    {
+      "sha256": "7e39a907d1ffc66c80bb14da564347c67f06a2463ff35f7d10a3ee7fc0b4e027",
+      "captures": [
+        {
+          "bytes": 39147,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-05/alcaraz_perricard_scene_007/sam31_result.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-05/alcaraz_perricard_scene_007/sam31_result.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "7e39a907d1ffc66c80bb14da564347c67f06a2463ff35f7d10a3ee7fc0b4e027"
+        }
+      ]
+    },
+    {
+      "sha256": "7ea681d3630d9c83cc9f02fa90170d47ab259ec5190411f996353931e9b17cef",
+      "captures": [
+        {
+          "bytes": 16076,
+          "family": "bp12-clip-roster",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp12-clip-roster/report.json",
+          "retained": "workers/server/outputs/selected_reports/bp12-clip-roster/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "7ea681d3630d9c83cc9f02fa90170d47ab259ec5190411f996353931e9b17cef"
+        }
+      ]
+    },
+    {
+      "sha256": "7ef9ffa4c3156189cf2d06618d222d458ab43be90584a180348fabe133100681",
+      "captures": [
+        {
+          "bytes": 249,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/mask-screen/yolo26n-seg-alcaraz000-window48/status.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/mask-screen/yolo26n-seg-alcaraz000-window48/status.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "7ef9ffa4c3156189cf2d06618d222d458ab43be90584a180348fabe133100681"
+        }
+      ]
+    },
+    {
+      "sha256": "7f6083981eeaa83091648f54e124d85801593908d0d5da21db90c2d775f8aa4f",
+      "captures": [
+        {
+          "bytes": 1159,
+          "family": "gate-b-confirmation",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/gate-b-confirmation/clips/bp57_ao2024_sabalenka_zheng/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/gate-b-confirmation/clips/bp57_ao2024_sabalenka_zheng/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "7f6083981eeaa83091648f54e124d85801593908d0d5da21db90c2d775f8aa4f"
+        }
+      ]
+    },
+    {
+      "sha256": "7f8789fc13d40c71fa71dbbdf0f1bc1f2dab73157d5da50520831a8d151fce43",
+      "captures": [
+        {
+          "bytes": 5362,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-01/alcaraz_highlights_scene_000/sam31_worker_config.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-01/alcaraz_highlights_scene_000/sam31_worker_config.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "7f8789fc13d40c71fa71dbbdf0f1bc1f2dab73157d5da50520831a8d151fce43"
+        }
+      ]
+    },
+    {
+      "sha256": "7fd09d1d9cac60f1d7262c4b07f6eb701f2b0ad79d889d01313faff426247b7d",
+      "captures": [
+        {
+          "bytes": 4551,
+          "family": "bp13-headroom",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp13-headroom/report.json",
+          "retained": "workers/server/outputs/selected_reports/bp13-headroom/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "7fd09d1d9cac60f1d7262c4b07f6eb701f2b0ad79d889d01313faff426247b7d"
+        }
+      ]
+    },
+    {
+      "sha256": "80a12d7e0602d7e60edade8ce75d676d93fa77b2b816d87ef785f03614b94f19",
+      "captures": [
+        {
+          "bytes": 26686,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-03/alcaraz_highlights_scene_010/sam31_result.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-03/alcaraz_highlights_scene_010/sam31_result.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "80a12d7e0602d7e60edade8ce75d676d93fa77b2b816d87ef785f03614b94f19"
+        }
+      ]
+    },
+    {
+      "sha256": "81cbd727831571aab8dd4556a1626c7dc7ecc7234c8bf70b0930c32e44206136",
+      "captures": [
+        {
+          "bytes": 23752,
+          "family": "journal-20260924",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260924/je05/decomposition-summary.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260924/je05/decomposition-summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "81cbd727831571aab8dd4556a1626c7dc7ecc7234c8bf70b0930c32e44206136"
+        }
+      ]
+    },
+    {
+      "sha256": "82bdeec25af245812fa2d818bce6435316a0bd85bd92b7cb89f29fa2844fc0fc",
+      "captures": [
+        {
+          "bytes": 6904,
+          "family": "journal-20260924",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260924/je00/intake.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260924/je00/intake.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "82bdeec25af245812fa2d818bce6435316a0bd85bd92b7cb89f29fa2844fc0fc"
+        }
+      ]
+    },
+    {
+      "sha256": "82c2c926685422c2973f7cf44d904755b47b2fa38bdac5ac3801ab9a2b578871",
+      "captures": [
+        {
+          "bytes": 1364,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/residual-high-fidelity/experiment-identity.json",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/residual-high-fidelity/experiment-identity.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "82c2c926685422c2973f7cf44d904755b47b2fa38bdac5ac3801ab9a2b578871"
+        }
+      ]
+    },
+    {
+      "sha256": "8304a9daf2f239eb49c46744c05eb6c554898a0039bbaa347a950835ad4700a5",
+      "captures": [
+        {
+          "bytes": 8633,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run3/run-manifest.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run3/run-manifest.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "8304a9daf2f239eb49c46744c05eb6c554898a0039bbaa347a950835ad4700a5"
+        }
+      ]
+    },
+    {
+      "sha256": "836ddfe82a92ec4f6f9045b735be6f6dad4a865fbc5af43822e9ad0c2376019a",
+      "captures": [
+        {
+          "bytes": 2572,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-dynamic-thresholding_20260711_001729/report.json",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-dynamic-thresholding_20260711_001729/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "836ddfe82a92ec4f6f9045b735be6f6dad4a865fbc5af43822e9ad0c2376019a"
+        }
+      ]
+    },
+    {
+      "sha256": "83e2d5c2e28d94e0eadb9cc7be74db716662ecbf56b871c022a41c16429b5d65",
+      "captures": [
+        {
+          "bytes": 1100,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/pilot-frozen/tool-identity.json",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/pilot-frozen/tool-identity.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "83e2d5c2e28d94e0eadb9cc7be74db716662ecbf56b871c022a41c16429b5d65"
+        },
+        {
+          "bytes": 1100,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/residual-high-fidelity/tool-identity.json",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/residual-high-fidelity/tool-identity.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "83e2d5c2e28d94e0eadb9cc7be74db716662ecbf56b871c022a41c16429b5d65"
+        },
+        {
+          "bytes": 1100,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/wave2-overlap-20260910/tool-identity.json",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/wave2-overlap-20260910/tool-identity.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "83e2d5c2e28d94e0eadb9cc7be74db716662ecbf56b871c022a41c16429b5d65"
+        }
+      ]
+    },
+    {
+      "sha256": "83f5e20916c46a19f605dec03a23111dcf029bb89b0c7f965ca3e9d415ef2c92",
+      "captures": [
+        {
+          "bytes": 1973,
+          "family": "journal-20260924",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260924/je04/neural-readiness.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260924/je04/neural-readiness.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "83f5e20916c46a19f605dec03a23111dcf029bb89b0c7f965ca3e9d415ef2c92"
+        }
+      ]
+    },
+    {
+      "sha256": "843f18e541bf234877e85465fd4242f0a8a578dda5fedcd6b4d6932d730f6e7a",
+      "captures": [
+        {
+          "bytes": 476,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run2/request.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run2/request.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "843f18e541bf234877e85465fd4242f0a8a578dda5fedcd6b4d6932d730f6e7a"
+        }
+      ]
+    },
+    {
+      "sha256": "8457f4de7bd06e460facad2b547c354f60ccf8ced2a95765c141a78cf74233ea",
+      "captures": [
+        {
+          "bytes": 1783,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/residual-high-fidelity/metric-calibration.json",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/residual-high-fidelity/metric-calibration.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "8457f4de7bd06e460facad2b547c354f60ccf8ced2a95765c141a78cf74233ea"
+        }
+      ]
+    },
+    {
+      "sha256": "855ff388d893148670c722d4caa439409d6808df85345d6d063e938d5be70bd8",
+      "captures": [
+        {
+          "bytes": 11838,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/mask-screen/yolo26n-seg-alcaraz000-window48/protocol.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/mask-screen/yolo26n-seg-alcaraz000-window48/protocol.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "855ff388d893148670c722d4caa439409d6808df85345d6d063e938d5be70bd8"
+        }
+      ]
+    },
+    {
+      "sha256": "887140702fcc3f709721e51d8a9e2b90caf72ba367e82ae241c72ed6e1e29b90",
+      "captures": [
+        {
+          "bytes": 1307,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-racket-heuristics_20260710_141407/report.json",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-racket-heuristics_20260710_141407/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "887140702fcc3f709721e51d8a9e2b90caf72ba367e82ae241c72ed6e1e29b90"
+        }
+      ]
+    },
+    {
+      "sha256": "88749e5a1ce7b8a7f04203188732102d1126f8a68fce3809e888a39df5d7ce6b",
+      "captures": [
+        {
+          "bytes": 2632,
+          "family": "20260710_140638_567946",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_140638_567946/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_140638_567946/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "88749e5a1ce7b8a7f04203188732102d1126f8a68fce3809e888a39df5d7ce6b"
+        }
+      ]
+    },
+    {
+      "sha256": "88e19ea5efacd1ab59e2849e446099b381797b79d3b9755a127236f20c60dcae",
+      "captures": [
+        {
+          "bytes": 2779,
+          "family": "20260710_224741_408520",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_224741_408520/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_224741_408520/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "88e19ea5efacd1ab59e2849e446099b381797b79d3b9755a127236f20c60dcae"
+        }
+      ]
+    },
+    {
+      "sha256": "8a3e93bab42e79ac36554b9959344099da40c5b57f87e1cc3bd802c9ddbdcdc5",
+      "captures": [
+        {
+          "bytes": 5347,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-03/alcaraz_highlights_scene_010/sam31_worker_config.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-03/alcaraz_highlights_scene_010/sam31_worker_config.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "8a3e93bab42e79ac36554b9959344099da40c5b57f87e1cc3bd802c9ddbdcdc5"
+        }
+      ]
+    },
+    {
+      "sha256": "8a701b7c9fde8255f99283444a7f12dc63ef8843da419649ff159f7f0c4ea4ec",
+      "captures": [
+        {
+          "bytes": 913,
+          "family": "hnerv_wrc_phase1",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/hnerv_wrc_phase1/budget_3.5M/20260713_133215/report.json",
+          "retained": "workers/server/outputs/selected_reports/hnerv_wrc_phase1/budget_3.5M/20260713_133215/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "8a701b7c9fde8255f99283444a7f12dc63ef8843da419649ff159f7f0c4ea4ec"
+        }
+      ]
+    },
+    {
+      "sha256": "8f6ebd22852e37192144f0de10719e5a61a9d1cfc9101446746f38f2037b7132",
+      "captures": [
+        {
+          "bytes": 5947,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sinner-alcaraz-scene002-first16-yolo26x-fast-run1/preregistered-protocol.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sinner-alcaraz-scene002-first16-yolo26x-fast-run1/preregistered-protocol.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "8f6ebd22852e37192144f0de10719e5a61a9d1cfc9101446746f38f2037b7132"
+        }
+      ]
+    },
+    {
+      "sha256": "906c1621ba0dd2c3739d76ab09509fd3ecb82daa47220d2d9d133aa30560af59",
+      "captures": [
+        {
+          "bytes": 828,
+          "family": "codec_baselines",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/codec_baselines/20260710_222256/report.md",
+          "retained": "workers/server/outputs/selected_reports/codec_baselines/20260710_222256/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "906c1621ba0dd2c3739d76ab09509fd3ecb82daa47220d2d9d133aa30560af59"
+        }
+      ]
+    },
+    {
+      "sha256": "9220f78a77fe6edd1460851b893eb7bf4158f27cc2f48bb914c7b36dbc6ba73c",
+      "captures": [
+        {
+          "bytes": 4208,
+          "family": "bp45-low-rate",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp45-low-rate/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp45-low-rate/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "9220f78a77fe6edd1460851b893eb7bf4158f27cc2f48bb914c7b36dbc6ba73c"
+        }
+      ]
+    },
+    {
+      "sha256": "936f1023e21f2f9c44b87dbd38f823e1022247263c42a93b1bd90ae5a736eb05",
+      "captures": [
+        {
+          "bytes": 11509,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run3/result.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run3/result.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "936f1023e21f2f9c44b87dbd38f823e1022247263c42a93b1bd90ae5a736eb05"
+        }
+      ]
+    },
+    {
+      "sha256": "958593b01b3d3544ad5c32f05b0a576726a11438c7c32b6c78d5e02dfe99f372",
+      "captures": [
+        {
+          "bytes": 7652,
+          "family": "bp24-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp24-ladder/av1-coarseness-lowmotion.json",
+          "retained": "records/experiments/saved-reports/outputs/bp24-ladder/av1-coarseness-lowmotion.json",
+          "scope": "exact targeted report read",
+          "sha256": "958593b01b3d3544ad5c32f05b0a576726a11438c7c32b6c78d5e02dfe99f372"
+        }
+      ]
+    },
+    {
+      "sha256": "96e05bc7ce53ab01bd5af415db5f3a33374c21d14467a549250621ecd909dd98",
+      "captures": [
+        {
+          "bytes": 2675,
+          "family": "20260709_221714_389957",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260709_221714_389957/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260709_221714_389957/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "96e05bc7ce53ab01bd5af415db5f3a33374c21d14467a549250621ecd909dd98"
+        }
+      ]
+    },
+    {
+      "sha256": "978f357d81836dc3e2b78346e00bac8bf8a59a889d2bed9cb23332838c5e17e5",
+      "captures": [
+        {
+          "bytes": 1516,
+          "family": "bp31-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/avc-scenecut-diagnostic.json",
+          "retained": "records/experiments/saved-reports/outputs/bp31-ladder/avc-scenecut-diagnostic.json",
+          "scope": "exact targeted report read",
+          "sha256": "978f357d81836dc3e2b78346e00bac8bf8a59a889d2bed9cb23332838c5e17e5"
+        }
+      ]
+    },
+    {
+      "sha256": "979de3bf4d3f6891f393dc6ad90fa75c3e32a847f4dcc53d8beda2755d282776",
+      "captures": [
+        {
+          "bytes": 2716,
+          "family": "20260707_132400_690120",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260707_132400_690120/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260707_132400_690120/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "979de3bf4d3f6891f393dc6ad90fa75c3e32a847f4dcc53d8beda2755d282776"
+        }
+      ]
+    },
+    {
+      "sha256": "98cd6ec995f1f5b314057753f7fbcdfdbc0162eb6c3c3b759f58856172fc455b",
+      "captures": [
+        {
+          "bytes": 281,
+          "family": "modular",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/modular/overnight-training-20260923/pix2pix-perricard002/status.json",
+          "retained": "workers/server/outputs/selected_reports/modular/overnight-training-20260923/pix2pix-perricard002/status.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "98cd6ec995f1f5b314057753f7fbcdfdbc0162eb6c3c3b759f58856172fc455b"
+        }
+      ]
+    },
+    {
+      "sha256": "98d2b9bc9fbe27f377e3991f8c80356037e11b0f9e23ac7b22ef8ab9566cc1ac",
+      "captures": [
+        {
+          "bytes": 41,
+          "family": "modular",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/modular/object-foreground-campaign/job/delivery.json",
+          "retained": "workers/server/outputs/selected_reports/modular/object-foreground-campaign/job/delivery.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "98d2b9bc9fbe27f377e3991f8c80356037e11b0f9e23ac7b22ef8ab9566cc1ac"
+        },
+        {
+          "bytes": 41,
+          "family": "modular",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/modular/overnight-training-20260923/pix2pix-perricard002/delivery.json",
+          "retained": "workers/server/outputs/selected_reports/modular/overnight-training-20260923/pix2pix-perricard002/delivery.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "98d2b9bc9fbe27f377e3991f8c80356037e11b0f9e23ac7b22ef8ab9566cc1ac"
+        }
+      ]
+    },
+    {
+      "sha256": "99b789e6474425f36ffa207bca679347f40bf7fa4c55eada761270f76cb31387",
+      "captures": [
+        {
+          "bytes": 544,
+          "family": "journal-20260926",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260926/sam31-racket-prompt-smoke16-run1/request.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260926/sam31-racket-prompt-smoke16-run1/request.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "99b789e6474425f36ffa207bca679347f40bf7fa4c55eada761270f76cb31387"
+        }
+      ]
+    },
+    {
+      "sha256": "99e019e0f544ac4064ca4fee0e8e7b5f02821cc2486cbf03c646f262bdfa34fa",
+      "captures": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e05/stage1_pilot/campaign_result_completed.json",
+          "family": "evaluation-20260914",
+          "retained": "records/experiments/saved-reports/outputs/evaluation-20260914/e05/stage1_pilot/campaign_result_completed.json",
+          "sha256": "99e019e0f544ac4064ca4fee0e8e7b5f02821cc2486cbf03c646f262bdfa34fa",
+          "bytes": 24963,
+          "scope": "exact targeted original report; direct modern campaign card"
+        }
+      ]
+    },
+    {
+      "sha256": "9a3ef7b9503b49696c683aff542694141bbfbd00eda0c338d0698300e16b1526",
+      "captures": [
+        {
+          "bytes": 542,
+          "family": "evaluation-20260914",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/probe-20260917-floor-arms/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/evaluation-20260914/e06/probe-20260917-floor-arms/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "9a3ef7b9503b49696c683aff542694141bbfbd00eda0c338d0698300e16b1526"
+        }
+      ]
+    },
+    {
+      "sha256": "9b38df9fea30955186326c4c30c4afca023fc595052592f938fc9ebdca7c6cdf",
+      "captures": [
+        {
+          "bytes": 7367,
+          "family": "journal-20260924",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260924/je05/perricard002-decomposition.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260924/je05/perricard002-decomposition.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "9b38df9fea30955186326c4c30c4afca023fc595052592f938fc9ebdca7c6cdf"
+        }
+      ]
+    },
+    {
+      "sha256": "9c6928eb99fbec89f911bcdcbc3f871b163694cab1f358e25d55fd29fcc79dfd",
+      "captures": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/campaign_result.e04a_derived.json",
+          "family": "evaluation-20260914",
+          "retained": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/campaign_result.e04a_derived.json",
+          "sha256": "9c6928eb99fbec89f911bcdcbc3f871b163694cab1f358e25d55fd29fcc79dfd",
+          "bytes": 11974,
+          "scope": "exact targeted original report; direct modern campaign card"
+        }
+      ]
+    },
+    {
+      "sha256": "9c7415a27862ee3138635fe0c9b546caddbb59d0059824a73517b9db6ec6c238",
+      "captures": [
+        {
+          "bytes": 1403,
+          "family": "modular",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/modular/overnight-training-20260923/pix2pix-perricard002/request.json",
+          "retained": "workers/server/outputs/selected_reports/modular/overnight-training-20260923/pix2pix-perricard002/request.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "9c7415a27862ee3138635fe0c9b546caddbb59d0059824a73517b9db6ec6c238"
+        }
+      ]
+    },
+    {
+      "sha256": "9c7602c7c9b4ed97b24cbffe03a66ec9f5f9d36199436eabe92d1cbf907d88d7",
+      "captures": [
+        {
+          "bytes": 15443,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sinner-alcaraz-scene002-first16-yolo26x-fast-run1/pilot-ledger.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sinner-alcaraz-scene002-first16-yolo26x-fast-run1/pilot-ledger.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "9c7602c7c9b4ed97b24cbffe03a66ec9f5f9d36199436eabe92d1cbf907d88d7"
+        }
+      ]
+    },
+    {
+      "sha256": "9d6efe0db6511ed3a9d7a72c71611dc736cc1067e17e47727bf21be1fe3604af",
+      "captures": [
+        {
+          "bytes": 1101,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/example-panorama-quality_20260710_093837/manifest.json",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/example-panorama-quality_20260710_093837/manifest.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "9d6efe0db6511ed3a9d7a72c71611dc736cc1067e17e47727bf21be1fe3604af"
+        }
+      ]
+    },
+    {
+      "sha256": "a06e05e265c6635e32557287e3e761bc553d9adf091a98fd03598d044d86c8ad",
+      "captures": [
+        {
+          "bytes": 2875,
+          "family": "20260712_005716_569644",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260712_005716_569644/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260712_005716_569644/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "a06e05e265c6635e32557287e3e761bc553d9adf091a98fd03598d044d86c8ad"
+        }
+      ]
+    },
+    {
+      "sha256": "a0d60ee94080b5c3a7ebc71236e158d367cb85cade6d5a3f157d9fafa631e746",
+      "captures": [
+        {
+          "bytes": 5347,
+          "family": "bp31-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/ladder-curve-stream-crf.json",
+          "retained": "records/experiments/saved-reports/outputs/bp31-ladder/ladder-curve-stream-crf.json",
+          "scope": "exact targeted report read",
+          "sha256": "a0d60ee94080b5c3a7ebc71236e158d367cb85cade6d5a3f157d9fafa631e746"
+        }
+      ]
+    },
+    {
+      "sha256": "a1795348bcf4e7ca26b278cc6b53ffedbc24af2f1b41026a0f8e999a8d783af8",
+      "captures": [
+        {
+          "bytes": 5347,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-05/alcaraz_highlights_scene_010/sam31_worker_config.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-05/alcaraz_highlights_scene_010/sam31_worker_config.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "a1795348bcf4e7ca26b278cc6b53ffedbc24af2f1b41026a0f8e999a8d783af8"
+        }
+      ]
+    },
+    {
+      "sha256": "a2184865e403a0710c8e07d06c3d1de21869b69892d19c1b380ce769431796c3",
+      "captures": [
+        {
+          "bytes": 3694,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sinner-alcaraz-scene002-first16-transport-smoke-run1/smoke-result.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sinner-alcaraz-scene002-first16-transport-smoke-run1/smoke-result.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "a2184865e403a0710c8e07d06c3d1de21869b69892d19c1b380ce769431796c3"
+        }
+      ]
+    },
+    {
+      "sha256": "a23d20f75516a5ffb520eed0de1259c278505d6a6503d83c4eccc4ece82400e1",
+      "captures": [
+        {
+          "bytes": 2634,
+          "family": "20260710_133850_259669",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_133850_259669/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_133850_259669/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "a23d20f75516a5ffb520eed0de1259c278505d6a6503d83c4eccc4ece82400e1"
+        }
+      ]
+    },
+    {
+      "sha256": "a265893a96aeb95b36a88ec3d7f5a4c64daa1743d27e8a08dbc94ae4f53904bb",
+      "captures": [
+        {
+          "bytes": 223,
+          "family": "journal-20260926",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260926/sam31-racket-prompt-smoke16-run1/status.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260926/sam31-racket-prompt-smoke16-run1/status.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "a265893a96aeb95b36a88ec3d7f5a4c64daa1743d27e8a08dbc94ae4f53904bb"
+        }
+      ]
+    },
+    {
+      "sha256": "a2a1af3ac9add42f420425f546a6a8cb7b0d91caf461afd5ab94516be77ac4d4",
+      "captures": [
+        {
+          "bytes": 1286,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/example-panorama-quality_20260710_001315/report.json",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/example-panorama-quality_20260710_001315/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "a2a1af3ac9add42f420425f546a6a8cb7b0d91caf461afd5ab94516be77ac4d4"
+        }
+      ]
+    },
+    {
+      "sha256": "a50fea9a0455d2e2adbfe14cb264ec59fadc3b2951314cd7e1f3259994dc6425",
+      "captures": [
+        {
+          "bytes": 1158,
+          "family": "gate-b-confirmation",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/gate-b-confirmation/clips/bp57_usopen2023_gauff_sabalenka/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/gate-b-confirmation/clips/bp57_usopen2023_gauff_sabalenka/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "a50fea9a0455d2e2adbfe14cb264ec59fadc3b2951314cd7e1f3259994dc6425"
+        }
+      ]
+    },
+    {
+      "sha256": "a57095dd934aa8d4ee9ed1391324572d9b7b10304b1448cc5c117d506b76b9c8",
+      "captures": [
+        {
+          "bytes": 3225,
+          "family": "journal-20260924",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260924/je01/metric-readiness.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260924/je01/metric-readiness.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "a57095dd934aa8d4ee9ed1391324572d9b7b10304b1448cc5c117d506b76b9c8"
+        }
+      ]
+    },
+    {
+      "sha256": "a65ece8b0a1a520acacc2a484507a4aa2d4a6e267db23963afaef07d7c4481d1",
+      "captures": [
+        {
+          "bytes": 144,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run1/policy.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run1/policy.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "a65ece8b0a1a520acacc2a484507a4aa2d4a6e267db23963afaef07d7c4481d1"
+        }
+      ]
+    },
+    {
+      "sha256": "a68afbe865f22c1527938c10e00cabe30a169654acd2d382e2dd784766debefe",
+      "captures": [
+        {
+          "bytes": 2808,
+          "family": "20260709_141414_625083",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260709_141414_625083/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260709_141414_625083/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "a68afbe865f22c1527938c10e00cabe30a169654acd2d382e2dd784766debefe"
+        }
+      ]
+    },
+    {
+      "sha256": "a970223751db37374043c84202b27f8f23001b829ffe012eaedcf79f962807b7",
+      "captures": [
+        {
+          "bytes": 3098,
+          "family": "evaluation-20260914",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "a970223751db37374043c84202b27f8f23001b829ffe012eaedcf79f962807b7"
+        }
+      ]
+    },
+    {
+      "sha256": "a995f24cdcdfe2de8ce1461e5cb13f099b1951c7aab1d8412ab4815e7d159a65",
+      "captures": [
+        {
+          "bytes": 2887,
+          "family": "20260711_233142_535554",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260711_233142_535554/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260711_233142_535554/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "a995f24cdcdfe2de8ce1461e5cb13f099b1951c7aab1d8412ab4815e7d159a65"
+        }
+      ]
+    },
+    {
+      "sha256": "abe81c336f285225f36788b85e8c4c6f96a68ac24092f4070be0e6e515447375",
+      "captures": [
+        {
+          "bytes": 16916,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-05/preflight.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-05/preflight.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "abe81c336f285225f36788b85e8c4c6f96a68ac24092f4070be0e6e515447375"
+        }
+      ]
+    },
+    {
+      "sha256": "ac47b4c381a8f0419683aea04e435200e87669faf19f23891f7e45bb218c6c6d",
+      "captures": [
+        {
+          "bytes": 966,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/example-panorama-quality_20260710_001315/report.md",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/example-panorama-quality_20260710_001315/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "ac47b4c381a8f0419683aea04e435200e87669faf19f23891f7e45bb218c6c6d"
+        }
+      ]
+    },
+    {
+      "sha256": "ac4dfa2ac56c3a3d48c33ae19c955f9550b7201584b8b222849cf6d93035a988",
+      "captures": [
+        {
+          "bytes": 1443,
+          "family": "bp24-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp24-ladder/plate-register.json",
+          "retained": "records/experiments/saved-reports/outputs/bp24-ladder/plate-register.json",
+          "scope": "exact targeted report read",
+          "sha256": "ac4dfa2ac56c3a3d48c33ae19c955f9550b7201584b8b222849cf6d93035a988"
+        }
+      ]
+    },
+    {
+      "sha256": "ac77da7ea5de49d1404bf115c642c5c294a76b6430f081bef51011d04f011126",
+      "captures": [
+        {
+          "bytes": 2792,
+          "family": "20260710_221738_093060",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_221738_093060/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_221738_093060/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "ac77da7ea5de49d1404bf115c642c5c294a76b6430f081bef51011d04f011126"
+        }
+      ]
+    },
+    {
+      "sha256": "ac89abc8b49c4c68906932a8095b7c422180660063d57b59f2a31ed3fb939a99",
+      "captures": [
+        {
+          "bytes": 2689,
+          "family": "20260629_102126_823233",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260629_102126_823233/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260629_102126_823233/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "ac89abc8b49c4c68906932a8095b7c422180660063d57b59f2a31ed3fb939a99"
+        }
+      ]
+    },
+    {
+      "sha256": "aef2295977de2088fd99412457cbea8a147db2d055c54cfd2faa22d24073008e",
+      "captures": [
+        {
+          "bytes": 19150,
+          "family": "bp23-tier",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp23-tier/report.json",
+          "retained": "workers/server/outputs/selected_reports/bp23-tier/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "aef2295977de2088fd99412457cbea8a147db2d055c54cfd2faa22d24073008e"
+        }
+      ]
+    },
+    {
+      "sha256": "afb13426787a258bbaa6eb63ad12bc0995b995e5884f6fa35aaf6011faa45c20",
+      "captures": [
+        {
+          "bytes": 9879,
+          "family": "bp25-ip-adapter",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp25-ip-adapter/report.json",
+          "retained": "workers/server/outputs/selected_reports/bp25-ip-adapter/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "afb13426787a258bbaa6eb63ad12bc0995b995e5884f6fa35aaf6011faa45c20"
+        }
+      ]
+    },
+    {
+      "sha256": "b0ab53c1b599c4fadee3c37dc17c64235cfd466b04c5bcbb2eb1b1232a1c30a4",
+      "captures": [
+        {
+          "bytes": 1398,
+          "family": "bp31-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/canvas-growth-by-span.json",
+          "retained": "records/experiments/saved-reports/outputs/bp31-ladder/canvas-growth-by-span.json",
+          "scope": "exact targeted report read",
+          "sha256": "b0ab53c1b599c4fadee3c37dc17c64235cfd466b04c5bcbb2eb1b1232a1c30a4"
+        }
+      ]
+    },
+    {
+      "sha256": "b13d517a285fc50dc3452f02a5d20de52763cf17ea059cab372f4f833dcbbf1a",
+      "captures": [
+        {
+          "bytes": 2233,
+          "family": "bp44-canonical-canvas",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp44-canonical-canvas/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp44-canonical-canvas/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "b13d517a285fc50dc3452f02a5d20de52763cf17ea059cab372f4f833dcbbf1a"
+        }
+      ]
+    },
+    {
+      "sha256": "b149e8a2635369e8efafc386010a691fd09489a7ace82db3d846336fa33f67af",
+      "captures": [
+        {
+          "bytes": 823,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run1/failure.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run1/failure.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "b149e8a2635369e8efafc386010a691fd09489a7ace82db3d846336fa33f67af"
+        }
+      ]
+    },
+    {
+      "sha256": "b166198e48172a3cabbae665ec38fef48bf668d77a08f93eba773bba352f5a49",
+      "captures": [
+        {
+          "bytes": 799,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/wave2-background-probe/summary_table.md",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/wave2-background-probe/summary_table.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "b166198e48172a3cabbae665ec38fef48bf668d77a08f93eba773bba352f5a49"
+        }
+      ]
+    },
+    {
+      "sha256": "b1854a955f505b068a392591206f8880f0ea1842b58eef798217382068f4e7ac",
+      "captures": [
+        {
+          "bytes": 1637,
+          "family": "20260611_064030_257190",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_064030_257190/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260611_064030_257190/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "b1854a955f505b068a392591206f8880f0ea1842b58eef798217382068f4e7ac"
+        }
+      ]
+    },
+    {
+      "sha256": "b1fee90306c338abd61d983bb9ab338c7fb2e40c6739a2c24996b23cd34631dd",
+      "captures": [
+        {
+          "bytes": 2830,
+          "family": "bp24-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp24-ladder/plate-probe.json",
+          "retained": "records/experiments/saved-reports/outputs/bp24-ladder/plate-probe.json",
+          "scope": "exact targeted report read",
+          "sha256": "b1fee90306c338abd61d983bb9ab338c7fb2e40c6739a2c24996b23cd34631dd"
+        }
+      ]
+    },
+    {
+      "sha256": "b33ba461da94f1c2a114364e95d202cf041b9cb37c3d93419ebf71571c7adefc",
+      "captures": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/standalone_decode_report.json",
+          "family": "evaluation-20260914",
+          "retained": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/standalone_decode_report.json",
+          "sha256": "b33ba461da94f1c2a114364e95d202cf041b9cb37c3d93419ebf71571c7adefc",
+          "bytes": 3687,
+          "scope": "exact targeted original report; direct modern campaign card"
+        }
+      ]
+    },
+    {
+      "sha256": "b390495208fc7b054aee830283da9b31e2dfd1d7018e57ceda4075e03088dd26",
+      "captures": [
+        {
+          "bytes": 2267,
+          "family": "bp19-conditioning",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp19-conditioning/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp19-conditioning/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "b390495208fc7b054aee830283da9b31e2dfd1d7018e57ceda4075e03088dd26"
+        }
+      ]
+    },
+    {
+      "sha256": "b6f8b8463c73f7d3a54a918b677bdb5b1e18ae7cf789490c900e023fa1d21240",
+      "captures": [
+        {
+          "bytes": 176353,
+          "family": "bp21-headroom",
+          "original": "coordinator capture; canonical original in coordinator-arithmetic.json",
+          "retained": "workers/coordinator/bp21-report.json",
+          "scope": "coordinator saved report arithmetic; campaign audit",
+          "sha256": "b6f8b8463c73f7d3a54a918b677bdb5b1e18ae7cf789490c900e023fa1d21240"
+        }
+      ]
+    },
+    {
+      "sha256": "b72ca4b5697ce6a3c4495dcf7e5f981d4811706dd494114ef28297a13f6fe9e0",
+      "captures": [
+        {
+          "bytes": 464,
+          "family": "modular",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/modular/object-foreground-campaign/job/request.json",
+          "retained": "workers/server/outputs/selected_reports/modular/object-foreground-campaign/job/request.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "b72ca4b5697ce6a3c4495dcf7e5f981d4811706dd494114ef28297a13f6fe9e0"
+        }
+      ]
+    },
+    {
+      "sha256": "b79b25ddbef96681ad9d1ef3e971181bb1011ff68d61effd8838a6a4461c3fd1",
+      "captures": [
+        {
+          "bytes": 5530,
+          "family": "bp31-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/ladder-curve-panorama-full.json",
+          "retained": "records/experiments/saved-reports/outputs/bp31-ladder/ladder-curve-panorama-full.json",
+          "scope": "exact targeted report read",
+          "sha256": "b79b25ddbef96681ad9d1ef3e971181bb1011ff68d61effd8838a6a4461c3fd1"
+        }
+      ]
+    },
+    {
+      "sha256": "b7f745a5b4d03e60f7b6ddec9094e685026caf53911a2c2de8b14a06bc7aca9d",
+      "captures": [
+        {
+          "bytes": 1048,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-dynamic-thresholding_20260710_221518/report.md",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-dynamic-thresholding_20260710_221518/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "b7f745a5b4d03e60f7b6ddec9094e685026caf53911a2c2de8b14a06bc7aca9d"
+        }
+      ]
+    },
+    {
+      "sha256": "b7fdf084dffd2b779dbb91101678ccd5effa335f821046e9bcd30ba559296441",
+      "captures": [
+        {
+          "bytes": 10260,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/mask-screen/sinner-alcaraz002-yolo26x-cpu-retry1/protocol.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/mask-screen/sinner-alcaraz002-yolo26x-cpu-retry1/protocol.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "b7fdf084dffd2b779dbb91101678ccd5effa335f821046e9bcd30ba559296441"
+        }
+      ]
+    },
+    {
+      "sha256": "b8fffa79afe3184059b8b928afbdf6c7810fa59eb561f0d1d576481708b31b06",
+      "captures": [
+        {
+          "bytes": 885,
+          "family": "hnerv_smoke",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/hnerv_smoke/20260712_234340/report.json",
+          "retained": "workers/server/outputs/selected_reports/hnerv_smoke/20260712_234340/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "b8fffa79afe3184059b8b928afbdf6c7810fa59eb561f0d1d576481708b31b06"
+        }
+      ]
+    },
+    {
+      "sha256": "b9458a6bbf75b3e962baf464597a96a8e382632ef95cf8e0500a7ab51d157a57",
+      "captures": [
+        {
+          "bytes": 20578,
+          "family": "bp19-multi-controlnet",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp19-multi-controlnet/summary.json",
+          "retained": "workers/server/outputs/selected_reports/bp19-multi-controlnet/summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "b9458a6bbf75b3e962baf464597a96a8e382632ef95cf8e0500a7ab51d157a57"
+        }
+      ]
+    },
+    {
+      "sha256": "b956ecfc006342318f240a526e9b8caf36b22dc02ae94be0cb2fc5b2e647c5ea",
+      "captures": [
+        {
+          "bytes": 4375,
+          "family": "bp24-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp24-ladder/plate-interframe.json",
+          "retained": "records/experiments/saved-reports/outputs/bp24-ladder/plate-interframe.json",
+          "scope": "exact targeted report read",
+          "sha256": "b956ecfc006342318f240a526e9b8caf36b22dc02ae94be0cb2fc5b2e647c5ea"
+        }
+      ]
+    },
+    {
+      "sha256": "bc37be1c12f007639a841a8e147639015a82bd7337bcc12f182b17030451eaf6",
+      "captures": [
+        {
+          "bytes": 9735,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/mask-screen/sinner-alcaraz002-yolo26x-cpu-retry1/preregistered-protocol.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/mask-screen/sinner-alcaraz002-yolo26x-cpu-retry1/preregistered-protocol.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "bc37be1c12f007639a841a8e147639015a82bd7337bcc12f182b17030451eaf6"
+        }
+      ]
+    },
+    {
+      "sha256": "bc86d7e66e75546ba593d88c9f1ded16972bb36e381e33d577b3f4819f950fe8",
+      "captures": [
+        {
+          "bytes": 16916,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-01/preflight.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-01/preflight.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "bc86d7e66e75546ba593d88c9f1ded16972bb36e381e33d577b3f4819f950fe8"
+        }
+      ]
+    },
+    {
+      "sha256": "bd1dba969e0037cc4218d52a8cfff548def4e56162aa35d5ffaa6e364b4bbc4e",
+      "captures": [
+        {
+          "bytes": 7337,
+          "family": "journal-20260924",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260924/je05/alcaraz000-decomposition.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260924/je05/alcaraz000-decomposition.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "bd1dba969e0037cc4218d52a8cfff548def4e56162aa35d5ffaa6e364b4bbc4e"
+        }
+      ]
+    },
+    {
+      "sha256": "bfb216519cb40f65e9b8d57313bd4c748c7179d9d4356b786578601ec253b6cf",
+      "captures": [
+        {
+          "bytes": 5362,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-02/alcaraz_highlights_scene_000/sam31_worker_config.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-02/alcaraz_highlights_scene_000/sam31_worker_config.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "bfb216519cb40f65e9b8d57313bd4c748c7179d9d4356b786578601ec253b6cf"
+        }
+      ]
+    },
+    {
+      "sha256": "c081baface1073ab59ad619320fad0173480043a69aca5531121d54c6abac740",
+      "captures": [
+        {
+          "bytes": 2723,
+          "family": "20260708_100957_830172",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260708_100957_830172/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260708_100957_830172/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "c081baface1073ab59ad619320fad0173480043a69aca5531121d54c6abac740"
+        }
+      ]
+    },
+    {
+      "sha256": "c09f79274e084be6c4f34364b63399376fc8487ca1d4f6371866ed96d824ae50",
+      "captures": [
+        {
+          "bytes": 21707,
+          "family": "bp24-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp24-ladder/roster-payload-lowmotion.json",
+          "retained": "records/experiments/saved-reports/outputs/bp24-ladder/roster-payload-lowmotion.json",
+          "scope": "exact targeted report read",
+          "sha256": "c09f79274e084be6c4f34364b63399376fc8487ca1d4f6371866ed96d824ae50"
+        }
+      ]
+    },
+    {
+      "sha256": "c12b490085cb197ddcb26eabbd36e4ded846446418fe7d15d47dacda7851f3b7",
+      "captures": [
+        {
+          "bytes": 7270,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/wave2-background-probe/probe_report.json",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/wave2-background-probe/probe_report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "c12b490085cb197ddcb26eabbd36e4ded846446418fe7d15d47dacda7851f3b7"
+        }
+      ]
+    },
+    {
+      "sha256": "c1d5068de845d3a70e9541f145f9e907c7709f36587cd1232f10222379af978d",
+      "captures": [
+        {
+          "bytes": 576,
+          "family": "bp31-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/probe-lever-exclusivity.json",
+          "retained": "records/experiments/saved-reports/outputs/bp31-ladder/probe-lever-exclusivity.json",
+          "scope": "exact targeted report read",
+          "sha256": "c1d5068de845d3a70e9541f145f9e907c7709f36587cd1232f10222379af978d"
+        }
+      ]
+    },
+    {
+      "sha256": "c37e2e79770ab96bff2a68cdd150db47f8fea1a3551fc1dd90762a21018825fe",
+      "captures": [
+        {
+          "bytes": 29817,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-05/alcaraz_highlights_scene_000/sam31_result.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-05/alcaraz_highlights_scene_000/sam31_result.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "c37e2e79770ab96bff2a68cdd150db47f8fea1a3551fc1dd90762a21018825fe"
+        }
+      ]
+    },
+    {
+      "sha256": "c4ead44b0ffc34d62f6557564d2e4269c211bd29ffd1a23db45b64173751bc1a",
+      "captures": [
+        {
+          "bytes": 2817,
+          "family": "journal-20260924",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260924/je11/consecutive-points-amortization.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260924/je11/consecutive-points-amortization.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "c4ead44b0ffc34d62f6557564d2e4269c211bd29ffd1a23db45b64173751bc1a"
+        }
+      ]
+    },
+    {
+      "sha256": "c4fdf515729ba9247146c93ca5eedbeba591db89a8a75a20b77da1211940931b",
+      "captures": [
+        {
+          "bytes": 915,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/mask-screen/yolo26n-seg-alcaraz000-window48/request.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/mask-screen/yolo26n-seg-alcaraz000-window48/request.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "c4fdf515729ba9247146c93ca5eedbeba591db89a8a75a20b77da1211940931b"
+        }
+      ]
+    },
+    {
+      "sha256": "c5baa95dfadd2784bb6405c98145fe89fb23db4556bbe21acdbbead79545d7d7",
+      "captures": [
+        {
+          "bytes": 3945,
+          "family": "bp49-native-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp49-native-recovery/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp49-native-recovery/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "c5baa95dfadd2784bb6405c98145fe89fb23db4556bbe21acdbbead79545d7d7"
+        }
+      ]
+    },
+    {
+      "sha256": "c6a9df0052a3a8c95f1b96f1fd23cbbc0d639fcbae07d496209171c9ff1db299",
+      "captures": [
+        {
+          "bytes": 3253,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-residual-compression_20260712_003235/manifest.json",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-residual-compression_20260712_003235/manifest.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "c6a9df0052a3a8c95f1b96f1fd23cbbc0d639fcbae07d496209171c9ff1db299"
+        }
+      ]
+    },
+    {
+      "sha256": "c7d64eb3ad057827c28faf1c554e08c117747b3ebb1629655653c4f2a824093e",
+      "captures": [
+        {
+          "bytes": 5364,
+          "family": "bp31-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/span-sweep-alcaraz_highlights.json",
+          "retained": "records/experiments/saved-reports/outputs/bp31-ladder/span-sweep-alcaraz_highlights.json",
+          "scope": "exact targeted report read",
+          "sha256": "c7d64eb3ad057827c28faf1c554e08c117747b3ebb1629655653c4f2a824093e"
+        }
+      ]
+    },
+    {
+      "sha256": "c80d688920b96e5a7c0de9960f7788c2cc9038a4a4ce255bc41fc0250fc41275",
+      "captures": [
+        {
+          "bytes": 723,
+          "family": "modular",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/modular/object-foreground-campaign/batch-summary.json",
+          "retained": "workers/server/outputs/selected_reports/modular/object-foreground-campaign/batch-summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "c80d688920b96e5a7c0de9960f7788c2cc9038a4a4ce255bc41fc0250fc41275"
+        }
+      ]
+    },
+    {
+      "sha256": "c82943c679e5bb2b9461ce49308a1df0f8182631745c14985d191320c9720c05",
+      "captures": [
+        {
+          "bytes": 3641,
+          "family": "bp24-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp24-ladder/smoke.json",
+          "retained": "records/experiments/saved-reports/outputs/bp24-ladder/smoke.json",
+          "scope": "exact targeted report read",
+          "sha256": "c82943c679e5bb2b9461ce49308a1df0f8182631745c14985d191320c9720c05"
+        }
+      ]
+    },
+    {
+      "sha256": "c942abeaadf9e375eec167755dda43976f6b6817c33f3e36ae090642ecbd7bae",
+      "captures": [
+        {
+          "bytes": 2787,
+          "family": "20260710_151054_636710",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_151054_636710/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_151054_636710/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "c942abeaadf9e375eec167755dda43976f6b6817c33f3e36ae090642ecbd7bae"
+        }
+      ]
+    },
+    {
+      "sha256": "c9857bc135d3c396a90438ba499673e704be10ab4a694b074a1dd594a6054417",
+      "captures": [
+        {
+          "bytes": 2627,
+          "family": "20260710_124449_288300",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_124449_288300/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_124449_288300/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "c9857bc135d3c396a90438ba499673e704be10ab4a694b074a1dd594a6054417"
+        }
+      ]
+    },
+    {
+      "sha256": "c9b268b4373a25bb198fe590a6cbff1543c434821ac6cab615cebc333a045a4a",
+      "captures": [
+        {
+          "bytes": 16627,
+          "family": "bp12-baselines",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp12-baselines/summary.json",
+          "retained": "workers/server/outputs/selected_reports/bp12-baselines/summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "c9b268b4373a25bb198fe590a6cbff1543c434821ac6cab615cebc333a045a4a"
+        }
+      ]
+    },
+    {
+      "sha256": "c9e1bb82ff3b6827baf8db610dd5ba94e0a40085835df0a77ca7aa7af150838c",
+      "captures": [
+        {
+          "bytes": 144,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/mask-screen/yolo26n-seg-alcaraz000-window48/policy.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/mask-screen/yolo26n-seg-alcaraz000-window48/policy.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "c9e1bb82ff3b6827baf8db610dd5ba94e0a40085835df0a77ca7aa7af150838c"
+        }
+      ]
+    },
+    {
+      "sha256": "cbe034864cc004cb8b39ca5dc8785c0faa30e3d6c1e31d8e6db5d541f422008c",
+      "captures": [
+        {
+          "bytes": 145,
+          "family": "journal-20260926",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260926/sam31-racket-prompt-smoke16-run1/policy.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260926/sam31-racket-prompt-smoke16-run1/policy.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "cbe034864cc004cb8b39ca5dc8785c0faa30e3d6c1e31d8e6db5d541f422008c"
+        }
+      ]
+    },
+    {
+      "sha256": "cc5f2ac5fbc60cc9c947937aa19ee42ebabc5541ee838907898ec90b9f5d5215",
+      "captures": [
+        {
+          "bytes": 2517,
+          "family": "bp24-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp24-ladder/motion-survey.json",
+          "retained": "records/experiments/saved-reports/outputs/bp24-ladder/motion-survey.json",
+          "scope": "exact targeted report read",
+          "sha256": "cc5f2ac5fbc60cc9c947937aa19ee42ebabc5541ee838907898ec90b9f5d5215"
+        }
+      ]
+    },
+    {
+      "sha256": "ccf5694aa6a90c248d1caba380ef73b2acaae05472684525fa6026f462b240b9",
+      "captures": [
+        {
+          "bytes": 743,
+          "family": "hnerv_wrc_phase1",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/hnerv_wrc_phase1/budget_0.9M/20260713_123308/report.md",
+          "retained": "workers/server/outputs/selected_reports/hnerv_wrc_phase1/budget_0.9M/20260713_123308/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "ccf5694aa6a90c248d1caba380ef73b2acaae05472684525fa6026f462b240b9"
+        }
+      ]
+    },
+    {
+      "sha256": "cd85d192834339d0fe10b169483041f44d90da89783f85334a0696091858924c",
+      "captures": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/retry_and_provenance_ledger.json",
+          "family": "evaluation-20260914",
+          "retained": "records/experiments/saved-reports/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/retry_and_provenance_ledger.json",
+          "sha256": "cd85d192834339d0fe10b169483041f44d90da89783f85334a0696091858924c",
+          "bytes": 5023,
+          "scope": "exact targeted original report; direct modern campaign card"
+        }
+      ]
+    },
+    {
+      "sha256": "cf9e214099e11b513e831e548b538ed509974d55c56ecfa47367d9c4a7e579ad",
+      "captures": [
+        {
+          "bytes": 7879,
+          "family": "bp24-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp24-ladder/av1-payload-highmotion.json",
+          "retained": "records/experiments/saved-reports/outputs/bp24-ladder/av1-payload-highmotion.json",
+          "scope": "exact targeted report read",
+          "sha256": "cf9e214099e11b513e831e548b538ed509974d55c56ecfa47367d9c4a7e579ad"
+        }
+      ]
+    },
+    {
+      "sha256": "d0482d2e8f63e6a60fa32b74148f445f0aa0883095bd4021c8e152976c4b46d8",
+      "captures": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/evidence_completion_report.json",
+          "family": "evaluation-20260914",
+          "retained": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/evidence_completion_report.json",
+          "sha256": "d0482d2e8f63e6a60fa32b74148f445f0aa0883095bd4021c8e152976c4b46d8",
+          "bytes": 6989,
+          "scope": "exact targeted original report; direct modern campaign card"
+        }
+      ]
+    },
+    {
+      "sha256": "d04d0fe223c30109b03ec9ce1a645147166d9fbc2e81a0220850f161673619fb",
+      "captures": [
+        {
+          "bytes": 33311,
+          "family": "bp20-headroom",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp20-headroom/report.json",
+          "retained": "workers/server/outputs/selected_reports/bp20-headroom/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "d04d0fe223c30109b03ec9ce1a645147166d9fbc2e81a0220850f161673619fb"
+        }
+      ]
+    },
+    {
+      "sha256": "d4a507aa2230f877c2ccb1a446abdfd4cca4bf66a3ac61319e62906529b49d0e",
+      "captures": [
+        {
+          "bytes": 6612,
+          "family": "bp31-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp31-ladder/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "d4a507aa2230f877c2ccb1a446abdfd4cca4bf66a3ac61319e62906529b49d0e"
+        },
+        {
+          "bytes": 6612,
+          "family": "bp31-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/bounds-before-run.json",
+          "retained": "records/experiments/saved-reports/outputs/bp31-ladder/bounds-before-run.json",
+          "scope": "exact targeted report read",
+          "sha256": "d4a507aa2230f877c2ccb1a446abdfd4cca4bf66a3ac61319e62906529b49d0e"
+        }
+      ]
+    },
+    {
+      "sha256": "d5d45a06eba58e9302cf966f1d874e042430593dd496835cf1e21131e264f0cd",
+      "captures": [
+        {
+          "bytes": 5362,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-05/alcaraz_highlights_scene_000/sam31_worker_config.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-05/alcaraz_highlights_scene_000/sam31_worker_config.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "d5d45a06eba58e9302cf966f1d874e042430593dd496835cf1e21131e264f0cd"
+        }
+      ]
+    },
+    {
+      "sha256": "d7af52b2208f441155a7512649961aae2fab81b8c1da3b943639c2c18a77bb4c",
+      "captures": [
+        {
+          "bytes": 2168,
+          "family": "bp30-background",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp30-background/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp30-background/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "d7af52b2208f441155a7512649961aae2fab81b8c1da3b943639c2c18a77bb4c"
+        }
+      ]
+    },
+    {
+      "sha256": "d804d1ab285acfc874cc0758b256f859f40fadc4c5ca89bcff2cf6b55e1bca5c",
+      "captures": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/audit-20260916-lossless-pack/audit_report.json",
+          "family": "evaluation-20260914",
+          "retained": "records/experiments/saved-reports/outputs/evaluation-20260914/e06/audit-20260916-lossless-pack/audit_report.json",
+          "sha256": "d804d1ab285acfc874cc0758b256f859f40fadc4c5ca89bcff2cf6b55e1bca5c",
+          "bytes": 65269,
+          "scope": "exact targeted original report; direct modern campaign card"
+        }
+      ]
+    },
+    {
+      "sha256": "d88a9319908bb487dafd1b603ee5ab46eeadc30c6127c0f7a4831118279b1004",
+      "captures": [
+        {
+          "bytes": 3874,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-residual-compression_20260712_003235/report.json",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-residual-compression_20260712_003235/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "d88a9319908bb487dafd1b603ee5ab46eeadc30c6127c0f7a4831118279b1004"
+        }
+      ]
+    },
+    {
+      "sha256": "d8d55df04ab8fd8b1f5b54318d8009989f8e563537803037010b2b29b23a1de1",
+      "captures": [
+        {
+          "bytes": 2786,
+          "family": "20260710_201524_487050",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_201524_487050/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_201524_487050/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "d8d55df04ab8fd8b1f5b54318d8009989f8e563537803037010b2b29b23a1de1"
+        }
+      ]
+    },
+    {
+      "sha256": "d8eee3c14e73da1949f96232ba509e3e46d520c7a818093a5e3e92ffb547ff50",
+      "captures": [
+        {
+          "bytes": 1353,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-residual-compression_20260712_003235/report.md",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-residual-compression_20260712_003235/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "d8eee3c14e73da1949f96232ba509e3e46d520c7a818093a5e3e92ffb547ff50"
+        }
+      ]
+    },
+    {
+      "sha256": "da140204c30481fd4f750cd28d813a7c54ba6a7e9c6aeb4ae7f82a60af296ad7",
+      "captures": [
+        {
+          "bytes": 743,
+          "family": "hnerv_wrc_phase1",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/hnerv_wrc_phase1/budget_0.4M/20260713_121150/report.md",
+          "retained": "workers/server/outputs/selected_reports/hnerv_wrc_phase1/budget_0.4M/20260713_121150/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "da140204c30481fd4f750cd28d813a7c54ba6a7e9c6aeb4ae7f82a60af296ad7"
+        }
+      ]
+    },
+    {
+      "sha256": "dd49fe887bd2ee3f2a7cde6a18815b9c5b072f9df67a8a32b068e20a015549a9",
+      "captures": [
+        {
+          "bytes": 2897,
+          "family": "20260711_223255_853536",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260711_223255_853536/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260711_223255_853536/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "dd49fe887bd2ee3f2a7cde6a18815b9c5b072f9df67a8a32b068e20a015549a9"
+        }
+      ]
+    },
+    {
+      "sha256": "dd9224bfe59f2fbce814566c04844a9c639494558a46af5dcaf0751b56f9107e",
+      "captures": [
+        {
+          "bytes": 5198,
+          "family": "modular",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/modular/measured-tennis/results.json",
+          "retained": "workers/server/outputs/selected_reports/modular/measured-tennis/results.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "dd9224bfe59f2fbce814566c04844a9c639494558a46af5dcaf0751b56f9107e"
+        },
+        {
+          "bytes": 5198,
+          "family": "modular",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/modular/measured-tennis/results.json",
+          "retained": "records/experiments/saved-reports/outputs/modular/measured-tennis/results.json",
+          "scope": "exact targeted report read",
+          "sha256": "dd9224bfe59f2fbce814566c04844a9c639494558a46af5dcaf0751b56f9107e"
+        }
+      ]
+    },
+    {
+      "sha256": "ddc3d40a400b688e391621fcaf1188d0a3ea6c4f21886f6cbef38eaa4d970681",
+      "captures": [
+        {
+          "bytes": 2719,
+          "family": "20260707_132855_342866",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260707_132855_342866/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260707_132855_342866/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "ddc3d40a400b688e391621fcaf1188d0a3ea6c4f21886f6cbef38eaa4d970681"
+        }
+      ]
+    },
+    {
+      "sha256": "de375ac96a2fa4a1b52debcf48b4c0efccb56c0bbdf8ee826b96e3fb5cbb511d",
+      "captures": [
+        {
+          "bytes": 2785,
+          "family": "20260710_211734_419673",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_211734_419673/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_211734_419673/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "de375ac96a2fa4a1b52debcf48b4c0efccb56c0bbdf8ee826b96e3fb5cbb511d"
+        }
+      ]
+    },
+    {
+      "sha256": "df3da27ab3fbdd7059a977eb0f17e980fec6b43069c988eeb40caf018413ca0d",
+      "captures": [
+        {
+          "bytes": 1364,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/wave2-overlap-20260910/experiment-identity.json",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/wave2-overlap-20260910/experiment-identity.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "df3da27ab3fbdd7059a977eb0f17e980fec6b43069c988eeb40caf018413ca0d"
+        }
+      ]
+    },
+    {
+      "sha256": "dfd206d391e8113ec04db07a481427a7dc4a4cbaacfa0bcdee6bd47b802bed63",
+      "captures": [
+        {
+          "bytes": 8319,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run2/run-manifest.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run2/run-manifest.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "dfd206d391e8113ec04db07a481427a7dc4a4cbaacfa0bcdee6bd47b802bed63"
+        }
+      ]
+    },
+    {
+      "sha256": "e005dd7261bd4f24c2a5e9244962bbaf823f57a7f5ede6b0c0007f8f7a8e7bce",
+      "captures": [
+        {
+          "bytes": 2875,
+          "family": "20260711_235921_644810",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260711_235921_644810/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260711_235921_644810/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "e005dd7261bd4f24c2a5e9244962bbaf823f57a7f5ede6b0c0007f8f7a8e7bce"
+        }
+      ]
+    },
+    {
+      "sha256": "e01447820e82efea8dd9941d58d6db4f2020bf79cb220b83d401744acaf8d88c",
+      "captures": [
+        {
+          "bytes": 158,
+          "family": "modular",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/modular/object-foreground-campaign/job/policy.json",
+          "retained": "workers/server/outputs/selected_reports/modular/object-foreground-campaign/job/policy.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "e01447820e82efea8dd9941d58d6db4f2020bf79cb220b83d401744acaf8d88c"
+        }
+      ]
+    },
+    {
+      "sha256": "e08557437c9391bb4fb4f3eb72cb433dd0f9b4566c37ad4bcef747cdc003acf2",
+      "captures": [
+        {
+          "bytes": 3328,
+          "family": "20260611_070758_903937",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_070758_903937/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260611_070758_903937/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "e08557437c9391bb4fb4f3eb72cb433dd0f9b4566c37ad4bcef747cdc003acf2"
+        }
+      ]
+    },
+    {
+      "sha256": "e08a09914a085e26416bda4ca12b8bcdce2a068246c782aa0b75424c47362400",
+      "captures": [
+        {
+          "bytes": 32509,
+          "family": "bp17-caption",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp17-caption/summary.json",
+          "retained": "workers/server/outputs/selected_reports/bp17-caption/summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "e08a09914a085e26416bda4ca12b8bcdce2a068246c782aa0b75424c47362400"
+        }
+      ]
+    },
+    {
+      "sha256": "e3931af123f63a0352f38c0143f151c432cc8866a9f7f6814b6423919d30bb0a",
+      "captures": [
+        {
+          "bytes": 812,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-racket-heuristics_20260710_141407/report.md",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-racket-heuristics_20260710_141407/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "e3931af123f63a0352f38c0143f151c432cc8866a9f7f6814b6423919d30bb0a"
+        }
+      ]
+    },
+    {
+      "sha256": "e4d1963cd1fb5b33d831589ce2e98106eb5586600b08314ca06e0e3fa711439f",
+      "captures": [
+        {
+          "bytes": 1635,
+          "family": "20260610_182152_465478",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260610_182152_465478/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260610_182152_465478/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "e4d1963cd1fb5b33d831589ce2e98106eb5586600b08314ca06e0e3fa711439f"
+        }
+      ]
+    },
+    {
+      "sha256": "e65ec04dedda40cdc472ace90fcce31e26b10218c15060097c6ca39f5010251d",
+      "captures": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-federer007/probe_report.json",
+          "family": "evaluation-20260914",
+          "retained": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-federer007/probe_report.json",
+          "sha256": "e65ec04dedda40cdc472ace90fcce31e26b10218c15060097c6ca39f5010251d",
+          "bytes": 37063,
+          "scope": "exact targeted original report; direct modern campaign card"
+        }
+      ]
+    },
+    {
+      "sha256": "e86a2969893106ac96969fcae43f01db60d5b94363ffaa25ad0977d0d3336e63",
+      "captures": [
+        {
+          "bytes": 32618,
+          "family": "bp29-panorama",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp29-panorama/report.json",
+          "retained": "workers/server/outputs/selected_reports/bp29-panorama/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "e86a2969893106ac96969fcae43f01db60d5b94363ffaa25ad0977d0d3336e63"
+        }
+      ]
+    },
+    {
+      "sha256": "e965c6de5ddbb4fd8d6413e10c8801bc713472fb92fad55a2d2ec62043082f6b",
+      "captures": [
+        {
+          "bytes": 469,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run1/request.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run1/request.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "e965c6de5ddbb4fd8d6413e10c8801bc713472fb92fad55a2d2ec62043082f6b"
+        }
+      ]
+    },
+    {
+      "sha256": "ed40e62e552789ad14a6b279af09e28ec4a56eb5fe61488e9bd2caaf4d33a1f8",
+      "captures": [
+        {
+          "bytes": 1605,
+          "family": "development-recovery",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/development-recovery/pilot-frozen/metric-calibration.json",
+          "retained": "workers/server/outputs/selected_reports/development-recovery/pilot-frozen/metric-calibration.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "ed40e62e552789ad14a6b279af09e28ec4a56eb5fe61488e9bd2caaf4d33a1f8"
+        }
+      ]
+    },
+    {
+      "sha256": "ed8a925aceb0ebc0ded36ebbdb5a929a4d73ae255ce8352a66f26db59f79ded8",
+      "captures": [
+        {
+          "bytes": 2868,
+          "family": "bp31-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/bounds-before-span-run.json",
+          "retained": "records/experiments/saved-reports/outputs/bp31-ladder/bounds-before-span-run.json",
+          "scope": "exact targeted report read",
+          "sha256": "ed8a925aceb0ebc0ded36ebbdb5a929a4d73ae255ce8352a66f26db59f79ded8"
+        }
+      ]
+    },
+    {
+      "sha256": "ee530ae50e4bbcf14aba0e5fad9d7952631604d3ed24980c41f3fea021499403",
+      "captures": [
+        {
+          "bytes": 904,
+          "family": "hnerv_vod_sweep_short",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/hnerv_vod_sweep_short/20260712_234755/report.json",
+          "retained": "workers/server/outputs/selected_reports/hnerv_vod_sweep_short/20260712_234755/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "ee530ae50e4bbcf14aba0e5fad9d7952631604d3ed24980c41f3fea021499403"
+        }
+      ]
+    },
+    {
+      "sha256": "ef32023618663063a5ce2aea1e634b996b4bc345354c142f32c81892a5117a89",
+      "captures": [
+        {
+          "bytes": 3098,
+          "family": "evaluation-20260914",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/bounds.json",
+          "retained": "workers/server/outputs/selected_reports/evaluation-20260914/e04a/run-20260916-evidence-completion/bounds.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "ef32023618663063a5ce2aea1e634b996b4bc345354c142f32c81892a5117a89"
+        }
+      ]
+    },
+    {
+      "sha256": "f18c59c417af4cf839174d976d3d29130b1c157e24da9e01ccf16e1fe64415cb",
+      "captures": [
+        {
+          "bytes": 2715,
+          "family": "20260708_093710_385853",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260708_093710_385853/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260708_093710_385853/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "f18c59c417af4cf839174d976d3d29130b1c157e24da9e01ccf16e1fe64415cb"
+        }
+      ]
+    },
+    {
+      "sha256": "f2358b348d9f33ed0692994485aed1b768519da477fef83851859959e5f6c3e5",
+      "captures": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/evidence_completion_report.json",
+          "family": "evaluation-20260914",
+          "retained": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/evidence_completion_report.json",
+          "sha256": "f2358b348d9f33ed0692994485aed1b768519da477fef83851859959e5f6c3e5",
+          "bytes": 4070,
+          "scope": "exact targeted original report; direct modern campaign card"
+        }
+      ]
+    },
+    {
+      "sha256": "f24af65dc64452c41b45b31bbc7f4997452a01999cddbf622ae761b9db7ebe3b",
+      "captures": [
+        {
+          "bytes": 2002,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-panorama-quality_20260710_164128/report.json",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-panorama-quality_20260710_164128/report.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "f24af65dc64452c41b45b31bbc7f4997452a01999cddbf622ae761b9db7ebe3b"
+        }
+      ]
+    },
+    {
+      "sha256": "f454fd01a6d34b421303a7415a18c271a1de7542bf1ab62a8cdfcd949c00e21f",
+      "captures": [
+        {
+          "bytes": 16916,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/preflight-20260927-lazy-registry.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/preflight-20260927-lazy-registry.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "f454fd01a6d34b421303a7415a18c271a1de7542bf1ab62a8cdfcd949c00e21f"
+        }
+      ]
+    },
+    {
+      "sha256": "f4a2b0be40742e4a80ddefdb46d3f055348309a9fef3bfd886f3d0c9ee90aabb",
+      "captures": [
+        {
+          "bytes": 342,
+          "family": "external-neural-bg-jobs",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/jobs/neural-bg/temporal-smokes/report.json",
+          "retained": "records/experiments/saved-reports/jobs/neural-bg/temporal-smokes/report.json",
+          "scope": "exact targeted report read",
+          "sha256": "f4a2b0be40742e4a80ddefdb46d3f055348309a9fef3bfd886f3d0c9ee90aabb"
+        }
+      ]
+    },
+    {
+      "sha256": "f4ce1926eaa51b36060e803e083b9898cb075ad28d51a4fd0c343add87910ecd",
+      "captures": [
+        {
+          "bytes": 825,
+          "family": "codec_baselines",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/codec_baselines/20260710_164414/report.md",
+          "retained": "workers/server/outputs/selected_reports/codec_baselines/20260710_164414/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "f4ce1926eaa51b36060e803e083b9898cb075ad28d51a4fd0c343add87910ecd"
+        }
+      ]
+    },
+    {
+      "sha256": "f52933ad5bb351991e3a6c3e80ac1c50bbc3efb45ba18b2b8f1c90ceb601405f",
+      "captures": [
+        {
+          "bytes": 1101,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/example-panorama-quality_20260710_001315/manifest.json",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/example-panorama-quality_20260710_001315/manifest.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "f52933ad5bb351991e3a6c3e80ac1c50bbc3efb45ba18b2b8f1c90ceb601405f"
+        }
+      ]
+    },
+    {
+      "sha256": "f56e5cb2a8c0239b4f3ecc007d164a403cb7512d8a6bd4ed1e625afdf7c8a425",
+      "captures": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e05/stage1_pilot/campaign_result.json",
+          "family": "evaluation-20260914",
+          "retained": "records/experiments/saved-reports/outputs/evaluation-20260914/e05/stage1_pilot/campaign_result.json",
+          "sha256": "f56e5cb2a8c0239b4f3ecc007d164a403cb7512d8a6bd4ed1e625afdf7c8a425",
+          "bytes": 24340,
+          "scope": "exact targeted original report; direct modern campaign card"
+        }
+      ]
+    },
+    {
+      "sha256": "f62ce9a555fd80a1aec4a1d57b3d16ac3f2759a6990b11366ccf57f763361bd3",
+      "captures": [
+        {
+          "bytes": 2773,
+          "family": "20260710_234603_892275",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_234603_892275/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260710_234603_892275/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "f62ce9a555fd80a1aec4a1d57b3d16ac3f2759a6990b11366ccf57f763361bd3"
+        }
+      ]
+    },
+    {
+      "sha256": "f6c808ed0f3ae71d1c80b720a710f104efb54f2c26d5df49b9863cf6241ea220",
+      "captures": [
+        {
+          "bytes": 2412,
+          "family": "bp21-headroom",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp21-headroom/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp21-headroom/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "f6c808ed0f3ae71d1c80b720a710f104efb54f2c26d5df49b9863cf6241ea220"
+        }
+      ]
+    },
+    {
+      "sha256": "f8aad89ed6732707bbbb2b66e7256a64d28a95e5f0eeb0e343aa54670f4b8130",
+      "captures": [
+        {
+          "bytes": 1843,
+          "family": "bp25-ip-adapter",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp25-ip-adapter/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp25-ip-adapter/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "f8aad89ed6732707bbbb2b66e7256a64d28a95e5f0eeb0e343aa54670f4b8130"
+        }
+      ]
+    },
+    {
+      "sha256": "f9a307d858f4ea56b238d20ef5b8565a2fb1d7a6d4dc8010473327d1e59ac32b",
+      "captures": [
+        {
+          "bytes": 16916,
+          "family": "sam31-unification",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-03/preflight.json",
+          "retained": "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-03/preflight.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "f9a307d858f4ea56b238d20ef5b8565a2fb1d7a6d4dc8010473327d1e59ac32b"
+        }
+      ]
+    },
+    {
+      "sha256": "faaf557cc7e4ee20b9e7eda90012390ce7d48cfa40d355b780f9a3b6ec8fcd36",
+      "captures": [
+        {
+          "bytes": 1243,
+          "family": "journal-20260924",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260924/je16/runtime-and-resources.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260924/je16/runtime-and-resources.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "faaf557cc7e4ee20b9e7eda90012390ce7d48cfa40d355b780f9a3b6ec8fcd36"
+        }
+      ]
+    },
+    {
+      "sha256": "fae37f65d14fd1f49eb0222fcd62be1dd89bd0d9b680aa77c5d8982a3f822d3a",
+      "captures": [
+        {
+          "bytes": 734,
+          "family": "hnerv_smoke",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/hnerv_smoke/20260712_234340/report.md",
+          "retained": "workers/server/outputs/selected_reports/hnerv_smoke/20260712_234340/report.md",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "fae37f65d14fd1f49eb0222fcd62be1dd89bd0d9b680aa77c5d8982a3f822d3a"
+        }
+      ]
+    },
+    {
+      "sha256": "fb11eba8a1840c6e749bcfdb2dd233c1defecf5cab491beb917e9f09904eac88",
+      "captures": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/e04b_derived_audit_report.json",
+          "family": "evaluation-20260914",
+          "retained": "records/experiments/saved-reports/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/e04b_derived_audit_report.json",
+          "sha256": "fb11eba8a1840c6e749bcfdb2dd233c1defecf5cab491beb917e9f09904eac88",
+          "bytes": 11330,
+          "scope": "exact targeted original report; direct modern campaign card"
+        }
+      ]
+    },
+    {
+      "sha256": "fb622097d375f07fef5405473abbb5eb026be9c4cfc2713e464df787bacfa0d6",
+      "captures": [
+        {
+          "bytes": 2707,
+          "family": "20260708_203613_869715",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260708_203613_869715/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260708_203613_869715/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "fb622097d375f07fef5405473abbb5eb026be9c4cfc2713e464df787bacfa0d6"
+        }
+      ]
+    },
+    {
+      "sha256": "fc0ea8efa7e41212c9daf186ecf69eeb5f542348a507b19b32a443274f9d4e76",
+      "captures": [
+        {
+          "bytes": 2715,
+          "family": "20260708_090746_135641",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260708_090746_135641/run_summary.json",
+          "retained": "workers/server/outputs/selected_reports/20260708_090746_135641/run_summary.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "fc0ea8efa7e41212c9daf186ecf69eeb5f542348a507b19b32a443274f9d4e76"
+        }
+      ]
+    },
+    {
+      "sha256": "fce6bfbe37bc09fdc1df00c32a47950192c7be8bb7c828290b95e531b36e568b",
+      "captures": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/campaign_result.e04a_derived.json",
+          "family": "evaluation-20260914",
+          "retained": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/campaign_result.e04a_derived.json",
+          "sha256": "fce6bfbe37bc09fdc1df00c32a47950192c7be8bb7c828290b95e531b36e568b",
+          "bytes": 11992,
+          "scope": "exact targeted original report; direct modern campaign card"
+        }
+      ]
+    },
+    {
+      "sha256": "fd32d66867fc7a10d4963099688004ca85a1d28f4b6a59ccb91cc6d1baeff709",
+      "captures": [
+        {
+          "bytes": 5174,
+          "family": "bp29-intra-sidecar",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp29-intra-sidecar/bounds-before-run.json",
+          "retained": "workers/server/outputs/selected_reports/bp29-intra-sidecar/bounds-before-run.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "fd32d66867fc7a10d4963099688004ca85a1d28f4b6a59ccb91cc6d1baeff709"
+        }
+      ]
+    },
+    {
+      "sha256": "fdce9465f0aaccbd0a4bcc8e44c5a0a21b38d9bb1a282f5626014ba38c5e191c",
+      "captures": [
+        {
+          "bytes": 4913,
+          "family": "bp31-ladder",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/bounds-before-codec-curves.json",
+          "retained": "records/experiments/saved-reports/outputs/bp31-ladder/bounds-before-codec-curves.json",
+          "scope": "exact targeted report read",
+          "sha256": "fdce9465f0aaccbd0a4bcc8e44c5a0a21b38d9bb1a282f5626014ba38c5e191c"
+        }
+      ]
+    },
+    {
+      "sha256": "fea34bd35da2252935566ea056938eaa5bdf992e31821f91ae50edecba5f6e72",
+      "captures": [
+        {
+          "bytes": 1177,
+          "family": "benchmarks",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/benchmarks/ablation-racket-heuristics_20260710_153843/manifest.json",
+          "retained": "workers/server/outputs/selected_reports/benchmarks/ablation-racket-heuristics_20260710_153843/manifest.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "fea34bd35da2252935566ea056938eaa5bdf992e31821f91ae50edecba5f6e72"
+        }
+      ]
+    },
+    {
+      "sha256": "fed49f1dc96f8c4939fa8fc16b3a0525ba4c6b80736313b0a52f82c61277c6ad",
+      "captures": [
+        {
+          "bytes": 27864,
+          "family": "journal-20260925",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/mask-screen/yolo26n-seg-alcaraz000-window48/screen-ledger.json",
+          "retained": "workers/server/outputs/selected_reports/journal-20260925/mask-screen/yolo26n-seg-alcaraz000-window48/screen-ledger.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "fed49f1dc96f8c4939fa8fc16b3a0525ba4c6b80736313b0a52f82c61277c6ad"
+        }
+      ]
+    },
+    {
+      "sha256": "ff812bff9d0555d212d9ce92422a9884bc6dec225d3415944e4bd09f72595736",
+      "captures": [
+        {
+          "bytes": 157,
+          "family": "modular",
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/modular/overnight-training-20260923/pix2pix-perricard002/policy.json",
+          "retained": "workers/server/outputs/selected_reports/modular/overnight-training-20260923/pix2pix-perricard002/policy.json",
+          "scope": "selected content; eligibility per campaign card, no native recertification",
+          "sha256": "ff812bff9d0555d212d9ce92422a9884bc6dec225d3415944e4bd09f72595736"
+        }
+      ]
+    }
+  ]
+}

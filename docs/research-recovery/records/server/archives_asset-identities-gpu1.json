@@ -1,0 +1,354 @@
+{
+  "dataset_families": [
+    "confirmation_raw",
+    "dataset",
+    "old_dataset",
+    "probe_set",
+    "probe_set.broken-v1",
+    "probe_set.broken-v2-unaligned",
+    "raw_4k"
+  ],
+  "depth": 2,
+  "host": "gpu1",
+  "limitations": "Directory and file metadata through depth 2; frame/media payloads below this depth were not walked or hashed.",
+  "records": [
+    {
+      "depth": 1,
+      "kind": "directory",
+      "mtime": "2026-09-14T11:04:45.4056674500",
+      "path": "/home/itec/emanuele/pointstream-data/assets/confirmation_raw",
+      "rel": "confirmation_raw",
+      "size": 4
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-09-04T15:43:15.5823662350",
+      "path": "/home/itec/emanuele/pointstream-data/assets/confirmation_raw/bp57",
+      "rel": "confirmation_raw/bp57",
+      "size": 11
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-09-14T12:00:41.3605191240",
+      "path": "/home/itec/emanuele/pointstream-data/assets/confirmation_raw/e01r",
+      "rel": "confirmation_raw/e01r",
+      "size": 5
+    },
+    {
+      "depth": 1,
+      "kind": "directory",
+      "mtime": "2026-07-01T13:55:18.1972782290",
+      "path": "/home/itec/emanuele/pointstream-data/assets/dataset",
+      "rel": "dataset",
+      "size": 10
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-06-30T14:18:08.4899217690",
+      "path": "/home/itec/emanuele/pointstream-data/assets/dataset/alcaraz_highlights",
+      "rel": "dataset/alcaraz_highlights",
+      "size": 7
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-06-30T14:23:42.0957131020",
+      "path": "/home/itec/emanuele/pointstream-data/assets/dataset/alcaraz_perricard",
+      "rel": "dataset/alcaraz_perricard",
+      "size": 7
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-07-11T01:30:57.9451447140",
+      "path": "/home/itec/emanuele/pointstream-data/assets/dataset/alcaraz_ruud",
+      "rel": "dataset/alcaraz_ruud",
+      "size": 7
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-06-30T15:20:19.5862967250",
+      "path": "/home/itec/emanuele/pointstream-data/assets/dataset/djokovic_federer",
+      "rel": "dataset/djokovic_federer",
+      "size": 7
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-06-30T14:06:34.9500368130",
+      "path": "/home/itec/emanuele/pointstream-data/assets/dataset/djokovic_zverev",
+      "rel": "dataset/djokovic_zverev",
+      "size": 7
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-06-30T14:17:49.7247084910",
+      "path": "/home/itec/emanuele/pointstream-data/assets/dataset/federer_djokovic",
+      "rel": "dataset/federer_djokovic",
+      "size": 7
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-06-30T14:16:24.8707440260",
+      "path": "/home/itec/emanuele/pointstream-data/assets/dataset/sinner_alcaraz",
+      "rel": "dataset/sinner_alcaraz",
+      "size": 7
+    },
+    {
+      "depth": 1,
+      "kind": "directory",
+      "mtime": "2026-06-29T15:33:06.1431500790",
+      "path": "/home/itec/emanuele/pointstream-data/assets/old_dataset",
+      "rel": "old_dataset",
+      "size": 11
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-06-23T11:18:55.6960130850",
+      "path": "/home/itec/emanuele/pointstream-data/assets/old_dataset/alcaraz_highlights",
+      "rel": "old_dataset/alcaraz_highlights",
+      "size": 8
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-06-23T09:07:27.7245260630",
+      "path": "/home/itec/emanuele/pointstream-data/assets/old_dataset/alcaraz_perricard",
+      "rel": "old_dataset/alcaraz_perricard",
+      "size": 8
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-06-23T08:58:31.8115114060",
+      "path": "/home/itec/emanuele/pointstream-data/assets/old_dataset/alcaraz_ruud",
+      "rel": "old_dataset/alcaraz_ruud",
+      "size": 8
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-06-23T09:51:04.3048938630",
+      "path": "/home/itec/emanuele/pointstream-data/assets/old_dataset/djokovic_federer",
+      "rel": "old_dataset/djokovic_federer",
+      "size": 8
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-06-23T08:57:48.6830274450",
+      "path": "/home/itec/emanuele/pointstream-data/assets/old_dataset/djokovic_zverev",
+      "rel": "old_dataset/djokovic_zverev",
+      "size": 8
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-06-23T09:03:56.2881528660",
+      "path": "/home/itec/emanuele/pointstream-data/assets/old_dataset/federer_djokovic",
+      "rel": "old_dataset/federer_djokovic",
+      "size": 8
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-06-24T16:46:57.4221360230",
+      "path": "/home/itec/emanuele/pointstream-data/assets/old_dataset/real_tennis",
+      "rel": "old_dataset/real_tennis",
+      "size": 8
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-06-23T09:03:01.5765388130",
+      "path": "/home/itec/emanuele/pointstream-data/assets/old_dataset/sinner_alcaraz",
+      "rel": "old_dataset/sinner_alcaraz",
+      "size": 8
+    },
+    {
+      "depth": 1,
+      "kind": "directory",
+      "mtime": "2026-08-22T13:42:38.2229576240",
+      "path": "/home/itec/emanuele/pointstream-data/assets/probe_set",
+      "rel": "probe_set",
+      "size": 5
+    },
+    {
+      "depth": 1,
+      "kind": "directory",
+      "mtime": "2026-08-22T11:25:10.4995216980",
+      "path": "/home/itec/emanuele/pointstream-data/assets/probe_set.broken-v1",
+      "rel": "probe_set.broken-v1",
+      "size": 5
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-07-12T23:55:16.8332535290",
+      "path": "/home/itec/emanuele/pointstream-data/assets/probe_set.broken-v1/training_view",
+      "rel": "probe_set.broken-v1/training_view",
+      "size": 7
+    },
+    {
+      "depth": 1,
+      "kind": "directory",
+      "mtime": "2026-08-22T11:31:13.4454455620",
+      "path": "/home/itec/emanuele/pointstream-data/assets/probe_set.broken-v2-unaligned",
+      "rel": "probe_set.broken-v2-unaligned",
+      "size": 5
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-08-22T11:31:08.0533724160",
+      "path": "/home/itec/emanuele/pointstream-data/assets/probe_set.broken-v2-unaligned/clips",
+      "rel": "probe_set.broken-v2-unaligned/clips",
+      "size": 7
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-08-22T11:31:13.7144492110",
+      "path": "/home/itec/emanuele/pointstream-data/assets/probe_set.broken-v2-unaligned/training_view",
+      "rel": "probe_set.broken-v2-unaligned/training_view",
+      "size": 7
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-08-22T13:42:26.8528025110",
+      "path": "/home/itec/emanuele/pointstream-data/assets/probe_set/clips",
+      "rel": "probe_set/clips",
+      "size": 7
+    },
+    {
+      "depth": 2,
+      "kind": "directory",
+      "mtime": "2026-08-22T13:42:39.0099683600",
+      "path": "/home/itec/emanuele/pointstream-data/assets/probe_set/training_view",
+      "rel": "probe_set/training_view",
+      "size": 7
+    },
+    {
+      "depth": 1,
+      "kind": "directory",
+      "mtime": "2026-06-17T11:55:13.9252236260",
+      "path": "/home/itec/emanuele/pointstream-data/assets/raw_4k",
+      "rel": "raw_4k",
+      "size": 9
+    },
+    {
+      "depth": 2,
+      "kind": "file",
+      "mtime": "2026-07-11T01:29:48.9923625050",
+      "path": "/home/itec/emanuele/pointstream-data/assets/dataset/pointstream_aa_meta.json",
+      "rel": "dataset/pointstream_aa_meta.json",
+      "size": 30404
+    },
+    {
+      "depth": 2,
+      "kind": "file",
+      "mtime": "2026-06-29T15:33:06.1441500900",
+      "path": "/home/itec/emanuele/pointstream-data/assets/old_dataset/pointstream_aa_meta.json",
+      "rel": "old_dataset/pointstream_aa_meta.json",
+      "size": 516
+    },
+    {
+      "depth": 2,
+      "kind": "file",
+      "mtime": "2026-08-22T11:25:10.5025217390",
+      "path": "/home/itec/emanuele/pointstream-data/assets/probe_set.broken-v1/SNAPSHOT.txt",
+      "rel": "probe_set.broken-v1/SNAPSHOT.txt",
+      "size": 335
+    },
+    {
+      "depth": 2,
+      "kind": "file",
+      "mtime": "2026-07-22T14:08:37.0870737370",
+      "path": "/home/itec/emanuele/pointstream-data/assets/probe_set.broken-v1/manifest.json",
+      "rel": "probe_set.broken-v1/manifest.json",
+      "size": 10393
+    },
+    {
+      "depth": 2,
+      "kind": "file",
+      "mtime": "2026-08-22T11:31:13.7494496860",
+      "path": "/home/itec/emanuele/pointstream-data/assets/probe_set.broken-v2-unaligned/manifest.json",
+      "rel": "probe_set.broken-v2-unaligned/manifest.json",
+      "size": 20829
+    },
+    {
+      "depth": 2,
+      "kind": "file",
+      "mtime": "2026-08-22T13:42:39.0839693700",
+      "path": "/home/itec/emanuele/pointstream-data/assets/probe_set/manifest.json",
+      "rel": "probe_set/manifest.json",
+      "size": 20829
+    },
+    {
+      "depth": 2,
+      "kind": "file",
+      "mtime": "2026-06-12T08:49:23.8696508760",
+      "path": "/home/itec/emanuele/pointstream-data/assets/raw_4k/alcaraz_highlights.mp4",
+      "rel": "raw_4k/alcaraz_highlights.mp4",
+      "size": 721610722
+    },
+    {
+      "depth": 2,
+      "kind": "file",
+      "mtime": "2026-06-12T08:56:27.6613557160",
+      "path": "/home/itec/emanuele/pointstream-data/assets/raw_4k/alcaraz_perricard.mp4",
+      "rel": "raw_4k/alcaraz_perricard.mp4",
+      "size": 3877348477
+    },
+    {
+      "depth": 2,
+      "kind": "file",
+      "mtime": "2025-06-02T17:00:16.3379460340",
+      "path": "/home/itec/emanuele/pointstream-data/assets/raw_4k/alcaraz_ruud.mp4",
+      "rel": "raw_4k/alcaraz_ruud.mp4",
+      "size": 1923296935
+    },
+    {
+      "depth": 2,
+      "kind": "file",
+      "mtime": "2025-07-07T15:23:08.5479275680",
+      "path": "/home/itec/emanuele/pointstream-data/assets/raw_4k/djokovic_federer.mp4",
+      "rel": "raw_4k/djokovic_federer.mp4",
+      "size": 4231590537
+    },
+    {
+      "depth": 2,
+      "kind": "file",
+      "mtime": "2025-06-02T17:05:33.7029680640",
+      "path": "/home/itec/emanuele/pointstream-data/assets/raw_4k/djokovic_zverev.mp4",
+      "rel": "raw_4k/djokovic_zverev.mp4",
+      "size": 2779649765
+    },
+    {
+      "depth": 2,
+      "kind": "file",
+      "mtime": "2026-06-12T08:49:58.5490356810",
+      "path": "/home/itec/emanuele/pointstream-data/assets/raw_4k/federer_djokovic.mp4",
+      "rel": "raw_4k/federer_djokovic.mp4",
+      "size": 966688892
+    },
+    {
+      "depth": 2,
+      "kind": "file",
+      "mtime": "2026-06-12T08:50:05.0161074400",
+      "path": "/home/itec/emanuele/pointstream-data/assets/raw_4k/sinner_alcaraz.mp4",
+      "rel": "raw_4k/sinner_alcaraz.mp4",
+      "size": 1018594001
+    }
+  ],
+  "root": "/home/itec/emanuele/pointstream-data/assets",
+  "source": "initial-lists-gpu1.tsv"
+}

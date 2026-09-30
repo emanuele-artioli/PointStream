@@ -1,0 +1,20 @@
+{
+  "negative_searches": [
+    {
+      "source": "GitHub connector /tags collection",
+      "outcome": "Rejected by URL allowlist; recovered tags through Git transport and read-only ls-remote instead.",
+      "resolution": "111 live public tags and120 recovered tags must remain separate."
+    },
+    {
+      "source": "git show1a9a90:experiments/modular/je10_full_codec.py",
+      "outcome": "Path absent at assembly commit.",
+      "resolution": "Assembly commit changes only docs; actual runner introduced at a4f603729e7a. Do not infer executable completion from earlier commit subject."
+    },
+    {
+      "source": "sandbox SSH to gpu3",
+      "outcome": "DNS failure in sandbox.",
+      "resolution": "Authorized escalated SSH succeeded; this is an access issue, not experimental failure."
+    }
+  ],
+  "explicit_source_addition": "User named core-idea and SAM3.1 tennis chats during audit; direct recovery required in addition to prior summaries."
+}

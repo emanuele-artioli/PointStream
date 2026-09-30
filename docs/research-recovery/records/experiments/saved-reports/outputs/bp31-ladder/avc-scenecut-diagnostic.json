@@ -1,0 +1,69 @@
+{
+  "n_plates": 18,
+  "rows": [
+    {
+      "crf": 30,
+      "arm": "default",
+      "chain_bytes": 4167190,
+      "fresh_intra_bytes": 1646943,
+      "ratio": 2.5303,
+      "frame_types": "IPPIIIIIIIIIIIIPII"
+    },
+    {
+      "crf": 30,
+      "arm": "scenecut0",
+      "chain_bytes": 4118880,
+      "fresh_intra_bytes": 1646943,
+      "ratio": 2.5009,
+      "frame_types": "IPPPPPPPPPPPPPPPPP"
+    },
+    {
+      "crf": 38,
+      "arm": "default",
+      "chain_bytes": 1995898,
+      "fresh_intra_bytes": 810174,
+      "ratio": 2.4635,
+      "frame_types": "IPPIIIIIIIIIIIIPII"
+    },
+    {
+      "crf": 38,
+      "arm": "scenecut0",
+      "chain_bytes": 1980705,
+      "fresh_intra_bytes": 810174,
+      "ratio": 2.4448,
+      "frame_types": "IPPPPPPPPPPPPPPPPP"
+    },
+    {
+      "crf": 45,
+      "arm": "default",
+      "chain_bytes": 1053138,
+      "fresh_intra_bytes": 536899,
+      "ratio": 1.9615,
+      "frame_types": "IPPIIIIIIIIIIIIPII"
+    },
+    {
+      "crf": 45,
+      "arm": "scenecut0",
+      "chain_bytes": 1041035,
+      "fresh_intra_bytes": 536899,
+      "ratio": 1.939,
+      "frame_types": "IPPPPPPPPPPPPPPPPP"
+    },
+    {
+      "crf": 51,
+      "arm": "default",
+      "chain_bytes": 620256,
+      "fresh_intra_bytes": 455615,
+      "ratio": 1.3614,
+      "frame_types": "IPPIIIIIIIIIIIIPII"
+    },
+    {
+      "crf": 51,
+      "arm": "scenecut0",
+      "chain_bytes": 619846,
+      "fresh_intra_bytes": 455615,
+      "ratio": 1.3605,
+      "frame_types": "IPPPPPPPPPPPPPPPPP"
+    }
+  ]
+}

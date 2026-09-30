@@ -1,0 +1,51 @@
+{
+  "source": "Gate A report identity.git.measurement_files vs recovered commit blobs",
+  "commit": "274638bdae7f5bd63c4f834a24804c0e14ed8d83",
+  "count": 7,
+  "all_match": true,
+  "checks": [
+    {
+      "path": "experiments/tier/gate_a_long_context.py",
+      "expected": "e236369c5316daba0c6317769a960d1e6dbeeb45ab993116c3d39e479d8e72ca",
+      "actual": "e236369c5316daba0c6317769a960d1e6dbeeb45ab993116c3d39e479d8e72ca",
+      "matches": true
+    },
+    {
+      "path": "experiments/tier/gate_a_identity.py",
+      "expected": "626e9f5510b797296c5934fae89130ca2bd77cd193adf7aaf9643d76353c0de7",
+      "actual": "626e9f5510b797296c5934fae89130ca2bd77cd193adf7aaf9643d76353c0de7",
+      "matches": true
+    },
+    {
+      "path": "experiments/tier/gate_a_tools.py",
+      "expected": "c7b71b76a1eb24368ef987f9e34c9f157bacea1c881c30cd49fd23a772cc76d3",
+      "actual": "c7b71b76a1eb24368ef987f9e34c9f157bacea1c881c30cd49fd23a772cc76d3",
+      "matches": true
+    },
+    {
+      "path": "experiments/tier/gate_a_controls.py",
+      "expected": "45bb4c28506bea69ed1537ab1f4175fffd21801f83556eb1600462c9271bed9c",
+      "actual": "45bb4c28506bea69ed1537ab1f4175fffd21801f83556eb1600462c9271bed9c",
+      "matches": true
+    },
+    {
+      "path": "experiments/tier/low_rate_measure.py",
+      "expected": "ebd2a8fc1c1f618051f13e6dad8c79c31a6d2aedb09e04bb2640ec5f3e0fd8f2",
+      "actual": "ebd2a8fc1c1f618051f13e6dad8c79c31a6d2aedb09e04bb2640ec5f3e0fd8f2",
+      "matches": true
+    },
+    {
+      "path": "src/components/codec/encode.py",
+      "expected": "7af7ce88a005edd240b2907bee726cf79f3e71e1417f95744a782d99474c8d2e",
+      "actual": "7af7ce88a005edd240b2907bee726cf79f3e71e1417f95744a782d99474c8d2e",
+      "matches": true
+    },
+    {
+      "path": "src/components/codec/measure.py",
+      "expected": "bc8510a873c3968ae70e5107bf4faa71685b2052ee411a004248a033ea29b4f8",
+      "actual": "bc8510a873c3968ae70e5107bf4faa71685b2052ee411a004248a033ea29b4f8",
+      "matches": true
+    }
+  ],
+  "limitation": "Verifies declared measurement-file identities; not the actual historical execution environment or native tools."
+}

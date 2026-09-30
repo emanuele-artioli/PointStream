@@ -1,0 +1,28 @@
+[
+  {
+    "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/bp21-headroom/report.json",
+    "size": 176353,
+    "disposition": "targeted-content-follow-up",
+    "reason": "metadata inventoried; full report not selected for bounded small-file content recovery",
+    "family": "bp21-headroom",
+    "coordinator_follow_up": {
+      "disposition": "analyzed",
+      "artifact": "workers/coordinator/bp21-report.json",
+      "sha256": "b6f8b8463c73f7d3a54a918b677bdb5b1e18ae7cf789490c900e023fa1d21240",
+      "scope": "full summary copied and hash verified from same NFS through gpu3; lightweight arithmetic/curve recomputation only, not native/frame recertification"
+    }
+  },
+  {
+    "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/gate-a-vvc-webp-n96-run2/report.json",
+    "size": 231232,
+    "disposition": "targeted-content-follow-up",
+    "reason": "metadata inventoried; full report exceeds bounded selected small-file content copy scope",
+    "family": "gate-a-vvc-webp-n96-run2",
+    "coordinator_follow_up": {
+      "disposition": "analyzed",
+      "artifact": "workers/coordinator/gate-a-report.json",
+      "sha256": "71d82a51c6bf831c6a336d12a2cb05b1496912caa17a702b9e490f28380d939a",
+      "scope": "full summary copied and hash verified from same NFS through gpu3; lightweight arithmetic/curve recomputation only, not native/frame recertification"
+    }
+  }
+]

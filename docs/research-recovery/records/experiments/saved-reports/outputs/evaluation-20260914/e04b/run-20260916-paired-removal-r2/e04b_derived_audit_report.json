@@ -1,0 +1,229 @@
+{
+  "task_id": "CODEC-ACT-07-E04B-AUDIT",
+  "written_utc": "2026-09-17T08:11:02Z",
+  "host": {
+    "hostname": "gpu5",
+    "architecture": "x86_64",
+    "os": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35"
+  },
+  "retry_and_provenance_ledger": {
+    "task_id": "CODEC-ACT-07-E04B-PROVENANCE",
+    "scene": "federer_djokovic/scene_007",
+    "attempts": [
+      {
+        "attempt": 1,
+        "directory": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04b/run-20260916-paired-removal",
+        "started_utc": "2026-09-16T18:11:38Z",
+        "started_utc_evidence": "verified by bounds.json / scorer_calibration.json filesystem mtime",
+        "status": "failed_during_report_serialization",
+        "failure_reason": "KeyError: 'prepared_frames_sha256' at line 547 when constructing report dict",
+        "failure_reason_evidence": "reconstructed from interactive session transcript; unverified by retained log artifact on disk in r1 directory",
+        "native_encode_invocations": 2,
+        "native_encode_evidence": "verified by 2 .vvc bitstreams present in r1/bitstreams/",
+        "candidate_arms_encoded": [
+          "registered_panorama_qp47_removal_on",
+          "registered_panorama_qp32_removal_on"
+        ],
+        "wall_clock_seconds": 28.0,
+        "wall_clock_seconds_evidence": "estimated from file mtime deltas (20:11:38 to 20:12:06 CEST, ~28s) and session transcript; unverified by retained timing report",
+        "bitstreams_preserved": true,
+        "bitstream_evidence": "verified by SHA-256 hash comparison with r2 bitstreams"
+      },
+      {
+        "attempt": 2,
+        "directory": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2",
+        "started_utc": "2026-09-16T18:16:58Z",
+        "started_utc_evidence": "verified by retained e04b_paired_removal_report.json and file mtimes",
+        "status": "completed_successfully",
+        "status_evidence": "verified by retained e04b_paired_removal_report.json",
+        "native_encode_invocations": 2,
+        "native_encode_evidence": "verified by retained e04b_paired_removal_report.json and r2/bitstreams/",
+        "candidate_arms_encoded": [
+          "registered_panorama_qp47_removal_on",
+          "registered_panorama_qp32_removal_on"
+        ],
+        "wall_clock_seconds": 32.56,
+        "wall_clock_evidence": "verified by retained e04b_paired_removal_report.json total_wall_seconds (32.561s)",
+        "bitstreams_preserved": true,
+        "bitstream_evidence": "verified by SHA-256 hash calculation over r2/bitstreams/"
+      }
+    ],
+    "cumulative_budget_accounting": {
+      "total_attempts": 2,
+      "total_candidate_encode_invocations": 4,
+      "cumulative_cpu_wall_seconds": 60.56,
+      "cumulative_accounting_status": "partially estimated (~28.0s unverified Attempt 1 + 32.56s verified Attempt 2)",
+      "budget_cap_cpu_minutes": 30.0,
+      "budget_utilized_pct": 3.36,
+      "new_encodes_released_now": 0
+    },
+    "bitstream_identity_check": {
+      "all_files_identical": true,
+      "verification_status": "verified by direct SHA-256 calculation on retained files in r1 and r2",
+      "files": {
+        "registered_panorama_qp32_removal_on_side.bin": {
+          "sha256": "390017238d895fd6ce977f74420c2faf0d8ea0d25fa6d4b34263b5da5ad6a896",
+          "byte_size": 1742
+        },
+        "registered_panorama_qp32_removal_on.vvc": {
+          "sha256": "52f5e3ad6462fc26ba73c0d44cfe943a3565666eef473330ec5cf802581d513d",
+          "byte_size": 14727
+        },
+        "registered_panorama_qp47_removal_on_side.bin": {
+          "sha256": "390017238d895fd6ce977f74420c2faf0d8ea0d25fa6d4b34263b5da5ad6a896",
+          "byte_size": 1742
+        },
+        "registered_panorama_qp47_removal_on.vvc": {
+          "sha256": "ac52960fc3ff5609ff51f6501eb43511df245c37af0565cfa7cd6d8680c82f50",
+          "byte_size": 2777
+        }
+      }
+    },
+    "code_provenance_link": {
+      "recorded_dirty_run": {
+        "commit": "aefdeb2c486d2054f2af8f642679a25cde372e9f",
+        "dirty": true,
+        "diff_sha256": "60bb3a35490350db2b0a2f247eeab3dea209e7b9bf5cf928a0337df3befb7a4e",
+        "evidence": "verified by e04b_paired_removal_report.json code_revision section"
+      },
+      "untracked_working_tree_state": {
+        "status": "unverified_by_git_object_database",
+        "evidence_note": "Because git does not store untracked working tree files, the runtime diff_sha256 calculated from git status --porcelain cannot be reconstructed directly from git history. The untracked files scripts/e04b_paired_removal.py and tests/test_e04b_paired_removal.py were subsequently committed in d30e59f and merged into PR #127."
+      },
+      "committed_source": {
+        "commit": "d30e59f8a3791a84ec0691763ddcc6c6f60037f3",
+        "merged_head": "a1a9750d5e1f0e4fc439f0eb5e840d5e94b21901",
+        "pull_request": "https://github.com/emanuele-artioli/PointStream/pull/127",
+        "script_path": "scripts/e04b_paired_removal.py",
+        "script_sha256": "eb08585ac6f1fd53e5b208a771dd9242ac934be9f80be3e13edc00a9bb64b586",
+        "test_path": "tests/test_e04b_paired_removal.py",
+        "test_sha256": "e3d48c3d915ca62c606be582c6906336d073bcac3d434cd4e797e0ec89a9583f",
+        "functional_equivalence": "verified by bit-for-bit identical bitstream and side data hashes when executed"
+      },
+      "provenance_status": "reconciled_with_untracked_runtime_caveat"
+    }
+  },
+  "reproduction_tolerance_audit": {
+    "tolerance_threshold": 0.01,
+    "max_observed_delta": 0.0,
+    "observed_deltas": {
+      "qp47_vis_psnr_delta_dB": 0.0,
+      "qp47_ghost_mad_delta": 0.0,
+      "qp32_vis_psnr_delta_dB": 0.0,
+      "qp32_ghost_mad_delta": 0.0
+    },
+    "reproduction_matches_exact_reported_precision": true
+  },
+  "reproduced_canonical_off_metrics": {
+    "qp47": {
+      "bytes": 4554,
+      "vis_psnr_y_dB": 21.161,
+      "ghosting_luma_mad": 9.165,
+      "boundary_luma_mad": 12.694,
+      "boundary_psnr_y_dB": 21.172
+    },
+    "qp32": {
+      "bytes": 17411,
+      "vis_psnr_y_dB": 22.798,
+      "ghosting_luma_mad": 6.704,
+      "boundary_luma_mad": 9.968,
+      "boundary_psnr_y_dB": 22.015
+    }
+  },
+  "measured_removal_on_metrics": {
+    "qp47": {
+      "bytes": 4519,
+      "vis_psnr_y_dB": 21.467,
+      "ghosting_luma_mad": 8.715,
+      "boundary_luma_mad": 11.763,
+      "boundary_psnr_y_dB": 21.764
+    },
+    "qp32": {
+      "bytes": 16469,
+      "vis_psnr_y_dB": 22.826,
+      "ghosting_luma_mad": 6.538,
+      "boundary_luma_mad": 9.988,
+      "boundary_psnr_y_dB": 22.007
+    }
+  },
+  "error_decomposition": {
+    "uncompressed_lossless_plate": {
+      "removal_off_ghost_mad": 5.208,
+      "removal_on_ghost_mad": 5.135,
+      "pure_mask_exclusion_delta_mad": -0.073,
+      "pure_mask_exclusion_reduction_pct": 1.4
+    },
+    "compression_distortion_contribution": {
+      "qp32": {
+        "coded_off_ghost_mad": 6.704,
+        "coded_on_ghost_mad": 6.538,
+        "compression_added_mad_off": 1.496,
+        "compression_added_mad_on": 1.403,
+        "net_coded_reduction_pct": 2.48
+      },
+      "qp47": {
+        "coded_off_ghost_mad": 9.165,
+        "coded_on_ghost_mad": 8.715,
+        "compression_added_mad_off": 3.957,
+        "compression_added_mad_on": 3.58,
+        "net_coded_reduction_pct": 4.91
+      }
+    },
+    "telea_inpainting_status": {
+      "total_holes_inpainted": 0,
+      "inpaint_frames": 0,
+      "telea_exercised": false,
+      "telea_effectiveness_claim": "untested_on_this_scene_zero_holes_required"
+    },
+    "uncompressed_error_characterization": {
+      "status": "observed_uncompressed_pipeline_error_distinct_from_proven_geometric_limit",
+      "observation": "On the uncompressed lossless plate, ghost-region MAD is 5.135 with removal-ON (compared to 5.208 with removal-OFF, a delta of only -0.073 MAD). This ~5.14 MAD residual is an OBSERVED error of the current single-homography plate pipeline on this clip, NOT a proven geometric limit of planar homography. The observed error conflates multiple potential factors: non-planar scene geometry/court parallax, camera sensor noise, temporal lighting/shadow changes across frames, feature tracking and homography estimation error, and bilinear warping interpolation. Isolating whether this residual stems from geometric non-planarity vs photometric or sensor noise requires a calibrated 3D multi-plane or multi-camera control (not available here). Therefore, causal attribution to geometric parallax remains an unverified hypothesis."
+    }
+  },
+  "alarms_audit": {
+    "original_protocol_alarms": [
+      {
+        "alarm_id": "ALARM-01",
+        "arm": "registered_panorama_qp47_removal_on",
+        "metric": "ghosting_luma_mad",
+        "observed_value": 8.715,
+        "pre_registered_bound": [
+          1.0,
+          6.0
+        ],
+        "protocol_status": "ACTIVE_TRIGGERED",
+        "diagnostic_disposition": "Triggered under protocol bounds [1.0, 6.0]. Diagnosed and explained by error decomposition: the uncompressed plate reconstruction has an observed error of ~5.14 MAD, and VVC QP 47 adds +3.58 MAD compression distortion, placing coded ghost MAD at 8.715. The bound was violated because its expectation of near-zero ghosting assumed mask removal alone would eliminate error."
+      },
+      {
+        "alarm_id": "ALARM-02",
+        "arm": "registered_panorama_qp32_removal_on",
+        "metric": "ghosting_luma_mad",
+        "observed_value": 6.538,
+        "pre_registered_bound": [
+          0.8,
+          4.5
+        ],
+        "protocol_status": "ACTIVE_TRIGGERED",
+        "diagnostic_disposition": "Triggered under protocol bounds [0.8, 4.5]. Diagnosed and explained by error decomposition: uncompressed plate reconstruction has an observed error of ~5.14 MAD, and VVC QP 32 adds +1.40 MAD compression distortion, placing coded ghost MAD at 6.538. The bound was violated for the same reason as ALARM-01."
+      }
+    ]
+  },
+  "policy_audit": {
+    "pre_registered_protocol_verdict": {
+      "verdict": "INCONCLUSIVE_EXPLORATORY",
+      "source_document": "bounds.json (CODEC-ACT-07-E04B pre-registered rules)",
+      "rules": {
+        "promote": "ghost MAD reduction >= 50%, vis PSNR loss <= 0.5 dB, byte increase <= 15%",
+        "stop": "ghost MAD reduction <= 0%, vis PSNR loss > 0.5 dB, byte increase > 15%",
+        "inconclusive": "ghost MAD reduction between 20% and 50%"
+      },
+      "evaluation": "Observed reductions of 4.91% (QP 47) and 2.48% (QP 32) are > 0% but < 50%. Because the pre-registered protocol did not explicitly define a hard stop for the (0%, 20%) band, the original run script evaluated the verdict as INCONCLUSIVE_EXPLORATORY."
+    },
+    "later_policy_decision": {
+      "verdict": "NOT_PROMOTED_REJECTED_FOR_PIPELINE",
+      "source_directive": "post-run audit directive (20260916-return-audit-and-reuse.md)",
+      "timing": "subsequent audit reconciliation",
+      "policy_clarification": "Outcomes with ghost MAD reduction < 20% fail the meaningful effect threshold. The minor reduction (2.5% to 4.9%) does not justify the 2.2x to 2.7x sender runtime penalty (from 1.9s to 4.2-5.3s) and pipeline complexity of foreground mask exclusion and inpainting. Removal-ON is therefore formally classified as NOT PROMOTED / REJECTED for PointStream standard pipeline."
+    }
+  }
+}

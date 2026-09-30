@@ -1,0 +1,125 @@
+{
+  "question_1": "is JPEG the wrong codec for a 4K plate? Compared against av1-intra and vvc-intra on the same still, matched on fidelity not on knob.",
+  "plate": {
+    "clip": "alcaraz_highlights/scene_000 frame 0",
+    "shape": [
+      2160,
+      3840,
+      3
+    ],
+    "raw_bytes": 24883200
+  },
+  "jpeg_versus_intra": {
+    "rows": [
+      {
+        "route": "jpeg",
+        "knob": "q10",
+        "bytes": 199933,
+        "psnr_dB": 31.027350553304625
+      },
+      {
+        "route": "jpeg",
+        "knob": "q30",
+        "bytes": 283431,
+        "psnr_dB": 37.97773196038629
+      },
+      {
+        "route": "jpeg",
+        "knob": "q50",
+        "bytes": 345558,
+        "psnr_dB": 40.039621798591334
+      },
+      {
+        "route": "jpeg",
+        "knob": "q75",
+        "bytes": 461771,
+        "psnr_dB": 42.78663746513487
+      },
+      {
+        "route": "jpeg",
+        "knob": "q90",
+        "bytes": 709794,
+        "psnr_dB": 45.44522675183246
+      },
+      {
+        "route": "av1",
+        "knob": "qp25",
+        "preset": "10",
+        "bytes": 425296,
+        "psnr_dB": 43.496290154479624
+      },
+      {
+        "route": "av1",
+        "knob": "qp35",
+        "preset": "10",
+        "bytes": 253346,
+        "psnr_dB": 42.554111778734296
+      },
+      {
+        "route": "av1",
+        "knob": "qp45",
+        "preset": "10",
+        "bytes": 143925,
+        "psnr_dB": 40.829725404158836
+      },
+      {
+        "route": "av1",
+        "knob": "qp55",
+        "preset": "10",
+        "bytes": 79726,
+        "psnr_dB": 38.25309821275533
+      },
+      {
+        "route": "vvc",
+        "knob": "qp25",
+        "preset": "faster",
+        "bytes": 179527,
+        "psnr_dB": 41.786002844165736
+      },
+      {
+        "route": "vvc",
+        "knob": "qp35",
+        "preset": "faster",
+        "bytes": 68477,
+        "psnr_dB": 38.376986342730994
+      },
+      {
+        "route": "vvc",
+        "knob": "qp45",
+        "preset": "faster",
+        "bytes": 26502,
+        "psnr_dB": 33.56740138062217
+      },
+      {
+        "route": "vvc",
+        "knob": "qp55",
+        "preset": "faster",
+        "bytes": 8247,
+        "psnr_dB": 27.38964741417727
+      }
+    ]
+  },
+  "question_2": "do scenes from one match share a background? A codec must start a fresh intra frame at every cut; a plate would not have to.",
+  "cross_scene": [
+    {
+      "video": "alcaraz_highlights",
+      "pairs": [
+        {
+          "pair": "scene_000 vs scene_010",
+          "psnr_dB": 13.746133292291242,
+          "mean_abs_diff": 39.38948728459362
+        }
+      ]
+    },
+    {
+      "video": "federer_djokovic",
+      "pairs": [
+        {
+          "pair": "scene_001 vs scene_003",
+          "psnr_dB": 15.10227475158233,
+          "mean_abs_diff": 22.969931158371914
+        }
+      ]
+    }
+  ]
+}

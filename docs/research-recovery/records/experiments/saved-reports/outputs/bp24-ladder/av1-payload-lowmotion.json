@@ -1,0 +1,243 @@
+{
+  "brief": "BP24 \u2014 the paired ladder (PLAN.md \u00a77 P0 items 2 and 3)",
+  "bounds_written_before_measurement": "outputs/bp24-ladder/bounds-before-run.json",
+  "quality_axis": "BD-rate is taken on BT.601 Y-PSNR. RGB-PSNR is recorded per rung but is not the axis: at yuv420p the anchor's RGB score is capped by the 4:2:0 round-trip (40.72 dB at QP 15 against 40.16 at QP 30 on this clip), and PointStream avoids most of that round-trip, so an RGB comparison would be measuring the colour format rather than the coding.",
+  "pairing": "Each codec appears on both arms at the same preset, rate control and pixel format, from one EncodeRequest per rung. The preset cancels within a pair.",
+  "off_limits": "Do not rank these gains against each other. The presets are not equal effort across codecs (plans/BP24-findings.md \u00a71), so an ordering of the magnitudes would be measuring the presets.",
+  "clip": {
+    "video": "alcaraz_highlights",
+    "scene": "scene_000",
+    "frame_ids": [
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45
+    ],
+    "n_frames": 8,
+    "resolution": "3840x2160",
+    "source_bytes": 199065600,
+    "n_tracks": 2,
+    "player_pixel_fraction": 0.005728126808449074,
+    "paste_back_mae": 0.0,
+    "paste_back_threshold": 2.0
+  },
+  "clip_motion_mad": 0.3317521632495591,
+  "tier": "balanced",
+  "sweep": "payload",
+  "rungs_requested": [
+    15,
+    25,
+    35,
+    45,
+    55
+  ],
+  "pairs": [
+    {
+      "codec": "av1",
+      "preset": "10",
+      "rate_control": "qp",
+      "pix_fmt": "yuv420p",
+      "preset_note": "This preset is on BOTH arms, which is why the comparison is fair. It is NOT matched-effort against other codecs' presets, so this gain must not be ranked against another codec's (plans/BP24-findings.md \u00a71).",
+      "anchor_rungs": [
+        {
+          "rate_value": 15,
+          "coded_bytes": 851572,
+          "psnr_dB": 44.0159139437626,
+          "seconds": 31.82,
+          "arm": "source-through-codec",
+          "psnr_rgb_dB": 43.55999878023837,
+          "codec": "av1",
+          "preset": "10",
+          "rate_control": "qp",
+          "pix_fmt": "yuv420p"
+        },
+        {
+          "rate_value": 25,
+          "coded_bytes": 526104,
+          "psnr_dB": 43.7151395465719,
+          "seconds": 39.67,
+          "arm": "source-through-codec",
+          "psnr_rgb_dB": 43.05972832199454,
+          "codec": "av1",
+          "preset": "10",
+          "rate_control": "qp",
+          "pix_fmt": "yuv420p"
+        },
+        {
+          "rate_value": 35,
+          "coded_bytes": 289198,
+          "psnr_dB": 42.96791666865883,
+          "seconds": 30.12,
+          "arm": "source-through-codec",
+          "psnr_rgb_dB": 42.005507467992054,
+          "codec": "av1",
+          "preset": "10",
+          "rate_control": "qp",
+          "pix_fmt": "yuv420p"
+        },
+        {
+          "rate_value": 45,
+          "coded_bytes": 156710,
+          "psnr_dB": 41.64580356615132,
+          "seconds": 28.18,
+          "arm": "source-through-codec",
+          "psnr_rgb_dB": 40.32343004604327,
+          "codec": "av1",
+          "preset": "10",
+          "rate_control": "qp",
+          "pix_fmt": "yuv420p"
+        },
+        {
+          "rate_value": 55,
+          "coded_bytes": 85995,
+          "psnr_dB": 39.44780116575992,
+          "seconds": 95.57,
+          "arm": "source-through-codec",
+          "psnr_rgb_dB": 37.86488767297209,
+          "codec": "av1",
+          "preset": "10",
+          "rate_control": "qp",
+          "pix_fmt": "yuv420p"
+        }
+      ],
+      "pointstream_rungs": [
+        {
+          "rate_value": 4,
+          "coded_bytes": 318077,
+          "psnr_dB": 39.207396412811136,
+          "seconds": 954.78,
+          "arm": "pointstream",
+          "psnr_rgb_dB": 36.96073512063574,
+          "rung": "jpeg30/qp55",
+          "background_jpeg_quality": 30,
+          "residual_rate": 55,
+          "codec": "av1",
+          "preset": "10",
+          "rate_control": "qp",
+          "is_rate": true,
+          "raw_parts": [],
+          "parts": {
+            "residual": 10285,
+            "panorama": 283483,
+            "actor_reference": 22542,
+            "metadata": 1767
+          },
+          "source_bytes": 199065600,
+          "precodec_vs_delivered_dB": 43.92572580686377
+        },
+        {
+          "rate_value": 3,
+          "coded_bytes": 390889,
+          "psnr_dB": 41.447957348778075,
+          "seconds": 163.88,
+          "arm": "pointstream",
+          "psnr_rgb_dB": 39.19924045422715,
+          "rung": "jpeg50/qp46",
+          "background_jpeg_quality": 50,
+          "residual_rate": 46,
+          "codec": "av1",
+          "preset": "10",
+          "rate_control": "qp",
+          "is_rate": true,
+          "raw_parts": [],
+          "parts": {
+            "residual": 20633,
+            "panorama": 345947,
+            "actor_reference": 22542,
+            "metadata": 1767
+          },
+          "source_bytes": 199065600,
+          "precodec_vs_delivered_dB": 47.35981519057985
+        },
+        {
+          "rate_value": 2,
+          "coded_bytes": 525462,
+          "psnr_dB": 43.592817317283796,
+          "seconds": 149.33,
+          "arm": "pointstream",
+          "psnr_rgb_dB": 41.66261481027515,
+          "rung": "jpeg75/qp38",
+          "background_jpeg_quality": 75,
+          "residual_rate": 38,
+          "codec": "av1",
+          "preset": "10",
+          "rate_control": "qp",
+          "is_rate": true,
+          "raw_parts": [],
+          "parts": {
+            "residual": 37819,
+            "panorama": 463334,
+            "actor_reference": 22542,
+            "metadata": 1767
+          },
+          "source_bytes": 199065600,
+          "precodec_vs_delivered_dB": 51.36223997372261
+        },
+        {
+          "rate_value": 1,
+          "coded_bytes": 808573,
+          "psnr_dB": 45.39408770523422,
+          "seconds": 146.87,
+          "arm": "pointstream",
+          "psnr_rgb_dB": 43.41654180553966,
+          "rung": "jpeg90/qp28",
+          "background_jpeg_quality": 90,
+          "residual_rate": 28,
+          "codec": "av1",
+          "preset": "10",
+          "rate_control": "qp",
+          "is_rate": true,
+          "raw_parts": [],
+          "parts": {
+            "residual": 70944,
+            "panorama": 713320,
+            "actor_reference": 22542,
+            "metadata": 1767
+          },
+          "source_bytes": 199065600,
+          "precodec_vs_delivered_dB": 55.61027242954957
+        },
+        {
+          "rate_value": 0,
+          "coded_bytes": 1548393,
+          "psnr_dB": 46.54819946335884,
+          "seconds": 140.89,
+          "arm": "pointstream",
+          "psnr_rgb_dB": 44.56225100493759,
+          "rung": "jpeg98/qp18",
+          "background_jpeg_quality": 98,
+          "residual_rate": 18,
+          "codec": "av1",
+          "preset": "10",
+          "rate_control": "qp",
+          "is_rate": true,
+          "raw_parts": [],
+          "parts": {
+            "residual": 115837,
+            "panorama": 1408247,
+            "actor_reference": 22542,
+            "metadata": 1767
+          },
+          "source_bytes": 199065600,
+          "precodec_vs_delivered_dB": 57.66885132615117
+        }
+      ],
+      "rungs_excluded_not_a_rate": [],
+      "failures": [],
+      "bound_alarms": [],
+      "bd_rate": 1.1677694595249468,
+      "bd_rate_percent": 116.77694595249469,
+      "bd_quality_dB": -0.4878806706927456,
+      "overlap_dB": [
+        39.44780116575992,
+        44.0159139437626
+      ],
+      "overlap_fraction": 1.0,
+      "reading": "PointStream using av1 costs +116.8% the rate of av1 alone at equal PSNR over 39.45-44.02 dB. Negative is PointStream winning."
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "host": "gpu1",
+    "access": "accessible",
+    "shared_identity": "data3:/x/home/itec/emanuele",
+    "local_matching_immediate_paths": 0,
+    "negative_search": "no PointStream-name matches in bounded /local /mnt /tmp /var/tmp scan",
+    "limits": "name-based bounded scan; unnamed relevant artifacts and permission-denied subtrees unverified; no dataset hashing"
+  },
+  {
+    "host": "gpu2",
+    "access": "accessible",
+    "shared_identity": "data3:/x/home/itec/emanuele",
+    "local_matching_immediate_paths": 0,
+    "negative_search": "no PointStream-name matches in bounded /local /mnt /tmp /var/tmp scan",
+    "limits": "name-based bounded scan; unnamed relevant artifacts and permission-denied subtrees unverified; no dataset hashing"
+  },
+  {
+    "host": "gpu3",
+    "access": "accessible",
+    "shared_identity": "data3:/x/home/itec/emanuele",
+    "local_matching_immediate_paths": 50,
+    "negative_search": null,
+    "limits": "name-based bounded scan; unnamed relevant artifacts and permission-denied subtrees unverified; no dataset hashing"
+  },
+  {
+    "host": "gpu4",
+    "access": "inaccessible-measurement-lock",
+    "shared_identity": null,
+    "local_matching_immediate_paths": 0,
+    "negative_search": null,
+    "limits": "name-based bounded scan; unnamed relevant artifacts and permission-denied subtrees unverified; no dataset hashing"
+  },
+  {
+    "host": "gpu5",
+    "access": "accessible",
+    "shared_identity": "data3:/x/home/itec/emanuele",
+    "local_matching_immediate_paths": 95,
+    "negative_search": null,
+    "limits": "name-based bounded scan; unnamed relevant artifacts and permission-denied subtrees unverified; no dataset hashing"
+  },
+  {
+    "host": "gpu6",
+    "access": "accessible",
+    "shared_identity": "data3:/x/home/itec/emanuele",
+    "local_matching_immediate_paths": 15,
+    "negative_search": null,
+    "limits": "name-based bounded scan; unnamed relevant artifacts and permission-denied subtrees unverified; no dataset hashing"
+  }
+]

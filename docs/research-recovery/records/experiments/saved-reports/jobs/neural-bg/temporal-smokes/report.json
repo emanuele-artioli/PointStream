@@ -1,0 +1,18 @@
+[
+  {
+    "fps": 12,
+    "frames": 48,
+    "source_seconds": 4,
+    "seconds": 1693.4,
+    "inside_mae_vs_30fps_1080p": 22.625,
+    "outside_mae_vs_30fps_1080p": 3.717
+  },
+  {
+    "fps": 6,
+    "frames": 24,
+    "source_seconds": 4,
+    "seconds": 424.9,
+    "inside_mae_vs_30fps_1080p": 20.728,
+    "outside_mae_vs_30fps_1080p": 3.873
+  }
+]

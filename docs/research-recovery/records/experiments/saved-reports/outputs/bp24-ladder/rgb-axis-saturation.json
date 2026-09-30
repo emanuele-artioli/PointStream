@@ -1,0 +1,34 @@
+{
+  "question": "can RGB-PSNR be the quality axis for a BD-rate against a yuv420p codec?",
+  "answer": "no",
+  "measured": {
+    "clip": "alcaraz_highlights/scene_000, 8 frames, 3840x2160",
+    "arm": "av1 coding the source, preset 10, QP, yuv420p, via coded_roundtrip",
+    "points": [
+      {
+        "qp": 15,
+        "coded_bytes": 851572,
+        "psnr_rgb_dB": 40.72
+      },
+      {
+        "qp": 25,
+        "coded_bytes": 526104,
+        "psnr_rgb_dB": 40.63
+      },
+      {
+        "qp": 35,
+        "coded_bytes": 289198,
+        "psnr_rgb_dB": 40.26
+      }
+    ],
+    "reading": "A 2.9x change in rate moved RGB-PSNR by 0.46 dB. The arm is capped by the RGB->yuv420p->RGB chroma round-trip, not by the quantizer. The 3 dB absolute-span guard in bd_rate refuses this curve, correctly."
+  },
+  "why_it_also_breaks_the_comparison": "The cap is asymmetric. PointStream delivers a JPEG plate with source crops pasted over it, so most of its pixels never make the 4:2:0 round-trip. On the same clip its delivered RGB-PSNR was 42.0-42.6 dB, above a ceiling the anchor cannot reach at any QP, so the two curves have no overlapping quality range at all. A BD-rate taken there would be measuring the colour format.",
+  "what_the_ladder_does_instead": "BD-rate is taken on BT.601 Y-PSNR, which is what the BD-rate literature reports. RGB-PSNR is recorded per rung so the chroma cost stays visible rather than being quietly dropped.",
+  "provenance": "Measured 2026-08-28 during the first full ladder run, which was stopped at this point and restarted on the luma axis. These three points are the whole of that run.",
+  "superseded_diagnosis": {
+    "what_this_file_originally_concluded": "That the anchor's flat curve was caused by the RGB -> yuv420p -> RGB chroma round-trip.",
+    "why_that_was_wrong": "Switching the axis to Y-PSNR barely moved the ceiling: 40.72 dB at QP 15 in RGB became 41.71 dB in luma, and the curve stayed flat at the fine end (41.71 at QP 15 against 41.67 at QP 25). A chroma explanation predicts the ceiling lifts when chroma leaves the metric. It did not, so the cap was elsewhere. See plans/BP24-findings.md \u00a714: the decode step named no -c:v and ffmpeg re-encoded to Matroska with libx264 at its default CRF, so every frame coded_roundtrip returned had been through a second encoder.",
+    "what_survives": "The measurements themselves, and the decision to take BD-rate on Y-PSNR \u2014 that is the conventional axis regardless. What does not survive is the stated reason for it."
+  }
+}

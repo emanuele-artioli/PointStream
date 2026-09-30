@@ -1,0 +1,54 @@
+{
+  "task_id": "CODEC-ACT-07",
+  "campaign_action": "E04A",
+  "operating_point": "display_low (640x360, 12 fps, 48 frames, Federer scene 007)",
+  "common_preparation_seconds": 5.8475,
+  "foreground_compositing_seconds": 0.0478,
+  "one_scene_conditional_observations": [
+    "Observation 1 (Rate tradeoff vs Dominance): Still frame 0 is a viable low-rate tradeoff (3,983 B total at QP 47 vs 4,554 B for registered panorama), with zero lookahead and zero homography computation. It is not strictly dominated; camera pan drift (10-20px) creates ghosting and lower SSIM, but at low bitrates it uses fewer bits and simpler decoding.",
+    "Observation 2 (Incomplete Ghosting Suppression): Registered panorama reduces ghosting MAD from 28.55 (still QP 32) to 6.70 (panorama QP 32). However, a ghosting MAD of 6.70 is nonzero and includes both baseline court reconstruction error and residual silhouette texture. Ghosting MAD alone cannot certify the disappearance of actor silhouettes; visual inspection of decoded plates is necessary.",
+    "Observation 3 (Scope Parity with Anchors): Comparing at adjacent rates: VVC QP 63 achieves 2,445 B (whole-codec) with visible PSNR 18.06 dB and whole-frame windowed SSIM 0.5887. PointStream panorama QP 47 achieves 4,554 B (background-only) with visible PSNR 21.16 dB. When full foreground overlay is added, PointStream must account for actor appearance transport to complete a whole-codec comparison."
+  ],
+  "smallest_costed_next_probe_proposal": {
+    "name": "E04B_paired_removal_probe",
+    "named_uncertainty": "Does explicit foreground removal and hole filling (removal=ON with temporal median mask exclusion + Telea fill) causally eliminate residual ghosting (MAD 6.70\u20139.16) on registered panorama, or does removal-OFF with inherent median aggregation already achieve the achievable ghosting suppression without inpainting blur and boundary artifacts?",
+    "reused_evidence": {
+      "scope": "federer_djokovic/scene_007 (48 frames @ 12 fps, 360p)",
+      "reused_runs": 6,
+      "reused_arms": [
+        "still_frame0_qp47_removal_off (3,983 B, vis PSNR 17.67 dB, ghost MAD 20.33)",
+        "still_frame0_qp32_removal_off (13,115 B, vis PSNR 17.58 dB, ghost MAD 28.55)",
+        "registered_panorama_qp47_removal_off (4,554 B, vis PSNR 21.16 dB, ghost MAD 9.16)",
+        "registered_panorama_qp32_removal_off (18,926 B, vis PSNR 23.21 dB, ghost MAD 6.70)",
+        "cleaned_video_qp47_removal_off (11,047 B, vis PSNR 23.77 dB, ghost MAD 4.14)",
+        "cleaned_video_qp32_removal_off (68,524 B, vis PSNR 29.83 dB, ghost MAD 0.88)"
+      ]
+    },
+    "minimal_probe": {
+      "description": "Smallest discriminative probe testing removal=ON on candidate registered_panorama",
+      "scene": "federer_djokovic/scene_007",
+      "representation": "registered_panorama",
+      "removal": "on",
+      "qps": [
+        47,
+        32
+      ],
+      "new_encodes": 2,
+      "hardware_requirement": "CPU only (16 cores under claim), zero GPU requirement",
+      "estimated_runtime_seconds": 15,
+      "estimated_storage_bytes": 50000
+    },
+    "optional_4arm_variant": {
+      "description": "Paired removal=ON probe on both still_frame0 and registered_panorama",
+      "new_encodes": 4,
+      "estimated_runtime_seconds": 30,
+      "estimated_storage_bytes": 100000
+    },
+    "decision_rules": {
+      "promote_rule": "Promote removal=ON if ghosting MAD drops by >= 50% relative to removal-OFF (ghosting MAD < 4.58 at QP 47 and < 3.35 at QP 32) without visible background PSNR degrading by > 0.5 dB or payload size increasing by > 15%.",
+      "stop_rule": "Stop removal investigation and retain removal-OFF if ghosting MAD reduction is marginal (< 1.5 MAD improvement) or if inpainting drops visible background PSNR by > 0.5 dB. Retain removal-OFF with inherent median aggregation as the standard background policy.",
+      "inconclusive_rule": "Mark inconclusive if Telea fill introduces visible player silhouette contours or edge seams requiring manual masking adjustments."
+    },
+    "status": "awaiting_review"
+  }
+}

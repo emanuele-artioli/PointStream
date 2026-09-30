@@ -1,0 +1,66 @@
+after-wave-2b-cosmic-sunbeam-1330c8
+agent-ac71fed8395e1fd74
+agent-ac933f7391641a3f1
+handoff-md-continuation-359171
+method-section-review-230326
+method-section-review-94e452
+operating-map-implementation-34a243
+pointstream-eval-e01
+pointstream-eval-r0
+pointstream-pr108-fix
+presley-handoff-adec1c
+presley-submission-prep-8b3b2d
+presley-submission-prep-eef0a0
+push-presley-b4264b
+review-deleted-untracked-files-c1c5ce
+simple-language-requirement-b0fe98
+d	after-wave-2b-cosmic-sunbeam-1330c8/.claude	4
+d	after-wave-2b-cosmic-sunbeam-1330c8/.pytest_cache	6
+d	after-wave-2b-cosmic-sunbeam-1330c8/src	3
+d	after-wave-2b-cosmic-sunbeam-1330c8/tests	4
+d	after-wave-2b-cosmic-sunbeam-1330c8/tools	3
+d	agent-ac71fed8395e1fd74/.pytest_cache	6
+d	agent-ac71fed8395e1fd74/src	3
+d	agent-ac71fed8395e1fd74/tests	4
+d	agent-ac71fed8395e1fd74/tools	3
+d	agent-ac933f7391641a3f1/.pytest_cache	6
+d	agent-ac933f7391641a3f1/src	3
+d	agent-ac933f7391641a3f1/tests	4
+d	agent-ac933f7391641a3f1/tools	3
+d	handoff-md-continuation-359171/.claude	4
+d	handoff-md-continuation-359171/.pytest_cache	6
+d	handoff-md-continuation-359171/src	3
+d	handoff-md-continuation-359171/tests	4
+d	handoff-md-continuation-359171/tools	3
+d	method-section-review-230326/.claude	4
+d	method-section-review-94e452/.claude	4
+d	operating-map-implementation-34a243/.claude	4
+d	operating-map-implementation-34a243/.pytest_cache	6
+d	operating-map-implementation-34a243/src	3
+d	operating-map-implementation-34a243/tests	4
+d	operating-map-implementation-34a243/tools	3
+d	pointstream-eval-e01/.ruff_cache	5
+d	pointstream-eval-e01/outputs	3
+d	pointstream-eval-r0/.pytest_cache	6
+d	pointstream-eval-r0/.ruff_cache	5
+d	pointstream-eval-r0/outputs	3
+d	pointstream-pr108-fix/pycache	4
+d	pointstream-pr108-fix/pytest	6
+d	presley-handoff-adec1c/.claude	4
+d	presley-submission-prep-8b3b2d/.claude	4
+d	presley-submission-prep-8b3b2d/.pytest_cache	6
+d	presley-submission-prep-8b3b2d/scripts	3
+d	presley-submission-prep-8b3b2d/src	3
+d	presley-submission-prep-8b3b2d/tests	4
+d	presley-submission-prep-8b3b2d/tools	3
+d	presley-submission-prep-eef0a0/.claude	4
+d	presley-submission-prep-eef0a0/.pytest_cache	6
+d	presley-submission-prep-eef0a0/scripts	3
+d	presley-submission-prep-eef0a0/src	3
+d	presley-submission-prep-eef0a0/tests	4
+d	presley-submission-prep-eef0a0/tools	3
+d	push-presley-b4264b/.claude	4
+d	review-deleted-untracked-files-c1c5ce/.claude	4
+d	simple-language-requirement-b0fe98/.claude	4
+f	pointstream-eval-e01/.ps-data-root	37
+l	presley-submission-prep-eef0a0/68e8b6bb11d0dd9e62a67aef	52

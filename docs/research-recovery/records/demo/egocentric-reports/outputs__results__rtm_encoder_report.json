@@ -1,0 +1,391 @@
+{
+  "clips": [
+    {
+      "clip_name": "clip_01_factory001_worker001_00001",
+      "control_wire": {
+        "detection_rate": 1.0,
+        "oracle_capture_ratio": 1.0,
+        "mpjpe_pixels": 2.0659084532850427,
+        "mean_confidence": 0.42593503937007876,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 1.0,
+        "pck50_all_gt": 1.0,
+        "gt_hands": 256.0,
+        "pred_hands": 256.0,
+        "matched_hands": 256.0
+      },
+      "variants": [
+        {
+          "name": "PS Extreme Starve (240p bg, 30k)",
+          "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/ps_rec_ps_extreme_starve_rtm_encoder.mp4",
+          "display": {
+            "detection_rate": 0.671875,
+            "oracle_capture_ratio": 0.671875,
+            "mpjpe_pixels": 110.19417889427794,
+            "mean_confidence": 0.43233631620573443,
+            "handedness_agreement": 1.0,
+            "pck50_matched": 0.5813953488372093,
+            "pck50_all_gt": 0.390625,
+            "gt_hands": 256.0,
+            "pred_hands": 292.0,
+            "matched_hands": 172.0
+          },
+          "control_wire": {
+            "detection_rate": 1.0,
+            "oracle_capture_ratio": 1.0,
+            "mpjpe_pixels": 2.0659084532850427,
+            "mean_confidence": 0.42593503937007876,
+            "handedness_agreement": 0.0,
+            "pck50_matched": 1.0,
+            "pck50_all_gt": 1.0,
+            "gt_hands": 256.0,
+            "pred_hands": 256.0,
+            "matched_hands": 256.0
+          }
+        },
+        {
+          "name": "PS Heavy Starve (360p bg, 70k)",
+          "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/ps_rec_ps_heavy_starve_rtm_encoder.mp4",
+          "display": {
+            "detection_rate": 0.6640625,
+            "oracle_capture_ratio": 0.6640625,
+            "mpjpe_pixels": 97.30932934679906,
+            "mean_confidence": 0.45969300042180455,
+            "handedness_agreement": 1.0,
+            "pck50_matched": 0.738655462184874,
+            "pck50_all_gt": 0.49051339285714285,
+            "gt_hands": 256.0,
+            "pred_hands": 298.0,
+            "matched_hands": 170.0
+          },
+          "control_wire": {
+            "detection_rate": 1.0,
+            "oracle_capture_ratio": 1.0,
+            "mpjpe_pixels": 2.0659084532850427,
+            "mean_confidence": 0.42593503937007876,
+            "handedness_agreement": 0.0,
+            "pck50_matched": 1.0,
+            "pck50_all_gt": 1.0,
+            "gt_hands": 256.0,
+            "pred_hands": 256.0,
+            "matched_hands": 256.0
+          }
+        },
+        {
+          "name": "PS Standard (540p bg, 250k)",
+          "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/ps_rec_ps_standard_rtm_encoder.mp4",
+          "display": {
+            "detection_rate": 0.68359375,
+            "oracle_capture_ratio": 0.68359375,
+            "mpjpe_pixels": 90.53773820117783,
+            "mean_confidence": 0.47011857782091415,
+            "handedness_agreement": 1.0,
+            "pck50_matched": 0.7714285714285715,
+            "pck50_all_gt": 0.52734375,
+            "gt_hands": 256.0,
+            "pred_hands": 293.0,
+            "matched_hands": 175.0
+          },
+          "control_wire": {
+            "detection_rate": 1.0,
+            "oracle_capture_ratio": 1.0,
+            "mpjpe_pixels": 2.0659084532850427,
+            "mean_confidence": 0.42593503937007876,
+            "handedness_agreement": 0.0,
+            "pck50_matched": 1.0,
+            "pck50_all_gt": 1.0,
+            "gt_hands": 256.0,
+            "pred_hands": 256.0,
+            "matched_hands": 256.0
+          }
+        },
+        {
+          "name": "PS Standard 1080p (native bg, 300k)",
+          "video_path": "demo/outputs/results/clip_01_factory001_worker001_00001/ps_rec_ps_standard_1080p_rtm_encoder.mp4",
+          "display": {
+            "detection_rate": 0.703125,
+            "oracle_capture_ratio": 0.703125,
+            "mpjpe_pixels": 74.98766518803602,
+            "mean_confidence": 0.5064820668763584,
+            "handedness_agreement": 1.0,
+            "pck50_matched": 0.8325396825396826,
+            "pck50_all_gt": 0.5853794642857143,
+            "gt_hands": 256.0,
+            "pred_hands": 289.0,
+            "matched_hands": 180.0
+          },
+          "control_wire": {
+            "detection_rate": 1.0,
+            "oracle_capture_ratio": 1.0,
+            "mpjpe_pixels": 2.0659084532850427,
+            "mean_confidence": 0.42593503937007876,
+            "handedness_agreement": 0.0,
+            "pck50_matched": 1.0,
+            "pck50_all_gt": 1.0,
+            "gt_hands": 256.0,
+            "pred_hands": 256.0,
+            "matched_hands": 256.0
+          }
+        }
+      ]
+    },
+    {
+      "clip_name": "clip_02_factory001_worker001_00002",
+      "control_wire": {
+        "detection_rate": 1.0,
+        "oracle_capture_ratio": 1.0,
+        "mpjpe_pixels": 1.9528799615942138,
+        "mean_confidence": 0.4363131079203335,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 1.0,
+        "pck50_all_gt": 1.0,
+        "gt_hands": 272.0,
+        "pred_hands": 272.0,
+        "matched_hands": 272.0
+      },
+      "variants": [
+        {
+          "name": "PS Extreme Starve (240p bg, 30k)",
+          "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/ps_rec_ps_extreme_starve_rtm_encoder.mp4",
+          "display": {
+            "detection_rate": 0.6286764705882353,
+            "oracle_capture_ratio": 0.6286764705882353,
+            "mpjpe_pixels": 97.29400141388679,
+            "mean_confidence": 0.4416341201255196,
+            "handedness_agreement": 1.0,
+            "pck50_matched": 0.6546922862712337,
+            "pck50_all_gt": 0.4115896358543417,
+            "gt_hands": 272.0,
+            "pred_hands": 293.0,
+            "matched_hands": 171.0
+          },
+          "control_wire": {
+            "detection_rate": 1.0,
+            "oracle_capture_ratio": 1.0,
+            "mpjpe_pixels": 1.9528799615942138,
+            "mean_confidence": 0.4363131079203335,
+            "handedness_agreement": 0.0,
+            "pck50_matched": 1.0,
+            "pck50_all_gt": 1.0,
+            "gt_hands": 272.0,
+            "pred_hands": 272.0,
+            "matched_hands": 272.0
+          }
+        },
+        {
+          "name": "PS Heavy Starve (360p bg, 70k)",
+          "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/ps_rec_ps_heavy_starve_rtm_encoder.mp4",
+          "display": {
+            "detection_rate": 0.6323529411764706,
+            "oracle_capture_ratio": 0.6323529411764706,
+            "mpjpe_pixels": 79.66642236618034,
+            "mean_confidence": 0.47704391424046005,
+            "handedness_agreement": 1.0,
+            "pck50_matched": 0.7170542635658915,
+            "pck50_all_gt": 0.4534313725490196,
+            "gt_hands": 272.0,
+            "pred_hands": 287.0,
+            "matched_hands": 172.0
+          },
+          "control_wire": {
+            "detection_rate": 1.0,
+            "oracle_capture_ratio": 1.0,
+            "mpjpe_pixels": 1.9528799615942138,
+            "mean_confidence": 0.4363131079203335,
+            "handedness_agreement": 0.0,
+            "pck50_matched": 1.0,
+            "pck50_all_gt": 1.0,
+            "gt_hands": 272.0,
+            "pred_hands": 272.0,
+            "matched_hands": 272.0
+          }
+        },
+        {
+          "name": "PS Standard (540p bg, 250k)",
+          "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/ps_rec_ps_standard_rtm_encoder.mp4",
+          "display": {
+            "detection_rate": 0.6139705882352942,
+            "oracle_capture_ratio": 0.6139705882352942,
+            "mpjpe_pixels": 80.37086433423397,
+            "mean_confidence": 0.4811805542000753,
+            "handedness_agreement": 1.0,
+            "pck50_matched": 0.7830054177359567,
+            "pck50_all_gt": 0.4807422969187675,
+            "gt_hands": 272.0,
+            "pred_hands": 278.0,
+            "matched_hands": 167.0
+          },
+          "control_wire": {
+            "detection_rate": 1.0,
+            "oracle_capture_ratio": 1.0,
+            "mpjpe_pixels": 1.9528799615942138,
+            "mean_confidence": 0.4363131079203335,
+            "handedness_agreement": 0.0,
+            "pck50_matched": 1.0,
+            "pck50_all_gt": 1.0,
+            "gt_hands": 272.0,
+            "pred_hands": 272.0,
+            "matched_hands": 272.0
+          }
+        },
+        {
+          "name": "PS Standard 1080p (native bg, 300k)",
+          "video_path": "demo/outputs/results/clip_02_factory001_worker001_00002/ps_rec_ps_standard_1080p_rtm_encoder.mp4",
+          "display": {
+            "detection_rate": 0.6470588235294118,
+            "oracle_capture_ratio": 0.6470588235294118,
+            "mpjpe_pixels": 59.57496806597194,
+            "mean_confidence": 0.5009776372462511,
+            "handedness_agreement": 1.0,
+            "pck50_matched": 0.8168290043290043,
+            "pck50_all_gt": 0.5285364145658263,
+            "gt_hands": 272.0,
+            "pred_hands": 272.0,
+            "matched_hands": 176.0
+          },
+          "control_wire": {
+            "detection_rate": 1.0,
+            "oracle_capture_ratio": 1.0,
+            "mpjpe_pixels": 1.9528799615942138,
+            "mean_confidence": 0.4363131079203335,
+            "handedness_agreement": 0.0,
+            "pck50_matched": 1.0,
+            "pck50_all_gt": 1.0,
+            "gt_hands": 272.0,
+            "pred_hands": 272.0,
+            "matched_hands": 272.0
+          }
+        }
+      ]
+    },
+    {
+      "clip_name": "clip_03_factory001_worker001_00000",
+      "control_wire": {
+        "detection_rate": 1.0,
+        "oracle_capture_ratio": 1.0,
+        "mpjpe_pixels": 1.91776973984066,
+        "mean_confidence": 0.44387892578066523,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 1.0,
+        "pck50_all_gt": 1.0,
+        "gt_hands": 263.0,
+        "pred_hands": 263.0,
+        "matched_hands": 263.0
+      },
+      "variants": [
+        {
+          "name": "PS Extreme Starve (240p bg, 30k)",
+          "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/ps_rec_ps_extreme_starve_rtm_encoder.mp4",
+          "display": {
+            "detection_rate": 0.25475285171102663,
+            "oracle_capture_ratio": 0.25475285171102663,
+            "mpjpe_pixels": 123.92102650779452,
+            "mean_confidence": 0.37503407117146165,
+            "handedness_agreement": 1.0,
+            "pck50_matched": 0.4669509594882729,
+            "pck50_all_gt": 0.11895708853883759,
+            "gt_hands": 263.0,
+            "pred_hands": 223.0,
+            "matched_hands": 67.0
+          },
+          "control_wire": {
+            "detection_rate": 1.0,
+            "oracle_capture_ratio": 1.0,
+            "mpjpe_pixels": 1.91776973984066,
+            "mean_confidence": 0.44387892578066523,
+            "handedness_agreement": 0.0,
+            "pck50_matched": 1.0,
+            "pck50_all_gt": 1.0,
+            "gt_hands": 263.0,
+            "pred_hands": 263.0,
+            "matched_hands": 263.0
+          }
+        },
+        {
+          "name": "PS Heavy Starve (360p bg, 70k)",
+          "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/ps_rec_ps_heavy_starve_rtm_encoder.mp4",
+          "display": {
+            "detection_rate": 0.3193916349809886,
+            "oracle_capture_ratio": 0.3193916349809886,
+            "mpjpe_pixels": 110.789100806078,
+            "mean_confidence": 0.4009859831560226,
+            "handedness_agreement": 1.0,
+            "pck50_matched": 0.6077097505668935,
+            "pck50_all_gt": 0.19409741082744886,
+            "gt_hands": 263.0,
+            "pred_hands": 216.0,
+            "matched_hands": 84.0
+          },
+          "control_wire": {
+            "detection_rate": 1.0,
+            "oracle_capture_ratio": 1.0,
+            "mpjpe_pixels": 1.91776973984066,
+            "mean_confidence": 0.44387892578066523,
+            "handedness_agreement": 0.0,
+            "pck50_matched": 1.0,
+            "pck50_all_gt": 1.0,
+            "gt_hands": 263.0,
+            "pred_hands": 263.0,
+            "matched_hands": 263.0
+          }
+        },
+        {
+          "name": "PS Standard (540p bg, 250k)",
+          "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/ps_rec_ps_standard_rtm_encoder.mp4",
+          "display": {
+            "detection_rate": 0.6501901140684411,
+            "oracle_capture_ratio": 0.6501901140684411,
+            "mpjpe_pixels": 78.2266817384784,
+            "mean_confidence": 0.4394830296262663,
+            "handedness_agreement": 1.0,
+            "pck50_matched": 0.6031746031746031,
+            "pck50_all_gt": 0.3921781640412819,
+            "gt_hands": 263.0,
+            "pred_hands": 259.0,
+            "matched_hands": 171.0
+          },
+          "control_wire": {
+            "detection_rate": 1.0,
+            "oracle_capture_ratio": 1.0,
+            "mpjpe_pixels": 1.91776973984066,
+            "mean_confidence": 0.44387892578066523,
+            "handedness_agreement": 0.0,
+            "pck50_matched": 1.0,
+            "pck50_all_gt": 1.0,
+            "gt_hands": 263.0,
+            "pred_hands": 263.0,
+            "matched_hands": 263.0
+          }
+        },
+        {
+          "name": "PS Standard 1080p (native bg, 300k)",
+          "video_path": "demo/outputs/results/clip_03_factory001_worker001_00000/ps_rec_ps_standard_1080p_rtm_encoder.mp4",
+          "display": {
+            "detection_rate": 0.6615969581749049,
+            "oracle_capture_ratio": 0.6615969581749049,
+            "mpjpe_pixels": 55.487407323969066,
+            "mean_confidence": 0.48911317737623194,
+            "handedness_agreement": 1.0,
+            "pck50_matched": 0.8932676518883416,
+            "pck50_all_gt": 0.5909831613253667,
+            "gt_hands": 263.0,
+            "pred_hands": 279.0,
+            "matched_hands": 174.0
+          },
+          "control_wire": {
+            "detection_rate": 1.0,
+            "oracle_capture_ratio": 1.0,
+            "mpjpe_pixels": 1.91776973984066,
+            "mean_confidence": 0.44387892578066523,
+            "handedness_agreement": 0.0,
+            "pck50_matched": 1.0,
+            "pck50_all_gt": 1.0,
+            "gt_hands": 263.0,
+            "pred_hands": 263.0,
+            "matched_hands": 263.0
+          }
+        }
+      ]
+    }
+  ]
+}

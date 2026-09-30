@@ -1,0 +1,14 @@
+[
+  {
+    "id": "01a0d490-13ce-7833-801c-3af6034eac1c",
+    "host": "remote-ssh-discovered:gpu3",
+    "title": "Refine PointStream core idea",
+    "purpose": "Direct audit of conceptual lineage, native baselines, generation defects and runtime corrections; earlier package treated as index only."
+  },
+  {
+    "id": "01a0e1b3-73ff-7b90-8de4-0d759b3b8535",
+    "host": "local",
+    "title": "Implement the approved GPU3 plan",
+    "purpose": "Explicit tennis SAM3.1 implementation/pilot source; connect to egocentric implementation without pooling domain results."
+  }
+]

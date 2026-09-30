@@ -1,0 +1,74 @@
+[
+  {
+    "raw_artifact": "workers/server/archives/SOURCE-MAP.md",
+    "committed_record": "archives_SOURCE-MAP.md",
+    "sha256": "a70a2bf5aadc51457c91e6080af30b635bf1e2ed2651c57f50c96c9632260a2f",
+    "bytes": 4323
+  },
+  {
+    "raw_artifact": "workers/server/archives/fleet-provenance-gpu1.json",
+    "committed_record": "archives_fleet-provenance-gpu1.json",
+    "sha256": "43e05bd5c0a7205ac09114645c38aff1296c31660cba606a04ba9558effff558",
+    "bytes": 531040
+  },
+  {
+    "raw_artifact": "workers/server/archives/fleet-command-source-map-gpu1.json",
+    "committed_record": "archives_fleet-command-source-map-gpu1.json",
+    "sha256": "1476874c233e69f1cf75ab1a26ca278cc56eb5433558258139cbc1563121b097",
+    "bytes": 584963
+  },
+  {
+    "raw_artifact": "workers/server/archives/jobs-families-gpu1.json",
+    "committed_record": "archives_jobs-families-gpu1.json",
+    "sha256": "9a7fa0cad8ca3a29f77faec93b0e1a8573036bb07af23c1c57ecaa7649e5a494",
+    "bytes": 70122
+  },
+  {
+    "raw_artifact": "workers/server/archives/asset-identities-gpu1.json",
+    "committed_record": "archives_asset-identities-gpu1.json",
+    "sha256": "aa9b0b3cbea0e9d7b82f84ec092b0324d312e4fa2444c736c6d62125fc4fa00e",
+    "bytes": 11065
+  },
+  {
+    "raw_artifact": "workers/server/archives/symlink-targets-gpu1.json",
+    "committed_record": "archives_symlink-targets-gpu1.json",
+    "sha256": "549db0d7ac3770b99f64a9a422ab5ee1dc8db7993d91a1b45f0b62a9b8f683b9",
+    "bytes": 4357
+  },
+  {
+    "raw_artifact": "workers/server/archives/git-worktrees-gpu1.txt",
+    "committed_record": "archives_git-worktrees-gpu1.txt",
+    "sha256": "c4b355ca0191272e2aa6e9d4e27994c8c669ad67dd89c4fcc99ceecfa98b9fb1",
+    "bytes": 1546
+  },
+  {
+    "raw_artifact": "workers/server/archives/pointstream-archive-tags-gpu1.json",
+    "committed_record": "archives_pointstream-archive-tags-gpu1.json",
+    "sha256": "ce88589d008dc5b30fcabff33327e459c650f0afe4c1f57a3c1850b9017900bb",
+    "bytes": 4573
+  },
+  {
+    "raw_artifact": "workers/server/archives/cleanup-pointstream-records-gpu1.json",
+    "committed_record": "archives_cleanup-pointstream-records-gpu1.json",
+    "sha256": "be6f52569fd01b1982aa47cc7c3ecd81b2c7759fde7138e07aadcd8722d6bf2d",
+    "bytes": 20020
+  },
+  {
+    "raw_artifact": "workers/server/archives/cleanup-local-file-names-gpu1.tsv",
+    "committed_record": "archives_cleanup-local-file-names-gpu1.tsv",
+    "sha256": "fee9ec5c17232fa3a5ef018bbb3c3ba7a0f2c90d31f1ebc42eedcfcf0b671749",
+    "bytes": 2525
+  },
+  {
+    "raw_artifact": "workers/server/archives/recursive-coverage-status-gpu1.json",
+    "committed_record": "archives_recursive-coverage-status-gpu1.json",
+    "sha256": "85cc8ed47414ebe9126757d28e6e9d4a547fd04076f8ed7051d975cbfecd797f",
+    "bytes": 2912
+  },
+  {
+    "raw_artifact": "workers/server/archives/initial-lists-gpu1.tsv",
+    "committed_record": "archives_initial-lists-gpu1.tsv",
+    "sha256": "dea5254a9dd27a7009aecd625f26d87680cbe26d515cbc26f07e33061ee51ecb",
+    "bytes": 123163
+  }
+]

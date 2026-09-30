@@ -1,0 +1,182 @@
+{
+  "video": "alcaraz_highlights",
+  "scenes": [
+    "scene_000",
+    "scene_010"
+  ],
+  "frames_per_scene": 8,
+  "n_rungs": 5,
+  "codec": "av1",
+  "preset": "10",
+  "anchor_low_delay_args": [],
+  "background": {
+    "method": "panorama-stream",
+    "stream_codec": "av1",
+    "stream_crf": 38,
+    "keyframe_interval": 0,
+    "reference_mode": "last"
+  },
+  "bounds_file": "/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/bounds-before-run.json",
+  "rows": [
+    {
+      "rung": "q30/qp55",
+      "rank": 4,
+      "anchor": {
+        "joint_bytes": 154891,
+        "separate_bytes": 181578,
+        "joint_over_separate": 0.853,
+        "psnr_y_dB": 38.229117893129725,
+        "psnr_rgb_dB": 36.47739697622565,
+        "seconds": 27.1,
+        "n_frames": 16,
+        "extra_args": []
+      },
+      "pointstream": {
+        "coded_bytes": 862585,
+        "psnr_y_dB": 41.90139243368732,
+        "psnr_rgb_dB": 40.72621256047184,
+        "is_rate": true,
+        "raw_parts": [],
+        "parts": {
+          "residual": 25269,
+          "panorama": 789304,
+          "actor_reference": 44479,
+          "metadata": 3533
+        },
+        "background_share": 0.915,
+        "n_chunks": 2,
+        "precodec_vs_delivered_dB": 45.79793788107079,
+        "seconds": 641.4
+      }
+    },
+    {
+      "rung": "q50/qp46",
+      "rank": 3,
+      "anchor": {
+        "joint_bytes": 274105,
+        "separate_bytes": 311842,
+        "joint_over_separate": 0.879,
+        "psnr_y_dB": 40.63679030749761,
+        "psnr_rgb_dB": 38.96929067108012,
+        "seconds": 25.2,
+        "n_frames": 16,
+        "extra_args": []
+      },
+      "pointstream": {
+        "coded_bytes": 901315,
+        "psnr_y_dB": 42.50618878961562,
+        "psnr_rgb_dB": 41.26738100227754,
+        "is_rate": true,
+        "raw_parts": [],
+        "parts": {
+          "residual": 63999,
+          "panorama": 789304,
+          "actor_reference": 44479,
+          "metadata": 3533
+        },
+        "background_share": 0.8757,
+        "n_chunks": 2,
+        "precodec_vs_delivered_dB": 47.35872032169331,
+        "seconds": 505.3
+      }
+    },
+    {
+      "rung": "q75/qp38",
+      "rank": 2,
+      "anchor": {
+        "joint_bytes": 453737,
+        "separate_bytes": 513916,
+        "joint_over_separate": 0.8829,
+        "psnr_y_dB": 42.25231561009249,
+        "psnr_rgb_dB": 40.77563797958647,
+        "seconds": 23.1,
+        "n_frames": 16,
+        "extra_args": []
+      },
+      "pointstream": {
+        "coded_bytes": 984897,
+        "psnr_y_dB": 43.04283312926774,
+        "psnr_rgb_dB": 41.72574323449076,
+        "is_rate": true,
+        "raw_parts": [],
+        "parts": {
+          "residual": 147581,
+          "panorama": 789304,
+          "actor_reference": 44479,
+          "metadata": 3533
+        },
+        "background_share": 0.8014,
+        "n_chunks": 2,
+        "precodec_vs_delivered_dB": 49.26864289333451,
+        "seconds": 457.3
+      }
+    },
+    {
+      "rung": "q90/qp28",
+      "rank": 1,
+      "anchor": {
+        "joint_bytes": 826451,
+        "separate_bytes": 940005,
+        "joint_over_separate": 0.8792,
+        "psnr_y_dB": 43.418543811308645,
+        "psnr_rgb_dB": 42.19550495537359,
+        "seconds": 21.9,
+        "n_frames": 16,
+        "extra_args": []
+      },
+      "pointstream": {
+        "coded_bytes": 1188842,
+        "psnr_y_dB": 43.48752879024373,
+        "psnr_rgb_dB": 42.1718022882977,
+        "is_rate": true,
+        "raw_parts": [],
+        "parts": {
+          "residual": 351526,
+          "panorama": 789304,
+          "actor_reference": 44479,
+          "metadata": 3533
+        },
+        "background_share": 0.6639,
+        "n_chunks": 2,
+        "precodec_vs_delivered_dB": 51.82388588130907,
+        "seconds": 461.3
+      }
+    },
+    {
+      "rung": "q98/qp18",
+      "rank": 0,
+      "anchor": {
+        "joint_bytes": 1355870,
+        "separate_bytes": 1590518,
+        "joint_over_separate": 0.8525,
+        "psnr_y_dB": 43.89537253230103,
+        "psnr_rgb_dB": 42.89810973615432,
+        "seconds": 26.0,
+        "n_frames": 16,
+        "extra_args": []
+      },
+      "pointstream": {
+        "coded_bytes": 1488402,
+        "psnr_y_dB": 43.62769258227637,
+        "psnr_rgb_dB": 42.38809268706049,
+        "is_rate": true,
+        "raw_parts": [],
+        "parts": {
+          "residual": 651086,
+          "panorama": 789304,
+          "actor_reference": 44479,
+          "metadata": 3533
+        },
+        "background_share": 0.5303,
+        "n_chunks": 2,
+        "precodec_vs_delivered_dB": 53.49169271185893,
+        "seconds": 501.9
+      }
+    }
+  ],
+  "alarms": [
+    "q30/qp55: background is 91.5% of the payload, still in the 88-91% band it occupied with a fresh plate per scene. The stream is not reaching the ledger \u2014 the amortisation would be configured, reported and absent.",
+    "q98/qp18: background is 53.0% of the payload, below the 55% floor written before the run. Something other than the plate changed; check the residual's rung and delivered_frames before believing it."
+  ],
+  "reading_note": "Two anchor arms at every rung. `anchor` is unconstrained and is the harder, primary comparison. `anchor_low_delay` is constrained the way PointStream's background stream is, which on this host costs SvtAv1EncApp +38% \u2014 so it is the latency-matched question, not the fair-by-default one, and reporting it alone would hand PointStream that 38%. Both are ONE encode over the concatenated scenes; `separate_bytes` is the control proving the anchor predicted across the joins. Quality is Y-PSNR on delivered_frames for PointStream and on the decoder's output for the anchor. Few scenes on one video is a configuration measurement, not a claim."
+}
