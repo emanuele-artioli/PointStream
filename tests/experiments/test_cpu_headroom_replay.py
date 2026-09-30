@@ -9,6 +9,8 @@ from experiments.headroom.cpu_replay import (
     summarize_scores,
     y4m_frames,
     select_reported_streams,
+    verify_rgb_window,
+    ReadBudget,
 )
 
 
@@ -59,6 +61,21 @@ def test_stream_selection_rejects_ambiguous_identity_and_excludes_old_points(tmp
     (tmp_path / "vvc_qp30.vvc").write_bytes(bytes(300))
     with pytest.raises(ValueError, match="exactly one"):
         select_reported_streams(tmp_path, "vvc", [300, 100, 50])
+
+
+def test_retained_rgb_identity_checks_conversion_and_frame_count(tmp_path):
+    from PIL import Image
+
+    rgb = np.zeros((4, 4, 3), dtype=np.uint8)
+    rgb[..., 0] = 255
+    Image.fromarray(rgb).save(tmp_path / "frame_000001.png")
+    expected = np.full((1, 4, 4), 76, dtype=np.uint8)
+    result = verify_rgb_window(tmp_path, expected, ReadBudget(0))
+    assert result["all_luma_pixels_identical"] and result["frames"] == 1
+    with pytest.raises(ValueError, match="does not match"):
+        verify_rgb_window(tmp_path, expected + 1, ReadBudget(0))
+    with pytest.raises(ValueError, match="missing or excess"):
+        verify_rgb_window(tmp_path, np.repeat(expected, 2, axis=0), ReadBudget(0))
 
 
 def test_group_sensitivity_retains_duplicate_scene_weights():

@@ -39,6 +39,9 @@ The fresh decoder gets the bitstream alone. Original and plate luma and masks
 are available only to the scorer. The reference is the stored 8-bit BT.601
 luma Y4M, not a newly interpreted RGB/color target. Mean per-frame Y-PSNR
 matches the historical metric. Pooled pixel MSE/PSNR is separately named.
+Each retained RGB window is hashed and its historical float64 BT.601-to-uint8
+conversion must equal every scored original luma pixel. This check does not
+recertify MP4 extraction, independent mask truth, or training exposure.
 Pixel hashes, native decoder path/binary hash/version, worker hash, exact code
 revision, commands, runtime, observed GPU UUIDs and resource policy travel in
 the report. Source and plate must be identical outside the removal masks.

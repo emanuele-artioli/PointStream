@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
 import hashlib
+import io
 import json
 import math
 import os
@@ -22,6 +23,7 @@ import sys
 import time
 
 import numpy as np
+from PIL import Image
 from scipy.interpolate import PchipInterpolator
 import scipy
 
@@ -120,6 +122,48 @@ def load_source(path: Path, expected_frames: int, budget: ReadBudget):
         "sha256": digest.hexdigest(),
         "luma_sha256": hashlib.sha256(pixels).hexdigest(),
         "shape": list(pixels.shape),
+    }
+
+
+def verify_rgb_window(window: Path, luma: np.ndarray, budget: ReadBudget) -> dict:
+    """Verify the retained RGB window maps exactly to the scored source luma.
+
+    This identifies retained frames; it does not recertify their extraction
+    from the original MP4, independent mask truth, or development exposure.
+    """
+    files = sorted(window.glob("frame_*.png"))
+    if len(files) != len(luma):
+        raise ValueError("registered RGB window has missing or excess frames")
+    rgb_digest = hashlib.sha256()
+    identities = []
+    for index, path in enumerate(files):
+        encoded = path.read_bytes()
+        budget.charge(len(encoded))
+        with Image.open(io.BytesIO(encoded)) as image:
+            rgb = np.asarray(image.convert("RGB"))
+        if rgb.shape != (*luma[index].shape, 3):
+            raise ValueError("RGB window and stored luma have different geometry")
+        rgb_digest.update(rgb)
+        floating = rgb.astype(np.float64)
+        converted = np.clip(
+            0.299 * floating[..., 0] + 0.587 * floating[..., 1] + 0.114 * floating[..., 2], 0, 255
+        ).astype(np.uint8)
+        if not np.array_equal(converted, luma[index]):
+            raise ValueError(f"{path}: stored BT.601 luma does not match RGB window")
+        identities.append(
+            {
+                "filename": path.name,
+                "bytes": len(encoded),
+                "sha256": hashlib.sha256(encoded).hexdigest(),
+            }
+        )
+    return {
+        "directory": str(window),
+        "frames": len(files),
+        "files": identities,
+        "contiguous_rgb_sha256": rgb_digest.hexdigest(),
+        "conversion": "0.299 R + 0.587 G + 0.114 B, float64 then uint8 truncation",
+        "all_luma_pixels_identical": True,
     }
 
 
@@ -432,6 +476,10 @@ def run(args) -> dict:
             base = root / "encode" / name / codec
             original, original_id = load_source(base / "original/source.y4m", 48, budget)
             plate, plate_id = load_source(base / "plate/source.y4m", 48, budget)
+            if codec == "av1":
+                clip_record["rgb_window"] = verify_rgb_window(
+                    root / "clips" / name / "window", original, budget
+                )
             if original.shape != masks.shape or plate.shape != masks.shape:
                 raise ValueError("source geometry mismatch")
             # Removal must leave every unmasked source luma pixel unchanged.
