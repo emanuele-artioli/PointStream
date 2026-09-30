@@ -29,6 +29,12 @@ original/plate AV1/VVC three-point streams must exist. Each native curve's
 physical byte sizes must equal the saved sizes. Each frame must have nonempty
 foreground and background masks; no missing frames or regions are dropped.
 
+The first full input audit found an extra older VVC QP39 file in the Djokovic--
+Federer directory. That initial job was stopped and retained. The corrected
+worker binds streams to the pinned report's three exact byte counts before
+observing fresh quality, rejects ambiguous identities, and records excluded
+older files. It suppresses BD-rate for reversed rate--quality segments.
+
 The fresh decoder gets the bitstream alone. Original and plate luma and masks
 are available only to the scorer. The reference is the stored 8-bit BT.601
 luma Y4M, not a newly interpreted RGB/color target. Mean per-frame Y-PSNR
