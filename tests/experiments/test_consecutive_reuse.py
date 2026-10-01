@@ -5,6 +5,7 @@ import json
 import hashlib
 import pytest
 from experiments.background.manifest_receiver import decode_manifest
+from experiments.background.reuse_summary import check_quality
 
 def test_fractional_fps_refresh_does_not_drift():
     assert schedule(600, Fraction(60000,1001), 1)==[0,60,120,180,240,300,360,420,480,539,599]
@@ -35,3 +36,12 @@ def test_receiver_refuses_changed_charged_payload(tmp_path):
 def test_receiver_refuses_incomplete_coverage(tmp_path):
     p=tmp_path/'package.json';p.write_text(json.dumps({'geometry':[2,2],'frames':2,'packets':[]}))
     with pytest.raises(ValueError,match='coverage'):decode_manifest(p)
+
+def test_summary_refuses_dropped_frame_and_changed_score():
+    source=np.zeros((2,2,2),dtype=np.uint8)
+    decoded=np.array([np.ones((2,2)),np.ones((2,2))*10],dtype=np.uint8)
+    quality=score(source,decoded)
+    check_quality(quality,2)
+    with pytest.raises(ValueError,match='denominator'):check_quality(quality,3)
+    quality['mean_frame_psnr_db']+=0.01
+    with pytest.raises(ValueError,match='PSNR'):check_quality(quality,2)
