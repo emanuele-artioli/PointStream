@@ -130,3 +130,5 @@ methods and remaining `HOLE` markers are included. The prior dossier at
 `21931f6` remains the historical evidence reference. Focused replay and resource
 monitor tests passed (63 tests); numerical manuscript checks and all-page visual
 inspection passed. No pull request was opened.
+
+Later publication: Overleaf `215a976` integrates separately qualified receiver, consecutive-region and task-instrument studies; see [remaining experiment evidence](remaining-experiment-evidence.md). The BP21 source/stream contract and measurements above are unchanged.
