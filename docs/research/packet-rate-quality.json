@@ -1,0 +1,1263 @@
+{
+  "schema": "pointstream.packet-rate-quality-independent-arithmetic.v1",
+  "scope": "one retained prepared development window; all registered rows; no independent task or held-out claim",
+  "raw_reports": [
+    {
+      "local_path": "/private/tmp/packet-full-bfab96c-report.json",
+      "external_path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/report.json",
+      "sha256": "9318c324bbe520a309e4495d5700dcec715b91477d1bd1dbb54449e74a565d5f",
+      "code_revision": "bfab96c3549ba6ed9acfb709caf796e07a8ee67d",
+      "worker": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-code-bfab96c-verified/experiments/packet_study/run.py",
+        "bytes": 10771,
+        "sha256": "8b2a6c191c72d995be1396f0364561235874a4665f8f19b5f3643794817abbe6"
+      }
+    },
+    {
+      "local_path": "/private/tmp/anchor-full-bfab96c-report.json",
+      "external_path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/report.json",
+      "sha256": "3d71547869d18b9180c51defe74bc9e79e9db44ac08b778fcef9dc61cd93d0fa",
+      "code_revision": "bfab96c3549ba6ed9acfb709caf796e07a8ee67d",
+      "worker": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-code-bfab96c-verified/experiments/packet_study/run.py",
+        "bytes": 10771,
+        "sha256": "8b2a6c191c72d995be1396f0364561235874a4665f8f19b5f3643794817abbe6"
+      }
+    }
+  ],
+  "source": {
+    "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03b/run-20260916-federer007/prepared_rgb.npy",
+    "bytes": 33177728,
+    "sha256": "9234147b68ace7217043c2761701f3bc915a0371db9fc83be6fea3973ae20191"
+  },
+  "source_rgb_sha256": "1f02475a5bbc3d94e4bae2e904dc29c3af3082be0c0c160e027b706a6950f6f8",
+  "source_rgb_frame_sha256": [
+    "ada1e63fea5a4a69e0406b493d2c43d49a9a025e1bb255459d073a6df4baaf2d",
+    "73f34d851b70152d99d473d3357e723b9d0bb27cd75d76480f8ca2323f6cbb89",
+    "5f39f18fed8cd2c11e243f9f328872049c387045c23cc0a30e3d78e5fc93fbd3",
+    "eec042ba7a32ab444afbc8d47b783623d6366732c11ab6dbc40d462f5f73bec9",
+    "b1fbfa2ec7750ee9206f730f781d3706d0639bb3a7cab53583dda4757bff54eb",
+    "1284c7202adf71ea7916344d37b767d756005d762f2fa15ccd81b6b01558d0d9",
+    "14a29bf8f455afd7292994198e11322b8c6231218040251db8bfa6ffdd54651d",
+    "104a203425e7f128ea221dacffc869e34ca3af51be017ab1e680c01e2f9ae49f",
+    "13e71410f09bcc92aa80c4c098dbd7f3e35d172d8c80ed67bbeaf598db3a22a3",
+    "e05fc65abdb3e0c915adccda59f5176c02413920e7aba9c591bb99b0cf128fc0",
+    "86944b876a6a694ab33712eeeb98258387d4a836252eff93b0075239bf48d7de",
+    "545a93cfabaa298891ff8f3a6db5ef08987de83c70d66d1b56fa29f3f0788585",
+    "50d55888c3b4621566e2c2c7f6a24c564e5776450e2bca4f311afa852ec164e3",
+    "2bfb96eff5910a76373a07de4c8a3ef2036b0057d58e9bda90a918f3c1d92f9a",
+    "2bd9c1c6afc2b0cff567269883b0bb6abd13ccd078e266d8e3e4d4c187f60a63",
+    "5c382c6c505118a637ab7afdb5df223dfd4a10f66537e6178ec271f0f0a81841",
+    "32ad7ceea8e1c67d41391220cda7076d41e5abf7e45bcc62b861c952c698885e",
+    "b3b297adfbac5c9635a2ce672c9f81b1a194d5f8ba54d7a3ed7a7d09d1614de1",
+    "cfa991aee626fdf24eb527e5a66a0ab0abcc6d73485d42468cf12d77acb8c7f6",
+    "e9caa7a0a0a43e1a74fc1684321ad5e7d38b98d43565118932eeda4d9451bd9f",
+    "e5aa0ad0d124b71f0b28439b65fec7040030524d5c7961d5e4a8a168c5c06463",
+    "ac2923fe2155863fd883a3b167c221f45606e56ca86d69c51de9b7e3bb47b9ed",
+    "5af792a2d421527052bb141173a5134a5c84ace627c21f04db2c8584d476d273",
+    "316dcfec61ed118eb269689979e2904c826924906cca5d8b0b010a3dfe8bed40",
+    "2285ae2947eb61bd9e6ae204267f36226b18a02acd6a4bbe2fee5935fb37a5a2",
+    "35967a0a543345ca730e5e34cd5c18b5405943d20c1b5249bc8a464494915358",
+    "70d2529be102bb2668ccaa2daac6e23d2b89ecfe7fe2f9fec9940941542460c4",
+    "b6c0f21e08cefc30b761d8c48f48ea802eff748898a7aa80c84c3330cfe332c7",
+    "87a03a3513e0a776c3d350ca8d14752fc529c5e52071fee040472b03f2bf93df",
+    "0d5d308a2d4546322944de0d4032bd6c4a9211a25cc754c5f8f4de7bb98f9a8c",
+    "ce2fc9fa731d44571dc459aacf0174a41c7493fca224efb747ffb1b18af9eff7",
+    "3f18226abf6655ad5a0d5eb18788e34ba123a1e9231e7ef1ecd60df04f056db1",
+    "1d1793be8ab9dcd8518fbb78c0013e728c1044e2f24a9205f906b5f501646879",
+    "754f2dac1ea2951cee05b84b3103a071d0a33cc01a01c9bde5e7d34108c89793",
+    "1475d44adc4235d213dcaaa8e2d66e49f567948d1eb557f5daf1eb3dd1444bb3",
+    "73b772eff54f7e5481de09d87f9b4c96028d5f1bb134dda95a745c0c2f3d8679",
+    "d003a59f4c337e329229726317576a83d167c0c602f063fdbd72a32c8a499821",
+    "71061efc766d1bbd2d751689104cff246ccca66d242a8e6893b33b1820d26dc7",
+    "d054079555ca277cfcd7f99a448b3f2dd17be9dfaa04ffa7f05badd144046fe3",
+    "cfa21cd296aed9d8934af0984d339ce400bf13db45dafaafbaaccb83ee87b1d0",
+    "11943ffe7bcba14eaf103d2ad97aea1aa4cb701b290daf9ce3db9d9c8cdd3c45",
+    "6ac76aab300323a3cdff0c12dd0a90f69e3035c30b68ecbb4b459813a7a21978",
+    "26fc13594cd7acfca2801bb1a04c5022aba6ca0d36b6295f43124f4a1db0100a",
+    "e141db356b9cc2f8c118d18777d05dc9e5e94aa900026eaf133a878eff98a937",
+    "3dbf182873b324d340edac35a3fe1d402d93bc73b1e32150570d2645207c1f85",
+    "35cc414a41f63a5a545a1f150d58d795976d76b30cdc5e8d8d69dd549cf48644",
+    "2bafb067d4311ef09731c789fd4ba7f6cd6ec6801757afea95b00ed7fbd5c7a7",
+    "3370201b88a1a86598d449c637f79e9a0c7a0ec5e1d457aef41d2dd88151d9c5"
+  ],
+  "source_shape": [
+    48,
+    360,
+    640,
+    3
+  ],
+  "registration": {
+    "source": "outputs/evaluation-20260914/e03b/run-20260916-federer007/prepared_rgb.npy",
+    "settings": [
+      "bbox_resized_first_reference_residual_off",
+      "bbox_resized_first_reference_residual_on",
+      "per_frame_crop_residual_off",
+      "per_frame_crop_residual_on"
+    ],
+    "fps": "12",
+    "lossy_mask_scales": [
+      2,
+      4,
+      8
+    ],
+    "mask_codecs": [
+      "psm1",
+      "rle"
+    ],
+    "batch_masks": true,
+    "retained_floor_control": "probe-20260917-floor-arms/mask_rle_per_frame/transport_floor.npz",
+    "anchor_av1_crf": [
+      32,
+      44,
+      52,
+      58,
+      63
+    ],
+    "anchor_vvc_qp": [
+      32,
+      44,
+      52,
+      58,
+      63
+    ],
+    "quality": "complete registered RGB frames; BT601 uint8 Y pooled and mean-frame PSNR, RGB MAE; no independent task truth",
+    "access": "offline complete-window encoding for all arms; fresh package/native receiver; preinstalled decoding software, no learned weights",
+    "exposure": "one retained development prepared cache; raw extraction and held-out exposure not newly certified",
+    "accounting": "every persisted transport byte, no free source-side assets; native anchors include file headers and exact deployment manifest",
+    "selection": "all registered variants retained, no post-result selection; no BD-rate without quality overlap; narrow scenario allowed"
+  },
+  "native_ffmpeg": {
+    "path": "/opt/local/bin/ffmpeg",
+    "bytes": 358696,
+    "sha256": "0b652966dc4ecf5e45854c58d8149c7a41352b3285e8695ca26501dff4a72656"
+  },
+  "native_ffmpeg_version": "ffmpeg version n7.1.1-56-gc2184b65d2 Copyright (c) 2000-2025 the FFmpeg developers\nbuilt with gcc 11 (Ubuntu 11.4.0-1ubuntu1~22.04)\nconfiguration: --prefix=/opt/local --enable-pthreads --enable-pic --enable-shared --enable-rpath --enable-gpl --enable-openssl --enable-libaom --enable-libass --enable-libfdk-aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libsvtav1 --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 --enable-libvmaf --enable-nonfree --enable-ffnvcodec --enable-demuxer=dash --enable-libxml2 --enable-libvvenc\nlibavutil      59. 39.100 / 59. 39.100\nlibavcodec     61. 19.101 / 61. 19.101\nlibavformat    61.  7.100 / 61.  7.100\nlibavdevice    61.  3.100 / 61.  3.100\nlibavfilter    10.  4.100 / 10.  4.100\nlibswscale      8.  3.100 /  8.  3.100\nlibswresample   5.  3.100 /  5.  3.100\nlibpostproc    58.  3.100 / 58.  3.100\n",
+  "environment": {
+    "python": "3.10.20 | packaged by conda-forge | (main, Mar  5 2026, 16:42:22) [GCC 14.3.0]",
+    "numpy": "1.26.4",
+    "threads": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1"
+    }
+  },
+  "arithmetic_audit": {
+    "rows": 29,
+    "registered_frames_per_row": 48,
+    "max_absolute_errors": {
+      "pooled_mse": 0,
+      "pooled_y_psnr_db": 0,
+      "mean_frame_y_psnr_db": 0
+    },
+    "source_and_all_frame_hashes_identical": true,
+    "all_19_candidate_rows_strictly_dominated_by_observed_vvc_point": true,
+    "quality_scope": "whole-frame uint8 BT601 Y; foreground effect unmeasured"
+  },
+  "quality_support": {
+    "candidate_pooled_y_psnr_db": [
+      20.674804042744608,
+      24.150987754531723
+    ],
+    "av1_pooled_y_psnr_db": [
+      27.736536708202628,
+      37.11662869621514
+    ],
+    "disjoint": true,
+    "bd_rate_reported": false
+  },
+  "strongest_lossy_own_baseline_result": {
+    "candidate_setting": "bbox_resized_first_reference_residual_off",
+    "candidate_variant": "rle_scale8",
+    "candidate_bytes": 14246,
+    "retained_lossless_floor_bytes": 17581,
+    "bytes_saved": 3335,
+    "fraction_saved": 0.1896934190319094,
+    "whole_y_psnr_delta_db": -0.005272549417654204,
+    "foreground_quality_delta": null
+  },
+  "packet_rows": [
+    {
+      "setting": "bbox_resized_first_reference_residual_off",
+      "variant": "original",
+      "mask_scale": 1,
+      "lossless": true,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/bbox_resized_first_reference_residual_off/transport.npz",
+        "bytes": 117861,
+        "sha256": "949fba3080f030ae24e0a20021b0bc774f99cd3487dad95c7b01a1ea7fa7d8bd"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_off/original/packet.zip",
+        "bytes": 117861,
+        "sha256": "949fba3080f030ae24e0a20021b0bc774f99cd3487dad95c7b01a1ea7fa7d8bd"
+      },
+      "decoded_rgb_sha256": "839a3c1b441e9065f8abdd33d352b532629d310439dea865bf34501bfdb08ba5",
+      "parent_decoded_rgb_sha256": "839a3c1b441e9065f8abdd33d352b532629d310439dea865bf34501bfdb08ba5",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_off/original/receiver.json",
+        "bytes": 1667,
+        "sha256": "350ef812d617af9e0880b7aac9d5f587750ae51e2541700afefacfde27630496"
+      },
+      "frames": 48,
+      "pooled_mse_y": 555.997324399595,
+      "pooled_y_psnr_db": 20.680076592162262,
+      "mean_frame_y_psnr_db": 20.689049019435604,
+      "rgb_mae": 31.277475827064045,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 44,
+          "complete_bytes": 50136,
+          "pooled_y_psnr_db": 27.073140500244428
+        },
+        {
+          "quantizer": 52,
+          "complete_bytes": 15178,
+          "pooled_y_psnr_db": 22.943484422691867
+        },
+        {
+          "quantizer": 58,
+          "complete_bytes": 7721,
+          "pooled_y_psnr_db": 20.819903006246943
+        }
+      ]
+    },
+    {
+      "setting": "bbox_resized_first_reference_residual_off",
+      "variant": "compact_psm1",
+      "mask_scale": 1,
+      "lossless": true,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/bbox_resized_first_reference_residual_off/transport.npz",
+        "bytes": 117861,
+        "sha256": "949fba3080f030ae24e0a20021b0bc774f99cd3487dad95c7b01a1ea7fa7d8bd"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_off/compact_psm1/packet.zip",
+        "bytes": 22492,
+        "sha256": "a581be36760408138a6cd498f77a07aaf218e02c610d34a34b3d192611030fbf"
+      },
+      "decoded_rgb_sha256": "839a3c1b441e9065f8abdd33d352b532629d310439dea865bf34501bfdb08ba5",
+      "parent_decoded_rgb_sha256": "839a3c1b441e9065f8abdd33d352b532629d310439dea865bf34501bfdb08ba5",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_off/compact_psm1/receiver.json",
+        "bytes": 1682,
+        "sha256": "5e1edf3a0275afb2d988dcdb078c973a52f8f2877d5b4840b7458d57245937b5"
+      },
+      "frames": 48,
+      "pooled_mse_y": 555.997324399595,
+      "pooled_y_psnr_db": 20.680076592162262,
+      "mean_frame_y_psnr_db": 20.689049019435604,
+      "rgb_mae": 31.277475827064045,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 52,
+          "complete_bytes": 15178,
+          "pooled_y_psnr_db": 22.943484422691867
+        },
+        {
+          "quantizer": 58,
+          "complete_bytes": 7721,
+          "pooled_y_psnr_db": 20.819903006246943
+        }
+      ]
+    },
+    {
+      "setting": "bbox_resized_first_reference_residual_off",
+      "variant": "rle_lossless",
+      "mask_scale": 1,
+      "lossless": true,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/bbox_resized_first_reference_residual_off/transport.npz",
+        "bytes": 117861,
+        "sha256": "949fba3080f030ae24e0a20021b0bc774f99cd3487dad95c7b01a1ea7fa7d8bd"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_off/rle_lossless/packet.zip",
+        "bytes": 20065,
+        "sha256": "2004d7036e65dfb9073907db6109ad1550fa0a7049a52b84b7f5c04bcf1ff095"
+      },
+      "decoded_rgb_sha256": "839a3c1b441e9065f8abdd33d352b532629d310439dea865bf34501bfdb08ba5",
+      "parent_decoded_rgb_sha256": "839a3c1b441e9065f8abdd33d352b532629d310439dea865bf34501bfdb08ba5",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_off/rle_lossless/receiver.json",
+        "bytes": 1682,
+        "sha256": "fc11ad0dd40c2a1083deb5cc41840b09feeb2b0eb514d0bba50c4be5529f2096"
+      },
+      "frames": 48,
+      "pooled_mse_y": 555.997324399595,
+      "pooled_y_psnr_db": 20.680076592162262,
+      "mean_frame_y_psnr_db": 20.689049019435604,
+      "rgb_mae": 31.277475827064045,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 52,
+          "complete_bytes": 15178,
+          "pooled_y_psnr_db": 22.943484422691867
+        },
+        {
+          "quantizer": 58,
+          "complete_bytes": 7721,
+          "pooled_y_psnr_db": 20.819903006246943
+        }
+      ]
+    },
+    {
+      "setting": "bbox_resized_first_reference_residual_off",
+      "variant": "rle_scale2",
+      "mask_scale": 2,
+      "lossless": false,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/bbox_resized_first_reference_residual_off/transport.npz",
+        "bytes": 117861,
+        "sha256": "949fba3080f030ae24e0a20021b0bc774f99cd3487dad95c7b01a1ea7fa7d8bd"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_off/rle_scale2/packet.zip",
+        "bytes": 16676,
+        "sha256": "64cfe0fcc78ba9eb819003922c229537f855b42570e710ad1f2e28da330071f0"
+      },
+      "decoded_rgb_sha256": "840e5aa9cdf4584ab960773dd9bee91489572c35aaf8ca2df7cf4900fbd30cac",
+      "parent_decoded_rgb_sha256": "839a3c1b441e9065f8abdd33d352b532629d310439dea865bf34501bfdb08ba5",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_off/rle_scale2/receiver.json",
+        "bytes": 1674,
+        "sha256": "1a148caf7696e4725836290b21fbdc1113241d673cf56e4fda4b89c22f3c4116"
+      },
+      "frames": 48,
+      "pooled_mse_y": 556.1407571976273,
+      "pooled_y_psnr_db": 20.678956370238645,
+      "mean_frame_y_psnr_db": 20.687984259385825,
+      "rgb_mae": 31.27770580150463,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 52,
+          "complete_bytes": 15178,
+          "pooled_y_psnr_db": 22.943484422691867
+        },
+        {
+          "quantizer": 58,
+          "complete_bytes": 7721,
+          "pooled_y_psnr_db": 20.819903006246943
+        }
+      ]
+    },
+    {
+      "setting": "bbox_resized_first_reference_residual_off",
+      "variant": "rle_scale4",
+      "mask_scale": 4,
+      "lossless": false,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/bbox_resized_first_reference_residual_off/transport.npz",
+        "bytes": 117861,
+        "sha256": "949fba3080f030ae24e0a20021b0bc774f99cd3487dad95c7b01a1ea7fa7d8bd"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_off/rle_scale4/packet.zip",
+        "bytes": 15046,
+        "sha256": "844b20bb8a067b3503fb52f1c5ff25516a45984a495905acfcf92a0ab52c65bb"
+      },
+      "decoded_rgb_sha256": "eddf26d965c91aaa53e2335d7d7df0dab081453505ca140bc55990cb1f3edbdb",
+      "parent_decoded_rgb_sha256": "839a3c1b441e9065f8abdd33d352b532629d310439dea865bf34501bfdb08ba5",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_off/rle_scale4/receiver.json",
+        "bytes": 1674,
+        "sha256": "4c64eb38e19bf0687591a058878c8a09d0bd5526528cab85cf924319b7e4d859"
+      },
+      "frames": 48,
+      "pooled_mse_y": 556.410285011574,
+      "pooled_y_psnr_db": 20.67685211721716,
+      "mean_frame_y_psnr_db": 20.68592287697729,
+      "rgb_mae": 31.277656460985725,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 58,
+          "complete_bytes": 7721,
+          "pooled_y_psnr_db": 20.819903006246943
+        }
+      ]
+    },
+    {
+      "setting": "bbox_resized_first_reference_residual_off",
+      "variant": "rle_scale8",
+      "mask_scale": 8,
+      "lossless": false,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/bbox_resized_first_reference_residual_off/transport.npz",
+        "bytes": 117861,
+        "sha256": "949fba3080f030ae24e0a20021b0bc774f99cd3487dad95c7b01a1ea7fa7d8bd"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_off/rle_scale8/packet.zip",
+        "bytes": 14246,
+        "sha256": "6f0282e3b6fd0e1e2a3b7558dc375d5204af23f04f03a0375996c916980bc075"
+      },
+      "decoded_rgb_sha256": "430db45602e75cdbbf6f16a536138ae600ce66ba2d43379227ec89074a8a429b",
+      "parent_decoded_rgb_sha256": "839a3c1b441e9065f8abdd33d352b532629d310439dea865bf34501bfdb08ba5",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_off/rle_scale8/receiver.json",
+        "bytes": 1674,
+        "sha256": "3ac03069f0aed5baacf1b76259f0031c926e433e65c556d2ffc32651676a164a"
+      },
+      "frames": 48,
+      "pooled_mse_y": 556.6727425130208,
+      "pooled_y_psnr_db": 20.674804042744608,
+      "mean_frame_y_psnr_db": 20.68394854086483,
+      "rgb_mae": 31.275617042824074,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 58,
+          "complete_bytes": 7721,
+          "pooled_y_psnr_db": 20.819903006246943
+        }
+      ]
+    },
+    {
+      "setting": "bbox_resized_first_reference_residual_off",
+      "variant": "retained_floor_rle",
+      "mask_scale": 1,
+      "lossless": true,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/bbox_resized_first_reference_residual_off/transport.npz",
+        "bytes": 117861,
+        "sha256": "949fba3080f030ae24e0a20021b0bc774f99cd3487dad95c7b01a1ea7fa7d8bd"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_off/retained_floor_rle/packet.zip",
+        "bytes": 17581,
+        "sha256": "ef409ffaae8d3f9281a00eb87b0b4da6b50acf3268d50eb221560c344600720f"
+      },
+      "decoded_rgb_sha256": "839a3c1b441e9065f8abdd33d352b532629d310439dea865bf34501bfdb08ba5",
+      "parent_decoded_rgb_sha256": "839a3c1b441e9065f8abdd33d352b532629d310439dea865bf34501bfdb08ba5",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_off/retained_floor_rle/receiver.json",
+        "bytes": 1706,
+        "sha256": "aa8802008ae32f99fcf2f05692754b2910b906d12787ef889f9a7b85a47d0552"
+      },
+      "frames": 48,
+      "pooled_mse_y": 555.997324399595,
+      "pooled_y_psnr_db": 20.680076592162262,
+      "mean_frame_y_psnr_db": 20.689049019435604,
+      "rgb_mae": 31.277475827064045,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 52,
+          "complete_bytes": 15178,
+          "pooled_y_psnr_db": 22.943484422691867
+        },
+        {
+          "quantizer": 58,
+          "complete_bytes": 7721,
+          "pooled_y_psnr_db": 20.819903006246943
+        }
+      ]
+    },
+    {
+      "setting": "bbox_resized_first_reference_residual_on",
+      "variant": "original",
+      "mask_scale": 1,
+      "lossless": true,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/bbox_resized_first_reference_residual_on/transport.npz",
+        "bytes": 195878,
+        "sha256": "91e0125106731b7dc54b24883d404cc7b23ffc0c8fc3fdc1e3d81cb941dc4a9b"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_on/original/packet.zip",
+        "bytes": 195878,
+        "sha256": "91e0125106731b7dc54b24883d404cc7b23ffc0c8fc3fdc1e3d81cb941dc4a9b"
+      },
+      "decoded_rgb_sha256": "b675636e3f2293abc1614036eb6975ef0a117d8b3aad0c0dace93fe9309ca4d0",
+      "parent_decoded_rgb_sha256": "b675636e3f2293abc1614036eb6975ef0a117d8b3aad0c0dace93fe9309ca4d0",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_on/original/receiver.json",
+        "bytes": 1947,
+        "sha256": "b7f3e4c30cf9522ce9504d25e03cf2bd2e80fc9382dbe2011fbad3edc3973b83"
+      },
+      "frames": 48,
+      "pooled_mse_y": 251.05271674262153,
+      "pooled_y_psnr_db": 24.133154354565075,
+      "mean_frame_y_psnr_db": 24.136164460789047,
+      "rgb_mae": 8.387130895543981,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 32,
+          "complete_bytes": 158246,
+          "pooled_y_psnr_db": 31.860988643063433
+        },
+        {
+          "quantizer": 44,
+          "complete_bytes": 50136,
+          "pooled_y_psnr_db": 27.073140500244428
+        }
+      ]
+    },
+    {
+      "setting": "bbox_resized_first_reference_residual_on",
+      "variant": "compact_psm1",
+      "mask_scale": 1,
+      "lossless": true,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/bbox_resized_first_reference_residual_on/transport.npz",
+        "bytes": 195878,
+        "sha256": "91e0125106731b7dc54b24883d404cc7b23ffc0c8fc3fdc1e3d81cb941dc4a9b"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_on/compact_psm1/packet.zip",
+        "bytes": 100410,
+        "sha256": "ce5b47fa400a249f74f2502af934d8d46488f51b9be3c0d5168d3388944b0df3"
+      },
+      "decoded_rgb_sha256": "b675636e3f2293abc1614036eb6975ef0a117d8b3aad0c0dace93fe9309ca4d0",
+      "parent_decoded_rgb_sha256": "b675636e3f2293abc1614036eb6975ef0a117d8b3aad0c0dace93fe9309ca4d0",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_on/compact_psm1/receiver.json",
+        "bytes": 1963,
+        "sha256": "e9b1503ec11ec45c7b74db43ccbe19efe46529ee6f139a740f1efb4c00ae9e33"
+      },
+      "frames": 48,
+      "pooled_mse_y": 251.05271674262153,
+      "pooled_y_psnr_db": 24.133154354565075,
+      "mean_frame_y_psnr_db": 24.136164460789047,
+      "rgb_mae": 8.387130895543981,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 44,
+          "complete_bytes": 50136,
+          "pooled_y_psnr_db": 27.073140500244428
+        }
+      ]
+    },
+    {
+      "setting": "bbox_resized_first_reference_residual_on",
+      "variant": "rle_lossless",
+      "mask_scale": 1,
+      "lossless": true,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/bbox_resized_first_reference_residual_on/transport.npz",
+        "bytes": 195878,
+        "sha256": "91e0125106731b7dc54b24883d404cc7b23ffc0c8fc3fdc1e3d81cb941dc4a9b"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_on/rle_lossless/packet.zip",
+        "bytes": 97983,
+        "sha256": "84a78ac2757ed6c2ee58c5d749ecbc483c5d6ed90e26bea50f07b109d5341f8a"
+      },
+      "decoded_rgb_sha256": "b675636e3f2293abc1614036eb6975ef0a117d8b3aad0c0dace93fe9309ca4d0",
+      "parent_decoded_rgb_sha256": "b675636e3f2293abc1614036eb6975ef0a117d8b3aad0c0dace93fe9309ca4d0",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/bbox_resized_first_reference_residual_on/rle_lossless/receiver.json",
+        "bytes": 1962,
+        "sha256": "e16927cf5b1ab7e1a03fea15b48c4064d90f7afcf9b89bcd28e6755a0b184173"
+      },
+      "frames": 48,
+      "pooled_mse_y": 251.05271674262153,
+      "pooled_y_psnr_db": 24.133154354565075,
+      "mean_frame_y_psnr_db": 24.136164460789047,
+      "rgb_mae": 8.387130895543981,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 44,
+          "complete_bytes": 50136,
+          "pooled_y_psnr_db": 27.073140500244428
+        }
+      ]
+    },
+    {
+      "setting": "per_frame_crop_residual_off",
+      "variant": "original",
+      "mask_scale": 1,
+      "lossless": true,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/per_frame_crop_residual_off/transport.npz",
+        "bytes": 180955,
+        "sha256": "da3c66116c11136ea4f24afa17982c4335823d8930a18f54b7eb6a67335c946e"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_off/original/packet.zip",
+        "bytes": 180955,
+        "sha256": "da3c66116c11136ea4f24afa17982c4335823d8930a18f54b7eb6a67335c946e"
+      },
+      "decoded_rgb_sha256": "5ee71c018cf785bf8529e7cd5a0876f01b3fe2ad841804d02e35ccab87d58984",
+      "parent_decoded_rgb_sha256": "5ee71c018cf785bf8529e7cd5a0876f01b3fe2ad841804d02e35ccab87d58984",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_off/original/receiver.json",
+        "bytes": 1611,
+        "sha256": "5afb22231c537c4beafe1efded651359fc8c5ac84226812a6b77752c67d50395"
+      },
+      "frames": 48,
+      "pooled_mse_y": 540.8889575195312,
+      "pooled_y_psnr_db": 20.799722456437916,
+      "mean_frame_y_psnr_db": 20.803968707356383,
+      "rgb_mae": 31.10278076171875,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 32,
+          "complete_bytes": 158246,
+          "pooled_y_psnr_db": 31.860988643063433
+        },
+        {
+          "quantizer": 44,
+          "complete_bytes": 50136,
+          "pooled_y_psnr_db": 27.073140500244428
+        },
+        {
+          "quantizer": 52,
+          "complete_bytes": 15178,
+          "pooled_y_psnr_db": 22.943484422691867
+        },
+        {
+          "quantizer": 58,
+          "complete_bytes": 7721,
+          "pooled_y_psnr_db": 20.819903006246943
+        }
+      ]
+    },
+    {
+      "setting": "per_frame_crop_residual_off",
+      "variant": "compact_psm1",
+      "mask_scale": 1,
+      "lossless": true,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/per_frame_crop_residual_off/transport.npz",
+        "bytes": 180955,
+        "sha256": "da3c66116c11136ea4f24afa17982c4335823d8930a18f54b7eb6a67335c946e"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_off/compact_psm1/packet.zip",
+        "bytes": 84224,
+        "sha256": "4ed640528bc61d965dc63bc4396ed8454d9feb05ab6b0525efe89e55e046c4e5"
+      },
+      "decoded_rgb_sha256": "5ee71c018cf785bf8529e7cd5a0876f01b3fe2ad841804d02e35ccab87d58984",
+      "parent_decoded_rgb_sha256": "5ee71c018cf785bf8529e7cd5a0876f01b3fe2ad841804d02e35ccab87d58984",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_off/compact_psm1/receiver.json",
+        "bytes": 1626,
+        "sha256": "ce7fce7269528bfe16f117bfed8cd43c0d6fe892ec1dc2565b06e16b34775071"
+      },
+      "frames": 48,
+      "pooled_mse_y": 540.8889575195312,
+      "pooled_y_psnr_db": 20.799722456437916,
+      "mean_frame_y_psnr_db": 20.803968707356383,
+      "rgb_mae": 31.10278076171875,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 44,
+          "complete_bytes": 50136,
+          "pooled_y_psnr_db": 27.073140500244428
+        },
+        {
+          "quantizer": 52,
+          "complete_bytes": 15178,
+          "pooled_y_psnr_db": 22.943484422691867
+        },
+        {
+          "quantizer": 58,
+          "complete_bytes": 7721,
+          "pooled_y_psnr_db": 20.819903006246943
+        }
+      ]
+    },
+    {
+      "setting": "per_frame_crop_residual_off",
+      "variant": "rle_lossless",
+      "mask_scale": 1,
+      "lossless": true,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/per_frame_crop_residual_off/transport.npz",
+        "bytes": 180955,
+        "sha256": "da3c66116c11136ea4f24afa17982c4335823d8930a18f54b7eb6a67335c946e"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_off/rle_lossless/packet.zip",
+        "bytes": 81799,
+        "sha256": "678af0176d38e133f4f8c8497804791a5ba70c19b347ca5e9c813769f509b0d2"
+      },
+      "decoded_rgb_sha256": "5ee71c018cf785bf8529e7cd5a0876f01b3fe2ad841804d02e35ccab87d58984",
+      "parent_decoded_rgb_sha256": "5ee71c018cf785bf8529e7cd5a0876f01b3fe2ad841804d02e35ccab87d58984",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_off/rle_lossless/receiver.json",
+        "bytes": 1626,
+        "sha256": "85e3789b8d522be552bc5ef885ade95ddb1c36d30c13b0f362a45fcb0598e7a9"
+      },
+      "frames": 48,
+      "pooled_mse_y": 540.8889575195312,
+      "pooled_y_psnr_db": 20.799722456437916,
+      "mean_frame_y_psnr_db": 20.803968707356383,
+      "rgb_mae": 31.10278076171875,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 44,
+          "complete_bytes": 50136,
+          "pooled_y_psnr_db": 27.073140500244428
+        },
+        {
+          "quantizer": 52,
+          "complete_bytes": 15178,
+          "pooled_y_psnr_db": 22.943484422691867
+        },
+        {
+          "quantizer": 58,
+          "complete_bytes": 7721,
+          "pooled_y_psnr_db": 20.819903006246943
+        }
+      ]
+    },
+    {
+      "setting": "per_frame_crop_residual_off",
+      "variant": "rle_scale2",
+      "mask_scale": 2,
+      "lossless": false,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/per_frame_crop_residual_off/transport.npz",
+        "bytes": 180955,
+        "sha256": "da3c66116c11136ea4f24afa17982c4335823d8930a18f54b7eb6a67335c946e"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_off/rle_scale2/packet.zip",
+        "bytes": 78408,
+        "sha256": "4918de1e8721745b04c85ee4c44cab8d9c790ccef8c319705bd836b78e56089e"
+      },
+      "decoded_rgb_sha256": "a05b9cdad5b7faedce78b79ae22019980e07a3e078422b888e35e96d80acae6c",
+      "parent_decoded_rgb_sha256": "5ee71c018cf785bf8529e7cd5a0876f01b3fe2ad841804d02e35ccab87d58984",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_off/rle_scale2/receiver.json",
+        "bytes": 1618,
+        "sha256": "00e12f3ee6e3deb14435f22428773cab6ec81fc6e69acefd21499fa9c0ae53b8"
+      },
+      "frames": 48,
+      "pooled_mse_y": 541.3118725585938,
+      "pooled_y_psnr_db": 20.796328083193618,
+      "mean_frame_y_psnr_db": 20.800620129846,
+      "rgb_mae": 31.105228376977237,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 44,
+          "complete_bytes": 50136,
+          "pooled_y_psnr_db": 27.073140500244428
+        },
+        {
+          "quantizer": 52,
+          "complete_bytes": 15178,
+          "pooled_y_psnr_db": 22.943484422691867
+        },
+        {
+          "quantizer": 58,
+          "complete_bytes": 7721,
+          "pooled_y_psnr_db": 20.819903006246943
+        }
+      ]
+    },
+    {
+      "setting": "per_frame_crop_residual_off",
+      "variant": "rle_scale4",
+      "mask_scale": 4,
+      "lossless": false,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/per_frame_crop_residual_off/transport.npz",
+        "bytes": 180955,
+        "sha256": "da3c66116c11136ea4f24afa17982c4335823d8930a18f54b7eb6a67335c946e"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_off/rle_scale4/packet.zip",
+        "bytes": 76779,
+        "sha256": "5e96771e19d0c0406d487e6aa5404ef2622e94256f0ab2a81a751ce6e3bc319f"
+      },
+      "decoded_rgb_sha256": "0e5413c7674de7597c093f6b6c1814e1ba551fdc31d060c0f471f9af22ec3886",
+      "parent_decoded_rgb_sha256": "5ee71c018cf785bf8529e7cd5a0876f01b3fe2ad841804d02e35ccab87d58984",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_off/rle_scale4/receiver.json",
+        "bytes": 1618,
+        "sha256": "1e276c653b127d2663f9911396639d0d1e246ef599718ae43bb849c85e1060e5"
+      },
+      "frames": 48,
+      "pooled_mse_y": 542.510393608941,
+      "pooled_y_psnr_db": 20.786722978979967,
+      "mean_frame_y_psnr_db": 20.79124024524594,
+      "rgb_mae": 31.111307719666282,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 44,
+          "complete_bytes": 50136,
+          "pooled_y_psnr_db": 27.073140500244428
+        },
+        {
+          "quantizer": 52,
+          "complete_bytes": 15178,
+          "pooled_y_psnr_db": 22.943484422691867
+        },
+        {
+          "quantizer": 58,
+          "complete_bytes": 7721,
+          "pooled_y_psnr_db": 20.819903006246943
+        }
+      ]
+    },
+    {
+      "setting": "per_frame_crop_residual_off",
+      "variant": "rle_scale8",
+      "mask_scale": 8,
+      "lossless": false,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/per_frame_crop_residual_off/transport.npz",
+        "bytes": 180955,
+        "sha256": "da3c66116c11136ea4f24afa17982c4335823d8930a18f54b7eb6a67335c946e"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_off/rle_scale8/packet.zip",
+        "bytes": 75981,
+        "sha256": "1f851a877679e1fa6eebe33b6053dea8c97f27d1f1810996946eeb77bab5f8ff"
+      },
+      "decoded_rgb_sha256": "8eef014ac7f87aed81294451d3d94b6f5b911805709988ccf50fccdbb3347add",
+      "parent_decoded_rgb_sha256": "5ee71c018cf785bf8529e7cd5a0876f01b3fe2ad841804d02e35ccab87d58984",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_off/rle_scale8/receiver.json",
+        "bytes": 1618,
+        "sha256": "670a96b662b55ed016d5c8bcef972d9864d737d4af8531d1f370d6d41efe9785"
+      },
+      "frames": 48,
+      "pooled_mse_y": 544.7531825991031,
+      "pooled_y_psnr_db": 20.76880584673452,
+      "mean_frame_y_psnr_db": 20.773808085200724,
+      "rgb_mae": 31.123414020302857,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 44,
+          "complete_bytes": 50136,
+          "pooled_y_psnr_db": 27.073140500244428
+        },
+        {
+          "quantizer": 52,
+          "complete_bytes": 15178,
+          "pooled_y_psnr_db": 22.943484422691867
+        },
+        {
+          "quantizer": 58,
+          "complete_bytes": 7721,
+          "pooled_y_psnr_db": 20.819903006246943
+        }
+      ]
+    },
+    {
+      "setting": "per_frame_crop_residual_on",
+      "variant": "original",
+      "mask_scale": 1,
+      "lossless": true,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/per_frame_crop_residual_on/transport.npz",
+        "bytes": 253122,
+        "sha256": "e47e81e6e21ffb36952c66e6077f6ad8f8a6cac0b6f10d79247c406a5aa9fb62"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_on/original/packet.zip",
+        "bytes": 253122,
+        "sha256": "e47e81e6e21ffb36952c66e6077f6ad8f8a6cac0b6f10d79247c406a5aa9fb62"
+      },
+      "decoded_rgb_sha256": "82454ad0d8d0cb0ae3962e40b784a945d09a0d6d12b7b2b70718fd3abcdf014c",
+      "parent_decoded_rgb_sha256": "82454ad0d8d0cb0ae3962e40b784a945d09a0d6d12b7b2b70718fd3abcdf014c",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_on/original/receiver.json",
+        "bytes": 1891,
+        "sha256": "0809561c306fd1f7b16b309bfbd9a8bfc66ae8433f7b66f9ae1dd07ee8d9f14d"
+      },
+      "frames": 48,
+      "pooled_mse_y": 250.02393464265046,
+      "pooled_y_psnr_db": 24.150987754531723,
+      "mean_frame_y_psnr_db": 24.154268000281874,
+      "rgb_mae": 8.384512532552083,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 32,
+          "complete_bytes": 158246,
+          "pooled_y_psnr_db": 31.860988643063433
+        },
+        {
+          "quantizer": 44,
+          "complete_bytes": 50136,
+          "pooled_y_psnr_db": 27.073140500244428
+        }
+      ]
+    },
+    {
+      "setting": "per_frame_crop_residual_on",
+      "variant": "compact_psm1",
+      "mask_scale": 1,
+      "lossless": true,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/per_frame_crop_residual_on/transport.npz",
+        "bytes": 253122,
+        "sha256": "e47e81e6e21ffb36952c66e6077f6ad8f8a6cac0b6f10d79247c406a5aa9fb62"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_on/compact_psm1/packet.zip",
+        "bytes": 156293,
+        "sha256": "950fb2d9014504ef3ce39ab1abe593678eb2286f35ed3d00ff1bc77fd7a5a980"
+      },
+      "decoded_rgb_sha256": "82454ad0d8d0cb0ae3962e40b784a945d09a0d6d12b7b2b70718fd3abcdf014c",
+      "parent_decoded_rgb_sha256": "82454ad0d8d0cb0ae3962e40b784a945d09a0d6d12b7b2b70718fd3abcdf014c",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_on/compact_psm1/receiver.json",
+        "bytes": 1907,
+        "sha256": "7e78cdd6d69ea852b58bc20eb63bbf0e5dd89578d1902bb57229ad9b01fd180b"
+      },
+      "frames": 48,
+      "pooled_mse_y": 250.02393464265046,
+      "pooled_y_psnr_db": 24.150987754531723,
+      "mean_frame_y_psnr_db": 24.154268000281874,
+      "rgb_mae": 8.384512532552083,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 44,
+          "complete_bytes": 50136,
+          "pooled_y_psnr_db": 27.073140500244428
+        }
+      ]
+    },
+    {
+      "setting": "per_frame_crop_residual_on",
+      "variant": "rle_lossless",
+      "mask_scale": 1,
+      "lossless": true,
+      "input_package": {
+        "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/per_frame_crop_residual_on/transport.npz",
+        "bytes": 253122,
+        "sha256": "e47e81e6e21ffb36952c66e6077f6ad8f8a6cac0b6f10d79247c406a5aa9fb62"
+      },
+      "packet": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_on/rle_lossless/packet.zip",
+        "bytes": 153866,
+        "sha256": "3526ec5f16d5e9d452d58915e0b8a6403e63b0dff5a8904b472d884fa8b7974d"
+      },
+      "decoded_rgb_sha256": "82454ad0d8d0cb0ae3962e40b784a945d09a0d6d12b7b2b70718fd3abcdf014c",
+      "parent_decoded_rgb_sha256": "82454ad0d8d0cb0ae3962e40b784a945d09a0d6d12b7b2b70718fd3abcdf014c",
+      "receiver_receipt": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/packet-full-bfab96c-20261001/results/per_frame_crop_residual_on/rle_lossless/receiver.json",
+        "bytes": 1907,
+        "sha256": "4d924f69745b06c40230c25e7eb15ac8e859323fd1559411967d5b5986b76a44"
+      },
+      "frames": 48,
+      "pooled_mse_y": 250.02393464265046,
+      "pooled_y_psnr_db": 24.150987754531723,
+      "mean_frame_y_psnr_db": 24.154268000281874,
+      "rgb_mae": 8.384512532552083,
+      "strict_vvc_point_dominators": [
+        {
+          "quantizer": 44,
+          "complete_bytes": 50136,
+          "pooled_y_psnr_db": 27.073140500244428
+        }
+      ]
+    }
+  ],
+  "anchor_rows": [
+    {
+      "codec": "av1",
+      "quantizer": 32,
+      "stream": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/av1_32/stream.ivf",
+        "bytes": 251171,
+        "sha256": "1682b068b280599f3a3021e9915d04fba41000a09406ccc781c309b579aceb6a"
+      },
+      "manifest": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/av1_32/manifest.json",
+        "bytes": 385,
+        "sha256": "902e71586fac74050a0b8e5e8edf79138dc223540d363b8fe9c38eb371700aff"
+      },
+      "complete_bytes": 251556,
+      "native_probe": [
+        {
+          "codec_name": "av1",
+          "width": 640,
+          "height": 360,
+          "pix_fmt": "yuv420p",
+          "nb_read_frames": "48"
+        }
+      ],
+      "decoded_rgb_sha256": "d31b640b393ccbe601f7ed22a73cddb8dc1badb834ac1d6ea7f8c4dd674a4097",
+      "access": "continuous complete-window native encoding, decode arguments contain charged stream only",
+      "frames": 48,
+      "pooled_mse_y": 12.630411241319445,
+      "pooled_y_psnr_db": 37.11662869621514,
+      "mean_frame_y_psnr_db": 37.23842487870531,
+      "rgb_mae": 3.4407469497492285
+    },
+    {
+      "codec": "av1",
+      "quantizer": 44,
+      "stream": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/av1_44/stream.ivf",
+        "bytes": 122470,
+        "sha256": "b59746a50b6aeaf7818f6662f52bafcbcc91a79219c175c3ce53bb8329476a27"
+      },
+      "manifest": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/av1_44/manifest.json",
+        "bytes": 385,
+        "sha256": "1828922e8e3759a124cfeef484058c2e77cee0e5c2fe700d1b0ddd50b797149a"
+      },
+      "complete_bytes": 122855,
+      "native_probe": [
+        {
+          "codec_name": "av1",
+          "width": 640,
+          "height": 360,
+          "pix_fmt": "yuv420p",
+          "nb_read_frames": "48"
+        }
+      ],
+      "decoded_rgb_sha256": "4647b8ea8427782d4ffc4f9377bcb8a90d7596cbac57b225edcb4f5c42638dc4",
+      "access": "continuous complete-window native encoding, decode arguments contain charged stream only",
+      "frames": 48,
+      "pooled_mse_y": 29.1351978443287,
+      "pooled_y_psnr_db": 33.48662389328699,
+      "mean_frame_y_psnr_db": 33.696031974441674,
+      "rgb_mae": 4.043097240306713
+    },
+    {
+      "codec": "av1",
+      "quantizer": 52,
+      "stream": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/av1_52/stream.ivf",
+        "bytes": 76236,
+        "sha256": "df1d49f0fda4f681ce2c4dd5f8b21cadb0787de7db98c97ddb7a03c4182a54f0"
+      },
+      "manifest": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/av1_52/manifest.json",
+        "bytes": 384,
+        "sha256": "c6add16af8012838839bfc545c747c5d4b9b71d65d42fa62214f45693140cea0"
+      },
+      "complete_bytes": 76620,
+      "native_probe": [
+        {
+          "codec_name": "av1",
+          "width": 640,
+          "height": 360,
+          "pix_fmt": "yuv420p",
+          "nb_read_frames": "48"
+        }
+      ],
+      "decoded_rgb_sha256": "fb7b53a416ad7cfe359e048f2b540b585eca01ae0ebe118d053a186b4ae0de0b",
+      "access": "continuous complete-window native encoding, decode arguments contain charged stream only",
+      "frames": 48,
+      "pooled_mse_y": 47.28472592954282,
+      "pooled_y_psnr_db": 31.38359484734309,
+      "mean_frame_y_psnr_db": 31.60061303555762,
+      "rgb_mae": 4.613415798611111
+    },
+    {
+      "codec": "av1",
+      "quantizer": 58,
+      "stream": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/av1_58/stream.ivf",
+        "bytes": 51556,
+        "sha256": "de8f33938a9a848a19fd1ec609f5c6d0ada4a0af449ad686421e515dd0d4a8ce"
+      },
+      "manifest": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/av1_58/manifest.json",
+        "bytes": 384,
+        "sha256": "6acf07c84afae7be148b864081a3fc4ce6454b54a0ce54e5c3d94cab74d0b3cd"
+      },
+      "complete_bytes": 51940,
+      "native_probe": [
+        {
+          "codec_name": "av1",
+          "width": 640,
+          "height": 360,
+          "pix_fmt": "yuv420p",
+          "nb_read_frames": "48"
+        }
+      ],
+      "decoded_rgb_sha256": "ec9415b33a3d7a310bdca621c7cdee667ea6a024211038644a9db879e41327ce",
+      "access": "continuous complete-window native encoding, decode arguments contain charged stream only",
+      "frames": 48,
+      "pooled_mse_y": 65.48691749855324,
+      "pooled_y_psnr_db": 29.96925812413078,
+      "mean_frame_y_psnr_db": 30.159403155207794,
+      "rgb_mae": 5.223182689525463
+    },
+    {
+      "codec": "av1",
+      "quantizer": 63,
+      "stream": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/av1_63/stream.ivf",
+        "bytes": 26343,
+        "sha256": "256136e19f66729ffb7e2c075f3d36b857566a050fa059f357de839c833bcfa3"
+      },
+      "manifest": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/av1_63/manifest.json",
+        "bytes": 384,
+        "sha256": "c10f57277b2e60a264b5d1483903c61171b5917c8d21cf3fa7f0de1c95e6f3c8"
+      },
+      "complete_bytes": 26727,
+      "native_probe": [
+        {
+          "codec_name": "av1",
+          "width": 640,
+          "height": 360,
+          "pix_fmt": "yuv420p",
+          "nb_read_frames": "48"
+        }
+      ],
+      "decoded_rgb_sha256": "81ab385f28cae606e8d9c0bd3bb6d6cd9a134c655014c723f377f370655b1424",
+      "access": "continuous complete-window native encoding, decode arguments contain charged stream only",
+      "frames": 48,
+      "pooled_mse_y": 109.50316957826969,
+      "pooled_y_psnr_db": 27.736536708202628,
+      "mean_frame_y_psnr_db": 27.84123466588063,
+      "rgb_mae": 6.66107235001929
+    },
+    {
+      "codec": "vvc",
+      "quantizer": 32,
+      "stream": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/vvc_32/stream.266",
+        "bytes": 157861,
+        "sha256": "e2a56ba5ad5578f199b214829c5250aec596379002e0173301714c6c8ec22e86"
+      },
+      "manifest": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/vvc_32/manifest.json",
+        "bytes": 385,
+        "sha256": "57aa278e634c379929bf17ee777e0b7afc9aa82d7463ed26f0f5d9143a581508"
+      },
+      "complete_bytes": 158246,
+      "native_probe": [
+        {
+          "codec_name": "vvc",
+          "width": 640,
+          "height": 360,
+          "pix_fmt": "yuv420p10le",
+          "nb_read_frames": "48"
+        }
+      ],
+      "decoded_rgb_sha256": "05d574003837390a56063e12c96c99b955dedebd946b3f6f8dcb8e6021712d0a",
+      "access": "continuous complete-window native encoding, decode arguments contain charged stream only",
+      "frames": 48,
+      "pooled_mse_y": 42.36249168113426,
+      "pooled_y_psnr_db": 31.860988643063433,
+      "mean_frame_y_psnr_db": 32.30386291567701,
+      "rgb_mae": 4.4664530888310185
+    },
+    {
+      "codec": "vvc",
+      "quantizer": 44,
+      "stream": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/vvc_44/stream.266",
+        "bytes": 49752,
+        "sha256": "682075cef8749865ed128f4ccee32a00ece040ec8330eae3b47fdf63f724732e"
+      },
+      "manifest": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/vvc_44/manifest.json",
+        "bytes": 384,
+        "sha256": "d553ab89132b0343e40922adfa7851c0d98aca3c9c3734641527802969e679af"
+      },
+      "complete_bytes": 50136,
+      "native_probe": [
+        {
+          "codec_name": "vvc",
+          "width": 640,
+          "height": 360,
+          "pix_fmt": "yuv420p10le",
+          "nb_read_frames": "48"
+        }
+      ],
+      "decoded_rgb_sha256": "f8aeb8a468c4c2b4b807b4e2549e256f52c61122286594f2bf6e1f3c6d2f149d",
+      "access": "continuous complete-window native encoding, decode arguments contain charged stream only",
+      "frames": 48,
+      "pooled_mse_y": 127.57521556712963,
+      "pooled_y_psnr_db": 27.073140500244428,
+      "mean_frame_y_psnr_db": 27.15759467655033,
+      "rgb_mae": 7.091876929012345
+    },
+    {
+      "codec": "vvc",
+      "quantizer": 52,
+      "stream": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/vvc_52/stream.266",
+        "bytes": 14794,
+        "sha256": "c1270be371743e42bf0d09ca1a8d8416216cdc3f174a327b2e3937eb39b80172"
+      },
+      "manifest": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/vvc_52/manifest.json",
+        "bytes": 384,
+        "sha256": "b4ea08c2d523d0f4ddda81fc31b1d35f2241f8a9cd6c9926acbe51c9a8e2cb61"
+      },
+      "complete_bytes": 15178,
+      "native_probe": [
+        {
+          "codec_name": "vvc",
+          "width": 640,
+          "height": 360,
+          "pix_fmt": "yuv420p10le",
+          "nb_read_frames": "48"
+        }
+      ],
+      "decoded_rgb_sha256": "38eb1aa6db8e894fd2f93474033563b7e03699f49db085193983ea4a96d5244d",
+      "access": "continuous complete-window native encoding, decode arguments contain charged stream only",
+      "frames": 48,
+      "pooled_mse_y": 330.16567337601276,
+      "pooled_y_psnr_db": 22.943484422691867,
+      "mean_frame_y_psnr_db": 22.96251508068188,
+      "rgb_mae": 11.051920844184028
+    },
+    {
+      "codec": "vvc",
+      "quantizer": 58,
+      "stream": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/vvc_58/stream.266",
+        "bytes": 7338,
+        "sha256": "7e8ad741caff65a19a659840c9abcd1782fcbcaf89ea9bbc0706ce0cdf5dba97"
+      },
+      "manifest": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/vvc_58/manifest.json",
+        "bytes": 383,
+        "sha256": "39f425ad9c9bfb974bd35d4a94fd880c78237ea6369a4f6456190fa63ac981e0"
+      },
+      "complete_bytes": 7721,
+      "native_probe": [
+        {
+          "codec_name": "vvc",
+          "width": 640,
+          "height": 360,
+          "pix_fmt": "yuv420p10le",
+          "nb_read_frames": "48"
+        }
+      ],
+      "decoded_rgb_sha256": "51a54ac779526a24bd7c5ed79e92db7c06907eec53a2f1ad8922be74a0bd71be",
+      "access": "continuous complete-window native encoding, decode arguments contain charged stream only",
+      "frames": 48,
+      "pooled_mse_y": 538.3814158347801,
+      "pooled_y_psnr_db": 20.819903006246943,
+      "mean_frame_y_psnr_db": 20.83020697433568,
+      "rgb_mae": 14.232709297839506
+    },
+    {
+      "codec": "vvc",
+      "quantizer": 63,
+      "stream": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/vvc_63/stream.266",
+        "bytes": 3779,
+        "sha256": "e0506e5fd29524a519d77ef1653d7a0a905d0a11a9b4e1c90b14e5d0fe534a6b"
+      },
+      "manifest": {
+        "path": "/home/itec/emanuele/pointstream-data/audits/anchor-full-bfab96c-20261001/results/vvc_63/manifest.json",
+        "bytes": 383,
+        "sha256": "84404614b9b5c492ba98fae810eb96b3c01e5a21887e013ae05f61bf4eeeadf2"
+      },
+      "complete_bytes": 4162,
+      "native_probe": [
+        {
+          "codec_name": "vvc",
+          "width": 640,
+          "height": 360,
+          "pix_fmt": "yuv420p10le",
+          "nb_read_frames": "48"
+        }
+      ],
+      "decoded_rgb_sha256": "d8879a975d7b666247e9118c50367c915fa55f6abdd78c2cc8b7a800717d642d",
+      "access": "continuous complete-window native encoding, decode arguments contain charged stream only",
+      "frames": 48,
+      "pooled_mse_y": 849.7764644820603,
+      "pooled_y_psnr_db": 18.837756622235162,
+      "mean_frame_y_psnr_db": 18.84051365688107,
+      "rgb_mae": 18.376091911410107
+    }
+  ]
+}
