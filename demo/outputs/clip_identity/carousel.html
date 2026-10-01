@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Source recordings for the two candidate clips</title>
+<style>
+  body { margin: 0; background: #111; color: #eee; font: 16px/1.4 -apple-system, sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 20px; }
+  h1 { font-size: 20px; font-weight: 600; }
+  h2 { font-size: 16px; margin: 28px 0 6px; }
+  p { color: #bbb; margin: 0 0 10px; }
+  img { width: 100%; background: #000; display: block; }
+  .bar { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+  button { background: #2a2a2a; color: #eee; border: 1px solid #444; padding: 6px 12px; }
+  input[type=range] { flex: 1; }
+  .mark { color: #f0c14a; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Whole recordings behind the two curated 10-second clips</h1>
+  <p>factory001_worker001_00001 stays the training clip. These two are the recordings the other curated files were cut from. A gold label means that 5-second sample overlaps the 10 seconds copied into the curated file. Arrow keys move the selected player.</p>
+
+  <h2>factory020_worker001_00000</h2>
+  <p>Source of <span class="mark">clip_02_factory020_slow_bg.mp4</span>. 3 minutes. The curated cut is 30 s–40 s.</p>
+  <img id="img-a" alt="factory020 frame" />
+  <div class="bar">
+    <button type="button" data-dir="-1" data-id="a">Prev</button>
+    <input id="range-a" type="range" min="0" max="35" value="6" />
+    <button type="button" data-dir="1" data-id="a">Next</button>
+    <span id="cap-a"></span>
+  </div>
+
+  <h2>factory010_worker001_00005</h2>
+  <p>Source of <span class="mark">clip_03_factory010_large_hands.mp4</span>. 3 minutes. The curated cut is 3 s–13 s.</p>
+  <img id="img-b" alt="factory010 frame" />
+  <div class="bar">
+    <button type="button" data-dir="-1" data-id="b">Prev</button>
+    <input id="range-b" type="range" min="0" max="35" value="1" />
+    <button type="button" data-dir="1" data-id="b">Next</button>
+    <span id="cap-b"></span>
+  </div>
+</main>
+<script>
+const players = {
+  a: { prefix: "carousel/factory020_t", window: [30, 40], start: 6 },
+  b: { prefix: "carousel/factory010_t", window: [3, 13], start: 1 },
+};
+function show(id, index) {
+  const p = players[id];
+  index = Math.max(0, Math.min(35, index));
+  const t = index * 5;
+  const img = document.getElementById("img-" + id);
+  img.src = p.prefix + String(t).padStart(4, "0") + ".jpg";
+  document.getElementById("range-" + id).value = index;
+  const inside = t < p.window[1] && t + 5 > p.window[0];
+  document.getElementById("cap-" + id).textContent = t + " s" + (inside ? "  · curated 10 s" : "");
+  document.getElementById("cap-" + id).className = inside ? "mark" : "";
+}
+document.querySelectorAll("button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.id;
+    show(id, Number(document.getElementById("range-" + id).value) + Number(btn.dataset.dir));
+  });
+});
+document.querySelectorAll("input[type=range]").forEach((el) => {
+  el.addEventListener("input", () => show(el.id.slice(6), Number(el.value)));
+});
+let active = "a";
+document.querySelectorAll("img, input").forEach((el) => {
+  el.addEventListener("pointerdown", () => { active = el.id.endsWith("b") || el.id.includes("-b") ? "b" : "a"; });
+});
+document.addEventListener("keydown", (ev) => {
+  if (ev.key === "ArrowRight") show(active, Number(document.getElementById("range-" + active).value) + 1);
+  if (ev.key === "ArrowLeft") show(active, Number(document.getElementById("range-" + active).value) - 1);
+});
+show("a", 6);
+show("b", 1);
+</script>
+</body>
+</html>

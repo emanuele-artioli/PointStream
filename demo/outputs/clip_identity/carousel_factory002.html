@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>factory002_worker001_00000</title>
+<style>
+  body { margin: 0; background: #111; color: #eee; font: 16px/1.4 -apple-system, sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 20px; }
+  h1 { font-size: 20px; font-weight: 600; }
+  p { color: #bbb; }
+  img { width: 100%; background: #000; display: block; }
+  .bar { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+  button { background: #2a2a2a; color: #eee; border: 1px solid #444; padding: 6px 12px; }
+  input[type=range] { flex: 1; }
+  .mark { color: #f0c14a; }
+</style>
+</head>
+<body>
+<main>
+  <h1>factory002_worker001_00000</h1>
+  <p>20 minutes, one frame every 10 seconds. The curated file <span class="mark">clip_03_factory002_worker001_00000_largehands.mp4</span> is 69–79 s. Gold marks the samples that overlap that cut. Left and right arrows move the slider.</p>
+  <img id="frame" alt="factory002 frame" />
+  <div class="bar">
+    <button type="button" id="prev">Prev</button>
+    <input id="range" type="range" min="0" max="119" value="7" />
+    <button type="button" id="next">Next</button>
+    <span id="cap"></span>
+  </div>
+</main>
+<script>
+const range = document.getElementById("range");
+function show(index) {
+  index = Math.max(0, Math.min(119, index));
+  const t = index * 10;
+  document.getElementById("frame").src = "carousel/f" + String(index + 1).padStart(4, "0") + ".jpg";
+  range.value = index;
+  const inside = t < 79 && t + 10 > 69;
+  const cap = document.getElementById("cap");
+  const m = Math.floor(t / 60);
+  const s = t % 60;
+  cap.textContent = m + ":" + String(s).padStart(2, "0") + (inside ? "  · curated 10 s" : "");
+  cap.className = inside ? "mark" : "";
+}
+document.getElementById("prev").onclick = () => show(Number(range.value) - 1);
+document.getElementById("next").onclick = () => show(Number(range.value) + 1);
+range.oninput = () => show(Number(range.value));
+document.addEventListener("keydown", (ev) => {
+  if (ev.key === "ArrowRight") show(Number(range.value) + 1);
+  if (ev.key === "ArrowLeft") show(Number(range.value) - 1);
+});
+show(7);
+</script>
+</body>
+</html>
