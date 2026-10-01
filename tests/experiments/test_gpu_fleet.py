@@ -15,6 +15,20 @@ import pytest
 from experiments.jobs import fleet
 
 
+def test_local_code_snapshot_keeps_data_root_run_paths():
+    host = {"data_root": "/data/pointstream"}
+    job = "20261001T172825Z-77156054"
+    assert fleet.snapshot_directory(host, job, None) == f"/data/pointstream/jobs/fleet/snapshots/{job}"
+    assert fleet.snapshot_directory(host, job, "/var/tmp/owned-code") == f"/var/tmp/owned-code/{job}"
+    assert fleet._remote_path(host, "runs", job) == f"/data/pointstream/jobs/fleet/runs/{job}"
+
+
+@pytest.mark.parametrize("path", ["relative", "/", "/var/tmp/../foreign"])
+def test_local_snapshot_rejects_ambiguous_roots(path):
+    with pytest.raises(fleet.FleetError):
+        fleet.snapshot_directory({"data_root": "/data"}, "20261001T172825Z-77156054", path)
+
+
 def device(
     name: str = "NVIDIA RTX 6000 Ada Generation",
     *,

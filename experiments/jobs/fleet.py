@@ -376,6 +376,18 @@ def _remote_path(host: dict[str, Any], *parts: str) -> str:
     return str(Path(host["data_root"]).joinpath("jobs", "fleet", *parts))
 
 
+def snapshot_directory(host: dict[str, Any], job_id: str, override: str | None) -> str:
+    """Keep run artifacts on the data root even when code uses local storage."""
+    if override is None:
+        return _remote_path(host, "snapshots", job_id)
+    path = PurePosixPath(override)
+    if not path.is_absolute() or ".." in path.parts or str(path) == "/":
+        raise FleetError("snapshot root must be an absolute non-root path without traversal")
+    if not JOB_ID_RE.fullmatch(job_id):
+        raise FleetError("invalid snapshot job identity")
+    return str(path / job_id)
+
+
 def _send_snapshot(host: str, source: Path, target: str, expected_sha256: str) -> None:
     remote_tar = str(Path(target).with_suffix(".tar"))
     receive = f"umask 077; set -o noclobber; cat > {shlex.quote(remote_tar)}"
@@ -491,7 +503,7 @@ def launch_job(args: argparse.Namespace, root: Path) -> dict[str, Any]:
     )
     job_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ-") + uuid.uuid4().hex[:8]
     run_dir = _remote_path(selected_host, "runs", job_id)
-    source_dir = _remote_path(selected_host, "snapshots", job_id)
+    source_dir = snapshot_directory(selected_host, job_id, getattr(args, "snapshot_root", None))
     local_manifest_path = Path(args.state_dir).expanduser() / f"{job_id}.json"
     snapshot: Path | None = None
     manifest: dict[str, Any] = {
@@ -732,6 +744,7 @@ def main(argv: list[str] | None = None) -> int:
     launch.add_argument("--include-untracked", action="append", default=[], help="local source/config file to add to the snapshot; may be repeated")
     launch.add_argument("--include-change", action="append", default=[], help="tracked local change to add to the snapshot; may be repeated")
     launch.add_argument("--state-dir", type=Path, default=DEFAULT_STATE_DIR)
+    launch.add_argument("--snapshot-root", help="absolute remote root for frozen code only; useful for host-local storage when shared-storage extraction is slow")
     launch.add_argument("command", nargs=argparse.REMAINDER)
     status = commands.add_parser("status", help="retrieve the status of a launched job")
     status.add_argument("job_id")

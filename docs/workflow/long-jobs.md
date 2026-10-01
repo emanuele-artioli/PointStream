@@ -36,6 +36,13 @@ manifest records code and patch checksums, command, runtime environment, GPU,
 and remote run directory. Jobs use the shared external data root and unique
 remote run directories; they never overwrite a working checkout.
 
+If unpacking code on shared storage is slow, pass an owned server-local root,
+for example `--snapshot-root /var/tmp/emanuele-pointstream-fleet-snapshots`.
+Only the unique, checksum-verified frozen code snapshot moves there. Inputs,
+run logs, outputs and cooperative resource claims stay on the external data
+root, and the manifest records the actual code location. Retain the normal
+admission checks and smoke requirements; a failed transfer is not a codec result.
+
 The remote supervisor survives SSH disconnection and laptop sleep. Inspect a
 job with `python -m experiments.jobs.fleet status JOB_ID`; stop it with
 `python -m experiments.jobs.fleet cancel JOB_ID`. Retrieve result files from the
