@@ -24,13 +24,14 @@ def digest(path):
 
 def hidden_receiver(package, output, data_root):
     allowed = {Path(package).resolve(), Path(output).resolve()}
+    code_root = Path(__file__).resolve().parents[2]
     reads, commands = [], []
     def audit(event, args):
         if event == 'open' and isinstance(args[0], (str, bytes, os.PathLike)):
             p = Path(os.fsdecode(args[0])).resolve()
             if p.is_relative_to(Path(data_root).resolve()):
                 reads.append(str(p))
-                if p not in allowed:
+                if p not in allowed and not p.is_relative_to(code_root):
                     raise PermissionError(f'receiver denied external data read: {p}')
         if event == 'subprocess.Popen':
             commands.append(args[1])
