@@ -6,6 +6,8 @@ import hashlib
 import pytest
 from experiments.background.manifest_receiver import decode_manifest
 from experiments.background.reuse_summary import check_quality
+from experiments.background.native_header_audit import ivf_header
+import struct
 
 def test_fractional_fps_refresh_does_not_drift():
     assert schedule(600, Fraction(60000,1001), 1)==[0,60,120,180,240,300,360,420,480,539,599]
@@ -45,3 +47,11 @@ def test_summary_refuses_dropped_frame_and_changed_score():
     with pytest.raises(ValueError,match='denominator'):check_quality(quality,3)
     quality['mean_frame_psnr_db']+=0.01
     with pytest.raises(ValueError,match='PSNR'):check_quality(quality,2)
+
+def test_ivf_header_checks_physical_frame_denominator(tmp_path):
+    path=tmp_path/'native.ivf'
+    header=struct.pack('<4sHH4sHHIIII',b'DKIF',0,32,b'AV01',640,90,60000,1001,1,0)
+    path.write_bytes(header+struct.pack('<IQ',1,0)+b'x')
+    assert ivf_header(path)=={'geometry':[640,90],'fps':'60000/1001','header_frames':1,'physical_packets':1}
+    path.write_bytes(header)
+    with pytest.raises(ValueError,match='denominator'):ivf_header(path)
