@@ -121,3 +121,12 @@ reconstruction and complete costs; consecutive-sequence background reuse with
 refresh/reset accounting; controlled conditioning/mask interventions; and
 independent all-frame task truth with disclosed held-out exposure. This run
 cannot resolve those gaps from retained removal streams alone.
+
+
+Manuscript publication: Overleaf revision `fc86ada` on 1 October 2026,
+from scoped branch `codex/paper-cpu-evidence`. The rendered working paper is
+20 pages including three appendix pages. Native replay, source-ID sensitivity,
+methods and remaining `HOLE` markers are included. The prior dossier at
+`21931f6` remains the historical evidence reference. Focused replay and resource
+monitor tests passed (63 tests); numerical manuscript checks and all-page visual
+inspection passed. No pull request was opened.
