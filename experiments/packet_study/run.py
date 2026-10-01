@@ -2,6 +2,8 @@
 from __future__ import annotations
 import argparse, hashlib, io, json, os, resource, socket, subprocess, sys, time
 from pathlib import Path
+for _key in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS"):
+ os.environ[_key]="1"
 import numpy as np
 
 SOURCE='outputs/evaluation-20260914/e03b/run-20260916-federer007/prepared_rgb.npy'
@@ -55,7 +57,7 @@ def study(args):
  source_path=args.data_root/SOURCE;source=np.load(source_path,allow_pickle=False)
  if source.shape!=(48,360,640,3) or source.dtype!=np.uint8:raise ValueError('registered prepared input mismatch')
  if hashlib.sha256(source.tobytes()).hexdigest()!='1f02475a5bbc3d94e4bae2e904dc29c3af3082be0c0c160e027b706a6950f6f8':raise ValueError('source hash mismatch')
- log=[];ffmpeg='/opt/local/bin/ffmpeg';report={'registration':REGISTRATION,'stage':args.stage,'smoke':args.smoke,'code_revision':args.code_revision,'worker':sha(__file__),'hostname':socket.getfqdn(),'affinity':sorted(os.sched_getaffinity(0)),'source':sha(source_path),'source_rgb_sha256':hashlib.sha256(source.tobytes()).hexdigest(),'source_rgb_frame_sha256':[hashlib.sha256(f.tobytes()).hexdigest() for f in source],'source_shape':list(source.shape),'environment':{'python':sys.version,'numpy':np.__version__},'ffmpeg':sha(ffmpeg),'ffmpeg_version':subprocess.run([ffmpeg,'-version'],capture_output=True,text=True).stdout,'gpu_allocated':False,'commands':log,'rows':[]}
+ log=[];ffmpeg='/opt/local/bin/ffmpeg';report={'registration':REGISTRATION,'stage':args.stage,'smoke':args.smoke,'code_revision':args.code_revision,'worker':sha(__file__),'hostname':socket.getfqdn(),'affinity':sorted(os.sched_getaffinity(0)),'source':sha(source_path),'source_rgb_sha256':hashlib.sha256(source.tobytes()).hexdigest(),'source_rgb_frame_sha256':[hashlib.sha256(f.tobytes()).hexdigest() for f in source],'source_shape':list(source.shape),'environment':{'python':sys.version,'numpy':np.__version__,'threads':{k:os.environ.get(k) for k in ['OPENBLAS_NUM_THREADS','OMP_NUM_THREADS','MKL_NUM_THREADS']}},'ffmpeg':sha(ffmpeg),'ffmpeg_version':subprocess.run([ffmpeg,'-version'],capture_output=True,text=True).stdout,'gpu_allocated':False,'commands':log,'rows':[]}
  if args.stage=='packing':
   for setting in SETTINGS[:1] if args.smoke else SETTINGS:
    original=(args.data_root/PACKETS/setting/'transport.npz').read_bytes();original_pixels=None
@@ -81,9 +83,11 @@ def study(args):
     command(cmd,log)
     # Persist and charge explicit common geometry/cadence/placement instead of using source at receiver.
     manifest=directory/'manifest.json';write(manifest,{'schema':'pointstream.native-anchor.v1','codec':codec,'stream':sha(stream),'width':640,'height':360,'frames':48,'fps':'12','output':'rgb24'})
+    probe=json.loads(command(['/opt/local/bin/ffprobe','-v','error','-threads','1','-count_frames','-show_entries','stream=codec_name,width,height,pix_fmt,nb_read_frames','-of','json',str(stream)],log))['streams']
+    if len(probe)!=1 or probe[0]['width']!=640 or probe[0]['height']!=360 or int(probe[0]['nb_read_frames'])!=48:raise ValueError('native geometry/frame denominator mismatch')
     decoded=command([ffmpeg,'-v','error','-threads','4','-i',str(stream),'-pix_fmt','rgb24','-f','rawvideo','pipe:1'],log)
     frames=np.frombuffer(decoded,np.uint8).reshape(-1,360,640,3);qvalues=quality(source,frames);np.save(directory/'decoded.npy',frames,allow_pickle=False)
-    report['rows'].append({'codec':codec,'quantizer':q,'stream':sha(stream),'manifest':sha(manifest),'complete_bytes':stream.stat().st_size+manifest.stat().st_size,'quality':qvalues,'decoded_rgb_sha256':hashlib.sha256(decoded).hexdigest(),'access':'continuous complete-window native encoding, decode arguments contain charged stream only'})
+    report['rows'].append({'codec':codec,'quantizer':q,'stream':sha(stream),'manifest':sha(manifest),'complete_bytes':stream.stat().st_size+manifest.stat().st_size,'native_probe':probe,'quality':qvalues,'decoded_rgb_sha256':hashlib.sha256(decoded).hexdigest(),'access':'continuous complete-window native encoding, decode arguments contain charged stream only'})
     write(args.out/'report.partial.json',report)
  report['status']='complete';write(args.out/'report.json',report);print(json.dumps({'status':'complete','report':sha(args.out/'report.json')}))
 

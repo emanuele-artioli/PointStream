@@ -109,8 +109,8 @@ def _masks(metadata: dict[str, Any], arrays: dict[str, np.ndarray]) -> dict[str,
 def _codec_encode(mask: np.ndarray, codec: str) -> bytes:
     if codec == "psm1":
         return encode_mask(mask)
-    # Reuse E06's independently tested PSR1 RLE wire; importing it is opt-in.
-    from experiments.tier.e06_floor import MODE_INTRA, encode_mask_stack
+    # Use the installed PSR1 wire primitives, byte-compatible with E06.
+    from src.runner.mask_rle import MODE_INTRA, encode_mask_stack
     stack = mask[None] if mask.ndim == 2 else mask
     if any(dim > 65535 for dim in stack.shape):
         raise ValueError("E06 RLE dimensions exceed uint16")
@@ -120,7 +120,7 @@ def _codec_encode(mask: np.ndarray, codec: str) -> bytes:
 def _codec_decode(blob: bytes, codec: str, ndim: int) -> np.ndarray:
     if codec == "psm1":
         return decode_mask(blob)
-    from experiments.tier.e06_floor import decode_mask_stack
+    from src.runner.mask_rle import decode_mask_stack
     stack = decode_mask_stack(blob)
     if ndim == 2:
         if stack.shape[0] != 1:

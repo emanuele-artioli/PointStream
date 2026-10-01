@@ -159,3 +159,51 @@ def test_unpacked_ordinary_envelope_is_validated_identity():
     metadata=meta(original);metadata['placements'][0]['mask_wire']['shape']=[6,7]
     with pytest.raises(ValueError,match='shape'):
         unpack_client_envelope(rewrite(original,metadata=metadata))
+
+
+@pytest.mark.parametrize("mode", [0, 1])
+def test_rle_wire_parity_with_retained_e06(mode):
+    from experiments.tier import e06_floor
+    from src.runner import mask_rle
+    masks = np.zeros((5, 7, 9), dtype=np.uint8)
+    masks[0, 1:4, 2:5] = 1
+    masks[1] = masks[0]
+    masks[2, ::2, ::2] = 1
+    masks[4] = 1
+    retained = e06_floor.encode_mask_stack(masks, mode=mode)
+    installed = mask_rle.encode_mask_stack(masks, mode=mode)
+    assert installed == retained
+    np.testing.assert_array_equal(mask_rle.decode_mask_stack(retained), masks)
+    np.testing.assert_array_equal(e06_floor.decode_mask_stack(installed), masks)
+
+
+def test_installed_adapter_without_experiments(tmp_path):
+    # A fresh interpreter gets only the installed src tree and rejects any
+    # accidental experimental import, including a lazy RLE import.
+    import pathlib
+    import shutil
+    import subprocess
+    import sys
+    source = pathlib.Path(__file__).resolve().parents[2] / "src"
+    shutil.copytree(source, tmp_path / "src")
+    (tmp_path / "input.npz").write_bytes(envelope())
+    script = """
+import importlib.abc
+import pathlib
+import sys
+class RejectExperiments(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname == 'experiments' or fullname.startswith('experiments.'):
+            raise AssertionError('installed adapter imported experiments')
+sys.meta_path.insert(0, RejectExperiments())
+from src.runner.packet_packing import pack_client_envelope, unpack_client_envelope
+from src.runner.client import reconstruct_serialized_client
+payload = pathlib.Path('input.npz').read_bytes()
+for scale in (1, 2):
+    packed = pack_client_envelope(payload, mask_codec='rle', mask_scale=scale)
+    frames = reconstruct_serialized_client(unpack_client_envelope(packed))
+    assert frames.shape == (3, 5, 7, 3)
+"""
+    completed = subprocess.run([sys.executable, "-c", script], cwd=tmp_path,
+                               capture_output=True, text=True, timeout=30)
+    assert completed.returncode == 0, completed.stdout + completed.stderr
