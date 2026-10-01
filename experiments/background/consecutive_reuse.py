@@ -28,6 +28,7 @@ REGISTRATION = {
     "encoder": "libaom-av1 cpu-used=6 row-mt=1 threads=4 crf, IVF; anchors g=9999; each refresh native one-frame stream",
     "scope": "two consecutive intervals; metadata cut times are retained labels, not independently labeled cut truth; no foreground/correction costs or complete codec",
     "exposure": "no learned model; historical data accessed during development; not held-out training evidence",
+    "extraction": "rounded nominal start frame converted to input -ss timestamp; passthrough decoded frames, no fps filter; require every selected showinfo PTS delta nominal +/-50us; metadata cut reset on first selected PTS at or after cut",
 }
 
 def sha(path):
@@ -90,7 +91,7 @@ def main():
             "gpu_inventory":run(["nvidia-smi","--query-gpu=uuid,name","--format=csv,noheader"],commands,output=True).decode(),
             "sources":[],"commands":commands}
     save(a.out/"registration-before-run.json", report)
-    for spec in REGISTRATION["sources"][:1] if a.smoke else REGISTRATION["sources"]:
+    for spec in REGISTRATION["sources"]:
         base=a.out/spec["id"];base.mkdir()
         source=a.data_root/"assets/raw_4k"/(spec["id"]+".mp4")
         meta=a.data_root/"assets/dataset"/spec["id"] /"scene_metadata.json"
@@ -105,10 +106,10 @@ def main():
         if len(times)!=n or not np.allclose(np.diff(times),float(1/fps),atol=5e-5,rtol=0):
             raise ValueError("selected source frames are not complete uniform nominal-timebase consecutive frames")
         pixels=np.fromfile(raw,dtype=np.uint8).reshape(n,640*90*3//2); y=pixels[:,:640*90].reshape(n,90,640)
-        cuts=[math.ceil((Fraction(str(c))-start/fps)*fps) for c in spec["scene_cuts_seconds"]]
+        cuts=[int(np.searchsorted(times,c-float(start/fps),side="left")) for c in spec["scene_cuts_seconds"]]
         result={"source_id":spec["id"],"source":sha(source),"scene_metadata":sha(meta),"probe":info,
                 "raw":sha(raw),"frame_sha256":[hashlib.sha256(v.tobytes()).hexdigest() for v in pixels],
-                "start_frame":start,"frame_count":n,"fps":str(fps),"observed_seconds":float(n/fps),
+                "requested_start_frame":start,"requested_seek_seconds":float(start/fps),"frame_count":n,"fps":str(fps),"observed_seconds":float(n/fps),
                 "registered_cut_frames":cuts,"selected_pts_seconds":times,"extraction_log":sha(base/"extraction.log"),"arms":[]}
         cache={}
         def coded(index,count,crf,name):
