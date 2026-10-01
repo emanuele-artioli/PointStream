@@ -152,6 +152,23 @@ def tensor_pixels(torch, tensor, width, height):
     return ((tensor[:, :, :height, :width].clamp(-1, 1) + 1) / 2).float().cpu().numpy()[0]
 
 
+def padding_canvas(height, width, policy):
+    if type(height) is not int or type(width) is not int or min(height, width) <= 0:
+        raise ValueError('Registered image dimensions must be positive integers')
+    if policy == 'released':
+        return max(1088, height), max(1920, width)
+    if policy == 'min64':
+        return ((height + 63) // 64) * 64, ((width + 63) // 64) * 64
+    raise ValueError('Unknown registered padding policy')
+
+
+def validate_rgb_geometry(mode, size, width, height):
+    if type(height) is not int or type(width) is not int or min(height, width) <= 0:
+        raise ValueError('Registered image dimensions must be positive integers')
+    if mode != 'RGB' or tuple(size) != (width, height):
+        raise ValueError('Input RGB geometry differs from registration')
+
+
 def configure_entropy(i_model, p_model, canvas_h, canvas_w):
     two = canvas_h * canvas_w > 1280 * 720
     i_model.set_use_two_entropy_coders(two)
@@ -185,7 +202,7 @@ def encode(args):
     # Registered input list contains exact paths and hashes, not a directory glob.
     if len(frames) != args.frames:
         raise ValueError('Registered frame count mismatch')
-    canvas_h, canvas_w = max(1088, args.height), max(1920, args.width)
+    canvas_h, canvas_w = padding_canvas(args.height, args.width, args.padding_policy)
     if args.qp < 0 or args.qp >= i_model.get_qp_num():
         raise ValueError('Unsupported registered base QP')
     ec_part = configure_entropy(i_model, p_model, canvas_h, canvas_w)
@@ -197,8 +214,7 @@ def encode(args):
         for index, record in enumerate(frames):
             checked_file(record['path'], record['sha256'])
             with Image.open(record['path']) as image:
-                if image.mode != 'RGB' or image.size != (args.width, args.height):
-                    raise ValueError('Input RGB geometry differs from registration')
+                validate_rgb_geometry(image.mode, image.size, args.width, args.height)
                 pixels = np.asarray(image, dtype=np.float32).transpose(2, 0, 1) / 255
             x = torch.from_numpy(pixels.copy()).unsqueeze(0).to('cuda:0').half()
             x = replicate_pad(x, canvas_h - args.height, canvas_w - args.width) * 2 - 1
@@ -232,6 +248,7 @@ def encode(args):
                 'frames': args.frames, 'fps': args.fps, 'original_width': args.width,
                 'original_height': args.height, 'canvas_width': canvas_w, 'canvas_height': canvas_h,
                 'base_qp': args.qp, 'reset_interval': args.reset_interval, 'placements': placements,
+                'padding_policy': args.padding_policy,
                 'reconstruction': 'float32 CHW, crop then clamp[-1,1] and map to[0,1]',
                 'force_zero_thres': None, 'ec_part': ec_part,
                 'model_deployment': 'preinstalled verified I/P models; not transmitted per stream'}
@@ -278,7 +295,7 @@ def deny_sources(paths):
 def validate_manifest(manifest):
     if min(manifest['frames'], manifest['fps'], manifest['original_width'], manifest['original_height']) <= 0:
         raise ValueError('Invalid manifest count/cadence/geometry')
-    if (manifest['canvas_height'], manifest['canvas_width']) != (max(1088, manifest['original_height']), max(1920, manifest['original_width'])):
+    if (manifest['canvas_height'], manifest['canvas_width']) != padding_canvas(manifest['original_height'], manifest['original_width'], manifest['padding_policy']):
         raise ValueError('Manifest canvas violates registered padding')
     if manifest['ec_part'] != int(manifest['canvas_height'] * manifest['canvas_width'] > 1280 * 720):
         raise ValueError('Manifest entropy partition policy mismatch')
@@ -398,6 +415,7 @@ def main():
     parser.add_argument('--height', type=int, default=1080)
     parser.add_argument('--fps', type=float, default=120)
     parser.add_argument('--qp', type=int, default=1)
+    parser.add_argument('--padding-policy', choices=['released', 'min64'], default='released')
     parser.add_argument('--reset-interval', type=int, default=8)
     parser.add_argument('--manifest', type=Path)
     parser.add_argument('--deny-source', action='append', default=[])
