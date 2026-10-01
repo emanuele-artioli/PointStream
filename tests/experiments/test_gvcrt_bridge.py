@@ -123,3 +123,35 @@ def test_i_initialization_and_both_native_partition_modes():
     bridge.compress_frame(i, p, 'input', 1, True, False, 0)
     assert i.events == [('partition', True), ('compress', 1)]
     assert p.events == [('partition', True), ('clear',), ('reference', None, 'I reconstructed pixels')]
+
+
+def test_official_namespace_wins_over_later_regular_pointstream_src(tmp_path):
+    official, shadow = tmp_path / 'official', tmp_path / 'pointstream'
+    (official / 'src').mkdir(parents=True)
+    (shadow / 'src').mkdir(parents=True)
+    (official / 'src/probe.py').write_text('ORIGIN="verified GVC"\n')
+    (shadow / 'src/__init__.py').write_text('ORIGIN="foreign PointStream"\n')
+    script = '''import importlib.util,sys
+spec=importlib.util.spec_from_file_location('bridge',sys.argv[1]); m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+sys.path[:0]=[sys.argv[2],sys.argv[3]]
+m.bind_source_namespace(sys.argv[2])
+import src.probe
+assert src.probe.ORIGIN=='verified GVC'
+assert list(src.__path__)==[sys.argv[2]+'/src']
+'''
+    subprocess.run([sys.executable, '-c', script, str(BRIDGE), str(official), str(shadow)], check=True)
+
+
+def test_preloaded_foreign_src_is_rejected(tmp_path):
+    official, shadow = tmp_path / 'official', tmp_path / 'pointstream'
+    (official / 'src').mkdir(parents=True)
+    (shadow / 'src').mkdir(parents=True)
+    (shadow / 'src/__init__.py').write_text('ORIGIN="foreign"\n')
+    script = '''import importlib.util,sys
+spec=importlib.util.spec_from_file_location('bridge',sys.argv[1]); m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+sys.path.insert(0,sys.argv[3]); import src
+try:m.bind_source_namespace(sys.argv[2])
+except RuntimeError as error:assert 'Foreign src' in str(error)
+else:raise AssertionError('foreign package accepted')
+'''
+    subprocess.run([sys.executable, '-c', script, str(BRIDGE), str(official), str(shadow)], check=True)

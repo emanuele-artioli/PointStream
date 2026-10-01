@@ -7,6 +7,8 @@ import argparse
 import hashlib
 import io
 import importlib.metadata
+import importlib.machinery
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -34,6 +36,24 @@ def write_json(path, value):
     Path(path).write_text(json.dumps(value, sort_keys=True, indent=2) + '\n')
 
 
+def bind_source_namespace(path):
+    """Keep the verified GVC namespace distinct from PointStream's regular src."""
+    source = (Path(path).resolve() / 'src').resolve(strict=True)
+    for name, module in list(sys.modules.items()):
+        if name != 'src' and not name.startswith('src.'):
+            continue
+        origins = list(getattr(module, '__path__', []))
+        if getattr(module, '__file__', None):
+            origins.append(module.__file__)
+        if not origins or any((resolved := Path(origin).resolve()) != source and source not in resolved.parents
+                              for origin in origins):
+            raise RuntimeError(f'Foreign src module already loaded: {name}; use a fresh worker')
+    spec = importlib.machinery.ModuleSpec('src', loader=None, is_package=True)
+    spec.submodule_search_locations = [str(source)]
+    namespace = importlib.util.module_from_spec(spec)
+    sys.modules['src'] = namespace
+
+
 def source_pin(path):
     path = Path(path).resolve()
     export = path / '.gvcrt-source.json'
@@ -57,6 +77,7 @@ def source_pin(path):
         if subprocess.check_output(['git', '-C', str(path), 'status', '--porcelain', '--untracked-files=no'], text=True).strip():
             raise ValueError('GVC tracked source tree is dirty')
     sys.path.insert(0, str(path))
+    bind_source_namespace(path)
 
 
 def checked_state(model, checkpoint, role):
