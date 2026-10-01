@@ -95,13 +95,14 @@ def test_empty_masks_and_multiple_objects_do_not_assume_one_mask_per_frame(codec
     assert packing_info(packed)['packing']['changed_mask_pixels']==0
 
 
-def test_native_members_and_geometry_metadata_are_preserved():
+@pytest.mark.parametrize("batch", [False, True])
+def test_native_members_and_geometry_metadata_are_preserved(batch):
     original=envelope();metadata=meta(original)
     metadata['background']={'geometry_header':'123456abcdef','wire_header_keys':['background_header_0']}
     extra={key:np.arange(17,dtype=np.uint8) for key in
            ['background_payload_0','encoded_crop_99','ref_player:0','residual_bitstream','background_header_0']}
     original=rewrite(original,metadata=metadata,extra=extra)
-    packed=pack_client_envelope(original,mask_codec='rle')
+    packed=pack_client_envelope(original,mask_codec='rle',batch_masks=batch)
     restored=unpack_client_envelope(packed)
     before,after=members(original),members(restored)
     for key in extra:
@@ -207,3 +208,44 @@ for scale in (1, 2):
     completed = subprocess.run([sys.executable, "-c", script], cwd=tmp_path,
                                capture_output=True, text=True, timeout=30)
     assert completed.returncode == 0, completed.stdout + completed.stderr
+
+
+@pytest.mark.parametrize('codec', ['psm1', 'rle'])
+@pytest.mark.parametrize('scale', [1, 2, 4, 8])
+def test_batch_mask_storage_sparse_multiobject_parity_and_overhead(codec, scale):
+    from src.runner.packet_packing import MASK_BLOB
+    mask = np.zeros((5, 7), dtype=np.uint8)
+    mask[::2, ::2] = 1
+    placements = tuple(ClientPlacement(crop=np.full((5, 7, 3), 180, dtype=np.uint8),
+        bbox=(0, 0, 7, 5), mask=mask, frame_index=i % 2, object_id=str(i)) for i in range(48))
+    original = envelope(frames=3, placements=placements)
+    per_mask = pack_client_envelope(original, mask_codec=codec, mask_scale=scale)
+    batch = pack_client_envelope(original, mask_codec=codec, mask_scale=scale, batch_masks=True)
+    assert batch == pack_client_envelope(original, mask_codec=codec, mask_scale=scale, batch_masks=True)
+    assert len(batch) < len(per_mask)
+    batch_members = members(batch)
+    assert MASK_BLOB in batch_members
+    assert not any(name.startswith('mask_') for name in batch_members)
+    assert meta(batch) == meta(original)  # Original metadata and geometry remain intact.
+    np.testing.assert_array_equal(reconstruct_serialized_client(unpack_client_envelope(batch)),
+                                  reconstruct_serialized_client(unpack_client_envelope(per_mask)))
+    assert packing_info(batch)['zip_framing_bytes'] < packing_info(per_mask)['zip_framing_bytes']
+    assert packing_info(batch)['complete_file_bytes'] == len(batch)
+    assert packing_info(batch)['packing']['version'] == 2
+    # Non-mask arrays, including crop/native packet bytes, remain byte-identical.
+    for name, value in members(original).items():
+        if not name.startswith('mask_'):
+            assert batch_members[name] == value
+
+
+def test_batch_empty_inventory_and_corrupt_ranges():
+    from src.runner.packet_packing import MASK_BLOB
+    original = envelope(placements=())
+    batch = pack_client_envelope(original, batch_masks=True, mask_codec='rle')
+    assert members(batch)[MASK_BLOB] == b''
+    assert reconstruct_serialized_client(unpack_client_envelope(batch)).shape == (3, 5, 7, 3)
+    batch = pack_client_envelope(envelope(), batch_masks=True)
+    spec = packing_info(batch)['packing']
+    spec['masks']['mask_0']['offset'] = 1
+    with pytest.raises(ValueError, match='range'):
+        unpack_client_envelope(rewrite(batch, spec=spec))

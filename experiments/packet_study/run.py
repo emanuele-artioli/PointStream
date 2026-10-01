@@ -9,7 +9,7 @@ import numpy as np
 SOURCE='outputs/evaluation-20260914/e03b/run-20260916-federer007/prepared_rgb.npy'
 PACKETS='outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox'
 SETTINGS=['bbox_resized_first_reference_residual_off','bbox_resized_first_reference_residual_on','per_frame_crop_residual_off','per_frame_crop_residual_on']
-REGISTRATION={'source':SOURCE,'settings':SETTINGS,'fps':'12','lossy_mask_scales':[2,4,8],'mask_codecs':['psm1','rle'],'anchor_av1_crf':[32,44,52,58,63],'anchor_vvc_qp':[32,44,52,58,63],'quality':'complete registered RGB frames; BT601 uint8 Y pooled and mean-frame PSNR, RGB MAE; no independent task truth','access':'offline complete-window encoding for all arms; fresh package/native receiver; preinstalled decoding software, no learned weights','exposure':'one retained development prepared cache; raw extraction and held-out exposure not newly certified','accounting':'every persisted transport byte, no free source-side assets; native anchors include file headers and exact deployment manifest','selection':'all registered variants retained, no post-result selection; no BD-rate without quality overlap; narrow scenario allowed'}
+REGISTRATION={'source':SOURCE,'settings':SETTINGS,'fps':'12','lossy_mask_scales':[2,4,8],'mask_codecs':['psm1','rle'],'batch_masks':True,'retained_floor_control':'probe-20260917-floor-arms/mask_rle_per_frame/transport_floor.npz','anchor_av1_crf':[32,44,52,58,63],'anchor_vvc_qp':[32,44,52,58,63],'quality':'complete registered RGB frames; BT601 uint8 Y pooled and mean-frame PSNR, RGB MAE; no independent task truth','access':'offline complete-window encoding for all arms; fresh package/native receiver; preinstalled decoding software, no learned weights','exposure':'one retained development prepared cache; raw extraction and held-out exposure not newly certified','accounting':'every persisted transport byte, no free source-side assets; native anchors include file headers and exact deployment manifest','selection':'all registered variants retained, no post-result selection; no BD-rate without quality overlap; narrow scenario allowed'}
 
 def sha(path):
  p=Path(path);return {'path':str(p),'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
@@ -45,8 +45,11 @@ def child(args):
  guard,reads,commands=receiver_access_guard(args.packet,args.decoded,args.data_root,Path(__file__).resolve().parents[2]);sys.addaudithook(guard)
  from src.runner.packet_packing import unpack_client_envelope
  from src.runner.client import reconstruct_serialized_client
- packed=args.packet.read_bytes();envelope=packed if args.original else unpack_client_envelope(packed)
- frames=np.asarray(reconstruct_serialized_client(envelope,require_compressed=True),dtype=np.uint8)
+ packed=args.packet.read_bytes();envelope=packed if (args.original or args.legacy_floor) else unpack_client_envelope(packed)
+ if args.legacy_floor:
+  from experiments.tier.e06_transport import reconstruct_standalone
+  frames=reconstruct_standalone(packed)
+ else:frames=np.asarray(reconstruct_serialized_client(envelope,require_compressed=True),dtype=np.uint8)
  np.save(args.decoded,frames,allow_pickle=False)
  print(json.dumps({'packet':sha(args.packet),'shape':list(frames.shape),'decoded_rgb_sha256':hashlib.sha256(frames.tobytes()).hexdigest(),'observed_registered_root_reads':reads,'native_commands':commands,'boundary':'observed Python access guard and native argv, not OS sandbox'}))
 
@@ -63,10 +66,12 @@ def study(args):
    original=(args.data_root/PACKETS/setting/'transport.npz').read_bytes();original_pixels=None
    variants=[('original',None,1),('compact_psm1','psm1',1),('rle_lossless','rle',1)]
    if setting.endswith('_off'):variants += [(f'rle_scale{scale}','rle',scale) for scale in ([2] if args.smoke else REGISTRATION['lossy_mask_scales'])]
+   if setting==SETTINGS[0]:variants.append(('retained_floor_rle','legacy',1))
    for name,codec,scale in variants:
-    directory=args.out/setting/name;directory.mkdir(parents=True);packet=directory/'packet.zip';packet.write_bytes(original if codec is None else pack_client_envelope(original,mask_scale=scale,mask_codec=codec))
+    directory=args.out/setting/name;directory.mkdir(parents=True);packet=directory/'packet.zip';packet.write_bytes((args.data_root/'outputs/evaluation-20260914/e06/probe-20260917-floor-arms/mask_rle_per_frame/transport_floor.npz').read_bytes() if codec=='legacy' else original if codec is None else pack_client_envelope(original,mask_scale=scale,mask_codec=codec,batch_masks=True))
     decoded=directory/'decoded.npy';receipt=directory/'receiver.json';cmd=[sys.executable,'-m','experiments.packet_study.run','--data-root',str(args.data_root),'--packet',str(packet),'--decoded',str(decoded),'--receipt',str(receipt)]
     if codec is None:cmd.append('--original')
+    if codec=='legacy':cmd.append('--legacy-floor')
     write(receipt,json.loads(command(cmd,log)));frames=np.load(decoded,allow_pickle=False);digest=hashlib.sha256(frames.tobytes()).hexdigest()
     if codec is None:original_pixels=digest
     if scale==1 and digest!=original_pixels:raise ValueError('lossless output parity failure')
@@ -92,7 +97,7 @@ def study(args):
  report['status']='complete';write(args.out/'report.json',report);print(json.dumps({'status':'complete','report':sha(args.out/'report.json')}))
 
 def main():
- p=argparse.ArgumentParser();p.add_argument('--data-root',type=Path,required=True);p.add_argument('--out',type=Path);p.add_argument('--stage',choices=['packing','anchors'],default='packing');p.add_argument('--smoke',action='store_true');p.add_argument('--code-revision',default='unfrozen');p.add_argument('--packet',type=Path);p.add_argument('--decoded',type=Path);p.add_argument('--receipt',type=Path);p.add_argument('--original',action='store_true');args=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('--data-root',type=Path,required=True);p.add_argument('--out',type=Path);p.add_argument('--stage',choices=['packing','anchors'],default='packing');p.add_argument('--smoke',action='store_true');p.add_argument('--code-revision',default='unfrozen');p.add_argument('--packet',type=Path);p.add_argument('--decoded',type=Path);p.add_argument('--receipt',type=Path);p.add_argument('--original',action='store_true');p.add_argument('--legacy-floor',action='store_true');args=p.parse_args()
  if args.packet:child(args)
  else:study(args)
 if __name__=='__main__':main()

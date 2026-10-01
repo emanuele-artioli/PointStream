@@ -20,6 +20,8 @@ from src.runner.mask_wire import decode_mask, encode_mask, wire_declaration
 MANIFEST = "packet_packing.json"
 FORMAT = "pointstream.client-packet-packing"
 VERSION = 1
+BATCH_VERSION = 2
+MASK_BLOB = "masks.bin"
 NATIVE_PREFIXES = ("residual_bitstream", "background_payload_", "encoded_crop_", "ref_")
 SCALES = (1, 2, 4, 8)
 MASK_CODECS = ("psm1", "rle")
@@ -60,7 +62,7 @@ def _read(payload: bytes) -> tuple[dict[str, bytes], dict[str, np.ndarray], dict
             names = archive.namelist()
             if len(names) != len(set(names)):
                 raise ValueError("duplicate archive member")
-            if any("/" in name or (not name.endswith(".npy") and name != MANIFEST) for name in names):
+            if any("/" in name or (not name.endswith(".npy") and name not in (MANIFEST, MASK_BLOB)) for name in names):
                 raise ValueError("unsupported envelope members")
             members = {name: archive.read(name) for name in names}
         arrays = {name[:-4]: np.load(io.BytesIO(value), allow_pickle=False)
@@ -138,7 +140,8 @@ def _expand(coarse: np.ndarray, original_shape: tuple[int, ...], scale: int) -> 
         ..., :original_shape[-2], :original_shape[-1]]
 
 
-def pack_client_envelope(payload: bytes, *, mask_scale: int = 1, mask_codec: str = "psm1") -> bytes:
+def pack_client_envelope(payload: bytes, *, mask_scale: int = 1, mask_codec: str = "psm1",
+                         batch_masks: bool = False) -> bytes:
     """Return a deterministic charged archive; scale 1 preserves mask pixels.
 
     Scales 2/4/8 may alter the predictor. Any residual-bearing input is rejected
@@ -146,7 +149,11 @@ def pack_client_envelope(payload: bytes, *, mask_scale: int = 1, mask_codec: str
     """
     if type(mask_scale) is not int or mask_scale not in SCALES or mask_codec not in MASK_CODECS:
         raise ValueError("unsupported mask scale or codec")
+    if type(batch_masks) is not bool:
+        raise ValueError("batch_masks must be boolean")
     members, arrays, metadata = _read(payload)
+    if MASK_BLOB in members and MANIFEST not in members:
+        raise ValueError("mask blob requires packing manifest")
     if MANIFEST in members:
         raise ValueError("unpack an adapter archive before repacking")
     if mask_scale > 1 and ((metadata.get("residual") or {}).get("present") or
@@ -154,15 +161,24 @@ def pack_client_envelope(payload: bytes, *, mask_scale: int = 1, mask_codec: str
         raise ValueError("lossy masks require recomputed correction; stale residual rejected")
     masks = _masks(metadata, arrays)
     descriptors = {}
+    shared = bytearray()
     changed = 0
-    for key, mask in masks.items():
+    for key, mask in sorted(masks.items()):
         coarse = mask[..., ::mask_scale, ::mask_scale]
         reconstructed = _expand(coarse, mask.shape, mask_scale)
         changed += int(np.count_nonzero(mask != reconstructed))
         blob = _codec_encode(coarse, mask_codec)
-        members[key + ".npy"] = _npy(np.frombuffer(blob, dtype=np.uint8))
         descriptors[key] = {"original_shape": list(mask.shape), "coded_shape": list(coarse.shape)}
-    members[MANIFEST] = _json({"format": FORMAT, "version": VERSION, "schema": 1,
+        if batch_masks:
+            members.pop(key + ".npy")
+            descriptors[key].update(offset=len(shared), length=len(blob))
+            shared.extend(blob)
+        else:
+            members[key + ".npy"] = _npy(np.frombuffer(blob, dtype=np.uint8))
+    if batch_masks:
+        members[MASK_BLOB] = bytes(shared)
+    members[MANIFEST] = _json({"format": FORMAT, "version": BATCH_VERSION if batch_masks else VERSION, "schema": 1,
+        "mask_storage": "concatenated" if batch_masks else "npy_members",
         "mask_scale": mask_scale, "mask_codec": mask_codec, "lossy_masks": mask_scale > 1,
         "predictor_pixels_may_change": mask_scale > 1, "changed_mask_pixels": changed,
         "frame_count": metadata["frame_count"], "height": metadata["height"], "width": metadata["width"],
@@ -179,11 +195,13 @@ def unpack_client_envelope(payload: bytes) -> bytes:
     """
     members, arrays, metadata = _read(payload)
     if MANIFEST not in members:
+        if MASK_BLOB in members:
+            raise ValueError("mask blob requires packing manifest")
         _masks(metadata, arrays)
         return payload
     spec = json.loads(members.pop(MANIFEST))
     scale, codec = spec.get("mask_scale"), spec.get("mask_codec")
-    if (spec.get("format") != FORMAT or spec.get("version") != VERSION or spec.get("schema") != 1 or
+    if (spec.get("format") != FORMAT or spec.get("version") not in (VERSION, BATCH_VERSION) or spec.get("schema") != 1 or
             type(scale) is not int or scale not in SCALES or codec not in MASK_CODECS or
             spec.get("lossy_masks") is not (scale > 1)):
         raise ValueError("unsupported packet packing declaration")
@@ -195,13 +213,32 @@ def unpack_client_envelope(payload: bytes) -> bytes:
     expected_keys = {p["mask_key"] for p in metadata["placements"] if p.get("mask_key")}
     if set(spec.get("masks", {})) != expected_keys:
         raise ValueError("packed mask descriptors do not cover placements")
-    for key, descriptor in spec["masks"].items():
+    batched = spec["version"] == BATCH_VERSION
+    if batched:
+        if spec.get("mask_storage") != "concatenated" or MASK_BLOB not in members:
+            raise ValueError("missing batch-mask storage declaration or payload")
+        if any(key.startswith("mask_") for key in arrays):
+            raise ValueError("batch masks must not carry redundant mask arrays")
+        shared = members.pop(MASK_BLOB)
+    elif MASK_BLOB in members:
+        raise ValueError("version 1 must not carry batch-mask payload")
+    cursor = 0
+    for key, descriptor in sorted(spec["masks"].items()):
         shape = tuple(descriptor["original_shape"])
         if len(shape) not in (2, 3) or any(type(v) is not int or v < 1 for v in shape):
             raise ValueError("invalid original mask dimensions")
         if len(shape) == 3 and shape[0] != metadata["frame_count"]:
             raise ValueError("packed mask stack frame count mismatch")
-        mask = _codec_decode(arrays[key].tobytes(), codec, len(shape))
+        if batched:
+            offset, length = descriptor.get("offset"), descriptor.get("length")
+            if (type(offset) is not int or type(length) is not int or
+                    offset != cursor or length < 1 or offset + length > len(shared)):
+                raise ValueError("invalid or noncontiguous batch-mask range")
+            coded_blob = shared[offset:offset + length]
+            cursor += length
+        else:
+            coded_blob = arrays[key].tobytes()
+        mask = _codec_decode(coded_blob, codec, len(shape))
         if list(mask.shape) != descriptor["coded_shape"]:
             raise ValueError("coded mask dimensions mismatch")
         blob = encode_mask(_expand(mask, shape, scale))
@@ -212,6 +249,8 @@ def unpack_client_envelope(payload: bytes) -> bytes:
                 if original_declared is not None and original_declared != list(shape):
                     raise ValueError("original mask dimensions differ from placement")
                 placement["mask_wire"] = {**wire_declaration(), "shape": list(shape), "payload_bytes": len(blob)}
+    if batched and cursor != len(shared):
+        raise ValueError("unreferenced trailing batch-mask bytes")
     members["metadata.npy"] = _npy(np.frombuffer(_json(metadata), dtype=np.uint8))
     restored = _archive(members)
     _, restored_arrays, restored_metadata = _read(restored)
