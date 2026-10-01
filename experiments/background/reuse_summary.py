@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 import math
+from fractions import Fraction
 from pathlib import Path
 import numpy as np
 
@@ -43,8 +44,13 @@ def summarize(report_path):
                 "bits_per_second":arm["bytes"]*8/duration,"mean_frame_y_psnr_db":arm["quality"]["mean_frame_psnr_db"],
                 "pooled_y_psnr_db":arm["quality"]["pooled_psnr_db"],"pooled_mse":arm["quality"]["pooled_mse"],
                 "rate_ratio_to_full_continuous_same_crf":arm["bytes"]/anchor["bytes"],"receiver_receipt":arm["receiver_receipt"],"manifest":arm["manifest"]})
-            for horizon in arm.get("horizons",[]):
-                check_quality(horizon["quality"],horizon["quality"]["frames"])
+            arm_horizons=arm.get("horizons",[])
+            registered=report["registration"]["horizons_seconds"]
+            if arm_horizons and len(arm_horizons)!=len(registered):raise ValueError("registered horizon coverage failed")
+            for requested,horizon in zip(registered,arm_horizons):
+                fps=Fraction(source["fps"]);expected=min(n,round(requested*fps))
+                check_quality(horizon["quality"],expected)
+                if not math.isclose(horizon["seconds"],float(expected/fps),abs_tol=1e-10):raise ValueError("registered horizon duration failed")
                 if not math.isclose(horizon["bits_per_second"],horizon["bytes"]*8/horizon["seconds"],abs_tol=1e-10):raise ValueError("observed horizon rate failed")
                 horizons.append({"source":source["source_id"],"crf":arm["crf"],"arm":arm["name"],"observed_seconds":horizon["seconds"],"bytes":horizon["bytes"],"bits_per_second":horizon["bits_per_second"],"mean_frame_y_psnr_db":horizon["quality"]["mean_frame_psnr_db"],"pooled_y_psnr_db":horizon["quality"]["pooled_psnr_db"],"manifest":horizon["manifest"]})
     return {"report_sha256":hashlib.sha256(Path(report_path).read_bytes()).hexdigest(),"code_revision":report["code_revision"],
