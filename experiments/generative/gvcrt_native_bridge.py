@@ -112,7 +112,8 @@ def models(args, device):
                    'customized_cuda_inference': CUSTOMIZED_CUDA_INFERENCE, 'disable_fused': args.disable_fused,
                    'deterministic_algorithms': torch.are_deterministic_algorithms_enabled(),
                    'torch_threads': torch.get_num_threads(),
-                   'cublas_workspace_config': os.environ.get('CUBLAS_WORKSPACE_CONFIG')}
+                   'cublas_workspace_config': os.environ.get('CUBLAS_WORKSPACE_CONFIG'),
+                   'force_zero_thres': None}
     if device == 'cuda':
         if not os.environ.get('CUDA_VISIBLE_DEVICES'):
             raise RuntimeError('CUDA mode requires fleet-provided CUDA_VISIBLE_DEVICES')
@@ -130,6 +131,27 @@ def tensor_pixels(torch, tensor, width, height):
     return ((tensor[:, :, :height, :width].clamp(-1, 1) + 1) / 2).float().cpu().numpy()[0]
 
 
+def configure_entropy(i_model, p_model, canvas_h, canvas_w):
+    two = canvas_h * canvas_w > 1280 * 720
+    i_model.set_use_two_entropy_coders(two)
+    p_model.set_use_two_entropy_coders(two)
+    return int(two)
+
+
+def compress_frame(i_model, p_model, x, qp, intra, reset, last_qp):
+    if intra:
+        result = i_model.compress(x, qp)
+        p_model.clear_dpb()
+        p_model.add_ref_frame(None, result['x_hat'])
+    else:
+        if reset:
+            p_model.prepare_feature_adaptor_i(last_qp)
+        result = p_model.compress(x, qp)
+    if not isinstance(result['bit_stream'], (bytes, bytearray, memoryview)):
+        raise ValueError('Native compression must return physical coded bytes')
+    return result
+
+
 def encode(args):
     import numpy as np
     from PIL import Image
@@ -145,7 +167,8 @@ def encode(args):
     canvas_h, canvas_w = max(1088, args.height), max(1920, args.width)
     if args.qp < 0 or args.qp >= i_model.get_qp_num():
         raise ValueError('Unsupported registered base QP')
-    payload, sps_helper, decoded, placements = io.BytesIO(), SPSHelper(), [], []
+    ec_part = configure_entropy(i_model, p_model, canvas_h, canvas_w)
+    payload, sps_helper, placements = io.BytesIO(), SPSHelper(), []
     last_qp = 0
     encode_seconds = []
     index_map = [0, 1, 0, 2, 0, 2, 0, 2]
@@ -165,17 +188,11 @@ def encode(args):
                 raise ValueError('Shifted P QP outside model table')
             torch.cuda.synchronize()
             frame_start = time.perf_counter()
-            if intra:
-                result = i_model.compress(x, qp)
-                p_model.clear_dpb()
-                p_model.add_ref_frame(None, result['x_hat'])
-            else:
-                if reset:
-                    p_model.prepare_feature_adaptor_i(last_qp)
-                result = p_model.compress(x, qp)
+            result = compress_frame(i_model, p_model, x, qp, intra, reset, last_qp)
+            if not intra:
                 last_qp = qp
             sps = {'sps_id': -1, 'height': canvas_h, 'width': canvas_w,
-                   'ec_part': int(canvas_h * canvas_w > 1280 * 720), 'use_ada_i': int(reset)}
+                   'ec_part': ec_part, 'use_ada_i': int(reset)}
             sps_id, new_sps = sps_helper.get_sps_id(sps)
             sps['sps_id'] = sps_id
             before = payload.tell()
@@ -184,12 +201,10 @@ def encode(args):
             write_ip(payload, intra, sps_id, qp, result['bit_stream'])
             torch.cuda.synchronize()
             encode_seconds.append(time.perf_counter() - frame_start)
-            decoded.append(tensor_pixels(torch, result['x_hat'], args.width, args.height))
             placements.append({'index': index, 'I': intra, 'reset': reset, 'qp': qp,
                                'offset': before, 'bytes': payload.tell() - before})
     stream = output / 'stream.bin'
     stream.write_bytes(payload.getvalue())
-    np.save(output / 'sender_reconstruction.npy', np.stack(decoded), allow_pickle=False)
     manifest = {'schema': 'gvcrt-native-v1', 'source_revision': PIN,
                 'stream': {'filename': 'stream.bin', 'sha256': sha256(stream), 'bytes': stream.stat().st_size},
                 'model_sha256': {'I': args.i_sha256, 'P': args.p_sha256},
@@ -197,11 +212,21 @@ def encode(args):
                 'original_height': args.height, 'canvas_width': canvas_w, 'canvas_height': canvas_h,
                 'base_qp': args.qp, 'reset_interval': args.reset_interval, 'placements': placements,
                 'reconstruction': 'float32 CHW, crop then clamp[-1,1] and map to[0,1]',
+                'force_zero_thres': None, 'ec_part': ec_part,
                 'model_deployment': 'preinstalled verified I/P models; not transmitted per stream'}
     validate_manifest(manifest)
     write_json(output / 'manifest.json', manifest)
+    source_attempts = deny_sources([record['path'] for record in frames])
+    reference_pixels, _, reference_seconds = decode_stream(torch, i_model, p_model, manifest, stream)
+    if source_attempts:
+        raise ValueError('Native reference decoder attempted source access')
+    np.save(output / 'sender_reconstruction.npy', reference_pixels, allow_pickle=False)
     write_json(output / 'sender_receipt.json', {'qualification': qualification, 'input_frames': frames,
                'encode_seconds_per_frame': encode_seconds,
+               'reference_kind': 'same-process native decode of completed persisted stream; not P compressor pixels',
+               'reference_decode_seconds_per_frame': reference_seconds,
+               'reference_source_deny': 'Python audit of exact registered frame paths; not OS sandbox',
+               'reference_source_open_attempts': source_attempts,
                'payload_bytes': stream.stat().st_size, 'charged_manifest_bytes': (output / 'manifest.json').stat().st_size})
 
 
@@ -234,6 +259,10 @@ def validate_manifest(manifest):
         raise ValueError('Invalid manifest count/cadence/geometry')
     if (manifest['canvas_height'], manifest['canvas_width']) != (max(1088, manifest['original_height']), max(1920, manifest['original_width'])):
         raise ValueError('Manifest canvas violates registered padding')
+    if manifest['ec_part'] != int(manifest['canvas_height'] * manifest['canvas_width'] > 1280 * 720):
+        raise ValueError('Manifest entropy partition policy mismatch')
+    if manifest['force_zero_thres'] is not None:
+        raise ValueError('Unregistered zero threshold policy')
     if len(manifest['placements']) != manifest['frames']:
         raise ValueError('Manifest placement count mismatch')
     offset = 0
@@ -251,23 +280,11 @@ def validate_manifest(manifest):
         raise ValueError('Placement physical byte total mismatch')
 
 
-def decode(args):
-    attempts = deny_sources(args.deny_source)
+def decode_stream(torch, i_model, p_model, manifest, stream):
+    """Native reference/fresh decode; receives no original image or source reader."""
     import numpy as np
-    torch, i_model, p_model, qualification = models(args, 'cuda')
     from src.utils.stream_helper import SPSHelper, NalType, read_header, read_sps_remaining, read_ip_remaining
-    manifest_path = Path(args.manifest).resolve()
-    manifest = json.loads(manifest_path.read_text())
-    if manifest['schema'] != 'gvcrt-native-v1' or manifest['source_revision'] != PIN:
-        raise ValueError('Unregistered manifest schema/source')
-    if manifest['model_sha256'] != {'I': args.i_sha256, 'P': args.p_sha256}:
-        raise ValueError('Manifest model identity mismatch')
-    if manifest['stream']['filename'] != 'stream.bin':
-        raise ValueError('Unexpected stream filename')
-    stream = manifest_path.parent / 'stream.bin'
-    checked_file(stream, manifest['stream']['sha256'])
-    if stream.stat().st_size != manifest['stream']['bytes']:
-        raise ValueError('Stream physical length mismatch')
+    p_model.set_curr_poc(0)
     data, sps_helper, pixels, packets = io.BytesIO(stream.read_bytes()), SPSHelper(), [], []
     decode_seconds = []
     validate_manifest(manifest)
@@ -279,7 +296,7 @@ def decode(args):
                 sps_helper.add_sps_by_id(read_sps_remaining(data, header['sps_id']))
                 header = read_header(data)
             sps = sps_helper.get_sps_by_id(header['sps_id'])
-            if sps is None or (sps['height'], sps['width']) != (manifest['canvas_height'], manifest['canvas_width']):
+            if sps is None or (sps['height'], sps['width']) != (manifest['canvas_height'], manifest['canvas_width']) or sps['ec_part'] != manifest['ec_part']:
                 raise ValueError('Invalid SPS geometry/reference')
             qp, bitstream = read_ip_remaining(data)
             intra = header['nal_type'] == NalType.NAL_I
@@ -309,11 +326,32 @@ def decode(args):
             packets.append(actual)
         if data.tell() != stream.stat().st_size:
             raise ValueError('Trailing stream bytes or frame-count mismatch')
+    return np.stack(pixels), packets, decode_seconds
+
+
+def decode(args):
+    attempts = deny_sources(args.deny_source)
+    import numpy as np
+    torch, i_model, p_model, qualification = models(args, 'cuda')
+    from src.utils.stream_helper import SPSHelper, NalType, read_header, read_sps_remaining, read_ip_remaining
+    manifest_path = Path(args.manifest).resolve()
+    manifest = json.loads(manifest_path.read_text())
+    if manifest['schema'] != 'gvcrt-native-v1' or manifest['source_revision'] != PIN:
+        raise ValueError('Unregistered manifest schema/source')
+    if manifest['model_sha256'] != {'I': args.i_sha256, 'P': args.p_sha256}:
+        raise ValueError('Manifest model identity mismatch')
+    if manifest['stream']['filename'] != 'stream.bin':
+        raise ValueError('Unexpected stream filename')
+    stream = manifest_path.parent / 'stream.bin'
+    checked_file(stream, manifest['stream']['sha256'])
+    if stream.stat().st_size != manifest['stream']['bytes']:
+        raise ValueError('Stream physical length mismatch')
+    pixels, packets, decode_seconds = decode_stream(torch, i_model, p_model, manifest, stream)
     if attempts:
         raise ValueError('Decoder attempted source access')
     output = Path(args.output_dir).resolve()
     output.mkdir(parents=True, exist_ok=False)
-    np.save(output / 'reconstruction.npy', np.stack(pixels), allow_pickle=False)
+    np.save(output / 'reconstruction.npy', pixels, allow_pickle=False)
     write_json(output / 'receiver_receipt.json', {'qualification': qualification,
                'manifest_sha256': sha256(manifest_path), 'manifest_bytes': manifest_path.stat().st_size,
                'stream_sha256': sha256(stream), 'stream_bytes': stream.stat().st_size,

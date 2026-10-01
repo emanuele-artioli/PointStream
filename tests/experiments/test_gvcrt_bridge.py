@@ -82,3 +82,44 @@ def test_uvg_prepare_rejects_short_registered_source_before_conversion(tmp_path)
     assert result.returncode != 0
     assert 'physical length differs' in result.stderr
     assert not output.exists()
+
+
+class CoderStub:
+    def __init__(self, intra=False):
+        self.intra = intra
+        self.events = []
+
+    def set_use_two_entropy_coders(self, value):
+        self.events.append(('partition', value))
+
+    def compress(self, x, qp):
+        self.events.append(('compress', qp))
+        result = {'bit_stream': b'native bytes'}
+        if self.intra:
+            result['x_hat'] = 'I reconstructed pixels'
+        return result
+
+    def clear_dpb(self):
+        self.events.append(('clear',))
+
+    def add_ref_frame(self, feature, frame):
+        self.events.append(('reference', feature, frame))
+
+    def prepare_feature_adaptor_i(self, qp):
+        self.events.append(('adapt', qp))
+
+
+def test_native_p_compressor_needs_no_pixel_return():
+    i, p = CoderStub(True), CoderStub()
+    result = bridge.compress_frame(i, p, 'input', 3, False, True, 0)
+    assert result == {'bit_stream': b'native bytes'}
+    assert p.events == [('adapt', 0), ('compress', 3)]
+    assert i.events == []
+
+
+def test_i_initialization_and_both_native_partition_modes():
+    i, p = CoderStub(True), CoderStub()
+    assert bridge.configure_entropy(i, p, 1088, 1920) == 1
+    bridge.compress_frame(i, p, 'input', 1, True, False, 0)
+    assert i.events == [('partition', True), ('compress', 1)]
+    assert p.events == [('partition', True), ('clear',), ('reference', None, 'I reconstructed pixels')]
