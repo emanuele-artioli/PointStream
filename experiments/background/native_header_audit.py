@@ -34,7 +34,7 @@ def ivf_header(path):
         if packets!=count:raise ValueError('native IVF declared/physical packet denominator mismatch')
     return {'geometry':[width,height],'fps':str(Fraction(rate,scale)),'header_frames':count,'physical_packets':packets}
 
-def audit(report_path):
+def audit(report_path,ffprobe='/opt/local/bin/ffprobe'):
     report=json.loads(report_path.read_text());receipts={};manifests=[]
     if report.get('status')!='complete':raise ValueError('completed native study required')
     for source in report['sources']:
@@ -49,6 +49,11 @@ def audit(report_path):
                 cursor=end
                 if str(stream) not in receipts:
                     receipts[str(stream)]={'identity':identity(stream),'header':ivf_header(stream)}
+                    cmd=[ffprobe,'-v','error','-threads','1','-select_streams','v:0','-show_entries','stream=codec_name,width,height,pix_fmt','-of','json',str(stream)]
+                    native_info=json.loads(subprocess.run(cmd,check=True,capture_output=True,text=True,timeout=30).stdout)['streams']
+                    if len(native_info)!=1 or native_info[0]['codec_name']!='av1' or [native_info[0]['width'],native_info[0]['height']]!=manifest['geometry'] or native_info[0]['pix_fmt']!='yuv420p':
+                        raise ValueError('native probe geometry/codec/pixel-format contract mismatch')
+                    receipts[str(stream)]['native_probe']={'command':cmd,'streams':native_info}
                 receipt=receipts[str(stream)];native=receipt['identity'];header=receipt['header']
                 if native['bytes']!=packet['stream']['bytes'] or native['sha256']!=packet['stream']['sha256']:raise ValueError('native IVF identity mismatch')
                 if header['geometry']!=manifest['geometry'] or header['fps']!=manifest['fps'] or header['header_frames']!=expected:
@@ -58,6 +63,7 @@ def audit(report_path):
             manifests.append({'source':source['source_id'],'arm':arm['name'],'crf':arm['crf'],'manifest_sha256':actual['sha256'],'charged_bytes':total})
     return {'report_sha256':identity(report_path)['sha256'],'audit_worker_sha256':identity(Path(__file__))['sha256'],
         'status':'pass','full_manifests':manifests,'unique_native_streams':receipts,
+        'ffprobe':identity(Path(ffprobe)),'ffprobe_version':subprocess.run([ffprobe,'-version'],check=True,capture_output=True,text=True,timeout=30).stdout,
         'scope':'Native IVF container headers and physical packet/byte ledger, combined with existing fresh native decoder parity; not an arbitrary malicious-bitstream security audit.'}
 
 def main():
