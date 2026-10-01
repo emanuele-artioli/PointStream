@@ -69,3 +69,16 @@ for operation in (lambda: pathlib.Path(sys.argv[2]).read_bytes(), lambda: os.ope
 assert len(attempts)==2
 '''
     subprocess.run([sys.executable, '-c', script, str(BRIDGE), str(source)], check=True)
+
+
+def test_uvg_prepare_rejects_short_registered_source_before_conversion(tmp_path):
+    source = tmp_path / 'Jockey_1920x1080_120fps_420_8bit_YUV.yuv'
+    source.write_bytes(b'truncated raw input')
+    output = tmp_path / 'converted'
+    helper = BRIDGE.parent / 'gvcrt_prepare_uvg.py'
+    result = subprocess.run([sys.executable, str(helper), '--source', str(source),
+                             '--output-dir', str(output), '--ffmpeg', '/must/not/run'],
+                            capture_output=True, text=True, timeout=10)
+    assert result.returncode != 0
+    assert 'physical length differs' in result.stderr
+    assert not output.exists()
