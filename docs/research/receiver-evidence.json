@@ -24,7 +24,15 @@
       "mean_frame_y_psnr_db": 20.68933878860757,
       "pooled_y_psnr_db": 20.68036755707937,
       "historical_pooled_y_psnr_db": 20.68009843377257,
-      "fresh_minus_saved_db": 0.0002691233068006227
+      "fresh_minus_saved_db": 0.0002691233068006227,
+      "physical_nonoverlapping_ledger": {
+        "appearance": 260,
+        "residual": 0,
+        "content_specific_weights": 0,
+        "total": 117861,
+        "coded_background_plate": 2812,
+        "remaining_geometry_metadata_and_container": 114789
+      }
     },
     {
       "family": "original",
@@ -37,7 +45,15 @@
       "mean_frame_y_psnr_db": 24.13645800580798,
       "pooled_y_psnr_db": 24.133447258487244,
       "historical_pooled_y_psnr_db": 24.13345158852085,
-      "fresh_minus_saved_db": -4.330033604560413e-06
+      "fresh_minus_saved_db": -4.330033604560413e-06,
+      "physical_nonoverlapping_ledger": {
+        "appearance": 260,
+        "residual": 77574,
+        "content_specific_weights": 0,
+        "total": 195878,
+        "coded_background_plate": 2812,
+        "remaining_geometry_metadata_and_container": 115232
+      }
     },
     {
       "family": "original",
@@ -50,7 +66,15 @@
       "mean_frame_y_psnr_db": 20.80426705583337,
       "pooled_y_psnr_db": 20.800021549004946,
       "historical_pooled_y_psnr_db": 20.799744908140013,
-      "fresh_minus_saved_db": 0.0002766408649321761
+      "fresh_minus_saved_db": 0.0002766408649321761,
+      "physical_nonoverlapping_ledger": {
+        "appearance": 50482,
+        "residual": 0,
+        "content_specific_weights": 0,
+        "total": 180955,
+        "coded_background_plate": 2812,
+        "remaining_geometry_metadata_and_container": 127661
+      }
     },
     {
       "family": "original",
@@ -63,7 +87,15 @@
       "mean_frame_y_psnr_db": 24.154421111409757,
       "pooled_y_psnr_db": 24.151141999668944,
       "historical_pooled_y_psnr_db": 24.15121352384984,
-      "fresh_minus_saved_db": -7.15241808961764e-05
+      "fresh_minus_saved_db": -7.15241808961764e-05,
+      "physical_nonoverlapping_ledger": {
+        "appearance": 50482,
+        "residual": 71724,
+        "content_specific_weights": 0,
+        "total": 253122,
+        "coded_background_plate": 2812,
+        "remaining_geometry_metadata_and_container": 128104
+      }
     },
     {
       "family": "compact",
@@ -74,7 +106,15 @@
       "decoded_pixels_sha256": "095e4b33a99287127bc3c7ae00bb426ca467bba53d699c881f47c7efca2afdfd",
       "frames": 48,
       "mean_frame_y_psnr_db": 20.68933878860757,
-      "pooled_y_psnr_db": 20.68036755707937
+      "pooled_y_psnr_db": 20.68036755707937,
+      "physical_nonoverlapping_ledger": {
+        "appearance": 260,
+        "residual": 0,
+        "content_specific_weights": 0,
+        "total": 30297,
+        "coded_background_plate": 2812,
+        "remaining_geometry_metadata_and_container": 27225
+      }
     },
     {
       "family": "compact",
@@ -85,7 +125,15 @@
       "decoded_pixels_sha256": "274ec944a2e543777e6f7c5608873a7777bda596dd631d23f53cce2ff5d34171",
       "frames": 48,
       "mean_frame_y_psnr_db": 24.13645800580798,
-      "pooled_y_psnr_db": 24.133447258487244
+      "pooled_y_psnr_db": 24.133447258487244,
+      "physical_nonoverlapping_ledger": {
+        "appearance": 260,
+        "residual": 77574,
+        "content_specific_weights": 0,
+        "total": 108210,
+        "coded_background_plate": 2812,
+        "remaining_geometry_metadata_and_container": 27564
+      }
     },
     {
       "family": "compact",
@@ -96,7 +144,15 @@
       "decoded_pixels_sha256": "0f13f1f4e46e1a22a050492a00b5150d6bc4cde79da71c330d923b646a7ff53b",
       "frames": 48,
       "mean_frame_y_psnr_db": 20.80426705583337,
-      "pooled_y_psnr_db": 20.800021549004946
+      "pooled_y_psnr_db": 20.800021549004946,
+      "physical_nonoverlapping_ledger": {
+        "appearance": 50482,
+        "residual": 0,
+        "content_specific_weights": 0,
+        "total": 92023,
+        "coded_background_plate": 2812,
+        "remaining_geometry_metadata_and_container": 38729
+      }
     },
     {
       "family": "compact",
@@ -107,7 +163,15 @@
       "decoded_pixels_sha256": "94085447619cacca8e78bab57ba1ee498288e82fcae415ae40435fb327d65944",
       "frames": 48,
       "mean_frame_y_psnr_db": 24.154421111409757,
-      "pooled_y_psnr_db": 24.151141999668944
+      "pooled_y_psnr_db": 24.151141999668944,
+      "physical_nonoverlapping_ledger": {
+        "appearance": 50482,
+        "residual": 71724,
+        "content_specific_weights": 0,
+        "total": 164088,
+        "coded_background_plate": 2812,
+        "remaining_geometry_metadata_and_container": 39070
+      }
     },
     {
       "family": "floor",
@@ -118,7 +182,15 @@
       "decoded_pixels_sha256": "095e4b33a99287127bc3c7ae00bb426ca467bba53d699c881f47c7efca2afdfd",
       "frames": 48,
       "mean_frame_y_psnr_db": 20.68933878860757,
-      "pooled_y_psnr_db": 20.68036755707937
+      "pooled_y_psnr_db": 20.68036755707937,
+      "physical_nonoverlapping_ledger": {
+        "appearance": 260,
+        "residual": 0,
+        "content_specific_weights": 0,
+        "total": 30297,
+        "coded_background_plate": 2812,
+        "remaining_geometry_metadata_and_container": 27225
+      }
     },
     {
       "family": "floor",
@@ -129,7 +201,15 @@
       "decoded_pixels_sha256": "095e4b33a99287127bc3c7ae00bb426ca467bba53d699c881f47c7efca2afdfd",
       "frames": 48,
       "mean_frame_y_psnr_db": 20.68933878860757,
-      "pooled_y_psnr_db": 20.68036755707937
+      "pooled_y_psnr_db": 20.68036755707937,
+      "physical_nonoverlapping_ledger": {
+        "appearance": 260,
+        "residual": 0,
+        "content_specific_weights": 0,
+        "total": 22055,
+        "coded_background_plate": 2812,
+        "remaining_geometry_metadata_and_container": 18983
+      }
     },
     {
       "family": "floor",
@@ -140,7 +220,15 @@
       "decoded_pixels_sha256": "095e4b33a99287127bc3c7ae00bb426ca467bba53d699c881f47c7efca2afdfd",
       "frames": 48,
       "mean_frame_y_psnr_db": 20.68933878860757,
-      "pooled_y_psnr_db": 20.68036755707937
+      "pooled_y_psnr_db": 20.68036755707937,
+      "physical_nonoverlapping_ledger": {
+        "appearance": 260,
+        "residual": 0,
+        "content_specific_weights": 0,
+        "total": 17581,
+        "coded_background_plate": 2812,
+        "remaining_geometry_metadata_and_container": 14509
+      }
     },
     {
       "family": "floor",
@@ -151,7 +239,15 @@
       "decoded_pixels_sha256": "095e4b33a99287127bc3c7ae00bb426ca467bba53d699c881f47c7efca2afdfd",
       "frames": 48,
       "mean_frame_y_psnr_db": 20.68933878860757,
-      "pooled_y_psnr_db": 20.68036755707937
+      "pooled_y_psnr_db": 20.68036755707937,
+      "physical_nonoverlapping_ledger": {
+        "appearance": 260,
+        "residual": 0,
+        "content_specific_weights": 0,
+        "total": 28125,
+        "coded_background_plate": 2812,
+        "remaining_geometry_metadata_and_container": 25053
+      }
     }
   ],
   "source_pixels": {
@@ -297,5 +393,6 @@
   "historical_source_recipe_sha256": "42aad272a486c78435644717c33f3f741df0cc622d801ab35cd8f56d7979234e",
   "original_e06_report_sha256": "52c0179c724469e56a1dedeafd8695536b44623cd0a63c48bf8128a49f8b5e33",
   "historical_encoder_revision": "def647adb393456eb4eaec8400fcf8109d9bcb95",
-  "native_pts_equal_pngs": "1/48 (historical; not re-extracted)"
+  "native_pts_equal_pngs": "1/48 (historical; not re-extracted)",
+  "accounting_contract": "Native plate 2812B, appearance and residual bitstreams remain stored unchanged. All remaining physical package bytes, including raw or deflated geometry, masks, placement JSON, array headers and container, are charged together. No guessed separate compressed-geometry charge is assigned. Content-specific decoder weights absent (generation disabled)."
 }
