@@ -166,7 +166,28 @@
         ],
         "mean_frame_y_psnr_db": 6.492213227937663,
         "pooled_y_psnr_db": 6.492212036690981
-      }
+      },
+      "source_png_file_sha256": [
+        "7745387ff8578fb21b39b8367d51b4d2abf0d58785ec9d522d0aced2f935b19a",
+        "9183e9189a02f937e87b54a8b9d8a1fdf4c04bfa546681d3aa80a2367091679f",
+        "ccef065d899d05bb27bb7daf7e5684c2116b83794082d9cf68082b3656b0b443",
+        "180adccd08772fb0c231666aa816cb686613d3eddffbf426ac3949fe284fe0ee",
+        "18109096fbf5095f82aee6c448aa4afd6e9ec823328f95a56a9ab90eb4b943a4",
+        "03641c89eb8cff975dcabd7d15a971e0a62930a33ccd8f4939ac50cfe2024afa",
+        "8eb28ee9205a5a9062480c3c24206c72e9ba15fdfde41b1bb45066f08cfc968b",
+        "525352e4a02de5739400e022ebef58101d782e258671e6ea1e305be71938f3fc",
+        "9c08ef6861d7799812f5d52a6c014e3271af081bfaa82870ab730e5d89cf3d78",
+        "8df59342b60edca378b7a294d6b5bd7f82e8625df68d4f409413437384b20c1c",
+        "5e2a3751bc020fd48a1994b71fc81e2b87384c24a94ed72f9a0f11cfe262237f",
+        "84c1a80ad4c5a0217f4821f0962ebf37d01f873b597b3f5eace4fc3b2903dbba",
+        "494a3600517582f3b4115bf658f5e8a356da65946b5171afcdbf0119ec9d705f",
+        "3eff90293934ad5f49bc2bd38dc2233908491d7f3b916b841a902ddf873a8315",
+        "2fc087be2bbec64a8e102ced8a61e36031926932ed6c801d0f535fd693dabdc2",
+        "8551ab5eed6318b382d5dfde396393bf92684f7a93431acfcf3887eee133dc08"
+      ],
+      "historical_source_video_sha256_declared": "af92ede5c64cc9070b4242020ac3c294cbb4a47b6dc243922929dc5367f0dab2",
+      "working_fps": 24,
+      "source_frame_dataset": "bp21-headroom-fallback"
     },
     {
       "source_id": "alcaraz_highlights_scene_010",
@@ -274,7 +295,28 @@
         ],
         "mean_frame_y_psnr_db": 7.954048369696469,
         "pooled_y_psnr_db": 7.954043803678417
-      }
+      },
+      "source_png_file_sha256": [
+        "e01b244771601ba20ee66970c8f87acfd29b305cce6a7e07ef9664a6357bb473",
+        "684a36e1dca1160e0e6321d68542f2c98dadec9e1d466a174908623b8c308346",
+        "c66cadf04bd735949304fb766d54a2b5df69e63c3e0969fd212577fdb4b85b3c",
+        "3189b1bbe4f093d7bd262311b69664ceb429f49bab012224657f0d8d4aff6754",
+        "cb60ca1bcc86a46937ce2a24cd2c725f88be168ad063defdd6a3ca040109ec6e",
+        "f1f53470a019436ae0719e226b5e52833c2e264f75ba08cd21a7dd609be2d75d",
+        "fa80589efd3eb19bd50d4fba2d9452d7bb2edc5cb0733a8c39556f0803d12445",
+        "7916c7259c4a178fbb8fc08edd8dd82f28f8550dd26e42f44150680b7ba202da",
+        "fd81981b2a9946b60b3aa74cc65c1024f92eb60885269c3621e58891326b066d",
+        "1f3580dee6f184e15fa5e66910b03f1270a91e4f1cd2922ffc7793415a45a888",
+        "5819cf06efb0fb9f16c26a16ffc8bff054ce47f384e9fb81ce3b591f2721fe0a",
+        "2bc21235df12575309537ae1a89872cb3788ecdc3f3af6e6a90f6ec25bff1ec9",
+        "014ad944eb6e43f80905b7b25660e6a32c5e263dd46e98055728d541fcc720b9",
+        "a09f9111df2c0f7c06a4df02cc088e0cf7a45ecf6d412c524bee0fb02991232f",
+        "71e4e3ef04cd81146a260c7a33651b9bde696cb48615d5a018da6fc059597699",
+        "8d7f8d10f127d6964921c297eec72fc9ec0bb3884053507ce9225ca08f9436c2"
+      ],
+      "historical_source_video_sha256_declared": "af92ede5c64cc9070b4242020ac3c294cbb4a47b6dc243922929dc5367f0dab2",
+      "working_fps": 24,
+      "source_frame_dataset": "bp21-headroom-fallback"
     },
     {
       "source_id": "alcaraz_perricard_scene_007",
@@ -382,7 +424,28 @@
         ],
         "mean_frame_y_psnr_db": 6.140574301352791,
         "pooled_y_psnr_db": 6.140563691617843
-      }
+      },
+      "source_png_file_sha256": [
+        "e823d3bd92a5bd47f697f7914e8f719c6b16203142ac8293a8d0597c1e2a2356",
+        "c136f437cd147d9e64ac7ce09ffaf059d9090fbb2bad24d55d1d9ebb07e3f6b4",
+        "52d09097cebb902fbb3a6527b7e1e991715d3c738d7c9b943e97ba5efc1daf77",
+        "e4e6bc43cc1e632dc887876a78e874ac7bbc608532ecb57433d55e5db62401ad",
+        "722e9dcc64f1c323dde7ef773f477245eaba47268f418e6b04c1b4bf3cea3df9",
+        "2a0d781e8a172a314eccad1cbceda950c3a625afde5716e49f972ef518b74d7c",
+        "bb573a4e3371c316e2dedc90eeef1745b9a868b940a7405ed15604258d5d268b",
+        "f102146a819774450f5786c1448aa59d7741a5b706f9e07a5c9d3f734745486e",
+        "602cc87471f7c3f53e30bed2842bc2445e57c800c7e1f494c1b30e9bd842f109",
+        "d458d81b3706a218689c5e32571e97ac3d0c052b3f29cf7560d6b352ef4b3eca",
+        "0214093deeb44fe56a1085801c5d879595bd02af87ca6409ffe4500ec8e6a38b",
+        "193a1ebed080bb7461d644be4eab2f1f8ebbc8e8244d806801ad47e6344082f8",
+        "73be3ed03d7a7d999274c4ca0b28d51ceba98830feacce4b4e4a8d7aedaaace8",
+        "ed9fbae16a62898398ba65749ff444317640f882253b57f03ba8ac8b0c91a339",
+        "1bbbae048add03b8e1e80d95f2c9ad1459801a7ed636490ed3fc336649b4da02",
+        "e15ef030cbe21f6057af2186b4e83ac0f023230ae46895ea501c66d4432098e4"
+      ],
+      "historical_source_video_sha256_declared": "a4b2b7139a17cb9e70f8683fbb9a488058284585fe74c2bf8610b34618f26fc9",
+      "working_fps": 24,
+      "source_frame_dataset": "bp46-long-scenes"
     }
   ],
   "not_recertified": [
@@ -395,5 +458,19 @@
     "pose or generator transport",
     "rate advantage"
   ],
-  "environment_reference": "receiver-evidence.json environment; same gpu1 conda decoder interpreter and installed image-decoding libraries; no native codec invoked in this replay"
+  "environment_reference": "receiver-evidence.json environment; same gpu1 conda decoder interpreter and installed image-decoding libraries; no native codec invoked in this replay",
+  "bounded_anchor_inventory": {
+    "root": "/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-05",
+    "maxdepth": 2,
+    "extensions": [
+      ".ivf",
+      ".vvc",
+      ".264",
+      ".265",
+      ".bin",
+      ".mkv"
+    ],
+    "matched_files": 0,
+    "scope": "no matching files in this bounded search; not a global absence claim"
+  }
 }
