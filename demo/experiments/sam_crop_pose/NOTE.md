@@ -39,3 +39,16 @@ GPU smoke: gpu6, RTX 6000 Ada, CUDA execution provider confirmed, eight crops, t
 ## How to rerun
 
 `demo/experiments/compare_pose_on_sam_crops.py` scores every crop. `pose_crop_gallery.py` redraws the sheet and times CPU. `pose_gpu_timing.py` times the GPU and stops if CUDA did not load. The full per-crop report stays at `/home/itec/emanuele/pointstream-data/jobs/sam-crop-pose/report.json`.
+
+## Hand generator smoke
+
+RTMW-l crops from these SAM boxes were used to train a SPADE generator and a pix2pix UNet (`demo/experiments/train_rtmw_hands.py`). FoundHand (CVPR 2025) was then scored zero-shot from the Drive checkpoint, using the demo sampler, against those two checkpoints (`demo/experiments/compare_foundhand.py`). The score is masked appearance L1 on one held-out crop from the last sampled second of each folder. Lower is better. Numbers are in `foundhand_compare.json`.
+
+| Scene | FoundHand | SPADE | pix2pix |
+|---|---:|---:|---:|
+| clip 1, frame 35106 | 1.68 | 0.84 | 1.50 |
+| clip 3, frame 11702 | 2.39 | 1.68 | 1.45 |
+| factory 2, frame 35100 | 2.60 | 1.20 | 2.54 |
+| Mean | 2.22 | 1.24 | 1.83 |
+
+SPADE wins the smoke. FoundHand is worst on every frame. FoundHand-10M stays undownloaded: the checkpoint is already that pretraining, and the public hands are a different domain from these factory gloves.
