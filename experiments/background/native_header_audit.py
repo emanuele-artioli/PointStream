@@ -6,12 +6,15 @@ import json
 import os
 from pathlib import Path
 import struct
+import resource
+import subprocess
 import time
 
 def identity(path):
     digest=hashlib.sha256();count=0;started=time.monotonic()
     with path.open('rb') as handle:
         while block:=handle.read(1024**2):
+            if os.getloadavg()[0]>40:raise RuntimeError('native audit host load exceeded40')
             digest.update(block);count+=len(block)
             delay=count/(20*1024**2)-(time.monotonic()-started)
             if delay>0:time.sleep(delay)
@@ -59,8 +62,12 @@ def audit(report_path):
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('report',type=Path);p.add_argument('--out',type=Path,required=True)
+    p.add_argument('--code-revision',required=True)
     a=p.parse_args();os.nice(19);os.sched_setaffinity(0,sorted(os.sched_getaffinity(0))[-2:])
-    a.out.write_text(json.dumps(audit(a.report),indent=2)+'\n')
+    resource.setrlimit(resource.RLIMIT_AS,(1024**3,1024**3))
+    subprocess.run(['ionice','-c','3','-p',str(os.getpid())],check=True)
+    result=audit(a.report);result['audit_code_revision']=a.code_revision
+    a.out.write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps(identity(a.out)))
 
 if __name__=='__main__':main()
