@@ -1,6 +1,10 @@
 from fractions import Fraction
 import numpy as np
 from experiments.background.consecutive_reuse import schedule, score
+import json
+import hashlib
+import pytest
+from experiments.background.manifest_receiver import decode_manifest
 
 def test_fractional_fps_refresh_does_not_drift():
     assert schedule(600, Fraction(60000,1001), 1)==[0,60,120,180,240,300,360,420,480,539,599]
@@ -15,3 +19,19 @@ def test_frame_mean_and_pooled_are_distinct():
     assert result['mse_per_frame']==[1,100]
     assert result['pooled_mse']==50.5
     assert result['mean_frame_psnr_db']>result['pooled_psnr_db']
+
+def test_receiver_refuses_gap_before_any_decode(tmp_path):
+    p=tmp_path/'package.json'
+    p.write_text(json.dumps({'geometry':[2,2],'frames':2,'packets':[{'frame':1,'hold_until':2}]}))
+    with pytest.raises(ValueError,match='placement'):decode_manifest(p)
+
+def test_receiver_refuses_changed_charged_payload(tmp_path):
+    stream=tmp_path/'native.ivf';stream.write_bytes(b'changed')
+    p=tmp_path/'package.json'
+    p.write_text(json.dumps({'geometry':[2,2],'frames':1,'packets':[{'frame':0,'hold_until':1,
+        'stream':{'path':str(stream),'bytes':7,'sha256':hashlib.sha256(b'original').hexdigest()}}]}))
+    with pytest.raises(ValueError,match='identity'):decode_manifest(p)
+
+def test_receiver_refuses_incomplete_coverage(tmp_path):
+    p=tmp_path/'package.json';p.write_text(json.dumps({'geometry':[2,2],'frames':2,'packets':[]}))
+    with pytest.raises(ValueError,match='coverage'):decode_manifest(p)
