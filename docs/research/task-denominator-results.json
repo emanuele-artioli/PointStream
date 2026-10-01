@@ -3,17 +3,17 @@
   "independent_task_accuracy": false,
   "source_frame_alignment_verified": false,
   "training_exposure_verified": false,
-  "code_revision": "25ff7108acc78fbdb1be19802ce522460c9cbeb1",
+  "code_revision": "7228db3c493bdef13fdd098cfbdaea4624c48ea2",
   "legacy_revision": "3f7c1210a7284a330b3e931c56d5a78d3eb1f29d",
   "legacy_scorer_sha256": "1261010fd4a0dc1d5708d53efbc3454e384b6a33332661e41ee0f0121ea36d0f",
   "corrected_scorer_sha256": "25eab6c4bf739b08cee6ecd281e588c6cfbc9270a7b1fc04216e5d50ac6ac0cb",
-  "audit_worker_sha256": "efa736756049a683906516e9962b99370d32be9f448e59243dec7c42980d8ad8",
+  "audit_worker_sha256": "f7f4a53c4f874150e7768bdbf731148122bc65902b0120d3e0c50d8db58c7bab",
   "command": [
     "/private/tmp/pointstream-task-evidence/experiments/task_audit/denominator_audit.py",
     "--track-root",
     "/private/tmp/task-evidence-inputs",
     "--out",
-    "/private/tmp/task-evidence-25ff710/report.json",
+    "/private/tmp/task-evidence-7228db3/report.json",
     "--report",
     "/Users/manu/.codex/worktrees/research-evidence-recovery/PointStream/docs/research-recovery/records/demo/egocentric-reports/outputs__results__offline_gt_report_rtm.json",
     "--report",
@@ -96,12 +96,22 @@
     }
   ],
   "external_report": {
-    "path": "/private/tmp/task-evidence-25ff710/report.json",
-    "sha256": "3322a374353fbecd465c05c894fdb9f0ea03e3d3b22a748546ca8ae7b30828b1"
+    "path": "/private/tmp/task-evidence-7228db3/report.json",
+    "sha256": "fd0b8699e5e988f1365f6889ee4eace6f0863fe9afec14c59bfb42b5f1b14f76"
   },
   "smoke": {
-    "path": "/private/tmp/task-evidence-25ff710/smoke.json",
-    "sha256": "2dac272beb6c6f8cecf69243c4c4cbe4e720f34fdc6c5b91caf913ceaee0198f"
+    "path": "/private/tmp/task-evidence-7228db3/smoke.json",
+    "sha256": "5430798d5f3cee3fc5661231a4f2e8324b1350f6d74853f1ecf61a5558695afb",
+    "started_at_utc": "2026-10-01T09:22:00.511048+00:00",
+    "finished_at_utc": "2026-10-01T09:22:00.730450+00:00",
+    "command": [
+      "/private/tmp/pointstream-task-evidence/experiments/task_audit/denominator_audit.py",
+      "--track-root",
+      "/private/tmp/task-evidence-inputs",
+      "--smoke",
+      "--out",
+      "/private/tmp/task-evidence-7228db3/smoke.json"
+    ]
   },
   "full_comparisons": 9,
   "controlled_conditions": 45,
@@ -1000,5 +1010,13 @@
         "matched_hands": 83.0
       }
     }
-  ]
+  ],
+  "started_at_utc": "2026-10-01T09:22:27.624702+00:00",
+  "finished_at_utc": "2026-10-01T09:22:28.149178+00:00",
+  "elapsed_seconds": 0.5243691250216216,
+  "thread_environment": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1"
+  },
+  "preregistration_sha256": "e95d1f92c66497fad4c42ccaf9a93bbcdd15a321ef5391097e773c3e54ae327c"
 }
