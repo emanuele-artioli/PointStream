@@ -303,7 +303,7 @@ def test_spawned_child_identity_write_failure_retains_claim_until_group_stops(
         raise OSError("identity write failed")
 
     monkeypatch.setattr(claims, "record_child_identity", failed_identity)
-    assert monitor.supervise(tmp_path) == 0
+    assert monitor.supervise(tmp_path) == 1
     assert monitor.read_json(tmp_path / "status.json")["status"] == "failed"
     allocations = claims.get_claims_status(claims_dir)["cpu_hosts"]
     assert any(host["allocations"] for host in allocations.values()) is not stopped
@@ -390,3 +390,99 @@ def test_pending_events_are_not_delivered_during_quiet_hours(
     monitor.deliver(tmp_path, "owner", "codex")
     assert len(events(tmp_path)) == 1
     assert not list((tmp_path / "events").glob("*.sent"))
+
+
+def test_identity_binding_and_release_failures_persist_primary_failure_before_cleanup(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from experiments.jobs import claims
+
+    setup_job(tmp_path)
+    claims_dir = tmp_path / "claims"
+    monitor.write_json(tmp_path / "request.json", {
+        "command": ["synthetic-worker"], "cwd": str(tmp_path),
+        "budget_seconds": 5, "thread": None, "codex": "codex",
+        "claims": {"cpu_threads": 1, "claims_dir": str(claims_dir), "available_cores": 4},
+    })
+    child = SimpleNamespace(pid=123, poll=lambda: None)
+    monkeypatch.setattr(monitor.subprocess, "Popen", lambda *a, **kw: child)
+    monkeypatch.setattr(claims, "get_process_start_time", lambda pid: "start-identity")
+    cleanup_observations = []
+
+    def failed_identity(*args: Any) -> Any:
+        persisted = monitor.read_json(tmp_path / "status.json")
+        assert persisted["pid"] == persisted["process_group_id"] == child.pid
+        assert persisted["proc_start_time"] == "start-identity"
+        raise RuntimeError("primary identity mutex timed out")
+
+    def stopped(proc: Any) -> bool:
+        persisted = monitor.read_json(tmp_path / "status.json")
+        assert persisted["status"] == "failed"
+        assert persisted["error"] == "primary identity mutex timed out"
+        return True
+
+    def failed_release(*args: Any) -> Any:
+        persisted = monitor.read_json(tmp_path / "status.json")
+        assert persisted["child_stopped"] is True
+        cleanup_observations.append(persisted["cleanup_phase"])
+        raise RuntimeError("secondary release mutex timed out")
+
+    monkeypatch.setattr(claims, "record_child_identity", failed_identity)
+    monkeypatch.setattr(monitor, "stop_child", stopped)
+    monkeypatch.setattr(claims, "release_session_claims", failed_release)
+    assert monitor.supervise(tmp_path) == 1
+    state = monitor.read_json(tmp_path / "status.json")
+    assert state["status"] == "failed"
+    assert state["error"] == "primary identity mutex timed out"
+    assert state["pid"] == state["process_group_id"] == 123
+    assert state["proc_start_time"] == "start-identity"
+    assert state["child_stopped"] is True and state["claims_retained"] is True
+    assert cleanup_observations == ["startup", "final"]
+    assert [item["error"] for item in state["cleanup_errors"]] == [
+        "secondary release mutex timed out", "secondary release mutex timed out",
+    ]
+    assert monitor.read_json(tmp_path / "claim.json")["cpu_claim"] is not None
+
+
+def test_final_release_failure_does_not_mask_completed_job_status(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from experiments.jobs import claims
+
+    setup_job(tmp_path)
+    monitor.write_json(tmp_path / "request.json", {
+        "command": ["synthetic-worker"], "cwd": str(tmp_path),
+        "budget_seconds": 5, "thread": None, "codex": "codex",
+        "claims": {"cpu_threads": 1, "claims_dir": str(tmp_path / "claims"), "available_cores": 4},
+    })
+    child = SimpleNamespace(pid=123, poll=lambda: 0)
+    monkeypatch.setattr(monitor.subprocess, "Popen", lambda *a, **kw: child)
+    monkeypatch.setattr(monitor, "stop_child", lambda proc: True)
+
+    def failed_release(*args: Any) -> Any:
+        raise OSError("final claim cleanup unavailable")
+
+    monkeypatch.setattr(claims, "release_session_claims", failed_release)
+    assert monitor.supervise(tmp_path) == 1
+    state = monitor.read_json(tmp_path / "status.json")
+    assert state["status"] == "complete" and state["exit_code"] == 0
+    assert state["claims_retained"] is True and state["child_stopped"] is True
+    assert state["cleanup_errors"] == [{
+        "phase": "final", "operation": "release_session_claims",
+        "error": "final claim cleanup unavailable",
+    }]
+
+
+def test_restart_does_not_certify_unknown_child_stopped_or_clear_retained_claim(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    state = setup_job(tmp_path)
+    state.update(pid=123, process_group_id=123, proc_start_time="unknown-start", claims_retained=True)
+    monitor.write_json(tmp_path / "status.json", state)
+    monitor.write_json(tmp_path / "request.json", {"thread": None, "codex": "codex"})
+    monkeypatch.setattr(monitor, "stop_child", lambda proc: pytest.fail("no owned child handle on restart"))
+    assert monitor.supervise(tmp_path) == 0
+    persisted = monitor.read_json(tmp_path / "status.json")
+    assert persisted["status"] == "interrupted"
+    assert persisted["child_stopped"] is False
+    assert persisted["claims_retained"] is True

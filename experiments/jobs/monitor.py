@@ -211,6 +211,50 @@ def stop_child(child: subprocess.Popen[Any]) -> bool:
     return terminate_and_reap_process_group(child)
 
 
+def cleanup_owned_job(
+    directory: Path, state: dict[str, Any], child: subprocess.Popen[Any] | None,
+    claim_session: Any, *, phase: str,
+) -> Any:
+    """Persist primary state before cleanup; retain claims unless stop is verified.
+
+    Claim release can fail or partially succeed. Keep the session receipt and
+    disclose that uncertainty instead of replacing the original job failure.
+    """
+    had_session = claim_session is not None
+    previously_retained = bool(state.get("claims_retained", False))
+    state["cleanup_phase"] = phase
+    write_json(directory / "status.json", state)
+    try:
+        # A restarted supervisor has no Popen handle; absence of a handle is
+        # not evidence that an earlier unknown child stopped.
+        child_stopped = (
+            bool(state.get("child_stopped", False)) if child is None and phase == "final"
+            else child is None or stop_child(child)
+        )
+    except Exception as exc:
+        child_stopped = False
+        state.setdefault("cleanup_errors", []).append(
+            {"phase": phase, "operation": "stop_child", "error": str(exc)}
+        )
+    state["child_stopped"] = child_stopped
+    state["claims_retained"] = claim_session is not None or previously_retained
+    write_json(directory / "status.json", state)
+    if claim_session is not None and child_stopped:
+        from experiments.jobs.claims import release_session_claims
+
+        try:
+            release_session_claims(claim_session)
+        except Exception as exc:
+            state.setdefault("cleanup_errors", []).append(
+                {"phase": phase, "operation": "release_session_claims", "error": str(exc)}
+            )
+        else:
+            claim_session = None
+    state["claims_retained"] = claim_session is not None if had_session else previously_retained
+    write_json(directory / "status.json", state)
+    return claim_session
+
+
 def supervise(directory: Path) -> int:
     def interrupted(signum: int, frame: Any) -> None:
         raise InterruptedError("supervisor interrupted")
@@ -321,10 +365,6 @@ def supervise(directory: Path) -> int:
                     if cand is None or not is_device_free(
                         cand, min_free_memory_mb=float(claims_cfg.get("min_free_memory_mb", 4000.0))
                     ):
-                        from experiments.jobs.claims import release_session_claims
-
-                        release_session_claims(claim_session)
-                        claim_session = None
                         err_msg = f"Device {claimed_uuid} became busy before launch"
                         state.update(status="failed", error=err_msg)
                         write_json(directory / "status.json", state)
@@ -341,23 +381,19 @@ def supervise(directory: Path) -> int:
                     )
                 from experiments.jobs.claims import get_process_start_time, record_child_identity
 
-                state.update(
-                    pid=child.pid,
-                    proc_start_time=get_process_start_time(child.pid),
-                    process_group_id=child.pid,
-                )
+                state.update(pid=child.pid, proc_start_time=None, process_group_id=child.pid)
+                # Persist even before identity binding touches a claim mutex.
+                write_json(directory / "status.json", state)
+                state["proc_start_time"] = get_process_start_time(child.pid)
+                write_json(directory / "status.json", state)
                 if claim_session is not None:
                     identity = record_child_identity(claim_session, child)
                     write_json(directory / "claim.json", {**claim_session.to_dict(), **identity})
                 write_json(directory / "status.json", state)
             except Exception as exc:
-                child_stopped = child is None or stop_child(child)
-                if claim_session and child_stopped:
-                    from experiments.jobs.claims import release_session_claims
-
-                    release_session_claims(claim_session)
-                    claim_session = None
                 state.update(status="failed", error=str(exc))
+                write_json(directory / "status.json", state)
+                claim_session = cleanup_owned_job(directory, state, child, claim_session, phase="startup")
         last_log = 0.0
         try:
             while True:
@@ -420,17 +456,14 @@ def supervise(directory: Path) -> int:
                         or any(x.startswith("report:") for x in state["emitted"])
                     )
                 ):
-                    return 0
+                    break
                 time.sleep(10)
         finally:
-            child_stopped = child is None or stop_child(child)
             if state["status"] == "running":
                 state["status"] = "interrupted"
                 write_json(directory / "status.json", state)
-            if claim_session is not None and child_stopped:
-                from experiments.jobs.claims import release_session_claims
-
-                release_session_claims(claim_session)
+            claim_session = cleanup_owned_job(directory, state, child, claim_session, phase="final")
+        return 1 if state["status"] == "failed" or state.get("cleanup_errors") else 0
 
 
 def positive(value: str) -> float:
