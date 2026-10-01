@@ -1,6 +1,9 @@
 """Bounded scorer conformance experiment; synthetic inputs are not task truth."""
 from __future__ import annotations
 import argparse
+from datetime import datetime, timezone
+import os
+import time
 import hashlib
 import json
 import platform
@@ -38,6 +41,8 @@ def audit_reports(paths):
 
 
 def main():
+    started_at = datetime.now(timezone.utc).isoformat()
+    start_clock = time.monotonic()
     parser = argparse.ArgumentParser()
     parser.add_argument('--out', required=True, type=Path)
     parser.add_argument('--legacy-revision', default='3f7c121')
@@ -95,7 +100,11 @@ def main():
         'corrected_scorer_sha256': hashlib.sha256(Path(source_path).read_bytes()).hexdigest(),
         'audit_worker_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         'code_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
-        'command': sys.argv, 'python': sys.version, 'platform': platform.platform(),
+        'command': sys.argv, 'started_at_utc': started_at,
+        'finished_at_utc': datetime.now(timezone.utc).isoformat(), 'elapsed_seconds': time.monotonic() - start_clock,
+        'thread_environment': {key: os.environ.get(key) for key in ['OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS']},
+        'preregistration_sha256': hashlib.sha256(Path('docs/research/task-denominator-preregistration.md').read_bytes()).hexdigest(),
+        'python': sys.version, 'platform': platform.platform(),
         'gpu_uuid': None, 'native_encoder_decoder': 'not used', 'inputs': receipts,
         'synthetic_interventions': results, 'saved_model_reference_rows': rows,
         'retained_model_reference_interventions': track_rows}
