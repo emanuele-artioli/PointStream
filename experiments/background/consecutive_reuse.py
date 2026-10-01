@@ -77,7 +77,7 @@ def main():
     p.add_argument("--out", type=Path, required=True); p.add_argument("--code-revision", required=True)
     p.add_argument("--smoke", action="store_true"); a=p.parse_args()
     a.out.mkdir(parents=True, exist_ok=False)
-    os.nice(19); cores=sorted(os.sched_getaffinity(0))[:8]; os.sched_setaffinity(0, cores)
+    os.nice(19); cores=sorted(os.sched_getaffinity(0))[-8:]; os.sched_setaffinity(0, cores)
     resource.setrlimit(resource.RLIMIT_AS,(16*1024**3,16*1024**3))
     subprocess.run(["ionice","-c","3","-p",str(os.getpid())], check=True)
     os.environ.update(CUDA_VISIBLE_DEVICES="",OMP_NUM_THREADS="1",OPENBLAS_NUM_THREADS="1")
