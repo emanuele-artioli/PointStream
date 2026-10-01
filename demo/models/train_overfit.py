@@ -22,7 +22,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 from demo.evaluation.pose_backends import BACKENDS
-from demo.models.dataset import EgocentricHandDataset, build_curated_samples
+from demo.models.dataset import EgocentricHandDataset, build_curated_samples, build_sampled_samples
 from demo.models.hand_objective import hand_step_loss
 from demo.models.matte import dwb2_roundtrip, interpolate_hand_alphas, read_hand_alphas
 from demo.models.unet_generator import HandPix2PixUNet, HandSPADEUNet
@@ -52,24 +52,53 @@ def train(
     max_minutes: float = 60.0,
     patience_epochs: int = 5,
     min_delta: float = 1e-3,
+    sampled_roots: list[Path] | None = None,
 ) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
+    device = torch.device(device_str if torch.cuda.is_available() else "cpu")
+    logger.info(f"Using training device: {device}")
+    all_samples = []
+    all_anchors = {}
+    if sampled_roots:
+        pose_backend = "sampled_segmented_rtm"
+        mask_video = Path("sampled-masks")
+        for clip_id, folder in enumerate(sampled_roots):
+            samples, anchors, _anchor_bytes = build_sampled_samples(folder, clip_id=clip_id)
+            logger.info("Sampled %s: %d hand crops", folder, len(samples))
+            all_samples.extend(samples)
+            all_anchors[clip_id] = anchors
+        if not all_samples:
+            raise ValueError(f"No hand samples in {sampled_roots}")
+    else:
+        _load_curated(
+            curated_dir, frames_per_clip, pose_backend, mask_video, dwb2, clip_indices, all_samples, all_anchors,
+        )
+    return _fit_from(
+        all_samples,
+        all_anchors,
+        output_dir=output_dir,
+        epochs=epochs,
+        batch_size=batch_size,
+        lr=lr,
+        device=device,
+        model_type=model_type,
+        smoke=smoke,
+        pose_backend=pose_backend,
+        mask_video=mask_video,
+        max_minutes=max_minutes,
+        patience_epochs=patience_epochs,
+        min_delta=min_delta,
+    )
+
+
+def _load_curated(curated_dir, frames_per_clip, pose_backend, mask_video, dwb2, clip_indices, all_samples, all_anchors):
     manifest_path = curated_dir / "manifest.json"
     if not manifest_path.exists():
         raise FileNotFoundError(f"Manifest not found at {manifest_path}")
-
     with open(manifest_path, "r") as f:
         manifest = json.load(f)
-
     if clip_indices is None:
         clip_indices = [0]
-
-    device = torch.device(device_str if torch.cuda.is_available() else "cpu")
-    logger.info(f"Using training device: {device}")
-
-    all_samples = []
-    all_anchors = {}
-
     for clip_idx in clip_indices:
         item = manifest[clip_idx]
         clip_path = Path(item["path"])
@@ -114,6 +143,8 @@ def train(
         all_samples.extend(samples)
         all_anchors[clip_idx] = anchors
 
+
+def _fit_from(all_samples, all_anchors, *, output_dir, epochs, batch_size, lr, device, model_type, smoke, pose_backend, mask_video, max_minutes, patience_epochs, min_delta):
     if not all_samples:
         raise ValueError("No hand samples were extracted! Check video format and hand presence.")
 
@@ -316,6 +347,8 @@ def main() -> None:
     parser.add_argument("--patience", type=int, default=5)
     parser.add_argument("--min-delta", type=float, default=1e-3)
     parser.add_argument("--clip-index", type=int, default=0)
+    parser.add_argument("--sampled-root", type=Path, action="append", default=None,
+                        help="Sampled folder with original/, masks/, and poses. Repeat for each recording.")
     args = parser.parse_args()
 
     train(
@@ -335,6 +368,7 @@ def main() -> None:
         max_minutes=args.max_minutes,
         patience_epochs=args.patience,
         min_delta=args.min_delta,
+        sampled_roots=args.sampled_root,
     )
 
 
