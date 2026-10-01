@@ -91,6 +91,8 @@ def models(args, device):
     if args.disable_fused:
         sys.modules['inference_extensions_cuda'] = None
     import torch
+    from src.utils.common import set_torch_env
+    set_torch_env()
     from src.models.image_model_gvcrt import DMCI
     from src.models.video_model_gvcrt import DMC
     import MLCodec_extensions_cpp as entropy
@@ -107,7 +109,10 @@ def models(args, device):
                    'command_argv': sys.argv, 'bridge_sha256': sha256(__file__),
                    'numpy': importlib.metadata.version('numpy'), 'Pillow': importlib.metadata.version('Pillow'),
                    'einops': importlib.metadata.version('einops'),
-                   'customized_cuda_inference': CUSTOMIZED_CUDA_INFERENCE, 'disable_fused': args.disable_fused}
+                   'customized_cuda_inference': CUSTOMIZED_CUDA_INFERENCE, 'disable_fused': args.disable_fused,
+                   'deterministic_algorithms': torch.are_deterministic_algorithms_enabled(),
+                   'torch_threads': torch.get_num_threads(),
+                   'cublas_workspace_config': os.environ.get('CUBLAS_WORKSPACE_CONFIG')}
     if device == 'cuda':
         if not os.environ.get('CUDA_VISIBLE_DEVICES'):
             raise RuntimeError('CUDA mode requires fleet-provided CUDA_VISIBLE_DEVICES')
