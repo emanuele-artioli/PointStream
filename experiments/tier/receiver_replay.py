@@ -22,9 +22,9 @@ def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def hidden_receiver(package, output, data_root):
+def receiver_access_guard(package, output, data_root, code_root):
     allowed = {Path(package).resolve(), Path(output).resolve()}
-    code_root = Path(__file__).resolve().parents[2]
+    code_root = Path(code_root).resolve()
     reads, commands = [], []
     def audit(event, args):
         if event == 'open' and isinstance(args[0], (str, bytes, os.PathLike)):
@@ -35,6 +35,11 @@ def hidden_receiver(package, output, data_root):
                     raise PermissionError(f'receiver denied external data read: {p}')
         if event == 'subprocess.Popen':
             commands.append(args[1])
+    return audit, reads, commands
+
+
+def hidden_receiver(package, output, data_root):
+    audit, reads, commands = receiver_access_guard(package, output, data_root, Path(__file__).resolve().parents[2])
     sys.addaudithook(audit)
     from experiments.tier.e06_transport import reconstruct_standalone
     frames = reconstruct_standalone(Path(package).read_bytes())
@@ -74,6 +79,8 @@ def main():
     source=root/'e03b/run-20260916-federer007/prepared_rgb.npy'
     families=[('original','run-20260916-federer007-perframe-bbox','transport.npz'),('compact','audit-20260916-lossless-pack','transport_compact.npz'),('floor','probe-20260917-floor-arms','transport_floor.npz')]
     candidates=[(family,path) for family,directory,name in families for path in sorted((root/'e06'/directory).glob('*/'+name))]
+    if len(candidates) != 12 or any(sum(f == family for f, _ in candidates) != 4 for family, _, _ in families):
+        raise ValueError("expected all twelve retained packages (four per family)")
     if args.smoke:candidates=candidates[:1]
     report={'host':socket.getfqdn(),'python':sys.version,'worker_sha256':digest(__file__),'code_revision':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip() if (Path.cwd()/'.git').exists() else os.environ.get('PS_CODE_REVISION'),'source':str(source),'source_file_sha256':digest(source),'cpu_affinity':affinity,'gpu_allocated':False,'smoke':args.smoke,'rows':[]}
     for family,path in candidates:
