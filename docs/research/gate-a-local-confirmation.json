@@ -1,0 +1,71 @@
+{
+  "scope": "posthoc local GateA hypothesis plus source audit; no measured compression win",
+  "base_code_revision": "931333e",
+  "branch": "codex/gate-a-local-confirmation",
+  "paper_branch": "codex/paper-gate-a-local",
+  "historical_source_revision": "274638bdae7f5bd63c4f834a24804c0e14ed8d83",
+  "stored_report_sha256": "71d82a51c6bf831c6a336d12a2cb05b1496912caa17a702b9e490f28380d939a",
+  "local50_70_pchip_bd_rate_percent": {
+    "vvc_continuous": -13.486806605820856,
+    "vvc_segmented": -13.964632042685999
+  },
+  "full_support_pchip_bd_rate_percent": {
+    "vvc_continuous": 14.088474933730776,
+    "vvc_segmented": 13.878769936356171
+  },
+  "qualified_native_win": false,
+  "audit_findings": [
+    "historical serialized receiver output discarded; encoder-DAG reconstruction scored",
+    "full physical NPZ mask/placement/envelope not in component ledger",
+    "no complete C2/C3 packet persisted; new legacy-derived export required"
+  ],
+  "smoke_registration": {
+    "path": "/private/tmp/gate-a-local-20261002/smoke-registration.json",
+    "sha256": "0c5a2c232c8f0d5dd033af25c5fa7c01626aee20840219788d90c0881ebdddc6"
+  },
+  "smokes": {
+    "C2": "gpu3:audits/gate-a-recert-C2-smoke-job-20261002",
+    "C3": "gpu3:audits/gate-a-recert-C3-smoke-job-20261002"
+  },
+  "execution": "CPU-only, no GPU, owned monitor claims, disjoint cores0\u20137/8\u201315, 0.5h each; no replay",
+  "remaining": "Inspect existing pilot12 jobs, do not replay; gate 48frame scale and 96recert on complete frames/finite metrics/physical costs and measured resources. Dense VVC and AV1 require fresh full-payload gate and separately frozen same-path native smoke/pilot.",
+  "prior_followups_retained": [
+    "lossless metadata baseline and mild/boundary-preserving lossy packing",
+    "GVC-RT native stream freshdecode/parity; supported-domainMTTF; GLC rateestimated separately"
+  ],
+  "paper_revision": "8d3b4aa",
+  "external_receipts": "/Users/manu/.codex/visualizations/2026/09/30/01a0f3d8-8225-77c0-b10a-4a9fd2401c9b/packet-rate-quality/gate-a-local-20261002",
+  "smoke_results": {
+    "C2": {
+      "status": "complete_exit0_claims_released",
+      "physical_payload_bytes": 121908,
+      "frames_total": 4,
+      "receiver_vmaf": 59.860755,
+      "paper_evidence": false
+    },
+    "C3": {
+      "status": "complete_exit0_claims_released",
+      "physical_payload_bytes": 172821,
+      "frames_total": 4,
+      "receiver_vmaf": 75.558327,
+      "paper_evidence": false
+    }
+  },
+  "metric_control_results": {
+    "status": "complete_exit0_claims_released",
+    "passed": true,
+    "values": {
+      "identical": 97.972531,
+      "mild_blur": 75.307224,
+      "severe_blur": 0.0,
+      "black_null": 0.0
+    },
+    "artifact": "gpu3:audits/gate-a-metric-controls-20261002/report.json",
+    "local_log_hashes_independently_verified": true
+  },
+  "pilot12_jobs": {
+    "C2": "gpu3:audits/gate-a-recert-C2-pilot12-job-20261002",
+    "C3": "gpu3:audits/gate-a-recert-C3-pilot12-job-20261002"
+  },
+  "native_anchor_worker": "implemented, focused no-padding test passes; not staged, registered, smoke-tested or run yet"
+}
