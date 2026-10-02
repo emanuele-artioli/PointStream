@@ -1,5 +1,5 @@
 {
-  "classification": "infrastructure qualification; full37 comparison pending",
+  "classification": "complete37 registered perceptual comparison on one prepared development window; native GVC qualification unresolved",
   "smoke": {
     "output": "/home/itec/emanuele/pointstream-data/audits/perceptual-cpu-smoke2-40255e0-20261002",
     "result_sha256": "7326614cac0c1e0a0016d37e56eaa7215f927d8f8f030c24391a40db6cbffe16",
@@ -15,7 +15,7 @@
     }
   },
   "full37_registration": {
-    "status": "registered_not_launched",
+    "status": "completed_validated37",
     "smoke_required": "perceptual-cpu-smoke2-40255e0-20261002 complete all48 valid results and measured budget",
     "parent_manifest_sha256": "0634c287bf0d0b6059419dcae57e77d5fe329563056797512573c9c20522f9fb",
     "groups": [
@@ -92,7 +92,8 @@
     "model_tensor_manifest_sha256": {
       "lpips_state": "ddf6cff30ce8ded007f87bc60f65e0ac77346ab09d8a2bdf0d05d683edd94fa9",
       "dists_state": "4d5dc7d05a7f04cc49788530b649fb3c85192f3b538d294759f0bc6e63d49a75"
-    }
+    },
+    "original_status": "registered_not_launched"
   },
   "native_smoke_failure": {
     "status": "failed",
@@ -112,5 +113,984 @@
     }
   },
   "native_smoke_job": "20261002T072546Z-f28c2b56",
-  "limitation": "No GVC encoder/decoder result. Full perceptual campaign must complete all37 before comparison claims."
+  "limitation": "Complete37 comparison is qualified only for the one prepared window. Native GVC attempt was interrupted by contention; sender reference, successful encode return, fresh decode and parity remain absent. Admission/contention outcomes are not algorithmic negatives.",
+  "native_smoke_followup": {
+    "command": [
+      "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "-u",
+      "-B",
+      "-m",
+      "experiments.generative.gvcrt_smoke_registered"
+    ],
+    "cpu_threads": 4,
+    "created_at": "2026-10-02T09:07:56.751499+00:00",
+    "data_root": "/home/itec/emanuele/pointstream-data",
+    "deleted_paths": [],
+    "error": "gpu1: launch failed: supervisor rejected launch before child start: {\"status\": \"failed\", \"started\": 1790932107.8604906, \"last_progress\": 1790932107.8604913, \"emitted\": [], \"error\": \"CPU claim failed: Failed to acquire atomic directory lock /home/itec/emanuele/pointstream-data/jobs/claims/cpu/gpu1.itec.aau.at.lock within 10.0s\"}",
+    "estimated_gpu_memory_mib": 8192,
+    "git_head": "b1641416d50322af1422133b288d1a7e1e83a943",
+    "gpu": {
+      "compute_processes": [],
+      "index": 0,
+      "memory_free_mib": 48592,
+      "memory_total_mib": 49152,
+      "memory_used_mib": 1,
+      "name": "Quadro RTX 8000",
+      "pointstream_claimed": false,
+      "utilization_pct": 0,
+      "uuid": "GPU-5ffa6674-72d4-2b5d-831b-99e54c600fc5"
+    },
+    "host": "gpu1.itec.aau.at",
+    "host_alias": "gpu1",
+    "included_untracked_sha256": {
+      "experiments/generative/gvcrt_smoke_registered.py": "9003e27d895ea490788a5f56fb5ef9cdf8ee97cd1bc3931f34ef4dd6365b1f0f",
+      "experiments/jobs/fleet.py": "6c2fe2b4c8b54a21c4ac56c8a513fcf4ebee60b59a1276071fba8b930d14b9cb"
+    },
+    "job_id": "20261002T090756Z-3e025442",
+    "run_dir": "/home/itec/emanuele/pointstream-data/jobs/fleet/runs/20261002T090756Z-3e025442",
+    "runtime_environment": {
+      "native_tools": {
+        "ffmpeg": {
+          "path": "/opt/local/bin/ffmpeg",
+          "returncode": 8,
+          "version": [
+            "ffmpeg version n7.1.1-56-gc2184b65d2 Copyright (c) 2000-2025 the FFmpeg developers",
+            "  built with gcc 11 (Ubuntu 11.4.0-1ubuntu1~22.04)",
+            "  configuration: --prefix=/opt/local --enable-pthreads --enable-pic --enable-shared --enable-rpath --enable-gpl --enable-openssl --enable-libaom --enable-libass --enable-libfdk-aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libsvtav1 --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 --enable-libvmaf --enable-nonfree --enable-ffnvcodec --enable-demuxer=dash --enable-libxml2 --enable-libvvenc"
+          ]
+        },
+        "vvencapp": {
+          "path": "/opt/local/bin/vvencapp",
+          "returncode": 0,
+          "version": [
+            "vvencapp version 1.11.0"
+          ]
+        }
+      },
+      "pointstream_python": "Python 3.10.20"
+    },
+    "selection": {
+      "hardware_order": [
+        "RTX 6000 Ada",
+        "RTX A6000",
+        "RTX 8000",
+        "GV100"
+      ],
+      "hardware_order_is_heuristic": true,
+      "idle_memory_mib": 256,
+      "idle_utilization_pct": 5,
+      "memory_margin_mib": 4096,
+      "policy": "no compute processes; memory use <= idle threshold; utilization <= idle threshold; free memory >= estimate + 4 GiB; CPU allowance <= 90% headroom",
+      "preferred_gpu_names": []
+    },
+    "snapshot_sha256": "76c0676d6f0d3bda37a4cf029b12be5442ab7ee14176bc615d2745f903620039",
+    "source_dir": "/var/tmp/emanuele-pointstream-fleet-snapshots/20261002T090756Z-3e025442",
+    "status": "failed",
+    "tracked_changes_excluded": [],
+    "tracked_changes_included": [],
+    "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_excluded_count": 0,
+    "untracked_excluded_paths_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_excluded_sample": [],
+    "remote_status": {
+      "status": "failed",
+      "started": 1790932107.8604906,
+      "last_progress": 1790932107.8604913,
+      "emitted": [],
+      "error": "CPU claim failed: Failed to acquire atomic directory lock /home/itec/emanuele/pointstream-data/jobs/claims/cpu/gpu1.itec.aau.at.lock within 10.0s",
+      "cleanup_phase": "startup",
+      "child_stopped": true,
+      "claims_retained": false
+    }
+  },
+  "full37_execution": {
+    "status": "complete_validated37",
+    "completed_groups": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "methods": 37,
+    "frames_per_method": 48,
+    "source": {
+      "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03b/run-20260916-federer007/prepared_rgb.npy",
+      "bytes": 33177728,
+      "sha256": "9234147b68ace7217043c2761701f3bc915a0371db9fc83be6fea3973ae20191",
+      "common_rgb_sha256": "1f02475a5bbc3d94e4bae2e904dc29c3af3082be0c0c160e027b706a6950f6f8"
+    },
+    "source_shape": [
+      48,
+      360,
+      640,
+      3
+    ],
+    "scorer_unchanged_sha256": "e8f9cb4895aa5222fe1d352c550bb1d10d63487c95c9ba0d917a92cdf35b0dba",
+    "groups": [
+      {
+        "group": 0,
+        "path": "/private/tmp/perceptual-full37-results-20261002/group0.json",
+        "sha256": "9a7fe5df596f771ea8d2bcbe10c23e51108751cc2623b430fe99985c8357c9e2",
+        "code_revision": "40255e01e17a9dac5412fafbfbb3f3563efce2b6",
+        "scorer": {
+          "path": "/var/tmp/emanuele-perceptual-cpu-code402-selected-20261002/experiments/packet_study/perceptual_score.py",
+          "bytes": 14515,
+          "sha256": "e8f9cb4895aa5222fe1d352c550bb1d10d63487c95c9ba0d917a92cdf35b0dba"
+        },
+        "models": {
+          "tensor_ids": {
+            "lpips_state": "ddf6cff30ce8ded007f87bc60f65e0ac77346ab09d8a2bdf0d05d683edd94fa9",
+            "dists_state": "4d5dc7d05a7f04cc49788530b649fb3c85192f3b538d294759f0bc6e63d49a75"
+          },
+          "assets": {
+            "alexnet": [
+              244408911,
+              "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
+            ],
+            "vgg16": [
+              553433881,
+              "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+            ],
+            "lpips_alex_v01": [
+              6009,
+              "df73285e35b22355a2df87cdb6b70b343713b667eddbda73e1977e0c860835c0"
+            ],
+            "dists": [
+              12288,
+              "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218"
+            ]
+          },
+          "device": "cpu",
+          "gpu": null,
+          "libraries": {
+            "torch": {
+              "distribution": "torch",
+              "version": "2.5.1+cu121",
+              "module": {
+                "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torch/__init__.py",
+                "bytes": 95190,
+                "sha256": "e1b5bf4151bd246a21e3ac5318f6edfcf2e6ef0fd4f233bfb77a264698ec1319"
+              },
+              "installed_distribution_manifests": {
+                "torch-2.5.1+cu121.dist-info/METADATA": {
+                  "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torch-2.5.1+cu121.dist-info/METADATA",
+                  "bytes": 28209,
+                  "sha256": "fa88b1f913d9e569d3fb57432cf9d49b127e8107dc1ad7202de38af2a7b4a756"
+                },
+                "torch-2.5.1+cu121.dist-info/RECORD": {
+                  "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torch-2.5.1+cu121.dist-info/RECORD",
+                  "bytes": 1512831,
+                  "sha256": "9f87849e42f9ae7bd79b3bb2eb772f8f21694979195a0079c8f851da56a730bb"
+                }
+              }
+            },
+            "torchvision": {
+              "distribution": "torchvision",
+              "version": "0.20.1+cu121",
+              "module": {
+                "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torchvision/__init__.py",
+                "bytes": 3534,
+                "sha256": "ee2c9f4110cf1203db48c42601607329ac1f19709fa91c152f8d95eb53437a73"
+              },
+              "installed_distribution_manifests": {
+                "torchvision-0.20.1+cu121.dist-info/METADATA": {
+                  "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torchvision-0.20.1+cu121.dist-info/METADATA",
+                  "bytes": 6074,
+                  "sha256": "d8eec8b7cc4b59edad69e8ca3e64db4222fac3991da83e0f4f90163c578dfc2b"
+                },
+                "torchvision-0.20.1+cu121.dist-info/RECORD": {
+                  "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torchvision-0.20.1+cu121.dist-info/RECORD",
+                  "bytes": 52107,
+                  "sha256": "bb5fe8beb85bcb687d70c847f0447ea63468e8561e1d110c9f6d6115a9cd48c4"
+                }
+              }
+            },
+            "lpips": {
+              "distribution": "lpips",
+              "version": "0.1.4",
+              "module": {
+                "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/lpips/__init__.py",
+                "bytes": 4846,
+                "sha256": "36ee004a45e2cc2c5ab47fa3955f00c0e41f6a151ef0249fb6f362533ed58b22"
+              },
+              "installed_distribution_manifests": {
+                "lpips-0.1.4.dist-info/METADATA": {
+                  "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/lpips-0.1.4.dist-info/METADATA",
+                  "bytes": 10852,
+                  "sha256": "cbd4a3730b2c9390741cdbad69661a87cabdc2796f1efc530bc46b738745b9b5"
+                },
+                "lpips-0.1.4.dist-info/RECORD": {
+                  "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/lpips-0.1.4.dist-info/RECORD",
+                  "bytes": 2359,
+                  "sha256": "62f1183d66d1ed638ff143f1f98e6c493f49526b6866c0aad3688f41d6469ed2"
+                }
+              }
+            },
+            "dists": {
+              "distribution": "DISTS-pytorch",
+              "version": "0.1",
+              "module": {
+                "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/DISTS_pytorch/DISTS_pt.py",
+                "bytes": 5435,
+                "sha256": "da9162307ae51bc58ffe259e7e778973e8586286652d36c3e9885e94bc269da8"
+              },
+              "installed_distribution_manifests": {
+                "DISTS_pytorch-0.1.dist-info/METADATA": {
+                  "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/DISTS_pytorch-0.1.dist-info/METADATA",
+                  "bytes": 2608,
+                  "sha256": "af744833875e13d5ba7b42420fbe9cde1a3c4be2bddab896e89b58508d532ad4"
+                },
+                "DISTS_pytorch-0.1.dist-info/RECORD": {
+                  "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/DISTS_pytorch-0.1.dist-info/RECORD",
+                  "bytes": 1476,
+                  "sha256": "a13fbf1f1f6f8d0e4e1429e09142874ce27974196afa63869836f8fe67741fe1"
+                }
+              }
+            }
+          }
+        },
+        "environment": {
+          "python": "3.12.14 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:46:43) [GCC 14.3.0]",
+          "executable": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/bin/python",
+          "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+          "numpy_version": "2.5.2",
+          "command": [
+            "/var/tmp/emanuele-perceptual-cpu-code402-selected-20261002/experiments/packet_study/perceptual_score.py",
+            "--source",
+            "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03b/run-20260916-federer007/prepared_rgb.npy",
+            "--manifest",
+            "/home/itec/emanuele/pointstream-data/audits/perceptual-full37-g0-40255e0-20261002/inputs.json",
+            "--weights",
+            "/home/itec/emanuele/pointstream-data/audits/perceptual-full37-g0-40255e0-20261002/weights.json",
+            "--output",
+            "/home/itec/emanuele/pointstream-data/audits/perceptual-full37-g0-40255e0-20261002/result.json",
+            "--device",
+            "cpu",
+            "--batch-size",
+            "1"
+          ]
+        }
+      },
+      {
+        "group": 1,
+        "path": "/private/tmp/perceptual-full37-results-20261002/group1.json",
+        "sha256": "27ce292843d0a959c82da045d98b2eed9ad01eeab7d18e25bc721efdebfd8906",
+        "code_revision": "40255e01e17a9dac5412fafbfbb3f3563efce2b6",
+        "scorer": {
+          "path": "/var/tmp/emanuele-perceptual-cpu-code402-selected-20261002/experiments/packet_study/perceptual_score.py",
+          "bytes": 14515,
+          "sha256": "e8f9cb4895aa5222fe1d352c550bb1d10d63487c95c9ba0d917a92cdf35b0dba"
+        },
+        "models": {
+          "tensor_ids": {
+            "lpips_state": "ddf6cff30ce8ded007f87bc60f65e0ac77346ab09d8a2bdf0d05d683edd94fa9",
+            "dists_state": "4d5dc7d05a7f04cc49788530b649fb3c85192f3b538d294759f0bc6e63d49a75"
+          },
+          "assets": {
+            "alexnet": [
+              244408911,
+              "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
+            ],
+            "vgg16": [
+              553433881,
+              "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+            ],
+            "lpips_alex_v01": [
+              6009,
+              "df73285e35b22355a2df87cdb6b70b343713b667eddbda73e1977e0c860835c0"
+            ],
+            "dists": [
+              12288,
+              "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218"
+            ]
+          },
+          "device": "cpu",
+          "gpu": null,
+          "libraries": {
+            "torch": {
+              "distribution": "torch",
+              "version": "2.5.1+cu121",
+              "module": {
+                "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torch/__init__.py",
+                "bytes": 95190,
+                "sha256": "e1b5bf4151bd246a21e3ac5318f6edfcf2e6ef0fd4f233bfb77a264698ec1319"
+              },
+              "installed_distribution_manifests": {
+                "torch-2.5.1+cu121.dist-info/METADATA": {
+                  "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torch-2.5.1+cu121.dist-info/METADATA",
+                  "bytes": 28209,
+                  "sha256": "fa88b1f913d9e569d3fb57432cf9d49b127e8107dc1ad7202de38af2a7b4a756"
+                },
+                "torch-2.5.1+cu121.dist-info/RECORD": {
+                  "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torch-2.5.1+cu121.dist-info/RECORD",
+                  "bytes": 1512831,
+                  "sha256": "9f87849e42f9ae7bd79b3bb2eb772f8f21694979195a0079c8f851da56a730bb"
+                }
+              }
+            },
+            "torchvision": {
+              "distribution": "torchvision",
+              "version": "0.20.1+cu121",
+              "module": {
+                "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torchvision/__init__.py",
+                "bytes": 3534,
+                "sha256": "ee2c9f4110cf1203db48c42601607329ac1f19709fa91c152f8d95eb53437a73"
+              },
+              "installed_distribution_manifests": {
+                "torchvision-0.20.1+cu121.dist-info/METADATA": {
+                  "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torchvision-0.20.1+cu121.dist-info/METADATA",
+                  "bytes": 6074,
+                  "sha256": "d8eec8b7cc4b59edad69e8ca3e64db4222fac3991da83e0f4f90163c578dfc2b"
+                },
+                "torchvision-0.20.1+cu121.dist-info/RECORD": {
+                  "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torchvision-0.20.1+cu121.dist-info/RECORD",
+                  "bytes": 52107,
+                  "sha256": "bb5fe8beb85bcb687d70c847f0447ea63468e8561e1d110c9f6d6115a9cd48c4"
+                }
+              }
+            },
+            "lpips": {
+              "distribution": "lpips",
+              "version": "0.1.4",
+              "module": {
+                "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/lpips/__init__.py",
+                "bytes": 4846,
+                "sha256": "36ee004a45e2cc2c5ab47fa3955f00c0e41f6a151ef0249fb6f362533ed58b22"
+              },
+              "installed_distribution_manifests": {
+                "lpips-0.1.4.dist-info/METADATA": {
+                  "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/lpips-0.1.4.dist-info/METADATA",
+                  "bytes": 10852,
+                  "sha256": "cbd4a3730b2c9390741cdbad69661a87cabdc2796f1efc530bc46b738745b9b5"
+                },
+                "lpips-0.1.4.dist-info/RECORD": {
+                  "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/lpips-0.1.4.dist-info/RECORD",
+                  "bytes": 2359,
+                  "sha256": "62f1183d66d1ed638ff143f1f98e6c493f49526b6866c0aad3688f41d6469ed2"
+                }
+              }
+            },
+            "dists": {
+              "distribution": "DISTS-pytorch",
+              "version": "0.1",
+              "module": {
+                "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/DISTS_pytorch/DISTS_pt.py",
+                "bytes": 5435,
+                "sha256": "da9162307ae51bc58ffe259e7e778973e8586286652d36c3e9885e94bc269da8"
+              },
+              "installed_distribution_manifests": {
+                "DISTS_pytorch-0.1.dist-info/METADATA": {
+                  "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/DISTS_pytorch-0.1.dist-info/METADATA",
+                  "bytes": 2608,
+                  "sha256": "af744833875e13d5ba7b42420fbe9cde1a3c4be2bddab896e89b58508d532ad4"
+                },
+                "DISTS_pytorch-0.1.dist-info/RECORD": {
+                  "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/DISTS_pytorch-0.1.dist-info/RECORD",
+                  "bytes": 1476,
+                  "sha256": "a13fbf1f1f6f8d0e4e1429e09142874ce27974196afa63869836f8fe67741fe1"
+                }
+              }
+            }
+          }
+        },
+        "environment": {
+          "python": "3.12.14 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:46:43) [GCC 14.3.0]",
+          "executable": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/bin/python",
+          "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+          "numpy_version": "2.5.2",
+          "command": [
+            "/var/tmp/emanuele-perceptual-cpu-code402-selected-20261002/experiments/packet_study/perceptual_score.py",
+            "--source",
+            "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03b/run-20260916-federer007/prepared_rgb.npy",
+            "--manifest",
+            "/home/itec/emanuele/pointstream-data/audits/perceptual-full37-g1-40255e0-20261002/inputs.json",
+            "--weights",
+            "/home/itec/emanuele/pointstream-data/audits/perceptual-full37-g1-40255e0-20261002/weights.json",
+            "--output",
+            "/home/itec/emanuele/pointstream-data/audits/perceptual-full37-g1-40255e0-20261002/result.json",
+            "--device",
+            "cpu",
+            "--batch-size",
+            "1"
+          ]
+        }
+      },
+      {
+        "group": 2,
+        "path": "/private/tmp/perceptual-full37-results-20261002/group2.json",
+        "sha256": "d446bdebc4e1fdd0db82aeb8b69a02eeb828275cd7804bf94a4c288b9666f7f3",
+        "code_revision": "b1641416d50322af1422133b288d1a7e1e83a943",
+        "scorer": {
+          "path": "/var/tmp/emanuele-perceptual-cpu-code-b164141-selected-20261002/experiments/packet_study/perceptual_score.py",
+          "bytes": 14515,
+          "sha256": "e8f9cb4895aa5222fe1d352c550bb1d10d63487c95c9ba0d917a92cdf35b0dba"
+        },
+        "models": {
+          "tensor_ids": {
+            "lpips_state": "ddf6cff30ce8ded007f87bc60f65e0ac77346ab09d8a2bdf0d05d683edd94fa9",
+            "dists_state": "4d5dc7d05a7f04cc49788530b649fb3c85192f3b538d294759f0bc6e63d49a75"
+          },
+          "assets": {
+            "alexnet": [
+              244408911,
+              "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
+            ],
+            "vgg16": [
+              553433881,
+              "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+            ],
+            "lpips_alex_v01": [
+              6009,
+              "df73285e35b22355a2df87cdb6b70b343713b667eddbda73e1977e0c860835c0"
+            ],
+            "dists": [
+              12288,
+              "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218"
+            ]
+          },
+          "device": "cpu",
+          "gpu": null,
+          "libraries": {
+            "torch": {
+              "distribution": "torch",
+              "version": "2.5.1+cu121",
+              "module": {
+                "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torch/__init__.py",
+                "bytes": 95190,
+                "sha256": "e1b5bf4151bd246a21e3ac5318f6edfcf2e6ef0fd4f233bfb77a264698ec1319"
+              },
+              "installed_distribution_manifests": {
+                "torch-2.5.1+cu121.dist-info/METADATA": {
+                  "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torch-2.5.1+cu121.dist-info/METADATA",
+                  "bytes": 28209,
+                  "sha256": "fa88b1f913d9e569d3fb57432cf9d49b127e8107dc1ad7202de38af2a7b4a756"
+                },
+                "torch-2.5.1+cu121.dist-info/RECORD": {
+                  "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torch-2.5.1+cu121.dist-info/RECORD",
+                  "bytes": 1512831,
+                  "sha256": "9f87849e42f9ae7bd79b3bb2eb772f8f21694979195a0079c8f851da56a730bb"
+                }
+              }
+            },
+            "torchvision": {
+              "distribution": "torchvision",
+              "version": "0.20.1+cu121",
+              "module": {
+                "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torchvision/__init__.py",
+                "bytes": 3534,
+                "sha256": "ee2c9f4110cf1203db48c42601607329ac1f19709fa91c152f8d95eb53437a73"
+              },
+              "installed_distribution_manifests": {
+                "torchvision-0.20.1+cu121.dist-info/METADATA": {
+                  "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torchvision-0.20.1+cu121.dist-info/METADATA",
+                  "bytes": 6074,
+                  "sha256": "d8eec8b7cc4b59edad69e8ca3e64db4222fac3991da83e0f4f90163c578dfc2b"
+                },
+                "torchvision-0.20.1+cu121.dist-info/RECORD": {
+                  "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torchvision-0.20.1+cu121.dist-info/RECORD",
+                  "bytes": 52107,
+                  "sha256": "bb5fe8beb85bcb687d70c847f0447ea63468e8561e1d110c9f6d6115a9cd48c4"
+                }
+              }
+            },
+            "lpips": {
+              "distribution": "lpips",
+              "version": "0.1.4",
+              "module": {
+                "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/lpips/__init__.py",
+                "bytes": 4846,
+                "sha256": "36ee004a45e2cc2c5ab47fa3955f00c0e41f6a151ef0249fb6f362533ed58b22"
+              },
+              "installed_distribution_manifests": {
+                "lpips-0.1.4.dist-info/METADATA": {
+                  "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/lpips-0.1.4.dist-info/METADATA",
+                  "bytes": 10852,
+                  "sha256": "cbd4a3730b2c9390741cdbad69661a87cabdc2796f1efc530bc46b738745b9b5"
+                },
+                "lpips-0.1.4.dist-info/RECORD": {
+                  "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/lpips-0.1.4.dist-info/RECORD",
+                  "bytes": 2359,
+                  "sha256": "62f1183d66d1ed638ff143f1f98e6c493f49526b6866c0aad3688f41d6469ed2"
+                }
+              }
+            },
+            "dists": {
+              "distribution": "DISTS-pytorch",
+              "version": "0.1",
+              "module": {
+                "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/DISTS_pytorch/DISTS_pt.py",
+                "bytes": 5435,
+                "sha256": "da9162307ae51bc58ffe259e7e778973e8586286652d36c3e9885e94bc269da8"
+              },
+              "installed_distribution_manifests": {
+                "DISTS_pytorch-0.1.dist-info/METADATA": {
+                  "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/DISTS_pytorch-0.1.dist-info/METADATA",
+                  "bytes": 2608,
+                  "sha256": "af744833875e13d5ba7b42420fbe9cde1a3c4be2bddab896e89b58508d532ad4"
+                },
+                "DISTS_pytorch-0.1.dist-info/RECORD": {
+                  "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/DISTS_pytorch-0.1.dist-info/RECORD",
+                  "bytes": 1476,
+                  "sha256": "a13fbf1f1f6f8d0e4e1429e09142874ce27974196afa63869836f8fe67741fe1"
+                }
+              }
+            }
+          }
+        },
+        "environment": {
+          "python": "3.12.14 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:46:43) [GCC 14.3.0]",
+          "executable": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/bin/python",
+          "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+          "numpy_version": "2.5.2",
+          "command": [
+            "/var/tmp/emanuele-perceptual-cpu-code-b164141-selected-20261002/experiments/packet_study/perceptual_score.py",
+            "--source",
+            "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03b/run-20260916-federer007/prepared_rgb.npy",
+            "--manifest",
+            "/home/itec/emanuele/pointstream-data/audits/perceptual-full37-g2-b164141-20261002/inputs.json",
+            "--weights",
+            "/home/itec/emanuele/pointstream-data/audits/perceptual-full37-g2-b164141-20261002/weights.json",
+            "--output",
+            "/home/itec/emanuele/pointstream-data/audits/perceptual-full37-g2-b164141-20261002/result.json",
+            "--device",
+            "cpu",
+            "--batch-size",
+            "1"
+          ]
+        }
+      },
+      {
+        "group": 3,
+        "path": "/private/tmp/perceptual-full37-results-20261002/group3.json",
+        "sha256": "51134ea282a8ea08e4674c3b6ab586b0fefd1dc80611eaa60a4ad21ba6d1d282",
+        "code_revision": "b1641416d50322af1422133b288d1a7e1e83a943",
+        "scorer": {
+          "path": "/var/tmp/emanuele-perceptual-cpu-code-b164141-selected-20261002/experiments/packet_study/perceptual_score.py",
+          "bytes": 14515,
+          "sha256": "e8f9cb4895aa5222fe1d352c550bb1d10d63487c95c9ba0d917a92cdf35b0dba"
+        },
+        "models": {
+          "tensor_ids": {
+            "lpips_state": "ddf6cff30ce8ded007f87bc60f65e0ac77346ab09d8a2bdf0d05d683edd94fa9",
+            "dists_state": "4d5dc7d05a7f04cc49788530b649fb3c85192f3b538d294759f0bc6e63d49a75"
+          },
+          "assets": {
+            "alexnet": [
+              244408911,
+              "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
+            ],
+            "vgg16": [
+              553433881,
+              "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+            ],
+            "lpips_alex_v01": [
+              6009,
+              "df73285e35b22355a2df87cdb6b70b343713b667eddbda73e1977e0c860835c0"
+            ],
+            "dists": [
+              12288,
+              "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218"
+            ]
+          },
+          "device": "cpu",
+          "gpu": null,
+          "libraries": {
+            "torch": {
+              "distribution": "torch",
+              "version": "2.5.1+cu121",
+              "module": {
+                "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torch/__init__.py",
+                "bytes": 95190,
+                "sha256": "e1b5bf4151bd246a21e3ac5318f6edfcf2e6ef0fd4f233bfb77a264698ec1319"
+              },
+              "installed_distribution_manifests": {
+                "torch-2.5.1+cu121.dist-info/METADATA": {
+                  "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torch-2.5.1+cu121.dist-info/METADATA",
+                  "bytes": 28209,
+                  "sha256": "fa88b1f913d9e569d3fb57432cf9d49b127e8107dc1ad7202de38af2a7b4a756"
+                },
+                "torch-2.5.1+cu121.dist-info/RECORD": {
+                  "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torch-2.5.1+cu121.dist-info/RECORD",
+                  "bytes": 1512831,
+                  "sha256": "9f87849e42f9ae7bd79b3bb2eb772f8f21694979195a0079c8f851da56a730bb"
+                }
+              }
+            },
+            "torchvision": {
+              "distribution": "torchvision",
+              "version": "0.20.1+cu121",
+              "module": {
+                "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torchvision/__init__.py",
+                "bytes": 3534,
+                "sha256": "ee2c9f4110cf1203db48c42601607329ac1f19709fa91c152f8d95eb53437a73"
+              },
+              "installed_distribution_manifests": {
+                "torchvision-0.20.1+cu121.dist-info/METADATA": {
+                  "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torchvision-0.20.1+cu121.dist-info/METADATA",
+                  "bytes": 6074,
+                  "sha256": "d8eec8b7cc4b59edad69e8ca3e64db4222fac3991da83e0f4f90163c578dfc2b"
+                },
+                "torchvision-0.20.1+cu121.dist-info/RECORD": {
+                  "path": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/torchvision-0.20.1+cu121.dist-info/RECORD",
+                  "bytes": 52107,
+                  "sha256": "bb5fe8beb85bcb687d70c847f0447ea63468e8561e1d110c9f6d6115a9cd48c4"
+                }
+              }
+            },
+            "lpips": {
+              "distribution": "lpips",
+              "version": "0.1.4",
+              "module": {
+                "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/lpips/__init__.py",
+                "bytes": 4846,
+                "sha256": "36ee004a45e2cc2c5ab47fa3955f00c0e41f6a151ef0249fb6f362533ed58b22"
+              },
+              "installed_distribution_manifests": {
+                "lpips-0.1.4.dist-info/METADATA": {
+                  "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/lpips-0.1.4.dist-info/METADATA",
+                  "bytes": 10852,
+                  "sha256": "cbd4a3730b2c9390741cdbad69661a87cabdc2796f1efc530bc46b738745b9b5"
+                },
+                "lpips-0.1.4.dist-info/RECORD": {
+                  "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/lpips-0.1.4.dist-info/RECORD",
+                  "bytes": 2359,
+                  "sha256": "62f1183d66d1ed638ff143f1f98e6c493f49526b6866c0aad3688f41d6469ed2"
+                }
+              }
+            },
+            "dists": {
+              "distribution": "DISTS-pytorch",
+              "version": "0.1",
+              "module": {
+                "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/DISTS_pytorch/DISTS_pt.py",
+                "bytes": 5435,
+                "sha256": "da9162307ae51bc58ffe259e7e778973e8586286652d36c3e9885e94bc269da8"
+              },
+              "installed_distribution_manifests": {
+                "DISTS_pytorch-0.1.dist-info/METADATA": {
+                  "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/DISTS_pytorch-0.1.dist-info/METADATA",
+                  "bytes": 2608,
+                  "sha256": "af744833875e13d5ba7b42420fbe9cde1a3c4be2bddab896e89b58508d532ad4"
+                },
+                "DISTS_pytorch-0.1.dist-info/RECORD": {
+                  "path": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/lib/python3.12/site-packages/DISTS_pytorch-0.1.dist-info/RECORD",
+                  "bytes": 1476,
+                  "sha256": "a13fbf1f1f6f8d0e4e1429e09142874ce27974196afa63869836f8fe67741fe1"
+                }
+              }
+            }
+          }
+        },
+        "environment": {
+          "python": "3.12.14 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:46:43) [GCC 14.3.0]",
+          "executable": "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/metric-runtime-dcvc-20261001/bin/python",
+          "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+          "numpy_version": "2.5.2",
+          "command": [
+            "/var/tmp/emanuele-perceptual-cpu-code-b164141-selected-20261002/experiments/packet_study/perceptual_score.py",
+            "--source",
+            "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03b/run-20260916-federer007/prepared_rgb.npy",
+            "--manifest",
+            "/home/itec/emanuele/pointstream-data/audits/perceptual-full37-g3-b164141-20261002/inputs.json",
+            "--weights",
+            "/home/itec/emanuele/pointstream-data/audits/perceptual-full37-g3-b164141-20261002/weights.json",
+            "--output",
+            "/home/itec/emanuele/pointstream-data/audits/perceptual-full37-g3-b164141-20261002/result.json",
+            "--device",
+            "cpu",
+            "--batch-size",
+            "1"
+          ]
+        }
+      }
+    ],
+    "original_reports": [
+      {
+        "local_path": "/private/tmp/packet-full-bfab96c-report.json",
+        "sha256": "9318c324bbe520a309e4495d5700dcec715b91477d1bd1dbb54449e74a565d5f"
+      },
+      {
+        "local_path": "/private/tmp/anchor-full-bfab96c-report.json",
+        "sha256": "3d71547869d18b9180c51defe74bc9e79e9db44ac08b778fcef9dc61cd93d0fa"
+      },
+      {
+        "local_path": "/private/tmp/background-full-a74efa6-report.json",
+        "sha256": "57a938ec13d8dbbf2d531803695bc0f3ac7197bff11465c9bb2bfa9c573311ca"
+      }
+    ],
+    "validator": {
+      "path": "/private/tmp/validate_perceptual37.py",
+      "bytes": 12633,
+      "sha256": "7cf825ac58133d99ad9a59636b33cd2b2aef7b5890e4fe298c524733ad39dd2f"
+    },
+    "validator_failure_tests": {
+      "identity": {
+        "path": "/private/tmp/test_validate_perceptual37.py",
+        "bytes": 1795,
+        "sha256": "6acaa72b590ff41799434e7ad804555cfe4668d7aee7f7cbe95803b2418fc971"
+      },
+      "tests_passed": 7
+    },
+    "validated_comparison": {
+      "path": "/private/tmp/perceptual37-validated-comparison.json",
+      "bytes": 300811,
+      "sha256": "35236bf6e473a1280082e764123d04520f8adb11038c0cafd4fa21379e75c754"
+    },
+    "paper_companion": {
+      "path": "/private/tmp/pointstream-paper-packet-rate-quality/companion/perceptual-common-metrics.json",
+      "bytes": 301761,
+      "sha256": "012368caec457d199c11692c77947d6e96c12004f7456311b2c8368fdfa5ae04"
+    },
+    "admission_failures": "groups2/3 initial and group2 r1 failed before child; originals retained and reconciled, no lock removal",
+    "qualification": "all37 exact registered methods; all48 finite LPIPS/DISTS scores; same model states/scorer; original Y parity, complete bytes and pixel hashes; no partial selection",
+    "limits": [
+      "No BD-rate or interpolation computed.",
+      "No independent task annotations or task accuracy claims.",
+      "No partial favorable promotion or method filtering.",
+      "Device-specific model/library receipts retained; inference timing not compared.",
+      "No native extraction/held-out exposure newly certified."
+    ],
+    "followup_boundary": "Original registered37 cohort only; later posthoc anchor densification is separate and not included."
+  },
+  "native_smoke_recovery": {
+    "scope": "native bounded smoke qualification; not paper evidence",
+    "recorded_at": "2026-10-02T09:15:20.415147+00:00",
+    "code_revision": "b1641416d50322af1422133b288d1a7e1e83a943",
+    "status": "blocked_before_dispatch",
+    "launch_returncode": 2,
+    "launch_error": "No eligible GPU is available: all inspected GPUs are busy, non-idle, or below the memory requirement",
+    "child_started": false,
+    "job_created": false,
+    "shared_locks_modified": false,
+    "recovery_wrapper_sha256": "da079ba2106ba02b06af6ceade5529e453720304ef37bb091179bbbdaab43903",
+    "recovery_wrapper": "/private/tmp/pointstream-packet-rate-quality/experiments/generative/gvcrt_smoke_registered_gpu3.py",
+    "preinspection": "/private/tmp/fleet-native-recovery-network-20261002.json",
+    "gpu1_cpu_lock": "/private/tmp/gpu1-cpu-lock-network-readonly-20261002.txt",
+    "gpu3_runtime": "/private/tmp/gpu3-native-runtime-readonly-20261002.txt",
+    "postinspection": "/private/tmp/fleet-native-recovery-post-refusal-20261002.json"
+  },
+  "full37_execution_history": {
+    "completed_groups": [
+      0,
+      1
+    ],
+    "complete_results_retained": "gpu3:audits/perceptual-full37-g{0,1}-40255e0-20261002/result.json",
+    "missing_groups_started": [
+      2,
+      3
+    ],
+    "missing_group_revision": "b1641416d50322af1422133b288d1a7e1e83a943",
+    "missing_group_outputs": "gpu3:audits/perceptual-full37-g{2,3}-b164141-20261002/result.json",
+    "scorer_unchanged_sha256": "e8f9cb4895aa5222fe1d352c550bb1d10d63487c95c9ba0d917a92cdf35b0dba",
+    "admission_failures": "groups2/3 initial and group2 r1 failed before child; originals retained and reconciled, no lock removal",
+    "remaining_requirement": "all37 exact registered methods, all48 scores, same model states, original complete bytes; no partial comparative claims"
+  },
+  "native_smoke_latest_contended": {
+    "identity": {
+      "local_path": "/private/tmp/gvcrt-gpu3-second-terminal-20261002.json",
+      "bytes": 3993,
+      "sha256": "3e490a9b149392f1f5b2a42e59ccb051c9d1c814de68cafcb3348ea128c29937"
+    },
+    "artifact_receipt_identity": {
+      "local_path": "/private/tmp/gvcrt-gpu3-second-artifact-receipt-20261002.txt",
+      "bytes": 3278,
+      "sha256": "a3bc8387868484bc0b0fe6443fe9513ae8f005ca887ad0eddc380d8a13dcb7ed"
+    },
+    "job_id": "20261002T094557Z-aa03c788",
+    "code_revision": "b1641416d50322af1422133b288d1a7e1e83a943",
+    "snapshot_sha256": "0999c42144522e9496cd748f50940290c8a016a86552c1cfd4a996382bf2241b",
+    "gpu_uuid": "GPU-6f70a27e-4171-22d7-3ffd-647e7f186a49",
+    "status": "contended",
+    "child_started": true,
+    "job_created": true,
+    "child_stopped": true,
+    "claims_retained": false,
+    "timing_contaminated": true,
+    "foreign_gpu_pids": [
+      430767
+    ],
+    "partial_artifacts": {
+      "run_root": "gpu3:/home/itec/emanuele/pointstream-data/audits/gvcrt-smoke16-b164141-gpu3-recovery2-20261002",
+      "stream": {
+        "bytes": 28081,
+        "filename": "stream.bin",
+        "sha256": "89f0b54d89b7c549cf632ee9c31fea23ba8f6103c2820b71ebcf378b6db510e7"
+      },
+      "manifest_bytes": 2917,
+      "placements": [
+        {
+          "I": true,
+          "bytes": 4442,
+          "index": 0,
+          "offset": 0,
+          "qp": 1,
+          "reset": false
+        },
+        {
+          "I": false,
+          "bytes": 3197,
+          "index": 1,
+          "offset": 4442,
+          "qp": 3,
+          "reset": true
+        },
+        {
+          "I": false,
+          "bytes": 1503,
+          "index": 2,
+          "offset": 7639,
+          "qp": 1,
+          "reset": false
+        },
+        {
+          "I": false,
+          "bytes": 1607,
+          "index": 3,
+          "offset": 9142,
+          "qp": 2,
+          "reset": false
+        },
+        {
+          "I": false,
+          "bytes": 1254,
+          "index": 4,
+          "offset": 10749,
+          "qp": 1,
+          "reset": false
+        },
+        {
+          "I": false,
+          "bytes": 1652,
+          "index": 5,
+          "offset": 12003,
+          "qp": 2,
+          "reset": false
+        },
+        {
+          "I": false,
+          "bytes": 1184,
+          "index": 6,
+          "offset": 13655,
+          "qp": 1,
+          "reset": false
+        },
+        {
+          "I": false,
+          "bytes": 1369,
+          "index": 7,
+          "offset": 14839,
+          "qp": 2,
+          "reset": false
+        },
+        {
+          "I": false,
+          "bytes": 837,
+          "index": 8,
+          "offset": 16208,
+          "qp": 1,
+          "reset": false
+        },
+        {
+          "I": false,
+          "bytes": 2657,
+          "index": 9,
+          "offset": 17045,
+          "qp": 3,
+          "reset": true
+        },
+        {
+          "I": false,
+          "bytes": 1380,
+          "index": 10,
+          "offset": 19702,
+          "qp": 1,
+          "reset": false
+        },
+        {
+          "I": false,
+          "bytes": 1567,
+          "index": 11,
+          "offset": 21082,
+          "qp": 2,
+          "reset": false
+        },
+        {
+          "I": false,
+          "bytes": 1211,
+          "index": 12,
+          "offset": 22649,
+          "qp": 1,
+          "reset": false
+        },
+        {
+          "I": false,
+          "bytes": 1677,
+          "index": 13,
+          "offset": 23860,
+          "qp": 2,
+          "reset": false
+        },
+        {
+          "I": false,
+          "bytes": 1145,
+          "index": 14,
+          "offset": 25537,
+          "qp": 1,
+          "reset": false
+        },
+        {
+          "I": false,
+          "bytes": 1399,
+          "index": 15,
+          "offset": 26682,
+          "qp": 2,
+          "reset": false
+        }
+      ],
+      "frames": 16,
+      "sender_reference_present": false,
+      "encode_returned_success": false,
+      "fresh_decode_present": false,
+      "parity_verified": false,
+      "boundary": "Partial persisted artifacts from interrupted execution; no qualified native rate/quality result or complete successful encode."
+    },
+    "scope": "Interrupted native qualification attempt; partial artifacts are not paper rate/quality evidence"
+  },
+  "native_wrapper_archive": {
+    "receipt": {
+      "path": "/Users/manu/.codex/visualizations/2026/09/30/01a0f3d8-8225-77c0-b10a-4a9fd2401c9b/perceptual-cpu-20261002/wrapper-archive-receipt.json",
+      "bytes": 1678,
+      "sha256": "2976cafd5330fc51b912e68bc6b9cd76d49c391089610a79dbaede695fe2fe37"
+    },
+    "files": [
+      {
+        "original_untracked_path": "/private/tmp/pointstream-packet-rate-quality/experiments/generative/gvcrt_smoke_registered.py",
+        "archive": {
+          "path": "/Users/manu/.codex/visualizations/2026/09/30/01a0f3d8-8225-77c0-b10a-4a9fd2401c9b/perceptual-cpu-20261002/gvcrt_smoke_registered.py",
+          "bytes": 2170,
+          "sha256": "9003e27d895ea490788a5f56fb5ef9cdf8ee97cd1bc3931f34ef4dd6365b1f0f"
+        },
+        "purpose": "host/run-specific smoke wrapper; archived outside reusable code"
+      },
+      {
+        "original_untracked_path": "/private/tmp/pointstream-packet-rate-quality/experiments/generative/gvcrt_smoke_registered_gpu3.py",
+        "archive": {
+          "path": "/Users/manu/.codex/visualizations/2026/09/30/01a0f3d8-8225-77c0-b10a-4a9fd2401c9b/perceptual-cpu-20261002/gvcrt_smoke_registered_gpu3.py",
+          "bytes": 2179,
+          "sha256": "da079ba2106ba02b06af6ceade5529e453720304ef37bb091179bbbdaab43903"
+        },
+        "purpose": "host/run-specific smoke wrapper; archived outside reusable code"
+      },
+      {
+        "original_untracked_path": "/private/tmp/pointstream-packet-rate-quality/experiments/generative/gvcrt_smoke_registered_gpu3_second.py",
+        "archive": {
+          "path": "/Users/manu/.codex/visualizations/2026/09/30/01a0f3d8-8225-77c0-b10a-4a9fd2401c9b/perceptual-cpu-20261002/gvcrt_smoke_registered_gpu3_second.py",
+          "bytes": 2180,
+          "sha256": "acc1309e0c5806eb30df265aedb524f5b960c6be25f86630cce3278562d7082a"
+        },
+        "purpose": "host/run-specific smoke wrapper; archived outside reusable code"
+      }
+    ],
+    "original_untracked_copies_removed_after_identity_check": true
+  }
 }

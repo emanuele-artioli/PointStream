@@ -266,5 +266,65 @@
     "source_dir": "/var/tmp/emanuele-pointstream-gvcrt-code-d0e32bf",
     "source_revision": "d0e32bfa3e8e282f9a77437c223c605858eea637"
   },
-  "schema": "pointstream.gvcrt_cpu_prerequisites.v1"
+  "schema": "pointstream.gvcrt_cpu_prerequisites.v1",
+  "strict_checkpoint_coverage": {
+    "original_artifact": "gpu5:audits/gvcrt-coverage-b6b38c7-gpu5-20261001/coverage.json",
+    "sha256": "fd9b96c2840b9401d37bc2e97358fb6815cfc71c310d4271e395a56eeb96d6d9",
+    "receipt": {
+      "coverage": [
+        {
+          "parameter_elements": 83508678,
+          "role": "I",
+          "selected_dictionary": "raw",
+          "state_tensors": 596,
+          "strict_complete_coverage": true
+        },
+        {
+          "parameter_elements": 51677028,
+          "role": "P",
+          "selected_dictionary": "state_dict",
+          "state_tensors": 537,
+          "strict_complete_coverage": true
+        }
+      ],
+      "environment": {
+        "Pillow": "12.3.0",
+        "bridge_sha256": "0b68ef2e7ab81550447609c1247361be2eff1ba950f58e105a17344070829f82",
+        "command_argv": [
+          "experiments/generative/gvcrt_native_bridge.py",
+          "coverage",
+          "--disable-fused",
+          "--official-repo",
+          "/var/tmp/emanuele-pointstream-gvcrt-code-d0e32bf",
+          "--i-checkpoint",
+          "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_I.pt",
+          "--i-sha256",
+          "c8a840415cc028307131c66f68076b7e9f6fcc4db7fed423c62e8b202f83a22d",
+          "--p-checkpoint",
+          "/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_P.pt",
+          "--p-sha256",
+          "7a89bd342a1484b3da7dfc3f03834ff81e0e4180e02f8a286dec0d1025c99f4e",
+          "--output-dir",
+          "/home/itec/emanuele/pointstream-data/audits/gvcrt-coverage-b6b38c7-gpu5-20261001/coverage.json"
+        ],
+        "cublas_workspace_config": ":4096:8",
+        "cuda_runtime": "12.1",
+        "customized_cuda_inference": false,
+        "deterministic_algorithms": true,
+        "disable_fused": true,
+        "einops": "0.8.2",
+        "entropy_extension": "/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/MLCodec_extensions_cpp.cpython-312-x86_64-linux-gnu.so",
+        "entropy_sha256": "64fddc77e335a8699394112c5e9e06a229b077ebaac00760b03a934a0ffffe2f",
+        "force_zero_thres": null,
+        "i_sha256": "c8a840415cc028307131c66f68076b7e9f6fcc4db7fed423c62e8b202f83a22d",
+        "numpy": "2.5.2",
+        "p_sha256": "7a89bd342a1484b3da7dfc3f03834ff81e0e4180e02f8a286dec0d1025c99f4e",
+        "python": "3.12.14 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:46:43) [GCC 14.3.0]",
+        "source_revision": "d0e32bfa3e8e282f9a77437c223c605858eea637",
+        "torch": "2.5.1+cu121",
+        "torch_threads": 1
+      }
+    },
+    "scope": "strict checkpoint state coverage retained before later inherited entropy API failure; not a successful full native codec probe"
+  }
 }
