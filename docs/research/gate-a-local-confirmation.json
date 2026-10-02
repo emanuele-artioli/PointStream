@@ -33,7 +33,7 @@
     "lossless metadata baseline and mild/boundary-preserving lossy packing",
     "GVC-RT native stream freshdecode/parity; supported-domainMTTF; GLC rateestimated separately"
   ],
-  "paper_revision": "45670cb",
+  "paper_revision": "874f6e359c4a21b56925c3b6d52138dbe2541d72",
   "external_receipts": "/Users/manu/.codex/visualizations/2026/09/30/01a0f3d8-8225-77c0-b10a-4a9fd2401c9b/packet-rate-quality/gate-a-local-20261002",
   "smoke_results": {
     "C2": {
