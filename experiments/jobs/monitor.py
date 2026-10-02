@@ -328,14 +328,22 @@ def supervise(directory: Path) -> int:
                             ),
                             cpu_cap=claims_cfg.get("cpu_cap") if isinstance(claims_cfg, dict) else None,
                         )
-                    except Exception:
+                    except Exception as exc:
+                        # No child exists yet. Preserve the primary failure and
+                        # any acquired GPU identity before attempting release.
+                        state.update(status="failed", error=f"CPU claim failed: {exc}")
                         if dev_claim:
-                            from experiments.jobs.claims import release_device_claim
-
-                            release_device_claim(
-                                dev_claim.host, dev_claim.device_uuid, dev_claim.token, claims_dir
+                            claim_session = ClaimSession(
+                                token=dev_claim.token, device_claim=dev_claim,
+                                cpu_claim=None,
+                                claims_dir=Path(claims_dir) if claims_dir else get_claims_dir(),
                             )
-                        raise
+                            write_json(directory / "claim.json", claim_session.to_dict())
+                        write_json(directory / "status.json", state)
+                        claim_session = cleanup_owned_job(
+                            directory, state, None, claim_session, phase="startup",
+                        )
+                        return 1
                 token = dev_claim.token if dev_claim else (cpu_claim.token if cpu_claim else "")
                 claim_session = ClaimSession(
                     token=token,

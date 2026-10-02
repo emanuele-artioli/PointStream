@@ -1,0 +1,116 @@
+{
+  "classification": "infrastructure qualification; full37 comparison pending",
+  "smoke": {
+    "output": "/home/itec/emanuele/pointstream-data/audits/perceptual-cpu-smoke2-40255e0-20261002",
+    "result_sha256": "7326614cac0c1e0a0016d37e56eaa7215f927d8f8f030c24391a40db6cbffe16",
+    "frames": 48,
+    "elapsed_seconds": 370.76943705929443,
+    "max_rss_kib": 1662932,
+    "terminal": "complete, exit0, child stopped, claims released",
+    "source_code_revision": "40255e01e17a9dac5412fafbfbb3f3563efce2b6",
+    "selected_source_archive_sha256": "0d2c1667eee7164d9a47907689a25e97344dc3cc4cc81e8837c30e258ac238ab",
+    "model_tensor_manifest_sha256": {
+      "lpips_state": "ddf6cff30ce8ded007f87bc60f65e0ac77346ab09d8a2bdf0d05d683edd94fa9",
+      "dists_state": "4d5dc7d05a7f04cc49788530b649fb3c85192f3b538d294759f0bc6e63d49a75"
+    }
+  },
+  "full37_registration": {
+    "status": "registered_not_launched",
+    "smoke_required": "perceptual-cpu-smoke2-40255e0-20261002 complete all48 valid results and measured budget",
+    "parent_manifest_sha256": "0634c287bf0d0b6059419dcae57e77d5fe329563056797512573c9c20522f9fb",
+    "groups": [
+      {
+        "group": 0,
+        "methods": [
+          "packet/bbox_resized_first_reference_residual_off/original",
+          "packet/bbox_resized_first_reference_residual_off/rle_scale4",
+          "packet/bbox_resized_first_reference_residual_on/compact_psm1",
+          "packet/per_frame_crop_residual_off/rle_lossless",
+          "packet/per_frame_crop_residual_on/original",
+          "anchor/av1/44",
+          "anchor/vvc/32",
+          "anchor/vvc/63",
+          "background/median_registered_q32",
+          "background/median_registered_reset24_q32"
+        ],
+        "manifest_sha256": "b31b99c39f014cf66165eca916b5b773b7534d921feec068cabf956de9161813"
+      },
+      {
+        "group": 1,
+        "methods": [
+          "packet/bbox_resized_first_reference_residual_off/compact_psm1",
+          "packet/bbox_resized_first_reference_residual_off/rle_scale8",
+          "packet/bbox_resized_first_reference_residual_on/rle_lossless",
+          "packet/per_frame_crop_residual_off/rle_scale2",
+          "packet/per_frame_crop_residual_on/compact_psm1",
+          "anchor/av1/52",
+          "anchor/vvc/44",
+          "background/first_identity_q32",
+          "background/median_registered_q44"
+        ],
+        "manifest_sha256": "a77df3baf149a9fd00f2ed57711e176f9d0d2a419add879bf604a9d2b43da96d"
+      },
+      {
+        "group": 2,
+        "methods": [
+          "packet/bbox_resized_first_reference_residual_off/rle_lossless",
+          "packet/bbox_resized_first_reference_residual_off/retained_floor_rle",
+          "packet/per_frame_crop_residual_off/original",
+          "packet/per_frame_crop_residual_off/rle_scale4",
+          "packet/per_frame_crop_residual_on/rle_lossless",
+          "anchor/av1/58",
+          "anchor/vvc/52",
+          "background/median_identity_q32",
+          "background/median_registered_perframe_q32"
+        ],
+        "manifest_sha256": "b2a1795e7f19a3be23f3ca1b430b897fc8dff463b6af3788760b32b082fcf2af"
+      },
+      {
+        "group": 3,
+        "methods": [
+          "packet/bbox_resized_first_reference_residual_off/rle_scale2",
+          "packet/bbox_resized_first_reference_residual_on/original",
+          "packet/per_frame_crop_residual_off/compact_psm1",
+          "packet/per_frame_crop_residual_off/rle_scale8",
+          "anchor/av1/32",
+          "anchor/av1/63",
+          "anchor/vvc/58",
+          "background/first_registered_q32",
+          "background/median_registered_reset12_q32"
+        ],
+        "manifest_sha256": "0fcfa93889c67c3cbc6bac38ada25d0d4401e1f479e338a0b23c9f99c049a4c1"
+      }
+    ],
+    "comparison": "same whole48 source, metric model tensor identities, batch1 CPU FP32 inference, complete bytes from retained packet/native/background reports",
+    "promotion": "all37 row coverage, finite48scores perrow, pooledluma recomputation, exactpixel cohorts identical metrics, no method selection",
+    "parallelism": "at most4 CPU1 claimed groups, disjoint CPU affinity; full budget chosen only after smoke",
+    "win_rule": "scoped lower complete bytes and no worse common metric at sampled endpoints; exclude rate/quality nonoverlap BD-rate; no task/human-truth inference",
+    "smoke_result_sha256": "7326614cac0c1e0a0016d37e56eaa7215f927d8f8f030c24391a40db6cbffe16",
+    "smoke_wall_seconds": 370.76943705929443,
+    "budget_hours_per_group": 1.5,
+    "child_timeout_seconds": 4800,
+    "model_tensor_manifest_sha256": {
+      "lpips_state": "ddf6cff30ce8ded007f87bc60f65e0ac77346ab09d8a2bdf0d05d683edd94fa9",
+      "dists_state": "4d5dc7d05a7f04cc49788530b649fb3c85192f3b538d294759f0bc6e63d49a75"
+    }
+  },
+  "native_smoke_failure": {
+    "status": "failed",
+    "started": 1790925956.355708,
+    "last_progress": 1790925956.3557084,
+    "emitted": [],
+    "error": "CPU claim lock timeout before child spawn; reconciled from supervisor traceback",
+    "child_stopped": true,
+    "claims_retained": false,
+    "reconciliation": {
+      "original_status_sha256": "8326282d84105fb384130eb4d5d3f1d12d7828e8f0b6717c8906aea3cae013fe",
+      "supervisor_log_sha256": "0c5449ff320ae36df26cad48caaf2e0cb1bd1f815009306807742261ee569ed8",
+      "no_child_log": true,
+      "no_supervisor_process": true,
+      "gpu_claim_absent": true,
+      "time": 1790926393.2340403
+    }
+  },
+  "native_smoke_job": "20261002T072546Z-f28c2b56",
+  "limitation": "No GVC encoder/decoder result. Full perceptual campaign must complete all37 before comparison claims."
+}

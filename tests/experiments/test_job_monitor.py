@@ -486,3 +486,42 @@ def test_restart_does_not_certify_unknown_child_stopped_or_clear_retained_claim(
     assert persisted["status"] == "interrupted"
     assert persisted["child_stopped"] is False
     assert persisted["claims_retained"] is True
+
+
+@pytest.mark.parametrize("gpu,release_fails", [(False, False), (True, False), (True, True)])
+def test_cpu_claim_failure_is_terminal_and_preserves_partial_gpu_claim(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, gpu: bool, release_fails: bool,
+) -> None:
+    from experiments.jobs import claims
+    setup_job(tmp_path)
+    cfg = {"cpu_threads": 1, "claims_dir": str(tmp_path / "claims")}
+    if gpu:
+        cfg["gpu"] = "GPU-owned"
+    monitor.write_json(tmp_path / "request.json", {
+        "command": ["never-start"], "cwd": str(tmp_path), "budget_seconds": 60,
+        "thread": None, "codex": "codex", "claims": cfg,
+    })
+    device = claims.DeviceClaim(
+        host="host", device_uuid="GPU-owned", token="owned-token",
+        job_id="test", job_dir=str(tmp_path), pid=1,
+        device_ordinal=0, child_ordinals={}, created_at=1.0,
+    ) if gpu else None
+    monkeypatch.setattr(claims, "acquire_device_claim", lambda **kw: device)
+    def fail_cpu(**kw: Any) -> Any:
+        raise TimeoutError("CPU lock timed out")
+    monkeypatch.setattr(claims, "acquire_cpu_claim", fail_cpu)
+    def release(session: Any) -> None:
+        saved = monitor.read_json(tmp_path / "status.json")
+        assert saved["status"] == "failed" and saved["child_stopped"] is True
+        assert monitor.read_json(tmp_path / "claim.json")["device_claim"]["token"] == "owned-token"
+        if release_fails:
+            raise RuntimeError("release failed")
+    monkeypatch.setattr(claims, "release_session_claims", release)
+    monkeypatch.setattr(monitor.subprocess, "Popen", lambda *a, **kw: pytest.fail("child must not start"))
+    assert monitor.supervise(tmp_path) == 1
+    saved = monitor.read_json(tmp_path / "status.json")
+    assert saved["status"] == "failed" and "CPU lock timed out" in saved["error"]
+    assert saved["child_stopped"] is True
+    assert saved["claims_retained"] is release_fails
+    if release_fails:
+        assert saved["cleanup_errors"][0]["error"] == "release failed"
