@@ -33,7 +33,7 @@
     "lossless metadata baseline and mild/boundary-preserving lossy packing",
     "GVC-RT native stream freshdecode/parity; supported-domainMTTF; GLC rateestimated separately"
   ],
-  "paper_revision": "d0d9735e4418c00073b4a2114b81a25fb98e93ac",
+  "paper_revision": "9d062c533447d1de5bc20a46031e21d0c80d9f07",
   "external_receipts": "/Users/manu/.codex/visualizations/2026/09/30/01a0f3d8-8225-77c0-b10a-4a9fd2401c9b/packet-rate-quality/gate-a-local-20261002",
   "smoke_results": {
     "C2": {
@@ -176,5 +176,6 @@
       "id": "gpu3:audits/gate-a-recert-C3-full96-job-20261002",
       "last_observed": "running"
     }
-  }
+  },
+  "prospective_unused_mask_worker": "prune_unused_masks.py preparedandfocusedtestspassed;strictoriginalreport/packet/source/nativepins;notregistered/staged/run. RequiresfreshRGBparity;unused-fieldpruningisnotsemanticpacketlossless."
 }
