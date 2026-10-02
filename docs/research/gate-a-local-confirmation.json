@@ -28,7 +28,7 @@
     "C3": "gpu3:audits/gate-a-recert-C3-smoke-job-20261002"
   },
   "execution": "CPU-only, no GPU, owned monitor claims, disjoint cores0\u20137/8\u201315, 0.5h each; no replay",
-  "remaining": "Checkpoint-enabled revised192GiBsmoke running after initial256GiBcap refused beforepipeline by inherited200GiBhard ceiling. Full96prospective pending checkpoint parity gate. Dense native anchors still pending full payload gate.",
+  "remaining": "Inspect existing full96 C2/C3 jobs without replay; verify all192freshdecoded/scoredframes,physicalcosts,receiver/metric/sourcehashes,placement/motion fidelity. Then register native anchor smoke/pilot/scale/full;candidatefullresultsnotyetavailable.",
   "prior_followups_retained": [
     "lossless metadata baseline and mild/boundary-preserving lossy packing",
     "GVC-RT native stream freshdecode/parity; supported-domainMTTF; GLC rateestimated separately"
@@ -148,5 +148,33 @@
     "interpretation": "instrument/resourceconfiguration failure;noalgorithmnegative;no replay"
   },
   "checkpoint_smoke_job": "gpu3:audits/gate-a-recert-C2-checkpoint-smoke192-job-20261002",
-  "scale48_envelope_audit": "448882 compressed mask-entry bytes across each pair;receiver ignores masks;prefix-specific, not complete-window or matched-codecwin. Null-mask output parity remains untested."
+  "scale48_envelope_audit": "448882 compressed mask-entry bytes across each pair;receiver ignores masks;prefix-specific, not complete-window or matched-codecwin. Null-mask output parity remains untested.",
+  "checkpoint_smoke_result": {
+    "status": "complete_exit0_claims_released",
+    "report_sha256": "3001338308cc028eb4cb24e1280bd38f9a8910b3b3fa76934a866ffecbbd2382",
+    "physical_bytes": 121908,
+    "frames": 4,
+    "vmaf": 59.860755,
+    "both_packets_and_decoded_rgb_hashes_match_prior_smoke": true,
+    "two_scene_checkpoints_verified": true
+  },
+  "full96_registration": {
+    "sha256": "1c756bee1db8d181f53d0eddeedf0042bce9cd177b608144ba91b4c0bd52719a",
+    "path": "gpu3:/var/tmp/emanuele-gate-a-recert-v4-20261002/full96-registration.json",
+    "memory_gib": 192,
+    "cpu_threads_each": 8,
+    "wall_cap_hours_each": 3,
+    "frames_per_scene": 96,
+    "original_checkpoints_enabled": true
+  },
+  "full96_jobs": {
+    "C2": {
+      "id": "gpu3:audits/gate-a-recert-C2-full96-job-20261002",
+      "last_observed": "running"
+    },
+    "C3": {
+      "id": "gpu3:audits/gate-a-recert-C3-full96-job-20261002",
+      "last_observed": "running"
+    }
+  }
 }
