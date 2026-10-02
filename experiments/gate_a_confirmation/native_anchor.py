@@ -141,12 +141,15 @@ def main():
         if len(video) != 1 or (video[0]['width'], video[0]['height']) != (a.width, height):
             raise ValueError('native bitstream raster differs from registered resolution')
         (out / (prefix + '.probe.json')).write_text(json.dumps(probe_data, indent=2) + '\n')
+        decoded_y4m = out / (prefix + '.decoded.y4m')
+        run(prefix + '-fresh-native-decode', [ff.path, '-hide_banner', '-loglevel', 'error',
+            '-threads', '8', '-i', str(stream), '-pix_fmt', 'yuv420p', str(decoded_y4m)])
         raw = out / (prefix + '.decoded.rgb')
-        argv = [ff.path, '-hide_banner', '-loglevel', 'error', '-threads', '8', '-i', str(stream)]
+        argv = [ff.path, '-hide_banner', '-loglevel', 'error', '-threads', '8', '-i', str(decoded_y4m)]
         if a.width != 3840:
             argv += ['-vf', 'scale=3840:2160:flags=lanczos']
         argv += ['-pix_fmt', 'rgb24', '-f', 'rawvideo', str(raw)]
-        run(prefix + '-fresh-decode-upscale', argv)
+        run(prefix + '-upscale-rgb-conversion', argv)
         shape = raw_shape(raw, len(piece))
         decoded.append(np.memmap(raw, dtype=np.uint8, mode='r', shape=shape))
         streams.append({'file': stream.name, 'bytes': stream.stat().st_size, 'sha256': digest(stream),

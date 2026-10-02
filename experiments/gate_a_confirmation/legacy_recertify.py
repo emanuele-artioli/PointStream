@@ -25,20 +25,20 @@ def slice_smoke(clip,count=2):
 def deployment_manifest(captured,shapes):
     return {'schema':1,'fps':24,'scenes':[{'package':x['package'],'shape':shape} for x,shape in zip(captured,shapes,strict=True)]}
 
-def limit_cpu():
+def limit_cpu(memory_gib=48):
     os.nice(19)
     if hasattr(os,'sched_getaffinity'):os.sched_setaffinity(0,sorted(os.sched_getaffinity(0))[:8])
-    resource.setrlimit(resource.RLIMIT_AS,(48*1024**3,48*1024**3))
+    resource.setrlimit(resource.RLIMIT_AS,(memory_gib*1024**3,memory_gib*1024**3))
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--legacy-root',required=True);p.add_argument('--data-root',required=True);p.add_argument('--output',required=True);p.add_argument('--receiver-script',required=True);p.add_argument('--mode',choices=['smoke','pilot','full'],required=True);p.add_argument('--frames',type=int,choices=[2,12,48,96],required=True);p.add_argument('--rung',choices=['C2','C3'],required=True);p.add_argument('--expected-commit',default='274638bdae7f5bd63c4f834a24804c0e14ed8d83');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--legacy-root',required=True);p.add_argument('--data-root',required=True);p.add_argument('--output',required=True);p.add_argument('--receiver-script',required=True);p.add_argument('--mode',choices=['smoke','pilot','full'],required=True);p.add_argument('--frames',type=int,choices=[2,12,48,96],required=True);p.add_argument('--rung',choices=['C2','C3'],required=True);p.add_argument('--memory-gib',type=int,choices=[48,128],default=48);p.add_argument('--expected-commit',default='274638bdae7f5bd63c4f834a24804c0e14ed8d83');a=p.parse_args()
     root=pathlib.Path(a.legacy_root).resolve();data=pathlib.Path(a.data_root).resolve();out=pathlib.Path(a.output).resolve();receiver=pathlib.Path(a.receiver_script).resolve()
     if out.exists():raise SystemExit('fresh output directory required')
     if (a.mode=='smoke' and a.frames!=2) or (a.mode=='full' and a.frames!=96) or (a.mode=='pilot' and a.frames not in (12,48)):
         raise SystemExit('mode/frame policy mismatch')
     os.environ['PS_CODEC_TIMEOUT_SECONDS']='600'
     os.environ['PS_CODEC_MAX_ATTEMPTS']='1'
-    limit_cpu()
+    limit_cpu(a.memory_gib)
     commit=subprocess.check_output(['git','-C',str(root),'rev-parse','HEAD'],text=True).strip()
     if commit!=a.expected_commit:raise SystemExit('legacy revision mismatch '+commit)
     dirty=subprocess.check_output(['git','-C',str(root),'status','--porcelain'],text=True)
@@ -101,6 +101,6 @@ def main():
     (out/'provenance.json').write_text(json.dumps(envelope_manifest,sort_keys=True,indent=2,default=str)+'\n')
     wire_manifest=deployment_manifest(captured,[list(c.frames.shape) for c in clips])
     encoded=(json.dumps(wire_manifest,sort_keys=True,separators=(',',':'))+'\n').encode();(out/'manifest.json').write_bytes(encoded)
-    report={'physical_payload_bytes':sum(x['bytes'] for x in captured)+len(encoded),'physical_package_bytes':sum(x['bytes'] for x in captured),'physical_manifest_bytes':len(encoded),'receiver_scores':scores,'legacy_encoder_diagnostic':result,'scored_boundary':'actual saved fresh-child receiver output','complete':True,'paper_evidence':False,'maxrss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'metric_frames':len(metric_frames),'frames_per_scene':a.frames,'memory_limit_gib':48,'cpu_affinity':sorted(os.sched_getaffinity(0)) if hasattr(os,'sched_getaffinity') else None}
+    report={'physical_payload_bytes':sum(x['bytes'] for x in captured)+len(encoded),'physical_package_bytes':sum(x['bytes'] for x in captured),'physical_manifest_bytes':len(encoded),'receiver_scores':scores,'legacy_encoder_diagnostic':result,'scored_boundary':'actual saved fresh-child receiver output','complete':True,'paper_evidence':False,'maxrss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'metric_frames':len(metric_frames),'frames_per_scene':a.frames,'memory_limit_gib':a.memory_gib,'cpu_affinity':sorted(os.sched_getaffinity(0)) if hasattr(os,'sched_getaffinity') else None}
     (out/'report.json').write_text(json.dumps(report,indent=2,default=str)+'\n')
 if __name__=='__main__':main()
