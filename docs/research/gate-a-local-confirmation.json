@@ -33,7 +33,7 @@
     "lossless metadata baseline and mild/boundary-preserving lossy packing",
     "GVC-RT native stream freshdecode/parity; supported-domainMTTF; GLC rateestimated separately"
   ],
-  "paper_revision": "874f6e359c4a21b56925c3b6d52138dbe2541d72",
+  "paper_revision": "d0d9735e4418c00073b4a2114b81a25fb98e93ac",
   "external_receipts": "/Users/manu/.codex/visualizations/2026/09/30/01a0f3d8-8225-77c0-b10a-4a9fd2401c9b/packet-rate-quality/gate-a-local-20261002",
   "smoke_results": {
     "C2": {
@@ -117,5 +117,10 @@
       "last_observed": "running"
     }
   },
-  "envelope_audit": "pilot12-envelope-costs.json: compressed NPY mask entries133371B per C2/C3 package set versus ZIPcontainer2134B; prefix-specific diagnostic, no full-window advantage claim or inferred transferable savings"
+  "envelope_audit": "pilot12-envelope-costs.json: compressed NPY mask entries133371B per C2/C3 package set versus ZIPcontainer2134B; prefix-specific diagnostic, no full-window advantage claim or inferred transferable savings",
+  "receiver_findings": [
+    "Pinned serialized receiver uses rectangular pasting and ignores mask contents.",
+    "Schema has no explicit foreground trajectory; completed12-prefix packets place both objects only at frame0.",
+    "Null-mask pixel-parity and foreground-region/motion diagnostics remain required; do not mistake globalVMAF advantage for event preservation."
+  ]
 }
