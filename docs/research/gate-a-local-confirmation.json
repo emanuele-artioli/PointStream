@@ -28,12 +28,12 @@
     "C3": "gpu3:audits/gate-a-recert-C3-smoke-job-20261002"
   },
   "execution": "CPU-only, no GPU, owned monitor claims, disjoint cores0\u20137/8\u201315, 0.5h each; no replay",
-  "remaining": "Inspect existing pilot12 jobs, do not replay; gate 48frame scale and 96recert on complete frames/finite metrics/physical costs and measured resources. Dense VVC and AV1 require fresh full-payload gate and separately frozen same-path native smoke/pilot.",
+  "remaining": "Inspect existing scale48 jobs without replay; review all96 receiver/scoredframes and measured RAM/time before full96/window. Dense VVC/AV1 waits for full payload gate and separately registered native smoke/pilot/scale.",
   "prior_followups_retained": [
     "lossless metadata baseline and mild/boundary-preserving lossy packing",
     "GVC-RT native stream freshdecode/parity; supported-domainMTTF; GLC rateestimated separately"
   ],
-  "paper_revision": "8d3b4aa",
+  "paper_revision": "45670cb",
   "external_receipts": "/Users/manu/.codex/visualizations/2026/09/30/01a0f3d8-8225-77c0-b10a-4a9fd2401c9b/packet-rate-quality/gate-a-local-20261002",
   "smoke_results": {
     "C2": {
@@ -67,5 +67,55 @@
     "C2": "gpu3:audits/gate-a-recert-C2-pilot12-job-20261002",
     "C3": "gpu3:audits/gate-a-recert-C3-pilot12-job-20261002"
   },
-  "native_anchor_worker": "implemented, focused no-padding test passes; not staged, registered, smoke-tested or run yet"
+  "native_anchor_worker": "prepared with AV1 QP/CRF and VVC QPA0/1 plus native/1440p/1080p/720p resampling support; current revision not registered, staged, smoke-tested or run. All native curves remain prospective; freeze bounded arms/budgets after full payload gate.",
+  "pilot12_results": {
+    "C2": {
+      "status": "complete_exit0_claims_released",
+      "physical_payload_bytes": 210238,
+      "metric_frames": 24,
+      "receiver_scores": {
+        "psnr_y": 30.559616343263198,
+        "ssim": 0.9380955256065381,
+        "vmaf": 57.86632
+      },
+      "maxrss_kib": 23747168,
+      "report_sha256": "698383c0c79a6c91fd569c54bc814dda60b901c0b36da82c507d313fb4702b1b",
+      "scope": "short-prefix instrument qualification, not comparison with historical96 rates"
+    },
+    "C3": {
+      "status": "complete_exit0_claims_released",
+      "physical_payload_bytes": 261837,
+      "metric_frames": 24,
+      "receiver_scores": {
+        "psnr_y": 32.67543553374244,
+        "ssim": 0.9626959941475244,
+        "vmaf": 73.491341
+      },
+      "maxrss_kib": 23779612,
+      "report_sha256": "dc21c4fe2e662e4bd68d5003ae5374cfefe9941e37e3134eed0799520553cb02",
+      "scope": "short-prefix instrument qualification, not comparison with historical96 rates"
+    }
+  },
+  "scale48_registration": {
+    "sha256": "4b30d0a7c8434baa43c2fcf51781d3bd0fe382327804b460f414bf66edcd6024",
+    "path": "gpu3:/var/tmp/emanuele-gate-a-recert-v2-20261002/scale48-registration.json",
+    "frames_per_scene": 48,
+    "memory_gib": 128,
+    "cpu_threads_each": 8,
+    "wall_cap_hours_each": 2,
+    "worker_revision": "c9872ac"
+  },
+  "scale48_jobs": {
+    "C2": {
+      "id": "gpu3:audits/gate-a-recert-C2-scale48-job-20261002",
+      "pid": 1709452,
+      "last_observed": "running"
+    },
+    "C3": {
+      "id": "gpu3:audits/gate-a-recert-C3-scale48-job-20261002",
+      "pid": 1715049,
+      "last_observed": "running"
+    }
+  },
+  "envelope_audit": "pilot12-envelope-costs.json: compressed NPY mask entries133371B per C2/C3 package set versus ZIPcontainer2134B; prefix-specific diagnostic, no full-window advantage claim or inferred transferable savings"
 }

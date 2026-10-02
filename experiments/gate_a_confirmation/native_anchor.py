@@ -44,15 +44,19 @@ def main():
     p.add_argument('--out', required=True)
     p.add_argument('--frames', type=int, choices=[2, 12, 48, 96], required=True)
     p.add_argument('--codec', choices=['vvc', 'av1'], required=True)
-    p.add_argument('--qp', type=int, required=True)
+    p.add_argument('--rate-control', choices=['qp', 'crf'], default='qp')
+    p.add_argument('--rate', type=int, required=True)
+    p.add_argument('--qpa', type=int, choices=[0, 1], default=0)
     p.add_argument('--width', type=int, choices=[3840, 2560, 1920, 1280], default=3840)
     p.add_argument('--access', choices=['continuous', 'segmented'], required=True)
     p.add_argument('--registration', required=True)
     p.add_argument('--timeout', type=int, default=3300)
     a = p.parse_args()
     low = 1 if a.codec == 'av1' else 0
-    if not low <= a.qp <= 63 or (a.codec == 'vvc' and a.width != 3840):
+    if not low <= a.rate <= 63 or (a.codec == 'vvc' and (a.width != 3840 or a.rate_control != 'qp')):
         raise ValueError('unsupported registered QP/resolution')
+    if a.codec == 'av1' and a.qpa:
+        raise ValueError('VVC QPA is not an AV1 setting')
     if not 0 < a.timeout <= 3300 or len(os.sched_getaffinity(0)) > 8:
         raise ValueError('bounded native timeout and at most eight assigned CPU cores required')
     root = Path(a.legacy_root).resolve()
@@ -60,7 +64,8 @@ def main():
     if revision != '274638bdae7f5bd63c4f834a24804c0e14ed8d83' or subprocess.check_output(['git', '-C', str(root), 'status', '--porcelain']):
         raise ValueError('clean pinned legacy revision required')
     registration = json.loads(Path(a.registration).read_text())
-    arm = {'codec': a.codec, 'qp': a.qp, 'width': a.width, 'access': a.access, 'frames_per_scene': a.frames}
+    arm = {'codec': a.codec, 'rate_control': a.rate_control, 'rate': a.rate,
+           'qpa': a.qpa, 'width': a.width, 'access': a.access, 'frames_per_scene': a.frames}
     if registration.get('status') != 'frozen_before_execution' or arm not in registration.get('arms', []):
         raise ValueError('arm is absent from frozen registration')
     if registration.get('worker_sha256') != digest(__file__):
@@ -110,8 +115,8 @@ def main():
             subprocess.run(argv, check=True, stdout=log, stderr=subprocess.STDOUT, timeout=a.timeout)
         calls.append({'label': label, 'argv': argv, 'seconds': time.monotonic() - start})
     height = a.width * 9 // 16
-    request = EncodeRequest(codec_name=a.codec, rate_control=RateControl.QP,
-                            rate=a.qp, preset='slower' if a.codec == 'vvc' else '0',
+    request = EncodeRequest(codec_name=a.codec, rate_control=RateControl(a.rate_control),
+                            rate=a.rate, preset='slower' if a.codec == 'vvc' else '0',
                             pix_fmt='yuv420p', extra_args=('-threads', '8') if a.codec == 'vvc' else ('--lp', '8'))
     streams, decoded = [], []
     pieces = [source] if a.access == 'continuous' else clips
@@ -129,6 +134,9 @@ def main():
                 '-i', str(y4m), '-vf', f'scale={a.width}:{height}:flags=lanczos', '-pix_fmt', 'yuv420p', str(native_input)])
         stream = out / (prefix + ('.vvc' if a.codec == 'vvc' else '.ivf'))
         argv = build_command('encode', request, source=native_input, dest=stream, encoder=encoder, ffmpeg=ff)
+        if a.codec == 'vvc':
+            # Keep one explicit QPA option; the historical builder defaults to 0.
+            argv[argv.index('-qpa') + 1] = str(a.qpa)
         run(prefix + '-encode', argv)
         if stream.stat().st_size <= 0:
             raise ValueError('empty native stream')
