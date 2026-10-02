@@ -38,3 +38,18 @@ def test_native_decode_rejects_missing_and_extra_frames(tmp_path):
     for size in (3*4*3,3*3*4*3,2*3*4*3+1):
         path.write_bytes(bytes(size))
         with pytest.raises(ValueError,match='frame count'):raw_shape(path,2,3,4)
+
+def test_unused_mask_pruning_preserves_other_arrays_and_placement_fields():
+    import io, json
+    from experiments.gate_a_confirmation.prune_unused_masks import prune
+    metadata={'placements':[{'mask_key':'mask_0','frame_index':0,'bbox':[1,2,3,4],'object_id':'x'}],'frame_count':96}
+    encoded=io.BytesIO()
+    bg=np.array([1,7,9],dtype=np.uint8)
+    np.savez_compressed(encoded,metadata=np.frombuffer(json.dumps(metadata).encode(),dtype=np.uint8),mask_0=np.ones((2,4,4),dtype=bool),background_payload=bg)
+    raw,removed=prune(encoded.getvalue())
+    with np.load(io.BytesIO(raw),allow_pickle=False) as packet:
+        assert removed==['mask_0'] and 'mask_0' not in packet.files
+        assert np.array_equal(packet['background_payload'],bg)
+        got=json.loads(packet['metadata'].tobytes())
+        metadata['placements'][0]['mask_key']=None
+        assert got==metadata
