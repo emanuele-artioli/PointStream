@@ -32,6 +32,12 @@ def main():
     if reg.get('status')!='frozen_before_execution' or reg.get('worker_sha256')!=digest(__file__) or reg.get('receiver_sha256')!=digest(a.receiver_script): raise ValueError('frozen worker/receiver registration required')
     if reg.get('frames_per_scene')!=a.frames or reg.get('original')!=str(original):raise ValueError('unregistered original')
     if os.environ.get('CUDA_VISIBLE_DEVICES','')!='' or len(os.sched_getaffinity(0))>8:raise ValueError('CPU-only isolated cores required')
+    if reg.get('original_report_sha256')!=digest(original/'report.json'):raise ValueError('original score report changed')
+    revision=subprocess.check_output(['git','-C',a.legacy_root,'rev-parse','HEAD'],text=True).strip()
+    if revision!='274638bdae7f5bd63c4f834a24804c0e14ed8d83' or subprocess.check_output(['git','-C',a.legacy_root,'status','--porcelain']):raise ValueError('clean pinned legacy source required')
+    for path,expected in reg.get('tools_and_libraries',{}).items():
+        if digest(path)!=expected:raise ValueError('native dependency changed')
+    if not reg.get('tools_and_libraries'):raise ValueError('native identities required')
     report=json.loads((original/'report.json').read_text())
     if not report['complete'] or report['metric_frames']!=2*a.frames:raise ValueError('complete registered original receiver gate required')
     os.nice(19)
