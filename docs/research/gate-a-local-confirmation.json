@@ -28,7 +28,7 @@
     "C3": "gpu3:audits/gate-a-recert-C3-smoke-job-20261002"
   },
   "execution": "CPU-only, no GPU, owned monitor claims, disjoint cores0\u20137/8\u201315, 0.5h each; no replay",
-  "remaining": "Inspect existing scale48 jobs without replay; review all96 receiver/scoredframes and measured RAM/time before full96/window. Dense VVC/AV1 waits for full payload gate and separately registered native smoke/pilot/scale.",
+  "remaining": "Checkpoint-enabled revised192GiBsmoke running after initial256GiBcap refused beforepipeline by inherited200GiBhard ceiling. Full96prospective pending checkpoint parity gate. Dense native anchors still pending full payload gate.",
   "prior_followups_retained": [
     "lossless metadata baseline and mild/boundary-preserving lossy packing",
     "GVC-RT native stream freshdecode/parity; supported-domainMTTF; GLC rateestimated separately"
@@ -109,12 +109,12 @@
     "C2": {
       "id": "gpu3:audits/gate-a-recert-C2-scale48-job-20261002",
       "pid": 1709452,
-      "last_observed": "running"
+      "last_observed": "complete_exit0_claims_released"
     },
     "C3": {
       "id": "gpu3:audits/gate-a-recert-C3-scale48-job-20261002",
       "pid": 1715049,
-      "last_observed": "running"
+      "last_observed": "complete_exit0_claims_released"
     }
   },
   "envelope_audit": "pilot12-envelope-costs.json: compressed NPY mask entries133371B per C2/C3 package set versus ZIPcontainer2134B; prefix-specific diagnostic, no full-window advantage claim or inferred transferable savings",
@@ -122,5 +122,31 @@
     "Pinned serialized receiver uses rectangular pasting and ignores mask contents.",
     "Schema has no explicit foreground trajectory; completed12-prefix packets place both objects only at frame0.",
     "Null-mask pixel-parity and foreground-region/motion diagnostics remain required; do not mistake globalVMAF advantage for event preservation."
-  ]
+  ],
+  "scale48_results": {
+    "gate-a-recert-C2-scale48-20261002": {
+      "report_sha256": "cace1a919b14f6e27102239693ddf8899a0fbbc258446137e5d2efb2b4ef6a6d",
+      "physical_bytes": 530073,
+      "vmaf": 57.376147,
+      "maxrss_kib": 66348896,
+      "legacy_seconds": 3317.617333777249,
+      "review": "completeexit0released;96freshfiniteframes;fullsourcehashes;physicalsum;nativeVmafhashmean;receiptshape/package/zero violations;recovery_alarmNone"
+    },
+    "gate-a-recert-C3-scale48-20261002": {
+      "report_sha256": "c579fd54576bc1010a5f3a3a02fc72b72c503af325c403a86ddf298fcc35c79b",
+      "physical_bytes": 581274,
+      "vmaf": 72.537713,
+      "maxrss_kib": 66335976,
+      "legacy_seconds": 3312.2498586620204,
+      "review": "completeexit0released;96freshfiniteframes;fullsourcehashes;physicalsum;nativeVmafhashmean;receiptshape/package/zero violations;recovery_alarmNone"
+    }
+  },
+  "resource_smoke_failure": {
+    "job": "gpu3:audits/gate-a-recert-C2-checkpoint-smoke-job-20261002",
+    "status": "failed_exit1_before_source_loading_claims_released",
+    "reason": "cannot raise inherited200GiBhardASlimit to256GiB",
+    "interpretation": "instrument/resourceconfiguration failure;noalgorithmnegative;no replay"
+  },
+  "checkpoint_smoke_job": "gpu3:audits/gate-a-recert-C2-checkpoint-smoke192-job-20261002",
+  "scale48_envelope_audit": "448882 compressed mask-entry bytes across each pair;receiver ignores masks;prefix-specific, not complete-window or matched-codecwin. Null-mask output parity remains untested."
 }
