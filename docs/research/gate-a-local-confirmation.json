@@ -28,12 +28,12 @@
     "C3": "gpu3:audits/gate-a-recert-C3-smoke-job-20261002"
   },
   "execution": "CPU-only, no GPU, owned monitor claims, disjoint cores0\u20137/8\u201315, 0.5h each; no replay",
-  "remaining": "Inspect existing full96 C2/C3 jobs without replay; verify all192freshdecoded/scoredframes,physicalcosts,receiver/metric/sourcehashes,placement/motion fidelity. Then register native anchor smoke/pilot/scale/full;candidatefullresultsnotyetavailable.",
+  "remaining": "Inspectexistingthree12framemechanicsjobswithoutreplay;verifyeachframeplacements and RGBdifferencesfromnull;inspectactorpresence/motion;thenregisterscale/fullcorrectness+sharedsourceanchors onlyifconditionalrepairvalid. Originalfulljobswillnotbeautomaticallyreplayed;58armnativegridremainsdraft.",
   "prior_followups_retained": [
     "lossless metadata baseline and mild/boundary-preserving lossy packing",
     "GVC-RT native stream freshdecode/parity; supported-domainMTTF; GLC rateestimated separately"
   ],
-  "paper_revision": "9d062c533447d1de5bc20a46031e21d0c80d9f07",
+  "paper_revision": "78c857e0615523b1f8c52bcfc47101ad48f332ca",
   "external_receipts": "/Users/manu/.codex/visualizations/2026/09/30/01a0f3d8-8225-77c0-b10a-4a9fd2401c9b/packet-rate-quality/gate-a-local-20261002",
   "smoke_results": {
     "C2": {
@@ -170,12 +170,33 @@
   "full96_jobs": {
     "C2": {
       "id": "gpu3:audits/gate-a-recert-C2-full96-job-20261002",
-      "last_observed": "running"
+      "last_observed": "cancelled_failed_foreground_screen_claims_released"
     },
     "C3": {
       "id": "gpu3:audits/gate-a-recert-C3-full96-job-20261002",
-      "last_observed": "running"
+      "last_observed": "cancelled_failed_foreground_screen_claims_released"
     }
   },
-  "prospective_unused_mask_worker": "prune_unused_masks.py preparedandfocusedtestspassed;strictoriginalreport/packet/source/nativepins;notregistered/staged/run. RequiresfreshRGBparity;unused-fieldpruningisnotsemanticpacketlossless."
+  "prospective_unused_mask_worker": "prune_unused_masks.py preparedandfocusedtestspassed;strictoriginalreport/packet/source/nativepins;notregistered/staged/run. RequiresfreshRGBparity;unused-fieldpruningisnotsemanticpacketlossless.",
+  "foreground_failure": {
+    "source_rgb_sha256": "09fbaee1f343b6046718853ef82b8b257c3bb8a9bbff8c52c23c368aeedce573",
+    "receiver_rgb_sha256": "7f61e8f63d273035b3e1a9709e4d09e1158f34a858ee5c5d57c3fa547888016f",
+    "selected_frames": [
+      0,
+      24,
+      95
+    ],
+    "observation": "C2scene000playerspresentat0absent24/95;globalVMAFdoesnotestablishforegroundfidelity",
+    "disposition": "Bothfulljobsstoppedoncorrectnessfailure;allfirstscene96packets/decoded/receipts/logspreserved;no full192score/no nativewinoralgorithmnegative;no replay"
+  },
+  "trajectory_mechanics_registration": {
+    "sha256": "d1114e08234e68991849a47e58c122806fb4ab4d76386cbab1eb4c04f01e80e5",
+    "worker_commit": "b208988420bf31167af3d754c0392edb02f81780",
+    "scope": "posthocfirstscene conditioning repair;full96offlineBGreusedin12frameprefixcontrols;notRDpoint;guideboxesnotindependenttasktruth;staticappearance/alpha nottruepose"
+  },
+  "trajectory_mechanics_jobs": {
+    "null": "gpu3:audits/gate-a-trajectory-null12-job-20261002",
+    "opaque": "gpu3:audits/gate-a-trajectory-opaque12-job-20261002",
+    "alpha": "gpu3:audits/gate-a-trajectory-alpha12-job-20261002"
+  }
 }
