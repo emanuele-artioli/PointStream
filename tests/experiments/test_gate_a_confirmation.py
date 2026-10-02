@@ -53,3 +53,10 @@ def test_unused_mask_pruning_preserves_other_arrays_and_placement_fields():
         got=json.loads(packet['metadata'].tobytes())
         metadata['placements'][0]['mask_key']=None
         assert got==metadata
+
+def test_trajectory_box_preserves_seed_and_moves_scales_with_guide():
+    from experiments.gate_a_confirmation.trajectory_packet import adapted_box, bounds
+    base=[10,20,30,60];first=(12,24,28,56)
+    assert adapted_box(base,first,first)==base
+    assert adapted_box(base,first,(22,29,38,61))==[20,25,40,65]
+    assert bounds(np.zeros((3,4),dtype=bool)) is None
