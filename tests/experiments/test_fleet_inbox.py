@@ -396,3 +396,14 @@ def test_worker_bundle_keeps_manager_dependency_closure(tmp_path):
         assert set(identities) == set(names[:-1])
     finally:
         bundle.unlink()
+
+
+def test_worker_lifetime_lease_blocks_concurrent_bootstrap(tmp_path, monkeypatch):
+    import fcntl
+    location = tmp_path / "workers" / "gpu1"
+    location.mkdir(parents=True)
+    with (location / "worker.lock").open("a") as lease:
+        fcntl.flock(lease, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        monkeypatch.setattr(inbox, "worker_loop", lambda *a: pytest.fail("second worker bootstrapped"))
+        with pytest.raises(BlockingIOError):
+            inbox.worker(tmp_path, "gpu1")
