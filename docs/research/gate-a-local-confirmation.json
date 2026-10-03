@@ -462,5 +462,32 @@
     "job": "gpu1:audits/gate-a-retained-score-C2-f12-job-20261003",
     "last_observed": "running"
   },
-  "paper_commit": "ae3eb1a"
+  "paper_commit": "ae3eb1a",
+  "encoder_access_qualification": {
+    "status": "matched_access_comparison_on_hold",
+    "finding": "Retained scene000 backgroundpixels use selectedsource000 frames, but canonical canvas geometry uses source000+source028 before firstplate. Nativeone-windowanchorhasnarrowerencoderaccess. Completebytechargingdoesnotfixthis.",
+    "evidence": {
+      "legacy_revision": "274638bdae7f5bd63c4f834a24804c0e14ed8d83",
+      "paths_lines": {
+        "experiments/gate_a_confirmation/legacy_recertify.py": [
+          60,
+          78
+        ],
+        "experiments/tier/low_rate_sweep.py": [
+          155
+        ],
+        "src/runner/stages.py": [
+          706,
+          745
+        ],
+        "src/components/background/plate.py": [
+          393,
+          414,
+          427
+        ]
+      }
+    },
+    "disposition": "Retain completed/running renderer and scorer outputs as unequal-contextdiagnostics. Do not promote source000-onlynative96anchors into matchedcomparison. C3v2null12passed; subsequentreused-contextC3rendererarms onholdbeforeadmission. Newsource000-onlysender workerbeingprepared; alsoauditcachedcropaccess. Native48preflightsremainvalidinstruments.",
+    "no_algorithmic_inference": true
+  }
 }
