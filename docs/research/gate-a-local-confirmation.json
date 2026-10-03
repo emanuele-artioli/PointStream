@@ -398,13 +398,18 @@
       },
       "alpha": {
         "id": "gpu1:audits/gate-a-receiver-score-alpha-smoke12-job-20261003",
-        "last_observed": "running"
+        "last_observed": "complete_exit0_claims_released"
       }
+    },
+    "verification": {
+      "artifact": "gpu1:audits/gate-a-receiver-score-smokes-verification-20261003.json",
+      "sha256": "7b5a3033c6b787e02d7af214162ab6bdb999bcb16c0f9172d0410c9b5eb89f9b",
+      "all3_passed": true
     }
   },
   "trajectory_full96_development_registration": {
     "sha256": "e88cba47d71032cdb77c3f869982ad30a609db9fd8662b9460e110b4fbcd0431",
-    "status": "registered_not_launched",
+    "status": "executing_all3_frozen_arms",
     "scope": "Source000 only, all96 static-reference trajectory ablation. No originaltwo-window recertification or pose/taskfidelity claim."
   },
   "native_pilot12_verification": {
@@ -421,5 +426,41 @@
     "sha256": "b5b48401fcaa1bd93ca92e6e344a9f07da164b2c87f104fbc7179653da1ef623",
     "arms": 3,
     "scope": "Source000 globalVMAF only,3frozenanchors; no dense interval/originaltwo-window or heldout claim"
-  }
+  },
+  "trajectory_full96_development_jobs": {
+    "null": {
+      "id": "gpu1:audits/gate-a-trajectory-gpu1-null96-job-20261003",
+      "last_observed": "complete_exit0_claims_released"
+    },
+    "opaque": {
+      "id": "gpu1:audits/gate-a-trajectory-gpu1-opaque96-job-20261003",
+      "last_observed": "complete_exit0_claims_released"
+    },
+    "alpha": {
+      "id": "gpu1:audits/gate-a-trajectory-gpu1-alpha96-job-20261003",
+      "last_observed": "running"
+    }
+  },
+  "native_scale48_jobs": {
+    "vvc-q50-qpa0": {
+      "id": "gpu1:audits/gate-a-single-window-vvc-q50-qpa0-scale48-job-20261003",
+      "last_observed": "complete_exit0_claims_released"
+    },
+    "vvc-q50-qpa1": {
+      "id": "gpu1:audits/gate-a-single-window-vvc-q50-qpa1-scale48-job-20261003",
+      "last_observed": "running"
+    },
+    "av1-crf59-1080": {
+      "id": "gpu1:audits/gate-a-single-window-av1-crf59-1080-scale48-job-20261003",
+      "last_observed": "not_started"
+    }
+  },
+  "retained_receiver_diagnostic": {
+    "registration_sha256": "55746bb2013fabd1ff97a37460759d13b59851d0b4d38c2a7b5463a52520ca7c",
+    "worker_sha256": "794fefed5174b93f5380e7d30606a5a80cd7c630371df3950194f76e4abc2d4f",
+    "scope": "Retrospective source000 retained C2/C3 outputs; incompleteparent192, no originalmanifest or historicalcomplete-envelopebytes. Full96identitiesvalidated even12smoke; scoredoesnotassert historicalmodelmatch or RDwin.",
+    "job": "gpu1:audits/gate-a-retained-score-C2-f12-job-20261003",
+    "last_observed": "running"
+  },
+  "paper_commit": "ae3eb1a"
 }
