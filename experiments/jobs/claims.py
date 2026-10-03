@@ -173,6 +173,14 @@ def is_pid_alive(pid: int, expected_start_time: float | None = None) -> bool:
         # Process exists and belongs to another user
         return True
 
+    try:
+        fields = Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()
+        if fields and fields[0] in {"Z", "X"}:
+            return False
+    except (OSError, IndexError):
+        # Unknown process state must remain protected, including on non-Linux.
+        pass
+
     if expected_start_time is not None:
         cur_start = get_process_start_time(pid)
         if cur_start is not None and abs(cur_start - expected_start_time) > 2.0:
