@@ -110,3 +110,25 @@ def test_production_player_roles_exclusions_and_held_history(tmp_path):
     assert all(row['history_held'] and row['stale'] and not row['detector_matched']
                and row['consecutive_held_frames']==1 for row in records[1]['tracked'])
     assert all(row['status']=='complete' for row in records)
+
+
+def test_loaded_runtime_not_distribution_version(tmp_path):
+    from types import SimpleNamespace
+    from experiments.gate_a_confirmation.window_guides import validate_torch_runtime, digest
+    version = tmp_path / 'version.py'
+    version.write_text("__version__ = '2.2.2+cu121'\n")
+    torch = SimpleNamespace(__version__='2.2.2+cu121', version=SimpleNamespace(
+        cuda='12.1', git_version='recorded', __file__=str(version)))
+    env = {'packages': {'torch': '2.5.1'}, 'torch_runtime': {
+        'version': '2.2.2+cu121', 'cuda': '12.1', 'git_version': 'recorded'},
+        'runtime_files': {str(version): digest(version)}}
+    assert validate_torch_runtime(torch, env)['version'] == '2.2.2+cu121'
+    torch.__version__ = '2.5.1'
+    with pytest.raises(ValueError, match='loaded torch runtime differs'):
+        validate_torch_runtime(torch, env)
+    torch.__version__ = '2.2.2+cu121'
+    version.write_text('changed')
+    with pytest.raises(ValueError, match='version source changed'):
+        validate_torch_runtime(torch, env)
+    with pytest.raises(ValueError, match='pins missing'):
+        validate_torch_runtime(torch, {})

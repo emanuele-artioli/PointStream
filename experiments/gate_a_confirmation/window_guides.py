@@ -48,6 +48,18 @@ def require(condition, message):
     if not condition:
         raise ValueError(message)
 
+def validate_torch_runtime(torch, environment):
+    """Pin the loaded runtime separately from potentially stale distribution metadata."""
+    expected = environment.get('torch_runtime')
+    require(isinstance(expected, dict), 'loaded torch runtime pins missing')
+    actual = {'version': str(torch.__version__), 'cuda': torch.version.cuda,
+              'git_version': torch.version.git_version}
+    require(actual == expected, 'loaded torch runtime differs from registration')
+    version_path = str(Path(torch.version.__file__).resolve())
+    require(version_path in environment['runtime_files'], 'loaded torch version source not pinned')
+    require(digest(version_path) == environment['runtime_files'][version_path], 'loaded torch version source changed')
+    return actual
+
 def digest(path):
     h = hashlib.sha256()
     with Path(path).open('rb') as stream:
@@ -318,6 +330,7 @@ def main():
     try:
         from ultralytics import YOLO
         import torch
+        receipt['loaded_torch_runtime'] = validate_torch_runtime(torch, env)
         from src.components.detection.yolo import YoloDetector
         from src.components.tracking.tracker import IdentityTracker
         from src.components.segmentation.yolo import YoloSegmenter
