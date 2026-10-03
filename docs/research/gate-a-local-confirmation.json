@@ -28,7 +28,7 @@
     "C3": "gpu3:audits/gate-a-recert-C3-smoke-job-20261002"
   },
   "execution": "CPU-only, no GPU, owned monitor claims, disjoint cores0\u20137/8\u201315, 0.5h each; no replay",
-  "remaining": "Inspectexistingthree12framemechanicsjobswithoutreplay;verifyeachframeplacements and RGBdifferencesfromnull;inspectactorpresence/motion;thenregisterscale/fullcorrectness+sharedsourceanchors onlyifconditionalrepairvalid. Originalfulljobswillnotbeautomaticallyreplayed;58armnativegridremainsdraft.",
+  "remaining": "Inspect existing GPU1 clone before launch; verify staged identities and admission, run sequential registered mechanics controls. Require foreground coverage and visual review before ranking an adapted candidate. The old G0 crossing remains a global-metric diagnostic; missing foreground does not invalidate interpolation arithmetic or prove algorithmic inferiority. Dense VVC/AV1 resolution ladder, complete-payload old-G0 diagnostic, and unseen-scene confirmation remain unmeasured.",
   "prior_followups_retained": [
     "lossless metadata baseline and mild/boundary-preserving lossy packing",
     "GVC-RT native stream freshdecode/parity; supported-domainMTTF; GLC rateestimated separately"
@@ -198,5 +198,46 @@
     "null": "gpu3:audits/gate-a-trajectory-null12-job-20261002",
     "opaque": "gpu3:audits/gate-a-trajectory-opaque12-job-20261002",
     "alpha": "gpu3:audits/gate-a-trajectory-alpha12-job-20261002"
+  },
+  "trajectory_mechanics_gpu3_disposition": {
+    "null": "complete_exit0_child_stopped_claim_retained_cleanup_mutex_timeout",
+    "opaque": "admission_failed_before_child",
+    "alpha": "admission_failed_before_child",
+    "mutex": "empty CPU claim directory without owner.json; ownership unresolved, not removed or bypassed",
+    "own_retained_claim": "64ee13f8c4399e9e0b6dc575068ace18",
+    "foreign_live_allocation": "preserved",
+    "algorithmic_result_from_failed_starts": false
+  },
+  "trajectory_mechanics_gpu1_registration": {
+    "path": "trajectory-mechanics-gpu1-registration.json",
+    "status": "null_started_other_arms_not_started",
+    "worker_revision": "bb1ce54",
+    "cpu_affinity": [
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39
+    ],
+    "sequence": "matched-host null, opaque, alpha sequentially; CPU8/48GiB/30min per arm, no GPU",
+    "reason": "new hardware requires new null; GPU3 starts not replayed",
+    "preflight": "doctor passed, clean legacy checkout, staged identities verified",
+    "sha256": "0714e77264fa4c06c30a32bc7a076b1469d96998ba3f0d4cb2545984ddfc7a30"
+  },
+  "trajectory_mechanics_gpu1_jobs": {
+    "null": {
+      "id": "gpu1:audits/gate-a-trajectory-gpu1-null12-job-20261002",
+      "supervisor_pid": 859197,
+      "child_pid": 859206,
+      "last_observed": "running"
+    }
+  },
+  "snapshot_provenance_erratum": {
+    "actual_archive_sha256": "451c1767bfaf7e086f84d97beacd6db0195f27a6762e8f28832dec19d5d83590",
+    "verification": "341 Python-only files; all339 original files byte-identical to931333e, two selected extra legacy workers; monitor files unchanged",
+    "historical_record": "scale48-registration.json records an incorrect monitor_snapshot_sha256; preserved unchanged, corrected here; per-worker/source/report receipts unaffected"
   }
 }
