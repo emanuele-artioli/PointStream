@@ -2090,13 +2090,80 @@
     "qualification_sha256": "48d28b3a6879457d2fcce5f847206c7d8ae0f29cc3855b26dc076625f526a467"
   },
   "fresh_window_guide_v3_full96": {
-    "status": "running_not_qualified",
+    "status": "complete_independently_verified_root_qualified_instrument",
     "job_id": "20261003T170004Z-87a04c7b",
     "snapshot": "/var/tmp/emanuele-gate-a-guide-snapshots-20261003/20261003T170004Z-87a04c7b",
     "registration_sha256": "5fbff21a0b9ee4b152ab9a5199126060cbddeeb1e876e59a893526a93f94a33b",
     "output": "gpu5:audits/gate-a-source000-yolo-guides-v3-full96-budget-20261003",
     "budget": "2400s collection /3600s supervisor; prospective scale-derived guard only; model/input/settings unchanged",
-    "no_replay": true
+    "no_replay": true,
+    "qualification": {
+      "schema": "pointstream.fresh_window_guides.qualification.v1",
+      "status": "qualified",
+      "frames": 96,
+      "visual_review": "accepted",
+      "source_access_review": "selected_source000_only",
+      "resources_review": "accepted",
+      "guide_root": "/home/itec/emanuele/Datasets/pointstream-data/audits/gate-a-source000-yolo-guides-v3-full96-budget-20261003",
+      "registration_sha256": "5fbff21a0b9ee4b152ab9a5199126060cbddeeb1e876e59a893526a93f94a33b",
+      "receipt_sha256": "e57fdff30fd08eaef0362ebe43dfab6ebac1d8215b9daecaa3c9f19d1a76c264",
+      "independent_proof_path": "/home/itec/emanuele/Datasets/pointstream-data/audits/gate-a-source000-yolo-guides-v3-full96-independent-proof-root-20261003/independent-verification.json",
+      "independent_proof_sha256": "82dbb1d6258151f651c4a12ddc38e74d8e81267a721bc97671f0ad615c02db60",
+      "job_id": "20261003T170004Z-87a04c7b",
+      "job_exit_code": 0,
+      "claims_released": true,
+      "reviewed_overlays": [
+        38,
+        86,
+        133
+      ],
+      "previous_prefix_held_visual_review": 52,
+      "limitations": [
+        "Qualified source-access and mechanics instrument only; model guides are not independent task truth.",
+        "Arm/racket clipping retained; one far-role history-held/stale frame52 and zero missing masks. No thresholds/boxes tuned.",
+        "No sender/receiver codec-quality or generalization result.",
+        "RSS samples are not OS hard limits. Loaded Torch2.2.2+cu121 pinned separately from distributionmetadata2.5.1."
+      ],
+      "counts": {
+        "history_held": 1,
+        "tracker_history_held": 0,
+        "stale": 1,
+        "mask_missing": 0
+      },
+      "observed_resources": {
+        "cpu_affinity": [
+          120,
+          121,
+          122,
+          123,
+          124,
+          125,
+          126,
+          127
+        ],
+        "nice": 19,
+        "peak_rss_kib": 5348972,
+        "rss_guard": {
+          "limit_bytes": 51539607552,
+          "samples": 770,
+          "peak_sampled_bytes": 5488549888
+        },
+        "cuda_runtime": {
+          "torch_version": "2.2.2+cu121",
+          "cuda_version": "12.1",
+          "device_name": "NVIDIA RTX 6000 Ada Generation",
+          "peak_allocated_bytes": 222796800,
+          "peak_reserved_bytes": 318767104
+        }
+      },
+      "prior_qualification_files": [
+        "window-guides-v3-f2-root-qualification.json",
+        "window-guides-v3-f12-root-qualification.json",
+        "window-guides-v3-scale48-root-qualification.json"
+      ],
+      "promotion": "Only fresh CPU registration generator and two-frame sender/source/background/serialization smoke admitted after fresh resource checks. Longer original index-only receiver arms remain unrunnable; separate temporal workflow qualification required."
+    },
+    "independent_proof_artifact": "/home/itec/emanuele/Datasets/pointstream-data/audits/gate-a-source000-yolo-guides-v3-full96-independent-proof-root-20261003/independent-verification.json"
   },
   "next_instrument_drafts": {
     "fresh_temporal_smoke": {
@@ -2119,5 +2186,11 @@
       "limits": "RGB-YUV helpers/probe excluded from child instrumentation; perprocess AS is not aggregate memory. Both historical sources verification-only hashed; selected windows only encoded/scored. No stronger-anchor result inferred."
     },
     "validation": "31 focused tests passed covering guides, sender, adapter, temporal checks and native receipt mechanics; synthetic/unit checks do not replace actual native smoke."
+  },
+  "fresh_sender_v1_registration": {
+    "state": "bounded CPU generator running; no sender execution",
+    "remote_stage": "gpu1:/var/tmp/emanuele-gate-a-fresh-sender-v1-20261003",
+    "runnable_arms": "Only C2/C3 two-frame source/background/serialization instruments",
+    "longer_arms": "Prospective only, rejected by sender membership guard; separate temporalworkflow qualification required"
   }
 }
