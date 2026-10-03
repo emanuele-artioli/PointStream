@@ -2097,5 +2097,27 @@
     "output": "gpu5:audits/gate-a-source000-yolo-guides-v3-full96-budget-20261003",
     "budget": "2400s collection /3600s supervisor; prospective scale-derived guard only; model/input/settings unchanged",
     "no_replay": true
+  },
+  "next_instrument_drafts": {
+    "fresh_temporal_smoke": {
+      "worker": "experiments/gate_a_confirmation/fresh_temporal_smoke.py",
+      "sha256": "a65ae3d9cf56cb438fecd33c46843440cb89d7af53d61b4046eb231c14f5b725",
+      "state": "implemented locally; not registered/executed; actual native decode smoke pending",
+      "controls": [
+        "null",
+        "unadapted",
+        "opaque",
+        "alpha"
+      ],
+      "limits": "requires qualified source000 sender2 and full96 guide artifacts. Checks every role/frame, recorded bbox motion, visible placement changes; retains all bytes/controls. Static appearance is not pose truth. Mechanics proof always leaves longer sender held for explicit visual/contract qualification. Audit denial is not OS sandbox."
+    },
+    "native_anchor_v2": {
+      "worker": "experiments/gate_a_confirmation/native_anchor_v2.py",
+      "sha256": "8826ade64df0f469d5be564e87fa4c07f77551ec14f7ccb2b7c97ed373129272",
+      "state": "implemented locally; not registered/executed; native same-path smoke pending",
+      "receipts": "all-frame VMAF/Y-MSE/SSIM with window-relative coordinates; exact POSIX wait4 directchild RSS/CPU plus observed constraints; Linux scientific entrypoint",
+      "limits": "RGB-YUV helpers/probe excluded from child instrumentation; perprocess AS is not aggregate memory. Both historical sources verification-only hashed; selected windows only encoded/scored. No stronger-anchor result inferred."
+    },
+    "validation": "31 focused tests passed covering guides, sender, adapter, temporal checks and native receipt mechanics; synthetic/unit checks do not replace actual native smoke."
   }
 }
