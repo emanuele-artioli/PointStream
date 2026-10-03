@@ -370,17 +370,26 @@ def campaign(directory: Path) -> int:
 
 
 def source_identity(source: Path) -> str:
+    # DirEntry caches directory metadata. Path.rglob followed by repeated stat
+    # calls is prohibitively slow on the fleet's shared NFS mount.
     records = []
-    for path in sorted(source.rglob("*")):
-        rel = path.relative_to(source)
-        if "__pycache__" in rel.parts or path.suffix == ".pyc":
-            continue
-        if path.is_symlink():
-            if not path.resolve().is_relative_to(source.resolve()):
-                raise fleet.FleetError(f"snapshot symlink escapes frozen source: {rel}")
-            records.append([str(rel), "symlink", os.readlink(path)])
-        elif path.is_file():
-            records.append([str(rel), file_digest(path)])
+    def scan(directory: Path) -> None:
+        with os.scandir(directory) as entries:
+            for entry in entries:
+                path = Path(entry.path)
+                rel = path.relative_to(source)
+                if entry.name == "__pycache__" or path.suffix == ".pyc":
+                    continue
+                if entry.is_symlink():
+                    if not path.resolve().is_relative_to(source.resolve()):
+                        raise fleet.FleetError(f"snapshot symlink escapes frozen source: {rel}")
+                    records.append([str(rel), "symlink", os.readlink(path)])
+                elif entry.is_dir(follow_symlinks=False):
+                    scan(path)
+                elif entry.is_file(follow_symlinks=False):
+                    records.append([str(rel), file_digest(path)])
+    scan(source)
+    records.sort(key=lambda record: Path(record[0]).parts)
     return digest(records)
 
 
@@ -605,7 +614,7 @@ def selftest_submit(args: argparse.Namespace, root: Path) -> Any:
     config = load_config(args.state_dir)
     identity = remote_rpc(config, "selftest_input", {})
     spec = {
-        "schema": SCHEMA, "hosts": config["hosts"], "gpu_models": [],
+        "schema": SCHEMA, "hosts": args.hosts or config["hosts"], "gpu_models": [],
         "gpu_memory_mib": 1024, "cpu_threads": 1,
         "entrypoint": ["-m", "experiments.jobs.fleet_smoke"],
         "arguments": ["--input", identity["path"], "--iterations", "{iterations}"],
@@ -658,6 +667,7 @@ def main(argv_values: list[str] | None = None) -> int:
         command.add_argument("--include-change", action="append", default=[])
         command.add_argument("--include-untracked", action="append", default=[])
     selftest = actions.add_parser("selftest", help="submit a bounded non-citable CUDA infrastructure campaign")
+    selftest.add_argument("--hosts", nargs="+", choices=fleet.DEFAULT_HOSTS, help="limit the bounded selftest to verified compatible hosts")
     selftest.add_argument("--chat-id", default=os.environ.get("CODEX_THREAD_ID"))
     selftest.add_argument("--include-change", action="append", default=[])
     selftest.add_argument("--include-untracked", action="append", default=[])
