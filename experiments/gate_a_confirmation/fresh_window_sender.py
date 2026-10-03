@@ -88,7 +88,7 @@ def build_clip(source, objects, *, expected_shape=(96, 2160, 3840, 3)):
     union = np.zeros(source.shape[:3], dtype=bool)
     appearances = []
     for item in objects:
-        require(item.object_class == 'person', 'fresh YOLO person semantics required')
+        require(item.object_class == 'player' and item.object_id in ('player_far','player_near'), 'explicit fresh production player roles required')
         require(item.mask.dtype == np.bool_ and item.mask.shape == source.shape[:3], 'full96 bool mask alignment required')
         frame = int(item.frame_index)
         require(frame == item.frame_index and 0 <= frame < source.shape[0], 'appearance frame outside source')
@@ -116,6 +116,7 @@ def load_fresh_guides(guide_root, reg, source_path):
     guide_registration = guide_root / 'registration.json'
     require(digest(guide_registration) == reg['guide_registration_sha256'] == receipt['registration_sha256'], 'guide registration changed')
     collector = json.loads(guide_registration.read_text())
+    require(collector['config']['selector'] == 'production_HeuristicSelector' and collector['config']['classes'] == ['player'], 'production player guide contract required')
     require(collector['status'] == 'frozen' and collector['frames'] == 96 and collector['source_rgb_sha256'] == SOURCE_RGB_SHA256,
             'full96 frozen within-window collection required')
     require(Path(collector['source_path']).resolve() == source_path and collector['source_file_sha256'] == reg['source_files'][str(source_path)], 'collector source differs')
@@ -131,11 +132,11 @@ def load_fresh_guides(guide_root, reg, source_path):
             'missing/unprocessed guide frames forbidden')
     objects = []
     for row in receipt['objects']:
-        require(row['object_class'] == 'person', 'unexpected guide class')
+        require(row['object_class'] == 'player' and row['object_id'] in ('player_far','player_near'), 'unexpected guide class')
         require(row['mask_file'] in receipt['artifact_sha256'] and row['appearance_file'] in receipt['artifact_sha256'], 'unhashed object artifact')
         objects.append(ObjectRequest(object_id=row['object_id'], frame_index=row['frame_index'], bbox=tuple(row['bbox']),
             mask=np.load(guide_root / row['mask_file'], mmap_mode='r', allow_pickle=False),
-            appearance=np.load(guide_root / row['appearance_file'], allow_pickle=False), object_class='person'))
+            appearance=np.load(guide_root / row['appearance_file'], allow_pickle=False), object_class='player'))
     source = np.load(source_path, mmap_mode='r', allow_pickle=False)
     require(all(row['rgb_sha256'] == rgb_digest(source[i:i+1]) for i,row in enumerate(records)), 'perframe guide RGB input identity differs')
     return tuple(objects), receipt, collector
@@ -296,7 +297,7 @@ def main():
                   'context_identifier': full.context_id, 'fps': 24, 'source028_access': False,
                   'checkpoint_or_prepared_background_reused': False, 'appearance_input_policy': 'reference_cutout',
                   'guide_provenance': 'fresh frozen window collector; model-derived, not independent task truth',
-                  'class_mapping': 'person preserved; no silent substitution to legacy player'},
+                  'class_mapping': 'raw YOLO person -> production heuristic player_far/player_near; explicit posthoc selected-domain contract'},
               'config': config_dict, 'config_sha256': config_sha256,
               'data_root_logical': reg['data_root_logical'], 'data_root_canonical': str(data),
               'guide_receipt_sha256': reg['guide_receipt_sha256'], 'guide_registration_sha256': reg['guide_registration_sha256'],

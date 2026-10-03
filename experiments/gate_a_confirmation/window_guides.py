@@ -28,13 +28,20 @@ import numpy as np
 
 SOURCE_RGB_SHA256 = '09fbaee1f343b6046718853ef82b8b257c3bb8a9bbff8c52c23c368aeedce573'
 CONFIG = {'detector_conf': 0.1, 'segmenter_conf': 0.2, 'tracker_iou_threshold': 0.3,
-          'classes': ['person'], 'rgb_to_model': 'BGR', 'tracking': 'fresh_past_only_default_recovery',
+          'classes': ['player'], 'selector': 'production_HeuristicSelector', 'selector_kwargs': {},
+          'selector_defaults': {'roles':['player_far','player_near'], 'midline_height_fraction':0.5,
+              'initial_anchor_width_fraction':0.5, 'far_anchor_height_fraction':0.30, 'near_anchor_height_fraction':0.72,
+              'area_ratio_max':4.0, 'distance_height_fraction':0.35, 'distance_previous_height_multiple':2.0,
+              'distance_diagonal_fraction':0.12, 'stabilize_height_fraction':0.18, 'stabilize_previous_height_multiple':2.2,
+              'score_area_scale':0.0015, 'score_center_scale':100.0, 'score_temporal_scale':220.0, 'history_hold':True},
+          'selection_change': 'posthoc development player curation after failed all-person pilot; no confidence/box tuning', 'rgb_to_model': 'BGR', 'tracking': 'fresh_past_only_default_recovery',
           'model_predict': {'verbose': False}, 'missing_masks': 'zero_recorded'}
 REQUIRED_CODE = ('src/components/detection/yolo.py', 'src/components/detection/parsing.py',
                  'src/components/detection/geometry.py', 'src/components/detection/types.py',
                  'src/components/tracking/tracker.py', 'src/components/tracking/recovery.py',
                  'src/components/segmentation/yolo.py', 'src/components/detection/weights.py',
                  'src/components/detection/__init__.py', 'src/components/tracking/__init__.py',
+                 'src/components/selection/heuristic.py', 'src/components/selection/__init__.py', 'config/tier_balanced.yaml',
                  'src/components/segmentation/__init__.py', 'src/components/__init__.py', 'src/__init__.py')
 
 def require(condition, message):
@@ -74,10 +81,37 @@ def validate_source(source, frames, full_shape=(96, 2160, 3840, 3)):
     require(source.dtype == np.uint8 and source.shape == full_shape, 'original full96 RGB shape required')
     return source[:frames]
 
+def select_with_audit(selector, detections, frame_shape, held_counts):
+    from src.components.detection.types import is_person, is_racket
+    people = [d for d in detections if is_person(d.class_name)]
+    rackets = [d for d in detections if is_racket(d.class_name)]
+    far, near = selector._pick_players(people, rackets, width=frame_shape[1], height=frame_shape[0])
+    candidates = {'player_far':far, 'player_near':near}
+    all_selected = list(selector.select(detections, frame_shape))
+    selected = [d for d in all_selected if is_person(d.class_name)]
+    audit = {}
+    selected_indices = set()
+    for item in selected:
+        candidate = candidates[item.track_id]
+        candidate_indices = [i for i,d in enumerate(detections) if d is candidate]
+        raw_indices = [i for i,d in enumerate(detections) if is_person(d.class_name) and d.bbox == item.bbox]
+        held = candidate is None or candidate.bbox != item.bbox
+        held_counts[item.track_id] = held_counts.get(item.track_id, 0)+1 if held else 0
+        selected_indices.update(raw_indices)
+        audit[item.track_id] = {'selected_role':item.track_id, 'candidate_raw_indices':candidate_indices,
+            'selected_raw_indices':raw_indices, 'history_held':held, 'stale':held,
+            'consecutive_held_frames':held_counts[item.track_id], 'detector_matched':bool(raw_indices)}
+    excluded = [{'raw_index':i, 'reason':'not selected as on-court player by production heuristic' if is_person(d.class_name)
+                  else 'non-player class omitted from player-only output'} for i,d in enumerate(detections) if i not in selected_indices]
+    return selected, audit, excluded, [detection_record(d) for d in all_selected]
+
 def collect(source, detector, tracker, segmenter, output, *, max_tracks, max_seconds, rss_guard=None):
     """Sequential source-only loop. Models receive BGR; appearance stays RGB."""
     from src.components.detection.geometry import Box
     from src.components.detection.types import is_person
+    from src.components.selection.heuristic import HeuristicSelector
+    selector = HeuristicSelector()
+    held_counts = {}
     tracker.reset()
     count, height, width, _ = source.shape
     masks, objects = {}, {}
@@ -88,19 +122,33 @@ def collect(source, detector, tracker, segmenter, output, *, max_tracks, max_sec
             if rss_guard is not None: rss_guard.check('frame_before')
             require(time.monotonic() - began <= max_seconds, 'collection time budget exhausted')
             bgr = rgb_to_bgr(rgb)
-            detected = list(detector.detect(bgr))
-            selected = [item for item in detected if is_person(item.class_name)]
-            tracked = list(tracker.update(bgr, selected, predictor=detector))
-            record = {'frame_index': index, 'source_frame_index': 38 + index,
-                      'rgb_sha256': array_digest(rgb[None]), 'detected': [detection_record(d) for d in detected],
-                      'tracked': [], 'status': 'processing'}
+            record = {'frame_index':index, 'source_frame_index':38+index, 'rgb_sha256':array_digest(rgb[None]),
+                      'detected':[], 'selected':[], 'excluded':[], 'tracked':[], 'status':'processing'}
             frame_records[index] = record
+            detected = list(detector.detect(bgr))
+            record['detected'] = [detection_record(d) for d in detected]
+            selected, selection_audit, excluded, all_selected = select_with_audit(selector, detected, (height,width), held_counts)
+            record.update(selected=[dict(detection_record(d), **selection_audit[d.track_id]) for d in selected],
+                          excluded=excluded, selector_output_including_rackets=all_selected)
+            previous_tracker = {d.track_id:d for d in getattr(tracker, '_previous', [])}
+            tracked = list(tracker.update(bgr, selected, predictor=detector))
+            record['tracker_output_before_validation'] = [detection_record(d) for d in tracked]
+            require(len({d.track_id for d in tracked}) == len(tracked), 'duplicate tracked role; recovery would duplicate identity')
             for item in tracked:
-                require(item.track_id is not None, 'tracker must assign identity')
+                require(item.track_id in ('player_far','player_near') and item.class_name == 'player', 'explicit two player roles required')
                 bbox = raster_box(item.bbox, height, width)
                 clipped = item.with_bbox(Box(*bbox))
                 mask = segmenter.segment(bgr, clipped)
                 row = detection_record(clipped)
+                selected_item = next((d for d in selected if d.track_id == item.track_id), None)
+                recovery_changed = selected_item is None or selected_item.bbox != item.bbox
+                row.update(selection_audit.get(item.track_id, {}))
+                prior = previous_tracker.get(item.track_id)
+                tracker_held = recovery_changed and prior is not None and prior.bbox == item.bbox
+                row['tracker_recovery_changed'] = recovery_changed
+                row['tracker_history_held'] = tracker_held
+                row['stale'] = row.get('stale', False) or tracker_held
+                row['tracker_matches_selected'] = not recovery_changed
                 row['mask_missing'] = mask is None
                 record['tracked'].append(row)
                 if item.track_id not in masks:
@@ -115,7 +163,7 @@ def collect(source, detector, tracker, segmenter, output, *, max_tracks, max_sec
                     np.save(output / appearance_file, appearance, allow_pickle=False)
                     objects[item.track_id] = {'object_id': item.track_id, 'frame_index': index,
                         'bbox': list(bbox), 'mask_file': filename, 'appearance_file': appearance_file,
-                        'appearance_rgb_sha256': array_digest(appearance[None]), 'object_class': 'person'}
+                        'appearance_rgb_sha256': array_digest(appearance[None]), 'object_class': 'player', 'selected_role':item.track_id}
                 if mask is not None:
                     x1, y1, x2, y2 = bbox
                     mask = np.asarray(mask)
@@ -125,9 +173,9 @@ def collect(source, detector, tracker, segmenter, output, *, max_tracks, max_sec
                     masks[item.track_id][index, y1:y2, x1:x2] = mask
                     row['crop_mask_sha256'] = array_digest(mask[None])
                     row['foreground_pixels'] = int(mask.sum())
+            if rss_guard is not None: rss_guard.check('frame_after')
             record['status'] = 'complete'
             (output / 'frames.json').write_text(json.dumps(frame_records, indent=2) + '\n')
-            if rss_guard is not None: rss_guard.check('frame_after')
         for mask in masks.values():
             mask.flush()
         return list(objects.values()), frame_records
@@ -151,7 +199,7 @@ def load_objects(output):
         require(digest(output / filename) == expected, 'guide artifact changed')
     return tuple(ObjectRequest(object_id=row['object_id'], frame_index=row['frame_index'],
         bbox=tuple(row['bbox']), appearance=np.load(output / row['appearance_file'], allow_pickle=False),
-        mask=np.load(output / row['mask_file'], mmap_mode='r', allow_pickle=False), object_class='person')
+        mask=np.load(output / row['mask_file'], mmap_mode='r', allow_pickle=False), object_class=row['object_class'])
         for row in receipt['objects'])
 
 class DeviceModel:
@@ -263,7 +311,9 @@ def main():
                'cpu_affinity': sorted(os.sched_getaffinity(0)), 'nice': os.getpriority(os.PRIO_PROCESS, 0),
                'cuda_visible_devices': os.environ.get('CUDA_VISIBLE_DEVICES'),
                'cpu_memory_guard': 'sampled RSS before/after model calls and frames; not OS hard enforcement; transient peaks not bounded' if bounds['device'] != 'cpu' else 'RLIMIT_AS plus sampled RSS',
-               'class_mapping': 'YOLO person retained as ObjectRequest person; production is_person accepts it. Legacy player labels not silently substituted.'}
+               'class_mapping': 'raw YOLO person -> production selector player with player_far/player_near roles; explicit selected-domain policy',
+               'selection_change': CONFIG['selection_change'],
+               'domain_track_bound': 'two on-court player slots; storage bound8 unchanged, all raw detections retained including excluded candidates'}
     (output / 'receipt.json').write_text(json.dumps(receipt, indent=2, default=str) + '\n')
     try:
         from ultralytics import YOLO
