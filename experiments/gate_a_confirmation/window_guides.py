@@ -3,7 +3,7 @@
 Registration: status=frozen, worker_sha256, source_path, source_file_sha256,
 source_rgb_sha256, frames (2/12/48/96), code_files {relative:sha256},
 weights {detector:{path,sha256},segmenter:{path,sha256}}, environment
-{python_path,python_sha256,packages:{name:version},package_record_sha256:{name:sha}},
+{python_path,python_sha256,packages:{name:version},package_manifest:{name:{kind:RECORD|METADATA|PKG-INFO,sha256}},runtime_files:{absolute:sha}},
 config (exact CONFIG), config_sha256, environment_sha256 (compact sorted JSON),
 resources {device:cpu|cuda:0,memory_gib,max_tracks,max_seconds,cpu_threads:8},
 output_path under the fixed external data audits root. GPU RAM guard samples RSS
@@ -209,9 +209,14 @@ def main():
     require(hashlib.sha256(json.dumps(env, sort_keys=True, separators=(',', ':')).encode()).hexdigest() == reg['environment_sha256'], 'environment hash mismatch')
     for name, version in env['packages'].items():
         require(importlib.metadata.version(name) == version, 'package version mismatch: ' + name)
-        record = importlib.metadata.distribution(name).read_text('RECORD')
-        require(record is not None and hashlib.sha256(record.encode()).hexdigest() == env['package_record_sha256'][name], 'installed package RECORD differs: ' + name)
+        manifest = env['package_manifest'][name]
+        require(manifest['kind'] in ('RECORD', 'METADATA', 'PKG-INFO'), 'invalid package manifest kind')
+        content = importlib.metadata.distribution(name).read_text(manifest['kind'])
+        require(content is not None and hashlib.sha256(content.encode()).hexdigest() == manifest['sha256'], 'installed package manifest differs: ' + name)
     require({'torch', 'ultralytics', 'numpy', 'opencv-python'} <= set(env['packages']), 'missing environment pins')
+    require(env['runtime_files'] and all(any(key in path.lower() for path in env['runtime_files']) for key in ('torch', 'ultralytics', 'numpy', 'cv2')), 'concrete runtime source/extension pins required for torch/ultralytics/numpy/cv2')
+    for filename, expected in env['runtime_files'].items():
+        require(Path(filename).is_absolute() and digest(filename) == expected, 'runtime file changed')
     source_path = Path(reg['source_path']).resolve()
     require(source_path.name == 'source.npy' and 'chunk_00' in source_path.parts, 'original source000 chunk00 required')
     require(digest(source_path) == reg['source_file_sha256'], 'original source file changed')
@@ -253,6 +258,7 @@ def main():
                'access_contract': 'only source000 RGB selected prefix; fresh past-only tracker; no legacy guides/source028',
                'source_frame_interval': [38, 38 + reg['frames']], 'config': CONFIG, 'resources': bounds,
                'scope': 'model-derived guides; no independent task truth or quality claim',
+               'environment_pin_caveat': 'METADATA/PKG-INFO pins identify packaging metadata, not all installed binary contents; separately selected runtime source/extension files pinned',
                'worker_start_utc': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
                'cpu_affinity': sorted(os.sched_getaffinity(0)), 'nice': os.getpriority(os.PRIO_PROCESS, 0),
                'cuda_visible_devices': os.environ.get('CUDA_VISIBLE_DEVICES'),
