@@ -33,7 +33,7 @@
     "lossless metadata baseline and mild/boundary-preserving lossy packing",
     "GVC-RT native stream freshdecode/parity; supported-domainMTTF; GLC rateestimated separately"
   ],
-  "paper_revision": "78c857e0615523b1f8c52bcfc47101ad48f332ca",
+  "paper_revision": "48b2685",
   "external_receipts": "/Users/manu/.codex/visualizations/2026/09/30/01a0f3d8-8225-77c0-b10a-4a9fd2401c9b/packet-rate-quality/gate-a-local-20261002",
   "smoke_results": {
     "C2": {
@@ -232,6 +232,18 @@
       "id": "gpu1:audits/gate-a-trajectory-gpu1-null12-job-20261002",
       "supervisor_pid": 859197,
       "child_pid": 859206,
+      "last_observed": "complete_exit0_claims_released"
+    },
+    "opaque": {
+      "id": "gpu1:audits/gate-a-trajectory-gpu1-opaque12-job-20261002",
+      "supervisor_pid": 872348,
+      "child_pid": 872428,
+      "last_observed": "complete_exit0_claims_released"
+    },
+    "alpha": {
+      "id": "gpu1:audits/gate-a-trajectory-gpu1-alpha12-job-20261002",
+      "supervisor_pid": 883452,
+      "child_pid": 883681,
       "last_observed": "running"
     }
   },
@@ -239,5 +251,21 @@
     "actual_archive_sha256": "451c1767bfaf7e086f84d97beacd6db0195f27a6762e8f28832dec19d5d83590",
     "verification": "341 Python-only files; all339 original files byte-identical to931333e, two selected extra legacy workers; monitor files unchanged",
     "historical_record": "scale48-registration.json records an incorrect monitor_snapshot_sha256; preserved unchanged, corrected here; per-worker/source/report receipts unaffected"
-  }
+  },
+  "native_anchor_smoke_registration": {
+    "sha256": "5480a756ffaf78c540d8dfa1215c55d76d4da56c6f5b300299cdb40a8f61735f",
+    "host": "gpu1",
+    "frozen_arms": 5,
+    "frames_per_window": 2,
+    "scope": "instrument smokes only; no quality/rate comparison",
+    "resource_policy": "sequential arms on cores40-47, CPU8/48GiB/30min per arm; disjoint from foreground controls32-39, no GPU"
+  },
+  "native_anchor_smoke_jobs": {
+    "vvc_q50_qpa0": {
+      "id": "gpu1:audits/gate-a-anchor-vvc-q50-qpa0-smoke2-job-20261003",
+      "supervisor_pid": 875077,
+      "last_observed": "started"
+    }
+  },
+  "native_single_window_extension": "CLI supports an explicitly registered original window index for a narrower paired confirmation. New worker not yet staged or natively smoke-qualified. Existing two-window smoke uses its unchanged pinned0c04 worker; do not mix revisions or source counts."
 }

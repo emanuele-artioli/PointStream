@@ -49,6 +49,8 @@ def main():
     p.add_argument('--qpa', type=int, choices=[0, 1], default=0)
     p.add_argument('--width', type=int, choices=[3840, 2560, 1920, 1280], default=3840)
     p.add_argument('--access', choices=['continuous', 'segmented'], required=True)
+    p.add_argument('--scene-index', type=int, choices=[0, 1],
+                   help='Explicit single original window; omission retains both windows')
     p.add_argument('--registration', required=True)
     p.add_argument('--timeout', type=int, default=3300)
     a = p.parse_args()
@@ -66,6 +68,8 @@ def main():
     registration = json.loads(Path(a.registration).read_text())
     arm = {'codec': a.codec, 'rate_control': a.rate_control, 'rate': a.rate,
            'qpa': a.qpa, 'width': a.width, 'access': a.access, 'frames_per_scene': a.frames}
+    if a.scene_index is not None:
+        arm['source_window_index'] = a.scene_index
     if registration.get('status') != 'frozen_before_execution' or arm not in registration.get('arms', []):
         raise ValueError('arm is absent from frozen registration')
     if registration.get('worker_sha256') != digest(__file__):
@@ -103,6 +107,10 @@ def main():
             raise ValueError('original source identity mismatch')
         clips.append(arr[:a.frames])
         identities.append({'path': str(path), 'rgb_sha256': rgb_hash, 'file_sha256': digest(path)})
+    verified_identities = list(identities)
+    source_indices = [0, 1] if a.scene_index is None else [a.scene_index]
+    clips = [clips[i] for i in source_indices]
+    identities = [identities[i] for i in source_indices]
     source = np.concatenate(clips)
     ff, encoder = resolve_ffmpeg(), resolve_encoder(a.codec)
     for tool in (ff, encoder):
@@ -189,10 +197,11 @@ def main():
     result = {'arm': arm, 'complete': True, 'paper_evidence': False, 'legacy_revision': revision,
               'registration_sha256': digest(a.registration), 'worker_sha256': digest(__file__),
               'source': identities, 'source_selected_rgb_sha256': hashlib.sha256(source.data).hexdigest(),
+              'source_window_indices': source_indices, 'verified_original_sources': verified_identities,
               'stream_bytes': sum(x['bytes'] for x in streams), 'manifest_bytes': packet_manifest.stat().st_size,
               'physical_payload_bytes': sum(x['bytes'] for x in streams) + packet_manifest.stat().st_size,
               'streams': streams, 'joined': summary(0, len(source)),
-              'per_window': [summary(i*a.frames, (i+1)*a.frames) for i in range(2)],
+              'per_window': [summary(i*a.frames, (i+1)*a.frames) for i in range(len(clips))],
               'metric_frames': len(values), 'vmaf_log_sha256': digest(metric_log), 'calls': calls,
               'maxrss_kib': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
               'request': dataclasses.asdict(request),
