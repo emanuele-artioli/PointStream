@@ -464,7 +464,7 @@ def rpc(base: Path, action: str, payload: dict[str, Any]) -> Any:
         # provisional until its heartbeat and ownership match the new PID.
         with (location / f"worker-{int(time.time())}-{uuid.uuid4().hex[:8]}.log").open("w") as log:
             process = subprocess.Popen([sys.executable, "-m", "experiments.jobs.inbox", "worker", str(base), alias], stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT, start_new_session=True, cwd=Path(__file__).resolve().parents[2], env={**os.environ, "PYTHONPATH": str(Path(__file__).resolve().parents[2]), "PS_DATA_ROOT": str(base.parent.parent)})
-        deadline = time.monotonic() + 10
+        deadline = time.monotonic() + 60
         while time.monotonic() < deadline:
             if process.poll() is not None:
                 raise fleet.FleetError(f"worker {alias} exited during startup; inspect its log")
@@ -649,7 +649,7 @@ def main(argv_values: list[str] | None = None) -> int:
         command = actions.add_parser(name)
         command.add_argument("--hosts", nargs="+", choices=fleet.DEFAULT_HOSTS, default=list(fleet.DEFAULT_HOSTS))
     workers = actions.add_parser("workers")
-    workers.add_argument("operation", choices=["start"])
+    workers.add_argument("operation", choices=["start", "status"])
     workers.add_argument("--hosts", nargs="+", choices=fleet.DEFAULT_HOSTS, default=list(fleet.DEFAULT_HOSTS))
     submission = actions.add_parser("submit")
     submission.add_argument("spec", type=Path)
@@ -696,7 +696,12 @@ def main(argv_values: list[str] | None = None) -> int:
             monitor.write_json(report_path, value)
             value["local_report"] = str(report_path)
         elif args.action == "workers":
-            value = workers_start(args, root)
+            if args.operation == "status":
+                config = load_config(args.state_dir)
+                value = remote_rpc(config, "health", {"hosts": config["hosts"]})
+                value["fresh"] = {alias: bool(heartbeat and time.time() - heartbeat["updated"] <= 3 * POLL_SECONDS) for alias, heartbeat in value["workers"].items()}
+            else:
+                value = workers_start(args, root)
         elif args.action == "submit":
             value = submit(args, root)
         elif args.action == "selftest":
