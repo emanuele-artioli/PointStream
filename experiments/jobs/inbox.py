@@ -9,6 +9,7 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 import hashlib
+import fcntl
 import json
 import math
 import os
@@ -291,6 +292,16 @@ def worker_tick(base: Path, alias: str) -> None:
 
 
 def worker(base: Path, alias: str) -> int:
+    location = base / "workers" / alias
+    location.mkdir(parents=True, exist_ok=True)
+    # Serialize bootstrap/recovery as well as the full worker lifetime. Two
+    # starters must never both reclaim the same verified-dead worker slot.
+    with (location / "worker.lock").open("a") as lease:
+        fcntl.flock(lease, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return worker_loop(base, alias)
+
+
+def worker_loop(base: Path, alias: str) -> int:
     location = base / "workers" / alias
     location.mkdir(parents=True, exist_ok=True)
     lock = location / "active"
