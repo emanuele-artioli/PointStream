@@ -60,10 +60,16 @@ class HandPix2PixUNet(nn.Module):
         self.up4 = UNetUp(512, 128)
         self.up5 = UNetUp(256, 64)
 
-        self.final = nn.Sequential(
-            nn.ConvTranspose2d(128, out_channels, 4, stride=2, padding=1),
-            nn.Tanh(),
-        )
+        self.out_channels = out_channels
+        if out_channels == 4:
+            # Four-channel smoke head: RGB uses tanh, alpha uses sigmoid.
+            # The legacy three-channel module keeps its original state-dict keys.
+            self.final_raw = nn.ConvTranspose2d(128, out_channels, 4, stride=2, padding=1)
+        else:
+            self.final = nn.Sequential(
+                nn.ConvTranspose2d(128, out_channels, 4, stride=2, padding=1),
+                nn.Tanh(),
+            )
 
     def forward(self, appearance_and_pose: torch.Tensor) -> torch.Tensor:
         # appearance_and_pose: [B, 6, H, W] in range [-1, 1]
@@ -80,6 +86,9 @@ class HandPix2PixUNet(nn.Module):
         u4 = self.up4(u3, d2)
         u5 = self.up5(u4, d1)
 
+        if self.out_channels == 4:
+            raw = self.final_raw(u5)
+            return torch.cat((torch.tanh(raw[:, :3]), torch.sigmoid(raw[:, 3:4])), dim=1)
         return self.final(u5)
 
 
@@ -240,5 +249,4 @@ class HandSPADEUNet(nn.Module):
             alpha = torch.sigmoid(raw[:, 3:4])
             return torch.cat((rgb, alpha), dim=1)
         return raw
-
 

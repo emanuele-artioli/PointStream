@@ -57,6 +57,52 @@ def hand_step_loss(
     return smooth_max([loss_app, loss_matte]), loss_app, loss_matte
 
 
+def smoke_hand_objective(
+    outputs: torch.Tensor,
+    source_rgb: torch.Tensor,
+    target_alpha: torch.Tensor,
+) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+    """Diagnostic RGB+alpha objective with explicit black compositing.
+
+    RGB and source_rgb are RGB tensors normalized to [-1, 1]. Output alpha
+    and target_alpha are in [0, 1]. ``source_rgb`` must be the original
+    unmatted crop; applying target alpha to a black-matted target a second
+    time changes the reference.
+    """
+    if outputs.ndim != 4 or outputs.shape[1] != 4:
+        raise ValueError("outputs must have shape [B,4,H,W] (RGB plus alpha)")
+    if source_rgb.shape != outputs[:, :3].shape:
+        raise ValueError("source_rgb must match the output RGB shape")
+    if target_alpha.shape != outputs[:, 3:4].shape:
+        raise ValueError("target_alpha must have shape [B,1,H,W]")
+    if not torch.isfinite(outputs).all() or not torch.isfinite(source_rgb).all() or not torch.isfinite(target_alpha).all():
+        raise ValueError("objective inputs must be finite")
+    if bool(((target_alpha < 0) | (target_alpha > 1)).any()):
+        raise ValueError("target_alpha must be in [0,1]")
+    if bool(((source_rgb < -1) | (source_rgb > 1)).any()) or bool(((outputs[:, :3] < -1) | (outputs[:, :3] > 1)).any()):
+        raise ValueError("source and predicted RGB must be in [-1,1]")
+    if bool(((outputs[:, 3:4] < 0) | (outputs[:, 3:4] > 1)).any()):
+        raise ValueError("predicted alpha must be in [0,1]")
+
+    pred_rgb, pred_alpha = outputs[:, :3], outputs[:, 3:4]
+    alpha_weight = target_alpha.expand_as(pred_rgb)
+    alpha_mass = target_alpha.sum()
+    masked_denom = torch.where(alpha_mass > 0, 3.0 * alpha_mass, torch.ones_like(alpha_mass))
+    masked_rgb = ((pred_rgb - source_rgb).abs() * alpha_weight).sum() / masked_denom
+
+    foreground = target_alpha >= 0.5
+    background = ~foreground
+    alpha_error = (pred_alpha - target_alpha).abs()
+    region_errors = [alpha_error[region].mean() for region in (foreground, background) if bool(region.any())]
+    balanced_alpha = torch.stack(region_errors).mean() if region_errors else alpha_error.sum() * 0.0
+
+    pred_composite = pred_alpha * pred_rgb + (1.0 - pred_alpha) * -1.0
+    target_composite = target_alpha * source_rgb + (1.0 - target_alpha) * -1.0
+    composite = (pred_composite - target_composite).abs().mean()
+    parts = {"masked_rgb_mae": masked_rgb, "balanced_alpha_mae": balanced_alpha, "composite_mae": composite}
+    return sum(parts.values()), parts
+
+
 def selection_min(
     current: dict[str, float],
     baseline: dict[str, float],
