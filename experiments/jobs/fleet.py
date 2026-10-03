@@ -713,7 +713,7 @@ def main(argv: list[str] | None = None) -> int:
     """Compatibility module entry point; all submissions use the smoke gate."""
     from experiments.jobs.inbox import main as inbox_main
 
-    return inbox_main(argv)
+    return inbox_main(argv, public_only=True)
 
 
 if __name__ == "__main__":
