@@ -333,3 +333,66 @@ def test_frozen_source_cannot_reference_external_code(tmp_path):
     (source / "link.py").symlink_to("../external.py")
     with pytest.raises(fleet.FleetError, match="escapes"):
         inbox.source_identity(source)
+
+
+def test_worker_reaps_only_its_own_completed_children(tmp_path, monkeypatch):
+    responses = iter([(1234, 0), (0, 0)])
+    calls = []
+    def waitpid(pid, options):
+        calls.append((pid, options))
+        return next(responses)
+    monkeypatch.setattr(inbox.os, "waitpid", waitpid)
+    inbox.worker_tick(tmp_path / "jobs" / "fleet", "gpu1")
+    assert calls == [(-1, inbox.os.WNOHANG), (-1, inbox.os.WNOHANG)]
+
+
+def test_admission_rejection_is_pending_for_monitors(tmp_path):
+    base = tmp_path / "jobs" / "fleet"
+    name = "20261003T000000Z-12345678"
+    directory = base / "inbox" / name
+    monitor.write_json(directory / "ready.json", {})
+    inbox.transition(directory, "running")
+    monitor.write_json(directory / "run" / "status.json", {"status": "failed", "admission_rejected": True, "error": "CPU busy"})
+    state = inbox.rpc(base, "status", {"job_id": name})
+    assert state["status"] == "pending"
+    assert state["admission_reason"] == "CPU busy"
+
+
+def test_claimed_request_preparation_is_visible(tmp_path):
+    base = tmp_path / "jobs" / "fleet"
+    name = "20261003T000000Z-12345678"
+    directory = base / "inbox" / name
+    monitor.write_json(directory / "ready.json", {})
+    inbox.transition(directory, "pending")
+    assert inbox.rpc(base, "status", {"job_id": name})["status"] == "pending"
+    inbox.acquire_request(directory, "gpu1")
+    state = inbox.rpc(base, "status", {"job_id": name})
+    assert state["status"] == "preparing"
+    assert state["execution_owner"]["alias"] == "gpu1"
+
+
+@pytest.mark.parametrize("process_state,expected", [("Z", False), ("X", False), ("S", True)])
+def test_zombie_supervisors_are_verified_dead(monkeypatch, process_state, expected):
+    from experiments.jobs import claims
+    monkeypatch.setattr(claims.os, "kill", lambda *a: None)
+    monkeypatch.setattr(Path, "read_text", lambda *a, **kw: f"123 (worker with spaces) {process_state} 1 2 3")
+    assert claims.is_pid_alive(123) is expected
+
+
+def test_worker_bundle_keeps_manager_dependency_closure(tmp_path):
+    import io
+    import tarfile
+    archive = tmp_path / "source.tar"
+    names = ["experiments/__init__.py", "experiments/jobs/inbox.py", "src/__init__.py", "src/contracts/paths.py", "experiments/unrelated.py"]
+    with tarfile.open(archive, "w") as tar:
+        for name in names:
+            info = tarfile.TarInfo(name)
+            info.size = 4
+            tar.addfile(info, io.BytesIO(b"code"))
+    bundle, identities = inbox.worker_bundle(archive)
+    try:
+        with tarfile.open(bundle) as tar:
+            assert tar.getnames() == names[:-1]
+        assert set(identities) == set(names[:-1])
+    finally:
+        bundle.unlink()

@@ -18,6 +18,8 @@ import socket
 import subprocess
 import sys
 import time
+import tarfile
+import tempfile
 from typing import Any
 import uuid
 
@@ -245,6 +247,14 @@ def start_request(directory: Path, spec: dict[str, Any], gpu: dict[str, Any], ho
 
 
 def worker_tick(base: Path, alias: str) -> None:
+    # Reap only our own completed supervisors before checking their liveness.
+    while True:
+        try:
+            reaped, _ = os.waitpid(-1, os.WNOHANG)
+        except ChildProcessError:
+            break
+        if reaped == 0:
+            break
     worker = base / "workers" / alias
     monitor.write_json(worker / "heartbeat.json", {"pid": os.getpid(), "proc_start_time": get_process_start_time(os.getpid()), "updated": time.time(), "alias": alias})
     directories = sorted((base / "inbox").glob("*"))
@@ -442,6 +452,10 @@ def rpc(base: Path, action: str, payload: dict[str, Any]) -> Any:
             remote = monitor.read_json(directory / "run" / "status.json", {})
             if remote.get("status"):
                 state = {**state, "status": remote["status"], "remote_status": remote}
+                if remote.get("admission_rejected") and not remote.get("pid"):
+                    state.update(status="pending", admission_reason=remote.get("error"))
+            if state.get("status") == "pending" and (directory / "owner").exists() and not remote:
+                state.update(status="preparing", execution_owner=monitor.read_json(directory / "owner" / "identity.json", {}))
             if action == "cancel":
                 if state.get("status") not in TERMINAL:
                     request = {"requested_at": time.time(), "request_id": uuid.uuid4().hex}
@@ -535,6 +549,54 @@ def doctor(hosts: list[str]) -> dict[str, Any]:
     return report
 
 
+def worker_bundle(snapshot: Path) -> tuple[Path, dict[str, str]]:
+    """Freeze the manager's dependency closure, without unrelated experiment files."""
+    def included(name: str) -> bool:
+        return name in {"src/__init__.py", "experiments/__init__.py"} or name.startswith(("src/contracts/", "experiments/jobs/"))
+    with tempfile.NamedTemporaryFile(prefix="pointstream-worker-", suffix=".tar", delete=False) as temporary:
+        bundle = Path(temporary.name)
+    identities = {}
+    try:
+        with tarfile.open(snapshot) as original, tarfile.open(bundle, "w") as target:
+            for member in original:
+                if included(member.name):
+                    data = original.extractfile(member) if member.isfile() else None
+                    target.addfile(member, data)
+                    if data is not None:
+                        data.close()
+                        content = original.extractfile(member)
+                        identities[member.name] = hashlib.sha256(content.read()).hexdigest()
+                        content.close()
+        return bundle, identities
+    except Exception:
+        bundle.unlink(missing_ok=True)
+        raise
+
+
+def stop_worker(config: dict[str, Any], alias: str) -> Any:
+    """Replace only a verified fleet worker, preserving detached supervisors."""
+    script = """import json,pathlib,os,signal,socket,time,sys
+sys.path.insert(0, RELEASE)
+from experiments.jobs.claims import is_pid_alive
+location=pathlib.Path(BASE)/'workers'/ALIAS
+path=location/'active'/'identity.json'
+if not path.exists(): print('{}'); raise SystemExit(0)
+identity=json.loads(path.read_text()); pid=identity.get('pid'); start=identity.get('proc_start_time')
+if identity.get('host')!=socket.getfqdn().lower() or not pid or start is None: raise SystemExit('unresolved worker ownership; no signal sent')
+if not is_pid_alive(pid,start): print('{}'); raise SystemExit(0)
+command=pathlib.Path('/proc')/str(pid)/'cmdline'
+args=command.read_bytes().split(bytes([0]))
+expected=[b'-m',b'experiments.jobs.inbox',b'worker',BASE.encode(),ALIAS.encode()]
+if args[1:6]!=expected: raise SystemExit('worker process identity differs; no signal sent')
+os.kill(pid,signal.SIGTERM)
+deadline=time.monotonic()+30
+while is_pid_alive(pid,start) and time.monotonic()<deadline: time.sleep(.1)
+if is_pid_alive(pid,start): raise SystemExit('worker did not stop; inspect before retrying')
+print(json.dumps({'stopped_worker_pid':pid}))
+""".replace("RELEASE", repr(config["release"])).replace("BASE", repr(config["base"])).replace("ALIAS", repr(alias))
+    return fleet._remote_json(alias, config["pythons"][alias], script, timeout=60)
+
+
 def workers_start(args: argparse.Namespace, root: Path) -> dict[str, Any]:
     report = doctor(args.hosts)
     if not report["passed"]:
@@ -544,6 +606,11 @@ def workers_start(args: argparse.Namespace, root: Path) -> dict[str, Any]:
     first = report["probes"][0]
     config = {"schema": SCHEMA, "hosts": args.hosts, "base": report["base"], "release": release, "pythons": {h["alias"]: h["python"] for h in report["probes"]}, "doctor": report["evidence_path"]}
     snapshot, sha, metadata = fleet._build_snapshot(root, include_changes=tuple(args.include_change), include_untracked=tuple(args.include_untracked))
+    original_snapshot = snapshot
+    snapshot, identities = worker_bundle(original_snapshot)
+    original_snapshot.unlink(missing_ok=True)
+    sha = file_digest(snapshot)
+    metadata.update(worker_bundle_sha256=sha, worker_files_sha256=identities)
     try:
         fleet._remote_json(first["alias"], first["python"], "import pathlib; pathlib.Path(" + repr(release) + ").mkdir(parents=True,exist_ok=False); print('{}')")
         fleet._send_snapshot(first["alias"], snapshot, release, sha)
@@ -556,6 +623,8 @@ def workers_start(args: argparse.Namespace, root: Path) -> dict[str, Any]:
     monitor.write_json(args.state_dir / "inbox.json", config)
     started = []
     for alias in args.hosts:
+        if args.operation == "restart":
+            stop_worker(config, alias)
         started.append(remote_rpc(config, "worker_start", {"alias": alias}, alias=alias))
     return {"config": config, "workers": started, "snapshot": metadata}
 
@@ -601,7 +670,11 @@ def remote_job(args: argparse.Namespace) -> Any:
             if args.action == "events":
                 raise fleet.FleetError("legacy job events are in the recorded remote run directory")
             return fleet.cancel_job(args.job_id, args.state_dir) if args.action == "cancel" else fleet.status_job(args.job_id, args.state_dir)
-        result = remote_rpc(record["config"], args.action, {"job_id": args.job_id})
+        # Preserve the original execution config as provenance, but use the
+        # current compatible management release for this same shared inbox.
+        current = monitor.read_json(args.state_dir / "inbox.json", {})
+        management = current if current.get("base") == record["config"].get("base") and current.get("hosts") else record["config"]
+        result = remote_rpc(management, args.action, {"job_id": args.job_id})
         if args.action == "events":
             # Acknowledge only after the consumer actually reports the event.
             seen = monitor.read_json(args.state_dir / "event-acks.json", {})
@@ -658,7 +731,7 @@ def main(argv_values: list[str] | None = None) -> int:
         command = actions.add_parser(name)
         command.add_argument("--hosts", nargs="+", choices=fleet.DEFAULT_HOSTS, default=list(fleet.DEFAULT_HOSTS))
     workers = actions.add_parser("workers")
-    workers.add_argument("operation", choices=["start", "status"])
+    workers.add_argument("operation", choices=["start", "status", "restart"])
     workers.add_argument("--hosts", nargs="+", choices=fleet.DEFAULT_HOSTS, default=list(fleet.DEFAULT_HOSTS))
     submission = actions.add_parser("submit")
     submission.add_argument("spec", type=Path)

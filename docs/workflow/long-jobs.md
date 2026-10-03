@@ -12,6 +12,7 @@ Inputs, snapshots, logs, validation and results live under the external data roo
 scripts/ps-fleet doctor
 scripts/ps-fleet workers start
 scripts/ps-fleet workers status
+scripts/ps-fleet workers restart          # upgrade verified workers; preserve supervisors
 scripts/ps-fleet inspect
 scripts/ps-fleet selftest                 # bounded, non-citable CUDA campaign
 scripts/ps-fleet submit /absolute/path/job.json
@@ -25,8 +26,11 @@ The default hosts are gpu1–gpu6. `doctor` verifies each host's environment,
 cross-host visibility of a fresh token, and exactly one winner of concurrent
 atomic mkdir. It retains its report under `jobs/fleet/checks`; worker startup is
 blocked when these checks fail. `workers start` installs a HEAD snapshot once on
-the shared filesystem and starts a detached worker per host. Existing live workers
-are reused, not replaced. Workers poll once a minute, admit oldest eligible jobs,
+the shared filesystem and starts a detached worker per host. Worker releases
+contain only the manager and its contract dependencies; workload snapshots retain
+the full selected source revision. Existing live workers
+are reused, not replaced. Use `workers restart` to install a new frozen release
+and replace only verified worker processes; detached supervisors continue. Workers poll once a minute, admit oldest eligible jobs,
 and claim both the request and its GPU/CPU resources. A request remains pending
 while compatible capacity is busy, until its absolute deadline.
 
