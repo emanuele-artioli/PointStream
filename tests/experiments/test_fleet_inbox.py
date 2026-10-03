@@ -308,3 +308,28 @@ def test_campaign_budget_includes_supervisor_startup(campaign):
     monitor.write_json(campaign / "run" / "request.json", {"budget_seconds": 101})
     assert inbox.campaign(campaign) == 1
     assert not (campaign / "smoke").exists()
+
+
+def test_fingerprint_remains_compatible_with_published_snapshots(tmp_path):
+    import hashlib
+    (tmp_path / "a").mkdir()
+    (tmp_path / "a" / "x.py").write_bytes(b"X")
+    (tmp_path / "a.py").write_bytes(b"Y")
+    (tmp_path / "__pycache__").mkdir()
+    (tmp_path / "__pycache__" / "ignored.pyc").write_bytes(b"cache")
+    (tmp_path / "link.py").symlink_to("a/x.py")
+    expected = inbox.digest([
+        ["a/x.py", hashlib.sha256(b"X").hexdigest()],
+        ["a.py", hashlib.sha256(b"Y").hexdigest()],
+        ["link.py", "symlink", "a/x.py"],
+    ])
+    assert inbox.source_identity(tmp_path) == expected
+
+
+def test_frozen_source_cannot_reference_external_code(tmp_path):
+    source = tmp_path / "source"
+    source.mkdir()
+    (tmp_path / "external.py").write_text("external code")
+    (source / "link.py").symlink_to("../external.py")
+    with pytest.raises(fleet.FleetError, match="escapes"):
+        inbox.source_identity(source)
