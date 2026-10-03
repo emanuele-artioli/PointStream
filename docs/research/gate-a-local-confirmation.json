@@ -448,11 +448,11 @@
     },
     "vvc-q50-qpa1": {
       "id": "gpu1:audits/gate-a-single-window-vvc-q50-qpa1-scale48-job-20261003",
-      "last_observed": "running"
+      "last_observed": "complete_exit0_claims_released"
     },
     "av1-crf59-1080": {
       "id": "gpu1:audits/gate-a-single-window-av1-crf59-1080-scale48-job-20261003",
-      "last_observed": "not_started"
+      "last_observed": "complete_exit0_claims_released"
     }
   },
   "retained_receiver_diagnostic": {
@@ -462,7 +462,7 @@
     "job": "gpu1:audits/gate-a-retained-score-C2-f12-job-20261003",
     "last_observed": "running"
   },
-  "paper_commit": "ae3eb1a",
+  "paper_commit": "bcd35f4",
   "encoder_access_qualification": {
     "status": "matched_access_comparison_on_hold",
     "finding": "Retained scene000 backgroundpixels use selectedsource000 frames, but canonical canvas geometry uses source000+source028 before firstplate. Nativeone-windowanchorhasnarrowerencoderaccess. Completebytechargingdoesnotfixthis.",
@@ -487,7 +487,268 @@
         ]
       }
     },
-    "disposition": "Retain completed/running renderer and scorer outputs as unequal-contextdiagnostics. Do not promote source000-onlynative96anchors into matchedcomparison. C3v2null12passed; subsequentreused-contextC3rendererarms onholdbeforeadmission. Newsource000-onlysender workerbeingprepared; alsoauditcachedcropaccess. Native48preflightsremainvalidinstruments.",
+    "disposition": "Existing inherited-context results verified asdiagnostics. Source000-onlysender2smoke runningwithactualreferencecutouts; cachedguide scopeunresolved. FreshsourceonlyYOLO guidecollector beingimplemented/pinned. Native96 baselinesstandalone, comparisonclaimsheld. Reused-contextC3rendererexpansion remainsheld.",
     "no_algorithmic_inference": true
+  },
+  "source000_registration": {
+    "sha256": "ca7f2bfc3b2cc6e541bf11b4856bbccc1a4db9b68208dcca8072edd785dadc74",
+    "artifact": "gpu1:/var/tmp/emanuele-gate-a-source000-sender-20261003/source000-reference-cutout-registration.json",
+    "policy": "selected-source RGB appearance/background; conditional cachedguide preprocessing remains unresolved",
+    "first_job": "gpu1:audits/gate-a-source000-reference-cutout-C2-f2-job-20261003",
+    "first_status": "running_no_replay"
+  },
+  "full96_trajectory_scores": {
+    "analysis_artifact": "receiver-score-full96-independent-verification-v2.json",
+    "analysis_sha256": "cfd750eb2d573ba9680627213a55179291dee3a0f4d670567d3a64f6324a9d45",
+    "passed": true,
+    "source_file_sha256": "027704f6ba70b70b254de58d66c1d346f0a034ec5657347a7feb03d2759626f3",
+    "source_full96_rgb_sha256": "09fbaee1f343b6046718853ef82b8b257c3bb8a9bbff8c52c23c368aeedce573",
+    "scope": "All3 retained C2 static-reference trajectory full96 development scores: saved outputs/logs and equal96-frame pooling independently verified; no quality rerun. Original scene00 background canonical canvas was conditioned on source028 as well, so encoder context differs from source000-only native anchors; no matched-access superiority, original192frame recertification, motion/task fidelity or generalization assertion. Reported physical bytes include complete new trajectory NPZ+manifest, not historical incomplete parent envelope; historical packet-only bytes are a distinct quantity.",
+    "results": [
+      {
+        "label": "null",
+        "report_sha256": "6f5fe09b0c2054b90923c33153c06ca3eb17507e07ba42f9774dabd58ec394eb",
+        "status_sha256": "863e1117f38ccea3fa5b8fc864a163e566a2598d0c4f0d3e7c9eda1a6554d891",
+        "registration_sha256": "679acab564c124be5aa58a6bfbc44f260a584a5593e59b01aec6e731b40e1599",
+        "upstream_report_sha256": "6ac50bc76a3bc6ffefaf5a68cadf94f3722d98df262c104efead986fbd9acf9e",
+        "package_sha256": "552789351b13f26a1bb3c97dc64952c87c96e4bf4d501f3e54e83d79a9a290e5",
+        "decoded_rgb_sha256": "bf662052fd05ef5752203afecf9fc8f53e898cfac2c1cac969f61befb5287ce8",
+        "package_bytes": 26792,
+        "manifest_bytes": 44,
+        "physical_payload_bytes": 26836,
+        "joined": {
+          "vmaf": 59.663791364583325,
+          "mse_y": 55.502622979560506,
+          "psnr_y": 30.68766853085205,
+          "ssim": 0.9435944461489028
+        },
+        "frames": 96,
+        "seconds": 581.0601144660031,
+        "self_peak_rss_kib": 5453044,
+        "child_peak_rss_kib": 5453044,
+        "affinity": [
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39
+        ],
+        "vmaf_log_sha256": "ed9d69c7af8a1028b64f5a0086736daff94ca00cc65dc8bbb4977c9bfbe51348"
+      },
+      {
+        "label": "opaque",
+        "report_sha256": "6be072381a7bdbd7714be62b227970923cc1623aa4506f60a1468556aa6433c7",
+        "status_sha256": "66ccac350f35307d6bc4b5eda44258c235a2a1ef0e5326463307e6e8272235dd",
+        "registration_sha256": "679acab564c124be5aa58a6bfbc44f260a584a5593e59b01aec6e731b40e1599",
+        "upstream_report_sha256": "93201a486f5349d96e6a4d06a4ef96b653f2b3d2e0be3a0f7be6c5c938a73fb9",
+        "package_sha256": "45ea93357caf507e9543a52959016dd0f4fde4f8cace4fc0407ccc63ffa426c5",
+        "decoded_rgb_sha256": "47eda22b9b06295cd5676560601e0eddf3a7a74587c907e9e28a1e9288c7725c",
+        "package_bytes": 35355,
+        "manifest_bytes": 44,
+        "physical_payload_bytes": 35399,
+        "joined": {
+          "vmaf": 59.227170854166665,
+          "mse_y": 67.93684876618562,
+          "psnr_y": 29.809749625081214,
+          "ssim": 0.9408953355485717
+        },
+        "frames": 96,
+        "seconds": 673.377583540976,
+        "self_peak_rss_kib": 5450504,
+        "child_peak_rss_kib": 5450504,
+        "affinity": [
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55
+        ],
+        "vmaf_log_sha256": "b2ad55aa491632da3b26e2258b217101af4e3eb78753d308eea31eca53145d67"
+      },
+      {
+        "label": "alpha",
+        "report_sha256": "95c14935538a9bb993be3d8d16b69e7e3829d2c053c371dc25562991d777896f",
+        "status_sha256": "6260029ec02edbd3c3c0f9616a8a44e7d91b3dc1e8bb44a994c203693f6e4c08",
+        "registration_sha256": "679acab564c124be5aa58a6bfbc44f260a584a5593e59b01aec6e731b40e1599",
+        "upstream_report_sha256": "16b1bf840144e43800387571f65d9d8a0aafdea4823c656e2ff0a0c025d1f9c1",
+        "package_sha256": "20cfdda9bd4c0a6172701e0fec390b719416cdbd8b355d881c048931d15edd00",
+        "decoded_rgb_sha256": "b950e8657524abe14aed7e0fb29a3665a4a88f47010646737e0358a4892a8bef",
+        "package_bytes": 37595,
+        "manifest_bytes": 44,
+        "physical_payload_bytes": 37639,
+        "joined": {
+          "vmaf": 59.63613272916666,
+          "mse_y": 60.523961035960006,
+          "psnr_y": 30.3115301785901,
+          "ssim": 0.9421017482772999
+        },
+        "frames": 96,
+        "seconds": 617.7189785840455,
+        "self_peak_rss_kib": 5452904,
+        "child_peak_rss_kib": 5452904,
+        "affinity": [
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63
+        ],
+        "vmaf_log_sha256": "3d4342d9156d09c0602b6e8a3d803e9f6ef641fbfe5aa1e4667f14ed41b0b1e3"
+      }
+    ],
+    "verification_seconds": 155.79847758205142
+  },
+  "retained96_diagnostic_scores": {
+    "analysis_artifact": "retained-full96-independent-verification-v1.json",
+    "analysis_sha256": "fb43c45b2b2330209dd6aa87a6177034e0cd7f286c38717e35fe80845aa27ddc",
+    "passed": true,
+    "source_file_sha256": "027704f6ba70b70b254de58d66c1d346f0a034ec5657347a7feb03d2759626f3",
+    "source_full96_rgb_sha256": "09fbaee1f343b6046718853ef82b8b257c3bb8a9bbff8c52c23c368aeedce573",
+    "scope": "Retrospective diagnostic of retained original scene00 only: all96 saved log frames, pooled metrics and fixed package/decoded/receipt/source/status/resource joins verified without quality recomputation. Parent192frame/two-window runs remain incomplete. Historical complete envelope bytes unknown; package-only bytes cannot become a complete RD point. Metrics explicitly builtinVMAF0.6.1 now; historical model compatibility unasserted. Canonical canvas had source028 conditioning, unlike source000-only native anchors. Observed audit denial is not native OS isolation proof.",
+    "results": [
+      {
+        "rung": "C2",
+        "report_sha256": "48ceedadcd642caa0e3f23b26472c19c060e61d7678c943418502737550398a8",
+        "status_sha256": "949dcdd28b68bc965865de65d6b767f16029f365734dd9da9ec5c780dc2084ac",
+        "registration_sha256": "55746bb2013fabd1ff97a37460759d13b59851d0b4d38c2a7b5463a52520ca7c",
+        "package_sha256": "d937c0b78302b63ae4e4d878dd00de0355dbdce4c4e63ce6acdb81badfaae282",
+        "decoded_rgb_sha256": "7f61e8f63d273035b3e1a9709e4d09e1158f34a858ee5c5d57c3fa547888016f",
+        "historical_package_bytes": 51931,
+        "historical_complete_envelope_bytes": null,
+        "parent_two_window_run_complete": false,
+        "frames": 96,
+        "joined": {
+          "vmaf": 59.690385281249995,
+          "mse_y": 55.31441278151524,
+          "psnr_y": 30.70242054591543,
+          "ssim": 0.943632000286109
+        },
+        "seconds": 592.2508888149168,
+        "self_peak_rss_kib": 5452252,
+        "child_peak_rss_kib": 5452252,
+        "vmaf_log_sha256": "341c1907a3842091ac8f2a43fded4658ea24dca41ebe122815dfc4ecdc944ff2"
+      },
+      {
+        "rung": "C3",
+        "report_sha256": "d22250aafb89c763b455b1abae80e680b3cb779d2966b4f6da013e08d0d4c5bf",
+        "status_sha256": "18a2e2fed71c505c7ef7463ebc0eeba8005fc836ffcbd63038467f998db798de",
+        "registration_sha256": "55746bb2013fabd1ff97a37460759d13b59851d0b4d38c2a7b5463a52520ca7c",
+        "package_sha256": "cec02d1a90c4b12c4b732bfe151113ffc041072ab7129cdc2bf93fcdbc0a20f4",
+        "decoded_rgb_sha256": "8db70e4c05524a6f90229c80b0c7b39484886968a62ed0d842a86b447559e98b",
+        "historical_package_bytes": 67521,
+        "historical_complete_envelope_bytes": null,
+        "parent_two_window_run_complete": false,
+        "frames": 96,
+        "joined": {
+          "vmaf": 73.061880625,
+          "mse_y": 35.93545088151845,
+          "psnr_y": 32.57557262555149,
+          "ssim": 0.964558162237406
+        },
+        "seconds": 658.1596318959491,
+        "self_peak_rss_kib": 5453292,
+        "child_peak_rss_kib": 5453292,
+        "vmaf_log_sha256": "b3add24a51b007dd62ddaa236762a49e7586bf82095ebc33ca47830d47046fad"
+      }
+    ],
+    "verification_seconds": 212.93496802507434
+  },
+  "native48_scale_qualification": {
+    "analysis_artifact": "native-scale48-independent-verification-v1.json",
+    "analysis_sha256": "c595908ffa115e7493a3df5a69316cd36931d73142ed2d319d85239dfb161eab",
+    "passed": true,
+    "scope": "Three frozen 48-frame CPU timing pilots only; prefix context differs from full96/window. No RD gain or generalization. Exact saved bitstream/rawRGB/physical/source/raster/metric/framecount joins independently checked; no OS decoder file-access sandbox asserted.",
+    "results": [
+      {
+        "label": "vvc-q50-qpa0",
+        "arm": {
+          "codec": "vvc",
+          "rate_control": "qp",
+          "rate": 50,
+          "qpa": 0,
+          "width": 3840,
+          "access": "continuous",
+          "frames_per_scene": 48,
+          "source_window_index": 0
+        },
+        "report_sha256": "42a17498d75810e988c5eba68adf23d6029ac274ac57606de9a8d3b58d6e1e8b",
+        "physical_payload_bytes": 33925,
+        "metric_frames": 48,
+        "call_seconds": {
+          "part-00-rgb-to-yuv": 5.375821608002298,
+          "part-00-encode": 95.7303520119749,
+          "part-00-fresh-native-decode": 8.008850998012349,
+          "part-00-upscale-rgb-conversion": 12.779234851943329,
+          "vmaf": 4.772333926986903
+        },
+        "maxrss_kib": 8951252,
+        "source_selected_rgb_sha256": "388665774c91f980c3bf0e329d6f4e3bd7123398e99e9192854540723cc60fd6"
+      },
+      {
+        "label": "vvc-q50-qpa1",
+        "arm": {
+          "codec": "vvc",
+          "rate_control": "qp",
+          "rate": 50,
+          "qpa": 1,
+          "width": 3840,
+          "access": "continuous",
+          "frames_per_scene": 48,
+          "source_window_index": 0
+        },
+        "report_sha256": "0df0e8ca3a5458157160483d4cd8b3c2900e6b1760c3c592f1b336f5ae0ddc48",
+        "physical_payload_bytes": 48944,
+        "metric_frames": 48,
+        "call_seconds": {
+          "part-00-rgb-to-yuv": 8.06336641695816,
+          "part-00-encode": 120.28094449092168,
+          "part-00-fresh-native-decode": 9.039976184023544,
+          "part-00-upscale-rgb-conversion": 12.49534429598134,
+          "vmaf": 4.041692050988786
+        },
+        "maxrss_kib": 8951528,
+        "source_selected_rgb_sha256": "388665774c91f980c3bf0e329d6f4e3bd7123398e99e9192854540723cc60fd6"
+      },
+      {
+        "label": "av1-crf59-1080",
+        "arm": {
+          "codec": "av1",
+          "rate_control": "crf",
+          "rate": 59,
+          "qpa": 0,
+          "width": 1920,
+          "access": "continuous",
+          "frames_per_scene": 48,
+          "source_window_index": 0
+        },
+        "report_sha256": "5a351ac9a27bc2b33e71e007731fc332f39aae22e24b8c58681230fb960d718f",
+        "physical_payload_bytes": 74513,
+        "metric_frames": 48,
+        "call_seconds": {
+          "part-00-rgb-to-yuv": 5.089084335952066,
+          "part-00-downscale": 5.321566559956409,
+          "part-00-encode": 48.47727402404416,
+          "part-00-fresh-native-decode": 2.660441978019662,
+          "part-00-upscale-rgb-conversion": 17.293707400909625,
+          "vmaf": 4.040647780057043
+        },
+        "maxrss_kib": 8950600,
+        "source_selected_rgb_sha256": "388665774c91f980c3bf0e329d6f4e3bd7123398e99e9192854540723cc60fd6"
+      }
+    ]
+  },
+  "native96_standalone_baseline": {
+    "first_job": "gpu1:audits/gate-a-single-window-vvc-q50-qpa0-full96-job-20261003",
+    "status": "running",
+    "basis": "Allthree native48 independentlyverified; unchangedworker/settings; firstofthreefrozenarms launched baselineonly, no matchedaccess superiority. All resultsretained."
   }
 }
