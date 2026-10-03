@@ -88,7 +88,9 @@ def build_clip(source, objects, *, expected_shape=(96, 2160, 3840, 3)):
     union = np.zeros(source.shape[:3], dtype=bool)
     appearances = []
     for item in objects:
-        require(item.object_class == 'player' and item.object_id in ('player_far','player_near'), 'explicit fresh production player roles required')
+        # Player class is validated in the immutable guide receipt, not an
+        # unsupported field on clean274 ObjectRequest. Role IDs survive adaptation.
+        require(item.object_id in ('player_far','player_near'), 'explicit fresh production player roles required')
         require(item.mask.dtype == np.bool_ and item.mask.shape == source.shape[:3], 'full96 bool mask alignment required')
         frame = int(item.frame_index)
         require(frame == item.frame_index and 0 <= frame < source.shape[0], 'appearance frame outside source')
@@ -136,7 +138,7 @@ def load_fresh_guides(guide_root, reg, source_path):
         require(row['mask_file'] in receipt['artifact_sha256'] and row['appearance_file'] in receipt['artifact_sha256'], 'unhashed object artifact')
         objects.append(ObjectRequest(object_id=row['object_id'], frame_index=row['frame_index'], bbox=tuple(row['bbox']),
             mask=np.load(guide_root / row['mask_file'], mmap_mode='r', allow_pickle=False),
-            appearance=np.load(guide_root / row['appearance_file'], allow_pickle=False), object_class='player'))
+            appearance=np.load(guide_root / row['appearance_file'], allow_pickle=False)))
     source = np.load(source_path, mmap_mode='r', allow_pickle=False)
     require(all(row['rgb_sha256'] == rgb_digest(source[i:i+1]) for i,row in enumerate(records)), 'perframe guide RGB input identity differs')
     return tuple(objects), receipt, collector
