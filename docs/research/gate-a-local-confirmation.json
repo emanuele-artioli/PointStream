@@ -2030,5 +2030,72 @@
     "tests": "12focusedadaptertests/all33selectedtestsPASS",
     "contract": "Recorded trackedintegerbbox/frame/init/role joins; explicitmissing/held/null/opaque/alpha policies; preservealloriginalpayloadarrays, addstaticinitialalpha only; no oldcache/source/modelread. Requirespinnedlegacydecoder+packetmaskpolicywrapper withINTER_LINEAR crop/alpha resize. AllcompleteNPZ+externalmanifest costs mustbechargedwhenrun. Staticappearance/templateisnottruepose; no maskpacking savings assumed.",
     "guide_bbox_representation": "Actualtracked rasterBoxrecords use exactintegralJSONfloats, e.gheldframe14. Adaptercanonicalizes tointegers without rounding, rejectsfractional/nonfinite coordinates; regressiontestcoversactualrepresentation."
+  },
+  "fresh_window_guide_v3_scale48": {
+    "qualification": {
+      "schema": "pointstream.fresh_window_guides.prefix_qualification.v1",
+      "status": "qualified_scale_instrument",
+      "frames": 48,
+      "source_access_review": "selected_source000_only",
+      "visual_review": "accepted_with_explicit_limits",
+      "reviewed_overlays": [
+        38,
+        52,
+        62,
+        85
+      ],
+      "limitations": [
+        "Model-derived guides are not independent truth; arm/racket clipping retained without tuning.",
+        "One far-player history-held/stale bbox at source frame52 retained explicitly; no missing masks.",
+        "Sampled RSS is not an OS hard limit; derived timing includes shared storage/model setup.",
+        "No sender/RD/task/generalization result."
+      ],
+      "job_id": "20261003T162107Z-17eb93b9",
+      "job_exit_code": 0,
+      "claims_released": true,
+      "proof_sha256": "9a598cd6eaa5f0af84afebec79152a6d2d5346e9733c01b032da23282225f8bd",
+      "receipt_sha256": "0086e4e9f313b57c6e63f552a50b4df481190251bb0cfd3671d1014886105083",
+      "registration_sha256": "28b0ef9d7665d08495adde41e0f9caef7f4167245a991ecc41464baf7c465644",
+      "resource_budget_summary": {
+        "derived_supervisor_wall_seconds": 709.6095759868622,
+        "model_collection_flush_upper_seconds": 628.505961894989,
+        "basis": "status/frames mtime minus recorded starts; not exactstage or live latency",
+        "peak_rss_kib": 4569040,
+        "rss_guard": {
+          "limit_bytes": 51539607552,
+          "samples": 386,
+          "peak_sampled_bytes": 4692590592
+        },
+        "cuda_runtime": {
+          "torch_version": "2.2.2+cu121",
+          "cuda_version": "12.1",
+          "device_name": "NVIDIA RTX 6000 Ada Generation",
+          "peak_allocated_bytes": 222673920,
+          "peak_reserved_bytes": 318767104
+        },
+        "actual_calls": {
+          "detector": 48,
+          "segmenter": 96
+        },
+        "held_stale_missing_counts": {
+          "history_held": 1,
+          "tracker_history_held": 0,
+          "stale": 1,
+          "mask_missing": 0
+        }
+      },
+      "next": "Prospectively register full96 with measured scale budgets; fresh fleet admission required. No sender promotion before full96 independent qualification."
+    },
+    "proof_artifact": "gpu5:audits/gate-a-source000-yolo-guides-v3-scale48-independent-proof-root-20261003/independent-verification.json",
+    "qualification_sha256": "48d28b3a6879457d2fcce5f847206c7d8ae0f29cc3855b26dc076625f526a467"
+  },
+  "fresh_window_guide_v3_full96": {
+    "status": "running_not_qualified",
+    "job_id": "20261003T170004Z-87a04c7b",
+    "snapshot": "/var/tmp/emanuele-gate-a-guide-snapshots-20261003/20261003T170004Z-87a04c7b",
+    "registration_sha256": "5fbff21a0b9ee4b152ab9a5199126060cbddeeb1e876e59a893526a93f94a33b",
+    "output": "gpu5:audits/gate-a-source000-yolo-guides-v3-full96-budget-20261003",
+    "budget": "2400s collection /3600s supervisor; prospective scale-derived guard only; model/input/settings unchanged",
+    "no_replay": true
   }
 }
