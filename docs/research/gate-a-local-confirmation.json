@@ -495,7 +495,7 @@
     "artifact": "gpu1:/var/tmp/emanuele-gate-a-source000-sender-20261003/source000-reference-cutout-registration.json",
     "policy": "selected-source RGB appearance/background; conditional cachedguide preprocessing remains unresolved",
     "first_job": "gpu1:audits/gate-a-source000-reference-cutout-C2-f2-job-20261003",
-    "first_status": "running_no_replay"
+    "first_status": "complete_exit0_claimsreleased_C2independentinstrumentqualification_v2"
   },
   "full96_trajectory_scores": {
     "analysis_artifact": "receiver-score-full96-independent-verification-v2.json",
@@ -748,7 +748,74 @@
   },
   "native96_standalone_baseline": {
     "first_job": "gpu1:audits/gate-a-single-window-vvc-q50-qpa0-full96-job-20261003",
-    "status": "running",
-    "basis": "Allthree native48 independentlyverified; unchangedworker/settings; firstofthreefrozenarms launched baselineonly, no matchedaccess superiority. All resultsretained."
+    "status": "QPA0completeindependentlyverified;QPA1running;AV1notstarted",
+    "basis": "Allthree native48 independentlyverified; unchangedworker/settings; firstofthreefrozenarms launched baselineonly, no matchedaccess superiority. All resultsretained.",
+    "current_job": "gpu1:audits/gate-a-single-window-vvc-q50-qpa1-full96-job-20261003"
+  },
+  "native96_qpa0_qualification": {
+    "analysis_artifact": "native-full96-qpa0-independent-verification-v1.json",
+    "analysis_sha256": "910ef8b08329e286335faf7415335f244071dcd2a8e92c1614892e2a94bbf61b",
+    "passed": true,
+    "schema": "pointstream.gate_a.native_full96_standalone_verification.v1",
+    "scope": "Standalone source000 full96 native baseline only. Inherited candidate panoramas used source028 geometry conditioning, and fresh cached-guide context remains conditional; no matched-access superiority claim. No original192frame recertification or task/generalization claim; no codec/metric recomputation.",
+    "label": "vvc-q50-qpa0",
+    "registration_sha256": "b5b48401fcaa1bd93ca92e6e344a9f07da164b2c87f104fbc7179653da1ef623",
+    "worker_sha256": "f48ebfd5c093e6268f1e88fa45cd115478cba0fa28947ead1d07865018d7f323",
+    "report_sha256": "88edc9d812269982101a69d419f0365758d2bc0a5934979297697a2ff02852d5",
+    "status_sha256": "c68e041f2749b9d6270ed270c44ad02adafe3b5af79d36aed53907c72cc9333b",
+    "source": {
+      "path": "/home/itec/emanuele/pointstream-data/outputs/gate-a-vvc-webp-n96-run2/points/C2.run/chunk_00/source.npy",
+      "rgb_sha256": "09fbaee1f343b6046718853ef82b8b257c3bb8a9bbff8c52c23c368aeedce573",
+      "file_sha256": "027704f6ba70b70b254de58d66c1d346f0a034ec5657347a7feb03d2759626f3"
+    },
+    "source_selected_rgb_sha256": "09fbaee1f343b6046718853ef82b8b257c3bb8a9bbff8c52c23c368aeedce573",
+    "stream_sha256": "fa4c255d32048264ee193050ff06c5d5736b8939bef8eed259a5790ac51843aa",
+    "decoded_rgb_sha256": "8d4f50f538a97ea06898e254490845b1f770e6e827e9863e5ca4fee449665570",
+    "stream_bytes": 66805,
+    "manifest_bytes": 150,
+    "physical_payload_bytes": 66955,
+    "manifest_sha256": "d73d39455f0390a459bff3e3c467969f3391451f2a4b1625647293157fa2f016",
+    "vmaf_log_sha256": "5b40691764b9ab69fa034c34b9df307d3c02ad2ed4f308439c4f5dc42579d83d",
+    "metric_frames": 96,
+    "joined": {
+      "vmaf": 68.28509401041667,
+      "psnr_y": 32.71797279088317,
+      "ssim": 0.946585119691655
+    },
+    "vmaf_pooling_independently_verified": true,
+    "psnr_y_ssim_pooling_verification": "finite report and identical single-window summary verified; pinned worker code uses equal-frame luma MSE and mean per-frame SSIM, but per-frame MSE/SSIM values not persisted, so independent arithmetic revalidation unavailable without rerun",
+    "resources": {
+      "call_seconds": {
+        "part-00-rgb-to-yuv": 14.288132571964525,
+        "part-00-encode": 181.32037740491796,
+        "part-00-fresh-native-decode": 13.430088122957386,
+        "part-00-upscale-rgb-conversion": 21.475120780989528,
+        "vmaf": 6.055895827012137
+      },
+      "self_peak_rss_kib": 12453288,
+      "status_complete_exit0_claims_released": true,
+      "policy_evidence": "Pinned immutable worker enforces CPU affinity<=8/noGPU/nice19/AS48GiB; raw affinity/nice/AS/childRSS not persisted in native report, so independent process-observation join unavailable"
+    },
+    "verification_seconds": 32.09019322809763
+  },
+  "source000_C3_f2_rejection": {
+    "job": "gpu1:audits/gate-a-source000-reference-cutout-C3-f2-job-20261003",
+    "status": "failed_preexecution_exit1_claimsreleased",
+    "cause": "Registeredworker expectedliteraldata root; logicalpath resolves tocanonicalDatasets root. Rejectedbefore source/sender/output. Noalgorithmnegative,noreplay; freshsenderexplicitlyregisters aliases."
+  },
+  "fresh_guides": {
+    "code_revision": "a0e79b1",
+    "scope": "YOLOframeRGB->BGR detector/pastonlytracker/segmenter, no cachedguide/source028; allframesmissing retained; nottasktruth",
+    "smoke_job": "20261003T092506Z-8f12382e",
+    "host": "gpu5",
+    "gpu_uuid": "GPU-7754164a-33cd-265c-3696-c20966d228fe",
+    "registration_sha256": "edb4c9455e9946097ed858d6e1d49152082f6c5501a48c221d7f1ca560a47e6b",
+    "status": "running_qualifiedfleetadmission_no_replay",
+    "prefixes_frozen_before_inference": [
+      2,
+      12,
+      48,
+      96
+    ]
   }
 }
