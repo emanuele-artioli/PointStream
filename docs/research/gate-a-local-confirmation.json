@@ -2025,9 +2025,10 @@
   "fresh_temporal_adapter": {
     "version": "pointstream.fresh_static_trajectory.v1",
     "source": "experiments/gate_a_confirmation/fresh_trajectory_packet.py",
-    "source_sha256": "d1d1f207262f4e1ac0017c07d4b85e91163c3fd3d88118ebebf94d4107752286",
+    "source_sha256": "7d617605ddc419eea2f4cb2f9a53389e6fbda5fa31cfac2ba2f637080861691f",
     "status": "pure_unit_checks_only_no_registration_run_decode_or_quality_result",
-    "tests": "11focusedadaptertests/all32selectedtestsPASS",
-    "contract": "Recorded trackedintegerbbox/frame/init/role joins; explicitmissing/held/null/opaque/alpha policies; preservealloriginalpayloadarrays, addstaticinitialalpha only; no oldcache/source/modelread. Requirespinnedlegacydecoder+packetmaskpolicywrapper withINTER_LINEAR crop/alpha resize. AllcompleteNPZ+externalmanifest costs mustbechargedwhenrun. Staticappearance/templateisnottruepose; no maskpacking savings assumed."
+    "tests": "12focusedadaptertests/all33selectedtestsPASS",
+    "contract": "Recorded trackedintegerbbox/frame/init/role joins; explicitmissing/held/null/opaque/alpha policies; preservealloriginalpayloadarrays, addstaticinitialalpha only; no oldcache/source/modelread. Requirespinnedlegacydecoder+packetmaskpolicywrapper withINTER_LINEAR crop/alpha resize. AllcompleteNPZ+externalmanifest costs mustbechargedwhenrun. Staticappearance/templateisnottruepose; no maskpacking savings assumed.",
+    "guide_bbox_representation": "Actualtracked rasterBoxrecords use exactintegralJSONfloats, e.gheldframe14. Adaptercanonicalizes tointegers without rounding, rejectsfractional/nonfinite coordinates; regressiontestcoversactualrepresentation."
   }
 }

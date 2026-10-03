@@ -58,7 +58,7 @@ def test_missing_absent_held_null_and_alpha_are_explicit():
 @pytest.mark.parametrize('change', ['float_box','outside','role','duplicate','frame','init','stale','missing_flag'])
 def test_invalid_geometry_roles_frames_and_flags_fail_closed(change):
     arrays,meta,records,receipt=inputs();row=records[2]['tracked'][0]
-    if change=='float_box':row['bbox'][0]=2.0
+    if change=='float_box':row['bbox'][0]=2.25
     elif change=='outside':row['bbox'][2]=9
     elif change=='role':row['track_id']='spectator'
     elif change=='duplicate':records[2]['tracked'].append(copy.deepcopy(row))
@@ -82,4 +82,17 @@ def test_two_roles_late_initialization_and_missing_sender_role():
     assert c==[0,1,2,2]
     assert [p['frame_index'] for p in new['placements'] if p['object_id']=='player_far']==[2,3]
     meta['placements'].pop()
+    with pytest.raises(ValueError):adapt_packet(arrays,meta,records,receipt,policy='opaque')
+
+
+def test_actual_guide_integral_float_box_representation():
+    arrays,meta,records,receipt=inputs()
+    for record in records:
+        record['tracked'][0]['bbox']=[float(v) for v in record['tracked'][0]['bbox']]
+    meta['placements'][0]['bbox']=[float(v) for v in meta['placements'][0]['bbox']]
+    _,updated,coverage=adapt_packet(arrays,meta,records,receipt,policy='alpha')
+    assert coverage==[0,1,1,1]
+    assert all(type(v) is int for row in updated['placements'] for v in row['bbox'])
+    assert updated['placements'][-1]['bbox']==[3,1,5,3]
+    records[2]['tracked'][0]['bbox'][0]=float('nan')
     with pytest.raises(ValueError):adapt_packet(arrays,meta,records,receipt,policy='opaque')

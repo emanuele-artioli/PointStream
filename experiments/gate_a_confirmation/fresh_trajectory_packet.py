@@ -6,6 +6,7 @@ access or decoding occurs here. This restores placement, not dynamic pose.
 import copy
 import io
 import json
+import math
 import numpy as np
 
 VERSION = 'pointstream.fresh_static_trajectory.v1'
@@ -19,11 +20,13 @@ def require(condition, message):
 
 def box(value, width, height):
     require(isinstance(value, (list, tuple)) and len(value) == 4 and
-            all(type(v) is int for v in value), 'tracked bbox must contain integer coordinates')
-    x1, y1, x2, y2 = value
+            all(type(v) in (int, float) and math.isfinite(v) and int(v) == v for v in value),
+            'tracked bbox must contain finite integral coordinates; no rounding')
+    # Detection Box serializes raster coordinates as integral JSON floats.
+    x1, y1, x2, y2 = map(int, value)
     require(0 <= x1 < x2 <= width and 0 <= y1 < y2 <= height,
             'tracked bbox must be inside raster')
-    return list(value)
+    return [x1, y1, x2, y2]
 
 
 def adapt_packet(arrays, metadata, records, receipt, *, policy,
@@ -66,7 +69,8 @@ def adapt_packet(arrays, metadata, records, receipt, *, policy,
         require(box(p['bbox'], width, height) == box(guides[role]['bbox'], width, height), 'initial bbox differs from fresh receipt')
         key = p.get('encoded_crop_key') or p.get('crop_key')
         require(key in arrays, 'shared appearance payload missing')
-        initial[role] = p
+        initial[role] = copy.deepcopy(p)
+        initial[role]['bbox'] = box(p['bbox'], width, height)
     require(set(initial) == {role for role, o in guides.items() if o['frame_index'] < n},
             'sender must carry every role initialized in this packet prefix')
     result = dict(arrays)
@@ -131,7 +135,7 @@ def adapt_packet(arrays, metadata, records, receipt, *, policy,
     meta['placements'] = rows
     meta['mask_policy'] = 'alpha' if policy == 'alpha' else 'opaque'
     meta['temporal_adapter'] = {'version':VERSION, 'policy':policy,
-        'geometry':'recorded_integer_tracked_bbox_no_mask_bound_inference',
+        'geometry':'recorded_integral_tracked_bbox_no_rounding_no_mask_bound_inference',
         'missing_policy':missing_policy, 'held_policy':held_policy,
         'appearance':'shared_initial_reference_static',
         'alpha':'initial_crop_local_static_template' if policy == 'alpha' else None,
