@@ -2,7 +2,8 @@
 
 ## One entry point
 
-Run `scripts/ps-fleet` from the Mac. It resolves its own checkout and interpreter,
+Run `scripts/ps-fleet` from the Mac. For preauthorized operation, invoke
+`/Users/manu/Desktop/PointStream/scripts/ps-fleet` directly as a standalone command. It resolves its own checkout and interpreter,
 so neither cwd nor PYTHONPATH selects the dispatcher. Remote host workers use
 frozen releases and a shared inbox; they need no inter-host SSH or remote Codex.
 Inputs, snapshots, logs, validation and results live under the external data root.
