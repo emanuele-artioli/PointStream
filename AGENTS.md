@@ -12,6 +12,15 @@ PointStream is an object-centric semantic video codec. The target is an ACM TOMM
 - Cooperative claims prevent collisions among participating PointStream jobs. They cannot stop another user starting work later, and free memory cannot guarantee an oversized workload will avoid OOM. If the supervisor detects outside GPU use, it stops only its own affected job, preserves files, and marks timing contaminated.
 - Hardware ordering (Ada, A6000, RTX 8000, GV100) is only a fallback heuristic. Prefer compatible hardware and measured performance for comparable workloads.
 
+## GPU command permissions
+
+- Use the local fleet dispatcher as the normal remote execution path: `python -m experiments.jobs.fleet inspect`, `launch`, `status`, and `cancel`. Follow the resource checks, task budgets, snapshot selection, and provenance requirements above. Run from the reviewed PointStream checkout; `python -m` resolves modules from the current environment and is not a security boundary.
+- Command approval is separate from task authorization. For network-dependent dispatcher calls in a network-disabled sandbox, submit the exact command through the execution tool's approval mechanism (`sandbox_permissions="require_escalated"` when available). State the purpose, hosts, and resource budget in the justification. Inspect approval or automatic-review results before continuing. A granted approval does not authorize work outside the user's assigned scope or budget.
+- Require per-invocation approval for raw `ssh` and dispatcher commands. Do not create blanket `allow` rules for `ssh`, `python`, or the dispatcher. In the local Codex rules, use `decision="prompt"` for these prefixes. Never broaden global permissions or change approval rules merely to make a command run; obtain explicit user authorization for policy changes.
+- Submit dispatcher commands directly. Do not hide them inside a generic Python script, shell loop, or retry wrapper: an approval for `ssh` or `fleet inspect` does not transfer to an interpreter that spawns it. Batch independent calls in the tool orchestrator instead. If a probe reports DNS failure, distinguish a sandbox denial from a host-side DNS problem before changing DNS, VPN, or SSH settings.
+- Raw SSH is an exception for explicitly authorized, bounded diagnostics. Review the exact host and remote command for that invocation. Do not use it to bypass dispatcher GPU admission, claims, snapshots, supervision, or job budgets. Do not create remote agent sessions, tunnels, forwarding, or credential changes as connection workarounds without specific user authorization.
+- After a disconnect, inspect the recorded job ID using `fleet status`; never replay a launch automatically. Cancel only task-owned jobs. Treat full-probe timeouts as unavailable even when a simpler SSH check succeeds.
+
 ## Branches and review
 
 Do this work on a scoped branch, not directly on `main`. Commit a coherent change when it is in a state worth keeping, and push that branch. Do not leave finished work only in the local checkout. When focused tests cover the behavior, suggest a pull request and wait for the user to ask before opening it.
