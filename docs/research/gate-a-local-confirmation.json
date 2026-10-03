@@ -67,7 +67,7 @@
     "C2": "gpu3:audits/gate-a-recert-C2-pilot12-job-20261002",
     "C3": "gpu3:audits/gate-a-recert-C3-pilot12-job-20261002"
   },
-  "native_anchor_worker": "prepared with AV1 QP/CRF and VVC QPA0/1 plus native/1440p/1080p/720p resampling support; current revision not registered, staged, smoke-tested or run. All native curves remain prospective; freeze bounded arms/budgets after full payload gate.",
+  "native_anchor_worker": "Pinned0c04 five4-frame smokes independently verified; currentf48 explicit source000 selector passed two2-frame smokes. Three12-frame native budget pilots registered; no full paired curve/old original192 recertification yet.",
   "pilot12_results": {
     "C2": {
       "status": "complete_exit0_claims_released",
@@ -275,9 +275,17 @@
       "id": "gpu1:audits/gate-a-anchor-av1-qp63-native-smoke2-job-20261003",
       "supervisor_pid": 914056,
       "last_observed": "complete_exit0_claims_released"
+    },
+    "av1_crf63_720": {
+      "id": "gpu1:audits/gate-a-anchor-av1-crf63-720-smoke2-job-20261003",
+      "last_observed": "complete_exit0_claims_released"
+    },
+    "av1_crf63_1440": {
+      "id": "gpu1:audits/gate-a-anchor-av1-crf63-1440-smoke2-job-20261003",
+      "last_observed": "complete_exit0_claims_released"
     }
   },
-  "native_single_window_extension": "CLI supports an explicitly registered original window index for a narrower paired confirmation. New worker not yet staged or natively smoke-qualified. Existing two-window smoke uses its unchanged pinned0c04 worker; do not mix revisions or source counts.",
+  "native_single_window_extension": "Two newly pinned2-frame selector smokes passed source/frame/raster joins. Source000 scope differs from original combined two-window Gate A interval; gap retained.",
   "trajectory_mechanics_gpu1_results": {
     "verification_passed": true,
     "verification_sha256": "8ba90ace4b720f26fa8bdc2217ad0b83b3ebd502e6de871c72ad0a4e6fa656ee",
@@ -305,7 +313,113 @@
       "id": "gpu1:audits/gate-a-trajectory-gpu1-null48-job-20261003",
       "supervisor_pid": 923363,
       "child_pid": 923471,
-      "last_observed": "running"
+      "last_observed": "complete_exit0_claims_released"
+    },
+    "opaque": {
+      "id": "gpu1:audits/gate-a-trajectory-gpu1-opaque48-job-20261003",
+      "supervisor_pid": 941028,
+      "child_pid": 941231,
+      "last_observed": "complete_exit0_claims_released"
+    },
+    "alpha": {
+      "id": "gpu1:audits/gate-a-trajectory-gpu1-alpha48-job-20261003",
+      "supervisor_pid": 960939,
+      "last_observed": "complete_exit0_claims_released"
     }
+  },
+  "native_smokes_verified": {
+    "artifact": "gpu1:audits/gate-a-native-smokes-verification-20261003.json",
+    "sha256": "db6f6b99d39e533fe373eae43dd618e1aebf038d440e76724bd8df7dc23bf94f",
+    "all5_arms_passed": true,
+    "scope": "Four frames each, correctness/native API/access/filter qualification only; not RD evidence."
+  },
+  "native_single_window_smoke_registration": {
+    "sha256": "bc53d33aa767f15d98654b040dcad49521ac1e0667953e9c8ed3a63a80508c18",
+    "worker_sha256": "f48ebfd5c093e6268f1e88fa45cd115478cba0fa28947ead1d07865018d7f323",
+    "scope": "source000 only, two frames; explicit selector newly qualifies output source count; old two-window interval gap retained",
+    "arms": 2
+  },
+  "native_single_window_smoke_jobs": {
+    "vvc_q50_qpa1": {
+      "id": "gpu1:audits/gate-a-single-window-vvc-q50-qpa1-smoke2-job-20261003",
+      "supervisor_pid": 957322,
+      "last_observed": "complete_exit0_claims_released"
+    },
+    "av1_crf59_1080": {
+      "id": "gpu1:audits/gate-a-single-window-av1-crf59-1080-smoke2-job-20261003",
+      "supervisor_pid": 979773,
+      "last_observed": "complete_exit0_claims_released"
+    }
+  },
+  "trajectory_scale48_verified": {
+    "artifact": "gpu1:audits/gate-a-trajectory-gpu1-scale48-verification-v3-20261003.json",
+    "sha256": "d6d7584fd103aeae295d0bda87fa84e1e7237066eb4bcaea6bed9d89f0c173c4",
+    "all48_exact_pixel_status_resource_joins_passed": true,
+    "visual_frames": [
+      0,
+      24,
+      47
+    ],
+    "limitation": "Presence/box motion restored, source poses still frozen; no prefix RD result",
+    "earlier_analysis_scripts": "v1 stale frame-count assert; v2 statuspaths12 not48; outputs/scripts preserved, v3 corrected. Native runs unaffected."
+  },
+  "native_pilot12_registration": {
+    "sha256": "66f335e701f76bf0f634c2db2d36dca726952ff4c5e33570072d6b7b629c037d",
+    "arms": 3,
+    "scope": "native runtime/memory pilot, not comparable to full96-background prefixes",
+    "resource_policy": "sequential CPU8/48GiBAS/30min, noGPU"
+  },
+  "native_pilot12_jobs": {
+    "vvc-q50-qpa0": {
+      "id": "gpu1:audits/gate-a-single-window-vvc-q50-qpa0-pilot12-job-20261003",
+      "last_observed": "complete_exit0_claims_released"
+    },
+    "vvc-q50-qpa1": {
+      "id": "gpu1:audits/gate-a-single-window-vvc-q50-qpa1-pilot12-job-20261003",
+      "last_observed": "complete_exit0_claims_released"
+    },
+    "av1-crf59-1080": {
+      "id": "gpu1:audits/gate-a-single-window-av1-crf59-1080-pilot12-job-20261003",
+      "last_observed": "complete_exit0_claims_released"
+    }
+  },
+  "receiver_score_smoke": {
+    "registration_sha256": "e69e5c54b00029701326a39b9836bbcbde4c06c25c877868309880656fc3e471",
+    "worker_sha256": "c02d2b221f98b82a6efb567df4a8837302afc26f7f10efd0b24e2dc7f2c91268",
+    "scope": "Three twelve-frame instrument controls only; full96 background reused. Not RD evidence.",
+    "jobs": {
+      "null": {
+        "id": "gpu1:audits/gate-a-receiver-score-null-smoke12-job-20261003",
+        "last_observed": "complete_exit0_claims_released"
+      },
+      "opaque": {
+        "id": "gpu1:audits/gate-a-receiver-score-opaque-smoke12-job-20261003",
+        "last_observed": "complete_exit0_claims_released"
+      },
+      "alpha": {
+        "id": "gpu1:audits/gate-a-receiver-score-alpha-smoke12-job-20261003",
+        "last_observed": "running"
+      }
+    }
+  },
+  "trajectory_full96_development_registration": {
+    "sha256": "e88cba47d71032cdb77c3f869982ad30a609db9fd8662b9460e110b4fbcd0431",
+    "status": "registered_not_launched",
+    "scope": "Source000 only, all96 static-reference trajectory ablation. No originaltwo-window recertification or pose/taskfidelity claim."
+  },
+  "native_pilot12_verification": {
+    "artifact": "gpu1:audits/gate-a-native-pilot12-verification-20261003.json",
+    "sha256": "833df1824b5000acf90802215dc8f4639e16f3141b2ee3508c23ef682fc191cc",
+    "all3_passed": true,
+    "scope": "Timing/memory instrument pilots, not matched RD."
+  },
+  "native_scale48_registration": {
+    "sha256": "aaef8f3037d8f765e498a5ebefbc342446998b5fec9a3d692c82a03570266148",
+    "arms": 3
+  },
+  "native_full96_development_registration": {
+    "sha256": "b5b48401fcaa1bd93ca92e6e344a9f07da164b2c87f104fbc7179653da1ef623",
+    "arms": 3,
+    "scope": "Source000 globalVMAF only,3frozenanchors; no dense interval/originaltwo-window or heldout claim"
   }
 }
