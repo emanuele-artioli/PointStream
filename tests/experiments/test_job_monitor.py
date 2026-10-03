@@ -213,7 +213,6 @@ def test_cancel_file_stops_owned_process_group_and_releases_cpu_claim(
 
     setup_job(tmp_path)
     (tmp_path / "events").mkdir()
-    (tmp_path / "cancel.json").write_text('{"requested": true}')
     claims_dir = tmp_path / "claims"
     monitor.write_json(
         tmp_path / "request.json",
@@ -228,7 +227,11 @@ def test_cancel_file_stops_owned_process_group_and_releases_cpu_claim(
     )
     child = SimpleNamespace(pid=123, poll=lambda: None)
     stopped: list[Any] = []
-    monkeypatch.setattr(monitor.subprocess, "Popen", lambda *args, **kwargs: child)
+    def spawn(*args: Any, **kwargs: Any) -> Any:
+        (tmp_path / "cancel.json").write_text('{"requested": true}')
+        return child
+
+    monkeypatch.setattr(monitor.subprocess, "Popen", spawn)
     def _stop(process: object) -> bool:
         stopped.append(process)
         return True
