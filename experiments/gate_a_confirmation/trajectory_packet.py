@@ -4,7 +4,7 @@ Reuse a preserved full96-scene background/crop packet, encode model-guide-derive
 per-frame boxes and one alpha template per actor. Static reference appearance is
 not dynamic pose reconstruction. Prefixes are mechanics controls, not RD points.
 """
-import argparse,hashlib,io,json,os,resource,subprocess,sys
+import argparse,hashlib,io,json,os,resource,subprocess,sys,time
 from pathlib import Path
 import numpy as np
 
@@ -47,6 +47,7 @@ def make_packet(raw,objects,count,policy,foreground=True):
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('--legacy-root',required=True);p.add_argument('--data-root',required=True);p.add_argument('--original-packet',required=True);p.add_argument('--receiver-script',required=True);p.add_argument('--base-receiver',required=True);p.add_argument('--registration',required=True);p.add_argument('--out',required=True);p.add_argument('--frames',type=int,choices=[2,12,48,96],required=True);p.add_argument('--mask-policy',choices=['opaque','alpha'],required=True);p.add_argument('--null-foreground',action='store_true');a=p.parse_args()
+    began=time.monotonic()
     reg=json.loads(Path(a.registration).read_text());arm={'frames':a.frames,'mask_policy':a.mask_policy,'foreground':not a.null_foreground}
     if reg.get('status')!='frozen_before_execution' or arm not in reg['arms'] or digest(__file__)!=reg['worker_sha256'] or digest(a.receiver_script)!=reg['receiver_sha256'] or digest(a.base_receiver)!=reg['base_receiver_sha256'] or digest(a.original_packet)!=reg['original_packet_sha256']:raise ValueError('frozen identities/arm required')
     for path,sha in reg['tools_and_libraries'].items():
@@ -64,5 +65,5 @@ def main():
     subprocess.run([sys.executable,a.receiver_script,'--base-receiver',a.base_receiver,'--legacy-root',str(root),'--package',str(packet),'--output',str(decoded),'--deny-root',a.data_root],check=True,timeout=600)
     rr=json.loads(decoded.with_suffix('.receipt.json').read_text());assert rr['frames_shape']==[a.frames,2160,3840,3] and not rr['violations']
     manifest={'schema':1,'fps':24,'package':'scene.npz'};(out/'manifest.json').write_text(json.dumps(manifest,separators=(',',':'))+'\n')
-    (out/'report.json').write_text(json.dumps({'arm':arm,'complete':True,'paper_evidence':False,'physical_bytes':len(encoded)+(out/'manifest.json').stat().st_size,'guide_placement_count_by_frame':coverage,'source96_rgb_sha256':hashlib.sha256(clip.frames.data).hexdigest(),'source_guide_masks':[{"object_id":o.object_id,"shape":list(o.mask.shape),"sha256":hashlib.sha256(np.ascontiguousarray(o.mask).data).hexdigest(),"first_bbox":list(o.bbox),"first_frame":o.frame_index} for o in clip.objects],'registration_sha256':digest(a.registration),'original_packet_sha256':digest(a.original_packet),'receiver':rr,'scope':'Posthoc conditioning adaptation; first source/window only, full96 offline background reused even in prefix controls; model guides are not independent task truth; static appearance/silhouette is not true pose reconstruction. No baseline/quality/generalization win.'},indent=2)+'\n')
+    (out/'report.json').write_text(json.dumps({'arm':arm,'complete':True,'paper_evidence':False,'physical_bytes':len(encoded)+(out/'manifest.json').stat().st_size,'guide_placement_count_by_frame':coverage,'source96_rgb_sha256':hashlib.sha256(clip.frames.data).hexdigest(),'source_guide_masks':[{"object_id":o.object_id,"shape":list(o.mask.shape),"sha256":hashlib.sha256(np.ascontiguousarray(o.mask).data).hexdigest(),"first_bbox":list(o.bbox),"first_frame":o.frame_index} for o in clip.objects],'registration_sha256':digest(a.registration),'original_packet_sha256':digest(a.original_packet),'receiver':rr,'resource_observation':{'worker_seconds':time.monotonic()-began,'self_peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'child_peak_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'caveat':'Linux process rusage peaks, not measured concurrent aggregate memory or live-codec latency'},'scope':'Posthoc conditioning adaptation; first source/window only, full96 offline background reused even in prefix controls; model guides are not independent task truth; static appearance/silhouette is not true pose reconstruction. No baseline/quality/generalization win.'},indent=2)+'\n')
 if __name__=='__main__':main()

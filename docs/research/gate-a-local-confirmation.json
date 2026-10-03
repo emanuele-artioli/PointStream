@@ -28,12 +28,12 @@
     "C3": "gpu3:audits/gate-a-recert-C3-smoke-job-20261002"
   },
   "execution": "CPU-only, no GPU, owned monitor claims, disjoint cores0\u20137/8\u201315, 0.5h each; no replay",
-  "remaining": "Inspect existing GPU1 clone before launch; verify staged identities and admission, run sequential registered mechanics controls. Require foreground coverage and visual review before ranking an adapted candidate. The old G0 crossing remains a global-metric diagnostic; missing foreground does not invalidate interpolation arithmetic or prove algorithmic inferiority. Dense VVC/AV1 resolution ladder, complete-payload old-G0 diagnostic, and unseen-scene confirmation remain unmeasured.",
+  "remaining": "Finish existing48-frame scale and registered AV1 resolution smokes without replay. Exact all-frame foreground/null and resource/visual checks before full96 source000 comparison. Single-window anchor extension requires its own pinned smoke. Retain old G0 posthoc local crossing, original two-window full qualification and denseVVC/AV1/unseen-scene gaps; no generalization or complete win inferred.",
   "prior_followups_retained": [
     "lossless metadata baseline and mild/boundary-preserving lossy packing",
     "GVC-RT native stream freshdecode/parity; supported-domainMTTF; GLC rateestimated separately"
   ],
-  "paper_revision": "48b2685",
+  "paper_revision": "b4b8267",
   "external_receipts": "/Users/manu/.codex/visualizations/2026/09/30/01a0f3d8-8225-77c0-b10a-4a9fd2401c9b/packet-rate-quality/gate-a-local-20261002",
   "smoke_results": {
     "C2": {
@@ -244,7 +244,7 @@
       "id": "gpu1:audits/gate-a-trajectory-gpu1-alpha12-job-20261002",
       "supervisor_pid": 883452,
       "child_pid": 883681,
-      "last_observed": "running"
+      "last_observed": "complete_exit0_claims_released"
     }
   },
   "snapshot_provenance_erratum": {
@@ -264,8 +264,48 @@
     "vvc_q50_qpa0": {
       "id": "gpu1:audits/gate-a-anchor-vvc-q50-qpa0-smoke2-job-20261003",
       "supervisor_pid": 875077,
-      "last_observed": "started"
+      "last_observed": "complete_exit0_claims_released"
+    },
+    "vvc_q50_qpa1": {
+      "id": "gpu1:audits/gate-a-anchor-vvc-q50-qpa1-smoke2-job-20261003",
+      "supervisor_pid": 898640,
+      "last_observed": "complete_exit0_claims_released"
+    },
+    "av1_qp63_native": {
+      "id": "gpu1:audits/gate-a-anchor-av1-qp63-native-smoke2-job-20261003",
+      "supervisor_pid": 914056,
+      "last_observed": "complete_exit0_claims_released"
     }
   },
-  "native_single_window_extension": "CLI supports an explicitly registered original window index for a narrower paired confirmation. New worker not yet staged or natively smoke-qualified. Existing two-window smoke uses its unchanged pinned0c04 worker; do not mix revisions or source counts."
+  "native_single_window_extension": "CLI supports an explicitly registered original window index for a narrower paired confirmation. New worker not yet staged or natively smoke-qualified. Existing two-window smoke uses its unchanged pinned0c04 worker; do not mix revisions or source counts.",
+  "trajectory_mechanics_gpu1_results": {
+    "verification_passed": true,
+    "verification_sha256": "8ba90ace4b720f26fa8bdc2217ad0b83b3ebd502e6de871c72ad0a4e6fa656ee",
+    "physical_bytes": {
+      "null": 20472,
+      "opaque": 26793,
+      "alpha": 28993
+    },
+    "all12_frames_placement_and_rgb_checks_passed": true,
+    "visual_frames": [
+      0,
+      6,
+      11
+    ],
+    "limitation": "Presence and box motion restored, initial pose/silhouette still frozen; rectangles copy background text; alpha suppresses surround. Not RD evidence; full96 offline background reused."
+  },
+  "trajectory_scale48_registration": {
+    "sha256": "0908860c4734c30b92dd148df04cd3b17a4d6aba94d3c378cbb0d41a2d7bb0bf",
+    "worker_sha256": "5aee9de7905c058a7fa59be2956a8973b0d0273e82417e40aab03dd031e899eb",
+    "scope": "frozen48-frame mechanics scale, not ratequality, only post-decoding resource instrumentation changed",
+    "resource_policy": "CPU8 cores32-39,48GiBAS per process,30min each, no GPU; null/opaque/alpha sequential"
+  },
+  "trajectory_scale48_jobs": {
+    "null": {
+      "id": "gpu1:audits/gate-a-trajectory-gpu1-null48-job-20261003",
+      "supervisor_pid": 923363,
+      "child_pid": 923471,
+      "last_observed": "running"
+    }
+  }
 }
