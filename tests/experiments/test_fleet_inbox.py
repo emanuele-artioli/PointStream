@@ -407,3 +407,18 @@ def test_worker_lifetime_lease_blocks_concurrent_bootstrap(tmp_path, monkeypatch
         monkeypatch.setattr(inbox, "worker_loop", lambda *a: pytest.fail("second worker bootstrapped"))
         with pytest.raises(BlockingIOError):
             inbox.worker(tmp_path, "gpu1")
+
+
+def test_completed_campaign_cannot_overwrite_its_artifacts(campaign):
+    assert inbox.campaign(campaign) == 0
+    before = {str(path.relative_to(campaign)): path.read_bytes() for path in campaign.rglob("*") if path.is_file()}
+    assert inbox.campaign(campaign) == 1
+    after = {str(path.relative_to(campaign)): path.read_bytes() for path in campaign.rglob("*") if path.is_file()}
+    assert after == before
+
+
+@pytest.mark.parametrize("internal", ["campaign", "worker", "rpc"])
+def test_preauthorized_entrypoint_exposes_only_public_actions(internal, capsys):
+    with pytest.raises(SystemExit):
+        inbox.main([internal], public_only=True)
+    assert "invalid choice" in capsys.readouterr().err

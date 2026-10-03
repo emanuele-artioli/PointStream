@@ -9,4 +9,4 @@ os.chdir(root)
 sys.path[:] = [str(root), *[p for p in sys.path if p and Path(p).resolve() != Path.cwd()]]
 from experiments.jobs.inbox import main
 
-raise SystemExit(main())
+raise SystemExit(main(public_only=True))

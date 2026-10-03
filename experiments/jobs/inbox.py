@@ -337,6 +337,10 @@ def phase_command(spec: dict[str, Any], stage: str) -> list[str]:
 
 def campaign(directory: Path) -> int:
     """The monitor owns this process group across smoke, validation, and full."""
+    previous = monitor.read_json(directory / "run" / "status.json", {})
+    if previous.get("status") in TERMINAL or any((directory / name).exists() for name in ("smoke", "full", "gate.json", "campaign-error.json")):
+        print("campaign: existing attempt is preserved; create a new request instead of replaying", file=sys.stderr)
+        return 1
     spec = monitor.read_json(directory / "spec.json")
     manifest = monitor.read_json(directory / "ready.json")
     source = directory / "source"
@@ -734,7 +738,7 @@ def watch_chat(state_dir: Path, chat_id: str) -> dict[str, Any]:
     return {"chat_id": chat_id, "jobs": jobs, "all_terminal": all(j["status"].get("status") in TERMINAL for j in jobs)}
 
 
-def main(argv_values: list[str] | None = None) -> int:
+def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--state-dir", type=Path, default=fleet.DEFAULT_STATE_DIR)
     actions = parser.add_subparsers(dest="action", required=True)
@@ -764,7 +768,7 @@ def main(argv_values: list[str] | None = None) -> int:
     watch.add_argument("chat_id")
     ack = actions.add_parser("ack")
     ack.add_argument("event_ids", nargs="+")
-    for name in ("worker", "campaign", "rpc"):
+    for name in (() if public_only else ("worker", "campaign", "rpc")):
         command = actions.add_parser(name, help=argparse.SUPPRESS)
         command.add_argument("directory", type=Path)
         if name == "worker":

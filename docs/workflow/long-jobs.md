@@ -146,7 +146,9 @@ Install the single allow rule in `~/.codex/rules/default.rules` for the absolute
 `/Users/manu/Desktop/PointStream/scripts/ps-fleet` entry point. Remove the former
 fleet prompt and redundant file-reading rules; do not allow general SSH. Validate
 all active rules with `codex execpolicy check` and restart Codex to reload changes.
-The rule grants fleet execution authority, including specified workload/validator
+If a shell tool starts inside the network-restricted sandbox, invoke the same
+absolute fleet command with `require_escalated`; the single fleet rule supplies
+its authorization. The rule grants fleet execution authority, including specified workload/validator
 commands; it does not sandbox arbitrary experiment code or override managed policy.
 
 ## Bounded paired codec ladders
