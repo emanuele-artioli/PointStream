@@ -10,6 +10,7 @@ Inputs, snapshots, logs, validation and results live under the external data roo
 ```bash
 scripts/ps-fleet doctor
 scripts/ps-fleet workers start
+scripts/ps-fleet workers status
 scripts/ps-fleet inspect
 scripts/ps-fleet selftest                 # bounded, non-citable CUDA campaign
 scripts/ps-fleet submit /absolute/path/job.json
