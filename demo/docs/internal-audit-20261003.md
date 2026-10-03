@@ -95,6 +95,10 @@ hashes. Reconcile the scored `s1/ckpt.pth.tar` with the stage-status `net`
 tensors and logs before interpreting LD/HT-S failure or HT-L completion.
 An epoch belongs to its stage; `status_epo19` alone does not establish a
 combined epoch count. Preserve the source diff and hashes in new runs.
+Reading the saved Torch ZIP metadata confirms embedded epochs 19 and 10 in
+the factory001 HT-L stage-0/stage-1 status files respectively. The current
+stage-1 checkpoint is 482521204 bytes. A bounded SHA-256 read timed out on the
+shared filesystem, so no checkpoint hash or tensor equivalence is claimed.
 
 DCVC-UF's QP is a learned index across lambdas 1–768 in this experiment;
 higher indices can mean better quality and more bits. This is not an inverted
@@ -131,6 +135,13 @@ pointers use that canonical path. Its HEAD is
 `manifests/second_domain_generalization.json` is preserved. Git itself does not
 need the old alias, but other active consumers must be checked before unlinking
 it. Never remove the target worktree.
+The old confirmation alias was subsequently removed after a bounded active
+configuration/process reference check returned no references. The target HEAD
+and dirty manifest were verified unchanged; the manifest SHA-256 is
+`6bce284070ee3e90b2b585020085505baca22874eb72f9cbec12de32e160d16a`.
+Recoverable link metadata was saved at
+`Datasets/pointstream-data/jobs/demo-path-audit/confirmation-alias-20261003T102627Z.json`.
+The data alias remains in place.
 
 ## Promotion order
 
