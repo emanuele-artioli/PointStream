@@ -321,7 +321,9 @@ def campaign(directory: Path) -> int:
     source = directory / "source"
     run = directory / "run"
     started = time.time()
-    budget_end = min(started + spec["budget_seconds"], spec["deadline_epoch"])
+    supervisor_state = monitor.read_json(run / "status.json", {})
+    supervisor_request = monitor.read_json(run / "request.json", {})
+    budget_end = min(supervisor_state.get("started", started) + supervisor_request.get("budget_seconds", spec["budget_seconds"]), spec["deadline_epoch"])
     try:
         if digest(spec) != manifest["spec_sha256"]:
             raise fleet.FleetError("saved specification identity changed")
@@ -334,7 +336,7 @@ def campaign(directory: Path) -> int:
             verify_inputs(spec, directory.parents[3])
             if digest(monitor.read_json(directory / "spec.json")) != manifest["spec_sha256"]:
                 raise fleet.FleetError("specification changed after smoke")
-            if source_identity(source) != code_identity:
+            if stage == "full" and source_identity(source) != code_identity:
                 raise fleet.FleetError("code changed after smoke")
             if time.time() + spec[stage]["seconds"] > budget_end:
                 raise fleet.FleetError("Remaining budget cannot support the saved stage estimate")
@@ -609,10 +611,10 @@ def selftest_submit(args: argparse.Namespace, root: Path) -> Any:
         "arguments": ["--input", identity["path"], "--iterations", "{iterations}"],
         "scale": {"iterations": {"smoke": 2, "full": 8}}, "inputs": [identity],
         "smoke": {"seconds": 60, "representative_basis": "Infrastructure only: same input and CUDA operation in both stages"},
-        "full": {"seconds": 60}, "budget_seconds": 180,
+        "full": {"seconds": 60}, "budget_seconds": 300,
         "validator": ["{python}", "-m", "experiments.jobs.fleet_smoke", "--validate"],
         "validator_seconds": 30, "required_commands": [],
-        "deadline": datetime.fromtimestamp(time.time() + 600, timezone.utc).isoformat(),
+        "deadline": datetime.fromtimestamp(time.time() + 900, timezone.utc).isoformat(),
     }
     args.spec = args.state_dir / "smoke-specs" / (uuid.uuid4().hex + ".json")
     monitor.write_json(args.spec, spec)

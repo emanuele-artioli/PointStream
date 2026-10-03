@@ -273,3 +273,38 @@ def test_admission_rejection_with_child_identity_never_requeues(tmp_path, monkey
     inbox.reconcile(tmp_path, "gpu1")
     assert monitor.read_json(tmp_path / "state.json")["status"] == "failed"
     assert (tmp_path / "owner").exists()
+
+
+def test_lost_publication_reply_retains_id_and_does_not_resubmit(tmp_path, monkeypatch):
+    from argparse import Namespace
+    spec_path = tmp_path / "spec.json"
+    spec_path.write_text(json.dumps(specification(tmp_path)))
+    snapshot = tmp_path / "snapshot.tar"
+    snapshot.write_bytes(b"snapshot")
+    config = {"hosts": ["gpu1"]}
+    calls = []
+    monkeypatch.setattr(inbox, "load_config", lambda _: config)
+    monkeypatch.setattr(fleet, "_build_snapshot", lambda *a, **kw: (snapshot, "hash", {}))
+    monkeypatch.setattr(fleet, "_send_snapshot", lambda *a: None)
+    def remote(config, action, payload):
+        calls.append(action)
+        if action == "health":
+            return {"workers": {"gpu1": {"updated": time.time()}}}
+        if action == "prepare":
+            return {"directory": "/data/jobs/fleet/inbox/" + payload["job_id"]}
+        raise TimeoutError("reply lost")
+    monkeypatch.setattr(inbox, "remote_rpc", remote)
+    args = Namespace(state_dir=tmp_path / "state", spec=spec_path, include_change=[], include_untracked=[], chat_id="chat")
+    with pytest.raises(fleet.FleetError, match="never resubmit"):
+        inbox.submit(args, tmp_path)
+    records = list(args.state_dir.glob("*.json"))
+    assert len(records) == 1
+    assert monitor.read_json(records[0])["status"] == "submission_unknown"
+    assert calls == ["health", "prepare", "publish"]
+
+
+def test_campaign_budget_includes_supervisor_startup(campaign):
+    monitor.write_json(campaign / "run" / "status.json", {"started": time.time() - 100})
+    monitor.write_json(campaign / "run" / "request.json", {"budget_seconds": 101})
+    assert inbox.campaign(campaign) == 1
+    assert not (campaign / "smoke").exists()
