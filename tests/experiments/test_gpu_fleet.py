@@ -287,3 +287,12 @@ def test_remote_launcher_python_is_well_formed_and_uses_the_existing_supervisor(
     assert "--claim-gpu" in tokens[3]
     assert "monotonic()+60" in tokens[3]
     assert "within 60 seconds" in tokens[3]
+
+
+def test_probe_timeout_reports_reason_without_dumping_the_remote_script(monkeypatch: pytest.MonkeyPatch) -> None:
+    def timeout(*args: Any, **kwargs: Any) -> Any:
+        raise subprocess.TimeoutExpired(["ssh", "gpu2", "long remote script"], 20)
+    monkeypatch.setattr(fleet, "_ssh", timeout)
+    result = fleet.probe_host("gpu2")
+    assert not result["available"]
+    assert result["error"] == "SSH/environment probe timed out after 20 seconds"

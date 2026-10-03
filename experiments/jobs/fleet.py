@@ -147,6 +147,8 @@ def probe_host(host: str, *, remote_python: str = "/usr/bin/python3", timeout: f
         return {"alias": host, "available": False, "error": "server is not in the configured GPU fleet", "gpus": []}
     try:
         result = _ssh(host, ["bash", "-lc", _probe_script(remote_python)], timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return {"alias": host, "available": False, "error": f"SSH/environment probe timed out after {timeout:g} seconds", "gpus": []}
     except (OSError, subprocess.SubprocessError) as exc:
         return {"alias": host, "available": False, "error": str(exc), "gpus": []}
     if result.returncode:
