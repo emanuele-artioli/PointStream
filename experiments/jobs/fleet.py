@@ -127,7 +127,7 @@ for name in ("ffmpeg", "vvencapp", "vvdecapp"):
     path = tools[name]
     if path:
         try:
-            version = subprocess.run([path, "--version"], capture_output=True, text=True, timeout=10, check=False)
+            version = subprocess.run([path, "-version" if name == "ffmpeg" else "--version"], capture_output=True, text=True, timeout=10, check=False)
             tool_versions[name] = {"path": path, "version": (version.stdout or version.stderr).splitlines()[:3], "returncode": version.returncode}
         except (OSError, subprocess.SubprocessError) as exc:
             tool_versions[name] = {"path": path, "version_error": str(exc)}
