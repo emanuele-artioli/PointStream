@@ -27,6 +27,7 @@ from PIL import Image
 
 from src.components.detection.types import Detection, is_person
 from src.contracts.observation import EstimatorProvenance, ObservationStatus
+from src.utils.git_readonly import readonly_git_command, readonly_git_env
 
 Role = Literal["player", "racket"]
 Propagation = Literal["forward", "backward", "both"]
@@ -176,7 +177,8 @@ class Sam31SequenceSegmenter:
             raise ValueError("SAM31_SOURCE_REVISION must pin the SAM 3.1 source checkout")
         try:
             actual_revision = subprocess.run(
-                ["git", "-C", str(self.source_root), "rev-parse", "HEAD"],
+                readonly_git_command(self.source_root, "rev-parse", "HEAD"),
+                env=readonly_git_env(),
                 check=True,
                 capture_output=True,
                 text=True,
@@ -190,7 +192,8 @@ class Sam31SequenceSegmenter:
                 f"checkout HEAD {actual_revision!r}"
             )
         status = subprocess.run(
-            ["git", "-C", str(self.source_root), "status", "--porcelain", "--untracked-files=all"],
+            readonly_git_command(self.source_root, "status", "--porcelain", "--untracked-files=all"),
+                env=readonly_git_env(),
             check=True,
             capture_output=True,
             text=True,

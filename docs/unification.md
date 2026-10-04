@@ -98,6 +98,54 @@ Still to do for metadata:
 - Ledger mapping in `src/runner/accounting.py`.
 - Client envelope integration.
 
+### Background provenance blocker: diagnosis (4 October 2026)
+
+Cause of the 30 s `dcvc-git-diff` timeout in job `20261004T195542Z-f8714ffc`.
+All checks were direct, bounded, read-only Git commands on gpu5 against
+`pointstream-data/jobs/neural-bg/src/DCVC`: 342 tracked files, 10.9 MB tracked,
+1.7 GB tree with untracked `third_party/cutlass/` and checkpoints. No GPU was
+claimed and no fleet job was submitted.
+
+| Command (gpu5, shared NFS checkout) | Seconds |
+|---|---:|
+| `git --no-optional-locks diff --quiet HEAD`, first run / repeat | 0.078 / 0.010 |
+| `git --no-optional-locks status --porcelain -uno` | 0.011 |
+| `git --no-optional-locks status --porcelain` (with untracked) | 0.256 |
+| Plain `diff` / `status` under the inbox worker's exact environment | 1.22 / 1.26 |
+| `git --no-optional-locks diff-index -p HEAD --`, minutes later | 9.27 |
+
+Findings:
+- **Not the cause:** the inbox worker carries no `GIT_*` variables and uses
+  the same `/usr/bin/git` 2.34.1. The repository is not inherently slow.
+- **What varies:** the cost of the same read-only Git operation ranged from
+  0.01 s to 9.3 s within minutes. It depends on the NFS stat-cache state of
+  an index last written from another host.
+- **What the job's commands do:** plain `status`/`diff` also rewrite the
+  shared index, which provenance must never do.
+- **Side effect of this diagnosis:** one plain run under the worker
+  environment refreshed the DCVC index stat cache. Content was unchanged;
+  the tracked patch SHA-256 before and after is
+  `aa4bee51...6e3dc01e`, identical between `diff-index` and porcelain `diff`.
+- **Status:** the 30 s stall itself was not reproduced. The most plausible
+  mechanism is the same stat-driven rehash or index write over loaded NFS.
+
+Changes made:
+- **Read-only Git:** `src/utils/git_readonly.py`, used by the background
+  smoke environment probe and the SAM 3.1 source check.
+  - It always passes `--no-optional-locks` and `GIT_OPTIONAL_LOCKS=0`.
+  - It produces patches with plumbing `diff-index -p`, which gives the same
+    bytes as before.
+  - This stops the mutation but does not bound the latency.
+
+Required fix (next):
+- Snapshot each external checkout once per host as an immutable archive of
+  `HEAD` plus the tracked patch, with SHA-256s and a receipt, outside timed
+  smoke parts.
+- Jobs extract it to local scratch and verify the archive hash. NFS Git
+  leaves the job path.
+- This is the environment-snapshot item of the plan. It precedes any further
+  B1 attempt.
+
 ## Next (Phase 0 continuation)
 
 1. Gate-A: merge the reusable code from `codex/gate-a-local-confirmation`
@@ -105,9 +153,8 @@ Still to do for metadata:
    native anchor v2) through a reviewed branch. Inspect the existing
    QP52f48 job without replaying it. VVC QP52f96 and the AV1 overlap ladder
    become the first jobs of the shared anchor service.
-2. Background: run one discriminating timing check of
-   `git status -uno` against `git diff HEAD` in the DCVC checkout. Replace
-   live Git provenance with a per-host environment snapshot. Then run
+2. Background: the timing check is done (above). Implement the per-host
+   environment snapshot. Then run
    B2/B3/B4 through the new backends within the remaining budget
    (1,520 GPU-s / 1,035 CPU-s). Training needs explicit approval.
 3. Review the unpushed Cursor branches; preserve the dirty Desktop checkout.

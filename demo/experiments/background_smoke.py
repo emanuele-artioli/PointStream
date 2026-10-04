@@ -30,6 +30,7 @@ import uuid
 import numpy as np
 
 from demo.experiments import background_smoke_core as core
+from src.utils.git_readonly import readonly_git_command, readonly_git_env
 
 KINDS = ("inventory", "codec", "drift", "latent")
 STATUSES = ("passed", "failed", "inconclusive", "blocked")
@@ -379,9 +380,10 @@ def inventory_env(stage: Stage) -> dict[str, Any]:
 
     for name, root, references in (("dcvc", core.DCVC_ROOT, core.DCVC_REFERENCE_SHA256), ("hnerv", core.HNERV_ROOT, core.HNERV_REFERENCE_SHA256)):
         def git(operation: str, *args: str) -> str:
-            return probe(name + "-git-" + operation, ["git", "-C", str(root), *args]).stdout
+            return probe(name + "-git-" + operation, readonly_git_command(root, *args),
+                         env=readonly_git_env()).stdout
 
-        diff = git("diff", "diff", "--no-color", "HEAD")
+        diff = git("diff", "diff-index", "-p", "--no-color", "HEAD", "--")
         core.write_json_new(stage.path(f"{name}-source-diff.json"), {"diff": diff})
         files = {}
         for rel in references:
