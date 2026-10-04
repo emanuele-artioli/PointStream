@@ -185,14 +185,13 @@ def _resolve_weight(checkpoint: str | None, default_name: str) -> Path:
     if checkpoint:
         path = Path(checkpoint)
         if not path.is_absolute():
-            planted = paths.assets() / "weights" / checkpoint
-            path = planted if planted.exists() else path
+            path = paths.model_asset(checkpoint)
     else:
-        path = paths.assets() / "weights" / default_name
+        path = paths.model_asset(default_name)
     if not path.is_file():
         raise FileNotFoundError(
             f"pix2pix has no model loaded and weight file is missing at {path}. "
-            f"Pass model=... for tests, or place {default_name} under assets/weights/."
+            f"Pass model=... for tests, or place {default_name} under the configured Models directory."
         )
     return path.resolve()
 

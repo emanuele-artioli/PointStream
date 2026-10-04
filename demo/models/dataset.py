@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import sqlite3  # noqa: F401
 import sys
 from pathlib import Path
@@ -17,9 +18,11 @@ import torch
 from torch.utils.data import Dataset
 
 from demo.models.matte import letterbox_alpha, matte_bgr, soft_edge_alpha
+from demo.models.sampled_seconds import sampled_frame_kept
 from demo.pipeline.foreground_segmenter import letterbox_crop
 from demo.pipeline.hand_keypoints import (
     FrameHandPose,
+    SingleHand,
     render_skeleton_on_canvas,
 )
 
@@ -67,6 +70,122 @@ class EgocentricHandDataset(Dataset):
             "clip_id": torch.tensor(item.get("clip_id", 0)),
             "frame_idx": torch.tensor(item.get("frame_idx", 0)),
         }
+
+
+def load_pose_rows(path: Path) -> list[FrameHandPose]:
+    rows = json.loads(path.read_text())
+    poses = []
+    for row in rows:
+        hands = []
+        for hand in row.get("hands", []):
+            pixel = hand["landmarks_pixel"]
+            wrist_x = float(pixel[0][0]) if pixel else 0.0
+            side = hand.get("handedness") or "Unknown"
+            if side not in ("Left", "Right"):
+                side = "Left" if wrist_x < 960.0 else "Right"
+            hands.append(
+                SingleHand(
+                    handedness=side,
+                    confidence=float(hand["confidence"]),
+                    bbox=[int(v) for v in hand["bbox"]],
+                    landmarks_norm=hand["landmarks_norm"],
+                    landmarks_pixel=pixel,
+                )
+            )
+        poses.append(FrameHandPose(frame_idx=int(row["frame_idx"]), hands=hands))
+    return poses
+
+
+def build_sampled_samples(
+    folder: Path,
+    *,
+    image_size: int = 256,
+    clip_id: int = 0,
+) -> tuple[list[dict[str, Any]], dict[str, np.ndarray], dict[str, int]]:
+    """Build hand crops from a sampled folder of original frames, masks, and poses."""
+    pose_path = folder / "poses_segmented.json"
+    if not pose_path.exists():
+        pose_path = folder / "poses.json"
+    poses = load_pose_rows(pose_path)
+    frames = sorted((folder / "original").glob("*.jpg"))
+    masks = folder / "masks"
+
+    def _alpha_for(idx: int, frame: np.ndarray, bbox: list[int]) -> np.ndarray | None:
+        path = masks / f"{frames[idx].stem}.png"
+        if not path.exists():
+            return None
+        full = cv2.imread(str(path), cv2.IMREAD_GRAYSCALE)
+        if full is None:
+            return None
+        if full.shape[:2] != frame.shape[:2]:
+            full = cv2.resize(full, (frame.shape[1], frame.shape[0]), interpolation=cv2.INTER_NEAREST)
+        return letterbox_alpha((full > 8).astype(np.uint8) * 255, bbox, target_size=image_size)
+
+    appearance_anchors: dict[str, np.ndarray] = {}
+    anchor_bytes: dict[str, int] = {}
+    anchor_score: dict[str, float] = {}
+    samples: list[dict[str, Any]] = []
+
+    def _store_anchor(side: str, crop: np.ndarray, score: float) -> None:
+        ok, webp_buf = cv2.imencode(".webp", crop, [cv2.IMWRITE_WEBP_QUALITY, 90])
+        if ok:
+            anchor_bytes[side] = len(webp_buf)
+            crop = cv2.imdecode(webp_buf, cv2.IMREAD_COLOR)
+        appearance_anchors[side] = crop
+        anchor_score[side] = score
+
+    loaded = [(idx, cv2.imread(str(path))) for idx, path in enumerate(frames)]
+    for idx, frame in loaded:
+        if frame is None or idx >= len(poses) or idx >= len(frames):
+            continue
+        if not sampled_frame_kept(folder, frames[idx].name):
+            continue
+        for hand in poses[idx].hands:
+            side = hand.handedness
+            alpha = _alpha_for(idx, frame, hand.bbox)
+            if alpha is not None and int(np.count_nonzero(alpha)) < 200:
+                continue
+            if side in appearance_anchors and hand.confidence <= anchor_score[side]:
+                continue
+            crop, _ = letterbox_crop(frame, hand.bbox, target_size=image_size)
+            if alpha is not None:
+                crop = matte_bgr(crop, alpha)
+            _store_anchor(side, crop, hand.confidence)
+
+    for idx, frame in loaded:
+        if frame is None or idx >= len(poses) or idx >= len(frames):
+            continue
+        if not sampled_frame_kept(folder, frames[idx].name):
+            continue
+        for hand in poses[idx].hands:
+            side = hand.handedness
+            if side not in appearance_anchors:
+                continue
+            alpha = _alpha_for(idx, frame, hand.bbox)
+            if alpha is not None and int(np.count_nonzero(alpha)) < 200:
+                continue
+            tgt_crop, _ = letterbox_crop(frame, hand.bbox, target_size=image_size)
+            if alpha is not None:
+                tgt_crop = matte_bgr(tgt_crop, alpha)
+            skel_crop = render_skeleton_on_canvas(
+                FrameHandPose(frame_idx=idx, hands=[hand]),
+                width=image_size,
+                height=image_size,
+                crop_bbox=hand.bbox,
+            )
+            sample: dict[str, Any] = {
+                "appearance_crop": appearance_anchors[side],
+                "skeleton_crop": skel_crop,
+                "target_crop": tgt_crop,
+                "clip_id": clip_id,
+                "frame_idx": idx,
+                "handedness": side,
+                "bbox": hand.bbox,
+            }
+            if alpha is not None:
+                sample["target_alpha"] = soft_edge_alpha(alpha)
+            samples.append(sample)
+    return samples, appearance_anchors, anchor_bytes
 
 
 def build_curated_samples(

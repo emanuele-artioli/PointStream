@@ -28,9 +28,29 @@ def score_pose_tracks(
 
     Detection is GT-hand recall (centroid match). MPJPE is *conditional* on a
     match (survivorship). ``pck50_all_gt`` treats an unmatched GT hand as 21
-    missed joints so it cannot improve by dropping hard frames.
+    missed joints so it cannot improve by dropping hard frames. Reference frame
+    indices define the window; missing predictions remain in the denominator.
+    Reference observations may be model-derived: this function cannot qualify
+    their independence or certify source timestamp alignment.
     """
-    n_frames = min(len(gt_poses), len(pred_poses))
+
+    # The complete reference track defines the registered evaluation window.
+    # An absent prediction is missing evidence, never a shorter denominator.
+    def index_frames(poses: list[FrameHandPose], name: str) -> dict[int, FrameHandPose]:
+        indexed: dict[int, FrameHandPose] = {}
+        for pose in poses:
+            if pose.frame_idx in indexed:
+                raise ValueError(f"duplicate {name} frame index: {pose.frame_idx}")
+            indexed[pose.frame_idx] = pose
+        return indexed
+
+    reference = index_frames(gt_poses, "reference")
+    prediction = index_frames(pred_poses, "prediction")
+    outside = sorted(set(prediction) - set(reference))
+    if outside:
+        raise ValueError(f"prediction frames outside registered reference: {outside}")
+    n_frames = len(reference)
+    missing_frames = len(set(reference) - set(prediction))
     empty = {
         "detection_rate": 0.0,
         "oracle_capture_ratio": 0.0,
@@ -39,9 +59,13 @@ def score_pose_tracks(
         "handedness_agreement": 0.0,
         "pck50_matched": 0.0,
         "pck50_all_gt": 0.0,
+        "registered_frames": float(n_frames),
+        "prediction_frames": float(len(prediction)),
+        "missing_prediction_frames": float(missing_frames),
         "gt_hands": 0.0,
         "pred_hands": 0.0,
         "matched_hands": 0.0,
+        "missing_reference_hands": 0.0,
     }
     if n_frames == 0:
         return empty
@@ -57,15 +81,18 @@ def score_pose_tracks(
     pck_hits_all = 0
     pck_total_all = 0
 
-    for i in range(n_frames):
-        unmatched_pred = list(pred_poses[i].hands)
-        pred_hands_total += len(pred_poses[i].hands)
+    for frame_idx, ref_frame in reference.items():
+        pred_frame = prediction.get(frame_idx)
+        unmatched_pred = list(pred_frame.hands) if pred_frame is not None else []
+        pred_hands_total += len(unmatched_pred)
 
-        for r_hand in gt_poses[i].hands:
+        for r_hand in ref_frame.hands:
             gt_hands_total += 1
             r_pts = np.array(r_hand.landmarks_pixel, dtype=np.float64)
             r_centroid = np.mean(r_pts, axis=0)
-            best_d_hand, best_dist, best_idx = _nearest_hand(r_hand, r_centroid, unmatched_pred, match_px)
+            best_d_hand, best_dist, best_idx = _nearest_hand(
+                r_hand, r_centroid, unmatched_pred, match_px
+            )
 
             pck_total_all += 21
             if best_d_hand is None:
@@ -93,10 +120,16 @@ def score_pose_tracks(
         "mpjpe_pixels": float(np.mean(joint_errors)) if joint_errors else 0.0,
         "mean_confidence": float(np.mean(confidences)) if confidences else 0.0,
         "handedness_agreement": (
-            float(handedness_agreed_count / detected_hands_count) if detected_hands_count > 0 else 1.0
+            float(handedness_agreed_count / detected_hands_count)
+            if detected_hands_count > 0
+            else 1.0
         ),
         "pck50_matched": float(pck_hits_matched / pck_total_matched) if pck_total_matched else 0.0,
         "pck50_all_gt": float(pck_hits_all / pck_total_all) if pck_total_all else 0.0,
+        "registered_frames": float(n_frames),
+        "prediction_frames": float(len(prediction)),
+        "missing_prediction_frames": float(missing_frames),
+        "missing_reference_hands": float(gt_hands_total - detected_hands_count),
         "gt_hands": float(gt_hands_total),
         "pred_hands": float(pred_hands_total),
         "matched_hands": float(detected_hands_count),

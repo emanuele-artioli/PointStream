@@ -92,7 +92,7 @@ def _repo_root() -> Path:
 
 
 def weights_dir(root: Path | None = None) -> Path:
-    return (root / "assets" / "weights") if root is not None else paths.assets() / "weights"
+    return (root / "assets" / "weights") if root is not None else paths.models_root()
 
 
 def resolve_controlnet_checkpoint(
@@ -115,15 +115,10 @@ def resolve_controlnet_checkpoint(
         raise ValueError(
             f"Unknown ControlNet variant {variant!r}. Known: {', '.join(sorted(_KNOWN))}."
         )
-    base = Path(checkpoint) if checkpoint else weights_dir(root) / _CONTROLNET_DIR.get(
-        variant, f"{variant}-controlnet"
-    )
+    selected = checkpoint or _CONTROLNET_DIR.get(variant, f"{variant}-controlnet")
+    base = Path(selected)
     if not base.is_absolute():
-        planted = weights_dir(root) / checkpoint if checkpoint else base
-        if planted.exists() or planted.is_symlink():
-            base = planted
-        elif not base.exists():
-            base = weights_dir(root) / base.name if checkpoint is None else (weights_dir(root) / checkpoint)
+        base = weights_dir(root) / selected if root is not None else paths.model_asset(selected)
 
     if base.name.startswith("checkpoint-epoch-"):
         parsed = int(base.name.rsplit("-", maxsplit=1)[-1])
@@ -304,9 +299,7 @@ class ControlNetGenerator(BaseFrameGenerator):
         self.last_prompt: str | None = None
         self.last_prompt_source: str | None = None
 
-    def prepare(
-        self, conditioning: ConditioningBundle, params: GenerationParams
-    ) -> dict[str, Any]:
+    def prepare(self, conditioning: ConditioningBundle, params: GenerationParams) -> dict[str, Any]:
         """Letterbox appearance and every declared condition onto one canvas.
 
         Public so the rescale fix is testable without loading diffusers.
@@ -417,9 +410,11 @@ class ControlNetGenerator(BaseFrameGenerator):
             return Image.fromarray(array)
 
         if self.variant == "ip-adapter":
-            kwargs["image"] = to_pil(control) if not isinstance(control, list) else [
-                to_pil(item) for item in control
-            ]
+            kwargs["image"] = (
+                to_pil(control)
+                if not isinstance(control, list)
+                else [to_pil(item) for item in control]
+            )
             kwargs["ip_adapter_image"] = to_pil(appearance)
             kwargs.pop("control_image", None)
             kwargs.pop("strength", None)
@@ -456,9 +451,7 @@ class ControlNetGenerator(BaseFrameGenerator):
                 f"Requested device={device!r}, checkpoint={self.checkpoint!r}."
             ) from exc
 
-        sources = controlnet_weight_paths(
-            self.variant, self.checkpoint, self.epoch
-        )
+        sources = controlnet_weight_paths(self.variant, self.checkpoint, self.epoch)
         sd_path = self._resolve_sd()
         dtype = _dtype_for(device)
         if self.variant == "multi":
@@ -527,9 +520,7 @@ class ControlNetGenerator(BaseFrameGenerator):
                     import torch
 
                     _LOGGER.info("Loading trained IP-Adapter weights from %s", trained)
-                    pipe.unet._load_ip_adapter_weights(
-                        [torch.load(trained, map_location="cpu")]
-                    )
+                    pipe.unet._load_ip_adapter_weights([torch.load(trained, map_location="cpu")])
             pipe.set_ip_adapter_scale(self.ip_adapter_scale)
         else:
             pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
@@ -581,7 +572,9 @@ def _dtype_for(device: Device) -> Any:
     from src.components.generation.torch_dtype import resolve_torch_dtype_for_device
 
     return resolve_torch_dtype_for_device(
-        device, default_cuda=torch.float16, allowed_cuda={torch.float16, torch.bfloat16, torch.float32}
+        device,
+        default_cuda=torch.float16,
+        allowed_cuda={torch.float16, torch.bfloat16, torch.float32},
     )
 
 

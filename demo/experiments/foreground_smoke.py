@@ -40,22 +40,48 @@ PROFILE_IMAGE_LIMIT = 16
 COMPARE_FRAME_LIMIT = 8
 SAM_FRAME_LIMIT = 30
 CONNECTIONS = (
-    (0, 1), (1, 2), (2, 3), (3, 4), (0, 5), (5, 6), (6, 7), (7, 8),
-    (0, 9), (9, 10), (10, 11), (11, 12), (0, 13), (13, 14), (14, 15), (15, 16),
-    (0, 17), (17, 18), (18, 19), (19, 20), (5, 9), (9, 13), (13, 17),
+    (0, 1),
+    (1, 2),
+    (2, 3),
+    (3, 4),
+    (0, 5),
+    (5, 6),
+    (6, 7),
+    (7, 8),
+    (0, 9),
+    (9, 10),
+    (10, 11),
+    (11, 12),
+    (0, 13),
+    (13, 14),
+    (14, 15),
+    (15, 16),
+    (0, 17),
+    (17, 18),
+    (18, 19),
+    (19, 20),
+    (5, 9),
+    (9, 13),
+    (13, 17),
 )
 
 
 def validate_limits(args: argparse.Namespace) -> None:
     """Reject broad runs at the CLI boundary, before loading any data/model."""
     if args.command == "audit":
-        if args.max_candidates_per_recording < 1 or args.max_candidates_per_recording > IMAGE_CANDIDATES_PER_RECORDING:
+        if (
+            args.max_candidates_per_recording < 1
+            or args.max_candidates_per_recording > IMAGE_CANDIDATES_PER_RECORDING
+        ):
             raise ValueError("audit is capped at 24 pixel-inspected candidates per recording")
     elif args.command == "packet":
         if not 1 <= args.max_frames <= COMPARE_FRAME_LIMIT:
             raise ValueError("packet smoke is capped at 8 frames")
     elif args.command == "fit":
-        if not 1 <= args.max_steps <= FIT_FRAMES_PER_ARM or not 1 <= args.seconds_per_arm <= FIT_SECONDS_PER_ARM:
+        if (
+            not 1 <= args.max_steps <= FIT_FRAMES_PER_ARM
+            or not 1 <= args.seconds_per_arm <= FIT_SECONDS_PER_ARM
+        ):
             raise ValueError("fit smoke is capped at 120 steps and 120 seconds per arm")
     elif args.command == "profile":
         if not 1 <= args.max_images <= PROFILE_IMAGE_LIMIT:
@@ -100,8 +126,12 @@ def _source_provenance() -> dict:
         return {"dispatch_manifest": "unreadable", "error": str(exc)}
     return {
         "git_head": dispatch.get("git_metadata", {}).get("git_head"),
-        "tracked_worktree_patch_sha256": dispatch.get("git_metadata", {}).get("tracked_worktree_patch_sha256"),
-        "included_untracked_sha256": dispatch.get("git_metadata", {}).get("included_untracked_sha256", {}),
+        "tracked_worktree_patch_sha256": dispatch.get("git_metadata", {}).get(
+            "tracked_worktree_patch_sha256"
+        ),
+        "included_untracked_sha256": dispatch.get("git_metadata", {}).get(
+            "included_untracked_sha256", {}
+        ),
         "snapshot_sha256": dispatch.get("git_metadata", {}).get("snapshot_sha256"),
     }
 
@@ -110,7 +140,12 @@ def _geometry_flags(hand: dict, width: int, height: int) -> tuple[list[str], dic
     flags: list[str] = []
     points = np.asarray(hand.get("landmarks_pixel", []), dtype=np.float64)
     bbox = np.asarray(hand.get("box", []), dtype=np.float64)
-    if points.shape != (21, 2) or not np.isfinite(points).all() or bbox.shape != (4,) or not np.isfinite(bbox).all():
+    if (
+        points.shape != (21, 2)
+        or not np.isfinite(points).all()
+        or bbox.shape != (4,)
+        or not np.isfinite(bbox).all()
+    ):
         return ["invalid_points_or_bbox"], {"distinct_positions": None, "bone_lengths_px": None}
     x1, y1, x2, y2 = (float(v) for v in bbox)
     if x2 <= x1 or y2 <= y1 or x2 < 0 or y2 < 0 or x1 > width or y1 > height:
@@ -154,13 +189,19 @@ def _sample_by_second(items: list[dict], limit: int, seed: int) -> list[dict]:
 
 
 def _box_iou(first: list[float], second: list[float]) -> float:
-    x1=max(float(first[0]),float(second[0])); y1=max(float(first[1]),float(second[1]))
-    x2=min(float(first[2]),float(second[2])); y2=min(float(first[3]),float(second[3]))
-    intersection=max(0.0,x2-x1)*max(0.0,y2-y1)
-    area_a=max(0.0,float(first[2])-float(first[0]))*max(0.0,float(first[3])-float(first[1]))
-    area_b=max(0.0,float(second[2])-float(second[0]))*max(0.0,float(second[3])-float(second[1]))
-    union=area_a+area_b-intersection
-    return intersection/union if union>0 else 0.0
+    x1 = max(float(first[0]), float(second[0]))
+    y1 = max(float(first[1]), float(second[1]))
+    x2 = min(float(first[2]), float(second[2]))
+    y2 = min(float(first[3]), float(second[3]))
+    intersection = max(0.0, x2 - x1) * max(0.0, y2 - y1)
+    area_a = max(0.0, float(first[2]) - float(first[0])) * max(
+        0.0, float(first[3]) - float(first[1])
+    )
+    area_b = max(0.0, float(second[2]) - float(second[0])) * max(
+        0.0, float(second[3]) - float(second[1])
+    )
+    union = area_a + area_b - intersection
+    return intersection / union if union > 0 else 0.0
 
 
 def _closest_component(mask: np.ndarray, bbox: list[float]) -> tuple[np.ndarray | None, int | None]:
@@ -213,7 +254,9 @@ def _candidate_group(flags: list[str], inside: float | None, distinct: int | Non
     return "plausible"
 
 
-def audit_dataset(dataset_root: Path, output_dir: Path, seed: int = 1234, max_per_recording: int = 24) -> Path:
+def audit_dataset(
+    dataset_root: Path, output_dir: Path, seed: int = 1234, max_per_recording: int = 24
+) -> Path:
     """Write a bounded geometry audit and pending-label contact sheets."""
     if not 1 <= max_per_recording <= IMAGE_CANDIDATES_PER_RECORDING:
         raise ValueError("audit is capped at 24 pixel-inspected candidates per recording")
@@ -229,13 +272,21 @@ def audit_dataset(dataset_root: Path, output_dir: Path, seed: int = 1234, max_pe
             for index, hand in enumerate(row.get("hands", [])):
                 flags, measurements = _geometry_flags(hand, 1920, 1080)
                 candidate_id = str(hand.get("candidate_id", f"{clip}:{frame}:{index}"))
-                candidates.append({
-                    "recording": clip, "frame_idx": frame, "source_second": frame // 30,
-                    "candidate_id": candidate_id, "file": row.get("file", f"{frame:06d}.jpg"),
-                    "hand": hand, "flags": flags, "measurements": measurements,
-                    "raw_mean_score": hand.get("confidence"), "raw_joint_scores": hand.get("joint_scores"),
-                    "legacy_row_flags": {key: row.get(key) for key in ("aisle", "look")},
-                })
+                candidates.append(
+                    {
+                        "recording": clip,
+                        "frame_idx": frame,
+                        "source_second": frame // 30,
+                        "candidate_id": candidate_id,
+                        "file": row.get("file", f"{frame:06d}.jpg"),
+                        "hand": hand,
+                        "flags": flags,
+                        "measurements": measurements,
+                        "raw_mean_score": hand.get("confidence"),
+                        "raw_joint_scores": hand.get("joint_scores"),
+                        "legacy_row_flags": {key: row.get(key) for key in ("aisle", "look")},
+                    }
+                )
 
         # Causal temporal jump flag. It is a review aid only: tracking does not
         # make the candidate a correct hand or assign a semantic side.
@@ -246,7 +297,7 @@ def audit_dataset(dataset_root: Path, output_dir: Path, seed: int = 1234, max_pe
         for frame_items in by_frame.values():
             valid_boxes = [item for item in frame_items if not item["flags"]]
             for index, first in enumerate(valid_boxes):
-                for second in valid_boxes[index + 1:]:
+                for second in valid_boxes[index + 1 :]:
                     first_box = first["hand"].get("box", [])
                     second_box = second["hand"].get("box", [])
                     if len(first_box) != 4 or len(second_box) != 4:
@@ -266,11 +317,15 @@ def audit_dataset(dataset_root: Path, output_dir: Path, seed: int = 1234, max_pe
             for item in valid_items:
                 hand = item["hand"]
                 side = str(hand.get("side", "")).lower()
-                detections.append(HandDetection(
-                    tuple(map(float, hand["box"])),
-                    tuple(tuple(map(float, point[:2])) for point in hand["landmarks_pixel"]),
-                    side if side in ("left", "right") else None, None, item["candidate_id"],
-                ))
+                detections.append(
+                    HandDetection(
+                        tuple(map(float, hand["box"])),
+                        tuple(tuple(map(float, point[:2])) for point in hand["landmarks_pixel"]),
+                        side if side in ("left", "right") else None,
+                        None,
+                        item["candidate_id"],
+                    )
+                )
             assignment = associator.assign(detections)
             for tracked in assignment.hands:
                 cx = (tracked.bbox[0] + tracked.bbox[2]) / 2
@@ -279,9 +334,19 @@ def audit_dataset(dataset_root: Path, output_dir: Path, seed: int = 1234, max_pe
                 if old and 0 < frame - old[0] <= 30:
                     jump = math.hypot(cx - old[1], cy - old[2]) / math.hypot(1920, 1080)
                     if jump > 0.25:
-                        item = next((candidate for candidate in valid_items
-                                     if tuple(map(float, candidate["hand"]["box"])) == tracked.bbox
-                                     and tuple(tuple(map(float, p[:2])) for p in candidate["hand"]["landmarks_pixel"]) == tracked.joints), None)
+                        item = next(
+                            (
+                                candidate
+                                for candidate in valid_items
+                                if tuple(map(float, candidate["hand"]["box"])) == tracked.bbox
+                                and tuple(
+                                    tuple(map(float, p[:2]))
+                                    for p in candidate["hand"]["landmarks_pixel"]
+                                )
+                                == tracked.joints
+                            ),
+                            None,
+                        )
                         if item is not None:
                             item["flags"].append("abrupt_temporal_change")
                             item["measurements"]["normalized_center_jump"] = jump
@@ -292,7 +357,9 @@ def audit_dataset(dataset_root: Path, output_dir: Path, seed: int = 1234, max_pe
         # may refine a stratum but is never considered a semantic hand label.
         strata = {name: [] for name in ("plausible", "flagged", "ambiguous")}
         for item in candidates:
-            group = _candidate_group(item["flags"], None, item["measurements"]["distinct_positions"])
+            group = _candidate_group(
+                item["flags"], None, item["measurements"]["distinct_positions"]
+            )
             item["sample_group"] = group
             strata[group].append(item)
         sample = []
@@ -308,7 +375,9 @@ def audit_dataset(dataset_root: Path, output_dir: Path, seed: int = 1234, max_pe
         sample = sample[:max_per_recording]
         if clip == "clip_03":
             frame_zero = next((item for item in candidates if item["frame_idx"] // 30 == 0), None)
-            if frame_zero is not None and all(item["candidate_id"] != frame_zero["candidate_id"] for item in sample):
+            if frame_zero is not None and all(
+                item["candidate_id"] != frame_zero["candidate_id"] for item in sample
+            ):
                 if len(sample) >= max_per_recording:
                     sample[-1] = frame_zero
                 else:
@@ -341,14 +410,22 @@ def audit_dataset(dataset_root: Path, output_dir: Path, seed: int = 1234, max_pe
             item["split"] = "factory002_audit_only" if clip == "factory002" else "unassigned"
             final_holdout = frame_index >= total_frames - 300
             recipe_excluded = clip == "clip_03" and frame_index // 30 in {210, 240, 420}
-            item["training_eligible"] = bool(clip != "factory002" and not final_holdout and not recipe_excluded)
+            item["training_eligible"] = bool(
+                clip != "factory002" and not final_holdout and not recipe_excluded
+            )
             item["training_excluded_reason"] = (
-                "factory002_audit_only" if clip == "factory002" else
-                "final_last_10_seconds" if final_holdout else
-                "clip3_excluded_source_second" if recipe_excluded else None
+                "factory002_audit_only"
+                if clip == "factory002"
+                else "final_last_10_seconds"
+                if final_holdout
+                else "clip3_excluded_source_second"
+                if recipe_excluded
+                else None
             )
             item["clip3_second_zero_look_override"] = bool(
-                clip == "clip_03" and frame_index // 30 == 0 and item["legacy_row_flags"].get("look")
+                clip == "clip_03"
+                and frame_index // 30 == 0
+                and item["legacy_row_flags"].get("look")
             )
             image_path = folder / "original" / item["file"]
             mask_path = folder / "masks" / f"{Path(item['file']).stem}.png"
@@ -368,9 +445,16 @@ def audit_dataset(dataset_root: Path, output_dir: Path, seed: int = 1234, max_pe
                 records.append(_record_candidate_summary(item, clip))
                 continue
             if mask.shape != image.shape[:2]:
-                mask = cv2.resize(mask, (image.shape[1], image.shape[0]), interpolation=cv2.INTER_NEAREST)
+                mask = cv2.resize(
+                    mask, (image.shape[1], image.shape[0]), interpolation=cv2.INTER_NEAREST
+                )
             raw_box = np.asarray(item["hand"].get("box", []), dtype=np.float64)
-            if raw_box.shape != (4,) or not np.isfinite(raw_box).all() or raw_box[2] <= raw_box[0] or raw_box[3] <= raw_box[1]:
+            if (
+                raw_box.shape != (4,)
+                or not np.isfinite(raw_box).all()
+                or raw_box[2] <= raw_box[0]
+                or raw_box[3] <= raw_box[1]
+            ):
                 item["pixel_review_error"] = "invalid_bbox_no_crop"
                 item["review_status"] = "pixel_review_unavailable"
                 item["image_sha256"] = hashlib.sha256(image_bytes).hexdigest()
@@ -379,12 +463,18 @@ def audit_dataset(dataset_root: Path, output_dir: Path, seed: int = 1234, max_pe
                 continue
             component, label = _closest_component(mask, list(map(float, raw_box)))
             points = np.asarray(item["hand"].get("landmarks_pixel", []), dtype=np.float64)
-            inside = _inside_fraction(points, component) if points.shape == (21, 2) and np.isfinite(points).all() else None
+            inside = (
+                _inside_fraction(points, component)
+                if points.shape == (21, 2) and np.isfinite(points).all()
+                else None
+            )
             item["mask_component_label"] = label
             item["inside_fraction_own_component"] = inside
             if inside is not None and inside < 0.5:
                 item["flags"].append("inside_fraction_below_0.5")
-            item["sample_group"] = _candidate_group(item["flags"], inside, item["measurements"]["distinct_positions"])
+            item["sample_group"] = _candidate_group(
+                item["flags"], inside, item["measurements"]["distinct_positions"]
+            )
             if displayed_by_group[item["sample_group"]] >= 8:
                 item["review_status"] = "not_on_contact_sheet"
             else:
@@ -392,8 +482,10 @@ def audit_dataset(dataset_root: Path, output_dir: Path, seed: int = 1234, max_pe
             item["image_sha256"] = hashlib.sha256(image_bytes).hexdigest()
             item["mask_sha256"] = hashlib.sha256(mask_bytes).hexdigest()
             x1, y1, x2, y2 = [int(round(float(v))) for v in item["hand"]["box"]]
-            x1=max(0,min(image.shape[1]-1,x1)); x2=max(x1+1,min(image.shape[1],x2))
-            y1=max(0,min(image.shape[0]-1,y1)); y2=max(y1+1,min(image.shape[0],y2))
+            x1 = max(0, min(image.shape[1] - 1, x1))
+            x2 = max(x1 + 1, min(image.shape[1], x2))
+            y1 = max(0, min(image.shape[0] - 1, y1))
+            y2 = max(y1 + 1, min(image.shape[0], y2))
             crop = image[y1:y2, x1:x2]
             if crop.size == 0:
                 item["flags"].append("zero_area_crop")
@@ -401,22 +493,51 @@ def audit_dataset(dataset_root: Path, output_dir: Path, seed: int = 1234, max_pe
                 records.append(_record_candidate_summary(item, clip))
                 continue
             crop = cv2.resize(crop, (192, 192), interpolation=cv2.INTER_AREA)
-            mask_tile = cv2.resize((component[y1:y2, x1:x2].astype(np.uint8) * 255) if component is not None else np.zeros((y2-y1,x2-x1),np.uint8), (192,192), interpolation=cv2.INTER_NEAREST)
+            mask_tile = cv2.resize(
+                (component[y1:y2, x1:x2].astype(np.uint8) * 255)
+                if component is not None
+                else np.zeros((y2 - y1, x2 - x1), np.uint8),
+                (192, 192),
+                interpolation=cv2.INTER_NEAREST,
+            )
             mask_tile = cv2.cvtColor(mask_tile, cv2.COLOR_GRAY2BGR)
             overlay = crop.copy()
-            for px, py in points if points.shape == (21,2) and np.isfinite(points).all() else []:
-                cx = int((px-x1)/max(1,x2-x1)*192); cy = int((py-y1)/max(1,y2-y1)*192)
+            for px, py in points if points.shape == (21, 2) and np.isfinite(points).all() else []:
+                cx = int((px - x1) / max(1, x2 - x1) * 192)
+                cy = int((py - y1) / max(1, y2 - y1) * 192)
                 if 0 <= cx < 192 and 0 <= cy < 192:
-                    cv2.circle(overlay, (cx,cy), 2, (0,255,255), -1)
+                    cv2.circle(overlay, (cx, cy), 2, (0, 255, 255), -1)
             if provisional_anchor is None and item["sample_group"] == "plausible":
                 provisional_anchor = crop.copy()
-            anchor = provisional_anchor if provisional_anchor is not None else np.full_like(crop, 128)
+            anchor = (
+                provisional_anchor if provisional_anchor is not None else np.full_like(crop, 128)
+            )
             tiles = [crop, mask_tile, overlay, anchor]
-            anchor_title = "provisional anchor" if provisional_anchor is not None else "anchor pending"
+            anchor_title = (
+                "provisional anchor" if provisional_anchor is not None else "anchor pending"
+            )
             for tile, title in zip(tiles, ("crop", "mask", "pose", anchor_title)):
-                cv2.putText(tile, title, (4, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0,255,0), 1, cv2.LINE_AA)
+                cv2.putText(
+                    tile,
+                    title,
+                    (4, 15),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.45,
+                    (0, 255, 0),
+                    1,
+                    cv2.LINE_AA,
+                )
             panel = np.concatenate(tiles, axis=1)
-            cv2.putText(panel, f"{clip} f{item['frame_idx']} {item['sample_group']} {item['flags']}", (4, 188), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0,0,255), 1, cv2.LINE_AA)
+            cv2.putText(
+                panel,
+                f"{clip} f{item['frame_idx']} {item['sample_group']} {item['flags']}",
+                (4, 188),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.35,
+                (0, 0, 255),
+                1,
+                cv2.LINE_AA,
+            )
             if item["review_status"] == "pending_human":
                 clip_panels.append(panel)
             records.append(_record_candidate_summary(item, clip))
@@ -430,13 +551,17 @@ def audit_dataset(dataset_root: Path, output_dir: Path, seed: int = 1234, max_pe
                 row["batches_manifest"] = batch_info
 
     manifest = {
-        "schema": "pointstream.foreground.audit.v1", "seed": seed,
-        "dataset_root": str(dataset_root), "created_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "schema": "pointstream.foreground.audit.v1",
+        "seed": seed,
+        "dataset_root": str(dataset_root),
+        "created_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "source_provenance": _source_provenance(),
         "max_pixel_inspected_candidates_per_recording": max_per_recording,
-        "notes": ["Heuristic flags and mask agreement are diagnostics, not labels.",
-                  "review_label remains null until a human assigns visible_hand, non_hand, or uncertain.",
-                  "No source data or legacy manifest was modified."],
+        "notes": [
+            "Heuristic flags and mask agreement are diagnostics, not labels.",
+            "review_label remains null until a human assigns visible_hand, non_hand, or uncertain.",
+            "No source data or legacy manifest was modified.",
+        ],
         "candidates": records,
     }
     path = output_dir / "audit-manifest.json"
@@ -466,36 +591,56 @@ def run_packet(input_path: Path, output_dir: Path, max_frames: int) -> dict:
     for frame in frames_in:
         hands = []
         for row in frame:
-            hands.append(TrackedHand(
-                int(row["track_id"]), row.get("handedness"),
-                tuple(map(float, row["bbox"])), tuple(tuple(map(float, point[:2])) for point in row["joints"]),
-            ))
+            hands.append(
+                TrackedHand(
+                    int(row["track_id"]),
+                    row.get("handedness"),
+                    tuple(map(float, row["bbox"])),
+                    tuple(tuple(map(float, point[:2])) for point in row["joints"]),
+                )
+            )
         frames.append(hands)
     output_dir.mkdir(parents=True, exist_ok=True)
-    report = {"schema": "pointstream.foreground.packet-smoke.v1", "input_sha256": hashlib.sha256(input_bytes).hexdigest(), "methods": {}}
+    report = {
+        "schema": "pointstream.foreground.packet-smoke.v1",
+        "input_sha256": hashlib.sha256(input_bytes).hexdigest(),
+        "methods": {},
+    }
     for method in ("raw", "zlib", "delta_zlib"):
-        packet = encode_segment(frames, width=width, height=height, start_frame=start_frame, method=method)
+        packet = encode_segment(
+            frames, width=width, height=height, start_frame=start_frame, method=method
+        )
         decoded = decode_segment(packet)
         path = output_dir / f"segment-{method}.psfg"
         path.write_bytes(packet)
-        report["methods"][method] = {"bytes": len(packet), "file_bytes": path.stat().st_size, "roundtrip_frames": len(decoded["frames"])}
+        report["methods"][method] = {
+            "bytes": len(packet),
+            "file_bytes": path.stat().st_size,
+            "roundtrip_frames": len(decoded["frames"]),
+        }
         report.setdefault("_decoded", []).append(decoded["frames"])
     decoded_sets = report.pop("_decoded")
     report["codes_identical"] = all(item == decoded_sets[0] for item in decoded_sets)
     report["citable"] = False
     report["label"] = "diagnostic"
-    (output_dir / "packet-report.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    (output_dir / "packet-report.json").write_text(
+        json.dumps(report, indent=2, sort_keys=True) + "\n"
+    )
     return report
 
 
-def compare_packet_cuts(frames: list[list[TrackedHand]], *, width: int, height: int, start_frame: int) -> dict:
+def compare_packet_cuts(
+    frames: list[list[TrackedHand]], *, width: int, height: int, start_frame: int
+) -> dict:
     """Byte accounting for raw, zlib, and exact residual coding on one fixed cut."""
     if len(frames) != 8:
         raise ValueError("the diagnostic cut is exactly 8 frames")
     methods = {}
     reference = None
     for method in ("raw", "zlib", "delta_zlib"):
-        packet = encode_segment(frames, width=width, height=height, start_frame=start_frame, method=method)
+        packet = encode_segment(
+            frames, width=width, height=height, start_frame=start_frame, method=method
+        )
         decoded = decode_segment(packet)["frames"]
         if reference is None:
             reference = decoded
@@ -503,10 +648,18 @@ def compare_packet_cuts(frames: list[list[TrackedHand]], *, width: int, height: 
             raise ValueError("lossless packet methods reconstructed different codes")
         methods[method] = {"bytes": len(packet), "frames": decoded}
     singles = [
-        encode_segment(frames[index:index + 1], width=width, height=height, start_frame=start_frame + index, method="delta_zlib")
+        encode_segment(
+            frames[index : index + 1],
+            width=width,
+            height=height,
+            start_frame=start_frame + index,
+            method="delta_zlib",
+        )
         for index in range(8)
     ]
-    whole = encode_segment(frames, width=width, height=height, start_frame=start_frame, method="delta_zlib")
+    whole = encode_segment(
+        frames, width=width, height=height, start_frame=start_frame, method="delta_zlib"
+    )
     raw_bytes = methods["raw"]["bytes"]
     best_name, best_bytes = min(
         ((name, item["bytes"]) for name, item in methods.items() if name != "raw"),
@@ -546,8 +699,11 @@ def build_parser() -> argparse.ArgumentParser:
     fit.add_argument("--output-dir", type=Path, required=True)
     fit.add_argument("--max-steps", type=int, default=120)
     fit.add_argument("--seconds-per-arm", type=int, default=120)
-    fit.add_argument("--freeze-only", action="store_true",
-                     help="validate human labels, freeze split, and serialize per-crop packets without training")
+    fit.add_argument(
+        "--freeze-only",
+        action="store_true",
+        help="validate human labels, freeze split, and serialize per-crop packets without training",
+    )
     profile = commands.add_parser("profile")
     profile.add_argument("--images", type=Path, required=True)
     profile.add_argument("--output-dir", type=Path, required=True)
@@ -595,6 +751,7 @@ def _emit(output_dir: Path, report: dict) -> dict:
     stage = os.environ.get("PS_STAGE")
     if stage and os.environ.get("PS_JOB_DIR"):
         from experiments.jobs.monitor import publish_progress
+
         publish_progress(stage, 1)
     return report
 
@@ -632,13 +789,16 @@ def run_profile(images: Path, output_dir: Path, max_images: int, sam_frames: int
     configured: list[str] = []
     try:
         import onnxruntime
+
         configured = list(onnxruntime.get_available_providers())
         provider = classify_execution_provider(configured, profiled)
     except ImportError:
         provider = "blocked"
     stages = {"read": read_s, "component_extraction": component_s}
     rates = stage_rates(stages, n_crops=crop_count, n_frames=len(arrays))
-    status = "passed" if provider == "cuda" else "blocked" if provider == "blocked" else "inconclusive"
+    status = (
+        "passed" if provider == "cuda" else "blocked" if provider == "blocked" else "inconclusive"
+    )
     report = _diagnostic(
         "profile",
         status=status,
@@ -661,7 +821,9 @@ def run_profile(images: Path, output_dir: Path, max_images: int, sam_frames: int
     return _emit(output_dir, report)
 
 
-def run_compare(manifest_path: Path, output_dir: Path, max_frames: int, resolutions: list[int]) -> dict:
+def run_compare(
+    manifest_path: Path, output_dir: Path, max_frames: int, resolutions: list[int]
+) -> dict:
     if resolutions != [64, 128, 256]:
         raise ValueError("diagnostic AV1 resolutions are fixed at 64, 128, and 256")
     if max_frames != 8:
@@ -678,10 +840,14 @@ def run_compare(manifest_path: Path, output_dir: Path, max_frames: int, resoluti
     for frame in frames_in[:8]:
         hands = []
         for row in frame:
-            hands.append(TrackedHand(
-                int(row["track_id"]), row.get("handedness"),
-                tuple(map(float, row["bbox"])), tuple(tuple(map(float, point[:2])) for point in row["joints"]),
-            ))
+            hands.append(
+                TrackedHand(
+                    int(row["track_id"]),
+                    row.get("handedness"),
+                    tuple(map(float, row["bbox"])),
+                    tuple(tuple(map(float, point[:2])) for point in row["joints"]),
+                )
+            )
         frames.append(hands)
     table = compare_packet_cuts(frames, width=width, height=height, start_frame=start)
     from demo.experiments.foreground_runtime import av1_square_args
@@ -723,7 +889,12 @@ def freeze_training_split(audit_manifest: dict, output_dir: Path) -> dict:
             continue
         bbox = row.get("bbox")
         points = row.get("landmarks_pixel")
-        if not isinstance(bbox, list) or len(bbox) != 4 or not isinstance(points, list) or len(points) != 21:
+        if (
+            not isinstance(bbox, list)
+            or len(bbox) != 4
+            or not isinstance(points, list)
+            or len(points) != 21
+        ):
             continue
         eligible.append(dict(row))
 
@@ -747,9 +918,13 @@ def freeze_training_split(audit_manifest: dict, output_dir: Path) -> dict:
                 chosen.append(sorted(by_side[side], key=lambda item: item["candidate_id"])[0])
         grouped[key[0]].append((key, chosen))
     for clip in grouped:
-        grouped[clip].sort(key=lambda pair: (pair[0][1], pair[1][0]["candidate_id"] if pair[1] else ""))
+        grouped[clip].sort(
+            key=lambda pair: (pair[0][1], pair[1][0]["candidate_id"] if pair[1] else "")
+        )
 
-    def pick_groups(limit: int, queues: dict[str, list], used: set[tuple[str, int]]) -> tuple[list[dict], set[tuple[str, int]]]:
+    def pick_groups(
+        limit: int, queues: dict[str, list], used: set[tuple[str, int]]
+    ) -> tuple[list[dict], set[tuple[str, int]]]:
         result: list[dict] = []
         selected_seconds: set[tuple[str, int]] = set()
         positions = {clip: 0 for clip in queues}
@@ -758,7 +933,10 @@ def freeze_training_split(audit_manifest: dict, output_dir: Path) -> dict:
         while len(result) < limit and progress:
             progress = False
             for clip in clips:
-                while positions[clip] < len(queues[clip]) and queues[clip][positions[clip]][0] in used | selected_seconds:
+                while (
+                    positions[clip] < len(queues[clip])
+                    and queues[clip][positions[clip]][0] in used | selected_seconds
+                ):
                     positions[clip] += 1
                 if positions[clip] >= len(queues[clip]) or len(result) >= limit:
                     continue
@@ -797,22 +975,25 @@ def freeze_training_split(audit_manifest: dict, output_dir: Path) -> dict:
                 tuple(map(float, row["bbox"])),
                 tuple(tuple(map(float, point[:2])) for point in row["landmarks_pixel"]),
             )
-            packet = encode_segment([[hand]], width=1920, height=1080,
-                                    start_frame=int(row["frame_idx"]), method="raw")
+            packet = encode_segment(
+                [[hand]], width=1920, height=1080, start_frame=int(row["frame_idx"]), method="raw"
+            )
             decoded = decode_segment(packet)["frames"][0][0]
             packet_path = packet_dir / f"{split}-{index:02d}.psfg"
             packet_path.write_bytes(packet)
-            result.append({
-                **row,
-                "split": split,
-                "packet_path": str(packet_path),
-                "packet_sha256": hashlib.sha256(packet).hexdigest(),
-                "packet_bytes": len(packet),
-                "decoded_track_id": decoded.track_id,
-                "decoded_handedness": decoded.handedness,
-                "decoded_bbox": list(decoded.bbox),
-                "decoded_joints": [list(point) for point in decoded.joints],
-            })
+            result.append(
+                {
+                    **row,
+                    "split": split,
+                    "packet_path": str(packet_path),
+                    "packet_sha256": hashlib.sha256(packet).hexdigest(),
+                    "packet_bytes": len(packet),
+                    "decoded_track_id": decoded.track_id,
+                    "decoded_handedness": decoded.handedness,
+                    "decoded_bbox": list(decoded.bbox),
+                    "decoded_joints": [list(point) for point in decoded.joints],
+                }
+            )
         return result
 
     fit_rows = canonicalize(fit, "fit")
@@ -828,17 +1009,26 @@ def freeze_training_split(audit_manifest: dict, output_dir: Path) -> dict:
         "anchors_from_fit_only": anchor_candidates,
         "fit": fit_rows,
         "validation": validation_rows,
-        "gate": {"fit_count": len(fit_rows), "validation_count": len(validation_rows),
-                 "passed": len(fit_rows) >= 8 and len(validation_rows) >= 4},
-        "notes": ["All selected labels were human-reviewed visible_hand.",
-                  "Every crop is encoded then decoded before later conditioning.",
-                  "No final hold-out or factory002 crop enters these sets."],
+        "gate": {
+            "fit_count": len(fit_rows),
+            "validation_count": len(validation_rows),
+            "passed": len(fit_rows) >= 8 and len(validation_rows) >= 4,
+        },
+        "notes": [
+            "All selected labels were human-reviewed visible_hand.",
+            "Every crop is encoded then decoded before later conditioning.",
+            "No final hold-out or factory002 crop enters these sets.",
+        ],
     }
-    (output_dir / "fit-split-manifest.json").write_text(json.dumps(frozen, indent=2, sort_keys=True) + "\n")
+    (output_dir / "fit-split-manifest.json").write_text(
+        json.dumps(frozen, indent=2, sort_keys=True) + "\n"
+    )
     return frozen
 
 
-def run_fit(manifest_path: Path, output_dir: Path, max_steps: int, seconds_per_arm: int, freeze_only: bool) -> dict:
+def run_fit(
+    manifest_path: Path, output_dir: Path, max_steps: int, seconds_per_arm: int, freeze_only: bool
+) -> dict:
     """Freeze reviewed crops, then train only inside the step and time caps."""
     if not 1 <= max_steps <= FIT_FRAMES_PER_ARM or not 1 <= seconds_per_arm <= FIT_SECONDS_PER_ARM:
         raise ValueError("fit smoke is capped at 120 steps and 120 seconds per arm")
@@ -847,28 +1037,44 @@ def run_fit(manifest_path: Path, output_dir: Path, max_steps: int, seconds_per_a
         try:
             frozen = freeze_training_split(manifest, output_dir / "frozen")
         except ValueError as exc:
-            report = _diagnostic("fit", status="blocked", fit_gate=False, reason=str(exc), max_steps_run=0)
+            report = _diagnostic(
+                "fit", status="blocked", fit_gate=False, reason=str(exc), max_steps_run=0
+            )
             return _emit(output_dir, report)
         if freeze_only:
-            report = _diagnostic("fit", status="passed", fit_gate=True, max_steps_run=0, frozen=frozen["gate"])
+            report = _diagnostic(
+                "fit", status="passed", fit_gate=True, max_steps_run=0, frozen=frozen["gate"]
+            )
             return _emit(output_dir, report)
         manifest = frozen
     try:
         import torch
     except ImportError:
-        report = _diagnostic("fit", status="blocked", fit_gate=manifest.get("gate", {}).get("passed", False),
-                             reason="PyTorch is not installed in this interpreter", max_steps_run=0)
+        report = _diagnostic(
+            "fit",
+            status="blocked",
+            fit_gate=manifest.get("gate", {}).get("passed", False),
+            reason="PyTorch is not installed in this interpreter",
+            max_steps_run=0,
+        )
         return _emit(output_dir, report)
     if not torch.cuda.is_available():
         report = _diagnostic(
-            "fit", status="blocked", fit_gate=bool(manifest.get("gate", {}).get("passed")),
-            reason="CUDA is unavailable; the smoke does not fall back to CPU", max_steps_run=0,
+            "fit",
+            status="blocked",
+            fit_gate=bool(manifest.get("gate", {}).get("passed")),
+            reason="CUDA is unavailable; the smoke does not fall back to CPU",
+            max_steps_run=0,
         )
         return _emit(output_dir, report)
     report = _diagnostic(
-        "fit", status="blocked", fit_gate=bool(manifest.get("gate", {}).get("passed")),
-        reason="reviewed image crops are not materialized in this manifest", max_steps_run=0,
-        max_steps_requested=max_steps, seconds_per_arm=seconds_per_arm,
+        "fit",
+        status="blocked",
+        fit_gate=bool(manifest.get("gate", {}).get("passed")),
+        reason="reviewed image crops are not materialized in this manifest",
+        max_steps_run=0,
+        max_steps_requested=max_steps,
+        seconds_per_arm=seconds_per_arm,
     )
     return _emit(output_dir, report)
 
@@ -883,19 +1089,35 @@ def main(argv: list[str] | None = None) -> int:
         else:
             output = args.output_dir
         if args.command == "audit":
-            manifest = audit_dataset(args.dataset_root, output, args.seed, args.max_candidates_per_recording)
-            result = _emit(output, _diagnostic(
-                "audit", status="pending_review", audit_manifest=str(manifest),
-                pixel_candidates=args.max_candidates_per_recording, fabricated_joint_scores=False,
-            ))
+            manifest = audit_dataset(
+                args.dataset_root, output, args.seed, args.max_candidates_per_recording
+            )
+            result = _emit(
+                output,
+                _diagnostic(
+                    "audit",
+                    status="pending_review",
+                    audit_manifest=str(manifest),
+                    pixel_candidates=args.max_candidates_per_recording,
+                    fabricated_joint_scores=False,
+                ),
+            )
         elif args.command == "packet":
             packet = run_packet(args.input, output / "packets", args.max_frames)
-            result = _emit(output, _diagnostic(
-                "packet", status="passed", methods=packet["methods"], codes_identical=packet["codes_identical"],
-                input_sha256=packet["input_sha256"],
-            ))
+            result = _emit(
+                output,
+                _diagnostic(
+                    "packet",
+                    status="passed",
+                    methods=packet["methods"],
+                    codes_identical=packet["codes_identical"],
+                    input_sha256=packet["input_sha256"],
+                ),
+            )
         elif args.command == "fit":
-            result = run_fit(args.manifest, output, args.max_steps, args.seconds_per_arm, args.freeze_only)
+            result = run_fit(
+                args.manifest, output, args.max_steps, args.seconds_per_arm, args.freeze_only
+            )
         elif args.command == "profile":
             result = run_profile(args.images, output, args.max_images, args.sam_frames)
         elif args.command == "compare":
@@ -904,7 +1126,13 @@ def main(argv: list[str] | None = None) -> int:
             raise RuntimeError(args.command)
     except (OSError, ValueError, KeyError, TypeError, RuntimeError, TimeoutError) as exc:
         parser.error(str(exc))
-    print(json.dumps({key: value for key, value in result.items() if key != "av1_commands"}, indent=2, sort_keys=True))
+    print(
+        json.dumps(
+            {key: value for key, value in result.items() if key != "av1_commands"},
+            indent=2,
+            sort_keys=True,
+        )
+    )
     return 0
 
 
