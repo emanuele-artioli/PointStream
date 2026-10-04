@@ -1,0 +1,16 @@
+# Retained pose-component lossless packing
+
+A bounded local CPU audit packs two retained egocentric pose components in a deterministic zlib envelope with a 54-byte header. The header charges magic, codec flags, compression level, original/compressed lengths and SHA-256 of original bytes. Levels 1, 6 and 9 are fixed controls. Each envelope is unpacked in a fresh Python process given only the packed file and output path; recovered bytes equal the original component exactly. There is no model inference, native video encoding/decoding, RGB synthesis, GPU allocation, or remote compute job. OpenBLAS/OpenMP are limited to one thread. The same-entrypoint full-DWB2 level-6 smoke passed before six full conditions; command, UTC timestamps, Python/zlib versions and worker hash travel in the report.
+
+The inputs were copied read-only from GPU1 `/home/itec/emanuele/tmp/maps-out/clip_01/pose/` to external `/private/tmp/pointstream-pose-packing-inputs`: `dwpose.bin`, `dwpose_hands.pk.bin`, `dwpose.json`. Both binary hashes match the prior inventory. The original decoder source was copied read-only from `/Users/manu/Desktop/PointStream/demo/pipeline/maps/pose_delta.py` into the input directory and hashed separately; this source may belong to active local work and is not assumed identical to the Git base revision. The new packing worker is separately frozen by file SHA-256; the parent will decide when to commit it.
+
+| Component | Original bytes | Level 1 framed bytes | Level 6 framed bytes | Level 9 framed bytes |
+|---|---:|---:|---:|---:|
+| DWB2 combined pose | 16,876 | 16,648 | 16,637 | 16,637 |
+| Length-prefixed PK hands | 28,326 | 24,005 | 23,807 | 23,806 |
+
+The best DWB2 wrapper saves 239 bytes (1.416%), including its header. PK wrapping saves 4,520 bytes (15.957%) at level 9, but remains larger than the already retained 16,876-byte DWB2 combined representation. These are gains relative to each component's own original physical bytes, not a novel best-codec result or a complete-video compression advantage.
+
+For interpretation, the pinned original `decode_pose_stream` independently decodes the retained DWB2 to 300 ordinal records. All 300 emitted hand packets exactly equal the retained length-prefixed PK records. Strict PK length/magic/instance arithmetic finds 558 transmitted hand instances. The sidecar reports 666 detected hand instances; their equality is not established. That mismatch might involve pre-packing filtering or stale metadata and remains unresolved. The 300-record agreement is a component denominator, not a verified join to original RGB source-frame IDs. Exact source RGB/frame hashes, full RGB receiver composition, reference exposure, independent annotations and matched package costs remain unqualified.
+
+[Compact results and provenance](pose-packing-results.json) record all input hashes, original decoder source hash, each charged size and fresh-process byte parity. Raw input/output data stay outside Git. Final raw report: `/private/tmp/pointstream-pose-packing-full-final/report.json`; the compact receipt supplies its SHA-256 and the preceding smoke receipt. Eight focused tests verify roundtrip levels, charged framing, malformed lengths, unsupported flags, checksum failure and strict PK record truncation. No shared-branch commit was made by this worker.

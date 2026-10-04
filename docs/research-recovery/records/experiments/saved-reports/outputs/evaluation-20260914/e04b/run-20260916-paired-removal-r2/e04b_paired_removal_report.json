@@ -1,0 +1,299 @@
+{
+  "task_id": "CODEC-ACT-07-E04B",
+  "action_name": "E04B_paired_removal_probe",
+  "written_utc": "2026-09-16T18:17:31Z",
+  "host": {
+    "hostname": "gpu5",
+    "architecture": "x86_64",
+    "os": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35"
+  },
+  "code_revision": {
+    "commit": "aefdeb2c486d2054f2af8f642679a25cde372e9f",
+    "dirty": true,
+    "diff_sha256": "60bb3a35490350db2b0a2f247eeab3dea209e7b9bf5cf928a0337df3befb7a4e",
+    "active_branch": "codex/e04b-paired-removal-20260916"
+  },
+  "source_clip": {
+    "video": "federer_djokovic",
+    "scene": "scene_007",
+    "n_frames": 48,
+    "fps": 12.0,
+    "resolution": "640x360",
+    "frames_sha256": "1f02475a5bbc3d94e4bae2e904dc29c3af3082be0c0c160e027b706a6950f6f8",
+    "masks_sha256": "a65f16975d5cf8ded6ab64642324971030a30a051180410de381f3021e82d45c"
+  },
+  "preprocessing_comparison": {
+    "removal_off": {
+      "optional_removal_calls": 0,
+      "removal_mode": "off",
+      "actor_pixels_untouched": true,
+      "total_inpaint_holes": 0,
+      "inpaint_frames": 0,
+      "plate_masks": "None (inherent temporal median)"
+    },
+    "removal_on": {
+      "optional_removal_calls": 1,
+      "removal_mode": "on",
+      "actor_pixels_untouched": false,
+      "total_inpaint_holes": 0,
+      "inpaint_frames": 0,
+      "build_seconds": 3.231,
+      "plate_masks": "masks_360 with nearest-finite/Telea hole fill"
+    }
+  },
+  "reused_evidence_source": {
+    "report_path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-federer007/probe_report.json",
+    "report_sha256": "e65ec04dedda40cdc472ace90fcce31e26b10218c15060097c6ca39f5010251d",
+    "canonical_screening_points": 6
+  },
+  "new_on_points": [
+    {
+      "arm": "registered_panorama_qp47_removal_on",
+      "representation": "registered_panorama",
+      "qp": 47,
+      "removal": "on",
+      "codec": "vvc",
+      "preset": "medium",
+      "lookahead_frames": 48,
+      "tool_path": "/opt/local/bin/ffmpeg",
+      "tool_version": "ffmpeg version n7.1.1-56-gc2184b65d2 Copyright (c) 2000-2025 the FFmpeg developers",
+      "plate_resolution": "656x364",
+      "bitstream_path": "bitstreams/registered_panorama_qp47_removal_on.vvc",
+      "bitstream_sha256": "ac52960fc3ff5609ff51f6501eb43511df245c37af0565cfa7cd6d8680c82f50",
+      "encoded_payload_bytes": 2777,
+      "side_data_bytes": 1742,
+      "total_package_bytes": 4519,
+      "side_data_detail": {
+        "geometry_bytes": 8,
+        "timing_bytes": 6,
+        "homography_bytes": 1728,
+        "total_side_data_bytes": 1742
+      },
+      "metrics": {
+        "no_overlay": {
+          "psnr_y_visible_dB": 21.467,
+          "ssim_visible": 0.8376,
+          "psnr_y_object_dB": 12.497,
+          "ssim_object": 0.1586,
+          "psnr_y_boundary_dB": 21.764,
+          "ssim_boundary": 0.6883,
+          "psnr_y_full_dB": 21.346,
+          "ssim_full": 0.7742,
+          "ghosting_luma_mad": 8.715
+        },
+        "fixed_overlay": {
+          "psnr_y_visible_dB": 21.467,
+          "ssim_visible": 0.8376,
+          "psnr_y_object_dB": 12.445,
+          "ssim_object": 0.3501,
+          "psnr_y_boundary_dB": 21.764,
+          "ssim_boundary": 0.6883,
+          "psnr_y_composed_dB": 21.345,
+          "ssim_composed": 0.7746,
+          "double_silhouette_luma_mad": 8.715
+        }
+      },
+      "timing": {
+        "preprocessing_seconds": 3.231,
+        "encode_seconds": 0.9756,
+        "sender_seconds": 4.2066,
+        "decode_render_seconds": 0.3366,
+        "client_seconds": 0.3366,
+        "total_end_to_end_seconds": 4.5432
+      }
+    },
+    {
+      "arm": "registered_panorama_qp32_removal_on",
+      "representation": "registered_panorama",
+      "qp": 32,
+      "removal": "on",
+      "codec": "vvc",
+      "preset": "medium",
+      "lookahead_frames": 48,
+      "tool_path": "/opt/local/bin/ffmpeg",
+      "tool_version": "ffmpeg version n7.1.1-56-gc2184b65d2 Copyright (c) 2000-2025 the FFmpeg developers",
+      "plate_resolution": "656x364",
+      "bitstream_path": "bitstreams/registered_panorama_qp32_removal_on.vvc",
+      "bitstream_sha256": "52f5e3ad6462fc26ba73c0d44cfe943a3565666eef473330ec5cf802581d513d",
+      "encoded_payload_bytes": 14727,
+      "side_data_bytes": 1742,
+      "total_package_bytes": 16469,
+      "side_data_detail": {
+        "geometry_bytes": 8,
+        "timing_bytes": 6,
+        "homography_bytes": 1728,
+        "total_side_data_bytes": 1742
+      },
+      "metrics": {
+        "no_overlay": {
+          "psnr_y_visible_dB": 22.826,
+          "ssim_visible": 0.8909,
+          "psnr_y_object_dB": 12.494,
+          "ssim_object": 0.1629,
+          "psnr_y_boundary_dB": 22.007,
+          "ssim_boundary": 0.7463,
+          "psnr_y_full_dB": 22.656,
+          "ssim_full": 0.8594,
+          "ghosting_luma_mad": 6.538
+        },
+        "fixed_overlay": {
+          "psnr_y_visible_dB": 22.826,
+          "ssim_visible": 0.8909,
+          "psnr_y_object_dB": 12.445,
+          "ssim_object": 0.3508,
+          "psnr_y_boundary_dB": 22.007,
+          "ssim_boundary": 0.7463,
+          "psnr_y_composed_dB": 22.654,
+          "ssim_composed": 0.8598,
+          "double_silhouette_luma_mad": 6.538
+        }
+      },
+      "timing": {
+        "preprocessing_seconds": 3.231,
+        "encode_seconds": 2.118,
+        "sender_seconds": 5.349,
+        "decode_render_seconds": 0.3436,
+        "client_seconds": 0.3436,
+        "total_end_to_end_seconds": 5.6927
+      }
+    }
+  ],
+  "paired_evaluations": [
+    {
+      "qp": 47,
+      "off_arm": "registered_panorama_qp47_removal_off",
+      "on_arm": "registered_panorama_qp47_removal_on",
+      "disposition": "INCONCLUSIVE_KEEP_EXPLORATORY",
+      "bytes": {
+        "off_bytes": 4554,
+        "on_bytes": 4519,
+        "delta_bytes": -35,
+        "pct_change": -0.77,
+        "within_15pct_inflation": true
+      },
+      "psnr_y_visible_dB": {
+        "off_psnr": 21.161,
+        "on_psnr": 21.467,
+        "delta_psnr": 0.306,
+        "loss_le_0_5dB": true
+      },
+      "ghosting_luma_mad": {
+        "off_ghost_mad": 9.165,
+        "on_ghost_mad": 8.715,
+        "delta_ghost_mad": -0.45,
+        "reduction_pct": 4.91,
+        "ge_50pct_reduction": false
+      },
+      "boundary": {
+        "off_boundary_mad": 0.0,
+        "on_boundary_mad": 0.0,
+        "delta_boundary_mad": 0.0
+      },
+      "timing_seconds": {
+        "off_sender_s": 1.879,
+        "on_sender_s": 4.2066,
+        "delta_sender_s": 2.3276,
+        "off_client_s": 0.306,
+        "on_client_s": 0.3366,
+        "delta_client_s": 0.0306
+      }
+    },
+    {
+      "qp": 32,
+      "off_arm": "registered_panorama_qp32_removal_off",
+      "on_arm": "registered_panorama_qp32_removal_on",
+      "disposition": "INCONCLUSIVE_KEEP_EXPLORATORY",
+      "bytes": {
+        "off_bytes": 17411,
+        "on_bytes": 16469,
+        "delta_bytes": -942,
+        "pct_change": -5.41,
+        "within_15pct_inflation": true
+      },
+      "psnr_y_visible_dB": {
+        "off_psnr": 22.798,
+        "on_psnr": 22.826,
+        "delta_psnr": 0.028,
+        "loss_le_0_5dB": true
+      },
+      "ghosting_luma_mad": {
+        "off_ghost_mad": 6.704,
+        "on_ghost_mad": 6.538,
+        "delta_ghost_mad": -0.166,
+        "reduction_pct": 2.48,
+        "ge_50pct_reduction": false
+      },
+      "boundary": {
+        "off_boundary_mad": 0.0,
+        "on_boundary_mad": 0.0,
+        "delta_boundary_mad": 0.0
+      },
+      "timing_seconds": {
+        "off_sender_s": 1.967,
+        "on_sender_s": 5.349,
+        "delta_sender_s": 3.382,
+        "off_client_s": 0.313,
+        "on_client_s": 0.3436,
+        "delta_client_s": 0.0306
+      }
+    }
+  ],
+  "visual_evidence_artifacts": [
+    "visual_evidence/qp47_frame000_side_by_side.png",
+    "visual_evidence/qp47_frame011_side_by_side.png",
+    "visual_evidence/qp47_frame023_side_by_side.png",
+    "visual_evidence/qp47_frame035_side_by_side.png",
+    "visual_evidence/qp47_frame047_side_by_side.png",
+    "visual_evidence/qp32_frame000_side_by_side.png",
+    "visual_evidence/qp32_frame011_side_by_side.png",
+    "visual_evidence/qp32_frame023_side_by_side.png",
+    "visual_evidence/qp32_frame035_side_by_side.png",
+    "visual_evidence/qp32_frame047_side_by_side.png"
+  ],
+  "pre_registered_bounds": {
+    "task_id": "CODEC-ACT-07-E04B",
+    "probe": "E04B_same_camera_paired_removal",
+    "rationale": "Registered panorama removal-OFF baseline yields 4,554 B / 21.16 dB vis PSNR / 9.16 ghost MAD (QP 47) and 17,411 B / 22.80 dB vis PSNR / 6.70 ghost MAD (QP 32). Removal-ON uses explicit mask exclusion and nearest-finite/Telea hole filling. Removal-ON must suppress ghosting (>= 50% MAD reduction target) while maintaining visible background PSNR within 0.5 dB and total package bytes within 15% inflation.",
+    "decision_rules": {
+      "promote_rule": "Promote removal=ON if ghosting MAD drops by >= 50% relative to removal-OFF at matched QP, visible PSNR-Y drops by <= 0.5 dB, and total package bytes increase by <= 15%.",
+      "stop_rule": "Stop / reject removal=ON if ghosting MAD does not decrease, visible background degrades by > 0.5 dB, or byte inflation exceeds 15%.",
+      "inconclusive_rule": "Keep exploratory / inconclusive if ghosting reduction is between 20% and 50% or boundary artifacts offset interior suppression."
+    },
+    "points": {
+      "registered_panorama_qp47_removal_on": {
+        "total_package_bytes": {
+          "min": 3800,
+          "max": 5500
+        },
+        "psnr_y_visible_dB": {
+          "min": 20.6,
+          "max": 22.0
+        },
+        "ghosting_luma_mad": {
+          "min": 1.0,
+          "max": 6.0
+        }
+      },
+      "registered_panorama_qp32_removal_on": {
+        "total_package_bytes": {
+          "min": 15000,
+          "max": 20500
+        },
+        "psnr_y_visible_dB": {
+          "min": 22.2,
+          "max": 23.8
+        },
+        "ghosting_luma_mad": {
+          "min": 0.8,
+          "max": 4.5
+        }
+      }
+    }
+  },
+  "alarms": [
+    "QP 47 removal-ON ghost MAD 8.715 outside bound [1.0, 6.0]",
+    "QP 32 removal-ON ghost MAD 6.538 outside bound [0.8, 4.5]"
+  ],
+  "overall_verdict": "INCONCLUSIVE_EXPLORATORY",
+  "total_wall_seconds": 32.561
+}

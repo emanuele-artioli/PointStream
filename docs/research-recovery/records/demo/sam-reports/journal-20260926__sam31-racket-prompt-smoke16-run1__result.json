@@ -1,0 +1,354 @@
+{
+  "checkpoint_load_audit": {
+    "all_loads_path_recorded": "checkpoint-load-audit.json",
+    "final_missing_count": 0,
+    "final_missing_keys_sample": [],
+    "final_module": "Sam3MultiplexTrackingWithInteractivity",
+    "final_unexpected_count": 0,
+    "final_unexpected_keys_sample": [],
+    "load_calls": 2
+  },
+  "codec_rate_quality_and_decode_metrics": "not measured in this model-only smoke test",
+  "frame_details": [
+    {
+      "frame_index": 0,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        3502,
+        2462
+      ]
+    },
+    {
+      "frame_index": 1,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        4847,
+        1543
+      ]
+    },
+    {
+      "frame_index": 2,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        6001,
+        1103
+      ]
+    },
+    {
+      "frame_index": 3,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        6979,
+        993
+      ]
+    },
+    {
+      "frame_index": 4,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        7281,
+        531
+      ]
+    },
+    {
+      "frame_index": 5,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        7493,
+        453
+      ]
+    },
+    {
+      "frame_index": 6,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        7522,
+        278
+      ]
+    },
+    {
+      "frame_index": 7,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        7926,
+        201
+      ]
+    },
+    {
+      "frame_index": 8,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        7880,
+        209
+      ]
+    },
+    {
+      "frame_index": 9,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        7934,
+        582
+      ]
+    },
+    {
+      "frame_index": 10,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        7961,
+        509
+      ]
+    },
+    {
+      "frame_index": 11,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        7652,
+        490
+      ]
+    },
+    {
+      "frame_index": 12,
+      "nonempty_object_count": 1,
+      "sam_object_ids": [
+        0
+      ],
+      "selected_ids_present": [
+        true,
+        false
+      ],
+      "selected_mask_areas": [
+        7450,
+        0
+      ]
+    },
+    {
+      "frame_index": 13,
+      "nonempty_object_count": 1,
+      "sam_object_ids": [
+        0
+      ],
+      "selected_ids_present": [
+        true,
+        false
+      ],
+      "selected_mask_areas": [
+        6437,
+        0
+      ]
+    },
+    {
+      "frame_index": 14,
+      "nonempty_object_count": 1,
+      "sam_object_ids": [
+        0
+      ],
+      "selected_ids_present": [
+        true,
+        false
+      ],
+      "selected_mask_areas": [
+        5676,
+        0
+      ]
+    },
+    {
+      "frame_index": 15,
+      "nonempty_object_count": 1,
+      "sam_object_ids": [
+        0
+      ],
+      "selected_ids_present": [
+        true,
+        false
+      ],
+      "selected_mask_areas": [
+        3843,
+        0
+      ]
+    }
+  ],
+  "gpu": {
+    "device": "NVIDIA RTX A6000",
+    "driver": "535.183.01",
+    "torch_runtime": "12.8",
+    "uuid": "GPU-6f70a27e-4171-22d7-3ffd-647e7f186a49"
+  },
+  "implementation": {
+    "checkpoint_filename": "sam3.1_multiplex.pt",
+    "checkpoint_path": "/home/itec/emanuele/.cache/huggingface/hub/models--facebook--sam3.1/snapshots/daa63191845a41281374e725f4c9e51c7a824460/sam3.1_multiplex.pt",
+    "checkpoint_repo": "facebook/sam3.1",
+    "checkpoint_revision": "daa63191845a41281374e725f4c9e51c7a824460",
+    "checkpoint_sha256": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
+    "checkpoint_size_bytes": 3502755717,
+    "expected_repository_commit": "2345a4ad109ac29c569da749c91d84f10dc08c40",
+    "package": "sam3==0.1.0 editable from pinned source",
+    "python": "3.12.14",
+    "repository": "https://github.com/facebookresearch/sam3",
+    "repository_commit": "2345a4ad109ac29c569da749c91d84f10dc08c40",
+    "repository_path": "/home/itec/emanuele/.cache/sam3-meta",
+    "torch": "2.10.0+cu128",
+    "torchvision": "0.25.0+cu128"
+  },
+  "inference": {
+    "api": "build_sam3_multiplex_video_predictor",
+    "async_loading_frames": false,
+    "compile": false,
+    "max_num_objects": 16,
+    "multiplex_count": 16,
+    "prompt": "tennis racket",
+    "prompt_frame_index": 0,
+    "reference_use": "Only after predicted masks are saved and hashed; diagnostic IoU/boundary-IoU only.",
+    "selection": "Among nonempty masks on frame 0, select the two largest areas; order their stable SAM object IDs by horizontal centroid, then track those IDs through the remaining frames.",
+    "use_fa3": false,
+    "use_rope_real": false
+  },
+  "inspection_images": [
+    "/home/itec/emanuele/pointstream-data/outputs/journal-20260926/sam31-racket-prompt-smoke16-run1/inspection-frame-000.png",
+    "/home/itec/emanuele/pointstream-data/outputs/journal-20260926/sam31-racket-prompt-smoke16-run1/inspection-frame-008.png",
+    "/home/itec/emanuele/pointstream-data/outputs/journal-20260926/sam31-racket-prompt-smoke16-run1/inspection-frame-015.png"
+  ],
+  "limitations": [
+    "one 16-frame development window and one text prompt; no comparison or held-out claim",
+    "no independent racket annotations; output is a SAM-derived pseudo-label",
+    "SAM masks have not yet been used to regenerate training crops or fed through the PointStream serializer"
+  ],
+  "manifest_path": "/home/itec/emanuele/pointstream-data/manifests/journal_20260926_sam31_racket_prompt_smoke16.json",
+  "manifest_sha256": "56fe7c89e155a01e87ceda011dd1e894cf48bf1d19bc921fcdb52c02cc018005",
+  "mask_agreement_diagnostic_only": null,
+  "model_build_seconds": 21.94916460895911,
+  "peak_cuda_allocated_gib": 15.968602657318115,
+  "peak_cuda_reserved_gib": 19.677734375,
+  "peak_rss_bytes": 8017285120,
+  "pointstream_codec_run": false,
+  "predicted_masks": {
+    "nonempty_selected_masks": 28,
+    "path": "/home/itec/emanuele/pointstream-data/outputs/journal-20260926/sam31-racket-prompt-smoke16-run1/predicted_racket_masks.npz",
+    "selected_objects": 2,
+    "sha256": "458e3c25e0c9dbd18cab1149726beede23df3b0bc925405f45cbbae21aff26e8",
+    "shape": [
+      16,
+      2,
+      2160,
+      3840
+    ]
+  },
+  "prompt_frame_object_ids": [
+    0,
+    1
+  ],
+  "propagation_seconds_excluding_model_build": 3.3426739242859185,
+  "runner_path": "/tmp/pointstream_sam31_racket_smoke.py",
+  "runner_sha256": "2f65a79ee40cfcb9a36f0e8a3b7ec7444e31799ddfa4f1f639902a7edff647be",
+  "schema": "pointstream.sam31.meta_video_smoke.result.v1",
+  "selected_track_ids": [
+    0,
+    1
+  ],
+  "session_start_workaround": "local signature-filtered start_session adapter for unsupported offload_state_to_cpu; upstream SAM source unchanged",
+  "source_dataset_id": "sinner_alcaraz/scene_002",
+  "source_frame_count": 16,
+  "source_resolution_wh": [
+    3840,
+    2160
+  ],
+  "status": "inference_completed",
+  "total_wall_seconds": 30.58413205901161,
+  "two_track_coverage_fraction": 0.75,
+  "within_registered_bounds": true
+}

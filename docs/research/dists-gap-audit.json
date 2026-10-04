@@ -1,0 +1,538 @@
+{
+  "status": "complete_validated_posthoc4",
+  "scope": "Post hoc development densification; original37 cohort unchanged and separately labeled. Exact sampled dominance only. No heldout, BD-rate, task claim or performance comparison.",
+  "source": {
+    "path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e03b/run-20260916-federer007/prepared_rgb.npy",
+    "bytes": 33177728,
+    "sha256": "9234147b68ace7217043c2761701f3bc915a0371db9fc83be6fea3973ae20191"
+  },
+  "source_rgb_sha256": "1f02475a5bbc3d94e4bae2e904dc29c3af3082be0c0c160e027b706a6950f6f8",
+  "posthoc_parameters": {
+    "av1_crf": [
+      56,
+      57
+    ],
+    "vvc_qp": [
+      53,
+      54
+    ],
+    "frames": 48,
+    "fps": 12,
+    "dimensions": [
+      360,
+      640
+    ],
+    "unchanged_encoder_decoder": true
+  },
+  "registration_rationale": "Selected after original37 development results to densify AV1 52\u201358 and VVC52\u201358 sampled gaps; cannot establish held-out confirmation. Retain all4 regardless outcome.",
+  "scorer_sha256": "e8f9cb4895aa5222fe1d352c550bb1d10d63487c95c9ba0d917a92cdf35b0dba",
+  "worker_sha256": "8b2a6c191c72d995be1396f0364561235874a4665f8f19b5f3643794817abbe6",
+  "model_state_ids": {
+    "lpips_state": "ddf6cff30ce8ded007f87bc60f65e0ac77346ab09d8a2bdf0d05d683edd94fa9",
+    "dists_state": "4d5dc7d05a7f04cc49788530b649fb3c85192f3b538d294759f0bc6e63d49a75"
+  },
+  "provenance": {
+    "original_root": "gpu3:/home/itec/emanuele/pointstream-data/audits/dists-gap-four-native-b164141-20261002",
+    "identities": {
+      "registration.json": {
+        "path": "/private/tmp/dists-gap-20261002/registration.json",
+        "bytes": 1985,
+        "sha256": "35734a25d28db81038dc92fa8bbc6729a087270f51c10d94e8887ca52740fbf3"
+      },
+      "report.json": {
+        "path": "/private/tmp/dists-gap-20261002/report.json",
+        "bytes": 26857,
+        "sha256": "22a80089e57c1c3a46816acd41d62e62c45318b89c1112439fe19caefff2376f"
+      },
+      "perceptual.json": {
+        "path": "/private/tmp/dists-gap-20261002/perceptual.json",
+        "bytes": 46991,
+        "sha256": "a642e3eb570b9a7c63b3ed6e8836c7bb17866ea1c0baf9ea63d4724ffd88b69b"
+      },
+      "inputs.json": {
+        "path": "/private/tmp/dists-gap-20261002/inputs.json",
+        "bytes": 1534,
+        "sha256": "8df27f27889869e244f691bf33bde7a16d18a79a433dc9e81220aff2066c54d6"
+      },
+      "weights.json": {
+        "path": "/private/tmp/dists-gap-20261002/weights.json",
+        "bytes": 1266,
+        "sha256": "a4e95a2e2288802db4d3265caa327caf20dcd0ee105b7e5318efac08ae8fdf7e"
+      },
+      "scorer-command.json": {
+        "path": "/private/tmp/dists-gap-20261002/scorer-command.json",
+        "bytes": 1138,
+        "sha256": "cf0c4fed5adf9a08e62d8f4c053eaca82e3a3e338b050aec4d1c9ec047f80df4"
+      },
+      "validate.py": {
+        "path": "/private/tmp/dists-gap-20261002/validate.py",
+        "bytes": 7250,
+        "sha256": "c3bbb6348ac1cadee10daed3ee6616f1afb232e8afcd3eb46ccccc842953e8ce"
+      },
+      "status.json": {
+        "path": "/private/tmp/dists-gap-20261002/status.json",
+        "bytes": 329,
+        "sha256": "edd67491e06bace7cd8aa90bd50606fc07a8b8472cd97f2fdc15d65dc5361147"
+      },
+      "validated-comparison.json": {
+        "path": "/private/tmp/dists-gap-20261002/validated-comparison.json",
+        "bytes": 67225,
+        "sha256": "66bc4287959b85cd236c91f21ef576ae9e07dbd2010ba77fa72d4f408c952af7"
+      },
+      "encoder-environment-audit.json": {
+        "path": "/private/tmp/dists-gap-20261002/encoder-environment-audit.json",
+        "bytes": 13799,
+        "sha256": "bd68a49269d7af79f831abffb173b626ce598461f2661655e878b740bd17db1a"
+      },
+      "gpu1-current-linked-library-audit.json": {
+        "path": "/private/tmp/dists-gap-20261002/gpu1-current-linked-library-audit.json",
+        "bytes": 5085,
+        "sha256": "0a6dd19e54976776e2a4ee37a52a9eed19a4527de4475f7e14ef6f99dbb08290"
+      },
+      "environment-comparison.json": {
+        "path": "/private/tmp/dists-gap-20261002/environment-comparison.json",
+        "bytes": 1428,
+        "sha256": "e4243039d6ae6c63771b35b7275e70e2c7d8a8aaa186bb4c07ff04c187610157"
+      },
+      "physical-final-audit.json": {
+        "path": "/private/tmp/dists-gap-20261002/physical-final-audit.json",
+        "bytes": 347,
+        "sha256": "6f071b70b08f26595f8e27071231f53c71d9dab3f9d5272cb92454e5bad1a79d"
+      },
+      "retrieval-receipt.json": {
+        "path": "/private/tmp/dists-gap-20261002/retrieval-receipt.json",
+        "bytes": 2934,
+        "sha256": "63875941b976a5c5a1c59527f7a3c6144c7a52bfb2694cace330ec23e054514c"
+      }
+    },
+    "original37_comparison": {
+      "path": "/private/tmp/perceptual37-validated-comparison.json",
+      "bytes": 300811,
+      "sha256": "35236bf6e473a1280082e764123d04520f8adb11038c0cafd4fa21379e75c754"
+    },
+    "helper_import": {
+      "path": "/private/tmp/validate_perceptual37.py",
+      "bytes": 12633,
+      "sha256": "7cf825ac58133d99ad9a59636b33cd2b2aef7b5890e4fe298c524733ad39dd2f"
+    },
+    "boundary": "Posthoc anchor selection after original37 results; all4 retained; original37 untouched."
+  },
+  "paper_companion": {
+    "path": "/private/tmp/pointstream-paper-packet-rate-quality/companion/dists-gap-results.json",
+    "bytes": 71523,
+    "sha256": "d4831f34cc806b668b3213e97a959c2b70be746d6346d987614dbbe3eca7aff1"
+  },
+  "rows": [
+    {
+      "method": "anchor_posthoc/av1/56",
+      "complete_bytes": 60246,
+      "common_rgb_sha256": "a3dde0beea9f873bf3ac93d1d2c2da57d6269b456835d5028f5e2e3504070f8f",
+      "lpips_mean": 0.030656095885206014,
+      "dists_mean": 0.0866926871240139,
+      "pooled_y_psnr_db": 30.483352320609445,
+      "physical_identity": {
+        "stream": {
+          "path": "/home/itec/emanuele/pointstream-data/audits/dists-gap-four-native-b164141-20261002/av1_56/stream.ivf",
+          "bytes": 59860,
+          "sha256": "e3b3ccc03744d754111683c5e393461e8753a06ce8dd99a4ae222791095d612e"
+        },
+        "manifest": {
+          "path": "/home/itec/emanuele/pointstream-data/audits/dists-gap-four-native-b164141-20261002/av1_56/manifest.json",
+          "bytes": 386,
+          "sha256": "cc6f666c9e420adc93b06fb3761c3b271dc7b002689bc0b7a5f7b8dff1e94b0c"
+        }
+      }
+    },
+    {
+      "method": "anchor_posthoc/av1/57",
+      "complete_bytes": 56020,
+      "common_rgb_sha256": "278688280bb24379e71e3022631126b229a0a6ad952db88b0e7aef2e0d18c325",
+      "lpips_mean": 0.03299407585291192,
+      "dists_mean": 0.09191678464412689,
+      "pooled_y_psnr_db": 30.23054594219179,
+      "physical_identity": {
+        "stream": {
+          "path": "/home/itec/emanuele/pointstream-data/audits/dists-gap-four-native-b164141-20261002/av1_57/stream.ivf",
+          "bytes": 55634,
+          "sha256": "a8ca72487650520eb8a8371602f88da18eabbfc5815b61c44441e0f0c9c850d3"
+        },
+        "manifest": {
+          "path": "/home/itec/emanuele/pointstream-data/audits/dists-gap-four-native-b164141-20261002/av1_57/manifest.json",
+          "bytes": 386,
+          "sha256": "2d7c04a61d763d62ea8180bb64e8b3aba6b8ff34eca442a73c32992624bee062"
+        }
+      }
+    },
+    {
+      "method": "anchor_posthoc/vvc/53",
+      "complete_bytes": 15834,
+      "common_rgb_sha256": "8c0e603711e3b5273acb060c6461ad63771cfee402559bf0ae0714b19100efdd",
+      "lpips_mean": 0.2657200445731481,
+      "dists_mean": 0.23433308179179826,
+      "pooled_y_psnr_db": 23.025311306141813,
+      "physical_identity": {
+        "stream": {
+          "path": "/home/itec/emanuele/pointstream-data/audits/dists-gap-four-native-b164141-20261002/vvc_53/stream.266",
+          "bytes": 15448,
+          "sha256": "edf208f6ceb2b2b458ce519a537bb90dcb7422e727900bb0c125f8d75383f16d"
+        },
+        "manifest": {
+          "path": "/home/itec/emanuele/pointstream-data/audits/dists-gap-four-native-b164141-20261002/vvc_53/manifest.json",
+          "bytes": 386,
+          "sha256": "d923aa096c4fa3943c574428a5b66602d44f880fc3248f851743b940fd3e559e"
+        }
+      }
+    },
+    {
+      "method": "anchor_posthoc/vvc/54",
+      "complete_bytes": 13609,
+      "common_rgb_sha256": "c271b8c181919d5e4b93b7ab301b81f9a1bc83c9f5ae5e17e63ca14cfd94071e",
+      "lpips_mean": 0.29312193269530934,
+      "dists_mean": 0.24638320381442705,
+      "pooled_y_psnr_db": 22.551851786600604,
+      "physical_identity": {
+        "stream": {
+          "path": "/home/itec/emanuele/pointstream-data/audits/dists-gap-four-native-b164141-20261002/vvc_54/stream.266",
+          "bytes": 13223,
+          "sha256": "88fe5474a6cbb09a512ec31cb2b980f6cb031329a0f2d2e9fea7eda46b1571f8"
+        },
+        "manifest": {
+          "path": "/home/itec/emanuele/pointstream-data/audits/dists-gap-four-native-b164141-20261002/vvc_54/manifest.json",
+          "bytes": 386,
+          "sha256": "87e4a04d821445cc46e0c07ec509a311c3063299b3e9ae9710549bf9b4669521"
+        }
+      }
+    }
+  ],
+  "union14_summary": {
+    "lpips_mean": {
+      "candidate_count": 27,
+      "anchor_count": 14,
+      "dominated_count": 27,
+      "nondominated_count": 0,
+      "any_twoaxis_win_count": 0
+    },
+    "dists_mean": {
+      "candidate_count": 27,
+      "anchor_count": 14,
+      "dominated_count": 27,
+      "nondominated_count": 0,
+      "any_twoaxis_win_count": 0
+    },
+    "pooled_y_psnr_db": {
+      "candidate_count": 27,
+      "anchor_count": 14,
+      "dominated_count": 27,
+      "nondominated_count": 0,
+      "any_twoaxis_win_count": 0
+    }
+  },
+  "original4_gap_comparison": [
+    {
+      "method": "packet/bbox_resized_first_reference_residual_off/rle_scale4",
+      "bytes": 15046,
+      "dists_mean": 0.2869385766486327,
+      "native_dominators_after_posthoc": [
+        "anchor_posthoc/vvc/54"
+      ],
+      "dominates_sampled_native_anchors": [],
+      "gap_survives": false,
+      "by_native_codec": {
+        "av1": {
+          "sampled_dominators": [],
+          "sampled_native_anchors_dominated": []
+        },
+        "vvc": {
+          "sampled_dominators": [
+            "anchor_posthoc/vvc/54"
+          ],
+          "sampled_native_anchors_dominated": []
+        }
+      },
+      "by_metric_and_codec": {
+        "lpips_mean": {
+          "av1": {
+            "sampled_dominators": [],
+            "sampled_native_anchors_dominated": []
+          },
+          "vvc": {
+            "sampled_dominators": [
+              "anchor/vvc/58",
+              "anchor_posthoc/vvc/54"
+            ],
+            "sampled_native_anchors_dominated": []
+          }
+        },
+        "dists_mean": {
+          "av1": {
+            "sampled_dominators": [],
+            "sampled_native_anchors_dominated": []
+          },
+          "vvc": {
+            "sampled_dominators": [
+              "anchor_posthoc/vvc/54"
+            ],
+            "sampled_native_anchors_dominated": []
+          }
+        },
+        "pooled_y_psnr_db": {
+          "av1": {
+            "sampled_dominators": [],
+            "sampled_native_anchors_dominated": []
+          },
+          "vvc": {
+            "sampled_dominators": [
+              "anchor/vvc/58",
+              "anchor_posthoc/vvc/54"
+            ],
+            "sampled_native_anchors_dominated": []
+          }
+        }
+      }
+    },
+    {
+      "method": "packet/bbox_resized_first_reference_residual_off/rle_scale8",
+      "bytes": 14246,
+      "dists_mean": 0.2892887592315674,
+      "native_dominators_after_posthoc": [
+        "anchor_posthoc/vvc/54"
+      ],
+      "dominates_sampled_native_anchors": [],
+      "gap_survives": false,
+      "by_native_codec": {
+        "av1": {
+          "sampled_dominators": [],
+          "sampled_native_anchors_dominated": []
+        },
+        "vvc": {
+          "sampled_dominators": [
+            "anchor_posthoc/vvc/54"
+          ],
+          "sampled_native_anchors_dominated": []
+        }
+      },
+      "by_metric_and_codec": {
+        "lpips_mean": {
+          "av1": {
+            "sampled_dominators": [],
+            "sampled_native_anchors_dominated": []
+          },
+          "vvc": {
+            "sampled_dominators": [
+              "anchor/vvc/58",
+              "anchor_posthoc/vvc/54"
+            ],
+            "sampled_native_anchors_dominated": []
+          }
+        },
+        "dists_mean": {
+          "av1": {
+            "sampled_dominators": [],
+            "sampled_native_anchors_dominated": []
+          },
+          "vvc": {
+            "sampled_dominators": [
+              "anchor_posthoc/vvc/54"
+            ],
+            "sampled_native_anchors_dominated": []
+          }
+        },
+        "pooled_y_psnr_db": {
+          "av1": {
+            "sampled_dominators": [],
+            "sampled_native_anchors_dominated": []
+          },
+          "vvc": {
+            "sampled_dominators": [
+              "anchor/vvc/58",
+              "anchor_posthoc/vvc/54"
+            ],
+            "sampled_native_anchors_dominated": []
+          }
+        }
+      }
+    },
+    {
+      "method": "background/first_identity_q32",
+      "bytes": 60607,
+      "dists_mean": 0.09248875454068184,
+      "native_dominators_after_posthoc": [
+        "anchor_posthoc/av1/56",
+        "anchor_posthoc/av1/57"
+      ],
+      "dominates_sampled_native_anchors": [],
+      "gap_survives": false,
+      "by_native_codec": {
+        "av1": {
+          "sampled_dominators": [
+            "anchor_posthoc/av1/56",
+            "anchor_posthoc/av1/57"
+          ],
+          "sampled_native_anchors_dominated": []
+        },
+        "vvc": {
+          "sampled_dominators": [],
+          "sampled_native_anchors_dominated": []
+        }
+      },
+      "by_metric_and_codec": {
+        "lpips_mean": {
+          "av1": {
+            "sampled_dominators": [
+              "anchor/av1/58",
+              "anchor/av1/63",
+              "anchor_posthoc/av1/56",
+              "anchor_posthoc/av1/57"
+            ],
+            "sampled_native_anchors_dominated": []
+          },
+          "vvc": {
+            "sampled_dominators": [
+              "anchor/vvc/44"
+            ],
+            "sampled_native_anchors_dominated": []
+          }
+        },
+        "dists_mean": {
+          "av1": {
+            "sampled_dominators": [
+              "anchor_posthoc/av1/56",
+              "anchor_posthoc/av1/57"
+            ],
+            "sampled_native_anchors_dominated": []
+          },
+          "vvc": {
+            "sampled_dominators": [],
+            "sampled_native_anchors_dominated": []
+          }
+        },
+        "pooled_y_psnr_db": {
+          "av1": {
+            "sampled_dominators": [
+              "anchor/av1/58",
+              "anchor/av1/63",
+              "anchor_posthoc/av1/56",
+              "anchor_posthoc/av1/57"
+            ],
+            "sampled_native_anchors_dominated": []
+          },
+          "vvc": {
+            "sampled_dominators": [
+              "anchor/vvc/63",
+              "anchor/vvc/44",
+              "anchor/vvc/52",
+              "anchor/vvc/58",
+              "anchor_posthoc/vvc/53",
+              "anchor_posthoc/vvc/54"
+            ],
+            "sampled_native_anchors_dominated": []
+          }
+        }
+      }
+    },
+    {
+      "method": "background/first_registered_q32",
+      "bytes": 62129,
+      "dists_mean": 0.09164000675082207,
+      "native_dominators_after_posthoc": [
+        "anchor_posthoc/av1/56"
+      ],
+      "dominates_sampled_native_anchors": [],
+      "gap_survives": false,
+      "by_native_codec": {
+        "av1": {
+          "sampled_dominators": [
+            "anchor_posthoc/av1/56"
+          ],
+          "sampled_native_anchors_dominated": []
+        },
+        "vvc": {
+          "sampled_dominators": [],
+          "sampled_native_anchors_dominated": []
+        }
+      },
+      "by_metric_and_codec": {
+        "lpips_mean": {
+          "av1": {
+            "sampled_dominators": [
+              "anchor/av1/58",
+              "anchor/av1/63",
+              "anchor_posthoc/av1/56",
+              "anchor_posthoc/av1/57"
+            ],
+            "sampled_native_anchors_dominated": []
+          },
+          "vvc": {
+            "sampled_dominators": [
+              "anchor/vvc/44"
+            ],
+            "sampled_native_anchors_dominated": []
+          }
+        },
+        "dists_mean": {
+          "av1": {
+            "sampled_dominators": [
+              "anchor_posthoc/av1/56"
+            ],
+            "sampled_native_anchors_dominated": []
+          },
+          "vvc": {
+            "sampled_dominators": [],
+            "sampled_native_anchors_dominated": []
+          }
+        },
+        "pooled_y_psnr_db": {
+          "av1": {
+            "sampled_dominators": [
+              "anchor/av1/58",
+              "anchor/av1/63",
+              "anchor_posthoc/av1/56",
+              "anchor_posthoc/av1/57"
+            ],
+            "sampled_native_anchors_dominated": []
+          },
+          "vvc": {
+            "sampled_dominators": [
+              "anchor/vvc/44",
+              "anchor/vvc/52",
+              "anchor/vvc/58",
+              "anchor_posthoc/vvc/53",
+              "anchor_posthoc/vvc/54"
+            ],
+            "sampled_native_anchors_dominated": []
+          }
+        }
+      }
+    }
+  ],
+  "limits": [
+    "All4 selected after original37 development results, not held-out confirmation.",
+    "Full48 frames and complete stream+manifest bytes; no rate/quality interpolation or BD-rate.",
+    "No task/human preference/global algorithmic inference."
+  ],
+  "physical_final_audit": {
+    "checks": [
+      {
+        "codec": "av1",
+        "quantizer": 56,
+        "physical_identities_verified": true
+      },
+      {
+        "codec": "av1",
+        "quantizer": 57,
+        "physical_identities_verified": true
+      },
+      {
+        "codec": "vvc",
+        "quantizer": 53,
+        "physical_identities_verified": true
+      },
+      {
+        "codec": "vvc",
+        "quantizer": 54,
+        "physical_identities_verified": true
+      }
+    ],
+    "native_budget_and_all48_complete": true
+  }
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "name": "presley",
+    "original_repository": "/Users/manu/Desktop/68e8b6bb11d0dd9e62a67aef",
+    "revision": "07b46952dc2783ef8857b277795fed58ff777a37",
+    "path": "sections/presley.tex",
+    "extract": "/private/tmp/pointstream-recovery-20260930/workers/manuscript/presley-primary.tex",
+    "sha256": "14e521577afabc5438fe93bf2a59fd333a75aacf7f2ef834c4ba74f9f536d440",
+    "disposition": "analyzed for lineage/accounting; underlying experiments/publication not recertified"
+  },
+  {
+    "name": "genstream",
+    "original_repository": "/Users/manu/Desktop/6a2957b406960e27e1129489",
+    "revision": "05ffd90a711a537b5053c5f76eaf64a36e7cb89f",
+    "path": "GenStream/main.tex",
+    "extract": "/private/tmp/pointstream-recovery-20260930/workers/manuscript/genstream-primary.tex",
+    "sha256": "7393787fe83c6039d7b6099bf3f0eb423fb094f09a65036c6b221962e7426239",
+    "disposition": "analyzed for lineage/accounting; underlying experiments/publication not recertified"
+  }
+]

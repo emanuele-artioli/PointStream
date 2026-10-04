@@ -1,0 +1,79 @@
+{
+  "measure": "mean absolute difference in grey levels, RGB, over the first N frames",
+  "why": "The plate the runner transmits is the first source frame, so vs_first_frame_mad is what the residual has to carry. consecutive_mad is the conventional motion figure and is reported beside it because the two can disagree.",
+  "n_frames": 8,
+  "clips_low_to_high": [
+    {
+      "video": "alcaraz_highlights",
+      "scene": "scene_000",
+      "n_frames": 8,
+      "resolution": "3840x2160",
+      "consecutive_mad": 0.3317521632495591,
+      "vs_first_frame_mad": 0.6890779780276308,
+      "last_vs_first_mad": 1.0666291313014404
+    },
+    {
+      "video": "alcaraz_highlights",
+      "scene": "scene_010",
+      "n_frames": 8,
+      "resolution": "3840x2160",
+      "consecutive_mad": 0.47162783381099355,
+      "vs_first_frame_mad": 1.3074874556786449,
+      "last_vs_first_mad": 1.8116405446244856
+    },
+    {
+      "video": "sinner_alcaraz",
+      "scene": "scene_001",
+      "n_frames": 8,
+      "resolution": "3840x2160",
+      "consecutive_mad": 0.6002010880548206,
+      "vs_first_frame_mad": 1.3115845803020283,
+      "last_vs_first_mad": 1.7467304044495884
+    },
+    {
+      "video": "federer_djokovic",
+      "scene": "scene_001",
+      "n_frames": 8,
+      "resolution": "3840x2160",
+      "consecutive_mad": 0.7732572866144914,
+      "vs_first_frame_mad": 1.5873162213863168,
+      "last_vs_first_mad": 2.0876922582304527
+    },
+    {
+      "video": "djokovic_federer",
+      "scene": "scene_003",
+      "n_frames": 8,
+      "resolution": "3840x2160",
+      "consecutive_mad": 0.8382095550411522,
+      "vs_first_frame_mad": 2.104620788323045,
+      "last_vs_first_mad": 2.6992928562242797
+    },
+    {
+      "video": "alcaraz_perricard",
+      "scene": "scene_002",
+      "n_frames": 8,
+      "resolution": "3840x2160",
+      "consecutive_mad": 3.1685283472957084,
+      "vs_first_frame_mad": 6.2312820239013815,
+      "last_vs_first_mad": 8.806794463734567
+    },
+    {
+      "video": "djokovic_zverev",
+      "scene": "scene_002",
+      "n_frames": 8,
+      "resolution": "3840x2160",
+      "consecutive_mad": 5.905088441771385,
+      "vs_first_frame_mad": 12.34695563386427,
+      "last_vs_first_mad": 15.70798944669496
+    },
+    {
+      "video": "federer_djokovic",
+      "scene": "scene_003",
+      "n_frames": 8,
+      "resolution": "3840x2160",
+      "consecutive_mad": 7.697175288662919,
+      "vs_first_frame_mad": 13.613382603523663,
+      "last_vs_first_mad": 17.040331669560185
+    }
+  ]
+}

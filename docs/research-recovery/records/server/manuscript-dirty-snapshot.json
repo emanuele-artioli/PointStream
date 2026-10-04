@@ -1,0 +1,10 @@
+{
+  "source": "gpu3:/home/itec/emanuele/pointstream/67a9ea6275d3d9785ce57026",
+  "artifact": "/private/tmp/pointstream-recovery-20260930/source/remote-paper-dirty.patch",
+  "sha256": "94f6687c7963bfe47bb68c37725b793170ee66862d97730fc8bd70d4898d1bb1",
+  "bytes": 19001,
+  "capture_timestamp_from_local_mtime_utc": "2026-09-30T09:17:19.368776+00:00",
+  "disposition": "root-captured manuscript dirty tracked patch; original unchanged",
+  "head": "2f96b25660d22482a81c8a69998bb597d28e4b19",
+  "format": "git diff --binary followed by status text (root capture); separate before replay"
+}

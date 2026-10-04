@@ -1,0 +1,33 @@
+{
+  "CPU_saved_rounded_score_analysis": true,
+  "report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/e04b_paired_removal_report.json",
+  "rows": [
+    {
+      "qp": 47,
+      "derived_byte_delta": -35,
+      "derived_byte_percent": -0.7685551163812088,
+      "historical_byte_percent": -0.77,
+      "derived_visible_psnr_delta": 0.3059999999999974,
+      "historical_visible_psnr_delta": 0.306,
+      "derived_ghost_MAD_reduction_percent": 4.909983633387882,
+      "historical_reduction_percent": 4.91,
+      "passes_50percent_criterion": false,
+      "historical_disposition": "INCONCLUSIVE_KEEP_EXPLORATORY",
+      "boundary_original": "defaulted zeros invalidated by later direct boundary audit"
+    },
+    {
+      "qp": 32,
+      "derived_byte_delta": -942,
+      "derived_byte_percent": -5.410372752857384,
+      "historical_byte_percent": -5.41,
+      "derived_visible_psnr_delta": 0.028000000000002245,
+      "historical_visible_psnr_delta": 0.028,
+      "derived_ghost_MAD_reduction_percent": 2.4761336515513044,
+      "historical_reduction_percent": 2.48,
+      "passes_50percent_criterion": false,
+      "historical_disposition": "INCONCLUSIVE_KEEP_EXPLORATORY",
+      "boundary_original": "defaulted zeros invalidated by later direct boundary audit"
+    }
+  ],
+  "limits": "arithmetic over rounded historical fields only; not new pixel measurement"
+}

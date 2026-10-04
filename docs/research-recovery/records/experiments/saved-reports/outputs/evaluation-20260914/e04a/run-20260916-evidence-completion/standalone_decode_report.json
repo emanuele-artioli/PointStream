@@ -1,0 +1,132 @@
+{
+  "validations": [
+    {
+      "representation": "cleaned_video",
+      "decoded_frames": 48,
+      "target_frames": 48,
+      "frame_shape": [
+        360,
+        640
+      ],
+      "fps": 12.0,
+      "decode_seconds": 0.7091,
+      "render_seconds": 0.0,
+      "total_client_seconds": 0.7091,
+      "rejected": false,
+      "bitstream_name": "cleaned_video_qp32.vvc",
+      "side_data_bytes": 10,
+      "bitstream_bytes": 145080,
+      "bitstream_sha256": "6c7196712f8d9e51a1359a306ec08a2c2da390f5efc2564b8e548ffc2ef61e22",
+      "max_diff_vs_saved_decode": 0,
+      "bit_identical_parity": true
+    },
+    {
+      "representation": "cleaned_video",
+      "decoded_frames": 48,
+      "target_frames": 48,
+      "frame_shape": [
+        360,
+        640
+      ],
+      "fps": 12.0,
+      "decode_seconds": 0.7211,
+      "render_seconds": 0.0003,
+      "total_client_seconds": 0.7214,
+      "rejected": false,
+      "bitstream_name": "cleaned_video_qp47.vvc",
+      "side_data_bytes": 10,
+      "bitstream_bytes": 21148,
+      "bitstream_sha256": "d2aba932631199df9f6d05c2feb5363aa25f73a650a9d7ba18f8af30c40912ba",
+      "max_diff_vs_saved_decode": 0,
+      "bit_identical_parity": true
+    },
+    {
+      "representation": "registered_panorama",
+      "decoded_frames": 48,
+      "target_frames": 48,
+      "plate_shape": [
+        364,
+        656
+      ],
+      "frame_shape": [
+        360,
+        640
+      ],
+      "fps": 12.0,
+      "decode_seconds": 0.1482,
+      "render_seconds": 0.0372,
+      "total_client_seconds": 0.1853,
+      "rejected": false,
+      "bitstream_name": "registered_panorama_qp32.vvc",
+      "side_data_bytes": 1742,
+      "bitstream_bytes": 15669,
+      "bitstream_sha256": "503f853caef8aefc48cd1d0fd25cbf902aa2df04ea18cbfbdf6cd9fa50d8ca7d",
+      "max_diff_vs_saved_decode": 0,
+      "bit_identical_parity": true
+    },
+    {
+      "representation": "registered_panorama",
+      "decoded_frames": 48,
+      "target_frames": 48,
+      "plate_shape": [
+        364,
+        656
+      ],
+      "frame_shape": [
+        360,
+        640
+      ],
+      "fps": 12.0,
+      "decode_seconds": 0.3369,
+      "render_seconds": 0.0596,
+      "total_client_seconds": 0.3965,
+      "rejected": false,
+      "bitstream_name": "registered_panorama_qp47.vvc",
+      "side_data_bytes": 1742,
+      "bitstream_bytes": 2812,
+      "bitstream_sha256": "31937000b96293420e741283985452233f896075748e657dff142304322947a6",
+      "max_diff_vs_saved_decode": 0,
+      "bit_identical_parity": true
+    },
+    {
+      "representation": "still_frame0",
+      "decoded_frames": 1,
+      "target_frames": 48,
+      "frame_shape": [
+        360,
+        640
+      ],
+      "fps": 12.0,
+      "decode_seconds": 0.678,
+      "render_seconds": 0.0057,
+      "total_client_seconds": 0.6838,
+      "rejected": false,
+      "bitstream_name": "still_frame0_qp32.vvc",
+      "side_data_bytes": 10,
+      "bitstream_bytes": 24587,
+      "bitstream_sha256": "65fac19ec97ff1f6f46e31de9a2cdd4a1e96561c884b01a76916ea090e75bc1a",
+      "max_diff_vs_saved_decode": 0,
+      "bit_identical_parity": true
+    },
+    {
+      "representation": "still_frame0",
+      "decoded_frames": 1,
+      "target_frames": 48,
+      "frame_shape": [
+        360,
+        640
+      ],
+      "fps": 12.0,
+      "decode_seconds": 0.1222,
+      "render_seconds": 0.0048,
+      "total_client_seconds": 0.127,
+      "rejected": false,
+      "bitstream_name": "still_frame0_qp47.vvc",
+      "side_data_bytes": 10,
+      "bitstream_bytes": 3973,
+      "bitstream_sha256": "51f398f08e024b08426905a9d7b6fe01ccc3d9a1c9904730721bd1a8901a75bf",
+      "max_diff_vs_saved_decode": 0,
+      "bit_identical_parity": true
+    }
+  ]
+}

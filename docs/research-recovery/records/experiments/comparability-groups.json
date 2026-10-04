@@ -1,0 +1,115 @@
+{
+  "membership_policy": "families are source leads, not automatic common-protocol membership; exact per-artifact cards control admission",
+  "groups": [
+    {
+      "id": "C1",
+      "question": "changed-target conventional headroom",
+      "source_families": [
+        "bp21-headroom"
+      ],
+      "input_window": "48  frames,3840x2160,24 fps;8 scene identities kept separate",
+      "access_target": "plate/flat/median source-derived target vs original",
+      "quality": "native codec quality relative to each different target",
+      "exclusion": "not whole-source  PointStream rate advantage"
+    },
+    {
+      "id": "C2",
+      "question": "native gates",
+      "source_families": [
+        "gate-a-vvc-webp-n96-run2",
+        "gate-b-confirmation"
+      ],
+      "input_window": "A2x96  frames3840x2160;Btwo independent48-frame1080/720 sources",
+      "access_target": "delivered source reconstruction with measured runner contract",
+      "quality": "stored VMAF;candidate/VVC common range; AV1 disjoint",
+      "exclusion": "GateA/B not pooled;GateBpassretracted"
+    },
+    {
+      "id": "C3",
+      "question": "background budget/register",
+      "source_families": [
+        "bp29-panorama",
+        "bp31-ladder",
+        "evaluation-20260914"
+      ],
+      "input_window": "8-frame BP controls;2x8-frame BP31;E04A48-frame360pgrid",
+      "access_target": "background component/fullcandidate scopes explicit",
+      "quality": "deliveredY PSNR vs visiblemasked background metrics separate",
+      "exclusion": "cold/refresh/geometry/residual and continuousanchor access must match"
+    },
+    {
+      "id": "C4",
+      "question": "modular fullcandidate",
+      "source_families": [
+        "modular",
+        "evaluation-20260914"
+      ],
+      "input_window": "48f/192f and specific E05/E06windows separate",
+      "access_target": "actual delivered vs cached/source-assisted runtime explicit",
+      "quality": "weightedregionaldB != overall PSNR != nativeY PSNR",
+      "exclusion": "constanttablevaluesinvalid;no all-familycomparability"
+    },
+    {
+      "id": "C5",
+      "question": "foreground checkpoints",
+      "source_families": [
+        "bp12-baselines",
+        "bp25-ip-adapter",
+        "evaluation-20260914",
+        "development-recovery"
+      ],
+      "input_window": "reference/target offset and crop/scene split fixed per card",
+      "access_target": "checkpoint/exactclipadaptation/targetalpha chargeddeclared",
+      "quality": "qualified samecrop/regionmetricversion",
+      "exclusion": "invalidconditioningcontrols cannot rankmodel  families"
+    },
+    {
+      "id": "C6",
+      "question": "JEcomponent/assembly",
+      "source_families": [
+        "journal-20260924"
+      ],
+      "input_window": "Alcaraz00048-frame point or five-frame region sample",
+      "access_target": "cachedbackground/source boxes privileged;persistedfresh client missing",
+      "quality": "weightedregionaldB/heuristiclinepixel PSNR/silhouetteIoU separate",
+      "exclusion": "JE11analyticalprojection;JE07conflictingidentity"
+    },
+    {
+      "id": "C7",
+      "question": "legacy residual/neural adaptation",
+      "source_families": [
+        "hnerv_smoke",
+        "hnerv_vod_sweep_short",
+        "hnerv_wrc_phase1"
+      ],
+      "input_window": "8/60-frame source real_tennis;32/360/720differentgrids",
+      "access_target": "pervideo fitting exposure and full weights/latents needed",
+      "quality": "legacy PSNR/SSIM/VMAF calibration unverified",
+      "exclusion": "not faithful HNeRVreplication;timestampcontainer fraction not window rate"
+    },
+    {
+      "id": "C8",
+      "question": "SAM/perception",
+      "source_families": [
+        "journal-20260925",
+        "journal-20260926",
+        "sam31-unification"
+      ],
+      "input_window": "same16PNG/cache diagnostic pair separatedfrom other48fpilots",
+      "access_target": "guided/offline vs onlineinformationpolicy/checkpoint identity",
+      "quality": "cacheagreement/coverage != independentGTmaskquality",
+      "exclusion": "R02anchors missing;racket/training quarantined"
+    },
+    {
+      "id": "C9",
+      "question": "egocentric demo/fill",
+      "source_families": [
+        "external-neural-bg-jobs"
+      ],
+      "input_window": "factory001/factory035identityand windowsunresolved",
+      "access_target": "sourcehandsbackground/rawposes/generatedfilltargets privileged",
+      "quality": "conditionedmatchedhands/MPJPE/generatedreferenceMAE separate",
+      "exclusion": "cold/fullphysicalbytes/checkpoint cost/judgeindependence unresolved"
+    }
+  ]
+}

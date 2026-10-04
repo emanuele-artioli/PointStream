@@ -1,0 +1,333 @@
+[
+  {
+    "sha": "912b0d7f288b1086039b39538b4e67db797eb3d9",
+    "parents": [
+      "c843ec73721134eb959a80cab97dddd6701f9f35"
+    ],
+    "date": "2026-09-30T07:51:52+02:00",
+    "subject": "Mark the RTM+SAM demo ladder as at risk of using the wrong clips.",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": [
+      "demo/experiments/export_demo_clips.py",
+      "demo/models/dataset.py",
+      "demo/pitch/interactive_demo.html"
+    ]
+  },
+  {
+    "sha": "4e9bcba16a28c79e6c7e17e4c571827263f206ee",
+    "parents": [
+      "3725388ebadb14f09c046657082d187b7735786d"
+    ],
+    "date": "2026-09-25T11:57:46+02:00",
+    "subject": "feat(metrics): add tracked landmark geometry scorer",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": [
+      "src/components/metrics/track_geometry.py",
+      "tests/components/test_track_geometry.py"
+    ]
+  },
+  {
+    "sha": "3725388ebadb14f09c046657082d187b7735786d",
+    "parents": [
+      "efc7b15017fac8bbbed342a64117b4a59ebf629c"
+    ],
+    "date": "2026-09-24T21:35:28+02:00",
+    "subject": "docs: record completed JE-11 amortization, JE-12 ablations, and JE-16 profiling in evaluation and journal plan",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": [
+      "docs/areas/evaluation.md",
+      "docs/strategy/journal-experiment-plan.md"
+    ]
+  },
+  {
+    "sha": "efc7b15017fac8bbbed342a64117b4a59ebf629c",
+    "parents": [
+      "a4f603729e7ab7ac78800ed1142b49dfd5cbb153"
+    ],
+    "date": "2026-09-24T21:33:07+02:00",
+    "subject": "docs(paper): record JE-10 winning headline numbers and JE-12 causal ablations",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": [
+      "docs/areas/paper.md"
+    ]
+  },
+  {
+    "sha": "a4f603729e7ab7ac78800ed1142b49dfd5cbb153",
+    "parents": [
+      "1a9a90f8339fdd7965c0b2b89a0245823d18ae4c"
+    ],
+    "date": "2026-09-24T21:32:14+02:00",
+    "subject": "feat(eval): add JE-10 full codec runner and unit tests",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": [
+      "experiments/modular/je10_full_codec.py",
+      "tests/experiments/test_je10_full_codec.py"
+    ]
+  },
+  {
+    "sha": "1a9a90f8339fdd7965c0b2b89a0245823d18ae4c",
+    "parents": [
+      "bbe5f8c84920d16bf99004f3c1493fc5add10d5e"
+    ],
+    "date": "2026-09-24T21:32:14+02:00",
+    "subject": "feat(eval): assemble JE-10 winning full codec candidate and JE-12 causal ablations",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": [
+      "docs/areas/evaluation.md",
+      "docs/strategy/journal-experiment-plan.md"
+    ]
+  },
+  {
+    "sha": "bbe5f8c84920d16bf99004f3c1493fc5add10d5e",
+    "parents": [
+      "0fcef4bb6fc501409e82339a7d4ff8e80b837895"
+    ],
+    "date": "2026-09-24T21:21:37+02:00",
+    "subject": "feat(eval): execute JE-07 appearance and silhouette compression probe",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": [
+      "docs/areas/evaluation.md",
+      "docs/strategy/journal-experiment-plan.md",
+      "experiments/modular/je07_appearance_silhouette.py",
+      "tests/experiments/test_je07_appearance_silhouette.py"
+    ]
+  },
+  {
+    "sha": "0fcef4bb6fc501409e82339a7d4ff8e80b837895",
+    "parents": [
+      "9ea6609bf323abcba667d66d8018e0cf2ad98ae6"
+    ],
+    "date": "2026-09-24T21:17:05+02:00",
+    "subject": "feat(eval): execute JE-05 regional error decomposition across court and surroundings",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": [
+      "docs/areas/evaluation.md",
+      "docs/strategy/journal-experiment-plan.md",
+      "experiments/modular/court_error_decomposition.py",
+      "tests/experiments/test_court_error_decomposition.py"
+    ]
+  },
+  {
+    "sha": "9ea6609bf323abcba667d66d8018e0cf2ad98ae6",
+    "parents": [
+      "55206bc310ee9034b79ce57a1e8e259f476a881e"
+    ],
+    "date": "2026-09-24T21:07:36+02:00",
+    "subject": "docs(eval): record Wave 0 readiness outputs and SPADE4Tennis generative screen results",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": [
+      "docs/areas/evaluation.md",
+      "docs/areas/generation.md",
+      "docs/strategy/journal-experiment-plan.md"
+    ]
+  },
+  {
+    "sha": "55206bc310ee9034b79ce57a1e8e259f476a881e",
+    "parents": [
+      "10d0ab9837ee89097124ca9daa78dd13e74902d9"
+    ],
+    "date": "2026-09-24T21:06:39+02:00",
+    "subject": "feat(eval): measure 16-frame SPADE4Tennis matched-wire screen against articulated paste",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": [
+      "experiments/modular/spade4tennis_part2.py",
+      "tests/experiments/test_spade4tennis_part2.py"
+    ]
+  },
+  {
+    "sha": "10d0ab9837ee89097124ca9daa78dd13e74902d9",
+    "parents": [
+      "ef87e1e05f8b17eb63f5ebb36ed6a56d7f3bb73f",
+      "b771b4bc20e47ada16216e8363c7e6ff3f6024a8"
+    ],
+    "date": "2026-09-24T20:56:28+02:00",
+    "subject": "feat(eval): intake foreground campaign results and reconcile with strategy documents",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": [
+      "PLAN.md"
+    ]
+  },
+  {
+    "sha": "ef87e1e05f8b17eb63f5ebb36ed6a56d7f3bb73f",
+    "parents": [
+      "88f17b98838ff00b721c2d8e03a824c6976b989e"
+    ],
+    "date": "2026-09-24T20:38:07+02:00",
+    "subject": "docs: define journal experiments, blockers, and parallel dispatch plan",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": [
+      "PLAN.md",
+      "docs/areas/evaluation.md",
+      "docs/strategy/journal-experiment-plan.md",
+      "docs/strategy/semantic-codec-thesis.md"
+    ]
+  },
+  {
+    "sha": "88f17b98838ff00b721c2d8e03a824c6976b989e",
+    "parents": [
+      "42199c65e3df8244b0760eb640410288d37e9941"
+    ],
+    "date": "2026-09-24T20:06:46+02:00",
+    "subject": "docs: rebuild semantic codec thesis from evidence and research rationale",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": [
+      "docs/areas/paper.md",
+      "docs/strategy/semantic-codec-thesis.md"
+    ]
+  },
+  {
+    "sha": "b771b4bc20e47ada16216e8363c7e6ff3f6024a8",
+    "parents": [
+      "b2a69c9177a01a7312aec66c727c56e3731734b8"
+    ],
+    "date": "2026-09-24T09:29:16+02:00",
+    "subject": "feat(eval): consolidate foreground campaign evidence and next probes",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": [
+      "PLAN.md",
+      "docs/areas/generation.md",
+      "docs/workflow/session/evaluation-campaign/20260923-development-campaign.md",
+      "docs/workflow/session/evaluation-campaign/20260924-foreground-campaign.md",
+      "experiments/modular/alcaraz_part2.py",
+      "experiments/modular/animate_anyone_part2.py",
+      "experiments/modular/foreground_campaign.py",
+      "experiments/modular/foreground_part2_common.py",
+      "experiments/modular/object_foreground_campaign.py",
+      "experiments/modular/roi_video_part2.py",
+      "experiments/modular/run_object_foreground_batch.py",
+      "experiments/modular/score_pix2pix_overfit.py",
+      "tests/experiments/test_alcaraz_part2.py",
+      "tests/experiments/test_animate_anyone_part2.py",
+      "tests/experiments/test_object_foreground_campaign.py",
+      "tests/experiments/test_roi_video_part2.py"
+    ]
+  },
+  {
+    "sha": "5009f68c7855981bcb92d8bc1314a631eac47eb9",
+    "parents": [
+      "6518fcff348770b012b8e690e7daefb142ba3625"
+    ],
+    "date": "2026-09-21T19:22:02+02:00",
+    "subject": "feat(eval): execute Gate B confirmation, second domain probe, and paper polish",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": [
+      "docs/areas/evaluation.md",
+      "docs/areas/paper.md",
+      "docs/history/findings.md",
+      "experiments/modular/oracle_ceiling.py",
+      "experiments/modular/rate_ladder.py",
+      "manifests/second_domain_generalization.json",
+      "tests/experiments/test_rate_ladder.py"
+    ]
+  },
+  {
+    "sha": "fc2d773bc7306bdd815c39541d10115ea268573b",
+    "parents": [
+      "64baac70de7c2f712658af193acf143994111e20",
+      "c16af58efc20754001ff07b06a6e9443fec8d527"
+    ],
+    "date": "2026-09-16T21:09:48+02:00",
+    "subject": "Merge remote-tracking branch 'origin/main' into codex/e05-stage1-pilot",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": []
+  },
+  {
+    "sha": "25154ee2c88b7b4de48e65d44230991d53a1b2e4",
+    "parents": [
+      "bc09184d8707529f924a41d0dccc2b6f20e88d3e",
+      "8c4dcd59f87b182f708cbf575d7b8fc8b188e8b3"
+    ],
+    "date": "2026-09-08T16:50:57+02:00",
+    "subject": "WIP on main: bc09184 docs(plan): refine Gate A competitive regime plan with fast eval and appendix sweeps (#72)",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": [
+      "AGENTS.md",
+      "PLAN.md",
+      "README.md",
+      "plans/PLAN-GATE-A-COMPETITIVE-REGIME.md",
+      "plans/ROADMAP.md"
+    ]
+  },
+  {
+    "sha": "8c4dcd59f87b182f708cbf575d7b8fc8b188e8b3",
+    "parents": [
+      "bc09184d8707529f924a41d0dccc2b6f20e88d3e"
+    ],
+    "date": "2026-09-08T16:50:57+02:00",
+    "subject": "index on main: bc09184 docs(plan): refine Gate A competitive regime plan with fast eval and appendix sweeps (#72)",
+    "public_reachable": false,
+    "pr_membership": [],
+    "disposition": "analyzed",
+    "review_scope": "recovered-only changed-path review; substantive additions and claims inspected as described in card",
+    "record": "recovered-only.md",
+    "paths": []
+  }
+]

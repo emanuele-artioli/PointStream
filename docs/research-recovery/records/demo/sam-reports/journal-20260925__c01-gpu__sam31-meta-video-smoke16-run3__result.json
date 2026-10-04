@@ -1,0 +1,469 @@
+{
+  "checkpoint_load_audit": {
+    "all_loads_path_recorded": "checkpoint-load-audit.json",
+    "final_missing_count": 0,
+    "final_missing_keys_sample": [],
+    "final_module": "Sam3MultiplexTrackingWithInteractivity",
+    "final_unexpected_count": 0,
+    "final_unexpected_keys_sample": [],
+    "load_calls": 2
+  },
+  "codec_rate_quality_and_decode_metrics": "not measured in this model-only smoke test",
+  "frame_details": [
+    {
+      "frame_index": 0,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        45970,
+        9423
+      ]
+    },
+    {
+      "frame_index": 1,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        47707,
+        9690
+      ]
+    },
+    {
+      "frame_index": 2,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        47907,
+        9854
+      ]
+    },
+    {
+      "frame_index": 3,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        49025,
+        10094
+      ]
+    },
+    {
+      "frame_index": 4,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        48033,
+        10082
+      ]
+    },
+    {
+      "frame_index": 5,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        49783,
+        10195
+      ]
+    },
+    {
+      "frame_index": 6,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        49077,
+        10093
+      ]
+    },
+    {
+      "frame_index": 7,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        47500,
+        10344
+      ]
+    },
+    {
+      "frame_index": 8,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        47542,
+        10327
+      ]
+    },
+    {
+      "frame_index": 9,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        48585,
+        10383
+      ]
+    },
+    {
+      "frame_index": 10,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        48807,
+        10777
+      ]
+    },
+    {
+      "frame_index": 11,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        49086,
+        10246
+      ]
+    },
+    {
+      "frame_index": 12,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        47378,
+        10541
+      ]
+    },
+    {
+      "frame_index": 13,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        46334,
+        11221
+      ]
+    },
+    {
+      "frame_index": 14,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        45930,
+        10930
+      ]
+    },
+    {
+      "frame_index": 15,
+      "nonempty_object_count": 2,
+      "sam_object_ids": [
+        0,
+        1
+      ],
+      "selected_ids_present": [
+        true,
+        true
+      ],
+      "selected_mask_areas": [
+        43871,
+        11168
+      ]
+    }
+  ],
+  "gpu": {
+    "device": "NVIDIA RTX A6000",
+    "driver": "535.183.01",
+    "torch_runtime": "12.8",
+    "uuid": "GPU-6f70a27e-4171-22d7-3ffd-647e7f186a49"
+  },
+  "implementation": {
+    "checkpoint_filename": "sam3.1_multiplex.pt",
+    "checkpoint_path": "/home/itec/emanuele/.cache/huggingface/hub/models--facebook--sam3.1/snapshots/daa63191845a41281374e725f4c9e51c7a824460/sam3.1_multiplex.pt",
+    "checkpoint_repo": "facebook/sam3.1",
+    "checkpoint_revision": "daa63191845a41281374e725f4c9e51c7a824460",
+    "checkpoint_sha256": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
+    "checkpoint_size_bytes": 3502755717,
+    "einops": "0.8.1",
+    "environment_path": "/home/itec/emanuele/.conda/envs/pointstream-sam31",
+    "expected_repository_commit": "2345a4ad109ac29c569da749c91d84f10dc08c40",
+    "numpy": "1.26.4",
+    "package": "sam3==0.1.0 editable from pinned source",
+    "psutil": "7.2.2",
+    "pycocotools": "2.0.10",
+    "python": "3.12.14",
+    "repository": "https://github.com/facebookresearch/sam3",
+    "repository_commit": "2345a4ad109ac29c569da749c91d84f10dc08c40",
+    "repository_path": "/home/itec/emanuele/.cache/sam3-meta",
+    "setuptools": "80.9.0",
+    "torch": "2.10.0+cu128",
+    "torchvision": "0.25.0+cu128"
+  },
+  "inference": {
+    "api": "build_sam3_multiplex_video_predictor",
+    "async_loading_frames": false,
+    "compile": false,
+    "max_num_objects": 16,
+    "multiplex_count": 16,
+    "prompt": "tennis player",
+    "prompt_frame_index": 0,
+    "reference_use": "Only after predicted masks are saved and hashed; diagnostic IoU/boundary-IoU only.",
+    "selection": "Among nonempty masks on frame 0, select the two largest areas; order their stable SAM object IDs by horizontal centroid, then track those IDs through the remaining frames.",
+    "use_fa3": false,
+    "use_rope_real": false
+  },
+  "inspection_images": [
+    "/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run3/inspection-frame-000.png",
+    "/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run3/inspection-frame-008.png",
+    "/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run3/inspection-frame-015.png"
+  ],
+  "limitations": [
+    "one 16-frame development window and one text prompt; no comparison or held-out claim",
+    "cached masks are project-derived imperfect references, not human ground truth",
+    "SAM masks have not yet been fed through the PointStream serializer and source-hidden decoder"
+  ],
+  "manifest_path": "/home/itec/emanuele/pointstream-data/manifests/journal_20260925_sam31_meta_video_smoke16_retry2.json",
+  "manifest_sha256": "8304a9daf2f239eb49c46744c05eb6c554898a0039bbaa347a950835ad4700a5",
+  "mask_agreement_diagnostic_only": {
+    "boundary_iou": 0.05924342595814485,
+    "global_iou": 0.8003966360044216,
+    "mean_frame_iou": 0.8025918636154334,
+    "per_frame": [
+      {
+        "frame_index": 0,
+        "iou": 0.819715714264135,
+        "predicted_pixels": 55393,
+        "reference_pixels": 65074
+      },
+      {
+        "frame_index": 1,
+        "iou": 0.794540837917901,
+        "predicted_pixels": 57397,
+        "reference_pixels": 69818
+      },
+      {
+        "frame_index": 2,
+        "iou": 0.7788944032774715,
+        "predicted_pixels": 57761,
+        "reference_pixels": 71634
+      },
+      {
+        "frame_index": 3,
+        "iou": 0.7701745543293718,
+        "predicted_pixels": 59119,
+        "reference_pixels": 74338
+      },
+      {
+        "frame_index": 4,
+        "iou": 0.7501750862217054,
+        "predicted_pixels": 58115,
+        "reference_pixels": 74333
+      },
+      {
+        "frame_index": 5,
+        "iou": 0.7617761465992944,
+        "predicted_pixels": 59978,
+        "reference_pixels": 76350
+      },
+      {
+        "frame_index": 6,
+        "iou": 0.7584711232617439,
+        "predicted_pixels": 59170,
+        "reference_pixels": 74618
+      },
+      {
+        "frame_index": 7,
+        "iou": 0.8543498029705971,
+        "predicted_pixels": 57844,
+        "reference_pixels": 64506
+      },
+      {
+        "frame_index": 8,
+        "iou": 0.8784416878083705,
+        "predicted_pixels": 57869,
+        "reference_pixels": 62819
+      },
+      {
+        "frame_index": 9,
+        "iou": 0.7766964718929784,
+        "predicted_pixels": 58968,
+        "reference_pixels": 69194
+      },
+      {
+        "frame_index": 10,
+        "iou": 0.7935116893013635,
+        "predicted_pixels": 59584,
+        "reference_pixels": 72214
+      },
+      {
+        "frame_index": 11,
+        "iou": 0.8808893594494441,
+        "predicted_pixels": 59332,
+        "reference_pixels": 65023
+      },
+      {
+        "frame_index": 12,
+        "iou": 0.7816831073593192,
+        "predicted_pixels": 57919,
+        "reference_pixels": 72306
+      },
+      {
+        "frame_index": 13,
+        "iou": 0.7957421593939138,
+        "predicted_pixels": 57555,
+        "reference_pixels": 69729
+      },
+      {
+        "frame_index": 14,
+        "iou": 0.8091145341831327,
+        "predicted_pixels": 56860,
+        "reference_pixels": 67750
+      },
+      {
+        "frame_index": 15,
+        "iou": 0.8372931396161915,
+        "predicted_pixels": 55039,
+        "reference_pixels": 63200
+      }
+    ],
+    "precision": 0.977770305732388,
+    "recall": 0.8152314750751636,
+    "reference_role": "imperfect evaluation-only cached mask, not ground truth"
+  },
+  "model_build_seconds": 20.851964425761253,
+  "peak_cuda_allocated_gib": 15.968602657318115,
+  "peak_cuda_reserved_gib": 19.681640625,
+  "peak_rss_bytes": 8019709952,
+  "pointstream_codec_run": false,
+  "predicted_masks": {
+    "nonempty_selected_masks": 32,
+    "path": "/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run3/predicted_player_masks.npz",
+    "selected_objects": 2,
+    "sha256": "4fc2f2eedd3e4b7c04f86fa69e71217285017a652c159d702f7b2193e4684e3f",
+    "shape": [
+      16,
+      2,
+      2160,
+      3840
+    ]
+  },
+  "prompt_frame_object_ids": [
+    0,
+    1
+  ],
+  "propagation_seconds_excluding_model_build": 3.391016236040741,
+  "runner_path": "/tmp/pointstream_sam31_smoke.py",
+  "runner_sha256": "2e0649e0ee15f767b59b358b9c818df14231fa50ce6c2261262f10790097388a",
+  "schema": "pointstream.sam31.meta_video_smoke.result.v1",
+  "selected_track_ids": [
+    0,
+    1
+  ],
+  "session_start_workaround": "local signature-filtered start_session adapter for unsupported offload_state_to_cpu; upstream SAM source unchanged",
+  "source_dataset_id": "sinner_alcaraz/scene_002",
+  "source_frame_count": 16,
+  "source_resolution_wh": [
+    3840,
+    2160
+  ],
+  "status": "inference_completed",
+  "total_wall_seconds": 32.20641637360677,
+  "two_track_coverage_fraction": 1.0,
+  "within_registered_bounds": true
+}

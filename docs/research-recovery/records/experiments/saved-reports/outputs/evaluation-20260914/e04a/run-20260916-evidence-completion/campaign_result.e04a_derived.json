@@ -1,0 +1,392 @@
+{
+  "schema": "pointstream.campaign_result.v1",
+  "contract_revision": "e03a-20260915",
+  "campaign": "evaluation-20260914",
+  "action": "E04A",
+  "records": [
+    {
+      "schema": "pointstream.campaign_result.v1",
+      "contract_revision": "e03a-20260915",
+      "record_class": "validated_claim",
+      "artifact_id": "e04a_derived_still_frame0_qp47",
+      "artifact_path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/evidence_completion_report.json",
+      "artifact_sha256": "f2358b348d9f33ed0692994485aed1b768519da477fef83851859959e5f6c3e5",
+      "code_revision": "d5e4a7642965ca76d2809bdfb5cd6d4ef95163bb",
+      "source_ids": [
+        "federer_djokovic_scene_007"
+      ],
+      "frame_ids": {
+        "start": 0,
+        "count": 48,
+        "fps": 12.0
+      },
+      "operating_point_id": "display_low",
+      "claim_eligibility": {
+        "rd": true,
+        "rd_arms": {
+          "bytes": true,
+          "psnr_y": true,
+          "ssim": true
+        },
+        "runtime": true,
+        "standalone_transport": true,
+        "trajectory": false,
+        "generalization": false,
+        "exclusions": [
+          {
+            "claim": "trajectory",
+            "reason": "background representation probe, not generative model trajectory"
+          },
+          {
+            "claim": "generalization",
+            "reason": "single development scene (Federer scene 007)"
+          }
+        ]
+      },
+      "evidence": {
+        "metrics": {
+          "psnr_y": 17.671,
+          "ssim": 0.6566,
+          "total_bytes": 3983
+        },
+        "bytes": {
+          "payload": 3973,
+          "side_data": 10,
+          "total": 3983
+        }
+      },
+      "timing_evidence": {
+        "timing_evidence_id": "timing_e04a_derived_still_frame0_qp47",
+        "host": "gpu5",
+        "n_repeats": 1,
+        "measured_client_seconds": 0.1748,
+        "encoder_seconds": 0.391
+      },
+      "controls": {
+        "standalone_decode": "verified",
+        "metric_calibration": "verified",
+        "wire_ledger": "reconciled"
+      }
+    },
+    {
+      "schema": "pointstream.campaign_result.v1",
+      "contract_revision": "e03a-20260915",
+      "record_class": "validated_claim",
+      "artifact_id": "e04a_derived_registered_panorama_qp47",
+      "artifact_path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/evidence_completion_report.json",
+      "artifact_sha256": "f2358b348d9f33ed0692994485aed1b768519da477fef83851859959e5f6c3e5",
+      "code_revision": "d5e4a7642965ca76d2809bdfb5cd6d4ef95163bb",
+      "source_ids": [
+        "federer_djokovic_scene_007"
+      ],
+      "frame_ids": {
+        "start": 0,
+        "count": 48,
+        "fps": 12.0
+      },
+      "operating_point_id": "display_low",
+      "claim_eligibility": {
+        "rd": true,
+        "rd_arms": {
+          "bytes": true,
+          "psnr_y": true,
+          "ssim": true
+        },
+        "runtime": true,
+        "standalone_transport": true,
+        "trajectory": false,
+        "generalization": false,
+        "exclusions": [
+          {
+            "claim": "trajectory",
+            "reason": "background representation probe, not generative model trajectory"
+          },
+          {
+            "claim": "generalization",
+            "reason": "single development scene (Federer scene 007)"
+          }
+        ]
+      },
+      "evidence": {
+        "metrics": {
+          "psnr_y": 21.161,
+          "ssim": 0.8236,
+          "total_bytes": 4554
+        },
+        "bytes": {
+          "payload": 2812,
+          "side_data": 1742,
+          "total": 4554
+        }
+      },
+      "timing_evidence": {
+        "timing_evidence_id": "timing_e04a_derived_registered_panorama_qp47",
+        "host": "gpu5",
+        "n_repeats": 1,
+        "measured_client_seconds": 0.4443,
+        "encoder_seconds": 0.298
+      },
+      "controls": {
+        "standalone_decode": "verified",
+        "metric_calibration": "verified",
+        "wire_ledger": "reconciled"
+      }
+    },
+    {
+      "schema": "pointstream.campaign_result.v1",
+      "contract_revision": "e03a-20260915",
+      "record_class": "validated_claim",
+      "artifact_id": "e04a_derived_registered_panorama_qp32",
+      "artifact_path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/evidence_completion_report.json",
+      "artifact_sha256": "f2358b348d9f33ed0692994485aed1b768519da477fef83851859959e5f6c3e5",
+      "code_revision": "d5e4a7642965ca76d2809bdfb5cd6d4ef95163bb",
+      "source_ids": [
+        "federer_djokovic_scene_007"
+      ],
+      "frame_ids": {
+        "start": 0,
+        "count": 48,
+        "fps": 12.0
+      },
+      "operating_point_id": "display_low",
+      "claim_eligibility": {
+        "rd": true,
+        "rd_arms": {
+          "bytes": true,
+          "psnr_y": true,
+          "ssim": true
+        },
+        "runtime": true,
+        "standalone_transport": true,
+        "trajectory": false,
+        "generalization": false,
+        "exclusions": [
+          {
+            "claim": "trajectory",
+            "reason": "background representation probe, not generative model trajectory"
+          },
+          {
+            "claim": "generalization",
+            "reason": "single development scene (Federer scene 007)"
+          }
+        ]
+      },
+      "evidence": {
+        "metrics": {
+          "psnr_y": 22.798,
+          "ssim": 0.8896,
+          "total_bytes": 17411
+        },
+        "bytes": {
+          "payload": 15669,
+          "side_data": 1742,
+          "total": 17411
+        }
+      },
+      "timing_evidence": {
+        "timing_evidence_id": "timing_e04a_derived_registered_panorama_qp32",
+        "host": "gpu5",
+        "n_repeats": 1,
+        "measured_client_seconds": 0.2332,
+        "encoder_seconds": 0.386
+      },
+      "controls": {
+        "standalone_decode": "verified",
+        "metric_calibration": "verified",
+        "wire_ledger": "reconciled"
+      }
+    },
+    {
+      "schema": "pointstream.campaign_result.v1",
+      "contract_revision": "e03a-20260915",
+      "record_class": "validated_claim",
+      "artifact_id": "e04a_derived_cleaned_video_qp47",
+      "artifact_path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/evidence_completion_report.json",
+      "artifact_sha256": "f2358b348d9f33ed0692994485aed1b768519da477fef83851859959e5f6c3e5",
+      "code_revision": "d5e4a7642965ca76d2809bdfb5cd6d4ef95163bb",
+      "source_ids": [
+        "federer_djokovic_scene_007"
+      ],
+      "frame_ids": {
+        "start": 0,
+        "count": 48,
+        "fps": 12.0
+      },
+      "operating_point_id": "display_low",
+      "claim_eligibility": {
+        "rd": true,
+        "rd_arms": {
+          "bytes": true,
+          "psnr_y": true,
+          "ssim": true
+        },
+        "runtime": true,
+        "standalone_transport": true,
+        "trajectory": false,
+        "generalization": false,
+        "exclusions": [
+          {
+            "claim": "trajectory",
+            "reason": "background representation probe, not generative model trajectory"
+          },
+          {
+            "claim": "generalization",
+            "reason": "single development scene (Federer scene 007)"
+          }
+        ]
+      },
+      "evidence": {
+        "metrics": {
+          "psnr_y": 23.578,
+          "ssim": 0.8934,
+          "total_bytes": 21158
+        },
+        "bytes": {
+          "payload": 21148,
+          "side_data": 10,
+          "total": 21158
+        }
+      },
+      "timing_evidence": {
+        "timing_evidence_id": "timing_e04a_derived_cleaned_video_qp47",
+        "host": "gpu5",
+        "n_repeats": 1,
+        "measured_client_seconds": 0.7692,
+        "encoder_seconds": 1.075
+      },
+      "controls": {
+        "standalone_decode": "verified",
+        "metric_calibration": "verified",
+        "wire_ledger": "reconciled"
+      }
+    },
+    {
+      "schema": "pointstream.campaign_result.v1",
+      "contract_revision": "e03a-20260915",
+      "record_class": "validated_claim",
+      "artifact_id": "e04a_derived_still_frame0_qp32",
+      "artifact_path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/evidence_completion_report.json",
+      "artifact_sha256": "f2358b348d9f33ed0692994485aed1b768519da477fef83851859959e5f6c3e5",
+      "code_revision": "d5e4a7642965ca76d2809bdfb5cd6d4ef95163bb",
+      "source_ids": [
+        "federer_djokovic_scene_007"
+      ],
+      "frame_ids": {
+        "start": 0,
+        "count": 48,
+        "fps": 12.0
+      },
+      "operating_point_id": "display_low",
+      "claim_eligibility": {
+        "rd": true,
+        "rd_arms": {
+          "bytes": true,
+          "psnr_y": true,
+          "ssim": true
+        },
+        "runtime": true,
+        "standalone_transport": true,
+        "trajectory": false,
+        "generalization": false,
+        "exclusions": [
+          {
+            "claim": "trajectory",
+            "reason": "background representation probe, not generative model trajectory"
+          },
+          {
+            "claim": "generalization",
+            "reason": "single development scene (Federer scene 007)"
+          }
+        ]
+      },
+      "evidence": {
+        "metrics": {
+          "psnr_y": 17.148,
+          "ssim": 0.6471,
+          "total_bytes": 24597
+        },
+        "bytes": {
+          "payload": 24587,
+          "side_data": 10,
+          "total": 24597
+        }
+      },
+      "timing_evidence": {
+        "timing_evidence_id": "timing_e04a_derived_still_frame0_qp32",
+        "host": "gpu5",
+        "n_repeats": 1,
+        "measured_client_seconds": 0.7315,
+        "encoder_seconds": 0.373
+      },
+      "controls": {
+        "standalone_decode": "verified",
+        "metric_calibration": "verified",
+        "wire_ledger": "reconciled"
+      }
+    },
+    {
+      "schema": "pointstream.campaign_result.v1",
+      "contract_revision": "e03a-20260915",
+      "record_class": "validated_claim",
+      "artifact_id": "e04a_derived_cleaned_video_qp32",
+      "artifact_path": "/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/evidence_completion_report.json",
+      "artifact_sha256": "f2358b348d9f33ed0692994485aed1b768519da477fef83851859959e5f6c3e5",
+      "code_revision": "d5e4a7642965ca76d2809bdfb5cd6d4ef95163bb",
+      "source_ids": [
+        "federer_djokovic_scene_007"
+      ],
+      "frame_ids": {
+        "start": 0,
+        "count": 48,
+        "fps": 12.0
+      },
+      "operating_point_id": "display_low",
+      "claim_eligibility": {
+        "rd": true,
+        "rd_arms": {
+          "bytes": true,
+          "psnr_y": true,
+          "ssim": true
+        },
+        "runtime": true,
+        "standalone_transport": true,
+        "trajectory": false,
+        "generalization": false,
+        "exclusions": [
+          {
+            "claim": "trajectory",
+            "reason": "background representation probe, not generative model trajectory"
+          },
+          {
+            "claim": "generalization",
+            "reason": "single development scene (Federer scene 007)"
+          }
+        ]
+      },
+      "evidence": {
+        "metrics": {
+          "psnr_y": 30.76,
+          "ssim": 0.9742,
+          "total_bytes": 145090
+        },
+        "bytes": {
+          "payload": 145080,
+          "side_data": 10,
+          "total": 145090
+        }
+      },
+      "timing_evidence": {
+        "timing_evidence_id": "timing_e04a_derived_cleaned_video_qp32",
+        "host": "gpu5",
+        "n_repeats": 1,
+        "measured_client_seconds": 0.7569,
+        "encoder_seconds": 3.369
+      },
+      "controls": {
+        "standalone_decode": "verified",
+        "metric_calibration": "verified",
+        "wire_ledger": "reconciled"
+      }
+    }
+  ]
+}

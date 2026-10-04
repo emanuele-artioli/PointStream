@@ -1,0 +1,2046 @@
+{
+  "depth": 2,
+  "directory_family_count": 34,
+  "families": [
+    {
+      "direct_counts_by_kind": {
+        "directory": 3
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-27T20:20:51.4869066220",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/canny-stable/clip_01",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-27T20:26:14.4073313120",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/canny-stable/clip_02",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-27T20:30:29.5298259150",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/canny-stable/clip_03",
+          "size": 3
+        }
+      ],
+      "direct_entry_count": 3,
+      "family_identity": "canny-stable",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/canny-stable",
+      "root_size": 5,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 2,
+        "file": 1
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-30T09:49:57.3040127360",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/claims/cpu",
+          "size": 7
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-30T09:49:56.3910002850",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/claims/devices",
+          "size": 4
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-26T23:07:10.6446318590",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/claims/fleet-cross-host-1790456819026.ready",
+          "size": 4
+        }
+      ],
+      "direct_entry_count": 3,
+      "family_identity": "claims",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/claims",
+      "root_size": 5,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 2,
+        "file": 1
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-27T19:03:05.2182015780",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/demo-ladder-180-720/pitch",
+          "size": 8
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-27T19:02:03.3993582100",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/demo-ladder-180-720/work",
+          "size": 5
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-27T19:03:05.2862025050",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/demo-ladder-180-720/ps_rungs.json",
+          "size": 1859
+        }
+      ],
+      "direct_entry_count": 3,
+      "family_identity": "demo-ladder-180-720",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/demo-ladder-180-720",
+      "root_size": 5,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 3,
+        "file": 1
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T07:28:12.3669606440",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/dino-av1-ladder/clip_01",
+          "size": 8
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T07:28:51.2574910590",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/dino-av1-ladder/clip_02",
+          "size": 8
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T07:29:30.0760204840",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/dino-av1-ladder/clip_03",
+          "size": 8
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T07:29:40.6841651620",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/dino-av1-ladder/report.json",
+          "size": 3517
+        }
+      ],
+      "direct_entry_count": 4,
+      "family_identity": "dino-av1-ladder",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/dino-av1-ladder",
+      "root_size": 6,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 3
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T09:29:18.2178710370",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/dwpose-ego/clip_01",
+          "size": 10
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T09:29:23.3959413570",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/dwpose-ego/clip_02",
+          "size": 10
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T09:29:29.7340274300",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/dwpose-ego/clip_03",
+          "size": 10
+        }
+      ],
+      "direct_entry_count": 3,
+      "family_identity": "dwpose-ego",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/dwpose-ego",
+      "root_size": 5,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 1,
+        "file": 11
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-16T11:02:48.3978113670",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/e03b-20260916-federer007/events",
+          "size": 4
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-16T11:01:05.8964130440",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/e03b-20260916-federer007/claim.json",
+          "size": 677
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-16T11:01:05.8304121440",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/e03b-20260916-federer007/command.log",
+          "size": 0
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-18T13:11:01.8160830850",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/e03b-20260916-federer007/delivery-error.log",
+          "size": 76
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-18T13:11:01.8370833710",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/e03b-20260916-federer007/delivery.json",
+          "size": 55
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-16T11:01:05.5304080500",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/e03b-20260916-federer007/policy.json",
+          "size": 146
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-16T11:02:43.7517479860",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/e03b-20260916-federer007/progress.json",
+          "size": 114
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-18T13:48:22.8425895880",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/e03b-20260916-federer007/progress.log",
+          "size": 55652
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-16T11:01:05.4904075050",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/e03b-20260916-federer007/request.json",
+          "size": 405
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-18T13:51:12.4378994760",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/e03b-20260916-federer007/status.json",
+          "size": 434
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-16T11:01:05.6894102200",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/e03b-20260916-federer007/supervisor.lock",
+          "size": 0
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-18T14:28:50.5406753400",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/e03b-20260916-federer007/supervisor.log",
+          "size": 1300
+        }
+      ],
+      "direct_entry_count": 12,
+      "family_identity": "e03b-20260916-federer007",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/e03b-20260916-federer007",
+      "root_size": 14,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 2
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-30T09:49:53.7899648140",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/fleet/runs",
+          "size": 152
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-30T09:49:51.2739305030",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/fleet/snapshots",
+          "size": 162
+        }
+      ],
+      "direct_entry_count": 2,
+      "family_identity": "fleet",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/fleet",
+      "root_size": 4,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 1,
+        "file": 3
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T13:04:14.3415820050",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/hand-model-compare-clip1/sheets",
+          "size": 7
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T12:32:46.4289908590",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/hand-model-compare-clip1/clip1_sample.mp4",
+          "size": 2032618
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T12:33:34.6206445540",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/hand-model-compare-clip1/montage.png",
+          "size": 8870302
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T12:33:34.7026456660",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/hand-model-compare-clip1/report.json",
+          "size": 6273
+        }
+      ],
+      "direct_entry_count": 4,
+      "family_identity": "hand-model-compare-clip1",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/hand-model-compare-clip1",
+      "root_size": 6,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 3
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-25T10:59:25.0598634180",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/journal-20260925/c01-gpu",
+          "size": 4
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-25T07:15:06.1410024430",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/journal-20260925/yolo26x-mask-sinner-alcaraz002",
+          "size": 11
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-25T07:19:20.2314494970",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/journal-20260925/yolo26x-mask-sinner-alcaraz002-retry1",
+          "size": 11
+        }
+      ],
+      "direct_entry_count": 3,
+      "family_identity": "journal-20260925",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/journal-20260925",
+      "root_size": 5,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 3,
+        "file": 1
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T20:27:30.9123290070",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-ps-rungs/clip_01",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T20:27:58.2817002440",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-ps-rungs/clip_02",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T20:28:16.7079501800",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-ps-rungs/clip_03",
+          "size": 3
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T20:28:34.9781979990",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-ps-rungs/report.json",
+          "size": 2061
+        }
+      ],
+      "direct_entry_count": 4,
+      "family_identity": "mask-oracle-ps-rungs",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-ps-rungs",
+      "root_size": 6,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 3,
+        "file": 1
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T21:04:48.4336830160",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-sam/clip_01",
+          "size": 9
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T21:07:04.5965417080",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-sam/clip_02",
+          "size": 9
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T21:08:47.7529496300",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-sam/clip_03",
+          "size": 9
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T21:09:00.4051223000",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-sam/report.json",
+          "size": 5816
+        }
+      ],
+      "direct_entry_count": 4,
+      "family_identity": "mask-oracle-sam",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-sam",
+      "root_size": 6,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 3,
+        "file": 1
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T20:09:17.4034961220",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-screen/clip_01",
+          "size": 9
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T20:12:15.0919064390",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-screen/clip_02",
+          "size": 9
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T20:18:15.9568014380",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-screen/clip_03",
+          "size": 9
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T20:57:43.2359105570",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-screen/report.json",
+          "size": 18852
+        }
+      ],
+      "direct_entry_count": 4,
+      "family_identity": "mask-oracle-screen",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-screen",
+      "root_size": 6,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 3,
+        "file": 1
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T19:41:44.8880784940",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-smoke/clip_01_factory001_worker001_00001",
+          "size": 5
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T19:42:06.9023771540",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-smoke/clip_01_factory001_worker001_00001_close",
+          "size": 5
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T19:42:25.5146296590",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-smoke/clip_01_factory035_close_hands",
+          "size": 5
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T19:42:28.0556641330",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-smoke/report.json",
+          "size": 2250
+        }
+      ],
+      "direct_entry_count": 4,
+      "family_identity": "mask-oracle-smoke",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-smoke",
+      "root_size": 6,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 1,
+        "file": 1
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T19:54:16.7352782430",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-smoke2/clip_01",
+          "size": 9
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T19:54:18.6803046290",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-smoke2/report.json",
+          "size": 2024
+        }
+      ],
+      "direct_entry_count": 2,
+      "family_identity": "mask-oracle-smoke2",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-smoke2",
+      "root_size": 4,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 1,
+        "file": 1
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T20:01:04.4158086690",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-smoke3/clip_01",
+          "size": 9
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T20:01:24.7480844840",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-smoke3/report.json",
+          "size": 5388
+        }
+      ],
+      "direct_entry_count": 2,
+      "family_identity": "mask-oracle-smoke3",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/mask-oracle-smoke3",
+      "root_size": 4,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 21,
+        "file": 50
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T12:49:39.0170748170",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/archive",
+          "size": 4
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T07:55:37.0603121090",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/clip1-sam",
+          "size": 9
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T07:44:08.2828988760",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/code",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T11:17:07.9101612860",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/compare",
+          "size": 5
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T22:35:46.1711047890",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/dcvc-smoke",
+          "size": 4
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T12:01:06.7237889980",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/dcvc-uf-smoke",
+          "size": 6
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T12:49:39.1250762830",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/factory001-arms",
+          "size": 7
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-30T02:38:18.3967466150",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/filled-dcvc",
+          "size": 9
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T21:32:46.3508035800",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/filled-hnerv-factory001",
+          "size": 6
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T08:05:16.4242301770",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/hand-candidates",
+          "size": 8
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T12:49:39.1160761610",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/hnerv-1080",
+          "size": 8
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T07:23:35.8820568790",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/hnerv-300",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T12:49:39.0760756180",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/hnerv-fusion",
+          "size": 4
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T22:43:40.1335676350",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/hnerv-smoke",
+          "size": 4
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T22:12:41.9702174980",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/holdout",
+          "size": 5
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T09:20:15.9006851870",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/holdout-factory001",
+          "size": 7
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T22:28:10.6428913830",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/inpaint-smoke",
+          "size": 9
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T22:32:59.3488295640",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/inpaint-smoke-person",
+          "size": 9
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T22:42:32.6936481550",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/pydeps",
+          "size": 41
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-30T09:23:22.4852620990",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/sample-smokes",
+          "size": 9
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T09:07:26.0051721560",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/src",
+          "size": 5
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T11:06:37.1625885140",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/arm_masks.py",
+          "size": 1500
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T13:59:22.9766002420",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/build-rans.log",
+          "size": 821
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T14:32:30.6165361660",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/build-uf-infer.log",
+          "size": 101536
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T14:32:58.9039195570",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/build-uf-infer2.log",
+          "size": 846
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T20:43:02.6851878750",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/build_filled_hnerv_set.py",
+          "size": 12020
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-30T09:48:51.1581106960",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/build_sampled_background.py",
+          "size": 11003
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T09:20:15.9486858420",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/checkpoints.json",
+          "size": 2025
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T13:58:50.4861600490",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/conda-dcvc-nvcc.log",
+          "size": 594
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T13:52:42.5341753260",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/conda-dcvc.log",
+          "size": 2878
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T09:08:36.4691342760",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/conda-diffueraser.log",
+          "size": 3433
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T08:07:25.9890009340",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/conda-neural.log",
+          "size": 543
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T22:14:09.2554091350",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/dcvc_fetch.log",
+          "size": 138
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T11:02:51.5415235810",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/diffueraser-weights.log",
+          "size": 1432
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T09:10:47.1699189150",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/factory001_fill_sheet.py",
+          "size": 4094
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T09:24:15.0149506680",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/factory001_flux_qwen.py",
+          "size": 2576
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T22:24:42.0940460870",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/fetch.log",
+          "size": 3082
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T22:17:03.2777846510",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/fetch_weights.py",
+          "size": 1339
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T11:16:27.2266081530",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/fill_arms.py",
+          "size": 6788
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T07:54:09.9751219430",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/flux-fetch.log",
+          "size": 497
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T08:02:10.0706832980",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/hand_candidates.py",
+          "size": 3318
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T11:03:41.5892033730",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/labeled_sheet.py",
+          "size": 3327
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T13:58:22.7397841310",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/pip-dcvc-req.log",
+          "size": 6512
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T13:57:05.9157433180",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/pip-dcvc-torch.log",
+          "size": 7660
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T09:25:51.9692747740",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/pip-diffueraser-rest.log",
+          "size": 14315
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T09:14:05.6056285380",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/pip-diffueraser-torch.log",
+          "size": 7698
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T09:08:00.2546397970",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/pip-neural.log",
+          "size": 9682
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T09:13:09.7688660780",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/pip-pin2.log",
+          "size": 5408
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T09:11:55.8468566780",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/pip-transformers-pin.log",
+          "size": 5458
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T09:10:51.8729831330",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/pip-transformers.log",
+          "size": 7304
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T10:57:16.4979739080",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/propainter-fetch.log",
+          "size": 2662
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T11:36:44.8400691820",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/qwen_offload.py",
+          "size": 2090
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T23:04:01.9542202040",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/report.json",
+          "size": 1608
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T11:06:37.1675885820",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/run_arm_masks.sh",
+          "size": 245
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T22:39:26.7531128370",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/run_codec_smoke.sh",
+          "size": 1068
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T12:02:50.4931754440",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/run_dcvc_uf_smoke.sh",
+          "size": 503
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T09:19:41.5882166090",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/run_factory001_sheet.sh",
+          "size": 257
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T11:16:40.3547866410",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/run_fill_arms.sh",
+          "size": 770
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-30T01:17:15.3572808220",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/run_filled_dcvc.sh",
+          "size": 4781
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T09:24:22.9710593240",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/run_flux_qwen.sh",
+          "size": 263
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T08:02:09.8616804410",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/run_hand_candidates.sh",
+          "size": 253
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T09:43:08.7254266340",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/run_hnerv_1080.sh",
+          "size": 801
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T07:23:11.4607231450",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/run_hnerv_300.sh",
+          "size": 804
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T21:43:11.8743135560",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/run_hnerv_filled.sh",
+          "size": 3789
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T11:42:54.6990650390",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/run_hnerv_fusion.sh",
+          "size": 809
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T22:59:48.9847732380",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/run_hnerv_smoke.sh",
+          "size": 727
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T10:57:26.2951069160",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/run_labeled_sheet.sh",
+          "size": 249
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T11:36:44.8440692360",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/run_qwen.sh",
+          "size": 255
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T07:44:48.2694453490",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/run_sam_clip1.sh",
+          "size": 516
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-29T09:49:43.1738068440",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/session_report.json",
+          "size": 1257
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-30T09:16:46.1938566290",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/smoke_fill_sampling.py",
+          "size": 8300
+        }
+      ],
+      "direct_entry_count": 71,
+      "family_identity": "neural-bg",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/neural-bg",
+      "root_size": 73,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 10
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T14:15:18.9795545870",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/rtm-sam-generator/curated",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T15:16:08.3705139910",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/rtm-sam-generator/ladder",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T15:58:37.8458952120",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/rtm-sam-generator/ladder-clip2",
+          "size": 4
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T15:49:38.8255838330",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/rtm-sam-generator/ladder-clip3",
+          "size": 4
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T15:28:00.5590991570",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/rtm-sam-generator/ladder-full",
+          "size": 5
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T15:17:38.8747316270",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/rtm-sam-generator/ladder-smoke",
+          "size": 5
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T14:14:21.4067743650",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/rtm-sam-generator/masks",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T14:20:48.0550143210",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/rtm-sam-generator/smoke",
+          "size": 5
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T14:23:19.3490647680",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/rtm-sam-generator/train",
+          "size": 5
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-29T14:41:24.5327726460",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/rtm-sam-generator/train-sides",
+          "size": 5
+        }
+      ],
+      "direct_entry_count": 10,
+      "family_identity": "rtm-sam-generator",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/rtm-sam-generator",
+      "root_size": 12,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 1,
+        "file": 3
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T14:16:14.8880127580",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/rtm-scales-clip1/sheets",
+          "size": 6
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T14:16:02.5918463870",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/rtm-scales-clip1/clip1_sample.mp4",
+          "size": 2032618
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T14:16:15.1750166420",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/rtm-scales-clip1/montage.png",
+          "size": 7223417
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T14:16:15.3280187120",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/rtm-scales-clip1/report.json",
+          "size": 5185
+        }
+      ],
+      "direct_entry_count": 4,
+      "family_identity": "rtm-scales-clip1",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/rtm-scales-clip1",
+      "root_size": 6,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 4,
+        "file": 1
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T08:03:08.2075421020",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder/clip_01",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T08:04:15.0944540650",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder/clip_02",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T08:05:21.5623602980",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder/clip_03",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T08:04:44.1708504990",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder/png",
+          "size": 5
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T08:05:51.9357744080",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder/report.json",
+          "size": 3726
+        }
+      ],
+      "direct_entry_count": 5,
+      "family_identity": "seg-av1-ladder",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder",
+      "root_size": 7,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 5,
+        "file": 1
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T09:13:17.8458326810",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-sam/clip_01",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T09:16:47.5536790800",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-sam/clip_02",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T09:20:30.8567104370",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-sam/clip_03",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T09:19:55.1162252290",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-sam/png",
+          "size": 5
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T09:17:15.1870541820",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-sam/work",
+          "size": 5
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T09:21:06.6401962410",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-sam/report.json",
+          "size": 3827
+        }
+      ],
+      "direct_entry_count": 6,
+      "family_identity": "seg-av1-ladder-sam",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-sam",
+      "root_size": 8,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 4,
+        "file": 1
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T11:56:34.0695486320",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold/clip_01",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T11:57:14.2660928970",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold/clip_02",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T11:58:03.2807565890",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold/clip_03",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T11:57:32.7603433190",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold/png",
+          "size": 5
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T11:58:21.8750083780",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold/report.json",
+          "size": 3905
+        }
+      ],
+      "direct_entry_count": 5,
+      "family_identity": "seg-av1-ladder-yoloe-hold",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold",
+      "root_size": 7,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 4,
+        "file": 1
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T12:01:46.8177838670",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold2/clip_01",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T12:02:21.6872561540",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold2/clip_02",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T12:03:02.8278133950",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold2/clip_03",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T12:02:39.6384992940",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold2/png",
+          "size": 5
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T12:03:21.1350613730",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold2/report.json",
+          "size": 3921
+        }
+      ],
+      "direct_entry_count": 5,
+      "family_identity": "seg-av1-ladder-yoloe-hold2",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold2",
+      "root_size": 7,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 4,
+        "file": 1
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T12:11:12.6824500780",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold3/clip_01",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T12:11:53.2559999130",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold3/clip_02",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T12:12:40.0766344270",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold3/clip_03",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T12:12:11.5162473730",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold3/png",
+          "size": 5
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T12:13:00.3099086370",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold3/report.json",
+          "size": 3948
+        }
+      ],
+      "direct_entry_count": 5,
+      "family_identity": "seg-av1-ladder-yoloe-hold3",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-hold3",
+      "root_size": 7,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 4,
+        "file": 1
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T11:28:51.5430425570",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-stable/clip_01",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T11:29:33.8296158460",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-stable/clip_02",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T11:30:16.1441895390",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-stable/clip_03",
+          "size": 3
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T11:29:51.8398600230",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-stable/png",
+          "size": 5
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T11:30:34.5224387110",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-stable/report.json",
+          "size": 3961
+        }
+      ],
+      "direct_entry_count": 5,
+      "family_identity": "seg-av1-ladder-yoloe-stable",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/seg-av1-ladder-yoloe-stable",
+      "root_size": 7,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 1,
+        "file": 3
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T13:46:27.9448495720",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/vitpose-densepose-clip1/sheets",
+          "size": 5
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T13:46:07.1125681500",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/vitpose-densepose-clip1/clip1_sample.mp4",
+          "size": 2032618
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T13:46:28.1518523680",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/vitpose-densepose-clip1/montage.png",
+          "size": 5344040
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T13:46:28.1948529490",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/vitpose-densepose-clip1/report.json",
+          "size": 2484
+        }
+      ],
+      "direct_entry_count": 4,
+      "family_identity": "vitpose-densepose-clip1",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/vitpose-densepose-clip1",
+      "root_size": 6,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 1,
+        "file": 7
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-10T20:38:14.8255995520",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910/events",
+          "size": 3
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T12:38:13.1501708470",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910/command.log",
+          "size": 323
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T12:38:12.4981619840",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910/policy.json",
+          "size": 146
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T20:29:53.1507615800",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910/progress.log",
+          "size": 3937
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T12:38:12.4941619290",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910/request.json",
+          "size": 225
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T20:38:14.8295996070",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910/status.json",
+          "size": 174
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T12:38:12.5551627580",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910/supervisor.lock",
+          "size": 0
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T12:38:12.5011620240",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910/supervisor.log",
+          "size": 0
+        }
+      ],
+      "direct_entry_count": 8,
+      "family_identity": "wave2-diag-then-hf-20260910",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910",
+      "root_size": 10,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {},
+      "direct_entries": [],
+      "direct_entry_count": 0,
+      "family_identity": "wave2-diag-then-hf-20260910.sh",
+      "root_kind": "file",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910.sh",
+      "root_size": 1283,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 1,
+        "file": 7
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-10T20:39:04.9122822580",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910b/events",
+          "size": 3
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T15:35:52.2200783060",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910b/command.log",
+          "size": 17215
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T12:38:58.0797815800",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910b/policy.json",
+          "size": 146
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T20:30:23.5181754860",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910b/progress.log",
+          "size": 4014
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T12:38:58.0767815390",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910b/request.json",
+          "size": 225
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T20:39:04.9162823120",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910b/status.json",
+          "size": 178
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T12:38:58.1387823820",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910b/supervisor.lock",
+          "size": 0
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T12:38:58.0827816210",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910b/supervisor.log",
+          "size": 0
+        }
+      ],
+      "direct_entry_count": 8,
+      "family_identity": "wave2-diag-then-hf-20260910b",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/wave2-diag-then-hf-20260910b",
+      "root_size": 10,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 1,
+        "file": 8
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-10T19:27:25.4276024230",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910/events",
+          "size": 4
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T19:27:17.9615004120",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910/command.log",
+          "size": 167
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T19:27:15.3054641220",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910/policy.json",
+          "size": 145
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T19:27:15.4394659530",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910/progress.json",
+          "size": 103
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T19:27:15.3894652700",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910/progress.log",
+          "size": 82
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T19:27:15.3004640540",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910/request.json",
+          "size": 227
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T19:27:25.4316024770",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910/status.json",
+          "size": 352
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T19:27:15.3704650100",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910/supervisor.lock",
+          "size": 0
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T19:27:15.3074641500",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910/supervisor.log",
+          "size": 0
+        }
+      ],
+      "direct_entry_count": 9,
+      "family_identity": "wave2-overlap-ladder-20260910",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910",
+      "root_size": 11,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {},
+      "direct_entries": [],
+      "direct_entry_count": 0,
+      "family_identity": "wave2-overlap-ladder-20260910.sh",
+      "root_kind": "file",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910.sh",
+      "root_size": 2544,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 1,
+        "file": 8
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-11T01:46:53.0943984720",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910b/events",
+          "size": 102
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-11T01:46:49.6393512410",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910b/command.log",
+          "size": 22861
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T19:27:59.3130654010",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910b/policy.json",
+          "size": 145
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-11T01:46:49.6303511180",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910b/progress.json",
+          "size": 123
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-11T01:38:52.1858238490",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910b/progress.log",
+          "size": 7364
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T19:27:59.3080653330",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910b/request.json",
+          "size": 227
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-11T01:46:53.0983985270",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910b/status.json",
+          "size": 5177
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T19:27:59.3660661250",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910b/supervisor.lock",
+          "size": 0
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T19:27:59.3150654280",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910b/supervisor.log",
+          "size": 0
+        }
+      ],
+      "direct_entry_count": 9,
+      "family_identity": "wave2-overlap-ladder-20260910b",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/wave2-overlap-ladder-20260910b",
+      "root_size": 11,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 1,
+        "file": 8
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-10T19:21:10.9894859670",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-platefix-diag-20260910/events",
+          "size": 6
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T19:21:07.6334401030",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-platefix-diag-20260910/command.log",
+          "size": 14540
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T18:53:06.6724670730",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-platefix-diag-20260910/policy.json",
+          "size": 145
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T19:21:07.6724406370",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-platefix-diag-20260910/progress.json",
+          "size": 130
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T19:13:09.4349043300",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-platefix-diag-20260910/progress.log",
+          "size": 437
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T18:53:06.6674670050",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-platefix-diag-20260910/request.json",
+          "size": 225
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T19:21:10.9934860210",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-platefix-diag-20260910/status.json",
+          "size": 479
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T18:53:06.7304678660",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-platefix-diag-20260910/supervisor.lock",
+          "size": 0
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T18:53:06.6754671140",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-platefix-diag-20260910/supervisor.log",
+          "size": 0
+        }
+      ],
+      "direct_entry_count": 9,
+      "family_identity": "wave2-platefix-diag-20260910",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/wave2-platefix-diag-20260910",
+      "root_size": 11,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {},
+      "direct_entries": [],
+      "direct_entry_count": 0,
+      "family_identity": "wave2-platefix-diag-20260910.sh",
+      "root_kind": "file",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/wave2-platefix-diag-20260910.sh",
+      "root_size": 4915,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 1,
+        "file": 8
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-10T17:28:22.2199710830",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910/events",
+          "size": 5
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T17:28:12.2168345160",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910/command.log",
+          "size": 6536
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T17:17:41.3552193610",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910/policy.json",
+          "size": 146
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T17:28:12.1368334230",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910/progress.json",
+          "size": 109
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T17:27:50.2485345930",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910/progress.log",
+          "size": 258
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T17:17:41.3262189650",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910/request.json",
+          "size": 226
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T17:28:23.2659853630",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910/status.json",
+          "size": 407
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T17:17:41.4962212870",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910/supervisor.lock",
+          "size": 0
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T17:17:41.3812197160",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910/supervisor.log",
+          "size": 0
+        }
+      ],
+      "direct_entry_count": 9,
+      "family_identity": "wave2-repaired-diag-20260910",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910",
+      "root_size": 11,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {},
+      "direct_entries": [],
+      "direct_entry_count": 0,
+      "family_identity": "wave2-repaired-diag-20260910.sh",
+      "root_kind": "file",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910.sh",
+      "root_size": 3513,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 1,
+        "file": 8
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-10T18:10:25.1524463570",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910b/events",
+          "size": 5
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T18:10:18.6783578050",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910b/command.log",
+          "size": 6496
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T17:59:50.3007601440",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910b/policy.json",
+          "size": 146
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T18:10:18.6453573540",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910b/progress.json",
+          "size": 108
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T18:09:55.0940351990",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910b/progress.log",
+          "size": 258
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T17:59:50.2957600760",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910b/request.json",
+          "size": 226
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T18:10:25.1554463980",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910b/status.json",
+          "size": 406
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T17:59:50.3587609380",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910b/supervisor.lock",
+          "size": 0
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T17:59:50.3037601850",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910b/supervisor.log",
+          "size": 0
+        }
+      ],
+      "direct_entry_count": 9,
+      "family_identity": "wave2-repaired-diag-20260910b",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910b",
+      "root_size": 11,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 1,
+        "file": 8
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-10T18:41:14.3847327210",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910c/events",
+          "size": 6
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T18:41:08.9106578950",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910c/command.log",
+          "size": 13510
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T18:13:10.4437071570",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910c/policy.json",
+          "size": 145
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T18:41:08.9506584420",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910c/progress.json",
+          "size": 130
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T18:33:13.5001584700",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910c/progress.log",
+          "size": 437
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T18:13:10.4387070890",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910c/request.json",
+          "size": 226
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T18:41:14.3877327620",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910c/status.json",
+          "size": 480
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T18:13:10.5047079920",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910c/supervisor.lock",
+          "size": 0
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-10T18:13:10.4467071980",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910c/supervisor.log",
+          "size": 0
+        }
+      ],
+      "direct_entry_count": 9,
+      "family_identity": "wave2-repaired-diag-20260910c",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/wave2-repaired-diag-20260910c",
+      "root_size": 11,
+      "shallow_depth": 2
+    },
+    {
+      "direct_counts_by_kind": {
+        "directory": 6,
+        "file": 1
+      },
+      "direct_entries": [
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T10:01:04.8797180870",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/yoloe-hand-debug/frame_000000",
+          "size": 7
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T10:01:05.6977291770",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/yoloe-hand-debug/frame_000008",
+          "size": 8
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T10:01:06.4167389240",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/yoloe-hand-debug/frame_000015",
+          "size": 7
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T10:01:10.1667897640",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/yoloe-hand-debug/frame_000075",
+          "size": 8
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T10:01:16.4618751060",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/yoloe-hand-debug/frame_000180",
+          "size": 8
+        },
+        {
+          "kind": "directory",
+          "mtime": "2026-09-28T10:01:19.9699226650",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/yoloe-hand-debug/frame_000232",
+          "size": 9
+        },
+        {
+          "kind": "file",
+          "mtime": "2026-09-28T10:01:19.9749227330",
+          "path": "/home/itec/emanuele/pointstream-data/jobs/yoloe-hand-debug/summaries.json",
+          "size": 3580
+        }
+      ],
+      "direct_entry_count": 7,
+      "family_identity": "yoloe-hand-debug",
+      "root_kind": "directory",
+      "root_path": "/home/itec/emanuele/pointstream-data/jobs/yoloe-hand-debug",
+      "root_size": 9,
+      "shallow_depth": 2
+    }
+  ],
+  "host": "gpu1",
+  "limitations": "Direct children only; deeper job artifacts are covered selectively by fleet source map and selected report references.",
+  "root": "/home/itec/emanuele/pointstream-data/jobs",
+  "source": "initial-lists-gpu1.tsv",
+  "top_level_entry_count": 38
+}

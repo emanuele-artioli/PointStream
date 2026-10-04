@@ -147,3 +147,61 @@ finish the96-frame VVC comparison and AV1 overlap; review/integrate qualified
 scientific evidence; then perform the separate storage maintenance procedure in
 [storage-layout.md](storage-layout.md). Keep final training gated. Neither recent
 session established a complete codec win.
+
+## Follow-up reconciliation — 4 October 2026
+
+All ten server branch heads were imported for read-only local content/ancestry
+review and archived in a verified1,188,324,607-byte bundle at
+`gpu3:/home/itec/emanuele/Datasets/audits/pointstream-server-reconciliation-20261004T212959Z`.
+The archive includes the primary's binary diff and90 loose files. Its599
+non-regenerable ignored entries are inventoried and remain in place; this is
+not a license to reset or remove that active checkout. The broad confirmation
+ignored-file inventory timed out; its dirty second-domain manifest was archived
+and verified separately. Both shared checkouts remain unchanged.
+
+The all-host inventory confirmed shared primary/confirmation inode identity
+on gpu1/gpu3/gpu5 and physical gpu3-local `/tmp` worktrees. GPU4 remains locked;
+gpu2/gpu6 connected but their bounded Git inventory timed out. Process checks
+found an owned `MainThread` using the primary, and no owned cwd/argument
+references to the five temporary checkouts before retirement. Exact saved
+statuses, owner IDs, tar hashes and absent non-regenerable ignored files were
+checked. The four clean temporary checkouts were removed with Git. The mask
+prototype's exact dirty file was verified against its archive, restored, then
+its checkout removed with Git; no recursive-force fallback was used.
+
+The mask prototype defines a new temporal API but replaces `wire_declaration`
+with `NotImplementedError`; it is unfinished design, not a codec implementation.
+Its original file remains archived. The useful R01 landmark scorer and its
+hand-computed controls are integrated separately, with nonfinite-score rejection.
+Three additional branches were found: `feat/journal-je10-winning-codec-candidate`
+is an ancestor of retained server main; `feat/semantic-generative-eval` has the
+same maintained metric implementations except unused imports/type annotation;
+`modular-evaluation-framework` is an older implementation and synthetic ceiling
+record whose claims are qualified in the recovered dossier. Their whole source
+histories remain archived; none is a scientific winner merely because of its name.
+
+The research dossier, preparation chapters and qualified campaign receipts are
+now indexed at [research/README.md](../research/README.md). Old documentary
+states are labelled historical; current Gate-A pauses/limits and manuscript
+revision remain separate. [Source map](reconciliation-source-map.json) pins every
+selected original file/revision/hash and notes review changes. Original runner
+experiments are not imported wholesale. Packet packing remains opt-in with
+lossless pixel/native-byte parity tests, explicit lossy flags and allocation/
+corrupt-header checks. Software tests are not new paper evidence.
+
+The [demo audit](../research/demo-source-identity-audit.md) independently confirms
+conflicting factory001/factory035 names and missing source-to-stream hashes.
+All three retained reference videos have300 frames at1920x1080/30fps; that
+metadata does not establish which source was intended. Future exports reject
+positional/unhashed manifests, bind explicit IDs, verify sources before/after,
+record identities and reserve fresh external outputs before model work. Old
+media/results remain unchanged. README/setup and imported preparation commands
+now use the canonical gated fleet interface rather than unrestricted launches.
+
+Remaining worktree targets are the shared active primary and paused confirmation
+on the server, the clean Mac primary, the paused Mac Gate-A evidence checkout,
+and the independent manuscript clone. Existing claims/jobs/processes were not
+cancelled. No new compute campaign, model training, frozen-worker upgrade, live
+storage cutover or manuscript edit occurred. The scientific/native comparisons
+and background preparation budget remain as recorded in the handoff; they were
+not resumed by this maintenance pass.

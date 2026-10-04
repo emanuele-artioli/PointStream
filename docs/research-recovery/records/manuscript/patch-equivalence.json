@@ -1,0 +1,20 @@
+{
+  "method": "git show --binary | git patch-id --stable; nonmerge commits",
+  "groups": [
+    {
+      "stable_patch_id": "2a6ea77522daa20e868ccd406d47a41d6e170754",
+      "commits": [
+        "305a86486e51fa7bc5344f655c563518d5b89516",
+        "4b0d78f84d0a5b64fea17821ad9e866531fbd294"
+      ]
+    },
+    {
+      "stable_patch_id": "1db95897d9f59461eaea026f0e9cc4ba0e8eb600",
+      "commits": [
+        "6060444ac23fef084286e7c8c5ae27453b21f00f",
+        "6cfcf3dec232280fecdfa0275446605b2dab5f12"
+      ]
+    }
+  ],
+  "limitation": "Patch equivalence is implementation duplication, not independent experiment evidence."
+}

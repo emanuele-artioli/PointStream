@@ -1,0 +1,798 @@
+{
+  "root": "/home/itec/emanuele/pointstream-data/outputs",
+  "timestamp_families": 99,
+  "with_run_summary": 52,
+  "without_run_summary": 47,
+  "candidates": [
+    {
+      "family": "20260709_135812_030590",
+      "depth4_files": 1,
+      "depth4_file_bytes": 723,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_135812_030590/debug/debug_panorama_bg_masked_median.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_135817_483291",
+      "depth4_files": 1,
+      "depth4_file_bytes": 1007,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_135817_483291/debug/debug_panorama_ball_e2e_0001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_135849_833866",
+      "depth4_files": 1,
+      "depth4_file_bytes": 4992,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_135849_833866/debug/debug_panorama_dec001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_135858_758466",
+      "depth4_files": 1,
+      "depth4_file_bytes": 1711,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_135858_758466/debug/debug_panorama_legacy_mask_decode.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_135902_363109",
+      "depth4_files": 1,
+      "depth4_file_bytes": 9726,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_135902_363109/debug/debug_panorama_enc001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_135917_403530",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2428,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_135917_403530/debug/debug_panorama_enc002.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_135934_885972",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2428,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_135934_885972/debug/debug_panorama_enc002.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_135936_849507",
+      "depth4_files": 1,
+      "depth4_file_bytes": 1408,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_135936_849507/debug/debug_panorama_e2e_mock_0001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_135941_170073",
+      "depth4_files": 31,
+      "depth4_file_bytes": 142887,
+      "depth4_dirs": 3,
+      "first_level_dirs": [
+        "decoded"
+      ],
+      "visible_files": [
+        "20260709_135941_170073/decoded/e2e_mock_0001.mp4",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000000.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000001.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000002.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000003.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000004.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000005.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000006.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000007.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000008.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000009.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000010.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000011.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000012.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000013.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000014.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000015.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000016.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000017.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000018.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000019.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000020.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000021.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000022.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000023.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000024.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000025.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000026.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000027.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000028.png",
+        "20260709_135941_170073/decoded/e2e_mock_0001/frame_000029.png"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140003_131496",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2442,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140003_131496/debug/debug_panorama_genai_ref_transport_0001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140013_393618",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2529,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140013_393618/debug/debug_panorama_genai_ref_decode_0001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140057_717385",
+      "depth4_files": 1,
+      "depth4_file_bytes": 1523,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140057_717385/debug/debug_panorama_residual_genai_sync_0001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140131_521431",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2442,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140131_521431/debug/debug_panorama_rt001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140134_315512",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2263,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140134_315512/debug/debug_panorama_rt002.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140137_930830",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2263,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140137_930830/debug/debug_panorama_rt003.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140438_726527",
+      "depth4_files": 1,
+      "depth4_file_bytes": 723,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140438_726527/debug/debug_panorama_bg_masked_median.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140440_358966",
+      "depth4_files": 1,
+      "depth4_file_bytes": 1007,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140440_358966/debug/debug_panorama_ball_e2e_0001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140445_646204",
+      "depth4_files": 1,
+      "depth4_file_bytes": 4992,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140445_646204/debug/debug_panorama_dec001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140454_826506",
+      "depth4_files": 1,
+      "depth4_file_bytes": 1711,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140454_826506/debug/debug_panorama_legacy_mask_decode.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140517_858023",
+      "depth4_files": 1,
+      "depth4_file_bytes": 9726,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140517_858023/debug/debug_panorama_enc001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140523_082665",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2428,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140523_082665/debug/debug_panorama_enc002.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140525_623721",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2428,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140525_623721/debug/debug_panorama_enc002.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140533_648657",
+      "depth4_files": 1,
+      "depth4_file_bytes": 1408,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140533_648657/debug/debug_panorama_e2e_mock_0001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140556_194039",
+      "depth4_files": 31,
+      "depth4_file_bytes": 142887,
+      "depth4_dirs": 3,
+      "first_level_dirs": [
+        "decoded"
+      ],
+      "visible_files": [
+        "20260709_140556_194039/decoded/e2e_mock_0001.mp4",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000000.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000001.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000002.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000003.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000004.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000005.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000006.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000007.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000008.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000009.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000010.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000011.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000012.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000013.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000014.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000015.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000016.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000017.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000018.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000019.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000020.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000021.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000022.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000023.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000024.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000025.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000026.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000027.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000028.png",
+        "20260709_140556_194039/decoded/e2e_mock_0001/frame_000029.png"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140557_650753",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2442,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140557_650753/debug/debug_panorama_genai_ref_transport_0001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140559_984492",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2529,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140559_984492/debug/debug_panorama_genai_ref_decode_0001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140637_827891",
+      "depth4_files": 1,
+      "depth4_file_bytes": 1523,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140637_827891/debug/debug_panorama_residual_genai_sync_0001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140646_199495",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2442,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140646_199495/debug/debug_panorama_rt001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140713_605774",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2263,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140713_605774/debug/debug_panorama_rt002.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140716_078258",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2263,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_140716_078258/debug/debug_panorama_rt003.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_140832_616572",
+      "depth4_files": 0,
+      "depth4_file_bytes": 0,
+      "depth4_dirs": 1,
+      "first_level_dirs": [],
+      "visible_files": [],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_141028_265191",
+      "depth4_files": 1,
+      "depth4_file_bytes": 723,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_141028_265191/debug/debug_panorama_bg_masked_median.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_141029_735231",
+      "depth4_files": 1,
+      "depth4_file_bytes": 1007,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_141029_735231/debug/debug_panorama_ball_e2e_0001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_141048_149913",
+      "depth4_files": 1,
+      "depth4_file_bytes": 4992,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_141048_149913/debug/debug_panorama_dec001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_141107_757768",
+      "depth4_files": 1,
+      "depth4_file_bytes": 1711,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_141107_757768/debug/debug_panorama_legacy_mask_decode.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_141111_140566",
+      "depth4_files": 1,
+      "depth4_file_bytes": 9726,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_141111_140566/debug/debug_panorama_enc001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_141124_473371",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2428,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_141124_473371/debug/debug_panorama_enc002.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_141141_724581",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2428,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_141141_724581/debug/debug_panorama_enc002.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_141144_124079",
+      "depth4_files": 1,
+      "depth4_file_bytes": 1408,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_141144_124079/debug/debug_panorama_e2e_mock_0001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_141146_381828",
+      "depth4_files": 31,
+      "depth4_file_bytes": 142887,
+      "depth4_dirs": 3,
+      "first_level_dirs": [
+        "decoded"
+      ],
+      "visible_files": [
+        "20260709_141146_381828/decoded/e2e_mock_0001.mp4",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000000.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000001.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000002.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000003.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000004.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000005.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000006.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000007.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000008.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000009.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000010.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000011.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000012.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000013.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000014.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000015.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000016.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000017.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000018.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000019.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000020.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000021.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000022.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000023.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000024.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000025.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000026.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000027.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000028.png",
+        "20260709_141146_381828/decoded/e2e_mock_0001/frame_000029.png"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_141150_360044",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2442,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_141150_360044/debug/debug_panorama_genai_ref_transport_0001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_141154_749555",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2529,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_141154_749555/debug/debug_panorama_genai_ref_decode_0001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_141233_833703",
+      "depth4_files": 1,
+      "depth4_file_bytes": 1523,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_141233_833703/debug/debug_panorama_residual_genai_sync_0001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_141302_448442",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2442,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_141302_448442/debug/debug_panorama_rt001.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_141305_468581",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2263,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_141305_468581/debug/debug_panorama_rt002.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260709_141309_184295",
+      "depth4_files": 1,
+      "depth4_file_bytes": 2263,
+      "depth4_dirs": 2,
+      "first_level_dirs": [
+        "debug"
+      ],
+      "visible_files": [
+        "20260709_141309_184295/debug/debug_panorama_rt003.jpg"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "debug-only timestamp fragment; most sibling directories are tiny and omit run summary; preserve as orphan evidence until source-mapped"
+    },
+    {
+      "family": "20260711_061829_768133",
+      "depth4_files": 77,
+      "depth4_file_bytes": 2910120898,
+      "depth4_dirs": 18,
+      "first_level_dirs": [
+        "anchor_cache",
+        "scene_cache",
+        "transport"
+      ],
+      "visible_files": [
+        "20260711_061829_768133/anchor_cache/079d499673162aa2b4980907ac30eacc1c075e318ae6cc1221d42fce0a875713.mp4",
+        "20260711_061829_768133/anchor_cache/2a7b9e8ce014a84c93ec2e39c8c5d38415c30044daa7bfde28883414381295e3.mp4",
+        "20260711_061829_768133/anchor_cache/31be0efb0233a9719e0007afed685129d5b98d6b7658bfe8b35b798225b8b659.mp4",
+        "20260711_061829_768133/anchor_cache/3569b7e46a1a8a5a73727d45e9289642ef11c9263797e86874c289ee27294301.mp4",
+        "20260711_061829_768133/anchor_cache/4f63375d7448c124b5292a307e68a2d090deb7893cde0c997824b18e9db4d8f5.mp4",
+        "20260711_061829_768133/anchor_cache/50cacba461f8dd35e72206986ac40144c5c74a8ad694e849dcf66b0e1dfe4124.mp4",
+        "20260711_061829_768133/anchor_cache/8ac55d1b31fe7b737572385ae21d448148db75913fc22e87e4631e4b4a46cfc4.mp4",
+        "20260711_061829_768133/anchor_cache/8b2df85971a40d36fb03ea24ac6e2e8001c1428fe4ecd1bc2ecd9e902eaf4ced.mp4",
+        "20260711_061829_768133/anchor_cache/94186fbff19b9010264fbb4890c0b7ccf0f5e8d4737282b7c15ffce0ad6955b0.mp4",
+        "20260711_061829_768133/anchor_cache/a38da50b7a3d79a345341e234cb05acf98c363e21b5bd97cbc17ae4a71179817.mp4",
+        "20260711_061829_768133/anchor_cache/aa1e30cad5595dc94820dac1f8ef3a283ead3f29b01be35dc1ec6a3df9640723.mp4",
+        "20260711_061829_768133/anchor_cache/cc31a282784b91721d6e1308439797580b2ae165fd9d80bd1fe38d488a0e9baa.mp4",
+        "20260711_061829_768133/anchor_cache/f53d89d966e61b04738a43a2b24fa1a7db1d71ff60ac0434c3fe71e05bf17737.mp4",
+        "20260711_061829_768133/anchor_cache/ff9ac381cecee2422307bda62af2f44a85336431446bdb91868bfefad365157d.mp4",
+        "20260711_061829_768133/scene_cache/djokovic_federer_90s/scene_scores.csv",
+        "20260711_061829_768133/transport/chunk_s0004c0000/metadata.msgpack",
+        "20260711_061829_768133/transport/chunk_s0004c0000/panorama.jpg",
+        "20260711_061829_768133/transport/chunk_s0004c0000/residual.mp4",
+        "20260711_061829_768133/transport/chunk_s0004c0001/metadata.msgpack",
+        "20260711_061829_768133/transport/chunk_s0004c0001/panorama.jpg",
+        "20260711_061829_768133/transport/chunk_s0004c0001/residual.mp4",
+        "20260711_061829_768133/transport/chunk_s0004c0002/metadata.msgpack",
+        "20260711_061829_768133/transport/chunk_s0004c0002/panorama.jpg",
+        "20260711_061829_768133/transport/chunk_s0004c0002/residual.mp4",
+        "20260711_061829_768133/transport/chunk_s0004c0003/metadata.msgpack",
+        "20260711_061829_768133/transport/chunk_s0004c0003/panorama.jpg",
+        "20260711_061829_768133/transport/chunk_s0004c0003/residual.mp4",
+        "20260711_061829_768133/transport/chunk_s0004c0004/metadata.msgpack",
+        "20260711_061829_768133/transport/chunk_s0004c0004/panorama.jpg",
+        "20260711_061829_768133/transport/chunk_s0004c0004/residual.mp4",
+        "20260711_061829_768133/transport/chunk_s0004c0005/metadata.msgpack",
+        "20260711_061829_768133/transport/chunk_s0004c0005/panorama.jpg",
+        "20260711_061829_768133/transport/chunk_s0004c0005/residual.mp4",
+        "20260711_061829_768133/transport/chunk_s0004c0006/metadata.msgpack",
+        "20260711_061829_768133/transport/chunk_s0004c0006/panorama.jpg",
+        "20260711_061829_768133/transport/chunk_s0004c0006/residual.mp4",
+        "20260711_061829_768133/transport/chunk_s0004c0007/metadata.msgpack",
+        "20260711_061829_768133/transport/chunk_s0004c0007/panorama.jpg",
+        "20260711_061829_768133/transport/chunk_s0004c0007/residual.mp4",
+        "20260711_061829_768133/transport/chunk_s0004c0008/metadata.msgpack"
+      ],
+      "reason": "timestamp-shaped output directory has no run_summary.json in metadata inventory; treated as partial/unindexed until matched to a manifest, job log, or source record",
+      "priority_note": "77 files in bounded inventory, including anchor_cache, scene_cache, and transport; nontrivial output with no summary, likely forgotten run candidate"
+    }
+  ],
+  "other_incomplete_named_families": [
+    "bp19-multi-controlnet-missing-dir: explicitly named missing-dir family with four files; interpret only from its own bounds/report notes, not as a canonical run",
+    "gate-a-vvc-webp-n96-dryrun: expected dry-run family",
+    "sam31-quality-existing-v2-20260927-full: smoke/full family suffixes encode stage, not source commit"
+  ]
+}

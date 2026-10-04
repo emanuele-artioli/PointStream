@@ -1,0 +1,63 @@
+{
+  "plate_shape": [
+    2161,
+    3841,
+    3
+  ],
+  "rows": [
+    {
+      "codec": "jpeg",
+      "knob": "q75",
+      "codec_id": "jpeg:75",
+      "bytes": 457290,
+      "psnr_y_dB": 45.59,
+      "psnr_rgb_dB": 43.1,
+      "seconds": 0.0
+    },
+    {
+      "codec": "jpeg",
+      "knob": "q50",
+      "codec_id": "jpeg:50",
+      "bytes": 342384,
+      "psnr_y_dB": 42.76,
+      "psnr_rgb_dB": 40.16,
+      "seconds": 0.0
+    },
+    {
+      "codec": "av1",
+      "knob": "qp35",
+      "codec_id": "av1:intra:qp35:10",
+      "bytes": 246734,
+      "psnr_y_dB": 43.02,
+      "psnr_rgb_dB": 42.52,
+      "seconds": 26.0
+    },
+    {
+      "codec": "av1",
+      "knob": "qp45",
+      "codec_id": "av1:intra:qp45:10",
+      "bytes": 139195,
+      "psnr_y_dB": 41.79,
+      "psnr_rgb_dB": 40.86,
+      "seconds": 25.0
+    },
+    {
+      "codec": "vvc",
+      "knob": "qp35",
+      "codec_id": "vvc:intra:qp35:faster",
+      "bytes": 66104,
+      "psnr_y_dB": 39.77,
+      "psnr_rgb_dB": 38.43,
+      "seconds": 23.7
+    },
+    {
+      "codec": "vvc",
+      "knob": "qp45",
+      "codec_id": "vvc:intra:qp45:faster",
+      "bytes": 25455,
+      "psnr_y_dB": 34.58,
+      "psnr_rgb_dB": 33.63,
+      "seconds": 23.6
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "question": "how big is plate B as a P-frame referencing plate A, against coding B fresh as intra?",
+  "why_this_supersedes_the_subtraction_test": "Pixel subtraction destroys the spatial correlation a transform coder depends on. Inter prediction does block-wise motion search, which is the mechanism a panned camera actually needs. The earlier delta test measured the wrong thing.",
+  "reading": "marginal_over_fresh below 1.0 means sending B as a P-frame against A is cheaper than sending it fresh, i.e. the proposal pays.",
+  "rows": [
+    {
+      "encoder": "libx265",
+      "crf": 28,
+      "inter_frame_types": [
+        "I",
+        "P"
+      ],
+      "keyframe_bytes": 526173,
+      "marginal_pframe_bytes": 15982,
+      "fresh_intra_bytes": 441080,
+      "marginal_over_fresh": 0.036,
+      "arm": "CONTROL consecutive frames, same scene"
+    },
+    {
+      "encoder": "libx265",
+      "crf": 38,
+      "inter_frame_types": [
+        "I",
+        "P"
+      ],
+      "keyframe_bytes": 193976,
+      "marginal_pframe_bytes": 5321,
+      "fresh_intra_bytes": 160430,
+      "marginal_over_fresh": 0.033,
+      "arm": "CONTROL consecutive frames, same scene"
+    },
+    {
+      "encoder": "libaom-av1",
+      "crf": 28,
+      "inter_frame_types": [
+        "I",
+        "P"
+      ],
+      "keyframe_bytes": 757138,
+      "marginal_pframe_bytes": 11601,
+      "fresh_intra_bytes": 758199,
+      "marginal_over_fresh": 0.015,
+      "arm": "CONTROL consecutive frames, same scene"
+    },
+    {
+      "encoder": "libaom-av1",
+      "crf": 38,
+      "inter_frame_types": [
+        "I",
+        "P"
+      ],
+      "keyframe_bytes": 485821,
+      "marginal_pframe_bytes": 5779,
+      "fresh_intra_bytes": 486116,
+      "marginal_over_fresh": 0.012,
+      "arm": "CONTROL consecutive frames, same scene"
+    },
+    {
+      "encoder": "libx265",
+      "crf": 28,
+      "inter_frame_types": [
+        "I",
+        "I"
+      ],
+      "keyframe_bytes": 440481,
+      "marginal_pframe_bytes": 441593,
+      "fresh_intra_bytes": 441591,
+      "marginal_over_fresh": 1.0,
+      "arm": "alcaraz_highlights scene_000 -> scene_010"
+    },
+    {
+      "encoder": "libx265",
+      "crf": 38,
+      "inter_frame_types": [
+        "I",
+        "I"
+      ],
+      "keyframe_bytes": 159665,
+      "marginal_pframe_bytes": 166514,
+      "fresh_intra_bytes": 166512,
+      "marginal_over_fresh": 1.0,
+      "arm": "alcaraz_highlights scene_000 -> scene_010"
+    },
+    {
+      "encoder": "libaom-av1",
+      "crf": 28,
+      "inter_frame_types": [
+        "I",
+        "P"
+      ],
+      "keyframe_bytes": 757138,
+      "marginal_pframe_bytes": 517226,
+      "fresh_intra_bytes": 754741,
+      "marginal_over_fresh": 0.685,
+      "arm": "alcaraz_highlights scene_000 -> scene_010"
+    },
+    {
+      "encoder": "libaom-av1",
+      "crf": 38,
+      "inter_frame_types": [
+        "I",
+        "P"
+      ],
+      "keyframe_bytes": 485821,
+      "marginal_pframe_bytes": 329183,
+      "fresh_intra_bytes": 490943,
+      "marginal_over_fresh": 0.671,
+      "arm": "alcaraz_highlights scene_000 -> scene_010"
+    },
+    {
+      "encoder": "libx265",
+      "crf": 28,
+      "inter_frame_types": [
+        "I",
+        "P"
+      ],
+      "keyframe_bytes": 553148,
+      "marginal_pframe_bytes": 482899,
+      "fresh_intra_bytes": 506999,
+      "marginal_over_fresh": 0.952,
+      "arm": "federer_djokovic scene_001 -> scene_003"
+    },
+    {
+      "encoder": "libx265",
+      "crf": 38,
+      "inter_frame_types": [
+        "I",
+        "P"
+      ],
+      "keyframe_bytes": 212716,
+      "marginal_pframe_bytes": 171388,
+      "fresh_intra_bytes": 195687,
+      "marginal_over_fresh": 0.876,
+      "arm": "federer_djokovic scene_001 -> scene_003"
+    },
+    {
+      "encoder": "libaom-av1",
+      "crf": 28,
+      "inter_frame_types": [
+        "I",
+        "P"
+      ],
+      "keyframe_bytes": 1029384,
+      "marginal_pframe_bytes": 489989,
+      "fresh_intra_bytes": 962693,
+      "marginal_over_fresh": 0.509,
+      "arm": "federer_djokovic scene_001 -> scene_003"
+    },
+    {
+      "encoder": "libaom-av1",
+      "crf": 38,
+      "inter_frame_types": [
+        "I",
+        "P"
+      ],
+      "keyframe_bytes": 671674,
+      "marginal_pframe_bytes": 294997,
+      "fresh_intra_bytes": 627435,
+      "marginal_over_fresh": 0.47,
+      "arm": "federer_djokovic scene_001 -> scene_003"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "written": "2026-08-28, before the first encode of the BP24 paired ladder",
+  "brief": "plans/BP24-encoder-boundary.md, PLAN.md \u00a77 P0 items 2 and 3",
+  "why_this_file_exists": "AGENTS.md: state a plausible best and worst case with its reasoning before reading any measured number. A result outside the range is an alarm to investigate, not a finding to report.",
+  "setup": {
+    "clip": "alcaraz_highlights/scene_000, 8 frames, 3840x2160 (BP23's clip, paste-back MAE 0.0)",
+    "source_bytes": 199065600,
+    "arms": "anchor = av1 coding the source; candidate = PointStream with its residual coded by av1, same preset 8, same CRF rungs, same yuv420p",
+    "rungs_crf": [
+      22,
+      32,
+      42,
+      52
+    ],
+    "quality": "one pooled-MSE PSNR over the whole clip, RGB, computed by the ladder for both arms"
+  },
+  "headline_bound": {
+    "quantity": "BD-rate of PointStream-via-av1 against av1-on-source, over the overlapping PSNR range",
+    "plausible_best_case_percent": -60,
+    "best_case_basis": "The plate is the first source frame and this scene is close to static, so the residual is the easy case BP24 measured (2.5% non-zero, 9,331,200 B -> 2,545 B). If the residual really is near-free, PointStream pays the plate once and beats a codec that re-sends structure every frame. BP21 measured 15-19x concentration on plate-filled clips, which is the mechanism, not this quantity - so -60% rather than the -90% that number might suggest.",
+    "plausible_worst_case_percent": 1500,
+    "worst_case_basis": "PointStream's fixed cost does not move with the rung: a 4K JPEG plate at q75 (BP24 measured 342,694 B at q50, so expect roughly 0.6-1.0 MB at q75), plus ~40 KB of JPEG appearance crops, plus a few KB of keypoints. Call it 0.7-1.1 MB before the residual. Eight frames of 4K av1 at CRF 52 should land near 50-300 KB in total. If the residual is not near-free, PointStream is paying an intra-frame-sized floor on top of a residual video and can plausibly cost 10-16x the anchor at the cheap end.",
+    "expected_direction": "PointStream LOSES on this configuration, i.e. a positive BD-rate. Generation is off in every tier config, so PointStream here is a codec plus a plate plus an appearance payload, on a clip only 8 frames long - the shortest clip is the least favourable amortisation of a fixed plate cost. A large negative number would be the surprising result and gets the extra check, not the celebration.",
+    "alarm_if": "outside [-60%, +1500%], or negative by more than 20% without the residual's non-zero fraction independently confirming a near-static scene"
+  },
+  "per_arm_bounds": {
+    "anchor_monotone": "Higher CRF must give both fewer bytes and lower PSNR at every step. A non-monotone anchor means the encoder is not honouring the rung.",
+    "anchor_size_range_bytes": [
+      30000,
+      8000000
+    ],
+    "anchor_size_basis": "0.32 s of 4K. CRF 52 should be well under 1% of the 199 MB source; CRF 22 on 4K intra plus 7 inter frames should stay under ~4% of it. Anything above 20% of source means the encoder is passing pixels through.",
+    "anchor_psnr_range_db": [
+      30,
+      50
+    ],
+    "pointstream_psnr_floor_db": 34.5,
+    "pointstream_psnr_floor_basis": "BP23 measured the unaided reconstruction (residual absent) at 34.88 dB on this clip. The residual can only add information, so no rung should deliver below roughly that. Below it means the residual is actively damaging the reconstruction - most likely the coded residual is being applied to the wrong base.",
+    "pointstream_psnr_ceiling_db": 60,
+    "pointstream_fixed_floor_bytes": [
+      600000,
+      1200000
+    ],
+    "pointstream_fixed_floor_basis": "plate + appearance + metadata, none of which move with the residual rung. transport_total at the coarsest rung must exceed this, and the four rungs must be monotone in it.",
+    "is_rate_must_be_true": "Every PointStream rung must report is_rate=true with an empty raw_parts. If actor_reference or panorama or residual comes back listed, the ledger is refusing to call the total a rate and no curve may be built from it.",
+    "precodec_vs_delivered_db": "Must be finite (not inf) at every rung. Infinite means the coded and pre-codec reconstructions are identical, i.e. residual.codec did not run, and the rung is not on the rate axis."
+  },
+  "overlap_bounds": {
+    "min_span_db": 3.0,
+    "basis": "The new absolute-span guard in src/components/metrics/bd_rate.py. BP24 finding \u00a72: a 0.5 dB span passed the relative overlap guard at fraction 1.0 and returned a confident -0.88. If the ladder cannot clear 3 dB of overlap the answer is 'the rungs were too narrow', not a BD-rate."
+  },
+  "motion_axis": {
+    "claim_under_test": "Both of BP24's headline ratios were the easy case (findings \u00a77). High motion should be worse.",
+    "prediction": "On a clip with a higher inter-frame mean-absolute-difference, PointStream's BD-rate must move in the POSITIVE direction (worse) relative to the low-motion clip. The plate is the first source frame, so as the scene moves the plate stops matching and the residual has to carry more of every frame.",
+    "alarm_if": "high motion comes out better than low motion. That would mean the residual is not tracking scene change, and the most likely explanation is that the block gate is discarding real error rather than the scene being kind."
+  },
+  "known_confounds_not_bounded_here": [
+    "The plate is the first source frame, not a stitched panorama (findings \u00a76). background.method selects a transmission strategy over one frame, so nothing here measures panorama stitching.",
+    "Generation is off in all three tier configs, so this measures PointStream-as-codec, not PointStream-with-a-generative-decoder.",
+    "Eight frames is a short clip and penalises a fixed plate cost. The direction of that bias is known and stated; it is not corrected for."
+  ],
+  "revision_2026_08_28_after_the_smoke_run": {
+    "why_this_is_recorded_rather_than_edited_in_place": "AGENTS.md: when a bound turns out to be wrong, record why it was wrong. The original bounds below stand exactly as written before the first encode. This block was added after a 2-rung, 4-frame smoke run (outputs/bp24-ladder/smoke.json) and BEFORE the real ladder, so the revision is on the record ahead of the number it applies to.",
+    "what_the_smoke_measured": {
+      "anchor_qp30": "347,889 B at 40.16 dB",
+      "anchor_qp46": "139,995 B at 38.96 dB",
+      "pointstream_qp30": "526,079 B at 42.59 dB",
+      "pointstream_qp46": "495,739 B at 42.04 dB",
+      "pointstream_payload_split": "panorama 463,334 B (93%), residual 8,871-39,211 B, actor_reference 22,542 B, metadata 992 B"
+    },
+    "what_was_wrong_with_the_original_bound": [
+      "The fixed-floor estimate was right (0.6-1.2 MB predicted; 487 KB of plate + appearance + metadata measured at jpeg:75) but the CONCLUSION drawn from it was wrong. It assumed the anchor would be cheap at PointStream's quality. On four frames of the most static clip available, av1 needed 348 KB to reach 40.16 dB while PointStream reached 42.59 dB for 526 KB. The anchor is not cheap here; a 4K intra frame is expensive whoever sends it, and PointStream sends one plate where the codec sends one keyframe plus inter frames.",
+      "The stated expected direction - 'PointStream LOSES' - is therefore not supported and may well be backwards on this clip. That is exactly the case AGENTS.md says to add a check to rather than celebrate.",
+      "The bound also did not anticipate that sweeping residual.rate alone moves PointStream's total by only 6%, because the plate does not move with it. A rung has to move the plate's quality too, which is what the payload sweep now does."
+    ],
+    "revised_headline_bound": {
+      "plausible_best_case_percent": -85,
+      "best_case_basis": "Extrapolating the two anchor points in log-rate (0.329 decades per dB) to PointStream's 42.04 dB gives roughly 1.45 MB against PointStream's 496 KB, about -66%. Extrapolation is not measurement, so the bound is set wider than the extrapolation rather than at it.",
+      "plausible_worst_case_percent": 400,
+      "worst_case_basis": "Unchanged in kind from the original: if the plate stops matching the scene the residual has to carry every frame and PointStream pays the plate on top of a residual video. The high-motion clip is the arm that tests this.",
+      "alarm_if": "outside [-85%, +400%]"
+    },
+    "checks_added_because_the_news_may_be_good": [
+      "The residual-absent rung of the coarseness sweep is the unaided control: plate plus pasted crops, no residual. If PointStream's gain is entirely present there, the gain is the plate, not the object-centric machinery.",
+      "The high-motion clip (federer_djokovic/scene_003, 23x the inter-frame motion) is run with the same rungs. A gain that survives there is about the architecture; one that does not is about the clip.",
+      "No BD-rate is reported from extrapolation. The curves must overlap on measured points or the run reports that they did not."
+    ]
+  }
+}
