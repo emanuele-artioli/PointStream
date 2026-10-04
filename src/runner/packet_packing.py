@@ -111,7 +111,11 @@ def _read(payload: bytes) -> tuple[dict[str, bytes], dict[str, np.ndarray], dict
         metadata = json.loads(metadata_array.tobytes())
     except (zipfile.BadZipFile, KeyError, OSError, json.JSONDecodeError) as exc:
         raise ValueError("unsupported or corrupt schema-1 NPZ envelope") from exc
-    if not isinstance(metadata, dict) or metadata.get("schema") != 1:
+    if (
+        not isinstance(metadata, dict)
+        or type(metadata.get("schema")) is not int
+        or metadata["schema"] != 1
+    ):
         raise ValueError("only schema-1 client envelopes are supported")
     for key in ("frame_count", "height", "width"):
         if type(metadata.get(key)) is not int or metadata[key] < 1:
@@ -262,6 +266,7 @@ def unpack_client_envelope(payload: bytes) -> bytes:
     scale, codec = spec.get("mask_scale"), spec.get("mask_codec")
     if (
         spec.get("format") != FORMAT
+        or type(spec.get("version")) is not int
         or spec.get("version") not in (VERSION, BATCH_VERSION)
         or spec.get("schema") != 1
         or type(scale) is not int

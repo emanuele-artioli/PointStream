@@ -379,3 +379,16 @@ def test_psm1_header_cannot_trigger_oversized_allocation():
     struct.pack_into("<II", blob, 10, 2**31, 2**31)
     with pytest.raises(ValueError, match="pixel limit"):
         _decode_psm1(bytes(blob))
+
+
+def test_boolean_wire_versions_are_not_integer_schema_identifiers():
+    original = envelope()
+    metadata = meta(original)
+    metadata["schema"] = True
+    with pytest.raises(ValueError, match="schema-1"):
+        pack_client_envelope(rewrite(original, metadata=metadata))
+    packed = pack_client_envelope(original)
+    spec = packing_info(packed)["packing"]
+    spec["version"] = True
+    with pytest.raises(ValueError, match="unsupported"):
+        unpack_client_envelope(rewrite(packed, spec=spec))

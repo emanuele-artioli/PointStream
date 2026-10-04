@@ -84,3 +84,12 @@ def test_output_alias_cannot_hide_a_source_tree_write(tmp_path):
     alias.symlink_to(source, target_is_directory=True)
     with pytest.raises(ValueError, match="outside"):
         check_output_paths((alias / "new-output",), source_root=source)
+
+
+def test_duplicate_source_under_another_filename_is_not_a_new_clip(tmp_path):
+    path, rows = manifest(tmp_path)
+    (tmp_path / rows[1]["path"]).write_bytes((tmp_path / rows[0]["path"]).read_bytes())
+    rows[1]["sha256"] = rows[0]["sha256"]
+    path.write_text(json.dumps(rows))
+    with pytest.raises(ValueError, match="duplicate one source identity"):
+        load_clip_manifest(path)

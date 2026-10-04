@@ -84,6 +84,8 @@ def load_clip_manifest(path: Path) -> ClipManifest:
         clip = ClipInput(clip_id, source_path.resolve(strict=True), digest)
         clip.verify()
         clips[clip_id] = clip
+    if len({clip.sha256 for clip in clips.values()}) != len(CLIP_IDS):
+        raise ValueError("different clip IDs must not duplicate one source identity")
     if len({clip.path for clip in clips.values()}) != len(CLIP_IDS):
         raise ValueError("different clip IDs must identify different source files")
     return ClipManifest(
