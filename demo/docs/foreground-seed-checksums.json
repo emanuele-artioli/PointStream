@@ -1,0 +1,8 @@
+{
+  "schema": "pointstream.foreground_seed_checksums.v1",
+  "inventory": "demo/docs/smoke-plan-source-inventory.json",
+  "inventory_source_head": "4c5ead904a362b338b90e77b60286bbd6c5b234e",
+  "verified_on_checkout_head": "cf4097c78d7c731ebb1d90d1dddc0dcc70c3ce1f",
+  "result": "every foreground-scoped inventory file matched its recorded SHA-256",
+  "note": "Untracked foreground seeds were copied by keeping the files already in this checkout. They were not edited. Background seeds and the dirty experiments/jobs/fleet.py patch were not included."
+}
