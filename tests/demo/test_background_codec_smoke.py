@@ -166,7 +166,7 @@ def fixture_stage(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     mask = data / "union.npy"
     np.save(mask, np.zeros(SHAPE[:2], bool))
     checkpoints = {}
-    for key in ("uf_image", "uf_video:htl:pretrained", "uf_video:ld:pretrained"):
+    for key in ("uf_image", "uf_video:htl:pretrained", "uf_video:ld:pretrained", "uf_video:ld:factory001:s1"):
         path = data / (key.replace(":", "_") + ".pth.tar")
         path.write_bytes(key.encode())
         checkpoints[key] = {"path": str(path), "sha256": core.sha256_bytes(key.encode()), "bytes": len(key)}
@@ -175,6 +175,9 @@ def fixture_stage(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
         "frames": {"f001c3": rows},
         "masks": {"f001c3": {row["chunk"]: {"path": str(mask), "sha256": core.sha256_file(mask, timeout=30)["sha256"], "shape": list(SHAPE[:2])} for row in rows}},
         "checkpoints": checkpoints,
+        "environment": {"stage_smoke": {"lpips": "lpips fixture", "dcvc": {
+            "files": {rel: {"sha256": digest} for rel, digest in core.DCVC_REFERENCE_SHA256.items()},
+            "adapter_check": {"reference": {"matches_reference": True}}}}},
     }
     manifest_path = data / "selected-inputs.json"
     manifest_path.write_text(json.dumps(manifest))
@@ -185,6 +188,8 @@ def fixture_stage(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     (job / "environment.json").write_text(json.dumps({"host": "gpu5", "gpu": {"uuid": "GPU-test", "name": "fixture"}}))
     monkeypatch.setenv("PS_STAGE_DIR", str(stage))
     monkeypatch.delenv("PS_JOB_DIR", raising=False)
+    # Fixtures exercise our runner/gates, not LPIPS or CUDA correctness.
+    monkeypatch.setattr(smoke.Lpips, "score", lambda self, ref, rec: {"status": "fixture", "mean": 0.0})
     return manifest_path
 
 
@@ -228,6 +233,7 @@ def fake_adapter(*, corrupt_repeat: bool = False):
                 streams.append({"name": name, "repeat": repeat, "out_dir": str(out), "decoded_png_sha256": hashes,
                                 "nal_types": ["I"] + ["P"] * (len(frames) - 1)})
             payload = {"streams": streams, "inputs": "container bytes only", "peak_memory": {"torch_max_reserved_mib": 12.0}, "load_seconds": 0.1}
+        payload.update(checkpoints={"strict_load": True}, reference={"matches_reference": True})
         report.write_text(json.dumps(payload))
         return payload
 
@@ -245,7 +251,7 @@ def test_codec_runner_end_to_end_on_fixtures(fixture_stage: Path, monkeypatch: p
     assert case["mean_frame_psnr_db"] == 99.0 and case["encoder_i_recon_equals_decoder"] is True
     assert case["kbps"] == pytest.approx(core.rate_kbps(case["container_bytes"], frames=8))
     assert case["checkpoints"]["image"]["sha256"] == core.sha256_bytes(b"uf_image")
-    assert Path(case["sheet"]).is_file() and case["lpips"]["status"].startswith("blocked")
+    assert Path(case["sheet"]).is_file() and case["lpips"]["status"] == "fixture"
     assert (stage / "f001c3-htl-pre" / "src").is_dir(), "sealed sources are restored after decode"
     assert not (stage.parent.parent.parent / "scratch").exists() or not any((stage.parent.parent.parent / "scratch").iterdir())
     assert result["citable"] is False and result["provenance"]["gpu_uuid"] == "GPU-test"
@@ -266,7 +272,13 @@ def test_decoder_state_dependence_fails_the_case_and_the_gate(fixture_stage: Pat
 
 def test_drift_runner_compares_one_stream_with_four_reset_streams(fixture_stage: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(smoke, "run_adapter", fake_adapter())
-    assert smoke.run("drift", argparse.Namespace(parts="f001c3-ld-pre", stage_seconds=120, manifest=[fixture_stage])) == 0
+    # Create the structurally valid, source/checkpoint-matched B2 pair first.
+    smoke.run("codec", argparse.Namespace(parts="f001c3-ld-pre,f001c3-ld-ft", stage_seconds=120, manifest=[fixture_stage]))
+    evidence = core.stage_dir() / "result.json"
+    stage = core.stage_dir().parent / "full"
+    stage.mkdir()
+    monkeypatch.setenv("PS_STAGE_DIR", str(stage))
+    assert smoke.run("drift", argparse.Namespace(parts="f001c3-ld-pre", stage_seconds=120, manifest=[fixture_stage], codec_evidence=evidence)) == 0
     case = json.loads((core.stage_dir() / "result.json").read_text())["parts"]["f001c3-ld-pre"]
     assert case["status"] == "passed", case
     assert case["segment_decode_order"][:4] == ["seg3", "seg0", "seg1", "seg2"]
@@ -282,3 +294,103 @@ def test_missing_checkpoint_identity_blocks_the_case(fixture_stage: Path, monkey
     case = json.loads((core.stage_dir() / "result.json").read_text())["parts"]["f001c3-hts-pre"]
     assert case["status"] == "blocked" and "uf_video:hts:pretrained" in case["reason"]
     assert not smoke.validate("codec")[0]
+
+
+@pytest.mark.parametrize("mutation", ["no_container", "corrupt_container", "no_lpips", "no_strict_load", "missing_metrics", "changed_source", "changed_manifest"])
+def test_codec_validator_rejects_incomplete_or_changed_artifacts(fixture_stage, monkeypatch, mutation):
+    monkeypatch.setattr(smoke, "run_adapter", fake_adapter())
+    smoke.run("codec", argparse.Namespace(parts="f001c3-htl-pre", stage_seconds=120, manifest=[fixture_stage]))
+    path = core.stage_dir() / "result.json"
+    value = json.loads(path.read_text())
+    record = value["parts"]["f001c3-htl-pre"]
+    if mutation == "no_container":
+        Path(record["container"]).unlink()
+    elif mutation == "corrupt_container":
+        target = Path(record["container"])
+        raw = target.read_bytes()
+        target.write_bytes(bytes([raw[0] ^ 1]) + raw[1:])
+    elif mutation == "no_lpips":
+        record["lpips_mean"] = None
+    elif mutation == "no_strict_load":
+        record["strict_load"] = False
+    elif mutation == "changed_source":
+        value_manifest = json.loads(fixture_stage.read_text())
+        Path(value_manifest["frames"]["f001c3"][0]["path"]).write_bytes(b"changed source")
+    elif mutation == "changed_manifest":
+        fixture_stage.write_text("{}")
+    else:
+        record.pop("frame_psnr_db")
+    path.write_text(json.dumps(value))
+    assert smoke.validate("codec")[0] is False
+
+
+@pytest.mark.parametrize("kind,name", [("codec", "f001c3-htl-pre"), ("drift", "f001c3-ld-pre"), ("latent", "f001c3-b6")])
+def test_status_only_records_never_pass_validation(fixture_stage, kind, name):
+    core.stage_dir().joinpath("result.json").write_text(json.dumps({
+        "kind": kind, "citable": False, "parts_requested": [name], "parts": {name: {"status": "passed"}},
+        "provenance": {"code_revision": "f" * 40, "gpu_uuid": "GPU-test"}}))
+    assert smoke.validate(kind)[0] is False
+
+
+def test_drift_requires_a_b2_pair_before_any_adapter(fixture_stage, monkeypatch):
+    def forbidden(*args, **kwargs):
+        raise AssertionError("must not start the model")
+    monkeypatch.setattr(smoke, "run_adapter", forbidden)
+    with pytest.raises(smoke.PartBlocked, match="B2 LD pair"):
+        smoke.run("drift", argparse.Namespace(parts="f001c3-ld-pre", stage_seconds=120, manifest=[fixture_stage]))
+
+
+def test_inventory_preserves_partial_identities_before_later_failure(fixture_stage, monkeypatch):
+    stage = smoke.Stage("inventory", 120, [])
+    def completed():
+        stage.selected["checkpoints"] = {"uf_image": {"sha256": "a" * 64}}
+        return {"verified": True}
+    stage.run_part("ckpt-image", completed)
+    stage.run_part("env", lambda: smoke._blocked("import unavailable"))
+    value = json.loads(stage.path("partial-inputs", "ckpt-image.json").read_text())
+    assert value["checkpoints"]["uf_image"]["sha256"] == "a" * 64
+
+
+def test_missing_environment_blocks_inference(fixture_stage, monkeypatch):
+    value = json.loads(fixture_stage.read_text())
+    value.pop("environment")
+    fixture_stage.write_text(json.dumps(value))
+    with pytest.raises(smoke.PartBlocked, match="environment"):
+        smoke.run("codec", argparse.Namespace(parts="f001c3-htl-pre", stage_seconds=120, manifest=[fixture_stage]))
+
+
+def test_preview_reads_the_saved_manifest_schema_and_corrects_hnerv_rate(tmp_path, monkeypatch):
+    preview = tmp_path / "preview"
+    (preview / "canvas").mkdir(parents=True)
+    clips = []
+    for factory in ("factory001", "factory002"):
+        panels = {}
+        for i in (0, 2, 4, 6):
+            rel = f"canvas/{factory}_frame_{i:02d}.jpg"
+            (preview / rel).write_bytes(b"panel")
+            panels[str(i)] = rel
+        clips.append({"factory": factory, "segment_start_in_holdout": 120, "segment_length": 8,
+            "panels": panels, "methods": {"hnerv": {"rate_kbps": 9000, "rgb_psnr_vs_filled_db": 28},
+            "uf_ld": {"rate_kbps": 401.94, "rgb_psnr_vs_filled_db": 36.72}}})
+    (preview / "canvas/manifest.json").write_text(json.dumps({"clips": clips, "qp": 21}))
+    stage = tmp_path / "smoke"
+    stage.mkdir()
+    monkeypatch.setenv("PS_STAGE_DIR", str(stage))
+    monkeypatch.setattr(core, "PREVIEW_ROOT", preview)
+    value = smoke.inventory_preview(smoke.Stage("inventory", 120, []))
+    assert value["status"] == "passed"
+    row = value["reuse_table"][0]
+    assert row["frames"] == 8 and row["display_rates_kbps"]["uf_ld"] == 401.94
+    assert "hnerv" not in row["display_rates_kbps"]
+    assert row["hnerv_setup_inclusive_estimate_kbps"] == 9000
+    clips[0]["panels"] = {}
+    (preview / "canvas/manifest.json").write_text(json.dumps({"clips": clips}))
+    assert smoke.inventory_preview(smoke.Stage("inventory", 120, []))["status"] == "inconclusive"
+
+
+def test_missing_lpips_inventory_blocks_before_model_work(fixture_stage, monkeypatch):
+    value = json.loads(fixture_stage.read_text())
+    value["environment"]["stage_smoke"]["lpips"] = "blocked: no cached weights"
+    fixture_stage.write_text(json.dumps(value))
+    with pytest.raises(smoke.PartBlocked, match="LPIPS-Alex"):
+        smoke.run("codec", argparse.Namespace(parts="f001c3-htl-pre", stage_seconds=120, manifest=[fixture_stage]))

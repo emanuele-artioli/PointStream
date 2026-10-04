@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timedelta, timezone
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -40,14 +41,14 @@ PLANS: dict[str, dict[str, Any]] = {
     },
     "latent": {
         "smoke_parts": "f001c3-b6",
-        "full_parts": "f001c3-b4",
-        "smoke_seconds": 200, "full_seconds": 90, "memory": MODEL_MEMORY_MIB,
+        "full_parts": "f002-b6",
+        "smoke_seconds": 200, "full_seconds": 170, "memory": MODEL_MEMORY_MIB,
         "basis": "B4 primary cut 120..151: frozen HNeRV encode once, 6-bit packets in 1/8/32-frame segments, decode from packets alone",
         "required_commands": [],
     },
     "drift": {
         "smoke_parts": "f001c3-ld-pre",
-        "full_parts": "f001c3-ld-ft,f001c3-hts-pre",
+        "full_parts": "f001c3-ld-ft",
         "smoke_seconds": 110, "full_seconds": 140, "memory": MODEL_MEMORY_MIB,
         "basis": "B3 LD pretrained, 120..151: one 32-frame stream versus four reset 8-frame streams",
         "required_commands": [],
@@ -55,11 +56,15 @@ PLANS: dict[str, dict[str, Any]] = {
 }
 
 
-def build_spec(kind: str, *, inputs: list[dict[str, str]], manifests: list[str], deadline: str, plan: dict[str, Any] | None = None) -> dict[str, Any]:
+def build_spec(kind: str, *, inputs: list[dict[str, str]], manifests: list[str], deadline: str, plan: dict[str, Any] | None = None, codec_evidence: str | None = None) -> dict[str, Any]:
     plan = plan or PLANS[kind]
     arguments = [kind, "--parts", "{parts}", "--stage-seconds", "{stage_seconds}"]
     for manifest in manifests:
         arguments += ["--manifest", manifest]
+    if kind == "drift":
+        if not codec_evidence or not any(item["path"] == codec_evidence for item in inputs):
+            raise ValueError("drift requires hash-pinned B2 codec evidence in inputs")
+        arguments += ["--codec-evidence", codec_evidence]
     validator_seconds = 30
     budget = plan["smoke_seconds"] + plan["full_seconds"] + validator_seconds + OVERHEAD_SECONDS
     return {
@@ -79,11 +84,33 @@ def build_spec(kind: str, *, inputs: list[dict[str, str]], manifests: list[str],
     }
 
 
-def check_plan(specs: list[dict[str, Any]], *, spent_seconds: float = 0.0) -> dict[str, Any]:
+def check_plan(specs: list[dict[str, Any]], *, spent_seconds: float = 0.0, spent_inventory_seconds: float = 0.0, spent_by_kind: dict[str, float] | None = None) -> dict[str, Any]:
     """Plan caps beyond the dispatcher schema. Raises ValueError on violation."""
+    if not math.isfinite(spent_seconds) or spent_seconds < 0 or not math.isfinite(spent_inventory_seconds) or spent_inventory_seconds < 0:
+        raise ValueError("spent budgets must be finite and nonnegative")
+    if spent_inventory_seconds > spent_seconds:
+        raise ValueError("inventory spend cannot exceed total spend")
     total = spent_seconds
+    per_kind = {"inventory": spent_inventory_seconds, "codec": 0, "drift": 0, "latent": 0}
+    limits = {"inventory": 600, "codec": 720, "drift": 300, "latent": 480}
+    for kind, seconds in (spent_by_kind or {}).items():
+        if kind not in limits or not math.isfinite(seconds) or seconds < 0:
+            raise ValueError("prior stage spend must have planned kinds and finite nonnegative values")
+        per_kind[kind] += seconds
+    attributed = sum(per_kind.values())
     for spec in specs:
+        from experiments.jobs.inbox import validate_spec
+        try:
+            validate_spec(spec)
+        except RuntimeError as exc:
+            raise ValueError(str(exc)) from exc
+        kind = spec["arguments"][0]
+        if kind not in limits:
+            raise ValueError("unplanned diagnostic kind")
         budget = spec["budget_seconds"]
+        if not math.isfinite(budget) or budget <= 0:
+            raise ValueError("job budget must be finite and positive")
+        per_kind[kind] += budget
         if budget > JOB_BUDGET_SECONDS:
             raise ValueError(f"job budget {budget}s exceeds the {JOB_BUDGET_SECONDS}s per-job cap")
         reserved = spec["smoke"]["seconds"] + spec["full"]["seconds"] + spec.get("validator_seconds", 60)
@@ -107,6 +134,11 @@ def check_plan(specs: list[dict[str, Any]], *, spent_seconds: float = 0.0) -> di
         total += budget
     if total > PLAN_BUDGET_SECONDS:
         raise ValueError(f"submitted budgets total {total:.0f}s, above the {PLAN_BUDGET_SECONDS}s plan ceiling")
+    if not math.isclose(attributed, spent_seconds):
+        raise ValueError("all prior spend must be attributed to diagnostic kinds")
+    for kind, seconds in per_kind.items():
+        if seconds > limits[kind]:
+            raise ValueError(f"{kind} budgets total {seconds:g}s, above the {limits[kind]}s stage ceiling")
     return {"jobs": len(specs), "budget_seconds_total": total, "remaining_seconds": PLAN_BUDGET_SECONDS - total}
 
 
@@ -116,6 +148,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--input", action="append", required=True, help="PATH=SHA256 under the data root")
     parser.add_argument("--manifest", action="append", default=[])
     parser.add_argument("--deadline-minutes", type=int, default=90)
+    parser.add_argument("--codec-evidence", help="hash-pinned B2 result.json required for drift")
+    parser.add_argument("--spent-by-kind", type=json.loads, default={}, help="JSON of prior diagnostic reservations by kind; together with inventory spend must sum to --spent-seconds")
+    parser.add_argument("--spent-inventory-seconds", type=float, default=0.0)
     parser.add_argument("--spent-seconds", type=float, default=0.0, help="budget already submitted by earlier jobs")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
@@ -123,9 +158,9 @@ def main(argv: list[str] | None = None) -> int:
 
     inputs = [{"path": item.split("=", 1)[0], "sha256": item.split("=", 1)[1]} for item in args.input]
     deadline = (datetime.now(timezone.utc) + timedelta(minutes=args.deadline_minutes)).isoformat(timespec="seconds")
-    spec = build_spec(args.kind, inputs=inputs, manifests=args.manifest, deadline=deadline)
+    spec = build_spec(args.kind, inputs=inputs, manifests=args.manifest, deadline=deadline, codec_evidence=args.codec_evidence)
     validate_spec(spec, now=datetime.now(timezone.utc).timestamp())
-    caps = check_plan([spec], spent_seconds=args.spent_seconds)
+    caps = check_plan([spec], spent_seconds=args.spent_seconds, spent_inventory_seconds=args.spent_inventory_seconds, spent_by_kind=args.spent_by_kind)
     if Path.cwd() in args.output.resolve().parents:
         raise SystemExit("specs live outside the code tree")
     if args.output.exists():

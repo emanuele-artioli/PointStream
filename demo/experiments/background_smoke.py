@@ -68,6 +68,8 @@ def parse_parts(kind: str, value: str) -> list[str]:
             raise ValueError(f"unknown inventory part {part}")
         if kind == "codec":
             cut, *rest = part.split("-")
+            if (cut == "f002" and rest and rest[0] in ("ld", "hts")):
+                raise ValueError("secondary cut is planned only for HT-L")
             if cut not in core.CUTS or rest not in (["av1"], ["intra"]) and not (
                 len(rest) == 2 and rest[0] in core.STRUCTURES and rest[1] in CODEC_ARMS
             ):
@@ -108,6 +110,7 @@ class Stage:
         self.clock = core.StageClock(seconds, reserve=DECISION_SETTLE_SECONDS + 5)
         self.ledger = core.Ledger(self.root / "ledger.json")
         self.scratch = SCRATCH_ROOT / f"{self.root.parent.name}-{self.root.name}-{uuid.uuid4().hex[:8]}"
+        self.manifest_identities = [{"path": str(path), "sha256": core.sha256_file(path, timeout=self.clock.bounded(30))["sha256"]} for path in manifests]
         self.manifest = merge_manifests([core.read_json_bounded(path) for path in manifests]) if manifests else {}
         self.manifest_paths = [str(path) for path in manifests]
         self.parts: dict[str, dict[str, Any]] = {}
@@ -130,7 +133,7 @@ class Stage:
         else:
             try:
                 record = {"status": "passed", **function()}
-            except PartBlocked as exc:
+            except (PartBlocked, ImportError) as exc:
                 record = {"status": "blocked", "reason": str(exc)}
             except (PartFailed, ValueError, OSError, RuntimeError, TimeoutError, subprocess.SubprocessError) as exc:
                 record = {"status": "failed", "reason": f"{type(exc).__name__}: {exc}"[:2000]}
@@ -139,6 +142,18 @@ class Stage:
         self.parts[name] = record
         self.ledger.record(f"{self.kind}:{name}", started, record["status"], reason=record.get("reason"))
         core.write_json_new(self.path("parts", f"{name}.json"), record)
+        # Preserve identities as each inventory part completes, even if a later
+        # NFS read or interpreter import consumes the stage allowance.
+        if self.kind == "inventory":
+            manifest = {"schema": "pointstream.background-smoke.inputs.v1",
+                        "provenance": core.job_provenance(), **self.selected,
+                        "environment": {"stage_" + os.environ.get("PS_STAGE", "local"): self.environment}}
+            core.write_json_new(self.path("partial-inputs", f"{name}.json"), manifest)
+        if os.environ.get("PS_JOB_DIR"):
+            from experiments.jobs.monitor import publish_progress
+            publish_progress(os.environ.get("PS_STAGE", "stage"),
+                             sum(r["status"] == "passed" for r in self.parts.values()),
+                             decision=json.dumps(compact(self.kind, {name: record}, {}), default=str))
         return record
 
     def checkpoint(self, key: str) -> dict[str, Any]:
@@ -357,6 +372,7 @@ def inventory_env(stage: Stage) -> dict[str, Any]:
     environment: dict[str, Any] = {}
     for name, root, references in (("dcvc", core.DCVC_ROOT, core.DCVC_REFERENCE_SHA256), ("hnerv", core.HNERV_ROOT, core.HNERV_REFERENCE_SHA256)):
         diff = _git(root, "diff", "--no-color", "HEAD")
+        core.write_json_new(stage.path(f"{name}-source-diff.json"), {"diff": diff})
         files = {}
         for rel in references:
             receipt = core.sha256_file(root / rel, timeout=stage.clock.bounded(30))
@@ -423,19 +439,23 @@ def inventory_preview(stage: Stage) -> dict[str, Any]:
         for index, rel in (clip.get("panels") or {}).items():
             path = core.PREVIEW_ROOT / rel
             panels[index] = core.sha256_file(path, timeout=stage.clock.bounded(30))["sha256"] if path.is_file() else None
-        rates = clip.get("rates_kbps") or {}
+        methods = clip.get("methods") or {}
+        rates = {key: value.get("rate_kbps") for key, value in methods.items()}
         corrected = {key: value for key, value in rates.items() if key != "hnerv"}
         rows.append({
             "factory": clip.get("factory"), "segment_start": clip.get("segment_start_in_holdout"),
-            "frames": clip.get("frames"), "panels_sha256": panels, "all_panels_present": all(panels.values()),
+            "frames": clip.get("segment_length"), "panels_sha256": panels,
+            "all_panels_present": set(panels) == {"0", "2", "4", "6"} and all(panels.values()),
             "display_rates_kbps": corrected,
             "hnerv_display_rate_label": "setup-inclusive estimate (total_bits includes decoder weights); not a streaming rate",
             "hnerv_setup_inclusive_estimate_kbps": rates.get("hnerv"),
-            "psnr_db": clip.get("psnr_db"),
+            "psnr_db": {key: value.get("rgb_psnr_vs_filled_db") for key, value in methods.items()},
             "verified": "manifest and panel file identities today",
-            "unknown": "checkpoint hashes at preview time; native decoded frames were not retained by the preview",
+            "unknown": "checkpoint hashes at preview time; native decodes/bitstreams and panel contents not inspected by this manifest audit",
         })
-    return {"manifest": {"path": str(manifest_path), "sha256": receipt["sha256"]}, "scope": manifest.get("scope"),
+    complete = (len(rows) == 2 and {row["factory"] for row in rows} == {"factory001", "factory002"}
+                and all(row["all_panels_present"] and row["frames"] == 8 and row["segment_start"] == 120 for row in rows))
+    return {"status": "passed" if complete else "inconclusive", "manifest": {"path": str(manifest_path), "sha256": receipt["sha256"]}, "scope": manifest.get("scope"),
             "qp": manifest.get("qp"), "reuse_table": rows, "citable": False}
 
 
@@ -679,6 +699,7 @@ def evaluate_stream(stage: Stage, encoded: dict, decoded: dict, name: str, sourc
         i_match = bool(np.array_equal(read_png(i_recon), frames[0]))
     report = {
         "frames": len(frames), "container": str(container), "container_bytes": enc["container_bytes"],
+        "container_sha256": core.sha256_file(container, timeout=stage.clock.bounded(30))["sha256"],
         "container_header_bytes": enc["container_header_bytes"], "native_stream_bytes": enc["native_stream_bytes"],
         "kbps": core.rate_kbps(enc["container_bytes"], frames=len(frames)), "nals": enc["nals"],
         "decoded_nal_types": first["nal_types"], "frame_psnr_db": psnr,
@@ -688,6 +709,8 @@ def evaluate_stream(stage: Stage, encoded: dict, decoded: dict, name: str, sourc
         "mask_region": metrics.get("mask_region", "unavailable: no aligned hand/arm union for these frames"),
         "encoder_i_recon_equals_decoder": i_match,
         "decode_independent": True, "decode_inputs": decoded["inputs"],
+        "strict_load": encoded["checkpoints"]["strict_load"] is True and decoded["checkpoints"]["strict_load"] is True,
+        "codec_source": encoded["reference"],
         "decoded_rgb_sha256": [core.rgb_identity(frame) for frame in frames],
     }
     scores = lpips.score(sources, frames)
@@ -797,6 +820,7 @@ def av1_reference(stage: Stage, cut: str, lpips: Lpips) -> dict[str, Any]:
         size = stream.stat().st_size
         scores = lpips.score(sources, frames)
         rungs[rung] = {
+            "container": str(stream), "container_sha256": core.sha256_file(stream, timeout=stage.clock.bounded(30))["sha256"],
             "file_bytes": size, "kbps": core.rate_kbps(size, frames=core.SHORT_LENGTH), "crf": AV1_CRF, "preset": AV1_PRESET,
             "gop": 8, "upscale": "bicubic to 1920x1080" if scale else "native", "mean_frame_psnr_db": metrics["mean_frame_psnr_db"],
             "pooled_mse_psnr_db": metrics["pooled_mse_psnr_db"], "frame_psnr_db": metrics["frame_psnr_db"],
@@ -808,8 +832,12 @@ def av1_reference(stage: Stage, cut: str, lpips: Lpips) -> dict[str, Any]:
 
 def run_codec(stage: Stage, parts: list[str]) -> None:
     lpips = Lpips()
+    halted = False
     intra_done: set[str] = set()
     for part in parts:
+        if halted:
+            stage.run_part(part, lambda: _blocked("a previous codec case failed its structural gate"))
+            continue
         cut, *rest = part.split("-")
         if rest == ["av1"]:
             stage.run_part(part, lambda: av1_reference(stage, cut, lpips))
@@ -819,6 +847,7 @@ def run_codec(stage: Stage, parts: list[str]) -> None:
             intra_done.add(cut)
             continue
         record = stage.run_part(part, lambda: codec_case(stage, part, lpips), minimum_seconds=45)
+        halted = record["status"] != "passed" or not isinstance(record.get("lpips_mean"), (int, float))
         if "prediction_frames_collapse" in record.get("flags", []) and cut not in intra_done:
             stage.run_part(f"{cut}-intra", lambda: intra_check(stage, cut, lpips), minimum_seconds=INTRA_CHECK_SECONDS)
             intra_done.add(cut)
@@ -882,11 +911,11 @@ def drift_case(stage: Stage, part: str, lpips: Lpips) -> dict[str, Any]:
     return {
         "structure": structure, "arm": arm, "qp": core.QP, "reset_interval": 0, "checkpoints": {"image": image[1], "video": video[1]},
         "frame_ids": frame_ids(stage, cut, core.PRIMARY_START, core.DRIFT_LENGTH),
-        "one_stream": {**_arm_summary(long), "drift": core.summarize_drift(rows(long["frame_psnr_db"])), "first_frame_mse_psnr_db": long["frame_psnr_db"][0], "last_frame_psnr_db": long["frame_psnr_db"][-1]},
+        "one_stream": {**long, "drift": core.summarize_drift(rows(long["frame_psnr_db"])), "first_frame_mse_psnr_db": long["frame_psnr_db"][0], "last_frame_psnr_db": long["frame_psnr_db"][-1]},
         "four_reset_streams": {"container_bytes_sum": sum(s["container_bytes"] for s in segments),
                                "kbps": core.rate_kbps(sum(s["container_bytes"] for s in segments), frames=core.DRIFT_LENGTH),
                                "drift": core.summarize_drift(rows(reset_psnr)),
-                               "per_segment": [_arm_summary(s) for s in segments]},
+                               "per_segment": segments},
         "segment_decode_order": [s["name"] for s in decoded["streams"]],
         "state_independence": "seg3 decoded first and again after seg0..seg2 and the 32-frame stream; identical output required",
         "setup_weights_bytes": {"image": image[1]["bytes"], "video": video[1]["bytes"], "charged": "once, outside stream totals"},
@@ -950,6 +979,7 @@ def latent_case(stage: Stage, part: str, session: dict[str, Any], lpips: Lpips) 
                         "quantizer": quantizer, "decoder_setup_bytes": session["setup"]["bytes"]}
             segments.append({"codes": codes, "metadata": metadata})
             direct.extend(frozen.decode_pixels(session["direct_decoder"], new_value))
+        stage.clock.bounded(1)
         written = packets.write_segment_packets(segments, work / f"b{bits}-L{length:02d}", bit_depth=bits)
         decoded_by_method: dict[str, list[np.ndarray]] = {}
         for method in packets.METHODS:
@@ -966,7 +996,7 @@ def latent_case(stage: Stage, part: str, session: dict[str, Any], lpips: Lpips) 
         scores = lpips.score(sources, decoded_by_method["packed"])
         table = packets.summarize_packets(written["packets"], frames=core.DRIFT_LENGTH, setup_bytes=session["setup"]["bytes"])
         results[str(length)] = {
-            "packets": table, "pixels_identical_across_methods_and_direct": identical,
+            "packets": table, "packet_files": written["packets"], "pixels_identical_across_methods_and_direct": identical,
             "mean_frame_psnr_db": metrics["mean_frame_psnr_db"], "pooled_mse_psnr_db": metrics["pooled_mse_psnr_db"],
             "temporal_reconstruction_error": metrics["temporal_reconstruction_error"], "lpips_mean": scores.get("mean"),
             "frame_psnr_db": metrics["frame_psnr_db"],
@@ -980,7 +1010,7 @@ def latent_case(stage: Stage, part: str, session: dict[str, Any], lpips: Lpips) 
         raise PartFailed("decoder rebuilt from the setup package differs from the quantized decoder")
     best_saving = max(row["saving_vs_packed"] for r in results.values() for row in r["packets"] if row["method"] == "delta-zlib")
     return {
-        "bit_depth": bits, "checkpoint": session["meta"], "architecture": session["dims"], "imports": session["imports"],
+        "bit_depth": bits, "frame_ids": ids, "checkpoint": session["meta"], "architecture": session["dims"], "imports": session["imports"],
         "decoder_setup": session["setup"], "decoder_setup_exact": session["setup_exact"], "segments": results,
         "source_independence": independence, "temporal_delta_best_saving": best_saving,
         "temporal_gate": "merits a later temporal-code study" if best_saving >= 0.10 else "below the 10% gate",
@@ -1020,7 +1050,7 @@ def compact(kind: str, parts: dict[str, dict[str, Any]], outputs: dict[str, Any]
                 row.update(_arm_summary(record))
                 row["frame_psnr_db"] = [round(v, 2) for v in record.get("frame_psnr_db", [])]
             elif kind == "drift":
-                row.update({k: record[k] for k in ("one_stream", "peak_memory_mib")})
+                row.update({"one_stream": {**_arm_summary(record["one_stream"]), "drift": record["one_stream"]["drift"]}, "peak_memory_mib": record["peak_memory_mib"]})
                 row["four_reset_streams"] = {k: v for k, v in record["four_reset_streams"].items() if k != "per_segment"}
             elif kind == "latent":
                 row.update({"bit_depth": record["bit_depth"], "setup_bytes": record["decoder_setup"]["bytes"],
@@ -1046,11 +1076,57 @@ def publish(stage: Stage, summary: dict[str, Any]) -> None:
     time.sleep(DECISION_SETTLE_SECONDS)
 
 
+def require_b2_pair(stage: Stage, path: Path | None) -> None:
+    if path is None:
+        raise PartBlocked("drift requires a structurally valid B2 LD pair")
+    value = core.read_json_bounded(path)
+    if value.get("kind") != "codec" or value.get("citable") is not False:
+        raise PartBlocked("B2 evidence is not a codec smoke result")
+    expected_ids = frame_ids(stage, "f001c3", core.PRIMARY_START, core.SHORT_LENGTH)
+    for arm in ("pre", "ft"):
+        record = value.get("parts", {}).get(f"f001c3-ld-{arm}", {})
+        key = video_checkpoint_key("factory001", "ld", arm)
+        if (record.get("status") != "passed" or not _stream(record, core.SHORT_LENGTH)
+                or record.get("frame_ids") != expected_ids or record.get("qp") != core.QP
+                or record.get("structure") != "ld" or record.get("reset_interval") != 0
+                or record.get("checkpoints", {}).get("image", {}).get("sha256") != stage.checkpoint("uf_image")["sha256"]
+                or record.get("checkpoints", {}).get("video", {}).get("sha256") != stage.checkpoint(key)["sha256"]):
+            raise PartBlocked(f"B2 LD {arm} arm is missing, invalid, or uses different source/checkpoints")
+
+
+def require_environment(stage: Stage, kind: str) -> None:
+    environments = list((stage.manifest.get("environment") or {}).values())
+    name = "hnerv" if kind == "latent" else "dcvc"
+    records = [env.get(name) for env in environments if isinstance(env, dict) and env.get(name)]
+    if not records:
+        raise PartBlocked(f"{name} environment has not passed inventory")
+    if not any(str(env.get("lpips", "")).startswith("lpips ") for env in environments if isinstance(env, dict)):
+        raise PartBlocked("LPIPS-Alex installed implementation/cached weights did not pass inventory")
+    references = core.HNERV_REFERENCE_SHA256 if name == "hnerv" else core.DCVC_REFERENCE_SHA256
+    record = records[-1]
+    if not all(record.get("files", {}).get(rel, {}).get("sha256") == digest for rel, digest in references.items()):
+        raise PartBlocked(f"{name} source identity does not match the reviewed inference path")
+    if name == "dcvc" and not record.get("adapter_check", {}).get("reference", {}).get("matches_reference"):
+        raise PartBlocked("DCVC adapter did not pass inventory")
+    # The adapter checks DCVC source again before each invocation. HNeRV runs
+    # in-process, so repeat its two-file identity gate before importing it.
+    if name == "hnerv":
+        for rel, digest in references.items():
+            if core.sha256_file(core.HNERV_ROOT / rel, timeout=stage.clock.bounded(30))["sha256"] != digest:
+                raise PartBlocked(f"HNeRV source changed since inventory: {rel}")
+
+
 def run(kind: str, args: argparse.Namespace) -> int:
+    if not math.isfinite(float(args.stage_seconds)) or not 20 < float(args.stage_seconds) <= 480:
+        raise ValueError("stage allowance must reserve reporting and remain inside the 480-second job cap")
     parts = parse_parts(kind, args.parts)
     if kind != "inventory" and not args.manifest:
         raise SystemExit(f"{kind} requires --manifest selected-inputs.json")
     stage = Stage(kind, float(args.stage_seconds), args.manifest)
+    if kind != "inventory":
+        require_environment(stage, kind)
+        if kind == "drift":
+            require_b2_pair(stage, getattr(args, "codec_evidence", None))
     try:
         {"inventory": run_inventory, "codec": run_codec, "drift": run_drift, "latent": run_latent}[kind](stage, parts)
     finally:
@@ -1060,6 +1136,7 @@ def run(kind: str, args: argparse.Namespace) -> int:
     summary["provenance"] = {k: v for k, v in core.job_provenance().items() if k in ("job_id", "stage", "code_revision", "host", "gpu_uuid", "gpu_name")}
     result = {"kind": kind, "parts_requested": parts, "manifests": stage.manifest_paths, "summary": summary,
               "parts": stage.parts, "outputs": stage.outputs, "provenance": core.job_provenance(),
+              "manifest_identities": stage.manifest_identities,
               "label": "diagnostic smoke; not paper evidence", "citable": False}
     core.write_json_new(stage.path("result.json"), result)
     publish(stage, summary)
@@ -1068,35 +1145,133 @@ def run(kind: str, args: argparse.Namespace) -> int:
 
 # --------------------------------------------------------------- validator
 
+def _artifact(record: dict[str, Any], *, size_key: str, path_key: str = "container", hash_key: str = "container_sha256") -> bool:
+    path = Path(record[path_key])
+    size = record[size_key]
+    return (isinstance(size, int) and size > 0 and path.is_file() and path.stat().st_size == size
+            and core.is_sha256(record.get(hash_key))
+            and core.sha256_file(path, timeout=30)["sha256"] == record[hash_key])
+
+
+def _metrics(record: dict[str, Any], frames: int) -> bool:
+    values = record.get("frame_psnr_db")
+    return (isinstance(values, list) and len(values) == frames
+            and all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in values)
+            and all(isinstance(record.get(k), (int, float)) and not isinstance(record[k], bool)
+                    for k in ("mean_frame_psnr_db", "pooled_mse_psnr_db", "temporal_reconstruction_error", "lpips_mean"))
+            and finite_tree(record))
+
+
+def _stream(record: dict[str, Any], frames: int) -> bool:
+    return (record.get("frames") == frames and _metrics(record, frames)
+            and record.get("decode_independent") is True and record.get("strict_load") is True
+            and record.get("codec_source", {}).get("matches_reference") is True
+            and len(record.get("decoded_rgb_sha256", [])) == frames
+            and all(core.is_sha256(v) for v in record["decoded_rgb_sha256"])
+            and _artifact(record, size_key="container_bytes")
+            and record["container_header_bytes"] + record["native_stream_bytes"] == record["container_bytes"]
+            and math.isclose(record["kbps"], core.rate_kbps(record["container_bytes"], frames=frames)))
+
+
 def validate(kind: str) -> tuple[bool, dict[str, Any]]:
-    root = core.stage_dir()
+    """Fail closed on incomplete/malformed records and missing metric/artifact gates."""
     checks: dict[str, Any] = {}
-    path = root / "result.json"
-    if not path.is_file():
-        return False, {"result_present": False}
-    result = core.read_json_bounded(path)
-    checks["kind_matches"] = result.get("kind") == kind
-    provenance = result.get("provenance") or {}
-    checks["provenance"] = bool(provenance.get("code_revision")) and len(provenance.get("code_revision") or "") == 40 and bool(provenance.get("gpu_uuid"))
-    checks["non_citable"] = result.get("citable") is False
-    statuses = {name: record.get("status") for name, record in result.get("parts", {}).items()}
-    checks["parts_requested_ran"] = sorted(statuses) == sorted(result.get("parts_requested", [])) or set(result.get("parts_requested", [])) <= set(statuses)
-    checks["all_parts_passed"] = bool(statuses) and all(status == "passed" for status in statuses.values())
-    checks["metrics_finite"] = finite_tree(result.get("parts"))
-    if kind == "inventory":
-        selected = result.get("outputs", {}).get("selected_inputs") or {}
-        manifest = Path(selected.get("path", ""))
-        checks["manifest_identity"] = manifest.is_file() and core.sha256_file(manifest, timeout=30)["sha256"] == selected.get("sha256")
-    if kind in ("codec", "drift"):
-        cases = [r for n, r in result.get("parts", {}).items() if r.get("status") == "passed" and "container_bytes" in r]
-        checks["decode_independent"] = all(r.get("decode_independent") for r in cases)
-        checks["container_sizes"] = all(Path(r["container"]).stat().st_size == r["container_bytes"] for r in cases)
-    if kind == "latent":
-        cases = [r for r in result.get("parts", {}).values() if r.get("status") == "passed"]
-        checks["source_independent"] = all(r["source_independence"]["independent"] for r in cases)
-        checks["pixels_identical"] = all(s["pixels_identical_across_methods_and_direct"] for r in cases for s in r["segments"].values())
-    passed = all(value is True for value in checks.values())
-    return passed, {"assertions": checks, "summary": result.get("summary")}
+    summary = None
+    try:
+        path = core.stage_dir() / "result.json"
+        if not path.is_file():
+            return False, {"result_present": False}
+        result = core.read_json_bounded(path)
+        summary = result.get("summary")
+        checks["kind_matches"] = result.get("kind") == kind
+        provenance = result.get("provenance") or {}
+        revision = provenance.get("code_revision", "")
+        checks["provenance"] = (isinstance(revision, str) and len(revision) == 40
+                                and all(c in "0123456789abcdef" for c in revision)
+                                and str(provenance.get("gpu_uuid", "")).startswith("GPU-"))
+        checks["non_citable"] = result.get("citable") is False
+        parts = result.get("parts") or {}
+        requested = result.get("parts_requested") or []
+        checks["parts_requested_ran"] = bool(requested) and set(requested) <= set(parts)
+        checks["all_parts_passed"] = bool(parts) and all(r.get("status") == "passed" for r in parts.values())
+        checks["metrics_finite"] = finite_tree(parts)
+        if kind != "inventory":
+            identities = result.get("manifest_identities") or []
+            checks["input_manifest_identity"] = bool(identities) and all(
+                core.is_sha256(row.get("sha256")) and core.sha256_file(Path(row["path"]), timeout=30)["sha256"] == row["sha256"] for row in identities)
+            selected = merge_manifests([core.read_json_bounded(Path(row["path"])) for row in identities])
+            source_valid = []
+            hashed = {}
+            for name, record in parts.items():
+                cut = name.split("-")[0]
+                count = core.DRIFT_LENGTH if kind in ("drift", "latent") else (1 if name.endswith("-intra") else core.SHORT_LENGTH)
+                rows = sorted((row for row in selected.get("frames", {}).get(cut, [])
+                               if core.PRIMARY_START <= row["index"] < core.PRIMARY_START + count), key=lambda row: row["index"])
+                good = len(rows) == count and [row["index"] for row in rows] == list(range(core.PRIMARY_START, core.PRIMARY_START + count))
+                if not name.endswith("-intra"):
+                    good = good and record.get("frame_ids") == [row["sha256"] for row in rows]
+                for row in rows:
+                    if row["path"] not in hashed:
+                        hashed[row["path"]] = core.sha256_file(Path(row["path"]), timeout=30)["sha256"]
+                    good = good and hashed[row["path"]] == row["sha256"]
+                source_valid.append(good)
+            checks["source_frame_identities"] = bool(source_valid) and all(source_valid)
+        if kind == "inventory":
+            selected = result.get("outputs", {}).get("selected_inputs") or {}
+            manifest = Path(selected.get("path", ""))
+            checks["manifest_identity"] = (manifest.is_file() and core.is_sha256(selected.get("sha256"))
+                and core.sha256_file(manifest, timeout=30)["sha256"] == selected["sha256"])
+            if checks["manifest_identity"]:
+                value = core.read_json_bounded(manifest)
+                checks["manifest_schema"] = value.get("schema") == "pointstream.background-smoke.inputs.v1"
+                checks["constituent_hashes"] = all(core.is_sha256(r.get("sha256")) for r in value.get("checkpoints", {}).values()) and all(
+                    core.is_sha256(r.get("sha256")) for rows in value.get("frames", {}).values() for r in rows)
+        if kind == "codec":
+            valid = []
+            for name, record in parts.items():
+                count = 1 if name.endswith("-intra") else core.SHORT_LENGTH
+                if name.endswith("-av1"):
+                    rungs = record.get("rungs") or {}
+                    valid.append(set(rungs) == {"240p", "1080p"} and all(
+                        _metrics(r, core.SHORT_LENGTH) and _artifact(r, size_key="file_bytes") for r in rungs.values()))
+                else:
+                    valid.append(_stream(record, count) and bool(record.get("checkpoints"))
+                        and all(core.is_sha256(r.get("sha256")) for r in record["checkpoints"].values()))
+            checks["codec_artifacts_and_metrics"] = bool(valid) and all(valid)
+        if kind == "drift":
+            valid = []
+            for record in parts.values():
+                long = record.get("one_stream") or {}
+                reset = record.get("four_reset_streams") or {}
+                segments = reset.get("per_segment") or []
+                valid.append(_stream(long, core.DRIFT_LENGTH) and len(segments) == 4
+                    and all(_stream(s, core.SHORT_LENGTH) for s in segments)
+                    and sum(s["container_bytes"] for s in segments) == reset["container_bytes_sum"])
+            checks["drift_artifacts_and_metrics"] = bool(valid) and all(valid)
+        if kind == "latent":
+            from demo.experiments import hnerv_latent_packet as packets
+            valid = []
+            for record in parts.values():
+                segments = record.get("segments") or {}
+                good = (record.get("source_independence", {}).get("independent") is True
+                        and record.get("decoder_setup_exact") is True and set(segments) == {"1", "8", "32"}
+                        and _artifact(record["decoder_setup"], size_key="bytes", path_key="path", hash_key="sha256"))
+                for segment in segments.values():
+                    files = segment.get("packet_files") or []
+                    good = good and _metrics(segment, core.DRIFT_LENGTH) and segment.get("pixels_identical_across_methods_and_direct") is True and bool(files)
+                    coverage = {method: [] for method in packets.METHODS}
+                    for file in files:
+                        codes, header = packets.decode_packet(Path(file["path"]).read_bytes(), expected_checkpoint_sha256=record["checkpoint"]["sha256"])
+                        coverage[file["method"]].extend(header["frame_ids"])
+                        good = good and Path(file["path"]).stat().st_size == file["file_bytes"]
+                    good = good and all(len(ids) == core.DRIFT_LENGTH and ids == record.get("frame_ids") for ids in coverage.values())
+                valid.append(good)
+            checks["latent_artifacts_and_metrics"] = bool(valid) and all(valid)
+    except (AttributeError, IndexError, KeyError, TypeError, ValueError, OSError, RuntimeError, TimeoutError) as exc:
+        checks["record_integrity"] = False
+        checks["error"] = f"{type(exc).__name__}: {exc}"[:500]
+    passed = bool(checks) and all(value is True for value in checks.values())
+    return passed, {"assertions": checks, "summary": summary}
 
 
 def run_validator(kind: str) -> int:
@@ -1137,6 +1312,8 @@ def main(argv: list[str] | None = None) -> int:
         command.add_argument("--parts", required=True)
         command.add_argument("--stage-seconds", type=float, required=True)
         command.add_argument("--manifest", type=Path, action="append", default=[])
+        if kind == "drift":
+            command.add_argument("--codec-evidence", type=Path, required=True)
     check = commands.add_parser("validate")
     check.add_argument("--kind", choices=KINDS, required=True)
     report = commands.add_parser("summarize")

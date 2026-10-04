@@ -221,3 +221,27 @@ def test_outputs_must_stay_inside_the_stage_directory(tmp_path: Path, monkeypatc
     core.write_json_new(stage.root / "result.json", {"a": 1})
     with pytest.raises(FileExistsError):
         core.write_json_new(stage.root / "result.json", {"a": 2})
+
+
+def test_hash_children_do_not_import_the_model_or_numpy(tmp_path, monkeypatch):
+    original = core.subprocess.run
+    commands = []
+    def recording(command, **kwargs):
+        commands.append(command)
+        return original(command, **kwargs)
+    monkeypatch.setattr(core.subprocess, "run", recording)
+    path = tmp_path / "input.bin"
+    path.write_bytes(b"source")
+    assert core.sha256_file(path)["sha256"] == core.sha256_bytes(b"source")
+    script = Path(commands[0][1])
+    assert script.name == "background_smoke_io.py"
+    assert "import numpy" not in script.read_text() and "import torch" not in script.read_text()
+
+
+def test_hnerv_missing_dependencies_block_without_stub_modules(tmp_path, monkeypatch):
+    import importlib.util
+    from demo.experiments import hnerv_frozen
+    monkeypatch.setattr(importlib.util, "find_spec", lambda name: None)
+    with pytest.raises(ImportError, match="installed dependencies unavailable"):
+        hnerv_frozen.enable_imports(tmp_path / "stubs")
+    assert not (tmp_path / "stubs").exists()

@@ -25,6 +25,8 @@ import zipfile
 
 import numpy as np
 
+from demo.experiments.background_smoke_io import _stat_identity, _stream_hash
+
 
 DATA_ROOT = Path("/home/itec/emanuele/Datasets/pointstream-data")
 DEMO_ROOT = Path("/home/itec/emanuele/Datasets/pointstream-demo")
@@ -104,43 +106,11 @@ def is_sha256(value: Any) -> bool:
     return isinstance(value, str) and len(value) == 64 and all(c in "0123456789abcdef" for c in value)
 
 
-def _stat_identity(path: Path) -> dict[str, int]:
-    info = os.stat(path)
-    return {
-        "bytes": info.st_size, "mtime_ns": info.st_mtime_ns, "ctime_ns": info.st_ctime_ns,
-        "inode": info.st_ino, "device": info.st_dev,
-    }
-
-
-def _stream_hash(path: Path, copy_to: Path | None = None, deadline: float | None = None) -> dict[str, Any]:
-    """Hash in 1 MiB blocks; optionally write the same bytes to a copy."""
-    before = _stat_identity(path)
-    digest = hashlib.sha256()
-    count = 0
-    target = copy_to.open("xb") if copy_to is not None else None
-    try:
-        with path.open("rb") as stream:
-            for block in iter(lambda: stream.read(1 << 20), b""):
-                digest.update(block)
-                count += len(block)
-                if target is not None:
-                    target.write(block)
-                if deadline is not None and time.monotonic() > deadline:
-                    raise TimeoutError(f"bounded read exceeded its deadline: {path}")
-    finally:
-        if target is not None:
-            target.close()
-    after = _stat_identity(path)
-    if before != after or count != after["bytes"]:
-        raise RuntimeError(f"file changed while it was read: {path}")
-    return {"sha256": digest.hexdigest(), **after}
-
-
 def sha256_file(path: Path, *, timeout: float = MAX_READ_SECONDS) -> dict[str, Any]:
     """Complete SHA-256 receipt from a killable child, or an exception."""
     if not 0 < timeout <= MAX_READ_SECONDS:
         raise ValueError(f"timeout must be in (0, {MAX_READ_SECONDS:g}] seconds")
-    command = [sys.executable, "-m", "demo.experiments.background_smoke_core", "hash-one", str(path)]
+    command = [sys.executable, str(Path(__file__).with_name("background_smoke_io.py")), "hash-one", str(path)]
     started = time.monotonic()
     try:
         result = subprocess.run(command, capture_output=True, text=True, timeout=timeout, check=False)
@@ -173,7 +143,7 @@ def copy_verified(source: Path, destination: Path, expected_sha256: str, *, time
     if destination.exists():
         raise FileExistsError(f"refusing to overwrite scratch copy: {destination}")
     command = [
-        sys.executable, "-m", "demo.experiments.background_smoke_core", "copy-one",
+        sys.executable, str(Path(__file__).with_name("background_smoke_io.py")), "copy-one",
         str(source), str(destination),
     ]
     started = time.monotonic()
@@ -189,7 +159,11 @@ def copy_verified(source: Path, destination: Path, expected_sha256: str, *, time
     if payload.get("sha256") != expected_sha256:
         destination.unlink(missing_ok=True)
         raise ValueError(f"checkpoint identity changed: {source} is {payload.get('sha256')}, expected {expected_sha256}")
-    copy = _stream_hash(destination)
+    remaining = timeout - (time.monotonic() - started)
+    if remaining <= 0:
+        destination.unlink(missing_ok=True)
+        raise TimeoutError(f"verified copy exhausted its allowance: {source}")
+    copy = sha256_file(destination, timeout=remaining)
     if copy["sha256"] != expected_sha256:
         destination.unlink(missing_ok=True)
         raise ValueError(f"scratch copy differs from its verified source: {destination}")

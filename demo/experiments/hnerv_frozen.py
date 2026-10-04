@@ -27,53 +27,26 @@ ENCODER_STEM_KEY = "encoder.downsample_layers.0.0.weight"
 MODEL_QUANT_BITS = 8
 
 
-def write_import_stub(root: Path) -> dict[str, Any]:
-    """Modules HNeRV imports but never uses on this path.
+def enable_imports(_reserved_path: Path) -> dict[str, Any]:
+    """Use installed dependencies only; unavailable imports block this path.
 
-    pytorchvideo/decord serve video files only; pytorch_msssim provides SSIM
-    losses that frozen decoding never calls. A stub is written only for a
-    module the interpreter lacks, and every stub is recorded.
+    The reserved path preserves the older probe CLI, but no replacement modules
+    are written and no shared environment is modified.
     """
     import importlib.util
 
-    root.mkdir(parents=True, exist_ok=True)
-    stubbed = []
-    if importlib.util.find_spec("pytorchvideo") is None:
-        package = root / "pytorchvideo" / "data"
-        package.mkdir(parents=True, exist_ok=True)
-        (root / "pytorchvideo" / "__init__.py").write_text("")
-        (package / "__init__.py").write_text("")
-        (package / "encoded_video.py").write_text("class EncodedVideo:\n    pass\n")
-        stubbed.append("pytorchvideo")
-    if importlib.util.find_spec("decord") is None:
-        (root / "decord.py").write_text(
-            "class _Bridge:\n    def set_bridge(self, _name):\n        return None\n"
-            "bridge = _Bridge()\n"
-            "class VideoReader:\n    def __init__(self, *_args, **_kwargs):\n"
-            "        raise RuntimeError('frozen HNeRV decoding does not read video files')\n"
-        )
-        stubbed.append("decord")
-    if importlib.util.find_spec("pytorch_msssim") is None:
-        (root / "pytorch_msssim.py").write_text(
-            "def _unused(*_args, **_kwargs):\n"
-            "    raise RuntimeError('SSIM is not part of frozen HNeRV decoding')\n"
-            "ms_ssim = ssim = _unused\n"
-        )
-        stubbed.append("pytorch_msssim")
-    return {"root": str(root), "stubbed_modules": stubbed}
-
-
-def enable_imports(stub_root: Path) -> dict[str, Any]:
-    record = write_import_stub(stub_root)
-    for entry in (str(HNERV_ROOT), str(stub_root)):
-        if entry not in sys.path:
-            sys.path.insert(0, entry)
+    missing = [name for name in ("pytorchvideo", "decord", "pytorch_msssim")
+               if importlib.util.find_spec(name) is None]
+    if missing:
+        raise ImportError("HNeRV installed dependencies unavailable: " + ", ".join(missing))
+    if str(HNERV_ROOT) not in sys.path:
+        sys.path.insert(0, str(HNERV_ROOT))
     import model_all  # noqa: F401
     import hnerv_utils  # noqa: F401
 
-    record["model_all"] = str(Path(sys.modules["model_all"].__file__))
-    record["hnerv_utils"] = str(Path(sys.modules["hnerv_utils"].__file__))
-    return record
+    return {"stubbed_modules": [],
+            "model_all": str(Path(sys.modules["model_all"].__file__)),
+            "hnerv_utils": str(Path(sys.modules["hnerv_utils"].__file__))}
 
 
 def load_verified_state(path: Path, expected_sha256: str) -> tuple[dict[str, Any], dict[str, Any]]:
