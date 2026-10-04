@@ -200,7 +200,11 @@ now use the canonical gated fleet interface rather than unrestricted launches.
 
 Remaining worktree targets are the shared active primary and paused confirmation
 on the server, the clean Mac primary, the paused Mac Gate-A evidence checkout,
-and the independent manuscript clone. Existing claims/jobs/processes were not
+and the independent manuscript clone. A new clean Claude checkout appeared during
+the audit at `.claude/worktrees/unify-demo-pointstream-6365e8`, on
+`claude/unify-demo-pointstream-6365e8` (observed head `4e81729`). Its four commits
+add egocentric-domain, objectstream-wire and shared-checkout provenance work.
+It is separate concurrent work, preserved for its own review rather than retired. Existing claims/jobs/processes were not
 cancelled. No new compute campaign, model training, frozen-worker upgrade, live
 storage cutover or manuscript edit occurred. The scientific/native comparisons
 and background preparation budget remain as recorded in the handoff; they were
