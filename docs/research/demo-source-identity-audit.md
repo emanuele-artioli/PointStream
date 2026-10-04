@@ -1,4 +1,4 @@
-# Demo source identity — 4 October 2026
+# Demo source identity — 4 October 2026 UTC
 
 The retained reports do not bind the published clip labels to one source set.
 The comparison and RTM encoder reports name

@@ -79,7 +79,7 @@ packet-rate quality, and research evidence recovery. Exact heads were checked
 against the verified bundle; remote deletions used expected-head leases.
 No blanket cleanup script or claim/process cancellation was used.
 
-| Branch retained (local and remote unless noted) | Reason it is neither merged nor deleted |
+| Branch retained at the first audit (local and remote unless noted) | Initial reason |
 | --- | --- |
 | `main` | Canonical maintained software and default branch. |
 | `codex/gate-a-local-confirmation` | Exact scientific execution revision; deleting or merging its broad experimental tree would obscure the distinction from the evidence revision. |
@@ -148,7 +148,7 @@ scientific evidence; then perform the separate storage maintenance procedure in
 [storage-layout.md](storage-layout.md). Keep final training gated. Neither recent
 session established a complete codec win.
 
-## Follow-up reconciliation — 4 October 2026
+## Follow-up reconciliation — 5 October 2026 (Vienna)
 
 All ten server branch heads were imported for read-only local content/ancestry
 review and archived in a verified1,188,324,607-byte bundle at
@@ -205,3 +205,16 @@ cancelled. No new compute campaign, model training, frozen-worker upgrade, live
 storage cutover or manuscript edit occurred. The scientific/native comparisons
 and background preparation budget remain as recorded in the handoff; they were
 not resumed by this maintenance pass.
+
+
+The selectively integrated documentation source histories are retained as merge
+parents without restoring the old tree, deletions or launch instructions. Once
+this reviewed integration is merged, both paper-documentation and paper-evidence
+branches are eligible for ordinary merged-branch retirement; immutable source
+citations remain reachable. The five legacy temporary server branches and three
+older unoccupied server branches are eligible for archived retirement after
+publication of the selected R01 functionality and provenance record. Retain server
+main and confirmation, and the Mac Gate-A execution/evidence and two Cursor
+source-audit branches. Exact head leases and verified recovery history remain
+required for remote deletions. The final external cleanup manifest records actual
+operations; these eligibility statements do not certify a still-pending merge.

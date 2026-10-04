@@ -1,6 +1,6 @@
 # Research evidence and preparation
 
-Current reconciliation: 4 October 2026. Start with the
+Current reconciliation: 5 October 2026 (Vienna; source audit collected4 October UTC). Start with the
 [scientific handoff](../workflow/pointstream-handoff.md) and
 [repository maintenance record](../workflow/repository-maintenance.md).
 Software integration and passing tests do not create new experimental evidence.
