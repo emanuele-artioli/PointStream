@@ -462,7 +462,7 @@
     "job": "gpu1:audits/gate-a-retained-score-C2-f12-job-20261003",
     "last_observed": "running"
   },
-  "paper_commit": "bcd35f4",
+  "paper_commit": "ae37810",
   "encoder_access_qualification": {
     "status": "matched_access_comparison_on_hold",
     "finding": "Retained scene000 backgroundpixels use selectedsource000 frames, but canonical canvas geometry uses source000+source028 before firstplate. Nativeone-windowanchorhasnarrowerencoderaccess. Completebytechargingdoesnotfixthis.",
@@ -2228,5 +2228,45 @@
       2
     ],
     "scope": "Static initialappearance only; bothroles visibly placed on bothframes, no pose/task/RD/generalization claim. Original unadapted decode unchanged. Null background retains foreground traces; no clean-background claim."
+  },
+  "fresh_combined_C2_pilot12": {
+    "status": "complete_independently_verified_all_four_controls",
+    "artifact": "gpu1:audits/gate-a-fresh-combined-C2-f12-20261004/report.json",
+    "registration_sha256": "f20633b2ee8a75a6873e38b5037e7d076b38feefa2d5124cd7b5fb7e585cc3ee",
+    "worker_sha256": "5aeafa60914f6c876b245412749e85b8435051410edecf7545b3d4bff4d0f06d",
+    "frames": 12,
+    "controls": {
+      "null": {
+        "complete_bytes": 45732,
+        "vmaf_all_frames": 63.97019383333333,
+        "psnr_y_pooled": 30.85329149634609
+      },
+      "unadapted": {
+        "complete_bytes": 45263,
+        "vmaf_all_frames": 64.15818658333333,
+        "psnr_y_pooled": 30.96992338534225
+      },
+      "opaque": {
+        "complete_bytes": 46120,
+        "vmaf_all_frames": 63.667267333333335,
+        "psnr_y_pooled": 30.889695516853138
+      },
+      "alpha": {
+        "complete_bytes": 48535,
+        "vmaf_all_frames": 64.22001525,
+        "psnr_y_pooled": 31.3776276073364
+      }
+    },
+    "scope": "Original4K source38..49, protected packet-only receiver; static initial poses, clipped far arm/racket, retained background ghosts. No matched12 native anchors or qualified96 comparison. All controls retained."
+  },
+  "fresh_combined_C2_scale48": {
+    "status": "running",
+    "job": "gpu1:audits/gate-a-fresh-combined-C2-f48-job-20261004",
+    "registration_sha256": "62c5f01302e508ea01955455c4da0ed66766788e57cb7e8bfb184c6bf80f72c5",
+    "admitted_by": "Actual12 independent byte/pixel/metric/visual qualification; same code/config",
+    "budget_seconds": 6000,
+    "memory_gib": 128,
+    "cpu_threads": 8,
+    "gpu": "none"
   }
 }
