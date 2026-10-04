@@ -1,0 +1,117 @@
+{
+  "common_limits": [
+    "no independently observed unoccluded truth",
+    "cache-dependent wall times; no qualified inference latency",
+    "cadence different from output 30fps playback",
+    "joined seconds noncontinuous",
+    "zip/min-length may omit frames",
+    "input/config/checkpoint/GPU/environment/native provenance absent in report",
+    "not neural codec rate-quality or held-out evidence"
+  ],
+  "reports": [
+    {
+      "exists": true,
+      "observations": [
+        {
+          "frames": 24,
+          "inside_mae_vs_1080p_30fps": 30.713,
+          "max_img_size": 360,
+          "name": "fps24_1s",
+          "outside_mae_vs_1080p_30fps": 7.265,
+          "seconds": 447.2
+        },
+        {
+          "frames": 24,
+          "inside_mae_vs_1080p_30fps": 41.189,
+          "max_img_size": 360,
+          "name": "fps1_24s",
+          "outside_mae_vs_1080p_30fps": 9.457,
+          "seconds": 864.3
+        },
+        {
+          "frames": 24,
+          "inside_mae_vs_1080p_30fps": 30.644,
+          "max_img_size": 360,
+          "name": "fps12_2s",
+          "outside_mae_vs_1080p_30fps": 8.979,
+          "seconds": 434.1
+        },
+        {
+          "frames": 24,
+          "inside_mae_vs_1080p_30fps": 37.642,
+          "max_img_size": 360,
+          "name": "fps8_3s",
+          "outside_mae_vs_1080p_30fps": 8.741,
+          "seconds": 557.9
+        },
+        {
+          "frames": 24,
+          "inside_mae_vs_1080p_30fps": 23.461,
+          "max_img_size": 720,
+          "name": "fps12_2s_720",
+          "outside_mae_vs_1080p_30fps": 5.776,
+          "seconds": 339.8
+        },
+        {
+          "frames": 24,
+          "inside_mae_vs_1080p_30fps": 21.148,
+          "max_img_size": 1920,
+          "name": "fps12_2s_1080",
+          "outside_mae_vs_1080p_30fps": 3.622,
+          "seconds": 545.6
+        }
+      ],
+      "sha256": "6d475c728d950703aa10635b7e5fa785d52c8a50a203791341e5a8a87d78b68d",
+      "source": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/budget-smokes/report.json"
+    },
+    {
+      "exists": true,
+      "observations": [
+        {
+          "inside_mae_vs_1080p": 23.588,
+          "max_img_size": 1280,
+          "outside_mae_vs_1080p": 3.282,
+          "seconds": 488.4
+        },
+        {
+          "inside_mae_vs_1080p": 37.354,
+          "max_img_size": 960,
+          "outside_mae_vs_1080p": 4.027,
+          "seconds": 57.0
+        }
+      ],
+      "sha256": "0e9dbc6bdd51b4bf7e792b75c637d56084dc51aa03e1cb8b4917303196b89b75",
+      "source": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/scale-smokes/report.json"
+    },
+    {
+      "exists": false,
+      "observations": null,
+      "sha256": null,
+      "source": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/grid-smokes/report.json"
+    },
+    {
+      "exists": true,
+      "observations": [
+        {
+          "fps": 12,
+          "frames": 48,
+          "inside_mae_vs_30fps_1080p": 22.625,
+          "outside_mae_vs_30fps_1080p": 3.717,
+          "seconds": 1693.4,
+          "source_seconds": 4
+        },
+        {
+          "fps": 6,
+          "frames": 24,
+          "inside_mae_vs_30fps_1080p": 20.728,
+          "outside_mae_vs_30fps_1080p": 3.873,
+          "seconds": 424.9,
+          "source_seconds": 4
+        }
+      ],
+      "sha256": "f4a2b0be40742e4a80ddefdb46d3f055348309a9fef3bfd886f3d0c9ee90aabb",
+      "source": "/home/itec/emanuele/pointstream-data/jobs/neural-bg/temporal-smokes/report.json"
+    }
+  ],
+  "status": "diagnostic / generated-reference approximation; grid report absent at exact path"
+}

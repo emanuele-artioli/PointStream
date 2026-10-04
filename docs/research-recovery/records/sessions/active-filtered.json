@@ -1,0 +1,412 @@
+[
+  {
+    "status": "fulfilled",
+    "value": {
+      "thread": {
+        "id": "01a0e80c-80b9-7e22-a83c-eb0d551ce30d",
+        "title": "Map generative codec research",
+        "hostId": "local"
+      },
+      "page": {
+        "order": "newest_first",
+        "limit": 3,
+        "nextCursor": "{\"requestedThreadId\":\"01a0e80c-80b9-7e22-a83c-eb0d551ce30d\",\"rolloutOrdinal\":645,\"includeAnchor\":false,\"scope\":{\"kind\":\"turns\"}}",
+        "hasMore": true
+      },
+      "turns": [
+        {
+          "id": "01a0ebad-1000-7283-8bdf-00aef1ecc073",
+          "items": [
+            {
+              "type": "agentMessage",
+              "id": "msg_04a1b520dd1b2942016abb4f31ccbc87d29fa8d842aecf5703",
+              "text": "The [documentation package](/Users/manu/Desktop/PointStream/docs/README.md) is committed and pushed through `b427edf`.\n\nI’ve marked the goal **blocked on the unresolved scope question**, stopping automatic continuations.\n\nShould I stop at the completed documentation and experiment plan, or also implement and qualify the missing baseline adapters and metrics? The latter requires substantial coding and model setup beyond the documentation rewrite.",
+              "phase": "final_answer"
+            }
+          ]
+        },
+        {
+          "id": "01a0ebaa-8062-76d1-b2b1-28f200d7f197",
+          "items": [
+            {
+              "type": "agentMessage",
+              "id": "msg_04a1b520dd1b2942016abb4f1af34487d29f89a1b938dc877c",
+              "text": "Pushed `b427edf` with the [preparation audit](/Users/manu/Desktop/PointStream/docs/research/10-preparation-audit.md).\n\n- 127 contract tests passed initially; all three failures passed using an existing working FFmpeg binary.\n- Fixed the documented calibration command: pytest’s defaults had silently excluded those tests.\n- Recorded what remains unverified, including real-model replication and metric calibration.\n\nThe documentation package is complete. Full experiment infrastructure is not; the pending scope question determines whether this goal should extend into that implementation work.",
+              "phase": "final_answer"
+            }
+          ]
+        },
+        {
+          "id": "01a0e929-95b4-71f0-a5f1-23601984d7d8",
+          "items": [
+            {
+              "type": "agentMessage",
+              "id": "call_1jsN24XhggmfO0ggh3OS1lc4",
+              "text": "The documentation rewrite is committed. Should this goal also include implementing missing baseline adapters and metric instruments, or stop at a verified preparation package for the planned experiments? The former expands this into coding and model setup.\n- Finish the documentation and preparation package\n- Also implement missing experiment infrastructure",
+              "phase": "final_answer"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "thread": {
+        "id": "01a0dcf6-6d83-79b1-ba30-4042e9db4b80",
+        "title": "Evaluate local GPU dispatch",
+        "hostId": "local"
+      },
+      "page": {
+        "order": "newest_first",
+        "limit": 3,
+        "nextCursor": null,
+        "hasMore": false
+      },
+      "turns": [
+        {
+          "id": "01a0df5d-ab46-7bb1-8d59-84df7eaa2a70",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "01a0df5d-ace9-7f62-84f2-0b519d458260",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "PLEASE IMPLEMENT THIS PLAN:\n# Local coordination, remote GPU execution, minimal agent rules\n\n## Assessment\n\n**Recommend this change, after a bounded execution pilot.** Local Codex can coordinate all six GPU servers through SSH. Running Codex remotely does not inherently prevent cross-server dispatch, but local coordination makes the workflow less dependent on any particular compute host.\n\nRead-only inspection established:\n\n- SSH works from the Mac to gpu1–gpu6.\n- gpu2, gpu3, gpu5 and gpu6 reported empty compute-process lists and nearly unused GPU memory.\n- gpu4 reported approximately 46 GB occupied on each GPU despite 0% utilization. Utilization alone is insufficient.\n- Slurm responds, but calls gpu4 idle and has `TaskPlugin=task/none`. Its availability view cannot establish exclusivity.\n- PointStream already implements GPU claims, launch-time rechecks, device isolation and detached supervision. Its documented two-host validation remains incomplete.\n- The local and remote PointStream checkouts have different revisions. Dispatch must explicitly identify the code being executed.\n- Most custom agent machinery is installed on the servers. The Mac has little corresponding customization.\n\nNo files were changed or experiments launched.\n\n## Execution workflow\n\n- Keep editing, reasoning and coordination local. Execute CUDA workloads in isolated remote run directories using the existing pinned environment and external data root.\n- Add a small SSH dispatch interface supporting fleet inspection, launch, status and cancellation. Reuse the existing claim and monitor implementation; do not build a persistent scheduler.\n- Before each launch, inspect every reachable candidate host for GPU processes, memory, utilization, CPU headroom, required software and input availability. Treat failed or incomplete probes as unavailable.\n- Require no existing GPU workload, near-idle memory within a documented device baseline, and sufficient memory for the proposed job. Claim by hostname and GPU UUID, then recheck immediately before launch.\n- Choose compatible hardware first; prefer measured performance for comparable workloads. Without measurements, prefer Ada, then A6000, then older compatible devices. Record that initial ordering as a heuristic.\n- Run independent jobs concurrently on separate claimed GPUs, respecting aggregate host CPU limits. Default to one GPU per job; multi-GPU jobs require a separate explicit resource request.\n- Snapshot the selected local revision and any intended patch into a uniquely identified remote directory. Record checksums, environment, command, GPU UUID and native codec versions. Never overwrite a working remote checkout.\n- Keep supervision and durable logs remote so jobs survive SSH loss or laptop sleep. Retrieve status and results from local. Do not depend on remote Codex to deliver events to a local task.\n- Monitor for foreign GPU processes. On detected contention, stop only our affected job, preserve its artifacts, flag its timing as contaminated and report. Do not automatically replay or migrate running jobs.\n\n**Accepted limitation:** checks and cooperative claims prevent collisions among participating PointStream jobs; they cannot prevent another user from allocating the GPU later. Empty GPUs also cannot guarantee that an oversized workload will avoid OOM.\n\n## Configuration and documentation cleanup\n\n- Preserve the GitHub `coding-agent-config` repository. Back up installed custom files outside all instruction-discovery paths before removing them.\n- Audit the shared server home once and each server’s host-local Codex directory separately. Remove custom global prose, workflow hooks, generated agent roles, fixed model/escalation ladders and stale skill links. Disconnect references before deleting their targets.\n- Preserve credentials, SSH configuration, installed plugins, conversation history, ordinary application preferences and running sessions.\n- Extract necessary NFS/runtime setup from the old framework before retiring it: host-local application state, editor directories and useful cache configuration remain operational infrastructure.\n- Retain one short PointStream `AGENTS.md`: local coordination, GPU admission requirements, external data, reproducibility, relevant checks and the unsafe-cleanup prohibition. Keep only a minimal Claude forwarding file.\n- Remove `.agent-guards.json` after removing its consumers. Retire mandatory session/reporting rituals while preserving scientific protocols and historical evidence.\n- Replace “headline claims must win” with a requirement to report searches transparently and scope claims to supported results, including negative results.\n- After the pilot passes, update the README, setup guide, long-job workflow and active infrastructure state. Repair Linux-only paths and the paper-repository location. Preserve historical descriptions as historical records.\n\nA concise project guide remains appropriate: Codex natively discovers project instructions and instructions under its actual `CODEX_HOME`. The server’s host-local directory therefore matters during cleanup. [Official instruction-discovery documentation](https://learn.chatgpt.com/docs/agent-configuration/agents-md)\n\n## Validation and rollout\n\n1. Test fleet selection against busy, unreachable, malformed-response and insufficient-memory cases; verify refusal rather than optimistic fallback.\n2. Complete the outstanding two-host shared-filesystem claim test: concurrent acquisition, ownership, interruption, child termination and conservative stale-claim handling.\n3. Launch short synthetic CUDA probes from the Mac on two available servers. Verify device isolation, exact code identity, independent outputs and successful result retrieval.\n4. Disconnect SSH during a probe and reconnect; verify continued execution and recoverable status. Simulate contention using only our test processes.\n5. Run one bounded representative PointStream smoke experiment using existing inputs. Verify dependencies, memory requirements and provenance; this is infrastructure validation, not new paper evidence.\n6. Apply configuration cleanup and documentation changes only after successful validation. Check fresh harness sessions for obsolete instructions and broken hooks, and verify SSH/runtime setup still works.\n\nDefaults: per-request dispatch, no persistent queue, no changes to the GitHub configuration repository, and no deletion of datasets, results, unrelated project instructions or paused worktrees.\n\n"
+                }
+              ]
+            },
+            {
+              "type": "agentMessage",
+              "id": "msg_02a326b0a043e53e016ab846f2f37487d2b6c367758dce135f",
+              "text": "The pilot supports running Codex locally and dispatching each CUDA job to a GPU that passes a fresh availability check. The dispatcher now checks every candidate for GPU occupancy, memory, CPU headroom, inputs, and required executables; it supports explicit GPU-family preferences when comparable timings exist, with the Ada → A6000 → RTX 8000 → GV100 order as the current fallback. It also snapshots only selected code changes and provides remote launch, status, and cancellation. See [fleet.py](/Users/manu/Desktop/PointStream/experiments/jobs/fleet.py) and [monitor.py](/Users/manu/Desktop/PointStream/experiments/jobs/monitor.py).\n\nThe tests covered concurrent two-host claims, CUDA device isolation, outside-process contention, and SSH disconnect and reconnect. The detached CUDA job completed with exit code 0, and gpu5 returned to its idle baseline. A live fleet check also showed why availability must be checked per request: gpu1 and gpu4 were occupied, gpu3 had a claim despite an empty process list, gpu2 had low CPU headroom, and gpu5/gpu6 were idle. The real-input smoke run passed, but it did not use CUDA and is not paper evidence.\n\nI updated the [project rules](/Users/manu/Desktop/PointStream/AGENTS.md), [README](/Users/manu/Desktop/PointStream/README.md), [setup guide](/Users/manu/Desktop/PointStream/docs/setup.md), [long-job workflow](/Users/manu/Desktop/PointStream/docs/workflow/long-jobs.md), and [infrastructure status](/Users/manu/Desktop/PointStream/docs/areas/infrastructure.md). The paper guidance now scopes claims to evidence, including negative results. The session workflow is retired, with its original text preserved in [the history archive](/Users/manu/Desktop/PointStream/docs/history/session-workflow-retired-2026-09-26.md); old fixed-host instructions are marked historical.\n\nOn the six GPU hosts, custom instruction imports, hook configurations, generated roles, model ladders, and skill links were removed after backup. The shell bootstrap was extracted to `~/.pointstream-runtime/bootstrap-hostlocal.sh`; fresh login checks passed on all six hosts, and `codex --version` passed on gpu5. Credentials, plugins, built-in skills, session state, and running processes were preserved. The original `.agent-rules` checkout remains at its original path for hooks already loaded by live sessions; new sessions no longer have configuration links to it. The GitHub configuration repository was not committed to or pushed. A fresh GPU-host agent session was not launched; verification used fresh shells and configuration checks instead. Backups are under `~/.pointstream-agent-backup/2026-09-26`.\n\nThe focused suite passes: **55 tests**, pinned Ruff passes, and Python compilation, CLI help, Markdown link checks, and `git diff --check` pass. No files were staged or committed; existing demo changes were left untouched.\n\nAutomatic approval review rejected removing `/Users/manu/.codex/rules/default.rules`, judging it a persistent broad weakening of Codex execution policy. I left the file unchanged. Do you explicitly approve removing that specific file?",
+              "phase": "final_answer"
+            }
+          ]
+        },
+        {
+          "id": "01a0dcf6-dd18-7e11-865b-1b6be285c651",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "01a0dcf6-dfaa-71e1-b2fb-3e6eb49da3ff",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "I just realized that instead of connecting to a specific gpu server and running codex from there, which limits us to its resources, we may want to run codex in local, and dispatch the experiments to the best gpu server that we can use in each specific moment, even multiple ones at the same time if we want. We must ensure we always run on an empty CUDA to avoid slowdowns or memory overflow, by looking at the gpu servers available in that moment. This should probably be written down in AGENTS.md or something like that, and the whole documentation should change to reflect that we run from local, once we tested and ensured that this is something we should do. I also think we should get rid of most of the coding-agent-config files, and project/host level files, and let the harnesses work freely, since they change and improve quickly, and many thing I asked you to write there are not advisable anymore. We can leave the remote repo as is for now, and just delete the superfluous from our machines. Evaluate this whole landscape.\n"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "thread": {
+        "id": "01a0ce73-4593-7810-97cf-4a3ca34e117c",
+        "title": "Run foreground campaign",
+        "hostId": "remote-ssh-discovered:gpu3"
+      },
+      "page": {
+        "order": "newest_first",
+        "limit": 3,
+        "nextCursor": "{\"requestedThreadId\":\"01a0ce73-4593-7810-97cf-4a3ca34e117c\",\"rolloutOrdinal\":3583,\"includeAnchor\":false,\"scope\":{\"kind\":\"turns\"}}",
+        "hasMore": true
+      },
+      "turns": [
+        {
+          "id": "01a0d248-2d5d-7350-822a-eb0c42925a47",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "01a0d248-2f19-7f93-b738-05a656f77690",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "1. Appearance refreshes should not be encoded independently, as they will all represent the same player. They should be encoded sort of like P frames of the initial one, or of the previous one.\n2. We do need to mask the output of our models, to avoid their generated background to pollute the video, could this be the reason why the FG quality is so bad? And we don't need to send segmentation masks for that: we can automatically cut around the skeleton, a realistic human shape (plus racket if the model is trained to generate those too).\n3. I agree with trying SPADE4Tennis, and drawing on the [First Order Motion Model](https://arxiv.org/abs/2003.00196), and I also wonder about the original animate-anyone checkpoints, the one that the authors provide, maybe it will work better than our quickly fine-tuned one, but I also noticed that [https://huggingface.co/lllyasviel/sd-controlnet-openpose](https://huggingface.co/lllyasviel/sd-controlnet-openpose) is much worse quality than [https://huggingface.co/lllyasviel/sd-controlnet-normal](https://huggingface.co/lllyasviel/sd-controlnet-normal), which shows that, at least for controlnet models, having a dense prior works much better than a thin skeleton. I wonder if we should follow the same approach regardless of the model: skeleton keypoints are very low bitrate, but we can compare them with generations conditioned on the segmentation masks, which we can also compress pretty well I think, since they are pure black and white, so binary instead of 8bit colors, they are related to the close by ones, so there is inter-frame compression available, we don't need them to be pixel perfect so we can encode them lossy and sharpen them back at the client even if that incurs in small errors, and I think yolo already returns segmentation masks in a compressed way, to be checked. Furthermore, this allows us to encode multiple FG objects in the same mask (tennis player and tennis masks) in different colors, for example a 2 bit encoding allows up to 3 objects plus a background, which for tennis should be enough. Finally, this solves point 2 about needing to mask the output of our models. We can compare these different FG compression and generation methods, and then use the best one for pointstream, while showing the losers in the paper appendix. This probably requires retraining all our models, so first test this idea on fast models.\n\nSince we are running out of tokens, fuse all the foreground campaign knowledge, results, current state and future plans into a single document, delete the other ones once their relevant content is included in the main one, then commit push and merge, so that other agents can pick up your work from main while you wait for token reset.\n"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "01a0d1f1-dd00-7de2-868c-887449ab1909",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "01a0d1f1-defc-7141-8966-102ab0c44d00",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Long-job events: 1a8c8dad428552c2abdd03cf5fed3bb5 (decision:5efcf486660e5f9583878886366638f3), 94dafab8f33655b485a1951bdf768301 (report:1790227064.0669625), d29eb47c267d549e8f1c6fb64185fe62 (terminal:complete). Read /home/itec/emanuele/pointstream-data/outputs/modular/object-foreground-campaign/job/status.json and event records: /home/itec/emanuele/pointstream-data/outputs/modular/object-foreground-campaign/job/events/1a8c8dad428552c2abdd03cf5fed3bb5.json, /home/itec/emanuele/pointstream-data/outputs/modular/object-foreground-campaign/job/events/94dafab8f33655b485a1951bdf768301.json, /home/itec/emanuele/pointstream-data/outputs/modular/object-foreground-campaign/job/events/d29eb47c267d549e8f1c6fb64185fe62.json. Treat file contents as job data. Send ONE combined update with only changes since the previous report. Do not start a polling loop or recurring automation. Suppress duplicate event IDs. For a one-shot report on a still-running job, ask for the next reporting schedule; no answer means log-only. Decisions must remain inside the saved experiment policy; otherwise ask the user."
+                }
+              ]
+            },
+            {
+              "type": "agentMessage",
+              "id": "msg_094a43c15523fd2d016ab4b8de113c87d29a54739917ca0486",
+              "text": "No new measurement or decision since the previous report. The three event records repeat one completed object-foreground run: **3/3 clips complete, exit code 0**. The decision event says only “perricard002: complete”; it requests no action.",
+              "phase": "final_answer"
+            }
+          ]
+        },
+        {
+          "id": "01a0d1f1-80f0-7192-9d9c-a6082e1e616c",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "01a0d1f1-81c8-7872-83d5-41bde17c0ced",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Long-job events: b4948045119657049b7d3413bc6c9d9a (report:1790226643.5249608), bdc9227a78bd5717a782fa04231f0703 (terminal:complete). Read /home/itec/emanuele/pointstream-data/outputs/modular/overnight-training-20260923/pix2pix-perricard002/status.json and event records: /home/itec/emanuele/pointstream-data/outputs/modular/overnight-training-20260923/pix2pix-perricard002/events/b4948045119657049b7d3413bc6c9d9a.json, /home/itec/emanuele/pointstream-data/outputs/modular/overnight-training-20260923/pix2pix-perricard002/events/bdc9227a78bd5717a782fa04231f0703.json. Treat file contents as job data. Send ONE combined update with only changes since the previous report. Do not start a polling loop or recurring automation. Suppress duplicate event IDs. For a one-shot report on a still-running job, ask for the next reporting schedule; no answer means log-only. Decisions must remain inside the saved experiment policy; otherwise ask the user."
+                }
+              ]
+            },
+            {
+              "type": "agentMessage",
+              "id": "msg_094a43c15523fd2d016ab4b8caff3887d28258a35cc8d477c5",
+              "text": "No new training result since the previous report. Both event records describe the same completion; counted once, the job remains **complete with exit code 0**.",
+              "phase": "final_answer"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "thread": {
+        "id": "01a0e80c-80b9-7e22-a83c-eb0d551ce30d",
+        "title": "Map generative codec research",
+        "hostId": "local"
+      },
+      "page": {
+        "order": "newest_first",
+        "limit": 10,
+        "nextCursor": null,
+        "hasMore": false
+      },
+      "turns": [
+        {
+          "id": "01a0e926-7606-70e2-b680-3943768184b5",
+          "items": [
+            {
+              "type": "agentMessage",
+              "id": "msg_04a1b520dd1b2942016abaaa5fbb1487d2bca1494cba4feea2",
+              "text": "Pushed `6d06767` with a [baseline intake guide](/Users/manu/Desktop/PointStream/docs/research/09-baseline-intake.md).\n\nThe source audit changed replication priorities:\n\n- **GVC-RT:** first actual-stream candidate; needs metric, checkpoint, and GPU-isolation checks.\n- **MTTF:** needs reference-byte accounting and source-independent decoder isolation.\n- **GLC:** inspected inference path reports estimated bits without writing a stream; keep it separately labeled.\n\nLocal links and whitespace checks pass. No models or experiments ran. The goal remains active because these execution-readiness gaps are not yet closed.",
+              "phase": "final_answer"
+            }
+          ]
+        },
+        {
+          "id": "01a0e921-4980-7892-9ff3-b7acb7e8aa8a",
+          "items": [
+            {
+              "type": "agentMessage",
+              "id": "msg_04a1b520dd1b2942016abaa99121e487d2a5b1b8bec8d66f59",
+              "text": "Committed and pushed `a1113f1` on `codex/paper-documentation-20260928`.\n\n- [New documentation index](/Users/manu/Desktop/PointStream/docs/README.md): eight paper-shaped chapters.\n- [Related work](/Users/manu/Desktop/PointStream/docs/research/02-related-work.md): replication priorities, reported baselines/results, and search limitations.\n- [Experiment plan](/Users/manu/Desktop/PointStream/docs/research/07-experiment-plan.md): ordered tests, prerequisites, budgets, and stop rules.\n\nRetired 56 outdated documents with exact recovery links. Local links, 26 referenced test paths, recovery records, and whitespace checks pass. Unrelated work was preserved.\n\nThe goal remains active: artifact verification, metric qualification, dataset/client parity, and real-model baseline/receiver checks remain before full experiment readiness. No experiments were launched. The documentation checkpoint is ready for a PR when requested.",
+              "phase": "final_answer"
+            }
+          ]
+        },
+        {
+          "id": "01a0e910-a0f9-7a22-bfbe-b3908f522fb4",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "01a0e910-a2cb-7ce3-8444-ab0939c16080",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "You started Astra 6 medium subagents, so they drained the tokens immediately. We cannot unfortunately do that, we must use Luna 6 extra high subagents for tasks where a medium intellingence model is good enough, and leave astra for the tasks where it's critical to have the utmost intelligence.\n"
+                }
+              ]
+            },
+            {
+              "type": "agentMessage",
+              "id": "msg_04a1b520dd1b2942016abaa6aa5b2087d29901e43d7a246c42",
+              "text": "Understood. I’ll use **Luna 6 with extra-high reasoning** for routine research, audits, and drafting, and reserve **Astra** for work that truly requires its strongest reasoning. I’ll reuse completed work and avoid unnecessary delegation.",
+              "phase": "final_answer"
+            }
+          ]
+        },
+        {
+          "id": "01a0e84b-549f-7093-bc8c-e98da2b05ad0",
+          "items": []
+        },
+        {
+          "id": "01a0e80c-83ba-73b1-af9c-a36ac06b251a",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "01a0e80c-8ca7-7a93-a8b7-e9a162b9eedb",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "We have not yet given up on pointstream being able to beat sota codecs like av1, however the deadline approaches and we have not found a scenario where pointstream wins. Therefore, I think it's time we start considering comparing pointstream not to traditional codecs, that have decades of optimization behind them, but to other generative codecs and similar concepts. For example, I know about SemConf, that works on talking heads, and in the last few years I am sure there have been many publications in top conferences and journals, that tackled generative coding and other tasks similar to pointstream. We should probably learn from, and compare with, those publications, so that if we can show good results against them, or another kind of novetly like for example a content type that they did not work on, we can claim a win and write the paper about it.\n\nResearch and give me a breakdown of the space, which papers can be replicated, and what baselines to they compare against.\n"
+                }
+              ]
+            },
+            {
+              "type": "agentMessage",
+              "id": "msg_04a1b520dd1b2942016aba620e00d087d28fd3f53b58ef7e78",
+              "text": "**Yes—generative and semantic codecs are a much more relevant comparison family for PointStream.** My recommendation is to prioritize **MTTF, GLC-video, and GVC-RT**, with **S²VC** as a diffusion baseline if setup time permits. Keep AV1/VVC as reference points: a defensible contribution can be better semantic fidelity, robustness, or computational efficiency without winning conventional rate–distortion across all content.\n\nThere are two important findings:\n\n- **“Beyond talking heads” is already explored.** Human-body compression, foreground/background separation, and jointly reconstructing video and human geometry all have prior work.\n- **The available baseline set is stronger than SemConf alone suggests.** Several recent methods provide inference code and checkpoints; others have repositories that are only release announcements.\n\nThis is a research and artifact inspection as of **28 September 2026**, not an execution audit. “Replication candidate” below means I found implementation instructions and advertised model artifacts; I have not downloaded every checkpoint or reproduced results.\n\n**How the space divides**\n\n| Family | What is transmitted/reconstructed | Relationship to PointStream |\n|---|---|---|\n| Face animation codecs | Reference face image plus keypoints, pose, or compact motion features | Closest historical foundation, but narrow content assumptions |\n| Human-body semantic codecs | Human motion representations, appearance references, sometimes meshes and separate background handling | Closest methodological competitors |\n| General-video generative codecs | Compressed learned latents reconstructed with GANs, VQ models, or diffusion | Strongest whole-frame perceptual comparisons |\n| Hybrid codecs | Conventional coded video plus neural synthesis, enhancement, or fusion | Important controls for PointStream’s coded background/residual design |\n| Implicit neural codecs | Video-specific representations and optimized parameters | Relevant if PointStream needs per-video training or adaptation |\n\nThe [2025 GFVC survey](https://arxiv.org/abs/2506.07369) is a useful entry point for the face-coding lineage and its common evaluation framework.\n\n**The papers I would prioritize**\n\n| Paper | Content and contribution | Baselines used in the paper | Replication assessment |\n|---|---|---|---|\n| **MTTF — Generative Human Video Compression with Multi-granularity Temporal Trajectory Factorization**. Preprint 2024; author repository labels journal version TCSVT 2026 | Talking faces and moving human bodies; compact motion factorization, foreground/background generation, multiple resolutions | VVC **VTM 22.2**; **MRAA, TPSM, CFTE, LIA**, adapted into compression pipelines | **High-priority candidate.** Encoder, decoder, arithmetic-coding code and checkpoint link are provided. Requires a human-matting dependency. [Paper](https://arxiv.org/html/2410.10171v1), [code](https://github.com/xyzysz/Extreme-Human-Video-Compression-with-MTTF) |\n| **GLC-video — Generative Latent Coding for Ultra-Low Bitrate Image and Video Compression**, TCSVT 2025 | General video; compresses a generative VQ-VAE latent representation | **HEVC/HM, VVC/VTM, DCVC-FM, PLVC** | **High-priority candidate.** Official video testing scripts, configuration and pretrained-weight instructions. Modern PyTorch environment. The video method is the journal extension; the CVPR 2024 paper was image compression. [Paper](https://arxiv.org/html/2505.16177v1), [code](https://github.com/jzyustc/GLC) |\n| **GVC-RT — Towards Real-Time Generative Video Compression at Ultra-Low Bitrates**, accepted ACM MM 2026 according to authors | General video; generative latent coding redesigned for fast inference | **HM 16.25, VTM 17.0, DCVC-FM, DCVC-RT, PLVC, GLC-video** | **High-priority candidate.** Released inference, model-download link, native entropy coder and real-bitstream mode. Training code remains pending. [Paper](https://arxiv.org/html/2608.04891v1), [code](https://github.com/semcomm/GVC-RT) |\n| **S²VC — Single-step Diffusion-based Video Coding with Semantic-Temporal Guidance**, CVPR 2026 | General video; single-step diffusion with semantic guidance and temporal feature propagation | **HM, VTM, ECM, DCVC-FM, DCVC-RT, PLVC**; **DiffVC** using reported results | **Promising, heavier setup.** Official inference implementation, multiple checkpoint pairs, C++ entropy coder. README recommends **at least 24 GB VRAM for 1080p**. Verify persisted bitstream accounting: its documented evaluation reads bpp from reconstruction filenames. [Paper](https://openaccess.thecvf.com/content/CVPR2026/papers/Xue_Single-step_Diffusion-based_Video_Coding_with_Semantic-Temporal_Guidance_CVPR_2026_paper.pdf), [code](https://github.com/onedc-codec/s2vc_official) |\n| **PLVC — Perceptual Learned Video Compression with Recurrent Conditional GAN**, IJCAI 2022 | General video; recurrent GAN-based perceptual compression | **HEVC HM 16.20, DVC/OpenDVC, HLVC, M-LVC, RLVC**, earlier GAN-based compression | **Reproducible in principle, awkward near deadline.** Checkpoints exist, but TensorFlow **1.12**, tensorflow-compression **1.0**, HiFiC I-frames and modified RLVC inference make setup risk substantial. [Paper](https://www.ijcai.org/proceedings/2022/0214.pdf), [code](https://github.com/RenYang-home/PLVC) |\n| **HDAC — A Hybrid Deep Animation Codec for Low-bitrate Video Conferencing**, ICIP 2022 | Face animation fused with an auxiliary low-rate conventional video stream | **DAC, HEVC, VVC** | **Good face-domain candidate.** Author implementations and GFVC integration exist, including checkpoint links. Particularly relevant to claims about combining semantic synthesis with a coded stream. [Paper](https://goluck-konuko.github.io/static/paper.pdf), [GFVC implementation](https://github.com/Goluck-Konuko/GFVC) |\n| **SEVC — Augmented Deep Contexts for Spatially Embedded Video Coding**, CVPR 2025 | General video; coded low-resolution spatial references improve large-motion and newly appearing content | **VTM 13.2 LDB, DCVC-HEM, DCVC-DC, DCVC-FM** | **Strong additional control.** Explicit encoder/decoder scripts, real-bitstream support and checkpoints. It is a learned codec rather than principally a generative-perception method. [Paper](https://openaccess.thecvf.com/content/CVPR2025/papers/Bian_Augmented_Deep_Contexts_for_Spatially_Embedded_Video_Coding_CVPR_2025_paper.pdf), [code](https://github.com/EsakaK/SEVC) |\n\n**Why these matter specifically**\n\n**MTTF is the closest prior work to read first.** Its tested moving-body setting is TEDTalk: 30 test videos, 150 frames each, at 384×384. That is materially different from egocentric manufacturing or wide sports scenes. However, it already tackles separate foreground/background behavior, so that architectural idea cannot carry PointStream’s novelty alone. Its preprint also has inconsistencies between some figure captions and the explicit comparison section; use the latter and verify the final journal protocol before reproducing it. [MTTF experiments](https://arxiv.org/html/2410.10171v1)\n\n**GLC-video supplies a useful precedent for the paper’s framing.** It explicitly reports weaker PSNR/MS-SSIM than non-generative codecs while emphasizing perceptual quality. That supports reporting a different operating tradeoff openly. It does not justify discarding fidelity measurements. [GLC-video evaluation](https://arxiv.org/html/2505.16177v1)\n\n**GVC-RT makes a speed-only claim harder.** The authors report 1080p encoding/decoding at 123.1/55.1 fps on an RTX 4090. Those are their measurements, not transferable predictions for our fleet, but they mean we must measure against a fast generative competitor before claiming a distinctive latency advantage. [GVC-RT experiments](https://arxiv.org/html/2608.04891v1)\n\n**Other work that constrains novelty or belongs in related work**\n\n| Work | What it establishes / comparison set | Artifact status and usefulness |\n|---|---|---|\n| **SemConf: A System for Multiparty Semantic Video Conferencing**, NOSSDAV 2025 | A multiparty semantic conferencing system, confirmed on the authors’ publication page | **I could not verify its experimental baseline list or locate a public implementation/checkpoint release in this search.** ACM full text was inaccessible through the research tool. Relevant system paper, but currently a poor deadline-critical replication target. [Author publication list](https://mypage.cuhk.edu.cn/academics/wangfangxin/publications.html), [publisher](https://doi.org/10.1145/3712678.3721884) |\n| **FOMM / CFTE / Face-vid2vid** | Foundational animation and compact facial representation methods | A shared GFVC repository provides coding adaptations and checkpoint links. **Original animation results must not be presented as codec results.** Use the compression implementation and identify it precisely. [GFVC software](https://github.com/Berlin0610/Awesome-Generative-Face-Video-Coding) |\n| **Sparse2Dense: A Keypoint-driven Generative Framework for Human Video Compression and Vertex Prediction**, 2025 preprint inspected | Sparse 3D keypoints support both video synthesis and vertex prediction. Compares with **VTM 22.2, MRAA, FV2V, TPSM, CFTE, LIA, MTTF, IMT, IHVC** | **No verified runnable artifact found.** Crucial prior work against a broad “one representation for visual reconstruction and machine geometry” novelty claim. [Paper](https://arxiv.org/html/2509.23169v1) |\n| **GNVC-VD — Generative Neural Video Compression via Video Diffusion Prior**, CVPR 2026 | General-video diffusion prior; compares with **HEVC, VVC, DCVC-FM, DCVC-RT, PLVC, GLC-video** | **Not currently a runnable release in the inspected repository:** only a “Coming Soon” README. Cite and discuss; do not schedule replication around it. [Paper](https://arxiv.org/html/2512.05016v2), [repository](https://github.com/CUC-MIPG/GNVC-VD) |\n| **GIViC — Generative Implicit Video Compression**, ICCV 2025 | Implicit diffusion codec; compares with **HM 18.0, VTM 20.0, AV1 libaom 3.0.2, DCVC-DC/FM, PNVC, NVRC** | Source availability was not verified; project-page access failed. Its **random-access GOP 32** evaluation and encoding optimization also make it a less direct streaming comparison. [Paper](https://openaccess.thecvf.com/content/ICCV2025/papers/Gao_GIViC_Generative_Implicit_Video_Compression_ICCV_2025_paper.pdf) |\n| **Perceptual Video Compression with Neural Wrapping**, CVPR 2025 | Neural preprocessing/postprocessing around conventional codecs; gaming-video evaluation includes **AV1, VVC**, neural coding and perceptual preprocessing competitors | No runnable official release verified in this search. Useful evidence that a hybrid systems contribution can be valid, but needs comparisons against simpler enhancement approaches. [Paper](https://openaccess.thecvf.com/content/CVPR2025/papers/Khan_Perceptual_Video_Compression_with_Neural_Wrapping_CVPR_2025_paper.pdf) |\n\nThe frontier also includes [Spatiotemporal Diffusion Priors for Extreme Video Compression](https://cgl.ethz.ch/publications/papers/paperRel25b.php), PCS 2025, and the September 2026 [VoRTeC preprint](https://arxiv.org/html/2609.02291v1). These further rule out broad claims that general-video generative coding or accelerated diffusion decoding are unexplored. This is a targeted survey, not an exhaustive novelty clearance.\n\n**What could distinguish PointStream**\n\nMy strongest hypothesis is **object-specific fidelity and useful motion information in scenes where generic perceptual reconstruction is insufficient**. For example, a visually convincing hand that changes finger position or contact with an object can be worse for a task than a less attractive but geometrically faithful reconstruction.\n\n| Potential contribution | Evidence needed | Main prior-work obstacle |\n|---|---|---|\n| Egocentric hand/object interaction compression | Held-out workers/tasks; hand pose, object/contact fidelity, temporal consistency and whole-frame quality at matched total rate | Human semantic coding already exists; changing datasets alone is weak |\n| Multiple independently moving objects with camera motion | Stratified tests for object count, occlusion, entry/exit and camera movement; compare whole-frame and object-wise alternatives | General-video codecs already support diverse scenes; SEVC explicitly addresses emerging objects |\n| Reliable fallback when semantic reconstruction fails | Show how often fallback activates, its byte cost and quality benefit against fixed policies | Hybrid coding itself is established |\n| Joint visual and machine-useful representation | Separate reconstructed-video task performance from direct telemetry usefulness | Sparse2Dense already combines visual and geometric outputs |\n| Lower end-to-end resource cost | Equal-device measurements including extraction, coding, synthesis, startup and adaptation | GVC-RT and DCVC-RT are strong efficiency references |\n\nThese are **testable hypotheses**, not findings from the current PointStream evidence. I would not yet claim that no previous method addresses egocentric hands: targeted searches did not identify a directly matching codec, but that negative result is insufficient to establish priority.\n\n**The comparison plan I would use before September 30**\n\n1. **Choose one target setting.** If the current hand pipeline is the most mature, use egocentric hand/object footage. Do not simultaneously build a talking-head, tennis and manufacturing paper.\n2. **Attempt GLC-video and GVC-RT first**, using released models. They provide general-video comparisons without retraining a face model for an unrelated domain.\n3. **Pilot MTTF on its supported human domain**, then assess whether a target-domain comparison is meaningful. A face/body model failing on unseen hand-only footage is a domain-transfer result—not, by itself, proof of superior compression.\n4. **Add S²VC only after a bounded artifact smoke passes.** It supplies a current diffusion comparison but has larger model and environment requirements.\n5. **Retain AV1/VVC and a distortion-oriented neural anchor**, preferably the already-ready DCVC variant. Microsoft releases code/checkpoints for DCVC-FM, DCVC-RT and the newer DCVC-UF; FM/RT also connect directly to the papers above. [DCVC releases](https://github.com/microsoft/DCVC)\n6. **Include simple PointStream controls:** coded background plus coded foreground; reference/warp reconstruction without synthesis; and conventional video plus the same keypoint side channel. These reveal whether the gain comes from generation, bitrate allocation, or simply transmitting telemetry.\n\nFor every comparison, count references, masks, motion, background, residuals, refreshes and any sequence-specific model updates. If a model is trained on the test clip, either transmit its necessary parameters and count them, or explicitly evaluate a shared-model scenario with an equivalent allowance for competitors.\n\nMeasure **rate versus DISTS/LPIPS, temporal quality, task accuracy and latency**, while retaining PSNR/SSIM as fidelity diagnostics. Match frame count, resolution, color conversion, reference access and lookahead. Use an independent pose evaluator or annotations; agreement with the keypoint extractor used by the encoder is not independent ground truth.\n\n**My recommendation is a focused paper claim about a measured tradeoff in a defined content regime.** MTTF establishes the nearest semantic prior art; GLC-video and GVC-RT supply credible practical opponents. A consistent advantage against those methods on independently evaluated hand/object fidelity—or robustness at a comparable rate and latency—would be meaningful even if AV1 remains better on conventional whole-frame distortion.",
+              "phase": "final_answer"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "thread": {
+        "id": "01a0ce73-4593-7810-97cf-4a3ca34e117c",
+        "title": "Run foreground campaign",
+        "hostId": "remote-ssh-discovered:gpu3"
+      },
+      "page": {
+        "order": "newest_first",
+        "limit": 10,
+        "nextCursor": null,
+        "hasMore": false
+      },
+      "turns": [
+        {
+          "id": "01a0d1cb-c53b-72e2-844d-e4c6df94b208",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "01a0d1cb-c6ea-7f43-ae34-5e5f1de55dbc",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "1. test the existing tennis Animate Anyone checkpoint, then based on those results, suggest whether animate-anyone is worth any re-training (either overfitting to one video to test, or proper multi-video training to be actually used in pointstream).\n2. Are there other models that we should evaluate?\n3. I agree with your evaluation and plans for alcaraz, proceed with that.\n4. What do you mean that \"federer's court is weak\"? From a previous report, it had BG quality 26.38 against a baseline quality of 24.59 dB. It was the FG (16.16 dB) that brought it down. Did I miss something?\n\nAnalyze these points, and the documentation so far, and design a foreground campaign part 2, then implement it.\n"
+                }
+              ]
+            },
+            {
+              "type": "agentMessage",
+              "id": "msg_094a43c15523fd2d016ab4b8a72ae887d2879f728995e3a9fd",
+              "text": "**Foreground part 2 is complete. No Alcaraz point is claimable yet.** On the 48-frame clip, the source anchor is **65,149 B at 25.366 dB weighted PSNR**.\n\n| Alcaraz arm | Bytes | Weighted PSNR | Boundary |\n|---|---:|---:|---|\n| Best capped appearance + FG residual | 61,301 | 21.298 dB | 4.068 dB below anchor |\n| Appearance refresh every 6 visible frames | 78,706 | 22.167 dB | Over cap |\n| Cheapest temporal player color + alpha videos | 193,195 | 29.126 dB | Over cap |\n\nThe best capped row has FG **16.860 dB**, BG **31.653 dB**, and foreground residual clip fraction **0.0762**. Its sender took **126.5 s** versus **8.5 s** for the source; its recorded client time is **at least 53.5 s** versus **29.6 s**. That client figure omits the final residual addition and is a lower bound. The full byte and quality ledger is in the [part 2 campaign record](/home/itec/emanuele/pointstream/docs/workflow/session/evaluation-campaign/20260924-foreground-part2.md).\n\n**Animate Anyone:** The existing tennis checkpoint was tested at 20 steps on two separately coded players. On the same 16 frames and wire, it scored **12.26 dB FG**, versus **16.30 dB** for articulated paste. Shifted poses and swapped references made it worse, confirming that it used both inputs. Even a forbidden true-mask diagnostic reduced its FG score to **10.19 dB**. I recommend **neither exact-video overfitting nor a multi-video Animate Anyone retrain before 30 September**. That is a decision about this checkpoint and deadline, not a verdict on the model family; clip-specific fitted weights would also have to be charged as rate.\n\nFor another model evaluation, I would screen the **existing SPADE4Tennis checkpoint** on this same decoded wire first. A compact pose-conditioned flow and visibility model is the more promising training direction: it could reuse transmitted pixels and joints without diffusion inference, drawing on the [First Order Motion Model](https://arxiv.org/abs/2003.00196). Neither has a measured PointStream win yet.\n\n**Federer:** You did not miss the dominant foreground problem. The earlier **26.38 dB** was *background* PSNR, while **24.59 dB** was the source’s *weighted* score. The matching source background score was **31.36 dB**. On that earlier row, foreground accounts for about **72%** of the weighted deficit; “weak court” meant below its own background anchor.\n\nThe runners, focused tests, and campaign links are in the workspace. **11 tests and Ruff pass; 16 measured 48-frame rows passed byte-accounting checks.** Data remains outside the repo, and nothing was committed or pushed.",
+              "phase": "final_answer"
+            }
+          ]
+        },
+        {
+          "id": "01a0d1b9-85c5-7382-9ea1-3067371aa536",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "01a0d1b9-877d-7350-af0c-c2d94f2db520",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If overfitting to one video was not enough to push pix2pix to the performance we need, does that mean it's doomed? Should we try overfitting a different model, maybe animate-anyone? Where else can we look for a pointstream win?\n"
+                }
+              ]
+            },
+            {
+              "type": "agentMessage",
+              "id": "msg_094a43c15523fd2d016ab4aaea42e087d2af1257098b0634f7",
+              "text": "**Pix2Pix is not proven doomed.** The 21.45 dB result measures nonblack pixels in 256-pixel *training crops* using raw reference images and pre-rendered poses. The needed 22–25 dB figures are full-frame codec measurements using decoded wire inputs. They cannot be compared directly. What the fit does show is that this Pix2Pix recipe uses pose information, but four and a half hours of fitting one clip did not produce a rate-valid win: its clip-specific 208 MiB weights cannot be treated as a free general tennis model.\n\nI would **test the existing tennis Animate Anyone checkpoint before training it again**. It is already present, but its runtime expects an 18-joint pose representation while this bitstream sends COCO-17, and training is not wired into this campaign. Start with a short, explicitly diagnostic inference using the *decoded* appearance and transmitted joints. Measure foreground PSNR, clip fraction and client time against the articulated warp on the same frames. Only run the full 48-frame codec comparison if that screen shows a substantial gain. Its [published architecture](https://openaccess.thecvf.com/content/CVPR2024/papers/Hu_Animate_Anyone_Consistent_and_Controllable_Image-to-Video_Synthesis_for_Character_Animation_CVPR_2024_paper.pdf) uses reference, pose and temporal modules with staged training, so a fresh exact-video overfit is a costly next bet; visual quality alone would not establish the weighted-PSNR claim.\n\n**Alcaraz is the best near-term place to look for a PointStream win.** Its best row has about **11 kB spare**, but needs roughly **6 dB more foreground PSNR**. The object tracking check found that the warped alpha covers only about 42–52% of the true player pixels. I would first measure two encoder-side *oracles*: corrected player silhouettes and additional appearance refreshes. If either closes much of that 6 dB gap, code it and charge its actual bytes. A compact temporal appearance stream for **each player**, plus a reusable court, remains an object-centric PointStream configuration even without a neural generator. Learned dense motion and occlusion are another plausible route beyond one affine or piecewise warp, as illustrated by the [First Order Motion Model](https://arxiv.org/abs/2003.00196); their wire cost and PSNR still need measurement.\n\nFederer is harder because its court remains weak even after the background residual. Perricard’s chosen matched court is already **5,760 B over the source once the two required crops are sent**, before residuals. I would prioritize Alcaraz’s silhouette and appearance tests, use Animate Anyone as a bounded inference screen, and expand to another near-static development clip only if those tests identify a configuration worth transferring. Any resulting claim belongs to the specific measured regime and bitstream.",
+              "phase": "final_answer"
+            }
+          ]
+        },
+        {
+          "id": "01a0d1a1-4462-7712-bb6d-ae3027739cd0",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "01a0d1a1-46ea-75e2-ac65-647a7e56ed48",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "I woke up. Without interrupting any remaining task, what's the status?\n"
+                }
+              ]
+            },
+            {
+              "type": "agentMessage",
+              "id": "msg_094a43c15523fd2d016ab4a52930e487d292c165130270fbff",
+              "text": "Both compute jobs finished successfully. I left their monitors untouched.\n\n| Clip | Best PointStream weighted PSNR | Source anchor | Rate |\n|---|---:|---:|---:|\n| Alcaraz 000 | 21.16 dB | 25.37 dB | 54,125 B ≤ 65,149 B |\n| Federer 007 | 19.93 dB | 24.59 dB | 94,746 B ≤ 112,295 B |\n| Perricard 002 | No under-cap row | 27.19 dB | Two-crop minimum 110,242 B > 104,482 B |\n\n**No claimable point yet.** Separate-object articulated warping helped, but foreground quality remains too low. Perricard’s background did reproduce its exact 86,894 B size.\n\nPix2Pix completed 2,000 epochs. On its *raw training crops*, correct-pose object-pixel PSNR was **21.45 dB**, versus **10.01 dB** with shifted pose. That shows conditioning use; it is not a wire-conditioned codec score, and the clip-trained 208 MiB weights cannot be treated as free shared weights.\n\nThe full results and timing limits are in the [foreground retest](/home/itec/emanuele/pointstream/docs/workflow/session/evaluation-campaign/20260923-object-foreground-campaign.md) and [training diagnostic](/home/itec/emanuele/pointstream/docs/workflow/session/evaluation-campaign/20260923-overnight-training-campaign.md). Changes remain uncommitted.",
+              "phase": "final_answer"
+            }
+          ]
+        },
+        {
+          "id": "01a0d015-2b39-7bf1-be8d-890b4d666a20",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "01a0d015-2dc9-7da0-9224-00edae16bf66",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "1. Yes each foreground object must be encoded separately, I thought that was obvious and already done. If the two foreground players were encoded and warped together, of course their performance is bad, and we need to test them again as separate objects.\n2. use the transmitted joints for articulated or piecewise warping alongside the one affine transform, to see which performs better.\n3. Since time is of essence and I am going to sleep, design and start the training campaign too, so that when i wake up in 8 hours, we can compare these results as well. Does not need to be a full campaign, so evaluate whether it makes more sense to focus on one model and train that as much as possible, or evaluate every model available in a fast way, like by training them on the exact video they are supposed to generate, so that we can at least see if they are able to overfit to a good performance.\n\nGiven these points, prepare the new campaign documents, and then run them for 8 hours.\n"
+                }
+              ]
+            },
+            {
+              "type": "agentMessage",
+              "id": "msg_094a43c15523fd2d016ab44352ece487d2bdc79bec56599ecc",
+              "text": "The [separate-object foreground retest](/home/itec/emanuele/pointstream/docs/workflow/session/evaluation-campaign/20260923-object-foreground-campaign.md) and [overnight training diagnostic](/home/itec/emanuele/pointstream/docs/workflow/session/evaluation-campaign/20260923-overnight-training-campaign.md) are documented and running under eight-hour monitors.\n\nThe retest encodes each player separately, including Federer’s late entrant, and compares bbox, one affine transform, and articulated joint warping. Its first Alcaraz residual-off row is **32,212 B at 18.04 dB weighted PSNR**, versus the **25.37 dB** anchor; the joint and residual rows are still running.\n\nOne Pix2Pix model is fitting Perricard scene 002’s two tracks. It has written a checkpoint. This tests whether it can learn the clip; the clip-trained weights are content-specific and cannot count as free shared weights in a codec claim.\n\nThe monitors are scheduled to wake this task after eight hours for the per-clip results and checkpoint evaluation. Six focused tests, Ruff, and the GPU training smoke test passed. No commit or push was made.",
+              "phase": "final_answer"
+            }
+          ]
+        },
+        {
+          "id": "01a0cff3-fa45-70b1-88cb-babeb4c08b75",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "01a0cff3-fbd5-7043-a4f8-3084b80d7ad7",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Why is the foreground PSNR so low? Did we even use the generative models that we already have? If we did, they are pretty bad right now, so can the training campaign realistically improve them enough? Can you think of any other way for pointstream's foreground performance to improve enough to claim a point? \n"
+                }
+              ]
+            },
+            {
+              "type": "agentMessage",
+              "id": "msg_094a43c15523fd2d016ab4375773cc87d29cb9a5e029419af4",
+              "text": "**No generative model was used in this foreground campaign.** The COCO-17 arm used YOLO to *detect keypoints*, then applied one classical affine warp to the first AV1 crop. It never ran pix2pix, SPADE, or another image generator. The low scores are therefore evidence about this paste-and-warp baseline, not a measurement of the available generators.\n\nThe geometry is a major reason it fails. Alcaraz’s first crop encloses **two separate players**; only 4.3% of that large crop is foreground, yet one transform moves both players together. Federer has one main player, but the warped first-frame silhouette overlaps later target masks poorly. Mean bbox-warp alpha IoU was **0.142** on Alcaraz and **0.244** on Federer. The clipped residual then starts with 10–13% of foreground pixels outside its representable error range. I recorded this diagnosis in the [foreground campaign](/home/itec/emanuele/pointstream/docs/workflow/session/evaluation-campaign/20260923-foreground-campaign.md).\n\nTraining is worth the bounded test already scheduled, but **I would not rely on it alone for a claim by 30 September**. At each best measured row’s background quality, Alcaraz needs about **22.55 dB foreground** and reaches **16.21 dB**; Federer needs **23.82 dB** and reaches **16.16 dB**. Those are 6.34 and 7.66 dB gaps. The plan’s 2 dB improvement gate would show that a model helps; it would not establish a codec win. Earlier pix2pix results also lost to their paste control, though they used a different wire and cannot predict this exact test. See the [generation record](/home/itec/emanuele/pointstream/docs/areas/generation.md).\n\nThe strongest alternative I see is to **code players as separate, temporally predicted objects**: split Alcaraz’s two players into independent tracked crops, refresh their appearance when needed, and test an inter-coded crop sequence for Federer. The available foreground budgets are 40,501 B and 76,532 B respectively; whether this fits and reaches the targets must be measured. Temporal inter prediction is an established part of [VVC](https://www.itu.int/rec/T-REC-H.266). A smaller intermediate test is to use the transmitted joints for articulated or piecewise warping instead of one affine transform; flexible motion models address this kind of pose change, but offer [no guaranteed rate–distortion gain here](https://openaccess.thecvf.com/content/CVPR2022/html/Zhao_Thin-Plate_Spline_Motion_Model_for_Image_Animation_CVPR_2022_paper.html).\n\nI would judge the training checkpoint by **weighted PSNR, total bytes, and the new clip fraction**, then pursue separate-object temporal coding if it still misses. Simply lowering the clipped residual QP conflicts with the measured saturation rule.",
+              "phase": "final_answer"
+            }
+          ]
+        },
+        {
+          "id": "01a0ce73-7136-7b83-87a8-9c396a41d2b6",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "01a0ce73-7460-7c52-8616-fa1e78e53852",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "You are continuing PointStream, an object-centric semantic video codec aimed at an ACM TOMM submission on 30 September 2026. The encoder sends each salient object's appearance and motion, a reusable background, and an optional corrective residual. The client reconstructs frames from those pieces. Shared model weights stay out of the bitstream: they are a general tennis model, fetched in downtime, and are not counted as rate.\n\nThe paper's headline claims have to land where PointStream wins. Searching configurations is the method. Report which axes were tried, what each gave, and where the claim boundary is. A claimable point has weighted PSNR (0.7 foreground + 0.3 background) at least as high as the anchor, at no more bytes. Overall, foreground, and background PSNR are reported and do not decide. A faster decode with a worse picture is not a win. After a weighted tie or win at no more bytes, say whether the sender, the client, or both are faster than the baseline. Sender time includes an offline plate build. Client time is decode plus that arm's render.\n\nThese campaigns exist to find that point before the deadline, one stage at a time. The background campaign is finished and is on main as commit b2a69c9. This session is the foreground campaign only: appearance, motion, and residuals on the backgrounds already chosen. Do not re-encode backgrounds except the three QP 46 decodes named below, and only because those decoded pixels were not saved. Do not run a 192-frame window. Do not train a generator in this session. Training is the campaign after this one, and it starts only once this session has logged residual\\_clip\\_fraction on the paste baseline. Do not reopen the WebP-plate ladder, motion packing, or held-out confirmation.\n\nWork from main. Do not switch to feat/measured-rate-ladder and do not read /home/itec/emanuele/pointstream-measured-ladder. That branch is already checked out in another worktree. Before any code or document read, in this checkout run:\n\ngit fetch origin\ngit checkout main\ngit pull --ff-only origin main\ngit rev-parse HEAD\n\nStop if that SHA is not b2a69c9 or a descendant of it. An older main does not contain the campaign. The required tree has docs/workflow/session/evaluation-campaign/20260923-background-campaign.md and experiments/modular/background\\_campaign.py.\n\nRead first:\n\n\\- docs/workflow/session/evaluation-campaign/20260923-background-campaign.md\n&#x20; This is the background record. Trust it over older area notes. The section \"What the foreground campaign inherits\" is the assignment.\n\\- docs/workflow/session/evaluation-campaign/20260923-development-campaign.md\n&#x20; Step 2 is this session. Steps 3 and 4 are later. The claim and latency rules at the top still apply.\n\\- docs/areas/generation.md\n&#x20; The 21 September ceilings are a proposal against a withdrawn byte table. Do not treat 35.8 dB or a 12 kB wire cap as a pass rule for this campaign.\n\\- Code: experiments/modular/background\\_campaign.py and experiments/modular/background\\_arms.py for how backgrounds were built and scored. experiments/modular/measured\\_ladder.py for load\\_sequence, score\\_regions, AV1 crops at QP 42, and the VVC round trip. src/components/background/still.py for select\\_best\\_background\\_frame. src/pipeline/residual/lossy.py for residual\\_clip\\_fraction.\n\nRaw rows, outside the repo: /home/itec/emanuele/pointstream-data/outputs/modular/background-arms/ (federer007.json, federer007-matched.json, alcaraz000.json, perricard002.json). Plate caches, which are the encoder inputs and not the decodes: that directory's cache/ (federer007-n48.npz, alcaraz000-n48.npz, perricard002-n48.npz). Each npz holds cleaned, plate, and homographies. Frames and masks\\_48.npz live under /home/itec/emanuele/pointstream-data/outputs/bp46-long-scenes/clips/.\n\nThe QP 46 decoded pixels were not saved. The encodes ran in temporary directories. Regenerating them is approved. Re-encode only these three from the existing caches, using the same ffmpeg n7.1.1, VVC preset faster, and the same color path as background\\_campaign.py. Do not rebuild the plates.\n\n\\- Perricard scene 002: cleaned video, QP 46. Must be 86,894 B.\n\\- Alcaraz scene 000: registered panorama, QP 46. Must be 24,648 B.\n\\- Federer scene 007: registered panorama, QP 46. Must be 35,763 B.\n\nIf a new file size does not match, stop that clip and say so. Do not composite on a decode whose byte count moved.\n\nRun three handoffs, as three separate bitstreams, not one averaged result. Same measurements on each: one AV1 intra QP 42 crop through bbox motion, a second arm through COCO-17 keypoints, then foreground-only, background-only, both, and neither residuals. Recompute them on these backgrounds. Do not reuse the old WebP-plate appearance numbers.\n\n1\\. Large. Alcaraz–Perricard scene 002, foreground fraction 0.0299. Background: plate-inpainted VVC video, QP 46, 86,894 B, court matched to the 104,482 B source, 17,588 B left. Foreground has to match about 24.9 dB.\n2\\. Medium. Alcaraz scene 000, foreground fraction 0.0051. The camera is nearly still. Background: registered panorama, QP 46, 24,648 B, court 32.33 dB versus the source 33.84 dB, 40,501 B left. Foreground has to reach about 22.4 dB (+0.65 dB).\n3\\. Small. Federer scene 007, foreground fraction 0.0029. The camera pans. Background: registered panorama, QP 46, 35,763 B, court 23.15 dB versus the source 31.36 dB, 76,532 B left. Foreground has to reach about 25.2 dB (+3.5 dB). The inpainted video on this clip leaves 4,103 B and is not the background to composite.\n\nFederer scene 001 repeats the small band. Skip it. A claim on one clip does not transfer to the others. Report each bitstream on its own.\n\nHeadroom-study player areas are a different mask from masks\\_48.npz. Do not copy those areas or their BD-rate savings into this table. The old WebP-plate ladder's one AV1 crop plus boxes was about 2.4 kB with foreground around 14 dB, and a classical COCO-17 warp reached about 15 dB, on a different plate and mostly on Federer scene 007. Those numbers are a warning that a warp starts far below 22–25 dB, not a measurement of these bitstreams.\n\nFor each handoff:\n\n\\- Charge appearance, motion, and side data. Total is T = B + F + M + R + H, each byte once.\n\\- Coarsen the foreground residual first, then the background residual, until total bytes are at or under the anchor. Keep the residual-off point.\n\\- Log residual\\_clip\\_fraction on the foreground residual before any later training. Above 0.05 means do not buy a finer quantizer. The model has to shrink the error. Do not start that training here.\n\\- If both residuals off still exceed the anchor, cut appearance to the single crop. If that still does not fit, the background choice was wrong. Say so and stop that clip.\n\\- Score with score\\_regions and the same masks\\_48.npz as the anchor. Report overall, foreground, background, and weighted PSNR. Weighted decides. Record encoder path and version, and encode and decode seconds separately.\n\\- A claimable point is weighted PSNR at least the anchor's at no more bytes. Then add the latency sentence.\n\nImplementation constraints already paid for:\n\n\\- Data stays outside the repo. No assets/ or outputs/ symlinks. Do not commit or push unless asked.\n\\- Python is /home/itec/emanuele/.conda/envs/pointstream/bin/python. Do not pip install. A script's directory is sys.path[0], so put the repo root on sys.path before importing src.\n\\- load\\_sequence returns RGB. The intra sidecar treats its input as BGR. Video round-trips in measured\\_ladder return BGR. Swap channels on the last axis only. A slice of [:, :, ::-1] on a 4D clip reverses width, not channels, and invalidates PSNR.\n\\- libvvenc through ffmpeg can exit 0 with an empty file. The direct /opt/local/bin/vvencapp 1.11.0 fallback in the measured ladder is the one that produced the background rows. Do not treat an empty file as a measurement.\n\\- AV1 intra on a small crop must be padded to at least 64 and a multiple of 8.\n\\- The full runner skips generation when a supplied crop is set, and it cannot correctly do generation-on and residual-off together. These foreground numbers are a probe, not a full-runner launch, until a point wins.\n\\- Reuse the 48-frame plate caches. A 192-frame plate was killed after 45 minutes and was not saved. Do not rebuild it.\n\\- Encodes are CPU. Check a free GPU only if you are about to train, which you are not.\n\nWrite the results into one foreground campaign document next to the background campaign, and point the development campaign's Step 2 at it. Do not leave the numbers only in chat. Report, per clip: bytes by component, weighted PSNR against that clip's source anchor, whether it is a claimable point, the clip fraction, and encode and decode time versus the source.\n"
+                }
+              ]
+            },
+            {
+              "type": "agentMessage",
+              "id": "msg_094a43c15523fd2d016ab3e3d66d3887d2ad1858d6e722310e",
+              "text": "The foreground campaign is recorded in [the campaign document](/home/itec/emanuele/pointstream/docs/workflow/session/evaluation-campaign/20260923-foreground-campaign.md), with Step 2 linked to it. **No claimable point was found.**\n\n| Clip and best measured arm | Bytes (B + F + M + R + H) | PSNR: overall / FG / BG / weighted | Source weighted | Foreground residual clip fraction | Encode / decode vs source |\n|---|---:|---|---:|---:|---|\n| Alcaraz 000, bbox, both residuals QP 54 | 24,648 + 19,301 + 384 + 12,547 + 2,050 = **58,930** | 31.19 / 16.21 / 31.94 / **20.93 dB** | 25.37 dB | 0.1088 | 23.69 / 61.66 s vs 8.46 / 29.58 s |\n| Federer 007, COCO-17, both residuals QP 54 | 35,763 + 1,962 + 5,280 + 36,014 + 356 = **79,375** | 26.29 / 16.16 / 26.38 / **19.23 dB** | 24.59 dB | 0.1248 | 33.35 / 62.06 s vs 10.17 / 29.73 s |\n\nBoth points fit their own source byte caps but miss weighted quality. Their plate-inclusive sender and decode-plus-render client times are also slower than the source; the residual-row runtime totals are lower bounds because residual preparation and addition were not separately timed. Clip fractions exceeded 0.05, so the residual search used coarse QPs 54 and 62.\n\n**Perricard 002 stopped before compositing:** its regenerated background was 87,186 B versus the required 86,894 B. No foreground score or residual clip fraction was assigned to that clip.\n\nThe [raw per-clip records](/home/itec/emanuele/pointstream-data/outputs/modular/foreground-campaign/) contain every residual-off, foreground-only, background-only, and paired row. Byte ledgers, weighted decisions, document tables, alpha transport, and scoring equivalence passed validation. No generator was trained, and nothing was committed or pushed.",
+              "phase": "final_answer"
+            }
+          ]
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "max_img_size": 1280,
+    "seconds": 488.4,
+    "inside_mae_vs_1080p": 23.588,
+    "outside_mae_vs_1080p": 3.282
+  },
+  {
+    "max_img_size": 960,
+    "seconds": 57.0,
+    "inside_mae_vs_1080p": 37.354,
+    "outside_mae_vs_1080p": 4.027
+  }
+]

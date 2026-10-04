@@ -1,0 +1,14 @@
+{
+  "source": "/Users/manu/Desktop/6a2957b406960e27e1129489 git show 05ffd90a711a537b5053c5f76eaf64a36e7cb89f:GenStream/main.tex",
+  "sha256": "7393787fe83c6039d7b6099bf3f0eb423fb094f09a65036c6b221962e7426239",
+  "verification": "Primary text supports 30fps/50s/5.8Mbps,17 two-coordinate11bit landmarks, seven32bit extrinsic camera values, and excludes initial venue/model assets. Four bbox coordinates remain an explicit analytical assumption rather than fixed wire certification. Data export is marked partially implemented; no measured complete stream recertified.",
+  "derivedArithmetic": {
+    "landmarkBitsPerFrame": 374,
+    "cameraBitsPerFrame": 224,
+    "bboxBitsPerFrameAssumingFourCoordinates": 44,
+    "continuousBitsPerSecondAt30fps": 19260,
+    "relativeReductionVs5800000bps": 0.9966793103448276,
+    "nominal50secondHEVCBytes": 36250000
+  },
+  "additionalPrimaryCorroboration": "GenStream historical manuscript lines358/432 explicitly retains largest detected human/bounding box per frame. This supports single-actor selection limitation, not an exhaustive audited software absence claim."
+}

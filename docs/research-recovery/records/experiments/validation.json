@@ -1,0 +1,33 @@
+{
+  "artifact_captures": 297,
+  "delegation": "modern worker Luna xhigh; second worker rejected thread limit; parent completed legacy/global shard",
+  "families": 179,
+  "fleet_dispatches": 153,
+  "followup_hashes_match": true,
+  "metadata_complete": 169,
+  "metadata_pruned": 10,
+  "negative_searches": [
+    "/home/itec/emanuele/pointstream-data/jobs/neural-bg/grid-smokes/report.json"
+  ],
+  "no_execution": "no GPU/native/training/preprocessing/job intervention; JSON arithmetic only",
+  "unique_contents": 284,
+  "json_files_parse_checked": 68,
+  "link_or_json_errors": [],
+  "legacy_timestamp_summaries": 52,
+  "legacy_timestamp_measurement_failure_or_null": 27,
+  "legacy_timestamp_unresolved_scored": 25,
+  "legacy_timestamp_declared_scored_count_flags": 31,
+  "legacy_timestamp_four_component_balance_flags": 8,
+  "modern_targeted_original_reports": 16,
+  "modern_targeted_original_total_bytes": 351216,
+  "modern_original_retained_hashes_match": true,
+  "modern_worker_finalization": "worker usage limit; lead reconciled persisted originals and finished without further remote searches",
+  "final": true,
+  "report_capture_hashes_checked": 297,
+  "family_count": 179,
+  "unique_family_count": 179,
+  "fleet_unique_dispatch_ids": 153,
+  "fleet_literal_output_family_joins": 51,
+  "retrieved_staging_aliases": "three flat E04A staging copies excluded; their canonical non-r2/r2 originals are indexed",
+  "no_source_edit_or_tests": "retrospective record/CPU saved-value analysis only; runtime tests not applicable"
+}

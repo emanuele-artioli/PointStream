@@ -1,0 +1,57 @@
+{
+  "video": "alcaraz_highlights",
+  "scenes": [
+    "scene_000",
+    "scene_010"
+  ],
+  "frames_per_scene": 8,
+  "n_rungs": 1,
+  "codec": "av1",
+  "preset": "10",
+  "anchor_low_delay_args": [],
+  "background": {
+    "method": "panorama-full",
+    "stream_codec": "av1",
+    "stream_crf": 38,
+    "keyframe_interval": 0,
+    "reference_mode": "last"
+  },
+  "bounds_file": "/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/bounds-before-run.json",
+  "rows": [
+    {
+      "rung": "q30/qp55",
+      "rank": 0,
+      "anchor": {
+        "joint_bytes": 154891,
+        "separate_bytes": 181578,
+        "joint_over_separate": 0.853,
+        "psnr_y_dB": 38.229117893129725,
+        "psnr_rgb_dB": 36.47739697622565,
+        "seconds": 26.1,
+        "n_frames": 16,
+        "extra_args": []
+      },
+      "pointstream": {
+        "coded_bytes": 643734,
+        "psnr_y_dB": 39.3032239744612,
+        "psnr_rgb_dB": 37.1186681700856,
+        "is_rate": true,
+        "raw_parts": [],
+        "parts": {
+          "residual": 26768,
+          "panorama": 568954,
+          "actor_reference": 44479,
+          "metadata": 3533
+        },
+        "background_share": 0.8838,
+        "n_chunks": 2,
+        "precodec_vs_delivered_dB": 43.93487295553263,
+        "seconds": 534.1
+      }
+    }
+  ],
+  "alarms": [
+    "q30/qp55: background is 88.4% of the payload, still in the 88-91% band it occupied with a fresh plate per scene. The stream is not reaching the ledger \u2014 the amortisation would be configured, reported and absent."
+  ],
+  "reading_note": "Two anchor arms at every rung. `anchor` is unconstrained and is the harder, primary comparison. `anchor_low_delay` is constrained the way PointStream's background stream is, which on this host costs SvtAv1EncApp +38% \u2014 so it is the latency-matched question, not the fair-by-default one, and reporting it alone would hand PointStream that 38%. Both are ONE encode over the concatenated scenes; `separate_bytes` is the control proving the anchor predicted across the joins. Quality is Y-PSNR on delivered_frames for PointStream and on the decoder's output for the anchor. Few scenes on one video is a configuration measurement, not a claim."
+}

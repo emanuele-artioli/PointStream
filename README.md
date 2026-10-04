@@ -44,25 +44,23 @@ This test constructs a small synthetic clip, drives each shipped tier configurat
 
 ## Real-Data Workflow
 
-Read [the setup guide](docs/setup.md), inspect the fleet, and launch a bounded job from the Mac. For example, use the pinned remote Python and write the result under the unique remote job directory:
+Read [the setup guide](docs/setup.md), check existing jobs and inspect the complete compatible fleet pool. Submit an immutable job specification with a representative smoke, workload-specific validator, saved full estimate, budget and absolute deadline:
 
 ```bash
-python -m experiments.jobs.fleet inspect --hosts gpu1 gpu2 gpu3 gpu4 gpu5 gpu6
-python -m experiments.jobs.fleet launch --hosts gpu5 gpu6 \
-  --gpu-memory-mib 12000 --cpu-threads 8 --budget-hours 2 \
-  --require-path /home/itec/emanuele/pointstream-data/assets/dataset/alcaraz_highlights/segmentations/scene_000 \
-  --require-path /home/itec/emanuele/pointstream-data/outputs/bp21-headroom/clips/alcaraz_highlights/scene_000/window \
-  -- /home/itec/emanuele/.conda/envs/pointstream/bin/python -c \
-  'import os; from experiments.tier.run import main; raise SystemExit(main(["--tiers", "fast", "--frames", "8", "--out", os.path.join(os.environ["PS_JOB_DIR"], "report.json")]))'
+scripts/ps-fleet status
+scripts/ps-fleet inspect
+scripts/ps-fleet submit /absolute/external/data/job.json
+scripts/ps-fleet status JOB_ID
+scripts/ps-fleet events JOB_ID
 ```
 
-The command snapshots `HEAD`; pass `--include-change PATH` or `--include-untracked PATH` only for source files that belong in the experiment. Use the returned job ID with `fleet status` or `fleet cancel`. The local coordinator can retrieve result files from the reported remote run directory with `scp`. Details and limits are in [docs/workflow/long-jobs.md](docs/workflow/long-jobs.md).
+[Long jobs](docs/workflow/long-jobs.md) defines the specification and recovery procedure. Submission freezes the selected revision and explicit local changes. Smoke validation and identity/budget checks gate automatic full execution. Connection failures are per host; uncertain jobs are never replayed.
 
 ---
 
 ## Output Locations
 
-- **Run Artifacts & Metrics**: Remotely supervised job files are stored under `$PS_DATA_ROOT/jobs/fleet/runs/<job-id>/`; datasets and older experiment outputs remain under the external data root.
+- **Run Artifacts & Metrics**: Shared requests, snapshots and results are stored under `$PS_DATA_ROOT/jobs/fleet/inbox/<job-id>/`; datasets and older experiment outputs remain under the external data root.
 - **Logs**: Each remote run keeps `command.log`, `status.json`, monitor state, the dispatch manifest, and outputs alongside the run record. A compact manifest is also stored on the coordinator.
 
 ---
@@ -80,7 +78,9 @@ The command snapshots `HEAD`; pass `--include-change PATH` or `--include-untrack
 └── docs/                   # Architecture, area documents, roadmap, and history
     ├── setup.md            # Local coordination, remote fleet, and data setup
     ├── roadmap.md          # Submission gates A through E
-    ├── areas/              # Current state and next actions by functional area
+    ├── research/           # Qualified current evidence index and historical preparation
+    ├── research-recovery/  # Source-backed historical dossier and provenance
+    ├── areas/              # Retained historical notes by functional area
     ├── history/            # Pull request index, findings/retraction log, retired docs
     └── workflow/           # Experiment procedures and long-job dispatch
 ```
@@ -88,3 +88,5 @@ The command snapshots `HEAD`; pass `--include-change PATH` or `--include-untrack
 For overnight runs, use [script-based monitoring and bounded codec pilots](docs/workflow/long-jobs.md).
 
 Storage uses the three roots `pointstream`, `Datasets`, and `Models`; see [storage layout and migration](docs/workflow/storage-layout.md) for path configuration, model repositories/checkpoints, compatibility, and the pending attended cutover.
+
+Start scientific review at the [research index](docs/research/README.md), which separates current qualification from historical records.

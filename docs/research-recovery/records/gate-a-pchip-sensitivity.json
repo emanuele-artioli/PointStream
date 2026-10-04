@@ -1,0 +1,47 @@
+{
+  "source": "gpu3:/home/itec/emanuele/pointstream-data/outputs/gate-a-vvc-webp-n96-run2/report.json",
+  "sha256": "71d82a51c6bf831c6a336d12a2cb05b1496912caa17a702b9e490f28380d939a",
+  "kind": "CPU interpolation sensitivity analysis of stored scores",
+  "method": "monotone PCHIP log10(bytes) versus VMAF over true overlapping intervals; different from historical cubic",
+  "comparisons": [
+    {
+      "codec": "av1",
+      "access": "continuous",
+      "interval": [
+        83.641753,
+        72.204183
+      ],
+      "has_overlap": false
+    },
+    {
+      "codec": "av1",
+      "access": "segmented",
+      "interval": [
+        85.405821,
+        72.204183
+      ],
+      "has_overlap": false
+    },
+    {
+      "codec": "vvc",
+      "access": "continuous",
+      "interval": [
+        8.41209,
+        72.204183
+      ],
+      "has_overlap": true,
+      "pchip_bd_rate_percent": 14.088474933730776
+    },
+    {
+      "codec": "vvc",
+      "access": "segmented",
+      "interval": [
+        8.618246,
+        72.204183
+      ],
+      "has_overlap": true,
+      "pchip_bd_rate_percent": 13.878769936356171
+    }
+  ],
+  "limitations": "Not new codec evidence; source/receiver/metric provenance must be checked separately. Do not silently replace historical cubic results."
+}

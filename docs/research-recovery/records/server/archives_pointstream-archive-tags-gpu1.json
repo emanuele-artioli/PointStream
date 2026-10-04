@@ -1,0 +1,136 @@
+{
+  "host": "gpu1",
+  "root": "/home/itec/emanuele/pointstream",
+  "source": "current `git for-each-ref` on gpu1",
+  "tag_count": 16,
+  "tags": [
+    {
+      "objectname": "9d563030492efef350a4505c7e71ad449bea1ada",
+      "objecttype": "commit",
+      "peeled_objectname": null,
+      "peeled_objecttype": null,
+      "points_to_commit": true,
+      "refname": "refs/tags/archive/20260916/codex/eval-e01"
+    },
+    {
+      "objectname": "0fd9f92c4c45f24502cd477a4f4b7d01e9074836",
+      "objecttype": "commit",
+      "peeled_objectname": null,
+      "peeled_objecttype": null,
+      "points_to_commit": true,
+      "refname": "refs/tags/archive/20260916/codex/eval-e02"
+    },
+    {
+      "objectname": "60c52a8510b531317ea5fa487ddc0f07c0e2fdfa",
+      "objecttype": "commit",
+      "peeled_objectname": null,
+      "peeled_objecttype": null,
+      "points_to_commit": true,
+      "refname": "refs/tags/archive/20260916/codex/eval-next-probes"
+    },
+    {
+      "objectname": "287c2eb1785ae5abdb90b3e5e2ea00a1c57fb244",
+      "objecttype": "commit",
+      "peeled_objectname": null,
+      "peeled_objecttype": null,
+      "points_to_commit": true,
+      "refname": "refs/tags/archive/20260916/codex/eval-r0"
+    },
+    {
+      "objectname": "0fba01bdc2630b1719efa7f39d087ee0c4aba775",
+      "objecttype": "commit",
+      "peeled_objectname": null,
+      "peeled_objecttype": null,
+      "points_to_commit": true,
+      "refname": "refs/tags/archive/20260916/codex/eval-wave0-review"
+    },
+    {
+      "objectname": "4b1eca48738408a6806e4f8f3c6ec6ddfb100ca8",
+      "objecttype": "commit",
+      "peeled_objectname": null,
+      "peeled_objecttype": null,
+      "points_to_commit": true,
+      "refname": "refs/tags/archive/20260916/codex/evaluation-campaign-20260914"
+    },
+    {
+      "objectname": "d3e81cf856ec894e3bb2b8fdf4054738d8110369",
+      "objecttype": "commit",
+      "peeled_objectname": null,
+      "peeled_objecttype": null,
+      "points_to_commit": true,
+      "refname": "refs/tags/archive/20260916/codex/evaluation-handoff-20260915"
+    },
+    {
+      "objectname": "cc442b6967d30f55b176e4c23caffa7fe903e053",
+      "objecttype": "commit",
+      "peeled_objectname": null,
+      "peeled_objecttype": null,
+      "points_to_commit": true,
+      "refname": "refs/tags/archive/20260916/codex/evaluation-handoff-20260916"
+    },
+    {
+      "objectname": "c9b4b3a03582c12a62e7510916ec1fd1db2c0ba0",
+      "objecttype": "commit",
+      "peeled_objectname": null,
+      "peeled_objecttype": null,
+      "points_to_commit": true,
+      "refname": "refs/tags/archive/20260916/codex/interrupted-checkout-preservation"
+    },
+    {
+      "objectname": "9d563030492efef350a4505c7e71ad449bea1ada",
+      "objecttype": "commit",
+      "peeled_objectname": null,
+      "peeled_objecttype": null,
+      "points_to_commit": true,
+      "refname": "refs/tags/archive/20260916/codex/pr104-acceptance-fix"
+    },
+    {
+      "objectname": "287c2eb1785ae5abdb90b3e5e2ea00a1c57fb244",
+      "objecttype": "commit",
+      "peeled_objectname": null,
+      "peeled_objecttype": null,
+      "points_to_commit": true,
+      "refname": "refs/tags/archive/20260916/codex/pr108-acceptance-fix"
+    },
+    {
+      "objectname": "1dc169ee254182af6d3d0c8fe995dea4df848116",
+      "objecttype": "commit",
+      "peeled_objectname": null,
+      "peeled_objecttype": null,
+      "points_to_commit": true,
+      "refname": "refs/tags/archive/20260916/stash-dynamic-thresholding"
+    },
+    {
+      "objectname": "a24c284a818e2c726e09e09e8e9225351c1c011b",
+      "objecttype": "commit",
+      "peeled_objectname": null,
+      "peeled_objecttype": null,
+      "points_to_commit": true,
+      "refname": "refs/tags/archive/20260916/stash-handoff-bp21"
+    },
+    {
+      "objectname": "ecc4da2fbcd84f674ce22f62e720c84804116f28",
+      "objecttype": "commit",
+      "peeled_objectname": null,
+      "peeled_objecttype": null,
+      "points_to_commit": true,
+      "refname": "refs/tags/archive/20260916/stash-interrupted-pull-aug26"
+    },
+    {
+      "objectname": "daf705832cc9877cbbaae129e982d85afe522b73",
+      "objecttype": "commit",
+      "peeled_objectname": null,
+      "peeled_objecttype": null,
+      "points_to_commit": true,
+      "refname": "refs/tags/archive/20260916/stash-march26-test"
+    },
+    {
+      "objectname": "29cf2a5bad93a2852191588fa2a74c9bbc8e1fe0",
+      "objecttype": "commit",
+      "peeled_objectname": null,
+      "peeled_objecttype": null,
+      "points_to_commit": true,
+      "refname": "refs/tags/archive/20260916/stash-pr104-interrupted"
+    }
+  ]
+}

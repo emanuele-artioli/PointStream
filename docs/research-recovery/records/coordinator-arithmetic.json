@@ -1,0 +1,57 @@
+{
+  "kind": "derived CPU arithmetic check of stored observations; no frame rescoring or native decode",
+  "bp21": {
+    "source": "gpu3:/home/itec/emanuele/pointstream-data/outputs/bp21-headroom/report.json",
+    "sha256": "b6f8b8463c73f7d3a54a918b677bdb5b1e18ae7cf789490c900e023fa1d21240",
+    "fg_plate_scene_summary_checks": [
+      {
+        "codec": "avc",
+        "n": 8,
+        "mean_saving_percent": 17.019005259653262,
+        "scene_se_percent": 3.1304749388615605,
+        "stored_mean": 0.17019005259653264,
+        "stored_se": 0.03130474938861561,
+        "matches_stored": true
+      },
+      {
+        "codec": "hevc",
+        "n": 8,
+        "mean_saving_percent": 18.290774081183464,
+        "scene_se_percent": 3.4172048882098176,
+        "stored_mean": 0.18290774081183464,
+        "stored_se": 0.034172048882098176,
+        "matches_stored": true
+      },
+      {
+        "codec": "av1",
+        "n": 8,
+        "mean_saving_percent": 15.4317695152698,
+        "scene_se_percent": 2.812721441488246,
+        "stored_mean": 0.154317695152698,
+        "stored_se": 0.028127214414882463,
+        "matches_stored": true
+      },
+      {
+        "codec": "vvc",
+        "n": 8,
+        "mean_saving_percent": 14.20359680707769,
+        "scene_se_percent": 2.555206777697064,
+        "stored_mean": 0.1420359680707769,
+        "stored_se": 0.02555206777697064,
+        "matches_stored": true
+      }
+    ],
+    "interpretation": "altered-target diagnostic, not PointStream gain; scene SE is original unit, not match-level uncertainty"
+  },
+  "je10": {
+    "source": "gpu3:/home/itec/emanuele/pointstream-data/outputs/journal-20260924/je10/alcaraz000-je10-winning-result.json",
+    "sha256": "1cac287bc1bd84b3d6db650234068748c576a4aef0e9e27eb47b766f60895249",
+    "component_sum": 64840,
+    "stored_total": 64840,
+    "slack": 309,
+    "nominal_saving_percent": 0.4742973798523385,
+    "candidate_weighted_dB": 26.589329999999997,
+    "anchor_weighted_dB": 25.36639,
+    "interpretation": "arithmetic agrees with stored narrow weighted point; this does not establish full persisted wire/receiver correctness, baseline parity, unseen-source eligibility or a curve advantage; later source/metric audits must govern eligibility"
+  }
+}

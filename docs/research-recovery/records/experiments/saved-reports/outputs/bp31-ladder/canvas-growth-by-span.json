@@ -1,0 +1,85 @@
+{
+  "video": "alcaraz_highlights",
+  "rows": [
+    {
+      "span": 8,
+      "scene_000": [
+        2161,
+        3841,
+        3
+      ],
+      "scene_010": [
+        2161,
+        3841,
+        3
+      ],
+      "match": true,
+      "scene_000_area_vs_frame": 1.0007,
+      "scene_010_area_vs_frame": 1.0007
+    },
+    {
+      "span": 16,
+      "scene_000": [
+        2161,
+        3841,
+        3
+      ],
+      "scene_010": [
+        2161,
+        3841,
+        3
+      ],
+      "match": true,
+      "scene_000_area_vs_frame": 1.0007,
+      "scene_010_area_vs_frame": 1.0007
+    },
+    {
+      "span": 24,
+      "scene_000": [
+        2161,
+        3841,
+        3
+      ],
+      "scene_010": [
+        2172,
+        3881,
+        3
+      ],
+      "match": false,
+      "scene_000_area_vs_frame": 1.0007,
+      "scene_010_area_vs_frame": 1.0163
+    },
+    {
+      "span": 32,
+      "scene_000": [
+        2161,
+        3841,
+        3
+      ],
+      "scene_010": [
+        2189,
+        3919,
+        3
+      ],
+      "match": false,
+      "scene_000_area_vs_frame": 1.0007,
+      "scene_010_area_vs_frame": 1.0343
+    },
+    {
+      "span": 48,
+      "scene_000": [
+        2161,
+        3841,
+        3
+      ],
+      "scene_010": [
+        2190,
+        3932,
+        3
+      ],
+      "match": false,
+      "scene_000_area_vs_frame": 1.0007,
+      "scene_010_area_vs_frame": 1.0382
+    }
+  ]
+}

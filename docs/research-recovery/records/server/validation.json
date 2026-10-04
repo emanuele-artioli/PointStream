@@ -1,0 +1,19 @@
+{
+  "source_snapshot_records": 38,
+  "source_snapshot_local_sha256_verified": 38,
+  "source_snapshot_capture_exit_status_zero": 38,
+  "source_snapshot_unique_content_hashes": 33,
+  "canonical_tracked_diff_bytes": 885408,
+  "canonical_tracked_diff_file_sections": 104,
+  "tests": "No source changes or compute; validation consisted of inventory parsing, selected source hash checks, SSH capture status, shared mount identity and provenance schema verification. Existing run results were not recomputed.",
+  "machine_readable_artifacts_parse_verified": 24,
+  "domain_record_links_missing": [],
+  "output_source_map_rows": 179,
+  "fleet_snapshot_records_verified": 157,
+  "fleet_command_records_verified": 153,
+  "output_source_map_statuses_verified": {
+    "complete": 169,
+    "complete_with_pruned_media_dirs": 10
+  },
+  "targeted_reports_not_copied": 2
+}

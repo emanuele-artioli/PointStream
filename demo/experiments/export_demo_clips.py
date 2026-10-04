@@ -12,6 +12,7 @@ import logging
 import os
 import shutil
 import sqlite3  # noqa: F401
+import uuid
 import sys
 from pathlib import Path
 
@@ -24,6 +25,7 @@ import torch
 
 from demo.evaluation.evaluate_robotics_teleop import score_pose_tracks
 from demo.evaluation.pose_backends import BACKENDS
+from demo.experiments.clip_identity import CLIP_IDS, check_output_paths, load_clip_manifest
 from demo.experiments.run_comparison import POINTSTREAM_TIERS, reconstruct_pointstream_video
 from demo.models.dataset import build_curated_samples
 from demo.models.hand_objective import composite_hand_metrics, selection_min
@@ -34,6 +36,7 @@ from demo.pipeline.hand_keypoints import serialize_poses_to_json
 from demo.pipeline.keypoint_compressor import KeypointCompressor
 from demo.pipeline.maps.av1_crf import AV1_LADDER, encode_av1_crf
 from demo.pitch.export_av1_web import transcode as web_transcode
+from src.contracts.paths import data_root, model_asset
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
@@ -186,11 +189,17 @@ def process_clip(
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    job_root = os.environ.get("PS_JOB_DIR")
+    stage_root = os.environ.get("PS_STAGE_DIR")
+    run_root = (Path(stage_root) if stage_root else
+                Path(job_root) / "artifacts" / os.environ.get("PS_STAGE", "local") if job_root else
+                data_root() / "jobs" / "demo-rebuild" / uuid.uuid4().hex)
     parser.add_argument("--curated-dir", type=Path, required=True)
-    parser.add_argument("--checkpoint", type=Path, default=Path("demo/outputs/models/overfit_generator.pt"))
-    parser.add_argument("--work", type=Path, default=Path("demo/outputs/results/demo_rebuild"))
-    parser.add_argument("--pitch", type=Path, default=Path("demo/outputs/pitch"))
-    parser.add_argument("--out", type=Path, default=Path("demo/outputs/results/demo_streams.json"))
+    parser.add_argument("--source-manifest", type=Path, help="Reviewed rows with explicit clip_id, path and source sha256; defaults to curated-dir/manifest.json")
+    parser.add_argument("--checkpoint", type=Path, default=model_asset("demo/overfit_generator.pt", legacy=REPO_ROOT / "demo/outputs/models/overfit_generator.pt"))
+    parser.add_argument("--work", type=Path, default=run_root / "work")
+    parser.add_argument("--pitch", type=Path, default=run_root / "pitch")
+    parser.add_argument("--out", type=Path, default=run_root / "report.json")
     parser.add_argument("--frames", type=int, default=300)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--mask-video", type=Path, default=None, help="SAM mask for clip 1")
@@ -210,9 +219,10 @@ def main() -> None:
         help="JSON with appearance, matte, jitter from the shipped clip (lower is better)",
     )
     args = parser.parse_args()
-    device = torch.device(args.device if torch.cuda.is_available() else "cpu")
-    model, _ = _load_model(args.checkpoint, device)
-    manifest = json.loads((args.curated_dir / "manifest.json").read_text())
+    check_output_paths((args.work, args.pitch, args.out), source_root=REPO_ROOT)
+    manifest = load_clip_manifest(args.source_manifest or args.curated_dir / "manifest.json")
+    if args.clip_only is not None and args.clip_only not in CLIP_IDS:
+        raise SystemExit(f"unknown clip ID: {args.clip_only}")
     only = [k for k in args.only_keys.split(",") if k] or None
     unknown = set(only or []) - set(PS_KEYS)
     if unknown:
@@ -220,18 +230,26 @@ def main() -> None:
     baseline_hand = None
     if args.baseline_hand is not None:
         baseline_hand = json.loads(args.baseline_hand.read_text())
-    report = {"clips": {}}
-    shorts = ["clip_01", "clip_02", "clip_03"]
+    report = {"status": "preparing", "clips": {}, "source_manifest": {"path": str(manifest.path), "sha256": manifest.sha256}}
+    args.work.mkdir(parents=True, exist_ok=False)
+    args.pitch.mkdir(parents=True, exist_ok=False)
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    with args.out.open("x") as handle:
+        json.dump(report, handle, indent=2)
+    device = torch.device(args.device if torch.cuda.is_available() else "cpu")
+    model, _ = _load_model(args.checkpoint, device)
     background_mp4s = None
     if args.bg_dir is not None:
         background_mp4s = {k: args.bg_dir / f"{k}.mp4" for k in PS_KEYS if (args.bg_dir / f"{k}.mp4").is_file()}
-    for item, short in zip(manifest[:3], shorts):
+    for clip in manifest.clips:
+        short = clip.clip_id
         if args.clip_only and short != args.clip_only:
             continue
         mask = args.mask_video if short == "clip_01" else None
-        logger.info("demo rebuild %s", item["filename"])
+        clip.verify()
+        logger.info("demo rebuild %s from %s", short, clip.path)
         report["clips"][short] = process_clip(
-            Path(item["path"]),
+            clip.path,
             short,
             args.work / short,
             args.pitch,
@@ -245,7 +263,9 @@ def main() -> None:
             background_mp4s=background_mp4s,
             baseline_hand=baseline_hand,
         )
-    args.out.parent.mkdir(parents=True, exist_ok=True)
+        clip.verify()
+        report["clips"][short]["source_identity"] = clip.receipt()
+    report["status"] = "complete"
     args.out.write_text(json.dumps(report, indent=2))
     logger.info("wrote %s", args.out)
 

@@ -10,41 +10,43 @@ The GPU hosts provide `/home/itec/emanuele/.conda/envs/pointstream` and native t
 
 The local dispatcher uses the Python standard library and SSH. Project tests can run locally with the project dependencies from `pyproject.toml`. Local CUDA is not required.
 
-## Inspect and launch remote work
+## Inspect and submit remote work
 
-From the repository root, inspect current host and GPU state:
-
-```bash
-python -m experiments.jobs.fleet inspect --hosts gpu1 gpu2 gpu3 gpu4 gpu5 gpu6
-```
-
-The probe checks reachability, GPU UUIDs, compute-process lists, memory, utilization, CPU headroom, the shared data root, the pinned Python environment, and native tool versions. A failed or malformed response makes that host unavailable. The default admission limits require no compute process, at most 256 MiB used, at most 5% utilization, free memory of the requested estimate plus a 4 GiB margin, and CPU headroom for the full declared thread allowance. Slurm state and GPU utilization alone do not establish GPU availability.
-
-For experiment-specific binaries, pass `--require-command NAME` (a PATH command such as `ffmpeg`) or an absolute executable path. The dispatcher checks each reachable candidate before selection and rechecks the chosen host before starting the child.
-
-Launch a bounded job to one or more candidate hosts:
+Use the canonical entry point from the Mac:
 
 ```bash
-python -m experiments.jobs.fleet launch --hosts gpu5 gpu6 \
-  --gpu-memory-mib 12000 --cpu-threads 8 --budget-hours 2 \
-  --require-path /home/itec/emanuele/pointstream-data/assets/dataset/alcaraz_highlights/segmentations/scene_000 \
-  --require-path /home/itec/emanuele/pointstream-data/outputs/bp21-headroom/clips/alcaraz_highlights/scene_000/window \
-  -- /home/itec/emanuele/.conda/envs/pointstream/bin/python -c \
-  'import os; from experiments.tier.run import main; raise SystemExit(main(["--tiers", "fast", "--frames", "8", "--out", os.path.join(os.environ["PS_JOB_DIR"], "report.json")]))'
+scripts/ps-fleet status
+scripts/ps-fleet inspect
+scripts/ps-fleet submit /absolute/external/data/job.json
+scripts/ps-fleet status JOB_ID
+scripts/ps-fleet events JOB_ID
+scripts/ps-fleet cancel JOB_ID
 ```
 
-`--gpu-memory-mib` is the workload's estimated peak device memory, not a reservation size. Default to one GPU and declare CPU threads honestly. Use `--hosts` to restrict candidates to servers with hardware compatible with the experiment; the fleet cannot infer application-specific GPU constraints from an arbitrary command. The fallback device order is Ada, A6000, RTX 8000, then GV100. When comparable workload timings exist, pass `--prefer-gpu-name SUBSTRING` once per GPU family in measured performance order; the manifest records that preference. The current pilot has no comparable cross-model timing, so use the fallback unless new evidence is available.
+Inspect existing requests before submitting and use the complete compatible host
+pool. Probe failures apply per host; a missing acknowledgement never authorizes
+replay. Read [long jobs](workflow/long-jobs.md) for the immutable specification,
+shared-inbox doctor checks, workers, recovery and bounded artifact export.
 
-The remote job runs from a unique snapshot directory. A clean `HEAD` snapshot is the default; only pass `--include-change PATH` for an intended tracked edit and `--include-untracked PATH` for an intended new file. The manifest records included checksums and excluded dirty paths. Never assume an active checkout on a GPU host matches the Mac revision.
+The complete probe checks UUIDs, compute processes, memory, utilization, CPU
+headroom, inputs, runtime and native tools. Admission requires no compute process,
+used memory <=256 MiB, utilization <=5%, free memory >= the saved estimate plus
+4 GiB, and aggregate CPU headroom. Worker selection and launch both recheck this
+policy under resource claims. GPU model filters express compatibility, not a
+performance guarantee.
 
-The monitor detaches on the server and owns the child process group, GPU/CPU claims, durable log, and status. An SSH disconnect or laptop sleep does not stop the run. Use the returned job ID to retrieve status or request cancellation:
+One processing path and common arguments serve smoke and full stages. The
+workload-specific validator must check outputs; exit zero alone does not pass
+smoke. Full promotion requires validation, unchanged identities and enough
+remaining budget for its saved estimate. Waiting and execution share an absolute
+deadline. Output roots and input/checkpoint identities must be explicit.
 
-```bash
-python -m experiments.jobs.fleet status JOB_ID
-python -m experiments.jobs.fleet cancel JOB_ID
-```
-
-The local manifest reports the host and remote `run_dir`. Retrieve result files from that directory with `scp`; keep the copy outside the Git tree. Remote jobs are never silently replayed or moved to another host. If foreign GPU use appears after launch, the supervisor stops only its own child, preserves its files, and marks timing contaminated.
+The selected code revision and reviewed changes are frozen independently of the
+remote primary checkout. Supervisors survive disconnection and Mac sleep, keep
+separate smoke/full artifacts and stop only their owned processes on contention.
+Do not use unrestricted legacy launches or an inline Python command. CPU-only
+work needs a supported CPU admission path with equivalent isolation and claims;
+reserving a needless GPU is not a substitute.
 
 ## Reproducibility and operational limits
 

@@ -1,0 +1,82 @@
+[
+  {
+    "source": "source/live-demo/demo/outputs/canny_task_sweep.json",
+    "original_path": "/Users/manu/Desktop/PointStream/demo/outputs/canny_task_sweep.json",
+    "sha256": "f04ff656bf54577d9c1d5d05a6cafabee38f09a1c651aa117dbe26a0ab2f5d73",
+    "bytes": 48068,
+    "recovered_small_file": "egocentric-reports/outputs__canny_task_sweep.json",
+    "disposition": "analyzed historical artifact; provenance/denominator/accounting limits in live/history cards"
+  },
+  {
+    "source": "source/live-demo/demo/outputs/maps/index.json",
+    "original_path": "/Users/manu/Desktop/PointStream/demo/outputs/maps/index.json",
+    "sha256": "fb5c2bae8e4f16b193cd2f76c29ac2c3aac8a017e6454e4023beabb00ce1ea0b",
+    "bytes": 46493,
+    "recovered_small_file": "egocentric-reports/outputs__maps__index.json",
+    "disposition": "analyzed historical artifact; provenance/denominator/accounting limits in live/history cards"
+  },
+  {
+    "source": "source/live-demo/demo/outputs/results/offline_gt_report_rtm.json",
+    "original_path": "/Users/manu/Desktop/PointStream/demo/outputs/results/offline_gt_report_rtm.json",
+    "sha256": "76b3011183769b5aa5fc53a862c436df3e828966b44cdf080bbcf9d41d538359",
+    "bytes": 26032,
+    "recovered_small_file": "egocentric-reports/outputs__results__offline_gt_report_rtm.json",
+    "disposition": "analyzed historical artifact; provenance/denominator/accounting limits in live/history cards"
+  },
+  {
+    "source": "source/live-demo/demo/outputs/results/demo_streams.json",
+    "original_path": "/Users/manu/Desktop/PointStream/demo/outputs/results/demo_streams.json",
+    "sha256": "536e75f110472776025533b1bbfa45e5f209ef61508982f57ac87035a741e225",
+    "bytes": 6814,
+    "recovered_small_file": "egocentric-reports/outputs__results__demo_streams.json",
+    "disposition": "analyzed historical artifact; provenance/denominator/accounting limits in live/history cards"
+  },
+  {
+    "source": "source/live-demo/demo/outputs/results/comparison_results.json",
+    "original_path": "/Users/manu/Desktop/PointStream/demo/outputs/results/comparison_results.json",
+    "sha256": "fffe2f4dfe33d8679d4c6af5b289b814b6fff293d87bde2bf71b0a92e0a6a39e",
+    "bytes": 65935,
+    "recovered_small_file": "egocentric-reports/outputs__results__comparison_results.json",
+    "disposition": "analyzed historical artifact; provenance/denominator/accounting limits in live/history cards"
+  },
+  {
+    "source": "source/live-demo/demo/outputs/results/offline_gt_report_wholebody.json",
+    "original_path": "/Users/manu/Desktop/PointStream/demo/outputs/results/offline_gt_report_wholebody.json",
+    "sha256": "918859f7fb1d3f11f908919cefde78541364c7409ae09b67b7a0e8fa767b5fab",
+    "bytes": 27081,
+    "recovered_small_file": "egocentric-reports/outputs__results__offline_gt_report_wholebody.json",
+    "disposition": "analyzed historical artifact; provenance/denominator/accounting limits in live/history cards"
+  },
+  {
+    "source": "source/live-demo/demo/outputs/results/rtm_encoder_report.json",
+    "original_path": "/Users/manu/Desktop/PointStream/demo/outputs/results/rtm_encoder_report.json",
+    "sha256": "ab0732cdbc8085129bed33b29f0e9344b558ca4003494b812b42cf90a1900bf2",
+    "bytes": 14492,
+    "recovered_small_file": "egocentric-reports/outputs__results__rtm_encoder_report.json",
+    "disposition": "analyzed historical artifact; provenance/denominator/accounting limits in live/history cards"
+  },
+  {
+    "source": "source/live-demo/demo/outputs/pitch/maps/index.json",
+    "original_path": "/Users/manu/Desktop/PointStream/demo/outputs/pitch/maps/index.json",
+    "sha256": "fb5c2bae8e4f16b193cd2f76c29ac2c3aac8a017e6454e4023beabb00ce1ea0b",
+    "bytes": 46493,
+    "recovered_small_file": "egocentric-reports/outputs__pitch__maps__index.json",
+    "disposition": "analyzed historical artifact; provenance/denominator/accounting limits in live/history cards"
+  },
+  {
+    "source": "source/live-demo/demo/outputs/hand_model_compare/vitpose_densepose/report.json",
+    "original_path": "/Users/manu/Desktop/PointStream/demo/outputs/hand_model_compare/vitpose_densepose/report.json",
+    "sha256": "94e7257cd682abfdbbf80bba5ff467aaa81e38df8d64a05b83665c9da7030762",
+    "bytes": 2484,
+    "recovered_small_file": "egocentric-reports/outputs__hand_model_compare__vitpose_densepose__report.json",
+    "disposition": "analyzed historical artifact; provenance/denominator/accounting limits in live/history cards"
+  },
+  {
+    "source": "source/live-demo/demo/outputs/hand_model_compare/rtm_scales/report.json",
+    "original_path": "/Users/manu/Desktop/PointStream/demo/outputs/hand_model_compare/rtm_scales/report.json",
+    "sha256": "873780a1ddd5d09c2176e2eee85ac27d4181bcdd39ebf48c74ae43e9b8f2c584",
+    "bytes": 5185,
+    "recovered_small_file": "egocentric-reports/outputs__hand_model_compare__rtm_scales__report.json",
+    "disposition": "analyzed historical artifact; provenance/denominator/accounting limits in live/history cards"
+  }
+]

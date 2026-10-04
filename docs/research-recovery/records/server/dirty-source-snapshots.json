@@ -1,0 +1,342 @@
+[
+  {
+    "source": "gpu3:/tmp/pointstream-mask-screen",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:21:11.317717+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-mask-screen/tracked.patch",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "returncode": 0,
+    "kind": "tracked-diff-binary"
+  },
+  {
+    "source": "gpu3:/tmp/pointstream-mask-screen/experiments/modular/yolo_mask_screen.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:21:13.876932+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-mask-screen/untracked/experiments/modular/yolo_mask_screen.py",
+    "sha256": "6e18126a3ca9be61790f06ae63305faf986687da2b253089cd1c44798f71f00b",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu3:/tmp/pointstream-mask-screen/tests/experiments/test_yolo_mask_screen.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:21:16.842128+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-mask-screen/untracked/tests/experiments/test_yolo_mask_screen.py",
+    "sha256": "f6f8e0418e20f1dc6c0094c1b10f6e479d84716dd78e3d50b85a334bce7af6c6",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu3:/tmp/pointstream-motion-contract-20260926",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:21:22.611129+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-motion-contract-20260926/tracked.patch",
+    "sha256": "c78708cd362fc88a3641ca501217cfeef6152d8b642146027757ebe2c13571a0",
+    "returncode": 0,
+    "kind": "tracked-diff-binary"
+  },
+  {
+    "source": "gpu3:/tmp/pointstream-temporal-mask-wire",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:21:27.734061+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-temporal-mask-wire/tracked.patch",
+    "sha256": "770199046378c04f130f3159cc492579af2863c18d02cba4cfd294a557a7f0cf",
+    "returncode": 0,
+    "kind": "tracked-diff-binary"
+  },
+  {
+    "source": "gpu3:/tmp/pointstream-c01-harness",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:21:32.900800+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-c01-harness/tracked.patch",
+    "sha256": "a1c2df644b21cafec029f4321be3277be781f2912f4d00c9a7ff7b85743b0118",
+    "returncode": 0,
+    "kind": "tracked-diff-binary"
+  },
+  {
+    "source": "gpu3:/tmp/pointstream-c01-harness/experiments/modular/c01_gpu_mask_codec_pilot.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:21:36.482694+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-c01-harness/untracked/experiments/modular/c01_gpu_mask_codec_pilot.py",
+    "sha256": "e4d8f9ea6e877fcca8afd5e05edc854c6c76dadbd1db36862cf7eded982d4d14",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu3:/tmp/pointstream-c01-harness/experiments/modular/person_mask_screen.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:21:39.332033+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-c01-harness/untracked/experiments/modular/person_mask_screen.py",
+    "sha256": "a582d697f8cb3f2c9a2d790f8b649b4bca232ce671e1a32785b07dba274c9863",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu3:/tmp/pointstream-c01-harness/experiments/modular/yolo_mask_screen.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:21:41.612445+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-c01-harness/untracked/experiments/modular/yolo_mask_screen.py",
+    "sha256": "6e18126a3ca9be61790f06ae63305faf986687da2b253089cd1c44798f71f00b",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu3:/tmp/pointstream-c01-harness/tests/experiments/test_c01_gpu_mask_codec_pilot.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:21:45.782951+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-c01-harness/untracked/tests/experiments/test_c01_gpu_mask_codec_pilot.py",
+    "sha256": "429b4c66eaacb030907b094c079607918a4d4e47544a96cc8fd88a93b6f94d00",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu3:/tmp/pointstream-r02-anchor-roundtrip",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:21:55.885920+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-r02-anchor-roundtrip/tracked.patch",
+    "sha256": "f4883b46023d1e33f9779965487efa2e3de5256fb903e2aac8f628eedadbce7e",
+    "returncode": 0,
+    "kind": "tracked-diff-binary"
+  },
+  {
+    "source": "gpu3:/tmp/pointstream-r02-anchor-roundtrip/experiments/modular/c01_gpu_mask_codec_pilot.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:22:03.261787+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-r02-anchor-roundtrip/untracked/experiments/modular/c01_gpu_mask_codec_pilot.py",
+    "sha256": "e4d8f9ea6e877fcca8afd5e05edc854c6c76dadbd1db36862cf7eded982d4d14",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu3:/tmp/pointstream-r02-anchor-roundtrip/experiments/modular/r02_anchor_roundtrip.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:22:09.855701+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-r02-anchor-roundtrip/untracked/experiments/modular/r02_anchor_roundtrip.py",
+    "sha256": "f9c3b405ce5a459ea62891915fa965c3b54bc99a773a56ccfa4a7e9fdbdd7750",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu3:/tmp/pointstream-r02-anchor-roundtrip/manifests/journal_20260925_c01_yolo26x_pointstream_fast_16f.json",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:22:14.789325+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-r02-anchor-roundtrip/untracked/manifests/journal_20260925_c01_yolo26x_pointstream_fast_16f.json",
+    "sha256": "8f6ebd22852e37192144f0de10719e5a61a9d1cfc9101446746f38f2037b7132",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu3:/tmp/pointstream-r02-anchor-roundtrip/manifests/journal_20260925_r02_sinner_alcaraz002_16f.json",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:22:16.440564+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-r02-anchor-roundtrip/untracked/manifests/journal_20260925_r02_sinner_alcaraz002_16f.json",
+    "sha256": "5722086554a50a910091c00a977f71aa725033b3769eb8e68c133cb4defdc65a",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu3:/tmp/pointstream-r02-anchor-roundtrip/tests/experiments/test_r02_anchor_roundtrip.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:22:18.104549+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-r02-anchor-roundtrip/untracked/tests/experiments/test_r02_anchor_roundtrip.py",
+    "sha256": "fca8bd1243720d58a9bc5a53ba4f02f1c3c0c8647159f290d8d351b586dcb6b4",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu3:/tmp/pointstream-motion-contract-20260926-code.patch",
+    "capture_utc": "2026-09-30T09:22:18.894398+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-motion-contract-20260926-code.patch",
+    "sha256": "a5167b01222cf239f3b1e51225db34bd3e5730ed68cf4dada6f44ce1f8bf61a5",
+    "returncode": 0,
+    "kind": "existing-patch"
+  },
+  {
+    "source": "gpu3:/tmp/pointstream-motion-contract-20260926-docs.patch",
+    "capture_utc": "2026-09-30T09:22:20.089279+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream-motion-contract-20260926-docs.patch",
+    "sha256": "86a2c481315c2a7740e4749ebd552bbd28a237012393d8e5adaf9084604de743",
+    "returncode": 0,
+    "kind": "existing-patch"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:25:30.090060+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/tracked.patch",
+    "sha256": "48adb7df05c0d7325ca69ed8b54644e3f48772050ff24a29b07c62ee75ea68d1",
+    "returncode": 0,
+    "kind": "tracked-diff-binary"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/docs/history/campaigns/20260923-background-campaign.md",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:25:33.418052+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/docs/history/campaigns/20260923-background-campaign.md",
+    "sha256": "ea863d015158544459b03841a4365d9caefbef821fc19e72a5553d0ef220e126",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/docs/history/campaigns/20260923-development-campaign.md",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:25:39.889469+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/docs/history/campaigns/20260923-development-campaign.md",
+    "sha256": "ea5e3d604b0425f53f6ccf6becb8182742b8fd70914b6c9eeb105164c6c65fcd",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/docs/history/campaigns/20260924-foreground-campaign.md",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:25:45.388205+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/docs/history/campaigns/20260924-foreground-campaign.md",
+    "sha256": "48dc7729f0da95239e54996f93b319a00ed7de616c6d4da51ee7472bbf2f4d47",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/experiments/modular/c01_gpu_mask_codec_pilot.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:25:47.852739+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/experiments/modular/c01_gpu_mask_codec_pilot.py",
+    "sha256": "b0163079d91c9b2b8ad1a05f6e259639caf08436f88e50b8a0b4339dba21dc43",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/experiments/modular/c01_transport_smoke.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:25:52.592780+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/experiments/modular/c01_transport_smoke.py",
+    "sha256": "ea3503ebf4c707d9317a8131847f0bc23c05b9aa7d56561ca50c8a41b5688807",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/experiments/modular/person_mask_screen.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:25:56.871692+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/experiments/modular/person_mask_screen.py",
+    "sha256": "55c99b5c710808639da447d40b24e3baa7273e234cde3f256da6c885a12e8f8c",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/experiments/modular/r02_anchor_roundtrip.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:26:01.114877+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/experiments/modular/r02_anchor_roundtrip.py",
+    "sha256": "8c8ca486f3cd6434a20e89ef45a8e56b70547c78dfb5825a228932a87e4720b4",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/experiments/modular/yolo_mask_screen.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:26:04.780114+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/experiments/modular/yolo_mask_screen.py",
+    "sha256": "45899afcd6d634e47ba5e8bb5832c39be2fe6d0133031f9be6bc9acec0864a27",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/manifests/journal_20260925_c01_yolo26x_pointstream_fast_16f.json",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:26:08.716880+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/manifests/journal_20260925_c01_yolo26x_pointstream_fast_16f.json",
+    "sha256": "8f6ebd22852e37192144f0de10719e5a61a9d1cfc9101446746f38f2037b7132",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/manifests/journal_20260925_r02_sinner_alcaraz002_16f.json",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:26:15.623242+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/manifests/journal_20260925_r02_sinner_alcaraz002_16f.json",
+    "sha256": "5722086554a50a910091c00a977f71aa725033b3769eb8e68c133cb4defdc65a",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/manifests/journal_20260925_yolo26x_sinner_alcaraz_scene002.json",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:26:28.028624+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/manifests/journal_20260925_yolo26x_sinner_alcaraz_scene002.json",
+    "sha256": "67f6c43365340d719d6ebe2f3861a81b9adde33122056c0e52c7380e47e981f3",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/manifests/journal_20260925_yolo26x_sinner_alcaraz_scene002_retry1.json",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:26:42.381683+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/manifests/journal_20260925_yolo26x_sinner_alcaraz_scene002_retry1.json",
+    "sha256": "bc37be1c12f007639a841a8e147639015a82bd7337bcc12f182b17030451eaf6",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/src/components/metrics/track_geometry.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:26:54.085869+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/src/components/metrics/track_geometry.py",
+    "sha256": "d99d5852ab0a1463edcf4818d6f503dd8c65d5b751253e3c6e9038c15515bbf2",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/tests/components/test_generation_crop.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:27:02.405070+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/tests/components/test_generation_crop.py",
+    "sha256": "44d17d05dcf02f497ed516110636795e40e6999c4e6a50edeb8d5f00bb8df514",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/tests/components/test_track_geometry.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:27:09.500196+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/tests/components/test_track_geometry.py",
+    "sha256": "d5f8d195ff5775b17ec34988cc4697d1467a7c0c997dcb97609c8222021f4d3c",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/tests/experiments/test_c01_gpu_mask_codec_pilot.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:27:16.203394+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/tests/experiments/test_c01_gpu_mask_codec_pilot.py",
+    "sha256": "d723bef95161b6860c8c20b4735fa73b93a0b39bd292db96f7da2857fa86e047",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/tests/experiments/test_person_mask_screen.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:27:21.051168+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/tests/experiments/test_person_mask_screen.py",
+    "sha256": "400008ee4f4a1916ecca1ad0a9b0b0cc3b314b724228ecdeb838ec21543d3ec9",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/tests/experiments/test_r02_anchor_roundtrip.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:27:24.867973+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/tests/experiments/test_r02_anchor_roundtrip.py",
+    "sha256": "fca8bd1243720d58a9bc5a53ba4f02f1c3c0c8647159f290d8d351b586dcb6b4",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  },
+  {
+    "source": "gpu1:/home/itec/emanuele/pointstream/tests/experiments/test_yolo_mask_screen.py",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "capture_utc": "2026-09-30T09:27:35.727515+00:00",
+    "artifact": "/private/tmp/pointstream-recovery-20260930/workers/server/source-snapshots/pointstream/untracked/tests/experiments/test_yolo_mask_screen.py",
+    "sha256": "00be5c9a459e6b15f4a296bdf8264d4bf2e994da20c0931b528a7d00efcbf520",
+    "returncode": 0,
+    "kind": "selected-untracked-source"
+  }
+]

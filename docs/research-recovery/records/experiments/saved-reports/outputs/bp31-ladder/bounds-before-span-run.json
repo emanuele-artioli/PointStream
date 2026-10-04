@@ -1,0 +1,41 @@
+{
+  "written": "2026-09-02",
+  "before": "the first span encode",
+  "source": "plans/BP33-span-amortisation.md §2, on branch chore/roadmap-and-cleanup (PR #46)",
+  "provenance_note": "These bounds were PRE-REGISTERED BY ANOTHER SESSION and reached this one before any span encode had been run here. They are adopted verbatim rather than rewritten: bounds authored after hearing a prediction are not bounds. This session verified only that the axis is runnable (48-frame clips load for both scenes, paste-back MAE 0.000) before adopting them. Copied into outputs/bp31-ladder/ because outputs/bp33-span/** is owned by the session that wrote the brief.",
+
+  "bounds": [
+    {
+      "quantity": "BD-rate at 48 frames per scene, panorama-stream, N=2 scenes, av1 preset 10",
+      "band_percent": [-40.0, 65.0],
+      "excursion_low": "Below -40%: check the anchor was given all 48 frames JOINTLY, via the joint/separate control in plans/BP31-findings.md §5.",
+      "excursion_high": "Above +65%: the plate grew far more than the canvas measurement predicts, or quality decayed enough that the residual ate the saving.",
+      "asymmetry_warning": "A negative BD-rate is the result this project has been looking for, which is exactly why it gets an extra check rather than a celebration. Before reporting any win, confirm joint/separate still reads below 1.0 and that quality came from delivered_frames, not RunResult.frames."
+    },
+    {
+      "quantity": "plate bytes, 48 frames vs 8 frames, static clip (alcaraz_highlights)",
+      "band_ratio": [1.00, 1.60],
+      "excursion": "Above 1.60x: the median over a long span is not converging; check foreground exclusion."
+    },
+    {
+      "quantity": "plate bytes, 48 frames vs 8 frames, moving clip (federer_djokovic/scene_003)",
+      "band_ratio": [1.05, 2.50],
+      "excursion": "Above 2.50x: the canvas is running toward MAX_CANVAS_SCALE and the pan has left the plate's usefulness behind."
+    },
+    {
+      "quantity": "anchor bytes per frame, 48 frames vs 8 frames",
+      "band_ratio": [0.45, 0.90],
+      "excursion": "Outside: the anchor is being run per-chunk rather than over the whole span."
+    },
+    {
+      "quantity": "delivered Y-PSNR at frame 47 minus frame 0",
+      "band_dB": [-4.0, 0.5],
+      "excursion": "Below -4 dB: the homography has drifted off the plate and the product is a reconstruction that visibly rots, which is a different product from a uniform one. A clip MEAN hides this, which is why it is measured against frame index."
+    }
+  ],
+
+  "scope_stated_in_advance": {
+    "n": "Two scenes of one video. This decides an operating point for the extraction campaign; it is not a claim.",
+    "one_thing_moves": "Span only, with scene count held at N=2. BP33 §5: span and scene count are both amortisation axes on the same fixed cost and one sweep will not separate them."
+  }
+}

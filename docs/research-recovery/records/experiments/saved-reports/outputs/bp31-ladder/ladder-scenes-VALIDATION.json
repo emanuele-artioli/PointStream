@@ -1,0 +1,81 @@
+{
+  "video": "alcaraz_highlights",
+  "scenes": [
+    "scene_000",
+    "scene_010"
+  ],
+  "frames_per_scene": 8,
+  "n_rungs": 1,
+  "codec": "av1",
+  "preset": "10",
+  "anchor_low_delay_args": [
+    "--pred-struct",
+    "1",
+    "--lookahead",
+    "0",
+    "--keyint",
+    "1000"
+  ],
+  "background": {
+    "method": "panorama-stream",
+    "stream_codec": "av1",
+    "stream_crf": 38,
+    "keyframe_interval": 0,
+    "reference_mode": "last"
+  },
+  "bounds_file": "/home/itec/emanuele/pointstream-data/outputs/bp31-ladder/bounds-before-run.json",
+  "rows": [
+    {
+      "rung": "q30/qp55",
+      "rank": 0,
+      "anchor": {
+        "joint_bytes": 154891,
+        "separate_bytes": 181578,
+        "joint_over_separate": 0.853,
+        "psnr_y_dB": 38.229117893129725,
+        "psnr_rgb_dB": 36.47739697622565,
+        "seconds": 30.2,
+        "n_frames": 16,
+        "extra_args": []
+      },
+      "anchor_low_delay": {
+        "joint_bytes": 186437,
+        "separate_bytes": 212108,
+        "joint_over_separate": 0.879,
+        "psnr_y_dB": 37.44771398213013,
+        "psnr_rgb_dB": 36.0021874623359,
+        "seconds": 23.4,
+        "n_frames": 16,
+        "extra_args": [
+          "--pred-struct",
+          "1",
+          "--lookahead",
+          "0",
+          "--keyint",
+          "1000"
+        ]
+      },
+      "pointstream": {
+        "coded_bytes": 862585,
+        "psnr_y_dB": 41.90139243368732,
+        "psnr_rgb_dB": 40.72621256047184,
+        "is_rate": true,
+        "raw_parts": [],
+        "parts": {
+          "residual": 25269,
+          "panorama": 789304,
+          "actor_reference": 44479,
+          "metadata": 3533
+        },
+        "background_share": 0.915,
+        "n_chunks": 2,
+        "precodec_vs_delivered_dB": 45.79793788107079,
+        "seconds": 597.4
+      }
+    }
+  ],
+  "alarms": [
+    "q30/qp55: background is 91.5% of the payload, still in the 88-91% band it occupied with a fresh plate per scene. The stream is not reaching the ledger \u2014 the amortisation would be configured, reported and absent."
+  ],
+  "reading_note": "Two anchor arms at every rung. `anchor` is unconstrained and is the harder, primary comparison. `anchor_low_delay` is constrained the way PointStream's background stream is, which on this host costs SvtAv1EncApp +38% \u2014 so it is the latency-matched question, not the fair-by-default one, and reporting it alone would hand PointStream that 38%. Both are ONE encode over the concatenated scenes; `separate_bytes` is the control proving the anchor predicted across the joins. Quality is Y-PSNR on delivered_frames for PointStream and on the decoder's output for the anchor. Few scenes on one video is a configuration measurement, not a claim."
+}

@@ -1,0 +1,64 @@
+{
+  "written": "2026-09-01",
+  "written_by": "BP31 session, wave9/bp31-ladder",
+  "before": "the stream_codec x stream_crf sweep, and any ladder encode",
+  "why_this_file_exists": "AGENTS.md: write a plausible best and worst case, with the reasoning, before reading any measured result. A result outside the range is an alarm to investigate, not a headline.",
+
+  "honesty_note": {
+    "statement": "Two quantities below are NOT blind. A feasibility probe was run before this file existed, to check that build_plate and the intra sidecars move at all, and its numbers were read.",
+    "already_observed": [
+      "still-sidecar bytes and Y-PSNR on the alcaraz_highlights/scene_000 panorama plate, for jpeg q50/q75 and av1/vvc intra at qp35/qp45 (outputs/bp31-ladder/smoke-panorama-plate.json)",
+      "payload lengths under panorama-stream and panorama-full for three background.codec values, on synthetic plates (outputs/bp31-ladder/probe-lever-exclusivity.json)"
+    ],
+    "consequence": "Those two are reported as observations with their provenance, never as results that passed a bound. Every bound below is for a quantity not yet measured in this session.",
+    "why_recorded_rather_than_fixed": "Deleting the probe and re-running it 'blind' would be theatre; the numbers are already known. Saying which numbers were seen first is the only version of this that is true."
+  },
+
+  "bounds": [
+    {
+      "quantity": "stream amortisation ratio: total bytes for N scenes as a low-delay chain, over total bytes coding each scene fresh as intra, per stream codec",
+      "plausible_range": [0.25, 0.75],
+      "basis": "BP30 measured 0.492 +- 0.062 over five videos, best case 0.294, on point-class scene frames at libaom-av1 CRF 38 (PLAN.md 2.22). This sweep varies the codec and the CRF around that operating point, so the centre should sit near 0.49 and the range is BP30's spread widened for the codec axis.",
+      "two_sided_because": "The bound is on the very quantity the sweep exists to move. A one-sided band anchored on av1/CRF38 would encode the incumbent setting as if it were a limit.",
+      "alarm_low": "Below 0.25 beats BP30's best case on any codec. Check the intra control actually coded intra, and that the chain is not silently dropping scenes.",
+      "alarm_high": "Above 0.75 means the chain is barely predicting. Check bframes=0 / lag-in-frames=0 really reached the encoder for that codec, and read the consecutive-frame control first."
+    },
+    {
+      "quantity": "consecutive-frame control (two frames of one scene, coded as a chain, second frame over fresh intra), per codec",
+      "plausible_range": [0.005, 0.15],
+      "basis": "BP30 measured 0.0074 on av1 and findings 18 puts the same control at 1.2-3.3%. It is near-zero by construction: consecutive frames of one scene are almost the same picture.",
+      "alarm": "Above 0.15, or above 1.0, the codec is not doing inter prediction and every amortisation number from it is meaningless. Findings 19 records exactly this failure on a misconfigured x265 - a P-frame came back larger than a fresh intra. Read this control before any headline ratio."
+    },
+    {
+      "quantity": "monotonicity of stream bytes in stream_crf, per codec",
+      "expected": "strictly decreasing as CRF rises",
+      "alarm": "A non-monotone rung means the CRF is not reaching that encoder. A flat curve while quality moves is the same failure as findings 14 in the other direction."
+    },
+    {
+      "quantity": "background share of PointStream's transport payload, end to end, under panorama-stream over N scenes",
+      "plausible_range": [0.55, 0.92],
+      "basis": "It was 88-91% at every rung of every BP24 sweep with a fresh plate per scene. At an amortisation near 0.49 the share should fall but stay dominant; brief 3 estimates 75-85%.",
+      "alarm_high": "At or above 0.88 the stream is not reaching the ledger - the amortisation would be configured, reported and absent, which is the failure PR #41's byte-count tests exist to catch.",
+      "alarm_low": "Below 0.55 something other than the plate changed. Check delivered_frames and the residual's rung before believing it."
+    },
+    {
+      "quantity": "paired BD-rate against av1 at preset 10, PointStream with panorama + cross-scene stream on, over N scenes, both arms same footage",
+      "plausible_range": [-20.0, 150.0],
+      "units": "percent, positive means PointStream costs more",
+      "basis": "+116.8% with a fresh plate per scene (PLAN.md 2.20). Multiplying 88-91% of the payload by ~0.49 arithmetically leaves a large positive number; the brief's own estimate for the codec lever alone was about +30%, i.e. still losing.",
+      "alarm_low": "A negative BD-rate is PointStream winning and is an ALARM, not a triumph. Before believing it, check: the anchor got the same N scenes concatenated, not one scene; the anchor ran under the same low-delay constraint and keyframe interval; quality came from delivered_frames and not RunResult.frames; the decode named an explicit -c:v. This is the asymmetry to watch - these checks get applied to disappointing results and skipped on exciting ones.",
+      "alarm_high": "Above +150% the stream made things worse than the fresh-plate baseline, which contradicts BP30 directly. Suspect the wiring before the content."
+    },
+    {
+      "quantity": "the anchor's own rate when given N scenes instead of one",
+      "expected": "must fall per frame, because a codec can predict across a scene join too",
+      "alarm": "If the anchor's per-frame rate is unchanged from the single-scene ladder, it is being run per-scene and concatenated afterwards. That rigs the comparison in PointStream's favour and invalidates the pair. This is the fairness condition, not a nicety."
+    }
+  ],
+
+  "scope_stated_in_advance": {
+    "plates": "The stream sweep runs on point-class scene FRAMES, not stitched panoramas and not player-masked plates - the same conservative choice BP30 made, so the ratio sits on the axis PLAN.md 2.22 already reports. A panorama has less moving content to mispredict, so this is the pessimistic case rather than the flattering one.",
+    "n": "One video for the codec x crf sweep, which is enough to choose an operating point and NOT enough for any claim. presley's bar is n>=6 videos before a significance claim and BP30 reached 5; the per-video spread there (0.294-0.624) is larger than every effect measured inside it. Any conclusion from this sweep is a configuration choice, not a finding.",
+    "quality_axis": "BT.601 Y-PSNR, per findings 12. RGB is recorded beside it and is not the axis."
+  }
+}

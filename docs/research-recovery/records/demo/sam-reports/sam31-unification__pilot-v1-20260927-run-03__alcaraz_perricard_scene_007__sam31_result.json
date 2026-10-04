@@ -1,0 +1,1621 @@
+{
+  "arrays_path": "/home/itec/emanuele/pointstream-data/outputs/sam31-unification/pilot-v1-20260927-run-03/alcaraz_perricard_scene_007/sam31_masks.npz",
+  "arrays_sha256": "734df9bb74b2f81f0ddd4ff3f3537796324524ba8d5f01bb00ba8e57f7829145",
+  "gpu": "NVIDIA RTX 6000 Ada Generation",
+  "gpu_memory_bytes": {
+    "current_allocated": 5259507712,
+    "current_reserved": 21030240256,
+    "peak_allocated": 17147573760,
+    "peak_reserved": 21030240256
+  },
+  "inference_seconds": 58.40092207957059,
+  "model_load_seconds": 34.64559362921864,
+  "outputs": [
+    {
+      "frame_index": 0,
+      "mask_key": "mask_000000",
+      "object_id": "player:0",
+      "reason": null,
+      "role": "player",
+      "score": 0.9569892287254333,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 0,
+      "mask_key": "mask_000001",
+      "object_id": "player:1",
+      "reason": null,
+      "role": "player",
+      "score": 0.9336099624633789,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 0,
+      "mask_key": "mask_000002",
+      "object_id": "player:2",
+      "reason": null,
+      "role": "player",
+      "score": 1.0,
+      "status": "observed",
+      "tracker_id": 2
+    },
+    {
+      "frame_index": 0,
+      "mask_key": "mask_000003",
+      "object_id": "player:3",
+      "reason": null,
+      "role": "player",
+      "score": 1.0,
+      "status": "observed",
+      "tracker_id": 3
+    },
+    {
+      "frame_index": 1,
+      "mask_key": "mask_000004",
+      "object_id": "player:0",
+      "reason": null,
+      "role": "player",
+      "score": 0.9569892287254333,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 1,
+      "mask_key": "mask_000005",
+      "object_id": "player:1",
+      "reason": null,
+      "role": "player",
+      "score": 0.9336099624633789,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 1,
+      "mask_key": "mask_000006",
+      "object_id": "player:2",
+      "reason": null,
+      "role": "player",
+      "score": 1.0,
+      "status": "observed",
+      "tracker_id": 2
+    },
+    {
+      "frame_index": 1,
+      "mask_key": "mask_000007",
+      "object_id": "player:3",
+      "reason": null,
+      "role": "player",
+      "score": 1.0,
+      "status": "observed",
+      "tracker_id": 3
+    },
+    {
+      "frame_index": 2,
+      "mask_key": "mask_000008",
+      "object_id": "player:0",
+      "reason": null,
+      "role": "player",
+      "score": 0.9569892287254333,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 2,
+      "mask_key": "mask_000009",
+      "object_id": "player:1",
+      "reason": null,
+      "role": "player",
+      "score": 0.9336099624633789,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 2,
+      "mask_key": "mask_000010",
+      "object_id": "player:2",
+      "reason": null,
+      "role": "player",
+      "score": 1.0,
+      "status": "observed",
+      "tracker_id": 2
+    },
+    {
+      "frame_index": 2,
+      "mask_key": "mask_000011",
+      "object_id": "player:3",
+      "reason": null,
+      "role": "player",
+      "score": 1.0,
+      "status": "observed",
+      "tracker_id": 3
+    },
+    {
+      "frame_index": 3,
+      "mask_key": "mask_000012",
+      "object_id": "player:0",
+      "reason": null,
+      "role": "player",
+      "score": 0.9569892287254333,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 3,
+      "mask_key": "mask_000013",
+      "object_id": "player:1",
+      "reason": null,
+      "role": "player",
+      "score": 0.9336099624633789,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 3,
+      "mask_key": "mask_000014",
+      "object_id": "player:2",
+      "reason": null,
+      "role": "player",
+      "score": 1.0,
+      "status": "observed",
+      "tracker_id": 2
+    },
+    {
+      "frame_index": 3,
+      "mask_key": "mask_000015",
+      "object_id": "player:3",
+      "reason": null,
+      "role": "player",
+      "score": 1.0,
+      "status": "observed",
+      "tracker_id": 3
+    },
+    {
+      "frame_index": 4,
+      "mask_key": "mask_000016",
+      "object_id": "player:0",
+      "reason": null,
+      "role": "player",
+      "score": 0.9569892287254333,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 4,
+      "mask_key": "mask_000017",
+      "object_id": "player:1",
+      "reason": null,
+      "role": "player",
+      "score": 0.9336099624633789,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 4,
+      "mask_key": "mask_000018",
+      "object_id": "player:2",
+      "reason": null,
+      "role": "player",
+      "score": 0.6908212304115295,
+      "status": "observed",
+      "tracker_id": 2
+    },
+    {
+      "frame_index": 4,
+      "mask_key": "mask_000019",
+      "object_id": "player:3",
+      "reason": null,
+      "role": "player",
+      "score": 1.0,
+      "status": "observed",
+      "tracker_id": 3
+    },
+    {
+      "frame_index": 5,
+      "mask_key": "mask_000020",
+      "object_id": "player:0",
+      "reason": null,
+      "role": "player",
+      "score": 0.9569892287254333,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 5,
+      "mask_key": "mask_000021",
+      "object_id": "player:1",
+      "reason": null,
+      "role": "player",
+      "score": 0.9336099624633789,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 5,
+      "mask_key": "mask_000022",
+      "object_id": "player:2",
+      "reason": null,
+      "role": "player",
+      "score": 0.6908212304115295,
+      "status": "observed",
+      "tracker_id": 2
+    },
+    {
+      "frame_index": 5,
+      "mask_key": "mask_000023",
+      "object_id": "player:3",
+      "reason": null,
+      "role": "player",
+      "score": 1.0,
+      "status": "observed",
+      "tracker_id": 3
+    },
+    {
+      "frame_index": 6,
+      "mask_key": "mask_000024",
+      "object_id": "player:0",
+      "reason": null,
+      "role": "player",
+      "score": 0.9569892287254333,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 6,
+      "mask_key": "mask_000025",
+      "object_id": "player:1",
+      "reason": null,
+      "role": "player",
+      "score": 0.9336099624633789,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 6,
+      "mask_key": "mask_000026",
+      "object_id": "player:2",
+      "reason": null,
+      "role": "player",
+      "score": 0.6908212304115295,
+      "status": "observed",
+      "tracker_id": 2
+    },
+    {
+      "frame_index": 6,
+      "mask_key": "mask_000027",
+      "object_id": "player:3",
+      "reason": null,
+      "role": "player",
+      "score": 1.0,
+      "status": "observed",
+      "tracker_id": 3
+    },
+    {
+      "frame_index": 7,
+      "mask_key": "mask_000028",
+      "object_id": "player:0",
+      "reason": null,
+      "role": "player",
+      "score": 0.9569892287254333,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 7,
+      "mask_key": "mask_000029",
+      "object_id": "player:1",
+      "reason": null,
+      "role": "player",
+      "score": 0.9336099624633789,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 7,
+      "mask_key": "mask_000030",
+      "object_id": "player:2",
+      "reason": null,
+      "role": "player",
+      "score": 0.6908212304115295,
+      "status": "observed",
+      "tracker_id": 2
+    },
+    {
+      "frame_index": 7,
+      "mask_key": "mask_000031",
+      "object_id": "player:3",
+      "reason": null,
+      "role": "player",
+      "score": 0.7387754917144775,
+      "status": "observed",
+      "tracker_id": 3
+    },
+    {
+      "frame_index": 8,
+      "mask_key": "mask_000032",
+      "object_id": "player:0",
+      "reason": null,
+      "role": "player",
+      "score": 0.9569892287254333,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 8,
+      "mask_key": "mask_000033",
+      "object_id": "player:1",
+      "reason": null,
+      "role": "player",
+      "score": 0.9336099624633789,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 8,
+      "mask_key": "mask_000034",
+      "object_id": "player:2",
+      "reason": null,
+      "role": "player",
+      "score": 0.6908212304115295,
+      "status": "observed",
+      "tracker_id": 2
+    },
+    {
+      "frame_index": 8,
+      "mask_key": "mask_000035",
+      "object_id": "player:3",
+      "reason": null,
+      "role": "player",
+      "score": 0.7387754917144775,
+      "status": "observed",
+      "tracker_id": 3
+    },
+    {
+      "frame_index": 9,
+      "mask_key": "mask_000036",
+      "object_id": "player:0",
+      "reason": null,
+      "role": "player",
+      "score": 0.9569892287254333,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 9,
+      "mask_key": "mask_000037",
+      "object_id": "player:1",
+      "reason": null,
+      "role": "player",
+      "score": 0.9336099624633789,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 9,
+      "mask_key": "mask_000038",
+      "object_id": "player:2",
+      "reason": null,
+      "role": "player",
+      "score": 0.6908212304115295,
+      "status": "observed",
+      "tracker_id": 2
+    },
+    {
+      "frame_index": 9,
+      "mask_key": "mask_000039",
+      "object_id": "player:3",
+      "reason": null,
+      "role": "player",
+      "score": 0.7387754917144775,
+      "status": "observed",
+      "tracker_id": 3
+    },
+    {
+      "frame_index": 10,
+      "mask_key": "mask_000040",
+      "object_id": "player:0",
+      "reason": null,
+      "role": "player",
+      "score": 0.9569892287254333,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 10,
+      "mask_key": "mask_000041",
+      "object_id": "player:1",
+      "reason": null,
+      "role": "player",
+      "score": 0.9336099624633789,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 10,
+      "mask_key": "mask_000042",
+      "object_id": "player:2",
+      "reason": null,
+      "role": "player",
+      "score": 0.6908212304115295,
+      "status": "observed",
+      "tracker_id": 2
+    },
+    {
+      "frame_index": 10,
+      "mask_key": "mask_000043",
+      "object_id": "player:3",
+      "reason": null,
+      "role": "player",
+      "score": 0.7387754917144775,
+      "status": "observed",
+      "tracker_id": 3
+    },
+    {
+      "frame_index": 11,
+      "mask_key": "mask_000044",
+      "object_id": "player:0",
+      "reason": null,
+      "role": "player",
+      "score": 0.9569892287254333,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 11,
+      "mask_key": "mask_000045",
+      "object_id": "player:1",
+      "reason": null,
+      "role": "player",
+      "score": 0.9336099624633789,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 11,
+      "mask_key": "mask_000046",
+      "object_id": "player:2",
+      "reason": null,
+      "role": "player",
+      "score": 0.6908212304115295,
+      "status": "observed",
+      "tracker_id": 2
+    },
+    {
+      "frame_index": 11,
+      "mask_key": "mask_000047",
+      "object_id": "player:3",
+      "reason": null,
+      "role": "player",
+      "score": 0.7387754917144775,
+      "status": "observed",
+      "tracker_id": 3
+    },
+    {
+      "frame_index": 12,
+      "mask_key": "mask_000048",
+      "object_id": "player:0",
+      "reason": null,
+      "role": "player",
+      "score": 0.9569892287254333,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 12,
+      "mask_key": "mask_000049",
+      "object_id": "player:1",
+      "reason": null,
+      "role": "player",
+      "score": 0.9336099624633789,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 12,
+      "mask_key": "mask_000050",
+      "object_id": "player:2",
+      "reason": null,
+      "role": "player",
+      "score": 0.6908212304115295,
+      "status": "observed",
+      "tracker_id": 2
+    },
+    {
+      "frame_index": 12,
+      "mask_key": "mask_000051",
+      "object_id": "player:3",
+      "reason": null,
+      "role": "player",
+      "score": 0.7387754917144775,
+      "status": "observed",
+      "tracker_id": 3
+    },
+    {
+      "frame_index": 13,
+      "mask_key": "mask_000052",
+      "object_id": "player:0",
+      "reason": null,
+      "role": "player",
+      "score": 0.9569892287254333,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 13,
+      "mask_key": "mask_000053",
+      "object_id": "player:1",
+      "reason": null,
+      "role": "player",
+      "score": 0.9336099624633789,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 13,
+      "mask_key": "mask_000054",
+      "object_id": "player:2",
+      "reason": null,
+      "role": "player",
+      "score": 0.6908212304115295,
+      "status": "observed",
+      "tracker_id": 2
+    },
+    {
+      "frame_index": 13,
+      "mask_key": "mask_000055",
+      "object_id": "player:3",
+      "reason": null,
+      "role": "player",
+      "score": 0.7387754917144775,
+      "status": "observed",
+      "tracker_id": 3
+    },
+    {
+      "frame_index": 14,
+      "mask_key": "mask_000056",
+      "object_id": "player:0",
+      "reason": null,
+      "role": "player",
+      "score": 0.9569892287254333,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 14,
+      "mask_key": "mask_000057",
+      "object_id": "player:1",
+      "reason": null,
+      "role": "player",
+      "score": 0.9336099624633789,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 14,
+      "mask_key": "mask_000058",
+      "object_id": "player:2",
+      "reason": null,
+      "role": "player",
+      "score": 0.6908212304115295,
+      "status": "observed",
+      "tracker_id": 2
+    },
+    {
+      "frame_index": 14,
+      "mask_key": "mask_000059",
+      "object_id": "player:3",
+      "reason": null,
+      "role": "player",
+      "score": 0.7387754917144775,
+      "status": "observed",
+      "tracker_id": 3
+    },
+    {
+      "frame_index": 15,
+      "mask_key": "mask_000060",
+      "object_id": "player:0",
+      "reason": null,
+      "role": "player",
+      "score": 0.9569892287254333,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 15,
+      "mask_key": "mask_000061",
+      "object_id": "player:1",
+      "reason": null,
+      "role": "player",
+      "score": 0.9336099624633789,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 15,
+      "mask_key": "mask_000062",
+      "object_id": "player:2",
+      "reason": null,
+      "role": "player",
+      "score": 0.6908212304115295,
+      "status": "observed",
+      "tracker_id": 2
+    },
+    {
+      "frame_index": 15,
+      "mask_key": "mask_000063",
+      "object_id": "player:3",
+      "reason": null,
+      "role": "player",
+      "score": 0.7387754917144775,
+      "status": "observed",
+      "tracker_id": 3
+    },
+    {
+      "frame_index": 0,
+      "mask_key": null,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "prompt_returned_no_mask",
+      "role": "racket",
+      "score": null,
+      "status": "missing",
+      "tracker_id": null
+    },
+    {
+      "frame_index": 0,
+      "mask_key": "mask_000064",
+      "object_id": "racket:0",
+      "reason": null,
+      "role": "racket",
+      "score": 1.0,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 0,
+      "mask_key": "mask_000065",
+      "object_id": "racket:1",
+      "reason": null,
+      "role": "racket",
+      "score": 1.0,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 1,
+      "mask_key": null,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "propagation_missing_frame_object",
+      "role": "racket",
+      "score": null,
+      "status": "missing",
+      "tracker_id": null
+    },
+    {
+      "frame_index": 1,
+      "mask_key": "mask_000066",
+      "object_id": "racket:0",
+      "reason": null,
+      "role": "racket",
+      "score": 0.7928802371025085,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 1,
+      "mask_key": "mask_000067",
+      "object_id": "racket:1",
+      "reason": null,
+      "role": "racket",
+      "score": 1.0,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 2,
+      "mask_key": null,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "propagation_missing_frame_object",
+      "role": "racket",
+      "score": null,
+      "status": "missing",
+      "tracker_id": null
+    },
+    {
+      "frame_index": 2,
+      "mask_key": "mask_000068",
+      "object_id": "racket:0",
+      "reason": null,
+      "role": "racket",
+      "score": 0.7928802371025085,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 2,
+      "mask_key": "mask_000069",
+      "object_id": "racket:1",
+      "reason": null,
+      "role": "racket",
+      "score": 0.6640419960021973,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 3,
+      "mask_key": null,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "propagation_missing_frame_object",
+      "role": "racket",
+      "score": null,
+      "status": "missing",
+      "tracker_id": null
+    },
+    {
+      "frame_index": 3,
+      "mask_key": "mask_000070",
+      "object_id": "racket:0",
+      "reason": null,
+      "role": "racket",
+      "score": 0.7928802371025085,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 3,
+      "mask_key": "mask_000071",
+      "object_id": "racket:1",
+      "reason": null,
+      "role": "racket",
+      "score": 0.6640419960021973,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 4,
+      "mask_key": null,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "propagation_missing_frame_object",
+      "role": "racket",
+      "score": null,
+      "status": "missing",
+      "tracker_id": null
+    },
+    {
+      "frame_index": 4,
+      "mask_key": "mask_000072",
+      "object_id": "racket:0",
+      "reason": null,
+      "role": "racket",
+      "score": 0.7928802371025085,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 4,
+      "mask_key": "mask_000073",
+      "object_id": "racket:1",
+      "reason": null,
+      "role": "racket",
+      "score": 0.6640419960021973,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 5,
+      "mask_key": null,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "propagation_missing_frame_object",
+      "role": "racket",
+      "score": null,
+      "status": "missing",
+      "tracker_id": null
+    },
+    {
+      "frame_index": 5,
+      "mask_key": "mask_000074",
+      "object_id": "racket:0",
+      "reason": null,
+      "role": "racket",
+      "score": 0.7928802371025085,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 5,
+      "mask_key": "mask_000075",
+      "object_id": "racket:1",
+      "reason": null,
+      "role": "racket",
+      "score": 0.6640419960021973,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 6,
+      "mask_key": null,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "propagation_missing_frame_object",
+      "role": "racket",
+      "score": null,
+      "status": "missing",
+      "tracker_id": null
+    },
+    {
+      "frame_index": 6,
+      "mask_key": "mask_000076",
+      "object_id": "racket:0",
+      "reason": null,
+      "role": "racket",
+      "score": 0.7928802371025085,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 6,
+      "mask_key": "mask_000077",
+      "object_id": "racket:1",
+      "reason": null,
+      "role": "racket",
+      "score": 0.6640419960021973,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 7,
+      "mask_key": null,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "propagation_missing_frame_object",
+      "role": "racket",
+      "score": null,
+      "status": "missing",
+      "tracker_id": null
+    },
+    {
+      "frame_index": 7,
+      "mask_key": "mask_000078",
+      "object_id": "racket:0",
+      "reason": null,
+      "role": "racket",
+      "score": 1.0,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 7,
+      "mask_key": "mask_000079",
+      "object_id": "racket:1",
+      "reason": null,
+      "role": "racket",
+      "score": 0.6640419960021973,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 8,
+      "mask_key": null,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "propagation_missing_frame_object",
+      "role": "racket",
+      "score": null,
+      "status": "missing",
+      "tracker_id": null
+    },
+    {
+      "frame_index": 8,
+      "mask_key": "mask_000080",
+      "object_id": "racket:0",
+      "reason": null,
+      "role": "racket",
+      "score": 1.0,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 8,
+      "mask_key": "mask_000081",
+      "object_id": "racket:1",
+      "reason": null,
+      "role": "racket",
+      "score": 0.6640419960021973,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 9,
+      "mask_key": null,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "propagation_missing_frame_object",
+      "role": "racket",
+      "score": null,
+      "status": "missing",
+      "tracker_id": null
+    },
+    {
+      "frame_index": 9,
+      "mask_key": "mask_000082",
+      "object_id": "racket:0",
+      "reason": null,
+      "role": "racket",
+      "score": 0.7928802371025085,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 9,
+      "mask_key": "mask_000083",
+      "object_id": "racket:1",
+      "reason": null,
+      "role": "racket",
+      "score": 0.6640419960021973,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 10,
+      "mask_key": null,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "propagation_missing_frame_object",
+      "role": "racket",
+      "score": null,
+      "status": "missing",
+      "tracker_id": null
+    },
+    {
+      "frame_index": 10,
+      "mask_key": "mask_000084",
+      "object_id": "racket:0",
+      "reason": null,
+      "role": "racket",
+      "score": 0.7928802371025085,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 10,
+      "mask_key": "mask_000085",
+      "object_id": "racket:1",
+      "reason": null,
+      "role": "racket",
+      "score": 0.6640419960021973,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 11,
+      "mask_key": null,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "propagation_missing_frame_object",
+      "role": "racket",
+      "score": null,
+      "status": "missing",
+      "tracker_id": null
+    },
+    {
+      "frame_index": 11,
+      "mask_key": "mask_000086",
+      "object_id": "racket:0",
+      "reason": null,
+      "role": "racket",
+      "score": 0.7928802371025085,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 11,
+      "mask_key": "mask_000087",
+      "object_id": "racket:1",
+      "reason": null,
+      "role": "racket",
+      "score": 0.6640419960021973,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 12,
+      "mask_key": null,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "propagation_missing_frame_object",
+      "role": "racket",
+      "score": null,
+      "status": "missing",
+      "tracker_id": null
+    },
+    {
+      "frame_index": 12,
+      "mask_key": "mask_000088",
+      "object_id": "racket:0",
+      "reason": null,
+      "role": "racket",
+      "score": 0.7928802371025085,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 12,
+      "mask_key": "mask_000089",
+      "object_id": "racket:1",
+      "reason": null,
+      "role": "racket",
+      "score": 0.6640419960021973,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 13,
+      "mask_key": null,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "propagation_missing_frame_object",
+      "role": "racket",
+      "score": null,
+      "status": "missing",
+      "tracker_id": null
+    },
+    {
+      "frame_index": 13,
+      "mask_key": "mask_000090",
+      "object_id": "racket:0",
+      "reason": null,
+      "role": "racket",
+      "score": 0.7928802371025085,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 13,
+      "mask_key": "mask_000091",
+      "object_id": "racket:1",
+      "reason": null,
+      "role": "racket",
+      "score": 0.6640419960021973,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 14,
+      "mask_key": null,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "propagation_missing_frame_object",
+      "role": "racket",
+      "score": null,
+      "status": "missing",
+      "tracker_id": null
+    },
+    {
+      "frame_index": 14,
+      "mask_key": "mask_000092",
+      "object_id": "racket:0",
+      "reason": null,
+      "role": "racket",
+      "score": 0.7928802371025085,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 14,
+      "mask_key": "mask_000093",
+      "object_id": "racket:1",
+      "reason": null,
+      "role": "racket",
+      "score": 0.6640419960021973,
+      "status": "observed",
+      "tracker_id": 1
+    },
+    {
+      "frame_index": 15,
+      "mask_key": null,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "propagation_missing_frame_object",
+      "role": "racket",
+      "score": null,
+      "status": "missing",
+      "tracker_id": null
+    },
+    {
+      "frame_index": 15,
+      "mask_key": "mask_000094",
+      "object_id": "racket:0",
+      "reason": null,
+      "role": "racket",
+      "score": 0.7928802371025085,
+      "status": "observed",
+      "tracker_id": 0
+    },
+    {
+      "frame_index": 15,
+      "mask_key": "mask_000095",
+      "object_id": "racket:1",
+      "reason": null,
+      "role": "racket",
+      "score": 0.6640419960021973,
+      "status": "observed",
+      "tracker_id": 1
+    }
+  ],
+  "prompts": [
+    {
+      "initial_object_ids": [
+        "player:0",
+        "player:1"
+      ],
+      "prompt_seconds": 0.7169623579829931,
+      "propagation_seconds": 3.288369115907699,
+      "role": "player",
+      "text": "tennis player"
+    },
+    {
+      "initial_object_ids": [
+        "alcaraz_perricard_scene_007:racket:prompt"
+      ],
+      "prompt_seconds": 0.17027493612840772,
+      "propagation_seconds": 1.6716543342918158,
+      "role": "racket",
+      "text": "tennis racket"
+    }
+  ],
+  "provenance": {
+    "checkpoint_sha256": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
+    "config_sha256": "5bad4dd39bcf2e98e1cdf90287ae863fb585b5cc78e3decaa78ef5f08c407872",
+    "model_revision": "2345a4ad109ac29c569da749c91d84f10dc08c40",
+    "name": "sam3.1_multiplex",
+    "policy": "offline_bidirectional"
+  },
+  "retries": [
+    {
+      "accepted": true,
+      "ambiguous_extra_masks": 0,
+      "attempted": true,
+      "bbox_xyxy": [
+        682,
+        517,
+        796,
+        915
+      ],
+      "frame_index": 0,
+      "guidance": "nearest_observed_mask_median_foreground_point",
+      "object_id": "player:2",
+      "positive_point_xy": [
+        736.0,
+        710.0
+      ],
+      "prompt_form": "positive_point_only",
+      "role": "player",
+      "seed_frame_index": 4
+    },
+    {
+      "accepted": true,
+      "ambiguous_extra_masks": 0,
+      "attempted": true,
+      "bbox_xyxy": [
+        682,
+        517,
+        796,
+        915
+      ],
+      "frame_index": 1,
+      "guidance": "nearest_observed_mask_median_foreground_point",
+      "object_id": "player:2",
+      "positive_point_xy": [
+        736.0,
+        710.0
+      ],
+      "prompt_form": "positive_point_only",
+      "role": "player",
+      "seed_frame_index": 4
+    },
+    {
+      "accepted": true,
+      "ambiguous_extra_masks": 0,
+      "attempted": true,
+      "bbox_xyxy": [
+        682,
+        517,
+        796,
+        915
+      ],
+      "frame_index": 2,
+      "guidance": "nearest_observed_mask_median_foreground_point",
+      "object_id": "player:2",
+      "positive_point_xy": [
+        736.0,
+        710.0
+      ],
+      "prompt_form": "positive_point_only",
+      "role": "player",
+      "seed_frame_index": 4
+    },
+    {
+      "accepted": true,
+      "ambiguous_extra_masks": 0,
+      "attempted": true,
+      "bbox_xyxy": [
+        682,
+        517,
+        796,
+        915
+      ],
+      "frame_index": 3,
+      "guidance": "nearest_observed_mask_median_foreground_point",
+      "object_id": "player:2",
+      "positive_point_xy": [
+        736.0,
+        710.0
+      ],
+      "prompt_form": "positive_point_only",
+      "role": "player",
+      "seed_frame_index": 4
+    },
+    {
+      "accepted": true,
+      "ambiguous_extra_masks": 0,
+      "attempted": true,
+      "bbox_xyxy": [
+        858,
+        505,
+        1007,
+        920
+      ],
+      "frame_index": 0,
+      "guidance": "nearest_observed_mask_median_foreground_point",
+      "object_id": "player:3",
+      "positive_point_xy": [
+        928.0,
+        717.0
+      ],
+      "prompt_form": "positive_point_only",
+      "role": "player",
+      "seed_frame_index": 7
+    },
+    {
+      "accepted": true,
+      "ambiguous_extra_masks": 0,
+      "attempted": true,
+      "bbox_xyxy": [
+        858,
+        505,
+        1007,
+        920
+      ],
+      "frame_index": 1,
+      "guidance": "nearest_observed_mask_median_foreground_point",
+      "object_id": "player:3",
+      "positive_point_xy": [
+        928.0,
+        717.0
+      ],
+      "prompt_form": "positive_point_only",
+      "role": "player",
+      "seed_frame_index": 7
+    },
+    {
+      "accepted": true,
+      "ambiguous_extra_masks": 0,
+      "attempted": true,
+      "bbox_xyxy": [
+        858,
+        505,
+        1007,
+        920
+      ],
+      "frame_index": 2,
+      "guidance": "nearest_observed_mask_median_foreground_point",
+      "object_id": "player:3",
+      "positive_point_xy": [
+        928.0,
+        717.0
+      ],
+      "prompt_form": "positive_point_only",
+      "role": "player",
+      "seed_frame_index": 7
+    },
+    {
+      "accepted": true,
+      "ambiguous_extra_masks": 0,
+      "attempted": true,
+      "bbox_xyxy": [
+        858,
+        505,
+        1007,
+        920
+      ],
+      "frame_index": 3,
+      "guidance": "nearest_observed_mask_median_foreground_point",
+      "object_id": "player:3",
+      "positive_point_xy": [
+        928.0,
+        717.0
+      ],
+      "prompt_form": "positive_point_only",
+      "role": "player",
+      "seed_frame_index": 7
+    },
+    {
+      "accepted": true,
+      "ambiguous_extra_masks": 0,
+      "attempted": true,
+      "bbox_xyxy": [
+        858,
+        505,
+        1007,
+        920
+      ],
+      "frame_index": 4,
+      "guidance": "nearest_observed_mask_median_foreground_point",
+      "object_id": "player:3",
+      "positive_point_xy": [
+        928.0,
+        717.0
+      ],
+      "prompt_form": "positive_point_only",
+      "role": "player",
+      "seed_frame_index": 7
+    },
+    {
+      "accepted": true,
+      "ambiguous_extra_masks": 0,
+      "attempted": true,
+      "bbox_xyxy": [
+        858,
+        505,
+        1007,
+        920
+      ],
+      "frame_index": 5,
+      "guidance": "nearest_observed_mask_median_foreground_point",
+      "object_id": "player:3",
+      "positive_point_xy": [
+        928.0,
+        717.0
+      ],
+      "prompt_form": "positive_point_only",
+      "role": "player",
+      "seed_frame_index": 7
+    },
+    {
+      "accepted": true,
+      "ambiguous_extra_masks": 0,
+      "attempted": true,
+      "bbox_xyxy": [
+        858,
+        505,
+        1007,
+        920
+      ],
+      "frame_index": 6,
+      "guidance": "nearest_observed_mask_median_foreground_point",
+      "object_id": "player:3",
+      "positive_point_xy": [
+        928.0,
+        717.0
+      ],
+      "prompt_form": "positive_point_only",
+      "role": "player",
+      "seed_frame_index": 7
+    },
+    {
+      "attempted": false,
+      "frame_index": 0,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "no_observed_mask_available_for_spatial_guidance",
+      "role": "racket"
+    },
+    {
+      "attempted": false,
+      "frame_index": 1,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "no_observed_mask_available_for_spatial_guidance",
+      "role": "racket"
+    },
+    {
+      "attempted": false,
+      "frame_index": 2,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "no_observed_mask_available_for_spatial_guidance",
+      "role": "racket"
+    },
+    {
+      "attempted": false,
+      "frame_index": 3,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "no_observed_mask_available_for_spatial_guidance",
+      "role": "racket"
+    },
+    {
+      "attempted": false,
+      "frame_index": 4,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "no_observed_mask_available_for_spatial_guidance",
+      "role": "racket"
+    },
+    {
+      "attempted": false,
+      "frame_index": 5,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "no_observed_mask_available_for_spatial_guidance",
+      "role": "racket"
+    },
+    {
+      "attempted": false,
+      "frame_index": 6,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "no_observed_mask_available_for_spatial_guidance",
+      "role": "racket"
+    },
+    {
+      "attempted": false,
+      "frame_index": 7,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "no_observed_mask_available_for_spatial_guidance",
+      "role": "racket"
+    },
+    {
+      "attempted": false,
+      "frame_index": 8,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "no_observed_mask_available_for_spatial_guidance",
+      "role": "racket"
+    },
+    {
+      "attempted": false,
+      "frame_index": 9,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "no_observed_mask_available_for_spatial_guidance",
+      "role": "racket"
+    },
+    {
+      "attempted": false,
+      "frame_index": 10,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "no_observed_mask_available_for_spatial_guidance",
+      "role": "racket"
+    },
+    {
+      "attempted": false,
+      "frame_index": 11,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "no_observed_mask_available_for_spatial_guidance",
+      "role": "racket"
+    },
+    {
+      "attempted": false,
+      "frame_index": 12,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "no_observed_mask_available_for_spatial_guidance",
+      "role": "racket"
+    },
+    {
+      "attempted": false,
+      "frame_index": 13,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "no_observed_mask_available_for_spatial_guidance",
+      "role": "racket"
+    },
+    {
+      "attempted": false,
+      "frame_index": 14,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "no_observed_mask_available_for_spatial_guidance",
+      "role": "racket"
+    },
+    {
+      "attempted": false,
+      "frame_index": 15,
+      "object_id": "alcaraz_perricard_scene_007:racket:prompt",
+      "reason": "no_observed_mask_available_for_spatial_guidance",
+      "role": "racket"
+    },
+    {
+      "accepted": true,
+      "ambiguous_extra_masks": 0,
+      "attempted": true,
+      "bbox_xyxy": [
+        733,
+        537,
+        854,
+        665
+      ],
+      "frame_index": 0,
+      "guidance": "nearest_observed_mask_median_foreground_point",
+      "object_id": "racket:0",
+      "positive_point_xy": [
+        796.0,
+        601.0
+      ],
+      "prompt_form": "positive_point_only",
+      "role": "racket",
+      "seed_frame_index": 1
+    },
+    {
+      "accepted": true,
+      "ambiguous_extra_masks": 0,
+      "attempted": true,
+      "bbox_xyxy": [
+        824,
+        1046,
+        849,
+        1113
+      ],
+      "frame_index": 7,
+      "guidance": "nearest_observed_mask_median_foreground_point",
+      "object_id": "racket:0",
+      "positive_point_xy": [
+        837.0,
+        1081.0
+      ],
+      "prompt_form": "positive_point_only",
+      "role": "racket",
+      "seed_frame_index": 6
+    },
+    {
+      "accepted": true,
+      "ambiguous_extra_masks": 0,
+      "attempted": true,
+      "bbox_xyxy": [
+        576,
+        1340,
+        704,
+        1532
+      ],
+      "frame_index": 8,
+      "guidance": "nearest_observed_mask_median_foreground_point",
+      "object_id": "racket:0",
+      "positive_point_xy": [
+        653.0,
+        1457.0
+      ],
+      "prompt_form": "positive_point_only",
+      "role": "racket",
+      "seed_frame_index": 9
+    },
+    {
+      "accepted": true,
+      "ambiguous_extra_masks": 0,
+      "attempted": true,
+      "bbox_xyxy": [
+        2246,
+        689,
+        2304,
+        752
+      ],
+      "frame_index": 0,
+      "guidance": "nearest_observed_mask_median_foreground_point",
+      "object_id": "racket:1",
+      "positive_point_xy": [
+        2276.0,
+        724.0
+      ],
+      "prompt_form": "positive_point_only",
+      "role": "racket",
+      "seed_frame_index": 2
+    },
+    {
+      "accepted": true,
+      "ambiguous_extra_masks": 0,
+      "attempted": true,
+      "bbox_xyxy": [
+        2246,
+        689,
+        2304,
+        752
+      ],
+      "frame_index": 1,
+      "guidance": "nearest_observed_mask_median_foreground_point",
+      "object_id": "racket:1",
+      "positive_point_xy": [
+        2276.0,
+        724.0
+      ],
+      "prompt_form": "positive_point_only",
+      "role": "racket",
+      "seed_frame_index": 2
+    }
+  ],
+  "sam_runtime": {
+    "cuda_runtime_version": "12.8",
+    "python": "/home/itec/emanuele/.conda/envs/pointstream-sam31/bin/python3.12",
+    "python_version": "3.12.14 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:46:43) [GCC 14.3.0]",
+    "torch_version": "2.10.0+cu128"
+  },
+  "schema": "pointstream.sam31-worker-result.v1",
+  "source_id": "alcaraz_perricard_scene_007"
+}

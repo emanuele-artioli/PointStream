@@ -1,0 +1,4431 @@
+{
+  "records": [
+    {
+      "family": "20260610_182152_465478",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260610_182152_465478/run_summary.json",
+      "sha256": "e4d1963cd1fb5b33d831589ce2e98106eb5586600b08314ca06e0e3fa711439f",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": null,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "pix2pix",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "decoded_video_size_bytes": 514766,
+        "transport_savings_percent": 83.88379165231923,
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames",
+        "sizes_bytes is missing; payload claims cannot be made from this run"
+      ],
+      "component_bytes_sum": 0,
+      "transport_total": null,
+      "balance": false,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260611_063408_954108",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_063408_954108/run_summary.json",
+      "sha256": "0e8da39205fba0ad03542e185f3c9d802d5c1777231932aaf1e1ba343bb9369b",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": null,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "pix2pix",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "decoded_video_size_bytes": 516467,
+        "transport_savings_percent": 83.89101940958841,
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames",
+        "sizes_bytes is missing; payload claims cannot be made from this run"
+      ],
+      "component_bytes_sum": 0,
+      "transport_total": null,
+      "balance": false,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260611_064030_257190",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_064030_257190/run_summary.json",
+      "sha256": "b1854a955f505b068a392591206f8880f0ea1842b58eef798217382068f4e7ac",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": null,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "pix2pix",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "decoded_video_size_bytes": 2452916,
+        "transport_savings_percent": 43.407068600888344,
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames",
+        "sizes_bytes is missing; payload claims cannot be made from this run"
+      ],
+      "component_bytes_sum": 0,
+      "transport_total": null,
+      "balance": false,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260611_070339_787671",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_070339_787671/run_summary.json",
+      "sha256": "2a8ce8f0c577c38b87ee9922c797f5872e6900b25815bfbb4a6890efe9178aee",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "pix2pix",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "decoded_video_size_bytes": 2452916,
+        "transport_savings_percent": 43.407068600888344,
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs",
+        "quality_evaluation_sec": 1.88629986718297
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames",
+        "sizes_bytes is missing; payload claims cannot be made from this run"
+      ],
+      "component_bytes_sum": 0,
+      "transport_total": null,
+      "balance": false,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260611_070758_903937",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_070758_903937/run_summary.json",
+      "sha256": "e08557437c9391bb4fb4f3eb72cb433dd0f9b4566c37ad4bcef747cdc003acf2",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "pix2pix",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "decoded_video_size_bytes": 2452916,
+        "transport_savings_percent": 43.407068600888344,
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs",
+        "quality_evaluation_sec": 1.4217289150692523
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames",
+        "sizes_bytes is missing; payload claims cannot be made from this run"
+      ],
+      "component_bytes_sum": 0,
+      "transport_total": null,
+      "balance": false,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260611_071446_695013",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_071446_695013/run_summary.json",
+      "sha256": "1374a8ab1e36408bde757665312344aa13e52d3871877d11dbbc672b2a42b0b4",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "pix2pix",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "decoded_video_size_bytes": 2452916,
+        "transport_savings_percent": 43.407068600888344,
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs",
+        "quality_evaluation_sec": 1.2631052630022168
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames",
+        "sizes_bytes is missing; payload claims cannot be made from this run"
+      ],
+      "component_bytes_sum": 0,
+      "transport_total": null,
+      "balance": false,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260611_072500_651949",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_072500_651949/run_summary.json",
+      "sha256": "4eaaf653629e274e440b1ae8d01c21e2892d8f78d46256dfd1fa8e8a834fe596",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "pix2pix",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "source_size_bytes": 6862433,
+        "metadata_size_bytes": 90422,
+        "actor_reference_size_bytes": 73655,
+        "residual_size_bytes": 3358384,
+        "panorama_size_bytes": 361191,
+        "transport_total_size_bytes": 3883652,
+        "timings_sec": {
+          "pipeline_total": 218.31422057421878,
+          "encode_chunk": {
+            "total": 99.43732695188373,
+            "actor_bundle": {
+              "total": 20.462817604187876,
+              "detection": 10.69465916370973,
+              "heuristic": 0.005883106961846352,
+              "segmentation": 5.572278223466128,
+              "pose_estimation": 1.8157488112337887,
+              "metadata_generation": 0.003981705289334059
+            },
+            "panorama": 25.153935741167516,
+            "rigid_objects": 6.021000444889069e-06,
+            "ball": 13.357159529812634,
+            "actors": 6.990041583776474e-06,
+            "frame_states": 2.880580723285675e-06,
+            "actor_references": 2.8755876277573407,
+            "residual": 37.48519856669009
+          },
+          "transport_send": 2.305265136063099,
+          "transport_receive": 0.0020863479003310204,
+          "decode": {
+            "total": 113.7333770529367,
+            "actor_state_build": 0.006556916981935501,
+            "synthesis": 0.2516494248993695,
+            "genai_baseline": 78.93084967089817,
+            "composite": 3.996648341882974,
+            "video_encoding": 30.5454029222019
+          },
+          "quality_evaluation": 1.4787127831950784
+        },
+        "transport_to_source_ratio": 0.5659293139911166,
+        "decoded_video_size_bytes": 2452916,
+        "transport_savings_percent": null,
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames",
+        "sizes_bytes is missing; payload claims cannot be made from this run"
+      ],
+      "component_bytes_sum": 0,
+      "transport_total": null,
+      "balance": false,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260611_073539_382810",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_073539_382810/run_summary.json",
+      "sha256": "73f6e7c0329cb6a7c7ac02e54c0842817897375c94e01d78bf85bdb14c1ef678",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "pix2pix",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "source_size_bytes": 6862433,
+        "metadata_size_bytes": 90422,
+        "actor_reference_size_bytes": 73655,
+        "residual_size_bytes": 3358384,
+        "panorama_size_bytes": 361191,
+        "transport_total_size_bytes": 3883652,
+        "timings_sec": {
+          "pipeline_total": 222.75406614970416,
+          "encode_chunk": {
+            "total": 100.83737969584763,
+            "actor_bundle": {
+              "total": 20.111908225808293,
+              "detection": 10.336241098120809,
+              "heuristic": 0.005758307408541441,
+              "segmentation": 5.531601362396032,
+              "pose_estimation": 1.818423940334469,
+              "metadata_generation": 0.0038008950650691986
+            },
+            "residual": {
+              "total": 39.27329467702657,
+              "synthesis": 2.1776663959026337,
+              "genai_baseline": 22.12178377015516,
+              "computation": 14.734916695859283
+            },
+            "panorama": 25.347765040118247,
+            "rigid_objects": 8.239876478910446e-06,
+            "ball": 13.248365689069033,
+            "actors": 5.490146577358246e-06,
+            "frame_states": 1.5399418771266937e-06,
+            "actor_references": 2.8152460451237857
+          },
+          "transport_send": 2.0983981150202453,
+          "transport_receive": 0.0019521210342645645,
+          "decode": {
+            "total": 117.01572280889377,
+            "actor_state_build": 0.014811722096055746,
+            "synthesis": 0.2729507661424577,
+            "genai_baseline": 82.27671248326078,
+            "composite": 3.962637221906334,
+            "video_encoding": 30.48716060211882
+          },
+          "quality_evaluation": 2.4602200561203063
+        },
+        "transport_to_source_ratio": 0.5659293139911166,
+        "decoded_video_size_bytes": 2452916,
+        "transport_savings_percent": null,
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames",
+        "sizes_bytes is missing; payload claims cannot be made from this run"
+      ],
+      "component_bytes_sum": 0,
+      "transport_total": null,
+      "balance": false,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260611_074329_655909",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_074329_655909/run_summary.json",
+      "sha256": "5ffcc8a3cdce368cdd9b1f76c8cadcec4ac565098de2536ca26e098ddfe43372",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "pix2pix",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 90422,
+          "actor_reference": 73655,
+          "residual": 3358384,
+          "panorama": 361191,
+          "transport_total": 3883652,
+          "decoded_video": 2452916
+        },
+        "timings_sec": {
+          "pipeline_total": 213.87993761105463,
+          "encode_chunk": {
+            "total": 106.05842737108469,
+            "actor_bundle": {
+              "total": 22.84747587190941,
+              "detection": 12.749098187778145,
+              "heuristic": 0.00601468188688159,
+              "segmentation": 5.72424686094746,
+              "pose_estimation": 1.9278304115869105,
+              "metadata_generation": 0.004433478228747845
+            },
+            "residual": {
+              "total": 37.42089868662879,
+              "synthesis": 2.400010755751282,
+              "genai_baseline": 22.059874553233385,
+              "computation": 12.71254005515948
+            },
+            "panorama": 26.23045015381649,
+            "rigid_objects": 2.1150801330804825e-05,
+            "ball": 16.602055369876325,
+            "actors": 1.2470874935388565e-05,
+            "frame_states": 1.1296942830085754e-06,
+            "actor_references": 2.891319850925356
+          },
+          "transport_send": 2.0278056766837835,
+          "transport_receive": 0.0021153786219656467,
+          "decode": {
+            "total": 102.84708587313071,
+            "actor_state_build": 0.022441354114562273,
+            "synthesis": 0.24100039806216955,
+            "genai_baseline": 69.91284831799567,
+            "composite": 4.0428955419920385,
+            "video_encoding": 28.624535718932748
+          },
+          "quality_evaluation": 2.633791664149612
+        },
+        "transport_to_source_ratio": 0.5659293139911166,
+        "transport_savings_percent": 43.407068600888344,
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 3883652,
+      "transport_total": 3883652,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260611_074846_407715",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260611_074846_407715/run_summary.json",
+      "sha256": "391e3d587d63e185046b107ca63c7ca155147e3ae3b3c70c99247d16a2c41e1e",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "pix2pix",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 90422,
+          "actor_reference": 73655,
+          "residual": 3358384,
+          "panorama": 361191,
+          "transport_total": 3883652,
+          "transport_to_source_ratio": 0.5659293139911166,
+          "decoded_video": 2452916,
+          "transport_savings_percent": 43.407068600888344
+        },
+        "timings_sec": {
+          "pipeline_total": 223.6641681799665,
+          "encode_chunk": {
+            "total": 105.69006178574637,
+            "actor_bundle": {
+              "total": 20.42317956779152,
+              "detection": 10.546009548008442,
+              "heuristic": 0.006021515000611544,
+              "segmentation": 5.594451366458088,
+              "pose_estimation": 1.7894920534454286,
+              "metadata_generation": 0.0038889599964022636
+            },
+            "residual": {
+              "total": 38.37812279490754,
+              "synthesis": 2.3805714370682836,
+              "genai_baseline": 21.69934019399807,
+              "computation": 14.058916315902025
+            },
+            "panorama": 29.319069251883775,
+            "rigid_objects": 5.4407864809036255e-06,
+            "ball": 14.573523728642613,
+            "actors": 4.239846020936966e-06,
+            "frame_states": 1.519918441772461e-06,
+            "actor_references": 2.9613345288671553
+          },
+          "transport_send": 2.2172025619074702,
+          "transport_receive": 0.00214877026155591,
+          "decode": {
+            "total": 113.07032400975004,
+            "actor_state_build": 0.006505704950541258,
+            "synthesis": 0.23371002124622464,
+            "genai_baseline": 78.82929382426664,
+            "composite": 4.65218530735001,
+            "video_encoding": 29.347476864233613
+          },
+          "quality_evaluation": 1.7015164741314948
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 3883652,
+      "transport_total": 3883652,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260629_102126_823233",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260629_102126_823233/run_summary.json",
+      "sha256": "ac89abc8b49c4c68906932a8095b7c422180660063d57b59f2a31ed3fb939a99",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/scene_004.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 248,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "pix2pix",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 16595574,
+          "metadata": 297856,
+          "actor_reference": 69919,
+          "residual": 8403018,
+          "panorama": 346875,
+          "transport_total": 9117668,
+          "transport_to_source_ratio": 0.5494035939943988,
+          "decoded_video": 6375311,
+          "transport_savings_percent": 45.05964060056012
+        },
+        "timings_sec": {
+          "pipeline_total": 908.5129239469534,
+          "encode_chunk": {
+            "total": 392.1247946929652,
+            "actor_bundle": {
+              "total": 119.62118852499407,
+              "detection": 56.65544379607309,
+              "heuristic": 0.033655693754553795,
+              "segmentation": 34.95194900117349,
+              "pose_estimation": 12.929741280968301,
+              "metadata_generation": 0.014355274033732712
+            },
+            "residual": {
+              "total": 141.10746963799465,
+              "synthesis": 2.7240505050867796,
+              "genai_baseline": 96.92882699205074,
+              "computation": 40.74374980200082
+            },
+            "panorama": 68.97303650702816,
+            "rigid_objects": 2.3551052436232567e-05,
+            "ball": 46.98622538999189,
+            "actors": 1.5230965800583363e-05,
+            "frame_states": 4.00992576032877e-06,
+            "actor_references": 15.187736330088228
+          },
+          "transport_send": 2.334032087936066,
+          "transport_receive": 0.007407127995975316,
+          "decode": {
+            "total": 512.0735556009458,
+            "actor_state_build": 0.012003713985905051,
+            "synthesis": 0.8357683609938249,
+            "genai_baseline": 372.6413035679143,
+            "composite": 12.821975274011493,
+            "video_encoding": 125.76153367501684
+          },
+          "quality_evaluation": 0.03427843004465103
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 9117668,
+      "transport_total": 9117668,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260702_123203_610276",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260702_123203_610276/run_summary.json",
+      "sha256": "575e9bdcb733db0481017919fde2da70ccd958c86dfbc0013e49bf538add0bfb",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/raw_4k/alcaraz_highlights.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 10,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 721610722,
+          "metadata": 271723,
+          "actor_reference": 34404,
+          "residual": 336860,
+          "panorama": 346130,
+          "transport_total": 989117,
+          "transport_to_source_ratio": 0.0013707071830343451,
+          "decoded_video": 414513,
+          "transport_savings_percent": 99.86292928169657
+        },
+        "timings_sec": {
+          "pipeline_total": 118.30497620208189,
+          "encode_chunk": {
+            "total": 69.67195329582319,
+            "actor_bundle": {
+              "total": 5.144625433022156,
+              "detection": 3.3478583788964897,
+              "heuristic": 0.0011175598483532667,
+              "segmentation": 0.028603829443454742,
+              "pose_estimation": 2.4265144020318985e-05,
+              "metadata_generation": 0.04857927793636918
+            },
+            "residual": {
+              "total": 40.65999778895639,
+              "synthesis": 1.982508041895926,
+              "genai_baseline": 30.35530719300732,
+              "computation": 7.55073126591742
+            },
+            "panorama": 16.839971627108753,
+            "rigid_objects": 7.370021194219589e-06,
+            "ball": 5.357641922077164,
+            "actors": 1.0659918189048767e-05,
+            "frame_states": 1.3899989426136017e-06,
+            "actor_references": 1.6657571790274233
+          },
+          "transport_send": 1.8672639520373195,
+          "transport_receive": 0.0012501250021159649,
+          "decode": {
+            "total": 44.53119997121394,
+            "actor_state_build": 0.007148511009290814,
+            "synthesis": 0.06733088102191687,
+            "genai_baseline": 34.94807716598734,
+            "composite": 1.563372883014381,
+            "video_encoding": 7.944920311914757
+          },
+          "quality_evaluation": 0.13032084587030113
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 989117,
+      "transport_total": 989117,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260706_155406_352230",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260706_155406_352230/run_summary.json",
+      "sha256": "75d55c6e32fb057a88ca8b318f5efcd0d04e230257e5b795529eae33b59bdbdb",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/raw_4k/alcaraz_highlights.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 10,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "seg-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 721610722,
+          "metadata": 129321,
+          "actor_reference": 34404,
+          "residual": 346929,
+          "panorama": 346130,
+          "transport_total": 856784,
+          "transport_to_source_ratio": 0.0011873216041266084,
+          "decoded_video": 417247,
+          "transport_savings_percent": 99.88126783958734
+        },
+        "timings_sec": {
+          "pipeline_total": 119.26672108401544,
+          "encode_chunk": {
+            "total": 70.95836736587808,
+            "actor_bundle": {
+              "total": 6.945493110921234,
+              "detection": 2.787551309913397,
+              "heuristic": 0.0010881249327212572,
+              "segmentation": 2.1222201231867075,
+              "pose_estimation": 3.109057433903217e-05,
+              "metadata_generation": 0.11473733512684703
+            },
+            "residual": {
+              "total": 39.859615192050114,
+              "synthesis": 1.749392987927422,
+              "genai_baseline": 29.90316939796321,
+              "computation": 7.467294709989801
+            },
+            "panorama": 17.07598187495023,
+            "rigid_objects": 1.4140969142317772e-05,
+            "ball": 5.226580298971385,
+            "actors": 7.440103217959404e-06,
+            "frame_states": 1.519918441772461e-06,
+            "actor_references": 1.8401818668935448
+          },
+          "transport_send": 1.7428182091098279,
+          "transport_receive": 0.0008987560868263245,
+          "decode": {
+            "total": 44.03059731191024,
+            "actor_state_build": 0.0056309509091079235,
+            "synthesis": 0.06552035384811461,
+            "genai_baseline": 34.49095373391174,
+            "composite": 1.480286039877683,
+            "video_encoding": 7.987849833909422
+          },
+          "quality_evaluation": 0.06020720908418298
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 856784,
+      "transport_total": 856784,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260707_132400_690120",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260707_132400_690120/run_summary.json",
+      "sha256": "979de3bf4d3f6891f393dc6ad90fa75c3e32a847f4dcc53d8beda2755d282776",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/raw_4k/alcaraz_highlights.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 10,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "seg-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 721610722,
+          "metadata": 129321,
+          "actor_reference": 34404,
+          "residual": 346929,
+          "panorama": 346130,
+          "transport_total": 856784,
+          "transport_to_source_ratio": 0.0011873216041266084,
+          "decoded_video": 417247,
+          "transport_savings_percent": 99.88126783958734
+        },
+        "timings_sec": {
+          "pipeline_total": 123.0631147690583,
+          "encode_chunk": {
+            "total": 72.70320994104259,
+            "actor_bundle": {
+              "total": 6.748587355017662,
+              "detection": 2.8112235602457076,
+              "heuristic": 0.0012085239868611097,
+              "segmentation": 2.100231043761596,
+              "pose_estimation": 4.193396307528019e-05,
+              "metadata_generation": 0.11287014000117779
+            },
+            "residual": {
+              "total": 40.89770597615279,
+              "synthesis": 1.8271440989337862,
+              "genai_baseline": 30.907866034889594,
+              "computation": 7.493352952878922
+            },
+            "panorama": 17.798381824046373,
+            "rigid_objects": 4.670117050409317e-06,
+            "ball": 5.537482755957171,
+            "actors": 1.3950048014521599e-05,
+            "frame_states": 2.5299377739429474e-06,
+            "actor_references": 1.710154804866761
+          },
+          "transport_send": 1.840766433859244,
+          "transport_receive": 0.0010595549829304218,
+          "decode": {
+            "total": 46.07988290395588,
+            "actor_state_build": 0.00708984793163836,
+            "synthesis": 0.08669881080277264,
+            "genai_baseline": 36.34013811708428,
+            "composite": 1.5423212500754744,
+            "video_encoding": 8.10290074092336
+          },
+          "quality_evaluation": 0.027809204068034887
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 856784,
+      "transport_total": 856784,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260707_132621_666693",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260707_132621_666693/run_summary.json",
+      "sha256": "0073d2d1edf09fcaa80431839b0b54e1d5e010f30b46ad256d7812e99edef2ed",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/raw_4k/alcaraz_highlights.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 10,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "baseline-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 721610722,
+          "metadata": 11235,
+          "actor_reference": 34404,
+          "residual": 338143,
+          "panorama": 346130,
+          "transport_total": 729912,
+          "transport_to_source_ratio": 0.0010115038174280343,
+          "decoded_video": 417566,
+          "transport_savings_percent": 99.8988496182572
+        },
+        "timings_sec": {
+          "pipeline_total": 137.3506813151762,
+          "encode_chunk": {
+            "total": 73.64800830907188,
+            "actor_bundle": {
+              "total": 7.509460357949138,
+              "detection": 2.9683103489223868,
+              "heuristic": 0.0011134680826216936,
+              "segmentation": 2.1175543235149235,
+              "pose_estimation": 0.5335797488223761,
+              "metadata_generation": 0.00511233601719141
+            },
+            "residual": {
+              "total": 40.66202706308104,
+              "synthesis": 1.79477146291174,
+              "genai_baseline": 30.14378946600482,
+              "computation": 8.020495868986472
+            },
+            "panorama": 18.342167905997485,
+            "rigid_objects": 5.65103255212307e-06,
+            "ball": 5.342641757102683,
+            "actors": 3.6732060834765434e-05,
+            "frame_states": 1.3799872249364853e-06,
+            "actor_references": 1.7035101549699903
+          },
+          "transport_send": 2.826377135934308,
+          "transport_receive": 0.0015149691607803106,
+          "decode": {
+            "total": 58.475889364024624,
+            "actor_state_build": 0.0056122110690921545,
+            "synthesis": 0.09590542805381119,
+            "genai_baseline": 47.85462332307361,
+            "composite": 1.5947171349544078,
+            "video_encoding": 8.924553781049326
+          },
+          "quality_evaluation": 0.02662405208684504
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 729912,
+      "transport_total": 729912,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260707_132855_342866",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260707_132855_342866/run_summary.json",
+      "sha256": "ddc3d40a400b688e391621fcaf1188d0a3ea6c4f21886f6cbef38eaa4d970681",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/raw_4k/alcaraz_highlights.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 10,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "ip-adapter-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 721610722,
+          "metadata": 11235,
+          "actor_reference": 34404,
+          "residual": 340563,
+          "panorama": 346130,
+          "transport_total": 732332,
+          "transport_to_source_ratio": 0.00101485742613453,
+          "decoded_video": 417176,
+          "transport_savings_percent": 99.89851425738655
+        },
+        "timings_sec": {
+          "pipeline_total": 168.73649868601933,
+          "encode_chunk": {
+            "total": 105.06526744598523,
+            "actor_bundle": {
+              "total": 7.091342183062807,
+              "detection": 2.794665024848655,
+              "heuristic": 0.001422012923285365,
+              "segmentation": 2.097379538230598,
+              "pose_estimation": 0.5104847005568445,
+              "metadata_generation": 0.009892364032566547
+            },
+            "residual": {
+              "total": 73.56573207397014,
+              "synthesis": 2.1249116871040314,
+              "genai_baseline": 63.351048679091036,
+              "computation": 7.432156952098012
+            },
+            "panorama": 16.914536785101518,
+            "rigid_objects": 3.244099207222462e-05,
+            "ball": 5.7542257979512215,
+            "actors": 1.1160038411617279e-05,
+            "frame_states": 1.1699739843606949e-06,
+            "actor_references": 1.719444568036124
+          },
+          "transport_send": 2.151165066054091,
+          "transport_receive": 0.001178771024569869,
+          "decode": {
+            "total": 59.17893178202212,
+            "actor_state_build": 0.005066593177616596,
+            "synthesis": 0.08255451498553157,
+            "genai_baseline": 49.683177317958325,
+            "composite": 1.596505852881819,
+            "video_encoding": 7.811007620068267
+          },
+          "quality_evaluation": 0.02566225198097527
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 732332,
+      "transport_total": 732332,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260708_090746_135641",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260708_090746_135641/run_summary.json",
+      "sha256": "fc0ea8efa7e41212c9daf186ecf69eeb5f542348a507b19b32a443274f9d4e76",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/raw_4k/alcaraz_highlights.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 10,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "seg-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 721610722,
+          "metadata": 129321,
+          "actor_reference": 34404,
+          "residual": 427998,
+          "panorama": 346130,
+          "transport_total": 937853,
+          "transport_to_source_ratio": 0.0012996661100054996,
+          "decoded_video": 450971,
+          "transport_savings_percent": 99.87003338899945
+        },
+        "timings_sec": {
+          "pipeline_total": 522.0179853830487,
+          "encode_chunk": {
+            "total": 317.44681724510156,
+            "actor_bundle": {
+              "total": 40.902580879163,
+              "detection": 12.527816651156172,
+              "heuristic": 0.0018210560083389282,
+              "segmentation": 25.80857669841498,
+              "pose_estimation": 3.314204514026642e-05,
+              "metadata_generation": 0.21325731603428721
+            },
+            "residual": {
+              "total": 197.9494318831712,
+              "synthesis": 2.10512652201578,
+              "genai_baseline": 162.00501577812247,
+              "computation": 31.136817953083664
+            },
+            "panorama": 45.00616803299636,
+            "rigid_objects": 5.499925464391708e-06,
+            "ball": 31.630759811028838,
+            "actors": 3.307103179395199e-05,
+            "frame_states": 6.850110366940498e-06,
+            "actor_references": 1.9342062310315669
+          },
+          "transport_send": 5.909950617002323,
+          "transport_receive": 0.0071448939852416515,
+          "decode": {
+            "total": 195.89880303596146,
+            "actor_state_build": 0.04318412905558944,
+            "synthesis": 0.21495805401355028,
+            "genai_baseline": 163.95062847598456,
+            "composite": 20.879844394978136,
+            "video_encoding": 10.809828582918271
+          },
+          "quality_evaluation": 1.1246444708667696
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 937853,
+      "transport_total": 937853,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260708_093710_385853",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260708_093710_385853/run_summary.json",
+      "sha256": "f18c59c417af4cf839174d976d3d29130b1c157e24da9e01ccf16e1fe64415cb",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/raw_4k/alcaraz_highlights.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 10,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 721610722,
+          "metadata": 271723,
+          "actor_reference": 34404,
+          "residual": 396906,
+          "panorama": 346130,
+          "transport_total": 1049163,
+          "transport_to_source_ratio": 0.0014539182526170946,
+          "decoded_video": 438837,
+          "transport_savings_percent": 99.85460817473829
+        },
+        "timings_sec": {
+          "pipeline_total": 508.3751262018923,
+          "encode_chunk": {
+            "total": 277.02708756993525,
+            "actor_bundle": {
+              "total": 37.16772132203914,
+              "detection": 34.72389291599393,
+              "heuristic": 0.036431266926229,
+              "segmentation": 0.17781261284835637,
+              "pose_estimation": 4.0590763092041016e-05,
+              "metadata_generation": 0.05760287307202816
+            },
+            "residual": {
+              "total": 184.50898359715939,
+              "synthesis": 25.634175733895972,
+              "genai_baseline": 128.6061170909088,
+              "computation": 20.322261658031493
+            },
+            "panorama": 44.0815197119955,
+            "rigid_objects": 4.461035132408142e-06,
+            "ball": 7.814048130065203,
+            "actors": 1.3740966096520424e-05,
+            "frame_states": 3.0801165848970413e-06,
+            "actor_references": 3.449874641839415
+          },
+          "transport_send": 3.0622071931138635,
+          "transport_receive": 0.10377570800483227,
+          "decode": {
+            "total": 225.32359097502194,
+            "actor_state_build": 0.22789910109713674,
+            "synthesis": 0.21744477399624884,
+            "genai_baseline": 186.7080434691161,
+            "composite": 27.43905882188119,
+            "video_encoding": 10.730782990111038
+          },
+          "quality_evaluation": 4.439772421028465
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 1049163,
+      "transport_total": 1049163,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260708_100043_225774",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260708_100043_225774/run_summary.json",
+      "sha256": "114c387eb7af49eb9c2e1719ff5754a478163a7ec10cf92a7fac182a1ec9da1c",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/raw_4k/alcaraz_highlights.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 10,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 721610722,
+          "metadata": 271723,
+          "actor_reference": 34404,
+          "residual": 396906,
+          "panorama": 346130,
+          "transport_total": 1049163,
+          "transport_to_source_ratio": 0.0014539182526170946,
+          "decoded_video": 438837,
+          "transport_savings_percent": 99.85460817473829
+        },
+        "timings_sec": {
+          "pipeline_total": 463.4235416960437,
+          "encode_chunk": {
+            "total": 266.3790324621368,
+            "actor_bundle": {
+              "total": 36.07977936603129,
+              "detection": 33.35606010421179,
+              "heuristic": 0.0016349067445844412,
+              "segmentation": 0.039784032851457596,
+              "pose_estimation": 2.4962471798062325e-05,
+              "metadata_generation": 0.05977668706327677
+            },
+            "residual": {
+              "total": 156.37456701416522,
+              "synthesis": 2.4178436240181327,
+              "genai_baseline": 143.03137377020903,
+              "computation": 10.107450736919418
+            },
+            "panorama": 44.06203278596513,
+            "rigid_objects": 2.1650921553373337e-05,
+            "ball": 27.667436964809895,
+            "actors": 1.3471115380525589e-05,
+            "frame_states": 1.2600794434547424e-06,
+            "actor_references": 2.190163904102519
+          },
+          "transport_send": 24.450130390003324,
+          "transport_receive": 0.0014910679310560226,
+          "decode": {
+            "total": 169.210924198851,
+            "actor_state_build": 0.11587263108231127,
+            "synthesis": 0.11832060990855098,
+            "genai_baseline": 154.68432314600796,
+            "composite": 4.498606835026294,
+            "video_encoding": 9.793427939992398
+          },
+          "quality_evaluation": 0.3894930339884013
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 1049163,
+      "transport_total": 1049163,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260708_100957_830172",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260708_100957_830172/run_summary.json",
+      "sha256": "c081baface1073ab59ad619320fad0173480043a69aca5531121d54c6abac740",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/raw_4k/alcaraz_highlights.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 10,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 721610722,
+          "metadata": 271723,
+          "actor_reference": 34404,
+          "residual": 396906,
+          "panorama": 346130,
+          "transport_total": 1049163,
+          "transport_to_source_ratio": 0.0014539182526170946,
+          "decoded_video": 438837,
+          "transport_savings_percent": 99.85460817473829
+        },
+        "timings_sec": {
+          "pipeline_total": 392.89688111515716,
+          "encode_chunk": {
+            "total": 212.8211696620565,
+            "actor_bundle": {
+              "total": 6.303861194988713,
+              "detection": 4.22680233605206,
+              "heuristic": 0.001212223432958126,
+              "segmentation": 0.03562399558722973,
+              "pose_estimation": 2.4810433387756348e-05,
+              "metadata_generation": 0.05261252191849053
+            },
+            "residual": {
+              "total": 133.61124562914483,
+              "synthesis": 2.8072457530070096,
+              "genai_baseline": 109.45023678801954,
+              "computation": 10.233531083911657
+            },
+            "panorama": 44.098930187057704,
+            "rigid_objects": 8.740928024053574e-06,
+            "ball": 26.42375670094043,
+            "actors": 3.055203706026077e-05,
+            "frame_states": 1.8300488591194153e-06,
+            "actor_references": 2.3024031152017415
+          },
+          "transport_send": 11.183065806981176,
+          "transport_receive": 0.013503917958587408,
+          "decode": {
+            "total": 165.79066891106777,
+            "actor_state_build": 0.05331969494000077,
+            "synthesis": 0.10007334500551224,
+            "genai_baseline": 127.29728175513446,
+            "composite": 2.313442219980061,
+            "video_encoding": 36.025698150042444
+          },
+          "quality_evaluation": 0.2551516748499125
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 1049163,
+      "transport_total": 1049163,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260708_132647_263803",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260708_132647_263803/run_summary.json",
+      "sha256": "24c77612fe84709af1271f68c8ca45e239736c767c46f4c9df273d85066147ea",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 10,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 285205,
+          "actor_reference": 73655,
+          "residual": 752458,
+          "panorama": 387568,
+          "transport_total": 1498886,
+          "transport_to_source_ratio": 0.2184190359308426,
+          "decoded_video": 553528,
+          "transport_savings_percent": 78.15809640691573
+        },
+        "timings_sec": {
+          "pipeline_total": 440.80305376299657,
+          "encode_chunk": {
+            "total": 209.3205149329733,
+            "actor_bundle": {
+              "total": 8.46210961509496,
+              "detection": 3.544537166832015,
+              "heuristic": 0.0012248852290213108,
+              "segmentation": 3.410739400656894,
+              "pose_estimation": 6.553321145474911e-05,
+              "metadata_generation": 0.11987606505863369
+            },
+            "residual": {
+              "total": 128.8376732089091,
+              "synthesis": 2.9931977081578225,
+              "genai_baseline": 114.87566206487827,
+              "computation": 10.404199602082372
+            },
+            "panorama": 43.495485165156424,
+            "rigid_objects": 2.0310981199145317e-05,
+            "ball": 27.14419358316809,
+            "actors": 1.8180813640356064e-05,
+            "frame_states": 1.4898832887411118e-06,
+            "actor_references": 1.367588783847168
+          },
+          "transport_send": 4.41414100700058,
+          "transport_receive": 0.0017306010704487562,
+          "decode": {
+            "total": 219.6614373009652,
+            "actor_state_build": 0.3235898460261524,
+            "synthesis": 0.4623636419419199,
+            "genai_baseline": 183.54460980393924,
+            "composite": 3.1826948190573603,
+            "video_encoding": 32.14785569300875
+          },
+          "quality_evaluation": 1.6729354918934405
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 1498886,
+      "transport_total": 1498886,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260708_173710_383144",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260708_173710_383144/run_summary.json",
+      "sha256": "17601956de01627dc04eda41903a41f8a6873a018ea5da72329fac5f5a99407a",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 10,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 285205,
+          "actor_reference": 73655,
+          "residual": 700723,
+          "panorama": 387568,
+          "transport_total": 1447151,
+          "transport_to_source_ratio": 0.21088016451308159,
+          "decoded_video": 549062,
+          "transport_savings_percent": 78.91198354869185
+        },
+        "timings_sec": {
+          "pipeline_total": 496.53146629501134,
+          "encode_chunk": {
+            "total": 261.89518694905564,
+            "actor_bundle": {
+              "total": 36.950403010006994,
+              "detection": 11.953485184116289,
+              "heuristic": 0.0015389018226414919,
+              "segmentation": 23.26974705909379,
+              "pose_estimation": 3.1431205570697784e-05,
+              "metadata_generation": 0.12629710417240858
+            },
+            "residual": {
+              "total": 147.8905014928896,
+              "synthesis": 2.8464446919970214,
+              "genai_baseline": 110.41504596709274,
+              "computation": 33.294468455947936
+            },
+            "panorama": 70.16595123894513,
+            "rigid_objects": 1.6890931874513626e-05,
+            "ball": 5.494262072024867,
+            "actors": 3.410200588405132e-05,
+            "frame_states": 2.5299377739429474e-06,
+            "actor_references": 1.3856736950110644
+          },
+          "transport_send": 3.728809601860121,
+          "transport_receive": 0.1857691491022706,
+          "decode": {
+            "total": 228.50617403304204,
+            "actor_state_build": 0.2715365500189364,
+            "synthesis": 0.23537943605333567,
+            "genai_baseline": 188.05093695386313,
+            "composite": 1.9124856749549508,
+            "video_encoding": 38.0354768789839
+          },
+          "quality_evaluation": 2.093585868831724
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 1447151,
+      "transport_total": 1447151,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260708_203613_869715",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260708_203613_869715/run_summary.json",
+      "sha256": "fb622097d375f07fef5405473abbb5eb026be9c4cfc2713e464df787bacfa0d6",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 10,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 285205,
+          "actor_reference": 73655,
+          "residual": 758434,
+          "panorama": 387568,
+          "transport_total": 1504862,
+          "transport_to_source_ratio": 0.21928986410504847,
+          "decoded_video": 562744,
+          "transport_savings_percent": 78.07101358949515
+        },
+        "timings_sec": {
+          "pipeline_total": 422.4541598188225,
+          "encode_chunk": {
+            "total": 231.14208267000504,
+            "actor_bundle": {
+              "total": 41.194666096009314,
+              "detection": 13.137088242685422,
+              "heuristic": 0.0018626272212713957,
+              "segmentation": 26.628901104908437,
+              "pose_estimation": 3.120116889476776e-05,
+              "metadata_generation": 0.11919952090829611
+            },
+            "residual": {
+              "total": 120.06983321206644,
+              "synthesis": 2.7094692911487073,
+              "genai_baseline": 104.15806346293539,
+              "computation": 12.030341101111844
+            },
+            "panorama": 61.431924781994894,
+            "rigid_objects": 1.2620817869901657e-05,
+            "ball": 7.160022882977501,
+            "actors": 1.7970800399780273e-05,
+            "frame_states": 4.650093615055084e-06,
+            "actor_references": 1.2797497499268502
+          },
+          "transport_send": 18.544878574088216,
+          "transport_receive": 0.0013898028992116451,
+          "decode": {
+            "total": 170.14328114595264,
+            "actor_state_build": 0.41970207006670535,
+            "synthesis": 1.1486454571131617,
+            "genai_baseline": 132.79973662202246,
+            "composite": 23.50505138398148,
+            "video_encoding": 12.269801754970104
+          },
+          "quality_evaluation": 2.793729931814596
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 1504862,
+      "transport_total": 1504862,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260709_141414_625083",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260709_141414_625083/run_summary.json",
+      "sha256": "a68afbe865f22c1527938c10e00cabe30a169654acd2d382e2dd784766debefe",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 3,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": false,
+      "genai_backend": null,
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 5599,
+          "actor_reference": 73655,
+          "residual": 170284,
+          "panorama": 404352,
+          "transport_total": 653890,
+          "transport_to_source_ratio": 0.0952854475956268,
+          "decoded_video": 317737,
+          "transport_savings_percent": 90.47145524043731
+        },
+        "timings_sec": {
+          "pipeline_total": 174.95181462494656,
+          "encode_chunk": {
+            "total": 140.04565581306815,
+            "actor_bundle": {
+              "total": 41.87663332000375,
+              "detection": 12.170207395683974,
+              "heuristic": 0.0006298923399299383,
+              "segmentation": 27.054667433025315,
+              "pose_estimation": 1.1716226558201015,
+              "metadata_generation": 0.00581104401499033
+            },
+            "residual": {
+              "total": 17.436918216058984,
+              "synthesis": 2.0617150620091707,
+              "genai_baseline": 0.0,
+              "computation": 9.635729243047535
+            },
+            "panorama": 47.349446148145944,
+            "rigid_objects": 7.091090083122253e-06,
+            "ball": 32.23622157913633,
+            "actors": 4.100147634744644e-06,
+            "frame_states": 1.269858330488205e-06,
+            "actor_references": 1.1272741360589862
+          },
+          "transport_send": 18.96997602004558,
+          "transport_receive": 0.001363870920613408,
+          "decode": {
+            "total": 13.099264061776921,
+            "actor_state_build": 0.13116081501357257,
+            "synthesis": 0.212861780077219,
+            "genai_baseline": 1.4581019058823586e-05,
+            "composite": 1.1504679911304265,
+            "video_encoding": 11.591387175954878
+          },
+          "quality_evaluation": 85.18718887818977
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": null,
+        "ssim_mean": 0.8182194833333334,
+        "ssim_std": 0.06370928517243821,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 30.939778,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 653890,
+      "transport_total": 653890,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260709_150929_285546",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260709_150929_285546/run_summary.json",
+      "sha256": "15015f0ef3c284601872e4e5fd2485df3e4bd179fb1c0e347cb15581b0324cde",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 3,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": false,
+      "genai_backend": null,
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 5599,
+          "actor_reference": 73655,
+          "residual": 170284,
+          "panorama": 404352,
+          "transport_total": 653890,
+          "transport_to_source_ratio": 0.0952854475956268,
+          "decoded_video": 317737,
+          "transport_savings_percent": 90.47145524043731
+        },
+        "timings_sec": {
+          "pipeline_total": 192.5422692662105,
+          "encode_chunk": {
+            "total": 155.04064966598526,
+            "actor_bundle": {
+              "total": 40.35244095721282,
+              "detection": 11.26954662008211,
+              "heuristic": 0.0006670048460364342,
+              "segmentation": 26.118734115269035,
+              "pose_estimation": 1.6319626877084374,
+              "metadata_generation": 0.005792983109131455
+            },
+            "residual": {
+              "total": 35.43328362284228,
+              "synthesis": 2.8587827009614557,
+              "genai_baseline": 0.0,
+              "computation": 28.191516524879262
+            },
+            "panorama": 48.52044520690106,
+            "rigid_objects": 1.730094663798809e-05,
+            "ball": 29.618398657999933,
+            "actors": 1.8671154975891113e-05,
+            "frame_states": 2.749962732195854e-06,
+            "actor_references": 1.0925363779533654
+          },
+          "transport_send": 4.491692480165511,
+          "transport_receive": 0.001063165022060275,
+          "decode": {
+            "total": 30.250044716056436,
+            "actor_state_build": 0.03930147783830762,
+            "synthesis": 0.09027054719626904,
+            "genai_baseline": 5.629844963550568e-06,
+            "composite": 1.087649333057925,
+            "video_encoding": 29.029792139073834
+          },
+          "quality_evaluation": 52.89174060616642
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": null,
+        "ssim_mean": 0.8182194833333334,
+        "ssim_std": 0.06370928517243821,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 30.939778,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 653890,
+      "transport_total": 653890,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260709_221319_778070",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260709_221319_778070/run_summary.json",
+      "sha256": "011e336d5a73f0969b36c209a67024ee74142baa46e43a881efd537272649099",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 3,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": false,
+      "genai_backend": null,
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 5599,
+          "actor_reference": 73655,
+          "residual": 175262,
+          "panorama": 404352,
+          "transport_total": 658868,
+          "transport_to_source_ratio": 0.09601084629897297,
+          "decoded_video": 322017,
+          "transport_savings_percent": 90.3989153701027
+        },
+        "timings_sec": {
+          "pipeline_total": 195.84306412306614,
+          "encode_chunk": {
+            "total": 145.98426229692996,
+            "actor_bundle": {
+              "total": 9.157568597001955,
+              "detection": 3.8268460240215063,
+              "heuristic": 0.0006717948708683252,
+              "segmentation": 2.094111684244126,
+              "pose_estimation": 1.6152348460163921,
+              "metadata_generation": 0.009214063175022602
+            },
+            "residual": {
+              "total": 32.86246544588357,
+              "synthesis": 3.359716251026839,
+              "genai_baseline": 0.0,
+              "computation": 25.570283668814227
+            },
+            "panorama": 67.51020303298719,
+            "rigid_objects": 1.3860873878002167e-05,
+            "ball": 35.36458080797456,
+            "actors": 6.149988621473312e-06,
+            "frame_states": 1.5611294656991959e-06,
+            "actor_references": 1.0530777960084379
+          },
+          "transport_send": 5.477699680021033,
+          "transport_receive": 0.0010865970980376005,
+          "decode": {
+            "total": 9.058586688013747,
+            "actor_state_build": 0.010128790978342295,
+            "synthesis": 0.11525469413027167,
+            "genai_baseline": 5.409820005297661e-06,
+            "composite": 1.0452420450747013,
+            "video_encoding": 7.887671173084527
+          },
+          "quality_evaluation": 25.33412502799183
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 658868,
+      "transport_total": 658868,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260709_221714_389957",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260709_221714_389957/run_summary.json",
+      "sha256": "96e05bc7ce53ab01bd5af415db5f3a33374c21d14467a549250621ecd909dd98",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 3,
+      "scored_frames": 0,
+      "frame_count_agrees": false,
+      "genai_enabled": false,
+      "genai_backend": null,
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 5599,
+          "actor_reference": 73655,
+          "residual": 175262,
+          "panorama": 932429,
+          "transport_total": 1186945,
+          "transport_to_source_ratio": 0.17296270870695568,
+          "decoded_video": 302210,
+          "transport_savings_percent": 82.70372912930443
+        },
+        "timings_sec": {
+          "pipeline_total": 158.87714029708877,
+          "encode_chunk": {
+            "total": 113.66771498299204,
+            "actor_bundle": {
+              "total": 5.4440287097822875,
+              "detection": 2.027338714338839,
+              "heuristic": 0.0005308780819177628,
+              "segmentation": 1.7159422647673637,
+              "pose_estimation": 0.5775343256536871,
+              "metadata_generation": 0.004795232089236379
+            },
+            "residual": {
+              "total": 30.140387998893857,
+              "synthesis": 2.705012660007924,
+              "genai_baseline": 0.0,
+              "computation": 21.50821005087346
+            },
+            "panorama": 47.119111655978486,
+            "rigid_objects": 1.4760997146368027e-05,
+            "ball": 29.556791267124936,
+            "actors": 8.259899914264679e-06,
+            "frame_states": 1.3802200555801392e-06,
+            "actor_references": 1.360431260894984
+          },
+          "transport_send": 6.92834597802721,
+          "transport_receive": 0.0011070079635828733,
+          "decode": {
+            "total": 10.78164135105908,
+            "actor_state_build": 0.008472163928672671,
+            "synthesis": 0.07768834289163351,
+            "genai_baseline": 7.119961082935333e-06,
+            "composite": 1.0375297381542623,
+            "video_encoding": 9.657689310843125
+          },
+          "quality_evaluation": 23.895277434028685
+        },
+        "psnr_mean": null,
+        "psnr_std": null,
+        "psnr_num_frames": 0,
+        "note": "no valid frame pairs"
+      },
+      "invariant_failures": [
+        "psnr_mean is null \u2014 quality evaluation did not complete",
+        "psnr was computed over zero frames"
+      ],
+      "component_bytes_sum": 1186945,
+      "transport_total": 1186945,
+      "balance": true,
+      "status": "implementation/measurement failure",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_073413_862055",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_073413_862055/run_summary.json",
+      "sha256": "0e03e6f585ab57cdff4a81b252ee9b90c54b31e8d1300e227785dba317b7831d",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 3,
+      "scored_frames": 60,
+      "frame_count_agrees": false,
+      "genai_enabled": false,
+      "genai_backend": null,
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 5640,
+          "actor_reference": 73655,
+          "residual": 226563,
+          "panorama": 404352,
+          "transport_total": 710210,
+          "transport_to_source_ratio": 0.10349244939804877,
+          "decoded_video": 22109796,
+          "transport_savings_percent": 89.65075506019512
+        },
+        "timings_sec": {
+          "pipeline_total": 158.6291076731868,
+          "encode_chunk": {
+            "total": 152.7777238090057,
+            "actor_bundle": {
+              "total": 39.801057980861515,
+              "detection": 35.447675107978284,
+              "heuristic": 0.0005438379012048244,
+              "segmentation": 2.6094333624932915,
+              "pose_estimation": 0.6775601021945477,
+              "metadata_generation": 0.008288094075396657
+            },
+            "residual": {
+              "total": 33.36463457415812,
+              "synthesis": 2.815232608001679,
+              "genai_baseline": 0.0,
+              "computation": 29.737974629038945
+            },
+            "panorama": 72.64951044693589,
+            "rigid_objects": 1.5849946066737175e-05,
+            "ball": 5.869430236984044,
+            "actors": 2.6041176170110703e-05,
+            "frame_states": 7.4498821049928665e-06,
+            "actor_references": 1.0898050388786942
+          },
+          "transport_send": 0.017027841182425618,
+          "transport_receive": 0.0008251031395047903,
+          "decode": {
+            "total": 2.5994413800071925,
+            "actor_state_build": 0.03350850287824869,
+            "synthesis": 0.10164240701124072,
+            "genai_baseline": 1.088087446987629e-05,
+            "composite": 1.129406290128827,
+            "video_encoding": 1.3346636979840696
+          },
+          "quality_evaluation": 73.48183956602588
+        },
+        "psnr_mean": 24.249666666666666,
+        "psnr_std": 4.778887585574236,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.8154751333333334,
+        "ssim_std": 0.06519423264534645,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 31.046937,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 710210,
+      "transport_total": 710210,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_073844_816285",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_073844_816285/run_summary.json",
+      "sha256": "44f981f512f666fc42791363d8140bee3bad5e53b33896141f723774ff624933",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 3,
+      "scored_frames": 60,
+      "frame_count_agrees": false,
+      "genai_enabled": false,
+      "genai_backend": null,
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 5640,
+          "actor_reference": 73655,
+          "residual": 226563,
+          "panorama": 404352,
+          "transport_total": 710210,
+          "transport_to_source_ratio": 0.10349244939804877,
+          "decoded_video": 320153,
+          "transport_savings_percent": 89.65075506019512
+        },
+        "timings_sec": {
+          "pipeline_total": 193.44141793786548,
+          "encode_chunk": {
+            "total": 155.99812248302624,
+            "actor_bundle": {
+              "total": 39.88945649401285,
+              "detection": 35.502426573308185,
+              "heuristic": 0.0006487229838967323,
+              "segmentation": 2.1091688338201493,
+              "pose_estimation": 0.6552961419802159,
+              "metadata_generation": 0.026119255926460028
+            },
+            "residual": {
+              "total": 32.712005008012056,
+              "synthesis": 20.291048693936318,
+              "genai_baseline": 0.0,
+              "computation": 10.730228452943265
+            },
+            "panorama": 75.1482036409434,
+            "rigid_objects": 1.0190997272729874e-05,
+            "ball": 6.882981788134202,
+            "actors": 3.438210114836693e-05,
+            "frame_states": 3.261025995016098e-06,
+            "actor_references": 1.3611789878923446
+          },
+          "transport_send": 1.1332645821385086,
+          "transport_receive": 0.36851096292957664,
+          "decode": {
+            "total": 33.08236920298077,
+            "actor_state_build": 0.29373136395588517,
+            "synthesis": 0.2058215970173478,
+            "genai_baseline": 7.621012628078461e-06,
+            "composite": 1.2614922921638936,
+            "video_encoding": 31.321012943983078
+          },
+          "quality_evaluation": 2.4298881120048463
+        },
+        "psnr_mean": 23.878999999999998,
+        "psnr_std": 4.1245317714054925,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 710210,
+      "transport_total": 710210,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_074235_874342",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_074235_874342/run_summary.json",
+      "sha256": "356bf484d639496d9fc56200311d2f86ea743794a47919a4b7e1e0607b547b8f",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 3,
+      "scored_frames": 60,
+      "frame_count_agrees": false,
+      "genai_enabled": false,
+      "genai_backend": null,
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 5640,
+          "actor_reference": 73655,
+          "residual": 185931,
+          "panorama": 932429,
+          "transport_total": 1197655,
+          "transport_to_source_ratio": 0.17452337968181256,
+          "decoded_video": 304143,
+          "transport_savings_percent": 82.54766203181875
+        },
+        "timings_sec": {
+          "pipeline_total": 197.44049243303016,
+          "encode_chunk": {
+            "total": 131.2873380430974,
+            "actor_bundle": {
+              "total": 10.141228658845648,
+              "detection": 3.3930743210949004,
+              "heuristic": 0.0007258881814777851,
+              "segmentation": 1.392329502152279,
+              "pose_estimation": 0.6695137736387551,
+              "metadata_generation": 0.016725505935028195
+            },
+            "residual": {
+              "total": 10.726393876830116,
+              "synthesis": 2.894813707098365,
+              "genai_baseline": 0.0,
+              "computation": 7.134442040929571
+            },
+            "panorama": 79.30899962806143,
+            "rigid_objects": 1.7480924725532532e-05,
+            "ball": 29.995998296886683,
+            "actors": 2.1741027012467384e-05,
+            "frame_states": 1.8100254237651825e-06,
+            "actor_references": 1.108333976007998
+          },
+          "transport_send": 2.2854562858119607,
+          "transport_receive": 0.0011679211165755987,
+          "decode": {
+            "total": 31.403793434845284,
+            "actor_state_build": 0.10418345895595849,
+            "synthesis": 0.31191488401964307,
+            "genai_baseline": 1.7260899767279625e-05,
+            "composite": 19.125052331015468,
+            "video_encoding": 11.86219263705425
+          },
+          "quality_evaluation": 2.3919925959780812
+        },
+        "psnr_mean": 23.86,
+        "psnr_std": 4.106332102172611,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 1197655,
+      "transport_total": 1197655,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_080529_146352",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_080529_146352/run_summary.json",
+      "sha256": "1060bc291ebf4960b23c1be1ae21363b0d2ac20e21ad914e17aaab00f68bc944",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 3,
+      "scored_frames": 60,
+      "frame_count_agrees": false,
+      "genai_enabled": false,
+      "genai_backend": null,
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 5640,
+          "actor_reference": 73655,
+          "residual": 221708,
+          "panorama": 404352,
+          "transport_total": 705355,
+          "transport_to_source_ratio": 0.10278497436696285,
+          "decoded_video": 322240,
+          "transport_savings_percent": 89.72150256330372
+        },
+        "timings_sec": {
+          "pipeline_total": 192.79140316089615,
+          "encode_chunk": {
+            "total": 158.24501836812124,
+            "actor_bundle": {
+              "total": 40.27134328405373,
+              "detection": 36.64504890120588,
+              "heuristic": 0.00074199796654284,
+              "segmentation": 1.6667403816245496,
+              "pose_estimation": 0.9075860839802772,
+              "metadata_generation": 0.00796226691454649
+            },
+            "residual": {
+              "total": 37.559110522968695,
+              "synthesis": 2.756883563939482,
+              "genai_baseline": 0.0,
+              "computation": 34.11136809596792
+            },
+            "panorama": 52.605871198000386,
+            "rigid_objects": 6.4999330788850784e-06,
+            "ball": 26.661590086994693,
+            "actors": 8.740928024053574e-06,
+            "frame_states": 3.390014171600342e-06,
+            "actor_references": 1.139727809932083
+          },
+          "transport_send": 0.017972030909731984,
+          "transport_receive": 0.0008190828375518322,
+          "decode": {
+            "total": 31.661816358100623,
+            "actor_state_build": 0.026278396137058735,
+            "synthesis": 0.0784729199949652,
+            "genai_baseline": 1.020100899040699e-05,
+            "composite": 1.0212959870696068,
+            "video_encoding": 30.53512766188942
+          },
+          "quality_evaluation": 47.02600015816279
+        },
+        "psnr_mean": 23.86333333333333,
+        "psnr_std": 4.107621642210436,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.8187333833333335,
+        "ssim_std": 0.06439641199427487,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 31.050538,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 705355,
+      "transport_total": 705355,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_121416_601979",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_121416_601979/run_summary.json",
+      "sha256": "4cb36c156758ba8476dbe88675f8e065b515aed51ad24f77460ea72f07ff24fc",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "metadata-source-mask",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "rle-v1",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106331,
+          "actor_reference": 73655,
+          "residual": 4062592,
+          "panorama": 361191,
+          "transport_total": 5603769,
+          "transport_to_source_ratio": 0.8165863331561852,
+          "decoded_video": 2534377,
+          "transport_savings_percent": 18.341366684381477
+        },
+        "timings_sec": {
+          "pipeline_total": 1784.4677084251307,
+          "encode_chunk": {
+            "total": 838.1813413659111,
+            "actor_bundle": {
+              "total": 93.29951591114514,
+              "detection": 65.20712723210454,
+              "heuristic": 0.02153177047148347,
+              "segmentation": 24.34737867070362,
+              "pose_estimation": 0.00021410081535577774,
+              "metadata_generation": 0.5959357330575585
+            },
+            "residual": {
+              "total": 588.2462064409629,
+              "synthesis": 26.436672331998125,
+              "genai_baseline": 521.7061145231128,
+              "computation": 38.851853045867756
+            },
+            "panorama": 132.01105034188367,
+            "rigid_objects": 8.901115506887436e-06,
+            "ball": 20.904257816029713,
+            "actors": 1.912098377943039e-05,
+            "frame_states": 1.6898848116397858e-06,
+            "actor_references": 3.679271049099043
+          },
+          "transport_send": 0.9675068678334355,
+          "transport_receive": 0.10980719910003245,
+          "decode": {
+            "total": 938.9457198260352,
+            "actor_state_build": 0.24873562203720212,
+            "synthesis": 0.37432799581438303,
+            "genai_baseline": 814.5544369490817,
+            "composite": 31.357340817106888,
+            "video_encoding": 92.40999713679776
+          },
+          "quality_evaluation": 24.3519608839415
+        },
+        "psnr_mean": 31.97050000000001,
+        "psnr_std": 0.35222826405613733,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 5603769,
+      "transport_total": 5603769,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_124449_288300",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_124449_288300/run_summary.json",
+      "sha256": "c9857bc135d3c396a90438ba499673e704be10ab4a694b074a1dd594a6054417",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "metadata-source-mask",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "segmenter-native",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 411287,
+          "actor_reference": 73655,
+          "residual": 3806347,
+          "panorama": 361191,
+          "transport_total": 4652480,
+          "transport_to_source_ratio": 0.6779636318489375,
+          "decoded_video": 2476657,
+          "transport_savings_percent": 32.20363681510625
+        },
+        "timings_sec": {
+          "pipeline_total": 1599.7610051529482,
+          "encode_chunk": {
+            "total": 659.8771345759742,
+            "actor_bundle": {
+              "total": 55.15371736185625,
+              "detection": 23.70843773894012,
+              "heuristic": 0.009406177094206214,
+              "segmentation": 27.796589967329055,
+              "pose_estimation": 0.0003359406255185604,
+              "metadata_generation": 0.5409839439671487
+            },
+            "residual": {
+              "total": 440.85844156495295,
+              "synthesis": 2.170354582834989,
+              "genai_baseline": 398.22638829099014,
+              "computation": 39.31188465189189
+            },
+            "panorama": 122.58755454490893,
+            "rigid_objects": 3.968202508985996e-05,
+            "ball": 37.8990207221359,
+            "actors": 2.2512162104249e-05,
+            "frame_states": 1.669861376285553e-06,
+            "actor_references": 3.32210063515231
+          },
+          "transport_send": 0.03787380503490567,
+          "transport_receive": 0.004305805079638958,
+          "decode": {
+            "total": 921.9418720540125,
+            "actor_state_build": 0.022229989059269428,
+            "synthesis": 0.2510624930728227,
+            "genai_baseline": 791.6615860478487,
+            "composite": 32.38675689813681,
+            "video_encoding": 93.54173099296167
+          },
+          "quality_evaluation": 23.84724436700344
+        },
+        "psnr_mean": 32.1535,
+        "psnr_std": 0.31905498481191796,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 4652480,
+      "transport_total": 4652480,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_133850_259669",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_133850_259669/run_summary.json",
+      "sha256": "a23d20f75516a5ffb520eed0de1259c278505d6a6503d83c4eccc4ece82400e1",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "metadata-source-mask",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "rle-v1",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106331,
+          "actor_reference": 73655,
+          "residual": 4062592,
+          "panorama": 361191,
+          "transport_total": 5603769,
+          "transport_to_source_ratio": 0.8165863331561852,
+          "decoded_video": 2534377,
+          "transport_savings_percent": 18.341366684381477
+        },
+        "timings_sec": {
+          "pipeline_total": 1632.549136764137,
+          "encode_chunk": {
+            "total": 734.9260237379931,
+            "actor_bundle": {
+              "total": 88.23088739905506,
+              "detection": 59.06622467935085,
+              "heuristic": 0.008556386455893517,
+              "segmentation": 25.432338810525835,
+              "pose_estimation": 0.0002477872185409069,
+              "metadata_generation": 0.5299537109676749
+            },
+            "residual": {
+              "total": 428.87743849493563,
+              "synthesis": 2.7020512900780886,
+              "genai_baseline": 388.1359118958935,
+              "computation": 37.773585305782035
+            },
+            "panorama": 150.86693690391257,
+            "rigid_objects": 1.8011080101132393e-05,
+            "ball": 40.19495908403769,
+            "actors": 2.370099537074566e-05,
+            "frame_states": 3.220047801733017e-06,
+            "actor_references": 26.727115595014766
+          },
+          "transport_send": 0.0258218499366194,
+          "transport_receive": 0.005320397904142737,
+          "decode": {
+            "total": 894.2349480860867,
+            "actor_state_build": 0.06897198618389666,
+            "synthesis": 0.2615787961985916,
+            "genai_baseline": 775.0216973328497,
+            "composite": 6.414093522820622,
+            "video_encoding": 112.46814755303785
+          },
+          "quality_evaluation": 5.370756609831005
+        },
+        "psnr_mean": 31.97050000000001,
+        "psnr_std": 0.35222826405613733,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 5603769,
+      "transport_total": 5603769,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_140638_567946",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_140638_567946/run_summary.json",
+      "sha256": "88749e5a1ce7b8a7f04203188732102d1126f8a68fce3809e888a39df5d7ce6b",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "metadata-source-mask",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "segmenter-native",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 411287,
+          "actor_reference": 73655,
+          "residual": 3806347,
+          "panorama": 361191,
+          "transport_total": 4652480,
+          "transport_to_source_ratio": 0.6779636318489375,
+          "decoded_video": 2476657,
+          "transport_savings_percent": 32.20363681510625
+        },
+        "timings_sec": {
+          "pipeline_total": 1642.0726443480235,
+          "encode_chunk": {
+            "total": 676.2147811399773,
+            "actor_bundle": {
+              "total": 88.06511272513308,
+              "detection": 60.713341544382274,
+              "heuristic": 0.008920295862480998,
+              "segmentation": 23.57587377098389,
+              "pose_estimation": 0.00024125492200255394,
+              "metadata_generation": 0.551121192984283
+            },
+            "residual": {
+              "total": 426.49818464391865,
+              "synthesis": 2.510965008987114,
+              "genai_baseline": 384.6497267000377,
+              "computation": 38.0089953399729
+            },
+            "panorama": 121.39513967302628,
+            "rigid_objects": 5.709938704967499e-06,
+            "ball": 36.91348176798783,
+            "actors": 3.111199475824833e-05,
+            "frame_states": 1.6200356185436249e-06,
+            "actor_references": 3.308500248938799
+          },
+          "transport_send": 0.021531809121370316,
+          "transport_receive": 0.001658387016505003,
+          "decode": {
+            "total": 962.9183253960218,
+            "actor_state_build": 0.015832209959626198,
+            "synthesis": 0.2592281869146973,
+            "genai_baseline": 837.3071040310897,
+            "composite": 6.709358884952962,
+            "video_encoding": 118.60885995090939
+          },
+          "quality_evaluation": 5.996783909853548
+        },
+        "psnr_mean": 32.1535,
+        "psnr_std": 0.31905498481191796,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 4652480,
+      "transport_total": 4652480,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_144136_542639",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_144136_542639/run_summary.json",
+      "sha256": "079fa517eaf8915b6a279e9d960b48f3187cd69621c6b1ae87b359b7be70d9c0",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106331,
+          "actor_reference": 73655,
+          "residual": 3962197,
+          "panorama": 361191,
+          "transport_total": 5503374,
+          "transport_to_source_ratio": 0.8019566821271698,
+          "decoded_video": 2510619,
+          "transport_savings_percent": 19.804331787283026
+        },
+        "timings_sec": {
+          "pipeline_total": 1638.5599644919857,
+          "encode_chunk": {
+            "total": 625.3968833510298,
+            "actor_bundle": {
+              "total": 84.0099803910125,
+              "detection": 54.42565330048092,
+              "heuristic": 0.009032212430611253,
+              "segmentation": 26.699271053774282,
+              "pose_estimation": 0.00022510136477649212,
+              "metadata_generation": 0.44869787199422717
+            },
+            "residual": {
+              "total": 412.67006734688766,
+              "synthesis": 11.455850770929828,
+              "genai_baseline": 360.3455850421451,
+              "computation": 38.08996744803153
+            },
+            "panorama": 87.67345976503566,
+            "rigid_objects": 1.5200115740299225e-05,
+            "ball": 37.74441698892042,
+            "actors": 1.7110025510191917e-05,
+            "frame_states": 1.3599637895822525e-06,
+            "actor_references": 3.2755332719534636
+          },
+          "transport_send": 1.6342063259799033,
+          "transport_receive": 0.12264071498066187,
+          "decode": {
+            "total": 1006.7239472791553,
+            "actor_state_build": 0.23679169593378901,
+            "synthesis": 0.6223082130309194,
+            "genai_baseline": 855.1323046109173,
+            "composite": 5.445827940944582,
+            "video_encoding": 145.28601708309725
+          },
+          "quality_evaluation": 83.30377754801884
+        },
+        "psnr_mean": 32.111666666666665,
+        "psnr_std": 0.39359101728683915,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.9587641333333333,
+        "ssim_std": 0.002845361596626263,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 82.873177,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 5503374,
+      "transport_total": 5503374,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_151054_636710",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_151054_636710/run_summary.json",
+      "sha256": "c942abeaadf9e375eec167755dda43976f6b6817c33f3e36ae090642ecbd7bae",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106331,
+          "actor_reference": 73655,
+          "residual": 3944646,
+          "panorama": 477487,
+          "transport_total": 5602119,
+          "transport_to_source_ratio": 0.8163458936502549,
+          "decoded_video": 2487237,
+          "transport_savings_percent": 18.36541063497451
+        },
+        "timings_sec": {
+          "pipeline_total": 1693.0883141788654,
+          "encode_chunk": {
+            "total": 690.5413680379279,
+            "actor_bundle": {
+              "total": 87.45869604707696,
+              "detection": 38.063722209539264,
+              "heuristic": 0.010205513564869761,
+              "segmentation": 46.18850354687311,
+              "pose_estimation": 0.0003723164554685354,
+              "metadata_generation": 0.5345298149622977
+            },
+            "residual": {
+              "total": 431.9006664068438,
+              "synthesis": 25.916322911158204,
+              "genai_baseline": 360.0838602420408,
+              "computation": 45.43724379502237
+            },
+            "panorama": 124.37223159708083,
+            "rigid_objects": 1.3089971616864204e-05,
+            "ball": 43.24105062219314,
+            "actors": 4.930188879370689e-06,
+            "frame_states": 1.7399434000253677e-06,
+            "actor_references": 3.5149592380039394
+          },
+          "transport_send": 0.02704697591252625,
+          "transport_receive": 0.0025159218348562717,
+          "decode": {
+            "total": 998.3442437599879,
+            "actor_state_build": 0.2711730219889432,
+            "synthesis": 0.5759332708548754,
+            "genai_baseline": 857.8183941778261,
+            "composite": 6.301282391184941,
+            "video_encoding": 133.32758267689496
+          },
+          "quality_evaluation": 115.59900859603658
+        },
+        "psnr_mean": 32.08816666666667,
+        "psnr_std": 0.3943623193066102,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.9588293166666665,
+        "ssim_std": 0.002781796754447659,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 82.816277,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 5602119,
+      "transport_total": 5602119,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_154141_878240",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_154141_878240/run_summary.json",
+      "sha256": "12f12e3203909c9c9d8ae5165326b79d8f5499a2d1139e6addffb4574936589d",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106331,
+          "actor_reference": 73655,
+          "residual": 3907590,
+          "panorama": 888968,
+          "transport_total": 5976544,
+          "transport_to_source_ratio": 0.8709074463823545,
+          "decoded_video": 2469606,
+          "transport_savings_percent": 12.909255361764549
+        },
+        "timings_sec": {
+          "pipeline_total": 1668.8246642618906,
+          "encode_chunk": {
+            "total": 659.0327404690906,
+            "actor_bundle": {
+              "total": 57.94935915688984,
+              "detection": 23.996285939821973,
+              "heuristic": 0.008194299647584558,
+              "segmentation": 30.743587804492563,
+              "pose_estimation": 0.00025235628709197044,
+              "metadata_generation": 0.505593383917585
+            },
+            "residual": {
+              "total": 439.49910333682783,
+              "synthesis": 10.937260005855933,
+              "genai_baseline": 386.4481516848318,
+              "computation": 40.728745059110224
+            },
+            "panorama": 115.76146405981854,
+            "rigid_objects": 1.003011129796505e-05,
+            "ball": 42.3403410250321,
+            "actors": 1.70909333974123e-05,
+            "frame_states": 2.9599759727716446e-06,
+            "actor_references": 3.4539327449165285
+          },
+          "transport_send": 0.07375614205375314,
+          "transport_receive": 0.0020981898996979,
+          "decode": {
+            "total": 1007.1692258610856,
+            "actor_state_build": 0.07390366005711257,
+            "synthesis": 0.28402089118026197,
+            "genai_baseline": 878.0682553420775,
+            "composite": 33.75109975296073,
+            "video_encoding": 94.98956780112348
+          },
+          "quality_evaluation": 108.96959940600209
+        },
+        "psnr_mean": 32.08816666666667,
+        "psnr_std": 0.39518979265945414,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.9587727666666666,
+        "ssim_std": 0.0028059163587359887,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 82.697658,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 5976544,
+      "transport_total": 5976544,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_201524_487050",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_201524_487050/run_summary.json",
+      "sha256": "d8d55df04ab8fd8b1f5b54318d8009989f8e563537803037010b2b29b23a1de1",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106331,
+          "actor_reference": 73655,
+          "residual": 3962197,
+          "panorama": 361191,
+          "transport_total": 5503374,
+          "transport_to_source_ratio": 0.8019566821271698,
+          "decoded_video": 2510619,
+          "transport_savings_percent": 19.804331787283026
+        },
+        "timings_sec": {
+          "pipeline_total": 1734.81933878595,
+          "encode_chunk": {
+            "total": 705.8222059952095,
+            "actor_bundle": {
+              "total": 85.79781864397228,
+              "detection": 54.04871836327948,
+              "heuristic": 0.008909054333344102,
+              "segmentation": 28.348975057946518,
+              "pose_estimation": 0.0003709155134856701,
+              "metadata_generation": 0.5457139071077108
+            },
+            "residual": {
+              "total": 405.81509371614084,
+              "synthesis": 3.473698695190251,
+              "genai_baseline": 362.1092453189194,
+              "computation": 38.53857874008827
+            },
+            "panorama": 150.08693613717332,
+            "rigid_objects": 8.940929546952248e-06,
+            "ball": 60.36507756309584,
+            "actors": 1.9100960344076157e-05,
+            "frame_states": 2.939952537417412e-06,
+            "actor_references": 3.7005987209267914
+          },
+          "transport_send": 0.06366641889326274,
+          "transport_receive": 0.006475659087300301,
+          "decode": {
+            "total": 1025.228832068853,
+            "actor_state_build": 0.2974143030587584,
+            "synthesis": 1.2863874989561737,
+            "genai_baseline": 872.2199286711402,
+            "composite": 30.52659422601573,
+            "video_encoding": 120.84357483801432
+          },
+          "quality_evaluation": 110.15253768092953
+        },
+        "psnr_mean": 32.111666666666665,
+        "psnr_std": 0.39359101728683915,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.9587641333333333,
+        "ssim_std": 0.002845361596626263,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 82.873177,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 5503374,
+      "transport_total": 5503374,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_204642_966849",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_204642_966849/run_summary.json",
+      "sha256": "02e05cf57b3d335d25f31125f770db3c1300bc4e24a449380d3648d1b16db906",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106331,
+          "actor_reference": 73655,
+          "residual": 3962197,
+          "panorama": 361191,
+          "transport_total": 5503374,
+          "transport_to_source_ratio": 0.8019566821271698,
+          "decoded_video": 2510619,
+          "transport_savings_percent": 19.804331787283026
+        },
+        "timings_sec": {
+          "pipeline_total": 1734.6906626869459,
+          "encode_chunk": {
+            "total": 733.7096151080914,
+            "actor_bundle": {
+              "total": 86.61261595087126,
+              "detection": 55.46661976771429,
+              "heuristic": 0.00943551235832274,
+              "segmentation": 27.556888537015766,
+              "pose_estimation": 0.0004089660942554474,
+              "metadata_generation": 0.445799513021484
+            },
+            "residual": {
+              "total": 470.2860539269168,
+              "synthesis": 2.5234788269735873,
+              "genai_baseline": 426.9929145819042,
+              "computation": 40.51203906512819
+            },
+            "panorama": 132.4029193620663,
+            "rigid_objects": 5.1663024351000786e-05,
+            "ball": 40.98669503792189,
+            "actors": 5.106208845973015e-05,
+            "frame_states": 1.400010660290718e-06,
+            "actor_references": 3.3762546831276268
+          },
+          "transport_send": 0.025208687875419855,
+          "transport_receive": 0.0036345799453556538,
+          "decode": {
+            "total": 997.119845797075,
+            "actor_state_build": 0.028351753018796444,
+            "synthesis": 0.2715078389737755,
+            "genai_baseline": 846.6670210009906,
+            "composite": 29.120170946000144,
+            "video_encoding": 121.03217379702255
+          },
+          "quality_evaluation": 83.1689426379744
+        },
+        "psnr_mean": 32.111666666666665,
+        "psnr_std": 0.39359101728683915,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.9587641333333333,
+        "ssim_std": 0.002845361596626263,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 82.873177,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 5503374,
+      "transport_total": 5503374,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_211734_419673",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_211734_419673/run_summary.json",
+      "sha256": "de375ac96a2fa4a1b52debcf48b4c0efccb56c0bbdf8ee826b96e3fb5cbb511d",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106331,
+          "actor_reference": 73655,
+          "residual": 3962197,
+          "panorama": 361191,
+          "transport_total": 5503374,
+          "transport_to_source_ratio": 0.8019566821271698,
+          "decoded_video": 2510619,
+          "transport_savings_percent": 19.804331787283026
+        },
+        "timings_sec": {
+          "pipeline_total": 1676.3310684938915,
+          "encode_chunk": {
+            "total": 707.6130717911292,
+            "actor_bundle": {
+              "total": 90.98382526100613,
+              "detection": 39.69046199275181,
+              "heuristic": 0.008649158291518688,
+              "segmentation": 47.03428404405713,
+              "pose_estimation": 0.0003256958443671465,
+              "metadata_generation": 1.085847666952759
+            },
+            "residual": {
+              "total": 426.8101974539459,
+              "synthesis": 20.240973371081054,
+              "genai_baseline": 365.8261258380953,
+              "computation": 39.781711627030745
+            },
+            "panorama": 149.7159374258481,
+            "rigid_objects": 1.4210818335413933e-05,
+            "ball": 37.46363543905318,
+            "actors": 2.1290965378284454e-05,
+            "frame_states": 2.891058102250099e-06,
+            "actor_references": 2.5801462361123413
+          },
+          "transport_send": 1.3167323730885983,
+          "transport_receive": 0.12414421187713742,
+          "decode": {
+            "total": 964.8382159080356,
+            "actor_state_build": 0.2832132610492408,
+            "synthesis": 0.45733848796226084,
+            "genai_baseline": 843.683775956044,
+            "composite": 12.507508010836318,
+            "video_encoding": 107.90564454393461
+          },
+          "quality_evaluation": 90.15057577099651
+        },
+        "psnr_mean": 32.111666666666665,
+        "psnr_std": 0.39359101728683915,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.9587641333333333,
+        "ssim_std": 0.002845361596626263,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 82.873177,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 5503374,
+      "transport_total": 5503374,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_214746_004819",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_214746_004819/run_summary.json",
+      "sha256": "5f250ac6a17bdb54b08473384b5fe2612c70e4564b5046abc58b01c3d4694b0b",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106331,
+          "actor_reference": 73655,
+          "residual": 3962197,
+          "panorama": 361191,
+          "transport_total": 5503374,
+          "transport_to_source_ratio": 0.8019566821271698,
+          "decoded_video": 2510619,
+          "transport_savings_percent": 19.804331787283026
+        },
+        "timings_sec": {
+          "pipeline_total": 1636.8735854141414,
+          "encode_chunk": {
+            "total": 699.0067196087912,
+            "actor_bundle": {
+              "total": 92.27579107997008,
+              "detection": 41.96749594272114,
+              "heuristic": 0.00999098108150065,
+              "segmentation": 45.96893753716722,
+              "pose_estimation": 0.00024206540547311306,
+              "metadata_generation": 1.7049855389632285
+            },
+            "residual": {
+              "total": 427.7350137960166,
+              "synthesis": 2.353741680039093,
+              "genai_baseline": 385.8199339141138,
+              "computation": 39.26412486797199
+            },
+            "panorama": 135.72164211818017,
+            "rigid_objects": 1.2770993635058403e-05,
+            "ball": 39.372706055874005,
+            "actors": 2.736109308898449e-05,
+            "frame_states": 2.1599698811769485e-06,
+            "actor_references": 3.8597900751046836
+          },
+          "transport_send": 0.04045036481693387,
+          "transport_receive": 0.012422029860317707,
+          "decode": {
+            "total": 932.1082948159892,
+            "actor_state_build": 0.08093090285547078,
+            "synthesis": 0.27877432899549603,
+            "genai_baseline": 812.0798208140768,
+            "composite": 5.839559289161116,
+            "video_encoding": 113.82648286805488
+          },
+          "quality_evaluation": 82.16966631822288
+        },
+        "psnr_mean": 32.111666666666665,
+        "psnr_std": 0.39359101728683915,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.9587641333333333,
+        "ssim_std": 0.002845361596626263,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 82.873177,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 5503374,
+      "transport_total": 5503374,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_221738_093060",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_221738_093060/run_summary.json",
+      "sha256": "ac77da7ea5de49d1404bf115c642c5c294a76b6430f081bef51011d04f011126",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106331,
+          "actor_reference": 73655,
+          "residual": 3962197,
+          "panorama": 361191,
+          "transport_total": 5503374,
+          "transport_to_source_ratio": 0.8019566821271698,
+          "decoded_video": 2510619,
+          "transport_savings_percent": 19.804331787283026
+        },
+        "timings_sec": {
+          "pipeline_total": 1693.5803331518546,
+          "encode_chunk": {
+            "total": 734.5555785540491,
+            "actor_bundle": {
+              "total": 83.60789503809065,
+              "detection": 56.379015693906695,
+              "heuristic": 0.009732949547469616,
+              "segmentation": 23.895681032678112,
+              "pose_estimation": 0.0003594779409468174,
+              "metadata_generation": 0.5206571298185736
+            },
+            "residual": {
+              "total": 464.77262472501025,
+              "synthesis": 3.7958726659417152,
+              "genai_baseline": 411.6375797840301,
+              "computation": 47.90169026493095
+            },
+            "panorama": 124.00125188194215,
+            "rigid_objects": 9.291106835007668e-06,
+            "ball": 36.533315344015136,
+            "actors": 5.404301919043064e-05,
+            "frame_states": 2.650078386068344e-06,
+            "actor_references": 25.594438896980137
+          },
+          "transport_send": 0.032102849101647735,
+          "transport_receive": 0.018692346988245845,
+          "decode": {
+            "total": 955.1944241009187,
+            "actor_state_build": 0.29489443311467767,
+            "synthesis": 0.45832549105398357,
+            "genai_baseline": 810.6321189950686,
+            "composite": 29.56201522704214,
+            "video_encoding": 114.24664844409563
+          },
+          "quality_evaluation": 78.79969352902845
+        },
+        "psnr_mean": 32.111666666666665,
+        "psnr_std": 0.39359101728683915,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.9587641333333333,
+        "ssim_std": 0.002845361596626263,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 82.873177,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 5503374,
+      "transport_total": 5503374,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_224741_408520",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_224741_408520/run_summary.json",
+      "sha256": "88e19ea5efacd1ab59e2849e446099b381797b79d3b9755a127236f20c60dcae",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106331,
+          "actor_reference": 73655,
+          "residual": 3949209,
+          "panorama": 361191,
+          "transport_total": 5490386,
+          "transport_to_source_ratio": 0.8000640589132163,
+          "decoded_video": 2500432,
+          "transport_savings_percent": 19.99359410867837
+        },
+        "timings_sec": {
+          "pipeline_total": 1592.3766311190557,
+          "encode_chunk": {
+            "total": 656.0656380099244,
+            "actor_bundle": {
+              "total": 80.95147441094741,
+              "detection": 36.34617708926089,
+              "heuristic": 0.010222832439467311,
+              "segmentation": 39.742427417309955,
+              "pose_estimation": 0.00039446912705898285,
+              "metadata_generation": 0.5599558961112052
+            },
+            "residual": {
+              "total": 424.30442055501044,
+              "synthesis": 2.877558759180829,
+              "genai_baseline": 380.3169339650776,
+              "computation": 40.721448383061215
+            },
+            "panorama": 108.86635989579372,
+            "rigid_objects": 7.869908586144447e-06,
+            "ball": 17.08546506613493,
+            "actors": 1.7481157556176186e-05,
+            "frame_states": 2.2309832274913788e-06,
+            "actor_references": 24.815255539957434
+          },
+          "transport_send": 0.027308108983561397,
+          "transport_receive": 0.0028706800658255816,
+          "decode": {
+            "total": 906.8039627959952,
+            "actor_state_build": 0.029849530896171927,
+            "synthesis": 0.2501319420989603,
+            "genai_baseline": 769.2409878619947,
+            "composite": 24.196175068151206,
+            "video_encoding": 113.0846712491475
+          },
+          "quality_evaluation": 83.46243648300879
+        },
+        "psnr_mean": 32.1,
+        "psnr_std": 0.3916843967618146,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.9587004333333333,
+        "ssim_std": 0.0028192320548136606,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 82.756806,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 5490386,
+      "transport_total": 5490386,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_231604_564889",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_231604_564889/run_summary.json",
+      "sha256": "2af214a20ee48b0b20a5738a7bbc9b628c512082c78e10b4d620cd095cffbef7",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106331,
+          "actor_reference": 73655,
+          "residual": 3951236,
+          "panorama": 361191,
+          "transport_total": 5492413,
+          "transport_to_source_ratio": 0.8003594352032289,
+          "decoded_video": 2509550,
+          "transport_savings_percent": 19.964056479677105
+        },
+        "timings_sec": {
+          "pipeline_total": 1691.864543372998,
+          "encode_chunk": {
+            "total": 736.6092981980182,
+            "actor_bundle": {
+              "total": 87.47538330010138,
+              "detection": 57.15626185410656,
+              "heuristic": 0.008598822401836514,
+              "segmentation": 26.198121826630086,
+              "pose_estimation": 0.00024181301705539227,
+              "metadata_generation": 1.3378831259906292
+            },
+            "residual": {
+              "total": 439.1602870009374,
+              "synthesis": 2.8260745089501143,
+              "genai_baseline": 394.6353648540098,
+              "computation": 41.381500898860395
+            },
+            "panorama": 142.02872529509477,
+            "rigid_objects": 1.0780058801174164e-05,
+            "ball": 64.58567429916002,
+            "actors": 2.5881920009851456e-05,
+            "frame_states": 2.3399479687213898e-06,
+            "actor_references": 3.2902642770204693
+          },
+          "transport_send": 0.031212856993079185,
+          "transport_receive": 0.003598489100113511,
+          "decode": {
+            "total": 951.800002085045,
+            "actor_state_build": 0.07381654204800725,
+            "synthesis": 0.30559105100110173,
+            "genai_baseline": 830.659791701939,
+            "composite": 15.236937743145972,
+            "video_encoding": 105.52267778501846
+          },
+          "quality_evaluation": 80.00931376288645
+        },
+        "psnr_mean": 32.075,
+        "psnr_std": 0.3865509884435255,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.9584396333333335,
+        "ssim_std": 0.0028030506771888563,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 82.734549,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 5492413,
+      "transport_total": 5492413,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260710_234603_892275",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260710_234603_892275/run_summary.json",
+      "sha256": "f62ce9a555fd80a1aec4a1d57b3d16ac3f2759a6990b11366ccf57f763361bd3",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106331,
+          "actor_reference": 73655,
+          "residual": 3977021,
+          "panorama": 361191,
+          "transport_total": 5518198,
+          "transport_to_source_ratio": 0.8041168489368129,
+          "decoded_video": 2537485,
+          "transport_savings_percent": 19.58831510631871
+        },
+        "timings_sec": {
+          "pipeline_total": 1612.636897101067,
+          "encode_chunk": {
+            "total": 678.994653493166,
+            "actor_bundle": {
+              "total": 98.7962373259943,
+              "detection": 60.646769382059574,
+              "heuristic": 0.013919004704803228,
+              "segmentation": 24.447713346686214,
+              "pose_estimation": 0.00022766180336475372,
+              "metadata_generation": 10.30508753308095
+            },
+            "residual": {
+              "total": 407.19339356711134,
+              "synthesis": 2.939311581896618,
+              "genai_baseline": 363.80581503291614,
+              "computation": 39.76599413808435
+            },
+            "panorama": 130.51269012200646,
+            "rigid_objects": 7.631024345755577e-06,
+            "ball": 38.89341908204369,
+            "actors": 3.0370894819498062e-05,
+            "frame_states": 1.6700942069292068e-06,
+            "actor_references": 3.569305579876527
+          },
+          "transport_send": 0.06658797105774283,
+          "transport_receive": 0.013859788188710809,
+          "decode": {
+            "total": 931.054403673159,
+            "actor_state_build": 0.05724024889059365,
+            "synthesis": 0.8115929609630257,
+            "genai_baseline": 786.5497535101604,
+            "composite": 29.59461558703333,
+            "video_encoding": 114.03715427499264
+          },
+          "quality_evaluation": 85.23277263296768
+        },
+        "psnr_mean": 32.031,
+        "psnr_std": 0.37775962374681243,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.9575299499999999,
+        "ssim_std": 0.002754900200400491,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 82.507052,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 5518198,
+      "transport_total": 5518198,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260711_223255_853536",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260711_223255_853536/run_summary.json",
+      "sha256": "dd49fe887bd2ee3f2a7cde6a18815b9c5b072f9df67a8a32b068e20a015549a9",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106329,
+          "actor_reference": 73655,
+          "residual": 2272729,
+          "panorama": 361191,
+          "transport_total": 3813904,
+          "transport_to_source_ratio": 0.5557655717731598,
+          "decoded_video": 1468426,
+          "transport_savings_percent": 44.423442822684024
+        },
+        "timings_sec": {
+          "pipeline_total": 1759.6284444842022,
+          "encode_chunk": {
+            "total": 728.2925907208119,
+            "actor_bundle": {
+              "total": 91.83422572701238,
+              "detection": 63.979045789455995,
+              "heuristic": 0.008842648239806294,
+              "segmentation": 24.057127033593133,
+              "pose_estimation": 0.0002938371617347002,
+              "metadata_generation": 0.7575579630210996
+            },
+            "residual": {
+              "total": 471.2211069499608,
+              "synthesis": 17.735152767039835,
+              "genai_baseline": 418.88720559701324,
+              "computation": 33.84427696908824
+            },
+            "panorama": 141.16259612794966,
+            "rigid_objects": 1.0011019185185432e-05,
+            "ball": 21.041055890964344,
+            "actors": 1.344108022749424e-05,
+            "frame_states": 1.6598496586084366e-06,
+            "actor_references": 3.0013532449956983
+          },
+          "transport_send": 1.2045324069913477,
+          "transport_receive": 0.11759358108974993,
+          "decode": {
+            "total": 1025.8180266881827,
+            "actor_state_build": 0.28436574805527925,
+            "synthesis": 0.4112105639651418,
+            "genai_baseline": 921.2882969439961,
+            "composite": 5.202568494016305,
+            "video_encoding": 98.63077919604257
+          },
+          "encoder_realtime_factor": 145.65851814416237,
+          "decoder_realtime_factor": 205.16360533763654,
+          "quality_evaluation": 79.19200951396488
+        },
+        "psnr_mean": 32.396166666666666,
+        "psnr_std": 0.47134237968687753,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.9386959166666666,
+        "ssim_std": 0.0036766495222855006,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 71.620783,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 3813904,
+      "transport_total": 3813904,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260711_230408_402989",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260711_230408_402989/run_summary.json",
+      "sha256": "0fd4c97d2727d03256db85a533e697a95c6edced1d2cf99994aadae13ce80322",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106329,
+          "actor_reference": 73655,
+          "residual": 2160007,
+          "panorama": 361191,
+          "transport_total": 3701182,
+          "transport_to_source_ratio": 0.5393396190534756,
+          "decoded_video": 1487716,
+          "transport_savings_percent": 46.06603809465244
+        },
+        "timings_sec": {
+          "pipeline_total": 1565.6165974610485,
+          "encode_chunk": {
+            "total": 490.6829610441346,
+            "actor_bundle": {
+              "total": 53.792558185057715,
+              "detection": 27.895228268345818,
+              "heuristic": 0.007828935980796814,
+              "segmentation": 22.74589494522661,
+              "pose_estimation": 0.00021065282635390759,
+              "metadata_generation": 0.4888507390860468
+            },
+            "residual": {
+              "total": 326.35962013481185,
+              "synthesis": 2.7432357741054147,
+              "genai_baseline": 285.3463599421084,
+              "computation": 37.115132690873
+            },
+            "panorama": 95.21833392395638,
+            "rigid_objects": 6.6801439970731735e-06,
+            "ball": 12.611006567021832,
+            "actors": 4.741130396723747e-06,
+            "frame_states": 1.1699739843606949e-06,
+            "actor_references": 2.656395254889503
+          },
+          "transport_send": 0.1695105789694935,
+          "transport_receive": 0.00789195392280817,
+          "decode": {
+            "total": 1067.5309692199808,
+            "actor_state_build": 0.048462828155606985,
+            "synthesis": 0.2509227639529854,
+            "genai_baseline": 962.7691081929952,
+            "composite": 4.559433072106913,
+            "video_encoding": 99.83647466613911
+          },
+          "encoder_realtime_factor": 98.13659220882691,
+          "decoder_realtime_factor": 213.50619384399616,
+          "quality_evaluation": 55.98073555389419
+        },
+        "psnr_mean": 31.53983333333333,
+        "psnr_std": 0.4178416433158488,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.9379996166666665,
+        "ssim_std": 0.0037233474548747443,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 71.619672,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 3701182,
+      "transport_total": 3701182,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260711_233142_535554",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260711_233142_535554/run_summary.json",
+      "sha256": "a995f24cdcdfe2de8ce1461e5cb13f099b1951c7aab1d8412ab4815e7d159a65",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106329,
+          "actor_reference": 73655,
+          "residual": 2152428,
+          "panorama": 361191,
+          "transport_total": 3693603,
+          "transport_to_source_ratio": 0.5382352002562356,
+          "decoded_video": 1506574,
+          "transport_savings_percent": 46.17647997437644
+        },
+        "timings_sec": {
+          "pipeline_total": 1545.3179847889114,
+          "encode_chunk": {
+            "total": 556.2770574430469,
+            "actor_bundle": {
+              "total": 64.66948234196752,
+              "detection": 25.2129517509602,
+              "heuristic": 0.007920378586277366,
+              "segmentation": 26.042476097587496,
+              "pose_estimation": 0.00023332703858613968,
+              "metadata_generation": 0.46392607991583645
+            },
+            "residual": {
+              "total": 347.5351542439312,
+              "synthesis": 3.154378121951595,
+              "genai_baseline": 306.0153846198227,
+              "computation": 36.838667307049036
+            },
+            "panorama": 97.44033773802221,
+            "rigid_objects": 1.3011042028665543e-05,
+            "ball": 43.210334222065285,
+            "actors": 1.6001053154468536e-05,
+            "frame_states": 1.369975507259369e-06,
+            "actor_references": 3.39297379902564
+          },
+          "transport_send": 0.2097377460449934,
+          "transport_receive": 0.03880251199007034,
+          "decode": {
+            "total": 960.644867651863,
+            "actor_state_build": 0.15241105295717716,
+            "synthesis": 0.31256074109114707,
+            "genai_baseline": 855.2610247498378,
+            "composite": 5.943012428935617,
+            "video_encoding": 98.97484860592522
+          },
+          "encoder_realtime_factor": 111.25541148860938,
+          "decoder_realtime_factor": 192.1289735303726,
+          "quality_evaluation": 62.92052653594874
+        },
+        "psnr_mean": 31.52216666666667,
+        "psnr_std": 0.5647332457797125,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.9292447166666666,
+        "ssim_std": 0.004157597684126684,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 72.317814,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 3693603,
+      "transport_total": 3693603,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260711_235921_644810",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260711_235921_644810/run_summary.json",
+      "sha256": "e005dd7261bd4f24c2a5e9244962bbaf823f57a7f5ede6b0c0007f8f7a8e7bce",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106329,
+          "actor_reference": 73655,
+          "residual": 2270193,
+          "panorama": 361191,
+          "transport_total": 3811368,
+          "transport_to_source_ratio": 0.5553960235385905,
+          "decoded_video": 1465639,
+          "transport_savings_percent": 44.46039764614095
+        },
+        "timings_sec": {
+          "pipeline_total": 1643.483652224997,
+          "encode_chunk": {
+            "total": 589.5825356279965,
+            "actor_bundle": {
+              "total": 52.7033399308566,
+              "detection": 27.659999320749193,
+              "heuristic": 0.01070318091660738,
+              "segmentation": 21.849278477486223,
+              "pose_estimation": 0.0003250087611377239,
+              "metadata_generation": 0.5127881970256567
+            },
+            "residual": {
+              "total": 362.8435698810499,
+              "synthesis": 2.512776165967807,
+              "genai_baseline": 317.4524491429329,
+              "computation": 36.95323903020471
+            },
+            "panorama": 104.53526705387048,
+            "rigid_objects": 7.390044629573822e-06,
+            "ball": 43.15145260607824,
+            "actors": 2.0710984244942665e-05,
+            "frame_states": 2.1900050342082977e-06,
+            "actor_references": 26.313359004911035
+          },
+          "transport_send": 2.4370651990175247,
+          "transport_receive": 0.31795995286665857,
+          "decode": {
+            "total": 1043.479189233156,
+            "actor_state_build": 0.5980905040632933,
+            "synthesis": 0.5106383939273655,
+            "genai_baseline": 939.1677614951041,
+            "composite": 4.586263064062223,
+            "video_encoding": 98.61488701403141
+          },
+          "encoder_realtime_factor": 117.91650712559931,
+          "decoder_realtime_factor": 208.69583784663118,
+          "quality_evaluation": 51.787968943826854
+        },
+        "psnr_mean": 32.394,
+        "psnr_std": 0.4650060931500434,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.9387670333333334,
+        "ssim_std": 0.003686869620543814,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 72.054975,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 3811368,
+      "transport_total": 3811368,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260712_002806_564661",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260712_002806_564661/run_summary.json",
+      "sha256": "3a44f684109b63d9e7efe312b61b563fcac06cfdc19ea5e87ce09d191188f68f",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106329,
+          "actor_reference": 73655,
+          "residual": 2165786,
+          "panorama": 361191,
+          "transport_total": 3706961,
+          "transport_to_source_ratio": 0.5401817402078826,
+          "decoded_video": 1485475,
+          "transport_savings_percent": 45.98182597921174
+        },
+        "timings_sec": {
+          "pipeline_total": 1634.2076073789503,
+          "encode_chunk": {
+            "total": 572.565038240049,
+            "actor_bundle": {
+              "total": 88.85088789789006,
+              "detection": 58.00387417827733,
+              "heuristic": 0.009425369324162602,
+              "segmentation": 27.676153583684936,
+              "pose_estimation": 0.0002688022796064615,
+              "metadata_generation": 0.5848313209135085
+            },
+            "residual": {
+              "total": 352.4096299849916,
+              "synthesis": 3.14422027207911,
+              "genai_baseline": 313.0479996621143,
+              "computation": 34.59848354407586
+            },
+            "panorama": 112.367460538866,
+            "rigid_objects": 1.557101495563984e-05,
+            "ball": 14.946944442111999,
+            "actors": 2.5362009182572365e-05,
+            "frame_states": 1.0731164366006851e-05,
+            "actor_references": 3.9386048088781536
+          },
+          "transport_send": 0.09276821091771126,
+          "transport_receive": 0.0037332349456846714,
+          "decode": {
+            "total": 1055.796680325875,
+            "actor_state_build": 0.04523717099800706,
+            "synthesis": 0.30046077095903456,
+            "genai_baseline": 916.7659975248389,
+            "composite": 28.282305686967447,
+            "video_encoding": 110.4021123230923
+          },
+          "encoder_realtime_factor": 114.5130076480098,
+          "decoder_realtime_factor": 211.159336065175,
+          "quality_evaluation": 78.38346654502675
+        },
+        "psnr_mean": 31.53016666666667,
+        "psnr_std": 0.415272969128607,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.9379638666666668,
+        "ssim_std": 0.003722582962884176,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 71.998338,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 3706961,
+      "transport_total": 3706961,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    },
+    {
+      "family": "20260712_005716_569644",
+      "original_report": "gpu1:/home/itec/emanuele/pointstream-data/outputs/20260712_005716_569644/run_summary.json",
+      "sha256": "a06e05e265c6635e32557287e3e761bc553d9adf091a98fd03598d044d86c8ad",
+      "source_uri": "/home/itec/emanuele/pointstream/assets/real_tennis.mp4",
+      "source_hash_window_split": "missing in summary; do not infer from timestamp",
+      "declared_frames": 60,
+      "scored_frames": 60,
+      "frame_count_agrees": true,
+      "genai_enabled": true,
+      "genai_backend": "canny-controlnet",
+      "residual_mode": "full_video",
+      "transport_backend": "disk",
+      "compositing_mask_mode": "postgen-seg-client",
+      "postgen_segmenter_backend": "yolo",
+      "metadata_mask_codec": "auto",
+      "historical_evaluation": {
+        "sizes_bytes": {
+          "source": 6862433,
+          "metadata": 1106329,
+          "actor_reference": 73655,
+          "residual": 2156335,
+          "panorama": 361191,
+          "transport_total": 3697510,
+          "transport_to_source_ratio": 0.5388045318620961,
+          "decoded_video": 1516181,
+          "transport_savings_percent": 46.11954681379039
+        },
+        "timings_sec": {
+          "pipeline_total": 1565.5692202460486,
+          "encode_chunk": {
+            "total": 564.4800124228932,
+            "actor_bundle": {
+              "total": 94.23034603800625,
+              "detection": 69.56619777018204,
+              "heuristic": 0.00801403890363872,
+              "segmentation": 21.430309062357992,
+              "pose_estimation": 0.0002261688932776451,
+              "metadata_generation": 0.4584683240391314
+            },
+            "residual": {
+              "total": 332.8560872890521,
+              "synthesis": 3.1143092568963766,
+              "genai_baseline": 318.92957706120797,
+              "computation": 10.415449345950037
+            },
+            "panorama": 92.87096625217237,
+            "rigid_objects": 4.54997643828392e-06,
+            "ball": 41.61478811199777,
+            "actors": 6.681284867227077e-05,
+            "frame_states": 1.8100254237651825e-06,
+            "actor_references": 2.836208631983027
+          },
+          "transport_send": 1.5397593909874558,
+          "transport_receive": 0.14323327294550836,
+          "decode": {
+            "total": 991.8352980630007,
+            "actor_state_build": 0.4024050300940871,
+            "synthesis": 0.3915973661933094,
+            "genai_baseline": 888.9482104370836,
+            "composite": 4.526308209868148,
+            "video_encoding": 97.56623218092136
+          },
+          "encoder_realtime_factor": 112.89600248457864,
+          "decoder_realtime_factor": 198.36705961260014,
+          "quality_evaluation": 55.199758721049875
+        },
+        "psnr_mean": 31.515,
+        "psnr_std": 0.5571549754481839,
+        "psnr_num_frames": 60,
+        "psnr_infinite_frames": 0,
+        "note": null,
+        "ssim_mean": 0.9292934333333333,
+        "ssim_std": 0.004166027841828338,
+        "ssim_num_frames": 60,
+        "vmaf_mean": 72.513072,
+        "vmaf_num_frames": 60
+      },
+      "invariant_failures": [],
+      "component_bytes_sum": 3697510,
+      "transport_total": 3697510,
+      "balance": true,
+      "status": "unresolved historical diagnostic; repaired-contract eligibility not established",
+      "rate_limit": "source byte denominator is source container, not certified same scored frame window; ratio/saving not compression result",
+      "source_protocol_missing": [
+        "revision/selected patch",
+        "frame hashes/index/split",
+        "model/checkpoint exposure",
+        "source-free decoder packet identity",
+        "qualified metric/native binary versions",
+        "GPU/environment"
+      ],
+      "paper_use": "development correction appendix; no native RD ranking"
+    }
+  ],
+  "counts": {
+    "implementation/measurement failure": 27,
+    "unresolved historical diagnostic; repaired-contract eligibility not established": 25
+  },
+  "summary_count": 52,
+  "missing_summary_candidates_record": "../server/outputs_orphan_runs.json"
+}

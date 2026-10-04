@@ -1,0 +1,26 @@
+[
+  {
+    "artifact": "workers/server/gpu3-dirty-source-summary.txt",
+    "sha256": "3e6fa834ee0469185a7e3774fd39a7e64a992aec167c881de5e02dffe210a651",
+    "bytes": 1924,
+    "scope": "selected host-local provenance extracts; original hashes embedded where captured"
+  },
+  {
+    "artifact": "workers/server/gpu5-archive-recovery-extract.txt",
+    "sha256": "3a2875388d358221020b4b40130b62e1259e70250e619388bc359dff9e4c4e24",
+    "bytes": 21971,
+    "scope": "selected host-local provenance extracts; original hashes embedded where captured"
+  },
+  {
+    "artifact": "workers/server/gpu5-selected-provenance-hashes.txt",
+    "sha256": "041e0166c8d33ea55714e6a9f7064949896c5f3e82a60cf60220ce33b71bf567",
+    "bytes": 2438,
+    "scope": "selected host-local provenance extracts; original hashes embedded where captured"
+  },
+  {
+    "artifact": "workers/server/gpu6-archive-details.tsv",
+    "sha256": "17e6d4de458b4acbb70c15247e18d5c0d5870d00dd783bb7783a1496701cd0fd",
+    "bytes": 4464,
+    "scope": "selected host-local provenance extracts; original hashes embedded where captured"
+  }
+]

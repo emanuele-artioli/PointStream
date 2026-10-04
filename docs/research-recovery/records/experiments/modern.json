@@ -1,0 +1,718 @@
+{
+  "record": "modern-modular-and-perception-evidence",
+  "audit_date": "2026-09-30",
+  "method": "/private/tmp/pointstream-recovery-20260930/dossier/METHOD.md",
+  "read_only": true,
+  "new_experiment_or_recompute": false,
+  "scope": [
+    "September E04A/E04B background removal probes",
+    "September E05 Pix2Pix stage-1 and E06 transport work",
+    "JE05/07/10/11/12/16 modular journal reports",
+    "September 25-27 C01/R02, SAM3.1 and YOLO perception pilots"
+  ],
+  "search_and_capture": {
+    "worker_outputs": "/private/tmp/pointstream-recovery-20260930/workers/server/outputs",
+    "source_git": "/private/tmp/pointstream-recovery-20260930/source/code.git",
+    "scratch": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern",
+    "scratch_inventory": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/inventory.json",
+    "capture_note": "Initial selected-report coverage was extended by exact targeted original JSON retrieval. Complete filesystem scientific coverage is not claimed.",
+    "e04b_remote_fetch": {
+      "initial_attempt": "sandbox DNS failure",
+      "resolved_by": "authorized escalated read-only scp",
+      "outcome": "targeted E04A/B/E05/E06 original payloads plus E05 matrix recovered and hashed",
+      "retrieved_report_index": "modern-retrieved-report-index.json",
+      "original_reports": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-federer007/probe_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04a/probe_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-federer007/probe_report.json",
+          "bytes": 37063,
+          "sha256": "e65ec04dedda40cdc472ace90fcce31e26b10218c15060097c6ca39f5010251d",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/e04b_paired_removal_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04b/e04b_paired_removal_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/e04b_paired_removal_report.json",
+          "bytes": 10183,
+          "sha256": "650f6a400e87fbd85d4abbd462fd36dae773053ee6c9f4c2b21ec3bdaf5573f4",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/e04b_derived_audit_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04b/e04b_derived_audit_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/e04b_derived_audit_report.json",
+          "bytes": 11330,
+          "sha256": "fb11eba8a1840c6e749bcfdb2dd233c1defecf5cab491beb917e9f09904eac88",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/retry_and_provenance_ledger.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04b/retry_and_provenance_ledger.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/retry_and_provenance_ledger.json",
+          "bytes": 5023,
+          "sha256": "cd85d192834339d0fe10b169483041f44d90da89783f85334a0696091858924c",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e05/stage1_pilot/campaign_result.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e05/campaign_result.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e05/stage1_pilot/campaign_result.json",
+          "bytes": 24340,
+          "sha256": "f56e5cb2a8c0239b4f3ecc007d164a403cb7512d8a6bd4ed1e625afdf7c8a425",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e05/stage1_pilot/campaign_result_completed.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e05/campaign_result_completed.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e05/stage1_pilot/campaign_result_completed.json",
+          "bytes": 24963,
+          "sha256": "99e019e0f544ac4064ca4fee0e8e7b5f02821cc2486cbf03c646f262bdfa34fa",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e05/stage1_pilot/matrix/diagnostic_matrix.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e05/matrix/diagnostic_matrix.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e05/stage1_pilot/matrix/diagnostic_matrix.json",
+          "bytes": 85630,
+          "sha256": "1baa1dda6e32c35e7c9c22bcb171181db342a8d93ad6e36de1d82d2522aaf0ed",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/probe_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e06/probe_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/probe_report.json",
+          "bytes": 6813,
+          "sha256": "52c0179c724469e56a1dedeafd8695536b44623cd0a63c48bf8128a49f8b5e33",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/audit-20260916-lossless-pack/audit_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e06/audit_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e06/audit-20260916-lossless-pack/audit_report.json",
+          "bytes": 65269,
+          "sha256": "d804d1ab285acfc874cc0758b256f859f40fadc4c5ca89bcff2cf6b55e1bca5c",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/probe-20260917-floor-arms/floor_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e06/floor_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e06/probe-20260917-floor-arms/floor_report.json",
+          "bytes": 38201,
+          "sha256": "0bd1e7cb0797ecda7b9174b6ea294cb91d0a72294d92e53e76fb581dd31c4026",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/campaign_result.e04a_derived.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04a/evidence-completion/campaign_result.e04a_derived.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/campaign_result.e04a_derived.json",
+          "bytes": 11974,
+          "sha256": "9c6928eb99fbec89f911bcdcbc3f871b163694cab1f358e25d55fd29fcc79dfd",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/evidence_completion_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04a/evidence-completion/evidence_completion_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/evidence_completion_report.json",
+          "bytes": 4070,
+          "sha256": "f2358b348d9f33ed0692994485aed1b768519da477fef83851859959e5f6c3e5",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/standalone_decode_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04a/evidence-completion/standalone_decode_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/standalone_decode_report.json",
+          "bytes": 3689,
+          "sha256": "67cb1885fd7921f2ef45f3acaffb38061fc87306b3349303c652eaa00129146f",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/campaign_result.e04a_derived.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04a/evidence-completion-r2/campaign_result.e04a_derived.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/campaign_result.e04a_derived.json",
+          "bytes": 11992,
+          "sha256": "fce6bfbe37bc09fdc1df00c32a47950192c7be8bb7c828290b95e531b36e568b",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/evidence_completion_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04a/evidence-completion-r2/evidence_completion_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/evidence_completion_report.json",
+          "bytes": 6989,
+          "sha256": "d0482d2e8f63e6a60fa32b74148f445f0aa0883095bd4021c8e152976c4b46d8",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/standalone_decode_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04a/evidence-completion-r2/standalone_decode_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/standalone_decode_report.json",
+          "bytes": 3687,
+          "sha256": "b33ba461da94f1c2a114364e95d202cf041b9cb37c3d93419ebf71571c7adefc",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        }
+      ]
+    }
+  },
+  "overall_finding": {
+    "status": "unresolved_as_a_modern_rate_quality_victory",
+    "claim": "The recovered evidence supports bounded component diagnostics and some implementation findings, not a modern PointStream full-wire rate-quality victory.",
+    "highest_risk_headline": "JE10 nominal arithmetic is reproducible, but the runner does not serialize a complete receiver package or reconstruct from only delivered bytes.",
+    "paper_boundary": "Keep each source window, target, metric, model/checkpoint, receiver information access, byte accounting and timing condition attached. Do not pool background-only, cached-reference, object-region, weighted-frame or mask-agreement measures into a common leaderboard."
+  },
+  "cards": [
+    {
+      "id": "E04A",
+      "status": "one-scene removal-off background component; no codec win",
+      "direct_saved_observations": "ghost MAD6.70\u20139.16 versus20.33\u201328.55 still; QP47panorama4554B including1742Bside data,21.16visibleYPSNR/.8236maskedSSIM; all six historical bitstreams and standalone decoded parity verified by recovered audit",
+      "limits": "47/48native seek frame identity unresolved; no overlap or whole-codec foreground cost",
+      "source_record": "modern.md",
+      "artifacts": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-federer007/probe_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04a/probe_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-federer007/probe_report.json",
+          "bytes": 37063,
+          "sha256": "e65ec04dedda40cdc472ace90fcce31e26b10218c15060097c6ca39f5010251d",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/campaign_result.e04a_derived.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04a/evidence-completion/campaign_result.e04a_derived.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/campaign_result.e04a_derived.json",
+          "bytes": 11974,
+          "sha256": "9c6928eb99fbec89f911bcdcbc3f871b163694cab1f358e25d55fd29fcc79dfd",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/evidence_completion_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04a/evidence-completion/evidence_completion_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/evidence_completion_report.json",
+          "bytes": 4070,
+          "sha256": "f2358b348d9f33ed0692994485aed1b768519da477fef83851859959e5f6c3e5",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/standalone_decode_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04a/evidence-completion/standalone_decode_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion/standalone_decode_report.json",
+          "bytes": 3689,
+          "sha256": "67cb1885fd7921f2ef45f3acaffb38061fc87306b3349303c652eaa00129146f",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/campaign_result.e04a_derived.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04a/evidence-completion-r2/campaign_result.e04a_derived.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/campaign_result.e04a_derived.json",
+          "bytes": 11992,
+          "sha256": "fce6bfbe37bc09fdc1df00c32a47950192c7be8bb7c828290b95e531b36e568b",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/evidence_completion_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04a/evidence-completion-r2/evidence_completion_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/evidence_completion_report.json",
+          "bytes": 6989,
+          "sha256": "d0482d2e8f63e6a60fa32b74148f445f0aa0883095bd4021c8e152976c4b46d8",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/standalone_decode_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04a/evidence-completion-r2/standalone_decode_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04a/run-20260916-evidence-completion-r2/standalone_decode_report.json",
+          "bytes": 3687,
+          "sha256": "b33ba461da94f1c2a114364e95d202cf041b9cb37c3d93419ebf71571c7adefc",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        }
+      ],
+      "correction_policy": "preserve initial observations and later audit separately; no new execution or metric rescoring"
+    },
+    {
+      "id": "E04B",
+      "status": "bounded small effect; tested standard-pipeline policy rejected; cause of remaining error unresolved",
+      "direct_saved_observations": "QP47ghostMAD9.165\u21928.715(4.91%),bytes4554\u21924519,YPSNR21.161\u219221.467;QP32MAD6.704\u21926.538(2.48%),bytes17411\u219216469,YPSNR22.798\u219222.826; actual boundaryMAD11.763/9.988ONvs12.694/9.968OFF; zeroTeleaholes",
+      "limits": "four encodeinvocations across twoattempts but twounique bitstreams; runtime dirtydiff not reconstructed; initial0\u201320%decisionband undefined; later<20%policy rejection is not a new pixel result",
+      "source_record": "modern.md",
+      "artifacts": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/e04b_paired_removal_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04b/e04b_paired_removal_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/e04b_paired_removal_report.json",
+          "bytes": 10183,
+          "sha256": "650f6a400e87fbd85d4abbd462fd36dae773053ee6c9f4c2b21ec3bdaf5573f4",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/e04b_derived_audit_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04b/e04b_derived_audit_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/e04b_derived_audit_report.json",
+          "bytes": 11330,
+          "sha256": "fb11eba8a1840c6e749bcfdb2dd233c1defecf5cab491beb917e9f09904eac88",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/retry_and_provenance_ledger.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e04b/retry_and_provenance_ledger.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e04b/run-20260916-paired-removal-r2/retry_and_provenance_ledger.json",
+          "bytes": 5023,
+          "sha256": "cd85d192834339d0fe10b169483041f44d90da89783f85334a0696091858924c",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        }
+      ],
+      "correction_policy": "preserve initial observations and later audit separately; no new execution or metric rescoring"
+    },
+    {
+      "id": "E05",
+      "status": "bounded same-matrix checkpoint-specific negative; blank control and heldout exposure unqualified",
+      "direct_saved_observations": "six direct corners and source hashes join; initial/completed adapter frame start0count16 vs prose16..31 may be relative/absolute; no proven leakage; matrix no_conditioning false contradicts completed true; candidate6671957B31.9827YdBvs paste999967B33.9394; completedcharges217736406Bper-video checkpoint and claims ineligible",
+      "limits": "training input hash mapping missing; no blank seventh corner; incomplete object/temporal/calibration; no family-wide Pix2Pix failure; actual742dffb runner identity-checked reuse repairs olderbug",
+      "source_record": "modern.md",
+      "artifacts": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e05/stage1_pilot/campaign_result.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e05/campaign_result.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e05/stage1_pilot/campaign_result.json",
+          "bytes": 24340,
+          "sha256": "f56e5cb2a8c0239b4f3ecc007d164a403cb7512d8a6bd4ed1e625afdf7c8a425",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e05/stage1_pilot/campaign_result_completed.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e05/campaign_result_completed.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e05/stage1_pilot/campaign_result_completed.json",
+          "bytes": 24963,
+          "sha256": "99e019e0f544ac4064ca4fee0e8e7b5f02821cc2486cbf03c646f262bdfa34fa",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e05/stage1_pilot/matrix/diagnostic_matrix.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e05/matrix/diagnostic_matrix.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e05/stage1_pilot/matrix/diagnostic_matrix.json",
+          "bytes": 85630,
+          "sha256": "1baa1dda6e32c35e7c9c22bcb171181db342a8d93ad6e36de1d82d2522aaf0ed",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        }
+      ],
+      "correction_policy": "preserve initial observations and later audit separately; no new execution or metric rescoring"
+    },
+    {
+      "id": "E06",
+      "status": "bounded negative configuration and separate no-native-reencode packaging floor",
+      "direct_saved_observations": "four fullprobe settings;compact30297B vs AV119116B/VVC21288B; RLE17581B retains parentPSNR20.6801dB,belowVVC24.6/AV127.4; XOR22055B/thin28125B",
+      "limits": "one48-frame360pwindow; separate client timing missing;47/48native-seek frame identity unresolved; floorpixels parity doesnotestablish RDwin",
+      "source_record": "modern.md",
+      "artifacts": [
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/probe_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e06/probe_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e06/run-20260916-federer007-perframe-bbox/probe_report.json",
+          "bytes": 6813,
+          "sha256": "52c0179c724469e56a1dedeafd8695536b44623cd0a63c48bf8128a49f8b5e33",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/audit-20260916-lossless-pack/audit_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e06/audit_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e06/audit-20260916-lossless-pack/audit_report.json",
+          "bytes": 65269,
+          "sha256": "d804d1ab285acfc874cc0758b256f859f40fadc4c5ca89bcff2cf6b55e1bca5c",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        },
+        {
+          "original": "gpu1:/home/itec/emanuele/pointstream-data/outputs/evaluation-20260914/e06/probe-20260917-floor-arms/floor_report.json",
+          "copy": "/private/tmp/pointstream-recovery-20260930/rawworkers/experiments/modern/retrieved/e06/floor_report.json",
+          "retained_report": "records/experiments/saved-reports/outputs/evaluation-20260914/e06/probe-20260917-floor-arms/floor_report.json",
+          "bytes": 38201,
+          "sha256": "0bd1e7cb0797ecda7b9174b6ea294cb91d0a72294d92e53e76fb581dd31c4026",
+          "retained_hash_matches": true,
+          "json_parsed": true,
+          "direct_read_only_capture": true
+        }
+      ],
+      "correction_policy": "preserve initial observations and later audit separately; no new execution or metric rescoring"
+    },
+    {
+      "id": "JE05",
+      "name": "Heuristic court-region decomposition",
+      "status": "diagnostic_oracle",
+      "reports": [
+        "workers/server/outputs/selected_reports/journal-20260924/je05/alcaraz000-decomposition.json",
+        "workers/server/outputs/selected_reports/journal-20260924/je05/federer007-decomposition.json",
+        "workers/server/outputs/selected_reports/journal-20260924/je05/perricard002-decomposition.json",
+        "workers/server/outputs/selected_reports/journal-20260924/je05/decomposition-summary.json"
+      ],
+      "metrics": {
+        "five_frame_court_line_pixel_psnr_db": {
+          "alcaraz": 23.33,
+          "federer": 12.99,
+          "perricard": 16.99
+        },
+        "five_frame_court_total_pixel_psnr_db": {
+          "alcaraz": 14.91,
+          "federer": 13.04,
+          "perricard": 10.5
+        }
+      },
+      "protocol": "Heuristic lower-court band, white/low-saturation line threshold and center HSV court color; regions overlap.",
+      "limits": [
+        "Pixel PSNR is not line displacement",
+        "Region errors are not independent additive causes",
+        "No PointStream code revision, scorer calibration/annotation identity, or independent geometry truth"
+      ]
+    },
+    {
+      "id": "JE07",
+      "name": "Appearance/silhouette ledger",
+      "status": "unresolved_due_to_report_summary_contradiction",
+      "report": "workers/server/outputs/selected_reports/journal-20260924/je07/je07-appearance-silhouette-evaluation.json",
+      "direct_report_values": {
+        "lossless_masks_bytes": 62977,
+        "scale_0_25": {
+          "bytes": 19861,
+          "mean_iou": 0.9468
+        },
+        "scale_0_125": {
+          "bytes": 10324,
+          "mean_iou": 0.9051
+        }
+      },
+      "contradictory_summary_values": {
+        "lossless_masks_bytes": 63773,
+        "scale_0_25": {
+          "bytes": 19633,
+          "mean_iou": 0.9501
+        },
+        "scale_0_125": {
+          "bytes": 10072,
+          "mean_iou": 0.9111
+        }
+      },
+      "source": "git show bbe5f8c84920d16bf99004f3c1493fc5add10d5e:experiments/modular/je07_appearance_silhouette.py",
+      "reconciliation": "Direct JSON and JE10 use the direct-output values; recovered JE07 hard-coded prose uses the alternate values. No artifact/code-output identity join resolves this. JE10 candidate H uses 10324 B.",
+      "limits": [
+        "Five-frame region samples",
+        "Naive pixel delta crops cost 44-58% more than independent AV1 intra crops on tested tracks",
+        "No direct claim about general mask coding efficiency"
+      ]
+    },
+    {
+      "id": "JE10",
+      "name": "Nominal full-codec candidate",
+      "status": "invalidated_or_retracted_as_full_wire_victory; arithmetic_only",
+      "report": "workers/server/outputs/selected_reports/journal-20260924/je10/alcaraz000-je10-winning-result.json",
+      "source_window": "One Alcaraz scene_000 candidate point; report lacks PointStream source revision.",
+      "nominal_values": {
+        "candidate_bytes": 64840,
+        "vvc_cap_bytes": 65149,
+        "byte_margin": 309,
+        "weighted_psnr_delta_db": 1.2229,
+        "foreground_psnr_delta_db": 2.3897,
+        "background_psnr_delta_db": -1.4995
+      },
+      "runner_commit": "a4f603729e7ab7ac78800ed1142b49dfd5cbb153",
+      "receiver_gaps": [
+        "Runner encodes object AV1 color only",
+        "24,648 B background comes from cached array",
+        "Boxes are source-derived rather than decoded serialized motion",
+        "No self-contained complete motion/receiver package",
+        "VVC size, quality and timing are constants"
+      ],
+      "commit_disambiguation": "1a9a90f8339fdd7965c0b2b89a0245823d18ae4c was documentation-only, not the executable runner.",
+      "limits": [
+        "No full-wire fresh-client Pareto comparison",
+        "No persistence or BD-rate conclusion",
+        "Invalidating the victory headline does not establish family failure"
+      ]
+    },
+    {
+      "id": "JE11_JE12_JE16",
+      "name": "Amortization, causal ablations and runtime follow-ups",
+      "status": "conditional_analytic_entries; no client_speed_win",
+      "reports": [
+        "workers/server/outputs/selected_reports/journal-20260924/je11/consecutive-points-amortization.json",
+        "workers/server/outputs/selected_reports/journal-20260924/je12/causal-ablations.json",
+        "workers/server/outputs/selected_reports/journal-20260924/je16/runtime-and-resources.json"
+      ],
+      "findings": {
+        "je11": "Multiplies identical nominal costs; no actual successive-interval points, cold/warm resets, refreshes or measured per-prefix byte totals.",
+        "je12": "No independent source/code revision attached; corresponding commits promoted report rows through documentation-only changes. Treat as analytical/conditional ablations, not certified causal executions.",
+        "je16": {
+          "client_total_seconds": 69.747,
+          "compositing_seconds": 66.094,
+          "vvc_decode_seconds": 29.581
+        }
+      }
+    },
+    {
+      "id": "C01_SAM_YOLO",
+      "name": "Sep 25 same-window player-mask and PointStream pilot",
+      "status": "diagnostic_only",
+      "shared_input": {
+        "source": "sinner_alcaraz/scene_002 first 16 frames",
+        "resolution": "3840x2160",
+        "comparison": "Same registered PNGs and imperfect project-derived cached-mask SHA; SAM and YOLO selection policies differ."
+      },
+      "sam31": {
+        "original_result": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run3/result.json",
+        "recovered": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sam31-meta-video-smoke16-run3/result.json",
+        "report_sha256": "936f1023e21f2f9c44b87dbd38f823e1022247263c42a93b1bd90ae5a736eb05",
+        "metrics_vs_cached_mask": {
+          "global_iou": 0.8004,
+          "mean_frame_iou": 0.8026,
+          "precision": 0.9778,
+          "recall": 0.8152,
+          "boundary_iou": 0.0592
+        },
+        "tracks_in_all_16_frames": 2,
+        "model_source_commit": "2345a4ad109ac29c569da749c91d84f10dc08c40",
+        "checkpoint_sha256": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6"
+      },
+      "yolo26x_pointstream": {
+        "original_ledger": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/c01-gpu/sinner-alcaraz-scene002-first16-yolo26x-fast-run1/pilot-ledger.json",
+        "recovered": "workers/server/outputs/selected_reports/journal-20260925/c01-gpu/sinner-alcaraz-scene002-first16-yolo26x-fast-run1/pilot-ledger.json",
+        "ledger_sha256": "9c7602c7c9b4ed97b24cbffe03a66ec9f5f9d36199436eabe92d1cbf907d88d7",
+        "metrics_vs_same_cached_mask": {
+          "global_iou": 0.5528,
+          "mean_frame_iou": 0.5549,
+          "precision": 0.6919,
+          "recall": 0.7332,
+          "boundary_iou": 0.0604
+        },
+        "point": {
+          "physical_bytes": 1024847,
+          "weighted_psnr_db_on_cached_reference_mask_regions": 24.231
+        },
+        "protocol_sha256": "8f6ebd22852e37192144f0de10719e5a61a9d1cfc9101446746f38f2037b7132",
+        "runner_sha256": "e4d8f9ea6e877fcca8afd5e05edc854c6c76dadbd1db36862cf7eded982d4d14",
+        "model_weights_sha256": "92b3debe8cd24bb6e3850f5fae0d28560afec2d05821ac141f1678d9b0a4"
+      },
+      "limits": [
+        "Cached reference is not ground truth",
+        "No paired AV1/VVC point or ladder",
+        "No independent causal perception comparison",
+        "Synthetic-rectangle transport smoke is separate infrastructure evidence"
+      ]
+    },
+    {
+      "id": "R02",
+      "name": "Matched conventional anchor preregistration",
+      "status": "implementation_failure_or_blocked_before_execution",
+      "manifest": "workers/server/source-snapshots/pointstream-r02-anchor-roundtrip/untracked/manifests/journal_20260925_r02_sinner_alcaraz002_16f.json",
+      "manifest_sha256": "5722086554a50a910091c00a977f71aa725033b3769eb8e68c133cb4defdc65a",
+      "planned_arms": [
+        "CPU AV1 QP54",
+        "CPU VVC QP46"
+      ],
+      "blocker": "Manifest records preregistered_blocked_on_free_gpu_preflight because nvidia-smi could not communicate with the driver, despite the planned encoders being CPU-only.",
+      "output_directory_registered": "gpu3:/home/itec/emanuele/pointstream-data/outputs/journal-20260925/r02-anchor-roundtrip/sinner-alcaraz002-first16-run1",
+      "output_result_found": false,
+      "interpretation": "No same-window anchor comparison survives; do not substitute a synthetic transport smoke."
+    },
+    {
+      "id": "SEP26_SAM_RACKET",
+      "name": "SAM3.1 racket prompt continuity smoke",
+      "status": "diagnostic_negative_for_continuity_only",
+      "original_result": "gpu1:/home/itec/emanuele/pointstream-data/outputs/journal-20260926/sam31-racket-prompt-smoke16-run1/result.json",
+      "recovered": "workers/server/outputs/selected_reports/journal-20260926/sam31-racket-prompt-smoke16-run1/result.json",
+      "result_sha256": "18b27dd827d383b89a1c305a72559a1c71236c9729bb3c17d5de9696bf07ac91",
+      "source_window": "Same Sinner/Alcaraz first-16-frame window.",
+      "result": {
+        "nonempty_selected_masks": 28,
+        "selected_slots": 32,
+        "coverage": 0.75
+      },
+      "limits": [
+        "No independent racket labels",
+        "No codec rate, quality or decode",
+        "Coverage failure is not measured racket recall"
+      ]
+    },
+    {
+      "id": "SEP27_SAM_UNIFICATION",
+      "name": "Guided SAM3.1 unified pilot",
+      "status": "bounded_infrastructure_and_negative_racket_perception_evidence",
+      "report_roots": [
+        "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-03",
+        "workers/server/outputs/selected_reports/sam31-unification/pilot-v1-20260927-run-05"
+      ],
+      "manifest_sha256": "f539783a8d62544310ca736a5eb1819ce6a3fa3f036595504634871713519b87",
+      "shared_identity": {
+        "source_revision": "2345a4ad109ac29c569da749c91d84f10dc08c40",
+        "policy": "offline_bidirectional",
+        "input": "three named 16-frame 3840x2160 windows with frame hashes",
+        "checkpoint_sha256": "same pinned checkpoint across runs"
+      },
+      "outputs": {
+        "scene_000": {
+          "player_observations": 80,
+          "racket_observations": 31,
+          "racket_missing": 1,
+          "racket_slots": 32
+        },
+        "scene_010": {
+          "player_observations": 48,
+          "racket_observations": 0,
+          "racket_missing": 16,
+          "racket_slots": 16
+        },
+        "alcaraz_perricard_scene_007": {
+          "player_observations": 64,
+          "racket_observations": 32,
+          "racket_missing": 16,
+          "racket_slots": 48
+        }
+      },
+      "repeat_check": "Run 03 and run 05 output-array SHA-256 are identical per scene; they are duplicate content, not independent repeats.",
+      "interpretation": "Racket/joint views remain quarantined for off-target near-static and small-racket masks and racket omissions during a pan. Retry prompts can use later observed-mask cues. Player views are development-only.",
+      "limits": [
+        "No independent racket annotations",
+        "No qualified training manifest",
+        "No rate ladder or client decode",
+        "Not a zero-side-information online mask result"
+      ]
+    }
+  ],
+  "comparison_groups": [
+    {
+      "members": [
+        "E04A panorama/still/video"
+      ],
+      "eligible_question": "Removal-off background quality on one shared Federer scene.",
+      "not_supported": [
+        "Full wire",
+        "Foreground cost",
+        "Second-camera or general camera-motion performance"
+      ]
+    },
+    {
+      "members": [
+        "E04A removal-off",
+        "E04B removal-on"
+      ],
+      "eligible_question": "Intended same-camera paired causal test at fixed QPs.",
+      "not_supported": [
+        "Resolved ghost alarms or proof of the hypothesized error floor"
+      ]
+    },
+    {
+      "members": [
+        "E06 full-codec",
+        "E06 payload floor"
+      ],
+      "eligible_question": "Stopped saved full-codec configuration and separate exact-pixel packaging floor.",
+      "not_supported": [
+        "New RD curve or replacement of whole-codec evidence"
+      ]
+    },
+    {
+      "members": [
+        "JE07",
+        "JE10"
+      ],
+      "eligible_question": "Historical nominal candidate arithmetic, noting conflicting JE07 prose.",
+      "not_supported": [
+        "Complete receiver, fresh-client rate/quality comparison, persistence or BD-rate"
+      ]
+    },
+    {
+      "members": [
+        "Sep25 SAM3.1",
+        "Sep25 YOLO26x PointStream"
+      ],
+      "eligible_question": "Same 16 registered PNGs and same imperfect cached mask: diagnostic model/cache agreement.",
+      "not_supported": [
+        "Ground-truth mask quality or codec rate advantage"
+      ]
+    },
+    {
+      "members": [
+        "Sep27 SAM run03",
+        "Sep27 SAM run05"
+      ],
+      "eligible_question": "Output-array identity and duplicate-content determination.",
+      "not_supported": [
+        "Independent replication or holdout generalization"
+      ]
+    }
+  ],
+  "unresolved_joins": [
+    "E04B dirty runtime diff object and isolated causal explanation of residual plate error; Telea never exercised.",
+    "E05 blank-conditioning execution, absolute/relative frame mapping and training exposure qualification; initial/completed checkpoint-accounting contradiction retained.",
+    "E06 separate client timing and remaining native-seek identity; floor probe is saved-pixel packing only.",
+    "JE05/07/10/11/12/16 source revision/raw output identity; JE07 conflicting summary values.",
+    "R02 actual matched AV1/VVC streams and decoded results absent from bounded inventories.",
+    "Independent SAM racket labels, eligible training manifest and causal guidance protocol."
+  ],
+  "source_notes": [
+    "All original paths use their original host:path identity where known; recovered paths remain relative to workers/server outputs.",
+    "Missing hashes or values are represented as null or identified as unobserved; no missing result is treated as a zero.",
+    "For detailed prose, metric definitions, artifact paths and comparison interpretation, see /private/tmp/pointstream-recovery-20260930/dossier/records/experiments/modern.md."
+  ],
+  "direct_closeout": {
+    "worker_interruption": "worker hit usage limit after report recovery; lead completed persisted reconciliation, matrix/source joins and validation",
+    "E05_matrix_source_join": "e05-matrix-source-join.json",
+    "E04B_arithmetic": "e04b-arithmetic.json",
+    "new_experiments": false
+  }
+}

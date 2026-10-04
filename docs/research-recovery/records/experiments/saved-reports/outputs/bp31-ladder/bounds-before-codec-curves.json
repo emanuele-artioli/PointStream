@@ -1,0 +1,58 @@
+{
+  "written": "2026-09-01",
+  "before": "the plate-codec curve run (experiments.tier.plate_codec_curves)",
+  "why": "The earlier feasibility probe compared codecs at single operating points, and vvc came back both cheaper and lower quality than av1 — which is not a comparison. A codec is only comparable to another on curves, and on three levers: quality, size, and encoding time.",
+
+  "honesty_note": {
+    "already_observed": [
+      "jpeg q50/q75 and av1/vvc at qp35/qp45 on this same panorama plate, bytes and Y-PSNR (outputs/bp31-ladder/smoke-panorama-plate.json)",
+      "a combined encode+decode wall time near 25 s per 4K intra plate for av1 and vvc"
+    ],
+    "still_blind": [
+      "encode time separated from decode time, per codec, which is the lever this run adds",
+      "the full curve shapes outside the four points above",
+      "every matched-fidelity ratio, since none was computed by interpolation before"
+    ],
+    "consequence": "Bounds below are stated only for the blind quantities. The four already-seen points are reported with their provenance and are not treated as having passed a bound."
+  },
+
+  "bounds": [
+    {
+      "quantity": "monotonicity: bytes and Y-PSNR against each codec's own knob",
+      "expected": "a coarser knob must cost fewer bytes AND score lower dB, on every codec",
+      "alarm": "A non-monotone point means the knob is not reaching that encoder, or the encoder is ignoring it. That is a broken axis, not a data point, and the codec's whole curve is disqualified rather than merely flagged."
+    },
+    {
+      "quantity": "encode wall time per 4K panorama plate, per codec",
+      "plausible_range_seconds": {"jpeg": [0.01, 2.0], "av1": [2.0, 90.0], "vvc": [5.0, 300.0]},
+      "basis": "jpeg is a libjpeg call on ~8.3 Mpixel. av1 is SvtAv1EncApp at preset 10, its fastest tier. vvc is vvencapp at `faster`, and VVC intra at 4K is the slowest thing on this roster. A combined encode+decode of ~25 s was seen for both av1 and vvc, so encode alone should sit under that.",
+      "alarm_low": "Below the floor, suspect the encoder did not run and a cached or empty payload came back. Check the payload's own first bytes and its container.",
+      "alarm_high": "Above the ceiling on av1, suspect the preset did not reach the binary."
+    },
+    {
+      "quantity": "bytes at matched Y-fidelity, av1 against jpeg, on the panorama plate",
+      "plausible_range_ratio": [0.25, 1.10],
+      "units": "av1 bytes / jpeg bytes at the same dB; below 1.0 means av1 is cheaper",
+      "basis": "PLAN.md §2.21 claims 3.6-4.1x for av1/vvc intra over JPEG, but that was measured on a source FRAME near 38 dB, not on a stitched panorama, and the ladder operates nearer 43 dB where JPEG does relatively better (BP29 plate-codec report §3 puts the jpeg/x264 crossover at ~40 dB). So a ratio near 0.25 would reproduce §2.21 and a ratio near 1.0 would say the lever is much smaller on this content and at this operating point.",
+      "two_sided_because": "The point of the run is to test §2.21's factor on the plate the system actually sends. Banding only below 1.0 would assume the conclusion.",
+      "alarm": "Outside [0.25, 1.10], check that both codecs were scored on the same pixels and the same axis before believing it."
+    },
+    {
+      "quantity": "bytes at matched Y-fidelity, vvc against av1",
+      "plausible_range_ratio": [0.4, 1.2],
+      "basis": "VVC intra is generally 20-40% below AV1 intra at matched quality in the literature. Neither preset here is a matched-effort setting, which is exactly why encode time is reported beside this number rather than after it.",
+      "alarm": "A ratio far below 0.4 alongside an encode time far above av1's is not a free win; it is the effort axis showing up in the size axis, and must be reported as both."
+    },
+    {
+      "quantity": "overlap of the three curves in Y-PSNR",
+      "expected": "at least a 3 dB band where all three codecs have measured points, so matched-fidelity reads are interpolations rather than extrapolations",
+      "alarm": "If the curves do not overlap, no matched-fidelity comparison is defined and the knob ranges must be widened and the run repeated. Reporting an extrapolated ratio would be reporting a property of the fit."
+    }
+  ],
+
+  "scope_stated_in_advance": {
+    "what_this_prices": "The `panorama-full` arm only. `plans/BP31-findings.md` §1 measured `background.codec` reaching nothing under `panorama-stream`, so this chooses a plate codec for the non-streaming method and says nothing about the streamed one.",
+    "not_a_codec_ranking": "Presets are not equal effort across codecs (BP24 findings §1). These curves compare what THIS project's plate costs under each configured encoder, which is an engineering choice about our plate. They are not a general statement that one codec beats another.",
+    "n": "One panorama plate, one scene, one video."
+  }
+}

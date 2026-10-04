@@ -1,0 +1,102 @@
+[
+  {
+    "host": "gpu3",
+    "path": "/tmp/pointstream-mask-screen",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "branch": "codex/yolo-mask-screen",
+    "dirty": true,
+    "status": "?? experiments/modular/yolo_mask_screen.py\n?? tests/experiments/test_yolo_mask_screen.py",
+    "disposition": "recover-uncommitted",
+    "shared_git_note": "Git administrative metadata may point into shared NFS; worktree payload is host-local"
+  },
+  {
+    "host": "gpu3",
+    "path": "/tmp/pointstream-foreground-campaign-20260924",
+    "head": "b771b4bc20e47ada16216e8363c7e6ff3f6024a8",
+    "branch": "codex/foreground-campaign-20260924",
+    "dirty": false,
+    "status": "",
+    "disposition": "source-reference",
+    "shared_git_note": "Git administrative metadata may point into shared NFS; worktree payload is host-local"
+  },
+  {
+    "host": "gpu3",
+    "path": "/tmp/pointstream-motion-contract-20260926",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "branch": "codex/motion-contract-20260926",
+    "dirty": true,
+    "status": "M demo/README.md\n M demo/experiments/eval_split_teleop.py\n M demo/experiments/run_comparison.py\n A demo/pipeline/temporal_hand_codec.py\n M docs/areas/codec.md\n M docs/scorecards/04_motion_metadata.md\n A experiments/modular/motion_sequence_gpu_smoke.py\n M src/components/motion/keypoints.py\n A src/components/motion/sequence.py\n M src/components/rigid/__init__.py\n M src/components/rigid/racket.py\n M src/components/rigid/strategy.py\n M src/components/rigid/types.py\n M src/contracts/keypoints.py\n M src/runner/perception.py\n M src/runner/stages.py\n A tests/components/test_motion_sequence.py\n M tests/components/test_rigid.py\n A tests/demo/test_temporal_hand_codec.py\n A tests/runner/test_temporal_motion.py",
+    "disposition": "recover-uncommitted",
+    "shared_git_note": "Git administrative metadata may point into shared NFS; worktree payload is host-local"
+  },
+  {
+    "host": "gpu3",
+    "path": "/tmp/pointstream-thesis-rebuild",
+    "head": "88f17b98838ff00b721c2d8e03a824c6976b989e",
+    "branch": "codex/rebuild-semantic-thesis",
+    "dirty": false,
+    "status": "",
+    "disposition": "source-reference",
+    "shared_git_note": "Git administrative metadata may point into shared NFS; worktree payload is host-local"
+  },
+  {
+    "host": "gpu3",
+    "path": "/tmp/pointstream-temporal-mask-wire",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "branch": "codex/temporal-mask-wire",
+    "dirty": true,
+    "status": "M src/runner/mask_wire.py",
+    "disposition": "recover-uncommitted",
+    "shared_git_note": "Git administrative metadata may point into shared NFS; worktree payload is host-local"
+  },
+  {
+    "host": "gpu3",
+    "path": "/tmp/pointstream-r01-landmark-metrics",
+    "head": "4e9bcba16a28c79e6c7e17e4c571827263f206ee",
+    "branch": "codex/r01-landmark-metrics",
+    "dirty": false,
+    "status": "",
+    "disposition": "source-reference",
+    "shared_git_note": "Git administrative metadata may point into shared NFS; worktree payload is host-local"
+  },
+  {
+    "host": "gpu3",
+    "path": "/tmp/pointstream-c01-harness",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "branch": "codex/c01-mask-codec-harness",
+    "dirty": true,
+    "status": "M src/runner/stages.py\n M tests/runner/test_mask_wire.py\n?? experiments/modular/c01_gpu_mask_codec_pilot.py\n?? experiments/modular/person_mask_screen.py\n?? experiments/modular/yolo_mask_screen.py\n?? tests/experiments/test_c01_gpu_mask_codec_pilot.py",
+    "disposition": "recover-uncommitted",
+    "shared_git_note": "Git administrative metadata may point into shared NFS; worktree payload is host-local"
+  },
+  {
+    "host": "gpu3",
+    "path": "/tmp/pointstream-r02-anchor-roundtrip",
+    "head": "3725388ebadb14f09c046657082d187b7735786d",
+    "branch": "codex/r02-anchor-roundtrip",
+    "dirty": true,
+    "status": "M src/components/codec/encode.py\n M tests/components/test_codec.py\n?? experiments/modular/c01_gpu_mask_codec_pilot.py\n?? experiments/modular/r02_anchor_roundtrip.py\n?? manifests/journal_20260925_c01_yolo26x_pointstream_fast_16f.json\n?? manifests/journal_20260925_r02_sinner_alcaraz002_16f.json\n?? tests/experiments/test_r02_anchor_roundtrip.py",
+    "disposition": "recover-uncommitted",
+    "shared_git_note": "Git administrative metadata may point into shared NFS; worktree payload is host-local"
+  },
+  {
+    "host": "gpu3",
+    "path": "/tmp/pointstream-journal-plan",
+    "head": "ef87e1e05f8b17eb63f5ebb36ed6a56d7f3bb73f",
+    "branch": "codex/journal-experiment-plan",
+    "dirty": false,
+    "status": "",
+    "disposition": "source-reference",
+    "shared_git_note": "Git administrative metadata may point into shared NFS; worktree payload is host-local"
+  },
+  {
+    "host": "gpu5",
+    "path": "/tmp/pointstream-wave1-genstream-source",
+    "head": "2e7f7e4b3522308fb52690a17d2d9c4330e8b578",
+    "branch": "codex/standalone-stream-20260917",
+    "dirty": false,
+    "status": "",
+    "disposition": "source-reference",
+    "shared_git_note": "Git administrative metadata may point into shared NFS; worktree payload is host-local"
+  }
+]
