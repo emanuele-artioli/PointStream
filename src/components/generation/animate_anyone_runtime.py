@@ -12,7 +12,10 @@ import numpy as np
 import torch
 
 from src.components.generation.dwpose_draw import draw_dwpose_canvas
-from src.components.generation.torch_dtype import is_cuda_device_usable, resolve_torch_dtype_for_device
+from src.components.generation.torch_dtype import (
+    is_cuda_device_usable,
+    resolve_torch_dtype_for_device,
+)
 from src.contracts import paths as ps_paths
 
 
@@ -95,21 +98,15 @@ def _resolve_model_root(repo_root: Path | None, model_dir: str | None, model_var
         if repo_root is not None:
             model_root = (repo_root / "Models" / model_folder).resolve()
         else:
-            project_assets_root = (
-                ps_paths.assets() / "animate-anyone" / "profiles" / model_folder
-            )
-            canonical_roots = [
-                project_assets_root,
-                Path.home() / "Models" / "AnimateAnyone" / "profiles" / model_folder,
-            ]
-            existing = [root.resolve() for root in canonical_roots if root.exists()]
-            if not existing:
+            model_root = ps_paths.model_asset(
+                f"AnimateAnyone/profiles/{model_folder}",
+                legacy=f"assets/animate-anyone/profiles/{model_folder}",
+            ).resolve()
+            if not model_root.is_dir():
                 raise FileNotFoundError(
-                    "AnimateAnyone model directory was not found. Set animate-anyone-model-dir in config, "
-                    "or place models under assets/animate-anyone/profiles/<variant> "
-                    "(or ~/Models/AnimateAnyone/profiles/<variant>)."
+                    f"AnimateAnyone model directory was not found at {model_root}. "
+                    "Set animate-anyone-model-dir or restore the selected Models profile."
                 )
-            model_root = existing[0]
 
     required_entries = [
         "stable-diffusion-v1-5",
@@ -131,7 +128,9 @@ def _resolve_model_root(repo_root: Path | None, model_dir: str | None, model_var
     return model_root
 
 
-def _load_pipeline(repo_root: Path | None, model_root: Path, device: str, gpu_dtype: Any = None) -> Any:
+def _load_pipeline(
+    repo_root: Path | None, model_root: Path, device: str, gpu_dtype: Any = None
+) -> Any:
     global _PIPELINE, _PIPELINE_DEVICE, _PIPELINE_DTYPE, _PIPELINE_REPO_ROOT, _PIPELINE_MODEL_ROOT
 
     with _PIPELINE_LOCK:
@@ -152,6 +151,7 @@ def _load_pipeline(repo_root: Path | None, model_root: Path, device: str, gpu_dt
 
         try:
             import diffusers.utils
+
             diffusers.utils.USE_PEFT_BACKEND = True
             from diffusers import AutoencoderKL, DDIMScheduler
             from omegaconf import OmegaConf
@@ -205,18 +205,30 @@ def _load_pipeline(repo_root: Path | None, model_root: Path, device: str, gpu_dt
             subfolder="unet",
             unet_additional_kwargs=OmegaConf.to_container(infer_config.unet_additional_kwargs),
         ).to(device=device, dtype=dtype)
-        pose_guider = PoseGuider(320, block_out_channels=(16, 32, 96, 256)).to(device=device, dtype=dtype)
-        image_encoder = CLIPVisionModelWithProjection.from_pretrained(image_encoder_path).to(device=device, dtype=dtype)
+        pose_guider = PoseGuider(320, block_out_channels=(16, 32, 96, 256)).to(
+            device=device, dtype=dtype
+        )
+        image_encoder = CLIPVisionModelWithProjection.from_pretrained(image_encoder_path).to(
+            device=device, dtype=dtype
+        )
 
         sched_container = OmegaConf.to_container(infer_config.noise_scheduler_kwargs)
         if not isinstance(sched_container, dict):
-            raise ValueError("AnimateAnyone inference config 'noise_scheduler_kwargs' must be a mapping")
+            raise ValueError(
+                "AnimateAnyone inference config 'noise_scheduler_kwargs' must be a mapping"
+            )
         sched_kwargs = cast(dict[str, Any], sched_container)
         scheduler = DDIMScheduler(**sched_kwargs)
 
-        denoising_unet.load_state_dict(torch.load(denoising_unet_path, map_location="cpu", weights_only=True), strict=False)
-        reference_unet.load_state_dict(torch.load(reference_unet_path, map_location="cpu", weights_only=True), strict=False)
-        pose_guider.load_state_dict(torch.load(pose_guider_path, map_location="cpu", weights_only=True), strict=False)
+        denoising_unet.load_state_dict(
+            torch.load(denoising_unet_path, map_location="cpu", weights_only=True), strict=False
+        )
+        reference_unet.load_state_dict(
+            torch.load(reference_unet_path, map_location="cpu", weights_only=True), strict=False
+        )
+        pose_guider.load_state_dict(
+            torch.load(pose_guider_path, map_location="cpu", weights_only=True), strict=False
+        )
 
         pipe = Pose2VideoPipeline(
             vae=vae,
@@ -292,7 +304,9 @@ def _prepare_pose_sequence(dense_pose_sequence: np.ndarray, width: int, height: 
     if dense_pose_sequence.ndim == 2:
         dense_pose_sequence = dense_pose_sequence[np.newaxis, ...]
     if dense_pose_sequence.ndim != 3:
-        raise ValueError(f"Expected dense pose sequence [T,18,3] or [18,3], got {dense_pose_sequence.shape}")
+        raise ValueError(
+            f"Expected dense pose sequence [T,18,3] or [18,3], got {dense_pose_sequence.shape}"
+        )
 
     try:
         from PIL import Image
@@ -306,7 +320,9 @@ def _prepare_pose_sequence(dense_pose_sequence: np.ndarray, width: int, height: 
             width=width,
             height=height,
         )
-        pose_canvas = _render_pose_image_from_dwpose(pose=normalized_pose, width=width, height=height)
+        pose_canvas = _render_pose_image_from_dwpose(
+            pose=normalized_pose, width=width, height=height
+        )
         pose_rgb = cv2.cvtColor(pose_canvas, cv2.COLOR_BGR2RGB)
         pose_images.append(Image.fromarray(pose_rgb))
     return pose_images
@@ -348,7 +364,9 @@ def _convert_video_to_bgr_sequence(video_tensor: torch.Tensor) -> np.ndarray:
     if frames_rgb.ndim != 4 or frames_rgb.shape[-1] != 3:
         raise ValueError(f"Expected RGB frames [F,H,W,3], got {frames_rgb.shape}")
 
-    return np.asarray([cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) for frame in frames_rgb], dtype=np.uint8)
+    return np.asarray(
+        [cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) for frame in frames_rgb], dtype=np.uint8
+    )
 
 
 def generate_sequence(
@@ -379,12 +397,20 @@ def generate_sequence(
         raise RuntimeError("Pillow is required for AnimateAnyone backend") from exc
 
     repo_root = _resolve_repo_root(repo_dir=repo_dir)
-    model_root = _resolve_model_root(repo_root=repo_root, model_dir=model_dir, model_variant=model_variant)
+    model_root = _resolve_model_root(
+        repo_root=repo_root, model_dir=model_dir, model_variant=model_variant
+    )
 
     resolved_device = "cpu"
-    if str(device).startswith("cuda") and torch.cuda.is_available() and is_cuda_device_usable(torch.device("cuda")):
+    if (
+        str(device).startswith("cuda")
+        and torch.cuda.is_available()
+        and is_cuda_device_usable(torch.device("cuda"))
+    ):
         resolved_device = "cuda"
-    pipe = _load_pipeline(repo_root=repo_root, model_root=model_root, device=resolved_device, gpu_dtype=gpu_dtype)
+    pipe = _load_pipeline(
+        repo_root=repo_root, model_root=model_root, device=resolved_device, gpu_dtype=gpu_dtype
+    )
 
     width = int(width)
     height = int(height)
@@ -406,7 +432,9 @@ def generate_sequence(
     if window is None or window >= frame_count:
         windows = [(0, frame_count)]
     else:
-        windows = [(start, min(frame_count, start + window)) for start in range(0, frame_count, window)]
+        windows = [
+            (start, min(frame_count, start + window)) for start in range(0, frame_count, window)
+        ]
 
     generator = torch.Generator(device=resolved_device).manual_seed(int(seed))
     generated_chunks: list[np.ndarray] = []
@@ -425,7 +453,9 @@ def generate_sequence(
             ).videos
 
         if output.ndim < 2:
-            raise ValueError(f"AnimateAnyone pipeline returned invalid video tensor shape: {tuple(output.shape)}")
+            raise ValueError(
+                f"AnimateAnyone pipeline returned invalid video tensor shape: {tuple(output.shape)}"
+            )
         video_tensor = output[0]
         generated_chunks.append(_convert_video_to_bgr_sequence(video_tensor))
 

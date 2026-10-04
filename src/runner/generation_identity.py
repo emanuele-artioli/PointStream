@@ -199,9 +199,10 @@ def resolve_client_checkpoint(
         if cdir.is_dir():
             search_dirs.append(cdir)
     try:
-        w_dir = paths.assets() / "weights"
+        w_dir = paths.models_root()
         if w_dir.is_dir() and w_dir not in search_dirs:
             search_dirs.append(w_dir)
+            search_dirs.extend(p for p in w_dir.iterdir() if p.is_dir())
     except Exception:
         pass
 
@@ -216,6 +217,11 @@ def resolve_client_checkpoint(
     }
     if name in default_names and default_names[name] not in candidate_names:
         candidate_names.append(default_names[name])
+
+    for cname in candidate_names:
+        directory = paths.model_asset(cname).parent
+        if directory.is_dir() and directory not in search_dirs:
+            search_dirs.append(directory)
 
     for sdir in search_dirs:
         for cname in candidate_names:

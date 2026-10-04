@@ -118,7 +118,6 @@ def _fill_diffueraser(frames, masks, work: Path, ffmpeg: str) -> list[np.ndarray
 
 
 def contact_sheet(originals, mask_vis, fills: dict[str, list[np.ndarray]], dest: Path) -> None:
-    names = ["original", "mask", *fills]
     rows = []
     for index, frame in enumerate(originals):
         cells = [frame, mask_vis[index]]

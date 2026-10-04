@@ -1,0 +1,36 @@
+{
+  "schema": "pointstream.foreground_packet_schema.v1",
+  "magic": "PSFG",
+  "version": 2,
+  "endian": "little",
+  "header": [
+    {"name": "magic", "type": "bytes", "size": 4},
+    {"name": "version", "type": "uint8", "size": 1},
+    {"name": "method", "type": "uint8", "size": 1, "values": {"raw": 0, "zlib": 1, "delta_zlib": 2}},
+    {"name": "width", "type": "uint16", "size": 2},
+    {"name": "height", "type": "uint16", "size": 2},
+    {"name": "fps_num", "type": "uint16", "size": 2},
+    {"name": "fps_den", "type": "uint16", "size": 2},
+    {"name": "coord_scale", "type": "uint16", "size": 2, "meaning": "coordinates are multiples of 1/coord_scale pixel"},
+    {"name": "segment_start", "type": "uint32", "size": 4},
+    {"name": "frame_count", "type": "uint32", "size": 4},
+    {"name": "record_count", "type": "uint32", "size": 4},
+    {"name": "payload_length", "type": "uint32", "size": 4},
+    {"name": "payload_crc32", "type": "uint32", "size": 4, "covers": "uncompressed payload"}
+  ],
+  "header_bytes": 36,
+  "record": [
+    {"name": "frame_count_byte", "type": "uint8", "size": 1, "note": "0..2 hands, once per frame"},
+    {"name": "track_id", "type": "uint16", "size": 2},
+    {"name": "handedness", "type": "uint8", "size": 1, "values": {"unknown": 0, "left": 1, "right": 2}},
+    {"name": "delta_flag", "type": "uint8", "size": 1, "values": {"absolute": 0, "modular_delta": 1}},
+    {"name": "codes", "type": "uint16", "count": 46, "size": 92, "order": "bbox xyxy then 21 xy joints"}
+  ],
+  "coordinate_unit": "1/16 pixel",
+  "max_quantization_error_px": 0.03125,
+  "notes": [
+    "A delta flag is legal only after an absolute record for the same track in the same segment.",
+    "The first record of a track is absolute, so every independently decoded segment starts from complete state.",
+    "Out-of-frame and nonfinite coordinates are rejected. They are not clipped into the frame."
+  ]
+}

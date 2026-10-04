@@ -78,12 +78,11 @@ DEFAULT_CHECKPOINT_BY_ARCH: dict[str, Path] = {
 
 
 def default_checkpoint_for(arch: str) -> Path:
-    weights_dir = ps_paths.assets() / "weights"
     relative = DEFAULT_CHECKPOINT_BY_ARCH.get(arch)
     if relative is not None:
-        return weights_dir / relative.name
+        return ps_paths.model_asset(relative.name)
     if arch == "animate-anyone":
-        return Path("/home/itec/emanuele/Models/AnimateAnyone/profiles/finetuned_tennis")
+        return ps_paths.model_asset("AnimateAnyone/profiles/finetuned_tennis", legacy="assets/animate-anyone/profiles/finetuned_tennis")
     raise ValueError(f"Unknown generator arch: {arch}")
 
 
