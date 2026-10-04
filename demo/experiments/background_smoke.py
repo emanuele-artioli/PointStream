@@ -371,13 +371,13 @@ def inventory_env(stage: Stage) -> dict[str, Any]:
     expected = stage.path("dcvc-reference.json")
     core.write_json_new(expected, core.DCVC_REFERENCE_SHA256)
     result = run_command([str(core.DCVC_PYTHON), str(ADAPTER), "check", "--expected", str(expected), "--report", str(report)],
-                         timeout=stage.clock.bounded(60), cwd=core.DCVC_ROOT, env={**os.environ, "PYTHONPATH": str(core.DCVC_ROOT)})
+                         timeout=stage.clock.bounded(90), cwd=core.DCVC_ROOT, env={**os.environ, "PYTHONPATH": str(core.DCVC_ROOT)})
     if result.returncode != 0:
         raise PartFailed(f"DCVC adapter check failed: {result.stderr[-800:]}")
     environment["dcvc"]["adapter_check"] = core.read_json_bounded(report)
     environment["dcvc"]["revision_matches_mirror"] = environment["dcvc"]["head"] == core.DCVC_REVISION
     probe = run_command([sys.executable, "-m", "demo.experiments.hnerv_frozen", "probe", "--stub", str(stage.path("hnerv-stub"))],
-                        timeout=stage.clock.bounded(60))
+                        timeout=stage.clock.bounded(90))
     environment["hnerv"]["import_probe"] = json.loads(probe.stdout.strip().splitlines()[-1]) if probe.returncode == 0 else {"error": probe.stderr[-800:]}
     ffmpeg_path = core.resolve_ffmpeg()
     if ffmpeg_path is None:

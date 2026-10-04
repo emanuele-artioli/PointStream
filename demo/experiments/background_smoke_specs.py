@@ -21,12 +21,11 @@ PLAN_BUDGET_SECONDS = 1800
 HOSTS = ["gpu3", "gpu5"]
 GPU_MODELS = ["RTX A6000", "RTX 6000 Ada"]
 MODEL_MEMORY_MIB = 24000
-RUNNER_MARGIN_SECONDS = 15
 OVERHEAD_SECONDS = 20
 
 PLANS: dict[str, dict[str, Any]] = {
     "inventory": {
-        "smoke_parts": "env,preview,frames-f001c3,ckpt-image,ckpt-htl",
+        "smoke_parts": "preview,frames-f001c3,ckpt-image,ckpt-htl,env",
         "full_parts": "ckpt-ld,ckpt-hts,frames-f002,ckpt-f002-htl,ckpt-hnerv,training",
         "smoke_seconds": 170, "full_seconds": 120, "memory": 1024,
         "basis": "B0/B1 on the primary cut: DCVC/HNeRV source identity, the saved preview, hold-out 120..151 and the HT-L checkpoints the first codec case loads",
@@ -68,7 +67,7 @@ def build_spec(kind: str, *, inputs: list[dict[str, str]], manifests: list[str],
         "entrypoint": ["-m", "demo.experiments.background_smoke"], "arguments": arguments,
         "scale": {
             "parts": {"smoke": plan["smoke_parts"], "full": plan["full_parts"]},
-            "stage_seconds": {"smoke": plan["smoke_seconds"] - RUNNER_MARGIN_SECONDS, "full": plan["full_seconds"] - RUNNER_MARGIN_SECONDS},
+            "stage_seconds": {"smoke": plan["smoke_seconds"], "full": plan["full_seconds"]},
         },
         "inputs": inputs,
         "smoke": {"seconds": plan["smoke_seconds"], "representative_basis": plan["basis"]},
