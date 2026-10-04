@@ -1,0 +1,12 @@
+#!/Users/manu/miniconda3/bin/python
+"""Canonical local fleet entry point; independent of cwd and PYTHONPATH."""
+import os
+from pathlib import Path
+import sys
+
+root = Path(__file__).resolve().parents[1]
+os.chdir(root)
+sys.path[:] = [str(root), *[p for p in sys.path if p and Path(p).resolve() != Path.cwd()]]
+from experiments.jobs.inbox import main
+
+raise SystemExit(main(public_only=True))

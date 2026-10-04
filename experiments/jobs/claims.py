@@ -173,6 +173,14 @@ def is_pid_alive(pid: int, expected_start_time: float | None = None) -> bool:
         # Process exists and belongs to another user
         return True
 
+    try:
+        fields = Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()
+        if fields and fields[0] in {"Z", "X"}:
+            return False
+    except (OSError, IndexError):
+        # Unknown process state must remain protected, including on non-Linux.
+        pass
+
     if expected_start_time is not None:
         cur_start = get_process_start_time(pid)
         if cur_start is not None and abs(cur_start - expected_start_time) > 2.0:
@@ -405,7 +413,7 @@ def query_gpus(
         gpu_proc = subprocess.run(
             [
                 "nvidia-smi",
-                "--query-gpu=index,uuid,name,memory.free,memory.total",
+                "--query-gpu=index,uuid,name,memory.free,memory.total,memory.used,utilization.gpu",
                 "--format=csv,noheader,nounits",
             ],
             capture_output=True,
@@ -419,7 +427,7 @@ def query_gpus(
     devices: dict[str, dict[str, Any]] = {}
     for line in gpu_proc.stdout.strip().splitlines():
         parts = [p.strip() for p in line.split(",")]
-        if len(parts) >= 5:
+        if len(parts) == 7:
             try:
                 idx = int(parts[0])
                 uuid_str = parts[1]
@@ -432,10 +440,14 @@ def query_gpus(
                     "name": name,
                     "memory_free_mb": mem_free,
                     "memory_total_mb": mem_total,
+                    "memory_used_mb": float(parts[5]),
+                    "utilization_pct": float(parts[6]),
                     "active_pids": [],
                 }
             except ValueError:
-                continue
+                return []
+        else:
+            return []
 
     # Query active compute processes per GPU
     try:
@@ -459,7 +471,9 @@ def query_gpus(
                     if gpu_uuid in devices:
                         devices[gpu_uuid]["active_pids"].append(pid)
                 except ValueError:
-                    continue
+                    return []
+            elif line.strip():
+                return []
     except (subprocess.SubprocessError, FileNotFoundError, OSError):
         # GPU properties without process occupancy are not enough to establish
         # that a device is free. Fail the complete probe closed.
@@ -475,7 +489,11 @@ def is_device_free(
     allowed_pids: set[int] | None = None,
 ) -> bool:
     """Check if a GPU device has sufficient free memory and no unallowed processes."""
+    if any(not isinstance(device_info.get(key, 0), (int, float)) or not math.isfinite(device_info.get(key, 0)) or device_info.get(key, 0) < 0 for key in ("memory_free_mb", "memory_used_mb", "utilization_pct")):
+        return False
     if device_info.get("memory_free_mb", 0.0) < min_free_memory_mb:
+        return False
+    if device_info.get("memory_used_mb", 0) > 256 or device_info.get("utilization_pct", 0) > 5:
         return False
     active = set(device_info.get("active_pids", []))
     if allowed_pids:

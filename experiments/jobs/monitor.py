@@ -98,7 +98,7 @@ def due_events(state: dict[str, Any], policy: dict[str, Any], now: float) -> lis
     status = state["status"]
     quiet = now < policy.get("quiet_until", 0)
     allow_event = not quiet or policy.get("urgent_during_quiet", False)
-    if status in {"failed", "complete", "budget_exhausted", "interrupted", "cancelled", "contended"}:
+    if status in {"failed", "complete", "budget_exhausted", "interrupted", "cancelled", "contended", "expired"}:
         key = f"terminal:{status}"
         if key not in state["emitted"] and allow_event:
             events.append(key)
@@ -217,10 +217,22 @@ def supervise(directory: Path) -> int:
 
     signal.signal(signal.SIGTERM, interrupted)
     request = read_json(directory / "request.json")
+    from experiments.jobs.claims import get_process_start_time
+
+    def cancellation_requested() -> bool:
+        return (directory / "cancel.json").exists() or bool(request.get("cancel_path") and Path(request["cancel_path"]).exists())
+
     with (directory / "supervisor.lock").open("w") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        write_json(directory / "supervisor.json", {"pid": os.getpid(), "proc_start_time": get_process_start_time(os.getpid())})
         claim_session = None
         state = read_json(directory / "status.json")
+        if state is None and time.time() >= request.get("deadline_epoch", float("inf")):
+            write_json(directory / "status.json", {"status": "expired", "error": "deadline expired before execution"})
+            return 1
+        if state is None and cancellation_requested():
+            write_json(directory / "status.json", {"status": "cancelled"})
+            return 0
         if state is not None:
             # Never replay a possibly-running command after supervisor loss.
             if state["status"] == "running":
@@ -268,7 +280,7 @@ def supervise(directory: Path) -> int:
                             min_free_memory_mb=gpu_memory_floor,
                         )
                     except Exception as exc:
-                        state.update(status="failed", error=f"GPU claim failed: {exc}")
+                        state.update(status="failed", admission_rejected=True, error=f"GPU claim failed: {exc}")
                         write_json(directory / "status.json", state)
                         return 1
                 cpu_claim = None
@@ -284,14 +296,16 @@ def supervise(directory: Path) -> int:
                             ),
                             cpu_cap=claims_cfg.get("cpu_cap") if isinstance(claims_cfg, dict) else None,
                         )
-                    except Exception:
+                    except Exception as exc:
                         if dev_claim:
                             from experiments.jobs.claims import release_device_claim
 
                             release_device_claim(
                                 dev_claim.host, dev_claim.device_uuid, dev_claim.token, claims_dir
                             )
-                        raise
+                        state.update(status="failed", admission_rejected=True, error=f"CPU claim failed: {exc}")
+                        write_json(directory / "status.json", state)
+                        return 1
                 token = dev_claim.token if dev_claim else (cpu_claim.token if cpu_claim else "")
                 claim_session = ClaimSession(
                     token=token,
@@ -326,7 +340,7 @@ def supervise(directory: Path) -> int:
                         release_session_claims(claim_session)
                         claim_session = None
                         err_msg = f"Device {claimed_uuid} became busy before launch"
-                        state.update(status="failed", error=err_msg)
+                        state.update(status="failed", admission_rejected=True, error=err_msg)
                         write_json(directory / "status.json", state)
                         raise DeviceBusyError(err_msg)
 
@@ -363,7 +377,7 @@ def supervise(directory: Path) -> int:
             while True:
                 now = time.time()
                 if child is not None and state["status"] == "running":
-                    if (directory / "cancel.json").exists():
+                    if cancellation_requested():
                         stopped = stop_child(child)
                         state.update(
                             status="cancelled" if stopped else "failed",
@@ -393,9 +407,9 @@ def supervise(directory: Path) -> int:
                         if code is not None:
                             stopped = stop_child(child)
                             state.update(status="complete" if code == 0 and stopped else "failed", exit_code=code)
-                        elif now - state["started"] >= request["budget_seconds"]:
-                            stop_child(child)
-                            state["status"] = "budget_exhausted"
+                        elif now - state["started"] >= request["budget_seconds"] or now >= request.get("deadline_epoch", float("inf")):
+                            stopped = stop_child(child)
+                            state["status"] = "budget_exhausted" if stopped else "failed"
                 tick(directory, state, now)
                 if now - last_log >= 600:
                     with (directory / "progress.log").open("a") as log:

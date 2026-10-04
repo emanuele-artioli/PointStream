@@ -71,24 +71,143 @@ Existing checkpoints/reports are under `jobs/hand-rd/train/` and `compare/`.
 These locations are read-only inputs. Do not delete the compatibility data
 symlink or rewrite old reports, checkpoints, or manifests.
 
-Before selecting a host:
+Read [the current job workflow](../../docs/workflow/long-jobs.md) before
+implementation. It supersedes the former direct Python fleet launcher. Use
+only the absolute, standalone allow-listed entry point from the Mac; do not
+wrap it in `bash -c`, change `PYTHONPATH`, invoke general SSH, or edit allow
+rules. If the shell sandbox blocks networking, invoke that same absolute
+command with `require_escalated`, as the workflow specifies.
+
+Run these as separate commands (not one shell chain):
 
 ```bash
-python -m experiments.jobs.fleet inspect --hosts gpu1 gpu2 gpu3 gpu4 gpu5 gpu6
+/Users/manu/Desktop/PointStream/scripts/ps-fleet doctor
+/Users/manu/Desktop/PointStream/scripts/ps-fleet workers status
+/Users/manu/Desktop/PointStream/scripts/ps-fleet inspect --hosts gpu1 gpu2 gpu3 gpu4 gpu5 gpu6
 ```
 
-Use only a complete successful probe and a GPU with no compute processes,
-memory <= inspected idle baseline (default 256 MiB), utilization <= 5%,
-estimate + 4 GiB free memory, and sufficient CPU headroom. SAM requires an
-A6000/Ada, not RTX 8000/GV100. Dispatch using `fleet launch` with one explicit
-bounded entry point, `--cpu-threads 4`, the stage's memory estimate and budget,
-and only reviewed `--include-change`/`--include-untracked` paths. Never send
-the entire dirty tree. An 8-minute allowance is `--budget-hours 0.1333`.
-Keep new outputs under `PS_JOB_DIR`; record job ID, GPU UUID, exact command,
-code/seed hashes, input identity, checkpoint hashes, versions/providers, and
-peak memory. Inspect the same job with `fleet status` after connection loss;
-never automatically replay or migrate it. No idle GPU means blocked compute,
-not permission to use the Mac for model inference/training.
+If workers are missing, use `workers start` only after `doctor` passes; it
+reuses live workers. Do not restart healthy workers for this workload. A worker
+upgrade, if actually required, uses verified `workers restart` and preserves
+supervisors; never kill workers manually. Failed doctor/probes make those
+hosts unavailable. No eligible capacity means a pending request until its
+absolute deadline, not a reason to bypass admission or use the Mac for model
+inference. Workers perform distributed admission and resource claims; do not
+pin a GPU UUID from an old inspection. Require no compute processes, memory
+<=256 MiB, utilization <=5%, declared peak +4 GiB free, and sufficient aggregate
+CPU headroom. Encode compatibility with `gpu_models`, not a performance claim.
+
+### Smoke-only requests under the two-stage schema
+
+Implement schema-1 JSON specs for each bounded task. Submit with:
+
+```text
+/Users/manu/Desktop/PointStream/scripts/ps-fleet submit /absolute/local/path/task.json --chat-id CHAT_ID
+```
+
+Replace `CHAT_ID` with the submitting chat's actual ID (or use the documented
+`CODEX_THREAD_ID` default); never invent it. Specs live outside the code tree.
+Submission snapshots clean HEAD by default. Commit the scoped implementation
+and needed seed files first, or append individually reviewed `--include-change
+PATH` / `--include-untracked PATH` arguments. Never dispatch the whole dirty
+checkout, particularly the unrelated local `experiments/jobs/fleet.py` patch.
+The historical source inventory identifies seeds; its infrastructure checksum
+is not authorization to include that patch. Use the current tracked manager
+and record the current implementation revision and selected patch hashes.
+
+The dispatcher always executes `smoke`, its validator, then a stage named
+`full`. **Here `full` means only the remainder of this bounded diagnostic; it
+never authorizes full training, a dataset sweep, or any longer experiment.**
+Make both stages use the same runner, subcommand, input manifest, processing
+path and fixed settings. Vary only whole-argument scale placeholders for a
+representative subset/count. Do not make the first stage a trivial import
+check and hide all meaningful processing in the second.
+
+Required spec fields and constraints:
+
+- `schema: 1`; `hosts` chosen from gpu1–gpu6; compatible `gpu_models`;
+  `gpu_memory_mib` from the estimates below; `cpu_threads: 4`.
+- `entrypoint` is one `[-m, module]` array or one relative `.py` script;
+  `arguments` is an argv array. No shell command, inline Python, or alternate
+  unrestricted launcher. Use real JSON strings, e.g. `["-m", "demo.experiments.foreground_smoke"]`.
+- Nonempty `scale`, with `smoke` and `full` values per key; each placeholder
+  such as `{frames}` occupies a whole argument. Freeze source identities,
+  checkpoints, resolution, seeds, codec settings and selection policy across
+  stages. Count work in **both** stages against this plan's caps; do not double
+  the specified matrix or silently reset the training budget. A precheck may
+  use a nested subset, but repeated processing still consumes time/updates.
+- Nonempty `inputs`: absolute paths under the external data root plus actual
+  lowercase SHA-256 values. Use an immutable selected-input manifest, with
+  constituent hashes checked by the workload validator. No placeholder hashes
+  or mutable latest-file identities.
+- `smoke.seconds`, `full.seconds`, `validator_seconds`, and `budget_seconds`
+  must reserve validation, model loads and overhead. `budget_seconds` <=480
+  and <=this task's remaining stage allowance; the sum of submitted budgets
+  must fit the plan's 1800-second ceiling. A two-minute task has a <=120-second
+  total budget, not two two-minute stages. `smoke.seconds` <=600 is the schema
+  limit, but this plan's tighter total limit always wins.
+- Nonempty `smoke.representative_basis` describes the fixed representative
+  subset and scientific path exercised. Supply `required_commands` for tools
+  actually invoked, a future `deadline` ISO timestamp with explicit timezone,
+  and `stall_seconds` no larger than the task budget. Choose a finite deadline
+  for the current attended work window and record it; never use a stale date
+  copied from a prior report or extend it automatically.
+- `validator` is an argv array, using `{python}` only for the manager's Python
+  where appropriate. It must exit zero and write `passed: true` and nonempty
+  substantive `checks` to `PS_VALIDATION_PATH` only when the relevant gate
+  passes. Missing/corrupt artifacts, nonfinite metrics, wrong input identity,
+  or decoder/source dependence fail validation; exit zero alone is insufficient.
+
+Implement runner/validator tests before submitting: validate specs locally
+with `experiments.jobs.inbox.validate_spec`; reject over-cap combined work,
+missing hashes, invalid scale arguments and absent substantive checks; verify
+validator failure blocks the second stage. Test the same bounded runner on
+fixtures without CUDA locally. Do not launch `selftest` automatically: it is
+additional infrastructure compute, not the model smoke requested here.
+
+The entrypoint starts in the configured worker interpreter; schema 1 has no
+per-job Python/environment override. If the model needs an existing dedicated
+interpreter below, implement an explicit bounded Python adapter in the workload
+runner: use an argv subprocess with that exact installed interpreter, propagate
+`PS_*` and `CUDA_VISIBLE_DEVICES`, retain the owned process group, and enforce
+remaining time/count caps. Never use inline `-c`, a shell, installations, or a
+new remote session to bypass the job contract. Record both interpreters and
+native tool versions. Test argument/environment propagation and failure/timeout
+handling. If the installed environment cannot execute that path, report blocked.
+
+Write workload artifacts under `PS_STAGE_DIR`, not the shared supervisor root
+`PS_JOB_DIR`. Keep smoke and diagnostic-stage outputs separate, preserve
+completed evidence, and publish progress through
+`experiments.jobs.monitor.publish_progress(stage, completed)` only when actual
+work completes. The validator reads smoke artifacts; reports identify the stage
+for each scalar. Dispatcher metadata, code/spec/input identity gates, tool paths,
+GPU UUID and resource usage remain preserved. Publish measured peak GPU memory
+and a cumulative ledger; model loading, validation, failures and filesystem waits
+after admission all count. Label both stages' outputs diagnostic/non-citable.
+
+### Monitoring and recovery
+
+After submission, register or update **one native Codex heartbeat per submitting
+chat**, every five minutes, covering all its jobs. Follow the exact saved prompt
+in `docs/workflow/long-jobs.md`: run the absolute `ps-fleet watch CHAT_ID`, stay
+quiet for unchanged/non-actionable state, combine terminal/stall/contention/
+budget/deadline/decision events, and acknowledge stable event IDs only after
+reporting them (`ps-fleet ack EVENT_ID ...`). Pause it when all watched jobs are
+terminal. Do not create one automation per job. If native automation tooling is
+unavailable, report that monitoring prerequisite as blocked before submission;
+do not substitute a shell cron or an unmonitored detached job.
+
+Use the same absolute entrypoint with `status JOB_ID` and `events JOB_ID` for
+read-only recovery, including existing legacy job IDs. Workers/supervisors survive
+Mac sleep and disconnection. On uncertain status, inspect saved request,
+supervisor/claim identity and logs; never automatically replay, migrate, extend
+budgets, or cancel. Recovery from worker death/reboot uses `doctor` then
+`workers start`. Cancellation, when authorized, uses `cancel JOB_ID` and only
+owned processes. Preserve every interrupted/completed directory. No heartbeat
+may submit new work or cancel jobs.
+
+For SAM requests restrict `gpu_models` to `["RTX A6000", "RTX 6000 Ada"]`;
+RTX 8000/GV100 remain excluded for this path.
 
 Initial conservative memory requests: 12,000 MiB for generator/pose smokes,
 38,000 MiB for an optional SAM smoke. SAM must be a separate job/process so
@@ -396,8 +515,11 @@ python -m pytest -q tests/demo/test_hand_packet_rate.py tests/demo/test_holdout_
 Run any existing tests covering a shared module you changed; enumerate them
 with `rg` rather than guessing a filename. If dispatcher/monitor code changes
 were somehow necessary, stop and justify that scope first; the required
-infrastructure tests are `test_resource_claims.py`, `test_gpu_fleet.py`, and
-`test_job_monitor.py` under `tests/experiments/`.
+infrastructure checks are:
+
+```bash
+python -m pytest -q tests/experiments/test_resource_claims.py tests/experiments/test_gpu_fleet.py tests/experiments/test_job_monitor.py tests/experiments/test_fleet_inbox.py
+```
 
 Deliver code/tests, the frozen audit/fit/validation/cut manifests, packet schema,
 actual packets and decode fixtures, provider/timing reports, smoke loss curves,
