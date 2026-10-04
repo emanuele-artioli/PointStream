@@ -21,6 +21,7 @@ import platform
 import subprocess
 import sys
 import time
+from typing import Any
 
 import numpy as np
 from PIL import Image
@@ -143,7 +144,7 @@ def verify_rgb_window(window: Path, luma: np.ndarray, budget: ReadBudget) -> dic
             rgb = np.asarray(image.convert("RGB"))
         if rgb.shape != (*luma[index].shape, 3):
             raise ValueError("RGB window and stored luma have different geometry")
-        rgb_digest.update(rgb)
+        rgb_digest.update(rgb.tobytes())
         floating = rgb.astype(np.float64)
         converted = np.clip(
             0.299 * floating[..., 0] + 0.587 * floating[..., 1] + 0.114 * floating[..., 2], 0, 255
@@ -193,6 +194,7 @@ def summarize_scores(rows: list[dict]) -> dict:
     for region in ["whole", "foreground", "background"]:
         mses = [r[region] for r in rows]
         dbs = [mse_to_db(x) for x in mses]
+        finite_dbs = [x for x in dbs if x is not None]
         counts = [
             r["frame_pixels"]
             if region == "whole"
@@ -203,7 +205,9 @@ def summarize_scores(rows: list[dict]) -> dict:
         ]
         # Do not quietly exclude identical or missing frames from the mean.
         answer[region] = {
-            "mean_frame_psnr_db": float(np.mean(dbs)) if all(x is not None for x in dbs) else None,
+            "mean_frame_psnr_db": float(np.mean(finite_dbs))
+            if len(finite_dbs) == len(dbs)
+            else None,
             "identical_frames": sum(x == 0 for x in mses),
             "pooled_pixel_mse": float(np.average(mses, weights=counts)),
             "pooled_pixel_psnr_db": mse_to_db(float(np.average(mses, weights=counts))),
@@ -272,7 +276,7 @@ def select_reported_streams(
 
 
 def group_sensitivity(report: dict, draws: int = 10000, seed: int = 20260930) -> dict:
-    result = {
+    result: dict[str, Any] = {
         "draws": draws,
         "seed": seed,
         "units": "percent saved; fixed saved per-scene BP21 estimates",
@@ -360,11 +364,12 @@ def decode_score(
         "yuv4mpegpipe",
         "pipe:1",
     ]
-    scores = {key: [] for key in targets}
+    scores: dict[str, list[dict[str, Any]]] = {key: [] for key in targets}
     digest = hashlib.sha256()
     started = time.monotonic()
     with log.open("wb") as errors:
         child = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=errors)
+        assert child.stdout is not None
         try:
             for index, frame in enumerate(y4m_frames(child.stdout)):
                 if index >= len(masks):

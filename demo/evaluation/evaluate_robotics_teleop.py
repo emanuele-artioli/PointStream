@@ -33,6 +33,7 @@ def score_pose_tracks(
     Reference observations may be model-derived: this function cannot qualify
     their independence or certify source timestamp alignment.
     """
+
     # The complete reference track defines the registered evaluation window.
     # An absent prediction is missing evidence, never a shorter denominator.
     def index_frames(poses: list[FrameHandPose], name: str) -> dict[int, FrameHandPose]:
@@ -89,7 +90,9 @@ def score_pose_tracks(
             gt_hands_total += 1
             r_pts = np.array(r_hand.landmarks_pixel, dtype=np.float64)
             r_centroid = np.mean(r_pts, axis=0)
-            best_d_hand, best_dist, best_idx = _nearest_hand(r_hand, r_centroid, unmatched_pred, match_px)
+            best_d_hand, best_dist, best_idx = _nearest_hand(
+                r_hand, r_centroid, unmatched_pred, match_px
+            )
 
             pck_total_all += 21
             if best_d_hand is None:
@@ -117,7 +120,9 @@ def score_pose_tracks(
         "mpjpe_pixels": float(np.mean(joint_errors)) if joint_errors else 0.0,
         "mean_confidence": float(np.mean(confidences)) if confidences else 0.0,
         "handedness_agreement": (
-            float(handedness_agreed_count / detected_hands_count) if detected_hands_count > 0 else 1.0
+            float(handedness_agreed_count / detected_hands_count)
+            if detected_hands_count > 0
+            else 1.0
         ),
         "pck50_matched": float(pck_hits_matched / pck_total_matched) if pck_total_matched else 0.0,
         "pck50_all_gt": float(pck_hits_all / pck_total_all) if pck_total_all else 0.0,

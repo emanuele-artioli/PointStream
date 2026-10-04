@@ -11,6 +11,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
@@ -54,7 +55,7 @@ def summarize(raw: dict, report_identity: dict, historical: dict | None = None) 
     compact = []
     regional_deltas = []
     for p in raw["points"]:
-        scores = {}
+        scores: dict[str, dict[str, dict[str, Any]]] = {}
         for target, parts in p["scores"].items():
             if parts["frames"] != 48 or len(parts["per_frame"]) != 48:
                 raise ValueError("incorrect all-frame denominator")
@@ -107,7 +108,7 @@ def summarize(raw: dict, report_identity: dict, historical: dict | None = None) 
                         "fresh original-region scores do not reproduce saved mask metrics"
                     )
                 regional_deltas.append(abs(delta))
-    midpoint = {}
+    midpoint: dict[str, Any] = {}
     for codec in ["av1", "vvc"]:
         midpoint[codec] = {}
         for target in ["original", "plate"]:
