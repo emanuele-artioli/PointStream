@@ -2188,9 +2188,45 @@
     "validation": "31 focused tests passed covering guides, sender, adapter, temporal checks and native receipt mechanics; synthetic/unit checks do not replace actual native smoke."
   },
   "fresh_sender_v1_registration": {
-    "state": "bounded CPU generator running; no sender execution",
+    "state": "frozen before execution; generator complete",
     "remote_stage": "gpu1:/var/tmp/emanuele-gate-a-fresh-sender-v1-20261003",
-    "runnable_arms": "Only C2/C3 two-frame source/background/serialization instruments",
-    "longer_arms": "Prospective only, rejected by sender membership guard; separate temporalworkflow qualification required"
+    "runnable_arms": "C2/C3 frames2 only, all8 configurations retained as prospective_arms",
+    "longer_arms": "Prospective only, rejected by sender membership guard; separate temporalworkflow qualification required",
+    "registration_sha256": "631c3b708735356a3336d73b9224babb5615fcc848eafd2c5236b9c5076ad059"
+  },
+  "fresh_C2_sender2": {
+    "state": "complete_independently_verified_instrument_only",
+    "job": "gpu1:audits/gate-a-fresh-window-sender-C2-f2-job-20261003",
+    "out": "gpu1:audits/gate-a-fresh-window-sender-C2-f2-20261003",
+    "supervisor_pid": 1770503,
+    "budget_seconds": 600,
+    "cpu_threads": 8,
+    "cuda_visible_devices": "",
+    "scope": "source/background/serialized packet instrument; no temporal quality/RD/mainwin inferred",
+    "no_replay": true,
+    "physical_bytes": 44815,
+    "per_frame_placement_count": [
+      2,
+      0
+    ],
+    "proof_sha256": "6c5fce45795e52aec35aee79110eb4c23c0bd38866c90e99c5b0c3e5cb0949dd",
+    "proof": "gpu1:/var/tmp/emanuele-gate-a-fresh-sender-v1-20261003/fresh-C2-f2-independent-proof-20261004.json"
+  },
+  "fresh_temporal_C2_smoke2": {
+    "state": "complete_exit0_claimsreleased_mechanics_passed_root_visual_reviewed",
+    "proof_sha256": "b4d8e7219c65362234a784416c707b578e84839a9908d882791572ade907dc97",
+    "registration_sha256": "a80adcd5f644daa2c9a913e72a25dfd9a7b05750e918d285b3c124cb07564fb2",
+    "artifact": "gpu1:audits/gate-a-fresh-temporal-C2-f2-20261004/proof.json",
+    "physical_bytes": {
+      "null": 45169,
+      "unadapted": 44815,
+      "opaque": 45264,
+      "alpha": 47674
+    },
+    "placement_count_by_frame": [
+      2,
+      2
+    ],
+    "scope": "Static initialappearance only; bothroles visibly placed on bothframes, no pose/task/RD/generalization claim. Original unadapted decode unchanged. Null background retains foreground traces; no clean-background claim."
   }
 }
