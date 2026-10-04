@@ -761,6 +761,8 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
     selftest.add_argument("--include-untracked", action="append", default=[])
     status = actions.add_parser("status")
     status.add_argument("job_id", nargs="?")
+    status.add_argument("--artifact", action="append", default=[], help="bounded read-only export of a selected job artifact")
+    status.add_argument("--output", type=Path, help="new local artifact export directory")
     for name in ("events", "cancel"):
         command = actions.add_parser(name)
         command.add_argument("job_id")
@@ -813,7 +815,18 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
                 monitor.write_json(args.state_dir / "event-acks" / (event_id + ".json"), {"acknowledged": time.time()})
             value = {"acknowledged": args.event_ids}
         else:
-            value = remote_job(args)
+            if getattr(args, "artifact", []):
+                if not args.job_id or args.output is None:
+                    raise fleet.FleetError("artifact export needs a recorded job ID and --output")
+                if not fleet.JOB_ID_RE.fullmatch(args.job_id):
+                    raise fleet.FleetError("invalid job ID")
+                from experiments.jobs.artifacts import export
+                record = monitor.read_json(args.state_dir / f"{args.job_id}.json")
+                if not record:
+                    raise fleet.FleetError("no local job record")
+                value = export(record, args.artifact, args.output)
+            else:
+                value = remote_job(args)
         print(json.dumps(value, indent=2, allow_nan=False))
         return 1 if isinstance(value, dict) and value.get("passed") is False else 0
     except (fleet.FleetError, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as exc:

@@ -115,7 +115,9 @@ rerun and passed **14 tests**. The required four fleet suites passed all
 python -m pytest -q -ra -o addopts='' tests/demo/test_factory_bg_rd.py tests/demo/test_neural_bg.py tests/demo/test_background_provenance.py tests/demo/test_background_codec_smoke.py tests/demo/test_hnerv_latent_packet.py tests/demo/test_background_smoke_specs.py
 python -m pytest -q -ra -o addopts='' tests/demo/test_background_smoke_specs.py
 python -m pytest -q tests/experiments/test_resource_claims.py tests/experiments/test_gpu_fleet.py tests/experiments/test_job_monitor.py tests/experiments/test_fleet_inbox.py
-``` No GPU inference correctness,
+```
+
+No GPU inference correctness,
 LPIPS installation, checkpoint architecture/configuration, historical checkpoint
 identity, training/hold-out provenance, prediction drift or measured temporal
 latent saving is established by these CPU tests.

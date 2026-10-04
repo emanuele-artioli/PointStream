@@ -142,6 +142,14 @@ Completed and interrupted directories remain intact. Cancellation signals only
 owned processes through the supervisor. Existing legacy job IDs remain readable
 and cancellable using their saved local manifests.
 
+Recover selected saved artifacts without a new allocation using
+`scripts/ps-fleet status JOB_ID --artifact smoke/ledger.json --artifact smoke/command.log --output /absolute/new/local/directory`.
+This exports at most twelve job metadata/log/image files, at most 512 KiB each,
+with a twenty-second timeout per read. Paths and symlinks cannot escape the job.
+Exported files are read-only; missing/truncated files are labeled in the receipt,
+and truncated files do not receive a complete content identity. This manager
+operation does not restart workers or replay a stage.
+
 Install the single allow rule in `~/.codex/rules/default.rules` for the absolute
 `/Users/manu/Desktop/PointStream/scripts/ps-fleet` entry point. Remove the former
 fleet prompt and redundant file-reading rules; do not allow general SSH. Validate
