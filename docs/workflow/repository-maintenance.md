@@ -54,30 +54,47 @@ atomically moved intact into `retired-checkouts`, including their Git metadata.
 Machine-readable cleanup records and a supplementary bundle preserve subsequent
 maintenance revisions. Keep this archive private; it can contain local configuration.
 
-Eleven obsolete/merged worktrees were removed after verification, including the
-old foreground checkout's uncommitted connectivity receipt. Remaining useful
-checkouts are the dirty Desktop Cursor checkout, the updated background
-continuation checkout, and the Gate-A evidence checkout. Temporary review
-checkouts can be retired after their revisions and this record are published.
-No blanket cleanup script, reset of user work, or claim/process cancellation was used.
+Eleven obsolete/merged worktrees were removed in the first audit. After Cursor
+finished, its primary checkout was independently archived again at
+`/Users/manu/Datasets/audits/pointstream-maintenance-20261004T211109Z/`.
+Every loose file was compared with its tarball before cleanup. Identical copies
+already exist in merged background code; differing background copies would
+restore dependency stubs, remove bounded provenance/progress collection and
+undo typed fleet recovery checks. The fleet timeout override would increase
+300 seconds to900 without addressing the NFS failure, so it was discarded.
 
-Merged branches were deleted only after a positive ancestry check and exact
-archive identity match. Remote deletions use expected-head leases to protect
-concurrent changes. Checked-out branches and Cursor's shared foundation branch
-are protected. Additional superseded branches may be retired only with their
-recorded disposition and verified recovery history.
+The untracked `gate_a_confirmation/anchors.py` and its five contract tests are
+preserved in that archive. This earlier two-scene sweep prototype is superseded
+by the registered single-arm `native_anchor.py` and `native_anchor_v2.py` in the
+retained Gate-A branch. It lacks the newer original-window/per-frame resource
+receipts and does not bind full promotion to the completed smoke path. It was
+not promoted to a second production runner. Private `.cursor` policy is archived.
+Saved outputs and non-regenerable ignored files remain intact.
 
-| Branch family retained | Disposition |
+The Desktop checkout now follows merged code. Cursor's merged foundation branch
+and the redundant clean background continuation checkout/branch were retired.
+The user also approved retiring all six archived legacy branch families:
+foreground smokes, foreground campaign, GPU permissions, GPU workflow,
+packet-rate quality, and research evidence recovery. Exact heads were checked
+against the verified bundle; remote deletions used expected-head leases.
+No blanket cleanup script or claim/process cancellation was used.
+
+| Branch retained (local and remote unless noted) | Reason it is neither merged nor deleted |
 | --- | --- |
-| `main` | Canonical software; local ref updated without switching Cursor. |
-| `codex/demo-smoke-plans-ps-fleet` | Active dirty Cursor checkout; preserve both local and remote heads. |
-| `codex/demo-background-smokes` | Useful clean continuation checkout, fast-forwarded to repaired PR head. No diagnostic was replayed. |
-| `codex/gate-a-local-confirmation` | Preserve immutable scientific worker revision; it differs from the evidence branch. |
-| `codex/gate-a-receiver-pilot-evidence` | Preserve paused scientific checkout and complete96 evidence. Needs a focused integration review; do not merge the broad experimental tree merely because its evidence is useful. |
-| `codex/paper-evidence-integration` | Retains the recovered dossier and manuscript integration; parent recovery branch can be retired because its exact history is included. Review the large dossier before merging. |
-| `codex/paper-documentation-20260928` | Unmerged71-file documentation rewrite; reconcile current paths and claims before integration. |
-| `cursor/cloud-agent-1790859677423-fmt6d` | Unique282-file snapshot; keep as recovery state, do not merge wholesale. |
-| `cursor/rtm-sam-ladder-at-risk` | Preserve unresolved source/clip warning until a consumer/input audit proves it superseded. |
+| `main` | Canonical maintained software and default branch. |
+| `codex/gate-a-local-confirmation` | Exact scientific execution revision; deleting or merging its broad experimental tree would obscure the distinction from the evidence revision. |
+| `codex/gate-a-receiver-pilot-evidence` | Paused scientific checkout and complete96-frame evidence; requires focused scientific integration review. |
+| `codex/paper-evidence-integration` | Large recovered dossier and manuscript integration contain unique provenance; qualify its claims and source records before merging. |
+| `codex/paper-documentation-20260928` | Unique71-file documentation rewrite needs reconciliation with current paths, results and claims. |
+| `cursor/cloud-agent-1790859677423-fmt6d` | Thirteen unique diagnostic scripts plus historical media/output snapshot. They lack current fleet admission/provenance review; preserve until useful diagnostics and external data are separated. |
+| `cursor/rtm-sam-ladder-at-risk` (local only) | Contains unresolved clip identity warning plus unverified metric/cache and mask-selection changes. The visible historical-demo warning is integrated separately; keep original branch until source/media identities are audited. Do not push its unverified metric replacements as reviewed work. |
+
+The only additional local PointStream worktree is
+`/private/tmp/pointstream-packet-rate-quality` on the paused Gate-A evidence
+branch. Keep it clean and pinned; create a separate integration branch when
+reviewing its source. The standalone manuscript clone
+`/private/tmp/pointstream-paper-packet-rate-quality` is a different repository,
+not a PointStream Git worktree, and remains useful for the manuscript session.
 
 Legacy GPU permission prose and unrestricted-launch workflow branches are
 superseded by the inbox interface; the useful FFmpeg correction is ported
@@ -104,8 +121,28 @@ across unavailable hosts is not verified. Archive and reconcile their remote
 history/process ownership before removing them; cleanliness alone is insufficient.
 No remote worktree, dataset, model, checkpoint, frozen release or source tree was moved.
 
-Next: integrate main into Cursor's branch after preserving its selected dirty
-changes; diagnose DCVC Git collection with a discriminating bounded check;
+The bounded follow-up on gpu3 confirmed four old `/tmp` checkouts clean and
+`temporal-mask-wire` dirty. Primary and confirmation status exceeded six seconds;
+the previous observed dirty state remains unresolved. Server-only branch
+retention is explicit:
+
+| Server branch | Reason retained |
+| --- | --- |
+| `main` | Remote primary contains unfinished work; do not fast-forward/reset over it. |
+| `feat/gate-b-confirmation-and-second-domain` | Paused confirmation work and changed second-domain manifest require provenance review. |
+| `codex/foreground-campaign-20260924` | Server head b771b4b differs from the retired Mac/PR143 head; retain until remote history is archived and ownership reconciled. |
+| `codex/journal-experiment-plan` | Clean checkout, but unique remote-only head ef87e1e is absent from the verified Mac archive; preserve research planning until archived/reviewed. |
+| `codex/r01-landmark-metrics` | Clean checkout, but remote-only head4e9bcba has not been imported/reviewed or archived here. |
+| `codex/temporal-mask-wire` | Uncommitted `src/runner/mask_wire.py` remains; preserve until its code and scientific use are reviewed. |
+| `codex/rebuild-semantic-thesis` | Clean checkout, but remote-only head88f17b9 is outside the verified Mac archive; reconcile manuscript/provenance before retirement. |
+
+These seven server worktree registrations share Git metadata. A clean `/tmp`
+checkout does not establish inactivity on every host; gpu2 is unreachable.
+None is silently classified as safe to delete based only on its age.
+
+
+Next: audit the demo source/media identities and selectively integrate qualified
+scientific branches; diagnose DCVC Git collection with a discriminating bounded check;
 finish the96-frame VVC comparison and AV1 overlap; review/integrate qualified
 scientific evidence; then perform the separate storage maintenance procedure in
 [storage-layout.md](storage-layout.md). Keep final training gated. Neither recent
